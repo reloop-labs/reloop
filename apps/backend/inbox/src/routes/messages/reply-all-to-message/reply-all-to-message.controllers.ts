@@ -8,6 +8,7 @@ import {
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
+import { resolveThreadIdForMessage } from "../../../lib/thread-correlation";
 import { proxySendToMailService } from "../messages.helper";
 
 export async function replyAllToMessageController(
@@ -19,6 +20,7 @@ export async function replyAllToMessageController(
 		to?: string | string[];
 		cc?: string | string[];
 		bcc?: string | string[];
+		threadId?: string;
 		attachments?: Array<{
 			content?: string;
 			filename?: string;
@@ -45,7 +47,6 @@ export async function replyAllToMessageController(
 		originalInbound?.replyTo ?? originalInbound?.fromEmail ?? "";
 	let originalSubject = originalInbound?.subject ?? "";
 	let headerMsgId = originalInbound?.messageId ?? null;
-	let resolvedThreadId: string | undefined;
 	let originalToEmails = originalInbound?.toEmails ?? [];
 	let originalCcEmails = (originalInbound?.ccEmails as string[]) ?? [];
 
@@ -58,44 +59,68 @@ export async function replyAllToMessageController(
 		});
 
 		if (!outboundLog) {
-			throw createError({
-				status: 404,
-				message: "Message not found",
-				why: `Message ${messageId} was not found in your organization`,
-				fix: "Verify the message ID",
+			const fallbackThreadId =
+				body.threadId ||
+				(await resolveThreadIdForMessage(messageId, organizationId));
+			const lastInbound = fallbackThreadId
+				? await db.query.threadMessage.findFirst({
+						where: and(
+							eq(threadMessage.threadId, fallbackThreadId),
+							eq(threadMessage.direction, "inbound"),
+						),
+						orderBy: (m, { desc }) => [desc(m.messageAt)],
+					})
+				: null;
+			const inb = lastInbound?.inboundEmailId
+				? await db.query.inboundEmail.findFirst({
+						where: eq(inboundEmail.id, lastInbound.inboundEmailId),
+					})
+				: null;
+			if (!inb) {
+				throw createError({
+					status: 404,
+					message: "Message not found",
+					why: `Message ${messageId} was not found in your organization`,
+					fix: "Verify the message ID",
+				});
+			}
+			mailboxId = inb.mailboxId;
+			defaultReplyTo = inb.replyTo ?? inb.fromEmail ?? "";
+			originalToEmails = inb.toEmails ?? [];
+			originalCcEmails = (inb.ccEmails as string[]) ?? [];
+			originalSubject = inb.subject || lastInbound?.subject || "";
+			headerMsgId = inb.messageId ?? lastInbound?.rfc822MessageId ?? null;
+		} else {
+			const mbx = await db.query.mailbox.findFirst({
+				where: and(
+					eq(mailbox.organizationId, organizationId),
+					eq(mailbox.email, outboundLog.fromEmail),
+				),
 			});
+			const firstMbx =
+				mbx ||
+				(await db.query.mailbox.findFirst({
+					where: eq(mailbox.organizationId, organizationId),
+				}));
+
+			mailboxId = firstMbx?.id ?? "";
+			const toArray = Array.isArray(outboundLog.toEmails)
+				? (outboundLog.toEmails as string[])
+				: [];
+			defaultReplyTo =
+				toArray[0] || outboundLog.replyTo || outboundLog.fromEmail;
+			originalToEmails = toArray;
+			originalCcEmails = Array.isArray(outboundLog.ccEmails)
+				? (outboundLog.ccEmails as string[])
+				: [];
+			originalSubject = outboundLog.subject || "";
+			headerMsgId = outboundLog.messageId || null;
 		}
-
-		const mbx = await db.query.mailbox.findFirst({
-			where: and(
-				eq(mailbox.organizationId, organizationId),
-				eq(mailbox.email, outboundLog.fromEmail),
-			),
-		});
-		const firstMbx =
-			mbx ||
-			(await db.query.mailbox.findFirst({
-				where: eq(mailbox.organizationId, organizationId),
-			}));
-
-		mailboxId = firstMbx?.id ?? "";
-		const toArray = Array.isArray(outboundLog.toEmails)
-			? (outboundLog.toEmails as string[])
-			: [];
-		defaultReplyTo = toArray[0] || outboundLog.replyTo || outboundLog.fromEmail;
-		originalToEmails = toArray;
-		originalCcEmails = Array.isArray(outboundLog.ccEmails)
-			? (outboundLog.ccEmails as string[])
-			: [];
-		originalSubject = outboundLog.subject || "";
-		headerMsgId = outboundLog.messageId || null;
-	} else {
-		const threadMsg = await db.query.threadMessage.findFirst({
-			where: eq(threadMessage.inboundEmailId, messageId),
-			columns: { threadId: true },
-		});
-		resolvedThreadId = threadMsg?.threadId;
 	}
+
+	const resolvedThreadId =
+		body.threadId ||
+		(await resolveThreadIdForMessage(messageId, organizationId));
 
 	// Resolve mailbox to get our email
 	const mbx = await db.query.mailbox.findFirst({

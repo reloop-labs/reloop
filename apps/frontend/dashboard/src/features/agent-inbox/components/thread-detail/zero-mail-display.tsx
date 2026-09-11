@@ -131,7 +131,7 @@ export const ZeroMailDisplay = ({
 		: email?.htmlBody || msg.htmlBody;
 	const bodyText = isTranslated
 		? translatedTextMap[key] || "Translating..."
-		: email?.textBody || msg.textBody;
+		: email?.textBody || msg.textBody || msg.preview;
 
 	const mailboxEmail = extractBareEmail(mailbox?.email || "").toLowerCase();
 	const parseRecipients = (raw: unknown) => {

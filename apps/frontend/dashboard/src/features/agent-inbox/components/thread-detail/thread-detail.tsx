@@ -157,6 +157,7 @@ export const ThreadDetail = ({
 		findDraft,
 		getDraft,
 		deleteDraft,
+		threads: inboxThreads,
 	} = useAgentInbox();
 
 	// ── UI state ──────────────────────────────────────────────────────────────
@@ -284,6 +285,31 @@ export const ThreadDetail = ({
 	// Mark conversation read when the detail pane opens an unread thread.
 	// List selection also triggers this; this covers any path that mounts detail.
 	useEffect(() => {
+		if (optimisticReplies.length === 0) return;
+		if (!threadDataMatches || !threadData?.messages?.length) return;
+		setOptimisticReplies((prev) =>
+			prev.filter((opt) => {
+				const body = String(opt.email?.textBody || "").trim();
+				if (!body) return false;
+				const snippet = body.slice(0, 80);
+				return !threadData.messages.some(
+					(m: {
+						direction?: string;
+						email?: { textBody?: string | null };
+						preview?: string | null;
+					}) => {
+						if (m.direction !== "outbound") return false;
+						const other = String(
+							m.email?.textBody || m.preview || "",
+						).trim();
+						return other.includes(snippet);
+					},
+				);
+			}),
+		);
+	}, [optimisticReplies.length, threadData, threadDataMatches]);
+
+	useEffect(() => {
 		if (!thread?.unread) return;
 		const id = thread.messageId || thread.id;
 		if (!id) return;
@@ -305,6 +331,21 @@ export const ThreadDetail = ({
 		!!thread?.threadId && isLoadingThread && !threadDataMatches;
 
 	// ── Build display messages list ───────────────────────────────────────────
+	const siblingOutbounds = useMemo(() => {
+		if (!thread) return [];
+		const keys = new Set(
+			[thread.id, thread.threadId, thread.messageId].filter(Boolean),
+		);
+		return inboxThreads.filter(
+			(t) =>
+				t.direction === "outbound" &&
+				t.id !== thread.id &&
+				(Boolean(t.threadId && keys.has(t.threadId)) ||
+					Boolean(t.threadId && keys.has(t.id)) ||
+					!t.threadId),
+		);
+	}, [inboxThreads, thread]);
+
 	const displayMessages = useMemo(
 		() =>
 			buildDisplayMessages({
@@ -314,6 +355,7 @@ export const ThreadDetail = ({
 				isLoadingThread,
 				mailboxEmail: mailbox?.email || "",
 				optimisticReplies,
+				siblingOutbounds,
 			}),
 		[
 			threadData,
@@ -322,6 +364,7 @@ export const ThreadDetail = ({
 			thread,
 			mailbox?.email,
 			optimisticReplies,
+			siblingOutbounds,
 		],
 	);
 
@@ -738,6 +781,11 @@ export const ThreadDetail = ({
 			bcc: payload.bcc && payload.bcc.length > 0 ? payload.bcc : undefined,
 		};
 
+		const conversationId =
+			thread.threadId?.startsWith("thr_") || thread.id.startsWith("thr_")
+				? thread.threadId || thread.id
+				: undefined;
+
 		const send =
 			replyMode === "replyAll"
 				? sendReplyAll(
@@ -746,6 +794,7 @@ export const ThreadDetail = ({
 						payload.html,
 						payload.attachments,
 						recipients,
+						conversationId,
 					)
 				: sendReply(
 						sendId,
@@ -753,6 +802,7 @@ export const ThreadDetail = ({
 						payload.html,
 						payload.attachments,
 						recipients,
+						conversationId,
 					);
 
 		toast.promise(send, {
@@ -766,7 +816,6 @@ export const ThreadDetail = ({
 					}
 				}
 				await Promise.all([mutateThread(), refresh()]);
-				setOptimisticReplies([]);
 				isReplyingRef.current = false;
 				setIsReplying(false);
 				return "Reply sent successfully";

@@ -92,8 +92,27 @@ export async function getSentMessagesController(
 
 	return sentEmails.map((email) => {
 		const threadId = threadIdByLog.get(email.id);
+		const toEmails = Array.isArray(email.toEmails)
+			? email.toEmails
+			: email.toEmails
+				? [String(email.toEmails)]
+				: [];
 		return {
-			...email,
+			id: email.id,
+			messageId: email.messageId,
+			organizationId: email.organizationId,
+			domainId: email.domainId,
+			fromEmail: email.fromEmail,
+			fromName: email.fromName ?? null,
+			toEmails,
+			ccEmails: Array.isArray(email.ccEmails) ? email.ccEmails : [],
+			bccEmails: Array.isArray(email.bccEmails) ? email.bccEmails : [],
+			subject: email.subject || "",
+			textBody: email.textBody ?? null,
+			htmlBody: email.htmlBody ?? null,
+			status: email.status,
+			errorMessage: email.errorMessage ?? null,
+			createdAt: email.createdAt,
 			threadId: threadId ?? null,
 			isStarred: threadId ? Boolean(starredByThread.get(threadId)) : false,
 			attachments: mapEmailLogAttachments(email.attachments),

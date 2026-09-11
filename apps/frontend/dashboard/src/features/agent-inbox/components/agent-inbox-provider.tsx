@@ -201,6 +201,7 @@ interface AgentInboxContextValue {
 			cc?: string | string[];
 			bcc?: string | string[];
 		},
+		threadId?: string,
 	) => Promise<void>;
 	sendReplyAll: (
 		id: string,
@@ -216,6 +217,7 @@ interface AgentInboxContextValue {
 			cc?: string | string[];
 			bcc?: string | string[];
 		},
+		threadId?: string,
 	) => Promise<void>;
 	sendForward: (
 		id: string,
@@ -1290,11 +1292,18 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				cc?: string | string[];
 				bcc?: string | string[];
 			},
+			threadId?: string,
 		) => {
 			const res = await apiFetch(`/api/inbox/v1/messages/${id}/reply`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text, html, attachments, ...recipients }),
+				body: JSON.stringify({
+					text,
+					html,
+					attachments,
+					threadId,
+					...recipients,
+				}),
 			});
 
 			if (!res.ok) {
@@ -1302,9 +1311,13 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to send reply");
 			}
 
-			await Promise.all([mutateMessages(), mutateSentMessages()]);
+			await Promise.all([
+				mutateMessages(),
+				mutateSentMessages(),
+				mutateThreads(),
+			]);
 		},
-		[mutateMessages, mutateSentMessages],
+		[mutateMessages, mutateSentMessages, mutateThreads],
 	);
 
 	const sendReplyAll = useCallback(
@@ -1322,11 +1335,18 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				cc?: string | string[];
 				bcc?: string | string[];
 			},
+			threadId?: string,
 		) => {
 			const res = await apiFetch(`/api/inbox/v1/messages/${id}/reply-all`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text, html, attachments, ...recipients }),
+				body: JSON.stringify({
+					text,
+					html,
+					attachments,
+					threadId,
+					...recipients,
+				}),
 			});
 
 			if (!res.ok) {
@@ -1334,9 +1354,13 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to send reply all");
 			}
 
-			await Promise.all([mutateMessages(), mutateSentMessages()]);
+			await Promise.all([
+				mutateMessages(),
+				mutateSentMessages(),
+				mutateThreads(),
+			]);
 		},
-		[mutateMessages, mutateSentMessages],
+		[mutateMessages, mutateSentMessages, mutateThreads],
 	);
 
 	const sendForward = useCallback(

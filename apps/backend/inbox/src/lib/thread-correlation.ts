@@ -2,6 +2,7 @@ import { db } from "@reloop/db/client";
 import {
 	emailLog,
 	emailThread,
+	inboundEmail,
 	mailbox,
 	threadMessage,
 } from "@reloop/db/schema";
@@ -17,6 +18,13 @@ const log = {
 function bareEmail(value: string): string {
 	const match = value.match(/<([^>]+)>/);
 	return (match?.[1] ?? value).trim().toLowerCase();
+}
+
+function normalizeSubject(value: string | null | undefined): string {
+	return (value || "")
+		.replace(/^(re|fw|fwd):\s*/gi, "")
+		.trim()
+		.toLowerCase();
 }
 
 function uniqueParticipants(...groups: Array<string[] | null | undefined>) {
@@ -185,6 +193,48 @@ export async function correlateInboundThread({
 }
 
 /**
+ * Resolve the conversation thread for a reply, no matter which id the
+ * client sent (inbound email, email log, thread message, or thread).
+ */
+export async function resolveThreadIdForMessage(
+	messageId: string,
+	organizationId: string,
+): Promise<string | undefined> {
+	const id = messageId.trim();
+	if (!id) return undefined;
+
+	const threadById = await db.query.emailThread.findFirst({
+		where: and(
+			eq(emailThread.id, id),
+			eq(emailThread.organizationId, organizationId),
+		),
+		columns: { id: true },
+	});
+	if (threadById) return threadById.id;
+
+	const linked = await db.query.threadMessage.findFirst({
+		where: or(
+			eq(threadMessage.id, id),
+			eq(threadMessage.inboundEmailId, id),
+			eq(threadMessage.emailLogId, id),
+		),
+		columns: { threadId: true },
+	});
+	if (linked?.threadId) return linked.threadId;
+
+	const inbound = await db.query.inboundEmail.findFirst({
+		where: and(
+			eq(inboundEmail.id, id),
+			eq(inboundEmail.organizationId, organizationId),
+		),
+		columns: { threadId: true },
+	});
+	if (inbound?.threadId) return inbound.threadId;
+
+	return undefined;
+}
+
+/**
  * Appends an outbound (sent) email to an existing thread.
  * Called from the mail send pipeline when `thread_id` is provided.
  */
@@ -321,6 +371,59 @@ export async function ensureOutboundThreadForEmailLog({
 		logRow.toEmails,
 		logRow.ccEmails,
 	);
+
+	const headerInReplyTo =
+		logRow.headers?.["In-Reply-To"] ||
+		logRow.headers?.["in-reply-to"] ||
+		undefined;
+	if (headerInReplyTo) {
+		const match = await db.query.threadMessage.findFirst({
+			where: eq(threadMessage.rfc822MessageId, headerInReplyTo),
+			columns: { threadId: true },
+		});
+		if (match?.threadId) {
+			await appendOutboundToThread({
+				threadId: match.threadId,
+				organizationId,
+				emailLogId,
+				fromEmail: bareEmail(logRow.fromEmail) || logRow.fromEmail,
+				fromName: logRow.fromName ?? undefined,
+				subject: logRow.subject,
+				textBody: logRow.textBody || "",
+				messageId: logRow.messageId || "",
+				inReplyTo: headerInReplyTo,
+				sentAt: messageAt,
+			});
+			return { threadId: match.threadId, created: false };
+		}
+	}
+
+	const subjectKey = normalizeSubject(logRow.subject);
+	if (subjectKey && resolvedMailboxId) {
+		const subjectMatch = await db.query.emailThread.findFirst({
+			where: and(
+				eq(emailThread.organizationId, organizationId),
+				eq(emailThread.mailboxId, resolvedMailboxId),
+				sql`lower(regexp_replace(coalesce(${emailThread.subject}, ''), '^(re|fw|fwd):\\s*', '', 'gi')) = ${subjectKey}`,
+			),
+			columns: { id: true },
+			orderBy: (t, { desc }) => [desc(t.lastMessageAt)],
+		});
+		if (subjectMatch?.id) {
+			await appendOutboundToThread({
+				threadId: subjectMatch.id,
+				organizationId,
+				emailLogId,
+				fromEmail: bareEmail(logRow.fromEmail) || logRow.fromEmail,
+				fromName: logRow.fromName ?? undefined,
+				subject: logRow.subject,
+				textBody: logRow.textBody || "",
+				messageId: logRow.messageId || "",
+				sentAt: messageAt,
+			});
+			return { threadId: subjectMatch.id, created: false };
+		}
+	}
 
 	const [newThread] = await db
 		.insert(emailThread)

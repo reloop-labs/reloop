@@ -32,6 +32,14 @@ function uniqueAddresses(
 	return out;
 }
 
+function asStringList(value: unknown): string[] {
+	if (Array.isArray(value)) {
+		return value.map((v) => String(v ?? "").trim()).filter(Boolean);
+	}
+	if (typeof value === "string" && value.trim()) return [value.trim()];
+	return [];
+}
+
 export async function getThreadController(id: string, organizationId: string) {
 	// 1. Try finding directly by emailThread.id
 	let thread = await db.query.emailThread.findFirst({
@@ -87,32 +95,82 @@ export async function getThreadController(id: string, organizationId: string) {
 
 	// 4. If a thread record was found, hydrate messages
 	if (thread) {
+		const rows =
+			thread.messages.length > 0
+				? thread.messages
+				: await db.query.threadMessage.findMany({
+						where: eq(threadMessage.threadId, thread.id),
+						orderBy: [desc(threadMessage.messageAt)],
+					});
+
 		const hydratedMessages = await Promise.all(
-			thread.messages.map(async (msg) => {
+			rows.map(async (msg) => {
+				const createdAt = asIso(msg.createdAt);
+				const messageAt = asIso(msg.messageAt);
+				const base = {
+					id: msg.id,
+					threadId: msg.threadId,
+					direction: msg.direction,
+					inboundEmailId: msg.inboundEmailId ?? null,
+					emailLogId: msg.emailLogId ?? null,
+					fromEmail: msg.fromEmail || "",
+					fromName: msg.fromName ?? null,
+					subject: msg.subject ?? null,
+					preview: msg.preview ?? null,
+					messageAt,
+					rfc822MessageId: msg.rfc822MessageId ?? null,
+					inReplyTo: msg.inReplyTo ?? null,
+					createdAt,
+				};
+
 				if (msg.direction === "inbound" && msg.inboundEmailId) {
 					const email = await db.query.inboundEmail.findFirst({
 						where: eq(inboundEmail.id, msg.inboundEmailId),
 						with: { attachments: true },
 					});
 					return {
-						...msg,
+						...base,
 						email: email
 							? {
 									id: email.id,
 									fromEmail: email.fromEmail,
-									fromName: email.fromName,
-									toEmails: email.toEmails,
-									ccEmails: email.ccEmails ?? [],
-									replyTo: email.replyTo,
-									subject: email.subject,
-									textBody: email.textBody,
-									htmlBody: email.htmlBody,
-									isRead: email.isRead,
-									isStarred: email.isStarred,
-									attachments: email.attachments,
-									createdAt: email.createdAt,
+									fromName: email.fromName ?? null,
+									toEmails: asStringList(email.toEmails),
+									ccEmails: asStringList(email.ccEmails),
+									replyTo: email.replyTo ?? null,
+									subject: email.subject ?? null,
+									textBody: email.textBody ?? msg.preview ?? null,
+									htmlBody: email.htmlBody ?? null,
+									isRead: Boolean(email.isRead),
+									isStarred: Boolean(email.isStarred),
+									attachments: (email.attachments ?? []).map((att) => ({
+										id: att.id,
+										inboundEmailId: att.inboundEmailId,
+										filename: att.filename,
+										contentType: att.contentType,
+										size: typeof att.size === "number" ? att.size : 0,
+										storagePath: att.storagePath,
+										contentDisposition: att.contentDisposition ?? null,
+										contentId: att.contentId ?? null,
+										createdAt: asIso(att.createdAt),
+									})),
+									createdAt: asIso(email.createdAt),
 								}
-							: null,
+							: {
+									id: msg.inboundEmailId,
+									fromEmail: msg.fromEmail || "",
+									fromName: msg.fromName ?? null,
+									toEmails: [],
+									ccEmails: [],
+									replyTo: null,
+									subject: msg.subject ?? null,
+									textBody: msg.preview ?? null,
+									htmlBody: null,
+									isRead: true,
+									isStarred: false,
+									attachments: [],
+									createdAt: messageAt,
+								},
 					};
 				}
 
@@ -121,36 +179,52 @@ export async function getThreadController(id: string, organizationId: string) {
 						where: eq(emailLog.id, msg.emailLogId),
 					});
 					return {
-						...msg,
+						...base,
 						errorMessage: email?.errorMessage ?? null,
 						email: email
 							? {
 									id: email.id,
 									fromEmail: email.fromEmail,
-									fromName: email.fromName,
-									toEmails: email.toEmails,
-									ccEmails: email.ccEmails ?? [],
-									bccEmails: email.bccEmails ?? [],
-									subject: email.subject,
-									textBody: email.textBody,
-									htmlBody: email.htmlBody,
-									status: email.status,
-									errorMessage: email.errorMessage,
-									sentAt: email.sentAt,
-									createdAt: email.createdAt,
+									fromName: email.fromName ?? null,
+									toEmails: asStringList(email.toEmails),
+									ccEmails: asStringList(email.ccEmails),
+									bccEmails: asStringList(email.bccEmails),
+									subject: email.subject ?? null,
+									textBody: email.textBody ?? msg.preview ?? null,
+									htmlBody: email.htmlBody ?? null,
+									status: email.status || "sent",
+									errorMessage: email.errorMessage ?? null,
+									sentAt: email.sentAt ? asIso(email.sentAt) : null,
+									createdAt: asIso(email.createdAt),
 									attachments: mapEmailLogAttachments(email.attachments),
 								}
-							: null,
+							: {
+									id: msg.emailLogId,
+									fromEmail: msg.fromEmail || "",
+									fromName: msg.fromName ?? null,
+									toEmails: [],
+									ccEmails: [],
+									bccEmails: [],
+									subject: msg.subject ?? null,
+									textBody: msg.preview ?? null,
+									htmlBody: null,
+									status: "sent",
+									errorMessage: null,
+									sentAt: messageAt,
+									createdAt: messageAt,
+									attachments: [],
+								},
 					};
 				}
 
-				return { ...msg, email: null };
+				return { ...base, email: null };
 			}),
 		);
 
 		return {
 			...thread,
 			participants: thread.participants || [],
+			messageCount: Math.max(thread.messageCount ?? 0, hydratedMessages.length),
 			messages: hydratedMessages,
 		};
 	}
@@ -166,18 +240,19 @@ export async function getThreadController(id: string, organizationId: string) {
 
 	if (standaloneInbound) {
 		const createdAt = asIso(standaloneInbound.createdAt);
+		const preview = (
+			standaloneInbound.snippet ||
+			standaloneInbound.textBody ||
+			""
+		)
+			.toString()
+			.slice(0, 200);
 		return {
 			id: standaloneInbound.id,
 			mailboxId: standaloneInbound.mailboxId,
 			organizationId: standaloneInbound.organizationId,
 			subject: standaloneInbound.subject ?? "(no subject)",
-			lastMessagePreview: (
-				standaloneInbound.snippet ||
-				standaloneInbound.textBody ||
-				""
-			)
-				.toString()
-				.slice(0, 200),
+			lastMessagePreview: preview,
 			lastMessageAt: createdAt,
 			status: "active",
 			messageCount: 1,
@@ -198,15 +273,9 @@ export async function getThreadController(id: string, organizationId: string) {
 					inboundEmailId: standaloneInbound.id,
 					emailLogId: null,
 					fromEmail: standaloneInbound.fromEmail,
-					fromName: standaloneInbound.fromName,
-					subject: standaloneInbound.subject,
-					preview: (
-						standaloneInbound.snippet ||
-						standaloneInbound.textBody ||
-						""
-					)
-						.toString()
-						.slice(0, 200),
+					fromName: standaloneInbound.fromName ?? null,
+					subject: standaloneInbound.subject ?? null,
+					preview,
 					messageAt: createdAt,
 					rfc822MessageId: standaloneInbound.messageId ?? null,
 					inReplyTo: null,
@@ -214,16 +283,26 @@ export async function getThreadController(id: string, organizationId: string) {
 					email: {
 						id: standaloneInbound.id,
 						fromEmail: standaloneInbound.fromEmail,
-						fromName: standaloneInbound.fromName,
-						toEmails: standaloneInbound.toEmails ?? [],
-						ccEmails: standaloneInbound.ccEmails ?? [],
-						replyTo: standaloneInbound.replyTo,
-						subject: standaloneInbound.subject,
-						textBody: standaloneInbound.textBody,
-						htmlBody: standaloneInbound.htmlBody,
+						fromName: standaloneInbound.fromName ?? null,
+						toEmails: asStringList(standaloneInbound.toEmails),
+						ccEmails: asStringList(standaloneInbound.ccEmails),
+						replyTo: standaloneInbound.replyTo ?? null,
+						subject: standaloneInbound.subject ?? null,
+						textBody: standaloneInbound.textBody ?? null,
+						htmlBody: standaloneInbound.htmlBody ?? null,
 						isRead: Boolean(standaloneInbound.isRead),
 						isStarred: Boolean(standaloneInbound.isStarred),
-						attachments: standaloneInbound.attachments ?? [],
+						attachments: (standaloneInbound.attachments ?? []).map((att) => ({
+							id: att.id,
+							inboundEmailId: att.inboundEmailId,
+							filename: att.filename,
+							contentType: att.contentType,
+							size: typeof att.size === "number" ? att.size : 0,
+							storagePath: att.storagePath,
+							contentDisposition: att.contentDisposition ?? null,
+							contentId: att.contentId ?? null,
+							createdAt: asIso(att.createdAt),
+						})),
 						createdAt,
 					},
 				},
@@ -241,22 +320,22 @@ export async function getThreadController(id: string, organizationId: string) {
 
 	if (standaloneLog) {
 		const createdAt = asIso(standaloneLog.createdAt);
-		const ccEmails = standaloneLog.ccEmails ?? [];
-		const bccEmails = standaloneLog.bccEmails ?? [];
+		const ccEmails = asStringList(standaloneLog.ccEmails);
+		const bccEmails = asStringList(standaloneLog.bccEmails);
+		const toEmails = asStringList(standaloneLog.toEmails);
+		const preview = (standaloneLog.textBody || "").toString().slice(0, 200);
 		return {
 			id: standaloneLog.id,
 			mailboxId: null,
 			organizationId: standaloneLog.organizationId,
 			subject: standaloneLog.subject ?? "(no subject)",
-			lastMessagePreview: (standaloneLog.textBody || "")
-				.toString()
-				.slice(0, 200),
+			lastMessagePreview: preview,
 			lastMessageAt: createdAt,
 			status: "active",
 			messageCount: 1,
 			participants: uniqueAddresses(
 				[standaloneLog.fromEmail],
-				standaloneLog.toEmails,
+				toEmails,
 				ccEmails,
 			),
 			isRead: true,
@@ -271,9 +350,9 @@ export async function getThreadController(id: string, organizationId: string) {
 					inboundEmailId: null,
 					emailLogId: standaloneLog.id,
 					fromEmail: standaloneLog.fromEmail,
-					fromName: standaloneLog.fromName,
-					subject: standaloneLog.subject,
-					preview: (standaloneLog.textBody || "").toString().slice(0, 200),
+					fromName: standaloneLog.fromName ?? null,
+					subject: standaloneLog.subject ?? null,
+					preview,
 					messageAt: createdAt,
 					errorMessage: standaloneLog.errorMessage ?? null,
 					rfc822MessageId: standaloneLog.messageId ?? null,
@@ -282,15 +361,15 @@ export async function getThreadController(id: string, organizationId: string) {
 					email: {
 						id: standaloneLog.id,
 						fromEmail: standaloneLog.fromEmail,
-						fromName: standaloneLog.fromName,
-						toEmails: standaloneLog.toEmails ?? [],
+						fromName: standaloneLog.fromName ?? null,
+						toEmails,
 						ccEmails,
 						bccEmails,
-						subject: standaloneLog.subject,
-						textBody: standaloneLog.textBody,
-						htmlBody: standaloneLog.htmlBody,
-						status: standaloneLog.status,
-						errorMessage: standaloneLog.errorMessage,
+						subject: standaloneLog.subject ?? null,
+						textBody: standaloneLog.textBody ?? null,
+						htmlBody: standaloneLog.htmlBody ?? null,
+						status: standaloneLog.status || "sent",
+						errorMessage: standaloneLog.errorMessage ?? null,
 						sentAt: standaloneLog.sentAt ? asIso(standaloneLog.sentAt) : null,
 						createdAt,
 						attachments: mapEmailLogAttachments(standaloneLog.attachments),

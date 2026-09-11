@@ -9,6 +9,8 @@
 export type DisplayMessageThread = {
 	id: string;
 	threadId?: string | null;
+	mailboxId?: string;
+	messageId?: string;
 	direction?: string;
 	status?: string;
 	errorMessage?: string | null;
@@ -31,7 +33,44 @@ export type DisplayMessageInput = {
 	isLoadingThread: boolean;
 	mailboxEmail?: string;
 	optimisticReplies?: any[];
+	siblingOutbounds?: DisplayMessageThread[];
 };
+
+function subjectKey(value: string | null | undefined): string {
+	return (value || "")
+		.replace(/^(re|fw|fwd):\s*/gi, "")
+		.trim()
+		.toLowerCase();
+}
+
+function outboundAsDisplayMessage(row: DisplayMessageThread) {
+	return {
+		id: row.id,
+		direction: "outbound" as const,
+		fromEmail: row.from.email,
+		fromName: row.from.name || null,
+		messageAt: row.receivedAt,
+		subject: row.subject,
+		status: row.status,
+		errorMessage: row.errorMessage ?? null,
+		emailLogId: row.id,
+		email: {
+			id: row.id,
+			fromEmail: row.from.email,
+			fromName: row.from.name || null,
+			toEmails: row.toEmails || [],
+			ccEmails: row.ccEmails ?? [],
+			bccEmails: row.bccEmails ?? [],
+			subject: row.subject,
+			textBody: row.bodyText,
+			htmlBody: row.bodyHtml,
+			status: row.status,
+			errorMessage: row.errorMessage ?? null,
+			attachments: row.attachments || [],
+			createdAt: row.receivedAt,
+		},
+	};
+}
 
 export function buildDisplayMessages({
 	thread,
@@ -40,6 +79,7 @@ export function buildDisplayMessages({
 	isLoadingThread,
 	mailboxEmail = "",
 	optimisticReplies = [],
+	siblingOutbounds = [],
 }: DisplayMessageInput): any[] {
 	if (!thread) return [];
 
@@ -126,7 +166,36 @@ export function buildDisplayMessages({
 		];
 	}
 
-	const apiIds = new Set(base.map((m) => m.id));
+	const apiIds = new Set(
+		base.flatMap((m) =>
+			[m.id, m.email?.id, m.emailLogId, m.inboundEmailId].filter(Boolean),
+		),
+	);
+	const threadKeys = new Set(
+		[thread.id, thread.threadId].filter(Boolean) as string[],
+	);
+	const threadSubject = subjectKey(thread.subject);
+	const extras = siblingOutbounds
+		.filter((row) => {
+			if (row.direction && row.direction !== "outbound") return false;
+			if (apiIds.has(row.id) || (row.messageId && apiIds.has(row.messageId))) {
+				return false;
+			}
+			if (row.threadId && threadKeys.has(row.threadId)) return true;
+			if (row.threadId) return false;
+			return (
+				!!threadSubject &&
+				subjectKey(row.subject) === threadSubject &&
+				(!thread.mailboxId ||
+					!row.mailboxId ||
+					row.mailboxId === thread.mailboxId)
+			);
+		})
+		.map(outboundAsDisplayMessage);
+
 	const pending = optimisticReplies.filter((r) => !apiIds.has(r.id));
-	return [...base, ...pending];
+	return [...base, ...extras, ...pending].sort(
+		(a, b) =>
+			new Date(a.messageAt).getTime() - new Date(b.messageAt).getTime(),
+	);
 }

@@ -38,6 +38,11 @@ export const replyAllToMessageRoute = new Elysia().use(authMiddleware).post(
 					description: "BCC recipient address(es)",
 				}),
 			),
+			threadId: t.Optional(
+				t.String({
+					description: "Conversation thread to append this reply to",
+				}),
+			),
 			attachments: t.Optional(
 				t.Array(
 					t.Object({
