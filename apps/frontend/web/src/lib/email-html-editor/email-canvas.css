@@ -247,3 +247,89 @@
 	outline: 2px solid #3b82f6 !important;
 	outline-offset: 0 !important;
 }
+
+/* Section, container, column, table, and block selection outline in the canvas */
+.tiptap.ProseMirror section.ProseMirror-selectednode,
+.tiptap.ProseMirror .node-section.ProseMirror-selectednode,
+.tiptap.ProseMirror [data-type="section"].ProseMirror-selectednode,
+.tiptap.ProseMirror .node-container.ProseMirror-selectednode,
+.tiptap.ProseMirror [data-type="container"].ProseMirror-selectednode,
+.tiptap.ProseMirror .node-columns.ProseMirror-selectednode,
+.tiptap.ProseMirror [data-type="twoColumns"].ProseMirror-selectednode,
+.tiptap.ProseMirror [data-type="threeColumns"].ProseMirror-selectednode,
+.tiptap.ProseMirror [data-type="fourColumns"].ProseMirror-selectednode,
+.tiptap.ProseMirror .node-column.ProseMirror-selectednode,
+.tiptap.ProseMirror [data-type="columnsColumn"].ProseMirror-selectednode,
+.tiptap.ProseMirror table.ProseMirror-selectednode,
+.tiptap.ProseMirror td.ProseMirror-selectednode,
+.tiptap.ProseMirror th.ProseMirror-selectednode,
+.ProseMirror section.ProseMirror-selectednode,
+.ProseMirror .node-section.ProseMirror-selectednode,
+.ProseMirror [data-type="section"].ProseMirror-selectednode,
+.ProseMirror .node-container.ProseMirror-selectednode,
+.ProseMirror [data-type="container"].ProseMirror-selectednode,
+.ProseMirror .node-columns.ProseMirror-selectednode,
+.ProseMirror [data-type="twoColumns"].ProseMirror-selectednode,
+.ProseMirror [data-type="threeColumns"].ProseMirror-selectednode,
+.ProseMirror [data-type="fourColumns"].ProseMirror-selectednode,
+.ProseMirror .node-column.ProseMirror-selectednode,
+.ProseMirror [data-type="columnsColumn"].ProseMirror-selectednode,
+.ProseMirror table.ProseMirror-selectednode,
+.ProseMirror td.ProseMirror-selectednode,
+.ProseMirror th.ProseMirror-selectednode,
+.tiptap.ProseMirror
+	.ProseMirror-selectednode:not(img):not(a.node-button):not(
+		div:has(> a.node-button)
+	),
+.ProseMirror
+	.ProseMirror-selectednode:not(img):not(a.node-button):not(
+		div:has(> a.node-button)
+	) {
+	outline: 2px solid #3b82f6 !important;
+	outline-offset: -1px !important;
+}
+
+/* Subtle hover indicator on sections when unselected and unedited */
+.tiptap.ProseMirror
+.node-section:not(.ProseMirror-selectednode):hover:not(:focus-within),
+.tiptap.ProseMirror
+	section:not(.ProseMirror-selectednode):hover:not(:focus-within),
+.tiptap.ProseMirror
+	[data-type="section"]:not(.ProseMirror-selectednode):hover:not(:focus-within),
+.tiptap.ProseMirror
+	.node-columns:not(.ProseMirror-selectednode):hover:not(:focus-within),
+.ProseMirror
+	.node-section:not(.ProseMirror-selectednode):hover:not(:focus-within),
+.ProseMirror section:not(.ProseMirror-selectednode):hover:not(:focus-within),
+.ProseMirror
+	[data-type="section"]:not(.ProseMirror-selectednode):hover:not(:focus-within),
+.ProseMirror
+	.node-columns:not(.ProseMirror-selectednode):hover:not(:focus-within) {
+	outline: 1px dashed rgba(59, 130, 246, 0.45) !important;
+	outline-offset: -1px !important;
+}
+
+/* Selected or active text block outline in the canvas */
+.tiptap.ProseMirror .email-selected-text-node,
+.tiptap.ProseMirror p.email-selected-text-node,
+.tiptap.ProseMirror h1.email-selected-text-node,
+.tiptap.ProseMirror h2.email-selected-text-node,
+.tiptap.ProseMirror h3.email-selected-text-node,
+.tiptap.ProseMirror h4.email-selected-text-node,
+.tiptap.ProseMirror h5.email-selected-text-node,
+.tiptap.ProseMirror h6.email-selected-text-node,
+.tiptap.ProseMirror blockquote.email-selected-text-node,
+.tiptap.ProseMirror pre.email-selected-text-node,
+.ProseMirror .email-selected-text-node,
+.ProseMirror p.email-selected-text-node,
+.ProseMirror h1.email-selected-text-node,
+.ProseMirror h2.email-selected-text-node,
+.ProseMirror h3.email-selected-text-node,
+.ProseMirror h4.email-selected-text-node,
+.ProseMirror h5.email-selected-text-node,
+.ProseMirror h6.email-selected-text-node,
+.ProseMirror blockquote.email-selected-text-node,
+.ProseMirror pre.email-selected-text-node {
+	outline: 2px solid #3b82f6 !important;
+	outline-offset: 2px !important;
+}

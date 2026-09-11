@@ -1,6 +1,12 @@
 import { StarterKit } from "@react-email/editor/extensions";
 import { Extension, Mark } from "@tiptap/core";
-import { NodeSelection, Plugin, PluginKey } from "@tiptap/pm/state";
+import {
+	NodeSelection,
+	Plugin,
+	PluginKey,
+	TextSelection,
+} from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { EMAIL_DECORATION_ATTR } from "./preserve-email-link-underlines";
 
 export const EMAIL_FONT_COLOR_MARK = "emailFontColor";
@@ -360,6 +366,203 @@ const emailImageSelection = Extension.create({
 });
 
 /**
+ * Clicking a section or container node outside of child text blocks / buttons / images
+ * establishes a NodeSelection on that section, highlighting it and allowing inspection.
+ * A subsequent click while already selected allows placing a text cursor inside.
+ */
+const emailSectionSelection = Extension.create({
+	name: "emailSectionSelection",
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				key: new PluginKey("emailSectionSelectionPlugin"),
+				props: {
+					handleClick(view, pos, event) {
+						const target = event.target;
+						if (!(target instanceof HTMLElement)) return false;
+
+						// Don't intercept clicks on images or buttons
+						if (
+							target.closest("img") ||
+							target.closest(
+								'a[data-id="react-email-button"], .node-button, a.button',
+							)
+						) {
+							return false;
+						}
+
+						// If clicking on text elements (p, h1-h6, span, strong, em, etc.), let default cursor placement work
+						const isTextElement =
+							target.tagName.toLowerCase() === "p" ||
+							target.tagName.toLowerCase() === "span" ||
+							target.tagName.toLowerCase() === "strong" ||
+							target.tagName.toLowerCase() === "em" ||
+							target.tagName.toLowerCase() === "u" ||
+							target.tagName.toLowerCase() === "s" ||
+							target.tagName.toLowerCase() === "code" ||
+							target.tagName.toLowerCase() === "a" ||
+							/^h[1-6]$/i.test(target.tagName);
+
+						if (isTextElement) {
+							return false;
+						}
+
+						// Check if clicked element is a section, container, columns, or table element
+						const sectionEl = target.closest(
+							'section, [data-type="section"], .node-section, [data-type="container"], .node-container, .node-columns, [data-type="twoColumns"], [data-type="threeColumns"], [data-type="fourColumns"]',
+						);
+
+						if (!sectionEl) return false;
+
+						const { doc, selection } = view.state;
+						let sectionPos: number | null = null;
+
+						try {
+							const domPos = view.posAtDOM(sectionEl, 0);
+							const $domPos = doc.resolve(domPos);
+							for (let depth = $domPos.depth; depth > 0; depth--) {
+								const n = $domPos.node(depth);
+								if (
+									n.type.name === "section" ||
+									n.type.name === "container" ||
+									n.type.name === "twoColumns" ||
+									n.type.name === "threeColumns" ||
+									n.type.name === "fourColumns"
+								) {
+									sectionPos = $domPos.before(depth);
+									break;
+								}
+							}
+
+							if (sectionPos === null) {
+								const direct = doc.nodeAt(domPos);
+								if (
+									direct &&
+									(direct.type.name === "section" ||
+										direct.type.name === "container" ||
+										direct.type.name === "twoColumns" ||
+										direct.type.name === "threeColumns" ||
+										direct.type.name === "fourColumns")
+								) {
+									sectionPos = domPos;
+								}
+							}
+						} catch {
+							// fallback
+						}
+
+						if (sectionPos === null) {
+							const $pos = doc.resolve(pos);
+							for (let depth = $pos.depth; depth > 0; depth--) {
+								const n = $pos.node(depth);
+								if (
+									n.type.name === "section" ||
+									n.type.name === "container" ||
+									n.type.name === "twoColumns" ||
+									n.type.name === "threeColumns" ||
+									n.type.name === "fourColumns"
+								) {
+									sectionPos = $pos.before(depth);
+									break;
+								}
+							}
+						}
+
+						if (sectionPos !== null) {
+							// If already selected, allow subsequent click to place text cursor
+							if (
+								selection instanceof NodeSelection &&
+								selection.from === sectionPos
+							) {
+								return false;
+							}
+
+							try {
+								const nodeSel = NodeSelection.create(doc, sectionPos);
+								view.dispatch(view.state.tr.setSelection(nodeSel));
+								return true;
+							} catch {
+								return false;
+							}
+						}
+
+						return false;
+					},
+				},
+			}),
+		];
+	},
+});
+
+/**
+ * When text is selected or focused, decorates the containing text block
+ * (heading, paragraph, blockquote, codeBlock) with the selection outline class
+ * so users can clearly see the blue line around the active text block.
+ */
+const emailActiveTextBlock = Extension.create({
+	name: "emailActiveTextBlock",
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				key: new PluginKey("emailActiveTextBlockPlugin"),
+				props: {
+					decorations(state) {
+						const { selection } = state;
+						if (!(selection instanceof TextSelection)) {
+							return DecorationSet.empty;
+						}
+
+						// If selection is inside a button, let the button's selection outline handle it
+						const { $from } = selection;
+						for (let d = $from.depth; d > 0; d--) {
+							if ($from.node(d).type.name === "button") {
+								return DecorationSet.empty;
+							}
+						}
+
+						const decorations: Decoration[] = [];
+						const seen = new Set<number>();
+
+						state.doc.nodesBetween(
+							selection.from,
+							selection.to,
+							(node, pos) => {
+								if (node.isTextblock && !seen.has(pos)) {
+									seen.add(pos);
+									decorations.push(
+										Decoration.node(pos, pos + node.nodeSize, {
+											class: "email-selected-text-node",
+										}),
+									);
+								}
+							},
+						);
+
+						// Fallback: if nodesBetween didn't catch the block (e.g. cursor at block edge)
+						if (decorations.length === 0) {
+							for (let d = $from.depth; d > 0; d--) {
+								const node = $from.node(d);
+								if (node.isTextblock) {
+									const pos = $from.before(d);
+									decorations.push(
+										Decoration.node(pos, pos + node.nodeSize, {
+											class: "email-selected-text-node",
+										}),
+									);
+									break;
+								}
+							}
+						}
+
+						return DecorationSet.create(state.doc, decorations);
+					},
+				},
+			}),
+		];
+	},
+});
+
+/**
  * React Email's StyleAttribute list omits `container`, so pasted
  * padding / max-width / background on the email wrapper are dropped.
  */
@@ -378,6 +581,8 @@ export function emailStarterKit() {
 				emailAlignmentSync,
 				emailButtonSelection,
 				emailImageSelection,
+				emailSectionSelection,
+				emailActiveTextBlock,
 			];
 		},
 	});
