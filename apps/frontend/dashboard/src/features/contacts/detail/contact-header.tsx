@@ -142,28 +142,34 @@ function ContactStatsRow({ email }: { email: string }) {
 
 	const rows: {
 		label: string;
+		icon: "mail" | "mail-send" | "eye-outline" | "cursor" | "star";
 		value: React.ReactNode;
 		title?: string;
 		valueClassName?: string;
 	}[] = [
 		{
 			label: "Total emails",
+			icon: "mail",
 			value: (stats?.total ?? statsQuery.data?.total ?? 0).toLocaleString(),
 		},
 		{
 			label: "Sent",
+			icon: "mail-send",
 			value: (stats?.sent ?? 0).toLocaleString(),
 		},
 		{
 			label: "Opened",
+			icon: "eye-outline",
 			value: (stats?.opened ?? 0).toLocaleString(),
 		},
 		{
 			label: "Clicked",
+			icon: "cursor",
 			value: (stats?.clicked ?? 0).toLocaleString(),
 		},
 		{
 			label: "Score",
+			icon: "star",
 			value:
 				scoreValue == null ? (
 					"—"
@@ -354,7 +360,15 @@ export const ContactHeader = ({
 							</h1>
 							{statusLabel && (
 								<StatusBadge.Root variant="light" status={statusBadgeStatus}>
-									<StatusBadge.Dot />
+									<StatusBadge.Icon
+										as={Icon}
+										name={
+											contact?.status?.toLowerCase() === "subscribed"
+												? "check-circle"
+												: "minus-circle"
+										}
+										className="h-3.5 w-3.5"
+									/>
 									{statusLabel}
 								</StatusBadge.Root>
 							)}
