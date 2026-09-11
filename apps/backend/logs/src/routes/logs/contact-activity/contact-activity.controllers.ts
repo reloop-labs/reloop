@@ -47,6 +47,54 @@ export async function contactActivityController({
 			},
 		});
 
+		// Aggregate engagement stats for this recipient
+		const statsResult = await db.execute(sql`
+			SELECT
+				COUNT(*)::int AS total,
+				COUNT(*) FILTER (WHERE ${schema.emailLog.sentAt} IS NOT NULL)::int AS sent,
+				COUNT(*) FILTER (WHERE ${schema.emailLog.deliveredAt} IS NOT NULL)::int AS delivered,
+				COUNT(*) FILTER (WHERE ${schema.emailLog.failedAt} IS NOT NULL)::int AS failed,
+				COUNT(*) FILTER (WHERE EXISTS (
+					SELECT 1 FROM ${schema.emailEvent}
+					WHERE ${schema.emailEvent.emailLogId} = ${schema.emailLog.id}
+					AND ${schema.emailEvent.type} = 'opened'
+				))::int AS opened,
+				COUNT(*) FILTER (WHERE EXISTS (
+					SELECT 1 FROM ${schema.emailEvent}
+					WHERE ${schema.emailEvent.emailLogId} = ${schema.emailLog.id}
+					AND ${schema.emailEvent.type} = 'clicked'
+				))::int AS clicked,
+				COUNT(*) FILTER (WHERE EXISTS (
+					SELECT 1 FROM ${schema.emailEvent}
+					WHERE ${schema.emailEvent.emailLogId} = ${schema.emailLog.id}
+					AND ${schema.emailEvent.type} = 'bounced'
+				))::int AS bounced
+			FROM ${schema.emailLog}
+			WHERE ${whereClause}
+		`);
+
+		const statsRow = statsResult.rows[0] as
+			| {
+					total: number;
+					sent: number;
+					delivered: number;
+					failed: number;
+					opened: number;
+					clicked: number;
+					bounced: number;
+			  }
+			| undefined;
+
+		const stats = {
+			total: statsRow?.total ?? total,
+			sent: statsRow?.sent ?? 0,
+			delivered: statsRow?.delivered ?? 0,
+			opened: statsRow?.opened ?? 0,
+			clicked: statsRow?.clicked ?? 0,
+			bounced: statsRow?.bounced ?? 0,
+			failed: statsRow?.failed ?? 0,
+		};
+
 		log.info("Contact activity fetched", { email, count: logs.length, total });
 
 		return {
@@ -73,6 +121,7 @@ export async function contactActivityController({
 			total,
 			page,
 			limit,
+			stats,
 		};
 	} catch (error) {
 		log.error("Error fetching contact activity", {

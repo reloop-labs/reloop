@@ -1,15 +1,12 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import {
-	Content as PopoverContent,
-	Root as PopoverRoot,
-	Trigger as PopoverTrigger,
-} from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import type { AudienceStatus } from "#/features/contacts/audience";
 import {
@@ -18,11 +15,10 @@ import {
 	getStatusLabel,
 } from "#/features/contacts/audience";
 import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import { queryKeys } from "#/lib/query-keys";
 import { DeleteContactModal } from "../components/contacts/delete-contact-modal";
 import { EditContactModal } from "../components/contacts/edit-contact-modal";
-import type { ActivityFilter } from "./contact-email-history";
 import { ContactEmailHistory } from "./contact-email-history";
 
 interface PropertyValueWithName {
@@ -41,14 +37,69 @@ interface ContactHeaderProps {
 	enrolledChannels?: { id: string; name: string }[];
 }
 
-type DetailTab = "overview" | "emails" | "changes" | "properties";
+interface ContactEngagementStats {
+	total: number;
+	sent: number;
+	delivered: number;
+	opened: number;
+	clicked: number;
+	bounced: number;
+	failed: number;
+}
 
-const DETAIL_TABS: { id: DetailTab; label: string }[] = [
-	{ id: "overview", label: "Overview" },
-	{ id: "emails", label: "Emails" },
-	{ id: "changes", label: "Changes" },
-	{ id: "properties", label: "Properties" },
-];
+function ContactStatsRow({ email }: { email: string }) {
+	const statsQuery = useQuery({
+		queryKey: [...queryKeys.contacts.activity(email), "stats"],
+		queryFn: async () => {
+			const res = await fetch(
+				`/api/logs/v1/emails/contact-activity?email=${encodeURIComponent(email)}&limit=1&page=1`,
+				{ credentials: "include" },
+			);
+			if (!res.ok) throw new Error("Failed to load contact stats");
+			return res.json() as Promise<{
+				total: number;
+				stats: ContactEngagementStats;
+			}>;
+		},
+		enabled: !!email,
+		staleTime: 30_000,
+	});
+
+	const stats = statsQuery.data?.stats;
+
+	const items = [
+		{ label: "Total emails", value: stats?.total ?? statsQuery.data?.total },
+		{ label: "Sent", value: stats?.sent },
+		{ label: "Opened", value: stats?.opened },
+		{ label: "Clicked", value: stats?.clicked },
+	];
+
+	return (
+		<div className="mt-6 flex items-stretch">
+			{items.map((item, idx) => (
+				<div key={item.label} className="flex items-stretch">
+					<div className="min-w-[110px]">
+						<p className="text-[13px] text-text-sub-600">{item.label}</p>
+						{statsQuery.isPending ? (
+							<Skeleton className="mt-1.5 h-6 w-12 rounded" />
+						) : statsQuery.isError ? (
+							<p className="mt-0.5 font-medium text-[20px] text-text-soft-400">
+								—
+							</p>
+						) : (
+							<p className="mt-0.5 font-medium text-[20px] text-text-strong-950 tabular-nums">
+								{(item.value ?? 0).toLocaleString()}
+							</p>
+						)}
+					</div>
+					{idx < items.length - 1 && (
+						<div className="mx-6 w-px bg-stroke-soft-200 sm:mx-8 dark:bg-white/10" />
+					)}
+				</div>
+			))}
+		</div>
+	);
+}
 
 const formatPropertyName = (name: string) => {
 	return name
@@ -56,16 +107,6 @@ const formatPropertyName = (name: string) => {
 		.replace(/^./, (str) => str.toUpperCase())
 		.trim();
 };
-
-const headerMenuItems = [
-	{ id: "edit", label: "Edit contact", icon: "edit" as const, isDanger: false },
-	{
-		id: "delete",
-		label: "Delete contact",
-		icon: "trash" as const,
-		isDanger: true,
-	},
-];
 
 export const ContactHeader = ({
 	contact,
@@ -77,14 +118,6 @@ export const ContactHeader = ({
 	const [copied, setCopied] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const [tab, setTab] = useState<DetailTab>("overview");
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
-	const currentRect = currentTab?.getBoundingClientRect();
-	const hoveredItem = headerMenuItems[hoverIdx ?? -1];
-	const isDanger = hoveredItem?.isDanger ?? false;
 
 	const handleCopyId = async () => {
 		if (contact?.id) {
@@ -104,14 +137,6 @@ export const ContactHeader = ({
 		router.push("/contacts");
 	};
 
-	const handleMenuItemClick = (itemId: string) => {
-		if (itemId === "edit") {
-			setIsEditModalOpen(true);
-		} else if (itemId === "delete") {
-			setIsDeleteModalOpen(true);
-		}
-	};
-
 	const displayName =
 		contact?.firstName || contact?.lastName
 			? `${contact?.firstName ?? ""} ${contact?.lastName ?? ""}`.trim()
@@ -123,11 +148,6 @@ export const ContactHeader = ({
 		: null;
 	const groupCount = contact?.groups?.length ?? 0;
 	const channelCount = enrolledChannels.length;
-
-	const activityFilter: ActivityFilter =
-		tab === "emails" ? "emails" : tab === "changes" ? "changes" : "all";
-	const showActivity = tab !== "properties";
-	const showProperties = tab === "overview" || tab === "properties";
 
 	if (!contact && !isLoading) {
 		return (
@@ -168,8 +188,8 @@ export const ContactHeader = ({
 				<div className="h-28 rounded-2xl bg-gradient-to-r from-[#F9DEE2] via-[#FCF0E3] to-[#DCEEF6] sm:h-32 dark:from-[#F9DEE2]/25 dark:via-[#FCF0E3]/15 dark:to-[#DCEEF6]/20" />
 
 				<div className="px-4 sm:px-6">
-					{/* Avatar overlapping the banner */}
-					<div className="-mt-10 mb-4">
+					{/* Avatar + actions row (Twitter-style) */}
+					<div className="-mt-10 mb-4 flex items-end justify-between gap-4">
 						{isLoading ? (
 							<Skeleton className="size-20 rounded-full" />
 						) : (
@@ -177,6 +197,22 @@ export const ContactHeader = ({
 								{initial}
 							</div>
 						)}
+
+						<div className="flex shrink-0 items-center gap-2 pb-1">
+							{isLoading ? (
+								<Skeleton className="h-9 w-28 rounded-lg" />
+							) : (
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
+									onClick={() => setIsEditModalOpen(true)}
+								>
+									Edit contact
+								</Button.Root>
+							)}
+						</div>
 					</div>
 
 					{/* Name */}
@@ -203,86 +239,9 @@ export const ContactHeader = ({
 						</p>
 					)}
 
-					{/* Actions */}
-					<div className="mt-4 flex items-center gap-2">
-						{isLoading ? (
-							<Skeleton className="h-9 w-28 rounded-lg" />
-						) : (
-							<>
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="xsmall"
-									onClick={() => setIsEditModalOpen(true)}
-								>
-									Edit contact
-								</Button.Root>
-								{contact && (
-									<PopoverRoot>
-										<PopoverTrigger asChild>
-											<Button.Root
-												variant="neutral"
-												mode="stroke"
-												size="xsmall"
-											>
-												<Icon
-													name="more-horizontal"
-													className="h-3.5 w-3.5 text-text-sub-600"
-												/>
-											</Button.Root>
-										</PopoverTrigger>
-										<PopoverContent
-											align="start"
-											sideOffset={4}
-											className="w-44 rounded-xl p-1.5"
-											showArrow
-										>
-											<div className="relative">
-												{headerMenuItems.map((item, idx) => (
-													<button
-														key={item.id}
-														ref={(el) => {
-															if (el) buttonRefs.current[idx] = el;
-														}}
-														type="button"
-														onPointerEnter={() => setHoverIdx(idx)}
-														onPointerLeave={() => setHoverIdx(undefined)}
-														onClick={() => handleMenuItemClick(item.id)}
-														className={cn(
-															"flex w-full cursor-pointer items-center gap-2 rounded-lg py-1.5 pl-2 font-medium text-xs transition-colors",
-															item.isDanger
-																? "text-error-base"
-																: "text-text-strong-950",
-															!currentRect &&
-																hoverIdx === idx &&
-																(item.isDanger
-																	? "bg-red-alpha-10"
-																	: "bg-neutral-alpha-10"),
-														)}
-													>
-														<Icon
-															name={item.icon}
-															className={cn(
-																"h-4 w-4",
-																item.isDanger ? "" : "text-text-sub-600",
-															)}
-														/>
-														<span>{item.label}</span>
-													</button>
-												))}
-												<AnimatedHoverBackground
-													rect={currentRect}
-													tabElement={currentTab}
-													isDanger={isDanger}
-												/>
-											</div>
-										</PopoverContent>
-									</PopoverRoot>
-								)}
-							</>
-						)}
-					</div>
+					{!isLoading && contact?.email && (
+						<ContactStatsRow email={contact.email} />
+					)}
 
 					{!isLoading && contact?.suppressionReason && (
 						<div className="mt-6 flex items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3">
@@ -302,47 +261,18 @@ export const ContactHeader = ({
 						</div>
 					)}
 
-					{/* Tabs */}
-					<div
-						className="mt-8 flex gap-6 overflow-x-auto border-stroke-soft-200 border-b dark:border-white/10"
-						role="tablist"
-						aria-label="Contact sections"
-					>
-						{DETAIL_TABS.map((t) => {
-							const active = tab === t.id;
-							return (
-								<button
-									key={t.id}
-									type="button"
-									role="tab"
-									aria-selected={active}
-									onClick={() => setTab(t.id)}
-									className={cn(
-										"-mb-px shrink-0 cursor-pointer border-b-2 pb-3 text-[15px] transition-colors",
-										active
-											? "border-text-strong-950 font-medium text-text-strong-950"
-											: "border-transparent text-text-sub-600 hover:text-text-strong-950",
-									)}
-								>
-									{t.label}
-								</button>
-							);
-						})}
-					</div>
-
-					{/* Tab content */}
+					{/* Content */}
 					<div className="mt-8 flex flex-col gap-10">
-						{showActivity && contact?.email && (
+						{contact?.email && (
 							<ContactEmailHistory
 								contactId={contact.id}
 								email={contact.email}
 								contactCreatedAt={contact.createdAt}
-								filter={activityFilter}
+								filter="all"
 							/>
 						)}
 
-						{showProperties && (
-							<section>
+						<section>
 								<h3 className="mb-3 text-[15px] text-text-sub-600">
 									Properties
 								</h3>
@@ -503,8 +433,41 @@ export const ContactHeader = ({
 									</div>
 								)}
 							</section>
-						)}
 					</div>
+
+					{!isLoading && contact && (
+						<div className="mt-6">
+							<p className="mb-3 font-medium text-label-md text-text-strong-950">
+								Danger zone
+							</p>
+							<div className="rounded-xl border border-error-light py-2 pr-2.5 pl-3">
+								<div className="flex items-center justify-between gap-4">
+									<div>
+										<p className="font-medium text-label-sm text-text-strong-950">
+											Delete contact
+										</p>
+										<p className="text-paragraph-xs text-text-sub-600">
+											Permanently delete this contact and all its associated
+											data. This cannot be undone.
+										</p>
+									</div>
+									<FancyButton.Root
+										variant="destructive"
+										size="xsmall"
+										type="button"
+										onClick={() => setIsDeleteModalOpen(true)}
+									>
+										<FancyButton.Icon
+											as={Icon}
+											name="trash-2"
+											className="ml-0.5 h-3.5 w-3.5"
+										/>
+										Delete contact
+									</FancyButton.Root>
+								</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 

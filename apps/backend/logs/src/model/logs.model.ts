@@ -366,6 +366,17 @@ export namespace LogsModel {
 	export type ContactActivityEmailEntry =
 		typeof contactActivityEmailEntry.static;
 
+	export const contactActivityStats = t.Object({
+		total: t.Number(),
+		sent: t.Number(),
+		delivered: t.Number(),
+		opened: t.Number(),
+		clicked: t.Number(),
+		bounced: t.Number(),
+		failed: t.Number(),
+	});
+	export type ContactActivityStats = typeof contactActivityStats.static;
+
 	export const contactActivityResponse = t.Object({
 		object: t.Literal("contact_activity"),
 		email: t.String(),
@@ -373,6 +384,7 @@ export namespace LogsModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		stats: contactActivityStats,
 	});
 	export type ContactActivityResponse = typeof contactActivityResponse.static;
 
