@@ -130,7 +130,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
 								transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
 								className="flex items-center"
 							>
-								<ContactStatusBadge status={status} />
+								<ContactStatusBadge status={status} variant="light" />
 							</motion.div>
 						</AnimatePresence>
 					</div>
