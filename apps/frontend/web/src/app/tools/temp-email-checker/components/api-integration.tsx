@@ -20,10 +20,23 @@ const SNIPPET_LANG: Record<string, string> = {
 	go: "go",
 };
 
+const apiPath = apiEndpoint.replace(/^https?:\/\/[^/]+/, "");
+
 export function ApiIntegration() {
 	const [activeId, setActiveId] = useState<string>(apiSnippets[0].id);
+	const [copiedEndpoint, setCopiedEndpoint] = useState(false);
 	const active = apiSnippets.find((s) => s.id === activeId) ?? apiSnippets[0];
 	const lang = SNIPPET_LANG[active.id] ?? "bash";
+
+	const handleCopyEndpoint = async () => {
+		try {
+			await navigator.clipboard.writeText(apiEndpoint);
+			setCopiedEndpoint(true);
+			setTimeout(() => setCopiedEndpoint(false), 2000);
+		} catch {
+			// Clipboard may be unavailable outside a secure context.
+		}
+	};
 
 	return (
 		<section
@@ -54,16 +67,31 @@ export function ApiIntegration() {
 			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 lg:grid-cols-2 lg:divide-x lg:divide-y-0 dark:divide-white/10">
 				{/* Left: endpoint + notes */}
 				<div className="flex flex-col gap-5 px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10">
-					<div className="flex items-center gap-2 font-mono text-[12px]">
-						<span className="rounded-md bg-emerald-500/10 px-2 py-0.5 font-semibold text-emerald-600 dark:text-emerald-400">
+					<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-white-0 py-2 pr-2 pl-3 dark:border-white/10 dark:bg-white/[0.03]">
+						<span className="shrink-0 rounded-md bg-blue-600 px-2 py-0.5 font-mono font-semibold text-[11px] text-white tracking-wide">
 							POST
 						</span>
-						<code className="truncate text-text-strong-950 dark:text-white">
-							{apiEndpoint}
+						<code className="min-w-0 flex-1 truncate font-mono text-[13px] text-text-strong-950 dark:text-white">
+							{apiPath}
 						</code>
+						<button
+							type="button"
+							onClick={handleCopyEndpoint}
+							aria-label={copiedEndpoint ? "Copied" : "Copy endpoint"}
+							className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+						>
+							<Icon
+								name={copiedEndpoint ? "check" : "copy"}
+								className="size-4"
+							/>
+						</button>
 					</div>
 
-					<div className="flex flex-wrap gap-1.5">
+					<div
+						role="tablist"
+						aria-label="Code language"
+						className="flex items-center gap-1 overflow-x-auto"
+					>
 						{apiSnippets.map((snippet) => {
 							const snippetLang = SNIPPET_LANG[snippet.id] ?? "bash";
 							const si = getLanguageIcon(
@@ -76,38 +104,45 @@ export function ApiIntegration() {
 								<button
 									key={snippet.id}
 									type="button"
+									role="tab"
+									aria-selected={isActive}
 									onClick={() => setActiveId(snippet.id)}
-									aria-pressed={isActive}
 									className={cn(
-										"inline-flex cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 font-medium text-[13px] transition-colors duration-150",
+										"relative shrink-0 cursor-pointer rounded-lg px-3 py-2 font-medium text-[13px] transition-colors duration-150",
 										isActive
-											? "text-white"
-											: "border border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-white/10 dark:text-white/60 dark:hover:text-white",
+											? "text-text-strong-950 dark:text-white"
+											: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
 									)}
 									style={
 										isActive && brandColor
-											? { backgroundColor: brandColor }
+											? {
+													backgroundColor: `color-mix(in srgb, ${brandColor} 12%, transparent)`,
+												}
 											: undefined
 									}
 								>
-									{si ? (
-										<span
-											className={cn(
-												"inline-flex items-center",
-												!isActive &&
+									<span className="inline-flex items-center gap-2">
+										{si ? (
+											<span
+												className={cn(
+													"inline-flex items-center",
 													isDark &&
-													"text-text-strong-950 dark:text-white",
-											)}
-											style={
-												isActive
-													? { color: "#ffffff" }
-													: getBrandColorStyle(si.hex)
-											}
-										>
-											<LanguageIcon icon={si} className="size-3.5" />
-										</span>
+														"text-text-strong-950 dark:text-white",
+												)}
+												style={getBrandColorStyle(si.hex)}
+											>
+												<LanguageIcon icon={si} className="size-4" />
+											</span>
+										) : null}
+										{snippet.label}
+									</span>
+									{isActive && brandColor ? (
+										<span
+											aria-hidden
+											className="absolute inset-x-3 -bottom-px h-[2px] rounded-full"
+											style={{ backgroundColor: brandColor }}
+										/>
 									) : null}
-									{snippet.label}
 								</button>
 							);
 						})}

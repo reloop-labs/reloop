@@ -3,6 +3,10 @@ const COLUMNS = ["Reloop", "Other providers"];
 const ROWS: { capability: string; cells: ("yes" | "no")[] }[] = [
 	{ capability: "~210k disposable-domain catalogue", cells: ["yes", "no"] },
 	{
+		capability: "Catalogue refreshed every 2 hours",
+		cells: ["yes", "no"],
+	},
+	{
 		capability: "Wildcard suffix & role-prefix signals",
 		cells: ["yes", "no"],
 	},
@@ -12,7 +16,8 @@ const ROWS: { capability: string; cells: ("yes" | "no")[] }[] = [
 		capability: "Confidence, risk score & flags",
 		cells: ["yes", "no"],
 	},
-	{ capability: "Free in the browser, no signup", cells: ["yes", "no"] },
+	{ capability: "No API key or account needed", cells: ["yes", "no"] },
+	{ capability: "Free for life, no signup", cells: ["yes", "no"] },
 ];
 
 function CheckIcon() {
