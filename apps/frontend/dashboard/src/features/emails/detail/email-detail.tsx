@@ -4,6 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -1064,7 +1065,17 @@ export const EmailDetail = ({
 							{isLoading ? (
 								<Skeleton className="h-4 w-48 rounded-md" />
 							) : (
-								email?.toEmails.join(", ")
+								email?.toEmails?.map((toEmail, idx) => (
+									<span key={toEmail}>
+										{idx > 0 && ", "}
+										<Link
+											href={`/contacts?search=${encodeURIComponent(toEmail)}`}
+											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+										>
+											{toEmail}
+										</Link>
+									</span>
+								))
 							)}
 						</span>
 					</div>
@@ -1074,7 +1085,17 @@ export const EmailDetail = ({
 								Cc
 							</span>
 							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{email.ccEmails.join(", ")}
+								{email.ccEmails.map((ccEmail, idx) => (
+									<span key={ccEmail}>
+										{idx > 0 && ", "}
+										<Link
+											href={`/contacts?search=${encodeURIComponent(ccEmail)}`}
+											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+										>
+											{ccEmail}
+										</Link>
+									</span>
+								))}
 							</span>
 						</div>
 					)}

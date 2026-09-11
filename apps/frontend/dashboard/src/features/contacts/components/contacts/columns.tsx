@@ -1,17 +1,12 @@
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
-import {
-	getFullName,
-	getStatusColorClass,
-	getStatusIcon,
-	getStatusLabel,
-} from "#/features/contacts/audience";
+import { getFullName } from "#/features/contacts/audience";
 import type { Contact } from "#/features/contacts/hooks/use-contacts-query";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import { ContactStatusBadge } from "./contact-status-badge";
 
 export type ContactTableMeta = {
 	editingContactId: string | null;
@@ -125,12 +120,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
 			const status = row.original.status;
 			return (
 				<div className="flex items-center">
-					<div
-						className={cn(
-							"relative flex min-h-[22px] items-center overflow-hidden py-0.5 font-medium text-[13px] capitalize transition-colors duration-200",
-							getStatusColorClass(status),
-						)}
-					>
+					<div className="relative flex min-h-[22px] items-center overflow-hidden py-0.5">
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.div
 								key={status}
@@ -138,13 +128,9 @@ export const contactColumns: ColumnDef<Contact>[] = [
 								animate={{ y: "0%", opacity: 1 }}
 								exit={{ y: "100%", opacity: 0 }}
 								transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-								className="flex items-center gap-2"
+								className="flex items-center"
 							>
-								<Icon
-									name={getStatusIcon(status)}
-									className="h-3.5 w-3.5 shrink-0"
-								/>
-								<span>{getStatusLabel(status)}</span>
+								<ContactStatusBadge status={status} />
 							</motion.div>
 						</AnimatePresence>
 					</div>

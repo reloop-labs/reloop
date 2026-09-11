@@ -3,21 +3,15 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import * as StatusBadge from "@reloop/ui/status-badge";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { AudienceStatus } from "#/features/contacts/audience";
-import {
-	getStatusIcon as getSharedStatusIcon,
-	getStatusColorClass,
-	getStatusLabel,
-} from "#/features/contacts/audience";
 import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
 import { queryKeys } from "#/lib/query-keys";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import { ContactStatusBadge } from "../components/contacts/contact-status-badge";
 import { DeleteContactModal } from "../components/contacts/delete-contact-modal";
 import { EditContactModal } from "../components/contacts/edit-contact-modal";
 import { ContactEmailHistory } from "./contact-email-history";
@@ -265,13 +259,6 @@ export const ContactHeader = ({
 			: (contact?.email ?? "Contact");
 	const initial = (displayName.charAt(0) || "?").toUpperCase();
 
-	const statusLabel = contact?.status
-		? getStatusLabel(contact.status as AudienceStatus)
-		: null;
-	const statusBadgeStatus =
-		contact?.status?.toLowerCase() === "subscribed"
-			? ("completed" as const)
-			: ("failed" as const);
 	const groupCount = contact?.groups?.length ?? 0;
 	const channelCount = enrolledChannels.length;
 	const propertyCount = propertyValues.length;
@@ -353,19 +340,8 @@ export const ContactHeader = ({
 							<h1 className="font-medium text-[22px] text-text-strong-950 tracking-tight">
 								{displayName}
 							</h1>
-							{statusLabel && (
-								<StatusBadge.Root variant="light" status={statusBadgeStatus}>
-									<StatusBadge.Icon
-										as={Icon}
-										name={
-											contact?.status?.toLowerCase() === "subscribed"
-												? "check-circle"
-												: "minus-circle"
-										}
-										className="h-3.5 w-3.5"
-									/>
-									{statusLabel}
-								</StatusBadge.Root>
+							{contact?.status && (
+								<ContactStatusBadge status={contact.status} />
 							)}
 						</div>
 					)}
@@ -467,22 +443,11 @@ export const ContactHeader = ({
 										<span className="font-medium text-[15px] text-text-strong-950">
 											Status
 										</span>
-										<span
-											className={cn(
-												"flex items-center gap-1.5 font-medium text-[15px]",
-												getStatusColorClass(contact?.status as AudienceStatus),
-											)}
-										>
-											<Icon
-												name={
-													getSharedStatusIcon(
-														contact?.status as AudienceStatus,
-													) as Parameters<typeof Icon>[0]["name"]
-												}
-												className="h-3.5 w-3.5"
-											/>
-											{statusLabel}
-										</span>
+										{contact?.status ? (
+											<ContactStatusBadge status={contact.status} />
+										) : (
+											<span className="text-text-sub-600">—</span>
+										)}
 									</div>
 									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
 										<span className="font-medium text-[15px] text-text-strong-950">
