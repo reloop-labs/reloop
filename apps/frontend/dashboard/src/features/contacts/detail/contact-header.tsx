@@ -3,6 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as StatusBadge from "@reloop/ui/status-badge";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -139,62 +140,83 @@ function ContactStatsRow({ email }: { email: string }) {
 	const rating = engagement?.rating ?? "New";
 	const scoreValue = engagement?.score;
 
-	const items = [
-		{ label: "Total emails", value: stats?.total ?? statsQuery.data?.total },
-		{ label: "Sent", value: stats?.sent },
-		{ label: "Opened", value: stats?.opened },
-		{ label: "Clicked", value: stats?.clicked },
+	const rows: {
+		label: string;
+		value: React.ReactNode;
+		title?: string;
+		valueClassName?: string;
+		caption?: string;
+	}[] = [
+		{
+			label: "Total emails",
+			value: (stats?.total ?? statsQuery.data?.total ?? 0).toLocaleString(),
+		},
+		{
+			label: "Sent",
+			value: (stats?.sent ?? 0).toLocaleString(),
+		},
+		{
+			label: "Opened",
+			value: (stats?.opened ?? 0).toLocaleString(),
+		},
+		{
+			label: "Clicked",
+			value: (stats?.clicked ?? 0).toLocaleString(),
+		},
+		{
+			label: "Score",
+			value: scoreValue == null ? "—" : scoreValue.toLocaleString(),
+			title:
+				scoreValue == null
+					? "Not enough sending history to score this contact yet"
+					: `Engagement ${scoreValue}/100 · ${rating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`,
+			valueClassName:
+				scoreValue == null ? "text-text-soft-400" : scoreColor(rating),
+			caption: scoreValue == null ? undefined : rating,
+		},
 	];
 
 	return (
-		<div className="mt-6 flex flex-wrap items-stretch gap-y-4">
-			<div className="flex items-stretch">
-				<div className="min-w-[90px]">
-					<p className="text-[13px] text-text-sub-600">Score</p>
-					{statsQuery.isPending ? (
-						<Skeleton className="mt-1.5 h-6 w-12 rounded" />
-					) : statsQuery.isError || scoreValue == null ? (
-						<p
-							className="mt-0.5 font-medium text-[20px] text-text-soft-400"
-							title="Not enough sending history to score this contact yet"
-						>
-							—
-						</p>
-					) : (
-						<p
-							className={`mt-0.5 font-medium text-[20px] tabular-nums ${scoreColor(rating)}`}
-							title={`Engagement ${scoreValue}/100 · ${rating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`}
-						>
-							{scoreValue}
-							<span className="ml-1.5 align-middle font-normal text-[12px] text-text-sub-600">
-								{rating}
-							</span>
-						</p>
-					)}
-				</div>
-				<div className="mx-6 w-px bg-stroke-soft-200 sm:mx-8 dark:bg-white/10" />
+		<div className="group flex w-full flex-col">
+			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-2 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
+				<span className="font-medium text-lg text-text-strong-950 dark:text-white">
+					Statistics
+				</span>
 			</div>
-			{items.map((item, idx) => (
-				<div key={item.label} className="flex items-stretch">
-					<div className="min-w-[110px]">
-						<p className="text-[13px] text-text-sub-600">{item.label}</p>
-						{statsQuery.isPending ? (
-							<Skeleton className="mt-1.5 h-6 w-12 rounded" />
-						) : statsQuery.isError ? (
-							<p className="mt-0.5 font-medium text-[20px] text-text-soft-400">
-								—
-							</p>
-						) : (
-							<p className="mt-0.5 font-medium text-[20px] text-text-strong-950 tabular-nums">
-								{(item.value ?? 0).toLocaleString()}
-							</p>
-						)}
-					</div>
-					{idx < items.length - 1 && (
-						<div className="mx-6 w-px bg-stroke-soft-200 sm:mx-8 dark:bg-white/10" />
-					)}
+
+			<div className="-mt-1.5 flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
+				<div className="flex flex-wrap gap-8 sm:gap-12">
+					{rows.map((row) => (
+						<div key={row.label} className="flex flex-col gap-1">
+							<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+								{row.label}
+							</span>
+							{statsQuery.isPending ? (
+								<Skeleton className="h-8 w-16 rounded" />
+							) : statsQuery.isError ? (
+								<span className="font-bold text-2xl text-text-soft-400 tracking-tight sm:text-3xl">
+									—
+								</span>
+							) : (
+								<span
+									title={row.title}
+									className={cn(
+										"font-bold text-2xl text-text-strong-950 tabular-nums tracking-tight sm:text-3xl dark:text-white",
+										row.valueClassName,
+									)}
+								>
+									{row.value}
+								</span>
+							)}
+							{row.caption && !statsQuery.isPending && !statsQuery.isError && (
+								<span className="font-medium text-[11px] text-text-sub-600">
+									{row.caption}
+								</span>
+							)}
+						</div>
+					))}
 				</div>
-			))}
+			</div>
 		</div>
 	);
 }
@@ -244,8 +266,13 @@ export const ContactHeader = ({
 	const statusLabel = contact?.status
 		? getStatusLabel(contact.status as AudienceStatus)
 		: null;
+	const statusBadgeStatus =
+		contact?.status?.toLowerCase() === "subscribed"
+			? ("completed" as const)
+			: ("failed" as const);
 	const groupCount = contact?.groups?.length ?? 0;
 	const channelCount = enrolledChannels.length;
+	const propertyCount = propertyValues.length;
 
 	if (!contact && !isLoading) {
 		return (
@@ -313,13 +340,24 @@ export const ContactHeader = ({
 						</div>
 					</div>
 
-					{/* Name */}
+					{/* Name + subscription badge */}
 					{isLoading ? (
-						<Skeleton className="h-7 w-48 rounded-lg" />
+						<div className="flex items-center gap-2.5">
+							<Skeleton className="h-7 w-48 rounded-lg" />
+							<Skeleton className="h-6 w-24 rounded-md" />
+						</div>
 					) : (
-						<h1 className="font-medium text-[22px] text-text-strong-950 tracking-tight">
-							{displayName}
-						</h1>
+						<div className="flex flex-wrap items-center gap-2.5">
+							<h1 className="font-medium text-[22px] text-text-strong-950 tracking-tight">
+								{displayName}
+							</h1>
+							{statusLabel && (
+								<StatusBadge.Root variant="light" status={statusBadgeStatus}>
+									<StatusBadge.Dot />
+									{statusLabel}
+								</StatusBadge.Root>
+							)}
+						</div>
 					)}
 
 					{/* Meta line */}
@@ -327,18 +365,22 @@ export const ContactHeader = ({
 						<Skeleton className="mt-2 h-4 w-64 rounded" />
 					) : (
 						<p className="mt-1.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-[14px] text-text-sub-600">
-							{statusLabel && <span>{statusLabel}</span>}
-							<span>
+							<span className="flex items-center gap-1.5">
+								<Icon name="users" className="h-3.5 w-3.5" />
 								{groupCount} group{groupCount === 1 ? "" : "s"}
 							</span>
-							<span>
+							<span className="flex items-center gap-1.5">
+								<Icon
+									name="notification-indicator"
+									className="h-3.5 w-3.5"
+								/>
 								{channelCount} channel{channelCount === 1 ? "" : "s"}
 							</span>
+							<span className="flex items-center gap-1.5">
+								<Icon name="tag" className="h-3.5 w-3.5" />
+								{propertyCount} propert{propertyCount === 1 ? "y" : "ies"}
+							</span>
 						</p>
-					)}
-
-					{!isLoading && contact?.email && (
-						<ContactStatsRow email={contact.email} />
 					)}
 
 					{!isLoading && contact?.suppressionReason && (
@@ -361,6 +403,10 @@ export const ContactHeader = ({
 
 					{/* Content */}
 					<div className="mt-8 flex flex-col gap-10">
+						{!isLoading && contact?.email && (
+							<ContactStatsRow email={contact.email} />
+						)}
+
 						{contact?.email && (
 							<ContactEmailHistory
 								contactId={contact.id}
