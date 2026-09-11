@@ -9,6 +9,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { queryKeys } from "#/lib/query-keys";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -389,25 +390,10 @@ function describeHistory(entry: HistoryEntry): ActivityDescription {
 
 // ─── UI ──────────────────────────────────────────────────────────────────────
 
-/** "SEP" / "14" badge like the reference Time-off card. */
-function DateBadge({ date }: { date: string }) {
-	const d = new Date(date);
-	const valid = !Number.isNaN(d.getTime());
-	const month = valid
-		? d.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
-		: "—";
-	const day = valid ? String(d.getDate()) : "—";
-	return (
-		<div className="flex h-14 w-12 shrink-0 flex-col items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]">
-			<span className="font-medium text-[11px] text-text-sub-600 tracking-wide">
-				{month}
-			</span>
-			<span className="font-semibold text-lg text-text-strong-950 tabular-nums leading-none">
-				{day}
-			</span>
-		</div>
-	);
-}
+/** Grid columns mirroring the dashboard emails table, minus the To column. */
+const contactEmailGridStyle = {
+	gridTemplateColumns: "minmax(0, 1fr) 140px 120px",
+};
 
 /** Small tinted icon tile for profile-change rows. */
 function ChangeIconTile({ marker }: { marker: ActivityMarker }) {
@@ -500,20 +486,6 @@ function EmailStatusLabel({ entry }: { entry: ActivityEntry }) {
 			{label}
 		</span>
 	);
-}
-
-function emailSubtitle(entry: ActivityEntry): string {
-	const types = new Set(entry.events.map((e) => e.type));
-	const date = formatRowDate(entry.sentAt ?? entry.createdAt);
-	let engagement = "Sent";
-	if (types.has("clicked")) engagement = "Clicked";
-	else if (types.has("opened")) engagement = "Opened";
-	else if (types.has("delivered") || entry.deliveredAt)
-		engagement = "Delivered";
-	else if (types.has("bounced")) engagement = "Bounced";
-	else if (types.has("failed") || entry.failedAt) engagement = "Failed";
-	else if (types.has("complaint")) engagement = "Spam complaint";
-	return `${date} · ${engagement}`;
 }
 
 function Section({
@@ -726,80 +698,125 @@ export function ContactEmailHistory({
 				</div>
 			)}
 
-			{/* ── Emails · Time-off style card ─────────────────────────── */}
+			{/* ── Emails · dashboard table (no To column) ─────────────── */}
 			{showEmails && (
-				<Section title="Emails" count={emailTotal || undefined}>
-					{emailQuery.isPending ? (
-						<CardSkeletonRows />
-					) : emailQuery.isError ? (
-						<div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
-							<div className="flex h-9 w-9 items-center justify-center rounded-full border border-error-light bg-error-lighter">
-								<Icon name="alert-circle" className="h-4 w-4 text-error-base" />
+				<section>
+					<div className="mb-3 flex items-baseline gap-2">
+						<h3 className="text-[15px] text-text-sub-600">Emails</h3>
+					</div>
+					<div className="w-full text-paragraph-sm">
+						<div
+							style={contactEmailGridStyle}
+							className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
+						>
+							<div className="flex items-center gap-1">
+								<Icon name="file-text" className="h-3 w-3" />
+								<span className="text-xs">Subject</span>
 							</div>
-							<p className="font-medium text-paragraph-sm text-text-strong-950">
-								Couldn&apos;t load emails
-							</p>
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={() => void emailQuery.refetch()}
-							>
-								Retry
-							</Button.Root>
+							<div className="flex items-center gap-1">
+								<Icon name="check-circle" className="h-3 w-3" />
+								<span className="text-xs">Status</span>
+							</div>
+							<div className="flex items-center gap-1">
+								<Icon name="clock" className="h-3 w-3" />
+								<span className="text-xs">Time</span>
+							</div>
 						</div>
-					) : emailsEmpty ? (
-						<CardEmpty
-							icon="mail"
-							title="No emails yet"
-							body={`Emails sent to ${email} will appear here.`}
-						/>
-					) : (
-						<div className="divide-y divide-stroke-soft-200 dark:divide-white/10">
-							{sortedEmails.map((entry) => {
-								const subject = entry.subject?.trim() || "(no subject)";
-								return (
-									<Link
-										key={entry.id}
-										href={`/emails/${entry.id}`}
-										className="flex items-center gap-4 px-4 py-4 transition-colors hover:bg-bg-weak-50/70 sm:px-5 dark:hover:bg-white/[0.03]"
+						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+							{emailQuery.isPending ? (
+								Array.from({ length: 3 }).map((_, i) => (
+									<div
+										key={`email-skeleton-${i}`}
+										style={contactEmailGridStyle}
+										className="grid items-center px-4 py-2.5"
 									>
-										<DateBadge date={entry.sentAt ?? entry.createdAt} />
-										<div className="min-w-0 flex-1">
-											<p className="truncate font-medium text-[15px] text-text-strong-950">
-												{subject}
-											</p>
-											<p className="mt-0.5 truncate text-[13px] text-text-sub-600">
-												{emailSubtitle(entry)}
-											</p>
+										<div className="h-4 w-48 rounded bg-bg-weak-50" />
+										<div className="flex items-center gap-2">
+											<div className="h-3.5 w-3.5 rounded-full bg-bg-weak-50" />
+											<div className="h-4 w-16 rounded bg-bg-weak-50" />
 										</div>
-										<EmailStatusLabel entry={entry} />
-									</Link>
-								);
-							})}
-							{emailQuery.hasNextPage && (
-								<button
-									type="button"
-									onClick={handleLoadMoreEmails}
-									disabled={emailQuery.isFetchingNextPage}
-									className="flex w-full cursor-pointer items-center justify-center gap-2 px-4 py-3.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-bg-weak-50/70 hover:text-text-strong-950"
-								>
-									{emailQuery.isFetchingNextPage ? (
-										"Loading…"
-									) : (
-										<>
-											Load more
-											<span className="text-text-soft-400 tabular-nums">
-												{sortedEmails.length}/{emailTotal}
-											</span>
-										</>
+										<div className="h-4 w-20 rounded bg-bg-weak-50" />
+									</div>
+								))
+							) : emailQuery.isError ? (
+								<div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+									<div className="flex h-9 w-9 items-center justify-center rounded-full border border-error-light bg-error-lighter">
+										<Icon
+											name="alert-circle"
+											className="h-4 w-4 text-error-base"
+										/>
+									</div>
+									<p className="font-medium text-paragraph-sm text-text-strong-950">
+										Couldn&apos;t load emails
+									</p>
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="stroke"
+										size="xsmall"
+										onClick={() => void emailQuery.refetch()}
+									>
+										Retry
+									</Button.Root>
+								</div>
+							) : emailsEmpty ? (
+								<CardEmpty
+									icon="mail"
+									title="No emails yet"
+									body={`Emails sent to ${email} will appear here.`}
+								/>
+							) : (
+								<>
+									{sortedEmails.map((entry) => {
+										const subject = entry.subject?.trim() || "(No Subject)";
+										return (
+											<Link
+												key={entry.id}
+												href={`/emails/${entry.id}`}
+												style={contactEmailGridStyle}
+												className="grid w-full cursor-pointer items-center px-4 py-2.5 text-left transition-colors hover:bg-bg-weak-50"
+											>
+												<span className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
+													{subject}
+												</span>
+												<EmailStatusLabel entry={entry} />
+												<span
+													className="whitespace-nowrap font-medium text-[13px] text-text-sub-600"
+													title={formatRowDate(
+														entry.sentAt ?? entry.createdAt,
+													)}
+												>
+													{formatRelativeTime(
+														entry.sentAt ?? entry.createdAt,
+													)}
+												</span>
+											</Link>
+										);
+									})}
+									{emailQuery.hasNextPage && (
+										<button
+											type="button"
+											onClick={handleLoadMoreEmails}
+											disabled={emailQuery.isFetchingNextPage}
+											className="flex w-full cursor-pointer items-center justify-center gap-2 px-4 py-3.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-bg-weak-50/70 hover:text-text-strong-950"
+										>
+											{emailQuery.isFetchingNextPage ? (
+												"Loading…"
+											) : (
+												<>
+													Load more
+													<span className="text-text-soft-400 tabular-nums">
+														{sortedEmails.length}/{emailTotal}
+													</span>
+												</>
+											)}
+										</button>
 									)}
-								</button>
+								</>
 							)}
 						</div>
-					)}
-				</Section>
+					</div>
+				</section>
 			)}
 
 			{/* ── Changes · icon-tile card ─────────────────────────────── */}

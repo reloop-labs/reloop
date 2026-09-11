@@ -1,6 +1,5 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
@@ -472,17 +471,37 @@ export const ContactHeader = ({
 
 						<div className="flex shrink-0 items-center gap-2">
 							{isLoading ? (
-								<Skeleton className="h-9 w-28 rounded-lg" />
+								<>
+									<Skeleton className="h-9 w-28 rounded-lg" />
+									<Skeleton className="h-9 w-9 rounded-lg" />
+								</>
 							) : (
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="xsmall"
-									onClick={() => setIsEditModalOpen(true)}
-								>
-									Edit contact
-								</Button.Root>
+								<>
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="stroke"
+										size="xsmall"
+										onClick={() => setIsEditModalOpen(true)}
+									>
+										Edit contact
+									</Button.Root>
+									{contact && (
+										<Button.Root
+											type="button"
+											variant="neutral"
+											mode="stroke"
+											size="xsmall"
+											aria-label="Delete contact"
+											onClick={() => setIsDeleteModalOpen(true)}
+										>
+											<Icon
+												name="trash"
+												className="h-3.5 w-3.5 text-text-sub-600"
+											/>
+										</Button.Root>
+									)}
+								</>
 							)}
 						</div>
 					</div>
@@ -676,37 +695,6 @@ export const ContactHeader = ({
 							</div>
 						)}
 					</div>
-
-					{!isLoading && contact && (
-						<div className="mt-6">
-							<div className="rounded-xl border border-error-light py-2 pr-2.5 pl-3">
-								<div className="flex items-center justify-between gap-4">
-									<div>
-										<p className="font-medium text-label-sm text-text-strong-950">
-											Delete contact
-										</p>
-										<p className="text-paragraph-xs text-text-sub-600">
-											Permanently delete this contact and all its associated
-											data. This cannot be undone.
-										</p>
-									</div>
-									<FancyButton.Root
-										variant="destructive"
-										size="xsmall"
-										type="button"
-										onClick={() => setIsDeleteModalOpen(true)}
-									>
-										<FancyButton.Icon
-											as={Icon}
-											name="trash-2"
-											className="ml-0.5 h-3.5 w-3.5"
-										/>
-										Delete contact
-									</FancyButton.Root>
-								</div>
-							</div>
-						</div>
-					)}
 				</div>
 			</div>
 
