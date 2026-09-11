@@ -18,6 +18,7 @@ import {
 	X,
 } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { SupportChatMarkdown } from "./support-chat-markdown";
 import { useSupportSocket } from "#/features/dashboard/hooks/use-support-socket";
 import { clearSupportUnreadInCache } from "#/features/dashboard/hooks/use-support-unread";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -654,9 +655,7 @@ export function SupportChatPanel() {
 														: "rounded-2xl rounded-bl-md border border-stroke-soft-100 bg-bg-weak-50 text-text-strong-950 dark:border-white/8 dark:bg-white/[0.06] dark:text-white/90",
 												)}
 											>
-												<p className="whitespace-pre-wrap break-words">
-													{m.body}
-												</p>
+												<SupportChatMarkdown content={m.body} mine={mine} />
 											</div>
 										</div>
 										{showMeta ? (

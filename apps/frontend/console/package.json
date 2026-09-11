@@ -24,6 +24,8 @@
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"react-hook-form": "catalog:ui",
+		"react-markdown": "catalog:ui",
+		"remark-gfm": "^4.0.1",
 		"sonner": "catalog:ui",
 		"swr": "catalog:ui",
 		"valibot": "catalog:db"

@@ -35,6 +35,8 @@ import {
 	useState,
 } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
+import { MarkdownRenderer } from "@fe/console/components/ui/markdown-renderer";
+import { SupportComposer } from "./support-composer";
 import { SupportContextPanel } from "./support-context-panel";
 
 type ConversationsResponse = { items: SupportConversation[]; total: number };
@@ -158,7 +160,6 @@ export default function SupportPage() {
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const unreadBannerRef = useRef<HTMLDivElement>(null);
 	const didScrollToUnreadRef = useRef(false);
-	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const activeId = selectedId || null;
 	const activeIdRef = useRef(activeId);
@@ -406,9 +407,6 @@ export default function SupportPage() {
 			});
 			setSelectedDetail(res.conversation);
 			setDraft("");
-			if (textareaRef.current) {
-				textareaRef.current.style.height = "auto";
-			}
 		} catch (e) {
 			console.error("Failed to send support message", e);
 		} finally {
@@ -757,9 +755,10 @@ export default function SupportPage() {
 																	: "rounded-2xl rounded-bl-md border border-stroke-soft-100 bg-bg-white-0 text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-[#121212]",
 															)}
 														>
-															<p className="whitespace-pre-wrap break-words">
-																{m.body}
-															</p>
+															<MarkdownRenderer
+																content={m.body}
+																variant={isAdmin ? "outgoing" : "incoming"}
+															/>
 														</div>
 													</div>
 													{showAvatar ? (
@@ -797,52 +796,18 @@ export default function SupportPage() {
 										</button>
 									</div>
 								) : null}
-								<div
-									className={cn(
-										"flex items-end gap-2 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/90 p-1.5 pl-3 dark:bg-white/[0.04]",
-										selected.status === "closed" && "opacity-50",
-									)}
-								>
-									<textarea
-										ref={textareaRef}
-										value={draft}
-										onChange={(e) => {
-											setDraft(e.target.value);
-											e.target.style.height = "auto";
-											e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
-										}}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" && !e.shiftKey) {
-												e.preventDefault();
-												void handleSend();
-											}
-										}}
-										disabled={selected.status === "closed"}
-										placeholder={
-											selected.status === "closed"
-												? "Thread is closed"
-												: "Write a reply… (Enter to send, Shift+Enter for line)"
-										}
-										rows={1}
-										className="max-h-[140px] min-h-[42px] flex-1 resize-none overflow-y-auto bg-transparent py-2.5 text-[13px] text-text-strong-950 outline-none placeholder:text-text-soft-400"
-									/>
-									<button
-										type="button"
-										onClick={() => void handleSend()}
-										disabled={
-											!draft.trim() || sending || selected.status === "closed"
-										}
-										aria-label="Send reply"
-										className={cn(
-											"mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all",
-											draft.trim() && selected.status !== "closed"
-												? "bg-blue-600 text-white shadow-sm hover:bg-blue-700"
-												: "bg-bg-white-0 text-text-soft-400 ring-1 ring-stroke-soft-100",
-										)}
-									>
-										<ArrowUp className="h-4 w-4" />
-									</button>
-								</div>
+								<SupportComposer
+									draft={draft}
+									setDraft={setDraft}
+									onSend={handleSend}
+									disabled={selected.status === "closed"}
+									sending={sending}
+									placeholder={
+										selected.status === "closed"
+											? "Thread is closed"
+											: "Write a reply… (Enter to send, Shift+Enter for line)"
+									}
+								/>
 							</div>
 						</>
 					)}

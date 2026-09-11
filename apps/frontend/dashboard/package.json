@@ -83,6 +83,8 @@
 		"react-dropzone": "14.3.8",
 		"react-hook-form": "catalog:ui",
 		"react-hotkeys-hook": "catalog:ui",
+		"react-markdown": "catalog:ui",
+		"remark-gfm": "^4.0.1",
 		"react-resizable-panels": "^2.1.9",
 		"react-virtuoso": "^4.18.11",
 		"recharts": "catalog:ui",
