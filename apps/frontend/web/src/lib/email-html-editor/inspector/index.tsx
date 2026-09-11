@@ -761,50 +761,68 @@ function InspectorNodeStyles({
 					/>
 				</InspectorSection>
 			)}
-			{nodeType === "button" && (
-				<InspectorSection>
-					<PropRow label="Link">
-						<UrlInput
-							value={String(getAttr("href") ?? "")}
-							onChange={(v) => setAttr("href", v)}
-						/>
-					</PropRow>
-					<PropRow label="Full width">
-						<ToggleSwitch
-							checked={String(getStyle("width") ?? "").includes("100%")}
-							onChange={(checked) => {
-								if (checked) {
-									batchSetStyle([
-										{ prop: "width", value: "100%" },
-										{ prop: "display", value: "block" },
-									]);
-									setAttr("alignment", "center");
-									setAttr("align", "center");
-								} else {
-									batchSetStyle([
-										{ prop: "width", value: "auto" },
-										{ prop: "display", value: "inline-block" },
-									]);
-								}
-							}}
-						/>
-					</PropRow>
-					<div className="flex flex-col gap-1 px-4 py-1.5">
-						<span className="font-normal text-text-sub-600 text-xs dark:text-text-soft-400">
-							Alignment
-						</span>
-						<AlignControls
-							alignment={String(
-								getAttr("alignment") ?? getAttr("align") ?? "left",
-							)}
-							setAlignment={(align) => {
-								setAttr("alignment", align);
-								setAttr("align", align);
-							}}
-						/>
-					</div>
-				</InspectorSection>
-			)}
+			{nodeType === "button" &&
+				(() => {
+					const nodeAtPos = nodePos
+						? nodeEditor?.state.doc.nodeAt(nodePos.pos)
+						: null;
+					const nodeStyle =
+						nodeAtPos?.type.name === "button"
+							? String(nodeAtPos.attrs.style ?? "")
+							: "";
+					const rawStyle = String(getAttr("style") ?? "");
+					const isFullWidth =
+						/(?<![\w-])width\s*:\s*100%/i.test(rawStyle) ||
+						/(?<![\w-])width\s*:\s*100%/i.test(nodeStyle);
+
+					return (
+						<InspectorSection>
+							<PropRow label="Link">
+								<UrlInput
+									value={String(getAttr("href") ?? "")}
+									onChange={(v) => setAttr("href", v)}
+								/>
+							</PropRow>
+							<PropRow label="Full width">
+								<ToggleSwitch
+									checked={isFullWidth}
+									ariaLabel="Toggle full width"
+									onChange={(checked) => {
+										if (checked) {
+											batchSetStyle([
+												{ prop: "width", value: "100%" },
+												{ prop: "display", value: "block" },
+												{ prop: "textAlign", value: "center" },
+												{ prop: "boxSizing", value: "border-box" },
+											]);
+										} else {
+											batchSetStyle([
+												{ prop: "width", value: "" },
+												{ prop: "display", value: "inline-block" },
+												{ prop: "textAlign", value: "" },
+												{ prop: "boxSizing", value: "" },
+											]);
+										}
+									}}
+								/>
+							</PropRow>
+							<div className="flex flex-col gap-1 px-4 py-1.5">
+								<span className="font-normal text-text-sub-600 text-xs dark:text-text-soft-400">
+									Alignment
+								</span>
+								<AlignControls
+									alignment={String(
+										getAttr("alignment") ?? getAttr("align") ?? "left",
+									)}
+									setAlignment={(align) => {
+										setAttr("alignment", align);
+										setAttr("align", align);
+									}}
+								/>
+							</div>
+						</InspectorSection>
+					);
+				})()}
 			<InspectorSection>
 				<SectionHeader label="Background" />
 				<ColorRow

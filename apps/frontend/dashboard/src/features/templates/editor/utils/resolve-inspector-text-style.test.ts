@@ -67,7 +67,10 @@ describe("resolveInspectorTextStyle", () => {
 
 	it("reads CTA padding from the link mark", () => {
 		expect(
-			numericPxFromCss("padding-top:12px;padding-right:20px;background-color:#000", "paddingTop"),
+			numericPxFromCss(
+				"padding-top:12px;padding-right:20px;background-color:#000",
+				"paddingTop",
+			),
 		).toBe(12);
 		expect(numericPxFromCss("padding-right:20px", "paddingRight")).toBe(20);
 	});
@@ -118,13 +121,18 @@ describe("resolveInspectorTextStyle", () => {
 	});
 
 	it("reads and formats fontFamily and fontWeight from inline CSS", () => {
-		const css = "font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-weight: 600";
-		expect(valueFromInlineCss(css, "fontFamily")).toContain("Plus Jakarta Sans");
+		const css =
+			"font-family: 'Plus Jakarta Sans', Arial, sans-serif; font-weight: 600";
+		expect(valueFromInlineCss(css, "fontFamily")).toContain(
+			"Plus Jakarta Sans",
+		);
 		expect(valueFromInlineCss(css, "fontWeight")).toBe("600");
 
 		const updated = setInlineCssProp(css, "fontWeight", "700");
 		expect(updated).toContain("font-weight: 700");
-		expect(updated).toContain("font-family: 'Plus Jakarta Sans', Arial, sans-serif");
+		expect(updated).toContain(
+			"font-family: 'Plus Jakarta Sans', Arial, sans-serif",
+		);
 	});
 
 	it("resolves alignment prioritizing inline text-align style", () => {
@@ -614,5 +622,74 @@ describe("resolveInspectorTextStyle", () => {
 
 		editor.destroy();
 	});
-});
 
+	it("supports toggling button full-width on and off and detecting full-width state", () => {
+		const editor = new Editor({
+			extensions: [emailStarterKit()],
+			content:
+				'<div class="align-left"><a class="node-button button" alignment="left" style="background-color: #fff; padding: 14px 20px;" data-id="react-email-button" href="https://example.com"><span>Confirm Email</span></a></div>',
+		});
+
+		let buttonPos = -1;
+		editor.state.doc.descendants((node, pos) => {
+			if (node.type.name === "button") buttonPos = pos;
+		});
+		expect(buttonPos).toBeGreaterThanOrEqual(0);
+
+		const getButtonNode = () => editor.state.doc.nodeAt(buttonPos)!;
+
+		// Initially not full width
+		expect(String(getButtonNode().attrs.style || "")).not.toContain(
+			"width: 100%",
+		);
+
+		// Turn full width ON
+		const fullWidthStyle = `${getButtonNode().attrs.style || ""}; width: 100%; display: block; text-align: center; box-sizing: border-box;`;
+		editor.view.dispatch(
+			editor.state.tr.setNodeMarkup(buttonPos, null, {
+				...getButtonNode().attrs,
+				style: fullWidthStyle,
+			}),
+		);
+
+		expect(getButtonNode().attrs.style).toContain("width: 100%");
+		expect(getButtonNode().attrs.style).toContain("display: block");
+
+		// Turn full width OFF (reverse)
+		const cleanStyle = (getButtonNode().attrs.style || "")
+			.replace(/\bwidth\s*:\s*[^;]+;?/gi, "")
+			.replace(/\bdisplay\s*:\s*[^;]+;?/gi, "")
+			.replace(/\btext-align\s*:\s*[^;]+;?/gi, "")
+			.replace(/\bbox-sizing\s*:\s*[^;]+;?/gi, "")
+			.trim();
+		const offStyle = cleanStyle
+			? `${cleanStyle}; display: inline-block;`
+			: "display: inline-block;";
+
+		editor.view.dispatch(
+			editor.state.tr.setNodeMarkup(buttonPos, null, {
+				...getButtonNode().attrs,
+				style: offStyle,
+			}),
+		);
+
+		expect(getButtonNode().attrs.style).not.toContain("width");
+		expect(getButtonNode().attrs.style).toContain("display: inline-block");
+
+		editor.destroy();
+	});
+
+	it("distinguishes max-width: 100% from width: 100% on button nodes", () => {
+		const isFullWidthRegex = /(?<![\w-])width\s*:\s*100%/i;
+		const naturalStyle =
+			"line-height:1.5;display:inline-block;max-width:100%;background-color:#fff;";
+		expect(isFullWidthRegex.test(naturalStyle)).toBe(false);
+
+		const fullWidthStyle =
+			"line-height:1.5;display:block;width:100%;text-align:center;box-sizing:border-box;";
+		expect(isFullWidthRegex.test(fullWidthStyle)).toBe(true);
+
+		const spacedStyle = "width: 100%; display: block;";
+		expect(isFullWidthRegex.test(spacedStyle)).toBe(true);
+	});
+});
