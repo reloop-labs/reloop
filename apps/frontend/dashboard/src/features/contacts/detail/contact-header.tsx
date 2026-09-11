@@ -16,8 +16,8 @@ import {
 	getStatusLabel,
 } from "#/features/contacts/audience";
 import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import { queryKeys } from "#/lib/query-keys";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import { DeleteContactModal } from "../components/contacts/delete-contact-modal";
 import { EditContactModal } from "../components/contacts/edit-contact-modal";
 import { ContactEmailHistory } from "./contact-email-history";
@@ -135,41 +135,36 @@ function ContactStatsRow({ email }: { email: string }) {
 	});
 
 	const stats = statsQuery.data?.stats;
-	const engagement = statsQuery.data?.engagement ??
+	const engagement =
+		statsQuery.data?.engagement ??
 		(stats ? scoreEngagementFallback(stats) : undefined);
 	const rating = engagement?.rating ?? "New";
 	const scoreValue = engagement?.score;
 
 	const rows: {
 		label: string;
-		icon: "mail" | "mail-send" | "eye-outline" | "cursor" | "star";
 		value: React.ReactNode;
 		title?: string;
 		valueClassName?: string;
 	}[] = [
 		{
 			label: "Total emails",
-			icon: "mail",
 			value: (stats?.total ?? statsQuery.data?.total ?? 0).toLocaleString(),
 		},
 		{
 			label: "Sent",
-			icon: "mail-send",
 			value: (stats?.sent ?? 0).toLocaleString(),
 		},
 		{
 			label: "Opened",
-			icon: "eye-outline",
 			value: (stats?.opened ?? 0).toLocaleString(),
 		},
 		{
 			label: "Clicked",
-			icon: "cursor",
 			value: (stats?.clicked ?? 0).toLocaleString(),
 		},
 		{
 			label: "Score",
-			icon: "star",
 			value:
 				scoreValue == null ? (
 					"—"
@@ -385,10 +380,7 @@ export const ContactHeader = ({
 								{groupCount} group{groupCount === 1 ? "" : "s"}
 							</span>
 							<span className="flex items-center gap-1.5">
-								<Icon
-									name="notification-indicator"
-									className="h-3.5 w-3.5"
-								/>
+								<Icon name="notification-indicator" className="h-3.5 w-3.5" />
 								{channelCount} channel{channelCount === 1 ? "" : "s"}
 							</span>
 							<span className="flex items-center gap-1.5">
@@ -432,173 +424,159 @@ export const ContactHeader = ({
 						)}
 
 						<section>
-								<h3 className="mb-3 text-[15px] text-text-sub-600">
-									Properties
-								</h3>
-								{isLoading ? (
-									<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">
-										{[0, 1, 2, 3].map((i) => (
-											<div
-												key={`property-skeleton-${i}`}
-												className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-4 last:border-b-0 sm:px-5 dark:border-white/10"
-											>
-												<Skeleton className="h-4 w-24 rounded" />
-												<Skeleton className="h-4 w-32 rounded" />
-											</div>
-										))}
+							<h3 className="mb-3 text-[15px] text-text-sub-600">Properties</h3>
+							{isLoading ? (
+								<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">
+									{[0, 1, 2, 3].map((i) => (
+										<div
+											key={`property-skeleton-${i}`}
+											className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-4 last:border-b-0 sm:px-5 dark:border-white/10"
+										>
+											<Skeleton className="h-4 w-24 rounded" />
+											<Skeleton className="h-4 w-32 rounded" />
+										</div>
+									))}
+								</div>
+							) : (
+								<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white dark:border-white/10 dark:bg-white/[0.02]">
+									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
+										<span className="font-medium text-[15px] text-text-strong-950">
+											Email
+										</span>
+										<span className="truncate font-medium text-[15px] text-text-strong-950">
+											{contact?.email}
+										</span>
 									</div>
-								) : (
-									<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white dark:border-white/10 dark:bg-white/[0.02]">
-										<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-											<span className="font-medium text-[15px] text-text-strong-950">
-												Email
-											</span>
-											<span className="truncate font-medium text-[15px] text-text-strong-950">
-												{contact?.email}
-											</span>
-										</div>
-										<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-											<span className="font-medium text-[15px] text-text-strong-950">
-												First name
-											</span>
-											<span className="font-medium text-[15px] text-text-strong-950">
-												{contact?.firstName || "—"}
-											</span>
-										</div>
-										<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-											<span className="font-medium text-[15px] text-text-strong-950">
-												Last name
-											</span>
-											<span className="font-medium text-[15px] text-text-strong-950">
-												{contact?.lastName || "—"}
-											</span>
-										</div>
-										<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-											<span className="font-medium text-[15px] text-text-strong-950">
-												Status
-											</span>
-											<span
-												className={cn(
-													"flex items-center gap-1.5 font-medium text-[15px]",
-													getStatusColorClass(
+									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
+										<span className="font-medium text-[15px] text-text-strong-950">
+											First name
+										</span>
+										<span className="font-medium text-[15px] text-text-strong-950">
+											{contact?.firstName || "—"}
+										</span>
+									</div>
+									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
+										<span className="font-medium text-[15px] text-text-strong-950">
+											Last name
+										</span>
+										<span className="font-medium text-[15px] text-text-strong-950">
+											{contact?.lastName || "—"}
+										</span>
+									</div>
+									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
+										<span className="font-medium text-[15px] text-text-strong-950">
+											Status
+										</span>
+										<span
+											className={cn(
+												"flex items-center gap-1.5 font-medium text-[15px]",
+												getStatusColorClass(contact?.status as AudienceStatus),
+											)}
+										>
+											<Icon
+												name={
+													getSharedStatusIcon(
 														contact?.status as AudienceStatus,
-													),
+													) as Parameters<typeof Icon>[0]["name"]
+												}
+												className="h-3.5 w-3.5"
+											/>
+											{statusLabel}
+										</span>
+									</div>
+									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
+										<span className="font-medium text-[15px] text-text-strong-950">
+											Groups
+										</span>
+										{contact?.groups && contact.groups.length > 0 ? (
+											<span className="flex max-w-[60%] flex-wrap justify-end gap-x-3 gap-y-1">
+												{contact.groups.map((group) => (
+													<Link
+														href={`/contacts/groups/${group.id}`}
+														key={group.id}
+														className="font-medium text-[15px] text-text-strong-950 underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
+													>
+														{group.name}
+													</Link>
+												))}
+											</span>
+										) : (
+											<span className="text-[15px] text-text-soft-400">—</span>
+										)}
+									</div>
+									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
+										<span className="font-medium text-[15px] text-text-strong-950">
+											Channels
+										</span>
+										{enrolledChannels.length > 0 ? (
+											<span className="max-w-[60%] truncate font-medium text-[15px] text-text-strong-950">
+												{enrolledChannels.map((c) => c.name).join(" · ")}
+											</span>
+										) : (
+											<span className="text-[15px] text-text-soft-400">—</span>
+										)}
+									</div>
+									{propertyValues.map((pv, idx) => {
+										const isLast =
+											idx === propertyValues.length - 1 && !contact?.createdAt;
+										return (
+											<div
+												key={pv.id}
+												className={cn(
+													"flex items-center justify-between gap-4 px-4 py-4 sm:px-5",
+													!isLast &&
+														"border-stroke-soft-200 border-b dark:border-white/10",
 												)}
 											>
+												<span className="font-medium text-[15px] text-text-strong-950">
+													{formatPropertyName(pv.name)}
+												</span>
+												<span className="max-w-[60%] truncate text-right font-medium text-[15px] text-text-strong-950">
+													{pv.value || "—"}
+												</span>
+											</div>
+										);
+									})}
+									{contact?.createdAt && (
+										<div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-5">
+											<span className="font-medium text-[15px] text-text-strong-950">
+												Created
+											</span>
+											<span className="font-medium text-[15px] text-text-strong-950">
+												{formatRelativeTime(contact.createdAt)}
+											</span>
+										</div>
+									)}
+									{contact?.id && (
+										<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-t px-4 py-4 sm:px-5 dark:border-white/10">
+											<span className="font-medium text-[15px] text-text-strong-950">
+												ID
+											</span>
+											<button
+												className="group/copy flex cursor-pointer items-center gap-1.5"
+												type="button"
+												onClick={handleCopyId}
+											>
+												<code className="max-w-[160px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
+													{contact.id.slice(0, 18)}...
+												</code>
 												<Icon
-													name={
-														getSharedStatusIcon(
-															contact?.status as AudienceStatus,
-														) as Parameters<typeof Icon>[0]["name"]
-													}
-													className="h-3.5 w-3.5"
-												/>
-												{statusLabel}
-											</span>
-										</div>
-										<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-											<span className="font-medium text-[15px] text-text-strong-950">
-												Groups
-											</span>
-											{contact?.groups && contact.groups.length > 0 ? (
-												<span className="flex max-w-[60%] flex-wrap justify-end gap-x-3 gap-y-1">
-													{contact.groups.map((group) => (
-														<Link
-															href={`/contacts/groups/${group.id}`}
-															key={group.id}
-															className="font-medium text-[15px] text-text-strong-950 underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
-														>
-															{group.name}
-														</Link>
-													))}
-												</span>
-											) : (
-												<span className="text-[15px] text-text-soft-400">
-													—
-												</span>
-											)}
-										</div>
-										<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-											<span className="font-medium text-[15px] text-text-strong-950">
-												Channels
-											</span>
-											{enrolledChannels.length > 0 ? (
-												<span className="max-w-[60%] truncate font-medium text-[15px] text-text-strong-950">
-													{enrolledChannels.map((c) => c.name).join(" · ")}
-												</span>
-											) : (
-												<span className="text-[15px] text-text-soft-400">
-													—
-												</span>
-											)}
-										</div>
-										{propertyValues.map((pv, idx) => {
-											const isLast =
-												idx === propertyValues.length - 1 &&
-												!contact?.createdAt;
-											return (
-												<div
-													key={pv.id}
+													name={copied ? "check" : "copy"}
 													className={cn(
-														"flex items-center justify-between gap-4 px-4 py-4 sm:px-5",
-														!isLast &&
-															"border-stroke-soft-200 border-b dark:border-white/10",
+														"h-3 w-3 flex-shrink-0 transition-all",
+														copied ? "text-success-base" : "text-text-sub-600",
 													)}
-												>
-													<span className="font-medium text-[15px] text-text-strong-950">
-														{formatPropertyName(pv.name)}
-													</span>
-													<span className="max-w-[60%] truncate text-right font-medium text-[15px] text-text-strong-950">
-														{pv.value || "—"}
-													</span>
-												</div>
-											);
-										})}
-										{contact?.createdAt && (
-											<div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-5">
-												<span className="font-medium text-[15px] text-text-strong-950">
-													Created
-												</span>
-												<span className="font-medium text-[15px] text-text-strong-950">
-													{formatRelativeTime(contact.createdAt)}
-												</span>
-											</div>
-										)}
-										{contact?.id && (
-											<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-t px-4 py-4 sm:px-5 dark:border-white/10">
-												<span className="font-medium text-[15px] text-text-strong-950">
-													ID
-												</span>
-												<button
-													className="group/copy flex cursor-pointer items-center gap-1.5"
-													type="button"
-													onClick={handleCopyId}
-												>
-													<code className="max-w-[160px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
-														{contact.id.slice(0, 18)}...
-													</code>
-													<Icon
-														name={copied ? "check" : "copy"}
-														className={cn(
-															"h-3 w-3 flex-shrink-0 transition-all",
-															copied
-																? "text-success-base"
-																: "text-text-sub-600",
-														)}
-													/>
-												</button>
-											</div>
-										)}
-									</div>
-								)}
-							</section>
+												/>
+											</button>
+										</div>
+									)}
+								</div>
+							)}
+						</section>
 					</div>
 
 					{!isLoading && contact && (
 						<div className="mt-6">
-							<p className="mb-3 font-medium text-label-md text-text-strong-950">
-								Danger zone
-							</p>
 							<div className="rounded-xl border border-error-light py-2 pr-2.5 pl-3">
 								<div className="flex items-center justify-between gap-4">
 									<div>
