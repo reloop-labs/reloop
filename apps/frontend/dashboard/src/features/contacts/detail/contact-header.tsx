@@ -145,7 +145,6 @@ function ContactStatsRow({ email }: { email: string }) {
 		value: React.ReactNode;
 		title?: string;
 		valueClassName?: string;
-		caption?: string;
 	}[] = [
 		{
 			label: "Total emails",
@@ -165,14 +164,21 @@ function ContactStatsRow({ email }: { email: string }) {
 		},
 		{
 			label: "Score",
-			value: scoreValue == null ? "—" : scoreValue.toLocaleString(),
+			value:
+				scoreValue == null ? (
+					"—"
+				) : (
+					<>
+						{scoreValue.toLocaleString()}
+						<span className="font-normal text-text-sub-600"> · {rating}</span>
+					</>
+				),
 			title:
 				scoreValue == null
 					? "Not enough sending history to score this contact yet"
 					: `Engagement ${scoreValue}/100 · ${rating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`,
 			valueClassName:
 				scoreValue == null ? "text-text-soft-400" : scoreColor(rating),
-			caption: scoreValue == null ? undefined : rating,
 		},
 	];
 
@@ -184,34 +190,29 @@ function ContactStatsRow({ email }: { email: string }) {
 				</span>
 			</div>
 
-			<div className="-mt-1.5 flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
-				<div className="flex flex-wrap gap-8 sm:gap-12">
+			<div className="-mt-1.5 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
+				<div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
 					{rows.map((row) => (
-						<div key={row.label} className="flex flex-col gap-1">
-							<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+						<div key={row.label} className="min-w-0">
+							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
 								{row.label}
-							</span>
+							</p>
 							{statsQuery.isPending ? (
-								<Skeleton className="h-8 w-16 rounded" />
+								<Skeleton className="mt-1 h-5 w-16 rounded-lg" />
 							) : statsQuery.isError ? (
-								<span className="font-bold text-2xl text-text-soft-400 tracking-tight sm:text-3xl">
+								<p className="mt-1 truncate font-medium text-sm text-text-soft-400 tabular-nums">
 									—
-								</span>
+								</p>
 							) : (
-								<span
+								<p
 									title={row.title}
 									className={cn(
-										"font-bold text-2xl text-text-strong-950 tabular-nums tracking-tight sm:text-3xl dark:text-white",
+										"mt-1 truncate font-medium text-sm text-text-strong-950 tabular-nums",
 										row.valueClassName,
 									)}
 								>
 									{row.value}
-								</span>
-							)}
-							{row.caption && !statsQuery.isPending && !statsQuery.isError && (
-								<span className="font-medium text-[11px] text-text-sub-600">
-									{row.caption}
-								</span>
+								</p>
 							)}
 						</div>
 					))}
