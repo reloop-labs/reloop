@@ -1,7 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
+import { Icon, type IconName } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
@@ -113,12 +113,12 @@ function scoreColor(rating: EngagementRating): string {
 	}
 }
 
-function ContactStatsRow({ email }: { email: string }) {
+function useContactEngagement(email: string | undefined) {
 	const statsQuery = useQuery({
-		queryKey: [...queryKeys.contacts.activity(email), "stats"],
+		queryKey: [...queryKeys.contacts.activity(email ?? ""), "stats"],
 		queryFn: async () => {
 			const res = await fetch(
-				`/api/logs/v1/emails/contact-activity?email=${encodeURIComponent(email)}&limit=1&page=1`,
+				`/api/logs/v1/emails/contact-activity?email=${encodeURIComponent(email ?? "")}&limit=1&page=1`,
 				{ credentials: "include" },
 			);
 			if (!res.ok) throw new Error("Failed to load contact stats");
@@ -136,88 +136,89 @@ function ContactStatsRow({ email }: { email: string }) {
 	const engagement =
 		statsQuery.data?.engagement ??
 		(stats ? scoreEngagementFallback(stats) : undefined);
-	const rating = engagement?.rating ?? "New";
-	const scoreValue = engagement?.score;
+
+	return {
+		statsQuery,
+		stats,
+		engagement,
+		rating: engagement?.rating ?? ("New" as EngagementRating),
+		scoreValue: engagement?.score,
+	};
+}
+
+function ContactStatsRow({ email }: { email: string }) {
+	const { statsQuery, stats } = useContactEngagement(email);
 
 	const rows: {
 		label: string;
+		icon: IconName;
 		value: React.ReactNode;
 		title?: string;
 		valueClassName?: string;
 	}[] = [
 		{
 			label: "Total emails",
+			icon: "mail",
 			value: (stats?.total ?? statsQuery.data?.total ?? 0).toLocaleString(),
 		},
 		{
 			label: "Sent",
+			icon: "mail-send",
 			value: (stats?.sent ?? 0).toLocaleString(),
 		},
 		{
 			label: "Opened",
+			icon: "eye-outline",
 			value: (stats?.opened ?? 0).toLocaleString(),
 		},
 		{
 			label: "Clicked",
+			icon: "cursor-click",
 			value: (stats?.clicked ?? 0).toLocaleString(),
 		},
 		{
-			label: "Score",
-			value:
-				scoreValue == null ? (
-					"—"
-				) : (
-					<>
-						{scoreValue.toLocaleString()}
-						<span className="font-normal text-text-sub-600"> · {rating}</span>
-					</>
-				),
-			title:
-				scoreValue == null
-					? "Not enough sending history to score this contact yet"
-					: `Engagement ${scoreValue}/100 · ${rating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`,
-			valueClassName:
-				scoreValue == null ? "text-text-soft-400" : scoreColor(rating),
+			label: "Bounced",
+			icon: "bounce",
+			value: (stats?.bounced ?? 0).toLocaleString(),
+			valueClassName: (stats?.bounced ?? 0) > 0 ? "text-error-base" : undefined,
+		},
+		{
+			label: "Failed",
+			icon: "cross-circle",
+			value: (stats?.failed ?? 0).toLocaleString(),
+			valueClassName: (stats?.failed ?? 0) > 0 ? "text-error-base" : undefined,
 		},
 	];
 
 	return (
-		<div className="group flex w-full flex-col">
-			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-2 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
-				<span className="font-medium text-lg text-text-strong-950 dark:text-white">
-					Statistics
-				</span>
+		<section>
+			<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
+				Statistics
+			</h3>
+			<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+				{rows.map((row) => (
+					<DetailItem key={row.label} icon={row.icon} label={row.label}>
+						{statsQuery.isPending ? (
+							<Skeleton className="h-4 w-12 rounded" />
+						) : statsQuery.isError ? (
+							<span className="font-medium text-paragraph-sm text-text-soft-400">
+								—
+							</span>
+						) : (
+							<span
+								title={row.title}
+								className={cn(
+									"font-medium text-paragraph-sm text-text-strong-950 tabular-nums",
+									row.valueClassName,
+								)}
+							>
+								{row.value}
+							</span>
+						)}
+					</DetailItem>
+				))}
 			</div>
-
-			<div className="-mt-1.5 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
-				<div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
-					{rows.map((row) => (
-						<div key={row.label} className="min-w-0">
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-								{row.label}
-							</p>
-							{statsQuery.isPending ? (
-								<Skeleton className="mt-1 h-5 w-16 rounded-lg" />
-							) : statsQuery.isError ? (
-								<p className="mt-1 truncate font-medium text-sm text-text-soft-400 tabular-nums">
-									—
-								</p>
-							) : (
-								<p
-									title={row.title}
-									className={cn(
-										"mt-1 truncate font-medium text-sm text-text-strong-950 tabular-nums",
-										row.valueClassName,
-									)}
-								>
-									{row.value}
-								</p>
-							)}
-						</div>
-					))}
-				</div>
-			</div>
-		</div>
+		</section>
 	);
 }
 
@@ -227,6 +228,47 @@ const formatPropertyName = (name: string) => {
 		.replace(/^./, (str) => str.toUpperCase())
 		.trim();
 };
+
+function PropertyField({
+	label,
+	children,
+}: {
+	label: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="flex min-w-0 flex-col gap-1">
+			<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+				{label}
+			</span>
+			<div className="min-w-0 font-medium text-paragraph-sm text-text-strong-950">
+				{children}
+			</div>
+		</div>
+	);
+}
+
+function DetailItem({
+	icon,
+	label,
+	children,
+}: {
+	icon: IconName;
+	label: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="flex min-w-0 flex-col gap-1.5">
+			<div className="flex items-center gap-1.5">
+				<Icon name={icon} className="h-3.5 w-3.5 text-text-sub-600" />
+				<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+					{label}
+				</span>
+			</div>
+			{children}
+		</div>
+	);
+}
 
 export const ContactHeader = ({
 	contact,
@@ -238,6 +280,12 @@ export const ContactHeader = ({
 	const [copied, setCopied] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+	const {
+		statsQuery: engagementQuery,
+		rating: engagementRating,
+		scoreValue: engagementScore,
+	} = useContactEngagement(contact?.email);
 
 	const handleCopyId = async () => {
 		if (contact?.id) {
@@ -298,21 +346,36 @@ export const ContactHeader = ({
 	return (
 		<>
 			<div className="mx-auto w-full max-w-[760px] pb-16">
-				{/* Pastel banner */}
-				<div className="h-28 rounded-2xl bg-gradient-to-r from-[#F9DEE2] via-[#FCF0E3] to-[#DCEEF6] sm:h-32 dark:from-[#F9DEE2]/25 dark:via-[#FCF0E3]/15 dark:to-[#DCEEF6]/20" />
-
-				<div className="px-4 sm:px-6">
-					{/* Avatar + actions row (Twitter-style) */}
-					<div className="-mt-10 mb-4 flex items-end justify-between gap-4">
+				<div className="px-4 pt-6 sm:px-6">
+					{/* Avatar + name + actions row */}
+					<div className="flex items-center gap-4">
 						{isLoading ? (
-							<Skeleton className="size-20 rounded-full" />
+							<Skeleton className="size-10 shrink-0 rounded-full" />
 						) : (
-							<div className="flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-2xl text-white uppercase tracking-wide shadow-sm ring-4 ring-white dark:ring-[#0a0a0b]">
+							<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-base text-white uppercase tracking-wide shadow-sm">
 								{initial}
 							</div>
 						)}
 
-						<div className="flex shrink-0 items-center gap-2 pb-1">
+						<div className="min-w-0 flex-1">
+							{isLoading ? (
+								<div className="flex items-center gap-2.5">
+									<Skeleton className="h-7 w-48 rounded-lg" />
+									<Skeleton className="h-6 w-24 rounded-md" />
+								</div>
+							) : (
+								<div className="flex flex-wrap items-center gap-2.5">
+									<h1 className="truncate font-medium text-[22px] text-text-strong-950 tracking-tight">
+										{displayName}
+									</h1>
+									{contact?.status && (
+										<ContactStatusBadge status={contact.status} />
+									)}
+								</div>
+							)}
+						</div>
+
+						<div className="flex shrink-0 items-center gap-2">
 							{isLoading ? (
 								<Skeleton className="h-9 w-28 rounded-lg" />
 							) : (
@@ -328,23 +391,6 @@ export const ContactHeader = ({
 							)}
 						</div>
 					</div>
-
-					{/* Name + subscription badge */}
-					{isLoading ? (
-						<div className="flex items-center gap-2.5">
-							<Skeleton className="h-7 w-48 rounded-lg" />
-							<Skeleton className="h-6 w-24 rounded-md" />
-						</div>
-					) : (
-						<div className="flex flex-wrap items-center gap-2.5">
-							<h1 className="font-medium text-[22px] text-text-strong-950 tracking-tight">
-								{displayName}
-							</h1>
-							{contact?.status && (
-								<ContactStatusBadge status={contact.status} />
-							)}
-						</div>
-					)}
 
 					{!isLoading && contact?.suppressionReason && (
 						<div className="mt-6 flex items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3">
@@ -366,17 +412,156 @@ export const ContactHeader = ({
 
 					{/* Content */}
 					<div className="mt-8 flex flex-col gap-10">
-						{!isLoading && contact?.email && (
-							<ContactStatsRow email={contact.email} />
+						<section>
+							<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
+								Properties
+							</h3>
+							{isLoading ? (
+								<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+									{[0, 1, 2, 3, 4, 5].map((i) => (
+										<div
+											key={`property-skeleton-${i}`}
+											className="flex flex-col gap-1"
+										>
+											<Skeleton className="h-2.5 w-16 rounded" />
+											<Skeleton className="h-4 w-28 rounded" />
+										</div>
+									))}
+								</div>
+							) : (
+								<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+									<PropertyField label="First name">
+										{contact?.firstName || "—"}
+									</PropertyField>
+									<PropertyField label="Last name">
+										{contact?.lastName || "—"}
+									</PropertyField>
+									{propertyValues.map((pv) => (
+										<PropertyField
+											key={pv.id}
+											label={formatPropertyName(pv.name)}
+										>
+											{pv.value ? (
+												<span className="block truncate">{pv.value}</span>
+											) : (
+												"—"
+											)}
+										</PropertyField>
+									))}
+								</div>
+							)}
+						</section>
+
+						{isLoading ? (
+							<div className="grid grid-cols-3 gap-x-12 gap-y-6">
+								{[0, 1, 2, 3, 4].map((i) => (
+									<div
+										key={`detail-skeleton-${i}`}
+										className="flex flex-col gap-1.5"
+									>
+										<Skeleton className="h-3.5 w-20 rounded" />
+										<Skeleton className="h-4 w-28 rounded" />
+									</div>
+								))}
+							</div>
+						) : (
+							contact && (
+								<div className="grid grid-cols-3 gap-x-12 gap-y-6">
+									<DetailItem icon="calendar" label="Created">
+										<span className="font-medium text-paragraph-sm text-text-strong-950">
+											{contact.createdAt
+												? formatRelativeTime(contact.createdAt)
+												: "—"}
+										</span>
+									</DetailItem>
+									<DetailItem icon="hash" label="ID">
+										<button
+											className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
+											type="button"
+											onClick={handleCopyId}
+										>
+											<code className="max-w-[120px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
+												{contact.id.slice(0, 18)}...
+											</code>
+											<Icon
+												name={copied ? "check" : "copy"}
+												className={cn(
+													"h-3 w-3 flex-shrink-0 transition-all",
+													copied ? "text-success-base" : "text-text-sub-600",
+												)}
+											/>
+										</button>
+									</DetailItem>
+									<DetailItem icon="star" label="Score">
+										{engagementQuery.isPending ? (
+											<Skeleton className="h-4 w-16 rounded" />
+										) : engagementQuery.isError || engagementScore == null ? (
+											<span
+												className="font-medium text-paragraph-sm text-text-soft-400"
+												title="Not enough sending history to score this contact yet"
+											>
+												—
+											</span>
+										) : (
+											<span
+												className={cn(
+													"font-medium text-paragraph-sm tabular-nums",
+													scoreColor(engagementRating),
+												)}
+												title={`Engagement ${engagementScore}/100 · ${engagementRating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`}
+											>
+												{engagementScore.toLocaleString()}
+												<span className="font-normal text-text-sub-600">
+													{" "}
+													· {engagementRating}
+												</span>
+											</span>
+										)}
+									</DetailItem>
+									<DetailItem icon="modules" label="Groups">
+										{contact.groups && contact.groups.length > 0 ? (
+											<span className="flex flex-wrap gap-x-3 gap-y-1 font-medium text-paragraph-sm text-text-strong-950">
+												{contact.groups.map((group) => (
+													<Link
+														href={`/contacts/groups/${group.id}`}
+														key={group.id}
+														className="underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
+													>
+														{group.name}
+													</Link>
+												))}
+											</span>
+										) : (
+											<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
+												No groups
+											</span>
+										)}
+									</DetailItem>
+									<DetailItem icon="notification-indicator" label="Channels">
+										{enrolledChannels.length > 0 ? (
+											<span className="flex flex-wrap gap-x-3 gap-y-1 font-medium text-paragraph-sm text-text-strong-950">
+												{enrolledChannels.map((channel) => (
+													<Link
+														href={`/contacts?channelId=${channel.id}`}
+														key={channel.id}
+														className="underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
+													>
+														{channel.name}
+													</Link>
+												))}
+											</span>
+										) : (
+											<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
+												No channels
+											</span>
+										)}
+									</DetailItem>
+								</div>
+							)
 						)}
 
-						{contact?.email && (
-							<ContactEmailHistory
-								contactId={contact.id}
-								email={contact.email}
-								contactCreatedAt={contact.createdAt}
-								filter="all"
-							/>
+						{!isLoading && contact?.email && (
+							<ContactStatsRow email={contact.email} />
 						)}
 
 						<section>
@@ -439,133 +624,14 @@ export const ContactHeader = ({
 							)}
 						</section>
 
-						<section>
-							<h3 className="mb-3 text-[15px] text-text-sub-600">Properties</h3>
-							{isLoading ? (
-								<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">
-									{[0, 1, 2, 3].map((i) => (
-										<div
-											key={`property-skeleton-${i}`}
-											className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-4 last:border-b-0 sm:px-5 dark:border-white/10"
-										>
-											<Skeleton className="h-4 w-24 rounded" />
-											<Skeleton className="h-4 w-32 rounded" />
-										</div>
-									))}
-								</div>
-							) : (
-								<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white dark:border-white/10 dark:bg-white/[0.02]">
-									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-										<span className="font-medium text-[15px] text-text-strong-950">
-											Email
-										</span>
-										<span className="truncate font-medium text-[15px] text-text-strong-950">
-											{contact?.email}
-										</span>
-									</div>
-									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-										<span className="font-medium text-[15px] text-text-strong-950">
-											First name
-										</span>
-										<span className="font-medium text-[15px] text-text-strong-950">
-											{contact?.firstName || "—"}
-										</span>
-									</div>
-									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-										<span className="font-medium text-[15px] text-text-strong-950">
-											Last name
-										</span>
-										<span className="font-medium text-[15px] text-text-strong-950">
-											{contact?.lastName || "—"}
-										</span>
-									</div>
-									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-										<span className="font-medium text-[15px] text-text-strong-950">
-											Status
-										</span>
-										{contact?.status ? (
-											<ContactStatusBadge status={contact.status} />
-										) : (
-											<span className="text-text-sub-600">—</span>
-										)}
-									</div>
-									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-										<span className="font-medium text-[15px] text-text-strong-950">
-											Groups
-										</span>
-										{contact?.groups && contact.groups.length > 0 ? (
-											<span className="flex max-w-[60%] flex-wrap justify-end gap-x-3 gap-y-1">
-												{contact.groups.map((group) => (
-													<Link
-														href={`/contacts/groups/${group.id}`}
-														key={group.id}
-														className="font-medium text-[15px] text-text-strong-950 underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
-													>
-														{group.name}
-													</Link>
-												))}
-											</span>
-										) : (
-											<span className="text-[15px] text-text-soft-400">—</span>
-										)}
-									</div>
-									{propertyValues.map((pv, idx) => {
-										const isLast =
-											idx === propertyValues.length - 1 && !contact?.createdAt;
-										return (
-											<div
-												key={pv.id}
-												className={cn(
-													"flex items-center justify-between gap-4 px-4 py-4 sm:px-5",
-													!isLast &&
-														"border-stroke-soft-200 border-b dark:border-white/10",
-												)}
-											>
-												<span className="font-medium text-[15px] text-text-strong-950">
-													{formatPropertyName(pv.name)}
-												</span>
-												<span className="max-w-[60%] truncate text-right font-medium text-[15px] text-text-strong-950">
-													{pv.value || "—"}
-												</span>
-											</div>
-										);
-									})}
-									{contact?.createdAt && (
-										<div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-5">
-											<span className="font-medium text-[15px] text-text-strong-950">
-												Created
-											</span>
-											<span className="font-medium text-[15px] text-text-strong-950">
-												{formatRelativeTime(contact.createdAt)}
-											</span>
-										</div>
-									)}
-									{contact?.id && (
-										<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-t px-4 py-4 sm:px-5 dark:border-white/10">
-											<span className="font-medium text-[15px] text-text-strong-950">
-												ID
-											</span>
-											<button
-												className="group/copy flex cursor-pointer items-center gap-1.5"
-												type="button"
-												onClick={handleCopyId}
-											>
-												<code className="max-w-[160px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
-													{contact.id.slice(0, 18)}...
-												</code>
-												<Icon
-													name={copied ? "check" : "copy"}
-													className={cn(
-														"h-3 w-3 flex-shrink-0 transition-all",
-														copied ? "text-success-base" : "text-text-sub-600",
-													)}
-												/>
-											</button>
-										</div>
-									)}
-								</div>
-							)}
-						</section>
+						{contact?.email && (
+							<ContactEmailHistory
+								contactId={contact.id}
+								email={contact.email}
+								contactCreatedAt={contact.createdAt}
+								filter="all"
+							/>
+						)}
 					</div>
 
 					{!isLoading && contact && (
