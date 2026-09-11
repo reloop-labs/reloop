@@ -374,8 +374,24 @@ export namespace LogsModel {
 		clicked: t.Number(),
 		bounced: t.Number(),
 		failed: t.Number(),
+		complained: t.Number(),
 	});
 	export type ContactActivityStats = typeof contactActivityStats.static;
+
+	export const contactActivityEngagement = t.Object({
+		/** 0–100 engagement score, null when nothing sent yet ("New"). */
+		score: t.Union([t.Number(), t.Null()]),
+		rating: t.Union([
+			t.Literal("New"),
+			t.Literal("Excellent"),
+			t.Literal("Good"),
+			t.Literal("Fair"),
+			t.Literal("At risk"),
+			t.Literal("Poor"),
+		]),
+	});
+	export type ContactActivityEngagement =
+		typeof contactActivityEngagement.static;
 
 	export const contactActivityResponse = t.Object({
 		object: t.Literal("contact_activity"),
@@ -385,6 +401,7 @@ export namespace LogsModel {
 		page: t.Number(),
 		limit: t.Number(),
 		stats: contactActivityStats,
+		engagement: contactActivityEngagement,
 	});
 	export type ContactActivityResponse = typeof contactActivityResponse.static;
 

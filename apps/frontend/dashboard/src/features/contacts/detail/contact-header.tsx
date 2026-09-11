@@ -45,6 +45,73 @@ interface ContactEngagementStats {
 	clicked: number;
 	bounced: number;
 	failed: number;
+	complained: number;
+}
+
+type EngagementRating =
+	| "New"
+	| "Excellent"
+	| "Good"
+	| "Fair"
+	| "At risk"
+	| "Poor";
+
+/**
+ * Client-side mirror of the backend engagement scorer
+ * (apps/backend/logs/src/lib/contact-engagement-score.ts).
+ * Used as a fallback if the API response predates the engagement field.
+ * Score 0–100 from delivery (20%), opens (35%), click-to-open (25%),
+ * scaled CTR (20%), minus bounce/fail/complaint penalties, shrunk toward
+ * 50 when fewer than 5 delivered. Any complaint caps at 40.
+ */
+function scoreEngagementFallback(s: ContactEngagementStats): {
+	score: number | null;
+	rating: EngagementRating;
+} {
+	if (s.sent <= 0) return { score: null, rating: "New" };
+	const total = Math.max(s.total, 1);
+	const clamp01 = (n: number) =>
+		Number.isNaN(n) ? 0 : Math.min(1, Math.max(0, n));
+	const delivery = clamp01(s.delivered / Math.max(s.sent, 1));
+	const open = clamp01(s.opened / Math.max(s.delivered, 1));
+	const ctor = s.opened > 0 ? clamp01(s.clicked / s.opened) : 0;
+	const ctrScaled = clamp01((s.clicked / Math.max(s.delivered, 1)) * 5);
+	let value =
+		100 * (0.2 * delivery + 0.35 * open + 0.25 * ctor + 0.2 * ctrScaled);
+	value -=
+		40 * (s.bounced / total) +
+		25 * (s.failed / total) +
+		60 * (s.complained / total);
+	value = Math.min(100, Math.max(0, value));
+	if (s.complained > 0) value = Math.min(value, 40);
+	const confidence = Math.min(s.delivered / 5, 1);
+	const score = Math.round(50 + (value - 50) * confidence);
+	const rating: EngagementRating =
+		score >= 80
+			? "Excellent"
+			: score >= 60
+				? "Good"
+				: score >= 40
+					? "Fair"
+					: score >= 20
+						? "At risk"
+						: "Poor";
+	return { score, rating };
+}
+
+function scoreColor(rating: EngagementRating): string {
+	switch (rating) {
+		case "Excellent":
+		case "Good":
+			return "text-success-base";
+		case "Fair":
+			return "text-warning-base";
+		case "At risk":
+		case "Poor":
+			return "text-error-base";
+		default:
+			return "text-text-soft-400";
+	}
 }
 
 function ContactStatsRow({ email }: { email: string }) {
@@ -59,6 +126,7 @@ function ContactStatsRow({ email }: { email: string }) {
 			return res.json() as Promise<{
 				total: number;
 				stats: ContactEngagementStats;
+				engagement?: { score: number | null; rating: EngagementRating };
 			}>;
 		},
 		enabled: !!email,
@@ -66,6 +134,10 @@ function ContactStatsRow({ email }: { email: string }) {
 	});
 
 	const stats = statsQuery.data?.stats;
+	const engagement = statsQuery.data?.engagement ??
+		(stats ? scoreEngagementFallback(stats) : undefined);
+	const rating = engagement?.rating ?? "New";
+	const scoreValue = engagement?.score;
 
 	const items = [
 		{ label: "Total emails", value: stats?.total ?? statsQuery.data?.total },
@@ -75,7 +147,33 @@ function ContactStatsRow({ email }: { email: string }) {
 	];
 
 	return (
-		<div className="mt-6 flex items-stretch">
+		<div className="mt-6 flex flex-wrap items-stretch gap-y-4">
+			<div className="flex items-stretch">
+				<div className="min-w-[90px]">
+					<p className="text-[13px] text-text-sub-600">Score</p>
+					{statsQuery.isPending ? (
+						<Skeleton className="mt-1.5 h-6 w-12 rounded" />
+					) : statsQuery.isError || scoreValue == null ? (
+						<p
+							className="mt-0.5 font-medium text-[20px] text-text-soft-400"
+							title="Not enough sending history to score this contact yet"
+						>
+							—
+						</p>
+					) : (
+						<p
+							className={`mt-0.5 font-medium text-[20px] tabular-nums ${scoreColor(rating)}`}
+							title={`Engagement ${scoreValue}/100 · ${rating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`}
+						>
+							{scoreValue}
+							<span className="ml-1.5 align-middle font-normal text-[12px] text-text-sub-600">
+								{rating}
+							</span>
+						</p>
+					)}
+				</div>
+				<div className="mx-6 w-px bg-stroke-soft-200 sm:mx-8 dark:bg-white/10" />
+			</div>
 			{items.map((item, idx) => (
 				<div key={item.label} className="flex items-stretch">
 					<div className="min-w-[110px]">

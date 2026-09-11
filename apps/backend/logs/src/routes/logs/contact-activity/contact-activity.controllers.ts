@@ -1,5 +1,6 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { scoreContactEngagement } from "@reloop/logs/lib/contact-engagement-score";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, count, desc, eq, type SQL, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
@@ -68,7 +69,12 @@ export async function contactActivityController({
 					SELECT 1 FROM ${schema.emailEvent}
 					WHERE ${schema.emailEvent.emailLogId} = ${schema.emailLog.id}
 					AND ${schema.emailEvent.type} = 'bounced'
-				))::int AS bounced
+				))::int AS bounced,
+				COUNT(*) FILTER (WHERE EXISTS (
+					SELECT 1 FROM ${schema.emailEvent}
+					WHERE ${schema.emailEvent.emailLogId} = ${schema.emailLog.id}
+					AND ${schema.emailEvent.type} = 'complaint'
+				))::int AS complained
 			FROM ${schema.emailLog}
 			WHERE ${whereClause}
 		`);
@@ -82,6 +88,7 @@ export async function contactActivityController({
 					opened: number;
 					clicked: number;
 					bounced: number;
+					complained: number;
 			  }
 			| undefined;
 
@@ -93,7 +100,10 @@ export async function contactActivityController({
 			clicked: statsRow?.clicked ?? 0,
 			bounced: statsRow?.bounced ?? 0,
 			failed: statsRow?.failed ?? 0,
+			complained: statsRow?.complained ?? 0,
 		};
+
+		const engagement = scoreContactEngagement(stats);
 
 		log.info("Contact activity fetched", { email, count: logs.length, total });
 
@@ -122,6 +132,7 @@ export async function contactActivityController({
 			page,
 			limit,
 			stats,
+			engagement,
 		};
 	} catch (error) {
 		log.error("Error fetching contact activity", {
