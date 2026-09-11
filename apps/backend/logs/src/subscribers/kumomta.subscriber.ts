@@ -219,6 +219,23 @@ export async function initKumomtaSubscriber() {
 					.set(updateData)
 					.where(eq(schema.emailLog.id, emailLogId));
 
+				if (newStatus === "failed" || newStatus === "bounced") {
+					const orgId =
+						(event.headers?.["X-Org-ID"] as string) ||
+						(event.meta?.["X-Org-ID"] as string) ||
+						"";
+
+					await bus
+						.publish(BusEvent.EMAIL_FAILED, {
+							organizationId: orgId,
+							emailLogId,
+							errorMessage:
+								(updateData.errorMessage as string) || "Delivery failed",
+							timestamp: new Date().toISOString(),
+						})
+						.catch(() => {});
+				}
+
 				log.info({
 					emailLogId,
 					type: event.type,

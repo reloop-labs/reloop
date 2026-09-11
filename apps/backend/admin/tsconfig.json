@@ -13,11 +13,10 @@
 		"declaration": false,
 		"declarationMap": false,
 		"baseUrl": ".",
-		"rootDir": "./src",
 		"paths": {
 			"@reloop/admin/*": ["./src/*"]
 		}
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "test/**/*"],
 	"exclude": ["node_modules", "dist"]
 }

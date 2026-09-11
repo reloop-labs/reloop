@@ -1,5 +1,11 @@
+import { sendSlackSupportNotification } from "@reloop/admin/services/slack/slack.service";
 import { db } from "@reloop/db/client";
-import { supportConversation, supportMessage, user } from "@reloop/db/schema";
+import {
+	organization,
+	supportConversation,
+	supportMessage,
+	user,
+} from "@reloop/db/schema";
 import { and, count, desc, eq, gt, sql } from "drizzle-orm";
 import { createError } from "evlog";
 
@@ -567,6 +573,28 @@ export async function createMessageController(input: {
 	const forUser = updatedConversation
 		? await mapConversation(updatedConversation, false)
 		: mapped;
+
+	// Notify Reloop admins via Slack when a customer sends a message
+	if (input.senderRole === "user") {
+		let orgName: string | null = null;
+		if (conversation.organizationId) {
+			const [org] = await db
+				.select({ name: organization.name })
+				.from(organization)
+				.where(eq(organization.id, conversation.organizationId))
+				.limit(1);
+			orgName = org?.name ?? null;
+		}
+
+		sendSlackSupportNotification({
+			conversationId: conversation.id,
+			userName: sender?.name ?? conversation.userName,
+			userEmail: sender?.email ?? conversation.userEmail,
+			orgName,
+			orgId: conversation.organizationId,
+			body: trimmed,
+		}).catch(() => {});
+	}
 
 	return {
 		message,

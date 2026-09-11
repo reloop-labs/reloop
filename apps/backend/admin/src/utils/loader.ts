@@ -1,4 +1,5 @@
 import { adminConfig } from "@reloop/admin/admin.config";
+import { initEmailFailedSubscriber } from "@reloop/admin/subscribers/email-failed.subscriber";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
@@ -14,6 +15,7 @@ export const loader = async () => {
 		log.info("Postgres", "Connected");
 		await bus.connect(adminConfig.NATS_URL);
 		log.info("NATS", "Connected");
+		await initEmailFailedSubscriber();
 	} catch (e) {
 		log.error({
 			message: "Error during service initialization",
