@@ -163,8 +163,13 @@ function ContactStatsRow({ email }: { email: string }) {
 		},
 		{
 			label: "Sent",
-			icon: "mail-send",
+			icon: "send-1",
 			value: (stats?.sent ?? 0).toLocaleString(),
+		},
+		{
+			label: "Delivered",
+			icon: "check-circle",
+			value: (stats?.delivered ?? 0).toLocaleString(),
 		},
 		{
 			label: "Opened",
@@ -177,16 +182,14 @@ function ContactStatsRow({ email }: { email: string }) {
 			value: (stats?.clicked ?? 0).toLocaleString(),
 		},
 		{
-			label: "Bounced",
-			icon: "bounce",
-			value: (stats?.bounced ?? 0).toLocaleString(),
-			valueClassName: (stats?.bounced ?? 0) > 0 ? "text-error-base" : undefined,
-		},
-		{
 			label: "Failed",
 			icon: "cross-circle",
-			value: (stats?.failed ?? 0).toLocaleString(),
-			valueClassName: (stats?.failed ?? 0) > 0 ? "text-error-base" : undefined,
+			value: ((stats?.bounced ?? 0) + (stats?.failed ?? 0)).toLocaleString(),
+			title: "Bounced + failed deliveries",
+			valueClassName:
+				(stats?.bounced ?? 0) + (stats?.failed ?? 0) > 0
+					? "text-error-base"
+					: undefined,
 		},
 	];
 
