@@ -29,7 +29,11 @@ interface ContactHeaderProps {
 	contact: ContactDetail | undefined;
 	isLoading: boolean;
 	propertyValues: PropertyValueWithName[];
-	enrolledChannels?: { id: string; name: string }[];
+	enrolledChannels?: {
+		id: string;
+		name: string;
+		description?: string | null;
+	}[];
 }
 
 interface ContactEngagementStats {
@@ -259,10 +263,6 @@ export const ContactHeader = ({
 			: (contact?.email ?? "Contact");
 	const initial = (displayName.charAt(0) || "?").toUpperCase();
 
-	const groupCount = contact?.groups?.length ?? 0;
-	const channelCount = enrolledChannels.length;
-	const propertyCount = propertyValues.length;
-
 	if (!contact && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
@@ -346,26 +346,6 @@ export const ContactHeader = ({
 						</div>
 					)}
 
-					{/* Meta line */}
-					{isLoading ? (
-						<Skeleton className="mt-2 h-4 w-64 rounded" />
-					) : (
-						<p className="mt-1.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-[14px] text-text-sub-600">
-							<span className="flex items-center gap-1.5">
-								<Icon name="users" className="h-3.5 w-3.5" />
-								{groupCount} group{groupCount === 1 ? "" : "s"}
-							</span>
-							<span className="flex items-center gap-1.5">
-								<Icon name="notification-indicator" className="h-3.5 w-3.5" />
-								{channelCount} channel{channelCount === 1 ? "" : "s"}
-							</span>
-							<span className="flex items-center gap-1.5">
-								<Icon name="tag" className="h-3.5 w-3.5" />
-								{propertyCount} propert{propertyCount === 1 ? "y" : "ies"}
-							</span>
-						</p>
-					)}
-
 					{!isLoading && contact?.suppressionReason && (
 						<div className="mt-6 flex items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3">
 							<Icon
@@ -398,6 +378,66 @@ export const ContactHeader = ({
 								filter="all"
 							/>
 						)}
+
+						<section>
+							<div className="mb-3 flex items-baseline gap-2">
+								<h3 className="text-[15px] text-text-sub-600">Channels</h3>
+								{!isLoading && enrolledChannels.length > 0 && (
+									<span className="text-[13px] text-text-soft-400 tabular-nums">
+										{enrolledChannels.length}
+									</span>
+								)}
+							</div>
+							{isLoading ? (
+								<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">
+									{[0, 1].map((i) => (
+										<div
+											key={`channel-skeleton-${i}`}
+											className="flex items-center gap-3 border-stroke-soft-200 border-b px-4 py-4 last:border-b-0 sm:px-5 dark:border-white/10"
+										>
+											<Skeleton className="h-5 w-5 shrink-0 rounded-md" />
+											<div className="flex flex-1 flex-col gap-2">
+												<Skeleton className="h-4 w-32 rounded" />
+												<Skeleton className="h-3 w-48 rounded" />
+											</div>
+										</div>
+									))}
+								</div>
+							) : enrolledChannels.length > 0 ? (
+								<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white dark:border-white/10 dark:bg-white/[0.02]">
+									{enrolledChannels.map((channel, idx) => (
+										<div
+											key={channel.id}
+											className={cn(
+												"flex items-center gap-3 px-4 py-4 sm:px-5",
+												idx < enrolledChannels.length - 1 &&
+													"border-stroke-soft-200 border-b dark:border-white/10",
+											)}
+										>
+											<span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-text-strong-950 text-static-white">
+												<Icon name="check" className="h-3.5 w-3.5" />
+											</span>
+											<span className="min-w-0">
+												<span className="block truncate font-medium text-[15px] text-text-strong-950">
+													{channel.name}
+												</span>
+												{channel.description && (
+													<span className="mt-0.5 block truncate text-[13px] text-text-sub-600">
+														{channel.description}
+													</span>
+												)}
+											</span>
+										</div>
+									))}
+								</div>
+							) : (
+								<div className="rounded-2xl border border-stroke-soft-200 bg-white px-4 py-6 text-center sm:px-5 dark:border-white/10 dark:bg-white/[0.02]">
+									<p className="text-[13px] text-text-soft-400">
+										Not enrolled in any channel.
+									</p>
+								</div>
+							)}
+						</section>
 
 						<section>
 							<h3 className="mb-3 text-[15px] text-text-sub-600">Properties</h3>
@@ -464,18 +504,6 @@ export const ContactHeader = ({
 														{group.name}
 													</Link>
 												))}
-											</span>
-										) : (
-											<span className="text-[15px] text-text-soft-400">—</span>
-										)}
-									</div>
-									<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b px-4 py-4 sm:px-5 dark:border-white/10">
-										<span className="font-medium text-[15px] text-text-strong-950">
-											Channels
-										</span>
-										{enrolledChannels.length > 0 ? (
-											<span className="max-w-[60%] truncate font-medium text-[15px] text-text-strong-950">
-												{enrolledChannels.map((c) => c.name).join(" · ")}
 											</span>
 										) : (
 											<span className="text-[15px] text-text-soft-400">—</span>

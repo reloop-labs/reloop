@@ -1,5 +1,6 @@
 import {
 	useAllPropertiesQuery,
+	useChannelsQuery,
 	useContactQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
 import { ContactHeader } from "./contact-header";
@@ -13,6 +14,7 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 	} = useContactQuery(contactId);
 
 	const { data: allPropertiesData } = useAllPropertiesQuery();
+	const { data: channelsData } = useChannelsQuery();
 
 	const allPropertiesWithValues =
 		allPropertiesData?.properties?.map((prop) => {
@@ -33,9 +35,16 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 	const enrolledChannels = (() => {
 		// Only show channels with an explicit enrollment on the contact.
 		// Channel defaultSubscription (opt-in/opt-out) is not membership.
+		const descriptions = new Map(
+			(channelsData?.channels ?? []).map((c) => [c.id, c.description]),
+		);
 		return (contactData?.channels ?? [])
 			.filter((channel) => channel.subscription === "opt_in")
-			.map((channel) => ({ id: channel.id, name: channel.name }));
+			.map((channel) => ({
+				id: channel.id,
+				name: channel.name,
+				description: descriptions.get(channel.id) ?? null,
+			}));
 	})();
 
 	const isLoading = contactLoading || (isFetching && !contactData);
