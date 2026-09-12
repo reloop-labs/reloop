@@ -631,7 +631,7 @@ export function ContactEmailHistory({
 	const historyTotal = historyQuery.data?.pages[0]?.total ?? 0;
 	const hasCreatedAudit = historyEntries.some((e) => e.action === "created");
 
-	const showEmails = filter !== "changes";
+	const showEmails = filter === "emails";
 	const showChanges = filter !== "emails";
 
 	const sortedEmails = useMemo(
@@ -698,12 +698,8 @@ export function ContactEmailHistory({
 				</div>
 			)}
 
-			{/* ── Emails · dashboard table (no To column) ─────────────── */}
 			{showEmails && (
 				<section>
-					<div className="mb-3 flex items-baseline gap-2">
-						<h3 className="text-[15px] text-text-sub-600">Emails</h3>
-					</div>
 					<div className="w-full text-paragraph-sm">
 						<div
 							style={contactEmailGridStyle}
