@@ -465,8 +465,8 @@ function ErrorDetailsPanel({
 							{summary}
 						</span>
 					</div>
-					<div className="flex items-center gap-2">
-						{onResend && (
+					{onResend && (
+						<div className="flex items-center gap-2">
 							<Button.Root
 								size="xsmall"
 								variant="neutral"
@@ -484,9 +484,8 @@ function ErrorDetailsPanel({
 								/>
 								<span>{isResending ? "Resending…" : "Resend email"}</span>
 							</Button.Root>
-						)}
-						<CopyButton value={errorMessage} label="Error details" />
-					</div>
+						</div>
+					)}
 				</div>
 
 				{/* Error details content - always visible */}
@@ -1178,7 +1177,9 @@ export const EmailDetail = ({
 			{!isLoading && email?.errorMessage && (
 				<ErrorDetailsPanel
 					errorMessage={email.errorMessage}
-					onResend={onResend}
+					onResend={
+						email?.status?.toLowerCase() !== "bounced" ? onResend : undefined
+					}
 					isResending={isResending}
 				/>
 			)}

@@ -166,7 +166,7 @@ function useEmailActionsMenu(
 
 	const isFailed = useMemo(() => {
 		const s = log.status.toLowerCase();
-		return s === "failed" || s === "bounced" || s === "spam";
+		return s === "failed";
 	}, [log.status]);
 
 	const menuItems = useMemo(() => {

@@ -23,12 +23,11 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 	const isFailed = useMemo(() => {
 		if (!data) return false;
 		const s = data.status?.toLowerCase();
+		if (s === "bounced") return false;
 		return (
 			s === "failed" ||
-			s === "bounced" ||
-			s === "spam" ||
-			!!data.errorMessage ||
-			!!data.failedAt
+			((s !== "sent" && s !== "delivered" && s !== "pending") &&
+				(!!data.errorMessage || !!data.failedAt))
 		);
 	}, [data]);
 
