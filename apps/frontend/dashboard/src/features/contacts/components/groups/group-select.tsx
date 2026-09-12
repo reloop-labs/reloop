@@ -159,10 +159,12 @@ export const GroupSelect = ({
 									// doesn't activate any control.
 									e.stopPropagation();
 								}}
-								className={cn(
-									"inline-flex h-6 max-w-full shrink-0 cursor-default items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40",
-									hideItemIcons ? "pl-2.5" : "pl-px",
-								)}
+								// NOTE: plain string, not cn() — default twMerge can't tell
+								// custom text-paragraph-sm (size) apart from text-text-*
+								// (color) and drops the size, rendering 16px instead of 14px.
+								className={`inline-flex h-6 max-w-full shrink-0 cursor-default items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 text-paragraph-sm text-text-strong-950 transition-all dark:border-stroke-soft-100/40 ${
+									hideItemIcons ? "pl-2.5" : "pl-0.5"
+								}`}
 							>
 								{hideItemIcons ? null : (
 									<Avatar.Root size="20" color="gray">

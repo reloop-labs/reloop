@@ -292,7 +292,6 @@ function EditContactFields({
 					selectedChannelIds={selectedChannelIds}
 					onChange={setSelectedChannelIds}
 					disabled={isSaving}
-					isSubscribed={isSubscribed}
 				/>
 
 				{/* 2. Marketing Email toggle */}
@@ -801,7 +800,6 @@ export function EditContactForm({
 							selectedChannelIds={selectedChannelIds}
 							onChange={setSelectedChannelIds}
 							disabled={isSaving}
-							isSubscribed={isSubscribed}
 						/>
 
 						{/* 2. Marketing Email toggle */}

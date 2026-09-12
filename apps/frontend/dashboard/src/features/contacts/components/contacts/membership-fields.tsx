@@ -55,7 +55,6 @@ interface ChannelsFieldProps {
 	selectedChannelIds: string[];
 	onChange: (ids: string[]) => void;
 	disabled?: boolean;
-	isSubscribed?: boolean;
 }
 
 export function ChannelsField({
@@ -64,7 +63,6 @@ export function ChannelsField({
 	selectedChannelIds,
 	onChange,
 	disabled,
-	isSubscribed = true,
 }: ChannelsFieldProps) {
 	const [channelInput, setChannelInput] = useState("");
 	const [showChannelDropdown, setShowChannelDropdown] = useState(false);
@@ -142,12 +140,7 @@ export function ChannelsField({
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	return (
-		<div
-			className={cn(
-				"flex flex-col gap-1.5 transition-opacity",
-				!isSubscribed && "opacity-60",
-			)}
-		>
+		<div className="flex flex-col gap-1.5">
 			<Label.Root
 				htmlFor={`channels-${contactId}`}
 				className="font-medium text-text-strong-950 text-xs"
@@ -186,7 +179,7 @@ export function ChannelsField({
 									// doesn't activate any control.
 									e.stopPropagation();
 								}}
-								className="inline-flex h-6 max-w-full shrink-0 cursor-default items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-px text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
+								className="inline-flex h-6 max-w-full shrink-0 cursor-default items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-sm text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
 							>
 								<Avatar.Root size="20" color="gray">
 									<Icon
