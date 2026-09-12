@@ -1,10 +1,9 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
+import { Icon, type IconName } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Minus, Plus, User } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
@@ -75,7 +74,7 @@ interface ContactHistoryResponse {
 	limit: number;
 }
 
-export type ActivityFilter = "all" | "changes" | "emails";
+export type ActivityFilter = "all" | "emails";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -395,34 +394,122 @@ const contactEmailGridStyle = {
 	gridTemplateColumns: "minmax(0, 1fr) 140px 120px",
 };
 
-/** Small tinted icon tile for profile-change rows. */
-function ChangeIconTile({ marker }: { marker: ActivityMarker }) {
-	if (marker === "plus") {
-		return (
-			<div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-[10px] border border-green-alpha-16 bg-green-alpha-10 text-success-base">
-				<Plus className="size-4" aria-hidden strokeWidth={2.25} />
-			</div>
-		);
-	}
-	if (marker === "minus") {
-		return (
-			<div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-[10px] border border-red-alpha-16 bg-red-alpha-10 text-error-base">
-				<Minus className="size-4" aria-hidden strokeWidth={2.25} />
-			</div>
-		);
-	}
+/** Fixed pastel tile tones (light + dark) for activity icons. */
+const tileTones = {
+	blue: "border-[#C9DCFA] bg-[#EAF1FD] text-[#1D5FD0] dark:border-white/15 dark:bg-white/10 dark:text-[#8AB4F8]",
+	purple:
+		"border-[#DDCFFA] bg-[#F2EBFD] text-[#7C3AED] dark:border-white/15 dark:bg-white/10 dark:text-[#C4B5FD]",
+	amber:
+		"border-[#EFDDB0] bg-[#FAF3E0] text-[#B45309] dark:border-white/15 dark:bg-white/10 dark:text-[#FCD34D]",
+	green:
+		"border-[#BDE5C8] bg-[#E9F7EE] text-[#15803D] dark:border-white/15 dark:bg-white/10 dark:text-[#86EFAC]",
+} as const;
+
+type TileTone = keyof typeof tileTones;
+
+function ResourceTile({ tone, icon }: { tone: TileTone; icon: IconName }) {
+	return (
+		<span
+			className={`flex size-10 shrink-0 items-center justify-center rounded-[10px] border ${tileTones[tone]}`}
+		>
+			<Icon name={icon} className="size-4" />
+		</span>
+	);
+}
+
+/**
+ * Definite icon per resource — group gets the group icon, channel the
+ * channel icon, etc. No more generic +/- tiles.
+ */
+function ChangeIconTile({
+	marker,
+	resource,
+}: {
+	marker: ActivityMarker;
+	resource?: ResourceKind;
+}) {
 	if (marker === "contact") {
+		return <ResourceTile tone="green" icon="user" />;
+	}
+	switch (resource) {
+		case "group":
+			return <ResourceTile tone="blue" icon="modules" />;
+		case "channel":
+			return <ResourceTile tone="purple" icon="notification-indicator" />;
+		case "property":
+			return <ResourceTile tone="amber" icon="tag" />;
+		case "email":
+		case "mail":
+			return <ResourceTile tone="blue" icon="mail-single" />;
+		case "status":
+			return <ResourceTile tone="purple" icon="activity" />;
+		case "name":
+		case "profile":
+			return <ResourceTile tone="blue" icon="user" />;
+		default:
+			return <ResourceTile tone="blue" icon="activity" />;
+	}
+}
+
+/** Tinted square icon tile for email rows — tint follows delivery status. */
+function EmailActivityIcon({ entry }: { entry: ActivityEntry }) {
+	const { tone } = getEmailStatus(entry);
+	if (tone === "green") {
 		return (
-			<div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-[10px] border border-green-alpha-16 bg-green-alpha-10 text-success-base">
-				<User className="size-4" aria-hidden strokeWidth={2.25} />
-			</div>
+			<span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-green-alpha-16 bg-green-alpha-10 text-success-base">
+				<Icon name="mail-single" className="size-4" />
+			</span>
+		);
+	}
+	if (tone === "red") {
+		return (
+			<span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-red-alpha-16 bg-red-alpha-10 text-error-base">
+				<Icon name="mail-single" className="size-4" />
+			</span>
 		);
 	}
 	return (
-		<div className="flex h-14 w-12 shrink-0 items-center justify-center rounded-[10px] border border-primary-alpha-16 bg-primary-alpha-10 text-primary-base">
-			<Icon name="arrow-up-right" className="size-4" />
-		</div>
+		<span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-primary-alpha-16 bg-primary-alpha-10 text-primary-base">
+			<Icon name="mail-single" className="size-4" />
+		</span>
 	);
+}
+const activityGridStyle = {
+	gridTemplateColumns: "minmax(0, 1fr) 120px",
+};
+
+function dayKey(date: string | Date): string {
+	const d = new Date(date);
+	if (Number.isNaN(d.getTime())) return "unknown";
+	return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+/** "FRIDAY, JANUARY 3" — with year when not the current year. */
+function formatDayHeader(date: string | Date): string {
+	const d = new Date(date);
+	if (Number.isNaN(d.getTime())) return "—";
+	const now = new Date();
+	const withYear = d.getFullYear() !== now.getFullYear();
+	const s = d.toLocaleDateString("en-US", {
+		weekday: "long",
+		month: "long",
+		day: "numeric",
+		...(withYear ? { year: "numeric" } : {}),
+	});
+	return s.toUpperCase();
+}
+
+/** "6:19 am" */
+function formatTimeAmPm(date: string | Date): string {
+	const d = new Date(date);
+	if (Number.isNaN(d.getTime())) return "—";
+	return d
+		.toLocaleTimeString("en-US", {
+			hour: "numeric",
+			minute: "2-digit",
+			hour12: true,
+		})
+		.toLowerCase();
 }
 
 function formatRowDate(date: string): string {
@@ -516,20 +603,28 @@ function Section({
 
 function CardSkeletonRows() {
 	return (
-		<div className="divide-y divide-stroke-soft-200 dark:divide-white/10">
-			{Array.from({ length: 3 }).map((_, i) => (
-				<div
-					key={`card-skeleton-${i}`}
-					className="flex items-center gap-4 px-4 py-4 sm:px-5"
-				>
-					<Skeleton className="h-14 w-12 shrink-0 rounded-[10px]" />
-					<div className="flex flex-1 flex-col gap-2">
-						<Skeleton className="h-4 w-2/5 rounded" />
-						<Skeleton className="h-3 w-1/4 rounded" />
-					</div>
-					<Skeleton className="h-4 w-16 rounded" />
+		<div className="flex flex-col gap-8">
+			<div>
+				<Skeleton className="h-4 w-48 rounded" />
+				<div className="mt-2 divide-y divide-stroke-soft-200 border-t border-stroke-soft-200 dark:divide-white/10 dark:border-white/10">
+					{Array.from({ length: 3 }).map((_, i) => (
+						<div
+							key={`card-skeleton-${i}`}
+							style={activityGridStyle}
+							className="grid items-center gap-4 py-4"
+						>
+							<div className="flex items-center gap-3">
+								<Skeleton className="size-10 shrink-0 rounded-[10px]" />
+								<div className="flex flex-1 flex-col gap-2">
+									<Skeleton className="h-4 w-2/5 rounded" />
+									<Skeleton className="h-3 w-1/4 rounded" />
+								</div>
+							</div>
+							<Skeleton className="h-4 w-20 rounded" />
+						</div>
+					))}
 				</div>
-			))}
+			</div>
 		</div>
 	);
 }
@@ -632,7 +727,7 @@ export function ContactEmailHistory({
 	const hasCreatedAudit = historyEntries.some((e) => e.action === "created");
 
 	const showEmails = filter === "emails";
-	const showChanges = filter !== "emails";
+	const showMerged = filter === "all";
 
 	const sortedEmails = useMemo(
 		() =>
@@ -696,6 +791,214 @@ export function ContactEmailHistory({
 						Retry
 					</Button.Root>
 				</div>
+			)}
+
+			{/* ── Merged activity · emails + changes interleaved by time ── */}
+			{showMerged && (
+				<section>
+					{emailQuery.isPending || historyQuery.isPending ? (
+						<CardSkeletonRows />
+					) : emailsEmpty && changesEmpty ? (
+						<CardEmpty
+							icon="mail"
+							title="No activity yet"
+							body="Emails sent and profile changes will appear here."
+						/>
+					) : (
+						(() => {
+							type MergedItem =
+								| { kind: "email"; id: string; createdAt: string; email: ActivityEntry }
+								| { kind: "change"; id: string; createdAt: string; entry: HistoryEntry }
+								| { kind: "fallback"; id: string; createdAt: string };
+							const merged: MergedItem[] = [
+								...sortedEmails.map(
+									(e) =>
+										({
+											kind: "email",
+											id: `email-${e.id}`,
+											createdAt: e.sentAt ?? e.createdAt,
+											email: e,
+										}) as const,
+								),
+								...(createdFallbackItem
+									? [
+											{
+												kind: "fallback",
+												id: "contact-created",
+												createdAt: createdFallbackItem.timestamp,
+											} as const,
+										]
+									: []),
+								...sortedChanges.map(
+									(entry) =>
+										({
+											kind: "change",
+											id: `change-${entry.id}`,
+											createdAt: entry.createdAt,
+											entry,
+										}) as const,
+								),
+							].sort(
+								(a, b) =>
+									new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+							);
+							const groups = new Map<string, { date: string; items: MergedItem[] }>();
+							for (const item of merged) {
+								const key = dayKey(item.createdAt);
+								const g = groups.get(key);
+								if (g) g.items.push(item);
+								else groups.set(key, { date: item.createdAt, items: [item] });
+							}
+							return (
+								<div className="flex flex-col gap-8">
+									{[...groups.values()].map((group) => (
+										<div key={dayKey(group.date)}>
+											<h4 className="font-semibold text-[13px] text-text-strong-950 tracking-wide">
+												{formatDayHeader(group.date)}
+											</h4>
+											<div className="mt-2 divide-y divide-stroke-soft-200 border-t border-stroke-soft-200 dark:divide-white/10 dark:border-white/10">
+												{group.items.map((item) => {
+													if (item.kind === "email") {
+														const subject =
+															item.email.subject?.trim() || "(No Subject)";
+														const { label } = getEmailStatus(item.email);
+														return (
+															<Link
+																key={item.id}
+																href={`/emails/${item.email.id}`}
+																style={activityGridStyle}
+																className="grid items-center gap-4 py-4 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
+															>
+																<div className="flex min-w-0 items-center gap-3">
+																	<EmailActivityIcon entry={item.email} />
+																	<div className="min-w-0">
+																		<p className="truncate font-medium text-[15px] text-text-strong-950">
+																			{subject}
+																			<span className="font-normal text-text-sub-600">
+																				{" "}
+																				- {label}
+																			</span>
+																		</p>
+																		<p className="mt-0.5 text-[13px] text-text-sub-600">
+																			{formatTimeAmPm(item.createdAt)}
+																		</p>
+																	</div>
+																</div>
+																<span className="text-right text-[14px] text-text-strong-950 tabular-nums sm:text-left">
+																	{formatCompactTime(item.createdAt)}
+																</span>
+															</Link>
+														);
+													}
+													if (item.kind === "fallback") {
+														return (
+															<div
+																key={item.id}
+																style={activityGridStyle}
+																className="grid items-center gap-4 py-4"
+															>
+																<div className="flex min-w-0 items-center gap-3">
+																	<ChangeIconTile marker="contact" />
+																	<div className="min-w-0">
+																		<p className="truncate font-medium text-[15px] text-text-strong-950">
+																			Contact created
+																		</p>
+																		<p className="mt-0.5 text-[13px] text-text-sub-600">
+																			{formatTimeAmPm(item.createdAt)}
+																		</p>
+																	</div>
+																</div>
+																<span className="text-right text-[14px] text-text-sub-600 tabular-nums sm:text-left">
+																	{formatCompactTime(item.createdAt)}
+																</span>
+															</div>
+														);
+													}
+													const { phrase, targets, marker } = describeHistory(item.entry);
+													const targetLabel = targets
+														.slice(0, 2)
+														.map((t) => t.label)
+														.join(", ");
+													return (
+														<Link
+															key={item.id}
+															href={`/logs?log=${item.entry.id}`}
+															style={activityGridStyle}
+															className="grid items-center gap-4 py-4 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
+														>
+															<div className="flex min-w-0 items-center gap-3">
+																<ChangeIconTile marker={marker} resource={targets[0]?.resource} />
+																<div className="min-w-0">
+																	<p className="truncate font-medium text-[15px] text-text-strong-950">
+																		{phrase}
+																		{targetLabel ? (
+																			<span className="font-normal text-text-sub-600">
+																				{" "}
+																				- {targetLabel}
+																			</span>
+																		) : null}
+																	</p>
+																	<p className="mt-0.5 text-[13px] text-text-sub-600">
+																		{formatTimeAmPm(item.createdAt)}
+																	</p>
+																</div>
+															</div>
+															<span className="text-right text-[14px] text-text-strong-950 tabular-nums sm:text-left">
+																{formatCompactTime(item.createdAt)}
+															</span>
+														</Link>
+													);
+												})}
+											</div>
+										</div>
+									))}
+									{(emailQuery.hasNextPage || historyQuery.hasNextPage) && (
+										<div className="flex flex-col gap-1">
+											{emailQuery.hasNextPage && (
+												<button
+													type="button"
+													onClick={handleLoadMoreEmails}
+													disabled={emailQuery.isFetchingNextPage}
+													className="flex cursor-pointer items-center gap-2 py-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950"
+												>
+													{emailQuery.isFetchingNextPage ? (
+														"Loading…"
+													) : (
+														<>
+															Load more emails
+															<span className="text-text-soft-400 tabular-nums">
+																{sortedEmails.length}/{emailTotal}
+															</span>
+														</>
+													)}
+												</button>
+											)}
+											{historyQuery.hasNextPage && (
+												<button
+													type="button"
+													onClick={handleLoadMoreChanges}
+													disabled={historyQuery.isFetchingNextPage}
+													className="flex cursor-pointer items-center gap-2 py-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950"
+												>
+													{historyQuery.isFetchingNextPage ? (
+														"Loading…"
+													) : (
+														<>
+															Load more changes
+															<span className="text-text-soft-400 tabular-nums">
+																{sortedChanges.length}/{historyTotal}
+															</span>
+														</>
+													)}
+												</button>
+											)}
+										</div>
+									)}
+								</div>
+							);
+						})()
+					)}
+				</section>
 			)}
 
 			{showEmails && (
@@ -814,112 +1117,6 @@ export function ContactEmailHistory({
 					</div>
 				</section>
 			)}
-
-			{/* ── Changes · icon-tile card ─────────────────────────────── */}
-			{showChanges && (
-				<Section title="Changes" count={historyTotal || undefined}>
-					{historyQuery.isPending ? (
-						<CardSkeletonRows />
-					) : historyQuery.isError ? (
-						<div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
-							<div className="flex h-9 w-9 items-center justify-center rounded-full border border-error-light bg-error-lighter">
-								<Icon name="alert-circle" className="h-4 w-4 text-error-base" />
-							</div>
-							<p className="font-medium text-paragraph-sm text-text-strong-950">
-								Couldn&apos;t load changes
-							</p>
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={() => void historyQuery.refetch()}
-							>
-								Retry
-							</Button.Root>
-						</div>
-					) : changesEmpty ? (
-						<CardEmpty
-							icon="change"
-							title="No profile changes yet"
-							body="Edits to name, status, properties, groups, and channels will show up here."
-						/>
-					) : (
-						<div className="divide-y divide-stroke-soft-200 dark:divide-white/10">
-							{createdFallbackItem && (
-								<div className="flex items-center gap-4 px-4 py-4 sm:px-5">
-									<ChangeIconTile marker="contact" />
-									<div className="min-w-0 flex-1">
-										<p className="truncate font-medium text-[15px] text-text-strong-950">
-											Contact created
-										</p>
-										<p className="mt-0.5 truncate text-[13px] text-text-sub-600">
-											{formatRowDate(createdFallbackItem.timestamp)}
-										</p>
-									</div>
-									<span className="shrink-0 text-[13px] text-text-soft-400 tabular-nums">
-										{formatCompactTime(createdFallbackItem.timestamp)}
-									</span>
-								</div>
-							)}
-							{sortedChanges.map((entry) => {
-								const { phrase, targets, marker } = describeHistory(entry);
-								const targetLabel = targets
-									.slice(0, 2)
-									.map((t) => t.label)
-									.join(" · ");
-								return (
-									<Link
-										key={entry.id}
-										href={`/logs?log=${entry.id}`}
-										className="flex items-center gap-4 px-4 py-4 transition-colors hover:bg-bg-weak-50/70 sm:px-5 dark:hover:bg-white/[0.03]"
-									>
-										<ChangeIconTile marker={marker} />
-										<div className="min-w-0 flex-1">
-											<p className="truncate font-medium text-[15px] text-text-strong-950">
-												{phrase}
-												{targetLabel ? (
-													<span className="font-normal text-text-sub-600">
-														{" "}
-														· {targetLabel}
-													</span>
-												) : null}
-											</p>
-											<p className="mt-0.5 truncate text-[13px] text-text-sub-600">
-												{formatRowDate(entry.createdAt)}
-												{entry.actorName ? ` · ${entry.actorName}` : ""}
-											</p>
-										</div>
-										<span className="shrink-0 text-[13px] text-text-soft-400 tabular-nums">
-											{formatCompactTime(entry.createdAt)}
-										</span>
-									</Link>
-								);
-							})}
-							{historyQuery.hasNextPage && (
-								<button
-									type="button"
-									onClick={handleLoadMoreChanges}
-									disabled={historyQuery.isFetchingNextPage}
-									className="flex w-full cursor-pointer items-center justify-center gap-2 px-4 py-3.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-bg-weak-50/70 hover:text-text-strong-950"
-								>
-									{historyQuery.isFetchingNextPage ? (
-										"Loading…"
-									) : (
-										<>
-											Load more
-											<span className="text-text-soft-400 tabular-nums">
-												{sortedChanges.length}/{historyTotal}
-											</span>
-										</>
-									)}
-								</button>
-							)}
-						</div>
-					)}
-				</Section>
-			)}
-
 			{isError && (
 				<Section title="Activity">
 					<div className="flex flex-col items-center gap-2 px-4 py-10 text-center">

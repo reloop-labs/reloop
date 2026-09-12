@@ -230,7 +230,6 @@ function ContactStatsRow({ email }: { email: string }) {
 const activityTabItems = [
 	{ title: "Activity", value: "all", iconName: "activity" },
 	{ title: "Emails", value: "emails", iconName: "mail-single" },
-	{ title: "Changes", value: "changes", iconName: "history" },
 ] as const;
 
 function ContactActivityTabs({
