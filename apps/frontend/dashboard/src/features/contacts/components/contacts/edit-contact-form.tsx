@@ -5,9 +5,11 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import * as Switch from "@reloop/ui/switch";
 import { useQuery } from "@tanstack/react-query";
+import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -117,6 +119,431 @@ async function removeContactFromGroup(contactId: string, groupId: string) {
 		};
 		throw new Error(data.message || "Failed to remove contact from group");
 	}
+}
+
+interface EditContactFieldsProps {
+	contact: EditContactFormContact;
+	isSaving: boolean;
+	email: string;
+	firstName: string;
+	setFirstName: (value: string) => void;
+	lastName: string;
+	setLastName: (value: string) => void;
+	customProperties: Property[];
+	propertyValues: Record<string, string>;
+	handlePropertyChange: (propertyId: string, value: string) => void;
+	selectedGroupIds: string[];
+	setSelectedGroupIds: (ids: string[]) => void;
+	isSubscribed: boolean;
+	setIsSubscribed: (value: boolean) => void;
+	selectedChannelIds: string[];
+	channelInput: string;
+	setChannelInput: (value: string) => void;
+	showChannelDropdown: boolean;
+	setShowChannelDropdown: (value: boolean) => void;
+	hoveredChannelId: string | null;
+	setHoveredChannelId: (value: string | null) => void;
+	channelInputRef: React.RefObject<HTMLInputElement | null>;
+	addChannel: (channelId: string) => void;
+	removeChannel: (channelId: string) => void;
+	getChannelName: (channelId: string) => string;
+	filteredChannels: Channel[];
+}
+
+function EditContactFields({
+	contact,
+	isSaving,
+	email,
+	firstName,
+	setFirstName,
+	lastName,
+	setLastName,
+	customProperties,
+	propertyValues,
+	handlePropertyChange,
+	selectedGroupIds,
+	setSelectedGroupIds,
+	isSubscribed,
+	setIsSubscribed,
+	selectedChannelIds,
+	channelInput,
+	setChannelInput,
+	showChannelDropdown,
+	setShowChannelDropdown,
+	hoveredChannelId,
+	setHoveredChannelId,
+	channelInputRef,
+	addChannel,
+	removeChannel,
+	getChannelName,
+	filteredChannels,
+}: EditContactFieldsProps) {
+	return (
+		<>
+			{/* ── Identity ───────────────────────────────────────── */}
+			<section className="space-y-4">
+				{/* Email — identity key, not editable here */}
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center gap-1.5">
+						<Label.Root
+							htmlFor={`email-${contact.id}`}
+							className="font-medium text-text-strong-950 text-xs"
+						>
+							Email
+						</Label.Root>
+						<span className="font-normal text-text-sub-600 text-xs">
+							(cannot be changed)
+						</span>
+					</div>
+					<Input.Root
+						size="medium"
+						className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
+					>
+						<Input.Wrapper>
+							<Input.Icon
+								as={Icon}
+								name="mail-single"
+								size="small"
+								className="h-4 w-4 text-text-sub-600"
+							/>
+							<Input.Input
+								id={`email-${contact.id}`}
+								type="email"
+								value={email}
+								readOnly
+								className="cursor-not-allowed font-medium text-text-strong-950 opacity-100 focus:outline-none"
+							/>
+							<Icon
+								name="lock"
+								className="mr-1.5 h-3.5 w-3.5 shrink-0 text-text-sub-600"
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+				</div>
+
+				{/* First Name & Last Name */}
+				<div className="grid gap-4 sm:grid-cols-2">
+					<div className="flex flex-col gap-1.5">
+						<Label.Root
+							htmlFor={`firstName-${contact.id}`}
+							className="font-medium text-text-strong-950 text-xs"
+						>
+							First name
+						</Label.Root>
+						<Input.Root size="medium">
+							<Input.Wrapper>
+								<Input.Input
+									id={`firstName-${contact.id}`}
+									type="text"
+									value={firstName}
+									onChange={(e) => setFirstName(e.target.value)}
+									disabled={isSaving}
+									placeholder="First name"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+					<div className="flex flex-col gap-1.5">
+						<Label.Root
+							htmlFor={`lastName-${contact.id}`}
+							className="font-medium text-text-strong-950 text-xs"
+						>
+							Last name
+						</Label.Root>
+						<Input.Root size="medium">
+							<Input.Wrapper>
+								<Input.Input
+									id={`lastName-${contact.id}`}
+									type="text"
+									value={lastName}
+									onChange={(e) => setLastName(e.target.value)}
+									disabled={isSaving}
+									placeholder="Last name"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+				</div>
+
+				{/* Custom properties — same identity block, no section header */}
+				{customProperties.length > 0 && (
+					<div className="grid gap-4 sm:grid-cols-2">
+						{customProperties.map((property) => (
+							<div key={property.id} className="flex flex-col gap-1.5">
+								<Label.Root
+									htmlFor={`prop-${contact.id}-${property.id}`}
+									className="font-medium text-text-strong-950 text-xs"
+								>
+									{property.propertyName}
+								</Label.Root>
+								<Input.Root size="medium">
+									<Input.Wrapper>
+										<Input.Input
+											id={`prop-${contact.id}-${property.id}`}
+											type={
+												property.propertyType === "number" ? "number" : "text"
+											}
+											value={propertyValues[property.id] ?? ""}
+											onChange={(e) =>
+												handlePropertyChange(property.id, e.target.value)
+											}
+											disabled={isSaving}
+											placeholder={
+												property.defaultValue ||
+												`Enter ${property.propertyName}`
+											}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+							</div>
+						))}
+					</div>
+				)}
+			</section>
+
+			{/* ── Organization ───────────────────────────────────── */}
+			<section className="space-y-4">
+				<div className="flex items-center gap-2">
+					<div className="h-px flex-1 bg-stroke-soft-100" />
+					<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-wider">
+						Organization
+					</span>
+					<div className="h-px flex-1 bg-stroke-soft-100" />
+				</div>
+
+				<GroupSelect
+					id={`groups-${contact.id}`}
+					selectedGroupIds={selectedGroupIds}
+					onChange={setSelectedGroupIds}
+					disabled={isSaving}
+					label="Groups"
+					labelHint="Audience groups for targeting and filtering. Separate from email opt-in."
+					description=""
+					knownGroups={contact.groups}
+				/>
+			</section>
+
+			{/* ── Email preferences (last) ───────────────────────── */}
+			<section className="space-y-4">
+				<div className="flex items-center gap-2">
+					<div className="h-px flex-1 bg-stroke-soft-100" />
+					<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-wider">
+						Email preferences
+					</span>
+					<div className="h-px flex-1 bg-stroke-soft-100" />
+				</div>
+
+				{/* 1. Channels */}
+				<div
+					className={cn(
+						"flex flex-col gap-1.5 transition-opacity",
+						!isSubscribed && "opacity-60",
+					)}
+				>
+					<Label.Root
+						htmlFor={`channels-${contact.id}`}
+						className="font-medium text-text-strong-950 text-xs"
+					>
+						Channels
+					</Label.Root>
+					<div className="relative">
+						<label
+							className={cn(
+								"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
+								isSaving && "pointer-events-none opacity-50",
+							)}
+						>
+							{selectedChannelIds.map((channelId) => {
+								const channelName = getChannelName(channelId) || "Channel";
+								return (
+									<span
+										key={channelId}
+										className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
+									>
+										<Avatar.Root size="20" color="gray">
+											<Icon
+												name="notification-indicator"
+												className="h-3 w-3 text-text-sub-600"
+											/>
+										</Avatar.Root>
+										<span className="font-medium">{channelName}</span>
+										<button
+											type="button"
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												removeChannel(channelId);
+											}}
+											className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
+											disabled={isSaving}
+											aria-label={`Remove ${channelName}`}
+										>
+											<Icon name="cross" className="h-3 w-3" />
+										</button>
+									</span>
+								);
+							})}
+							<input
+								ref={channelInputRef}
+								id={`channels-${contact.id}`}
+								type="text"
+								value={channelInput}
+								onChange={(e) => {
+									setChannelInput(e.target.value);
+									setShowChannelDropdown(true);
+								}}
+								onFocus={() => setShowChannelDropdown(true)}
+								onBlur={(e) => {
+									const relatedTarget = e.relatedTarget as HTMLElement | null;
+									if (
+										!relatedTarget?.closest("[data-channel-select-dropdown]")
+									) {
+										setShowChannelDropdown(false);
+									}
+								}}
+								placeholder={
+									selectedChannelIds.length === 0
+										? "Search channels to enroll..."
+										: "Add another..."
+								}
+								className="min-w-[100px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
+								disabled={isSaving}
+							/>
+						</label>
+						<AnimatePresence>
+							{showChannelDropdown && filteredChannels.length > 0 && (
+								<motion.div
+									data-channel-select-dropdown
+									initial={{ opacity: 0, y: -6, scale: 0.96 }}
+									animate={{ opacity: 1, y: 0, scale: 1 }}
+									exit={{ opacity: 0, y: -6, scale: 0.96 }}
+									transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+									onMouseLeave={() => setHoveredChannelId(null)}
+									className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+								>
+									{filteredChannels.map((channel) => (
+										<button
+											key={channel.id}
+											type="button"
+											onMouseEnter={() => setHoveredChannelId(channel.id)}
+											onMouseDown={(e) => e.preventDefault()}
+											onClick={() => addChannel(channel.id)}
+											className="group relative flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-paragraph-sm text-text-strong-950 transition-colors"
+										>
+											{hoveredChannelId === channel.id && (
+												<motion.span
+													layoutId="channel-dropdown-hover-pill"
+													className="absolute inset-0 rounded-xl bg-bg-weak-50"
+													transition={{
+														type: "spring",
+														stiffness: 500,
+														damping: 38,
+													}}
+												/>
+											)}
+											<span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950">
+												<Icon
+													name="notification-indicator"
+													className="h-3.5 w-3.5"
+												/>
+											</span>
+											<span className="relative z-10 font-medium text-text-strong-950 text-xs">
+												{channel.name}
+											</span>
+											{channel.defaultSubscription === "opt_out" && (
+												<span className="relative z-10 ml-auto text-paragraph-xs text-text-soft-400">
+													Opt-out default
+												</span>
+											)}
+										</button>
+									))}
+								</motion.div>
+							)}
+							{showChannelDropdown &&
+								filteredChannels.length === 0 &&
+								channelInput && (
+									<motion.div
+										data-channel-select-dropdown
+										initial={{ opacity: 0, y: -6, scale: 0.96 }}
+										animate={{ opacity: 1, y: 0, scale: 1 }}
+										exit={{ opacity: 0, y: -6, scale: 0.96 }}
+										transition={{
+											duration: 0.18,
+											ease: [0.16, 1, 0.3, 1],
+										}}
+										className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-center shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+									>
+										<p className="text-paragraph-xs text-text-soft-400">
+											No channels found for &ldquo;{channelInput}&rdquo;
+										</p>
+									</motion.div>
+								)}
+						</AnimatePresence>
+					</div>
+					<p className="text-paragraph-xs text-text-soft-400">
+						{isSubscribed
+							? "Email lists this contact is enrolled in. They only get mail from these channels."
+							: "Enrollment is saved, but marketing is paused until they re-subscribe."}
+					</p>
+				</div>
+
+				{/* 2. Marketing subscription toggle */}
+				<div
+					className={cn(
+						"flex items-center justify-between gap-4 rounded-2xl border p-3.5 transition-colors",
+						isSubscribed
+							? "border-stroke-soft-200 bg-bg-weak-50/40"
+							: "border-red-500/15 bg-red-500/[0.03]",
+						isSaving && "opacity-50",
+					)}
+				>
+					<div className="flex min-w-0 items-center gap-3">
+						<div
+							className={cn(
+								"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border bg-bg-white-0 shadow-xs",
+								isSubscribed
+									? "border-stroke-soft-200 text-text-strong-950"
+									: "border-red-500/20 text-red-600",
+							)}
+						>
+							<Icon
+								name={isSubscribed ? "mail-single" : "bell-off"}
+								className="h-4 w-4"
+							/>
+						</div>
+						<div className="flex min-w-0 flex-col gap-0.5 text-left">
+							<div className="flex flex-wrap items-center gap-2">
+								<span className="font-medium text-text-strong-950 text-xs">
+									Marketing subscription
+								</span>
+								<span
+									className={cn(
+										"inline-flex items-center rounded-md px-1.5 py-0.5 font-medium text-[10px] leading-none",
+										isSubscribed
+											? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+											: "bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400",
+									)}
+								>
+									{isSubscribed ? "Subscribed" : "Unsubscribed"}
+								</span>
+							</div>
+							<span className="text-paragraph-xs text-text-sub-600">
+								{isSubscribed
+									? "Can receive marketing and broadcast emails"
+									: "Marketing paused — transactional emails only"}
+							</span>
+						</div>
+					</div>
+					<Switch.Root
+						checked={isSubscribed}
+						onCheckedChange={setIsSubscribed}
+						disabled={isSaving}
+						aria-label="Marketing subscription"
+					/>
+				</div>
+			</section>
+		</>
+	);
 }
 
 export function EditContactForm({
@@ -358,27 +785,139 @@ export function EditContactForm({
 
 	const isInline = variant === "inline";
 
+	if (!isInline) {
+		return (
+			<div className="w-full font-sans" onClick={(e) => e.stopPropagation()}>
+				{/* Modal: same nested gray/white card + header as CreateApiKeyModal. */}
+				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
+					<form onSubmit={handleSubmit}>
+						<div className="relative m-0.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+							{/* Header — icon + title + in-flow close, like CreateApiKeyModal */}
+							<div className="flex items-start justify-between gap-4 px-6">
+								<div className="flex items-center gap-2">
+									<Icon
+										name="user"
+										className="size-4 text-text-sub-600 dark:text-white/60"
+									/>
+									<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
+										Edit contact
+									</Modal.Title>
+								</div>
+								<button
+									type="button"
+									onClick={onCancel}
+									aria-label="Close"
+									disabled={isSaving}
+									className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:bg-transparent dark:hover:bg-white/[0.05] dark:hover:text-white"
+								>
+									<X className="size-3.5" strokeWidth={2.25} />
+								</button>
+							</div>
+
+							<div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 pt-5 pb-6">
+								<EditContactFields
+									contact={contact}
+									isSaving={isSaving}
+									email={email}
+									firstName={firstName}
+									setFirstName={setFirstName}
+									lastName={lastName}
+									setLastName={setLastName}
+									customProperties={customProperties}
+									propertyValues={propertyValues}
+									handlePropertyChange={handlePropertyChange}
+									selectedGroupIds={selectedGroupIds}
+									setSelectedGroupIds={setSelectedGroupIds}
+									isSubscribed={isSubscribed}
+									setIsSubscribed={setIsSubscribed}
+									selectedChannelIds={selectedChannelIds}
+									channelInput={channelInput}
+									setChannelInput={setChannelInput}
+									showChannelDropdown={showChannelDropdown}
+									setShowChannelDropdown={setShowChannelDropdown}
+									hoveredChannelId={hoveredChannelId}
+									setHoveredChannelId={setHoveredChannelId}
+									channelInputRef={channelInputRef}
+									addChannel={addChannel}
+									removeChannel={removeChannel}
+									getChannelName={getChannelName}
+									filteredChannels={filteredChannels}
+								/>
+							</div>
+						</div>
+
+						{/* Bottom Footer / Action Bar — like CreateApiKeyModal */}
+						<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="ghost"
+								size="small"
+								onClick={onCancel}
+								disabled={isSaving}
+								className={cn(
+									"gap-1.5 transition-opacity duration-200",
+									isSaving && "pointer-events-none opacity-50",
+								)}
+							>
+								Cancel
+								<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+									esc
+								</ActionKbd>
+							</Button.Root>
+
+							<FancyButton.Root
+								type="submit"
+								variant="primary"
+								size="small"
+								disabled={isSaving}
+								className="min-w-[95px] justify-center font-medium"
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={isSaving ? "saving" : "idle"}
+										transition={{
+											type: "spring",
+											duration: 0.25,
+											bounce: 0,
+										}}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center justify-center gap-1.5 font-medium"
+									>
+										{isSaving ? (
+											<>
+												<Spinner size={14} color="currentColor" />
+												<span>Updating...</span>
+											</>
+										) : (
+											<>
+												<span>Update</span>
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
+											</>
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
+						</div>
+					</form>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<form
 			onSubmit={handleSubmit}
 			className="w-full font-sans"
 			onClick={(e) => e.stopPropagation()}
 		>
-			{/* Table inline: nested gray/white card. Modal: flat (padding from modal shell). */}
-			<div
-				className={cn(
-					isInline &&
-						"overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50",
-				)}
-			>
-				<div
-					className={cn(
-						"space-y-6",
-						isInline &&
-							"m-0.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6",
-						!isInline && "max-h-[60vh] overflow-y-auto pb-2",
-					)}
-				>
+			{/* Table inline: nested gray/white card. */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
+				<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6">
 					{/* ── Identity ───────────────────────────────────────── */}
 					<section className="space-y-4">
 						{/* Email — identity key, not editable here */}
