@@ -1,6 +1,5 @@
 "use client";
 
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon, type IconName } from "@reloop/ui/icon";
@@ -231,62 +230,149 @@ function getChannelDetails(entry: HistoryEntry): {
 	return { name, id, isOptOut };
 }
 
-type BadgeColor =
-	| "gray"
-	| "blue"
-	| "orange"
-	| "red"
-	| "green"
-	| "yellow"
-	| "purple"
-	| "sky"
-	| "pink"
-	| "teal";
-
-type EmailStatusBadgeConfig = {
-	label: string;
-	color: BadgeColor;
-	icon: IconName;
+const getEmailStatusColorClass = (status: string): string => {
+	switch (status.toLowerCase()) {
+		case "delivered":
+		case "sent":
+			return "text-success-base";
+		case "failed":
+		case "bounced":
+		case "spam":
+			return "text-error-base";
+		case "pending":
+		case "scheduled":
+			return "text-warning-base";
+		case "opened":
+			return "text-information-base";
+		case "clicked":
+			return "text-feature-base";
+		default:
+			return "text-text-sub-600";
+	}
 };
 
-function getEmailStatusBadgeConfig(
-	entry: ActivityEntry,
-): EmailStatusBadgeConfig {
+const getEmailStatusIcon = (status: string): IconName => {
+	switch (status.toLowerCase()) {
+		case "delivered":
+		case "sent":
+			return "check-circle";
+		case "failed":
+		case "bounced":
+		case "spam":
+			return "minus-circle";
+		case "pending":
+		case "scheduled":
+			return "clock";
+		case "opened":
+			return "eye-outline";
+		case "clicked":
+			return "cursor-click";
+		default:
+			return "mail-single";
+	}
+};
+
+const getEmailStatusLabel = (status: string): string => {
+	switch (status.toLowerCase()) {
+		case "delivered":
+			return "Delivered";
+		case "sent":
+			return "Sent";
+		case "failed":
+			return "Failed";
+		case "bounced":
+			return "Bounced";
+		case "spam":
+			return "Spam";
+		case "pending":
+			return "Pending";
+		case "scheduled":
+			return "Scheduled";
+		case "opened":
+			return "Opened";
+		case "clicked":
+			return "Clicked";
+		default:
+			return status;
+	}
+};
+
+function getEmailStatus(entry: ActivityEntry): string {
 	const types = new Set(entry.events.map((e) => e.type));
-	if (types.has("complaint") || entry.status === "spam")
-		return { label: "Spam", color: "red", icon: "cross" };
-	if (types.has("bounced") || entry.status === "bounced")
-		return { label: "Bounced", color: "red", icon: "cross" };
+	if (types.has("complaint") || entry.status === "spam") return "spam";
+	if (types.has("bounced") || entry.status === "bounced") return "bounced";
 	if (types.has("failed") || entry.failedAt || entry.status === "failed")
-		return { label: "Failed", color: "red", icon: "cross" };
-	if (types.has("clicked"))
-		return { label: "Clicked", color: "purple", icon: "cursor-click" };
-	if (types.has("opened"))
-		return { label: "Opened", color: "green", icon: "eye-outline" };
-	if (types.has("delivered") || entry.deliveredAt)
-		return { label: "Delivered", color: "green", icon: "check" };
+		return "failed";
+	if (types.has("clicked")) return "clicked";
+	if (types.has("opened")) return "opened";
+	if (types.has("delivered") || entry.deliveredAt) return "delivered";
 	if (entry.status === "pending" || entry.status === "scheduled")
-		return {
-			label: entry.status === "scheduled" ? "Scheduled" : "Pending",
-			color: "gray",
-			icon: "clock",
-		};
-	return { label: "Sent", color: "blue", icon: "send-1" };
+		return entry.status === "scheduled" ? "scheduled" : "pending";
+	return entry.status || "sent";
+}
+
+/** Exact stroke checkmark used on the pricing page (`PlanCheckmark`) */
+function PricingCheckmark({
+	className,
+	withCircle = false,
+	strokeWidth = 1.25,
+}: {
+	className?: string;
+	withCircle?: boolean;
+	strokeWidth?: number;
+}) {
+	return (
+		<svg
+			fill="none"
+			viewBox="0 0 20 20"
+			className={cn("shrink-0", className)}
+			aria-hidden="true"
+		>
+			{withCircle && (
+				<circle cx="10" cy="10" fill="currentColor" fillOpacity="0.08" r="8" />
+			)}
+			<path
+				d="M7 10.5L9 12.5L13 7.5"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth={strokeWidth}
+			/>
+		</svg>
+	);
+}
+
+/** Status indicator matching the main Emails page (`email-table.tsx`) */
+function EmailStatusIndicator({
+	status,
+	className,
+}: {
+	status: string;
+	className?: string;
+}) {
+	const normalized = status.toLowerCase();
+	return (
+		<div className="flex items-center">
+			<div
+				className={cn(
+					"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+					getEmailStatusColorClass(normalized),
+					className,
+				)}
+			>
+				<Icon
+					name={getEmailStatusIcon(normalized)}
+					className="h-3.5 w-3.5 shrink-0"
+				/>
+				{getEmailStatusLabel(normalized)}
+			</div>
+		</div>
+	);
 }
 
 function EmailStatusLabel({ entry }: { entry: ActivityEntry }) {
-	const config = getEmailStatusBadgeConfig(entry);
-	return (
-		<Badge.Root
-			variant="lighter"
-			color={config.color}
-			size="small"
-			className="gap-1 px-1.5"
-		>
-			<Icon name={config.icon} className="size-2.5" />
-			<span>{config.label}</span>
-		</Badge.Root>
-	);
+	const status = getEmailStatus(entry);
+	return <EmailStatusIndicator status={status} />;
 }
 
 // ─── Diff & Property Components ──────────────────────────────────────────────
@@ -338,7 +424,7 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 					return (
 						<span
 							key={`${change.field}-${idx}`}
-							className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50"
+							className="inline-flex max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs dark:bg-bg-weak-50/60"
 						>
 							<span className="font-medium font-sans text-text-sub-600">
 								{formattedLabel}:
@@ -385,168 +471,202 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 
 // ─── Timeline Card Components ────────────────────────────────────────────────
 
+const timelineCardClass = "relative py-1";
+
+function TimelineMeta({
+	createdAt,
+	actor,
+}: {
+	createdAt: string;
+	actor?: string | null;
+}) {
+	return (
+		<div className="flex shrink-0 items-center gap-1.5 text-paragraph-xs text-text-soft-400">
+			{actor && (
+				<>
+					<span
+						className="max-w-[130px] truncate font-medium text-text-sub-600 sm:max-w-[180px]"
+						title={actor}
+					>
+						{actor}
+					</span>
+					<span className="text-text-soft-400/80">·</span>
+				</>
+			)}
+			<span className="font-medium text-text-sub-600 tabular-nums">
+				{formatTimeAmPm(createdAt)}
+			</span>
+			<span className="text-text-soft-400/80">·</span>
+			<span className="tabular-nums">{formatCompactTime(createdAt)}</span>
+		</div>
+	);
+}
+
+function TimelineItemWrapper({
+	isLast,
+	node,
+	children,
+}: {
+	isLast: boolean;
+	node: React.ReactNode;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="relative flex items-start gap-3">
+			{/* Connector line to next item */}
+			{!isLast && (
+				<div
+					aria-hidden="true"
+					className="-bottom-5 -translate-x-1/2 absolute top-3.5 left-3.5 w-px bg-stroke-soft-200 dark:bg-stroke-soft-100/40"
+				/>
+			)}
+
+			{/* Node icon */}
+			<div className="relative z-10 flex size-7 shrink-0 items-center justify-center rounded-full bg-bg-white-0 dark:bg-bg-weak-50">
+				{node}
+			</div>
+
+			{/* Card content */}
+			<div className="min-w-0 flex-1">{children}</div>
+		</div>
+	);
+}
+
 function EmailTimelineCard({
 	entry,
 	contactEmail,
+	isLast,
 }: {
 	entry: ActivityEntry;
 	contactEmail: string;
+	isLast: boolean;
 }) {
-	const statusConfig = getEmailStatusBadgeConfig(entry);
+	const status = getEmailStatus(entry);
 	const subject = entry.subject?.trim() || "(No Subject)";
 	const recipient = entry.toEmails?.[0] || contactEmail;
 	const timestamp = entry.sentAt ?? entry.createdAt;
 
 	return (
-		<div className="group/card relative rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all duration-150 hover:border-stroke-sub-300 hover:shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:border-stroke-soft-200">
-			{/* Node icon on vertical track */}
-			<div className="-left-8 absolute top-3.5 flex size-7 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
+		<TimelineItemWrapper
+			isLast={isLast}
+			node={
 				<Icon
 					name="mail-single"
-					className={cn(
-						"size-3.5",
-						statusConfig.color === "green" && "text-success-base",
-						statusConfig.color === "red" && "text-error-base",
-						statusConfig.color === "purple" && "text-purple-600",
-					)}
+					className={cn("size-3.5", getEmailStatusColorClass(status))}
 				/>
-			</div>
+			}
+		>
+			<div className={timelineCardClass}>
+				{/* Main line: Subject + Status indicator, and Timestamp */}
+				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+					<div className="flex min-w-0 flex-wrap items-center gap-2.5">
+						<Link
+							href={`/emails/${entry.id}`}
+							className="truncate font-medium text-paragraph-sm text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
+						>
+							{subject}
+						</Link>
+						<EmailStatusIndicator
+							status={status}
+							className="gap-1.5 font-medium text-xs"
+						/>
+					</div>
 
-			{/* Top Header */}
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex flex-wrap items-center gap-2">
-					<Badge.Root
-						variant="lighter"
-						color="gray"
-						size="small"
-						className="gap-1 px-1.5"
-					>
-						<Icon name="mail-single" className="size-2.5 text-text-sub-600" />
-						<span>Email</span>
-					</Badge.Root>
-
-					<Badge.Root
-						variant="lighter"
-						color={statusConfig.color}
-						size="small"
-						className="gap-1 px-1.5"
-					>
-						<Icon name={statusConfig.icon} className="size-2.5" />
-						<span>{statusConfig.label}</span>
-					</Badge.Root>
+					<TimelineMeta createdAt={timestamp} />
 				</div>
 
-				<span className="shrink-0 font-medium text-paragraph-xs text-text-sub-600 tabular-nums">
-					{formatTimeAmPm(timestamp)} · {formatCompactTime(timestamp)}
-				</span>
-			</div>
-
-			{/* Middle: Subject */}
-			<div className="mt-2.5">
-				<Link
-					href={`/emails/${entry.id}`}
-					className="inline-block max-w-full truncate font-medium text-paragraph-sm text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
-				>
-					&ldquo;{subject}&rdquo;
-				</Link>
-			</div>
-
-			{/* Footer: Meta & Action */}
-			<div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-stroke-soft-100 border-t pt-2.5 text-paragraph-xs text-text-sub-600 dark:border-stroke-soft-100/40">
-				<div className="flex items-center gap-1.5">
-					<span className="text-text-soft-400">To:</span>
-					<span className="font-mono text-text-strong-950">{recipient}</span>
+				{/* Metadata line: sender, recipient, and view link */}
+				<div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-paragraph-xs text-text-soft-400">
 					{entry.fromEmail && (
 						<>
-							<span className="text-text-soft-400">·</span>
-							<span className="text-text-soft-400">From:</span>
-							<span className="font-mono text-text-sub-600">
-								{entry.fromEmail}
+							<span>
+								from{" "}
+								<span className="font-mono text-text-sub-600">
+									{entry.fromEmail}
+								</span>
 							</span>
+							<span>·</span>
 						</>
 					)}
+					<span>
+						to <span className="font-mono text-text-sub-600">{recipient}</span>
+					</span>
+					<span>·</span>
+					<Link
+						href={`/emails/${entry.id}`}
+						className="inline-flex items-center gap-0.5 font-medium text-text-sub-600 transition-colors hover:text-text-strong-950"
+					>
+						<span>View email</span>
+						<Icon name="arrow-up-right" className="size-3" />
+					</Link>
 				</div>
-
-				<Link
-					href={`/emails/${entry.id}`}
-					className="inline-flex items-center gap-1 font-medium text-text-sub-600 transition-colors hover:text-text-strong-950"
-				>
-					<span>View email</span>
-					<Icon name="arrow-up-right" className="size-3" />
-				</Link>
 			</div>
-		</div>
+		</TimelineItemWrapper>
 	);
 }
 
-function GroupTimelineCard({ entry }: { entry: HistoryEntry }) {
+function GroupTimelineCard({
+	entry,
+	isLast,
+}: {
+	entry: HistoryEntry;
+	isLast: boolean;
+}) {
 	const { name: groupName, id: groupId } = getGroupDetails(entry);
 	const isRemoved = entry.action === "removed_from_group";
 	const actor = getActorAttribution(entry);
 
 	return (
-		<div className="group/card relative rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all duration-150 hover:border-stroke-sub-300 hover:shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:border-stroke-soft-200">
-			{/* Node icon on vertical track */}
-			<div className="-left-8 absolute top-3.5 flex size-7 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
+		<TimelineItemWrapper
+			isLast={isLast}
+			node={
 				<Icon
 					name="modules"
 					className={cn(
 						"size-3.5",
-						isRemoved ? "text-error-base" : "text-text-sub-600",
+						isRemoved ? "text-error-base" : "text-blue-600 dark:text-blue-400",
 					)}
 				/>
-			</div>
-
-			{/* Top Header */}
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex flex-wrap items-center gap-2">
-					<Badge.Root
-						variant="lighter"
-						color={isRemoved ? "red" : "blue"}
-						size="small"
-						className="gap-1 px-1.5"
-					>
-						<Icon name="modules" className="size-2.5" />
-						<span>Audience</span>
-					</Badge.Root>
-
-					<span className="font-medium text-paragraph-sm text-text-strong-950">
-						{isRemoved ? "Removed from group" : "Added to group"}
-					</span>
-
-					{groupId ? (
-						<Link
-							href={`/contacts/groups/${groupId}`}
-							className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:border-stroke-sub-300 hover:text-primary-base dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50"
-						>
-							<Icon name="modules" className="size-3 text-text-sub-600" />
-							<span>{groupName}</span>
-						</Link>
-					) : (
-						<span className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
-							<Icon name="modules" className="size-3 text-text-sub-600" />
-							<span>{groupName}</span>
+			}
+		>
+			<div className={timelineCardClass}>
+				{/* Top Header */}
+				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+					<div className="flex flex-wrap items-center gap-2">
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{isRemoved ? "Removed from group" : "Added to group"}
 						</span>
-					)}
-				</div>
 
-				<span className="shrink-0 font-medium text-paragraph-xs text-text-sub-600 tabular-nums">
-					{formatTimeAmPm(entry.createdAt)} ·{" "}
-					{formatCompactTime(entry.createdAt)}
-				</span>
+						{groupId ? (
+							<Link
+								href={`/contacts/groups/${groupId}`}
+								className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:bg-bg-weak-100 hover:text-primary-base dark:bg-bg-weak-50/60 dark:hover:bg-bg-weak-50/90"
+							>
+								<Icon name="modules" className="size-3 text-text-sub-600" />
+								<span>{groupName}</span>
+							</Link>
+						) : (
+							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 dark:bg-bg-weak-50/60">
+								<Icon name="modules" className="size-3 text-text-sub-600" />
+								<span>{groupName}</span>
+							</span>
+						)}
+					</div>
+
+					<TimelineMeta createdAt={entry.createdAt} actor={actor} />
+				</div>
 			</div>
-
-			{/* Footer: Actor attribution */}
-			{actor && (
-				<div className="mt-2.5 border-stroke-soft-100 border-t pt-2 text-paragraph-xs text-text-soft-400 dark:border-stroke-soft-100/40">
-					{actor}
-				</div>
-			)}
-		</div>
+		</TimelineItemWrapper>
 	);
 }
 
-function ChannelTimelineCard({ entry }: { entry: HistoryEntry }) {
+function ChannelTimelineCard({
+	entry,
+	isLast,
+}: {
+	entry: HistoryEntry;
+	isLast: boolean;
+}) {
 	const {
 		name: channelName,
 		id: channelId,
@@ -555,66 +675,64 @@ function ChannelTimelineCard({ entry }: { entry: HistoryEntry }) {
 	const actor = getActorAttribution(entry);
 
 	return (
-		<div className="group/card relative rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all duration-150 hover:border-stroke-sub-300 hover:shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:border-stroke-soft-200">
-			{/* Node icon on vertical track */}
-			<div className="-left-8 absolute top-3.5 flex size-7 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
+		<TimelineItemWrapper
+			isLast={isLast}
+			node={
 				<Icon
 					name="notification-indicator"
 					className={cn(
 						"size-3.5",
-						isOptOut ? "text-warning-base" : "text-text-sub-600",
+						isOptOut
+							? "text-warning-base"
+							: "text-purple-600 dark:text-purple-400",
 					)}
 				/>
-			</div>
-
-			{/* Top Header */}
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex flex-wrap items-center gap-2">
-					<Badge.Root
-						variant="lighter"
-						color={isOptOut ? "orange" : "purple"}
-						size="small"
-						className="gap-1 px-1.5"
-					>
-						<Icon name="notification-indicator" className="size-2.5" />
-						<span>Channel</span>
-					</Badge.Root>
-
-					<span className="font-medium text-paragraph-sm text-text-strong-950">
-						{isOptOut ? "Opted out of channel" : "Subscribed to channel"}
-					</span>
-
-					{channelId ? (
-						<Link
-							href={`/contacts?channelId=${channelId}`}
-							className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:border-stroke-sub-300 hover:text-primary-base dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50"
-						>
-							<span>{channelName}</span>
-						</Link>
-					) : (
-						<span className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
-							<span>{channelName}</span>
+			}
+		>
+			<div className={timelineCardClass}>
+				{/* Top Header */}
+				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+					<div className="flex flex-wrap items-center gap-2">
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{isOptOut ? "Opted out of channel" : "Subscribed to channel"}
 						</span>
-					)}
-				</div>
 
-				<span className="shrink-0 font-medium text-paragraph-xs text-text-sub-600 tabular-nums">
-					{formatTimeAmPm(entry.createdAt)} ·{" "}
-					{formatCompactTime(entry.createdAt)}
-				</span>
+						{channelId ? (
+							<Link
+								href={`/contacts?channelId=${channelId}`}
+								className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:bg-bg-weak-100 hover:text-primary-base dark:bg-bg-weak-50/60 dark:hover:bg-bg-weak-50/90"
+							>
+								<Icon
+									name="notification-indicator"
+									className="size-3 text-text-sub-600"
+								/>
+								<span>{channelName}</span>
+							</Link>
+						) : (
+							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 dark:bg-bg-weak-50/60">
+								<Icon
+									name="notification-indicator"
+									className="size-3 text-text-sub-600"
+								/>
+								<span>{channelName}</span>
+							</span>
+						)}
+					</div>
+
+					<TimelineMeta createdAt={entry.createdAt} actor={actor} />
+				</div>
 			</div>
-
-			{/* Footer: Actor attribution */}
-			{actor && (
-				<div className="mt-2.5 border-stroke-soft-100 border-t pt-2 text-paragraph-xs text-text-soft-400 dark:border-stroke-soft-100/40">
-					{actor}
-				</div>
-			)}
-		</div>
+		</TimelineItemWrapper>
 	);
 }
 
-function ProfileUpdateTimelineCard({ entry }: { entry: HistoryEntry }) {
+function ProfileUpdateTimelineCard({
+	entry,
+	isLast,
+}: {
+	entry: HistoryEntry;
+	isLast: boolean;
+}) {
 	const changes = entry.changes ?? [];
 	const actor = getActorAttribution(entry);
 
@@ -626,165 +744,133 @@ function ProfileUpdateTimelineCard({ entry }: { entry: HistoryEntry }) {
 		: "Updated contact details";
 
 	return (
-		<div className="group/card relative rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all duration-150 hover:border-stroke-sub-300 hover:shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:border-stroke-soft-200">
-			{/* Node icon on vertical track */}
-			<div className="-left-8 absolute top-3.5 flex size-7 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
-				<Icon name="user" className="size-3.5 text-text-sub-600" />
-			</div>
-
-			{/* Top Header */}
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex flex-wrap items-center gap-2">
-					<Badge.Root
-						variant="lighter"
-						color="orange"
-						size="small"
-						className="gap-1 px-1.5"
-					>
-						<Icon name="user" className="size-2.5" />
-						<span>Contact</span>
-					</Badge.Root>
-
+		<TimelineItemWrapper
+			isLast={isLast}
+			node={
+				<Icon
+					name="user"
+					className="size-3.5 text-amber-600 dark:text-amber-400"
+				/>
+			}
+		>
+			<div className={timelineCardClass}>
+				{/* Top Header */}
+				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
 					<span className="font-medium text-paragraph-sm text-text-strong-950">
 						{title}
 					</span>
+
+					<TimelineMeta createdAt={entry.createdAt} actor={actor} />
 				</div>
 
-				<span className="shrink-0 font-medium text-paragraph-xs text-text-sub-600 tabular-nums">
-					{formatTimeAmPm(entry.createdAt)} ·{" "}
-					{formatCompactTime(entry.createdAt)}
-				</span>
+				{/* Middle: Diffs */}
+				{changes.length > 0 && (
+					<div className="mt-2.5">
+						<PropertyDiffList changes={changes} />
+					</div>
+				)}
 			</div>
-
-			{/* Middle: Diffs */}
-			{changes.length > 0 && (
-				<div className="mt-2.5">
-					<PropertyDiffList changes={changes} />
-				</div>
-			)}
-
-			{/* Footer: Actor attribution */}
-			{actor && (
-				<div className="mt-2.5 border-stroke-soft-100 border-t pt-2 text-paragraph-xs text-text-soft-400 dark:border-stroke-soft-100/40">
-					{actor}
-				</div>
-			)}
-		</div>
+		</TimelineItemWrapper>
 	);
 }
 
 function ContactCreatedTimelineCard({
 	createdAt,
 	actor,
+	isLast,
 }: {
 	createdAt: string;
 	actor?: string | null;
+	isLast: boolean;
 }) {
 	return (
-		<div className="group/card relative rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all duration-150 hover:border-stroke-sub-300 hover:shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:border-stroke-soft-200">
-			{/* Node icon on vertical track */}
-			<div className="-left-8 absolute top-3.5 flex size-7 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-success-base shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
-				<Icon name="check" className="size-3.5 text-success-base" />
-			</div>
-
-			{/* Top Header */}
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex flex-wrap items-center gap-2">
-					<Badge.Root
-						variant="lighter"
-						color="green"
-						size="small"
-						className="gap-1 px-1.5"
-					>
-						<Icon name="check-circle" className="size-2.5" />
-						<span>Lifecycle</span>
-					</Badge.Root>
-
+		<TimelineItemWrapper
+			isLast={isLast}
+			node={
+				<PricingCheckmark
+					className="size-4 text-success-base"
+					strokeWidth={1.5}
+				/>
+			}
+		>
+			<div className={timelineCardClass}>
+				{/* Top Header */}
+				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
 					<span className="font-medium text-paragraph-sm text-text-strong-950">
 						Contact created
 					</span>
+
+					<TimelineMeta
+						createdAt={createdAt}
+						actor={actor || "Created in Reloop"}
+					/>
 				</div>
-
-				<span className="shrink-0 font-medium text-paragraph-xs text-text-sub-600 tabular-nums">
-					{formatTimeAmPm(createdAt)} · {formatCompactTime(createdAt)}
-				</span>
 			</div>
-
-			{/* Footer */}
-			<div className="mt-2.5 border-stroke-soft-100 border-t pt-2 text-paragraph-xs text-text-soft-400 dark:border-stroke-soft-100/40">
-				{actor || "Created in Reloop"}
-			</div>
-		</div>
+		</TimelineItemWrapper>
 	);
 }
 
-function GenericHistoryTimelineCard({ entry }: { entry: HistoryEntry }) {
+function GenericHistoryTimelineCard({
+	entry,
+	isLast,
+}: {
+	entry: HistoryEntry;
+	isLast: boolean;
+}) {
 	const actor = getActorAttribution(entry);
 	const title = entry.title || `Contact ${entry.action.replaceAll("_", " ")}`;
 
 	return (
-		<div className="group/card relative rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all duration-150 hover:border-stroke-sub-300 hover:shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20 dark:hover:border-stroke-soft-200">
-			<div className="-left-8 absolute top-3.5 flex size-7 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
-				<Icon name="activity" className="size-3.5 text-text-sub-600" />
-			</div>
-
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex flex-wrap items-center gap-2">
-					<Badge.Root
-						variant="lighter"
-						color="gray"
-						size="small"
-						className="gap-1 px-1.5"
-					>
-						<Icon name="activity" className="size-2.5" />
-						<span>Activity</span>
-					</Badge.Root>
+		<TimelineItemWrapper
+			isLast={isLast}
+			node={<Icon name="activity" className="size-3.5 text-text-sub-600" />}
+		>
+			<div className={timelineCardClass}>
+				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
 					<span className="font-medium text-paragraph-sm text-text-strong-950">
 						{title}
 					</span>
+
+					<TimelineMeta createdAt={entry.createdAt} actor={actor} />
 				</div>
 
-				<span className="shrink-0 font-medium text-paragraph-xs text-text-sub-600 tabular-nums">
-					{formatTimeAmPm(entry.createdAt)} ·{" "}
-					{formatCompactTime(entry.createdAt)}
-				</span>
+				{entry.summary && (
+					<p className="mt-2 text-paragraph-xs text-text-sub-600">
+						{entry.summary}
+					</p>
+				)}
 			</div>
-
-			{entry.summary && (
-				<p className="mt-2 text-paragraph-xs text-text-sub-600">
-					{entry.summary}
-				</p>
-			)}
-
-			{actor && (
-				<div className="mt-2.5 border-stroke-soft-100 border-t pt-2 text-paragraph-xs text-text-soft-400 dark:border-stroke-soft-100/40">
-					{actor}
-				</div>
-			)}
-		</div>
+		</TimelineItemWrapper>
 	);
 }
 
-function HistoryTimelineCard({ entry }: { entry: HistoryEntry }) {
+function HistoryTimelineCard({
+	entry,
+	isLast,
+}: {
+	entry: HistoryEntry;
+	isLast: boolean;
+}) {
 	switch (entry.action) {
 		case "added_to_group":
 		case "removed_from_group":
-			return <GroupTimelineCard entry={entry} />;
+			return <GroupTimelineCard entry={entry} isLast={isLast} />;
 		case "added_to_channel":
 		case "updated_channel":
 		case "removed_from_channel":
-			return <ChannelTimelineCard entry={entry} />;
+			return <ChannelTimelineCard entry={entry} isLast={isLast} />;
 		case "updated":
-			return <ProfileUpdateTimelineCard entry={entry} />;
+			return <ProfileUpdateTimelineCard entry={entry} isLast={isLast} />;
 		case "created":
 			return (
 				<ContactCreatedTimelineCard
 					createdAt={entry.createdAt}
 					actor={getActorAttribution(entry)}
+					isLast={isLast}
 				/>
 			);
 		default:
-			return <GenericHistoryTimelineCard entry={entry} />;
+			return <GenericHistoryTimelineCard entry={entry} isLast={isLast} />;
 	}
 }
 
@@ -795,29 +881,20 @@ function TimelineSkeleton() {
 		<div className="flex flex-col gap-8">
 			<div>
 				<Skeleton className="h-3.5 w-44 rounded" />
-				<div className="relative mt-4 space-y-3.5 pl-8 before:absolute before:top-3.5 before:bottom-3.5 before:left-3.5 before:w-px before:bg-stroke-soft-200 dark:before:bg-stroke-soft-100/40">
+				<div className="mt-4 space-y-3.5">
 					{Array.from({ length: 3 }).map((_, i) => (
-						<div
+						<TimelineItemWrapper
 							key={`timeline-skel-${i}`}
-							className="relative rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20"
+							isLast={i === 2}
+							node={<Skeleton className="size-3.5 rounded-full" />}
 						>
-							<div className="-left-8 absolute top-3.5 flex size-7 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-stroke-soft-100/40 dark:bg-bg-weak-50">
-								<Skeleton className="size-3.5 rounded-full" />
-							</div>
-							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									<Skeleton className="h-4 w-16 rounded" />
-									<Skeleton className="h-4 w-28 rounded" />
+							<div className={timelineCardClass}>
+								<div className="flex items-center justify-between">
+									<Skeleton className="h-4 w-36 rounded" />
+									<Skeleton className="h-3 w-28 rounded" />
 								</div>
-								<Skeleton className="h-3 w-20 rounded" />
 							</div>
-							<div className="mt-2.5">
-								<Skeleton className="h-4 w-3/5 rounded" />
-							</div>
-							<div className="mt-2.5 border-stroke-soft-100 border-t pt-2 dark:border-stroke-soft-100/40">
-								<Skeleton className="h-3 w-2/5 rounded" />
-							</div>
-						</div>
+						</TimelineItemWrapper>
 					))}
 				</div>
 			</div>
@@ -1074,15 +1151,16 @@ export function ContactEmailHistory({
 												{formatDayHeader(group.date)}
 											</h4>
 
-											{/* Continuous vertical timeline connector line */}
-											<div className="relative space-y-3.5 pl-8 before:absolute before:top-3.5 before:bottom-3.5 before:left-3.5 before:w-px before:bg-stroke-soft-200 dark:before:bg-stroke-soft-100/40">
-												{group.items.map((item) => {
+											<div className="space-y-3.5">
+												{group.items.map((item, idx) => {
+													const isLast = idx === group.items.length - 1;
 													if (item.kind === "email") {
 														return (
 															<EmailTimelineCard
 																key={item.id}
 																entry={item.email}
 																contactEmail={email}
+																isLast={isLast}
 															/>
 														);
 													}
@@ -1091,6 +1169,7 @@ export function ContactEmailHistory({
 															<ContactCreatedTimelineCard
 																key={item.id}
 																createdAt={item.createdAt}
+																isLast={isLast}
 															/>
 														);
 													}
@@ -1098,6 +1177,7 @@ export function ContactEmailHistory({
 														<HistoryTimelineCard
 															key={item.id}
 															entry={item.entry}
+															isLast={isLast}
 														/>
 													);
 												})}
