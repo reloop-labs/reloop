@@ -288,7 +288,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 														Manual
 													</span>
 													<span className="truncate text-[11px] text-text-sub-600">
-														Add contact with details
+														Add manually or copy paste
 													</span>
 												</div>
 											</Dropdown.Item>
