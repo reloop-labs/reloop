@@ -419,7 +419,7 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 					return (
 						<span
 							key={`${change.field}-${idx}`}
-							className="inline-flex max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90"
+							className="inline-flex max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs dark:bg-bg-weak-50/60"
 						>
 							<span className="font-medium font-sans text-text-sub-600">
 								{formattedLabel}:
@@ -466,8 +466,7 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 
 // ─── Timeline Card Components ────────────────────────────────────────────────
 
-const timelineCardClass =
-	"group/card relative rounded-lg px-3.5 py-2  duration-150 hover:bg-bg-weak-50/70 dark:hover:bg-bg-weak-50/40";
+const timelineCardClass = "relative py-2";
 
 function TimelineMeta({
 	createdAt,
