@@ -2,27 +2,16 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import * as StatusBadge from "@reloop/ui/status-badge";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-import type { Campaign, CampaignStatus } from "../campaign-types";
+import type { Campaign } from "../campaign-types";
 import { CampaignAvatar } from "./campaign-avatar";
 import {
 	CampaignHeaderMenu,
 	type CampaignHeaderMenuAction,
 } from "./campaign-header-menu";
-
-const STATUS_MAP: Record<
-	CampaignStatus,
-	{ label: string; status: "completed" | "pending" | "disabled" | "failed" }
-> = {
-	sent: { label: "Sent", status: "completed" },
-	sending: { label: "Sending", status: "pending" },
-	scheduled: { label: "Scheduled", status: "pending" },
-	draft: { label: "Draft", status: "disabled" },
-	cancelled: { label: "Cancelled", status: "failed" },
-};
+import { CampaignStatusBadge } from "./campaign-status-badge";
 
 export function CampaignHeader({
 	campaign,
@@ -95,8 +84,6 @@ export function CampaignHeader({
 	}
 
 	const displayName = campaign?.name || "Unnamed Campaign";
-	const statusConfig =
-		(campaign?.status && STATUS_MAP[campaign.status]) || STATUS_MAP.draft;
 
 	return (
 		<div>
@@ -125,14 +112,7 @@ export function CampaignHeader({
 									<h1 className="truncate font-semibold text-title-h6 leading-5">
 										{displayName}
 									</h1>
-									<StatusBadge.Root
-										variant="light"
-										status={statusConfig.status}
-										className="capitalize"
-									>
-										<StatusBadge.Dot />
-										{statusConfig.label}
-									</StatusBadge.Root>
+									<CampaignStatusBadge status={campaign?.status} />
 								</div>
 							</div>
 						</div>
