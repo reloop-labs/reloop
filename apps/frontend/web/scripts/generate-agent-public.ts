@@ -198,4 +198,9 @@ if (existsSync(join(pub, "skill.md"))) {
 	console.log("  wrote public/.well-known/agent-skills/reloop/SKILL.md");
 }
 
+write(
+	"install.sh",
+	readFileSync(join(root, "../../../install/install.sh"), "utf-8"),
+);
+
 console.log("Done: agent files in public/");
