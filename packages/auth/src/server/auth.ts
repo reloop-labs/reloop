@@ -282,7 +282,7 @@ export const auth = betterAuth({
 			expiresIn: 60 * 15,
 			allowedAttempts: 3,
 			async sendVerificationOTP({ email, otp, type }) {
-				log.info("server", `Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
+				log.info("server", `Sending OTP (${type}) to: ${email}`);
 				if (
 					authServerConfig.DEFAULT_OTP &&
 					authServerConfig.NODE_ENV !== "development"

@@ -138,7 +138,11 @@ export async function initDomainSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{
+						error,
+						domainId: payload.domainId,
+						organizationId: payload.organizationId,
+					},
 					message: "Failed to send domain verified email",
 				});
 			}
@@ -183,7 +187,7 @@ export async function initDomainSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, email: payload.email, domain: payload.domain },
 					message: "Failed to send DNS config email",
 				});
 			}
