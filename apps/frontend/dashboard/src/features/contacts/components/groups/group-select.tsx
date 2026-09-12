@@ -5,7 +5,7 @@ import * as Label from "@reloop/ui/label";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
@@ -48,11 +48,25 @@ export const GroupSelect = ({
 	const [showGroupDropdown, setShowGroupDropdown] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const groupInputRef = useRef<HTMLInputElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
 	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	// Explicit input id so the wrapping box label activates the search input —
 	// never a chip's remove button.
 	const inputId = id ?? useId();
+
+	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			if (
+				containerRef.current &&
+				!containerRef.current.contains(e.target as Node)
+			) {
+				setShowGroupDropdown(false);
+			}
+		};
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, []);
 
 	const { data: allGroupsData } = useQuery({
 		queryKey: ["contacts", "groups", "select"],
@@ -113,7 +127,7 @@ export const GroupSelect = ({
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	return (
-		<div className={cn("flex flex-col gap-1.5", className)}>
+		<div ref={containerRef} className={cn("flex flex-col gap-1.5", className)}>
 			<div className="flex flex-wrap items-center gap-1.5">
 				<Label.Root
 					htmlFor={inputId}
@@ -135,6 +149,10 @@ export const GroupSelect = ({
 			<div className="relative">
 				<label
 					htmlFor={inputId}
+					onClick={() => {
+						groupInputRef.current?.focus();
+						setShowGroupDropdown(true);
+					}}
 					className={cn(
 						"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-button-important-focus dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
 						disabled && "pointer-events-none opacity-50",
@@ -213,6 +231,10 @@ export const GroupSelect = ({
 							}
 						}}
 						onFocus={() => setShowGroupDropdown(true)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setShowGroupDropdown(true);
+						}}
 						onBlur={(e) => {
 							const relatedTarget = e.relatedTarget as HTMLElement | null;
 							if (!relatedTarget?.closest("[data-group-select-dropdown]")) {

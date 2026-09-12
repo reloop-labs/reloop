@@ -325,15 +325,17 @@ export function CreateContactModal({
 								</div>
 							)}
 
-							{/* Assign to Groups & Tip — at the end */}
+							{/* Groups — matching edit modal in contacts detail page */}
 							<div className="pt-1">
 								<GroupSelect
+									id="manual-contact-groups"
 									selectedGroupIds={selectedGroupIds}
 									onChange={setSelectedGroupIds}
 									disabled={isSubmitting}
-									label="Assign to Groups"
-									labelHint="optional"
-									open={false}
+									label="Groups"
+									labelIcon="modules"
+									description=""
+									open={open}
 								/>
 							</div>
 						</div>

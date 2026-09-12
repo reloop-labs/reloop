@@ -1,5 +1,7 @@
 import { ContactsLayoutClient } from "./layout-client";
 
+export const instant = false;
+
 export default function ContactsLayout({
 	children,
 }: {
