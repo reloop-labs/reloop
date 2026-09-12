@@ -15,8 +15,12 @@ export const metadata: Metadata = {
 	},
 };
 
-import { TwitterContactIdShowcase } from "./components/twitter-contact-id-showcase";
+import { TwitterEditContactComparison } from "./components/twitter-edit-contact-comparison";
 
 export default function TwitterPage() {
-	return <TwitterContactIdShowcase />;
+	return (
+		<div className="flex min-h-dvh w-full items-center justify-center bg-white p-6 py-12 antialiased dark:bg-[#080808]">
+			<TwitterEditContactComparison />
+		</div>
+	);
 }

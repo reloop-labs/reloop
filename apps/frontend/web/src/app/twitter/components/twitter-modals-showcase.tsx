@@ -213,7 +213,7 @@ function ModalStyleOne({ onClose }: { onClose?: () => void }) {
 										<span className="shrink-0 select-none text-text-sub-600">
 											{"{{{"}
 										</span>
-										<div className="relative mx-1 inline-flex items-center min-w-[2px]">
+										<div className="relative mx-1 inline-flex min-w-[2px] items-center">
 											<span
 												aria-hidden="true"
 												className="invisible select-none whitespace-pre font-mono text-xs"
@@ -602,7 +602,7 @@ function ModalStyleTwo({ onClose }: { onClose?: () => void }) {
 											<span className="shrink-0 select-none text-text-sub-600">
 												{"{{{"}
 											</span>
-											<div className="relative mx-1 inline-flex items-center min-w-[2px]">
+											<div className="relative mx-1 inline-flex min-w-[2px] items-center">
 												<span
 													aria-hidden="true"
 													className="invisible select-none whitespace-pre font-mono text-xs"
