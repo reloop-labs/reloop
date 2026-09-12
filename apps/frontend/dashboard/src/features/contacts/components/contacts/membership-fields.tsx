@@ -1,7 +1,9 @@
+import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import { useQuery } from "@tanstack/react-query";
+import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GroupSelect } from "#/features/contacts/components/groups/group-select";
@@ -41,7 +43,6 @@ export function GroupsField({
 			disabled={disabled}
 			label="Groups"
 			labelIcon="modules"
-			hideItemIcons
 			description=""
 			knownGroups={knownGroups}
 		/>
@@ -161,8 +162,9 @@ export function ChannelsField({
 			</Label.Root>
 			<div className="relative">
 				<label
+					htmlFor={`channels-${contactId}`}
 					className={cn(
-						"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
+						"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-button-important-focus dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
 						disabled && "pointer-events-none opacity-50",
 					)}
 				>
@@ -171,8 +173,27 @@ export function ChannelsField({
 						return (
 							<span
 								key={channelId}
-								className="inline-flex h-6 max-w-full shrink-0 items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-2.5 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
+								onMouseDown={(e) => {
+									// Only the X removes — clicking the badge body does nothing
+									// (blocks the wrapping label from focusing the input).
+									if ((e.target as HTMLElement).closest("button") === null) {
+										e.preventDefault();
+									}
+								}}
+								onClick={(e) => {
+									// The X stops propagation itself; anything else reaching
+									// here is a badge-body click — swallow it so the label
+									// doesn't activate any control.
+									e.stopPropagation();
+								}}
+								className="inline-flex h-6 max-w-full shrink-0 cursor-default items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-px text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
 							>
+								<Avatar.Root size="20" color="gray">
+									<Icon
+										name="notification-indicator"
+										className="h-3 w-3 text-text-sub-600"
+									/>
+								</Avatar.Root>
 								<span className="truncate font-medium">{channelName}</span>
 								<button
 									type="button"
@@ -181,11 +202,11 @@ export function ChannelsField({
 										e.stopPropagation();
 										removeChannel(channelId);
 									}}
-									className="ml-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
+									className="ml-0.5 flex h-3.5 w-3.5 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
 									disabled={disabled}
 									aria-label={`Remove ${channelName}`}
 								>
-									<Icon name="cross" className="h-3 w-3" />
+									<X className="h-3 w-3" strokeWidth={2.5} />
 								</button>
 							</span>
 						);
@@ -198,6 +219,19 @@ export function ChannelsField({
 						onChange={(e) => {
 							setChannelInput(e.target.value);
 							setShowChannelDropdown(true);
+						}}
+						onKeyDown={(e) => {
+							if (
+								e.key === "Backspace" &&
+								!channelInput &&
+								selectedChannelIds.length > 0
+							) {
+								const lastId =
+									selectedChannelIds[selectedChannelIds.length - 1];
+								if (lastId) {
+									onChange(selectedChannelIds.filter((id) => id !== lastId));
+								}
+							}
 						}}
 						onFocus={() => setShowChannelDropdown(true)}
 						onBlur={(e) => {
@@ -244,6 +278,12 @@ export function ChannelsField({
 											!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 										)}
 									>
+										<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600">
+											<Icon
+												name="notification-indicator"
+												className="h-3.5 w-3.5"
+											/>
+										</span>
 										<span className="min-w-0 flex-1 truncate font-medium text-sm text-text-strong-950 dark:text-white">
 											{channel.name}
 										</span>

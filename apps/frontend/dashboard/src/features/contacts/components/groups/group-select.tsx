@@ -3,8 +3,9 @@ import { cn } from "@reloop/ui/cn";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import { useQuery } from "@tanstack/react-query";
+import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
@@ -49,6 +50,9 @@ export const GroupSelect = ({
 	const groupInputRef = useRef<HTMLInputElement>(null);
 	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	// Explicit input id so the wrapping box label activates the search input —
+	// never a chip's remove button.
+	const inputId = id ?? useId();
 
 	const { data: allGroupsData } = useQuery({
 		queryKey: ["contacts", "groups", "select"],
@@ -112,7 +116,7 @@ export const GroupSelect = ({
 		<div className={cn("flex flex-col gap-1.5", className)}>
 			<div className="flex flex-wrap items-center gap-1.5">
 				<Label.Root
-					htmlFor={id}
+					htmlFor={inputId}
 					className="font-medium text-text-strong-950 text-xs"
 				>
 					<span className="inline-flex items-center gap-1.5">
@@ -130,8 +134,9 @@ export const GroupSelect = ({
 			</div>
 			<div className="relative">
 				<label
+					htmlFor={inputId}
 					className={cn(
-						"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
+						"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-button-important-focus dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
 						disabled && "pointer-events-none opacity-50",
 					)}
 				>
@@ -141,9 +146,22 @@ export const GroupSelect = ({
 						return (
 							<span
 								key={groupId}
+								onMouseDown={(e) => {
+									// Only the X removes — clicking the badge body does nothing
+									// (blocks the wrapping label from focusing the input).
+									if ((e.target as HTMLElement).closest("button") === null) {
+										e.preventDefault();
+									}
+								}}
+								onClick={(e) => {
+									// The X stops propagation itself; anything else reaching
+									// here is a badge-body click — swallow it so the label
+									// doesn't activate any control.
+									e.stopPropagation();
+								}}
 								className={cn(
-									"inline-flex h-6 max-w-full shrink-0 items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40",
-									hideItemIcons ? "pl-2.5" : "pl-0.5",
+									"inline-flex h-6 max-w-full shrink-0 cursor-default items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40",
+									hideItemIcons ? "pl-2.5" : "pl-px",
 								)}
 							>
 								{hideItemIcons ? null : (
@@ -162,23 +180,35 @@ export const GroupSelect = ({
 										e.stopPropagation();
 										removeGroup(groupId);
 									}}
-									className="ml-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
+									className="ml-0.5 flex h-3.5 w-3.5 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
 									disabled={disabled}
 									aria-label={`Remove ${groupName}`}
 								>
-									<Icon name="cross" className="h-3 w-3" />
+									<X className="h-3 w-3" strokeWidth={2.5} />
 								</button>
 							</span>
 						);
 					})}
 					<input
 						ref={groupInputRef}
-						id={id}
+						id={inputId}
 						type="text"
 						value={groupInput}
 						onChange={(e) => {
 							setGroupInput(e.target.value);
 							setShowGroupDropdown(true);
+						}}
+						onKeyDown={(e) => {
+							if (
+								e.key === "Backspace" &&
+								!groupInput &&
+								selectedGroupIds.length > 0
+							) {
+								const lastId = selectedGroupIds[selectedGroupIds.length - 1];
+								if (lastId) {
+									onChange(selectedGroupIds.filter((gid) => gid !== lastId));
+								}
+							}
 						}}
 						onFocus={() => setShowGroupDropdown(true)}
 						onBlur={(e) => {
