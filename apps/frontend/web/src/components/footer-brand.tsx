@@ -97,14 +97,14 @@ function OpenSourceSeal({ accent }: { accent: FooterBrandAccent }) {
 			>
 				<polygon
 					points={SEAL_POINTS}
-					className="fill-bg-white-0 stroke-stroke-soft-100 dark:fill-black dark:stroke-white/15"
+					className="fill-bg-white-0 stroke-stroke-sub-300 dark:fill-black dark:stroke-white/15"
 					strokeWidth="1"
 				/>
 				<circle
 					cx="44"
 					cy="44"
 					r="31"
-					className="stroke-stroke-soft-100 dark:stroke-white/15"
+					className="stroke-stroke-sub-300 dark:stroke-white/15"
 					fill="none"
 					strokeWidth=".8"
 				/>

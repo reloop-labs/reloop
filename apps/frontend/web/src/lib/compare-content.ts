@@ -4,6 +4,7 @@ import {
 	comparisonCellText,
 } from "@reloop/web/app/compare/compare-types";
 import { loopsComparisonCategories } from "@reloop/web/app/compare/loops/comparison-data";
+import { mailgunComparisonCategories } from "@reloop/web/app/compare/mailgun/comparison-data";
 import { resendComparisonCategories } from "@reloop/web/app/compare/resend/comparison-data";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import {
@@ -45,34 +46,6 @@ const sendgridFeatures: ComparisonFeatureRow[] = [
 		label: "Contract flexibility",
 		reloop: "Monthly tiers + self-host",
 		competitor: "Often annual enterprise",
-	},
-];
-
-const mailgunFeatures: ComparisonFeatureRow[] = [
-	{
-		label: "Open-source codebase",
-		reloop: "Yes (Apache 2.0)",
-		competitor: "No",
-	},
-	{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
-	{ label: "REST API", reloop: "Yes", competitor: "Yes" },
-	{ label: "SMTP relay", reloop: "Yes", competitor: "Yes" },
-	{
-		label: "Inbound / reply handling",
-		reloop: "Agent inbox",
-		competitor: "Inbound routes",
-	},
-	{ label: "Email validation API", reloop: "Yes", competitor: "Yes" },
-	{
-		label: "Marketing campaigns",
-		reloop: "Yes",
-		competitor: "Limited",
-	},
-	{ label: "Agent / AI workflows", reloop: "Yes", competitor: "No" },
-	{
-		label: "Free tier",
-		reloop: "3,000 emails / month · 200 / day",
-		competitor: "Trial-based",
 	},
 ];
 
@@ -242,7 +215,7 @@ export const comparePages: ComparePageContent[] = [
 			"Learn how Reloop compares to Mailgun for developer email APIs and SMTP.",
 		summary:
 			"Reloop offers REST + SMTP, inbound agent inbox, and Apache 2.0 self-host. Mailgun is hosted SaaS with inbound routes. Reloop Free is 3,000 emails/month (200/day).",
-		features: mailgunFeatures,
+		categories: mailgunComparisonCategories,
 		faqs: [
 			{
 				question: "Can Reloop replace Mailgun inbound routes?",
@@ -252,7 +225,17 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "Do we lose deliverability moving off Mailgun?",
 				answer:
-					"Deliverability depends on domain reputation, content, and IPs—not the dashboard brand. Self-hosted Reloop lets you own IPs directly; hosted Reloop manages shared pools like other providers.",
+					"Deliverability depends on domain reputation, content, and IPs, not the dashboard brand. Self-hosted Reloop lets you own IPs directly; hosted Reloop manages shared pools like other providers.",
+			},
+			{
+				question: "How does Reloop Cloud pricing compare to Mailgun?",
+				answer:
+					"Mailgun Basic is $15/month for 10,000 emails and Foundation is $35/month for 50,000, with overage from $1.30 per 1,000. Reloop Pro is $10/month for 50,000 emails and Growth is $20/month for 100,000, with overage at $0.50 per 1,000. Self-hosted Reloop has no Reloop license fee; you pay your own infrastructure.",
+			},
+			{
+				question: "Do SMTP senders need code changes?",
+				answer:
+					"No. Applications sending over SMTP change host, port, and credentials only. API senders need a small client adapter, since Reloop is not a drop-in Mailgun proxy.",
 			},
 		],
 	},
@@ -497,7 +480,6 @@ export function buildCompareJsonLd(page: ComparePageContent) {
 
 export {
 	sendgridFeatures,
-	mailgunFeatures,
 	awsSesFeatures,
 	postmarkFeatures,
 	mailchimpFeatures,

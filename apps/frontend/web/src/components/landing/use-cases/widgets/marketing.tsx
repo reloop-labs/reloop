@@ -14,18 +14,18 @@ export default function MarketingWidget() {
 	const clickRate = 2.4 + (hasCTA ? 1.8 : 0) + (hasPromo ? 2.5 : 0);
 
 	return (
-		<div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950 font-sans shadow-2xl">
+		<div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 font-sans shadow-lg dark:border-white/10 dark:bg-slate-950 dark:shadow-2xl">
 			{/* Designer Header */}
-			<div className="flex items-center justify-between border-white/5 border-b bg-slate-900 px-4 py-3">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3 dark:border-white/5 dark:bg-slate-900">
 				<div className="flex items-center gap-1.5">
 					<span className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
 					<span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
 					<span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
-					<span className="ml-2 font-mono text-white/40 text-xs">
+					<span className="ml-2 font-mono text-text-sub-600 text-xs dark:text-white/40">
 						campaign_builder_v2.email
 					</span>
 				</div>
-				<span className="rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-[10px] text-rose-400">
+				<span className="rounded border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-[10px] text-rose-600 dark:text-rose-400">
 					Builder Mode
 				</span>
 			</div>
@@ -33,8 +33,8 @@ export default function MarketingWidget() {
 			<div className="grid flex-1 grid-cols-1 gap-4 p-4 md:grid-cols-2">
 				{/* Editor & Stats Control */}
 				<div className="flex flex-col justify-between gap-4">
-					<div className="flex flex-col gap-3 rounded-xl border border-white/5 bg-slate-900/40 p-4">
-						<h3 className="font-bold text-white/40 text-xs uppercase tracking-wider">
+					<div className="flex flex-col gap-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-4 dark:border-white/5 dark:bg-slate-900/40">
+						<h3 className="font-bold text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/40">
 							Email Elements
 						</h3>
 
@@ -44,8 +44,8 @@ export default function MarketingWidget() {
 								onClick={() => setHasHero(!hasHero)}
 								className={`flex cursor-pointer items-center justify-between rounded-lg border p-2.5 text-left transition-all ${
 									hasHero
-										? "border-rose-500/30 bg-rose-950/20 text-rose-300"
-										: "border-white/5 bg-slate-900/60 text-white/40"
+										? "border-rose-500/30 bg-rose-50 text-rose-600 dark:bg-rose-950/20 dark:text-rose-300"
+										: "border-stroke-soft-200 bg-bg-weak-50/60 text-text-sub-600 dark:border-white/5 dark:bg-slate-900/60 dark:text-white/40"
 								}`}
 							>
 								<div className="flex items-center gap-2">
@@ -53,7 +53,7 @@ export default function MarketingWidget() {
 									<span className="font-medium text-xs">Hero Image Block</span>
 								</div>
 								<div
-									className={`h-4 w-6 rounded-full p-0.5 transition-colors ${hasHero ? "bg-rose-500" : "bg-slate-800"}`}
+									className={`h-4 w-6 rounded-full p-0.5 transition-colors ${hasHero ? "bg-rose-500" : "bg-stroke-soft-200 dark:bg-slate-800"}`}
 								>
 									<div
 										className={`h-3 w-3 rounded-full bg-white transition-transform ${hasHero ? "translate-x-2" : "translate-x-0"}`}
@@ -65,8 +65,8 @@ export default function MarketingWidget() {
 								onClick={() => setHasPromo(!hasPromo)}
 								className={`flex cursor-pointer items-center justify-between rounded-lg border p-2.5 text-left transition-all ${
 									hasPromo
-										? "border-rose-500/30 bg-rose-950/20 text-rose-300"
-										: "border-white/5 bg-slate-900/60 text-white/40"
+										? "border-rose-500/30 bg-rose-50 text-rose-600 dark:bg-rose-950/20 dark:text-rose-300"
+										: "border-stroke-soft-200 bg-bg-weak-50/60 text-text-sub-600 dark:border-white/5 dark:bg-slate-900/60 dark:text-white/40"
 								}`}
 							>
 								<div className="flex items-center gap-2">
@@ -76,7 +76,7 @@ export default function MarketingWidget() {
 									</span>
 								</div>
 								<div
-									className={`h-4 w-6 rounded-full p-0.5 transition-colors ${hasPromo ? "bg-rose-500" : "bg-slate-800"}`}
+									className={`h-4 w-6 rounded-full p-0.5 transition-colors ${hasPromo ? "bg-rose-500" : "bg-stroke-soft-200 dark:bg-slate-800"}`}
 								>
 									<div
 										className={`h-3 w-3 rounded-full bg-white transition-transform ${hasPromo ? "translate-x-2" : "translate-x-0"}`}
@@ -88,8 +88,8 @@ export default function MarketingWidget() {
 								onClick={() => setHasCTA(!hasCTA)}
 								className={`flex cursor-pointer items-center justify-between rounded-lg border p-2.5 text-left transition-all ${
 									hasCTA
-										? "border-rose-500/30 bg-rose-950/20 text-rose-300"
-										: "border-white/5 bg-slate-900/60 text-white/40"
+										? "border-rose-500/30 bg-rose-50 text-rose-600 dark:bg-rose-950/20 dark:text-rose-300"
+										: "border-stroke-soft-200 bg-bg-weak-50/60 text-text-sub-600 dark:border-white/5 dark:bg-slate-900/60 dark:text-white/40"
 								}`}
 							>
 								<div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export default function MarketingWidget() {
 									</span>
 								</div>
 								<div
-									className={`h-4 w-6 rounded-full p-0.5 transition-colors ${hasCTA ? "bg-rose-500" : "bg-slate-800"}`}
+									className={`h-4 w-6 rounded-full p-0.5 transition-colors ${hasCTA ? "bg-rose-500" : "bg-stroke-soft-200 dark:bg-slate-800"}`}
 								>
 									<div
 										className={`h-3 w-3 rounded-full bg-white transition-transform ${hasCTA ? "translate-x-2" : "translate-x-0"}`}
@@ -110,30 +110,30 @@ export default function MarketingWidget() {
 					</div>
 
 					{/* Campaign Analytics Simulation */}
-					<div className="rounded-xl border border-white/5 bg-slate-900/40 p-4">
-						<h3 className="mb-3 font-bold text-white/40 text-xs uppercase tracking-wider">
+					<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-4 dark:border-white/5 dark:bg-slate-900/40">
+						<h3 className="mb-3 font-bold text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/40">
 							Estimated Impact
 						</h3>
 						<div className="grid grid-cols-2 gap-3">
-							<div className="rounded-lg border border-white/5 bg-slate-950/60 p-3">
-								<div className="font-mono text-[10px] text-white/40">
+							<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50/60 p-3 dark:border-white/5 dark:bg-slate-950/60">
+								<div className="font-mono text-[10px] text-text-sub-600 dark:text-white/40">
 									AVG. OPEN RATE
 								</div>
-								<div className="mt-1 font-bold font-mono text-lg text-white">
+								<div className="mt-1 font-bold font-mono text-lg text-text-strong-950 dark:text-white">
 									{openRate.toFixed(1)}%
 								</div>
-								<div className="mt-0.5 font-mono text-[9px] text-emerald-400">
+								<div className="mt-0.5 font-mono text-[9px] text-emerald-600 dark:text-emerald-400">
 									🚀 +{(openRate - 22).toFixed(1)}% optimization
 								</div>
 							</div>
-							<div className="rounded-lg border border-white/5 bg-slate-950/60 p-3">
-								<div className="font-mono text-[10px] text-white/40">
+							<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50/60 p-3 dark:border-white/5 dark:bg-slate-950/60">
+								<div className="font-mono text-[10px] text-text-sub-600 dark:text-white/40">
 									CLICK RATE (CTR)
 								</div>
-								<div className="mt-1 font-bold font-mono text-lg text-white">
+								<div className="mt-1 font-bold font-mono text-lg text-text-strong-950 dark:text-white">
 									{clickRate.toFixed(1)}%
 								</div>
-								<div className="mt-0.5 font-mono text-[9px] text-emerald-400">
+								<div className="mt-0.5 font-mono text-[9px] text-emerald-600 dark:text-emerald-400">
 									📈 +{(clickRate - 2.4).toFixed(1)}% conversions
 								</div>
 							</div>
@@ -142,14 +142,14 @@ export default function MarketingWidget() {
 				</div>
 
 				{/* Visual Email Canvas Preview */}
-				<div className="flex min-h-[220px] select-none flex-col rounded-xl border border-white/5 bg-slate-900 p-3">
-					<div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-lg border border-white/5 bg-slate-950 p-3 text-left">
+				<div className="flex min-h-[220px] select-none flex-col rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 dark:border-white/5 dark:bg-slate-900">
+					<div className="flex flex-1 flex-col gap-3 overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-3 text-left dark:border-white/5 dark:bg-slate-950">
 						{/* Email Header */}
-						<div className="border-white/5 border-b pb-2">
-							<div className="font-mono text-[9px] text-white/40">
+						<div className="border-stroke-soft-200 border-b pb-2 dark:border-white/5">
+							<div className="font-mono text-[9px] text-text-sub-600 dark:text-white/40">
 								To: active_subscribers_list
 							</div>
-							<div className="mt-1 font-bold text-[11px] text-white/80">
+							<div className="mt-1 font-bold text-[11px] text-text-strong-950 dark:text-white/80">
 								✨ March Reloop Updates!
 							</div>
 						</div>
@@ -166,7 +166,7 @@ export default function MarketingWidget() {
 									animate={{ opacity: 1, scale: 1 }}
 									className="relative flex aspect-[3/1] items-center justify-center overflow-hidden rounded-md border border-rose-500/20 bg-gradient-to-tr from-rose-600/35 to-violet-600/35"
 								>
-									<span className="font-mono font-semibold text-[9px] text-white/60 tracking-wider">
+									<span className="font-mono font-semibold text-[9px] text-text-sub-600 tracking-wider dark:text-white/60">
 										MARCH PRODUCT LAUNCH
 									</span>
 								</motion.div>
@@ -186,7 +186,7 @@ export default function MarketingWidget() {
 									animate={{ opacity: 1, y: 0 }}
 									className="rounded border border-rose-500/30 border-dashed bg-rose-500/10 p-2 text-center"
 								>
-									<span className="font-bold font-mono text-[8px] text-rose-400 tracking-widest">
+									<span className="font-bold font-mono text-[8px] text-rose-600 tracking-widest dark:text-rose-400">
 										USE CODE: RELOOP20
 									</span>
 								</motion.div>

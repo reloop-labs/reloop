@@ -45,28 +45,30 @@ export default function AutomatedWidget() {
 	};
 
 	return (
-		<div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950 text-left font-sans shadow-2xl">
+		<div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 text-left font-sans shadow-lg dark:border-white/10 dark:bg-slate-950 dark:shadow-2xl">
 			{/* Designer Header */}
-			<div className="flex items-center justify-between border-white/5 border-b bg-slate-900 px-4 py-3">
+			<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3 dark:border-white/5 dark:bg-slate-900">
 				<div className="flex items-center gap-1.5">
 					<span className="h-2.5 w-2.5 rounded-full bg-violet-500/80" />
 					<span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
 					<span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
-					<span className="ml-2 font-mono text-white/40 text-xs">
+					<span className="ml-2 font-mono text-text-sub-600 text-xs dark:text-white/40">
 						welcome_series_drip.workflow
 					</span>
 				</div>
-				<span className="rounded border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 font-mono text-[10px] text-violet-400">
+				<span className="rounded border border-violet-500/20 bg-violet-500/10 px-2 py-0.5 font-mono text-[10px] text-violet-600 dark:text-violet-400">
 					Drip Engine
 				</span>
 			</div>
 
 			<div className="flex flex-1 flex-col gap-6 p-5">
 				{/* Header & Control Button */}
-				<div className="flex items-center justify-between rounded-xl border border-white/5 bg-slate-900/40 p-3">
+				<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-3 dark:border-white/5 dark:bg-slate-900/40">
 					<div>
-						<div className="font-mono text-white/40 text-xs">TRIGGER EVENT</div>
-						<div className="mt-0.5 font-mono font-semibold text-white/70 text-xs">
+						<div className="font-mono text-text-sub-600 text-xs dark:text-white/40">
+							TRIGGER EVENT
+						</div>
+						<div className="mt-0.5 font-mono font-semibold text-text-sub-600 text-xs dark:text-white/70">
 							user.registered
 						</div>
 					</div>
@@ -75,7 +77,7 @@ export default function AutomatedWidget() {
 						disabled={isRunning}
 						className={`cursor-pointer rounded-lg px-4 py-2 font-medium text-xs transition-all ${
 							isRunning
-								? "cursor-not-allowed bg-slate-800 text-white/40"
+								? "cursor-not-allowed bg-stroke-soft-200 text-text-sub-600 dark:bg-slate-800 dark:text-white/40"
 								: "bg-violet-600 text-white shadow-lg shadow-violet-500/20 hover:bg-violet-500 active:scale-95"
 						}`}
 					>
@@ -84,7 +86,7 @@ export default function AutomatedWidget() {
 				</div>
 
 				{/* SVG Flow canvas */}
-				<div className="relative flex min-h-[220px] flex-1 flex-col items-center justify-center overflow-hidden rounded-xl border border-white/5 bg-slate-900/20 p-4">
+				<div className="relative flex min-h-[220px] flex-1 flex-col items-center justify-center overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-white/5 dark:bg-slate-900/20">
 					{/* SVG Connector Paths */}
 					<svg
 						className="pointer-events-none absolute inset-0 h-full w-full"
@@ -140,8 +142,8 @@ export default function AutomatedWidget() {
 						<div
 							className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs transition-all ${
 								activeNode === 0
-									? "border-violet-500 bg-violet-950 text-violet-300 ring-2 ring-violet-500/20"
-									: "border-white/5 bg-slate-900 text-white/50"
+									? "border-violet-500 bg-violet-50 text-violet-600 ring-2 ring-violet-500/20 dark:bg-violet-950 dark:text-violet-300"
+									: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/5 dark:bg-slate-900 dark:text-white/50"
 							}`}
 						>
 							<Icon name="Activity" className="h-3.5 w-3.5" />
@@ -152,8 +154,8 @@ export default function AutomatedWidget() {
 						<div
 							className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs transition-all ${
 								activeNode === 1
-									? "border-violet-500 bg-violet-950 text-violet-300 ring-2 ring-violet-500/20"
-									: "border-white/5 bg-slate-900 text-white/50"
+									? "border-violet-500 bg-violet-50 text-violet-600 ring-2 ring-violet-500/20 dark:bg-violet-950 dark:text-violet-300"
+									: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/5 dark:bg-slate-900 dark:text-white/50"
 							}`}
 						>
 							<Icon name="Clock" className="h-3.5 w-3.5" />
@@ -164,8 +166,8 @@ export default function AutomatedWidget() {
 						<div
 							className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs transition-all ${
 								activeNode === 2
-									? "border-violet-500 bg-violet-950 text-violet-300 ring-2 ring-violet-500/20"
-									: "border-white/5 bg-slate-900 text-white/50"
+									? "border-violet-500 bg-violet-50 text-violet-600 ring-2 ring-violet-500/20 dark:bg-violet-950 dark:text-violet-300"
+									: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/5 dark:bg-slate-900 dark:text-white/50"
 							}`}
 						>
 							<Icon name="Mail" className="h-3.5 w-3.5" />
@@ -176,8 +178,8 @@ export default function AutomatedWidget() {
 						<div
 							className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs transition-all ${
 								activeNode >= 3
-									? "border-violet-500 bg-violet-950 text-violet-300 ring-2 ring-violet-500/20"
-									: "border-white/5 bg-slate-900 text-white/50"
+									? "border-violet-500 bg-violet-50 text-violet-600 ring-2 ring-violet-500/20 dark:bg-violet-950 dark:text-violet-300"
+									: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/5 dark:bg-slate-900 dark:text-white/50"
 							}`}
 						>
 							<Icon name="GitFork" className="h-3.5 w-3.5" />
@@ -190,11 +192,14 @@ export default function AutomatedWidget() {
 							<div
 								className={`flex items-center gap-1 rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-all ${
 									activeNode === 5
-										? "border-emerald-500 bg-emerald-950 text-emerald-300 ring-2 ring-emerald-500/20"
-										: "border-white/5 bg-slate-900/60 text-white/30"
+										? "border-emerald-500 bg-emerald-50 text-emerald-600 ring-2 ring-emerald-500/20 dark:bg-emerald-950 dark:text-emerald-300"
+										: "border-stroke-soft-200 bg-bg-weak-50/60 text-text-soft-400 dark:border-white/5 dark:bg-slate-900/60 dark:text-white/30"
 								}`}
 							>
-								<Icon name="Percent" className="h-3 w-3 text-emerald-400" />
+								<Icon
+									name="Percent"
+									className="h-3 w-3 text-emerald-600 dark:text-emerald-400"
+								/>
 								<span>Yes: Send 20% Off coupon</span>
 							</div>
 
@@ -202,11 +207,14 @@ export default function AutomatedWidget() {
 							<div
 								className={`flex items-center gap-1 rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-all ${
 									activeNode === 6
-										? "border-rose-500 bg-rose-950 text-rose-300 ring-2 ring-rose-500/20"
-										: "border-white/5 bg-slate-900/60 text-white/30"
+										? "border-rose-500 bg-rose-50 text-rose-600 ring-2 ring-rose-500/20 dark:bg-rose-950 dark:text-rose-300"
+										: "border-stroke-soft-200 bg-bg-weak-50/60 text-text-soft-400 dark:border-white/5 dark:bg-slate-900/60 dark:text-white/30"
 								}`}
 							>
-								<Icon name="Tag" className="h-3 w-3 text-rose-400" />
+								<Icon
+									name="Tag"
+									className="h-3 w-3 text-rose-600 dark:text-rose-400"
+								/>
 								<span>No: Tag "Unengaged"</span>
 							</div>
 						</div>

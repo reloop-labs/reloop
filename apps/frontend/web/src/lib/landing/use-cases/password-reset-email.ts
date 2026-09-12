@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/password-reset-email",
 	titleLines: ["Password Reset", "Email API"],
 	description:
-		"Deliver tokenized reset links in seconds — before the user gives up and contacts support. Bounce webhooks tell you when delivery fails so you can act.",
+		"Deliver tokenized reset links in seconds, before the user gives up and contacts support. Bounce webhooks tell you when delivery fails so you can act.",
 	keywords: [
 		"password reset email API",
 		"forgot password email",
@@ -27,7 +27,7 @@ export const config: LandingPageDefinition = {
 				{
 					title: "Instant delivery",
 					description:
-						"Users expect reset links in seconds—Reloop delivers with low latency.",
+						"Users expect reset links in seconds. Reloop delivers with low latency.",
 				},
 				{
 					title: "Template variables",

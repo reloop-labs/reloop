@@ -51,14 +51,16 @@ export default function SystemMonitoringWidget() {
 		<div
 			className={`flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border font-sans shadow-2xl transition-all duration-300 ${
 				isSpiking
-					? "border-red-500/30 bg-red-950/20"
-					: "border-white/10 bg-slate-950"
+					? "border-red-500/30 bg-red-50 dark:bg-red-950/20"
+					: "border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-slate-950"
 			}`}
 		>
 			{/* Header */}
 			<div
 				className={`flex items-center justify-between border-white/5 border-b px-4 py-3 transition-colors ${
-					isSpiking ? "bg-red-950/50" : "bg-slate-900"
+					isSpiking
+						? "bg-red-50 dark:bg-red-950/50"
+						: "bg-bg-weak-50 dark:bg-slate-900"
 				}`}
 			>
 				<div className="flex items-center gap-1.5">
@@ -67,15 +69,15 @@ export default function SystemMonitoringWidget() {
 					) : (
 						<span className="h-2.5 w-2.5 rounded-full bg-slate-500" />
 					)}
-					<span className="ml-2 font-mono text-white/40 text-xs">
+					<span className="ml-2 font-mono text-text-sub-600 text-xs dark:text-white/40">
 						sys_monitor_watchdog.sh
 					</span>
 				</div>
 				<span
 					className={`rounded border px-2 py-0.5 font-mono text-[10px] ${
 						isSpiking
-							? "border-red-500/20 bg-red-500/10 text-red-400"
-							: "border-white/10 bg-slate-500/10 text-slate-400"
+							? "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400"
+							: "border-stroke-soft-200 bg-slate-500/10 text-text-sub-600 dark:border-white/10 dark:text-slate-400"
 					}`}
 				>
 					{isSpiking ? "ALERTING STATE" : "MONITORING ACTIVE"}
@@ -84,33 +86,33 @@ export default function SystemMonitoringWidget() {
 
 			<div className="flex flex-1 flex-col gap-5 p-5 text-left text-sm">
 				{/* Top Status Cards */}
-				<div className="grid grid-cols-3 gap-3 text-white">
-					<div className="flex flex-col justify-between rounded-xl border border-white/5 bg-slate-900/40 p-3">
-						<span className="font-mono text-[10px] text-white/40">
+				<div className="grid grid-cols-3 gap-3 text-text-strong-950 dark:text-white">
+					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-3 dark:border-white/5 dark:bg-slate-900/40">
+						<span className="font-mono text-[10px] text-text-sub-600 dark:text-white/40">
 							NODE HEALTH
 						</span>
 						<span
-							className={`mt-1 font-bold font-mono text-xs ${isSpiking ? "text-red-400" : "text-emerald-400"}`}
+							className={`mt-1 font-bold font-mono text-xs ${isSpiking ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}
 						>
 							{isSpiking ? "⚠️ UNHEALTHY" : "🟢 HEALTHY"}
 						</span>
 					</div>
-					<div className="flex flex-col justify-between rounded-xl border border-white/5 bg-slate-900/40 p-3">
-						<span className="font-mono text-[10px] text-white/40">
+					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-3 dark:border-white/5 dark:bg-slate-900/40">
+						<span className="font-mono text-[10px] text-text-sub-600 dark:text-white/40">
 							CPU LOAD
 						</span>
 						<span
-							className={`mt-1 font-bold font-mono text-xs ${isSpiking ? "text-red-400" : "text-slate-300"}`}
+							className={`mt-1 font-bold font-mono text-xs ${isSpiking ? "text-red-600 dark:text-red-400" : "text-text-sub-600 dark:text-slate-300"}`}
 						>
 							{isSpiking ? "🔥 98.4%" : "12.6%"}
 						</span>
 					</div>
-					<div className="flex flex-col justify-between rounded-xl border border-white/5 bg-slate-900/40 p-3">
-						<span className="font-mono text-[10px] text-white/40">
+					<div className="flex flex-col justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-3 dark:border-white/5 dark:bg-slate-900/40">
+						<span className="font-mono text-[10px] text-text-sub-600 dark:text-white/40">
 							P99 LATENCY
 						</span>
 						<span
-							className={`mt-1 font-bold font-mono text-xs ${isSpiking ? "text-red-400" : "text-slate-300"}`}
+							className={`mt-1 font-bold font-mono text-xs ${isSpiking ? "text-red-600 dark:text-red-400" : "text-text-sub-600 dark:text-slate-300"}`}
 						>
 							{isSpiking ? "⚡ 2410ms" : "14ms"}
 						</span>
@@ -118,12 +120,12 @@ export default function SystemMonitoringWidget() {
 				</div>
 
 				{/* Incident Control Section */}
-				<div className="flex items-center justify-between rounded-xl border border-white/5 bg-slate-900/40 p-3.5">
+				<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50/60 p-3.5 dark:border-white/5 dark:bg-slate-900/40">
 					<div>
-						<div className="font-mono text-white/40 text-xs">
+						<div className="font-mono text-text-sub-600 text-xs dark:text-white/40">
 							INCIDENT DISPATCHER
 						</div>
-						<div className="mt-0.5 font-mono text-[11px] text-white/60">
+						<div className="mt-0.5 font-mono text-[11px] text-text-sub-600 dark:text-white/60">
 							Send alerts automatically on CPU Spike
 						</div>
 					</div>
@@ -131,7 +133,7 @@ export default function SystemMonitoringWidget() {
 						{isSpiking ? (
 							<button
 								onClick={resetIncident}
-								className="cursor-pointer rounded-lg bg-slate-800 px-3.5 py-1.5 font-medium text-white text-xs transition-colors hover:bg-slate-700"
+								className="cursor-pointer rounded-lg bg-stroke-soft-200 px-3.5 py-1.5 font-medium text-text-strong-950 text-xs transition-colors hover:bg-stroke-sub-300 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
 							>
 								Resolve
 							</button>
@@ -147,8 +149,8 @@ export default function SystemMonitoringWidget() {
 				</div>
 
 				{/* Logger Outputs */}
-				<div className="flex min-h-[140px] flex-1 flex-col justify-between rounded-xl border border-white/5 bg-slate-950 p-3.5 text-left font-mono text-[11px]">
-					<div className="flex max-h-[120px] flex-col gap-1.5 overflow-y-auto text-white/60">
+				<div className="flex min-h-[140px] flex-1 flex-col justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 text-left font-mono text-[11px] dark:border-white/5 dark:bg-slate-950">
+					<div className="flex max-h-[120px] flex-col gap-1.5 overflow-y-auto text-text-sub-600 dark:text-white/60">
 						{logs.map((log, index) => (
 							<motion.div
 								key={index}
@@ -157,12 +159,12 @@ export default function SystemMonitoringWidget() {
 								transition={{ duration: 0.1 }}
 								className={
 									log.includes("🚨") || log.includes("⚠️")
-										? "font-semibold text-red-400"
+										? "font-semibold text-red-600 dark:text-red-400"
 										: log.includes("📧") || log.includes("📬")
-											? "text-slate-300"
+											? "text-text-sub-600 dark:text-slate-300"
 											: log.includes("✅")
-												? "text-emerald-400"
-												: "text-white/45"
+												? "text-emerald-600 dark:text-emerald-400"
+												: "text-text-sub-600 dark:text-white/45"
 								}
 							>
 								{log}
