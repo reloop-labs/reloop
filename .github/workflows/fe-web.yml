@@ -7,6 +7,7 @@ on:
     paths:
       - 'apps/frontend/web/**'
       - 'packages/ui/**'
+      - 'install/install.sh'
       - '.github/workflows/fe-web.yml'
   workflow_dispatch:
 
