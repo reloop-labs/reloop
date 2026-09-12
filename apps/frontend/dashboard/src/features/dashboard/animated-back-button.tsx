@@ -12,6 +12,7 @@ interface AnimatedBackButtonProps {
 	showText?: boolean;
 	label?: string;
 	href?: string;
+	fallbackHref?: string;
 }
 
 const easing = [0.4, 0, 0.2, 1] as const;
@@ -24,6 +25,7 @@ export function AnimatedBackButton({
 	showText = true,
 	label = "Back",
 	href,
+	fallbackHref,
 }: AnimatedBackButtonProps) {
 	const router = useRouter();
 	const [hovered, setHovered] = useState(false);
@@ -35,6 +37,14 @@ export function AnimatedBackButton({
 		}
 		if (href) {
 			router.push(href);
+			return;
+		}
+		if (
+			fallbackHref &&
+			typeof window !== "undefined" &&
+			window.history.length <= 1
+		) {
+			router.push(fallbackHref);
 			return;
 		}
 		router.back();

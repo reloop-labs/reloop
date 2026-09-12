@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { queryKeys } from "#/lib/query-keys";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { ContactStatusBadge } from "../components/contacts/contact-status-badge";
@@ -417,7 +418,10 @@ export const ContactHeader = ({
 
 	if (!contact && !isLoading) {
 		return (
-			<div className="pt-10 pb-8">
+			<div className="mx-auto max-w-3xl px-4 pb-8 sm:px-8">
+				<div className="flex items-center justify-between pt-10 pb-8">
+					<AnimatedBackButton fallbackHref="/contacts" />
+				</div>
 				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-1.5">
@@ -449,312 +453,313 @@ export const ContactHeader = ({
 
 	return (
 		<>
-			<div className="mx-auto w-full max-w-[760px] pb-16">
-				<div className="px-4 pt-6 sm:px-6">
-					{/* Avatar + name + actions row */}
-					<div className="flex items-center gap-4">
+			<div className="mx-auto max-w-3xl px-4 pb-16 sm:px-8">
+				<div className="flex items-center justify-between pt-10 pb-8">
+					<AnimatedBackButton fallbackHref="/contacts" />
+				</div>
+				{/* Avatar + name + actions row */}
+				<div className="flex items-center gap-4">
+					{isLoading ? (
+						<Skeleton className="size-10 shrink-0 rounded-full" />
+					) : (
+						<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-base text-white uppercase tracking-wide shadow-sm">
+							{initial}
+						</div>
+					)}
+
+					<div className="min-w-0 flex-1">
 						{isLoading ? (
-							<Skeleton className="size-10 shrink-0 rounded-full" />
+							<div className="flex items-center gap-2.5">
+								<Skeleton className="h-7 w-48 rounded-lg" />
+								<Skeleton className="h-6 w-24 rounded-md" />
+							</div>
 						) : (
-							<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-base text-white uppercase tracking-wide shadow-sm">
-								{initial}
+							<div className="flex flex-wrap items-center gap-2.5">
+								<h1 className="truncate font-medium text-[22px] text-text-strong-950 tracking-tight">
+									{displayName}
+								</h1>
+								{contact?.status && (
+									<ContactStatusBadge status={contact.status} />
+								)}
 							</div>
 						)}
+					</div>
 
-						<div className="min-w-0 flex-1">
-							{isLoading ? (
-								<div className="flex items-center gap-2.5">
-									<Skeleton className="h-7 w-48 rounded-lg" />
-									<Skeleton className="h-6 w-24 rounded-md" />
-								</div>
-							) : (
-								<div className="flex flex-wrap items-center gap-2.5">
-									<h1 className="truncate font-medium text-[22px] text-text-strong-950 tracking-tight">
-										{displayName}
-									</h1>
-									{contact?.status && (
-										<ContactStatusBadge status={contact.status} />
-									)}
-								</div>
-							)}
-						</div>
-
-						<div className="flex shrink-0 items-center gap-2">
-							{isLoading ? (
-								<>
-									<Skeleton className="h-9 w-28 rounded-lg" />
-									<Skeleton className="h-9 w-9 rounded-lg" />
-								</>
-							) : (
-								<>
+					<div className="flex shrink-0 items-center gap-2">
+						{isLoading ? (
+							<>
+								<Skeleton className="h-9 w-28 rounded-lg" />
+								<Skeleton className="h-9 w-9 rounded-lg" />
+							</>
+						) : (
+							<>
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
+									onClick={() => setIsEditModalOpen(true)}
+								>
+									Edit contact
+								</Button.Root>
+								{contact && (
 									<Button.Root
 										type="button"
 										variant="neutral"
 										mode="stroke"
 										size="xsmall"
-										onClick={() => setIsEditModalOpen(true)}
+										aria-label="Delete contact"
+										onClick={() => setIsDeleteModalOpen(true)}
 									>
-										Edit contact
+										<Icon
+											name="trash"
+											className="h-3.5 w-3.5 text-text-sub-600"
+										/>
 									</Button.Root>
-									{contact && (
-										<Button.Root
-											type="button"
-											variant="neutral"
-											mode="stroke"
-											size="xsmall"
-											aria-label="Delete contact"
-											onClick={() => setIsDeleteModalOpen(true)}
-										>
-											<Icon
-												name="trash"
-												className="h-3.5 w-3.5 text-text-sub-600"
-											/>
-										</Button.Root>
-									)}
-								</>
-							)}
+								)}
+							</>
+						)}
+					</div>
+				</div>
+
+				{!isLoading && contact?.suppressionReason && (
+					<div className="mt-6 flex items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3">
+						<Icon
+							name="alert-octagon"
+							className="mt-0.5 h-5 w-5 flex-shrink-0 text-error-base"
+						/>
+						<div className="flex flex-col gap-0.5">
+							<h3 className="font-medium text-error-base text-sm">
+								Contact Suppressed
+							</h3>
+							<p className="text-error-base/80 text-sm">
+								This contact has been automatically excluded from all
+								communications due to a delivery issue or spam report.
+							</p>
 						</div>
 					</div>
+				)}
 
-					{!isLoading && contact?.suppressionReason && (
-						<div className="mt-6 flex items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3">
-							<Icon
-								name="alert-octagon"
-								className="mt-0.5 h-5 w-5 flex-shrink-0 text-error-base"
-							/>
-							<div className="flex flex-col gap-0.5">
-								<h3 className="font-medium text-error-base text-sm">
-									Contact Suppressed
-								</h3>
-								<p className="text-error-base/80 text-sm">
-									This contact has been automatically excluded from all
-									communications due to a delivery issue or spam report.
-								</p>
-							</div>
-						</div>
-					)}
-
-					{/* Content */}
-					<div className="mt-8 flex flex-col gap-10">
-						<section>
-							<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
-								Properties
-							</h3>
-							{isLoading ? (
-								<div className="grid grid-cols-3 gap-x-8 gap-y-8">
-									{[0, 1, 2, 3, 4, 5].map((i) => (
-										<div
-											key={`property-skeleton-${i}`}
-											className="flex flex-col gap-1"
-										>
-											<Skeleton className="h-2.5 w-16 rounded" />
-											<Skeleton className="h-4 w-28 rounded" />
-										</div>
-									))}
-								</div>
-							) : (
-								<div className="grid grid-cols-3 gap-x-8 gap-y-8">
-									<PropertyField label="First name">
-										{!isEmptyPropertyValue(contact?.firstName) ? (
-											contact?.firstName
-										) : (
-											<EmptyDash />
-										)}
-									</PropertyField>
-									<PropertyField label="Last name">
-										{!isEmptyPropertyValue(contact?.lastName) ? (
-											contact?.lastName
-										) : (
-											<EmptyDash />
-										)}
-									</PropertyField>
-									{propertyValues.map((pv) => (
-										<PropertyField
-											key={pv.id}
-											label={formatPropertyName(pv.name)}
-										>
-											{!isEmptyPropertyValue(pv.value) ? (
-												<span className="block truncate">{pv.value}</span>
-											) : (
-												<EmptyDash />
-											)}
-										</PropertyField>
-									))}
-								</div>
-							)}
-						</section>
-
+				{/* Content */}
+				<div className="mt-8 flex flex-col gap-10">
+					<section>
+						<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
+							Properties
+						</h3>
 						{isLoading ? (
 							<div className="grid grid-cols-3 gap-x-8 gap-y-8">
-								{[0, 1, 2, 3, 4].map((i) => (
+								{[0, 1, 2, 3, 4, 5].map((i) => (
 									<div
-										key={`detail-skeleton-${i}`}
-										className="flex flex-col gap-1.5"
+										key={`property-skeleton-${i}`}
+										className="flex flex-col gap-1"
 									>
-										<Skeleton className="h-3.5 w-20 rounded" />
+										<Skeleton className="h-2.5 w-16 rounded" />
 										<Skeleton className="h-4 w-28 rounded" />
 									</div>
 								))}
 							</div>
 						) : (
-							contact && (
-								<div className="grid grid-cols-3 gap-x-8 gap-y-8">
-									<DetailItem icon="calendar" label="Created">
-										{contact.createdAt ? (
-											<span className="font-medium text-paragraph-sm text-text-strong-950">
-												{formatRelativeTime(contact.createdAt)}
-											</span>
+							<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+								<PropertyField label="First name">
+									{!isEmptyPropertyValue(contact?.firstName) ? (
+										contact?.firstName
+									) : (
+										<EmptyDash />
+									)}
+								</PropertyField>
+								<PropertyField label="Last name">
+									{!isEmptyPropertyValue(contact?.lastName) ? (
+										contact?.lastName
+									) : (
+										<EmptyDash />
+									)}
+								</PropertyField>
+								{propertyValues.map((pv) => (
+									<PropertyField
+										key={pv.id}
+										label={formatPropertyName(pv.name)}
+									>
+										{!isEmptyPropertyValue(pv.value) ? (
+											<span className="block truncate">{pv.value}</span>
 										) : (
 											<EmptyDash />
 										)}
-									</DetailItem>
-									<DetailItem icon="hash" label="ID">
-										<button
-											className="group/copy w-[150px] cursor-pointer text-left"
-											type="button"
-											onClick={handleCopyId}
-											title="Copy contact ID"
-										>
-											<code className="relative isolate flex h-6 w-full items-center justify-between gap-1.5 overflow-hidden rounded-md bg-neutral-alpha-10 px-2 py-1 text-left font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20">
-												<span className="relative flex h-full min-w-0 flex-1 items-center justify-start overflow-hidden text-left">
-													<AnimatePresence mode="popLayout" initial={false}>
-														<motion.span
-															key={copied ? "copied" : "id"}
-															transition={{
-																type: "spring",
-																duration: 0.25,
-																bounce: 0,
-															}}
-															initial={{ opacity: 0, y: -12 }}
-															animate={{ opacity: 1, y: 0 }}
-															exit={{ opacity: 0, y: 12 }}
-															className="block w-full truncate text-left"
-														>
-															{copied
-																? "Copied!"
-																: `${contact.id.slice(0, 18)}...`}
-														</motion.span>
-													</AnimatePresence>
-												</span>
-												<span className="relative flex h-3 w-3 shrink-0 items-center justify-center">
-													<motion.span
-														className="pointer-events-none absolute inset-0 flex items-center justify-center"
-														initial={false}
-														animate={{
-															scale: copied ? 0 : 1,
-															opacity: copied ? 0 : 1,
-														}}
-														transition={{ duration: 0.18, ease: "easeInOut" }}
-													>
-														<Icon
-															name="copy"
-															className="h-3 w-3 text-text-sub-600 transition-colors group-hover/copy:text-text-strong-950"
-														/>
-													</motion.span>
-													<motion.span
-														className="pointer-events-none absolute inset-0 flex items-center justify-center"
-														initial={false}
-														animate={{
-															scale: copied ? 1 : 0,
-															opacity: copied ? 1 : 0,
-														}}
-														transition={{ duration: 0.18, ease: "easeInOut" }}
-													>
-														<Icon
-															name="check-mark"
-															className="h-3 w-3 text-success-base"
-														/>
-													</motion.span>
-												</span>
-											</code>
-										</button>
-									</DetailItem>
-									<DetailItem icon="star" label="Score">
-										{engagementQuery.isPending ? (
-											<Skeleton className="h-4 w-16 rounded" />
-										) : engagementQuery.isError || engagementScore == null ? (
-											<span title="Not enough sending history to score this contact yet">
-												<EmptyDash />
-											</span>
-										) : (
-											<span
-												className={cn(
-													"font-medium text-paragraph-sm tabular-nums",
-													scoreColor(engagementRating),
-												)}
-												title={`Engagement ${engagementScore}/100 · ${engagementRating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`}
-											>
-												{engagementScore.toLocaleString()}
-												<span className="font-normal text-paragraph-xs text-text-sub-600">
-													{" "}
-													· {engagementRating}
-												</span>
-											</span>
-										)}
-									</DetailItem>
-									<DetailItem icon="modules" label="Groups">
-										{contact.groups && contact.groups.length > 0 ? (
-											<span className="flex flex-wrap gap-x-3 gap-y-1 font-medium text-paragraph-sm text-text-strong-950">
-												{contact.groups.map((group) => (
-													<Link
-														href={`/contacts/groups/${group.id}`}
-														key={group.id}
-														className="underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
-													>
-														{group.name}
-													</Link>
-												))}
-											</span>
-										) : (
-											<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
-												No groups
-											</span>
-										)}
-									</DetailItem>
-									<DetailItem icon="notification-indicator" label="Channels">
-										{enrolledChannels.length > 0 ? (
-											<span className="flex flex-wrap gap-x-3 gap-y-1 font-medium text-paragraph-sm text-text-strong-950">
-												{enrolledChannels.map((channel) => (
-													<Link
-														href={`/contacts?channelId=${channel.id}`}
-														key={channel.id}
-														className="underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
-													>
-														{channel.name}
-													</Link>
-												))}
-											</span>
-										) : (
-											<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
-												No channels
-											</span>
-										)}
-									</DetailItem>
-								</div>
-							)
-						)}
-
-						{!isLoading && contact?.email && (
-							<ContactStatsRow email={contact.email} />
-						)}
-
-						{contact?.email && (
-							<div>
-								<ContactActivityTabs
-									value={activityTab}
-									onChange={setActivityTab}
-								/>
-								<div className="mt-8">
-									<ContactEmailHistory
-										contactId={contact.id}
-										email={contact.email}
-										contactCreatedAt={contact.createdAt}
-										filter={activityTab}
-									/>
-								</div>
+									</PropertyField>
+								))}
 							</div>
 						)}
-					</div>
+					</section>
+
+					{isLoading ? (
+						<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+							{[0, 1, 2, 3, 4].map((i) => (
+								<div
+									key={`detail-skeleton-${i}`}
+									className="flex flex-col gap-1.5"
+								>
+									<Skeleton className="h-3.5 w-20 rounded" />
+									<Skeleton className="h-4 w-28 rounded" />
+								</div>
+							))}
+						</div>
+					) : (
+						contact && (
+							<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+								<DetailItem icon="calendar" label="Created">
+									{contact.createdAt ? (
+										<span className="font-medium text-paragraph-sm text-text-strong-950">
+											{formatRelativeTime(contact.createdAt)}
+										</span>
+									) : (
+										<EmptyDash />
+									)}
+								</DetailItem>
+								<DetailItem icon="hash" label="ID">
+									<button
+										className="group/copy w-[150px] cursor-pointer text-left"
+										type="button"
+										onClick={handleCopyId}
+										title="Copy contact ID"
+									>
+										<code className="relative isolate flex h-6 w-full items-center justify-between gap-1.5 overflow-hidden rounded-md bg-neutral-alpha-10 px-2 py-1 text-left font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20">
+											<span className="relative flex h-full min-w-0 flex-1 items-center justify-start overflow-hidden text-left">
+												<AnimatePresence mode="popLayout" initial={false}>
+													<motion.span
+														key={copied ? "copied" : "id"}
+														transition={{
+															type: "spring",
+															duration: 0.25,
+															bounce: 0,
+														}}
+														initial={{ opacity: 0, y: -12 }}
+														animate={{ opacity: 1, y: 0 }}
+														exit={{ opacity: 0, y: 12 }}
+														className="block w-full truncate text-left"
+													>
+														{copied
+															? "Copied!"
+															: `${contact.id.slice(0, 18)}...`}
+													</motion.span>
+												</AnimatePresence>
+											</span>
+											<span className="relative flex h-3 w-3 shrink-0 items-center justify-center">
+												<motion.span
+													className="pointer-events-none absolute inset-0 flex items-center justify-center"
+													initial={false}
+													animate={{
+														scale: copied ? 0 : 1,
+														opacity: copied ? 0 : 1,
+													}}
+													transition={{ duration: 0.18, ease: "easeInOut" }}
+												>
+													<Icon
+														name="copy"
+														className="h-3 w-3 text-text-sub-600 transition-colors group-hover/copy:text-text-strong-950"
+													/>
+												</motion.span>
+												<motion.span
+													className="pointer-events-none absolute inset-0 flex items-center justify-center"
+													initial={false}
+													animate={{
+														scale: copied ? 1 : 0,
+														opacity: copied ? 1 : 0,
+													}}
+													transition={{ duration: 0.18, ease: "easeInOut" }}
+												>
+													<Icon
+														name="check-mark"
+														className="h-3 w-3 text-success-base"
+													/>
+												</motion.span>
+											</span>
+										</code>
+									</button>
+								</DetailItem>
+								<DetailItem icon="star" label="Score">
+									{engagementQuery.isPending ? (
+										<Skeleton className="h-4 w-16 rounded" />
+									) : engagementQuery.isError || engagementScore == null ? (
+										<span title="Not enough sending history to score this contact yet">
+											<EmptyDash />
+										</span>
+									) : (
+										<span
+											className={cn(
+												"font-medium text-paragraph-sm tabular-nums",
+												scoreColor(engagementRating),
+											)}
+											title={`Engagement ${engagementScore}/100 · ${engagementRating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`}
+										>
+											{engagementScore.toLocaleString()}
+											<span className="font-normal text-paragraph-xs text-text-sub-600">
+												{" "}
+												· {engagementRating}
+											</span>
+										</span>
+									)}
+								</DetailItem>
+								<DetailItem icon="modules" label="Groups">
+									{contact.groups && contact.groups.length > 0 ? (
+										<span className="flex flex-wrap gap-x-3 gap-y-1 font-medium text-paragraph-sm text-text-strong-950">
+											{contact.groups.map((group) => (
+												<Link
+													href={`/contacts/groups/${group.id}`}
+													key={group.id}
+													className="underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
+												>
+													{group.name}
+												</Link>
+											))}
+										</span>
+									) : (
+										<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
+											No groups
+										</span>
+									)}
+								</DetailItem>
+								<DetailItem icon="notification-indicator" label="Channels">
+									{enrolledChannels.length > 0 ? (
+										<span className="flex flex-wrap gap-x-3 gap-y-1 font-medium text-paragraph-sm text-text-strong-950">
+											{enrolledChannels.map((channel) => (
+												<Link
+													href={`/contacts?channelId=${channel.id}`}
+													key={channel.id}
+													className="underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
+												>
+													{channel.name}
+												</Link>
+											))}
+										</span>
+									) : (
+										<span className="font-medium text-paragraph-sm text-text-soft-400 italic">
+											No channels
+										</span>
+									)}
+								</DetailItem>
+							</div>
+						)
+					)}
+
+					{!isLoading && contact?.email && (
+						<ContactStatsRow email={contact.email} />
+					)}
+
+					{contact?.email && (
+						<div>
+							<ContactActivityTabs
+								value={activityTab}
+								onChange={setActivityTab}
+							/>
+							<div className="mt-8">
+								<ContactEmailHistory
+									contactId={contact.id}
+									email={contact.email}
+									contactCreatedAt={contact.createdAt}
+									filter={activityTab}
+								/>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 

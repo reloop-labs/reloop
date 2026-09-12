@@ -3,6 +3,7 @@ import {
 	useChannelsQuery,
 	useContactQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { ContactHeader } from "./contact-header";
 
 export function ContactDetailContent({ contactId }: { contactId: string }) {
@@ -53,29 +54,39 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 		const is404 =
 			contactError instanceof Error && contactError.message.includes("404");
 		return (
-			<div className="py-12 text-center">
-				<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
-					{is404 ? "Contact not found" : "Failed to load contact"}
-				</h2>
-				<p className="text-text-sub-600">
-					{is404
-						? "The contact you're looking for doesn't exist or has been deleted."
-						: "There was an error loading the contact details. Please try again."}
-				</p>
+			<div className="mx-auto max-w-3xl px-4 sm:px-8">
+				<div className="flex items-center justify-between pt-10 pb-8">
+					<AnimatedBackButton fallbackHref="/contacts" />
+				</div>
+				<div className="py-12 text-center">
+					<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
+						{is404 ? "Contact not found" : "Failed to load contact"}
+					</h2>
+					<p className="text-text-sub-600">
+						{is404
+							? "The contact you're looking for doesn't exist or has been deleted."
+							: "There was an error loading the contact details. Please try again."}
+					</p>
+				</div>
 			</div>
 		);
 	}
 
 	if (!contactData && !isLoading) {
 		return (
-			<div className="py-12 text-center">
-				<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
-					Contact not found
-				</h2>
-				<p className="text-text-sub-600">
-					The contact you&apos;re looking for doesn&apos;t exist or has been
-					deleted.
-				</p>
+			<div className="mx-auto max-w-3xl px-4 sm:px-8">
+				<div className="flex items-center justify-between pt-10 pb-8">
+					<AnimatedBackButton fallbackHref="/contacts" />
+				</div>
+				<div className="py-12 text-center">
+					<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
+						Contact not found
+					</h2>
+					<p className="text-text-sub-600">
+						The contact you&apos;re looking for doesn&apos;t exist or has been
+						deleted.
+					</p>
+				</div>
 			</div>
 		);
 	}

@@ -3,7 +3,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { useEmailsLive } from "#/features/emails/hooks/use-emails-live";
@@ -14,7 +13,6 @@ import { EmailDetail } from "./email-detail";
 import { EmailNotFound } from "./email-not-found";
 
 export function EmailDetailPage({ emailId }: { emailId: string }) {
-	const router = useRouter();
 	const { data, error, isPending, isFetching } = useEmailDetailQuery(emailId);
 	useEmailsLive({ received: false });
 	const resendEmailMutation = useResendEmail();
@@ -65,7 +63,7 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<div className="flex items-center justify-between pt-10 pb-8">
-				<AnimatedBackButton onClick={() => router.push("/")} />
+				<AnimatedBackButton fallbackHref="/" />
 				{isFailed && (
 					<Button.Root
 						size="small"

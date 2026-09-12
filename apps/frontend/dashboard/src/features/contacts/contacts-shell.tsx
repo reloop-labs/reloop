@@ -29,12 +29,13 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		}
 	}, [deletedItemName]);
 
+	const isContactDetailPage = pathname.includes("/contacts/detail/");
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isChannelsPage = pathname.includes("/contacts/channels");
 	const isGroupsPage = pathname.includes("/contacts/groups");
 	const isBulkImportPage = pathname.includes("/bulk-import");
 	const isDetailPage =
-		pathname.includes("/contacts/detail/") ||
+		isContactDetailPage ||
 		Boolean(pathname.match(/\/contacts\/groups\/[^/]+$/)) ||
 		Boolean(pathname.match(/\/contacts\/channels\/[^/]+$/));
 
@@ -128,6 +129,23 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 			: isGroupsPage
 				? GroupsApiDetails
 				: ContactsApiDetails;
+
+	if (isContactDetailPage) {
+		return (
+			<>
+				{children}
+				<ContactsModals
+					onDeleteChannelSuccess={(name) =>
+						setDeletedItemName(`Channel "${name}"`)
+					}
+					onDeleteGroupSuccess={(name) => setDeletedItemName(`Group "${name}"`)}
+					onDeletePropertySuccess={(name) =>
+						setDeletedItemName(`Property "${name}"`)
+					}
+				/>
+			</>
+		);
+	}
 
 	return (
 		<>
