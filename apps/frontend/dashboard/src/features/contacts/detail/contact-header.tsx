@@ -339,7 +339,9 @@ function PropertyField({
 }
 
 function EmptyDash() {
-	return <span className="block text-xs font-normal text-text-soft-400">—</span>;
+	return (
+		<span className="block font-normal text-text-soft-400 text-xs">—</span>
+	);
 }
 
 function isEmptyPropertyValue(v: string | null | undefined) {
@@ -394,7 +396,6 @@ export const ContactHeader = ({
 		if (contact?.id) {
 			try {
 				await navigator.clipboard.writeText(contact.id);
-				toast.success("Contact ID copied to clipboard");
 				setCopied(true);
 				setTimeout(() => setCopied(false), 2000);
 			} catch {
@@ -609,17 +610,14 @@ export const ContactHeader = ({
 									</DetailItem>
 									<DetailItem icon="hash" label="ID">
 										<button
-											className="group/copy w-[150px] cursor-pointer"
+											className="group/copy w-[150px] cursor-pointer text-left"
 											type="button"
 											onClick={handleCopyId}
 											title="Copy contact ID"
 										>
-											<code className="flex w-full items-center justify-between gap-1.5 overflow-hidden rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20 active:scale-[0.97]">
-												<span className="flex min-w-0 flex-1 items-center overflow-hidden">
-													<AnimatePresence
-														mode="popLayout"
-														initial={false}
-													>
+											<code className="relative isolate flex h-6 w-full items-center justify-between gap-1.5 overflow-hidden rounded bg-neutral-alpha-10 px-2 py-1 text-left font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20">
+												<span className="relative flex h-full min-w-0 flex-1 items-center justify-start overflow-hidden text-left">
+													<AnimatePresence mode="popLayout" initial={false}>
 														<motion.span
 															key={copied ? "copied" : "id"}
 															transition={{
@@ -627,10 +625,10 @@ export const ContactHeader = ({
 																duration: 0.25,
 																bounce: 0,
 															}}
-															initial={{ opacity: 0, y: -14 }}
+															initial={{ opacity: 0, y: -12 }}
 															animate={{ opacity: 1, y: 0 }}
-															exit={{ opacity: 0, y: 14 }}
-															className="block truncate"
+															exit={{ opacity: 0, y: 12 }}
+															className="block w-full truncate text-left"
 														>
 															{copied
 																? "Copied!"
@@ -638,18 +636,18 @@ export const ContactHeader = ({
 														</motion.span>
 													</AnimatePresence>
 												</span>
-												<span className="relative flex h-3 w-3 shrink-0 items-center justify-center">
+												<span className="relative flex h-3 w-3 shrink-0 items-center justify-center overflow-hidden">
 													<AnimatePresence mode="wait" initial={false}>
 														<motion.span
-															key={copied ? "check" : "copy"}
-															initial={{ opacity: 0, scale: 0.5, y: 4 }}
+															key={copied ? "check-mark" : "copy"}
+															initial={{ opacity: 0, scale: 0.5, y: 3 }}
 															animate={{ opacity: 1, scale: 1, y: 0 }}
-															exit={{ opacity: 0, scale: 0.5, y: -4 }}
+															exit={{ opacity: 0, scale: 0.5, y: -3 }}
 															transition={{ duration: 0.15, ease: "easeOut" }}
 															className="flex"
 														>
 															<Icon
-																name={copied ? "check" : "copy"}
+																name={copied ? "check-mark" : "copy"}
 																className={cn(
 																	"h-3 w-3 transition-colors",
 																	copied
