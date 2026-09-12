@@ -31,12 +31,13 @@ import { CsvPropertyMapping } from "./property-mapping";
 
 interface CsvImportStepProps {
 	onBack: () => void;
+	initialFile?: File | null;
 }
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB Max Cap
 const BATCH_SIZE = 5; // Concurrency limit for client-side API requests
 
-export function CsvImportStep({ onBack }: CsvImportStepProps) {
+export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 	const router = useRouter();
 	const invalidate = useInvalidateContacts();
 	const { data: propertiesData } = useAllPropertiesQuery();
@@ -128,6 +129,12 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 		};
 		reader.readAsText(inputFile);
 	};
+
+	useEffect(() => {
+		if (initialFile && !file) {
+			processFile(initialFile);
+		}
+	}, [initialFile]);
 
 	// Auto-suggest custom property mappings once org properties are available
 	useEffect(() => {
@@ -295,12 +302,16 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 				<div className="m-0.5 max-h-[calc(100dvh-520px)] space-y-6 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
 					{/* Header */}
 					<div>
+						<div className="mb-1 text-xs font-normal text-text-sub-600">
+							Step 2 of 3
+						</div>
 						<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
-							Import Contacts from CSV
+							{parsedResult ? "Map properties & groups" : "Import Contacts from CSV"}
 						</h2>
 						<p className="text-text-sub-600 text-xs leading-relaxed">
-							Upload a spreadsheet to bulk import contacts and custom
-							properties.
+							{parsedResult
+								? "Verify detected columns and choose optional audience groups for your imported contacts."
+								: "Upload a spreadsheet to bulk import contacts and custom properties."}
 						</p>
 					</div>
 
