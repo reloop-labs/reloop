@@ -419,7 +419,7 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 					return (
 						<span
 							key={`${change.field}-${idx}`}
-							className="inline-flex max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs transition-colors group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90"
+							className="inline-flex max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90"
 						>
 							<span className="font-medium font-sans text-text-sub-600">
 								{formattedLabel}:
@@ -455,7 +455,7 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 				<button
 					type="button"
 					onClick={() => setExpanded(!expanded)}
-					className="w-fit cursor-pointer font-medium text-[11px] text-text-sub-600 transition-colors hover:text-text-strong-950"
+					className="w-fit cursor-pointer font-medium text-[11px] text-text-sub-600 hover:text-text-strong-950"
 				>
 					{expanded ? "Show less" : `+${remaining} more properties`}
 				</button>
@@ -467,7 +467,7 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 // ─── Timeline Card Components ────────────────────────────────────────────────
 
 const timelineCardClass =
-	"group/card relative rounded-lg px-3.5 py-2 transition-colors duration-150 hover:bg-bg-weak-50/70 dark:hover:bg-bg-weak-50/40";
+	"group/card relative rounded-lg px-3.5 py-2  duration-150 hover:bg-bg-weak-50/70 dark:hover:bg-bg-weak-50/40";
 
 function TimelineMeta({
 	createdAt,
@@ -558,7 +558,7 @@ function EmailTimelineCard({
 					<div className="flex min-w-0 flex-wrap items-center gap-2.5">
 						<Link
 							href={`/emails/${entry.id}`}
-							className="truncate font-medium text-paragraph-sm text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
+							className="truncate font-medium text-paragraph-sm text-text-strong-950 hover:text-primary-base hover:underline"
 						>
 							{subject}
 						</Link>
@@ -590,7 +590,7 @@ function EmailTimelineCard({
 					<span>·</span>
 					<Link
 						href={`/emails/${entry.id}`}
-						className="inline-flex items-center gap-0.5 font-medium text-text-sub-600 transition-colors hover:text-text-strong-950"
+						className="inline-flex items-center gap-0.5 font-medium text-text-sub-600 hover:text-text-strong-950"
 					>
 						<span>View email</span>
 						<Icon name="arrow-up-right" className="size-3" />
@@ -628,25 +628,31 @@ function GroupTimelineCard({
 			<div className={timelineCardClass}>
 				{/* Top Header */}
 				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-					<div className="flex flex-wrap items-center gap-2">
+					<div className="flex flex-wrap items-center gap-1.5">
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{isRemoved ? "Removed from group" : "Added to group"}
+							{isRemoved ? "Removed from" : "Added to"}
 						</span>
 
 						{groupId ? (
 							<Link
 								href={`/contacts/groups/${groupId}`}
-								className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:bg-bg-weak-100 hover:text-primary-base group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90 dark:hover:bg-bg-weak-100"
+								className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-strong-950 hover:text-primary-base"
 							>
 								<Icon name="modules" className="size-3 text-text-sub-600" />
-								<span>{groupName}</span>
+								<span className="underline decoration-dotted underline-offset-2">
+									{groupName}
+								</span>
 							</Link>
 						) : (
-							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90">
+							<span className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-strong-950">
 								<Icon name="modules" className="size-3 text-text-sub-600" />
 								<span>{groupName}</span>
 							</span>
 						)}
+
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							group
+						</span>
 					</div>
 
 					<TimelineMeta createdAt={entry.createdAt} actor={actor} />
@@ -688,24 +694,26 @@ function ChannelTimelineCard({
 			<div className={timelineCardClass}>
 				{/* Top Header */}
 				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-					<div className="flex flex-wrap items-center gap-2">
+					<div className="flex flex-wrap items-center gap-1.5">
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{isOptOut ? "Opted out of channel" : "Subscribed to channel"}
+							{isOptOut ? "Opted out of" : "Subscribed to"}
 						</span>
 
 						{channelId ? (
 							<Link
 								href={`/contacts?channelId=${channelId}`}
-								className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:bg-bg-weak-100 hover:text-primary-base group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90 dark:hover:bg-bg-weak-100"
+								className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-strong-950 hover:text-primary-base"
 							>
 								<Icon
 									name="notification-indicator"
 									className="size-3 text-text-sub-600"
 								/>
-								<span>{channelName}</span>
+								<span className="underline decoration-dotted underline-offset-2">
+									{channelName}
+								</span>
 							</Link>
 						) : (
-							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90">
+							<span className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-strong-950">
 								<Icon
 									name="notification-indicator"
 									className="size-3 text-text-sub-600"
@@ -713,6 +721,10 @@ function ChannelTimelineCard({
 								<span>{channelName}</span>
 							</span>
 						)}
+
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							channel
+						</span>
 					</div>
 
 					<TimelineMeta createdAt={entry.createdAt} actor={actor} />
@@ -1309,7 +1321,7 @@ export function ContactEmailHistory({
 												key={entry.id}
 												href={`/emails/${entry.id}`}
 												style={contactEmailGridStyle}
-												className="grid w-full cursor-pointer items-center px-4 py-2.5 text-left transition-colors hover:bg-bg-weak-50"
+												className="grid w-full cursor-pointer items-center px-4 py-2.5 text-left hover:bg-bg-weak-50"
 											>
 												<span className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
 													{subject}
@@ -1329,7 +1341,7 @@ export function ContactEmailHistory({
 											type="button"
 											onClick={handleLoadMoreEmails}
 											disabled={emailQuery.isFetchingNextPage}
-											className="flex w-full cursor-pointer items-center justify-center gap-2 px-4 py-3.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:bg-bg-weak-50/70 hover:text-text-strong-950"
+											className="flex w-full cursor-pointer items-center justify-center gap-2 px-4 py-3.5 font-medium text-[13px] text-text-sub-600 hover:bg-bg-weak-50/70 hover:text-text-strong-950"
 										>
 											{emailQuery.isFetchingNextPage ? (
 												"Loading…"
