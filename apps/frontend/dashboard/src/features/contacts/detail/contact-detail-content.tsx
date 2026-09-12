@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
 	useAllPropertiesQuery,
 	useChannelsQuery,
@@ -13,16 +12,6 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 		isPending: contactLoading,
 		isFetching,
 	} = useContactQuery(contactId);
-
-	useEffect(() => {
-		if (contactData?.id && contactId !== contactData.id) {
-			window.history.replaceState(
-				null,
-				"",
-				`/contacts/detail/${contactData.id}`,
-			);
-		}
-	}, [contactData?.id, contactId]);
 
 	const { data: allPropertiesData } = useAllPropertiesQuery();
 	const { data: channelsData } = useChannelsQuery();
