@@ -1,5 +1,6 @@
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
+import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -7,7 +8,6 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import * as Switch from "@reloop/ui/switch";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -534,9 +534,9 @@ function EditContactFields({
 							</span>
 						</div>
 					</div>
-					<Switch.Root
+					<Checkbox.Root
 						checked={isSubscribed}
-						onCheckedChange={setIsSubscribed}
+						onCheckedChange={(checked) => setIsSubscribed(checked === true)}
 						disabled={isSaving}
 						aria-label="Marketing subscription"
 					/>
@@ -1277,9 +1277,9 @@ export function EditContactForm({
 									</span>
 								</div>
 							</div>
-							<Switch.Root
+							<Checkbox.Root
 								checked={isSubscribed}
-								onCheckedChange={setIsSubscribed}
+								onCheckedChange={(checked) => setIsSubscribed(checked === true)}
 								disabled={isSaving}
 								aria-label="Marketing subscription"
 							/>
