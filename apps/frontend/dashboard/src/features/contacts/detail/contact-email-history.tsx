@@ -311,28 +311,23 @@ function getEmailStatus(entry: ActivityEntry): string {
 	return entry.status || "sent";
 }
 
-/** Exact stroke checkmark used on the pricing page (`PlanCheckmark`) */
+/** Exact stroke checkmark matching the pricing page geometry, scaled to standard 24x24 icon grid */
 function PricingCheckmark({
 	className,
-	withCircle = false,
-	strokeWidth = 1.25,
+	strokeWidth = 2,
 }: {
 	className?: string;
-	withCircle?: boolean;
 	strokeWidth?: number;
 }) {
 	return (
 		<svg
 			fill="none"
-			viewBox="0 0 20 20"
+			viewBox="0 0 24 24"
 			className={cn("shrink-0", className)}
 			aria-hidden="true"
 		>
-			{withCircle && (
-				<circle cx="10" cy="10" fill="currentColor" fillOpacity="0.08" r="8" />
-			)}
 			<path
-				d="M7 10.5L9 12.5L13 7.5"
+				d="M4.5 12.5L9.5 17.5L19.5 7.5"
 				stroke="currentColor"
 				strokeLinecap="round"
 				strokeLinejoin="round"
@@ -424,7 +419,7 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 					return (
 						<span
 							key={`${change.field}-${idx}`}
-							className="inline-flex max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs dark:bg-bg-weak-50/60"
+							className="inline-flex max-w-full items-center gap-1.5 rounded-md bg-bg-weak-50 px-2 py-0.5 font-mono text-paragraph-xs transition-colors group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90"
 						>
 							<span className="font-medium font-sans text-text-sub-600">
 								{formattedLabel}:
@@ -471,7 +466,8 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 
 // ─── Timeline Card Components ────────────────────────────────────────────────
 
-const timelineCardClass = "relative py-1";
+const timelineCardClass =
+	"group/card relative rounded-lg px-3.5 py-2 transition-colors duration-150 hover:bg-bg-weak-50/70 dark:hover:bg-bg-weak-50/40";
 
 function TimelineMeta({
 	createdAt,
@@ -512,17 +508,17 @@ function TimelineItemWrapper({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="relative flex items-start gap-3">
+		<div className="relative flex items-start gap-2.5">
 			{/* Connector line to next item */}
 			{!isLast && (
 				<div
 					aria-hidden="true"
-					className="-bottom-5 -translate-x-1/2 absolute top-3.5 left-3.5 w-px bg-stroke-soft-200 dark:bg-stroke-soft-100/40"
+					className="-bottom-1.5 -translate-x-1/2 absolute top-[18px] left-3 w-px bg-stroke-soft-200 dark:bg-stroke-soft-100/40"
 				/>
 			)}
 
 			{/* Node icon */}
-			<div className="relative z-10 flex size-7 shrink-0 items-center justify-center rounded-full bg-bg-white-0 dark:bg-bg-weak-50">
+			<div className="relative z-10 mt-1.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-bg-white-0 dark:bg-bg-weak-50">
 				{node}
 			</div>
 
@@ -640,13 +636,13 @@ function GroupTimelineCard({
 						{groupId ? (
 							<Link
 								href={`/contacts/groups/${groupId}`}
-								className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:bg-bg-weak-100 hover:text-primary-base dark:bg-bg-weak-50/60 dark:hover:bg-bg-weak-50/90"
+								className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:bg-bg-weak-100 hover:text-primary-base group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90 dark:hover:bg-bg-weak-100"
 							>
 								<Icon name="modules" className="size-3 text-text-sub-600" />
 								<span>{groupName}</span>
 							</Link>
 						) : (
-							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 dark:bg-bg-weak-50/60">
+							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90">
 								<Icon name="modules" className="size-3 text-text-sub-600" />
 								<span>{groupName}</span>
 							</span>
@@ -700,7 +696,7 @@ function ChannelTimelineCard({
 						{channelId ? (
 							<Link
 								href={`/contacts?channelId=${channelId}`}
-								className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:bg-bg-weak-100 hover:text-primary-base dark:bg-bg-weak-50/60 dark:hover:bg-bg-weak-50/90"
+								className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors hover:bg-bg-weak-100 hover:text-primary-base group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90 dark:hover:bg-bg-weak-100"
 							>
 								<Icon
 									name="notification-indicator"
@@ -709,7 +705,7 @@ function ChannelTimelineCard({
 								<span>{channelName}</span>
 							</Link>
 						) : (
-							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 dark:bg-bg-weak-50/60">
+							<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-2 py-0.5 font-medium text-label-xs text-text-strong-950 transition-colors group-hover/card:bg-bg-white-0 dark:bg-bg-weak-50/60 dark:group-hover/card:bg-bg-weak-50/90">
 								<Icon
 									name="notification-indicator"
 									className="size-3 text-text-sub-600"
@@ -788,8 +784,8 @@ function ContactCreatedTimelineCard({
 			isLast={isLast}
 			node={
 				<PricingCheckmark
-					className="size-4 text-success-base"
-					strokeWidth={1.5}
+					className="size-3.5 text-success-base"
+					strokeWidth={2}
 				/>
 			}
 		>
@@ -1144,14 +1140,14 @@ export function ContactEmailHistory({
 							}
 
 							return (
-								<div className="flex flex-col gap-10">
+								<div className="flex flex-col gap-6">
 									{[...groups.values()].map((group) => (
 										<div key={dayKey(group.date)}>
-											<h4 className="mb-4 font-semibold text-subheading-2xs text-text-sub-600 uppercase tracking-wider">
+											<h4 className="mb-2.5 font-semibold text-subheading-2xs text-text-sub-600 uppercase tracking-wider">
 												{formatDayHeader(group.date)}
 											</h4>
 
-											<div className="space-y-3.5">
+											<div className="space-y-1.5">
 												{group.items.map((item, idx) => {
 													const isLast = idx === group.items.length - 1;
 													if (item.kind === "email") {
