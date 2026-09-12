@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { Glob } from "bun";
+import ts from "typescript";
 
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
 
@@ -15,7 +16,7 @@ const SKIPPED = [
 	".test.ts",
 ];
 
-const LOG_CALL = /(?:\blog|\bconsole)\.[a-z]+\(/g;
+const LOGGER_IDENTIFIERS = new Set(["log", "logger", "console"]);
 
 const FORBIDDEN_IN_LOG_ARGS: { name: string; pattern: RegExp }[] = [
 	{ name: "interpolated secret", pattern: /\$\{[^}]*\b(otp|privateKey)\b/i },
@@ -28,20 +29,32 @@ const FORBIDDEN_IN_LOG_ARGS: { name: string; pattern: RegExp }[] = [
 	{ name: "whole dns record set", pattern: /[{,]\s*records\s*[,}]/ },
 ];
 
-function logCallArguments(source: string): string[] {
+export function logCallArguments(path: string, source: string): string[] {
+	const sourceFile = ts.createSourceFile(
+		path,
+		source,
+		ts.ScriptTarget.Latest,
+		true,
+		path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+	);
+
 	const calls: string[] = [];
-	for (const match of source.matchAll(LOG_CALL)) {
-		let depth = 1;
-		let i = (match.index ?? 0) + match[0].length;
-		const start = i;
-		while (i < source.length && depth > 0) {
-			const char = source[i];
-			if (char === "(") depth++;
-			else if (char === ")") depth--;
-			i++;
+
+	function visit(node: ts.Node): void {
+		if (
+			ts.isCallExpression(node) &&
+			ts.isPropertyAccessExpression(node.expression) &&
+			ts.isIdentifier(node.expression.expression) &&
+			LOGGER_IDENTIFIERS.has(node.expression.expression.text)
+		) {
+			calls.push(
+				node.arguments.map((arg) => arg.getText(sourceFile)).join(", "),
+			);
 		}
-		calls.push(source.slice(start, i - 1));
+		ts.forEachChild(node, visit);
 	}
+
+	visit(sourceFile);
 	return calls;
 }
 
@@ -59,6 +72,28 @@ function scannedFiles(): string[] {
 	return files;
 }
 
+describe("log call scanner", () => {
+	test("parentheses inside strings and templates do not end a call", () => {
+		const source = [
+			"log.info(`closing paren ) here`, payload);",
+			'log.info("another ) one", { otp });',
+			"log.info(/\\)/.source, records);",
+		].join("\n");
+
+		expect(logCallArguments("sample.ts", source)).toEqual([
+			"`closing paren ) here`, payload",
+			'"another ) one", { otp }',
+			"/\\)/.source, records",
+		]);
+	});
+
+	test("nested calls are captured separately", () => {
+		expect(logCallArguments("sample.ts", "log.info(format(payload));")).toEqual(
+			["format(payload)"],
+		);
+	});
+});
+
 describe("credentials never reach a log call", () => {
 	const files = scannedFiles();
 
@@ -71,7 +106,7 @@ describe("credentials never reach a log call", () => {
 
 		for (const path of files) {
 			const source = readFileSync(`${repoRoot}${path}`, "utf8");
-			for (const args of logCallArguments(source)) {
+			for (const args of logCallArguments(path, source)) {
 				for (const { name, pattern } of FORBIDDEN_IN_LOG_ARGS) {
 					if (pattern.test(args)) {
 						offenders.push(`${path}: ${name} — ${args.replace(/\s+/g, " ")}`);
