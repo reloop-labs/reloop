@@ -615,7 +615,7 @@ export const ContactHeader = ({
 											onClick={handleCopyId}
 											title="Copy contact ID"
 										>
-											<code className="relative isolate flex h-6 w-full items-center justify-between gap-1.5 overflow-hidden rounded bg-neutral-alpha-10 px-2 py-1 text-left font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20">
+											<code className="relative isolate flex h-6 w-full items-center justify-between gap-1.5 overflow-hidden rounded-md bg-neutral-alpha-10 px-2 py-1 text-left font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20">
 												<span className="relative flex h-full min-w-0 flex-1 items-center justify-start overflow-hidden text-left">
 													<AnimatePresence mode="popLayout" initial={false}>
 														<motion.span
