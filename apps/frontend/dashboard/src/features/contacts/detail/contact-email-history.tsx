@@ -527,19 +527,154 @@ function TimelineItemWrapper({
 	);
 }
 
+interface EmailBadgeItem {
+	key: string;
+	label: string;
+	icon: IconName;
+	className: string;
+}
+
+function getEmailLifecycleBadges(entry: ActivityEntry): EmailBadgeItem[] {
+	const status = (entry.status || "").toLowerCase();
+	const events = entry.events || [];
+	const eventTypes = new Set(events.map((e) => e.type.toLowerCase()));
+
+	if (status === "pending" || status === "scheduled") {
+		return [
+			{
+				key: status,
+				label: status === "scheduled" ? "Scheduled" : "Pending",
+				icon: "clock",
+				className: "bg-warning-lighter text-warning-base",
+			},
+		];
+	}
+
+	const isBounced = status === "bounced" || eventTypes.has("bounced");
+	const isSpam = status === "spam" || eventTypes.has("complaint");
+	const isFailed =
+		isBounced ||
+		isSpam ||
+		status === "failed" ||
+		!!entry.failedAt ||
+		!!entry.errorMessage ||
+		eventTypes.has("failed");
+
+	const badges: EmailBadgeItem[] = [];
+
+	// Sent step
+	const isSent =
+		!!entry.sentAt ||
+		!!entry.createdAt ||
+		eventTypes.has("sent") ||
+		status === "sent" ||
+		status === "delivered" ||
+		status === "opened" ||
+		status === "clicked";
+
+	if (isSent) {
+		badges.push({
+			key: "sent",
+			label: "Sent",
+			icon: "send-1",
+			className: "bg-information-lighter text-information-base",
+		});
+	}
+
+	if (isFailed) {
+		if (isSpam) {
+			badges.push({
+				key: "spam",
+				label: "Spam",
+				icon: "cross-circle",
+				className: "bg-error-lighter text-error-base",
+			});
+		} else if (isBounced) {
+			badges.push({
+				key: "bounced",
+				label: "Bounced",
+				icon: "cross-circle",
+				className: "bg-error-lighter text-error-base",
+			});
+		} else {
+			badges.push({
+				key: "failed",
+				label: "Failed",
+				icon: "cross-circle",
+				className: "bg-error-lighter text-error-base",
+			});
+		}
+		return badges;
+	}
+
+	// Delivered step
+	const isDelivered =
+		!!entry.deliveredAt ||
+		eventTypes.has("delivered") ||
+		status === "delivered" ||
+		status === "opened" ||
+		status === "clicked";
+
+	if (isDelivered) {
+		badges.push({
+			key: "delivered",
+			label: "Delivered",
+			icon: "check-circle",
+			className: "bg-success-lighter text-success-base",
+		});
+	}
+
+	// Opened step
+	const isOpened =
+		eventTypes.has("opened") || status === "opened" || status === "clicked";
+
+	if (isOpened) {
+		badges.push({
+			key: "opened",
+			label: "Opened",
+			icon: "eye-outline",
+			className:
+				"bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
+		});
+	}
+
+	// Clicked step
+	const isClicked = eventTypes.has("clicked") || status === "clicked";
+
+	if (isClicked) {
+		badges.push({
+			key: "clicked",
+			label: "Clicked",
+			icon: "cursor-click",
+			className:
+				"bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
+		});
+	}
+
+	if (badges.length === 0) {
+		badges.push({
+			key: "sent",
+			label: "Sent",
+			icon: "send-1",
+			className: "bg-information-lighter text-information-base",
+		});
+	}
+
+	return badges;
+}
+
 function EmailTimelineCard({
 	entry,
-	contactEmail,
 	isLast,
 }: {
 	entry: ActivityEntry;
-	contactEmail: string;
+	contactEmail?: string;
 	isLast: boolean;
 }) {
 	const status = getEmailStatus(entry);
 	const subject = entry.subject?.trim() || "(No Subject)";
-	const recipient = entry.toEmails?.[0] || contactEmail;
 	const timestamp = entry.sentAt ?? entry.createdAt;
+	const badges = getEmailLifecycleBadges(entry);
 
 	return (
 		<TimelineItemWrapper
@@ -552,48 +687,53 @@ function EmailTimelineCard({
 			}
 		>
 			<div className={timelineCardClass}>
-				{/* Main line: Subject + Status indicator, and Timestamp */}
+				{/* Top line: Subject and View email link */}
 				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-					<div className="flex min-w-0 flex-wrap items-center gap-2.5">
-						<Link
-							href={`/emails/${entry.id}`}
-							className="truncate font-medium text-paragraph-sm text-text-strong-950 hover:text-primary-base hover:underline"
-						>
-							{subject}
-						</Link>
-						<EmailStatusIndicator
-							status={status}
-							className="gap-1.5 font-medium text-xs"
-						/>
-					</div>
-
-					<TimelineMeta createdAt={timestamp} />
-				</div>
-
-				{/* Metadata line: sender, recipient, and view link */}
-				<div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-paragraph-xs text-text-soft-400">
-					{entry.fromEmail && (
-						<>
-							<span>
-								from{" "}
-								<span className="font-mono text-text-sub-600">
-									{entry.fromEmail}
-								</span>
-							</span>
-							<span>·</span>
-						</>
-					)}
-					<span>
-						to <span className="font-mono text-text-sub-600">{recipient}</span>
-					</span>
-					<span>·</span>
 					<Link
 						href={`/emails/${entry.id}`}
-						className="inline-flex items-center gap-0.5 font-medium text-text-sub-600 hover:text-text-strong-950"
+						className="truncate font-medium text-paragraph-sm text-text-strong-950 hover:text-primary-base hover:underline"
+					>
+						{subject}
+					</Link>
+
+					<Link
+						href={`/emails/${entry.id}`}
+						className="inline-flex items-center gap-0.5 font-medium text-paragraph-xs text-text-sub-600 hover:text-text-strong-950"
 					>
 						<span>View email</span>
 						<Icon name="arrow-up-right" className="size-3" />
 					</Link>
+				</div>
+
+				{/* Second line: sender and timestamp */}
+				<div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-paragraph-xs text-text-soft-400">
+					{entry.fromEmail ? (
+						<span>
+							from{" "}
+							<span className="font-mono text-text-sub-600">
+								{entry.fromEmail}
+							</span>
+						</span>
+					) : (
+						<span />
+					)}
+					<TimelineMeta createdAt={timestamp} />
+				</div>
+
+				{/* Third line: lifecycle badges */}
+				<div className="mt-2 flex flex-wrap items-center gap-1.5">
+					{badges.map((badge) => (
+						<span
+							key={badge.key}
+							className={cn(
+								"inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 font-medium text-xs",
+								badge.className,
+							)}
+						>
+							<Icon name={badge.icon} className="size-3 shrink-0" />
+							<span>{badge.label}</span>
+						</span>
+					))}
 				</div>
 			</div>
 		</TimelineItemWrapper>
