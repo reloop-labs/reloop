@@ -206,9 +206,7 @@ function ContactStatsRow({ email }: { email: string }) {
 						{statsQuery.isPending ? (
 							<Skeleton className="h-4 w-12 rounded" />
 						) : statsQuery.isError ? (
-							<span className="font-medium text-paragraph-sm text-text-soft-400">
-								—
-							</span>
+							<EmptyDash />
 						) : (
 							<span
 								title={row.title}
@@ -337,6 +335,18 @@ function PropertyField({
 				{children}
 			</div>
 		</div>
+	);
+}
+
+function EmptyDash() {
+	return <span className="block text-xs font-normal text-text-soft-400">—</span>;
+}
+
+function isEmptyPropertyValue(v: string | null | undefined) {
+	if (v == null) return true;
+	const t = v.trim();
+	return (
+		t === "" || t === "-" || t === "—" || t === "–" || t === "--" || t === "---"
 	);
 }
 
@@ -544,20 +554,28 @@ export const ContactHeader = ({
 							) : (
 								<div className="grid grid-cols-3 gap-x-8 gap-y-8">
 									<PropertyField label="First name">
-										{contact?.firstName || "—"}
+										{!isEmptyPropertyValue(contact?.firstName) ? (
+											contact?.firstName
+										) : (
+											<EmptyDash />
+										)}
 									</PropertyField>
 									<PropertyField label="Last name">
-										{contact?.lastName || "—"}
+										{!isEmptyPropertyValue(contact?.lastName) ? (
+											contact?.lastName
+										) : (
+											<EmptyDash />
+										)}
 									</PropertyField>
 									{propertyValues.map((pv) => (
 										<PropertyField
 											key={pv.id}
 											label={formatPropertyName(pv.name)}
 										>
-											{pv.value ? (
+											{!isEmptyPropertyValue(pv.value) ? (
 												<span className="block truncate">{pv.value}</span>
 											) : (
-												"—"
+												<EmptyDash />
 											)}
 										</PropertyField>
 									))}
@@ -581,39 +599,56 @@ export const ContactHeader = ({
 							contact && (
 								<div className="grid grid-cols-3 gap-x-12 gap-y-6">
 									<DetailItem icon="calendar" label="Created">
-										<span className="font-medium text-paragraph-sm text-text-strong-950">
-											{contact.createdAt
-												? formatRelativeTime(contact.createdAt)
-												: "—"}
-										</span>
+										{contact.createdAt ? (
+											<span className="font-medium text-paragraph-sm text-text-strong-950">
+												{formatRelativeTime(contact.createdAt)}
+											</span>
+										) : (
+											<EmptyDash />
+										)}
 									</DetailItem>
 									<DetailItem icon="hash" label="ID">
 										<button
-											className="group/copy flex w-fit cursor-pointer items-center gap-1.5"
+											className="group/copy w-fit cursor-pointer"
 											type="button"
 											onClick={handleCopyId}
+											title="Copy contact ID"
 										>
-											<code className="max-w-[120px] truncate rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs">
-												{contact.id.slice(0, 18)}...
+											<code className="flex max-w-[150px] items-center gap-1.5 rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20 active:scale-[0.97]">
+												<span className="truncate">
+													{contact.id.slice(0, 18)}...
+												</span>
+												<span className="relative flex h-3 w-3 shrink-0 items-center justify-center">
+													<AnimatePresence mode="wait" initial={false}>
+														<motion.span
+															key={copied ? "check" : "copy"}
+															initial={{ opacity: 0, scale: 0.5, y: 4 }}
+															animate={{ opacity: 1, scale: 1, y: 0 }}
+															exit={{ opacity: 0, scale: 0.5, y: -4 }}
+															transition={{ duration: 0.15, ease: "easeOut" }}
+															className="flex"
+														>
+															<Icon
+																name={copied ? "check" : "copy"}
+																className={cn(
+																	"h-3 w-3 transition-colors",
+																	copied
+																		? "text-success-base"
+																		: "text-text-sub-600 group-hover/copy:text-text-strong-950",
+																)}
+															/>
+														</motion.span>
+													</AnimatePresence>
+												</span>
 											</code>
-											<Icon
-												name={copied ? "check" : "copy"}
-												className={cn(
-													"h-3 w-3 flex-shrink-0 transition-all",
-													copied ? "text-success-base" : "text-text-sub-600",
-												)}
-											/>
 										</button>
 									</DetailItem>
 									<DetailItem icon="star" label="Score">
 										{engagementQuery.isPending ? (
 											<Skeleton className="h-4 w-16 rounded" />
 										) : engagementQuery.isError || engagementScore == null ? (
-											<span
-												className="font-medium text-paragraph-sm text-text-soft-400"
-												title="Not enough sending history to score this contact yet"
-											>
-												—
+											<span title="Not enough sending history to score this contact yet">
+												<EmptyDash />
 											</span>
 										) : (
 											<span
@@ -624,7 +659,7 @@ export const ContactHeader = ({
 												title={`Engagement ${engagementScore}/100 · ${engagementRating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`}
 											>
 												{engagementScore.toLocaleString()}
-												<span className="font-normal text-text-sub-600">
+												<span className="font-normal text-paragraph-xs text-text-sub-600">
 													{" "}
 													· {engagementRating}
 												</span>
