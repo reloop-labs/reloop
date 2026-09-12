@@ -636,27 +636,35 @@ export const ContactHeader = ({
 														</motion.span>
 													</AnimatePresence>
 												</span>
-												<span className="relative flex h-3 w-3 shrink-0 items-center justify-center overflow-hidden">
-													<AnimatePresence mode="wait" initial={false}>
-														<motion.span
-															key={copied ? "check-mark" : "copy"}
-															initial={{ opacity: 0, scale: 0.5, y: 3 }}
-															animate={{ opacity: 1, scale: 1, y: 0 }}
-															exit={{ opacity: 0, scale: 0.5, y: -3 }}
-															transition={{ duration: 0.15, ease: "easeOut" }}
-															className="flex"
-														>
-															<Icon
-																name={copied ? "check-mark" : "copy"}
-																className={cn(
-																	"h-3 w-3 transition-colors",
-																	copied
-																		? "text-success-base"
-																		: "text-text-sub-600 group-hover/copy:text-text-strong-950",
-																)}
-															/>
-														</motion.span>
-													</AnimatePresence>
+												<span className="relative flex h-3 w-3 shrink-0 items-center justify-center">
+													<motion.span
+														className="pointer-events-none absolute inset-0 flex items-center justify-center"
+														initial={false}
+														animate={{
+															scale: copied ? 0 : 1,
+															opacity: copied ? 0 : 1,
+														}}
+														transition={{ duration: 0.18, ease: "easeInOut" }}
+													>
+														<Icon
+															name="copy"
+															className="h-3 w-3 text-text-sub-600 transition-colors group-hover/copy:text-text-strong-950"
+														/>
+													</motion.span>
+													<motion.span
+														className="pointer-events-none absolute inset-0 flex items-center justify-center"
+														initial={false}
+														animate={{
+															scale: copied ? 1 : 0,
+															opacity: copied ? 1 : 0,
+														}}
+														transition={{ duration: 0.18, ease: "easeInOut" }}
+													>
+														<Icon
+															name="check-mark"
+															className="h-3 w-3 text-success-base"
+														/>
+													</motion.span>
 												</span>
 											</code>
 										</button>
