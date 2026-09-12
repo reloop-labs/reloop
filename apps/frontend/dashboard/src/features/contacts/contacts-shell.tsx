@@ -1,7 +1,10 @@
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, Upload, UserPlus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
@@ -21,6 +24,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
 	const [, setModal] = useQueryState("modal");
 	const [deletedItemName, setDeletedItemName] = useState<string | null>(null);
+	const [isAddDropdownOpen, setIsAddDropdownOpen] = useState(false);
 
 	useEffect(() => {
 		if (deletedItemName) {
@@ -40,11 +44,18 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		Boolean(pathname.match(/\/contacts\/groups\/[^/]+$/)) ||
 		Boolean(pathname.match(/\/contacts\/channels\/[^/]+$/));
 
+	const isContactsPage =
+		!isPropertiesPage &&
+		!isChannelsPage &&
+		!isGroupsPage &&
+		!isBulkImportPage &&
+		!isDetailPage;
+
 	const handleAction = () => {
 		if (isPropertiesPage) void setModal("add-property");
 		else if (isChannelsPage) void setModal("create-channel");
 		else if (isGroupsPage) void setModal("create-group");
-		else router.push("/contacts/create");
+		else setIsAddDropdownOpen((prev) => !prev);
 	};
 
 	const openDocs = () => window.open(DOCS_URL, "_blank");
@@ -211,20 +222,94 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									Documentation
 									<ActionKbd>D</ActionKbd>
 								</Button.Root>
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="small"
-									onClick={handleAction}
-									className="gap-1.5 rounded-xl"
-									aria-keyshortcuts="c"
-								>
-									<Icon name="plus" className="h-4 w-4" />
-									{actionLabel}
-									<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
-										C
-									</ActionKbd>
-								</FancyButton.Root>
+								{isContactsPage ? (
+									<Dropdown.Root
+										open={isAddDropdownOpen}
+										onOpenChange={setIsAddDropdownOpen}
+									>
+										<Dropdown.Trigger asChild>
+											<FancyButton.Root
+												type="button"
+												variant="blue"
+												size="small"
+												className="cursor-pointer gap-1.5 rounded-xl"
+												aria-keyshortcuts="c"
+											>
+												<Icon name="plus" className="h-4 w-4" />
+												Add contact
+												<ChevronDown
+													className={cn(
+														"h-3.5 w-3.5 opacity-80 transition-transform duration-200",
+														isAddDropdownOpen && "rotate-180",
+													)}
+												/>
+												<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+													C
+												</ActionKbd>
+											</FancyButton.Root>
+										</Dropdown.Trigger>
+										<Dropdown.Content
+											align="end"
+											sideOffset={6}
+											className="w-60 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]"
+										>
+											<Dropdown.Item
+												onClick={() => {
+													setIsAddDropdownOpen(false);
+													router.push("/contacts/create");
+												}}
+												className="group/item flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 transition-colors hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]"
+											>
+												<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover/item:border-stroke-sub-300 group-hover/item:text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
+													<Upload className="h-4 w-4" />
+												</div>
+												<div className="flex min-w-0 flex-1 flex-col">
+													<span className="font-medium text-text-strong-950 text-xs">
+														Upload CSV
+													</span>
+													<span className="truncate text-[11px] text-text-sub-600">
+														Import CSV or spreadsheet
+													</span>
+												</div>
+											</Dropdown.Item>
+
+											<Dropdown.Item
+												onClick={() => {
+													setIsAddDropdownOpen(false);
+													void setModal("add-contact");
+												}}
+												className="group/item flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 transition-colors hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]"
+											>
+												<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover/item:border-stroke-sub-300 group-hover/item:text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
+													<UserPlus className="h-4 w-4" />
+												</div>
+												<div className="flex min-w-0 flex-1 flex-col">
+													<span className="font-medium text-text-strong-950 text-xs">
+														Manual
+													</span>
+													<span className="truncate text-[11px] text-text-sub-600">
+														Add contact with details
+													</span>
+												</div>
+											</Dropdown.Item>
+										</Dropdown.Content>
+									</Dropdown.Root>
+								) : (
+									<FancyButton.Root
+										type="button"
+										variant="blue"
+										size="small"
+										onClick={handleAction}
+										className="gap-1.5 rounded-xl"
+										aria-keyshortcuts="c"
+									>
+										<Icon name="plus" className="h-4 w-4" />
+										{actionLabel}
+										<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+											C
+										</ActionKbd>
+									</FancyButton.Root>
+								)}
 							</div>
 						)}
 					</div>

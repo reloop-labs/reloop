@@ -4,6 +4,7 @@ import { CreateChannelModal } from "./components/channels/create-channel-modal";
 import { DeleteChannelModal } from "./components/channels/delete-channel";
 import { EditChannelModal } from "./components/channels/edit-channel-modal";
 import { AddContactToGroupModal } from "./components/contacts/add-contact-to-group";
+import { CreateContactModal } from "./components/contacts/create-contact-modal";
 import { DeleteContactModal } from "./components/contacts/delete-contact-modal";
 import { EditContactModal } from "./components/contacts/edit-contact-modal";
 import { CreateGroupModal } from "./components/groups/create-group-modal";
@@ -145,6 +146,10 @@ export function ContactsModals({
 				open={modal === "delete-contact"}
 				onOpenChange={handleOpenChange}
 				contact={(contactData as Contact) || null}
+			/>
+			<CreateContactModal
+				open={modal === "add-contact"}
+				onOpenChange={handleOpenChange}
 			/>
 			<AddContactToGroupModal
 				open={modal === "add-contact-to-group"}
