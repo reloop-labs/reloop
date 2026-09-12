@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
 	useAllPropertiesQuery,
 	useChannelsQuery,
@@ -12,6 +13,16 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 		isPending: contactLoading,
 		isFetching,
 	} = useContactQuery(contactId);
+
+	useEffect(() => {
+		if (contactData?.id && contactId !== contactData.id) {
+			window.history.replaceState(
+				null,
+				"",
+				`/contacts/detail/${contactData.id}`,
+			);
+		}
+	}, [contactData?.id, contactId]);
 
 	const { data: allPropertiesData } = useAllPropertiesQuery();
 	const { data: channelsData } = useChannelsQuery();
@@ -50,9 +61,18 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 	const isLoading = contactLoading || (isFetching && !contactData);
 
 	if (contactError && !contactData) {
+		const is404 =
+			contactError instanceof Error && contactError.message.includes("404");
 		return (
 			<div className="py-12 text-center">
-				<p className="text-sm text-text-sub-600">Failed to load contact</p>
+				<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
+					{is404 ? "Contact not found" : "Failed to load contact"}
+				</h2>
+				<p className="text-text-sub-600">
+					{is404
+						? "The contact you're looking for doesn't exist or has been deleted."
+						: "There was an error loading the contact details. Please try again."}
+				</p>
 			</div>
 		);
 	}

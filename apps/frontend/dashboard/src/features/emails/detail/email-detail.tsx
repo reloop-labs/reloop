@@ -1069,7 +1069,7 @@ export const EmailDetail = ({
 									<span key={toEmail}>
 										{idx > 0 && ", "}
 										<Link
-											href={`/contacts?search=${encodeURIComponent(toEmail)}`}
+											href={`/contacts/detail/${encodeURIComponent(toEmail)}`}
 											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
 										>
 											{toEmail}
@@ -1089,7 +1089,7 @@ export const EmailDetail = ({
 									<span key={ccEmail}>
 										{idx > 0 && ", "}
 										<Link
-											href={`/contacts?search=${encodeURIComponent(ccEmail)}`}
+											href={`/contacts/detail/${encodeURIComponent(ccEmail)}`}
 											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
 										>
 											{ccEmail}

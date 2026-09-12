@@ -585,7 +585,7 @@ export const ContactHeader = ({
 						</section>
 
 						{isLoading ? (
-							<div className="grid grid-cols-3 gap-x-12 gap-y-6">
+							<div className="grid grid-cols-3 gap-x-8 gap-y-8">
 								{[0, 1, 2, 3, 4].map((i) => (
 									<div
 										key={`detail-skeleton-${i}`}
@@ -598,7 +598,7 @@ export const ContactHeader = ({
 							</div>
 						) : (
 							contact && (
-								<div className="grid grid-cols-3 gap-x-12 gap-y-6">
+								<div className="grid grid-cols-3 gap-x-8 gap-y-8">
 									<DetailItem icon="calendar" label="Created">
 										{contact.createdAt ? (
 											<span className="font-medium text-paragraph-sm text-text-strong-950">

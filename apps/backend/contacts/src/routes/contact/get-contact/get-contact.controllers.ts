@@ -5,7 +5,7 @@ import {
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export async function getContactController({
@@ -19,9 +19,19 @@ export async function getContactController({
 	log.info("Getting contact", { contactId, organizationId });
 
 	try {
+		let decodedId = contactId;
+		try {
+			decodedId = decodeURIComponent(contactId);
+		} catch {}
+
 		const contact = await db.query.contact.findFirst({
 			where: and(
-				eq(schema.contact.id, contactId),
+				or(
+					eq(schema.contact.id, decodedId),
+					eq(schema.contact.id, contactId),
+					eq(schema.contact.email, decodedId.toLowerCase()),
+					eq(schema.contact.email, contactId.toLowerCase()),
+				),
 				eq(schema.contact.organizationId, organizationId),
 				isNull(schema.contact.deletedAt),
 			),

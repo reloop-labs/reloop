@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 	},
 };
 
-import { TwitterCreateWebhookComparison } from "./components/twitter-create-webhook-comparison";
+import { TwitterContactIdShowcase } from "./components/twitter-contact-id-showcase";
 
 export default function TwitterPage() {
-	return <TwitterCreateWebhookComparison />;
+	return <TwitterContactIdShowcase />;
 }
