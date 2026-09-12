@@ -11,6 +11,7 @@ import {
 	useCampaignQuery,
 	useCampaigns,
 } from "./campaigns-provider";
+import { CampaignPreviewTabs } from "./components/campaign-preview-tabs";
 
 function CampaignDetailContent() {
 	const params = useParams();
@@ -19,7 +20,6 @@ function CampaignDetailContent() {
 	const { sendCampaign, duplicateCampaign, deleteCampaign } = useCampaigns();
 	const campaignQuery = useCampaignQuery(campaignId);
 
-	const [activeTab, setActiveTab] = useState<"preview" | "raw">("preview");
 	const [actionPending, setActionPending] = useState(false);
 
 	const campaign = campaignQuery.data;
@@ -236,51 +236,8 @@ function CampaignDetailContent() {
 				</div>
 			</div>
 
-			{/* Message Preview Container */}
-			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-				<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/50">
-					<span className="font-medium text-text-strong-950 text-xs">
-						Email Content Preview
-					</span>
-					<div className="flex items-center gap-1 rounded-lg border border-stroke-soft-100 p-0.5">
-						<button
-							type="button"
-							onClick={() => setActiveTab("preview")}
-							className={`rounded px-2 py-1 font-medium text-xs ${
-								activeTab === "preview"
-									? "bg-bg-weak-100 text-text-strong-950"
-									: "text-text-sub-600 hover:text-text-strong-950"
-							}`}
-						>
-							Rendered
-						</button>
-						<button
-							type="button"
-							onClick={() => setActiveTab("raw")}
-							className={`rounded px-2 py-1 font-medium text-xs ${
-								activeTab === "raw"
-									? "bg-bg-weak-100 text-text-strong-950"
-									: "text-text-sub-600 hover:text-text-strong-950"
-							}`}
-						>
-							HTML Source
-						</button>
-					</div>
-				</div>
-
-				<div className="p-6">
-					{activeTab === "preview" ? (
-						<div
-							className="prose prose-sm dark:prose-invert max-w-none text-text-strong-950"
-							dangerouslySetInnerHTML={{ __html: campaign.contentHtml }}
-						/>
-					) : (
-						<pre className="overflow-x-auto rounded-lg bg-bg-weak-50 p-4 font-mono text-text-strong-950 text-xs">
-							{campaign.contentHtml}
-						</pre>
-					)}
-				</div>
-			</div>
+			{/* Message Preview Tabs */}
+			<CampaignPreviewTabs campaign={campaign} />
 		</div>
 	);
 }
