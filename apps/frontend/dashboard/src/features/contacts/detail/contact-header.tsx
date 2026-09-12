@@ -609,14 +609,34 @@ export const ContactHeader = ({
 									</DetailItem>
 									<DetailItem icon="hash" label="ID">
 										<button
-											className="group/copy w-fit cursor-pointer"
+											className="group/copy w-[150px] cursor-pointer"
 											type="button"
 											onClick={handleCopyId}
 											title="Copy contact ID"
 										>
-											<code className="flex max-w-[150px] items-center gap-1.5 rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20 active:scale-[0.97]">
-												<span className="truncate">
-													{contact.id.slice(0, 18)}...
+											<code className="flex w-full items-center justify-between gap-1.5 overflow-hidden rounded bg-neutral-alpha-10 px-2 py-1 font-medium font-mono text-text-strong-950 text-xs transition-colors group-hover/copy:bg-neutral-alpha-20 active:scale-[0.97]">
+												<span className="flex min-w-0 flex-1 items-center overflow-hidden">
+													<AnimatePresence
+														mode="popLayout"
+														initial={false}
+													>
+														<motion.span
+															key={copied ? "copied" : "id"}
+															transition={{
+																type: "spring",
+																duration: 0.25,
+																bounce: 0,
+															}}
+															initial={{ opacity: 0, y: -14 }}
+															animate={{ opacity: 1, y: 0 }}
+															exit={{ opacity: 0, y: 14 }}
+															className="block truncate"
+														>
+															{copied
+																? "Copied!"
+																: `${contact.id.slice(0, 18)}...`}
+														</motion.span>
+													</AnimatePresence>
 												</span>
 												<span className="relative flex h-3 w-3 shrink-0 items-center justify-center">
 													<AnimatePresence mode="wait" initial={false}>
