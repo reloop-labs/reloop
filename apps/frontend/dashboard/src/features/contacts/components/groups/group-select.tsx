@@ -1,11 +1,12 @@
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
+import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useRef, useState } from "react";
 import type { Group } from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 interface GroupSelectProps {
 	selectedGroupIds: string[];
@@ -14,6 +15,10 @@ interface GroupSelectProps {
 	open?: boolean;
 	/** Field label. Defaults to create-flow copy. */
 	label?: string;
+	/** Icon shown before the label text. */
+	labelIcon?: IconName;
+	/** Hide the per-item avatar/icon in chips and dropdown rows. */
+	hideItemIcons?: boolean;
 	/** Small parenthetical hint next to the label, e.g. "for targeting". */
 	labelHint?: string;
 	/** Helper text under the field. Pass empty string to hide. */
@@ -30,6 +35,8 @@ export const GroupSelect = ({
 	disabled = false,
 	open = true,
 	label = "Assign to Groups (Optional)",
+	labelIcon,
+	hideItemIcons = false,
 	labelHint,
 	description = "You can create new groups from the Groups tab.",
 	className,
@@ -38,8 +45,10 @@ export const GroupSelect = ({
 }: GroupSelectProps) => {
 	const [groupInput, setGroupInput] = useState("");
 	const [showGroupDropdown, setShowGroupDropdown] = useState(false);
-	const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const groupInputRef = useRef<HTMLInputElement>(null);
+	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
 	const { data: allGroupsData } = useQuery({
 		queryKey: ["contacts", "groups", "select"],
@@ -71,11 +80,17 @@ export const GroupSelect = ({
 			onChange([...selectedGroupIds, groupId]);
 		}
 		setGroupInput("");
-		setShowGroupDropdown(false);
+		setHoverIdx(undefined);
+		// Keep the dropdown open for multi-select; return focus to search
+		// (keyboard activation may have focused the row being removed).
+		groupInputRef.current?.focus();
 	};
 
 	const removeGroup = (groupId: string) => {
 		onChange(selectedGroupIds.filter((gid) => gid !== groupId));
+		// The chip's remove button unmounts — keep focus in the search input
+		// instead of losing it (Tab would otherwise land on the modal close).
+		groupInputRef.current?.focus();
 	};
 
 	const getGroupName = (groupId: string) => nameById.get(groupId) || "";
@@ -90,6 +105,9 @@ export const GroupSelect = ({
 			)
 		: availableGroups;
 
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+
 	return (
 		<div className={cn("flex flex-col gap-1.5", className)}>
 			<div className="flex flex-wrap items-center gap-1.5">
@@ -97,7 +115,12 @@ export const GroupSelect = ({
 					htmlFor={id}
 					className="font-medium text-text-strong-950 text-xs"
 				>
-					{label}
+					<span className="inline-flex items-center gap-1.5">
+						{labelIcon ? (
+							<Icon name={labelIcon} className="size-3.5 text-text-sub-600" />
+						) : null}
+						{label}
+					</span>
 				</Label.Root>
 				{labelHint ? (
 					<span className="font-normal text-[11px] text-text-soft-400">
@@ -118,12 +141,20 @@ export const GroupSelect = ({
 						return (
 							<span
 								key={groupId}
-								className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
+								className={cn(
+									"inline-flex h-6 max-w-full shrink-0 items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40",
+									hideItemIcons ? "pl-2.5" : "pl-0.5",
+								)}
 							>
-								<Avatar.Root size="20" color="gray">
-									<Icon name="modules" className="h-3 w-3 text-text-sub-600" />
-								</Avatar.Root>
-								<span className="font-medium">{groupName}</span>
+								{hideItemIcons ? null : (
+									<Avatar.Root size="20" color="gray">
+										<Icon
+											name="modules"
+											className="h-3 w-3 text-text-sub-600"
+										/>
+									</Avatar.Root>
+								)}
+								<span className="truncate font-medium">{groupName}</span>
 								<button
 									type="button"
 									onClick={(e) => {
@@ -131,7 +162,7 @@ export const GroupSelect = ({
 										e.stopPropagation();
 										removeGroup(groupId);
 									}}
-									className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
+									className="ml-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
 									disabled={disabled}
 									aria-label={`Remove ${groupName}`}
 								>
@@ -171,37 +202,44 @@ export const GroupSelect = ({
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -6, scale: 0.96 }}
 							transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-							onMouseLeave={() => setHoveredGroupId(null)}
-							className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+							className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
 						>
-							{filteredGroups.map((group) => (
-								<button
-									key={group.id}
-									type="button"
-									onMouseEnter={() => setHoveredGroupId(group.id)}
-									onMouseDown={(e) => e.preventDefault()}
-									onClick={() => addGroup(group.id)}
-									className="group relative flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-paragraph-sm text-text-strong-950 transition-colors"
-								>
-									{hoveredGroupId === group.id && (
-										<motion.span
-											layoutId="group-dropdown-hover-pill"
-											className="absolute inset-0 rounded-xl bg-bg-weak-50"
-											transition={{
-												type: "spring",
-												stiffness: 500,
-												damping: 38,
-											}}
-										/>
-									)}
-									<span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950">
-										<Icon name="modules" className="h-3.5 w-3.5" />
-									</span>
-									<span className="relative z-10 font-medium text-text-strong-950 text-xs">
-										{group.name}
-									</span>
-								</button>
-							))}
+							<div ref={scrollContainerRef} className="relative">
+								{filteredGroups.map((group, idx) => (
+									<button
+										key={group.id}
+										type="button"
+										ref={(el) => {
+											if (el) {
+												buttonRefs.current[idx] = el;
+											}
+										}}
+										onPointerEnter={() => setHoverIdx(idx)}
+										onPointerLeave={() => setHoverIdx(undefined)}
+										onMouseDown={(e) => e.preventDefault()}
+										onClick={() => addGroup(group.id)}
+										className={cn(
+											"flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors",
+											!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
+										)}
+									>
+										{hideItemIcons ? null : (
+											<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600">
+												<Icon name="modules" className="h-3.5 w-3.5" />
+											</span>
+										)}
+										<span className="min-w-0 flex-1 truncate font-medium text-sm text-text-strong-950 dark:text-white">
+											{group.name}
+										</span>
+									</button>
+								))}
+								<AnimatedHoverBackground
+									rect={currentRect}
+									tabElement={currentTab ?? undefined}
+									containerElement={scrollContainerRef.current}
+									className="rounded-lg"
+								/>
+							</div>
 						</motion.div>
 					)}
 					{showGroupDropdown && filteredGroups.length === 0 && groupInput && (
@@ -211,9 +249,9 @@ export const GroupSelect = ({
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -6, scale: 0.96 }}
 							transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-							className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-center shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+							className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
 						>
-							<p className="text-paragraph-xs text-text-soft-400">
+							<p className="px-3 py-4 text-center text-paragraph-xs text-text-soft-400">
 								No groups found for &ldquo;{groupInput}&rdquo;
 							</p>
 						</motion.div>

@@ -25,6 +25,9 @@ export const EditContactModal = ({
 			<Modal.Content
 				className="border-0 bg-transparent p-0 shadow-none sm:max-w-[520px]"
 				showClose={false}
+				// Don't let Radix auto-focus the header close button on open —
+				// the form focuses the first name field instead.
+				onOpenAutoFocus={(e) => e.preventDefault()}
 			>
 				{!contact && open ? (
 					<div className="w-full font-sans">

@@ -1,4 +1,3 @@
-import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
@@ -11,13 +10,13 @@ import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import type { AudienceStatus } from "#/features/contacts/audience";
-import { GroupSelect } from "#/features/contacts/components/groups/group-select";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ChannelsField, GroupsField } from "./membership-fields";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
 const actionKbdOnBlueClassName =
@@ -43,12 +42,6 @@ interface Property {
 	propertyName: string;
 	propertyType: string;
 	defaultValue: string | null;
-}
-
-interface Channel {
-	id: string;
-	name: string;
-	defaultSubscription: "opt_in" | "opt_out";
 }
 
 interface EditContactFormProps {
@@ -137,17 +130,9 @@ interface EditContactFieldsProps {
 	isSubscribed: boolean;
 	setIsSubscribed: (value: boolean) => void;
 	selectedChannelIds: string[];
-	channelInput: string;
-	setChannelInput: (value: string) => void;
-	showChannelDropdown: boolean;
-	setShowChannelDropdown: (value: boolean) => void;
-	hoveredChannelId: string | null;
-	setHoveredChannelId: (value: string | null) => void;
-	channelInputRef: React.RefObject<HTMLInputElement | null>;
-	addChannel: (channelId: string) => void;
-	removeChannel: (channelId: string) => void;
-	getChannelName: (channelId: string) => string;
-	filteredChannels: Channel[];
+	setSelectedChannelIds: (ids: string[]) => void;
+	/** Focus the first name field on mount (modal only, not inline). */
+	autoFocusName?: boolean;
 }
 
 function EditContactFields({
@@ -166,17 +151,8 @@ function EditContactFields({
 	isSubscribed,
 	setIsSubscribed,
 	selectedChannelIds,
-	channelInput,
-	setChannelInput,
-	showChannelDropdown,
-	setShowChannelDropdown,
-	hoveredChannelId,
-	setHoveredChannelId,
-	channelInputRef,
-	addChannel,
-	removeChannel,
-	getChannelName,
-	filteredChannels,
+	setSelectedChannelIds,
+	autoFocusName = false,
 }: EditContactFieldsProps) {
 	return (
 		<>
@@ -200,12 +176,6 @@ function EditContactFields({
 						className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
 					>
 						<Input.Wrapper>
-							<Input.Icon
-								as={Icon}
-								name="mail-single"
-								size="small"
-								className="h-4 w-4 text-text-sub-600"
-							/>
 							<Input.Input
 								id={`email-${contact.id}`}
 								type="email"
@@ -239,6 +209,7 @@ function EditContactFields({
 									onChange={(e) => setFirstName(e.target.value)}
 									disabled={isSaving}
 									placeholder="First name"
+									autoFocus={autoFocusName}
 								/>
 							</Input.Wrapper>
 						</Input.Root>
@@ -303,198 +274,36 @@ function EditContactFields({
 
 			{/* ── Organization ───────────────────────────────────── */}
 			<section className="space-y-4">
-				<div className="flex items-center gap-2">
-					<div className="h-px flex-1 bg-stroke-soft-100" />
-					<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-wider">
-						Organization
-					</span>
-					<div className="h-px flex-1 bg-stroke-soft-100" />
-				</div>
-
-				<GroupSelect
-					id={`groups-${contact.id}`}
+				<GroupsField
+					contactId={contact.id}
+					knownGroups={contact.groups}
 					selectedGroupIds={selectedGroupIds}
 					onChange={setSelectedGroupIds}
 					disabled={isSaving}
-					label="Groups"
-					labelHint="Audience groups for targeting and filtering. Separate from email opt-in."
-					description=""
-					knownGroups={contact.groups}
 				/>
 			</section>
 
 			{/* ── Email preferences (last) ───────────────────────── */}
 			<section className="space-y-4">
-				<div className="flex items-center gap-2">
-					<div className="h-px flex-1 bg-stroke-soft-100" />
-					<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-wider">
-						Email preferences
-					</span>
-					<div className="h-px flex-1 bg-stroke-soft-100" />
-				</div>
-
 				{/* 1. Channels */}
-				<div
-					className={cn(
-						"flex flex-col gap-1.5 transition-opacity",
-						!isSubscribed && "opacity-60",
-					)}
-				>
-					<Label.Root
-						htmlFor={`channels-${contact.id}`}
-						className="font-medium text-text-strong-950 text-xs"
-					>
-						Channels
-					</Label.Root>
-					<div className="relative">
-						<label
-							className={cn(
-								"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
-								isSaving && "pointer-events-none opacity-50",
-							)}
-						>
-							{selectedChannelIds.map((channelId) => {
-								const channelName = getChannelName(channelId) || "Channel";
-								return (
-									<span
-										key={channelId}
-										className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
-									>
-										<Avatar.Root size="20" color="gray">
-											<Icon
-												name="notification-indicator"
-												className="h-3 w-3 text-text-sub-600"
-											/>
-										</Avatar.Root>
-										<span className="font-medium">{channelName}</span>
-										<button
-											type="button"
-											onClick={(e) => {
-												e.preventDefault();
-												e.stopPropagation();
-												removeChannel(channelId);
-											}}
-											className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
-											disabled={isSaving}
-											aria-label={`Remove ${channelName}`}
-										>
-											<Icon name="cross" className="h-3 w-3" />
-										</button>
-									</span>
-								);
-							})}
-							<input
-								ref={channelInputRef}
-								id={`channels-${contact.id}`}
-								type="text"
-								value={channelInput}
-								onChange={(e) => {
-									setChannelInput(e.target.value);
-									setShowChannelDropdown(true);
-								}}
-								onFocus={() => setShowChannelDropdown(true)}
-								onBlur={(e) => {
-									const relatedTarget = e.relatedTarget as HTMLElement | null;
-									if (
-										!relatedTarget?.closest("[data-channel-select-dropdown]")
-									) {
-										setShowChannelDropdown(false);
-									}
-								}}
-								placeholder={
-									selectedChannelIds.length === 0
-										? "Search channels to enroll..."
-										: "Add another..."
-								}
-								className="min-w-[100px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
-								disabled={isSaving}
-							/>
-						</label>
-						<AnimatePresence>
-							{showChannelDropdown && filteredChannels.length > 0 && (
-								<motion.div
-									data-channel-select-dropdown
-									initial={{ opacity: 0, y: -6, scale: 0.96 }}
-									animate={{ opacity: 1, y: 0, scale: 1 }}
-									exit={{ opacity: 0, y: -6, scale: 0.96 }}
-									transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-									onMouseLeave={() => setHoveredChannelId(null)}
-									className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
-								>
-									{filteredChannels.map((channel) => (
-										<button
-											key={channel.id}
-											type="button"
-											onMouseEnter={() => setHoveredChannelId(channel.id)}
-											onMouseDown={(e) => e.preventDefault()}
-											onClick={() => addChannel(channel.id)}
-											className="group relative flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-paragraph-sm text-text-strong-950 transition-colors"
-										>
-											{hoveredChannelId === channel.id && (
-												<motion.span
-													layoutId="channel-dropdown-hover-pill"
-													className="absolute inset-0 rounded-xl bg-bg-weak-50"
-													transition={{
-														type: "spring",
-														stiffness: 500,
-														damping: 38,
-													}}
-												/>
-											)}
-											<span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950">
-												<Icon
-													name="notification-indicator"
-													className="h-3.5 w-3.5"
-												/>
-											</span>
-											<span className="relative z-10 font-medium text-text-strong-950 text-xs">
-												{channel.name}
-											</span>
-											{channel.defaultSubscription === "opt_out" && (
-												<span className="relative z-10 ml-auto text-paragraph-xs text-text-soft-400">
-													Opt-out default
-												</span>
-											)}
-										</button>
-									))}
-								</motion.div>
-							)}
-							{showChannelDropdown &&
-								filteredChannels.length === 0 &&
-								channelInput && (
-									<motion.div
-										data-channel-select-dropdown
-										initial={{ opacity: 0, y: -6, scale: 0.96 }}
-										animate={{ opacity: 1, y: 0, scale: 1 }}
-										exit={{ opacity: 0, y: -6, scale: 0.96 }}
-										transition={{
-											duration: 0.18,
-											ease: [0.16, 1, 0.3, 1],
-										}}
-										className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-center shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
-									>
-										<p className="text-paragraph-xs text-text-soft-400">
-											No channels found for &ldquo;{channelInput}&rdquo;
-										</p>
-									</motion.div>
-								)}
-						</AnimatePresence>
-					</div>
-					<p className="text-paragraph-xs text-text-soft-400">
-						{isSubscribed
-							? "Email lists this contact is enrolled in. They only get mail from these channels."
-							: "Enrollment is saved, but marketing is paused until they re-subscribe."}
-					</p>
-				</div>
+				<ChannelsField
+					contactId={contact.id}
+					knownChannels={contact.channels}
+					selectedChannelIds={selectedChannelIds}
+					onChange={setSelectedChannelIds}
+					disabled={isSaving}
+					isSubscribed={isSubscribed}
+				/>
 
-				{/* 2. Marketing subscription toggle */}
-				<div
+				{/* 2. Marketing Email toggle */}
+				<label
+					htmlFor={`marketing-subscription-${contact.id}`}
 					className={cn(
-						"flex items-center justify-between gap-4 rounded-2xl border p-3.5 transition-colors",
+						"flex cursor-pointer items-center justify-between gap-4 rounded-2xl border p-3.5 transition-colors",
 						isSubscribed
 							? "border-stroke-soft-200 bg-bg-weak-50/40"
 							: "border-red-500/15 bg-red-500/[0.03]",
-						isSaving && "opacity-50",
+						isSaving && "pointer-events-none opacity-50",
 					)}
 				>
 					<div className="flex min-w-0 items-center gap-3">
@@ -514,7 +323,7 @@ function EditContactFields({
 						<div className="flex min-w-0 flex-col gap-0.5 text-left">
 							<div className="flex flex-wrap items-center gap-2">
 								<span className="font-medium text-text-strong-950 text-xs">
-									Marketing subscription
+									Marketing Email
 								</span>
 								<span
 									className={cn(
@@ -535,12 +344,13 @@ function EditContactFields({
 						</div>
 					</div>
 					<Checkbox.Root
+						id={`marketing-subscription-${contact.id}`}
 						checked={isSubscribed}
 						onCheckedChange={(checked) => setIsSubscribed(checked === true)}
 						disabled={isSaving}
-						aria-label="Marketing subscription"
+						aria-label="Marketing Email"
 					/>
-				</div>
+				</label>
 			</section>
 		</>
 	);
@@ -569,11 +379,6 @@ export function EditContactForm({
 	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>(() =>
 		getInitialGroupIds(contact),
 	);
-	const [channelInput, setChannelInput] = useState("");
-	const [showChannelDropdown, setShowChannelDropdown] = useState(false);
-	const [hoveredChannelId, setHoveredChannelId] = useState<string | null>(null);
-	const channelInputRef = useRef<HTMLInputElement>(null);
-
 	// Snapshot of memberships when the form opened / contact switched — used for diffs on save
 	const initialChannelIdsRef = useRef(getInitialChannelIds(contact));
 	const initialGroupIdsRef = useRef(getInitialGroupIds(contact));
@@ -589,30 +394,7 @@ export function EditContactForm({
 		},
 	});
 
-	const { data: allChannelsData } = useQuery({
-		queryKey: ["contacts", "channels", "edit-form"],
-		queryFn: async () => {
-			const res = await fetch("/api/contacts/v1/channels/list?limit=100", {
-				credentials: "include",
-			});
-			if (!res.ok) throw new Error("Failed");
-			return res.json() as Promise<{ channels: Channel[]; total: number }>;
-		},
-	});
-
-	const allChannels = allChannelsData?.channels || [];
 	const customProperties = propertiesData?.properties || [];
-
-	const channelNameById = useMemo(() => {
-		const map = new Map<string, string>();
-		for (const c of contact.channels ?? []) {
-			map.set(c.id, c.name);
-		}
-		for (const c of allChannels) {
-			map.set(c.id, c.name);
-		}
-		return map;
-	}, [allChannels, contact.channels]);
 
 	// Reset form when switching to a different contact
 	useEffect(() => {
@@ -624,8 +406,6 @@ export function EditContactForm({
 		setIsSubscribed(contact.status.toLowerCase() === "subscribed");
 		setSelectedChannelIds(channelIds);
 		setSelectedGroupIds(groupIds);
-		setChannelInput("");
-		setShowChannelDropdown(false);
 		initialChannelIdsRef.current = channelIds;
 		initialGroupIdsRef.current = groupIds;
 	}, [contact]);
@@ -663,31 +443,6 @@ export function EditContactForm({
 		},
 		{ enableOnFormTags: ["INPUT"] },
 	);
-
-	const addChannel = (channelId: string) => {
-		if (!selectedChannelIds.includes(channelId)) {
-			setSelectedChannelIds((prev) => [...prev, channelId]);
-		}
-		setChannelInput("");
-		setShowChannelDropdown(false);
-	};
-
-	const removeChannel = (channelId: string) => {
-		setSelectedChannelIds((prev) => prev.filter((id) => id !== channelId));
-	};
-
-	const getChannelName = (channelId: string) =>
-		channelNameById.get(channelId) || "";
-
-	const availableChannels = allChannels.filter(
-		(channel) => !selectedChannelIds.includes(channel.id),
-	);
-
-	const filteredChannels = channelInput
-		? availableChannels.filter((t) =>
-				t.name.toLowerCase().includes(channelInput.toLowerCase()),
-			)
-		: availableChannels;
 
 	const handlePropertyChange = (propertyId: string, value: string) => {
 		setPropertyValues((prev) => ({
@@ -831,17 +586,8 @@ export function EditContactForm({
 									isSubscribed={isSubscribed}
 									setIsSubscribed={setIsSubscribed}
 									selectedChannelIds={selectedChannelIds}
-									channelInput={channelInput}
-									setChannelInput={setChannelInput}
-									showChannelDropdown={showChannelDropdown}
-									setShowChannelDropdown={setShowChannelDropdown}
-									hoveredChannelId={hoveredChannelId}
-									setHoveredChannelId={setHoveredChannelId}
-									channelInputRef={channelInputRef}
-									addChannel={addChannel}
-									removeChannel={removeChannel}
-									getChannelName={getChannelName}
-									filteredChannels={filteredChannels}
+									setSelectedChannelIds={setSelectedChannelIds}
+									autoFocusName
 								/>
 							</div>
 						</div>
@@ -938,12 +684,6 @@ export function EditContactForm({
 								className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
 							>
 								<Input.Wrapper>
-									<Input.Icon
-										as={Icon}
-										name="mail-single"
-										size="small"
-										className="h-4 w-4 text-text-sub-600"
-									/>
 									<Input.Input
 										id={`email-${contact.id}`}
 										type="email"
@@ -1043,201 +783,36 @@ export function EditContactForm({
 
 					{/* ── Organization ───────────────────────────────────── */}
 					<section className="space-y-4">
-						<div className="flex items-center gap-2">
-							<div className="h-px flex-1 bg-stroke-soft-100" />
-							<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-wider">
-								Organization
-							</span>
-							<div className="h-px flex-1 bg-stroke-soft-100" />
-						</div>
-
-						<GroupSelect
-							id={`groups-${contact.id}`}
+						<GroupsField
+							contactId={contact.id}
+							knownGroups={contact.groups}
 							selectedGroupIds={selectedGroupIds}
 							onChange={setSelectedGroupIds}
 							disabled={isSaving}
-							label="Groups"
-							labelHint="Audience groups for targeting and filtering. Separate from email opt-in."
-							description=""
-							knownGroups={contact.groups}
 						/>
 					</section>
 
 					{/* ── Email preferences (last) ───────────────────────── */}
 					<section className="space-y-4">
-						<div className="flex items-center gap-2">
-							<div className="h-px flex-1 bg-stroke-soft-100" />
-							<span className="font-medium text-[10px] text-text-soft-400 uppercase tracking-wider">
-								Email preferences
-							</span>
-							<div className="h-px flex-1 bg-stroke-soft-100" />
-						</div>
-
 						{/* 1. Channels */}
-						<div
-							className={cn(
-								"flex flex-col gap-1.5 transition-opacity",
-								!isSubscribed && "opacity-60",
-							)}
-						>
-							<Label.Root
-								htmlFor={`channels-${contact.id}`}
-								className="font-medium text-text-strong-950 text-xs"
-							>
-								Channels
-							</Label.Root>
-							<div className="relative">
-								<label
-									className={cn(
-										"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
-										isSaving && "pointer-events-none opacity-50",
-									)}
-								>
-									{selectedChannelIds.map((channelId) => {
-										const channelName = getChannelName(channelId) || "Channel";
-										return (
-											<span
-												key={channelId}
-												className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
-											>
-												<Avatar.Root size="20" color="gray">
-													<Icon
-														name="notification-indicator"
-														className="h-3 w-3 text-text-sub-600"
-													/>
-												</Avatar.Root>
-												<span className="font-medium">{channelName}</span>
-												<button
-													type="button"
-													onClick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														removeChannel(channelId);
-													}}
-													className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
-													disabled={isSaving}
-													aria-label={`Remove ${channelName}`}
-												>
-													<Icon name="cross" className="h-3 w-3" />
-												</button>
-											</span>
-										);
-									})}
-									<input
-										ref={channelInputRef}
-										id={`channels-${contact.id}`}
-										type="text"
-										value={channelInput}
-										onChange={(e) => {
-											setChannelInput(e.target.value);
-											setShowChannelDropdown(true);
-										}}
-										onFocus={() => setShowChannelDropdown(true)}
-										onBlur={(e) => {
-											const relatedTarget =
-												e.relatedTarget as HTMLElement | null;
-											if (
-												!relatedTarget?.closest(
-													"[data-channel-select-dropdown]",
-												)
-											) {
-												setShowChannelDropdown(false);
-											}
-										}}
-										placeholder={
-											selectedChannelIds.length === 0
-												? "Search channels to enroll..."
-												: "Add another..."
-										}
-										className="min-w-[100px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
-										disabled={isSaving}
-									/>
-								</label>
-								<AnimatePresence>
-									{showChannelDropdown && filteredChannels.length > 0 && (
-										<motion.div
-											data-channel-select-dropdown
-											initial={{ opacity: 0, y: -6, scale: 0.96 }}
-											animate={{ opacity: 1, y: 0, scale: 1 }}
-											exit={{ opacity: 0, y: -6, scale: 0.96 }}
-											transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-											onMouseLeave={() => setHoveredChannelId(null)}
-											className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
-										>
-											{filteredChannels.map((channel) => (
-												<button
-													key={channel.id}
-													type="button"
-													onMouseEnter={() => setHoveredChannelId(channel.id)}
-													onMouseDown={(e) => e.preventDefault()}
-													onClick={() => addChannel(channel.id)}
-													className="group relative flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-paragraph-sm text-text-strong-950 transition-colors"
-												>
-													{hoveredChannelId === channel.id && (
-														<motion.span
-															layoutId="channel-dropdown-hover-pill"
-															className="absolute inset-0 rounded-xl bg-bg-weak-50"
-															transition={{
-																type: "spring",
-																stiffness: 500,
-																damping: 38,
-															}}
-														/>
-													)}
-													<span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950">
-														<Icon
-															name="notification-indicator"
-															className="h-3.5 w-3.5"
-														/>
-													</span>
-													<span className="relative z-10 font-medium text-text-strong-950 text-xs">
-														{channel.name}
-													</span>
-													{channel.defaultSubscription === "opt_out" && (
-														<span className="relative z-10 ml-auto text-paragraph-xs text-text-soft-400">
-															Opt-out default
-														</span>
-													)}
-												</button>
-											))}
-										</motion.div>
-									)}
-									{showChannelDropdown &&
-										filteredChannels.length === 0 &&
-										channelInput && (
-											<motion.div
-												data-channel-select-dropdown
-												initial={{ opacity: 0, y: -6, scale: 0.96 }}
-												animate={{ opacity: 1, y: 0, scale: 1 }}
-												exit={{ opacity: 0, y: -6, scale: 0.96 }}
-												transition={{
-													duration: 0.18,
-													ease: [0.16, 1, 0.3, 1],
-												}}
-												className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-center shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
-											>
-												<p className="text-paragraph-xs text-text-soft-400">
-													No channels found for &ldquo;{channelInput}&rdquo;
-												</p>
-											</motion.div>
-										)}
-								</AnimatePresence>
-							</div>
-							<p className="text-paragraph-xs text-text-soft-400">
-								{isSubscribed
-									? "Email lists this contact is enrolled in. They only get mail from these channels."
-									: "Enrollment is saved, but marketing is paused until they re-subscribe."}
-							</p>
-						</div>
+						<ChannelsField
+							contactId={contact.id}
+							knownChannels={contact.channels}
+							selectedChannelIds={selectedChannelIds}
+							onChange={setSelectedChannelIds}
+							disabled={isSaving}
+							isSubscribed={isSubscribed}
+						/>
 
-						{/* 2. Marketing subscription toggle */}
-						<div
+						{/* 2. Marketing Email toggle */}
+						<label
+							htmlFor={`marketing-subscription-${contact.id}`}
 							className={cn(
-								"flex items-center justify-between gap-4 rounded-2xl border p-3.5 transition-colors",
+								"flex cursor-pointer items-center justify-between gap-4 rounded-2xl border p-3.5 transition-colors",
 								isSubscribed
 									? "border-stroke-soft-200 bg-bg-weak-50/40"
 									: "border-red-500/15 bg-red-500/[0.03]",
-								isSaving && "opacity-50",
+								isSaving && "pointer-events-none opacity-50",
 							)}
 						>
 							<div className="flex min-w-0 items-center gap-3">
@@ -1257,7 +832,7 @@ export function EditContactForm({
 								<div className="flex min-w-0 flex-col gap-0.5 text-left">
 									<div className="flex flex-wrap items-center gap-2">
 										<span className="font-medium text-text-strong-950 text-xs">
-											Marketing subscription
+											Marketing Email
 										</span>
 										<span
 											className={cn(
@@ -1278,12 +853,13 @@ export function EditContactForm({
 								</div>
 							</div>
 							<Checkbox.Root
+								id={`marketing-subscription-${contact.id}`}
 								checked={isSubscribed}
 								onCheckedChange={(checked) => setIsSubscribed(checked === true)}
 								disabled={isSaving}
-								aria-label="Marketing subscription"
+								aria-label="Marketing Email"
 							/>
-						</div>
+						</label>
 					</section>
 				</div>
 
