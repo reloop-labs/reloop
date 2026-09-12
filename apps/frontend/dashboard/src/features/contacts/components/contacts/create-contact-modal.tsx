@@ -419,7 +419,7 @@ export function CreateContactModal({
 							type="submit"
 							variant="blue"
 							size="small"
-							disabled={isSubmitting || totalValidNow === 0}
+							disabled={isSubmitting}
 							className="gap-1.5"
 						>
 							{isSubmitting ? (
