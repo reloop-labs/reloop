@@ -21,6 +21,7 @@ import {
 	deleteCampaignRequest,
 	duplicateCampaignRequest,
 	getCampaignById,
+	listCampaignRecipients,
 	listCampaigns,
 	scheduleCampaignRequest,
 	sendCampaignRequest,
@@ -206,5 +207,14 @@ export function useCampaignQuery(id: string | undefined) {
 			);
 			return listed?.find((campaign) => campaign.id === id);
 		},
+	});
+}
+
+export function useCampaignRecipientsQuery(id: string | undefined) {
+	const { activeOrganization } = useActiveOrganization();
+	return useQuery({
+		queryKey: queryKeys.campaigns.recipients(id ?? ""),
+		queryFn: () => listCampaignRecipients(id as string, { limit: 20 }),
+		enabled: Boolean(id && activeOrganization?.id),
 	});
 }

@@ -4,11 +4,12 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import {
 	CampaignsProvider,
 	useCampaignQuery,
+	useCampaignRecipientsQuery,
 	useCampaigns,
 } from "./campaigns-provider";
 import { CampaignPreviewTabs } from "./components/campaign-preview-tabs";
@@ -19,10 +20,71 @@ function CampaignDetailContent() {
 	const campaignId = params?.campaignId as string;
 	const { sendCampaign, duplicateCampaign, deleteCampaign } = useCampaigns();
 	const campaignQuery = useCampaignQuery(campaignId);
+	const recipientsQuery = useCampaignRecipientsQuery(campaignId);
 
 	const [actionPending, setActionPending] = useState(false);
 
 	const campaign = campaignQuery.data;
+	const recipients = recipientsQuery.data?.recipients ?? [];
+
+	const toEmails = useMemo<string[]>(() => {
+		if (recipients.length > 0) {
+			return recipients.map((r) => r.email);
+		}
+		if (campaign?.csvEmails && campaign.csvEmails.length > 0) {
+			return campaign.csvEmails;
+		}
+		return [];
+	}, [recipients, campaign?.csvEmails]);
+
+	const audienceInfo = useMemo(() => {
+		if (!campaign) return null;
+		const count = campaign.recipientCount ?? 0;
+		const countLabel = `${count.toLocaleString()} ${count === 1 ? "recipient" : "recipients"}`;
+		const targetName = campaign.audienceTargetName?.trim();
+
+		if (campaign.audienceType === "group") {
+			return {
+				name: targetName || "Group",
+				type: "group" as const,
+				typeLabel: "Group",
+				countLabel,
+				href: campaign.audienceTargetId
+					? `/contacts/groups/${campaign.audienceTargetId}`
+					: undefined,
+			};
+		}
+
+		if (campaign.audienceType === "channel") {
+			return {
+				name: targetName?.replace(/^Channel:\s*/i, "") || "Channel",
+				type: "channel" as const,
+				typeLabel: "Channel",
+				countLabel,
+				href: campaign.audienceTargetId
+					? `/contacts?channelId=${campaign.audienceTargetId}`
+					: undefined,
+			};
+		}
+
+		if (campaign.audienceType === "csv") {
+			return {
+				name: targetName || "CSV Upload",
+				type: "csv" as const,
+				typeLabel: "CSV",
+				countLabel,
+				href: undefined,
+			};
+		}
+
+		return {
+			name: targetName || "All Contacts",
+			type: "all" as const,
+			typeLabel: "All Contacts",
+			countLabel,
+			href: "/contacts",
+		};
+	}, [campaign]);
 
 	if (campaignQuery.isLoading) {
 		return (
@@ -153,45 +215,47 @@ function CampaignDetailContent() {
 						size="small"
 						onClick={handleDelete}
 						disabled={actionPending}
+						className="border-error-sub-300 text-error-base hover:bg-error-lighter"
 					>
 						Delete
 					</Button.Root>
 				</div>
 			</div>
 
-			{/* Performance Metrics Funnel */}
-			{campaign.status === "sent" && (
-				<div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+			{/* High-level Metric Cards */}
+			{campaign.status !== "draft" && (
+				<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 					<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
 						<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-							Total Sent
+							TOTAL SENT
 						</p>
-						<p className="mt-2 font-semibold text-2xl text-text-strong-950 tabular-nums">
+						<p className="mt-2 font-semibold text-2xl text-text-strong-950">
 							{campaign.sentCount.toLocaleString()}
 						</p>
 						<p className="mt-0.5 text-text-sub-600 text-xs">
-							Broadcasted{" "}
-							{campaign.sentAt ? formatRelativeTime(campaign.sentAt) : ""}
+							{campaign.sentAt
+								? `Broadcasted ${formatRelativeTime(campaign.sentAt)}`
+								: "Broadcasted"}
 						</p>
 					</div>
 
 					<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
 						<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-							Delivered ({deliveryRate}%)
+							DELIVERED ({deliveryRate}%)
 						</p>
-						<p className="mt-2 font-semibold text-2xl text-text-strong-950 tabular-nums">
+						<p className="mt-2 font-semibold text-2xl text-text-strong-950">
 							{campaign.deliveredCount.toLocaleString()}
 						</p>
 						<p className="mt-0.5 text-text-sub-600 text-xs">
-							{campaign.failedCount} bounced / failed
+							{campaign.failedCount.toLocaleString()} bounced / failed
 						</p>
 					</div>
 
 					<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
 						<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-							Unique Opens ({openRate}%)
+							UNIQUE OPENS ({openRate}%)
 						</p>
-						<p className="mt-2 font-semibold text-2xl text-text-strong-950 tabular-nums">
+						<p className="mt-2 font-semibold text-2xl text-text-strong-950">
 							{campaign.openedCount.toLocaleString()}
 						</p>
 						<p className="mt-0.5 text-text-sub-600 text-xs">
@@ -201,9 +265,9 @@ function CampaignDetailContent() {
 
 					<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
 						<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-							Clicks ({clickRate}%)
+							CLICKS ({clickRate}%)
 						</p>
-						<p className="mt-2 font-semibold text-2xl text-text-strong-950 tabular-nums">
+						<p className="mt-2 font-semibold text-2xl text-text-strong-950">
 							{campaign.clickedCount.toLocaleString()}
 						</p>
 						<p className="mt-0.5 text-text-sub-600 text-xs">
@@ -213,28 +277,89 @@ function CampaignDetailContent() {
 				</div>
 			)}
 
-			{/* Metadata Details Grid */}
-			<div className="grid grid-cols-1 gap-4 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 sm:grid-cols-3 dark:border-stroke-soft-100/50">
-				<div>
-					<p className="font-medium text-text-sub-600 text-xs">Sender</p>
-					<p className="mt-1 font-mono text-text-strong-950 text-xs">
-						{campaign.fromName} &lt;{campaign.fromEmail}&gt;
-					</p>
+			{/* Delivery Info - Email Header Style */}
+			<section>
+				<div className="flex flex-col gap-3.5">
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							From
+						</span>
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{campaign.fromName
+								? `${campaign.fromName} <${campaign.fromEmail}>`
+								: campaign.fromEmail}
+						</span>
+					</div>
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							To
+						</span>
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{audienceInfo ? (
+								<>
+									{audienceInfo.href ? (
+										<Link
+											href={audienceInfo.href}
+											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+										>
+											{audienceInfo.name}
+										</Link>
+									) : (
+										<span>{audienceInfo.name}</span>
+									)}
+									<span className="font-normal text-text-sub-600">
+										{" "}
+										(
+										{audienceInfo.type !== "all"
+											? `${audienceInfo.typeLabel} · `
+											: ""}
+										{toEmails.length === 1 ? (
+											<>
+												1 recipient:{" "}
+												<Link
+													href={`/contacts/detail/${encodeURIComponent(toEmails[0] ?? "")}`}
+													className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+												>
+													{toEmails[0]}
+												</Link>
+											</>
+										) : (
+											audienceInfo.countLabel
+										)}
+										)
+									</span>
+								</>
+							) : null}
+						</span>
+					</div>
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							Date
+						</span>
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{new Date(campaign.sentAt || campaign.createdAt).toLocaleString(
+								undefined,
+								{
+									weekday: "long",
+									year: "numeric",
+									month: "long",
+									day: "numeric",
+									hour: "2-digit",
+									minute: "2-digit",
+								},
+							)}
+						</span>
+					</div>
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							Subject
+						</span>
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{campaign.subject}
+						</span>
+					</div>
 				</div>
-				<div>
-					<p className="font-medium text-text-sub-600 text-xs">Audience</p>
-					<p className="mt-1 font-medium text-text-strong-950 text-xs">
-						{campaign.audienceTargetName || "All Contacts"} (
-						{campaign.recipientCount.toLocaleString()} recipients)
-					</p>
-				</div>
-				<div>
-					<p className="font-medium text-text-sub-600 text-xs">Created</p>
-					<p className="mt-1 text-text-strong-950 text-xs">
-						{new Date(campaign.createdAt).toLocaleString()}
-					</p>
-				</div>
-			</div>
+			</section>
 
 			{/* Message Preview Tabs */}
 			<CampaignPreviewTabs campaign={campaign} />

@@ -30,6 +30,7 @@ export type Campaign = {
 	templateName?: string;
 	content?: unknown[];
 	contentHtml: string;
+	csvEmails?: string[];
 	scheduledAt?: string;
 	sentAt?: string;
 	createdAt: string;

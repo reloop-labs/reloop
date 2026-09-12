@@ -117,3 +117,35 @@ export async function cancelCampaignRequest(id: string): Promise<Campaign> {
 	if (!res.ok) throw new Error(await parseError(res));
 	return (await res.json()) as Campaign;
 }
+
+export interface CampaignRecipient {
+	id: string;
+	email: string;
+	contactId?: string;
+	status: string;
+	skipReason?: string;
+	emailLogId?: string;
+	openedAt?: string;
+	clickedAt?: string;
+}
+
+export async function listCampaignRecipients(
+	id: string,
+	params?: { page?: number; limit?: number; status?: string },
+): Promise<{
+	recipients: CampaignRecipient[];
+	total: number;
+	page: number;
+	limit: number;
+}> {
+	const sp = new URLSearchParams();
+	if (params?.page) sp.set("page", String(params.page));
+	if (params?.limit) sp.set("limit", String(params.limit));
+	if (params?.status) sp.set("status", params.status);
+	const query = sp.toString() ? `?${sp.toString()}` : "";
+	const res = await fetch(`${BASE}/${id}/recipients${query}`, {
+		credentials: "include",
+	});
+	if (!res.ok) throw new Error(await parseError(res));
+	return await res.json();
+}
