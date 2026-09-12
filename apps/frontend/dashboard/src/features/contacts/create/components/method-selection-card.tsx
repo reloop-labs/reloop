@@ -1,15 +1,16 @@
 "use client";
 
-import {
-	ArrowDownToLine,
-	Code2,
-	FileText,
-	Sparkles,
-	Upload,
-} from "lucide-react";
+import { cn } from "@reloop/ui/cn";
+import * as FileFormatIcon from "@reloop/ui/file-format-icon";
+import * as FileUpload from "@reloop/ui/file-upload";
+import { Icon } from "@reloop/ui/icon";
+import { Code2, FileText } from "lucide-react";
+import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { ContactsApiDetails } from "#/components/api-details/contacts";
 import type { CreateContactStep } from "../types";
+import { ManualContactsModal } from "./manual-contacts-modal";
 
 interface MethodSelectionCardProps {
 	onSelectMethod: (method: CreateContactStep) => void;
@@ -17,31 +18,27 @@ interface MethodSelectionCardProps {
 	onSelectGroupModal?: () => void;
 }
 
-const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB Max Cap
 
 export function MethodSelectionCard({
 	onSelectMethod,
 	onFileSelect,
 }: MethodSelectionCardProps) {
-	const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+	const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		accept: {
 			"text/csv": [".csv"],
-			"application/vnd.ms-excel": [".csv", ".xls"],
-			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-				".xlsx",
-			],
-			"text/plain": [".txt"],
+			"application/vnd.ms-excel": [".csv"],
 		},
-		noClick: false,
 		maxFiles: 1,
 		maxSize: MAX_FILE_SIZE_BYTES,
 		onDrop: (acceptedFiles, fileRejections) => {
 			const rejection = fileRejections[0];
 			if (rejection) {
 				if (rejection.errors.some((err) => err.code === "file-too-large")) {
-					toast.error("File size exceeds the 25 MB limit.");
+					toast.error("File size exceeds the 5 MB limit.");
 				} else {
-					toast.error("Please upload a valid CSV or spreadsheet file.");
+					toast.error("Please upload a valid CSV file.");
 				}
 				return;
 			}
@@ -55,111 +52,136 @@ export function MethodSelectionCard({
 		},
 	});
 
+	const handleDownloadSample = () => {
+		const sampleCsvContent =
+			"email,first_name,last_name,company,role\nalice@example.com,Alice,Smith,Acme Corp,Marketing Lead\nbob@example.com,Bob,Jones,Global Tech,Engineer\ncharlie@example.com,Charlie,Brown,Design Co,Product Designer\n";
+		const blob = new Blob([sampleCsvContent], {
+			type: "text/csv;charset=utf-8;",
+		});
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.setAttribute("href", url);
+		link.setAttribute("download", "sample_contacts.csv");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	};
+
 	return (
-		<div className="w-full max-w-xl mx-auto font-sans">
-			{/* Top Step Counter */}
-			<div className="mb-2 text-xs sm:text-sm font-normal text-text-sub-600">
-				Step 1 of 3
+		<div className="mx-auto w-full max-w-xl space-y-6 font-sans">
+			{/* Header */}
+			<div>
+				<div className="mb-1 font-normal text-text-sub-600 text-xs">
+					Step 1 of 3
+				</div>
+				<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
+					Import Contacts from CSV
+				</h2>
 			</div>
 
-			{/* Main Title & Subtitle */}
-			<div className="mb-6 space-y-1.5">
-				<h1 className="text-2xl sm:text-[28px] font-semibold tracking-tight text-text-strong-950">
-					Start from a document
-				</h1>
-				<p className="text-xs sm:text-sm text-text-sub-600 leading-relaxed max-w-md">
-					Upload a spreadsheet, CSV, or contact list you&apos;ve used before.
-					We&apos;ll scan it and fill in what we find
-				</p>
-			</div>
-
-			{/* Dashed Dropzone Box */}
-			<div
+			{/* Upload Box */}
+			<FileUpload.Root
 				{...getRootProps()}
-				className={`group relative flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-dashed p-8 sm:p-10 text-center transition-all cursor-pointer ${
-					isDragActive
-						? "border-text-strong-950 bg-bg-weak-50/80 dark:border-white"
-						: "border-stroke-soft-300 dark:border-stroke-soft-200/40 bg-bg-weak-50/20 hover:border-stroke-soft-400 hover:bg-bg-weak-50/50"
-				}`}
+				className={cn(
+					"flex cursor-pointer flex-col items-center justify-center gap-3.5 rounded-2xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/30 p-8 text-center transition-all hover:border-stroke-soft-400 hover:bg-bg-weak-50/70",
+					isDragActive && "border-text-strong-950 bg-bg-weak-50/80",
+				)}
 			>
 				<input {...getInputProps()} />
 
-				{/* Upload Icon in Rounded Square */}
-				<div className="mb-3.5 flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-xs transition-transform group-hover:scale-105 group-hover:text-text-strong-950">
-					<Upload className="h-4 w-4 stroke-[2]" />
+				<FileFormatIcon.Root
+					format="CSV"
+					color="green"
+					size="small"
+					className="h-10 w-10"
+				/>
+
+				<div className="space-y-1">
+					<p className="font-normal text-sm text-text-strong-950">
+						<span className="font-medium underline underline-offset-2">
+							Choose a file
+						</span>{" "}
+						or drag & drop it here.
+					</p>
+					<p className="text-text-sub-600 text-xs">CSV files up to 5 MB</p>
 				</div>
+			</FileUpload.Root>
 
-				{/* Drop Prompt */}
-				<div className="font-semibold text-sm sm:text-base text-text-strong-950">
-					Drop your files here
+			{/* File Requirements Box */}
+			<div className="space-y-2 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-text-sub-600 text-xs">
+				<div className="flex items-center justify-between">
+					<p className="font-medium text-text-strong-950">
+						CSV File Requirements:
+					</p>
+					<button
+						type="button"
+						onClick={handleDownloadSample}
+						className="inline-flex cursor-pointer items-center gap-1 font-medium text-text-sub-600 text-xs underline underline-offset-2 transition-colors hover:text-text-strong-950"
+					>
+						<Icon name="file-download" className="h-3.5 w-3.5" />
+						Download sample
+					</button>
 				</div>
-
-				{/* Formats Info */}
-				<p className="mt-1 text-xs text-text-sub-600">
-					Supports CSV, XLS, XLSX. Max file size 25MB
-				</p>
-
-				{/* Choose Files Button */}
-				<button
-					type="button"
-					onClick={(e) => {
-						e.stopPropagation();
-						open();
-					}}
-					className="mt-4 inline-flex items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-2 font-medium text-xs text-text-strong-950 shadow-2xs transition-colors hover:bg-bg-weak-50"
-				>
-					Choose files
-				</button>
+				<ul className="list-inside list-disc space-y-0.5 leading-relaxed">
+					<li>
+						Must contain an{" "}
+						<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
+							email
+						</code>{" "}
+						column header.
+					</li>
+					<li>
+						Optional headers:{" "}
+						<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
+							first_name
+						</code>
+						,{" "}
+						<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
+							last_name
+						</code>
+						. Map extra columns to Reloop properties after upload.
+					</li>
+				</ul>
 			</div>
 
 			{/* Alternative Methods Section */}
-			<div className="mt-8 space-y-3">
-				<div className="text-xs sm:text-sm font-medium text-text-sub-600">
+			<div className="space-y-3 pt-2">
+				<div className="font-medium text-text-sub-600 text-xs sm:text-sm">
 					Or start a different way
 				</div>
 
 				<div className="space-y-1">
-					{/* Option 1: Import from another app */}
+					{/* Option 1: Add manually or copy paste */}
 					<button
 						type="button"
-						onClick={() => onSelectMethod("csv-import")}
-						className="group flex w-full items-center gap-3 rounded-lg py-2 text-left font-medium text-xs sm:text-sm text-text-strong-950 transition-colors hover:text-black dark:hover:text-white cursor-pointer"
-					>
-						<ArrowDownToLine className="h-4 w-4 text-text-sub-600 transition-colors group-hover:text-text-strong-950" />
-						<span>Import contacts from another app</span>
-					</button>
-
-					{/* Option 2: Add manually or copy paste */}
-					<button
-						type="button"
-						onClick={() => onSelectMethod("single-contact")}
-						className="group flex w-full items-center gap-3 rounded-lg py-2 text-left font-medium text-xs sm:text-sm text-text-strong-950 transition-colors hover:text-black dark:hover:text-white cursor-pointer"
+						onClick={() => setIsManualModalOpen(true)}
+						className="group flex w-full cursor-pointer items-center gap-3 rounded-lg py-2 text-left font-medium text-text-strong-950 text-xs transition-colors hover:text-black sm:text-sm dark:hover:text-white"
 					>
 						<FileText className="h-4 w-4 text-text-sub-600 transition-colors group-hover:text-text-strong-950" />
 						<span>Add manually or copy paste</span>
 					</button>
 
-					{/* Option 3: Sync via SDK */}
-					<button
-						type="button"
-						onClick={() => onSelectMethod("api-sync")}
-						className="group flex w-full items-center gap-3 rounded-lg py-2 text-left font-medium text-xs sm:text-sm text-text-strong-950 transition-colors hover:text-black dark:hover:text-white cursor-pointer"
-					>
-						<Code2 className="h-4 w-4 text-text-sub-600 transition-colors group-hover:text-text-strong-950" />
-						<span>Sync via SDK or REST API</span>
-					</button>
-
-					{/* Option 4: AI Import */}
-					<button
-						type="button"
-						onClick={() => onSelectMethod("ai-import")}
-						className="group flex w-full items-center gap-3 rounded-lg py-2 text-left font-medium text-xs sm:text-sm text-text-strong-950 transition-colors hover:text-black dark:hover:text-white cursor-pointer"
-					>
-						<Sparkles className="h-4 w-4 text-text-sub-600 transition-colors group-hover:text-text-strong-950" />
-						<span>Import contacts using AI assistant</span>
-					</button>
+					{/* Option 2: Sync via SDK or REST API */}
+					<ContactsApiDetails
+						renderTrigger={({ open }) => (
+							<button
+								type="button"
+								onClick={open}
+								className="group flex w-full cursor-pointer items-center gap-3 rounded-lg py-2 text-left font-medium text-text-strong-950 text-xs transition-colors hover:text-black sm:text-sm dark:hover:text-white"
+							>
+								<Code2 className="h-4 w-4 text-text-sub-600 transition-colors group-hover:text-text-strong-950" />
+								<span>Sync via SDK or REST API</span>
+							</button>
+						)}
+					/>
 				</div>
 			</div>
+
+			<ManualContactsModal
+				open={isManualModalOpen}
+				onOpenChange={setIsManualModalOpen}
+			/>
 		</div>
 	);
 }
