@@ -45,3 +45,8 @@ In Reloop, open the domain → **Verify Domain** (setup: **Verify & finish**; me
 - Open the matching [provider guide](/docs/guides/connect-domain/providers)
 - Try [Auto-populate](/docs/guides/connect-domain/auto-populate) if the dashboard shows **Auto populate**
 - Contact Reloop support with: domain name, screenshot of DNS rows, and `dig` output
+
+> [!NOTE]
+> Self-hosting? If every record fails at once and `dig` from the host shows them
+> fine, the containers cannot reach a resolver. See
+> [Network Requirements](/docs/self-host/requirements#network-requirements).

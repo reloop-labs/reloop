@@ -31,3 +31,56 @@ Verify the following software and runtimes are installed on your hosting server:
 * **Docker Compose**: Version `2.20.0+`
 * **Bun**: Version `1.3.0+` (Only required if you run the microservices natively outside of Docker containers, or during the initial environment variables setup).
 * **Git**: For cloning the repository and checking out configurations.
+
+---
+
+## Network Requirements
+
+Domain verification reads your published SPF, DKIM, DMARC and MX records from
+public DNS. It queries upstream resolvers directly rather than the host's
+resolver, because a host resolver is frequently a link-local or VPN address that
+is unreachable from inside the container network — the symptom is every record
+failing with `ENOTFOUND` while the same lookup succeeds from the host shell.
+
+The `domain` and `workflow` services need:
+
+* **Outbound UDP port 53** to the resolvers they are configured to use. Allow **TCP port 53** as well; responses larger than 512 bytes fall back to TCP, which DKIM keys routinely exceed.
+
+### Choosing resolvers
+
+`DNS_RESOLVERS` in your `.env` sets the upstream resolvers, as a comma-separated
+list of IP addresses. It defaults to `8.8.8.8,8.8.4.4`, and falls back to that
+default if the value is empty or is not a valid address.
+
+```bash
+DNS_RESOLVERS=1.1.1.1,9.9.9.9
+```
+
+Point this at a reachable resolver when outbound 53 to the public resolvers is
+blocked, or when you run an internal resolver you would rather use. Restart the
+two services afterwards:
+
+```bash
+reloop restart domain workflow
+```
+
+> [!NOTE]
+> Use resolvers that answer for the public internet. An internal split-horizon
+> resolver may return private answers for your sending domain, or none at all,
+> and verification will fail even though the records are published correctly.
+
+### Docker resolver configuration
+
+`docker-compose.yml` also sets `dns` on every backend service, so containers
+that fall back to the system resolver still reach a working one:
+
+```yaml
+x-backend: &backend
+  dns:
+    - 1.1.1.1
+    - 8.8.8.8
+```
+
+This does not affect service discovery. Docker keeps its embedded resolver at
+`127.0.0.11` inside the container and uses the `dns` list only as upstream
+forwarders, so `postgres`, `redis` and `nats` continue to resolve by name.

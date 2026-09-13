@@ -1,0 +1,17 @@
+{
+	"name": "@reloop/dns",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./resolver": "./src/resolver.ts"
+	},
+	"scripts": {
+		"test": "bun test test/"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	}
+}
