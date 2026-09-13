@@ -37,6 +37,7 @@ export type ToolDefinition = LandingPageDefinition & {
 		| "deliverability-tester"
 		| "auth-checker"
 		| "bimi-checker"
+		| "domain-reputation-checker"
 		| "email-html-editor";
 };
 

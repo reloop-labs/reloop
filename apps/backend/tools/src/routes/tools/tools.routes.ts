@@ -4,6 +4,7 @@ import { blocklistCheckRoute } from "@be/tools/routes/tools/blocklist-check/bloc
 import { deliverabilityTestRoute } from "@be/tools/routes/tools/deliverability-test/deliverability-test.route";
 import { dnsLookupRoute } from "@be/tools/routes/tools/dns-lookup/dns-lookup.route";
 import { domainAgeRoute } from "@be/tools/routes/tools/domain-age/domain-age.route";
+import { domainReputationRoute } from "@be/tools/routes/tools/domain-reputation/domain-reputation.route";
 import { emailHealthCheckRoute } from "@be/tools/routes/tools/email-health-check/email-health-check.route";
 import { lookalikeWatchRoute } from "@be/tools/routes/tools/lookalike-watch/lookalike-watch.route";
 import { spamCheckRoute } from "@be/tools/routes/tools/spam-check/spam-check.route";
@@ -27,4 +28,5 @@ export const toolsRoutes = new Elysia({
 	.use(whoSendsRoute)
 	.use(domainAgeRoute)
 	.use(lookalikeWatchRoute)
-	.use(bimiCheckRoute);
+	.use(bimiCheckRoute)
+	.use(domainReputationRoute);

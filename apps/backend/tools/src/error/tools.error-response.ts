@@ -44,4 +44,18 @@ export const ToolsErrors = {
 			why: "The value was not a domain name with a dot.",
 			fix: "Enter a host like example.com — not an IP address or a URL path.",
 		}),
+	domainReputationEmptyInput: () =>
+		createError({
+			status: 400,
+			message: "No domain provided",
+			why: "The request did not include a domain to check reputation for.",
+			fix: 'Send {"domain": "example.com"} as JSON, or GET /api/tools/v1/domain-reputation?domain=example.com',
+		}),
+	domainReputationInvalidDomain: () =>
+		createError({
+			status: 400,
+			message: "Invalid domain",
+			why: "The value was not a valid domain name.",
+			fix: "Enter a valid root or sending domain like example.com — without protocol or path prefixes.",
+		}),
 };

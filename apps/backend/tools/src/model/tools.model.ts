@@ -1033,6 +1033,161 @@ export namespace ToolsModel {
 		recommendations: t.Array(t.String()),
 	});
 
+	export const domainReputationBody = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: toolsConfig.constants.maxInputLength,
+			description: "Root or sending domain to assess reputation for.",
+			examples: ["reloop.sh", "github.com", "stripe.com"],
+		}),
+	});
+
+	export const domainReputationQuery = t.Object({
+		domain: t.String({
+			minLength: 1,
+			maxLength: toolsConfig.constants.maxInputLength,
+			description: "Root or sending domain to assess reputation for.",
+		}),
+	});
+
+	export const domainReputationResponse = t.Object({
+		domain: t.String(),
+		resolvedAt: t.String(),
+		responseTimeMs: t.Number(),
+		score: t.Number(),
+		grade: t.Union([
+			t.Literal("A+"),
+			t.Literal("A"),
+			t.Literal("B"),
+			t.Literal("C"),
+			t.Literal("D"),
+			t.Literal("F"),
+		]),
+		verdict: t.Union([
+			t.Literal("excellent"),
+			t.Literal("good"),
+			t.Literal("fair"),
+			t.Literal("poor"),
+			t.Literal("critical"),
+		]),
+		verdictLabel: t.String(),
+		breakdown: t.Object({
+			authentication: t.Object({
+				score: t.Number(),
+				weight: t.Number(),
+				status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+				summary: t.String(),
+			}),
+			blocklist: t.Object({
+				score: t.Number(),
+				weight: t.Number(),
+				status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+				summary: t.String(),
+			}),
+			domainAge: t.Object({
+				score: t.Number(),
+				weight: t.Number(),
+				status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+				summary: t.String(),
+			}),
+			dnsHealth: t.Object({
+				score: t.Number(),
+				weight: t.Number(),
+				status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+				summary: t.String(),
+			}),
+		}),
+		details: t.Object({
+			authentication: t.Object({
+				spf: t.Object({
+					exists: t.Boolean(),
+					record: t.Optional(t.String()),
+					qualifier: t.Optional(t.String()),
+					status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+					detail: t.String(),
+				}),
+				dkim: t.Object({
+					detected: t.Boolean(),
+					selector: t.Optional(t.String()),
+					record: t.Optional(t.String()),
+					status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+					detail: t.String(),
+				}),
+				dmarc: t.Object({
+					exists: t.Boolean(),
+					record: t.Optional(t.String()),
+					policy: t.Optional(t.String()),
+					pct: t.Optional(t.Number()),
+					status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+					detail: t.String(),
+				}),
+			}),
+			blocklist: t.Object({
+				cleanCount: t.Number(),
+				listedCount: t.Number(),
+				totalChecked: t.Number(),
+				listings: t.Array(
+					t.Object({
+						zone: t.String(),
+						name: t.String(),
+						listed: t.Boolean(),
+						returnCode: t.Optional(t.String()),
+					}),
+				),
+			}),
+			domainAge: t.Object({
+				ageDays: t.Optional(t.Number()),
+				createdDate: t.Optional(t.String()),
+				expiryDate: t.Optional(t.String()),
+				registrar: t.Optional(t.String()),
+				tier: t.Union([
+					t.Literal("mature"),
+					t.Literal("established"),
+					t.Literal("warming"),
+					t.Literal("young"),
+					t.Literal("new"),
+					t.Literal("unknown"),
+				]),
+				detail: t.String(),
+			}),
+			dnsHealth: t.Object({
+				mxRecords: t.Array(
+					t.Object({
+						exchange: t.String(),
+						priority: t.Number(),
+					}),
+				),
+				aRecords: t.Array(t.String()),
+				nsRecords: t.Array(t.String()),
+				hasPtr: t.Boolean(),
+				sslValid: t.Boolean(),
+				sslDaysRemaining: t.Optional(t.Number()),
+				sslIssuer: t.Optional(t.String()),
+			}),
+		}),
+		checks: t.Array(
+			t.Object({
+				id: t.String(),
+				category: t.Union([
+					t.Literal("authentication"),
+					t.Literal("blocklist"),
+					t.Literal("domain_age"),
+					t.Literal("dns_health"),
+				]),
+				label: t.String(),
+				status: t.Union([
+					t.Literal("pass"),
+					t.Literal("warn"),
+					t.Literal("fail"),
+					t.Literal("info"),
+				]),
+				detail: t.String(),
+				record: t.Optional(t.String()),
+			}),
+		),
+		recommendations: t.Array(t.String()),
+	});
+
 	export const errorResponse = t.Object({
 		message: t.String(),
 		why: t.Optional(t.String()),
@@ -1065,4 +1220,6 @@ export namespace ToolsModel {
 	export type LookalikeWatchBody = typeof lookalikeWatchBody.static;
 	export type LookalikeWatchResponse = typeof lookalikeWatchResponse.static;
 	export type BimiCheckResponse = typeof bimiCheckResponse.static;
+	export type DomainReputationBody = typeof domainReputationBody.static;
+	export type DomainReputationResponse = typeof domainReputationResponse.static;
 }
