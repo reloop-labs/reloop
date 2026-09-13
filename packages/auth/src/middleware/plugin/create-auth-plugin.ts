@@ -1,3 +1,4 @@
+import { resolveInternalBaseUrl } from "@reloop/auth/middleware/internal-base-url";
 import { sanitizeInternalSecret } from "@reloop/auth/middleware/internal-secret";
 import { resolveAuthRedis } from "@reloop/auth/middleware/redis/resolve-auth-redis";
 import { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
@@ -17,7 +18,10 @@ import { Elysia } from "elysia";
 const UNAUTH = { message: "Authentication required" };
 
 export function createAuthPlugin(config: AuthMiddlewareConfig) {
-	const baseUrl = config.baseUrl;
+	const baseUrl = resolveInternalBaseUrl(
+		config.baseUrl,
+		config.internalBaseUrl,
+	);
 	const redis = resolveAuthRedis(config);
 	const ttl = config.ttl ?? DEFAULT_SESSION_CACHE_TTL_SECONDS;
 	// Drop known-insecure defaults in production so internal auth cannot be spoofed.

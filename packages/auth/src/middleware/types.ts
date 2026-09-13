@@ -36,6 +36,8 @@ export type AuthRedis = {
 export type AuthMiddlewareConfig = {
 	baseUrl: string;
 
+	internalBaseUrl?: string;
+
 	redisUrl?: string;
 
 	redis?: AuthRedis;

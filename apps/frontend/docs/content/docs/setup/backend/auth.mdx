@@ -74,6 +74,40 @@ GITHUB_CLIENT_SECRET=
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event bus |
 | `DEFAULT_OTP` | No | `888888` | Dev OTP bypass |
 | `DISABLE_SIGNUP` | No | `false` | Set `true` after creating an admin |
+| `AUTH_INTERNAL_BASE_URL` | No | `BASE_URL` | Origin the services use to validate sessions with each other |
+
+
+## Session validation between services
+
+Every backend validates a session by calling `GET /api/auth/v1/get-session` on
+the auth service. It uses `BASE_URL` for that, which is your public origin — so
+the call leaves the container, goes back through the reverse proxy and comes
+in again.
+
+That round trip fails in some proxy setups: TLS terminates at the proxy, the
+public hostname does not resolve from inside the container network, or the
+certificate is not trusted internally. `fetch` throws, the session cannot be
+read, and **protected routes answer `401` straight after a successful login**
+while the login itself worked.
+
+Point the services at the auth container instead:
+
+```bash
+AUTH_INTERNAL_BASE_URL=http://auth:8000
+```
+
+Then restart the backends. Leave it empty and everything keeps using
+`BASE_URL`, so existing deployments are unaffected.
+
+> [!NOTE]
+> The path is appended exactly as it is today, so `http://auth:8000` becomes
+> `http://auth:8000/api/auth/v1/get-session` — the same path the proxy forwards
+> to that container. Give the origin only: no trailing path, no trailing slash
+> needed.
+
+This changes only service-to-service validation. `BASE_URL` stays the public
+origin and is still what invite links and OAuth callbacks use, so it must
+remain correct.
 
 
 ## Commands
