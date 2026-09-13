@@ -15,12 +15,13 @@ export const exportEmailRoute = new Elysia()
 	)
 	.post(
 		"/export/email",
-		async ({ body, organizationId, userId }) => {
-			return await requestExportEmailController({
+		async ({ body, organizationId, userId, status }) => {
+			const result = await requestExportEmailController({
 				organizationId: organizationId as string,
 				userId: userId as string,
 				query: body,
 			});
+			return status(202, result);
 		},
 		{
 			auth: true,
