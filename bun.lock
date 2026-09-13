@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -167,6 +168,7 @@
     "apps/backend/contacts": {
       "name": "be-contacts",
       "dependencies": {
+        "@aws-sdk/client-s3": "catalog:backend",
         "@elysia/opentelemetry": "catalog:backend",
         "@elysiajs/cors": "catalog:backend",
         "@elysiajs/cron": "catalog:backend",
