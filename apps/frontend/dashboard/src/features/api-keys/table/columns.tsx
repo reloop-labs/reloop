@@ -122,7 +122,12 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 	},
 	{
 		id: "name",
-		header: () => <span className="text-xs">Name</span>,
+		header: () => (
+			<div className="flex items-center gap-1">
+				<Icon name="key-new" className="h-3 w-3" />
+				<span className="text-xs">Name</span>
+			</div>
+		),
 		cell: ({ row, table }) => {
 			const apiKey = row.original;
 			const displayName =
@@ -131,6 +136,7 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 			const isEditing = meta?.editingApiKeyId === apiKey.id;
 			return (
 				<div className="flex min-w-0 items-center gap-2">
+					<Icon name="key-new" className="h-4 w-4 shrink-0 text-text-sub-600" />
 					<Link
 						href={`/api-keys/${apiKey.id}`}
 						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
@@ -153,7 +159,7 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 		id: "prefix",
 		header: () => (
 			<div className="flex items-center gap-1">
-				<Icon name="key-new" className="h-3 w-3" />
+				<Icon name="hash" className="h-3 w-3" />
 				<span className="text-xs">Prefix</span>
 			</div>
 		),

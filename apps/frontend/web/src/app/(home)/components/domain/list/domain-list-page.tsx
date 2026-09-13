@@ -260,21 +260,9 @@ export function DomainListPage({
 	return (
 		<MotionStage className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
 			<MotionItem className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
-				<div>
-					<div className="flex items-center gap-2.5">
-						<Icon
-							name="globe"
-							className="h-6 w-6 shrink-0 text-text-strong-950"
-						/>
-						<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-							Domains
-						</h1>
-					</div>
-					<p className="mt-1 text-sm text-text-sub-600">
-						Add and verify custom domains to send emails with maximum
-						deliverability.
-					</p>
-				</div>
+				<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+					Domains
+				</h1>
 
 				<div className="flex shrink-0 items-center gap-2">
 					<Button.Root
