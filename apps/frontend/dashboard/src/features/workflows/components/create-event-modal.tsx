@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -340,21 +340,10 @@ export function CreateEventModal({
 				</div>
 
 				<div className="space-y-2">
-					<div className="flex items-center justify-between">
-						<Label.Root className="font-medium text-text-strong-950 text-xs">
-							Properties
-							<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
-						</Label.Root>
-						<button
-							type="button"
-							onClick={handleAddProperty}
-							disabled={status !== "idle"}
-							className="inline-flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 font-medium text-text-strong-950 text-xs hover:bg-bg-weak-50 disabled:opacity-50 dark:border-stroke-soft-100/40"
-						>
-							<Icon name="plus" className="h-3 w-3" />
-							Add property
-						</button>
-					</div>
+					<Label.Root className="font-medium text-text-strong-950 text-xs">
+						Properties
+						<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
+					</Label.Root>
 
 					{properties.length === 0 ? (
 						<p className="rounded-lg border border-stroke-soft-200 border-dashed bg-bg-weak-50/30 px-3 py-3 text-center text-text-sub-600 text-xs dark:border-stroke-soft-100/40">
@@ -366,63 +355,96 @@ export function CreateEventModal({
 							{properties.map((p) => (
 								<div
 									key={p.id}
-									className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2 dark:border-stroke-soft-100/40"
+									className="flex items-center gap-2 rounded-xl bg-bg-weak-50 p-2 dark:bg-bg-weak-50/40"
 								>
-									<div className="flex-1">
-										<Input.Root size="medium" className="rounded-lg">
-											<Input.Wrapper>
-												<Input.Input
-													placeholder="plan"
-													value={p.name}
-													onChange={(e) =>
-														handleUpdateProperty(p.id, {
-															name: e.target.value,
-														})
-													}
+									<div className="flex flex-1 items-center gap-2 rounded-lg border border-stroke-soft-200/80 bg-bg-white-0 py-1 pr-1.5 pl-3 shadow-2xs transition-colors focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+										<input
+											placeholder="plan"
+											value={p.name}
+											onChange={(e) =>
+												handleUpdateProperty(p.id, {
+													name: e.target.value,
+												})
+											}
+											disabled={status !== "idle"}
+											className="h-7 min-w-0 flex-1 bg-transparent font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 disabled:opacity-50"
+										/>
+										<Dropdown.Root>
+											<Dropdown.Trigger asChild>
+												<button
+													type="button"
 													disabled={status !== "idle"}
-													className="font-mono text-xs"
-												/>
-											</Input.Wrapper>
-										</Input.Root>
-									</div>
-									<div className="flex shrink-0 items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-stroke-soft-100/40">
-										{PROPERTY_TYPE_OPTIONS.map((opt) => (
-											<button
-												key={opt.value}
-												type="button"
-												disabled={status !== "idle"}
-												onClick={() =>
-													handleUpdateProperty(p.id, {
-														propertyType: opt.value,
-													})
-												}
-												className={cn(
-													"rounded-md px-2.5 py-1 font-medium text-xs transition-colors",
-													p.propertyType === opt.value
-														? "bg-bg-white-0 text-text-strong-950 shadow-sm dark:bg-bg-white-0/10"
-														: "text-text-sub-600 hover:text-text-strong-950",
-												)}
+													className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border border-stroke-soft-200/70 bg-bg-weak-50 px-2 font-medium text-text-strong-950 text-xs transition-colors hover:bg-bg-soft-200 focus:outline-none dark:border-stroke-soft-100/40 dark:bg-white/10 dark:hover:bg-white/15"
+												>
+													<span>
+														{PROPERTY_TYPE_OPTIONS.find(
+															(opt) => opt.value === p.propertyType,
+														)?.label ?? "String"}
+													</span>
+													<Icon
+														name="chevron-down"
+														className="h-3 w-3 text-text-sub-600"
+													/>
+												</button>
+											</Dropdown.Trigger>
+											<Dropdown.Content
+												align="end"
+												className="w-32 rounded-xl p-1 shadow-regular-md"
 											>
-												{opt.label}
-											</button>
-										))}
+												{PROPERTY_TYPE_OPTIONS.map((opt) => (
+													<Dropdown.Item
+														key={opt.value}
+														onClick={() =>
+															handleUpdateProperty(p.id, {
+																propertyType: opt.value,
+															})
+														}
+														className="flex items-center justify-between py-1.5 text-xs"
+													>
+														<span>{opt.label}</span>
+														{p.propertyType === opt.value ? (
+															<Icon
+																name="check"
+																className="h-3.5 w-3.5 text-text-strong-950"
+															/>
+														) : null}
+													</Dropdown.Item>
+												))}
+											</Dropdown.Content>
+										</Dropdown.Root>
 									</div>
 									<button
 										type="button"
 										onClick={() => handleRemoveProperty(p.id)}
 										disabled={status !== "idle"}
-										className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-50"
+										className="flex size-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-error-lighter hover:text-error-base disabled:opacity-50 dark:hover:bg-error-base/10 dark:hover:text-error-base"
 										aria-label="Remove property"
+										title="Remove property"
 									>
-										<Icon name="close" className="h-3.5 w-3.5" />
+										<Icon name="trash" className="size-4" />
 									</button>
 								</div>
 							))}
-							<p className="text-[11px] text-text-sub-600">
-								Types are enforced when tracking. No default values — missing
-								properties stay empty unless required.
-							</p>
 						</div>
+					)}
+
+					<div className="pt-0.5">
+						<button
+							type="button"
+							onClick={handleAddProperty}
+							disabled={status !== "idle"}
+							className="inline-flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 font-medium text-text-strong-950 text-xs hover:bg-bg-weak-50 disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5 dark:hover:bg-bg-white-0/10"
+						>
+							<Icon name="plus" className="h-3 w-3" />
+							Add property
+						</button>
+					</div>
+
+					{properties.length > 0 && (
+						<p className="text-[11px] text-text-sub-600">
+							Types are enforced when tracking. No default values — missing
+							properties stay empty unless required.
+						</p>
 					)}
 				</div>
 			</div>
