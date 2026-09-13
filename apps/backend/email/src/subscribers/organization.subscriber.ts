@@ -1,4 +1,5 @@
 import { BusEvent, bus } from "@reloop/bus";
+import { appName } from "@reloop/email/brand";
 import { emailConfig } from "@reloop/email/email.config";
 import InviteEmail from "@reloop/email/emails/invite";
 import OrgJoinedEmail from "@reloop/email/emails/org-joined";
@@ -39,9 +40,9 @@ export async function initOrgSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `${payload.inviterName} via Reloop <invites@${requireReloopSenderDomain()}>`,
+					from: `${payload.inviterName} via ${appName} <invites@${requireReloopSenderDomain()}>`,
 					to: payload.email,
-					subject: `Join ${payload.organizationName} on Reloop`,
+					subject: `Join ${payload.organizationName} on ${appName}`,
 					html,
 					text,
 				});
@@ -88,7 +89,7 @@ export async function initOrgSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `${payload.orgName} via Reloop <org@${requireReloopSenderDomain()}>`,
+					from: `${payload.orgName} via ${appName} <org@${requireReloopSenderDomain()}>`,
 					to: payload.userEmail,
 					subject: `You're now part of the ${payload.orgName} team!`,
 					html,

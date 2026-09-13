@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -89,7 +90,7 @@ export const ApiKeyCreatedEmail = ({
 	return (
 		<Html>
 			<Head />
-			<Preview>A new API key was created on your Reloop account.</Preview>
+			<Preview>A new API key was created on your {appName} account.</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
@@ -111,8 +112,8 @@ export const ApiKeyCreatedEmail = ({
 
 						<Text className={cls.bodyText}>
 							A new API key named <strong>&ldquo;{keyName}&rdquo;</strong> was
-							just created on your Reloop account. If this was you, no action is
-							needed.
+							just created on your {appName} account. If this was you, no action
+							is needed.
 						</Text>
 
 						{/* Key Prefix Display */}

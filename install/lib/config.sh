@@ -51,7 +51,7 @@ load_existing_values() {
 		RELOOP_HTTPS POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD REDIS_PASSWORD \
 		BETTER_AUTH_SECRET RELOOP_INTERNAL_SECRET TRACKING_SECRET PREFERENCES_SECRET \
 		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
-		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS; do
+		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS APP_NAME; do
 		local value
 		value="$(env_get "$key" "$ENV_FILE" || true)"
 		if [ -n "$value" ]; then
@@ -190,6 +190,7 @@ collect_configuration() {
 	preserved_or_new WEBHOOK_ENCRYPTION_KEY gen_hex 32
 	preserved_or_new DEFAULT_OTP gen_digits 6
 	DNS_RESOLVERS="${PRESERVED_DNS_RESOLVERS:-8.8.8.8,8.8.4.4}"
+	APP_NAME="${PRESERVED_APP_NAME:-Reloop}"
 }
 
 write_env_file() {
@@ -216,6 +217,13 @@ RELOOP_TRACKING_SITE_ADDRESS=$RELOOP_TRACKING_SITE_ADDRESS
 RELOOP_ACME_EMAIL=$RELOOP_ADMIN_EMAIL
 
 NODE_ENV=production
+
+# Name used in system email — the sender name, the subjects and the message
+# bodies. Set it to your own product name to brand the mail your users
+# receive. The logo is served from BASE_URL, so replace that asset too if
+# you rebrand.
+APP_NAME=$APP_NAME
+
 BASE_URL=$RELOOP_SCHEME://$RELOOP_DOMAIN
 HOST_DOMAIN=$RELOOP_DOMAIN
 TRACKING_DOMAIN=$RELOOP_TRACKING_HOST

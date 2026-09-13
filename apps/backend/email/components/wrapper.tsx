@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import type * as React from "react";
 import { Img, Link, Section } from "react-email";
 
@@ -23,7 +24,7 @@ export const Wrapper = ({
 						src={`${baseUrl}/web-app-manifest-192x192.png`}
 						width="52"
 						height="52"
-						alt="Reloop Logo"
+						alt={`${appName} Logo`}
 						className={isDark ? "invert" : "-ml-2.5"}
 					/>
 				</Link>

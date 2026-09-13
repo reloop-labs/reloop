@@ -1,4 +1,5 @@
 import { BusEvent, bus } from "@reloop/bus";
+import { appName } from "@reloop/email/brand";
 import { emailConfig } from "@reloop/email/email.config";
 import OtpEmail from "@reloop/email/emails/otp";
 import SigninDetectedEmail from "@reloop/email/emails/signin-detected";
@@ -39,9 +40,9 @@ export async function initAuthSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <onboarding@${requireReloopSenderDomain()}>`,
+					from: `${appName} <onboarding@${requireReloopSenderDomain()}>`,
 					to: payload.email,
-					subject: "Welcome to Reloop!",
+					subject: `Welcome to ${appName}!`,
 					html,
 					text,
 				});
@@ -87,10 +88,10 @@ export async function initAuthSubscribers() {
 						? "Your password reset code"
 						: payload.type === "email-verification"
 							? "Your email verification code"
-							: "Your Reloop verification code";
+							: `Your ${appName} verification code`;
 
 				await sendEmail({
-					from: `Reloop <auth@${requireReloopSenderDomain()}>`,
+					from: `${appName} <auth@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject,
 					html,
@@ -152,7 +153,7 @@ export async function initAuthSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Security Alert <security@${requireReloopSenderDomain()}>`,
+					from: `${appName} Security <security@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: "New sign-in detected on your account",
 					html,

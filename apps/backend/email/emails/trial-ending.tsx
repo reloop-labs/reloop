@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -85,7 +86,7 @@ export const TrialEndingEmail = ({
 		<Html>
 			<Head />
 			<Preview>
-				{`Your Reloop trial ends in ${daysLeft} day${daysLeft !== 1 ? "s" : ""} — upgrade to keep access.`}
+				{`Your ${appName} trial ends in ${daysLeft} day${daysLeft !== 1 ? "s" : ""} — upgrade to keep access.`}
 			</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
@@ -174,7 +175,7 @@ export const TrialEndingEmail = ({
 										<Text className={cls.rowTitle}>Custom Domains</Text>
 										<Text className={cls.rowDesc}>
 											Send from your own verified domain instead of shared
-											Reloop infrastructure.
+											{appName} infrastructure.
 										</Text>
 									</td>
 								</tr>
