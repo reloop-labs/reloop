@@ -22,7 +22,7 @@ export async function initTestEmailSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, to: payload.to, subject: payload.subject },
 					message: "Failed to send test email in subscriber",
 				});
 			}

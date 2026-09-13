@@ -62,7 +62,7 @@ export async function initApiKeySubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, apiKeyId: payload.api_key_id },
 					message: "Failed to send API key created email",
 				});
 			}

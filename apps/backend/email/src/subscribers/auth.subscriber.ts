@@ -47,7 +47,7 @@ export async function initAuthSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, email: payload.email },
 					message: "Failed to send welcome email",
 				});
 			}
@@ -60,19 +60,18 @@ export async function initAuthSubscribers() {
 		BusEvent.OTP_REQUESTED,
 		async (payload) => {
 			// Dedup OTP by email and OTP value to avoid double sends for the same request
-			const dedupKey = `email:otp:${payload.email}:${payload.otp}`;
+			const dedupKey = `email:otp:${payload.email}:${payload.type}`;
 			try {
-				const alreadySent = await redis.get(dedupKey);
-				if (alreadySent) {
+				const alreadySent = await redis.get<string | number>(dedupKey);
+				if (alreadySent !== undefined && String(alreadySent) === payload.otp) {
 					log.warn(
 						"server",
 						`Duplicate OTP_REQUESTED for ${payload.email}, skipping`,
 					);
 					return;
 				}
-				await redis.set(dedupKey, "1", 60);
+				await redis.set(dedupKey, payload.otp, 60);
 
-				console.log(payload, "OTP PAYLOAD");
 				const html = await render(
 					React.createElement(OtpEmail, {
 						otp: payload.otp,
@@ -99,7 +98,7 @@ export async function initAuthSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, email: payload.email, type: payload.type },
 					message: "Failed to send OTP email",
 				});
 			}
@@ -161,7 +160,7 @@ export async function initAuthSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, email: payload.email },
 					message: "Failed to send signin detected email",
 				});
 			}

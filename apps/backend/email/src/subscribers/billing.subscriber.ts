@@ -39,7 +39,7 @@ export async function initBillingSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, email: payload.email, planName: payload.planName },
 					message: "Failed to send payment failed email",
 				});
 			}
@@ -75,7 +75,11 @@ export async function initBillingSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{
+						error,
+						email: payload.email,
+						resourceType: payload.resourceType,
+					},
 					message: "Failed to send quota warning email",
 				});
 			}
@@ -111,7 +115,7 @@ export async function initBillingSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, email: payload.email, daysLeft: payload.daysLeft },
 					message: "Failed to send trial ending email",
 				});
 			}

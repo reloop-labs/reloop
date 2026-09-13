@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import { apiKey } from "@better-auth/api-key";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
@@ -282,17 +283,24 @@ export const auth = betterAuth({
 			expiresIn: 60 * 15,
 			allowedAttempts: 3,
 			async sendVerificationOTP({ email, otp, type }) {
-				log.info("server", `Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
+				log.info("server", `Sending OTP (${type}) to: ${email}`);
 				if (
 					authServerConfig.DEFAULT_OTP &&
 					authServerConfig.NODE_ENV !== "development"
 				)
 					return;
+				const otpRequestId = createHmac(
+					"sha256",
+					authServerConfig.BETTER_AUTH_SECRET,
+				)
+					.update(otp)
+					.digest("hex")
+					.slice(0, 32);
 				try {
 					await bus.publish(
 						BusEvent.OTP_REQUESTED,
 						{ email, otp, type },
-						{ msgId: `otp_requested:${email}:${otp}` },
+						{ msgId: `otp_requested:${email}:${otpRequestId}` },
 					);
 					log.info("server", `OTP bus event published for ${email} (${type})`);
 				} catch (error) {

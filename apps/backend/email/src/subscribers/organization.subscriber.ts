@@ -47,7 +47,11 @@ export async function initOrgSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{
+						error,
+						email: payload.email,
+						organizationName: payload.organizationName,
+					},
 					message: "Failed to send invite email",
 				});
 			}
@@ -92,7 +96,7 @@ export async function initOrgSubscribers() {
 				});
 			} catch (error) {
 				log.error({
-					...{ error, payload },
+					...{ error, userEmail: payload.userEmail, orgName: payload.orgName },
 					message: "Failed to send org joined email",
 				});
 			}

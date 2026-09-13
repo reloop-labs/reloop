@@ -47,7 +47,7 @@ export async function initExportSubscribers() {
 			} catch (error) {
 				await redis.delete(dedupKey).catch(() => {});
 				log.error({
-					...{ error, payload },
+					...{ error, exportId: payload.exportId, to: payload.to },
 					message: "Failed to send export-ready email",
 				});
 			}

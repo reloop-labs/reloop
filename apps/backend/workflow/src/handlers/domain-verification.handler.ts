@@ -75,6 +75,17 @@ export async function processDomainVerification({
 		with: {
 			dnsRecords: {
 				where: isNull(schema.domainDnsRecord.deletedAt),
+				columns: {
+					id: true,
+					recordType: true,
+					recordTypeName: true,
+					name: true,
+					value: true,
+					fqdn: true,
+					priority: true,
+					purpose: true,
+					status: true,
+				},
 			},
 		},
 	});
@@ -91,7 +102,12 @@ export async function processDomainVerification({
 	// (e.g. pending/failed → verified), never verified → verified on re-checks.
 	const wasAlreadyVerified = domainWithRecords.systemVerified;
 	const previousStatus = domainWithRecords.status;
-	log.info({ message: "Fetched DNS records from database", domainId, records });
+	log.info({
+		message: "Fetched DNS records from database",
+		domainId,
+		recordCount: records.length,
+		recordTypeNames: records.map((r) => r.recordTypeName),
+	});
 
 	// Find mandatory DKIM verification record
 	const dkimRecord = records.find(
