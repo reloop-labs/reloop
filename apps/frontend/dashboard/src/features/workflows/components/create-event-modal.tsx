@@ -20,7 +20,7 @@ import {
 	type AutomationModalStatus,
 } from "./automation-modal-frame";
 
-const EMPTY_NAME_ERROR = "Please enter an event name.";
+const EMPTY_TRIGGER_ERROR = "Please enter a trigger key.";
 
 type PropertyDraft = {
 	id: string;
@@ -43,7 +43,7 @@ const slugifySuffix = (value: string) =>
 	value
 		.trim()
 		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, ".")
+		.replace(/[^a-z0-9_.-]+/g, ".")
 		.replace(/^\.+|\.+$/g, "");
 
 const isValidPropertyName = (name: string) =>
@@ -68,12 +68,11 @@ export function CreateEventModal({
 	onUpdated,
 }: CreateEventModalProps) {
 	const queryClient = useQueryClient();
-	const [name, setName] = useState("");
 	const [keySuffix, setKeySuffix] = useState("");
 	const [properties, setProperties] = useState<PropertyDraft[]>([]);
 	const [status, setStatus] = useState<AutomationModalStatus>("idle");
-	const nameField = useFieldError();
-	const clearNameError = nameField.clear;
+	const triggerField = useFieldError();
+	const clearTriggerError = triggerField.clear;
 
 	const handleClose = () => {
 		if (status !== "idle") return;
@@ -117,9 +116,10 @@ export function CreateEventModal({
 
 	const handleSubmit = async () => {
 		if (status !== "idle") return;
-		const trimmed = name.trim();
-		if (!trimmed) {
-			nameField.show(EMPTY_NAME_ERROR);
+		const fullKey = buildKey();
+		const rawSuffix = keySuffix.trim();
+		if (!rawSuffix || !fullKey) {
+			triggerField.show(EMPTY_TRIGGER_ERROR);
 			return;
 		}
 
@@ -144,7 +144,7 @@ export function CreateEventModal({
 			seen.add(n);
 		}
 
-		nameField.clear();
+		triggerField.clear();
 		setStatus("busy");
 		try {
 			const normalizedProps = properties.map((p) => ({
@@ -154,7 +154,7 @@ export function CreateEventModal({
 
 			if (event) {
 				const updated = await updateCustomEvent(event.id, {
-					name: trimmed,
+					name: rawSuffix,
 					properties: normalizedProps,
 				});
 				await queryClient.invalidateQueries({
@@ -167,15 +167,15 @@ export function CreateEventModal({
 				setTimeout(() => {
 					onUpdated?.(updated);
 					onOpenChange(false);
-					nameField.clear();
+					triggerField.clear();
 					setStatus("idle");
 				}, 450);
 				return;
 			}
 
 			const created = await createCustomEvent({
-				name: trimmed,
-				key: buildKey(),
+				name: rawSuffix,
+				key: fullKey,
 				properties: normalizedProps.length > 0 ? normalizedProps : undefined,
 			});
 			await queryClient.invalidateQueries({
@@ -185,10 +185,9 @@ export function CreateEventModal({
 			setTimeout(() => {
 				onCreated?.(created);
 				onOpenChange(false);
-				setName("");
 				setKeySuffix("");
 				setProperties([]);
-				nameField.clear();
+				triggerField.clear();
 				setStatus("idle");
 			}, 450);
 		} catch (err) {
@@ -198,8 +197,8 @@ export function CreateEventModal({
 					? err.message
 					: isEdit
 						? "Failed to update trigger"
-						: "Failed to create event";
-			nameField.show(message);
+						: "Failed to create trigger";
+			triggerField.show(message);
 			toast.error(message);
 		}
 	};
@@ -211,7 +210,7 @@ export function CreateEventModal({
 			if (open && status === "idle") void handleSubmit();
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, status, name, keySuffix, properties],
+		[open, status, keySuffix, properties],
 	);
 
 	useHotkeys(
@@ -226,7 +225,6 @@ export function CreateEventModal({
 	useEffect(() => {
 		if (open) {
 			if (event) {
-				setName(event.name);
 				setKeySuffix(suffixFromKey(event.key));
 				setProperties(
 					event.properties.map((p) => ({
@@ -239,24 +237,13 @@ export function CreateEventModal({
 			return;
 		}
 		const timer = setTimeout(() => {
-			setName("");
 			setKeySuffix("");
 			setProperties([]);
-			clearNameError();
+			clearTriggerError();
 			setStatus("idle");
 		}, 300);
 		return () => clearTimeout(timer);
-	}, [open, event, clearNameError]);
-
-	const previewKey = (() => {
-		const k = buildKey();
-		if (k) return k;
-		if (name.trim()) {
-			const slug = slugifySuffix(name.trim());
-			return `${TRIGGER_PREFIX}${slug || "event"}`;
-		}
-		return `${TRIGGER_PREFIX}...`;
-	})();
+	}, [open, event, clearTriggerError]);
 
 	return (
 		<AutomationModalFrame
@@ -273,76 +260,34 @@ export function CreateEventModal({
 			<div className="space-y-4 px-6 pb-7">
 				<div className="space-y-1.5">
 					<Label.Root
-						htmlFor="evt-name"
+						htmlFor="evt-trigger"
 						className="font-medium text-text-strong-950 text-xs"
 					>
-						Name
+						Trigger
 						<Label.Asterisk />
 					</Label.Root>
-					<FieldError
-						field={nameField}
-						hint="Shown on the trigger step. Use something you will recognize."
-					>
-						<Input.Root size="medium" hasError={nameField.hasError}>
+					<FieldError field={triggerField}>
+						<Input.Root size="medium" hasError={triggerField.hasError}>
 							<Input.Wrapper>
 								<Input.Input
-									id="evt-name"
-									{...nameField.controlProps}
-									placeholder="e.g. User signed up"
-									value={name}
+									id="evt-trigger"
+									{...triggerField.controlProps}
+									placeholder="e.g. signup"
+									value={keySuffix}
 									onChange={(e) => {
-										setName(e.target.value);
-										if (nameField.hasError) nameField.clear();
+										setKeySuffix(e.target.value);
+										if (triggerField.hasError) triggerField.clear();
 									}}
-									autoFocus
-									disabled={status !== "idle"}
+									disabled={status !== "idle" || isEdit}
 								/>
 							</Input.Wrapper>
 						</Input.Root>
 					</FieldError>
 				</div>
-				<div className="space-y-1.5">
-					<Label.Root
-						htmlFor="evt-key"
-						className="font-medium text-text-strong-950 text-xs"
-					>
-						Key
-						{isEdit ? null : (
-							<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
-						)}
-					</Label.Root>
-					<div className="flex items-stretch overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/40">
-						<span className="flex items-center bg-bg-weak-50 px-3 font-mono text-sm text-text-sub-600 dark:bg-bg-weak-50/40">
-							{TRIGGER_PREFIX}
-						</span>
-						<input
-							id="evt-key"
-							placeholder="signup"
-							value={keySuffix}
-							onChange={(e) => setKeySuffix(e.target.value)}
-							disabled={status !== "idle" || isEdit}
-							className="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-text-soft-400 disabled:opacity-50"
-						/>
-					</div>
-					<p className="font-mono text-[11px] text-text-sub-600">
-						Full key: {previewKey}
-					</p>
-					<p className="text-[11px] text-text-sub-600">
-						{isEdit
-							? "The key is used when tracking events and cannot be changed."
-							: "Defaults from the name if you leave this blank. Only type after "}
-						{isEdit ? null : (
-							<code className="rounded bg-bg-weak-50 px-1 py-0.5 font-mono text-[11px] dark:bg-bg-weak-50/60">
-								trigger.
-							</code>
-						)}
-					</p>
-				</div>
 
 				<div className="space-y-2">
 					<Label.Root className="font-medium text-text-strong-950 text-xs">
 						Properties
-						<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
 					</Label.Root>
 
 					{properties.length === 0 ? (
@@ -355,9 +300,9 @@ export function CreateEventModal({
 							{properties.map((p) => (
 								<div
 									key={p.id}
-									className="flex items-center gap-2 rounded-xl bg-bg-weak-50 p-2 dark:bg-bg-weak-50/40"
+									className="flex items-center gap-2 rounded-xl bg-bg-weak-50 p-0.5 dark:bg-bg-weak-50/40"
 								>
-									<div className="flex flex-1 items-center gap-2 rounded-lg border border-stroke-soft-200/80 bg-bg-white-0 py-1 pr-1.5 pl-3 shadow-2xs transition-colors focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+									<div className="flex flex-1 items-center gap-2 rounded-[10px] border border-stroke-soft-200/80 bg-bg-white-0 py-1 pr-1.5 pl-3 transition-colors focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 										<input
 											placeholder="plan"
 											value={p.name}
@@ -417,7 +362,7 @@ export function CreateEventModal({
 										type="button"
 										onClick={() => handleRemoveProperty(p.id)}
 										disabled={status !== "idle"}
-										className="flex size-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-error-lighter hover:text-error-base disabled:opacity-50 dark:hover:bg-error-base/10 dark:hover:text-error-base"
+										className="flex size-8 shrink-0 items-center justify-center rounded-[10px] text-text-sub-600 transition-colors hover:bg-error-lighter hover:text-error-base disabled:opacity-50 dark:hover:bg-error-base/10 dark:hover:text-error-base"
 										aria-label="Remove property"
 										title="Remove property"
 									>
@@ -439,13 +384,6 @@ export function CreateEventModal({
 							Add property
 						</button>
 					</div>
-
-					{properties.length > 0 && (
-						<p className="text-[11px] text-text-sub-600">
-							Types are enforced when tracking. No default values — missing
-							properties stay empty unless required.
-						</p>
-					)}
 				</div>
 			</div>
 		</AutomationModalFrame>
