@@ -1,4 +1,4 @@
-import { resolveTxt } from "node:dns/promises";
+import { resolver } from "@reloop/dns/resolver";
 import { useLogger } from "evlog/elysia";
 
 export interface DCSettings {
@@ -93,7 +93,7 @@ export async function resolveDCHost(
 	rootDomain: string,
 ): Promise<string | null> {
 	try {
-		const records = await resolveTxt(`_domainconnect.${rootDomain}`);
+		const records = await resolver.resolveTxt(`_domainconnect.${rootDomain}`);
 		const flat = records.flat();
 		return flat[0] || null;
 	} catch {

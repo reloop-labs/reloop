@@ -6,12 +6,14 @@ import {
 } from "@reloop/domain/utils/domain-connect-discovery";
 
 // Mock dns resolveTxt for testing resolveDCHost
-mock.module("node:dns/promises", () => ({
-	resolveTxt: async (hostname: string) => {
-		if (hostname === "_domainconnect.example.com") {
-			return [["api.domainconnect.godaddy.com"]];
-		}
-		throw new Error("DNS lookup failed");
+mock.module("@reloop/dns/resolver", () => ({
+	resolver: {
+		resolveTxt: async (hostname: string) => {
+			if (hostname === "_domainconnect.example.com") {
+				return [["api.domainconnect.godaddy.com"]];
+			}
+			throw new Error("DNS lookup failed");
+		},
 	},
 }));
 

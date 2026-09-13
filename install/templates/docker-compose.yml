@@ -20,6 +20,9 @@ x-backend: &backend
   env_file:
     - .env
   depends_on: *infra-ready
+  dns:
+    - 1.1.1.1
+    - 8.8.8.8
   networks:
     - reloop
   <<: *logging

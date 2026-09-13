@@ -265,6 +265,7 @@
         "@reloop/cache": "workspace:*",
         "@reloop/code-samples": "workspace:*",
         "@reloop/db": "workspace:*",
+        "@reloop/dns": "workspace:*",
         "@reloop/webhook-events": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",
@@ -657,6 +658,7 @@
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
+        "@reloop/dns": "workspace:*",
         "@reloop/webhook-delivery": "workspace:*",
         "@reloop/webhook-events": "workspace:*",
         "better-auth": "catalog:",
@@ -1031,6 +1033,15 @@
         "dotenv-cli": "catalog:db",
         "drizzle-kit": "catalog:db",
         "shx": "catalog:db",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/dns": {
+      "name": "@reloop/dns",
+      "version": "0.0.1",
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/node": "catalog:",
         "typescript": "catalog:",
       },
     },
@@ -2238,6 +2249,8 @@
     "@reloop/code-samples": ["@reloop/code-samples@workspace:packages/code-samples"],
 
     "@reloop/db": ["@reloop/db@workspace:packages/db"],
+
+    "@reloop/dns": ["@reloop/dns@workspace:packages/dns"],
 
     "@reloop/email-validation": ["@reloop/email-validation@workspace:packages/email-validation"],
 
