@@ -51,7 +51,7 @@ load_existing_values() {
 		RELOOP_HTTPS POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD REDIS_PASSWORD \
 		BETTER_AUTH_SECRET RELOOP_INTERNAL_SECRET TRACKING_SECRET PREFERENCES_SECRET \
 		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
-		S3_BUCKET S3_REGION DEFAULT_OTP; do
+		S3_BUCKET S3_REGION DEFAULT_OTP DISABLE_SIGNUP DISABLE_ORG_CREATION; do
 		local value
 		value="$(env_get "$key" "$ENV_FILE" || true)"
 		if [ -n "$value" ]; then
@@ -189,6 +189,8 @@ collect_configuration() {
 	preserved_or_new PREFERENCES_SECRET gen_secret 48
 	preserved_or_new WEBHOOK_ENCRYPTION_KEY gen_hex 32
 	preserved_or_new DEFAULT_OTP gen_digits 6
+	DISABLE_SIGNUP="${PRESERVED_DISABLE_SIGNUP:-false}"
+	DISABLE_ORG_CREATION="${PRESERVED_DISABLE_ORG_CREATION:-false}"
 }
 
 write_env_file() {
@@ -251,7 +253,15 @@ WEBHOOK_ENCRYPTION_KEY=$WEBHOOK_ENCRYPTION_KEY
 # verified a sending domain, so this fixed code stands in for the first login.
 # Remove it (and restart) as soon as your own domain sends mail.
 DEFAULT_OTP=$DEFAULT_OTP
-DISABLE_SIGNUP=false
+
+# Close registration once your own accounts exist. Blocks every sign-up path —
+# password, email code and social — except addresses holding a pending
+# organization invitation. Existing users keep signing in.
+DISABLE_SIGNUP=$DISABLE_SIGNUP
+
+# Stop anyone creating further organizations. Existing organizations, their
+# members and invitations are unaffected.
+DISABLE_ORG_CREATION=$DISABLE_ORG_CREATION
 
 KUMOMTA_MIN_FREE_SPACE=5%
 KUMOMTA_MIN_FREE_INODES=0

@@ -15,7 +15,7 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 import { log } from "evlog";
 import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
 import {
@@ -25,6 +25,10 @@ import {
 } from "../organization-limits";
 import { ac, orgRoles } from "../permissions";
 import { platformAc, platformRoles } from "../platform-permissions";
+import {
+	isEnvFlagEnabled,
+	REGISTRATION_DISABLED_MESSAGE,
+} from "../registration-controls";
 import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
 import {
 	USER_NAME_PART_MAX_LENGTH,
@@ -50,6 +54,31 @@ function assertUserDisplayNameLength(name: string | undefined) {
 		throw new APIError("BAD_REQUEST", {
 			message: userNamePartMaxLengthMessage("Name", USER_NAME_PART_MAX_LENGTH),
 		});
+	}
+}
+
+async function assertRegistrationAllowed(email: string | undefined) {
+	if (!isEnvFlagEnabled(authServerConfig.DISABLE_SIGNUP)) return;
+
+	const normalized = email?.trim().toLowerCase();
+	if (!normalized) {
+		throw new APIError("FORBIDDEN", { message: REGISTRATION_DISABLED_MESSAGE });
+	}
+
+	const [invited] = await db
+		.select({ id: schema.invitation.id })
+		.from(schema.invitation)
+		.where(
+			and(
+				eq(schema.invitation.email, normalized),
+				eq(schema.invitation.status, "pending"),
+				gt(schema.invitation.expiresAt, new Date()),
+			),
+		)
+		.limit(1);
+
+	if (!invited) {
+		throw new APIError("FORBIDDEN", { message: REGISTRATION_DISABLED_MESSAGE });
 	}
 }
 
@@ -95,6 +124,11 @@ export const auth = betterAuth({
 	databaseHooks: {
 		user: {
 			create: {
+				before: async (user) => {
+					await assertRegistrationAllowed(
+						typeof user.email === "string" ? user.email : undefined,
+					);
+				},
 				// Signup uses the same paths as sign-in (`/sign-in/email-otp`, OAuth
 				// callbacks). Emit welcome from the actual user-create hook so first-time
 				// accounts get WelcomeEmail regardless of which auth path created them.
@@ -232,7 +266,6 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		autoSignIn: true,
-		disableSignUp: authServerConfig.DISABLE_SIGNUP === "true",
 	},
 	socialProviders: {
 		google: {
@@ -322,6 +355,9 @@ export const auth = betterAuth({
 		organization({
 			ac,
 			roles: orgRoles,
+			allowUserToCreateOrganization: !isEnvFlagEnabled(
+				authServerConfig.DISABLE_ORG_CREATION,
+			),
 			additionalFields: {
 				organization: {
 					billingEmail: {
