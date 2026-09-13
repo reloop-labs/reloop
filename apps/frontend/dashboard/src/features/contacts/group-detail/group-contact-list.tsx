@@ -3,7 +3,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
-import { toast } from "sonner";
+import { ContactExportModal } from "#/features/contacts/components/contacts/contact-export-modal";
 import {
 	ContactFilterDropdown,
 	type ContactFilterOption,
@@ -24,6 +24,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [statusFilter, setStatusFilter] = useState<ContactFilterOption>(null);
 	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [exportOpen, setExportOpen] = useState(false);
 
 	const {
 		data,
@@ -45,46 +46,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 			return matchesStatus && matchesSearch;
 		}) || [];
 
-	const handleDownloadCSV = async () => {
-		try {
-			const response = await fetch(
-				`/api/contacts/v1/groups/${groupId}/contacts?limit=10000`,
-				{ credentials: "include" },
-			);
-			const allData = (await response.json()) as {
-				group?: { contacts?: typeof filteredContacts };
-			};
-
-			if (!allData.group?.contacts || allData.group.contacts.length === 0) {
-				toast.error("No contacts to export");
-				return;
-			}
-
-			const headers = ["Email", "Status", "Created At"];
-			const csvRows = allData.group.contacts.map((contact) => [
-				contact.email,
-				contact.status,
-				new Date(contact.createdAt).toISOString(),
-			]);
-
-			const csvContent = [
-				headers.join(","),
-				...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-			].join("\n");
-
-			const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-			const link = document.createElement("a");
-			link.href = URL.createObjectURL(blob);
-			link.download = `group_contacts_${new Date().toISOString().split("T")[0]}.csv`;
-			link.click();
-			URL.revokeObjectURL(link.href);
-
-			toast.success("Contacts exported successfully");
-		} catch (err) {
-			console.error("Failed to download CSV:", err);
-			toast.error("Failed to export contacts");
-		}
-	};
+	const hasContacts = !!data?.group?.contacts && data.group.contacts.length > 0;
 
 	if (error) {
 		return (
@@ -124,8 +86,8 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 					variant="neutral"
 					mode="stroke"
 					size="xsmall"
-					onClick={() => void handleDownloadCSV()}
-					disabled={!data?.group?.contacts || data.group.contacts.length === 0}
+					onClick={() => setExportOpen(true)}
+					disabled={!hasContacts}
 					title="Export CSV"
 				>
 					<Icon name="file-download" className="h-4 w-4" />
@@ -151,6 +113,22 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 						<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 					</span>
 				}
+			/>
+
+			<ContactExportModal
+				open={exportOpen}
+				onOpenChange={setExportOpen}
+				scope={{
+					groupId,
+					groupName: data?.group?.name,
+					search: searchQuery || undefined,
+				}}
+				counts={{
+					total: data?.total ?? 0,
+					subscribed: data?.subscribedContacts ?? 0,
+					unsubscribed: data?.unsubscribedContacts ?? 0,
+				}}
+				defaultStatus={statusFilter ?? "all"}
 			/>
 		</div>
 	);

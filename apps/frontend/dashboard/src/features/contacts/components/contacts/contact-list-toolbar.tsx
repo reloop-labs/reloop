@@ -239,7 +239,8 @@ export function ContactListToolbar({
 											<ActionKbd>E</ActionKbd>
 										</div>
 										<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-											Download all contacts as a CSV file.
+											Download all contacts as a CSV file. We&apos;ll also email
+											you a link valid for 7 days.
 										</p>
 									</div>
 								</div>

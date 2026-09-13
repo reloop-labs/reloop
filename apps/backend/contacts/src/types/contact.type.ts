@@ -14,6 +14,8 @@ export namespace ContactTypes {
 		typeof ContactModel.createContactsBody.static;
 	export type UpdateContactBody = typeof ContactModel.updateContactBody.static;
 	export type ContactQuery = typeof ContactModel.contactQuery.static;
+	export type ContactExportQuery =
+		typeof ContactModel.contactExportQuery.static;
 
 	// Error Types
 	export type ContactNotFound = typeof ContactModel.contactNotFound.static;

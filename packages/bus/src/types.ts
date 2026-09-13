@@ -103,6 +103,20 @@ export interface ContactGroupLifecyclePayload {
 	name: string;
 }
 
+export interface ContactExportReadyPayload {
+	organizationId: string;
+	/** Recipient of the download link (requesting user's email). */
+	to: string;
+	/** Backend export id, for dedup/logging. */
+	exportId: string;
+	/** Signed download URL, expires per token TTL. */
+	downloadUrl: string;
+	totalRows: number;
+	fileName: string;
+	/** ISO timestamp when the link + file expire. */
+	expiresAt: string;
+}
+
 export interface OrganizationCreatedPayload {
 	id: string;
 	name: string;
@@ -418,6 +432,7 @@ export interface EventPayloads {
 	[BusEvent.CONTACT_GROUP_CREATED]: ContactGroupLifecyclePayload;
 	[BusEvent.CONTACT_GROUP_UPDATED]: ContactGroupLifecyclePayload;
 	[BusEvent.CONTACT_GROUP_DELETED]: ContactGroupLifecyclePayload;
+	[BusEvent.CONTACT_EXPORT_READY]: ContactExportReadyPayload;
 	[BusEvent.CONTACT_AUTO_CREATED]: ContactAutoCreatedPayload;
 	[BusEvent.CONTACT_DELIVERABILITY_UPDATED]: ContactDeliverabilityUpdatedPayload;
 	[BusEvent.INBOUND_EMAIL_RECEIVED]: InboundEmailReceivedPayload;
