@@ -82,6 +82,7 @@ describe("getAvailableIdentityTargets", () => {
 		expect(getAvailableIdentityTargets(rows, "b")).toEqual([
 			"firstName",
 			"lastName",
+			"status",
 		]);
 	});
 });

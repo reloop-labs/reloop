@@ -54,7 +54,8 @@ export function CsvPropertyMapping({
 					Property mapping
 				</p>
 				<p className="mt-0.5 text-[11px] text-text-sub-600">
-					Map CSV columns to email, name, or Reloop properties.
+					Map CSV columns to email, name, subscription status, or Reloop
+					properties.
 				</p>
 			</div>
 
