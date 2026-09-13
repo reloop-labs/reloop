@@ -27,7 +27,7 @@ export const inputVariants = tv({
 			// hover
 			"hover:shadow-none",
 			// focus
-			"has-[input:focus]:shadow-button-important-focus has-[input:focus]:before:ring-stroke-strong-950",
+			"has-[input:focus]:shadow-none has-[input:focus]:ring-4 has-[input:focus]:ring-primary-base/10 has-[input:focus]:before:ring-primary-base",
 			// disabled
 			"has-[input:disabled]:shadow-none has-[input:disabled]:before:ring-transparent",
 		],
@@ -115,7 +115,7 @@ export const inputVariants = tv({
 					// base
 					"hover:before:ring-error-base hover:[&:not(&:has(input:focus)):has(>:only-child)]:before:ring-error-base",
 					// focus
-					"has-[input:focus]:shadow-button-error-focus has-[input:focus]:before:ring-error-base",
+					"has-[input:focus]:shadow-none has-[input:focus]:ring-4 has-[input:focus]:ring-error-base/10 has-[input:focus]:before:ring-error-base",
 				],
 			},
 			false: {
@@ -133,7 +133,7 @@ export const inputVariants = tv({
 					// base
 					"hover:before:ring-success-base hover:[&:not(&:has(input:focus)):has(>:only-child)]:before:ring-success-base",
 					// focus
-					"has-[input:focus]:shadow-button-success-focus has-[input:focus]:before:ring-success-base",
+					"has-[input:focus]:shadow-none has-[input:focus]:ring-4 has-[input:focus]:ring-success-base/10 has-[input:focus]:before:ring-success-base",
 				],
 			},
 		},

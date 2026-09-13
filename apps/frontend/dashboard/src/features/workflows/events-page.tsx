@@ -81,6 +81,7 @@ export function EventsPage() {
 
 			<EventsTable
 				events={filtered}
+				allEvents={events}
 				isLoading={isLoading}
 				isTotalEmpty={isTotalEmpty}
 				isFilteredEmpty={isFilteredEmpty}

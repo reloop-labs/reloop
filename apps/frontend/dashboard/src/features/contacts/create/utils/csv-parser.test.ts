@@ -33,8 +33,18 @@ describe("parseCsvContent", () => {
 		).toBe("last_name");
 
 		expect(result.contacts).toEqual([
-			{ email: "alice@example.com", firstName: "Alice", lastName: "Smith" },
-			{ email: "bob@example.com", firstName: "Bob", lastName: "Jones" },
+			{
+				email: "alice@example.com",
+				firstName: "Alice",
+				lastName: "Smith",
+				status: "subscribed",
+			},
+			{
+				email: "bob@example.com",
+				firstName: "Bob",
+				lastName: "Jones",
+				status: "subscribed",
+			},
 		]);
 	});
 
@@ -47,6 +57,7 @@ describe("parseCsvContent", () => {
 		expect(result.contacts[0]).toEqual({
 			email: "jane@acme.com",
 			firstName: "Jane",
+			status: "subscribed",
 			properties: {
 				Company: "Acme Inc",
 				Score: 100,
@@ -77,6 +88,7 @@ describe("parseCsvContent", () => {
 		expect(result.contacts[0]).toEqual({
 			email: "charlie@test.org",
 			firstName: "Charlie, Jr.",
+			status: "subscribed",
 		});
 	});
 
@@ -115,6 +127,7 @@ describe("unified mapping rows → contacts", () => {
 		expect(built.contacts[0]).toEqual({
 			email: "alice@example.com",
 			firstName: "Alice",
+			status: "subscribed",
 			properties: {
 				company_name: "Acme",
 				job_title: "Engineer",
@@ -153,7 +166,69 @@ describe("unified mapping rows → contacts", () => {
 		expect(built.contacts[0]).toEqual({
 			email: "alice@example.com",
 			firstName: "Alice",
+			status: "subscribed",
 			properties: { company: "Acme" },
 		});
+	});
+});
+
+describe("subscription status (Resend dialect)", () => {
+	it("maps Resend unsubscribed boolean to status and skips id/created_at", () => {
+		const csv =
+			"id,created_at,first_name,last_name,email,unsubscribed\nfad4dddb-8b88-4720-80be-6f8441dff647,2026-05-31 08:19:35.263642+00,,,gogddo@gmail.com,true\nfb2be896-8aca-4179-8b7b-cdf18ab1b076,2026-07-29 14:59:23.402266+00,,,sdf@asf.fg,false";
+		const result = parseCsvContent(csv);
+
+		expect(result.validCount).toBe(2);
+		expect(
+			result.mappings.find((m) => m.csvHeader === "unsubscribed")?.target,
+		).toBe("status");
+		expect(result.mappings.find((m) => m.csvHeader === "id")?.target).toBe(
+			"skip",
+		);
+		expect(
+			result.mappings.find((m) => m.csvHeader === "created_at")?.target,
+		).toBe("skip");
+
+		expect(result.contacts).toEqual([
+			{ email: "gogddo@gmail.com", status: "unsubscribed" },
+			{ email: "sdf@asf.fg", status: "subscribed" },
+		]);
+		// Reserved fields never leak into custom properties
+		expect(result.contacts[0]?.properties).toBeUndefined();
+	});
+
+	it("parses explicit status column with synonyms", () => {
+		const headers = ["email", "status"];
+		const rawRows = [
+			["a@test.com", "subscribed"],
+			["b@test.com", "Unsubscribed"],
+			["c@test.com", "opt_out"],
+			["d@test.com", ""],
+			["e@test.com", "garbage"],
+		];
+		const mappings: ColumnMapping[] = [
+			{ csvHeader: "email", target: "email" },
+			{ csvHeader: "status", target: "status" },
+		];
+		const built = buildContactsFromMapping(headers, rawRows, mappings);
+		expect(built.contacts.map((c) => c.status)).toEqual([
+			"subscribed",
+			"unsubscribed",
+			"unsubscribed",
+			"subscribed",
+			"subscribed",
+		]);
+	});
+
+	it("explicit status wins over unsubscribed boolean when both mapped", () => {
+		const headers = ["email", "status", "unsubscribed"];
+		const rawRows = [["a@test.com", "subscribed", "true"]];
+		const mappings: ColumnMapping[] = [
+			{ csvHeader: "email", target: "email" },
+			{ csvHeader: "status", target: "status" },
+			{ csvHeader: "unsubscribed", target: "status" },
+		];
+		const built = buildContactsFromMapping(headers, rawRows, mappings);
+		expect(built.contacts[0]?.status).toBe("subscribed");
 	});
 });

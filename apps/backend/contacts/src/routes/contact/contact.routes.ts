@@ -3,6 +3,9 @@ import { addContactToChannelRoute } from "./add-contact-to-channel/add-contact-t
 import { addContactToGroupRoute } from "./add-contact-to-group/add-contact-to-group.route";
 import { createContactRoute } from "./create-contact/create-contact.route";
 import { deleteContactRoute } from "./delete-contact/delete-contact.route";
+import { exportContactsRoute } from "./export-contacts/export-contacts.route";
+import { exportDownloadRoute } from "./export-contacts/export-download.route";
+import { exportEmailRoute } from "./export-contacts/export-email.route";
 import { getContactRoute } from "./get-contact/get-contact.route";
 import { listContactsRoute } from "./list-contacts/list-contacts.route";
 import { removeContactFromGroupRoute } from "./remove-contact-from-group/remove-contact-from-group.route";
@@ -15,6 +18,9 @@ export const contactRoutes = new Elysia({ name: "ContactRoutes" })
 	.use(createContactRoute)
 	.use(getContactRoute)
 	.use(listContactsRoute)
+	.use(exportContactsRoute)
+	.use(exportEmailRoute)
+	.use(exportDownloadRoute)
 	.use(subscriptionActivityRoute)
 	.use(updateContactRoute)
 	.use(deleteContactRoute)

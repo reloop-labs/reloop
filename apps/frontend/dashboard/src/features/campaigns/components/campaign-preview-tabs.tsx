@@ -4,6 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -18,11 +19,23 @@ import type { Campaign } from "../campaign-types";
 
 export type CampaignPreviewTabId = "preview" | "plain" | "html" | "insights";
 
-interface CampaignPreviewTabsProps {
-	campaign: Campaign;
+export interface CampaignAudienceInfo {
+	name: string;
+	type: "all" | "group" | "channel" | "csv";
+	typeLabel: string;
+	countLabel: string;
+	href?: string;
 }
 
-export function CampaignPreviewTabs({ campaign }: CampaignPreviewTabsProps) {
+interface CampaignPreviewTabsProps {
+	campaign: Campaign;
+	audienceInfo?: CampaignAudienceInfo | null;
+}
+
+export function CampaignPreviewTabs({
+	campaign,
+	audienceInfo,
+}: CampaignPreviewTabsProps) {
 	const [activeTab, setActiveTab] = useState<CampaignPreviewTabId>("preview");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -32,6 +45,56 @@ export function CampaignPreviewTabs({ campaign }: CampaignPreviewTabsProps) {
 			htmlToPlainText(campaign.contentHtml || "") || campaign.previewText || ""
 		);
 	}, [campaign.contentHtml, campaign.previewText]);
+
+	const fallbackAudienceInfo = useMemo<CampaignAudienceInfo>(() => {
+		const count = campaign.recipientCount ?? 0;
+		const countLabel = `${count.toLocaleString()} ${count === 1 ? "recipient" : "recipients"}`;
+		const targetName = campaign.audienceTargetName?.trim();
+
+		if (campaign.audienceType === "group") {
+			return {
+				name: targetName || "Group",
+				type: "group",
+				typeLabel: "Group",
+				countLabel,
+				href: campaign.audienceTargetId
+					? `/contacts/groups/${campaign.audienceTargetId}`
+					: undefined,
+			};
+		}
+
+		if (campaign.audienceType === "channel") {
+			return {
+				name: targetName?.replace(/^Channel:\s*/i, "") || "Channel",
+				type: "channel",
+				typeLabel: "Channel",
+				countLabel,
+				href: campaign.audienceTargetId
+					? `/contacts?channelId=${campaign.audienceTargetId}`
+					: undefined,
+			};
+		}
+
+		if (campaign.audienceType === "csv") {
+			return {
+				name: targetName || "CSV Upload",
+				type: "csv",
+				typeLabel: "CSV",
+				countLabel,
+				href: undefined,
+			};
+		}
+
+		return {
+			name: targetName || "All Contacts",
+			type: "all",
+			typeLabel: "All Contacts",
+			countLabel,
+			href: "/contacts",
+		};
+	}, [campaign]);
+
+	const effectiveAudienceInfo = audienceInfo ?? fallbackAudienceInfo;
 
 	const tabItems = useMemo(() => {
 		return [
@@ -181,14 +244,84 @@ export function CampaignPreviewTabs({ campaign }: CampaignPreviewTabsProps) {
 					)}
 				>
 					<TabMenu.Content value="preview">
-						<div className="bg-white p-6 dark:bg-neutral-950">
-							{campaign.contentHtml ? (
-								<EmailHtmlPreview html={campaign.contentHtml} />
-							) : (
-								<div className="p-6 text-paragraph-sm text-text-sub-600">
-									No content
+						<div className="bg-white dark:bg-neutral-950">
+							{/* Delivery Info - Email Header Style */}
+							<div className="divide-y divide-stroke-soft-100 border-stroke-soft-100 border-b dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
+								<div className="flex items-start gap-4 px-6 py-3.5">
+									<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+										From
+									</span>
+									<span className="font-medium text-paragraph-sm text-text-strong-950">
+										{campaign.fromName
+											? `${campaign.fromName} <${campaign.fromEmail}>`
+											: campaign.fromEmail}
+									</span>
 								</div>
-							)}
+								<div className="flex items-start gap-4 px-6 py-3.5">
+									<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+										To
+									</span>
+									<span className="font-medium text-paragraph-sm text-text-strong-950">
+										{effectiveAudienceInfo ? (
+											<>
+												{effectiveAudienceInfo.href ? (
+													<Link
+														href={effectiveAudienceInfo.href}
+														className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+													>
+														{effectiveAudienceInfo.name}
+													</Link>
+												) : (
+													<span>{effectiveAudienceInfo.name}</span>
+												)}
+												<span className="font-normal text-text-sub-600">
+													{" "}
+													(
+													{effectiveAudienceInfo.type !== "all"
+														? `${effectiveAudienceInfo.typeLabel} · `
+														: ""}
+													{effectiveAudienceInfo.countLabel})
+												</span>
+											</>
+										) : null}
+									</span>
+								</div>
+								<div className="flex items-start gap-4 px-6 py-3.5">
+									<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+										Date
+									</span>
+									<span className="font-medium text-paragraph-sm text-text-strong-950">
+										{new Date(
+											campaign.sentAt || campaign.createdAt,
+										).toLocaleString(undefined, {
+											weekday: "long",
+											year: "numeric",
+											month: "long",
+											day: "numeric",
+											hour: "2-digit",
+											minute: "2-digit",
+										})}
+									</span>
+								</div>
+								<div className="flex items-start gap-4 px-6 py-3.5">
+									<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+										Subject
+									</span>
+									<span className="font-medium text-paragraph-sm text-text-strong-950">
+										{campaign.subject}
+									</span>
+								</div>
+							</div>
+
+							<div className="p-6">
+								{campaign.contentHtml ? (
+									<EmailHtmlPreview html={campaign.contentHtml} />
+								) : (
+									<div className="text-paragraph-sm text-text-sub-600">
+										No content
+									</div>
+								)}
+							</div>
 						</div>
 					</TabMenu.Content>
 

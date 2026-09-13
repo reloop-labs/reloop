@@ -23,7 +23,12 @@ function targetSelectValue(target: MappingRowTarget | null): string {
 
 function parseTargetSelectValue(value: string): MappingRowTarget | null {
 	if (!value || value === EMPTY_VALUE) return null;
-	if (value === "email" || value === "firstName" || value === "lastName") {
+	if (
+		value === "email" ||
+		value === "firstName" ||
+		value === "lastName" ||
+		value === "status"
+	) {
 		return value;
 	}
 	if (value.startsWith("property:")) {
@@ -40,6 +45,7 @@ function targetLabel(
 	if (target === "email") return "Email Address (Required)";
 	if (target === "firstName") return "First Name";
 	if (target === "lastName") return "Last Name";
+	if (target === "status") return "Subscription Status";
 	if (isPropertyTarget(target)) return propertyTargetName(target);
 	return "Select field…";
 }
@@ -47,7 +53,7 @@ function targetLabel(
 export type ReloopFieldSelectProps = {
 	value: MappingRowTarget | null;
 	onChange: (target: MappingRowTarget | null) => void;
-	identityOptions: Array<"email" | "firstName" | "lastName">;
+	identityOptions: Array<"email" | "firstName" | "lastName" | "status">;
 	properties: Array<{ propertyName: string; propertyType?: string }>;
 	createPrefill?: string;
 	disabled?: boolean;

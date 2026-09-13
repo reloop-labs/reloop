@@ -118,30 +118,57 @@ export async function cancelCampaignRequest(id: string): Promise<Campaign> {
 	return (await res.json()) as Campaign;
 }
 
+export type DeliverabilityCategory =
+	| "unsubscribed"
+	| "bounced"
+	| "suppressed"
+	| "complained";
+
 export interface CampaignRecipient {
 	id: string;
 	email: string;
 	contactId?: string;
+	contactName?: string;
 	status: string;
 	skipReason?: string;
 	emailLogId?: string;
+	error?: string;
+	category?: DeliverabilityCategory;
 	openedAt?: string;
 	clickedAt?: string;
+	updatedAt?: string;
 }
 
-export async function listCampaignRecipients(
-	id: string,
-	params?: { page?: number; limit?: number; status?: string },
-): Promise<{
+export interface CampaignRecipientsResponse {
 	recipients: CampaignRecipient[];
 	total: number;
 	page: number;
 	limit: number;
-}> {
+	counts?: {
+		unsubscribed: number;
+		bounced: number;
+		suppressed: number;
+		complained: number;
+		all: number;
+	};
+}
+
+export async function listCampaignRecipients(
+	id: string,
+	params?: {
+		page?: number;
+		limit?: number;
+		status?: string;
+		category?: string;
+		search?: string;
+	},
+): Promise<CampaignRecipientsResponse> {
 	const sp = new URLSearchParams();
 	if (params?.page) sp.set("page", String(params.page));
 	if (params?.limit) sp.set("limit", String(params.limit));
 	if (params?.status) sp.set("status", params.status);
+	if (params?.category) sp.set("category", params.category);
+	if (params?.search) sp.set("search", params.search);
 	const query = sp.toString() ? `?${sp.toString()}` : "";
 	const res = await fetch(`${BASE}/${id}/recipients${query}`, {
 		credentials: "include",

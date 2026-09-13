@@ -10,6 +10,18 @@ export const contactsConfig = {
 	PREFERENCES_SECRET:
 		process.env.PREFERENCES_SECRET ||
 		"reloop-preferences-secret-key-change-in-prod",
+	EXPORT_DOWNLOAD_SECRET:
+		process.env.EXPORT_DOWNLOAD_SECRET ||
+		process.env.PREFERENCES_SECRET ||
+		"reloop-preferences-secret-key-change-in-prod",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
+	S3: {
+		ENDPOINT: process.env.S3_ENDPOINT || "http://localhost:9010",
+		ACCESS_KEY: process.env.S3_ACCESS_KEY || "reloop",
+		SECRET_KEY: process.env.S3_SECRET_KEY || "reloop123",
+		BUCKET: process.env.S3_BUCKET || "reloop-uploads",
+		REGION: process.env.S3_REGION || "us-east-1",
+		FORCE_PATH_STYLE: process.env.S3_FORCE_PATH_STYLE || "true",
+	},
 };

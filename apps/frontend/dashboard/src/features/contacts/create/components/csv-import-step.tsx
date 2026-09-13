@@ -189,7 +189,7 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 
 	const handleDownloadSample = () => {
 		const sampleCsvContent =
-			"email,first_name,last_name,company,role\nalice@example.com,Alice,Smith,Acme Corp,Marketing Lead\nbob@example.com,Bob,Jones,Global Tech,Engineer\ncharlie@example.com,Charlie,Brown,Design Co,Product Designer\n";
+			"email,first_name,last_name,status,company,role\nalice@example.com,Alice,Smith,subscribed,Acme Corp,Marketing Lead\nbob@example.com,Bob,Jones,unsubscribed,Global Tech,Engineer\ncharlie@example.com,Charlie,Brown,,Design Co,Product Designer\n";
 		const blob = new Blob([sampleCsvContent], {
 			type: "text/csv;charset=utf-8;",
 		});
@@ -212,6 +212,39 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 		const totalToProcess = parsedResult.contacts.length;
 		let successCount = 0;
 		let skippedCount = 0;
+		let unsubscribedCount = 0;
+
+		// One-way compliance update: if a contact already exists (409) and the
+		// CSV says unsubscribed, resolve by email and patch to unsubscribed.
+		// Never resubscribes via CSV and never touches blocked.
+		const applyUnsubscribedToExisting = async (
+			email: string,
+		): Promise<boolean> => {
+			try {
+				const listRes = await fetch(
+					`/api/contacts/list?search=${encodeURIComponent(email)}&limit=5`,
+				);
+				if (!listRes.ok) return false;
+				const data = (await listRes.json().catch(() => null)) as {
+					contacts?: Array<{ id: string; email: string; status: string }>;
+				} | null;
+				const match =
+					data?.contacts?.find(
+						(c) => c.email.toLowerCase() === email.toLowerCase(),
+					) ?? data?.contacts?.[0];
+				if (!match?.id) return false;
+				if (match.status === "unsubscribed" || match.status === "blocked")
+					return true;
+				const patchRes = await fetch(`/api/contacts/${match.id}`, {
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ status: "unsubscribed" }),
+				});
+				return patchRes.ok;
+			} catch {
+				return false;
+			}
+		};
 
 		try {
 			for (let i = 0; i < totalToProcess; i += BATCH_SIZE) {
@@ -219,6 +252,7 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 
 				await Promise.all(
 					batch.map(async (contact) => {
+						const status = contact.status ?? "subscribed";
 						try {
 							const response = await fetch("/api/contacts/create", {
 								method: "POST",
@@ -227,6 +261,7 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 									email: contact.email,
 									firstName: contact.firstName,
 									lastName: contact.lastName,
+									status,
 									properties: contact.properties,
 									groupIds: selectedGroupIds,
 								}),
@@ -234,6 +269,7 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 
 							if (response.ok) {
 								successCount++;
+								if (status === "unsubscribed") unsubscribedCount++;
 								if (selectedGroupIds.length > 0) {
 									for (const groupId of selectedGroupIds) {
 										await fetch(`/api/contacts/group/${groupId}`, {
@@ -244,7 +280,20 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 									}
 								}
 							} else if (response.status === 409) {
-								skippedCount++;
+								// Never auto-resubscribe on conflict; only apply unsubscribed.
+								if (status === "unsubscribed") {
+									const updated = await applyUnsubscribedToExisting(
+										contact.email,
+									);
+									if (updated) {
+										successCount++;
+										unsubscribedCount++;
+									} else {
+										skippedCount++;
+									}
+								} else {
+									skippedCount++;
+								}
 							} else {
 								skippedCount++;
 							}
@@ -265,7 +314,7 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 
 			if (successCount > 0) {
 				toast.success(
-					`Successfully imported ${successCount} contact(s)${
+					`Successfully imported ${successCount} contact(s)${unsubscribedCount > 0 ? ` (${unsubscribedCount} unsubscribed)` : ""}${
 						skippedCount > 0 ? ` (${skippedCount} skipped)` : ""
 					}`,
 				);
@@ -289,6 +338,9 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 		: 0;
 
 	const emailMapped = hasEmailMapping(mappingRows);
+	const unsubscribedPreviewCount =
+		parsedResult?.contacts.filter((c) => c.status === "unsubscribed").length ??
+		0;
 
 	return (
 		<div className="w-full space-y-6 font-sans">
@@ -373,7 +425,16 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 								<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
 									last_name
 								</code>
-								. Map extra columns to Reloop properties after upload.
+								,{" "}
+								<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
+									status
+								</code>{" "}
+								or Resend{" "}
+								<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
+									unsubscribed
+								</code>{" "}
+								(true/false). Map extra columns to Reloop properties after
+								upload.
 							</li>
 						</ul>
 					</div>
@@ -464,13 +525,23 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 						</div>
 					</div>
 
-					{/* Unified Property Mapping (email, name, custom) */}
+					{/* Unified Property Mapping (email, name, status, custom) */}
 					<CsvPropertyMapping
 						csvHeaders={parsedResult.headers}
 						rows={mappingRows}
 						onChange={handleMappingRowsChange}
 						disabled={isImporting}
 					/>
+					{unsubscribedPreviewCount > 0 && (
+						<p className="text-text-sub-600 text-xs leading-relaxed">
+							{unsubscribedPreviewCount} contact
+							{unsubscribedPreviewCount !== 1 ? "s" : ""} will import as{" "}
+							<span className="font-medium text-text-strong-950">
+								unsubscribed
+							</span>{" "}
+							and will be excluded from campaigns.
+						</p>
+					)}
 
 					{/* Optional Group Assignment */}
 					<div className="space-y-1.5 pt-1">

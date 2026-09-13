@@ -2,6 +2,7 @@ import { initApiKeySubscribers } from "@reloop/email/subscribers/api-key.subscri
 import { initAuthSubscribers } from "@reloop/email/subscribers/auth.subscriber";
 import { initBillingSubscribers } from "@reloop/email/subscribers/billing.subscriber";
 import { initDomainSubscribers } from "@reloop/email/subscribers/domain.subscriber";
+import { initExportSubscribers } from "@reloop/email/subscribers/export.subscriber";
 import { initOrgSubscribers } from "@reloop/email/subscribers/organization.subscriber";
 import { initTestEmailSubscribers } from "@reloop/email/subscribers/test-email.subscriber";
 import { log } from "evlog";
@@ -15,6 +16,7 @@ export async function initSubscribers() {
 			initDomainSubscribers(),
 			initApiKeySubscribers(),
 			initTestEmailSubscribers(),
+			initExportSubscribers(),
 		]);
 
 		log.info("server", "All email subscribers initialized");

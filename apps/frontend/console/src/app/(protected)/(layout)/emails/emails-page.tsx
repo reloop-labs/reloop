@@ -7,13 +7,14 @@ import {
 	PageHeading,
 } from "@fe/console/components/ui/page-frame";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
+import { TablePagination } from "@fe/console/components/ui/table-pagination";
 import { adminGet } from "@fe/console/lib/admin-api";
 import { formatRecipients, formatRelativeTime } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
-import { parseAsString, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
@@ -44,22 +45,39 @@ export default function EmailsPage() {
 		"emailId",
 		parseAsString.withDefault(""),
 	);
+	const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+	const [limit, setLimit] = useQueryState(
+		"limit",
+		parseAsInteger.withDefault(50),
+	);
 	const [draftQ, setDraftQ] = useState(q);
 
 	useEffect(() => {
 		setDraftQ(q);
 	}, [q]);
 
+	const offset = Math.max(0, (page - 1) * limit);
+
 	const { data, isLoading } = useSWR<EmailsResponse>(
-		["/emails", q, status, organizationId],
+		["/emails", q, status, organizationId, page, limit],
 		() =>
 			adminGet<EmailsResponse>("/emails", {
 				q: q || undefined,
 				status: status || undefined,
 				organizationId: organizationId || undefined,
-				limit: 50,
+				limit,
+				offset,
 			}),
 	);
+
+	useEffect(() => {
+		if (data?.total !== undefined && data.total > 0) {
+			const totalPages = Math.ceil(data.total / limit);
+			if (page > totalPages) {
+				setPage(totalPages);
+			}
+		}
+	}, [data?.total, limit, page, setPage]);
 
 	return (
 		<PageFrame>
@@ -77,6 +95,7 @@ export default function EmailsPage() {
 						className="flex flex-wrap gap-2"
 						onSubmit={(e) => {
 							e.preventDefault();
+							setPage(1);
 							setQ(draftQ.trim() || null);
 						}}
 					>
@@ -92,7 +111,10 @@ export default function EmailsPage() {
 						<select
 							className="h-10 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 text-[13px] dark:bg-transparent"
 							value={status}
-							onChange={(e) => setStatus(e.target.value || null)}
+							onChange={(e) => {
+								setPage(1);
+								setStatus(e.target.value || null);
+							}}
 						>
 							<option value="">All statuses</option>
 							<option value="bounced">Bounced</option>
@@ -111,7 +133,10 @@ export default function EmailsPage() {
 									type="button"
 									variant="neutral"
 									mode="ghost"
-									onClick={() => setOrganizationId(null)}
+									onClick={() => {
+										setPage(1);
+										setOrganizationId(null);
+									}}
 								>
 									Clear org
 								</Button.Root>
@@ -190,6 +215,18 @@ export default function EmailsPage() {
 						</tr>
 					))}
 				</DataTable>
+				<TablePagination
+					total={data?.total ?? 0}
+					page={page}
+					limit={limit}
+					onPageChange={(p) => setPage(p)}
+					onLimitChange={(l) => {
+						setLimit(l);
+						setPage(1);
+					}}
+					isLoading={isLoading}
+					itemName="emails"
+				/>
 			</div>
 
 			<EmailDetailDrawer

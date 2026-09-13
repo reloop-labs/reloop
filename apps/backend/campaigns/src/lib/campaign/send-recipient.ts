@@ -70,7 +70,7 @@ export async function sendCampaignRecipient(
 		email: recipient.email,
 		firstName: contact?.firstName,
 		lastName: contact?.lastName,
-		properties: (contact?.properties as Record<string, any>) ?? null,
+		properties: ((contact as any)?.properties as Record<string, any>) ?? null,
 	});
 	const subject = interpolate(campaign.subject, vars);
 	const html = interpolate(campaign.contentHtml, vars);

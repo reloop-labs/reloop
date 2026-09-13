@@ -4,6 +4,7 @@ import { config as blocklist_checker } from "./blocklist-checker";
 import { config as deliverability_tester } from "./deliverability-tester";
 import { config as dns_lookup } from "./dns-lookup";
 import { config as domain_age } from "./domain-age";
+import { config as domain_reputation_checker } from "./domain-reputation-checker";
 import { config as email_html_editor } from "./email-html-editor";
 import { config as email_spam_words_checker } from "./email-spam-words-checker";
 import { config as email_validator } from "./email-validator";
@@ -13,6 +14,7 @@ import { config as temp_email_checker } from "./temp-email-checker";
 import { config as who_sends } from "./who-sends";
 
 export const toolConfigs = [
+	domain_reputation_checker,
 	dns_lookup,
 	spoof_checker,
 	who_sends,

@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -13,13 +13,14 @@ import { queryKeys } from "#/lib/query-keys";
 import {
 	type CustomEvent,
 	createCustomEvent,
+	updateCustomEvent,
 } from "../hooks/use-custom-events-api";
 import {
 	AutomationModalFrame,
 	type AutomationModalStatus,
 } from "./automation-modal-frame";
 
-const EMPTY_NAME_ERROR = "Please enter an event name.";
+const EMPTY_TRIGGER_ERROR = "Please enter a trigger key.";
 
 type PropertyDraft = {
 	id: string;
@@ -42,7 +43,7 @@ const slugifySuffix = (value: string) =>
 	value
 		.trim()
 		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, ".")
+		.replace(/[^a-z0-9_.-]+/g, ".")
 		.replace(/^\.+|\.+$/g, "");
 
 const isValidPropertyName = (name: string) =>
@@ -51,21 +52,27 @@ const isValidPropertyName = (name: string) =>
 interface CreateEventModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	event?: CustomEvent | null;
 	onCreated?: (event: CustomEvent) => void;
+	onUpdated?: (event: CustomEvent) => void;
 }
+
+const suffixFromKey = (key: string) =>
+	key.startsWith(TRIGGER_PREFIX) ? key.slice(TRIGGER_PREFIX.length) : key;
 
 export function CreateEventModal({
 	open,
 	onOpenChange,
+	event,
 	onCreated,
+	onUpdated,
 }: CreateEventModalProps) {
 	const queryClient = useQueryClient();
-	const [name, setName] = useState("");
 	const [keySuffix, setKeySuffix] = useState("");
 	const [properties, setProperties] = useState<PropertyDraft[]>([]);
 	const [status, setStatus] = useState<AutomationModalStatus>("idle");
-	const nameField = useFieldError();
-	const clearNameError = nameField.clear;
+	const triggerField = useFieldError();
+	const clearTriggerError = triggerField.clear;
 
 	const handleClose = () => {
 		if (status !== "idle") return;
@@ -83,10 +90,7 @@ export function CreateEventModal({
 		]);
 	};
 
-	const handleUpdateProperty = (
-		id: string,
-		patch: Partial<PropertyDraft>,
-	) => {
+	const handleUpdateProperty = (id: string, patch: Partial<PropertyDraft>) => {
 		setProperties((prev) =>
 			prev.map((p) => (p.id === id ? { ...p, ...patch } : p)),
 		);
@@ -108,11 +112,14 @@ export function CreateEventModal({
 		return `${TRIGGER_PREFIX}${suffix}`;
 	};
 
+	const isEdit = !!event;
+
 	const handleSubmit = async () => {
 		if (status !== "idle") return;
-		const trimmed = name.trim();
-		if (!trimmed) {
-			nameField.show(EMPTY_NAME_ERROR);
+		const fullKey = buildKey();
+		const rawSuffix = keySuffix.trim();
+		if (!rawSuffix || !fullKey) {
+			triggerField.show(EMPTY_TRIGGER_ERROR);
 			return;
 		}
 
@@ -137,22 +144,39 @@ export function CreateEventModal({
 			seen.add(n);
 		}
 
-		nameField.clear();
+		triggerField.clear();
 		setStatus("busy");
 		try {
-			const key = buildKey();
-			const normalizedProps =
-				properties.length > 0
-					? properties.map((p) => ({
-							name: p.name.trim(),
-							propertyType: p.propertyType,
-						}))
-					: undefined;
+			const normalizedProps = properties.map((p) => ({
+				name: p.name.trim(),
+				propertyType: p.propertyType,
+			}));
+
+			if (event) {
+				const updated = await updateCustomEvent(event.id, {
+					name: rawSuffix,
+					properties: normalizedProps,
+				});
+				await queryClient.invalidateQueries({
+					queryKey: queryKeys.workflows.events(),
+				});
+				await queryClient.invalidateQueries({
+					queryKey: queryKeys.workflows.event(event.id),
+				});
+				setStatus("success");
+				setTimeout(() => {
+					onUpdated?.(updated);
+					onOpenChange(false);
+					triggerField.clear();
+					setStatus("idle");
+				}, 450);
+				return;
+			}
 
 			const created = await createCustomEvent({
-				name: trimmed,
-				key,
-				properties: normalizedProps,
+				name: rawSuffix,
+				key: fullKey,
+				properties: normalizedProps.length > 0 ? normalizedProps : undefined,
 			});
 			await queryClient.invalidateQueries({
 				queryKey: queryKeys.workflows.events(),
@@ -161,17 +185,20 @@ export function CreateEventModal({
 			setTimeout(() => {
 				onCreated?.(created);
 				onOpenChange(false);
-				setName("");
 				setKeySuffix("");
 				setProperties([]);
-				nameField.clear();
+				triggerField.clear();
 				setStatus("idle");
 			}, 450);
 		} catch (err) {
 			setStatus("idle");
 			const message =
-				err instanceof Error ? err.message : "Failed to create event";
-			nameField.show(message);
+				err instanceof Error
+					? err.message
+					: isEdit
+						? "Failed to update trigger"
+						: "Failed to create trigger";
+			triggerField.show(message);
 			toast.error(message);
 		}
 	};
@@ -183,7 +210,7 @@ export function CreateEventModal({
 			if (open && status === "idle") void handleSubmit();
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, status, name, keySuffix, properties],
+		[open, status, keySuffix, properties],
 	);
 
 	useHotkeys(
@@ -196,122 +223,75 @@ export function CreateEventModal({
 	);
 
 	useEffect(() => {
-		if (!open) {
-			const timer = setTimeout(() => {
-				setName("");
-				setKeySuffix("");
-				setProperties([]);
-				clearNameError();
-				setStatus("idle");
-			}, 300);
-			return () => clearTimeout(timer);
+		if (open) {
+			if (event) {
+				setKeySuffix(suffixFromKey(event.key));
+				setProperties(
+					event.properties.map((p) => ({
+						id: p.id,
+						name: p.name,
+						propertyType: p.propertyType,
+					})),
+				);
+			}
+			return;
 		}
-	}, [open, clearNameError]);
-
-	const previewKey = (() => {
-		const k = buildKey();
-		if (k) return k;
-		if (name.trim()) {
-			const slug = slugifySuffix(name.trim());
-			return `${TRIGGER_PREFIX}${slug || "event"}`;
-		}
-		return `${TRIGGER_PREFIX}...`;
-	})();
+		const timer = setTimeout(() => {
+			setKeySuffix("");
+			setProperties([]);
+			clearTriggerError();
+			setStatus("idle");
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [open, event, clearTriggerError]);
 
 	return (
 		<AutomationModalFrame
 			open={open}
-			title="Create trigger"
+			title={isEdit ? "Edit trigger" : "Create trigger"}
 			icon="zap"
 			status={status}
 			onSubmit={() => void handleSubmit()}
 			onClose={handleClose}
-			submitLabel="Create trigger"
-			busyLabel="Creating..."
-			successLabel="Created"
+			submitLabel={isEdit ? "Save changes" : "Create trigger"}
+			busyLabel={isEdit ? "Saving..." : "Creating..."}
+			successLabel={isEdit ? "Saved" : "Created"}
 		>
 			<div className="space-y-4 px-6 pb-7">
 				<div className="space-y-1.5">
 					<Label.Root
-						htmlFor="evt-name"
+						htmlFor="evt-trigger"
 						className="font-medium text-text-strong-950 text-xs"
 					>
-						Name
+						Trigger
 						<Label.Asterisk />
 					</Label.Root>
-					<FieldError
-						field={nameField}
-						hint="Shown on the trigger step. Use something you will recognize."
-					>
-						<Input.Root size="medium" hasError={nameField.hasError}>
+					<FieldError field={triggerField}>
+						<Input.Root size="medium" hasError={triggerField.hasError}>
 							<Input.Wrapper>
 								<Input.Input
-									id="evt-name"
-									{...nameField.controlProps}
-									placeholder="e.g. User signed up"
-									value={name}
+									id="evt-trigger"
+									{...triggerField.controlProps}
+									placeholder="e.g. signup"
+									value={keySuffix}
 									onChange={(e) => {
-										setName(e.target.value);
-										if (nameField.hasError) nameField.clear();
+										setKeySuffix(e.target.value);
+										if (triggerField.hasError) triggerField.clear();
 									}}
-									autoFocus
-									disabled={status !== "idle"}
+									disabled={status !== "idle" || isEdit}
 								/>
 							</Input.Wrapper>
 						</Input.Root>
 					</FieldError>
 				</div>
-				<div className="space-y-1.5">
-					<Label.Root
-						htmlFor="evt-key"
-						className="font-medium text-text-strong-950 text-xs"
-					>
-						Key
-						<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
-					</Label.Root>
-					<div className="flex items-stretch overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/40">
-						<span className="flex items-center bg-bg-weak-50 px-3 font-mono text-sm text-text-sub-600 dark:bg-bg-weak-50/40">
-							{TRIGGER_PREFIX}
-						</span>
-						<input
-							id="evt-key"
-							placeholder="signup"
-							value={keySuffix}
-							onChange={(e) => setKeySuffix(e.target.value)}
-							disabled={status !== "idle"}
-							className="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-text-soft-400 disabled:opacity-50"
-						/>
-					</div>
-					<p className="font-mono text-[11px] text-text-sub-600">
-						Full key: {previewKey}
-					</p>
-					<p className="text-[11px] text-text-sub-600">
-						Defaults from the name if you leave this blank. Only type after{" "}
-						<code className="rounded bg-bg-weak-50 px-1 py-0.5 font-mono text-[11px] dark:bg-bg-weak-50/60">
-							trigger.
-						</code>
-					</p>
-				</div>
 
 				<div className="space-y-2">
-					<div className="flex items-center justify-between">
-						<Label.Root className="font-medium text-text-strong-950 text-xs">
-							Properties
-							<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
-						</Label.Root>
-						<button
-							type="button"
-							onClick={handleAddProperty}
-							disabled={status !== "idle"}
-							className="inline-flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs font-medium text-text-strong-950 hover:bg-bg-weak-50 disabled:opacity-50 dark:border-stroke-soft-100/40"
-						>
-							<Icon name="plus" className="h-3 w-3" />
-							Add property
-						</button>
-					</div>
+					<Label.Root className="font-medium text-text-strong-950 text-xs">
+						Properties
+					</Label.Root>
 
 					{properties.length === 0 ? (
-						<p className="rounded-lg border border-dashed border-stroke-soft-200 bg-bg-weak-50/30 px-3 py-3 text-center text-xs text-text-sub-600 dark:border-stroke-soft-100/40">
+						<p className="rounded-lg border border-stroke-soft-200 border-dashed bg-bg-weak-50/30 px-3 py-3 text-center text-text-sub-600 text-xs dark:border-stroke-soft-100/40">
 							No properties yet. Add dynamic properties like contact properties
 							— each has a name and a type (no default values).
 						</p>
@@ -320,64 +300,90 @@ export function CreateEventModal({
 							{properties.map((p) => (
 								<div
 									key={p.id}
-									className="flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2 dark:border-stroke-soft-100/40"
+									className="flex items-center gap-2 rounded-xl bg-bg-weak-50 p-0.5 dark:bg-bg-weak-50/40"
 								>
-									<div className="flex-1">
-										<Input.Root size="medium" className="rounded-lg">
-											<Input.Wrapper>
-												<Input.Input
-													placeholder="plan"
-													value={p.name}
-													onChange={(e) =>
-														handleUpdateProperty(p.id, {
-															name: e.target.value,
-														})
-													}
+									<div className="flex flex-1 items-center gap-2 rounded-[10px] border border-stroke-soft-200/80 bg-bg-white-0 py-1 pr-1.5 pl-3 transition-colors focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+										<input
+											placeholder="plan"
+											value={p.name}
+											onChange={(e) =>
+												handleUpdateProperty(p.id, {
+													name: e.target.value,
+												})
+											}
+											disabled={status !== "idle"}
+											className="h-7 min-w-0 flex-1 bg-transparent font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 disabled:opacity-50"
+										/>
+										<Dropdown.Root>
+											<Dropdown.Trigger asChild>
+												<button
+													type="button"
 													disabled={status !== "idle"}
-													className="font-mono text-xs"
-												/>
-											</Input.Wrapper>
-										</Input.Root>
-									</div>
-									<div className="flex shrink-0 items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-stroke-soft-100/40">
-										{PROPERTY_TYPE_OPTIONS.map((opt) => (
-											<button
-												key={opt.value}
-												type="button"
-												disabled={status !== "idle"}
-												onClick={() =>
-													handleUpdateProperty(p.id, {
-														propertyType: opt.value,
-													})
-												}
-												className={cn(
-													"rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-													p.propertyType === opt.value
-														? "bg-bg-white-0 text-text-strong-950 shadow-sm dark:bg-bg-white-0/10"
-														: "text-text-sub-600 hover:text-text-strong-950",
-												)}
+													className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border border-stroke-soft-200/70 bg-bg-weak-50 px-2 font-medium text-text-strong-950 text-xs transition-colors hover:bg-bg-soft-200 focus:outline-none dark:border-stroke-soft-100/40 dark:bg-white/10 dark:hover:bg-white/15"
+												>
+													<span>
+														{PROPERTY_TYPE_OPTIONS.find(
+															(opt) => opt.value === p.propertyType,
+														)?.label ?? "String"}
+													</span>
+													<Icon
+														name="chevron-down"
+														className="h-3 w-3 text-text-sub-600"
+													/>
+												</button>
+											</Dropdown.Trigger>
+											<Dropdown.Content
+												align="end"
+												className="w-32 rounded-xl p-1 shadow-regular-md"
 											>
-												{opt.label}
-											</button>
-										))}
+												{PROPERTY_TYPE_OPTIONS.map((opt) => (
+													<Dropdown.Item
+														key={opt.value}
+														onClick={() =>
+															handleUpdateProperty(p.id, {
+																propertyType: opt.value,
+															})
+														}
+														className="flex items-center justify-between py-1.5 text-xs"
+													>
+														<span>{opt.label}</span>
+														{p.propertyType === opt.value ? (
+															<Icon
+																name="check"
+																className="h-3.5 w-3.5 text-text-strong-950"
+															/>
+														) : null}
+													</Dropdown.Item>
+												))}
+											</Dropdown.Content>
+										</Dropdown.Root>
 									</div>
 									<button
 										type="button"
 										onClick={() => handleRemoveProperty(p.id)}
 										disabled={status !== "idle"}
-										className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-50"
+										className="flex size-8 shrink-0 items-center justify-center rounded-[10px] text-text-sub-600 transition-colors hover:bg-error-lighter hover:text-error-base disabled:opacity-50 dark:hover:bg-error-base/10 dark:hover:text-error-base"
 										aria-label="Remove property"
+										title="Remove property"
 									>
-										<Icon name="close" className="h-3.5 w-3.5" />
+										<Icon name="trash" className="size-4" />
 									</button>
 								</div>
 							))}
-							<p className="text-[11px] text-text-sub-600">
-								Types are enforced when tracking. No default values — missing
-								properties stay empty unless required.
-							</p>
 						</div>
 					)}
+
+					<div className="pt-0.5">
+						<button
+							type="button"
+							onClick={handleAddProperty}
+							disabled={status !== "idle"}
+							className="inline-flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 font-medium text-text-strong-950 text-xs hover:bg-bg-weak-50 disabled:opacity-50 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5 dark:hover:bg-bg-white-0/10"
+						>
+							<Icon name="plus" className="h-3 w-3" />
+							Add property
+						</button>
+					</div>
 				</div>
 			</div>
 		</AutomationModalFrame>

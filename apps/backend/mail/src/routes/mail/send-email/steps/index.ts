@@ -1,5 +1,6 @@
 export * from "./step-1-parse-from";
 export * from "./step-2-verify-domain";
+export * from "./step-2b-check-suppressions";
 export * from "./step-3-check-dns";
 export * from "./step-4-create-log";
 export * from "./step-5-resolve-template";

@@ -16,7 +16,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { toast } from "sonner";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -26,6 +25,7 @@ import {
 	useContactsQuery,
 	useSubscriptionActivityQuery,
 } from "../../hooks/use-contacts-query";
+import { ContactExportModal } from "./contact-export-modal";
 import { ContactListToolbar } from "./contact-list-toolbar";
 import { ContactTable } from "./contact-table";
 
@@ -85,6 +85,7 @@ export function ContactList() {
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const { columnVisibility, setColumnVisible } = useContactColumnVisibility();
+	const [exportOpen, setExportOpen] = useState(false);
 
 	/** Exactly one status applies a filter (same pattern as API keys). */
 	const statusParam = statusFilter.length === 1 ? (statusFilter[0] ?? "") : "";
@@ -143,41 +144,9 @@ export function ContactList() {
 		[chartData],
 	);
 
-	const handleDownloadCSV = useCallback(async () => {
-		try {
-			const params = new URLSearchParams({ limit: "10000" });
-			if (channelFilter) params.set("channelId", channelFilter);
-			const response = await fetch(`/api/contacts/list?${params.toString()}`, {
-				credentials: "include",
-			});
-			const allData = (await response.json()) as typeof data;
-			if (!allData?.contacts?.length) {
-				toast.error("No contacts to export");
-				return;
-			}
-			const headers = ["Email", "Name", "Status", "Last Updated", "Created At"];
-			const csvRows = allData.contacts.map((contact) => [
-				contact.email,
-				[contact.firstName, contact.lastName].filter(Boolean).join(" "),
-				contact.status,
-				new Date(contact.updatedAt).toISOString(),
-				new Date(contact.createdAt).toISOString(),
-			]);
-			const csvContent = [
-				headers.join(","),
-				...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-			].join("\n");
-			const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-			const link = document.createElement("a");
-			link.href = URL.createObjectURL(blob);
-			link.download = `contacts_${new Date().toISOString().split("T")[0]}.csv`;
-			link.click();
-			URL.revokeObjectURL(link.href);
-			toast.success("Contacts exported successfully");
-		} catch {
-			toast.error("Failed to export contacts");
-		}
-	}, [channelFilter, data]);
+	const openExportModal = useCallback(() => {
+		setExportOpen(true);
+	}, []);
 
 	const actions = useMemo<CommandAction[]>(
 		() => [
@@ -193,7 +162,7 @@ export function ContactList() {
 				label: "Export Contacts CSV",
 				icon: "download",
 				shortcut: { label: "E", keys: ["e"] },
-				onSelect: () => void handleDownloadCSV(),
+				onSelect: () => openExportModal(),
 			},
 			{
 				id: "open-api-reference",
@@ -224,7 +193,7 @@ export function ContactList() {
 					window.dispatchEvent(new CustomEvent("contacts:select-all")),
 			},
 		],
-		[router, handleDownloadCSV],
+		[router, openExportModal],
 	);
 
 	useRegisterCommandActions("contacts", "Contacts", actions);
@@ -316,7 +285,7 @@ export function ContactList() {
 			<ContactListToolbar
 				columnVisibility={columnVisibility}
 				onColumnVisibleChange={setColumnVisible}
-				onExport={() => void handleDownloadCSV()}
+				onExport={() => setExportOpen(true)}
 				canExport={!!data?.contacts && data.contacts.length > 0}
 				channelFilter={
 					channelFilter
@@ -349,6 +318,28 @@ export function ContactList() {
 					}
 				/>
 			</div>
+
+			<ContactExportModal
+				open={exportOpen}
+				onOpenChange={setExportOpen}
+				scope={{
+					search: searchQuery ?? undefined,
+					channelId: channelFilter,
+					channelName,
+				}}
+				counts={{
+					total: data?.totalContacts ?? 0,
+					subscribed: data?.subscribedContacts ?? 0,
+					unsubscribed: data?.unsubscribedContacts ?? 0,
+				}}
+				defaultStatus={
+					statusParam === "subscribed" ||
+					statusParam === "unsubscribed" ||
+					statusParam === "blocked"
+						? statusParam
+						: "all"
+				}
+			/>
 		</div>
 	);
 }

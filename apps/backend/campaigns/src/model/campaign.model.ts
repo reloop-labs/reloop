@@ -111,6 +111,10 @@ export const campaignRecipientSchema = t.Object({
 	status: recipientStatusSchema,
 	skipReason: t.Optional(t.String()),
 	emailLogId: t.Optional(t.String()),
+	error: t.Optional(t.String()),
+	category: t.Optional(t.String()),
+	contactName: t.Optional(t.String()),
 	openedAt: t.Optional(t.String()),
 	clickedAt: t.Optional(t.String()),
+	updatedAt: t.Optional(t.String()),
 });

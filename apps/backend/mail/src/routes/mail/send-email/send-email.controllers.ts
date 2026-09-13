@@ -1,5 +1,6 @@
 import { assertHasCredits } from "@reloop/be-mail/lib/credits-gate";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
+import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { db } from "@reloop/db/client";
 import { emailThread, threadMessage } from "@reloop/db/schema";
@@ -8,6 +9,7 @@ import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import {
 	checkDnsHealth_step3,
+	checkSuppressions_step2b,
 	createEmailLog_step4,
 	finalizeEmail_step7,
 	injectCustomTracking_step5c,
@@ -28,7 +30,7 @@ function parseFromName(from: string): string {
 
 export async function sendEmailController({
 	organizationId,
-	body,
+	body: rawBody,
 	apiKey,
 	apiKeyId,
 	userId,
@@ -48,13 +50,29 @@ export async function sendEmailController({
 	const logger = useLogger();
 	logger.set({
 		organizationId,
-		from: body.from,
-		to: body.to,
+		from: rawBody.from,
+		to: rawBody.to,
 	});
 	log.info("server", "Initiating email send process");
 
 	// Fail closed before DNS/log/Kumo work when the monthly meter is empty.
-	await assertHasCredits({ organizationId, body });
+	await assertHasCredits({ organizationId, body: rawBody });
+
+	// ── Outbound content security ─────────────────────────────────────────
+	// Runs before any log or KumoMTA work so phishing/spam payloads are
+	// rejected at the API boundary and never touch the mail queue.
+	const { sanitizedHeaders } = runOutboundGuard({
+		from: rawBody.from,
+		subject: rawBody.subject,
+		html: rawBody.html,
+		text: rawBody.text,
+		headers: rawBody.headers,
+		replyTo: rawBody.reply_to,
+		attachments: rawBody.attachments,
+	});
+	// Swap in the sanitized headers (CRLF-clean, reserved names stripped)
+	let body: MailModel.SendEmailBody = { ...rawBody, headers: sanitizedHeaders };
+	log.info({ message: "Outbound guard passed", from: body.from, subject: body.subject });
 
 	const { domainName } = parseFromAddress_step1(body.from);
 
@@ -62,6 +80,23 @@ export async function sendEmailController({
 		organizationId,
 		domainName,
 	});
+
+	// ── GAP 8: Global suppression list check ──────────────────────────────
+	// Runs after auth (org confirmed) but before log creation so suppressed
+	// sends are never logged or billed.
+	// Platform-global: an email suppressed in ANY org is blocked here too,
+	// protecting shared IP reputation across all tenants.
+	const { body: cleanBody, suppressed } = await checkSuppressions_step2b({
+		body,
+	});
+	if (suppressed.length > 0) {
+		log.warn({
+			message: `Removed ${suppressed.length} suppressed recipient(s) before send`,
+			suppressed: suppressed.map((s) => s.email),
+			organizationId,
+		});
+	}
+	body = cleanBody;
 
 	const dnsHealthCheck = await checkDnsHealth_step3({
 		domainId: currentDomain.id,

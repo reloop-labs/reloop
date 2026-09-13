@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
@@ -9,11 +8,11 @@ import { formatRelativeTime } from "#/utils/format-relative-time";
 import {
 	CampaignsProvider,
 	useCampaignQuery,
-	useCampaignRecipientsQuery,
 	useCampaigns,
 } from "./campaigns-provider";
 import { CampaignHeader } from "./components/campaign-header";
 import { CampaignPreviewTabs } from "./components/campaign-preview-tabs";
+import { CampaignRecipientIssuesCard } from "./components/campaign-recipient-issues-card";
 import { DeleteCampaignModal } from "./components/delete-campaign";
 
 function CampaignDetailContent() {
@@ -23,22 +22,10 @@ function CampaignDetailContent() {
 	const [, setDeleteId] = useQueryState("delete");
 	const { sendCampaign, duplicateCampaign } = useCampaigns();
 	const campaignQuery = useCampaignQuery(campaignId);
-	const recipientsQuery = useCampaignRecipientsQuery(campaignId);
 
 	const [actionPending, setActionPending] = useState(false);
 
 	const campaign = campaignQuery.data;
-	const recipients = recipientsQuery.data?.recipients ?? [];
-
-	const toEmails = useMemo<string[]>(() => {
-		if (recipients.length > 0) {
-			return recipients.map((r) => r.email);
-		}
-		if (campaign?.csvEmails && campaign.csvEmails.length > 0) {
-			return campaign.csvEmails;
-		}
-		return [];
-	}, [recipients, campaign?.csvEmails]);
 
 	const audienceInfo = useMemo(() => {
 		if (!campaign) return null;
@@ -294,92 +281,11 @@ function CampaignDetailContent() {
 					</div>
 				)}
 
-				{/* Delivery Info - Email Header Style */}
-				<section>
-					<div className="flex flex-col gap-3.5">
-						<div className="flex items-start gap-4">
-							<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
-								From
-							</span>
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{campaign.fromName
-									? `${campaign.fromName} <${campaign.fromEmail}>`
-									: campaign.fromEmail}
-							</span>
-						</div>
-						<div className="flex items-start gap-4">
-							<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
-								To
-							</span>
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{audienceInfo ? (
-									<>
-										{audienceInfo.href ? (
-											<Link
-												href={audienceInfo.href}
-												className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
-											>
-												{audienceInfo.name}
-											</Link>
-										) : (
-											<span>{audienceInfo.name}</span>
-										)}
-										<span className="font-normal text-text-sub-600">
-											{" "}
-											(
-											{audienceInfo.type !== "all"
-												? `${audienceInfo.typeLabel} · `
-												: ""}
-											{toEmails.length === 1 ? (
-												<>
-													1 recipient:{" "}
-													<Link
-														href={`/contacts/detail/${encodeURIComponent(toEmails[0] ?? "")}`}
-														className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
-													>
-														{toEmails[0]}
-													</Link>
-												</>
-											) : (
-												audienceInfo.countLabel
-											)}
-											)
-										</span>
-									</>
-								) : null}
-							</span>
-						</div>
-						<div className="flex items-start gap-4">
-							<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
-								Date
-							</span>
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{new Date(campaign.sentAt || campaign.createdAt).toLocaleString(
-									undefined,
-									{
-										weekday: "long",
-										year: "numeric",
-										month: "long",
-										day: "numeric",
-										hour: "2-digit",
-										minute: "2-digit",
-									},
-								)}
-							</span>
-						</div>
-						<div className="flex items-start gap-4">
-							<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
-								Subject
-							</span>
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
-								{campaign.subject}
-							</span>
-						</div>
-					</div>
-				</section>
+				{/* Deliverability & Recipient Activity (Unsubscribed, Bounced, Suppressed, Complained) */}
+				<CampaignRecipientIssuesCard campaignId={campaign.id} />
 
 				{/* Message Preview Tabs */}
-				<CampaignPreviewTabs campaign={campaign} />
+				<CampaignPreviewTabs campaign={campaign} audienceInfo={audienceInfo} />
 			</div>
 
 			<DeleteCampaignModal campaigns={campaign ? [campaign] : []} />

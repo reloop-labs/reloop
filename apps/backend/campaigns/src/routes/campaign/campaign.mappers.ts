@@ -40,7 +40,14 @@ export function toCampaignResponse(
 	};
 }
 
-export function toRecipientResponse(row: CampaignRecipient) {
+export function toRecipientResponse(
+	row: CampaignRecipient,
+	extra?: {
+		category?: string | null;
+		contactName?: string | null;
+		error?: string | null;
+	},
+) {
 	return {
 		id: row.id,
 		email: row.email,
@@ -48,7 +55,11 @@ export function toRecipientResponse(row: CampaignRecipient) {
 		status: row.status,
 		skipReason: row.skipReason ?? undefined,
 		emailLogId: row.emailLogId ?? undefined,
+		error: extra?.error ?? row.error ?? undefined,
+		category: extra?.category ?? undefined,
+		contactName: extra?.contactName ?? undefined,
 		openedAt: iso(row.openedAt),
 		clickedAt: iso(row.clickedAt),
+		updatedAt: iso(row.updatedAt),
 	};
 }

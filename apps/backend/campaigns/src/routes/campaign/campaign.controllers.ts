@@ -33,9 +33,11 @@ import {
 	and,
 	desc,
 	eq,
+	exists,
 	ilike,
 	inArray,
 	isNull,
+	or,
 	type SQL,
 	sql,
 } from "drizzle-orm";
@@ -485,23 +487,149 @@ export async function listRecipientsController(params: {
 	page?: number;
 	limit?: number;
 	status?: "pending" | "sending" | "sent" | "skipped" | "failed";
+	category?: "unsubscribed" | "bounced" | "suppressed" | "complained" | "all";
+	search?: string;
 }) {
 	await requireCampaign(params.id, params.organizationId);
 	const page = Math.max(1, params.page ?? 1);
 	const limit = Math.min(params.limit ?? 50, 100);
 	const offset = (page - 1) * limit;
-	const filters: SQL[] = [
+
+	// Condition fragments for deliverability categories
+	const unsubscribedCondition = or(
+		eq(schema.campaignRecipient.skipReason, "unsubscribed"),
+		eq(schema.contact.status, "unsubscribed"),
+		exists(
+			db
+				.select({ id: schema.emailEvent.id })
+				.from(schema.emailEvent)
+				.where(
+					and(
+						eq(schema.emailEvent.emailLogId, schema.campaignRecipient.emailLogId),
+						eq(schema.emailEvent.type, "unsubscribed"),
+					),
+				),
+		),
+	)!;
+
+	const bouncedCondition = or(
+		eq(schema.campaignRecipient.status, "failed"),
+		eq(schema.emailLog.status, "bounced"),
+		eq(schema.contact.suppressionReason, "hard_bounce"),
+		exists(
+			db
+				.select({ id: schema.emailEvent.id })
+				.from(schema.emailEvent)
+				.where(
+					and(
+						eq(schema.emailEvent.emailLogId, schema.campaignRecipient.emailLogId),
+						eq(schema.emailEvent.type, "bounced"),
+					),
+				),
+		),
+	)!;
+
+	const suppressedCondition = or(
+		inArray(schema.campaignRecipient.skipReason, ["suppressed", "blocked"]),
+		sql`${schema.contact.suppressedAt} IS NOT NULL`,
+		sql`${schema.contact.suppressionReason} IS NOT NULL`,
+		eq(schema.contact.status, "blocked"),
+	)!;
+
+	const complainedCondition = or(
+		eq(schema.emailLog.status, "spam"),
+		eq(schema.contact.suppressionReason, "spam_complaint"),
+		ilike(schema.campaignRecipient.error, "%spam%"),
+		ilike(schema.campaignRecipient.error, "%complaint%"),
+		exists(
+			db
+				.select({ id: schema.emailEvent.id })
+				.from(schema.emailEvent)
+				.where(
+					and(
+						eq(schema.emailEvent.emailLogId, schema.campaignRecipient.emailLogId),
+						eq(schema.emailEvent.type, "complaint"),
+					),
+				),
+		),
+	)!;
+
+	const anyIssueCondition = or(
+		unsubscribedCondition,
+		bouncedCondition,
+		suppressedCondition,
+		complainedCondition,
+	)!;
+
+	const baseFilter: SQL[] = [
 		eq(schema.campaignRecipient.campaignId, params.id),
 		eq(schema.campaignRecipient.organizationId, params.organizationId),
 	];
+
+	const countsWhere = and(...baseFilter);
+
+	const selectFields = {
+		recipient: schema.campaignRecipient,
+		contactFirstName: schema.contact.firstName,
+		contactLastName: schema.contact.lastName,
+		contactStatus: schema.contact.status,
+		contactSuppressionReason: schema.contact.suppressionReason,
+		contactSuppressedAt: schema.contact.suppressedAt,
+		emailLogStatus: schema.emailLog.status,
+	};
+
+	const queryFilter: SQL[] = [...baseFilter];
 	if (params.status) {
-		filters.push(eq(schema.campaignRecipient.status, params.status));
+		queryFilter.push(eq(schema.campaignRecipient.status, params.status));
 	}
-	const where = and(...filters);
-	const [rows, totalRow] = await Promise.all([
+	if (params.category) {
+		switch (params.category) {
+			case "unsubscribed":
+				queryFilter.push(unsubscribedCondition);
+				break;
+			case "bounced":
+				queryFilter.push(bouncedCondition);
+				break;
+			case "suppressed":
+				queryFilter.push(suppressedCondition);
+				break;
+			case "complained":
+				queryFilter.push(complainedCondition);
+				break;
+			case "all":
+				queryFilter.push(anyIssueCondition);
+				break;
+		}
+	}
+	if (params.search?.trim()) {
+		const q = `%${params.search.trim().replace(/[%_\\]/g, "\\$&")}%`;
+		queryFilter.push(
+			or(
+				ilike(schema.campaignRecipient.email, q),
+				ilike(schema.contact.firstName, q),
+				ilike(schema.contact.lastName, q),
+			)!,
+		);
+	}
+
+	const where = and(...queryFilter);
+
+	const [rows, totalRow, countsRow] = await Promise.all([
 		db
-			.select()
+			.select(selectFields)
 			.from(schema.campaignRecipient)
+			.leftJoin(
+				schema.contact,
+				and(
+					eq(schema.contact.organizationId, schema.campaignRecipient.organizationId),
+					eq(schema.contact.email, schema.campaignRecipient.email),
+					isNull(schema.contact.deletedAt),
+				),
+			)
+			.leftJoin(
+				schema.emailLog,
+				eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
+			)
 			.where(where)
 			.orderBy(desc(schema.campaignRecipient.createdAt))
 			.limit(limit)
@@ -509,12 +637,113 @@ export async function listRecipientsController(params: {
 		db
 			.select({ value: sql<number>`count(*)` })
 			.from(schema.campaignRecipient)
+			.leftJoin(
+				schema.contact,
+				and(
+					eq(schema.contact.organizationId, schema.campaignRecipient.organizationId),
+					eq(schema.contact.email, schema.campaignRecipient.email),
+					isNull(schema.contact.deletedAt),
+				),
+			)
+			.leftJoin(
+				schema.emailLog,
+				eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
+			)
 			.where(where),
+		db
+			.select({
+				unsubscribed: sql<number>`count(*) filter (where ${unsubscribedCondition})`,
+				bounced: sql<number>`count(*) filter (where ${bouncedCondition})`,
+				suppressed: sql<number>`count(*) filter (where ${suppressedCondition})`,
+				complained: sql<number>`count(*) filter (where ${complainedCondition})`,
+				all: sql<number>`count(*) filter (where ${anyIssueCondition})`,
+			})
+			.from(schema.campaignRecipient)
+			.leftJoin(
+				schema.contact,
+				and(
+					eq(schema.contact.organizationId, schema.campaignRecipient.organizationId),
+					eq(schema.contact.email, schema.campaignRecipient.email),
+					isNull(schema.contact.deletedAt),
+				),
+			)
+			.leftJoin(
+				schema.emailLog,
+				eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
+			)
+			.where(countsWhere),
 	]);
+
+	const recipients = rows.map(
+		({
+			recipient,
+			contactFirstName,
+			contactLastName,
+			contactStatus,
+			contactSuppressionReason,
+			contactSuppressedAt,
+			emailLogStatus,
+		}) => {
+			let category:
+				| "unsubscribed"
+				| "bounced"
+				| "suppressed"
+				| "complained"
+				| undefined;
+
+			if (
+				emailLogStatus === "spam" ||
+				contactSuppressionReason === "spam_complaint" ||
+				(recipient.error && /spam|complaint|feedback/i.test(recipient.error))
+			) {
+				category = "complained";
+			} else if (
+				recipient.skipReason === "unsubscribed" ||
+				contactStatus === "unsubscribed"
+			) {
+				category = "unsubscribed";
+			} else if (
+				emailLogStatus === "bounced" ||
+				contactSuppressionReason === "hard_bounce" ||
+				recipient.status === "failed" ||
+				(recipient.error && /bounce|oob|expiration/i.test(recipient.error))
+			) {
+				category = "bounced";
+			} else if (
+				recipient.skipReason === "suppressed" ||
+				recipient.skipReason === "blocked" ||
+				contactSuppressedAt != null ||
+				contactSuppressionReason != null ||
+				contactStatus === "blocked"
+			) {
+				category = "suppressed";
+			}
+
+			const contactName =
+				[contactFirstName, contactLastName].filter(Boolean).join(" ").trim() ||
+				undefined;
+
+			return toRecipientResponse(recipient, {
+				category,
+				contactName,
+				error: recipient.error,
+			});
+		},
+	);
+
 	return {
-		recipients: rows.map(toRecipientResponse),
+		recipients,
 		total: Number(totalRow[0]?.value ?? 0),
 		page,
 		limit,
+		counts: countsRow[0]
+			? {
+					unsubscribed: Number(countsRow[0].unsubscribed ?? 0),
+					bounced: Number(countsRow[0].bounced ?? 0),
+					suppressed: Number(countsRow[0].suppressed ?? 0),
+					complained: Number(countsRow[0].complained ?? 0),
+					all: Number(countsRow[0].all ?? 0),
+				}
+			: undefined,
 	};
 }

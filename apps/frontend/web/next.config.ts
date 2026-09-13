@@ -21,25 +21,25 @@ const nextConfig: NextConfig = {
 			...(isDev
 				? []
 				: [
-						{
-							source: "/_next/static/:path*",
-							headers: [
-								{
-									key: "Cache-Control",
-									value: "public, max-age=31536000, immutable",
-								},
-							],
-						},
-						{
-							source: "/font/:path*",
-							headers: [
-								{
-									key: "Cache-Control",
-									value: "public, max-age=31536000, immutable",
-								},
-							],
-						},
-					]),
+					{
+						source: "/_next/static/:path*",
+						headers: [
+							{
+								key: "Cache-Control",
+								value: "public, max-age=31536000, immutable",
+							},
+						],
+					},
+					{
+						source: "/font/:path*",
+						headers: [
+							{
+								key: "Cache-Control",
+								value: "public, max-age=31536000, immutable",
+							},
+						],
+					},
+				]),
 			{
 				source: "/manifest.json",
 				headers: [
@@ -59,14 +59,6 @@ const nextConfig: NextConfig = {
 				],
 			},
 		];
-	},
-	images: {
-		remotePatterns: [
-			{
-				protocol: "https",
-				hostname: "images.unsplash.com",
-			},
-		],
 	},
 	async rewrites() {
 		return [

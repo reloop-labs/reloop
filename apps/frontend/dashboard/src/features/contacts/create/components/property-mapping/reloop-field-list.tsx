@@ -9,7 +9,7 @@ import { EMPTY_VALUE } from "./constants";
 
 export type ReloopFieldListProps = {
 	value: MappingRowTarget | null;
-	identityOptions: Array<"email" | "firstName" | "lastName">;
+	identityOptions: Array<"email" | "firstName" | "lastName" | "status">;
 	properties: Array<{ propertyName: string; propertyType?: string }>;
 	onAddProperty: () => void;
 };

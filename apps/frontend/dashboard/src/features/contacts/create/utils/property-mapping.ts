@@ -1,11 +1,15 @@
 import type { ColumnMapping, ColumnTarget } from "./csv-parser";
+import { isSkippedHeader, isStatusHeader } from "./csv-parser";
 
-/** Right-side mapping target: identity fields or a custom Reloop property. */
+/** Right-side mapping target: identity/system fields or a custom Reloop property. */
 export type MappingRowTarget =
 	| "email"
 	| "firstName"
 	| "lastName"
+	| "status"
 	| `property:${string}`;
+
+export type SystemTarget = "email" | "firstName" | "lastName" | "status";
 
 export type PropertyMappingRow = {
 	id: string;
@@ -30,6 +34,10 @@ export const IDENTITY_TARGETS = [
 	{
 		value: "lastName" as const,
 		label: "Last Name",
+	},
+	{
+		value: "status" as const,
+		label: "Subscription Status",
 	},
 ];
 
@@ -73,8 +81,13 @@ export function createEmptyPropertyRow(): PropertyMappingRow {
 
 export function isIdentityTarget(
 	target: MappingRowTarget | null | undefined,
-): target is "email" | "firstName" | "lastName" {
-	return target === "email" || target === "firstName" || target === "lastName";
+): target is "email" | "firstName" | "lastName" | "status" {
+	return (
+		target === "email" ||
+		target === "firstName" ||
+		target === "lastName" ||
+		target === "status"
+	);
 }
 
 export function isPropertyTarget(
@@ -110,14 +123,14 @@ export function getAvailableCsvHeaders(
 export function getAvailableIdentityTargets(
 	rows: PropertyMappingRow[],
 	currentRowId?: string,
-): Array<"email" | "firstName" | "lastName"> {
+): Array<"email" | "firstName" | "lastName" | "status"> {
 	const used = new Set(
 		rows
 			.filter((r) => r.id !== currentRowId && isIdentityTarget(r.target))
 			.map((r) => r.target as string),
 	);
 
-	return (["email", "firstName", "lastName"] as const).filter(
+	return (["email", "firstName", "lastName", "status"] as const).filter(
 		(t) => !used.has(t),
 	);
 }
@@ -167,8 +180,8 @@ export function fuzzyMatchHeaderToProperty(
 
 /**
  * Seed mapping rows from auto-detected CSV column mappings.
- * Keeps identity targets (email / first / last); drops raw property:header
- * invents so the user maps custom properties explicitly (or via suggest).
+ * Keeps identity/system targets (email / first / last / status); drops raw property:header
+ * invents and export-only `skip` columns so the user maps custom properties explicitly (or via suggest).
  */
 export function seedRowsFromDetectedMappings(
 	mappings: ColumnMapping[],
@@ -179,7 +192,8 @@ export function seedRowsFromDetectedMappings(
 		if (
 			m.target === "email" ||
 			m.target === "firstName" ||
-			m.target === "lastName"
+			m.target === "lastName" ||
+			m.target === "status"
 		) {
 			rows.push({
 				id: crypto.randomUUID(),
@@ -212,6 +226,8 @@ export function suggestPropertyRows(
 
 	for (const header of csvHeaders) {
 		if (usedHeaders.has(header)) continue;
+		// Never auto-suggest reserved subscription fields or export-only columns as properties.
+		if (isStatusHeader(header) || isSkippedHeader(header)) continue;
 
 		const match = fuzzyMatchHeaderToProperty(header, properties);
 		if (!match) continue;
@@ -243,6 +259,10 @@ export function rowsToColumnMappings(
 
 export function hasEmailMapping(rows: PropertyMappingRow[]): boolean {
 	return rows.some((r) => isRowComplete(r) && r.target === "email");
+}
+
+export function hasStatusMapping(rows: PropertyMappingRow[]): boolean {
+	return rows.some((r) => isRowComplete(r) && r.target === "status");
 }
 
 /** Count complete rows that map to custom properties (not identity). */

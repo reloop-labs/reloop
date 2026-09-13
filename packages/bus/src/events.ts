@@ -63,6 +63,7 @@ export enum BusEvent {
 	CONTACT_GROUP_CREATED = "contact.group.created",
 	CONTACT_GROUP_UPDATED = "contact.group.updated",
 	CONTACT_GROUP_DELETED = "contact.group.deleted",
+	CONTACT_EXPORT_READY = "contact.export_ready",
 
 	// Contact Auto-Capture Events
 	CONTACT_AUTO_CREATED = "contact.auto_created",

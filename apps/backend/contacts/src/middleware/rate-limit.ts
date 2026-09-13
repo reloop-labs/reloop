@@ -1,3 +1,4 @@
+import { contactsConfig } from "@be/contacts/contacts.config";
 import { redis } from "@be/contacts/utils/loader";
 import {
 	applyResponseHeaders,
@@ -83,6 +84,10 @@ export function rateLimitPlugin(opts: RateLimitOptions) {
 	return new Elysia({ name: `rate-limit-${opts.namespace}` }).macro({
 		rateLimit: {
 			async resolve(context) {
+				if (contactsConfig.NODE_ENV === "development") {
+					return;
+				}
+
 				const identifier = getRateLimitIdentifier(
 					context as Record<string, unknown>,
 					context.request,

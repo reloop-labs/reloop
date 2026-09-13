@@ -201,6 +201,35 @@ export function FoundersAvatarStack() {
 	);
 }
 
+function SupportChatUserAvatar({
+	user,
+}: {
+	user: {
+		name?: string | null;
+		image?: string | null;
+		email?: string | null;
+	};
+}) {
+	const [failedSrc, setFailedSrc] = useState<string | null>(null);
+	const showImage = Boolean(user.image) && failedSrc !== user.image;
+	const initial = (user.name?.[0] || user.email?.[0] || "U").toUpperCase();
+
+	return (
+		<div className="relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-text-strong-950 font-medium text-[11px] text-white dark:bg-white dark:text-black">
+			{showImage && user.image ? (
+				<img
+					src={user.image}
+					alt={user.name || "User"}
+					onError={() => setFailedSrc(user.image ?? null)}
+					className="size-full object-cover"
+				/>
+			) : (
+				initial
+			)}
+		</div>
+	);
+}
+
 export function SupportChatHeader({
 	user,
 	onRefresh,
@@ -242,18 +271,7 @@ export function SupportChatHeader({
 			<div className="flex items-center gap-2">
 				{user ? (
 					<div className="flex items-center gap-2 rounded-full border border-stroke-soft-200/80 bg-bg-white-0 py-1 pr-2.5 pl-1 shadow-xs dark:border-white/10 dark:bg-white/5">
-						<div className="relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-text-strong-950 font-medium text-[11px] text-white dark:bg-white dark:text-black">
-							{user.image ? (
-								<Image
-									src={user.image}
-									alt={user.name || "User"}
-									fill
-									className="object-cover"
-								/>
-							) : (
-								(user.name?.[0] || user.email?.[0] || "U").toUpperCase()
-							)}
-						</div>
+						<SupportChatUserAvatar user={user} />
 						<span className="max-w-[80px] truncate font-medium text-[12px] text-text-strong-950 dark:text-white">
 							{user.name?.split(" ")[0] || "You"}
 						</span>

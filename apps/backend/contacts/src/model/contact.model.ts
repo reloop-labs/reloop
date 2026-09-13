@@ -387,6 +387,71 @@ export namespace ContactModel {
 
 	export type ContactQuery = typeof contactQuery.static;
 
+	export const contactExportQuery = t.Object({
+		search: t.Optional(t.String({ description: "Search by email" })),
+		status: t.Optional(
+			t.Union(
+				[
+					t.Literal("subscribed"),
+					t.Literal("unsubscribed"),
+					t.Literal("blocked"),
+				],
+				{
+					description: "Filter by status",
+				},
+			),
+		),
+		channelId: t.Optional(
+			t.String({
+				description:
+					"Filter to contacts enrolled in this channel (status = enrolled)",
+			}),
+		),
+		groupId: t.Optional(
+			t.String({ description: "Filter to contacts in this group" }),
+		),
+	});
+
+	export type ContactExportQuery = typeof contactExportQuery.static;
+
+	export const contactExportEmailBody = t.Object({
+		search: t.Optional(t.String({ description: "Search by email" })),
+		status: t.Optional(
+			t.Union(
+				[
+					t.Literal("subscribed"),
+					t.Literal("unsubscribed"),
+					t.Literal("blocked"),
+				],
+				{
+					description: "Filter by status",
+				},
+			),
+		),
+		channelId: t.Optional(
+			t.String({
+				description:
+					"Filter to contacts enrolled in this channel (status = enrolled)",
+			}),
+		),
+		groupId: t.Optional(
+			t.String({ description: "Filter to contacts in this group" }),
+		),
+	});
+
+	export type ContactExportEmailBody = typeof contactExportEmailBody.static;
+
+	export const contactExportEmailResponse = t.Object({
+		exportId: t.String({ description: "Background export job identifier" }),
+		totalRows: t.Number({ description: "Contacts matched for the export" }),
+		recipient: t.String({
+			description: "Account email the download link will be sent to",
+		}),
+	});
+
+	export type ContactExportEmailResponse =
+		typeof contactExportEmailResponse.static;
+
 	// Delete Response
 	export const deleteResponse = t.Object(
 		{

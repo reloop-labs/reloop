@@ -3,7 +3,27 @@ import {
 	decodeTrackingToken,
 	encodeTrackingToken,
 } from "@reloop/be-mail/lib/crypto";
+import {
+	extractHostname,
+} from "@reloop/be-mail/lib/outbound-guard";
 import { mailConfig } from "@reloop/be-mail/mail.config";
+import { log } from "evlog";
+
+// ─── Shortener / blocked-domain guard (mirrors outbound-guard.ts) ─────────────
+// Kept as a local inline set so tracking injection has zero extra dependencies
+// at runtime and never issues a redirect to a known phishing shortener.
+const BLOCKED_TRACKING_HOSTNAMES = new Set([
+	"lix.li", "clck.ru", "vk.cc",
+	"bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly",
+	"is.gd", "buff.ly", "rb.gy", "cutt.ly", "short.io",
+	"tiny.cc", "t2m.io", "shorte.st", "adf.ly", "t.me", "telegram.me",
+	...(process.env.BLOCKED_DOMAINS ?? "").split(",").map((d) => d.trim().toLowerCase()).filter(Boolean),
+]);
+
+function isBlockedTrackingUrl(url: string): boolean {
+	const h = extractHostname(url);
+	return h !== "" && BLOCKED_TRACKING_HOSTNAMES.has(h);
+}
 
 export function injectTracking_step5b({
 	html,
@@ -38,7 +58,8 @@ export function injectTracking_step5b({
 
 /**
  * Replaces every href in <a> tags with a tracking redirect URL.
- * Skips mailto:, tel:, #anchors, and decodes/rewrites already-rewritten tracking URLs.
+ * Skips mailto:, tel:, #anchors, already-rewritten URLs, and any URL
+ * pointing to a known phishing shortener or blocked domain.
  */
 function rewriteLinks(
 	html: string,
@@ -60,7 +81,7 @@ function rewriteLinks(
 			// Decode HTML entities — href attributes encode & as &amp;
 			let cleanUrl = originalUrl.replace(/&amp;/gi, "&");
 
-			// Check if it is already a redirect URL
+			// Check if it is already a redirect URL — unwrap to get real destination
 			const redirectMatch = cleanUrl.match(/\/redirect\/([^/?#"]+)/);
 			if (redirectMatch) {
 				const existingToken = redirectMatch[1];
@@ -86,6 +107,22 @@ function rewriteLinks(
 						return match;
 					}
 				}
+			}
+
+			// ── Security: never issue a Reloop redirect to a blocked domain ──────
+			// This is the defence against the lix.li / clck.ru phishing-relay attack.
+			// Strip the entire link rather than forwarding victims to a scam site.
+			if (isBlockedTrackingUrl(cleanUrl)) {
+				log.warn({
+					message: "Blocked phishing/shortener URL removed from tracking injection",
+					url: cleanUrl,
+					emailLogId,
+				});
+				// Remove href entirely — link text is preserved, destination is gone
+				return match.replace(
+					/href=["'][^"']*["']/gi,
+					`href="#blocked-url"`,
+				);
 			}
 
 			let token: string;

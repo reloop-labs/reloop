@@ -12,61 +12,74 @@ const Textarea = React.forwardRef<
 	HTMLTextAreaElement,
 	React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
 		hasError?: boolean;
+		hasSuccess?: boolean;
 		simple?: boolean;
 	}
->(({ className, hasError, simple, disabled, ...rest }, forwardedRef) => {
-	return (
-		<textarea
-			className={cn(
-				[
-					// base
-					"block w-full resize-none text-paragraph-xs text-text-sub-600 outline-none",
-					!simple && [
-						"pointer-events-auto h-full min-h-[82px] bg-transparent pt-2.5 pr-2.5 pl-3",
-					],
-					simple && [
-						"min-h-28 rounded-xl bg-bg-white-0 px-3 py-2.5 shadow-regular-xs",
-						"ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/40",
-						"transition duration-200 ease-out",
-						// hover
-						"hover:[&:not(:focus)]:bg-bg-weak-50",
-						!hasError && [
+>(
+	(
+		{ className, hasError, hasSuccess, simple, disabled, ...rest },
+		forwardedRef,
+	) => {
+		return (
+			<textarea
+				className={cn(
+					[
+						// base
+						"block w-full resize-none text-paragraph-xs text-text-sub-600 outline-none",
+						!simple && [
+							"pointer-events-auto h-full min-h-[82px] bg-transparent pt-2.5 pr-2.5 pl-3",
+						],
+						simple && [
+							"min-h-28 rounded-xl bg-bg-white-0 px-3 py-2.5 shadow-regular-xs",
+							"border border-stroke-soft-100 dark:border-stroke-soft-100/40",
+							"transition duration-200 ease-out",
 							// hover
-							"hover:[&:not(:focus)]:ring-transparent",
-							// focus
-							"focus:shadow-button-important-focus focus:ring-stroke-strong-950",
+							"hover:[&:not(:focus)]:bg-bg-weak-50",
+							!hasError &&
+								!hasSuccess && [
+									// hover
+									"hover:[&:not(:focus)]:border-transparent",
+									// focus
+									"focus:border-primary-base focus:shadow-none focus:ring-4 focus:ring-primary-base/10",
+								],
+							hasError && [
+								// base
+								"border-error-base",
+								// focus
+								"focus:border-error-base focus:shadow-none focus:ring-4 focus:ring-error-base/10",
+							],
+							hasSuccess && [
+								// base
+								"border-success-base",
+								// focus
+								"focus:border-success-base focus:shadow-none focus:ring-4 focus:ring-success-base/10",
+							],
+							disabled && ["border-transparent bg-bg-weak-50"],
 						],
-						hasError && [
-							// base
-							"ring-error-base",
+						!disabled && [
+							// placeholder
+							"placeholder:select-none placeholder:text-text-soft-400 placeholder:transition placeholder:duration-200 placeholder:ease-out",
+							// hover placeholder
+							"group-hover/textarea:placeholder:text-text-sub-600",
 							// focus
-							"focus:shadow-button-error-focus focus:ring-error-base",
+							"focus:outline-none",
+							// focus placeholder
+							"focus:placeholder:text-text-sub-600",
 						],
-						disabled && ["bg-bg-weak-50 ring-transparent"],
+						disabled && [
+							// disabled
+							"text-text-disabled-300 placeholder:text-text-disabled-300",
+						],
 					],
-					!disabled && [
-						// placeholder
-						"placeholder:select-none placeholder:text-text-soft-400 placeholder:transition placeholder:duration-200 placeholder:ease-out",
-						// hover placeholder
-						"group-hover/textarea:placeholder:text-text-sub-600",
-						// focus
-						"focus:outline-none",
-						// focus placeholder
-						"focus:placeholder:text-text-sub-600",
-					],
-					disabled && [
-						// disabled
-						"text-text-disabled-300 placeholder:text-text-disabled-300",
-					],
-				],
-				className,
-			)}
-			ref={forwardedRef}
-			disabled={disabled}
-			{...rest}
-		/>
-	);
-});
+					className,
+				)}
+				ref={forwardedRef}
+				disabled={disabled}
+				{...rest}
+			/>
+		);
+	},
+);
 Textarea.displayName = TEXTAREA_NAME;
 
 function ResizeHandle() {
@@ -96,23 +109,31 @@ type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
 				children?: never;
 				containerClassName?: never;
 				hasError?: boolean;
+				hasSuccess?: boolean;
 		  }
 		| {
 				simple?: false;
 				children?: React.ReactNode;
 				containerClassName?: string;
 				hasError?: boolean;
+				hasSuccess?: boolean;
 		  }
 	);
 
 const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 	(
-		{ containerClassName, children, hasError, simple, ...rest },
+		{ containerClassName, children, hasError, hasSuccess, simple, ...rest },
 		forwardedRef,
 	) => {
 		if (simple) {
 			return (
-				<Textarea ref={forwardedRef} simple hasError={hasError} {...rest} />
+				<Textarea
+					ref={forwardedRef}
+					simple
+					hasError={hasError}
+					hasSuccess={hasSuccess}
+					{...rest}
+				/>
 			);
 		}
 
@@ -122,31 +143,50 @@ const TextareaRoot = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 					[
 						// base
 						"group/textarea relative flex w-full flex-col rounded-xl bg-bg-white-0 pb-2.5 shadow-regular-xs",
-						"ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/40",
 						"transition duration-200 ease-out",
+						// before
+						"before:absolute before:inset-0 before:ring-1 before:ring-stroke-soft-100 before:ring-inset dark:before:ring-stroke-soft-100/40",
+						"before:pointer-events-none before:rounded-[inherit]",
+						"before:transition before:duration-200 before:ease-out",
 						// hover
-						"hover:[&:not(:focus-within)]:bg-bg-weak-50",
+						"hover:shadow-none hover:[&:not(:focus-within)]:bg-bg-weak-50",
 						// disabled
-						"has-[[disabled]]:pointer-events-none has-[[disabled]]:bg-bg-weak-50 has-[[disabled]]:ring-transparent",
+						"has-[[disabled]]:pointer-events-none has-[[disabled]]:bg-bg-weak-50 has-[[disabled]]:before:ring-transparent",
 					],
-					!hasError && [
-						// hover
-						"hover:[&:not(:focus-within)]:ring-transparent",
-						// focus
-						"focus-within:shadow-button-important-focus focus-within:ring-stroke-strong-950",
-					],
+					!hasError &&
+						!hasSuccess && [
+							// hover
+							"hover:[&:not(:focus-within)]:before:ring-transparent",
+							// focus
+							"focus-within:shadow-none focus-within:ring-4 focus-within:ring-primary-base/10 focus-within:before:ring-primary-base",
+						],
 					hasError && [
 						// base
-						"ring-error-base",
+						"before:ring-error-base",
+						// hover
+						"hover:before:ring-error-base",
 						// focus
-						"focus-within:shadow-button-error-focus focus-within:ring-error-base",
+						"focus-within:shadow-none focus-within:ring-4 focus-within:ring-error-base/10 focus-within:before:ring-error-base",
+					],
+					hasSuccess && [
+						// base
+						"before:ring-success-base",
+						// hover
+						"hover:before:ring-success-base",
+						// focus
+						"focus-within:shadow-none focus-within:ring-4 focus-within:ring-success-base/10 focus-within:before:ring-success-base",
 					],
 					containerClassName,
 				)}
 			>
 				<div className="grid">
 					<div className="pointer-events-none relative z-10 flex flex-col gap-2 [grid-area:1/1]">
-						<Textarea ref={forwardedRef} hasError={hasError} {...rest} />
+						<Textarea
+							ref={forwardedRef}
+							hasError={hasError}
+							hasSuccess={hasSuccess}
+							{...rest}
+						/>
 						<div className="pointer-events-none flex items-center justify-end gap-1.5 pr-2.5 pl-3">
 							{children}
 							<ResizeHandle />
