@@ -221,6 +221,11 @@ HOST_DOMAIN=$RELOOP_DOMAIN
 TRACKING_DOMAIN=$RELOOP_TRACKING_HOST
 TRACKING_BASE_URL=$RELOOP_SCHEME://$RELOOP_TRACKING_HOST
 INBOUND_HOSTNAME=$RELOOP_INBOUND_HOST
+
+# Hostname your senders connect to for SMTP submission. Used as the relay's
+# own EHLO name and shown in the dashboard's SMTP credentials and code
+# examples. Change it if submission runs on a different host than the
+# dashboard, then restart smtp and dashboard.
 SMTP_HOSTNAME=$RELOOP_DOMAIN
 DKIM_SELECTOR=reloop
 
