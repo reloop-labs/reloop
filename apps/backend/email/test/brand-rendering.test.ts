@@ -40,27 +40,35 @@ describe("system email branding", () => {
 	test("every template renders the configured app name", async () => {
 		const rendered = await renderAll("Contoso Mail");
 
-		for (const [name, counts] of Object.entries(rendered)) {
-			expect(`${name}: ${counts.brand}`).toBe(`${name}: ${counts.brand}`);
-			expect(counts.brand).toBeGreaterThan(0);
-		}
+		expect(
+			Object.entries(rendered)
+				.filter(([, counts]) => counts.brand < 1)
+				.map(([name]) => name),
+		).toEqual([]);
 	});
 
 	test("no template leaks Reloop beyond the shared footer", async () => {
 		const rendered = await renderAll("Contoso Mail");
 
-		for (const [name, counts] of Object.entries(rendered)) {
-			expect(`${name} leaked ${counts.reloop}`).toBe(
-				`${name} leaked ${RETAINED_FOOTER_ATTRIBUTION_MENTIONS}`,
-			);
-		}
+		expect(
+			Object.entries(rendered)
+				.filter(
+					([, counts]) =>
+						counts.reloop !== RETAINED_FOOTER_ATTRIBUTION_MENTIONS,
+				)
+				.map(([name, counts]) => `${name}: ${counts.reloop}`),
+		).toEqual([]);
 	});
 
-	test("defaults to Reloop when APP_NAME is unset", async () => {
+	test("defaults to Reloop in template copy, not just the footer", async () => {
 		const rendered = await renderAll();
 
-		for (const counts of Object.values(rendered)) {
-			expect(counts.brand).toBeGreaterThan(0);
-		}
+		expect(
+			Object.entries(rendered)
+				.filter(
+					([, counts]) => counts.brand <= RETAINED_FOOTER_ATTRIBUTION_MENTIONS,
+				)
+				.map(([name, counts]) => `${name}: ${counts.brand}`),
+		).toEqual([]);
 	});
 });
