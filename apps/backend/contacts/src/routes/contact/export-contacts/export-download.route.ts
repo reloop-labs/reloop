@@ -11,7 +11,7 @@ export const exportDownloadRoute = new Elysia()
 		}),
 	)
 	.get(
-		"/download",
+		"/export/download",
 		async ({ query, status }) => {
 			if (!query.token) {
 				return status(400, {

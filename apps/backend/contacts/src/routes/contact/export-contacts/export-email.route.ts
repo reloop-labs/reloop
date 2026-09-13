@@ -14,7 +14,7 @@ export const exportEmailRoute = new Elysia()
 		}),
 	)
 	.post(
-		"/email",
+		"/export/email",
 		async ({ body, organizationId, userId }) => {
 			return await requestExportEmailController({
 				organizationId: organizationId as string,

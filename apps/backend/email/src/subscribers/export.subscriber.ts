@@ -22,8 +22,6 @@ export async function initExportSubscribers() {
 					);
 					return;
 				}
-				await redis.set(dedupKey, "1", 7 * 24 * 60 * 60);
-
 				const html = await render(
 					React.createElement(ExportReadyEmail, {
 						totalRows: payload.totalRows,
@@ -44,7 +42,10 @@ export async function initExportSubscribers() {
 					html,
 					text,
 				});
+
+				await redis.set(dedupKey, "1", 7 * 24 * 60 * 60);
 			} catch (error) {
+				await redis.delete(dedupKey).catch(() => {});
 				log.error({
 					...{ error, payload },
 					message: "Failed to send export-ready email",
