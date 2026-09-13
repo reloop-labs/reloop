@@ -182,7 +182,7 @@ export function WorkflowDropdown({
 					aria-label="Actions"
 					className="h-6 w-6 p-0 text-text-sub-600 hover:text-text-strong-950"
 				>
-					<Icon name="dots-horizontal" className="h-4 w-4" />
+					<Icon name="more-horizontal" className="h-4 w-4" />
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content

@@ -13,6 +13,7 @@ import { queryKeys } from "#/lib/query-keys";
 import {
 	type CustomEvent,
 	createCustomEvent,
+	updateCustomEvent,
 } from "../hooks/use-custom-events-api";
 import {
 	AutomationModalFrame,
@@ -51,13 +52,20 @@ const isValidPropertyName = (name: string) =>
 interface CreateEventModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	event?: CustomEvent | null;
 	onCreated?: (event: CustomEvent) => void;
+	onUpdated?: (event: CustomEvent) => void;
 }
+
+const suffixFromKey = (key: string) =>
+	key.startsWith(TRIGGER_PREFIX) ? key.slice(TRIGGER_PREFIX.length) : key;
 
 export function CreateEventModal({
 	open,
 	onOpenChange,
+	event,
 	onCreated,
+	onUpdated,
 }: CreateEventModalProps) {
 	const queryClient = useQueryClient();
 	const [name, setName] = useState("");
@@ -83,10 +91,7 @@ export function CreateEventModal({
 		]);
 	};
 
-	const handleUpdateProperty = (
-		id: string,
-		patch: Partial<PropertyDraft>,
-	) => {
+	const handleUpdateProperty = (id: string, patch: Partial<PropertyDraft>) => {
 		setProperties((prev) =>
 			prev.map((p) => (p.id === id ? { ...p, ...patch } : p)),
 		);
@@ -107,6 +112,8 @@ export function CreateEventModal({
 		if (!suffix) return undefined;
 		return `${TRIGGER_PREFIX}${suffix}`;
 	};
+
+	const isEdit = !!event;
 
 	const handleSubmit = async () => {
 		if (status !== "idle") return;
@@ -140,19 +147,36 @@ export function CreateEventModal({
 		nameField.clear();
 		setStatus("busy");
 		try {
-			const key = buildKey();
-			const normalizedProps =
-				properties.length > 0
-					? properties.map((p) => ({
-							name: p.name.trim(),
-							propertyType: p.propertyType,
-						}))
-					: undefined;
+			const normalizedProps = properties.map((p) => ({
+				name: p.name.trim(),
+				propertyType: p.propertyType,
+			}));
+
+			if (event) {
+				const updated = await updateCustomEvent(event.id, {
+					name: trimmed,
+					properties: normalizedProps,
+				});
+				await queryClient.invalidateQueries({
+					queryKey: queryKeys.workflows.events(),
+				});
+				await queryClient.invalidateQueries({
+					queryKey: queryKeys.workflows.event(event.id),
+				});
+				setStatus("success");
+				setTimeout(() => {
+					onUpdated?.(updated);
+					onOpenChange(false);
+					nameField.clear();
+					setStatus("idle");
+				}, 450);
+				return;
+			}
 
 			const created = await createCustomEvent({
 				name: trimmed,
-				key,
-				properties: normalizedProps,
+				key: buildKey(),
+				properties: normalizedProps.length > 0 ? normalizedProps : undefined,
 			});
 			await queryClient.invalidateQueries({
 				queryKey: queryKeys.workflows.events(),
@@ -170,7 +194,11 @@ export function CreateEventModal({
 		} catch (err) {
 			setStatus("idle");
 			const message =
-				err instanceof Error ? err.message : "Failed to create event";
+				err instanceof Error
+					? err.message
+					: isEdit
+						? "Failed to update trigger"
+						: "Failed to create event";
 			nameField.show(message);
 			toast.error(message);
 		}
@@ -196,17 +224,29 @@ export function CreateEventModal({
 	);
 
 	useEffect(() => {
-		if (!open) {
-			const timer = setTimeout(() => {
-				setName("");
-				setKeySuffix("");
-				setProperties([]);
-				clearNameError();
-				setStatus("idle");
-			}, 300);
-			return () => clearTimeout(timer);
+		if (open) {
+			if (event) {
+				setName(event.name);
+				setKeySuffix(suffixFromKey(event.key));
+				setProperties(
+					event.properties.map((p) => ({
+						id: p.id,
+						name: p.name,
+						propertyType: p.propertyType,
+					})),
+				);
+			}
+			return;
 		}
-	}, [open, clearNameError]);
+		const timer = setTimeout(() => {
+			setName("");
+			setKeySuffix("");
+			setProperties([]);
+			clearNameError();
+			setStatus("idle");
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [open, event, clearNameError]);
 
 	const previewKey = (() => {
 		const k = buildKey();
@@ -221,14 +261,14 @@ export function CreateEventModal({
 	return (
 		<AutomationModalFrame
 			open={open}
-			title="Create trigger"
+			title={isEdit ? "Edit trigger" : "Create trigger"}
 			icon="zap"
 			status={status}
 			onSubmit={() => void handleSubmit()}
 			onClose={handleClose}
-			submitLabel="Create trigger"
-			busyLabel="Creating..."
-			successLabel="Created"
+			submitLabel={isEdit ? "Save changes" : "Create trigger"}
+			busyLabel={isEdit ? "Saving..." : "Creating..."}
+			successLabel={isEdit ? "Saved" : "Created"}
 		>
 			<div className="space-y-4 px-6 pb-7">
 				<div className="space-y-1.5">
@@ -267,7 +307,9 @@ export function CreateEventModal({
 						className="font-medium text-text-strong-950 text-xs"
 					>
 						Key
-						<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
+						{isEdit ? null : (
+							<Label.Sub className="ml-1 text-xs">(optional)</Label.Sub>
+						)}
 					</Label.Root>
 					<div className="flex items-stretch overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/40">
 						<span className="flex items-center bg-bg-weak-50 px-3 font-mono text-sm text-text-sub-600 dark:bg-bg-weak-50/40">
@@ -278,7 +320,7 @@ export function CreateEventModal({
 							placeholder="signup"
 							value={keySuffix}
 							onChange={(e) => setKeySuffix(e.target.value)}
-							disabled={status !== "idle"}
+							disabled={status !== "idle" || isEdit}
 							className="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-text-soft-400 disabled:opacity-50"
 						/>
 					</div>
@@ -286,10 +328,14 @@ export function CreateEventModal({
 						Full key: {previewKey}
 					</p>
 					<p className="text-[11px] text-text-sub-600">
-						Defaults from the name if you leave this blank. Only type after{" "}
-						<code className="rounded bg-bg-weak-50 px-1 py-0.5 font-mono text-[11px] dark:bg-bg-weak-50/60">
-							trigger.
-						</code>
+						{isEdit
+							? "The key is used when tracking events and cannot be changed."
+							: "Defaults from the name if you leave this blank. Only type after "}
+						{isEdit ? null : (
+							<code className="rounded bg-bg-weak-50 px-1 py-0.5 font-mono text-[11px] dark:bg-bg-weak-50/60">
+								trigger.
+							</code>
+						)}
 					</p>
 				</div>
 
@@ -303,7 +349,7 @@ export function CreateEventModal({
 							type="button"
 							onClick={handleAddProperty}
 							disabled={status !== "idle"}
-							className="inline-flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-xs font-medium text-text-strong-950 hover:bg-bg-weak-50 disabled:opacity-50 dark:border-stroke-soft-100/40"
+							className="inline-flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 font-medium text-text-strong-950 text-xs hover:bg-bg-weak-50 disabled:opacity-50 dark:border-stroke-soft-100/40"
 						>
 							<Icon name="plus" className="h-3 w-3" />
 							Add property
@@ -311,7 +357,7 @@ export function CreateEventModal({
 					</div>
 
 					{properties.length === 0 ? (
-						<p className="rounded-lg border border-dashed border-stroke-soft-200 bg-bg-weak-50/30 px-3 py-3 text-center text-xs text-text-sub-600 dark:border-stroke-soft-100/40">
+						<p className="rounded-lg border border-stroke-soft-200 border-dashed bg-bg-weak-50/30 px-3 py-3 text-center text-text-sub-600 text-xs dark:border-stroke-soft-100/40">
 							No properties yet. Add dynamic properties like contact properties
 							— each has a name and a type (no default values).
 						</p>
@@ -351,7 +397,7 @@ export function CreateEventModal({
 													})
 												}
 												className={cn(
-													"rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+													"rounded-md px-2.5 py-1 font-medium text-xs transition-colors",
 													p.propertyType === opt.value
 														? "bg-bg-white-0 text-text-strong-950 shadow-sm dark:bg-bg-white-0/10"
 														: "text-text-sub-600 hover:text-text-strong-950",

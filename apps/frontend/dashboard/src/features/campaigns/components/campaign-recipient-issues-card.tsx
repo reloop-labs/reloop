@@ -1,5 +1,6 @@
 "use client";
 
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
@@ -192,13 +193,16 @@ export function CampaignRecipientIssuesCard({
 				{/* Right ... menu */}
 				<Dropdown.Root>
 					<Dropdown.Trigger asChild>
-						<button
+						<Button.Root
 							type="button"
-							className="flex h-8 w-8 items-center justify-center rounded-xl text-text-sub-600 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950 dark:hover:bg-neutral-900"
+							variant="neutral"
+							mode="ghost"
+							size="xxsmall"
+							className="aspect-square h-8 w-8 rounded-xl p-0 text-text-sub-600 hover:text-text-strong-950"
 							aria-label="More options"
 						>
 							<Icon name="more-horizontal" className="h-4 w-4" />
-						</button>
+						</Button.Root>
 					</Dropdown.Trigger>
 					<Dropdown.Content align="end" className="w-52">
 						<Dropdown.Item

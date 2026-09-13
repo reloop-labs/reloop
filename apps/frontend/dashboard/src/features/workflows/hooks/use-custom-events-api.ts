@@ -49,17 +49,19 @@ export async function listCustomEvents(
 	return parseJson(res);
 }
 
+export type CustomEventPropertyInput = {
+	name: string;
+	propertyType?: "string" | "number" | "boolean";
+	required?: boolean;
+	defaultValue?: string | null;
+	description?: string | null;
+};
+
 export async function createCustomEvent(input: {
 	name: string;
 	key?: string;
 	description?: string;
-	properties?: Array<{
-		name: string;
-		propertyType?: "string" | "number" | "boolean";
-		required?: boolean;
-		defaultValue?: string | null;
-		description?: string | null;
-	}>;
+	properties?: CustomEventPropertyInput[];
 }): Promise<CustomEvent> {
 	const res = await fetch("/api/workflow/v1/events", {
 		method: "POST",
@@ -67,5 +69,48 @@ export async function createCustomEvent(input: {
 		headers: { "content-type": "application/json" },
 		body: JSON.stringify(input),
 	});
+	return parseJson(res);
+}
+
+export async function getCustomEvent(
+	eventIdOrKey: string,
+): Promise<CustomEvent> {
+	const res = await fetch(
+		`/api/workflow/v1/events/${encodeURIComponent(eventIdOrKey)}`,
+		{ credentials: "include" },
+	);
+	return parseJson(res);
+}
+
+export async function updateCustomEvent(
+	eventId: string,
+	input: {
+		name?: string;
+		description?: string | null;
+		properties?: CustomEventPropertyInput[];
+	},
+): Promise<CustomEvent> {
+	const res = await fetch(
+		`/api/workflow/v1/events/${encodeURIComponent(eventId)}`,
+		{
+			method: "PATCH",
+			credentials: "include",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify(input),
+		},
+	);
+	return parseJson(res);
+}
+
+export async function deleteCustomEvent(
+	eventId: string,
+): Promise<{ success: boolean; id: string }> {
+	const res = await fetch(
+		`/api/workflow/v1/events/${encodeURIComponent(eventId)}`,
+		{
+			method: "DELETE",
+			credentials: "include",
+		},
+	);
 	return parseJson(res);
 }
