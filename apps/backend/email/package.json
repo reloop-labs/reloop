@@ -30,6 +30,7 @@
 		"@elysiajs/openapi": "catalog:backend",
 		"@react-email/render": "catalog:ui",
 		"@react-email/tailwind": "catalog:ui",
+		"@reloop/brand": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/cache": "workspace:*",

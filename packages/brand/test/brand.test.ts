@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { DEFAULT_APP_NAME, resolveAppName } from "@reloop/email/brand";
+import { DEFAULT_APP_NAME, resolveAppName } from "@reloop/brand";
 
 describe("resolveAppName", () => {
 	test("uses the configured name", () => {

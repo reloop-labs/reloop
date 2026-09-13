@@ -3,6 +3,7 @@ import {
 	createAuthPlugin,
 	resolveSessionAuthWithProfile,
 } from "@reloop/auth/middleware";
+import { appName } from "@reloop/brand";
 import { db } from "@reloop/db/client";
 import { member } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
@@ -122,7 +123,7 @@ export const sendTestEmailRoute = new Elysia({
 
 			// Display name + address — matches product expectation:
 			// Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}>
-			const from = `Reloop <${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}>`;
+			const from = `${appName} <${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}>`;
 			try {
 				const result = await sendEmail({
 					from,
