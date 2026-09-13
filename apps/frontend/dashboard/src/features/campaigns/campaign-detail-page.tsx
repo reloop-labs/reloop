@@ -12,6 +12,7 @@ import {
 } from "./campaigns-provider";
 import { CampaignHeader } from "./components/campaign-header";
 import { CampaignPreviewTabs } from "./components/campaign-preview-tabs";
+import { CampaignRecipientIssuesCard } from "./components/campaign-recipient-issues-card";
 import { DeleteCampaignModal } from "./components/delete-campaign";
 
 function CampaignDetailContent() {
@@ -279,6 +280,9 @@ function CampaignDetailContent() {
 						</div>
 					</div>
 				)}
+
+				{/* Deliverability & Recipient Activity (Unsubscribed, Bounced, Suppressed, Complained) */}
+				<CampaignRecipientIssuesCard campaignId={campaign.id} />
 
 				{/* Message Preview Tabs */}
 				<CampaignPreviewTabs campaign={campaign} audienceInfo={audienceInfo} />

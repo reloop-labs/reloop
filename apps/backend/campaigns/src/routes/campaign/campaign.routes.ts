@@ -251,17 +251,19 @@ export const campaignRoutes = new Elysia({
 			return await listRecipientsController({
 				id: params.id,
 				organizationId,
-				page: query.page,
-				limit: query.limit,
+				page: query.page ? Number(query.page) : undefined,
+				limit: query.limit ? Number(query.limit) : undefined,
 				status: query.status,
+				category: query.category,
+				search: query.search,
 			});
 		},
 		{
 			auth: true,
 			params: t.Object({ id: t.String() }),
 			query: t.Object({
-				page: t.Optional(t.Number()),
-				limit: t.Optional(t.Number()),
+				page: t.Optional(t.Numeric()),
+				limit: t.Optional(t.Numeric()),
 				status: t.Optional(
 					t.Union([
 						t.Literal("pending"),
@@ -271,6 +273,16 @@ export const campaignRoutes = new Elysia({
 						t.Literal("failed"),
 					]),
 				),
+				category: t.Optional(
+					t.Union([
+						t.Literal("unsubscribed"),
+						t.Literal("bounced"),
+						t.Literal("suppressed"),
+						t.Literal("complained"),
+						t.Literal("all"),
+					]),
+				),
+				search: t.Optional(t.String()),
 			}),
 			response: {
 				200: t.Object({
@@ -278,6 +290,15 @@ export const campaignRoutes = new Elysia({
 					total: t.Number(),
 					page: t.Number(),
 					limit: t.Number(),
+					counts: t.Optional(
+						t.Object({
+							unsubscribed: t.Number(),
+							bounced: t.Number(),
+							suppressed: t.Number(),
+							complained: t.Number(),
+							all: t.Number(),
+						}),
+					),
 				}),
 				...errorResponses,
 			},
