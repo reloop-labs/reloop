@@ -13,6 +13,21 @@ function pct2(numerator: number, denominator: number): string {
 	return `${((numerator / denominator) * 100).toFixed(2)}%`;
 }
 
+// Card shell matches CampaignRecipientIssuesCard (same page) and the
+// dashboard card convention: single-layer white panel, p-5.
+const cardShell =
+	"overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/50 dark:bg-neutral-950";
+
+// Eyebrow label + headline value follow the dashboard stat convention
+// (see SendHealthCard MetricStat / domain-stats).
+const eyebrowCls =
+	"font-medium text-[10px] text-text-soft-400 uppercase tracking-wider";
+
+const headlineCls =
+	"mt-2 font-semibold text-title-h6 text-text-strong-950 tabular-nums tracking-tight";
+
+const helperCls = "mt-1 text-paragraph-xs text-text-soft-400";
+
 function BreakdownRow({
 	dot,
 	name,
@@ -27,14 +42,14 @@ function BreakdownRow({
 	muted?: boolean;
 }) {
 	return (
-		<div className="flex items-center justify-between gap-3 border-stroke-soft-100 border-b py-3 last:border-b-0 dark:border-neutral-800">
+		<div className="flex items-center justify-between gap-3 py-3">
 			<span className="flex min-w-0 items-center gap-2">
 				{dot ? (
 					<span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dot)} />
 				) : null}
 				<span
 					className={cn(
-						"truncate text-[13px]",
+						"truncate text-paragraph-sm",
 						muted ? "text-text-sub-600" : "text-text-strong-950",
 					)}
 				>
@@ -42,10 +57,10 @@ function BreakdownRow({
 				</span>
 			</span>
 			<span className="flex shrink-0 items-baseline gap-2 tabular-nums">
-				<span className="text-[13px] text-text-sub-600">
+				<span className="text-paragraph-sm text-text-sub-600">
 					{count.toLocaleString()}
 				</span>
-				<span className="min-w-[52px] text-right font-medium text-[13px] text-text-strong-950">
+				<span className="min-w-[52px] text-right font-medium text-paragraph-sm text-text-strong-950">
 					{rate}
 				</span>
 			</span>
@@ -131,43 +146,41 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 	return (
 		<div className="space-y-3">
 			{showBanner ? (
-				<div className="flex items-start gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50 px-4 py-3.5 dark:border-neutral-800 dark:bg-neutral-900">
-					<Icon
-						name="chart-pie"
-						className="mt-0.5 h-4 w-4 shrink-0 text-text-sub-600"
-					/>
-					<div className="min-w-0 flex-1">
-						<p className="text-[13px] text-text-strong-950 leading-5">
-							{bannerMessage}
-						</p>
-						<a
-							href={settingsHref}
-							className="mt-0.5 inline-block text-[13px] text-text-sub-600 underline-offset-2 hover:underline"
+				<div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 dark:border-amber-800/40 dark:bg-amber-950/30">
+					<div className="flex items-start gap-2.5">
+						<Icon
+							name="chart-pie"
+							className="mt-0.5 h-4 w-4 shrink-0 text-amber-800 dark:text-amber-200"
+						/>
+						<div className="min-w-0 flex-1">
+							<p className="text-amber-800 text-xs leading-relaxed dark:text-amber-200">
+								{bannerMessage}{" "}
+								<a
+									href={settingsHref}
+									className="font-medium underline underline-offset-2 hover:opacity-80"
+								>
+									Open the settings.
+								</a>
+							</p>
+						</div>
+						<button
+							type="button"
+							aria-label="Dismiss"
+							onClick={() => setBannerDismissed(true)}
+							className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-amber-800 hover:bg-amber-900/10 dark:text-amber-200 dark:hover:bg-white/10"
 						>
-							Open the settings.
-						</a>
+							<Icon name="cross" className="h-3 w-3" />
+						</button>
 					</div>
-					<button
-						type="button"
-						aria-label="Dismiss"
-						onClick={() => setBannerDismissed(true)}
-						className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-strong-950 hover:bg-neutral-alpha-10"
-					>
-						<Icon name="cross" className="h-3.5 w-3.5" />
-					</button>
 				</div>
 			) : null}
 
 			{/* Metric cards: deliverability + opt-out + engagement */}
 			<div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-				<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 sm:p-6 dark:border-neutral-800 dark:bg-neutral-950">
-					<p className="font-medium text-[13px] text-text-sub-600 uppercase tracking-wide">
-						Deliverability
-					</p>
-					<p className="mt-2 font-medium text-[28px] text-text-strong-950 tabular-nums leading-9 tracking-tight">
-						{deliverabilityPct}
-					</p>
-					<div className="mt-3">
+				<div className={cardShell}>
+					<p className={eyebrowCls}>Deliverability</p>
+					<p className={headlineCls}>{deliverabilityPct}</p>
+					<div className="mt-3 divide-y divide-stroke-soft-100/60 dark:divide-stroke-soft-100/30">
 						<BreakdownRow
 							dot="bg-emerald-700 dark:bg-emerald-500"
 							name="Delivered"
@@ -189,14 +202,10 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 					</div>
 				</div>
 
-				<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 sm:p-6 dark:border-neutral-800 dark:bg-neutral-950">
-					<p className="font-medium text-[13px] text-text-sub-600 uppercase tracking-wide">
-						Opt-out
-					</p>
-					<p className="mt-2 font-medium text-[28px] text-text-strong-950 tabular-nums leading-9 tracking-tight">
-						{unsubPct}
-					</p>
-					<div className="mt-3">
+				<div className={cardShell}>
+					<p className={eyebrowCls}>Opt-out</p>
+					<p className={headlineCls}>{unsubPct}</p>
+					<div className="mt-3 divide-y divide-stroke-soft-100/60 dark:divide-stroke-soft-100/30">
 						<BreakdownRow
 							dot="bg-red-800 dark:bg-red-500"
 							name="Unsubscribed"
@@ -212,19 +221,15 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 					</div>
 				</div>
 
-				<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 sm:p-6 dark:border-neutral-800 dark:bg-neutral-950">
-					<p className="font-medium text-[13px] text-text-sub-600 uppercase tracking-wide">
-						Engagement
-					</p>
-					<p className="mt-2 font-medium text-[28px] text-text-strong-950 tabular-nums leading-9 tracking-tight">
-						{openRatePct}
-					</p>
+				<div className={cardShell}>
+					<p className={eyebrowCls}>Engagement</p>
+					<p className={headlineCls}>{openRatePct}</p>
 					{trackingOff ? (
-						<p className="mt-1 text-[13px] text-text-sub-600 leading-5">
+						<p className={helperCls}>
 							Tracking disabled — enable in domain settings
 						</p>
 					) : null}
-					<div className="mt-3">
+					<div className="mt-3 divide-y divide-stroke-soft-100/60 dark:divide-stroke-soft-100/30">
 						<BreakdownRow
 							dot="bg-blue-500"
 							name="Unique opens"
