@@ -11,8 +11,11 @@ export const CampaignSubjectField = () => {
 	const setSubject = useCampaignEditorStore((s) => s.setSubject);
 	const previewText = useCampaignEditorStore((s) => s.previewText);
 	const setPreviewText = useCampaignEditorStore((s) => s.setPreviewText);
+	const subjectErrorFlash = useCampaignEditorStore((s) => s.subjectErrorFlash);
 
 	const [showPreview, setShowPreview] = useState(false);
+
+	const showSubjectError = subjectErrorFlash > 0 && !subject.trim();
 
 	useEffect(() => {
 		if (previewText) {
@@ -27,6 +30,7 @@ export const CampaignSubjectField = () => {
 				id="campaign-send-details-subject"
 				label="Subject"
 				required
+				hasError={showSubjectError}
 				infoTooltip={{
 					title: "Email Subject",
 					description: "Subject line displayed in the recipient's inbox.",

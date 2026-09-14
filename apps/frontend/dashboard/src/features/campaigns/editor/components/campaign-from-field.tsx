@@ -118,6 +118,7 @@ export const CampaignFromField = () => {
 	const setFromEmail = useCampaignEditorStore((s) => s.setFromEmail);
 	const replyTo = useCampaignEditorStore((s) => s.replyTo);
 	const setReplyTo = useCampaignEditorStore((s) => s.setReplyTo);
+	const fromErrorFlash = useCampaignEditorStore((s) => s.fromErrorFlash);
 
 	const { user } = useActiveOrganization();
 
@@ -183,7 +184,9 @@ export const CampaignFromField = () => {
 		if (angleMatch) {
 			const namePart = angleMatch[1]?.trim() || "";
 			const emailPart = angleMatch[2]?.trim() || "";
-			const isComplete = Boolean(emailPart.includes("@") && emailPart.includes("."));
+			const isComplete = Boolean(
+				emailPart.includes("@") && emailPart.includes("."),
+			);
 			const [handlePart = "", domainPart = ""] = emailPart.split("@");
 			return {
 				name: namePart,
@@ -307,12 +310,7 @@ export const CampaignFromField = () => {
 		// If query filtered out everything, fallback to showing all default suggestions
 		const finalSuggestions = result.length > 0 ? result : allDefaults;
 		return finalSuggestions.slice(0, 8);
-	}, [
-		verifiedSendingDomains,
-		parsedInput,
-		user?.name,
-		user?.email,
-	]);
+	}, [verifiedSendingDomains, parsedInput, user?.name, user?.email]);
 
 	// Auto-correct & update store as the user types
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -435,7 +433,12 @@ export const CampaignFromField = () => {
 		verifiedDomainNames.includes(fromDomain);
 
 	let fromError: ErrorDetails | null = null;
-	if (fromEmail) {
+	if (!fromEmailAddress && fromErrorFlash > 0) {
+		fromError = {
+			title: "From address required",
+			description: "Add a From address before sending a test email.",
+		};
+	} else if (fromEmail) {
 		if (!isFromEmailValid) {
 			fromError = {
 				title: "Invalid Email Format",
@@ -473,6 +476,7 @@ export const CampaignFromField = () => {
 				id="campaign-send-details-from"
 				label="From"
 				required
+				hasError={fromError !== null}
 				infoTooltip={{
 					title: "Sender Identity",
 					description:

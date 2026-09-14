@@ -21,6 +21,12 @@ export interface CampaignEditorState {
 	viewMode: "visual" | "code" | "preview";
 	isDetailsOpen: boolean;
 
+	// Validation flash counters — incremented to underline a field red
+	// (e.g. when Test email is clicked with missing details).
+	// Fields clear their own counter on edit.
+	fromErrorFlash: number;
+	subjectErrorFlash: number;
+
 	// Actions
 	setCampaignData: (campaign: Campaign) => void;
 	setName: (name: string) => void;
@@ -41,6 +47,8 @@ export interface CampaignEditorState {
 	setViewMode: (mode: "visual" | "code" | "preview") => void;
 	setIsDetailsOpen: (open: boolean) => void;
 	toggleDetailsOpen: () => void;
+	flashFromError: () => void;
+	flashSubjectError: () => void;
 }
 
 export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
@@ -61,6 +69,8 @@ export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 	previewDevice: "desktop",
 	viewMode: "visual",
 	isDetailsOpen: true,
+	fromErrorFlash: 0,
+	subjectErrorFlash: 0,
 
 	setCampaignData: (campaign: Campaign) =>
 		set({
@@ -78,11 +88,13 @@ export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 		}),
 
 	setName: (name) => set({ name, hasUnsavedChanges: true }),
-	setSubject: (subject) => set({ subject, hasUnsavedChanges: true }),
+	setSubject: (subject) =>
+		set({ subject, hasUnsavedChanges: true, subjectErrorFlash: 0 }),
 	setPreviewText: (previewText) =>
 		set({ previewText, hasUnsavedChanges: true }),
 	setFromName: (fromName) => set({ fromName, hasUnsavedChanges: true }),
-	setFromEmail: (fromEmail) => set({ fromEmail, hasUnsavedChanges: true }),
+	setFromEmail: (fromEmail) =>
+		set({ fromEmail, hasUnsavedChanges: true, fromErrorFlash: 0 }),
 	setReplyTo: (replyTo) => set({ replyTo, hasUnsavedChanges: true }),
 	setAudience: (type, targetId = "", targetName = "All Contacts") =>
 		set({
@@ -100,4 +112,8 @@ export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 	setIsDetailsOpen: (isDetailsOpen) => set({ isDetailsOpen }),
 	toggleDetailsOpen: () =>
 		set((state) => ({ isDetailsOpen: !state.isDetailsOpen })),
+	flashFromError: () =>
+		set((state) => ({ fromErrorFlash: state.fromErrorFlash + 1 })),
+	flashSubjectError: () =>
+		set((state) => ({ subjectErrorFlash: state.subjectErrorFlash + 1 })),
 }));

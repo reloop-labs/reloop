@@ -141,9 +141,46 @@ function CampaignNameField() {
 
 export function CampaignEditorHeader() {
 	const { campaignId } = useCampaignEditorStore();
+	const fromEmail = useCampaignEditorStore((s) => s.fromEmail);
+	const subject = useCampaignEditorStore((s) => s.subject);
 	const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 	const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 	const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+
+	const focusField = (id: string) => {
+		const el = document.getElementById(id);
+		if (!el) return;
+		el.scrollIntoView({ behavior: "smooth", block: "center" });
+		// Focus after scroll so the caret lands in the field
+		window.requestAnimationFrame(() => {
+			el.focus({ preventScroll: true });
+		});
+	};
+
+	const handleTestClick = () => {
+		const { flashFromError, flashSubjectError } =
+			useCampaignEditorStore.getState();
+		const raw = fromEmail.trim();
+		const match = raw.match(/<([^>]+)>/);
+		const address = (match?.[1] ?? raw).trim();
+		const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address);
+
+		// Priority 1: From address — empty or invalid → red underline + focus
+		if (!address || !isValid) {
+			flashFromError();
+			focusField("campaign-send-details-from");
+			return;
+		}
+
+		// Priority 2: Subject — empty → red underline + focus
+		if (!subject.trim()) {
+			flashSubjectError();
+			focusField("campaign-send-details-subject");
+			return;
+		}
+
+		setIsTestModalOpen(true);
+	};
 
 	return (
 		<>
@@ -166,7 +203,7 @@ export function CampaignEditorHeader() {
 					<FancyButton.Root
 						variant="basic"
 						size="xsmall"
-						onClick={() => setIsTestModalOpen(true)}
+						onClick={handleTestClick}
 					>
 						Test email
 					</FancyButton.Root>

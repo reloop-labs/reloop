@@ -19,6 +19,7 @@ export interface CampaignFieldRowProps {
 	children: React.ReactNode;
 	hideBorder?: boolean;
 	required?: boolean;
+	hasError?: boolean;
 	className?: string;
 	infoTooltip?: string | FieldInfoDetails | React.ReactNode;
 }
@@ -29,6 +30,7 @@ export const CampaignFieldRow = ({
 	children,
 	hideBorder,
 	required,
+	hasError,
 	className,
 	infoTooltip,
 }: CampaignFieldRowProps) => {
@@ -52,11 +54,12 @@ export const CampaignFieldRow = ({
 			className={cn(
 				"group relative flex items-center border-stroke-soft-200 border-b py-3 dark:border-stroke-soft-100/40",
 				hideBorder && "border-b-0",
+				hasError && "border-error-base dark:border-error-base",
 				className,
 			)}
 		>
 			{infoTooltip && (
-				<div className="absolute -left-7 top-1/2 flex -translate-y-1/2 items-center justify-center opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+				<div className="-left-7 -translate-y-1/2 absolute top-1/2 flex items-center justify-center opacity-0 transition-opacity duration-150 group-hover:opacity-100">
 					<Tooltip.Provider delayDuration={0}>
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>
@@ -111,7 +114,7 @@ export const CampaignFieldRow = ({
 					<span className="ml-0.5 text-error-base text-paragraph-xs">*</span>
 				)}
 			</label>
-			<div className="flex flex-1 items-center min-w-0">{children}</div>
+			<div className="flex min-w-0 flex-1 items-center">{children}</div>
 		</div>
 	);
 };

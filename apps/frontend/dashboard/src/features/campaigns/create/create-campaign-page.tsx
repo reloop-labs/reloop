@@ -141,6 +141,7 @@ function CreateCampaignPageContent() {
 			: "Reloop Team",
 	);
 	const [fromUsername, setFromUsername] = useState("updates");
+	const [fromUsernameError, setFromUsernameError] = useState("");
 	const [selectedDomain, setSelectedDomain] = useState("");
 	const [replyTo, setReplyTo] = useState("");
 
@@ -377,6 +378,41 @@ function CreateCampaignPageContent() {
 	);
 
 	const handleSendTestEmail = () => {
+		const focusField = (id: string) => {
+			window.setTimeout(() => {
+				const el = document.getElementById(id);
+				if (!el) return;
+				el.scrollIntoView({ behavior: "smooth", block: "center" });
+				window.requestAnimationFrame(() => {
+					el.focus({ preventScroll: true });
+				});
+			}, 50);
+		};
+
+		// Priority 1: From address — empty or invalid → red underline + focus
+		const username = fromUsername.trim();
+		if (!username || !/^[^\s@]+$/.test(username)) {
+			setStep("sender");
+			setSubjectError("");
+			setFromUsernameError(
+				!username
+					? "Please enter a From address"
+					: "This doesn't look like a valid email prefix",
+			);
+			focusField("from-username");
+			return;
+		}
+		setFromUsernameError("");
+
+		// Priority 2: Subject — empty → red underline + focus
+		if (!subject.trim()) {
+			setStep("sender");
+			setSubjectError("Please enter a subject line");
+			setSubjectShakeKey((k) => k + 1);
+			focusField("campaign-subject");
+			return;
+		}
+
 		const email = testEmailAddress.trim();
 		if (!email || !email.includes("@")) {
 			toast.error("Please enter a valid email address for test send");
@@ -1387,12 +1423,19 @@ function CreateCampaignPageContent() {
 										<Label.Root>From Email Address</Label.Root>
 										<div className="flex items-center gap-2">
 											<div className="flex-1">
-												<Input.Root size="medium">
+												<Input.Root
+													size="medium"
+													hasError={Boolean(fromUsernameError)}
+												>
 													<Input.Wrapper>
 														<Input.Input
+															id="from-username"
 															placeholder="newsletter"
 															value={fromUsername}
-															onChange={(e) => setFromUsername(e.target.value)}
+															onChange={(e) => {
+																setFromUsername(e.target.value);
+																if (fromUsernameError) setFromUsernameError("");
+															}}
 														/>
 													</Input.Wrapper>
 												</Input.Root>
@@ -1420,6 +1463,11 @@ function CreateCampaignPageContent() {
 												{senderEmailAddress}
 											</span>
 										</p>
+										{fromUsernameError ? (
+											<p className="font-medium text-error-base text-xs">
+												{fromUsernameError}
+											</p>
+										) : null}
 									</div>
 
 									{/* Subject Line */}
