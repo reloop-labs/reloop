@@ -23,6 +23,7 @@ import {
 } from "#/features/contacts/hooks/use-contacts-query";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { testCampaignRequest } from "../../campaigns-api";
+import { useCampaignEditorStore } from "../campaign-editor-store";
 
 import * as Textarea from "@reloop/ui/textarea";
 
@@ -118,6 +119,8 @@ export function CampaignTestEmailModal({
 	const { data: session } = useSessionQuery();
 	const { data: propertiesData } = useAllPropertiesQuery();
 	const properties = propertiesData?.properties ?? [];
+	const fromEmail = useCampaignEditorStore((s) => s.fromEmail);
+	const hasFrom = fromEmail.trim().length > 0;
 
 	const [email, setEmail] = useState("");
 	const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
@@ -179,6 +182,11 @@ export function CampaignTestEmailModal({
 	const handleSendTest = async (e?: React.FormEvent) => {
 		e?.preventDefault();
 		if (status !== "idle") return;
+
+		if (!fromEmail.trim()) {
+			toast.error("Add a From address before sending a test email.");
+			return;
+		}
 
 		let hasError = false;
 
@@ -271,7 +279,7 @@ export function CampaignTestEmailModal({
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, status, email, variableValues, properties],
+		[open, status, email, variableValues, properties, fromEmail],
 	);
 
 	useHotkeys(
@@ -283,7 +291,7 @@ export function CampaignTestEmailModal({
 			}
 		},
 		{ enableOnFormTags: ["INPUT", "TEXTAREA"], enabled: open },
-		[open, status, email, variableValues, properties],
+		[open, status, email, variableValues, properties, fromEmail],
 	);
 
 	useHotkeys(
@@ -371,6 +379,12 @@ export function CampaignTestEmailModal({
 
 									{/* Content */}
 									<div className="space-y-4 px-6 pb-6">
+										{!hasFrom ? (
+											<div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+												Add a From address to this campaign before
+												sending a test email.
+											</div>
+										) : null}
 										<div className="space-y-1.5">
 											<Label.Root
 												htmlFor="test-recipient-email"
@@ -458,7 +472,8 @@ export function CampaignTestEmailModal({
 								type="submit"
 								variant="blue"
 								size="small"
-								disabled={status !== "idle"}
+								disabled={status !== "idle" || !hasFrom}
+								title={hasFrom ? undefined : "Add a From address first"}
 								className={cn(
 									"min-w-[130px] justify-center overflow-hidden transition-all duration-200",
 									status !== "idle" && "pointer-events-none",

@@ -52,7 +52,8 @@ load_existing_values() {
 		BETTER_AUTH_SECRET RELOOP_INTERNAL_SECRET TRACKING_SECRET PREFERENCES_SECRET \
 		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
 		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS \
-		AUTH_INTERNAL_BASE_URL RELOOP_API_KEY RELOOP_SENDER_DOMAIN \
+		AUTH_INTERNAL_BASE_URL DISABLE_SIGNUP DISABLE_ORG_CREATION \
+		RELOOP_API_KEY RELOOP_SENDER_DOMAIN \
 		SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD SMTP_SECURE; do
 		local value
 		value="$(env_get "$key" "$ENV_FILE" || true)"
@@ -193,6 +194,8 @@ collect_configuration() {
 	preserved_or_new DEFAULT_OTP gen_digits 6
 	DNS_RESOLVERS="${PRESERVED_DNS_RESOLVERS:-8.8.8.8,8.8.4.4}"
 	AUTH_INTERNAL_BASE_URL="${PRESERVED_AUTH_INTERNAL_BASE_URL:-}"
+	DISABLE_SIGNUP="${PRESERVED_DISABLE_SIGNUP:-false}"
+	DISABLE_ORG_CREATION="${PRESERVED_DISABLE_ORG_CREATION:-false}"
 	RELOOP_API_KEY="${PRESERVED_RELOOP_API_KEY:-}"
 	RELOOP_SENDER_DOMAIN="${PRESERVED_RELOOP_SENDER_DOMAIN:-}"
 	SMTP_HOST="${PRESERVED_SMTP_HOST:-}"
@@ -273,7 +276,15 @@ WEBHOOK_ENCRYPTION_KEY=$WEBHOOK_ENCRYPTION_KEY
 # verified a sending domain, so this fixed code stands in for the first login.
 # Remove it (and restart) as soon as your own domain sends mail.
 DEFAULT_OTP=$DEFAULT_OTP
-DISABLE_SIGNUP=false
+
+# Close registration once your own accounts exist. Blocks every sign-up path —
+# password, email code and social — except addresses holding a pending
+# organization invitation. Existing users keep signing in.
+DISABLE_SIGNUP=$DISABLE_SIGNUP
+
+# Stop anyone creating further organizations. Existing organizations, their
+# members and invitations are unaffected.
+DISABLE_ORG_CREATION=$DISABLE_ORG_CREATION
 
 # How system email leaves the box: sign-in codes, invitations, billing alerts.
 # Pick ONE. With neither set the email service refuses to send and logs why,

@@ -48,10 +48,11 @@ export const campaignResponseSchema = t.Object({
 
 export const createCampaignBody = t.Object({
 	name: t.String({ minLength: 1, maxLength: 255 }),
-	subject: t.String({ minLength: 1, maxLength: 255 }),
+	subject: t.Optional(t.String({ maxLength: 255 })),
 	previewText: t.Optional(t.String()),
-	fromName: t.String({ minLength: 1, maxLength: 255 }),
-	fromEmail: t.String({ minLength: 3, maxLength: 255 }),
+	// From may start empty on drafts — required at send/schedule time.
+	fromName: t.Optional(t.String({ maxLength: 255 })),
+	fromEmail: t.Optional(t.String({ maxLength: 255 })),
 	replyTo: t.Optional(t.String()),
 	audienceType: audienceTypeSchema,
 	audienceTargetId: t.Optional(t.String()),
@@ -66,10 +67,10 @@ export const createCampaignBody = t.Object({
 
 export const updateCampaignBody = t.Object({
 	name: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
-	subject: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+	subject: t.Optional(t.String({ maxLength: 255 })),
 	previewText: t.Optional(t.String()),
-	fromName: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
-	fromEmail: t.Optional(t.String({ minLength: 3, maxLength: 255 })),
+	fromName: t.Optional(t.String({ maxLength: 255 })),
+	fromEmail: t.Optional(t.String({ maxLength: 255 })),
 	replyTo: t.Optional(t.String()),
 	audienceType: t.Optional(audienceTypeSchema),
 	audienceTargetId: t.Optional(t.String()),

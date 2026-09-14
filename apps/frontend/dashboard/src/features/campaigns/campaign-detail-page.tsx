@@ -4,13 +4,13 @@ import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import {
 	CampaignsProvider,
 	useCampaignQuery,
 	useCampaigns,
 } from "./campaigns-provider";
 import { CampaignHeader } from "./components/campaign-header";
+import { CampaignMetricsCards } from "./components/campaign-metrics-cards";
 import { CampaignPreviewTabs } from "./components/campaign-preview-tabs";
 import { CampaignRecipientIssuesCard } from "./components/campaign-recipient-issues-card";
 import { DeleteCampaignModal } from "./components/delete-campaign";
@@ -199,19 +199,6 @@ function CampaignDetailContent() {
 		);
 	}
 
-	const openRate =
-		campaign && campaign.deliveredCount > 0
-			? Math.round((campaign.openedCount / campaign.deliveredCount) * 100)
-			: 0;
-	const clickRate =
-		campaign && campaign.deliveredCount > 0
-			? Math.round((campaign.clickedCount / campaign.deliveredCount) * 100)
-			: 0;
-	const deliveryRate =
-		campaign && campaign.sentCount > 0
-			? Math.round((campaign.deliveredCount / campaign.sentCount) * 100)
-			: 0;
-
 	return (
 		<>
 			<div className="mx-auto max-w-5xl space-y-8 px-6 pt-8 pb-12 sm:px-8">
@@ -228,57 +215,7 @@ function CampaignDetailContent() {
 
 				{/* High-level Metric Cards */}
 				{campaign.status !== "draft" && (
-					<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-						<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-								TOTAL SENT
-							</p>
-							<p className="mt-2 font-semibold text-2xl text-text-strong-950">
-								{campaign.sentCount.toLocaleString()}
-							</p>
-							<p className="mt-0.5 text-text-sub-600 text-xs">
-								{campaign.sentAt
-									? `Broadcasted ${formatRelativeTime(campaign.sentAt)}`
-									: "Broadcasted"}
-							</p>
-						</div>
-
-						<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-								DELIVERED ({deliveryRate}%)
-							</p>
-							<p className="mt-2 font-semibold text-2xl text-text-strong-950">
-								{campaign.deliveredCount.toLocaleString()}
-							</p>
-							<p className="mt-0.5 text-text-sub-600 text-xs">
-								{campaign.failedCount.toLocaleString()} bounced / failed
-							</p>
-						</div>
-
-						<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-								UNIQUE OPENS ({openRate}%)
-							</p>
-							<p className="mt-2 font-semibold text-2xl text-text-strong-950">
-								{campaign.openedCount.toLocaleString()}
-							</p>
-							<p className="mt-0.5 text-text-sub-600 text-xs">
-								Verified pixel loads
-							</p>
-						</div>
-
-						<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/50">
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-								CLICKS ({clickRate}%)
-							</p>
-							<p className="mt-2 font-semibold text-2xl text-text-strong-950">
-								{campaign.clickedCount.toLocaleString()}
-							</p>
-							<p className="mt-0.5 text-text-sub-600 text-xs">
-								Link interactions
-							</p>
-						</div>
-					</div>
+					<CampaignMetricsCards campaign={campaign} />
 				)}
 
 				{/* Deliverability & Recipient Activity (Unsubscribed, Bounced, Suppressed, Complained) */}

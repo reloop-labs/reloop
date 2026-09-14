@@ -28,6 +28,16 @@ export function CampaignSendModal({
 		useCampaignEditorStore();
 	const [isSending, setIsSending] = useState(false);
 
+	const hasFrom = fromEmail.trim().length > 0;
+	const hasSubject = subject.trim().length > 0;
+	const missing = [
+		!hasFrom && "a From address",
+		!hasSubject && "a subject",
+	]
+		.filter(Boolean)
+		.join(" and ");
+	const canSend = hasFrom && hasSubject;
+
 	const handleSend = async () => {
 		setIsSending(true);
 		try {
@@ -79,7 +89,15 @@ export function CampaignSendModal({
 							<div className="flex justify-between">
 								<span className="text-text-sub-600">From:</span>
 								<span className="font-medium text-text-strong-950">
-									{fromName} &lt;{fromEmail}&gt;
+									{hasFrom ? (
+										<>
+											{fromName} &lt;{fromEmail}&gt;
+										</>
+									) : (
+										<span className="text-text-sub-600">
+											(No sender yet — add a From address)
+										</span>
+									)}
 								</span>
 							</div>
 							<div className="flex justify-between">
@@ -90,7 +108,11 @@ export function CampaignSendModal({
 							</div>
 						</div>
 						<p className="text-[11px] text-text-sub-600">
-							This action cannot be undone once delivery begins.
+							{canSend ? (
+								"This action cannot be undone once delivery begins."
+							) : (
+								<>Add {missing} before broadcasting.</>
+							)}
 						</p>
 					</Modal.Body>
 
@@ -110,7 +132,8 @@ export function CampaignSendModal({
 							variant="neutral"
 							size="small"
 							onClick={handleSend}
-							disabled={isSending}
+							disabled={isSending || !canSend}
+							title={canSend ? undefined : `Add ${missing} first`}
 							className="gap-1.5 bg-[#1868DF] text-white hover:bg-[#1557bf]"
 						>
 							{isSending ? (
