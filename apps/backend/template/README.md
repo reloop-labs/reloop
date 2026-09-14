@@ -41,6 +41,6 @@ In Docker the service uses Alpine’s `chromium` package via `CHROMIUM_PATH`.
 - 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/template/openapi)
 - 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
 - 🆘 **Support**: [Get Help](https://reloop.sh/support)
-- 💬 **Discord**: [Join Chat](https://discord.gg/bHnkBcp7xR)
+- 💬 **Discord**: [Join Chat](https://discord.gg/ZBYwWKY96U)
 - 🐦 **Twitter**: [Follow Us](https://x.com/reloophq)
 - 🛠️ **Setup**: [Setup Guide](https://reloop.sh/docs/setup/backend/template)

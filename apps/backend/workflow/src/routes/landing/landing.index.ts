@@ -29,7 +29,7 @@ export const landing = new Elysia()
 ║ 📊 Jobs UI: /api/workflow/jobs  (BullMQ Workbench)                   ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
-║ 💬 Discord: https://discord.gg/bHnkBcp7xR                                ║
+║ 💬 Discord: https://discord.gg/ZBYwWKY96U                                ║
 ║ 🐦 Twitter: https://x.com/reloophq                               ║
 ║ 🛠️ Setup: https://reloop.sh/docs/setup/workflow                      ║
 ║                                                                      ║

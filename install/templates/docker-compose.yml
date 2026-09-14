@@ -288,6 +288,9 @@ services:
     <<: *frontend
     image: reloopsh/fe-dashboard:${RELOOP_VERSION}
     container_name: reloop-dashboard
+    environment:
+      NODE_ENV: production
+      SMTP_HOSTNAME: ${SMTP_HOSTNAME}
 
   links:
     <<: *frontend

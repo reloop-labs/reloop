@@ -264,7 +264,7 @@ export function Footer() {
 							<Icon name="social-x" className="size-4" />
 						</a>
 						<a
-							href="https://discord.gg/bHnkBcp7xR"
+							href="https://discord.gg/ZBYwWKY96U"
 							target="_blank"
 							rel="noreferrer"
 							className="flex w-12 items-center justify-center border-stroke-soft-100 border-l transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 sm:w-14 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04] dark:hover:text-white"

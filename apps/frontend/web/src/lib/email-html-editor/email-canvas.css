@@ -21,10 +21,89 @@
 	 * here would show as a white strip above a gray section. */
 	padding-top: 0 !important;
 	padding-bottom: 0 !important;
-	/* Dashboard `html.dark` / OS dark must not activate email
-	 * `@media (prefers-color-scheme: dark)` or inherit chrome text color. */
+	min-height: 100% !important;
 	color-scheme: light;
 	color: #000000;
+}
+
+/* ------------------------------------------------------------------ */
+/* Template Editor White Canvas Isolation                            */
+/* The email editing canvas stays strictly in white mode even when    */
+/* the user is in dark mode (exceptional case for editor canvas).     */
+/* ------------------------------------------------------------------ */
+.template-editor-canvas,
+html.dark .template-editor-canvas {
+	background-color: #ffffff !important;
+	color: #0e0d0c !important;
+	color-scheme: light !important;
+
+	/* Reset design tokens to light mode inside the editing canvas */
+	--bg-strong-950: var(--neutral-950);
+	--bg-surface-800: var(--neutral-800);
+	--bg-sub-300: var(--neutral-300);
+	--bg-soft-200: var(--neutral-200);
+	--bg-soft-50: var(--neutral-50);
+	--bg-weak-50: var(--neutral-50);
+	--bg-white-0: #ffffff;
+
+	--text-strong-950: #0e0d0c;
+	--text-sub-600: #484542;
+	--text-soft-400: #93908a;
+	--text-disabled-300: #c7c5c0;
+	--text-white-0: #0e0d0c;
+
+	--stroke-strong-950: #0e0d0c;
+	--stroke-sub-300: #d4d4d8;
+	--stroke-soft-200: #e5e7eb;
+	--stroke-soft-100: #f4f4f5;
+	--stroke-inbox: #e4dfd6;
+}
+
+/* Ensure editor content and scroll containers inside canvas are white */
+.template-editor-canvas .tiptap.ProseMirror,
+.template-editor-canvas .ProseMirror,
+html.dark .template-editor-canvas .tiptap.ProseMirror,
+html.dark .template-editor-canvas .ProseMirror {
+	background-color: #ffffff !important;
+	color: #000000 !important;
+	color-scheme: light !important;
+	min-height: 100% !important;
+}
+
+/* Placeholders inside the editor are always light-mode gray */
+.tiptap.ProseMirror p.is-empty::before,
+.tiptap.ProseMirror p.is-editor-empty::before,
+.tiptap.ProseMirror [data-placeholder]::before,
+.ProseMirror p.is-empty::before,
+.ProseMirror p.is-editor-empty::before,
+.ProseMirror [data-placeholder]::before {
+	color: #a1a1aa !important;
+}
+
+/* Reset SendDetails input & label styling inside canvas in dark mode */
+html.dark .template-editor-canvas input {
+	color: #0e0d0c !important;
+}
+html.dark .template-editor-canvas input::placeholder {
+	color: #93908a !important;
+}
+html.dark .template-editor-canvas label {
+	color: #484542 !important;
+}
+html.dark .template-editor-canvas .border-stroke-soft-200,
+html.dark .template-editor-canvas [class*="dark:border-stroke-soft-100"] {
+	border-color: #e5e7eb !important;
+}
+
+/* Dropdown inside SendDetails in canvas */
+html.dark .template-editor-canvas [role="listbox"] {
+	background-color: #ffffff !important;
+	border-color: #e5e7eb !important;
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+}
+html.dark .template-editor-canvas [role="option"]:hover,
+html.dark .template-editor-canvas [role="option"][aria-selected="true"] {
+	background-color: #f4f4f5 !important;
 }
 
 .tiptap.ProseMirror td,
@@ -332,4 +411,26 @@
 .ProseMirror pre.email-selected-text-node {
 	outline: 2px solid #3b82f6 !important;
 	outline-offset: 2px !important;
+}
+
+/* Empty or placeholder blocks ("Press / for commands...") must never have a selection border */
+.tiptap.ProseMirror p.is-empty,
+.tiptap.ProseMirror p.is-editor-empty,
+.tiptap.ProseMirror [data-placeholder],
+.tiptap.ProseMirror .email-selected-text-node.is-empty,
+.tiptap.ProseMirror .email-selected-text-node.is-editor-empty,
+.tiptap.ProseMirror section:has(> p.is-empty:only-child),
+.tiptap.ProseMirror section:has(> p.is-editor-empty:only-child),
+.tiptap.ProseMirror .node-section:has(> p.is-empty:only-child),
+.tiptap.ProseMirror .node-section:has(> p.is-editor-empty:only-child),
+.ProseMirror p.is-empty,
+.ProseMirror p.is-editor-empty,
+.ProseMirror [data-placeholder],
+.ProseMirror .email-selected-text-node.is-empty,
+.ProseMirror .email-selected-text-node.is-editor-empty,
+.ProseMirror section:has(> p.is-empty:only-child),
+.ProseMirror section:has(> p.is-editor-empty:only-child),
+.ProseMirror .node-section:has(> p.is-empty:only-child),
+.ProseMirror .node-section:has(> p.is-editor-empty:only-child) {
+	outline: none !important;
 }

@@ -39,6 +39,30 @@ Key variables in `local/docker-compose.yml`:
 | :--- | :--- |
 | `BASE_URL` | `https://local.reloop.sh` |
 | `NATS_URL` | `reloop-nats:4222` |
+| `SMTP_HOSTNAME` | `smtp.reloop.sh` |
+
+### SMTP_HOSTNAME
+
+The hostname senders connect to for submission. It is the relay's own EHLO
+name, and the dashboard reads it to fill the **SMTP → Credentials** panel and
+every code example on that page, so self-hosted users are shown their own
+endpoint instead of Reloop's.
+
+The installer defaults it to your Reloop domain and preserves it across
+re-runs. Set it explicitly when submission runs on a different host:
+
+```bash
+SMTP_HOSTNAME=mail.example.com
+```
+
+It is read at request time, so both services pick up a change on restart:
+
+```bash
+reloop restart smtp dashboard
+```
+
+Leave it unset and the dashboard falls back to `smtp.reloop.sh`, which is
+correct for Reloop Cloud and wrong for every self-hosted install — so set it.
 
 
 ## Commands

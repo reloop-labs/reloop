@@ -523,11 +523,19 @@ const emailActiveTextBlock = Extension.create({
 						const decorations: Decoration[] = [];
 						const seen = new Set<number>();
 
+						const isNonEmptyTextblock = (node: any) => {
+							if (!node?.isTextblock) return false;
+							if (node.content?.size === 0) return false;
+							const text = node.textContent;
+							if (!text || text.trim() === "") return false;
+							return true;
+						};
+
 						state.doc.nodesBetween(
 							selection.from,
 							selection.to,
 							(node, pos) => {
-								if (node.isTextblock && !seen.has(pos)) {
+								if (isNonEmptyTextblock(node) && !seen.has(pos)) {
 									seen.add(pos);
 									decorations.push(
 										Decoration.node(pos, pos + node.nodeSize, {
@@ -542,7 +550,7 @@ const emailActiveTextBlock = Extension.create({
 						if (decorations.length === 0) {
 							for (let d = $from.depth; d > 0; d--) {
 								const node = $from.node(d);
-								if (node.isTextblock) {
+								if (isNonEmptyTextblock(node)) {
 									const pos = $from.before(d);
 									decorations.push(
 										Decoration.node(pos, pos + node.nodeSize, {

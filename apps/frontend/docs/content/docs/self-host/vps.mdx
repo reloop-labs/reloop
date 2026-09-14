@@ -118,6 +118,12 @@ Reloop sends one-time codes through its own mail pipeline, which needs a verifie
 
 Once one of your domains is verified and sending, remove the `DEFAULT_OTP` line from `/opt/reloop/.env` and run `reloop restart auth`. Set `DISABLE_SIGNUP=true` in the same file if you do not want anyone else creating accounts.
 
+If sign-in succeeds but the dashboard then answers `401` on every protected
+page, the services cannot reach the auth service over your public origin. Set
+`AUTH_INTERNAL_BASE_URL=http://auth:8000` in `/opt/reloop/.env` and run
+`reloop restart`. See [session validation between
+services](/docs/setup/backend/auth#session-validation-between-services).
+
 ---
 
 ## Running it again

@@ -51,7 +51,8 @@ load_existing_values() {
 		RELOOP_HTTPS POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD REDIS_PASSWORD \
 		BETTER_AUTH_SECRET RELOOP_INTERNAL_SECRET TRACKING_SECRET PREFERENCES_SECRET \
 		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
-		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS APP_NAME; do
+		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS \
+		AUTH_INTERNAL_BASE_URL APP_NAME; do
 		local value
 		value="$(env_get "$key" "$ENV_FILE" || true)"
 		if [ -n "$value" ]; then
@@ -190,6 +191,7 @@ collect_configuration() {
 	preserved_or_new WEBHOOK_ENCRYPTION_KEY gen_hex 32
 	preserved_or_new DEFAULT_OTP gen_digits 6
 	DNS_RESOLVERS="${PRESERVED_DNS_RESOLVERS:-8.8.8.8,8.8.4.4}"
+	AUTH_INTERNAL_BASE_URL="${PRESERVED_AUTH_INTERNAL_BASE_URL:-}"
 	APP_NAME="${PRESERVED_APP_NAME:-Reloop}"
 }
 
@@ -225,10 +227,21 @@ NODE_ENV=production
 APP_NAME=$APP_NAME
 
 BASE_URL=$RELOOP_SCHEME://$RELOOP_DOMAIN
+
+# Origin the services use to validate sessions with each other. Empty means
+# they call BASE_URL, which goes back out through the proxy. Set it to
+# http://auth:8000 if that round trip fails and protected routes answer 401
+# after a successful login.
+AUTH_INTERNAL_BASE_URL=$AUTH_INTERNAL_BASE_URL
 HOST_DOMAIN=$RELOOP_DOMAIN
 TRACKING_DOMAIN=$RELOOP_TRACKING_HOST
 TRACKING_BASE_URL=$RELOOP_SCHEME://$RELOOP_TRACKING_HOST
 INBOUND_HOSTNAME=$RELOOP_INBOUND_HOST
+
+# Hostname your senders connect to for SMTP submission. Used as the relay's
+# own EHLO name and shown in the dashboard's SMTP credentials and code
+# examples. Change it if submission runs on a different host than the
+# dashboard, then restart smtp and dashboard.
 SMTP_HOSTNAME=$RELOOP_DOMAIN
 DKIM_SELECTOR=reloop
 

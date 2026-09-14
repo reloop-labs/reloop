@@ -202,7 +202,7 @@ describe("Email Section Selection", () => {
 		// Verify that decoration produces the class
 		const decos = editor.view.someProp("decorations", (f) => f(editor.state));
 		expect(decos).toBeTruthy();
-		const found = decos?.find();
+		const found = (decos as any)?.find();
 		expect(found?.length).toBeGreaterThanOrEqual(1);
 		expect(found?.[0]?.type?.attrs?.class).toBe("email-selected-text-node");
 
@@ -234,8 +234,27 @@ describe("Email Section Selection", () => {
 		editor.view.dispatch(editor.state.tr.setSelection(textSel));
 
 		const decos = editor.view.someProp("decorations", (f) => f(editor.state));
-		const found = decos?.find();
+		const found = (decos as any)?.find();
 		expect(found?.length ?? 0).toBe(0);
+
+		editor.destroy();
+	});
+
+	it("does not decorate empty placeholder text blocks with email-selected-text-node", () => {
+		const editor = new Editor({
+			extensions: [emailStarterKit()],
+			content: "<p></p>",
+		});
+
+		// Focus the empty paragraph (showing placeholder)
+		editor.commands.focus("start");
+
+		const decos = editor.view.someProp("decorations", (f) => f(editor.state));
+		const found = (decos as any)?.find();
+		expect(found?.length ?? 0).toBe(0);
+
+		const pEl = editor.view.dom.querySelector("p");
+		expect(pEl?.classList.contains("email-selected-text-node")).toBe(false);
 
 		editor.destroy();
 	});
