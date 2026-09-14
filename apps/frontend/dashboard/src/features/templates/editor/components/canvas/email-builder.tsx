@@ -79,7 +79,7 @@ export function FullEmailBuilder() {
 				computePositionConfig={DRAG_POSITION_CONFIG}
 			>
 				<div
-					className="mr-1 cursor-pointer rounded-sm bg-bg-soft-200 py-0.5 text-text-sub-600"
+					className="mr-1 cursor-pointer rounded-sm bg-bg-soft-200 py-0.5 text-text-sub-600 hover:bg-bg-sub-300"
 					title="Drag to reorder"
 				>
 					<Icon name="more-vertical" className="h-3.5 w-3.5" />
