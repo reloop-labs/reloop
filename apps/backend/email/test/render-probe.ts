@@ -22,7 +22,10 @@ const templates = [
 	"onboarding-test",
 ];
 
-const out: Record<string, { brand: number; reloop: number }> = {};
+const out: Record<
+	string,
+	{ brand: number; reloop: number; selfHosted: string }
+> = {};
 const brand = process.env.APP_NAME?.trim() || "Reloop";
 const escaped = brand.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -32,9 +35,11 @@ for (const name of templates) {
 		React.createElement(mod.default, props[name] ?? {}),
 	);
 	const text = html.replace(/https?:\/\/[^"'\s<>]+/g, "");
+	const flat = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 	out[name] = {
 		brand: (text.match(new RegExp(escaped, "g")) ?? []).length,
 		reloop: (text.match(/Reloop/g) ?? []).length,
+		selfHosted: (flat.match(/Self-hosted .*?(?= Copyright)/) ?? [""])[0].trim(),
 	};
 }
 

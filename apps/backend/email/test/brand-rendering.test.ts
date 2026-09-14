@@ -4,6 +4,8 @@ import { join } from "node:path";
 const PROBE = join(import.meta.dir, "render-probe.ts");
 
 const RETAINED_FOOTER_ATTRIBUTION_MENTIONS = 2;
+const REBRANDED_FOOTER_ATTRIBUTION_MENTIONS =
+	RETAINED_FOOTER_ATTRIBUTION_MENTIONS + 1;
 
 function buildEnv(appName?: string): Record<string, string> {
 	const env = { ...process.env } as Record<string, string>;
@@ -33,7 +35,17 @@ async function renderAll(appName?: string) {
 	if (code !== 0 || !line.startsWith("{")) {
 		throw new Error(`render probe failed (exit ${code}): ${stderr || stdout}`);
 	}
-	return JSON.parse(line) as Record<string, { brand: number; reloop: number }>;
+	return JSON.parse(line) as Record<
+		string,
+		{ brand: number; reloop: number; selfHosted: string }
+	>;
+}
+
+async function renderFooters(appName?: string) {
+	const rendered = await renderAll(appName);
+	return Object.fromEntries(
+		Object.entries(rendered).map(([name, counts]) => [name, counts.selfHosted]),
+	);
 }
 
 describe("system email branding", () => {
@@ -54,9 +66,29 @@ describe("system email branding", () => {
 			Object.entries(rendered)
 				.filter(
 					([, counts]) =>
-						counts.reloop !== RETAINED_FOOTER_ATTRIBUTION_MENTIONS,
+						counts.reloop !== REBRANDED_FOOTER_ATTRIBUTION_MENTIONS,
 				)
 				.map(([name, counts]) => `${name}: ${counts.reloop}`),
+		).toEqual([]);
+	});
+
+	test("a rebranded install is footed as self-hosted Reloop", async () => {
+		const footers = await renderFooters("Contoso Mail");
+
+		expect(
+			Object.entries(footers)
+				.filter(([, footer]) => footer !== "Self-hosted Reloop × Contoso Mail")
+				.map(([name, footer]) => `${name}: ${footer}`),
+		).toEqual([]);
+	});
+
+	test("Reloop Cloud carries no self-hosted line", async () => {
+		const footers = await renderFooters();
+
+		expect(
+			Object.entries(footers)
+				.filter(([, footer]) => footer !== "")
+				.map(([name, footer]) => `${name}: ${footer}`),
 		).toEqual([]);
 	});
 
