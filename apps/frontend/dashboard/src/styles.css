@@ -73,6 +73,10 @@ body {
 	--animate-theme-bar-2: theme-bar-2 0.5s ease-out 0.18s both;
 	--animate-theme-bar-3: theme-bar-3 0.5s ease-out 0.36s both;
 	--animate-sidebar-bar-slide: sidebar-bar-slide 0.45s ease-in-out both;
+	--animate-campaign-horn: campaign-horn 0.7s ease-in-out both;
+	--animate-campaign-ray-1: campaign-ray 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s both;
+	--animate-campaign-ray-2: campaign-ray 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.18s both;
+	--animate-campaign-ray-3: campaign-ray 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.28s both;
 }
 
 @keyframes stroke-draw {
@@ -256,6 +260,46 @@ body {
 	}
 	to {
 		transform: rotate(0deg);
+	}
+}
+
+@keyframes campaign-horn {
+	0% {
+		transform: rotate(0deg);
+	}
+	20% {
+		transform: rotate(-12deg);
+	}
+	42% {
+		transform: rotate(3deg);
+	}
+	65% {
+		transform: rotate(-1.5deg);
+	}
+	85% {
+		transform: rotate(0.5deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+
+@keyframes campaign-ray {
+	0% {
+		opacity: 0;
+		transform: scale(0) translateX(-2.5px);
+	}
+	65% {
+		opacity: 1;
+		transform: scale(1.18) translateX(0.5px);
+	}
+	85% {
+		opacity: 1;
+		transform: scale(0.96) translateX(0);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) translateX(0);
 	}
 }
 
