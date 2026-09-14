@@ -4,3 +4,25 @@ export const REGISTRATION_DISABLED_MESSAGE =
 export function isEnvFlagEnabled(value: string | undefined): boolean {
 	return value?.trim().toLowerCase() === "true";
 }
+
+export function normalizeInviteEmail(email: string | undefined): string {
+	return email?.trim().toLowerCase() ?? "";
+}
+
+/**
+ * Resolves whether a sign-up may proceed while registration is closed. The
+ * invitation lookup is injected so the decision stays testable without the
+ * better-auth server graph, and so callers keep ownership of the query.
+ */
+export async function isRegistrationAllowed(
+	email: string | undefined,
+	disableSignup: string | undefined,
+	hasPendingInvitation: (email: string) => Promise<boolean>,
+): Promise<boolean> {
+	if (!isEnvFlagEnabled(disableSignup)) return true;
+
+	const normalized = normalizeInviteEmail(email);
+	if (!normalized) return false;
+
+	return await hasPendingInvitation(normalized);
+}

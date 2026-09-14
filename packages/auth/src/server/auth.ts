@@ -27,6 +27,7 @@ import { ac, orgRoles } from "../permissions";
 import { platformAc, platformRoles } from "../platform-permissions";
 import {
 	isEnvFlagEnabled,
+	isRegistrationAllowed,
 	REGISTRATION_DISABLED_MESSAGE,
 } from "../registration-controls";
 import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
@@ -57,27 +58,30 @@ function assertUserDisplayNameLength(name: string | undefined) {
 	}
 }
 
-async function assertRegistrationAllowed(email: string | undefined) {
-	if (!isEnvFlagEnabled(authServerConfig.DISABLE_SIGNUP)) return;
-
-	const normalized = email?.trim().toLowerCase();
-	if (!normalized) {
-		throw new APIError("FORBIDDEN", { message: REGISTRATION_DISABLED_MESSAGE });
-	}
-
+async function hasPendingInvitation(email: string): Promise<boolean> {
 	const [invited] = await db
 		.select({ id: schema.invitation.id })
 		.from(schema.invitation)
 		.where(
 			and(
-				eq(schema.invitation.email, normalized),
+				eq(schema.invitation.email, email),
 				eq(schema.invitation.status, "pending"),
 				gt(schema.invitation.expiresAt, new Date()),
 			),
 		)
 		.limit(1);
 
-	if (!invited) {
+	return Boolean(invited);
+}
+
+async function assertRegistrationAllowed(email: string | undefined) {
+	const allowed = await isRegistrationAllowed(
+		email,
+		authServerConfig.DISABLE_SIGNUP,
+		hasPendingInvitation,
+	);
+
+	if (!allowed) {
 		throw new APIError("FORBIDDEN", { message: REGISTRATION_DISABLED_MESSAGE });
 	}
 }
