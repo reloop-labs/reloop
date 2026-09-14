@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -58,7 +59,7 @@ export const DomainVerifiedEmail = ({
 	if (isReceivingEmailEnabled) {
 		unlocked.push({
 			title: "Receive Inbound Email",
-			desc: "Mail sent to addresses on this domain is delivered to Reloop and available via the API and inbox.",
+			desc: `Mail sent to addresses on this domain is delivered to ${appName} and available via the API and inbox.`,
 		});
 	}
 	if (isTrackingEnabled) {
@@ -127,8 +128,8 @@ export const DomainVerifiedEmail = ({
 		.join(", ");
 
 	const previewLine = isSendingEmailEnabled
-		? `${domain} is verified you can now send emails through Reloop.`
-		: `${domain} is verified on Reloop.`;
+		? `${domain} is verified you can now send emails through ${appName}.`
+		: `${domain} is verified on ${appName}.`;
 
 	return (
 		<Html>
@@ -161,7 +162,7 @@ export const DomainVerifiedEmail = ({
 
 						<Text className={cls.bodyText}>
 							Your domain has passed all required DNS checks and is now fully
-							verified on Reloop
+							verified on {appName}
 							{capabilitySummary ? ` for ${capabilitySummary}` : ""}.{" "}
 							{isSendingEmailEnabled ? (
 								<>
@@ -231,7 +232,7 @@ export const DomainVerifiedEmail = ({
 						</Section>
 
 						<Text className={cls.footerText}>
-							If you did not add this domain to Reloop, please contact our
+							If you did not add this domain to {appName}, please contact our
 							support team immediately.
 						</Text>
 

@@ -1,4 +1,5 @@
 import { BusEvent, bus } from "@reloop/bus";
+import { appName } from "@reloop/email/brand";
 import { emailConfig } from "@reloop/email/email.config";
 import ExportReadyEmail from "@reloop/email/emails/export-ready";
 import { redis } from "@reloop/email/lib/redis";
@@ -36,7 +37,7 @@ export async function initExportSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <exports@${requireReloopSenderDomain()}>`,
+					from: `${appName} <exports@${requireReloopSenderDomain()}>`,
 					to: payload.to,
 					subject: `Your contacts export is ready (${payload.totalRows.toLocaleString()} rows)`,
 					html,

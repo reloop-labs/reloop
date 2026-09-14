@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -485,14 +486,14 @@ export const DnsConfigEmail = ({
 	if (dkimRecords.length > 0) {
 		groups.push({
 			title: "Domain Verification (DKIM)",
-			description: "Proves Reloop is authorized to sign mail for this domain.",
+			description: `Proves ${appName} is authorized to sign mail for this domain.`,
 			records: dkimRecords,
 		});
 	}
 	if (resolvedSending.length > 0) {
 		groups.push({
 			title: "Email Sending (SPF)",
-			description: "Authorizes Reloop to send mail from this domain.",
+			description: `Authorizes ${appName} to send mail from this domain.`,
 			records: resolvedSending,
 		});
 	}
@@ -507,7 +508,7 @@ export const DnsConfigEmail = ({
 	if (receivingRecords.length > 0) {
 		groups.push({
 			title: "Email Receiving (MX)",
-			description: "Delivers inbound mail for this domain to Reloop.",
+			description: `Delivers inbound mail for this domain to ${appName}.`,
 			records: receivingRecords,
 		});
 	}

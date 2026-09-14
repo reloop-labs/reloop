@@ -2,6 +2,7 @@ import type { DnsConfigRequestedPayload } from "@reloop/bus";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { appName } from "@reloop/email/brand";
 import { emailConfig } from "@reloop/email/email.config";
 import DnsConfigEmail from "@reloop/email/emails/dns-config";
 import DomainVerifiedEmail from "@reloop/email/emails/domain-verified";
@@ -130,7 +131,7 @@ export async function initDomainSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <support@${requireReloopSenderDomain()}>`,
+					from: `${appName} <support@${requireReloopSenderDomain()}>`,
 					to: domain.user.email,
 					subject: `Domain ${payload.domain} has been verified`,
 					html,
@@ -179,7 +180,7 @@ export async function initDomainSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <support@${requireReloopSenderDomain()}>`,
+					from: `${appName} <support@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: `DNS Configuration for ${payload.domain}`,
 					html,

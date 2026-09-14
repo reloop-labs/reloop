@@ -52,7 +52,8 @@ load_existing_values() {
 		BETTER_AUTH_SECRET RELOOP_INTERNAL_SECRET TRACKING_SECRET PREFERENCES_SECRET \
 		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
 		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS \
-		AUTH_INTERNAL_BASE_URL DISABLE_SIGNUP DISABLE_ORG_CREATION; do
+		AUTH_INTERNAL_BASE_URL DISABLE_SIGNUP DISABLE_ORG_CREATION \
+		APP_NAME; do
 		local value
 		value="$(env_get "$key" "$ENV_FILE" || true)"
 		if [ -n "$value" ]; then
@@ -194,6 +195,7 @@ collect_configuration() {
 	AUTH_INTERNAL_BASE_URL="${PRESERVED_AUTH_INTERNAL_BASE_URL:-}"
 	DISABLE_SIGNUP="${PRESERVED_DISABLE_SIGNUP:-false}"
 	DISABLE_ORG_CREATION="${PRESERVED_DISABLE_ORG_CREATION:-false}"
+	APP_NAME="${PRESERVED_APP_NAME:-Reloop}"
 }
 
 write_env_file() {
@@ -220,6 +222,13 @@ RELOOP_TRACKING_SITE_ADDRESS=$RELOOP_TRACKING_SITE_ADDRESS
 RELOOP_ACME_EMAIL=$RELOOP_ADMIN_EMAIL
 
 NODE_ENV=production
+
+# Name used in system email — the sender name, the subjects and the message
+# bodies. Set it to your own product name to brand the mail your users
+# receive. The logo is served from BASE_URL, so replace that asset too if
+# you rebrand.
+APP_NAME=$APP_NAME
+
 BASE_URL=$RELOOP_SCHEME://$RELOOP_DOMAIN
 
 # Origin the services use to validate sessions with each other. Empty means

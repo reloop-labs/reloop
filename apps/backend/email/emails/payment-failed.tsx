@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -88,7 +89,8 @@ export const PaymentFailedEmail = ({
 		<Html>
 			<Head />
 			<Preview>
-				Action required — your payment of {amount} for Reloop {planName} failed.
+				Action required — your payment of {amount} for {appName} {planName}{" "}
+				failed.
 			</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
@@ -110,7 +112,7 @@ export const PaymentFailedEmail = ({
 						</Text>
 
 						<Text className={cls.bodyText}>
-							Your payment of <strong>{amount}</strong> for the Reloop{" "}
+							Your payment of <strong>{amount}</strong> for the {appName}{" "}
 							<strong>{planName}</strong> plan was unsuccessful. Please update
 							your payment method to avoid any interruption to your service.
 						</Text>

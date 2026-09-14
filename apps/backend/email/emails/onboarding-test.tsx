@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -91,8 +92,8 @@ export const OnboardingTestEmail = ({
 
 	const tdBorder = isDark ? "1px solid #222222" : "1px solid #e0e0e0";
 	const previewLine = isPlatform
-		? "Your Reloop API key works — this message was delivered to your inbox."
-		: `${domain} is ready to send emails through Reloop.`;
+		? `Your ${appName} API key works — this message was delivered to your inbox.`
+		: `${domain} is ready to send emails through ${appName}.`;
 
 	return (
 		<Html>
@@ -130,17 +131,17 @@ export const OnboardingTestEmail = ({
 						<Text className={cls.bodyText}>
 							{isPlatform ? (
 								<>
-									You generated an API key and asked Reloop to send a real test
-									message. This email is the proof: delivery works. It was sent
-									from Reloop&apos;s platform test domain (
+									You generated an API key and asked {appName} to send a real
+									test message. This email is the proof: delivery works. It was
+									sent from {appName}&apos;s platform test domain (
 									<strong>{domain}</strong>), not from a domain you verified
 									yourself.
 								</>
 							) : (
 								<>
-									You added <strong>{domain}</strong> to Reloop and finished DNS
-									verification. This message is the proof: it was delivered from
-									your own domain, so outbound sending works.
+									You added <strong>{domain}</strong> to {appName} and finished
+									DNS verification. This message is the proof: it was delivered
+									from your own domain, so outbound sending works.
 								</>
 							)}
 						</Text>

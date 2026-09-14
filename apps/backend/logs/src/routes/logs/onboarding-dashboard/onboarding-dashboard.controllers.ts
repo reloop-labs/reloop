@@ -1,5 +1,6 @@
 import type { ApiKeyCache } from "@reloop/auth/apikey/validate";
 import { validateApiKey } from "@reloop/auth/apikey/validate";
+import { appName } from "@reloop/brand";
 import { db } from "@reloop/db/client";
 import { activityLog, domain, emailLog, member, user } from "@reloop/db/schema";
 import { logsConfig } from "@reloop/logs/logs.config";
@@ -151,7 +152,7 @@ async function insertCustomerEmailLog({
 			userId,
 			apikeyId,
 			fromEmail: parseFromEmail(from),
-			fromName: parseFromName(from) ?? "Reloop",
+			fromName: parseFromName(from) ?? appName,
 			toEmails: [to],
 			subject: ONBOARDING_TEST_SUBJECT,
 			textBody: ONBOARDING_TEST_TEXT,
@@ -237,8 +238,8 @@ export async function onboardingDashboardController({
 		process.env.ONBOARDING_TEST_DOMAIN || ""
 	).trim();
 	const from = onboardingTestDomain
-		? `Reloop <${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}>`
-		: `Reloop <${ONBOARDING_TEST_LOCAL_PART}@reloop.email>`;
+		? `${appName} <${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}>`
+		: `${appName} <${ONBOARDING_TEST_LOCAL_PART}@reloop.email>`;
 
 	try {
 		const candidates = await db

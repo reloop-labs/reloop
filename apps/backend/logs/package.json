@@ -36,6 +36,7 @@
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
 		"pg": "catalog:db",
+		"@reloop/brand": "workspace:*",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",

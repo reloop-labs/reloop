@@ -1,3 +1,4 @@
+import { appName, DEFAULT_APP_NAME } from "@reloop/email/brand";
 import { Link, Section, Text } from "react-email";
 
 interface FooterProps {
@@ -28,6 +29,12 @@ export const Footer = ({ baseUrl = "https://reloop.sh" }: FooterProps) => {
 			</Text>
 
 			<Text className="m-0 mt-4 text-[12px] leading-[24px]">
+				{appName !== DEFAULT_APP_NAME && (
+					<>
+						Self-hosted {DEFAULT_APP_NAME} × {appName}
+						<br />
+					</>
+				)}
 				Copyright © 2026 Reloop Inc. All rights reserved.
 				<br />
 				440 N Barranca Ave #4133 Covina, CA 91723

@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -96,7 +97,7 @@ export const WelcomeEmail = ({
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
 						{/* Small Label */}
-						<Text className={cls.label}>Welcome to Reloop</Text>
+						<Text className={cls.label}>Welcome to {appName}</Text>
 
 						{/* Main Headline */}
 						<Heading
@@ -122,7 +123,7 @@ export const WelcomeEmail = ({
 							moving from idea to launch in days. The builders are getting
 							faster. The tools around email haven't changed much.
 						</Text>
-						<Text className={cls.bodyText}>That's why Reloop exists.</Text>
+						<Text className={cls.bodyText}>That's why {appName} exists.</Text>
 
 						{/* Mission Section */}
 						<Section className={cls.missionBox}>
@@ -141,13 +142,13 @@ export const WelcomeEmail = ({
 							billing stack.
 						</Text>
 						<Text className={cls.bodyText}>
-							Reloop gives them the email layer they deserve: reliable,
+							{appName} gives them the email layer they deserve: reliable,
 							composable, and transparent, and self-hostable.
 						</Text>
 
 						{/* Capabilities Box */}
 						<Section className={cls.capBox}>
-							<Text className={cls.label}>What you can do with Reloop</Text>
+							<Text className={cls.label}>What you can do with {appName}</Text>
 
 							<table
 								width="100%"
@@ -209,7 +210,7 @@ export const WelcomeEmail = ({
 						<Text className={cls.closingText}>
 							Honestly? We'll probably get things wrong. But that's exactly why
 							I'm writing to you. Every critique, every 'this feels off', every
-							'why doesn't it do this' — that's what shapes Reloop into
+							'why doesn't it do this' — that's what shapes {appName} into
 							something worth using. You're not just a user here. You're the
 							reason it gets better. Hit reply. I read everything personally.
 						</Text>
