@@ -15,7 +15,7 @@ No vendor lock-in. Full transparency. No proprietary black boxes.
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 [![GitHub Stars](https://img.shields.io/github/stars/reloop-labs/reloop?style=for-the-badge)](https://github.com/reloop-labs/reloop)
 
-[Website](https://reloop.sh) · [Documentation](https://reloop.sh/docs) · [Hosted Sign-up](https://reloop.sh/dashboard/signup) · [Discord](https://discord.gg/bHnkBcp7xR)
+[Website](https://reloop.sh) · [Documentation](https://reloop.sh/docs) · [Hosted Sign-up](https://reloop.sh/dashboard/signup) · [Discord](https://discord.gg/ZBYwWKY96U)
 
 </div>
 
@@ -108,7 +108,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting bugs, reques
 
 ## Community & Support
 
-- 💬 **Discord** — [Join the community](https://discord.gg/bHnkBcp7xR)
+- 💬 **Discord** — [Join the community](https://discord.gg/ZBYwWKY96U)
 - 🐦 **Twitter/X** — [Follow @reloop_labs](https://x.com/reloop_labs)
 - 💼 **LinkedIn** — [Follow on LinkedIn](https://www.linkedin.com/company/reloop-labs)
 - 🐙 **GitHub Issues** — [Report bugs or request features](https://github.com/reloop-labs/reloop/issues)

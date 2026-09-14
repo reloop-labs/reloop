@@ -183,7 +183,7 @@ const ContactPage = () => {
 				primaryHref={`mailto:${contactEmail}`}
 				primaryExternal
 				secondaryLabel="Join Discord"
-				secondaryHref="https://discord.gg/bHnkBcp7xR"
+				secondaryHref="https://discord.gg/ZBYwWKY96U"
 				secondaryExternal
 				accentColor="blue"
 			/>

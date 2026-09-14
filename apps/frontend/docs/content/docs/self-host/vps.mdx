@@ -127,6 +127,12 @@ To lock the instance down, set these in the same file and restart `auth`:
 
 Set `DISABLE_SIGNUP` only after your own account exists. The installer keeps both values across re-runs, so an update will not reopen registration. See [Closing registration](/docs/setup/backend/auth#closing-registration).
 
+If sign-in succeeds but the dashboard then answers `401` on every protected
+page, the services cannot reach the auth service over your public origin. Set
+`AUTH_INTERNAL_BASE_URL=http://auth:8000` in `/opt/reloop/.env` and run
+`reloop restart`. See [session validation between
+services](/docs/setup/backend/auth#session-validation-between-services).
+
 ---
 
 ## Running it again

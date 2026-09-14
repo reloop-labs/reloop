@@ -46,22 +46,22 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 						<div className="relative flex min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
 							<main
 								className={cn(
-									"flex h-full flex-1 flex-col overflow-hidden",
+									"template-editor-canvas flex h-full flex-1 flex-col overflow-hidden bg-white text-neutral-950",
 									!isCodeSplit && "pr-72",
 								)}
 							>
 								<CampaignSendDetails />
 								<GeneratingOverlay />
 								{showHtmlCanvas ? (
-									<div className="relative min-h-0 flex-1">
+									<div className="relative min-h-0 flex-1 bg-white">
 										<HtmlEmailPreview editable={false} />
 									</div>
 								) : (
 									<ScrollAreaPrimitive.Root
-										className="relative min-h-0 flex-1 overflow-hidden"
+										className="relative min-h-0 flex-1 overflow-hidden bg-white"
 										type="auto"
 									>
-										<ScrollAreaPrimitive.Viewport className="[&>div]:!block [&>div]:!min-h-full [&>div]:!w-full size-full">
+										<ScrollAreaPrimitive.Viewport className="[&>div]:!block [&>div]:!min-h-full [&>div]:!w-full size-full bg-white">
 											<FullEmailBuilder />
 										</ScrollAreaPrimitive.Viewport>
 										<ScrollAreaPrimitive.Scrollbar
@@ -71,7 +71,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 												!isCodeSplit ? "right-72" : "right-0",
 											)}
 										>
-											<ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-stroke-soft-200 hover:bg-stroke-sub-300 dark:bg-stroke-soft-100/60" />
+											<ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-stroke-soft-200 hover:bg-stroke-sub-300" />
 										</ScrollAreaPrimitive.Scrollbar>
 									</ScrollAreaPrimitive.Root>
 								)}

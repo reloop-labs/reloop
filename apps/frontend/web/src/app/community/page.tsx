@@ -26,7 +26,7 @@ const CommunityPage = () => {
 				description="We're a small team in the early days—whether you want to contribute code, report issues, or simply follow along, you're welcome here."
 				primary={{
 					label: "Join Discord",
-					href: "https://discord.gg/bHnkBcp7xR",
+					href: "https://discord.gg/ZBYwWKY96U",
 				}}
 				secondary={{
 					label: "Star on GitHub",

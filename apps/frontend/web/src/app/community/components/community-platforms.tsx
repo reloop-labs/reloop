@@ -14,7 +14,7 @@ const platforms: {
 		title: "Discord Community",
 		description:
 			"Real-time discussions, support, and community events. Get help from the team and fellow developers.",
-		href: "https://discord.gg/bHnkBcp7xR",
+		href: "https://discord.gg/ZBYwWKY96U",
 		label: "Join Discord",
 		icon: siDiscord,
 		iconClassName: "fill-[#5865F2]",

@@ -1,6 +1,6 @@
-import { Resolver } from "node:dns/promises";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { resolver } from "@reloop/dns/resolver";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DNSTypes } from "@reloop/domain/types/dns.type";
 import { DOMAIN_GET_DNS_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -39,9 +39,6 @@ export async function getDomainDNSController({
 				: foundDomain.domain;
 
 		try {
-			// Use Google Public DNS to avoid stale cache on the server's local resolver
-			const resolver = new Resolver();
-			resolver.setServers(["8.8.8.8", "8.8.4.4"]);
 			nameservers = await resolver.resolveNs(baseDomain);
 
 			if (nameservers && nameservers.length > 0) {

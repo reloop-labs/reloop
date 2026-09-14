@@ -42,6 +42,6 @@ Falls back to those defaults when unset. Local overrides live in `local.d/`.
 - 📚 **Docs**: [Documentation](https://reloop.sh/docs/setup/backend/spam)
 - 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
 - 🆘 **Support**: [Get Help](https://reloop.sh/support)
-- 💬 **Discord**: [Join Chat](https://discord.gg/bHnkBcp7xR)
+- 💬 **Discord**: [Join Chat](https://discord.gg/ZBYwWKY96U)
 - 🐦 **Twitter**: [Follow Us](https://x.com/reloophq)
 - 🛠️ **Setup**: [Setup Guide](https://reloop.sh/docs/setup/backend/spam)

@@ -16,6 +16,7 @@ import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { useApiLanguage } from "#/hooks/use-api-language";
 import {
 	buildSmtpCodeExamples,
+	DEFAULT_SMTP_HOST,
 	SMTP_LANGUAGES,
 	type SmtpLanguageId,
 } from "./smtp-code-examples";
@@ -171,16 +172,18 @@ function SmtpLanguagePills({
 
 export function SmtpCodePanel({
 	apiKeyPlaceholder = "YOUR_API_KEY",
+	smtpHost = DEFAULT_SMTP_HOST,
 }: {
 	apiKeyPlaceholder?: string;
+	smtpHost?: string;
 }) {
 	const languageIds = useMemo(() => SMTP_LANGUAGES.map((l) => l.id), []);
 	const [selectedLanguage, setSelectedLanguage] =
 		useApiLanguage<SmtpLanguageId>(languageIds, "nodejs");
 
 	const examples = useMemo(
-		() => buildSmtpCodeExamples(apiKeyPlaceholder),
-		[apiKeyPlaceholder],
+		() => buildSmtpCodeExamples(apiKeyPlaceholder, smtpHost),
+		[apiKeyPlaceholder, smtpHost],
 	);
 
 	const active = SMTP_LANGUAGES.find((l) => l.id === selectedLanguage);

@@ -26,7 +26,7 @@ export const landingRoute = new Elysia().get(
 ║ 🧪 Try it: https://reloop.sh/tools/temp-email-checker                ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
-║ 💬 Discord: https://discord.gg/bHnkBcp7xR                            ║
+║ 💬 Discord: https://discord.gg/ZBYwWKY96U                            ║
 ║ 🐦 Twitter: https://x.com/reloophq                                   ║
 ║                                                                      ║
 ╠══════════════════════════════════════════════════════════════════════╣

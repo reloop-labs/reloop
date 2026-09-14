@@ -155,7 +155,7 @@ A Husky pre-commit hook runs this automatically. If you bypass it, CI will catch
 
 Have questions before contributing? Reach out:
 
-- 💬 **Discord** — [discord.gg/bHnkBcp7xR](https://discord.gg/bHnkBcp7xR) — best place for real-time discussion
+- 💬 **Discord** — [discord.gg/ZBYwWKY96U](https://discord.gg/ZBYwWKY96U) — best place for real-time discussion
 - 🐙 **GitHub Issues** — [github.com/reloop-labs/reloop/issues](https://github.com/reloop-labs/reloop/issues)
 - 🐦 **Twitter/X** — [@reloop_labs](https://x.com/reloop_labs)
 - 💼 **LinkedIn** — [reloop-labs](https://www.linkedin.com/company/reloop-labs)

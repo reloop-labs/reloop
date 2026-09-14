@@ -61,6 +61,6 @@ a separate system — workflow events do not fan out to webhooks.
 - 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/workflow/openapi)
 - 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
 - 🆘 **Support**: [Get Help](https://reloop.sh/support)
-- 💬 **Discord**: [Join Chat](https://discord.gg/bHnkBcp7xR)
+- 💬 **Discord**: [Join Chat](https://discord.gg/ZBYwWKY96U)
 - 🐦 **Twitter**: [Follow Us](https://x.com/reloophq)
 - 🛠️ **Setup**: [Setup Guide](https://reloop.sh/docs/setup/backend/workflow)
