@@ -16,7 +16,6 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useCampaigns } from "../campaigns-provider";
 
 const EMPTY_NAME_ERROR = "Please enter a campaign name.";
@@ -34,7 +33,6 @@ export function CreateCampaignModal({
 	onOpenChange,
 }: CreateCampaignModalProps) {
 	const router = useRouter();
-	const { activeOrganization } = useActiveOrganization();
 	const { createCampaign } = useCampaigns();
 	const [name, setName] = useState("");
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
@@ -62,14 +60,12 @@ export function CreateCampaignModal({
 		nameField.clear();
 		setStatus("creating");
 		try {
-			const campaign = await createCampaign(
-				{
-					name: trimmed,
-					subject: trimmed,
-					fromName: activeOrganization?.name
-						? `${activeOrganization.name} Team`
-						: "Team",
-					fromEmail: "updates@reloop.sh",
+		const campaign = await createCampaign(
+			{
+				name: trimmed,
+				subject: "",
+				fromName: "",
+				fromEmail: "",
 					audienceType: "all",
 					audienceTargetName: "All Contacts",
 					contentHtml: "",

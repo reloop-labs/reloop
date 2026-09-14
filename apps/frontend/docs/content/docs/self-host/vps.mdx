@@ -116,7 +116,16 @@ Reloop sends one-time codes through its own mail pipeline, which needs a verifie
 2. Sign up with the administrator email
 3. Enter the printed code
 
-Once one of your domains is verified and sending, remove the `DEFAULT_OTP` line from `/opt/reloop/.env` and run `reloop restart auth`. Set `DISABLE_SIGNUP=true` in the same file if you do not want anyone else creating accounts.
+Once one of your domains is verified and sending, remove the `DEFAULT_OTP` line from `/opt/reloop/.env` and run `reloop restart auth`.
+
+To lock the instance down, set these in the same file and restart `auth`:
+
+| Variable | Effect |
+| :--- | :--- |
+| `DISABLE_SIGNUP=true` | No new accounts on any sign-up path. Existing users still sign in, and invited addresses can still join |
+| `DISABLE_ORG_CREATION=true` | Nobody can create further organizations |
+
+Set `DISABLE_SIGNUP` only after your own account exists. The installer keeps both values across re-runs, so an update will not reopen registration. See [Closing registration](/docs/setup/backend/auth#closing-registration).
 
 If sign-in succeeds but the dashboard then answers `401` on every protected
 page, the services cannot reach the auth service over your public origin. Set

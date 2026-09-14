@@ -68,10 +68,10 @@ export async function createCampaignController(params: {
 	userId: string;
 	body: {
 		name: string;
-		subject: string;
+		subject?: string;
 		previewText?: string;
-		fromName: string;
-		fromEmail: string;
+		fromName?: string;
+		fromEmail?: string;
 		replyTo?: string;
 		audienceType: "all" | "group" | "channel" | "csv";
 		audienceTargetId?: string;
@@ -87,12 +87,13 @@ export async function createCampaignController(params: {
 	const { organizationId, userId, body } = params;
 	const sendImmediately = Boolean(body.sendImmediately);
 	if (!body.name.trim()) throw CampaignErrors.nameRequired();
-	if (!body.subject.trim()) throw CampaignErrors.subjectRequired();
-	if (!body.fromName.trim() || !body.fromEmail.trim()) {
-		throw CampaignErrors.fromRequired();
-	}
+	// Subject + From may be empty on drafts — enforced at send/schedule time.
+	const subject = body.subject?.trim() ?? "";
+	const fromName = body.fromName?.trim() ?? "";
+	const fromEmail = body.fromEmail?.trim() ?? "";
 	if (sendImmediately || body.scheduledAt) {
-		await assertVerifiedFromDomain(organizationId, body.fromEmail);
+		if (!subject) throw CampaignErrors.subjectRequired();
+		await assertVerifiedFromDomain(organizationId, fromEmail);
 	}
 
 	const csvEmails = normalizeCsvEmails(body.csvEmails ?? []);
@@ -125,10 +126,10 @@ export async function createCampaignController(params: {
 			organizationId,
 			userId,
 			name: body.name.trim(),
-			subject: body.subject.trim(),
+			subject,
 			previewText: body.previewText?.trim() || null,
-			fromName: body.fromName.trim(),
-			fromEmail: body.fromEmail.trim(),
+			fromName,
+			fromEmail,
 			replyTo: body.replyTo?.trim() || null,
 			audienceType: body.audienceType,
 			audienceTargetId: body.audienceTargetId || null,
@@ -302,6 +303,7 @@ export async function sendCampaignController(params: {
 }) {
 	const row = await requireCampaign(params.id, params.organizationId);
 	if (!canSend(row.status)) throw CampaignErrors.cannotSend(row.id, row.status);
+	if (!row.subject.trim()) throw CampaignErrors.subjectRequired();
 	await assertVerifiedFromDomain(params.organizationId, row.fromEmail);
 	await enqueueCampaignStart({
 		campaignId: row.id,
@@ -327,6 +329,7 @@ export async function scheduleCampaignController(params: {
 	) {
 		throw CampaignErrors.invalidSchedule();
 	}
+	if (!row.subject.trim()) throw CampaignErrors.subjectRequired();
 	await assertVerifiedFromDomain(params.organizationId, row.fromEmail);
 	await snapshotAudience(row);
 	const [updated] = await db

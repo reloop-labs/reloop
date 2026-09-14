@@ -55,7 +55,10 @@ NATS_URL=nats://localhost:4222
 
 # Local dev helpers
 DEFAULT_OTP=888888
+
+# Registration controls
 DISABLE_SIGNUP=false
+DISABLE_ORG_CREATION=false
 
 # OAuth (optional)
 GOOGLE_CLIENT_ID=
@@ -73,8 +76,44 @@ GITHUB_CLIENT_SECRET=
 | `PORT` | **YES** | `8000` | Host port |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event bus |
 | `DEFAULT_OTP` | No | `888888` | Dev OTP bypass |
-| `DISABLE_SIGNUP` | No | `false` | Set `true` after creating an admin |
+| `DISABLE_SIGNUP` | No | `false` | `true` closes registration on every sign-up path, except pending invitations |
+| `DISABLE_ORG_CREATION` | No | `false` | `true` stops users creating further organizations |
 | `AUTH_INTERNAL_BASE_URL` | No | `BASE_URL` | Origin the services use to validate sessions with each other |
+
+
+## Closing registration
+
+`DISABLE_SIGNUP=true` refuses **every** path that would create a new account —
+password sign-up, email code, and social providers — because it is enforced once
+where the user record is written rather than per method. Existing users keep
+signing in normally.
+
+The one exception is an address holding a **pending, unexpired organization
+invitation**. That keeps an invite-only instance usable: admins go on adding
+teammates from **Members → Invite** without reopening registration. An expired
+invitation does not grant access.
+
+| Who | Result with `DISABLE_SIGNUP=true` |
+| :--- | :--- |
+| Existing user signing in | Allowed |
+| Address with a pending invitation | Allowed |
+| Address with an expired invitation | Refused |
+| Anyone else, any method | Refused with `403` |
+
+`DISABLE_ORG_CREATION=true` is separate, and stops users creating further
+organizations. Existing organizations, their members and their invitations are
+untouched, so this is safe to turn on once your organizations exist.
+
+Both flags are read at startup, so restart the service after changing them:
+
+```bash
+reloop restart auth
+```
+
+> [!WARNING]
+> Set `DISABLE_SIGNUP=true` only after your own account exists. There is no
+> bootstrap exemption — with registration closed and no users, nobody can sign
+> up and no invitation can be issued.
 
 
 ## Session validation between services

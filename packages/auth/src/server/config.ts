@@ -16,5 +16,6 @@ export const authServerConfig = {
 	GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
 	DEFAULT_OTP: process.env.DEFAULT_OTP,
 	DISABLE_SIGNUP: process.env.DISABLE_SIGNUP,
+	DISABLE_ORG_CREATION: process.env.DISABLE_ORG_CREATION,
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 };

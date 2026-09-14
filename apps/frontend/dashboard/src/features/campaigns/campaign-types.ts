@@ -26,6 +26,7 @@ export type Campaign = {
 	openedCount: number;
 	clickedCount: number;
 	failedCount: number;
+	skippedCount?: number;
 	templateId?: string;
 	templateName?: string;
 	content?: unknown[];
