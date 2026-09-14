@@ -31,7 +31,7 @@ export const SMTP_LANGUAGES: readonly SmtpLanguageConfig[] = [
 	{ id: "curl", label: "cURL", shikiLang: "bash", filename: "send.sh" },
 ] as const;
 
-export const SMTP_HOST = "smtp.reloop.sh";
+export const DEFAULT_SMTP_HOST = "smtp.reloop.sh";
 export const SMTP_PORT = 465;
 export const SMTP_USER = "reloop";
 
@@ -41,8 +41,9 @@ export const SMTP_USER = "reloop";
  */
 export function buildSmtpCodeExamples(
 	apiKeyPlaceholder = "YOUR_API_KEY",
+	smtpHost = DEFAULT_SMTP_HOST,
 ): Record<SmtpLanguageId, string> {
-	const host = SMTP_HOST;
+	const host = smtpHost.trim() || DEFAULT_SMTP_HOST;
 	const port = SMTP_PORT;
 	const user = SMTP_USER;
 	const pass = apiKeyPlaceholder;

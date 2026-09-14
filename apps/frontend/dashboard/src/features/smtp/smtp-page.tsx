@@ -9,7 +9,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { buildReloopAiPrompt } from "#/features/dashboard/page-header/copy-prompt-button";
-import { SMTP_HOST, SMTP_USER } from "./smtp-code-examples";
+import { DEFAULT_SMTP_HOST, SMTP_USER } from "./smtp-code-examples";
 import { SmtpCodePanel } from "./smtp-code-panel";
 
 const DOCS_URL = "https://reloop.sh/docs/examples/smtp/introduction";
@@ -175,7 +175,11 @@ function CredentialRow({
 	);
 }
 
-export function SmtpPage() {
+export function SmtpPage({
+	smtpHost = DEFAULT_SMTP_HOST,
+}: {
+	smtpHost?: string;
+}) {
 	const router = useRouter();
 
 	useHotkeys(
@@ -273,7 +277,7 @@ export function SmtpPage() {
 					</div>
 
 					<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
-						<CredentialRow label="Host" value={SMTP_HOST} mono />
+						<CredentialRow label="Host" value={smtpHost} mono />
 						<CredentialRow
 							label="Port"
 							value={SMTP_PORTS}
@@ -321,7 +325,7 @@ export function SmtpPage() {
 
 				{/* Code samples */}
 				<div className="min-w-0 lg:sticky lg:top-6 lg:col-span-7 lg:self-start">
-					<SmtpCodePanel apiKeyPlaceholder="YOUR_API_KEY" />
+					<SmtpCodePanel apiKeyPlaceholder="YOUR_API_KEY" smtpHost={smtpHost} />
 				</div>
 			</div>
 		</div>
