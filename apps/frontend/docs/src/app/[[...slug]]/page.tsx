@@ -23,7 +23,7 @@ function getJsonLd(page: any, canonicalUrl: string) {
 	const siteName = "Reloop";
 	const socialProfiles = {
 		github: "https://github.com/reloop-labs/reloop",
-		discord: "https://discord.gg/bHnkBcp7xR",
+		discord: "https://discord.gg/ZBYwWKY96U",
 		x: "https://x.com/reloop_labs",
 		linkedin: "https://www.linkedin.com/company/reloop-labs",
 	};

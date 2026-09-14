@@ -101,5 +101,5 @@ See the [package README](../../../packages/email-validation/README.md).
 - 📖 **OpenAPI**: [OpenAPI Spec](https://reloop.sh/api/tools/openapi)
 - 🐙 **GitHub**: [Source Code](https://github.com/reloop-labs/reloop)
 - 🆘 **Support**: [Get Help](https://reloop.sh/support)
-- 💬 **Discord**: [Join Chat](https://discord.gg/bHnkBcp7xR)
+- 💬 **Discord**: [Join Chat](https://discord.gg/ZBYwWKY96U)
 - 🐦 **Twitter**: [Follow Us](https://x.com/reloophq)

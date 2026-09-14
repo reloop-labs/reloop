@@ -31,7 +31,7 @@ export function HelpFooterLinks() {
 					<span>
 						Chat with Reloop developers on{" "}
 						<a
-							href="https://discord.gg/bHnkBcp7xR"
+							href="https://discord.gg/ZBYwWKY96U"
 							target="_blank"
 							rel="noreferrer"
 							className="font-medium text-primary-link hover:underline"
