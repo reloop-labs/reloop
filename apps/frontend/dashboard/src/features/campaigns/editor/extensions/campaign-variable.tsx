@@ -4,7 +4,11 @@ import { mergeAttributes, nodeInputRule, nodePasteRule } from "@tiptap/core";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import type React from "react";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
-import { normalizeTemplateVariableName } from "#/features/templates/lib/template-variables";
+import {
+	findContactPropertyForVariable,
+	normalizeCampaignVariableName,
+	stripContactPrefix,
+} from "../lib/campaign-variables";
 
 export function CampaignVariableNodeView({
 	node,
@@ -19,20 +23,14 @@ export function CampaignVariableNodeView({
 	const { data: propertiesData } = useAllPropertiesQuery();
 
 	const properties = propertiesData?.properties ?? [];
-	const cleanName = name.startsWith("contact.")
-		? name.slice("contact.".length)
-		: name;
-	const normalizedTarget = normalizeTemplateVariableName(cleanName);
+	// Campaign variables are read-only references to contact properties.
+	// Everything resolves via `contact.*` at send time.
+	const cleanName = stripContactPrefix(name);
 
-	const matchedProp = properties.find((p) => {
-		const propClean = p.propertyName.startsWith("contact.")
-			? p.propertyName.slice("contact.".length)
-			: p.propertyName;
-		return normalizeTemplateVariableName(propClean) === normalizedTarget;
-	});
+	const matchedProp = findContactPropertyForVariable(properties, name);
 
 	const isStandardProp = ["email", "firstname", "lastname"].includes(
-		cleanName.toLowerCase(),
+		normalizeCampaignVariableName(cleanName).toLowerCase(),
 	);
 
 	const hasDefaultValue =

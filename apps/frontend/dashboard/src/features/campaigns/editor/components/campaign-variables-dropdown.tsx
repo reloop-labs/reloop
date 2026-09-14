@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
+import { mapContactPropertiesToVariables } from "../lib/campaign-variables";
 
 interface CampaignVariablesDropdownProps {
 	query: string;
@@ -16,17 +16,15 @@ export const CampaignVariablesDropdown = forwardRef(
 		const { data: propertiesData } = useAllPropertiesQuery();
 
 		const rawProperties = propertiesData?.properties ?? [];
-		const rawVariables = rawProperties.map((p) =>
-			p.propertyName.startsWith("contact.")
-				? p.propertyName
-				: `contact.${p.propertyName}`,
-		);
+		// Campaign variables are read-only and come only from contact properties.
+		// No creation or editing here — manage properties under Contacts.
+		const mapped = mapContactPropertiesToVariables(rawProperties);
 
 		// If no custom properties yet, provide standard contact variables
 		const variables =
-			rawVariables.length === 0
+			mapped.length === 0
 				? ["contact.email", "contact.firstName", "contact.lastName"]
-				: rawVariables;
+				: mapped;
 
 		const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -35,7 +33,7 @@ export const CampaignVariablesDropdown = forwardRef(
 			v.toLowerCase().includes(props.query.toLowerCase()),
 		);
 
-		const totalItems = filtered.length + 1;
+		const totalItems = filtered.length;
 
 		// Keyboard navigation support
 		useImperativeHandle(ref, () => ({
@@ -66,17 +64,9 @@ export const CampaignVariablesDropdown = forwardRef(
 		}, [props.query]);
 
 		const selectItem = (index: number) => {
-			if (index < filtered.length) {
-				const name = filtered[index];
-				if (name !== undefined) {
-					props.command({ name });
-				}
-			} else {
-				// "+ Add variable..." option -> Open contacts properties page
-				const { editor, range } = props;
-				editor.chain().focus().deleteRange(range).run();
-
-				window.open("/dashboard/contacts/properties", "_blank");
+			const name = filtered[index];
+			if (name !== undefined) {
+				props.command({ name });
 			}
 		};
 
@@ -96,12 +86,12 @@ export const CampaignVariablesDropdown = forwardRef(
 		return (
 			<div className="z-50 min-w-[220px] select-none rounded-2xl bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50">
 				<div className="px-2.5 py-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
-					Variables
+					Contact properties
 				</div>
 
 				{filtered.length === 0 ? (
 					<div className="px-2.5 py-1.5 text-paragraph-xs text-text-soft-400 italic">
-						No matching variables
+						No matching contact properties
 					</div>
 				) : (
 					filtered.map((item: string, index: number) => {
@@ -119,21 +109,6 @@ export const CampaignVariablesDropdown = forwardRef(
 						);
 					})
 				)}
-
-				<div className="my-1 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
-
-				<button
-					type="button"
-					onMouseDown={preventEditorBlur}
-					onClick={() => selectItem(filtered.length)}
-					className={cn(
-						itemClass(selectedIndex === filtered.length),
-						"font-semibold",
-					)}
-				>
-					<Icon name="plus" className="h-3 w-3 shrink-0" />
-					<span className="truncate">Add variable...</span>
-				</button>
 			</div>
 		);
 	},
