@@ -55,16 +55,32 @@ export type CampaignContactProperty = {
 };
 
 /**
+ * Native contact fields — always available even when they are not present
+ * in the custom properties list (they live as columns on `contact`, not as
+ * rows in `contact_property`). Mirrors backend `campaignMergeVars`.
+ */
+export const STANDARD_CAMPAIGN_VARIABLES = [
+	"contact.email",
+	"contact.firstName",
+	"contact.lastName",
+] as const;
+
+/**
  * Map raw contact properties to the read-only variable names shown in the
- * campaign editor. Always returns `contact.*` names.
+ * campaign editor. Always returns `contact.*` names with the standard
+ * contact fields first, then custom properties (deduplicated).
  */
 export function mapContactPropertiesToVariables(
 	properties: CampaignContactProperty[] | null | undefined,
 ): string[] {
-	if (!properties || properties.length === 0) return [];
 	const seen = new Set<string>();
 	const result: string[] = [];
-	for (const p of properties) {
+	for (const name of STANDARD_CAMPAIGN_VARIABLES) {
+		const key = normalizeCampaignVariableName(name).toLowerCase();
+		seen.add(key);
+		result.push(name);
+	}
+	for (const p of properties ?? []) {
 		if (!p?.propertyName) continue;
 		const name = toContactVariableName(p.propertyName);
 		const key = normalizeCampaignVariableName(name).toLowerCase();
