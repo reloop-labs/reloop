@@ -21,7 +21,7 @@ export function AnimatedCampaignsIcon({
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0 overflow-visible", className)}
 		>
-			<g className="origin-[5px_18px] [transform-box:view-box] motion-safe:group-data-[animating=true]:animate-campaign-horn">
+			<g className="origin-[5px_18px] [transform-box:view-box] motion-safe:group-data-[animating=true]:animate-campaign-horn motion-safe:group-hover:animate-campaign-horn">
 				{/* Scaled megaphone body leaving a distinct gap before the sound lines */}
 				<g transform="translate(-1, 0.8) scale(0.8)">
 					{/* Megaphone body tint */}
@@ -52,7 +52,7 @@ export function AnimatedCampaignsIcon({
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
-					className="origin-[19px_7px] opacity-0 transition-opacity duration-200 [transform-box:view-box] group-hover:opacity-100 group-data-[animating=true]:opacity-100 motion-safe:group-data-[animating=true]:animate-campaign-ray-1"
+					className="origin-[19px_7px] opacity-0 transition-opacity duration-150 [transform-box:view-box] motion-safe:group-data-[animating=true]:animate-campaign-ray-1 motion-safe:group-hover:animate-campaign-ray-1"
 				/>
 
 				{/* 2. Middle ray (horizontal) */}
@@ -64,7 +64,7 @@ export function AnimatedCampaignsIcon({
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
-					className="origin-[19.5px_11.5px] opacity-0 transition-opacity duration-200 [transform-box:view-box] group-hover:opacity-100 group-data-[animating=true]:opacity-100 motion-safe:group-data-[animating=true]:animate-campaign-ray-2"
+					className="origin-[19.5px_11.5px] opacity-0 transition-opacity duration-150 [transform-box:view-box] motion-safe:group-data-[animating=true]:animate-campaign-ray-2 motion-safe:group-hover:animate-campaign-ray-2"
 				/>
 
 				{/* 3. Bottom ray (angled downward) */}
@@ -76,7 +76,7 @@ export function AnimatedCampaignsIcon({
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
-					className="origin-[19px_16px] opacity-0 transition-opacity duration-200 [transform-box:view-box] group-hover:opacity-100 group-data-[animating=true]:opacity-100 motion-safe:group-data-[animating=true]:animate-campaign-ray-3"
+					className="origin-[19px_16px] opacity-0 transition-opacity duration-150 [transform-box:view-box] motion-safe:group-data-[animating=true]:animate-campaign-ray-3 motion-safe:group-hover:animate-campaign-ray-3"
 				/>
 			</g>
 		</svg>

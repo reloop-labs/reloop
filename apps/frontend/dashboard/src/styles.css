@@ -73,10 +73,10 @@ body {
 	--animate-theme-bar-2: theme-bar-2 0.5s ease-out 0.18s both;
 	--animate-theme-bar-3: theme-bar-3 0.5s ease-out 0.36s both;
 	--animate-sidebar-bar-slide: sidebar-bar-slide 0.45s ease-in-out both;
-	--animate-campaign-horn: campaign-horn 0.7s ease-in-out both;
-	--animate-campaign-ray-1: campaign-ray 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s both;
-	--animate-campaign-ray-2: campaign-ray 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.18s both;
-	--animate-campaign-ray-3: campaign-ray 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 0.28s both;
+	--animate-campaign-horn: campaign-horn 0.65s ease-in-out both;
+	--animate-campaign-ray-1: campaign-ray 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) 0.06s both;
+	--animate-campaign-ray-2: campaign-ray 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) 0.22s both;
+	--animate-campaign-ray-3: campaign-ray 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) 0.38s both;
 }
 
 @keyframes stroke-draw {
