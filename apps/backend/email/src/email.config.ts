@@ -28,4 +28,13 @@ export const emailConfig = {
 	 * Separate from RELOOP_SENDER_DOMAIN.
 	 */
 	ONBOARDING_TEST_DOMAIN: process.env.ONBOARDING_TEST_DOMAIN || "",
+
+	SMTP_HOST: process.env.SMTP_HOST || "",
+	SMTP_PORT: Number(process.env.SMTP_PORT || "587"),
+	SMTP_USER: process.env.SMTP_USER || "",
+	SMTP_PASSWORD: process.env.SMTP_PASSWORD || "",
+	SMTP_SECURE: process.env.SMTP_SECURE === "true",
+
+	MAILPIT_HOST: process.env.MAILPIT_HOST || "localhost",
+	MAILPIT_PORT: Number(process.env.MAILPIT_PORT || "1025"),
 };
