@@ -4,24 +4,21 @@ import {
 } from "@reloop/links/components/preference-shell";
 import { fetchPreferencesData } from "@reloop/links/lib/preferences-data";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { PreferencesContent } from "./preferences-content";
+import { UnsubscribeContent } from "./unsubscribe-content";
 
 export const metadata: Metadata = {
-	title: "Email Preferences",
-	description: "Manage your email subscription preferences.",
+	title: "Unsubscribe",
+	description: "Unsubscribe from this mailing list.",
 	robots: { index: false, follow: false },
 };
 
-async function PreferencesBody({
+async function UnsubscribeBody({
 	params,
 }: {
 	params: Promise<{ token: string }>;
 }) {
-	// cacheComponents/PPR otherwise prerenders this page without a real
-	// token and caches the "expired" shell for every visitor.
 	await connection();
 	const { token } = await params;
 	const data = await fetchPreferencesData(token);
@@ -30,35 +27,31 @@ async function PreferencesBody({
 		return (
 			<PreferenceInvalid
 				title="Link expired or invalid"
-				description="This preferences link has expired or is no longer valid. Please check your email for a newer link, or contact the sender for an updated one."
+				description="This unsubscribe link has expired or is no longer valid. Please check your email for a newer link, or contact the sender for an updated one."
 			/>
 		);
 	}
 
-	// No public channels: skip the empty preference center and unsubscribe
-	// at the main list on the dedicated unsubscribe page.
-	if (data.channels.length === 0) {
-		redirect(`/preferences/unsubscribe/${token}`);
-	}
-
 	return (
-		<PreferencesContent
+		<UnsubscribeContent
 			token={token}
 			contact={data.contact}
 			organization={data.organization}
-			channels={data.channels}
+			preferencesHref={
+				data.channels.length > 0 ? `/preferences/${token}` : null
+			}
 		/>
 	);
 }
 
-export default function PreferencesPage({
+export default function UnsubscribePage({
 	params,
 }: {
 	params: Promise<{ token: string }>;
 }) {
 	return (
 		<Suspense fallback={<PreferenceFallback />}>
-			<PreferencesBody params={params} />
+			<UnsubscribeBody params={params} />
 		</Suspense>
 	);
 }

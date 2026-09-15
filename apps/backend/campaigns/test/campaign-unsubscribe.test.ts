@@ -10,6 +10,7 @@ import {
 	oneClickUnsubscribeUrl,
 	preferencesPageUrl,
 	signPreferencesToken,
+	unsubscribePageUrl,
 } from "../src/lib/campaign/unsubscribe";
 
 describe("signPreferencesToken", () => {
@@ -35,7 +36,10 @@ describe("signPreferencesToken", () => {
 });
 
 describe("unsubscribe urls", () => {
-	test("preferences page and one-click urls embed the token", () => {
+	test("campaign unsubscribe is a dedicated page, not the preference center", () => {
+		expect(unsubscribePageUrl("tok.abc")).toContain(
+			"/preferences/unsubscribe/tok.abc",
+		);
 		expect(preferencesPageUrl("tok.abc")).toContain("/preferences/tok.abc");
 		expect(oneClickUnsubscribeUrl("tok.abc")).toContain(
 			"/api/contacts/v1/preferences/one-click/tok.abc",
@@ -43,6 +47,9 @@ describe("unsubscribe urls", () => {
 	});
 
 	test("custom tracking base keeps sender and unsubscribe domains aligned", () => {
+		expect(unsubscribePageUrl("tok.abc", "https://link.example.com")).toBe(
+			"https://link.example.com/preferences/unsubscribe/tok.abc",
+		);
 		expect(preferencesPageUrl("tok.abc", "https://link.example.com")).toBe(
 			"https://link.example.com/preferences/tok.abc",
 		);
@@ -64,6 +71,9 @@ describe("hasUnsubscribeContent", () => {
 	test("detects existing unsubscribe affordances", () => {
 		expect(hasUnsubscribeContent('<a href="x">Unsubscribe</a>')).toBe(true);
 		expect(hasUnsubscribeContent("{{{unsubscribe_url}}}")).toBe(true);
+		expect(hasUnsubscribeContent("/preferences/unsubscribe/tok.abc")).toBe(
+			true,
+		);
 		expect(hasUnsubscribeContent("<p>Hello</p>")).toBe(false);
 	});
 });
@@ -72,18 +82,20 @@ describe("appendUnsubscribeFooter", () => {
 	test("appends footer only when missing", () => {
 		const withFooter = appendUnsubscribeFooter(
 			"<p>Hello</p>",
-			"https://example.com/preferences/tok",
+			"https://example.com/preferences/unsubscribe/tok",
 		);
 		expect(withFooter).toContain("Unsubscribe");
-		expect(withFooter).toContain("https://example.com/preferences/tok");
+		expect(withFooter).toContain(
+			"https://example.com/preferences/unsubscribe/tok",
+		);
 		expect(withFooter).toContain('data-unsubscribe-link="true"');
 		expect(withFooter).toMatch(
-			/<a href="https:\/\/example.com\/preferences\/tok"[^>]*>Unsubscribe<\/a>/,
+			/<a href="https:\/\/example.com\/preferences\/unsubscribe\/tok"[^>]*>Unsubscribe<\/a>/,
 		);
 
 		const untouched = appendUnsubscribeFooter(
 			'<p>Hello <a href="x">unsubscribe here</a></p>',
-			"https://example.com/preferences/tok",
+			"https://example.com/preferences/unsubscribe/tok",
 		);
 		expect(untouched).not.toContain("example.com");
 	});

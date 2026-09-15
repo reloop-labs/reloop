@@ -106,6 +106,11 @@ export function preferencesPageUrl(token: string, base?: string): string {
 	return `${(base ?? fallbackBaseUrl()).replace(/\/$/, "")}/preferences/${token}`;
 }
 
+/** Campaign unsubscribe link — main-list only, no channel preference UI. */
+export function unsubscribePageUrl(token: string, base?: string): string {
+	return `${(base ?? fallbackBaseUrl()).replace(/\/$/, "")}/preferences/unsubscribe/${token}`;
+}
+
 export function oneClickUnsubscribeUrl(token: string, base?: string): string {
 	return `${(base ?? fallbackBaseUrl()).replace(/\/$/, "")}/api/contacts/v1/preferences/one-click/${token}`;
 }
@@ -125,12 +130,12 @@ export function hasUnsubscribeContent(html: string): boolean {
  * Totally unstyled footer appended only when the campaign has no unsubscribe
  * content of its own. Inherits the surrounding email styles.
  */
-export function buildUnsubscribeFooter(preferencesUrl: string): string {
+export function buildUnsubscribeFooter(unsubscribeUrl: string): string {
 	return (
 		`<div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;` +
 		`font-size:12px;line-height:1.6;color:#6b7280;text-align:center;">` +
 		`<p style="margin:0 0 8px 0;">You received this email because you subscribed. ` +
-		`<a href="${preferencesUrl}" data-unsubscribe-link="true" ` +
+		`<a href="${unsubscribeUrl}" data-unsubscribe-link="true" ` +
 		`style="color:#6b7280;text-decoration:underline;">Unsubscribe</a> ` +
 		"to stop receiving these emails.</p></div>"
 	);
@@ -138,10 +143,10 @@ export function buildUnsubscribeFooter(preferencesUrl: string): string {
 
 export function appendUnsubscribeFooter(
 	html: string,
-	preferencesUrl: string,
+	unsubscribeUrl: string,
 ): string {
 	if (!html || hasUnsubscribeContent(html)) return html;
-	const footer = buildUnsubscribeFooter(preferencesUrl);
+	const footer = buildUnsubscribeFooter(unsubscribeUrl);
 	const bodyClose = html.lastIndexOf("</body>");
 	if (bodyClose !== -1) {
 		return html.slice(0, bodyClose) + footer + html.slice(bodyClose);

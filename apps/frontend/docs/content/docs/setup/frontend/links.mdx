@@ -74,7 +74,8 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 
 | Route | Purpose |
 | :--- | :--- |
-| `/preferences/[token]` | Manage subscription topics and unsubscribe |
+| `/preferences/[token]` | Manage subscription topics (public channels) |
+| `/preferences/unsubscribe/[token]` | Main-list unsubscribe from campaign emails |
 | `/redirect/[token]` | Track clicks and redirect to destination URL |
 | `/api/mail/v1/track/open/[token]` | Proxy open-tracking pixels to the mail service |
 

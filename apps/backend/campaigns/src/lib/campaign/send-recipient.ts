@@ -11,9 +11,9 @@ import { sendCampaignMail } from "@be/campaigns/lib/campaign/send-mail";
 import {
 	appendUnsubscribeFooter,
 	oneClickUnsubscribeUrl,
-	preferencesPageUrl,
 	resolveUnsubscribeBase,
 	signPreferencesToken,
+	unsubscribePageUrl,
 } from "@be/campaigns/lib/campaign/unsubscribe";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -81,7 +81,7 @@ export async function sendCampaignRecipient(
 	// signed token — CSV recipients without a contactId keep today's behavior.
 	// The base is the sender's tracking domain when enabled, else the Reloop
 	// links host, so the unsubscribe domain matches the sender family.
-	let preferencesUrl: string | null = null;
+	let unsubscribeUrl: string | null = null;
 	let oneClickUrl: string | null = null;
 	if (contact) {
 		const token = await signPreferencesToken({
@@ -92,7 +92,7 @@ export async function sendCampaignRecipient(
 			organizationId: campaign.organizationId,
 			from: campaign.fromEmail,
 		});
-		preferencesUrl = preferencesPageUrl(token, base);
+		unsubscribeUrl = unsubscribePageUrl(token, base);
 		oneClickUrl = oneClickUnsubscribeUrl(token, base);
 	}
 
@@ -101,13 +101,13 @@ export async function sendCampaignRecipient(
 		firstName: contact?.firstName,
 		lastName: contact?.lastName,
 		properties: ((contact as any)?.properties as Record<string, any>) ?? null,
-		unsubscribeUrl: preferencesUrl,
+		unsubscribeUrl,
 	});
 	const subject = interpolate(campaign.subject, vars);
 	// Auto-append the unsubscribe footer when the content has none, so every
 	// campaign carries a working main-list unsubscribe link.
-	const htmlWithFooter = preferencesUrl
-		? appendUnsubscribeFooter(campaign.contentHtml, preferencesUrl)
+	const htmlWithFooter = unsubscribeUrl
+		? appendUnsubscribeFooter(campaign.contentHtml, unsubscribeUrl)
 		: campaign.contentHtml;
 	const html = interpolate(htmlWithFooter, vars);
 	const text = htmlToText(html) || subject;

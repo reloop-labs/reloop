@@ -27,3 +27,7 @@ export function getContactsApiBaseUrl(): string {
 export function getContactsOneClickUrl(token: string): string {
 	return `${getContactsApiBaseUrl()}/v1/preferences/one-click/${encodeURIComponent(token)}`;
 }
+
+export function getContactsPreferencesUrl(path: string): string {
+	return `${getContactsApiBaseUrl()}/v1/preferences/${path.replace(/^\/+/, "")}`;
+}

@@ -1,9 +1,10 @@
 import { AuthErrors } from "@be/contacts/error/contacts.error-response";
-import { db } from "@reloop/db/client";
-import * as schema from "@reloop/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 import { verifyToken } from "../token.utils";
+import {
+	unenrollAllChannels,
+	unsubscribeMainList,
+} from "../unsubscribe.helpers";
 
 export async function unsubscribeAllController({ token }: { token: string }) {
 	const log = useLogger();
@@ -16,48 +17,24 @@ export async function unsubscribeAllController({ token }: { token: string }) {
 
 	const { contactId, organizationId } = payload;
 
-	// Unsubscribe from the main contacts list first.
-	await db
-		.update(schema.contact)
-		.set({ status: "unsubscribed", updatedAt: new Date() })
-		.where(
-			and(
-				eq(schema.contact.id, contactId),
-				eq(schema.contact.organizationId, organizationId),
-				isNull(schema.contact.deletedAt),
-			),
-		);
-
-	// Get all active enrollments for this contact in this org
-	const enrollments = await db.query.channelSubscription.findMany({
-		where: and(
-			eq(schema.channelSubscription.contactId, contactId),
-			eq(schema.channelSubscription.organizationId, organizationId),
-			isNull(schema.channelSubscription.deletedAt),
-		),
-	});
-
-	// Batch update all to unenrolled
-	if (enrollments.length > 0) {
-		await db
-			.update(schema.channelSubscription)
-			.set({ status: "unenrolled", updatedAt: new Date() })
-			.where(
-				and(
-					eq(schema.channelSubscription.contactId, contactId),
-					eq(schema.channelSubscription.organizationId, organizationId),
-					isNull(schema.channelSubscription.deletedAt),
-				),
-			);
+	const main = await unsubscribeMainList({ contactId, organizationId });
+	if (!main.found) {
+		log.info("Unsubscribe-all for unknown contact (suppressed)");
+		return { success: true, updatedCount: 0 };
 	}
 
-	log.info("Unsubscribed from all channels", {
+	const updatedCount = await unenrollAllChannels({
 		contactId,
-		updatedCount: enrollments.length,
+		organizationId,
+	});
+
+	log.info("Unsubscribed from main list and all channels", {
+		contactId,
+		updatedCount,
 	});
 
 	return {
 		success: true,
-		updatedCount: enrollments.length,
+		updatedCount,
 	};
 }
