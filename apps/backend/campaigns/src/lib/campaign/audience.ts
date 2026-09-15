@@ -22,6 +22,16 @@ export function skipReasonForContact(
 	return null;
 }
 
+/** Marketing unsubscribes stay off the snapshot. Auto-suppressed addresses
+ *  are still snapshotted so send can skip them and the campaign UI can list
+ *  them under Suppressed. */
+export function excludeFromCampaignSnapshot(
+	contact: SendableContact,
+): boolean {
+	const reason = skipReasonForContact(contact);
+	return reason === "unsubscribed";
+}
+
 export function normalizeCsvEmails(emails: string[]): string[] {
 	const seen = new Set<string>();
 	const out: string[] = [];

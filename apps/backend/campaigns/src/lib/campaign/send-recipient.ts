@@ -18,7 +18,7 @@ import {
 } from "@be/campaigns/lib/campaign/unsubscribe";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNotNull, or, sql } from "drizzle-orm";
 import { log } from "evlog";
 
 export type SendRecipientResult =
@@ -48,18 +48,18 @@ export async function sendCampaignRecipient(
 		return { outcome: "ignored" };
 	}
 
-	if (recipient.contactId) {
-		const contact = await db.query.contact.findFirst({
-			where: eq(schema.contact.id, recipient.contactId),
-		});
-		const skip = contact
-			? skipReasonForContact(contact)
-			: ("unsubscribed" as const);
-		if (skip) {
-			await markSkipped(recipient.id, campaign.id, skip);
-			await maybeCompleteCampaign(campaign.id);
-			return { outcome: "skipped" };
-		}
+	const contact = recipient.contactId
+		? await db.query.contact.findFirst({
+				where: eq(schema.contact.id, recipient.contactId),
+			})
+		: null;
+	const skip =
+		(contact ? skipReasonForContact(contact) : null) ??
+		(await platformSuppressionSkip(recipient.email));
+	if (skip) {
+		await markSkipped(recipient.id, campaign.id, skip);
+		await maybeCompleteCampaign(campaign.id);
+		return { outcome: "skipped" };
 	}
 
 	await db
@@ -71,12 +71,6 @@ export async function sendCampaignRecipient(
 				eq(schema.campaignRecipient.status, "pending"),
 			),
 		);
-
-	const contact = recipient.contactId
-		? await db.query.contact.findFirst({
-				where: eq(schema.contact.id, recipient.contactId),
-			})
-		: null;
 
 	// Per-recipient unsubscribe URLs. Only contacts on the main list carry a
 	// signed token — CSV recipients without a contactId keep today's behavior.
@@ -204,6 +198,37 @@ export async function sendCampaignRecipient(
 
 	await maybeCompleteCampaign(campaign.id);
 	return { outcome: "sent" };
+}
+
+/**
+ * Reloop auto-suppression: if any org already marked this address as
+ * hard-bounced / not found (or blocked), skip sending for this campaign.
+ * Unsubscribe stays org-local and is not applied here.
+ */
+async function platformSuppressionSkip(
+	email: string,
+): Promise<"suppressed" | "blocked" | null> {
+	const normalized = email.trim().toLowerCase();
+	if (!normalized) return null;
+	const rows = await db
+		.select({
+			status: schema.contact.status,
+			suppressionReason: schema.contact.suppressionReason,
+		})
+		.from(schema.contact)
+		.where(
+			and(
+				eq(schema.contact.email, normalized),
+				or(
+					eq(schema.contact.status, "blocked"),
+					isNotNull(schema.contact.suppressionReason),
+				),
+			),
+		)
+		.limit(8);
+	if (rows.some((row) => row.status === "blocked")) return "blocked";
+	if (rows.some((row) => row.suppressionReason)) return "suppressed";
+	return null;
 }
 
 async function markSkipped(

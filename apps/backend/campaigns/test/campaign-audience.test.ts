@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	excludeFromCampaignSnapshot,
 	normalizeCsvEmails,
 	skipReasonForContact,
 } from "../src/lib/campaign/audience";
@@ -44,6 +45,18 @@ describe("skipReasonForContact", () => {
 				suppressionReason: "hard_bounce",
 			}),
 		).toBe("suppressed");
+	});
+
+	test("snapshot still includes auto-suppressed contacts so they can be listed", () => {
+		expect(
+			excludeFromCampaignSnapshot({
+				status: "subscribed",
+				suppressionReason: "hard_bounce",
+			}),
+		).toBe(false);
+		expect(
+			excludeFromCampaignSnapshot({ status: "unsubscribed" }),
+		).toBe(true);
 	});
 });
 

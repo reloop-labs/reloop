@@ -528,7 +528,6 @@ export async function listRecipientsController(params: {
 	const bouncedCondition = or(
 		eq(schema.campaignRecipient.status, "failed"),
 		eq(schema.emailLog.status, "bounced"),
-		eq(schema.contact.suppressionReason, "hard_bounce"),
 		exists(
 			db
 				.select({ id: schema.emailEvent.id })
@@ -545,12 +544,10 @@ export async function listRecipientsController(params: {
 		),
 	)!;
 
-	const suppressedCondition = or(
-		inArray(schema.campaignRecipient.skipReason, ["suppressed", "blocked"]),
-		sql`${schema.contact.suppressedAt} IS NOT NULL`,
-		sql`${schema.contact.suppressionReason} IS NOT NULL`,
-		eq(schema.contact.status, "blocked"),
-	)!;
+	const suppressedCondition = inArray(schema.campaignRecipient.skipReason, [
+		"suppressed",
+		"blocked",
+	]);
 
 	const complainedCondition = or(
 		eq(schema.emailLog.status, "spam"),
@@ -765,7 +762,6 @@ export async function listRecipientsController(params: {
 			contactLastName,
 			contactStatus,
 			contactSuppressionReason,
-			contactSuppressedAt,
 			emailLogStatus,
 			clickCount,
 			uniqueClickCount,
@@ -792,20 +788,16 @@ export async function listRecipientsController(params: {
 			) {
 				category = "unsubscribed";
 			} else if (
+				recipient.skipReason === "suppressed" ||
+				recipient.skipReason === "blocked"
+			) {
+				category = "suppressed";
+			} else if (
 				emailLogStatus === "bounced" ||
-				contactSuppressionReason === "hard_bounce" ||
 				recipient.status === "failed" ||
 				(recipient.error && /bounce|oob|expiration/i.test(recipient.error))
 			) {
 				category = "bounced";
-			} else if (
-				recipient.skipReason === "suppressed" ||
-				recipient.skipReason === "blocked" ||
-				contactSuppressedAt != null ||
-				contactSuppressionReason != null ||
-				contactStatus === "blocked"
-			) {
-				category = "suppressed";
 			}
 
 			const contactName =

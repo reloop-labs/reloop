@@ -27,7 +27,12 @@ import {
 /** How long the rotate icon spins after a refresh is triggered. */
 const REFRESH_SPIN_MS = 2000;
 
-export type CategoryTab = "unsubscribed" | "bounced" | "complained" | "clicked";
+export type CategoryTab =
+	| "unsubscribed"
+	| "bounced"
+	| "suppressed"
+	| "complained"
+	| "clicked";
 
 const TABS: Array<{
 	id: CategoryTab;
@@ -36,6 +41,7 @@ const TABS: Array<{
 }> = [
 	{ id: "unsubscribed", label: "Unsubscribed", icon: "user-minus" },
 	{ id: "bounced", label: "Bounced", icon: "bounce" },
+	{ id: "suppressed", label: "Suppressed", icon: "slash" },
 	{ id: "complained", label: "Complained", icon: "alert-triangle" },
 	{ id: "clicked", label: "Clicks", icon: "cursor-click" },
 ];
@@ -45,32 +51,38 @@ function getCategoryBadge(category?: DeliverabilityCategory | string) {
 		case "unsubscribed":
 			return {
 				label: "Unsubscribed",
-				className:
-					"bg-rose-50 text-rose-600 border border-rose-200/70 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/40",
+				icon: "user-minus",
+				className: "text-error-base",
 			};
 		case "bounced":
 			return {
 				label: "Bounced",
-				className:
-					"bg-amber-50 text-amber-700 border border-amber-200/70 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40",
+				icon: "minus-circle",
+				className: "text-error-base",
+			};
+		case "suppressed":
+			return {
+				label: "Suppressed",
+				icon: "slash",
+				className: "text-text-sub-600",
 			};
 		case "complained":
 			return {
 				label: "Complained",
-				className:
-					"bg-red-50 text-red-600 border border-red-200/70 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800/40",
+				icon: "minus-circle",
+				className: "text-error-base",
 			};
 		case "clicked":
 			return {
 				label: "Clicked",
-				className:
-					"bg-violet-50 text-violet-700 border border-violet-200/70 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800/40",
+				icon: "cursor-click",
+				className: "text-feature-base",
 			};
 		default:
 			return {
 				label: category || "Issue",
-				className:
-					"bg-neutral-100 text-neutral-600 border border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300",
+				icon: "minus-circle",
+				className: "text-text-sub-600",
 			};
 	}
 }
@@ -514,14 +526,18 @@ export function CampaignRecipientIssuesCard({
 												</span>
 											</div>
 										) : (
-											<span
+											<div
 												className={cn(
-													"rounded-full px-2.5 py-0.5 font-medium text-[11px] tracking-wide",
+													"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
 													badge.className,
 												)}
 											>
+												<Icon
+													name={badge.icon}
+													className="h-3.5 w-3.5 shrink-0"
+												/>
 												{badge.label}
-											</span>
+											</div>
 										)}
 									</li>
 								);

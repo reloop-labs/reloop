@@ -233,7 +233,7 @@ function CampaignDetailContent() {
 					/>
 				)}
 
-				{/* Deliverability & Recipient Activity (Unsubscribed, Bounced, Complained, Clicks) */}
+				{/* Deliverability & Recipient Activity (Unsubscribed, Bounced, Suppressed, Complained, Clicks) */}
 				<CampaignRecipientIssuesCard
 					campaignId={campaign.id}
 					activeTab={recipientTab}
