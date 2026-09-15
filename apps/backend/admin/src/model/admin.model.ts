@@ -169,6 +169,16 @@ export namespace AdminModel {
 		total: t.Number(),
 	});
 
+	export const emailAttachment = t.Object({
+		id: t.String(),
+		filename: t.String(),
+		contentType: t.String(),
+		size: t.Number(),
+		storagePath: t.Optional(t.String()),
+		contentDisposition: t.Optional(t.Union([t.String(), t.Null()])),
+		contentId: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
 	export const organizationDetail = t.Object({
 		id: t.String(),
 		name: t.String(),
@@ -282,6 +292,7 @@ export namespace AdminModel {
 				status: t.String(),
 				createdAt: t.Date(),
 				sentAt: t.Union([t.Date(), t.Null()]),
+				attachments: t.Array(emailAttachment),
 			}),
 		),
 		supportConversations: t.Array(
@@ -390,6 +401,7 @@ export namespace AdminModel {
 		status: t.String(),
 		createdAt: t.Date(),
 		sentAt: t.Union([t.Date(), t.Null()]),
+		attachments: t.Array(emailAttachment),
 	});
 
 	export const emailEvent = t.Object({
@@ -430,12 +442,22 @@ export namespace AdminModel {
 		failedAt: t.Union([t.Date(), t.Null()]),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+		attachments: t.Array(emailAttachment),
 		events: t.Array(emailEvent),
 	});
 
 	export const emailsResponse = t.Object({
 		items: t.Array(emailItem),
 		total: t.Number(),
+	});
+
+	export const inboundAttachmentItem = t.Object({
+		id: t.String(),
+		filename: t.String(),
+		contentType: t.String(),
+		size: t.Number(),
+		contentDisposition: t.Union([t.String(), t.Null()]),
+		contentId: t.Union([t.String(), t.Null()]),
 	});
 
 	export const inboundEmailItem = t.Object({
@@ -453,15 +475,7 @@ export namespace AdminModel {
 		spamScore: t.Union([t.Number(), t.Null()]),
 		size: t.Number(),
 		createdAt: t.Date(),
-	});
-
-	export const inboundAttachmentItem = t.Object({
-		id: t.String(),
-		filename: t.String(),
-		contentType: t.String(),
-		size: t.Number(),
-		contentDisposition: t.Union([t.String(), t.Null()]),
-		contentId: t.Union([t.String(), t.Null()]),
+		attachments: t.Array(inboundAttachmentItem),
 	});
 
 	export const inboundEmailDetail = t.Object({

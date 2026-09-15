@@ -2,6 +2,7 @@
 
 import { EmailDetailDrawer } from "@fe/console/components/email-detail-drawer";
 import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
+import { AttachmentChips } from "@fe/console/components/ui/attachment-chips";
 import { EntityTabs } from "@fe/console/components/ui/entity-tabs";
 import { MetricGrid } from "@fe/console/components/ui/metric-grid";
 import {
@@ -119,6 +120,12 @@ type OrgDetail = {
 		status: string;
 		createdAt: string;
 		sentAt: string | null;
+		attachments?: Array<{
+			id: string;
+			filename: string;
+			contentType: string;
+			size: number;
+		}>;
 	}>;
 	supportConversations: Array<{
 		id: string;
@@ -803,8 +810,16 @@ export default function OrganizationDetailPage() {
 					}
 				>
 					<DataTable
-						headers={["When", "From", "To", "Subject", "Status", ""]}
-						colSpan={6}
+						headers={[
+							"When",
+							"From",
+							"To",
+							"Subject",
+							"Attachments",
+							"Status",
+							"",
+						]}
+						colSpan={7}
 						empty={data.recentEmails.length === 0}
 					>
 						{data.recentEmails.map((e) => (
@@ -827,6 +842,12 @@ export default function OrganizationDetailPage() {
 									>
 										{e.subject || "(no subject)"}
 									</button>
+								</td>
+								<td className="px-4 py-3">
+									<AttachmentChips
+										attachments={e.attachments}
+										onAttachmentClick={() => setSelectedEmailId(e.id)}
+									/>
 								</td>
 								<td className="px-4 py-3">
 									<StatusPill status={e.status} />

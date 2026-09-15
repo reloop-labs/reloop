@@ -1,6 +1,7 @@
 "use client";
 
 import { InboundDetailDrawer } from "@fe/console/components/inbound-detail-drawer";
+import { AttachmentChips } from "@fe/console/components/ui/attachment-chips";
 import {
 	DataTable,
 	PageFrame,
@@ -17,6 +18,15 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
+type InboundAttachment = {
+	id: string;
+	filename: string;
+	contentType: string;
+	size: number;
+	contentDisposition?: string | null;
+	contentId?: string | null;
+};
+
 type InboundItem = {
 	id: string;
 	organizationId: string;
@@ -29,6 +39,7 @@ type InboundItem = {
 	isSpam: boolean;
 	spamScore: number | null;
 	createdAt: string;
+	attachments?: InboundAttachment[];
 };
 
 type InboundResponse = { items: InboundItem[]; total: number };
@@ -141,12 +152,13 @@ export default function InboundPage() {
 						"From",
 						"To",
 						"Subject",
+						"Attachments",
 						"Status",
 						"Mailbox",
 						"Org",
 						"",
 					]}
-					colSpan={8}
+					colSpan={9}
 					loading={isLoading}
 					empty={!isLoading && !data?.items.length}
 				>
@@ -170,6 +182,12 @@ export default function InboundPage() {
 								>
 									{email.subject || "(no subject)"}
 								</button>
+							</td>
+							<td className="px-4 py-3">
+								<AttachmentChips
+									attachments={email.attachments}
+									onAttachmentClick={() => setSelectedEmailId(email.id)}
+								/>
 							</td>
 							<td className="px-4 py-3">
 								<div className="flex items-center gap-1.5">

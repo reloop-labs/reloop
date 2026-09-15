@@ -1,6 +1,7 @@
 "use client";
 
 import { EmailDetailDrawer } from "@fe/console/components/email-detail-drawer";
+import { AttachmentChips } from "@fe/console/components/ui/attachment-chips";
 import {
 	DataTable,
 	PageFrame,
@@ -27,6 +28,13 @@ type EmailItem = {
 	status: string;
 	createdAt: string;
 	sentAt: string | null;
+	attachments?: Array<{
+		id: string;
+		filename: string;
+		contentType: string;
+		size: number;
+		storagePath?: string;
+	}>;
 };
 
 type EmailsResponse = { items: EmailItem[]; total: number };
@@ -158,8 +166,17 @@ export default function EmailsPage() {
 
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 				<DataTable
-					headers={["When", "From", "To", "Subject", "Status", "Org", ""]}
-					colSpan={7}
+					headers={[
+						"When",
+						"From",
+						"To",
+						"Subject",
+						"Attachments",
+						"Status",
+						"Org",
+						"",
+					]}
+					colSpan={8}
 					loading={isLoading}
 					empty={!isLoading && !data?.items.length}
 				>
@@ -183,6 +200,12 @@ export default function EmailsPage() {
 								>
 									{email.subject || "(no subject)"}
 								</button>
+							</td>
+							<td className="px-4 py-3">
+								<AttachmentChips
+									attachments={email.attachments}
+									onAttachmentClick={() => setSelectedEmailId(email.id)}
+								/>
 							</td>
 							<td className="px-4 py-3">
 								<StatusPill status={email.status} />

@@ -3,6 +3,7 @@
 import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { adminGet } from "@fe/console/lib/admin-api";
 import {
+	formatBytes,
 	formatDateTime,
 	formatRecipients,
 	formatRelativeTime,
@@ -47,6 +48,15 @@ export type EmailDetailData = {
 	failedAt?: string | Date | null;
 	createdAt: string | Date;
 	updatedAt?: string | Date;
+	attachments?: Array<{
+		id: string;
+		filename: string;
+		contentType: string;
+		size: number;
+		storagePath?: string;
+		contentDisposition?: string | null;
+		contentId?: string | null;
+	}>;
 	events?: {
 		id: string;
 		type: string;
@@ -54,14 +64,6 @@ export type EmailDetailData = {
 		createdAt: string | Date;
 	}[];
 };
-
-function formatBytes(bytes: number): string {
-	if (bytes === 0) return "0 B";
-	const k = 1024;
-	const sizes = ["B", "KB", "MB", "GB"];
-	const i = Math.floor(Math.log(bytes) / Math.log(k));
-	return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`;
-}
 
 function formatHtml(html: string): string {
 	if (!html) return "";
@@ -191,7 +193,14 @@ export function EmailDetailDrawer({
 	onOpenChange: (open: boolean) => void;
 }) {
 	const [activeTab, setActiveTab] = useState<
-		"preview" | "plain" | "html" | "raw" | "headers" | "timeline" | "insights"
+		| "preview"
+		| "plain"
+		| "html"
+		| "raw"
+		| "headers"
+		| "attachments"
+		| "timeline"
+		| "insights"
 	>("preview");
 	const [previewTheme, setPreviewTheme] = useState<"light" | "dark">("light");
 
@@ -523,6 +532,11 @@ export function EmailDetailDrawer({
 												{ id: "raw", label: "Raw MIME", icon: "file-code" },
 												{ id: "headers", label: "Headers", icon: "list" },
 												{
+													id: "attachments",
+													label: `Files (${email.attachments?.length ?? 0})`,
+													icon: "paperclip",
+												},
+												{
 													id: "timeline",
 													label: `Timeline (${email.events?.length ?? 0})`,
 													icon: "history",
@@ -721,6 +735,43 @@ export function EmailDetailDrawer({
 												</div>
 											)}
 										</div>
+									)}
+
+									{activeTab === "attachments" && (
+										email.attachments && email.attachments.length > 0 ? (
+											<ul className="divide-y divide-stroke-soft-100 overflow-hidden rounded-2xl border border-stroke-soft-100 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
+												{email.attachments.map((att, i) => (
+													<li
+														key={att.id || `${att.filename}-${i}`}
+														className="flex items-center justify-between gap-3 px-4 py-3 text-[13px]"
+													>
+														<div className="min-w-0">
+															<div className="flex items-center gap-2">
+																<Icon
+																	name="paperclip"
+																	className="h-4 w-4 shrink-0 text-text-soft-400"
+																/>
+																<p className="truncate font-medium text-text-strong-950">
+																	{att.filename}
+																</p>
+															</div>
+															<p className="mt-0.5 pl-6 text-[12px] text-text-sub-600">
+																{att.contentType} · {formatBytes(att.size)}
+															</p>
+														</div>
+														{att.storagePath ? (
+															<span className="font-mono text-[11px] text-text-sub-600">
+																{att.storagePath}
+															</span>
+														) : null}
+													</li>
+												))}
+											</ul>
+										) : (
+											<div className="p-8 text-center text-[13px] text-text-sub-600">
+												No attachments on this message.
+											</div>
+										)
 									)}
 
 									{activeTab === "timeline" && (
