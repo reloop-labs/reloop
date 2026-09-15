@@ -27,7 +27,7 @@ export const unsubscribeAllRoute = new Elysia()
 				tags: ["Preferences"],
 				summary: "Unsubscribe from all channels",
 				description:
-					"Unenroll a contact from all their channel subscriptions. No auth required — token is self-contained.",
+					"Unsubscribe a contact from the main list and unenroll all channel subscriptions. No auth required — token is self-contained.",
 				hide: true,
 			},
 		},

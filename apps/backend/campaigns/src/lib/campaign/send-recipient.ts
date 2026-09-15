@@ -8,6 +8,13 @@ import {
 	interpolate,
 } from "@be/campaigns/lib/campaign/interpolate";
 import { sendCampaignMail } from "@be/campaigns/lib/campaign/send-mail";
+import {
+	appendUnsubscribeFooter,
+	oneClickUnsubscribeUrl,
+	preferencesPageUrl,
+	resolveUnsubscribeBase,
+	signPreferencesToken,
+} from "@be/campaigns/lib/campaign/unsubscribe";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, sql } from "drizzle-orm";
@@ -66,18 +73,52 @@ export async function sendCampaignRecipient(
 			})
 		: null;
 
+	// Per-recipient unsubscribe URLs. Only contacts on the main list carry a
+	// signed token — CSV recipients without a contactId keep today's behavior.
+	// The base is the sender's tracking domain when enabled, else the Reloop
+	// links host, so the unsubscribe domain matches the sender family.
+	let preferencesUrl: string | null = null;
+	let oneClickUrl: string | null = null;
+	if (contact) {
+		const token = await signPreferencesToken({
+			contactId: contact.id,
+			organizationId: campaign.organizationId,
+		});
+		const base = await resolveUnsubscribeBase({
+			organizationId: campaign.organizationId,
+			from: campaign.fromEmail,
+		});
+		preferencesUrl = preferencesPageUrl(token, base);
+		oneClickUrl = oneClickUnsubscribeUrl(token, base);
+	}
+
 	const vars = campaignMergeVars({
 		email: recipient.email,
 		firstName: contact?.firstName,
 		lastName: contact?.lastName,
 		properties: ((contact as any)?.properties as Record<string, any>) ?? null,
+		unsubscribeUrl: preferencesUrl,
 	});
 	const subject = interpolate(campaign.subject, vars);
-	const html = interpolate(campaign.contentHtml, vars);
+	// Auto-append the unsubscribe footer when the content has none, so every
+	// campaign carries a working main-list unsubscribe link.
+	const htmlWithFooter = preferencesUrl
+		? appendUnsubscribeFooter(campaign.contentHtml, preferencesUrl)
+		: campaign.contentHtml;
+	const html = interpolate(htmlWithFooter, vars);
 	const text = htmlToText(html) || subject;
 	const from = campaign.fromName
 		? `${campaign.fromName} <${campaign.fromEmail}>`
 		: campaign.fromEmail;
+
+	// RFC 8058 one-click headers. Mailto fallback preserved when replyTo set.
+	const headers: Record<string, string> = {};
+	const listParts: string[] = [];
+	if (oneClickUrl) listParts.push(`<${oneClickUrl}>`);
+	if (campaign.replyTo) listParts.push(`<mailto:${campaign.replyTo}>`);
+	if (listParts.length > 0) headers["List-Unsubscribe"] = listParts.join(", ");
+	if (oneClickUrl)
+		headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
 
 	try {
 		const result = await sendCampaignMail({
@@ -91,9 +132,7 @@ export async function sendCampaignRecipient(
 			replyTo: campaign.replyTo,
 			tags: [{ name: "campaign", value: campaign.id }],
 			templateId: campaign.contentHtml ? null : campaign.templateId,
-			headers: campaign.replyTo
-				? { "List-Unsubscribe": `<mailto:${campaign.replyTo}>` }
-				: undefined,
+			headers: Object.keys(headers).length > 0 ? headers : undefined,
 		});
 
 		await db

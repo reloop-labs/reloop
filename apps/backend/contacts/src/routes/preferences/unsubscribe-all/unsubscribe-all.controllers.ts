@@ -16,6 +16,18 @@ export async function unsubscribeAllController({ token }: { token: string }) {
 
 	const { contactId, organizationId } = payload;
 
+	// Unsubscribe from the main contacts list first.
+	await db
+		.update(schema.contact)
+		.set({ status: "unsubscribed", updatedAt: new Date() })
+		.where(
+			and(
+				eq(schema.contact.id, contactId),
+				eq(schema.contact.organizationId, organizationId),
+				isNull(schema.contact.deletedAt),
+			),
+		);
+
 	// Get all active enrollments for this contact in this org
 	const enrollments = await db.query.channelSubscription.findMany({
 		where: and(
