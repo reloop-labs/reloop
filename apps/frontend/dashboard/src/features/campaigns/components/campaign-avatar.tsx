@@ -1,8 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { AnimatedCampaignsIcon } from "#/features/dashboard/sidebar/animated-campaigns-icon";
-import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
+import { Icon } from "@reloop/ui/icon";
 import type { CampaignStatus } from "../campaign-types";
 
 type CampaignAvatarSize = "sm" | "md" | "lg" | "xl";
@@ -66,7 +65,7 @@ const STATUS_TONE: Record<CampaignStatus, { outer: string; icon: string }> = {
 };
 
 /**
- * Campaign megaphone icon inside a two-layer card with hover animation.
+ * Campaign megaphone icon inside a two-layer card.
  * Outer border and icon color follow campaign status.
  */
 export function CampaignAvatar({
@@ -81,11 +80,9 @@ export function CampaignAvatar({
 }) {
 	const sizeConfig = SIZE_CLASS[size];
 	const tone = (status && STATUS_TONE[status]) || STATUS_TONE.draft;
-	const { groupProps } = usePlayAnimationOnHover();
 
 	return (
 		<div
-			{...groupProps}
 			className={cn(
 				"group flex shrink-0 items-center justify-center border",
 				sizeConfig.container,
@@ -100,7 +97,8 @@ export function CampaignAvatar({
 					sizeConfig.inner,
 				)}
 			>
-				<AnimatedCampaignsIcon
+				<Icon
+					name="mega-phone"
 					className={cn(tone.icon, sizeConfig.icon)}
 				/>
 			</div>

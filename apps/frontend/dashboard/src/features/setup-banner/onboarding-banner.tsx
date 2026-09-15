@@ -1,208 +1,167 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useRef, useState } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { formatOwnDomainFrom, type SetupStep } from "./setup-progress";
 import { useSendFromOwnDomain } from "./use-send-from-own-domain";
 import { useSetupProgress } from "./use-setup-progress";
 
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
-
-function GlowingBlueDot() {
-	return (
-		<span className="relative flex size-2.5">
-			<span className="absolute inline-flex h-full w-full rounded-full bg-primary-base opacity-75 motion-safe:animate-ping" />
-			<span className="relative inline-flex size-2.5 rounded-full bg-primary-base ring-2 ring-bg-white-0 dark:ring-[#0c0c0c]" />
-		</span>
-	);
-}
-
-function SetupProgressBar({ value, max }: { value: number; max: number }) {
-	const safeMax = max <= 0 ? 1 : max;
-	const pct = Math.min(100, Math.max(0, (value / safeMax) * 100));
-	return (
-		<div
-			className="h-1.5 w-full rounded-full bg-bg-soft-200"
-			role="progressbar"
-			aria-valuenow={value}
-			aria-valuemin={0}
-			aria-valuemax={max}
-		>
-			<div
-				className="h-full rounded-full bg-primary-base transition-[width] duration-300 ease-out"
-				style={{ width: `${pct}%` }}
-			/>
-		</div>
-	);
-}
-
-function StepIndicator({
-	complete,
-	index,
+function ProgressRing({
+	completed,
+	total,
+	size = 18,
 }: {
-	complete: boolean;
-	index: number;
+	completed: number;
+	total: number;
+	size?: number;
 }) {
+	const safeTotal = total <= 0 ? 1 : total;
+	const pct = Math.min(1, Math.max(0, completed / safeTotal));
+	const stroke = 3;
+	const r = (size - stroke) / 2;
+	const c = 2 * Math.PI * r;
+	const done = completed >= safeTotal;
+
+	if (done) {
+		return <PricingCheckmark size={size} />;
+	}
+
 	return (
 		<span
-			className={cn(
-				"flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-medium text-[11px] tabular-nums",
-				complete
-					? "bg-success-base text-static-white"
-					: "bg-bg-weak-50 text-text-sub-600 ring-1 ring-stroke-soft-200 ring-inset",
-			)}
+			className="relative shrink-0"
+			style={{ width: size, height: size }}
 			aria-hidden
 		>
-			{complete ? <Icon name="check" className="h-3 w-3" /> : index + 1}
+			<svg width={size} height={size} className="-rotate-90">
+				<circle
+					cx={size / 2}
+					cy={size / 2}
+					r={r}
+					fill="none"
+					stroke="currentColor"
+					strokeWidth={stroke}
+					className="text-black/15 dark:text-white/[0.18]"
+				/>
+				{pct > 0 && (
+					<circle
+						cx={size / 2}
+						cy={size / 2}
+						r={r}
+						fill="none"
+						stroke="currentColor"
+						strokeWidth={stroke}
+						strokeLinecap="round"
+						strokeDasharray={c}
+						strokeDashoffset={c * (1 - pct)}
+						className="text-primary-base"
+					/>
+				)}
+				{pct === 0 && (
+					<circle
+						cx={size / 2}
+						cy={stroke / 2}
+						r={stroke / 2}
+						fill="currentColor"
+						stroke="none"
+						className="text-primary-base"
+					/>
+				)}
+			</svg>
 		</span>
+	);
+}
+
+/**
+ * Checkmark matching the pricing page geometry (tinted circle + check),
+ * scaled to the same 18px footprint as the incomplete ring.
+ */
+function PricingCheckmark({ size = 18 }: { size?: number }) {
+	return (
+		<svg
+			width={size}
+			height={size}
+			viewBox="0 0 18 18"
+			fill="none"
+			className="shrink-0 text-primary-base"
+			aria-hidden="true"
+		>
+			<circle cx="9" cy="9" r="9" fill="currentColor" fillOpacity="0.08" />
+			<path
+				d="M6.3 9.45L8.1 11.25L11.7 6.75"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="1.25"
+			/>
+		</svg>
+	);
+}
+
+function StepDot({ complete }: { complete: boolean }) {
+	if (complete) {
+		return <PricingCheckmark size={18} />;
+	}
+	return (
+		<span
+			className="h-[18px] w-[18px] shrink-0 rounded-full border-[3px] border-black/20 dark:border-white/20"
+			aria-hidden
+		/>
 	);
 }
 
 function StepRow({
 	step,
-	index,
-	onSend,
-	onNavigate,
+	onRun,
 	sending,
-	sendDisabled,
+	disabled,
 }: {
 	step: SetupStep;
-	index: number;
-	onSend: () => void;
-	onNavigate: (href: string) => void;
+	onRun: () => void;
 	sending: boolean;
-	sendDisabled: boolean;
+	disabled: boolean;
 }) {
-	const ctaDisabled =
-		step.disabled || (step.action === "send" && (sending || sendDisabled));
-
+	const external = step.href?.startsWith("http");
 	return (
-		<li className="flex items-start gap-3 py-3">
-			<StepIndicator complete={step.complete} index={index} />
-			<div className="min-w-0 flex-1">
-				<p
+		<li>
+			<button
+				type="button"
+				onClick={onRun}
+				disabled={step.complete || disabled}
+				className={cn(
+					"group flex w-full items-center gap-2.5 px-4 py-1.5 text-left",
+					step.complete || disabled ? "cursor-default" : "cursor-pointer",
+				)}
+			>
+				{sending && step.action === "send" ? (
+					<span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center text-text-sub-600 dark:text-white/60">
+						<Spinner size={14} />
+					</span>
+				) : (
+					<StepDot complete={step.complete} />
+				)}
+				<span
 					className={cn(
-						"h-5 font-medium text-label-sm leading-5",
-						step.complete ? "text-text-sub-600" : "text-text-strong-950",
+						"min-w-0 flex-1 truncate font-medium text-[13px] leading-5 tracking-normal",
+						step.complete
+							? "text-text-soft-400 line-through dark:text-white/30"
+							: "text-text-strong-950 dark:text-white/75",
 					)}
 				>
 					{step.title}
-				</p>
-				<p className="truncate text-paragraph-xs text-text-soft-400">
-					{step.description}
-				</p>
-			</div>
-			{step.complete ? (
-				<span className="flex h-5 shrink-0 items-center self-center font-medium text-label-xs text-success-base">
-					Done
 				</span>
-			) : step.action === "send" ? (
-				<Button.Root
-					type="button"
-					variant="neutral"
-					mode="stroke"
-					size="xxsmall"
-					className="shrink-0 gap-1.5 self-center rounded-xl"
-					disabled={ctaDisabled}
-					onClick={onSend}
-				>
-					{sending ? (
-						<>
-							<Spinner size={12} />
-							Sending…
-						</>
-					) : (
-						<>
-							<Icon name="mail-send" className="h-3.5 w-3.5" />
-							{step.cta}
-						</>
-					)}
-				</Button.Root>
-			) : (
-				<Button.Root
-					type="button"
-					variant="neutral"
-					mode="stroke"
-					size="xxsmall"
-					className="shrink-0 gap-1.5 self-center rounded-xl"
-					onClick={() => onNavigate(step.href ?? "/")}
-				>
-					{step.cta}
-					<Icon name="arrow-right" className="h-3.5 w-3.5" />
-				</Button.Root>
-			)}
+				{external && !step.complete && (
+					<Icon
+						name="arrow-up-right"
+						className="h-3.5 w-3.5 shrink-0 text-text-soft-400 dark:text-white/30"
+					/>
+				)}
+			</button>
 		</li>
-	);
-}
-
-function CollapsedTrigger({
-	completedCount,
-	totalCount,
-	onOpen,
-}: {
-	completedCount: number;
-	totalCount: number;
-	onOpen: () => void;
-}) {
-	return (
-		<button
-			type="button"
-			onClick={onOpen}
-			aria-label={`Get started, ${completedCount} of ${totalCount} complete`}
-			title="Get started"
-			className="flex h-8 w-8 items-center justify-center rounded-lg transition-[background-color,transform] duration-150 ease-out hover:bg-bg-weak-50 active:scale-[0.97] dark:hover:bg-white/10"
-		>
-			<GlowingBlueDot />
-		</button>
-	);
-}
-
-function ExpandedTrigger({
-	completedCount,
-	totalCount,
-	nextTitle,
-	onOpen,
-}: {
-	completedCount: number;
-	totalCount: number;
-	nextTitle: string | undefined;
-	onOpen: () => void;
-}) {
-	return (
-		<button
-			type="button"
-			onClick={onOpen}
-			className="relative w-full overflow-visible rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2.5 text-left transition-[background-color,transform] duration-150 ease-out hover:bg-bg-weak-50 active:scale-[0.99] dark:border-stroke-soft-100/40 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
-		>
-			<span className="-top-0.75 -right-0.75 pointer-events-none absolute z-10">
-				<GlowingBlueDot />
-			</span>
-			<div className="flex items-center justify-between gap-2">
-				<span className="font-medium text-label-sm text-text-strong-950">
-					Get started
-				</span>
-				<span className="font-medium text-label-xs text-text-sub-600 tabular-nums">
-					{completedCount}/{totalCount}
-				</span>
-			</div>
-			<div className="mt-2">
-				<SetupProgressBar value={completedCount} max={totalCount} />
-			</div>
-			<p className="mt-1.5 truncate text-paragraph-xs text-text-soft-400">
-				{nextTitle ?? "Finish setup"}
-			</p>
-		</button>
 	);
 }
 
@@ -212,17 +171,29 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 	const { orgName, progress, isPending } = useSetupProgress();
 	const send = useSendFromOwnDomain();
 	const [open, setOpen] = useState(false);
+	const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const visible = !isPending && (!progress.allComplete || open);
+	const cancelClose = () => {
+		if (closeTimer.current) {
+			clearTimeout(closeTimer.current);
+			closeTimer.current = null;
+		}
+	};
+	const handleEnter = () => {
+		cancelClose();
+		setOpen(true);
+	};
+	const handleLeave = () => {
+		cancelClose();
+		closeTimer.current = setTimeout(() => setOpen(false), 120);
+	};
+
+	if (isPending || progress.allComplete) return null;
+
 	const userEmail = session?.user?.email?.trim() ?? "";
 	const activeDomain = progress.activeDomain;
-	const nextStep = progress.steps.find((step) => !step.complete);
 	const sending = send.isPending;
 	const sendDisabled = !userEmail;
-	const nextDisabled =
-		!nextStep ||
-		nextStep.disabled ||
-		(nextStep.action === "send" && (sending || sendDisabled));
 
 	const handleSend = () => {
 		if (!activeDomain || !userEmail) return;
@@ -234,154 +205,138 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 
 	const runStep = (step: SetupStep) => {
 		if (step.complete) return;
+		if (step.disabled) return;
 		if (step.action === "send") {
+			if (sending || sendDisabled) return;
 			handleSend();
 			return;
 		}
-		setOpen(false);
 		router.push(step.href ?? "/");
 	};
 
-	useHotkeys(
-		"enter",
-		(e) => {
-			e.preventDefault();
-			if (open && nextStep && !nextDisabled) runStep(nextStep);
-		},
-		{ enabled: open && Boolean(nextStep) && !nextDisabled },
+	const isStepBusy = (step: SetupStep) =>
+		step.action === "send" && (sending || sendDisabled);
+	const isStepDisabled = (step: SetupStep) =>
+		Boolean(step.disabled) || isStepBusy(step);
+
+	// Completed steps sink to the bottom, pending ones stay on top.
+	const orderedSteps = [...progress.steps].sort(
+		(a, b) => Number(a.complete) - Number(b.complete),
 	);
 
-	if (!visible) return null;
-
-	return (
-		<>
-			{isCollapsed ? (
-				<CollapsedTrigger
-					completedCount={progress.completedCount}
-					totalCount={progress.totalCount}
-					onOpen={() => setOpen(true)}
+	const stepsList = (
+		<ol className="py-1">
+			{orderedSteps.map((step) => (
+				<StepRow
+					key={step.id}
+					step={step}
+					onRun={() => runStep(step)}
+					sending={sending}
+					disabled={isStepDisabled(step)}
 				/>
-			) : (
-				<ExpandedTrigger
-					completedCount={progress.completedCount}
-					totalCount={progress.totalCount}
-					nextTitle={nextStep?.title}
-					onOpen={() => setOpen(true)}
-				/>
-			)}
+			))}
+		</ol>
+	);
 
-			<Modal.Root open={open} onOpenChange={setOpen}>
-				<Modal.Content
-					className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-					showClose={false}
+	// Sidebar collapsed → dot that reveals the card on hover (flyout)
+	if (isCollapsed) {
+		return (
+			<div
+				className="relative flex w-full items-center justify-center"
+				onMouseEnter={handleEnter}
+				onMouseLeave={handleLeave}
+				onFocus={handleEnter}
+				onBlur={handleLeave}
+			>
+				<span
+					title={`Get started, ${progress.completedCount} of ${progress.totalCount} complete`}
+					className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg-weak-50 transition-colors hover:bg-bg-soft-200 dark:bg-[#242424] dark:hover:bg-[#2c2c2c]"
 				>
-					<div className="p-6">
-						<div>
-							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-								Get started
-							</Modal.Title>
-							<p className="mt-1 text-sm text-text-sub-600 leading-relaxed">
-								Finish these three steps so you can send from your own domain.
-							</p>
-						</div>
+					<ProgressRing
+						completed={progress.completedCount}
+						total={progress.totalCount}
+						size={18}
+					/>
+				</span>
 
-						<div className="mt-5">
-							<div className="mb-2 flex items-center justify-between">
-								<span className="font-medium text-label-xs text-text-sub-600 tabular-nums">
-									{progress.completedCount} of {progress.totalCount} complete
+				<AnimatePresence>
+					{open && (
+						<motion.div
+							initial={{ opacity: 0, x: -6 }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: -6 }}
+							transition={{ duration: 0.15, ease: "easeOut" }}
+							className="absolute bottom-0 left-[calc(100%+10px)] z-50 w-60 overflow-hidden rounded-2xl border border-primary-base/40 bg-bg-white-0 dark:border-primary-base/50 dark:bg-[#242424]"
+						>
+							<div className="flex items-center gap-2.5 px-4 py-3">
+								<ProgressRing
+									completed={progress.completedCount}
+									total={progress.totalCount}
+								/>
+								<span className="min-w-0 flex-1 truncate font-medium text-[13px] text-text-strong-950 leading-5 dark:text-[#e8e8e8]">
+									Get started
+								</span>
+								<span className="shrink-0 font-normal text-[12px] text-text-soft-400 tabular-nums leading-5 dark:text-white/35">
+									{progress.completedCount} of {progress.totalCount}
 								</span>
 							</div>
-							<SetupProgressBar
-								value={progress.completedCount}
-								max={progress.totalCount}
-							/>
-						</div>
+							<div className="h-px w-full bg-stroke-soft-200 dark:bg-white/[0.07]" />
+							{stepsList}
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</div>
+		);
+	}
 
-						<ol className="mt-4 divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-							{progress.steps.map((step, index) => (
-								<StepRow
-									key={step.id}
-									step={step}
-									index={index}
-									onSend={handleSend}
-									onNavigate={(href) => {
-										setOpen(false);
-										router.push(href);
-									}}
-									sending={sending}
-									sendDisabled={sendDisabled}
-								/>
-							))}
-						</ol>
+	return (
+		<div
+			className="relative w-full overflow-hidden rounded-2xl border border-primary-base/40 bg-gradient-to-br from-primary-base/[0.09] via-bg-white-0 to-bg-white-0 dark:border-primary-base/50 dark:from-primary-base/[0.22] dark:via-[#242424] dark:to-[#242424]"
+			onMouseEnter={handleEnter}
+			onMouseLeave={handleLeave}
+			onFocus={handleEnter}
+			onBlur={handleLeave}
+		>
+			{/* Attention glow — pulses until setup is complete */}
+			<motion.span
+				aria-hidden
+				className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-primary-base/60"
+				animate={{ opacity: [0.15, 0.75, 0.15] }}
+				transition={{
+					duration: 2.2,
+					repeat: Number.POSITIVE_INFINITY,
+					ease: "easeInOut",
+				}}
+			/>
+			{/* Header — hover expands, mouse-leave collapses (Image 2 ↔ Image 1) */}
+			<div className="flex w-full items-center gap-2.5 px-4 py-3 text-left">
+				<ProgressRing
+					completed={progress.completedCount}
+					total={progress.totalCount}
+				/>
+				<span className="min-w-0 flex-1 truncate font-medium text-[13px] text-text-strong-950 leading-5 dark:text-[#e8e8e8]">
+					Get started
+				</span>
+				<span className="shrink-0 font-normal text-[12px] text-text-soft-400 tabular-nums leading-5 dark:text-white/35">
+					{progress.completedCount} of {progress.totalCount}
+				</span>
+			</div>
 
-						<div className="mt-6 flex items-center justify-end gap-3">
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								size="small"
-								onClick={() => setOpen(false)}
-								className="gap-1.5 rounded-xl"
-							>
-								Cancel
-								<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-									esc
-								</ActionKbd>
-							</Button.Root>
-							{nextStep ? (
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="small"
-									disabled={nextDisabled}
-									onClick={() => runStep(nextStep)}
-									className="min-w-35 justify-center overflow-hidden rounded-xl"
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={sending ? "sending" : nextStep.id}
-											transition={{
-												type: "spring",
-												duration: 0.25,
-												bounce: 0,
-											}}
-											initial={{ opacity: 0, y: -14 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: 14 }}
-											className="flex items-center justify-center gap-1.5"
-										>
-											{sending ? (
-												<>
-													<Spinner size={14} color="currentColor" />
-													Sending…
-												</>
-											) : (
-												<>
-													{nextStep.cta}
-													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
-													</ActionKbd>
-												</>
-											)}
-										</motion.span>
-									</AnimatePresence>
-								</FancyButton.Root>
-							) : (
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="small"
-									onClick={() => setOpen(false)}
-									className="gap-1.5 rounded-xl"
-								>
-									Done
-									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
-								</FancyButton.Root>
-							)}
-						</div>
-					</div>
-				</Modal.Content>
-			</Modal.Root>
-		</>
+			<AnimatePresence initial={false}>
+				{open && (
+					<motion.div
+						key="steps"
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+						className="overflow-hidden"
+					>
+						<div className="h-px w-full bg-stroke-soft-200 dark:bg-white/[0.07]" />
+						{stepsList}
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</div>
 	);
 }
