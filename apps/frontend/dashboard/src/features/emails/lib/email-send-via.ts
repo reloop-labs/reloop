@@ -12,7 +12,7 @@ export type EmailSendOrigin = {
 
 export type EmailSendVia = {
 	label: string;
-	channel?: string;
+	icon: string;
 	href?: string;
 };
 
@@ -25,26 +25,32 @@ export function emailSendVia(params: {
 
 	if (source === "campaign") {
 		return {
-			label: "Campaign",
-			channel: origin?.type === "campaign" ? origin.name : undefined,
+			label:
+				origin?.type === "campaign" && origin.name.trim()
+					? origin.name
+					: "Campaign",
+			icon: "mega-phone",
 			href: origin?.type === "campaign" ? `/campaigns/${origin.id}` : undefined,
 		};
 	}
 
 	if (source === "automation") {
 		return {
-			label: "Automation",
-			channel: origin?.type === "automation" ? origin.name : undefined,
+			label:
+				origin?.type === "automation" && origin.name.trim()
+					? origin.name
+					: "Automation",
+			icon: "workflow",
 			href:
 				origin?.type === "automation" ? `/automation/${origin.id}` : undefined,
 		};
 	}
 
 	if (source === "smtp") {
-		return { label: "Transactional", channel: "SMTP" };
+		return { label: "Transactional", icon: "mail-send" };
 	}
 
-	return { label: "Transactional", channel: "API" };
+	return { label: "Transactional", icon: "code" };
 }
 
 export function emailSendViaListLabel(source?: string | null): string {

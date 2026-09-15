@@ -7,7 +7,7 @@ import {
 } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 export type EmailSendOrigin = {
 	type: "campaign" | "automation";
@@ -58,6 +58,98 @@ export async function resolveEmailSend(params: {
 	}
 
 	return { source, origin };
+}
+
+export async function resolveEmailSends(
+	logs: Array<{
+		id: string;
+		source?: string | null;
+		tags?: EmailLogTag[] | null;
+	}>,
+): Promise<Map<string, ResolvedEmailSend>> {
+	const resolved = new Map<string, ResolvedEmailSend>();
+	if (logs.length === 0) return resolved;
+
+	const ids = logs.map((log) => log.id);
+	const [campaignRows, automationRows] = await Promise.all([
+		db
+			.select({
+				emailLogId: schema.campaignRecipient.emailLogId,
+				id: schema.campaign.id,
+				name: schema.campaign.name,
+			})
+			.from(schema.campaignRecipient)
+			.innerJoin(
+				schema.campaign,
+				eq(schema.campaign.id, schema.campaignRecipient.campaignId),
+			)
+			.where(inArray(schema.campaignRecipient.emailLogId, ids)),
+		db
+			.select({
+				emailLogId: schema.automationStepRun.emailLogId,
+				id: schema.automation.id,
+				name: schema.automation.name,
+			})
+			.from(schema.automationStepRun)
+			.innerJoin(
+				schema.automationEnrollment,
+				eq(
+					schema.automationEnrollment.id,
+					schema.automationStepRun.enrollmentId,
+				),
+			)
+			.innerJoin(
+				schema.automation,
+				eq(schema.automation.id, schema.automationEnrollment.automationId),
+			)
+			.where(inArray(schema.automationStepRun.emailLogId, ids)),
+	]);
+
+	const campaignByLog = new Map<string, EmailSendOrigin>();
+	for (const row of campaignRows) {
+		if (!row.emailLogId) continue;
+		campaignByLog.set(row.emailLogId, {
+			type: "campaign",
+			id: row.id,
+			name: row.name,
+		});
+	}
+
+	const automationByLog = new Map<string, EmailSendOrigin>();
+	for (const row of automationRows) {
+		if (!row.emailLogId) continue;
+		automationByLog.set(row.emailLogId, {
+			type: "automation",
+			id: row.id,
+			name: row.name,
+		});
+	}
+
+	for (const log of logs) {
+		const tags = log.tags ?? [];
+		const source: EmailSendSource = isEmailSendSource(log.source)
+			? log.source
+			: sourceFromTags(tags);
+
+		if (source !== "smtp" && campaignByLog.has(log.id)) {
+			resolved.set(log.id, {
+				source: "campaign",
+				origin: campaignByLog.get(log.id) ?? null,
+			});
+			continue;
+		}
+		if (source !== "smtp" && automationByLog.has(log.id)) {
+			resolved.set(log.id, {
+				source: "automation",
+				origin: automationByLog.get(log.id) ?? null,
+			});
+			continue;
+		}
+
+		resolved.set(log.id, { source, origin: null });
+	}
+
+	return resolved;
 }
 
 async function findCampaignOrigin(params: {

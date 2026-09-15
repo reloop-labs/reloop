@@ -2,28 +2,28 @@ import { describe, expect, test } from "vitest";
 import { emailSendVia, emailSendViaListLabel } from "./email-send-via";
 
 describe("emailSendVia", () => {
-	test("campaign links to the campaign by name", () => {
+	test("campaign uses the campaign name as the underlined link", () => {
 		expect(
 			emailSendVia({
 				source: "campaign",
 				origin: { type: "campaign", id: "cmp_1", name: "June launch" },
 			}),
 		).toEqual({
-			label: "Campaign",
-			channel: "June launch",
+			label: "June launch",
+			icon: "mega-phone",
 			href: "/campaigns/cmp_1",
 		});
 	});
 
-	test("automation links to the workflow", () => {
+	test("automation uses the workflow name as the link", () => {
 		expect(
 			emailSendVia({
 				source: "automation",
 				origin: { type: "automation", id: "auto_1", name: "Welcome" },
 			}),
 		).toEqual({
-			label: "Automation",
-			channel: "Welcome",
+			label: "Welcome",
+			icon: "workflow",
 			href: "/automation/auto_1",
 		});
 	});
@@ -31,15 +31,15 @@ describe("emailSendVia", () => {
 	test("api and smtp are both transactional", () => {
 		expect(emailSendVia({ source: "transactional" })).toEqual({
 			label: "Transactional",
-			channel: "API",
+			icon: "code",
 		});
 		expect(emailSendVia({ source: "smtp" })).toEqual({
 			label: "Transactional",
-			channel: "SMTP",
+			icon: "mail-send",
 		});
 		expect(emailSendVia({})).toEqual({
 			label: "Transactional",
-			channel: "API",
+			icon: "code",
 		});
 	});
 });

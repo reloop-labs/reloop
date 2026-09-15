@@ -41,7 +41,7 @@ import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-ba
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { useResendEmail } from "../hooks/use-resend-email";
-import { emailSendViaListLabel } from "../lib/email-send-via";
+import { emailSendVia } from "../lib/email-send-via";
 import { EmailsEmptyState } from "./emails-empty-state";
 
 export interface EmailLogData {
@@ -53,6 +53,11 @@ export interface EmailLogData {
 	createdAt: string;
 	hasAttachments?: boolean;
 	source?: string;
+	origin?: {
+		type: "campaign" | "automation";
+		id: string;
+		name: string;
+	} | null;
 }
 
 interface EmailTableProps {
@@ -71,7 +76,7 @@ interface EmailTableProps {
 
 const emailGridStyle = {
 	gridTemplateColumns:
-		"32px minmax(0, 1.2fr) minmax(0, 1.8fr) 120px 110px 32px",
+		"32px minmax(0, 1.15fr) minmax(0, 1.5fr) minmax(120px, 0.9fr) 120px 110px 32px",
 };
 
 const getEmailStatusColorClass = (status: string): string => {
@@ -729,148 +734,195 @@ function EmailSelectionActionBar({
 	);
 }
 
-const emailColumns: ColumnDef<EmailLogData>[] = [
-	{
-		id: "select",
-		size: 32,
-		enableSorting: false,
-		enableHiding: false,
-		header: ({ table }) => (
-			<div
-				className="flex items-center"
-				onClick={(e) => e.stopPropagation()}
-				onKeyDown={(e) => e.stopPropagation()}
-			>
-				<DataTableCheckbox
-					aria-label="Select all"
-					checked={
-						table.getIsAllPageRowsSelected() ||
-						(table.getIsSomePageRowsSelected() && "indeterminate")
-					}
-					onCheckedChange={(value) =>
-						table.toggleAllPageRowsSelected(value === true)
-					}
-				/>
-			</div>
-		),
-		cell: ({ row }) => (
-			<div
-				className="flex items-center"
-				onClick={(e) => e.stopPropagation()}
-				onKeyDown={(e) => e.stopPropagation()}
-			>
-				<DataTableCheckbox
-					aria-label="Select row"
-					checked={row.getIsSelected()}
-					disabled={!row.getCanSelect()}
-					onCheckedChange={(value) => row.toggleSelected(value === true)}
-				/>
-			</div>
-		),
-	},
-	{
-		id: "to",
-		header: () => (
-			<div className="flex items-center gap-1">
-				<Icon name="user" className="h-3 w-3" />
-				<span className="text-xs">To</span>
-			</div>
-		),
-		cell: ({ row }) => {
-			const recipient = row.original.toEmails[0] || "";
-			return (
-				<div className="flex min-w-0 items-center gap-2 pr-4">
-					<Avatar.Root size="20" color="gray" className="shrink-0">
-						<Avatar.Image asChild>
-							<div
-								className={cn(
-									"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-									getAvatarGradient(recipient),
-								)}
-							>
-								{getAvatarInitial(null, recipient)}
-							</div>
-						</Avatar.Image>
-					</Avatar.Root>
-					<span className="truncate font-medium text-label-sm text-text-strong-950">
-						{row.original.toEmails.join(", ")}
-					</span>
-				</div>
-			);
-		},
-	},
-	{
-		id: "subject",
-		header: () => (
-			<div className="flex items-center gap-1">
-				<Icon name="file-text" className="h-3 w-3" />
-				<span className="text-xs">Subject</span>
-			</div>
-		),
-		cell: ({ row }) => (
-			<div className="flex min-w-0 items-center gap-1.5 pr-4">
-				<Link
-					href={`/emails/${row.original.id}`}
-					className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+function getEmailColumns(
+	router: ReturnType<typeof useRouter>,
+): ColumnDef<EmailLogData>[] {
+	return [
+		{
+			id: "select",
+			size: 32,
+			enableSorting: false,
+			enableHiding: false,
+			header: ({ table }) => (
+				<div
+					className="flex items-center"
+					onClick={(e) => e.stopPropagation()}
+					onKeyDown={(e) => e.stopPropagation()}
 				>
-					{row.original.subject || "(No Subject)"}
-				</Link>
-				{row.original.hasAttachments && (
-					<Icon
-						name="paperclip"
-						className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
+					<DataTableCheckbox
+						aria-label="Select all"
+						checked={
+							table.getIsAllPageRowsSelected() ||
+							(table.getIsSomePageRowsSelected() && "indeterminate")
+						}
+						onCheckedChange={(value) =>
+							table.toggleAllPageRowsSelected(value === true)
+						}
 					/>
-				)}
-				{row.original.source && (
-					<span className="shrink-0 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-bg-weak-50/40">
-						{emailSendViaListLabel(row.original.source)}
-					</span>
-				)}
-			</div>
-		),
-	},
-	{
-		id: "status",
-		header: () => (
-			<div className="flex items-center gap-1">
-				<Icon name="check-circle" className="h-3 w-3" />
-				<span className="text-xs">Status</span>
-			</div>
-		),
-		cell: ({ row }) => {
-			const status = row.original.status;
-			return (
-				<div className="flex items-center">
-					<div
-						className={cn(
-							"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-							getEmailStatusColorClass(status),
-						)}
-					>
-						<Icon name={getEmailStatusIcon(status)} className="h-3.5 w-3.5" />
-						{getEmailStatusLabel(status)}
-					</div>
 				</div>
-			);
+			),
+			cell: ({ row }) => (
+				<div
+					className="flex items-center"
+					onClick={(e) => e.stopPropagation()}
+					onKeyDown={(e) => e.stopPropagation()}
+				>
+					<DataTableCheckbox
+						aria-label="Select row"
+						checked={row.getIsSelected()}
+						disabled={!row.getCanSelect()}
+						onCheckedChange={(value) => row.toggleSelected(value === true)}
+					/>
+				</div>
+			),
 		},
-	},
-	{
-		id: "createdAt",
-		header: () => (
-			<div className="flex items-center gap-1">
-				<Icon name="clock" className="h-3 w-3" />
-				<span className="text-xs">Time</span>
-			</div>
-		),
-		cell: ({ row }) => (
-			<div className="flex items-center">
-				<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
-					{formatRelativeTime(row.original.createdAt)}
-				</span>
-			</div>
-		),
-	},
-];
+		{
+			id: "to",
+			header: () => (
+				<div className="flex items-center gap-1">
+					<Icon name="user" className="h-3 w-3" />
+					<span className="text-xs">To</span>
+				</div>
+			),
+			cell: ({ row }) => {
+				const recipient = row.original.toEmails[0] || "";
+				return (
+					<div className="flex min-w-0 items-center gap-2 pr-4">
+						<Avatar.Root size="20" color="gray" className="shrink-0">
+							<Avatar.Image asChild>
+								<div
+									className={cn(
+										"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+										getAvatarGradient(recipient),
+									)}
+								>
+									{getAvatarInitial(null, recipient)}
+								</div>
+							</Avatar.Image>
+						</Avatar.Root>
+						<span className="truncate font-medium text-label-sm text-text-strong-950">
+							{row.original.toEmails.join(", ")}
+						</span>
+					</div>
+				);
+			},
+		},
+		{
+			id: "subject",
+			header: () => (
+				<div className="flex items-center gap-1">
+					<Icon name="file-text" className="h-3 w-3" />
+					<span className="text-xs">Subject</span>
+				</div>
+			),
+			cell: ({ row }) => (
+				<div className="flex min-w-0 items-center gap-1.5 pr-4">
+					<Link
+						href={`/emails/${row.original.id}`}
+						className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+					>
+						{row.original.subject || "(No Subject)"}
+					</Link>
+					{row.original.hasAttachments && (
+						<Icon
+							name="paperclip"
+							className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
+						/>
+					)}
+				</div>
+			),
+		},
+		{
+			id: "via",
+			header: () => (
+				<div className="flex items-center gap-1">
+					<Icon name="split-route" className="h-3 w-3" />
+					<span className="text-xs">Via</span>
+				</div>
+			),
+			cell: ({ row }) => {
+				const via = emailSendVia({
+					source: row.original.source,
+					origin: row.original.origin,
+				});
+				const href = via.href;
+				if (!href) {
+					return (
+						<div className="flex min-w-0 items-center gap-1.5 pr-4">
+							<Icon
+								name={via.icon}
+								className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+							/>
+							<span className="truncate font-medium text-[13px] text-text-sub-600">
+								{via.label}
+							</span>
+						</div>
+					);
+				}
+				return (
+					<button
+						type="button"
+						onClick={(event) => {
+							event.preventDefault();
+							event.stopPropagation();
+							router.push(href);
+						}}
+						className="flex min-w-0 items-center gap-1.5 pr-4 text-left"
+					>
+						<Icon
+							name={via.icon}
+							className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+						/>
+						<span className="truncate font-medium text-[13px] text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400">
+							{via.label}
+						</span>
+					</button>
+				);
+			},
+		},
+		{
+			id: "status",
+			header: () => (
+				<div className="flex items-center gap-1">
+					<Icon name="check-circle" className="h-3 w-3" />
+					<span className="text-xs">Status</span>
+				</div>
+			),
+			cell: ({ row }) => {
+				const status = row.original.status;
+				return (
+					<div className="flex items-center">
+						<div
+							className={cn(
+								"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+								getEmailStatusColorClass(status),
+							)}
+						>
+							<Icon name={getEmailStatusIcon(status)} className="h-3.5 w-3.5" />
+							{getEmailStatusLabel(status)}
+						</div>
+					</div>
+				);
+			},
+		},
+		{
+			id: "createdAt",
+			header: () => (
+				<div className="flex items-center gap-1">
+					<Icon name="clock" className="h-3 w-3" />
+					<span className="text-xs">Time</span>
+				</div>
+			),
+			cell: ({ row }) => (
+				<div className="flex items-center">
+					<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
+						{formatRelativeTime(row.original.createdAt)}
+					</span>
+				</div>
+			),
+		},
+	];
+}
 
 const EmailSkeleton = () => (
 	<div style={emailGridStyle} className="grid items-center px-4 py-2">
@@ -883,6 +935,10 @@ const EmailSkeleton = () => (
 		</div>
 		<div className="flex items-center">
 			<div className="h-4 w-48 rounded bg-bg-weak-50" />
+		</div>
+		<div className="flex items-center gap-1.5">
+			<div className="h-3.5 w-3.5 rounded bg-bg-weak-50" />
+			<div className="h-4 w-20 rounded bg-bg-weak-50" />
 		</div>
 		<div className="flex items-center gap-2">
 			<div className="h-3.5 w-3.5 rounded-full bg-bg-weak-50" />
@@ -935,9 +991,11 @@ export const EmailTable = ({
 		[router, handleOpenChange],
 	);
 
+	const columns = useMemo(() => getEmailColumns(router), [router]);
+
 	const table = useReactTable({
 		data: logs,
-		columns: emailColumns,
+		columns,
 		state: { rowSelection },
 		onRowSelectionChange: setRowSelection,
 		enableRowSelection: true,

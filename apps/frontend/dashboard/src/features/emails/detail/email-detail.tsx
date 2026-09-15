@@ -5,6 +5,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -340,27 +341,25 @@ function EmailSentVia({
 		name: string;
 	} | null;
 }) {
+	const router = useRouter();
 	const via = emailSendVia({ source, origin });
+	const href = via.href;
+	const label = href ? (
+		<button
+			type="button"
+			onClick={() => router.push(href)}
+			className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+		>
+			{via.label}
+		</button>
+	) : (
+		<span>{via.label}</span>
+	);
+
 	return (
-		<span className="inline-flex flex-wrap items-baseline gap-x-1.5">
-			<span>{via.label}</span>
-			{via.channel && (
-				<>
-					<span className="text-stroke-sub-300 dark:text-stroke-sub-300/40">
-						·
-					</span>
-					{via.href ? (
-						<Link
-							href={via.href}
-							className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
-						>
-							{via.channel}
-						</Link>
-					) : (
-						<span className="text-text-sub-600">{via.channel}</span>
-					)}
-				</>
-			)}
+		<span className="inline-flex items-center gap-1.5">
+			<Icon name={via.icon} className="h-3.5 w-3.5 text-text-sub-600" />
+			{label}
 		</span>
 	);
 }
@@ -682,18 +681,6 @@ export const EmailDetail = ({
 					)}
 					<div className="flex items-start gap-4">
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
-							Via
-						</span>
-						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{isLoading ? (
-								<Skeleton className="h-4 w-40 rounded-md" />
-							) : (
-								<EmailSentVia source={email?.source} origin={email?.origin} />
-							)}
-						</span>
-					</div>
-					<div className="flex items-start gap-4">
-						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							Date
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
@@ -721,6 +708,18 @@ export const EmailDetail = ({
 								<Skeleton className="h-4 w-80 rounded-md" />
 							) : (
 								email?.subject
+							)}
+						</span>
+					</div>
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							Via
+						</span>
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{isLoading ? (
+								<Skeleton className="h-4 w-28 rounded-md" />
+							) : (
+								<EmailSentVia source={email?.source} origin={email?.origin} />
 							)}
 						</span>
 					</div>

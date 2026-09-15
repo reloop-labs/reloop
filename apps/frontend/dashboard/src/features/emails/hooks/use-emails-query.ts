@@ -10,6 +10,11 @@ export type EmailLogData = {
 	createdAt: string;
 	hasAttachments?: boolean;
 	source?: string;
+	origin?: {
+		type: "campaign" | "automation";
+		id: string;
+		name: string;
+	} | null;
 };
 
 export type EmailListResponse = {
