@@ -41,6 +41,7 @@ import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-ba
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { useResendEmail } from "../hooks/use-resend-email";
+import { emailSendViaListLabel } from "../lib/email-send-via";
 import { EmailsEmptyState } from "./emails-empty-state";
 
 export interface EmailLogData {
@@ -51,6 +52,7 @@ export interface EmailLogData {
 	status: string;
 	createdAt: string;
 	hasAttachments?: boolean;
+	source?: string;
 }
 
 interface EmailTableProps {
@@ -818,6 +820,11 @@ const emailColumns: ColumnDef<EmailLogData>[] = [
 						name="paperclip"
 						className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
 					/>
+				)}
+				{row.original.source && (
+					<span className="shrink-0 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-bg-weak-50/40">
+						{emailSendViaListLabel(row.original.source)}
+					</span>
 				)}
 			</div>
 		),

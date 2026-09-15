@@ -1,6 +1,7 @@
 import { serializeSendAttachments } from "@reloop/be-mail/lib/email-log-attachments";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
+import { sourceFromTags } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 
@@ -79,6 +80,8 @@ export async function createEmailLog_step4({
 			attachments: serializeSendAttachments(body.attachments),
 			status: "pending",
 			provider: "kumomta",
+			source: sourceFromTags(body.tags),
+			tags: body.tags ?? [],
 			size: (body.text?.length || 0) + (body.html?.length || 0),
 		})
 		.returning({ id: emailLog.id });

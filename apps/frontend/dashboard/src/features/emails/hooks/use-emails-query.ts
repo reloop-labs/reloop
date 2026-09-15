@@ -9,6 +9,7 @@ export type EmailLogData = {
 	status: string;
 	createdAt: string;
 	hasAttachments?: boolean;
+	source?: string;
 };
 
 export type EmailListResponse = {
@@ -143,6 +144,12 @@ export type EmailDetailData = {
 		metadata: Record<string, unknown> | null;
 		createdAt: string;
 	}[];
+	source?: string;
+	origin?: {
+		type: "campaign" | "automation";
+		id: string;
+		name: string;
+	} | null;
 };
 
 export function useEmailDetailQuery(emailId: string | null | undefined) {

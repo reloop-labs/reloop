@@ -10,6 +10,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { MessageAttachments } from "#/features/agent-inbox/components/thread-detail/message-attachments";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { emailSendVia } from "#/features/emails/lib/email-send-via";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { EmailHtmlPreview } from "./email-html-preview";
 import { EmailInsightsPanel } from "./email-insights-panel";
@@ -262,6 +263,12 @@ interface EmailDetailProps {
 			metadata: Record<string, unknown> | null;
 			createdAt: string;
 		}[];
+		source?: string;
+		origin?: {
+			type: "campaign" | "automation";
+			id: string;
+			name: string;
+		} | null;
 	};
 	isLoading: boolean;
 	onResend?: () => void;
@@ -320,6 +327,42 @@ function pickDeliveredSmtpRow(rows: SmtpDetailRow[]): SmtpDetailRow | null {
 		.reverse()
 		.find((r) => r.code != null && r.code >= 200 && r.code < 300);
 	return success ?? rows[rows.length - 1] ?? null;
+}
+
+function EmailSentVia({
+	source,
+	origin,
+}: {
+	source?: string;
+	origin?: {
+		type: "campaign" | "automation";
+		id: string;
+		name: string;
+	} | null;
+}) {
+	const via = emailSendVia({ source, origin });
+	return (
+		<span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+			<span>{via.label}</span>
+			{via.channel && (
+				<>
+					<span className="text-stroke-sub-300 dark:text-stroke-sub-300/40">
+						·
+					</span>
+					{via.href ? (
+						<Link
+							href={via.href}
+							className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+						>
+							{via.channel}
+						</Link>
+					) : (
+						<span className="text-text-sub-600">{via.channel}</span>
+					)}
+				</>
+			)}
+		</span>
+	);
 }
 
 function CopyButton({ value, label }: { value: string; label?: string }) {
@@ -637,6 +680,18 @@ export const EmailDetail = ({
 							</span>
 						</div>
 					)}
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							Via
+						</span>
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{isLoading ? (
+								<Skeleton className="h-4 w-40 rounded-md" />
+							) : (
+								<EmailSentVia source={email?.source} origin={email?.origin} />
+							)}
+						</span>
+					</div>
 					<div className="flex items-start gap-4">
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							Date

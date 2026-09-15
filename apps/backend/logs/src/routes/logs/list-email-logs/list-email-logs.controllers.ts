@@ -154,6 +154,7 @@ export async function listEmailLogsController({
 				hasAttachments: Array.isArray(entry.attachments)
 					? entry.attachments.length > 0
 					: false,
+				source: entry.source,
 			})),
 			total,
 			page,

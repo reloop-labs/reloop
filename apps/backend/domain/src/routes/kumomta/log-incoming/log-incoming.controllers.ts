@@ -132,6 +132,7 @@ export async function logIncomingController({
 			size: body.size || 0,
 			provider: "kumomta",
 			providerMessageId: body.providerMessageId,
+			source: "smtp",
 		})
 		.returning({ id: emailLog.id });
 

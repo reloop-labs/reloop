@@ -22,6 +22,7 @@ export {
 	type DatabaseInstance,
 	db,
 } from "./client";
+export * from "./email-send-source";
 export * from "./schema/index";
 export * from "./utils/crypto";
 export * from "./webhook-events";

@@ -13,6 +13,7 @@ export type EmailLogLivePayload = {
 	status: string;
 	createdAt: string;
 	hasAttachments: boolean;
+	source?: string;
 };
 
 export function emailLogLiveEvent(data: EmailLogLivePayload) {
@@ -35,6 +36,7 @@ export async function broadcastEmailLogLive(emailLogId: string): Promise<void> {
 				status: true,
 				createdAt: true,
 				attachments: true,
+				source: true,
 			},
 			with: {
 				events: {
@@ -60,6 +62,7 @@ export async function broadcastEmailLogLive(emailLogId: string): Promise<void> {
 				hasAttachments: Array.isArray(row.attachments)
 					? row.attachments.length > 0
 					: false,
+				source: row.source,
 			}),
 		);
 	} catch (error) {

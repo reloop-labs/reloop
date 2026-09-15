@@ -246,6 +246,7 @@ export namespace LogsModel {
 		status: t.String(),
 		createdAt: t.String(),
 		hasAttachments: t.Optional(t.Boolean()),
+		source: t.Optional(t.String()),
 	});
 
 	export const listEmailLogsResponse = t.Object({
@@ -292,6 +293,17 @@ export namespace LogsModel {
 		updatedAt: t.String(),
 		attachments: t.Optional(t.Array(emailLogAttachment)),
 		events: t.Optional(t.Array(emailEventLine)),
+		source: t.Optional(t.String()),
+		origin: t.Optional(
+			t.Union([
+				t.Object({
+					type: t.Union([t.Literal("campaign"), t.Literal("automation")]),
+					id: t.String(),
+					name: t.String(),
+				}),
+				t.Null(),
+			]),
+		),
 	});
 	export type EmailLogFullEntry = typeof emailLogFullEntry.static;
 
