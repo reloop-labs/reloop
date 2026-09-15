@@ -132,12 +132,18 @@ function BreakdownRow({
 	negative?: boolean;
 }) {
 	return (
-		<div className="flex items-center justify-between">
+		<div className="flex items-center justify-between py-[3px]">
 			<span className="text-text-sub-600">{label}</span>
 			{isLoading ? (
 				<Skeleton className="h-4 w-12 rounded" />
 			) : (
-				<span className="font-medium text-text-strong-950 tabular-nums dark:text-white">
+				<span
+					className={
+						negative && (value ?? 0) > 0
+							? "font-medium text-text-sub-600 tabular-nums"
+							: "font-medium text-text-strong-950 tabular-nums dark:text-white"
+					}
+				>
 					{negative && (value ?? 0) > 0 ? "−" : ""}
 					{value?.toLocaleString() ?? "—"}
 				</span>
@@ -307,16 +313,22 @@ export function CampaignSendModal({
 									</div>
 
 									{/* Content */}
-									<div className="space-y-3 px-6 pt-2 pb-5 text-xs">
-										<div>
-											<div className="flex items-center border-stroke-soft-200 border-b py-3 dark:border-stroke-soft-100/40">
-												<span className="w-20 shrink-0 select-none text-label-sm text-text-sub-600">
+									<div className="space-y-3 px-6 pt-3 pb-5 text-xs">
+										{/* Receipt card — campaign details + delivery summary */}
+										<div className="px-1 py-1">
+											<div className="flex items-center justify-between gap-3 py-2.5">
+												<span className="shrink-0 text-text-sub-600">
 													From
 													<span className="ml-0.5 text-error-base text-paragraph-xs">
 														*
 													</span>
 												</span>
-												<span className="min-w-0 flex-1 truncate font-medium text-label-sm text-text-strong-950 dark:text-white">
+												<span
+													title={
+														hasFrom ? `${fromName} <${fromEmail}>` : undefined
+													}
+													className="min-w-0 truncate text-right font-medium text-text-strong-950 dark:text-white"
+												>
 													{hasFrom ? (
 														<>
 															{fromName} &lt;{fromEmail}&gt;
@@ -328,16 +340,14 @@ export function CampaignSendModal({
 													)}
 												</span>
 											</div>
-											<div className="flex items-center border-stroke-soft-200 border-b py-3 dark:border-stroke-soft-100/40">
-												<span className="w-20 shrink-0 select-none text-label-sm text-text-sub-600">
-													To
-												</span>
-												<span className="flex min-w-0 flex-1 items-center gap-1.5 font-medium text-label-sm text-text-strong-950 dark:text-white">
+											<div className="flex items-center justify-between gap-3 border-stroke-soft-200 border-t py-2.5 dark:border-stroke-soft-100/40">
+												<span className="shrink-0 text-text-sub-600">To</span>
+												<span className="flex min-w-0 items-center justify-end gap-1.5 text-right font-medium text-text-strong-950 dark:text-white">
 													<span className="truncate">{audienceTargetName}</span>
 													{breakdown.isLoading ? (
 														<Skeleton className="h-4 w-20 rounded" />
 													) : (
-														<span className="shrink-0 font-normal text-text-soft-400">
+														<span className="shrink-0 font-normal text-text-soft-400 tabular-nums">
 															({(breakdown.sendable ?? 0).toLocaleString()}{" "}
 															{(breakdown.sendable ?? 0) === 1
 																? "contact"
@@ -347,50 +357,55 @@ export function CampaignSendModal({
 													)}
 												</span>
 											</div>
-											<div className="flex items-center border-stroke-soft-200 border-b py-3 dark:border-stroke-soft-100/40">
-												<span className="w-20 shrink-0 select-none text-label-sm text-text-sub-600">
+											<div className="flex items-center justify-between gap-3 border-stroke-soft-200 border-t py-2.5 dark:border-stroke-soft-100/40">
+												<span className="shrink-0 text-text-sub-600">
 													Subject
 													<span className="ml-0.5 text-error-base text-paragraph-xs">
 														*
 													</span>
 												</span>
-												<span className="min-w-0 flex-1 truncate font-medium text-label-sm text-text-strong-950 dark:text-white">
+												<span
+													title={subject || undefined}
+													className="min-w-0 truncate text-right font-medium text-text-strong-950 dark:text-white"
+												>
 													{subject || "(No subject)"}
 												</span>
 											</div>
-										</div>
 
-										{/* Delivery summary — invoice style */}
-										<div className="space-y-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/40">
-											<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
-												Delivery summary
-											</p>
-											<BreakdownRow
-												label="Total contacts"
-												value={breakdown.total}
-												isLoading={breakdown.isLoading}
-											/>
-											<BreakdownRow
-												label="Unsubscribed"
-												value={breakdown.unsubscribed}
-												isLoading={breakdown.isLoading}
-												negative
-											/>
-											<BreakdownRow
-												label="Blocked & suppressed"
-												value={breakdown.blocked}
-												isLoading={breakdown.isLoading}
-												negative
-											/>
-											<div className="border-stroke-soft-200 border-t border-dashed pt-2 dark:border-stroke-soft-100/40">
+											<div className="border-stroke-soft-200 border-t border-dashed py-1 dark:border-stroke-soft-100/40">
+												<p className="pt-2 font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
+													Delivery summary
+												</p>
+												<div className="py-1">
+													<BreakdownRow
+														label="Total contacts"
+														value={breakdown.total}
+														isLoading={breakdown.isLoading}
+													/>
+													<BreakdownRow
+														label="Unsubscribed"
+														value={breakdown.unsubscribed}
+														isLoading={breakdown.isLoading}
+														negative
+													/>
+													<BreakdownRow
+														label="Blocked & suppressed"
+														value={breakdown.blocked}
+														isLoading={breakdown.isLoading}
+														negative
+													/>
+												</div>
+											</div>
+
+											<div className="border-stroke-soft-200 border-t border-dashed py-2.5 dark:border-stroke-soft-100/40">
 												<div className="flex items-center justify-between">
-													<span className="font-semibold text-text-strong-950 dark:text-white">
+													<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 														Emails to be sent
 													</span>
 													{breakdown.isLoading ? (
 														<Skeleton className="h-5 w-14 rounded" />
 													) : (
-														<span className="font-semibold text-[#1868DF] text-sm tabular-nums dark:text-blue-400">
+														<span className="font-semibold text-[#1868DF] text-base tabular-nums dark:text-blue-400">
 															{(breakdown.sendable ?? 0).toLocaleString()}
 														</span>
 													)}
