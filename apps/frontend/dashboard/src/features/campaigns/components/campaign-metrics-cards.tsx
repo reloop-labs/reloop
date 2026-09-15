@@ -3,7 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import type { DomainListResponse } from "#/features/domain/types";
 import type { Campaign } from "../campaign-types";
 import { listCampaignRecipients } from "../campaigns-api";
@@ -13,40 +13,25 @@ function pct2(numerator: number, denominator: number): string {
 	return `${((numerator / denominator) * 100).toFixed(2)}%`;
 }
 
-// Card shell matches CampaignRecipientIssuesCard (same page) and the
-// dashboard card convention: single-layer white panel, p-5.
-const cardShell =
-	"overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/50 dark:bg-neutral-950";
-
-// Eyebrow label + headline value follow the dashboard stat convention
-// (see SendHealthCard MetricStat / domain-stats).
-const eyebrowCls =
-	"font-medium text-[10px] text-text-soft-400 uppercase tracking-wider";
-
-const headlineCls =
-	"mt-2 font-semibold text-title-h6 text-text-strong-950 tabular-nums tracking-tight";
-
-const helperCls = "mt-1 text-paragraph-xs text-text-soft-400";
-
 function BreakdownRow({
-	dot,
+	icon,
+	iconClass,
 	name,
 	count,
 	rate,
 	muted,
 }: {
-	dot?: string;
+	icon: string;
+	iconClass: string;
 	name: string;
 	count: number;
 	rate: string;
 	muted?: boolean;
 }) {
 	return (
-		<div className="flex items-center justify-between gap-3 py-3">
-			<span className="flex min-w-0 items-center gap-2">
-				{dot ? (
-					<span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dot)} />
-				) : null}
+		<div className="flex w-full items-center border-stroke-soft-100 border-b py-2.5 last:border-b-0 dark:border-stroke-soft-100/50">
+			<span className="flex min-w-0 flex-1 items-center gap-2">
+				<Icon name={icon} className={cn("h-3.5 w-3.5 shrink-0", iconClass)} />
 				<span
 					className={cn(
 						"truncate text-paragraph-sm",
@@ -56,14 +41,43 @@ function BreakdownRow({
 					{name}
 				</span>
 			</span>
-			<span className="flex shrink-0 items-baseline gap-2 tabular-nums">
-				<span className="text-paragraph-sm text-text-sub-600">
-					{count.toLocaleString()}
-				</span>
-				<span className="min-w-[52px] text-right font-medium text-paragraph-sm text-text-strong-950">
-					{rate}
-				</span>
+			<span className="w-12 shrink-0 text-right text-paragraph-sm text-text-sub-600 tabular-nums">
+				{count.toLocaleString()}
 			</span>
+			<span className="w-16 shrink-0 text-right font-medium text-paragraph-sm text-text-strong-950 tabular-nums">
+				{rate}
+			</span>
+		</div>
+	);
+}
+
+function MetricTable({
+	label,
+	value,
+	helper,
+	children,
+}: {
+	label: string;
+	value: string;
+	helper?: string;
+	children: ReactNode;
+}) {
+	return (
+		<div className="flex h-full w-full flex-col text-paragraph-sm">
+			<div className="flex items-center justify-between gap-3 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<span>{label}</span>
+				<span className="font-semibold text-text-strong-950 tabular-nums tracking-tight">
+					{value}
+				</span>
+			</div>
+			<div className="-mt-2.5 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+				{helper ? (
+					<p className="px-4 pt-2 text-paragraph-xs text-text-soft-400">
+						{helper}
+					</p>
+				) : null}
+				<div className="flex min-h-0 flex-1 flex-col px-4">{children}</div>
+			</div>
 		</div>
 	);
 }
@@ -175,75 +189,73 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 				</div>
 			) : null}
 
-			{/* Metric cards: deliverability + opt-out + engagement */}
-			<div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-				<div className={cardShell}>
-					<p className={eyebrowCls}>Deliverability</p>
-					<p className={headlineCls}>{deliverabilityPct}</p>
-					<div className="mt-3 divide-y divide-stroke-soft-100/60 dark:divide-stroke-soft-100/30">
-						<BreakdownRow
-							dot="bg-emerald-700 dark:bg-emerald-500"
-							name="Delivered"
-							count={delivered}
-							rate={deliverabilityPct}
-						/>
-						<BreakdownRow
-							dot="bg-red-800 dark:bg-red-500"
-							name="Bounced"
-							count={failed}
-							rate={bouncedPct}
-						/>
-						<BreakdownRow
-							name="Suppressed"
-							count={suppressedTotal}
-							rate={suppressedPct}
-							muted
-						/>
-					</div>
-				</div>
+			<div className="grid grid-cols-1 items-stretch gap-3 md:grid-cols-3">
+				<MetricTable label="Deliverability" value={deliverabilityPct}>
+					<BreakdownRow
+						icon="check-circle"
+						iconClass="text-emerald-700 dark:text-emerald-500"
+						name="Delivered"
+						count={delivered}
+						rate={deliverabilityPct}
+					/>
+					<BreakdownRow
+						icon="bounce"
+						iconClass="text-red-800 dark:text-red-500"
+						name="Bounced"
+						count={failed}
+						rate={bouncedPct}
+					/>
+					<BreakdownRow
+						icon="slash"
+						iconClass="text-text-sub-600"
+						name="Suppressed"
+						count={suppressedTotal}
+						rate={suppressedPct}
+						muted
+					/>
+				</MetricTable>
 
-				<div className={cardShell}>
-					<p className={eyebrowCls}>Opt-out</p>
-					<p className={headlineCls}>{unsubPct}</p>
-					<div className="mt-3 divide-y divide-stroke-soft-100/60 dark:divide-stroke-soft-100/30">
-						<BreakdownRow
-							dot="bg-red-800 dark:bg-red-500"
-							name="Unsubscribed"
-							count={unsubCount}
-							rate={unsubPct}
-						/>
-						<BreakdownRow
-							dot="bg-amber-500"
-							name="Complained"
-							count={complaintCount}
-							rate={complaintPct}
-						/>
-					</div>
-				</div>
+				<MetricTable label="Opt-out" value={unsubPct}>
+					<BreakdownRow
+						icon="user-minus"
+						iconClass="text-red-800 dark:text-red-500"
+						name="Unsubscribed"
+						count={unsubCount}
+						rate={unsubPct}
+					/>
+					<BreakdownRow
+						icon="alert-triangle"
+						iconClass="text-amber-500"
+						name="Complained"
+						count={complaintCount}
+						rate={complaintPct}
+					/>
+				</MetricTable>
 
-				<div className={cardShell}>
-					<p className={eyebrowCls}>Engagement</p>
-					<p className={headlineCls}>{openRatePct}</p>
-					{trackingOff ? (
-						<p className={helperCls}>
-							Tracking disabled — enable in domain settings
-						</p>
-					) : null}
-					<div className="mt-3 divide-y divide-stroke-soft-100/60 dark:divide-stroke-soft-100/30">
-						<BreakdownRow
-							dot="bg-blue-500"
-							name="Unique opens"
-							count={opened}
-							rate={openRatePct}
-						/>
-						<BreakdownRow
-							dot="bg-violet-500"
-							name="Clicks"
-							count={clicked}
-							rate={clickRatePct}
-						/>
-					</div>
-				</div>
+				<MetricTable
+					label="Engagement"
+					value={openRatePct}
+					helper={
+						trackingOff
+							? "Tracking disabled — enable in domain settings"
+							: undefined
+					}
+				>
+					<BreakdownRow
+						icon="eye-outline"
+						iconClass="text-blue-500"
+						name="Unique opens"
+						count={opened}
+						rate={openRatePct}
+					/>
+					<BreakdownRow
+						icon="cursor-click"
+						iconClass="text-violet-500"
+						name="Clicks"
+						count={clicked}
+						rate={clickRatePct}
+					/>
+				</MetricTable>
 			</div>
 		</div>
 	);

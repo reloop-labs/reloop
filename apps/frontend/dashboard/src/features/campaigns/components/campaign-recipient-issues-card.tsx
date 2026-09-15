@@ -4,9 +4,12 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useDeferredValue, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useDeferredValue, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
 	type CampaignRecipient,
@@ -19,11 +22,12 @@ type CategoryTab = "unsubscribed" | "bounced" | "suppressed" | "complained";
 const TABS: Array<{
 	id: CategoryTab;
 	label: string;
+	icon: string;
 }> = [
-	{ id: "unsubscribed", label: "Unsubscribed" },
-	{ id: "bounced", label: "Bounced" },
-	{ id: "suppressed", label: "Suppressed" },
-	{ id: "complained", label: "Complained" },
+	{ id: "unsubscribed", label: "Unsubscribed", icon: "user-minus" },
+	{ id: "bounced", label: "Bounced", icon: "bounce" },
+	{ id: "suppressed", label: "Suppressed", icon: "slash" },
+	{ id: "complained", label: "Complained", icon: "alert-triangle" },
 ];
 
 function getCategoryBadge(category?: DeliverabilityCategory | string) {
@@ -78,14 +82,12 @@ export function CampaignRecipientIssuesCard({
 }: CampaignRecipientIssuesCardProps) {
 	const [activeTab, setActiveTab] = useState<CategoryTab>("unsubscribed");
 	const [searchQuery, setSearchQuery] = useState("");
+	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	const deferredSearch = useDeferredValue(searchQuery);
 
-	const {
-		data,
-		isLoading,
-		refetch,
-	} = useQuery({
+	const { data, isLoading, refetch } = useQuery({
 		queryKey: [
 			"campaign-recipients-card",
 			campaignId,
@@ -104,6 +106,10 @@ export function CampaignRecipientIssuesCard({
 
 	const counts = data?.counts;
 	const recipients = data?.recipients ?? [];
+	const activeIndex = TABS.findIndex((tab) => tab.id === activeTab);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
+	const currentTab = buttonRefs.current[currentIdx];
+	const rect = currentTab?.getBoundingClientRect();
 
 	const handleCopyEmails = useCallback((list: CampaignRecipient[]) => {
 		if (!list.length) {
@@ -133,7 +139,9 @@ export function CampaignRecipientIssuesCard({
 					].join(","),
 				)
 				.join("\n");
-			const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
+			const blob = new Blob([header + rows], {
+				type: "text/csv;charset=utf-8;",
+			});
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement("a");
 			a.href = url;
@@ -146,198 +154,233 @@ export function CampaignRecipientIssuesCard({
 	);
 
 	return (
-		<div
-			className={cn(
-				"overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/50 dark:bg-neutral-950",
-				className,
-			)}
-		>
-			{/* Top bar: Tabs on left, Actions menu on right */}
-			<div className="flex items-center justify-between gap-3">
-				{/* Tabs */}
-				<div className="flex items-center gap-1">
-					{TABS.map((tab) => {
-						const isActive = activeTab === tab.id;
-						const count = counts?.[tab.id];
-
-						return (
-							<button
-								key={tab.id}
-								type="button"
-								onClick={() => setActiveTab(tab.id)}
-								className={cn(
-									"flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-medium text-paragraph-sm transition-all",
-									isActive
-										? "bg-neutral-alpha-10 text-text-strong-950 dark:bg-neutral-800/80"
-										: "text-text-sub-600 hover:bg-neutral-alpha-6 hover:text-text-strong-950 dark:hover:bg-neutral-900",
-								)}
-							>
-								<span>{tab.label}</span>
-								{typeof count === "number" && count > 0 && (
-									<span
-										className={cn(
-											"rounded-full px-1.5 py-0.2 text-[10px] tabular-nums",
-											isActive
-												? "bg-bg-white-0 text-text-strong-950 shadow-xs dark:bg-neutral-700"
-												: "bg-neutral-alpha-10 text-text-sub-600 dark:bg-neutral-800",
-										)}
-									>
-										{count}
-									</span>
-								)}
-							</button>
-						);
-					})}
-				</div>
-
-				{/* Right ... menu */}
-				<Dropdown.Root>
-					<Dropdown.Trigger asChild>
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="ghost"
-							size="xxsmall"
-							className="aspect-square h-8 w-8 rounded-xl p-0 text-text-sub-600 hover:text-text-strong-950"
-							aria-label="More options"
-						>
-							<Icon name="more-horizontal" className="h-4 w-4" />
-						</Button.Root>
-					</Dropdown.Trigger>
-					<Dropdown.Content align="end" className="w-52">
-						<Dropdown.Item
-							onClick={() => handleCopyEmails(recipients)}
-							disabled={recipients.length === 0}
-						>
-							<Icon name="copy" className="h-4 w-4 text-text-sub-600" />
-							Copy emails in view
-						</Dropdown.Item>
-						<Dropdown.Item
-							onClick={() => handleExportCsv(recipients)}
-							disabled={recipients.length === 0}
-						>
-							<Icon
-								name="arrow-down-tray"
-								className="h-4 w-4 text-text-sub-600"
-							/>
-							Export as CSV
-						</Dropdown.Item>
-						<Dropdown.Item
-							onClick={() => {
-								void refetch();
-								toast.success("Refreshed");
-							}}
-						>
-							<Icon name="refresh" className="h-4 w-4 text-text-sub-600" />
-							Refresh list
-						</Dropdown.Item>
-					</Dropdown.Content>
-				</Dropdown.Root>
-			</div>
-
-			{/* Search input bar */}
-			<div className="mt-3.5">
-				<div className="relative flex items-center">
-					<Icon
-						name="search"
-						className="pointer-events-none absolute left-3.5 h-4 w-4 text-text-soft-400"
-					/>
-					<input
-						type="text"
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						placeholder="Search..."
-						className="h-10 w-full rounded-xl border border-stroke-soft-100/60 bg-bg-weak-50/70 pl-9 pr-8 text-paragraph-sm text-text-strong-950 placeholder:text-text-soft-400 focus:border-stroke-soft-200 focus:bg-bg-white-0 focus:outline-none dark:border-neutral-800/80 dark:bg-neutral-900/80 dark:focus:bg-neutral-900"
-					/>
-					{searchQuery ? (
-						<button
-							type="button"
-							onClick={() => setSearchQuery("")}
-							className="absolute right-2.5 flex h-5 w-5 items-center justify-center rounded-full text-text-soft-400 hover:bg-neutral-alpha-10 hover:text-text-strong-950"
-						>
-							<Icon name="cross" className="h-3 w-3" />
-						</button>
-					) : null}
-				</div>
-			</div>
-
-			{/* Recipient list */}
-			<div className="mt-2 min-h-[140px] max-h-[420px] overflow-y-auto">
-				{isLoading ? (
-					<div className="space-y-3 py-3">
-						{Array.from({ length: 4 }).map((_, i) => (
-							<div
-								key={i}
-								className="flex items-center justify-between border-stroke-soft-100/60 border-b py-2.5 last:border-b-0 dark:border-stroke-soft-100/30"
-							>
-								<div className="flex items-center gap-3">
-									<Skeleton className="h-7 w-7 rounded-full" />
-									<Skeleton className="h-4 w-40" />
-								</div>
-								<Skeleton className="h-5 w-20 rounded-full" />
-							</div>
-						))}
-					</div>
-				) : recipients.length > 0 ? (
-					<ul className="divide-y divide-stroke-soft-100/60 dark:divide-stroke-soft-100/30">
-						{recipients.map((recipient) => {
-							const badge = getCategoryBadge(
-								recipient.category || activeTab,
-							);
-							const initial = getInitial(
-								recipient.email,
-								recipient.contactName,
-							);
-
+		<div className={cn("w-full text-paragraph-sm", className)}>
+			<div className="rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-1 pr-2 pb-5 pl-2 dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<TabMenu.Root
+					value={activeTab}
+					onValueChange={(val) => setActiveTab(val as CategoryTab)}
+				>
+					<TabMenu.List className="relative h-11 gap-0 border-b-0 py-0">
+						{TABS.map((tab, index) => {
+							const count = counts?.[tab.id];
 							return (
-								<li
-									key={recipient.id}
-									className="group flex items-center justify-between gap-3 py-3 transition-colors"
+								<TabMenu.Trigger
+									key={tab.id}
+									value={tab.id}
+									ref={(el) => {
+										if (el) buttonRefs.current[index] = el;
+									}}
+									onPointerEnter={() => setHoveredIdx(index)}
+									onPointerLeave={() => setHoveredIdx(undefined)}
+									className={cn(
+										"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
+										hoveredIdx === undefined &&
+											activeIndex === index &&
+											"text-text-strong-950",
+									)}
 								>
-									<div className="flex min-w-0 items-center gap-3">
-										{/* Avatar */}
-										<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 font-medium text-text-sub-600 text-xs dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-300">
-											{initial}
-										</div>
-
-										{/* Email & Contact Info */}
-										<div className="min-w-0">
-											<p className="truncate font-medium text-paragraph-sm text-text-strong-950">
-												{recipient.email}
-											</p>
-											{recipient.contactName ? (
-												<p className="truncate text-paragraph-xs text-text-soft-400">
-													{recipient.contactName}
-												</p>
-											) : null}
-										</div>
-									</div>
-
-									{/* Category Badge */}
-									<span
-										className={cn(
-											"rounded-full px-2.5 py-0.5 font-medium text-[11px] tracking-wide",
-											badge.className,
-										)}
-									>
-										{badge.label}
-									</span>
-								</li>
+									<Icon name={tab.icon} className="h-4 w-4" />
+									{tab.label}
+									{typeof count === "number" && count > 0 ? (
+										<span className="text-text-soft-400 text-xs tabular-nums">
+											{count}
+										</span>
+									) : null}
+								</TabMenu.Trigger>
 							);
 						})}
-					</ul>
-				) : (
-					<div className="flex flex-col items-center justify-center py-10 text-center">
-						<p className="font-medium text-paragraph-sm text-text-strong-950">
-							No {activeTab} recipients
-						</p>
-						<p className="mt-1 max-w-sm text-paragraph-xs text-text-sub-600">
-							{searchQuery
-								? `No recipients matching "${searchQuery}" in ${activeTab}.`
-								: `There are currently no recipients recorded as ${activeTab} for this campaign.`}
-						</p>
-					</div>
-				)}
+						<AnimatePresence>
+							{rect && activeIndex !== -1 ? (
+								<motion.div
+									className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
+									initial={{
+										pointerEvents: "none",
+										width: rect.width,
+										height: rect.height - 14,
+										left:
+											rect.left -
+											(currentTab?.offsetParent?.getBoundingClientRect().left ||
+												0),
+										top:
+											rect.top -
+											(currentTab?.offsetParent?.getBoundingClientRect().top ||
+												0) +
+											7,
+										opacity: 0,
+									}}
+									animate={{
+										pointerEvents: "none",
+										width: rect.width,
+										height: rect.height - 14,
+										left:
+											rect.left -
+											(currentTab?.offsetParent?.getBoundingClientRect().left ||
+												0),
+										top:
+											rect.top -
+											(currentTab?.offsetParent?.getBoundingClientRect().top ||
+												0) +
+											7,
+										opacity: 1,
+									}}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.14 }}
+								/>
+							) : null}
+						</AnimatePresence>
+						<div className="ml-auto flex items-center">
+							<Dropdown.Root>
+								<Dropdown.Trigger asChild>
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="ghost"
+										size="xxsmall"
+										className="aspect-square h-7 w-7 rounded-lg p-0 text-text-sub-600 hover:text-text-strong-950"
+										aria-label="More options"
+									>
+										<Icon name="more-horizontal" className="h-3.5 w-3.5" />
+									</Button.Root>
+								</Dropdown.Trigger>
+								<Dropdown.Content align="end" className="w-52">
+									<Dropdown.Item
+										onClick={() => handleCopyEmails(recipients)}
+										disabled={recipients.length === 0}
+									>
+										<Icon name="copy" className="h-4 w-4 text-text-sub-600" />
+										Copy emails in view
+									</Dropdown.Item>
+									<Dropdown.Item
+										onClick={() => handleExportCsv(recipients)}
+										disabled={recipients.length === 0}
+									>
+										<Icon
+											name="arrow-down-tray"
+											className="h-4 w-4 text-text-sub-600"
+										/>
+										Export as CSV
+									</Dropdown.Item>
+									<Dropdown.Item
+										onClick={() => {
+											void refetch();
+											toast.success("Refreshed");
+										}}
+									>
+										<Icon
+											name="refresh"
+											className="h-4 w-4 text-text-sub-600"
+										/>
+										Refresh list
+									</Dropdown.Item>
+								</Dropdown.Content>
+							</Dropdown.Root>
+						</div>
+					</TabMenu.List>
+				</TabMenu.Root>
+			</div>
+
+			<div className="-mt-2.5 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+				<div className="border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/50">
+					<Input.Root
+						size="small"
+						className="w-full max-w-72 rounded-xl shadow-none!"
+					>
+						<Input.Wrapper>
+							<Input.Icon as={Icon} name="search" size="small" />
+							<Input.Input
+								value={searchQuery}
+								placeholder="Search..."
+								aria-label="Search recipients"
+								onChange={(e) => setSearchQuery(e.target.value)}
+							/>
+							{searchQuery ? (
+								<button
+									type="button"
+									aria-label="Clear search"
+									onClick={() => setSearchQuery("")}
+									className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-soft-400 hover:bg-neutral-alpha-10 hover:text-text-strong-950"
+								>
+									<Icon name="cross" className="h-3 w-3" />
+								</button>
+							) : null}
+						</Input.Wrapper>
+					</Input.Root>
+				</div>
+
+				<div className="max-h-[420px] min-h-[140px] overflow-y-auto">
+					{isLoading ? (
+						<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+							{Array.from({ length: 4 }).map((_, i) => (
+								<div
+									key={i}
+									className="flex items-center justify-between px-4 py-2.5"
+								>
+									<div className="flex items-center gap-3">
+										<Skeleton className="h-7 w-7 rounded-full" />
+										<Skeleton className="h-4 w-40" />
+									</div>
+									<Skeleton className="h-5 w-20 rounded-full" />
+								</div>
+							))}
+						</div>
+					) : recipients.length > 0 ? (
+						<ul className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+							{recipients.map((recipient) => {
+								const badge = getCategoryBadge(recipient.category || activeTab);
+								const initial = getInitial(
+									recipient.email,
+									recipient.contactName,
+								);
+
+								return (
+									<li
+										key={recipient.id}
+										className="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-bg-weak-50"
+									>
+										<div className="flex min-w-0 items-center gap-3">
+											<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 font-medium text-text-sub-600 text-xs dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-300">
+												{initial}
+											</div>
+											<div className="min-w-0">
+												<p className="truncate font-medium text-paragraph-sm text-text-strong-950">
+													{recipient.email}
+												</p>
+												{recipient.contactName ? (
+													<p className="truncate text-paragraph-xs text-text-soft-400">
+														{recipient.contactName}
+													</p>
+												) : null}
+											</div>
+										</div>
+										<span
+											className={cn(
+												"rounded-full px-2.5 py-0.5 font-medium text-[11px] tracking-wide",
+												badge.className,
+											)}
+										>
+											{badge.label}
+										</span>
+									</li>
+								);
+							})}
+						</ul>
+					) : (
+						<div className="flex flex-col items-center px-6 py-12 text-center">
+							<Icon
+								name={searchQuery ? "search" : "users"}
+								className="mb-4 h-8 w-8 text-text-sub-600"
+							/>
+							<p className="font-semibold text-text-strong-950 text-xl">
+								No {activeTab} recipients
+							</p>
+							<p className="mt-2 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
+								{searchQuery
+									? `No recipients matching "${searchQuery}" in ${activeTab}.`
+									: `There are currently no recipients recorded as ${activeTab} for this campaign.`}
+							</p>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);
