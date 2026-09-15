@@ -38,6 +38,7 @@ import {
 	inArray,
 	isNotNull,
 	isNull,
+	ne,
 	or,
 	type SQL,
 	sql,
@@ -544,10 +545,29 @@ export async function listRecipientsController(params: {
 		),
 	)!;
 
-	const suppressedCondition = inArray(schema.campaignRecipient.skipReason, [
-		"suppressed",
-		"blocked",
-	]);
+	// Truly suppressed: skipped for suppression at send time, or currently
+	// carrying a suppression reason (e.g. suppressed after the send ran).
+	// Spam complaints surface under Complained instead (see row mapping).
+	const suppressedCondition = or(
+		eq(schema.campaignRecipient.skipReason, "suppressed"),
+		and(
+			isNotNull(schema.contact.suppressionReason),
+			ne(schema.contact.suppressionReason, "spam_complaint"),
+		),
+	)!;
+
+	// Manually blocked (no suppression reason) is tracked separately so it
+	// is never mislabeled as suppressed.
+	const blockedCondition = or(
+		eq(schema.campaignRecipient.skipReason, "blocked"),
+		and(
+			eq(schema.contact.status, "blocked"),
+			isNull(schema.contact.suppressionReason),
+		),
+	)!;
+
+	// The Suppressed tab lists both, with the row badge telling them apart.
+	const suppressedTabCondition = or(suppressedCondition, blockedCondition)!;
 
 	const complainedCondition = or(
 		eq(schema.emailLog.status, "spam"),
@@ -590,7 +610,7 @@ export async function listRecipientsController(params: {
 	const anyIssueCondition = or(
 		unsubscribedCondition,
 		bouncedCondition,
-		suppressedCondition,
+		suppressedTabCondition,
 		complainedCondition,
 	)!;
 
@@ -641,7 +661,7 @@ export async function listRecipientsController(params: {
 				queryFilter.push(bouncedCondition);
 				break;
 			case "suppressed":
-				queryFilter.push(suppressedCondition);
+				queryFilter.push(suppressedTabCondition);
 				break;
 			case "complained":
 				queryFilter.push(complainedCondition);
@@ -717,7 +737,7 @@ export async function listRecipientsController(params: {
 			.select({
 				unsubscribed: sql<number>`count(*) filter (where ${unsubscribedCondition})`,
 				bounced: sql<number>`count(*) filter (where ${bouncedCondition})`,
-				suppressed: sql<number>`count(*) filter (where ${suppressedCondition})`,
+				suppressed: sql<number>`count(*) filter (where ${suppressedTabCondition})`,
 				complained: sql<number>`count(*) filter (where ${complainedCondition})`,
 				clicked: sql<number>`count(*) filter (where ${clickedCondition})`,
 				all: sql<number>`count(*) filter (where ${anyIssueCondition})`,
@@ -770,6 +790,7 @@ export async function listRecipientsController(params: {
 				| "unsubscribed"
 				| "bounced"
 				| "suppressed"
+				| "blocked"
 				| "complained"
 				| "clicked"
 				| undefined;
@@ -789,9 +810,16 @@ export async function listRecipientsController(params: {
 				category = "unsubscribed";
 			} else if (
 				recipient.skipReason === "suppressed" ||
-				recipient.skipReason === "blocked"
+				contactSuppressionReason
 			) {
+				// NB: spam_complaint never reaches here — the complained branch
+				// above already claimed it.
 				category = "suppressed";
+			} else if (
+				recipient.skipReason === "blocked" ||
+				contactStatus === "blocked"
+			) {
+				category = "blocked";
 			} else if (
 				emailLogStatus === "bounced" ||
 				recipient.status === "failed" ||

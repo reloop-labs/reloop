@@ -122,6 +122,7 @@ export type DeliverabilityCategory =
 	| "unsubscribed"
 	| "bounced"
 	| "suppressed"
+	| "blocked"
 	| "complained"
 	| "clicked";
 

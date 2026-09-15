@@ -66,6 +66,12 @@ function getCategoryBadge(category?: DeliverabilityCategory | string) {
 			return {
 				label: "Suppressed",
 				icon: "slash",
+				className: "text-error-base",
+			};
+		case "blocked":
+			return {
+				label: "Blocked",
+				icon: "minus-circle",
 				className: "text-text-sub-600",
 			};
 		case "complained":

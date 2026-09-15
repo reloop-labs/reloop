@@ -55,7 +55,7 @@ export async function sendCampaignRecipient(
 		: null;
 	const skip =
 		(contact ? skipReasonForContact(contact) : null) ??
-		(await platformSuppressionSkip(recipient.email));
+		(await platformSuppressionSkip(recipient.email, recipient.organizationId));
 	if (skip) {
 		await markSkipped(recipient.id, campaign.id, skip);
 		await maybeCompleteCampaign(campaign.id);
@@ -201,12 +201,14 @@ export async function sendCampaignRecipient(
 }
 
 /**
- * Reloop auto-suppression: if any org already marked this address as
+ * Reloop auto-suppression: if this org already marked this address as
  * hard-bounced / not found (or blocked), skip sending for this campaign.
- * Unsubscribe stays org-local and is not applied here.
+ * Suppression is org-scoped — another org's suppression must never cause
+ * a skip here. Unsubscribe stays org-local and is not applied here.
  */
 async function platformSuppressionSkip(
 	email: string,
+	organizationId: string,
 ): Promise<"suppressed" | "blocked" | null> {
 	const normalized = email.trim().toLowerCase();
 	if (!normalized) return null;
@@ -218,6 +220,7 @@ async function platformSuppressionSkip(
 		.from(schema.contact)
 		.where(
 			and(
+				eq(schema.contact.organizationId, organizationId),
 				eq(schema.contact.email, normalized),
 				or(
 					eq(schema.contact.status, "blocked"),
