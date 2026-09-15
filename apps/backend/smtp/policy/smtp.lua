@@ -210,10 +210,21 @@ local function apply_reloop_logic(msg, api_key)
       local dkim_data = kumo.serde.json_parse(dkim_body)
       if dkim_data and dkim_data.privateKey and dkim_data.selector then
         local sign_ok, sign_err = pcall(function()
+          -- RFC 6376 5.4.1 plus List-Unsubscribe-Post (RFC 8058). Gmail will
+          -- not offer one-click unsubscribe unless those two list headers are
+          -- in the DKIM h= tag.
           local signer = kumo.dkim.rsa_sha256_signer {
             domain   = domain,
             selector = dkim_data.selector,
-            headers  = { 'From', 'To', 'Subject', 'Date', 'Message-ID' },
+            headers  = {
+              'From', 'Sender', 'Reply-To', 'Subject', 'Date', 'Message-ID',
+              'To', 'Cc', 'MIME-Version', 'Content-Type',
+              'Content-Transfer-Encoding', 'Resent-Date', 'Resent-From',
+              'Resent-To', 'Resent-Cc', 'In-Reply-To', 'References',
+              'List-Id', 'List-Help', 'List-Unsubscribe',
+              'List-Unsubscribe-Post', 'List-Subscribe', 'List-Post',
+              'List-Owner', 'List-Archive',
+            },
             key      = { key_data = dkim_data.privateKey },
           }
           msg:dkim_sign(signer)

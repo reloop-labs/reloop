@@ -5,7 +5,9 @@ import {
 } from "../src/lib/campaign/interpolate";
 import {
 	appendUnsubscribeFooter,
+	campaignListHeaders,
 	extractSenderDomain,
+	extractSenderMailbox,
 	hasUnsubscribeContent,
 	oneClickUnsubscribeUrl,
 	preferencesPageUrl,
@@ -64,6 +66,43 @@ describe("extractSenderDomain", () => {
 		expect(extractSenderDomain("news@example.com")).toBe("example.com");
 		expect(extractSenderDomain("News <news@example.com>")).toBe("example.com");
 		expect(extractSenderDomain("not-an-email")).toBeNull();
+	});
+});
+
+describe("extractSenderMailbox", () => {
+	test("parses bare and display-name from addresses", () => {
+		expect(extractSenderMailbox("news@example.com")).toBe("news@example.com");
+		expect(extractSenderMailbox("News <news@example.com>")).toBe(
+			"news@example.com",
+		);
+		expect(extractSenderMailbox("not-an-email")).toBeNull();
+	});
+});
+
+describe("campaignListHeaders", () => {
+	test("builds RFC 8058 headers with mailto fallback and List-Id", () => {
+		const headers = campaignListHeaders({
+			oneClickUrl: "https://link.example.com/api/contacts/v1/preferences/one-click/tok",
+			from: "News <news@acme.com>",
+			campaignId: "cmp_123",
+		});
+		expect(headers["List-Unsubscribe"]).toBe(
+			"<https://link.example.com/api/contacts/v1/preferences/one-click/tok>, <mailto:news@acme.com?subject=unsubscribe>",
+		);
+		expect(headers["List-Unsubscribe-Post"]).toBe("List-Unsubscribe=One-Click");
+		expect(headers["List-Id"]).toBe("<cmp_123.campaigns.acme.com>");
+	});
+
+	test("prefers reply-to for mailto", () => {
+		const headers = campaignListHeaders({
+			oneClickUrl: "https://link.example.com/u/tok",
+			from: "news@acme.com",
+			replyTo: "unsub@acme.com",
+			campaignId: "cmp_123",
+		});
+		expect(headers["List-Unsubscribe"]).toContain(
+			"<mailto:unsub@acme.com?subject=unsubscribe>",
+		);
 	});
 });
 

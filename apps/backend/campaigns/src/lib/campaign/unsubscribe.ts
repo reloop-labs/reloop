@@ -61,9 +61,50 @@ function trackingProtocol(): string {
 }
 
 export function extractSenderDomain(from: string): string | null {
-	const match = from.match(/<([^>]+)>/)?.[1] ?? from;
-	const domain = match.trim().split("@")[1]?.trim().toLowerCase();
+	const mailbox = extractSenderMailbox(from);
+	const domain = mailbox?.split("@")[1]?.trim().toLowerCase();
 	return domain || null;
+}
+
+export function extractSenderMailbox(from: string): string | null {
+	const match = from.match(/<([^>]+)>/)?.[1] ?? from;
+	const email = match.trim().toLowerCase();
+	return email.includes("@") ? email : null;
+}
+
+/**
+ * RFC 8058 / RFC 2369 headers for campaign mail.
+ * Gmail only offers one-click if List-Unsubscribe and List-Unsubscribe-Post
+ * are present, HTTPS, and covered by DKIM.
+ */
+export function campaignListHeaders(params: {
+	oneClickUrl: string | null;
+	from: string;
+	replyTo?: string | null;
+	campaignId: string;
+}): Record<string, string> {
+	const headers: Record<string, string> = {};
+	const listParts: string[] = [];
+	if (params.oneClickUrl) {
+		listParts.push(`<${params.oneClickUrl}>`);
+	}
+	const mailbox =
+		extractSenderMailbox(params.replyTo ?? "") ??
+		extractSenderMailbox(params.from);
+	if (mailbox) {
+		listParts.push(`<mailto:${mailbox}?subject=unsubscribe>`);
+	}
+	if (listParts.length > 0) {
+		headers["List-Unsubscribe"] = listParts.join(", ");
+	}
+	if (params.oneClickUrl) {
+		headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
+	}
+	const domain = extractSenderDomain(params.from);
+	if (domain && params.campaignId) {
+		headers["List-Id"] = `<${params.campaignId}.campaigns.${domain}>`;
+	}
+	return headers;
 }
 
 /**

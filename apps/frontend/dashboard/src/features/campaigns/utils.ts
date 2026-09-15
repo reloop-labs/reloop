@@ -1,4 +1,4 @@
-import type { CampaignStatus } from "./campaign-types";
+import type { AudienceTargetType, CampaignStatus } from "./campaign-types";
 
 export const getStatusLabel = (status: CampaignStatus): string => {
 	switch (status) {
@@ -46,5 +46,19 @@ export const getStatusIcon = (status: CampaignStatus): string => {
 			return "cross-circle";
 		default:
 			return "minus-circle";
+	}
+};
+
+export const getAudienceIcon = (type?: AudienceTargetType): string => {
+	switch (type) {
+		case "group":
+			return "modules";
+		case "channel":
+			return "notification-indicator";
+		case "csv":
+			return "file-text";
+		case "all":
+		default:
+			return "contacts";
 	}
 };

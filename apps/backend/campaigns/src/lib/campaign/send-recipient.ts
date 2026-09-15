@@ -10,6 +10,7 @@ import {
 import { sendCampaignMail } from "@be/campaigns/lib/campaign/send-mail";
 import {
 	appendUnsubscribeFooter,
+	campaignListHeaders,
 	oneClickUnsubscribeUrl,
 	resolveUnsubscribeBase,
 	signPreferencesToken,
@@ -115,14 +116,12 @@ export async function sendCampaignRecipient(
 		? `${campaign.fromName} <${campaign.fromEmail}>`
 		: campaign.fromEmail;
 
-	// RFC 8058 one-click headers. Mailto fallback preserved when replyTo set.
-	const headers: Record<string, string> = {};
-	const listParts: string[] = [];
-	if (oneClickUrl) listParts.push(`<${oneClickUrl}>`);
-	if (campaign.replyTo) listParts.push(`<mailto:${campaign.replyTo}>`);
-	if (listParts.length > 0) headers["List-Unsubscribe"] = listParts.join(", ");
-	if (oneClickUrl)
-		headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
+	const headers = campaignListHeaders({
+		oneClickUrl,
+		from: campaign.fromEmail,
+		replyTo: campaign.replyTo,
+		campaignId: campaign.id,
+	});
 
 	try {
 		const result = await sendCampaignMail({
