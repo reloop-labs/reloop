@@ -4,6 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Campaign } from "../campaign-types";
 import { CampaignAvatar } from "./campaign-avatar";
@@ -68,6 +69,9 @@ export function CampaignHeader({
 	if (!campaign && !isLoading) {
 		return (
 			<div>
+				<div className="pb-8">
+					<AnimatedBackButton fallbackHref="/campaigns" />
+				</div>
 				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-1.5 text-error-base">
@@ -87,6 +91,9 @@ export function CampaignHeader({
 
 	return (
 		<div>
+			<div className="pb-8">
+				<AnimatedBackButton fallbackHref="/campaigns" />
+			</div>
 			<div className="flex items-center justify-between">
 				<div>
 					{isLoading ? (

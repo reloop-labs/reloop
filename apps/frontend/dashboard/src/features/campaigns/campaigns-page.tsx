@@ -79,14 +79,6 @@ function CampaignsPageContent() {
 				onSelect: () =>
 					window.open("https://reloop.sh/docs/learn/emails", "_blank"),
 			},
-			{
-				id: "select-all",
-				label: "Select All",
-				icon: "check-square",
-				shortcut: { label: "⌘A", keys: ["mod+a"] },
-				onSelect: () =>
-					window.dispatchEvent(new CustomEvent("campaigns:select-all")),
-			},
 		],
 		[setModal],
 	);

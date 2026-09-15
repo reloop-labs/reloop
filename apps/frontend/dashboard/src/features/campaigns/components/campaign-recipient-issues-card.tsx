@@ -5,16 +5,27 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useDeferredValue, useRef, useState } from "react";
+import {
+	useCallback,
+	useDeferredValue,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { dataTableToolbarControlClassName } from "#/components/data-table/toolbar-control";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
-	type CampaignRecipient,
 	type DeliverabilityCategory,
 	listCampaignRecipients,
 } from "../campaigns-api";
+
+/** How long the rotate icon spins after a refresh is triggered. */
+const REFRESH_SPIN_MS = 2000;
 
 export type CategoryTab =
 	| "unsubscribed"
@@ -101,7 +112,9 @@ export function CampaignRecipientIssuesCard({
 }: CampaignRecipientIssuesCardProps) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const spinTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const deferredSearch = useDeferredValue(searchQuery);
 
@@ -125,66 +138,98 @@ export function CampaignRecipientIssuesCard({
 	const counts = data?.counts;
 	const recipients = data?.recipients ?? [];
 	const activeIndex = TABS.findIndex((tab) => tab.id === activeTab);
-	const isHovering = hoveredIdx !== undefined;
-	const currentIdx = isHovering ? hoveredIdx : activeIndex;
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const currentTab = buttonRefs.current[currentIdx];
-	const rect = currentTab?.getBoundingClientRect();
-	const parentRect = currentTab?.offsetParent?.getBoundingClientRect();
-	const pillInsetTop = 7;
-	const pillInsetBottom = isHovering ? 7 : 2;
+	const pillInsetY = 7;
+	const pill =
+		currentTab && activeIndex !== -1
+			? {
+					width: currentTab.offsetWidth,
+					height: currentTab.offsetHeight - pillInsetY * 2,
+					left: currentTab.offsetLeft,
+					top: currentTab.offsetTop + pillInsetY,
+				}
+			: null;
 
-	const handleCopyEmails = useCallback((list: CampaignRecipient[]) => {
-		if (!list.length) {
-			toast.info("No recipients to copy");
+	const canExport = recipients.length > 0;
+
+	const handleExportCsv = useCallback(() => {
+		if (!recipients.length) {
+			toast.info("No recipients to export");
 			return;
 		}
-		const text = list.map((r) => r.email).join("\n");
-		void navigator.clipboard.writeText(text);
-		toast.success(`Copied ${list.length} email${list.length === 1 ? "" : "s"}`);
+		const isClicks = activeTab === "clicked";
+		const header = isClicks
+			? "Email,Clicks,Unique Clicks,Status,Contact Name\n"
+			: "Email,Status,Category,Error,Contact Name\n";
+		const rows = recipients
+			.map((r) =>
+				(isClicks
+					? [
+							`"${r.email}"`,
+							`"${r.clickCount ?? 0}"`,
+							`"${r.uniqueClickCount ?? 0}"`,
+							`"${r.status || ""}"`,
+							`"${(r.contactName || "").replace(/"/g, '""')}"`,
+						]
+					: [
+							`"${r.email}"`,
+							`"${r.status || ""}"`,
+							`"${r.category || activeTab}"`,
+							`"${(r.error || "").replace(/"/g, '""')}"`,
+							`"${(r.contactName || "").replace(/"/g, '""')}"`,
+						]
+				).join(","),
+			)
+			.join("\n");
+		const blob = new Blob([header + rows], {
+			type: "text/csv;charset=utf-8;",
+		});
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = `campaign-${campaignId}-${activeTab}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+		toast.success("CSV downloaded");
+	}, [activeTab, campaignId, recipients]);
+
+	const refresh = useCallback(() => {
+		void refetch();
+		setIsRefreshing(true);
+		if (spinTimeoutRef.current != null) {
+			clearTimeout(spinTimeoutRef.current);
+		}
+		spinTimeoutRef.current = setTimeout(() => {
+			setIsRefreshing(false);
+			spinTimeoutRef.current = null;
+		}, REFRESH_SPIN_MS);
+	}, [refetch]);
+
+	useEffect(() => {
+		return () => {
+			if (spinTimeoutRef.current != null) {
+				clearTimeout(spinTimeoutRef.current);
+			}
+		};
 	}, []);
 
-	const handleExportCsv = useCallback(
-		(list: CampaignRecipient[]) => {
-			if (!list.length) {
-				toast.info("No recipients to export");
-				return;
-			}
-			const isClicks = activeTab === "clicked";
-			const header = isClicks
-				? "Email,Clicks,Unique Clicks,Status,Contact Name\n"
-				: "Email,Status,Category,Error,Contact Name\n";
-			const rows = list
-				.map((r) =>
-					(isClicks
-						? [
-								`"${r.email}"`,
-								`"${r.clickCount ?? 0}"`,
-								`"${r.uniqueClickCount ?? 0}"`,
-								`"${r.status || ""}"`,
-								`"${(r.contactName || "").replace(/"/g, '""')}"`,
-							]
-						: [
-								`"${r.email}"`,
-								`"${r.status || ""}"`,
-								`"${r.category || activeTab}"`,
-								`"${(r.error || "").replace(/"/g, '""')}"`,
-								`"${(r.contactName || "").replace(/"/g, '""')}"`,
-							]
-					).join(","),
-				)
-				.join("\n");
-			const blob = new Blob([header + rows], {
-				type: "text/csv;charset=utf-8;",
-			});
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.href = url;
-			a.download = `campaign-${campaignId}-${activeTab}.csv`;
-			a.click();
-			URL.revokeObjectURL(url);
-			toast.success("CSV downloaded");
+	useHotkeys(
+		"r",
+		(e) => {
+			e.preventDefault();
+			refresh();
 		},
-		[activeTab, campaignId],
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
+	useHotkeys(
+		"e",
+		(e) => {
+			e.preventDefault();
+			if (canExport) handleExportCsv();
+		},
+		{ enableOnFormTags: false, preventDefault: true, enabled: canExport },
 	);
 
 	return (
@@ -227,23 +272,17 @@ export function CampaignRecipientIssuesCard({
 							);
 						})}
 						<AnimatePresence>
-							{rect && parentRect && activeIndex !== -1 ? (
+							{pill ? (
 								<motion.div
 									className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
 									initial={{
 										pointerEvents: "none",
-										width: rect.width,
-										height: rect.height - pillInsetTop - pillInsetBottom,
-										left: rect.left - parentRect.left,
-										top: rect.top - parentRect.top + pillInsetTop,
+										...pill,
 										opacity: 0,
 									}}
 									animate={{
 										pointerEvents: "none",
-										width: rect.width,
-										height: rect.height - pillInsetTop - pillInsetBottom,
-										left: rect.left - parentRect.left,
-										top: rect.top - parentRect.top + pillInsetTop,
+										...pill,
 										opacity: 1,
 									}}
 									exit={{ opacity: 0 }}
@@ -282,41 +321,131 @@ export function CampaignRecipientIssuesCard({
 						</Input.Wrapper>
 					</Input.Root>
 					<div className="flex shrink-0 items-center gap-2">
-						<button
-							type="button"
-							onClick={() => handleCopyEmails(recipients)}
-							disabled={recipients.length === 0}
-							className={cn(
-								dataTableToolbarControlClassName,
-								"disabled:pointer-events-none disabled:opacity-50",
-							)}
-						>
-							<Icon name="copy" className="h-3.5 w-3.5 shrink-0" />
-							Copy
-						</button>
-						<button
-							type="button"
-							onClick={() => handleExportCsv(recipients)}
-							disabled={recipients.length === 0}
-							className={cn(
-								dataTableToolbarControlClassName,
-								"disabled:pointer-events-none disabled:opacity-50",
-							)}
-						>
-							<Icon name="arrow-down-tray" className="h-3.5 w-3.5 shrink-0" />
-							Export
-						</button>
-						<button
-							type="button"
-							onClick={() => {
-								void refetch();
-								toast.success("Refreshed");
-							}}
-							className={dataTableToolbarControlClassName}
-						>
-							<Icon name="refresh" className="h-3.5 w-3.5 shrink-0" />
-							Refresh
-						</button>
+						<Tooltip.Provider delayDuration={200}>
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<button
+										type="button"
+										onClick={handleExportCsv}
+										disabled={!canExport}
+										className={cn(
+											dataTableToolbarControlClassName,
+											"gap-2 px-1.5",
+											canExport
+												? "cursor-pointer"
+												: "pointer-events-none opacity-50",
+										)}
+										aria-label="Export recipients CSV"
+										aria-keyshortcuts="e"
+									>
+										<Icon
+											name="file-download"
+											className="h-3.5 w-3.5 shrink-0"
+										/>
+										<ActionKbd>E</ActionKbd>
+									</button>
+								</Tooltip.Trigger>
+								<Tooltip.Content
+									side="top"
+									sideOffset={-1}
+									size="medium"
+									variant="light"
+									className="max-w-63 p-2.5"
+								>
+									<div className="flex items-start gap-2.5">
+										<div
+											className={cn(
+												"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
+												"bg-bg-weak-50 ring-1 ring-stroke-soft-200",
+											)}
+											aria-hidden
+										>
+											<Icon
+												name="file-download"
+												className="h-3.5 w-3.5 text-text-sub-600"
+											/>
+										</div>
+										<div className="min-w-0 flex-1">
+											<div className="flex items-center justify-between gap-3">
+												<p className="font-medium text-label-sm text-text-strong-950">
+													Export CSV
+												</p>
+												<ActionKbd>E</ActionKbd>
+											</div>
+											<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
+												Download this list as a CSV file.
+											</p>
+										</div>
+									</div>
+								</Tooltip.Content>
+							</Tooltip.Root>
+						</Tooltip.Provider>
+						<Tooltip.Provider delayDuration={200}>
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<button
+										type="button"
+										onClick={refresh}
+										disabled={isRefreshing}
+										className={cn(
+											dataTableToolbarControlClassName,
+											"gap-2 px-1.5",
+											isRefreshing ? "pointer-events-none" : "cursor-pointer",
+										)}
+										aria-label="Refresh recipients"
+										aria-keyshortcuts="r"
+										aria-busy={isRefreshing}
+									>
+										<Icon
+											name="rotate-cw"
+											className={cn(
+												"h-3.5 w-3.5 shrink-0",
+												isRefreshing && "animate-spin",
+											)}
+										/>
+										<ActionKbd>R</ActionKbd>
+									</button>
+								</Tooltip.Trigger>
+								<Tooltip.Content
+									side="top"
+									sideOffset={-1}
+									size="medium"
+									variant="light"
+									className="max-w-63 p-2.5"
+								>
+									<div className="flex items-start gap-2.5">
+										<div
+											className={cn(
+												"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
+												"bg-bg-weak-50 ring-1 ring-stroke-soft-200",
+											)}
+											aria-hidden
+										>
+											<Icon
+												name="rotate-cw"
+												className={cn(
+													"h-3.5 w-3.5 text-text-sub-600",
+													isRefreshing && "animate-spin",
+												)}
+											/>
+										</div>
+										<div className="min-w-0 flex-1">
+											<div className="flex items-center justify-between gap-3">
+												<p className="font-medium text-label-sm text-text-strong-950">
+													{isRefreshing ? "Refreshing…" : "Refresh"}
+												</p>
+												<ActionKbd>R</ActionKbd>
+											</div>
+											<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
+												{isRefreshing
+													? "Fetching the latest recipients."
+													: "Reload recipients from the server."}
+											</p>
+										</div>
+									</div>
+								</Tooltip.Content>
+							</Tooltip.Root>
+						</Tooltip.Provider>
 					</div>
 				</div>
 

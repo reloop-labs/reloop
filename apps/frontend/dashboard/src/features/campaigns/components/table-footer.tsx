@@ -4,13 +4,9 @@ import { PaginationControls } from "#/features/api-keys/table/pagination-control
 
 export function CampaignTableFooter({
 	total,
-	selectedCount = 0,
-	pageRowCount = 0,
 	isLoading,
 }: {
 	total: number;
-	selectedCount?: number;
-	pageRowCount?: number;
 	isLoading?: boolean;
 }) {
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -22,7 +18,11 @@ export function CampaignTableFooter({
 		parseAsInteger.withDefault(10),
 	);
 
-	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
+	const limit = pageSize ?? 10;
+	const page = currentPage ?? 1;
+	const totalPages = Math.max(1, Math.ceil(total / limit));
+	const startIndex = total > 0 ? (page - 1) * limit + 1 : 0;
+	const endIndex = Math.min(page * limit, total);
 
 	if (total <= 0) return null;
 
@@ -30,10 +30,11 @@ export function CampaignTableFooter({
 		<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
 			<div className="flex items-center gap-3">
 				<span>
-					{selectedCount} of {pageRowCount} row(s) selected.
+					Showing {startIndex}–{endIndex} of {total} campaign
+					{total !== 1 ? "s" : ""}
 				</span>
 				<PageSizeDropdown
-					value={pageSize ?? 10}
+					value={limit}
 					onValueChange={(value) => {
 						void setPageSize(value);
 						void setCurrentPage(1);

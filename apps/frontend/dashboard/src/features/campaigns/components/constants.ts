@@ -11,7 +11,7 @@ const COLUMN_TRACKS: Record<string, string> = {
 export function getCampaignTableGridStyle(
 	visibility: VisibilityState = {},
 ): CSSProperties {
-	const tracks = ["32px"];
+	const tracks: string[] = [];
 	for (const [id, track] of Object.entries(COLUMN_TRACKS)) {
 		if (visibility[id] !== false) tracks.push(track);
 	}
