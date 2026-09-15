@@ -211,7 +211,7 @@ services:
     image: reloopsh/be-inbox:${RELOOP_VERSION}
     container_name: reloop-inbox
     environment:
-      PORT: 8021
+      PORT: 8028
 
   email:
     <<: *backend

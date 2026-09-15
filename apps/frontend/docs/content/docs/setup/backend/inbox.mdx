@@ -16,7 +16,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker i
 | Property | Value |
 | :--- | :--- |
 | **Directory** | `apps/backend/inbox` |
-| **Port** | `8021` |
+| **Port** | `8028` |
 | **Local URL** | [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) |
 | **Swagger UI** | [https://local.reloop.sh/api/inbox/openapi](https://local.reloop.sh/api/inbox/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
@@ -38,7 +38,7 @@ Or `bun backend:dev` / `bun dev`.
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-PORT=8021
+PORT=8028
 BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
 NODE_ENV=development
@@ -48,7 +48,7 @@ NODE_ENV=development
 | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` |
 | `REDIS_URL` | **YES** | `redis://...` |
-| `PORT` | **YES** | `8021` |
+| `PORT` | **YES** | `8028` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
 

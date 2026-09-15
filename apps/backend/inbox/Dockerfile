@@ -33,6 +33,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/package.json ./package.json
 
-EXPOSE 8017
+EXPOSE 8028
 
 CMD ["bun", "run", "dist/index.js"]

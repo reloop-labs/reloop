@@ -15347,7 +15347,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker i
 | Property | Value |
 | :--- | :--- |
 | **Directory** | `apps/backend/inbox` |
-| **Port** | `8021` |
+| **Port** | `8028` |
 | **Local URL** | [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) |
 | **Swagger UI** | [https://local.reloop.sh/api/inbox/openapi](https://local.reloop.sh/api/inbox/openapi) |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
@@ -15367,7 +15367,7 @@ Or `bun backend:dev` / `bun dev`.
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-PORT=8021
+PORT=8028
 BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
 NODE_ENV=development
@@ -15377,7 +15377,7 @@ NODE_ENV=development
 | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` |
 | `REDIS_URL` | **YES** | `redis://...` |
-| `PORT` | **YES** | `8021` |
+| `PORT` | **YES** | `8028` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
 ## Commands
@@ -16791,7 +16791,7 @@ Stack: [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/),
     Broadcasts — `8027`
   </Card>
   <Card icon="inbox" title="Inbox" href="/setup/backend/inbox">
-    Inbound mail — `8021`
+    Inbound mail — `8028`
   </Card>
   <Card icon="envelope" title="Email" href="/setup/backend/email">
     Platform email — `8022`
@@ -16924,7 +16924,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) | [Upload](/docs/setup/backend/upload) | `8018` |
 | [https://local.reloop.sh/api/template](https://local.reloop.sh/api/template) | [Template](/docs/setup/backend/template) | `8019` |
 | [https://local.reloop.sh/api/campaigns](https://local.reloop.sh/api/campaigns) | [Campaigns](/docs/setup/backend/campaigns) | `8027` |
-| [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) | [Inbox](/docs/setup/backend/inbox) | `8021` |
+| [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) | [Inbox](/docs/setup/backend/inbox) | `8028` |
 | [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) | [Email](/docs/setup/backend/email) | `8022` |
 | [https://local.reloop.sh/api/credits](https://local.reloop.sh/api/credits) | [Credits](/docs/setup/backend/credits) | `8023` |
 | [https://local.reloop.sh/api/admin](https://local.reloop.sh/api/admin) | Admin | `8024` |
@@ -16954,7 +16954,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | [Upload](/docs/setup/backend/upload) | [`/api/upload`](https://local.reloop.sh/api/upload) | `8018` |
 | [Template](/docs/setup/backend/template) | [`/api/template`](https://local.reloop.sh/api/template) | `8019` |
 | [Campaigns](/docs/setup/backend/campaigns) | [`/api/campaigns`](https://local.reloop.sh/api/campaigns) | `8027` |
-| [Inbox](/docs/setup/backend/inbox) | [`/api/inbox`](https://local.reloop.sh/api/inbox) | `8021` |
+| [Inbox](/docs/setup/backend/inbox) | [`/api/inbox`](https://local.reloop.sh/api/inbox) | `8028` |
 | [Email](/docs/setup/backend/email) | [`/api/email`](https://local.reloop.sh/api/email) | `8022` |
 | [Credits](/docs/setup/backend/credits) | [`/api/credits`](https://local.reloop.sh/api/credits) | `8023` |
 | Admin | [`/api/admin`](https://local.reloop.sh/api/admin) | `8024` |
