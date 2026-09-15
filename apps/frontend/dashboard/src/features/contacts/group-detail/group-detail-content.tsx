@@ -16,7 +16,7 @@ export function GroupDetailContent({ groupId }: { groupId: string }) {
 
 	if (groupError && !groupData) {
 		return (
-			<div className="mx-auto max-w-6xl px-6 pb-6 lg:px-8 lg:pb-8">
+			<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
 				<div className="flex items-center justify-between pt-10 pb-8">
 					<AnimatedBackButton fallbackHref="/contacts/groups" />
 				</div>
@@ -29,7 +29,7 @@ export function GroupDetailContent({ groupId }: { groupId: string }) {
 
 	if (!groupData && !isLoading) {
 		return (
-			<div className="mx-auto max-w-6xl px-6 pb-6 lg:px-8 lg:pb-8">
+			<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
 				<div className="flex items-center justify-between pt-10 pb-8">
 					<AnimatedBackButton fallbackHref="/contacts/groups" />
 				</div>
@@ -47,7 +47,7 @@ export function GroupDetailContent({ groupId }: { groupId: string }) {
 	}
 
 	return (
-		<div className="mx-auto max-w-6xl px-6 pb-6 lg:px-8 lg:pb-8">
+		<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
 			<GroupHeader group={groupData} isLoading={isLoading} />
 			<GroupSummary group={groupData} isLoading={isLoading} />
 			<GroupContactList groupId={groupId} />
