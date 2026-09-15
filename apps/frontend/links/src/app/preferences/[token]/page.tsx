@@ -1,4 +1,6 @@
+import { getContactsApiBaseUrl } from "@reloop/links/lib/contacts-api";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { PreferencesContent } from "./preferences-content";
 
@@ -22,19 +24,12 @@ interface PreferencesData {
 	channels: ChannelData[];
 }
 
-const API_BASE =
-	process.env.INTERNAL_API_URL || "http://localhost:8014/api/contacts";
-
 async function fetchPreferencesData(
 	token: string,
 ): Promise<PreferencesData | null> {
 	try {
-		const res = await fetch(
-			`${API_BASE}/v1/preferences/data?token=${encodeURIComponent(token)}`,
-			{
-				cache: "no-store",
-			},
-		);
+		const url = `${getContactsApiBaseUrl()}/v1/preferences/data?token=${encodeURIComponent(token)}`;
+		const res = await fetch(url, { cache: "no-store" });
 		if (!res.ok) return null;
 		return res.json();
 	} catch {
@@ -108,6 +103,9 @@ async function PreferencesBody({
 }: {
 	params: Promise<{ token: string }>;
 }) {
+	// cacheComponents/PPR otherwise prerenders this page without a real
+	// token and caches the "expired" shell for every visitor.
+	await connection();
 	const { token } = await params;
 	const data = await fetchPreferencesData(token);
 

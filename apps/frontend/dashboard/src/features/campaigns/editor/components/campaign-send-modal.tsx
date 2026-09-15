@@ -413,13 +413,21 @@ export function CampaignSendModal({
 											</div>
 										</div>
 
-										<p className="text-[11px] text-text-sub-600">
-											{canSend ? (
-												"This action cannot be undone once delivery begins."
-											) : (
-												<>Add {missing} before broadcasting.</>
-											)}
-										</p>
+										{canSend ? (
+											<div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+												<Icon
+													name="alert-triangle"
+													className="mt-0.5 h-4 w-4 shrink-0"
+												/>
+												<p>
+													This action cannot be undone once delivery begins.
+												</p>
+											</div>
+										) : (
+											<p className="text-[11px] text-text-sub-600">
+												Add {missing} before broadcasting.
+											</p>
+										)}
 									</div>
 								</div>
 
