@@ -3,7 +3,8 @@
 import { PreferenceShell } from "@reloop/links/components/preference-shell";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
+import { unsubscribeContactAction } from "./actions";
 
 interface Props {
 	token: string;
@@ -17,6 +18,7 @@ interface Props {
 		name: string;
 	};
 	preferencesHref: string | null;
+	initialState: "done" | "error";
 }
 
 export function UnsubscribeContent({
@@ -24,33 +26,17 @@ export function UnsubscribeContent({
 	contact,
 	organization,
 	preferencesHref,
+	initialState,
 }: Props) {
-	const alreadyUnsubscribed = contact.status === "unsubscribed";
 	const [state, setState] = useState<"loading" | "done" | "error">(
-		alreadyUnsubscribed ? "done" : "loading",
+		initialState,
 	);
-	const started = useRef(alreadyUnsubscribed);
 
 	const unsubscribe = useCallback(async () => {
 		setState("loading");
-		try {
-			const res = await fetch("/api/contacts/v1/preferences/unsubscribe", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ token }),
-			});
-			if (!res.ok) throw new Error("Failed");
-			setState("done");
-		} catch {
-			setState("error");
-		}
+		const ok = await unsubscribeContactAction(token);
+		setState(ok ? "done" : "error");
 	}, [token]);
-
-	useEffect(() => {
-		if (started.current) return;
-		started.current = true;
-		void unsubscribe();
-	}, [unsubscribe]);
 
 	return (
 		<PreferenceShell email={contact.email} emailLabel="For">

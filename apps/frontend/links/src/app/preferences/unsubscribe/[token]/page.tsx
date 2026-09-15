@@ -3,6 +3,7 @@ import {
 	PreferenceInvalid,
 } from "@reloop/links/components/preference-shell";
 import { fetchPreferencesData } from "@reloop/links/lib/preferences-data";
+import { postMainListUnsubscribe } from "@reloop/links/lib/preferences-unsubscribe";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -32,6 +33,10 @@ async function UnsubscribeBody({
 		);
 	}
 
+	const alreadyUnsubscribed = data.contact.status === "unsubscribed";
+	const unsubscribed =
+		alreadyUnsubscribed || (await postMainListUnsubscribe(token));
+
 	return (
 		<UnsubscribeContent
 			token={token}
@@ -40,6 +45,7 @@ async function UnsubscribeBody({
 			preferencesHref={
 				data.channels.length > 0 ? `/preferences/${token}` : null
 			}
+			initialState={unsubscribed ? "done" : "error"}
 		/>
 	);
 }
