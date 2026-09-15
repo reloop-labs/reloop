@@ -6,6 +6,7 @@ describe("useCampaignEditorStore", () => {
 	beforeEach(() => {
 		useCampaignEditorStore.setState({
 			campaignId: "",
+			status: "draft",
 			name: "",
 			subject: "",
 			previewText: "",
@@ -59,12 +60,38 @@ describe("useCampaignEditorStore", () => {
 
 		const state = useCampaignEditorStore.getState();
 		expect(state.campaignId).toBe("cmp_123");
+		expect(state.status).toBe("draft");
 		expect(state.name).toBe("Summer Blast");
 		expect(state.subject).toBe("Hot Deals Inside");
 		expect(state.previewText).toBe("Don't miss out");
 		expect(state.fromName).toBe("Store Team");
 		expect(state.fromEmail).toBe("news@store.com");
 		expect(state.hasUnsavedChanges).toBe(false);
+	});
+
+	it("marks sent campaigns as sent in editor state", () => {
+		const mockCampaign: Campaign = {
+			id: "cmp_sent",
+			organizationId: "org_1",
+			name: "Sent Blast",
+			subject: "Hello",
+			fromName: "Team",
+			fromEmail: "team@store.com",
+			status: "sent",
+			audienceType: "all",
+			recipientCount: 10,
+			sentCount: 10,
+			deliveredCount: 10,
+			openedCount: 0,
+			clickedCount: 0,
+			failedCount: 0,
+			contentHtml: "<p>Hi</p>",
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		};
+
+		useCampaignEditorStore.getState().setCampaignData(mockCampaign);
+		expect(useCampaignEditorStore.getState().status).toBe("sent");
 	});
 
 	it("updates subject and flags unsaved changes", () => {

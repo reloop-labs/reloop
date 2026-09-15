@@ -13,6 +13,7 @@ import { EmailInspector } from "#/features/templates/editor/inspector";
 import { shouldShowSourceHtmlPreview } from "#/features/templates/editor/utils/should-show-source-html-preview";
 import { CampaignsProvider } from "../campaigns-provider";
 import { CampaignEditorProvider } from "./campaign-editor-provider";
+import { useCampaignEditorStore } from "./campaign-editor-store";
 import { CampaignSendDetails } from "./components/campaign-send-details";
 
 const viewModes = ["visual", "code"] as const;
@@ -23,7 +24,9 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 		parseAsStringLiteral(viewModes).withDefault("visual"),
 	);
 
-	const isCodeSplit = viewMode === "code";
+	const status = useCampaignEditorStore((s) => s.status);
+	const isReadOnly = status !== "draft";
+	const isCodeSplit = !isReadOnly && viewMode === "code";
 	const codeHtml = useEditorStore((s) => s.codeHtml);
 	const showHtmlCanvas = shouldShowSourceHtmlPreview({
 		isCodeSplit,
@@ -47,7 +50,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 							<main
 								className={cn(
 									"template-editor-canvas flex h-full flex-1 flex-col overflow-hidden bg-white text-neutral-950",
-									!isCodeSplit && "pr-72",
+									!isCodeSplit && !isReadOnly && "pr-72",
 								)}
 							>
 								<CampaignSendDetails />
@@ -68,7 +71,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 											orientation="vertical"
 											className={cn(
 												"absolute top-0 bottom-0 z-20 flex w-2.5 touch-none select-none p-0.5 transition-[right] duration-300",
-												!isCodeSplit ? "right-72" : "right-0",
+												!isCodeSplit && !isReadOnly ? "right-72" : "right-0",
 											)}
 										>
 											<ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-stroke-soft-200 hover:bg-stroke-sub-300" />
@@ -77,7 +80,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 								)}
 							</main>
 							<AnimatePresence initial={false}>
-								{!isCodeSplit && (
+								{!isCodeSplit && !isReadOnly && (
 									<motion.div
 										initial={{ width: 0, opacity: 0 }}
 										animate={{ width: "288px", opacity: 1 }}

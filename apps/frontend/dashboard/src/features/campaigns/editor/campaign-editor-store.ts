@@ -1,8 +1,13 @@
 import { create } from "zustand";
-import type { AudienceTargetType, Campaign } from "../campaign-types";
+import type {
+	AudienceTargetType,
+	Campaign,
+	CampaignStatus,
+} from "../campaign-types";
 
 export interface CampaignEditorState {
 	campaignId: string;
+	status: CampaignStatus;
 	name: string;
 	subject: string;
 	previewText: string;
@@ -53,6 +58,7 @@ export interface CampaignEditorState {
 
 export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 	campaignId: "",
+	status: "draft",
 	name: "",
 	subject: "",
 	previewText: "",
@@ -75,6 +81,7 @@ export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 	setCampaignData: (campaign: Campaign) =>
 		set({
 			campaignId: campaign.id,
+			status: campaign.status,
 			name: campaign.name,
 			subject: campaign.subject || "",
 			previewText: campaign.previewText || "",

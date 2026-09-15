@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
+import { getStatusLabel } from "../../utils";
 import { useCampaignEditorStore } from "../campaign-editor-store";
 import { CampaignScheduleModal } from "./campaign-schedule-modal";
 import { CampaignSendModal } from "./campaign-send-modal";
@@ -90,17 +91,19 @@ function CenterNav() {
 }
 
 function CampaignNameField() {
-	const { name, setName } = useCampaignEditorStore();
+	const { name, setName, status } = useCampaignEditorStore();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const measureRef = useRef<HTMLSpanElement>(null);
+	const isReadOnly = status !== "draft";
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: DOM measurement of input text width
 	useEffect(() => {
+		if (isReadOnly) return;
 		if (measureRef.current && inputRef.current) {
 			const width = measureRef.current.offsetWidth;
 			inputRef.current.style.width = `${Math.max(60, width)}px`;
 		}
-	}, [name]);
+	}, [name, isReadOnly]);
 
 	return (
 		<div className="flex items-center">
@@ -117,22 +120,30 @@ function CampaignNameField() {
 			<span className="ml-2.5 text-text-disabled-300 text-xs">/</span>
 
 			<div className="group ml-1 flex items-center">
-				<span
-					ref={measureRef}
-					className="invisible absolute whitespace-pre px-2 py-1 font-semibold text-label-sm"
-					aria-hidden="true"
-				>
-					{name || "Campaign name"}
-				</span>
-				<input
-					ref={inputRef}
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					placeholder="Campaign name"
-					className="rounded-md bg-transparent px-2 py-1 font-semibold text-label-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:ring-0"
-				/>
+				{isReadOnly ? (
+					<span className="px-2 py-1 font-semibold text-label-sm text-text-strong-950">
+						{name || "Campaign name"}
+					</span>
+				) : (
+					<>
+						<span
+							ref={measureRef}
+							className="invisible absolute whitespace-pre px-2 py-1 font-semibold text-label-sm"
+							aria-hidden="true"
+						>
+							{name || "Campaign name"}
+						</span>
+						<input
+							ref={inputRef}
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							placeholder="Campaign name"
+							className="rounded-md bg-transparent px-2 py-1 font-semibold text-label-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:ring-0"
+						/>
+					</>
+				)}
 				<span className="ml-2 shrink-0 select-none rounded-full bg-bg-weak-50 px-2.5 py-1 font-medium text-[11px] text-text-sub-600 leading-none ring-1 ring-stroke-soft-100 ring-inset dark:bg-bg-soft-200 dark:ring-stroke-soft-100/40">
-					Draft
+					{getStatusLabel(status)}
 				</span>
 			</div>
 		</div>
@@ -141,11 +152,13 @@ function CampaignNameField() {
 
 export function CampaignEditorHeader() {
 	const { campaignId } = useCampaignEditorStore();
+	const status = useCampaignEditorStore((s) => s.status);
 	const fromEmail = useCampaignEditorStore((s) => s.fromEmail);
 	const subject = useCampaignEditorStore((s) => s.subject);
 	const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 	const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 	const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+	const isReadOnly = status !== "draft";
 
 	const focusField = (id: string) => {
 		const el = document.getElementById(id);
@@ -188,7 +201,7 @@ export function CampaignEditorHeader() {
 				{/* Left: Toggle, CenterNav */}
 				<div className="flex min-w-0 flex-1 items-center gap-2">
 					<SidebarToggleButton />
-					<CenterNav />
+					{isReadOnly ? null : <CenterNav />}
 				</div>
 
 				{/* Center: Title / Breadcrumb */}
@@ -198,23 +211,31 @@ export function CampaignEditorHeader() {
 					</div>
 				</div>
 
-				{/* Right: Test email and Review Buttons */}
+				{/* Right: Test email and Review / Details */}
 				<div className="flex flex-1 items-center justify-end gap-2">
-					<FancyButton.Root
-						variant="basic"
-						size="xsmall"
-						onClick={handleTestClick}
-					>
-						Test email
-					</FancyButton.Root>
+					{isReadOnly ? (
+						<FancyButton.Root variant="blue" size="xsmall" asChild>
+							<Link href={`/campaigns/${campaignId}`}>Details</Link>
+						</FancyButton.Root>
+					) : (
+						<>
+							<FancyButton.Root
+								variant="basic"
+								size="xsmall"
+								onClick={handleTestClick}
+							>
+								Test email
+							</FancyButton.Root>
 
-					<FancyButton.Root
-						variant="blue"
-						size="xsmall"
-						onClick={() => setIsSendModalOpen(true)}
-					>
-						Review
-					</FancyButton.Root>
+							<FancyButton.Root
+								variant="blue"
+								size="xsmall"
+								onClick={() => setIsSendModalOpen(true)}
+							>
+								Review
+							</FancyButton.Root>
+						</>
+					)}
 				</div>
 			</div>
 

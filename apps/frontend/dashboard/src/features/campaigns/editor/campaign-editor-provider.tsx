@@ -90,9 +90,15 @@ export function CampaignEditorProvider({
 	}, [editor, campaign, campaignReady]);
 
 	// Autosave logic
+	useEffect(() => {
+		if (!editor) return;
+		editor.setEditable(campaign?.status === "draft");
+	}, [editor, campaign?.status]);
+
 	saveRef.current = async () => {
 		if (!editor || !campaignId || isInitialHydrateRef.current || !campaign)
 			return;
+		if (campaign.status !== "draft") return;
 		const state = useCampaignEditorStore.getState();
 		if (Date.now() < skipUntilRef.current) return;
 
@@ -216,7 +222,7 @@ export function CampaignEditorProvider({
 				    Rendering them here too would mount two BubbleMenu instances
 				    with the same PluginKey on one editor, which ProseMirror
 				    rejects ("Adding different instances of a keyed plugin"). */}
-				<EmailSlashCommand />
+				{campaign?.status === "draft" ? <EmailSlashCommand /> : null}
 			</div>
 		</EditorContext.Provider>
 	);
