@@ -122,7 +122,8 @@ export type DeliverabilityCategory =
 	| "unsubscribed"
 	| "bounced"
 	| "suppressed"
-	| "complained";
+	| "complained"
+	| "clicked";
 
 export interface CampaignRecipient {
 	id: string;
@@ -136,6 +137,8 @@ export interface CampaignRecipient {
 	category?: DeliverabilityCategory;
 	openedAt?: string;
 	clickedAt?: string;
+	clickCount?: number;
+	uniqueClickCount?: number;
 	updatedAt?: string;
 }
 
@@ -149,6 +152,8 @@ export interface CampaignRecipientsResponse {
 		bounced: number;
 		suppressed: number;
 		complained: number;
+		clicked: number;
+		clickedTotal: number;
 		all: number;
 	};
 }

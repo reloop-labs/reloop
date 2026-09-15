@@ -12,7 +12,10 @@ import {
 import { CampaignHeader } from "./components/campaign-header";
 import { CampaignMetricsCards } from "./components/campaign-metrics-cards";
 import { CampaignPreviewTabs } from "./components/campaign-preview-tabs";
-import { CampaignRecipientIssuesCard } from "./components/campaign-recipient-issues-card";
+import {
+	CampaignRecipientIssuesCard,
+	type CategoryTab,
+} from "./components/campaign-recipient-issues-card";
 import { DeleteCampaignModal } from "./components/delete-campaign";
 
 function CampaignDetailContent() {
@@ -24,6 +27,7 @@ function CampaignDetailContent() {
 	const campaignQuery = useCampaignQuery(campaignId);
 
 	const [actionPending, setActionPending] = useState(false);
+	const [recipientTab, setRecipientTab] = useState<CategoryTab>("unsubscribed");
 
 	const campaign = campaignQuery.data;
 
@@ -215,11 +219,23 @@ function CampaignDetailContent() {
 
 				{/* High-level Metric Cards */}
 				{campaign.status !== "draft" && (
-					<CampaignMetricsCards campaign={campaign} />
+					<CampaignMetricsCards
+						campaign={campaign}
+						onSelectCategory={(tab) => {
+							setRecipientTab(tab);
+							document
+								.getElementById("campaign-recipients")
+								?.scrollIntoView({ behavior: "smooth", block: "start" });
+						}}
+					/>
 				)}
 
-				{/* Deliverability & Recipient Activity (Unsubscribed, Bounced, Suppressed, Complained) */}
-				<CampaignRecipientIssuesCard campaignId={campaign.id} />
+				{/* Deliverability & Recipient Activity (Unsubscribed, Bounced, Suppressed, Complained, Clicks) */}
+				<CampaignRecipientIssuesCard
+					campaignId={campaign.id}
+					activeTab={recipientTab}
+					onActiveTabChange={setRecipientTab}
+				/>
 
 				{/* Message Preview Tabs */}
 				<CampaignPreviewTabs campaign={campaign} audienceInfo={audienceInfo} />

@@ -117,5 +117,7 @@ export const campaignRecipientSchema = t.Object({
 	contactName: t.Optional(t.String()),
 	openedAt: t.Optional(t.String()),
 	clickedAt: t.Optional(t.String()),
+	clickCount: t.Optional(t.Number()),
+	uniqueClickCount: t.Optional(t.Number()),
 	updatedAt: t.Optional(t.String()),
 });

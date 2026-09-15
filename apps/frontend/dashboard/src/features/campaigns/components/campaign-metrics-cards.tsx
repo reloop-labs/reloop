@@ -7,6 +7,7 @@ import { type ReactNode, useState } from "react";
 import type { DomainListResponse } from "#/features/domain/types";
 import type { Campaign } from "../campaign-types";
 import { listCampaignRecipients } from "../campaigns-api";
+import type { CategoryTab } from "./campaign-recipient-issues-card";
 
 function pct2(numerator: number, denominator: number): string {
 	if (!denominator || denominator <= 0) return "0.00%";
@@ -20,6 +21,7 @@ function BreakdownRow({
 	count,
 	rate,
 	muted,
+	onClick,
 }: {
 	icon: string;
 	iconClass: string;
@@ -27,15 +29,22 @@ function BreakdownRow({
 	count: number;
 	rate: string;
 	muted?: boolean;
+	onClick?: () => void;
 }) {
-	return (
-		<div className="flex w-full items-center border-stroke-soft-100 border-b py-2.5 last:border-b-0 dark:border-stroke-soft-100/50">
+	const className = cn(
+		"flex w-full items-center border-stroke-soft-100 border-b py-2.5 last:border-b-0 dark:border-stroke-soft-100/50",
+		onClick && "cursor-pointer text-left",
+	);
+	const content = (
+		<>
 			<span className="flex min-w-0 flex-1 items-center gap-2">
 				<Icon name={icon} className={cn("h-3.5 w-3.5 shrink-0", iconClass)} />
 				<span
 					className={cn(
 						"truncate text-paragraph-sm",
 						muted ? "text-text-sub-600" : "text-text-strong-950",
+						onClick &&
+							"underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400",
 					)}
 				>
 					{name}
@@ -47,8 +56,18 @@ function BreakdownRow({
 			<span className="w-16 shrink-0 text-right font-medium text-paragraph-sm text-text-strong-950 tabular-nums">
 				{rate}
 			</span>
-		</div>
+		</>
 	);
+
+	if (onClick) {
+		return (
+			<button type="button" onClick={onClick} className={className}>
+				{content}
+			</button>
+		);
+	}
+
+	return <div className={className}>{content}</div>;
 }
 
 function MetricTable({
@@ -82,7 +101,13 @@ function MetricTable({
 	);
 }
 
-export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
+export function CampaignMetricsCards({
+	campaign,
+	onSelectCategory,
+}: {
+	campaign: Campaign;
+	onSelectCategory: (tab: CategoryTab) => void;
+}) {
 	const campaignId = campaign.id;
 	const [bannerDismissed, setBannerDismissed] = useState(false);
 
@@ -204,6 +229,7 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 						name="Bounced"
 						count={failed}
 						rate={bouncedPct}
+						onClick={() => onSelectCategory("bounced")}
 					/>
 					<BreakdownRow
 						icon="slash"
@@ -212,6 +238,7 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 						count={suppressedTotal}
 						rate={suppressedPct}
 						muted
+						onClick={() => onSelectCategory("suppressed")}
 					/>
 				</MetricTable>
 
@@ -222,6 +249,7 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 						name="Unsubscribed"
 						count={unsubCount}
 						rate={unsubPct}
+						onClick={() => onSelectCategory("unsubscribed")}
 					/>
 					<BreakdownRow
 						icon="alert-triangle"
@@ -229,6 +257,7 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 						name="Complained"
 						count={complaintCount}
 						rate={complaintPct}
+						onClick={() => onSelectCategory("complained")}
 					/>
 				</MetricTable>
 
@@ -254,6 +283,7 @@ export function CampaignMetricsCards({ campaign }: { campaign: Campaign }) {
 						name="Clicks"
 						count={clicked}
 						rate={clickRatePct}
+						onClick={() => onSelectCategory("clicked")}
 					/>
 				</MetricTable>
 			</div>
