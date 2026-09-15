@@ -7,10 +7,10 @@ import { fetchGetSession } from "@reloop/auth/middleware/session/fetch-get-sessi
 import { normalizeCachedContext } from "@reloop/auth/middleware/session/normalize-cached-context";
 import type { ResolveSessionOptions } from "@reloop/auth/middleware/session/resolve-session-options";
 import type { AuthContext } from "@reloop/auth/middleware/types";
+import { isUserBanned } from "@reloop/auth/user/is-banned";
 import { db } from "@reloop/db/client";
 import { user } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
-import { isUserBanned } from "@reloop/auth/user/is-banned";
 
 export async function resolveSession(
 	cookie: string | null,

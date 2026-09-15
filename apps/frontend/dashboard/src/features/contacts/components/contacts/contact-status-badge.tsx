@@ -108,10 +108,7 @@ export function ContactStatusGlyph({
 					config.text,
 				)}
 			>
-				<Icon
-					name={config.icon}
-					className={cn("size-3", config.iconClass)}
-				/>
+				<Icon name={config.icon} className={cn("size-3", config.iconClass)} />
 			</span>
 		</span>
 	);

@@ -57,7 +57,6 @@ export const getAudienceIcon = (type?: AudienceTargetType): string => {
 			return "notification-indicator";
 		case "csv":
 			return "file-text";
-		case "all":
 		default:
 			return "contacts";
 	}

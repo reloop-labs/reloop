@@ -33,15 +33,13 @@ export function PropRow({
 						type="button"
 						onClick={onReset}
 						title="Revert to inherited default"
-						className="opacity-0 transition-opacity group-hover/row:opacity-100 hover:text-text-strong-950 text-text-soft-400 cursor-pointer p-0.5 rounded focus:outline-none"
+						className="cursor-pointer rounded p-0.5 text-text-soft-400 opacity-0 transition-opacity hover:text-text-strong-950 focus:outline-none group-hover/row:opacity-100"
 					>
 						<RotateCcw className="size-3 stroke-[2]" />
 					</button>
 				)}
 			</div>
-			<div className="flex shrink-0 items-center justify-end">
-				{children}
-			</div>
+			<div className="flex shrink-0 items-center justify-end">{children}</div>
 		</div>
 	);
 }

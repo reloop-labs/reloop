@@ -26,7 +26,9 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 		if (s === "bounced") return false;
 		return (
 			s === "failed" ||
-			((s !== "sent" && s !== "delivered" && s !== "pending") &&
+			(s !== "sent" &&
+				s !== "delivered" &&
+				s !== "pending" &&
 				(!!data.errorMessage || !!data.failedAt))
 		);
 	}, [data]);

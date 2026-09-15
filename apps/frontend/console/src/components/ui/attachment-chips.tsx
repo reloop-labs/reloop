@@ -23,7 +23,7 @@ export function AttachmentChips({
 	onAttachmentClick?: (attachment: AttachmentItem) => void;
 }) {
 	if (!attachments || attachments.length === 0) {
-		return <span className="text-text-sub-600 text-[12px]">—</span>;
+		return <span className="text-[12px] text-text-sub-600">—</span>;
 	}
 
 	return (
@@ -46,7 +46,7 @@ export function AttachmentChips({
 							name="paperclip"
 							className="h-3 w-3 shrink-0 text-text-soft-400"
 						/>
-						<span className="max-w-[130px] truncate text-[11px] font-medium text-text-strong-950 dark:text-neutral-200">
+						<span className="max-w-[130px] truncate font-medium text-[11px] text-text-strong-950 dark:text-neutral-200">
 							{att.filename}
 						</span>
 						{att.size != null ? (

@@ -22,7 +22,10 @@ export async function listApiKeysController({
 	const log = controllerLog();
 	log.info("Getting API keys");
 
-	const conditions = [eq(schema.apikey.organizationId, organizationId), isNull(schema.apikey.deletedAt)];
+	const conditions = [
+		eq(schema.apikey.organizationId, organizationId),
+		isNull(schema.apikey.deletedAt),
+	];
 	if (enabled !== undefined)
 		conditions.push(eq(schema.apikey.enabled, enabled));
 	if (userId !== undefined) conditions.push(eq(schema.apikey.userId, userId));

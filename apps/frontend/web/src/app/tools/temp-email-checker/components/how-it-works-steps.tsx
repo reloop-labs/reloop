@@ -34,8 +34,8 @@ export function HowItWorksSteps() {
 					id="how-it-works-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
-					How <span className="text-primary-base">Reloop&rsquo;s</span>{" "}
-					free Temp Email Checker works:
+					How <span className="text-primary-base">Reloop&rsquo;s</span> free
+					Temp Email Checker works:
 				</h2>
 			</div>
 
@@ -45,7 +45,7 @@ export function HowItWorksSteps() {
 						key={step.title}
 						className="flex flex-col px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10"
 					>
-						<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
+						<h3 className="text-balance font-semibold text-[16px] text-text-strong-950 tracking-[-0.025em] dark:text-white">
 							{step.title}
 						</h3>
 						<p className="mt-3 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">

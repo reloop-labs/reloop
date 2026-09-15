@@ -7,8 +7,8 @@ import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
 import { PixelBlast } from "@reloop/web/components/pixel-blast";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useTheme } from "next-themes";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HeroWindowChrome } from "./hero-chrome";
 import { HeroDashboardShell } from "./hero-dashboard-shell";
@@ -223,7 +223,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 						</div>
 					</div>
 					{/* Optical offset: the CRT's 3/4 mass sits right and high of the bounding-box center. */}
-					<div className="relative z-10 lg:-translate-x-16 order-1 h-[320px] w-full sm:h-[400px] lg:order-2 lg:h-[470px] lg:translate-y-4">
+					<div className="lg:-translate-x-16 relative z-10 order-1 h-[320px] w-full sm:h-[400px] lg:order-2 lg:h-[470px] lg:translate-y-4">
 						<MacintoshHeroMonitorLazy />
 					</div>
 				</div>

@@ -2,9 +2,9 @@ import dns from "node:dns/promises";
 import net from "node:net";
 import {
 	type AuthSpfResult,
-	type DomainAuthReport,
 	checkDomainAuth,
 	cleanDomainInput,
+	type DomainAuthReport,
 	parseSpfRecord,
 } from "@be/tools/routes/tools/auth-checker/auth-checker.service";
 import { withDeadline } from "@be/tools/utils/deadline";
@@ -154,7 +154,11 @@ export const VENDOR_CATALOG: VendorCatalogEntry[] = [
 	{
 		id: "zendesk",
 		name: "Zendesk",
-		spfPatterns: [/zendesk\.com$/i, /spf\.zendesk\.com$/i, /mail\.zendesk\.com$/i],
+		spfPatterns: [
+			/zendesk\.com$/i,
+			/spf\.zendesk\.com$/i,
+			/mail\.zendesk\.com$/i,
+		],
 		dkimSelectors: ["zendesk1", "zendesk2"],
 	},
 	{
@@ -430,8 +434,12 @@ export function identifySenders(input: IdentifySendersInput): WhoSendsReport {
 					vendor: vendorMatch.name,
 					role:
 						inbox.provider &&
-						(inbox.provider.toLowerCase().includes(vendorMatch.name.toLowerCase()) ||
-							vendorMatch.name.toLowerCase().includes(inbox.provider.toLowerCase()))
+						(inbox.provider
+							.toLowerCase()
+							.includes(vendorMatch.name.toLowerCase()) ||
+							vendorMatch.name
+								.toLowerCase()
+								.includes(inbox.provider.toLowerCase()))
 							? "inbox_and_send"
 							: "send",
 					confidence: "high",
@@ -460,8 +468,12 @@ export function identifySenders(input: IdentifySendersInput): WhoSendsReport {
 					vendor: vendorMatch.name,
 					role:
 						inbox.provider &&
-						(inbox.provider.toLowerCase().includes(vendorMatch.name.toLowerCase()) ||
-							vendorMatch.name.toLowerCase().includes(inbox.provider.toLowerCase()))
+						(inbox.provider
+							.toLowerCase()
+							.includes(vendorMatch.name.toLowerCase()) ||
+							vendorMatch.name
+								.toLowerCase()
+								.includes(inbox.provider.toLowerCase()))
 							? "inbox_and_send"
 							: "send",
 					confidence: "high",
@@ -566,7 +578,9 @@ export function identifySenders(input: IdentifySendersInput): WhoSendsReport {
 	const isUnpublished = !spf.published;
 	const isIpOnly =
 		namedSenders.length === 0 &&
-		(spf.ip4.length > 0 || spf.ip6.length > 0 || remainingUnknownIncludes.length > 0);
+		(spf.ip4.length > 0 ||
+			spf.ip6.length > 0 ||
+			remainingUnknownIncludes.length > 0);
 
 	if (isWideOpen) {
 		verdict = "wide_open";
@@ -620,7 +634,8 @@ export function identifySenders(input: IdentifySendersInput): WhoSendsReport {
 	} else {
 		verdict = "unpublished";
 		headline = "No sending policy — we can’t see who is authorized";
-		summary = "The SPF record does not specify any authorized sender mechanisms.";
+		summary =
+			"The SPF record does not specify any authorized sender mechanisms.";
 	}
 
 	// Subdomain Note

@@ -427,7 +427,12 @@ export namespace ToolsModel {
 			maxLength: 255,
 			description:
 				"Domain name, hostname, IP address, or query with prefix (e.g. ohraya.com, a:ohraya.com, mx:ohraya.com).",
-			examples: ["ohraya.com", "a:ohraya.com", "mx:google.com", "txt:_dmarc.apple.com"],
+			examples: [
+				"ohraya.com",
+				"a:ohraya.com",
+				"mx:google.com",
+				"txt:_dmarc.apple.com",
+			],
 		}),
 		recordType: t.Optional(
 			t.Union([
@@ -776,7 +781,8 @@ export namespace ToolsModel {
 		domain: t.String({
 			minLength: 1,
 			maxLength: 255,
-			description: "The sending domain name or URL to analyze sender permissions for.",
+			description:
+				"The sending domain name or URL to analyze sender permissions for.",
 			examples: ["stripe.com", "github.com", "reloop.sh"],
 		}),
 	});
@@ -864,7 +870,8 @@ export namespace ToolsModel {
 		domain: t.String({
 			minLength: 1,
 			maxLength: 255,
-			description: "The domain name or URL to check registration age and email readiness for.",
+			description:
+				"The domain name or URL to check registration age and email readiness for.",
 			examples: ["google.com", "github.com", "reloop.sh"],
 		}),
 	});
@@ -932,7 +939,8 @@ export namespace ToolsModel {
 		domain: t.String({
 			minLength: 1,
 			maxLength: 255,
-			description: "The primary domain name or URL to scan for phishing lookalikes.",
+			description:
+				"The primary domain name or URL to scan for phishing lookalikes.",
 			examples: ["stripe.com", "github.com", "reloop.sh"],
 		}),
 	});
@@ -1075,25 +1083,41 @@ export namespace ToolsModel {
 			authentication: t.Object({
 				score: t.Number(),
 				weight: t.Number(),
-				status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+				status: t.Union([
+					t.Literal("pass"),
+					t.Literal("warn"),
+					t.Literal("fail"),
+				]),
 				summary: t.String(),
 			}),
 			blocklist: t.Object({
 				score: t.Number(),
 				weight: t.Number(),
-				status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+				status: t.Union([
+					t.Literal("pass"),
+					t.Literal("warn"),
+					t.Literal("fail"),
+				]),
 				summary: t.String(),
 			}),
 			domainAge: t.Object({
 				score: t.Number(),
 				weight: t.Number(),
-				status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+				status: t.Union([
+					t.Literal("pass"),
+					t.Literal("warn"),
+					t.Literal("fail"),
+				]),
 				summary: t.String(),
 			}),
 			dnsHealth: t.Object({
 				score: t.Number(),
 				weight: t.Number(),
-				status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+				status: t.Union([
+					t.Literal("pass"),
+					t.Literal("warn"),
+					t.Literal("fail"),
+				]),
 				summary: t.String(),
 			}),
 		}),
@@ -1103,14 +1127,22 @@ export namespace ToolsModel {
 					exists: t.Boolean(),
 					record: t.Optional(t.String()),
 					qualifier: t.Optional(t.String()),
-					status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+					status: t.Union([
+						t.Literal("pass"),
+						t.Literal("warn"),
+						t.Literal("fail"),
+					]),
 					detail: t.String(),
 				}),
 				dkim: t.Object({
 					detected: t.Boolean(),
 					selector: t.Optional(t.String()),
 					record: t.Optional(t.String()),
-					status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+					status: t.Union([
+						t.Literal("pass"),
+						t.Literal("warn"),
+						t.Literal("fail"),
+					]),
 					detail: t.String(),
 				}),
 				dmarc: t.Object({
@@ -1118,7 +1150,11 @@ export namespace ToolsModel {
 					record: t.Optional(t.String()),
 					policy: t.Optional(t.String()),
 					pct: t.Optional(t.Number()),
-					status: t.Union([t.Literal("pass"), t.Literal("warn"), t.Literal("fail")]),
+					status: t.Union([
+						t.Literal("pass"),
+						t.Literal("warn"),
+						t.Literal("fail"),
+					]),
 					detail: t.String(),
 				}),
 			}),

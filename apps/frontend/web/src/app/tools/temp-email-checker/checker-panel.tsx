@@ -334,7 +334,7 @@ function ResultCardDetailed({
 					name={recTone.icon}
 					className={cn("mt-0.5 size-4 shrink-0", recTone.iconClass)}
 				/>
-				<div className="flex-1 min-w-0 space-y-0.5 text-left">
+				<div className="min-w-0 flex-1 space-y-0.5 text-left">
 					<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 						Recommendation
 					</p>
@@ -462,7 +462,7 @@ export function CheckerPanel() {
 	}, []);
 
 	return (
-		<div className="mx-auto w-full max-w-xl font-sans text-left">
+		<div className="mx-auto w-full max-w-xl text-left font-sans">
 			{/* Dashboard Modal / Card Container */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top White Card: Input + Results with dynamic height morphing */}

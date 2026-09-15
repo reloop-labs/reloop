@@ -277,7 +277,7 @@ export function DeleteApiKeyModal({
 						) : (
 							<p className="text-sm text-text-sub-600 leading-relaxed">
 								This will permanently delete{" "}
-								<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-mono font-medium text-text-strong-950 text-xs dark:bg-white/[0.06]">
+								<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium font-mono text-text-strong-950 text-xs dark:bg-white/[0.06]">
 									{apiKeyToDelete?.start || apiKeyToDelete?.prefix || "rl_..."}
 								</span>
 								{apiKeyToDelete?.name ? (
@@ -320,7 +320,11 @@ export function DeleteApiKeyModal({
 												initial={{ opacity: 0, scale: 0.6 }}
 												animate={{ opacity: 1, scale: 1 }}
 												exit={{ opacity: 0, scale: 0.6 }}
-												transition={{ type: "spring", duration: 0.2, bounce: 0.3 }}
+												transition={{
+													type: "spring",
+													duration: 0.2,
+													bounce: 0.3,
+												}}
 												className="flex items-center justify-center"
 											>
 												<Icon

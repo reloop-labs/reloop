@@ -8,8 +8,12 @@ import {
 describe("Who Sends Email Service (Sender Fingerprint)", () => {
 	describe("mapSpfIncludeToVendor", () => {
 		it("maps known vendors accurately", () => {
-			expect(mapSpfIncludeToVendor("_spf.google.com")?.name).toBe("Google Workspace");
-			expect(mapSpfIncludeToVendor("spf.protection.outlook.com")?.name).toBe("Microsoft 365");
+			expect(mapSpfIncludeToVendor("_spf.google.com")?.name).toBe(
+				"Google Workspace",
+			);
+			expect(mapSpfIncludeToVendor("spf.protection.outlook.com")?.name).toBe(
+				"Microsoft 365",
+			);
 			expect(mapSpfIncludeToVendor("amazonses.com")?.name).toBe("Amazon SES");
 			expect(mapSpfIncludeToVendor("sendgrid.net")?.name).toBe("SendGrid");
 			expect(mapSpfIncludeToVendor("servers.mcsv.net")?.name).toBe("Mailchimp");
@@ -20,19 +24,29 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 
 	describe("mapDkimSelectorToVendor & ambiguous s1 handling", () => {
 		it("maps unambiguous selectors like google and k1", () => {
-			expect(mapDkimSelectorToVendor("google", new Set()).vendor?.name).toBe("Google Workspace");
-			expect(mapDkimSelectorToVendor("k1", new Set()).vendor?.name).toBe("Mailchimp");
-			expect(mapDkimSelectorToVendor("ses", new Set()).vendor?.name).toBe("Amazon SES");
+			expect(mapDkimSelectorToVendor("google", new Set()).vendor?.name).toBe(
+				"Google Workspace",
+			);
+			expect(mapDkimSelectorToVendor("k1", new Set()).vendor?.name).toBe(
+				"Mailchimp",
+			);
+			expect(mapDkimSelectorToVendor("ses", new Set()).vendor?.name).toBe(
+				"Amazon SES",
+			);
 		});
 
 		it("handles ambiguous s1 with SPF context", () => {
 			// s1 with SendGrid in SPF -> SendGrid
 			const sendgridSet = new Set(["SendGrid"]);
-			expect(mapDkimSelectorToVendor("s1", sendgridSet).vendor?.name).toBe("SendGrid");
+			expect(mapDkimSelectorToVendor("s1", sendgridSet).vendor?.name).toBe(
+				"SendGrid",
+			);
 
 			// s1 with Reloop in SPF -> Reloop
 			const reloopSet = new Set(["Reloop"]);
-			expect(mapDkimSelectorToVendor("s1", reloopSet).vendor?.name).toBe("Reloop");
+			expect(mapDkimSelectorToVendor("s1", reloopSet).vendor?.name).toBe(
+				"Reloop",
+			);
 
 			// s1 with neither in SPF -> null (ambiguous)
 			expect(mapDkimSelectorToVendor("s1", new Set()).vendor).toBeNull();
@@ -54,7 +68,8 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 					includes: ["_spf.google.com", "amazonses.com"],
 					ip4: [],
 					ip6: [],
-					rawRecord: "v=spf1 include:_spf.google.com include:amazonses.com ~all",
+					rawRecord:
+						"v=spf1 include:_spf.google.com include:amazonses.com ~all",
 				},
 				dkim: { published: false, selector: null, keyLength: null },
 			});
@@ -86,7 +101,9 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 			});
 
 			expect(report.verdict).toBe("single_stack");
-			expect(report.headline).toContain("Google Workspace receives and sends this company’s mail");
+			expect(report.headline).toContain(
+				"Google Workspace receives and sends this company’s mail",
+			);
 		});
 
 		it("Case 3: Single stack (Microsoft 365 only)", () => {
@@ -109,7 +126,9 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 			});
 
 			expect(report.verdict).toBe("single_stack");
-			expect(report.headline).toContain("Microsoft 365 receives and sends this company’s mail");
+			expect(report.headline).toContain(
+				"Microsoft 365 receives and sends this company’s mail",
+			);
 		});
 
 		it("Case 4: Crowded roster (6 services)", () => {
@@ -140,13 +159,18 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 
 			expect(report.verdict).toBe("crowded");
 			expect(report.headline).toContain("6 services can send as acme.com");
-			expect(report.senders.find((s) => s.vendor === "Mailchimp")?.leftover).toBe(true);
+			expect(
+				report.senders.find((s) => s.vendor === "Mailchimp")?.leftover,
+			).toBe(true);
 		});
 
 		it("Case 5: Nested include unrolling", () => {
 			const report = identifySenders({
 				domain: "acme.com",
-				inbox: { provider: "Google Workspace", exchanges: ["aspmx.l.google.com"] },
+				inbox: {
+					provider: "Google Workspace",
+					exchanges: ["aspmx.l.google.com"],
+				},
 				spf: {
 					published: true,
 					qualifier: "~all",
@@ -163,9 +187,9 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 			});
 
 			expect(report.senders.some((s) => s.vendor === "SendGrid")).toBe(true);
-			expect(report.senders.find((s) => s.vendor === "SendGrid")?.evidence[0]?.value).toContain(
-				"spf.acme.com → sendgrid.net",
-			);
+			expect(
+				report.senders.find((s) => s.vendor === "SendGrid")?.evidence[0]?.value,
+			).toContain("spf.acme.com → sendgrid.net");
 		});
 
 		it("Case 6: Flattened IPs (opaque)", () => {
@@ -185,14 +209,19 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 			});
 
 			expect(report.verdict).toBe("opaque");
-			expect(report.headline).toContain("Sending IPs are listed, but we can’t name the vendor");
+			expect(report.headline).toContain(
+				"Sending IPs are listed, but we can’t name the vendor",
+			);
 			expect(report.unnamed.ip4.length).toBe(2);
 		});
 
 		it("Case 8: No SPF (unpublished)", () => {
 			const report = identifySenders({
 				domain: "newdomain.com",
-				inbox: { provider: "Google Workspace", exchanges: ["aspmx.l.google.com"] },
+				inbox: {
+					provider: "Google Workspace",
+					exchanges: ["aspmx.l.google.com"],
+				},
 				spf: {
 					published: false,
 					qualifier: null,
@@ -212,7 +241,10 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 		it("Case 9: SPF +all (wide_open)", () => {
 			const report = identifySenders({
 				domain: "open.com",
-				inbox: { provider: "Google Workspace", exchanges: ["aspmx.l.google.com"] },
+				inbox: {
+					provider: "Google Workspace",
+					exchanges: ["aspmx.l.google.com"],
+				},
 				spf: {
 					published: true,
 					qualifier: "+all",
@@ -226,7 +258,9 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 			});
 
 			expect(report.verdict).toBe("wide_open");
-			expect(report.headline).toContain("Anyone on the internet is authorized to send");
+			expect(report.headline).toContain(
+				"Anyone on the internet is authorized to send",
+			);
 		});
 
 		it("Case 15: No MX with SES send (send_only)", () => {
@@ -246,7 +280,9 @@ describe("Who Sends Email Service (Sender Fingerprint)", () => {
 			});
 
 			expect(report.verdict).toBe("send_only");
-			expect(report.headline).toContain("Mail is sent via Amazon SES. This domain does not receive mail.");
+			expect(report.headline).toContain(
+				"Mail is sent via Amazon SES. This domain does not receive mail.",
+			);
 		});
 	});
 });

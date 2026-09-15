@@ -51,7 +51,7 @@ export function assertBodySize(html?: string, text?: string): void {
  * Set ALLOW_NON_LATIN_SUBJECTS=true if your platform serves those locales.
  */
 const SUSPICIOUS_SCRIPTS: Array<{ re: RegExp; name: string }> = [
-	{ re: /[\u0400-\u04FF]/u, name: "Cyrillic" },   // Russian, Ukrainian, etc.
+	{ re: /[\u0400-\u04FF]/u, name: "Cyrillic" }, // Russian, Ukrainian, etc.
 	{ re: /[\u0600-\u06FF]/u, name: "Arabic" },
 	{ re: /[\u0900-\u097F]/u, name: "Devanagari" },
 	{ re: /[\u4E00-\u9FFF]/u, name: "CJK" },
@@ -79,24 +79,68 @@ export function assertSubjectScript(subject: string): void {
 
 const DEFAULT_BRANDS = [
 	// Payment / fintech
-	"paypal", "stripe", "square", "venmo", "cashapp", "zelle",
-	"mastercard", "visa", "american express", "amex",
-	"binance", "coinbase", "kraken",
+	"paypal",
+	"stripe",
+	"square",
+	"venmo",
+	"cashapp",
+	"zelle",
+	"mastercard",
+	"visa",
+	"american express",
+	"amex",
+	"binance",
+	"coinbase",
+	"kraken",
 	// Russian-language targets (this attack)
-	"yandex", "sberbank", "tinkoff", "vk", "gosuslugi",
+	"yandex",
+	"sberbank",
+	"tinkoff",
+	"vk",
+	"gosuslugi",
 	// Big tech
-	"apple", "google", "microsoft", "amazon", "meta",
-	"facebook", "instagram", "twitter", "whatsapp",
+	"apple",
+	"google",
+	"microsoft",
+	"amazon",
+	"meta",
+	"facebook",
+	"instagram",
+	"twitter",
+	"whatsapp",
 	// Banks
-	"chase", "bank of america", "wells fargo", "citibank",
-	"hsbc", "barclays", "halifax", "natwest", "santander",
+	"chase",
+	"bank of america",
+	"wells fargo",
+	"citibank",
+	"hsbc",
+	"barclays",
+	"halifax",
+	"natwest",
+	"santander",
 	// E-commerce / logistics
-	"ebay", "aliexpress", "fedex", "ups", "dhl", "usps", "royal mail",
+	"ebay",
+	"aliexpress",
+	"fedex",
+	"ups",
+	"dhl",
+	"usps",
+	"royal mail",
 	// Government / trust signals
-	"irs", "hmrc", "gov.uk",
+	"irs",
+	"hmrc",
+	"gov.uk",
 	// Generic impersonation anchors
-	"support", "security", "helpdesk", "alert", "verify", "verification",
-	"account", "billing", "invoice", "confirm",
+	"support",
+	"security",
+	"helpdesk",
+	"alert",
+	"verify",
+	"verification",
+	"account",
+	"billing",
+	"invoice",
+	"confirm",
 ];
 
 const extraBrands = (process.env.BRAND_BLOCKLIST ?? "")
@@ -139,7 +183,7 @@ export function assertDisplayNameNotSpoofed(from: string): void {
 const SHORTENER_DOMAINS = new Set([
 	// This attack
 	"lix.li",
-	"clck.ru",   // Yandex short links
+	"clck.ru", // Yandex short links
 	"vk.cc",
 	// Common shorteners abused in phishing
 	"bit.ly",
@@ -324,7 +368,12 @@ const ALLOW_CROSS_DOMAIN_REPLY_TO =
 function extractDomain(address: string): string {
 	const bare = address.match(/<([^<>]+)>/)?.[1] ?? address;
 	const at = bare.lastIndexOf("@");
-	return at >= 0 ? bare.slice(at + 1).trim().toLowerCase() : "";
+	return at >= 0
+		? bare
+				.slice(at + 1)
+				.trim()
+				.toLowerCase()
+		: "";
 }
 
 export function assertReplyToValid(
@@ -367,21 +416,54 @@ export function assertReplyToValid(
  */
 const BLOCKED_EXTENSIONS = new Set([
 	// Executables
-	".exe", ".com", ".bat", ".cmd", ".msi", ".msp",
+	".exe",
+	".com",
+	".bat",
+	".cmd",
+	".msi",
+	".msp",
 	// Scripts
-	".js", ".jse", ".vbs", ".vbe", ".ps1", ".ps2", ".psm1", ".psd1",
-	".sh", ".bash", ".zsh", ".fish", ".py", ".rb", ".pl", ".php",
+	".js",
+	".jse",
+	".vbs",
+	".vbe",
+	".ps1",
+	".ps2",
+	".psm1",
+	".psd1",
+	".sh",
+	".bash",
+	".zsh",
+	".fish",
+	".py",
+	".rb",
+	".pl",
+	".php",
 	// Shortcuts / launchers
-	".lnk", ".url", ".scf", ".pif",
+	".lnk",
+	".url",
+	".scf",
+	".pif",
 	// Archives that could wrap any of the above
-	".iso", ".img", ".dmg",
+	".iso",
+	".img",
+	".dmg",
 	// Java
-	".jar", ".jnlp",
+	".jar",
+	".jnlp",
 	// HTA / web executables
-	".hta", ".htm", ".html", // blocked in attachment context
+	".hta",
+	".htm",
+	".html", // blocked in attachment context
 	// Macro-enabled Office (plain .docx/.xlsx/.pptx are allowed)
-	".doc", ".xls", ".ppt",
-	".docm", ".xlsm", ".pptm", ".xlam", ".xltm",
+	".doc",
+	".xls",
+	".ppt",
+	".docm",
+	".xlsm",
+	".pptm",
+	".xlam",
+	".xltm",
 ]);
 
 /**
@@ -405,9 +487,7 @@ const BLOCKED_MIME_TYPES = new Set([
 ]);
 
 export function assertAttachmentsAllowed(
-	attachments:
-		| Array<{ filename?: string; content_type?: string }>
-		| undefined,
+	attachments: Array<{ filename?: string; content_type?: string }> | undefined,
 ): void {
 	if (!attachments || attachments.length === 0) return;
 

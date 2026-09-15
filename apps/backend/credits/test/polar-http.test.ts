@@ -2,13 +2,13 @@ import { describe, expect, test } from "bun:test";
 import {
 	isPolarMissingCustomerError,
 	isPolarPaymentFailedError,
+	PolarHttpError,
 	parsePolarCheckout,
 	parsePolarCustomer,
 	parsePolarOwnerMemberId,
 	parsePolarPortal,
 	parsePolarProductRefs,
 	polarTeamCustomerCreateBody,
-	PolarHttpError,
 } from "../src/lib/polar-http";
 
 const polarProductListWithUnitBased = {
@@ -185,7 +185,11 @@ describe("isPolarMissingCustomerError", () => {
 	test("detects Polar 402 when the prorated charge fails", () => {
 		expect(
 			isPolarPaymentFailedError(
-				new PolarHttpError(402, "/v1/subscriptions/sub_1", '{"error":"PaymentFailed"}'),
+				new PolarHttpError(
+					402,
+					"/v1/subscriptions/sub_1",
+					'{"error":"PaymentFailed"}',
+				),
 			),
 		).toBe(true);
 	});

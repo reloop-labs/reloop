@@ -737,8 +737,8 @@ export function EmailDetailDrawer({
 										</div>
 									)}
 
-									{activeTab === "attachments" && (
-										email.attachments && email.attachments.length > 0 ? (
+									{activeTab === "attachments" &&
+										(email.attachments && email.attachments.length > 0 ? (
 											<ul className="divide-y divide-stroke-soft-100 overflow-hidden rounded-2xl border border-stroke-soft-100 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
 												{email.attachments.map((att, i) => (
 													<li
@@ -771,8 +771,7 @@ export function EmailDetailDrawer({
 											<div className="p-8 text-center text-[13px] text-text-sub-600">
 												No attachments on this message.
 											</div>
-										)
-									)}
+										))}
 
 									{activeTab === "timeline" && (
 										<div className="space-y-4 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/40 p-4 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">

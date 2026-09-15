@@ -1,5 +1,6 @@
 "use client";
 
+import { MarkdownRenderer } from "@fe/console/components/ui/markdown-renderer";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { useSupportSocket } from "@fe/console/hooks/use-support-socket";
 import {
@@ -35,7 +36,6 @@ import {
 	useState,
 } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
-import { MarkdownRenderer } from "@fe/console/components/ui/markdown-renderer";
 import { SupportComposer } from "./support-composer";
 import { SupportContextPanel } from "./support-context-panel";
 

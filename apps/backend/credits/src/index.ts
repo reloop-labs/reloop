@@ -10,13 +10,13 @@ import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
 import { creditsConfig } from "./credits.config";
+import { polarEnvSnapshot } from "./lib/polar";
 import { loader } from "./loader";
 import { billingRoutes } from "./routes/billing/billing.routes";
 import { creditsRoutes } from "./routes/credits/credits.routes";
 import { agentCardRoute } from "./routes/landing/agent-card.route";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
-import { polarEnvSnapshot } from "./lib/polar";
 import { polarWebhookRoute } from "./routes/webhooks/polar.route";
 
 const parseOtlpHeaders = (

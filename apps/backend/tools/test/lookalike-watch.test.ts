@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import { generateLookalikeCandidates } from "@be/tools/routes/tools/lookalike-watch/generate-candidates";
 import {
-	type LookalikeHit,
 	evaluateLookalikes,
+	type LookalikeHit,
 } from "@be/tools/routes/tools/lookalike-watch/lookalike-watch.service";
 
 describe("Lookalike Domain Watch Service", () => {
@@ -70,7 +70,9 @@ describe("Lookalike Domain Watch Service", () => {
 			const report = evaluateLookalikes("acme.com", "acme.com", hits, 60);
 
 			expect(report.verdict).toBe("mail_twins");
-			expect(report.headline).toBe("Lookalikes can send mail that looks like you");
+			expect(report.headline).toBe(
+				"Lookalikes can send mail that looks like you",
+			);
 			expect(report.hits[0]?.name).toBe("acme-login.com"); // mailCapable sorted first
 		});
 
@@ -94,7 +96,12 @@ describe("Lookalike Domain Watch Service", () => {
 		});
 
 		it("Case 3: Zero hits -> clear_scan (headline must not claim 100% safe)", () => {
-			const report = evaluateLookalikes("obscuredomain999.com", "obscuredomain999.com", [], 60);
+			const report = evaluateLookalikes(
+				"obscuredomain999.com",
+				"obscuredomain999.com",
+				[],
+				60,
+			);
 
 			expect(report.verdict).toBe("clear_scan");
 			expect(report.headline).toBe("No common lookalikes in this scan");

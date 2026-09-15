@@ -1,10 +1,10 @@
+import { FaqSection } from "@reloop/web/components/faq-section";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
-import { FaqSection } from "@reloop/web/components/faq-section";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
-import { HowItCompares } from "./components/how-it-compares";
 import { ApiIntegration } from "./components/api-integration";
+import { HowItCompares } from "./components/how-it-compares";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { SimilarTools } from "./components/similar-tools";
 import { TempEmailHero } from "./components/temp-email-hero";
@@ -34,7 +34,7 @@ export default function TempEmailCheckerPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-			<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
+		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
 			<JsonLd
 				data={[
 					{

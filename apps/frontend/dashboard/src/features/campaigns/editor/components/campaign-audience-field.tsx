@@ -3,14 +3,18 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useEffect, useId, useMemo, useRef, useState } from "react";
-import type { Channel, Group } from "#/features/contacts/hooks/use-contacts-query";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import type {
+	Channel,
+	Group,
+} from "#/features/contacts/hooks/use-contacts-query";
 import {
 	useChannelsQuery,
 	useContactsQuery,
 	useGroupContactsCountQuery,
 	useGroupsQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
+import { getAudienceIcon } from "../../utils";
 import { useCampaignEditorStore } from "../campaign-editor-store";
 import { CampaignFieldRow } from "./campaign-field-row";
 
@@ -62,9 +66,15 @@ const AudienceGroupRow = ({
 					: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
 			)}
 		>
-			<span className="truncate">{group.name}</span>
+			<div className="flex min-w-0 items-center gap-2">
+				<Icon
+					name="modules"
+					className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+				/>
+				<span className="truncate">{group.name}</span>
+			</div>
 			<div className="flex items-center gap-1.5">
-				<span className="text-[11px] font-normal text-text-soft-400">
+				<span className="font-normal text-[11px] text-text-soft-400">
 					{count.toLocaleString()} contacts
 				</span>
 				{isSelected && (
@@ -102,9 +112,15 @@ const AudienceTopicRow = ({
 					: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
 			)}
 		>
-			<span className="truncate">{channel.name}</span>
+			<div className="flex min-w-0 items-center gap-2">
+				<Icon
+					name="notification-indicator"
+					className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+				/>
+				<span className="truncate">{channel.name}</span>
+			</div>
 			<div className="flex items-center gap-1.5">
-				<span className="text-[11px] font-normal text-text-soft-400">
+				<span className="font-normal text-[11px] text-text-soft-400">
 					{count.toLocaleString()} contacts
 				</span>
 				{isSelected && (
@@ -263,8 +279,12 @@ export const CampaignAudienceField = () => {
 					aria-haspopup="listbox"
 					aria-expanded={isMenuOpen}
 					aria-controls={listboxId}
-					className="flex items-center gap-1.5 text-label-sm font-medium text-text-strong-950 hover:text-text-sub-600 outline-none cursor-pointer"
+					className="flex cursor-pointer items-center gap-1.5 font-medium text-label-sm text-text-strong-950 outline-none hover:text-text-sub-600"
 				>
+					<Icon
+						name={getAudienceIcon(audienceType)}
+						className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+					/>
 					<span>{displayLabel}</span>
 					<span className="font-normal text-text-soft-400">
 						({recipientCount.toLocaleString()}{" "}
@@ -290,10 +310,14 @@ export const CampaignAudienceField = () => {
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -4, scale: 0.98 }}
 							transition={{ duration: 0.15, ease: "easeOut" }}
-							className="absolute top-full left-0 z-50 mt-2.5 w-full min-w-[320px] max-w-[420px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200 cursor-default"
+							className="absolute top-full left-0 z-50 mt-2.5 w-full min-w-[320px] max-w-[420px] cursor-default overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
 						>
 							<div className="relative w-full">
-								<AnimatePresence initial={false} custom={direction} mode="popLayout">
+								<AnimatePresence
+									initial={false}
+									custom={direction}
+									mode="popLayout"
+								>
 									{menuView === "root" && (
 										<motion.div
 											key="root"
@@ -306,7 +330,7 @@ export const CampaignAudienceField = () => {
 												duration: SLIDE_MS,
 												ease: EASE_DEFAULT,
 											}}
-											className="flex w-full max-h-56 flex-col gap-0.5 overflow-y-auto"
+											className="flex max-h-56 w-full flex-col gap-0.5 overflow-y-auto"
 										>
 											{/* All Contacts */}
 											<button
@@ -324,13 +348,24 @@ export const CampaignAudienceField = () => {
 														: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
 												)}
 											>
-												<span className="font-medium text-text-strong-950">All Contacts</span>
+												<div className="flex items-center gap-2">
+													<Icon
+														name="contacts"
+														className="h-3.5 w-3.5 text-text-sub-600"
+													/>
+													<span className="font-medium text-text-strong-950">
+														All Contacts
+													</span>
+												</div>
 												<div className="flex items-center gap-1.5">
-													<span className="text-[11px] font-normal text-text-soft-400">
+													<span className="font-normal text-[11px] text-text-soft-400">
 														{totalContacts.toLocaleString()} contacts
 													</span>
 													{audienceType === "all" && (
-														<Icon name="check" className="h-3.5 w-3.5 text-primary-base" />
+														<Icon
+															name="check"
+															className="h-3.5 w-3.5 text-primary-base"
+														/>
 													)}
 												</div>
 											</button>
@@ -350,10 +385,19 @@ export const CampaignAudienceField = () => {
 														: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
 												)}
 											>
-												<span className="font-medium text-text-strong-950">Groups</span>
+												<div className="flex items-center gap-2">
+													<Icon
+														name="modules"
+														className="h-3.5 w-3.5 text-text-sub-600"
+													/>
+													<span className="font-medium text-text-strong-950">
+														Groups
+													</span>
+												</div>
 												<div className="flex items-center gap-1 text-text-soft-400">
-													<span className="text-[11px] font-normal">
-														{groups.length} {groups.length === 1 ? "group" : "groups"}
+													<span className="font-normal text-[11px]">
+														{groups.length}{" "}
+														{groups.length === 1 ? "group" : "groups"}
 													</span>
 													<Icon name="chevron-right" className="h-3.5 w-3.5" />
 												</div>
@@ -374,10 +418,19 @@ export const CampaignAudienceField = () => {
 														: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
 												)}
 											>
-												<span className="font-medium text-text-strong-950">Topics</span>
+												<div className="flex items-center gap-2">
+													<Icon
+														name="notification-indicator"
+														className="h-3.5 w-3.5 text-text-sub-600"
+													/>
+													<span className="font-medium text-text-strong-950">
+														Topics
+													</span>
+												</div>
 												<div className="flex items-center gap-1 text-text-soft-400">
-													<span className="text-[11px] font-normal">
-														{channels.length} {channels.length === 1 ? "topic" : "topics"}
+													<span className="font-normal text-[11px]">
+														{channels.length}{" "}
+														{channels.length === 1 ? "topic" : "topics"}
 													</span>
 													<Icon name="chevron-right" className="h-3.5 w-3.5" />
 												</div>
@@ -406,13 +459,16 @@ export const CampaignAudienceField = () => {
 													setDirection(-1);
 													setMenuView("root");
 												}}
-												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
+												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left font-semibold text-label-xs text-text-strong-950 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
 											>
-												<Icon name="arrow-left" className="h-3.5 w-3.5 text-text-soft-400" />
+												<Icon
+													name="arrow-left"
+													className="h-3.5 w-3.5 text-text-soft-400"
+												/>
 												<span>Groups</span>
 											</button>
 
-											<div className="border-stroke-soft-200 my-1 border-t dark:border-stroke-soft-100/40" />
+											<div className="my-1 border-stroke-soft-200 border-t dark:border-stroke-soft-100/40" />
 
 											<div className="max-h-56 overflow-y-auto">
 												{groups.length === 0 ? (
@@ -425,7 +481,8 @@ export const CampaignAudienceField = () => {
 															key={g.id}
 															group={g}
 															isSelected={
-																audienceType === "group" && audienceTargetId === g.id
+																audienceType === "group" &&
+																audienceTargetId === g.id
 															}
 															onSelect={() => {
 																setAudience("group", g.id, g.name);
@@ -458,14 +515,17 @@ export const CampaignAudienceField = () => {
 												onClick={() => {
 													setDirection(-1);
 													setMenuView("root");
-													}}
-												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-label-xs font-semibold text-text-strong-950 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
+												}}
+												className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-left font-semibold text-label-xs text-text-strong-950 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20"
 											>
-												<Icon name="arrow-left" className="h-3.5 w-3.5 text-text-soft-400" />
+												<Icon
+													name="arrow-left"
+													className="h-3.5 w-3.5 text-text-soft-400"
+												/>
 												<span>Topics</span>
 											</button>
 
-											<div className="border-stroke-soft-200 my-1 border-t dark:border-stroke-soft-100/40" />
+											<div className="my-1 border-stroke-soft-200 border-t dark:border-stroke-soft-100/40" />
 
 											<div className="max-h-56 overflow-y-auto">
 												{channels.length === 0 ? (

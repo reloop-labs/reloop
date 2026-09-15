@@ -82,7 +82,8 @@ describe("extractSenderMailbox", () => {
 describe("campaignListHeaders", () => {
 	test("builds RFC 8058 headers with mailto fallback and List-Id", () => {
 		const headers = campaignListHeaders({
-			oneClickUrl: "https://link.example.com/api/contacts/v1/preferences/one-click/tok",
+			oneClickUrl:
+				"https://link.example.com/api/contacts/v1/preferences/one-click/tok",
 			from: "News <news@acme.com>",
 			campaignId: "cmp_123",
 		});

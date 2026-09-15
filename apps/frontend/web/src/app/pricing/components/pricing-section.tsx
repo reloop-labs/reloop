@@ -1,5 +1,6 @@
 "use client";
 
+import * as HoverCard from "@radix-ui/react-hover-card";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -12,7 +13,6 @@ import {
 	pricingPlans,
 } from "@reloop/web/lib/pricing";
 import Link from "next/link";
-import * as HoverCard from "@radix-ui/react-hover-card";
 import { Fragment } from "react";
 
 function PlanCtaLink({
@@ -245,8 +245,7 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 function getSectionIcon(section: string, customClassName?: string) {
 	const key = section.toLowerCase().trim();
 	const className =
-		customClassName ??
-		"size-4 shrink-0 text-text-strong-950 dark:text-white";
+		customClassName ?? "size-4 shrink-0 text-text-strong-950 dark:text-white";
 
 	if (key.includes("volume")) {
 		return <Icon name="mail-single" className={className} />;
@@ -572,8 +571,7 @@ function PlanColumn({
 		selectedVolume == null || !Number.isFinite(includedVolume)
 			? 0
 			: Math.max(0, selectedVolume - includedVolume);
-	const overageCost =
-		(extraEmailCount / 1000) * paidOverageUsdPerThousand;
+	const overageCost = (extraEmailCount / 1000) * paidOverageUsdPerThousand;
 	const displayPrice =
 		!isCustom && recommended && selectedVolume != null
 			? (price ?? 0) + overageCost
@@ -751,7 +749,7 @@ function PlanCrossIcon({ className }: { className?: string }) {
 				strokeWidth="1.25"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="dark:stroke-white dark:stroke-opacity-30"
+				className="dark:stroke-opacity-30 dark:stroke-white"
 			/>
 		</svg>
 	);
@@ -862,7 +860,7 @@ function ComparisonTable({
 						<div
 							key={plan.id}
 							className={cn(
-								"sticky top-16 z-30 flex flex-col justify-center gap-7 border-stroke-soft-100 border-b border-l px-5 py-7 sm:px-6 backdrop-blur-md dark:border-white/10",
+								"sticky top-16 z-30 flex flex-col justify-center gap-7 border-stroke-soft-100 border-b border-l px-5 py-7 backdrop-blur-md sm:px-6 dark:border-white/10",
 								active
 									? "bg-bg-weak-50/95 dark:bg-white/[0.05]"
 									: "bg-bg-white-0/95 dark:bg-[#131313]/95",
@@ -912,9 +910,7 @@ function ComparisonTable({
 								))}
 							</>
 						)}
-						<div
-							className="flex items-center gap-2.5 border-stroke-soft-100 border-b px-5 pt-6 pb-3 sm:px-7 lg:px-9 dark:border-white/[0.07]"
-						>
+						<div className="flex items-center gap-2.5 border-stroke-soft-100 border-b px-5 pt-6 pb-3 sm:px-7 lg:px-9 dark:border-white/[0.07]">
 							{getSectionIcon(
 								section.title,
 								"size-4 shrink-0 text-text-strong-950 dark:text-white/80",
@@ -946,7 +942,7 @@ function ComparisonTable({
 								>
 									<HoverCard.Root openDelay={100} closeDelay={150}>
 										<HoverCard.Trigger asChild>
-											<span className="relative cursor-pointer text-body-default underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-blue-accent text-text-strong-950 dark:text-white">
+											<span className="relative cursor-pointer text-body-default text-text-strong-950 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-blue-accent dark:text-white">
 												{row.label}
 											</span>
 										</HoverCard.Trigger>
@@ -956,7 +952,7 @@ function ComparisonTable({
 												align="start"
 												sideOffset={10}
 												collisionPadding={16}
-												className="z-50 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 duration-150 outline-none"
+												className="fade-in-0 zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 animate-in outline-none duration-150 data-[state=closed]:animate-out"
 											>
 												<FeatureTooltipContent
 													label={row.label}

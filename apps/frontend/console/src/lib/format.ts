@@ -55,4 +55,3 @@ export function formatBytes(bytes: number | null | undefined): string {
 	const i = Math.floor(Math.log(bytes) / Math.log(k));
 	return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`;
 }
-

@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { useId, useState } from "react";
 import type { ReactNode } from "react";
+import { useId, useState } from "react";
 
 export type FaqItem = {
 	question: string;

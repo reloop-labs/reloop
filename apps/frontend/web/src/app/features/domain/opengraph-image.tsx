@@ -449,7 +449,8 @@ export default function OpenGraphImage() {
 							marginTop: "16px",
 						}}
 					>
-						Automated SPF, DKIM, and DMARC verification for flawless inbox delivery.
+						Automated SPF, DKIM, and DMARC verification for flawless inbox
+						delivery.
 					</div>
 				</div>
 

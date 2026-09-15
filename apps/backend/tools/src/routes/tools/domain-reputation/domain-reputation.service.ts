@@ -1,15 +1,15 @@
 import * as dns from "node:dns/promises";
 import * as tls from "node:tls";
 import {
-	type DomainAuthReport,
 	checkDomainAuth,
 	cleanDomainInput,
+	type DomainAuthReport,
 } from "@be/tools/routes/tools/auth-checker/auth-checker.service";
 import { DOMAIN_DNSBL_PROVIDERS } from "@be/tools/routes/tools/blocklist-check/dnsbl-providers";
 import { querySingleDnsbl } from "@be/tools/routes/tools/blocklist-check/dnsbl-query";
 import {
-	type DomainAgeReport,
 	checkDomainAge,
+	type DomainAgeReport,
 } from "@be/tools/routes/tools/domain-age/domain-age.service";
 
 export interface CategoryResult {
@@ -44,15 +44,39 @@ export interface DomainReputationResult {
 	};
 	details: {
 		authentication: {
-			spf: { exists: boolean; record?: string; qualifier?: string; status: "pass" | "warn" | "fail"; detail: string };
-			dkim: { detected: boolean; selector?: string; record?: string; status: "pass" | "warn" | "fail"; detail: string };
-			dmarc: { exists: boolean; record?: string; policy?: string; pct?: number; status: "pass" | "warn" | "fail"; detail: string };
+			spf: {
+				exists: boolean;
+				record?: string;
+				qualifier?: string;
+				status: "pass" | "warn" | "fail";
+				detail: string;
+			};
+			dkim: {
+				detected: boolean;
+				selector?: string;
+				record?: string;
+				status: "pass" | "warn" | "fail";
+				detail: string;
+			};
+			dmarc: {
+				exists: boolean;
+				record?: string;
+				policy?: string;
+				pct?: number;
+				status: "pass" | "warn" | "fail";
+				detail: string;
+			};
 		};
 		blocklist: {
 			cleanCount: number;
 			listedCount: number;
 			totalChecked: number;
-			listings: Array<{ zone: string; name: string; listed: boolean; returnCode?: string }>;
+			listings: Array<{
+				zone: string;
+				name: string;
+				listed: boolean;
+				returnCode?: string;
+			}>;
 		};
 		domainAge: {
 			ageDays?: number;
@@ -97,7 +121,11 @@ export function isValidDomain(domain: string): boolean {
  */
 async function checkSsl(domain: string) {
 	try {
-		return await new Promise<{ valid: boolean; daysRemaining?: number; issuer?: string }>((resolve) => {
+		return await new Promise<{
+			valid: boolean;
+			daysRemaining?: number;
+			issuer?: string;
+		}>((resolve) => {
 			const socket = tls.connect(
 				{
 					host: domain,
@@ -115,9 +143,13 @@ async function checkSsl(domain: string) {
 
 					const expiry = new Date(cert.valid_to);
 					const now = new Date();
-					const diffDays = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+					const diffDays = Math.floor(
+						(expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+					);
 					const valid = socket.authorized && diffDays > 0;
-					const issuer = cert.issuer ? (cert.issuer.O || cert.issuer.CN || "Unknown") : undefined;
+					const issuer = cert.issuer
+						? cert.issuer.O || cert.issuer.CN || "Unknown"
+						: undefined;
 
 					resolve({
 						valid,
@@ -156,8 +188,12 @@ async function queryDomainDnsbl(domain: string) {
 		),
 	);
 
-	const listedCount = results.filter((r) => r.isListed || r.status === "listed").length;
-	const cleanCount = results.filter((r) => !r.isListed && r.status !== "listed").length;
+	const listedCount = results.filter(
+		(r) => r.isListed || r.status === "listed",
+	).length;
+	const cleanCount = results.filter(
+		(r) => !r.isListed && r.status !== "listed",
+	).length;
 
 	return {
 		totalChecked: results.length,
@@ -170,33 +206,65 @@ async function queryDomainDnsbl(domain: string) {
 /**
  * Main domain reputation check function that composes auth-checker, domain-age, and blocklist services
  */
-export async function checkDomainReputation(rawInput: string): Promise<DomainReputationResult> {
+export async function checkDomainReputation(
+	rawInput: string,
+): Promise<DomainReputationResult> {
 	const startTime = Date.now();
 	const domain = normalizeDomain(rawInput);
 
 	if (!isValidDomain(domain)) {
-		throw new Error(`Invalid domain name: '${rawInput}'. Enter a valid domain like 'example.com'.`);
+		throw new Error(
+			`Invalid domain name: '${rawInput}'. Enter a valid domain like 'example.com'.`,
+		);
 	}
 
 	// Concurrently run existing domain services + TLS & DNS checks
-	const [authReport, ageReport, blocklistReport, sslInfo, aRecords, nsRecords] = await Promise.all([
-		checkDomainAuth(domain).catch(() => null as DomainAuthReport | null),
-		checkDomainAge(domain).catch(() => null as DomainAgeReport | null),
-		queryDomainDnsbl(domain).catch(() => ({ totalChecked: 0, listedCount: 0, cleanCount: 0, results: [] })),
-		checkSsl(domain),
-		dns.resolve4(domain).catch(() => [] as string[]),
-		dns.resolveNs(domain).catch(() => [] as string[]),
-	]);
+	const [authReport, ageReport, blocklistReport, sslInfo, aRecords, nsRecords] =
+		await Promise.all([
+			checkDomainAuth(domain).catch(() => null as DomainAuthReport | null),
+			checkDomainAge(domain).catch(() => null as DomainAgeReport | null),
+			queryDomainDnsbl(domain).catch(() => ({
+				totalChecked: 0,
+				listedCount: 0,
+				cleanCount: 0,
+				results: [],
+			})),
+			checkSsl(domain),
+			dns.resolve4(domain).catch(() => [] as string[]),
+			dns.resolveNs(domain).catch(() => [] as string[]),
+		]);
 
 	// 1. Process Authentication (35% weight)
 	const authScore = authReport ? authReport.score : 0;
 	const authCategoryScore = Math.min(100, Math.max(0, authScore));
 	const authStatus: "pass" | "warn" | "fail" =
-		authCategoryScore >= 75 ? "pass" : authCategoryScore >= 45 ? "warn" : "fail";
+		authCategoryScore >= 75
+			? "pass"
+			: authCategoryScore >= 45
+				? "warn"
+				: "fail";
 
-	const spfStatus = (authReport?.spf.status === "pass" ? "pass" : authReport?.spf.status === "warn" ? "warn" : "fail") as "pass" | "warn" | "fail";
-	const dkimStatus = (authReport?.dkim.status === "pass" ? "pass" : authReport?.dkim.status === "warn" ? "warn" : "fail") as "pass" | "warn" | "fail";
-	const dmarcStatus = (authReport?.dmarc.status === "pass" ? "pass" : authReport?.dmarc.status === "warn" ? "warn" : "fail") as "pass" | "warn" | "fail";
+	const spfStatus = (
+		authReport?.spf.status === "pass"
+			? "pass"
+			: authReport?.spf.status === "warn"
+				? "warn"
+				: "fail"
+	) as "pass" | "warn" | "fail";
+	const dkimStatus = (
+		authReport?.dkim.status === "pass"
+			? "pass"
+			: authReport?.dkim.status === "warn"
+				? "warn"
+				: "fail"
+	) as "pass" | "warn" | "fail";
+	const dmarcStatus = (
+		authReport?.dmarc.status === "pass"
+			? "pass"
+			: authReport?.dmarc.status === "warn"
+				? "warn"
+				: "fail"
+	) as "pass" | "warn" | "fail";
 
 	const spfSummary = authReport?.spf.published
 		? `SPF record published with qualifier '${authReport.spf.qualifier || "~all"}' (${authReport.spf.lookupCount}/10 lookups).`
@@ -230,7 +298,13 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 	}));
 
 	// 3. Process Domain Age (20% weight)
-	let ageTier: "mature" | "established" | "warming" | "young" | "new" | "unknown" = "unknown";
+	let ageTier:
+		| "mature"
+		| "established"
+		| "warming"
+		| "young"
+		| "new"
+		| "unknown" = "unknown";
 	let ageCategoryScore = 50;
 
 	if (ageReport) {
@@ -259,11 +333,16 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 	const ageStatus: "pass" | "warn" | "fail" =
 		ageCategoryScore >= 70 ? "pass" : ageCategoryScore >= 50 ? "warn" : "fail";
 
-	const ageDays = ageReport?.age.ageDays !== null && ageReport?.age.ageDays !== undefined ? ageReport.age.ageDays : undefined;
+	const ageDays =
+		ageReport?.age.ageDays !== null && ageReport?.age.ageDays !== undefined
+			? ageReport.age.ageDays
+			: undefined;
 
 	// 4. Process DNS & Infrastructure (15% weight)
 	const mxRecords = authReport?.mx.records || [];
-	const resolvedNameservers = ageReport?.nameservers.hosts.length ? ageReport.nameservers.hosts : nsRecords;
+	const resolvedNameservers = ageReport?.nameservers.hosts.length
+		? ageReport.nameservers.hosts
+		: nsRecords;
 
 	let hasPtr = false;
 	const firstARecord = aRecords[0];
@@ -288,10 +367,10 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 
 	// Overall composite score (0–100)
 	const overallScore = Math.round(
-		(authCategoryScore * 0.35) +
-		(blocklistScore * 0.30) +
-		(ageCategoryScore * 0.20) +
-		(dnsCategoryScore * 0.15),
+		authCategoryScore * 0.35 +
+			blocklistScore * 0.3 +
+			ageCategoryScore * 0.2 +
+			dnsCategoryScore * 0.15,
 	);
 
 	// Grade & Verdict
@@ -306,19 +385,23 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 	} else if (overallScore >= 80) {
 		grade = "A";
 		verdict = "good";
-		verdictLabel = "Strong reputation. Well protected against spam classification.";
+		verdictLabel =
+			"Strong reputation. Well protected against spam classification.";
 	} else if (overallScore >= 70) {
 		grade = "B";
 		verdict = "good";
-		verdictLabel = "Good reputation with minor authentication or policy recommendations.";
+		verdictLabel =
+			"Good reputation with minor authentication or policy recommendations.";
 	} else if (overallScore >= 55) {
 		grade = "C";
 		verdict = "fair";
-		verdictLabel = "Fair reputation. Vulnerable to deliverability degradation or impersonation.";
+		verdictLabel =
+			"Fair reputation. Vulnerable to deliverability degradation or impersonation.";
 	} else if (overallScore >= 40) {
 		grade = "D";
 		verdict = "poor";
-		verdictLabel = "Poor reputation. Missing critical records or flagged on blocklists.";
+		verdictLabel =
+			"Poor reputation. Missing critical records or flagged on blocklists.";
 	}
 
 	// Flat Checks List
@@ -362,7 +445,11 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 			category: "domain_age",
 			label: "Domain Age & Warmup Stage",
 			status: ageStatus,
-			detail: ageReport?.summary || (ageDays ? `Domain is ${ageDays} days old.` : "Domain age could not be verified."),
+			detail:
+				ageReport?.summary ||
+				(ageDays
+					? `Domain is ${ageDays} days old.`
+					: "Domain age could not be verified."),
 		},
 		{
 			id: "dns_mx",
@@ -408,18 +495,28 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 	if (authReport?.spf.warnings.length) {
 		for (const w of authReport.spf.warnings) recommendations.push(w);
 	} else if (!authReport?.spf.published) {
-		recommendations.push("Publish an SPF record with 'v=spf1 ... ~all' to authorize sending servers.");
+		recommendations.push(
+			"Publish an SPF record with 'v=spf1 ... ~all' to authorize sending servers.",
+		);
 	}
 
 	if (authReport?.dmarc.warnings.length) {
 		for (const w of authReport.dmarc.warnings) recommendations.push(w);
 	} else if (!authReport?.dmarc.published) {
-		recommendations.push("Add a DMARC policy at '_dmarc." + domain + "' to protect against email spoofing.");
+		recommendations.push(
+			"Add a DMARC policy at '_dmarc." +
+				domain +
+				"' to protect against email spoofing.",
+		);
 	}
 
 	if (listedCount > 0) {
-		for (const item of blocklistReport.results.filter((r) => r.isListed || r.status === "listed")) {
-			recommendations.push(`Request delisting from ${item.name} (${item.host}) after investigating recent outbound sending.`);
+		for (const item of blocklistReport.results.filter(
+			(r) => r.isListed || r.status === "listed",
+		)) {
+			recommendations.push(
+				`Request delisting from ${item.name} (${item.host}) after investigating recent outbound sending.`,
+			);
 		}
 	}
 
@@ -430,7 +527,9 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 	}
 
 	if (recommendations.length === 0) {
-		recommendations.push("All domain reputation checks passed. Maintain high sender reputation by monitoring engagement and spam complaint rates below 0.1%.");
+		recommendations.push(
+			"All domain reputation checks passed. Maintain high sender reputation by monitoring engagement and spam complaint rates below 0.1%.",
+		);
 	}
 
 	const responseTimeMs = Date.now() - startTime;
@@ -460,7 +559,10 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 				score: ageCategoryScore,
 				weight: 20,
 				status: ageStatus,
-				summary: ageDays !== undefined ? `${ageDays} days old (${ageTier})` : `Stage: ${ageTier}`,
+				summary:
+					ageDays !== undefined
+						? `${ageDays} days old (${ageTier})`
+						: `Stage: ${ageTier}`,
 			},
 			dnsHealth: {
 				score: dnsCategoryScore,
@@ -509,7 +611,10 @@ export async function checkDomainReputation(rawInput: string): Promise<DomainRep
 				detail: ageReport?.summary || "Domain age evaluation.",
 			},
 			dnsHealth: {
-				mxRecords: mxRecords.map((m) => ({ exchange: m.exchange, priority: m.priority })),
+				mxRecords: mxRecords.map((m) => ({
+					exchange: m.exchange,
+					priority: m.priority,
+				})),
 				aRecords,
 				nsRecords: resolvedNameservers,
 				hasPtr,

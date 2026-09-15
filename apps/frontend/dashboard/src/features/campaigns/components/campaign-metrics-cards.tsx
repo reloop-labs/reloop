@@ -135,7 +135,6 @@ export function CampaignMetricsCards({
 	const counts = countsQuery.data?.counts;
 	const unsubCount = counts?.unsubscribed ?? 0;
 	const complaintCount = counts?.complained ?? 0;
-	const suppressedCount = counts?.suppressed ?? 0;
 
 	const sent = campaign.sentCount ?? 0;
 	const delivered = campaign.deliveredCount ?? 0;
@@ -147,14 +146,11 @@ export function CampaignMetricsCards({
 	const openRatePct = pct2(opened, delivered);
 	const clickRatePct = pct2(clicked, delivered);
 
-	// Breakdown base: prefer sent, fall back to delivery totals
-	const base = sent > 0 ? sent : delivered + failed + suppressedCount + skipped;
+	const base = sent > 0 ? sent : delivered + failed + skipped;
 	const safeBase = base > 0 ? base : 1;
-	const suppressedTotal = suppressedCount > 0 ? suppressedCount : skipped;
 
 	const deliverabilityPct = pct2(delivered, safeBase);
 	const bouncedPct = pct2(failed, safeBase);
-	const suppressedPct = pct2(suppressedTotal, safeBase);
 	const unsubPct = pct2(unsubCount, safeBase);
 	const complaintPct = pct2(complaintCount, safeBase);
 
@@ -230,15 +226,6 @@ export function CampaignMetricsCards({
 						count={failed}
 						rate={bouncedPct}
 						onClick={() => onSelectCategory("bounced")}
-					/>
-					<BreakdownRow
-						icon="slash"
-						iconClass="text-text-sub-600"
-						name="Suppressed"
-						count={suppressedTotal}
-						rate={suppressedPct}
-						muted
-						onClick={() => onSelectCategory("suppressed")}
 					/>
 				</MetricTable>
 

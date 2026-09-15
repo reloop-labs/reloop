@@ -37,7 +37,9 @@ describe("Domain Reputation Service", () => {
 			expect(report.score).toBeGreaterThanOrEqual(0);
 			expect(report.score).toBeLessThanOrEqual(100);
 			expect(["A+", "A", "B", "C", "D", "F"]).toContain(report.grade);
-			expect(["excellent", "good", "fair", "poor", "critical"]).toContain(report.verdict);
+			expect(["excellent", "good", "fair", "poor", "critical"]).toContain(
+				report.verdict,
+			);
 
 			// Breakdowns exist
 			expect(report.breakdown.authentication).toBeDefined();

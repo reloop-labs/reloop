@@ -31,7 +31,10 @@ export function CheckerPanel() {
 
 	const abortRef = useRef<AbortController | null>(null);
 
-	const executeCheck = async (targetDomain: string, targetSelector?: string) => {
+	const executeCheck = async (
+		targetDomain: string,
+		targetSelector?: string,
+	) => {
 		const target = targetDomain.trim();
 		if (!target) return;
 
@@ -228,11 +231,18 @@ https://reloop.sh/tools/auth-checker`;
 								Automate SPF, DKIM &amp; DMARC with Reloop
 							</h3>
 							<p className="max-w-xl text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
-								1-click DNS record verification, automated key rotation, and real-time alerts when your domain records drift.
+								1-click DNS record verification, automated key rotation, and
+								real-time alerts when your domain records drift.
 							</p>
 						</div>
 
-						<Button.Root asChild variant="primary" mode="filled" size="small" className="shrink-0">
+						<Button.Root
+							asChild
+							variant="primary"
+							mode="filled"
+							size="small"
+							className="shrink-0"
+						>
 							<a href="/dashboard/signup">
 								<span>Start Free Trial</span>
 								<Button.Icon as={Icon} name="arrow-right" />
@@ -242,7 +252,7 @@ https://reloop.sh/tools/auth-checker`;
 
 					{/* Summary Header Card */}
 					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="flex flex-col justify-between gap-4 border-b border-stroke-soft-200 pb-5 sm:flex-row sm:items-center dark:border-white/10">
+						<div className="flex flex-col justify-between gap-4 border-stroke-soft-200 border-b pb-5 sm:flex-row sm:items-center dark:border-white/10">
 							<div className="flex items-center gap-3">
 								<div className="flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.06] dark:text-white">
 									<Icon name="lock" className="size-5" />
@@ -256,20 +266,29 @@ https://reloop.sh/tools/auth-checker`;
 										{/* Capsule Verdict matching Spam Score Checker */}
 										{result.verdict === "fully_aligned" && (
 											<div className="inline-flex items-center gap-1.5 rounded-full bg-success-lighter px-2.5 py-0.5 font-medium text-[12px] text-success-base dark:bg-emerald-500/10 dark:text-emerald-400">
-												<Icon name="shield-check" className="size-3.5 shrink-0" />
+												<Icon
+													name="shield-check"
+													className="size-3.5 shrink-0"
+												/>
 												<span>{result.verdictLabel}</span>
 											</div>
 										)}
 										{result.verdict === "partially_aligned" && (
 											<div className="inline-flex items-center gap-1.5 rounded-full bg-warning-lighter px-2.5 py-0.5 font-medium text-[12px] text-warning-base dark:bg-amber-500/10 dark:text-amber-400">
-												<Icon name="alert-triangle" className="size-3.5 shrink-0" />
+												<Icon
+													name="alert-triangle"
+													className="size-3.5 shrink-0"
+												/>
 												<span>{result.verdictLabel}</span>
 											</div>
 										)}
 										{(result.verdict === "misconfigured" ||
 											result.verdict === "vulnerable") && (
 											<div className="inline-flex items-center gap-1.5 rounded-full bg-error-lighter px-2.5 py-0.5 font-medium text-[12px] text-error-base dark:bg-rose-500/10 dark:text-rose-400">
-												<Icon name="minus-circle" className="size-3.5 shrink-0" />
+												<Icon
+													name="minus-circle"
+													className="size-3.5 shrink-0"
+												/>
 												<span>{result.verdictLabel}</span>
 											</div>
 										)}
@@ -277,9 +296,10 @@ https://reloop.sh/tools/auth-checker`;
 									<p className="mt-0.5 font-mono text-[12px] text-text-sub-600 dark:text-white/45">
 										MX Host:{" "}
 										<span className="text-text-strong-950 dark:text-white">
-											{result.mx.provider || (result.mx.records[0]?.exchange ?? "None")}
-										</span>
-										{" "}· Latency:{" "}
+											{result.mx.provider ||
+												(result.mx.records[0]?.exchange ?? "None")}
+										</span>{" "}
+										· Latency:{" "}
 										<span className="text-emerald-600 dark:text-emerald-400">
 											{result.responseTimeMs} ms
 										</span>
@@ -303,7 +323,9 @@ https://reloop.sh/tools/auth-checker`;
 									<span>{copied ? "Copied" : "Copy summary"}</span>
 								</Button.Root>
 
-								<Link href={`/tools/dns-lookup?domain=${encodeURIComponent(result.domain)}`}>
+								<Link
+									href={`/tools/dns-lookup?domain=${encodeURIComponent(result.domain)}`}
+								>
 									<Button.Root variant="neutral" mode="stroke" size="small">
 										<Button.Icon as={Icon} name="globe" />
 										<span>All DNS Records</span>
@@ -342,7 +364,9 @@ https://reloop.sh/tools/auth-checker`;
 									SPF Lookups
 								</span>
 								<p className="mt-1 font-mono font-semibold text-[15px] text-text-strong-950 dark:text-white">
-									{result.spf.published ? `${result.spf.lookupCount}/10 Lookups` : "Missing"}
+									{result.spf.published
+										? `${result.spf.lookupCount}/10 Lookups`
+										: "Missing"}
 								</p>
 							</div>
 
@@ -363,9 +387,12 @@ https://reloop.sh/tools/auth-checker`;
 					<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 						{/* 1. DMARC Card */}
 						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
-									<Icon name="shield-check" className="size-4 text-text-strong-950 dark:text-white" />
+									<Icon
+										name="shield-check"
+										className="size-4 text-text-strong-950 dark:text-white"
+									/>
 									<h3 className="font-semibold text-[14.5px] text-text-strong-950 dark:text-white">
 										DMARC Policy (RFC 7489)
 									</h3>
@@ -390,44 +417,57 @@ https://reloop.sh/tools/auth-checker`;
 
 							<div className="mt-3.5 space-y-3 text-[13px]">
 								{result.dmarc.rawRecord ? (
-									<div className="relative rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 font-mono text-[12px] text-text-strong-950 break-all dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
+									<div className="relative break-all rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 font-mono text-[12px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
 										{result.dmarc.rawRecord}
 										<div className="mt-2 flex justify-end">
 											<CompactButton.Root
 												type="button"
 												variant="ghost"
 												size="medium"
-												onClick={() => handleCopyValue(result.dmarc.rawRecord || "", "dmarc")}
+												onClick={() =>
+													handleCopyValue(result.dmarc.rawRecord || "", "dmarc")
+												}
 											>
 												<CompactButton.Icon
 													as={Icon}
 													name={copiedKey === "dmarc" ? "check" : "copy"}
-													className={copiedKey === "dmarc" ? "text-emerald-500" : ""}
+													className={
+														copiedKey === "dmarc" ? "text-emerald-500" : ""
+													}
 												/>
 											</CompactButton.Root>
 										</div>
 									</div>
 								) : (
 									<p className="text-text-sub-600 dark:text-white/50">
-										No TXT record found at <code className="font-mono text-[11.5px]">_dmarc.{result.domain}</code>
+										No TXT record found at{" "}
+										<code className="font-mono text-[11.5px]">
+											_dmarc.{result.domain}
+										</code>
 									</p>
 								)}
 
 								<div className="grid grid-cols-2 gap-2 text-[12px]">
 									<div>
-										<span className="text-text-sub-600 dark:text-white/45">Policy (p):</span>{" "}
+										<span className="text-text-sub-600 dark:text-white/45">
+											Policy (p):
+										</span>{" "}
 										<strong className="font-mono text-text-strong-950 dark:text-white">
 											{result.dmarc.policy || "none"}
 										</strong>
 									</div>
 									<div>
-										<span className="text-text-sub-600 dark:text-white/45">Percentage (pct):</span>{" "}
+										<span className="text-text-sub-600 dark:text-white/45">
+											Percentage (pct):
+										</span>{" "}
 										<strong className="font-mono text-text-strong-950 dark:text-white">
 											{result.dmarc.percentage ?? 100}%
 										</strong>
 									</div>
 									<div className="col-span-2 truncate">
-										<span className="text-text-sub-600 dark:text-white/45">Reports (rua):</span>{" "}
+										<span className="text-text-sub-600 dark:text-white/45">
+											Reports (rua):
+										</span>{" "}
 										<span className="font-mono text-text-strong-950 dark:text-white">
 											{result.dmarc.rua[0] || "None configured"}
 										</span>
@@ -438,9 +478,12 @@ https://reloop.sh/tools/auth-checker`;
 
 						{/* 2. SPF Card */}
 						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
-									<Icon name="mail" className="size-4 text-text-strong-950 dark:text-white" />
+									<Icon
+										name="mail"
+										className="size-4 text-text-strong-950 dark:text-white"
+									/>
 									<h3 className="font-semibold text-[14.5px] text-text-strong-950 dark:text-white">
 										SPF Authentication (RFC 7208)
 									</h3>
@@ -465,19 +508,23 @@ https://reloop.sh/tools/auth-checker`;
 
 							<div className="mt-3.5 space-y-3 text-[13px]">
 								{result.spf.rawRecord ? (
-									<div className="relative rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 font-mono text-[12px] text-text-strong-950 break-all dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
+									<div className="relative break-all rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 font-mono text-[12px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
 										{result.spf.rawRecord}
 										<div className="mt-2 flex justify-end">
 											<CompactButton.Root
 												type="button"
 												variant="ghost"
 												size="medium"
-												onClick={() => handleCopyValue(result.spf.rawRecord || "", "spf")}
+												onClick={() =>
+													handleCopyValue(result.spf.rawRecord || "", "spf")
+												}
 											>
 												<CompactButton.Icon
 													as={Icon}
 													name={copiedKey === "spf" ? "check" : "copy"}
-													className={copiedKey === "spf" ? "text-emerald-500" : ""}
+													className={
+														copiedKey === "spf" ? "text-emerald-500" : ""
+													}
 												/>
 											</CompactButton.Root>
 										</div>
@@ -490,7 +537,9 @@ https://reloop.sh/tools/auth-checker`;
 
 								<div className="grid grid-cols-2 gap-2 text-[12px]">
 									<div>
-										<span className="text-text-sub-600 dark:text-white/45">Lookup Count:</span>{" "}
+										<span className="text-text-sub-600 dark:text-white/45">
+											Lookup Count:
+										</span>{" "}
 										<strong
 											className={cn(
 												"font-mono",
@@ -503,14 +552,18 @@ https://reloop.sh/tools/auth-checker`;
 										</strong>
 									</div>
 									<div>
-										<span className="text-text-sub-600 dark:text-white/45">Qualifier:</span>{" "}
+										<span className="text-text-sub-600 dark:text-white/45">
+											Qualifier:
+										</span>{" "}
 										<strong className="font-mono text-text-strong-950 dark:text-white">
 											{result.spf.qualifier || "None"}
 										</strong>
 									</div>
 									{result.spf.includes.length > 0 && (
 										<div className="col-span-2 truncate">
-											<span className="text-text-sub-600 dark:text-white/45">Includes:</span>{" "}
+											<span className="text-text-sub-600 dark:text-white/45">
+												Includes:
+											</span>{" "}
 											<span className="font-mono text-text-strong-950 dark:text-white">
 												{result.spf.includes.join(", ")}
 											</span>
@@ -522,9 +575,12 @@ https://reloop.sh/tools/auth-checker`;
 
 						{/* 3. DKIM Card */}
 						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
-									<Icon name="key" className="size-4 text-text-strong-950 dark:text-white" />
+									<Icon
+										name="key"
+										className="size-4 text-text-strong-950 dark:text-white"
+									/>
 									<h3 className="font-semibold text-[14.5px] text-text-strong-950 dark:text-white">
 										DKIM Signature (RFC 6376)
 									</h3>
@@ -549,40 +605,51 @@ https://reloop.sh/tools/auth-checker`;
 
 							<div className="mt-3.5 space-y-3 text-[13px]">
 								{result.dkim.rawRecord ? (
-									<div className="relative rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 font-mono text-[12px] text-text-strong-950 break-all dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
+									<div className="relative break-all rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 font-mono text-[12px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
 										{result.dkim.rawRecord}
 										<div className="mt-2 flex justify-end">
 											<CompactButton.Root
 												type="button"
 												variant="ghost"
 												size="medium"
-												onClick={() => handleCopyValue(result.dkim.rawRecord || "", "dkim")}
+												onClick={() =>
+													handleCopyValue(result.dkim.rawRecord || "", "dkim")
+												}
 											>
 												<CompactButton.Icon
 													as={Icon}
 													name={copiedKey === "dkim" ? "check" : "copy"}
-													className={copiedKey === "dkim" ? "text-emerald-500" : ""}
+													className={
+														copiedKey === "dkim" ? "text-emerald-500" : ""
+													}
 												/>
 											</CompactButton.Root>
 										</div>
 									</div>
 								) : (
 									<p className="text-text-sub-600 dark:text-white/50">
-										No public key on standard selectors. Enter your specific selector in the search box above.
+										No public key on standard selectors. Enter your specific
+										selector in the search box above.
 									</p>
 								)}
 
 								<div className="grid grid-cols-2 gap-2 text-[12px]">
 									<div>
-										<span className="text-text-sub-600 dark:text-white/45">Selector:</span>{" "}
+										<span className="text-text-sub-600 dark:text-white/45">
+											Selector:
+										</span>{" "}
 										<strong className="font-mono text-text-strong-950 dark:text-white">
 											{result.dkim.selector || "None"}
 										</strong>
 									</div>
 									<div>
-										<span className="text-text-sub-600 dark:text-white/45">Key Size:</span>{" "}
+										<span className="text-text-sub-600 dark:text-white/45">
+											Key Size:
+										</span>{" "}
 										<strong className="font-mono text-text-strong-950 dark:text-white">
-											{result.dkim.keyLength ? `${result.dkim.keyLength}-bit RSA` : "Unknown"}
+											{result.dkim.keyLength
+												? `${result.dkim.keyLength}-bit RSA`
+												: "Unknown"}
 										</strong>
 									</div>
 								</div>
@@ -591,9 +658,12 @@ https://reloop.sh/tools/auth-checker`;
 
 						{/* 4. MX Routing Card */}
 						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
-									<Icon name="server" className="size-4 text-text-strong-950 dark:text-white" />
+									<Icon
+										name="server"
+										className="size-4 text-text-strong-950 dark:text-white"
+									/>
 									<h3 className="font-semibold text-[14.5px] text-text-strong-950 dark:text-white">
 										Mail Routing (MX)
 									</h3>
@@ -647,7 +717,7 @@ https://reloop.sh/tools/auth-checker`;
 
 					{/* Diagnostics List Card */}
 					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="border-b border-stroke-soft-200 px-4 py-3 sm:px-5 dark:border-white/10">
+						<div className="border-stroke-soft-200 border-b px-4 py-3 sm:px-5 dark:border-white/10">
 							<h3 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
 								Health &amp; Security Diagnostics ({result.diagnostics.length})
 							</h3>
@@ -662,16 +732,28 @@ https://reloop.sh/tools/auth-checker`;
 									<div className="flex items-start gap-3">
 										<div className="mt-0.5">
 											{diag.status === "pass" && (
-												<Icon name="check-circle" className="size-4 text-emerald-500" />
+												<Icon
+													name="check-circle"
+													className="size-4 text-emerald-500"
+												/>
 											)}
 											{diag.status === "warn" && (
-												<Icon name="alert-triangle" className="size-4 text-amber-500" />
+												<Icon
+													name="alert-triangle"
+													className="size-4 text-amber-500"
+												/>
 											)}
 											{diag.status === "fail" && (
-												<Icon name="minus-circle" className="size-4 text-rose-500" />
+												<Icon
+													name="minus-circle"
+													className="size-4 text-rose-500"
+												/>
 											)}
 											{diag.status === "info" && (
-												<Icon name="info-outline" className="size-4 text-blue-500" />
+												<Icon
+													name="info-outline"
+													className="size-4 text-blue-500"
+												/>
 											)}
 										</div>
 										<div>
@@ -697,7 +779,10 @@ https://reloop.sh/tools/auth-checker`;
 									)}
 									{diag.status === "warn" && (
 										<div className="inline-flex items-center gap-1.5 rounded-full bg-warning-lighter px-2.5 py-0.5 font-medium text-[12px] text-warning-base dark:bg-amber-500/10 dark:text-amber-400">
-											<Icon name="alert-triangle" className="size-3.5 shrink-0" />
+											<Icon
+												name="alert-triangle"
+												className="size-3.5 shrink-0"
+											/>
 											<span>Warning</span>
 										</div>
 									)}

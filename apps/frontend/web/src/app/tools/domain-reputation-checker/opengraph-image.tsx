@@ -76,7 +76,8 @@ export default function OpenGraphImage() {
 							lineHeight: 1.5,
 						}}
 					>
-						Check overall sender reputation, 0–100 health score, SPF/DKIM/DMARC auth, live DNSBL status, domain age, and DNS health.
+						Check overall sender reputation, 0–100 health score, SPF/DKIM/DMARC
+						auth, live DNSBL status, domain age, and DNS health.
 					</div>
 				</div>
 
@@ -126,10 +127,26 @@ export default function OpenGraphImage() {
 				}}
 			>
 				{[
-					{ label: "Authentication (35%)", val: "SPF / DKIM / DMARC", color: "#10b981" },
-					{ label: "Blocklists (30%)", val: "Spamhaus · URIBL · SURBL", color: "#0ea5e9" },
-					{ label: "Domain Age (20%)", val: "RDAP Maturity Analysis", color: "#8b5cf6" },
-					{ label: "DNS Health (15%)", val: "MX · NS · A · TLS", color: "#f59e0b" },
+					{
+						label: "Authentication (35%)",
+						val: "SPF / DKIM / DMARC",
+						color: "#10b981",
+					},
+					{
+						label: "Blocklists (30%)",
+						val: "Spamhaus · URIBL · SURBL",
+						color: "#0ea5e9",
+					},
+					{
+						label: "Domain Age (20%)",
+						val: "RDAP Maturity Analysis",
+						color: "#8b5cf6",
+					},
+					{
+						label: "DNS Health (15%)",
+						val: "MX · NS · A · TLS",
+						color: "#f59e0b",
+					},
 				].map((row) => (
 					<div
 						key={row.label}

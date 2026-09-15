@@ -113,20 +113,18 @@ describe("mapPolarSubscriptionStatus", () => {
 
 describe("shouldClaimOrganizationExternalCustomerId", () => {
 	test("lets the first Reloop org own a Polar customer id", () => {
-		expect(
-			shouldClaimOrganizationExternalCustomerId("org_2", null),
-		).toBe(true);
+		expect(shouldClaimOrganizationExternalCustomerId("org_2", null)).toBe(true);
 	});
 
 	test("lets an org keep its own Polar customer id", () => {
-		expect(
-			shouldClaimOrganizationExternalCustomerId("org_1", "org_1"),
-		).toBe(true);
+		expect(shouldClaimOrganizationExternalCustomerId("org_1", "org_1")).toBe(
+			true,
+		);
 	});
 
 	test("does not steal a Polar customer id already claimed by another org", () => {
-		expect(
-			shouldClaimOrganizationExternalCustomerId("org_2", "org_1"),
-		).toBe(false);
+		expect(shouldClaimOrganizationExternalCustomerId("org_2", "org_1")).toBe(
+			false,
+		);
 	});
 });

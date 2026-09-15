@@ -97,10 +97,7 @@ export function CampaignAvatar({
 					sizeConfig.inner,
 				)}
 			>
-				<Icon
-					name="mega-phone"
-					className={cn(tone.icon, sizeConfig.icon)}
-				/>
+				<Icon name="mega-phone" className={cn(tone.icon, sizeConfig.icon)} />
 			</div>
 		</div>
 	);

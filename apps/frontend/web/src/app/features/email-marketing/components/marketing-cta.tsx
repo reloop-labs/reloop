@@ -9,7 +9,9 @@ export function MarketingCta() {
 					<span className="block font-semibold text-[3rem] leading-[1.04] tracking-[-0.04em] sm:text-[4.25rem] lg:text-[5.25rem]">
 						Start now
 						<br />
-						<span className="text-orange-600 dark:text-orange-400">$0 / mo.</span>
+						<span className="text-orange-600 dark:text-orange-400">
+							$0 / mo.
+						</span>
 					</span>
 				}
 				sub="No credit card required. 3,000 emails for free."

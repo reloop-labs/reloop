@@ -3,9 +3,7 @@ import {
 	decodeTrackingToken,
 	encodeTrackingToken,
 } from "@reloop/be-mail/lib/crypto";
-import {
-	extractHostname,
-} from "@reloop/be-mail/lib/outbound-guard";
+import { extractHostname } from "@reloop/be-mail/lib/outbound-guard";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { log } from "evlog";
 
@@ -13,11 +11,29 @@ import { log } from "evlog";
 // Kept as a local inline set so tracking injection has zero extra dependencies
 // at runtime and never issues a redirect to a known phishing shortener.
 const BLOCKED_TRACKING_HOSTNAMES = new Set([
-	"lix.li", "clck.ru", "vk.cc",
-	"bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly",
-	"is.gd", "buff.ly", "rb.gy", "cutt.ly", "short.io",
-	"tiny.cc", "t2m.io", "shorte.st", "adf.ly", "t.me", "telegram.me",
-	...(process.env.BLOCKED_DOMAINS ?? "").split(",").map((d) => d.trim().toLowerCase()).filter(Boolean),
+	"lix.li",
+	"clck.ru",
+	"vk.cc",
+	"bit.ly",
+	"tinyurl.com",
+	"t.co",
+	"goo.gl",
+	"ow.ly",
+	"is.gd",
+	"buff.ly",
+	"rb.gy",
+	"cutt.ly",
+	"short.io",
+	"tiny.cc",
+	"t2m.io",
+	"shorte.st",
+	"adf.ly",
+	"t.me",
+	"telegram.me",
+	...(process.env.BLOCKED_DOMAINS ?? "")
+		.split(",")
+		.map((d) => d.trim().toLowerCase())
+		.filter(Boolean),
 ]);
 
 function isBlockedTrackingUrl(url: string): boolean {
@@ -114,15 +130,13 @@ function rewriteLinks(
 			// Strip the entire link rather than forwarding victims to a scam site.
 			if (isBlockedTrackingUrl(cleanUrl)) {
 				log.warn({
-					message: "Blocked phishing/shortener URL removed from tracking injection",
+					message:
+						"Blocked phishing/shortener URL removed from tracking injection",
 					url: cleanUrl,
 					emailLogId,
 				});
 				// Remove href entirely — link text is preserved, destination is gone
-				return match.replace(
-					/href=["'][^"']*["']/gi,
-					`href="#blocked-url"`,
-				);
+				return match.replace(/href=["'][^"']*["']/gi, `href="#blocked-url"`);
 			}
 
 			let token: string;

@@ -1,5 +1,6 @@
 export const toolPath = "/tools/who-sends";
-export const toolTitle = "Who Sends Email From This Domain? — ESP & Stack Fingerprint";
+export const toolTitle =
+	"Who Sends Email From This Domain? — ESP & Stack Fingerprint";
 export const toolDescription =
 	"Discover which email service providers (e.g. Google, Amazon SES, SendGrid, Mailchimp) are authorized to send email for any domain, and inspect their inbound mailbox routing.";
 export const metaDescription =
@@ -76,7 +77,8 @@ export const faqGroups: FaqGroup[] = [
 					"No. DNS records represent a permission authorization list, not a real-time sending log. An authorized provider may be actively sending millions of emails per day, or it may be an abandoned trial account from three years ago that was never removed from DNS.",
 			},
 			{
-				question: "What is the difference between an Inbound Mailbox and an Outbound Sender?",
+				question:
+					"What is the difference between an Inbound Mailbox and an Outbound Sender?",
 				answer:
 					"The MX (Mail Exchange) record defines who receives email (e.g. employee inboxes on Google Workspace or Microsoft 365). Outbound senders (defined in SPF and DKIM) are the third-party platforms authorized to dispatch automated transactional or marketing emails on behalf of that domain (e.g. Amazon SES, SendGrid, Reloop, Mailchimp).",
 			},

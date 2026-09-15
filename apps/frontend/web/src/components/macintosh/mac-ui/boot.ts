@@ -14,10 +14,20 @@ export interface UiState {
 	height: number;
 	windowRect: { x: number; y: number; width: number; height: number } | null;
 	trashWindowOpen: boolean;
-	trashWindowRect: { x: number; y: number; width: number; height: number } | null;
+	trashWindowRect: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} | null;
 	trashVideoOpen: boolean;
 	videoWindowOpen: boolean;
-	videoWindowRect: { x: number; y: number; width: number; height: number } | null;
+	videoWindowRect: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} | null;
 }
 
 export interface BootController {
@@ -70,7 +80,10 @@ export function createBootController({
 			}
 			const diff = bootTargetPercent - bootDisplayPercent;
 			const step = diff > 10 ? Math.ceil(diff / 5) : 1;
-			bootDisplayPercent = Math.min(bootTargetPercent, bootDisplayPercent + step);
+			bootDisplayPercent = Math.min(
+				bootTargetPercent,
+				bootDisplayPercent + step,
+			);
 			setBootState({ progress: bootDisplayPercent / 100 });
 		}, 16);
 	}
@@ -103,7 +116,7 @@ export function createBootController({
 			stage: next.stage ?? state.bootState?.stage ?? "off",
 			progress: Number.isFinite(next.progress)
 				? (next.progress as number)
-				: state.bootState?.progress ?? 0,
+				: (state.bootState?.progress ?? 0),
 		};
 		if (state.bootState.stage === "desktop") state.currentWindow = "desktop";
 		drawMacUI();

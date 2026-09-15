@@ -3,6 +3,7 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
+import { Band, SectionIntro } from "../blocklist-checker/grid";
 import { ApiSection } from "./api-section";
 import {
 	faqGroups,
@@ -15,7 +16,6 @@ import {
 	toolTitle,
 } from "./content";
 import { FaqGrid } from "./faq-grid";
-import { Band, SectionIntro } from "../blocklist-checker/grid";
 import { LookupPanel } from "./lookup-panel";
 
 export const instant = false;

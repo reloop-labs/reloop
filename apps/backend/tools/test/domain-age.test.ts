@@ -3,8 +3,8 @@ import {
 	classifyNameserverKind,
 	classifyRdapHttp,
 	evaluateColdDomain,
-	parseRdapResponse,
 	parseIanaRdapBootstrap,
+	parseRdapResponse,
 	rdapEndpointsForDomain,
 	rdapTldCandidates,
 	toRegistrableDomain,
@@ -15,13 +15,19 @@ describe("Domain Age & Warmup Checker Service", () => {
 
 	describe("Seam 1: toRegistrableDomain", () => {
 		it("normalizes subdomains and URLs to registrable root", () => {
-			expect(toRegistrableDomain("https://www.acme.com/blog").registrableDomain).toBe("acme.com");
-			expect(toRegistrableDomain("mail.acme.co.uk").registrableDomain).toBe("acme.co.uk");
+			expect(
+				toRegistrableDomain("https://www.acme.com/blog").registrableDomain,
+			).toBe("acme.com");
+			expect(toRegistrableDomain("mail.acme.co.uk").registrableDomain).toBe(
+				"acme.co.uk",
+			);
 			expect(toRegistrableDomain("mail.acme.co.uk").tld).toBe("co.uk");
 			expect(toRegistrableDomain("mail.reloop.sh").registrableDomain).toBe(
 				"reloop.sh",
 			);
-			expect(toRegistrableDomain("xn--mnchen-3ya.de").registrableDomain).toBe("xn--mnchen-3ya.de");
+			expect(toRegistrableDomain("xn--mnchen-3ya.de").registrableDomain).toBe(
+				"xn--mnchen-3ya.de",
+			);
 		});
 
 		it("throws on IP address inputs", () => {
@@ -33,9 +39,15 @@ describe("Domain Age & Warmup Checker Service", () => {
 		it("extracts creation date, expiration, registrar org, and status without leaking personal fields", () => {
 			const fixture = {
 				events: [
-					{ eventAction: "registration", eventDate: "2026-08-27T00:00:00.000Z" },
+					{
+						eventAction: "registration",
+						eventDate: "2026-08-27T00:00:00.000Z",
+					},
 					{ eventAction: "expiration", eventDate: "2027-08-27T00:00:00.000Z" },
-					{ eventAction: "last changed", eventDate: "2026-08-28T00:00:00.000Z" },
+					{
+						eventAction: "last changed",
+						eventDate: "2026-08-28T00:00:00.000Z",
+					},
 				],
 				status: ["clientTransferProhibited"],
 				entities: [
@@ -115,7 +127,11 @@ describe("Domain Age & Warmup Checker Service", () => {
 					nameservers: ["ns1.cloudflare.com"],
 				},
 				emailSetup: { spf: true, dmarc: true, dmarcPolicy: "none", mx: true },
-				nameservers: { hosts: ["ns1.cloudflare.com"], provider: "Cloudflare", kind: "production" },
+				nameservers: {
+					hosts: ["ns1.cloudflare.com"],
+					provider: "Cloudflare",
+					kind: "production",
+				},
 			});
 
 			expect(report.verdict).toBe("cold");
@@ -135,7 +151,12 @@ describe("Domain Age & Warmup Checker Service", () => {
 					registrar: "Google Domains",
 					nameservers: [],
 				},
-				emailSetup: { spf: true, dmarc: true, dmarcPolicy: "quarantine", mx: true },
+				emailSetup: {
+					spf: true,
+					dmarc: true,
+					dmarcPolicy: "quarantine",
+					mx: true,
+				},
 				nameservers: { hosts: [], provider: null, kind: "unknown" },
 			});
 
@@ -178,7 +199,11 @@ describe("Domain Age & Warmup Checker Service", () => {
 					nameservers: ["ns1.google.com"],
 				},
 				emailSetup: { spf: true, dmarc: true, dmarcPolicy: "reject", mx: true },
-				nameservers: { hosts: ["ns1.google.com"], provider: "Google Cloud", kind: "production" },
+				nameservers: {
+					hosts: ["ns1.google.com"],
+					provider: "Google Cloud",
+					kind: "production",
+				},
 			});
 
 			expect(report.verdict).toBe("mature");
@@ -338,7 +363,9 @@ describe("Domain Age & Warmup Checker Service", () => {
 			});
 
 			expect(report.verdict).toBe("mature");
-			expect(report.warnings.some((w) => w.includes("Domain expires in 10 days"))).toBe(true);
+			expect(
+				report.warnings.some((w) => w.includes("Domain expires in 10 days")),
+			).toBe(true);
 		});
 
 		it("Case 20: Parking nameservers -> classifies kind as parking and adds warning", () => {

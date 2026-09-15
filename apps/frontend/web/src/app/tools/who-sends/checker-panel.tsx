@@ -8,7 +8,7 @@ import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { type WhoSendsReport, runWhoSends } from "./check-api";
+import { runWhoSends, type WhoSendsReport } from "./check-api";
 
 const PRESETS = [
 	{ label: "stripe.com (Split)", value: "stripe.com" },
@@ -149,7 +149,8 @@ https://reloop.sh/tools/who-sends`;
 					</Button.Root>
 				</form>
 				<p className="mt-2.5 font-mono text-[11px] text-text-sub-600 dark:text-white/40">
-					We inspect public MX, SPF includes, nested delegations, and DKIM selectors. We do not send email.
+					We inspect public MX, SPF includes, nested delegations, and DKIM
+					selectors. We do not send email.
 				</p>
 			</div>
 
@@ -175,12 +176,15 @@ https://reloop.sh/tools/who-sends`;
 					{/* Top Headline Card */}
 					<div
 						className={cn(
-							"rounded-2xl border p-6 shadow-xs sm:p-7 transition-colors",
+							"rounded-2xl border p-6 shadow-xs transition-colors sm:p-7",
 							result.verdict === "wide_open" &&
 								"border-rose-500/30 bg-rose-500/[0.04] dark:border-rose-500/40 dark:bg-rose-500/[0.07]",
-							(result.verdict === "unpublished" || result.verdict === "opaque") &&
+							(result.verdict === "unpublished" ||
+								result.verdict === "opaque") &&
 								"border-amber-500/30 bg-amber-500/[0.04] dark:border-amber-500/40 dark:bg-amber-500/[0.07]",
-							(result.verdict === "split_stack" || result.verdict === "crowded" || result.verdict === "send_only") &&
+							(result.verdict === "split_stack" ||
+								result.verdict === "crowded" ||
+								result.verdict === "send_only") &&
 								"border-blue-500/30 bg-blue-500/[0.04] dark:border-blue-500/40 dark:bg-blue-500/[0.07]",
 							result.verdict === "single_stack" &&
 								"border-emerald-500/30 bg-emerald-500/[0.04] dark:border-emerald-500/40 dark:bg-emerald-500/[0.07]",
@@ -232,7 +236,7 @@ https://reloop.sh/tools/who-sends`;
 									</div>
 								)}
 
-								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 sm:text-[26px] tracking-tight dark:text-white">
+								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
 									{result.headline}
 								</h2>
 								<p className="mt-2 max-w-2xl text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/70">
@@ -259,7 +263,7 @@ https://reloop.sh/tools/who-sends`;
 						</div>
 
 						{/* Disclaimer Strip */}
-						<div className="mt-4 border-t border-stroke-soft-200/60 pt-3 dark:border-white/10 font-mono text-[11.5px] text-text-sub-600 dark:text-white/45">
+						<div className="mt-4 border-stroke-soft-200/60 border-t pt-3 font-mono text-[11.5px] text-text-sub-600 dark:border-white/10 dark:text-white/45">
 							ℹ️ {result.disclaimer}
 						</div>
 					</div>
@@ -267,10 +271,13 @@ https://reloop.sh/tools/who-sends`;
 					{/* 🏛️ The Two-Column Roster (Inbox vs. Who Can Send) */}
 					<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 						{/* Column 1: Inbound Mailbox (MX) */}
-						<div className="lg:col-span-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs lg:col-span-5 dark:border-white/10 dark:bg-[#0b0b0b]">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
-									<Icon name="mail-receive" className="size-4 text-text-strong-950 dark:text-white" />
+									<Icon
+										name="mail-receive"
+										className="size-4 text-text-strong-950 dark:text-white"
+									/>
 									<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 										Inbound Mailbox
 									</h3>
@@ -291,7 +298,10 @@ https://reloop.sh/tools/who-sends`;
 										</p>
 										<div className="mt-3 space-y-1.5 font-mono text-[11.5px]">
 											{result.inbox.exchanges.slice(0, 3).map((ex) => (
-												<div key={ex} className="truncate text-text-sub-600 dark:text-white/55">
+												<div
+													key={ex}
+													className="truncate text-text-sub-600 dark:text-white/55"
+												>
 													↳ {ex}
 												</div>
 											))}
@@ -299,7 +309,10 @@ https://reloop.sh/tools/who-sends`;
 									</div>
 								) : (
 									<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 text-center dark:border-white/10 dark:bg-white/[0.02]">
-										<Icon name="alert-triangle" className="size-5 mx-auto text-amber-500 mb-1" />
+										<Icon
+											name="alert-triangle"
+											className="mx-auto mb-1 size-5 text-amber-500"
+										/>
 										<p className="font-medium text-[13.5px] text-text-strong-950 dark:text-white">
 											No MX Records Found
 										</p>
@@ -312,10 +325,13 @@ https://reloop.sh/tools/who-sends`;
 						</div>
 
 						{/* Column 2: Who Can Send (Outbound Senders Roster) */}
-						<div className="lg:col-span-7 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs lg:col-span-7 dark:border-white/10 dark:bg-[#0b0b0b]">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
-									<Icon name="mail-send" className="size-4 text-text-strong-950 dark:text-white" />
+									<Icon
+										name="mail-send"
+										className="size-4 text-text-strong-950 dark:text-white"
+									/>
 									<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 										Who Can Send ({result.senders.length})
 									</h3>
@@ -340,25 +356,26 @@ https://reloop.sh/tools/who-sends`;
 
 													{/* Role Tag */}
 													{sender.role === "inbox_and_send" && (
-														<span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10.5px] text-emerald-600 dark:text-emerald-400 font-medium">
+														<span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium font-mono text-[10.5px] text-emerald-600 dark:text-emerald-400">
 															Inbox &amp; Send
 														</span>
 													)}
 													{sender.role === "send" && (
-														<span className="inline-flex items-center rounded-full bg-blue-500/10 px-2 py-0.5 font-mono text-[10.5px] text-blue-600 dark:text-blue-400 font-medium">
+														<span className="inline-flex items-center rounded-full bg-blue-500/10 px-2 py-0.5 font-medium font-mono text-[10.5px] text-blue-600 dark:text-blue-400">
 															Outbound ESP
 														</span>
 													)}
 													{sender.role === "dkim_only" && (
-														<span className="inline-flex items-center rounded-full bg-purple-500/10 px-2 py-0.5 font-mono text-[10.5px] text-purple-600 dark:text-purple-400 font-medium">
+														<span className="inline-flex items-center rounded-full bg-purple-500/10 px-2 py-0.5 font-medium font-mono text-[10.5px] text-purple-600 dark:text-purple-400">
 															DKIM Only
 														</span>
 													)}
 
 													{/* Leftover Tag */}
 													{sender.leftover && (
-														<span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[10.5px] text-amber-600 dark:text-amber-400 font-medium">
-															<Icon name="alert-triangle" className="size-3" /> Likely Leftover
+														<span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 font-medium font-mono text-[10.5px] text-amber-600 dark:text-amber-400">
+															<Icon name="alert-triangle" className="size-3" />{" "}
+															Likely Leftover
 														</span>
 													)}
 												</div>
@@ -379,18 +396,21 @@ https://reloop.sh/tools/who-sends`;
 										</div>
 									))
 								) : (
-									<p className="text-center py-6 text-[13px] text-text-sub-600 dark:text-white/45">
+									<p className="py-6 text-center text-[13px] text-text-sub-600 dark:text-white/45">
 										No third-party sending providers were named in public DNS.
 									</p>
 								)}
 
 								{/* Unnamed Senders Row */}
-								{(result.unnamed.ip4.length > 0 || result.unnamed.includes.length > 0) && (
+								{(result.unnamed.ip4.length > 0 ||
+									result.unnamed.includes.length > 0) && (
 									<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/25 p-3 font-mono text-[11.5px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
 										<span className="font-semibold text-text-strong-950 dark:text-white">
 											Also Authorized (Unnamed Infrastructure):{" "}
 										</span>
-										{[...result.unnamed.ip4, ...result.unnamed.includes].join(", ")}
+										{[...result.unnamed.ip4, ...result.unnamed.includes].join(
+											", ",
+										)}
 									</div>
 								)}
 							</div>
@@ -400,7 +420,7 @@ https://reloop.sh/tools/who-sends`;
 					{/* 🚀 Next Steps & Reloop Consolidation CTA */}
 					<div className="flex flex-col justify-between gap-4 rounded-2xl border border-blue-500/20 bg-blue-500/[0.04] p-5 sm:flex-row sm:items-center dark:border-blue-500/30 dark:bg-blue-500/[0.08]">
 						<div className="space-y-1">
-							<span className="font-mono text-[10.5px] text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold">
+							<span className="font-mono font-semibold text-[10.5px] text-blue-600 uppercase tracking-wider dark:text-blue-400">
 								Infrastructure Recommendation
 							</span>
 							<h3 className="font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
@@ -411,7 +431,7 @@ https://reloop.sh/tools/who-sends`;
 							</p>
 						</div>
 
-						<div className="flex flex-wrap items-center gap-2 shrink-0">
+						<div className="flex shrink-0 flex-wrap items-center gap-2">
 							<Button.Root asChild variant="primary" mode="filled" size="small">
 								<a href={result.nextStep.href}>
 									<span>Take Action</span>
@@ -419,14 +439,18 @@ https://reloop.sh/tools/who-sends`;
 								</a>
 							</Button.Root>
 
-							<Link href={`/tools/spoof-checker?domain=${encodeURIComponent(result.domain)}`}>
+							<Link
+								href={`/tools/spoof-checker?domain=${encodeURIComponent(result.domain)}`}
+							>
 								<Button.Root variant="neutral" mode="stroke" size="small">
 									<Button.Icon as={Icon} name="shield-check" />
 									<span>Spoof Checker</span>
 								</Button.Root>
 							</Link>
 
-							<Link href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}>
+							<Link
+								href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}
+							>
 								<Button.Root variant="neutral" mode="stroke" size="small">
 									<Button.Icon as={Icon} name="lock" />
 									<span>Auth Audit</span>
@@ -442,13 +466,19 @@ https://reloop.sh/tools/who-sends`;
 							onClick={() => setShowRawRecord((prev) => !prev)}
 							className="font-mono text-[12px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 						>
-							{showRawRecord ? "▲ Hide raw SPF record" : "▼ View raw SPF record for proof"}
+							{showRawRecord
+								? "▲ Hide raw SPF record"
+								: "▼ View raw SPF record for proof"}
 						</button>
 
 						{showRawRecord && (
-							<div className="mt-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 font-mono text-[11.5px] text-text-strong-950 break-all dark:border-white/10 dark:bg-white/[0.02] dark:text-white">
-								<span className="text-text-sub-600 dark:text-white/40">SPF ({result.domain}):</span>
-								<p className="mt-0.5">{result.spf.rawRecord || "No SPF record found"}</p>
+							<div className="mt-3 break-all rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 font-mono text-[11.5px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white">
+								<span className="text-text-sub-600 dark:text-white/40">
+									SPF ({result.domain}):
+								</span>
+								<p className="mt-0.5">
+									{result.spf.rawRecord || "No SPF record found"}
+								</p>
 							</div>
 						)}
 					</div>

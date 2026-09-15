@@ -25,7 +25,7 @@ export async function checkDnsHealth_step3({
 	const lastVerified = domainData.lastVerifiedAt;
 	const isRecent = lastVerified
 		? Date.now() - new Date(lastVerified).getTime() <
-		STALE_THRESHOLD_HOURS * 60 * 60 * 1000
+			STALE_THRESHOLD_HOURS * 60 * 60 * 1000
 		: false;
 
 	if (domainData.systemVerified && domainData.status === "active" && isRecent) {

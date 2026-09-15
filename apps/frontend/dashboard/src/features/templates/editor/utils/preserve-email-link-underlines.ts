@@ -150,4 +150,3 @@ export function stampFilledLinksAsEmailButtons(root: Element): void {
 		}
 	}
 }
-

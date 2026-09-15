@@ -203,7 +203,10 @@ export async function requestExportEmailController({
 		// Single-flight per org: one emailed export generating at a time.
 		const lockKey = emailLockKey(organizationId);
 		const existingLock = await redis.get<number>(lockKey);
-		if (existingLock !== undefined && contactsConfig.NODE_ENV !== "development") {
+		if (
+			existingLock !== undefined &&
+			contactsConfig.NODE_ENV !== "development"
+		) {
 			throw createError({
 				status: 429,
 				message: "Export email already in progress",

@@ -62,7 +62,7 @@ function makeRainbowAppleMaterial(
 		shader.vertexShader = shader.vertexShader
 			.replace(
 				"#include <common>",
-				`#include <common>\nvarying float vAppleCoord;`,
+				"#include <common>\nvarying float vAppleCoord;",
 			)
 			.replace(
 				"#include <begin_vertex>",

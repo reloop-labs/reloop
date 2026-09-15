@@ -29,12 +29,12 @@
 	--text-opaque-disabled: rgba(255, 255, 255, 0.25);
 	--bg-white-0: #131313;
 	--color-bg-white-0: #131313;
-	--stroke-soft-200: #1F1F1F;
-	--stroke-soft-100: #1F1F1F;
-	--color-stroke-soft-200: #1F1F1F;
-	--color-stroke-soft-100: #1F1F1F;
-	--stroke-inbox: #1F1F1F;
-	--border: #1F1F1F;
+	--stroke-soft-200: #1f1f1f;
+	--stroke-soft-100: #1f1f1f;
+	--color-stroke-soft-200: #1f1f1f;
+	--color-stroke-soft-100: #1f1f1f;
+	--stroke-inbox: #1f1f1f;
+	--border: #1f1f1f;
 }
 
 html.dark,
@@ -59,7 +59,7 @@ body.dark,
 :is(.dark, .dark *) [class*="border-stroke-soft"],
 .dark [class*="divide-stroke-soft"],
 :is(.dark, .dark *) [class*="divide-stroke-soft"] {
-	border-color: #1F1F1F !important;
+	border-color: #1f1f1f !important;
 }
 
 .text-body-default {

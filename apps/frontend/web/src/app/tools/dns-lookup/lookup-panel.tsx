@@ -83,7 +83,10 @@ export function LookupPanel() {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const abortRef = useRef<AbortController | null>(null);
 
-	const executeLookup = async (targetValue: string, recordType?: DnsRecordType) => {
+	const executeLookup = async (
+		targetValue: string,
+		recordType?: DnsRecordType,
+	) => {
 		const target = targetValue.trim();
 		if (!target) return;
 
@@ -164,7 +167,8 @@ https://reloop.sh/tools/dns-lookup`;
 
 	const filteredRecords = (result?.records || []).filter((item) => {
 		const matchesTab =
-			activeTab === "all" || item.type.toUpperCase() === activeTab.toUpperCase();
+			activeTab === "all" ||
+			item.type.toUpperCase() === activeTab.toUpperCase();
 
 		const matchesSearch =
 			!searchQuery ||
@@ -284,11 +288,18 @@ https://reloop.sh/tools/dns-lookup`;
 								Protect your sending domain reputation with Reloop
 							</h3>
 							<p className="max-w-xl text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
-								Continuous DNS monitoring, automated SPF/DKIM/DMARC alignment, and instant alerts when records drift.
+								Continuous DNS monitoring, automated SPF/DKIM/DMARC alignment,
+								and instant alerts when records drift.
 							</p>
 						</div>
 
-						<Button.Root asChild variant="primary" mode="filled" size="small" className="shrink-0">
+						<Button.Root
+							asChild
+							variant="primary"
+							mode="filled"
+							size="small"
+							className="shrink-0"
+						>
 							<a href="/dashboard/signup">
 								<span>Start Free Trial</span>
 								<Button.Icon as={Icon} name="arrow-right" />
@@ -298,7 +309,7 @@ https://reloop.sh/tools/dns-lookup`;
 
 					{/* Summary Header Card */}
 					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="flex flex-col justify-between gap-4 border-b border-stroke-soft-200 pb-5 sm:flex-row sm:items-center dark:border-white/10">
+						<div className="flex flex-col justify-between gap-4 border-stroke-soft-200 border-b pb-5 sm:flex-row sm:items-center dark:border-white/10">
 							<div className="flex items-center gap-3">
 								<div className="flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.06] dark:text-white">
 									<Icon name="globe" className="size-5" />
@@ -320,7 +331,8 @@ https://reloop.sh/tools/dns-lookup`;
 										</span>
 										{result.nameserver && (
 											<>
-												{" "}· NS:{" "}
+												{" "}
+												· NS:{" "}
 												<span className="text-text-strong-950 dark:text-white">
 													{result.nameserver}
 												</span>
@@ -346,7 +358,9 @@ https://reloop.sh/tools/dns-lookup`;
 									<span>{copied ? "Copied" : "Copy summary"}</span>
 								</Button.Root>
 
-								<Link href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}>
+								<Link
+									href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}
+								>
 									<Button.Root variant="neutral" mode="stroke" size="small">
 										<Button.Icon as={Icon} name="lock" />
 										<span>Auth Check</span>
@@ -371,7 +385,9 @@ https://reloop.sh/tools/dns-lookup`;
 									DMARC Policy
 								</span>
 								<p className="mt-1 font-mono font-semibold text-[15px] text-text-strong-950 dark:text-white">
-									{result.summary.dmarcPolicy ? `p=${result.summary.dmarcPolicy}` : "None"}
+									{result.summary.dmarcPolicy
+										? `p=${result.summary.dmarcPolicy}`
+										: "None"}
 								</p>
 							</div>
 
@@ -397,7 +413,7 @@ https://reloop.sh/tools/dns-lookup`;
 
 					{/* Health & Security Diagnostics */}
 					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="border-b border-stroke-soft-200 px-4 py-3 sm:px-5 dark:border-white/10">
+						<div className="border-stroke-soft-200 border-b px-4 py-3 sm:px-5 dark:border-white/10">
 							<h3 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
 								Health &amp; Security Diagnostics
 							</h3>
@@ -412,16 +428,28 @@ https://reloop.sh/tools/dns-lookup`;
 									<div className="flex items-start gap-3">
 										<div className="mt-0.5">
 											{diag.status === "pass" && (
-												<Icon name="check-circle" className="size-4 text-emerald-500" />
+												<Icon
+													name="check-circle"
+													className="size-4 text-emerald-500"
+												/>
 											)}
 											{diag.status === "warn" && (
-												<Icon name="alert-triangle" className="size-4 text-amber-500" />
+												<Icon
+													name="alert-triangle"
+													className="size-4 text-amber-500"
+												/>
 											)}
 											{diag.status === "fail" && (
-												<Icon name="minus-circle" className="size-4 text-rose-500" />
+												<Icon
+													name="minus-circle"
+													className="size-4 text-rose-500"
+												/>
 											)}
 											{diag.status === "info" && (
-												<Icon name="info-outline" className="size-4 text-blue-500" />
+												<Icon
+													name="info-outline"
+													className="size-4 text-blue-500"
+												/>
 											)}
 										</div>
 										<div>
@@ -447,7 +475,10 @@ https://reloop.sh/tools/dns-lookup`;
 									)}
 									{diag.status === "warn" && (
 										<div className="inline-flex items-center gap-1.5 rounded-full bg-warning-lighter px-2.5 py-0.5 font-medium text-[12px] text-warning-base dark:bg-amber-500/10 dark:text-amber-400">
-											<Icon name="alert-triangle" className="size-3.5 shrink-0" />
+											<Icon
+												name="alert-triangle"
+												className="size-3.5 shrink-0"
+											/>
 											<span>Warning</span>
 										</div>
 									)}
@@ -471,13 +502,15 @@ https://reloop.sh/tools/dns-lookup`;
 					{/* Records Table Card */}
 					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
 						{/* Table Header Controls */}
-						<div className="flex flex-col gap-3 border-b border-stroke-soft-200 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
+						<div className="flex flex-col gap-3 border-stroke-soft-200 border-b p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
 							<div className="flex flex-wrap items-center gap-1">
 								{RECORD_TABS.map((tab) => {
 									const count =
 										tab.id === "all"
 											? result.records.length
-											: result.records.filter((r) => r.type.toUpperCase() === tab.id).length;
+											: result.records.filter(
+													(r) => r.type.toUpperCase() === tab.id,
+												).length;
 									if (count === 0 && tab.id !== "all") return null;
 
 									const isActive = activeTab === tab.id;
@@ -540,11 +573,11 @@ https://reloop.sh/tools/dns-lookup`;
 							<div className="overflow-x-auto">
 								<table className="w-full text-left text-[13px]">
 									<thead>
-										<tr className="border-b border-stroke-soft-200 bg-bg-weak-50/60 font-mono text-[11px] uppercase tracking-wider text-text-sub-600 dark:border-white/10 dark:bg-white/[0.02] dark:text-white/40">
-											<th className="py-3 pl-4 pr-3">Type</th>
-											<th className="py-3 px-3">Name / Host</th>
-											<th className="py-3 px-3">Value / Target</th>
-											<th className="py-3 px-3">TTL</th>
+										<tr className="border-stroke-soft-200 border-b bg-bg-weak-50/60 font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:border-white/10 dark:bg-white/[0.02] dark:text-white/40">
+											<th className="py-3 pr-3 pl-4">Type</th>
+											<th className="px-3 py-3">Name / Host</th>
+											<th className="px-3 py-3">Value / Target</th>
+											<th className="px-3 py-3">TTL</th>
 											<th className="py-3 pr-4 pl-3 text-right">Copy</th>
 										</tr>
 									</thead>
@@ -556,20 +589,20 @@ https://reloop.sh/tools/dns-lookup`;
 													key={copyKey}
 													className="transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
 												>
-													<td className="py-3 pl-4 pr-3">
+													<td className="py-3 pr-3 pl-4">
 														<span
 															className={cn(
-																"inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[11px] font-semibold",
+																"inline-flex items-center rounded-full px-2.5 py-0.5 font-mono font-semibold text-[11px]",
 																getRecordCapsuleClass(record.type),
 															)}
 														>
 															{record.type}
 														</span>
 													</td>
-													<td className="max-w-[200px] truncate py-3 px-3 font-mono text-[12.5px] text-text-strong-950 dark:text-white">
+													<td className="max-w-[200px] truncate px-3 py-3 font-mono text-[12.5px] text-text-strong-950 dark:text-white">
 														{record.name}
 													</td>
-													<td className="max-w-[420px] py-3 px-3 font-mono text-[12.5px] text-text-strong-950 break-all dark:text-white/90">
+													<td className="max-w-[420px] break-all px-3 py-3 font-mono text-[12.5px] text-text-strong-950 dark:text-white/90">
 														{record.priority !== undefined && (
 															<span className="mr-2 inline-flex rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/10 dark:text-white/70">
 																Priority: {record.priority}
@@ -577,7 +610,7 @@ https://reloop.sh/tools/dns-lookup`;
 														)}
 														<span>{record.value}</span>
 													</td>
-													<td className="py-3 px-3 font-mono text-[12px] text-text-sub-600 dark:text-white/50">
+													<td className="px-3 py-3 font-mono text-[12px] text-text-sub-600 dark:text-white/50">
 														{formatTtl(record.ttl)}
 													</td>
 													<td className="py-3 pr-4 pl-3 text-right">
@@ -585,13 +618,19 @@ https://reloop.sh/tools/dns-lookup`;
 															type="button"
 															variant="ghost"
 															size="medium"
-															onClick={() => handleCopyValue(record.value, copyKey)}
+															onClick={() =>
+																handleCopyValue(record.value, copyKey)
+															}
 															aria-label="Copy record value"
 														>
 															<CompactButton.Icon
 																as={Icon}
 																name={copiedItem === copyKey ? "check" : "copy"}
-																className={copiedItem === copyKey ? "text-emerald-500" : ""}
+																className={
+																	copiedItem === copyKey
+																		? "text-emerald-500"
+																		: ""
+																}
 															/>
 														</CompactButton.Root>
 													</td>

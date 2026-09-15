@@ -16,6 +16,7 @@ import {
 } from "#/features/emails/detail/format-html";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import type { Campaign } from "../campaign-types";
+import { getAudienceIcon } from "../utils";
 
 export type CampaignPreviewTabId = "preview" | "plain" | "html" | "insights";
 
@@ -261,9 +262,13 @@ export function CampaignPreviewTabs({
 									<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 										To
 									</span>
-									<span className="font-medium text-paragraph-sm text-text-strong-950">
+									<span className="flex items-center gap-1.5 font-medium text-paragraph-sm text-text-strong-950">
 										{effectiveAudienceInfo ? (
 											<>
+												<Icon
+													name={getAudienceIcon(effectiveAudienceInfo.type)}
+													className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+												/>
 												{effectiveAudienceInfo.href ? (
 													<Link
 														href={effectiveAudienceInfo.href}

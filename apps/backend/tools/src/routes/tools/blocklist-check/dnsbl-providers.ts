@@ -82,8 +82,7 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: true,
 		supportsIpv6: false,
 		delistUrl: "https://mailspike.org/iplookup.html",
-		description:
-			"Mailspike zero-hour IP blocklist.",
+		description: "Mailspike zero-hour IP blocklist.",
 	},
 	{
 		id: "mailspike-z",
@@ -95,8 +94,7 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: true,
 		supportsIpv6: false,
 		delistUrl: "https://mailspike.org/iplookup.html",
-		description:
-			"Mailspike zero-hour real-time sender reputation zone.",
+		description: "Mailspike zero-hour real-time sender reputation zone.",
 	},
 	{
 		id: "hostkarma",
@@ -157,7 +155,8 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: true,
 		supportsIpv6: false,
 		delistUrl: "https://www.spamrats.com/lookup.php",
-		description: "IP addresses with missing or invalid reverse DNS (PTR) records.",
+		description:
+			"IP addresses with missing or invalid reverse DNS (PTR) records.",
 	},
 	{
 		id: "sem-black",
@@ -181,7 +180,8 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: true,
 		supportsIpv6: false,
 		delistUrl: "https://spameatingmonkey.com/lookup",
-		description: "IPs sending misdirected non-delivery reports (NDRs / backscatter).",
+		description:
+			"IPs sending misdirected non-delivery reports (NDRs / backscatter).",
 	},
 	{
 		id: "nordspam",
@@ -205,7 +205,8 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: true,
 		supportsIpv6: false,
 		delistUrl: "https://www.blocklist.de/en/search.html",
-		description: "Community-driven list of IPs attacking mail servers and web services.",
+		description:
+			"Community-driven list of IPs attacking mail servers and web services.",
 	},
 	{
 		id: "dronebl",
@@ -217,7 +218,8 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: true,
 		supportsIpv6: false,
 		delistUrl: "https://dronebl.org/lookup",
-		description: "Real-time tracking of botnets, compromised routers, open relays, and proxies.",
+		description:
+			"Real-time tracking of botnets, compromised routers, open relays, and proxies.",
 	},
 	{
 		id: "dan-tor",
@@ -241,7 +243,8 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: true,
 		supportsIpv6: false,
 		delistUrl: "https://www.dan.me.uk/torlist",
-		description: "Active Tor exit nodes that can originate outbound mail or web traffic.",
+		description:
+			"Active Tor exit nodes that can originate outbound mail or web traffic.",
 	},
 	{
 		id: "cymru-bogons",
@@ -253,7 +256,8 @@ export const IP_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: true,
 		supportsIpv6: false,
 		delistUrl: "https://www.team-cymru.com/bogon-reference",
-		description: "Unallocated and reserved IP address space that should not send public traffic.",
+		description:
+			"Unallocated and reserved IP address space that should not send public traffic.",
 	},
 	{
 		id: "fabelsources",
@@ -503,8 +507,7 @@ export const DOMAIN_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: false,
 		supportsIpv6: false,
 		delistUrl: "https://spameatingmonkey.com/lookup",
-		description:
-			"SEM URI blocklist of domains seen in spam bodies and links.",
+		description: "SEM URI blocklist of domains seen in spam bodies and links.",
 	},
 	{
 		id: "sem-fresh",
@@ -516,8 +519,7 @@ export const DOMAIN_DNSBL_PROVIDERS: DnsblProvider[] = [
 		supportsIpv4: false,
 		supportsIpv6: false,
 		delistUrl: "https://spameatingmonkey.com/lookup",
-		description:
-			"SEM list of newly registered domains (less than 5 days old).",
+		description: "SEM list of newly registered domains (less than 5 days old).",
 	},
 	{
 		id: "sem-urired",

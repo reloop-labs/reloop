@@ -53,7 +53,6 @@ export type InboundDetailData = {
 	attachments: InboundAttachment[];
 };
 
-
 export function InboundDetailDrawer({
 	emailId,
 	open,
@@ -280,7 +279,8 @@ export function InboundDetailDrawer({
 
 									{activeTab === "headers" ? (
 										<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-											{email.headers && Object.keys(email.headers).length > 0 ? (
+											{email.headers &&
+											Object.keys(email.headers).length > 0 ? (
 												<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 													{Object.entries(email.headers).map(([key, val]) => (
 														<div

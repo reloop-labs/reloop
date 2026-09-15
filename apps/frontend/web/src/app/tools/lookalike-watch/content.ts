@@ -1,5 +1,6 @@
 export const toolPath = "/tools/lookalike-watch";
-export const toolTitle = "Lookalike Domain Watch — Phishing Twin & Mail-Ready Scanner";
+export const toolTitle =
+	"Lookalike Domain Watch — Phishing Twin & Mail-Ready Scanner";
 export const toolDescription =
 	"Check whether someone has registered domains that look like yours (e.g. acme-login.com or acme.co) and whether those lookalikes have active mail servers configured to send email.";
 export const metaDescription =
@@ -116,7 +117,8 @@ export const faqGroups: FaqGroup[] = [
 		title: "Spoofing vs. Lookalike Domains",
 		items: [
 			{
-				question: "What is the difference between domain spoofing and lookalike domains?",
+				question:
+					"What is the difference between domain spoofing and lookalike domains?",
 				answer:
 					"Domain spoofing is sending an email using your exact domain (e.g. 'ceo@acme.com') without permission — this is blocked by publishing a strict DMARC 'p=reject' policy. Lookalikes are entirely separate domains registered by third parties (e.g. 'support@acme-login.com' or 'billing@acme.co'). DMARC on your real domain does not stop someone from sending from a lookalike domain.",
 			},
@@ -131,7 +133,8 @@ export const faqGroups: FaqGroup[] = [
 					"No. 'mail.acme.com' is a legitimate subdomain of your own registered domain ('acme.com'). Lookalikes are separate registered root domains such as 'acme-mail.com', 'acme.co', or 'login-acme.com'.",
 			},
 			{
-				question: "Does a 'No common lookalikes' verdict mean I am 100% safe from phishing?",
+				question:
+					"Does a 'No common lookalikes' verdict mean I am 100% safe from phishing?",
 				answer:
 					"No. This tool runs a bounded scan across top alternative TLDs, common typos, and prefix permutations. Because the number of possible domain variations on the internet is infinite, a clean scan means no common permutations were detected, not that phishing is impossible.",
 			},
@@ -141,7 +144,8 @@ export const faqGroups: FaqGroup[] = [
 		title: "Protection & Best Practices",
 		items: [
 			{
-				question: "Can I stop people from registering domains that look like mine?",
+				question:
+					"Can I stop people from registering domains that look like mine?",
 				answer:
 					"You cannot prevent third parties from registering names unless you proactively buy them first (defensive registration). If an infringing domain actively commits fraud or trademark violation, legal remedies like ICANN UDRP (Uniform Domain-Name Dispute-Resolution Policy) or registrar abuse reports can be filed.",
 			},
@@ -151,7 +155,8 @@ export const faqGroups: FaqGroup[] = [
 					"No, buying every variation is impossible and cost-prohibitive. It is best practice to defensively hold key corporate TLDs (e.g. .com, .co, .io) and primary brand login variants, and protect all outbound mail on your real domain with Reloop and DMARC enforcement.",
 			},
 			{
-				question: "Does this tool send test emails or attack the lookalike domains?",
+				question:
+					"Does this tool send test emails or attack the lookalike domains?",
 				answer:
 					"No. We never send test emails, contact domain owners, or perform invasive probing. We only query public DNS records (NS, A, MX, and TXT) across authoritative global root resolvers.",
 			},

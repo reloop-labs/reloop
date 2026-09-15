@@ -38,7 +38,11 @@ function hasButtonPaddingCss(style: string): boolean {
 	if (!style) return false;
 	const s = style.toLowerCase();
 	if (/\bpadding\s*:\s*(?!0(?:\s|px|rem|em|;|$))/.test(s)) return true;
-	if (/\bpadding-(?:top|bottom|left|right)\s*:\s*(?!0(?:\s|px|rem|em|;|$))/.test(s))
+	if (
+		/\bpadding-(?:top|bottom|left|right)\s*:\s*(?!0(?:\s|px|rem|em|;|$))/.test(
+			s,
+		)
+	)
 		return true;
 	return false;
 }
@@ -143,7 +147,9 @@ export function extractButtonFromParagraphJson(
  * into native TipTap `button` nodes.
  * Returns `true` if any nodes were converted.
  */
-export function convertFilledLinksToButtonsInJson(root: TipTapJsonNode): boolean {
+export function convertFilledLinksToButtonsInJson(
+	root: TipTapJsonNode,
+): boolean {
 	let modified = false;
 
 	function walk(node: TipTapJsonNode) {

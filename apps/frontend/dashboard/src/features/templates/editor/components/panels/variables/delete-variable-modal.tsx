@@ -172,7 +172,7 @@ export const DeleteTemplateVariableModal = ({
 						{/* Details Card */}
 						<div className="grid grid-cols-3 gap-3 rounded-xl border border-stroke-soft-200 bg-bg-soft-50 p-3.5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
 							<div>
-								<p className="font-normal text-text-sub-600 text-[11px]">
+								<p className="font-normal text-[11px] text-text-sub-600">
 									Variable name
 								</p>
 								<p className="mt-0.5 truncate font-mono font-semibold text-text-strong-950 text-xs">
@@ -182,7 +182,7 @@ export const DeleteTemplateVariableModal = ({
 								</p>
 							</div>
 							<div>
-								<p className="font-normal text-text-sub-600 text-[11px]">
+								<p className="font-normal text-[11px] text-text-sub-600">
 									Variable type
 								</p>
 								<div className="mt-0.5 flex items-center">
@@ -197,7 +197,7 @@ export const DeleteTemplateVariableModal = ({
 								</div>
 							</div>
 							<div>
-								<p className="font-normal text-text-sub-600 text-[11px]">
+								<p className="font-normal text-[11px] text-text-sub-600">
 									Default value
 								</p>
 								<p className="mt-0.5 truncate font-mono text-text-strong-950 text-xs">
@@ -207,7 +207,7 @@ export const DeleteTemplateVariableModal = ({
 						</div>
 
 						{/* Warning Banner */}
-						<div className="rounded-xl border border-amber-200/60 bg-amber-50/50 p-3 text-amber-900 text-[11px] leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/20 dark:text-amber-200">
+						<div className="rounded-xl border border-amber-200/60 bg-amber-50/50 p-3 text-[11px] text-amber-900 leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/20 dark:text-amber-200">
 							<span className="font-semibold text-amber-950 dark:text-amber-100">
 								Warning:
 							</span>{" "}
@@ -220,7 +220,7 @@ export const DeleteTemplateVariableModal = ({
 						<div className="space-y-1.5 pt-1">
 							<Label.Root
 								htmlFor="delete-variable-confirmation"
-								className="flex flex-wrap items-center gap-1.5 text-xs text-text-sub-600"
+								className="flex flex-wrap items-center gap-1.5 text-text-sub-600 text-xs"
 							>
 								<span>Type</span>
 								<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">

@@ -195,7 +195,6 @@ export function buildDisplayMessages({
 
 	const pending = optimisticReplies.filter((r) => !apiIds.has(r.id));
 	return [...base, ...extras, ...pending].sort(
-		(a, b) =>
-			new Date(a.messageAt).getTime() - new Date(b.messageAt).getTime(),
+		(a, b) => new Date(a.messageAt).getTime() - new Date(b.messageAt).getTime(),
 	);
 }

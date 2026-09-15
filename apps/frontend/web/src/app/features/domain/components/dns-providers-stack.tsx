@@ -124,7 +124,8 @@ export function DnsProvidersStack() {
 
 					<p className="mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
 						Whether you manage DNS on Cloudflare, AWS Route 53, Google Cloud, or
-						self-hosted BIND servers, Reloop validates TXT and CNAME records effortlessly.
+						self-hosted BIND servers, Reloop validates TXT and CNAME records
+						effortlessly.
 					</p>
 
 					<div className="mt-6">

@@ -122,9 +122,9 @@ describe("preserveEmailLinkUnderlines", () => {
 		expect(cssPaintedBackgroundValue("background-color:#000000")).toMatch(
 			/#000000|rgb\(0,\s*0,\s*0\)/i,
 		);
-		expect(cssHasPaintedBackground("color:#0066ff;text-decoration:underline")).toBe(
-			false,
-		);
+		expect(
+			cssHasPaintedBackground("color:#0066ff;text-decoration:underline"),
+		).toBe(false);
 	});
 
 	it("does not stamp an underlined text link as a button", () => {

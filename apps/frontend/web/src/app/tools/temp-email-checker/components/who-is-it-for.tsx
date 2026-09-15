@@ -34,12 +34,12 @@ export function WhoIsItFor() {
 					id="who-is-it-for-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
-					Who is <span className="text-primary-base">Reloop&rsquo;s</span>{" "}
-					Temp Email Checker for?
+					Who is <span className="text-primary-base">Reloop&rsquo;s</span> Temp
+					Email Checker for?
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					Anyone who needs to know if an address is real — without ever
-					probing the mailbox.
+					Anyone who needs to know if an address is real — without ever probing
+					the mailbox.
 				</p>
 			</div>
 
@@ -49,7 +49,7 @@ export function WhoIsItFor() {
 						key={audience.title}
 						className="flex flex-col px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10"
 					>
-						<h3 className="text-balance font-semibold text-text-strong-950 text-[16px] tracking-[-0.025em] dark:text-white">
+						<h3 className="text-balance font-semibold text-[16px] text-text-strong-950 tracking-[-0.025em] dark:text-white">
 							{audience.title}
 						</h3>
 						<p className="mt-3 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">

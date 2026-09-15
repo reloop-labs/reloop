@@ -33,6 +33,7 @@ export const whoSendsRoute = new Elysia()
 			tags: ["Tools"],
 			summary: "ESP & Sending Stack Fingerprint (GET)",
 			hide: true,
-			description: "Query authorized email senders via HTTP GET query parameters.",
+			description:
+				"Query authorized email senders via HTTP GET query parameters.",
 		},
 	});

@@ -2,8 +2,8 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useTheme } from "next-themes";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTheme } from "next-themes";
 import { forwardRef, useMemo, useRef, useState } from "react";
 import { useSignOut } from "#/features/auth/session-query";
 import {

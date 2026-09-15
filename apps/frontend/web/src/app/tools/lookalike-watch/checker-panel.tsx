@@ -148,7 +148,9 @@ https://reloop.sh/tools/lookalike-watch`;
 					</Button.Root>
 				</form>
 				<p className="mt-2.5 font-mono text-[11px] text-text-sub-600 dark:text-white/40">
-					We generate bounded candidate permutations (TLDs, typos, affixes, homoglyphs) and query public DNS. We never send test emails or scrape WHOIS.
+					We generate bounded candidate permutations (TLDs, typos, affixes,
+					homoglyphs) and query public DNS. We never send test emails or scrape
+					WHOIS.
 				</p>
 			</div>
 
@@ -174,7 +176,7 @@ https://reloop.sh/tools/lookalike-watch`;
 					{/* Top Headline Card */}
 					<div
 						className={cn(
-							"rounded-2xl border p-6 shadow-xs sm:p-7 transition-colors",
+							"rounded-2xl border p-6 shadow-xs transition-colors sm:p-7",
 							result.verdict === "mail_twins" &&
 								"border-rose-500/30 bg-rose-500/[0.04] dark:border-rose-500/40 dark:bg-rose-500/[0.07]",
 							result.verdict === "parked_twins" &&
@@ -205,7 +207,7 @@ https://reloop.sh/tools/lookalike-watch`;
 									</div>
 								)}
 
-								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 sm:text-[26px] tracking-tight dark:text-white">
+								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
 									{result.headline}
 								</h2>
 
@@ -233,7 +235,7 @@ https://reloop.sh/tools/lookalike-watch`;
 						</div>
 
 						{/* Disclaimer Strip */}
-						<div className="mt-4 border-t border-stroke-soft-200/60 pt-3 dark:border-white/10 font-mono text-[11.5px] text-text-sub-600 dark:text-white/45">
+						<div className="mt-4 border-stroke-soft-200/60 border-t pt-3 font-mono text-[11.5px] text-text-sub-600 dark:border-white/10 dark:text-white/45">
 							ℹ️ {result.disclaimer}
 						</div>
 					</div>
@@ -241,27 +243,31 @@ https://reloop.sh/tools/lookalike-watch`;
 					{/* 🎭 Phishing Simulation Card (Rendered if mail_twins) */}
 					{result.verdict === "mail_twins" && firstMailTwin && (
 						<div className="rounded-2xl border border-rose-500/30 bg-bg-white-0 p-5 shadow-xs dark:border-rose-500/30 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
 									<Icon name="mail" className="size-4 text-rose-500" />
 									<h3 className="font-semibold text-[14.5px] text-text-strong-950 dark:text-white">
 										Simulated Phishing Attack Vector
 									</h3>
 								</div>
-								<span className="rounded-full bg-rose-500/10 px-2.5 py-0.5 font-mono text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+								<span className="rounded-full bg-rose-500/10 px-2.5 py-0.5 font-medium font-mono text-[11px] text-rose-600 dark:text-rose-400">
 									Active Threat Vector
 								</span>
 							</div>
 
-							<div className="mt-4 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 font-mono text-[12px] space-y-1.5 dark:border-white/10 dark:bg-white/[0.02]">
+							<div className="mt-4 space-y-1.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 font-mono text-[12px] dark:border-white/10 dark:bg-white/[0.02]">
 								<div className="flex items-baseline gap-2">
-									<span className="text-text-sub-600 dark:text-white/40">From:</span>
+									<span className="text-text-sub-600 dark:text-white/40">
+										From:
+									</span>
 									<span className="font-semibold text-rose-600 dark:text-rose-400">
 										Security Support &lt;support@{firstMailTwin.name}&gt;
 									</span>
 								</div>
 								<div className="flex items-baseline gap-2">
-									<span className="text-text-sub-600 dark:text-white/40">Subject:</span>
+									<span className="text-text-sub-600 dark:text-white/40">
+										Subject:
+									</span>
 									<span className="text-text-strong-950 dark:text-white">
 										Action Required: Verify payroll &amp; login credentials
 									</span>
@@ -269,18 +275,32 @@ https://reloop.sh/tools/lookalike-watch`;
 							</div>
 
 							<p className="mt-3 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
-								Recipients see your brand name in the address and assume it is authentic. Because <code className="font-mono text-[11.5px] text-text-strong-950 dark:text-white">{firstMailTwin.name}</code> is a distinct registered domain, strict DMARC (<code className="font-mono text-[11px]">p=reject</code>) on <code className="font-mono text-[11.5px] text-text-strong-950 dark:text-white">{result.registrableDomain}</code> will <strong>not</strong> prevent delivery of this message.
+								Recipients see your brand name in the address and assume it is
+								authentic. Because{" "}
+								<code className="font-mono text-[11.5px] text-text-strong-950 dark:text-white">
+									{firstMailTwin.name}
+								</code>{" "}
+								is a distinct registered domain, strict DMARC (
+								<code className="font-mono text-[11px]">p=reject</code>) on{" "}
+								<code className="font-mono text-[11.5px] text-text-strong-950 dark:text-white">
+									{result.registrableDomain}
+								</code>{" "}
+								will <strong>not</strong> prevent delivery of this message.
 							</p>
 						</div>
 					)}
 
 					{/* 📋 Roster of Detected Lookalikes */}
 					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+						<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 							<div className="flex items-center gap-2">
-								<Icon name="server" className="size-4 text-text-strong-950 dark:text-white" />
+								<Icon
+									name="server"
+									className="size-4 text-text-strong-950 dark:text-white"
+								/>
 								<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
-									Detected Lookalike Domains ({result.hits.length} of {result.scanned} scanned)
+									Detected Lookalike Domains ({result.hits.length} of{" "}
+									{result.scanned} scanned)
 								</h3>
 							</div>
 							<span className="font-mono text-[11px] text-text-sub-600 dark:text-white/40">
@@ -290,12 +310,16 @@ https://reloop.sh/tools/lookalike-watch`;
 
 						{result.hits.length === 0 ? (
 							<div className="py-8 text-center">
-								<Icon name="shield-check" className="mx-auto size-8 text-emerald-500/80" />
+								<Icon
+									name="shield-check"
+									className="mx-auto size-8 text-emerald-500/80"
+								/>
 								<p className="mt-2 font-medium text-[14px] text-text-strong-950 dark:text-white">
 									No common lookalike domains were active in this scan.
 								</p>
 								<p className="mt-1 text-[12.5px] text-text-sub-600 dark:text-white/50">
-									Tested {result.scanned} permutations across alternate TLDs, common hyphens, typos, and homoglyphs.
+									Tested {result.scanned} permutations across alternate TLDs,
+									common hyphens, typos, and homoglyphs.
 								</p>
 							</div>
 						) : (
@@ -307,7 +331,7 @@ https://reloop.sh/tools/lookalike-watch`;
 									>
 										<div className="min-w-0">
 											<div className="flex flex-wrap items-center gap-2">
-												<span className="font-mono font-medium text-[13.5px] text-text-strong-950 dark:text-white">
+												<span className="font-medium font-mono text-[13.5px] text-text-strong-950 dark:text-white">
 													{hit.name}
 												</span>
 												{hit.unicodeName && (
@@ -348,7 +372,7 @@ https://reloop.sh/tools/lookalike-watch`;
 
 										<div className="flex shrink-0 items-center gap-2">
 											{hit.mailCapable ? (
-												<span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-1 font-mono text-[11px] font-medium text-rose-600 dark:text-rose-400">
+												<span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-1 font-medium font-mono text-[11px] text-rose-600 dark:text-rose-400">
 													<Icon name="alert-triangle" className="size-3" />
 													Can Send Mail
 												</span>
@@ -367,7 +391,7 @@ https://reloop.sh/tools/lookalike-watch`;
 					{/* 🛡️ Next Steps & Action Recommendation */}
 					<div className="flex flex-col justify-between gap-4 rounded-2xl border border-blue-500/20 bg-blue-500/[0.04] p-5 sm:flex-row sm:items-center dark:border-blue-500/30 dark:bg-blue-500/[0.08]">
 						<div className="space-y-1">
-							<span className="font-mono text-[10.5px] text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold">
+							<span className="font-mono font-semibold text-[10.5px] text-blue-600 uppercase tracking-wider dark:text-blue-400">
 								Defense Recommendation
 							</span>
 							<h3 className="font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
@@ -378,7 +402,7 @@ https://reloop.sh/tools/lookalike-watch`;
 							</p>
 						</div>
 
-						<div className="flex flex-wrap items-center gap-2 shrink-0">
+						<div className="flex shrink-0 flex-wrap items-center gap-2">
 							<Button.Root asChild variant="primary" mode="filled" size="small">
 								<a href={result.nextStep.href}>
 									<span>Get Protected</span>
@@ -386,14 +410,18 @@ https://reloop.sh/tools/lookalike-watch`;
 								</a>
 							</Button.Root>
 
-							<Link href={`/tools/spoof-checker?domain=${encodeURIComponent(result.domain)}`}>
+							<Link
+								href={`/tools/spoof-checker?domain=${encodeURIComponent(result.domain)}`}
+							>
 								<Button.Root variant="neutral" mode="stroke" size="small">
 									<Button.Icon as={Icon} name="shield-check" />
 									<span>Spoof Checker</span>
 								</Button.Root>
 							</Link>
 
-							<Link href={`/tools/domain-age?domain=${encodeURIComponent(result.domain)}`}>
+							<Link
+								href={`/tools/domain-age?domain=${encodeURIComponent(result.domain)}`}
+							>
 								<Button.Root variant="neutral" mode="stroke" size="small">
 									<Button.Icon as={Icon} name="globe" />
 									<span>Domain Age</span>

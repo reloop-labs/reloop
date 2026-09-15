@@ -200,7 +200,7 @@ export function EditPropertyForm({
 								>
 									{nameLabel}
 								</Label.Root>
-								<span className="font-normal text-text-sub-600 text-[11px]">
+								<span className="font-normal text-[11px] text-text-sub-600">
 									(Cannot be edited)
 								</span>
 							</div>
@@ -264,7 +264,7 @@ export function EditPropertyForm({
 								</Input.Wrapper>
 							</Input.Root>
 							{fallbackValueError ? (
-								<p className="text-error-base text-[11px]">
+								<p className="text-[11px] text-error-base">
 									{fallbackValueError}
 								</p>
 							) : (

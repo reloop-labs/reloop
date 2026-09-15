@@ -13,7 +13,8 @@ const RECORD_CYCLES = [
 		name: "rl._domainkey.acme.com",
 		value: "k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQ...",
 		status: "Verified",
-		badgeColor: "text-emerald-600 bg-emerald-500/10 border-emerald-500/20 dark:text-emerald-400",
+		badgeColor:
+			"text-emerald-600 bg-emerald-500/10 border-emerald-500/20 dark:text-emerald-400",
 		description: "2048-bit RSA key cryptographic identity signature",
 	},
 	{
@@ -21,7 +22,8 @@ const RECORD_CYCLES = [
 		name: "acme.com",
 		value: "v=spf1 include:_spf.reloop.sh ~all",
 		status: "Aligned",
-		badgeColor: "text-blue-600 bg-blue-500/10 border-blue-500/20 dark:text-blue-400",
+		badgeColor:
+			"text-blue-600 bg-blue-500/10 border-blue-500/20 dark:text-blue-400",
 		description: "Authorizes Reloop edge MTAs to deliver from your domain",
 	},
 	{
@@ -29,7 +31,8 @@ const RECORD_CYCLES = [
 		name: "_dmarc.acme.com",
 		value: "v=DMARC1; p=reject; rua=mailto:dmarc@reloop.sh",
 		status: "Enforced",
-		badgeColor: "text-purple-600 bg-purple-500/10 border-purple-500/20 dark:text-purple-400",
+		badgeColor:
+			"text-purple-600 bg-purple-500/10 border-purple-500/20 dark:text-purple-400",
 		description: "Strict policy protecting against sender spoofing & phishing",
 	},
 	{
@@ -37,7 +40,8 @@ const RECORD_CYCLES = [
 		name: "mail.acme.com",
 		value: "CNAME bounce.reloop.sh",
 		status: "Custom Mail-From",
-		badgeColor: "text-amber-600 bg-amber-500/10 border-amber-500/20 dark:text-amber-400",
+		badgeColor:
+			"text-amber-600 bg-amber-500/10 border-amber-500/20 dark:text-amber-400",
 		description: "Custom envelope domain to eliminate 'via reloop.sh' warnings",
 	},
 ] as const;
@@ -85,8 +89,9 @@ export function DomainPreviewSection() {
 								Provision &amp; verify domains via API.
 							</h3>
 							<p className="mt-2.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] lg:text-[15px] dark:text-white/60">
-								Automate domain provisioning in CI/CD pipelines, multi-tenant SaaS
-								apps, and agentic workflows with our TypeScript SDK and CLI.
+								Automate domain provisioning in CI/CD pipelines, multi-tenant
+								SaaS apps, and agentic workflows with our TypeScript SDK and
+								CLI.
 							</p>
 
 							<div className="mt-6 flex flex-wrap items-center gap-2">
@@ -159,7 +164,8 @@ export function DomainPreviewSection() {
 							</h3>
 							<p className="mt-2.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] lg:text-[15px] dark:text-white/60">
 								Zero DNS guesswork. Reloop validates name servers, checks
-								propagation across global resolvers, and flags misconfigurations instantly.
+								propagation across global resolvers, and flags misconfigurations
+								instantly.
 							</p>
 						</div>
 

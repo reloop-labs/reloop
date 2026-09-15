@@ -38,13 +38,17 @@ function CodeBlockWithCopy({
 					aria-label="Copy code"
 					className={cn(
 						"absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded transition-opacity",
-						"opacity-0 group-hover/code:opacity-100 focus:opacity-100",
+						"opacity-0 focus:opacity-100 group-hover/code:opacity-100",
 						mine
 							? "bg-white/20 text-white hover:bg-white/30"
 							: "bg-bg-white-0/80 text-text-sub-600 shadow-sm hover:bg-bg-white-0 dark:bg-white/10 dark:text-white/80 dark:hover:bg-white/20",
 					)}
 				>
-					{copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+					{copied ? (
+						<Check className="h-3 w-3" />
+					) : (
+						<Copy className="h-3 w-3" />
+					)}
 				</button>
 			) : null}
 			{children}
@@ -60,7 +64,7 @@ export function SupportChatMarkdown({
 	return (
 		<div
 			className={cn(
-				"text-[13px] leading-relaxed break-words",
+				"break-words text-[13px] leading-relaxed",
 				mine ? "text-white" : "text-text-strong-950 dark:text-white/90",
 				className,
 			)}
@@ -122,7 +126,9 @@ export function SupportChatMarkdown({
 						<hr
 							className={cn(
 								"my-2.5 border-t",
-								mine ? "border-white/20" : "border-stroke-soft-200 dark:border-white/10",
+								mine
+									? "border-white/20"
+									: "border-stroke-soft-200 dark:border-white/10",
 							)}
 						/>
 					),
@@ -137,7 +143,9 @@ export function SupportChatMarkdown({
 						<th
 							className={cn(
 								"border-b pb-1.5 font-semibold",
-								mine ? "border-white/20" : "border-stroke-soft-200 dark:border-white/20",
+								mine
+									? "border-white/20"
+									: "border-stroke-soft-200 dark:border-white/20",
 							)}
 						>
 							{children}
@@ -147,7 +155,9 @@ export function SupportChatMarkdown({
 						<td
 							className={cn(
 								"border-b py-1.5",
-								mine ? "border-white/10" : "border-stroke-soft-100 dark:border-white/10",
+								mine
+									? "border-white/10"
+									: "border-stroke-soft-100 dark:border-white/10",
 							)}
 						>
 							{children}
@@ -157,7 +167,11 @@ export function SupportChatMarkdown({
 						let rawText = "";
 						try {
 							const codeNode = node?.children?.[0];
-							if (codeNode && "children" in codeNode && Array.isArray(codeNode.children)) {
+							if (
+								codeNode &&
+								"children" in codeNode &&
+								Array.isArray(codeNode.children)
+							) {
 								rawText = codeNode.children
 									.map((c: any) => c.value || "")
 									.join("");
@@ -182,7 +196,10 @@ export function SupportChatMarkdown({
 						);
 					},
 					code: ({ className: codeClassName, children, ...props }) => {
-						const isInline = !codeClassName && typeof children === "string" && !children.includes("\n");
+						const isInline =
+							!codeClassName &&
+							typeof children === "string" &&
+							!children.includes("\n");
 						if (isInline) {
 							return (
 								<code

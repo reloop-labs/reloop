@@ -12,7 +12,13 @@ describe("mergeOrganizationsWithPlans", () => {
 				[{ organizationId: "org_2", planId: "individual" }],
 			),
 		).toEqual([
-			{ id: "org_1", name: "Acme", slug: "acme", logo: undefined, planId: "free" },
+			{
+				id: "org_1",
+				name: "Acme",
+				slug: "acme",
+				logo: undefined,
+				planId: "free",
+			},
 			{
 				id: "org_2",
 				name: "Beta",

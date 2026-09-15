@@ -18,61 +18,71 @@ export const MODERN_WEB_FONTS: FontOption[] = [
 	{
 		label: "Inter",
 		family: "Inter",
-		value: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+		value:
+			"Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "Plus Jakarta Sans",
 		family: "Plus Jakarta Sans",
-		value: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+		value:
+			"'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "Roboto",
 		family: "Roboto",
-		value: "Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
+		value:
+			"Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "Poppins",
 		family: "Poppins",
-		value: "Poppins, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+		value:
+			"Poppins, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "Outfit",
 		family: "Outfit",
-		value: "Outfit, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+		value:
+			"Outfit, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "DM Sans",
 		family: "DM Sans",
-		value: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+		value:
+			"'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "Space Grotesk",
 		family: "Space Grotesk",
-		value: "'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+		value:
+			"'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "Montserrat",
 		family: "Montserrat",
-		value: "Montserrat, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
+		value:
+			"Montserrat, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "Open Sans",
 		family: "Open Sans",
-		value: "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
+		value:
+			"'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
 		category: "web",
 	},
 	{
 		label: "Lato",
 		family: "Lato",
-		value: "Lato, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
+		value:
+			"Lato, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
 		category: "web",
 	},
 	{
@@ -175,9 +185,7 @@ export function normalizeFontValue(raw: string | undefined): string {
 	const lower = trimmed.toLowerCase();
 
 	// 1. Try exact match on full value (case-insensitive)
-	const exactMatch = ALL_FONTS.find(
-		(f) => f.value.toLowerCase() === lower,
-	);
+	const exactMatch = ALL_FONTS.find((f) => f.value.toLowerCase() === lower);
 	if (exactMatch) return exactMatch.value;
 
 	// 2. Extract the primary family name (first font in comma-separated stack)
@@ -186,7 +194,8 @@ export function normalizeFontValue(raw: string | undefined): string {
 		const familyMatch = ALL_FONTS.find(
 			(f) =>
 				f.family.toLowerCase() === primaryFamily ||
-				cleanQuotes(f.value.split(",")[0] ?? "").toLowerCase() === primaryFamily,
+				cleanQuotes(f.value.split(",")[0] ?? "").toLowerCase() ===
+					primaryFamily,
 		);
 		if (familyMatch) return familyMatch.value;
 	}
@@ -200,9 +209,7 @@ export function getFontDisplayLabel(raw: string | undefined): string {
 	const lower = trimmed.toLowerCase();
 
 	// 1. Try exact match on full value
-	const exactMatch = ALL_FONTS.find(
-		(f) => f.value.toLowerCase() === lower,
-	);
+	const exactMatch = ALL_FONTS.find((f) => f.value.toLowerCase() === lower);
 	if (exactMatch) return exactMatch.label;
 
 	// 2. Extract primary family name (first font in comma-separated stack)
@@ -213,7 +220,8 @@ export function getFontDisplayLabel(raw: string | undefined): string {
 		const familyMatch = ALL_FONTS.find(
 			(f) =>
 				f.family.toLowerCase() === primaryFamily ||
-				cleanQuotes(f.value.split(",")[0] ?? "").toLowerCase() === primaryFamily,
+				cleanQuotes(f.value.split(",")[0] ?? "").toLowerCase() ===
+					primaryFamily,
 		);
 		if (familyMatch) return familyMatch.label;
 	}
@@ -241,7 +249,7 @@ export function FontFamilySelect({
 					onClick={() => setIsOpen((prev) => !prev)}
 					className={cn(
 						inspectorFieldClassName,
-						"cursor-pointer justify-between text-left text-sm text-text-strong-950 font-normal outline-none select-none",
+						"cursor-pointer select-none justify-between text-left font-normal text-sm text-text-strong-950 outline-none",
 					)}
 				>
 					<span className="truncate">{displayLabel}</span>
@@ -266,7 +274,7 @@ export function FontFamilySelect({
 					className="z-50 max-h-72 w-56 overflow-y-auto rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-regular-md dark:border-stroke-soft-100/40 dark:bg-black"
 				>
 					<div className="flex flex-col gap-0.5">
-						<div className="px-2 py-1 text-[10px] font-semibold tracking-wider text-text-sub-600 uppercase">
+						<div className="px-2 py-1 font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider">
 							Modern Web Fonts
 						</div>
 						{MODERN_WEB_FONTS.map((opt) => {
@@ -297,9 +305,9 @@ export function FontFamilySelect({
 							);
 						})}
 
-						<div className="my-1 border-t border-stroke-soft-100 dark:border-stroke-soft-100/40" />
+						<div className="my-1 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
 
-						<div className="px-2 py-1 text-[10px] font-semibold tracking-wider text-text-sub-600 uppercase">
+						<div className="px-2 py-1 font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider">
 							Email-Safe System Fonts
 						</div>
 						{EMAIL_SAFE_SYSTEM_FONTS.map((opt) => {

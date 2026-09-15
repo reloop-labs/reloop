@@ -62,7 +62,7 @@ function CrossIcon() {
 				strokeWidth="1.25"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="dark:stroke-white dark:stroke-opacity-30"
+				className="dark:stroke-opacity-30 dark:stroke-white"
 			/>
 		</svg>
 	);
@@ -153,8 +153,7 @@ export function HowItCompares() {
 					id="how-it-compares-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
-					How <span className="text-primary-base">Reloop</span>{" "}
-					compares:
+					How <span className="text-primary-base">Reloop</span> compares:
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
 					Syntax checks miss throwaway domains. Mailbox probing burns your

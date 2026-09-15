@@ -1,7 +1,7 @@
+import { isUserBanned } from "@reloop/auth/user/is-banned";
 import { db as defaultDb } from "@reloop/db/client";
 import { apikey, user } from "@reloop/db/schema";
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { isUserBanned } from "@reloop/auth/user/is-banned";
 import {
 	API_KEY_CREDENTIAL_CACHE_TTL_SECONDS,
 	type ApiKeyCredentialCache,
@@ -90,12 +90,23 @@ async function isOwnerBanned(
 ): Promise<boolean> {
 	try {
 		// Test fakes may not implement user query — treat as not banned
-		const query = (db as unknown as { query?: { user?: { findFirst: unknown } } })
-			.query?.user?.findFirst as
-			| ((args: unknown) => Promise<{ banned: boolean | null; banExpires: Date | null } | undefined>)
+		const query = (
+			db as unknown as { query?: { user?: { findFirst: unknown } } }
+		).query?.user?.findFirst as
+			| ((
+					args: unknown,
+			  ) => Promise<
+					{ banned: boolean | null; banExpires: Date | null } | undefined
+			  >)
 			| undefined;
 		if (!query) return false;
-		const u = await (db.query.user.findFirst as unknown as (args: unknown) => Promise<{ banned: boolean | null; banExpires: Date | null } | undefined>)({
+		const u = await (
+			db.query.user.findFirst as unknown as (
+				args: unknown,
+			) => Promise<
+				{ banned: boolean | null; banExpires: Date | null } | undefined
+			>
+		)({
 			where: eq(user.id, userId),
 			columns: { banned: true, banExpires: true },
 		});
@@ -162,7 +173,11 @@ export async function validateApiKey(
 	}
 
 	const apiKeyRecord = await db.query.apikey.findFirst({
-		where: and(eq(apikey.key, hashedKey), eq(apikey.enabled, true), isNull(apikey.deletedAt)),
+		where: and(
+			eq(apikey.key, hashedKey),
+			eq(apikey.enabled, true),
+			isNull(apikey.deletedAt),
+		),
 	});
 
 	if (!apiKeyRecord) {

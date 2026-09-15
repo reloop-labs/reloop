@@ -449,7 +449,7 @@ export function TesterPanel() {
 
 							{/* Sample Email Pills */}
 							<div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-[11.5px] text-text-sub-600 dark:text-white/45">
-								<span className="font-mono uppercase tracking-wider text-[10.5px]">
+								<span className="font-mono text-[10.5px] uppercase tracking-wider">
 									Try:
 								</span>
 								{SAMPLE_EMAILS.map((sample) => (
@@ -593,7 +593,7 @@ export function TesterPanel() {
 									{/* General Section */}
 									<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-white/10 dark:bg-white/[0.02]">
 										<div className="mb-3 flex items-center justify-between">
-											<h4 className="font-semibold text-xs text-text-strong-950 dark:text-white">
+											<h4 className="font-semibold text-text-strong-950 text-xs dark:text-white">
 												General Overview
 											</h4>
 											<Badge.Root
@@ -608,7 +608,7 @@ export function TesterPanel() {
 											</Badge.Root>
 										</div>
 
-										<div className="grid grid-cols-1 gap-y-2.5 sm:grid-cols-2 text-xs">
+										<div className="grid grid-cols-1 gap-y-2.5 text-xs sm:grid-cols-2">
 											<div className="flex items-center justify-between pr-4">
 												<span className="text-text-sub-600 dark:text-white/50">
 													Full Name
@@ -679,10 +679,10 @@ export function TesterPanel() {
 
 									{/* Attributes Section */}
 									<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-white/10 dark:bg-white/[0.02]">
-										<h4 className="mb-3 font-semibold text-xs text-text-strong-950 dark:text-white">
+										<h4 className="mb-3 font-semibold text-text-strong-950 text-xs dark:text-white">
 											Attributes & Signals
 										</h4>
-										<div className="grid grid-cols-1 gap-y-2.5 sm:grid-cols-2 text-xs">
+										<div className="grid grid-cols-1 gap-y-2.5 text-xs sm:grid-cols-2">
 											<div className="flex items-center justify-between pr-4">
 												<span className="flex items-center gap-1.5 text-text-sub-600 dark:text-white/50">
 													<Icon
@@ -835,10 +835,10 @@ export function TesterPanel() {
 
 									{/* Mail Server Section */}
 									<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 dark:border-white/10 dark:bg-white/[0.02]">
-										<h4 className="mb-3 font-semibold text-xs text-text-strong-950 dark:text-white">
+										<h4 className="mb-3 font-semibold text-text-strong-950 text-xs dark:text-white">
 											Mail Server & DNS Infrastructure
 										</h4>
-										<div className="grid grid-cols-1 gap-y-2.5 sm:grid-cols-2 text-xs">
+										<div className="grid grid-cols-1 gap-y-2.5 text-xs sm:grid-cols-2">
 											<div className="flex items-center justify-between pr-4">
 												<span className="text-text-sub-600 dark:text-white/50">
 													SMTP Provider
@@ -886,7 +886,7 @@ export function TesterPanel() {
 								<h2 className="font-semibold text-sm text-text-strong-950 dark:text-white">
 									Batch List Health Verification
 								</h2>
-								<p className="mt-0.5 text-xs text-text-sub-600 dark:text-white/55">
+								<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
 									Upload up to 1,000 email addresses via CSV/TXT or paste
 									directly.
 								</p>
@@ -938,7 +938,7 @@ export function TesterPanel() {
 									<div className="flex size-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
 										<Icon name="upload" className="size-4.5" />
 									</div>
-									<p className="mt-2.5 font-semibold text-xs text-text-strong-950 dark:text-white">
+									<p className="mt-2.5 font-semibold text-text-strong-950 text-xs dark:text-white">
 										{csvFile
 											? csvFile.name
 											: "Drag and drop CSV or TXT file here"}
@@ -949,7 +949,7 @@ export function TesterPanel() {
 											: "Supports .csv or .txt up to 512 KB and 1,000 addresses"}
 									</p>
 									<label htmlFor="csv-upload" className="mt-3 cursor-pointer">
-										<span className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 font-medium text-xs text-text-strong-950 shadow-2xs hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15">
+										<span className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 py-1.5 font-medium text-text-strong-950 text-xs shadow-2xs hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15">
 											<Icon name="folder-move" className="size-3.5" />
 											Browse File
 										</span>
@@ -969,7 +969,7 @@ export function TesterPanel() {
 										value={pasteText}
 										onChange={(e) => setPasteText(e.target.value)}
 										placeholder="Paste one email per line (up to 1,000 addresses)..."
-										className="w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3 font-mono text-xs text-text-strong-950 outline-none ring-primary-base/30 focus:ring-2 dark:border-white/10 dark:bg-black dark:text-white"
+										className="w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3 font-mono text-text-strong-950 text-xs outline-none ring-primary-base/30 focus:ring-2 dark:border-white/10 dark:bg-black dark:text-white"
 									/>
 								</div>
 							)}
@@ -1026,7 +1026,7 @@ export function TesterPanel() {
 								>
 									<Spinner size={16} />
 									<div>
-										<p className="font-semibold text-xs text-text-strong-950 dark:text-white">
+										<p className="font-semibold text-text-strong-950 text-xs dark:text-white">
 											{pollJob.status === "queued"
 												? "Job queued in background pipeline..."
 												: "Running batch checks, DNS MX lookups, and domain caching..."}
@@ -1077,7 +1077,7 @@ export function TesterPanel() {
 										<h3 className="mt-0.5 font-bold text-2xl text-text-strong-950 sm:text-3xl dark:text-white">
 											{pollJob.summary.healthyPct}% Healthy
 										</h3>
-										<p className="mt-0.5 text-xs text-text-sub-600 dark:text-white/60">
+										<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/60">
 											{pollJob.summary.deliverableCount} of{" "}
 											{pollJob.summary.totalUnique} unique addresses likely
 											deliverable.

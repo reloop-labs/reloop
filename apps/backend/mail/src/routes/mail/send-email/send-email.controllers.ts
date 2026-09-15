@@ -72,7 +72,11 @@ export async function sendEmailController({
 	});
 	// Swap in the sanitized headers (CRLF-clean, reserved names stripped)
 	let body: MailModel.SendEmailBody = { ...rawBody, headers: sanitizedHeaders };
-	log.info({ message: "Outbound guard passed", from: body.from, subject: body.subject });
+	log.info({
+		message: "Outbound guard passed",
+		from: body.from,
+		subject: body.subject,
+	});
 
 	const { domainName } = parseFromAddress_step1(body.from);
 

@@ -340,25 +340,34 @@ https://reloop.sh/tools/blocklist-checker`;
 										{/* Capsule Badge with Icon matching Spam Score Checker */}
 										{result.verdict === "clean" && (
 											<div className="inline-flex items-center gap-1.5 rounded-full bg-success-lighter px-2.5 py-0.5 font-medium text-[12px] text-success-base dark:bg-emerald-500/10 dark:text-emerald-400">
-												<Icon name="shield-check" className="size-3.5 shrink-0" />
+												<Icon
+													name="shield-check"
+													className="size-3.5 shrink-0"
+												/>
 												<span>Clean</span>
 											</div>
 										)}
 										{result.verdict === "listed" && (
 											<div className="inline-flex items-center gap-1.5 rounded-full bg-error-lighter px-2.5 py-0.5 font-medium text-[12px] text-error-base dark:bg-rose-500/10 dark:text-rose-400">
-												<Icon name="minus-circle" className="size-3.5 shrink-0" />
+												<Icon
+													name="minus-circle"
+													className="size-3.5 shrink-0"
+												/>
 												<span>{result.listedCount} Listed</span>
 											</div>
 										)}
 										{result.verdict === "inconclusive" && (
 											<div className="inline-flex items-center gap-1.5 rounded-full bg-warning-lighter px-2.5 py-0.5 font-medium text-[12px] text-warning-base dark:bg-amber-500/10 dark:text-amber-400">
-												<Icon name="alert-triangle" className="size-3.5 shrink-0" />
+												<Icon
+													name="alert-triangle"
+													className="size-3.5 shrink-0"
+												/>
 												<span>Inconclusive</span>
 											</div>
 										)}
 									</div>
 
-									<div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-text-sub-600 dark:text-white/60">
+									<div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-text-sub-600 text-xs dark:text-white/60">
 										<span>
 											Target:{" "}
 											<strong className="font-mono font-semibold text-text-strong-950 dark:text-white">
@@ -387,7 +396,7 @@ https://reloop.sh/tools/blocklist-checker`;
 									</div>
 
 									{result.recommendations[0] && (
-										<p className="mt-1.5 text-xs text-text-sub-600 leading-relaxed dark:text-white/70">
+										<p className="mt-1.5 text-text-sub-600 text-xs leading-relaxed dark:text-white/70">
 											{result.recommendations[0]}
 										</p>
 									)}
@@ -426,7 +435,11 @@ https://reloop.sh/tools/blocklist-checker`;
 								>
 									<Link href="/dashboard/signup">
 										Send with Reloop
-										<Button.Icon as={Icon} name="arrow-right" className="size-3.5" />
+										<Button.Icon
+											as={Icon}
+											name="arrow-right"
+											className="size-3.5"
+										/>
 									</Link>
 								</Button.Root>
 							</div>
@@ -555,7 +568,7 @@ https://reloop.sh/tools/blocklist-checker`;
 												<code className="font-mono text-[11px] text-text-soft-400 dark:text-white/35">
 													{item.host}
 												</code>
-												<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2.5 py-0.5 font-mono text-[10px] font-medium text-text-sub-600 uppercase dark:bg-white/10 dark:text-white/60">
+												<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2.5 py-0.5 font-medium font-mono text-[10px] text-text-sub-600 uppercase dark:bg-white/10 dark:text-white/60">
 													{item.listType === "domain" ? "URI" : "IP"} ·{" "}
 													{item.impact}
 												</span>
@@ -574,7 +587,10 @@ https://reloop.sh/tools/blocklist-checker`;
 										{item.status === "listed" ? (
 											<div className="flex items-center gap-2">
 												<div className="inline-flex items-center gap-1.5 rounded-full bg-error-lighter px-2.5 py-0.5 font-medium text-[12px] text-error-base dark:bg-rose-500/10 dark:text-rose-400">
-													<Icon name="minus-circle" className="size-3.5 shrink-0" />
+													<Icon
+														name="minus-circle"
+														className="size-3.5 shrink-0"
+													/>
 													<span>Listed</span>
 												</div>
 												<LinkButton.Root
@@ -595,12 +611,18 @@ https://reloop.sh/tools/blocklist-checker`;
 											</div>
 										) : item.status === "not_listed" ? (
 											<div className="inline-flex items-center gap-1.5 rounded-full bg-success-lighter px-2.5 py-0.5 font-medium text-[12px] text-success-base dark:bg-emerald-500/10 dark:text-emerald-400">
-												<Icon name="check-circle" className="size-3.5 shrink-0" />
+												<Icon
+													name="check-circle"
+													className="size-3.5 shrink-0"
+												/>
 												<span>Not listed</span>
 											</div>
 										) : item.status === "error" ? (
 											<div className="inline-flex items-center gap-1.5 rounded-full bg-warning-lighter px-2.5 py-0.5 font-medium text-[12px] text-warning-base dark:bg-amber-500/10 dark:text-amber-400">
-												<Icon name="alert-triangle" className="size-3.5 shrink-0" />
+												<Icon
+													name="alert-triangle"
+													className="size-3.5 shrink-0"
+												/>
 												<span>Couldn't query</span>
 											</div>
 										) : (

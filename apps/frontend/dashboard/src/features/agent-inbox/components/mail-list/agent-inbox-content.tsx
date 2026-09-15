@@ -531,7 +531,7 @@ export const AgentInboxContent = ({
 				className={cn(
 					"sticky top-0 z-15 shrink-0 bg-bg-white-0",
 					!showInboxTabs &&
-						"border-b border-stroke-soft-100 dark:border-stroke-soft-100/40",
+						"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
 				)}
 			>
 				<div className="flex h-11 items-center pr-6 pl-4">

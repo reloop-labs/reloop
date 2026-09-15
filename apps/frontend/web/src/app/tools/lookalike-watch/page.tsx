@@ -131,21 +131,37 @@ export default function LookalikeWatchPage() {
 					<div className="rounded-2xl border border-rose-500/30 bg-rose-500/[0.04] p-6 dark:border-rose-500/30 dark:bg-rose-500/[0.06]">
 						<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 							<div className="space-y-2">
-								<span className="font-mono text-[11px] text-rose-600 dark:text-rose-400 font-semibold uppercase tracking-wider">
+								<span className="font-mono font-semibold text-[11px] text-rose-600 uppercase tracking-wider dark:text-rose-400">
 									Worked Example
 								</span>
 								<h3 className="font-semibold text-[18px] text-text-strong-950 dark:text-white">
-									From: <code className="font-mono text-[16px] text-rose-600 dark:text-rose-400">support@acme-login.com</code>
+									From:{" "}
+									<code className="font-mono text-[16px] text-rose-600 dark:text-rose-400">
+										support@acme-login.com
+									</code>
 								</h3>
 								<p className="text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/70">
-									Recipient receives an urgent email with your logo asking to &ldquo;Verify payroll credentials.&rdquo; The user glances at the word &ldquo;acme&rdquo; and clicks. Even with <code className="font-mono text-[12px]">p=reject</code> on <code className="font-mono text-[12px]">acme.com</code>, this email lands in the inbox because <code className="font-mono text-[12px]">acme-login.com</code> is a completely separate registered domain.
+									Recipient receives an urgent email with your logo asking to
+									&ldquo;Verify payroll credentials.&rdquo; The user glances at
+									the word &ldquo;acme&rdquo; and clicks. Even with{" "}
+									<code className="font-mono text-[12px]">p=reject</code> on{" "}
+									<code className="font-mono text-[12px]">acme.com</code>, this
+									email lands in the inbox because{" "}
+									<code className="font-mono text-[12px]">acme-login.com</code>{" "}
+									is a completely separate registered domain.
 								</p>
 							</div>
 
-							<div className="shrink-0 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 font-mono text-[11.5px] space-y-1 dark:border-white/10 dark:bg-black">
-								<div className="text-emerald-600 dark:text-emerald-400">✓ DMARC on acme.com: PASS</div>
-								<div className="text-rose-500">✗ Blocked by acme.com DMARC? NO</div>
-								<div className="text-text-sub-600 dark:text-white/40">• Registered owner: Attacker</div>
+							<div className="shrink-0 space-y-1 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 font-mono text-[11.5px] dark:border-white/10 dark:bg-black">
+								<div className="text-emerald-600 dark:text-emerald-400">
+									✓ DMARC on acme.com: PASS
+								</div>
+								<div className="text-rose-500">
+									✗ Blocked by acme.com DMARC? NO
+								</div>
+								<div className="text-text-sub-600 dark:text-white/40">
+									• Registered owner: Attacker
+								</div>
 							</div>
 						</div>
 					</div>
@@ -161,7 +177,7 @@ export default function LookalikeWatchPage() {
 									<span className="font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
 										{trick.type}
 									</span>
-									<p className="mt-1 font-mono font-medium text-[13px] text-text-strong-950 dark:text-white">
+									<p className="mt-1 font-medium font-mono text-[13px] text-text-strong-950 dark:text-white">
 										{trick.example}
 									</p>
 									<p className="mt-2 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
@@ -183,37 +199,52 @@ export default function LookalikeWatchPage() {
 
 				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3 dark:divide-white/10 dark:border-white/10">
 					<div className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8">
-						<Icon name="eye-off" className="size-5 text-text-sub-600 dark:text-white/40" />
+						<Icon
+							name="eye-off"
+							className="size-5 text-text-sub-600 dark:text-white/40"
+						/>
 						<div>
 							<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 								Staff do not read full hostnames
 							</p>
 							<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								Recipients scan names quickly on mobile screens. A message from support@acme-sso.com looks genuine enough to fool busy employees into sharing passwords.
+								Recipients scan names quickly on mobile screens. A message from
+								support@acme-sso.com looks genuine enough to fool busy employees
+								into sharing passwords.
 							</p>
 						</div>
 					</div>
 
 					<div className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8">
-						<Icon name="lock" className="size-5 text-text-sub-600 dark:text-white/40" />
+						<Icon
+							name="lock"
+							className="size-5 text-text-sub-600 dark:text-white/40"
+						/>
 						<div>
 							<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 								DMARC enforcement shifts the attack
 							</p>
 							<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								Once you publish p=reject on your real domain, attackers stop raw spoofing and switch directly to registering lookalike domains with active mail servers.
+								Once you publish p=reject on your real domain, attackers stop
+								raw spoofing and switch directly to registering lookalike
+								domains with active mail servers.
 							</p>
 						</div>
 					</div>
 
 					<div className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8">
-						<Icon name="mail" className="size-5 text-text-sub-600 dark:text-white/40" />
+						<Icon
+							name="mail"
+							className="size-5 text-text-sub-600 dark:text-white/40"
+						/>
 						<div>
 							<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 								MX/SPF twins can send mail
 							</p>
 							<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								A parked lookalike domain with no DNS records is benign. A lookalike with MX exchanges or SPF includes is configured to send convincing email.
+								A parked lookalike domain with no DNS records is benign. A
+								lookalike with MX exchanges or SPF includes is configured to
+								send convincing email.
 							</p>
 						</div>
 					</div>
@@ -229,37 +260,51 @@ export default function LookalikeWatchPage() {
 
 				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3 dark:divide-white/10 dark:border-white/10">
 					<div className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8">
-						<Icon name="list" className="size-5 text-text-sub-600 dark:text-white/40" />
+						<Icon
+							name="list"
+							className="size-5 text-text-sub-600 dark:text-white/40"
+						/>
 						<div>
 							<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 								Bounded Permutation Engine
 							</p>
 							<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								We generate a deterministic set of ~65 candidate variations across popular alternative TLDs, common typos, prefix hyphens, and IDN homoglyphs.
+								We generate a deterministic set of ~65 candidate variations
+								across popular alternative TLDs, common typos, prefix hyphens,
+								and IDN homoglyphs.
 							</p>
 						</div>
 					</div>
 
 					<div className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8">
-						<Icon name="globe" className="size-5 text-text-sub-600 dark:text-white/40" />
+						<Icon
+							name="globe"
+							className="size-5 text-text-sub-600 dark:text-white/40"
+						/>
 						<div>
 							<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 								Read-Only Public DNS Queries
 							</p>
 							<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								We query standard NS, A, MX, and TXT (SPF) records from authoritative root nameservers. No probing, hacking, or web crawling.
+								We query standard NS, A, MX, and TXT (SPF) records from
+								authoritative root nameservers. No probing, hacking, or web
+								crawling.
 							</p>
 						</div>
 					</div>
 
 					<div className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8">
-						<Icon name="shield-check" className="size-5 text-text-sub-600 dark:text-white/40" />
+						<Icon
+							name="shield-check"
+							className="size-5 text-text-sub-600 dark:text-white/40"
+						/>
 						<div>
 							<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 								Mail-Capable Verification
 							</p>
 							<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								A candidate is classified as mail-ready if it publishes valid MX mail exchangers or SPF authorization strings in public DNS.
+								A candidate is classified as mail-ready if it publishes valid MX
+								mail exchangers or SPF authorization strings in public DNS.
 							</p>
 						</div>
 					</div>
@@ -275,27 +320,54 @@ export default function LookalikeWatchPage() {
 
 				<div className="mx-auto max-w-4xl px-5 py-8 sm:px-6 sm:py-12 md:px-8">
 					<div className="divide-y divide-stroke-soft-200 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-xs dark:divide-white/10 dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="py-3 flex items-start gap-3">
-							<Icon name="info-outline" className="size-4.5 text-text-sub-600 shrink-0 mt-0.5 dark:text-white/40" />
+						<div className="flex items-start gap-3 py-3">
+							<Icon
+								name="info-outline"
+								className="mt-0.5 size-4.5 shrink-0 text-text-sub-600 dark:text-white/40"
+							/>
 							<div>
-								<h4 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">Not every possible phish on the internet</h4>
-								<p className="mt-0.5 text-[13px] text-text-sub-600 dark:text-white/60">Permutations are infinite. A clean scan means no common variations were found, not that nobody can ever register a new one.</p>
+								<h4 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
+									Not every possible phish on the internet
+								</h4>
+								<p className="mt-0.5 text-[13px] text-text-sub-600 dark:text-white/60">
+									Permutations are infinite. A clean scan means no common
+									variations were found, not that nobody can ever register a new
+									one.
+								</p>
 							</div>
 						</div>
 
-						<div className="py-3 flex items-start gap-3">
-							<Icon name="info-outline" className="size-4.5 text-text-sub-600 shrink-0 mt-0.5 dark:text-white/40" />
+						<div className="flex items-start gap-3 py-3">
+							<Icon
+								name="info-outline"
+								className="mt-0.5 size-4.5 shrink-0 text-text-sub-600 dark:text-white/40"
+							/>
 							<div>
-								<h4 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">Registered does not mean they emailed your customers today</h4>
-								<p className="mt-0.5 text-[13px] text-text-sub-600 dark:text-white/60">A registered lookalike might be held by a domain squatter or competitor. It indicates sending capability, not proof of active fraud.</p>
+								<h4 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
+									Registered does not mean they emailed your customers today
+								</h4>
+								<p className="mt-0.5 text-[13px] text-text-sub-600 dark:text-white/60">
+									A registered lookalike might be held by a domain squatter or
+									competitor. It indicates sending capability, not proof of
+									active fraud.
+								</p>
 							</div>
 						</div>
 
-						<div className="py-3 flex items-start gap-3">
-							<Icon name="info-outline" className="size-4.5 text-text-sub-600 shrink-0 mt-0.5 dark:text-white/40" />
+						<div className="flex items-start gap-3 py-3">
+							<Icon
+								name="info-outline"
+								className="mt-0.5 size-4.5 shrink-0 text-text-sub-600 dark:text-white/40"
+							/>
 							<div>
-								<h4 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">Not a takedown or Google Safe Browsing report</h4>
-								<p className="mt-0.5 text-[13px] text-text-sub-600 dark:text-white/60">This tool provides diagnostic visibility. Domain takedowns require filing registrar abuse complaints or ICANN UDRP disputes.</p>
+								<h4 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
+									Not a takedown or Google Safe Browsing report
+								</h4>
+								<p className="mt-0.5 text-[13px] text-text-sub-600 dark:text-white/60">
+									This tool provides diagnostic visibility. Domain takedowns
+									require filing registrar abuse complaints or ICANN UDRP
+									disputes.
+								</p>
 							</div>
 						</div>
 					</div>
@@ -321,7 +393,7 @@ export default function LookalikeWatchPage() {
 								</div>
 
 								<div className="flex-1">
-									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+									<div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
 										<h4 className="font-semibold text-[14.5px] text-text-strong-950 dark:text-white">
 											{step.title}
 										</h4>

@@ -27,12 +27,7 @@ import {
 /** How long the rotate icon spins after a refresh is triggered. */
 const REFRESH_SPIN_MS = 2000;
 
-export type CategoryTab =
-	| "unsubscribed"
-	| "bounced"
-	| "suppressed"
-	| "complained"
-	| "clicked";
+export type CategoryTab = "unsubscribed" | "bounced" | "complained" | "clicked";
 
 const TABS: Array<{
 	id: CategoryTab;
@@ -41,7 +36,6 @@ const TABS: Array<{
 }> = [
 	{ id: "unsubscribed", label: "Unsubscribed", icon: "user-minus" },
 	{ id: "bounced", label: "Bounced", icon: "bounce" },
-	{ id: "suppressed", label: "Suppressed", icon: "slash" },
 	{ id: "complained", label: "Complained", icon: "alert-triangle" },
 	{ id: "clicked", label: "Clicks", icon: "cursor-click" },
 ];
@@ -59,12 +53,6 @@ function getCategoryBadge(category?: DeliverabilityCategory | string) {
 				label: "Bounced",
 				className:
 					"bg-amber-50 text-amber-700 border border-amber-200/70 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40",
-			};
-		case "suppressed":
-			return {
-				label: "Suppressed",
-				className:
-					"bg-neutral-100 text-neutral-600 border border-neutral-200/80 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700/80",
 			};
 		case "complained":
 			return {

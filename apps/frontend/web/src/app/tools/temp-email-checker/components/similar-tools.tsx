@@ -33,13 +33,12 @@ export function SimilarTools() {
 					id="similar-tools-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
-					Explore more{" "}
-					<span className="text-primary-base">free tools</span>{" "}
+					Explore more <span className="text-primary-base">free tools</span>{" "}
 					like Temp Email Checker
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					Validate, inspect, and test every part of your email setup. Free,
-					no signup required.
+					Validate, inspect, and test every part of your email setup. Free, no
+					signup required.
 				</p>
 			</div>
 

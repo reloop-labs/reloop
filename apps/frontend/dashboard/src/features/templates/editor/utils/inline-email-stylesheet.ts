@@ -201,21 +201,13 @@ export function stripEmailColorSchemeMedia(css: string): string {
 
 function firstStylesheetBodyBackground(css: string): string {
 	const source = stripEmailColorSchemeMedia(css);
-	const match = source.match(
-		/(?:^|}|,)[\s]*body\b[^{]*\{([^}]*)\}/i,
-	);
+	const match = source.match(/(?:^|}|,)[\s]*body\b[^{]*\{([^}]*)\}/i);
 	if (!match?.[1]) return "";
 	const scratch =
-		typeof document !== "undefined"
-			? document.createElement("div")
-			: null;
+		typeof document !== "undefined" ? document.createElement("div") : null;
 	if (!scratch) return "";
 	scratch.style.cssText = match[1];
-	return (
-		scratch.style.backgroundColor ||
-		scratch.style.background ||
-		""
-	);
+	return scratch.style.backgroundColor || scratch.style.background || "";
 }
 
 /** Body fill from inline style, bgcolor, or a `body { }` rule — not an invented white. */

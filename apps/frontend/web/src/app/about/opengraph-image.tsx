@@ -70,12 +70,7 @@ export default async function OpenGraphImage() {
 						alignItems: "center",
 					}}
 				>
-					<svg
-						width="60"
-						height="60"
-						viewBox="0 0 200 200"
-						fill="none"
-					>
+					<svg width="60" height="60" viewBox="0 0 200 200" fill="none">
 						<rect x="55" y="51" width="83" height="8" fill="#2C2C2C" />
 						<rect
 							x="55"
@@ -412,8 +407,8 @@ export default async function OpenGraphImage() {
 							textWrap: "balance",
 						}}
 					>
-						The Reloop Engine. Automated warmup, smart retries,
-						suppression — in the open. Nothing to babysit.
+						The Reloop Engine. Automated warmup, smart retries, suppression — in
+						the open. Nothing to babysit.
 					</p>
 
 					<div

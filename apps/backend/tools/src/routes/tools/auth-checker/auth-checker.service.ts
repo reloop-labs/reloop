@@ -80,7 +80,11 @@ export interface DomainAuthReport {
 	responseTimeMs: number;
 	score: number;
 	grade: string;
-	verdict: "fully_aligned" | "partially_aligned" | "misconfigured" | "vulnerable";
+	verdict:
+		| "fully_aligned"
+		| "partially_aligned"
+		| "misconfigured"
+		| "vulnerable";
 	verdictLabel: string;
 	spf: AuthSpfResult;
 	dkim: AuthDkimResult;
@@ -111,8 +115,18 @@ const COMMON_DKIM_SELECTORS = [
 ];
 
 const MX_PROVIDERS: Array<{ name: string; patterns: RegExp[] }> = [
-	{ name: "Google Workspace", patterns: [/google\.com$/i, /googlemail\.com$/i, /aspmx\.l\.google\.com$/i] },
-	{ name: "Microsoft 365 / Outlook", patterns: [/outlook\.com$/i, /microsoft\.com$/i, /protection\.outlook\.com$/i] },
+	{
+		name: "Google Workspace",
+		patterns: [/google\.com$/i, /googlemail\.com$/i, /aspmx\.l\.google\.com$/i],
+	},
+	{
+		name: "Microsoft 365 / Outlook",
+		patterns: [
+			/outlook\.com$/i,
+			/microsoft\.com$/i,
+			/protection\.outlook\.com$/i,
+		],
+	},
 	{ name: "Zoho Mail", patterns: [/zoho\.(?:com|eu|in)$/i] },
 	{ name: "Proton Mail", patterns: [/protonmail\.ch$/i, /proton\.me$/i] },
 	{ name: "Fastmail", patterns: [/messagingengine\.com$/i, /fastmail\.com$/i] },
@@ -183,7 +197,9 @@ export function parseSpfRecord(spfString: string): {
 		else if (lower === "?all") qualifier = "?all";
 		else if (lower === "+all") {
 			qualifier = "+all";
-			warnings.push("The '+all' qualifier allows ANY IP on the internet to spoof email for your domain.");
+			warnings.push(
+				"The '+all' qualifier allows ANY IP on the internet to spoof email for your domain.",
+			);
 		}
 
 		if (lower.startsWith("include:")) {
@@ -195,7 +211,9 @@ export function parseSpfRecord(spfString: string): {
 			lookupCount++;
 		} else if (lower.startsWith("ptr") || lower.startsWith("ptr:")) {
 			lookupCount++;
-			warnings.push("The 'ptr' mechanism is deprecated in RFC 7208 and slows down mail delivery.");
+			warnings.push(
+				"The 'ptr' mechanism is deprecated in RFC 7208 and slows down mail delivery.",
+			);
 		} else if (lower.startsWith("exists:")) {
 			lookupCount++;
 		} else if (lower.startsWith("redirect=")) {
@@ -208,7 +226,9 @@ export function parseSpfRecord(spfString: string): {
 	}
 
 	if (lookupCount > 10) {
-		warnings.push(`SPF contains ${lookupCount} DNS lookup mechanisms, exceeding the RFC 7208 limit of 10 (PermError).`);
+		warnings.push(
+			`SPF contains ${lookupCount} DNS lookup mechanisms, exceeding the RFC 7208 limit of 10 (PermError).`,
+		);
 	}
 
 	return { qualifier, lookupCount, mechanisms, includes, ip4, ip6, warnings };
@@ -249,9 +269,13 @@ export function parseDkimRecord(rawDkim: string): {
 			else keyLength = rawBytes * 8;
 
 			if (keyLength < 1024) {
-				warnings.push(`DKIM public key is ${keyLength}-bit, which is considered insecure and obsolete.`);
+				warnings.push(
+					`DKIM public key is ${keyLength}-bit, which is considered insecure and obsolete.`,
+				);
 			} else if (keyLength === 1024) {
-				warnings.push("1024-bit DKIM key detected. Upgrading to a 2048-bit RSA key is recommended by NIST.");
+				warnings.push(
+					"1024-bit DKIM key detected. Upgrading to a 2048-bit RSA key is recommended by NIST.",
+				);
 			}
 		} catch {
 			warnings.push("Failed to decode DKIM public key base64 data.");
@@ -297,7 +321,9 @@ export function parseDmarcRecord(rawDmarc: string): {
 		} else if (key === "pct") {
 			percentage = Number.parseInt(val, 10) || 100;
 			if (percentage < 100) {
-				warnings.push(`DMARC policy applies to only ${percentage}% of outbound messages.`);
+				warnings.push(
+					`DMARC policy applies to only ${percentage}% of outbound messages.`,
+				);
 			}
 		} else if (key === "rua") {
 			rua.push(...val.split(",").map((v) => v.trim()));
@@ -313,11 +339,15 @@ export function parseDmarcRecord(rawDmarc: string): {
 	if (!policy) {
 		warnings.push("DMARC record is missing mandatory policy tag ('p=').");
 	} else if (policy === "none") {
-		warnings.push("DMARC policy is set to 'p=none' (monitoring only). Spoofed messages will still reach inboxes.");
+		warnings.push(
+			"DMARC policy is set to 'p=none' (monitoring only). Spoofed messages will still reach inboxes.",
+		);
 	}
 
 	if (rua.length === 0) {
-		warnings.push("No aggregate reporting address ('rua=') configured. You will not receive DMARC delivery reports.");
+		warnings.push(
+			"No aggregate reporting address ('rua=') configured. You will not receive DMARC delivery reports.",
+		);
 	}
 
 	return {
@@ -377,10 +407,14 @@ export async function checkDomainAuth(
 				category: "mx",
 				status: "pass",
 				message: `Configured with ${sorted.length} mail exchange server(s)${provider ? ` via ${provider}` : ""}`,
-				details: sorted.map((m) => `${m.exchange} (priority ${m.priority})`).join(", "),
+				details: sorted
+					.map((m) => `${m.exchange} (priority ${m.priority})`)
+					.join(", "),
 			});
 		} else {
-			mxResult.warnings.push("No MX records found. The domain cannot receive inbound email.");
+			mxResult.warnings.push(
+				"No MX records found. The domain cannot receive inbound email.",
+			);
 			diagnostics.push({
 				id: "mx-records",
 				name: "Mail Routing (MX)",
@@ -429,7 +463,9 @@ export async function checkDomainAuth(
 			spfResult.status = "fail";
 			spfResult.published = true;
 			spfResult.rawRecord = allSpf[0] || null;
-			spfResult.warnings.push(`Multiple SPF records found (${allSpf.length}). RFC 7208 Section 3.2 specifies that multiple SPF records cause a PermError.`);
+			spfResult.warnings.push(
+				`Multiple SPF records found (${allSpf.length}). RFC 7208 Section 3.2 specifies that multiple SPF records cause a PermError.`,
+			);
 			diagnostics.push({
 				id: "spf-record",
 				name: "Sender Policy Framework (SPF)",
@@ -441,8 +477,10 @@ export async function checkDomainAuth(
 		} else if (allSpf.length === 1) {
 			const raw = allSpf[0]!;
 			const parsed = parseSpfRecord(raw);
-			const isStrict = parsed.qualifier === "-all" || parsed.qualifier === "~all";
-			const status = parsed.lookupCount > 10 ? "fail" : isStrict ? "pass" : "warn";
+			const isStrict =
+				parsed.qualifier === "-all" || parsed.qualifier === "~all";
+			const status =
+				parsed.lookupCount > 10 ? "fail" : isStrict ? "pass" : "warn";
 
 			spfResult = {
 				status,
@@ -516,7 +554,9 @@ export async function checkDomainAuth(
 			dmarcResult.status = "fail";
 			dmarcResult.published = true;
 			dmarcResult.rawRecord = dmarcMatches[0] || null;
-			dmarcResult.warnings.push("Multiple DMARC records found. Only one DMARC record is permitted.");
+			dmarcResult.warnings.push(
+				"Multiple DMARC records found. Only one DMARC record is permitted.",
+			);
 			diagnostics.push({
 				id: "dmarc-record",
 				name: "DMARC Policy Enforcement",
@@ -527,7 +567,12 @@ export async function checkDomainAuth(
 		} else if (dmarcMatches.length === 1) {
 			const raw = dmarcMatches[0]!;
 			const parsed = parseDmarcRecord(raw);
-			const status = parsed.policy === "reject" ? "pass" : parsed.policy === "quarantine" ? "pass" : "warn";
+			const status =
+				parsed.policy === "reject"
+					? "pass"
+					: parsed.policy === "quarantine"
+						? "pass"
+						: "warn";
 
 			dmarcResult = {
 				status,
@@ -552,13 +597,16 @@ export async function checkDomainAuth(
 				details: raw,
 			});
 		} else {
-			dmarcResult.warnings.push("No DMARC record published at _dmarc." + domain);
+			dmarcResult.warnings.push(
+				"No DMARC record published at _dmarc." + domain,
+			);
 			diagnostics.push({
 				id: "dmarc-record",
 				name: "DMARC Policy Enforcement",
 				category: "dmarc",
 				status: "fail",
-				message: "Missing DMARC record — receivers will accept unauthorized emails",
+				message:
+					"Missing DMARC record — receivers will accept unauthorized emails",
 			});
 		}
 	} catch {
@@ -601,11 +649,20 @@ export async function checkDomainAuth(
 
 			const validDkim = (dkimTxts || [])
 				.map((entry) => entry.join("").trim())
-				.find((txt) => txt.toLowerCase().includes("p=") || txt.toLowerCase().includes("v=dkim1"));
+				.find(
+					(txt) =>
+						txt.toLowerCase().includes("p=") ||
+						txt.toLowerCase().includes("v=dkim1"),
+				);
 
 			if (validDkim) {
 				const parsed = parseDkimRecord(validDkim);
-				const status = parsed.keyLength && parsed.keyLength >= 2048 ? "pass" : parsed.publicKey ? "pass" : "warn";
+				const status =
+					parsed.keyLength && parsed.keyLength >= 2048
+						? "pass"
+						: parsed.publicKey
+							? "pass"
+							: "warn";
 
 				dkimResult = {
 					status,
@@ -637,7 +694,9 @@ export async function checkDomainAuth(
 	if (!dkimResult.published) {
 		if (selectorOverride) {
 			dkimResult.status = "fail";
-			dkimResult.warnings.push(`No DKIM public key found for selector '${selectorOverride}' at ${selectorOverride}._domainkey.${domain}`);
+			dkimResult.warnings.push(
+				`No DKIM public key found for selector '${selectorOverride}' at ${selectorOverride}._domainkey.${domain}`,
+			);
 			diagnostics.push({
 				id: "dkim-record",
 				name: "DKIM Signature & Key",
@@ -647,13 +706,16 @@ export async function checkDomainAuth(
 			});
 		} else {
 			dkimResult.status = "info";
-			dkimResult.warnings.push("No DKIM public key found on standard selectors (s1, google, default, k1). Try entering your specific selector.");
+			dkimResult.warnings.push(
+				"No DKIM public key found on standard selectors (s1, google, default, k1). Try entering your specific selector.",
+			);
 			diagnostics.push({
 				id: "dkim-record",
 				name: "DKIM Signature & Key",
 				category: "dkim",
 				status: "info",
-				message: "No standard DKIM selector detected — enter your custom selector above to verify",
+				message:
+					"No standard DKIM selector detected — enter your custom selector above to verify",
 			});
 		}
 	}
@@ -692,7 +754,8 @@ export async function checkDomainAuth(
 				name: "Brand Indicators (BIMI)",
 				category: "security",
 				status: "pass",
-				message: "BIMI record published — avatar logo displayed in supporting inboxes",
+				message:
+					"BIMI record published — avatar logo displayed in supporting inboxes",
 				details: bimiResult.svgUrl || undefined,
 			});
 		}
@@ -728,7 +791,8 @@ export async function checkDomainAuth(
 				name: "Mail Transport Security (MTA-STS)",
 				category: "security",
 				status: "pass",
-				message: "MTA-STS policy record published for encrypted TLS transmission",
+				message:
+					"MTA-STS policy record published for encrypted TLS transmission",
 			});
 		}
 	} catch {}
@@ -759,7 +823,11 @@ export async function checkDomainAuth(
 	}
 
 	let grade = "F";
-	let verdict: "fully_aligned" | "partially_aligned" | "misconfigured" | "vulnerable" = "vulnerable";
+	let verdict:
+		| "fully_aligned"
+		| "partially_aligned"
+		| "misconfigured"
+		| "vulnerable" = "vulnerable";
 	let verdictLabel = "Vulnerable to Email Spoofing";
 
 	if (score >= 90) {

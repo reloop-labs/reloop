@@ -1,23 +1,27 @@
 import { describe, expect, it } from "bun:test";
 import { dnsLookupController } from "../src/routes/tools/dns-lookup/dns-lookup.controllers";
 import {
-	detectDnsProvider,
-} from "../src/routes/tools/dns-lookup/dns-providers";
-import {
 	parseQueryInput,
 	performDnsLookup,
 } from "../src/routes/tools/dns-lookup/dns-lookup.service";
+import { detectDnsProvider } from "../src/routes/tools/dns-lookup/dns-providers";
 
 describe("DNS Provider Detector", () => {
 	it("detects Cloudflare nameservers", () => {
-		const provider = detectDnsProvider(["ns1.cloudflare.com", "ns2.cloudflare.com"]);
+		const provider = detectDnsProvider([
+			"ns1.cloudflare.com",
+			"ns2.cloudflare.com",
+		]);
 		expect(provider).not.toBeNull();
 		expect(provider?.id).toBe("cloudflare");
 		expect(provider?.name).toBe("Cloudflare");
 	});
 
 	it("detects AWS Route 53 nameservers", () => {
-		const provider = detectDnsProvider(["ns-123.awsdns-45.org", "ns-678.awsdns-12.com"]);
+		const provider = detectDnsProvider([
+			"ns-123.awsdns-45.org",
+			"ns-678.awsdns-12.com",
+		]);
 		expect(provider).not.toBeNull();
 		expect(provider?.id).toBe("aws-route53");
 	});
