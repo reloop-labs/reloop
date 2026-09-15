@@ -76,6 +76,10 @@ describe("appendUnsubscribeFooter", () => {
 		);
 		expect(withFooter).toContain("Unsubscribe");
 		expect(withFooter).toContain("https://example.com/preferences/tok");
+		expect(withFooter).toContain('data-unsubscribe-link="true"');
+		expect(withFooter).toMatch(
+			/<a href="https:\/\/example.com\/preferences\/tok"[^>]*>Unsubscribe<\/a>/,
+		);
 
 		const untouched = appendUnsubscribeFooter(
 			'<p>Hello <a href="x">unsubscribe here</a></p>',

@@ -116,6 +116,7 @@ export function hasUnsubscribeContent(html: string): boolean {
 	return (
 		lower.includes("unsubscribe") ||
 		lower.includes("unsubscribe_url") ||
+		lower.includes("data-unsubscribe-link") ||
 		lower.includes("/preferences/")
 	);
 }
@@ -129,7 +130,8 @@ export function buildUnsubscribeFooter(preferencesUrl: string): string {
 		`<div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;` +
 		`font-size:12px;line-height:1.6;color:#6b7280;text-align:center;">` +
 		`<p style="margin:0 0 8px 0;">You received this email because you subscribed. ` +
-		`<a href="${preferencesUrl}" style="color:#6b7280;text-decoration:underline;">Unsubscribe</a> ` +
+		`<a href="${preferencesUrl}" data-unsubscribe-link="true" ` +
+		`style="color:#6b7280;text-decoration:underline;">Unsubscribe</a> ` +
 		"to stop receiving these emails.</p></div>"
 	);
 }

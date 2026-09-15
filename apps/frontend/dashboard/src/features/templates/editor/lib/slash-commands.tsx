@@ -6,6 +6,7 @@ import {
 } from "@react-email/editor/ui";
 import { Icon } from "@reloop/ui/icon";
 import type { Editor } from "@tiptap/core";
+import { unsubscribeAnchorHtml } from "#/features/campaigns/editor/lib/unsubscribe-link";
 
 export const variableSlashCommand: SlashCommandItem = {
 	title: "Variable",
@@ -18,6 +19,11 @@ export const variableSlashCommand: SlashCommandItem = {
 	},
 };
 
+export const FOOTER_SLASH_HTML =
+	'<p style="text-align:center;font-size:12px;line-height:20px;color:#888888">' +
+	"You received this email because you signed up.<br/>" +
+	`${unsubscribeAnchorHtml("Unsubscribe")} · <a href="#">Privacy</a></p>`;
+
 export const footerSlashCommand: SlashCommandItem = {
 	title: "Footer",
 	description: "Unsubscribe and legal footer",
@@ -29,9 +35,7 @@ export const footerSlashCommand: SlashCommandItem = {
 			.chain()
 			.focus()
 			.deleteRange(range)
-			.insertContent(
-				'<p style="text-align:center;font-size:12px;line-height:20px;color:#888888">You received this email because you signed up.<br/><a href="#">Unsubscribe</a> · <a href="#">Privacy</a></p>',
-			)
+			.insertContent(FOOTER_SLASH_HTML)
 			.run();
 	},
 };

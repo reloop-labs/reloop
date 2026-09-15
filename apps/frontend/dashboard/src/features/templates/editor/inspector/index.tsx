@@ -5,10 +5,15 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { getMarkRange } from "@tiptap/core";
 import { useCurrentEditor, useEditorState } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import {
+	UNSUBSCRIBE_HREF_PLACEHOLDER,
+	unsubscribeLinkTitle,
+} from "#/features/campaigns/editor/lib/unsubscribe-link";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
@@ -78,6 +83,83 @@ const TYPE_OPTIONS = [
 /* ------------------------------------------------------------------ */
 /* Shared section wrapper                                              */
 /* ------------------------------------------------------------------ */
+function UnsubscribeLinkInspector() {
+	const { editor } = useCurrentEditor();
+	const isActive = Boolean(editor?.isActive("unsubscribeLink"));
+	const markType = editor?.state.schema.marks.unsubscribeLink;
+	const range =
+		editor && markType
+			? getMarkRange(editor.state.selection.$from, markType)
+			: null;
+	const currentTitle = range
+		? editor?.state.doc.textBetween(range.from, range.to)
+		: unsubscribeLinkTitle();
+	const [title, setTitle] = useState(currentTitle ?? "");
+
+	useEffect(() => {
+		setTitle(currentTitle ?? "");
+	}, [currentTitle]);
+
+	if (!editor || !isActive) return null;
+
+	const commitTitle = () => {
+		if (!range) return;
+		const next = unsubscribeLinkTitle(title);
+		if (next === currentTitle) return;
+		editor
+			.chain()
+			.focus()
+			.insertContentAt(
+				{ from: range.from, to: range.to },
+				{
+					type: "text",
+					text: next,
+					marks: [
+						{
+							type: "unsubscribeLink",
+							attrs: { href: UNSUBSCRIBE_HREF_PLACEHOLDER },
+						},
+					],
+				},
+			)
+			.run();
+	};
+
+	return (
+		<InspectorSection>
+			<SectionHeader label="Unsubscribe link" />
+			<PropRow label="Title">
+				<Input.Root size="small" className="w-full">
+					<Input.Wrapper>
+						<Input.Input
+							value={title}
+							onChange={(event) => setTitle(event.target.value)}
+							onBlur={commitTitle}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") {
+									event.preventDefault();
+									commitTitle();
+									(event.target as HTMLElement).blur();
+								}
+							}}
+							placeholder="Unsubscribe"
+						/>
+					</Input.Wrapper>
+				</Input.Root>
+			</PropRow>
+			<PropRow label="Link">
+				<span className="truncate font-mono text-text-sub-600 text-xs">
+					{UNSUBSCRIBE_HREF_PLACEHOLDER}
+				</span>
+			</PropRow>
+			<p className="px-4 text-text-soft-400 text-xs leading-normal">
+				The title is the clickable text. Underline, bold, and color it like any
+				other link.
+			</p>
+		</InspectorSection>
+	);
+}
+
 function InspectorSection({ children }: { children: React.ReactNode }) {
 	return <div className="flex flex-col py-2">{children}</div>;
 }
@@ -140,16 +222,14 @@ function CampaignVariableInspectorCard({ name }: { name: string }) {
 				<div className="flex flex-col gap-3 px-4 py-2">
 					<div className="flex flex-col gap-1">
 						<span className="font-semibold text-text-sub-600 text-xs">
-							System variable
+							Unsubscribe link
 						</span>
-						<div className="select-all font-mono font-semibold text-text-strong-950">
-							{formatTemplateVariable(name, 3)}
-						</div>
+						<p className="text-text-sub-600 text-xs leading-normal">
+							Insert this as a styled link from the{" "}
+							<span className="font-mono">{"{{"}</span> menu so the title can be
+							underlined and colored.
+						</p>
 					</div>
-					<p className="text-text-sub-600 text-xs leading-normal">
-						Resolves to the recipient&apos;s personal unsubscribe link at
-						send time.
-					</p>
 				</div>
 			</InspectorSection>
 		);
@@ -1456,6 +1536,7 @@ export const EmailInspector = () => {
 
 			{/* ── All sections in one flat scroll container ── */}
 			<div className="flex flex-col divide-y divide-stroke-soft-100 pb-6">
+				<UnsubscribeLinkInspector />
 				{/* ── Text card (Handles both text selection and node selection) ── */}
 				<Inspector.Text>
 					{(textProps) => (
@@ -1511,15 +1592,19 @@ export const EmailInspector = () => {
 							(nodeProps.setStyle as any)("textAlign", align);
 						};
 
-						const isLinkActive = editor.isActive("link");
+						const linkMark = editor.isActive("unsubscribeLink")
+							? "unsubscribeLink"
+							: "link";
+						const isLinkActive =
+							editor.isActive("link") || editor.isActive("unsubscribeLink");
 						const linkColor =
-							(editor.getAttributes("link").color as string) || "";
+							(editor.getAttributes(linkMark).color as string) || "";
 						const setLinkColor = (color: string) =>
 							editor
 								.chain()
 								.focus()
-								.extendMarkRange("link")
-								.updateAttributes("link", { color })
+								.extendMarkRange(linkMark)
+								.updateAttributes(linkMark, { color })
 								.run();
 
 						return (

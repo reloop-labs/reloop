@@ -10,6 +10,7 @@ import { emailStarterKit } from "#/features/templates/editor/utils/email-starter
 import { handleEmailHtmlPaste } from "#/features/templates/editor/utils/load-html-into-editor";
 import { CampaignVariable } from "../extensions/campaign-variable";
 import { CampaignVariableSuggestion } from "../extensions/campaign-variable-suggestion";
+import { UnsubscribeLink } from "../extensions/unsubscribe-link";
 
 export interface CampaignCollabOptions {
 	ydoc: Y.Doc;
@@ -104,6 +105,7 @@ export const useCampaignEditorHook = (collab: CampaignCollabOptions) => {
 			extensions: [
 				emailStarterKit(),
 				...baseExtensions,
+				UnsubscribeLink,
 				CampaignVariable,
 				CampaignVariableSuggestion as any,
 				imageExtension,

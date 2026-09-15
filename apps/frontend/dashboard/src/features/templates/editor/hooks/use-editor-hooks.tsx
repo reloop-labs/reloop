@@ -6,6 +6,7 @@ import { type Editor, useEditor } from "@tiptap/react";
 import { useCallback, useRef } from "react";
 import type { WebsocketProvider } from "y-websocket";
 import type * as Y from "yjs";
+import { UnsubscribeLink } from "#/features/campaigns/editor/extensions/unsubscribe-link";
 import { Variable } from "../extensions/variable";
 import { VariableSuggestion } from "../extensions/variable-suggestion";
 import { emailStarterKit } from "../utils/email-starter-kit";
@@ -104,6 +105,7 @@ export const useEditorHook = (collab: CollabOptions) => {
 			extensions: [
 				emailStarterKit(),
 				...baseExtensions,
+				UnsubscribeLink,
 				Variable,
 				VariableSuggestion as any,
 				imageExtension,

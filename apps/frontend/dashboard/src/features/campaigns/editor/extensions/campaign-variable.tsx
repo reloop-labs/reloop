@@ -135,14 +135,18 @@ export const CampaignVariable = EmailNode.create({
 				find: /\{\{\{([a-zA-Z0-9_.]+)\}\}\}/g,
 				type: this.type,
 				getAttributes: (match) => {
-					return { name: match[1] };
+					const name = match[1] ?? "";
+					if (isSystemCampaignVariable(name)) return false;
+					return { name };
 				},
 			}),
 			nodeInputRule({
 				find: /\{\{([a-zA-Z0-9_.]+)\}\}/g,
 				type: this.type,
 				getAttributes: (match) => {
-					return { name: match[1] };
+					const name = match[1] ?? "";
+					if (isSystemCampaignVariable(name)) return false;
+					return { name };
 				},
 			}),
 		];
@@ -154,14 +158,18 @@ export const CampaignVariable = EmailNode.create({
 				find: /\{\{\{([a-zA-Z0-9_.]+)\}\}\}/g,
 				type: this.type,
 				getAttributes: (match) => {
-					return { name: match[1] };
+					const name = match[1] ?? "";
+					if (isSystemCampaignVariable(name)) return false;
+					return { name };
 				},
 			}),
 			nodePasteRule({
 				find: /\{\{([a-zA-Z0-9_.]+)\}\}/g,
 				type: this.type,
 				getAttributes: (match) => {
-					return { name: match[1] };
+					const name = match[1] ?? "";
+					if (isSystemCampaignVariable(name)) return false;
+					return { name };
 				},
 			}),
 		];

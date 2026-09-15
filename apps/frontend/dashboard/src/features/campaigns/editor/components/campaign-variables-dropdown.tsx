@@ -2,16 +2,25 @@ import { cn } from "@reloop/ui/cn";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import {
-	SYSTEM_CAMPAIGN_VARIABLES,
+	isSystemCampaignVariable,
 	mapContactPropertiesToVariables,
+	SYSTEM_CAMPAIGN_VARIABLES,
 } from "../lib/campaign-variables";
+import {
+	DEFAULT_UNSUBSCRIBE_LINK_TITLE,
+	UNSUBSCRIBE_URL_VARIABLE,
+} from "../lib/unsubscribe-link";
 
 interface CampaignVariablesDropdownProps {
 	query: string;
 	editor: any;
 	range: any;
 	clientRect?: (() => DOMRect | null) | DOMRect | null;
-	command: (props: { name: string }) => void;
+	command: (props: {
+		name: string;
+		insert?: "unsubscribeLink";
+		title?: string;
+	}) => void;
 }
 
 export const CampaignVariablesDropdown = forwardRef(
@@ -69,9 +78,16 @@ export const CampaignVariablesDropdown = forwardRef(
 
 		const selectItem = (index: number) => {
 			const name = filtered[index];
-			if (name !== undefined) {
-				props.command({ name });
+			if (name === undefined) return;
+			if (isSystemCampaignVariable(name)) {
+				props.command({
+					name,
+					insert: "unsubscribeLink",
+					title: DEFAULT_UNSUBSCRIBE_LINK_TITLE,
+				});
+				return;
 			}
+			props.command({ name });
 		};
 
 		const preventEditorBlur = (e: React.MouseEvent) => {
@@ -129,7 +145,14 @@ export const CampaignVariablesDropdown = forwardRef(
 									onClick={() => selectItem(index)}
 									className={itemClass(index === selectedIndex)}
 								>
-									<span className="truncate font-mono">{`{{{ ${item} }}}`}</span>
+									<span className="flex min-w-0 flex-col">
+										<span className="truncate">
+											{DEFAULT_UNSUBSCRIBE_LINK_TITLE}
+										</span>
+										<span className="truncate font-mono text-[10px] text-text-soft-400">
+											{`{{{ ${UNSUBSCRIBE_URL_VARIABLE} }}}`}
+										</span>
+									</span>
 								</button>
 							);
 						})}
