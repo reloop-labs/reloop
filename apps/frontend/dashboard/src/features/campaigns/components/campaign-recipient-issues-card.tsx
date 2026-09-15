@@ -8,6 +8,7 @@ import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import {
 	useCallback,
 	useDeferredValue,
@@ -18,6 +19,7 @@ import {
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { dataTableToolbarControlClassName } from "#/components/data-table/toolbar-control";
+import { ContactStatusBadge } from "#/features/contacts/components/contacts/contact-status-badge";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	type DeliverabilityCategory,
@@ -496,49 +498,57 @@ export function CampaignRecipientIssuesCard({
 								);
 
 								return (
-									<li
-										key={recipient.id}
-										className="flex items-center justify-between gap-3 px-4 py-2.5"
-									>
-										<div className="flex min-w-0 items-center gap-3">
-											<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 font-medium text-text-sub-600 text-xs dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-300">
-												{initial}
+									<li key={recipient.id}>
+										<Link
+											href={`/contacts/detail/${encodeURIComponent(recipient.contactId ?? recipient.email)}`}
+											className="flex items-center justify-between gap-3 px-4 py-2.5 transition-colors hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.04]"
+										>
+											<div className="flex min-w-0 items-center gap-3">
+												<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 font-medium text-text-sub-600 text-xs dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-300">
+													{initial}
+												</div>
+												<div className="min-w-0">
+													<span className="block truncate font-medium text-paragraph-sm text-text-strong-950 underline decoration-dotted underline-offset-2">
+														{recipient.email}
+													</span>
+													{recipient.contactName ? (
+														<p className="truncate text-paragraph-xs text-text-soft-400">
+															{recipient.contactName}
+														</p>
+													) : null}
+												</div>
 											</div>
-											<div className="min-w-0">
-												<p className="truncate font-medium text-paragraph-sm text-text-strong-950">
-													{recipient.email}
-												</p>
-												{recipient.contactName ? (
-													<p className="truncate text-paragraph-xs text-text-soft-400">
-														{recipient.contactName}
-													</p>
-												) : null}
-											</div>
-										</div>
-										{activeTab === "clicked" ? (
-											<div className="flex shrink-0 items-center gap-2 text-paragraph-sm tabular-nums">
-												<span className="font-medium text-text-strong-950">
-													{formatClicks(recipient.clickCount ?? 0)}
-												</span>
-												<span className="text-text-soft-400">
-													{(recipient.uniqueClickCount ?? 0).toLocaleString()}{" "}
-													unique
-												</span>
-											</div>
-										) : (
-											<div
-												className={cn(
-													"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-													badge.className,
-												)}
-											>
-												<Icon
-													name={badge.icon}
-													className="h-3.5 w-3.5 shrink-0"
+											{activeTab === "clicked" ? (
+												<div className="flex shrink-0 items-center gap-2 text-paragraph-sm tabular-nums">
+													<span className="font-medium text-text-strong-950">
+														{formatClicks(recipient.clickCount ?? 0)}
+													</span>
+													<span className="text-text-soft-400">
+														{(recipient.uniqueClickCount ?? 0).toLocaleString()}{" "}
+														unique
+													</span>
+												</div>
+											) : (recipient.category || activeTab) ===
+												"unsubscribed" ? (
+												<ContactStatusBadge
+													status="unsubscribed"
+													variant="light"
 												/>
-												{badge.label}
-											</div>
-										)}
+											) : (
+												<div
+													className={cn(
+														"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+														badge.className,
+													)}
+												>
+													<Icon
+														name={badge.icon}
+														className="h-3.5 w-3.5 shrink-0"
+													/>
+													{badge.label}
+												</div>
+											)}
+										</Link>
 									</li>
 								);
 							})}

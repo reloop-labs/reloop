@@ -38,6 +38,12 @@ const SOLID_STATUS_CONFIGS: Record<string, StatusStyleConfig> = {
 		icon: "check",
 	},
 	unsubscribed: SOLID_DEFAULT_CONFIG,
+	suppressed: {
+		shell: "bg-[#991b1b] dark:bg-[#7f1d1d]",
+		face: "bg-[#dc2626] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#b91c1c] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+		text: "text-white",
+		icon: "slash",
+	},
 	blocked: {
 		shell: "bg-[#78350f] dark:bg-[#451a03]",
 		face: "bg-[#d97706] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#b45309] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
@@ -62,6 +68,12 @@ const LIGHT_STATUS_CONFIGS: Record<string, StatusStyleConfig> = {
 		icon: "check",
 	},
 	unsubscribed: LIGHT_DEFAULT_CONFIG,
+	suppressed: {
+		shell: "bg-[#fca5a5] dark:bg-[#7f1d1d]",
+		face: "bg-[#fee2e2] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#450a0a]/85 dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.12)]",
+		text: "text-[#b91c1c] dark:text-[#f87171]",
+		icon: "slash",
+	},
 	blocked: {
 		shell: "bg-[#fcd34d] dark:bg-[#78350f]",
 		face: "bg-[#fef3c7] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#451a03]/85 dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.12)]",

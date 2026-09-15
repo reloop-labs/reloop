@@ -415,6 +415,12 @@ export const ContactHeader = ({
 			? `${contact?.firstName ?? ""} ${contact?.lastName ?? ""}`.trim()
 			: (contact?.email ?? "Contact");
 	const initial = (displayName.charAt(0) || "?").toUpperCase();
+	const isSuppressed = Boolean(contact?.suppressionReason);
+	const effectiveStatus = isSuppressed ? "suppressed" : contact?.status;
+	const suppressionCopy =
+		contact?.suppressionReason === "spam_complaint"
+			? "This contact reported an email as spam, so they are automatically excluded from all sends."
+			: "Emails to this address hard-bounced, so this contact is automatically excluded from all sends.";
 
 	if (!contact && !isLoading) {
 		return (
@@ -478,8 +484,8 @@ export const ContactHeader = ({
 								<h1 className="truncate font-medium text-[22px] text-text-strong-950 tracking-tight">
 									{displayName}
 								</h1>
-								{contact?.status && (
-									<ContactStatusBadge status={contact.status} />
+								{effectiveStatus && (
+									<ContactStatusBadge status={effectiveStatus} />
 								)}
 							</div>
 						)}
@@ -522,7 +528,7 @@ export const ContactHeader = ({
 					</div>
 				</div>
 
-				{!isLoading && contact?.suppressionReason && (
+				{!isLoading && isSuppressed && (
 					<div className="mt-6 flex items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3">
 						<Icon
 							name="alert-octagon"
@@ -531,11 +537,14 @@ export const ContactHeader = ({
 						<div className="flex flex-col gap-0.5">
 							<h3 className="font-medium text-error-base text-sm">
 								Contact Suppressed
+								{contact?.suppressedAt && (
+									<span className="font-normal text-error-base/70">
+										{" "}
+										· {formatRelativeTime(contact.suppressedAt)}
+									</span>
+								)}
 							</h3>
-							<p className="text-error-base/80 text-sm">
-								This contact has been automatically excluded from all
-								communications due to a delivery issue or spam report.
-							</p>
+							<p className="text-error-base/80 text-sm">{suppressionCopy}</p>
 						</div>
 					</div>
 				)}
