@@ -9,9 +9,7 @@ import { useCurrentEditor, useEditorState } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import {
-	useAllPropertiesQuery,
-} from "#/features/contacts/hooks/use-contacts-query";
+import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import {
@@ -131,9 +129,31 @@ function CampaignVariableInspectorCard({ name }: { name: string }) {
 	);
 
 	const isStandard = ["email", "firstname", "lastname"].includes(target);
+	const isSystem = ["unsubscribe_url"].includes(target);
 	const varType =
 		matchedProp?.propertyType?.toLowerCase() === "number" ? "number" : "string";
 	const fallback = matchedProp?.defaultValue ?? "";
+
+	if (isSystem) {
+		return (
+			<InspectorSection>
+				<div className="flex flex-col gap-3 px-4 py-2">
+					<div className="flex flex-col gap-1">
+						<span className="font-semibold text-text-sub-600 text-xs">
+							System variable
+						</span>
+						<div className="select-all font-mono font-semibold text-text-strong-950">
+							{formatTemplateVariable(name, 3)}
+						</div>
+					</div>
+					<p className="text-text-sub-600 text-xs leading-normal">
+						Resolves to the recipient&apos;s personal unsubscribe link at
+						send time.
+					</p>
+				</div>
+			</InspectorSection>
+		);
+	}
 
 	return (
 		<InspectorSection>

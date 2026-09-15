@@ -47,6 +47,19 @@ export function toContactVariableName(raw: string): string {
 	return bare ? `contact.${bare}` : "contact.";
 }
 
+/**
+ * System variables — resolved by the sender at send time, not from contact
+ * properties. Rendered in their own dropdown section so users can place them
+ * anywhere in the content.
+ */
+export const SYSTEM_CAMPAIGN_VARIABLES = ["unsubscribe_url"] as const;
+
+/** Case-insensitive check for a system variable (ignores `contact.` prefix). */
+export function isSystemCampaignVariable(raw: string): boolean {
+	const bare = stripContactPrefix(raw).toLowerCase();
+	return (SYSTEM_CAMPAIGN_VARIABLES as readonly string[]).includes(bare);
+}
+
 export type CampaignContactProperty = {
 	id?: string;
 	propertyName: string;

@@ -6,6 +6,7 @@ import type React from "react";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import {
 	findContactPropertyForVariable,
+	isSystemCampaignVariable,
 	normalizeCampaignVariableName,
 	stripContactPrefix,
 } from "../lib/campaign-variables";
@@ -33,8 +34,12 @@ export function CampaignVariableNodeView({
 		normalizeCampaignVariableName(cleanName).toLowerCase(),
 	);
 
+	// System variables (e.g. unsubscribe_url) resolve at send time.
+	const isSystemVar = isSystemCampaignVariable(name);
+
 	const hasDefaultValue =
 		isStandardProp ||
+		isSystemVar ||
 		(!!matchedProp &&
 			matchedProp.defaultValue !== undefined &&
 			matchedProp.defaultValue !== null &&
