@@ -84,11 +84,14 @@ export async function checkRateLimit({
 	headers,
 	activeOrganizationId,
 	userId,
+	authType,
 	log,
 }: {
 	headers: Headers;
 	activeOrganizationId: string;
 	userId?: string;
+	/** Internal service-to-service sends share a datacenter IP; skip the IP layer. */
+	authType?: "session" | "apikey" | "internal";
 	log: {
 		warn: (msg: string, meta?: Record<string, unknown>) => void;
 		error: (msg: string, meta?: Record<string, unknown>) => void;
@@ -102,13 +105,20 @@ export async function checkRateLimit({
 	try {
 		const ip = getClientIp(headers);
 
-		const layers: RateLimitLayer[] = [
-			{
+		const layers: RateLimitLayer[] = [];
+
+		// Campaigns and automations inject from a shared egress IP. The IP
+		// bucket is for public clients, not internal fan-out.
+		if (authType !== "internal") {
+			layers.push({
 				name: "IP",
 				key: `rl:send:ip:${ip}`,
 				max: mailConfig.RATE_LIMIT_IP_MAX,
 				windowSeconds: mailConfig.RATE_LIMIT_IP_WINDOW_SECONDS,
-			},
+			});
+		}
+
+		layers.push(
 			{
 				name: "organization",
 				key: `rl:send:org:${activeOrganizationId}`,
@@ -127,10 +137,10 @@ export async function checkRateLimit({
 				max: mailConfig.RATE_LIMIT_GLOBAL_MAX,
 				windowSeconds: mailConfig.RATE_LIMIT_GLOBAL_WINDOW_SECONDS,
 			},
-		];
+		);
 
 		if (userId) {
-			layers.splice(3, 0, {
+			layers.push({
 				name: "user",
 				key: `rl:send:user:${userId}`,
 				max: mailConfig.RATE_LIMIT_USER_MAX,

@@ -1,6 +1,8 @@
 import { campaignsConfig } from "@be/campaigns/campaigns.config";
-import { startCampaignSend } from "@be/campaigns/lib/campaign/dispatch";
-import { sendCampaignRecipient } from "@be/campaigns/lib/campaign/send-recipient";
+import {
+	sendCampaignBatch,
+	startCampaignSend,
+} from "@be/campaigns/lib/campaign/dispatch";
 import {
 	CAMPAIGN_QUEUE,
 	type CampaignJobData,
@@ -24,13 +26,18 @@ export function startCampaignWorker(): Worker {
 				return;
 			}
 
-			for (const recipientId of job.data.recipientIds) {
-				await sendCampaignRecipient(recipientId);
-			}
+			await sendCampaignBatch({
+				campaignId: job.data.campaignId,
+				organizationId: job.data.organizationId,
+				batchIndex: job.data.batchIndex ?? 0,
+				recipientIds: job.data.recipientIds,
+			});
 		},
 		{
 			connection,
-			concurrency: 5,
+			// Multiple campaigns may run at once; each campaign only has one
+			// active batch so a single org cannot fan out past the mail caps.
+			concurrency: 3,
 		},
 	);
 

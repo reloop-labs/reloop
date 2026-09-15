@@ -2,7 +2,7 @@ import {
 	htmlToText,
 	skipReasonForContact,
 } from "@be/campaigns/lib/campaign/audience";
-import { maybeCompleteCampaign } from "@be/campaigns/lib/campaign/dispatch";
+import { maybeCompleteCampaign } from "@be/campaigns/lib/campaign/complete";
 import {
 	campaignMergeVars,
 	interpolate,
@@ -20,27 +20,31 @@ import * as schema from "@reloop/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { log } from "evlog";
 
+export type SendRecipientResult =
+	| { outcome: "sent" | "skipped" | "failed" | "ignored" | "quota_exceeded" }
+	| { outcome: "rate_limited"; retryAfterSeconds?: number };
+
 export async function sendCampaignRecipient(
 	recipientId: string,
-): Promise<void> {
+): Promise<SendRecipientResult> {
 	const recipient = await db.query.campaignRecipient.findFirst({
 		where: eq(schema.campaignRecipient.id, recipientId),
 	});
-	if (!recipient) return;
+	if (!recipient) return { outcome: "ignored" };
 	if (recipient.emailLogId || recipient.status === "sent") {
 		await maybeCompleteCampaign(recipient.campaignId);
-		return;
+		return { outcome: "ignored" };
 	}
 	if (recipient.status === "skipped" || recipient.status === "failed") {
 		await maybeCompleteCampaign(recipient.campaignId);
-		return;
+		return { outcome: "ignored" };
 	}
 
 	const campaign = await db.query.campaign.findFirst({
 		where: eq(schema.campaign.id, recipient.campaignId),
 	});
 	if (!campaign || campaign.status === "cancelled" || campaign.deletedAt) {
-		return;
+		return { outcome: "ignored" };
 	}
 
 	if (recipient.contactId) {
@@ -53,7 +57,7 @@ export async function sendCampaignRecipient(
 		if (skip) {
 			await markSkipped(recipient.id, campaign.id, skip);
 			await maybeCompleteCampaign(campaign.id);
-			return;
+			return { outcome: "skipped" };
 		}
 	}
 
@@ -171,7 +175,12 @@ export async function sendCampaignRecipient(
 				.update(schema.campaign)
 				.set({ lastError: message, updatedAt: new Date() })
 				.where(eq(schema.campaign.id, campaign.id));
-			throw error;
+			if (status === 402) return { outcome: "quota_exceeded" };
+			return {
+				outcome: "rate_limited",
+				retryAfterSeconds: (error as { retryAfterSeconds?: number })
+					.retryAfterSeconds,
+			};
 		}
 
 		await db
@@ -190,9 +199,12 @@ export async function sendCampaignRecipient(
 				updatedAt: new Date(),
 			})
 			.where(eq(schema.campaign.id, campaign.id));
+		await maybeCompleteCampaign(campaign.id);
+		return { outcome: "failed" };
 	}
 
 	await maybeCompleteCampaign(campaign.id);
+	return { outcome: "sent" };
 }
 
 async function markSkipped(

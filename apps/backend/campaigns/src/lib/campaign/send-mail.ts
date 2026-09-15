@@ -1,4 +1,5 @@
 import { campaignsConfig } from "@be/campaigns/campaigns.config";
+import { parseRetryAfter } from "@be/campaigns/lib/campaign/batch";
 import {
 	INTERNAL_ORG_ID_HEADER,
 	INTERNAL_SECRET_HEADER,
@@ -64,8 +65,15 @@ export async function sendCampaignMail(params: {
 			detail,
 			to: params.to,
 		});
-		const error = new Error(detail) as Error & { status?: number };
+		const error = new Error(detail) as Error & {
+			status?: number;
+			retryAfterSeconds?: number;
+		};
 		error.status = res.status;
+		const retryAfterSeconds = parseRetryAfter(res.headers.get("retry-after"));
+		if (retryAfterSeconds != null) {
+			error.retryAfterSeconds = retryAfterSeconds;
+		}
 		throw error;
 	}
 

@@ -11,7 +11,9 @@ export type CampaignJobData =
 			type: "send_batch";
 			campaignId: string;
 			organizationId: string;
-			recipientIds: string[];
+			batchIndex: number;
+			/** Legacy fan-out jobs may still carry a frozen recipient list. */
+			recipientIds?: string[];
 	  };
 
 const connection = {
@@ -39,9 +41,9 @@ export function campaignStartJobId(campaignId: string): string {
 
 export function campaignBatchJobId(
 	campaignId: string,
-	batchStart: string,
+	batchIndex: number,
 ): string {
-	return `campaign-send-${campaignId}-${batchStart}`;
+	return `campaign-send-${campaignId}-${batchIndex}`;
 }
 
 export async function enqueueCampaignStart(params: {
@@ -78,8 +80,91 @@ export async function enqueueCampaignStart(params: {
 	);
 }
 
+export async function enqueueCampaignBatch(params: {
+	campaignId: string;
+	organizationId: string;
+	batchIndex: number;
+	delayMs?: number;
+	recipientIds?: string[];
+}): Promise<void> {
+	const jobId = campaignBatchJobId(params.campaignId, params.batchIndex);
+	const existing = await campaignQueue.getJob(jobId);
+	if (existing) {
+		const state = await existing.getState();
+		if (state === "active" || state === "waiting" || state === "delayed") {
+			return;
+		}
+		await existing.remove().catch(() => undefined);
+	}
+
+	await campaignQueue.add(
+		"send_batch",
+		{
+			type: "send_batch",
+			campaignId: params.campaignId,
+			organizationId: params.organizationId,
+			batchIndex: params.batchIndex,
+			...(params.recipientIds ? { recipientIds: params.recipientIds } : {}),
+		},
+		{
+			jobId,
+			delay: Math.max(0, params.delayMs ?? 0),
+		},
+	);
+}
+
+export async function scheduleCampaignStart(params: {
+	campaignId: string;
+	organizationId: string;
+	scheduledAt: Date;
+}): Promise<void> {
+	const delayMs = Math.max(0, params.scheduledAt.getTime() - Date.now());
+	await enqueueCampaignStart({
+		campaignId: params.campaignId,
+		organizationId: params.organizationId,
+		delayMs,
+	});
+}
+
 export async function cancelCampaignStart(campaignId: string): Promise<void> {
-	const existing = await campaignQueue.getJob(campaignStartJobId(campaignId));
+	await removeJobIfIdle(campaignStartJobId(campaignId));
+}
+
+export async function campaignHasQueuedSend(
+	campaignId: string,
+): Promise<boolean> {
+	const jobs = await campaignQueue.getJobs([
+		"wait",
+		"waiting",
+		"delayed",
+		"active",
+		"paused",
+		"waiting-children",
+	]);
+	return jobs.some(
+		(job) =>
+			job.data.campaignId === campaignId && job.data.type === "send_batch",
+	);
+}
+
+export async function cancelCampaignJobs(campaignId: string): Promise<void> {
+	await cancelCampaignStart(campaignId);
+	const jobs = await campaignQueue.getJobs([
+		"wait",
+		"waiting",
+		"delayed",
+		"paused",
+		"waiting-children",
+	]);
+	await Promise.all(
+		jobs
+			.filter((job) => job.data.campaignId === campaignId)
+			.map((job) => job.remove().catch(() => undefined)),
+	);
+}
+
+async function removeJobIfIdle(jobId: string): Promise<void> {
+	const existing = await campaignQueue.getJob(jobId);
 	if (!existing) return;
 	const state = await existing.getState();
 	if (state === "active") return;

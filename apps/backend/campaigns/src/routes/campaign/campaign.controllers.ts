@@ -20,7 +20,7 @@ import {
 	canSend,
 } from "@be/campaigns/lib/campaign/status";
 import {
-	cancelCampaignStart,
+	cancelCampaignJobs,
 	enqueueCampaignStart,
 } from "@be/campaigns/queues/campaign.queue";
 import {
@@ -360,7 +360,7 @@ export async function cancelCampaignController(params: {
 	if (!canCancel(row.status)) {
 		throw CampaignErrors.cannotCancel(row.id, row.status);
 	}
-	await cancelCampaignStart(row.id);
+	await cancelCampaignJobs(row.id);
 	const skipped = await db
 		.update(schema.campaignRecipient)
 		.set({
