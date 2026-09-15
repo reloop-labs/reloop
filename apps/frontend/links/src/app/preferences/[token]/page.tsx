@@ -29,9 +29,12 @@ async function fetchPreferencesData(
 	token: string,
 ): Promise<PreferencesData | null> {
 	try {
-		const res = await fetch(`${API_BASE}/v1/preferences/data/${token}`, {
-			cache: "no-store",
-		});
+		const res = await fetch(
+			`${API_BASE}/v1/preferences/data?token=${encodeURIComponent(token)}`,
+			{
+				cache: "no-store",
+			},
+		);
 		if (!res.ok) return null;
 		return res.json();
 	} catch {

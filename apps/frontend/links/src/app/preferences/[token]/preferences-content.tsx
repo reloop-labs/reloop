@@ -113,17 +113,15 @@ export function PreferencesContent({
 		try {
 			const updates = changedChannels.map(async (channel) => {
 				const targetSubscribed = checked[channel.id];
-				const res = await fetch(
-					`/api/contacts/v1/preferences/update/${token}`,
-					{
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							channelId: channel.id,
-							subscribe: targetSubscribed,
-						}),
-					},
-				);
+				const res = await fetch("/api/contacts/v1/preferences/update", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						token,
+						channelId: channel.id,
+						subscribe: targetSubscribed,
+					}),
+				});
 				if (!res.ok) throw new Error(`Failed to update ${channel.name}`);
 			});
 
@@ -145,9 +143,11 @@ export function PreferencesContent({
 			setUnsubscribeAllState("loading");
 			try {
 				const res = await fetch(
-					`/api/contacts/v1/preferences/unsubscribe-all/${token}`,
+					"/api/contacts/v1/preferences/unsubscribe-all",
 					{
 						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ token }),
 					},
 				);
 				if (!res.ok) throw new Error("Failed");

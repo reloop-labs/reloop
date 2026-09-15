@@ -71,7 +71,7 @@ export async function generatePreferenceTokenController({
 		organizationId,
 		expiresAt,
 	});
-	const url = `${BASE_URL}/preferences?token=${token}`;
+	const url = `${BASE_URL}/preferences/${token}`;
 
 	log.info("Preference token generated successfully", {
 		contactId: contact.id,
