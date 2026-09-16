@@ -20,6 +20,27 @@ export interface SlackEmailFailureAlertInput {
 	orgId?: string | null;
 }
 
+export interface SlackSigninAlertInput {
+	email: string;
+	fullName: string;
+	userId?: string | null;
+	isNewUser?: boolean;
+	browser?: string | null;
+	os?: string | null;
+	ip?: string | null;
+	location?: string | null;
+}
+
+export interface SlackDomainAddedAlertInput {
+	domain: string;
+	domainId: string;
+	orgName?: string | null;
+	orgId?: string | null;
+	userName?: string | null;
+	userEmail?: string | null;
+	restored?: boolean;
+}
+
 // In-memory sliding window for email failure alert throttling
 const EMAIL_FAILURE_WINDOW_MS = 60_000;
 const MAX_EMAIL_FAILURE_ALERTS_PER_WINDOW = 5;
@@ -196,6 +217,176 @@ export function buildEmailFailureSlackPayload(
 	};
 }
 
+export function buildSigninSlackPayload(
+	input: SlackSigninAlertInput,
+	consoleBaseUrl = adminConfig.CONSOLE_BASE_URL,
+) {
+	const base = cleanConsoleUrl(consoleBaseUrl);
+	const displayName = input.fullName || "User";
+	const displayEmail = input.email || "No email";
+	const isNewUser = Boolean(input.isNewUser);
+	const header = isNewUser ? "👋 New user signed in" : "🔑 User signed in";
+	const userUrl = input.userId
+		? `${base}/console/users/${encodeURIComponent(input.userId)}`
+		: `${base}/console/users?q=${encodeURIComponent(displayEmail)}`;
+
+	const fields: Array<{ type: "mrkdwn"; text: string }> = [
+		{
+			type: "mrkdwn",
+			text: `*User:*\n${escapeSlackText(displayName)} (<mailto:${escapeSlackText(displayEmail)}|${escapeSlackText(displayEmail)}>)`,
+		},
+	];
+
+	if (input.browser) {
+		fields.push({
+			type: "mrkdwn",
+			text: `*Browser:*\n${escapeSlackText(input.browser)}`,
+		});
+	}
+	if (input.os) {
+		fields.push({
+			type: "mrkdwn",
+			text: `*OS:*\n${escapeSlackText(input.os)}`,
+		});
+	}
+	if (input.ip) {
+		fields.push({
+			type: "mrkdwn",
+			text: `*IP:*\n\`${escapeSlackText(input.ip)}\``,
+		});
+	}
+	if (input.location) {
+		fields.push({
+			type: "mrkdwn",
+			text: `*Location:*\n${escapeSlackText(input.location)}`,
+		});
+	}
+
+	return {
+		text: `${header}: ${displayName} (${displayEmail})`,
+		blocks: [
+			{
+				type: "header",
+				text: {
+					type: "plain_text",
+					text: header,
+					emoji: true,
+				},
+			},
+			{
+				type: "section",
+				fields,
+			},
+			{
+				type: "actions",
+				elements: [
+					{
+						type: "button",
+						text: {
+							type: "plain_text",
+							text: "Open in Console ↗",
+							emoji: true,
+						},
+						url: userUrl,
+						style: "primary",
+					},
+				],
+			},
+		],
+	};
+}
+
+export function buildDomainAddedSlackPayload(
+	input: SlackDomainAddedAlertInput,
+	consoleBaseUrl = adminConfig.CONSOLE_BASE_URL,
+) {
+	const base = cleanConsoleUrl(consoleBaseUrl);
+	const restored = Boolean(input.restored);
+	const header = restored ? "🌐 Domain restored" : "🌐 Domain added";
+	const displayOrg = input.orgName
+		? `${input.orgName}${input.orgId ? ` (${input.orgId})` : ""}`
+		: input.orgId || "Unknown organization";
+	const addedBy =
+		input.userName || input.userEmail
+			? `${input.userName || "User"}${input.userEmail ? ` (${input.userEmail})` : ""}`
+			: null;
+	const domainUrl = `${base}/console/domains?q=${encodeURIComponent(input.domain)}`;
+	const orgUrl = input.orgId
+		? `${base}/console/organizations/${encodeURIComponent(input.orgId)}`
+		: null;
+
+	const fields: Array<{ type: "mrkdwn"; text: string }> = [
+		{
+			type: "mrkdwn",
+			text: `*Domain:*\n\`${escapeSlackText(input.domain)}\``,
+		},
+		{
+			type: "mrkdwn",
+			text: `*Organization:*\n${escapeSlackText(displayOrg)}`,
+		},
+	];
+
+	if (addedBy) {
+		fields.push({
+			type: "mrkdwn",
+			text: `*Added by:*\n${escapeSlackText(addedBy)}`,
+		});
+	}
+
+	const actions: Array<{
+		type: "button";
+		text: { type: "plain_text"; text: string; emoji: boolean };
+		url: string;
+		style: "primary";
+	}> = [
+		{
+			type: "button",
+			text: {
+				type: "plain_text",
+				text: "Open domain ↗",
+				emoji: true,
+			},
+			url: domainUrl,
+			style: "primary",
+		},
+	];
+
+	if (orgUrl) {
+		actions.push({
+			type: "button",
+			text: {
+				type: "plain_text",
+				text: "Open organization ↗",
+				emoji: true,
+			},
+			url: orgUrl,
+			style: "primary",
+		});
+	}
+
+	return {
+		text: `${header}: ${input.domain} (${displayOrg})`,
+		blocks: [
+			{
+				type: "header",
+				text: {
+					type: "plain_text",
+					text: header,
+					emoji: true,
+				},
+			},
+			{
+				type: "section",
+				fields,
+			},
+			{
+				type: "actions",
+				elements: actions,
+			},
+		],
+	};
+}
+
 export type SlackFetcher = (
 	url: string,
 	init?: RequestInit,
@@ -324,6 +515,50 @@ export async function sendSlackEmailFailureNotification(
 	}
 
 	const payload = buildEmailFailureSlackPayload(
+		input,
+		options.consoleBaseUrl ?? adminConfig.CONSOLE_BASE_URL,
+	);
+	return await postToSlack(webhookUrl, payload, options.fetcher);
+}
+
+export async function sendSlackSigninNotification(
+	input: SlackSigninAlertInput,
+	options: SlackNotificationOptions = {},
+): Promise<boolean> {
+	const webhookUrl = options.webhookUrl ?? adminConfig.SLACK_WEBHOOK_URL;
+
+	if (!webhookUrl) {
+		log.debug({
+			email: input.email,
+			message: "Slack webhook not configured, skipping sign-in notification",
+		});
+		return false;
+	}
+
+	const payload = buildSigninSlackPayload(
+		input,
+		options.consoleBaseUrl ?? adminConfig.CONSOLE_BASE_URL,
+	);
+	return await postToSlack(webhookUrl, payload, options.fetcher);
+}
+
+export async function sendSlackDomainAddedNotification(
+	input: SlackDomainAddedAlertInput,
+	options: SlackNotificationOptions = {},
+): Promise<boolean> {
+	const webhookUrl = options.webhookUrl ?? adminConfig.SLACK_WEBHOOK_URL;
+
+	if (!webhookUrl) {
+		log.debug({
+			domain: input.domain,
+			domainId: input.domainId,
+			message:
+				"Slack webhook not configured, skipping domain-added notification",
+		});
+		return false;
+	}
+
+	const payload = buildDomainAddedSlackPayload(
 		input,
 		options.consoleBaseUrl ?? adminConfig.CONSOLE_BASE_URL,
 	);
