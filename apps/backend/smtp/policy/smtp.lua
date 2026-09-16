@@ -373,12 +373,53 @@ local function apply_reloop_logic(msg, api_key)
   end
 end
 
--- AUTH
+local function validate_smtp_api_key(password)
+  if password == nil or password == "" then
+    return false, "empty"
+  end
+
+  local client = kumo.http.build_client({
+    danger_accept_invalid_certs = true
+  })
+  local target_url = constants.kumomta_url .. "/v1/smtp-auth"
+  local status, response = pcall(function()
+    local req = client:post(target_url)
+    return req
+      :header("x-api-key", password)
+      :header("User-Agent", "ReloopSmtp/1.0")
+      :send()
+  end)
+
+  if not status then
+    return nil, tostring(response)
+  end
+
+  local code = response:status_code()
+  if code == 200 then
+    return true
+  end
+  if code == 401 then
+    return false, "unauthorized"
+  end
+  return nil, "status " .. tostring(code)
+end
+
+-- AUTH: reject unknown passwords at connect time, not only at DATA.
 kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
-  -- Store API key; actual key + domain verification happens on message receipt
-  conn_meta:set_meta('api_key', password)
-  conn_meta:set_meta('authz_id', authc)
-  return true
+  local ok, err = validate_smtp_api_key(password)
+  if ok == true then
+    conn_meta:set_meta('api_key', password)
+    conn_meta:set_meta('authz_id', authc)
+    print("[SMTP-AUTH] accepted")
+    return true
+  end
+  if ok == false then
+    print("[SMTP-AUTH] rejected: " .. tostring(err))
+    return false
+  end
+  print("[SMTP-AUTH] temporary failure: " .. tostring(err))
+  kumo.reject(454, "4.7.0 Temporary authentication failure")
+  return false
 end)
 
 kumo.on('http_server_validate_auth_basic', function(user, password)
