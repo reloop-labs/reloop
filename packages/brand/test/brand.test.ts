@@ -23,4 +23,14 @@ describe("resolveAppName", () => {
 			expect(resolveAppName(value)).toBe(DEFAULT_APP_NAME);
 		}
 	});
+
+	test("does not repeat an already prefixed name", () => {
+		for (const value of [
+			"Self-hosted Reloop × Acme Mail",
+			"  self-hosted reloop ×Acme Mail",
+		]) {
+			expect(resolveAppName(value)).toBe("Self-hosted Reloop × Acme Mail");
+		}
+		expect(resolveAppName("Self-hosted Reloop × ")).toBe(DEFAULT_APP_NAME);
+	});
 });
