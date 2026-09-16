@@ -4,8 +4,7 @@
 	"private": true,
 	"type": "module",
 	"exports": {
-		"./resolver": "./src/resolver.ts",
-		"./rdap-created-at": "./src/rdap-created-at.ts"
+		"./resolver": "./src/resolver.ts"
 	},
 	"scripts": {
 		"test": "bun test test/"

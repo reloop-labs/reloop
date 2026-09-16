@@ -86,9 +86,6 @@ export const domain = pgTable(
 			.notNull()
 			.default(false),
 		verificationFailedReason: text("verification_failed_reason"),
-		/** RDAP registration date for the registrable domain, when known. */
-		registeredAt: timestamp("registered_at"),
-		registrationAgeCheckedAt: timestamp("registration_age_checked_at"),
 		deletedAt: timestamp("deleted_at"),
 		lastVerifiedAt: timestamp("last_verified_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),

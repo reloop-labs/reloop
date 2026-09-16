@@ -22,15 +22,6 @@ export {
 	type DatabaseInstance,
 	db,
 } from "./client";
-export {
-	domainDailyOverlay,
-	isRegistrationAgeStale,
-	mergeDailyLimits,
-	NEW_DOMAIN_COLD_DAILY_CAP,
-	NEW_DOMAIN_TOO_NEW_DAILY_CAP,
-	REGISTRATION_AGE_STALE_MS,
-	refreshDomainRegistrationAge,
-} from "./domain-daily-overlay";
 export * from "./email-send-source";
 export {
 	type AssignCheck,
@@ -63,7 +54,6 @@ export {
 	type OutboundAbuseScore,
 	type OutboundAbuseSeverity,
 	scoreOutboundAbuse,
-	shouldApplyNewDomainThrottle,
 } from "./outbound-abuse";
 export {
 	applyCreditReservation,

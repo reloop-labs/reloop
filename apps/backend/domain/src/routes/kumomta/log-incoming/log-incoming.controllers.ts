@@ -1,10 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
-import { refreshDomainRegistrationAge } from "@reloop/db/domain-daily-overlay";
-import {
-	scoreOutboundAbuse,
-	shouldApplyNewDomainThrottle,
-} from "@reloop/db/outbound-abuse";
+import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import {
 	type CreditReservation,
 	refundSendCredits,
@@ -12,7 +8,6 @@ import {
 } from "@reloop/db/reserve-send-credits";
 import { domain, emailLog } from "@reloop/db/schema";
 import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
-import { lookupRdapCreatedAt } from "@reloop/dns/rdap-created-at";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
 import { createError } from "evlog";
@@ -96,8 +91,6 @@ export async function logIncomingController({
 			domain: true,
 			systemVerified: true,
 			tls: true,
-			registeredAt: true,
-			registrationAgeCheckedAt: true,
 		},
 	});
 
@@ -166,37 +159,13 @@ export async function logIncomingController({
 		throw KumoMtaErrors.abuseBlocked(abuse.reasons);
 	}
 
-	let registeredAt = domainRecord.registeredAt;
-	try {
-		registeredAt = await refreshDomainRegistrationAge({
-			domainId: domainRecord.id,
-			domainName: domainRecord.domain,
-			registeredAt: domainRecord.registeredAt,
-			registrationAgeCheckedAt: domainRecord.registrationAgeCheckedAt,
-			lookup: lookupRdapCreatedAt,
-		});
-	} catch (error) {
-		log.warn(
-			`[LOG-INCOMING] Domain age refresh failed: ${error instanceof Error ? error.message : String(error)}`,
-		);
-	}
-
 	const recipientCount = toEmails.length;
 	const decision = await reserveSendCredits({
 		organizationId: finalOrgId,
 		recipientCount,
-		domainRegisteredAt: registeredAt,
-		applyDomainAgeOverlay: shouldApplyNewDomainThrottle(abuse, recipientCount),
 	});
 	if (!decision.ok) {
 		if (decision.reason === "daily" && decision.dailyLimit != null) {
-			if (decision.cause === "domain_age") {
-				throw KumoMtaErrors.domainTooNew({
-					used: decision.dailyUsed,
-					limit: decision.dailyLimit,
-					required: recipientCount,
-				});
-			}
 			throw KumoMtaErrors.dailyQuotaExceeded({
 				used: decision.dailyUsed,
 				limit: decision.dailyLimit,

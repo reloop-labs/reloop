@@ -1,6 +1,5 @@
 import { and, eq, lte } from "drizzle-orm";
 import { type DatabaseInstance, db } from "./client";
-import { domainDailyOverlay, mergeDailyLimits } from "./domain-daily-overlay";
 import {
 	creditLedger,
 	organizationCredits,
@@ -28,7 +27,6 @@ export type CreditSnapshot = {
 export type ReserveDenied = {
 	ok: false;
 	reason: "monthly" | "daily";
-	cause?: "domain_age";
 	remaining: number;
 	monthlyCredits: number;
 	dailyUsed: number;
@@ -243,40 +241,18 @@ async function ensureActiveCredits(
 	return activeCredits;
 }
 
-async function loadPlanCaps(
+async function loadPlanDailyEmailLimit(
 	organizationId: string,
 	client: DatabaseInstance,
-): Promise<{ planId: string; dailyEmailLimit: number | null }> {
+): Promise<number | null> {
 	const plan = await client.query.organizationPlan.findFirst({
 		where: eq(organizationPlan.organizationId, organizationId),
-		columns: { planId: true, dailyEmailLimit: true },
+		columns: { dailyEmailLimit: true },
 	});
 	if (!plan) {
-		return { planId: "free", dailyEmailLimit: DEFAULT_DAILY_EMAIL_LIMIT };
+		return DEFAULT_DAILY_EMAIL_LIMIT;
 	}
-	return { planId: plan.planId, dailyEmailLimit: plan.dailyEmailLimit };
-}
-
-function resolveDailyLimit(args: {
-	planId: string;
-	planDailyEmailLimit: number | null;
-	domainRegisteredAt?: Date | null;
-	now: Date;
-	applyDomainAgeOverlay?: boolean;
-}): { dailyEmailLimit: number | null; domainAgeLimited: boolean } {
-	const overlay =
-		args.applyDomainAgeOverlay === false
-			? null
-			: domainDailyOverlay({
-					registeredAt: args.domainRegisteredAt,
-					planId: args.planId,
-					now: args.now,
-				});
-	const dailyEmailLimit = mergeDailyLimits(args.planDailyEmailLimit, overlay);
-	const domainAgeLimited =
-		overlay != null &&
-		(args.planDailyEmailLimit == null || overlay < args.planDailyEmailLimit);
-	return { dailyEmailLimit, domainAgeLimited };
+	return plan.dailyEmailLimit;
 }
 
 function snapshotFromRow(
@@ -301,30 +277,20 @@ export async function peekSendCredits(args: {
 	recipientCount: number;
 	now?: Date;
 	client?: DatabaseInstance;
-	domainRegisteredAt?: Date | null;
-	applyDomainAgeOverlay?: boolean;
 }): Promise<ReserveDecision> {
 	const client = args.client ?? db;
 	const now = args.now ?? new Date();
 	const credits = await ensureActiveCredits(args.organizationId, client, now);
-	const plan = await loadPlanCaps(args.organizationId, client);
-	const { dailyEmailLimit, domainAgeLimited } = resolveDailyLimit({
-		planId: plan.planId,
-		planDailyEmailLimit: plan.dailyEmailLimit,
-		domainRegisteredAt: args.domainRegisteredAt,
-		now,
-		applyDomainAgeOverlay: args.applyDomainAgeOverlay,
-	});
-	const decision = applyCreditReservation({
+	const dailyEmailLimit = await loadPlanDailyEmailLimit(
+		args.organizationId,
+		client,
+	);
+	return applyCreditReservation({
 		credits: snapshotFromRow(credits),
 		dailyEmailLimit,
 		recipientCount: args.recipientCount,
 		now,
 	});
-	if (!decision.ok && decision.reason === "daily" && domainAgeLimited) {
-		return { ...decision, cause: "domain_age" };
-	}
-	return decision;
 }
 
 /**
@@ -336,8 +302,6 @@ export async function reserveSendCredits(args: {
 	recipientCount: number;
 	now?: Date;
 	client?: DatabaseInstance;
-	domainRegisteredAt?: Date | null;
-	applyDomainAgeOverlay?: boolean;
 }): Promise<ReserveDecision & { reservation?: CreditReservation }> {
 	const outer = args.client ?? db;
 	const now = args.now ?? new Date();
@@ -385,14 +349,7 @@ export async function reserveSendCredits(args: {
 			throw new Error("Failed to lock organization credits for reservation");
 		}
 
-		const plan = await loadPlanCaps(organizationId, tx);
-		const { dailyEmailLimit, domainAgeLimited } = resolveDailyLimit({
-			planId: plan.planId,
-			planDailyEmailLimit: plan.dailyEmailLimit,
-			domainRegisteredAt: args.domainRegisteredAt,
-			now,
-			applyDomainAgeOverlay: args.applyDomainAgeOverlay,
-		});
+		const dailyEmailLimit = await loadPlanDailyEmailLimit(organizationId, tx);
 		const decision = applyCreditReservation({
 			credits: snapshotFromRow(locked),
 			dailyEmailLimit,
@@ -401,9 +358,6 @@ export async function reserveSendCredits(args: {
 		});
 
 		if (!decision.ok) {
-			if (decision.reason === "daily" && domainAgeLimited) {
-				return { ...decision, cause: "domain_age" };
-			}
 			return decision;
 		}
 

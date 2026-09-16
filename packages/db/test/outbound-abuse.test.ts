@@ -1,8 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import {
-	scoreOutboundAbuse,
-	shouldApplyNewDomainThrottle,
-} from "../src/outbound-abuse";
+import { scoreOutboundAbuse } from "../src/outbound-abuse";
 
 describe("scoreOutboundAbuse", () => {
 	test("a normal transactional send is not abuse", () => {
@@ -13,7 +10,6 @@ describe("scoreOutboundAbuse", () => {
 			text: "Thanks for being a customer. https://acme.com/invoices/1",
 		});
 		expect(score.severity).toBe("none");
-		expect(shouldApplyNewDomainThrottle(score, 1)).toBe(false);
 	});
 
 	test("the CVE / Telus MMS campaign is blocked as high", () => {
@@ -25,7 +21,6 @@ describe("scoreOutboundAbuse", () => {
 		});
 		expect(score.severity).toBe("high");
 		expect(score.reasons).toContain("sms_gateway");
-		expect(shouldApplyNewDomainThrottle(score, 1)).toBe(true);
 	});
 
 	test("stacked phishing tokens without a gateway are still high", () => {
@@ -46,7 +41,6 @@ describe("scoreOutboundAbuse", () => {
 			text: "See https://exchange.com/status",
 		});
 		expect(score.severity).toBe("medium");
-		expect(shouldApplyNewDomainThrottle(score, 1)).toBe(true);
 	});
 
 	test("25 recipients is medium bulk", () => {

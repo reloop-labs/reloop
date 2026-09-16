@@ -129,11 +129,3 @@ export function scoreOutboundAbuse(args: {
 
 	return { severity: "none", reasons: [], phishingTokenCount: phishing.count };
 }
-
-/** New-domain 10/25 overlay is for blast-shaped mail, not a 2FA to one user. */
-export function shouldApplyNewDomainThrottle(
-	score: OutboundAbuseScore,
-	recipientCount: number,
-): boolean {
-	return score.severity !== "none" || recipientCount > 10;
-}

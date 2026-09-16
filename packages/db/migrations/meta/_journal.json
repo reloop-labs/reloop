@@ -148,6 +148,13 @@
 			"when": 1786900000000,
 			"tag": "0020_sending_ip",
 			"breakpoints": true
+		},
+		{
+			"idx": 21,
+			"version": "7",
+			"when": 1787000000000,
+			"tag": "0021_drop_domain_registration_age",
+			"breakpoints": true
 		}
 	]
 }

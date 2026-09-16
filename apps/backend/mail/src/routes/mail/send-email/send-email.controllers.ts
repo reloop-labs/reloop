@@ -9,13 +9,8 @@ import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
-import { refreshDomainRegistrationAge } from "@reloop/db/domain-daily-overlay";
-import {
-	scoreOutboundAbuse,
-	shouldApplyNewDomainThrottle,
-} from "@reloop/db/outbound-abuse";
+import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import { emailThread, threadMessage } from "@reloop/db/schema";
-import { lookupRdapCreatedAt } from "@reloop/dns/rdap-created-at";
 import { eq, sql } from "drizzle-orm";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -31,30 +26,6 @@ import {
 	sendEmail_step6,
 	verifyDomainAuth_step2,
 } from "./steps";
-
-async function ensureSendingDomainAge(currentDomain: {
-	id: string;
-	domain: string;
-	registeredAt: Date | null;
-	registrationAgeCheckedAt: Date | null;
-}): Promise<Date | null> {
-	try {
-		return await refreshDomainRegistrationAge({
-			domainId: currentDomain.id,
-			domainName: currentDomain.domain,
-			registeredAt: currentDomain.registeredAt,
-			registrationAgeCheckedAt: currentDomain.registrationAgeCheckedAt,
-			lookup: lookupRdapCreatedAt,
-		});
-	} catch (error) {
-		log.warn({
-			message: "Domain registration age refresh failed; using cached value",
-			domainId: currentDomain.id,
-			error: error instanceof Error ? error.message : String(error),
-		});
-		return currentDomain.registeredAt;
-	}
-}
 
 function parseFromName(from: string): string {
 	const displayNameMatch = from.match(/^(.+?)\s*<[^>]+>$/);
@@ -181,18 +152,11 @@ export async function sendEmailController({
 		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
 	}
 
-	const registeredAt = await ensureSendingDomainAge(currentDomain);
-
 	// Reserve monthly + daily quota under a row lock so concurrent API/SMTP
 	// senders cannot all pass a stale remaining-balance check.
 	const reservation = await reserveCreditsForSend({
 		organizationId,
 		body,
-		domainRegisteredAt: registeredAt,
-		applyDomainAgeOverlay: shouldApplyNewDomainThrottle(
-			abuse,
-			countEmailRecipients(body),
-		),
 	});
 
 	let injected = false;

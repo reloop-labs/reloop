@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 /**
  * TypeScript mirror of policy/tls.lua. If a case fails here, update both files.
@@ -34,8 +33,9 @@ function enableTls(
 	return "OpportunisticInsecure";
 }
 
-const policyDir = join(dirname(fileURLToPath(import.meta.url)), "../policy");
-const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
+/** package.json `bun test` runs with cwd = apps/backend/smtp */
+const policyDir = join(process.cwd(), "policy");
+const repoRoot = join(process.cwd(), "../../..");
 
 describe("normalizeTlsMode", () => {
 	test("defaults unknown values to opportunistic", () => {
@@ -161,7 +161,7 @@ describe("policy sources stay wired", () => {
 		expect(logIncoming).toContain("creditsReserved: true");
 		expect(logIncoming).toContain("uniqueBareEmails(body.toEmails)");
 		expect(logIncoming).toContain("No envelope recipients");
-		expect(logIncoming).toContain('decision.cause === "domain_age"');
+		expect(logIncoming).toContain("scoreOutboundAbuse");
 	});
 
 	test("smtp.lua validates AUTH PLAIN against /v1/smtp-auth", () => {
@@ -205,6 +205,6 @@ describe("policy sources stay wired", () => {
 		expect(sendController).toContain("if (!injected)");
 		expect(sendController).toContain("refundCreditsForFailedSend(reservation)");
 		expect(sendController).toContain("credits kept");
-		expect(sendController).toContain("domainRegisteredAt: registeredAt");
+		expect(sendController).toContain("scoreOutboundAbuse");
 	});
 });
