@@ -76,8 +76,8 @@ local function collect_send_recipients(msg)
   return emails
 end
 
--- Helper function to apply business logic to both SMTP and HTTP generated messages
-local function apply_reloop_logic(msg, api_key)
+-- source is 'smtp' (customer submission) or 'http' (mail-service inject).
+local function apply_reloop_logic(msg, api_key, source)
   local msg_id = msg:id()
 
   local header_api_key = msg:get_first_named_header_value('X-Api-Key')
@@ -123,16 +123,18 @@ local function apply_reloop_logic(msg, api_key)
   local existing_log_id = msg:get_first_named_header_value('X-Email-Log-ID')
   local org_id = msg:get_first_named_header_value('X-Org-ID') or ""
   local is_internal = (api_key ~= "" and api_key == constants.internal_secret)
+  -- Mail HTTP inject already inserted email_log (API key or internal secret).
+  -- Customer SMTP must not skip quota by stamping a fake X-Email-Log-ID.
+  local trust_log_id = is_internal or source == 'http'
 
-  -- Customer SMTP must never skip quota by stamping X-Email-Log-ID.
-  -- Only mail-service inject (internal secret) may reuse an existing log id.
-  if not is_internal then
+  if not trust_log_id then
     if existing_log_id and existing_log_id ~= "" then
       print("[LOG-INCOMING] [" .. msg_id .. "] Ignoring customer X-Email-Log-ID")
     end
     existing_log_id = nil
-    msg:remove_all_named_headers('X-Email-Log-ID')
   end
+  -- Never leak Reloop log ids to mailbox providers.
+  msg:remove_all_named_headers('X-Email-Log-ID')
 
   if is_internal and (not existing_log_id or existing_log_id == "") then
     print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Internal secret requires X-Email-Log-ID (mail service inject only)")
@@ -156,7 +158,7 @@ local function apply_reloop_logic(msg, api_key)
     danger_accept_invalid_certs = true
   })
 
-  -- Check if message was already logged by internal backend HTTP inject
+  -- Mail HTTP inject already created email_log; SMTP still needs log-incoming.
   if not existing_log_id then
     local target_url = constants.kumomta_url .. "/v1/log-incoming"
     print("[LOG-INCOMING] [" .. msg_id .. "] calling webhook: " .. target_url)
@@ -459,7 +461,7 @@ kumo.on('smtp_server_message_received', function(msg)
     return
   end
 
-  apply_reloop_logic(msg, api_key)
+  apply_reloop_logic(msg, api_key, 'smtp')
 end)
 
 kumo.on('http_message_generated', function(msg)
@@ -471,5 +473,5 @@ kumo.on('http_message_generated', function(msg)
     -- Identity is the Basic-auth password: org API key (rl_...) or internal secret
     api_key = http_auth
   end
-  apply_reloop_logic(msg, api_key)
+  apply_reloop_logic(msg, api_key, 'http')
 end)

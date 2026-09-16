@@ -123,11 +123,12 @@ describe("policy sources stay wired", () => {
 		);
 	});
 
-	test("smtp.lua skips log-incoming only for internal inject", () => {
+	test("HTTP inject reuses the mail-service log; customer SMTP cannot skip quota", () => {
 		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("apply_reloop_logic(msg, api_key, 'smtp')");
+		expect(smtpLua).toContain("apply_reloop_logic(msg, api_key, 'http')");
 		expect(smtpLua).toContain("Ignoring customer X-Email-Log-ID");
-		expect(smtpLua).toContain("if not is_internal then");
-		expect(smtpLua).toContain("existing_log_id = nil");
+		expect(smtpLua).toContain("trust_log_id = is_internal or source == 'http'");
 		expect(smtpLua).toContain(
 			"Internal secret requires X-Email-Log-ID (mail service inject only)",
 		);
