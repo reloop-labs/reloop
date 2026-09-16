@@ -40,8 +40,8 @@ export const mailConfig = {
 		process.env.RATE_LIMIT_ORG_WINDOW_SECONDS || "60",
 	),
 
-	// Per-Organization daily: infra ceiling when the plan has no daily cap.
-	// Free-plan dailyEmailLimit (100) overlays this in the rate limiter.
+	// Per-Organization daily: request ceiling (not plan email quota).
+	// Free-plan 100 emails/day is enforced in Postgres reservation, not here.
 	RATE_LIMIT_ORG_DAILY_MAX: Number(
 		process.env.RATE_LIMIT_ORG_DAILY_MAX || "5000",
 	),
