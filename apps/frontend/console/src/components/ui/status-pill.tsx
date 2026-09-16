@@ -17,6 +17,7 @@ export function statusTone(status: string): keyof typeof TONE {
 	if (
 		[
 			"active",
+			"completed",
 			"delivered",
 			"sent",
 			"open",

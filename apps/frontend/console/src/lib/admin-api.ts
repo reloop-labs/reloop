@@ -28,3 +28,11 @@ export async function adminPost<T>(
 	const { data } = await adminApi.post<T>(path, body);
 	return data;
 }
+
+export function adminErrorMessage(error: unknown): string {
+	if (axios.isAxiosError(error)) {
+		const payload = error.response?.data as { message?: string } | undefined;
+		return payload?.message ?? error.message;
+	}
+	return error instanceof Error ? error.message : "Request failed";
+}

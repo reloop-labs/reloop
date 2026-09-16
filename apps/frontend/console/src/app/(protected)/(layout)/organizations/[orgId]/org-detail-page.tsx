@@ -30,6 +30,7 @@ import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { OrgSendingIps } from "./org-sending-ips";
 
 type OrgDetail = {
 	id: string;
@@ -154,6 +155,7 @@ const TABS = [
 	{ id: "overview", label: "Overview" },
 	{ id: "members", label: "Members" },
 	{ id: "domains", label: "Domains" },
+	{ id: "dedicated-ips", label: "Dedicated IPs" },
 	{ id: "api-keys", label: "API keys" },
 	{ id: "templates", label: "Templates" },
 	{ id: "emails", label: "Emails" },
@@ -702,6 +704,10 @@ export default function OrganizationDetailPage() {
 						))}
 					</DataTable>
 				</SectionCard>
+			) : null}
+
+			{tab === "dedicated-ips" ? (
+				<OrgSendingIps organizationId={data.id} organizationName={data.name} />
 			) : null}
 
 			{tab === "api-keys" ? (
