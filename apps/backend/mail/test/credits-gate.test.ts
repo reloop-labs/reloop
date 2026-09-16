@@ -69,3 +69,18 @@ describe("MailErrors.dailyQuotaExceeded", () => {
 		expect(err.fix).toContain("daily");
 	});
 });
+
+describe("MailErrors.domainTooNew", () => {
+	test("returns 402 with the new-domain daily cap", () => {
+		const err = MailErrors.domainTooNew({
+			used: 10,
+			limit: 10,
+			required: 1,
+		}) as Error & { status?: number; why?: string; fix?: string };
+
+		expect(err.status).toBe(402);
+		expect(err.message).toBe("Domain is too new to send this volume");
+		expect(err.why).toContain("limited to 10 emails per day");
+		expect(err.fix).toContain("30 days");
+	});
+});

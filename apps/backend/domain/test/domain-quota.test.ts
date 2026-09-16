@@ -1,6 +1,23 @@
 import { describe, expect, test } from "bun:test";
-import { DomainErrors } from "../src/error/domain.error-response";
+import {
+	DomainErrors,
+	KumoMtaErrors,
+} from "../src/error/domain.error-response";
 import { decideCustomDomainSlot } from "../src/lib/domain-quota";
+
+describe("KumoMtaErrors.domainTooNew", () => {
+	test("returns 402 with the new-domain daily cap", () => {
+		const err = KumoMtaErrors.domainTooNew({
+			used: 10,
+			limit: 10,
+			required: 1,
+		}) as Error & { status?: number; why?: string };
+
+		expect(err.status).toBe(402);
+		expect(err.message).toBe("Domain is too new to send this volume");
+		expect(err.why).toContain("limited to 10 emails per day");
+	});
+});
 
 describe("decideCustomDomainSlot", () => {
 	test("free plan cap of 1 blocks the second domain", () => {

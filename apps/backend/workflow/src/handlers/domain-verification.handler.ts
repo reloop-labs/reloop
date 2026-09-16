@@ -12,7 +12,9 @@ import {
 } from "@be/workflow/utils/verify-dns-records";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { refreshDomainRegistrationAge } from "@reloop/db/domain-daily-overlay";
 import * as schema from "@reloop/db/schema";
+import { lookupRdapCreatedAt } from "@reloop/dns/rdap-created-at";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 
@@ -327,6 +329,22 @@ export async function processDomainVerification({
 				isTrackingDomain: cnameOk && isTrackingEnabled,
 			})
 			.where(eq(schema.domain.id, domainId));
+
+		try {
+			await refreshDomainRegistrationAge({
+				domainId,
+				domainName,
+				registeredAt: domainWithRecords.registeredAt,
+				registrationAgeCheckedAt: domainWithRecords.registrationAgeCheckedAt,
+				lookup: lookupRdapCreatedAt,
+			});
+		} catch (error) {
+			log.warn({
+				message: "Domain registration age lookup failed after verify",
+				domainId,
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
 
 		// Only notify on a real transition into verified. Re-running verification
 		// while already verified (dashboard re-check, stale DNS health check, etc.)

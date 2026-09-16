@@ -22,6 +22,15 @@ export {
 	type DatabaseInstance,
 	db,
 } from "./client";
+export {
+	domainDailyOverlay,
+	isRegistrationAgeStale,
+	mergeDailyLimits,
+	NEW_DOMAIN_COLD_DAILY_CAP,
+	NEW_DOMAIN_TOO_NEW_DAILY_CAP,
+	REGISTRATION_AGE_STALE_MS,
+	refreshDomainRegistrationAge,
+} from "./domain-daily-overlay";
 export * from "./email-send-source";
 export {
 	applyCreditReservation,
@@ -34,5 +43,6 @@ export {
 	utcDayStart,
 } from "./reserve-send-credits";
 export * from "./schema/index";
+export { bareEmail, uniqueBareEmails } from "./smtp-recipients";
 export * from "./utils/crypto";
 export * from "./webhook-events";

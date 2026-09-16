@@ -7,6 +7,8 @@
 		"./schema": "./src/schema/index.ts",
 		"./index": "./src/index.ts",
 		"./reserve-send-credits": "./src/reserve-send-credits.ts",
+		"./domain-daily-overlay": "./src/domain-daily-overlay.ts",
+		"./smtp-recipients": "./src/smtp-recipients.ts",
 		"./webhook-events": "./src/webhook-events.ts",
 		"./utils": "./src/utils/*"
 	},

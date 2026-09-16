@@ -37,6 +37,7 @@
 		"redis": "catalog:db",
 		"zod": "catalog:ui",
 		"@reloop/db": "workspace:*",
+		"@reloop/dns": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",

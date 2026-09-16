@@ -434,6 +434,7 @@
         "@reloop/cache": "workspace:*",
         "@reloop/code-samples": "workspace:*",
         "@reloop/db": "workspace:*",
+        "@reloop/dns": "workspace:*",
         "@types/nodemailer": "catalog:backend",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",

@@ -7,7 +7,9 @@ import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { db } from "@reloop/db/client";
+import { refreshDomainRegistrationAge } from "@reloop/db/domain-daily-overlay";
 import { emailThread, threadMessage } from "@reloop/db/schema";
+import { lookupRdapCreatedAt } from "@reloop/dns/rdap-created-at";
 import { eq, sql } from "drizzle-orm";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -23,6 +25,30 @@ import {
 	sendEmail_step6,
 	verifyDomainAuth_step2,
 } from "./steps";
+
+async function ensureSendingDomainAge(currentDomain: {
+	id: string;
+	domain: string;
+	registeredAt: Date | null;
+	registrationAgeCheckedAt: Date | null;
+}): Promise<Date | null> {
+	try {
+		return await refreshDomainRegistrationAge({
+			domainId: currentDomain.id,
+			domainName: currentDomain.domain,
+			registeredAt: currentDomain.registeredAt,
+			registrationAgeCheckedAt: currentDomain.registrationAgeCheckedAt,
+			lookup: lookupRdapCreatedAt,
+		});
+	} catch (error) {
+		log.warn({
+			message: "Domain registration age refresh failed; using cached value",
+			domainId: currentDomain.id,
+			error: error instanceof Error ? error.message : String(error),
+		});
+		return currentDomain.registeredAt;
+	}
+}
 
 function parseFromName(from: string): string {
 	const displayNameMatch = from.match(/^(.+?)\s*<[^>]+>$/);
@@ -116,13 +142,17 @@ export async function sendEmailController({
 		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
 	}
 
+	const registeredAt = await ensureSendingDomainAge(currentDomain);
+
 	// Reserve monthly + daily quota under a row lock so concurrent API/SMTP
 	// senders cannot all pass a stale remaining-balance check.
 	const reservation = await reserveCreditsForSend({
 		organizationId,
 		body,
+		domainRegisteredAt: registeredAt,
 	});
 
+	let injected = false;
 	try {
 		return await sendReservedEmail({
 			organizationId,
@@ -134,9 +164,21 @@ export async function sendEmailController({
 			cookie,
 			requestApiKey,
 			useInternalInject,
+			onInjected: () => {
+				injected = true;
+			},
 		});
 	} catch (error) {
-		await refundCreditsForFailedSend(reservation);
+		if (!injected) {
+			await refundCreditsForFailedSend(reservation);
+		} else {
+			log.error({
+				message:
+					"Kumo accepted the message but post-inject work failed; credits kept",
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
 		throw error;
 	}
 }
@@ -151,6 +193,7 @@ async function sendReservedEmail({
 	cookie,
 	requestApiKey,
 	useInternalInject,
+	onInjected,
 }: {
 	organizationId: string;
 	body: MailModel.SendEmailBody;
@@ -163,6 +206,7 @@ async function sendReservedEmail({
 	cookie?: string | null;
 	requestApiKey?: string | null;
 	useInternalInject?: boolean;
+	onInjected?: () => void;
 }): Promise<MailModel.SendEmailResponse> {
 	// ── Resolve In-Reply-To header if replying to a thread ────────
 	const threadHeaders: Record<string, string> = {};
@@ -245,6 +289,7 @@ async function sendReservedEmail({
 		userId,
 		useInternalInject,
 	});
+	onInjected?.();
 
 	const response = await finalizeEmail_step7({
 		emailLogId,

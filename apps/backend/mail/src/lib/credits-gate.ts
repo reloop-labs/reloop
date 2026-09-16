@@ -16,6 +16,13 @@ function throwQuotaError(
 		throw new Error("throwQuotaError called on an accepted reservation");
 	}
 	if (decision.reason === "daily" && decision.dailyLimit != null) {
+		if (decision.cause === "domain_age") {
+			throw MailErrors.domainTooNew({
+				used: decision.dailyUsed,
+				limit: decision.dailyLimit,
+				required: recipientCount,
+			});
+		}
 		throw MailErrors.dailyQuotaExceeded({
 			used: decision.dailyUsed,
 			limit: decision.dailyLimit,
@@ -56,6 +63,7 @@ export async function assertHasCredits({
 export async function reserveCreditsForSend({
 	organizationId,
 	body,
+	domainRegisteredAt,
 }: {
 	organizationId: string;
 	body: {
@@ -63,6 +71,7 @@ export async function reserveCreditsForSend({
 		cc?: string | string[];
 		bcc?: string | string[];
 	};
+	domainRegisteredAt?: Date | null;
 }): Promise<CreditReservation | null> {
 	const recipientCount = countEmailRecipients(body);
 	if (recipientCount <= 0) return null;
@@ -70,6 +79,7 @@ export async function reserveCreditsForSend({
 	const decision = await reserveSendCredits({
 		organizationId,
 		recipientCount,
+		domainRegisteredAt,
 	});
 	if (!decision.ok) throwQuotaError(decision, recipientCount);
 	return decision.reservation ?? null;

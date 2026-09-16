@@ -1,13 +1,17 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { refreshDomainRegistrationAge } from "@reloop/db/domain-daily-overlay";
 import {
 	type CreditReservation,
 	refundSendCredits,
 	reserveSendCredits,
 } from "@reloop/db/reserve-send-credits";
 import { domain, emailLog } from "@reloop/db/schema";
+import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
+import { lookupRdapCreatedAt } from "@reloop/dns/rdap-created-at";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
+import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { simpleParser } from "mailparser";
 
@@ -88,6 +92,8 @@ export async function logIncomingController({
 			domain: true,
 			systemVerified: true,
 			tls: true,
+			registeredAt: true,
+			registrationAgeCheckedAt: true,
 		},
 	});
 
@@ -117,13 +123,46 @@ export async function logIncomingController({
 		throw KumoMtaErrors.messageIdConflict(body.messageId);
 	}
 
-	const recipientCount = Math.max(body.toEmails.length, 1);
+	const toEmails = uniqueBareEmails(body.toEmails);
+	if (toEmails.length === 0) {
+		throw createError({
+			status: 400,
+			message: "No envelope recipients",
+			why: "SMTP quota is charged per envelope recipient. This message has none.",
+			fix: "Provide at least one RCPT TO address",
+		});
+	}
+
+	let registeredAt = domainRecord.registeredAt;
+	try {
+		registeredAt = await refreshDomainRegistrationAge({
+			domainId: domainRecord.id,
+			domainName: domainRecord.domain,
+			registeredAt: domainRecord.registeredAt,
+			registrationAgeCheckedAt: domainRecord.registrationAgeCheckedAt,
+			lookup: lookupRdapCreatedAt,
+		});
+	} catch (error) {
+		log.warn(
+			`[LOG-INCOMING] Domain age refresh failed: ${error instanceof Error ? error.message : String(error)}`,
+		);
+	}
+
+	const recipientCount = toEmails.length;
 	const decision = await reserveSendCredits({
 		organizationId: finalOrgId,
 		recipientCount,
+		domainRegisteredAt: registeredAt,
 	});
 	if (!decision.ok) {
 		if (decision.reason === "daily" && decision.dailyLimit != null) {
+			if (decision.cause === "domain_age") {
+				throw KumoMtaErrors.domainTooNew({
+					used: decision.dailyUsed,
+					limit: decision.dailyLimit,
+					required: recipientCount,
+				});
+			}
 			throw KumoMtaErrors.dailyQuotaExceeded({
 				used: decision.dailyUsed,
 				limit: decision.dailyLimit,
@@ -151,7 +190,7 @@ export async function logIncomingController({
 				userId: userId || null,
 				apikeyId: apikeyId || null,
 				fromEmail: body.fromEmail,
-				toEmails: body.toEmails,
+				toEmails,
 				subject: subject,
 				textBody: textBody,
 				htmlBody: htmlBody,
@@ -177,7 +216,7 @@ export async function logIncomingController({
 	await bus.publish(BusEvent.EMAIL_SENT, {
 		organizationId: finalOrgId,
 		emailLogId: insertedId,
-		recipientCount: body.toEmails.length,
+		recipientCount: toEmails.length,
 		creditsReserved: true,
 		timestamp: new Date().toISOString(),
 	});

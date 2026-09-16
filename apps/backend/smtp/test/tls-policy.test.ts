@@ -111,6 +111,28 @@ describe("policy sources stay wired", () => {
 		expect(smtpLua).toContain("5.7.1 Email quota exceeded");
 	});
 
+	test("smtp.lua charges envelope recipients, not a single To header", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("function collect_send_recipients");
+		expect(smtpLua).toContain("msg:recipient_list()");
+		expect(smtpLua).toContain(
+			'for _, header_name in ipairs({ "To", "Cc", "Bcc" })',
+		);
+		expect(smtpLua).not.toMatch(
+			/local to_emails = \{\}[\s\S]*get_first_named_header_value\('To'\)[\s\S]*table.insert\(to_emails/,
+		);
+	});
+
+	test("smtp.lua skips log-incoming only for internal inject", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("Ignoring customer X-Email-Log-ID");
+		expect(smtpLua).toContain("if not is_internal then");
+		expect(smtpLua).toContain("existing_log_id = nil");
+		expect(smtpLua).toContain(
+			"Internal secret requires X-Email-Log-ID (mail service inject only)",
+		);
+	});
+
 	test("mail inject and log-incoming pass tls through", () => {
 		const step6 = readFileSync(
 			join(
@@ -130,5 +152,23 @@ describe("policy sources stay wired", () => {
 		expect(logIncoming).toContain("tls: domainRecord.tls");
 		expect(logIncoming).toContain("reserveSendCredits");
 		expect(logIncoming).toContain("creditsReserved: true");
+		expect(logIncoming).toContain("uniqueBareEmails(body.toEmails)");
+		expect(logIncoming).toContain("No envelope recipients");
+		expect(logIncoming).toContain('decision.cause === "domain_age"');
+	});
+
+	test("HTTP send refunds credits only when Kumo inject has not succeeded", () => {
+		const sendController = readFileSync(
+			join(
+				repoRoot,
+				"apps/backend/mail/src/routes/mail/send-email/send-email.controllers.ts",
+			),
+			"utf8",
+		);
+		expect(sendController).toContain("onInjected?.()");
+		expect(sendController).toContain("if (!injected)");
+		expect(sendController).toContain("refundCreditsForFailedSend(reservation)");
+		expect(sendController).toContain("credits kept");
+		expect(sendController).toContain("domainRegisteredAt: registeredAt");
 	});
 });

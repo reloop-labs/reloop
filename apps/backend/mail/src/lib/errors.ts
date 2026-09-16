@@ -197,6 +197,21 @@ export const MailErrors = {
 			why: `This send needs ${required} email${required === 1 ? "" : "s"}, but you have already sent ${used} of ${limit} today`,
 			fix: "Wait until the daily limit resets, or upgrade your plan to remove the daily cap",
 		}),
+	domainTooNew: ({
+		used,
+		limit,
+		required,
+	}: {
+		used: number;
+		limit: number;
+		required: number;
+	}) =>
+		createError({
+			status: 402,
+			message: "Domain is too new to send this volume",
+			why: `This sending domain is newly registered or of unknown age, so it is limited to ${limit} emails per day on Reloop IPs. This send needs ${required} and ${used} have already gone out today.`,
+			fix: "Wait until the daily limit resets, send fewer recipients, or wait until the domain is older than 30 days",
+		}),
 };
 
 export const RateLimitErrors = {

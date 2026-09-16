@@ -5,6 +5,77 @@ utils.init(kumo)
 
 
 
+local function bare_email(addr)
+  local s = tostring(addr or "")
+  s = s:gsub("^%s+", ""):gsub("%s+$", "")
+  local angled = s:match("<([^<>]+)>")
+  if angled then
+    s = angled
+  end
+  s = s:gsub("^%s+", ""):gsub("%s+$", "")
+  local email = s:match("([^%s<>]+@[^%s<>]+)")
+  if not email then
+    return ""
+  end
+  return string.lower(email)
+end
+
+local function envelope_email(recip)
+  if type(recip) == "table" then
+    local user = recip.user or recip.local_part
+    local recip_domain = recip.domain
+    if user and recip_domain and tostring(user) ~= "" and tostring(recip_domain) ~= "" then
+      return string.lower(tostring(user) .. "@" .. tostring(recip_domain))
+    end
+  end
+  return bare_email(recip)
+end
+
+local function add_unique(emails, seen, email)
+  if email == nil or email == "" or seen[email] then
+    return
+  end
+  seen[email] = true
+  table.insert(emails, email)
+end
+
+-- Charge quota for envelope RCPT TO, not the visible To header.
+local function collect_send_recipients(msg)
+  local seen = {}
+  local emails = {}
+
+  local ok_list, list = pcall(function()
+    return msg:recipient_list()
+  end)
+  if ok_list and type(list) == "table" then
+    for _, recip in ipairs(list) do
+      add_unique(emails, seen, envelope_email(recip))
+    end
+  end
+
+  if #emails == 0 then
+    local ok_one, one = pcall(function()
+      return msg:recipient()
+    end)
+    if ok_one and one then
+      add_unique(emails, seen, envelope_email(one))
+    end
+  end
+
+  if #emails == 0 then
+    for _, header_name in ipairs({ "To", "Cc", "Bcc" }) do
+      local header = msg:get_first_named_header_value(header_name)
+      if header and header ~= "" then
+        for part in string.gmatch(header, "[^,;]+") do
+          add_unique(emails, seen, bare_email(part))
+        end
+      end
+    end
+  end
+
+  return emails
+end
+
 -- Helper function to apply business logic to both SMTP and HTTP generated messages
 local function apply_reloop_logic(msg, api_key)
   local msg_id = msg:id()
@@ -25,10 +96,11 @@ local function apply_reloop_logic(msg, api_key)
     domain = string.match(from_email, "@([^>]+)>?") or ""
   end
 
-  local to_emails = {}
-  local to_header = msg:get_first_named_header_value('To')
-  if to_header then
-    table.insert(to_emails, tostring(to_header))
+  local to_emails = collect_send_recipients(msg)
+  if #to_emails == 0 then
+    print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: No envelope recipients")
+    kumo.reject(550, "5.7.1 No envelope recipients")
+    return
   end
 
   local message_id = msg:get_first_named_header_value('Message-ID') or ""
@@ -51,6 +123,16 @@ local function apply_reloop_logic(msg, api_key)
   local existing_log_id = msg:get_first_named_header_value('X-Email-Log-ID')
   local org_id = msg:get_first_named_header_value('X-Org-ID') or ""
   local is_internal = (api_key ~= "" and api_key == constants.internal_secret)
+
+  -- Customer SMTP must never skip quota by stamping X-Email-Log-ID.
+  -- Only mail-service inject (internal secret) may reuse an existing log id.
+  if not is_internal then
+    if existing_log_id and existing_log_id ~= "" then
+      print("[LOG-INCOMING] [" .. msg_id .. "] Ignoring customer X-Email-Log-ID")
+    end
+    existing_log_id = nil
+    msg:remove_all_named_headers('X-Email-Log-ID')
+  end
 
   if is_internal and (not existing_log_id or existing_log_id == "") then
     print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Internal secret requires X-Email-Log-ID (mail service inject only)")
@@ -138,6 +220,10 @@ local function apply_reloop_logic(msg, api_key)
         print("[LOG-INCOMING] [" .. msg_id .. "] ERROR: backend returned 200 but no ID found")
         utils.apply_tls_mode(msg, header_tls_mode)
       end
+    elseif code == 400 then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Invalid recipients")
+      kumo.reject(550, "5.7.1 Invalid recipients")
+      return
     elseif code == 401 then
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Invalid API key")
       kumo.reject(535, "5.7.8 Invalid API key")
