@@ -40,7 +40,8 @@ export const mailConfig = {
 		process.env.RATE_LIMIT_ORG_WINDOW_SECONDS || "60",
 	),
 
-	// Per-Organization daily: hard daily cap per tenant
+	// Per-Organization daily: infra ceiling when the plan has no daily cap.
+	// Free-plan dailyEmailLimit (100) overlays this in the rate limiter.
 	RATE_LIMIT_ORG_DAILY_MAX: Number(
 		process.env.RATE_LIMIT_ORG_DAILY_MAX || "5000",
 	),

@@ -72,22 +72,28 @@ export async function initEmailSubscriber() {
 						})
 						.returning();
 
-					// 3. Update credit counters
-					const newCreditsUsed =
-						activeCredits.creditsUsed + payload.recipientCount;
-					const newCreditsRemaining = Math.max(
-						0,
-						activeCredits.creditsRemaining - payload.recipientCount,
-					);
+					// 3. Update credit counters unless the send path already reserved.
+					const creditsReserved = payload.creditsReserved === true;
+					const newCreditsUsed = creditsReserved
+						? activeCredits.creditsUsed
+						: activeCredits.creditsUsed + payload.recipientCount;
+					const newCreditsRemaining = creditsReserved
+						? activeCredits.creditsRemaining
+						: Math.max(
+								0,
+								activeCredits.creditsRemaining - payload.recipientCount,
+							);
 
-					await tx
-						.update(organizationCredits)
-						.set({
-							creditsUsed: sql`${organizationCredits.creditsUsed} + ${payload.recipientCount}`,
-							creditsRemaining: sql`GREATEST(0, ${organizationCredits.creditsRemaining} - ${payload.recipientCount})`,
-							updatedAt: new Date(),
-						})
-						.where(eq(organizationCredits.id, activeCredits.id));
+					if (!creditsReserved) {
+						await tx
+							.update(organizationCredits)
+							.set({
+								creditsUsed: sql`${organizationCredits.creditsUsed} + ${payload.recipientCount}`,
+								creditsRemaining: sql`GREATEST(0, ${organizationCredits.creditsRemaining} - ${payload.recipientCount})`,
+								updatedAt: new Date(),
+							})
+							.where(eq(organizationCredits.id, activeCredits.id));
+					}
 
 					// 4. Log in credit ledger
 					if (sendRecord) {

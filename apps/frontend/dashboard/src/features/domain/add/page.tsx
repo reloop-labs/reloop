@@ -100,7 +100,9 @@ export function AddDomainPage() {
 
 			changeStatus("idle");
 			const errorMessage = axios.isAxiosError(error)
-				? error.response?.data?.message || "An unexpected error occurred"
+				? error.response?.data?.why ||
+					error.response?.data?.message ||
+					"An unexpected error occurred"
 				: "An unexpected error occurred";
 			setError("domain", {
 				type: "manual",

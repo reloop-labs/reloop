@@ -13,12 +13,12 @@ export const pricingFaqItems: PricingFaqItem[] = [
 	{
 		question: "Do I need a credit card to start?",
 		answer:
-			"No. The Free plan includes 3,000 emails per month and 200 emails per day, with no credit card required. Upgrade when your volume grows.",
+			"No. The Free plan includes 3,000 emails per month and 100 emails per day, with no credit card required. Upgrade when your volume grows.",
 	},
 	{
 		question: "What happens if I exceed my monthly limit?",
 		answer:
-			"On paid plans, overage emails are billed at $0.50 per 1,000. On the Free plan, sending pauses at 3,000 emails per month or 200 emails per day until the next period unless you upgrade. Free has no overage.",
+			"On paid plans, overage emails are billed at $0.50 per 1,000. On the Free plan, sending pauses at 3,000 emails per month or 100 emails per day until the next period unless you upgrade. Free has no overage.",
 	},
 	{
 		question: "Is self-hosting really free?",

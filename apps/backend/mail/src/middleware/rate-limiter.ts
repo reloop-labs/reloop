@@ -6,6 +6,8 @@ import { RateLimitErrors } from "@reloop/be-mail/lib/errors";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { redis } from "@reloop/be-mail/utils/loader";
 import { db } from "@reloop/db/client";
+import { organizationPlan } from "@reloop/db/schema";
+import { eq } from "drizzle-orm";
 
 // ── Types ──────────────────────────────────────────────────────────
 interface RateLimitLayer {
@@ -72,6 +74,21 @@ async function loadMonthlyUsed(organizationId: string): Promise<number | null> {
 	}
 }
 
+/** Plan daily cap when set (Free = 100). Null means no plan daily cap. */
+async function loadDailyEmailLimit(
+	organizationId: string,
+): Promise<number | null | undefined> {
+	try {
+		const plan = await db.query.organizationPlan.findFirst({
+			where: eq(organizationPlan.organizationId, organizationId),
+			columns: { dailyEmailLimit: true },
+		});
+		return plan?.dailyEmailLimit;
+	} catch {
+		return undefined;
+	}
+}
+
 /**
  * Multi-layer rate limiter for the send-email endpoint.
  *
@@ -101,9 +118,17 @@ export async function checkRateLimit({
 
 	// Quota headers are best-effort and independent of Redis RL success.
 	const monthlyUsedPromise = loadMonthlyUsed(activeOrganizationId);
+	const dailyLimitPromise = loadDailyEmailLimit(activeOrganizationId);
 
 	try {
 		const ip = getClientIp(headers);
+		const planDailyLimit = await dailyLimitPromise;
+		const orgDailyMax =
+			planDailyLimit === undefined
+				? 100
+				: planDailyLimit === null
+					? mailConfig.RATE_LIMIT_ORG_DAILY_MAX
+					: planDailyLimit;
 
 		const layers: RateLimitLayer[] = [];
 
@@ -128,7 +153,7 @@ export async function checkRateLimit({
 			{
 				name: "organization-daily",
 				key: `rl:send:org-day:${activeOrganizationId}`,
-				max: mailConfig.RATE_LIMIT_ORG_DAILY_MAX,
+				max: orgDailyMax,
 				windowSeconds: 86400,
 			},
 			{

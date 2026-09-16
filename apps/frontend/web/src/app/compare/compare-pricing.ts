@@ -22,7 +22,7 @@ const reloopPro = pricingPlans.find((plan) => plan.id === "individual");
 const reloopGrowth = pricingPlans.find((plan) => plan.id === "startup");
 
 const reloopFreeValue = formatPrice(reloopFree?.monthlyPrice ?? 0);
-const reloopFreeNote = `${reloopFree?.emailsLabel ?? "3,000 emails / month"} · ${reloopFree?.comparison.dailyLimit ?? "200"} / day`;
+const reloopFreeNote = `${reloopFree?.emailsLabel ?? "3,000 emails / month"} · ${reloopFree?.comparison.dailyLimit ?? "100"} / day`;
 const reloopEntryValue = `${formatPrice(reloopPro?.monthlyPrice ?? 10)} / mo`;
 const reloopEntryNote = reloopPro?.emailsLabel ?? "50,000 emails / month";
 const reloopMidValue = `${formatPrice(reloopGrowth?.monthlyPrice ?? 20)} / mo`;

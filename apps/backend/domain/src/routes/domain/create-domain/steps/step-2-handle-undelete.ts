@@ -2,6 +2,7 @@ import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
+import { assertCustomDomainQuota } from "@reloop/domain/lib/domain-quota";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_UNDELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
@@ -38,31 +39,34 @@ export async function handleUndelete_step2({
 		const now = new Date();
 		log.info("Undeleting existing domain");
 
-		await db
-			.update(schema.domain)
-			.set({
-				deletedAt: null,
-				updatedAt: now,
-				createdAt: now,
-				status: "pending",
-				customReturnPath,
-				trackingSubdomain,
-				isClickTrackingEnabled: clickTracking,
-				isOpenTrackingEnabled: openTracking,
-				tls,
-				isSendingEmailEnabled,
-				isReceivingEmailEnabled,
-			})
-			.where(eq(schema.domain.id, domainId));
+		await db.transaction(async (tx) => {
+			await assertCustomDomainQuota(organizationId, tx);
+			await tx
+				.update(schema.domain)
+				.set({
+					deletedAt: null,
+					updatedAt: now,
+					createdAt: now,
+					status: "pending",
+					customReturnPath,
+					trackingSubdomain,
+					isClickTrackingEnabled: clickTracking,
+					isOpenTrackingEnabled: openTracking,
+					tls,
+					isSendingEmailEnabled,
+					isReceivingEmailEnabled,
+				})
+				.where(eq(schema.domain.id, domainId));
 
-		log.info("Undeleting domain DNS records");
-		await db
-			.update(schema.domainDnsRecord)
-			.set({
-				deletedAt: null,
-				updatedAt: now,
-			})
-			.where(eq(schema.domainDnsRecord.domainId, domainId));
+			log.info("Undeleting domain DNS records");
+			await tx
+				.update(schema.domainDnsRecord)
+				.set({
+					deletedAt: null,
+					updatedAt: now,
+				})
+				.where(eq(schema.domainDnsRecord.domainId, domainId));
+		});
 
 		const undeletedDomain = await db.query.domain.findFirst({
 			where: and(

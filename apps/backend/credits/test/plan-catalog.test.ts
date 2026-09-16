@@ -12,7 +12,7 @@ describe("plan catalog", () => {
 	test("matches hosted pricing numbers", () => {
 		expect(getPlanLimits("free")).toMatchObject({
 			monthlyEmails: 3000,
-			dailyEmailLimit: 200,
+			dailyEmailLimit: 100,
 			overageEnabled: false,
 			maxAgentInboxes: 1,
 			maxWebhooks: 1,

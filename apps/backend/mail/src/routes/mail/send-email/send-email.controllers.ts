@@ -1,4 +1,8 @@
-import { assertHasCredits } from "@reloop/be-mail/lib/credits-gate";
+import {
+	assertHasCredits,
+	refundCreditsForFailedSend,
+	reserveCreditsForSend,
+} from "@reloop/be-mail/lib/credits-gate";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
@@ -112,6 +116,54 @@ export async function sendEmailController({
 		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
 	}
 
+	// Reserve monthly + daily quota under a row lock so concurrent API/SMTP
+	// senders cannot all pass a stale remaining-balance check.
+	const reservation = await reserveCreditsForSend({
+		organizationId,
+		body,
+	});
+
+	try {
+		return await sendReservedEmail({
+			organizationId,
+			body,
+			currentDomain,
+			apiKey,
+			apiKeyId,
+			userId,
+			cookie,
+			requestApiKey,
+			useInternalInject,
+		});
+	} catch (error) {
+		await refundCreditsForFailedSend(reservation);
+		throw error;
+	}
+}
+
+async function sendReservedEmail({
+	organizationId,
+	body,
+	currentDomain,
+	apiKey,
+	apiKeyId,
+	userId,
+	cookie,
+	requestApiKey,
+	useInternalInject,
+}: {
+	organizationId: string;
+	body: MailModel.SendEmailBody;
+	currentDomain: Awaited<
+		ReturnType<typeof verifyDomainAuth_step2>
+	>["currentDomain"];
+	apiKey: string;
+	apiKeyId?: string;
+	userId?: string;
+	cookie?: string | null;
+	requestApiKey?: string | null;
+	useInternalInject?: boolean;
+}): Promise<MailModel.SendEmailResponse> {
 	// ── Resolve In-Reply-To header if replying to a thread ────────
 	const threadHeaders: Record<string, string> = {};
 	if (body.thread_id) {

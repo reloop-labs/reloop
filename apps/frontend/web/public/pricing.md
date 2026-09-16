@@ -16,7 +16,7 @@
 - CTA: Get started → /dashboard/signup
 - Features:
   - 3,000 emails / month
-  - 200 emails / day
+  - 100 emails / day
   - 1 agent inbox
   - 1 webhook
   - 1 custom domain

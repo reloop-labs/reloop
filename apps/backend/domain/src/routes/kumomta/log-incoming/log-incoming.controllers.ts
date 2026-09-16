@@ -1,5 +1,10 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import {
+	type CreditReservation,
+	refundSendCredits,
+	reserveSendCredits,
+} from "@reloop/db/reserve-send-credits";
 import { domain, emailLog } from "@reloop/db/schema";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
@@ -112,32 +117,60 @@ export async function logIncomingController({
 		throw KumoMtaErrors.messageIdConflict(body.messageId);
 	}
 
-	const inserted = await db
-		.insert(emailLog)
-		.values({
-			messageId:
-				body.messageId ||
-				`msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-			organizationId: finalOrgId,
-			domainId: domainRecord.id,
-			userId: userId || null,
-			apikeyId: apikeyId || null,
-			fromEmail: body.fromEmail,
-			toEmails: body.toEmails,
-			subject: subject,
-			textBody: textBody,
-			htmlBody: htmlBody,
-			rawMessage: body.rawMessage || null,
-			status: "pending",
-			size: body.size || 0,
-			provider: "kumomta",
-			providerMessageId: body.providerMessageId,
-			source: "smtp",
-		})
-		.returning({ id: emailLog.id });
+	const recipientCount = Math.max(body.toEmails.length, 1);
+	const decision = await reserveSendCredits({
+		organizationId: finalOrgId,
+		recipientCount,
+	});
+	if (!decision.ok) {
+		if (decision.reason === "daily" && decision.dailyLimit != null) {
+			throw KumoMtaErrors.dailyQuotaExceeded({
+				used: decision.dailyUsed,
+				limit: decision.dailyLimit,
+				required: recipientCount,
+			});
+		}
+		throw KumoMtaErrors.quotaExceeded({
+			remaining: decision.remaining,
+			required: recipientCount,
+			monthlyCredits: decision.monthlyCredits,
+		});
+	}
+	const reservation: CreditReservation | undefined = decision.reservation;
+
+	let inserted: { id: string }[] | undefined;
+	try {
+		inserted = await db
+			.insert(emailLog)
+			.values({
+				messageId:
+					body.messageId ||
+					`msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+				organizationId: finalOrgId,
+				domainId: domainRecord.id,
+				userId: userId || null,
+				apikeyId: apikeyId || null,
+				fromEmail: body.fromEmail,
+				toEmails: body.toEmails,
+				subject: subject,
+				textBody: textBody,
+				htmlBody: htmlBody,
+				rawMessage: body.rawMessage || null,
+				status: "pending",
+				size: body.size || 0,
+				provider: "kumomta",
+				providerMessageId: body.providerMessageId,
+				source: "smtp",
+			})
+			.returning({ id: emailLog.id });
+	} catch (error) {
+		if (reservation) await refundSendCredits({ reservation });
+		throw error;
+	}
 
 	const insertedId = inserted?.[0]?.id;
 	if (!insertedId) {
+		if (reservation) await refundSendCredits({ reservation });
 		throw KumoMtaErrors.failedToInsertLog();
 	}
 
@@ -145,6 +178,7 @@ export async function logIncomingController({
 		organizationId: finalOrgId,
 		emailLogId: insertedId,
 		recipientCount: body.toEmails.length,
+		creditsReserved: true,
 		timestamp: new Date().toISOString(),
 	});
 

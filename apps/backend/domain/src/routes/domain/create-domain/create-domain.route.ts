@@ -39,6 +39,7 @@ export const createDomainRoute = new Elysia()
 			response: {
 				201: DomainModel.domainResponse,
 				400: ErrorResponseSchema,
+				402: ErrorResponseSchema,
 				403: ErrorResponseSchema,
 				409: ErrorResponseSchema,
 			},

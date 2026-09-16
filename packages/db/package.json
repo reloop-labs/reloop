@@ -6,6 +6,7 @@
 		"./client": "./src/client.ts",
 		"./schema": "./src/schema/index.ts",
 		"./index": "./src/index.ts",
+		"./reserve-send-credits": "./src/reserve-send-credits.ts",
 		"./webhook-events": "./src/webhook-events.ts",
 		"./utils": "./src/utils/*"
 	},

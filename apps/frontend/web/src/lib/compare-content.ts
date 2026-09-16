@@ -116,7 +116,7 @@ const postmarkFeatures: ComparisonFeatureRow[] = [
 	{ label: "Agent inbox", reloop: "Yes", competitor: "No" },
 	{
 		label: "Free tier",
-		reloop: "3,000 emails / month · 200 / day",
+		reloop: "3,000 emails / month · 100 / day",
 		competitor: "Trial credits",
 	},
 ];
@@ -171,7 +171,7 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "Does Reloop Free have a daily send limit?",
 				answer:
-					"Yes. Reloop Free includes 3,000 emails per month and 200 emails per day. Pro ($10/mo), Growth ($20/mo), and Enterprise have no daily cap. Self-hosted Reloop is limited by your own infrastructure, not Reloop Cloud quotas.",
+					"Yes. Reloop Free includes 3,000 emails per month and 100 emails per day. Pro ($10/mo), Growth ($20/mo), and Enterprise have no daily cap. Self-hosted Reloop is limited by your own infrastructure, not Reloop Cloud quotas.",
 			},
 			{
 				question: "Is Reloop a drop-in Resend API?",

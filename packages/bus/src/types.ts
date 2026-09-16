@@ -53,6 +53,8 @@ export interface EmailSentPayload {
 	organizationId: string;
 	emailLogId: string;
 	recipientCount: number;
+	/** True when the send path already reserved monthly/daily credits. */
+	creditsReserved?: boolean;
 	timestamp: string;
 }
 

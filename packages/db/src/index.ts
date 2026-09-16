@@ -23,6 +23,16 @@ export {
 	db,
 } from "./client";
 export * from "./email-send-source";
+export {
+	applyCreditReservation,
+	type CreditReservation,
+	type CreditSnapshot,
+	peekSendCredits,
+	type ReserveDecision,
+	refundSendCredits,
+	reserveSendCredits,
+	utcDayStart,
+} from "./reserve-send-credits";
 export * from "./schema/index";
 export * from "./utils/crypto";
 export * from "./webhook-events";
