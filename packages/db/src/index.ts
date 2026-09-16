@@ -39,11 +39,22 @@ export {
 	DEFAULT_WARMUP_SCHEDULE,
 	dailyCapForDay,
 	type EgressDecision,
+	emptyProviderCounts,
+	MAILBOX_PROVIDER_SHARES,
+	normalizeProviderCounts,
+	phaseForDay,
+	providerCapForDay,
 	resolveEgressDecision,
+	splitProviderCaps,
+	totalSentToday,
 	type WarmupReservation,
 	type WarmupSnapshot,
 	warmupDayNumber,
 } from "./ip-warmup";
+export {
+	classifyMailboxProvider,
+	recipientDomain,
+} from "./mailbox-provider";
 export {
 	applyCreditReservation,
 	type CreditReservation,

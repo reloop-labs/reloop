@@ -26,6 +26,16 @@ const GLOBAL_PHASES: Array<[number, number, number]> = [
 	[36, 42, 10_000],
 ];
 
+export function emptyProviderCounts(): ProviderSendCounts {
+	return {
+		gmail: 0,
+		microsoft: 0,
+		yahoo: 0,
+		apple: 0,
+		other: 0,
+	};
+}
+
 /** Largest-remainder split so provider caps always sum to the daily total. */
 export function splitProviderCaps(total: number): ProviderSendCounts {
 	const raw = MAILBOX_PROVIDERS.map((provider) => {
@@ -33,14 +43,15 @@ export function splitProviderCaps(total: number): ProviderSendCounts {
 		const floor = Math.floor(exact);
 		return { provider, floor, remainder: exact - floor };
 	});
-	let assigned = raw.reduce((sum, row) => sum + row.floor, 0);
-	const caps = {} as ProviderSendCounts;
+	const assigned = raw.reduce((sum, row) => sum + row.floor, 0);
+	const caps = emptyProviderCounts();
 	for (const row of raw) caps[row.provider] = row.floor;
-	const leftover = total - assigned;
+	let leftover = total - assigned;
 	const byRemainder = [...raw].sort((a, b) => b.remainder - a.remainder);
-	for (let i = 0; i < leftover; i++) {
-		caps[byRemainder[i]!.provider] += 1;
-		assigned += 1;
+	for (const row of byRemainder) {
+		if (leftover <= 0) break;
+		caps[row.provider] += 1;
+		leftover -= 1;
 	}
 	return caps;
 }
@@ -64,16 +75,6 @@ export const DEFAULT_WARMUP_SCHEDULE: WarmupPhase[] = GLOBAL_PHASES.map(
 );
 
 const MS_PER_DAY = 86_400_000;
-
-export function emptyProviderCounts(): ProviderSendCounts {
-	return {
-		gmail: 0,
-		microsoft: 0,
-		yahoo: 0,
-		apple: 0,
-		other: 0,
-	};
-}
 
 export function normalizeProviderCounts(
 	raw: Partial<ProviderSendCounts> | null | undefined,

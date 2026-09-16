@@ -1,11 +1,6 @@
 import type { MailboxProvider } from "./schema/sending-ip";
-import { MAILBOX_PROVIDERS } from "./schema/sending-ip";
 
-const GMAIL_DOMAINS = new Set([
-	"gmail.com",
-	"googlemail.com",
-	"google.com",
-]);
+const GMAIL_DOMAINS = new Set(["gmail.com", "googlemail.com", "google.com"]);
 
 const MICROSOFT_DOMAINS = new Set([
 	"outlook.com",
@@ -87,6 +82,3 @@ export function classifyMailboxProvider(
 	if (!domain) return "other";
 	return DOMAIN_TO_PROVIDER.get(domain) ?? "other";
 }
-
-export { MAILBOX_PROVIDERS };
-export type { MailboxProvider };

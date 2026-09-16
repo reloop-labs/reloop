@@ -623,6 +623,20 @@ export namespace AdminModel {
 		t.Literal("defer"),
 	]);
 
+	export const mailboxProvider = t.Union([
+		t.Literal("gmail"),
+		t.Literal("microsoft"),
+		t.Literal("yahoo"),
+		t.Literal("apple"),
+		t.Literal("other"),
+	]);
+
+	export const warmupProviderView = t.Object({
+		provider: mailboxProvider,
+		dailyCap: t.Union([t.Number(), t.Null()]),
+		sentToday: t.Number(),
+	});
+
 	export const warmupView = t.Object({
 		id: t.String(),
 		status: ipWarmupStatus,
@@ -630,6 +644,7 @@ export namespace AdminModel {
 		day: t.Number(),
 		dailyCap: t.Union([t.Number(), t.Null()]),
 		sentToday: t.Number(),
+		providers: t.Array(warmupProviderView),
 		startedAt: t.Union([t.Date(), t.Null()]),
 		completedAt: t.Union([t.Date(), t.Null()]),
 		pausedAt: t.Union([t.Date(), t.Null()]),

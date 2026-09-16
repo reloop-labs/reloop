@@ -132,7 +132,7 @@ export const ipWarmup = pgTable(
 		sentTodayByProvider: jsonb("sent_today_by_provider")
 			.$type<ProviderSendCounts>()
 			.notNull()
-			.default({}),
+			.default(sql`'{}'::jsonb`),
 		dailyWindowStart: timestamp("daily_window_start").notNull().defaultNow(),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at").notNull().defaultNow(),

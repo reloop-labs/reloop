@@ -4,6 +4,8 @@ import { type DatabaseInstance, db } from "./client";
 import {
 	assertCanAssignDedicatedIp,
 	DEFAULT_WARMUP_SCHEDULE,
+	emptyProviderCounts,
+	normalizeProviderCounts,
 	resolveEgressDecision,
 	type WarmupSnapshot,
 } from "./ip-warmup";
@@ -12,6 +14,7 @@ import { organizationPlan } from "./schema/billing";
 import {
 	type IpWarmupOverflow,
 	ipWarmup,
+	type MailboxProvider,
 	organizationSendingIp,
 	type SendingIpKind,
 	type SendingIpStatus,
@@ -47,7 +50,7 @@ function snapshotFromRow(row: typeof ipWarmup.$inferSelect): WarmupSnapshot {
 		startedAt: row.startedAt,
 		completedAt: row.completedAt,
 		pausedAt: row.pausedAt,
-		sentToday: row.sentToday,
+		sentTodayByProvider: normalizeProviderCounts(row.sentTodayByProvider),
 		dailyWindowStart: row.dailyWindowStart,
 	};
 }
@@ -363,7 +366,7 @@ export async function assignDedicatedIp(
 				overflow: input.overflow ?? "shared",
 				schedule: input.schedule ?? DEFAULT_WARMUP_SCHEDULE,
 				startedAt: startWarmup ? now : null,
-				sentToday: 0,
+				sentTodayByProvider: emptyProviderCounts(),
 				dailyWindowStart: now,
 				createdAt: now,
 				updatedAt: now,
@@ -524,7 +527,7 @@ export async function setWarmupAction(
 				startedAt: now,
 				completedAt: null,
 				pausedAt: null,
-				sentToday: 0,
+				sentTodayByProvider: emptyProviderCounts(),
 				dailyWindowStart: now,
 			};
 		}
@@ -585,6 +588,7 @@ export async function listOrganizationSendingIps(
 
 export type OrgEgress = {
 	pool: "dedicated" | "shared" | "defer";
+	provider: MailboxProvider;
 	reason: ReturnType<typeof resolveEgressDecision>["reason"];
 	sendingIpId: string | null;
 	address: string | null;
@@ -596,10 +600,16 @@ export type OrgEgress = {
 
 export async function resolveOrgEgress(
 	organizationId: string,
-	recipientCount = 1,
+	args: {
+		provider: MailboxProvider;
+		recipientCount?: number;
+		now?: Date;
+	},
 	outer: DatabaseInstance = db,
-	now: Date = new Date(),
 ): Promise<OrgEgress> {
+	const recipientCount = args.recipientCount ?? 1;
+	const now = args.now ?? new Date();
+	const provider = args.provider;
 	return outer.transaction(async (tx) => {
 		const [assignment] = await tx
 			.select()
@@ -616,11 +626,13 @@ export async function resolveOrgEgress(
 		if (!assignment) {
 			const decision = resolveEgressDecision({
 				assignment: null,
+				provider,
 				recipientCount,
 				now,
 			});
 			return {
 				pool: decision.pool,
+				provider: decision.provider,
 				reason: decision.reason,
 				sendingIpId: null,
 				address: null,
@@ -650,6 +662,7 @@ export async function resolveOrgEgress(
 						warmup: lockedWarmup ? snapshotFromRow(lockedWarmup) : null,
 					}
 				: null,
+			provider,
 			recipientCount,
 			now,
 		});
@@ -659,7 +672,7 @@ export async function resolveOrgEgress(
 				.update(ipWarmup)
 				.set({
 					status: decision.warmupNext.status,
-					sentToday: decision.warmupNext.sentToday,
+					sentTodayByProvider: decision.warmupNext.sentTodayByProvider,
 					dailyWindowStart: decision.warmupNext.dailyWindowStart,
 					completedAt: decision.warmupNext.completedAt,
 					updatedAt: now,
@@ -674,7 +687,7 @@ export async function resolveOrgEgress(
 			await tx
 				.update(ipWarmup)
 				.set({
-					sentToday: decision.warmupNext.sentToday,
+					sentTodayByProvider: decision.warmupNext.sentTodayByProvider,
 					dailyWindowStart: decision.warmupNext.dailyWindowStart,
 					updatedAt: now,
 				})
@@ -683,6 +696,7 @@ export async function resolveOrgEgress(
 
 		return {
 			pool: decision.pool,
+			provider: decision.provider,
 			reason: decision.reason,
 			sendingIpId: decision.pool === "dedicated" && ip ? ip.id : null,
 			address: decision.pool === "dedicated" && ip ? ip.address : null,

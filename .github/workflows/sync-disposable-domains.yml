@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   sync-catalogue:
@@ -26,15 +27,17 @@ jobs:
       - name: Run multi-source catalogue refresh
         run: bun run --filter=@reloop/email-validation refresh
 
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
-          if [[ -n "$(git status --porcelain packages/email-validation/data/upstream/)" ]]; then
-            git add packages/email-validation/data/upstream/
-            git commit -m "chore(email-validation): sync daily disposable domains"
-            git push origin HEAD:${{ github.ref_name }}
-          else
-            echo "No changes in disposable domain datasets."
-          fi
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(email-validation): sync daily disposable domains"
+          title: "chore(email-validation): sync daily disposable domains"
+          body: |
+            Automated daily sync of upstream disposable domain datasets.
+
+            Triggered by scheduled catalogue refresh.
+          branch: "automated/sync-disposable-domains"
+          delete-branch: true
+          add-paths: |
+            packages/email-validation/data/upstream/
+
