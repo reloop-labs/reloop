@@ -12,38 +12,12 @@ import {
 	markConversationReadController,
 	updateConversationStatusController,
 } from "./support.controllers";
-import { broadcastToConversation, broadcastToLobby } from "./support.rooms";
+import {
+	broadcastConversationUpdate,
+	broadcastToConversation,
+	broadcastToLobby,
+} from "./support.rooms";
 import { supportWsRoute } from "./support.ws";
-
-async function broadcastConversationUpdate(input: {
-	conversationId: string;
-	conversationForAdmin: unknown;
-	conversationForUser: unknown;
-	message?: unknown;
-}) {
-	if (input.message) {
-		broadcastToConversation(input.conversationId, {
-			type: "message_created",
-			message: input.message,
-		});
-		broadcastToLobby({
-			type: "message_created",
-			message: input.message,
-		});
-	}
-	// Lobby (admins) get admin-perspective unread
-	broadcastToLobby({
-		type: "conversation_updated",
-		conversation: input.conversationForAdmin,
-	});
-	// Conversation room gets both perspectives via a dual payload;
-	// clients pick unreadCount based on their role from their own view.
-	broadcastToConversation(input.conversationId, {
-		type: "conversation_updated",
-		conversation: input.conversationForUser,
-		conversationAdmin: input.conversationForAdmin,
-	});
-}
 
 export const supportRoute = new Elysia({ prefix: "/support" })
 	.use(authMiddleware)

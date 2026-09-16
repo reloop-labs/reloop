@@ -3,6 +3,7 @@ import { initAbuseSuspectedSubscriber } from "@reloop/admin/subscribers/abuse-su
 import { initDomainCreatedSubscriber } from "@reloop/admin/subscribers/domain-created.subscriber";
 import { initEmailFailedSubscriber } from "@reloop/admin/subscribers/email-failed.subscriber";
 import { initSigninSubscriber } from "@reloop/admin/subscribers/signin.subscriber";
+import { initSignupWelcomeSubscriber } from "@reloop/admin/subscribers/signup-welcome.subscriber";
 import { redis } from "@reloop/admin/utils/redis";
 import { bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
@@ -20,6 +21,7 @@ export const loader = async () => {
 		await initSigninSubscriber();
 		await initDomainCreatedSubscriber();
 		await initAbuseSuspectedSubscriber();
+		await initSignupWelcomeSubscriber();
 	} catch (e) {
 		log.error({
 			message: "Error during service initialization",
