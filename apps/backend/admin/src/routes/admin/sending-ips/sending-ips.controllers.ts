@@ -2,19 +2,14 @@ import { writeAdminAudit } from "@reloop/admin/utils/audit";
 import {
 	assignDedicatedIp,
 	createSendingIp,
-	dailyCapForDay,
 	getSendingIp,
 	listOrganizationSendingIps,
 	listSendingIps,
-	MAILBOX_PROVIDERS,
-	normalizeProviderCounts,
-	providerCapForDay,
 	setWarmupAction,
-	totalSentToday,
 	unassignDedicatedIp,
 	updateSendingIp,
 	type WarmupAction,
-	warmupDayNumber,
+	warmupProgressView,
 } from "@reloop/db";
 import type {
 	ipWarmup,
@@ -31,31 +26,7 @@ type SendingIpRow = {
 };
 
 function toWarmupView(warmup: typeof ipWarmup.$inferSelect, now: Date) {
-	const day = warmup.startedAt ? warmupDayNumber(warmup.startedAt, now) : 0;
-	const scheduleDay = Math.max(day, 1);
-	const completed = warmup.status === "completed";
-	const counts = normalizeProviderCounts(warmup.sentTodayByProvider);
-	const dailyCap = completed
-		? null
-		: dailyCapForDay(warmup.schedule, scheduleDay);
-	return {
-		id: warmup.id,
-		status: warmup.status,
-		overflow: warmup.overflow,
-		day,
-		dailyCap,
-		sentToday: totalSentToday(counts),
-		providers: MAILBOX_PROVIDERS.map((provider) => ({
-			provider,
-			dailyCap: completed
-				? null
-				: providerCapForDay(warmup.schedule, scheduleDay, provider),
-			sentToday: counts[provider],
-		})),
-		startedAt: warmup.startedAt,
-		completedAt: warmup.completedAt,
-		pausedAt: warmup.pausedAt,
-	};
+	return { id: warmup.id, ...warmupProgressView(warmup, now) };
 }
 
 function toSendingIpItem(row: SendingIpRow, now: Date) {

@@ -47,9 +47,11 @@ export {
 	resolveEgressDecision,
 	splitProviderCaps,
 	totalSentToday,
+	type WarmupProgressView,
 	type WarmupReservation,
 	type WarmupSnapshot,
 	warmupDayNumber,
+	warmupProgressView,
 } from "./ip-warmup";
 export {
 	classifyMailboxProvider,
@@ -77,6 +79,7 @@ export {
 	type OrgEgress,
 	parseSendingHostname,
 	parseSendingIpAddress,
+	presentOrganizationSendingIps,
 	resolveOrgEgress,
 	setWarmupAction,
 	unassignDedicatedIp,

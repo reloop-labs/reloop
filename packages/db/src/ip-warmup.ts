@@ -127,6 +127,59 @@ export function providerCapForDay(
 	return entry.providers[provider];
 }
 
+export type WarmupProgressProvider = {
+	provider: MailboxProvider;
+	dailyCap: number | null;
+	sentToday: number;
+};
+
+export type WarmupProgressView = {
+	status: IpWarmupStatus;
+	overflow: IpWarmupOverflow;
+	day: number;
+	dailyCap: number | null;
+	sentToday: number;
+	providers: WarmupProgressProvider[];
+	startedAt: Date | null;
+	completedAt: Date | null;
+	pausedAt: Date | null;
+};
+
+export function warmupProgressView(
+	warmup: {
+		status: IpWarmupStatus;
+		overflow: IpWarmupOverflow;
+		schedule: WarmupPhase[];
+		startedAt: Date | null;
+		completedAt: Date | null;
+		pausedAt: Date | null;
+		sentTodayByProvider: Partial<ProviderSendCounts> | null;
+	},
+	now: Date,
+): WarmupProgressView {
+	const day = warmup.startedAt ? warmupDayNumber(warmup.startedAt, now) : 0;
+	const scheduleDay = Math.max(day, 1);
+	const completed = warmup.status === "completed";
+	const counts = normalizeProviderCounts(warmup.sentTodayByProvider);
+	return {
+		status: warmup.status,
+		overflow: warmup.overflow,
+		day,
+		dailyCap: completed ? null : dailyCapForDay(warmup.schedule, scheduleDay),
+		sentToday: totalSentToday(counts),
+		providers: MAILBOX_PROVIDERS.map((provider) => ({
+			provider,
+			dailyCap: completed
+				? null
+				: providerCapForDay(warmup.schedule, scheduleDay, provider),
+			sentToday: counts[provider],
+		})),
+		startedAt: warmup.startedAt,
+		completedAt: warmup.completedAt,
+		pausedAt: warmup.pausedAt,
+	};
+}
+
 export type WarmupSnapshot = {
 	status: IpWarmupStatus;
 	overflow: IpWarmupOverflow;

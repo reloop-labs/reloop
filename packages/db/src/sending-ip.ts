@@ -8,6 +8,7 @@ import {
 	normalizeProviderCounts,
 	resolveEgressDecision,
 	type WarmupSnapshot,
+	warmupProgressView,
 } from "./ip-warmup";
 import { organization } from "./schema/auth";
 import { organizationPlan } from "./schema/billing";
@@ -583,6 +584,24 @@ export async function listOrganizationSendingIps(
 		dedicatedIpCount: plan?.dedicatedIpCount ?? 0,
 		assignedCount: items.length,
 		items,
+	};
+}
+
+export function presentOrganizationSendingIps(
+	result: Awaited<ReturnType<typeof listOrganizationSendingIps>>,
+	now: Date = new Date(),
+) {
+	return {
+		dedicatedIpCount: result.dedicatedIpCount,
+		assignedCount: result.assignedCount,
+		items: result.items.map((row) => ({
+			id: row.ip.id,
+			address: row.ip.address,
+			hostname: row.ip.hostname,
+			isPrimary: row.assignment.isPrimary,
+			assignedAt: row.assignment.assignedAt,
+			warmup: row.warmup ? warmupProgressView(row.warmup, now) : null,
+		})),
 	};
 }
 

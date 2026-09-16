@@ -11,6 +11,7 @@ import {
 	totalSentToday,
 	type WarmupSnapshot,
 	warmupDayNumber,
+	warmupProgressView,
 } from "../src/ip-warmup";
 import { classifyMailboxProvider } from "../src/mailbox-provider";
 import { utcDayStart } from "../src/reserve-send-credits";
@@ -99,6 +100,17 @@ describe("warmup schedule", () => {
 		expect(providerCapForDay(DEFAULT_WARMUP_SCHEDULE, 1, "microsoft")).toBe(60);
 		expect(providerCapForDay(DEFAULT_WARMUP_SCHEDULE, 8, "gmail")).toBe(200);
 		expect(providerCapForDay(DEFAULT_WARMUP_SCHEDULE, 43, "gmail")).toBeNull();
+
+		const progress = warmupProgressView(
+			warmup(),
+			new Date("2026-09-16T10:00:00.000Z"),
+		);
+		expect(
+			progress.providers.find((p) => p.provider === "gmail")?.dailyCap,
+		).toBe(80);
+		expect(
+			progress.providers.find((p) => p.provider === "microsoft")?.dailyCap,
+		).toBe(60);
 
 		for (const total of [200, 500, 1000, 2500, 5000, 10000]) {
 			const caps = splitProviderCaps(total);

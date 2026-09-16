@@ -4,6 +4,7 @@ import { deleteDomainRoute } from "@reloop/domain/routes/domain/delete-domain/de
 import { getDomainRoute } from "@reloop/domain/routes/domain/get-domain/get-domain.route";
 import { getDomainNameserversRoute } from "@reloop/domain/routes/domain/get-domain-nameserver/get-domain-dns.route";
 import { listDomainsRoute } from "@reloop/domain/routes/domain/list-domains/list-domains.route";
+import { listSendingIpsRoute } from "@reloop/domain/routes/domain/list-sending-ips/list-sending-ips.route";
 import { updateDomainRoute } from "@reloop/domain/routes/domain/update-domain/update-domain.route";
 import { verifyDNSRecordRoute } from "@reloop/domain/routes/domain/verify-dns/verify-dns.route";
 import { domainConnectRoutes } from "@reloop/domain/routes/domain-connect/domain-connect.routes";
@@ -15,6 +16,7 @@ import { Elysia } from "elysia";
 export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })
 	.use(createDomainRoute)
 	.use(listDomainsRoute)
+	.use(listSendingIpsRoute)
 	.use(getDomainNameserversRoute)
 	.use(verifyDNSRecordRoute)
 	.use(domainConnectRoutes)

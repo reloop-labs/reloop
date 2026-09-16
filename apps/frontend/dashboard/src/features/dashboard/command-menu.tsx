@@ -91,6 +91,7 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			",": "/settings",
 			u: "/settings",
 			b: "/settings/billing",
+			I: "/settings/dedicated-ip",
 			W: "/settings/organization",
 			O: "/settings/organization",
 			P: "/settings/profile",
