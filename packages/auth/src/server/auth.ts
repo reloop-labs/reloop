@@ -173,11 +173,11 @@ export const auth = betterAuth({
 				// callbacks). Emit welcome from the actual user-create hook so first-time
 				// accounts get WelcomeEmail regardless of which auth path created them.
 				after: async (user) => {
+					log.info({
+						...{ data: { id: user.id, email: user.email } },
+						message: "User registered:",
+					});
 					try {
-						log.info({
-							...{ data: { id: user.id, email: user.email } },
-							message: "User registered:",
-						});
 						await bus.publish(
 							BusEvent.USER_CREATED,
 							{
@@ -188,8 +188,12 @@ export const auth = betterAuth({
 							{ msgId: `user_created:${user.email}` },
 						);
 					} catch (error) {
+						const message =
+							error instanceof Error ? error.message : String(error);
+						// Tests (and a down NATS) construct `auth` without bus.connect().
+						if (message.includes("Bus not connected")) return;
 						log.error({
-							...{ data: error },
+							...{ data: { message } },
 							message: "Failed to publish USER_CREATED",
 						});
 					}
@@ -301,6 +305,7 @@ export const auth = betterAuth({
 			}
 		}),
 	},
+	baseURL: authServerConfig.BASE_URL,
 	basePath: "/api/auth/v1",
 	telemetry: { enabled: false },
 	emailAndPassword: {
@@ -308,14 +313,24 @@ export const auth = betterAuth({
 		autoSignIn: true,
 	},
 	socialProviders: {
-		google: {
-			clientId: authServerConfig.GOOGLE_CLIENT_ID as string,
-			clientSecret: authServerConfig.GOOGLE_CLIENT_SECRET as string,
-		},
-		github: {
-			clientId: authServerConfig.GITHUB_CLIENT_ID as string,
-			clientSecret: authServerConfig.GITHUB_CLIENT_SECRET as string,
-		},
+		...(authServerConfig.GOOGLE_CLIENT_ID &&
+		authServerConfig.GOOGLE_CLIENT_SECRET
+			? {
+					google: {
+						clientId: authServerConfig.GOOGLE_CLIENT_ID,
+						clientSecret: authServerConfig.GOOGLE_CLIENT_SECRET,
+					},
+				}
+			: {}),
+		...(authServerConfig.GITHUB_CLIENT_ID &&
+		authServerConfig.GITHUB_CLIENT_SECRET
+			? {
+					github: {
+						clientId: authServerConfig.GITHUB_CLIENT_ID,
+						clientSecret: authServerConfig.GITHUB_CLIENT_SECRET,
+					},
+				}
+			: {}),
 	},
 	secret: authServerConfig.BETTER_AUTH_SECRET,
 	session: {

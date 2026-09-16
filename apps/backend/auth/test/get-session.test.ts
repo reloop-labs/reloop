@@ -44,7 +44,9 @@ async function signUp(): Promise<{
 
 /** Force a session stored in Redis (secondaryStorage) to be expired. */
 async function expireSession(token: string): Promise<void> {
-	const client = createClient({ url: process.env.REDIS_URL });
+	const client = createClient({
+		url: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
+	});
 	await client.connect();
 	try {
 		const key = `auth:${token}`;
