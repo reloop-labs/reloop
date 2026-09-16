@@ -9,6 +9,7 @@
 		"./reserve-send-credits": "./src/reserve-send-credits.ts",
 		"./domain-daily-overlay": "./src/domain-daily-overlay.ts",
 		"./smtp-recipients": "./src/smtp-recipients.ts",
+		"./outbound-abuse": "./src/outbound-abuse.ts",
 		"./webhook-events": "./src/webhook-events.ts",
 		"./utils": "./src/utils/*"
 	},

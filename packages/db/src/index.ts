@@ -58,6 +58,14 @@ export {
 	recipientDomain,
 } from "./mailbox-provider";
 export {
+	countPhishingTokens,
+	isSmsGatewayAddress,
+	type OutboundAbuseScore,
+	type OutboundAbuseSeverity,
+	scoreOutboundAbuse,
+	shouldApplyNewDomainThrottle,
+} from "./outbound-abuse";
+export {
 	applyCreditReservation,
 	type CreditReservation,
 	type CreditSnapshot,

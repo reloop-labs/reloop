@@ -212,6 +212,13 @@ export const MailErrors = {
 			why: `This sending domain is newly registered or of unknown age, so it is limited to ${limit} emails per day on Reloop IPs. This send needs ${required} and ${used} have already gone out today.`,
 			fix: "Wait until the daily limit resets, send fewer recipients, or wait until the domain is older than 30 days",
 		}),
+	abuseBlocked: (reasons: string[]) =>
+		createError({
+			status: 403,
+			message: "Message rejected",
+			why: `This send matches outbound abuse patterns (${reasons.join(", ")}) and was not accepted`,
+			fix: "Remove phishing content and carrier SMS/MMS gateway recipients, then contact support if this is legitimate mail",
+		}),
 };
 
 export const RateLimitErrors = {

@@ -262,12 +262,16 @@ function resolveDailyLimit(args: {
 	planDailyEmailLimit: number | null;
 	domainRegisteredAt?: Date | null;
 	now: Date;
+	applyDomainAgeOverlay?: boolean;
 }): { dailyEmailLimit: number | null; domainAgeLimited: boolean } {
-	const overlay = domainDailyOverlay({
-		registeredAt: args.domainRegisteredAt,
-		planId: args.planId,
-		now: args.now,
-	});
+	const overlay =
+		args.applyDomainAgeOverlay === false
+			? null
+			: domainDailyOverlay({
+					registeredAt: args.domainRegisteredAt,
+					planId: args.planId,
+					now: args.now,
+				});
 	const dailyEmailLimit = mergeDailyLimits(args.planDailyEmailLimit, overlay);
 	const domainAgeLimited =
 		overlay != null &&
@@ -298,6 +302,7 @@ export async function peekSendCredits(args: {
 	now?: Date;
 	client?: DatabaseInstance;
 	domainRegisteredAt?: Date | null;
+	applyDomainAgeOverlay?: boolean;
 }): Promise<ReserveDecision> {
 	const client = args.client ?? db;
 	const now = args.now ?? new Date();
@@ -308,6 +313,7 @@ export async function peekSendCredits(args: {
 		planDailyEmailLimit: plan.dailyEmailLimit,
 		domainRegisteredAt: args.domainRegisteredAt,
 		now,
+		applyDomainAgeOverlay: args.applyDomainAgeOverlay,
 	});
 	const decision = applyCreditReservation({
 		credits: snapshotFromRow(credits),
@@ -331,6 +337,7 @@ export async function reserveSendCredits(args: {
 	now?: Date;
 	client?: DatabaseInstance;
 	domainRegisteredAt?: Date | null;
+	applyDomainAgeOverlay?: boolean;
 }): Promise<ReserveDecision & { reservation?: CreditReservation }> {
 	const outer = args.client ?? db;
 	const now = args.now ?? new Date();
@@ -384,6 +391,7 @@ export async function reserveSendCredits(args: {
 			planDailyEmailLimit: plan.dailyEmailLimit,
 			domainRegisteredAt: args.domainRegisteredAt,
 			now,
+			applyDomainAgeOverlay: args.applyDomainAgeOverlay,
 		});
 		const decision = applyCreditReservation({
 			credits: snapshotFromRow(locked),

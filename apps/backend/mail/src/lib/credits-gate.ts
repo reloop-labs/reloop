@@ -64,6 +64,7 @@ export async function reserveCreditsForSend({
 	organizationId,
 	body,
 	domainRegisteredAt,
+	applyDomainAgeOverlay,
 }: {
 	organizationId: string;
 	body: {
@@ -72,6 +73,7 @@ export async function reserveCreditsForSend({
 		bcc?: string | string[];
 	};
 	domainRegisteredAt?: Date | null;
+	applyDomainAgeOverlay?: boolean;
 }): Promise<CreditReservation | null> {
 	const recipientCount = countEmailRecipients(body);
 	if (recipientCount <= 0) return null;
@@ -80,6 +82,7 @@ export async function reserveCreditsForSend({
 		organizationId,
 		recipientCount,
 		domainRegisteredAt,
+		applyDomainAgeOverlay,
 	});
 	if (!decision.ok) throwQuotaError(decision, recipientCount);
 	return decision.reservation ?? null;

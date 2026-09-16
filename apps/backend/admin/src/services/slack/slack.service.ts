@@ -31,6 +31,18 @@ export interface SlackSigninAlertInput {
 	location?: string | null;
 }
 
+export interface SlackAbuseAlertInput {
+	organizationId: string;
+	emailLogId?: string | null;
+	fromEmail: string;
+	subject: string;
+	recipientCount: number;
+	severity: "medium" | "high";
+	reasons: string[];
+	action: "blocked" | "allowed";
+	orgName?: string | null;
+}
+
 export interface SlackDomainAddedAlertInput {
 	domain: string;
 	domainId: string;
@@ -387,6 +399,93 @@ export function buildDomainAddedSlackPayload(
 	};
 }
 
+export function buildAbuseSlackPayload(
+	input: SlackAbuseAlertInput,
+	consoleBaseUrl = adminConfig.CONSOLE_BASE_URL,
+) {
+	const base = cleanConsoleUrl(consoleBaseUrl);
+	const blocked = input.action === "blocked";
+	const header = blocked
+		? "Blocked suspected scam send"
+		: "Review suspected scam send";
+	const displayOrg = input.orgName
+		? `${input.orgName} (${input.organizationId})`
+		: input.organizationId;
+	const emailsUrl = input.emailLogId
+		? `${base}/console/emails?emailId=${encodeURIComponent(input.emailLogId)}`
+		: `${base}/console/emails`;
+	const orgUrl = `${base}/console/organizations/${encodeURIComponent(input.organizationId)}`;
+	const reasons = input.reasons.length > 0 ? input.reasons.join(", ") : "n/a";
+
+	return {
+		text: `${header}: ${input.fromEmail} (${displayOrg})`,
+		blocks: [
+			{
+				type: "header",
+				text: {
+					type: "plain_text",
+					text: header,
+					emoji: true,
+				},
+			},
+			{
+				type: "section",
+				fields: [
+					{
+						type: "mrkdwn",
+						text: `*From:*\n${escapeSlackText(input.fromEmail)}`,
+					},
+					{
+						type: "mrkdwn",
+						text: `*Organization:*\n${escapeSlackText(displayOrg)}`,
+					},
+					{
+						type: "mrkdwn",
+						text: `*Subject:*\n${escapeSlackText(input.subject || "(none)")}`,
+					},
+					{
+						type: "mrkdwn",
+						text: `*Recipients:*\n${input.recipientCount}`,
+					},
+					{
+						type: "mrkdwn",
+						text: `*Severity:*\n${input.severity} / ${input.action}`,
+					},
+					{
+						type: "mrkdwn",
+						text: `*Signals:*\n${escapeSlackText(reasons)}`,
+					},
+				],
+			},
+			{
+				type: "actions",
+				elements: [
+					{
+						type: "button",
+						text: {
+							type: "plain_text",
+							text: "Open email ↗",
+							emoji: true,
+						},
+						url: emailsUrl,
+						style: "primary",
+					},
+					{
+						type: "button",
+						text: {
+							type: "plain_text",
+							text: "Open organization ↗",
+							emoji: true,
+						},
+						url: orgUrl,
+						style: "primary",
+					},
+				],
+			},
+		],
+	};
+}
+
 export type SlackFetcher = (
 	url: string,
 	init?: RequestInit,
@@ -559,6 +658,30 @@ export async function sendSlackDomainAddedNotification(
 	}
 
 	const payload = buildDomainAddedSlackPayload(
+		input,
+		options.consoleBaseUrl ?? adminConfig.CONSOLE_BASE_URL,
+	);
+	return await postToSlack(webhookUrl, payload, options.fetcher);
+}
+
+export async function sendSlackAbuseNotification(
+	input: SlackAbuseAlertInput,
+	options: SlackNotificationOptions = {},
+): Promise<boolean> {
+	const webhookUrl =
+		options.webhookUrl ??
+		(adminConfig.SLACK_ALERTS_WEBHOOK_URL || adminConfig.SLACK_WEBHOOK_URL);
+
+	if (!webhookUrl) {
+		log.debug({
+			organizationId: input.organizationId,
+			message:
+				"Slack alerts webhook not configured, skipping abuse notification",
+		});
+		return false;
+	}
+
+	const payload = buildAbuseSlackPayload(
 		input,
 		options.consoleBaseUrl ?? adminConfig.CONSOLE_BASE_URL,
 	);

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	buildAbuseSlackPayload,
 	buildDomainAddedSlackPayload,
 	buildEmailFailureSlackPayload,
 	buildSigninSlackPayload,
@@ -508,6 +509,37 @@ describe("Slack Notification Service", () => {
 			expect((calledPayload as { text: string }).text).toContain("acme.com");
 			expect((calledPayload as { text: string }).text).toContain(
 				"Domain added",
+			);
+		});
+	});
+
+	describe("buildAbuseSlackPayload", () => {
+		test("links the console email and organization for a blocked scam", () => {
+			const payload = buildAbuseSlackPayload(
+				{
+					organizationId: "org_scam",
+					emailLogId: "eml_123",
+					fromEmail: "crypto.non-custodial-wallets@cve.patch-security.to",
+					subject: "CVE-2026-48291",
+					recipientCount: 1,
+					severity: "high",
+					reasons: ["sms_gateway"],
+					action: "blocked",
+					orgName: "Mriam Corporation",
+				},
+				"https://reloop.sh",
+			);
+
+			expect(payload.text).toContain("Blocked suspected scam send");
+			expect(payload.text).toContain("Mriam Corporation");
+			const actions = payload.blocks[2] as {
+				elements: Array<{ url: string }>;
+			};
+			expect(actions.elements[0]?.url).toBe(
+				"https://reloop.sh/console/emails?emailId=eml_123",
+			);
+			expect(actions.elements[1]?.url).toBe(
+				"https://reloop.sh/console/organizations/org_scam",
 			);
 		});
 	});

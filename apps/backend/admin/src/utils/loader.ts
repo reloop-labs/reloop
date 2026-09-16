@@ -1,4 +1,5 @@
 import { adminConfig } from "@reloop/admin/admin.config";
+import { initAbuseSuspectedSubscriber } from "@reloop/admin/subscribers/abuse-suspected.subscriber";
 import { initDomainCreatedSubscriber } from "@reloop/admin/subscribers/domain-created.subscriber";
 import { initEmailFailedSubscriber } from "@reloop/admin/subscribers/email-failed.subscriber";
 import { initSigninSubscriber } from "@reloop/admin/subscribers/signin.subscriber";
@@ -18,6 +19,7 @@ export const loader = async () => {
 		await initEmailFailedSubscriber();
 		await initSigninSubscriber();
 		await initDomainCreatedSubscriber();
+		await initAbuseSuspectedSubscriber();
 	} catch (e) {
 		log.error({
 			message: "Error during service initialization",

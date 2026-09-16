@@ -2,6 +2,10 @@ import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { refreshDomainRegistrationAge } from "@reloop/db/domain-daily-overlay";
 import {
+	scoreOutboundAbuse,
+	shouldApplyNewDomainThrottle,
+} from "@reloop/db/outbound-abuse";
+import {
 	type CreditReservation,
 	refundSendCredits,
 	reserveSendCredits,
@@ -133,6 +137,35 @@ export async function logIncomingController({
 		});
 	}
 
+	const abuse = scoreOutboundAbuse({
+		from: body.fromEmail,
+		to: toEmails,
+		subject,
+		text: textBody,
+		html: htmlBody,
+	});
+	if (abuse.severity !== "none") {
+		try {
+			await bus.publish(BusEvent.ABUSE_SUSPECTED, {
+				organizationId: finalOrgId,
+				fromEmail: body.fromEmail,
+				subject,
+				recipientCount: toEmails.length,
+				severity: abuse.severity,
+				reasons: abuse.reasons,
+				action: abuse.severity === "high" ? "blocked" : "allowed",
+				timestamp: new Date().toISOString(),
+			});
+		} catch (error) {
+			log.warn(
+				`[LOG-INCOMING] Failed to publish abuse.suspected: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
+	if (abuse.severity === "high") {
+		throw KumoMtaErrors.abuseBlocked(abuse.reasons);
+	}
+
 	let registeredAt = domainRecord.registeredAt;
 	try {
 		registeredAt = await refreshDomainRegistrationAge({
@@ -153,6 +186,7 @@ export async function logIncomingController({
 		organizationId: finalOrgId,
 		recipientCount,
 		domainRegisteredAt: registeredAt,
+		applyDomainAgeOverlay: shouldApplyNewDomainThrottle(abuse, recipientCount),
 	});
 	if (!decision.ok) {
 		if (decision.reason === "daily" && decision.dailyLimit != null) {

@@ -84,3 +84,16 @@ describe("MailErrors.domainTooNew", () => {
 		expect(err.fix).toContain("30 days");
 	});
 });
+
+describe("MailErrors.abuseBlocked", () => {
+	test("returns 403 with the matched signals", () => {
+		const err = MailErrors.abuseBlocked(["sms_gateway"]) as Error & {
+			status?: number;
+			why?: string;
+		};
+
+		expect(err.status).toBe(403);
+		expect(err.message).toBe("Message rejected");
+		expect(err.why).toContain("sms_gateway");
+	});
+});

@@ -105,6 +105,12 @@ describe("policy sources stay wired", () => {
 		expect(smtpLua).toContain("body.tls or header_tls_mode");
 	});
 
+	test("smtp.lua maps 403 abuse rejections from log-incoming", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("code == 403");
+		expect(smtpLua).toContain("5.7.1 Message rejected");
+	});
+
 	test("smtp.lua permanently rejects quota exceeded from log-incoming", () => {
 		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
 		expect(smtpLua).toContain("code == 402");

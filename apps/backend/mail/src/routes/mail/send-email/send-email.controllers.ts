@@ -1,3 +1,4 @@
+import { countEmailRecipients } from "@reloop/be-mail/lib/count-recipients";
 import {
 	assertHasCredits,
 	refundCreditsForFailedSend,
@@ -6,8 +7,13 @@ import {
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { refreshDomainRegistrationAge } from "@reloop/db/domain-daily-overlay";
+import {
+	scoreOutboundAbuse,
+	shouldApplyNewDomainThrottle,
+} from "@reloop/db/outbound-abuse";
 import { emailThread, threadMessage } from "@reloop/db/schema";
 import { lookupRdapCreatedAt } from "@reloop/dns/rdap-created-at";
 import { eq, sql } from "drizzle-orm";
@@ -132,6 +138,39 @@ export async function sendEmailController({
 	}
 	body = cleanBody;
 
+	const abuse = scoreOutboundAbuse({
+		from: body.from,
+		to: body.to,
+		cc: body.cc,
+		bcc: body.bcc,
+		subject: body.subject,
+		text: body.text,
+		html: body.html,
+	});
+	if (abuse.severity !== "none") {
+		try {
+			await bus.publish(BusEvent.ABUSE_SUSPECTED, {
+				organizationId,
+				fromEmail: body.from,
+				subject: body.subject,
+				recipientCount: countEmailRecipients(body),
+				severity: abuse.severity,
+				reasons: abuse.reasons,
+				action: abuse.severity === "high" ? "blocked" : "allowed",
+				timestamp: new Date().toISOString(),
+			});
+		} catch (error) {
+			log.warn({
+				message: "Failed to publish abuse.suspected event",
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
+	}
+	if (abuse.severity === "high") {
+		throw MailErrors.abuseBlocked(abuse.reasons);
+	}
+
 	const dnsHealthCheck = await checkDnsHealth_step3({
 		domainId: currentDomain.id,
 		organizationId,
@@ -150,6 +189,10 @@ export async function sendEmailController({
 		organizationId,
 		body,
 		domainRegisteredAt: registeredAt,
+		applyDomainAgeOverlay: shouldApplyNewDomainThrottle(
+			abuse,
+			countEmailRecipients(body),
+		),
 	});
 
 	let injected = false;
