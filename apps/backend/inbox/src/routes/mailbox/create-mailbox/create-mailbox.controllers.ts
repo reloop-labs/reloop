@@ -1,3 +1,4 @@
+import { assertInboxQuota } from "@reloop/be-inbox/lib/inbox-quota";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { domain, mailbox } from "@reloop/db/schema";
@@ -138,17 +139,20 @@ export async function createMailboxController({
 		});
 	}
 
-	const inserted = await db
-		.insert(mailbox)
-		.values({
-			organizationId,
-			domainId,
-			email,
-			password: password || "placeholder", // In a real app, hash this
-			quota: quota || "5 GB",
-			displayName,
-		})
-		.returning({ id: mailbox.id });
+	const inserted = await db.transaction(async (tx) => {
+		await assertInboxQuota(organizationId, tx);
+		return tx
+			.insert(mailbox)
+			.values({
+				organizationId,
+				domainId,
+				email,
+				password: password || "placeholder", // In a real app, hash this
+				quota: quota || "5 GB",
+				displayName,
+			})
+			.returning({ id: mailbox.id });
+	});
 
 	const id = inserted[0]?.id;
 	if (!id) {

@@ -16,6 +16,7 @@
 		"./permissions": "./src/permissions.ts",
 		"./platform-permissions": "./src/platform-permissions.ts",
 		"./organization-limits": "./src/organization-limits.ts",
+		"./organization-create-quota": "./src/organization-create-quota.ts",
 		"./user-name-limits": "./src/user-name-limits.ts",
 		"./*": "./src/*.ts"
 	},

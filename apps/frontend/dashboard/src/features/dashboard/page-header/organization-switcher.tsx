@@ -77,7 +77,14 @@ export function OrganizationSwitcher({
 	const currentTab = buttonRefs.current[currentIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
+	const hasFreeOrg = organizations?.some((org) => org.planId === "free");
+
 	const handleCreateOrganization = () => {
+		if (hasFreeOrg) {
+			router.push("/settings/billing");
+			setIsOpen(false);
+			return;
+		}
 		router.push("/onboarding");
 		setIsOpen(false);
 	};
@@ -197,7 +204,9 @@ export function OrganizationSwitcher({
 							<Icon name="plus" className="h-3.5 w-3.5 text-text-sub-600" />
 						</div>
 						<span className="font-medium text-sm text-text-strong-950">
-							Create organization
+							{hasFreeOrg
+								? "Upgrade to add organization"
+								: "Create organization"}
 						</span>
 					</button>
 				</div>

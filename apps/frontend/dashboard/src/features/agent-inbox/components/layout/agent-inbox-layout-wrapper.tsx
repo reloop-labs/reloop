@@ -9,6 +9,7 @@ import { InboxTopNavbar } from "#/features/agent-inbox/components/layout/inbox-t
 import { MailboxRail } from "#/features/agent-inbox/components/mailbox-rail/mailbox-rail";
 import { InboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
+import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 
 export const AgentInboxLayoutWrapper = ({
 	mailbox,
@@ -21,13 +22,24 @@ export const AgentInboxLayoutWrapper = ({
 }) => {
 	const router = useRouter();
 	const [isAddOpen, setIsAddOpen] = useState(false);
+	const { data: billing } = useBillingUsage();
+	const inboxUsed = billing?.resources?.agentInboxes.used ?? 0;
+	const inboxLimit = billing?.resources?.agentInboxes.limit ?? 1;
+	const atInboxCap = inboxLimit > 0 && inboxUsed >= inboxLimit;
 
 	return (
 		<div className="flex h-full min-h-0 w-full overflow-hidden bg-bg-white-0 text-text-strong-950 dark:bg-black">
 			<MailboxRail
 				activeMailboxId={mailbox.id}
 				currentFolder={folder}
-				onAddMailbox={() => setIsAddOpen(true)}
+				atInboxCap={atInboxCap}
+				onAddMailbox={() => {
+					if (atInboxCap) {
+						router.push("/settings/billing");
+						return;
+					}
+					setIsAddOpen(true);
+				}}
 			/>
 			<InboxSidebar mailbox={mailbox} folder={folder} />
 			<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">

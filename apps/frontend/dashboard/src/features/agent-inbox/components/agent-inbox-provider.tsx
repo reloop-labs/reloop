@@ -819,8 +819,12 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				const body = await res.text();
 				let message = "Failed to create mailbox";
 				try {
-					const parsed = JSON.parse(body) as { message?: string };
-					if (parsed.message) message = parsed.message;
+					const parsed = JSON.parse(body) as {
+						message?: string;
+						why?: string;
+					};
+					if (parsed.why) message = parsed.why;
+					else if (parsed.message) message = parsed.message;
 				} catch {
 					if (body) message = body;
 				}

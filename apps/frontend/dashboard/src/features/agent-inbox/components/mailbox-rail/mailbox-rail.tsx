@@ -87,10 +87,12 @@ export function MailboxRail({
 	activeMailboxId,
 	currentFolder = "inbox",
 	onAddMailbox,
+	atInboxCap = false,
 }: {
 	activeMailboxId: string;
 	currentFolder?: string;
 	onAddMailbox: () => void;
+	atInboxCap?: boolean;
 }) {
 	const router = useRouter();
 	const { mailboxes, isLoadingMailboxes, mailboxesError, retryMailboxes } =
@@ -149,8 +151,12 @@ export function MailboxRail({
 						<button
 							type="button"
 							onClick={onAddMailbox}
-							title="Add inbox address"
-							aria-label="Add inbox address"
+							title={
+								atInboxCap ? "Upgrade to add an inbox" : "Add inbox address"
+							}
+							aria-label={
+								atInboxCap ? "Upgrade to add an inbox" : "Add inbox address"
+							}
 							className="group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 text-text-sub-600 transition-all duration-150 hover:border-text-strong-950 hover:bg-bg-weak-50 hover:text-text-strong-950 focus:outline-none active:scale-[0.96] dark:border-white/20 dark:bg-white/[0.04] dark:hover:border-white/50 dark:hover:bg-white/[0.08] dark:hover:text-white"
 						>
 							<Plus className="size-4 transition-transform duration-200 group-hover:rotate-90" />

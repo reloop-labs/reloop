@@ -29,6 +29,7 @@ export const createMailboxRoute = new Elysia().use(authMiddleware).post(
 			200: MailModel.createMailboxResponse,
 			400: MailModel.ErrorResponseSchema,
 			401: MailModel.ErrorResponseSchema,
+			402: MailModel.ErrorResponseSchema,
 			403: MailModel.ErrorResponseSchema,
 			409: MailModel.ErrorResponseSchema,
 			500: MailModel.ErrorResponseSchema,

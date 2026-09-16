@@ -50,4 +50,11 @@ export const InboxErrors = {
 			why: message,
 			fix: "Please try again later or contact support if the issue persists",
 		}),
+	inboxLimitReached: ({ used, limit }: { used: number; limit: number }) =>
+		createError({
+			status: 402,
+			message: "Inbox limit reached",
+			why: `Your plan allows ${limit} agent inbox${limit === 1 ? "" : "es"} and you already have ${used}.`,
+			fix: "Delete an existing inbox or upgrade your plan to add more.",
+		}),
 };
