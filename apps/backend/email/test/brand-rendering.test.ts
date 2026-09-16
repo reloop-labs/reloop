@@ -4,8 +4,6 @@ import { join } from "node:path";
 const PROBE = join(import.meta.dir, "render-probe.ts");
 
 const RETAINED_FOOTER_ATTRIBUTION_MENTIONS = 2;
-const REBRANDED_FOOTER_ATTRIBUTION_MENTIONS =
-	RETAINED_FOOTER_ATTRIBUTION_MENTIONS + 1;
 
 function buildEnv(appName?: string): Record<string, string> {
 	const env = { ...process.env } as Record<string, string>;
@@ -37,7 +35,7 @@ async function renderAll(appName?: string) {
 	}
 	return JSON.parse(line) as Record<
 		string,
-		{ brand: number; reloop: number; selfHosted: string }
+		{ brand: number; attributed: number; selfHosted: string }
 	>;
 }
 
@@ -59,16 +57,15 @@ describe("system email branding", () => {
 		).toEqual([]);
 	});
 
-	test("no template leaks Reloop beyond the shared footer", async () => {
+	test("the configured name never appears without Reloop attribution", async () => {
 		const rendered = await renderAll("Contoso Mail");
 
 		expect(
 			Object.entries(rendered)
-				.filter(
-					([, counts]) =>
-						counts.reloop !== REBRANDED_FOOTER_ATTRIBUTION_MENTIONS,
-				)
-				.map(([name, counts]) => `${name}: ${counts.reloop}`),
+				.filter(([, counts]) => counts.attributed !== counts.brand)
+				.map(
+					([name, counts]) => `${name}: ${counts.attributed}/${counts.brand}`,
+				),
 		).toEqual([]);
 	});
 

@@ -58,14 +58,15 @@ NODE_ENV=development
 | `RELOOP_API_KEY` | Prod | — | API key for the org that owns the sender domain(s); used by `reloop-email` |
 | `RELOOP_SENDER_DOMAIN` | Prod | — | System product mail From domain (auth, billing, invites) |
 | `ONBOARDING_TEST_DOMAIN` | Prod | — | Onboarding “Send email” From domain only (can differ) |
-| `APP_NAME` | No | `Reloop` | Product name used in system email senders, subjects and bodies |
+| `APP_NAME` | No | `Reloop` | Company name shown as `Self-hosted Reloop × <APP_NAME>` in system email senders, subjects and bodies |
 
 
 ## Branding system email
 
-`APP_NAME` sets the product name used across every system email — the sender
-name, the subject line and the message body — so a self-hosted install can send
-mail under its own name instead of Reloop's.
+`APP_NAME` sets the name used across every system email: the sender name, the
+subject line and the message body. Any value other than `Reloop` is shown as
+`Self-hosted Reloop × <APP_NAME>`, so mail carries both your name and the fact
+that it runs on Reloop.
 
 ```bash
 APP_NAME=Contoso Mail
@@ -73,14 +74,14 @@ APP_NAME=Contoso Mail
 
 | Email | Sender with `APP_NAME=Contoso Mail` |
 | :--- | :--- |
-| Login code | `Contoso Mail <auth@…>` |
-| New sign-in | `Contoso Mail Security <security@…>` |
-| Billing | `Contoso Mail Billing <billing@…>` |
-| Quota warning | `Contoso Mail Support <support@…>` |
-| Invitation | `Dana via Contoso Mail <invites@…>` |
+| Login code | `Self-hosted Reloop × Contoso Mail <auth@…>` |
+| New sign-in | `Self-hosted Reloop × Contoso Mail Security <security@…>` |
+| Billing | `Self-hosted Reloop × Contoso Mail Billing <billing@…>` |
+| Quota warning | `Self-hosted Reloop × Contoso Mail Support <support@…>` |
+| Invitation | `Dana via Self-hosted Reloop × Contoso Mail <invites@…>` |
 
-Leave it unset and everything stays `Reloop`, so existing deployments are
-unaffected. The installer defaults it to `Reloop` and preserves your value
+Leave it unset, or set it to `Reloop`, and everything stays plain `Reloop`, so
+existing deployments are unaffected. The installer defaults it to `Reloop` and preserves your value
 across re-runs.
 
 The sign-in alert previously sent as `Security Alert`, which was the only
@@ -92,9 +93,8 @@ matching the Billing and Support senders.
 > asset in your own deployment if you rebrand.
 
 > [!NOTE]
-> `APP_NAME` does not change the shared footer, which keeps Reloop's help
-> link, copyright line and postal address. That attribution is retained
-> deliberately, so every install sends mail with it regardless of
+> The Reloop attribution cannot be configured away. The shared footer also
+> keeps Reloop's help link, copyright line and postal address regardless of
 > `APP_NAME`.
 
 

@@ -31,7 +31,7 @@ export const Footer = ({ baseUrl = "https://reloop.sh" }: FooterProps) => {
 			<Text className="m-0 mt-4 text-[12px] leading-[24px]">
 				{appName !== DEFAULT_APP_NAME && (
 					<>
-						Self-hosted {DEFAULT_APP_NAME} × {appName}
+						{appName}
 						<br />
 					</>
 				)}

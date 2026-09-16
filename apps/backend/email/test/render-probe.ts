@@ -24,10 +24,13 @@ const templates = [
 
 const out: Record<
 	string,
-	{ brand: number; reloop: number; selfHosted: string }
+	{ brand: number; attributed: number; selfHosted: string }
 > = {};
 const brand = process.env.APP_NAME?.trim() || "Reloop";
-const escaped = brand.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeRegExp = (value: string) =>
+	value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const count = (text: string, value: string) =>
+	(text.match(new RegExp(escapeRegExp(value), "g")) ?? []).length;
 
 for (const name of templates) {
 	const mod = await import(`@reloop/email/emails/${name}`);
@@ -37,9 +40,11 @@ for (const name of templates) {
 	const text = html.replace(/https?:\/\/[^"'\s<>]+/g, "");
 	const flat = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 	out[name] = {
-		brand: (text.match(new RegExp(escaped, "g")) ?? []).length,
-		reloop: (text.match(/Reloop/g) ?? []).length,
-		selfHosted: (flat.match(/Self-hosted .*?(?= Copyright)/) ?? [""])[0].trim(),
+		brand: count(text, brand),
+		attributed: count(text, `Self-hosted Reloop × ${brand}`),
+		selfHosted: (
+			flat.match(/.*(Self-hosted .*?)(?= Copyright)/)?.[1] ?? ""
+		).trim(),
 	};
 }
 

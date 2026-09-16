@@ -223,10 +223,10 @@ RELOOP_ACME_EMAIL=$RELOOP_ADMIN_EMAIL
 
 NODE_ENV=production
 
-# Name used in system email — the sender name, the subjects and the message
-# bodies. Set it to your own product name to brand the mail your users
-# receive. The logo is served from BASE_URL, so replace that asset too if
-# you rebrand.
+# Your company name for system email: the sender name, the subjects and the
+# message bodies. Anything other than Reloop is shown as
+# "Self-hosted Reloop × APP_NAME". The logo is served from BASE_URL, so
+# replace that asset too if you rebrand.
 APP_NAME=$APP_NAME
 
 BASE_URL=$RELOOP_SCHEME://$RELOOP_DOMAIN
