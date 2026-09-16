@@ -104,7 +104,10 @@ if (process.env.PROBE_MODE === "seed") {
 	await invite(expired, new Date(Date.now() - 3_600_000));
 	results.expiredInvite = await signInOtp(expired);
 
-	const cookie = await cookieFor(OWNER);
+	// Use a member who does not already own an org. The owner of org_probe
+	// is on Free, so the one-free-org quota would 403 a second create and
+	// this check would no longer isolate DISABLE_ORG_CREATION.
+	const cookie = await cookieFor("member@probe.test");
 	const org = await handle(
 		"/organization/create",
 		{ name: "Second Org", slug: `second-${crypto.randomUUID()}` },
