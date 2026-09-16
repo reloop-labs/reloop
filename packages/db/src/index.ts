@@ -33,6 +33,18 @@ export {
 } from "./domain-daily-overlay";
 export * from "./email-send-source";
 export {
+	type AssignCheck,
+	applyWarmupReservation,
+	assertCanAssignDedicatedIp,
+	DEFAULT_WARMUP_SCHEDULE,
+	dailyCapForDay,
+	type EgressDecision,
+	resolveEgressDecision,
+	type WarmupReservation,
+	type WarmupSnapshot,
+	warmupDayNumber,
+} from "./ip-warmup";
+export {
 	applyCreditReservation,
 	type CreditReservation,
 	type CreditSnapshot,
@@ -43,6 +55,23 @@ export {
 	utcDayStart,
 } from "./reserve-send-credits";
 export * from "./schema/index";
+export {
+	type AssignDedicatedIpResult,
+	assignDedicatedIp,
+	type CreateSendingIpResult,
+	createSendingIp,
+	getSendingIp,
+	listOrganizationSendingIps,
+	listSendingIps,
+	type OrgEgress,
+	parseSendingHostname,
+	parseSendingIpAddress,
+	resolveOrgEgress,
+	setWarmupAction,
+	unassignDedicatedIp,
+	updateSendingIp,
+	type WarmupAction,
+} from "./sending-ip";
 export { bareEmail, uniqueBareEmails } from "./smtp-recipients";
 export * from "./utils/crypto";
 export * from "./webhook-events";

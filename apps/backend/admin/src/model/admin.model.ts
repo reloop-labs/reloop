@@ -598,4 +598,102 @@ export namespace AdminModel {
 	export const createSupportMessageBody = t.Object({
 		body: t.String({ minLength: 1, maxLength: 4000 }),
 	});
+
+	export const sendingIpKind = t.Union([
+		t.Literal("shared"),
+		t.Literal("dedicated"),
+	]);
+
+	export const sendingIpStatus = t.Union([
+		t.Literal("active"),
+		t.Literal("disabled"),
+		t.Literal("retired"),
+	]);
+
+	export const ipWarmupStatus = t.Union([
+		t.Literal("pending"),
+		t.Literal("active"),
+		t.Literal("paused"),
+		t.Literal("completed"),
+		t.Literal("aborted"),
+	]);
+
+	export const ipWarmupOverflow = t.Union([
+		t.Literal("shared"),
+		t.Literal("defer"),
+	]);
+
+	export const warmupView = t.Object({
+		id: t.String(),
+		status: ipWarmupStatus,
+		overflow: ipWarmupOverflow,
+		day: t.Number(),
+		dailyCap: t.Union([t.Number(), t.Null()]),
+		sentToday: t.Number(),
+		startedAt: t.Union([t.Date(), t.Null()]),
+		completedAt: t.Union([t.Date(), t.Null()]),
+		pausedAt: t.Union([t.Date(), t.Null()]),
+	});
+
+	export const sendingIpAssignment = t.Object({
+		id: t.String(),
+		organizationId: t.String(),
+		organizationName: t.Union([t.String(), t.Null()]),
+		isPrimary: t.Boolean(),
+		assignedAt: t.Date(),
+		warmup: t.Union([warmupView, t.Null()]),
+	});
+
+	export const sendingIpItem = t.Object({
+		id: t.String(),
+		address: t.String(),
+		hostname: t.String(),
+		kind: sendingIpKind,
+		status: sendingIpStatus,
+		notes: t.Union([t.String(), t.Null()]),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
+		assignment: t.Union([sendingIpAssignment, t.Null()]),
+	});
+
+	export const sendingIpsResponse = t.Object({
+		items: t.Array(sendingIpItem),
+		total: t.Number(),
+	});
+
+	export const createSendingIpBody = t.Object({
+		address: t.String({ minLength: 1, maxLength: 45 }),
+		hostname: t.String({ minLength: 1, maxLength: 255 }),
+		kind: sendingIpKind,
+		notes: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
+	export const updateSendingIpBody = t.Object({
+		hostname: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+		status: t.Optional(sendingIpStatus),
+		notes: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
+	export const assignSendingIpBody = t.Object({
+		organizationId: t.String(),
+		isPrimary: t.Optional(t.Boolean()),
+		overflow: t.Optional(ipWarmupOverflow),
+		startWarmup: t.Optional(t.Boolean()),
+	});
+
+	export const warmupActionBody = t.Object({
+		action: t.Union([
+			t.Literal("pause"),
+			t.Literal("resume"),
+			t.Literal("complete"),
+			t.Literal("restart"),
+		]),
+	});
+
+	export const organizationSendingIpsResponse = t.Object({
+		organizationId: t.String(),
+		dedicatedIpCount: t.Number(),
+		assignedCount: t.Number(),
+		items: t.Array(sendingIpItem),
+	});
 }

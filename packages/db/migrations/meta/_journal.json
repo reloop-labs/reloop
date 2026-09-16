@@ -141,6 +141,13 @@
 			"when": 1786800000000,
 			"tag": "0019_domain_registration_age",
 			"breakpoints": true
+		},
+		{
+			"idx": 20,
+			"version": "7",
+			"when": 1786900000000,
+			"tag": "0020_sending_ip",
+			"breakpoints": true
 		}
 	]
 }
