@@ -1,6 +1,6 @@
 import { sendSlackAbuseNotification } from "@reloop/admin/services/slack/slack.service";
 import { redis } from "@reloop/admin/utils/redis";
-import { type AbuseSuspectedPayload, BusEvent, bus } from "@reloop/bus";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { organization } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
@@ -10,7 +10,7 @@ const ABUSE_DEDUP_TTL_SECONDS = 15 * 60;
 
 async function alreadyNotified(orgId: string): Promise<boolean> {
 	const key = `slack:abuse:${orgId}`;
-	const existing = await redis.get(key);
+	const existing = await redis.get<string>(key);
 	if (existing) return true;
 	await redis.set(key, "1", ABUSE_DEDUP_TTL_SECONDS);
 	return false;
@@ -29,13 +29,13 @@ export async function initAbuseSuspectedSubscriber() {
 	try {
 		await bus.subscribe(
 			BusEvent.ABUSE_SUSPECTED,
-			async (payload: AbuseSuspectedPayload) => {
+			async (payload) => {
 				try {
 					if (await alreadyNotified(payload.organizationId)) {
-						log.warn(
-							"server",
-							`Duplicate abuse Slack alert for ${payload.organizationId}, skipping`,
-						);
+						log.warn({
+							organizationId: payload.organizationId,
+							message: "Duplicate abuse Slack alert, skipping",
+						});
 						return;
 					}
 
@@ -73,7 +73,7 @@ export async function initAbuseSuspectedSubscriber() {
 			{ queue: "admin-slack-worker" },
 		);
 
-		log.info("server", "Slack abuse-suspected subscriber registered");
+		log.info({ message: "Slack abuse-suspected subscriber registered" });
 	} catch (error) {
 		log.error({
 			error: error instanceof Error ? error.message : String(error),
