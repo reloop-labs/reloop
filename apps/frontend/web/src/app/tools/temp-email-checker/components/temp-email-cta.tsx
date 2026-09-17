@@ -2,7 +2,6 @@
 
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
-import { useState } from "react";
 
 export interface TempEmailCtaProps {
 	headlineLine1?: string;
@@ -28,21 +27,18 @@ export interface TempEmailCtaProps {
  * - Concentric circular construction guides
  * - 45° diagonal fold rays
  * - Envelope geometry with top flap & bottom seams
- * - Letter sheet peek with verified badge
- * - Interactive CAD anchor handles with coordinate tags
+ * - CAD anchor handles
  * - Technical dimension callouts (320px width, 180px height, R20 radius)
  */
 function BlueprintEmailIllustration() {
-	const [activeNode, setActiveNode] = useState<string | null>(null);
-
 	const anchorNodes = [
-		{ id: "flap-apex", x: 240, y: 176, label: "P(240,176) Apex" },
-		{ id: "top-left", x: 80, y: 90, label: "P(80,90) R20" },
-		{ id: "top-right", x: 400, y: 90, label: "P(400,90) R20" },
-		{ id: "bottom-left", x: 80, y: 270, label: "P(80,270) Base" },
-		{ id: "bottom-right", x: 400, y: 270, label: "P(400,270) Base" },
-		{ id: "flap-open-apex", x: 240, y: 22, label: "P(240,22) Fold" },
-		{ id: "center-cross", x: 240, y: 160, label: "P(240,160) Center" },
+		{ id: "flap-apex", x: 240, y: 176 },
+		{ id: "top-left", x: 80, y: 90 },
+		{ id: "top-right", x: 400, y: 90 },
+		{ id: "bottom-left", x: 80, y: 270 },
+		{ id: "bottom-right", x: 400, y: 270 },
+		{ id: "flap-open-apex", x: 240, y: 22 },
+		{ id: "center-cross", x: 240, y: 160 },
 	];
 
 	return (
@@ -51,10 +47,8 @@ function BlueprintEmailIllustration() {
 				viewBox="0 0 480 320"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
-				className="h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.01]"
+				className="h-auto w-full"
 			>
-				<title>Email SVG Construction Blueprint</title>
-
 				<defs>
 					{/* Primary blueprint stroke gradient */}
 					<linearGradient
@@ -81,19 +75,6 @@ function BlueprintEmailIllustration() {
 					>
 						<stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
 						<stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
-					</linearGradient>
-
-					{/* Letter paper gradient */}
-					<linearGradient
-						id="letterFill"
-						x1="120"
-						y1="55"
-						x2="360"
-						y2="150"
-						gradientUnits="userSpaceOnUse"
-					>
-						<stop offset="0%" stopColor="#ffffff" stopOpacity="0.16" />
-						<stop offset="100%" stopColor="#ffffff" stopOpacity="0.06" />
 					</linearGradient>
 				</defs>
 
@@ -207,77 +188,6 @@ function BlueprintEmailIllustration() {
 					<path d="M 236 270 H 244 M 240 266 V 274" />
 					<path d="M 76 160 H 84 M 80 156 V 164" />
 					<path d="M 396 160 H 404 M 400 156 V 164" />
-				</g>
-
-				{/* 7. LETTER DOCUMENT PEEKING OUT OF ENVELOPE */}
-				<g>
-					{/* Letter paper body */}
-					<rect
-						x="116"
-						y="52"
-						width="248"
-						height="105"
-						rx="8"
-						fill="url(#letterFill)"
-						stroke="white"
-						strokeWidth="1.25"
-						strokeOpacity="0.4"
-					/>
-
-					{/* Document header line */}
-					<line
-						x1="140"
-						y1="72"
-						x2="230"
-						y2="72"
-						stroke="white"
-						strokeOpacity="0.6"
-						strokeWidth="1.75"
-						strokeLinecap="round"
-					/>
-
-					{/* Document text content lines */}
-					<line
-						x1="140"
-						y1="88"
-						x2="310"
-						y2="88"
-						stroke="white"
-						strokeOpacity="0.35"
-						strokeWidth="1.25"
-						strokeLinecap="round"
-					/>
-					<line
-						x1="140"
-						y1="102"
-						x2="280"
-						y2="102"
-						stroke="white"
-						strokeOpacity="0.25"
-						strokeWidth="1.25"
-						strokeLinecap="round"
-					/>
-
-					{/* Verified badge stamp inside letter */}
-					<g transform="translate(322, 75)">
-						<circle
-							cx="12"
-							cy="12"
-							r="12"
-							fill="rgba(255,255,255,0.12)"
-							stroke="white"
-							strokeWidth="1"
-							strokeOpacity="0.65"
-						/>
-						{/* Checkmark */}
-						<path
-							d="M 8 12.5 L 11 15.5 L 17 9"
-							stroke="white"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-					</g>
 				</g>
 
 				{/* 8. OPEN FLAP GHOST CONSTRUCTION (Upper inverted triangle in dashed lines) */}
@@ -435,83 +345,32 @@ function BlueprintEmailIllustration() {
 					</text>
 				</g>
 
-				{/* 13. CAD VECTOR ANCHOR HANDLES (Interactive Squares with coordinates) */}
-				{anchorNodes.map((node) => {
-					const isHovered = activeNode === node.id;
-					return (
-						<g
-							key={node.id}
-							className="cursor-pointer transition-transform duration-200"
-							onMouseEnter={() => setActiveNode(node.id)}
-							onMouseLeave={() => setActiveNode(null)}
-						>
-							{/* Coordinate chip on hover */}
-							{isHovered && (
-								<g className="fade-in zoom-in-95 animate-in duration-150">
-									<rect
-										x={node.x - 42}
-										y={node.y - 26}
-										width="84"
-										height="18"
-										rx="4"
-										fill="#0f172a"
-										stroke="white"
-										strokeWidth="1"
-										strokeOpacity="0.8"
-										filter="drop-shadow(0 2px 4px rgba(0,0,0,0.25))"
-									/>
-									<text
-										x={node.x}
-										y={node.y - 14}
-										fill="#ffffff"
-										fontSize="8.5"
-										fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
-										textAnchor="middle"
-										fontWeight="500"
-									>
-										{node.label}
-									</text>
-								</g>
-							)}
+				{/* 13. CAD VECTOR ANCHOR HANDLES */}
+				{anchorNodes.map((node) => (
+					<g key={node.id}>
+						{/* The Vector Square Node */}
+						<rect
+							x={node.x - 4}
+							y={node.y - 4}
+							width="8"
+							height="8"
+							rx="1.5"
+							fill="#ffffff"
+							stroke="#1660f0"
+							strokeWidth="1.5"
+						/>
 
-							{/* Outer glow ring on hover */}
-							{isHovered && (
-								<circle
-									cx={node.x}
-									cy={node.y}
-									r="10"
-									fill="none"
-									stroke="white"
-									strokeWidth="1.5"
-									strokeOpacity="0.6"
-								/>
-							)}
-
-							{/* The Vector Square Node */}
-							<rect
-								x={node.x - 4}
-								y={node.y - 4}
-								width="8"
-								height="8"
-								rx="1.5"
-								fill="#ffffff"
-								stroke="#1660f0"
-								strokeWidth="1.5"
-								className="transition-transform duration-150 hover:scale-125"
-							/>
-
-							{/* Center core dot */}
-							<rect
-								x={node.x - 1}
-								y={node.y - 1}
-								width="2"
-								height="2"
-								fill="#1660f0"
-								opacity="0.85"
-							/>
-						</g>
-					);
-				})}
+						{/* Center core dot */}
+						<rect
+							x={node.x - 1}
+							y={node.y - 1}
+							width="2"
+							height="2"
+							fill="#1660f0"
+							opacity="0.85"
+						/>
+					</g>
+				))}
 			</svg>
 		</div>
 	);
