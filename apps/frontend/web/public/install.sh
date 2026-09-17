@@ -13,6 +13,8 @@ RELOOP_DOMAIN="${RELOOP_DOMAIN:-}"
 RELOOP_ADMIN_EMAIL="${RELOOP_ADMIN_EMAIL:-}"
 RELOOP_PUBLIC_IP="${RELOOP_PUBLIC_IP:-}"
 RELOOP_HTTPS="${RELOOP_HTTPS:-}"
+RELOOP_EXTERNAL_PROXY="${RELOOP_EXTERNAL_PROXY:-}"
+RELOOP_PROXY_PORT="${RELOOP_PROXY_PORT:-}"
 POSTGRES_DB="${RELOOP_DB_NAME:-}"
 POSTGRES_USER="${RELOOP_DB_USER:-}"
 RELOOP_S3="${RELOOP_S3:-}"
@@ -148,7 +150,12 @@ print_summary() {
 	printf '\nOnce DNS propagates, Reloop will be available at:\n'
 	printf '%s://%s\n' "$RELOOP_SCHEME" "$RELOOP_DOMAIN"
 
-	if [ "$RELOOP_HTTPS" = "yes" ]; then
+	if [ "$RELOOP_EXTERNAL_PROXY" = "yes" ]; then
+		printf '\nReverse proxy: Reloop listens on http://127.0.0.1:%s\n' "$RELOOP_PROXY_PORT"
+		printf 'Route %s and %s to it, keeping the original Host header.\n' "$RELOOP_DOMAIN" "$RELOOP_TRACKING_HOST"
+		printf 'Your proxy owns their TLS certificates and renewal.\n'
+		printf 'Setup guide: https://reloop.sh/docs/self-host/vps#behind-an-existing-reverse-proxy\n'
+	elif [ "$RELOOP_HTTPS" = "yes" ]; then
 		printf '\nHTTPS: Caddy requests a certificate as soon as %s resolves to\n' "$RELOOP_DOMAIN"
 		printf '%s. It retries automatically — no action needed after DNS is added.\n' "$RELOOP_PUBLIC_IP"
 		printf 'Watch it happen with:  reloop logs proxy\n'
@@ -202,13 +209,13 @@ main() {
 
 	preflight
 	ensure_docker
-	check_ports
 
 	install -d -m 0755 -o root -g root "$INSTALL_DIR"
 	ok "Installation directory: $INSTALL_DIR"
 
 	detect_existing_install
 	collect_configuration
+	check_ports
 	detect_public_ip
 
 	write_env_file

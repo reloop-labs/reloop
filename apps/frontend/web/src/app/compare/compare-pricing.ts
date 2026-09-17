@@ -200,8 +200,8 @@ const COMPETITOR_PRICING: Record<string, ComparePricing> = {
 				label: "Free",
 				reloop: reloopSendRows.free,
 				competitor: {
-					value: "62,000 / mo",
-					note: "From EC2 in the same region · first 12 months",
+					value: "$200 credits",
+					note: "AWS Free Tier credits · first 6 months",
 				},
 			},
 			{
@@ -210,7 +210,7 @@ const COMPETITOR_PRICING: Record<string, ComparePricing> = {
 				reloop: reloopSendRows.entry,
 				competitor: {
 					value: "$0.10 / 1k",
-					note: "Plus data transfer",
+					note: "À la carte · $0.16 / 1k on the Essentials tier",
 				},
 			},
 			{

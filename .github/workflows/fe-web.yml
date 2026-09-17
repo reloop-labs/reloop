@@ -17,7 +17,34 @@ permissions:
 
 
 jobs:
+  pricing_source_of_truth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          # Keep in sync with local Bun used to generate bun.lock (frozen install fails across major patch skew).
+          bun-version: 1.3.14
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Regenerate agent discovery files
+        run: bun run generate:agent-public
+        working-directory: apps/frontend/web
+
+      - name: Fail if generated pricing surfaces drifted from @reloop/pricing
+        run: git diff --exit-code -- apps/frontend/web/public/llms.txt apps/frontend/web/public/pricing.md apps/frontend/web/public/index.md
+
+      - name: Check every pricing surface against the catalog
+        run: bun test src/lib/pricing-facts.test.ts
+        working-directory: apps/frontend/web
+
   build_and_publish:
+    needs: pricing_source_of_truth
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

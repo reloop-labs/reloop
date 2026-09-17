@@ -13,6 +13,10 @@ import {
 import { join } from "node:path";
 import { loadMarketingCorpus } from "../src/lib/agent-content";
 import { injectMarkdownAgentDirective } from "../src/lib/agent-directive";
+import {
+	freeDailyEmails,
+	pricingSnapshotMarkdown,
+} from "../src/lib/pricing-facts";
 import { buildPricingMarkdown } from "../src/lib/pricing-md";
 
 const root = join(import.meta.dirname, "..");
@@ -74,13 +78,33 @@ const mirrors: Array<[string, string]> = [
 for (const [src, dest] of mirrors) {
 	const from = join(agentDir, src);
 	if (existsSync(from)) {
-		const body = injectMarkdownAgentDirective(readFileSync(from, "utf-8"));
+		const body = injectMarkdownAgentDirective(
+			readFileSync(from, "utf-8").replace(
+				/\*\*\d+ \/ day\*\*/g,
+				`**${freeDailyEmails} / day**`,
+			),
+		);
 		write(dest, body);
 	}
 }
 
-// --- skill.md / llms.txt / llms-docs.txt are hand-maintained in public/ ---
-for (const name of ["skill.md", "llms.txt", "llms-docs.txt"] as const) {
+const llmsPath = join(pub, "llms.txt");
+if (existsSync(llmsPath)) {
+	const raw = readFileSync(llmsPath, "utf-8");
+	const snapshotHeading = "## Hosted pricing snapshot (Reloop Cloud)";
+	const start = raw.indexOf(snapshotHeading);
+	const end = raw.indexOf("\n## ", start + snapshotHeading.length);
+	if (start === -1 || end === -1) {
+		throw new Error("llms.txt is missing the hosted pricing snapshot section");
+	}
+	write(
+		"llms.txt",
+		`${raw.slice(0, start)}${snapshotHeading}\n\n${pricingSnapshotMarkdown()}\n${raw.slice(end)}`,
+	);
+}
+
+// --- skill.md / llms-docs.txt are hand-maintained in public/ ---
+for (const name of ["skill.md", "llms-docs.txt"] as const) {
 	if (!existsSync(join(pub, name))) {
 		console.warn(
 			`  missing public/${name} (expected hand-maintained source of truth)`,

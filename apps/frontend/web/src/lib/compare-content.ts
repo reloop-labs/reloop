@@ -8,10 +8,16 @@ import { mailgunComparisonCategories } from "@reloop/web/app/compare/mailgun/com
 import { resendComparisonCategories } from "@reloop/web/app/compare/resend/comparison-data";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import {
+	breadcrumbJsonLd,
 	type FaqEntry,
 	faqPageJsonLd,
 	pricingProductJsonLd,
 } from "@reloop/web/lib/schema";
+import {
+	freeDailyEmails,
+	freeMonthlyEmails,
+	freePlanSummary,
+} from "@reloop/web/lib/pricing-facts";
 import { getSiteUrl } from "@reloop/web/lib/site";
 
 export type ComparePageContent = {
@@ -164,8 +170,7 @@ export const comparePages: ComparePageContent[] = [
 		title: "Reloop vs Resend",
 		description:
 			"Learn how Reloop compares to Resend and why Reloop is an open-source alternative for developer email.",
-		summary:
-			"Reloop is email infrastructure you can host or self-host (Apache 2.0, KumoMTA). Resend is a hosted DX layer over Amazon SES. Reloop Free is 3,000 emails/month with a 200/day cap; Pro is $10/month for 50,000 emails with no daily cap. Reloop is not a drop-in Resend proxy.",
+		summary: `Reloop is email infrastructure you can host or self-host (Apache 2.0, KumoMTA). Resend is a hosted DX layer over Amazon SES. Reloop Free is ${freePlanSummary}; Pro is $10/month for 50,000 emails with no daily cap. Reloop is not a drop-in Resend proxy.`,
 		categories: resendComparisonCategories,
 		faqs: [
 			{
@@ -191,8 +196,7 @@ export const comparePages: ComparePageContent[] = [
 		title: "Reloop vs SendGrid",
 		description:
 			"Learn how Reloop compares to SendGrid for transactional and marketing email.",
-		summary:
-			"SendGrid bundles transactional APIs, marketing campaigns, and deliverability tooling—often with annual commits. Reloop is API-first, Apache 2.0, and self-hostable, with campaigns and transactional sends in one codebase. Reloop Cloud Free is 3,000 emails/month (200/day).",
+		summary: `SendGrid bundles transactional APIs, marketing campaigns, and deliverability tooling—often with annual commits. Reloop is API-first, Apache 2.0, and self-hostable, with campaigns and transactional sends in one codebase. Reloop Cloud Free is ${freePlanSummary}.`,
 		features: sendgridFeatures,
 		faqs: [
 			{
@@ -213,8 +217,7 @@ export const comparePages: ComparePageContent[] = [
 		title: "Reloop vs Mailgun",
 		description:
 			"Learn how Reloop compares to Mailgun for developer email APIs and SMTP.",
-		summary:
-			"Reloop offers REST + SMTP, inbound agent inbox, and Apache 2.0 self-host. Mailgun is hosted SaaS with inbound routes. Reloop Free is 3,000 emails/month (200/day).",
+		summary: `Reloop offers REST + SMTP, inbound agent inbox, and Apache 2.0 self-host. Mailgun is hosted SaaS with inbound routes. Reloop Free is ${freePlanSummary}.`,
 		categories: mailgunComparisonCategories,
 		faqs: [
 			{
@@ -272,8 +275,7 @@ export const comparePages: ComparePageContent[] = [
 		title: "Reloop vs Postmark",
 		description:
 			"Learn how Reloop compares to Postmark for transactional email.",
-		summary:
-			"Postmark focuses on transactional delivery with streams. Reloop unifies transactional API sends and campaigns, is Apache 2.0 / self-hostable, and offers an agent inbox. Reloop Free is 3,000 emails/month (200/day).",
+		summary: `Postmark focuses on transactional delivery with streams. Reloop unifies transactional API sends and campaigns, is Apache 2.0 / self-hostable, and offers an agent inbox. Reloop Free is ${freePlanSummary}.`,
 		features: postmarkFeatures,
 		faqs: [
 			{
@@ -294,15 +296,13 @@ export const comparePages: ComparePageContent[] = [
 		title: "Reloop vs Loops",
 		description:
 			"Compare Reloop to Loops: send-based pricing vs contact-list pricing, plus transactional API and self-host.",
-		summary:
-			"Loops prices by contact list size. Reloop prices by emails sent. Reloop Free is 3,000 emails/month (200/day); Pro is $10/month for 50,000 emails; Growth is $20/month for 100,000 emails. Reloop is the ESP/MTA, not a lifecycle UI on top of another sender.",
+		summary: `Loops prices by contact list size. Reloop prices by emails sent. Reloop Free is ${freePlanSummary}; Pro is $10/month for 50,000 emails; Growth is $20/month for 100,000 emails. Reloop is the ESP/MTA, not a lifecycle UI on top of another sender.`,
 		categories: loopsComparisonCategories,
 		faqs: [
 			{
 				question:
 					"Why should we choose send-based pricing over contact-based pricing?",
-				answer:
-					"Contact-based pricing charges you for inactive leads and users who never open your emails. Reloop's send-based pricing charges for emails sent. Free is 3,000 emails/month (200/day); paid overage is $0.50 per 1,000.",
+				answer: `Contact-based pricing charges you for inactive leads and users who never open your emails. Reloop's send-based pricing charges for emails sent. Free is ${freePlanSummary}; paid overage is $0.50 per 1,000.`,
 			},
 			{
 				question:
@@ -323,8 +323,7 @@ export const comparePages: ComparePageContent[] = [
 		title: "Reloop vs Mailchimp",
 		description:
 			"Compare Reloop to Mailchimp: send-based developer email vs contact-list marketing SaaS.",
-		summary:
-			"Mailchimp is a marketer-first, contact-priced platform. Reloop is developer-first email infrastructure with send-based Reloop Cloud pricing and an Apache 2.0 self-host path. Reloop Free is 3,000 emails/month (200/day).",
+		summary: `Mailchimp is a marketer-first, contact-priced platform. Reloop is developer-first email infrastructure with send-based Reloop Cloud pricing and an Apache 2.0 self-host path. Reloop Free is ${freePlanSummary}.`,
 		features: mailchimpFeatures,
 		faqs: [
 			{
@@ -436,7 +435,7 @@ export function buildCompareIndexMarkdown(): string {
 		`HTML: ${origin}/compare`,
 		`Canonical pricing: ${origin}/pricing.md`,
 		"",
-		"Reloop is open-source email infrastructure (Apache 2.0): transactional API, SMTP, campaigns, webhooks, and an agent inbox. Hosted Reloop Cloud plans are Free (3,000 emails/month, 200/day), Pro $10/month (50,000), Growth $20/month (100,000), Enterprise custom. Self-host has no Reloop license fee.",
+		`Reloop is open-source email infrastructure (Apache 2.0): transactional API, SMTP, campaigns, webhooks, and an agent inbox. Hosted Reloop Cloud plans are Free (${freeMonthlyEmails} emails/month, ${freeDailyEmails}/day), Pro $10/month (50,000), Growth $20/month (100,000), Enterprise custom. Self-host has no Reloop license fee.`,
 		"",
 		"## Comparisons",
 		"",
@@ -471,6 +470,10 @@ export function buildCompareJsonLd(page: ComparePageContent) {
 			},
 		},
 		pricingProductJsonLd(siteUrl),
+		breadcrumbJsonLd([
+			{ name: "Compare", path: "/compare" },
+			{ name: `Reloop vs ${page.competitor}`, path: `/compare/${page.slug}` },
+		]),
 	];
 	if (page.faqs.length > 0) {
 		graph.push(faqPageJsonLd(page.faqs));

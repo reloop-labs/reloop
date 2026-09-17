@@ -120,7 +120,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting bugs, reques
 
 ## License
 
-Reloop is open source under the [Business Source License](LICENSE).
+Reloop is licensed under the [Apache License 2.0 with additional Reloop Labs use restrictions](LICENSE). Read the LICENSE file for the exact terms before redistributing it or offering it as a hosted service.
 
 ---
 

@@ -6,6 +6,7 @@
 		"dev": "next dev --turbopack --port=3000",
 		"build": "bun run generate:agent-public && next build",
 		"start": "next start",
+		"test": "bun test",
 		"lint": "next lint",
 		"generate:agent-public": "bun run scripts/generate-agent-public.ts && bun run scripts/generate-docs-llms-full.ts",
 		"generate:llms-full": "bun run scripts/generate-agent-public.ts",
