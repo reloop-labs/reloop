@@ -136,9 +136,7 @@ export default function TempEmailCheckerPage() {
 					/>
 				</div>
 				<div aria-hidden className="h-16 sm:h-24" />
-				<div className="w-full border-stroke-soft-100 border-t dark:border-white/10">
-					<TempEmailCta />
-				</div>
+				<TempEmailCta />
 			</div>
 		</div>
 	);
