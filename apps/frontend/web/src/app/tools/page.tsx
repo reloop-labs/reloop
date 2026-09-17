@@ -2,6 +2,7 @@ import { Icon } from "@reloop/ui/icon";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { hostedSignupHref } from "@reloop/web/lib/site";
+import { Check } from "lucide-react";
 import { ToolsGrid } from "./components/tools-grid";
 import { ToolsHeroBlast } from "./components/tools-hero-blast";
 
@@ -26,7 +27,7 @@ export const metadata = createLandingMetadata(
 
 export default function ToolsIndexPage() {
 	return (
-		<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#10b981] [--primary-dark:#059669] [--primary-darker:#047857] [--primary-link:#059669] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#6ee7b7] dark:[--primary-dark:#6ee7b7] dark:[--primary-darker:#a7f3d0] dark:[--primary-link:#6ee7b7]">
+		<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#2563eb] [--primary-dark:#1d4ed8] [--primary-darker:#1e40af] [--primary-link:#1d4ed8] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#60a5fa] dark:[--primary-dark:#3b82f6] dark:[--primary-darker:#2563eb] dark:[--primary-link:#93c5fd]">
 			{/* Hero Section — matches pricing / why-open-source */}
 			<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-28 text-center sm:px-8 sm:pb-36 lg:px-12">
 				<div
@@ -39,14 +40,14 @@ export default function ToolsIndexPage() {
 					<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 						<span
 							aria-hidden
-							className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#065f46]"
+							className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#1e3a8a]"
 						>
-							<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-black dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+							<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-white dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
 								<Icon name="zap" className="size-[11px]" />
 							</span>
 						</span>
 						<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
-							Free Tools
+							Tools
 						</span>
 					</div>
 
@@ -61,10 +62,22 @@ export default function ToolsIndexPage() {
 						</span>
 					</h1>
 
-					<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
-						Zero signup required. Validate addresses, inspect DNS auth records,
-						score deliverability, and preview templates.
-					</p>
+					<div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:mt-7">
+						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[13px] text-text-sub-600 shadow-2xs dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70">
+							<Check
+								className="size-3.5 text-blue-600 dark:text-blue-400"
+								strokeWidth={2.5}
+							/>
+							No sign up required
+						</span>
+						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[13px] text-text-sub-600 shadow-2xs dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70">
+							<Check
+								className="size-3.5 text-blue-600 dark:text-blue-400"
+								strokeWidth={2.5}
+							/>
+							Free for lifetime
+						</span>
+					</div>
 				</div>
 			</header>
 
@@ -87,8 +100,8 @@ export default function ToolsIndexPage() {
 					primaryVariant="primary"
 					secondaryLabel="View pricing"
 					secondaryHref="/pricing"
-					accentColor="emerald"
-					blast={{ light: "#10B981", dark: "#6ee7b7" }}
+					accentColor="blue"
+					blast={{ light: "#2563eb", dark: "#93c5fd" }}
 					flush
 					align="center"
 					pill={false}
