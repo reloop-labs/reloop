@@ -1,5 +1,10 @@
 "use client";
 
+import {
+	Breadcrumb,
+	PageFrame,
+	PageHeading,
+} from "@fe/console/components/ui/page-frame";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { adminGet } from "@fe/console/lib/admin-api";
 import {
@@ -10,9 +15,9 @@ import {
 } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -183,15 +188,10 @@ function classifyError(msg: string) {
 	};
 }
 
-export function EmailDetailDrawer({
-	emailId,
-	open,
-	onOpenChange,
-}: {
-	emailId: string | null;
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-}) {
+export default function EmailDetailPage() {
+	const params = useParams<{ emailId: string }>();
+	const emailId = params.emailId;
+
 	const [activeTab, setActiveTab] = useState<
 		| "preview"
 		| "plain"
@@ -205,7 +205,7 @@ export function EmailDetailDrawer({
 	const [previewTheme, setPreviewTheme] = useState<"light" | "dark">("light");
 
 	const { data: email, isLoading } = useSWR<EmailDetailData>(
-		open && emailId ? `/emails/${emailId}` : null,
+		emailId ? `/emails/${emailId}` : null,
 		() => adminGet<EmailDetailData>(`/emails/${emailId}`),
 	);
 
@@ -321,50 +321,71 @@ export function EmailDetailDrawer({
 	}, [email]);
 
 	return (
-		<Drawer.Root open={open} onOpenChange={onOpenChange}>
-			<Drawer.Content className="w-full max-w-3xl border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#121212]">
-				<Drawer.Header className="flex items-center justify-between border-stroke-soft-100 border-b px-6 py-4 dark:border-stroke-soft-100/40">
-					<div className="flex min-w-0 items-center gap-3">
-						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-bg-weak-50 text-text-strong-950 dark:bg-white/[0.06]">
-							<Icon name="mail-single" className="h-5 w-5" />
-						</div>
-						<div className="min-w-0">
-							<Drawer.Title className="truncate font-semibold text-[15px] text-text-strong-950">
-								{isLoading
-									? "Loading email..."
-									: email?.subject || "(no subject)"}
-							</Drawer.Title>
-							<p className="truncate text-[12px] text-text-sub-600">
-								{email ? (
-									<>
-										{email.fromEmail} · {formatRelativeTime(email.createdAt)}
-									</>
-								) : (
-									"Email details and delivery breakdown"
-								)}
-							</p>
-						</div>
-					</div>
-					{email && (
-						<div className="flex items-center gap-2">
-							<StatusPill status={email.status} />
-						</div>
-					)}
-				</Drawer.Header>
+		<PageFrame className="max-w-3xl">
+			<Breadcrumb
+				items={[
+					{ label: "Emails", href: "/emails" },
+					{
+						label: isLoading
+							? "Loading…"
+							: email?.subject || "(no subject)",
+					},
+				]}
+			/>
 
-				<Drawer.Body className="space-y-6 overflow-y-auto p-6">
-					{isLoading ? (
-						<div className="space-y-4 py-8">
-							<div className="h-24 animate-pulse rounded-2xl bg-bg-weak-50 dark:bg-white/[0.04]" />
-							<div className="h-40 animate-pulse rounded-2xl bg-bg-weak-50 dark:bg-white/[0.04]" />
-							<div className="h-64 animate-pulse rounded-2xl bg-bg-weak-50 dark:bg-white/[0.04]" />
+			<PageHeading
+				title={
+					isLoading
+						? "Loading email…"
+						: email?.subject || "(no subject)"
+				}
+				description={
+					email
+						? `${email.fromEmail} · ${formatRelativeTime(email.createdAt)}`
+						: "Email details and delivery breakdown"
+				}
+				meta={email ? <StatusPill status={email.status} /> : undefined}
+				actions={
+					email ? (
+						<div className="flex flex-wrap items-center gap-2">
+							<Button.Root
+								variant="neutral"
+								mode="stroke"
+								size="small"
+								onClick={() => copyToClipboard(email.id, "Email ID")}
+							>
+								<Icon name="copy" className="h-3.5 w-3.5" />
+								Copy ID
+							</Button.Root>
+							<Button.Root asChild variant="primary" size="small">
+								<Link href={`/organizations/${email.organizationId}`}>
+									Open org hub
+								</Link>
+							</Button.Root>
 						</div>
-					) : !email ? (
-						<div className="py-12 text-center text-text-sub-600">
-							Email details could not be found or loaded.
-						</div>
-					) : (
-						<>
+					) : undefined
+				}
+			/>
+
+			<div className="space-y-6">
+				{isLoading ? (
+					<div className="space-y-4 py-4">
+						<div className="h-24 animate-pulse rounded-2xl bg-bg-weak-50 dark:bg-white/[0.04]" />
+						<div className="h-40 animate-pulse rounded-2xl bg-bg-weak-50 dark:bg-white/[0.04]" />
+						<div className="h-64 animate-pulse rounded-2xl bg-bg-weak-50 dark:bg-white/[0.04]" />
+					</div>
+				) : !email ? (
+					<div className="rounded-2xl border border-stroke-soft-100 px-6 py-16 text-center text-[13px] text-text-sub-600 dark:border-stroke-soft-100/40">
+						<p className="font-medium text-text-strong-950">Email not found</p>
+						<p className="mt-1">
+							This email log may have been deleted or the ID is invalid.
+						</p>
+						<Button.Root asChild variant="neutral" mode="stroke" size="small" className="mt-4">
+							<Link href="/emails">Back to emails</Link>
+						</Button.Root>
+					</div>
+				) : (
+					<>
 							{/* Error Callout (if failed / error) */}
 							{email.errorMessage && (
 								<div className="rounded-2xl border border-red-500/20 bg-red-500/[0.06] p-4 text-[13px] dark:bg-red-500/[0.08]">
@@ -482,7 +503,7 @@ export function EmailDetailDrawer({
 									{email.failedAt && (
 										<div className="flex items-start justify-between gap-2">
 											<span className="text-text-sub-600">Failed At</span>
-											<span className="text-right font-medium text-red-500 text-text-strong-950">
+											<span className="text-right font-medium text-red-500">
 												{formatDateTime(email.failedAt)}
 											</span>
 										</div>
@@ -892,36 +913,9 @@ export function EmailDetailDrawer({
 									)}
 								</div>
 							</div>
-						</>
-					)}
-				</Drawer.Body>
-
-				<Drawer.Footer className="flex items-center justify-between border-stroke-soft-100 border-t px-6 py-4 dark:border-stroke-soft-100/40">
-					<Drawer.Close asChild>
-						<Button.Root variant="neutral" mode="stroke" size="small">
-							Close
-						</Button.Root>
-					</Drawer.Close>
-					{email && (
-						<div className="flex items-center gap-2">
-							<Button.Root
-								variant="neutral"
-								mode="stroke"
-								size="small"
-								onClick={() => copyToClipboard(email.id, "Email ID")}
-							>
-								<Icon name="copy" className="h-3.5 w-3.5" />
-								Copy ID
-							</Button.Root>
-							<Button.Root asChild variant="primary" size="small">
-								<Link href={`/organizations/${email.organizationId}`}>
-									Open org hub
-								</Link>
-							</Button.Root>
-						</div>
-					)}
-				</Drawer.Footer>
-			</Drawer.Content>
-		</Drawer.Root>
+					</>
+				)}
+			</div>
+		</PageFrame>
 	);
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { EmailDetailDrawer } from "@fe/console/components/email-detail-drawer";
 import {
 	EmptyState,
 	PageFrame,
@@ -19,6 +18,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -207,6 +207,7 @@ function AttachmentCell({
 }
 
 export default function EmailsPage() {
+	const router = useRouter();
 	const [q, setQ] = useQueryState("q", parseAsString.withDefault(""));
 	const [status, setStatus] = useQueryState(
 		"status",
@@ -214,10 +215,6 @@ export default function EmailsPage() {
 	);
 	const [organizationId, setOrganizationId] = useQueryState(
 		"organizationId",
-		parseAsString.withDefault(""),
-	);
-	const [selectedEmailId, setSelectedEmailId] = useQueryState(
-		"emailId",
 		parseAsString.withDefault(""),
 	);
 	const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
@@ -361,7 +358,6 @@ export default function EmailsPage() {
 								typeof email.toEmails[0] === "string"
 									? email.toEmails[0]
 									: toLabel;
-							const isActive = selectedEmailId === email.id;
 
 							return (
 								<div
@@ -370,9 +366,8 @@ export default function EmailsPage() {
 									className={cn(
 										"group/row grid w-full cursor-pointer items-center px-4 py-2.5 text-left",
 										"hover:bg-bg-weak-50",
-										isActive && "bg-bg-weak-50/70",
 									)}
-									onClick={() => setSelectedEmailId(email.id)}
+									onClick={() => router.push(`/emails/${email.id}`)}
 								>
 									<div className="flex items-center">
 										<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
@@ -472,14 +467,6 @@ export default function EmailsPage() {
 					/>
 				</div>
 			</div>
-
-			<EmailDetailDrawer
-				emailId={selectedEmailId || null}
-				open={Boolean(selectedEmailId)}
-				onOpenChange={(open) =>
-					setSelectedEmailId(open ? selectedEmailId : null)
-				}
-			/>
 		</PageFrame>
 	);
 }

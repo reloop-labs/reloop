@@ -1,6 +1,5 @@
 "use client";
 
-import { EmailDetailDrawer } from "@fe/console/components/email-detail-drawer";
 import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
 import { AttachmentChips } from "@fe/console/components/ui/attachment-chips";
 import { EntityTabs } from "@fe/console/components/ui/entity-tabs";
@@ -26,7 +25,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -169,10 +168,10 @@ type TabId = (typeof TABS)[number]["id"];
 export default function OrganizationDetailPage() {
 	const params = useParams<{ orgId: string }>();
 	const orgId = params.orgId;
+	const router = useRouter();
 	const [tab, setTab] = useState<TabId>("overview");
 	const [suspendOpen, setSuspendOpen] = useState(false);
 	const [topupOpen, setTopupOpen] = useState(false);
-	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
 	const [topupAmount, setTopupAmount] = useState("1000");
 	const [topupReason, setTopupReason] = useState("");
 
@@ -589,13 +588,12 @@ export default function OrganizationDetailPage() {
 								>
 									<div className="min-w-0 flex-1">
 										<div className="flex items-center gap-2">
-											<button
-												type="button"
-												onClick={() => setSelectedEmailId(e.id)}
-												className="truncate text-left font-medium text-[13px] text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
+											<Link
+												href={`/emails/${e.id}`}
+												className="truncate font-medium text-[13px] text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
 											>
 												{e.subject || "(no subject)"}
-											</button>
+											</Link>
 											<StatusPill status={e.status} />
 										</div>
 										<p className="mt-0.5 truncate text-[12px] text-text-sub-600">
@@ -603,15 +601,16 @@ export default function OrganizationDetailPage() {
 										</p>
 									</div>
 									<Button.Root
-										type="button"
+										asChild
 										size="xsmall"
 										variant="neutral"
 										mode="stroke"
-										onClick={() => setSelectedEmailId(e.id)}
 										className="shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100"
 									>
-										<Icon name="eye" className="h-3 w-3" />
-										Details
+										<Link href={`/emails/${e.id}`}>
+											<Icon name="eye" className="h-3 w-3" />
+											Open
+										</Link>
 									</Button.Root>
 								</div>
 							))}
@@ -823,15 +822,15 @@ export default function OrganizationDetailPage() {
 							"Subject",
 							"Attachments",
 							"Status",
-							"",
 						]}
-						colSpan={7}
+						colSpan={6}
 						empty={data.recentEmails.length === 0}
 					>
 						{data.recentEmails.map((e) => (
 							<tr
 								key={e.id}
-								className="group border-stroke-soft-100 border-t transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.02]"
+								className="group cursor-pointer border-stroke-soft-100 border-t transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.02]"
+								onClick={() => router.push(`/emails/${e.id}`)}
 							>
 								<td className="whitespace-nowrap px-4 py-3 text-text-sub-600">
 									{formatRelativeTime(e.createdAt)}
@@ -841,35 +840,19 @@ export default function OrganizationDetailPage() {
 									{formatRecipients(e.toEmails)}
 								</td>
 								<td className="max-w-[220px] truncate px-4 py-3">
-									<button
-										type="button"
-										onClick={() => setSelectedEmailId(e.id)}
-										className="truncate text-left font-medium text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
+									<Link
+										href={`/emails/${e.id}`}
+										onClick={(ev) => ev.stopPropagation()}
+										className="truncate font-medium text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-primary-base"
 									>
 										{e.subject || "(no subject)"}
-									</button>
+									</Link>
 								</td>
 								<td className="px-4 py-3">
-									<AttachmentChips
-										attachments={e.attachments}
-										onAttachmentClick={() => setSelectedEmailId(e.id)}
-									/>
+									<AttachmentChips attachments={e.attachments} />
 								</td>
 								<td className="px-4 py-3">
 									<StatusPill status={e.status} />
-								</td>
-								<td className="px-4 py-3 text-right">
-									<Button.Root
-										type="button"
-										size="xsmall"
-										variant="neutral"
-										mode="stroke"
-										onClick={() => setSelectedEmailId(e.id)}
-										className="gap-1"
-									>
-										<Icon name="eye" className="h-3 w-3" />
-										Details
-									</Button.Root>
 								</td>
 							</tr>
 						))}
@@ -986,12 +969,6 @@ export default function OrganizationDetailPage() {
 					</DataTable>
 				</SectionCard>
 			) : null}
-
-			<EmailDetailDrawer
-				emailId={selectedEmailId}
-				open={Boolean(selectedEmailId)}
-				onOpenChange={(open) => !open && setSelectedEmailId(null)}
-			/>
 		</PageFrame>
 	);
 }
