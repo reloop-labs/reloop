@@ -1,8 +1,8 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { PixelBlastLazy } from "./pixel-blast";
 import type { FooterBrandAccent } from "./footer-brand";
+import { PixelBlastLazy } from "./pixel-blast";
 
 const accentPixelColorLight: Record<FooterBrandAccent, string> = {
 	default: "#3B82F6",

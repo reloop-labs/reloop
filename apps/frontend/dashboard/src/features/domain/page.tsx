@@ -10,6 +10,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 import { DomainCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { DomainErrorState } from "./components/domain-error-state";
 import { DomainListHeader } from "./components/domain-list-header";
@@ -22,6 +23,11 @@ import { useDomainsQuery } from "./hooks/use-domains-query";
 export function DomainPage() {
 	const router = useRouter();
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
+	const { data: billing } = useBillingUsage();
+	const atDomainCap =
+		(billing?.resources?.customDomains.limit ?? 1) > 0 &&
+		(billing?.resources?.customDomains.used ?? 0) >=
+			(billing?.resources?.customDomains.limit ?? 1);
 	const [statusFilters] = useQueryState(
 		"status",
 		parseAsArrayOf(parseAsString).withDefault([]),
@@ -35,10 +41,11 @@ export function DomainPage() {
 		() => [
 			{
 				id: "add-domain",
-				label: "Add Domain",
+				label: atDomainCap ? "Upgrade to add a domain" : "Add Domain",
 				icon: "plus",
 				shortcut: { label: "C", keys: ["c"] },
-				onSelect: () => router.push("/domain/add"),
+				onSelect: () =>
+					router.push(atDomainCap ? "/settings/billing" : "/domain/add"),
 			},
 			{
 				id: "open-api-reference",
@@ -68,7 +75,7 @@ export function DomainPage() {
 					window.dispatchEvent(new CustomEvent("domains:select-all")),
 			},
 		],
-		[router],
+		[router, atDomainCap],
 	);
 
 	useRegisterCommandActions("domains", "Domains", actions);

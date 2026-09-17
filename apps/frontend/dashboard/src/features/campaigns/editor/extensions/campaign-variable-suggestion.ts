@@ -14,6 +14,15 @@ export const CampaignVariableSuggestion = Extension.create({
 				allowSpaces: false,
 				startOfLine: false,
 				command: ({ editor, range, props }) => {
+					if (props.insert === "unsubscribeLink") {
+						editor
+							.chain()
+							.focus()
+							.deleteRange(range)
+							.insertUnsubscribeLink({ title: props.title })
+							.run();
+						return;
+					}
 					editor
 						.chain()
 						.focus()

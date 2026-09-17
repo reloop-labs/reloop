@@ -495,10 +495,8 @@ function NetworkOverlay({
 					const other = hops.find((item, j) => j !== i && item);
 					if (
 						other &&
-						Math.hypot(
-							hop.labelX - other.labelX,
-							hop.labelY - other.labelY,
-						) < 14
+						Math.hypot(hop.labelX - other.labelX, hop.labelY - other.labelY) <
+							14
 					) {
 						hop.labelX = 2 * hop.to.x - hop.labelX;
 						hop.labelY = 2 * hop.to.y - hop.labelY;

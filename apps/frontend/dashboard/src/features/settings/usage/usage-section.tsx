@@ -7,6 +7,7 @@ import {
 } from "@reloop/pricing";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import Link from "next/link";
 import { Circle } from "rc-progress";
 import { useState } from "react";
 import { resolvePlanId } from "#/features/settings/billing/plan-id";
@@ -104,12 +105,20 @@ function UsageRow({
 function SpecRow({
 	label,
 	value,
+	href,
 	isLast,
 }: {
 	label: string;
 	value: string;
+	href?: string;
 	isLast?: boolean;
 }) {
+	const valueEl = (
+		<span className="inline-flex h-5 shrink-0 items-center rounded-full bg-bg-weak-50 px-2.5 font-medium text-label-xs text-text-sub-600 transition-colors dark:bg-white/[0.06]">
+			{value}
+		</span>
+	);
+
 	return (
 		<div
 			className={cn(
@@ -125,9 +134,16 @@ function SpecRow({
 				<span className="truncate font-medium text-paragraph-sm text-text-sub-600">
 					{label}
 				</span>
-				<span className="inline-flex h-5 shrink-0 items-center rounded-full bg-bg-weak-50 px-2.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
-					{value}
-				</span>
+				{href ? (
+					<Link
+						href={href}
+						className="rounded-full hover:bg-bg-weak-50 dark:hover:bg-white/[0.08]"
+					>
+						{valueEl}
+					</Link>
+				) : (
+					valueEl
+				)}
 			</div>
 		</div>
 	);
@@ -431,6 +447,7 @@ export function UsageSection() {
 							? `${dedicatedIpCount} included`
 							: "Not included"
 					}
+					href="/settings/dedicated-ip"
 					isLast={false}
 				/>
 				<SpecRow

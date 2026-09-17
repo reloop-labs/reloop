@@ -10,6 +10,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import * as Textarea from "@reloop/ui/textarea";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import type React from "react";
@@ -24,8 +25,6 @@ import {
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { testCampaignRequest } from "../../campaigns-api";
 import { useCampaignEditorStore } from "../campaign-editor-store";
-
-import * as Textarea from "@reloop/ui/textarea";
 
 const actionKbdOnBlueClassName =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
@@ -120,6 +119,7 @@ export function CampaignTestEmailModal({
 	const { data: propertiesData } = useAllPropertiesQuery();
 	const properties = propertiesData?.properties ?? [];
 	const fromEmail = useCampaignEditorStore((s) => s.fromEmail);
+	const subject = useCampaignEditorStore((s) => s.subject);
 	const hasFrom = fromEmail.trim().length > 0;
 
 	const [email, setEmail] = useState("");
@@ -183,8 +183,31 @@ export function CampaignTestEmailModal({
 		e?.preventDefault();
 		if (status !== "idle") return;
 
-		if (!fromEmail.trim()) {
-			toast.error("Add a From address before sending a test email.");
+		const focusField = (id: string) => {
+			const el = document.getElementById(id);
+			if (!el) return;
+			el.scrollIntoView({ behavior: "smooth", block: "center" });
+			window.requestAnimationFrame(() => {
+				el.focus({ preventScroll: true });
+			});
+		};
+
+		// Priority 1: From address — empty or invalid → red underline + focus
+		const rawFrom = fromEmail.trim();
+		const fromMatch = rawFrom.match(/<([^>]+)>/);
+		const fromAddress = (fromMatch?.[1] ?? rawFrom).trim();
+		if (!fromAddress || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromAddress)) {
+			useCampaignEditorStore.getState().flashFromError();
+			onOpenChange(false);
+			window.setTimeout(() => focusField("campaign-send-details-from"), 50);
+			return;
+		}
+
+		// Priority 2: Subject — empty → red underline + focus
+		if (!subject.trim()) {
+			useCampaignEditorStore.getState().flashSubjectError();
+			onOpenChange(false);
+			window.setTimeout(() => focusField("campaign-send-details-subject"), 50);
 			return;
 		}
 
@@ -279,7 +302,7 @@ export function CampaignTestEmailModal({
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, status, email, variableValues, properties, fromEmail],
+		[open, status, email, variableValues, properties, fromEmail, subject],
 	);
 
 	useHotkeys(
@@ -291,7 +314,7 @@ export function CampaignTestEmailModal({
 			}
 		},
 		{ enableOnFormTags: ["INPUT", "TEXTAREA"], enabled: open },
-		[open, status, email, variableValues, properties, fromEmail],
+		[open, status, email, variableValues, properties, fromEmail, subject],
 	);
 
 	useHotkeys(
@@ -311,7 +334,11 @@ export function CampaignTestEmailModal({
 				className="min-h-[270px] overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 				showClose={false}
 			>
-				<form onSubmit={handleSendTest} noValidate className="flex min-h-[270px] flex-col justify-between">
+				<form
+					onSubmit={handleSendTest}
+					noValidate
+					className="flex min-h-[270px] flex-col justify-between"
+				>
 					<div className="relative m-0.5 flex-1 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
 						<AnimatePresence mode="popLayout">
 							{status === "success" ? (
@@ -381,8 +408,8 @@ export function CampaignTestEmailModal({
 									<div className="space-y-4 px-6 pb-6">
 										{!hasFrom ? (
 											<div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-												Add a From address to this campaign before
-												sending a test email.
+												Add a From address to this campaign before sending a
+												test email.
 											</div>
 										) : null}
 										<div className="space-y-1.5">
@@ -401,10 +428,12 @@ export function CampaignTestEmailModal({
 													id="test-recipient-email"
 													simple
 													hasError={emailField.hasError}
-													className="min-h-[76px] resize-none text-xs text-text-strong-950"
+													className="min-h-[76px] resize-none text-text-strong-950 text-xs"
 													placeholder="you@company.com, team@company.com"
 													value={email}
-													onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+													onChange={(
+														e: React.ChangeEvent<HTMLTextAreaElement>,
+													) => {
 														setEmail(e.target.value);
 														if (emailField.hasError) emailField.clear();
 													}}

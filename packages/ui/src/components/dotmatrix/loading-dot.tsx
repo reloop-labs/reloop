@@ -1,11 +1,11 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { type CSSProperties, useEffect, useState } from "react";
 import { DotmSquare1 } from "./dotm-square-1";
 import { DotmSquare3 } from "./dotm-square-3";
 import { DotmSquare11 } from "./dotm-square-11";
 import { DotmSquare12 } from "./dotm-square-12";
-import { cn } from "@reloop/ui/cn";
 
 const LOADERS = [DotmSquare1, DotmSquare3, DotmSquare11, DotmSquare12];
 
@@ -38,11 +38,16 @@ export function LoadingDot({
 			aria-label={label}
 			className={cn(
 				"inline-flex shrink-0 items-center justify-center text-current",
-				className
+				className,
 			)}
 			style={style}
 		>
-			<SelectedLoader size={size} dotSize={dotSize} speed={1.35} color={color} />
+			<SelectedLoader
+				size={size}
+				dotSize={dotSize}
+				speed={1.35}
+				color={color}
+			/>
 		</span>
 	);
 }

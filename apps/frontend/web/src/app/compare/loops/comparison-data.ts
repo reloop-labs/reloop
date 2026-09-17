@@ -29,7 +29,7 @@ export const loopsComparisonCategories: ComparisonCategory[] = [
 				icon: "send-2",
 				reloop: {
 					value: "3,000 emails / mo",
-					note: "200 / day cap",
+					note: "100 / day cap",
 				},
 				competitor: "1,000 contacts",
 			},

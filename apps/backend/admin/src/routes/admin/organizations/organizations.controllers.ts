@@ -279,6 +279,7 @@ export async function getOrganizationController(organizationId: string) {
 				toEmails: emailLog.toEmails,
 				subject: emailLog.subject,
 				status: emailLog.status,
+				attachments: emailLog.attachments,
 				createdAt: emailLog.createdAt,
 				sentAt: emailLog.sentAt,
 			})
@@ -447,6 +448,15 @@ export async function getOrganizationController(organizationId: string) {
 			status: e.status,
 			createdAt: e.createdAt,
 			sentAt: e.sentAt ?? null,
+			attachments: (e.attachments ?? []).map((att) => ({
+				id: att.id,
+				filename: att.filename,
+				contentType: att.contentType,
+				size: att.size,
+				storagePath: att.storagePath,
+				contentDisposition: att.contentDisposition ?? null,
+				contentId: att.contentId ?? null,
+			})),
 		})),
 		supportConversations: supportThreads.map((t) => ({
 			id: t.id,

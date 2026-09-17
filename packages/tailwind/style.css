@@ -1049,9 +1049,9 @@
 
 	--stroke-strong-950: var(--neutral-0);
 	--stroke-sub-300: var(--neutral-600);
-	--stroke-soft-200: #1F1F1F;
-	--stroke-soft-100: #1F1F1F;
-	--stroke-inbox: #1F1F1F;
+	--stroke-soft-200: #1f1f1f;
+	--stroke-soft-100: #1f1f1f;
+	--stroke-inbox: #1f1f1f;
 	--panel-light: #ffffff;
 	--panel-dark: #1a1a1a;
 	--offset-light: #f5f5f5;
@@ -1168,7 +1168,12 @@
 
 	* {
 		scrollbar-width: thin;
-		scrollbar-color: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent) transparent;
+		scrollbar-color: color-mix(
+				in srgb,
+				var(--foreground, currentColor) 20%,
+				transparent
+			)
+			transparent;
 	}
 
 	html {
@@ -1176,7 +1181,12 @@
 		scrollbar-gutter: stable;
 		overscroll-behavior-y: none;
 		scrollbar-width: thin;
-		scrollbar-color: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent) transparent;
+		scrollbar-color: color-mix(
+				in srgb,
+				var(--foreground, currentColor) 20%,
+				transparent
+			)
+			transparent;
 	}
 
 	body {
@@ -1194,24 +1204,42 @@
 	}
 
 	::-webkit-scrollbar-thumb {
-		background: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent);
+		background: color-mix(
+			in srgb,
+			var(--foreground, currentColor) 20%,
+			transparent
+		);
 		border-radius: 9999px;
 	}
 
 	::-webkit-scrollbar-thumb:hover {
-		background: color-mix(in srgb, var(--foreground, currentColor) 35%, transparent);
+		background: color-mix(
+			in srgb,
+			var(--foreground, currentColor) 35%,
+			transparent
+		);
 	}
 }
 
 @layer utilities {
 	.scrollbar-thin {
 		scrollbar-width: thin;
-		scrollbar-color: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent) transparent;
+		scrollbar-color: color-mix(
+				in srgb,
+				var(--foreground, currentColor) 20%,
+				transparent
+			)
+			transparent;
 	}
 
 	.scrollbar-custom {
 		scrollbar-width: thin;
-		scrollbar-color: color-mix(in srgb, var(--foreground, currentColor) 20%, transparent) transparent;
+		scrollbar-color: color-mix(
+				in srgb,
+				var(--foreground, currentColor) 20%,
+				transparent
+			)
+			transparent;
 	}
 
 	.scroll-native {

@@ -19,7 +19,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 	free: {
 		planId: "free",
 		monthlyEmails: 3_000,
-		dailyEmailLimit: 200,
+		dailyEmailLimit: 100,
 		overageEnabled: false,
 		maxAgentInboxes: 1,
 		maxWebhooks: 1,

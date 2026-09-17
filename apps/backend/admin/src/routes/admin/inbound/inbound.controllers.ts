@@ -1,6 +1,11 @@
 import { db } from "@reloop/db/client";
-import { inboundEmail, mailbox, organization } from "@reloop/db/schema";
-import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
+import {
+	inboundAttachment,
+	inboundEmail,
+	mailbox,
+	organization,
+} from "@reloop/db/schema";
+import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { createError } from "evlog";
 
 const INBOUND_STATUSES = [
@@ -81,8 +86,45 @@ export async function listInboundEmailsController({
 		.limit(limit)
 		.offset(offset);
 
+	const emailIds = items.map((i) => i.id);
+	const attachments =
+		emailIds.length > 0
+			? await db
+					.select({
+						id: inboundAttachment.id,
+						inboundEmailId: inboundAttachment.inboundEmailId,
+						filename: inboundAttachment.filename,
+						contentType: inboundAttachment.contentType,
+						size: inboundAttachment.size,
+						contentDisposition: inboundAttachment.contentDisposition,
+						contentId: inboundAttachment.contentId,
+					})
+					.from(inboundAttachment)
+					.where(inArray(inboundAttachment.inboundEmailId, emailIds))
+			: [];
+
+	const attachmentMap = new Map<string, typeof attachments>();
+	for (const att of attachments) {
+		const list = attachmentMap.get(att.inboundEmailId);
+		if (list) {
+			list.push(att);
+		} else {
+			attachmentMap.set(att.inboundEmailId, [att]);
+		}
+	}
+
 	return {
-		items,
+		items: items.map((item) => ({
+			...item,
+			attachments: (attachmentMap.get(item.id) ?? []).map((att) => ({
+				id: att.id,
+				filename: att.filename,
+				contentType: att.contentType,
+				size: att.size,
+				contentDisposition: att.contentDisposition,
+				contentId: att.contentId,
+			})),
+		})),
 		total: totalRow?.value ?? 0,
 	};
 }

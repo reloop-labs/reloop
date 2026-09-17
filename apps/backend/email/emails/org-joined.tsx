@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -88,7 +89,7 @@ export const OrgJoinedEmail = ({
 		<Html>
 			<Head />
 			<Preview>
-				You&apos;ve joined {orgName} on Reloop — welcome to the team.
+				You&apos;ve joined {orgName} on {appName} — welcome to the team.
 			</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
@@ -113,7 +114,7 @@ export const OrgJoinedEmail = ({
 
 						<Text className={cls.bodyText}>
 							You&apos;ve successfully joined <strong>{orgName}</strong> on
-							Reloop. <strong>{inviterName}</strong> added you as a{" "}
+							{appName}. <strong>{inviterName}</strong> added you as a{" "}
 							<strong>{role}</strong> — you now have access to the
 							organization&apos;s workspace.
 						</Text>
@@ -221,7 +222,8 @@ export const OrgJoinedEmail = ({
 
 						<Text className={cls.bodyText}>
 							If you weren&apos;t expecting to be added to this organization,
-							please reach out to your Reloop admin or contact our support team.
+							please reach out to your {appName} admin or contact our support
+							team.
 						</Text>
 
 						<Hr className={cls.footerHr} />

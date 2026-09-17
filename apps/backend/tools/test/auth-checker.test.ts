@@ -18,7 +18,8 @@ describe("Email Authentication Service (SPF, DKIM, DMARC)", () => {
 
 	describe("parseSpfRecord", () => {
 		it("parses mechanisms, qualifier, includes, and IP ranges", () => {
-			const spf = "v=spf1 ip4:192.0.2.1 include:_spf.google.com include:mailgun.org ~all";
+			const spf =
+				"v=spf1 ip4:192.0.2.1 include:_spf.google.com include:mailgun.org ~all";
 			const result = parseSpfRecord(spf);
 
 			expect(result.qualifier).toBe("~all");
@@ -29,11 +30,14 @@ describe("Email Authentication Service (SPF, DKIM, DMARC)", () => {
 		});
 
 		it("flags excessive DNS lookups over limit of 10", () => {
-			const spf = "v=spf1 include:a.com include:b.com include:c.com include:d.com include:e.com include:f.com include:g.com include:h.com include:i.com include:j.com include:k.com -all";
+			const spf =
+				"v=spf1 include:a.com include:b.com include:c.com include:d.com include:e.com include:f.com include:g.com include:h.com include:i.com include:j.com include:k.com -all";
 			const result = parseSpfRecord(spf);
 
 			expect(result.lookupCount).toBe(11);
-			expect(result.warnings.some((w) => w.includes("exceeding the RFC 7208 limit"))).toBe(true);
+			expect(
+				result.warnings.some((w) => w.includes("exceeding the RFC 7208 limit")),
+			).toBe(true);
 		});
 
 		it("flags dangerous +all qualifier", () => {
@@ -41,13 +45,16 @@ describe("Email Authentication Service (SPF, DKIM, DMARC)", () => {
 			const result = parseSpfRecord(spf);
 
 			expect(result.qualifier).toBe("+all");
-			expect(result.warnings.some((w) => w.includes("allows ANY IP"))).toBe(true);
+			expect(result.warnings.some((w) => w.includes("allows ANY IP"))).toBe(
+				true,
+			);
 		});
 	});
 
 	describe("parseDmarcRecord", () => {
 		it("parses policy, aggregate rua address, and percentage", () => {
-			const dmarc = "v=DMARC1; p=reject; sp=reject; pct=100; rua=mailto:dmarc-reports@stripe.com,mailto:reloop@dmarc.reloop.sh; aspf=s";
+			const dmarc =
+				"v=DMARC1; p=reject; sp=reject; pct=100; rua=mailto:dmarc-reports@stripe.com,mailto:reloop@dmarc.reloop.sh; aspf=s";
 			const result = parseDmarcRecord(dmarc);
 
 			expect(result.policy).toBe("reject");
@@ -70,7 +77,8 @@ describe("Email Authentication Service (SPF, DKIM, DMARC)", () => {
 	describe("parseDkimRecord", () => {
 		it("extracts public key and estimates RSA bit length", () => {
 			// 2048-bit base64 dummy key
-			const fake2048Key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Y".padEnd(392, "A");
+			const fake2048Key =
+				"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Y".padEnd(392, "A");
 			const dkim = `v=DKIM1; k=rsa; p=${fake2048Key}`;
 			const result = parseDkimRecord(dkim);
 
@@ -84,7 +92,9 @@ describe("Email Authentication Service (SPF, DKIM, DMARC)", () => {
 			const result = parseDkimRecord(dkim);
 
 			expect(result.publicKey).toBeNull();
-			expect(result.warnings.some((w) => w.includes("missing the public key"))).toBe(true);
+			expect(
+				result.warnings.some((w) => w.includes("missing the public key")),
+			).toBe(true);
 		});
 	});
 

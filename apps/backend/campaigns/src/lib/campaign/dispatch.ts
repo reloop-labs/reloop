@@ -1,14 +1,21 @@
+import {
+	CAMPAIGN_BATCH_SIZE,
+	nextBatchDelayMs,
+} from "@be/campaigns/lib/campaign/batch";
+import { maybeCompleteCampaign } from "@be/campaigns/lib/campaign/complete";
+import { sendCampaignRecipient } from "@be/campaigns/lib/campaign/send-recipient";
 import { snapshotAudience } from "@be/campaigns/lib/campaign/snapshot";
 import {
-	campaignBatchJobId,
-	campaignQueue,
-	enqueueCampaignStart,
+	campaignHasQueuedSend,
+	enqueueCampaignBatch,
 } from "@be/campaigns/queues/campaign.queue";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 
-export const CAMPAIGN_BATCH_SIZE = 50;
+export { CAMPAIGN_BATCH_SIZE } from "@be/campaigns/lib/campaign/batch";
+export { maybeCompleteCampaign } from "@be/campaigns/lib/campaign/complete";
+export { scheduleCampaignStart } from "@be/campaigns/queues/campaign.queue";
 
 export async function startCampaignSend(params: {
 	campaignId: string;
@@ -46,77 +53,114 @@ export async function startCampaignSend(params: {
 		throw error;
 	}
 
-	const pending = await db
+	if (await campaignHasQueuedSend(campaign.id)) return;
+
+	await enqueueCampaignBatch({
+		campaignId: campaign.id,
+		organizationId: campaign.organizationId,
+		batchIndex: 0,
+	});
+}
+
+export async function sendCampaignBatch(params: {
+	campaignId: string;
+	organizationId: string;
+	batchIndex: number;
+	recipientIds?: string[];
+}): Promise<void> {
+	const campaign = await db.query.campaign.findFirst({
+		where: eq(schema.campaign.id, params.campaignId),
+	});
+	if (!campaign || campaign.status === "cancelled" || campaign.deletedAt) {
+		return;
+	}
+
+	const isSequential = !params.recipientIds?.length;
+	if (isSequential) {
+		// A crashed worker can leave recipients stuck in `sending`. Sequential
+		// batches are the only active send for this campaign, so reclaim them.
+		await db
+			.update(schema.campaignRecipient)
+			.set({ status: "pending", updatedAt: new Date() })
+			.where(
+				and(
+					eq(schema.campaignRecipient.campaignId, params.campaignId),
+					eq(schema.campaignRecipient.status, "sending"),
+				),
+			);
+	}
+
+	const recipientIds = isSequential
+		? await loadNextRecipientIds(params.campaignId)
+		: (params.recipientIds ?? []);
+
+	if (recipientIds.length === 0) {
+		await maybeCompleteCampaign(params.campaignId);
+		return;
+	}
+
+	for (const recipientId of recipientIds) {
+		const result = await sendCampaignRecipient(recipientId);
+		if (result.outcome === "quota_exceeded") {
+			return;
+		}
+		if (result.outcome === "rate_limited") {
+			await enqueueCampaignBatch({
+				campaignId: params.campaignId,
+				organizationId: params.organizationId,
+				batchIndex: params.batchIndex + 1,
+				delayMs: nextBatchDelayMs({
+					rateLimited: true,
+					retryAfterSeconds: result.retryAfterSeconds,
+				}),
+			});
+			return;
+		}
+	}
+
+	const morePending = await hasPendingRecipients(params.campaignId);
+	if (morePending) {
+		await enqueueCampaignBatch({
+			campaignId: params.campaignId,
+			organizationId: params.organizationId,
+			batchIndex: params.batchIndex + 1,
+			delayMs: nextBatchDelayMs({}),
+		});
+		return;
+	}
+
+	await maybeCompleteCampaign(params.campaignId);
+}
+
+async function loadNextRecipientIds(campaignId: string): Promise<string[]> {
+	const rows = await db
 		.select({ id: schema.campaignRecipient.id })
 		.from(schema.campaignRecipient)
 		.where(
 			and(
-				eq(schema.campaignRecipient.campaignId, campaign.id),
+				eq(schema.campaignRecipient.campaignId, campaignId),
 				eq(schema.campaignRecipient.status, "pending"),
 			),
-		);
+		)
+		.orderBy(
+			asc(schema.campaignRecipient.createdAt),
+			asc(schema.campaignRecipient.id),
+		)
+		.limit(CAMPAIGN_BATCH_SIZE);
 
-	if (pending.length === 0) {
-		await maybeCompleteCampaign(campaign.id);
-		return;
-	}
-
-	for (let i = 0; i < pending.length; i += CAMPAIGN_BATCH_SIZE) {
-		const recipientIds = pending
-			.slice(i, i + CAMPAIGN_BATCH_SIZE)
-			.map((row) => row.id);
-		const firstId = recipientIds[0];
-		if (!firstId) continue;
-		await campaignQueue.add(
-			"send_batch",
-			{
-				type: "send_batch",
-				campaignId: campaign.id,
-				organizationId: campaign.organizationId,
-				recipientIds,
-			},
-			{ jobId: campaignBatchJobId(campaign.id, firstId) },
-		);
-	}
+	return rows.map((row) => row.id);
 }
 
-export async function maybeCompleteCampaign(campaignId: string): Promise<void> {
-	const remaining = await db
-		.select({ value: count() })
+async function hasPendingRecipients(campaignId: string): Promise<boolean> {
+	const rows = await db
+		.select({ id: schema.campaignRecipient.id })
 		.from(schema.campaignRecipient)
 		.where(
 			and(
 				eq(schema.campaignRecipient.campaignId, campaignId),
 				inArray(schema.campaignRecipient.status, ["pending", "sending"]),
 			),
-		);
-
-	if (Number(remaining[0]?.value ?? 0) > 0) return;
-
-	await db
-		.update(schema.campaign)
-		.set({
-			status: "sent",
-			sentAt: new Date(),
-			updatedAt: new Date(),
-		})
-		.where(
-			and(
-				eq(schema.campaign.id, campaignId),
-				eq(schema.campaign.status, "sending"),
-			),
-		);
-}
-
-export async function scheduleCampaignStart(params: {
-	campaignId: string;
-	organizationId: string;
-	scheduledAt: Date;
-}): Promise<void> {
-	const delayMs = Math.max(0, params.scheduledAt.getTime() - Date.now());
-	await enqueueCampaignStart({
-		campaignId: params.campaignId,
-		organizationId: params.organizationId,
-		delayMs,
-	});
+		)
+		.limit(1);
+	return rows.length > 0;
 }

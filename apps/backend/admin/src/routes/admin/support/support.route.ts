@@ -12,40 +12,12 @@ import {
 	markConversationReadController,
 	updateConversationStatusController,
 } from "./support.controllers";
+import {
+	broadcastConversationUpdate,
+	broadcastToConversation,
+	broadcastToLobby,
+} from "./support.rooms";
 import { supportWsRoute } from "./support.ws";
-
-async function broadcastConversationUpdate(input: {
-	conversationId: string;
-	conversationForAdmin: unknown;
-	conversationForUser: unknown;
-	message?: unknown;
-}) {
-	const { broadcastToConversation, broadcastToLobby } = await import(
-		"./support.rooms"
-	);
-	if (input.message) {
-		broadcastToConversation(input.conversationId, {
-			type: "message_created",
-			message: input.message,
-		});
-		broadcastToLobby({
-			type: "message_created",
-			message: input.message,
-		});
-	}
-	// Lobby (admins) get admin-perspective unread
-	broadcastToLobby({
-		type: "conversation_updated",
-		conversation: input.conversationForAdmin,
-	});
-	// Conversation room gets both perspectives via a dual payload;
-	// clients pick unreadCount based on their role from their own view.
-	broadcastToConversation(input.conversationId, {
-		type: "conversation_updated",
-		conversation: input.conversationForUser,
-		conversationAdmin: input.conversationForAdmin,
-	});
-}
 
 export const supportRoute = new Elysia({ prefix: "/support" })
 	.use(authMiddleware)
@@ -76,7 +48,6 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 			// Only notify admin lobby when a new thread is created — never wipe
 			// unread by broadcasting a user-perspective / zeroed payload.
 			if (result.created) {
-				const { broadcastToLobby } = await import("./support.rooms");
 				broadcastToLobby({
 					type: "conversation_updated",
 					conversation: result.conversationForAdmin,
@@ -264,9 +235,6 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 				conversationId: params.conversationId,
 				status: body.status,
 			});
-			const { broadcastToConversation, broadcastToLobby } = await import(
-				"./support.rooms"
-			);
 			const payload = {
 				type: "conversation_updated" as const,
 				conversation: result.conversation,

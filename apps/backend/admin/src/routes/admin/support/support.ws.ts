@@ -7,8 +7,7 @@ import {
 	createMessageController,
 } from "./support.controllers";
 import {
-	broadcastToConversation,
-	broadcastToLobby,
+	broadcastConversationUpdate,
 	joinConversationRoom,
 	joinLobby,
 	leaveConversationRoom,
@@ -195,22 +194,11 @@ export const supportWsRoute = new Elysia().use(authMiddleware).ws("/ws", {
 					isPlatformAdmin,
 				});
 
-				broadcastToConversation(parsed.conversationId, {
-					type: "message_created",
+				broadcastConversationUpdate({
+					conversationId: parsed.conversationId,
+					conversationForAdmin: result.conversationForAdmin,
+					conversationForUser: result.conversationForUser,
 					message: result.message,
-				});
-				broadcastToLobby({
-					type: "message_created",
-					message: result.message,
-				});
-				broadcastToLobby({
-					type: "conversation_updated",
-					conversation: result.conversationForAdmin,
-				});
-				broadcastToConversation(parsed.conversationId, {
-					type: "conversation_updated",
-					conversation: result.conversationForUser,
-					conversationAdmin: result.conversationForAdmin,
 				});
 			} catch (error) {
 				const errMessage =

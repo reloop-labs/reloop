@@ -63,4 +63,3 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 		contact: "https://reloop.sh/support",
 	},
 }));
-

@@ -1,6 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { appName } from "@reloop/email/brand";
 import { emailConfig } from "@reloop/email/email.config";
 import ApiKeyCreatedEmail from "@reloop/email/emails/api-key-created";
 import { render, toPlainText } from "@reloop/email/render";
@@ -54,7 +55,7 @@ export async function initApiKeySubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <security@${requireReloopSenderDomain()}>`,
+					from: `${appName} <security@${requireReloopSenderDomain()}>`,
 					to: apiKey.user.email,
 					subject: `A new API key "${apiKey.name}" was created`,
 					html,

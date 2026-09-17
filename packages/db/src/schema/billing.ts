@@ -168,6 +168,8 @@ export const organizationCredits = pgTable(
 		creditsUsed: integer("credits_used").notNull().default(0),
 		creditsRemaining: integer("credits_remaining").notNull().default(3000),
 		monthlyCredits: integer("monthly_credits").notNull().default(3000),
+		dailyEmailsUsed: integer("daily_emails_used").notNull().default(0),
+		dailyWindowStart: timestamp("daily_window_start").notNull().defaultNow(),
 		currentPeriodStart: timestamp("current_period_start")
 			.notNull()
 			.defaultNow(),

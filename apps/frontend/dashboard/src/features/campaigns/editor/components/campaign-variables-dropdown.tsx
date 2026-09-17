@@ -1,14 +1,26 @@
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
+import {
+	isSystemCampaignVariable,
+	mapContactPropertiesToVariables,
+	SYSTEM_CAMPAIGN_VARIABLES,
+} from "../lib/campaign-variables";
+import {
+	DEFAULT_UNSUBSCRIBE_LINK_TITLE,
+	UNSUBSCRIBE_URL_VARIABLE,
+} from "../lib/unsubscribe-link";
 
 interface CampaignVariablesDropdownProps {
 	query: string;
 	editor: any;
 	range: any;
 	clientRect?: (() => DOMRect | null) | DOMRect | null;
-	command: (props: { name: string }) => void;
+	command: (props: {
+		name: string;
+		insert?: "unsubscribeLink";
+		title?: string;
+	}) => void;
 }
 
 export const CampaignVariablesDropdown = forwardRef(
@@ -16,26 +28,25 @@ export const CampaignVariablesDropdown = forwardRef(
 		const { data: propertiesData } = useAllPropertiesQuery();
 
 		const rawProperties = propertiesData?.properties ?? [];
-		const rawVariables = rawProperties.map((p) =>
-			p.propertyName.startsWith("contact.")
-				? p.propertyName
-				: `contact.${p.propertyName}`,
-		);
-
-		// If no custom properties yet, provide standard contact variables
-		const variables =
-			rawVariables.length === 0
-				? ["contact.email", "contact.firstName", "contact.lastName"]
-				: rawVariables;
+		// Campaign variables are read-only and come only from contact properties.
+		// No creation or editing here — manage properties under Contacts.
+		// Standard fields (email/firstName/lastName) are always included first.
+		const variables = mapContactPropertiesToVariables(rawProperties);
 
 		const [selectedIndex, setSelectedIndex] = useState(0);
 
 		// Filter based on the query typed after '{{'
-		const filtered = variables.filter((v: string) =>
-			v.toLowerCase().includes(props.query.toLowerCase()),
+		const query = props.query.toLowerCase();
+		const filteredContacts = variables.filter((v: string) =>
+			v.toLowerCase().includes(query),
 		);
+		const filteredSystem = (
+			SYSTEM_CAMPAIGN_VARIABLES as readonly string[]
+		).filter((v) => v.toLowerCase().includes(query));
+		// Single flat list for keyboard nav; sections are visual only.
+		const filtered = [...filteredContacts, ...filteredSystem];
 
-		const totalItems = filtered.length + 1;
+		const totalItems = filtered.length;
 
 		// Keyboard navigation support
 		useImperativeHandle(ref, () => ({
@@ -66,18 +77,17 @@ export const CampaignVariablesDropdown = forwardRef(
 		}, [props.query]);
 
 		const selectItem = (index: number) => {
-			if (index < filtered.length) {
-				const name = filtered[index];
-				if (name !== undefined) {
-					props.command({ name });
-				}
-			} else {
-				// "+ Add variable..." option -> Open contacts properties page
-				const { editor, range } = props;
-				editor.chain().focus().deleteRange(range).run();
-
-				window.open("/dashboard/contacts/properties", "_blank");
+			const name = filtered[index];
+			if (name === undefined) return;
+			if (isSystemCampaignVariable(name)) {
+				props.command({
+					name,
+					insert: "unsubscribeLink",
+					title: DEFAULT_UNSUBSCRIBE_LINK_TITLE,
+				});
+				return;
 			}
+			props.command({ name });
 		};
 
 		const preventEditorBlur = (e: React.MouseEvent) => {
@@ -96,23 +106,23 @@ export const CampaignVariablesDropdown = forwardRef(
 		return (
 			<div className="z-50 min-w-[220px] select-none rounded-2xl bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50">
 				<div className="px-2.5 py-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
-					Variables
+					Contact properties
 				</div>
 
-				{filtered.length === 0 ? (
+				{filteredContacts.length === 0 ? (
 					<div className="px-2.5 py-1.5 text-paragraph-xs text-text-soft-400 italic">
-						No matching variables
+						No matching contact properties
 					</div>
 				) : (
-					filtered.map((item: string, index: number) => {
-						const isSelected = index === selectedIndex;
+					filteredContacts.map((item: string) => {
+						const index = filtered.indexOf(item);
 						return (
 							<button
 								key={item}
 								type="button"
 								onMouseDown={preventEditorBlur}
 								onClick={() => selectItem(index)}
-								className={itemClass(isSelected)}
+								className={itemClass(index === selectedIndex)}
 							>
 								<span className="truncate font-mono">{`{{{ ${item} }}}`}</span>
 							</button>
@@ -120,20 +130,34 @@ export const CampaignVariablesDropdown = forwardRef(
 					})
 				)}
 
-				<div className="my-1 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
-
-				<button
-					type="button"
-					onMouseDown={preventEditorBlur}
-					onClick={() => selectItem(filtered.length)}
-					className={cn(
-						itemClass(selectedIndex === filtered.length),
-						"font-semibold",
-					)}
-				>
-					<Icon name="plus" className="h-3 w-3 shrink-0" />
-					<span className="truncate">Add variable...</span>
-				</button>
+				{filteredSystem.length > 0 && (
+					<>
+						<div className="px-2.5 pt-2 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
+							System
+						</div>
+						{filteredSystem.map((item: string) => {
+							const index = filtered.indexOf(item);
+							return (
+								<button
+									key={item}
+									type="button"
+									onMouseDown={preventEditorBlur}
+									onClick={() => selectItem(index)}
+									className={itemClass(index === selectedIndex)}
+								>
+									<span className="flex min-w-0 flex-col">
+										<span className="truncate">
+											{DEFAULT_UNSUBSCRIBE_LINK_TITLE}
+										</span>
+										<span className="truncate font-mono text-[10px] text-text-soft-400">
+											{`{{{ ${UNSUBSCRIBE_URL_VARIABLE} }}}`}
+										</span>
+									</span>
+								</button>
+							);
+						})}
+					</>
+				)}
 			</div>
 		);
 	},

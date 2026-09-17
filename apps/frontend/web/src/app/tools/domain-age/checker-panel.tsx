@@ -158,7 +158,8 @@ https://reloop.sh/tools/domain-age`;
 					</Button.Root>
 				</form>
 				<p className="mt-2.5 font-mono text-[11px] text-text-sub-600 dark:text-white/40">
-					We query official ICANN RDAP registry endpoints and public email DNS. We do not send emails or scrape WHOIS.
+					We query official ICANN RDAP registry endpoints and public email DNS.
+					We do not send emails or scrape WHOIS.
 				</p>
 			</div>
 
@@ -184,12 +185,17 @@ https://reloop.sh/tools/domain-age`;
 					{/* Top Headline & Big Age Card */}
 					<div
 						className={cn(
-							"rounded-2xl border p-6 shadow-xs sm:p-7 transition-colors",
-							(result.verdict === "too_new" || result.verdict === "held" || result.verdict === "not_registered") &&
+							"rounded-2xl border p-6 shadow-xs transition-colors sm:p-7",
+							(result.verdict === "too_new" ||
+								result.verdict === "held" ||
+								result.verdict === "not_registered") &&
 								"border-rose-500/30 bg-rose-500/[0.04] dark:border-rose-500/40 dark:bg-rose-500/[0.07]",
-							(result.verdict === "cold" || result.verdict === "warming" || result.verdict === "unknown_age") &&
+							(result.verdict === "cold" ||
+								result.verdict === "warming" ||
+								result.verdict === "unknown_age") &&
 								"border-amber-500/30 bg-amber-500/[0.04] dark:border-amber-500/40 dark:bg-amber-500/[0.07]",
-							(result.verdict === "established" || result.verdict === "mature") &&
+							(result.verdict === "established" ||
+								result.verdict === "mature") &&
 								"border-emerald-500/30 bg-emerald-500/[0.04] dark:border-emerald-500/40 dark:bg-emerald-500/[0.07]",
 						)}
 					>
@@ -245,7 +251,7 @@ https://reloop.sh/tools/domain-age`;
 									</div>
 								)}
 
-								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 sm:text-[26px] tracking-tight dark:text-white">
+								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
 									{result.headline}
 								</h2>
 
@@ -253,15 +259,23 @@ https://reloop.sh/tools/domain-age`;
 								{result.age.ageDays !== null && (
 									<div className="mt-2 flex flex-wrap items-baseline gap-2">
 										<span className="font-semibold text-[19px] text-text-strong-950 sm:text-[22px] dark:text-white">
-											Registered {result.age.ageDays === 0 ? "today" : `${result.age.ageDays.toLocaleString()} days ago`}
+											Registered{" "}
+											{result.age.ageDays === 0
+												? "today"
+												: `${result.age.ageDays.toLocaleString()} days ago`}
 										</span>
 										{result.age.createdAt && (
 											<span className="text-[13.5px] text-text-sub-600 dark:text-white/50">
-												({new Date(result.age.createdAt).toLocaleDateString("en-US", {
-													month: "long",
-													day: "numeric",
-													year: "numeric",
-												})})
+												(
+												{new Date(result.age.createdAt).toLocaleDateString(
+													"en-US",
+													{
+														month: "long",
+														day: "numeric",
+														year: "numeric",
+													},
+												)}
+												)
 											</span>
 										)}
 									</div>
@@ -276,9 +290,9 @@ https://reloop.sh/tools/domain-age`;
 										<span className="font-medium text-text-strong-950 dark:text-white">
 											{result.registrableDomain}
 										</span>{" "}
-										(the registered domain). Subdomains like {result.domain} inherit
-										that age — sending mail from them does not create a new
-										registration date.
+										(the registered domain). Subdomains like {result.domain}{" "}
+										inherit that age — sending mail from them does not create a
+										new registration date.
 									</p>
 								)}
 							</div>
@@ -304,7 +318,7 @@ https://reloop.sh/tools/domain-age`;
 						{/* 📊 Visual Timeline Bar */}
 						{result.age.ageDays !== null && (
 							<div className="mt-6 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-								<div className="mb-2 flex items-center justify-between text-[11px] font-mono text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+								<div className="mb-2 flex items-center justify-between font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
 									<span>Domain Warmup Stages</span>
 									<span>Current Age: {result.age.ageDays}d</span>
 								</div>
@@ -320,23 +334,50 @@ https://reloop.sh/tools/domain-age`;
 
 									{/* Current Marker Pin */}
 									<div
-										className="absolute top-0 bottom-0 w-2.5 -ml-1 rounded-full bg-text-strong-950 shadow-md ring-2 ring-white dark:bg-white dark:ring-black"
-										style={{ left: `${getTimelineProgress(result.age.ageDays)}%` }}
+										className="-ml-1 absolute top-0 bottom-0 w-2.5 rounded-full bg-text-strong-950 shadow-md ring-2 ring-white dark:bg-white dark:ring-black"
+										style={{
+											left: `${getTimelineProgress(result.age.ageDays)}%`,
+										}}
 									/>
 								</div>
 
 								{/* Labels below segments */}
 								<div className="mt-2.5 grid grid-cols-4 text-center font-mono text-[10.5px] text-text-sub-600 dark:text-white/50">
-									<div className={result.verdict === "too_new" ? "font-semibold text-rose-500" : ""}>
+									<div
+										className={
+											result.verdict === "too_new"
+												? "font-semibold text-rose-500"
+												: ""
+										}
+									>
 										Too New (0–7d)
 									</div>
-									<div className={result.verdict === "cold" ? "font-semibold text-amber-500" : ""}>
+									<div
+										className={
+											result.verdict === "cold"
+												? "font-semibold text-amber-500"
+												: ""
+										}
+									>
 										Cold (8–30d)
 									</div>
-									<div className={result.verdict === "warming" ? "font-semibold text-blue-500" : ""}>
+									<div
+										className={
+											result.verdict === "warming"
+												? "font-semibold text-blue-500"
+												: ""
+										}
+									>
 										Warming (31–90d)
 									</div>
-									<div className={(result.verdict === "established" || result.verdict === "mature") ? "font-semibold text-emerald-500" : ""}>
+									<div
+										className={
+											result.verdict === "established" ||
+											result.verdict === "mature"
+												? "font-semibold text-emerald-500"
+												: ""
+										}
+									>
 										Established (90d+)
 									</div>
 								</div>
@@ -344,7 +385,7 @@ https://reloop.sh/tools/domain-age`;
 						)}
 
 						{/* Disclaimer */}
-						<div className="mt-4 border-t border-stroke-soft-200/60 pt-3 dark:border-white/10 font-mono text-[11.5px] text-text-sub-600 dark:text-white/45">
+						<div className="mt-4 border-stroke-soft-200/60 border-t pt-3 font-mono text-[11.5px] text-text-sub-600 dark:border-white/10 dark:text-white/45">
 							ℹ️ {result.disclaimer}
 						</div>
 					</div>
@@ -352,10 +393,13 @@ https://reloop.sh/tools/domain-age`;
 					{/* 🏛️ Two Side Cards: Email Authentication vs Registry & DNS */}
 					<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 						{/* Card 1: Email Authentication Status */}
-						<div className="lg:col-span-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs lg:col-span-6 dark:border-white/10 dark:bg-[#0b0b0b]">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
-									<Icon name="lock" className="size-4 text-text-strong-950 dark:text-white" />
+									<Icon
+										name="lock"
+										className="size-4 text-text-strong-950 dark:text-white"
+									/>
 									<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 										Email Authentication Readiness
 									</h3>
@@ -387,7 +431,8 @@ https://reloop.sh/tools/domain-age`;
 									</span>
 									{result.emailSetup.dmarc ? (
 										<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-emerald-600 dark:text-emerald-400">
-											<Icon name="shield-check" className="size-3.5" /> {result.emailSetup.dmarcPolicy || "Published"}
+											<Icon name="shield-check" className="size-3.5" />{" "}
+											{result.emailSetup.dmarcPolicy || "Published"}
 										</span>
 									) : (
 										<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-rose-500">
@@ -411,17 +456,22 @@ https://reloop.sh/tools/domain-age`;
 									)}
 								</div>
 
-								<p className="text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50 pt-1">
-									Age and authentication are separate signals. Valid authentication is required, but it does not erase the coldness of a brand-new domain.
+								<p className="pt-1 text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
+									Age and authentication are separate signals. Valid
+									authentication is required, but it does not erase the coldness
+									of a brand-new domain.
 								</p>
 							</div>
 						</div>
 
 						{/* Card 2: Registry & Nameservers */}
-						<div className="lg:col-span-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs lg:col-span-6 dark:border-white/10 dark:bg-[#0b0b0b]">
+							<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 								<div className="flex items-center gap-2">
-									<Icon name="server" className="size-4 text-text-strong-950 dark:text-white" />
+									<Icon
+										name="server"
+										className="size-4 text-text-strong-950 dark:text-white"
+									/>
 									<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 										Registry &amp; Nameserver Setup
 									</h3>
@@ -447,17 +497,17 @@ https://reloop.sh/tools/domain-age`;
 											DNS Provider &amp; Kind
 										</span>
 										{result.nameservers.kind === "production" && (
-											<span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[10.5px] text-emerald-600 dark:text-emerald-400 font-medium">
+											<span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-medium font-mono text-[10.5px] text-emerald-600 dark:text-emerald-400">
 												Production DNS
 											</span>
 										)}
 										{result.nameservers.kind === "registrar_default" && (
-											<span className="rounded-full bg-blue-500/10 px-2 py-0.5 font-mono text-[10.5px] text-blue-600 dark:text-blue-400 font-medium">
+											<span className="rounded-full bg-blue-500/10 px-2 py-0.5 font-medium font-mono text-[10.5px] text-blue-600 dark:text-blue-400">
 												Registrar Default
 											</span>
 										)}
 										{result.nameservers.kind === "parking" && (
-											<span className="rounded-full bg-amber-500/10 px-2 py-0.5 font-mono text-[10.5px] text-amber-600 dark:text-amber-400 font-medium">
+											<span className="rounded-full bg-amber-500/10 px-2 py-0.5 font-medium font-mono text-[10.5px] text-amber-600 dark:text-amber-400">
 												Parked Nameservers
 											</span>
 										)}
@@ -466,7 +516,7 @@ https://reloop.sh/tools/domain-age`;
 										{result.nameservers.provider || "Custom Nameservers"}
 									</p>
 									{result.nameservers.hosts.length > 0 && (
-										<div className="mt-1 font-mono text-[11px] text-text-sub-600 dark:text-white/45 truncate">
+										<div className="mt-1 truncate font-mono text-[11px] text-text-sub-600 dark:text-white/45">
 											{result.nameservers.hosts.slice(0, 2).join(", ")}
 										</div>
 									)}
@@ -479,7 +529,10 @@ https://reloop.sh/tools/domain-age`;
 					{result.warnings.length > 0 && (
 						<div className="rounded-2xl border border-amber-500/30 bg-amber-500/[0.04] p-4 dark:border-amber-500/40 dark:bg-amber-500/[0.07]">
 							<div className="flex items-start gap-3">
-								<Icon name="alert-triangle" className="size-4.5 text-amber-500 shrink-0 mt-0.5" />
+								<Icon
+									name="alert-triangle"
+									className="mt-0.5 size-4.5 shrink-0 text-amber-500"
+								/>
 								<div className="space-y-1">
 									<h4 className="font-semibold text-[13.5px] text-text-strong-950 dark:text-white">
 										Important Deliverability Notes
@@ -497,7 +550,7 @@ https://reloop.sh/tools/domain-age`;
 					{/* 🚀 Next Steps & Reloop Recommendation */}
 					<div className="flex flex-col justify-between gap-4 rounded-2xl border border-blue-500/20 bg-blue-500/[0.04] p-5 sm:flex-row sm:items-center dark:border-blue-500/30 dark:bg-blue-500/[0.08]">
 						<div className="space-y-1">
-							<span className="font-mono text-[10.5px] text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold">
+							<span className="font-mono font-semibold text-[10.5px] text-blue-600 uppercase tracking-wider dark:text-blue-400">
 								Sending Recommendation
 							</span>
 							<h3 className="font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
@@ -508,7 +561,7 @@ https://reloop.sh/tools/domain-age`;
 							</p>
 						</div>
 
-						<div className="flex flex-wrap items-center gap-2 shrink-0">
+						<div className="flex shrink-0 flex-wrap items-center gap-2">
 							<Button.Root asChild variant="primary" mode="filled" size="small">
 								<a href={result.nextStep.href}>
 									<span>Take Action</span>
@@ -516,14 +569,18 @@ https://reloop.sh/tools/domain-age`;
 								</a>
 							</Button.Root>
 
-							<Link href={`/tools/spoof-checker?domain=${encodeURIComponent(result.domain)}`}>
+							<Link
+								href={`/tools/spoof-checker?domain=${encodeURIComponent(result.domain)}`}
+							>
 								<Button.Root variant="neutral" mode="stroke" size="small">
 									<Button.Icon as={Icon} name="shield-check" />
 									<span>Spoof Checker</span>
 								</Button.Root>
 							</Link>
 
-							<Link href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}>
+							<Link
+								href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}
+							>
 								<Button.Root variant="neutral" mode="stroke" size="small">
 									<Button.Icon as={Icon} name="lock" />
 									<span>Auth Audit</span>
@@ -539,17 +596,35 @@ https://reloop.sh/tools/domain-age`;
 							onClick={() => setShowRawRdap((prev) => !prev)}
 							className="font-mono text-[12px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 						>
-							{showRawRdap ? "▲ Hide raw RDAP details" : "▼ View raw RDAP registration metadata"}
+							{showRawRdap
+								? "▲ Hide raw RDAP details"
+								: "▼ View raw RDAP registration metadata"}
 						</button>
 
 						{showRawRdap && (
-							<div className="mt-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 font-mono text-[11.5px] text-text-strong-950 space-y-1.5 dark:border-white/10 dark:bg-white/[0.02] dark:text-white">
-								<div><strong>Registrable Domain:</strong> {result.registrableDomain}</div>
-								<div><strong>Created At:</strong> {result.age.createdAt || "None"}</div>
-								<div><strong>Expires At:</strong> {result.age.expiresAt || "None"}</div>
-								<div><strong>Registrar:</strong> {result.registry.registrar || "None"}</div>
-								<div><strong>Registry Status:</strong> {result.registry.status.join(", ") || "None"}</div>
-								<div><strong>Nameservers:</strong> {result.nameservers.hosts.join(", ") || "None"}</div>
+							<div className="mt-3 space-y-1.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 font-mono text-[11.5px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white">
+								<div>
+									<strong>Registrable Domain:</strong>{" "}
+									{result.registrableDomain}
+								</div>
+								<div>
+									<strong>Created At:</strong> {result.age.createdAt || "None"}
+								</div>
+								<div>
+									<strong>Expires At:</strong> {result.age.expiresAt || "None"}
+								</div>
+								<div>
+									<strong>Registrar:</strong>{" "}
+									{result.registry.registrar || "None"}
+								</div>
+								<div>
+									<strong>Registry Status:</strong>{" "}
+									{result.registry.status.join(", ") || "None"}
+								</div>
+								<div>
+									<strong>Nameservers:</strong>{" "}
+									{result.nameservers.hosts.join(", ") || "None"}
+								</div>
 							</div>
 						)}
 					</div>

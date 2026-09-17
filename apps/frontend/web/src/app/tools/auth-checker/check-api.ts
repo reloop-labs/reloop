@@ -75,7 +75,11 @@ export interface DomainAuthReport {
 	responseTimeMs: number;
 	score: number;
 	grade: string;
-	verdict: "fully_aligned" | "partially_aligned" | "misconfigured" | "vulnerable";
+	verdict:
+		| "fully_aligned"
+		| "partially_aligned"
+		| "misconfigured"
+		| "vulnerable";
 	verdictLabel: string;
 	spf: AuthSpfResult;
 	dkim: AuthDkimResult;

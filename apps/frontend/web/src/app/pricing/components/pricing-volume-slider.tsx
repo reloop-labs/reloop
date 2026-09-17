@@ -4,8 +4,8 @@ import { cn } from "@reloop/ui/cn";
 import * as Slider from "@reloop/ui/slider";
 import {
 	getPlanById,
-	paidOverageUsdPerThousand,
 	type PlanId,
+	paidOverageUsdPerThousand,
 } from "@reloop/web/lib/pricing";
 
 const TICKS = [
@@ -87,8 +87,7 @@ export function recommendPlanIdForVolume(volume: number): PlanId {
 		Number(pro?.comparison.monthlyEmails.replace(/,/g, "")) || 50000;
 	const proTotal =
 		proBase +
-		(Math.max(0, volume - proIncluded) / 1000) *
-			paidOverageUsdPerThousand;
+		(Math.max(0, volume - proIncluded) / 1000) * paidOverageUsdPerThousand;
 	// Once overage pushes Pro within threshold of Growth's base,
 	// the next tier is the better deal — recommend it instead of
 	// inflating Pro up to (or past) Growth's price.

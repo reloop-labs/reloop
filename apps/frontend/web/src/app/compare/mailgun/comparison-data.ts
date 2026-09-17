@@ -13,7 +13,7 @@ export const mailgunComparisonCategories: ComparisonCategory[] = [
 				icon: "send-2",
 				reloop: {
 					value: "3,000 / mo",
-					note: "200 / day cap",
+					note: "100 / day cap",
 				},
 				competitor: {
 					value: "100 / day",

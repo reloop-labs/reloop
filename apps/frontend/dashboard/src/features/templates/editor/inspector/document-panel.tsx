@@ -32,8 +32,12 @@ export function DocumentPanel() {
 						<SectionHeader label="Container" />
 						<ColorRow
 							label="Color"
-							value={String(findStyleValue("container", "backgroundColor") ?? "")}
-							onChange={(v) => setGlobalStyle("container", "backgroundColor", v)}
+							value={String(
+								findStyleValue("container", "backgroundColor") ?? "",
+							)}
+							onChange={(v) =>
+								setGlobalStyle("container", "backgroundColor", v)
+							}
 						/>
 						<ScrubRow
 							label="Width"

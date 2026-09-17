@@ -1,10 +1,15 @@
 import { describe, expect, test } from "bun:test";
 import {
+	buildAbuseSlackPayload,
+	buildDomainAddedSlackPayload,
 	buildEmailFailureSlackPayload,
+	buildSigninSlackPayload,
 	buildSupportSlackPayload,
 	isSystemEmail,
 	resetEmailFailureThrottleForTesting,
+	sendSlackDomainAddedNotification,
 	sendSlackEmailFailureNotification,
+	sendSlackSigninNotification,
 	sendSlackSupportNotification,
 	shouldThrottleEmailFailure,
 } from "@reloop/admin/services/slack/slack.service";
@@ -146,6 +151,163 @@ describe("Slack Notification Service", () => {
 		});
 	});
 
+	describe("buildSigninSlackPayload", () => {
+		test("formats a returning sign-in with session details and users search link", () => {
+			const payload = buildSigninSlackPayload(
+				{
+					email: "jane@example.com",
+					fullName: "Jane Doe",
+					browser: "Chrome 128",
+					os: "macOS",
+					ip: "203.0.113.10",
+					location: "San Francisco, US",
+				},
+				"https://reloop.sh",
+			);
+
+			expect(payload.text).toContain("User signed in");
+			expect(payload.text).toContain("Jane Doe");
+			expect(payload.text).toContain("jane@example.com");
+
+			const header = payload.blocks[0] as {
+				type: string;
+				text: { text: string };
+			};
+			expect(header.text.text).toBe("🔑 User signed in");
+
+			const section = payload.blocks[1] as {
+				type: string;
+				fields: Array<{ type: string; text: string }>;
+			};
+			expect(section.fields[0]?.text).toContain("Jane Doe");
+			expect(section.fields[0]?.text).toContain("mailto:jane@example.com");
+			expect(
+				section.fields.some((field) => field.text.includes("Chrome 128")),
+			).toBe(true);
+			expect(
+				section.fields.some((field) => field.text.includes("203.0.113.10")),
+			).toBe(true);
+
+			const actions = payload.blocks[2] as {
+				type: string;
+				elements: Array<{ url: string }>;
+			};
+			expect(actions.elements[0]?.url).toBe(
+				"https://reloop.sh/console/users?q=jane%40example.com",
+			);
+		});
+
+		test("formats a new-user sign-in and links to the user hub", () => {
+			const payload = buildSigninSlackPayload(
+				{
+					email: "new@example.com",
+					fullName: "New User",
+					userId: "user_abc",
+					isNewUser: true,
+				},
+				"https://reloop.sh",
+			);
+
+			const header = payload.blocks[0] as {
+				type: string;
+				text: { text: string };
+			};
+			expect(header.text.text).toBe("👋 New user signed in");
+
+			const actions = payload.blocks[2] as {
+				type: string;
+				elements: Array<{ url: string }>;
+			};
+			expect(actions.elements[0]?.url).toBe(
+				"https://reloop.sh/console/users/user_abc",
+			);
+		});
+
+		test("escapes special characters in sign-in fields", () => {
+			const payload = buildSigninSlackPayload(
+				{
+					email: "jane@example.com",
+					fullName: "Jane <Hacker> & Co",
+					browser: "Chrome <script>",
+				},
+				"https://reloop.sh",
+			);
+
+			const section = payload.blocks[1] as {
+				type: string;
+				fields: Array<{ type: string; text: string }>;
+			};
+			expect(section.fields[0]?.text).toContain("Jane &lt;Hacker&gt; &amp; Co");
+			expect(
+				section.fields.some((field) => field.text.includes("&lt;script&gt;")),
+			).toBe(true);
+		});
+	});
+
+	describe("buildDomainAddedSlackPayload", () => {
+		test("formats a new domain with org, adder, and console buttons", () => {
+			const payload = buildDomainAddedSlackPayload(
+				{
+					domain: "acme.com",
+					domainId: "domain_123",
+					orgName: "Acme Corp",
+					orgId: "org_12345",
+					userName: "Jane Doe",
+					userEmail: "jane@acme.com",
+				},
+				"https://reloop.sh",
+			);
+
+			expect(payload.text).toContain("Domain added");
+			expect(payload.text).toContain("acme.com");
+			expect(payload.text).toContain("Acme Corp (org_12345)");
+
+			const header = payload.blocks[0] as {
+				type: string;
+				text: { text: string };
+			};
+			expect(header.text.text).toBe("🌐 Domain added");
+
+			const section = payload.blocks[1] as {
+				type: string;
+				fields: Array<{ type: string; text: string }>;
+			};
+			expect(section.fields[0]?.text).toContain("acme.com");
+			expect(section.fields[1]?.text).toContain("Acme Corp (org_12345)");
+			expect(section.fields[2]?.text).toContain("Jane Doe (jane@acme.com)");
+
+			const actions = payload.blocks[2] as {
+				type: string;
+				elements: Array<{ url: string }>;
+			};
+			expect(actions.elements[0]?.url).toBe(
+				"https://reloop.sh/console/domains?q=acme.com",
+			);
+			expect(actions.elements[1]?.url).toBe(
+				"https://reloop.sh/console/organizations/org_12345",
+			);
+		});
+
+		test("formats a restored domain with a distinct header", () => {
+			const payload = buildDomainAddedSlackPayload(
+				{
+					domain: "restored.com",
+					domainId: "domain_456",
+					orgId: "org_456",
+					restored: true,
+				},
+				"https://reloop.sh",
+			);
+
+			expect(payload.text).toContain("Domain restored");
+			const header = payload.blocks[0] as {
+				type: string;
+				text: { text: string };
+			};
+			expect(header.text.text).toBe("🌐 Domain restored");
+		});
+	});
+
 	describe("Throttling logic", () => {
 		test("never throttles system emails even in high volumes", () => {
 			resetEmailFailureThrottleForTesting();
@@ -200,6 +362,24 @@ describe("Slack Notification Service", () => {
 				{ webhookUrl: "" },
 			);
 			expect(emailResult).toBe(false);
+
+			const signinResult = await sendSlackSigninNotification(
+				{
+					email: "test@example.com",
+					fullName: "Test User",
+				},
+				{ webhookUrl: "" },
+			);
+			expect(signinResult).toBe(false);
+
+			const domainResult = await sendSlackDomainAddedNotification(
+				{
+					domain: "example.com",
+					domainId: "domain_test",
+				},
+				{ webhookUrl: "" },
+			);
+			expect(domainResult).toBe(false);
 		});
 	});
 
@@ -264,6 +444,102 @@ describe("Slack Notification Service", () => {
 			expect(calledUrl).toBe("https://hooks.slack.com/mock-webhook");
 			expect((calledPayload as { text: string }).text).toContain(
 				"P0 - SYSTEM EMAIL FAILURE",
+			);
+		});
+
+		test("sends sign-in payload to configured webhook via fetcher", async () => {
+			let calledUrl = "";
+			let calledPayload: unknown = null;
+
+			const mockFetcher = async (url: string, init?: RequestInit) => {
+				calledUrl = url;
+				if (typeof init?.body === "string") {
+					calledPayload = JSON.parse(init.body);
+				}
+				return new Response("ok", { status: 200 });
+			};
+
+			const result = await sendSlackSigninNotification(
+				{
+					email: "jane@example.com",
+					fullName: "Jane Doe",
+					ip: "203.0.113.10",
+				},
+				{
+					webhookUrl: "https://hooks.slack.com/mock-webhook",
+					fetcher: mockFetcher,
+				},
+			);
+
+			expect(result).toBe(true);
+			expect(calledUrl).toBe("https://hooks.slack.com/mock-webhook");
+			expect((calledPayload as { text: string }).text).toContain("Jane Doe");
+			expect((calledPayload as { text: string }).text).toContain(
+				"User signed in",
+			);
+		});
+
+		test("sends domain-added payload to configured webhook via fetcher", async () => {
+			let calledUrl = "";
+			let calledPayload: unknown = null;
+
+			const mockFetcher = async (url: string, init?: RequestInit) => {
+				calledUrl = url;
+				if (typeof init?.body === "string") {
+					calledPayload = JSON.parse(init.body);
+				}
+				return new Response("ok", { status: 200 });
+			};
+
+			const result = await sendSlackDomainAddedNotification(
+				{
+					domain: "acme.com",
+					domainId: "domain_test",
+					orgName: "Acme Corp",
+					orgId: "org_123",
+				},
+				{
+					webhookUrl: "https://hooks.slack.com/mock-webhook",
+					fetcher: mockFetcher,
+				},
+			);
+
+			expect(result).toBe(true);
+			expect(calledUrl).toBe("https://hooks.slack.com/mock-webhook");
+			expect((calledPayload as { text: string }).text).toContain("acme.com");
+			expect((calledPayload as { text: string }).text).toContain(
+				"Domain added",
+			);
+		});
+	});
+
+	describe("buildAbuseSlackPayload", () => {
+		test("links the console email and organization for a blocked scam", () => {
+			const payload = buildAbuseSlackPayload(
+				{
+					organizationId: "org_scam",
+					emailLogId: "eml_123",
+					fromEmail: "crypto.non-custodial-wallets@cve.patch-security.to",
+					subject: "CVE-2026-48291",
+					recipientCount: 1,
+					severity: "high",
+					reasons: ["sms_gateway"],
+					action: "blocked",
+					orgName: "Mriam Corporation",
+				},
+				"https://reloop.sh",
+			);
+
+			expect(payload.text).toContain("Blocked suspected scam send");
+			expect(payload.text).toContain("Mriam Corporation");
+			const actions = payload.blocks[2] as {
+				elements: Array<{ url: string }>;
+			};
+			expect(actions.elements[0]?.url).toBe(
+				"https://reloop.sh/console/emails?emailId=eml_123",
+			);
+			expect(actions.elements[1]?.url).toBe(
+				"https://reloop.sh/console/organizations/org_scam",
 			);
 		});
 	});

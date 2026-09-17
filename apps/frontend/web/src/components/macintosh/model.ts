@@ -344,7 +344,16 @@ function buildScreen(
 			roughness: 0.8,
 		}),
 	);
-	add(monitor, trayGeo, trayMat, slotX, slotY - 0.022, slotZ - 0.01, false, true);
+	add(
+		monitor,
+		trayGeo,
+		trayMat,
+		slotX,
+		slotY - 0.022,
+		slotZ - 0.01,
+		false,
+		true,
+	);
 
 	// Eject notch hole on the right of the slot
 	const ejectGeo = track(

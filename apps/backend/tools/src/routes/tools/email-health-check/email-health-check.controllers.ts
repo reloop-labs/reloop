@@ -1,8 +1,9 @@
 import crypto from "node:crypto";
 import type { ToolsModel } from "@be/tools/model/tools.model";
+import { checkImplicitMx } from "@be/tools/routes/tools/temp-email-checker/mx-lookup";
 import {
-	tempEmailCheckerController,
 	type TempEmailCheckerDeps,
+	tempEmailCheckerController,
 } from "@be/tools/routes/tools/temp-email-checker/temp-email-checker.controllers";
 import { toolsConfig } from "@be/tools/tools.config";
 import { redis } from "@be/tools/utils/loader";
@@ -14,8 +15,6 @@ import {
 	getBatchJobRecord,
 	processBatchJob,
 } from "./job-processor";
-
-import { checkImplicitMx } from "@be/tools/routes/tools/temp-email-checker/mx-lookup";
 
 export async function singleEmailHealthCheckController(
 	input: string,

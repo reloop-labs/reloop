@@ -188,7 +188,7 @@ export function LoginPage() {
 						size="medium"
 						disabled={ctaDisabled}
 						className={`h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm transition-colors duration-200 ${
-							ctaSuccess ? "cursor-default pointer-events-none" : ""
+							ctaSuccess ? "pointer-events-none cursor-default" : ""
 						}`}
 						onClick={() => {
 							if (!isOtpStep || ctaSuccess || ctaLoading) return;

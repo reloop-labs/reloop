@@ -28,25 +28,29 @@ function getGradeColor(grade: string) {
 		case "A+":
 		case "A":
 			return {
-				badge: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30",
+				badge:
+					"bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30",
 				gauge: "text-emerald-500 stroke-emerald-500",
 				bgGlow: "from-emerald-500/10 via-transparent to-transparent",
 			};
 		case "B":
 			return {
-				badge: "bg-blue-500/15 text-blue-600 border-blue-500/30 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/30",
+				badge:
+					"bg-blue-500/15 text-blue-600 border-blue-500/30 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/30",
 				gauge: "text-blue-500 stroke-blue-500",
 				bgGlow: "from-blue-500/10 via-transparent to-transparent",
 			};
 		case "C":
 			return {
-				badge: "bg-amber-500/15 text-amber-600 border-amber-500/30 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/30",
+				badge:
+					"bg-amber-500/15 text-amber-600 border-amber-500/30 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/30",
 				gauge: "text-amber-500 stroke-amber-500",
 				bgGlow: "from-amber-500/10 via-transparent to-transparent",
 			};
 		default:
 			return {
-				badge: "bg-rose-500/15 text-rose-600 border-rose-500/30 dark:bg-rose-500/20 dark:text-rose-400 dark:border-rose-500/30",
+				badge:
+					"bg-rose-500/15 text-rose-600 border-rose-500/30 dark:bg-rose-500/20 dark:text-rose-400 dark:border-rose-500/30",
 				gauge: "text-rose-500 stroke-rose-500",
 				bgGlow: "from-rose-500/10 via-transparent to-transparent",
 			};
@@ -57,28 +61,28 @@ function StatusBadge({ status }: { status: CheckStatus }) {
 	switch (status) {
 		case "pass":
 			return (
-				<span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[11px] font-medium text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+				<span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-medium font-mono text-[11px] text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
 					<span className="size-1.5 rounded-full bg-emerald-500" />
 					Pass
 				</span>
 			);
 		case "warn":
 			return (
-				<span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 font-mono text-[11px] font-medium text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
+				<span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 font-medium font-mono text-[11px] text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
 					<span className="size-1.5 rounded-full bg-amber-500" />
 					Warn
 				</span>
 			);
 		case "fail":
 			return (
-				<span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 font-mono text-[11px] font-medium text-rose-600 dark:bg-rose-500/15 dark:text-rose-400">
+				<span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-0.5 font-medium font-mono text-[11px] text-rose-600 dark:bg-rose-500/15 dark:text-rose-400">
 					<span className="size-1.5 rounded-full bg-rose-500" />
 					Fail
 				</span>
 			);
 		default:
 			return (
-				<span className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-0.5 font-mono text-[11px] font-medium text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
+				<span className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-0.5 font-medium font-mono text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
 					<span className="size-1.5 rounded-full bg-text-soft-400 dark:bg-white/40" />
 					Info
 				</span>
@@ -91,7 +95,9 @@ export function CheckerPanel() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [result, setResult] = useState<DomainReputationResponse | null>(null);
-	const [activeTab, setActiveTab] = useState<"all" | "issues" | "passed">("all");
+	const [activeTab, setActiveTab] = useState<"all" | "issues" | "passed">(
+		"all",
+	);
 	const [copied, setCopied] = useState(false);
 
 	const abortRef = useRef<AbortController | null>(null);
@@ -157,11 +163,14 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 
 	const checks = result?.checks || [];
 	const passCount = checks.filter((c) => c.status === "pass").length;
-	const issuesCount = checks.filter((c) => c.status === "warn" || c.status === "fail").length;
+	const issuesCount = checks.filter(
+		(c) => c.status === "warn" || c.status === "fail",
+	).length;
 
 	const filteredChecks = checks.filter((c) => {
 		if (activeTab === "passed") return c.status === "pass";
-		if (activeTab === "issues") return c.status === "warn" || c.status === "fail";
+		if (activeTab === "issues")
+			return c.status === "warn" || c.status === "fail";
 		return true;
 	});
 
@@ -227,7 +236,11 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 								</>
 							) : (
 								<>
-									<Button.Icon as={Icon} name="shield-check" className="size-3.5" />
+									<Button.Icon
+										as={Icon}
+										name="shield-check"
+										className="size-3.5"
+									/>
 									<span>Audit Reputation</span>
 								</>
 							)}
@@ -246,7 +259,9 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 				>
 					<Alert.Icon as={Icon} name="alert-triangle" />
 					<div>
-						<div className="font-medium text-label-sm">Reputation Check Failed</div>
+						<div className="font-medium text-label-sm">
+							Reputation Check Failed
+						</div>
 						<p className="mt-0.5 text-paragraph-sm">{error}</p>
 					</div>
 				</Alert.Root>
@@ -254,7 +269,7 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 
 			{/* Loading Skeleton */}
 			{isLoading && (
-				<div className="mt-8 space-y-6 animate-pulse">
+				<div className="mt-8 animate-pulse space-y-6">
 					<div className="h-44 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]" />
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 						<div className="h-32 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04]" />
@@ -276,11 +291,11 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 						)}
 					>
 						<div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-							<div className="flex flex-col items-center gap-6 sm:flex-row text-center sm:text-left">
+							<div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
 								{/* Score Gauge Circle */}
 								<div className="relative flex size-28 shrink-0 items-center justify-center rounded-full border-4 border-stroke-soft-200 bg-bg-white-0 shadow-inner sm:size-32 dark:border-white/10 dark:bg-black">
 									<div className="flex flex-col items-center">
-										<span className="font-bold text-3xl sm:text-4xl text-text-strong-950 tracking-tight dark:text-white">
+										<span className="font-bold text-3xl text-text-strong-950 tracking-tight sm:text-4xl dark:text-white">
 											{result.score}
 										</span>
 										<span className="font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
@@ -291,13 +306,13 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 
 								{/* Verdict Info */}
 								<div className="space-y-2">
-									<div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+									<div className="flex flex-wrap items-center justify-center gap-2.5 sm:justify-start">
 										<span className="font-semibold text-2xl text-text-strong-950 sm:text-3xl dark:text-white">
 											{result.domain}
 										</span>
 										<span
 											className={cn(
-												"inline-flex items-center rounded-lg border px-3 py-1 font-mono font-bold text-sm tracking-wide",
+												"inline-flex items-center rounded-lg border px-3 py-1 font-bold font-mono text-sm tracking-wide",
 												gradeColor?.badge,
 											)}
 										>
@@ -305,20 +320,23 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 										</span>
 									</div>
 
-									<p className="text-[15px] font-medium text-text-sub-600 dark:text-white/70">
+									<p className="font-medium text-[15px] text-text-sub-600 dark:text-white/70">
 										{result.verdictLabel}
 									</p>
 
-									<div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-1 font-mono text-[11.5px] text-text-soft-400 dark:text-white/40">
+									<div className="flex flex-wrap items-center justify-center gap-3 pt-1 font-mono text-[11.5px] text-text-soft-400 sm:justify-start dark:text-white/40">
 										<span>Latency: {result.responseTimeMs}ms</span>
 										<span>•</span>
-										<span>Audited: {new Date(result.resolvedAt).toLocaleTimeString()}</span>
+										<span>
+											Audited:{" "}
+											{new Date(result.resolvedAt).toLocaleTimeString()}
+										</span>
 									</div>
 								</div>
 							</div>
 
 							{/* Actions */}
-							<div className="flex items-center gap-2 shrink-0">
+							<div className="flex shrink-0 items-center gap-2">
 								<CompactButton.Root
 									variant="stroke"
 									onClick={handleCopySummary}
@@ -349,7 +367,7 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 									{result.breakdown.authentication.score}%
 								</span>
 							</div>
-							<p className="mt-2 text-[12.5px] text-text-sub-600 line-clamp-2 dark:text-white/50">
+							<p className="mt-2 line-clamp-2 text-[12.5px] text-text-sub-600 dark:text-white/50">
 								{result.breakdown.authentication.summary}
 							</p>
 						</div>
@@ -364,13 +382,14 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 							</div>
 							<div className="mt-3 flex items-baseline gap-2">
 								<span className="font-bold text-2xl text-text-strong-950 dark:text-white">
-									{result.details.blocklist.cleanCount}/{result.details.blocklist.totalChecked}
+									{result.details.blocklist.cleanCount}/
+									{result.details.blocklist.totalChecked}
 								</span>
 								<span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400">
 									Clean
 								</span>
 							</div>
-							<p className="mt-2 text-[12.5px] text-text-sub-600 line-clamp-2 dark:text-white/50">
+							<p className="mt-2 line-clamp-2 text-[12.5px] text-text-sub-600 dark:text-white/50">
 								{result.details.blocklist.listedCount === 0
 									? "Clean on all monitored domain DNSBLs."
 									: `Flagged on ${result.details.blocklist.listedCount} blocklists.`}
@@ -391,11 +410,11 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 										? `${result.details.domainAge.ageDays}d`
 										: "N/A"}
 								</span>
-								<span className="font-mono text-[11px] capitalize text-text-sub-600 dark:text-white/50">
+								<span className="font-mono text-[11px] text-text-sub-600 capitalize dark:text-white/50">
 									({result.details.domainAge.tier})
 								</span>
 							</div>
-							<p className="mt-2 text-[12.5px] text-text-sub-600 line-clamp-2 dark:text-white/50">
+							<p className="mt-2 line-clamp-2 text-[12.5px] text-text-sub-600 dark:text-white/50">
 								{result.details.domainAge.registrar
 									? `Registrar: ${result.details.domainAge.registrar}`
 									: result.details.domainAge.detail}
@@ -415,7 +434,7 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 									{result.breakdown.dnsHealth.score}%
 								</span>
 							</div>
-							<p className="mt-2 text-[12.5px] text-text-sub-600 line-clamp-2 dark:text-white/50">
+							<p className="mt-2 line-clamp-2 text-[12.5px] text-text-sub-600 dark:text-white/50">
 								{result.breakdown.dnsHealth.summary}
 							</p>
 						</div>
@@ -425,7 +444,10 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 					{result.recommendations.length > 0 && (
 						<div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.04] p-6 dark:border-amber-500/20 dark:bg-amber-500/[0.03]">
 							<div className="flex items-center gap-2.5">
-								<Icon name="alert-circle" className="size-5 text-amber-600 dark:text-amber-400" />
+								<Icon
+									name="alert-circle"
+									className="size-5 text-amber-600 dark:text-amber-400"
+								/>
 								<h3 className="font-semibold text-base text-text-strong-950 dark:text-white">
 									Prioritized Deliverability Recommendations
 								</h3>
@@ -434,7 +456,7 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 								{result.recommendations.map((rec) => (
 									<li
 										key={rec}
-										className="flex items-start gap-2.5 text-[13.5px] text-text-sub-600 dark:text-white/70 leading-relaxed"
+										className="flex items-start gap-2.5 text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/70"
 									>
 										<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-amber-500" />
 										<span>{rec}</span>
@@ -452,7 +474,8 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 									Individual Audit Checks
 								</h3>
 								<p className="text-[13px] text-text-sub-600 dark:text-white/50">
-									Detailed evaluation of sender authentication, DNS zones, and domain telemetry.
+									Detailed evaluation of sender authentication, DNS zones, and
+									domain telemetry.
 								</p>
 							</div>
 
@@ -500,20 +523,20 @@ Check here: https://reloop.sh/tools/domain-reputation-checker`;
 						{/* Checks List */}
 						<div className="mt-6 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t dark:divide-white/10 dark:border-white/10">
 							{filteredChecks.map((check) => (
-								<div key={check.id} className="py-4 space-y-2">
+								<div key={check.id} className="space-y-2 py-4">
 									<div className="flex items-center justify-between gap-4">
 										<div className="flex items-center gap-2.5">
 											<span className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 												{check.label}
 											</span>
-											<span className="font-mono text-[10.5px] uppercase text-text-soft-400 dark:text-white/40">
+											<span className="font-mono text-[10.5px] text-text-soft-400 uppercase dark:text-white/40">
 												[{check.category.replace("_", " ")}]
 											</span>
 										</div>
 										<StatusBadge status={check.status} />
 									</div>
 
-									<p className="text-[13px] text-text-sub-600 dark:text-white/60 leading-relaxed">
+									<p className="text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
 										{check.detail}
 									</p>
 

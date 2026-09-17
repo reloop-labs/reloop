@@ -190,6 +190,7 @@ export const RELOOP_ICON_NAMES = new Set<string>([
 	"social-mail",
 	"social-x",
 	"sparkling",
+	"split-route",
 	"stand",
 	"star",
 	"star-filled",

@@ -6,11 +6,11 @@ import {
 	applyPastedEmailTheme,
 	parseGlobalStylesFromHtml,
 } from "#/features/templates/editor/utils/apply-pasted-email-theme";
-import { sanitizeEmailHtml } from "#/features/templates/editor/utils/sanitize-email-html";
 import {
 	isFullEmailHtml,
 	pickPastedEmailHtml,
 } from "#/features/templates/editor/utils/pick-pasted-email-html";
+import { sanitizeEmailHtml } from "#/features/templates/editor/utils/sanitize-email-html";
 
 export { isFullEmailHtml, pickPastedEmailHtml };
 

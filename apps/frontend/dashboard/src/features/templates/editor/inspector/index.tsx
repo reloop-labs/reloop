@@ -5,14 +5,16 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { getMarkRange } from "@tiptap/core";
 import { useCurrentEditor, useEditorState } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-	useAllPropertiesQuery,
-	useInvalidateContacts,
-} from "#/features/contacts/hooks/use-contacts-query";
+	UNSUBSCRIBE_HREF_PLACEHOLDER,
+	unsubscribeLinkTitle,
+} from "#/features/campaigns/editor/lib/unsubscribe-link";
+import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import {
@@ -81,6 +83,83 @@ const TYPE_OPTIONS = [
 /* ------------------------------------------------------------------ */
 /* Shared section wrapper                                              */
 /* ------------------------------------------------------------------ */
+function UnsubscribeLinkInspector() {
+	const { editor } = useCurrentEditor();
+	const isActive = Boolean(editor?.isActive("unsubscribeLink"));
+	const markType = editor?.state.schema.marks.unsubscribeLink;
+	const range =
+		editor && markType
+			? getMarkRange(editor.state.selection.$from, markType)
+			: null;
+	const currentTitle = range
+		? editor?.state.doc.textBetween(range.from, range.to)
+		: unsubscribeLinkTitle();
+	const [title, setTitle] = useState(currentTitle ?? "");
+
+	useEffect(() => {
+		setTitle(currentTitle ?? "");
+	}, [currentTitle]);
+
+	if (!editor || !isActive) return null;
+
+	const commitTitle = () => {
+		if (!range) return;
+		const next = unsubscribeLinkTitle(title);
+		if (next === currentTitle) return;
+		editor
+			.chain()
+			.focus()
+			.insertContentAt(
+				{ from: range.from, to: range.to },
+				{
+					type: "text",
+					text: next,
+					marks: [
+						{
+							type: "unsubscribeLink",
+							attrs: { href: UNSUBSCRIBE_HREF_PLACEHOLDER },
+						},
+					],
+				},
+			)
+			.run();
+	};
+
+	return (
+		<InspectorSection>
+			<SectionHeader label="Unsubscribe link" />
+			<PropRow label="Title">
+				<Input.Root size="small" className="w-full">
+					<Input.Wrapper>
+						<Input.Input
+							value={title}
+							onChange={(event) => setTitle(event.target.value)}
+							onBlur={commitTitle}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") {
+									event.preventDefault();
+									commitTitle();
+									(event.target as HTMLElement).blur();
+								}
+							}}
+							placeholder="Unsubscribe"
+						/>
+					</Input.Wrapper>
+				</Input.Root>
+			</PropRow>
+			<PropRow label="Link">
+				<span className="truncate font-mono text-text-sub-600 text-xs">
+					{UNSUBSCRIBE_HREF_PLACEHOLDER}
+				</span>
+			</PropRow>
+			<p className="px-4 text-text-soft-400 text-xs leading-normal">
+				The title is the clickable text. Underline, bold, and color it like any
+				other link.
+			</p>
+		</InspectorSection>
+	);
+}
+
 function InspectorSection({ children }: { children: React.ReactNode }) {
 	return <div className="flex flex-col py-2">{children}</div>;
 }
@@ -103,47 +182,140 @@ function ColorRow({
 	);
 }
 
-function VariableInspectorCard({ name }: { name: string }) {
-	const templateId = useTemplateId();
-	const { editor } = useCurrentEditor();
-	const invalidateContacts = useInvalidateContacts();
+function stripCampaignContactPrefix(raw: string): string {
+	const trimmed = raw.trim();
+	if (/^contact\./i.test(trimmed)) return trimmed.slice("contact.".length);
+	return trimmed;
+}
 
-	// Fetch variable meta config from DB if in template mode
+/**
+ * Campaign-only read-only variable card.
+ *
+ * Campaign variables cannot be edited here and always resolve from contact
+ * properties at send time. Template variables keep their own editable engine
+ * below; this card intentionally has no type picker, default input,
+ * save, create, or delete actions.
+ */
+function CampaignVariableInspectorCard({ name }: { name: string }) {
+	const { data: propertiesData } = useAllPropertiesQuery(true);
+	const properties = propertiesData?.properties ?? [];
+
+	const target = stripCampaignContactPrefix(
+		normalizeTemplateVariableName(name),
+	).toLowerCase();
+	const matchedProp = properties.find(
+		(p) =>
+			stripCampaignContactPrefix(
+				normalizeTemplateVariableName(p.propertyName),
+			).toLowerCase() === target,
+	);
+
+	const isStandard = ["email", "firstname", "lastname"].includes(target);
+	const isSystem = ["unsubscribe_url"].includes(target);
+	const varType =
+		matchedProp?.propertyType?.toLowerCase() === "number" ? "number" : "string";
+	const fallback = matchedProp?.defaultValue ?? "";
+
+	if (isSystem) {
+		return (
+			<InspectorSection>
+				<div className="flex flex-col gap-3 px-4 py-2">
+					<div className="flex flex-col gap-1">
+						<span className="font-semibold text-text-sub-600 text-xs">
+							Unsubscribe link
+						</span>
+						<p className="text-text-sub-600 text-xs leading-normal">
+							Insert this as a styled link from the{" "}
+							<span className="font-mono">{"{{"}</span> menu so the title can be
+							underlined and colored.
+						</p>
+					</div>
+				</div>
+			</InspectorSection>
+		);
+	}
+
+	return (
+		<InspectorSection>
+			<div className="flex flex-col gap-3 px-4 py-2">
+				<div className="flex flex-col gap-1">
+					<span className="font-semibold text-text-sub-600 text-xs">
+						Campaign variable
+					</span>
+					<div className="select-all font-mono font-semibold text-text-strong-950">
+						{formatTemplateVariable(name, 3)}
+					</div>
+				</div>
+
+				<div className="flex flex-col gap-1">
+					<span className="font-semibold text-text-sub-600 text-xs">
+						Contact property
+					</span>
+					<span className="truncate font-mono text-text-strong-950 text-xs">
+						{matchedProp?.propertyName
+							? matchedProp.propertyName.startsWith("contact.")
+								? matchedProp.propertyName
+								: `contact.${matchedProp.propertyName}`
+							: isStandard
+								? `contact.${target}`
+								: "—"}
+					</span>
+					{!matchedProp && !isStandard ? (
+						<p className="text-text-sub-600 text-xs leading-normal">
+							Not a contact property — it will render empty at send time.
+						</p>
+					) : null}
+				</div>
+
+				<div className="flex items-center justify-between">
+					<span className="font-semibold text-text-sub-600 text-xs">Type</span>
+					<span className="font-medium text-text-strong-950 text-xs capitalize">
+						{varType}
+					</span>
+				</div>
+
+				<div className="flex flex-col gap-1">
+					<span className="font-semibold text-text-sub-600 text-xs">
+						Fallback value
+					</span>
+					<span className="truncate text-text-strong-950 text-xs">
+						{fallback !== null && fallback !== undefined && fallback !== ""
+							? String(fallback)
+							: "—"}
+					</span>
+				</div>
+
+				<p className="text-text-sub-600 text-xs leading-normal">
+					Read-only — values come from contact properties at send time.
+				</p>
+			</div>
+		</InspectorSection>
+	);
+}
+
+function TemplateVariableInspectorCard({
+	name,
+	templateId,
+}: {
+	name: string;
+	templateId: string;
+}) {
+	const { editor } = useCurrentEditor();
+
+	// Template mode only — own editable variable engine.
 	const { data: templateData, mutate } = useSWR(
-		templateId ? `/api/template/v1/${templateId}` : null,
+		`/api/template/v1/${templateId}`,
 		(url) => fetch(url, { credentials: "include" }).then((res) => res.json()),
 	);
 
-	// Fetch contact properties if in campaign / no-template mode
-	const { data: propertiesData } = useAllPropertiesQuery(!templateId);
-
 	const templateVariables = mapTemplateVariables(templateData?.variables);
-	const contactProperties = propertiesData?.properties ?? [];
-
 	const normalizedTarget = normalizeTemplateVariableName(name);
+	const matchedVar = templateVariables.find(
+		(v) => normalizeTemplateVariableName(v.name) === normalizedTarget,
+	);
 
-	const matchedVar = templateId
-		? templateVariables.find(
-				(v) => normalizeTemplateVariableName(v.name) === normalizedTarget,
-			)
-		: null;
-
-	const matchedProp = !templateId
-		? contactProperties.find(
-				(p) =>
-					normalizeTemplateVariableName(p.propertyName) === normalizedTarget,
-			)
-		: null;
-
-	const varType = templateId
-		? (matchedVar?.type ?? "string")
-		: matchedProp?.propertyType?.toLowerCase() === "number"
-			? "number"
-			: "string";
-
-	const defaultValue = templateId
-		? (matchedVar?.defaultValue ?? "")
-		: (matchedProp?.defaultValue ?? "");
+	const varType = matchedVar?.type ?? "string";
+	const defaultValue = matchedVar?.defaultValue ?? "";
 
 	const [localType, setLocalType] = useState(varType);
 	const [localDefaultValue, setLocalDefaultValue] = useState(defaultValue);
@@ -166,75 +338,34 @@ function VariableInspectorCard({ name }: { name: string }) {
 				? { from: editor.state.selection.from, to: editor.state.selection.to }
 				: null;
 
-			if (templateId) {
-				const updatedVar = {
-					name,
-					type: localType,
-					defaultValue: localDefaultValue,
-				};
-				const updatedVariables = templateVariables.map((v) =>
-					normalizeTemplateVariableName(v.name) === normalizedTarget
-						? updatedVar
-						: v,
-				);
+			const updatedVar = {
+				name,
+				type: localType,
+				defaultValue: localDefaultValue,
+			};
+			const updatedVariables = templateVariables.map((v) =>
+				normalizeTemplateVariableName(v.name) === normalizedTarget
+					? updatedVar
+					: v,
+			);
 
-				const response = await fetch(`/api/template/v1/${templateId}`, {
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					credentials: "include",
-					body: JSON.stringify({
-						variables: updatedVariables,
-					}),
-				});
+			const response = await fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify({
+					variables: updatedVariables,
+				}),
+			});
 
-				if (!response.ok) {
-					throw new Error("Failed to update variable properties");
-				}
-
-				toast.success("Saved variable properties");
-				await mutate();
-			} else {
-				// Campaign mode -> Update contact property
-				if (matchedProp) {
-					const response = await fetch(
-						`/api/contacts/v1/properties/${matchedProp.id}`,
-						{
-							method: "PATCH",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								fallbackValue: localDefaultValue || null,
-							}),
-						},
-					);
-
-					if (!response.ok) {
-						throw new Error("Failed to update property");
-					}
-
-					toast.success("Saved variable properties");
-					void invalidateContacts();
-				} else {
-					// Create new contact property if not already existing
-					const response = await fetch("/api/contacts/v1/properties/create", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							name,
-							type: localType,
-							fallbackValue: localDefaultValue || undefined,
-						}),
-					});
-
-					if (!response.ok) {
-						throw new Error("Failed to create property");
-					}
-
-					toast.success(`Created property ${name}`);
-					void invalidateContacts();
-				}
+			if (!response.ok) {
+				throw new Error("Failed to update variable properties");
 			}
+
+			toast.success("Saved variable properties");
+			await mutate();
 
 			// Restore selection and focus to keep the inspector open on this variable node
 			if (editor && selectionRange) {
@@ -264,45 +395,27 @@ function VariableInspectorCard({ name }: { name: string }) {
 	const handleDelete = async () => {
 		setIsDeleting(true);
 		try {
-			if (templateId) {
-				const updatedVariables = templateVariables.filter(
-					(v) => normalizeTemplateVariableName(v.name) !== normalizedTarget,
-				);
+			const updatedVariables = templateVariables.filter(
+				(v) => normalizeTemplateVariableName(v.name) !== normalizedTarget,
+			);
 
-				const response = await fetch(`/api/template/v1/${templateId}`, {
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					credentials: "include",
-					body: JSON.stringify({
-						variables: updatedVariables,
-					}),
-				});
+			const response = await fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify({
+					variables: updatedVariables,
+				}),
+			});
 
-				if (!response.ok) {
-					throw new Error("Failed to delete variable");
-				}
-
-				toast.success(`Deleted variable ${name}`);
-				mutate();
-			} else {
-				if (matchedProp) {
-					const response = await fetch(
-						`/api/contacts/v1/properties/${matchedProp.id}`,
-						{
-							method: "DELETE",
-						},
-					);
-
-					if (!response.ok) {
-						throw new Error("Failed to delete property");
-					}
-
-					toast.success(`Deleted variable ${name}`);
-					void invalidateContacts();
-				}
+			if (!response.ok) {
+				throw new Error("Failed to delete variable");
 			}
+
+			toast.success(`Deleted variable ${name}`);
+			mutate();
 
 			// Delete the active variable node in the editor
 			if (editor) {
@@ -478,6 +591,16 @@ function VariableInspectorCard({ name }: { name: string }) {
 			/>
 		</InspectorSection>
 	);
+}
+
+function VariableInspectorCard({ name }: { name: string }) {
+	const templateId = useTemplateId();
+	// Campaign (no templateId) is read-only and backed solely by contact
+	// properties. Template keeps its own editable variable engine.
+	if (!templateId) {
+		return <CampaignVariableInspectorCard name={name} />;
+	}
+	return <TemplateVariableInspectorCard name={name} templateId={templateId} />;
 }
 
 type InspectorStyleProperty = any;
@@ -1413,6 +1536,7 @@ export const EmailInspector = () => {
 
 			{/* ── All sections in one flat scroll container ── */}
 			<div className="flex flex-col divide-y divide-stroke-soft-100 pb-6">
+				<UnsubscribeLinkInspector />
 				{/* ── Text card (Handles both text selection and node selection) ── */}
 				<Inspector.Text>
 					{(textProps) => (
@@ -1468,15 +1592,19 @@ export const EmailInspector = () => {
 							(nodeProps.setStyle as any)("textAlign", align);
 						};
 
-						const isLinkActive = editor.isActive("link");
+						const linkMark = editor.isActive("unsubscribeLink")
+							? "unsubscribeLink"
+							: "link";
+						const isLinkActive =
+							editor.isActive("link") || editor.isActive("unsubscribeLink");
 						const linkColor =
-							(editor.getAttributes("link").color as string) || "";
+							(editor.getAttributes(linkMark).color as string) || "";
 						const setLinkColor = (color: string) =>
 							editor
 								.chain()
 								.focus()
-								.extendMarkRange("link")
-								.updateAttributes("link", { color })
+								.extendMarkRange(linkMark)
+								.updateAttributes(linkMark, { color })
 								.run();
 
 						return (

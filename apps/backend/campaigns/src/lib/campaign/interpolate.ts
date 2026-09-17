@@ -22,6 +22,7 @@ export function campaignMergeVars(contact: {
 	firstName?: string | null;
 	lastName?: string | null;
 	properties?: Record<string, any> | null;
+	unsubscribeUrl?: string | null;
 }): Record<string, string> {
 	const vars: Record<string, string> = {
 		email: contact.email,
@@ -33,6 +34,8 @@ export function campaignMergeVars(contact: {
 		EMAIL: contact.email,
 		FIRST_NAME: contact.firstName ?? "",
 		LAST_NAME: contact.lastName ?? "",
+		unsubscribe_url: contact.unsubscribeUrl ?? "",
+		UNSUBSCRIBE_URL: contact.unsubscribeUrl ?? "",
 	};
 
 	if (contact.properties && typeof contact.properties === "object") {

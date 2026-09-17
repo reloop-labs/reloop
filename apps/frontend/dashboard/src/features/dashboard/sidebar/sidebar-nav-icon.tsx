@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatedBillingIcon } from "./animated-billing-icon";
+
 import { AnimatedChannelsIcon } from "./animated-channels-icon";
 import { AnimatedContactsIcon } from "./animated-contacts-icon";
 import { AnimatedGearIcon } from "./animated-gear-icon";
@@ -69,6 +70,14 @@ export function SidebarNavIcon({
 			return <AnimatedMailActionIcon direction="send" className={tone} />;
 		case "mail-receive":
 			return <AnimatedMailActionIcon direction="receive" className={tone} />;
+		case "campaigns":
+		case "campaign":
+			return (
+				<Icon
+					name="mega-phone"
+					className={cn("h-4 w-4 shrink-0 transition-all duration-200", tone)}
+				/>
+			);
 		case "layout":
 			return <AnimatedLayoutIcon className={tone} />;
 		case "workflow":

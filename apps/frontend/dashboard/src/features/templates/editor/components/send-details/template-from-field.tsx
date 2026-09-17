@@ -309,12 +309,7 @@ export const TemplateFromField = () => {
 		// If query filtered out everything, fallback to showing all default suggestions
 		const finalSuggestions = result.length > 0 ? result : allDefaults;
 		return finalSuggestions.slice(0, 8);
-	}, [
-		verifiedSendingDomains,
-		parsedInput,
-		user?.name,
-		user?.email,
-	]);
+	}, [verifiedSendingDomains, parsedInput, user?.name, user?.email]);
 
 	// Auto-correct & update store as the user types
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

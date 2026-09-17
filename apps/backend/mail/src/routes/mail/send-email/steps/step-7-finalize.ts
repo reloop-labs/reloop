@@ -52,6 +52,7 @@ export async function finalizeEmail_step7({
 			organizationId,
 			emailLogId,
 			recipientCount: totalRecipients,
+			creditsReserved: true,
 			timestamp,
 		});
 	}

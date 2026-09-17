@@ -84,3 +84,30 @@ export function broadcastToLobby(payload: unknown) {
 export function sendToClient(client: SupportWsClient, payload: unknown) {
 	safeSend(client, payload);
 }
+
+export function broadcastConversationUpdate(input: {
+	conversationId: string;
+	conversationForAdmin: unknown;
+	conversationForUser: unknown;
+	message?: unknown;
+}) {
+	if (input.message) {
+		broadcastToConversation(input.conversationId, {
+			type: "message_created",
+			message: input.message,
+		});
+		broadcastToLobby({
+			type: "message_created",
+			message: input.message,
+		});
+	}
+	broadcastToLobby({
+		type: "conversation_updated",
+		conversation: input.conversationForAdmin,
+	});
+	broadcastToConversation(input.conversationId, {
+		type: "conversation_updated",
+		conversation: input.conversationForUser,
+		conversationAdmin: input.conversationForAdmin,
+	});
+}

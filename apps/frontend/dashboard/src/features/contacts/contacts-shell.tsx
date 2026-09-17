@@ -34,6 +34,9 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 	}, [deletedItemName]);
 
 	const isContactDetailPage = pathname.includes("/contacts/detail/");
+	const isGroupDetailPage = Boolean(
+		pathname.match(/\/contacts\/groups\/[^/]+$/),
+	);
 	const isCreatePage = pathname.includes("/contacts/create");
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isChannelsPage = pathname.includes("/contacts/channels");
@@ -142,7 +145,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 				? GroupsApiDetails
 				: ContactsApiDetails;
 
-	if (isContactDetailPage || isCreatePage) {
+	if (isContactDetailPage || isGroupDetailPage || isCreatePage) {
 		return (
 			<>
 				{children}

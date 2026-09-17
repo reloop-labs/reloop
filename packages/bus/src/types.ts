@@ -53,6 +53,20 @@ export interface EmailSentPayload {
 	organizationId: string;
 	emailLogId: string;
 	recipientCount: number;
+	/** True when the send path already reserved monthly/daily credits. */
+	creditsReserved?: boolean;
+	timestamp: string;
+}
+
+export interface AbuseSuspectedPayload {
+	organizationId: string;
+	emailLogId?: string | null;
+	fromEmail: string;
+	subject: string;
+	recipientCount: number;
+	severity: "medium" | "high";
+	reasons: string[];
+	action: "blocked" | "allowed";
 	timestamp: string;
 }
 
@@ -397,6 +411,7 @@ export interface EventPayloads {
 	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
 	[BusEvent.WEBHOOK_TRIGGERED]: WebhookTriggeredPayload;
 	[BusEvent.EMAIL_SENT]: EmailSentPayload;
+	[BusEvent.ABUSE_SUSPECTED]: AbuseSuspectedPayload;
 	[BusEvent.EMAIL_SCHEDULED]: EmailScheduledPayload;
 	[BusEvent.EMAIL_OPENED]: EmailOpenedPayload;
 	[BusEvent.EMAIL_CLICKED]: EmailClickedPayload;

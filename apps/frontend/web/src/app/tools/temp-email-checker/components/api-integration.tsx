@@ -11,7 +11,12 @@ import {
 import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
 import { useState } from "react";
 import type { SimpleIcon } from "simple-icons";
-import { apiEndpoint, apiNotes, apiResponseSample, apiSnippets } from "../content";
+import {
+	apiEndpoint,
+	apiNotes,
+	apiResponseSample,
+	apiSnippets,
+} from "../content";
 
 const SNIPPET_LANG: Record<string, string> = {
 	curl: "bash",
@@ -39,11 +44,7 @@ export function ApiIntegration() {
 	};
 
 	return (
-		<section
-			id="api"
-			aria-labelledby="api-heading"
-			className="w-full"
-		>
+		<section id="api" aria-labelledby="api-heading" className="w-full">
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<p className="mb-3 font-medium text-[12px] uppercase">
 					<span className="text-primary-base">03.</span>{" "}
@@ -59,8 +60,8 @@ export function ApiIntegration() {
 					not in a spreadsheet
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					One public POST — no key, no account. Copy a snippet, paste it
-					into your signup flow, and share the result link with your team.
+					One public POST — no key, no account. Copy a snippet, paste it into
+					your signup flow, and share the result link with your team.
 				</p>
 			</div>
 
@@ -94,9 +95,9 @@ export function ApiIntegration() {
 					>
 						{apiSnippets.map((snippet) => {
 							const snippetLang = SNIPPET_LANG[snippet.id] ?? "bash";
-							const si = getLanguageIcon(
-								snippetLang,
-							) as unknown as SimpleIcon | undefined;
+							const si = getLanguageIcon(snippetLang) as unknown as
+								| SimpleIcon
+								| undefined;
 							const brandColor = si ? `#${si.hex}` : undefined;
 							const isActive = snippet.id === activeId;
 							const isDark = si ? isDarkBrandColor(si.hex) : true;
@@ -126,8 +127,7 @@ export function ApiIntegration() {
 											<span
 												className={cn(
 													"inline-flex items-center",
-													isDark &&
-														"text-text-strong-950 dark:text-white",
+													isDark && "text-text-strong-950 dark:text-white",
 												)}
 												style={getBrandColorStyle(si.hex)}
 											>
@@ -139,7 +139,7 @@ export function ApiIntegration() {
 									{isActive && brandColor ? (
 										<span
 											aria-hidden
-											className="absolute inset-x-3 -bottom-px h-[2px] rounded-full"
+											className="-bottom-px absolute inset-x-3 h-[2px] rounded-full"
 											style={{ backgroundColor: brandColor }}
 										/>
 									) : null}
@@ -166,7 +166,6 @@ export function ApiIntegration() {
 							</li>
 						))}
 					</ul>
-
 				</div>
 
 				{/* Right: request + response */}

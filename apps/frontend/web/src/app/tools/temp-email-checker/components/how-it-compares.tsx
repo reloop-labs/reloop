@@ -62,7 +62,7 @@ function CrossIcon() {
 				strokeWidth="1.25"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="dark:stroke-white dark:stroke-opacity-30"
+				className="dark:stroke-opacity-30 dark:stroke-white"
 			/>
 		</svg>
 	);
@@ -106,6 +106,16 @@ const QUOTES: {
 		tweetUrl: "https://x.com/puppygirllulu/status/2097816263623836047",
 		quote:
 			"Lately i been working at @reloop_labs as a fullstack engineer and the experience has been great its been so great ive moved most my projects off resend started working on a CLI tool as well for the project and introduced selfhost for people who prefer selfhostinf #devops…",
+	},
+	{
+		name: "mulu mex",
+		handle: "@mulumexx",
+		initials: "MM",
+		avatar:
+			"https://pbs.twimg.com/profile_images/2093200456138862592/1uFOXfFv_normal.jpg",
+		tweetUrl: "https://x.com/mulumexx/status/2098345235268948476",
+		quote:
+			"If your still using resend what are you doing. @reloop_labs is infinitely better.",
 	},
 ];
 
@@ -153,8 +163,7 @@ export function HowItCompares() {
 					id="how-it-compares-heading"
 					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
 				>
-					How <span className="text-primary-base">Reloop</span>{" "}
-					compares:
+					How <span className="text-primary-base">Reloop</span> compares:
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
 					Syntax checks miss throwaway domains. Mailbox probing burns your
@@ -224,7 +233,7 @@ export function HowItCompares() {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 border-stroke-soft-100 border-b lg:grid-cols-3 lg:divide-x lg:divide-y-0 dark:divide-white/10 dark:border-white/10">
+			<div className="grid grid-cols-1 gap-px border-stroke-soft-100 border-b bg-stroke-soft-100 sm:grid-cols-2 dark:border-white/10 dark:bg-white/10">
 				{QUOTES.map((quote) => {
 					const body = (
 						<>
@@ -267,14 +276,14 @@ export function HowItCompares() {
 							href={quote.tweetUrl}
 							target="_blank"
 							rel="noreferrer"
-							className="flex flex-col px-4 py-6 transition-colors hover:bg-bg-weak-50/60 sm:px-8 sm:py-8 lg:px-12 lg:py-10 dark:hover:bg-white/[0.03]"
+							className="flex flex-col bg-bg-white-0 px-4 py-6 transition-colors hover:bg-bg-weak-50/60 sm:px-8 sm:py-8 lg:px-12 lg:py-10 dark:bg-black dark:hover:bg-white/[0.03]"
 						>
 							{body}
 						</a>
 					) : (
 						<figure
 							key={quote.handle}
-							className="flex flex-col px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10"
+							className="flex flex-col bg-bg-white-0 px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10 dark:bg-black"
 						>
 							{body}
 						</figure>

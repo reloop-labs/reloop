@@ -119,7 +119,7 @@ export const FlowNodeCard = ({
 							<span
 								key={`${handle.id}-label`}
 								className={cn(
-									"pointer-events-none absolute bottom-1 -translate-x-1/2 font-mono text-[10px] text-text-sub-600",
+									"-translate-x-1/2 pointer-events-none absolute bottom-1 font-mono text-[10px] text-text-sub-600",
 									handle.labelClassName,
 								)}
 								style={{ left: handle.left }}

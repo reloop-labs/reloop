@@ -1,4 +1,4 @@
-import { redis } from "@reloop/admin/utils/loader";
+import { redis } from "@reloop/admin/utils/redis";
 import { bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";

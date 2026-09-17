@@ -39,7 +39,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Requires third-party tools for inbound AI logic",
 		],
 		freeTier: {
-			reloop: "3,000 / mo · 200 / day",
+			reloop: "3,000 / mo · 100 / day",
 			competitor: "3,000 emails / mo · 100 / day",
 		},
 		openSource: {
@@ -67,7 +67,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Expensive dedicated IP add-ons",
 		],
 		freeTier: {
-			reloop: "3,000 / mo · 200 / day",
+			reloop: "3,000 / mo · 100 / day",
 			competitor: "100 emails / day",
 		},
 		openSource: {
@@ -94,7 +94,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Separate tools needed for marketing campaigns",
 			"No open source option",
 		],
-		freeTier: { reloop: "3,000 / mo · 200 / day", competitor: "Trial only" },
+		freeTier: { reloop: "3,000 / mo · 100 / day", competitor: "Trial only" },
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
 		inboundAi: { reloop: "Built-in Agent Inbox", competitor: "Basic Routes" },
 	},
@@ -117,7 +117,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"No out-of-the-box marketing campaign tools",
 		],
 		freeTier: {
-			reloop: "3,000 / mo · 200 / day",
+			reloop: "3,000 / mo · 100 / day",
 			competitor: "62k/mo (EC2 only)",
 		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
@@ -145,7 +145,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"No native AI capabilities",
 		],
 		freeTier: {
-			reloop: "3,000 / mo · 200 / day",
+			reloop: "3,000 / mo · 100 / day",
 			competitor: "100 emails / mo",
 		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
@@ -170,7 +170,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Gets expensive quickly for high contact volume",
 		],
 		freeTier: {
-			reloop: "3,000 / mo · 200 / day",
+			reloop: "3,000 / mo · 100 / day",
 			competitor: "1,000 contacts",
 		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },
@@ -195,7 +195,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 			"Expensive monthly contact tier locks",
 		],
 		freeTier: {
-			reloop: "3,000 / mo · 200 / day",
+			reloop: "3,000 / mo · 100 / day",
 			competitor: "500 contacts limit",
 		},
 		openSource: { reloop: "Yes (KumoMTA Engine)", competitor: "No" },

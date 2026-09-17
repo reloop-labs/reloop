@@ -5,29 +5,14 @@ import {
 	createBootController,
 	type UiState,
 } from "./boot";
-import { createChrome, type Chrome } from "./chrome";
+import { type Chrome, createChrome } from "./chrome";
 import { createRectManager, type RectManager } from "./rects";
-import {
-	createDesktopScreen,
-	type DesktopScreen,
-} from "./screens/desktop";
-import {
-	createMacPaintScreen,
-	type MacPaintScreen,
-} from "./screens/macpaint";
-import {
-	createMacWriteScreen,
-	type MacWriteScreen,
-} from "./screens/macwrite";
-import {
-	createPicturesScreen,
-	type PicturesScreen,
-} from "./screens/pictures";
+import { createDesktopScreen, type DesktopScreen } from "./screens/desktop";
+import { createMacPaintScreen, type MacPaintScreen } from "./screens/macpaint";
+import { createMacWriteScreen, type MacWriteScreen } from "./screens/macwrite";
+import { createPicturesScreen, type PicturesScreen } from "./screens/pictures";
 import * as text from "./text";
-import {
-	createViewportHelpers,
-	type ViewportHelpers,
-} from "./viewports";
+import { createViewportHelpers, type ViewportHelpers } from "./viewports";
 
 const CANVAS_SCALE =
 	typeof window !== "undefined"
@@ -156,7 +141,15 @@ if (typeof document !== "undefined" && ctx) {
 }
 
 export function drawMacUI(): void {
-	if (!ctx || !chrome || !boot || !desktopScreen || !macPaintScreen || !macWriteScreen || !picturesScreen) {
+	if (
+		!ctx ||
+		!chrome ||
+		!boot ||
+		!desktopScreen ||
+		!macPaintScreen ||
+		!macWriteScreen ||
+		!picturesScreen
+	) {
 		return;
 	}
 	isReadyToRedraw = true;
@@ -251,23 +244,27 @@ function getDesktopIconHitTargets() {
 	if (!rects || !desktopScreen) {
 		return { clipRect: { x: 0, y: 0, w: 0, h: 0 }, targets: {} };
 	}
-	const { windowX, windowY, windowWidth, windowHeight } =
-		rects.getWindowRect();
+	const { windowX, windowY, windowWidth, windowHeight } = rects.getWindowRect();
 	const layout = desktopScreen.getDesktopIconLayout(
 		windowX,
 		windowY,
 		windowWidth,
 		windowHeight,
 	);
-	const targets: Record<string, { x: number; y: number; w: number; h: number }> =
-		{};
+	const targets: Record<
+		string,
+		{ x: number; y: number; w: number; h: number }
+	> = {};
 	for (const [id, pos] of Object.entries(layout.icons)) {
 		targets[id] = { x: pos.x, y: pos.y, w: pos.w, h: pos.h };
 	}
 	return { clipRect: layout.clipRect, targets };
 }
 
-export function hitTestDesktop(canvasX: number, canvasY: number): string | null {
+export function hitTestDesktop(
+	canvasX: number,
+	canvasY: number,
+): string | null {
 	const { clipRect, targets } = getDesktopIconHitTargets();
 	if (clipRect.w <= 0 || clipRect.h <= 0) return null;
 	if (
@@ -335,7 +332,12 @@ export function hitTestTrashWindowItem(
 	canvasX: number,
 	canvasY: number,
 ): string | null {
-	if (!state.trashWindowOpen || state.trashVideoOpen || !rects || !desktopScreen)
+	if (
+		!state.trashWindowOpen ||
+		state.trashVideoOpen ||
+		!rects ||
+		!desktopScreen
+	)
 		return null;
 	rects.ensureTrashWindowRect();
 	const r = state.trashWindowRect;
@@ -360,8 +362,7 @@ export function hitTestTrashWindowItem(
 
 export function hitTestGrowBox(canvasX: number, canvasY: number): boolean {
 	if (!rects) return false;
-	const { windowX, windowY, windowWidth, windowHeight } =
-		rects.getWindowRect();
+	const { windowX, windowY, windowWidth, windowHeight } = rects.getWindowRect();
 	const scrollWidth = 16;
 	const gbX = windowX + windowWidth - scrollWidth;
 	const gbY = windowY + windowHeight - scrollWidth;

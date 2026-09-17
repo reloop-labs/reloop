@@ -1,6 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { LogsErrors } from "@reloop/logs/error/logs.error-response";
+import { resolveEmailSend } from "@reloop/logs/lib/email-send-origin";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import { and, eq } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
@@ -33,6 +34,11 @@ export async function getEmailLogController({
 		}
 
 		log.info("Email log details retrieved successfully", { id });
+		const send = await resolveEmailSend({
+			emailLogId: emailLogEntry.id,
+			storedSource: emailLogEntry.source,
+			tags: emailLogEntry.tags,
+		});
 		return {
 			...emailLogEntry,
 			sentAt: emailLogEntry.sentAt?.toISOString() || null,
@@ -47,6 +53,8 @@ export async function getEmailLogController({
 				metadata: event.metadata ?? null,
 				createdAt: event.createdAt.toISOString(),
 			})),
+			source: send.source,
+			origin: send.origin,
 		} as LogsModel.EmailLogFullEntry;
 	} catch (error) {
 		log.error("Error fetching email log details", {

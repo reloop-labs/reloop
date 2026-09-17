@@ -143,13 +143,7 @@ export function createChrome({
 			ctx.rotate(angle);
 			if (isDark) ctx.filter = "invert(1)";
 			ctx.imageSmoothingEnabled = false;
-			ctx.drawImage(
-				arrowImg,
-				Math.round(-dw / 2),
-				Math.round(-dh / 2),
-				dw,
-				dh,
-			);
+			ctx.drawImage(arrowImg, Math.round(-dw / 2), Math.round(-dh / 2), dw, dh);
 			ctx.restore();
 			return;
 		}
@@ -369,8 +363,7 @@ export function createChrome({
 		ctx.fillText(title, x + width / 2, y + 10);
 		ctx.restore();
 
-		if (options.scrollbars !== false)
-			drawScrollBars(ctx, x, y, width, height);
+		if (options.scrollbars !== false) drawScrollBars(ctx, x, y, width, height);
 	}
 
 	return { drawBackground, drawMenuBar, drawWindow };

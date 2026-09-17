@@ -14,4 +14,7 @@ export const adminConfig = {
 	SLACK_ALERTS_WEBHOOK_URL: process.env.SLACK_ALERTS_WEBHOOK_URL || "",
 	CONSOLE_BASE_URL:
 		process.env.CONSOLE_BASE_URL || process.env.BASE_URL || "https://reloop.sh",
+	SUPPORT_WELCOME_SENDER_EMAIL: (
+		process.env.SUPPORT_WELCOME_SENDER_EMAIL || ""
+	).trim(),
 };

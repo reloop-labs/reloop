@@ -1,8 +1,16 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
+import {
+	type CreditReservation,
+	refundSendCredits,
+	reserveSendCredits,
+} from "@reloop/db/reserve-send-credits";
 import { domain, emailLog } from "@reloop/db/schema";
+import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
+import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { simpleParser } from "mailparser";
 
@@ -112,38 +120,107 @@ export async function logIncomingController({
 		throw KumoMtaErrors.messageIdConflict(body.messageId);
 	}
 
-	const inserted = await db
-		.insert(emailLog)
-		.values({
-			messageId:
-				body.messageId ||
-				`msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-			organizationId: finalOrgId,
-			domainId: domainRecord.id,
-			userId: userId || null,
-			apikeyId: apikeyId || null,
-			fromEmail: body.fromEmail,
-			toEmails: body.toEmails,
-			subject: subject,
-			textBody: textBody,
-			htmlBody: htmlBody,
-			rawMessage: body.rawMessage || null,
-			status: "pending",
-			size: body.size || 0,
-			provider: "kumomta",
-			providerMessageId: body.providerMessageId,
-		})
-		.returning({ id: emailLog.id });
+	const toEmails = uniqueBareEmails(body.toEmails);
+	if (toEmails.length === 0) {
+		throw createError({
+			status: 400,
+			message: "No envelope recipients",
+			why: "SMTP quota is charged per envelope recipient. This message has none.",
+			fix: "Provide at least one RCPT TO address",
+		});
+	}
+
+	const abuse = scoreOutboundAbuse({
+		from: body.fromEmail,
+		to: toEmails,
+		subject,
+		text: textBody,
+		html: htmlBody,
+	});
+	if (abuse.severity !== "none") {
+		try {
+			await bus.publish(BusEvent.ABUSE_SUSPECTED, {
+				organizationId: finalOrgId,
+				fromEmail: body.fromEmail,
+				subject,
+				recipientCount: toEmails.length,
+				severity: abuse.severity,
+				reasons: abuse.reasons,
+				action: abuse.severity === "high" ? "blocked" : "allowed",
+				timestamp: new Date().toISOString(),
+			});
+		} catch (error) {
+			log.warn(
+				`[LOG-INCOMING] Failed to publish abuse.suspected: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
+	if (abuse.severity === "high") {
+		throw KumoMtaErrors.abuseBlocked(abuse.reasons);
+	}
+
+	const recipientCount = toEmails.length;
+	const decision = await reserveSendCredits({
+		organizationId: finalOrgId,
+		recipientCount,
+	});
+	if (!decision.ok) {
+		if (decision.reason === "daily" && decision.dailyLimit != null) {
+			throw KumoMtaErrors.dailyQuotaExceeded({
+				used: decision.dailyUsed,
+				limit: decision.dailyLimit,
+				required: recipientCount,
+			});
+		}
+		throw KumoMtaErrors.quotaExceeded({
+			remaining: decision.remaining,
+			required: recipientCount,
+			monthlyCredits: decision.monthlyCredits,
+		});
+	}
+	const reservation: CreditReservation | undefined = decision.reservation;
+
+	let inserted: { id: string }[] | undefined;
+	try {
+		inserted = await db
+			.insert(emailLog)
+			.values({
+				messageId:
+					body.messageId ||
+					`msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+				organizationId: finalOrgId,
+				domainId: domainRecord.id,
+				userId: userId || null,
+				apikeyId: apikeyId || null,
+				fromEmail: body.fromEmail,
+				toEmails,
+				subject: subject,
+				textBody: textBody,
+				htmlBody: htmlBody,
+				rawMessage: body.rawMessage || null,
+				status: "pending",
+				size: body.size || 0,
+				provider: "kumomta",
+				providerMessageId: body.providerMessageId,
+				source: "smtp",
+			})
+			.returning({ id: emailLog.id });
+	} catch (error) {
+		if (reservation) await refundSendCredits({ reservation });
+		throw error;
+	}
 
 	const insertedId = inserted?.[0]?.id;
 	if (!insertedId) {
+		if (reservation) await refundSendCredits({ reservation });
 		throw KumoMtaErrors.failedToInsertLog();
 	}
 
 	await bus.publish(BusEvent.EMAIL_SENT, {
 		organizationId: finalOrgId,
 		emailLogId: insertedId,
-		recipientCount: body.toEmails.length,
+		recipientCount: toEmails.length,
+		creditsReserved: true,
 		timestamp: new Date().toISOString(),
 	});
 

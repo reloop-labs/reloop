@@ -24,7 +24,9 @@ export async function authCheckerController({
 	} catch (error) {
 		set.status = 400;
 		return {
-			message: (error as Error).message || "Failed to query domain authentication records.",
+			message:
+				(error as Error).message ||
+				"Failed to query domain authentication records.",
 			why: "Domain could not be resolved or input is invalid.",
 			fix: "Check that the domain is spelled correctly without extra protocols or paths.",
 			link: "https://reloop.sh/tools/auth-checker",

@@ -164,7 +164,9 @@ export function RotateApiKeyModal({
 										name={step === "success" ? "check-circle" : "refresh"}
 										className={cn(
 											"size-4",
-											step === "success" ? "text-emerald-600 dark:text-emerald-400" : "text-text-sub-600 dark:text-white/60",
+											step === "success"
+												? "text-emerald-600 dark:text-emerald-400"
+												: "text-text-sub-600 dark:text-white/60",
 										)}
 									/>
 									<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
@@ -228,95 +230,95 @@ export function RotateApiKeyModal({
 						layout
 						className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3"
 					>
-							<Button.Root
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
+							onClick={() => {
+								if (!isRotating) handleClose();
+							}}
+							className={cn(
+								"gap-1.5 transition-opacity duration-200",
+								isRotating && "pointer-events-none opacity-50",
+							)}
+						>
+							{step === "confirm" ? "Cancel" : "Close"}
+							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+								esc
+							</ActionKbd>
+						</Button.Root>
+						{step === "confirm" ? (
+							<FancyButton.Root
 								type="button"
-								variant="neutral"
-								mode="ghost"
+								variant="blue"
 								size="small"
-								onClick={() => {
-									if (!isRotating) handleClose();
-								}}
+								onClick={handleRotate}
+								disabled={!canRotate}
 								className={cn(
-									"gap-1.5 transition-opacity duration-200",
-									isRotating && "pointer-events-none opacity-50",
+									"min-w-[158px] justify-center overflow-hidden transition-all duration-200",
+									(!canRotate || isRotating) &&
+										"pointer-events-none opacity-50",
+									isRotating && "opacity-90",
 								)}
 							>
-								{step === "confirm" ? "Cancel" : "Close"}
-								<ActionKbd className="lowercase! w-auto min-w-0 px-1">
-									esc
-								</ActionKbd>
-							</Button.Root>
-							{step === "confirm" ? (
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="small"
-									onClick={handleRotate}
-									disabled={!canRotate}
-									className={cn(
-										"min-w-[158px] justify-center overflow-hidden transition-all duration-200",
-										(!canRotate || isRotating) &&
-											"pointer-events-none opacity-50",
-										isRotating && "opacity-90",
-									)}
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={isRotating ? "rotating" : "idle"}
-											transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-											initial={{ opacity: 0, y: -14 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: 14 }}
-											className="flex items-center justify-center gap-1.5"
-										>
-											{isRotating ? (
-												<>
-													<Spinner size={14} color="currentColor" />
-													<span>Rotating...</span>
-												</>
-											) : (
-												<>
-													Rotate API key
-													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
-													</ActionKbd>
-												</>
-											)}
-										</motion.span>
-									</AnimatePresence>
-								</FancyButton.Root>
-							) : (
-								<FancyButton.Root
-									type="button"
-									variant="blue"
-									size="small"
-									onClick={handleCopyKey}
-									className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={copied ? "copied" : "idle"}
-											transition={{ type: "spring", duration: 0.25, bounce: 0 }}
-											initial={{ opacity: 0, y: -14 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, y: 14 }}
-											className="flex items-center justify-center gap-1.5"
-										>
-											{copied ? (
-												"Copied!"
-											) : (
-												<>
-													Copy API key
-													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
-													</ActionKbd>
-												</>
-											)}
-										</motion.span>
-									</AnimatePresence>
-								</FancyButton.Root>
-							)}
-						</motion.div>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={isRotating ? "rotating" : "idle"}
+										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center justify-center gap-1.5"
+									>
+										{isRotating ? (
+											<>
+												<Spinner size={14} color="currentColor" />
+												<span>Rotating...</span>
+											</>
+										) : (
+											<>
+												Rotate API key
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
+											</>
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
+						) : (
+							<FancyButton.Root
+								type="button"
+								variant="blue"
+								size="small"
+								onClick={handleCopyKey}
+								className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={copied ? "copied" : "idle"}
+										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center justify-center gap-1.5"
+									>
+										{copied ? (
+											"Copied!"
+										) : (
+											<>
+												Copy API key
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
+											</>
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
+						)}
+					</motion.div>
 				</motion.div>
 			</Modal.Content>
 		</Modal.Root>

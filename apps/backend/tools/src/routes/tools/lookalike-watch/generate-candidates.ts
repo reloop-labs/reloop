@@ -30,15 +30,7 @@ const SUFFIXES = [
 	"sso",
 ];
 
-const PREFIXES = [
-	"login",
-	"secure",
-	"support",
-	"pay",
-	"verify",
-	"mail",
-	"sso",
-];
+const PREFIXES = ["login", "secure", "support", "pay", "verify", "mail", "sso"];
 
 // Cyrillic lookalikes mapping for IDN homoglyphs
 const CYRILLIC_LOOKALIKES: Record<string, string> = {
@@ -101,7 +93,10 @@ export function generateLookalikeCandidates(
 	// Omission (drop letter if baseLabel > 3)
 	if (baseLabel.length > 3) {
 		for (let i = 0; i < chars.length; i++) {
-			const omitted = chars.slice(0, i).concat(chars.slice(i + 1)).join("");
+			const omitted = chars
+				.slice(0, i)
+				.concat(chars.slice(i + 1))
+				.join("");
 			addCandidate(`${omitted}.${tld}`, "typo");
 		}
 	}
@@ -109,9 +104,7 @@ export function generateLookalikeCandidates(
 	// Duplication (duplicate letter)
 	for (let i = 0; i < chars.length; i++) {
 		const duplicated =
-			chars.slice(0, i + 1).join("") +
-			chars[i] +
-			chars.slice(i + 1).join("");
+			chars.slice(0, i + 1).join("") + chars[i] + chars.slice(i + 1).join("");
 		addCandidate(`${duplicated}.${tld}`, "typo");
 	}
 

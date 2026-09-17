@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { toCampaignResponse } from "../src/routes/campaign/campaign.mappers";
+import {
+	toCampaignResponse,
+	toRecipientResponse,
+} from "../src/routes/campaign/campaign.mappers";
 
 function campaignRow(overrides: Record<string, unknown> = {}) {
 	const now = new Date("2026-09-02T12:00:00.000Z");
@@ -65,5 +68,40 @@ describe("toCampaignResponse", () => {
 			campaignRow({ content: null }) as never,
 		);
 		expect(response.content).toEqual([]);
+	});
+});
+
+describe("toRecipientResponse", () => {
+	test("includes per-recipient click counts", () => {
+		const now = new Date("2026-09-02T12:00:00.000Z");
+		const response = toRecipientResponse(
+			{
+				id: "crcp_1",
+				campaignId: "cmp_test",
+				organizationId: "org_1",
+				contactId: "ct_1",
+				email: "jane@example.com",
+				status: "sent",
+				skipReason: null,
+				emailLogId: "eml_1",
+				error: null,
+				deliveredAt: now,
+				openedAt: now,
+				clickedAt: now,
+				createdAt: now,
+				updatedAt: now,
+			} as never,
+			{
+				category: "clicked",
+				contactName: "Jane Doe",
+				clickCount: 5,
+				uniqueClickCount: 2,
+			},
+		);
+
+		expect(response.category).toBe("clicked");
+		expect(response.clickCount).toBe(5);
+		expect(response.uniqueClickCount).toBe(2);
+		expect(response.clickedAt).toBe(now.toISOString());
 	});
 });

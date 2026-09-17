@@ -339,7 +339,7 @@ function SupportCardIllustration() {
 	return (
 		<div className="relative mt-4 flex h-[104px] w-full items-center justify-center overflow-hidden">
 			{/* Connector line with node anchor dots */}
-			<div className="absolute inset-x-2 top-1/2 flex -translate-y-1/2 items-center justify-between">
+			<div className="-translate-y-1/2 absolute inset-x-2 top-1/2 flex items-center justify-between">
 				<span className="size-1.5 rounded-full border border-neutral-300/80 bg-white dark:border-white/30 dark:bg-neutral-900" />
 				<div className="h-px flex-1 bg-gradient-to-r from-neutral-200 via-neutral-300 to-neutral-200 dark:from-white/5 dark:via-white/20 dark:to-white/5" />
 				<span className="size-1.5 rounded-full border border-neutral-300/80 bg-white dark:border-white/30 dark:bg-neutral-900" />
@@ -348,8 +348,8 @@ function SupportCardIllustration() {
 			{/* Background canvas card with delicate depth */}
 			<div className="relative flex h-[76px] w-[156px] items-center justify-center rounded-[18px] border border-neutral-200/50 bg-neutral-50/60 shadow-[0_4px_16px_rgba(0,0,0,0.02)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.02] dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top floating pill: user request with skeleton dashes */}
-				<div className="absolute -top-2.5 left-2.5 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-transform duration-300 group-hover:-translate-y-0.5 dark:border-white/15 dark:bg-neutral-900">
-					<span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+				<div className="-top-2.5 group-hover:-translate-y-0.5 absolute left-2.5 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-transform duration-300 dark:border-white/15 dark:bg-neutral-900">
+					<span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
 					<div className="flex items-center gap-1">
 						<span className="h-1 w-4 rounded-full bg-neutral-300 dark:bg-white/30" />
 						<span className="h-1 w-2 rounded-full bg-neutral-200 dark:bg-white/20" />
@@ -358,7 +358,7 @@ function SupportCardIllustration() {
 				</div>
 
 				{/* Bottom floating capsule: 2m reply with sparkles */}
-				<div className="absolute -bottom-2 right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-neutral-100/95 px-2.5 shadow-[0_4px_12px_rgba(0,0,0,0.06)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-1 dark:border-white/15 dark:bg-neutral-800/95">
+				<div className="-bottom-2 group-hover:-translate-y-1 absolute right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-neutral-100/95 px-2.5 shadow-[0_4px_12px_rgba(0,0,0,0.06)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 dark:border-white/15 dark:bg-neutral-800/95">
 					{/* 4-point sparkle star 1 */}
 					<svg
 						className="size-2.5 text-neutral-400 dark:text-neutral-400"
@@ -395,7 +395,7 @@ function TransactionalCardIllustration() {
 	return (
 		<div className="relative mt-4 flex h-[104px] w-full items-center justify-center overflow-hidden">
 			{/* Connector line with terminal node dots */}
-			<div className="absolute inset-x-2 top-1/2 flex -translate-y-1/2 items-center justify-between">
+			<div className="-translate-y-1/2 absolute inset-x-2 top-1/2 flex items-center justify-between">
 				<span className="size-1.5 rounded-full border border-sky-400/60 bg-white dark:border-sky-400/40 dark:bg-neutral-900" />
 				<div className="h-px flex-1 bg-gradient-to-r from-sky-200/60 via-neutral-300 to-sky-200/60 dark:from-sky-500/10 dark:via-white/20 dark:to-sky-500/10" />
 				<span className="size-1.5 rounded-full border border-sky-400/60 bg-white dark:border-sky-400/40 dark:bg-neutral-900" />
@@ -404,7 +404,7 @@ function TransactionalCardIllustration() {
 			{/* Background canvas card */}
 			<div className="relative flex h-[76px] w-[156px] items-center justify-center rounded-[18px] border border-neutral-200/50 bg-neutral-50/60 shadow-[0_4px_16px_rgba(0,0,0,0.02)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.02] dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top floating pill: API trigger + 99ms badge */}
-				<div className="absolute -top-2.5 left-2 flex h-7 items-center gap-1.5 rounded-full border border-sky-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(14,165,233,0.08)] transition-transform duration-300 group-hover:-translate-y-0.5 dark:border-sky-500/30 dark:bg-neutral-900">
+				<div className="-top-2.5 group-hover:-translate-y-0.5 absolute left-2 flex h-7 items-center gap-1.5 rounded-full border border-sky-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(14,165,233,0.08)] transition-transform duration-300 dark:border-sky-500/30 dark:bg-neutral-900">
 					<svg
 						className="size-3 text-sky-500 dark:text-sky-400"
 						viewBox="0 0 24 24"
@@ -415,19 +415,23 @@ function TransactionalCardIllustration() {
 						strokeLinejoin="round"
 						aria-hidden
 					>
-						<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor" fillOpacity="0.2" />
+						<polygon
+							points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+							fill="currentColor"
+							fillOpacity="0.2"
+						/>
 					</svg>
-					<span className="font-mono font-medium text-[10.5px] text-sky-700 tracking-tight dark:text-sky-300">
+					<span className="font-medium font-mono text-[10.5px] text-sky-700 tracking-tight dark:text-sky-300">
 						99ms
 					</span>
-					<div className="flex items-center gap-0.5 border-l border-neutral-200 pl-1.5 dark:border-white/15">
+					<div className="flex items-center gap-0.5 border-neutral-200 border-l pl-1.5 dark:border-white/15">
 						<span className="h-1 w-3 rounded-full bg-neutral-300 dark:bg-white/30" />
 						<span className="h-1 w-1.5 rounded-full bg-neutral-200 dark:bg-white/20" />
 					</div>
 				</div>
 
 				{/* Bottom floating capsule: Delivered checkmark with 4-point sparkle */}
-				<div className="absolute -bottom-2 right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-sky-50/90 px-2.5 shadow-[0_4px_12px_rgba(14,165,233,0.08)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-1 dark:border-white/15 dark:bg-sky-950/50">
+				<div className="-bottom-2 group-hover:-translate-y-1 absolute right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-sky-50/90 px-2.5 shadow-[0_4px_12px_rgba(14,165,233,0.08)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 dark:border-white/15 dark:bg-sky-950/50">
 					<span className="flex size-3.5 items-center justify-center rounded-full bg-sky-500 text-[9px] text-white">
 						✓
 					</span>
@@ -458,7 +462,7 @@ function MarketingCardIllustration() {
 	return (
 		<div className="relative mt-4 flex h-[104px] w-full items-center justify-center overflow-hidden">
 			{/* Connector line with terminal node dots */}
-			<div className="absolute inset-x-2 top-1/2 flex -translate-y-1/2 items-center justify-between">
+			<div className="-translate-y-1/2 absolute inset-x-2 top-1/2 flex items-center justify-between">
 				<span className="size-1.5 rounded-full border border-amber-400/60 bg-white dark:border-amber-400/40 dark:bg-neutral-900" />
 				<div className="h-px flex-1 bg-gradient-to-r from-amber-200/60 via-neutral-300 to-amber-200/60 dark:from-amber-500/10 dark:via-white/20 dark:to-amber-500/10" />
 				<span className="size-1.5 rounded-full border border-amber-400/60 bg-white dark:border-amber-400/40 dark:bg-neutral-900" />
@@ -467,7 +471,7 @@ function MarketingCardIllustration() {
 			{/* Background canvas card with mini template layout */}
 			<div className="relative flex h-[76px] w-[156px] items-center justify-center rounded-[18px] border border-neutral-200/50 bg-neutral-50/60 shadow-[0_4px_16px_rgba(0,0,0,0.02)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.02] dark:border-white/10 dark:bg-white/[0.03]">
 				{/* Top floating pill: Audience segment */}
-				<div className="absolute -top-2.5 left-2 flex h-7 items-center gap-1.5 rounded-full border border-amber-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(245,158,11,0.08)] transition-transform duration-300 group-hover:-translate-y-0.5 dark:border-amber-500/30 dark:bg-neutral-900">
+				<div className="-top-2.5 group-hover:-translate-y-0.5 absolute left-2 flex h-7 items-center gap-1.5 rounded-full border border-amber-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(245,158,11,0.08)] transition-transform duration-300 dark:border-amber-500/30 dark:bg-neutral-900">
 					<svg
 						className="size-3 text-amber-500 dark:text-amber-400"
 						viewBox="0 0 24 24"
@@ -486,7 +490,7 @@ function MarketingCardIllustration() {
 					<span className="font-medium text-[10.5px] text-amber-700 tracking-tight dark:text-amber-300">
 						Audience
 					</span>
-					<div className="flex items-end gap-0.5 border-l border-neutral-200 pl-1.5 dark:border-white/15">
+					<div className="flex items-end gap-0.5 border-neutral-200 border-l pl-1.5 dark:border-white/15">
 						<span className="h-1.5 w-1 rounded-sm bg-amber-400" />
 						<span className="h-2.5 w-1 rounded-sm bg-amber-500" />
 						<span className="h-3.5 w-1 rounded-sm bg-amber-600" />
@@ -494,7 +498,7 @@ function MarketingCardIllustration() {
 				</div>
 
 				{/* Bottom floating capsule: 42% open rate with sparkles */}
-				<div className="absolute -bottom-2 right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-amber-50/90 px-2.5 shadow-[0_4px_12px_rgba(245,158,11,0.08)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-1 dark:border-white/15 dark:bg-amber-950/50">
+				<div className="-bottom-2 group-hover:-translate-y-1 absolute right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-amber-50/90 px-2.5 shadow-[0_4px_12px_rgba(245,158,11,0.08)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 dark:border-white/15 dark:bg-amber-950/50">
 					{/* 4-point sparkle star 1 */}
 					<svg
 						className="size-2.5 text-amber-500 dark:text-amber-400"
@@ -531,7 +535,7 @@ function DocsCardIllustration() {
 	return (
 		<div className="relative mt-4 flex h-[104px] w-full items-center justify-center overflow-hidden">
 			{/* Connector line with terminal node dots */}
-			<div className="absolute inset-x-2 top-1/2 flex -translate-y-1/2 items-center justify-between">
+			<div className="-translate-y-1/2 absolute inset-x-2 top-1/2 flex items-center justify-between">
 				<span className="size-1.5 rounded-full border border-emerald-400/60 bg-white dark:border-emerald-400/40 dark:bg-neutral-900" />
 				<div className="h-px flex-1 bg-gradient-to-r from-emerald-200/60 via-neutral-300 to-emerald-200/60 dark:from-emerald-500/10 dark:via-white/20 dark:to-emerald-500/10" />
 				<span className="size-1.5 rounded-full border border-emerald-400/60 bg-white dark:border-emerald-400/40 dark:bg-neutral-900" />
@@ -550,8 +554,8 @@ function DocsCardIllustration() {
 				</div>
 
 				{/* Top floating pill: Quickstart with glowing dot */}
-				<div className="absolute -top-2.5 left-2 flex h-7 items-center gap-1.5 rounded-full border border-emerald-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(16,185,129,0.08)] transition-transform duration-300 group-hover:-translate-y-0.5 dark:border-emerald-500/30 dark:bg-neutral-900">
-					<span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+				<div className="-top-2.5 group-hover:-translate-y-0.5 absolute left-2 flex h-7 items-center gap-1.5 rounded-full border border-emerald-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(16,185,129,0.08)] transition-transform duration-300 dark:border-emerald-500/30 dark:bg-neutral-900">
+					<span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
 					<span className="font-medium text-[10.5px] text-emerald-700 tracking-tight dark:text-emerald-300">
 						Quickstart
 					</span>
@@ -559,7 +563,7 @@ function DocsCardIllustration() {
 				</div>
 
 				{/* Bottom floating capsule: Interactive guide with sparkles */}
-				<div className="absolute -bottom-2 right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-emerald-50/90 px-2.5 shadow-[0_4px_12px_rgba(16,185,129,0.08)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-1 dark:border-white/15 dark:bg-emerald-950/50">
+				<div className="-bottom-2 group-hover:-translate-y-1 absolute right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-emerald-50/90 px-2.5 shadow-[0_4px_12px_rgba(16,185,129,0.08)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 dark:border-white/15 dark:bg-emerald-950/50">
 					<svg
 						className="size-2.5 text-emerald-500 dark:text-emerald-400"
 						viewBox="0 0 24 24"
@@ -594,7 +598,7 @@ function IntegrationsCardIllustration() {
 	return (
 		<div className="relative mt-4 flex h-[104px] w-full items-center justify-center overflow-hidden">
 			{/* Connector line with terminal node dots */}
-			<div className="absolute inset-x-2 top-1/2 flex -translate-y-1/2 items-center justify-between">
+			<div className="-translate-y-1/2 absolute inset-x-2 top-1/2 flex items-center justify-between">
 				<span className="size-1.5 rounded-full border border-violet-400/60 bg-white dark:border-violet-400/40 dark:bg-neutral-900" />
 				<div className="h-px flex-1 bg-gradient-to-r from-violet-200/60 via-neutral-300 to-violet-200/60 dark:from-violet-500/10 dark:via-white/20 dark:to-violet-500/10" />
 				<span className="size-1.5 rounded-full border border-violet-400/60 bg-white dark:border-violet-400/40 dark:bg-neutral-900" />
@@ -614,7 +618,7 @@ function IntegrationsCardIllustration() {
 				</div>
 
 				{/* Top floating pill: 20+ SDKs with connection icon */}
-				<div className="absolute -top-2.5 left-2 flex h-7 items-center gap-1.5 rounded-full border border-violet-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(139,92,246,0.08)] transition-transform duration-300 group-hover:-translate-y-0.5 dark:border-violet-500/30 dark:bg-neutral-900">
+				<div className="-top-2.5 group-hover:-translate-y-0.5 absolute left-2 flex h-7 items-center gap-1.5 rounded-full border border-violet-200/90 bg-white px-2.5 shadow-[0_2px_8px_rgba(139,92,246,0.08)] transition-transform duration-300 dark:border-violet-500/30 dark:bg-neutral-900">
 					<svg
 						className="size-3 text-violet-500 dark:text-violet-400"
 						viewBox="0 0 24 24"
@@ -634,7 +638,7 @@ function IntegrationsCardIllustration() {
 				</div>
 
 				{/* Bottom floating capsule: Instant Sync with sparkles */}
-				<div className="absolute -bottom-2 right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-violet-50/90 px-2.5 shadow-[0_4px_12px_rgba(139,92,246,0.08)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-1 dark:border-white/15 dark:bg-violet-950/50">
+				<div className="-bottom-2 group-hover:-translate-y-1 absolute right-2 flex h-7 items-center gap-1.5 rounded-full border border-neutral-200/80 bg-violet-50/90 px-2.5 shadow-[0_4px_12px_rgba(139,92,246,0.08)] backdrop-blur-sm transition-transform duration-300 group-hover:translate-x-0.5 dark:border-white/15 dark:bg-violet-950/50">
 					<svg
 						className="size-2.5 text-violet-500 dark:text-violet-400"
 						viewBox="0 0 24 24"
@@ -1361,7 +1365,7 @@ function MegaLink({
 	const featuredCardWidth = "w-[168px] shrink-0";
 	const className = isTransactional
 		? cn(
-				"group relative flex h-full min-h-[210px] w-[235px] shrink-0 flex-col justify-between overflow-hidden pl-7 pr-6 py-[22px] transition-all duration-300",
+				"group relative flex h-full min-h-[210px] w-[235px] shrink-0 flex-col justify-between overflow-hidden py-[22px] pr-6 pl-7 transition-all duration-300",
 				"bg-transparent hover:bg-neutral-50/70",
 				"dark:bg-transparent dark:hover:bg-white/[0.03]",
 			)
@@ -1371,45 +1375,45 @@ function MegaLink({
 					"bg-transparent hover:bg-neutral-50/70",
 					"dark:bg-transparent dark:hover:bg-white/[0.03]",
 				)
-		: isSupportCard
-			? cn(
-					"group relative flex h-full min-h-[210px] w-[240px] shrink-0 flex-col justify-between overflow-hidden pl-7 pr-6 py-[22px] transition-all duration-300",
-					"bg-transparent hover:bg-neutral-50/70",
-					"dark:bg-transparent dark:hover:bg-white/[0.03]",
-				)
-		: isDocsCard
-			? cn(
-					"group relative flex h-full min-h-[210px] w-[210px] shrink-0 flex-col justify-between overflow-hidden rounded-[18px] p-5 transition-all duration-300",
-					"border border-stroke-soft-200/80 bg-neutral-50/50 hover:bg-neutral-50/90 hover:border-emerald-300/90",
-					"dark:border-white/[0.08] dark:bg-white/[0.02] dark:hover:bg-white/[0.04] dark:hover:border-emerald-500/30",
-					"shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.06)] dark:shadow-none",
-				)
-		: isIntegrationsCard
-			? cn(
-					"group relative flex h-full min-h-[210px] w-[210px] shrink-0 flex-col justify-between overflow-hidden rounded-[18px] p-5 transition-all duration-300",
-					"border border-stroke-soft-200/80 bg-neutral-50/50 hover:bg-neutral-50/90 hover:border-violet-300/90",
-					"dark:border-white/[0.08] dark:bg-white/[0.02] dark:hover:bg-white/[0.04] dark:hover:border-violet-500/30",
-					"shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(139,92,246,0.06)] dark:shadow-none",
-				)
-		: productCard
-			? cn(
-					"group relative flex h-full min-h-[200px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-0 sm:p-5",
-					// Dark: near-black surface like the global header (not muddy grey)
-					"dark:border-white/[0.08] dark:bg-white/[0.03]",
-					featuredCardWidth,
-				)
-			: docsCard
-				? // Docs / Resources / Company featured: Help Center–style hover
-					cn(
-						"group relative flex h-full min-h-[132px] flex-col justify-between overflow-hidden rounded-[18px] p-4 sm:min-h-[148px] sm:p-5",
-						"border border-stroke-soft-200/80 bg-bg-weak-50/50",
-						"transition-colors duration-300",
-						"dark:border-white/[0.08] dark:bg-white/[0.03]",
-						featuredCardWidth,
+			: isSupportCard
+				? cn(
+						"group relative flex h-full min-h-[210px] w-[240px] shrink-0 flex-col justify-between overflow-hidden py-[22px] pr-6 pl-7 transition-all duration-300",
+						"bg-transparent hover:bg-neutral-50/70",
+						"dark:bg-transparent dark:hover:bg-white/[0.03]",
 					)
-				: simple
-					? "group flex min-w-0 items-center gap-2.5 rounded-[12px] px-1.5 py-2 transition-opacity hover:opacity-70"
-					: "group flex min-w-0 items-start gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]";
+				: isDocsCard
+					? cn(
+							"group relative flex h-full min-h-[210px] w-[210px] shrink-0 flex-col justify-between overflow-hidden rounded-[18px] p-5 transition-all duration-300",
+							"border border-stroke-soft-200/80 bg-neutral-50/50 hover:border-emerald-300/90 hover:bg-neutral-50/90",
+							"dark:border-white/[0.08] dark:bg-white/[0.02] dark:hover:border-emerald-500/30 dark:hover:bg-white/[0.04]",
+							"shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.06)] dark:shadow-none",
+						)
+					: isIntegrationsCard
+						? cn(
+								"group relative flex h-full min-h-[210px] w-[210px] shrink-0 flex-col justify-between overflow-hidden rounded-[18px] p-5 transition-all duration-300",
+								"border border-stroke-soft-200/80 bg-neutral-50/50 hover:border-violet-300/90 hover:bg-neutral-50/90",
+								"dark:border-white/[0.08] dark:bg-white/[0.02] dark:hover:border-violet-500/30 dark:hover:bg-white/[0.04]",
+								"shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(139,92,246,0.06)] dark:shadow-none",
+							)
+						: productCard
+							? cn(
+									"group relative flex h-full min-h-[200px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/50 p-4 transition-colors duration-300 sm:min-h-0 sm:p-5",
+									// Dark: near-black surface like the global header (not muddy grey)
+									"dark:border-white/[0.08] dark:bg-white/[0.03]",
+									featuredCardWidth,
+								)
+							: docsCard
+								? // Docs / Resources / Company featured: Help Center–style hover
+									cn(
+										"group relative flex h-full min-h-[132px] flex-col justify-between overflow-hidden rounded-[18px] p-4 sm:min-h-[148px] sm:p-5",
+										"border border-stroke-soft-200/80 bg-bg-weak-50/50",
+										"transition-colors duration-300",
+										"dark:border-white/[0.08] dark:bg-white/[0.03]",
+										featuredCardWidth,
+									)
+								: simple
+									? "group flex min-w-0 items-center gap-2.5 rounded-[12px] px-1.5 py-2 transition-opacity hover:opacity-70"
+									: "group flex min-w-0 items-start gap-3 rounded-[12px] px-1.5 py-2 transition-colors hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.04]";
 
 	const content = isTransactional ? (
 		<>
@@ -1746,14 +1750,14 @@ function DividedListColumn({
 	return (
 		<div className="flex min-h-0 w-full min-w-[280px] flex-col divide-y divide-stroke-soft-200/80 dark:divide-white/[0.08]">
 			{title ? (
-				<div className="flex items-center justify-between pl-7 pr-6 py-[22px]">
-					<p className="font-normal text-[14px] leading-5 text-neutral-500 dark:text-neutral-400">
+				<div className="flex items-center justify-between py-[22px] pr-6 pl-7">
+					<p className="font-normal text-[14px] text-neutral-500 leading-5 dark:text-neutral-400">
 						{title}
 					</p>
 					{viewAllHref ? (
 						<a
 							href={viewAllHref}
-							className="text-[13px] leading-5 text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+							className="text-[13px] text-neutral-500 leading-5 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
 						>
 							View all
 						</a>
@@ -1764,7 +1768,7 @@ function DividedListColumn({
 				const external = isExternalHref(link.href, link.external);
 				const crossDomain = isCrossDomain(link.href);
 				const className = cn(
-					"group flex min-w-0 items-start gap-3 pl-7 pr-5 py-4.5 transition-colors",
+					"group flex min-w-0 items-start gap-3 py-4.5 pr-5 pl-7 transition-colors",
 					"hover:bg-neutral-50/80 dark:hover:bg-white/[0.04]",
 				);
 				const body = (
@@ -1798,7 +1802,7 @@ function DividedListColumn({
 									{link.title}
 								</span>
 								{external && (
-									<span className="text-[11px] text-neutral-400 transition-transform group-hover:-translate-y-px group-hover:translate-x-px dark:text-neutral-500">
+									<span className="group-hover:-translate-y-px text-[11px] text-neutral-400 transition-transform group-hover:translate-x-px dark:text-neutral-500">
 										↗
 									</span>
 								)}
@@ -2148,9 +2152,7 @@ function MegaPanel({ item }: { item: NavItem }) {
 									"flex h-full min-h-[148px]",
 									category.links.length >= 2
 										? category.links.some(
-												(l) =>
-													l.featuredTransactional ||
-													l.featuredMarketing,
+												(l) => l.featuredTransactional || l.featuredMarketing,
 											)
 											? "w-max flex-row items-stretch divide-x divide-stroke-soft-200/80 dark:divide-white/[0.08]"
 											: "w-max flex-row items-stretch gap-2.5"

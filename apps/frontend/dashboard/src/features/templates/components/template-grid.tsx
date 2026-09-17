@@ -175,7 +175,7 @@ const TemplatePreviewPaper = ({ children }: { children: ReactNode }) => (
 		className="pointer-events-none absolute inset-0 select-none overflow-hidden"
 		style={previewPaperStyle}
 	>
-		<div className="relative h-full w-full overflow-hidden rounded-t-2xl border-t border-x border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
+		<div className="relative h-full w-full overflow-hidden rounded-t-2xl border-stroke-soft-100 border-x border-t bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
 			{children}
 		</div>
 	</div>

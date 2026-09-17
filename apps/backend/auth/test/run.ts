@@ -37,6 +37,8 @@ try {
 					process.env.BETTER_AUTH_SECRET ?? "test-secret-characterization",
 				NODE_ENV: "test",
 				DISABLE_SIGNUP: "false",
+				BASE_URL: process.env.BASE_URL ?? "http://localhost",
+				BETTER_AUTH_URL: process.env.BETTER_AUTH_URL ?? "http://localhost",
 			},
 			stdio: ["inherit", "inherit", "inherit"],
 		},

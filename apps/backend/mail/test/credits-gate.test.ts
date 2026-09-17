@@ -54,3 +54,31 @@ describe("MailErrors.quotaExceeded", () => {
 		expect(err.why).not.toContain("needs 1 credits");
 	});
 });
+
+describe("MailErrors.dailyQuotaExceeded", () => {
+	test("returns 402 with today's usage vs plan daily cap", () => {
+		const err = MailErrors.dailyQuotaExceeded({
+			used: 100,
+			limit: 100,
+			required: 1,
+		}) as Error & { status?: number; why?: string; fix?: string };
+
+		expect(err.status).toBe(402);
+		expect(err.message).toBe("Daily email limit reached");
+		expect(err.why).toContain("already sent 100 of 100 today");
+		expect(err.fix).toContain("daily");
+	});
+});
+
+describe("MailErrors.abuseBlocked", () => {
+	test("returns 403 with the matched signals", () => {
+		const err = MailErrors.abuseBlocked(["sms_gateway"]) as Error & {
+			status?: number;
+			why?: string;
+		};
+
+		expect(err.status).toBe(403);
+		expect(err.message).toBe("Message rejected");
+		expect(err.why).toContain("sms_gateway");
+	});
+});

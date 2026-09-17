@@ -76,7 +76,8 @@ export function CampaignScheduleModal({
 								<div>
 									<Modal.Title>Schedule Campaign</Modal.Title>
 									<Modal.Description className="text-text-sub-600 text-xs">
-										Choose date and time to automatically broadcast this campaign.
+										Choose date and time to automatically broadcast this
+										campaign.
 									</Modal.Description>
 								</div>
 							</div>

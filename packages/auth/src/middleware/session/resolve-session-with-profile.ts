@@ -9,10 +9,10 @@ import type {
 	AuthContext,
 	AuthContextWithProfile,
 } from "@reloop/auth/middleware/types";
+import { isUserBanned } from "@reloop/auth/user/is-banned";
 import { db } from "@reloop/db/client";
 import { user } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
-import { isUserBanned } from "@reloop/auth/user/is-banned";
 
 export async function resolveSessionWithProfile(
 	cookie: string | null,

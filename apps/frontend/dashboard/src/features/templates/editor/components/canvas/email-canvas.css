@@ -15,6 +15,12 @@
 	margin-right: auto;
 }
 
+.tiptap.ProseMirror a[data-unsubscribe-link],
+.ProseMirror a[data-unsubscribe-link] {
+	cursor: text;
+	text-decoration: underline;
+}
+
 .tiptap.ProseMirror,
 .ProseMirror {
 	/* Email body background must meet the canvas edge. Chrome padding
@@ -99,7 +105,9 @@ html.dark .template-editor-canvas [class*="dark:border-stroke-soft-100"] {
 html.dark .template-editor-canvas [role="listbox"] {
 	background-color: #ffffff !important;
 	border-color: #e5e7eb !important;
-	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+	box-shadow:
+		0 10px 15px -3px rgba(0, 0, 0, 0.1),
+		0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
 }
 html.dark .template-editor-canvas [role="option"]:hover,
 html.dark .template-editor-canvas [role="option"][aria-selected="true"] {

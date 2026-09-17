@@ -11,7 +11,7 @@ API_HEALTH=(
 	"workflow|Workflows|http://workflow:8017/api/workflow/health"
 	"template|Templates|http://template:8019/api/template/health"
 	"campaigns|Campaigns|http://campaigns:8027/api/campaigns/health"
-	"inbox|Inbox|http://inbox:8021/api/inbox/health"
+	"inbox|Inbox|http://inbox:8028/api/inbox/health"
 	"email|Email|http://email:8022/api/email/health"
 )
 

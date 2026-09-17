@@ -79,14 +79,6 @@ function CampaignsPageContent() {
 				onSelect: () =>
 					window.open("https://reloop.sh/docs/learn/emails", "_blank"),
 			},
-			{
-				id: "select-all",
-				label: "Select All",
-				icon: "check-square",
-				shortcut: { label: "⌘A", keys: ["mod+a"] },
-				onSelect: () =>
-					window.dispatchEvent(new CustomEvent("campaigns:select-all")),
-			},
 		],
 		[setModal],
 	);
@@ -96,7 +88,7 @@ function CampaignsPageContent() {
 	const showLoading = !isHydrated || isLoading;
 
 	return (
-		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+		<div className="mx-auto max-w-5xl space-y-6 p-6 lg:p-8">
 			<CampaignsListHeader />
 
 			{isError ? (

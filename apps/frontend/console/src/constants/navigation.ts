@@ -48,6 +48,12 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
 				iconName: "logs",
 				description: "Admin action history",
 			},
+			{
+				href: "/sending-ips",
+				label: "Sending IPs",
+				iconName: "dedicated-ip",
+				description: "Inventory and org assignment",
+			},
 		],
 	},
 	{

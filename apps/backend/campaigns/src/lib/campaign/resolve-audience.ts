@@ -1,7 +1,7 @@
 import { CampaignErrors } from "@be/campaigns/error/campaign.error";
 import {
+	excludeFromCampaignSnapshot,
 	normalizeCsvEmails,
-	skipReasonForContact,
 } from "@be/campaigns/lib/campaign/audience";
 import { db } from "@reloop/db/client";
 import type { Campaign } from "@reloop/db/schema";
@@ -61,7 +61,7 @@ function toSendable(
 	for (const contact of contacts) {
 		const email = contact.email.trim().toLowerCase();
 		if (!email || seen.has(email)) continue;
-		if (skipReasonForContact(contact)) continue;
+		if (excludeFromCampaignSnapshot(contact)) continue;
 		seen.add(email);
 		rows.push({ email, contactId: contact.id });
 	}
@@ -107,7 +107,7 @@ export async function resolveSendableAudience(
 				rows.push({ email, contactId: null });
 				continue;
 			}
-			if (skipReasonForContact(contact)) continue;
+			if (excludeFromCampaignSnapshot(contact)) continue;
 			rows.push({ email, contactId: contact.id });
 		}
 		return rows;

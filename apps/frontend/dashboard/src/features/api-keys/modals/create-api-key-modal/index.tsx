@@ -186,7 +186,11 @@ export function CreateApiKeyModal({
 								) : (
 									<motion.div
 										key="success"
-										initial={{ opacity: 0, filter: "blur(4px)", height: "94px" }}
+										initial={{
+											opacity: 0,
+											filter: "blur(4px)",
+											height: "94px",
+										}}
 										animate={{
 											opacity: 1,
 											filter: "blur(0px)",
@@ -221,7 +225,9 @@ export function CreateApiKeyModal({
 							)}
 						>
 							Cancel
-							<ActionKbd className="lowercase! w-auto min-w-0 px-1">esc</ActionKbd>
+							<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+								esc
+							</ActionKbd>
 						</Button.Root>
 						{step === "form" ? (
 							<FancyButton.Root
@@ -252,7 +258,9 @@ export function CreateApiKeyModal({
 										) : (
 											<>
 												Create API key
-												<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
 											</>
 										)}
 									</motion.span>
@@ -280,7 +288,9 @@ export function CreateApiKeyModal({
 										) : (
 											<>
 												Copy API key
-												<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+												<ActionKbd className={actionKbdOnBlueClassName}>
+													↵
+												</ActionKbd>
 											</>
 										)}
 									</motion.span>

@@ -23,10 +23,7 @@ export function createPicturesScreen({
 		const textValue = String(filename);
 		const lastDash = textValue.lastIndexOf("-");
 		if (lastDash > 0 && lastDash < textValue.length - 1) {
-			return [
-				textValue.slice(0, lastDash + 1),
-				textValue.slice(lastDash + 1),
-			];
+			return [textValue.slice(0, lastDash + 1), textValue.slice(lastDash + 1)];
 		}
 		return [textValue];
 	}

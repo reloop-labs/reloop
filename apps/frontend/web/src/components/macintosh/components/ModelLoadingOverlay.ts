@@ -204,7 +204,10 @@ export function createModelLoadingOverlay(
 	applyTheme();
 
 	let observer: MutationObserver | null = null;
-	if (typeof document !== "undefined" && typeof MutationObserver !== "undefined") {
+	if (
+		typeof document !== "undefined" &&
+		typeof MutationObserver !== "undefined"
+	) {
 		observer = new MutationObserver(() => {
 			if (!disposed) applyTheme();
 		});
@@ -246,10 +249,7 @@ export function createModelLoadingOverlay(
 	const updateScale = () => {
 		const targetW = container ? container.clientWidth : window.innerWidth;
 		const targetH = container ? container.clientHeight : window.innerHeight;
-		const scale = Math.min(
-			targetW / LOADER_REF_W,
-			targetH / LOADER_REF_H,
-		);
+		const scale = Math.min(targetW / LOADER_REF_W, targetH / LOADER_REF_H);
 		const k = clamp(scale * 0.9, 0.25, 1.6);
 		panel.style.transform = `scale(${k})`;
 	};

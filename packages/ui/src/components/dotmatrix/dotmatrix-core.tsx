@@ -203,7 +203,8 @@ export function DotMatrixBase({
 					const distanceFromCenter = Math.hypot(row - CENTER, col - CENTER);
 					const angleFromCenter = Math.atan2(row - CENTER, col - CENTER);
 					const radiusNormalized = distanceFromCenter / (Math.SQRT2 * CENTER);
-					const manhattanDistance = Math.abs(row - CENTER) + Math.abs(col - CENTER);
+					const manhattanDistance =
+						Math.abs(row - CENTER) + Math.abs(col - CENTER);
 
 					const ctx: DotAnimationContext = {
 						index,

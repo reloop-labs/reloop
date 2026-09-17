@@ -49,4 +49,3 @@ export const landingRoute = new Elysia().get(
 		},
 	},
 );
-

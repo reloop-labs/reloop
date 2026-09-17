@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 /**
  * TypeScript mirror of policy/tls.lua. If a case fails here, update both files.
@@ -34,8 +33,9 @@ function enableTls(
 	return "OpportunisticInsecure";
 }
 
-const policyDir = join(dirname(fileURLToPath(import.meta.url)), "../policy");
-const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../../../..");
+/** package.json `bun test` runs with cwd = apps/backend/smtp */
+const policyDir = join(process.cwd(), "policy");
+const repoRoot = join(process.cwd(), "../../..");
 
 describe("normalizeTlsMode", () => {
 	test("defaults unknown values to opportunistic", () => {
@@ -105,6 +105,41 @@ describe("policy sources stay wired", () => {
 		expect(smtpLua).toContain("body.tls or header_tls_mode");
 	});
 
+	test("smtp.lua maps 403 abuse rejections from log-incoming", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("code == 403");
+		expect(smtpLua).toContain("5.7.1 Message rejected");
+	});
+
+	test("smtp.lua permanently rejects quota exceeded from log-incoming", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("code == 402");
+		expect(smtpLua).toContain("5.7.1 Email quota exceeded");
+	});
+
+	test("smtp.lua charges envelope recipients, not a single To header", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("function collect_send_recipients");
+		expect(smtpLua).toContain("msg:recipient_list()");
+		expect(smtpLua).toContain(
+			'for _, header_name in ipairs({ "To", "Cc", "Bcc" })',
+		);
+		expect(smtpLua).not.toMatch(
+			/local to_emails = \{\}[\s\S]*get_first_named_header_value\('To'\)[\s\S]*table.insert\(to_emails/,
+		);
+	});
+
+	test("HTTP inject reuses the mail-service log; customer SMTP cannot skip quota", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("apply_reloop_logic(msg, api_key, 'smtp')");
+		expect(smtpLua).toContain("apply_reloop_logic(msg, api_key, 'http')");
+		expect(smtpLua).toContain("Ignoring customer X-Email-Log-ID");
+		expect(smtpLua).toContain("trust_log_id = is_internal or source == 'http'");
+		expect(smtpLua).toContain(
+			"Internal secret requires X-Email-Log-ID (mail service inject only)",
+		);
+	});
+
 	test("mail inject and log-incoming pass tls through", () => {
 		const step6 = readFileSync(
 			join(
@@ -122,5 +157,54 @@ describe("policy sources stay wired", () => {
 		);
 		expect(step6).toContain('"X-Reloop-TLS-Mode": tlsMode');
 		expect(logIncoming).toContain("tls: domainRecord.tls");
+		expect(logIncoming).toContain("reserveSendCredits");
+		expect(logIncoming).toContain("creditsReserved: true");
+		expect(logIncoming).toContain("uniqueBareEmails(body.toEmails)");
+		expect(logIncoming).toContain("No envelope recipients");
+		expect(logIncoming).toContain("scoreOutboundAbuse");
+	});
+
+	test("smtp.lua validates AUTH PLAIN against /v1/smtp-auth", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("function validate_smtp_api_key");
+		expect(smtpLua).toContain("/v1/smtp-auth");
+		expect(smtpLua).toContain("smtp_server_auth_plain");
+		expect(smtpLua).toContain("4.7.0 Temporary authentication failure");
+		expect(smtpLua).not.toContain(
+			"actual key + domain verification happens on message receipt",
+		);
+		const routes = readFileSync(
+			join(
+				repoRoot,
+				"apps/backend/domain/src/routes/kumomta/kumomta.routes.ts",
+			),
+			"utf8",
+		);
+		expect(routes).toContain("smtpAuthRoute");
+		expect(routes).toContain("./smtp-auth/smtp-auth.route");
+		const smtpAuth = readFileSync(
+			join(
+				repoRoot,
+				"apps/backend/domain/src/routes/kumomta/smtp-auth/smtp-auth.route.ts",
+			),
+			"utf8",
+		);
+		expect(smtpAuth).toContain('"/smtp-auth"');
+		expect(smtpAuth).toContain("authKey: true");
+	});
+
+	test("HTTP send refunds credits only when Kumo inject has not succeeded", () => {
+		const sendController = readFileSync(
+			join(
+				repoRoot,
+				"apps/backend/mail/src/routes/mail/send-email/send-email.controllers.ts",
+			),
+			"utf8",
+		);
+		expect(sendController).toContain("onInjected?.()");
+		expect(sendController).toContain("if (!injected)");
+		expect(sendController).toContain("refundCreditsForFailedSend(reservation)");
+		expect(sendController).toContain("credits kept");
+		expect(sendController).toContain("scoreOutboundAbuse");
 	});
 });

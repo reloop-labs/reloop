@@ -75,6 +75,7 @@ export async function getPreferencesDataController({
 			email: contact.email,
 			firstName: contact.firstName,
 			lastName: contact.lastName,
+			status: contact.status,
 		},
 		organization: {
 			name: org?.name ?? "Reloop",

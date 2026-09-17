@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
 	editorSlashCommands,
+	FOOTER_SLASH_HTML,
 	groupByCategory,
 	groupWidgetSections,
 } from "./slash-commands";
@@ -41,6 +42,14 @@ describe("editorSlashCommands", () => {
 				"Variable",
 			]),
 		);
+	});
+});
+
+describe("footer slash command", () => {
+	it("inserts an unsubscribe anchor with title and merge-var href", () => {
+		expect(FOOTER_SLASH_HTML).toContain('data-unsubscribe-link="true"');
+		expect(FOOTER_SLASH_HTML).toContain('href="{{{unsubscribe_url}}}"');
+		expect(FOOTER_SLASH_HTML).toContain(">Unsubscribe</a>");
 	});
 });
 

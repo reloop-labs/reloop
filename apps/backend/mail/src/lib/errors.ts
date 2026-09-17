@@ -182,6 +182,28 @@ export const MailErrors = {
 			why: `This send needs ${required} credit${required === 1 ? "" : "s"}, but only ${remaining} remain of ${monthlyCredits} this period`,
 			fix: "Upgrade your plan, wait for the monthly reset, or reduce recipients for this send",
 		}),
+	dailyQuotaExceeded: ({
+		used,
+		limit,
+		required,
+	}: {
+		used: number;
+		limit: number;
+		required: number;
+	}) =>
+		createError({
+			status: 402,
+			message: "Daily email limit reached",
+			why: `This send needs ${required} email${required === 1 ? "" : "s"}, but you have already sent ${used} of ${limit} today`,
+			fix: "Wait until the daily limit resets, or upgrade your plan to remove the daily cap",
+		}),
+	abuseBlocked: (reasons: string[]) =>
+		createError({
+			status: 403,
+			message: "Message rejected",
+			why: `This send matches outbound abuse patterns (${reasons.join(", ")}) and was not accepted`,
+			fix: "Remove phishing content and carrier SMS/MMS gateway recipients, then contact support if this is legitimate mail",
+		}),
 };
 
 export const RateLimitErrors = {

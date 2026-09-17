@@ -2,50 +2,16 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { Campaign } from "../campaign-types";
-import { getStatusColorClass, getStatusIcon, getStatusLabel } from "../utils";
+import {
+	getAudienceIcon,
+	getStatusColorClass,
+	getStatusIcon,
+	getStatusLabel,
+} from "../utils";
 
 export const campaignColumns: ColumnDef<Campaign>[] = [
-	{
-		id: "select",
-		size: 32,
-		enableSorting: false,
-		enableHiding: false,
-		header: ({ table }) => (
-			<div
-				className="flex items-center"
-				onClick={(e) => e.stopPropagation()}
-				onKeyDown={(e) => e.stopPropagation()}
-			>
-				<DataTableCheckbox
-					aria-label="Select all"
-					checked={
-						table.getIsAllPageRowsSelected() ||
-						(table.getIsSomePageRowsSelected() && "indeterminate")
-					}
-					onCheckedChange={(value) =>
-						table.toggleAllPageRowsSelected(value === true)
-					}
-				/>
-			</div>
-		),
-		cell: ({ row }) => (
-			<div
-				className="flex items-center"
-				onClick={(e) => e.stopPropagation()}
-				onKeyDown={(e) => e.stopPropagation()}
-			>
-				<DataTableCheckbox
-					aria-label="Select row"
-					checked={row.getIsSelected()}
-					disabled={!row.getCanSelect()}
-					onCheckedChange={(value) => row.toggleSelected(value === true)}
-				/>
-			</div>
-		),
-	},
 	{
 		id: "campaign",
 		enableHiding: false,
@@ -112,7 +78,11 @@ export const campaignColumns: ColumnDef<Campaign>[] = [
 		cell: ({ row }) => {
 			const campaign = row.original;
 			return (
-				<div className="flex min-w-0 items-center pr-2">
+				<div className="flex min-w-0 items-center gap-1.5 pr-2">
+					<Icon
+						name={getAudienceIcon(campaign.audienceType)}
+						className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+					/>
 					<span className="truncate font-medium text-sm text-text-sub-600">
 						{campaign.audienceTargetName || "All Contacts"}
 					</span>

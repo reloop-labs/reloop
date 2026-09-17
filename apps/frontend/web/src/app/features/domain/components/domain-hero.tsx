@@ -76,8 +76,8 @@ export function DomainHero() {
 					Authenticate Your Domain in 2 Minutes
 				</h1>
 				<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
-					Add sending domains and verify SPF, DKIM, and DMARC with automated
-					DNS validation, 2048-bit keys, and real-time deliverability checks.
+					Add sending domains and verify SPF, DKIM, and DMARC with automated DNS
+					validation, 2048-bit keys, and real-time deliverability checks.
 				</p>
 				<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
 					<FancyButton.Root

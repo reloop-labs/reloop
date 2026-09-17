@@ -96,7 +96,8 @@ export function createMacPaintScreen({
 		const hGutterX = contentX + pad;
 		const hGutterY = toolY + toolH;
 		const hGutterW = Math.max(0, contentW - pad * 2);
-		if (gap > 0 && hGutterW > 0) ctx.fillRect(hGutterX, hGutterY, hGutterW, gap);
+		if (gap > 0 && hGutterW > 0)
+			ctx.fillRect(hGutterX, hGutterY, hGutterW, gap);
 
 		// Toolbox
 		const drewToolbox = assets.drawSprite(

@@ -169,6 +169,16 @@ export namespace AdminModel {
 		total: t.Number(),
 	});
 
+	export const emailAttachment = t.Object({
+		id: t.String(),
+		filename: t.String(),
+		contentType: t.String(),
+		size: t.Number(),
+		storagePath: t.Optional(t.String()),
+		contentDisposition: t.Optional(t.Union([t.String(), t.Null()])),
+		contentId: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
 	export const organizationDetail = t.Object({
 		id: t.String(),
 		name: t.String(),
@@ -282,6 +292,7 @@ export namespace AdminModel {
 				status: t.String(),
 				createdAt: t.Date(),
 				sentAt: t.Union([t.Date(), t.Null()]),
+				attachments: t.Array(emailAttachment),
 			}),
 		),
 		supportConversations: t.Array(
@@ -390,6 +401,7 @@ export namespace AdminModel {
 		status: t.String(),
 		createdAt: t.Date(),
 		sentAt: t.Union([t.Date(), t.Null()]),
+		attachments: t.Array(emailAttachment),
 	});
 
 	export const emailEvent = t.Object({
@@ -430,12 +442,22 @@ export namespace AdminModel {
 		failedAt: t.Union([t.Date(), t.Null()]),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+		attachments: t.Array(emailAttachment),
 		events: t.Array(emailEvent),
 	});
 
 	export const emailsResponse = t.Object({
 		items: t.Array(emailItem),
 		total: t.Number(),
+	});
+
+	export const inboundAttachmentItem = t.Object({
+		id: t.String(),
+		filename: t.String(),
+		contentType: t.String(),
+		size: t.Number(),
+		contentDisposition: t.Union([t.String(), t.Null()]),
+		contentId: t.Union([t.String(), t.Null()]),
 	});
 
 	export const inboundEmailItem = t.Object({
@@ -453,15 +475,7 @@ export namespace AdminModel {
 		spamScore: t.Union([t.Number(), t.Null()]),
 		size: t.Number(),
 		createdAt: t.Date(),
-	});
-
-	export const inboundAttachmentItem = t.Object({
-		id: t.String(),
-		filename: t.String(),
-		contentType: t.String(),
-		size: t.Number(),
-		contentDisposition: t.Union([t.String(), t.Null()]),
-		contentId: t.Union([t.String(), t.Null()]),
+		attachments: t.Array(inboundAttachmentItem),
 	});
 
 	export const inboundEmailDetail = t.Object({
@@ -583,5 +597,118 @@ export namespace AdminModel {
 
 	export const createSupportMessageBody = t.Object({
 		body: t.String({ minLength: 1, maxLength: 4000 }),
+	});
+
+	export const sendingIpKind = t.Union([
+		t.Literal("shared"),
+		t.Literal("dedicated"),
+	]);
+
+	export const sendingIpStatus = t.Union([
+		t.Literal("active"),
+		t.Literal("disabled"),
+		t.Literal("retired"),
+	]);
+
+	export const ipWarmupStatus = t.Union([
+		t.Literal("pending"),
+		t.Literal("active"),
+		t.Literal("paused"),
+		t.Literal("completed"),
+		t.Literal("aborted"),
+	]);
+
+	export const ipWarmupOverflow = t.Union([
+		t.Literal("shared"),
+		t.Literal("defer"),
+	]);
+
+	export const mailboxProvider = t.Union([
+		t.Literal("gmail"),
+		t.Literal("microsoft"),
+		t.Literal("yahoo"),
+		t.Literal("apple"),
+		t.Literal("other"),
+	]);
+
+	export const warmupProviderView = t.Object({
+		provider: mailboxProvider,
+		dailyCap: t.Union([t.Number(), t.Null()]),
+		sentToday: t.Number(),
+	});
+
+	export const warmupView = t.Object({
+		id: t.String(),
+		status: ipWarmupStatus,
+		overflow: ipWarmupOverflow,
+		day: t.Number(),
+		dailyCap: t.Union([t.Number(), t.Null()]),
+		sentToday: t.Number(),
+		providers: t.Array(warmupProviderView),
+		startedAt: t.Union([t.Date(), t.Null()]),
+		completedAt: t.Union([t.Date(), t.Null()]),
+		pausedAt: t.Union([t.Date(), t.Null()]),
+	});
+
+	export const sendingIpAssignment = t.Object({
+		id: t.String(),
+		organizationId: t.String(),
+		organizationName: t.Union([t.String(), t.Null()]),
+		isPrimary: t.Boolean(),
+		assignedAt: t.Date(),
+		warmup: t.Union([warmupView, t.Null()]),
+	});
+
+	export const sendingIpItem = t.Object({
+		id: t.String(),
+		address: t.String(),
+		hostname: t.String(),
+		kind: sendingIpKind,
+		status: sendingIpStatus,
+		notes: t.Union([t.String(), t.Null()]),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
+		assignment: t.Union([sendingIpAssignment, t.Null()]),
+	});
+
+	export const sendingIpsResponse = t.Object({
+		items: t.Array(sendingIpItem),
+		total: t.Number(),
+	});
+
+	export const createSendingIpBody = t.Object({
+		address: t.String({ minLength: 1, maxLength: 45 }),
+		hostname: t.String({ minLength: 1, maxLength: 255 }),
+		kind: sendingIpKind,
+		notes: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
+	export const updateSendingIpBody = t.Object({
+		hostname: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+		status: t.Optional(sendingIpStatus),
+		notes: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
+	export const assignSendingIpBody = t.Object({
+		organizationId: t.String(),
+		isPrimary: t.Optional(t.Boolean()),
+		overflow: t.Optional(ipWarmupOverflow),
+		startWarmup: t.Optional(t.Boolean()),
+	});
+
+	export const warmupActionBody = t.Object({
+		action: t.Union([
+			t.Literal("pause"),
+			t.Literal("resume"),
+			t.Literal("complete"),
+			t.Literal("restart"),
+		]),
+	});
+
+	export const organizationSendingIpsResponse = t.Object({
+		organizationId: t.String(),
+		dedicatedIpCount: t.Number(),
+		assignedCount: t.Number(),
+		items: t.Array(sendingIpItem),
 	});
 }

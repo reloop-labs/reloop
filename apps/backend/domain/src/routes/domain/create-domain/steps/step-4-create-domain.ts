@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { domainConfig } from "@reloop/domain/domain.config";
+import { assertCustomDomainQuota } from "@reloop/domain/lib/domain-quota";
 
 import { useLogger } from "evlog/elysia";
 
@@ -32,24 +33,27 @@ export async function createDomainEntry_step4({
 	const domainId = `domain_${createId()}`;
 	log.info("Creating domain");
 
-	await db.insert(schema.domain).values({
-		id: domainId,
-		userId: userId,
-		organizationId,
-		domain: domain,
+	await db.transaction(async (tx) => {
+		await assertCustomDomainQuota(organizationId, tx);
+		await tx.insert(schema.domain).values({
+			id: domainId,
+			userId: userId,
+			organizationId,
+			domain: domain,
 
-		status: "pending",
-		userVerifiedDomain: false,
-		systemVerified: false,
-		customReturnPath,
-		trackingSubdomain,
-		isClickTrackingEnabled: clickTracking,
-		isOpenTrackingEnabled: openTracking,
-		tls,
-		isSendingEmailEnabled,
-		isReceivingEmailEnabled,
-		createdAt: new Date(),
-		updatedAt: new Date(),
+			status: "pending",
+			userVerifiedDomain: false,
+			systemVerified: false,
+			customReturnPath,
+			trackingSubdomain,
+			isClickTrackingEnabled: clickTracking,
+			isOpenTrackingEnabled: openTracking,
+			tls,
+			isSendingEmailEnabled,
+			isReceivingEmailEnabled,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
 	});
 
 	return { domainId };

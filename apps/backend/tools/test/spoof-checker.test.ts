@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
-	type SpoofCheckResult,
 	evaluateSpoofability,
+	type SpoofCheckResult,
 } from "@be/tools/routes/tools/spoof-checker/spoof-checker.service";
 
 describe("Spoof Checker Service (evaluateSpoofability pure logic)", () => {
@@ -46,7 +46,9 @@ describe("Spoof Checker Service (evaluateSpoofability pure logic)", () => {
 		expect(res.verdict).toBe("spoofable");
 		expect(res.spoofable).toBe(true);
 		expect(res.inboxOutcome).toBe("delivered");
-		expect(res.headline).toContain("Yes — anyone can send as you@newstartup.io");
+		expect(res.headline).toContain(
+			"Yes — anyone can send as you@newstartup.io",
+		);
 		expect(res.summary).toContain("No DMARC record is published");
 	});
 
@@ -108,7 +110,9 @@ describe("Spoof Checker Service (evaluateSpoofability pure logic)", () => {
 		expect(res.verdict).toBe("protected");
 		expect(res.spoofable).toBe(false);
 		expect(res.inboxOutcome).toBe("rejected");
-		expect(res.headline).toContain("No — receivers are told to reject fakes as you@stripe.com");
+		expect(res.headline).toContain(
+			"No — receivers are told to reject fakes as you@stripe.com",
+		);
 	});
 
 	it("Case 5: p=reject but pct=50 -> partially_protected (Sometimes)", () => {

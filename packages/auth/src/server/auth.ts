@@ -15,9 +15,14 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, inArray } from "drizzle-orm";
 import { log } from "evlog";
 import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
+import {
+	canCreateAnotherOrganization,
+	createOrganizationQuotaMessage,
+	memberRoleIncludesOwner,
+} from "../organization-create-quota";
 import {
 	ORGANIZATION_NAME_MAX_LENGTH,
 	organizationNameMaxLengthMessage,
@@ -39,6 +44,37 @@ import {
 import { authServerConfig } from "./config";
 import { redis } from "./redis";
 import { sessionCacheRedis } from "./session-cache-redis";
+
+async function assertCanCreateAnotherOrganization(userId: string) {
+	const memberships = await db.query.member.findMany({
+		where: eq(schema.member.userId, userId),
+		columns: { organizationId: true, role: true },
+	});
+	const ownedOrgIds = memberships
+		.filter((row) => memberRoleIncludesOwner(row.role))
+		.map((row) => row.organizationId);
+	if (ownedOrgIds.length === 0) return;
+
+	const plans = await db
+		.select({
+			organizationId: schema.organizationPlan.organizationId,
+			planId: schema.organizationPlan.planId,
+		})
+		.from(schema.organizationPlan)
+		.where(inArray(schema.organizationPlan.organizationId, ownedOrgIds));
+
+	const planByOrg = new Map(
+		plans.map((row) => [row.organizationId, row.planId]),
+	);
+	const ownedPlanIds = ownedOrgIds.map(
+		(organizationId) => planByOrg.get(organizationId) ?? "free",
+	);
+	if (!canCreateAnotherOrganization(ownedPlanIds).ok) {
+		throw new APIError("FORBIDDEN", {
+			message: createOrganizationQuotaMessage(),
+		});
+	}
+}
 
 function assertOrganizationNameLength(name: string | undefined) {
 	if (typeof name !== "string") return;
@@ -137,11 +173,11 @@ export const auth = betterAuth({
 				// callbacks). Emit welcome from the actual user-create hook so first-time
 				// accounts get WelcomeEmail regardless of which auth path created them.
 				after: async (user) => {
+					log.info({
+						...{ data: { id: user.id, email: user.email } },
+						message: "User registered:",
+					});
 					try {
-						log.info({
-							...{ data: { id: user.id, email: user.email } },
-							message: "User registered:",
-						});
 						await bus.publish(
 							BusEvent.USER_CREATED,
 							{
@@ -152,8 +188,12 @@ export const auth = betterAuth({
 							{ msgId: `user_created:${user.email}` },
 						);
 					} catch (error) {
+						const message =
+							error instanceof Error ? error.message : String(error);
+						// Tests (and a down NATS) construct `auth` without bus.connect().
+						if (message.includes("Bus not connected")) return;
 						log.error({
-							...{ data: error },
+							...{ data: { message } },
 							message: "Failed to publish USER_CREATED",
 						});
 					}
@@ -265,6 +305,7 @@ export const auth = betterAuth({
 			}
 		}),
 	},
+	baseURL: authServerConfig.BASE_URL,
 	basePath: "/api/auth/v1",
 	telemetry: { enabled: false },
 	emailAndPassword: {
@@ -272,14 +313,24 @@ export const auth = betterAuth({
 		autoSignIn: true,
 	},
 	socialProviders: {
-		google: {
-			clientId: authServerConfig.GOOGLE_CLIENT_ID as string,
-			clientSecret: authServerConfig.GOOGLE_CLIENT_SECRET as string,
-		},
-		github: {
-			clientId: authServerConfig.GITHUB_CLIENT_ID as string,
-			clientSecret: authServerConfig.GITHUB_CLIENT_SECRET as string,
-		},
+		...(authServerConfig.GOOGLE_CLIENT_ID &&
+		authServerConfig.GOOGLE_CLIENT_SECRET
+			? {
+					google: {
+						clientId: authServerConfig.GOOGLE_CLIENT_ID,
+						clientSecret: authServerConfig.GOOGLE_CLIENT_SECRET,
+					},
+				}
+			: {}),
+		...(authServerConfig.GITHUB_CLIENT_ID &&
+		authServerConfig.GITHUB_CLIENT_SECRET
+			? {
+					github: {
+						clientId: authServerConfig.GITHUB_CLIENT_ID,
+						clientSecret: authServerConfig.GITHUB_CLIENT_SECRET,
+					},
+				}
+			: {}),
 	},
 	secret: authServerConfig.BETTER_AUTH_SECRET,
 	session: {
@@ -438,8 +489,9 @@ export const auth = betterAuth({
 			// email+org before inserting a new one.
 			cancelPendingInvitationsOnReInvite: true,
 			organizationHooks: {
-				beforeCreateOrganization: async ({ organization: org }) => {
+				beforeCreateOrganization: async ({ organization: org, user }) => {
 					assertOrganizationNameLength(org.name);
+					await assertCanCreateAnotherOrganization(user.id);
 				},
 				beforeUpdateOrganization: async ({ organization: org }) => {
 					assertOrganizationNameLength(org.name);

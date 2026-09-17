@@ -171,8 +171,7 @@ export function verifyPolarWebhook(args: {
 	const polarHmacSecret = Buffer.from(secret, "utf-8").toString("base64");
 	const matchedAsIs = polarSignatureMatches(args.body, headers, secret);
 	const matchedPolarHmac =
-		!matchedAsIs &&
-		polarSignatureMatches(args.body, headers, polarHmacSecret);
+		!matchedAsIs && polarSignatureMatches(args.body, headers, polarHmacSecret);
 	const verified = matchedAsIs || matchedPolarHmac;
 
 	log.info({

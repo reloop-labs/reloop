@@ -84,10 +84,7 @@ export function scoreContactEngagement(inputs: EngagementInputs): {
 
 	const raw =
 		100 *
-		(0.2 * deliveryRate +
-			0.35 * openRate +
-			0.25 * ctor +
-			0.2 * ctrScaled);
+		(0.2 * deliveryRate + 0.35 * openRate + 0.25 * ctor + 0.2 * ctrScaled);
 
 	const penalty =
 		40 * (bounced / safeTotal) +

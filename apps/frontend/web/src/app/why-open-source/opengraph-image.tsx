@@ -415,8 +415,7 @@ export default async function OpenGraphImage() {
 							textWrap: "balance",
 						}}
 					>
-						Free to use. Never free to build. That&apos;s why we built
-						Reloop.
+						Free to use. Never free to build. That&apos;s why we built Reloop.
 					</p>
 
 					<div

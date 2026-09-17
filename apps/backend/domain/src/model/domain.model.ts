@@ -347,4 +347,51 @@ export namespace DomainModel {
 	export const unauthorized = t.Object({
 		message: t.Literal("Unauthorized access"),
 	});
+
+	export const mailboxProvider = t.Union([
+		t.Literal("gmail"),
+		t.Literal("microsoft"),
+		t.Literal("yahoo"),
+		t.Literal("apple"),
+		t.Literal("other"),
+	]);
+
+	export const sendingIpWarmupProvider = t.Object({
+		provider: mailboxProvider,
+		dailyCap: t.Union([t.Number(), t.Null()]),
+		sentToday: t.Number(),
+	});
+
+	export const sendingIpWarmup = t.Object({
+		status: t.Union([
+			t.Literal("pending"),
+			t.Literal("active"),
+			t.Literal("paused"),
+			t.Literal("completed"),
+			t.Literal("aborted"),
+		]),
+		overflow: t.Union([t.Literal("shared"), t.Literal("defer")]),
+		day: t.Number(),
+		dailyCap: t.Union([t.Number(), t.Null()]),
+		sentToday: t.Number(),
+		providers: t.Array(sendingIpWarmupProvider),
+		startedAt: t.Union([t.Date(), t.Null()]),
+		completedAt: t.Union([t.Date(), t.Null()]),
+		pausedAt: t.Union([t.Date(), t.Null()]),
+	});
+
+	export const organizationSendingIp = t.Object({
+		id: t.String(),
+		address: t.String(),
+		hostname: t.String(),
+		isPrimary: t.Boolean(),
+		assignedAt: t.Date(),
+		warmup: t.Union([sendingIpWarmup, t.Null()]),
+	});
+
+	export const organizationSendingIpsResponse = t.Object({
+		dedicatedIpCount: t.Number(),
+		assignedCount: t.Number(),
+		items: t.Array(organizationSendingIp),
+	});
 }

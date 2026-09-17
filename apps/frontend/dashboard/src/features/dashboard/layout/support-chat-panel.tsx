@@ -18,7 +18,6 @@ import {
 	X,
 } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { SupportChatMarkdown } from "./support-chat-markdown";
 import { useSupportSocket } from "#/features/dashboard/hooks/use-support-socket";
 import { clearSupportUnreadInCache } from "#/features/dashboard/hooks/use-support-unread";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -29,6 +28,7 @@ import type {
 } from "#/lib/support-types";
 import { useUIStore } from "#/store/use-ui-store";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { SupportChatMarkdown } from "./support-chat-markdown";
 
 type ConversationPayload = {
 	conversation: SupportConversation;

@@ -46,6 +46,8 @@ export function toRecipientResponse(
 		category?: string | null;
 		contactName?: string | null;
 		error?: string | null;
+		clickCount?: number | null;
+		uniqueClickCount?: number | null;
 	},
 ) {
 	return {
@@ -60,6 +62,8 @@ export function toRecipientResponse(
 		contactName: extra?.contactName ?? undefined,
 		openedAt: iso(row.openedAt),
 		clickedAt: iso(row.clickedAt),
+		clickCount: extra?.clickCount ?? undefined,
+		uniqueClickCount: extra?.uniqueClickCount ?? undefined,
 		updatedAt: iso(row.updatedAt),
 	};
 }

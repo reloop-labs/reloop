@@ -1,9 +1,9 @@
 import net from "node:net";
 import {
 	type AuthSpfResult,
-	type DomainAuthReport,
 	checkDomainAuth,
 	cleanDomainInput,
+	type DomainAuthReport,
 } from "@be/tools/routes/tools/auth-checker/auth-checker.service";
 
 export interface SpoofReason {
@@ -122,7 +122,9 @@ export function evaluateSpoofability(
 		reasons.push({
 			id: isMultipleDmarc ? "dmarc-multiple" : "dmarc-missing",
 			severity: "critical",
-			title: isMultipleDmarc ? "Multiple DMARC records (Invalid)" : "Missing DMARC Record",
+			title: isMultipleDmarc
+				? "Multiple DMARC records (Invalid)"
+				: "Missing DMARC Record",
 			detail: isMultipleDmarc
 				? "RFC 7489 states that domains with more than one DMARC record must be treated as having no valid policy."
 				: "Without a DMARC policy, email receivers cannot enforce SPF or DKIM failures and will deliver unauthorized messages.",
@@ -171,7 +173,7 @@ export function evaluateSpoofability(
 		verdict = "partially_protected";
 		spoofable = false;
 		inboxOutcome = "spam";
-		headline = `Sometimes — reject is set but SPF is missing`;
+		headline = "Sometimes — reject is set but SPF is missing";
 		summary =
 			"Your DMARC policy is set to 'p=reject', but no SPF record was found. While spoofed mail with no DKIM signature is blocked, legitimate emails without DKIM will also be dropped.";
 		reasons.push({
@@ -204,7 +206,11 @@ export function evaluateSpoofability(
 	}
 
 	// Subdomain Hole Check (sp=none when root is reject/quarantine)
-	if (dmarc.published && dmarc.subdomainPolicy === "none" && dmarc.policy === "reject") {
+	if (
+		dmarc.published &&
+		dmarc.subdomainPolicy === "none" &&
+		dmarc.policy === "reject"
+	) {
 		subdomainNote = `Your root domain is locked, but your subdomains have 'sp=none' and are still spoofable (e.g. ceo@mail.${domain}).`;
 		reasons.push({
 			id: "subdomain-hole",
@@ -259,7 +265,9 @@ export function evaluateSpoofability(
 			id: "dkim-found",
 			severity: "info",
 			title: `DKIM Public Key Found (Selector: '${dkim.selector}')`,
-			detail: dkim.keyLength ? `${dkim.keyLength}-bit RSA key` : "Published in DNS",
+			detail: dkim.keyLength
+				? `${dkim.keyLength}-bit RSA key`
+				: "Published in DNS",
 		});
 	} else {
 		reasons.push({

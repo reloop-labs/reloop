@@ -8,6 +8,8 @@ export const getStatusLabel = (status: AudienceStatus | string): string => {
 			return "Unsubscribed";
 		case "blocked":
 			return "Blocked";
+		case "suppressed":
+			return "Suppressed";
 		default:
 			return status;
 	}
@@ -21,6 +23,7 @@ export const getStatusColorClass = (
 			return "text-success-base";
 		case "unsubscribed":
 		case "blocked":
+		case "suppressed":
 			return "text-error-base";
 		default:
 			return "text-text-sub-600";
@@ -31,6 +34,8 @@ export const getStatusIcon = (status: AudienceStatus | string): string => {
 	switch (status.toLowerCase()) {
 		case "subscribed":
 			return "check-circle";
+		case "suppressed":
+			return "slash";
 		case "unsubscribed":
 		case "blocked":
 			return "minus-circle";

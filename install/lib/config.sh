@@ -54,7 +54,8 @@ load_existing_values() {
 		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS \
 		AUTH_INTERNAL_BASE_URL DISABLE_SIGNUP DISABLE_ORG_CREATION \
 		RELOOP_API_KEY RELOOP_SENDER_DOMAIN \
-		SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD SMTP_SECURE; do
+		SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD SMTP_SECURE \
+		APP_NAME; do
 		local value
 		value="$(env_get "$key" "$ENV_FILE" || true)"
 		if [ -n "$value" ]; then
@@ -203,6 +204,7 @@ collect_configuration() {
 	SMTP_USER="${PRESERVED_SMTP_USER:-}"
 	SMTP_PASSWORD="${PRESERVED_SMTP_PASSWORD:-}"
 	SMTP_SECURE="${PRESERVED_SMTP_SECURE:-false}"
+	APP_NAME="${PRESERVED_APP_NAME:-Reloop}"
 }
 
 write_env_file() {
@@ -229,6 +231,13 @@ RELOOP_TRACKING_SITE_ADDRESS=$RELOOP_TRACKING_SITE_ADDRESS
 RELOOP_ACME_EMAIL=$RELOOP_ADMIN_EMAIL
 
 NODE_ENV=production
+
+# Your company name for system email: the sender name, the subjects and the
+# message bodies. Anything other than Reloop is shown as
+# "Self-hosted Reloop × APP_NAME". The logo is served from BASE_URL, so
+# replace that asset too if you rebrand.
+APP_NAME=$APP_NAME
+
 BASE_URL=$RELOOP_SCHEME://$RELOOP_DOMAIN
 
 # Origin the services use to validate sessions with each other. Empty means

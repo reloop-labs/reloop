@@ -2,7 +2,7 @@ import dns from "node:dns/promises";
 import net from "node:net";
 import { domainToASCII } from "node:url";
 import { withDeadline } from "@be/tools/utils/deadline";
-import { detectDnsProvider, type DnsProviderInfo } from "./dns-providers";
+import { type DnsProviderInfo, detectDnsProvider } from "./dns-providers";
 
 export type DnsRecordType =
 	| "ANY"
@@ -82,7 +82,9 @@ export function parseQueryInput(rawInput: string): {
 
 		if (prefix === "DMARC") {
 			requestedType = "TXT";
-			input = remainder.startsWith("_dmarc.") ? remainder : `_dmarc.${remainder}`;
+			input = remainder.startsWith("_dmarc.")
+				? remainder
+				: `_dmarc.${remainder}`;
 		} else if (prefix === "SPF") {
 			requestedType = "TXT";
 			input = remainder;
@@ -119,7 +121,12 @@ export function parseQueryInput(rawInput: string): {
 
 function isNxdomain(error: unknown): boolean {
 	const code = (error as { code?: string })?.code;
-	return code === "ENOTFOUND" || code === "ENODATA" || code === "ENOTIMP" || code === "ESERVFAIL";
+	return (
+		code === "ENOTFOUND" ||
+		code === "ENODATA" ||
+		code === "ENOTIMP" ||
+		code === "ESERVFAIL"
+	);
 }
 
 export async function performDnsLookup(
@@ -129,7 +136,10 @@ export async function performDnsLookup(
 ): Promise<DnsLookupResult> {
 	const parsed = parseQueryInput(rawTarget);
 	const target = parsed.target;
-	const recordType = typeOverride && typeOverride !== "ANY" ? typeOverride : parsed.requestedType;
+	const recordType =
+		typeOverride && typeOverride !== "ANY"
+			? typeOverride
+			: parsed.requestedType;
 
 	const startTime = Date.now();
 	const records: FormattedDnsRecord[] = [];
@@ -172,7 +182,8 @@ export async function performDnsLookup(
 					category: "dns",
 					status: "fail",
 					message: "PTR lookup failed or no reverse hostname found",
-					details: error instanceof Error ? error.message : "Reverse lookup error",
+					details:
+						error instanceof Error ? error.message : "Reverse lookup error",
 				});
 			} else {
 				diagnostics.push({
@@ -440,7 +451,9 @@ export async function performDnsLookup(
 		// DMARC TXT Check (at _dmarc.<target>)
 		(async () => {
 			try {
-				const dmarcTarget = target.startsWith("_dmarc.") ? target : `_dmarc.${target}`;
+				const dmarcTarget = target.startsWith("_dmarc.")
+					? target
+					: `_dmarc.${target}`;
 				const dmarcTxt = await withDeadline(
 					customResolver.resolveTxt(dmarcTarget),
 					DEFAULT_TIMEOUT_MS,
@@ -528,7 +541,8 @@ export async function performDnsLookup(
 
 	// 4. SPF Check
 	if (spfRecordString) {
-		const isPermissive = spfRecordString.includes("+all") || spfRecordString.includes("?all");
+		const isPermissive =
+			spfRecordString.includes("+all") || spfRecordString.includes("?all");
 		diagnostics.push({
 			id: "spf-record",
 			name: "SPF Record",
@@ -545,13 +559,15 @@ export async function performDnsLookup(
 			name: "SPF Record",
 			category: "email_auth",
 			status: "warn",
-			message: "Missing SPF record. Senders might suffer spoofing or delivery issues.",
+			message:
+				"Missing SPF record. Senders might suffer spoofing or delivery issues.",
 		});
 	}
 
 	// 5. DMARC Check
 	if (dmarcPolicyString) {
-		const isStrict = dmarcPolicyString === "reject" || dmarcPolicyString === "quarantine";
+		const isStrict =
+			dmarcPolicyString === "reject" || dmarcPolicyString === "quarantine";
 		diagnostics.push({
 			id: "dmarc-policy",
 			name: "DMARC Protection",

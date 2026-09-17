@@ -111,6 +111,12 @@ export async function updateContactController({
 				}
 				if (contactStatus !== undefined) {
 					updateData.status = contactStatus;
+					// Manual resubscribe clears stale auto-suppression so the
+					// contact is not treated as suppressed anymore.
+					if (contactStatus === "subscribed") {
+						updateData.suppressionReason = null;
+						updateData.suppressedAt = null;
+					}
 				}
 
 				const [updatedContact] = await tx

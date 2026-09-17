@@ -5,9 +5,14 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { mainNavigation } from "../navigation";
+import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import {
+	mainNavigation,
+	SETTINGS_ADMIN_HOME,
+	SETTINGS_MEMBER_HOME,
+} from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
-import { SidebarNavButton, SidebarNavLink } from "./sidebar-nav-link";
+import { SidebarNavLink } from "./sidebar-nav-link";
 import { useSidebarHoverBox } from "./use-sidebar-hover-box";
 
 export function SidebarItems({
@@ -24,6 +29,8 @@ export function SidebarItems({
 	const mainNavRefs = useRef<HTMLElement[]>([]);
 	const subNavRefs = useRef<Record<string, HTMLAnchorElement[]>>({});
 	const pathname = usePathname();
+	const { isOrgAdmin } = useOrgPermissions();
+	const settingsHref = isOrgAdmin ? SETTINGS_ADMIN_HOME : SETTINGS_MEMBER_HOME;
 
 	// Router basepath is /dashboard — compare paths without it for active state.
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
@@ -68,8 +75,7 @@ export function SidebarItems({
 		if (item.items?.some((sub) => pathWithoutSlug.startsWith(sub.path))) {
 			return false;
 		}
-		// Settings href is role-aware (/settings vs /settings/profile) but should
-		// highlight for any settings route.
+		// Settings lives in its own sidebar; do not highlight it in main nav.
 		if (item.path === "/settings") {
 			return false;
 		}
@@ -160,90 +166,32 @@ export function SidebarItems({
 									{section}
 								</div>
 							))}
-						{path === "/settings" ? (
-							<SidebarNavButton
-								ref={(el) => {
-									if (el) mainNavRefs.current[index] = el;
-								}}
-								onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
-								onClick={() => onOpenSettings?.()}
-								className={cn(
-									"relative z-10 flex h-8 items-center rounded-lg transition-all",
-									isCollapsed
-										? "h-8 w-8 justify-center px-0"
-										: "w-full justify-start gap-2.5 px-2.5",
-								)}
-								title={
-									isCollapsed
-										? shortcut
-											? `${label} (${shortcut.label})`
-											: label
-										: undefined
-								}
-							>
-								<span
-									className={cn(
-										"flex min-w-0 items-center",
-										isCollapsed
-											? "justify-center"
-											: "flex-1 justify-between gap-2.5",
-									)}
-								>
-									<span
-										className={cn(
-											"flex min-w-0 items-center",
-											!isCollapsed && "gap-2.5",
-										)}
-									>
-										<SidebarNavIcon
-											name={iconName}
-											isSpecial={isSpecial}
-											isActive={activeMainIndex === index}
-										/>
-										{!isCollapsed && (
-											<span
-												className={cn(
-													"truncate font-medium text-[13px] transition-colors",
-													isSpecial
-														? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
-														: activeMainIndex === index
-															? "text-text-strong-950"
-															: "text-text-sub-600 group-hover:text-text-strong-950",
-												)}
-											>
-												{label}
-											</span>
-										)}
-									</span>
-									{!isCollapsed && shortcut && (
-										<ShortcutHint>{shortcut.label}</ShortcutHint>
-									)}
-								</span>
-							</SidebarNavButton>
-						) : (
-							<SidebarNavLink
-								href={path}
-								ref={(el) => {
-									if (el) mainNavRefs.current[index] = el;
-								}}
-								onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
-								className={cn(
-									"relative z-10 flex h-8 items-center rounded-lg transition-all",
-									isCollapsed
-										? "h-8 w-8 justify-center px-0"
-										: cn(
-												"w-full gap-2.5 px-2.5",
-												hasSubNav ? "justify-between" : "justify-start",
-											),
-								)}
-								title={
-									isCollapsed
-										? shortcut
-											? `${label} (${shortcut.label})`
-											: label
-										: undefined
-								}
-							>
+						<SidebarNavLink
+							href={path === "/settings" ? settingsHref : path}
+							ref={(el) => {
+								if (el) mainNavRefs.current[index] = el;
+							}}
+							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
+							onClick={
+								path === "/settings" ? () => onOpenSettings?.() : undefined
+							}
+							className={cn(
+								"relative z-10 flex h-8 items-center rounded-lg transition-all",
+								isCollapsed
+									? "h-8 w-8 justify-center px-0"
+									: cn(
+											"w-full gap-2.5 px-2.5",
+											hasSubNav ? "justify-between" : "justify-start",
+										),
+							)}
+							title={
+								isCollapsed
+									? shortcut
+										? `${label} (${shortcut.label})`
+										: label
+									: undefined
+							}
+						>
 								<span
 									className={cn(
 										"flex min-w-0 items-center",
@@ -321,7 +269,6 @@ export function SidebarItems({
 									</button>
 								)}
 							</SidebarNavLink>
-						)}
 
 						{hasSubNav && !isCollapsed && (
 							<AnimatePresence initial={false}>

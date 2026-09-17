@@ -28,6 +28,7 @@ export const resendEmailRoute = new Elysia()
 					headers: request.headers,
 					activeOrganizationId: organizationId,
 					userId,
+					authType,
 					log,
 				});
 				for (const [key, value] of Object.entries(rateLimitHeaders)) {

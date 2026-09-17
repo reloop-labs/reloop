@@ -1,8 +1,13 @@
 import { create } from "zustand";
-import type { AudienceTargetType, Campaign } from "../campaign-types";
+import type {
+	AudienceTargetType,
+	Campaign,
+	CampaignStatus,
+} from "../campaign-types";
 
 export interface CampaignEditorState {
 	campaignId: string;
+	status: CampaignStatus;
 	name: string;
 	subject: string;
 	previewText: string;
@@ -20,6 +25,12 @@ export interface CampaignEditorState {
 	previewDevice: "desktop" | "mobile";
 	viewMode: "visual" | "code" | "preview";
 	isDetailsOpen: boolean;
+
+	// Validation flash counters — incremented to underline a field red
+	// (e.g. when Test email is clicked with missing details).
+	// Fields clear their own counter on edit.
+	fromErrorFlash: number;
+	subjectErrorFlash: number;
 
 	// Actions
 	setCampaignData: (campaign: Campaign) => void;
@@ -41,10 +52,13 @@ export interface CampaignEditorState {
 	setViewMode: (mode: "visual" | "code" | "preview") => void;
 	setIsDetailsOpen: (open: boolean) => void;
 	toggleDetailsOpen: () => void;
+	flashFromError: () => void;
+	flashSubjectError: () => void;
 }
 
 export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 	campaignId: "",
+	status: "draft",
 	name: "",
 	subject: "",
 	previewText: "",
@@ -61,10 +75,13 @@ export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 	previewDevice: "desktop",
 	viewMode: "visual",
 	isDetailsOpen: true,
+	fromErrorFlash: 0,
+	subjectErrorFlash: 0,
 
 	setCampaignData: (campaign: Campaign) =>
 		set({
 			campaignId: campaign.id,
+			status: campaign.status,
 			name: campaign.name,
 			subject: campaign.subject || "",
 			previewText: campaign.previewText || "",
@@ -78,11 +95,13 @@ export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 		}),
 
 	setName: (name) => set({ name, hasUnsavedChanges: true }),
-	setSubject: (subject) => set({ subject, hasUnsavedChanges: true }),
+	setSubject: (subject) =>
+		set({ subject, hasUnsavedChanges: true, subjectErrorFlash: 0 }),
 	setPreviewText: (previewText) =>
 		set({ previewText, hasUnsavedChanges: true }),
 	setFromName: (fromName) => set({ fromName, hasUnsavedChanges: true }),
-	setFromEmail: (fromEmail) => set({ fromEmail, hasUnsavedChanges: true }),
+	setFromEmail: (fromEmail) =>
+		set({ fromEmail, hasUnsavedChanges: true, fromErrorFlash: 0 }),
 	setReplyTo: (replyTo) => set({ replyTo, hasUnsavedChanges: true }),
 	setAudience: (type, targetId = "", targetName = "All Contacts") =>
 		set({
@@ -100,4 +119,8 @@ export const useCampaignEditorStore = create<CampaignEditorState>((set) => ({
 	setIsDetailsOpen: (isDetailsOpen) => set({ isDetailsOpen }),
 	toggleDetailsOpen: () =>
 		set((state) => ({ isDetailsOpen: !state.isDetailsOpen })),
+	flashFromError: () =>
+		set((state) => ({ fromErrorFlash: state.fromErrorFlash + 1 })),
+	flashSubjectError: () =>
+		set((state) => ({ subjectErrorFlash: state.subjectErrorFlash + 1 })),
 }));

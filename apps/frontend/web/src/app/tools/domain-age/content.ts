@@ -1,5 +1,6 @@
 export const toolPath = "/tools/domain-age";
-export const toolTitle = "Domain Age & Email Warmup Checker — Registration Date & Risk";
+export const toolTitle =
+	"Domain Age & Email Warmup Checker — Registration Date & Risk";
 export const toolDescription =
 	"Check when any domain was registered via official RDAP records. Discover whether domain age or cold-sending filters will cause Gmail and Outlook to route your emails to spam.";
 export const metaDescription =
@@ -66,22 +67,26 @@ export const faqGroups: FaqGroup[] = [
 		title: "Domain Age & Email Deliverability",
 		items: [
 			{
-				question: "Why do mailbox providers like Gmail treat new domains as spam?",
+				question:
+					"Why do mailbox providers like Gmail treat new domains as spam?",
 				answer:
 					"Spammers frequently register brand-new domains, blast hundreds of thousands of unsolicited emails over 48 hours, and abandon them. To protect recipients, mailbox algorithms (and blocklists like Spamhaus NRD) automatically treat domains registered within the last 14 to 30 days as high-risk cold senders.",
 			},
 			{
-				question: "Does perfect SPF, DKIM, and DMARC override a brand-new domain?",
+				question:
+					"Does perfect SPF, DKIM, and DMARC override a brand-new domain?",
 				answer:
 					"No. Authentication proves that the sender authorized the email, but it does not give the domain a positive sending reputation history. A 3-day-old domain with valid SPF and DMARC will still face severe inbox filtering if it suddenly sends high-volume marketing emails.",
 			},
 			{
-				question: "How long should I wait before sending marketing or cold emails?",
+				question:
+					"How long should I wait before sending marketing or cold emails?",
 				answer:
 					"We recommend waiting at least 14 days after domain registration before beginning initial sending warmups. During the first 14 days, publish SPF, DKIM, and DMARC in DNS. Start warmups slowly between days 15 and 90, gradually scaling daily volume.",
 			},
 			{
-				question: "What happens if an expired domain was dropped and re-registered?",
+				question:
+					"What happens if an expired domain was dropped and re-registered?",
 				answer:
 					"When an old domain drops and is registered by a new owner, the registry resets the creation date. Mailbox providers treat the newly registered owner as a cold domain with no prior positive sending credit. Our RDAP check reflects the latest active registration date.",
 			},
@@ -91,17 +96,20 @@ export const faqGroups: FaqGroup[] = [
 		title: "RDAP, Privacy & Nameservers",
 		items: [
 			{
-				question: "What is RDAP and how is it different from traditional WHOIS?",
+				question:
+					"What is RDAP and how is it different from traditional WHOIS?",
 				answer:
 					"RDAP (Registration Data Access Protocol) is the modern, standardized JSON replacement for legacy port-43 WHOIS created by ICANN and the IETF. It provides authoritative, machine-readable registration events directly from accredited registries without web scraping.",
 			},
 			{
-				question: "Why does my country code TLD (ccTLD) show 'We can't see this domain's age'?",
+				question:
+					"Why does my country code TLD (ccTLD) show 'We can't see this domain's age'?",
 				answer:
 					"Some country-code TLDs never list themselves on rdap.org. Reloop looks up the TLD in IANA’s RDAP bootstrap, then a catalog of national registries (Identity Digital, DENIC, Nominet, AFNIC, Registro.br, and others), then a nic.{tld} guess. .sh, .io, .de, .uk, .fr, .br, and similar names are checked the same way. If a registry still hides the creation date, we report unknown_age rather than calling the domain unregistered.",
 			},
 			{
-				question: "I send mail from mail.example.com — why is the age for example.com?",
+				question:
+					"I send mail from mail.example.com — why is the age for example.com?",
 				answer:
 					"Only the registered domain has a creation date. Subdomains (mail.reloop.sh, www.acme.com) inherit that date. Sending volume from a subdomain does not make the name older in RDAP.",
 			},

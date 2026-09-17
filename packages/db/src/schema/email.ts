@@ -36,6 +36,17 @@ export const emailPriorityEnum = pgEnum("email_priority", [
 	"urgent",
 ]);
 
+export const emailSendSourceEnum = pgEnum("email_send_source", [
+	"transactional",
+	"campaign",
+	"automation",
+	"smtp",
+]);
+
+export type EmailSendSource = (typeof emailSendSourceEnum.enumValues)[number];
+
+export type EmailLogTag = { name: string; value: string };
+
 // Email event type enum
 export const emailEventTypeEnum = pgEnum("email_event_type", [
 	"sent",
@@ -94,6 +105,12 @@ export const emailLog = pgTable(
 			.default([]),
 		status: emailStatusEnum("status").notNull().default("pending"),
 		priority: emailPriorityEnum("priority").notNull().default("normal"),
+		/**
+		 * How this message entered Reloop: API/dashboard (transactional),
+		 * a campaign broadcast, an automation workflow, or SMTP inject.
+		 */
+		source: emailSendSourceEnum("source").notNull().default("transactional"),
+		tags: jsonb("tags").$type<EmailLogTag[]>().notNull().default([]),
 		errorMessage: text("error_message"),
 		provider: varchar("provider", { length: 100 }).notNull().default("postfix"),
 		providerMessageId: varchar("provider_message_id", { length: 500 }),

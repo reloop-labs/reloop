@@ -645,7 +645,11 @@ export function getGlobalStylesArray(editor: any): any[] {
 	return globalContentNode?.attrs?.data?.styles || [];
 }
 
-export function findStyleInputValue(styles: any[], componentId: string, prop: string) {
+export function findStyleInputValue(
+	styles: any[],
+	componentId: string,
+	prop: string,
+) {
 	const group = styles?.find((g) => g.id === componentId);
 	return group?.inputs?.find((input: any) => input.prop === prop)?.value;
 }

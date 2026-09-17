@@ -95,7 +95,7 @@ export const pricingPlans: PricingPlan[] = [
 		ctaHref: "/dashboard/signup",
 		features: [
 			"3,000 emails / month",
-			"200 emails / day",
+			"100 emails / day",
 			"1 agent inbox",
 			"1 webhook",
 			"1 custom domain",
@@ -105,7 +105,7 @@ export const pricingPlans: PricingPlan[] = [
 		],
 		comparison: {
 			monthlyEmails: "3,000",
-			dailyLimit: "200",
+			dailyLimit: "100",
 			overage: "—",
 			agentInbox: "1 inbox",
 			webhooks: "1 webhook",

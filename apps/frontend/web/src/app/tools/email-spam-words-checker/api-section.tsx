@@ -223,8 +223,8 @@ export function ApiSection() {
 				</h2>
 				<p className="mt-3 max-w-2xl text-[14.5px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
 					Call the public spam check endpoint from your email pipeline or CI/CD.
-					Analyze subject lines, trigger words, and deliverability metrics with a
-					single request.
+					Analyze subject lines, trigger words, and deliverability metrics with
+					a single request.
 				</p>
 			</div>
 
@@ -291,9 +291,7 @@ export function ApiSection() {
 					<div className="relative">
 						<div
 							className={`overflow-x-auto px-4 py-6 transition-all duration-300 sm:px-6 lg:px-8 ${
-								!isJsonExpanded
-									? "max-h-[290px] overflow-hidden"
-									: "max-h-none"
+								!isJsonExpanded ? "max-h-[290px] overflow-hidden" : "max-h-none"
 							}`}
 						>
 							<AnimatePresence mode="wait">
@@ -315,7 +313,7 @@ export function ApiSection() {
 								<button
 									type="button"
 									onClick={() => setIsJsonExpanded(true)}
-									className="pointer-events-auto group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-mono font-medium text-[11.5px] text-text-strong-950 backdrop-blur-md transition-all hover:border-stroke-soft-200/80 hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+									className="group pointer-events-auto flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium font-mono text-[11.5px] text-text-strong-950 backdrop-blur-md transition-all hover:border-stroke-soft-200/80 hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
 								>
 									<span>Show full response</span>
 									<Icon
@@ -329,12 +327,12 @@ export function ApiSection() {
 								<button
 									type="button"
 									onClick={() => setIsJsonExpanded(false)}
-									className="group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-mono font-medium text-[11.5px] text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.98] dark:border-white/15 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+									className="group flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium font-mono text-[11.5px] text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.98] dark:border-white/15 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
 								>
 									<span>Collapse response</span>
 									<Icon
 										name="chevron-up"
-										className="size-3.5 text-text-soft-400 transition-transform duration-200 group-hover:-translate-y-0.5 dark:text-white/50"
+										className="group-hover:-translate-y-0.5 size-3.5 text-text-soft-400 transition-transform duration-200 dark:text-white/50"
 									/>
 								</button>
 							</div>

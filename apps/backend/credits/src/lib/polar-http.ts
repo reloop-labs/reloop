@@ -170,7 +170,11 @@ export async function polarJson(
 	const { status, json } = await polarRequest(path, init);
 	if (status >= 400) {
 		const body =
-			typeof json === "string" ? json : json == null ? "" : JSON.stringify(json);
+			typeof json === "string"
+				? json
+				: json == null
+					? ""
+					: JSON.stringify(json);
 		throw new PolarHttpError(status, path, body);
 	}
 	return json;
@@ -184,7 +188,11 @@ export async function polarJsonOrNotFound(
 	if (status === 404) return null;
 	if (status >= 400) {
 		const body =
-			typeof json === "string" ? json : json == null ? "" : JSON.stringify(json);
+			typeof json === "string"
+				? json
+				: json == null
+					? ""
+					: JSON.stringify(json);
 		throw new PolarHttpError(status, path, body);
 	}
 	return json;

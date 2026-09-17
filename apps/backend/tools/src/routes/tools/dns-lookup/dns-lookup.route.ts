@@ -32,7 +32,8 @@ export const dnsLookupRoute = new Elysia()
 	.use(rateLimitPlugin)
 	.post(
 		"/dns-lookup",
-		async ({ body }) => runLookup(body.domain, body.recordType as DnsRecordType | undefined),
+		async ({ body }) =>
+			runLookup(body.domain, body.recordType as DnsRecordType | undefined),
 		{
 			body: ToolsModel.dnsLookupBody,
 			response: {
@@ -46,7 +47,8 @@ export const dnsLookupRoute = new Elysia()
 	)
 	.get(
 		"/dns-lookup",
-		async ({ query }) => runLookup(query.domain, query.recordType as DnsRecordType | undefined),
+		async ({ query }) =>
+			runLookup(query.domain, query.recordType as DnsRecordType | undefined),
 		{
 			query: ToolsModel.dnsLookupQuery,
 			response: {

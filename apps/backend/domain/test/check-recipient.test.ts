@@ -1,11 +1,11 @@
-import { describe, expect, test, mock } from "bun:test";
-import { checkRecipientController } from "../src/routes/kumomta/check-recipient/check-recipient.controllers";
+import { describe, expect, mock, test } from "bun:test";
 import { db } from "@reloop/db/client";
+import { checkRecipientController } from "../src/routes/kumomta/check-recipient/check-recipient.controllers";
 
 describe("checkRecipientController", () => {
 	test("returns allowed=true for exact active mailbox match", async () => {
 		const originalFindFirst = db.query.mailbox.findFirst;
-		// @ts-ignore
+		// @ts-expect-error
 		db.query.mailbox.findFirst = mock(async ({ where }: any) => {
 			return { id: "mbx_123" };
 		});
@@ -21,7 +21,7 @@ describe("checkRecipientController", () => {
 	test("returns allowed=true for plus-addressed alias when base mailbox exists", async () => {
 		const originalFindFirst = db.query.mailbox.findFirst;
 		let queryCount = 0;
-		// @ts-ignore
+		// @ts-expect-error
 		db.query.mailbox.findFirst = mock(async () => {
 			queryCount++;
 			// First lookup for "hello+tag@example.com" returns null
@@ -31,7 +31,9 @@ describe("checkRecipientController", () => {
 		});
 
 		try {
-			const result = await checkRecipientController("hello+newsletter@example.com");
+			const result = await checkRecipientController(
+				"hello+newsletter@example.com",
+			);
 			expect(result.allowed).toBe(true);
 			expect(queryCount).toBe(2);
 		} finally {
@@ -41,7 +43,7 @@ describe("checkRecipientController", () => {
 
 	test("returns allowed=false when neither exact nor base mailbox exists", async () => {
 		const originalFindFirst = db.query.mailbox.findFirst;
-		// @ts-ignore
+		// @ts-expect-error
 		db.query.mailbox.findFirst = mock(async () => {
 			return null;
 		});

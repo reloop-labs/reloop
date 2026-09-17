@@ -58,6 +58,7 @@ export async function listEmailsController({
 			toEmails: emailLog.toEmails,
 			subject: emailLog.subject,
 			status: emailLog.status,
+			attachments: emailLog.attachments,
 			createdAt: emailLog.createdAt,
 			sentAt: emailLog.sentAt,
 		})
@@ -68,7 +69,10 @@ export async function listEmailsController({
 		.offset(offset);
 
 	return {
-		items,
+		items: items.map((item) => ({
+			...item,
+			attachments: item.attachments ?? [],
+		})),
 		total: totalRow?.value ?? 0,
 	};
 }
@@ -109,6 +113,7 @@ export async function getEmailController(emailId: string) {
 		...email,
 		organizationName: email.organization?.name ?? null,
 		domainName: email.domain?.domain ?? null,
+		attachments: email.attachments ?? [],
 		events: (email.events || []).map((ev) => ({
 			id: ev.id,
 			type: ev.type,

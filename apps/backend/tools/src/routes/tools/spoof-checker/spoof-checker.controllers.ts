@@ -24,7 +24,8 @@ export async function spoofCheckerController({
 	} catch (error) {
 		set.status = 400;
 		return {
-			message: (error as Error).message || "Failed to query domain spoofing records.",
+			message:
+				(error as Error).message || "Failed to query domain spoofing records.",
 			why: "Domain could not be resolved or input is invalid.",
 			fix: "Check that the domain is spelled correctly without special characters.",
 			link: "https://reloop.sh/tools/spoof-checker",

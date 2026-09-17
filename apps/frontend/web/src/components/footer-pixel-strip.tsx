@@ -69,7 +69,13 @@ const envelope0: Sprite = {
 };
 
 const envelope1: Sprite = {
-	colors: { G: "#3d6b45", L: "#4e8658", D: "#2a4d32", W: "#ffffff", H: "#ff5070" },
+	colors: {
+		G: "#3d6b45",
+		L: "#4e8658",
+		D: "#2a4d32",
+		W: "#ffffff",
+		H: "#ff5070",
+	},
 	pixels: [
 		"....WWWW....",
 		"...WHHHHW...",
@@ -87,7 +93,13 @@ const envelope1: Sprite = {
 };
 
 const envelope2: Sprite = {
-	colors: { G: "#3d6b45", L: "#4e8658", D: "#2a4d32", W: "#ffffff", H: "#ff5070" },
+	colors: {
+		G: "#3d6b45",
+		L: "#4e8658",
+		D: "#2a4d32",
+		W: "#ffffff",
+		H: "#ff5070",
+	},
 	pixels: [
 		"...WH..HW...",
 		"...WHHHHW...",
@@ -172,30 +184,10 @@ const INBOX_COLORS = {
 };
 
 const INBOX_EYES: Record<MailbotEye, string[]> = {
-	center: [
-		"..SOOOOOOS..",
-		"..SOWLLWOS..",
-		"..SOPLLPOS..",
-		"..SOOOOOOS..",
-	],
-	left: [
-		"..SOOOOOOS..",
-		"..SWLLWOOS..",
-		"..SPLLPOOS..",
-		"..SOOOOOOS..",
-	],
-	right: [
-		"..SOOOOOOS..",
-		"..SOOWLLWS..",
-		"..SOOPLLPS..",
-		"..SOOOOOOS..",
-	],
-	blink: [
-		"..SOOOOOOS..",
-		"..SOOOOOOS..",
-		"..SODDDDOS..",
-		"..SOOOOOOS..",
-	],
+	center: ["..SOOOOOOS..", "..SOWLLWOS..", "..SOPLLPOS..", "..SOOOOOOS.."],
+	left: ["..SOOOOOOS..", "..SWLLWOOS..", "..SPLLPOOS..", "..SOOOOOOS.."],
+	right: ["..SOOOOOOS..", "..SOOWLLWS..", "..SOOPLLPS..", "..SOOOOOOS.."],
+	blink: ["..SOOOOOOS..", "..SOOOOOOS..", "..SODDDDOS..", "..SOOOOOOS.."],
 };
 
 function getInboxSprite(eye: MailbotEye): Sprite {
@@ -540,10 +532,7 @@ export function FooterPixelStrip({ className }: { className?: string } = {}) {
 				onMouseEnter={playMailbotOneShot}
 				className="cursor-pointer select-none"
 			>
-				<PixelSprite
-					sprite={getInboxSprite(mailbotEye)}
-					pixelSize={4}
-				/>
+				<PixelSprite sprite={getInboxSprite(mailbotEye)} pixelSize={4} />
 			</div>
 
 			{/* 3. Lightning Bolt */}
@@ -551,10 +540,7 @@ export function FooterPixelStrip({ className }: { className?: string } = {}) {
 				onMouseEnter={playBoltOneShot}
 				className="cursor-pointer select-none"
 			>
-				<PixelSprite
-					sprite={boltSprites[boltFrame] ?? bolt0}
-					pixelSize={4}
-				/>
+				<PixelSprite sprite={boltSprites[boltFrame] ?? bolt0} pixelSize={4} />
 			</div>
 
 			{/* 4. At Sign */}

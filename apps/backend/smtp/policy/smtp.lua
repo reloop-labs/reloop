@@ -5,8 +5,79 @@ utils.init(kumo)
 
 
 
--- Helper function to apply business logic to both SMTP and HTTP generated messages
-local function apply_reloop_logic(msg, api_key)
+local function bare_email(addr)
+  local s = tostring(addr or "")
+  s = s:gsub("^%s+", ""):gsub("%s+$", "")
+  local angled = s:match("<([^<>]+)>")
+  if angled then
+    s = angled
+  end
+  s = s:gsub("^%s+", ""):gsub("%s+$", "")
+  local email = s:match("([^%s<>]+@[^%s<>]+)")
+  if not email then
+    return ""
+  end
+  return string.lower(email)
+end
+
+local function envelope_email(recip)
+  if type(recip) == "table" then
+    local user = recip.user or recip.local_part
+    local recip_domain = recip.domain
+    if user and recip_domain and tostring(user) ~= "" and tostring(recip_domain) ~= "" then
+      return string.lower(tostring(user) .. "@" .. tostring(recip_domain))
+    end
+  end
+  return bare_email(recip)
+end
+
+local function add_unique(emails, seen, email)
+  if email == nil or email == "" or seen[email] then
+    return
+  end
+  seen[email] = true
+  table.insert(emails, email)
+end
+
+-- Charge quota for envelope RCPT TO, not the visible To header.
+local function collect_send_recipients(msg)
+  local seen = {}
+  local emails = {}
+
+  local ok_list, list = pcall(function()
+    return msg:recipient_list()
+  end)
+  if ok_list and type(list) == "table" then
+    for _, recip in ipairs(list) do
+      add_unique(emails, seen, envelope_email(recip))
+    end
+  end
+
+  if #emails == 0 then
+    local ok_one, one = pcall(function()
+      return msg:recipient()
+    end)
+    if ok_one and one then
+      add_unique(emails, seen, envelope_email(one))
+    end
+  end
+
+  if #emails == 0 then
+    for _, header_name in ipairs({ "To", "Cc", "Bcc" }) do
+      local header = msg:get_first_named_header_value(header_name)
+      if header and header ~= "" then
+        for part in string.gmatch(header, "[^,;]+") do
+          add_unique(emails, seen, bare_email(part))
+        end
+      end
+    end
+  end
+
+  return emails
+end
+
+-- source is 'smtp' (customer submission) or 'http' (mail-service inject).
+local function apply_reloop_logic(msg, api_key, source)
   local msg_id = msg:id()
 
   local header_api_key = msg:get_first_named_header_value('X-Api-Key')
@@ -25,10 +96,11 @@ local function apply_reloop_logic(msg, api_key)
     domain = string.match(from_email, "@([^>]+)>?") or ""
   end
 
-  local to_emails = {}
-  local to_header = msg:get_first_named_header_value('To')
-  if to_header then
-    table.insert(to_emails, tostring(to_header))
+  local to_emails = collect_send_recipients(msg)
+  if #to_emails == 0 then
+    print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: No envelope recipients")
+    kumo.reject(550, "5.7.1 No envelope recipients")
+    return
   end
 
   local message_id = msg:get_first_named_header_value('Message-ID') or ""
@@ -51,6 +123,18 @@ local function apply_reloop_logic(msg, api_key)
   local existing_log_id = msg:get_first_named_header_value('X-Email-Log-ID')
   local org_id = msg:get_first_named_header_value('X-Org-ID') or ""
   local is_internal = (api_key ~= "" and api_key == constants.internal_secret)
+  -- Mail HTTP inject already inserted email_log (API key or internal secret).
+  -- Customer SMTP must not skip quota by stamping a fake X-Email-Log-ID.
+  local trust_log_id = is_internal or source == 'http'
+
+  if not trust_log_id then
+    if existing_log_id and existing_log_id ~= "" then
+      print("[LOG-INCOMING] [" .. msg_id .. "] Ignoring customer X-Email-Log-ID")
+    end
+    existing_log_id = nil
+  end
+  -- Never leak Reloop log ids to mailbox providers.
+  msg:remove_all_named_headers('X-Email-Log-ID')
 
   if is_internal and (not existing_log_id or existing_log_id == "") then
     print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Internal secret requires X-Email-Log-ID (mail service inject only)")
@@ -74,7 +158,7 @@ local function apply_reloop_logic(msg, api_key)
     danger_accept_invalid_certs = true
   })
 
-  -- Check if message was already logged by internal backend HTTP inject
+  -- Mail HTTP inject already created email_log; SMTP still needs log-incoming.
   if not existing_log_id then
     local target_url = constants.kumomta_url .. "/v1/log-incoming"
     print("[LOG-INCOMING] [" .. msg_id .. "] calling webhook: " .. target_url)
@@ -138,9 +222,21 @@ local function apply_reloop_logic(msg, api_key)
         print("[LOG-INCOMING] [" .. msg_id .. "] ERROR: backend returned 200 but no ID found")
         utils.apply_tls_mode(msg, header_tls_mode)
       end
+    elseif code == 400 then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Invalid recipients")
+      kumo.reject(550, "5.7.1 Invalid recipients")
+      return
     elseif code == 401 then
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Invalid API key")
       kumo.reject(535, "5.7.8 Invalid API key")
+      return
+    elseif code == 402 then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Email quota exceeded")
+      kumo.reject(550, "5.7.1 Email quota exceeded")
+      return
+    elseif code == 403 then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Abuse policy")
+      kumo.reject(550, "5.7.1 Message rejected")
       return
     elseif code == 404 then
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Domain " .. domain .. " not found")
@@ -210,10 +306,21 @@ local function apply_reloop_logic(msg, api_key)
       local dkim_data = kumo.serde.json_parse(dkim_body)
       if dkim_data and dkim_data.privateKey and dkim_data.selector then
         local sign_ok, sign_err = pcall(function()
+          -- RFC 6376 5.4.1 plus List-Unsubscribe-Post (RFC 8058). Gmail will
+          -- not offer one-click unsubscribe unless those two list headers are
+          -- in the DKIM h= tag.
           local signer = kumo.dkim.rsa_sha256_signer {
             domain   = domain,
             selector = dkim_data.selector,
-            headers  = { 'From', 'To', 'Subject', 'Date', 'Message-ID' },
+            headers  = {
+              'From', 'Sender', 'Reply-To', 'Subject', 'Date', 'Message-ID',
+              'To', 'Cc', 'MIME-Version', 'Content-Type',
+              'Content-Transfer-Encoding', 'Resent-Date', 'Resent-From',
+              'Resent-To', 'Resent-Cc', 'In-Reply-To', 'References',
+              'List-Id', 'List-Help', 'List-Unsubscribe',
+              'List-Unsubscribe-Post', 'List-Subscribe', 'List-Post',
+              'List-Owner', 'List-Archive',
+            },
             key      = { key_data = dkim_data.privateKey },
           }
           msg:dkim_sign(signer)
@@ -272,12 +379,53 @@ local function apply_reloop_logic(msg, api_key)
   end
 end
 
--- AUTH
+local function validate_smtp_api_key(password)
+  if password == nil or password == "" then
+    return false, "empty"
+  end
+
+  local client = kumo.http.build_client({
+    danger_accept_invalid_certs = true
+  })
+  local target_url = constants.kumomta_url .. "/v1/smtp-auth"
+  local status, response = pcall(function()
+    local req = client:post(target_url)
+    return req
+      :header("x-api-key", password)
+      :header("User-Agent", "ReloopSmtp/1.0")
+      :send()
+  end)
+
+  if not status then
+    return nil, tostring(response)
+  end
+
+  local code = response:status_code()
+  if code == 200 then
+    return true
+  end
+  if code == 401 then
+    return false, "unauthorized"
+  end
+  return nil, "status " .. tostring(code)
+end
+
+-- AUTH: reject unknown passwords at connect time, not only at DATA.
 kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
-  -- Store API key; actual key + domain verification happens on message receipt
-  conn_meta:set_meta('api_key', password)
-  conn_meta:set_meta('authz_id', authc)
-  return true
+  local ok, err = validate_smtp_api_key(password)
+  if ok == true then
+    conn_meta:set_meta('api_key', password)
+    conn_meta:set_meta('authz_id', authc)
+    print("[SMTP-AUTH] accepted")
+    return true
+  end
+  if ok == false then
+    print("[SMTP-AUTH] rejected: " .. tostring(err))
+    return false
+  end
+  print("[SMTP-AUTH] temporary failure: " .. tostring(err))
+  kumo.reject(454, "4.7.0 Temporary authentication failure")
+  return false
 end)
 
 kumo.on('http_server_validate_auth_basic', function(user, password)
@@ -317,7 +465,7 @@ kumo.on('smtp_server_message_received', function(msg)
     return
   end
 
-  apply_reloop_logic(msg, api_key)
+  apply_reloop_logic(msg, api_key, 'smtp')
 end)
 
 kumo.on('http_message_generated', function(msg)
@@ -329,5 +477,5 @@ kumo.on('http_message_generated', function(msg)
     -- Identity is the Basic-auth password: org API key (rl_...) or internal secret
     api_key = http_auth
   end
-  apply_reloop_logic(msg, api_key)
+  apply_reloop_logic(msg, api_key, 'http')
 end)

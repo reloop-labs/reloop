@@ -457,35 +457,35 @@ export function EmailImageSelectionOverlay({
 			{/* Top handle */}
 			<div
 				title="Resize image top"
-				className="pointer-events-auto absolute -top-1 left-1/2 h-2 w-8 -translate-x-1/2 -translate-y-1/2 cursor-ns-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
+				className="-top-1 -translate-x-1/2 -translate-y-1/2 pointer-events-auto absolute left-1/2 h-2 w-8 cursor-ns-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
 				onPointerDown={(e) => handlePointerDown(e, "top")}
 			/>
 
 			{/* Bottom handle */}
 			<div
 				title="Resize image bottom"
-				className="pointer-events-auto absolute -bottom-1 left-1/2 h-2 w-8 -translate-x-1/2 translate-y-1/2 cursor-ns-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
+				className="-bottom-1 -translate-x-1/2 pointer-events-auto absolute left-1/2 h-2 w-8 translate-y-1/2 cursor-ns-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
 				onPointerDown={(e) => handlePointerDown(e, "bottom")}
 			/>
 
 			{/* Left handle */}
 			<div
 				title="Resize image left"
-				className="pointer-events-auto absolute top-1/2 -left-1 h-8 w-2 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
+				className="-left-1 -translate-x-1/2 -translate-y-1/2 pointer-events-auto absolute top-1/2 h-8 w-2 cursor-ew-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
 				onPointerDown={(e) => handlePointerDown(e, "left")}
 			/>
 
 			{/* Right handle */}
 			<div
 				title="Resize image right"
-				className="pointer-events-auto absolute top-1/2 -right-1 h-8 w-2 translate-x-1/2 -translate-y-1/2 cursor-ew-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
+				className="-right-1 -translate-y-1/2 pointer-events-auto absolute top-1/2 h-8 w-2 translate-x-1/2 cursor-ew-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
 				onPointerDown={(e) => handlePointerDown(e, "right")}
 			/>
 
 			{/* Floating Bottom Dark Pill Toolbar */}
 			<div
 				onMouseDown={(e) => e.preventDefault()}
-				className="fade-in zoom-in-95 pointer-events-auto absolute top-[calc(100%+12px)] left-1/2 z-40 flex -translate-x-1/2 animate-in items-center gap-1 rounded-full border border-white/15 bg-[#121417] px-2 py-1 text-white shadow-2xl duration-150"
+				className="fade-in zoom-in-95 -translate-x-1/2 pointer-events-auto absolute top-[calc(100%+12px)] left-1/2 z-40 flex animate-in items-center gap-1 rounded-full border border-white/15 bg-[#121417] px-2 py-1 text-white shadow-2xl duration-150"
 			>
 				{/* Hidden file input for system image picker */}
 				<input
@@ -545,7 +545,7 @@ export function EmailImageSelectionOverlay({
 			{isLinkOpen && (
 				<div
 					onMouseDown={(e) => e.stopPropagation()}
-					className="fade-in slide-in-from-top-1 pointer-events-auto absolute top-[calc(100%+52px)] left-1/2 z-50 flex -translate-x-1/2 animate-in items-center gap-1.5 rounded-xl border border-white/15 bg-[#121417] p-1.5 text-white shadow-2xl duration-150"
+					className="fade-in slide-in-from-top-1 -translate-x-1/2 pointer-events-auto absolute top-[calc(100%+52px)] left-1/2 z-50 flex animate-in items-center gap-1.5 rounded-xl border border-white/15 bg-[#121417] p-1.5 text-white shadow-2xl duration-150"
 					style={{ minWidth: "280px" }}
 				>
 					<input

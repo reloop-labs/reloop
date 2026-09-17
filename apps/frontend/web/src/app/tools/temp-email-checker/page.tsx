@@ -1,12 +1,12 @@
-import { JsonLd } from "@reloop/web/components/json-ld";
-import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { FaqSection } from "@reloop/web/components/faq-section";
+import { JsonLd } from "@reloop/web/components/json-ld";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
-import { HowItCompares } from "./components/how-it-compares";
 import { ApiIntegration } from "./components/api-integration";
+import { HowItCompares } from "./components/how-it-compares";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { SimilarTools } from "./components/similar-tools";
+import { TempEmailCta } from "./components/temp-email-cta";
 import { TempEmailHero } from "./components/temp-email-hero";
 import { WhoIsItFor } from "./components/who-is-it-for";
 import {
@@ -34,7 +34,7 @@ export default function TempEmailCheckerPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-			<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
+		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
 			<JsonLd
 				data={[
 					{
@@ -135,31 +135,8 @@ export default function TempEmailCheckerPage() {
 						flush
 					/>
 				</div>
-				<div aria-hidden className="h-24" />
-				<div className="w-full border-stroke-soft-100 border-y dark:border-white/10">
-					<BlogCta
-						headline={
-							<>
-								Email API
-								<br />
-								for Developers
-							</>
-						}
-						sub="Free plan: 3,000 emails a month. No credit card."
-						primaryLabel="Get started free"
-						primaryHref="/dashboard/signup"
-						primaryVariant="primary"
-						secondaryLabel="Schedule call"
-						secondaryHref="https://cal.com/pranavp/30"
-						secondaryExternal
-						accentColor="primary"
-						blast={{ light: "#006ffe", dark: "#52a8ff" }}
-						flush
-						align="center"
-						pill={false}
-						showTopRule={false}
-					/>
-				</div>
+				<div aria-hidden className="h-16 sm:h-24" />
+				<TempEmailCta />
 			</div>
 		</div>
 	);

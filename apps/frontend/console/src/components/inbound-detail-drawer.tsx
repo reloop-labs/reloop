@@ -3,6 +3,7 @@
 import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { adminGet } from "@fe/console/lib/admin-api";
 import {
+	formatBytes,
 	formatDateTime,
 	formatRecipients,
 	formatRelativeTime,
@@ -51,14 +52,6 @@ export type InboundDetailData = {
 	createdAt: string | Date;
 	attachments: InboundAttachment[];
 };
-
-function formatBytes(bytes: number): string {
-	if (bytes === 0) return "0 B";
-	const k = 1024;
-	const sizes = ["B", "KB", "MB", "GB"];
-	const i = Math.floor(Math.log(bytes) / Math.log(k));
-	return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`;
-}
 
 export function InboundDetailDrawer({
 	emailId,
@@ -286,7 +279,8 @@ export function InboundDetailDrawer({
 
 									{activeTab === "headers" ? (
 										<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-											{email.headers && Object.keys(email.headers).length > 0 ? (
+											{email.headers &&
+											Object.keys(email.headers).length > 0 ? (
 												<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 													{Object.entries(email.headers).map(([key, val]) => (
 														<div

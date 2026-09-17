@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import { toolsConfig } from "@be/tools/tools.config";
 import { BusEvent, bus } from "@reloop/bus";
 import { createLogger, log } from "evlog";
-import { toolsConfig } from "@be/tools/tools.config";
 import { processInboundTesterEmail } from "../routes/tools/deliverability-test/deliverability-test.controllers";
 
 const subscriberContext = new AsyncLocalStorage();

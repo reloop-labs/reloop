@@ -9,7 +9,7 @@ import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { type SpoofCheckResult, runSpoofCheck } from "./check-api";
+import { runSpoofCheck, type SpoofCheckResult } from "./check-api";
 
 const PRESETS = [
 	{ label: "stripe.com (Locked)", value: "stripe.com" },
@@ -150,7 +150,8 @@ https://reloop.sh/tools/spoof-checker`;
 					</Button.Root>
 				</form>
 				<p className="mt-2.5 font-mono text-[11px] text-text-sub-600 dark:text-white/40">
-					We do not send test emails. We only query public DNS records across global root resolvers.
+					We do not send test emails. We only query public DNS records across
+					global root resolvers.
 				</p>
 			</div>
 
@@ -176,7 +177,7 @@ https://reloop.sh/tools/spoof-checker`;
 					{/* Big Answer Verdict Card */}
 					<div
 						className={cn(
-							"rounded-2xl border p-6 shadow-xs sm:p-7 transition-colors",
+							"rounded-2xl border p-6 shadow-xs transition-colors sm:p-7",
 							result.verdict === "spoofable" &&
 								"border-rose-500/30 bg-rose-500/[0.04] dark:border-rose-500/40 dark:bg-rose-500/[0.07]",
 							result.verdict === "partially_protected" &&
@@ -207,7 +208,7 @@ https://reloop.sh/tools/spoof-checker`;
 									</div>
 								)}
 
-								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 sm:text-[26px] tracking-tight dark:text-white">
+								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
 									{result.headline}
 								</h2>
 								<p className="mt-2 max-w-2xl text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/70">
@@ -215,7 +216,7 @@ https://reloop.sh/tools/spoof-checker`;
 								</p>
 
 								{result.subdomainNote && (
-									<p className="mt-2 text-[13px] text-amber-600 dark:text-amber-400 font-medium">
+									<p className="mt-2 font-medium text-[13px] text-amber-600 dark:text-amber-400">
 										⚠️ {result.subdomainNote}
 									</p>
 								)}
@@ -242,7 +243,7 @@ https://reloop.sh/tools/spoof-checker`;
 
 					{/* 📧 Fake Inbox Mock (CEO Fraud Simulation) */}
 					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="mb-3 flex items-center justify-between border-b border-stroke-soft-200 pb-3 dark:border-white/10">
+						<div className="mb-3 flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
 							<span className="font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
 								Simulated Inbox Outcome (Gmail / Outlook)
 							</span>
@@ -270,7 +271,8 @@ https://reloop.sh/tools/spoof-checker`;
 										Urgent: please wire $40,000 to vendor account today
 									</p>
 									<p className="truncate text-[12px] text-text-sub-600 dark:text-white/45">
-										Hi team, please process this payment before end of day. Wire details attached...
+										Hi team, please process this payment before end of day. Wire
+										details attached...
 									</p>
 								</div>
 							</div>
@@ -278,19 +280,19 @@ https://reloop.sh/tools/spoof-checker`;
 							{/* Inbox Status Outcome Badge */}
 							<div className="shrink-0">
 								{result.inboxOutcome === "delivered" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-3 py-1 font-medium text-[12px] text-rose-600 border border-rose-500/20 dark:bg-rose-500/15 dark:text-rose-400">
+									<div className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/20 bg-rose-500/10 px-3 py-1 font-medium text-[12px] text-rose-600 dark:bg-rose-500/15 dark:text-rose-400">
 										<Icon name="alert-triangle" className="size-3.5 shrink-0" />
 										<span>Would be delivered to Primary Inbox</span>
 									</div>
 								)}
 								{result.inboxOutcome === "spam" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1 font-medium text-[12px] text-amber-600 border border-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400">
+									<div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 font-medium text-[12px] text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
 										<Icon name="alert-triangle" className="size-3.5 shrink-0" />
 										<span>Would be routed to Spam / Junk folder</span>
 									</div>
 								)}
 								{result.inboxOutcome === "rejected" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 font-medium text-[12px] text-emerald-600 border border-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-400">
+									<div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 font-medium text-[12px] text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
 										<Icon name="shield-check" className="size-3.5 shrink-0" />
 										<span>Would be blocked &amp; rejected at gateway</span>
 									</div>
@@ -313,11 +315,13 @@ https://reloop.sh/tools/spoof-checker`;
 									</span>
 								) : result.dmarc.policy === "quarantine" ? (
 									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-amber-600 dark:text-amber-400">
-										<Icon name="alert-triangle" className="size-3.5" /> p=quarantine
+										<Icon name="alert-triangle" className="size-3.5" />{" "}
+										p=quarantine
 									</span>
 								) : result.dmarc.policy === "none" ? (
 									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-rose-500">
-										<Icon name="minus-circle" className="size-3.5" /> p=none (monitor)
+										<Icon name="minus-circle" className="size-3.5" /> p=none
+										(monitor)
 									</span>
 								) : (
 									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-rose-500">
@@ -342,11 +346,13 @@ https://reloop.sh/tools/spoof-checker`;
 								</span>
 								{result.spf.published && result.spf.qualifier !== "+all" ? (
 									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-emerald-600 dark:text-emerald-400">
-										<Icon name="check" className="size-3.5" /> {result.spf.qualifier || "Valid"}
+										<Icon name="check" className="size-3.5" />{" "}
+										{result.spf.qualifier || "Valid"}
 									</span>
 								) : result.spf.qualifier === "+all" ? (
 									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-rose-500">
-										<Icon name="minus-circle" className="size-3.5" /> +all (open)
+										<Icon name="minus-circle" className="size-3.5" /> +all
+										(open)
 									</span>
 								) : (
 									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-amber-600 dark:text-amber-400">
@@ -369,7 +375,8 @@ https://reloop.sh/tools/spoof-checker`;
 								</span>
 								{result.dkim.published ? (
 									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-emerald-600 dark:text-emerald-400">
-										<Icon name="check" className="size-3.5" /> {result.dkim.selector}
+										<Icon name="check" className="size-3.5" />{" "}
+										{result.dkim.selector}
 									</span>
 								) : (
 									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-text-sub-600 dark:text-white/45">
@@ -387,7 +394,7 @@ https://reloop.sh/tools/spoof-checker`;
 
 					{/* 📋 Diagnostic Breakdown */}
 					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="border-b border-stroke-soft-200 px-4 py-3 sm:px-5 dark:border-white/10">
+						<div className="border-stroke-soft-200 border-b px-4 py-3 sm:px-5 dark:border-white/10">
 							<h3 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
 								Technical Verdict Breakdown ({result.reasons.length})
 							</h3>
@@ -402,16 +409,28 @@ https://reloop.sh/tools/spoof-checker`;
 									<div className="flex items-start gap-3">
 										<div className="mt-0.5">
 											{r.severity === "critical" && (
-												<Icon name="minus-circle" className="size-4 text-rose-500" />
+												<Icon
+													name="minus-circle"
+													className="size-4 text-rose-500"
+												/>
 											)}
 											{r.severity === "warning" && (
-												<Icon name="alert-triangle" className="size-4 text-amber-500" />
+												<Icon
+													name="alert-triangle"
+													className="size-4 text-amber-500"
+												/>
 											)}
 											{r.severity === "success" && (
-												<Icon name="shield-check" className="size-4 text-emerald-500" />
+												<Icon
+													name="shield-check"
+													className="size-4 text-emerald-500"
+												/>
 											)}
 											{r.severity === "info" && (
-												<Icon name="info-outline" className="size-4 text-blue-500" />
+												<Icon
+													name="info-outline"
+													className="size-4 text-blue-500"
+												/>
 											)}
 										</div>
 										<div>
@@ -431,7 +450,7 @@ https://reloop.sh/tools/spoof-checker`;
 					{/* 🚀 Next Steps & Reloop CTA */}
 					<div className="flex flex-col justify-between gap-4 rounded-2xl border border-blue-500/20 bg-blue-500/[0.04] p-5 sm:flex-row sm:items-center dark:border-blue-500/30 dark:bg-blue-500/[0.08]">
 						<div className="space-y-1">
-							<span className="font-mono text-[10.5px] text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold">
+							<span className="font-mono font-semibold text-[10.5px] text-blue-600 uppercase tracking-wider dark:text-blue-400">
 								Recommended Action
 							</span>
 							<h3 className="font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
@@ -442,7 +461,7 @@ https://reloop.sh/tools/spoof-checker`;
 							</p>
 						</div>
 
-						<div className="flex flex-wrap items-center gap-2 shrink-0">
+						<div className="flex shrink-0 flex-wrap items-center gap-2">
 							<Button.Root asChild variant="primary" mode="filled" size="small">
 								<a href={result.nextStep.href}>
 									<span>Take Action</span>
@@ -450,7 +469,9 @@ https://reloop.sh/tools/spoof-checker`;
 								</a>
 							</Button.Root>
 
-							<Link href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}>
+							<Link
+								href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}
+							>
 								<Button.Root variant="neutral" mode="stroke" size="small">
 									<Button.Icon as={Icon} name="lock" />
 									<span>Full Protocol Audit</span>
@@ -466,18 +487,28 @@ https://reloop.sh/tools/spoof-checker`;
 							onClick={() => setShowRawRecords((prev) => !prev)}
 							className="font-mono text-[12px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 						>
-							{showRawRecords ? "▲ Hide raw DNS records" : "▼ View raw DNS records for proof"}
+							{showRawRecords
+								? "▲ Hide raw DNS records"
+								: "▼ View raw DNS records for proof"}
 						</button>
 
 						{showRawRecords && (
 							<div className="mt-3 space-y-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 font-mono text-[11.5px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white">
 								<div>
-									<span className="text-text-sub-600 dark:text-white/40">DMARC (_dmarc.{result.domain}):</span>
-									<p className="mt-0.5 break-all">{result.dmarc.rawRecord || "No record found"}</p>
+									<span className="text-text-sub-600 dark:text-white/40">
+										DMARC (_dmarc.{result.domain}):
+									</span>
+									<p className="mt-0.5 break-all">
+										{result.dmarc.rawRecord || "No record found"}
+									</p>
 								</div>
-								<div className="pt-2 border-t border-stroke-soft-200 dark:border-white/10">
-									<span className="text-text-sub-600 dark:text-white/40">SPF ({result.domain}):</span>
-									<p className="mt-0.5 break-all">{result.spf.rawRecord || "No record found"}</p>
+								<div className="border-stroke-soft-200 border-t pt-2 dark:border-white/10">
+									<span className="text-text-sub-600 dark:text-white/40">
+										SPF ({result.domain}):
+									</span>
+									<p className="mt-0.5 break-all">
+										{result.spf.rawRecord || "No record found"}
+									</p>
 								</div>
 							</div>
 						)}

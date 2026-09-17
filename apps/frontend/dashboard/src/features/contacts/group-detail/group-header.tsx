@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import type { GroupDetail } from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { DeleteGroupModal } from "../components/groups/delete-group";
@@ -83,7 +84,10 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 
 	if (!group && !isLoading) {
 		return (
-			<div className="pt-10 pb-8">
+			<div>
+				<div className="flex items-center justify-between pt-10 pb-8">
+					<AnimatedBackButton fallbackHref="/contacts/groups" />
+				</div>
 				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-1.5">
@@ -109,19 +113,33 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 
 	return (
 		<>
-			<div className="pt-10 pb-2">
+			<div className="flex items-center justify-between pt-10 pb-8">
+				<AnimatedBackButton fallbackHref="/contacts/groups" />
+			</div>
+			<div className="pb-2">
 				<div className="flex items-center justify-between gap-4">
 					<div className="min-w-0">
 						{isLoading ? (
-							<Skeleton className="h-7 w-48 rounded-lg" />
-						) : (
-							<div className="flex min-w-0 items-center">
-								<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
-									<Icon name="modules" className="h-3 w-3" />
+							<div className="flex items-center gap-3">
+								<Skeleton className="h-12 w-12 shrink-0 rounded-[14px]" />
+								<div className="flex min-w-0 flex-col gap-1.5">
+									<Skeleton className="h-4 w-14 rounded-full" />
+									<Skeleton className="h-6 w-48 rounded-lg" />
 								</div>
-								<h1 className="ml-2 truncate font-medium text-title-h6 leading-8">
-									{group?.name}
-								</h1>
+							</div>
+						) : (
+							<div className="flex min-w-0 items-center gap-3">
+								<div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-neutral-600 to-neutral-500 text-white shadow-sm">
+									<Icon name="modules" className="h-6 w-6" />
+								</div>
+								<div className="min-w-0">
+									<p className="font-medium text-paragraph-xs text-text-sub-600">
+										Group
+									</p>
+									<h1 className="mb-0.5 truncate font-semibold text-title-h6 leading-5">
+										{group?.name}
+									</h1>
+								</div>
 							</div>
 						)}
 					</div>

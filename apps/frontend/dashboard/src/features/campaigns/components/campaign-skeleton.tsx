@@ -26,7 +26,6 @@ export function CampaignSkeleton({
 					style={gridStyle}
 					className="grid items-center px-4 py-2"
 				>
-					<Skeleton className="h-4 w-4 rounded" />
 					{Array.from({ length: visibleCount }).map((__, colIndex) => (
 						<Skeleton
 							key={`skeleton-${index}-${colIndex}`}

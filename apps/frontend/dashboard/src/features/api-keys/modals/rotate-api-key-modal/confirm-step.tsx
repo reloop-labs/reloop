@@ -36,15 +36,19 @@ export function ConfirmStep({
 		<div className="space-y-4">
 			<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
 				This will rotate{" "}
-				<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-mono font-medium text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
+				<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium font-mono text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
 					{keyPrefix}
 				</span>{" "}
-				<span className="font-medium text-text-strong-950 dark:text-white">{displayName}</span>.
+				<span className="font-medium text-text-strong-950 dark:text-white">
+					{displayName}
+				</span>
+				.
 			</p>
 
 			<div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-				<span className="font-semibold">Note:</span> Generating a new secret will instantly revoke the old key. Any
-				services using it will experience downtime until updated with the new secret.
+				<span className="font-semibold">Note:</span> Generating a new secret
+				will instantly revoke the old key. Any services using it will experience
+				downtime until updated with the new secret.
 			</div>
 
 			{/* Confirmation Input */}

@@ -1,4 +1,5 @@
 import { BusEvent, bus } from "@reloop/bus";
+import { appName } from "@reloop/email/brand";
 import { emailConfig } from "@reloop/email/email.config";
 import PaymentFailedEmail from "@reloop/email/emails/payment-failed";
 import QuotaWarningEmail from "@reloop/email/emails/quota-warning";
@@ -31,7 +32,7 @@ export async function initBillingSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop Billing <billing@${requireReloopSenderDomain()}>`,
+					from: `${appName} Billing <billing@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: "Payment Failed - Action Required",
 					html,
@@ -67,7 +68,7 @@ export async function initBillingSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop Support <support@${requireReloopSenderDomain()}>`,
+					from: `${appName} Support <support@${requireReloopSenderDomain()}>`,
 					to: payload.email,
 					subject: `Usage Alert: ${payload.percentage}% of your ${payload.resourceType} quota used`,
 					html,
@@ -107,9 +108,9 @@ export async function initBillingSubscribers() {
 				const text = toPlainText(html);
 
 				await sendEmail({
-					from: `Reloop <hello@${requireReloopSenderDomain()}>`,
+					from: `${appName} <hello@${requireReloopSenderDomain()}>`,
 					to: payload.email,
-					subject: `Your Reloop trial ends in ${payload.daysLeft} days`,
+					subject: `Your ${appName} trial ends in ${payload.daysLeft} days`,
 					html,
 					text,
 				});

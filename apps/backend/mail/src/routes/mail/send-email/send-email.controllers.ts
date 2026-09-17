@@ -1,8 +1,15 @@
-import { assertHasCredits } from "@reloop/be-mail/lib/credits-gate";
+import { countEmailRecipients } from "@reloop/be-mail/lib/count-recipients";
+import {
+	assertHasCredits,
+	refundCreditsForFailedSend,
+	reserveCreditsForSend,
+} from "@reloop/be-mail/lib/credits-gate";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import { emailThread, threadMessage } from "@reloop/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { log } from "evlog";
@@ -72,7 +79,11 @@ export async function sendEmailController({
 	});
 	// Swap in the sanitized headers (CRLF-clean, reserved names stripped)
 	let body: MailModel.SendEmailBody = { ...rawBody, headers: sanitizedHeaders };
-	log.info({ message: "Outbound guard passed", from: body.from, subject: body.subject });
+	log.info({
+		message: "Outbound guard passed",
+		from: body.from,
+		subject: body.subject,
+	});
 
 	const { domainName } = parseFromAddress_step1(body.from);
 
@@ -98,6 +109,39 @@ export async function sendEmailController({
 	}
 	body = cleanBody;
 
+	const abuse = scoreOutboundAbuse({
+		from: body.from,
+		to: body.to,
+		cc: body.cc,
+		bcc: body.bcc,
+		subject: body.subject,
+		text: body.text,
+		html: body.html,
+	});
+	if (abuse.severity !== "none") {
+		try {
+			await bus.publish(BusEvent.ABUSE_SUSPECTED, {
+				organizationId,
+				fromEmail: body.from,
+				subject: body.subject,
+				recipientCount: countEmailRecipients(body),
+				severity: abuse.severity,
+				reasons: abuse.reasons,
+				action: abuse.severity === "high" ? "blocked" : "allowed",
+				timestamp: new Date().toISOString(),
+			});
+		} catch (error) {
+			log.warn({
+				message: "Failed to publish abuse.suspected event",
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
+	}
+	if (abuse.severity === "high") {
+		throw MailErrors.abuseBlocked(abuse.reasons);
+	}
+
 	const dnsHealthCheck = await checkDnsHealth_step3({
 		domainId: currentDomain.id,
 		organizationId,
@@ -108,6 +152,69 @@ export async function sendEmailController({
 		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
 	}
 
+	// Reserve monthly + daily quota under a row lock so concurrent API/SMTP
+	// senders cannot all pass a stale remaining-balance check.
+	const reservation = await reserveCreditsForSend({
+		organizationId,
+		body,
+	});
+
+	let injected = false;
+	try {
+		return await sendReservedEmail({
+			organizationId,
+			body,
+			currentDomain,
+			apiKey,
+			apiKeyId,
+			userId,
+			cookie,
+			requestApiKey,
+			useInternalInject,
+			onInjected: () => {
+				injected = true;
+			},
+		});
+	} catch (error) {
+		if (!injected) {
+			await refundCreditsForFailedSend(reservation);
+		} else {
+			log.error({
+				message:
+					"Kumo accepted the message but post-inject work failed; credits kept",
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
+		throw error;
+	}
+}
+
+async function sendReservedEmail({
+	organizationId,
+	body,
+	currentDomain,
+	apiKey,
+	apiKeyId,
+	userId,
+	cookie,
+	requestApiKey,
+	useInternalInject,
+	onInjected,
+}: {
+	organizationId: string;
+	body: MailModel.SendEmailBody;
+	currentDomain: Awaited<
+		ReturnType<typeof verifyDomainAuth_step2>
+	>["currentDomain"];
+	apiKey: string;
+	apiKeyId?: string;
+	userId?: string;
+	cookie?: string | null;
+	requestApiKey?: string | null;
+	useInternalInject?: boolean;
+	onInjected?: () => void;
+}): Promise<MailModel.SendEmailResponse> {
 	// ── Resolve In-Reply-To header if replying to a thread ────────
 	const threadHeaders: Record<string, string> = {};
 	if (body.thread_id) {
@@ -189,6 +296,7 @@ export async function sendEmailController({
 		userId,
 		useInternalInject,
 	});
+	onInjected?.();
 
 	const response = await finalizeEmail_step7({
 		emailLogId,

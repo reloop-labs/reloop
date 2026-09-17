@@ -112,7 +112,7 @@ const MASTER_CATEGORIES: MatrixCategory[] = [
 			{
 				feature: "Free Tier Allowance",
 				detail: "Free monthly sending credit",
-				reloop: "3,000 / mo · 200 / day",
+				reloop: "3,000 / mo · 100 / day",
 				resend: "3,000 / mo",
 				sendgrid: "100 / day",
 				postmark: "100 / mo",

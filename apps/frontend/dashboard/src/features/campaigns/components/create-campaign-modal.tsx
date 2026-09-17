@@ -12,7 +12,7 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -38,6 +38,13 @@ export function CreateCampaignModal({
 	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
 	const nameField = useFieldError();
 	const clearNameError = nameField.clear;
+	const navigateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (navigateTimer.current) clearTimeout(navigateTimer.current);
+		};
+	}, []);
 
 	const handleClose = () => {
 		if (status !== "idle") return;
@@ -60,12 +67,12 @@ export function CreateCampaignModal({
 		nameField.clear();
 		setStatus("creating");
 		try {
-		const campaign = await createCampaign(
-			{
-				name: trimmed,
-				subject: "",
-				fromName: "",
-				fromEmail: "",
+			const campaign = await createCampaign(
+				{
+					name: trimmed,
+					subject: "",
+					fromName: "",
+					fromEmail: "",
 					audienceType: "all",
 					audienceTargetName: "All Contacts",
 					contentHtml: "",
@@ -74,8 +81,11 @@ export function CreateCampaignModal({
 				0,
 			);
 			setStatus("success");
-			setTimeout(() => {
-				onOpenChange(false);
+			// Single navigation to the editor. Closing the modal via query
+			// state would trigger a competing navigation that can cancel
+			// this push, so we navigate directly — the modal unmounts with
+			// the page.
+			navigateTimer.current = setTimeout(() => {
 				setName("");
 				nameField.clear();
 				setStatus("idle");

@@ -70,6 +70,7 @@ NODE_ENV=development
 | `SMTP_SECURE` | No | `false` | `true` for implicit TLS |
 | `MAILPIT_HOST` | No | `localhost` | Development capture host |
 | `MAILPIT_PORT` | No | `1025` | Development capture port |
+| `APP_NAME` | No | `Reloop` | Company name shown as `Self-hosted Reloop × <APP_NAME>` in system email senders, subjects and bodies |
 
 
 ## How system email is delivered
@@ -126,6 +127,43 @@ A fresh install has no sending domain, so it cannot email you a code to log in
 and verify a sending domain. The installer writes a fixed `DEFAULT_OTP` into
 `.env` to break that loop. Use it to sign in, configure a transport above, then
 remove `DEFAULT_OTP` and restart.
+
+
+## Branding system email
+
+`APP_NAME` sets the name used across every system email: the sender name, the
+subject line and the message body. Any value other than `Reloop` is shown as
+`Self-hosted Reloop × <APP_NAME>`, so mail carries both your name and the fact
+that it runs on Reloop.
+
+```bash
+APP_NAME=Contoso Mail
+```
+
+| Email | Sender with `APP_NAME=Contoso Mail` |
+| :--- | :--- |
+| Login code | `Self-hosted Reloop × Contoso Mail <auth@…>` |
+| New sign-in | `Self-hosted Reloop × Contoso Mail Security <security@…>` |
+| Billing | `Self-hosted Reloop × Contoso Mail Billing <billing@…>` |
+| Quota warning | `Self-hosted Reloop × Contoso Mail Support <support@…>` |
+| Invitation | `Dana via Self-hosted Reloop × Contoso Mail <invites@…>` |
+
+Leave it unset, or set it to `Reloop`, and everything stays plain `Reloop`, so
+existing deployments are unaffected. The installer defaults it to `Reloop` and preserves your value
+across re-runs.
+
+The sign-in alert previously sent as `Security Alert`, which was the only
+sender that did not carry the product name. It is now `<APP_NAME> Security`,
+matching the Billing and Support senders.
+
+> [!NOTE]
+> The email logo is loaded from `BASE_URL`, not from Reloop, so replace that
+> asset in your own deployment if you rebrand.
+
+> [!NOTE]
+> The Reloop attribution cannot be configured away. The shared footer also
+> keeps Reloop's help link, copyright line and postal address regardless of
+> `APP_NAME`.
 
 
 ## Commands

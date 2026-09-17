@@ -299,9 +299,7 @@ export const ThreadDetail = ({
 						preview?: string | null;
 					}) => {
 						if (m.direction !== "outbound") return false;
-						const other = String(
-							m.email?.textBody || m.preview || "",
-						).trim();
+						const other = String(m.email?.textBody || m.preview || "").trim();
 						return other.includes(snippet);
 					},
 				);

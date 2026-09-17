@@ -115,7 +115,10 @@ export function SupportComposer({
 					const ta = textareaRef.current;
 					if (ta) {
 						ta.focus();
-						ta.setSelectionRange(snapshot.selectionStart, snapshot.selectionEnd);
+						ta.setSelectionRange(
+							snapshot.selectionStart,
+							snapshot.selectionEnd,
+						);
 					}
 				});
 			}
@@ -133,7 +136,10 @@ export function SupportComposer({
 					const ta = textareaRef.current;
 					if (ta) {
 						ta.focus();
-						ta.setSelectionRange(snapshot.selectionStart, snapshot.selectionEnd);
+						ta.setSelectionRange(
+							snapshot.selectionStart,
+							snapshot.selectionEnd,
+						);
 					}
 				});
 			}
@@ -152,7 +158,7 @@ export function SupportComposer({
 		const prevText = current?.text ?? "";
 		const isLargeChange = Math.abs(nextVal.length - prevText.length) > 2;
 		const isWordBoundary =
-			/\s$/.test(nextVal) || /[\n\.\,\!\?]/.test(nextVal.slice(-1));
+			/\s$/.test(nextVal) || /[\n.,!?]/.test(nextVal.slice(-1));
 		const isPause = now - lastTypingTimeRef.current > 600;
 
 		if (
@@ -354,9 +360,7 @@ export function SupportComposer({
 						onClick={() => insertBlock("```\n", "\n```\n", "code block")}
 						disabled={mode === "preview" || disabled}
 						title={
-							isMac
-								? "Code Block (Cmd+Shift+C)"
-								: "Code Block (Ctrl+Shift+C)"
+							isMac ? "Code Block (Cmd+Shift+C)" : "Code Block (Ctrl+Shift+C)"
 						}
 						aria-label="Code Block"
 						className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-white-0 hover:text-text-strong-950 disabled:opacity-40 dark:hover:bg-white/10 dark:hover:text-white"
@@ -461,7 +465,7 @@ export function SupportComposer({
 						{draft.trim() ? (
 							<MarkdownRenderer content={draft} variant="preview" />
 						) : (
-							<p className="italic text-[13px] text-text-soft-400">
+							<p className="text-[13px] text-text-soft-400 italic">
 								Nothing to preview yet. Switch to Write and enter markdown text.
 							</p>
 						)}

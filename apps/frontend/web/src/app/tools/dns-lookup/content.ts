@@ -181,4 +181,3 @@ export const apiResponseSample = `{
     "spfRecord": "v=spf1 include:_spf.google.com ~all"
   }
 }`;
-

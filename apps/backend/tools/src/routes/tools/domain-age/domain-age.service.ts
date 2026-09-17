@@ -1,9 +1,9 @@
 import dns from "node:dns/promises";
 import net from "node:net";
 import {
-	type DomainAuthReport,
 	checkDomainAuth,
 	cleanDomainInput,
+	type DomainAuthReport,
 } from "@be/tools/routes/tools/auth-checker/auth-checker.service";
 import { detectDnsProvider } from "@be/tools/routes/tools/dns-lookup/dns-providers";
 import { getDomain, getPublicSuffix } from "tldts";
@@ -41,8 +41,8 @@ const emptyRdap = (
 });
 
 export {
-	rdapEndpointsForDomain,
 	joinRdapDomainUrl,
+	rdapEndpointsForDomain,
 	rdapTldCandidates,
 } from "./rdap-registry-catalog";
 
@@ -241,10 +241,7 @@ export function parseRdapResponse(data: any): ParsedRdapResult {
 	let registrar: string | null = null;
 	if (Array.isArray(data.entities)) {
 		for (const entity of data.entities) {
-			if (
-				Array.isArray(entity.roles) &&
-				entity.roles.includes("registrar")
-			) {
+			if (Array.isArray(entity.roles) && entity.roles.includes("registrar")) {
 				if (Array.isArray(entity.vcardArray) && entity.vcardArray[1]) {
 					for (const item of entity.vcardArray[1]) {
 						if (item[0] === "fn" || item[0] === "org") {
@@ -513,12 +510,7 @@ export function evaluateColdDomain(
 	}
 
 	// 5. Age Verdict Bands
-	let verdict:
-		| "too_new"
-		| "cold"
-		| "warming"
-		| "established"
-		| "mature";
+	let verdict: "too_new" | "cold" | "warming" | "established" | "mature";
 	let headline = "";
 	let summary = "";
 	let nextStep: { title: string; body: string; href: string };
@@ -722,8 +714,7 @@ export async function checkDomainAge(
 		resolver.resolveNs(registrableDomain).catch(() => [] as string[]),
 	]);
 
-	const nsHosts =
-		nsRecords.length > 0 ? nsRecords : rdap.nameservers || [];
+	const nsHosts = nsRecords.length > 0 ? nsRecords : rdap.nameservers || [];
 	const nsProvider = detectDnsProvider(nsHosts);
 	const nsKind = classifyNameserverKind(nsHosts);
 

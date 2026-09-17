@@ -4,13 +4,11 @@ import { cn } from "@reloop/ui/cn";
 import {
 	flexRender,
 	getCoreRowModel,
-	type RowSelectionState,
 	useReactTable,
 	type VisibilityState,
 } from "@tanstack/react-table";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useCallback, useMemo, useState } from "react";
 import type { Campaign } from "../campaign-types";
 import { useCampaigns } from "../campaigns-provider";
 import {
@@ -19,7 +17,6 @@ import {
 	CampaignRowContextMenu,
 } from "./campaign-dropdown";
 import { CampaignEmptyState } from "./campaign-empty-state";
-import { CampaignSelectionActionBar } from "./campaign-selection-action-bar";
 import { CampaignSkeleton } from "./campaign-skeleton";
 import { campaignColumns } from "./columns";
 import { getCampaignTableGridStyle } from "./constants";
@@ -43,7 +40,6 @@ export function CampaignTable({
 	const [, setDeleteId] = useQueryState("delete");
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
-	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
 
@@ -73,49 +69,17 @@ export function CampaignTable({
 	const table = useReactTable({
 		data: campaigns,
 		columns: campaignColumns,
-		state: { columnVisibility, rowSelection },
+		state: { columnVisibility },
 		onColumnVisibilityChange: () => {},
-		onRowSelectionChange: setRowSelection,
-		enableRowSelection: true,
 		getCoreRowModel: getCoreRowModel(),
 		getRowId: (row) => row.id,
 		manualPagination: true,
 		pageCount: totalPages,
 	});
 
-	useHotkeys(
-		"mod+a",
-		(e) => {
-			e.preventDefault();
-			if (campaigns.length === 0) return;
-			const allSelected = table.getIsAllPageRowsSelected();
-			table.toggleAllPageRowsSelected(!allSelected);
-		},
-		{ enableOnFormTags: false, preventDefault: true },
-	);
-
-	useEffect(() => {
-		const handler = () => {
-			if (campaigns.length === 0) return;
-			const allSelected = table.getIsAllPageRowsSelected();
-			table.toggleAllPageRowsSelected(!allSelected);
-		};
-		window.addEventListener("campaigns:select-all", handler);
-		return () => window.removeEventListener("campaigns:select-all", handler);
-	}, [campaigns.length, table]);
-
 	const headerGroup = table.getHeaderGroups()[0];
 	const rows = table.getRowModel().rows;
 	const gridStyle = getCampaignTableGridStyle(columnVisibility);
-	const selectedRows = table.getFilteredSelectedRowModel().rows;
-	const selectedCount = selectedRows.length;
-	const selectedCampaigns = useMemo(
-		() => selectedRows.map((row) => row.original),
-		[selectedRows],
-	);
-	const handleClearSelection = useCallback(() => {
-		table.resetRowSelection();
-	}, [table]);
 
 	const showEmptyState = !isLoading && rows.length === 0;
 	const showHeader = !showEmptyState;
@@ -167,12 +131,10 @@ export function CampaignTable({
 								>
 									<div
 										style={gridStyle}
-										data-state={row.getIsSelected() ? "selected" : undefined}
 										className={cn(
 											"group/row grid w-full items-center px-4 py-2 text-left",
 											"hover:bg-bg-weak-50",
-											(isRowActive || row.getIsSelected()) &&
-												"bg-bg-weak-50/50",
+											isRowActive && "bg-bg-weak-50/50",
 										)}
 									>
 										{row.getVisibleCells().map((cell) => (
@@ -198,20 +160,10 @@ export function CampaignTable({
 						})
 					)}
 
-					<CampaignTableFooter
-						total={total}
-						selectedCount={selectedCount}
-						pageRowCount={rows.length}
-						isLoading={isLoading}
-					/>
+					<CampaignTableFooter total={total} isLoading={isLoading} />
 				</div>
 			</div>
-			<CampaignSelectionActionBar table={table} />
-			<DeleteCampaignModal
-				campaigns={campaigns}
-				selectedCampaigns={selectedCampaigns}
-				onClearSelection={handleClearSelection}
-			/>
+			<DeleteCampaignModal campaigns={campaigns} />
 		</>
 	);
 }

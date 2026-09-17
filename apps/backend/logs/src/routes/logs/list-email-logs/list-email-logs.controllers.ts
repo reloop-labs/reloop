@@ -1,6 +1,7 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { deriveDisplayStatus } from "@reloop/logs/lib/email-log-display-status";
+import { resolveEmailSends } from "@reloop/logs/lib/email-send-origin";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
 import {
 	and,
@@ -136,25 +137,31 @@ export async function listEmailLogsController({
 		});
 
 		log.info("Email logs listed successfully", { count: logs.length, total });
+		const sends = await resolveEmailSends(logs);
 		// Project only the list-entry shape. Spreading the full row can leave
 		// Date fields that confuse clients and response validation.
 		// Status is the lifecycle display status (opened/clicked when tracked).
 		return {
 			object: "list",
-			data: logs.map((entry) => ({
-				id: entry.id,
-				subject: entry.subject,
-				fromEmail: entry.fromEmail,
-				toEmails: (entry.toEmails ?? []) as string[],
-				status: deriveDisplayStatus(
-					entry.status,
-					(entry.events ?? []).map((e) => e.type),
-				),
-				createdAt: entry.createdAt.toISOString(),
-				hasAttachments: Array.isArray(entry.attachments)
-					? entry.attachments.length > 0
-					: false,
-			})),
+			data: logs.map((entry) => {
+				const send = sends.get(entry.id);
+				return {
+					id: entry.id,
+					subject: entry.subject,
+					fromEmail: entry.fromEmail,
+					toEmails: (entry.toEmails ?? []) as string[],
+					status: deriveDisplayStatus(
+						entry.status,
+						(entry.events ?? []).map((e) => e.type),
+					),
+					createdAt: entry.createdAt.toISOString(),
+					hasAttachments: Array.isArray(entry.attachments)
+						? entry.attachments.length > 0
+						: false,
+					source: send?.source ?? entry.source,
+					origin: send?.origin ?? null,
+				};
+			}),
 			total,
 			page,
 			limit,

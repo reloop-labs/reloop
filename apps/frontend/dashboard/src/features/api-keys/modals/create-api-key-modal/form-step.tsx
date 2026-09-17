@@ -20,7 +20,10 @@ export function FormStep({
 
 	return (
 		<div className="space-y-1.5">
-			<Label.Root htmlFor="name" className="font-medium text-text-strong-950 text-xs dark:text-white">
+			<Label.Root
+				htmlFor="name"
+				className="font-medium text-text-strong-950 text-xs dark:text-white"
+			>
 				API key name
 				<Label.Asterisk />
 			</Label.Root>

@@ -21,6 +21,8 @@ export interface SlideToPublishProps {
 	isPublishing: boolean;
 	isSuccess: boolean;
 	disabled?: boolean;
+	idleText?: string;
+	successText?: string;
 }
 
 export function SlideToPublish({
@@ -28,6 +30,8 @@ export function SlideToPublish({
 	isPublishing,
 	isSuccess,
 	disabled = false,
+	idleText = "Slide to publish »",
+	successText = "Published",
 }: SlideToPublishProps) {
 	const trackRef = useRef<HTMLDivElement>(null);
 	const [trackWidth, setTrackWidth] = useState(360);
@@ -181,7 +185,7 @@ export function SlideToPublish({
 							className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400"
 						>
 							<Check className="size-3.5" strokeWidth={2.5} />
-							<span>Published</span>
+							<span>{successText}</span>
 						</motion.span>
 					) : (
 						<motion.span
@@ -192,7 +196,7 @@ export function SlideToPublish({
 							style={{ opacity: idleTextOpacity }}
 							className="slide-shimmer-text font-medium text-xs tracking-tight"
 						>
-							<span>Slide to publish »</span>
+							<span>{idleText}</span>
 						</motion.span>
 					)}
 				</AnimatePresence>

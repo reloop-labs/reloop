@@ -172,6 +172,13 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 				shortcut: { label: "G B", keys: ["g b", "g+b"] },
 			},
 			{
+				label: "Dedicated IP",
+				path: "/settings/dedicated-ip",
+				iconName: "dedicated-ip",
+				requiresOrgAdmin: true,
+				shortcut: { label: "G Shift+I", keys: ["g shift+i", "g+shift+i"] },
+			},
+			{
 				label: "Teams",
 				path: "/settings/teams",
 				iconName: "users",

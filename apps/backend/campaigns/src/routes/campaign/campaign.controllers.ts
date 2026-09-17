@@ -20,7 +20,7 @@ import {
 	canSend,
 } from "@be/campaigns/lib/campaign/status";
 import {
-	cancelCampaignStart,
+	cancelCampaignJobs,
 	enqueueCampaignStart,
 } from "@be/campaigns/queues/campaign.queue";
 import {
@@ -36,7 +36,9 @@ import {
 	exists,
 	ilike,
 	inArray,
+	isNotNull,
 	isNull,
+	ne,
 	or,
 	type SQL,
 	sql,
@@ -360,7 +362,7 @@ export async function cancelCampaignController(params: {
 	if (!canCancel(row.status)) {
 		throw CampaignErrors.cannotCancel(row.id, row.status);
 	}
-	await cancelCampaignStart(row.id);
+	await cancelCampaignJobs(row.id);
 	const skipped = await db
 		.update(schema.campaignRecipient)
 		.set({
@@ -490,7 +492,13 @@ export async function listRecipientsController(params: {
 	page?: number;
 	limit?: number;
 	status?: "pending" | "sending" | "sent" | "skipped" | "failed";
-	category?: "unsubscribed" | "bounced" | "suppressed" | "complained" | "all";
+	category?:
+		| "unsubscribed"
+		| "bounced"
+		| "suppressed"
+		| "complained"
+		| "clicked"
+		| "all";
 	search?: string;
 }) {
 	await requireCampaign(params.id, params.organizationId);
@@ -508,7 +516,10 @@ export async function listRecipientsController(params: {
 				.from(schema.emailEvent)
 				.where(
 					and(
-						eq(schema.emailEvent.emailLogId, schema.campaignRecipient.emailLogId),
+						eq(
+							schema.emailEvent.emailLogId,
+							schema.campaignRecipient.emailLogId,
+						),
 						eq(schema.emailEvent.type, "unsubscribed"),
 					),
 				),
@@ -518,26 +529,45 @@ export async function listRecipientsController(params: {
 	const bouncedCondition = or(
 		eq(schema.campaignRecipient.status, "failed"),
 		eq(schema.emailLog.status, "bounced"),
-		eq(schema.contact.suppressionReason, "hard_bounce"),
 		exists(
 			db
 				.select({ id: schema.emailEvent.id })
 				.from(schema.emailEvent)
 				.where(
 					and(
-						eq(schema.emailEvent.emailLogId, schema.campaignRecipient.emailLogId),
+						eq(
+							schema.emailEvent.emailLogId,
+							schema.campaignRecipient.emailLogId,
+						),
 						eq(schema.emailEvent.type, "bounced"),
 					),
 				),
 		),
 	)!;
 
+	// Truly suppressed: skipped for suppression at send time, or currently
+	// carrying a suppression reason (e.g. suppressed after the send ran).
+	// Spam complaints surface under Complained instead (see row mapping).
 	const suppressedCondition = or(
-		inArray(schema.campaignRecipient.skipReason, ["suppressed", "blocked"]),
-		sql`${schema.contact.suppressedAt} IS NOT NULL`,
-		sql`${schema.contact.suppressionReason} IS NOT NULL`,
-		eq(schema.contact.status, "blocked"),
+		eq(schema.campaignRecipient.skipReason, "suppressed"),
+		and(
+			isNotNull(schema.contact.suppressionReason),
+			ne(schema.contact.suppressionReason, "spam_complaint"),
+		),
 	)!;
+
+	// Manually blocked (no suppression reason) is tracked separately so it
+	// is never mislabeled as suppressed.
+	const blockedCondition = or(
+		eq(schema.campaignRecipient.skipReason, "blocked"),
+		and(
+			eq(schema.contact.status, "blocked"),
+			isNull(schema.contact.suppressionReason),
+		),
+	)!;
+
+	// The Suppressed tab lists both, with the row badge telling them apart.
+	const suppressedTabCondition = or(suppressedCondition, blockedCondition)!;
 
 	const complainedCondition = or(
 		eq(schema.emailLog.status, "spam"),
@@ -550,17 +580,37 @@ export async function listRecipientsController(params: {
 				.from(schema.emailEvent)
 				.where(
 					and(
-						eq(schema.emailEvent.emailLogId, schema.campaignRecipient.emailLogId),
+						eq(
+							schema.emailEvent.emailLogId,
+							schema.campaignRecipient.emailLogId,
+						),
 						eq(schema.emailEvent.type, "complaint"),
 					),
 				),
 		),
 	)!;
 
+	const clickedEventExists = exists(
+		db
+			.select({ id: schema.emailEvent.id })
+			.from(schema.emailEvent)
+			.where(
+				and(
+					eq(schema.emailEvent.emailLogId, schema.campaignRecipient.emailLogId),
+					eq(schema.emailEvent.type, "clicked"),
+				),
+			),
+	);
+
+	const clickedCondition = or(
+		isNotNull(schema.campaignRecipient.clickedAt),
+		clickedEventExists,
+	)!;
+
 	const anyIssueCondition = or(
 		unsubscribedCondition,
 		bouncedCondition,
-		suppressedCondition,
+		suppressedTabCondition,
 		complainedCondition,
 	)!;
 
@@ -571,6 +621,21 @@ export async function listRecipientsController(params: {
 
 	const countsWhere = and(...baseFilter);
 
+	const clickCountExpr = sql<number>`coalesce((
+		select count(*)::int
+		from ${schema.emailEvent}
+		where ${schema.emailEvent.emailLogId} = ${schema.campaignRecipient.emailLogId}
+			and ${schema.emailEvent.type} = 'clicked'
+	), 0)`;
+
+	const uniqueClickCountExpr = sql<number>`coalesce((
+		select count(distinct ${schema.emailEvent.metadata}->>'url')::int
+		from ${schema.emailEvent}
+		where ${schema.emailEvent.emailLogId} = ${schema.campaignRecipient.emailLogId}
+			and ${schema.emailEvent.type} = 'clicked'
+			and coalesce(${schema.emailEvent.metadata}->>'url', '') <> ''
+	), 0)`;
+
 	const selectFields = {
 		recipient: schema.campaignRecipient,
 		contactFirstName: schema.contact.firstName,
@@ -579,6 +644,8 @@ export async function listRecipientsController(params: {
 		contactSuppressionReason: schema.contact.suppressionReason,
 		contactSuppressedAt: schema.contact.suppressedAt,
 		emailLogStatus: schema.emailLog.status,
+		clickCount: clickCountExpr,
+		uniqueClickCount: uniqueClickCountExpr,
 	};
 
 	const queryFilter: SQL[] = [...baseFilter];
@@ -594,10 +661,13 @@ export async function listRecipientsController(params: {
 				queryFilter.push(bouncedCondition);
 				break;
 			case "suppressed":
-				queryFilter.push(suppressedCondition);
+				queryFilter.push(suppressedTabCondition);
 				break;
 			case "complained":
 				queryFilter.push(complainedCondition);
+				break;
+			case "clicked":
+				queryFilter.push(clickedCondition);
 				break;
 			case "all":
 				queryFilter.push(anyIssueCondition);
@@ -617,14 +687,17 @@ export async function listRecipientsController(params: {
 
 	const where = and(...queryFilter);
 
-	const [rows, totalRow, countsRow] = await Promise.all([
+	const [rows, totalRow, countsRow, clickedTotalRow] = await Promise.all([
 		db
 			.select(selectFields)
 			.from(schema.campaignRecipient)
 			.leftJoin(
 				schema.contact,
 				and(
-					eq(schema.contact.organizationId, schema.campaignRecipient.organizationId),
+					eq(
+						schema.contact.organizationId,
+						schema.campaignRecipient.organizationId,
+					),
 					eq(schema.contact.email, schema.campaignRecipient.email),
 					isNull(schema.contact.deletedAt),
 				),
@@ -634,7 +707,11 @@ export async function listRecipientsController(params: {
 				eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
 			)
 			.where(where)
-			.orderBy(desc(schema.campaignRecipient.createdAt))
+			.orderBy(
+				params.category === "clicked"
+					? desc(clickCountExpr)
+					: desc(schema.campaignRecipient.createdAt),
+			)
 			.limit(limit)
 			.offset(offset),
 		db
@@ -643,7 +720,10 @@ export async function listRecipientsController(params: {
 			.leftJoin(
 				schema.contact,
 				and(
-					eq(schema.contact.organizationId, schema.campaignRecipient.organizationId),
+					eq(
+						schema.contact.organizationId,
+						schema.campaignRecipient.organizationId,
+					),
 					eq(schema.contact.email, schema.campaignRecipient.email),
 					isNull(schema.contact.deletedAt),
 				),
@@ -657,15 +737,19 @@ export async function listRecipientsController(params: {
 			.select({
 				unsubscribed: sql<number>`count(*) filter (where ${unsubscribedCondition})`,
 				bounced: sql<number>`count(*) filter (where ${bouncedCondition})`,
-				suppressed: sql<number>`count(*) filter (where ${suppressedCondition})`,
+				suppressed: sql<number>`count(*) filter (where ${suppressedTabCondition})`,
 				complained: sql<number>`count(*) filter (where ${complainedCondition})`,
+				clicked: sql<number>`count(*) filter (where ${clickedCondition})`,
 				all: sql<number>`count(*) filter (where ${anyIssueCondition})`,
 			})
 			.from(schema.campaignRecipient)
 			.leftJoin(
 				schema.contact,
 				and(
-					eq(schema.contact.organizationId, schema.campaignRecipient.organizationId),
+					eq(
+						schema.contact.organizationId,
+						schema.campaignRecipient.organizationId,
+					),
 					eq(schema.contact.email, schema.campaignRecipient.email),
 					isNull(schema.contact.deletedAt),
 				),
@@ -675,6 +759,20 @@ export async function listRecipientsController(params: {
 				eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
 			)
 			.where(countsWhere),
+		db
+			.select({ value: sql<number>`count(*)::int` })
+			.from(schema.emailEvent)
+			.innerJoin(
+				schema.campaignRecipient,
+				eq(schema.campaignRecipient.emailLogId, schema.emailEvent.emailLogId),
+			)
+			.where(
+				and(
+					eq(schema.campaignRecipient.campaignId, params.id),
+					eq(schema.campaignRecipient.organizationId, params.organizationId),
+					eq(schema.emailEvent.type, "clicked"),
+				),
+			),
 	]);
 
 	const recipients = rows.map(
@@ -684,17 +782,22 @@ export async function listRecipientsController(params: {
 			contactLastName,
 			contactStatus,
 			contactSuppressionReason,
-			contactSuppressedAt,
 			emailLogStatus,
+			clickCount,
+			uniqueClickCount,
 		}) => {
 			let category:
 				| "unsubscribed"
 				| "bounced"
 				| "suppressed"
+				| "blocked"
 				| "complained"
+				| "clicked"
 				| undefined;
 
-			if (
+			if (params.category === "clicked") {
+				category = "clicked";
+			} else if (
 				emailLogStatus === "spam" ||
 				contactSuppressionReason === "spam_complaint" ||
 				(recipient.error && /spam|complaint|feedback/i.test(recipient.error))
@@ -706,30 +809,39 @@ export async function listRecipientsController(params: {
 			) {
 				category = "unsubscribed";
 			} else if (
+				recipient.skipReason === "suppressed" ||
+				contactSuppressionReason
+			) {
+				// NB: spam_complaint never reaches here — the complained branch
+				// above already claimed it.
+				category = "suppressed";
+			} else if (
+				recipient.skipReason === "blocked" ||
+				contactStatus === "blocked"
+			) {
+				category = "blocked";
+			} else if (
 				emailLogStatus === "bounced" ||
-				contactSuppressionReason === "hard_bounce" ||
 				recipient.status === "failed" ||
 				(recipient.error && /bounce|oob|expiration/i.test(recipient.error))
 			) {
 				category = "bounced";
-			} else if (
-				recipient.skipReason === "suppressed" ||
-				recipient.skipReason === "blocked" ||
-				contactSuppressedAt != null ||
-				contactSuppressionReason != null ||
-				contactStatus === "blocked"
-			) {
-				category = "suppressed";
 			}
 
 			const contactName =
 				[contactFirstName, contactLastName].filter(Boolean).join(" ").trim() ||
 				undefined;
 
+			const events = Number(clickCount ?? 0);
+			const uniqueLinks = Number(uniqueClickCount ?? 0);
+			const hasClicked = Boolean(recipient.clickedAt) || events > 0;
+
 			return toRecipientResponse(recipient, {
 				category,
 				contactName,
 				error: recipient.error,
+				clickCount: hasClicked ? Math.max(events, 1) : events,
+				uniqueClickCount: hasClicked ? Math.max(uniqueLinks, 1) : uniqueLinks,
 			});
 		},
 	);
@@ -745,6 +857,8 @@ export async function listRecipientsController(params: {
 					bounced: Number(countsRow[0].bounced ?? 0),
 					suppressed: Number(countsRow[0].suppressed ?? 0),
 					complained: Number(countsRow[0].complained ?? 0),
+					clicked: Number(countsRow[0].clicked ?? 0),
+					clickedTotal: Number(clickedTotalRow[0]?.value ?? 0),
 					all: Number(countsRow[0].all ?? 0),
 				}
 			: undefined,

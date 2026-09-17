@@ -83,7 +83,8 @@ export const faqGroups: FaqGroup[] = [
 					"Your DKIM selector is provided by your email service provider (e.g. Google Workspace uses 'google', Reloop uses 's1' or 'reloop', SendGrid uses 's1'/'s2', Postmark uses '2023...'). The record is published in your DNS under '<selector>._domainkey.<yourdomain>'.",
 			},
 			{
-				question: "What is the difference between p=none, p=quarantine, and p=reject?",
+				question:
+					"What is the difference between p=none, p=quarantine, and p=reject?",
 				answer:
 					"p=none is a monitoring policy where unauthorized emails are still delivered to the inbox while sending you diagnostic DMARC reports. p=quarantine moves unauthenticated emails to the Spam/Junk folder. p=reject is the strongest policy that instructs mailbox providers to block and reject unauthorized emails entirely.",
 			},

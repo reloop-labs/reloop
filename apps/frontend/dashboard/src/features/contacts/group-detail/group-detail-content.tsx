@@ -1,4 +1,5 @@
 import { useGroupQuery } from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { GroupContactList } from "./group-contact-list";
 import { GroupHeader } from "./group-header";
 import { GroupSummary } from "./group-summary";
@@ -15,31 +16,41 @@ export function GroupDetailContent({ groupId }: { groupId: string }) {
 
 	if (groupError && !groupData) {
 		return (
-			<div className="py-12 text-center">
-				<p className="text-sm text-text-sub-600">Failed to load group</p>
+			<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
+				<div className="flex items-center justify-between pt-10 pb-8">
+					<AnimatedBackButton fallbackHref="/contacts/groups" />
+				</div>
+				<div className="py-12 text-center">
+					<p className="text-sm text-text-sub-600">Failed to load group</p>
+				</div>
 			</div>
 		);
 	}
 
 	if (!groupData && !isLoading) {
 		return (
-			<div className="py-12 text-center">
-				<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
-					Group not found
-				</h2>
-				<p className="text-text-sub-600">
-					The group you&apos;re looking for doesn&apos;t exist or has been
-					deleted.
-				</p>
+			<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
+				<div className="flex items-center justify-between pt-10 pb-8">
+					<AnimatedBackButton fallbackHref="/contacts/groups" />
+				</div>
+				<div className="py-12 text-center">
+					<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
+						Group not found
+					</h2>
+					<p className="text-text-sub-600">
+						The group you&apos;re looking for doesn&apos;t exist or has been
+						deleted.
+					</p>
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<>
+		<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
 			<GroupHeader group={groupData} isLoading={isLoading} />
 			<GroupSummary group={groupData} isLoading={isLoading} />
 			<GroupContactList groupId={groupId} />
-		</>
+		</div>
 	);
 }

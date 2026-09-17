@@ -6,10 +6,10 @@ export function generatePlanarUVs(geometry: THREE.BufferGeometry): void {
 
 	const uvs = new Float32Array(pos.count * 2);
 
-	let minX = Infinity;
-	let maxX = -Infinity;
-	let minY = Infinity;
-	let maxY = -Infinity;
+	let minX = Number.POSITIVE_INFINITY;
+	let maxX = Number.NEGATIVE_INFINITY;
+	let minY = Number.POSITIVE_INFINITY;
+	let maxY = Number.NEGATIVE_INFINITY;
 
 	for (let i = 0; i < pos.count; i++) {
 		minX = Math.min(minX, pos.getX(i));

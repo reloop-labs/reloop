@@ -23,14 +23,16 @@ export function CreateContactPage() {
 	};
 
 	return (
-		<div className="w-full min-h-[calc(100vh-4rem)] px-4 py-6 sm:px-8 sm:py-10">
+		<div className="min-h-[calc(100vh-4rem)] w-full px-4 py-6 sm:px-8 sm:py-10">
 			<div className="mx-auto w-full max-w-xl">
 				{/* Top Navigation Row: Back Button */}
 				<div className="mb-6 flex items-center justify-between">
 					<AnimatedBackButton
 						fallbackHref="/contacts"
 						onClick={
-							!isMethodSelection ? () => setCurrentStep("select-method") : undefined
+							!isMethodSelection
+								? () => setCurrentStep("select-method")
+								: undefined
 						}
 					/>
 				</div>

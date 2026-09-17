@@ -35,7 +35,7 @@ export function SelectField({
 					onClick={() => setIsOpen((prev) => !prev)}
 					className={cn(
 						inspectorFieldClassName,
-						"cursor-pointer justify-between text-left text-sm text-text-strong-950 font-normal outline-none select-none",
+						"cursor-pointer select-none justify-between text-left font-normal text-sm text-text-strong-950 outline-none",
 					)}
 				>
 					<span className="truncate">{selected?.label ?? placeholder}</span>

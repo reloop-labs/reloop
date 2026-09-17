@@ -285,7 +285,7 @@ export const AddPropertyModal = ({
 											className={cn(
 												"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
 												isSelected
-													? "border-primary-base shadow-[0_0_0_1px_#0055FF] bg-bg-white-0 dark:border-primary-base dark:shadow-[0_0_0_1px_#0055FF] dark:bg-white/[0.04]"
+													? "border-primary-base bg-bg-white-0 shadow-[0_0_0_1px_#0055FF] dark:border-primary-base dark:bg-white/[0.04] dark:shadow-[0_0_0_1px_#0055FF]"
 													: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
 											)}
 										>

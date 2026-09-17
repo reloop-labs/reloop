@@ -1,11 +1,13 @@
 import { adminConfig } from "@reloop/admin/admin.config";
+import { initAbuseSuspectedSubscriber } from "@reloop/admin/subscribers/abuse-suspected.subscriber";
+import { initDomainCreatedSubscriber } from "@reloop/admin/subscribers/domain-created.subscriber";
 import { initEmailFailedSubscriber } from "@reloop/admin/subscribers/email-failed.subscriber";
+import { initSigninSubscriber } from "@reloop/admin/subscribers/signin.subscriber";
+import { initSignupWelcomeSubscriber } from "@reloop/admin/subscribers/signup-welcome.subscriber";
+import { redis } from "@reloop/admin/utils/redis";
 import { bus } from "@reloop/bus";
-import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
-
-export const redis = new RedisCache("admin", 86400, adminConfig.REDIS_URL);
 
 export const loader = async () => {
 	try {
@@ -16,6 +18,10 @@ export const loader = async () => {
 		await bus.connect(adminConfig.NATS_URL);
 		log.info("NATS", "Connected");
 		await initEmailFailedSubscriber();
+		await initSigninSubscriber();
+		await initDomainCreatedSubscriber();
+		await initAbuseSuspectedSubscriber();
+		await initSignupWelcomeSubscriber();
 	} catch (e) {
 		log.error({
 			message: "Error during service initialization",

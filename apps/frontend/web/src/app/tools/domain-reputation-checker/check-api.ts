@@ -1,6 +1,11 @@
 export type CheckStatus = "pass" | "warn" | "fail" | "info";
 export type ReputationGrade = "A+" | "A" | "B" | "C" | "D" | "F";
-export type ReputationVerdict = "excellent" | "good" | "fair" | "poor" | "critical";
+export type ReputationVerdict =
+	| "excellent"
+	| "good"
+	| "fair"
+	| "poor"
+	| "critical";
 
 export type CategoryResult = {
 	score: number;
@@ -34,15 +39,39 @@ export type DomainReputationResponse = {
 	};
 	details: {
 		authentication: {
-			spf: { exists: boolean; record?: string; qualifier?: string; status: "pass" | "warn" | "fail"; detail: string };
-			dkim: { detected: boolean; selector?: string; record?: string; status: "pass" | "warn" | "fail"; detail: string };
-			dmarc: { exists: boolean; record?: string; policy?: string; pct?: number; status: "pass" | "warn" | "fail"; detail: string };
+			spf: {
+				exists: boolean;
+				record?: string;
+				qualifier?: string;
+				status: "pass" | "warn" | "fail";
+				detail: string;
+			};
+			dkim: {
+				detected: boolean;
+				selector?: string;
+				record?: string;
+				status: "pass" | "warn" | "fail";
+				detail: string;
+			};
+			dmarc: {
+				exists: boolean;
+				record?: string;
+				policy?: string;
+				pct?: number;
+				status: "pass" | "warn" | "fail";
+				detail: string;
+			};
 		};
 		blocklist: {
 			cleanCount: number;
 			listedCount: number;
 			totalChecked: number;
-			listings: Array<{ zone: string; name: string; listed: boolean; returnCode?: string }>;
+			listings: Array<{
+				zone: string;
+				name: string;
+				listed: boolean;
+				returnCode?: string;
+			}>;
 		};
 		domainAge: {
 			ageDays?: number;

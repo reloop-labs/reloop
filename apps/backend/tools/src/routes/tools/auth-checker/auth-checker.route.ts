@@ -33,6 +33,7 @@ export const authCheckerRoute = new Elysia()
 			tags: ["Tools"],
 			summary: "SPF, DKIM, DMARC & MX Email Authentication Checker (GET)",
 			hide: true,
-			description: "Query email authentication status via HTTP GET query parameters.",
+			description:
+				"Query email authentication status via HTTP GET query parameters.",
 		},
 	});

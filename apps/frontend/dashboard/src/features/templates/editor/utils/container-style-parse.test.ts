@@ -119,7 +119,10 @@ describe("email page vs column background", () => {
 
 	it("does not invent a white column background in the theme extractor", () => {
 		const themeSource = readFileSync(
-			join(dirname(fileURLToPath(import.meta.url)), "apply-pasted-email-theme.ts"),
+			join(
+				dirname(fileURLToPath(import.meta.url)),
+				"apply-pasted-email-theme.ts",
+			),
 			"utf8",
 		);
 		const sanitizeSource = readFileSync(
@@ -127,7 +130,9 @@ describe("email page vs column background", () => {
 			"utf8",
 		);
 		expect(themeSource).toMatch(/containerBg\s*=\s*[\s\S]*\|\|\s*undefined/);
-		expect(themeSource).not.toMatch(/containerBg\s*=\s*[\s\S]*\|\|\s*"#ffffff"/);
+		expect(themeSource).not.toMatch(
+			/containerBg\s*=\s*[\s\S]*\|\|\s*"#ffffff"/,
+		);
 		expect(sanitizeSource).toMatch(/prop\.startsWith\("background"\)/);
 	});
 });
@@ -135,7 +140,10 @@ describe("email page vs column background", () => {
 describe("parseGlobalStylesFromHtml canvas defaults", () => {
 	it("does not force wrapper font-size onto every block with !important", () => {
 		const source = readFileSync(
-			join(dirname(fileURLToPath(import.meta.url)), "apply-pasted-email-theme.ts"),
+			join(
+				dirname(fileURLToPath(import.meta.url)),
+				"apply-pasted-email-theme.ts",
+			),
 			"utf8",
 		);
 		const sanitizeSource = readFileSync(

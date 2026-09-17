@@ -38,8 +38,7 @@ export const config: ToolDefinition = {
 				},
 				{
 					title: "Leftover Vendor Audit",
-					description:
-						"Flags unused ESP includes without active DKIM keys.",
+					description: "Flags unused ESP includes without active DKIM keys.",
 				},
 			],
 		},

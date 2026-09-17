@@ -71,8 +71,8 @@ const SERVICES: ServiceConfig[] = [
 	{
 		name: "inbox",
 		prefix: "/api/inbox",
-		port: 8021,
-		specUrl: "http://localhost:8021/api/inbox/openapi/json",
+		port: 8028,
+		specUrl: "http://localhost:8028/api/inbox/openapi/json",
 		prodUrl: "https://reloop.sh/api/inbox/openapi/json",
 	},
 	{
