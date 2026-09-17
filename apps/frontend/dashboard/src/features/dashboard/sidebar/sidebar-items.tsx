@@ -192,83 +192,83 @@ export function SidebarItems({
 									: undefined
 							}
 						>
+							<span
+								className={cn(
+									"flex min-w-0 items-center",
+									isCollapsed
+										? "justify-center"
+										: "flex-1 justify-between gap-2.5",
+								)}
+							>
 								<span
 									className={cn(
 										"flex min-w-0 items-center",
-										isCollapsed
-											? "justify-center"
-											: "flex-1 justify-between gap-2.5",
+										!isCollapsed && "gap-2.5",
 									)}
 								>
-									<span
-										className={cn(
-											"flex min-w-0 items-center",
-											!isCollapsed && "gap-2.5",
-										)}
-									>
-										<SidebarNavIcon
-											name={iconName}
-											isSpecial={isSpecial}
-											isActive={activeMainIndex === index}
-										/>
-										{!isCollapsed && (
-											<span
-												className={cn(
-													"truncate font-medium text-[13px] transition-colors",
-													isSpecial
-														? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
-														: activeMainIndex === index
-															? "text-text-strong-950"
-															: "text-text-sub-600 group-hover:text-text-strong-950",
-												)}
-											>
-												{label}
-											</span>
-										)}
-									</span>
-									{!isCollapsed && shortcut && (
-										<ShortcutHint>{shortcut.label}</ShortcutHint>
+									<SidebarNavIcon
+										name={iconName}
+										isSpecial={isSpecial}
+										isActive={activeMainIndex === index}
+									/>
+									{!isCollapsed && (
+										<span
+											className={cn(
+												"truncate font-medium text-[13px] transition-colors",
+												isSpecial
+													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
+													: activeMainIndex === index
+														? "text-text-strong-950"
+														: "text-text-sub-600 group-hover:text-text-strong-950",
+											)}
+										>
+											{label}
+										</span>
 									)}
 								</span>
-
-								{hasSubNav && !isCollapsed && (
-									<button
-										type="button"
-										tabIndex={0}
-										aria-expanded={isExpanded}
-										aria-label={
-											isExpanded ? `Collapse ${label}` : `Expand ${label}`
-										}
-										onClick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-											setExpandedItems((prev) => {
-												const willOpen = !prev[path];
-												if (willOpen) {
-													userCollapsedRef.current.delete(path);
-												} else {
-													const isActiveSection = items?.some((sub) =>
-														pathWithoutSlug.startsWith(sub.path),
-													);
-													if (isActiveSection) {
-														userCollapsedRef.current.add(path);
-													}
-												}
-												return { ...prev, [path]: willOpen };
-											});
-										}}
-										className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
-									>
-										<Icon
-											name="chevron-right"
-											className={cn(
-												"h-3 w-3 shrink-0 text-text-sub-600 opacity-60 transition-transform duration-200",
-												isExpanded && "rotate-90",
-											)}
-										/>
-									</button>
+								{!isCollapsed && shortcut && (
+									<ShortcutHint>{shortcut.label}</ShortcutHint>
 								)}
-							</SidebarNavLink>
+							</span>
+
+							{hasSubNav && !isCollapsed && (
+								<button
+									type="button"
+									tabIndex={0}
+									aria-expanded={isExpanded}
+									aria-label={
+										isExpanded ? `Collapse ${label}` : `Expand ${label}`
+									}
+									onClick={(e) => {
+										e.preventDefault();
+										e.stopPropagation();
+										setExpandedItems((prev) => {
+											const willOpen = !prev[path];
+											if (willOpen) {
+												userCollapsedRef.current.delete(path);
+											} else {
+												const isActiveSection = items?.some((sub) =>
+													pathWithoutSlug.startsWith(sub.path),
+												);
+												if (isActiveSection) {
+													userCollapsedRef.current.add(path);
+												}
+											}
+											return { ...prev, [path]: willOpen };
+										});
+									}}
+									className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
+								>
+									<Icon
+										name="chevron-right"
+										className={cn(
+											"h-3 w-3 shrink-0 text-text-sub-600 opacity-60 transition-transform duration-200",
+											isExpanded && "rotate-90",
+										)}
+									/>
+								</button>
+							)}
+						</SidebarNavLink>
 
 						{hasSubNav && !isCollapsed && (
 							<AnimatePresence initial={false}>

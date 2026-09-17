@@ -200,7 +200,10 @@ function AttachmentCell({
 			className="flex min-w-0 items-center gap-1.5 text-text-sub-600"
 			title={title}
 		>
-			<Icon name="paperclip" className="h-3.5 w-3.5 shrink-0 text-text-soft-400" />
+			<Icon
+				name="paperclip"
+				className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
+			/>
 			<span className="truncate font-medium text-[13px]">{label}</span>
 		</div>
 	);

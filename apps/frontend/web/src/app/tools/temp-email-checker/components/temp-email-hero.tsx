@@ -1,18 +1,12 @@
 import { Icon } from "@reloop/ui/icon";
 import { CheckerPanel } from "../checker-panel";
-import { TempEmailHeroBlast } from "./temp-email-hero-blast";
+import { TempEmailHeroLines } from "./temp-email-hero-lines";
 
 export function TempEmailHero() {
 	return (
 		<div className="relative w-full overflow-hidden">
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
-				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-16 text-center sm:px-8 sm:pb-20 lg:px-12 lg:pb-24">
-					<div
-						aria-hidden="true"
-						className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
-					>
-						<TempEmailHeroBlast />
-					</div>
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col md:max-w-7xl">
+				<header className="relative flex w-full flex-col items-center bg-transparent px-6 pt-[224px] pb-16 text-center sm:px-8 sm:pb-20 lg:px-12 lg:pb-24">
 					<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
 						<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 							<span
@@ -41,7 +35,8 @@ export function TempEmailHero() {
 							records. We do not probe the mailbox.
 						</p>
 
-						<div className="mt-10 w-full max-w-xl text-left sm:mt-12">
+						<div className="relative mt-10 w-full max-w-xl text-left sm:mt-12">
+							<TempEmailHeroLines />
 							<CheckerPanel />
 						</div>
 					</div>

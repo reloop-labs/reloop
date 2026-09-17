@@ -815,14 +815,7 @@ export default function OrganizationDetailPage() {
 					}
 				>
 					<DataTable
-						headers={[
-							"When",
-							"From",
-							"To",
-							"Subject",
-							"Attachments",
-							"Status",
-						]}
+						headers={["When", "From", "To", "Subject", "Attachments", "Status"]}
 						colSpan={6}
 						empty={data.recentEmails.length === 0}
 					>

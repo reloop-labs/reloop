@@ -14,13 +14,7 @@ import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import {
-	Fragment,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
@@ -508,9 +502,12 @@ export default function EmailDetailPage() {
 	const [activeTab, setActiveTab] = useState("preview");
 	const [previewTheme, setPreviewTheme] = useState<"light" | "dark">("light");
 
-	const { data: email, isLoading, error } = useSWR<EmailDetailData>(
-		emailId ? `/emails/${emailId}` : null,
-		() => adminGet<EmailDetailData>(`/emails/${emailId}`),
+	const {
+		data: email,
+		isLoading,
+		error,
+	} = useSWR<EmailDetailData>(emailId ? `/emails/${emailId}` : null, () =>
+		adminGet<EmailDetailData>(`/emails/${emailId}`),
 	);
 
 	const copyToClipboard = (text: string, label: string) => {
@@ -666,7 +663,13 @@ export default function EmailDetailPage() {
 				<p className="mt-1 text-[13px] text-text-sub-600">
 					This email log may have been deleted or the ID is invalid.
 				</p>
-				<Button.Root asChild variant="neutral" mode="stroke" size="small" className="mt-4">
+				<Button.Root
+					asChild
+					variant="neutral"
+					mode="stroke"
+					size="small"
+					className="mt-4"
+				>
 					<Link href="/emails">Back to emails</Link>
 				</Button.Root>
 			</div>
@@ -1000,7 +1003,10 @@ export default function EmailDetailPage() {
 														variant="neutral"
 														mode="stroke"
 														onClick={() =>
-															copyToClipboard(email.textBody || "", "Plain text")
+															copyToClipboard(
+																email.textBody || "",
+																"Plain text",
+															)
 														}
 													>
 														<Icon name="copy" className="h-3 w-3" />
@@ -1060,7 +1066,10 @@ export default function EmailDetailPage() {
 														variant="neutral"
 														mode="stroke"
 														onClick={() =>
-															copyToClipboard(email.rawMessage || "", "Raw MIME")
+															copyToClipboard(
+																email.rawMessage || "",
+																"Raw MIME",
+															)
 														}
 													>
 														<Icon name="copy" className="h-3 w-3" />
@@ -1176,7 +1185,8 @@ export default function EmailDetailPage() {
 															name={
 																ev.type === "delivered"
 																	? "check"
-																	: ev.type === "failed" || ev.type === "bounced"
+																	: ev.type === "failed" ||
+																			ev.type === "bounced"
 																		? "alert-circle"
 																		: "history"
 															}

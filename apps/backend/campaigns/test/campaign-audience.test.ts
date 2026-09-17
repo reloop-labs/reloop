@@ -54,9 +54,7 @@ describe("skipReasonForContact", () => {
 				suppressionReason: "hard_bounce",
 			}),
 		).toBe(false);
-		expect(
-			excludeFromCampaignSnapshot({ status: "unsubscribed" }),
-		).toBe(true);
+		expect(excludeFromCampaignSnapshot({ status: "unsubscribed" })).toBe(true);
 	});
 });
 
