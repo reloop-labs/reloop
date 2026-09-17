@@ -4,5 +4,9 @@
 	"private": true,
 	"scripts": {
 		"test": "bun test test/"
+	},
+	"devDependencies": {
+		"@types/mailparser": "catalog:backend",
+		"mailparser": "catalog:backend"
 	}
 }

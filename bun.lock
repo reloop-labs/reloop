@@ -462,6 +462,10 @@
     "apps/backend/smtp": {
       "name": "be-smtp",
       "version": "1.0.0",
+      "devDependencies": {
+        "@types/mailparser": "catalog:backend",
+        "mailparser": "catalog:backend",
+      },
     },
     "apps/backend/spam": {
       "name": "be-spam",

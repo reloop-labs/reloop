@@ -136,7 +136,7 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
   end
 
   -- 2. Rewrite links (always, using click_tracking flag)
-  html = html:gsub('(href=["\']?)(https?://[^"%s >]+)(["\']?)', function(prefix, url, suffix)
+  html = html:gsub('(href=["\']?)(https?://[^"\'%s >]+)(["\']?)', function(prefix, url, suffix)
     -- Clean &amp; entity before encoding
     local clean_url = url:gsub("&[aA][mM][pP];", "&")
 
