@@ -7,3 +7,6 @@
 zoho.com
 hushmail.com
 outlook.de
+
+# Corporate domains wrongly listed by upstream disposable catalogues.
+starbucks.com
