@@ -3,7 +3,6 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { ApiIntegration } from "./components/api-integration";
-import { HowItCompares } from "./components/how-it-compares";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { SimilarTools } from "./components/similar-tools";
 import { TempEmailCta } from "./components/temp-email-cta";
@@ -111,11 +110,6 @@ export default function TempEmailCheckerPage() {
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
-				<HowItCompares />
-				<div
-					aria-hidden
-					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
-				/>
 				<SimilarTools />
 				<div aria-hidden className="h-24" />
 				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
@@ -124,7 +118,7 @@ export default function TempEmailCheckerPage() {
 						id="faq-section"
 						eyebrow={
 							<>
-								<span className="text-primary-base">06.</span>{" "}
+								<span className="text-primary-base">05.</span>{" "}
 								<span className="text-text-sub-600 dark:text-white/50">
 									FAQ
 								</span>

@@ -78,7 +78,7 @@ export function WhoIsItFor() {
 					Email Checker for?
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					Anyone who needs to know if an address is real — without ever probing
+					Anyone who needs to know if an address is real without ever probing
 					the mailbox.
 				</p>
 			</div>

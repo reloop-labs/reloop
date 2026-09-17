@@ -56,10 +56,6 @@ export function BestFeatures() {
 					Why <span className="text-primary-base">Reloop</span> is the best temp
 					email checker:
 				</h2>
-				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					In-memory catalogue matching, live DNS resolution, and zero mailbox
-					probing — built for speed, accuracy, and scale.
-				</p>
 			</div>
 
 			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
