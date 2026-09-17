@@ -32,7 +32,7 @@ Markdown: https://reloop.sh/pricing.md
 - CTA: Get started → /dashboard/signup
 - Features:
   - 3,000 emails / month
-  - 200 emails / day
+  - 100 emails / day
   - 1 agent inbox
   - 1 webhook
   - 1 custom domain
@@ -141,7 +141,7 @@ Each successfully sent email counts toward your monthly quota—transactional me
 
 ### Do I need a credit card to start?
 
-No. The Free plan includes 3,000 emails per month and 200 emails per day, with no credit card required. Upgrade when your volume grows.
+No. The Free plan includes 3,000 emails per month and 100 emails per day, with no credit card required. Upgrade when your volume grows.
 
 
 ---
@@ -171,7 +171,7 @@ Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Pro is $10/mo for 50
 | Feature | Reloop | Resend |
 | --- | --- | --- |
 | Free monthly emails | 3,000 / mo | 3,000 / mo |
-| Daily send limit (Free tier) | 200 / day (Free also caps at 3,000 / month) | 100 / day (Free tier limited to 100 sends/day) |
+| Daily send limit (Free tier) | 100 / day (Free also caps at 3,000 / month) | 100 / day (Free tier limited to 100 sends/day) |
 | Entry paid plan | $10 / mo (50,000 emails included) | $20 / mo (50,000 emails included (no $10 tier)) |
 | 100,000 emails / mo plan | $20 / mo | $90 / mo |
 | Overage rate (per 1k emails) | $0.50 / 1k | $0.90 / 1k |
@@ -251,7 +251,7 @@ This section is about control plane ownership—not a promise that Reloop is fas
 
 ### Does Reloop Free have a daily send limit?
 
-Yes. Reloop Free includes 3,000 emails per month and 200 emails per day. Pro ($10/mo), Growth ($20/mo), and Enterprise have no daily cap. Self-hosted Reloop is limited by your own infrastructure, not Reloop Cloud quotas.
+Yes. Reloop Free includes 3,000 emails per month and 100 emails per day. Pro ($10/mo), Growth ($20/mo), and Enterprise have no daily cap. Self-hosted Reloop is limited by your own infrastructure, not Reloop Cloud quotas.
 
 ### Is Reloop a drop-in Resend API?
 
@@ -339,19 +339,59 @@ Reloop offers REST + SMTP, inbound agent inbox, and Apache 2.0 self-host. Mailgu
 
 Reloop is the email service / infrastructure (ESP + MTA). It is not a multi-ESP connector that sits on SendGrid, Mailgun, Resend, or SES.
 
-## Reloop vs Mailgun
+## Pricing & Email Volume
+
+Mailgun prices in plan tiers: Basic at $15/mo for 10,000 emails, Foundation at $35/mo for 50,000, with overage billed from $1.30 per 1,000. Reloop Cloud Pro is $10/mo for 50,000 emails and $0.50 per 1,000 after that. Self-hosting Reloop carries no Reloop license fee; you pay your own infrastructure.
 
 | Feature | Reloop | Mailgun |
 | --- | --- | --- |
-| Open-source codebase | Yes (Apache 2.0) | No |
-| Self-hostable | Yes | No |
+| Free tier | 3,000 / mo (100 / day cap) | 100 / day (Trial period only) |
+| Entry paid plan | $10 / mo (50,000 emails included) | $15 / mo (Basic · 10,000 emails) |
+| 50,000 emails / mo | $10 / mo | $35 / mo (Foundation) |
+| Overage rate (per 1k emails) | $0.50 / 1k | From $1.30 / 1k (Basic from $1.80 / 1k) |
+| Email validation | Yes | Yes (Priced as a separate add-on) |
+| Self-hosted email sends | Unlimited (Free open-source software (own infra)) | N/A (Hosted SaaS only) |
+
+## Sending & Receiving
+
+The sending surface overlaps closely: both speak REST and SMTP, both parse inbound mail. The split is what sits behind it. Reloop runs its own MTA and MX stack (KumoMTA, Rspamd, two-way agent inbox) and hands you the source; Mailgun is managed sending with regex-matched inbound routes.
+
+| Feature | Reloop | Mailgun |
+| --- | --- | --- |
 | REST API | Yes | Yes |
 | SMTP relay | Yes | Yes |
-| Inbound / reply handling | Agent inbox | Inbound routes |
-| Email validation API | Yes | Yes |
-| Marketing campaigns | Yes | Limited |
-| Agent / AI workflows | Yes | No |
-| Free tier | 3,000 emails / month · 200 / day | Trial-based |
+| Inbound / reply handling | Agent inbox (AI triage plus webhooks) | Inbound routes (Regex match and forward) |
+| Agent / AI inbox | Yes | No |
+| Stored templates | Yes (React Email or HTML) | Yes (Handlebars templates) |
+| Batch / broadcast sending | Yes | Yes |
+| Scheduled delivery | Yes | Yes |
+| Marketing campaigns | Yes | Limited (Campaign tooling is a separate Sinch product) |
+
+## Data & Security
+
+Delivery telemetry is comparable. We only mark what Reloop ships today, with no geolocation or client fingerprinting claims.
+
+| Feature | Reloop | Mailgun |
+| --- | --- | --- |
+| Delivery events | Yes | Yes |
+| Bounce & complaint handling | Yes | Yes |
+| Open & click tracking | Yes | Yes |
+| Suppression lists | Yes | Yes |
+| Dashboard activity / logs | Yes | Yes |
+| Webhook signature verification | Yes (HMAC-SHA256 (X-Webhook-Signature)) | Yes (HMAC with account signing key) |
+| SPF / DKIM / DMARC | Yes | Yes |
+
+## Ownership & Exit
+
+This is the section that decides most Mailgun migrations. Mailgun is hosted-only under Sinch, so leaving means rebuilding on someone else's stack. Reloop ships the source and a self-host path, so the exit is a deployment target rather than a rewrite.
+
+| Feature | Reloop | Mailgun |
+| --- | --- | --- |
+| Open-source codebase | Yes (Apache 2.0 plus Reloop Labs terms) | No |
+| Self-hostable | Yes | No |
+| Direct MTA control | Yes (KumoMTA under your control) | No (Managed sending only) |
+| Dedicated IPs | 1 included (Growth plan; bring your own when self-hosted) | Paid add-on (Plan-tiered availability) |
+| Vendor lock-in risk | Lower (Source plus self-host path; still evaluate license terms) | Higher (Hosted-only proprietary stack) |
 
 ## FAQ
 
@@ -361,7 +401,15 @@ Reloop's agent inbox and webhook model cover reply handling and automated triage
 
 ### Do we lose deliverability moving off Mailgun?
 
-Deliverability depends on domain reputation, content, and IPs—not the dashboard brand. Self-hosted Reloop lets you own IPs directly; hosted Reloop manages shared pools like other providers.
+Deliverability depends on domain reputation, content, and IPs, not the dashboard brand. Self-hosted Reloop lets you own IPs directly; hosted Reloop manages shared pools like other providers.
+
+### How does Reloop Cloud pricing compare to Mailgun?
+
+Mailgun Basic is $15/month for 10,000 emails and Foundation is $35/month for 50,000, with overage from $1.30 per 1,000. Reloop Pro is $10/month for 50,000 emails and Growth is $20/month for 100,000, with overage at $0.50 per 1,000. Self-hosted Reloop has no Reloop license fee; you pay your own infrastructure.
+
+### Do SMTP senders need code changes?
+
+No. Applications sending over SMTP change host, port, and credentials only. API senders need a small client adapter, since Reloop is not a drop-in Mailgun proxy.
 
 ## Related
 
@@ -457,7 +505,7 @@ Reloop is the email service / infrastructure (ESP + MTA). It is not a multi-ESP 
 | SMTP relay | Yes | Yes |
 | Message streams / separation | Domain + campaign types | Streams |
 | Agent inbox | Yes | No |
-| Free tier | 3,000 emails / month · 200 / day | Trial credits |
+| Free tier | 3,000 emails / month · 100 / day | Trial credits |
 
 ## FAQ
 
@@ -503,7 +551,7 @@ Loops charges based on your contact list size—penalizing list growth even for 
 | Feature | Reloop | Loops |
 | --- | --- | --- |
 | Pricing basis | Emails sent (Pay for actual volume used) | Contact list size (Bill increases as list grows) |
-| Free monthly tier | 3,000 emails / mo (200 / day cap) | 1,000 contacts |
+| Free monthly tier | 3,000 emails / mo (100 / day cap) | 1,000 contacts |
 | Entry paid plan | $10 / mo (50,000 emails included) | $49 / mo (10k contacts) |
 | 100,000 volume plan | $20 / mo | $399 / mo (100k contacts) |
 | Self-hosted email sends | Unlimited ($0) (Free open-source engine (own infra)) | N/A (Closed SaaS only) |

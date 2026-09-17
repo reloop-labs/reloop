@@ -1,6 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
 import { CheckerPanel } from "../checker-panel";
-import { TempEmailHeroLines } from "./temp-email-hero-lines";
 
 export function TempEmailHero() {
 	return (
@@ -35,8 +34,7 @@ export function TempEmailHero() {
 							records. We do not probe the mailbox.
 						</p>
 
-						<div className="relative mt-10 w-full max-w-xl text-left sm:mt-12">
-							<TempEmailHeroLines />
+						<div className="mt-10 w-full max-w-xl text-left sm:mt-12">
 							<CheckerPanel />
 						</div>
 					</div>

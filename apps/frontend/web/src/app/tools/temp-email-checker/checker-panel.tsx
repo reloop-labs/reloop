@@ -5,7 +5,6 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Label from "@reloop/ui/label";
 import { LoadingDot } from "@reloop/ui/loading-dot";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -16,6 +15,7 @@ import {
 	useState,
 } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
+import { TempEmailHeroLines } from "./components/temp-email-hero-lines";
 import {
 	type CheckResult,
 	type CheckVerdict,
@@ -450,6 +450,7 @@ export function CheckerPanel() {
 
 	// Deep-link support: /tools/temp-email-checker?email=foo@bar.com
 	// auto-fills and runs once so results are shareable.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: run once on mount
 	useEffect(() => {
 		if (autoRanRef.current) return;
 		autoRanRef.current = true;
@@ -463,121 +464,106 @@ export function CheckerPanel() {
 
 	return (
 		<div className="mx-auto w-full max-w-xl text-left font-sans">
-			{/* Dashboard Modal / Card Container */}
-			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
-				{/* Top White Card: Input + Results with dynamic height morphing */}
-				<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#0c0c0c]">
-					{/* Input Check Zone */}
-					<form onSubmit={onSubmit} noValidate className="space-y-4">
-						<div className="space-y-2">
-							<Label.Root
-								htmlFor="checker-input"
-								className="font-semibold text-sm text-text-strong-950 dark:text-white"
-							>
-								Email or domain
-								<Label.Asterisk />
-							</Label.Root>
-
-							<FieldError
-								field={field}
-								messageClassName="text-xs leading-relaxed"
-							>
-								<Input.Root
-									size="medium"
-									hasError={hasFieldError}
-									className={cn(
-										"!shadow-none w-full rounded-xl",
-										hasFieldError
-											? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
-											: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
-									)}
-								>
-									<Input.Wrapper className="h-11 pr-1.5 pl-3.5 dark:bg-[#0c0c0c]">
-										<Input.Input
-											id="checker-input"
-											{...field.controlProps}
-											type="text"
-											inputMode="email"
-											autoComplete="off"
-											autoCapitalize="none"
-											spellCheck={false}
-											value={value}
-											onChange={(e) => {
-												setValue(e.target.value);
-												if (hasFieldError) field.clear();
-												if (result) setResult(null);
-												if (error) setError(null);
-											}}
-											placeholder="you@example.com or domain.com"
-											className="font-medium text-[14.5px]"
-										/>
-										{hasChecked ? (
-											<button
-												type="button"
-												onClick={handleReset}
-												className="flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
-												aria-label="Clear check"
-											>
-												<svg
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="2.5"
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													className="size-3.5"
-													aria-hidden="true"
-												>
-													<path d="M18 6L6 18M6 6l12 12" />
-												</svg>
-											</button>
-										) : (
-											<FancyButton.Root
-												type="submit"
-												variant="primary"
-												size="xsmall"
-												className="!p-0 flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-lg"
-												aria-label="Verify email or domain"
-											>
-												{isPending ? (
-													<LoadingDot
-														size={13}
-														dotSize={2}
-														className="text-white"
-													/>
-												) : (
-													<FancyButton.Icon className="mx-0 size-3.5">
-														<Icon name="arrow-right" className="size-3.5" />
-													</FancyButton.Icon>
-												)}
-											</FancyButton.Root>
-										)}
-									</Input.Wrapper>
-								</Input.Root>
-							</FieldError>
-						</div>
-
-						<MorphSlot
-							activeKey={error ? "error" : result ? "result" : null}
-							reduceMotion={shouldReduceMotion}
+			{/* Input Check Zone */}
+			<form onSubmit={onSubmit} noValidate className="space-y-4">
+				<FieldError field={field} messageClassName="text-xs leading-relaxed">
+					<div className="relative w-full">
+						<TempEmailHeroLines />
+						<Input.Root
+							size="medium"
+							hasError={hasFieldError}
+							className={cn(
+								"relative z-10 w-full rounded-xl bg-bg-white-0 shadow-xs transition-shadow sm:rounded-2xl dark:bg-[#0c0c0c]",
+								hasFieldError
+									? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
+									: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
+							)}
 						>
-							{error ? (
-								<div className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-text-sub-600 text-xs dark:text-white/60">
-									<Icon
-										name="alert-triangle"
-										className="mt-0.5 size-4 shrink-0 text-rose-500"
-									/>
-									<p className="text-rose-600 leading-relaxed dark:text-rose-400">
-										{error}
-									</p>
-								</div>
-							) : result ? (
-								<ResultCardDetailed result={result} onReset={handleReset} />
-							) : null}
-						</MorphSlot>
-					</form>
-				</div>
-			</div>
+							<Input.Wrapper className="h-12 pr-1.5 pl-4 dark:bg-[#0c0c0c]">
+								<Input.Input
+									id="checker-input"
+									aria-label="Email or domain"
+									{...field.controlProps}
+									type="text"
+									inputMode="email"
+									autoComplete="off"
+									autoCapitalize="none"
+									spellCheck={false}
+									value={value}
+									onChange={(e) => {
+										setValue(e.target.value);
+										if (hasFieldError) field.clear();
+										if (result) setResult(null);
+										if (error) setError(null);
+									}}
+									placeholder="you@example.com or domain.com"
+									className="font-medium text-[15px]"
+								/>
+								{hasChecked ? (
+									<button
+										type="button"
+										onClick={handleReset}
+										className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+										aria-label="Clear check"
+									>
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											className="size-3.5"
+											aria-hidden="true"
+										>
+											<path d="M18 6L6 18M6 6l12 12" />
+										</svg>
+									</button>
+								) : (
+									<FancyButton.Root
+										type="submit"
+										variant="primary"
+										size="xsmall"
+										className="!p-0 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg"
+										aria-label="Verify email or domain"
+									>
+										{isPending ? (
+											<LoadingDot
+												size={13}
+												dotSize={2}
+												className="text-white"
+											/>
+										) : (
+											<FancyButton.Icon className="mx-0 size-3.5">
+												<Icon name="arrow-right" className="size-3.5" />
+											</FancyButton.Icon>
+										)}
+									</FancyButton.Root>
+								)}
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+				</FieldError>
+
+				<MorphSlot
+					activeKey={error ? "error" : result ? "result" : null}
+					reduceMotion={shouldReduceMotion}
+				>
+					{error ? (
+						<div className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-text-sub-600 text-xs dark:text-white/60">
+							<Icon
+								name="alert-triangle"
+								className="mt-0.5 size-4 shrink-0 text-rose-500"
+							/>
+							<p className="text-rose-600 leading-relaxed dark:text-rose-400">
+								{error}
+							</p>
+						</div>
+					) : result ? (
+						<ResultCardDetailed result={result} onReset={handleReset} />
+					) : null}
+				</MorphSlot>
+			</form>
 		</div>
 	);
 }

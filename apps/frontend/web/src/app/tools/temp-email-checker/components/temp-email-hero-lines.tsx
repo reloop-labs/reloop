@@ -227,9 +227,9 @@ export function TempEmailHeroLines() {
 		<>
 			{/* Left Canvas: Flows from viewport left edge into input's left edge */}
 			<div
-				className="-translate-y-1/2 pointer-events-none absolute top-[74px] right-full hidden md:block"
+				className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-[calc(100%-14px)] z-0 hidden md:block"
 				style={{
-					width: "calc(50vw - 50%)",
+					width: "calc(50vw - 50% + 14px)",
 					height: "clamp(420px, calc((50vw - 50%) * 1.25), 850px)",
 				}}
 				aria-hidden="true"
@@ -239,9 +239,9 @@ export function TempEmailHeroLines() {
 
 			{/* Right Canvas: Flows from viewport right edge into input's right edge */}
 			<div
-				className="-translate-y-1/2 pointer-events-none absolute top-[74px] left-full hidden rotate-180 md:block"
+				className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-[calc(100%-14px)] z-0 hidden rotate-180 md:block"
 				style={{
-					width: "calc(50vw - 50%)",
+					width: "calc(50vw - 50% + 14px)",
 					height: "clamp(420px, calc((50vw - 50%) * 1.25), 850px)",
 				}}
 				aria-hidden="true"
