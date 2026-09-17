@@ -97,10 +97,21 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
   if click_tracking == nil then click_tracking = true end
   if open_tracking == nil then open_tracking = true end
 
-  -- Only proceed if it looks like HTML
-  if not data:find("text/html") then
+  if not data:find("text/html", 1, true) then
     return data
   end
+
+  local parsed, root = pcall(_kumo.mimepart.parse, data)
+  if not parsed then
+    return data
+  end
+
+  local html_part = root:get_simple_structure().html_part
+  if not html_part then
+    return data
+  end
+
+  local html = html_part.body
 
   local tracking_base_url
   if tracking_domain and tracking_domain ~= "" then
@@ -116,22 +127,18 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
   if open_tracking then
     local open_token = utils.encode_tracking_token(email_log_id, nil)
     local pixel = string.format('<img src="%s/api/mail/v1/track/open/%s" width="1" height="1" style="display:none" alt="" />', tracking_base_url, open_token)
-    if data:find("</body>") then
-      data = data:gsub("</body>", pixel .. "</body>")
+    if html:find("</body>") then
+      html = html:gsub("</body>", pixel .. "</body>")
     else
       -- If no </body>, just append at end (naive but better than nothing)
-      data = data .. pixel
+      html = html .. pixel
     end
   end
 
   -- 2. Rewrite links (always, using click_tracking flag)
-  -- Join QP soft line breaks (=\r\n) so href URLs are not split across lines
-  data = data:gsub("=\r?\n", "")
-
-  -- Rewrite href links in the now-joined content
-  data = data:gsub('(href=3D?["\']?)(https?://[^"%s >]+)(["\']?)', function(prefix, url, suffix)
-    -- Clean &amp; entity and QP =3D artifacts before encoding
-    local clean_url = url:gsub("&[aA][mM][pP];", "&"):gsub("=3D", "=")
+  html = html:gsub('(href=["\']?)(https?://[^"%s >]+)(["\']?)', function(prefix, url, suffix)
+    -- Clean &amp; entity before encoding
+    local clean_url = url:gsub("&[aA][mM][pP];", "&")
 
     -- Check if it is already a redirect URL
     local existing_token = clean_url:match("/redirect/([%w%-_]+)")
@@ -164,7 +171,8 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
     return prefix .. tracked_url .. suffix
   end)
 
-  return data
+  html_part.body = html
+  return tostring(root)
 end
 
 function utils.normalize_tls_mode(mode)
