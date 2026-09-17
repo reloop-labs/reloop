@@ -1,6 +1,11 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
-import { getSiteUrl, siteName, socialProfiles } from "@reloop/web/lib/site";
+import {
+	getSiteUrl,
+	siteName,
+	socialImage,
+	socialProfiles,
+} from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { SectionSeparator } from "../(home)/components/section-separator";
 import ShipFast from "../(home)/components/ship-fast";
@@ -14,7 +19,8 @@ export const instant = false;
 
 const siteUrl = getSiteUrl();
 const pageUrl = `${siteUrl}/self-host`;
-const pageTitle = "Self-Host Email Infrastructure | Reloop";
+const pageTitle = "Self-Host Email Infrastructure";
+const socialTitle = `${pageTitle} | Reloop`;
 const pageDescription =
 	"Deploy full-featured email infrastructure on your own servers. Apache 2.0 open-source transactional APIs, webhooks, SMTP routing, and agent inboxes with 100% data sovereignty.";
 
@@ -34,16 +40,18 @@ export const metadata: Metadata = {
 	],
 	alternates: { canonical: pageUrl },
 	openGraph: {
-		title: pageTitle,
+		title: socialTitle,
 		description: pageDescription,
+		images: [socialImage],
 		type: "website",
 		url: pageUrl,
 		siteName,
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: pageTitle,
+		title: socialTitle,
 		description: pageDescription,
+		images: [socialImage.url],
 	},
 };
 

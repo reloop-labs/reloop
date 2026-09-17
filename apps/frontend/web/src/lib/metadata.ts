@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { defaultOgImage } from "./site";
+import { socialImage } from "./site";
 
 type PageMetadataInput = {
 	title: string;
 	description: string;
 	path: string;
 	keywords?: readonly string[];
-	/** Set to false when the route provides opengraph-image.tsx */
 	ogImage?: string | false;
 };
 
@@ -15,7 +14,7 @@ export function createPageMetadata({
 	description,
 	path,
 	keywords,
-	ogImage = defaultOgImage,
+	ogImage,
 }: PageMetadataInput): Metadata {
 	const metadata: Metadata = {
 		title,
@@ -39,13 +38,13 @@ export function createPageMetadata({
 
 	if (ogImage !== false) {
 		const image = {
-			url: ogImage,
-			width: ogImage === defaultOgImage ? 512 : 1200,
-			height: ogImage === defaultOgImage ? 512 : 630,
+			url: ogImage ?? socialImage.url,
+			width: 1200,
+			height: 630,
 			alt: `${title} | Reloop`,
 		};
 		metadata.openGraph = { ...metadata.openGraph, images: [image] };
-		metadata.twitter = { ...metadata.twitter, images: [ogImage] };
+		metadata.twitter = { ...metadata.twitter, images: [image.url] };
 	}
 
 	return metadata;

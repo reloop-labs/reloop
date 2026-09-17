@@ -26,7 +26,7 @@ export const metadata = createPageMetadata({
 	description: metaDescription,
 	path: toolPath,
 	keywords: toolKeywords,
-	ogImage: false,
+	ogImage: "/tools/opengraph-image",
 });
 
 export default function EmailValidatorPage() {

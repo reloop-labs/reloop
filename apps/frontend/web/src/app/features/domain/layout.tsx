@@ -5,7 +5,7 @@ const pagePath = "/features/domain";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
-	title: "Custom Domain & DNS Authentication | Reloop",
+	title: "Custom Domain & DNS Authentication",
 	description:
 		"Automated SPF, DKIM, and DMARC verification for custom sending domains. Verify DNS records, secure email deliverability, and eliminate spam flags with zero configuration.",
 	keywords: [

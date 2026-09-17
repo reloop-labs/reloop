@@ -1,4 +1,4 @@
-import { getSiteUrl } from "@reloop/web/lib/site";
+import { getSiteUrl, socialImage } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 
 export function createLandingMetadata(
@@ -12,7 +12,7 @@ export function createLandingMetadata(
 	const canonicalUrl = `${getSiteUrl()}${path}`;
 
 	return {
-		title: fullTitle,
+		title,
 		description,
 		keywords,
 		alternates: { canonical: canonicalUrl },
@@ -22,11 +22,13 @@ export function createLandingMetadata(
 			type: "website",
 			url: canonicalUrl,
 			siteName: "Reloop",
+			images: [socialImage],
 		},
 		twitter: {
 			card: "summary_large_image",
 			title: fullTitle,
 			description: ogDescription ?? description,
+			images: [socialImage.url],
 		},
 	};
 }

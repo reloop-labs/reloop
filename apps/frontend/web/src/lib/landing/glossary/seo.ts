@@ -6,7 +6,7 @@ const siteUrl = () => getSiteUrl();
 
 /** Meta description sweet spot. */
 const DESC_MIN = 120;
-const DESC_MAX = 160;
+const DESC_MAX = 155;
 
 function clampDescription(text: string, keywordHint?: string): string {
 	let d = text.trim().replace(/\s+/g, " ");
@@ -18,7 +18,8 @@ function clampDescription(text: string, keywordHint?: string): string {
 		d = `${d}${pad}`;
 	}
 	if (d.length <= DESC_MAX) return d;
-	return `${d.slice(0, DESC_MAX - 1).trimEnd()}...`;
+	const cut = d.slice(0, DESC_MAX - 3);
+	return `${cut.slice(0, cut.lastIndexOf(" ")).trimEnd()}...`;
 }
 
 /**

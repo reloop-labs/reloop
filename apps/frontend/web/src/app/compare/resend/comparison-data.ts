@@ -1,3 +1,4 @@
+import { freePlanSummary } from "@reloop/web/lib/pricing-facts";
 import type { ComparisonCategory } from "../compare-types";
 
 /**
@@ -10,8 +11,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 		id: "pricing-volume",
 		label: "Pricing & Email Volume",
 		icon: "invoice",
-		intro:
-			"Reloop Cloud Free is 3,000 emails/month with a 200/day cap. Pro is $10/mo for 50,000 emails with no daily cap. Overage is $0.50 vs Resend's $0.90 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).",
+		intro: `Reloop Cloud Free is ${freePlanSummary}. Pro is $10/mo for 50,000 emails with no daily cap. Overage is $0.50 vs Resend's $0.90 per 1,000. Self-hosting Reloop has no Reloop license fee (you pay your own infra).`,
 		features: [
 			{
 				label: "Free monthly emails",

@@ -3,7 +3,9 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
+import { JsonLd } from "@reloop/web/components/json-ld";
 import type { AlternativeDefinition } from "@reloop/web/lib/landing/types";
+import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import Link from "next/link";
 
 const competitorAccent: Record<string, string> = {
@@ -26,6 +28,12 @@ export function AlternativePageView({
 
 	return (
 		<div className="min-h-screen bg-[#fafafa] dark:bg-black">
+			<JsonLd
+				data={breadcrumbJsonLd([
+					{ name: "Alternatives", path: "/alternatives" },
+					{ name: `${config.competitorName} alternative`, path: config.path },
+				])}
+			/>
 			{/* VS header — alternative.to / G2 pattern */}
 			<div className="border-stroke-soft-200 border-b bg-white dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-4xl px-4 py-12 text-center sm:px-6">

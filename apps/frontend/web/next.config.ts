@@ -52,12 +52,27 @@ const nextConfig: NextConfig = {
 			{
 				// Marketing HTML + agent routes — short cache for AFDocs cache hygiene
 				source:
-					"/:path((?!_next/static|_next/image|font/|manifest\\.json|healthz).*)",
+					"/:path((?!_next/static|_next/image|font/|manifest\\.json|healthz)(?!.*\\.md$).*)",
 				headers: [
 					{ key: "Link", value: agentLink },
 					{ key: "Cache-Control", value: agentCache },
 				],
 			},
+			...[
+				["/index.md", ""],
+				["/pricing.md", "/pricing"],
+				["/about.md", "/about"],
+				["/developers.md", "/developers"],
+			].map(([file, page]) => ({
+				source: file as string,
+				headers: [
+					{
+						key: "Link",
+						value: `${agentLink}, <https://reloop.sh${page}>; rel="canonical"`,
+					},
+					{ key: "Cache-Control", value: agentCache },
+				],
+			})),
 		];
 	},
 	async rewrites() {

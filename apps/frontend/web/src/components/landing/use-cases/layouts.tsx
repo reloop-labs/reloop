@@ -2,9 +2,11 @@
 
 import * as Button from "@reloop/ui/button";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
+import { JsonLd } from "@reloop/web/components/json-ld";
 import { accentStyles } from "@reloop/web/lib/landing/page-accents";
 import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import { getUseCaseEnrichment } from "@reloop/web/lib/landing/use-cases/enrichment";
+import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import Link from "next/link";
 import type React from "react";
 
@@ -20,6 +22,12 @@ export function SplitScreenLayout({ config, children }: LayoutProps) {
 
 	return (
 		<div className="min-h-screen bg-white text-left font-sans dark:bg-black">
+			<JsonLd
+				data={breadcrumbJsonLd([
+					{ name: "Use cases", path: "/use-cases" },
+					{ name: config.titleLines.join(" "), path: config.path },
+				])}
+			/>
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">
 				<div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-16">
 					<div>
@@ -125,6 +133,12 @@ export function ConsoleFirstLayout({ config, children }: LayoutProps) {
 
 	return (
 		<div className="min-h-screen bg-white text-left font-sans dark:bg-black">
+			<JsonLd
+				data={breadcrumbJsonLd([
+					{ name: "Use cases", path: "/use-cases" },
+					{ name: config.titleLines.join(" "), path: config.path },
+				])}
+			/>
 			{/* Hero & Terminal */}
 			<div className="relative overflow-hidden border-stroke-soft-200 border-b pt-24 pb-16 dark:border-white/10">
 				{/* Background Glow */}
@@ -230,6 +244,12 @@ export function CenteredVisualLayout({ config, children }: LayoutProps) {
 
 	return (
 		<div className="min-h-screen bg-white text-center font-sans dark:bg-black">
+			<JsonLd
+				data={breadcrumbJsonLd([
+					{ name: "Use cases", path: "/use-cases" },
+					{ name: config.titleLines.join(" "), path: config.path },
+				])}
+			/>
 			{/* Centered Hero */}
 			<div className="relative border-stroke-soft-200 border-b bg-slate-50/20 pt-24 pb-16 dark:border-white/10 dark:bg-slate-900/[0.05]">
 				<div className="pointer-events-none absolute inset-0">
@@ -324,6 +344,12 @@ export function AutomationFlowLayout({ config, children }: LayoutProps) {
 
 	return (
 		<div className="min-h-screen bg-white text-left font-sans dark:bg-black">
+			<JsonLd
+				data={breadcrumbJsonLd([
+					{ name: "Use cases", path: "/use-cases" },
+					{ name: config.titleLines.join(" "), path: config.path },
+				])}
+			/>
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">
 				<div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6">
 					{/* Breadcrumbs */}

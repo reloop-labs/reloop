@@ -17,7 +17,7 @@ export const instant = false;
 const pageUrl = `${getSiteUrl()}/features`;
 
 export const metadata: Metadata = {
-	title: "Features | Reloop",
+	title: "Features",
 	description:
 		"Explore Reloop features—campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
 	keywords: [

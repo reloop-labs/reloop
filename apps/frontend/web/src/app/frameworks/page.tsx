@@ -17,7 +17,7 @@ const siteUrl = getSiteUrl();
 const pageUrl = `${siteUrl}/frameworks`;
 
 export const metadata: Metadata = {
-	title: "Framework Integrations | Next.js, Django, Laravel & more | Reloop",
+	title: "Framework Integrations | Next.js, Django, Laravel & more",
 	description:
 		"Official email framework guides for Next.js, Express, NestJS, Fastify, Elysia, Django, FastAPI, Flask, Laravel, Rails, Spring Boot, ASP.NET Core, Phoenix, and Gin.",
 	keywords: [

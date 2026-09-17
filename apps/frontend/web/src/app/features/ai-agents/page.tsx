@@ -1,10 +1,12 @@
+import { JsonLd } from "@reloop/web/components/json-ld";
+import { breadcrumbJsonLd, faqPageJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import AgentFacts, { agentFaq } from "./components/agent-facts";
 import Bento from "./components/bento";
 import CTA from "./components/cta";
 import Guide from "./components/guide";
 import Hero from "./components/hero";
-import Metrics from "./components/metrics";
 import Sandbox from "./components/sandbox";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -15,21 +17,22 @@ const pagePath = "/features/ai-agents";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
-	title: "Email for AI Agents | Reloop",
+	title: "Email API for AI Agents: Inbox, MCP and Inbound Email",
 	description:
-		"Send, receive, and manage email from autonomous AI agents and LLMs. API-first email infrastructure designed for agentic workflows, tool-use, and programmatic communication.",
+		"Give AI agents an email address, an inbound webhook, an MCP server and a send API. Open-source email infrastructure for agents, hosted or self-hosted.",
 	keywords: [
+		"email API for AI agents",
+		"AI agent inbox",
+		"email infrastructure for AI agents",
+		"MCP email server",
+		"inbound email for AI agents",
 		"AI agent email",
 		"LLM email API",
-		"email for AI agents",
-		"agentic email infrastructure",
-		"programmatic email",
-		"AI email automation",
 		"open source email API",
 	],
 	alternates: { canonical: pageUrl },
 	openGraph: {
-		title: "Email for AI Agents | Reloop",
+		title: "Email API for AI Agents | Reloop",
 		description:
 			"API-first email infrastructure designed for autonomous AI agents, LLMs, and agentic workflows.",
 		type: "website",
@@ -38,7 +41,7 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Email for AI Agents | Reloop",
+		title: "Email API for AI Agents | Reloop",
 		description:
 			"API-first email infrastructure designed for autonomous AI agents, LLMs, and agentic workflows.",
 	},
@@ -47,10 +50,19 @@ export const metadata: Metadata = {
 const AiAgentsPage = () => {
 	return (
 		<div>
+			<JsonLd
+				data={[
+					breadcrumbJsonLd([
+						{ name: "Features", path: "/features" },
+						{ name: "Email for AI agents", path: pagePath },
+					]),
+					faqPageJsonLd(agentFaq),
+				]}
+			/>
 			<Hero />
 			<Sandbox />
 			<Bento />
-			<Metrics />
+			<AgentFacts />
 			<Guide />
 			<CTA />
 		</div>

@@ -13,7 +13,7 @@ export const instant = false;
 const pageUrl = `${getSiteUrl()}/changelog`;
 
 export const metadata: Metadata = {
-	title: "Changelog | Reloop",
+	title: "Changelog",
 	description:
 		"What's new in Reloop — product releases from September 2025 onward, organized by planning, design, frontend, backend, and DevOps.",
 	keywords: [

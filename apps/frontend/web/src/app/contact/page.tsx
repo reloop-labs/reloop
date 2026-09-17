@@ -30,7 +30,7 @@ const seoDescription =
 	"Get help from the engineers who built Reloop. Start a live chat, configure self-hosting or SMTP, and debug API delivery. Typically reply in 2-3 minutes.";
 
 export const metadata: Metadata = {
-	title: "Get help from the engineers who built it | Reloop",
+	title: "Get help from the engineers who built it",
 	description: seoDescription,
 	keywords: [
 		"contact Reloop",

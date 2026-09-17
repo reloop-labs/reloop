@@ -155,7 +155,8 @@ const config = {
 			{
 				// Docs HTML/API/agent content — short cache so agents see updates promptly.
 				// Exclude hashed static assets.
-				source: "/:path((?!_next/static|_next/image|font/|healthz).*)",
+				source:
+					"/:path((?!_next/static|_next/image|font/|healthz)(?!.*\\.md$).*)",
 				headers: [
 					{
 						key: "Link",

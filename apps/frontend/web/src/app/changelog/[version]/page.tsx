@@ -1,3 +1,5 @@
+import { JsonLd } from "@reloop/web/components/json-ld";
+import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -61,6 +63,12 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 
 	return (
 		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<JsonLd
+				data={breadcrumbJsonLd([
+					{ name: "Changelog", path: "/changelog" },
+					{ name: release.title, path: `/changelog/${release.version}` },
+				])}
+			/>
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
 				{/* Breadcrumb Header */}
 				<div className="flex items-center gap-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">

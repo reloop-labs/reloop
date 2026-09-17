@@ -101,7 +101,7 @@ export default function FrameworkHero({
 
 						<div className="min-w-0 flex-1">
 							<h1 className="flex min-h-16 items-center font-semibold text-3xl text-text-strong-950 tracking-tight sm:min-h-20 sm:text-4xl lg:text-[2.5rem] dark:text-white">
-								{framework.name}
+								Send email from {framework.name}
 							</h1>
 							<p className="mt-2 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
 								{framework.shortDescription}

@@ -1,10 +1,34 @@
 import { type PricingPlan, pricingPlans } from "@reloop/pricing";
+import { hostedPlansSentence } from "@reloop/web/lib/pricing-facts";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
 
 export type FaqEntry = {
 	question: string;
 	answer: string;
 };
+
+export type BreadcrumbEntry = {
+	name: string;
+	path: string;
+};
+
+export function breadcrumbJsonLd(
+	items: BreadcrumbEntry[],
+	siteUrl = getSiteUrl(),
+) {
+	return {
+		"@context": "https://schema.org" as const,
+		"@type": "BreadcrumbList" as const,
+		itemListElement: [{ name: "Home", path: "/" }, ...items].map(
+			(item, index) => ({
+				"@type": "ListItem" as const,
+				position: index + 1,
+				name: item.name,
+				item: `${siteUrl}${item.path === "/" ? "" : item.path}`,
+			}),
+		),
+	};
+}
 
 export function faqPageJsonLd(items: FaqEntry[]) {
 	return {
@@ -60,8 +84,7 @@ export function pricingOffersJsonLd(siteUrl = getSiteUrl()) {
 		.filter((offer): offer is NonNullable<typeof offer> => offer !== null);
 }
 
-const PRODUCT_DESCRIPTION =
-	"Open-source email infrastructure (Apache 2.0). Hosted Reloop Cloud plans: Free (3,000 emails/month, 200/day), Pro $10/month (50,000 emails, no daily cap), Growth $20/month (100,000 emails, no daily cap), Enterprise custom. Self-host has no Reloop license fee.";
+const PRODUCT_DESCRIPTION = `Open-source email infrastructure (Apache 2.0 with Reloop Labs use restrictions). ${hostedPlansSentence()} Self-host has no Reloop license fee.`;
 
 /** Product + Offer JSON-LD driven by `@reloop/pricing`. No reviews or invented plans. */
 export function pricingProductJsonLd(siteUrl = getSiteUrl()) {

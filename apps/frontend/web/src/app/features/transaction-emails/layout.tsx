@@ -5,7 +5,7 @@ const pagePath = "/features/transaction-emails";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
-	title: "Transactional Email API | Reloop",
+	title: "Transactional Email API",
 	description:
 		"Low-latency transactional email delivery for developers. Send password resets, order confirmations, and welcome emails with a simple API. Open source and self-hostable.",
 	keywords: [

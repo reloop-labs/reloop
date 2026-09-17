@@ -76,10 +76,10 @@ const ResendComparisonPage = () => {
 							Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;{resendBrand?.name}
 						</h2>
 						<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-							Reloop is the #1 open-source alternative to{" "}
-							{resendBrand?.name || "Resend"}.
-							<br /> With Reloop, get everything you need sending, receiving, AI
-							templates, and agent inboxes at a fraction of the cost.
+							Reloop is an open-source alternative to{" "}
+							{resendBrand?.name || "Resend"} that runs its own MTA.
+							<br /> Sending, receiving, AI templates, and agent inboxes in one
+							codebase, hosted or self-hosted.
 						</p>
 					</div>
 					<ComparisonMatrix

@@ -13,7 +13,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata = createPageMetadata({
 	title: "Reloop Engine",
 	description:
-		"Five synchronized layers built for sub-millisecond dispatch, bulletproof deliverability, and developer flexibility from wire protocols to autonomous agents.",
+		"How Reloop is built: five layers from wire protocols and the KumoMTA sending core to deliverability tooling, the REST API, and autonomous agent surfaces.",
 	path: pagePath,
 	keywords: [
 		"Reloop engine",
@@ -30,7 +30,7 @@ const jsonLd = {
 	url: pageUrl,
 	name: "Reloop Engine",
 	description:
-		"Five synchronized layers built for sub-millisecond dispatch, bulletproof deliverability, and developer flexibility from wire protocols to autonomous agents.",
+		"How Reloop is built: five layers from wire protocols and the KumoMTA sending core to deliverability tooling, the REST API, and autonomous agent surfaces.",
 };
 
 export default function EnginePage() {

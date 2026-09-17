@@ -1,5 +1,6 @@
 "use client";
 
+import { CompareSourceNote } from "./compare-source-note";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
@@ -409,6 +410,7 @@ export function ComparisonTable({
 				<div className="h-6 border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]" />
 				<div />
 			</div>
+			<CompareSourceNote competitorName={competitorName} />
 		</div>
 	);
 }

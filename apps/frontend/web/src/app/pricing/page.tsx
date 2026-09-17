@@ -1,5 +1,6 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
+import { freePlanSummary } from "@reloop/web/lib/pricing-facts";
 import { faqPageJsonLd, pricingProductJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
@@ -13,11 +14,10 @@ export const instant = false;
 
 const siteUrl = getSiteUrl();
 const pricingPageUrl = `${siteUrl}/pricing`;
-const pricingDescription =
-	"Scale your email, control your costs. Start free with 3,000 emails per month (200/day). Upgrade to Pro $10, Growth $20, or Enterprise—or self-host with no Reloop license fee.";
+const pricingDescription = `Start free with ${freePlanSummary}. Upgrade to Pro $10 or Growth $20 per month with no daily cap, or self-host with no Reloop license fee.`;
 
 export const metadata: Metadata = {
-	title: "Pricing | Reloop",
+	title: "Pricing",
 	description: pricingDescription,
 	keywords: [
 		"email pricing",

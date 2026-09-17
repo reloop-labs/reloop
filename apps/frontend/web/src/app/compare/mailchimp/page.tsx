@@ -1,3 +1,7 @@
+import {
+	freeDailyEmails,
+	freeMonthlyEmails,
+} from "@reloop/web/lib/pricing-facts";
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
 import {
@@ -100,9 +104,10 @@ const MailchimpComparisonPage = () => {
 								Reloop model
 							</h3>
 							<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
-								3,000 emails free (200/day), then Pro $10/mo (50,000), Growth
-								$20/mo (100,000), Enterprise custom. Store contacts for
-								segmentation without audience-based surcharges. See{" "}
+								{freeMonthlyEmails} emails free ({freeDailyEmails}/day), then
+								Pro $10/mo (50,000), Growth $20/mo (100,000), Enterprise custom.
+								Store contacts for segmentation without audience-based
+								surcharges. See{" "}
 								<Link
 									href="/pricing"
 									className="font-semibold text-primary-base"

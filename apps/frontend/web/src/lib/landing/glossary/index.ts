@@ -1,3 +1,4 @@
+import { term as agent_inbox } from "./agent-inbox";
 import { term as api } from "./api";
 import { term as authentication } from "./authentication";
 import { term as bimi } from "./bimi";
@@ -32,6 +33,7 @@ import { term as ip_warming } from "./ip-warming";
 import { term as list_hygiene } from "./list-hygiene";
 import { term as list_unsubscribe } from "./list-unsubscribe";
 import { term as marketing_email } from "./marketing-email";
+import { term as mcp } from "./mcp";
 import { term as mime } from "./mime";
 import { term as mta } from "./mta";
 import { term as mx_record } from "./mx-record";
@@ -59,6 +61,7 @@ import { term as webhook } from "./webhook";
 import { term as whitelist } from "./whitelist";
 
 export const glossaryTerms = [
+	agent_inbox,
 	api,
 	authentication,
 	bounce,
@@ -93,6 +96,7 @@ export const glossaryTerms = [
 	list_hygiene,
 	list_unsubscribe,
 	marketing_email,
+	mcp,
 	mime,
 	mta,
 	mx_record,

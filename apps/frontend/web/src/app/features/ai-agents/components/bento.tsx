@@ -119,9 +119,9 @@ export default function Bento() {
 								AI-Native Guardrails
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Filter prompt injection vectors hiding inside incoming email
-								bodies. Ensure outbound agent drafts are sanitized, legal, and
-								hallucination-free.
+								Screen inbound bodies for prompt-injection patterns before they
+								reach your model, and route outbound drafts to a human for
+								approval before they send.
 							</p>
 						</div>
 						<div className="mt-12 flex flex-wrap gap-2">

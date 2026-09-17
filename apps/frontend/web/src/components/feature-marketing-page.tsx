@@ -83,7 +83,7 @@ export function featurePageMetadata(
 		: undefined;
 
 	return {
-		title: fullTitle,
+		title,
 		description,
 		keywords: options?.keywords,
 		alternates: canonicalUrl ? { canonical: canonicalUrl } : undefined,

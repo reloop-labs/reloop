@@ -1,5 +1,5 @@
 import type { BlogPostDefinition } from "@reloop/web/lib/landing/types";
-import { getSiteUrl, siteName } from "@reloop/web/lib/site";
+import { getSiteUrl, siteName, socialImage } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 
 const DESC_MAX = 160;
@@ -69,14 +69,12 @@ export function createBlogPostMetadata(post: BlogPostDefinition): Metadata {
 	const canonicalUrl = blogPostUrl(post.slug);
 	const titleFull = `${post.title} | ${siteName}`;
 	const description = clampDescription(post.description);
-	const cover = post.image
-		? {
-				url: post.image,
-				width: 1200,
-				height: 630,
-				alt: post.title,
-			}
-		: undefined;
+	const cover = {
+		url: post.image ?? `/blog/${post.slug}/opengraph-image`,
+		width: 1200,
+		height: 630,
+		alt: post.title,
+	};
 
 	return {
 		title: post.title,
@@ -91,16 +89,16 @@ export function createBlogPostMetadata(post: BlogPostDefinition): Metadata {
 			url: canonicalUrl,
 			siteName,
 			locale: "en_US",
-			publishedTime: post.publishedAt,
+			publishedTime: new Date(post.publishedAt).toISOString(),
 			authors: [post.author.name],
 			tags: post.tags.length > 0 ? post.tags : undefined,
-			...(cover ? { images: [cover] } : {}),
+			images: [cover],
 		},
 		twitter: {
 			card: "summary_large_image",
 			title: titleFull,
 			description,
-			...(cover ? { images: [cover.url] } : {}),
+			images: [cover.url],
 		},
 	};
 }
@@ -159,11 +157,13 @@ export function createBlogCategoryMetadata(category: {
 			url: pageUrl,
 			siteName,
 			locale: "en_US",
+			images: [socialImage],
 		},
 		twitter: {
 			card: "summary_large_image",
 			title,
 			description,
+			images: [socialImage.url],
 		},
 	};
 }

@@ -1,7 +1,7 @@
 import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { PixelBlast } from "@reloop/web/components/pixel-blast";
-import { getSiteUrl } from "@reloop/web/lib/site";
+import { getSiteUrl, socialImage } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { OpenSourceFaq } from "./components/open-source-faq";
 import { OpenSourceSection } from "./components/open-source-section";
@@ -12,7 +12,8 @@ export const instant = false;
 
 const pagePath = "/why-open-source";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
-const pageTitle = "Why Open Source | Reloop";
+const pageTitle = "Why Open Source";
+const socialTitle = `${pageTitle} | Reloop`;
 const pageDescription =
 	"Don't take our word for it. Reloop is open-source email infrastructure you can verify in code: no black-box claims page, single-click deploy, real product UI and DX.";
 
@@ -31,16 +32,18 @@ export const metadata: Metadata = {
 	],
 	alternates: { canonical: pageUrl },
 	openGraph: {
-		title: pageTitle,
+		title: socialTitle,
 		description: pageDescription,
+		images: [socialImage],
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: pageTitle,
+		title: socialTitle,
 		description: pageDescription,
+		images: [socialImage.url],
 	},
 };
 

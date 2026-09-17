@@ -12,7 +12,7 @@ export const instant = false;
 const pageUrl = `${getSiteUrl()}/license`;
 
 export const metadata: Metadata = {
-	title: "License | Reloop",
+	title: "License",
 	description:
 		"Reloop is licensed under Apache License 2.0 with additional use restrictions from Reloop Labs. Review permitted uses, hosted service, and self-hosting options.",
 	keywords: [

@@ -14,7 +14,7 @@ export const instant = false;
 const pageUrl = `${getSiteUrl()}/features/email-templates`;
 
 export const metadata: Metadata = {
-	title: "Email Templates | Reloop",
+	title: "Email Templates",
 	description:
 		"Beautiful, responsive email templates for every use case. Choose from our library of pre-built templates or create custom designs with our drag-and-drop editor.",
 	keywords: [
