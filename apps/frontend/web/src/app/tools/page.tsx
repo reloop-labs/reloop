@@ -1,9 +1,8 @@
 import { Icon } from "@reloop/ui/icon";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
-import { toolConfigs } from "@reloop/web/lib/landing/tools";
 import { hostedSignupHref } from "@reloop/web/lib/site";
-import Link from "next/link";
+import { ToolsGrid } from "./components/tools-grid";
 import { ToolsHeroBlast } from "./components/tools-hero-blast";
 
 export const instant = false;
@@ -29,7 +28,7 @@ export default function ToolsIndexPage() {
 	return (
 		<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#10b981] [--primary-dark:#059669] [--primary-darker:#047857] [--primary-link:#059669] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#6ee7b7] dark:[--primary-dark:#6ee7b7] dark:[--primary-darker:#a7f3d0] dark:[--primary-link:#6ee7b7]">
 			{/* Hero Section — matches pricing / why-open-source */}
-			<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
+			<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-28 text-center sm:px-8 sm:pb-36 lg:px-12">
 				<div
 					aria-hidden="true"
 					className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
@@ -69,29 +68,8 @@ export default function ToolsIndexPage() {
 				</div>
 			</header>
 
-			{/* Tools Grid — minimal Firecrawl-style cards */}
-			<div className="w-full px-6 py-12 sm:px-8 lg:px-12 lg:py-16">
-				<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-					{toolConfigs.map((tool) => {
-						const title = tool.titleLines.join(" ");
-
-						return (
-							<Link
-								key={tool.path}
-								href={tool.path}
-								className="group hover:-translate-y-0.5 rounded-[20px] border border-stroke-soft-100 bg-white p-8 transition-all duration-200 hover:border-emerald-500/60 dark:border-white/10 dark:bg-white/[0.02] dark:hover:border-emerald-400/50 dark:hover:bg-white/[0.04]"
-							>
-								<h2 className="font-medium text-[18px] text-text-strong-950 tracking-tight dark:text-white">
-									{title}
-								</h2>
-								<p className="mt-2 line-clamp-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
-									{tool.description}
-								</p>
-							</Link>
-						);
-					})}
-				</div>
-			</div>
+			{/* Tools Grid */}
+			<ToolsGrid />
 
 			{/* Global Upsell / Platform CTA */}
 			<div className="border-stroke-soft-100 border-t dark:border-white/10">

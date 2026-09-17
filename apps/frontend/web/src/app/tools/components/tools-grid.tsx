@@ -1,25 +1,33 @@
 import { cn } from "@reloop/ui/cn";
 import {
+	Activity,
+	AlertTriangle,
+	BadgeCheck,
 	Ban,
 	Calendar,
+	Clock,
+	Code2,
+	Eye,
 	Globe,
 	MailCheck,
 	Search,
 	Send,
 	ShieldAlert,
 	ShieldCheck,
+	Sparkles,
+	Terminal,
 } from "lucide-react";
 import Link from "next/link";
 import type { ComponentType } from "react";
 
-type SimilarToolItem = {
+export type ToolItem = {
 	title: string;
 	description: string;
 	icon: ComponentType<{ className?: string }>;
 	path: string;
 };
 
-const SIMILAR_TOOLS: SimilarToolItem[] = [
+export const ALL_TOOLS: ToolItem[] = [
 	{
 		title: "Free Email Validator",
 		description:
@@ -76,6 +84,62 @@ const SIMILAR_TOOLS: SimilarToolItem[] = [
 		icon: ShieldCheck,
 		path: "/tools/auth-checker",
 	},
+	{
+		title: "Temp & Disposable Email Checker",
+		description:
+			"Check syntax, known disposable providers, role prefixes, free webmail domains, and MX records before sending.",
+		icon: Clock,
+		path: "/tools/temp-email-checker",
+	},
+	{
+		title: "Domain Reputation Checker",
+		description:
+			"Evaluate your sending domain reputation with real-time health score, spam placement risks, and configuration audits.",
+		icon: Activity,
+		path: "/tools/domain-reputation-checker",
+	},
+	{
+		title: "Lookalike Domain Watch & Phish Scanner",
+		description:
+			"Discover registered domain twins, typosquats, and lookalikes impersonating your brand before attackers strike.",
+		icon: Eye,
+		path: "/tools/lookalike-watch",
+	},
+	{
+		title: "Email Spam Words Checker",
+		description:
+			"Scan email subject lines and copy for trigger words, spam patterns, and formatting issues that hurt inbox delivery.",
+		icon: AlertTriangle,
+		path: "/tools/email-spam-words-checker",
+	},
+	{
+		title: "BIMI Checker",
+		description:
+			"Validate your Brand Indicators for Message Identification record and SVG logo to display verified avatars in inboxes.",
+		icon: BadgeCheck,
+		path: "/tools/bimi-checker",
+	},
+	{
+		title: "Email HTML Editor",
+		description:
+			"Create, edit, and preview responsive email HTML templates in real time across mobile and desktop viewports.",
+		icon: Code2,
+		path: "/tools/email-html-editor",
+	},
+	{
+		title: "Developer Tools API",
+		description:
+			"Integrate syntax verification, DNS queries, and deliverability checks directly via our low-latency REST API.",
+		icon: Terminal,
+		path: "/docs/api",
+	},
+	{
+		title: "Suggest a Tool",
+		description:
+			"Need an email or DNS utility that isn't listed here? Suggest a tool and we'll build it for the community.",
+		icon: Sparkles,
+		path: "/contact",
+	},
 ];
 
 function getBorderClass(index: number, total: number) {
@@ -97,57 +161,37 @@ function getBorderClass(index: number, total: number) {
 	);
 }
 
-export function SimilarTools() {
+export function ToolsGrid() {
 	return (
 		<section
-			id="similar-tools"
-			aria-labelledby="similar-tools-heading"
+			id="tools-list"
+			aria-label="All Free Developer Tools"
 			className="w-full"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-primary-base">04.</span>{" "}
-					<span className="text-text-sub-600 dark:text-white/50">
-						Similar tools
-					</span>
-				</p>
-				<h2
-					id="similar-tools-heading"
-					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
-				>
-					Explore more <span className="text-primary-base">free tools</span>{" "}
-					like Temp Email Checker
-				</h2>
-				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					Validate, inspect, and test every part of your email setup. Free, no
-					signup required.
-				</p>
-			</div>
-
-			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
-				{SIMILAR_TOOLS.map((tool, index) => {
+			<div className="grid grid-cols-1 border-stroke-soft-100 border-t border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
+				{ALL_TOOLS.map((tool, index) => {
 					const IconComponent = tool.icon;
-					const borderClass = getBorderClass(index, SIMILAR_TOOLS.length);
+					const borderClass = getBorderClass(index, ALL_TOOLS.length);
 
 					return (
 						<Link
 							key={tool.title}
 							href={tool.path}
 							className={cn(
-								"group flex flex-col border-stroke-soft-100 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 transition-colors hover:bg-neutral-50/70 dark:border-white/10 dark:hover:bg-white/[0.02]",
+								"group flex flex-col border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-neutral-50/70 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:border-white/10 dark:hover:bg-white/[0.02]",
 								borderClass,
 							)}
 						>
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-primary-base transition-transform group-hover:scale-105 dark:bg-blue-950/40 dark:text-blue-400">
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition-transform group-hover:scale-105 dark:bg-blue-950/40 dark:text-blue-400">
 								<IconComponent className="h-5 w-5 stroke-[1.75]" />
 							</div>
 
 							<div className="mt-6 flex items-center gap-2">
 								<span
-									className="h-3.5 w-[2px] shrink-0 rounded-full bg-primary-base transition-all group-hover:h-4"
+									className="h-3.5 w-[2px] shrink-0 rounded-full bg-blue-600 transition-all group-hover:h-4 dark:bg-blue-500"
 									aria-hidden="true"
 								/>
-								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight transition-colors group-hover:text-primary-base sm:text-[16px] dark:text-white dark:group-hover:text-blue-400">
+								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight transition-colors group-hover:text-blue-600 sm:text-[16px] dark:text-white dark:group-hover:text-blue-400">
 									{tool.title}
 								</h3>
 							</div>
