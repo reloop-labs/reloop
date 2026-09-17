@@ -3,12 +3,14 @@ import "./globals.css";
 import { PostHogProvider } from "@reloop/analytics";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { AgentDirective } from "@reloop/web/components/agent-directive";
+import { DiscordFab } from "@reloop/web/components/discord-fab";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
+import { Suspense } from "react";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -111,6 +113,9 @@ export default function RootLayout({
 								<Footer />
 							</div>
 						</div>
+						<Suspense fallback={null}>
+							<DiscordFab />
+						</Suspense>
 						<IconsSprite />
 					</ThemeProvider>
 				</PostHogProvider>

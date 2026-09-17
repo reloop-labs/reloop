@@ -2,7 +2,12 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { FeatureCta } from "@reloop/web/components/page-shell";
 import { communityJsonLd, communitySeo } from "@reloop/web/lib/community-seo";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
+import { Suspense } from "react";
 import { CommunityPlatforms } from "./components/community-platforms";
+import {
+	DiscordWidget,
+	DiscordWidgetSkeleton,
+} from "./components/discord-widget";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -17,6 +22,9 @@ const CommunityPage = () => {
 			<section>
 				<div className="mx-auto max-w-[1320px] px-4 pt-32 pb-16 sm:px-6 sm:pt-36 sm:pb-20 lg:px-8 lg:pb-24">
 					<CommunityPlatforms />
+					<Suspense fallback={<DiscordWidgetSkeleton />}>
+						<DiscordWidget />
+					</Suspense>
 				</div>
 			</section>
 
