@@ -1,5 +1,8 @@
 {
 	auto_https off
+	servers {
+		trusted_proxies static private_ranges
+	}
 }
 
 (reloop_app) {
@@ -84,5 +87,9 @@
 }
 
 {$RELOOP_TRACKING_SITE_ADDRESS} {
+	import reloop_tracking
+}
+
+http:// {
 	import reloop_tracking
 }

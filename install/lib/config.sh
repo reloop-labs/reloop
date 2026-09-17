@@ -48,7 +48,8 @@ detect_existing_install() {
 load_existing_values() {
 	local key
 	for key in RELOOP_VERSION RELOOP_DOMAIN RELOOP_ADMIN_EMAIL RELOOP_PUBLIC_IP \
-		RELOOP_HTTPS POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD REDIS_PASSWORD \
+		RELOOP_HTTPS RELOOP_EXTERNAL_PROXY RELOOP_PROXY_PORT \
+		POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD REDIS_PASSWORD \
 		BETTER_AUTH_SECRET RELOOP_INTERNAL_SECRET TRACKING_SECRET PREFERENCES_SECRET \
 		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
 		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS \
@@ -125,6 +126,7 @@ collect_configuration() {
 	if [ "$REUSE_CONFIG" = "1" ]; then
 		local key
 		for key in RELOOP_DOMAIN RELOOP_ADMIN_EMAIL RELOOP_HTTPS RELOOP_PUBLIC_IP \
+			RELOOP_EXTERNAL_PROXY RELOOP_PROXY_PORT \
 			POSTGRES_DB POSTGRES_USER S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
 			S3_BUCKET S3_REGION; do
 			local ref="PRESERVED_$key"
@@ -158,7 +160,19 @@ collect_configuration() {
 			"${PRESERVED_POSTGRES_USER:-reloop}" valid_pg_identifier \
 			"Use lowercase letters, digits and underscores, starting with a letter."
 
-		ask_yes_no RELOOP_HTTPS "Configure automatic HTTPS" "${PRESERVED_RELOOP_HTTPS:-yes}"
+		ask_yes_no RELOOP_EXTERNAL_PROXY "Run behind an existing reverse proxy" \
+			"${PRESERVED_RELOOP_EXTERNAL_PROXY:-no}"
+
+		if [ "$RELOOP_EXTERNAL_PROXY" = "yes" ]; then
+			ask RELOOP_PROXY_PORT "Local port for your reverse proxy" \
+				"Reloop listens on 127.0.0.1 at this port; your proxy forwards to it" \
+				"${PRESERVED_RELOOP_PROXY_PORT:-8080}" valid_port \
+				"Enter a port number between 1 and 65535."
+			ask_yes_no RELOOP_HTTPS "Does your proxy serve Reloop over HTTPS" \
+				"${PRESERVED_RELOOP_HTTPS:-yes}"
+		else
+			ask_yes_no RELOOP_HTTPS "Configure automatic HTTPS" "${PRESERVED_RELOOP_HTTPS:-yes}"
+		fi
 
 		collect_storage
 	fi
@@ -175,12 +189,23 @@ collect_configuration() {
 	RELOOP_TRACKING_HOST="link.$RELOOP_DOMAIN"
 	RELOOP_INBOUND_HOST="inbound.$RELOOP_DOMAIN"
 
+	RELOOP_EXTERNAL_PROXY="${RELOOP_EXTERNAL_PROXY:-no}"
+	if [ "$RELOOP_EXTERNAL_PROXY" = "yes" ]; then
+		RELOOP_PROXY_PORT="${RELOOP_PROXY_PORT:-8080}"
+		REQUIRED_PORTS=("$RELOOP_PROXY_PORT" 25 465 587)
+		PORT_PURPOSE[$RELOOP_PROXY_PORT]="HTTP upstream for your reverse proxy"
+	fi
+
 	if [ "$RELOOP_HTTPS" = "yes" ]; then
 		RELOOP_SCHEME="https"
+	else
+		RELOOP_SCHEME="http"
+	fi
+
+	if [ "$RELOOP_HTTPS" = "yes" ] && [ "$RELOOP_EXTERNAL_PROXY" != "yes" ]; then
 		RELOOP_SITE_ADDRESS="$RELOOP_DOMAIN"
 		RELOOP_TRACKING_SITE_ADDRESS="$RELOOP_TRACKING_HOST"
 	else
-		RELOOP_SCHEME="http"
 		RELOOP_SITE_ADDRESS="http://$RELOOP_DOMAIN"
 		RELOOP_TRACKING_SITE_ADDRESS="http://$RELOOP_TRACKING_HOST"
 	fi
@@ -226,6 +251,8 @@ RELOOP_INBOUND_HOST=$RELOOP_INBOUND_HOST
 RELOOP_ADMIN_EMAIL=$RELOOP_ADMIN_EMAIL
 RELOOP_PUBLIC_IP=$RELOOP_PUBLIC_IP
 RELOOP_HTTPS=$RELOOP_HTTPS
+RELOOP_EXTERNAL_PROXY=$RELOOP_EXTERNAL_PROXY
+RELOOP_PROXY_PORT=$RELOOP_PROXY_PORT
 RELOOP_SITE_ADDRESS=$RELOOP_SITE_ADDRESS
 RELOOP_TRACKING_SITE_ADDRESS=$RELOOP_TRACKING_SITE_ADDRESS
 RELOOP_ACME_EMAIL=$RELOOP_ADMIN_EMAIL
@@ -353,9 +380,18 @@ install_asset() {
 }
 
 write_stack_files() {
-	install_asset "$ASSET_DIR/templates/docker-compose.yml" "$INSTALL_DIR/docker-compose.yml" 0644
+	if [ "$RELOOP_EXTERNAL_PROXY" = "yes" ]; then
+		local compose_file
+		compose_file="$(mktemp -t reloop-compose.XXXXXX)"
+		sed -e 's|- "80:80"|- "127.0.0.1:${RELOOP_PROXY_PORT}:80"|' -e '/- "443:443/d' \
+			"$ASSET_DIR/templates/docker-compose.yml" >"$compose_file"
+		install_asset "$compose_file" "$INSTALL_DIR/docker-compose.yml" 0644
+		rm -f "$compose_file"
+	else
+		install_asset "$ASSET_DIR/templates/docker-compose.yml" "$INSTALL_DIR/docker-compose.yml" 0644
+	fi
 
-	if [ "$RELOOP_HTTPS" = "yes" ]; then
+	if [ "$RELOOP_HTTPS" = "yes" ] && [ "$RELOOP_EXTERNAL_PROXY" != "yes" ]; then
 		install_asset "$ASSET_DIR/templates/Caddyfile" "$INSTALL_DIR/Caddyfile" 0644
 	else
 		install_asset "$ASSET_DIR/templates/Caddyfile.http" "$INSTALL_DIR/Caddyfile" 0644
