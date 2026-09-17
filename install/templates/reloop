@@ -68,7 +68,7 @@ stop | down)
 	compose stop
 	;;
 restart)
-	compose restart "$@"
+	compose up -d --force-recreate "$@"
 	;;
 update)
 	compose pull

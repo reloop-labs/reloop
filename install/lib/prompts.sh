@@ -158,6 +158,10 @@ valid_ipv4() {
 	return 0
 }
 
+valid_port() {
+	[[ "$1" =~ ^[0-9]{1,5}$ ]] && [ "$1" -ge 1 ] && [ "$1" -le 65535 ]
+}
+
 valid_url() {
 	case "$1" in
 	https://*.* | http://*.*) return 0 ;;

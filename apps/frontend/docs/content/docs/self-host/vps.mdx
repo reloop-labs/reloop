@@ -10,6 +10,18 @@ The Reloop self-host installer takes a fresh VPS and turns it into a running Rel
 curl -fsSL https://reloop.sh/install.sh | sudo bash
 ```
 
+`https://reloop.sh/install.sh` is the canonical address. It serves
+[`install/install.sh`](https://github.com/reloop-labs/reloop/blob/main/install/install.sh)
+from the Reloop repository, and the script downloads the rest of the installer
+(`install/lib` and `install/templates`) from the same place. To read it before
+running it as root:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh -o install.sh
+less install.sh
+sudo bash install.sh
+```
+
 ---
 
 ## Before you start
@@ -21,7 +33,7 @@ curl -fsSL https://reloop.sh/install.sh | sudo bash
 | **CPU** | 2 vCPUs minimum, 4+ recommended |
 | **RAM** | 4 GB minimum, 8 GB recommended |
 | **Disk** | 35 GB minimum, 50 GB recommended |
-| **Ports** | `80`, `443`, `25`, `465`, `587` free |
+| **Ports** | `25`, `465`, `587` free, plus `80` and `443` unless you run [behind your own reverse proxy](#behind-an-existing-reverse-proxy) |
 | **Access** | root or sudo |
 
 > [!NOTE]
@@ -39,7 +51,9 @@ Many providers block outbound port `25` by default. Reloop still sends through t
 | Administrator email | Let's Encrypt contact and your first Reloop account | — |
 | Database name | PostgreSQL database | `reloop` |
 | Database user | PostgreSQL role | `reloop` |
-| Configure automatic HTTPS | Let Caddy obtain and renew certificates | `yes` |
+| Run behind an existing reverse proxy | Serve plain HTTP on a local port for your own Caddy, Nginx or Traefik instead of taking `80` and `443`. See [Behind an existing reverse proxy](#behind-an-existing-reverse-proxy) | `no` |
+| Local port for your reverse proxy | Only asked behind a proxy. Reloop listens on `127.0.0.1` at this port | `8080` |
+| Configure automatic HTTPS | Let Caddy obtain and renew certificates. Behind your own proxy it asks whether that proxy serves Reloop over HTTPS instead | `yes` |
 | Configure object storage | S3-compatible storage for file uploads | `no` |
 
 Everything else is generated: database and Redis passwords, the Better Auth secret, the internal service secret, the tracking and preferences secrets, and the webhook encryption key. They are written to `/opt/reloop/.env` with mode `0600`.
@@ -58,7 +72,7 @@ Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloo
 └── backups/             automatic database dumps taken before schema changes
 ```
 
-The stack runs 20 containers: 14 Reloop backend services, 2 frontends (dashboard, links), PostgreSQL, Redis, NATS and Caddy. Only Caddy (`80`, `443`) and the two mail transports (`25` inbound, `465`/`587` submission) publish host ports — the database and event bus stay on the internal Docker network.
+The stack runs 20 containers: 14 Reloop backend services, 2 frontends (dashboard, links), PostgreSQL, Redis, NATS and Caddy. Only Caddy (`80` and `443`, or `127.0.0.1:<port>` behind your own proxy) and the two mail transports (`25` inbound, `465`/`587` submission) publish host ports. The database and event bus stay on the internal Docker network.
 
 A self-hosted install deliberately leaves out the parts of Reloop that only make sense for the hosted service: the public documentation site (`/docs` redirects to reloop.sh), the credits and quota service, the public email-validation tools, the operator console, and bundled object storage. Sending is not metered.
 
@@ -67,7 +81,7 @@ A `reloop` command is installed alongside it:
 ```bash
 reloop status            # container health
 reloop logs [service]    # follow logs
-reloop restart           # restart the stack
+reloop restart [service] # recreate the stack or one service, applying .env changes
 reloop update            # pull the configured version and redeploy
 ```
 
@@ -108,6 +122,187 @@ You can run the installer before adding DNS. Caddy keeps retrying certificate is
 
 ---
 
+## Behind an existing reverse proxy
+
+Use this when the server already runs Caddy, Nginx or Traefik on `80` and
+`443`, for example alongside other sites. Answer yes to **Run behind an
+existing reverse proxy**, or set `RELOOP_EXTERNAL_PROXY=true` for an
+unattended install. The installer then:
+
+- publishes the bundled Caddy on `127.0.0.1:<port>` only, over plain HTTP, and no longer needs `80` or `443`
+- keeps routing every Reloop path itself, so your proxy forwards whole hostnames
+- trusts `X-Forwarded-For` and `X-Forwarded-Proto` from private addresses, so Reloop sees the visitor's IP and the `https` scheme
+
+Answer yes to **Does your proxy serve Reloop over HTTPS** if it does. That sets
+the `https://` URLs Reloop puts in links and emails.
+
+To move the port later, change `RELOOP_PROXY_PORT` in `/opt/reloop/.env` and
+run `reloop restart proxy`.
+
+### What your proxy needs to do
+
+| Hostname | Forward to | TLS certificate |
+| :--- | :--- | :--- |
+| `reloop.example.com` | `http://127.0.0.1:8080` | Issued and renewed by your proxy |
+| `link.reloop.example.com` | `http://127.0.0.1:8080` | Issued and renewed by your proxy |
+| Customer tracking domains | `http://127.0.0.1:8080` | Issued on demand, see below |
+
+- **Keep the original `Host` header.** Reloop decides between the dashboard and the tracking site by hostname.
+- **Pass WebSocket upgrades.** Live email logs, the inbox and template collaboration use them.
+- **Set `X-Forwarded-For` and `X-Forwarded-Proto`.**
+
+`inbound.reloop.example.com` needs no proxy route. It is only an MX target,
+and Reloop serves port `25` directly.
+
+**Custom tracking domains.** A customer can point their own hostname, such as
+`track.customer.com`, at `link.reloop.example.com` with a CNAME, and it needs a
+certificate as soon as it is added. Reloop answers Caddy's on-demand TLS check
+at `https://reloop.example.com/api/domain/v1/caddy/ask?domain=<hostname>`,
+returning `200` for an active tracking domain and `404` otherwise, so Caddy
+issues these automatically. Nginx and Traefik have no equivalent: add a route
+and certificate for each tracking domain yourself, or don't offer custom
+tracking domains.
+
+### Caddy
+
+```caddyfile
+{
+	on_demand_tls {
+		ask https://reloop.example.com/api/domain/v1/caddy/ask
+	}
+}
+
+reloop.example.com, link.reloop.example.com {
+	reverse_proxy 127.0.0.1:8080
+}
+
+https:// {
+	tls {
+		on_demand
+	}
+	reverse_proxy 127.0.0.1:8080
+}
+```
+
+Merge `on_demand_tls` into your existing global options block. The `https://`
+block catches every hostname your other sites don't claim, which is what lets
+tracking domains work; if you already have a catch-all site, route tracking
+domains from there instead. Caddy keeps the `Host` header, sets the forwarded
+headers and passes WebSockets without extra configuration, and renews its
+certificates itself.
+
+### Nginx
+
+```nginx
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+server {
+    listen 80;
+    server_name reloop.example.com link.reloop.example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name reloop.example.com link.reloop.example.com;
+
+    ssl_certificate     /etc/letsencrypt/live/reloop.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/reloop.example.com/privkey.pem;
+
+    client_max_body_size 25m;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+}
+```
+
+The certificate must cover both hostnames, for example
+`certbot certonly --nginx -d reloop.example.com -d link.reloop.example.com`.
+Certbot's timer renews it. `client_max_body_size` raises Nginx's 1 MB default:
+uploads and email attachments go up to 10 MB, and attachments grow by about a
+third when base64-encoded in an API request.
+
+### Traefik
+
+Traefik usually runs in a container, where `127.0.0.1` is the Traefik container
+itself. Put Traefik on Reloop's Docker network and forward to the Reloop proxy
+container by name. In Traefik's compose file:
+
+```yaml
+services:
+  traefik:
+    networks:
+      - reloop
+
+networks:
+  reloop:
+    external: true
+```
+
+Then add a router and service, here with the file provider:
+
+```yaml
+http:
+  routers:
+    reloop:
+      rule: Host(`reloop.example.com`) || Host(`link.reloop.example.com`)
+      entryPoints:
+        - websecure
+      service: reloop
+      tls:
+        certResolver: letsencrypt
+  services:
+    reloop:
+      loadBalancer:
+        servers:
+          - url: http://reloop-proxy:80
+```
+
+Replace `websecure` and `letsencrypt` with your own entry point and certificate
+resolver. Traefik passes the `Host` header and WebSockets by default and renews
+certificates through the resolver.
+
+The same applies to Caddy or Nginx running in a container: join the `reloop`
+network and forward to `http://reloop-proxy:80` instead of `127.0.0.1`.
+
+---
+
+## TLS certificates and mail ports
+
+| Hostname or port | With the bundled Caddy | Behind your own proxy |
+| :--- | :--- | :--- |
+| `reloop.example.com` | Let's Encrypt, issued and renewed by Caddy | Your proxy |
+| `link.reloop.example.com` | Let's Encrypt, issued and renewed by Caddy | Your proxy |
+| Customer tracking domains | Issued on demand and renewed by Caddy | Caddy on demand, or by hand |
+| Port `25`, `587`, `465` | Self-signed certificate, see below | Same |
+
+The mail ports are published by Docker directly and never pass through the
+HTTP proxy, in either setup.
+
+| Port | Used by | Protocol |
+| :--- | :--- | :--- |
+| `25` | Other mail servers delivering to your verified domains | SMTP with STARTTLS |
+| `587` | Your applications submitting mail to Reloop | SMTP submission with STARTTLS |
+| `465` | Your applications submitting mail to Reloop | The same STARTTLS listener as `587`, not implicit TLS |
+
+The SMTP services generate a self-signed certificate, since no certificate is
+mounted into them. Most sending servers delivering to port `25` accept that
+for opportunistic TLS. For submission, use port `587` with STARTTLS: a client set to
+implicit TLS (often labelled SSL/TLS or SMTPS) on `465` will fail, and a client
+that verifies certificates has to be told to accept this one.
+
+---
+
 ## First sign-in
 
 Reloop sends one-time codes through its own mail pipeline, which needs a verified sending domain — so a fresh installation has no way to email you the first code. The installer generates a bootstrap code, writes it to `DEFAULT_OTP` in `/opt/reloop/.env`, and prints it once.
@@ -135,9 +330,82 @@ services](/docs/setup/backend/auth#session-validation-between-services).
 
 ---
 
+## Configuration reference
+
+Everything lives in `/opt/reloop/.env`. The installer writes it and keeps your
+edits across re-runs. After changing a value, run `reloop restart`, or
+`reloop restart <service>` for one service.
+
+<Warning>
+The `reloop` command from earlier installers ran a plain `docker compose
+restart`, which does not re-read `.env`. If `reloop restart` does not pick up a
+change, run `reloop start` instead, or re-run the installer to update the
+command.
+</Warning>
+
+| Variable | Purpose |
+| :--- | :--- |
+| `RELOOP_VERSION` | Image tag deployed for every service |
+| `RELOOP_DOMAIN` | Dashboard and API hostname |
+| `RELOOP_TRACKING_HOST` / `RELOOP_INBOUND_HOST` | `link.` and `inbound.` hostnames, derived from `RELOOP_DOMAIN` |
+| `RELOOP_ADMIN_EMAIL` | Let's Encrypt contact and the first account |
+| `RELOOP_PUBLIC_IP` | Address printed in the DNS records and SPF |
+| `RELOOP_HTTPS` | Whether Reloop is reached over `https://` |
+| `RELOOP_EXTERNAL_PROXY` / `RELOOP_PROXY_PORT` | Run behind your own proxy, and the local port it forwards to |
+| `BASE_URL` / `TRACKING_BASE_URL` | Public origins used in links and emails, generated from the values above |
+| `RELOOP_SITE_ADDRESS` / `RELOOP_TRACKING_SITE_ADDRESS` | Site addresses for the bundled Caddy, generated |
+| `POSTGRES_*`, `REDIS_PASSWORD`, `BETTER_AUTH_SECRET`, `RELOOP_INTERNAL_SECRET`, `TRACKING_SECRET`, `PREFERENCES_SECRET`, `WEBHOOK_ENCRYPTION_KEY` | Generated once and kept across re-runs. Back them up with the file and don't replace them by hand |
+| `DEFAULT_OTP` | Bootstrap sign-in code, see [First sign-in](#first-sign-in) |
+| `DISABLE_SIGNUP` / `DISABLE_ORG_CREATION` | Close registration and organization creation |
+| `AUTH_INTERNAL_BASE_URL` | Internal origin for session checks between services |
+| `APP_NAME` | Name used in system email. See [Branding system email](/docs/setup/backend/email#branding-system-email) |
+| `RELOOP_API_KEY`, `RELOOP_SENDER_DOMAIN`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE` | How system email is delivered. See [How system email is delivered](/docs/setup/backend/email#how-system-email-is-delivered) |
+| `SMTP_HOSTNAME` | Hostname senders connect to for submission, shown in the dashboard |
+| `COMPOSE_PROFILES`, `S3_*` | File uploads, see [File uploads](#file-uploads) |
+| `DNS_RESOLVERS` | Resolvers used to verify DKIM, SPF, DMARC and MX records |
+
+Per-service variables are documented under [Backend services](/docs/setup/backend/auth).
+
+---
+
 ## Running it again
 
 Re-running the installer is safe. It detects the existing installation and offers to abort, reconfigure (re-ask the domain and HTTPS settings while keeping data and secrets), or redeploy with the existing configuration. Secrets, volumes and the database are never regenerated or dropped, and a database dump is taken before any schema change.
+
+---
+
+## Updating and rolling back
+
+```bash
+reloop update
+```
+
+This pulls the images for `RELOOP_VERSION`, dumps the database to
+`/opt/reloop/backups/pre-migration-<timestamp>.sql.gz`, applies the schema and
+recreates the containers that changed. It does not touch
+`docker-compose.yml`, the `Caddyfile` or the `reloop` command. To pick up
+changes to those as well, re-run the install command and choose to redeploy with
+the existing configuration.
+
+Reloop images are published as `latest`, and not every image has a per-release
+tag yet, so rolling back to an earlier image version is not supported. What you
+can roll back is the database, to the dump taken before an update:
+
+```bash
+cd /opt/reloop
+ls -t backups/
+reloop stop
+docker compose up -d postgres
+docker compose exec -T postgres psql -U reloop -d reloop \
+  -c 'drop schema public cascade; create schema public authorization reloop'
+gunzip -c backups/pre-migration-20260917101500.sql.gz |
+  docker compose exec -T postgres psql -U reloop -d reloop -v ON_ERROR_STOP=1
+reloop start
+```
+
+Run these as root, use the file name `ls` shows, and replace `reloop` after
+`-U` and `-d` if you changed the database user or name. This discards everything
+written since the dump was taken.
 
 ---
 
@@ -160,7 +428,9 @@ curl -fsSL https://reloop.sh/install.sh | sudo \
 | `RELOOP_DOMAIN` | Primary hostname |
 | `RELOOP_ADMIN_EMAIL` | Administrator email |
 | `RELOOP_DB_NAME` / `RELOOP_DB_USER` | Database name and role |
-| `RELOOP_HTTPS` | `yes` or `no` |
+| `RELOOP_HTTPS` | `yes` or `no`. Behind your own proxy, whether that proxy serves HTTPS |
+| `RELOOP_EXTERNAL_PROXY` | `yes` to run behind your own reverse proxy instead of taking `80` and `443` |
+| `RELOOP_PROXY_PORT` | Local port your proxy forwards to (default `8080`) |
 | `RELOOP_S3` | `yes` to configure object storage, `no` to disable file uploads |
 | `RELOOP_S3_ENDPOINT` / `RELOOP_S3_ACCESS_KEY` / `RELOOP_S3_SECRET_KEY` | Object storage credentials |
 | `RELOOP_S3_BUCKET` / `RELOOP_S3_REGION` | Bucket and region |
