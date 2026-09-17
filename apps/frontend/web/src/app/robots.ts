@@ -10,7 +10,10 @@ export default function robots(): MetadataRoute.Robots {
 			allow: "/",
 			disallow: ["/preferences/", "/redirect/", "/twitter", "/home"],
 		},
-		// Main site map + glossary-specific map for term pages
-		sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/glossary/sitemap.xml`],
+		sitemap: [
+			`${siteUrl}/sitemap.xml`,
+			`${siteUrl}/glossary/sitemap.xml`,
+			`${siteUrl}/docs/sitemap.xml`,
+		],
 	};
 }

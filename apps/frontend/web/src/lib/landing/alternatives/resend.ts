@@ -5,7 +5,7 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/resend",
 	competitorName: "Resend",
 	compareHref: "/compare/resend",
-	titleLines: ["Best Resend", "Alternative"],
+	titleLines: ["Open-Source Resend", "Alternative"],
 	description:
 		"Open-source email infrastructure with the same developer DX as Resend—plus self-hosting, campaigns, and agent workflows.",
 	keywords: [

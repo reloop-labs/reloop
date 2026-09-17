@@ -260,9 +260,9 @@ export function DomainListPage({
 	return (
 		<MotionStage className="mx-auto max-w-6xl space-y-6 overflow-hidden p-6 lg:p-8">
 			<MotionItem className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
-				<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+				<p className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 					Domains
-				</h1>
+				</p>
 
 				<div className="flex shrink-0 items-center gap-2">
 					<Button.Root

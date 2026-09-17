@@ -24,9 +24,9 @@ export function EmailsListHeader({ mounted }: { mounted: boolean }) {
 							name="mail-send"
 							className="h-6 w-6 shrink-0 text-text-strong-950"
 						/>
-						<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+						<p className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 							Email Sent
-						</h1>
+						</p>
 					</div>
 				</AnimateIn>
 				<AnimateIn mounted={mounted} delay={0.07} y={10}>

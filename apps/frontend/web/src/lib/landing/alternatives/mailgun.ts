@@ -5,7 +5,7 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/mailgun",
 	competitorName: "Mailgun",
 	compareHref: "/compare/mailgun",
-	titleLines: ["Best Mailgun", "Alternative"],
+	titleLines: ["Open-Source Mailgun", "Alternative"],
 	description:
 		"Developer email API with deliverability tools, webhooks, and the option to self-host.",
 	keywords: [

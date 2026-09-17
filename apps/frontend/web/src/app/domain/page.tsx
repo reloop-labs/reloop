@@ -1,5 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { getSiteUrl, siteName } from "@reloop/web/lib/site";
+import { getSiteUrl, siteName, socialImage } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import CTA from "../(home)/components/cta";
 import { SectionSeparator } from "../(home)/components/section-separator";
@@ -34,10 +34,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: pageUrl,
 		siteName,
+		images: [socialImage],
 	},
 	twitter: {
 		card: "summary_large_image",
 		title: "Domain Authentication | Reloop",
+		images: [socialImage.url],
 		description:
 			"Add a sending domain and verify SPF, DKIM, and DMARC so every email authenticates.",
 	},

@@ -10,7 +10,7 @@ export const instant = false;
 const pageUrl = `${getSiteUrl()}/terms-and-conditions`;
 
 export const metadata: Metadata = {
-	title: "Terms of Service | Reloop",
+	title: "Terms of Service",
 	description:
 		"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs.",
 	keywords: [

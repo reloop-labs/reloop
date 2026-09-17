@@ -7,6 +7,7 @@ import {
 	siteName,
 	socialProfiles,
 } from "@reloop/web/lib/site";
+import type { Metadata } from "next";
 import LanguageExplorer from "../sdk/components/language-explorer";
 import { AgentCards } from "./components/agent-cards";
 import CTA from "./components/cta";
@@ -21,25 +22,54 @@ import ShipFast from "./components/ship-fast";
 export const instant = false;
 
 const siteUrl = getSiteUrl();
+const organizationId = `${siteUrl}/#organization`;
+
+export const metadata: Metadata = {
+	title: {
+		absolute: "Reloop: Open-Source Email API & Infrastructure for Developers",
+	},
+	description: siteDescription,
+	alternates: { canonical: siteUrl },
+	openGraph: {
+		title: "Reloop: Open-Source Email API & Infrastructure for Developers",
+		description: siteDescription,
+		url: siteUrl,
+		type: "website",
+		siteName,
+	},
+};
 
 const homeSchema = [
 	{
 		"@context": "https://schema.org" as const,
 		"@type": "WebSite" as const,
+		"@id": `${siteUrl}/#website`,
 		name: siteName,
 		url: siteUrl,
 		description: siteDescription,
+		publisher: { "@id": organizationId },
 	},
 	{
 		"@context": "https://schema.org" as const,
 		"@type": "Organization" as const,
+		"@id": organizationId,
 		name: "Reloop Labs",
 		alternateName: siteName,
 		url: siteUrl,
 		logo: `${siteUrl}${defaultOgImage}`,
-		sameAs: [socialProfiles.github, socialProfiles.x, socialProfiles.discord],
+		sameAs: [
+			socialProfiles.github,
+			socialProfiles.x,
+			socialProfiles.discord,
+			socialProfiles.linkedin,
+		],
 	},
-	pricingSoftwareApplicationJsonLd(siteUrl),
+	{
+		...pricingSoftwareApplicationJsonLd(siteUrl),
+		"@id": `${siteUrl}/#software`,
+		url: siteUrl,
+		publisher: { "@id": organizationId },
+	},
 ];
 
 export default function Home() {

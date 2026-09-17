@@ -1,3 +1,5 @@
+import { JsonLd } from "@reloop/web/components/json-ld";
+import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
@@ -28,8 +30,9 @@ export async function generateMetadata({
 	if (!language) {
 		return { title: "SDK | Reloop" };
 	}
-	const title = `Send Email with ${language.name} | Reloop`;
-	const description = `${language.shortDescription} Step-by-step: install, set your API key, and send.`;
+	const title = `${language.name} Email API: Send Email with the Reloop ${language.name} SDK`;
+	const socialTitle = `Send Email with ${language.name} | Reloop`;
+	const description = `Send transactional email from ${language.name} with the official Reloop SDK: install the package, add your API key, and send in minutes.`;
 	const url = `${getSiteUrl()}/sdk/${language.slug}`;
 	const ogImage = {
 		url: `${url}/opengraph-image`,
@@ -42,7 +45,7 @@ export async function generateMetadata({
 		description,
 		alternates: { canonical: url },
 		openGraph: {
-			title,
+			title: socialTitle,
 			description,
 			type: "website",
 			url,
@@ -51,7 +54,7 @@ export async function generateMetadata({
 		},
 		twitter: {
 			card: "summary_large_image",
-			title,
+			title: socialTitle,
 			description,
 			images: [ogImage.url],
 		},
@@ -78,6 +81,12 @@ export default async function LanguagePage({ params }: PageProps) {
 
 	return (
 		<main className="w-full max-w-full overflow-x-clip bg-bg-white-0 dark:bg-black">
+			<JsonLd
+				data={breadcrumbJsonLd([
+					{ name: "SDKs", path: "/sdk" },
+					{ name: language.name, path: `/sdk/${language.slug}` },
+				])}
+			/>
 			<LanguageHero language={language} />
 			<LanguageSteps language={language} />
 			<LanguageFrameworks language={language} />

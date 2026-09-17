@@ -16,7 +16,7 @@ const pagePath = "/features/email-analytics";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
-	title: "Email Analytics & Deliverability Insights | Reloop",
+	title: "Email Analytics & Deliverability Insights",
 	description:
 		"Real-time email analytics, delivery observability, engagement heatmaps, and bounce diagnostics. Track opens, clicks, and domain reputation from the moment you hit send.",
 	keywords: [

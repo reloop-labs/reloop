@@ -5,7 +5,7 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/aws-ses",
 	competitorName: "AWS SES",
 	compareHref: "/compare/aws-ses",
-	titleLines: ["Best AWS SES", "Alternative"],
+	titleLines: ["Open-Source AWS SES", "Alternative"],
 	description:
 		"Email infrastructure with a real dashboard, templates, and campaigns—without wiring SES yourself.",
 	keywords: [

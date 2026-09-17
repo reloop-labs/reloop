@@ -5,7 +5,7 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/sendgrid",
 	competitorName: "SendGrid",
 	compareHref: "/compare/sendgrid",
-	titleLines: ["Best SendGrid", "Alternative"],
+	titleLines: ["Open-Source SendGrid", "Alternative"],
 	description:
 		"Modern email infrastructure without SendGrid's complexity—open source, developer-first, and self-hostable.",
 	keywords: [

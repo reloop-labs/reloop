@@ -5,12 +5,7 @@ import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { AgentDirective } from "@reloop/web/components/agent-directive";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
-import {
-	defaultOgImage,
-	getSiteUrl,
-	siteDescription,
-	siteName,
-} from "@reloop/web/lib/site";
+import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
@@ -60,11 +55,9 @@ export const metadata: Metadata = {
 	openGraph: {
 		type: "website",
 		siteName,
-		images: [{ url: defaultOgImage, width: 512, height: 512, alt: siteName }],
 	},
 	twitter: {
 		card: "summary_large_image",
-		images: [defaultOgImage],
 	},
 };
 

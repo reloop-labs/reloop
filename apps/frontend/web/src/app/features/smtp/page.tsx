@@ -16,7 +16,7 @@ import WorksWith from "./components/works-with";
 export const instant = false;
 
 export const metadata: Metadata = {
-	title: "Fast, Reliable SMTP Relay & Email Service | Reloop",
+	title: "Fast, Reliable SMTP Relay & Email Service",
 	description:
 		"Connect your existing applications to Reloop's fast, reliable SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
 	keywords: [

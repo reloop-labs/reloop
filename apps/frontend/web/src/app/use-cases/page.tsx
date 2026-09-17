@@ -7,7 +7,7 @@ import Link from "next/link";
 export const instant = false;
 
 export const metadata = createLandingMetadata(
-	"Email Use Cases for Developers | Reloop",
+	"Email Use Cases for Developers",
 	"Copy production-ready code for transactional alerts, drip flows, AI agent inboxes, and more. Every Reloop use case ships with a live flow diagram and working API snippet.",
 	"/use-cases",
 	[

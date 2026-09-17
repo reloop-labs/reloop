@@ -5,7 +5,7 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/mailchimp",
 	competitorName: "Mailchimp",
 	compareHref: "/compare/mailchimp",
-	titleLines: ["Best Mailchimp", "Alternative"],
+	titleLines: ["Open-Source Mailchimp", "Alternative"],
 	description:
 		"Email platform for developers and marketers who want API access, self-hosting, and no legacy bloat.",
 	keywords: [

@@ -2,7 +2,10 @@ import { resolveMarketingMarkdown } from "@reloop/web/lib/agent-content";
 import {
 	AGENT_CACHE_CONTROL,
 	AGENT_CONTENT_SIGNAL,
+	AGENT_LINK_HEADER,
+	canonicalLinkHeader,
 } from "@reloop/web/lib/agent-headers";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import { type NextRequest, NextResponse } from "next/server";
 
 const RESERVED = new Set([
@@ -40,6 +43,7 @@ export async function GET(
 			"Content-Type": "text/markdown; charset=utf-8",
 			"Cache-Control": AGENT_CACHE_CONTROL,
 			"Content-Signal": AGENT_CONTENT_SIGNAL,
+			Link: `${AGENT_LINK_HEADER}, ${canonicalLinkHeader(`${getSiteUrl()}${path === "/" ? "" : path}`)}`,
 			"x-markdown-tokens": String(Math.ceil(content.length / 4)),
 		},
 	});

@@ -5,7 +5,7 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/loops",
 	competitorName: "Loops",
 	compareHref: "/compare/loops",
-	titleLines: ["Best Loops", "Alternative"],
+	titleLines: ["Open-Source Loops", "Alternative"],
 	description:
 		"Product email for SaaS teams—transactional, lifecycle, and campaigns with open-source flexibility.",
 	keywords: [

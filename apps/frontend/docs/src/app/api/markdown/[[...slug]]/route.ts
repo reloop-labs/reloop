@@ -5,6 +5,7 @@ import { injectMarkdownAgentDirective } from "../../../../lib/agent-directive";
 import {
 	AGENT_CACHE_CONTROL,
 	AGENT_CONTENT_SIGNAL,
+	AGENT_LINK_HEADER,
 } from "../../../../lib/agent-headers";
 import { getDocsContentDir } from "../../../../lib/docs-content-fs";
 
@@ -55,6 +56,7 @@ export async function GET(
 				"x-markdown-tokens": estimatedTokens.toString(),
 				"Content-Signal": AGENT_CONTENT_SIGNAL,
 				"Cache-Control": AGENT_CACHE_CONTROL,
+				Link: `${AGENT_LINK_HEADER}, <${(process.env.NEXT_PUBLIC_URL || "https://reloop.sh").replace(/\/$/, "")}/docs/${slug.join("/")}>; rel="canonical"`,
 			},
 		});
 	} catch (error: any) {

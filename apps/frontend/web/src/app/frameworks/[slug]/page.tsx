@@ -1,4 +1,6 @@
+import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -31,8 +33,9 @@ export async function generateMetadata({
 	if (!framework) {
 		return { title: "Framework | Reloop" };
 	}
-	const title = `Send Email with ${framework.name} | Reloop`;
-	const description = `${framework.shortDescription} Step-by-step: install, set your API key, and send.`;
+	const title = `${framework.name} Email API: Send Transactional Email from ${framework.name}`;
+	const socialTitle = `Send Email with ${framework.name} | Reloop`;
+	const description = `Send transactional email from ${framework.name} with the Reloop ${framework.languageName} SDK: install, add your API key, verify a domain, and send.`;
 	const url = `${getSiteUrl()}/frameworks/${framework.slug}`;
 	const ogImage = {
 		url: `${url}/opengraph-image`,
@@ -45,7 +48,7 @@ export async function generateMetadata({
 		description,
 		alternates: { canonical: url },
 		openGraph: {
-			title,
+			title: socialTitle,
 			description,
 			type: "website",
 			url,
@@ -54,7 +57,7 @@ export async function generateMetadata({
 		},
 		twitter: {
 			card: "summary_large_image",
-			title,
+			title: socialTitle,
 			description,
 			images: [ogImage.url],
 		},
@@ -81,6 +84,12 @@ export default async function FrameworkPage({ params }: PageProps) {
 
 	return (
 		<main className="w-full max-w-full overflow-x-clip bg-bg-white-0 dark:bg-black">
+			<JsonLd
+				data={breadcrumbJsonLd([
+					{ name: "Frameworks", path: "/frameworks" },
+					{ name: framework.name, path: `/frameworks/${framework.slug}` },
+				])}
+			/>
 			<FrameworkHero framework={framework} />
 			<FrameworkSteps framework={framework} />
 			<FrameworkMore current={framework} />
