@@ -53,6 +53,8 @@ load_existing_values() {
 		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
 		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS \
 		AUTH_INTERNAL_BASE_URL DISABLE_SIGNUP DISABLE_ORG_CREATION \
+		RELOOP_API_KEY RELOOP_SENDER_DOMAIN \
+		SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD SMTP_SECURE \
 		APP_NAME; do
 		local value
 		value="$(env_get "$key" "$ENV_FILE" || true)"
@@ -195,6 +197,13 @@ collect_configuration() {
 	AUTH_INTERNAL_BASE_URL="${PRESERVED_AUTH_INTERNAL_BASE_URL:-}"
 	DISABLE_SIGNUP="${PRESERVED_DISABLE_SIGNUP:-false}"
 	DISABLE_ORG_CREATION="${PRESERVED_DISABLE_ORG_CREATION:-false}"
+	RELOOP_API_KEY="${PRESERVED_RELOOP_API_KEY:-}"
+	RELOOP_SENDER_DOMAIN="${PRESERVED_RELOOP_SENDER_DOMAIN:-}"
+	SMTP_HOST="${PRESERVED_SMTP_HOST:-}"
+	SMTP_PORT="${PRESERVED_SMTP_PORT:-587}"
+	SMTP_USER="${PRESERVED_SMTP_USER:-}"
+	SMTP_PASSWORD="${PRESERVED_SMTP_PASSWORD:-}"
+	SMTP_SECURE="${PRESERVED_SMTP_SECURE:-false}"
 	APP_NAME="${PRESERVED_APP_NAME:-Reloop}"
 }
 
@@ -285,6 +294,26 @@ DISABLE_SIGNUP=$DISABLE_SIGNUP
 # Stop anyone creating further organizations. Existing organizations, their
 # members and invitations are unaffected.
 DISABLE_ORG_CREATION=$DISABLE_ORG_CREATION
+
+# How system email leaves the box: sign-in codes, invitations, billing alerts.
+# Pick ONE. With neither set the email service refuses to send and logs why,
+# because Mailpit is a development-only target and is not running here.
+#
+#   1. Through Reloop itself, once you have verified a sending domain:
+#      set RELOOP_API_KEY to an API key of the organization that owns
+#      RELOOP_SENDER_DOMAIN, and set RELOOP_SENDER_DOMAIN to that domain.
+#   2. Through any SMTP server you already have (Postmark, SES, your own):
+#      set SMTP_HOST, and SMTP_USER/SMTP_PASSWORD if it needs credentials.
+#      SMTP_SECURE=true means implicit TLS, normally with SMTP_PORT=465.
+#
+# Until one is configured, sign in with DEFAULT_OTP above.
+RELOOP_API_KEY=$RELOOP_API_KEY
+RELOOP_SENDER_DOMAIN=$RELOOP_SENDER_DOMAIN
+SMTP_HOST=$SMTP_HOST
+SMTP_PORT=$SMTP_PORT
+SMTP_USER=$SMTP_USER
+SMTP_PASSWORD=$SMTP_PASSWORD
+SMTP_SECURE=$SMTP_SECURE
 
 KUMOMTA_MIN_FREE_SPACE=5%
 KUMOMTA_MIN_FREE_INODES=0

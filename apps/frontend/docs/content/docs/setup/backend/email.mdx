@@ -32,7 +32,7 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 bun be:email:dev
 ```
 
-Or `bun backend:dev` / `bun dev`. Locally, when `RELOOP_API_KEY` is unset, mail falls back to Mailpit SMTP (`localhost:1025`).
+Or `bun backend:dev` / `bun dev`. In development, when neither `RELOOP_API_KEY` nor `SMTP_HOST` is set, mail falls back to Mailpit SMTP (`localhost:1025`). That fallback is development-only: see [How system email is delivered](#how-system-email-is-delivered).
 
 
 ## Environment
@@ -47,6 +47,11 @@ NATS_URL=nats://localhost:4222
 RELOOP_API_KEY=
 RELOOP_SENDER_DOMAIN=
 ONBOARDING_TEST_DOMAIN=
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASSWORD=
+SMTP_SECURE=false
 NODE_ENV=development
 ```
 
@@ -55,10 +60,73 @@ NODE_ENV=development
 | `EMAIL_PORT` / `PORT` | **YES** | `8022` | Listening port |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` | Platform base URL |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event subscriptions |
-| `RELOOP_API_KEY` | Prod | — | API key for the org that owns the sender domain(s); used by `reloop-email` |
-| `RELOOP_SENDER_DOMAIN` | Prod | — | System product mail From domain (auth, billing, invites) |
+| `RELOOP_API_KEY` | One of | — | API key for the org that owns the sender domain(s); used by `reloop-email` |
+| `RELOOP_SENDER_DOMAIN` | With API key | — | System product mail From domain (auth, billing, invites) |
 | `ONBOARDING_TEST_DOMAIN` | Prod | — | Onboarding “Send email” From domain only (can differ) |
+| `SMTP_HOST` | One of | — | Relay system mail through your own SMTP server instead of Reloop |
+| `SMTP_PORT` | No | `587` | Use `465` with `SMTP_SECURE=true` |
+| `SMTP_USER` | No | — | Omit for an unauthenticated relay |
+| `SMTP_PASSWORD` | No | — | Paired with `SMTP_USER` |
+| `SMTP_SECURE` | No | `false` | `true` for implicit TLS |
+| `MAILPIT_HOST` | No | `localhost` | Development capture host |
+| `MAILPIT_PORT` | No | `1025` | Development capture port |
 | `APP_NAME` | No | `Reloop` | Company name shown as `Self-hosted Reloop × <APP_NAME>` in system email senders, subjects and bodies |
+
+
+## How system email is delivered
+
+System email is anything Reloop sends to **your own users**: sign-in codes,
+invitations, billing alerts. It is separate from customer mail, which always
+goes through [mail](/docs/setup/backend/mail).
+
+The service picks a transport at startup, in this order:
+
+| Condition | Transport |
+| :--- | :--- |
+| `RELOOP_API_KEY` is set | Reloop API, sending from `RELOOP_SENDER_DOMAIN` |
+| otherwise `SMTP_HOST` is set | That SMTP server directly |
+| otherwise, `NODE_ENV` is not `production` | Mailpit on `MAILPIT_HOST:MAILPIT_PORT` |
+| otherwise | **Nothing. The send fails and logs why.** |
+
+The chosen transport is logged once on boot, so `reloop logs email` tells you
+which one is live:
+
+```
+System email transport: SMTP smtp.acme.test:587 (authenticated)
+```
+
+<Warning>
+In production, Mailpit is never used. Earlier versions fell back to it
+silently, so an install without `RELOOP_API_KEY` accepted sign-ins and then
+dropped every one-time code into a Mailpit that was not running. The service
+now refuses to send and logs the reason instead.
+</Warning>
+
+### Choosing a transport
+
+**Through Reloop.** Best once you have a verified sending domain. Create an API
+key in the organization that owns it, then set `RELOOP_API_KEY` and
+`RELOOP_SENDER_DOMAIN`. Your platform mail then gets the same delivery
+pipeline, tracking and logs as customer mail.
+
+**Through your own SMTP server.** Set `SMTP_HOST`, plus `SMTP_USER` and
+`SMTP_PASSWORD` if it requires auth. Useful on day one, before any domain is
+verified, and for shops that already relay everything through Postmark, SES or
+an internal server. Leave `RELOOP_API_KEY` empty.
+
+```bash
+SMTP_HOST=smtp.postmarkapp.com
+SMTP_PORT=587
+SMTP_USER=your-token
+SMTP_PASSWORD=your-token
+```
+
+### Signing in before email works
+
+A fresh install has no sending domain, so it cannot email you a code to log in
+and verify a sending domain. The installer writes a fixed `DEFAULT_OTP` into
+`.env` to break that loop. Use it to sign in, configure a transport above, then
+remove `DEFAULT_OTP` and restart.
 
 
 ## Branding system email
