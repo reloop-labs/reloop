@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -65,7 +66,9 @@ export const InviteEmail = ({
 	return (
 		<Html>
 			<Head />
-			<Preview>Join {teamName} on Reloop</Preview>
+			<Preview>
+				Join {teamName} on {appName}
+			</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
@@ -78,7 +81,7 @@ export const InviteEmail = ({
 							style={{ fontFamily: "Georgia, serif" }}
 						>
 							Join <span className="font-bold">{teamName}</span> on{" "}
-							<span className="font-bold">Reloop.</span>
+							<span className="font-bold">{appName}.</span>
 						</Heading>
 
 						<Hr className={cls.hr} />
@@ -94,7 +97,7 @@ export const InviteEmail = ({
 						<Text className={cls.bodyText}>
 							<strong>{inviterName}</strong> (<strong>{inviterEmail}</strong>)
 							has invited you to the <strong>{teamName}</strong> team on{" "}
-							<strong>Reloop</strong>.
+							<strong>{appName}</strong>.
 						</Text>
 
 						{/* CTA Button */}

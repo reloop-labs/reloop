@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -96,7 +97,7 @@ export const SignInDetectedEmail = ({
 	return (
 		<Html>
 			<Head />
-			<Preview>New sign-in detected on your Reloop account</Preview>
+			<Preview>New sign-in detected on your {appName} account</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
@@ -108,7 +109,7 @@ export const SignInDetectedEmail = ({
 							className={cls.heading}
 							style={{ fontFamily: "Georgia, serif" }}
 						>
-							New sign-in detected on your Reloop account.
+							New sign-in detected on your {appName} account.
 						</Heading>
 
 						<Hr className={cls.hr} />
@@ -119,7 +120,7 @@ export const SignInDetectedEmail = ({
 						</Text>
 
 						<Text className={cls.bodyText}>
-							Your Reloop account <strong>{email}</strong> was recently
+							Your {appName} account <strong>{email}</strong> was recently
 							signed-in from a new location, device or browser:
 						</Text>
 

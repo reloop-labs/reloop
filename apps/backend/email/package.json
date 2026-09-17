@@ -22,13 +22,15 @@
 		"fix-lint": "biome check --fix .",
 		"format": "biome format .",
 		"lint": "biome check .",
-		"start": "bun run dist/index.js"
+		"start": "bun run dist/index.js",
+		"test": "bun test test/"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"@react-email/render": "catalog:ui",
 		"@react-email/tailwind": "catalog:ui",
+		"@reloop/brand": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/cache": "workspace:*",

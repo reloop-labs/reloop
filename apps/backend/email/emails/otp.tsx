@@ -1,3 +1,4 @@
+import { appName } from "@reloop/email/brand";
 import {
 	Body,
 	Button,
@@ -64,7 +65,9 @@ export const OTPTokenEmail = ({
 	return (
 		<Html>
 			<Head />
-			<Preview>Your login code for Reloop is {otp}</Preview>
+			<Preview>
+				Your login code for {appName} is {otp}
+			</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
@@ -76,7 +79,7 @@ export const OTPTokenEmail = ({
 							className={cls.heading}
 							style={{ fontFamily: "Georgia, serif" }}
 						>
-							Your login code for Reloop.
+							Your login code for {appName}.
 						</Heading>
 
 						<Hr className={cls.hr} />
@@ -95,7 +98,7 @@ export const OTPTokenEmail = ({
 						{/* CTA Button */}
 						<Section className="mt-10">
 							<Button className={cls.btn} href={url}>
-								Login to Reloop
+								Login to {appName}
 							</Button>
 						</Section>
 

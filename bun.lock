@@ -297,6 +297,7 @@
         "@react-email/render": "catalog:ui",
         "@react-email/tailwind": "catalog:ui",
         "@reloop/auth": "workspace:*",
+        "@reloop/brand": "workspace:*",
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
@@ -392,6 +393,7 @@
         "@opentelemetry/semantic-conventions": "catalog:backend",
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/auth": "workspace:*",
+        "@reloop/brand": "workspace:*",
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/code-samples": "workspace:*",
@@ -986,6 +988,15 @@
       },
       "peerDependencies": {
         "react": ">=18",
+      },
+    },
+    "packages/brand": {
+      "name": "@reloop/brand",
+      "version": "0.0.1",
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/bus": {
@@ -2241,6 +2252,8 @@
     "@reloop/analytics": ["@reloop/analytics@workspace:packages/analytics"],
 
     "@reloop/auth": ["@reloop/auth@workspace:packages/auth"],
+
+    "@reloop/brand": ["@reloop/brand@workspace:packages/brand"],
 
     "@reloop/bus": ["@reloop/bus@workspace:packages/bus"],
 
