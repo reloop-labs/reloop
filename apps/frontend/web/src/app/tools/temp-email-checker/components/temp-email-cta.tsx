@@ -13,30 +13,548 @@ export interface TempEmailCtaProps {
 	secondaryLabel?: string;
 	secondaryHref?: string;
 	secondaryExternal?: boolean;
+	/**
+	 * Position of the blueprint email illustration relative to the copy.
+	 * Defaults to "right".
+	 */
+	illustrationPosition?: "left" | "right";
+}
+
+/**
+ * Blueprint Email Illustration depicting an email envelope in vector drafting / CAD construction view.
+ * Modeled after the Apple icon grid / SVG construction wireframes with:
+ * - Bounding squircle / frame
+ * - Extended blueprint grid lines
+ * - Concentric circular construction guides
+ * - 45° diagonal fold rays
+ * - Envelope geometry with top flap & bottom seams
+ * - Letter sheet peek with verified badge
+ * - Interactive CAD anchor handles with coordinate tags
+ * - Technical dimension callouts (320px width, 180px height, R20 radius)
+ */
+function BlueprintEmailIllustration() {
+	const [activeNode, setActiveNode] = useState<string | null>(null);
+
+	const anchorNodes = [
+		{ id: "flap-apex", x: 240, y: 176, label: "P(240,176) Apex" },
+		{ id: "top-left", x: 80, y: 90, label: "P(80,90) R20" },
+		{ id: "top-right", x: 400, y: 90, label: "P(400,90) R20" },
+		{ id: "bottom-left", x: 80, y: 270, label: "P(80,270) Base" },
+		{ id: "bottom-right", x: 400, y: 270, label: "P(400,270) Base" },
+		{ id: "flap-open-apex", x: 240, y: 22, label: "P(240,22) Fold" },
+		{ id: "center-cross", x: 240, y: 160, label: "P(240,160) Center" },
+	];
+
+	return (
+		<div className="relative w-full max-w-[480px] select-none">
+			<svg
+				viewBox="0 0 480 320"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+				className="h-auto w-full transition-transform duration-500 ease-out group-hover:scale-[1.01]"
+			>
+				<title>Email SVG Construction Blueprint</title>
+
+				<defs>
+					{/* Primary blueprint stroke gradient */}
+					<linearGradient
+						id="blueprintStroke"
+						x1="40"
+						y1="20"
+						x2="440"
+						y2="300"
+						gradientUnits="userSpaceOnUse"
+					>
+						<stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+						<stop offset="50%" stopColor="#dbeafe" stopOpacity="0.95" />
+						<stop offset="100%" stopColor="#ffffff" stopOpacity="0.85" />
+					</linearGradient>
+
+					{/* Subtle envelope inner fill gradient */}
+					<linearGradient
+						id="envelopeFill"
+						x1="80"
+						y1="90"
+						x2="400"
+						y2="270"
+						gradientUnits="userSpaceOnUse"
+					>
+						<stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
+						<stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
+					</linearGradient>
+
+					{/* Letter paper gradient */}
+					<linearGradient
+						id="letterFill"
+						x1="120"
+						y1="55"
+						x2="360"
+						y2="150"
+						gradientUnits="userSpaceOnUse"
+					>
+						<stop offset="0%" stopColor="#ffffff" stopOpacity="0.16" />
+						<stop offset="100%" stopColor="#ffffff" stopOpacity="0.06" />
+					</linearGradient>
+				</defs>
+
+				{/* 1. EXTENDED BLUEPRINT GRID LINES */}
+				<g opacity="0.32" stroke="white" strokeWidth="0.85">
+					{/* Vertical grid lines */}
+					<line x1="40" y1="10" x2="40" y2="310" />
+					<line x1="80" y1="10" x2="80" y2="310" />
+					<line x1="120" y1="10" x2="120" y2="310" />
+					<line x1="160" y1="10" x2="160" y2="310" />
+					<line x1="200" y1="10" x2="200" y2="310" />
+					<line x1="280" y1="10" x2="280" y2="310" />
+					<line x1="320" y1="10" x2="320" y2="310" />
+					<line x1="360" y1="10" x2="360" y2="310" />
+					<line x1="400" y1="10" x2="400" y2="310" />
+					<line x1="440" y1="10" x2="440" y2="310" />
+
+					{/* Horizontal grid lines */}
+					<line x1="20" y1="22" x2="460" y2="22" />
+					<line x1="20" y1="56" x2="460" y2="56" />
+					<line x1="20" y1="90" x2="460" y2="90" />
+					<line x1="20" y1="125" x2="460" y2="125" />
+					<line x1="20" y1="195" x2="460" y2="195" />
+					<line x1="20" y1="230" x2="460" y2="230" />
+					<line x1="20" y1="270" x2="460" y2="270" />
+					<line x1="20" y1="300" x2="460" y2="300" />
+				</g>
+
+				{/* 2. PRIMARY CENTER AXES (Stronger dashed drafting lines) */}
+				<g stroke="white" strokeWidth="1" strokeDasharray="6 4" opacity="0.45">
+					{/* Vertical Center Axis (x=240) */}
+					<line x1="240" y1="8" x2="240" y2="312" />
+					{/* Horizontal Center Axis (y=160) */}
+					<line x1="16" y1="160" x2="464" y2="160" />
+				</g>
+
+				{/* 3. ICON SQUIRCLE / BOUNDING MASK (Matching Apple Icon Grid reference) */}
+				<rect
+					x="36"
+					y="18"
+					width="408"
+					height="284"
+					rx="52"
+					fill="none"
+					stroke="white"
+					strokeWidth="1"
+					strokeDasharray="6 5"
+					opacity="0.25"
+				/>
+
+				{/* 4. CONCENTRIC DRAFTING CIRCLES (Centered at x=240, y=160) */}
+				<g stroke="white" strokeWidth="0.85" opacity="0.28" fill="none">
+					{/* Inner core circle */}
+					<circle cx="240" cy="160" r="44" />
+					{/* Mid construction circle */}
+					<circle cx="240" cy="160" r="92" strokeDasharray="3 3" />
+					{/* Envelope height guide circle */}
+					<circle cx="240" cy="160" r="140" />
+					{/* Outer boundary guide circle */}
+					<circle cx="240" cy="160" r="185" strokeDasharray="4 4" />
+
+					{/* Flap apex tangent circle (showing curvature construction) */}
+					<circle
+						cx="240"
+						cy="176"
+						r="16"
+						strokeDasharray="2 2"
+						strokeWidth="1"
+						opacity="0.8"
+					/>
+
+					{/* Corner radius guide circles at the 4 envelope corners */}
+					<circle cx="100" cy="110" r="20" strokeDasharray="2 2" />
+					<circle cx="380" cy="110" r="20" strokeDasharray="2 2" />
+					<circle cx="100" cy="250" r="20" strokeDasharray="2 2" />
+					<circle cx="380" cy="250" r="20" strokeDasharray="2 2" />
+				</g>
+
+				{/* 5. 45-DEGREE DIAGONAL CONSTRUCTION RAYS */}
+				<g stroke="white" strokeWidth="0.85" opacity="0.28">
+					{/* Diagonal Ray 1: Top-Left through center to Bottom-Right */}
+					<line x1="80" y1="0" x2="400" y2="320" />
+					{/* Diagonal Ray 2: Top-Right through center to Bottom-Left */}
+					<line x1="400" y1="0" x2="80" y2="320" />
+					{/* Envelope diagonal fold rays extending out */}
+					<line
+						x1="40"
+						y1="50"
+						x2="240"
+						y2="250"
+						strokeDasharray="4 4"
+						opacity="0.6"
+					/>
+					<line
+						x1="440"
+						y1="50"
+						x2="240"
+						y2="250"
+						strokeDasharray="4 4"
+						opacity="0.6"
+					/>
+				</g>
+
+				{/* 6. CAD INTERSECTION TICK MARKS (+) */}
+				<g opacity="0.35" stroke="white" strokeWidth="1">
+					<path d="M 76 90 H 84 M 80 86 V 94" />
+					<path d="M 396 90 H 404 M 400 86 V 94" />
+					<path d="M 76 270 H 84 M 80 266 V 274" />
+					<path d="M 396 270 H 404 M 400 266 V 274" />
+					<path d="M 236 90 H 244 M 240 86 V 94" />
+					<path d="M 236 270 H 244 M 240 266 V 274" />
+					<path d="M 76 160 H 84 M 80 156 V 164" />
+					<path d="M 396 160 H 404 M 400 156 V 164" />
+				</g>
+
+				{/* 7. LETTER DOCUMENT PEEKING OUT OF ENVELOPE */}
+				<g>
+					{/* Letter paper body */}
+					<rect
+						x="116"
+						y="52"
+						width="248"
+						height="105"
+						rx="8"
+						fill="url(#letterFill)"
+						stroke="white"
+						strokeWidth="1.25"
+						strokeOpacity="0.4"
+					/>
+
+					{/* Document header line */}
+					<line
+						x1="140"
+						y1="72"
+						x2="230"
+						y2="72"
+						stroke="white"
+						strokeOpacity="0.6"
+						strokeWidth="1.75"
+						strokeLinecap="round"
+					/>
+
+					{/* Document text content lines */}
+					<line
+						x1="140"
+						y1="88"
+						x2="310"
+						y2="88"
+						stroke="white"
+						strokeOpacity="0.35"
+						strokeWidth="1.25"
+						strokeLinecap="round"
+					/>
+					<line
+						x1="140"
+						y1="102"
+						x2="280"
+						y2="102"
+						stroke="white"
+						strokeOpacity="0.25"
+						strokeWidth="1.25"
+						strokeLinecap="round"
+					/>
+
+					{/* Verified badge stamp inside letter */}
+					<g transform="translate(322, 75)">
+						<circle
+							cx="12"
+							cy="12"
+							r="12"
+							fill="rgba(255,255,255,0.12)"
+							stroke="white"
+							strokeWidth="1"
+							strokeOpacity="0.65"
+						/>
+						{/* Checkmark */}
+						<path
+							d="M 8 12.5 L 11 15.5 L 17 9"
+							stroke="white"
+							strokeWidth="1.5"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</g>
+				</g>
+
+				{/* 8. OPEN FLAP GHOST CONSTRUCTION (Upper inverted triangle in dashed lines) */}
+				<path
+					d="M 82 92 L 232 24 C 236 21, 244 21, 248 24 L 398 92"
+					fill="rgba(255, 255, 255, 0.02)"
+					stroke="white"
+					strokeWidth="1.25"
+					strokeDasharray="4 4"
+					strokeOpacity="0.32"
+				/>
+
+				{/* 9. MAIN ENVELOPE RECTANGLE (Base body) */}
+				<rect
+					x="80"
+					y="90"
+					width="320"
+					height="180"
+					rx="20"
+					fill="url(#envelopeFill)"
+					stroke="url(#blueprintStroke)"
+					strokeWidth="2"
+					className="drop-shadow-xs"
+				/>
+
+				{/* 10. INTERIOR BOTTOM ENVELOPE SEAM FOLDS */}
+				<g
+					stroke="white"
+					strokeWidth="1.25"
+					opacity="0.38"
+					strokeDasharray="4 4"
+				>
+					{/* Bottom-left to center-left fold */}
+					<line x1="84" y1="266" x2="216" y2="162" />
+					{/* Bottom-right to center-right fold */}
+					<line x1="396" y1="266" x2="264" y2="162" />
+				</g>
+
+				{/* 11. PRIMARY ENVELOPE DOWNWARD FOLD FLAP (Front flap) */}
+				<path
+					d="
+						M 82 92
+						L 229 174
+						C 235 178, 245 178, 251 174
+						L 398 92
+					"
+					fill="none"
+					stroke="url(#blueprintStroke)"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+
+				{/* 12. BLUEPRINT DIMENSION & CAD SPECS ANNOTATIONS */}
+				{/* Top Width Dimension Bar (320.0 px) */}
+				<g opacity="0.75">
+					<line
+						x1="80"
+						y1="40"
+						x2="400"
+						y2="40"
+						stroke="white"
+						strokeWidth="0.85"
+					/>
+					<path
+						d="M 80 35 V 45 M 400 35 V 45"
+						stroke="white"
+						strokeWidth="0.85"
+					/>
+					<rect
+						x="200"
+						y="32"
+						width="80"
+						height="16"
+						rx="3"
+						fill="#256bf5"
+						stroke="white"
+						strokeWidth="0.75"
+						strokeOpacity="0.4"
+					/>
+					<text
+						x="240"
+						y="43.5"
+						fill="white"
+						fontSize="8.5"
+						fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+						textAnchor="middle"
+						letterSpacing="0.04em"
+					>
+						W: 320.0px
+					</text>
+				</g>
+
+				{/* Right Height Dimension Bar (180.0 px) */}
+				<g opacity="0.75">
+					<line
+						x1="428"
+						y1="90"
+						x2="428"
+						y2="270"
+						stroke="white"
+						strokeWidth="0.85"
+					/>
+					<path
+						d="M 423 90 H 433 M 423 270 H 433"
+						stroke="white"
+						strokeWidth="0.85"
+					/>
+					<rect
+						x="414"
+						y="172"
+						width="28"
+						height="16"
+						rx="3"
+						fill="#256bf5"
+						stroke="white"
+						strokeWidth="0.75"
+						strokeOpacity="0.4"
+					/>
+					<text
+						x="428"
+						y="183.5"
+						fill="white"
+						fontSize="8"
+						fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+						textAnchor="middle"
+					>
+						180
+					</text>
+				</g>
+
+				{/* Corner Radius Callout (R20) */}
+				<g opacity="0.7">
+					<text
+						x="62"
+						y="82"
+						fill="white"
+						fontSize="8.5"
+						fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+					>
+						R20
+					</text>
+				</g>
+
+				{/* Flap Angle Callout (45°) */}
+				<g opacity="0.6">
+					<text
+						x="142"
+						y="126"
+						fill="white"
+						fontSize="8"
+						fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+					>
+						∠45.0°
+					</text>
+				</g>
+
+				{/* 13. CAD VECTOR ANCHOR HANDLES (Interactive Squares with coordinates) */}
+				{anchorNodes.map((node) => {
+					const isHovered = activeNode === node.id;
+					return (
+						<g
+							key={node.id}
+							className="cursor-pointer transition-transform duration-200"
+							onMouseEnter={() => setActiveNode(node.id)}
+							onMouseLeave={() => setActiveNode(null)}
+						>
+							{/* Coordinate chip on hover */}
+							{isHovered && (
+								<g className="fade-in zoom-in-95 animate-in duration-150">
+									<rect
+										x={node.x - 42}
+										y={node.y - 26}
+										width="84"
+										height="18"
+										rx="4"
+										fill="#0f172a"
+										stroke="white"
+										strokeWidth="1"
+										strokeOpacity="0.8"
+										filter="drop-shadow(0 2px 4px rgba(0,0,0,0.25))"
+									/>
+									<text
+										x={node.x}
+										y={node.y - 14}
+										fill="#ffffff"
+										fontSize="8.5"
+										fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+										textAnchor="middle"
+										fontWeight="500"
+									>
+										{node.label}
+									</text>
+								</g>
+							)}
+
+							{/* Outer glow ring on hover */}
+							{isHovered && (
+								<circle
+									cx={node.x}
+									cy={node.y}
+									r="10"
+									fill="none"
+									stroke="white"
+									strokeWidth="1.5"
+									strokeOpacity="0.6"
+								/>
+							)}
+
+							{/* The Vector Square Node */}
+							<rect
+								x={node.x - 4}
+								y={node.y - 4}
+								width="8"
+								height="8"
+								rx="1.5"
+								fill="#ffffff"
+								stroke="#1660f0"
+								strokeWidth="1.5"
+								className="transition-transform duration-150 hover:scale-125"
+							/>
+
+							{/* Center core dot */}
+							<rect
+								x={node.x - 1}
+								y={node.y - 1}
+								width="2"
+								height="2"
+								fill="#1660f0"
+								opacity="0.85"
+							/>
+						</g>
+					);
+				})}
+			</svg>
+		</div>
+	);
 }
 
 export function TempEmailCta({
-	headlineLine1 = "Ready to block fake signups?",
+	headlineLine1 = "Ready to scale your email?",
 	headlineLine2 = "Let's talk.",
-	subtext = "3,000 free API checks every month. Stop throwaway emails at signup with zero hassle.",
+	subtext = "3,000 free emails every month. Modern email infrastructure and deliverability built for developers.",
 	primaryLabel = "Get started free",
 	primaryHref = hostedSignupHref,
 	secondaryLabel = "Schedule call",
 	secondaryHref = "https://cal.com/pranavp/30",
 	secondaryExternal = true,
+	illustrationPosition = "right",
 }: TempEmailCtaProps) {
-	const [isNodeHovered, setIsNodeHovered] = useState(false);
-
 	return (
 		<section className="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
 			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#256bf5] p-8 transition-all duration-300 sm:rounded-[32px] sm:p-12 lg:p-14">
-				{/* Left Column: Heading, Subhead, and Actions */}
 				<div className="relative z-10 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8">
-					<div className="flex flex-col items-start text-left lg:col-span-7">
-						<h2 className="font-normal text-3xl text-white tracking-[-0.03em] sm:text-4xl lg:text-[44px] lg:leading-[1.12]">
+					{/* Blueprint Email Illustration Column */}
+					<div
+						className={`relative flex items-center justify-center lg:col-span-5 ${
+							illustrationPosition === "left"
+								? "order-2 lg:order-1 lg:justify-start"
+								: "order-2 lg:order-2 lg:justify-end"
+						}`}
+					>
+						<BlueprintEmailIllustration />
+					</div>
+
+					{/* Heading, Subhead, and Actions Column */}
+					<div
+						className={`flex flex-col items-start text-left lg:col-span-7 ${
+							illustrationPosition === "left"
+								? "order-1 lg:order-2 lg:pl-6"
+								: "order-1 lg:order-1 lg:pr-6"
+						}`}
+					>
+						<h2 className="font-medium text-2xl text-white tracking-[-0.025em] sm:text-3xl lg:text-[32px] lg:leading-[1.2]">
 							<span>{headlineLine1}</span>
 							<br />
-							<span className="font-normal text-white">{headlineLine2}</span>
+							<span className="font-medium text-white">{headlineLine2}</span>
 						</h2>
 
 						{subtext && (
@@ -72,281 +590,6 @@ export function TempEmailCta({
 									{secondaryLabel}
 								</Link>
 							)}
-						</div>
-					</div>
-
-					{/* Right Column: Architectural Blueprint Grid & CAD Monogram */}
-					<div className="relative flex items-center justify-center lg:col-span-5 lg:justify-end">
-						<div className="relative w-full max-w-[460px] overflow-hidden rounded-2xl">
-							<svg
-								viewBox="0 0 460 260"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-								className="h-auto w-full select-none"
-							>
-								<title>Reloop Architectural Blueprint</title>
-
-								<defs>
-									{/* Gradient stroke for dynamic vector curves */}
-									<linearGradient
-										id="vectorStroke"
-										x1="0"
-										y1="0"
-										x2="460"
-										y2="260"
-										gradientUnits="userSpaceOnUse"
-									>
-										<stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
-										<stop offset="50%" stopColor="#dbeafe" stopOpacity="0.85" />
-										<stop
-											offset="100%"
-											stopColor="#ffffff"
-											stopOpacity="0.65"
-										/>
-									</linearGradient>
-								</defs>
-
-								{/* Blueprint Grid Lines */}
-								<g opacity="0.4">
-									{/* Vertical grid lines (spaced at 70px intervals starting at x=40) */}
-									<line
-										x1="40"
-										y1="10"
-										x2="40"
-										y2="250"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="110"
-										y1="10"
-										x2="110"
-										y2="250"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="180"
-										y1="10"
-										x2="180"
-										y2="250"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="250"
-										y1="10"
-										x2="250"
-										y2="250"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="320"
-										y1="10"
-										x2="320"
-										y2="250"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="390"
-										y1="10"
-										x2="390"
-										y2="250"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="450"
-										y1="10"
-										x2="450"
-										y2="250"
-										stroke="white"
-										strokeWidth="1"
-									/>
-
-									{/* Horizontal grid lines (spaced at 60px intervals) */}
-									<line
-										x1="40"
-										y1="10"
-										x2="450"
-										y2="10"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="40"
-										y1="70"
-										x2="450"
-										y2="70"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="40"
-										y1="130"
-										x2="450"
-										y2="130"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="40"
-										y1="190"
-										x2="450"
-										y2="190"
-										stroke="white"
-										strokeWidth="1"
-									/>
-									<line
-										x1="40"
-										y1="250"
-										x2="450"
-										y2="250"
-										stroke="white"
-										strokeWidth="1"
-									/>
-								</g>
-
-								{/* Subtle CAD Intersection Marks (Tick Marks) */}
-								<g opacity="0.3" stroke="white" strokeWidth="1">
-									<path d="M 106 70 H 114 M 110 66 V 74" />
-									<path d="M 176 70 H 184 M 180 66 V 74" />
-									<path d="M 246 70 H 254 M 250 66 V 74" />
-									<path d="M 316 70 H 324 M 320 66 V 74" />
-									<path d="M 386 70 H 394 M 390 66 V 74" />
-
-									<path d="M 176 130 H 184 M 180 126 V 134" />
-									<path d="M 246 130 H 254 M 250 126 V 134" />
-									<path d="M 316 130 H 324 M 320 126 V 134" />
-									<path d="M 386 130 H 394 M 390 126 V 134" />
-								</g>
-
-								{/* The Blueprint Monogram Continuous Curves (Reloop Wave Loops) */}
-								{/* Geometric pill loops and sweeping arches traversing the grid */}
-								<g
-									className="transition-transform duration-500 ease-out group-hover:scale-[1.01]"
-									style={{ transformOrigin: "240px 180px" }}
-								>
-									{/* Outer looping contour - continuous interlocking arches */}
-									<path
-										d="
-											M 40 220
-											L 88 152
-											C 100 134, 126 134, 138 152
-											L 174 204
-											C 186 222, 212 222, 224 204
-											L 260 152
-											C 272 134, 298 134, 310 152
-											L 346 204
-											C 358 222, 384 222, 396 204
-											L 444 136
-											C 458 116, 480 132, 468 150
-											L 418 222
-											C 400 248, 364 248, 346 222
-											L 310 172
-											C 298 154, 272 154, 260 172
-											L 224 222
-											C 206 248, 170 248, 152 222
-											L 116 172
-											C 104 154, 78 154, 66 172
-											L 22 234
-											C 10 252, -12 236, 4 214
-											Z
-										"
-										stroke="url(#vectorStroke)"
-										strokeWidth="1.75"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										fill="rgba(255, 255, 255, 0.03)"
-									/>
-
-									{/* Secondary inner architectural curve echoing the loop geometry */}
-									<path
-										d="
-											M 70 190
-											C 90 150, 140 150, 160 190
-											C 180 230, 230 230, 250 190
-											C 270 150, 320 150, 340 190
-											C 360 230, 410 230, 430 190
-										"
-										stroke="rgba(255, 255, 255, 0.28)"
-										strokeWidth="1.25"
-										strokeDasharray="4 4"
-										fill="none"
-									/>
-								</g>
-
-								{/* CAD Vector Anchor Point Handle (Exact feature from reference) */}
-								{/* Located at key grid node (x=40, y=130) on the leftmost vertical grid line */}
-								<g
-									className="cursor-pointer transition-all duration-300"
-									onMouseEnter={() => setIsNodeHovered(true)}
-									onMouseLeave={() => setIsNodeHovered(false)}
-								>
-									{/* Subtle coordinate guide lines when hovered */}
-									{isNodeHovered && (
-										<g opacity="0.6">
-											<line
-												x1="0"
-												y1="130"
-												x2="40"
-												y2="130"
-												stroke="white"
-												strokeWidth="1"
-												strokeDasharray="2 2"
-											/>
-											<text
-												x="10"
-												y="124"
-												fill="white"
-												fontSize="9"
-												fontFamily="monospace"
-											>
-												P(40,130)
-											</text>
-										</g>
-									)}
-
-									{/* The Vector Square Node */}
-									<rect
-										x="36"
-										y="126"
-										width="8"
-										height="8"
-										rx="1.5"
-										fill="#ffffff"
-										stroke="#1660f0"
-										strokeWidth="1.5"
-										className="transition-transform duration-200 hover:scale-125"
-									/>
-
-									{/* Tiny center core dot */}
-									<rect
-										x="39"
-										y="129"
-										width="2"
-										height="2"
-										fill="#1660f0"
-										opacity="0.8"
-									/>
-								</g>
-
-								{/* Secondary vector handle on line intersection (x=180, y=70) */}
-								<g opacity="0.75">
-									<rect
-										x="177"
-										y="67"
-										width="6"
-										height="6"
-										rx="1"
-										fill="#ffffff"
-										stroke="#1660f0"
-										strokeWidth="1"
-									/>
-								</g>
-							</svg>
 						</div>
 					</div>
 				</div>
