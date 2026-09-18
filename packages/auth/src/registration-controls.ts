@@ -1,3 +1,4 @@
+import { isSetupBootstrapBypassed } from "./setup/bootstrap-bypass";
 import { getRuntimeDisableSignup } from "./setup/runtime-registration";
 
 export const REGISTRATION_DISABLED_MESSAGE =
@@ -21,6 +22,8 @@ export async function isRegistrationAllowed(
 	disableSignup: string | undefined,
 	hasPendingInvitation: (email: string) => Promise<boolean>,
 ): Promise<boolean> {
+	if (isSetupBootstrapBypassed()) return true;
+
 	const runtime = getRuntimeDisableSignup();
 	const closed =
 		runtime === true || (runtime !== false && isEnvFlagEnabled(disableSignup));
