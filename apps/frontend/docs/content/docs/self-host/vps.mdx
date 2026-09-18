@@ -67,6 +67,7 @@ Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloo
 ```text
 /opt/reloop/
 ├── .env                 production configuration and secrets (0600, root)
+├── admin-setup.key      one-time first-run setup key (0600, emptied after setup)
 ├── docker-compose.yml   the production stack
 ├── Caddyfile            reverse proxy and TLS
 └── backups/             automatic database dumps taken before schema changes
