@@ -198,7 +198,12 @@ export namespace ContactModel {
 				},
 			),
 			suppressionReason: t.Union(
-				[t.Literal("hard_bounce"), t.Literal("spam_complaint"), t.Null()],
+				[
+					t.Literal("hard_bounce"),
+					t.Literal("spam_complaint"),
+					t.Literal("mailbox_full"),
+					t.Null(),
+				],
 				{
 					description: "Suppression reason, or null if not suppressed",
 					default: null,

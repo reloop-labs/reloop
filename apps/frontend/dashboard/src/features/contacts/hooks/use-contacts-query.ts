@@ -20,7 +20,7 @@ export type ContactDetail = Contact & {
 	properties?: Record<string, string | number>;
 	groups?: { id: string; name: string }[];
 	channels?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
-	suppressionReason?: "hard_bounce" | "spam_complaint" | null;
+	suppressionReason?: "hard_bounce" | "spam_complaint" | "mailbox_full" | null;
 	suppressedAt?: string | null;
 };
 

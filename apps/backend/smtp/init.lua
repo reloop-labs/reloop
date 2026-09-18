@@ -4,6 +4,7 @@ local kumo = require 'kumo'
 require 'policy.webhooks'
 require 'policy.smtp'
 require 'policy.queue'
+require 'policy.bounce_rewrite'
 
 local constants = require 'policy.constants'
 

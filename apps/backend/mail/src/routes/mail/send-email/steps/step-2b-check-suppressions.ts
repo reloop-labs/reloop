@@ -15,7 +15,7 @@
  *  - Normalises all recipient addresses (To + CC + BCC) to bare emails.
  *  - Looks up each one across ALL orgs in the contact table.
  *  - Contacts with status = "blocked" OR a non-null suppressionReason
- *    (hard_bounce | spam_complaint) are filtered out.
+ *    (hard_bounce | spam_complaint | mailbox_full) are filtered out.
  *  - If EVERY recipient is suppressed → throws 400.
  *  - If SOME recipients are suppressed → skips those, logs a warning,
  *    continues with remaining recipients.

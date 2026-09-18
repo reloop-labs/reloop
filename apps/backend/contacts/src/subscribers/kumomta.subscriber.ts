@@ -7,9 +7,13 @@
  * Lifecycle:
  *  • Delivery      → upsert contact (create if not exists)
  *  • Bounce        → upsert contact, suppress with hard_bounce
+ *                   (mailbox_full when the bounce is an over-quota rewrite)
+ *  • TransientFailure matching over-quota → upsert + suppress mailbox_full
+ *                   (fallback for pre-rewrite events; Kumo rewrite bounces
+ *                   these immediately so retries stop)
  *  • AdminBounce   → same as Bounce
  *  • Feedback      → upsert contact, suppress with spam_complaint
- *  • Reception / TransientFailure / Expiration / OOB → no-op (skip)
+ *  • Reception / Expiration / OOB / other TransientFailure → no-op (skip)
  *
  * Safety guarantees:
  *  • Never overwrites a contact that is already manually unsubscribed or blocked
@@ -36,11 +40,39 @@ type KumomtaEventType =
 	| "AdminBounce";
 
 type Deliverability = "delivered" | "bounced" | "spam";
-type SuppressionReason = "hard_bounce" | "spam_complaint";
+type SuppressionReason = "hard_bounce" | "spam_complaint" | "mailbox_full";
 
 interface EventAction {
 	deliverability: Deliverability;
 	suppressionReason?: SuppressionReason;
+}
+
+/**
+ * Over-quota / full-mailbox signatures (Gmail `452 4.2.2 OverQuotaTemp`,
+ * `out of storage space`, generic quota/mailbox-full replies).
+ * Matched case-insensitively against `response.content`.
+ * Keep in sync with apps/backend/smtp/policy/bounce_rewrite.lua
+ * and apps/backend/logs/src/subscribers/kumomta.subscriber.ts.
+ */
+const OVER_QUOTA_PATTERNS = [
+	"overquota",
+	"over quota",
+	"over-quota",
+	"out of storage",
+	"quota exceeded",
+	"exceeded quota",
+	"exceeded storage",
+	"mailbox full",
+	"mailbox over",
+	"storage exceeded",
+	"insufficient storage",
+];
+
+function isOverQuotaEvent(event: KumomtaLogRecordPayload): boolean {
+	const content = event.response?.content;
+	if (!content) return false;
+	const haystack = content.toLowerCase();
+	return OVER_QUOTA_PATTERNS.some((pat) => haystack.includes(pat));
 }
 
 /** Maps actionable KumoMTA event types to their contact-level outcomes */
@@ -248,9 +280,24 @@ export async function initKumomtaContactSubscriber() {
 		async (event: KumomtaLogRecordPayload) => {
 			try {
 				const eventType = event.type as KumomtaEventType;
-				const action = EVENT_ACTION_MAP[eventType];
+				let action = EVENT_ACTION_MAP[eventType];
 
-				// Skip non-actionable event types (Reception, TransientFailure, etc.)
+				// Over-quota mailbox: suppress with the proper reason instead of
+				// a generic hard bounce. Covers both the post-rewrite `Bounce`
+				// (552 after smtp_client_rewrite_delivery_status) and any
+				// pre-rewrite `TransientFailure` (452 OverQuotaTemp) still in
+				// flight, so the address is blocked on the first signal.
+				if (
+					(eventType === "Bounce" || eventType === "TransientFailure") &&
+					isOverQuotaEvent(event)
+				) {
+					action = {
+						deliverability: "bounced",
+						suppressionReason: "mailbox_full",
+					};
+				}
+
+				// Skip non-actionable event types (Reception, Expiration, etc.)
 				if (!action) {
 					log.debug({
 						type: eventType,

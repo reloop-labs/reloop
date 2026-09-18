@@ -420,7 +420,9 @@ export const ContactHeader = ({
 	const suppressionCopy =
 		contact?.suppressionReason === "spam_complaint"
 			? "This contact reported an email as spam, so they are automatically excluded from all sends."
-			: "Emails to this address hard-bounced, so this contact is automatically excluded from all sends.";
+			: contact?.suppressionReason === "mailbox_full"
+				? "This mailbox is full (out of storage), so this contact is automatically excluded from all sends."
+				: "Emails to this address hard-bounced, so this contact is automatically excluded from all sends.";
 
 	if (!contact && !isLoading) {
 		return (
