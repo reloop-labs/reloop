@@ -857,11 +857,11 @@ export function TesterPanel() {
 														: "No"}
 												</span>
 											</div>
-											<div className="col-span-1 flex items-center justify-between pr-4 sm:col-span-2">
-												<span className="text-text-sub-600 dark:text-white/50">
+											<div className="flex min-w-0 items-center justify-between gap-2 pr-4">
+												<span className="shrink-0 text-text-sub-600 dark:text-white/50">
 													MX Mail Record
 												</span>
-												<span className="font-mono text-text-strong-950 dark:text-white">
+												<span className="truncate font-mono text-text-strong-950 dark:text-white">
 													{singleResult.health?.mailServer?.mxRecord ||
 														(singleResult.mxRecords.length > 0
 															? singleResult.mxRecords[0]
