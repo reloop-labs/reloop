@@ -92,6 +92,7 @@ describe("self-host setup routes", () => {
 		off = await probe({
 			PG_URL: pgUrl,
 			PROBE_CASE: "off",
+			SETUP_MODE: "false",
 			ADMIN_SETUP_KEY_FILE: offFiles.keyFile,
 			RELOOP_ENV_FILE: offFiles.envFile,
 		});
