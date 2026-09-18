@@ -6,6 +6,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { KbdKey } from "@reloop/ui/kbd-key";
 import Spinner from "@reloop/ui/spinner";
 import * as Table from "@reloop/ui/table";
 import {
@@ -17,9 +18,23 @@ import {
 	submitBatchHealthCheck,
 } from "@reloop/web/app/tools/email-validator/check-api";
 import { AnimatePresence, motion } from "framer-motion";
-import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
+import {
+	type ChangeEvent,
+	type FormEvent,
+	type KeyboardEvent,
+	useEffect,
+	useState,
+} from "react";
 
 type FilterVerdict = "all" | "deliverable" | "risky" | "disposable" | "invalid";
+
+const actionKbdOnFilledClassName = cn(
+	"h-4 w-auto min-w-4 rounded-[5px] px-1 font-mono text-[10px] leading-none",
+	"border border-white/20 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.25)]",
+	"dark:border-black/15 dark:bg-black/10 dark:text-text-strong-950 dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.15)]",
+	"group-disabled:border-stroke-soft-200 group-disabled:bg-transparent group-disabled:text-text-disabled-300 group-disabled:shadow-none",
+	"dark:group-disabled:border-white/10 dark:group-disabled:bg-transparent dark:group-disabled:text-white/30",
+);
 
 const SAMPLE_EMAILS = [
 	"alex@reloop.sh",
@@ -413,6 +428,12 @@ export function TesterPanel() {
 													setSingleEmail(e.target.value);
 													if (singleError) setSingleError(null);
 												}}
+												onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+													if (e.key !== "Enter") return;
+													e.preventDefault();
+													if (singleLoading || !singleEmail.trim()) return;
+													void handleSingleSubmit();
+												}}
 												placeholder="name@company.com"
 												autoComplete="off"
 												spellCheck={false}
@@ -427,7 +448,7 @@ export function TesterPanel() {
 									size="small"
 									type="submit"
 									disabled={singleLoading || !singleEmail.trim()}
-									className="shrink-0"
+									className="shrink-0 gap-1.5"
 								>
 									{singleLoading ? (
 										<>
@@ -442,6 +463,7 @@ export function TesterPanel() {
 												className="size-3.5"
 											/>
 											<span>Check Health</span>
+											<KbdKey className={actionKbdOnFilledClassName}>↵</KbdKey>
 										</>
 									)}
 								</Button.Root>
@@ -714,7 +736,7 @@ export function TesterPanel() {
 											<div className="flex items-center justify-between pr-4">
 												<span className="flex items-center gap-1.5 text-text-sub-600 dark:text-white/50">
 													<Icon
-														name="user-check"
+														name="user-role"
 														className="size-3.5 text-text-sub-600/60"
 													/>
 													Role Account
@@ -781,7 +803,7 @@ export function TesterPanel() {
 											<div className="flex items-center justify-between pr-4">
 												<span className="flex items-center gap-1.5 text-text-sub-600 dark:text-white/50">
 													<Icon
-														name="mail-open"
+														name="inbox"
 														className="size-3.5 text-text-sub-600/60"
 													/>
 													Mailbox Full
