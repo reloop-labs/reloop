@@ -9,7 +9,7 @@ import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import Spinner from "@reloop/ui/spinner";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
-import * as Table from "@reloop/ui/table";
+import * as Tooltip from "@reloop/ui/tooltip";
 import {
 	type BatchPollResponse,
 	type EmailHealthCheckResponse,
@@ -41,6 +41,67 @@ const actionKbdOnFilledClassName = cn(
 	"group-disabled:border-stroke-soft-200 group-disabled:bg-transparent group-disabled:text-text-disabled-300 group-disabled:shadow-none",
 	"dark:group-disabled:border-white/10 dark:group-disabled:bg-transparent dark:group-disabled:text-white/30",
 );
+
+const batchResultsGridStyle = {
+	gridTemplateColumns:
+		"40px minmax(0, 1.35fr) 120px minmax(110px, 0.9fr) minmax(0, 1.4fr) minmax(130px, 1fr) 56px",
+} as const;
+
+const AVATAR_GRADIENTS = [
+	"from-rose-500 to-pink-600",
+	"from-pink-500 to-fuchsia-600",
+	"from-fuchsia-500 to-purple-600",
+	"from-purple-500 to-indigo-600",
+	"from-indigo-500 to-blue-600",
+	"from-blue-500 to-cyan-600",
+	"from-cyan-500 to-teal-600",
+	"from-teal-500 to-emerald-600",
+	"from-emerald-500 to-green-600",
+	"from-amber-500 to-orange-600",
+	"from-orange-500 to-red-600",
+	"from-violet-500 to-purple-600",
+] as const;
+
+function getAvatarGradient(seed: string): string {
+	let hash = 5381;
+	for (let i = 0; i < seed.length; i++) {
+		hash = (hash * 33) ^ seed.charCodeAt(i);
+	}
+	const index = Math.abs(hash) % AVATAR_GRADIENTS.length;
+	return `bg-gradient-to-br ${AVATAR_GRADIENTS[index]}`;
+}
+
+function getStatePresentation(state: string): {
+	icon: string;
+	className: string;
+	label: string;
+} {
+	const normalized = state.toLowerCase();
+	if (normalized === "deliverable") {
+		return {
+			icon: "check-circle",
+			className: "text-success-base",
+			label: "Deliverable",
+		};
+	}
+	if (normalized === "risky" || normalized === "disposable") {
+		return {
+			icon: "alert-triangle",
+			className: "text-warning-base",
+			label: normalized === "disposable" ? "Disposable" : "Risky",
+		};
+	}
+	return {
+		icon: "minus-circle",
+		className: "text-error-base",
+		label:
+			normalized === "invalid"
+				? "Invalid"
+				: normalized === "undeliverable"
+					? "Undeliverable"
+					: state.charAt(0).toUpperCase() + state.slice(1),
+	};
+}
 
 const SAMPLE_EMAILS = [
 	"alex@reloop.sh",
@@ -436,7 +497,9 @@ export function EmailValidatorPageView() {
 											<>
 												<FancyButton.Icon as={Icon} name="shield-check" />
 												<span>Check Health</span>
-												<KbdKey className={actionKbdOnFilledClassName}>↵</KbdKey>
+												<KbdKey className={actionKbdOnFilledClassName}>
+													↵
+												</KbdKey>
 											</>
 										)}
 									</FancyButton.Root>
@@ -918,7 +981,21 @@ export function EmailValidatorPageView() {
 								</FancyButton.Root>
 							</div>
 
-							<form onSubmit={handleBulkSubmit} className="space-y-4">
+							<form
+								onSubmit={handleBulkSubmit}
+								onKeyDown={(e) => {
+									if (e.key !== "Enter") return;
+									if (e.target instanceof HTMLTextAreaElement) return;
+									const canSubmit =
+										!bulkLoading &&
+										((bulkInputMode === "upload" && Boolean(csvFile)) ||
+											(bulkInputMode === "paste" && Boolean(pasteText.trim())));
+									if (!canSubmit) return;
+									e.preventDefault();
+									void handleBulkSubmit();
+								}}
+								className="space-y-4"
+							>
 								{bulkInputMode === "upload" ? (
 									<div className="flex flex-col items-center justify-center rounded-2xl border-2 border-stroke-soft-200 border-dashed bg-bg-weak-50/40 p-8 text-center transition hover:border-emerald-500/40 dark:border-white/10 dark:bg-white/[0.02]">
 										<div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
@@ -954,6 +1031,17 @@ export function EmailValidatorPageView() {
 											rows={6}
 											value={pasteText}
 											onChange={(e) => setPasteText(e.target.value)}
+											onKeyDown={(e: KeyboardEvent<HTMLTextAreaElement>) => {
+												if (e.key !== "Enter" || (!e.metaKey && !e.ctrlKey))
+													return;
+												e.preventDefault();
+												if (
+													bulkLoading ||
+													(bulkInputMode === "paste" && !pasteText.trim())
+												)
+													return;
+												void handleBulkSubmit();
+											}}
 											placeholder="Paste one email per line (up to 1,000 addresses)..."
 											className="w-full rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 font-mono text-[13px] text-text-strong-950 outline-none ring-primary-base/30 focus:ring-2 dark:border-white/10 dark:bg-black dark:text-white"
 										/>
@@ -963,7 +1051,7 @@ export function EmailValidatorPageView() {
 								{bulkError && (
 									<Alert.Root variant="lighter" status="error" size="large">
 										<Alert.Icon as={Icon} name="alert-triangle" />
-										<div className="flex-1">
+										<div className="min-w-0 flex-1 text-left">
 											<div className="font-medium text-label-sm">
 												Submission Error
 											</div>
@@ -981,7 +1069,7 @@ export function EmailValidatorPageView() {
 										(bulkInputMode === "upload" && !csvFile) ||
 										(bulkInputMode === "paste" && !pasteText.trim())
 									}
-									className="w-full"
+									className="w-full gap-1.5"
 								>
 									{bulkLoading ? (
 										<>
@@ -992,6 +1080,7 @@ export function EmailValidatorPageView() {
 										<>
 											<FancyButton.Icon as={Icon} name="shield-check" />
 											<span>Start Batch Health Check</span>
+											<KbdKey className={actionKbdOnFilledClassName}>↵</KbdKey>
 										</>
 									)}
 								</FancyButton.Root>
@@ -1031,27 +1120,28 @@ export function EmailValidatorPageView() {
 							>
 								{/* Duplicate Notification Banner */}
 								{pollJob.summary.duplicatesRemoved > 0 && (
-									<Alert.Root
-										variant="lighter"
-										status="information"
-										size="large"
-									>
-										<Alert.Icon as={Icon} name="info" />
-										<div className="flex-1">
+									<div className="flex w-full items-start gap-3 rounded-xl border border-information-base/20 bg-information-lighter p-3.5 text-left text-text-strong-950">
+										<Icon
+											name="info"
+											className="mt-0.5 size-5 shrink-0 text-information-base"
+										/>
+										<div className="min-w-0 flex-1">
 											<div className="font-semibold text-label-sm">
 												Deduplication Notice
 											</div>
-											<p className="mt-0.5 text-paragraph-sm">
+											<p className="mt-0.5 text-paragraph-sm text-text-sub-600">
 												Found and removed{" "}
-												<strong>
+												<strong className="text-text-strong-950">
 													{pollJob.summary.duplicatesRemoved} duplicate email(s)
 												</strong>{" "}
 												automatically. Evaluated{" "}
-												<strong>{pollJob.summary.totalUnique}</strong> unique
-												addresses.
+												<strong className="text-text-strong-950">
+													{pollJob.summary.totalUnique}
+												</strong>{" "}
+												unique addresses.
 											</p>
 										</div>
-									</Alert.Root>
+									</div>
 								)}
 
 								{/* List Health Summary Card */}
@@ -1077,7 +1167,7 @@ export function EmailValidatorPageView() {
 												size="small"
 												onClick={() => handleDownloadCsv(false)}
 											>
-												<FancyButton.Icon as={Icon} name="download" />
+												<FancyButton.Icon as={Icon} name="file-download" />
 												<span>Full CSV Report</span>
 											</FancyButton.Root>
 											<FancyButton.Root
@@ -1188,33 +1278,45 @@ export function EmailValidatorPageView() {
 										</div>
 									</div>
 
-									{/* Reloop Table */}
-									<Table.Root>
-										<Table.Header>
-											<Table.Row>
-												<Table.Head className="w-12 pl-4 font-mono text-[11px]">
-													#
-												</Table.Head>
-												<Table.Head>Email Address</Table.Head>
-												<Table.Head>State</Table.Head>
-												<Table.Head>Reason</Table.Head>
-												<Table.Head>Summary</Table.Head>
-												<Table.Head>MX Status</Table.Head>
-												<Table.Head className="pr-4 text-right">
-													Score
-												</Table.Head>
-											</Table.Row>
-										</Table.Header>
-										<Table.Body>
+									<div className="p-4 pt-3 text-paragraph-sm">
+										<div
+											style={batchResultsGridStyle}
+											className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
+										>
+											<div className="flex items-center">
+												<span className="text-xs">#</span>
+											</div>
+											<div className="flex items-center gap-1">
+												<Icon name="mail" className="h-3 w-3" />
+												<span className="text-xs">Email</span>
+											</div>
+											<div className="flex items-center gap-1">
+												<Icon name="check-circle" className="h-3 w-3" />
+												<span className="text-xs">State</span>
+											</div>
+											<div className="flex items-center gap-1">
+												<Icon name="code" className="h-3 w-3" />
+												<span className="text-xs">Reason</span>
+											</div>
+											<div className="flex items-center gap-1">
+												<Icon name="file-text" className="h-3 w-3" />
+												<span className="text-xs">Summary</span>
+											</div>
+											<div className="flex items-center gap-1">
+												<Icon name="server" className="h-3 w-3" />
+												<span className="text-xs">MX</span>
+											</div>
+											<div className="flex items-center justify-end">
+												<span className="text-xs">Score</span>
+											</div>
+										</div>
+
+										<Tooltip.Provider delayDuration={200}>
+											<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40 dark:bg-[#121212]">
 											{paginatedRows.length === 0 ? (
-												<Table.Row>
-													<Table.Cell
-														colSpan={7}
-														className="py-10 text-center text-paragraph-sm text-text-sub-600 dark:text-white/40"
-													>
-														No matching records found.
-													</Table.Cell>
-												</Table.Row>
+												<div className="px-4 py-10 text-center text-paragraph-sm text-text-sub-600 dark:text-white/40">
+													No matching records found.
+												</div>
 											) : (
 												paginatedRows.map((row) => {
 													const state =
@@ -1225,106 +1327,170 @@ export function EmailValidatorPageView() {
 													const score =
 														row.health?.score ??
 														(state === "deliverable" ? 100 : 0);
-													const rowBadgeColor =
-														score >= 80
-															? "green"
-															: score >= 50
-																? "orange"
-																: "red";
+													const stateUi = getStatePresentation(state);
+													const reason =
+														row.health?.reason ||
+														(row.mxRecords.length === 0
+															? "NO_MX_RECORDS"
+															: "ACCEPTED_EMAIL");
+													const initial = (
+														row.email.split("@")[0]?.[0] || "?"
+													).toUpperCase();
 
 													return (
-														<Table.Row key={`${row.rowNumber}-${row.email}`}>
-															<Table.Cell className="pl-4 font-mono text-label-xs text-text-sub-600 dark:text-white/40">
-																{row.rowNumber}
-															</Table.Cell>
-															<Table.Cell className="font-medium font-mono text-paragraph-sm text-text-strong-950 dark:text-white">
-																{row.email}
-															</Table.Cell>
-															<Table.Cell>
-																<Badge.Root
-																	variant="lighter"
-																	color={rowBadgeColor}
-																	size="small"
+														<div
+															key={`${row.rowNumber}-${row.email}`}
+															style={batchResultsGridStyle}
+															className="group/row grid w-full items-center px-4 py-2.5 text-left hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]"
+														>
+															<div className="flex items-center">
+																<span className="font-medium text-[12px] text-text-soft-400 tabular-nums">
+																	{row.rowNumber}
+																</span>
+															</div>
+
+															<div className="flex min-w-0 items-center gap-2 pr-3">
+																<div
+																	className={cn(
+																		"flex size-5 shrink-0 items-center justify-center rounded-full font-semibold text-[10px] text-white shadow-sm",
+																		getAvatarGradient(row.email),
+																	)}
 																>
-																	<Badge.Dot />
-																	<span className="capitalize">{state}</span>
-																</Badge.Root>
-															</Table.Cell>
-															<Table.Cell className="font-mono text-label-xs text-text-sub-600 uppercase dark:text-white/50">
-																{row.health?.reason ||
-																	(row.mxRecords.length === 0
-																		? "NO_MX_RECORDS"
-																		: "ACCEPTED_EMAIL")}
-															</Table.Cell>
-															<Table.Cell className="text-paragraph-xs text-text-sub-600 dark:text-white/60">
-																{row.health?.summary}
-															</Table.Cell>
-															<Table.Cell className="text-paragraph-xs text-text-sub-600 dark:text-white/60">
-																{row.mxRecords.length > 0 ? (
-																	<span className="font-mono text-emerald-600 dark:text-emerald-400">
-																		✓ {row.mxRecords[0]}
-																	</span>
-																) : (
-																	<span className="font-mono text-rose-500">
-																		No MX
-																	</span>
-																)}
-															</Table.Cell>
-															<Table.Cell className="pr-4 text-right font-bold font-mono text-paragraph-sm">
+																	{initial}
+																</div>
+																<span className="truncate font-medium text-label-sm text-text-strong-950 dark:text-white">
+																	{row.email}
+																</span>
+															</div>
+
+															<div className="flex items-center">
 																<span
-																	className={
+																	className={cn(
+																		"flex items-center gap-1.5 font-medium text-[13px]",
+																		stateUi.className,
+																	)}
+																>
+																	<Icon
+																		name={stateUi.icon}
+																		className="h-3.5 w-3.5"
+																	/>
+																	{stateUi.label}
+																</span>
+															</div>
+
+															<div className="flex min-w-0 items-center gap-1.5 pr-3">
+																<Icon
+																	name="code"
+																	className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+																/>
+																<span className="truncate font-medium text-[12px] text-text-sub-600 uppercase tracking-wide dark:text-white/50">
+																	{reason}
+																</span>
+															</div>
+
+															<div className="min-w-0 pr-3">
+																<span className="line-clamp-2 font-medium text-[13px] text-text-sub-600 dark:text-white/55">
+																	{row.health?.summary || "—"}
+																</span>
+															</div>
+
+															<div className="flex min-w-0 items-center gap-1.5 pr-3">
+																{row.mxRecords.length > 0 ? (
+																	<Tooltip.Root>
+																		<Tooltip.Trigger asChild>
+																			<button
+																				type="button"
+																				className="flex min-w-0 cursor-default items-center gap-1.5 text-left"
+																			>
+																				<Icon
+																					name="check-circle"
+																					className="h-3.5 w-3.5 shrink-0 text-success-base"
+																				/>
+																				<span className="truncate font-medium text-[13px] text-success-base">
+																					{row.mxRecords[0]}
+																				</span>
+																			</button>
+																		</Tooltip.Trigger>
+																		<Tooltip.Content
+																			side="top"
+																			size="xsmall"
+																			variant="dark"
+																			className="max-w-xs break-all font-mono"
+																		>
+																			{row.mxRecords[0]}
+																		</Tooltip.Content>
+																	</Tooltip.Root>
+																) : (
+																	<>
+																		<Icon
+																			name="minus-circle"
+																			className="h-3.5 w-3.5 shrink-0 text-error-base"
+																		/>
+																		<span className="font-medium text-[13px] text-error-base">
+																			No MX
+																		</span>
+																	</>
+																)}
+															</div>
+
+															<div className="flex items-center justify-end">
+																<span
+																	className={cn(
+																		"font-semibold text-[13px] tabular-nums",
 																		score >= 80
-																			? "text-emerald-600 dark:text-emerald-400"
+																			? "text-success-base"
 																			: score >= 50
-																				? "text-amber-600 dark:text-amber-400"
-																				: "text-rose-600 dark:text-rose-400"
-																	}
+																				? "text-warning-base"
+																				: "text-error-base",
+																	)}
 																>
 																	{score}
 																</span>
-															</Table.Cell>
-														</Table.Row>
+															</div>
+														</div>
 													);
 												})
 											)}
-										</Table.Body>
-									</Table.Root>
 
-									{/* Pagination */}
-									{totalPages > 1 && (
-										<div className="flex items-center justify-between border-stroke-soft-200 border-t p-4 text-paragraph-sm dark:border-white/10">
-											<p className="text-paragraph-xs text-text-sub-600 dark:text-white/50">
-												Showing {pageIndex * PAGE_SIZE + 1} –{" "}
-												{Math.min(
-													(pageIndex + 1) * PAGE_SIZE,
-													filteredRows.length,
-												)}{" "}
-												of {filteredRows.length}
-											</p>
-											<div className="flex gap-2">
-												<FancyButton.Root
-													variant="basic"
-													size="xsmall"
-													disabled={pageIndex === 0}
-													onClick={() =>
-														setPageIndex((p) => Math.max(0, p - 1))
-													}
-												>
-													<span>Previous</span>
-												</FancyButton.Root>
-												<FancyButton.Root
-													variant="basic"
-													size="xsmall"
-													disabled={pageIndex >= totalPages - 1}
-													onClick={() =>
-														setPageIndex((p) => Math.min(totalPages - 1, p + 1))
-													}
-												>
-													<span>Next</span>
-												</FancyButton.Root>
+											<div className="flex items-center justify-between gap-3 px-4 py-3 text-paragraph-sm">
+												<p className="text-[12px] text-text-sub-600 dark:text-white/50">
+													{filteredRows.length === 0
+														? "0 results"
+														: `Showing ${pageIndex * PAGE_SIZE + 1} – ${Math.min(
+																(pageIndex + 1) * PAGE_SIZE,
+																filteredRows.length,
+															)} of ${filteredRows.length}`}
+												</p>
+												{totalPages > 1 && (
+													<div className="flex gap-2">
+														<FancyButton.Root
+															variant="basic"
+															size="xsmall"
+															disabled={pageIndex === 0}
+															onClick={() =>
+																setPageIndex((p) => Math.max(0, p - 1))
+															}
+														>
+															<span>Previous</span>
+														</FancyButton.Root>
+														<FancyButton.Root
+															variant="basic"
+															size="xsmall"
+															disabled={pageIndex >= totalPages - 1}
+															onClick={() =>
+																setPageIndex((p) =>
+																	Math.min(totalPages - 1, p + 1),
+																)
+															}
+														>
+															<span>Next</span>
+														</FancyButton.Root>
+													</div>
+												)}
 											</div>
 										</div>
-									)}
+										</Tooltip.Provider>
+									</div>
 								</div>
 							</motion.div>
 						)}
