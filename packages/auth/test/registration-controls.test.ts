@@ -103,6 +103,6 @@ describe("runtime registration lock", () => {
 			async () => false,
 		);
 		expect(allowed).toBe(false);
-		setRuntimeDisableSignup(false);
+		setRuntimeDisableSignup(null);
 	});
 });
