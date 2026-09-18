@@ -69,6 +69,9 @@ const setupDeps: CompleteSetupDeps = {
 			.set({ role: role as typeof PLATFORM_ADMIN_ROLE })
 			.where(eq(schema.user.id, userId));
 	},
+	deleteUser: async ({ userId }) => {
+		await db.delete(schema.user).where(eq(schema.user.id, userId));
+	},
 	createOwnedOrganization: async ({ userId, name }) => {
 		const created = await auth.api.createOrganization({
 			body: { name, slug: await uniqueOrganizationSlug(name), userId },

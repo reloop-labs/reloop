@@ -29,6 +29,7 @@ export type CompleteSetupDeps = {
 		password: string;
 	}) => Promise<{ userId: string }>;
 	setUserRole: (input: { userId: string; role: string }) => Promise<void>;
+	deleteUser?: (input: { userId: string }) => Promise<void>;
 	createOwnedOrganization: (input: {
 		userId: string;
 		name: string;
@@ -62,6 +63,21 @@ export class InvalidAdminSetupKeyError extends Error {
 	}
 }
 
+export class AdminPromotionFailedError extends Error {
+	readonly rolledBack: boolean;
+
+	constructor(rolledBack: boolean, cause: unknown) {
+		super(
+			rolledBack
+				? "The administrator account could not be promoted, so it was removed. Try setup again."
+				: "The administrator account was created but could not be promoted. Run apps/backend/admin/scripts/promote-admin.ts for that email, then sign in.",
+			{ cause },
+		);
+		this.name = "AdminPromotionFailed";
+		this.rolledBack = rolledBack;
+	}
+}
+
 export async function completeSelfHostSetup(
 	input: CompleteSetupInput,
 	deps: CompleteSetupDeps,
@@ -82,7 +98,20 @@ export async function completeSelfHostSetup(
 			password: input.password,
 		}),
 	);
-	await deps.setUserRole({ userId, role: PLATFORM_ADMIN_ROLE });
+	try {
+		await deps.setUserRole({ userId, role: PLATFORM_ADMIN_ROLE });
+	} catch (error) {
+		let rolledBack = false;
+		if (deps.deleteUser) {
+			try {
+				await deps.deleteUser({ userId });
+				rolledBack = true;
+			} catch {
+				rolledBack = false;
+			}
+		}
+		throw new AdminPromotionFailedError(rolledBack, error);
+	}
 
 	const organizationName = input.organizationName?.trim();
 	let organizationId: string | null = null;

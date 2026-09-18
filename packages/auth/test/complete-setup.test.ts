@@ -3,6 +3,7 @@ import { isRegistrationAllowed } from "@reloop/auth/registration-controls";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import { isSetupBootstrapBypassed } from "@reloop/auth/setup/bootstrap-bypass";
 import {
+	AdminPromotionFailedError,
 	type CompleteSetupDeps,
 	type CompleteSetupInput,
 	completeSelfHostSetup,
@@ -49,6 +50,9 @@ function createHarness(overrides: Partial<CompleteSetupDeps> = {}): Harness {
 		},
 		setUserRole: async (payload) => {
 			calls.push({ name: "setUserRole", payload });
+		},
+		deleteUser: async (payload) => {
+			calls.push({ name: "deleteUser", payload });
 		},
 		createOwnedOrganization: async (payload) => {
 			calls.push({ name: "createOwnedOrganization", payload });
@@ -207,6 +211,47 @@ describe("completeSelfHostSetup", () => {
 
 		expect(harness.names()).not.toContain("setRuntimeDisableSignup");
 		expect(harness.envUpdates).toEqual([{ SETUP_MODE: "false" }]);
+	});
+
+	test("removes the half-created account when promotion fails", async () => {
+		const harness = createHarness({
+			setUserRole: async () => {
+				throw new Error("update failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(AdminPromotionFailedError);
+		expect((error as AdminPromotionFailedError).rolledBack).toBe(true);
+		expect(harness.names()).toEqual([
+			"readAdminSetupKey",
+			"signUpEmail",
+			"deleteUser",
+		]);
+		expect((error as Error).message).toContain("Try setup again");
+	});
+
+	test("points at promote-admin when the account cannot be removed", async () => {
+		const harness = createHarness({
+			setUserRole: async () => {
+				throw new Error("update failed");
+			},
+			deleteUser: async () => {
+				throw new Error("delete failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect((error as AdminPromotionFailedError).rolledBack).toBe(false);
+		expect((error as Error).message).toContain("promote-admin");
 	});
 
 	test("refuses when setup is already complete", async () => {
