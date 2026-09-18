@@ -8,6 +8,8 @@ export type MainNavigationItem = {
 	isSpecial?: boolean;
 	items?: MainNavigationItem[];
 	section?: string;
+	/** Hide from sidebar UIs while keeping the route live. Flip to publish. */
+	hidden?: boolean;
 };
 
 export const mainNavigation: MainNavigationItem[] = [
@@ -72,6 +74,8 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "workflow",
 		shortcut: { label: "G F", keys: ["g f", "g+f"] },
 		section: "Messaging",
+		// Hidden from sidebar until launch — set to false to publish.
+		hidden: true,
 	},
 	{
 		label: "Metrics",

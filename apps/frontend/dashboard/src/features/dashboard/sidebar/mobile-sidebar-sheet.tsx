@@ -196,6 +196,7 @@ export function MobileSidebarSheet({
 						<div className="flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-3">
 							{/* Main Navigation Sections */}
 							{mainNavigation
+								.filter((item) => !item.hidden)
 								.reduce<{ section: string; items: typeof mainNavigation }[]>(
 									(acc, item) => {
 										const sectionName = item.section || "General";

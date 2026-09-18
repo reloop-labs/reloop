@@ -8,9 +8,11 @@ import { SidebarNavIcon } from "./sidebar/sidebar-nav-icon";
 function LoadingSidebarNav() {
 	return (
 		<div className="relative flex w-full flex-col">
-			{mainNavigation.map((item, index) => {
+			{mainNavigation
+				.filter((item) => !item.hidden)
+				.map((item, index, visibleItems) => {
 				if (item.path === "/ai") return null;
-				const prevItem = index > 0 ? mainNavigation[index - 1] : null;
+				const prevItem = index > 0 ? visibleItems[index - 1] : null;
 				const showSectionHeader =
 					item.section && (!prevItem || prevItem.section !== item.section);
 				return (
