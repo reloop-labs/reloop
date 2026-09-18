@@ -87,9 +87,11 @@ export type ResolvedTarget = {
  */
 export async function resolvePublicTarget(
 	hostname: string,
+	options?: { allowPrivate?: boolean },
 ): Promise<ResolvedTarget> {
+	const allowPrivate = options?.allowPrivate === true;
 	if (net.isIP(hostname)) {
-		if (isPrivateOrBlockedIP(hostname)) {
+		if (!allowPrivate && isPrivateOrBlockedIP(hostname)) {
 			throw new SsrfBlockedError(
 				`Outbound request to private/local IP address ${hostname} is blocked`,
 			);
@@ -112,7 +114,7 @@ export async function resolvePublicTarget(
 
 	const ips = results.map((r) => r.address);
 	for (const ip of ips) {
-		if (isPrivateOrBlockedIP(ip)) {
+		if (!allowPrivate && isPrivateOrBlockedIP(ip)) {
 			throw new SsrfBlockedError(
 				`Outbound request to private/local IP address ${ip} is blocked`,
 			);

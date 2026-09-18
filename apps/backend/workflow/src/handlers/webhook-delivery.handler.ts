@@ -137,12 +137,13 @@ export async function processWebhookDelivery({
 		  };
 
 	try {
-		const allowHttp = process.env.NODE_ENV === "development";
+		const isDevelopment = process.env.NODE_ENV === "development";
 		const response = await postWebhook({
 			url: webhook.url,
 			headers,
 			body: rawBody,
-			allowHttp,
+			allowHttp: isDevelopment,
+			allowPrivate: isDevelopment,
 		});
 		result = {
 			ok: true,

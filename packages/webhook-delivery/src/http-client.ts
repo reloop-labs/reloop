@@ -34,6 +34,7 @@ export async function postWebhook(input: {
 	timeoutMs?: number;
 	/** When false (default), only https: is allowed. */
 	allowHttp?: boolean;
+	allowPrivate?: boolean;
 }): Promise<WebhookHttpResult> {
 	const timeoutMs = input.timeoutMs ?? WEBHOOK_HTTP_TIMEOUT_MS;
 	const start = Date.now();
@@ -62,7 +63,9 @@ export async function postWebhook(input: {
 
 	let resolved: ResolvedTarget;
 	try {
-		resolved = await resolvePublicTarget(parsed.hostname);
+		resolved = await resolvePublicTarget(parsed.hostname, {
+			allowPrivate: input.allowPrivate,
+		});
 	} catch (e) {
 		const message =
 			e instanceof SsrfBlockedError
