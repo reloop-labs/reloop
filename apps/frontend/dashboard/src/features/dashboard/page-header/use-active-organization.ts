@@ -11,12 +11,16 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { toast } from "sonner";
 import {
 	useOrganizationsQuery,
 	useUserInvitationsQuery,
 } from "#/features/auth/organizations-query";
 import { resolveOrglessDestination } from "#/features/auth/orgless-destination";
-import { useSessionQuery } from "#/features/auth/session-query";
+import {
+	sessionQueryOptions,
+	useSessionQuery,
+} from "#/features/auth/session-query";
 import { queryKeys } from "#/lib/query-keys";
 
 export type Organization = {
@@ -206,21 +210,36 @@ function useActiveOrganizationState(): Omit<
 		async (organization: Organization) => {
 			setIsSwitching(true);
 			try {
-				await authClient.organization.setActive({
+				const { error } = await authClient.organization.setActive({
 					organizationId: organization.id,
 				});
+				if (error) throw new Error(error.message || error.statusText);
 				setConfirmedSessionOrgId(organization.id);
-				await queryClient.invalidateQueries({
+				queryClient.setQueryData(sessionQueryOptions().queryKey, (prev) =>
+					prev
+						? {
+								...prev,
+								session: {
+									...prev.session,
+									activeOrganizationId: organization.id,
+								},
+							}
+						: prev,
+				);
+				void queryClient.resetQueries({
+					predicate: (query) => query.queryKey[0] !== queryKeys.auth.all[0],
+				});
+				void queryClient.invalidateQueries({
 					queryKey: queryKeys.auth.session(),
 				});
-				// Drop org-scoped contact caches so history/activity never flash
-				// data from the previous organization while the next fetch is pending.
-				await queryClient.removeQueries({
-					queryKey: queryKeys.contacts.all,
-				});
-				await refetchOrganizations();
+				void refetchOrganizations();
 			} catch (error) {
 				console.error("Error switching organization", error);
+				toast.error(
+					error instanceof Error
+						? error.message
+						: "Failed to switch organization",
+				);
 			} finally {
 				setIsSwitching(false);
 			}

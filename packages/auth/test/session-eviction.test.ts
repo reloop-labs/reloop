@@ -101,6 +101,25 @@ describe("session cache eviction", () => {
 		expect(await redis.get(sessionUserIndexKey(userId))).toBeUndefined();
 	});
 
+	test("organization-switch evicts the cookie token even when it is missing from the user index", async () => {
+		const redis = new MemoryRedis();
+		const token = "orphan-tok";
+		await redis.set(sessionTokenCacheKey(token), {
+			userId: "user-orphan",
+			organizationId: "old-org",
+			platformRole: "user",
+			authType: "session",
+		} satisfies AuthContext);
+
+		await applySessionCacheEviction(redis, {
+			type: "organization-switch",
+			userId: null,
+			sessionToken: token,
+		});
+
+		expect(await redis.get(sessionTokenCacheKey(token))).toBeUndefined();
+	});
+
 	test("evictAllSessionsForUser is a no-op when the index is empty", async () => {
 		const redis = new MemoryRedis();
 		await evictAllSessionsForUser(redis, "nobody");
@@ -162,7 +181,38 @@ describe("evictionEventFromAuthPath (lifecycle mapping)", () => {
 				path: "/organization/set-active",
 				userId: "u",
 			}),
-		).toEqual({ type: "organization-switch", userId: "u" });
+		).toEqual({
+			type: "organization-switch",
+			userId: "u",
+			sessionToken: null,
+		});
+	});
+
+	test("maps /organization/set-active with cookie and no userId to a token eviction", () => {
+		expect(
+			evictionEventFromAuthPath({
+				path: "/organization/set-active",
+				cookieHeader: "reloop.session_token=switchTok.sig; other=1",
+			}),
+		).toEqual({
+			type: "organization-switch",
+			userId: null,
+			sessionToken: "switchTok",
+		});
+	});
+
+	test("maps /organization/set-active with userId and cookie to both", () => {
+		expect(
+			evictionEventFromAuthPath({
+				path: "/organization/set-active",
+				userId: "u",
+				cookieHeader: "__Secure-reloop.session_token=secureSwitch.sig%3D",
+			}),
+		).toEqual({
+			type: "organization-switch",
+			userId: "u",
+			sessionToken: "secureSwitch",
+		});
 	});
 
 	test("ignores unrelated paths", () => {
@@ -217,5 +267,28 @@ describe("evictionEventFromAuthPath (lifecycle mapping)", () => {
 		expect(event?.type).toBe("organization-switch");
 		expect(await redis.get(sessionTokenCacheKey("o1"))).toBeUndefined();
 		expect(await redis.get(sessionUserIndexKey(userId))).toBeUndefined();
+	});
+
+	test("handleAuthLifecycleEviction set-active evicts the cookie token when userId is missing", async () => {
+		const redis = new MemoryRedis();
+		const token = "hook-tok";
+		await redis.set(sessionTokenCacheKey(token), {
+			userId: "hook-user",
+			organizationId: "old-org",
+			platformRole: "user",
+			authType: "session",
+		} satisfies AuthContext);
+
+		const event = await handleAuthLifecycleEviction(redis, {
+			path: "/organization/set-active",
+			cookieHeader: `reloop.session_token=${token}.sig`,
+		});
+
+		expect(event).toEqual({
+			type: "organization-switch",
+			userId: null,
+			sessionToken: token,
+		});
+		expect(await redis.get(sessionTokenCacheKey(token))).toBeUndefined();
 	});
 });

@@ -299,12 +299,18 @@ export const auth = betterAuth({
 			const { path, context } = ctx;
 			log.info({ message: String(ctx.path) });
 
+			const cookieHeader =
+				typeof ctx.headers?.get === "function"
+					? ctx.headers.get("cookie")
+					: null;
+			let sessionUser = context?.session?.user ?? context?.newSession?.user;
+
+			if (path === "/organization/set-active" && !sessionUser) {
+				const current = await getSessionFromCtx(ctx);
+				sessionUser = current?.user;
+			}
+
 			try {
-				const cookieHeader =
-					typeof ctx.headers?.get === "function"
-						? ctx.headers.get("cookie")
-						: null;
-				const sessionUser = context?.session?.user ?? context?.newSession?.user;
 				await handleAuthLifecycleEviction(sessionCacheRedis, {
 					path: String(path),
 					cookieHeader,
@@ -318,8 +324,7 @@ export const auth = betterAuth({
 			}
 
 			if (path === "/organization/set-active") {
-				const current = await getSessionFromCtx(ctx);
-				await persistActiveOrganization(current?.user.id ?? null, ctx.body);
+				await persistActiveOrganization(sessionUser?.id ?? null, ctx.body);
 			}
 
 			if (
