@@ -1122,7 +1122,7 @@ export function EmailValidatorPageView() {
 								{pollJob.summary.duplicatesRemoved > 0 && (
 									<div className="flex w-full items-start gap-3 rounded-xl border border-information-base/20 bg-information-lighter p-3.5 text-left text-text-strong-950">
 										<Icon
-											name="info"
+											name="info-outline"
 											className="mt-0.5 size-5 shrink-0 text-information-base"
 										/>
 										<div className="min-w-0 flex-1">
@@ -1313,182 +1313,182 @@ export function EmailValidatorPageView() {
 
 										<Tooltip.Provider delayDuration={200}>
 											<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40 dark:bg-[#121212]">
-											{paginatedRows.length === 0 ? (
-												<div className="px-4 py-10 text-center text-paragraph-sm text-text-sub-600 dark:text-white/40">
-													No matching records found.
-												</div>
-											) : (
-												paginatedRows.map((row) => {
-													const state =
-														row.health?.state ||
-														(row.verdict === "deliverable"
-															? "deliverable"
-															: "undeliverable");
-													const score =
-														row.health?.score ??
-														(state === "deliverable" ? 100 : 0);
-													const stateUi = getStatePresentation(state);
-													const reason =
-														row.health?.reason ||
-														(row.mxRecords.length === 0
-															? "NO_MX_RECORDS"
-															: "ACCEPTED_EMAIL");
-													const initial = (
-														row.email.split("@")[0]?.[0] || "?"
-													).toUpperCase();
-
-													return (
-														<div
-															key={`${row.rowNumber}-${row.email}`}
-															style={batchResultsGridStyle}
-															className="group/row grid w-full items-center px-4 py-2.5 text-left hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]"
-														>
-															<div className="flex items-center">
-																<span className="font-medium text-[12px] text-text-soft-400 tabular-nums">
-																	{row.rowNumber}
-																</span>
-															</div>
-
-															<div className="flex min-w-0 items-center gap-2 pr-3">
-																<div
-																	className={cn(
-																		"flex size-5 shrink-0 items-center justify-center rounded-full font-semibold text-[10px] text-white shadow-sm",
-																		getAvatarGradient(row.email),
-																	)}
-																>
-																	{initial}
-																</div>
-																<span className="truncate font-medium text-label-sm text-text-strong-950 dark:text-white">
-																	{row.email}
-																</span>
-															</div>
-
-															<div className="flex items-center">
-																<span
-																	className={cn(
-																		"flex items-center gap-1.5 font-medium text-[13px]",
-																		stateUi.className,
-																	)}
-																>
-																	<Icon
-																		name={stateUi.icon}
-																		className="h-3.5 w-3.5"
-																	/>
-																	{stateUi.label}
-																</span>
-															</div>
-
-															<div className="flex min-w-0 items-center gap-1.5 pr-3">
-																<Icon
-																	name="code"
-																	className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
-																/>
-																<span className="truncate font-medium text-[12px] text-text-sub-600 uppercase tracking-wide dark:text-white/50">
-																	{reason}
-																</span>
-															</div>
-
-															<div className="min-w-0 pr-3">
-																<span className="line-clamp-2 font-medium text-[13px] text-text-sub-600 dark:text-white/55">
-																	{row.health?.summary || "—"}
-																</span>
-															</div>
-
-															<div className="flex min-w-0 items-center gap-1.5 pr-3">
-																{row.mxRecords.length > 0 ? (
-																	<Tooltip.Root>
-																		<Tooltip.Trigger asChild>
-																			<button
-																				type="button"
-																				className="flex min-w-0 cursor-default items-center gap-1.5 text-left"
-																			>
-																				<Icon
-																					name="check-circle"
-																					className="h-3.5 w-3.5 shrink-0 text-success-base"
-																				/>
-																				<span className="truncate font-medium text-[13px] text-success-base">
-																					{row.mxRecords[0]}
-																				</span>
-																			</button>
-																		</Tooltip.Trigger>
-																		<Tooltip.Content
-																			side="top"
-																			size="xsmall"
-																			variant="dark"
-																			className="max-w-xs break-all font-mono"
-																		>
-																			{row.mxRecords[0]}
-																		</Tooltip.Content>
-																	</Tooltip.Root>
-																) : (
-																	<>
-																		<Icon
-																			name="minus-circle"
-																			className="h-3.5 w-3.5 shrink-0 text-error-base"
-																		/>
-																		<span className="font-medium text-[13px] text-error-base">
-																			No MX
-																		</span>
-																	</>
-																)}
-															</div>
-
-															<div className="flex items-center justify-end">
-																<span
-																	className={cn(
-																		"font-semibold text-[13px] tabular-nums",
-																		score >= 80
-																			? "text-success-base"
-																			: score >= 50
-																				? "text-warning-base"
-																				: "text-error-base",
-																	)}
-																>
-																	{score}
-																</span>
-															</div>
-														</div>
-													);
-												})
-											)}
-
-											<div className="flex items-center justify-between gap-3 px-4 py-3 text-paragraph-sm">
-												<p className="text-[12px] text-text-sub-600 dark:text-white/50">
-													{filteredRows.length === 0
-														? "0 results"
-														: `Showing ${pageIndex * PAGE_SIZE + 1} – ${Math.min(
-																(pageIndex + 1) * PAGE_SIZE,
-																filteredRows.length,
-															)} of ${filteredRows.length}`}
-												</p>
-												{totalPages > 1 && (
-													<div className="flex gap-2">
-														<FancyButton.Root
-															variant="basic"
-															size="xsmall"
-															disabled={pageIndex === 0}
-															onClick={() =>
-																setPageIndex((p) => Math.max(0, p - 1))
-															}
-														>
-															<span>Previous</span>
-														</FancyButton.Root>
-														<FancyButton.Root
-															variant="basic"
-															size="xsmall"
-															disabled={pageIndex >= totalPages - 1}
-															onClick={() =>
-																setPageIndex((p) =>
-																	Math.min(totalPages - 1, p + 1),
-																)
-															}
-														>
-															<span>Next</span>
-														</FancyButton.Root>
+												{paginatedRows.length === 0 ? (
+													<div className="px-4 py-10 text-center text-paragraph-sm text-text-sub-600 dark:text-white/40">
+														No matching records found.
 													</div>
+												) : (
+													paginatedRows.map((row) => {
+														const state =
+															row.health?.state ||
+															(row.verdict === "deliverable"
+																? "deliverable"
+																: "undeliverable");
+														const score =
+															row.health?.score ??
+															(state === "deliverable" ? 100 : 0);
+														const stateUi = getStatePresentation(state);
+														const reason =
+															row.health?.reason ||
+															(row.mxRecords.length === 0
+																? "NO_MX_RECORDS"
+																: "ACCEPTED_EMAIL");
+														const initial = (
+															row.email.split("@")[0]?.[0] || "?"
+														).toUpperCase();
+
+														return (
+															<div
+																key={`${row.rowNumber}-${row.email}`}
+																style={batchResultsGridStyle}
+																className="group/row grid w-full items-center px-4 py-2.5 text-left hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]"
+															>
+																<div className="flex items-center">
+																	<span className="font-medium text-[12px] text-text-soft-400 tabular-nums">
+																		{row.rowNumber}
+																	</span>
+																</div>
+
+																<div className="flex min-w-0 items-center gap-2 pr-3">
+																	<div
+																		className={cn(
+																			"flex size-5 shrink-0 items-center justify-center rounded-full font-semibold text-[10px] text-white shadow-sm",
+																			getAvatarGradient(row.email),
+																		)}
+																	>
+																		{initial}
+																	</div>
+																	<span className="truncate font-medium text-label-sm text-text-strong-950 dark:text-white">
+																		{row.email}
+																	</span>
+																</div>
+
+																<div className="flex items-center">
+																	<span
+																		className={cn(
+																			"flex items-center gap-1.5 font-medium text-[13px]",
+																			stateUi.className,
+																		)}
+																	>
+																		<Icon
+																			name={stateUi.icon}
+																			className="h-3.5 w-3.5"
+																		/>
+																		{stateUi.label}
+																	</span>
+																</div>
+
+																<div className="flex min-w-0 items-center gap-1.5 pr-3">
+																	<Icon
+																		name="code"
+																		className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+																	/>
+																	<span className="truncate font-medium text-[12px] text-text-sub-600 uppercase tracking-wide dark:text-white/50">
+																		{reason}
+																	</span>
+																</div>
+
+																<div className="min-w-0 pr-3">
+																	<span className="line-clamp-2 font-medium text-[13px] text-text-sub-600 dark:text-white/55">
+																		{row.health?.summary || "—"}
+																	</span>
+																</div>
+
+																<div className="flex min-w-0 items-center gap-1.5 pr-3">
+																	{row.mxRecords.length > 0 ? (
+																		<Tooltip.Root>
+																			<Tooltip.Trigger asChild>
+																				<button
+																					type="button"
+																					className="flex min-w-0 cursor-default items-center gap-1.5 text-left"
+																				>
+																					<Icon
+																						name="check-circle"
+																						className="h-3.5 w-3.5 shrink-0 text-success-base"
+																					/>
+																					<span className="truncate font-medium text-[13px] text-success-base">
+																						{row.mxRecords[0]}
+																					</span>
+																				</button>
+																			</Tooltip.Trigger>
+																			<Tooltip.Content
+																				side="top"
+																				size="xsmall"
+																				variant="dark"
+																				className="max-w-xs break-all font-mono"
+																			>
+																				{row.mxRecords[0]}
+																			</Tooltip.Content>
+																		</Tooltip.Root>
+																	) : (
+																		<>
+																			<Icon
+																				name="minus-circle"
+																				className="h-3.5 w-3.5 shrink-0 text-error-base"
+																			/>
+																			<span className="font-medium text-[13px] text-error-base">
+																				No MX
+																			</span>
+																		</>
+																	)}
+																</div>
+
+																<div className="flex items-center justify-end">
+																	<span
+																		className={cn(
+																			"font-semibold text-[13px] tabular-nums",
+																			score >= 80
+																				? "text-success-base"
+																				: score >= 50
+																					? "text-warning-base"
+																					: "text-error-base",
+																		)}
+																	>
+																		{score}
+																	</span>
+																</div>
+															</div>
+														);
+													})
 												)}
+
+												<div className="flex items-center justify-between gap-3 px-4 py-3 text-paragraph-sm">
+													<p className="text-[12px] text-text-sub-600 dark:text-white/50">
+														{filteredRows.length === 0
+															? "0 results"
+															: `Showing ${pageIndex * PAGE_SIZE + 1} – ${Math.min(
+																	(pageIndex + 1) * PAGE_SIZE,
+																	filteredRows.length,
+																)} of ${filteredRows.length}`}
+													</p>
+													{totalPages > 1 && (
+														<div className="flex gap-2">
+															<FancyButton.Root
+																variant="basic"
+																size="xsmall"
+																disabled={pageIndex === 0}
+																onClick={() =>
+																	setPageIndex((p) => Math.max(0, p - 1))
+																}
+															>
+																<span>Previous</span>
+															</FancyButton.Root>
+															<FancyButton.Root
+																variant="basic"
+																size="xsmall"
+																disabled={pageIndex >= totalPages - 1}
+																onClick={() =>
+																	setPageIndex((p) =>
+																		Math.min(totalPages - 1, p + 1),
+																	)
+																}
+															>
+																<span>Next</span>
+															</FancyButton.Root>
+														</div>
+													)}
+												</div>
 											</div>
-										</div>
 										</Tooltip.Provider>
 									</div>
 								</div>
