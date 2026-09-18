@@ -4,22 +4,22 @@ export const toolPath = "/tools/email-validator";
 
 export const toolTitle = "Free Email Validator & Bulk List Cleaner";
 export const siteTitle = toolTitle;
+export const heroHeading = "Free Email Validator";
 export const metaTitle =
 	"Free Email Validator — Bulk Email Verifier & List Cleaner";
 export const metaDescription =
 	"Free bulk email verifier and email list cleaning tool. Clean email lists, find invalid emails in CSV files, check disposable temporary emails, and verify live DNS MX mail servers instantly.";
 
 export const toolDescription =
-	"Free bulk email verifier and list cleaning tool. Validate single addresses or upload CSV files to find invalid emails, detect ~210k+ disposable domains, and verify live DNS MX records.";
+	"Free email validator and bulk list cleaner. Check a single address or upload a CSV to find invalid emails, detect ~210k+ disposable domains, and verify live DNS MX records — no signup required.";
 
 export const toolKeywords = [
+	"free email validator",
 	"bulk email verifier",
+	"email list cleaning tool",
 	"clean email list",
 	"find invalid emails in csv",
 	"check disposable emails",
-	"email list cleaning tool",
-	"check 5000 email addresses",
-	"free email validator",
 	"email verifier online",
 	"verify email list csv",
 	"remove bounce emails",
@@ -28,7 +28,29 @@ export const toolKeywords = [
 	"email health checker",
 	"email validation api",
 	"rfc 5322 syntax validation",
+	"check 5000 email addresses",
 	"emailable alternative",
+];
+
+export const howItWorks = [
+	{
+		step: "01",
+		title: "Paste an email or upload a CSV",
+		description:
+			"Check one address instantly, or upload a CSV/TXT list (up to 1,000 rows in the browser). We auto-detect the email column and remove duplicates before scoring.",
+	},
+	{
+		step: "02",
+		title: "Run syntax, disposable, and MX checks",
+		description:
+			"Each address is validated against RFC 5322 grammar, a ~210,000-domain disposable catalogue, role/free-provider signals, and live DNS MX records — without SMTP mailbox probing.",
+	},
+	{
+		step: "03",
+		title: "Get a health score and clean export",
+		description:
+			"See deliverability state, risk flags, and mail-server details per address. Download a cleaned list for campaigns, or automate the same checks with the validation API.",
+	},
 ];
 
 export const reasons = [
