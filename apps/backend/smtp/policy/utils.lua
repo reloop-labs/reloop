@@ -30,30 +30,26 @@ end
 function utils.encode_tracking_token(email_log_id, url, click_tracking)
   if click_tracking == nil then click_tracking = true end
 
-  local token_obj
-  if click_tracking then
-    local signed_content
-    if url then
-      signed_content = email_log_id .. ":" .. url
-    else
-      signed_content = email_log_id
-    end
-
-    -- HMAC-SHA256, take first 16 hex chars (matches TS: .digest("hex").slice(0, 16))
-    local key_source = { key_data = constants.tracking_secret }
-    local sig = _kumo.digest.hmac_sha256(key_source, signed_content).hex:sub(1, 16)
-
-    if url then
-      token_obj = { id = email_log_id, url = url, s = sig }
-    else
-      token_obj = { id = email_log_id, s = sig }
-    end
+  local signed_content
+  if url and click_tracking then
+    signed_content = email_log_id .. ":" .. url
+  elseif url then
+    signed_content = email_log_id .. ":" .. url .. ":nt"
   else
-    if url then
-      token_obj = { url = url }
-    else
-      token_obj = {}
-    end
+    signed_content = email_log_id
+  end
+
+  -- HMAC-SHA256, take first 16 hex chars (matches TS: .digest("hex").slice(0, 16))
+  local key_source = { key_data = constants.tracking_secret }
+  local sig = _kumo.digest.hmac_sha256(key_source, signed_content).hex:sub(1, 16)
+
+  local token_obj
+  if url and click_tracking then
+    token_obj = { id = email_log_id, url = url, s = sig }
+  elseif url then
+    token_obj = { id = email_log_id, url = url, nt = 1, s = sig }
+  else
+    token_obj = { id = email_log_id, s = sig }
   end
 
   local json_str = _kumo.serde.json_encode(token_obj)
@@ -77,7 +73,9 @@ function utils.decode_tracking_token(token)
 
   -- Verify signature
   local signed_content
-  if obj.url then
+  if obj.url and obj.nt == 1 then
+    signed_content = obj.id .. ":" .. obj.url .. ":nt"
+  elseif obj.url then
     signed_content = obj.id .. ":" .. obj.url
   else
     signed_content = obj.id

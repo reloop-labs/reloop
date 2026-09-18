@@ -10,7 +10,7 @@ export const signTestEventRoute = new Elysia().use(authMiddleware).post(
 			webhookId: body.webhookId,
 			event: body.event,
 			payload: body.payload,
-			organizationId: body.organizationId || organizationId,
+			organizationId,
 		});
 	},
 	{

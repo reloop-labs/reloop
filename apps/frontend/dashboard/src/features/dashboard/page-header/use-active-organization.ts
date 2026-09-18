@@ -154,8 +154,8 @@ function useActiveOrganizationState(): Omit<
 				setConfirmedSessionOrgId(preferredOrgId);
 				setHasInitialized(true);
 				if (userActiveOrganizationId !== preferredOrgId) {
-					void authClient
-						.updateUser({ activeOrganizationId: preferredOrgId })
+					void authClient.organization
+						.setActive({ organizationId: preferredOrgId })
 						.then(() =>
 							queryClient.invalidateQueries({
 								queryKey: queryKeys.auth.session(),
@@ -175,11 +175,6 @@ function useActiveOrganizationState(): Omit<
 				await authClient.organization.setActive({
 					organizationId: preferredOrgId,
 				});
-				if (userActiveOrganizationId !== preferredOrgId) {
-					await authClient.updateUser({
-						activeOrganizationId: preferredOrgId,
-					});
-				}
 				await queryClient.invalidateQueries({
 					queryKey: queryKeys.auth.session(),
 				});
@@ -213,9 +208,6 @@ function useActiveOrganizationState(): Omit<
 			try {
 				await authClient.organization.setActive({
 					organizationId: organization.id,
-				});
-				await authClient.updateUser({
-					activeOrganizationId: organization.id,
 				});
 				setConfirmedSessionOrgId(organization.id);
 				await queryClient.invalidateQueries({

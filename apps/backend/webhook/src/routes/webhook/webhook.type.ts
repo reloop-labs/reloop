@@ -66,8 +66,8 @@ export namespace WebhookTypes {
 	export interface TriggerWebhookRequest {
 		event: string;
 		payload: Record<string, unknown>;
-		organizationId?: string;
-		userId?: string;
+		organizationId: string;
+		userId: string;
 	}
 
 	export type WebhookDeliveryResponse =

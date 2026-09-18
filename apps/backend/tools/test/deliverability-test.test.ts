@@ -1,6 +1,9 @@
 import { describe, expect, it, mock } from "bun:test";
 import { checkBody } from "../src/routes/tools/deliverability-test/analyzer/check-body";
-import { checkLinks } from "../src/routes/tools/deliverability-test/analyzer/check-links";
+import {
+	checkLinks,
+	probeUrl,
+} from "../src/routes/tools/deliverability-test/analyzer/check-links";
 import { checkRspamdAndContent } from "../src/routes/tools/deliverability-test/analyzer/check-rspamd";
 import { parseMime } from "../src/routes/tools/deliverability-test/analyzer/parse-mime";
 import { computeDeliverabilityScore } from "../src/routes/tools/deliverability-test/analyzer/score";
@@ -361,4 +364,48 @@ Email six`;
 			globalThis.fetch = originalFetch;
 		}
 	}, 15_000);
+});
+
+describe("probeUrl", () => {
+	it("refuses to probe private, loopback and metadata hosts", async () => {
+		const calls: string[] = [];
+		const fetchImpl = (async (input: RequestInfo | URL) => {
+			calls.push(String(input));
+			return new Response("", { status: 200 });
+		}) as typeof fetch;
+		for (const url of [
+			"http://169.254.169.254/latest/meta-data/",
+			"http://10.0.0.5:6379/",
+			"http://127.0.0.1:8017/api/workflow/jobs",
+			"http://localhost/",
+			"http://[fd00::1]/",
+		]) {
+			expect(await probeUrl(url, fetchImpl)).toEqual({
+				status: null,
+				ok: false,
+				error: "Blocked destination",
+			});
+		}
+		expect(calls).toEqual([]);
+	});
+
+	it("does not follow redirects and never echoes raw errors", async () => {
+		const redirecting = (async () =>
+			new Response(null, {
+				status: 302,
+				headers: { location: "http://10.0.0.5/" },
+			})) as typeof fetch;
+		expect(await probeUrl("http://1.1.1.1/a", redirecting)).toEqual({
+			status: 302,
+			ok: true,
+		});
+		const failing = (async () => {
+			throw new Error("ECONNREFUSED 10.0.0.5:6379");
+		}) as typeof fetch;
+		expect(await probeUrl("http://1.1.1.1/b", failing)).toEqual({
+			status: null,
+			ok: false,
+			error: "Connection failed",
+		});
+	});
 });

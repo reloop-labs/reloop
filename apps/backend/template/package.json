@@ -42,6 +42,7 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
+		"@reloop/webhook-delivery": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
 		"evlog": "catalog:backend",
 		"ai": "catalog:backend",

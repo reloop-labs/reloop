@@ -1,3 +1,7 @@
+import {
+	hostnameResolvesPublic,
+	isBlockedHostname,
+} from "../../../../lib/ssrf";
 import type { CategoryResult, CheckItem } from "../deliverability-test.types";
 import type { ParsedEmailData } from "./parse-mime";
 
@@ -61,21 +65,35 @@ function extractLinks(email: ParsedEmailData): ExtractedLink[] {
 	return links;
 }
 
-async function probeUrl(
+export async function probeUrl(
 	url: string,
+	fetchImpl: typeof fetch = fetch,
 ): Promise<{ status: number | null; ok: boolean; error?: string }> {
+	let hostname: string;
+	try {
+		hostname = new URL(url).hostname.replace(/^\[|\]$/g, "");
+	} catch {
+		return { status: null, ok: false, error: "Invalid URL" };
+	}
+	if (
+		isBlockedHostname(hostname) ||
+		!(await hostnameResolvesPublic(hostname))
+	) {
+		return { status: null, ok: false, error: "Blocked destination" };
+	}
+
 	try {
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), 1500);
 
-		const resp = await fetch(url, {
+		const resp = await fetchImpl(url, {
 			method: "HEAD",
 			signal: controller.signal,
 			headers: {
 				"User-Agent":
 					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 			},
-			redirect: "follow",
+			redirect: "manual",
 		});
 		clearTimeout(timeoutId);
 
@@ -84,14 +102,11 @@ async function probeUrl(
 			ok: resp.status < 400,
 		};
 	} catch (e: unknown) {
-		const err = e as { name?: string; message?: string };
+		const err = e as { name?: string };
 		return {
 			status: null,
 			ok: false,
-			error:
-				err.name === "AbortError"
-					? "Timeout"
-					: err.message || "Connection failed",
+			error: err.name === "AbortError" ? "Timeout" : "Connection failed",
 		};
 	}
 }

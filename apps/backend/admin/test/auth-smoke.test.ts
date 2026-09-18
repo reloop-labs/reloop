@@ -60,6 +60,7 @@ beforeAll(async () => {
 					role: s.role ?? "user",
 					activeOrganizationId: s.activeOrganizationId ?? null,
 				},
+				session: { activeOrganizationId: s.activeOrganizationId ?? null },
 			};
 		},
 	);

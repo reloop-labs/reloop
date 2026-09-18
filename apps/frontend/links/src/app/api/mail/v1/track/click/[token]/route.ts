@@ -1,7 +1,4 @@
-import {
-	decodeDestinationFromToken,
-	getMailTrackClickUrl,
-} from "@reloop/links/lib/mail-api";
+import { getMailTrackClickUrl } from "@reloop/links/lib/mail-api";
 import { NextResponse } from "next/server";
 
 /**
@@ -21,7 +18,7 @@ export async function GET(
 		return NextResponse.redirect(new URL("/", _request.url), 302);
 	}
 
-	let destination = decodeDestinationFromToken(token);
+	let destination: string | null = null;
 
 	try {
 		const res = await fetch(getMailTrackClickUrl(token), {
@@ -42,7 +39,7 @@ export async function GET(
 			}
 		}
 	} catch {
-		// Fall through to token-decoded destination.
+		return NextResponse.redirect(new URL("/", _request.url), 302);
 	}
 
 	if (!destination) {

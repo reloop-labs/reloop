@@ -12,7 +12,7 @@ export const workflowConfig = {
 	/** Shared secret for service-to-service calls (e.g. mail send). */
 	RELOOP_INTERNAL_SECRET:
 		process.env.RELOOP_INTERNAL_SECRET || "reloop_internal_secret_default_123",
-	/** Optional basic-auth for Workbench (`/api/workflow/jobs`). Empty = open (dev only). */
+	/** Basic-auth for Workbench (`/api/workflow/jobs`). Required outside development; empty disables it. */
 	WORKBENCH_USER: process.env.WORKBENCH_USER || "",
 	WORKBENCH_PASS: process.env.WORKBENCH_PASS || "",
 };

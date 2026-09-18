@@ -1,8 +1,9 @@
 import { existsSync } from "node:fs";
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateConfig } from "@be/template/template.config";
+import { resolvePublicTarget } from "@reloop/webhook-delivery";
 import { log } from "evlog";
-import type { Browser, Page } from "playwright";
+import type { Browser, BrowserContext, Page } from "playwright";
 import { chromium } from "playwright";
 import { type HtmlToImageRequest, wrapEmailHtml } from "./html-document";
 
@@ -41,6 +42,35 @@ function launchArgs(): string[] {
 		"--no-sandbox",
 		"--disable-setuid-sandbox",
 	];
+}
+
+const INLINE_SCHEMES = new Set(["data:", "about:", "blob:"]);
+
+export async function isAllowedRenderUrl(url: string): Promise<boolean> {
+	let parsed: URL;
+	try {
+		parsed = new URL(url);
+	} catch {
+		return false;
+	}
+	if (INLINE_SCHEMES.has(parsed.protocol)) return true;
+	if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
+	try {
+		await resolvePublicTarget(parsed.hostname);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+async function blockPrivateRequests(context: BrowserContext): Promise<void> {
+	await context.route("**/*", async (route) => {
+		if (await isAllowedRenderUrl(route.request().url())) {
+			await route.continue();
+			return;
+		}
+		await route.abort("blockedbyclient");
+	});
 }
 
 let browserPromise: Promise<Browser> | null = null;
@@ -119,6 +149,7 @@ export async function renderHtmlToImage(
 	});
 
 	try {
+		await blockPrivateRequests(context);
 		const page = await context.newPage();
 		page.setDefaultTimeout(limits.timeoutMs);
 		await page.setContent(document, {

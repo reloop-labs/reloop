@@ -1,5 +1,4 @@
-import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { resolvePublicTarget } from "@reloop/webhook-delivery";
 import { mailConfig } from "../mail.config";
 import { MailErrors } from "./errors";
 
@@ -76,9 +75,10 @@ async function fetchBytes(
 	url: string,
 	fetchImpl: typeof fetch = fetch,
 	headers?: HeadersInit,
+	redirect: RequestRedirect = "follow",
 ): Promise<Buffer> {
 	const response = await fetchImpl(url, {
-		redirect: "follow",
+		redirect,
 		headers: {
 			"user-agent": "ReloopMail/1.0",
 			...headers,
@@ -94,6 +94,17 @@ async function fetchBytes(
 		);
 	}
 	return bytes;
+}
+
+export async function fetchPublicAttachment(
+	url: string,
+	fetchImpl: typeof fetch = fetch,
+): Promise<Buffer> {
+	if (!isPublicAttachmentUrl(url)) {
+		throw new Error(`attachment URL is not a public http(s) address: ${url}`);
+	}
+	await resolvePublicTarget(new URL(url).hostname);
+	return fetchBytes(url, fetchImpl, undefined, "manual");
 }
 
 export function createUploadServiceStore(
@@ -136,33 +147,31 @@ export function createUploadServiceStore(
 async function loadPathBytes(
 	path: string,
 	store: RemoteAttachmentStore,
+	fetchImpl: typeof fetch,
 ): Promise<Buffer> {
-	if (existsSync(path)) {
-		return readFile(path);
-	}
-
 	const key = s3KeyFromAttachmentPath(path);
 	if (key) {
 		try {
 			return await store.get(key);
 		} catch (error) {
 			if (isPublicAttachmentUrl(path)) {
-				return fetchBytes(path);
+				return fetchPublicAttachment(path, fetchImpl);
 			}
 			throw error;
 		}
 	}
 
 	if (isPublicAttachmentUrl(path)) {
-		return fetchBytes(path);
+		return fetchPublicAttachment(path, fetchImpl);
 	}
 
-	throw new Error(`no such file or directory, open '${path}'`);
+	throw new Error(`attachment path must be an upload key or a public URL`);
 }
 
 export async function materializeAttachments(
 	attachments: SendAttachment[],
 	store: RemoteAttachmentStore,
+	fetchImpl: typeof fetch = fetch,
 ): Promise<MaterializedAttachment[]> {
 	return Promise.all(
 		attachments.map(async (att) => {
@@ -187,7 +196,7 @@ export async function materializeAttachments(
 			}
 
 			try {
-				const content = await loadPathBytes(att.path, store);
+				const content = await loadPathBytes(att.path, store, fetchImpl);
 				return {
 					filename: att.filename,
 					content,

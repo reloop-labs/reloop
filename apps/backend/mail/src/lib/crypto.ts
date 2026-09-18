@@ -19,6 +19,7 @@ export interface ClickTrackingPayload {
 	id: string;
 	/** destination URL */
 	url: string;
+	nt?: 1;
 }
 
 /**
@@ -32,17 +33,22 @@ export function encodeTrackingToken(
 	payload: OpenTrackingPayload | ClickTrackingPayload,
 	secret: string,
 ): string {
+	const noTrack = "nt" in payload && payload.nt === 1;
 	const signedContent =
-		"url" in payload ? `${payload.id}:${payload.url}` : payload.id;
+		"url" in payload
+			? `${payload.id}:${payload.url}${noTrack ? ":nt" : ""}`
+			: payload.id;
 
 	const sig = createHmac("sha256", secret)
 		.update(signedContent)
 		.digest("hex")
 		.slice(0, 16);
 
-	const tokenObj: Record<string, string> =
+	const tokenObj: Record<string, string | number> =
 		"url" in payload
-			? { id: payload.id, url: payload.url, s: sig }
+			? noTrack
+				? { id: payload.id, url: payload.url, nt: 1, s: sig }
+				: { id: payload.id, url: payload.url, s: sig }
 			: { id: payload.id, s: sig };
 
 	return Buffer.from(JSON.stringify(tokenObj)).toString("base64url"); // base64url = URL-safe, no padding
@@ -61,8 +67,11 @@ export function decodeTrackingToken<
 
 		if (!obj.id || !obj.s) return null;
 
+		const noTrack = "nt" in obj && (obj as { nt?: unknown }).nt === 1;
 		const signedContent =
-			"url" in obj && obj.url ? `${obj.id}:${obj.url}` : obj.id;
+			"url" in obj && obj.url
+				? `${obj.id}:${obj.url}${noTrack ? ":nt" : ""}`
+				: obj.id;
 
 		const expectedSig = createHmac("sha256", secret)
 			.update(signedContent)

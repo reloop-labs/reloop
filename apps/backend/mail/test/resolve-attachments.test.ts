@@ -118,25 +118,73 @@ describe("materializeAttachments", () => {
 		expect(resolved[0]?.path).toBeUndefined();
 	});
 
-	test("reads an existing local file", async () => {
+	test("never reads local files, even ones that exist", async () => {
 		const dir = join(tmpdir(), `reloop-mail-att-${Date.now()}`);
 		mkdirSync(dir, { recursive: true });
 		const filePath = join(dir, "local.txt");
 		writeFileSync(filePath, "from-disk");
 		try {
-			const resolved = await materializeAttachments(
-				[{ filename: "local.txt", path: filePath, content_type: "text/plain" }],
-				{
-					get: async () => {
-						throw new Error("storage should not be called");
+			await expect(
+				materializeAttachments(
+					[{ filename: "env.txt", path: filePath, content_type: "text/plain" }],
+					{
+						get: async () => {
+							throw new Error("storage should not be called");
+						},
 					},
-				},
-			);
-			expect(Buffer.isBuffer(resolved[0]?.content)).toBe(true);
-			expect(resolved[0]?.content?.toString()).toBe("from-disk");
+				),
+			).rejects.toMatchObject({
+				why: expect.stringMatching(/upload key or a public URL/),
+			});
+			await expect(
+				materializeAttachments(
+					[{ filename: "env.txt", path: "/proc/self/environ" }],
+					{ get: async () => Buffer.from("") },
+				),
+			).rejects.toMatchObject({
+				why: expect.stringMatching(/upload key or a public URL/),
+			});
 		} finally {
 			rmSync(dir, { recursive: true, force: true });
 		}
+	});
+
+	test("rejects public-looking URLs that point at private or metadata addresses", async () => {
+		const calls: string[] = [];
+		const fetchImpl = (async (input: RequestInfo | URL) => {
+			calls.push(String(input));
+			return new Response("secret", { status: 200 });
+		}) as typeof fetch;
+		for (const url of [
+			"http://10.0.0.5:6379/",
+			"http://169.254.169.254/latest/meta-data/",
+			"http://192.168.1.1/",
+			"http://[::1]/",
+		]) {
+			await expect(
+				materializeAttachments(
+					[{ filename: "x", path: url }],
+					{ get: async () => Buffer.from("") },
+					fetchImpl,
+				),
+			).rejects.toMatchObject({ why: expect.stringMatching(/blocked/) });
+		}
+		expect(calls).toEqual([]);
+	});
+
+	test("does not follow redirects from public attachment URLs", async () => {
+		const fetchImpl = (async () =>
+			new Response(null, {
+				status: 302,
+				headers: { location: "http://10.0.0.5/" },
+			})) as typeof fetch;
+		await expect(
+			materializeAttachments(
+				[{ filename: "x", path: "http://1.1.1.1/file.pdf" }],
+				{ get: async () => Buffer.from("") },
+				fetchImpl,
+			),
+		).rejects.toMatchObject({ why: expect.stringMatching(/HTTP 302/) });
 	});
 
 	test("does not fetch local MinIO URLs when the upload store fails", async () => {

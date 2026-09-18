@@ -2,6 +2,7 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { parseHtmlToImageRequest } from "../src/utils/html-document";
 import {
 	closeHtmlToImageRenderer,
+	isAllowedRenderUrl,
 	renderHtmlToImage,
 } from "../src/utils/html-to-image";
 
@@ -32,4 +33,25 @@ describe("renderHtmlToImage", () => {
 		},
 		30_000,
 	);
+});
+
+describe("isAllowedRenderUrl", () => {
+	test("allows inline schemes and public hosts", async () => {
+		expect(await isAllowedRenderUrl("data:image/png;base64,AAAA")).toBe(true);
+		expect(await isAllowedRenderUrl("about:blank")).toBe(true);
+		expect(await isAllowedRenderUrl("https://1.1.1.1/logo.png")).toBe(true);
+	});
+
+	test("blocks private, loopback, metadata and non-http targets", async () => {
+		for (const url of [
+			"http://169.254.169.254/latest/meta-data/",
+			"http://10.0.0.5:8222/varz",
+			"http://127.0.0.1:8000/metrics",
+			"http://[::1]/",
+			"file:///etc/passwd",
+			"ftp://1.1.1.1/x",
+		]) {
+			expect(await isAllowedRenderUrl(url)).toBe(false);
+		}
+	});
 });
