@@ -4,6 +4,10 @@ import {
 	isRegistrationAllowed,
 	REGISTRATION_DISABLED_MESSAGE,
 } from "@reloop/auth/registration-controls";
+import {
+	getRuntimeDisableSignup,
+	setRuntimeDisableSignup,
+} from "@reloop/auth/setup/runtime-registration";
 
 describe("isEnvFlagEnabled", () => {
 	test("enables on true regardless of case or padding", () => {
@@ -86,5 +90,19 @@ describe("closed registration still honours invitations", () => {
 			true,
 		);
 		expect(called).toBe(false);
+	});
+});
+
+describe("runtime registration lock", () => {
+	test("runtime lock blocks signup even when env is open", async () => {
+		setRuntimeDisableSignup(true);
+		expect(getRuntimeDisableSignup()).toBe(true);
+		const allowed = await isRegistrationAllowed(
+			"a@b.com",
+			"false",
+			async () => false,
+		);
+		expect(allowed).toBe(false);
+		setRuntimeDisableSignup(false);
 	});
 });

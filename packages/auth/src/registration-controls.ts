@@ -1,3 +1,5 @@
+import { getRuntimeDisableSignup } from "./setup/runtime-registration";
+
 export const REGISTRATION_DISABLED_MESSAGE =
 	"Registration is disabled on this instance. Ask an administrator for an invitation.";
 
@@ -19,7 +21,10 @@ export async function isRegistrationAllowed(
 	disableSignup: string | undefined,
 	hasPendingInvitation: (email: string) => Promise<boolean>,
 ): Promise<boolean> {
-	if (!isEnvFlagEnabled(disableSignup)) return true;
+	const runtime = getRuntimeDisableSignup();
+	const closed =
+		runtime === true || (runtime !== false && isEnvFlagEnabled(disableSignup));
+	if (!closed) return true;
 
 	const normalized = normalizeInviteEmail(email);
 	if (!normalized) return false;
