@@ -31,12 +31,18 @@ describe("setup-mode", () => {
 		expect(await readAdminSetupKey(path)).toBe("secret-key-1");
 	});
 
-	test("consumeAdminSetupKeyFile removes the file", async () => {
+	test("consumeAdminSetupKeyFile empties the file in place", async () => {
 		const dir = await mkdtemp(join(tmpdir(), "reloop-setup-"));
 		const path = join(dir, "admin-setup.key");
 		await writeFile(path, "secret\n", { mode: 0o600 });
 		await consumeAdminSetupKeyFile(path);
-		expect(await readAdminSetupKey(path)).toBeNull();
+		expect(await readAdminSetupKey(path)).toBe("");
+		expect(await readFile(path, "utf8")).toBe("");
+	});
+
+	test("consumeAdminSetupKeyFile tolerates a missing file", async () => {
+		const dir = await mkdtemp(join(tmpdir(), "reloop-setup-"));
+		await consumeAdminSetupKeyFile(join(dir, "admin-setup.key"));
 	});
 
 	test("patchEnvFile updates and inserts keys", async () => {

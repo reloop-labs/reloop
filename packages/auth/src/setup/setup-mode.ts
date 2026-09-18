@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import { readFile, unlink, writeFile } from "node:fs/promises";
+import { readFile, truncate, writeFile } from "node:fs/promises";
 import { isEnvFlagEnabled } from "../registration-controls";
 
 export function isSetupModeEnabled(value: string | undefined): boolean {
@@ -32,7 +32,11 @@ export function adminSetupKeysEqual(
 export async function consumeAdminSetupKeyFile(
 	filePath: string,
 ): Promise<void> {
-	await unlink(filePath);
+	try {
+		await truncate(filePath, 0);
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+	}
 }
 
 export async function patchEnvFile(
