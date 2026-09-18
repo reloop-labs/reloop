@@ -6,6 +6,7 @@ import {
 	organizationNameMaxLengthMessage,
 	organizationNameTooLong,
 } from "@reloop/auth/organization-limits";
+import { APP_NAME_MAX_LENGTH } from "@reloop/auth/setup/setup-limits";
 import {
 	USER_NAME_PART_MAX_LENGTH,
 	userDisplayNamePartsTooLong,
@@ -18,7 +19,7 @@ import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Controller, type Resolver, useForm } from "react-hook-form";
+import { Controller, type Resolver, useForm, useWatch } from "react-hook-form";
 import * as v from "valibot";
 import { clearClientAuthState } from "#/features/auth/session-query";
 import { toastApiError } from "#/lib/rate-limit-toast";
@@ -27,7 +28,7 @@ import { completeSetup, SetupRequestError } from "./setup-api";
 export const SETUP_FORM_ID = "selfhost-setup-form";
 
 export const PASSWORD_MIN_LENGTH = 8;
-export const APP_NAME_MAX_LENGTH = 40;
+export { APP_NAME_MAX_LENGTH };
 
 export type SetupUiState = {
 	canSubmit: boolean;
@@ -136,6 +137,8 @@ export function SetupForm({
 			disableSignup: true,
 		},
 	});
+
+	const disableSignup = useWatch({ control, name: "disableSignup" });
 
 	const isLoading = status === "loading";
 	const canSubmit = isValid && !isLoading && !isSuccess;
@@ -344,7 +347,8 @@ export function SetupForm({
 					<p className="text-error-base text-sm">{errors.appName.message}</p>
 				) : (
 					<p className="text-[12px] text-text-soft-400">
-						Shown in emails and page titles. Defaults to Reloop.
+						Used in system emails. Applies once the services restart. Defaults
+						to Reloop.
 					</p>
 				)}
 			</div>
@@ -376,6 +380,19 @@ export function SetupForm({
 					</span>
 				</span>
 			</label>
+
+			{disableSignup ? null : (
+				<output className="flex items-start gap-2.5 rounded-xl border border-warning-base/25 bg-warning-lighter px-3.5 py-3 text-[12px] text-text-sub-600 leading-relaxed dark:border-warning-base/30 dark:bg-warning-base/10">
+					<Icon
+						name="alert-triangle"
+						className="mt-px size-4 shrink-0 text-warning-base"
+					/>
+					<span>
+						Sign-ups stay open: anyone who can reach this URL can create an
+						account. You can close them later in the instance settings.
+					</span>
+				</output>
+			)}
 		</form>
 	);
 }
