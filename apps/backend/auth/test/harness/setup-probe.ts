@@ -3,6 +3,7 @@ import {
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
+import { seedRuntimeSignupLockFromEnvFile } from "@reloop/auth/setup/setup-mode";
 import { Elysia } from "elysia";
 import { auth } from "../../src/lib/auth";
 import { setupRoutes } from "../../src/routes/setup/setup.route";
@@ -80,6 +81,18 @@ if (process.env.PROBE_CASE === "off") {
 		adminKey: "any-key",
 	});
 	checks.completeInvalidBody = await call("POST", COMPLETE_PATH, {});
+} else if (process.env.PROBE_CASE === "restart") {
+	await seedRuntimeSignupLockFromEnvFile(envFile);
+
+	checks.publicSignUpAfterRestart = await call(
+		"POST",
+		"/api/auth/v1/sign-up/email",
+		{
+			name: "Late Stranger",
+			email: "late-stranger@probe.test",
+			password: "password12345",
+		},
+	);
 } else {
 	const adminKey = (await readFile(keyFile, "utf8")).trim();
 
@@ -89,6 +102,16 @@ if (process.env.PROBE_CASE === "off") {
 	checks.completeWrongKey = await call("POST", COMPLETE_PATH, {
 		...account,
 		adminKey: "wrong-setup-key",
+	});
+	checks.completeUnsafeAppName = await call("POST", COMPLETE_PATH, {
+		...account,
+		adminKey,
+		appName: "Probe Corp\nDISABLE_SIGNUP=false",
+	});
+	checks.completeOverlongAppName = await call("POST", COMPLETE_PATH, {
+		...account,
+		adminKey,
+		appName: "P".repeat(200),
 	});
 	checks.complete = await call("POST", COMPLETE_PATH, { ...account, adminKey });
 	checks.statusAfter = await call("GET", STATUS_PATH);

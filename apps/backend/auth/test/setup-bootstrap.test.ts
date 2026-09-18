@@ -83,6 +83,7 @@ async function probe(env: Record<string, string>): Promise<ProbeOutput> {
 describe("self-host setup routes", () => {
 	let off: ProbeOutput;
 	let flow: ProbeOutput;
+	let restart: ProbeOutput;
 
 	beforeAll(async () => {
 		const pgUrl = await isolatedDatabaseUrl();
@@ -100,6 +101,14 @@ describe("self-host setup routes", () => {
 			PG_URL: pgUrl,
 			PROBE_CASE: "flow",
 			SETUP_MODE: "true",
+			ADMIN_SETUP_KEY_FILE: flowFiles.keyFile,
+			RELOOP_ENV_FILE: flowFiles.envFile,
+		});
+
+		restart = await probe({
+			PG_URL: pgUrl,
+			PROBE_CASE: "restart",
+			DISABLE_SIGNUP: "false",
 			ADMIN_SETUP_KEY_FILE: flowFiles.keyFile,
 			RELOOP_ENV_FILE: flowFiles.envFile,
 		});
@@ -152,8 +161,17 @@ describe("self-host setup routes", () => {
 		expect(flow.checks.completeAgain?.status).toBe(404);
 	});
 
+	test("an instance name that could inject env keys is rejected", () => {
+		expect(flow.checks.completeUnsafeAppName?.status).toBe(400);
+		expect(flow.checks.completeOverlongAppName?.status).toBe(400);
+	});
+
 	test("the signup lock applies immediately after setup", () => {
 		expect(flow.checks.publicSignUpAfter?.status).toBe(403);
+	});
+
+	test("the signup lock survives a restart through the env file", () => {
+		expect(restart.checks.publicSignUpAfterRestart?.status).toBe(403);
 	});
 
 	test("the admin key is emptied and the env file is rewritten", () => {

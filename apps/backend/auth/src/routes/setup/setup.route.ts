@@ -1,4 +1,9 @@
+import { ORGANIZATION_NAME_MAX_LENGTH } from "@reloop/auth/organization-limits";
 import type { CompleteSetupInput } from "@reloop/auth/setup/complete-setup";
+import {
+	APP_NAME_MAX_LENGTH,
+	isSafeEnvText,
+} from "@reloop/auth/setup/setup-limits";
 import { APIError } from "better-auth/api";
 import { Elysia } from "elysia";
 import {
@@ -23,8 +28,20 @@ function requiredText(value: unknown): string | null {
 	return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function isOptionalText(value: unknown): boolean {
-	return value === undefined || value === null || typeof value === "string";
+type OptionalText = { ok: true; value: string | undefined } | { ok: false };
+
+function boundedOptionalText(value: unknown, maxLength: number): OptionalText {
+	if (value === undefined || value === null)
+		return { ok: true, value: undefined };
+	if (typeof value !== "string") return { ok: false };
+
+	const trimmed = value.trim();
+	if (!trimmed) return { ok: true, value: undefined };
+	if (trimmed.length > maxLength || !isSafeEnvText(trimmed)) {
+		return { ok: false };
+	}
+
+	return { ok: true, value: trimmed };
 }
 
 async function readJsonBody(request: Request): Promise<unknown> {
@@ -47,6 +64,11 @@ function parseCompleteSetupBody(raw: unknown): ParsedBody {
 	const name = requiredText(body.name);
 	const email = requiredText(body.email);
 	const password = typeof body.password === "string" ? body.password : null;
+	const organizationName = boundedOptionalText(
+		body.organizationName,
+		ORGANIZATION_NAME_MAX_LENGTH,
+	);
+	const appName = boundedOptionalText(body.appName, APP_NAME_MAX_LENGTH);
 
 	const invalid: string[] = [];
 	if (!adminKey) invalid.push("adminKey");
@@ -54,8 +76,8 @@ function parseCompleteSetupBody(raw: unknown): ParsedBody {
 	if (!email) invalid.push("email");
 	if (!password) invalid.push("password");
 	if (typeof body.disableSignup !== "boolean") invalid.push("disableSignup");
-	if (!isOptionalText(body.organizationName)) invalid.push("organizationName");
-	if (!isOptionalText(body.appName)) invalid.push("appName");
+	if (!organizationName.ok) invalid.push("organizationName");
+	if (!appName.ok) invalid.push("appName");
 
 	if (
 		invalid.length > 0 ||
@@ -63,7 +85,9 @@ function parseCompleteSetupBody(raw: unknown): ParsedBody {
 		name === null ||
 		email === null ||
 		password === null ||
-		typeof body.disableSignup !== "boolean"
+		typeof body.disableSignup !== "boolean" ||
+		!organizationName.ok ||
+		!appName.ok
 	) {
 		return {
 			ok: false,
@@ -79,8 +103,8 @@ function parseCompleteSetupBody(raw: unknown): ParsedBody {
 			email,
 			password,
 			disableSignup: body.disableSignup,
-			organizationName: requiredText(body.organizationName) ?? undefined,
-			appName: requiredText(body.appName) ?? undefined,
+			organizationName: organizationName.value,
+			appName: appName.value,
 		},
 	};
 }
