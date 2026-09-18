@@ -218,7 +218,11 @@ collect_configuration() {
 	preserved_or_new TRACKING_SECRET gen_secret 48
 	preserved_or_new PREFERENCES_SECRET gen_secret 48
 	preserved_or_new WEBHOOK_ENCRYPTION_KEY gen_hex 32
-	SETUP_MODE="${PRESERVED_SETUP_MODE:-true}"
+	if [ "$EXISTING_INSTALL" = "1" ]; then
+		SETUP_MODE="${PRESERVED_SETUP_MODE:-false}"
+	else
+		SETUP_MODE="${PRESERVED_SETUP_MODE:-true}"
+	fi
 	DEFAULT_OTP="${PRESERVED_DEFAULT_OTP:-}"
 	DNS_RESOLVERS="${PRESERVED_DNS_RESOLVERS:-8.8.8.8,8.8.4.4}"
 	AUTH_INTERNAL_BASE_URL="${PRESERVED_AUTH_INTERNAL_BASE_URL:-}"
