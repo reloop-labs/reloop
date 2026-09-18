@@ -42,9 +42,6 @@
 	handle /api/logs* {
 		reverse_proxy logs:8016
 	}
-	handle /api/workflow/jobs* {
-		respond 404
-	}
 	handle /api/workflow* {
 		reverse_proxy workflow:8017
 	}

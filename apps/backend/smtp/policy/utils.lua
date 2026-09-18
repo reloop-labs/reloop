@@ -34,7 +34,7 @@ function utils.encode_tracking_token(email_log_id, url, click_tracking)
   if url and click_tracking then
     signed_content = email_log_id .. ":" .. url
   elseif url then
-    signed_content = email_log_id .. ":" .. url .. ":nt"
+    signed_content = "nt:" .. email_log_id .. ":" .. url
   else
     signed_content = email_log_id
   end
@@ -74,7 +74,7 @@ function utils.decode_tracking_token(token)
   -- Verify signature
   local signed_content
   if obj.url and obj.nt == 1 then
-    signed_content = obj.id .. ":" .. obj.url .. ":nt"
+    signed_content = "nt:" .. obj.id .. ":" .. obj.url
   elseif obj.url then
     signed_content = obj.id .. ":" .. obj.url
   else

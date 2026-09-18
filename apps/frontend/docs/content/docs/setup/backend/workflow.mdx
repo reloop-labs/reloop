@@ -58,6 +58,8 @@ NODE_ENV=development
 | `WORKBENCH_USER` | Outside development | empty (dashboard disabled) |
 | `WORKBENCH_PASS` | Outside development | empty (dashboard disabled) |
 
+Outside development the dashboard at `/api/workflow/jobs` only mounts when both values are set, and then sits behind HTTP basic auth. The self-host installer generates them.
+
 
 ## Commands
 

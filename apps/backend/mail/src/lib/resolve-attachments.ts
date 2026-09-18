@@ -1,4 +1,4 @@
-import { resolvePublicTarget } from "@reloop/webhook-delivery";
+import { type PinnedTransport, requestPinned } from "@reloop/webhook-delivery";
 import { mailConfig } from "../mail.config";
 import { MailErrors } from "./errors";
 
@@ -75,10 +75,9 @@ async function fetchBytes(
 	url: string,
 	fetchImpl: typeof fetch = fetch,
 	headers?: HeadersInit,
-	redirect: RequestRedirect = "follow",
 ): Promise<Buffer> {
 	const response = await fetchImpl(url, {
-		redirect,
+		redirect: "follow",
 		headers: {
 			"user-agent": "ReloopMail/1.0",
 			...headers,
@@ -98,13 +97,22 @@ async function fetchBytes(
 
 export async function fetchPublicAttachment(
 	url: string,
-	fetchImpl: typeof fetch = fetch,
+	transport: PinnedTransport = requestPinned,
 ): Promise<Buffer> {
 	if (!isPublicAttachmentUrl(url)) {
 		throw new Error(`attachment URL is not a public http(s) address: ${url}`);
 	}
-	await resolvePublicTarget(new URL(url).hostname);
-	return fetchBytes(url, fetchImpl, undefined, "manual");
+	const response = await transport({
+		url,
+		method: "GET",
+		allowHttp: true,
+		maxBytes: MAX_ATTACHMENT_BYTES,
+		headers: { "user-agent": "ReloopMail/1.0" },
+	});
+	if (response.status < 200 || response.status >= 300) {
+		throw new Error(`HTTP ${response.status} fetching ${url}`);
+	}
+	return response.bodyBuffer;
 }
 
 export function createUploadServiceStore(
@@ -147,7 +155,7 @@ export function createUploadServiceStore(
 async function loadPathBytes(
 	path: string,
 	store: RemoteAttachmentStore,
-	fetchImpl: typeof fetch,
+	transport: PinnedTransport,
 ): Promise<Buffer> {
 	const key = s3KeyFromAttachmentPath(path);
 	if (key) {
@@ -155,23 +163,23 @@ async function loadPathBytes(
 			return await store.get(key);
 		} catch (error) {
 			if (isPublicAttachmentUrl(path)) {
-				return fetchPublicAttachment(path, fetchImpl);
+				return fetchPublicAttachment(path, transport);
 			}
 			throw error;
 		}
 	}
 
 	if (isPublicAttachmentUrl(path)) {
-		return fetchPublicAttachment(path, fetchImpl);
+		return fetchPublicAttachment(path, transport);
 	}
 
-	throw new Error(`attachment path must be an upload key or a public URL`);
+	throw new Error("attachment path must be an upload key or a public URL");
 }
 
 export async function materializeAttachments(
 	attachments: SendAttachment[],
 	store: RemoteAttachmentStore,
-	fetchImpl: typeof fetch = fetch,
+	transport: PinnedTransport = requestPinned,
 ): Promise<MaterializedAttachment[]> {
 	return Promise.all(
 		attachments.map(async (att) => {
@@ -196,7 +204,7 @@ export async function materializeAttachments(
 			}
 
 			try {
-				const content = await loadPathBytes(att.path, store, fetchImpl);
+				const content = await loadPathBytes(att.path, store, transport);
 				return {
 					filename: att.filename,
 					content,

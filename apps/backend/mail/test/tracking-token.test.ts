@@ -46,5 +46,21 @@ describe("tracking tokens", () => {
 			JSON.stringify({ ...parsed, url: "https://evil.example/" }),
 		).toString("base64url");
 		expect(decodeTrackingToken(retargeted, secret)).toBeNull();
+
+		const untracked = encodeTrackingToken(
+			{ id: "log_1", url: "https://example.com/a", nt: 1 },
+			secret,
+		);
+		const { nt: _nt, ...rest } = JSON.parse(
+			Buffer.from(untracked, "base64url").toString(),
+		);
+		const promoted = Buffer.from(
+			JSON.stringify({ ...rest, url: "https://example.com/a:nt" }),
+		).toString("base64url");
+		expect(decodeTrackingToken(promoted, secret)).toBeNull();
+		const prefixed = Buffer.from(
+			JSON.stringify({ ...rest, url: "nt:log_1:https://example.com/a" }),
+		).toString("base64url");
+		expect(decodeTrackingToken(prefixed, secret)).toBeNull();
 	});
 });

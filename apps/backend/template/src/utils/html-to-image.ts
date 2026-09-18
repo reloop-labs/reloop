@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateConfig } from "@be/template/template.config";
-import { resolvePublicTarget } from "@reloop/webhook-delivery";
+import { requestPinned, resolvePublicTarget } from "@reloop/webhook-delivery";
 import { log } from "evlog";
 import type { Browser, BrowserContext, Page } from "playwright";
 import { chromium } from "playwright";
@@ -63,14 +63,60 @@ export async function isAllowedRenderUrl(url: string): Promise<boolean> {
 	}
 }
 
-async function blockPrivateRequests(context: BrowserContext): Promise<void> {
-	await context.route("**/*", async (route) => {
-		if (await isAllowedRenderUrl(route.request().url())) {
-			await route.continue();
-			return;
+const MAX_SUBRESOURCE_BYTES = 5 * 1024 * 1024;
+const MAX_REDIRECTS = 5;
+
+async function fetchSubresource(url: string, accept: string) {
+	let current = url;
+	for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+		const response = await requestPinned({
+			url: current,
+			method: "GET",
+			allowHttp: true,
+			timeoutMs: limits.timeoutMs,
+			maxBytes: MAX_SUBRESOURCE_BYTES,
+			headers: { accept },
+		});
+		const location = response.headers.location;
+		if (response.status < 300 || response.status >= 400 || !location) {
+			return response;
 		}
+		current = new URL(location, current).toString();
+	}
+	throw new Error("Too many redirects");
+}
+
+async function fulfillThroughPinnedClient(
+	route: Parameters<Parameters<BrowserContext["route"]>[1]>[0],
+): Promise<void> {
+	const request = route.request();
+	const url = request.url();
+	if (!(await isAllowedRenderUrl(url)) || request.method() !== "GET") {
 		await route.abort("blockedbyclient");
-	});
+		return;
+	}
+	if (INLINE_SCHEMES.has(new URL(url).protocol)) {
+		await route.continue();
+		return;
+	}
+	try {
+		const response = await fetchSubresource(
+			url,
+			request.headers().accept ?? "*/*",
+		);
+		const contentType = response.headers["content-type"];
+		await route.fulfill({
+			status: response.status,
+			headers: contentType ? { "content-type": contentType } : {},
+			body: response.bodyBuffer,
+		});
+	} catch {
+		await route.abort("blockedbyclient");
+	}
+}
+
+async function blockPrivateRequests(context: BrowserContext): Promise<void> {
+	await context.route("**/*", fulfillThroughPinnedClient);
 }
 
 let browserPromise: Promise<Browser> | null = null;

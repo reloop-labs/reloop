@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { PinnedTransport } from "@reloop/webhook-delivery";
 import MailComposer from "nodemailer/lib/mail-composer";
 import {
 	isPublicAttachmentUrl,
@@ -150,11 +151,6 @@ describe("materializeAttachments", () => {
 	});
 
 	test("rejects public-looking URLs that point at private or metadata addresses", async () => {
-		const calls: string[] = [];
-		const fetchImpl = (async (input: RequestInfo | URL) => {
-			calls.push(String(input));
-			return new Response("secret", { status: 200 });
-		}) as typeof fetch;
 		for (const url of [
 			"http://10.0.0.5:6379/",
 			"http://169.254.169.254/latest/meta-data/",
@@ -162,27 +158,32 @@ describe("materializeAttachments", () => {
 			"http://[::1]/",
 		]) {
 			await expect(
-				materializeAttachments(
-					[{ filename: "x", path: url }],
-					{ get: async () => Buffer.from("") },
-					fetchImpl,
-				),
+				materializeAttachments([{ filename: "x", path: url }], {
+					get: async () => Buffer.from(""),
+				}),
 			).rejects.toMatchObject({ why: expect.stringMatching(/blocked/) });
 		}
-		expect(calls).toEqual([]);
 	});
 
 	test("does not follow redirects from public attachment URLs", async () => {
-		const fetchImpl = (async () =>
-			new Response(null, {
-				status: 302,
-				headers: { location: "http://10.0.0.5/" },
-			})) as typeof fetch;
+		const transport: PinnedTransport = async () => ({
+			status: 302,
+			headers: { location: "http://10.0.0.5/" },
+			body: "",
+			bodyBuffer: Buffer.alloc(0),
+			durationMs: 1,
+			resolved: {
+				hostname: "1.1.1.1",
+				pinnedIp: "1.1.1.1",
+				allIps: ["1.1.1.1"],
+				family: 4,
+			},
+		});
 		await expect(
 			materializeAttachments(
 				[{ filename: "x", path: "http://1.1.1.1/file.pdf" }],
 				{ get: async () => Buffer.from("") },
-				fetchImpl,
+				transport,
 			),
 		).rejects.toMatchObject({ why: expect.stringMatching(/HTTP 302/) });
 	});

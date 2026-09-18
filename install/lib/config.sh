@@ -310,7 +310,7 @@ TRACKING_SECRET=$TRACKING_SECRET
 PREFERENCES_SECRET=$PREFERENCES_SECRET
 WEBHOOK_ENCRYPTION_KEY=$WEBHOOK_ENCRYPTION_KEY
 
-# Basic auth for the queue dashboard at /api/workflow/jobs (docker network only).
+# Basic auth for the queue dashboard at https://$RELOOP_DOMAIN/api/workflow/jobs.
 WORKBENCH_USER=$WORKBENCH_USER
 WORKBENCH_PASS=$WORKBENCH_PASS
 

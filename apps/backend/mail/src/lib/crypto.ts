@@ -36,7 +36,7 @@ export function encodeTrackingToken(
 	const noTrack = "nt" in payload && payload.nt === 1;
 	const signedContent =
 		"url" in payload
-			? `${payload.id}:${payload.url}${noTrack ? ":nt" : ""}`
+			? `${noTrack ? "nt:" : ""}${payload.id}:${payload.url}`
 			: payload.id;
 
 	const sig = createHmac("sha256", secret)
@@ -70,7 +70,7 @@ export function decodeTrackingToken<
 		const noTrack = "nt" in obj && (obj as { nt?: unknown }).nt === 1;
 		const signedContent =
 			"url" in obj && obj.url
-				? `${obj.id}:${obj.url}${noTrack ? ":nt" : ""}`
+				? `${noTrack ? "nt:" : ""}${obj.id}:${obj.url}`
 				: obj.id;
 
 		const expectedSig = createHmac("sha256", secret)
