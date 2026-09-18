@@ -23,6 +23,13 @@ S3_ACCESS_KEY="${RELOOP_S3_ACCESS_KEY:-}"
 S3_SECRET_KEY="${RELOOP_S3_SECRET_KEY:-}"
 S3_BUCKET="${RELOOP_S3_BUCKET:-}"
 S3_REGION="${RELOOP_S3_REGION:-}"
+ADMIN_SETUP_KEY_OVERRIDE="${RELOOP_ADMIN_SETUP_KEY:-}"
+
+for arg in "$@"; do
+	case "$arg" in
+	--admin-key=*) ADMIN_SETUP_KEY_OVERRIDE="${arg#--admin-key=}" ;;
+	esac
+done
 
 NONINTERACTIVE=0
 case "${RELOOP_NONINTERACTIVE:-}" in
@@ -165,14 +172,20 @@ print_summary() {
 
 	printf '\n'
 	rule
-	printf 'First sign-in\n'
+	printf 'Create your administrator account\n'
 	rule
-	printf '\n  1. Open %s://%s/dashboard\n' "$RELOOP_SCHEME" "$RELOOP_DOMAIN"
-	printf '  2. Sign up with %s\n' "$RELOOP_ADMIN_EMAIL"
-	printf '  3. Enter this one-time code when asked:  %s\n' "$DEFAULT_OTP"
-	printf '\n  Reloop cannot email a code until one of your own domains is verified,\n'
-	printf '  so this fixed code stands in. Remove DEFAULT_OTP from %s/.env\n' "$INSTALL_DIR"
-	printf '  and run "reloop restart auth" once your domain is sending mail.\n'
+	if [ -n "$ADMIN_SETUP_KEY" ]; then
+		printf '\n  1. Open %s://%s/dashboard/setup\n' "$RELOOP_SCHEME" "$RELOOP_DOMAIN"
+		printf '  2. Enter this setup key:\n'
+		printf '\n       %s\n' "$ADMIN_SETUP_KEY"
+		printf '\n  3. Choose the name, email and password for the first administrator.\n'
+		printf '\n  The key works once. Finishing setup clears it and closes the setup\n'
+		printf '  page for good. Until then it is readable at %s/admin-setup.key\n' "$INSTALL_DIR"
+		printf '  and this is the only time it is printed.\n'
+	else
+		printf '\n  An administrator account already exists on this installation.\n'
+		printf '  Sign in at %s://%s/dashboard\n' "$RELOOP_SCHEME" "$RELOOP_DOMAIN"
+	fi
 
 	printf '\n'
 	rule
@@ -219,6 +232,7 @@ main() {
 	detect_public_ip
 
 	write_env_file
+	write_admin_setup_key
 	write_stack_files
 
 	pull_images

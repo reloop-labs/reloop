@@ -3,6 +3,7 @@
 ENV_FILE=""
 EXISTING_INSTALL=0
 REUSE_CONFIG=0
+ADMIN_SETUP_KEY=""
 
 env_get() {
 	local key="$1" file="$2"
@@ -52,7 +53,7 @@ load_existing_values() {
 		POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD REDIS_PASSWORD \
 		BETTER_AUTH_SECRET RELOOP_INTERNAL_SECRET TRACKING_SECRET PREFERENCES_SECRET \
 		WEBHOOK_ENCRYPTION_KEY S3_ENDPOINT S3_ACCESS_KEY S3_SECRET_KEY \
-		S3_BUCKET S3_REGION DEFAULT_OTP DNS_RESOLVERS \
+		S3_BUCKET S3_REGION SETUP_MODE DEFAULT_OTP DNS_RESOLVERS \
 		AUTH_INTERNAL_BASE_URL DISABLE_SIGNUP DISABLE_ORG_CREATION \
 		RELOOP_API_KEY RELOOP_SENDER_DOMAIN \
 		SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD SMTP_SECURE \
@@ -138,7 +139,7 @@ collect_configuration() {
 		fi
 		step "Using the existing configuration"
 		ok "Domain: $RELOOP_DOMAIN"
-		ok "Administrator email: $RELOOP_ADMIN_EMAIL"
+		ok "TLS contact email: $RELOOP_ADMIN_EMAIL"
 	else
 		step "Configuration"
 
@@ -147,8 +148,8 @@ collect_configuration() {
 			"${PRESERVED_RELOOP_DOMAIN:-}" valid_hostname \
 			"Enter a bare hostname — no scheme, no path, no port. Example: reloop.example.com"
 
-		ask RELOOP_ADMIN_EMAIL "Administrator email" \
-			"Used for Let's Encrypt notices and as your first Reloop account" \
+		ask RELOOP_ADMIN_EMAIL "TLS contact email" \
+			"Where Let's Encrypt sends certificate expiry and renewal-failure notices" \
 			"${PRESERVED_RELOOP_ADMIN_EMAIL:-}" valid_email \
 			"Enter a valid email address, e.g. admin@example.com"
 
@@ -217,7 +218,8 @@ collect_configuration() {
 	preserved_or_new TRACKING_SECRET gen_secret 48
 	preserved_or_new PREFERENCES_SECRET gen_secret 48
 	preserved_or_new WEBHOOK_ENCRYPTION_KEY gen_hex 32
-	preserved_or_new DEFAULT_OTP gen_digits 6
+	SETUP_MODE="${PRESERVED_SETUP_MODE:-true}"
+	DEFAULT_OTP="${PRESERVED_DEFAULT_OTP:-}"
 	DNS_RESOLVERS="${PRESERVED_DNS_RESOLVERS:-8.8.8.8,8.8.4.4}"
 	AUTH_INTERNAL_BASE_URL="${PRESERVED_AUTH_INTERNAL_BASE_URL:-}"
 	DISABLE_SIGNUP="${PRESERVED_DISABLE_SIGNUP:-false}"
@@ -308,9 +310,19 @@ TRACKING_SECRET=$TRACKING_SECRET
 PREFERENCES_SECRET=$PREFERENCES_SECRET
 WEBHOOK_ENCRYPTION_KEY=$WEBHOOK_ENCRYPTION_KEY
 
-# Bootstrap sign-in code. Reloop cannot email a one-time code until you have
-# verified a sending domain, so this fixed code stands in for the first login.
-# Remove it (and restart) as soon as your own domain sends mail.
+# First-run administrator setup. While SETUP_MODE is true and the key file
+# still holds a key, /dashboard/setup accepts that key once to create the
+# administrator account. Finishing setup empties the key file and sets
+# SETUP_MODE to false. Both paths are bind-mounted into the auth container,
+# so edit them here rather than inside the container.
+SETUP_MODE=$SETUP_MODE
+ADMIN_SETUP_KEY_FILE=/run/reloop/admin-setup.key
+RELOOP_ENV_FILE=/run/reloop/.env
+
+# Fixed sign-in code, empty on new installations because the first account is
+# created through /dashboard/setup instead. Installations upgraded from an
+# older installer keep the code they were given; remove it (and restart) once
+# your own domain sends mail.
 DEFAULT_OTP=$DEFAULT_OTP
 
 # Close registration once your own accounts exist. Blocks every sign-up path —
@@ -333,7 +345,7 @@ DISABLE_ORG_CREATION=$DISABLE_ORG_CREATION
 #      set SMTP_HOST, and SMTP_USER/SMTP_PASSWORD if it needs credentials.
 #      SMTP_SECURE=true means implicit TLS, normally with SMTP_PORT=465.
 #
-# Until one is configured, sign in with DEFAULT_OTP above.
+# Until one is configured, Reloop cannot send sign-in codes or invitations.
 RELOOP_API_KEY=$RELOOP_API_KEY
 RELOOP_SENDER_DOMAIN=$RELOOP_SENDER_DOMAIN
 SMTP_HOST=$SMTP_HOST
@@ -368,6 +380,31 @@ EOF
 	chown root:root "$ENV_FILE"
 	chmod 600 "$ENV_FILE"
 	ok "Wrote $ENV_FILE (root-only, 0600)"
+}
+
+write_admin_setup_key() {
+	local key_file="$INSTALL_DIR/admin-setup.key"
+
+	if [ "$SETUP_MODE" != "true" ]; then
+		ADMIN_SETUP_KEY=""
+		[ -f "$key_file" ] || install -m 0600 -o root -g root /dev/null "$key_file"
+		return 0
+	fi
+
+	if [ -n "${ADMIN_SETUP_KEY_OVERRIDE:-}" ]; then
+		ADMIN_SETUP_KEY="$ADMIN_SETUP_KEY_OVERRIDE"
+	else
+		ADMIN_SETUP_KEY="$(gen_secret 40)"
+	fi
+
+	local tmp
+	tmp="$(mktemp "$INSTALL_DIR/.admin-setup.key.XXXXXX")"
+	chmod 600 "$tmp"
+	printf '%s\n' "$ADMIN_SETUP_KEY" >"$tmp"
+	mv "$tmp" "$key_file"
+	chown root:root "$key_file"
+	chmod 600 "$key_file"
+	ok "Wrote $key_file (root-only, 0600)"
 }
 
 install_asset() {
