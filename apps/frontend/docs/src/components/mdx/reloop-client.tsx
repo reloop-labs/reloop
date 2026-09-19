@@ -460,61 +460,65 @@ export const Card = React.forwardRef<
 		onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 		noIconFrame?: boolean;
 	}
->(({ title, icon, href, children, className, onClick, noIconFrame, ...props }, ref) => {
-	const content = (
-		<div
-			ref={ref}
-			className={cn(
-				"group flex h-full flex-col gap-4 rounded-2xl border-2 border-transparent bg-bg-white-0 p-4 shadow-[inset_0_0_0_1px_var(--color-stroke-soft-100)] transition-all dark:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-stroke-soft-100)_40%,transparent)]",
-				href &&
-					"cursor-pointer hover:border-black hover:bg-black/[0.02] hover:shadow-none dark:hover:border-white dark:hover:bg-white/[0.02] dark:hover:shadow-none",
-				"dark:bg-zinc-950",
-				className,
-			)}
-			{...props}
-		>
-			{icon && (
-				noIconFrame ? (
-					<div className="text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:group-hover:text-white">
-						{typeof icon === "string" ? (
-							<ReloopIcon name={icon} className="size-4" />
-						) : (
-							icon
-						)}
+>(
+	(
+		{ title, icon, href, children, className, onClick, noIconFrame, ...props },
+		ref,
+	) => {
+		const content = (
+			<div
+				ref={ref}
+				className={cn(
+					"group flex h-full flex-col gap-4 rounded-2xl border-2 border-transparent bg-bg-white-0 p-4 shadow-[inset_0_0_0_1px_var(--color-stroke-soft-100)] dark:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-stroke-soft-100)_40%,transparent)]",
+					href &&
+						"cursor-pointer hover:border-black hover:bg-black/[0.02] hover:shadow-none dark:hover:border-white dark:hover:bg-white/[0.02] dark:hover:shadow-none",
+					"dark:bg-zinc-950",
+					className,
+				)}
+				{...props}
+			>
+				{icon &&
+					(noIconFrame ? (
+						<div className="text-text-sub-600 group-hover:text-text-strong-950 dark:group-hover:text-white">
+							{typeof icon === "string" ? (
+								<ReloopIcon name={icon} className="size-4" />
+							) : (
+								icon
+							)}
+						</div>
+					) : (
+						<div className="flex size-9 items-center justify-center rounded-lg border border-stroke-soft-100 text-text-sub-600 group-hover:text-text-strong-950 dark:border-stroke-soft-100/40 dark:group-hover:text-white">
+							{typeof icon === "string" ? (
+								<ReloopIcon name={icon} className="size-4" />
+							) : (
+								icon
+							)}
+						</div>
+					))}
+				{title && (
+					<h3 className="m-0 font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
+						{title}
+					</h3>
+				)}
+				{children && (
+					<div className="text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/60 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
+						{children}
 					</div>
-				) : (
-					<div className="flex size-9 items-center justify-center rounded-lg border border-stroke-soft-100 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:border-stroke-soft-100/40 dark:group-hover:text-white">
-						{typeof icon === "string" ? (
-							<ReloopIcon name={icon} className="size-4" />
-						) : (
-							icon
-						)}
-					</div>
-				)
-			)}
-			{title && (
-				<h3 className="m-0 font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
-					{title}
-				</h3>
-			)}
-			{children && (
-				<div className="text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/60 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
-					{children}
-				</div>
-			)}
-		</div>
-	);
-
-	if (href) {
-		return (
-			<Link href={href} onClick={onClick} className="no-underline not-prose">
-				{content}
-			</Link>
+				)}
+			</div>
 		);
-	}
 
-	return content;
-});
+		if (href) {
+			return (
+				<Link href={href} onClick={onClick} className="not-prose no-underline">
+					{content}
+				</Link>
+			);
+		}
+
+		return content;
+	},
+);
 Card.displayName = "Card";
 
 export function Icon({
