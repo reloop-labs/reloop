@@ -25,9 +25,9 @@ export function DomainPage() {
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
 	const { data: billing } = useBillingUsage();
 	const atDomainCap =
-		(billing?.resources?.customDomains.limit ?? 1) > 0 &&
+		(billing?.resources?.customDomains.limit ?? 3) > 0 &&
 		(billing?.resources?.customDomains.used ?? 0) >=
-			(billing?.resources?.customDomains.limit ?? 1);
+			(billing?.resources?.customDomains.limit ?? 3);
 	const [statusFilters] = useQueryState(
 		"status",
 		parseAsArrayOf(parseAsString).withDefault([]),

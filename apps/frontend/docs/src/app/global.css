@@ -1,10 +1,13 @@
 @import "tailwindcss";
 @import "@reloop/tailwind/style.css";
 
+@plugin "@tailwindcss/typography";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-	--font-sans: var(--font-open-runde), ui-sans-serif, system-ui, sans-serif;
+	--font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, sans-serif;
 	--radius-xl: 0.75rem;
 	--radius-2xl: 1rem;
 
@@ -84,17 +87,6 @@ body {
 	width: 80px !important;
 	height: auto !important;
 	display: block;
-}
-
-/* Spacing fixes — prose container uses .prose, not article */
-.prose h2 {
-	margin-top: 2rem !important;
-	margin-bottom: 0.75rem !important;
-}
-
-.prose h3 {
-	margin-top: 1.5rem !important;
-	margin-bottom: 0.5rem !important;
 }
 
 /* Remove double-gap: h2 bottom + table-wrapper top = ~48px gap */

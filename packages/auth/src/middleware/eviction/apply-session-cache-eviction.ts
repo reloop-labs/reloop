@@ -11,5 +11,14 @@ export async function applySessionCacheEviction(
 		await evictSessionByToken(redis, event.sessionToken, event.userId);
 		return;
 	}
+	if (event.type === "organization-switch") {
+		if (event.userId) {
+			await evictAllSessionsForUser(redis, event.userId);
+		}
+		if (event.sessionToken) {
+			await evictSessionByToken(redis, event.sessionToken, event.userId);
+		}
+		return;
+	}
 	await evictAllSessionsForUser(redis, event.userId);
 }

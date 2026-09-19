@@ -72,7 +72,7 @@ export const getUsageController = async ({
 					and(
 						eq(domain.organizationId, organizationId),
 						isNull(domain.deletedAt),
-						eq(domain.isTrackingDomain, false),
+						eq(domain.isSendingEmailEnabled, true),
 					),
 				),
 			db

@@ -4,7 +4,6 @@ type SessionUser = {
 	email?: string | null;
 	name?: string | null;
 	image?: string | null;
-	activeOrganizationId?: string | null;
 };
 
 type SessionRecord = {
@@ -55,9 +54,7 @@ export async function fetchGetSession(
 	const user = body?.user;
 	if (!user?.id) return null;
 
-	// Prefer the Better Auth session field; fall back to the durable user preference.
-	const activeOrganizationId =
-		body?.session?.activeOrganizationId ?? user.activeOrganizationId ?? null;
+	const activeOrganizationId = body?.session?.activeOrganizationId ?? null;
 
 	return {
 		id: user.id,

@@ -1,6 +1,7 @@
 "use client";
 
 import { JAVA_ICON } from "@reloop/ui/icons/java";
+import { cn } from "@reloop/fe-docs/lib/cn";
 import type { SVGProps } from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import {
@@ -155,15 +156,33 @@ export function SimpleIcon({
 		// Rust brand hex is #000000 — use red so the gear is visible on dark UI
 		const resolvedHex = iconKey === "siRust" ? "e24d2b" : icon.hex;
 
+		// Near-black brand marks (Next.js, Express, Vercel…) vanish on dark UI —
+		// render in currentColor so they stay black in light mode, white in dark mode
+		const adaptiveMono = new Set([
+			"siNextdotjs",
+			"siExpress",
+			"siReadthedocs",
+			"siVercel",
+			"siCursor",
+			"siV0",
+			"siRailway",
+			"siWindsurf",
+			"siGhost",
+			"siDjango",
+		]).has(iconKey);
+
 		return (
 			<svg
 				role="img"
 				viewBox="0 0 24 24"
 				width={size}
 				height={size}
-				fill={color || `#${resolvedHex}`}
+				fill={color || (adaptiveMono ? "currentColor" : `#${resolvedHex}`)}
 				xmlns="http://www.w3.org/2000/svg"
-				className="size-6 shrink-0"
+				className={cn(
+					"size-6 shrink-0",
+					adaptiveMono && !color && "text-[#171717] dark:text-white",
+				)}
 				{...props}
 			>
 				<title>{icon.title}</title>

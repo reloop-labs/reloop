@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -436,6 +437,7 @@
         "@reloop/cache": "workspace:*",
         "@reloop/code-samples": "workspace:*",
         "@reloop/db": "workspace:*",
+        "@reloop/webhook-delivery": "workspace:*",
         "@types/nodemailer": "catalog:backend",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",
@@ -496,6 +498,7 @@
         "@reloop/cache": "workspace:*",
         "@reloop/code-samples": "workspace:*",
         "@reloop/db": "workspace:*",
+        "@reloop/webhook-delivery": "workspace:*",
         "ai": "catalog:backend",
         "better-auth": "catalog:",
         "dotenv": "catalog:backend",
@@ -537,6 +540,7 @@
         "@reloop/cache": "workspace:*",
         "@reloop/code-samples": "workspace:*",
         "@reloop/email-validation": "workspace:*",
+        "@reloop/webhook-delivery": "workspace:*",
         "dotenv": "catalog:backend",
         "elysia": "catalog:backend",
         "evlog": "catalog:backend",
@@ -853,6 +857,7 @@
       },
       "devDependencies": {
         "@tailwindcss/postcss": "catalog:ui",
+        "@tailwindcss/typography": "catalog:ui",
         "@types/js-yaml": "catalog:ui",
         "@types/mdx": "catalog:ui",
         "@types/node": "catalog:",
@@ -1281,6 +1286,7 @@
       "@responsive-email/react-email": "0.0.4",
       "@swc/helpers": "0.5.21",
       "@tailwindcss/postcss": "4.1.11",
+      "@tailwindcss/typography": "0.5.20",
       "@takumi-rs/image-response": "0.73.1",
       "@tanstack/react-table": "8.21.3",
       "@tiptap/core": "^3.22.5",

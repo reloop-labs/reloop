@@ -269,11 +269,8 @@ export default async function Page(props: {
 	const MDXContent = page.data.body;
 	const isFullWidth = page.data.full === true;
 	const isApiPage = !!page.data._apiData;
-	const isDocsHome =
-		!params.slug?.length ||
-		params.slug[0] === "introduction" ||
-		page.url === "/introduction" ||
-		page.url === "/";
+	// Custom landing pages opt in via `home: true` frontmatter (renders <DocsHome /> with no title row or TOC)
+	const isDocsHome = (page.data as any).home === true;
 
 	const _slugPath = params.slug?.join("/") || "index";
 
@@ -313,7 +310,11 @@ export default async function Page(props: {
 			>
 				<div
 					className={`relative w-full flex-col ${
-						hideToc ? "max-w-none" : "w-full xl:grid xl:grid-cols-[1fr_260px]"
+						isDocsHome
+							? "mx-auto w-full max-w-6xl"
+							: hideToc
+								? "max-w-none"
+								: "w-full xl:grid xl:grid-cols-[minmax(0,1fr)_260px]"
 					}`}
 				>
 					{/* Agent discovery — top of main content, outside nav */}
@@ -341,13 +342,18 @@ export default async function Page(props: {
 									: hideToc
 										? isApiPage
 											? "min-w-0"
-											: ""
-										: "mx-auto max-w-[680px]"
+											: "mx-auto w-full max-w-3xl"
+										: "mx-auto w-full max-w-[680px]"
 							}
 						>
 							{/* Title row — hidden on docs home (custom hero owns the H1) */}
 							{!isDocsHome && (
 								<div className="mb-8">
+									{(page.data as any).eyebrow && (
+										<p className="mb-2 text-[15px] text-text-sub-600">
+											{(page.data as any).eyebrow}
+										</p>
+									)}
 									<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
 										<h1 className="min-w-0 font-semibold text-2xl text-fd-foreground leading-snug tracking-[-0.03em] sm:text-3xl sm:leading-tight">
 											{page.data.title}
@@ -406,10 +412,10 @@ export default async function Page(props: {
 						)}
 					</div>
 
-					{/* Right sidebar - Table of Contents (hidden on full-width API pages) */}
+					{/* Right sidebar - Table of Contents, snug beside content, no divider */}
 					{!hideToc && (
-						<aside className="hidden border-stroke-soft-100 border-l xl:block dark:border-stroke-soft-100/40">
-							<div className="scrollbar-thin sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-6 pl-6 [scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin] md:pr-10">
+						<aside className="hidden min-w-0 xl:block">
+							<div className="scrollbar-thin sticky top-0 h-[calc(100vh-3rem)] overflow-y-auto pt-8 pr-2 [scrollbar-color:--alpha(var(--foreground)/20%)_transparent] [scrollbar-width:thin]">
 								<TableOfContents items={page.data.toc as TOCItem[]} />
 							</div>
 						</aside>

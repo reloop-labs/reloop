@@ -81,7 +81,7 @@ export const organizationPlan = pgTable(
 		overageEnabled: boolean("overage_enabled").notNull().default(false),
 		maxAgentInboxes: integer("max_agent_inboxes").notNull().default(1),
 		maxWebhooks: integer("max_webhooks").notNull().default(1),
-		maxCustomDomains: integer("max_custom_domains").notNull().default(1),
+		maxCustomDomains: integer("max_custom_domains").notNull().default(3),
 		maxAttachmentBytes: integer("max_attachment_bytes")
 			.notNull()
 			.default(1048576),

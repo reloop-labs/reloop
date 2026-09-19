@@ -19,7 +19,7 @@
   - 100 emails / day
   - 1 agent inbox
   - 1 webhook
-  - 1 custom domain
+  - 3 custom domains
   - 1 MB attachments
   - Data retention (45 days)
   - Community support

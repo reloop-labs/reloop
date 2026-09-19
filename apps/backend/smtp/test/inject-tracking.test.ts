@@ -9,7 +9,10 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { simpleParser } from "mailparser";
-import { decodeTrackingToken } from "../../mail/src/lib/crypto";
+import {
+	decodeTrackingToken,
+	encodeTrackingToken,
+} from "../../mail/src/lib/crypto";
 
 const TRACKING_SECRET = "test_tracking_secret";
 const TRACKING_BASE_URL = "https://link.reloop.test";
@@ -134,6 +137,7 @@ const fixtures: Record<string, string> = {
 };
 
 let results: Record<string, string>;
+let parityTokens: { tracked: string; untracked: string };
 
 function mimeSegments(raw: string, boundary: string): string[] {
 	return raw.split(`--${boundary}`).slice(1, -1);
@@ -201,12 +205,41 @@ beforeAll(() => {
 			);
 		}
 		results = JSON.parse(line.slice("INJECT_TRACKING_RESULTS ".length));
+		const parityLine = stdout
+			.split("\n")
+			.find((output) => output.startsWith("TOKEN_PARITY "));
+		parityTokens = JSON.parse(
+			(parityLine ?? "TOKEN_PARITY {}").slice("TOKEN_PARITY ".length),
+		);
 	} finally {
 		rmSync(dir, { recursive: true, force: true });
 	}
 }, 300_000);
 
 describe("inject_tracking in KumoMTA", () => {
+	test("lua and typescript sign tracked and untracked links the same way", () => {
+		const signature = (token: string) =>
+			JSON.parse(Buffer.from(token, "base64url").toString()).s;
+		const url = "https://example.com/a";
+
+		expect(
+			decodeTrackingToken(parityTokens.tracked, TRACKING_SECRET),
+		).toMatchObject({ id: "log_test_1", url });
+		expect(
+			decodeTrackingToken(parityTokens.untracked, TRACKING_SECRET),
+		).toMatchObject({ id: "log_test_1", url, nt: 1 });
+		expect(signature(parityTokens.tracked)).toBe(
+			signature(
+				encodeTrackingToken({ id: "log_test_1", url }, TRACKING_SECRET),
+			),
+		);
+		expect(signature(parityTokens.untracked)).toBe(
+			signature(
+				encodeTrackingToken({ id: "log_test_1", url, nt: 1 }, TRACKING_SECRET),
+			),
+		);
+	});
+
 	test("fixtures exercise the cases that used to break", () => {
 		expect(fixtures.pythonBoundary).toContain(
 			"==\r\n\r\n--===============111==",

@@ -38,17 +38,6 @@ export function getMailTrackOpenUrl(token: string): string {
 	return `${getMailApiBaseUrl()}/v1/track/open/${encodeURIComponent(token)}`;
 }
 
-/** Best-effort destination from a tracking token when the mail API is down. */
-export function decodeDestinationFromToken(token: string): string | null {
-	try {
-		const json = Buffer.from(token, "base64url").toString("utf-8");
-		const payload = JSON.parse(json) as { url?: string };
-		return payload.url ?? null;
-	} catch {
-		return null;
-	}
-}
-
 /**
  * Record a click through this app's public Next API
  * (`NEXT_PUBLIC_URL/api/mail/v1/track/click/...`), which proxies to mail.
@@ -56,7 +45,7 @@ export function decodeDestinationFromToken(token: string): string | null {
 export async function resolveClickDestination(
 	token: string,
 ): Promise<string | null> {
-	let destination = decodeDestinationFromToken(token);
+	let destination: string | null = null;
 
 	try {
 		const res = await fetch(getPublicTrackClickUrl(token), {
@@ -77,7 +66,7 @@ export async function resolveClickDestination(
 			}
 		}
 	} catch {
-		// Fall through to token-decoded destination.
+		return null;
 	}
 
 	return destination;

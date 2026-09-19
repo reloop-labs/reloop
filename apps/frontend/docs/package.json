@@ -54,6 +54,7 @@
 		"@types/js-yaml": "catalog:ui",
 		"@types/mdx": "catalog:ui",
 		"@tailwindcss/postcss": "catalog:ui",
+		"@tailwindcss/typography": "catalog:ui",
 		"tailwindcss": "catalog:ui",
 		"postcss": "catalog:ui"
 	}

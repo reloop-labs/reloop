@@ -114,7 +114,7 @@ If a send fails due to a temporary issue (rate limit, provider timeout), retry w
 - Attempt 3: 5 minutes
 - Attempt 4: give up and alert
 
-But never retry a hard bounce (invalid address, domain doesn't exist). Hard bounces are permanent. Re-sending damages your reputation. Reloop's bounce processing handles this automatically — addresses that hard bounce are suppressed and never re-sent to.
+But never retry a hard bounce (invalid address, domain doesn't exist). Hard bounces are permanent. Re-sending damages your reputation. Reloop's bounce processing handles this automatically — addresses that hard bounce are suppressed and never re-sent to. To reduce hard bounces upstream, verify addresses at collection with a [free email validator](/tools/email-validator) (syntax, disposable domains, and MX checks) before they hit your transactional send queue.
 
 ---
 
@@ -183,7 +183,7 @@ was delivered successfully. <a href="/logs/abc123">View delivery details →</a>
 
 Sending to an address that has previously hard bounced is one of the fastest ways to damage your sender reputation. Reloop maintains a suppression list automatically — addresses that hard bounce or mark your email as spam are added and never re-sent to.
 
-If you're managing email sends outside of Reloop, implement your own suppression list and check it before every send.
+If you're managing email sends outside of Reloop, implement your own suppression list and check it before every send. For imported or legacy lists, run a [bulk email verifier](/tools/email-validator) first so you suppress (or remove) undeliverable addresses before the first transactional send.
 
 ### Handle unsubscribes for every email type
 

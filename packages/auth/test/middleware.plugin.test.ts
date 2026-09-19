@@ -195,6 +195,9 @@ beforeAll(async () => {
 					image: session.image ?? null,
 					activeOrganizationId: session.activeOrganizationId ?? null,
 				},
+				session: {
+					activeOrganizationId: session.activeOrganizationId ?? null,
+				},
 			};
 		},
 	);

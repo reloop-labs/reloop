@@ -1,6 +1,8 @@
 import { workflowQueue } from "@be/workflow/queues/workflow.queue";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { workbench } from "@getworkbench/elysia";
+import { Elysia } from "elysia";
+import { log } from "evlog";
 
 /** Public URL path (includes service prefix) — used for base href + alert links. */
 export const WORKBENCH_PATH = "/api/workflow/jobs";
@@ -17,14 +19,25 @@ const auth =
  * BullMQ Workbench dashboard, mounted on the same Redis + queue as the worker.
  * Visit: {BASE_URL}/api/workflow/jobs  (or http://localhost:8017/api/workflow/jobs)
  */
-export const workbenchApp = workbench({
-	queues: [workflowQueue],
-	basePath: WORKBENCH_PATH,
-	title: "Reloop · Workflow",
-	// Filterable fields from WorkflowJobData
-	tags: ["type", "organizationId", "workflowId"],
-	auth,
-	alerts: {
-		dashboardUrl: `${workflowConfig.BASE_URL}${WORKBENCH_PATH}`,
-	},
-});
+function buildWorkbenchApp() {
+	if (!auth && workflowConfig.NODE_ENV !== "development") {
+		log.warn(
+			"workbench",
+			"WORKBENCH_USER/WORKBENCH_PASS are not set; the Workbench dashboard is disabled",
+		);
+		return new Elysia().all("*", () => new Response("Not found", { status: 404 }));
+	}
+	return workbench({
+		queues: [workflowQueue],
+		basePath: WORKBENCH_PATH,
+		title: "Reloop · Workflow",
+		// Filterable fields from WorkflowJobData
+		tags: ["type", "organizationId", "workflowId"],
+		auth,
+		alerts: {
+			dashboardUrl: `${workflowConfig.BASE_URL}${WORKBENCH_PATH}`,
+		},
+	});
+}
+
+export const workbenchApp = buildWorkbenchApp();

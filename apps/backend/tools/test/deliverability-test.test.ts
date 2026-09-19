@@ -1,6 +1,10 @@
 import { describe, expect, it, mock } from "bun:test";
+import type { PinnedTransport } from "@reloop/webhook-delivery";
 import { checkBody } from "../src/routes/tools/deliverability-test/analyzer/check-body";
-import { checkLinks } from "../src/routes/tools/deliverability-test/analyzer/check-links";
+import {
+	checkLinks,
+	probeUrl,
+} from "../src/routes/tools/deliverability-test/analyzer/check-links";
 import { checkRspamdAndContent } from "../src/routes/tools/deliverability-test/analyzer/check-rspamd";
 import { parseMime } from "../src/routes/tools/deliverability-test/analyzer/parse-mime";
 import { computeDeliverabilityScore } from "../src/routes/tools/deliverability-test/analyzer/score";
@@ -361,4 +365,68 @@ Email six`;
 			globalThis.fetch = originalFetch;
 		}
 	}, 15_000);
+});
+
+const okResult = (status: number) => ({
+	status,
+	headers: {},
+	body: "",
+	bodyBuffer: Buffer.alloc(0),
+	durationMs: 1,
+	resolved: {
+		hostname: "1.1.1.1",
+		pinnedIp: "1.1.1.1",
+		allIps: ["1.1.1.1"],
+		family: 4 as const,
+	},
+});
+
+describe("probeUrl", () => {
+	it("refuses to probe private, loopback and metadata hosts", async () => {
+		const calls: string[] = [];
+		const transport: PinnedTransport = async (input) => {
+			calls.push(input.url);
+			return okResult(200);
+		};
+		for (const url of [
+			"http://169.254.169.254/latest/meta-data/",
+			"http://10.0.0.5:6379/",
+			"http://127.0.0.1:8017/api/workflow/jobs",
+			"http://localhost/",
+			"http://[fd00::1]/",
+		]) {
+			expect(await probeUrl(url, transport)).toEqual({
+				status: null,
+				ok: false,
+				error: "Blocked destination",
+			});
+		}
+		expect(calls).toEqual([]);
+	});
+
+	it("uses the pinned client, which blocks a hostname resolving to a private address", async () => {
+		expect(await probeUrl("http://10.0.0.5:6379/")).toEqual({
+			status: null,
+			ok: false,
+			error: "Blocked destination",
+		});
+	});
+
+	it("does not follow redirects and never echoes raw errors", async () => {
+		const redirecting: PinnedTransport = async () => okResult(302);
+		expect(await probeUrl("http://1.1.1.1/a", redirecting)).toEqual({
+			status: 302,
+			ok: true,
+		});
+		const failing: PinnedTransport = async () => {
+			throw Object.assign(new Error("ECONNREFUSED 10.0.0.5:6379"), {
+				kind: "network",
+			});
+		};
+		expect(await probeUrl("http://1.1.1.1/b", failing)).toEqual({
+			status: null,
+			ok: false,
+			error: "Connection failed",
+		});
+	});
 });
