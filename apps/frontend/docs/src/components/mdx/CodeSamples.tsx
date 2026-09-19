@@ -99,6 +99,7 @@ export function CodeSamples({ samples }: { samples: LearnCodeSample[] }) {
 				onTabChange={setActiveTab}
 				noScroll={false}
 				codeExtraPadding
+				bareCode
 			/>
 		</div>
 	);

@@ -247,6 +247,7 @@ export const CodeGroup = React.forwardRef<
 				tabs={tabs}
 				activeTab={resolvedActiveTab}
 				onTabChange={setActiveTabId}
+				bareCode
 			/>
 		</div>
 	);
@@ -300,6 +301,7 @@ export const CodeBlock = React.forwardRef<
 				lang={lang}
 				label={title.toUpperCase()}
 				si={si}
+				bareCode
 			/>
 		</div>
 	);

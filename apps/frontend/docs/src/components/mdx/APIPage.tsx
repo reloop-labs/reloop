@@ -625,6 +625,7 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 			noScroll={false}
 			maxHeight="340px"
 			codeExtraPadding
+			bareCode
 		/>
 	);
 }
@@ -756,6 +757,7 @@ print(response.json())`;
 			onTabChange={setActiveTab}
 			noScroll={false}
 			codeExtraPadding
+			bareCode
 		/>
 	);
 }
