@@ -84,6 +84,7 @@ export function AuthCard({
 	/** Step direction from useAuthStepDirection — footer slides with the card body. */
 	direction = 1,
 	showBrandMark = true,
+	headerAside,
 }: {
 	children: ReactNode;
 	/** Soft outer-shell footer (e.g. "Already have an account?"). */
@@ -93,6 +94,7 @@ export function AuthCard({
 	direction?: number;
 	/** Gray two-layer logo tile above step content (default true). */
 	showBrandMark?: boolean;
+	headerAside?: ReactNode;
 }) {
 	return (
 		<div className="w-full font-sans">
@@ -101,18 +103,21 @@ export function AuthCard({
 				{/* White panel height-animates alone */}
 				<AnimatedHeight>
 					<div className="space-y-6 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-5 pt-5 pb-6 sm:px-6 sm:pb-7 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-						{showBrandMark ? (
-							// Plain <a> so we leave /dashboard basePath and hit the marketing site root.
-							<a
-								href="/home"
-								aria-label="Reloop home"
-								className="block w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 transition-opacity hover:opacity-80 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
-							>
-								<div className="m-px flex size-11 items-center justify-center rounded-[14px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-									<Logo className="h-10 w-10" />
-								</div>
-							</a>
-						) : null}
+						<div className="flex items-center justify-between gap-4 empty:hidden">
+							{showBrandMark ? (
+								// Plain <a> so we leave /dashboard basePath and hit the marketing site root.
+								<a
+									href="/home"
+									aria-label="Reloop home"
+									className="block w-fit overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 transition-opacity hover:opacity-80 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
+								>
+									<div className="m-px flex size-11 items-center justify-center rounded-[14px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+										<Logo className="h-10 w-10" />
+									</div>
+								</a>
+							) : null}
+							{headerAside}
+						</div>
 
 						{children}
 					</div>

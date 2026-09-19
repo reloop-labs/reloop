@@ -12,38 +12,39 @@ import {
 	userDisplayNamePartsTooLong,
 	userNamePartMaxLengthMessage,
 } from "@reloop/auth/user-name-limits";
-import * as Checkbox from "@reloop/ui/checkbox";
+import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import Spinner from "@reloop/ui/spinner";
+import * as Switch from "@reloop/ui/switch";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 import { Controller, type Resolver, useForm, useWatch } from "react-hook-form";
 import * as v from "valibot";
+import { AuthCardHeader } from "#/features/auth/auth-card";
+import { authStepVariants } from "#/features/auth/auth-shell";
 import { clearClientAuthState } from "#/features/auth/session-query";
 import { toastApiError } from "#/lib/rate-limit-toast";
 import { completeSetup, SetupRequestError } from "./setup-api";
 
-export const SETUP_FORM_ID = "selfhost-setup-form";
-
 export const PASSWORD_MIN_LENGTH = 8;
 export { APP_NAME_MAX_LENGTH };
-
-export type SetupUiState = {
-	canSubmit: boolean;
-	isLoading: boolean;
-	isSuccess: boolean;
-};
 
 const filled = (message: string) =>
 	v.check((value: string) => value.trim().length > 0, message);
 
-const setupSchema = v.object({
+const keyEntries = {
 	adminKey: v.pipe(
 		v.string("Setup key is required"),
 		filled("Setup key is required"),
 	),
+};
+
+const accountEntries = {
 	name: v.pipe(
 		v.string("Name is required"),
 		filled("Name is required"),
@@ -64,6 +65,9 @@ const setupSchema = v.object({
 			`Password must be at least ${PASSWORD_MIN_LENGTH} characters`,
 		),
 	),
+};
+
+const instanceEntries = {
 	organizationName: v.pipe(
 		v.string(),
 		v.check(
@@ -79,38 +83,87 @@ const setupSchema = v.object({
 		),
 	),
 	disableSignup: v.boolean(),
+};
+
+const setupSchema = v.object({
+	...keyEntries,
+	...accountEntries,
+	...instanceEntries,
 });
 
 type SetupFormData = v.InferInput<typeof setupSchema>;
 
-function FieldLabel({
-	htmlFor,
-	children,
+export const SETUP_STEPS = [
+	{
+		title: "Unlock setup",
+		description: "Paste the key the installer printed.",
+		schema: v.object(keyEntries),
+		firstField: "adminKey",
+	},
+	{
+		title: "Create the admin account",
+		description: "You will sign in with this email and password.",
+		schema: v.object(accountEntries),
+		firstField: "name",
+	},
+	{
+		title: "Name your instance",
+		description: "Both names are optional. Decide who can join.",
+		schema: v.object(instanceEntries),
+		firstField: "organizationName",
+	},
+] as const;
+
+const LAST_STEP = SETUP_STEPS.length - 1;
+
+function Field({
+	id,
+	label,
 	optional = false,
+	error,
+	hint,
+	children,
 }: {
-	htmlFor: string;
-	children: string;
+	id: string;
+	label: string;
 	optional?: boolean;
+	error?: string;
+	hint?: ReactNode;
+	children: ReactNode;
 }) {
 	return (
-		<label
-			htmlFor={htmlFor}
-			className="flex items-center justify-between gap-2 font-medium text-[13px] text-text-strong-950"
-		>
-			{children}
-			{optional ? (
-				<span className="font-normal text-[12px] text-text-soft-400">
-					Optional
-				</span>
+		<div className="flex flex-col gap-1.5">
+			<label
+				htmlFor={id}
+				className="flex items-center justify-between gap-2 font-medium text-[13px] text-text-strong-950"
+			>
+				{label}
+				{optional ? (
+					<span className="font-normal text-[12px] text-text-soft-400">
+						Optional
+					</span>
+				) : null}
+			</label>
+			<Input.Root hasError={!!error} className="rounded-xl!">
+				<Input.Wrapper>{children}</Input.Wrapper>
+			</Input.Root>
+			{error ? (
+				<p className="text-error-base text-sm">{error}</p>
+			) : hint ? (
+				<p className="text-[12px] text-text-soft-400 leading-relaxed">{hint}</p>
 			) : null}
-		</label>
+		</div>
 	);
 }
 
 export function SetupForm({
-	onUiStateChange,
+	step,
+	direction,
+	onStepChange,
 }: {
-	onUiStateChange?: (state: SetupUiState) => void;
+	step: number;
+	direction: number;
+	onStepChange: (step: number) => void;
 }) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -123,7 +176,7 @@ export function SetupForm({
 		register,
 		handleSubmit,
 		setError,
-		formState: { errors, isValid },
+		formState: { errors },
 	} = useForm<SetupFormData>({
 		resolver: valibotResolver(setupSchema) as Resolver<SetupFormData>,
 		mode: "onChange",
@@ -138,18 +191,17 @@ export function SetupForm({
 		},
 	});
 
-	const disableSignup = useWatch({ control, name: "disableSignup" });
+	const values = useWatch({ control });
+	const current = SETUP_STEPS[step] ?? SETUP_STEPS[0];
+	const isLastStep = step === LAST_STEP;
 
 	const isLoading = status === "loading";
-	const canSubmit = isValid && !isLoading && !isSuccess;
 	const isBusy = isLoading || isSuccess;
-
-	const onUiStateChangeRef = useRef(onUiStateChange);
-	onUiStateChangeRef.current = onUiStateChange;
+	const canContinue = !isBusy && v.safeParse(current.schema, values).success;
 
 	useEffect(() => {
-		onUiStateChangeRef.current?.({ canSubmit, isLoading, isSuccess });
-	}, [canSubmit, isLoading, isSuccess]);
+		document.getElementById(current.firstField)?.focus({ preventScroll: true });
+	}, [current.firstField]);
 
 	const onSubmit = async (data: SetupFormData) => {
 		try {
@@ -173,6 +225,7 @@ export function SetupForm({
 
 			if (error instanceof SetupRequestError && error.status === 403) {
 				setError("adminKey", { type: "server", message: error.message });
+				onStepChange(0);
 				return;
 			}
 
@@ -186,213 +239,271 @@ export function SetupForm({
 		}
 	};
 
+	const onFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+		if (isLastStep) return handleSubmit(onSubmit)(event);
+		event.preventDefault();
+		if (canContinue) onStepChange(step + 1);
+	};
+
+	const inputClassName = "h-11 font-medium text-base";
+
 	return (
-		<form
-			id={SETUP_FORM_ID}
-			onSubmit={handleSubmit(onSubmit)}
-			className="flex flex-col gap-4"
-		>
-			<div className="flex flex-col gap-1.5">
-				<FieldLabel htmlFor="adminKey">Setup key</FieldLabel>
-				<Input.Root hasError={!!errors.adminKey} className="rounded-xl!">
-					<Input.Wrapper>
-						<Input.Input
-							className="h-11 font-mono text-base"
-							id="adminKey"
-							type="text"
-							autoComplete="off"
-							spellCheck={false}
-							placeholder="Printed by the installer"
-							disabled={isBusy}
-							{...register("adminKey")}
+		<form onSubmit={onFormSubmit} noValidate>
+			<div className="relative">
+				<AnimatePresence mode="sync" custom={direction} initial={false}>
+					<motion.div
+						key={step}
+						custom={direction}
+						variants={authStepVariants}
+						initial="initial"
+						animate="animate"
+						exit="exit"
+						transition={{ duration: 0.28, ease: [0.23, 1, 0.32, 1] }}
+						className="w-full space-y-6"
+					>
+						<AuthCardHeader
+							title={current.title}
+							description={current.description}
 						/>
-					</Input.Wrapper>
-				</Input.Root>
-				{errors.adminKey ? (
-					<p className="text-error-base text-sm">{errors.adminKey.message}</p>
-				) : (
-					<p className="text-[12px] text-text-soft-400">
-						Also saved to admin-setup.key in your install directory.
-					</p>
-				)}
+
+						<div className="flex flex-col gap-4">
+							{step === 0 ? (
+								<Field
+									id="adminKey"
+									label="Setup key"
+									error={errors.adminKey?.message}
+									hint={
+										<>
+											Lost it? Read{" "}
+											<code className="rounded-md bg-bg-weak-50 px-1 py-0.5 font-mono text-[11px] text-text-sub-600 dark:bg-white/[0.06]">
+												admin-setup.key
+											</code>{" "}
+											in your install directory.
+										</>
+									}
+								>
+									<Icon
+										name="key-new"
+										className="size-5 shrink-0 text-text-soft-400"
+									/>
+									<Input.Input
+										className="h-11 font-mono text-base placeholder:font-sans"
+										id="adminKey"
+										type="text"
+										autoComplete="off"
+										spellCheck={false}
+										placeholder="Printed by the installer"
+										disabled={isBusy}
+										{...register("adminKey")}
+									/>
+								</Field>
+							) : null}
+
+							{step === 1 ? (
+								<>
+									<Field
+										id="name"
+										label="Your name"
+										error={errors.name?.message}
+									>
+										<Input.Input
+											className={inputClassName}
+											id="name"
+											type="text"
+											autoComplete="name"
+											maxLength={USER_NAME_PART_MAX_LENGTH * 2}
+											placeholder="Steve Jobs"
+											disabled={isBusy}
+											{...register("name")}
+										/>
+									</Field>
+									<Field id="email" label="Email" error={errors.email?.message}>
+										<Input.Input
+											className={inputClassName}
+											id="email"
+											type="email"
+											autoComplete="email"
+											placeholder="steve@apple.com"
+											disabled={isBusy}
+											{...register("email")}
+										/>
+									</Field>
+									<Field
+										id="password"
+										label="Password"
+										error={errors.password?.message}
+									>
+										<Input.Input
+											className={inputClassName}
+											id="password"
+											type={showPassword ? "text" : "password"}
+											autoComplete="new-password"
+											placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`}
+											disabled={isBusy}
+											{...register("password")}
+										/>
+										<button
+											type="button"
+											onClick={() => setShowPassword((previous) => !previous)}
+											disabled={isBusy}
+											aria-label={
+												showPassword ? "Hide password" : "Show password"
+											}
+											className="flex size-5 shrink-0 items-center justify-center rounded-md text-text-soft-400 transition-colors hover:text-text-strong-950 disabled:text-text-disabled-300"
+										>
+											<Icon
+												name={
+													showPassword ? "eye-slash-outline" : "eye-outline"
+												}
+												className="size-5"
+											/>
+										</button>
+									</Field>
+								</>
+							) : null}
+
+							{step === 2 ? (
+								<>
+									<Field
+										id="organizationName"
+										label="Organization"
+										optional
+										error={errors.organizationName?.message}
+										hint="Leave empty to create your first organization later."
+									>
+										<Input.Input
+											className={inputClassName}
+											id="organizationName"
+											type="text"
+											maxLength={ORGANIZATION_NAME_MAX_LENGTH}
+											placeholder="Apple"
+											disabled={isBusy}
+											{...register("organizationName")}
+										/>
+									</Field>
+									<Field
+										id="appName"
+										label="Instance name"
+										optional
+										error={errors.appName?.message}
+										hint="Shown in system emails after a restart. Defaults to Reloop."
+									>
+										<Input.Input
+											className={inputClassName}
+											id="appName"
+											type="text"
+											maxLength={APP_NAME_MAX_LENGTH}
+											placeholder="Reloop"
+											disabled={isBusy}
+											{...register("appName")}
+										/>
+									</Field>
+
+									<label
+										htmlFor="allowSignup"
+										className="flex cursor-pointer select-none items-start justify-between gap-4 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 px-3.5 py-3 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
+									>
+										<span className="flex flex-col gap-0.5">
+											<span className="font-medium text-[13px] text-text-strong-950">
+												Allow public sign-ups
+											</span>
+											<span className="text-[12px] text-text-sub-600 leading-relaxed">
+												Keep this off so only people you invite can join.
+											</span>
+										</span>
+										<Controller
+											name="disableSignup"
+											control={control}
+											render={({ field }) => (
+												<Switch.Root
+													id="allowSignup"
+													checked={!field.value}
+													onCheckedChange={(allowed) =>
+														field.onChange(!allowed)
+													}
+													disabled={isBusy}
+												/>
+											)}
+										/>
+									</label>
+
+									{values.disableSignup ? null : (
+										<output className="flex items-start gap-2.5 rounded-xl border border-warning-base/25 bg-warning-lighter px-3.5 py-3 text-[12px] text-text-sub-600 leading-relaxed dark:border-warning-base/30 dark:bg-warning-base/10">
+											<Icon
+												name="alert-triangle"
+												className="mt-px size-4 shrink-0 text-warning-base"
+											/>
+											<span>
+												Sign-ups stay open: anyone who can reach this URL can
+												create an account. You can close them later in the
+												instance settings.
+											</span>
+										</output>
+									)}
+								</>
+							) : null}
+						</div>
+					</motion.div>
+				</AnimatePresence>
 			</div>
 
-			<div className="flex flex-col gap-1.5">
-				<FieldLabel htmlFor="name">Your name</FieldLabel>
-				<Input.Root hasError={!!errors.name} className="rounded-xl!">
-					<Input.Wrapper>
-						<Input.Input
-							className="h-11 font-medium text-base"
-							id="name"
-							type="text"
-							autoComplete="name"
-							maxLength={USER_NAME_PART_MAX_LENGTH * 2}
-							placeholder="Steve Jobs"
-							disabled={isBusy}
-							{...register("name")}
-						/>
-					</Input.Wrapper>
-				</Input.Root>
-				{errors.name && (
-					<p className="text-error-base text-sm">{errors.name.message}</p>
-				)}
-			</div>
-
-			<div className="flex flex-col gap-1.5">
-				<FieldLabel htmlFor="email">Email</FieldLabel>
-				<Input.Root hasError={!!errors.email} className="rounded-xl!">
-					<Input.Wrapper>
-						<Input.Input
-							className="h-11 font-medium text-base"
-							id="email"
-							type="email"
-							autoComplete="email"
-							placeholder="steve@apple.com"
-							disabled={isBusy}
-							{...register("email")}
-						/>
-					</Input.Wrapper>
-				</Input.Root>
-				{errors.email && (
-					<p className="text-error-base text-sm">{errors.email.message}</p>
-				)}
-			</div>
-
-			<div className="flex flex-col gap-1.5">
-				<FieldLabel htmlFor="password">Password</FieldLabel>
-				<Input.Root hasError={!!errors.password} className="rounded-xl!">
-					<Input.Wrapper>
-						<Input.Input
-							className="h-11 font-medium text-base"
-							id="password"
-							type={showPassword ? "text" : "password"}
-							autoComplete="new-password"
-							placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`}
-							disabled={isBusy}
-							{...register("password")}
-						/>
-						<button
-							type="button"
-							onClick={() => setShowPassword((previous) => !previous)}
-							disabled={isBusy}
-							aria-label={showPassword ? "Hide password" : "Show password"}
-							className="flex size-5 shrink-0 items-center justify-center rounded-md text-text-soft-400 transition-colors hover:text-text-strong-950 disabled:text-text-disabled-300"
-						>
-							<Icon
-								name={showPassword ? "eye-slash-outline" : "eye-outline"}
-								className="size-5"
-							/>
-						</button>
-					</Input.Wrapper>
-				</Input.Root>
-				{errors.password && (
-					<p className="text-error-base text-sm">{errors.password.message}</p>
-				)}
-			</div>
-
-			<div
-				className="border-stroke-soft-200 border-t border-dashed pt-1 dark:border-stroke-soft-100/40"
-				aria-hidden
-			/>
-
-			<div className="flex flex-col gap-1.5">
-				<FieldLabel htmlFor="organizationName" optional>
-					Organization
-				</FieldLabel>
-				<Input.Root
-					hasError={!!errors.organizationName}
-					className="rounded-xl!"
+			<div className="mt-6 flex gap-2">
+				{step > 0 ? (
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						onClick={() => onStepChange(step - 1)}
+						disabled={isBusy}
+						aria-label="Back"
+						className="size-11 shrink-0 rounded-xl"
+					>
+						<Button.Icon as={Icon} name="arrow-left" />
+					</Button.Root>
+				) : null}
+				<FancyButton.Root
+					type="submit"
+					variant={isSuccess ? "success" : "blue"}
+					size="medium"
+					disabled={!canContinue}
+					className={`h-11 min-w-0 flex-1 justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm transition-colors duration-200 ${
+						isSuccess ? "pointer-events-none cursor-default" : ""
+					}`}
 				>
-					<Input.Wrapper>
-						<Input.Input
-							className="h-11 font-medium text-base"
-							id="organizationName"
-							type="text"
-							maxLength={ORGANIZATION_NAME_MAX_LENGTH}
-							placeholder="Apple"
-							disabled={isBusy}
-							{...register("organizationName")}
-						/>
-					</Input.Wrapper>
-				</Input.Root>
-				{errors.organizationName ? (
-					<p className="text-error-base text-sm">
-						{errors.organizationName.message}
-					</p>
-				) : (
-					<p className="text-[12px] text-text-soft-400">
-						Leave empty to create your first organization later.
-					</p>
-				)}
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key={
+								isSuccess
+									? "success"
+									: isLoading
+										? "creating"
+										: isLastStep
+											? "create-admin"
+											: "continue"
+							}
+							transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+							initial={{ opacity: 0, y: -14 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 14 }}
+							className="flex items-center justify-center gap-1.5"
+						>
+							{isLoading && <Spinner size={14} color="currentColor" />}
+							{isSuccess && (
+								<Icon name="check-circle" className="h-4 w-4 shrink-0" />
+							)}
+							<span>
+								{isSuccess
+									? "Setup complete! Redirecting…"
+									: isLoading
+										? "Creating your account…"
+										: isLastStep
+											? "Create admin account"
+											: "Continue"}
+							</span>
+						</motion.span>
+					</AnimatePresence>
+				</FancyButton.Root>
 			</div>
-
-			<div className="flex flex-col gap-1.5">
-				<FieldLabel htmlFor="appName" optional>
-					Instance name
-				</FieldLabel>
-				<Input.Root hasError={!!errors.appName} className="rounded-xl!">
-					<Input.Wrapper>
-						<Input.Input
-							className="h-11 font-medium text-base"
-							id="appName"
-							type="text"
-							maxLength={APP_NAME_MAX_LENGTH}
-							placeholder="Reloop"
-							disabled={isBusy}
-							{...register("appName")}
-						/>
-					</Input.Wrapper>
-				</Input.Root>
-				{errors.appName ? (
-					<p className="text-error-base text-sm">{errors.appName.message}</p>
-				) : (
-					<p className="text-[12px] text-text-soft-400">
-						Used in system emails. Applies once the services restart. Defaults
-						to Reloop.
-					</p>
-				)}
-			</div>
-
-			<label
-				htmlFor="disableSignup"
-				className="flex cursor-pointer select-none items-start gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 px-3.5 py-3 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
-			>
-				<Controller
-					name="disableSignup"
-					control={control}
-					render={({ field }) => (
-						<Checkbox.Root
-							id="disableSignup"
-							variant="black"
-							checked={field.value}
-							onCheckedChange={field.onChange}
-							disabled={isBusy}
-							className="mt-0.5"
-						/>
-					)}
-				/>
-				<span className="flex flex-col gap-0.5">
-					<span className="font-medium text-[13px] text-text-strong-950">
-						Turn off public sign-ups
-					</span>
-					<span className="text-[12px] text-text-sub-600 leading-relaxed">
-						Only you can invite new people. Recommended for private instances.
-					</span>
-				</span>
-			</label>
-
-			{disableSignup ? null : (
-				<output className="flex items-start gap-2.5 rounded-xl border border-warning-base/25 bg-warning-lighter px-3.5 py-3 text-[12px] text-text-sub-600 leading-relaxed dark:border-warning-base/30 dark:bg-warning-base/10">
-					<Icon
-						name="alert-triangle"
-						className="mt-px size-4 shrink-0 text-warning-base"
-					/>
-					<span>
-						Sign-ups stay open: anyone who can reach this URL can create an
-						account. You can close them later in the instance settings.
-					</span>
-				</output>
-			)}
 		</form>
 	);
 }

@@ -4,7 +4,7 @@ import { pageMetadata } from "../../_lib/page-metadata";
 import { SetupPage } from "./client";
 
 export const metadata = pageMetadata(
-	"Setup | Reloop Dashboard",
+	"Setup",
 	"Create the first administrator account for this self-hosted Reloop instance.",
 );
 
