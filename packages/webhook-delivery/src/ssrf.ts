@@ -147,11 +147,16 @@ export async function resolvePublicTarget(
 		);
 	}
 
+	const pinned =
+		allowPrivate && results.some((r) => r.family === 4)
+			? (results.find((r) => r.family === 4) ?? first)
+			: first;
+
 	return {
 		hostname,
-		pinnedIp: first.address,
+		pinnedIp: pinned.address,
 		allIps: ips,
-		family: first.family === 6 ? 6 : 4,
+		family: pinned.family === 6 ? 6 : 4,
 	};
 }
 
