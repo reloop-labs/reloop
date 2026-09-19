@@ -1,7 +1,6 @@
 import { DocsHome } from "@reloop/fe-docs/components/docs/docs-home";
 import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
-import { HelpFooterLinks } from "@reloop/fe-docs/components/mdx/HelpFooterLinks";
 import {
 	DocImage,
 	MDXImage,
@@ -167,7 +166,6 @@ export function getMDXComponents(
 		PromptActions,
 		RelatedTopics,
 		RelatedTopic,
-		HelpFooterLinks,
 		SideBySide,
 		Side,
 		pre: (props: any) => {
