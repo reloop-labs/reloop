@@ -465,7 +465,7 @@ export const Card = React.forwardRef<
 		<div
 			ref={ref}
 			className={cn(
-				"group flex h-full flex-col gap-2.5 rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 transition-all",
+				"group flex h-full flex-col gap-4 rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-all",
 				href &&
 					"cursor-pointer hover:border-black/30 hover:bg-black/[0.02] dark:hover:border-white/30 dark:hover:bg-white/[0.02]",
 				"dark:border-stroke-soft-100/40 dark:bg-zinc-950",
@@ -493,7 +493,7 @@ export const Card = React.forwardRef<
 				)
 			)}
 			{title && (
-				<h3 className="m-0 font-semibold text-[14px] text-text-strong-950 tracking-tight dark:text-white">
+				<h3 className="m-0 font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
 					{title}
 				</h3>
 			)}
@@ -507,7 +507,7 @@ export const Card = React.forwardRef<
 
 	if (href) {
 		return (
-			<Link href={href} onClick={onClick} className="no-underline">
+			<Link href={href} onClick={onClick} className="no-underline not-prose">
 				{content}
 			</Link>
 		);

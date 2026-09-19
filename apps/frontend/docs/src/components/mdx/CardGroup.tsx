@@ -16,7 +16,7 @@ export function CardGroup({ cols = 3, children }: CardGroupProps) {
 	}[cols];
 
 	return (
-		<div className={cn("my-8 grid grid-cols-1 gap-6", gridCols)}>
+		<div className={cn("my-6 grid grid-cols-1 gap-4", gridCols)}>
 			{children}
 		</div>
 	);

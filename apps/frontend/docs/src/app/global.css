@@ -89,17 +89,6 @@ body {
 	display: block;
 }
 
-/* Spacing fixes — prose container uses .prose, not article */
-.prose h2 {
-	margin-top: 2rem !important;
-	margin-bottom: 0.75rem !important;
-}
-
-.prose h3 {
-	margin-top: 1.5rem !important;
-	margin-bottom: 0.5rem !important;
-}
-
 /* Remove double-gap: h2 bottom + table-wrapper top = ~48px gap */
 .prose h2 + .my-6,
 .prose h3 + .my-6 {
