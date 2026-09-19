@@ -465,10 +465,10 @@ export const Card = React.forwardRef<
 		<div
 			ref={ref}
 			className={cn(
-				"group flex h-full flex-col gap-4 rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-all",
+				"group flex h-full flex-col gap-4 rounded-2xl border-2 border-transparent bg-bg-white-0 p-4 shadow-[inset_0_0_0_1px_var(--color-stroke-soft-100)] transition-all dark:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-stroke-soft-100)_40%,transparent)]",
 				href &&
-					"cursor-pointer hover:border-black/30 hover:bg-black/[0.02] dark:hover:border-white/30 dark:hover:bg-white/[0.02]",
-				"dark:border-stroke-soft-100/40 dark:bg-zinc-950",
+					"cursor-pointer hover:border-black hover:bg-black/[0.02] hover:shadow-none dark:hover:border-white dark:hover:bg-white/[0.02] dark:hover:shadow-none",
+				"dark:bg-zinc-950",
 				className,
 			)}
 			{...props}
