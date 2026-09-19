@@ -1,3 +1,4 @@
+import { cleanHtml } from "./email-html";
 import { Icon } from "@reloop/ui/icon";
 import { toast } from "@reloop/ui/toast";
 import dayjs from "dayjs";
@@ -1116,21 +1117,39 @@ export const ThreadDetail = ({
 		);
 	};
 
+	const escapeHtml = (value: string) =>
+		value
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;");
+	const safeSubject = escapeHtml(thread?.subject ?? "");
+	const safeSender = (msg: { fromName?: string | null; fromEmail: string }) =>
+		escapeHtml(
+			msg.fromName ? `${msg.fromName} <${msg.fromEmail}>` : msg.fromEmail,
+		);
+	const safeBody = (
+		html: string | null | undefined,
+		text: string | null | undefined,
+	) =>
+		html
+			? cleanHtml(html)
+			: `<pre style="white-space:pre-wrap;">${escapeHtml(text ?? "")}</pre>`;
+
 	const handleDownload = () => {
 		try {
 			const messagesHtml = displayMessages
 				.map((msg) => {
-					const body = msg.email?.htmlBody || msg.email?.textBody || "";
 					return `<div style="margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:20px;">
-						<strong>From:</strong> ${msg.fromName ? `${msg.fromName} <${msg.fromEmail}>` : msg.fromEmail}<br>
-						<strong>Date:</strong> ${msg.messageAt}<br><br>
-						${body}
+						<strong>From:</strong> ${safeSender(msg)}<br>
+						<strong>Date:</strong> ${escapeHtml(String(msg.messageAt))}<br><br>
+						${safeBody(msg.email?.htmlBody, msg.email?.textBody)}
 					</div>`;
 				})
 				.join("");
 			const file = new Blob(
 				[
-					`<html><head><title>${thread?.subject}</title></head><body style="font-family:sans-serif;padding:20px;"><h2>${thread?.subject}</h2>${messagesHtml}</body></html>`,
+					`<html><head><title>${safeSubject}</title></head><body style="font-family:sans-serif;padding:20px;"><h2>${safeSubject}</h2>${messagesHtml}</body></html>`,
 				],
 				{ type: "text/html" },
 			);
@@ -1156,23 +1175,19 @@ export const ThreadDetail = ({
 			const messagesHtml = displayMessages
 				.map((msg) => {
 					const key = `${msg.id}-${targetLanguage}`;
-					const body = isTranslated
-						? translatedHtmlMap[key] || translatedTextMap[key] || ""
-						: msg.email?.htmlBody || msg.email?.textBody || "";
-					const formatted =
-						body.includes("<body") || body.includes("<html")
-							? body
-							: `<pre style="white-space:pre-wrap;">${body}</pre>`;
+					const formatted = isTranslated
+						? safeBody(translatedHtmlMap[key], translatedTextMap[key])
+						: safeBody(msg.email?.htmlBody, msg.email?.textBody);
 					return `<div style="margin-bottom:30px;border-bottom:1px solid #e5e7eb;padding-bottom:20px;">
-						<div style="font-weight:bold;font-size:14px;">${msg.fromName ? `${msg.fromName} &lt;${msg.fromEmail}&gt;` : msg.fromEmail}</div>
+						<div style="font-weight:bold;font-size:14px;">${safeSender(msg)}</div>
 						<div style="font-size:12px;color:#4b5563;margin-bottom:10px;">Date: ${dayjs(msg.messageAt).format("ddd, MMM D, YYYY [at] h:mm A")}</div>
 						<div>${formatted}</div>
 					</div>`;
 				})
 				.join("");
-			pw.document.write(`<!DOCTYPE html><html><head><title>${thread?.subject}</title>
+			pw.document.write(`<!DOCTYPE html><html><head><title>${safeSubject}</title>
 				<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#1c1917;padding:20px;}</style>
-				</head><body><h1 style="font-size:20px;margin-bottom:20px;border-bottom:2px solid #e5e7eb;padding-bottom:10px;">${thread?.subject}</h1>
+				</head><body><h1 style="font-size:20px;margin-bottom:20px;border-bottom:2px solid #e5e7eb;padding-bottom:10px;">${safeSubject}</h1>
 				${messagesHtml}<script>window.onload=function(){setTimeout(function(){window.print();window.close();},300);}</script></body></html>`);
 			pw.document.close();
 		} catch {

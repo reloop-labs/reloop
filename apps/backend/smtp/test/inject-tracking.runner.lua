@@ -12,6 +12,10 @@ kumo.on('init', function()
     results[name] = utils.inject_tracking(raw, 'log_test_1', '', true, true)
   end
 
+  print('TOKEN_PARITY ' .. kumo.serde.json_encode({
+    tracked = utils.encode_tracking_token('log_test_1', 'https://example.com/a', true),
+    untracked = utils.encode_tracking_token('log_test_1', 'https://example.com/a', false),
+  }))
   print('INJECT_TRACKING_RESULTS ' .. kumo.serde.json_encode(results))
   os.exit(0)
 end)

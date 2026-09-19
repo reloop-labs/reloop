@@ -96,6 +96,14 @@ local function apply_reloop_logic(msg, api_key, source)
     domain = string.match(from_email, "@([^>]+)>?") or ""
   end
 
+  local header_from = bare_email(msg:get_first_named_header_value('From'))
+  local header_from_domain = string.match(header_from, "@(.+)$") or ""
+  if header_from_domain ~= "" and header_from_domain ~= string.lower(domain) then
+    print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: From header domain " .. header_from_domain .. " does not match sender domain " .. domain)
+    kumo.reject(550, "5.7.1 From header domain must match the authenticated sender domain")
+    return
+  end
+
   local to_emails = collect_send_recipients(msg)
   if #to_emails == 0 then
     print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: No envelope recipients")

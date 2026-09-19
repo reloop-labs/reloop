@@ -5,7 +5,11 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError, createAuthMiddleware } from "better-auth/api";
+import {
+	APIError,
+	createAuthMiddleware,
+	getSessionFromCtx,
+} from "better-auth/api";
 import {
 	admin,
 	bearer,
@@ -134,6 +138,44 @@ function isRecentlyCreatedUser(user: {
 	return Date.now() - createdAtMs < NEW_USER_SIGNIN_GRACE_MS;
 }
 
+async function isOrganizationMember(
+	userId: string,
+	organizationId: string,
+): Promise<boolean> {
+	const [row] = await db
+		.select({ id: schema.member.id })
+		.from(schema.member)
+		.where(
+			and(
+				eq(schema.member.userId, userId),
+				eq(schema.member.organizationId, organizationId),
+			),
+		)
+		.limit(1);
+	return Boolean(row);
+}
+
+async function persistActiveOrganization(
+	userId: string | null,
+	body: unknown,
+): Promise<void> {
+	if (!userId || typeof body !== "object" || body === null) return;
+	const requested = (body as { organizationId?: unknown }).organizationId;
+	if (requested === null) {
+		await db
+			.update(schema.user)
+			.set({ activeOrganizationId: null })
+			.where(eq(schema.user.id, userId));
+		return;
+	}
+	if (typeof requested !== "string" || !requested) return;
+	if (!(await isOrganizationMember(userId, requested))) return;
+	await db
+		.update(schema.user)
+		.set({ activeOrganizationId: requested })
+		.where(eq(schema.user.id, userId));
+}
+
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -144,7 +186,7 @@ export const auth = betterAuth({
 			activeOrganizationId: {
 				type: "string",
 				required: false,
-				input: true,
+				input: false,
 			},
 			mode: {
 				type: "string",
@@ -221,6 +263,14 @@ export const auth = betterAuth({
 						.limit(1);
 
 					if (!found?.activeOrganizationId) return;
+					if (
+						!(await isOrganizationMember(
+							session.userId,
+							found.activeOrganizationId,
+						))
+					) {
+						return;
+					}
 
 					return {
 						data: {
@@ -249,12 +299,18 @@ export const auth = betterAuth({
 			const { path, context } = ctx;
 			log.info({ message: String(ctx.path) });
 
+			const cookieHeader =
+				typeof ctx.headers?.get === "function"
+					? ctx.headers.get("cookie")
+					: null;
+			let sessionUser = context?.session?.user ?? context?.newSession?.user;
+
+			if (path === "/organization/set-active" && !sessionUser) {
+				const current = await getSessionFromCtx(ctx);
+				sessionUser = current?.user;
+			}
+
 			try {
-				const cookieHeader =
-					typeof ctx.headers?.get === "function"
-						? ctx.headers.get("cookie")
-						: null;
-				const sessionUser = context?.session?.user ?? context?.newSession?.user;
 				await handleAuthLifecycleEviction(sessionCacheRedis, {
 					path: String(path),
 					cookieHeader,
@@ -265,6 +321,10 @@ export const auth = betterAuth({
 					...{ data: err },
 					message: "Session cache eviction failed",
 				});
+			}
+
+			if (path === "/organization/set-active") {
+				await persistActiveOrganization(sessionUser?.id ?? null, ctx.body);
 			}
 
 			if (

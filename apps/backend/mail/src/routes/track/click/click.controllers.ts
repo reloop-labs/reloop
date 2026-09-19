@@ -16,20 +16,8 @@ export async function handleClickTracking({ token }: { token: string }) {
 		mailConfig.TRACKING_SECRET,
 	);
 
-	let isTracked = true;
-	let url = payload?.url;
-
-	if (!payload) {
-		// Fallback: decode without signature verification (untracked redirect when clickTracking is disabled)
-		try {
-			const json = Buffer.from(token, "base64url").toString("utf-8");
-			const obj = JSON.parse(json) as { url?: string };
-			if (obj.url) {
-				url = obj.url;
-				isTracked = false;
-			}
-		} catch {}
-	}
+	const url = payload?.url;
+	const isTracked = payload?.nt !== 1;
 
 	if (!url) {
 		log.warn({

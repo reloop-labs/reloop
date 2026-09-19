@@ -4,7 +4,7 @@ export const workflowConfig = {
 		process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
-	NODE_ENV: process.env.NODE_ENV || "development",
+	NODE_ENV: process.env.NODE_ENV || "production",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED || "0",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
@@ -12,7 +12,7 @@ export const workflowConfig = {
 	/** Shared secret for service-to-service calls (e.g. mail send). */
 	RELOOP_INTERNAL_SECRET:
 		process.env.RELOOP_INTERNAL_SECRET || "reloop_internal_secret_default_123",
-	/** Optional basic-auth for Workbench (`/api/workflow/jobs`). Empty = open (dev only). */
+	/** Basic-auth for Workbench (`/api/workflow/jobs`). Required outside development; empty disables it. */
 	WORKBENCH_USER: process.env.WORKBENCH_USER || "",
 	WORKBENCH_PASS: process.env.WORKBENCH_PASS || "",
 };

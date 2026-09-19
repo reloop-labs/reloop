@@ -116,6 +116,7 @@ beforeAll(async () => {
 					platformRole: session.role ?? "user",
 					activeOrganizationId: session.activeOrganizationId ?? null,
 				},
+				session: { activeOrganizationId: session.activeOrganizationId ?? null },
 			};
 		},
 	);

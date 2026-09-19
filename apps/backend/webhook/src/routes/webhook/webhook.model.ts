@@ -361,16 +361,6 @@ export namespace WebhookModel {
 			payload: t.Record(t.String(), t.Any(), {
 				description: "Event payload (becomes envelope.data)",
 			}),
-			organizationId: t.Optional(
-				t.String({
-					description: "Organization ID to trigger webhooks for",
-				}),
-			),
-			userId: t.Optional(
-				t.String({
-					description: "User ID to trigger webhooks for",
-				}),
-			),
 		},
 		{
 			examples: [
@@ -380,7 +370,6 @@ export namespace WebhookModel {
 						domainId: "dom_123456789",
 						domain: "example.com",
 					},
-					organizationId: "org_123456789",
 				},
 			],
 		},
@@ -407,11 +396,6 @@ export namespace WebhookModel {
 		payload: t.Record(t.String(), t.Any(), {
 			description: "Event payload (becomes envelope.data)",
 		}),
-		organizationId: t.Optional(
-			t.String({
-				description: "Organization ID to trigger webhooks for",
-			}),
-		),
 	});
 
 	export type SignTestEventBody = typeof signTestEventBody.static;

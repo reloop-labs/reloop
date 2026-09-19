@@ -55,8 +55,10 @@ NODE_ENV=development
 | `PORT` | **YES** | `8017` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `WORKBENCH_USER` | No | empty (open in dev) |
-| `WORKBENCH_PASS` | No | empty (open in dev) |
+| `WORKBENCH_USER` | Outside development | empty (dashboard disabled) |
+| `WORKBENCH_PASS` | Outside development | empty (dashboard disabled) |
+
+Outside development the dashboard at `/api/workflow/jobs` only mounts when both values are set, and then sits behind HTTP basic auth. The self-host installer generates them.
 
 
 ## Commands

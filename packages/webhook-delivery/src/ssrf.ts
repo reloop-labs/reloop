@@ -88,6 +88,7 @@ export type ResolvedTarget = {
 export async function resolvePublicTarget(
 	hostname: string,
 ): Promise<ResolvedTarget> {
+	hostname = hostname.replace(/^\[|\]$/g, "");
 	if (net.isIP(hostname)) {
 		if (isPrivateOrBlockedIP(hostname)) {
 			throw new SsrfBlockedError(

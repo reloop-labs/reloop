@@ -28,7 +28,6 @@ describe("invitation acceptance", () => {
 				data: { invitation: { organizationId: "org-1" } },
 			}),
 			setActive: vi.fn().mockResolvedValue(undefined),
-			updateUser: vi.fn().mockResolvedValue(undefined),
 		};
 
 		await expect(
@@ -40,9 +39,6 @@ describe("invitation acceptance", () => {
 		expect(client.setActive).toHaveBeenCalledWith({
 			organizationId: "org-1",
 		});
-		expect(client.updateUser).toHaveBeenCalledWith({
-			activeOrganizationId: "org-1",
-		});
 	});
 
 	it("does not mutate organization state when acceptance fails", async () => {
@@ -51,14 +47,12 @@ describe("invitation acceptance", () => {
 				.fn()
 				.mockResolvedValue({ error: { message: "Invitation revoked" } }),
 			setActive: vi.fn(),
-			updateUser: vi.fn(),
 		};
 
 		await expect(
 			acceptAndActivateInvitation("invite-1", client),
 		).resolves.toEqual({ ok: false, message: "Invitation revoked" });
 		expect(client.setActive).not.toHaveBeenCalled();
-		expect(client.updateUser).not.toHaveBeenCalled();
 	});
 
 	it("rejects expired, revoked, and missing invitations", () => {
