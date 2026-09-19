@@ -178,7 +178,7 @@ export function Navbar({
 				{mounted && !isPending && session ? (
 					<FancyButton.Root
 						asChild
-						variant="neutral"
+						variant="primary"
 						size="xsmall"
 						className="h-7! px-3! font-semibold! text-xs!"
 					>
@@ -187,7 +187,7 @@ export function Navbar({
 				) : (
 					<FancyButton.Root
 						asChild
-						variant="neutral"
+						variant="primary"
 						size="xsmall"
 						className="h-7! px-3! font-semibold! text-xs!"
 					>

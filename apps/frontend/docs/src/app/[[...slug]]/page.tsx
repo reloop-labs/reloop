@@ -349,6 +349,11 @@ export default async function Page(props: {
 							{/* Title row — hidden on docs home (custom hero owns the H1) */}
 							{!isDocsHome && (
 								<div className="mb-8">
+									{(page.data as any).eyebrow && (
+										<p className="mb-2 text-[15px] text-text-sub-600">
+											{(page.data as any).eyebrow}
+										</p>
+									)}
 									<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
 										<h1 className="min-w-0 font-semibold text-2xl text-fd-foreground leading-snug tracking-[-0.03em] sm:text-3xl sm:leading-tight">
 											{page.data.title}
