@@ -87,7 +87,6 @@ export function useCreateOrg() {
 				} catch (setActiveError) {
 					console.error("Error setting active organization:", setActiveError);
 				}
-				await authClient.updateUser({ activeOrganizationId: organization.id });
 				// Seed the org list immediately so post-auth routing never reads a
 				// stale empty cache (ensureQueryData / stale [] bounce → /onboarding).
 				queryClient.setQueryData(

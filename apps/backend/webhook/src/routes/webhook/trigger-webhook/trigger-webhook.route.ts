@@ -11,8 +11,8 @@ export const triggerWebhookRoute = new Elysia().use(authMiddleware).post(
 		return await triggerWebhookController({
 			event: body.event,
 			payload: body.payload,
-			organizationId: body.organizationId || organizationId,
-			userId: body.userId || userId,
+			organizationId,
+			userId,
 		});
 	},
 	{

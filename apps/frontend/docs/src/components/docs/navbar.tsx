@@ -91,7 +91,7 @@ export function Navbar({
 						Reloop
 					</p>
 					<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
-						Beta
+						Docs
 					</span>
 				</a>
 			</div>
@@ -178,7 +178,7 @@ export function Navbar({
 				{mounted && !isPending && session ? (
 					<FancyButton.Root
 						asChild
-						variant="neutral"
+						variant="primary"
 						size="xsmall"
 						className="h-7! px-3! font-semibold! text-xs!"
 					>
@@ -187,7 +187,7 @@ export function Navbar({
 				) : (
 					<FancyButton.Root
 						asChild
-						variant="neutral"
+						variant="primary"
 						size="xsmall"
 						className="h-7! px-3! font-semibold! text-xs!"
 					>

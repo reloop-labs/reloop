@@ -24,8 +24,13 @@ export function evictionEventFromAuthPath(opts: {
 	}
 
 	if (path === "/organization/set-active") {
-		if (!opts.userId) return null;
-		return { type: "organization-switch", userId: opts.userId };
+		const token = extractSessionToken(opts.cookieHeader ?? null);
+		if (!opts.userId && !token) return null;
+		return {
+			type: "organization-switch",
+			userId: opts.userId ?? null,
+			sessionToken: token,
+		};
 	}
 
 	return null;

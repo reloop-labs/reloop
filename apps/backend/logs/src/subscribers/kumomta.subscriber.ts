@@ -56,6 +56,28 @@ const EVENT_TYPE_MAP: Partial<
 	TransientFailure: "deferred",
 };
 
+/** Over-quota signatures — keep in sync with bounce_rewrite.lua + contacts subscriber. */
+const OVER_QUOTA_PATTERNS = [
+	"overquota",
+	"over quota",
+	"over-quota",
+	"out of storage",
+	"quota exceeded",
+	"exceeded quota",
+	"exceeded storage",
+	"mailbox full",
+	"mailbox over",
+	"storage exceeded",
+	"insufficient storage",
+];
+
+function isOverQuotaEvent(event: KumomtaLogRecordPayload): boolean {
+	const content = event.response?.content;
+	if (!content) return false;
+	const haystack = content.toLowerCase();
+	return OVER_QUOTA_PATTERNS.some((pat) => haystack.includes(pat));
+}
+
 function formatErrorMessage(event: KumomtaLogRecordPayload): string {
 	const parts: string[] = [];
 
@@ -145,10 +167,21 @@ export async function initKumomtaSubscriber() {
 				}
 
 				const kumoType = event.type as KumomtaEventType;
-				const eventType = EVENT_TYPE_MAP[kumoType];
-				const newStatus = EVENT_STATUS_MAP[kumoType];
+				let eventType = EVENT_TYPE_MAP[kumoType];
+				let newStatus = EVENT_STATUS_MAP[kumoType];
 				const metadata = buildEventMetadata(event);
 				const at = eventTimestamp(event);
+
+				// Over-quota mailbox: surface the first 452 as a bounce, not a
+				// deferred retry. (KumoMTA rewrite bounces these immediately going
+				// forward; this covers any pre-rewrite TransientFailure still in
+				// flight so the log reflects the suppression reason at once.)
+				let overQuota = false;
+				if (kumoType === "TransientFailure" && isOverQuotaEvent(event)) {
+					overQuota = true;
+					eventType = "bounced";
+					newStatus = "bounced";
+				}
 
 				// Always persist the SMTP/Kumo response as an email_event when mappable.
 				if (eventType) {
@@ -211,6 +244,15 @@ export async function initKumomtaSubscriber() {
 
 					case "Feedback":
 						updateData.errorMessage = `Feedback loop: ${event.response?.content || "spam complaint"}`;
+						break;
+
+					case "TransientFailure":
+						// Only reachable for over-quota (rewritten above); other
+						// transient failures return early with no status change.
+						if (overQuota) {
+							updateData.failedAt = at;
+							updateData.errorMessage = `Mailbox full (no retry): ${event.response?.content || "recipient inbox out of storage"}`;
+						}
 						break;
 				}
 

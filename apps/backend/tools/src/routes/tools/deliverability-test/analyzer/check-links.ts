@@ -1,3 +1,5 @@
+import { type PinnedTransport, requestPinned } from "@reloop/webhook-delivery";
+import { isBlockedHostname } from "../../../../lib/ssrf";
 import type { CategoryResult, CheckItem } from "../deliverability-test.types";
 import type { ParsedEmailData } from "./parse-mime";
 
@@ -61,37 +63,46 @@ function extractLinks(email: ParsedEmailData): ExtractedLink[] {
 	return links;
 }
 
-async function probeUrl(
+export async function probeUrl(
 	url: string,
+	transport: PinnedTransport = requestPinned,
 ): Promise<{ status: number | null; ok: boolean; error?: string }> {
+	let hostname: string;
 	try {
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), 1500);
+		hostname = new URL(url).hostname.replace(/^\[|\]$/g, "");
+	} catch {
+		return { status: null, ok: false, error: "Invalid URL" };
+	}
+	if (isBlockedHostname(hostname)) {
+		return { status: null, ok: false, error: "Blocked destination" };
+	}
 
-		const resp = await fetch(url, {
+	try {
+		const resp = await transport({
+			url,
 			method: "HEAD",
-			signal: controller.signal,
+			allowHttp: true,
+			timeoutMs: 1500,
 			headers: {
 				"User-Agent":
 					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 			},
-			redirect: "follow",
 		});
-		clearTimeout(timeoutId);
-
 		return {
 			status: resp.status,
 			ok: resp.status < 400,
 		};
 	} catch (e: unknown) {
-		const err = e as { name?: string; message?: string };
+		const err = e as { kind?: string };
 		return {
 			status: null,
 			ok: false,
 			error:
-				err.name === "AbortError"
-					? "Timeout"
-					: err.message || "Connection failed",
+				err.kind === "ssrf"
+					? "Blocked destination"
+					: err.kind === "timeout"
+						? "Timeout"
+						: "Connection failed",
 		};
 	}
 }

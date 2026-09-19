@@ -12,6 +12,7 @@ export type WebhookHttpResult = {
 	status: number;
 	headers: Record<string, string>;
 	body: string;
+	bodyBuffer: Buffer;
 	durationMs: number;
 	resolved: ResolvedTarget;
 };
@@ -23,27 +24,33 @@ export type WebhookHttpError = {
 	resolved?: ResolvedTarget;
 };
 
-/**
- * POST JSON to a customer webhook URL with DNS resolution pinned to a
- * pre-validated public IP (mitigates DNS rebinding TOCTOU).
- */
-export async function postWebhook(input: {
+export type PinnedRequestInput = {
 	url: string;
-	headers: Record<string, string>;
-	body: string;
+	method?: "GET" | "HEAD" | "POST";
+	headers?: Record<string, string>;
+	body?: string;
 	timeoutMs?: number;
-	/** When false (default), only https: is allowed. */
 	allowHttp?: boolean;
 	allowPrivate?: boolean;
-}): Promise<WebhookHttpResult> {
+	maxBytes?: number;
+};
+
+export type PinnedTransport = (
+	input: PinnedRequestInput,
+) => Promise<WebhookHttpResult>;
+
+export async function requestPinned(
+	input: PinnedRequestInput,
+): Promise<WebhookHttpResult> {
 	const timeoutMs = input.timeoutMs ?? WEBHOOK_HTTP_TIMEOUT_MS;
+	const method = input.method ?? "GET";
 	const start = Date.now();
 
 	let parsed: URL;
 	try {
 		parsed = new URL(input.url);
 	} catch {
-		throw Object.assign(new Error("Invalid webhook URL"), {
+		throw Object.assign(new Error("Invalid URL"), {
 			kind: "network" as const,
 			durationMs: Date.now() - start,
 		});
@@ -55,7 +62,7 @@ export async function postWebhook(input: {
 	) {
 		const err: WebhookHttpError = {
 			kind: "ssrf",
-			message: "Only HTTPS webhook URLs are allowed",
+			message: "Only HTTPS URLs are allowed",
 			durationMs: Date.now() - start,
 		};
 		throw Object.assign(new Error(err.message), err);
@@ -88,6 +95,7 @@ export async function postWebhook(input: {
 			: parsed.protocol === "https:"
 				? 443
 				: 80;
+	const body = input.body ?? "";
 
 	return new Promise<WebhookHttpResult>((resolve, reject) => {
 		const req = lib.request(
@@ -96,11 +104,13 @@ export async function postWebhook(input: {
 				hostname: resolved.pinnedIp,
 				port,
 				path: `${parsed.pathname}${parsed.search}`,
-				method: "POST",
+				method,
 				headers: {
 					...input.headers,
 					Host: parsed.host,
-					"Content-Length": Buffer.byteLength(input.body),
+					...(method === "POST"
+						? { "Content-Length": Buffer.byteLength(body) }
+						: {}),
 				},
 				// Pin DNS to the IP we already validated (anti rebinding).
 				lookup: (_hostname, _options, callback) => {
@@ -112,11 +122,24 @@ export async function postWebhook(input: {
 			},
 			(res) => {
 				const chunks: Buffer[] = [];
+				let total = 0;
 				res.on("data", (chunk: Buffer) => {
+					total += chunk.byteLength;
+					if (input.maxBytes !== undefined && total > input.maxBytes) {
+						const err: WebhookHttpError = {
+							kind: "network",
+							message: `Response exceeds ${input.maxBytes} bytes`,
+							durationMs: Date.now() - start,
+							resolved,
+						};
+						reject(Object.assign(new Error(err.message), err));
+						res.destroy();
+						return;
+					}
 					chunks.push(chunk);
 				});
 				res.on("end", () => {
-					const body = Buffer.concat(chunks).toString("utf8");
+					const bodyBuffer = Buffer.concat(chunks);
 					const headers: Record<string, string> = {};
 					for (const [k, v] of Object.entries(res.headers)) {
 						if (v === undefined) continue;
@@ -125,7 +148,8 @@ export async function postWebhook(input: {
 					resolve({
 						status: res.statusCode ?? 0,
 						headers,
-						body,
+						body: bodyBuffer.toString("utf8"),
+						bodyBuffer,
 						durationMs: Date.now() - start,
 						resolved,
 					});
@@ -137,7 +161,7 @@ export async function postWebhook(input: {
 			req.destroy();
 			const err: WebhookHttpError = {
 				kind: "timeout",
-				message: `Webhook request timed out after ${timeoutMs}ms`,
+				message: `Request timed out after ${timeoutMs}ms`,
 				durationMs: Date.now() - start,
 				resolved,
 			};
@@ -154,7 +178,30 @@ export async function postWebhook(input: {
 			reject(Object.assign(new Error(err.message), err));
 		});
 
-		req.write(input.body);
+		if (method === "POST") req.write(body);
 		req.end();
 	});
+}
+
+/**
+ * POST JSON to a customer webhook URL with DNS resolution pinned to a
+ * pre-validated public IP (mitigates DNS rebinding TOCTOU).
+ */
+export async function postWebhook(input: {
+	url: string;
+	headers: Record<string, string>;
+	body: string;
+	timeoutMs?: number;
+	/** When false (default), only https: is allowed. */
+	allowHttp?: boolean;
+	allowPrivate?: boolean;
+}): Promise<WebhookHttpResult> {
+	try {
+		return await requestPinned({ ...input, method: "POST" });
+	} catch (e) {
+		if (e instanceof Error && e.message === "Only HTTPS URLs are allowed") {
+			e.message = "Only HTTPS webhook URLs are allowed";
+		}
+		throw e;
+	}
 }

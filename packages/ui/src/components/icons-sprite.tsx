@@ -1660,6 +1660,20 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol
+				id="dollar"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M6 16a4 4 0 004 4h4.513a3.487 3.487 0 001.103-6.795l-7.232-2.41A3.487 3.487 0 019.487 4H14a4 4 0 014 4m-6-6v20"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 
 			<symbol id="info-outline" viewBox="0 0 24 24" fill="none">
 				<circle opacity="0.12" cx={12} cy={12} r={10} fill="currentColor" />

@@ -26,6 +26,7 @@ export const contactStatusEnum = pgEnum("contact_status", [
 export const suppressionReasonEnum = pgEnum("suppression_reason", [
 	"hard_bounce",
 	"spam_complaint",
+	"mailbox_full",
 ]);
 
 export const propertyTypeEnum = pgEnum("property_type", ["string", "number"]);

@@ -40,7 +40,7 @@ describe("fetchGetSession", () => {
 		}
 	});
 
-	test("falls back to user.activeOrganizationId when session field is missing", async () => {
+	test("ignores user.activeOrganizationId when the session has no active org", async () => {
 		const originalFetch = globalThis.fetch;
 		globalThis.fetch = mock(async () => {
 			return new Response(
@@ -62,7 +62,7 @@ describe("fetchGetSession", () => {
 				"reloop.session_token=tok",
 				"http://auth",
 			);
-			expect(result?.activeOrganizationId).toBe("user-org");
+			expect(result?.activeOrganizationId).toBeNull();
 		} finally {
 			globalThis.fetch = originalFetch;
 		}

@@ -68,6 +68,7 @@ beforeAll(async () => {
 					id: s.userId,
 					activeOrganizationId: s.activeOrganizationId ?? null,
 				},
+				session: { activeOrganizationId: s.activeOrganizationId ?? null },
 			};
 		},
 	);

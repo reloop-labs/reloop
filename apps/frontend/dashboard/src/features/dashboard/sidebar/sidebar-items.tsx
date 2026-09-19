@@ -35,7 +35,7 @@ export function SidebarItems({
 	// Router basepath is /dashboard — compare paths without it for active state.
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 
-	const navigation = mainNavigation;
+	const navigation = mainNavigation.filter((item) => !item.hidden);
 	const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
 		{},
 	);

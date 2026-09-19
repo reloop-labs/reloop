@@ -8,6 +8,8 @@ import { ApiSection } from "./api-section";
 import {
 	faqGroups,
 	faqs,
+	heroHeading,
+	howItWorks,
 	metaDescription,
 	metaTitle,
 	reasons,
@@ -108,7 +110,7 @@ export default function EmailValidatorPage() {
 						</span>
 
 						<h1 className="mt-6 text-balance font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
-							Email Validator
+							{heroHeading}
 						</h1>
 
 						<p className="mx-auto mt-5 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
@@ -119,6 +121,35 @@ export default function EmailValidatorPage() {
 					<div className="mt-10">
 						<TesterPanel />
 					</div>
+				</div>
+			</Band>
+
+			{/* Section: How this free email validator works */}
+			<Band id="how-it-works">
+				<SectionIntro
+					lead="How this free email validator works."
+					description="Three steps from raw addresses to a cleaner list — syntax, disposable domains, and live MX checks without intrusive SMTP probes."
+				/>
+
+				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-white/10 dark:border-white/10">
+					{howItWorks.map((item) => (
+						<div
+							key={item.step}
+							className="flex min-h-[14rem] flex-col justify-between gap-6 p-6 sm:p-7 lg:p-8"
+						>
+							<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
+								{item.step}
+							</span>
+							<div>
+								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+									{item.title}
+								</h3>
+								<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
+									{item.description}
+								</p>
+							</div>
+						</div>
+					))}
 				</div>
 			</Band>
 

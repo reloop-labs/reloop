@@ -87,6 +87,7 @@ export function CopyCodeBlock({
 	codeExtraPadding = false,
 	action,
 	icon,
+	bareCode = false,
 }: {
 	code: string;
 	lang: string;
@@ -105,6 +106,8 @@ export function CopyCodeBlock({
 	codeExtraPadding?: boolean;
 	action?: React.ReactNode;
 	icon?: React.ReactNode;
+	/** Render code directly on the card — skip the inner inset panel + its bg. */
+	bareCode?: boolean;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
@@ -430,14 +433,7 @@ export function CopyCodeBlock({
 				</div>
 			)}
 
-			<div
-				className="mx-0.5 mb-0.5 overflow-hidden rounded-2xl border border-stroke-soft-100/70 bg-white dark:border-stroke-soft-100/15 dark:bg-zinc-950"
-				style={
-					maxHeight
-						? ({ "--code-max-height": maxHeight } as React.CSSProperties)
-						: undefined
-				}
-			>
+			{bareCode ? (
 				<CodeBlock
 					code={code}
 					lang={lang}
@@ -446,7 +442,25 @@ export function CopyCodeBlock({
 					maxHeight={maxHeight}
 					codeExtraPadding={codeExtraPadding}
 				/>
-			</div>
+			) : (
+				<div
+					className="mx-0.5 mb-0.5 overflow-hidden rounded-2xl border border-stroke-soft-100/70 bg-white dark:border-stroke-soft-100/15 dark:bg-zinc-950"
+					style={
+						maxHeight
+							? ({ "--code-max-height": maxHeight } as React.CSSProperties)
+							: undefined
+					}
+				>
+					<CodeBlock
+						code={code}
+						lang={lang}
+						hideLineNumbers={hideLineNumbers}
+						noScroll={noScroll}
+						maxHeight={maxHeight}
+						codeExtraPadding={codeExtraPadding}
+					/>
+				</div>
+			)}
 		</div>
 	);
 }

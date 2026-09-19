@@ -1,6 +1,5 @@
 "use client";
 
-import { HelpFooterLinks } from "@reloop/fe-docs/components/mdx/HelpFooterLinks";
 import type { PageNode } from "@reloop/fe-docs/lib/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -66,10 +65,7 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 				)}
 			</div>
 
-			{/* Help & Support Links */}
-			<HelpFooterLinks />
-
-			{/* Navigation Cards */}
+		{/* Navigation Cards */}
 			<div className="grid gap-4 sm:grid-cols-2">
 				{previous ? (
 					<Link

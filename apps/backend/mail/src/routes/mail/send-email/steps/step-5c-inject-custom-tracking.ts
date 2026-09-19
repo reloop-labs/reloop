@@ -94,17 +94,12 @@ function rewriteLinks(
 				}
 			}
 
-			let token: string;
-			if (clickTracking) {
-				token = encodeTrackingToken(
-					{ id: emailLogId, url: cleanUrl },
-					mailConfig.TRACKING_SECRET,
-				);
-			} else {
-				token = Buffer.from(JSON.stringify({ url: cleanUrl })).toString(
-					"base64url",
-				);
-			}
+			const token = encodeTrackingToken(
+				clickTracking
+					? { id: emailLogId, url: cleanUrl }
+					: { id: emailLogId, url: cleanUrl, nt: 1 },
+				mailConfig.TRACKING_SECRET,
+			);
 			const trackingUrl = `${baseUrl}/redirect/${token}`;
 
 			return `${prefix}${quote}${trackingUrl}${quote}`;

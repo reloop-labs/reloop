@@ -57,8 +57,10 @@ WEBHOOK_ENCRYPTION_KEY=your-64-char-hex-key
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 | `WEBHOOK_ENCRYPTION_KEY` | Same value as the webhook service | Dev key in `.env.dev` |
-| `WORKBENCH_USER` | No | empty (open in dev) |
-| `WORKBENCH_PASS` | No | empty (open in dev) |
+| `WORKBENCH_USER` | Outside development | empty (dashboard disabled) |
+| `WORKBENCH_PASS` | Outside development | empty (dashboard disabled) |
+
+Outside development the dashboard at `/api/workflow/jobs` only mounts when both values are set, and then sits behind HTTP basic auth. The self-host installer generates them.
 
 This service signs outbound webhook deliveries, so it decrypts the secrets the webhook service stored. Both services must use the same `WEBHOOK_ENCRYPTION_KEY`, or every signature will be computed from the ciphertext and fail verification.
 

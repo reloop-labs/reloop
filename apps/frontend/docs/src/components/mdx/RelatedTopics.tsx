@@ -78,8 +78,10 @@ function renderTopicIcon(icon?: string | React.ReactNode) {
 }
 
 export function RelatedTopic({ title, href, icon }: RelatedTopicProps) {
+	// Next.js basePath ("/docs") is applied automatically to <Link> —
+	// strip any hardcoded /docs prefix so links don't resolve to /docs/docs/…
 	const finalHref =
-		href.startsWith("/") && !href.startsWith("/docs") ? `/docs${href}` : href;
+		href.startsWith("/docs") ? href.slice("/docs".length) || "/" : href;
 
 	return (
 		<Link

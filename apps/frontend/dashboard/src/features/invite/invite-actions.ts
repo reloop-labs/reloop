@@ -21,7 +21,6 @@ export type InvitationClient = {
 		error?: { message?: string } | null;
 	}>;
 	setActive: (input: { organizationId: string }) => Promise<unknown>;
-	updateUser: (input: { activeOrganizationId: string }) => Promise<unknown>;
 };
 
 export async function acceptAndActivateInvitation(
@@ -30,7 +29,6 @@ export async function acceptAndActivateInvitation(
 		acceptInvitation: (input) =>
 			authClient.organization.acceptInvitation(input),
 		setActive: (input) => authClient.organization.setActive(input),
-		updateUser: (input) => authClient.updateUser(input),
 	},
 ) {
 	const { error, data } = await client.acceptInvitation({ invitationId });
@@ -41,7 +39,6 @@ export async function acceptAndActivateInvitation(
 	const organizationId = data?.invitation?.organizationId;
 	if (organizationId) {
 		await client.setActive({ organizationId });
-		await client.updateUser({ activeOrganizationId: organizationId });
 	}
 
 	return { ok: true as const, organizationId: organizationId ?? null };

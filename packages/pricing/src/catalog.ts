@@ -23,7 +23,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 		overageEnabled: false,
 		maxAgentInboxes: 1,
 		maxWebhooks: 1,
-		maxCustomDomains: 1,
+		maxCustomDomains: 3,
 		maxAttachmentBytes: 1 * MB,
 		dataRetentionDays: 45,
 		dedicatedIpCount: 0,

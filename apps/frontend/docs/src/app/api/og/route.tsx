@@ -16,14 +16,14 @@ import {
 
 function getFontBuffer(fontName: string): ArrayBuffer | null {
 	const paths = [
-		path.join(process.cwd(), "public/font/openRunde", fontName),
+		path.join(process.cwd(), "public/font/inter", fontName),
 		path.join(
 			process.cwd(),
-			"apps/frontend/docs/public/font/openRunde",
+			"apps/frontend/docs/public/font/inter",
 			fontName,
 		),
-		path.resolve("./public/font/openRunde", fontName),
-		path.resolve("./apps/frontend/docs/public/font/openRunde", fontName),
+		path.resolve("./public/font/inter", fontName),
+		path.resolve("./apps/frontend/docs/public/font/inter", fontName),
 	];
 	for (const p of paths) {
 		try {
@@ -80,13 +80,13 @@ export async function GET(request: NextRequest) {
 
 	// Prepare fonts
 	const fonts = [];
-	const regularFontData = getFontBuffer("OpenRunde-Regular.woff");
-	const semiboldFontData = getFontBuffer("OpenRunde-Semibold.woff");
-	const boldFontData = getFontBuffer("OpenRunde-Bold.woff");
+	const regularFontData = getFontBuffer("Inter-400.woff");
+	const semiboldFontData = getFontBuffer("Inter-600.woff");
+	const boldFontData = getFontBuffer("Inter-700.woff");
 
 	if (regularFontData) {
 		fonts.push({
-			name: "OpenRunde",
+			name: "Inter",
 			data: regularFontData,
 			weight: 400 as const,
 			style: "normal" as const,
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 	}
 	if (semiboldFontData) {
 		fonts.push({
-			name: "OpenRunde",
+			name: "Inter",
 			data: semiboldFontData,
 			weight: 600 as const,
 			style: "normal" as const,
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
 	}
 	if (boldFontData) {
 		fonts.push({
-			name: "OpenRunde",
+			name: "Inter",
 			data: boldFontData,
 			weight: 700 as const,
 			style: "normal" as const,
@@ -120,7 +120,7 @@ export async function GET(request: NextRequest) {
 				backgroundImage:
 					"radial-gradient(circle at 95% 10%, rgba(217, 119, 87, 0.15) 0%, transparent 60%), radial-gradient(circle at 5% 90%, rgba(217, 119, 87, 0.15) 0%, transparent 60%)",
 				padding: "48px",
-				fontFamily: fonts.length > 0 ? "OpenRunde" : "sans-serif",
+				fontFamily: fonts.length > 0 ? "Inter" : "sans-serif",
 				position: "relative",
 			}}
 		>

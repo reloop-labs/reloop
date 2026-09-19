@@ -43,7 +43,7 @@ export namespace ContactTypes {
 			name: string;
 			subscription: "opt_in" | "opt_out";
 		}[];
-		suppressionReason: "hard_bounce" | "spam_complaint" | null;
+		suppressionReason: "hard_bounce" | "spam_complaint" | "mailbox_full" | null;
 		suppressedAt: Date | null;
 	}
 

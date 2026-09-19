@@ -6,13 +6,13 @@ import {
 import { decideCustomDomainSlot } from "../src/lib/domain-quota";
 
 describe("decideCustomDomainSlot", () => {
-	test("free plan cap of 1 blocks the second domain", () => {
+	test("free plan cap of 3 blocks the fourth domain", () => {
 		let used = 0;
 		let accepted = 0;
 		let denied = 0;
 
 		for (let i = 0; i < 50; i++) {
-			const decision = decideCustomDomainSlot({ used, limit: 1 });
+			const decision = decideCustomDomainSlot({ used, limit: 3 });
 			if (decision.ok) {
 				used += 1;
 				accepted += 1;
@@ -21,9 +21,9 @@ describe("decideCustomDomainSlot", () => {
 			}
 		}
 
-		expect(accepted).toBe(1);
-		expect(denied).toBe(49);
-		expect(used).toBe(1);
+		expect(accepted).toBe(3);
+		expect(denied).toBe(47);
+		expect(used).toBe(3);
 	});
 
 	test("a paid cap of 5 allows five domains then blocks", () => {

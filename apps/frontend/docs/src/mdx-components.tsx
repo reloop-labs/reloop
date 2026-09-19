@@ -1,7 +1,6 @@
 import { DocsHome } from "@reloop/fe-docs/components/docs/docs-home";
 import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
-import { HelpFooterLinks } from "@reloop/fe-docs/components/mdx/HelpFooterLinks";
 import {
 	DocImage,
 	MDXImage,
@@ -22,7 +21,7 @@ import {
 	Tabs,
 	Tip,
 	Warning,
-} from "@reloop/fe-docs/components/mdx/mintlify-client";
+} from "@reloop/fe-docs/components/mdx/reloop-client";
 import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
 import {
 	RelatedTopic,
@@ -53,7 +52,7 @@ function resolveCardIcon(icon: unknown): React.ReactNode {
 		return <ReloopIcon name={icon} className="size-6 shrink-0" />;
 	}
 
-	// Fall through to Mintlify/Font Awesome for other string names
+	// Fall through to Font Awesome for other string names
 	return icon;
 }
 
@@ -101,10 +100,10 @@ export function getMDXComponents(
 		Video: MDXVideo,
 		...restComponents,
 		Card: ({ icon, href, children, ...props }: any) => {
+			// Next.js basePath ("/docs") is applied automatically to <Link> —
+			// strip any hardcoded /docs prefix so links don't resolve to /docs/docs/…
 			const finalHref =
-				href?.startsWith("/") && !href.startsWith("/docs")
-					? `/docs${href}`
-					: href;
+				href?.startsWith("/docs") ? href.slice("/docs".length) || "/" : href;
 
 			return (
 				<Card
@@ -167,7 +166,6 @@ export function getMDXComponents(
 		PromptActions,
 		RelatedTopics,
 		RelatedTopic,
-		HelpFooterLinks,
 		SideBySide,
 		Side,
 		pre: (props: any) => {
