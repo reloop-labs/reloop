@@ -8,6 +8,7 @@ import {
 	type CompleteSetupInput,
 	completeSelfHostSetup,
 	InvalidAdminSetupKeyError,
+	SetupFinalizationFailedError,
 	SetupNotAvailableError,
 } from "@reloop/auth/setup/complete-setup";
 
@@ -252,6 +253,74 @@ describe("completeSelfHostSetup", () => {
 
 		expect((error as AdminPromotionFailedError).rolledBack).toBe(false);
 		expect((error as Error).message).toContain("promote-admin");
+	});
+
+	test("removes the promoted account when organization creation fails", async () => {
+		const harness = createHarness({
+			createOwnedOrganization: async () => {
+				throw new Error("org create failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(SetupFinalizationFailedError);
+		expect((error as SetupFinalizationFailedError).rolledBack).toBe(true);
+		expect(harness.names()).toEqual([
+			"readAdminSetupKey",
+			"signUpEmail",
+			"setUserRole",
+			"deleteUser",
+		]);
+		expect((error as Error).message).toContain("Try setup again");
+	});
+
+	test("removes the promoted account when env finalization fails", async () => {
+		const harness = createHarness({
+			patchEnvFile: async () => {
+				throw new Error("env write failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(SetupFinalizationFailedError);
+		expect((error as SetupFinalizationFailedError).rolledBack).toBe(true);
+		expect(harness.names()).toContain("deleteUser");
+		expect(harness.names()).toContain("setRuntimeDisableSignup");
+		expect(
+			harness.calls.filter((call) => call.name === "setRuntimeDisableSignup"),
+		).toEqual([
+			{ name: "setRuntimeDisableSignup", payload: true },
+			{ name: "setRuntimeDisableSignup", payload: false },
+		]);
+	});
+
+	test("keeps the admin when only key consumption fails after env is closed", async () => {
+		const harness = createHarness({
+			consumeAdminSetupKeyFile: async () => {
+				throw new Error("key consume failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(SetupFinalizationFailedError);
+		expect((error as SetupFinalizationFailedError).rolledBack).toBe(false);
+		expect((error as SetupFinalizationFailedError).envClosed).toBe(true);
+		expect(harness.names()).not.toContain("deleteUser");
+		expect(harness.envUpdates).toEqual([
+			{ SETUP_MODE: "false", DISABLE_SIGNUP: "true", APP_NAME: "Reloop" },
+		]);
 	});
 
 	test("refuses when setup is already complete", async () => {

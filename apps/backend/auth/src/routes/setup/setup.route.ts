@@ -27,6 +27,9 @@ const isInvalidAdminSetupKey = (error: unknown): boolean =>
 const isAdminPromotionFailed = (error: unknown): boolean =>
 	error instanceof Error && error.name === "AdminPromotionFailed";
 
+const isSetupFinalizationFailed = (error: unknown): boolean =>
+	error instanceof Error && error.name === "SetupFinalizationFailed";
+
 function requiredText(value: unknown): string | null {
 	return typeof value === "string" && value.trim() ? value.trim() : null;
 }
@@ -146,6 +149,9 @@ export const setupRoutes = new Elysia({ name: "selfhost-setup" })
 					return status(403, { message: "Invalid setup key" });
 				}
 				if (isAdminPromotionFailed(error)) {
+					return status(500, { message: (error as Error).message });
+				}
+				if (isSetupFinalizationFailed(error)) {
 					return status(500, { message: (error as Error).message });
 				}
 				if (error instanceof APIError) {

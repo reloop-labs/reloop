@@ -78,6 +78,30 @@ export class AdminPromotionFailedError extends Error {
 	}
 }
 
+export class SetupFinalizationFailedError extends Error {
+	readonly rolledBack: boolean;
+	readonly envClosed: boolean;
+
+	constructor(
+		rolledBack: boolean,
+		cause: unknown,
+		options: { envClosed?: boolean } = {},
+	) {
+		const envClosed = options.envClosed === true;
+		super(
+			envClosed
+				? "Setup closed the instance but could not clear the admin setup key. Sign in with the administrator account you just created."
+				: rolledBack
+					? "Setup could not finish after creating the administrator, so the account was removed. Try setup again."
+					: "Setup could not finish after creating the administrator. Remove that account (or run apps/backend/admin/scripts/promote-admin.ts if it is incomplete), then try setup again.",
+			{ cause },
+		);
+		this.name = "SetupFinalizationFailed";
+		this.rolledBack = rolledBack;
+		this.envClosed = envClosed;
+	}
+}
+
 export async function completeSelfHostSetup(
 	input: CompleteSetupInput,
 	deps: CompleteSetupDeps,
@@ -115,25 +139,50 @@ export async function completeSelfHostSetup(
 
 	const organizationName = input.organizationName?.trim();
 	let organizationId: string | null = null;
-	if (organizationName) {
-		const organization = await deps.createOwnedOrganization({
-			userId,
-			name: organizationName,
+	let closedSignup = false;
+	let envClosed = false;
+	try {
+		if (organizationName) {
+			const organization = await deps.createOwnedOrganization({
+				userId,
+				name: organizationName,
+			});
+			organizationId = organization.organizationId;
+			await deps.setActiveOrganization({ userId, organizationId });
+		}
+
+		if (input.disableSignup) {
+			deps.setRuntimeDisableSignup(true);
+			closedSignup = true;
+		}
+
+		const appName = input.appName?.trim();
+		await deps.patchEnvFile(deps.envFile, {
+			SETUP_MODE: "false",
+			...(input.disableSignup ? { DISABLE_SIGNUP: "true" } : {}),
+			...(appName ? { APP_NAME: appName } : {}),
 		});
-		organizationId = organization.organizationId;
-		await deps.setActiveOrganization({ userId, organizationId });
+		envClosed = true;
+
+		await deps.consumeAdminSetupKeyFile(deps.adminSetupKeyFile);
+
+		return { userId, organizationId };
+	} catch (error) {
+		if (closedSignup) deps.setRuntimeDisableSignup(false);
+
+		if (envClosed) {
+			throw new SetupFinalizationFailedError(false, error, { envClosed: true });
+		}
+
+		let rolledBack = false;
+		if (deps.deleteUser) {
+			try {
+				await deps.deleteUser({ userId });
+				rolledBack = true;
+			} catch {
+				rolledBack = false;
+			}
+		}
+		throw new SetupFinalizationFailedError(rolledBack, error);
 	}
-
-	if (input.disableSignup) deps.setRuntimeDisableSignup(true);
-
-	const appName = input.appName?.trim();
-	await deps.patchEnvFile(deps.envFile, {
-		SETUP_MODE: "false",
-		...(input.disableSignup ? { DISABLE_SIGNUP: "true" } : {}),
-		...(appName ? { APP_NAME: appName } : {}),
-	});
-
-	await deps.consumeAdminSetupKeyFile(deps.adminSetupKeyFile);
-
-	return { userId, organizationId };
 }
