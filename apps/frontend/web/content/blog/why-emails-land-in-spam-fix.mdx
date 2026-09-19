@@ -133,7 +133,8 @@ Internet Service Providers (ISPs) maintain rolling reputation scores for every s
 ### How to eliminate bounce penalties
 
 1. **Automatically suppress hard-bounced addresses**: Never retry sending to a hard bounce. [Reloop's delivery engine](/features/deliverability) automatically suppresses hard bounces to protect your domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
-2. **Verify addresses in real-time at signup**: Prevent typos and invalid domains directly at your registration form:
+2. **Clean lists before you send**: Before campaigns or imports, run addresses through a [free email validator](/tools/email-validator) to catch invalid syntax, disposable domains, and domains with no MX records — so hard bounces never hit your sending reputation.
+3. **Verify addresses in real-time at signup**: Prevent typos and invalid domains directly at your registration form (or call Reloop's [email validation API](/features/email-validation) / use the free [bulk email verifier](/tools/email-validator) for CSV imports):
    ```typescript
    import { resolver } from "node:dns/promises";
 
@@ -152,7 +153,7 @@ Internet Service Providers (ISPs) maintain rolling reputation scores for every s
      }
    }
    ```
-3. **Never purchase or scrape email lists**: Third-party lists contain spam traps (honeypot addresses maintained by anti-spam organizations) that immediately ruin domain reputation.
+4. **Never purchase or scrape email lists**: Third-party lists contain spam traps (honeypot addresses maintained by anti-spam organizations) that immediately ruin domain reputation.
 
 ## Cause 4: High spam complaint rate
 
