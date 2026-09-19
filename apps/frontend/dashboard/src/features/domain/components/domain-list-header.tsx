@@ -12,7 +12,7 @@ export function DomainListHeader() {
 	const router = useRouter();
 	const { data: billing } = useBillingUsage();
 	const domainUsed = billing?.resources?.customDomains.used ?? 0;
-	const domainLimit = billing?.resources?.customDomains.limit ?? 1;
+	const domainLimit = billing?.resources?.customDomains.limit ?? 3;
 	const atDomainCap = domainLimit > 0 && domainUsed >= domainLimit;
 
 	const openAddDomain = () =>

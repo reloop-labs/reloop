@@ -3,7 +3,7 @@ import { domain, organizationPlan } from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { and, count, eq, isNull, sql } from "drizzle-orm";
 
-const DEFAULT_MAX_CUSTOM_DOMAINS = 1;
+const DEFAULT_MAX_CUSTOM_DOMAINS = 3;
 
 export type DomainSlotDecision =
 	| { ok: true }
@@ -24,8 +24,9 @@ export function decideCustomDomainSlot(args: {
 }
 
 /**
- * Lock the org, count active custom domains, and throw if the plan is full.
+ * Lock the org, count non-deleted sending domains, and throw if the plan is full.
  * Must run in the same transaction as the insert / undelete.
+ * Tracking verification (`is_tracking_domain`) does not affect the count.
  */
 export async function assertCustomDomainQuota(
 	organizationId: string,
@@ -45,6 +46,8 @@ export async function assertCustomDomainQuota(
 	});
 	const limit = plan?.maxCustomDomains ?? DEFAULT_MAX_CUSTOM_DOMAINS;
 
+	// Count every non-deleted sending domain. `is_tracking_domain` only means
+	// the tracking CNAME verified — it must not drop the domain out of the cap.
 	const [row] = await tx
 		.select({ total: count() })
 		.from(domain)
@@ -52,7 +55,7 @@ export async function assertCustomDomainQuota(
 			and(
 				eq(domain.organizationId, organizationId),
 				isNull(domain.deletedAt),
-				eq(domain.isTrackingDomain, false),
+				eq(domain.isSendingEmailEnabled, true),
 			),
 		);
 
