@@ -1,6 +1,6 @@
 import { PLATFORM_ADMIN_ROLE } from "../roles";
 import { runWithSetupBootstrapBypass } from "./bootstrap-bypass";
-import { adminSetupKeysEqual } from "./setup-mode";
+import type { RedeemAdminSetupKeyResult } from "./setup-mode";
 import type { SetupStatus } from "./setup-status";
 
 export type CompleteSetupInput = {
@@ -22,7 +22,11 @@ export type CompleteSetupDeps = {
 	adminSetupKeyFile: string;
 	envFile: string;
 	getSetupStatus: () => Promise<SetupStatus>;
-	readAdminSetupKey: (filePath: string) => Promise<string | null>;
+	redeemAdminSetupKey: (
+		filePath: string,
+		presented: string,
+	) => Promise<RedeemAdminSetupKeyResult>;
+	writeAdminSetupKeyFile?: (filePath: string, key: string) => Promise<void>;
 	signUpEmail: (input: {
 		name: string;
 		email: string;
@@ -43,7 +47,6 @@ export type CompleteSetupDeps = {
 		filePath: string,
 		updates: Record<string, string>,
 	) => Promise<void>;
-	consumeAdminSetupKeyFile: (filePath: string) => Promise<void>;
 };
 
 export class SetupNotAvailableError extends Error {
@@ -90,7 +93,7 @@ export class SetupFinalizationFailedError extends Error {
 		const envClosed = options.envClosed === true;
 		super(
 			envClosed
-				? "Setup closed the instance but could not clear the admin setup key. Sign in with the administrator account you just created."
+				? "Setup closed the instance but could not finish clearing setup state. Sign in with the administrator account you just created."
 				: rolledBack
 					? "Setup could not finish after creating the administrator, so the account was removed. Try setup again."
 					: "Setup could not finish after creating the administrator. Remove that account (or run apps/backend/admin/scripts/promote-admin.ts if it is incomplete), then try setup again.",
@@ -102,6 +105,31 @@ export class SetupFinalizationFailedError extends Error {
 	}
 }
 
+async function restoreSetupKey(
+	deps: CompleteSetupDeps,
+	key: string,
+): Promise<void> {
+	if (!deps.writeAdminSetupKeyFile) return;
+	try {
+		await deps.writeAdminSetupKeyFile(deps.adminSetupKeyFile, key);
+	} catch {
+		return;
+	}
+}
+
+async function deleteCreatedUser(
+	deps: CompleteSetupDeps,
+	userId: string,
+): Promise<boolean> {
+	if (!deps.deleteUser) return false;
+	try {
+		await deps.deleteUser({ userId });
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 export async function completeSelfHostSetup(
 	input: CompleteSetupInput,
 	deps: CompleteSetupDeps,
@@ -109,39 +137,41 @@ export async function completeSelfHostSetup(
 	const status = await deps.getSetupStatus();
 	if (!status.required) throw new SetupNotAvailableError(status.reason);
 
-	const expectedKey = await deps.readAdminSetupKey(deps.adminSetupKeyFile);
-	if (!expectedKey) throw new SetupNotAvailableError("missing_key");
-	if (!adminSetupKeysEqual(input.adminKey, expectedKey)) {
+	const redeemed = await deps.redeemAdminSetupKey(
+		deps.adminSetupKeyFile,
+		input.adminKey,
+	);
+	if (redeemed.status === "missing") {
+		throw new SetupNotAvailableError("missing_key");
+	}
+	if (redeemed.status === "invalid") {
 		throw new InvalidAdminSetupKeyError();
 	}
 
-	const { userId } = await runWithSetupBootstrapBypass(() =>
-		deps.signUpEmail({
-			name: input.name,
-			email: input.email,
-			password: input.password,
-		}),
-	);
-	try {
-		await deps.setUserRole({ userId, role: PLATFORM_ADMIN_ROLE });
-	} catch (error) {
-		let rolledBack = false;
-		if (deps.deleteUser) {
-			try {
-				await deps.deleteUser({ userId });
-				rolledBack = true;
-			} catch {
-				rolledBack = false;
-			}
-		}
-		throw new AdminPromotionFailedError(rolledBack, error);
-	}
-
-	const organizationName = input.organizationName?.trim();
-	let organizationId: string | null = null;
-	let closedSignup = false;
+	const redeemedKey = redeemed.key;
+	let userId: string | undefined;
 	let envClosed = false;
+
 	try {
+		({ userId } = await runWithSetupBootstrapBypass(() =>
+			deps.signUpEmail({
+				name: input.name,
+				email: input.email,
+				password: input.password,
+			}),
+		));
+
+		try {
+			await deps.setUserRole({ userId, role: PLATFORM_ADMIN_ROLE });
+		} catch (error) {
+			const rolledBack = await deleteCreatedUser(deps, userId);
+			await restoreSetupKey(deps, redeemedKey);
+			throw new AdminPromotionFailedError(rolledBack, error);
+		}
+
+		const organizationName = input.organizationName?.trim();
+		let organizationId: string | null = null;
+
 		if (organizationName) {
 			const organization = await deps.createOwnedOrganization({
 				userId,
@@ -151,38 +181,36 @@ export async function completeSelfHostSetup(
 			await deps.setActiveOrganization({ userId, organizationId });
 		}
 
-		if (input.disableSignup) {
-			deps.setRuntimeDisableSignup(true);
-			closedSignup = true;
-		}
+		deps.setRuntimeDisableSignup(input.disableSignup);
 
 		const appName = input.appName?.trim();
 		await deps.patchEnvFile(deps.envFile, {
 			SETUP_MODE: "false",
-			...(input.disableSignup ? { DISABLE_SIGNUP: "true" } : {}),
+			DISABLE_SIGNUP: input.disableSignup ? "true" : "false",
 			...(appName ? { APP_NAME: appName } : {}),
 		});
 		envClosed = true;
 
-		await deps.consumeAdminSetupKeyFile(deps.adminSetupKeyFile);
-
 		return { userId, organizationId };
 	} catch (error) {
-		if (closedSignup) deps.setRuntimeDisableSignup(false);
+		if (
+			error instanceof AdminPromotionFailedError ||
+			error instanceof SetupNotAvailableError ||
+			error instanceof InvalidAdminSetupKeyError
+		) {
+			throw error;
+		}
+
+		deps.setRuntimeDisableSignup(false);
 
 		if (envClosed) {
 			throw new SetupFinalizationFailedError(false, error, { envClosed: true });
 		}
 
 		let rolledBack = false;
-		if (deps.deleteUser) {
-			try {
-				await deps.deleteUser({ userId });
-				rolledBack = true;
-			} catch {
-				rolledBack = false;
-			}
-		}
+		if (userId) rolledBack = await deleteCreatedUser(deps, userId);
+		await restoreSetupKey(deps, redeemedKey);
+		if (!userId) throw error;
 		throw new SetupFinalizationFailedError(rolledBack, error);
 	}
 }

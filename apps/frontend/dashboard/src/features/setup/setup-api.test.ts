@@ -41,12 +41,21 @@ describe("fetchSetupStatus", () => {
 		});
 	});
 
-	test("treats a malformed body as not required", async () => {
+	test("keeps transient HTTP failures as errors so the client can retry", async () => {
+		mockFetch(new Response(null, { status: 503 }));
+
+		await expect(fetchSetupStatus()).rejects.toMatchObject({
+			name: "SetupRequestError",
+			status: 503,
+		});
+	});
+
+	test("rejects a malformed success body instead of hiding setup", async () => {
 		mockFetch(new Response("not json", { status: 200 }));
 
-		await expect(fetchSetupStatus()).resolves.toEqual({
-			required: false,
-			reason: "not_required",
+		await expect(fetchSetupStatus()).rejects.toMatchObject({
+			name: "SetupRequestError",
+			status: 200,
 		});
 	});
 });

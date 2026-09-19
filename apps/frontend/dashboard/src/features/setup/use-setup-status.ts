@@ -12,7 +12,8 @@ export function setupStatusQueryOptions() {
 		queryFn: ({ signal }) => fetchSetupStatus(signal),
 		staleTime: Number.POSITIVE_INFINITY,
 		gcTime: Number.POSITIVE_INFINITY,
-		retry: false,
+		retry: 2,
+		retryDelay: 1_000,
 	});
 }
 
@@ -25,10 +26,10 @@ export function useSetupStatusQuery(enabled = true) {
 
 export function useRedirectIfSetupRequired(enabled = true) {
 	const router = useRouter();
-	const { data, isFetched } = useSetupStatusQuery(enabled);
+	const { data, isPending, isError, isFetched } = useSetupStatusQuery(enabled);
 
 	const isSetupRequired = enabled && data?.required === true;
-	const isCheckingSetup = enabled && !isFetched;
+	const isCheckingSetup = enabled && (isPending || isError || !isFetched);
 
 	useEffect(() => {
 		if (!isSetupRequired) return;

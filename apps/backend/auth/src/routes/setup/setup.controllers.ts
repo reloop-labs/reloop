@@ -7,9 +7,9 @@ import {
 } from "@reloop/auth/setup/complete-setup";
 import { setRuntimeDisableSignup } from "@reloop/auth/setup/runtime-registration";
 import {
-	consumeAdminSetupKeyFile,
 	patchEnvFile,
-	readAdminSetupKey,
+	redeemAdminSetupKey,
+	writeAdminSetupKeyFile,
 } from "@reloop/auth/setup/setup-mode";
 import {
 	getSetupStatus,
@@ -56,7 +56,8 @@ const setupDeps: CompleteSetupDeps = {
 	adminSetupKeyFile: authServerConfig.ADMIN_SETUP_KEY_FILE,
 	envFile: authServerConfig.RELOOP_ENV_FILE,
 	getSetupStatus,
-	readAdminSetupKey,
+	redeemAdminSetupKey,
+	writeAdminSetupKeyFile,
 	signUpEmail: async ({ name, email, password }) => {
 		const created = await auth.api.signUpEmail({
 			body: { name, email, password },
@@ -87,7 +88,6 @@ const setupDeps: CompleteSetupDeps = {
 	},
 	setRuntimeDisableSignup,
 	patchEnvFile,
-	consumeAdminSetupKeyFile,
 };
 
 export async function setupStatusController(): Promise<SetupStatus> {

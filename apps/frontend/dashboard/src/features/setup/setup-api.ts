@@ -52,7 +52,14 @@ export async function fetchSetupStatus(
 		signal,
 	});
 
-	if (!response.ok) return NOT_REQUIRED;
+	if (response.status === 404) return NOT_REQUIRED;
+	if (!response.ok) {
+		throw new SetupRequestError(
+			response.status,
+			(await readMessage(response)) ??
+				"Could not determine whether setup is required.",
+		);
+	}
 
 	try {
 		const body = (await response.json()) as SetupStatus | null;
@@ -60,7 +67,10 @@ export async function fetchSetupStatus(
 			? { required: true, reason: body.reason ?? "ready" }
 			: NOT_REQUIRED;
 	} catch {
-		return NOT_REQUIRED;
+		throw new SetupRequestError(
+			response.status,
+			"Could not determine whether setup is required.",
+		);
 	}
 }
 

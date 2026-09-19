@@ -14,7 +14,7 @@ import { useSetupStatusQuery } from "./use-setup-status";
 
 export function SetupPage() {
 	const router = useRouter();
-	const { data, isFetched } = useSetupStatusQuery();
+	const { data, isFetched, isError, isPending } = useSetupStatusQuery();
 	const [ui, setUi] = useState<SetupUiState>({
 		canSubmit: false,
 		isLoading: false,
@@ -22,14 +22,14 @@ export function SetupPage() {
 	});
 
 	const isSetupRequired = data?.required === true;
-	const isUnavailable = isFetched && !isSetupRequired;
+	const isUnavailable = isFetched && !isError && !isSetupRequired;
 
 	useEffect(() => {
 		if (!isUnavailable) return;
 		router.replace("/login");
 	}, [isUnavailable, router]);
 
-	if (!isFetched || !isSetupRequired) {
+	if (isPending || isError || !isSetupRequired) {
 		return <AuthSessionLoader />;
 	}
 

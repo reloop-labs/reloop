@@ -403,6 +403,15 @@ write_admin_setup_key() {
 
 	if [ -n "${ADMIN_SETUP_KEY_OVERRIDE:-}" ]; then
 		ADMIN_SETUP_KEY="$ADMIN_SETUP_KEY_OVERRIDE"
+	elif [ -f "$key_file" ]; then
+		ADMIN_SETUP_KEY="$(tr -d '[:space:]' <"$key_file" || true)"
+		if [ -n "$ADMIN_SETUP_KEY" ]; then
+			chown root:root "$key_file"
+			chmod 600 "$key_file"
+			ok "Kept existing $key_file (root-only, 0600)"
+			return 0
+		fi
+		ADMIN_SETUP_KEY="$(gen_secret 40)"
 	else
 		ADMIN_SETUP_KEY="$(gen_secret 40)"
 	fi

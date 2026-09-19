@@ -13,6 +13,7 @@ import {
 	patchEnvFile,
 	readAdminSetupKey,
 	readEnvFileValue,
+	redeemAdminSetupKey,
 	seedRuntimeSignupLockFromEnvFile,
 } from "@reloop/auth/setup/setup-mode";
 
@@ -49,6 +50,32 @@ describe("setup-mode", () => {
 	test("consumeAdminSetupKeyFile tolerates a missing file", async () => {
 		const dir = await mkdtemp(join(tmpdir(), "reloop-setup-"));
 		await consumeAdminSetupKeyFile(join(dir, "admin-setup.key"));
+	});
+
+	test("redeemAdminSetupKey spends a matching key under a lock", async () => {
+		const dir = await mkdtemp(join(tmpdir(), "reloop-setup-"));
+		const path = join(dir, "admin-setup.key");
+		await writeFile(path, "secret-key-1\n", { mode: 0o600 });
+
+		expect(await redeemAdminSetupKey(path, "secret-key-1")).toEqual({
+			status: "redeemed",
+			key: "secret-key-1",
+		});
+		expect(await readAdminSetupKey(path)).toBe("");
+		expect(await redeemAdminSetupKey(path, "secret-key-1")).toEqual({
+			status: "missing",
+		});
+	});
+
+	test("redeemAdminSetupKey rejects a wrong key without emptying the file", async () => {
+		const dir = await mkdtemp(join(tmpdir(), "reloop-setup-"));
+		const path = join(dir, "admin-setup.key");
+		await writeFile(path, "secret-key-1\n", { mode: 0o600 });
+
+		expect(await redeemAdminSetupKey(path, "secret-key-2")).toEqual({
+			status: "invalid",
+		});
+		expect(await readAdminSetupKey(path)).toBe("secret-key-1");
 	});
 
 	test("patchEnvFile updates and inserts keys", async () => {

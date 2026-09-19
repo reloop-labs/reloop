@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import { readFile, truncate, writeFile } from "node:fs/promises";
+import { open, readFile, truncate, unlink, writeFile } from "node:fs/promises";
 import { isEnvFlagEnabled } from "../registration-controls";
 import { setRuntimeDisableSignup } from "./runtime-registration";
 import { isSafeEnvText } from "./setup-limits";
@@ -39,6 +39,58 @@ export async function consumeAdminSetupKeyFile(
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
 	}
+}
+
+export async function writeAdminSetupKeyFile(
+	filePath: string,
+	key: string,
+): Promise<void> {
+	await writeFile(filePath, `${key}\n`, { mode: 0o600 });
+}
+
+async function withExclusiveFileLock<T>(
+	lockPath: string,
+	fn: () => Promise<T>,
+): Promise<T> {
+	const started = Date.now();
+	for (;;) {
+		let handle: Awaited<ReturnType<typeof open>> | undefined;
+		try {
+			handle = await open(lockPath, "wx");
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+			if (Date.now() - started > 15_000) {
+				throw new Error("Timed out waiting for the administrator setup key");
+			}
+			await new Promise((resolve) => setTimeout(resolve, 25));
+			continue;
+		}
+
+		try {
+			return await fn();
+		} finally {
+			await handle.close();
+			await unlink(lockPath).catch(() => {});
+		}
+	}
+}
+
+export type RedeemAdminSetupKeyResult =
+	| { status: "redeemed"; key: string }
+	| { status: "missing" }
+	| { status: "invalid" };
+
+export async function redeemAdminSetupKey(
+	filePath: string,
+	presented: string,
+): Promise<RedeemAdminSetupKeyResult> {
+	return await withExclusiveFileLock(`${filePath}.lock`, async () => {
+		const expected = await readAdminSetupKey(filePath);
+		if (!expected) return { status: "missing" };
+		if (!adminSetupKeysEqual(presented, expected)) return { status: "invalid" };
+		await consumeAdminSetupKeyFile(filePath);
+		return { status: "redeemed", key: expected };
+	});
 }
 
 export async function readEnvFileValue(
