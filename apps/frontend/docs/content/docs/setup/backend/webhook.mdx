@@ -45,7 +45,7 @@ NATS_URL=nats://localhost:4222
 NODE_ENV=development
 ```
 
-`WEBHOOK_ENCRYPTION_KEY` encrypts stored webhook signing secrets. If unset, secrets are stored in plaintext (local only).
+`WEBHOOK_ENCRYPTION_KEY` encrypts stored webhook signing secrets. If unset, secrets are stored in plaintext (local only). The workflow service decrypts them to sign deliveries, so it needs the same value.
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |

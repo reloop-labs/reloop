@@ -1,26 +1,19 @@
 import dns from "node:dns";
 import net from "node:net";
 
-export function isPrivateOrBlockedIP(ip: string): boolean {
-	if (net.isIPv4(ip)) {
-		const parts = ip.split(".").map(Number);
-		if (parts.length !== 4 || parts.some((p) => Number.isNaN(p))) return true;
+function ipv4Parts(ip: string): number[] | null {
+	const parts = ip.split(".").map(Number);
+	if (parts.length !== 4 || parts.some((p) => Number.isNaN(p))) return null;
+	return parts;
+}
 
-		// Loopback 127.0.0.0/8
+export function isPrivateNetworkIP(ip: string): boolean {
+	if (net.isIPv4(ip)) {
+		const parts = ipv4Parts(ip);
+		if (!parts) return true;
+
 		if (parts[0] === 127) return true;
-		// "This" network 0.0.0.0/8
-		if (parts[0] === 0) return true;
-		// Private 10.0.0.0/8
 		if (parts[0] === 10) return true;
-		// CGNAT 100.64.0.0/10
-		if (
-			parts[0] === 100 &&
-			parts[1] !== undefined &&
-			parts[1] >= 64 &&
-			parts[1] <= 127
-		)
-			return true;
-		// Private 172.16.0.0/12
 		if (
 			parts[0] === 172 &&
 			parts[1] !== undefined &&
@@ -28,41 +21,17 @@ export function isPrivateOrBlockedIP(ip: string): boolean {
 			parts[1] <= 31
 		)
 			return true;
-		// Private 192.168.0.0/16
 		if (parts[0] === 192 && parts[1] === 168) return true;
-		// Link-local 169.254.0.0/16 (includes AWS metadata 169.254.169.254)
-		if (parts[0] === 169 && parts[1] === 254) return true;
-		// Benchmarking 198.18.0.0/15
-		if (
-			parts[0] === 198 &&
-			parts[1] !== undefined &&
-			(parts[1] === 18 || parts[1] === 19)
-		)
-			return true;
-		// Multicast / reserved
-		if (parts[0] !== undefined && parts[0] >= 224) return true;
-
 		return false;
 	}
 
 	if (net.isIPv6(ip)) {
 		const normalized = ip.toLowerCase();
-		if (normalized === "::1" || normalized === "::") return true;
-		// IPv4-mapped IPv6
+		if (normalized === "::1") return true;
 		if (normalized.startsWith("::ffff:")) {
 			const v4 = normalized.slice("::ffff:".length);
-			if (net.isIPv4(v4)) return isPrivateOrBlockedIP(v4);
+			if (net.isIPv4(v4)) return isPrivateNetworkIP(v4);
 		}
-		// Link-local fe80::/10
-		if (
-			normalized.startsWith("fe8") ||
-			normalized.startsWith("fe9") ||
-			normalized.startsWith("fea") ||
-			normalized.startsWith("feb")
-		) {
-			return true;
-		}
-		// Unique local fc00::/7
 		if (normalized.startsWith("fc") || normalized.startsWith("fd")) {
 			return true;
 		}
@@ -72,25 +41,76 @@ export function isPrivateOrBlockedIP(ip: string): boolean {
 	return true;
 }
 
+export function isAlwaysBlockedIP(ip: string): boolean {
+	if (net.isIPv4(ip)) {
+		const parts = ipv4Parts(ip);
+		if (!parts) return true;
+
+		if (parts[0] === 0) return true;
+		if (
+			parts[0] === 100 &&
+			parts[1] !== undefined &&
+			parts[1] >= 64 &&
+			parts[1] <= 127
+		)
+			return true;
+		if (parts[0] === 169 && parts[1] === 254) return true;
+		if (
+			parts[0] === 198 &&
+			parts[1] !== undefined &&
+			(parts[1] === 18 || parts[1] === 19)
+		)
+			return true;
+		if (parts[0] !== undefined && parts[0] >= 224) return true;
+		return false;
+	}
+
+	if (net.isIPv6(ip)) {
+		const normalized = ip.toLowerCase();
+		if (normalized === "::") return true;
+		if (normalized.startsWith("::ffff:")) {
+			const v4 = normalized.slice("::ffff:".length);
+			if (net.isIPv4(v4)) return isAlwaysBlockedIP(v4);
+		}
+		if (
+			normalized.startsWith("fe8") ||
+			normalized.startsWith("fe9") ||
+			normalized.startsWith("fea") ||
+			normalized.startsWith("feb")
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	return true;
+}
+
+export function isPrivateOrBlockedIP(ip: string): boolean {
+	return isPrivateNetworkIP(ip) || isAlwaysBlockedIP(ip);
+}
+
+function isBlockedForTarget(ip: string, allowPrivate: boolean): boolean {
+	if (isAlwaysBlockedIP(ip)) return true;
+	if (allowPrivate) return false;
+	return isPrivateNetworkIP(ip);
+}
+
 export type ResolvedTarget = {
 	hostname: string;
-	/** First public IP chosen for the connection. */
 	pinnedIp: string;
-	/** All resolved addresses (for logging). */
 	allIps: string[];
 	family: 4 | 6;
 };
 
-/**
- * Resolve hostname and reject if any resolved address is private/blocked.
- * Returns a single public IP to pin for the outbound connection.
- */
 export async function resolvePublicTarget(
 	hostname: string,
+	options?: { allowPrivate?: boolean },
 ): Promise<ResolvedTarget> {
 	hostname = hostname.replace(/^\[|\]$/g, "");
+	const allowPrivate = options?.allowPrivate === true;
 	if (net.isIP(hostname)) {
-		if (isPrivateOrBlockedIP(hostname)) {
+		if (isBlockedForTarget(hostname, allowPrivate)) {
 			throw new SsrfBlockedError(
 				`Outbound request to private/local IP address ${hostname} is blocked`,
 			);
@@ -113,7 +133,7 @@ export async function resolvePublicTarget(
 
 	const ips = results.map((r) => r.address);
 	for (const ip of ips) {
-		if (isPrivateOrBlockedIP(ip)) {
+		if (isBlockedForTarget(ip, allowPrivate)) {
 			throw new SsrfBlockedError(
 				`Outbound request to private/local IP address ${ip} is blocked`,
 			);
@@ -127,11 +147,16 @@ export async function resolvePublicTarget(
 		);
 	}
 
+	const pinned =
+		allowPrivate && results.some((r) => r.family === 4)
+			? (results.find((r) => r.family === 4) ?? first)
+			: first;
+
 	return {
 		hostname,
-		pinnedIp: first.address,
+		pinnedIp: pinned.address,
 		allIps: ips,
-		family: first.family === 6 ? 6 : 4,
+		family: pinned.family === 6 ? 6 : 4,
 	};
 }
 

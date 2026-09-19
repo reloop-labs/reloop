@@ -31,6 +31,7 @@ export type PinnedRequestInput = {
 	body?: string;
 	timeoutMs?: number;
 	allowHttp?: boolean;
+	allowPrivate?: boolean;
 	maxBytes?: number;
 };
 
@@ -69,7 +70,9 @@ export async function requestPinned(
 
 	let resolved: ResolvedTarget;
 	try {
-		resolved = await resolvePublicTarget(parsed.hostname);
+		resolved = await resolvePublicTarget(parsed.hostname, {
+			allowPrivate: input.allowPrivate,
+		});
 	} catch (e) {
 		const message =
 			e instanceof SsrfBlockedError
@@ -191,6 +194,7 @@ export async function postWebhook(input: {
 	timeoutMs?: number;
 	/** When false (default), only https: is allowed. */
 	allowHttp?: boolean;
+	allowPrivate?: boolean;
 }): Promise<WebhookHttpResult> {
 	try {
 		return await requestPinned({ ...input, method: "POST" });

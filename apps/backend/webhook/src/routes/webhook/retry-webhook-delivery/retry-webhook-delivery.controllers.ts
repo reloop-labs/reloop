@@ -28,7 +28,7 @@ export async function retryWebhookDeliveryController({
 }: {
 	deliveryId: string;
 	organizationId: string;
-}): Promise<{ success: boolean; message: string; newDeliveryId?: string }> {
+}): Promise<{ success: boolean; message: string; newDeliveryId: string }> {
 	const delivery = await db.query.webhookDelivery.findFirst({
 		where: eq(schema.webhookDelivery.id, deliveryId),
 		with: {
