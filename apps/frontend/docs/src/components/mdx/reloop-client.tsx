@@ -458,8 +458,9 @@ export const Card = React.forwardRef<
 		children?: React.ReactNode;
 		className?: string;
 		onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+		noIconFrame?: boolean;
 	}
->(({ title, icon, href, children, className, onClick, ...props }, ref) => {
+>(({ title, icon, href, children, className, onClick, noIconFrame, ...props }, ref) => {
 	const content = (
 		<div
 			ref={ref}
@@ -473,13 +474,23 @@ export const Card = React.forwardRef<
 			{...props}
 		>
 			{icon && (
-				<div className="flex size-9 items-center justify-center rounded-lg border border-stroke-soft-100 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:border-stroke-soft-100/40 dark:group-hover:text-white">
-					{typeof icon === "string" ? (
-						<ReloopIcon name={icon} className="size-4" />
-					) : (
-						icon
-					)}
-				</div>
+				noIconFrame ? (
+					<div className="text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:group-hover:text-white">
+						{typeof icon === "string" ? (
+							<ReloopIcon name={icon} className="size-4" />
+						) : (
+							icon
+						)}
+					</div>
+				) : (
+					<div className="flex size-9 items-center justify-center rounded-lg border border-stroke-soft-100 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:border-stroke-soft-100/40 dark:group-hover:text-white">
+						{typeof icon === "string" ? (
+							<ReloopIcon name={icon} className="size-4" />
+						) : (
+							icon
+						)}
+					</div>
+				)
 			)}
 			{title && (
 				<h3 className="m-0 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">

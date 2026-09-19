@@ -21,7 +21,7 @@ import {
 	Tabs,
 	Tip,
 	Warning,
-} from "@reloop/fe-docs/components/mdx/mintlify-client";
+} from "@reloop/fe-docs/components/mdx/reloop-client";
 import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
 import {
 	RelatedTopic,
@@ -52,7 +52,7 @@ function resolveCardIcon(icon: unknown): React.ReactNode {
 		return <ReloopIcon name={icon} className="size-6 shrink-0" />;
 	}
 
-	// Fall through to Mintlify/Font Awesome for other string names
+	// Fall through to Font Awesome for other string names
 	return icon;
 }
 
