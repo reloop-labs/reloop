@@ -493,7 +493,7 @@ export const Card = React.forwardRef<
 				)
 			)}
 			{title && (
-				<h3 className="m-0 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+				<h3 className="m-0 font-semibold text-[14px] text-text-strong-950 tracking-tight dark:text-white">
 					{title}
 				</h3>
 			)}
