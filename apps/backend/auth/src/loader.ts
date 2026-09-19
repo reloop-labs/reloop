@@ -1,3 +1,4 @@
+import { seedRuntimeSignupLockFromEnvFile } from "@reloop/auth/setup/setup-mode";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
@@ -14,6 +15,15 @@ export const loader = async () => {
 		log.info("server", "Postgres connected");
 		await bus.connect(authConfig.NATS_URL);
 		log.info("server", "NATS connected");
+	} catch (e) {
+		log.error({ message: String(e) });
+	}
+
+	try {
+		const locked = await seedRuntimeSignupLockFromEnvFile(
+			authConfig.RELOOP_ENV_FILE,
+		);
+		if (locked) log.info("server", "Registration locked by instance env file");
 	} catch (e) {
 		log.error({ message: String(e) });
 	}

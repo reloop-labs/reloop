@@ -132,6 +132,9 @@ services:
     container_name: reloop-auth
     environment:
       PORT: 8000
+    volumes:
+      - ./admin-setup.key:/run/reloop/admin-setup.key
+      - ./.env:/run/reloop/.env
 
   domain:
     <<: *backend

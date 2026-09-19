@@ -48,7 +48,7 @@ Many providers block outbound port `25` by default. Reloop still sends through t
 | Prompt | Purpose | Default |
 | :--- | :--- | :--- |
 | Primary Reloop domain | The hostname the dashboard and API are served on | — |
-| Administrator email | Let's Encrypt contact and your first Reloop account | — |
+| TLS contact email | Let's Encrypt expiry and account notices | — |
 | Database name | PostgreSQL database | `reloop` |
 | Database user | PostgreSQL role | `reloop` |
 | Run behind an existing reverse proxy | Serve plain HTTP on a local port for your own Caddy, Nginx or Traefik instead of taking `80` and `443`. See [Behind an existing reverse proxy](#behind-an-existing-reverse-proxy) | `no` |
@@ -67,6 +67,7 @@ Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloo
 ```text
 /opt/reloop/
 ├── .env                 production configuration and secrets (0600, root)
+├── admin-setup.key      one-time first-run setup key (0600, emptied after setup)
 ├── docker-compose.yml   the production stack
 ├── Caddyfile            reverse proxy and TLS
 └── backups/             automatic database dumps taken before schema changes
@@ -305,22 +306,46 @@ that verifies certificates has to be told to accept this one.
 
 ## First sign-in
 
-Reloop sends one-time codes through its own mail pipeline, which needs a verified sending domain — so a fresh installation has no way to email you the first code. The installer generates a bootstrap code, writes it to `DEFAULT_OTP` in `/opt/reloop/.env`, and prints it once.
+The installer prints a one-time administrator setup key when a new installation
+finishes. It also saves the key to `/opt/reloop/admin-setup.key`, a root-only
+file, in case you need to retrieve it before completing setup.
 
-1. Open `https://your-domain/dashboard`
-2. Sign up with the administrator email
-3. Enter the printed code
+1. Open `https://your-domain/dashboard/setup`
+2. Enter the setup key
+3. Choose the first administrator's name, email and password
+4. Name the instance and first organization
+5. Leave **Turn off public sign-ups** selected for a private instance, or clear
+   it if anyone should be able to register
 
-Once one of your domains is verified and sending, remove the `DEFAULT_OTP` line from `/opt/reloop/.env` and run `reloop restart auth`.
+The first account is created as a `super-admin`. Completing setup consumes the
+key, empties `admin-setup.key`, sets `SETUP_MODE=false` and closes the setup
+page. The installer only prints the key once.
 
-To lock the instance down, set these in the same file and restart `auth`:
+To supply your own key, download the installer before running it:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh -o install.sh
+sudo bash install.sh --admin-key='your-long-random-key'
+```
+
+`RELOOP_ADMIN_EMAIL` is only the TLS contact address; it does not preselect or
+create the administrator account. Self-host setup uses a password, not an
+emailed code. Reloop Cloud's one-time-code sign-in is unrelated and unchanged.
+
+If the setup flow is unavailable after an account already exists,
+`apps/backend/admin/scripts/promote-admin.ts` remains available as a
+break-glass recovery tool. It is not the normal first-run setup path.
+
+To change registration or organization creation later, edit these values in
+`/opt/reloop/.env` and run `reloop restart auth`:
 
 | Variable | Effect |
 | :--- | :--- |
 | `DISABLE_SIGNUP=true` | No new accounts on any sign-up path. Existing users still sign in, and invited addresses can still join |
 | `DISABLE_ORG_CREATION=true` | Nobody can create further organizations |
 
-Set `DISABLE_SIGNUP` only after your own account exists. The installer keeps both values across re-runs, so an update will not reopen registration. See [Closing registration](/docs/setup/backend/auth#closing-registration).
+The installer keeps both values across re-runs, so an update will not reopen
+registration. See [Closing registration](/docs/setup/backend/auth#closing-registration).
 
 If sign-in succeeds but the dashboard then answers `401` on every protected
 page, the services cannot reach the auth service over your public origin. Set
@@ -348,14 +373,14 @@ command.
 | `RELOOP_VERSION` | Image tag deployed for every service |
 | `RELOOP_DOMAIN` | Dashboard and API hostname |
 | `RELOOP_TRACKING_HOST` / `RELOOP_INBOUND_HOST` | `link.` and `inbound.` hostnames, derived from `RELOOP_DOMAIN` |
-| `RELOOP_ADMIN_EMAIL` | Let's Encrypt contact and the first account |
+| `RELOOP_ADMIN_EMAIL` | Let's Encrypt contact address only |
 | `RELOOP_PUBLIC_IP` | Address printed in the DNS records and SPF |
 | `RELOOP_HTTPS` | Whether Reloop is reached over `https://` |
 | `RELOOP_EXTERNAL_PROXY` / `RELOOP_PROXY_PORT` | Run behind your own proxy, and the local port it forwards to |
 | `BASE_URL` / `TRACKING_BASE_URL` | Public origins used in links and emails, generated from the values above |
 | `RELOOP_SITE_ADDRESS` / `RELOOP_TRACKING_SITE_ADDRESS` | Site addresses for the bundled Caddy, generated |
 | `POSTGRES_*`, `REDIS_PASSWORD`, `BETTER_AUTH_SECRET`, `RELOOP_INTERNAL_SECRET`, `TRACKING_SECRET`, `PREFERENCES_SECRET`, `WEBHOOK_ENCRYPTION_KEY` | Generated once and kept across re-runs. Back them up with the file and don't replace them by hand |
-| `DEFAULT_OTP` | Bootstrap sign-in code, see [First sign-in](#first-sign-in) |
+| `SETUP_MODE` / `ADMIN_SETUP_KEY_FILE` | First-run setup state and the setup key path inside the auth container |
 | `DISABLE_SIGNUP` / `DISABLE_ORG_CREATION` | Close registration and organization creation |
 | `AUTH_INTERNAL_BASE_URL` | Internal origin for session checks between services |
 | `APP_NAME` | Name used in system email. See [Branding system email](/docs/setup/backend/email#branding-system-email) |
@@ -426,7 +451,8 @@ curl -fsSL https://reloop.sh/install.sh | sudo \
 | :--- | :--- |
 | `RELOOP_NONINTERACTIVE` | Never prompt; fail if a required value is missing |
 | `RELOOP_DOMAIN` | Primary hostname |
-| `RELOOP_ADMIN_EMAIL` | Administrator email |
+| `RELOOP_ADMIN_EMAIL` | TLS contact email |
+| `RELOOP_ADMIN_SETUP_KEY` | Optional administrator setup key override; equivalent to `--admin-key=` |
 | `RELOOP_DB_NAME` / `RELOOP_DB_USER` | Database name and role |
 | `RELOOP_HTTPS` | `yes` or `no`. Behind your own proxy, whether that proxy serves HTTPS |
 | `RELOOP_EXTERNAL_PROXY` | `yes` to run behind your own reverse proxy instead of taking `80` and `443` |

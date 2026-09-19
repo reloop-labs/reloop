@@ -14,6 +14,7 @@ import { SocialSignup } from "#/features/auth/signup/social-signup";
 import { useAuthStepDirection } from "#/features/auth/use-auth-step-direction";
 import { useRedirectIfAuthenticated } from "#/features/auth/use-redirect-if-authenticated";
 import { VerifyOTP, type VerifyOtpUiState } from "#/features/auth/verify-otp";
+import { useRedirectIfSetupRequired } from "#/features/setup/use-setup-status";
 
 export function SignupPage() {
 	const [otpSentEmail, setOtpSentEmail] = useQueryState(
@@ -35,6 +36,7 @@ export function SignupPage() {
 	const currentLevel = otpSentEmail ? 1 : 0;
 	const direction = useAuthStepDirection(currentLevel);
 	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(inviteId);
+	const { shouldBlockForSetup } = useRedirectIfSetupRequired();
 
 	// OTP step footer — keep a placeholder so the strip never unmounts mid-transition.
 	const [otpResendFooter, setOtpResendFooter] = useState<ReactNode>(null);
@@ -55,7 +57,7 @@ export function SignupPage() {
 		verifyOtpRef.current = fn;
 	}, []);
 
-	if (shouldBlockAuthUi) {
+	if (shouldBlockAuthUi || shouldBlockForSetup) {
 		return <AuthSessionLoader />;
 	}
 

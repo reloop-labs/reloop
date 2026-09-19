@@ -3,6 +3,7 @@ export const queryKeys = {
 	auth: {
 		all: ["auth"] as const,
 		session: () => [...queryKeys.auth.all, "session"] as const,
+		setupStatus: () => [...queryKeys.auth.all, "setup-status"] as const,
 		organizations: () => [...queryKeys.auth.all, "organizations"] as const,
 		userInvitations: () => [...queryKeys.auth.all, "user-invitations"] as const,
 		accounts: () => [...queryKeys.auth.all, "accounts"] as const,
