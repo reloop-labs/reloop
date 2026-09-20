@@ -64,13 +64,13 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 		),
 	},
 	{
-		id: "dkim-rotation",
-		icon: "key",
-		title: "Automatic DKIM key rotation",
+		id: "phishing-protection",
+		icon: "shield-check",
+		title: "Phishing protection",
 		description: (
 			<>
-				Keep <Term href="/glossary/dkim">DKIM</Term> keys fresh with automated
-				rotation.
+				Detect <Term href="/tools/lookalike-watch">lookalike</Term> domains and
+				block impersonation attacks.
 			</>
 		),
 	},
@@ -107,7 +107,7 @@ const deliverabilityHighlights: FeatureHighlight[] = [
 	{
 		id: "dmarc",
 		icon: "fingerprint",
-		title: "Prevent spoofing with DMARC",
+		title: "Prevent spoofing",
 		description: (
 			<>
 				<Term href="/glossary/dmarc">DMARC</Term> stops impersonation before it
