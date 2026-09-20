@@ -3,7 +3,6 @@ import {
 	FeatureHighlightsGrid,
 } from "@reloop/web/components/landing/feature-highlights";
 import Link from "next/link";
-import { SceneGlyph } from "./_shared/scene-header";
 
 function Term({ href, children }: { href: string; children: React.ReactNode }) {
 	return (
@@ -134,18 +133,15 @@ export default function Highlights() {
 		<section
 			id="highlights"
 			aria-labelledby="highlights-heading"
-			className="w-full"
+			className="w-full border-stroke-soft-200 border-b dark:border-white/10"
 		>
-			<div className="border-stroke-soft-200 border-b px-4 py-16 sm:px-6 sm:py-20 lg:px-12 lg:py-24 dark:border-white/10">
-				<div className="flex items-center gap-2">
-					<SceneGlyph icon="shield" color="emerald" />
-					<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
-						Deliverability
-					</span>
-				</div>
+			<div className="border-stroke-soft-200 border-b px-5 py-8 sm:px-7 lg:px-9 lg:py-10 dark:border-white/10">
+				<p className="font-medium text-[12px] text-primary-base uppercase">
+					Deliverability
+				</p>
 				<h2
 					id="highlights-heading"
-					className="mt-3.5 max-w-3xl text-balance font-medium text-4xl text-text-strong-950 leading-[1.05] tracking-tighter sm:text-5xl dark:text-white"
+					className="mt-3 font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
 					Built to land in the inbox.
 				</h2>
