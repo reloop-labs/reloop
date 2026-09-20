@@ -12,18 +12,20 @@ const pageUrl = `${getSiteUrl()}/terms-and-conditions`;
 export const metadata: Metadata = {
 	title: "Terms of Service",
 	description:
-		"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs.",
+		"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs, including acceptable use, reputation protection, and refunds.",
 	keywords: [
 		"Reloop terms of service",
 		"email platform terms",
 		"terms and conditions",
 		"open source email terms",
+		"acceptable use policy",
+		"refund policy",
 	],
 	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Terms of Service | Reloop",
 		description:
-			"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs.",
+			"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs, including acceptable use, reputation protection, and refunds.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -32,18 +34,18 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Terms of Service | Reloop",
 		description:
-			"Terms governing use of reloop.sh and the open-source Reloop email infrastructure.",
+			"Terms governing use of reloop.sh, including acceptable use, reputation protection, and refunds.",
 	},
 };
 
-const LAST_UPDATED = "June 2, 2026";
+const LAST_UPDATED = "September 19, 2026";
 
 const TermsPage = () => {
 	return (
 		<PageLayout
 			title="Terms of Service"
 			subtitle={`LAST UPDATED: ${LAST_UPDATED}`}
-			description="Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs."
+			description="Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs, including acceptable use, reputation protection, and refunds."
 			tocPosition="right"
 		>
 			<div>
@@ -154,24 +156,205 @@ const TermsPage = () => {
 				</section>
 
 				<section>
-					<h2>5. Acceptable use of the software</h2>
-					<p>You agree not to use Reloop to:</p>
+					<h2>5. Acceptable use</h2>
+					<p>
+						You agree not to use Reloop—whether hosted or self-hosted—to engage
+						in, facilitate, or attempt any of the following:
+					</p>
 					<ul>
-						<li>Send unsolicited or unlawful email (spam).</li>
-						<li>Phish, distribute malware, or engage in fraud.</li>
-						<li>Violate applicable export, sanctions, or anti-abuse laws.</li>
-						<li>Infringe intellectual property or privacy rights of others.</li>
+						<li>
+							Send unsolicited, bulk, or unlawful email (spam), or send to
+							purchased, scraped, or otherwise non-consented lists.
+						</li>
+						<li>
+							Phish, spoof, impersonate brands or individuals, distribute
+							malware, or engage in fraud, scams, or social-engineering attacks.
+						</li>
+						<li>
+							Send messages that lure recipients with fake security alerts,
+							CVE-style claims, crypto or wallet theft narratives, seed-phrase
+							or private-key requests, or similar deception.
+						</li>
+						<li>
+							Route mail through carrier SMS or MMS email-to-text gateways (for
+							example addresses on domains such as mms.mb.telus.com,
+							txt.att.net, vtext.com, or tmomail.net) to deliver unsolicited
+							messages to phones.
+						</li>
+						<li>
+							Violate applicable export, sanctions, anti-abuse, or anti-spam
+							laws.
+						</li>
+						<li>
+							Infringe intellectual property, privacy, or publicity rights of
+							others.
+						</li>
+						<li>
+							Bypass, probe, or defeat sending limits, credit reservation,
+							authentication, abuse filters, or other technical controls.
+						</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>6. Shared infrastructure and reputation</h2>
+					<p>
+						On the hosted service, many customers share Reloop Labs&rsquo;
+						sending infrastructure, including IP addresses and related
+						reputation with mailbox providers. You agree not to take actions
+						that harm Reloop&rsquo;s reputation, deliverability, or the ability
+						of other customers to send mail. Harmful actions include, without
+						limitation:
+					</p>
+					<ul>
+						<li>
+							High bounce rates, spam complaints, or blocklist listings caused
+							by your sending.
+						</li>
+						<li>
+							Phishing, scam, malware, or gateway abuse campaigns that cause
+							providers to distrust Reloop infrastructure.
+						</li>
+						<li>
+							Using Reloop to send content that mailbox providers reasonably
+							treat as abusive or fraudulent.
+						</li>
+						<li>
+							Any pattern of use that, in Reloop Labs&rsquo; reasonable
+							judgment, endangers shared IP or domain reputation.
+						</li>
 					</ul>
 					<p>
-						Reloop Labs may investigate and take action—including reporting to
-						authorities or restricting community access—if we become aware of
-						uses that violate these Terms or applicable law, even when such use
-						occurs on infrastructure not operated by us.
+						You are responsible for list hygiene, consent, authentication on
+						your domains, and compliance with recipient expectations. Reloop
+						Labs may throttle, quarantine, or refuse traffic that threatens
+						shared reputation.
 					</p>
 				</section>
 
 				<section>
-					<h2>6. Intellectual property</h2>
+					<h2>7. Abuse classifications and enforcement</h2>
+					<p>
+						Reloop Labs may automatically or manually classify outbound activity
+						on the hosted service. Classifications may include:
+					</p>
+					<ul>
+						<li>
+							<strong>High severity</strong> — activity that legitimate
+							customers do not engage in, such as SMS/MMS gateway abuse or
+							stacked phishing or scam lures. High-severity sends may be
+							blocked immediately.
+						</li>
+						<li>
+							<strong>Medium severity</strong> — activity that warrants
+							operator review (for example suspicious content plus a link, or
+							unusually large recipient sets). Medium-severity sends may still
+							be delivered while we investigate.
+						</li>
+						<li>
+							<strong>None</strong> — ordinary transactional or consented mail
+							subject only to your plan limits.
+						</li>
+					</ul>
+					<p>
+						Reloop Labs may investigate and take action if we become aware of
+						uses that violate these Terms or applicable law, including on
+						self-hosted instances when we learn of such use. Actions may
+						include, without limitation:
+					</p>
+					<ul>
+						<li>Blocking individual messages or campaigns.</li>
+						<li>
+							Throttling, suspending, or terminating accounts, API keys, or
+							domains.
+						</li>
+						<li>
+							Removing content, disabling sending, or reclaiming shared
+							resources.
+						</li>
+						<li>
+							Reporting activity to mailbox providers, registrars, payment
+							processors, or law enforcement.
+						</li>
+					</ul>
+					<p>
+						We may act with or without prior notice when we reasonably believe
+						delay would increase harm to Reloop, other customers, or the public.
+						Enforcement decisions are final except where mandatory law requires
+						otherwise.
+					</p>
+				</section>
+
+				<section>
+					<h2>8. Billing, cancellation, and refunds</h2>
+					<p>
+						Paid hosted plans are billed according to the plan you select at
+						checkout or in the dashboard. Unused sending credits and plan
+						allowances do not roll over unless we expressly say otherwise for
+						that plan.
+					</p>
+					<p>
+						You may cancel a paid subscription at any time. Cancellation takes
+						effect at the end of the then-current billing period unless we
+						terminate earlier for cause. You retain access through the end of
+						the paid period when you cancel in good standing.
+					</p>
+					<p>
+						<strong>Refunds.</strong> Except where required by mandatory
+						consumer law, refunds are handled as follows:
+					</p>
+					<ul>
+						<li>
+							<strong>Seven-day satisfaction window.</strong> If you are a
+							legitimate paying subscriber and you are not satisfied with the
+							hosted service, you may request a refund within{" "}
+							<strong>seven (7) days</strong> of the payment date by contacting{" "}
+							<a href={`mailto:${contactEmail}`}>{contactEmail}</a>. Your
+							request must include a clear, specific, and valid reason (for
+							example, the product does not meet a documented feature you
+							reasonably expected, a material service failure on our side, or a
+							billing error). Vague dissatisfaction without explanation is not
+							a valid reason.
+						</li>
+						<li>
+							Reloop Labs will review eligible requests in good faith. Approval
+							is at our reasonable discretion after we verify that the account
+							is in good standing, the request is timely, and the reason is
+							valid. Approved refunds are typically returned to the original
+							payment method.
+						</li>
+						<li>
+							<strong>No refund outside the window or without a valid
+							reason.</strong> Requests made more than seven (7) days after
+							payment, or without a proper and valid reason, will not be
+							refunded—whether the account belongs to a legitimate customer or
+							not.
+						</li>
+						<li>
+							<strong>No refund for abuse or fraud.</strong> No refunds,
+							credits, or chargebacks are available if we suspend or terminate
+							your account for violating these Terms—including acceptable use,
+							fraud, phishing, spam, SMS/MMS gateway abuse, or conduct that
+							harms Reloop&rsquo;s sender reputation—regardless of when the
+							payment was made.
+						</li>
+						<li>
+							Unused sending credits, partial billing periods after the
+							seven-day window, and mid-cycle downgrades are otherwise
+							non-refundable.
+						</li>
+						<li>
+							Initiating a chargeback or payment dispute instead of contacting
+							us under this section—or after an abuse-related suspension or
+							termination—is a further breach of these Terms. We may contest
+							the dispute and seek recovery of fees, costs, and related
+							damages.
+						</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>9. Intellectual property</h2>
 					<p>
 						The Reloop name, logo, and website content are owned by Reloop Labs
 						or its licensors, except where open-source license terms apply to
@@ -187,7 +370,7 @@ const TermsPage = () => {
 				</section>
 
 				<section>
-					<h2>7. Disclaimers</h2>
+					<h2>10. Disclaimers</h2>
 					<p>
 						The website and software are provided{" "}
 						<strong>&ldquo;as is&rdquo;</strong> and{" "}
@@ -200,7 +383,7 @@ const TermsPage = () => {
 				</section>
 
 				<section>
-					<h2>8. Limitation of liability</h2>
+					<h2>11. Limitation of liability</h2>
 					<p>
 						To the fullest extent permitted by law, Reloop Labs and its
 						contributors will not be liable for any indirect, incidental,
@@ -217,7 +400,7 @@ const TermsPage = () => {
 				</section>
 
 				<section>
-					<h2>9. Third-party services and links</h2>
+					<h2>12. Third-party services and links</h2>
 					<p>
 						The website may link to third-party sites and services (for example,
 						GitHub, Discord, and documentation hosts). Reloop Labs is not
@@ -226,7 +409,7 @@ const TermsPage = () => {
 				</section>
 
 				<section>
-					<h2>10. Changes to these terms</h2>
+					<h2>13. Changes to these terms</h2>
 					<p>
 						We may update these Terms from time to time. The updated version
 						will be posted on this page with a revised &ldquo;Last
@@ -238,7 +421,7 @@ const TermsPage = () => {
 				</section>
 
 				<section>
-					<h2>11. Governing law</h2>
+					<h2>14. Governing law</h2>
 					<p>
 						These Terms are governed by the laws applicable to Reloop Labs,
 						without regard to conflict-of-law principles, except where mandatory
@@ -247,7 +430,7 @@ const TermsPage = () => {
 				</section>
 
 				<section>
-					<h2>12. Contact</h2>
+					<h2>15. Contact</h2>
 					<p>
 						Questions about these Terms may be sent to{" "}
 						<a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
