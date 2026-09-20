@@ -74,11 +74,10 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 						fontSize="180"
 						className="transition-colors duration-200"
 					>
-						{/* "reloop." in high-contrast dashed stroke with hollow fill */}
+						{/* "Reloop." in stroke outline with hollow fill */}
 						<tspan
 							fill="none"
 							strokeWidth="2.2"
-							strokeDasharray="4.5 4"
 							strokeLinecap="round"
 							strokeLinejoin="round"
 							stroke="url(#wordmark-fancy-gradient)"
