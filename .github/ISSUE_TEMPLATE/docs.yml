@@ -1,0 +1,45 @@
+name: 📚 Docs improvement
+description: A docs page is wrong, missing, or confusing. Small typos can go straight to a PR.
+labels: [documentation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for improving the docs! For typos or obvious fixes, feel free to open a PR directly per [CONTRIBUTING.md](https://github.com/reloop-labs/reloop/blob/main/CONTRIBUTING.md).
+
+  - type: input
+    id: page
+    attributes:
+      label: Docs page
+      description: URL or path of the page (e.g. https://reloop.sh/docs/setup or docs/content/docs/setup/port.mdx).
+      placeholder: https://reloop.sh/docs/setup/backend/auth
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's wrong or missing?
+      description: What's confusing, outdated, or absent?
+      placeholder: The port table lists the old gateway route; step 3 fails on a fresh clone because…
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested change
+      description: What should it say instead? Paste corrected text or an outline if you have one.
+      placeholder: Change step 3 to… / Add a section about…
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I checked the latest docs and this is still an issue
+          required: true
+        - label: I am willing to open a PR with the fix
+          required: false

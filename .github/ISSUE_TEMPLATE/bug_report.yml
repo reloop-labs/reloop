@@ -1,0 +1,141 @@
+name: 🐛 Bug report
+description: Something is broken. Tell us what happened and how to reproduce it.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please check [existing issues](https://github.com/reloop-labs/reloop/issues) first — your bug may already be tracked.
+        ⛔ Do **not** use this template for security vulnerabilities. See our [Security Policy](https://github.com/reloop-labs/reloop/security/policy).
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: Clicking "Send test email" in the dashboard spins forever and nothing is delivered.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps to trigger it. Include API calls, UI clicks, or config.
+      placeholder: |
+        1. `bun setup` then `bun dev` on macOS
+        2. Go to dashboard → Campaigns → …
+        3. Click … → see error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What did you expect to see instead?
+      placeholder: Test email is delivered and appears in Logs.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area affected
+      description: Which service or app is this about?
+      multiple: true
+      options:
+        - dashboard
+        - console
+        - web
+        - docs
+        - links
+        - auth
+        - mail / smtp
+        - inbox / inbound
+        - contacts
+        - campaigns
+        - template
+        - webhook
+        - workflow
+        - domain
+        - api-key
+        - credits / entitlements
+        - upload
+        - tools
+        - installer / docker / infra
+        - not sure / other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment
+      description: Where does the bug occur?
+      options:
+        - Local dev (`bun dev`)
+        - Self-hosted VPS (`install.sh` / docker)
+        - Hosted (reloop.sh)
+        - Not sure
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: Tag or commit SHA you tested on. Please retest on latest `main` if you can.
+      placeholder: main @ a15d043 or v0.3.1
+    validations:
+      required: false
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      description: e.g. macOS 15, Ubuntu 24.04, Debian 13
+      placeholder: macOS 15.5
+    validations:
+      required: false
+
+  - type: input
+    id: bun
+    attributes:
+      label: Bun version
+      description: Output of `bun --version`
+      placeholder: 1.3.x
+    validations:
+      required: false
+
+  - type: input
+    id: docker
+    attributes:
+      label: Docker version
+      description: Output of `docker --version` (skip if not using Docker)
+      placeholder: 28.x
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant error output or stack traces. Redact secrets, API keys, and PII.
+      render: shell
+      placeholder: Paste logs here…
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+        - label: I tested on the latest `main` (or explain why not in Version field)
+          required: false
+        - label: I stripped secrets and PII from the logs above
+          required: true

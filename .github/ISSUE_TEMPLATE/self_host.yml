@@ -1,0 +1,72 @@
+name: 🖥️ Self-host / deploy issue
+description: Problems installing, upgrading, or running Reloop on your own server.
+labels: [self-host]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please follow the [VPS guide](https://reloop.sh/docs/self-host/vps) and [Setup guide](https://reloop.sh/docs/setup) first.
+        ⛔ Never paste secrets, `.env` contents, or DNS API tokens. Redact domains if you prefer.
+
+  - type: dropdown
+    id: method
+    attributes:
+      label: Install method
+      description: How did you deploy Reloop?
+      options:
+        - install.sh on fresh VPS (recommended)
+        - Manual docker compose
+        - Kubernetes / other
+        - Local dev (`bun setup` / `bun dev`)
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Server OS
+      description: e.g. Ubuntu 24.04, Debian 13
+      placeholder: Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: Tag or commit SHA of your deployment.
+      placeholder: main @ 5151bde or v0.3.1
+    validations:
+      required: false
+
+  - type: textarea
+    id: step
+    attributes:
+      label: Where does it fail?
+      description: Which step of the guide, and what did you expect?
+      placeholder: install.sh → "verifying health" step; expected all services healthy…
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Installer output, `docker ps`, health-check output, or service logs. Redact secrets.
+      render: shell
+      placeholder: Paste output of the failing step here…
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I followed the VPS / setup guide on a clean machine
+          required: false
+        - label: DNS records from the installer output have been added (if applicable)
+          required: false
+        - label: I redacted all secrets, tokens, and passwords
+          required: true

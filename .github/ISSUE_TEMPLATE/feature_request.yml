@@ -1,0 +1,85 @@
+name: ✨ Feature request
+description: Propose an idea — describe the problem first, then your suggested solution.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! Please check [existing issues](https://github.com/reloop-labs/reloop/issues) first.
+        For significant changes, maintainers may ask you to discuss the approach before a PR (see [CONTRIBUTING.md](https://github.com/reloop-labs/reloop/blob/main/CONTRIBUTING.md)).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What problem are you trying to solve? Not the solution — the pain.
+      placeholder: I can't bulk-import my 50k contacts; adding them one by one via the API is too slow…
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How should it work? API shape, UI flow, or behaviour.
+      placeholder: Add a CSV bulk-import endpoint + dashboard upload with progress and error report…
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you thought about, and why they fall short.
+      placeholder: Scripting the single-contact API in a loop — works but slow and hammers rate limits…
+    validations:
+      required: false
+
+  - type: textarea
+    id: audience
+    attributes:
+      label: Who does this help?
+      description: Use cases and audience (developers, DevOps, marketers…).
+      placeholder: Marketing teams migrating large lists from Mailchimp…
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of Reloop would this touch?
+      multiple: true
+      options:
+        - dashboard
+        - console
+        - web
+        - docs
+        - links
+        - auth
+        - mail / smtp
+        - inbox / inbound
+        - contacts
+        - campaigns
+        - template
+        - webhook
+        - workflow
+        - domain
+        - api-key
+        - credits / entitlements
+        - upload
+        - tools
+        - installer / docker / infra
+        - not sure / other
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this idea is not already tracked
+          required: true
+        - label: I am willing to contribute a PR for this (or help test it)
+          required: false

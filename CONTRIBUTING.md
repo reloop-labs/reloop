@@ -2,6 +2,8 @@
 
 Thanks for taking the time to contribute. Reloop is open source and we welcome bug reports, feature requests, documentation improvements, and code contributions.
 
+Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) in all community interactions.
+
 ---
 
 ## Table of Contents
@@ -28,7 +30,7 @@ Thanks for taking the time to contribute. Reloop is open source and we welcome b
 
 ## Reporting Bugs
 
-[Open a GitHub issue](https://github.com/reloop-labs/reloop/issues/new) and include:
+[Open a GitHub issue](https://github.com/reloop-labs/reloop/issues/new/choose) using the **🐛 Bug report** template and include:
 
 1. **What happened** — a clear description of the bug
 2. **Steps to reproduce** — the exact steps to trigger it
@@ -40,7 +42,7 @@ Thanks for taking the time to contribute. Reloop is open source and we welcome b
 
 ## Requesting Features
 
-[Open a GitHub issue](https://github.com/reloop-labs/reloop/issues/new) and describe:
+[Open a GitHub issue](https://github.com/reloop-labs/reloop/issues/new/choose) using the **✨ Feature request** template and describe:
 
 1. **The problem** you're trying to solve (not just the solution)
 2. **Your proposed solution** and any alternatives you considered
@@ -152,6 +154,8 @@ A Husky pre-commit hook runs this automatically. If you bypass it, CI will catch
 ---
 
 ## Community
+
+Participation in Reloop spaces is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). To report a violation, email **reloop.sh@gmail.com** with subject `[CoC]`.
 
 Have questions before contributing? Reach out:
 

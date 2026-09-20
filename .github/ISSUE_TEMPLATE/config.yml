@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/reloop-labs/reloop/security/policy
+    about: Do not open public issues for security flaws. Please use private reporting.
+  - name: 📚 Documentation
+    url: https://reloop.sh/docs
+    about: Setup, architecture, and self-hosting guides — your answer may already be here.
+  - name: 💬 Discord community
+    url: https://discord.gg/ZBYwWKY96U
+    about: Real-time help from the community. Best for questions, not bug reports.
+  - name: 🆘 Hosted-service support
+    url: https://reloop.sh/support
+    about: Account, billing, or hosted reloop.sh issues (not for self-host bugs).
