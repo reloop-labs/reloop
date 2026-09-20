@@ -312,9 +312,8 @@ const TermsPage = () => {
 							<a href={`mailto:${contactEmail}`}>{contactEmail}</a>. Your
 							request must include a clear, specific, and valid reason (for
 							example, the product does not meet a documented feature you
-							reasonably expected, a material service failure on our side, or a
-							billing error). Vague dissatisfaction without explanation is not a
-							valid reason.
+							reasonably expected, or a billing error). Vague dissatisfaction
+							without explanation is not a valid reason.
 						</li>
 						<li>
 							Reloop Labs will review eligible requests in good faith. Approval
