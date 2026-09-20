@@ -1,12 +1,12 @@
 "use client";
 
-import { CompareSourceNote } from "./compare-source-note";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
+import { CompareSourceNote } from "./compare-source-note";
 import { CompareTitleIcon } from "./compare-title-icon";
 
 export type PlanType = "free" | "growth" | "paid";

@@ -1,6 +1,6 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import { freePlanSummary } from "@reloop/web/lib/pricing-facts";
+import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import { faqPageJsonLd, pricingProductJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";

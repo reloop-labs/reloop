@@ -1,4 +1,3 @@
-import { cleanHtml } from "./email-html";
 import { Icon } from "@reloop/ui/icon";
 import { toast } from "@reloop/ui/toast";
 import dayjs from "dayjs";
@@ -25,6 +24,7 @@ import type {
 	InboundThread,
 } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
+import { cleanHtml } from "./email-html";
 import { ForwardComposer } from "./forward-composer";
 import type { AttachmentItem } from "./message-attachments";
 import { RawHeadersModal } from "./raw-headers-modal";

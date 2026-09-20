@@ -65,7 +65,7 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 				)}
 			</div>
 
-		{/* Navigation Cards */}
+			{/* Navigation Cards */}
 			<div className="grid gap-4 sm:grid-cols-2">
 				{previous ? (
 					<Link

@@ -1,13 +1,13 @@
-import {
-	freeDailyEmails,
-	freeMonthlyEmails,
-} from "@reloop/web/lib/pricing-facts";
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
 import {
 	getComparePage,
 	mailchimpFeatures,
 } from "@reloop/web/lib/compare-content";
+import {
+	freeDailyEmails,
+	freeMonthlyEmails,
+} from "@reloop/web/lib/pricing-facts";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";

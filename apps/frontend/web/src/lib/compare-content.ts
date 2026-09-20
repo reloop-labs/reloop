@@ -6,6 +6,11 @@ import {
 import { loopsComparisonCategories } from "@reloop/web/app/compare/loops/comparison-data";
 import { mailgunComparisonCategories } from "@reloop/web/app/compare/mailgun/comparison-data";
 import { resendComparisonCategories } from "@reloop/web/app/compare/resend/comparison-data";
+import {
+	freeDailyEmails,
+	freeMonthlyEmails,
+	freePlanSummary,
+} from "@reloop/web/lib/pricing-facts";
 import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
 import {
 	breadcrumbJsonLd,
@@ -13,11 +18,6 @@ import {
 	faqPageJsonLd,
 	pricingProductJsonLd,
 } from "@reloop/web/lib/schema";
-import {
-	freeDailyEmails,
-	freeMonthlyEmails,
-	freePlanSummary,
-} from "@reloop/web/lib/pricing-facts";
 import { getSiteUrl } from "@reloop/web/lib/site";
 
 export type ComparePageContent = {

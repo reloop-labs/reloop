@@ -4,7 +4,7 @@ import { CheckerPanel } from "../checker-panel";
 export function TempEmailHero() {
 	return (
 		<div className="relative w-full overflow-hidden">
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col md:max-w-7xl">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<header className="relative flex w-full flex-col items-center bg-transparent px-6 pt-[224px] pb-16 text-center sm:px-8 sm:pb-20 lg:px-12 lg:pb-24">
 					<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
 						<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
@@ -34,7 +34,10 @@ export function TempEmailHero() {
 							records. We do not probe the mailbox.
 						</p>
 
-						<div id="checker" className="mt-10 w-full max-w-xl scroll-mt-24 text-left sm:mt-12">
+						<div
+							id="checker"
+							className="mt-10 w-full max-w-xl scroll-mt-24 text-left sm:mt-12"
+						>
 							<CheckerPanel />
 						</div>
 					</div>

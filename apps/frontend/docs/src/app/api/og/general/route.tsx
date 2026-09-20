@@ -6,11 +6,7 @@ import type { NextRequest } from "next/server";
 function getFontBuffer(fontName: string): ArrayBuffer | null {
 	const paths = [
 		path.join(process.cwd(), "public/font/inter", fontName),
-		path.join(
-			process.cwd(),
-			"apps/frontend/docs/public/font/inter",
-			fontName,
-		),
+		path.join(process.cwd(), "apps/frontend/docs/public/font/inter", fontName),
 		path.resolve("./public/font/inter", fontName),
 		path.resolve("./apps/frontend/docs/public/font/inter", fontName),
 	];

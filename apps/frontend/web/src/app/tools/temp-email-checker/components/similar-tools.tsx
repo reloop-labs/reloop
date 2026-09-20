@@ -134,7 +134,7 @@ export function SimilarTools() {
 							key={tool.title}
 							href={tool.path}
 							className={cn(
-								"group flex flex-col border-stroke-soft-100 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 transition-colors hover:bg-neutral-50/70 dark:border-white/10 dark:hover:bg-white/[0.02]",
+								"group flex flex-col border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-neutral-50/70 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:border-white/10 dark:hover:bg-white/[0.02]",
 								borderClass,
 							)}
 						>

@@ -214,9 +214,9 @@ describe("completeSelfHostSetup", () => {
 			harness.deps,
 		);
 
-		expect(harness.calls.find((c) => c.name === "setRuntimeDisableSignup")?.payload).toBe(
-			false,
-		);
+		expect(
+			harness.calls.find((c) => c.name === "setRuntimeDisableSignup")?.payload,
+		).toBe(false);
 		expect(harness.envUpdates).toEqual([
 			{ SETUP_MODE: "false", DISABLE_SIGNUP: "false" },
 		]);

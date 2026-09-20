@@ -2,8 +2,8 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 import type { AlternativeDefinition } from "@reloop/web/lib/landing/types";
 import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import Link from "next/link";

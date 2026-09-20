@@ -6,6 +6,11 @@ import {
 	MDXImage,
 	MDXVideo,
 } from "@reloop/fe-docs/components/mdx/ImageZoom";
+import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
+import {
+	RelatedTopic,
+	RelatedTopics,
+} from "@reloop/fe-docs/components/mdx/RelatedTopics";
 import {
 	Accordion,
 	AccordionGroup,
@@ -22,11 +27,6 @@ import {
 	Tip,
 	Warning,
 } from "@reloop/fe-docs/components/mdx/reloop-client";
-import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
-import {
-	RelatedTopic,
-	RelatedTopics,
-} from "@reloop/fe-docs/components/mdx/RelatedTopics";
 import { Side, SideBySide } from "@reloop/fe-docs/components/mdx/SideBySide";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import { ApiKeyCodeSamples } from "@reloop/fe-docs/lib/api-key-code-samples";
@@ -102,8 +102,9 @@ export function getMDXComponents(
 		Card: ({ icon, href, children, ...props }: any) => {
 			// Next.js basePath ("/docs") is applied automatically to <Link> —
 			// strip any hardcoded /docs prefix so links don't resolve to /docs/docs/…
-			const finalHref =
-				href?.startsWith("/docs") ? href.slice("/docs".length) || "/" : href;
+			const finalHref = href?.startsWith("/docs")
+				? href.slice("/docs".length) || "/"
+				: href;
 
 			return (
 				<Card

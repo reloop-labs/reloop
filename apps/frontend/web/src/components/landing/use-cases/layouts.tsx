@@ -1,8 +1,8 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 import { accentStyles } from "@reloop/web/lib/landing/page-accents";
 import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import { getUseCaseEnrichment } from "@reloop/web/lib/landing/use-cases/enrichment";

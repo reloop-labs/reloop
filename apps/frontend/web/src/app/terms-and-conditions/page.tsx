@@ -242,14 +242,14 @@ const TermsPage = () => {
 						<li>
 							<strong>High severity</strong> — activity that legitimate
 							customers do not engage in, such as SMS/MMS gateway abuse or
-							stacked phishing or scam lures. High-severity sends may be
-							blocked immediately.
+							stacked phishing or scam lures. High-severity sends may be blocked
+							immediately.
 						</li>
 						<li>
-							<strong>Medium severity</strong> — activity that warrants
-							operator review (for example suspicious content plus a link, or
-							unusually large recipient sets). Medium-severity sends may still
-							be delivered while we investigate.
+							<strong>Medium severity</strong> — activity that warrants operator
+							review (for example suspicious content plus a link, or unusually
+							large recipient sets). Medium-severity sends may still be
+							delivered while we investigate.
 						</li>
 						<li>
 							<strong>None</strong> — ordinary transactional or consented mail
@@ -313,8 +313,8 @@ const TermsPage = () => {
 							request must include a clear, specific, and valid reason (for
 							example, the product does not meet a documented feature you
 							reasonably expected, a material service failure on our side, or a
-							billing error). Vague dissatisfaction without explanation is not
-							a valid reason.
+							billing error). Vague dissatisfaction without explanation is not a
+							valid reason.
 						</li>
 						<li>
 							Reloop Labs will review eligible requests in good faith. Approval
@@ -324,11 +324,12 @@ const TermsPage = () => {
 							payment method.
 						</li>
 						<li>
-							<strong>No refund outside the window or without a valid
-							reason.</strong> Requests made more than seven (7) days after
-							payment, or without a proper and valid reason, will not be
-							refunded—whether the account belongs to a legitimate customer or
-							not.
+							<strong>
+								No refund outside the window or without a valid reason.
+							</strong>{" "}
+							Requests made more than seven (7) days after payment, or without a
+							proper and valid reason, will not be refunded—whether the account
+							belongs to a legitimate customer or not.
 						</li>
 						<li>
 							<strong>No refund for abuse or fraud.</strong> No refunds,
@@ -346,9 +347,8 @@ const TermsPage = () => {
 						<li>
 							Initiating a chargeback or payment dispute instead of contacting
 							us under this section—or after an abuse-related suspension or
-							termination—is a further breach of these Terms. We may contest
-							the dispute and seek recovery of fees, costs, and related
-							damages.
+							termination—is a further breach of these Terms. We may contest the
+							dispute and seek recovery of fees, costs, and related damages.
 						</li>
 					</ul>
 				</section>

@@ -1,7 +1,7 @@
 "use client";
 
-import { JAVA_ICON } from "@reloop/ui/icons/java";
 import { cn } from "@reloop/fe-docs/lib/cn";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import type { SVGProps } from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import {

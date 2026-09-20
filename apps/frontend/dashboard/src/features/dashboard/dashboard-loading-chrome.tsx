@@ -11,28 +11,31 @@ function LoadingSidebarNav() {
 			{mainNavigation
 				.filter((item) => !item.hidden)
 				.map((item, index, visibleItems) => {
-				if (item.path === "/ai") return null;
-				const prevItem = index > 0 ? visibleItems[index - 1] : null;
-				const showSectionHeader =
-					item.section && (!prevItem || prevItem.section !== item.section);
-				return (
-					<div key={item.path} className="flex w-full flex-col">
-						{showSectionHeader ? (
-							<div
-								className={`px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] ${index === 0 ? "pt-1.5" : ""}`}
-							>
-								{item.section}
+					if (item.path === "/ai") return null;
+					const prevItem = index > 0 ? visibleItems[index - 1] : null;
+					const showSectionHeader =
+						item.section && (!prevItem || prevItem.section !== item.section);
+					return (
+						<div key={item.path} className="flex w-full flex-col">
+							{showSectionHeader ? (
+								<div
+									className={`px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] ${index === 0 ? "pt-1.5" : ""}`}
+								>
+									{item.section}
+								</div>
+							) : null}
+							<div className="relative z-10 flex h-8 w-full items-center justify-start gap-2.5 px-2.5">
+								<SidebarNavIcon
+									name={item.iconName}
+									isSpecial={item.isSpecial}
+								/>
+								<span className="truncate font-medium text-[13px] text-text-sub-600">
+									{item.label}
+								</span>
 							</div>
-						) : null}
-						<div className="relative z-10 flex h-8 w-full items-center justify-start gap-2.5 px-2.5">
-							<SidebarNavIcon name={item.iconName} isSpecial={item.isSpecial} />
-							<span className="truncate font-medium text-[13px] text-text-sub-600">
-								{item.label}
-							</span>
 						</div>
-					</div>
-				);
-			})}
+					);
+				})}
 		</div>
 	);
 }

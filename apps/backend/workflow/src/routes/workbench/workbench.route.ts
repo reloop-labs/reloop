@@ -25,7 +25,10 @@ function buildWorkbenchApp() {
 			"workbench",
 			"WORKBENCH_USER/WORKBENCH_PASS are not set; the Workbench dashboard is disabled",
 		);
-		return new Elysia().all("*", () => new Response("Not found", { status: 404 }));
+		return new Elysia().all(
+			"*",
+			() => new Response("Not found", { status: 404 }),
+		);
 	}
 	return workbench({
 		queues: [workflowQueue],

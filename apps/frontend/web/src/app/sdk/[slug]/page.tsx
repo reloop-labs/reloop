@@ -1,6 +1,6 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";

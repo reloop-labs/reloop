@@ -123,10 +123,7 @@ describe("resolvePublicTarget", () => {
 			allowPrivate: true,
 		});
 		expect(["127.0.0.1", "::1"]).toContain(target.pinnedIp);
-		if (
-			target.allIps.includes("127.0.0.1") &&
-			target.allIps.includes("::1")
-		) {
+		if (target.allIps.includes("127.0.0.1") && target.allIps.includes("::1")) {
 			expect(target.pinnedIp).toBe("127.0.0.1");
 			expect(target.family).toBe(4);
 		}
