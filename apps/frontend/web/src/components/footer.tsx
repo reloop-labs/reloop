@@ -187,7 +187,6 @@ export const Footer = () => {
 						</nav>
 					))}
 				</div>
-				<div aria-hidden className="h-12 sm:h-16" />
 				<FooterWordmark />
 			</div>
 		</footer>

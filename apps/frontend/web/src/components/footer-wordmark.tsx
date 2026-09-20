@@ -83,7 +83,7 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 							strokeLinejoin="round"
 							className="stroke-neutral-900/85 transition-all duration-300 group-hover:stroke-neutral-950 dark:stroke-white/80 dark:group-hover:stroke-white"
 						>
-							reloop.
+							Reloop.
 						</tspan>
 
 						{/* "sh" in solid fill */}
