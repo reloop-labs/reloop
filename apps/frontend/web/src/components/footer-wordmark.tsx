@@ -28,9 +28,9 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 					aria-hidden="true"
 				>
 					<defs>
-						{/* Blue gradient for the cursor pointer */}
+						{/* Fancy blue gradient for the wordmark */}
 						<linearGradient
-							id="wordmark-cursor-gradient"
+							id="wordmark-fancy-gradient"
 							x1="0%"
 							y1="0%"
 							x2="100%"
@@ -81,15 +81,17 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 							strokeDasharray="4.5 4"
 							strokeLinecap="round"
 							strokeLinejoin="round"
-							className="stroke-neutral-900/85 transition-all duration-300 group-hover:stroke-neutral-950 dark:stroke-white/80 dark:group-hover:stroke-white"
+							stroke="url(#wordmark-fancy-gradient)"
+							className="transition-all duration-300 dark:stroke-white/80"
 						>
 							Reloop.
 						</tspan>
 
-						{/* "sh" in solid fill */}
+						{/* "sh" in solid fill with fancy gradient */}
 						<tspan
 							stroke="none"
-							className="fill-neutral-950 transition-colors duration-200 dark:fill-white"
+							fill="url(#wordmark-fancy-gradient)"
+							className="transition-colors duration-200 dark:fill-white"
 						>
 							sh
 						</tspan>

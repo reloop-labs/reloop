@@ -8,7 +8,7 @@ export const pricingFaqItems: PricingFaqItem[] = [
 	{
 		question: "What counts as an email?",
 		answer:
-			"Each successfully sent email counts toward your monthly quota—transactional messages, campaign sends, and SMTP relay deliveries all use credits the same way.",
+			"Each successfully sent email counts toward your monthly quota: transactional messages, campaign sends, and SMTP relay deliveries all use credits the same way.",
 	},
 	{
 		question: "Do I need a credit card to start?",
@@ -23,16 +23,31 @@ export const pricingFaqItems: PricingFaqItem[] = [
 	{
 		question: "Is self-hosting really free?",
 		answer:
-			"Yes. Reloop is open source under Apache 2.0 with Reloop Labs use restrictions. You can deploy on your own infrastructure at no Reloop license cost—you pay only for your servers and email delivery infrastructure. Self-host is not a Reloop Cloud subscription.",
+			"Yes. Reloop is open source under Apache 2.0 with Reloop Labs use restrictions. You can deploy on your own infrastructure at no Reloop license cost: you pay only for your servers and email delivery infrastructure. Self-host is not a Reloop Cloud subscription.",
 	},
 	{
 		question: "Is hosted pricing different from self-hosted?",
 		answer:
-			"Yes. Reloop Cloud (hosted) uses the published Free, Pro ($10/mo), Growth ($20/mo), and Enterprise tiers. Self-hosting the Apache 2.0 stack has no Reloop SaaS fee—it is not the same as buying those hosted plans for your own servers.",
+			"Yes. Reloop Cloud (hosted) uses the published Free, Pro ($10/mo), Growth ($20/mo), and Enterprise tiers. Self-hosting the Apache 2.0 stack has no Reloop SaaS fee: it is not the same as buying those hosted plans for your own servers.",
 	},
 	{
 		question: "Can I switch plans at any time?",
 		answer:
 			"Yes. Upgrade or downgrade from your dashboard. Plan changes apply to the current billing period according to your subscription settings.",
+	},
+	{
+		question: "What is your refund policy?",
+		answer:
+			"You can request a refund within 7 days of billing if you have used at most 2% of your plan's email quota and include a clear reason, such as a missing documented feature, a material service failure on our side, or a billing error. Usage above 2% of quota, refunds requested after 7 days, and accounts suspended for abuse or fraud are not refundable.",
+	},
+	{
+		question: "How do I request a refund?",
+		answer:
+			"Contact reloop.sh@gmail.com within 7 days of the payment date with your account, the charge, your usage, and the reason. Approved refunds go back to the original payment method. Opening a chargeback instead of contacting us is a breach of our Terms.",
+	},
+	{
+		question: "If I am caught sending spam, do I still get a refund?",
+		answer:
+			"No. If you are caught sending spam, phishing, scams, or any other abuse, your payment is never refunded, your subscription is auto-cancelled, and your account is suspended. Abuse related terminations carry no refunds, credits, or chargebacks under our Terms.",
 	},
 ];
