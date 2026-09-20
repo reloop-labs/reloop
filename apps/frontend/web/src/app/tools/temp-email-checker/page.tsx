@@ -111,7 +111,9 @@ export default function TempEmailCheckerPage() {
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
 				<SimilarTools />
-				<div aria-hidden className="h-24" />
+				<div aria-hidden className="h-12 sm:h-16" />
+				<TempEmailCta />
+				<div aria-hidden className="h-16 sm:h-24" />
 				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
 					<FaqSection
 						items={faqGroups.flatMap((g) => g.items)}
@@ -129,8 +131,6 @@ export default function TempEmailCheckerPage() {
 						flush
 					/>
 				</div>
-				<div aria-hidden className="h-16 sm:h-24" />
-				<TempEmailCta />
 			</div>
 		</div>
 	);

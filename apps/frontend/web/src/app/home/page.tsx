@@ -1,5 +1,9 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { pricingSoftwareApplicationJsonLd } from "@reloop/web/lib/schema";
+import { homeFaqItems } from "@reloop/web/lib/home-faq";
+import {
+	faqPageJsonLd,
+	pricingSoftwareApplicationJsonLd,
+} from "@reloop/web/lib/schema";
 import {
 	defaultOgImage,
 	getSiteUrl,
@@ -8,12 +12,13 @@ import {
 	socialProfiles,
 } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import { AgentCards } from "../(home)/components/agent-cards";
 import CTA from "../(home)/components/cta";
 import EmailSystem from "../(home)/components/email-system";
 import Hero from "../(home)/components/hero";
 import Highlights from "../(home)/components/highlights";
+import { HomeFaq } from "../(home)/components/home-faq";
 import { SectionSeparator } from "../(home)/components/section-separator";
-import ShipFast from "../(home)/components/ship-fast";
 import LanguageExplorer from "../sdk/components/language-explorer";
 
 // Non-indexable replica of the landing page
@@ -59,6 +64,7 @@ const homeSchema = [
 		sameAs: [socialProfiles.github, socialProfiles.x, socialProfiles.discord],
 	},
 	pricingSoftwareApplicationJsonLd(siteUrl),
+	faqPageJsonLd(homeFaqItems),
 ];
 
 export default function HomePage() {
@@ -76,13 +82,15 @@ export default function HomePage() {
 					id="sdks"
 				/>
 				<SectionSeparator />
+				<AgentCards />
+				<SectionSeparator />
 				<EmailSystem />
 				<SectionSeparator />
 				<Highlights />
-				<SectionSeparator />
-				<ShipFast />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<CTA />
+				<div aria-hidden className="h-16 sm:h-24" />
+				<HomeFaq />
 			</div>
 		</div>
 	);

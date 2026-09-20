@@ -1,5 +1,9 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { pricingSoftwareApplicationJsonLd } from "@reloop/web/lib/schema";
+import { homeFaqItems } from "@reloop/web/lib/home-faq";
+import {
+	faqPageJsonLd,
+	pricingSoftwareApplicationJsonLd,
+} from "@reloop/web/lib/schema";
 import {
 	defaultOgImage,
 	getSiteUrl,
@@ -14,8 +18,8 @@ import CTA from "./components/cta";
 import EmailSystem from "./components/email-system";
 import Hero from "./components/hero";
 import Highlights from "./components/highlights";
+import { HomeFaq } from "./components/home-faq";
 import { SectionSeparator } from "./components/section-separator";
-import ShipFast from "./components/ship-fast";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -70,6 +74,7 @@ const homeSchema = [
 		url: siteUrl,
 		publisher: { "@id": organizationId },
 	},
+	faqPageJsonLd(homeFaqItems),
 ];
 
 export default function Home() {
@@ -91,10 +96,10 @@ export default function Home() {
 				<EmailSystem />
 				<SectionSeparator />
 				<Highlights />
-				<SectionSeparator />
-				<ShipFast />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<CTA />
+				<div aria-hidden className="h-16 sm:h-24" />
+				<HomeFaq />
 			</div>
 		</div>
 	);

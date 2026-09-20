@@ -16,7 +16,6 @@ import {
 	HeroDemoPlaybackButton,
 	HeroDemoPlaybackProvider,
 } from "./hero-demo-playback";
-import { MacintoshHeroMonitorLazy } from "./hero-monitor-lazy";
 import { HeroPreviewContent, type HeroTabId } from "./hero-preview-content";
 
 const TAB_TO_NAV: Record<HeroTabId, string> = {
@@ -168,10 +167,10 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			) : (
-				<div className="relative mx-auto grid w-full max-w-5xl items-center gap-10 overflow-hidden border-stroke-soft-200 border-x px-6 pt-[224px] pb-40 sm:px-8 md:max-w-7xl lg:grid-cols-[1.1fr_1fr] lg:gap-6 lg:px-12 dark:border-white/10">
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center overflow-hidden border-stroke-soft-200 border-x px-6 pt-36 pb-20 text-center sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28 dark:border-white/10">
 					<div
 						aria-hidden="true"
-						className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
+						className="pointer-events-none absolute inset-0 [-webkit-mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
 					>
 						<PixelBlast
 							variant="square"
@@ -188,44 +187,38 @@ export function Hero({ variant = "default" }: HeroProps) {
 							edgeFade={0.65}
 						/>
 					</div>
-					<div className="relative z-10 order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
-						<h1 className="max-w-xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-left lg:text-[4.25rem] dark:text-white">
-							Open-Source Email Infrastructure for Developers
-						</h1>
-						<p className="mt-5 max-w-[30rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-left lg:text-[20px] dark:text-white/60">
-							Reloop is a transactional email API, SMTP relay, campaign sender,
-							and inbound agent inbox in one Apache 2.0 codebase. Run it on
-							Reloop Cloud or self-host it.
-						</p>
-						<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4 lg:justify-start">
-							<FancyButton.Root
-								asChild
-								variant="primary"
-								size="medium"
-								className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+					<h1 className="relative z-10 max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+						Open-Source Email Infrastructure for Developers
+					</h1>
+					<p className="relative z-10 mt-5 max-w-[34rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
+						Reloop is a transactional email API, SMTP relay, campaign sender,
+						and inbound agent inbox in one Apache 2.0 codebase. Run it on Reloop
+						Cloud or self-host it.
+					</p>
+					<div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
+						<FancyButton.Root
+							asChild
+							variant="primary"
+							size="medium"
+							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+						>
+							<a href={hostedSignupHref}>Get Started</a>
+						</FancyButton.Root>
+						<FancyButton.Root
+							asChild
+							variant="basic"
+							size="medium"
+							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+						>
+							<a
+								href="https://cal.com/pranavp/30"
+								target="_blank"
+								rel="noreferrer"
 							>
-								<a href={hostedSignupHref}>Get Started</a>
-							</FancyButton.Root>
-							<FancyButton.Root
-								asChild
-								variant="basic"
-								size="medium"
-								className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
-							>
-								<a
-									href="https://cal.com/pranavp/30"
-									target="_blank"
-									rel="noreferrer"
-								>
-									<Icon name="calendar" className="size-4 shrink-0" />
-									<span>Schedule call</span>
-								</a>
-							</FancyButton.Root>
-						</div>
-					</div>
-					{/* Optical offset: the CRT's 3/4 mass sits right and high of the bounding-box center. */}
-					<div className="lg:-translate-x-16 relative z-10 order-1 h-[320px] w-full sm:h-[400px] lg:order-2 lg:h-[470px] lg:translate-y-4">
-						<MacintoshHeroMonitorLazy />
+								<Icon name="calendar" className="size-4 shrink-0" />
+								<span>Schedule call</span>
+							</a>
+						</FancyButton.Root>
 					</div>
 				</div>
 			)}
