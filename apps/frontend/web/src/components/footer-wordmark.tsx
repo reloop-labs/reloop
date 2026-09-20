@@ -9,7 +9,7 @@ export interface FooterWordmarkProps {
 
 export function FooterWordmark({ className }: FooterWordmarkProps) {
 	const textRef = useRef<SVGTextElement>(null);
-	// Initial calibrated fallback coordinates for viewBox="0 0 1000 200"
+	// Calibrated coordinates for viewBox="0 0 1000 180"
 
 	return (
 		<div
@@ -21,7 +21,7 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 			<div className="block w-full max-w-4xl px-4">
 				<span className="sr-only">reloop.sh</span>
 				<svg
-					viewBox="0 0 1000 190"
+					viewBox="0 0 1000 180"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
 					className="h-auto w-full overflow-visible"
@@ -63,9 +63,9 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 					<text
 						ref={textRef}
 						x="500"
-						y="135"
+						y="90"
 						textAnchor="middle"
-						dominantBaseline="middle"
+						dominantBaseline="central"
 						style={{
 							fontFamily:
 								"var(--font-geist-sans), 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
