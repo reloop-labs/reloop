@@ -15,7 +15,6 @@ import {
 	useState,
 } from "react";
 import { CheckRequestError, runCheck } from "./check-api";
-import { TempEmailHeroLines } from "./components/temp-email-hero-lines";
 import {
 	type CheckResult,
 	type CheckVerdict,
@@ -468,7 +467,6 @@ export function CheckerPanel() {
 			<form onSubmit={onSubmit} noValidate className="space-y-4">
 				<FieldError field={field} messageClassName="text-xs leading-relaxed">
 					<div className="relative w-full">
-						<TempEmailHeroLines />
 						<Input.Root
 							size="medium"
 							hasError={hasFieldError}

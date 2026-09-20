@@ -81,7 +81,7 @@ export default function HomePage() {
 				<Highlights />
 				<SectionSeparator />
 				<ShipFast />
-				<SectionSeparator />
+				<div aria-hidden className="h-12 sm:h-16" />
 				<CTA />
 			</div>
 		</div>
