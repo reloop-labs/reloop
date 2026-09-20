@@ -24,6 +24,7 @@ export const retryWebhookDeliveryRoute = new Elysia().use(authMiddleware).post(
 			200: t.Object({
 				success: t.Boolean(),
 				message: t.String(),
+				newDeliveryId: t.String(),
 			}),
 			400: WebhookModel.evlogError,
 			401: WebhookModel.evlogError,
