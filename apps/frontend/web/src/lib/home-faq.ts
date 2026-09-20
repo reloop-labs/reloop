@@ -1,3 +1,5 @@
+import { pricingFaqItems } from "@reloop/web/lib/pricing-faq";
+
 export type HomeFaqItem = {
 	question: string;
 	answer: string;
@@ -25,12 +27,6 @@ export const homeFaqGroups: HomeFaqGroup[] = [
 				answer:
 					"Unlike traditional closed email services, Reloop is open-source under Apache 2.0. You get full transparency into queues, delivery pipelines, and DNS checks with zero vendor lock-in. You can self-host for free on your own servers or use Reloop Cloud with 3,000 free emails every month.",
 			},
-		],
-	},
-	{
-		id: "product",
-		label: "Product & features",
-		items: [
 			{
 				question: "Which programming languages and frameworks are supported?",
 				answer:
@@ -51,16 +47,42 @@ export const homeFaqGroups: HomeFaqGroup[] = [
 	{
 		id: "pricing",
 		label: "Pricing & billing",
+		/* Mirrors the pricing page FAQ so both stay in lockstep. */
+		items: [...pricingFaqItems],
+	},
+	{
+		id: "compare",
+		label: "Compare: cost, developer experience & UX",
 		items: [
 			{
-				question: "Do I need a credit card to get started?",
+				question: "How does Reloop pricing compare to Mailgun or SendGrid?",
 				answer:
-					"No credit card is required. The Free plan includes 3,000 emails per month and 100 emails per day on Reloop Cloud so you can build, test, and launch your product without entering billing details.",
+					"Reloop Pro is $10 per month for 50,000 emails and Growth is $20 per month for 100,000, with overage at $0.50 per 1,000. Mailgun Basic is $15 per month for 10,000 emails and Foundation is $35 per month for 50,000, with overage from $1.30 per 1,000. SendGrid commonly pushes annual enterprise commits, while Reloop stays on monthly tiers. Full comparisons live on our compare pages.",
 			},
 			{
-				question: "What happens if I exceed my monthly free quota?",
+				question: "How is Reloop different from Resend for developers?",
 				answer:
-					"On Reloop Cloud's Free plan, sending pauses when you hit your monthly limit. You can upgrade to Pro ($10/mo) or Growth ($20/mo) at any time for higher volume and pay-as-you-go overages billed at $0.50 per 1,000 emails.",
+					"Resend is a hosted developer layer over Amazon SES focused on transactional sending. Reloop is a full email platform in one codebase: transactional API, SMTP relay, marketing campaigns, contact audiences, inbound webhooks, and agent inboxes. Reloop is not a drop-in Resend proxy, so plan a small client adapter using the x-api-key header when migrating.",
+			},
+			{
+				question: "When should I pick Reloop over AWS SES?",
+				answer:
+					"Pick SES if you only need raw sending pipes at extreme volume and are happy wiring everything yourself. Pick Reloop when you want the platform around the pipe: REST and SMTP APIs, a delivery dashboard, campaign builder, templates, native webhooks instead of SNS configuration, and support. SES is often cheaper per email at huge scale, while Reloop competes on total platform cost including engineering time.",
+			},
+			{
+				question: "How does send-based pricing compare to Mailchimp or Loops?",
+				answer:
+					"Mailchimp and Loops charge by contacts stored, so inactive leads cost you money every month. Reloop charges by emails sent, so a quiet list costs nothing extra. Reloop also unifies transactional and marketing sending in one product, while Mailchimp routes transactional through a separate product path.",
+			},
+			{
+				question: "How hard is it to migrate developer code to Reloop?",
+				answer:
+					"SMTP senders only change host, port, and credentials. REST senders add a small client adapter, since Reloop is not a drop-in proxy for Mailgun, Resend, or SES SDK calls. First-party SDKs cover Node.js, TypeScript, Python, Go, Rust, PHP, and Ruby, and inbound routes map to Reloop webhook handlers.",
+			},
+			{
+				question: "How does the Reloop dashboard compare on UX?",
+				answer:
+					"Transactional sends, broadcast campaigns, templates, delivery analytics, and agent inboxes live in one interface instead of spread across separate products or CloudWatch and SNS consoles. For pure marketer drag-and-drop workflows, Mailchimp's visual editor is still more mature, so evaluate that with your marketing lead.",
 			},
 		],
 	},
