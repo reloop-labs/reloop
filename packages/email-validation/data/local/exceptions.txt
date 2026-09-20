@@ -10,3 +10,4 @@ outlook.de
 
 # Corporate domains wrongly listed by upstream disposable catalogues.
 starbucks.com
+booklive.com
