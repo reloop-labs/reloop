@@ -71,7 +71,7 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 								"var(--font-geist-sans), 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
 							fontWeight: 800,
 						}}
-						fontSize="265"
+						fontSize="180"
 						className="transition-colors duration-200"
 					>
 						{/* "reloop." in high-contrast dashed stroke with hollow fill */}
