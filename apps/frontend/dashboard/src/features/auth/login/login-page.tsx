@@ -14,6 +14,7 @@ import { SocialLogin } from "#/features/auth/login/social-login";
 import { useAuthStepDirection } from "#/features/auth/use-auth-step-direction";
 import { useRedirectIfAuthenticated } from "#/features/auth/use-redirect-if-authenticated";
 import { VerifyOTP, type VerifyOtpUiState } from "#/features/auth/verify-otp";
+import { useRedirectIfSetupRequired } from "#/features/setup/use-setup-status";
 
 export function LoginPage() {
 	const [otpSentEmail, setOtpSentEmail] = useQueryState(
@@ -47,6 +48,7 @@ export function LoginPage() {
 		inviteId,
 		redirectTo,
 	);
+	const { shouldBlockForSetup } = useRedirectIfSetupRequired();
 
 	const [otpResendFooter, setOtpResendFooter] = useState<ReactNode>(null);
 	const handleResendFooterChange = useCallback((footer: ReactNode | null) => {
@@ -65,7 +67,7 @@ export function LoginPage() {
 		verifyOtpRef.current = fn;
 	}, []);
 
-	if (shouldBlockAuthUi) {
+	if (shouldBlockAuthUi || shouldBlockForSetup) {
 		return <AuthSessionLoader />;
 	}
 

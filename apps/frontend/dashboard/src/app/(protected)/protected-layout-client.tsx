@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { DashboardLoadingChrome } from "#/features/dashboard/dashboard-loading-chrome";
 import { ActiveOrganizationProvider } from "#/features/dashboard/page-header/use-active-organization";
+import { useRedirectIfSetupRequired } from "#/features/setup/use-setup-status";
 
 export function ProtectedLayoutClient({
 	children,
@@ -14,12 +15,15 @@ export function ProtectedLayoutClient({
 	const router = useRouter();
 	const { data: session, isPending, isFetched } = useSessionQuery();
 
+	const isSignedOut = isFetched && !isPending && !session;
+	const { shouldBlockForSetup } = useRedirectIfSetupRequired(isSignedOut);
+
 	useEffect(() => {
 		if (isPending || !isFetched) return;
-		if (!session) {
+		if (!session && !shouldBlockForSetup) {
 			router.replace("/login");
 		}
-	}, [isFetched, isPending, router, session]);
+	}, [isFetched, isPending, router, session, shouldBlockForSetup]);
 
 	if (isPending || !isFetched) {
 		return <DashboardLoadingChrome />;

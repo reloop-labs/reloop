@@ -1,0 +1,415 @@
+import { describe, expect, test } from "bun:test";
+import { isRegistrationAllowed } from "@reloop/auth/registration-controls";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
+import { isSetupBootstrapBypassed } from "@reloop/auth/setup/bootstrap-bypass";
+import {
+	AdminPromotionFailedError,
+	type CompleteSetupDeps,
+	type CompleteSetupInput,
+	completeSelfHostSetup,
+	InvalidAdminSetupKeyError,
+	SetupFinalizationFailedError,
+	SetupNotAvailableError,
+} from "@reloop/auth/setup/complete-setup";
+
+const ADMIN_SETUP_KEY_FILE = "/run/reloop/admin-setup.key";
+const ENV_FILE = "/run/reloop/.env";
+const ADMIN_SETUP_KEY = "setup-key-value";
+
+type RecordedCall = { name: string; payload?: unknown };
+
+type Harness = {
+	deps: CompleteSetupDeps;
+	calls: RecordedCall[];
+	names: () => string[];
+	envUpdates: Record<string, string>[];
+	bypassDuringSignUp: boolean[];
+	registrationAllowedDuringSignUp: boolean[];
+	keyPresent: boolean;
+};
+
+function createHarness(overrides: Partial<CompleteSetupDeps> = {}): Harness {
+	const calls: RecordedCall[] = [];
+	const envUpdates: Record<string, string>[] = [];
+	const bypassDuringSignUp: boolean[] = [];
+	const registrationAllowedDuringSignUp: boolean[] = [];
+	const state = { keyPresent: true };
+
+	const deps: CompleteSetupDeps = {
+		adminSetupKeyFile: ADMIN_SETUP_KEY_FILE,
+		envFile: ENV_FILE,
+		getSetupStatus: async () => ({ required: true, reason: "ready" }),
+		redeemAdminSetupKey: async (filePath, presented) => {
+			calls.push({
+				name: "redeemAdminSetupKey",
+				payload: { filePath, presented },
+			});
+			if (!state.keyPresent) return { status: "missing" };
+			if (presented !== ADMIN_SETUP_KEY) return { status: "invalid" };
+			state.keyPresent = false;
+			return { status: "redeemed", key: ADMIN_SETUP_KEY };
+		},
+		writeAdminSetupKeyFile: async (filePath, key) => {
+			calls.push({
+				name: "writeAdminSetupKeyFile",
+				payload: { filePath, key },
+			});
+			state.keyPresent = true;
+		},
+		signUpEmail: async (payload) => {
+			calls.push({ name: "signUpEmail", payload });
+			bypassDuringSignUp.push(isSetupBootstrapBypassed());
+			registrationAllowedDuringSignUp.push(
+				await isRegistrationAllowed(payload.email, "true", async () => false),
+			);
+			return { userId: "user-1" };
+		},
+		setUserRole: async (payload) => {
+			calls.push({ name: "setUserRole", payload });
+		},
+		deleteUser: async (payload) => {
+			calls.push({ name: "deleteUser", payload });
+		},
+		createOwnedOrganization: async (payload) => {
+			calls.push({ name: "createOwnedOrganization", payload });
+			return { organizationId: "org-1" };
+		},
+		setActiveOrganization: async (payload) => {
+			calls.push({ name: "setActiveOrganization", payload });
+		},
+		setRuntimeDisableSignup: (value) => {
+			calls.push({ name: "setRuntimeDisableSignup", payload: value });
+		},
+		patchEnvFile: async (filePath, updates) => {
+			calls.push({ name: "patchEnvFile", payload: { filePath, updates } });
+			envUpdates.push(updates);
+		},
+		...overrides,
+	};
+
+	return {
+		deps,
+		calls,
+		names: () => calls.map((call) => call.name),
+		envUpdates,
+		bypassDuringSignUp,
+		registrationAllowedDuringSignUp,
+		get keyPresent() {
+			return state.keyPresent;
+		},
+	};
+}
+
+function createInput(overrides: Partial<CompleteSetupInput> = {}) {
+	return {
+		adminKey: ADMIN_SETUP_KEY,
+		name: "Ada Lovelace",
+		email: "admin@example.com",
+		password: "correct-horse-battery-staple",
+		disableSignup: true,
+		organizationName: "Reloop Labs",
+		appName: "Reloop",
+		...overrides,
+	} satisfies CompleteSetupInput;
+}
+
+describe("completeSelfHostSetup", () => {
+	test("creates the super-admin, the organization, and closes setup", async () => {
+		const harness = createHarness();
+
+		const result = await completeSelfHostSetup(createInput(), harness.deps);
+
+		expect(result).toEqual({ userId: "user-1", organizationId: "org-1" });
+		expect(harness.names()).toEqual([
+			"redeemAdminSetupKey",
+			"signUpEmail",
+			"setUserRole",
+			"createOwnedOrganization",
+			"setActiveOrganization",
+			"setRuntimeDisableSignup",
+			"patchEnvFile",
+		]);
+		expect(harness.calls[0]?.payload).toEqual({
+			filePath: ADMIN_SETUP_KEY_FILE,
+			presented: ADMIN_SETUP_KEY,
+		});
+		expect(harness.calls[1]?.payload).toEqual({
+			name: "Ada Lovelace",
+			email: "admin@example.com",
+			password: "correct-horse-battery-staple",
+		});
+		expect(harness.calls[2]?.payload).toEqual({
+			userId: "user-1",
+			role: PLATFORM_ADMIN_ROLE,
+		});
+		expect(harness.calls[5]?.payload).toBe(true);
+		expect(harness.envUpdates).toEqual([
+			{ SETUP_MODE: "false", DISABLE_SIGNUP: "true", APP_NAME: "Reloop" },
+		]);
+		expect(harness.keyPresent).toBe(false);
+	});
+
+	test("creates the super-admin behind a scoped registration bypass", async () => {
+		const harness = createHarness();
+
+		await completeSelfHostSetup(createInput(), harness.deps);
+
+		expect(harness.bypassDuringSignUp).toEqual([true]);
+		expect(harness.registrationAllowedDuringSignUp).toEqual([true]);
+		expect(isSetupBootstrapBypassed()).toBe(false);
+		expect(
+			await isRegistrationAllowed(
+				"admin@example.com",
+				"true",
+				async () => false,
+			),
+		).toBe(false);
+	});
+
+	test("releases the bypass when user creation fails", async () => {
+		const harness = createHarness({
+			signUpEmail: async () => {
+				throw new Error("weak password");
+			},
+		});
+
+		await expect(
+			completeSelfHostSetup(createInput(), harness.deps),
+		).rejects.toThrow("weak password");
+		expect(isSetupBootstrapBypassed()).toBe(false);
+		expect(harness.names()).toContain("writeAdminSetupKeyFile");
+		expect(harness.keyPresent).toBe(true);
+	});
+
+	test("skips the organization when no name is given", async () => {
+		const harness = createHarness();
+
+		const result = await completeSelfHostSetup(
+			createInput({ organizationName: undefined }),
+			harness.deps,
+		);
+
+		expect(result).toEqual({ userId: "user-1", organizationId: null });
+		expect(harness.names()).not.toContain("createOwnedOrganization");
+		expect(harness.names()).not.toContain("setActiveOrganization");
+	});
+
+	test("treats a blank organization name as no organization", async () => {
+		const harness = createHarness();
+
+		const result = await completeSelfHostSetup(
+			createInput({ organizationName: "   " }),
+			harness.deps,
+		);
+
+		expect(result.organizationId).toBeNull();
+		expect(harness.names()).not.toContain("createOwnedOrganization");
+	});
+
+	test("writes an open signup choice into the runtime lock and env file", async () => {
+		const harness = createHarness();
+
+		await completeSelfHostSetup(
+			createInput({ disableSignup: false, appName: undefined }),
+			harness.deps,
+		);
+
+		expect(harness.calls.find((c) => c.name === "setRuntimeDisableSignup")?.payload).toBe(
+			false,
+		);
+		expect(harness.envUpdates).toEqual([
+			{ SETUP_MODE: "false", DISABLE_SIGNUP: "false" },
+		]);
+	});
+
+	test("removes the half-created account when promotion fails", async () => {
+		const harness = createHarness({
+			setUserRole: async () => {
+				throw new Error("update failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(AdminPromotionFailedError);
+		expect((error as AdminPromotionFailedError).rolledBack).toBe(true);
+		expect(harness.names()).toEqual([
+			"redeemAdminSetupKey",
+			"signUpEmail",
+			"deleteUser",
+			"writeAdminSetupKeyFile",
+		]);
+		expect(harness.keyPresent).toBe(true);
+		expect((error as Error).message).toContain("Try setup again");
+	});
+
+	test("points at promote-admin when the account cannot be removed", async () => {
+		const harness = createHarness({
+			setUserRole: async () => {
+				throw new Error("update failed");
+			},
+			deleteUser: async () => {
+				throw new Error("delete failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect((error as AdminPromotionFailedError).rolledBack).toBe(false);
+		expect((error as Error).message).toContain("promote-admin");
+		expect(harness.names()).toContain("writeAdminSetupKeyFile");
+	});
+
+	test("removes the promoted account when organization creation fails", async () => {
+		const harness = createHarness({
+			createOwnedOrganization: async () => {
+				throw new Error("org create failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(SetupFinalizationFailedError);
+		expect((error as SetupFinalizationFailedError).rolledBack).toBe(true);
+		expect(harness.names()).toEqual([
+			"redeemAdminSetupKey",
+			"signUpEmail",
+			"setUserRole",
+			"setRuntimeDisableSignup",
+			"deleteUser",
+			"writeAdminSetupKeyFile",
+		]);
+		expect(harness.keyPresent).toBe(true);
+		expect((error as Error).message).toContain("Try setup again");
+	});
+
+	test("removes the promoted account when env finalization fails", async () => {
+		const harness = createHarness({
+			patchEnvFile: async () => {
+				throw new Error("env write failed");
+			},
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(SetupFinalizationFailedError);
+		expect((error as SetupFinalizationFailedError).rolledBack).toBe(true);
+		expect(harness.names()).toContain("deleteUser");
+		expect(harness.names()).toContain("writeAdminSetupKeyFile");
+		expect(
+			harness.calls.filter((call) => call.name === "setRuntimeDisableSignup"),
+		).toEqual([
+			{ name: "setRuntimeDisableSignup", payload: true },
+			{ name: "setRuntimeDisableSignup", payload: false },
+		]);
+		expect(harness.keyPresent).toBe(true);
+	});
+
+	test("spends the setup key before creating the administrator", async () => {
+		const harness = createHarness();
+		let keySpentBeforeSignUp = false;
+		harness.deps.signUpEmail = async (payload) => {
+			keySpentBeforeSignUp = !harness.keyPresent;
+			harness.calls.push({ name: "signUpEmail", payload });
+			return { userId: "user-1" };
+		};
+
+		await completeSelfHostSetup(createInput(), harness.deps);
+
+		expect(keySpentBeforeSignUp).toBe(true);
+		expect(harness.keyPresent).toBe(false);
+	});
+
+	test("refuses when setup is already complete", async () => {
+		const harness = createHarness({
+			getSetupStatus: async () => ({
+				required: false,
+				reason: "already_complete",
+			}),
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(SetupNotAvailableError);
+		expect((error as SetupNotAvailableError).name).toBe("SetupNotAvailable");
+		expect((error as SetupNotAvailableError).reason).toBe("already_complete");
+		expect(harness.names()).toEqual([]);
+	});
+
+	test("refuses outside self-host setup mode", async () => {
+		const harness = createHarness({
+			getSetupStatus: async () => ({
+				required: false,
+				reason: "not_self_host_setup",
+			}),
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect((error as SetupNotAvailableError).reason).toBe(
+			"not_self_host_setup",
+		);
+		expect(harness.names()).toEqual([]);
+	});
+
+	test("refuses when the key file disappeared before completion", async () => {
+		const harness = createHarness({
+			redeemAdminSetupKey: async () => ({ status: "missing" }),
+		});
+
+		const error = await completeSelfHostSetup(
+			createInput(),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(SetupNotAvailableError);
+		expect((error as SetupNotAvailableError).reason).toBe("missing_key");
+		expect(harness.names()).toEqual([]);
+	});
+
+	test("refuses a wrong admin key without touching the instance", async () => {
+		const harness = createHarness();
+
+		const error = await completeSelfHostSetup(
+			createInput({ adminKey: "setup-key-wrong" }),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(InvalidAdminSetupKeyError);
+		expect((error as InvalidAdminSetupKeyError).name).toBe(
+			"InvalidAdminSetupKey",
+		);
+		expect(harness.names()).toEqual(["redeemAdminSetupKey"]);
+		expect(harness.keyPresent).toBe(true);
+	});
+
+	test("refuses an empty admin key", async () => {
+		const harness = createHarness();
+
+		const error = await completeSelfHostSetup(
+			createInput({ adminKey: "" }),
+			harness.deps,
+		).catch((thrown: unknown) => thrown);
+
+		expect(error).toBeInstanceOf(InvalidAdminSetupKeyError);
+		expect(harness.names()).toEqual(["redeemAdminSetupKey"]);
+	});
+});

@@ -169,3 +169,140 @@ local.reloop.sh, *.local.reloop.sh {
         }
     }
 }
+
+# Setup wizard + post-setup product preview (same backends as local.reloop.sh).
+# Auth hits main :8000 so API-key/session middleware (BASE_URL=local.reloop.sh) works.
+# Isolated preview auth :8099 is wizard-only — stop it when done with first-run.
+setup.local.reloop.sh {
+    tls /etc/caddy/certs/local.reloop.sh.pem /etc/caddy/certs/local.reloop.sh-key.pem
+
+    handle /dashboard* {
+        reverse_proxy host.docker.internal:3001 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/auth* {
+        reverse_proxy host.docker.internal:8000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/api-key* {
+        reverse_proxy host.docker.internal:8012 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/domain* {
+        reverse_proxy host.docker.internal:8011 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/webhook* {
+        reverse_proxy host.docker.internal:8013 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/contacts* {
+        reverse_proxy host.docker.internal:8014 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/mail* {
+        reverse_proxy host.docker.internal:8015 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/logs* {
+        reverse_proxy host.docker.internal:8016 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/workflow* {
+        reverse_proxy host.docker.internal:8017 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/upload* {
+        reverse_proxy host.docker.internal:8018 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/template* {
+        reverse_proxy host.docker.internal:8019 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/campaigns* {
+        reverse_proxy host.docker.internal:8027 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/email* {
+        reverse_proxy host.docker.internal:8022 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/credits* {
+        reverse_proxy host.docker.internal:8023 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/admin* {
+        reverse_proxy host.docker.internal:8024 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/tools* {
+        reverse_proxy host.docker.internal:8026 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/tool* {
+        reverse_proxy host.docker.internal:8026 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/inbox* {
+        reverse_proxy host.docker.internal:8028 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle {
+        respond "setup.local.reloop.sh — open /dashboard" 404
+    }
+}

@@ -12,6 +12,7 @@ import { authConfig } from "./auth.config";
 import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
+import { setupRoutes } from "./routes/setup/setup.route";
 
 const parseOtlpHeaders = (
 	headersStr?: string,
@@ -58,6 +59,7 @@ const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 			},
 		}),
 	)
+	.use(setupRoutes)
 	.mount("/", auth.handler)
 	.use(landing)
 	.onStart(async () => {
