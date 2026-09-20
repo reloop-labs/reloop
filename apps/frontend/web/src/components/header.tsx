@@ -2553,24 +2553,14 @@ export const Header = () => {
 								<a href="/dashboard">Dashboard</a>
 							</FancyButton.Root>
 						) : (
-							<div className="flex gap-2">
-								<FancyButton.Root
-									asChild
-									variant="basic"
-									size="xsmall"
-									className="px-3.5!"
-								>
-									<a href="/dashboard/login">Sign in</a>
-								</FancyButton.Root>
-								<FancyButton.Root
-									asChild
-									variant="primary"
-									size="xsmall"
-									className="px-3.5!"
-								>
-									<a href="/dashboard/signup">Get Started</a>
-								</FancyButton.Root>
-							</div>
+							<FancyButton.Root
+								asChild
+								variant="primary"
+								size="xsmall"
+								className="px-3.5!"
+							>
+								<a href="/dashboard/signup">Get Started</a>
+							</FancyButton.Root>
 						)}
 					</div>
 

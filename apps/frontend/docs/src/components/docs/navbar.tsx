@@ -173,7 +173,7 @@ export function Navbar({
 					title="GitHub"
 				>
 					<Icon name="social-github" className="h-3.5 w-3.5 shrink-0" />
-					<span className="max-w-[6.5rem] truncate">{stars}</span>
+					<span className="w-10 truncate">{stars}</span>
 				</Link>
 				{mounted && !isPending && session ? (
 					<FancyButton.Root

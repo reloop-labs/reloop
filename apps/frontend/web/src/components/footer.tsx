@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { FooterBrand } from "@reloop/web/components/footer-brand";
-import { FooterPixelStrip } from "@reloop/web/components/footer-pixel-strip";
+import { FooterWordmark } from "@reloop/web/components/footer-wordmark";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -187,8 +187,8 @@ export const Footer = () => {
 						</nav>
 					))}
 				</div>
-				<div aria-hidden className="h-24" />
-				<FooterPixelStrip />
+				<div aria-hidden className="h-12 sm:h-16" />
+				<FooterWordmark />
 			</div>
 		</footer>
 	);
