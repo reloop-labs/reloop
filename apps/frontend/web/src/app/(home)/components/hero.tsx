@@ -4,11 +4,9 @@ import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
-import { PixelBlast } from "@reloop/web/components/pixel-blast";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HeroWindowChrome } from "./hero-chrome";
 import { HeroDashboardShell } from "./hero-dashboard-shell";
@@ -71,7 +69,6 @@ export function Hero({ variant = "default" }: HeroProps) {
 	const [installMethod, setInstallMethod] = useState<InstallMethod>("curl");
 	const [active, setActive] = useState<HeroTabId>("overview");
 	const reduceMotion = useReducedMotion();
-	const { resolvedTheme } = useTheme();
 
 	const heroRef = useRef<HTMLElement>(null);
 	const panelRef = useRef<HTMLDivElement>(null);
@@ -167,35 +164,16 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			) : (
-				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center overflow-hidden border-stroke-soft-200 border-x px-6 pt-36 pb-20 text-center sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28 dark:border-white/10">
-					<div
-						aria-hidden="true"
-						className="pointer-events-none absolute inset-0 [-webkit-mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
-					>
-						<PixelBlast
-							variant="square"
-							pixelSize={2}
-							color={resolvedTheme === "dark" ? "#93c5fd" : "#2563eb"}
-							patternScale={4}
-							patternDensity={0.45}
-							enableRipples={false}
-							rippleSpeed={0.05}
-							rippleThickness={0.09}
-							rippleIntensityScale={2.5}
-							speed={0.2}
-							transparent
-							edgeFade={0.65}
-						/>
-					</div>
-					<h1 className="relative z-10 max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-200 border-x px-6 pt-36 pb-20 text-center sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28 dark:border-white/10">
+					<h1 className="max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
 						Open-Source Email Infrastructure for Developers
 					</h1>
-					<p className="relative z-10 mt-5 max-w-[34rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
+					<p className="mt-5 max-w-4xl text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
 						Reloop is a transactional email API, SMTP relay, campaign sender,
 						and inbound agent inbox in one Apache 2.0 codebase. Run it on Reloop
 						Cloud or self-host it.
 					</p>
-					<div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
+					<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
 						<FancyButton.Root
 							asChild
 							variant="primary"
