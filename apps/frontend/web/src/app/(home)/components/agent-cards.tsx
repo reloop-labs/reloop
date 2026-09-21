@@ -198,7 +198,7 @@ function ApiCard() {
 			<div className="mt-6 mb-4">
 				<ApiDiagram />
 			</div>
-			<div className="mt-auto flex items-center justify-start border-stroke-soft-200 border-t pt-4 dark:border-white/10">
+			<div className="mt-auto flex items-center justify-start border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
 					<span>Explore API Reference</span>
 					<Icon
@@ -336,7 +336,7 @@ function CliCard() {
 			<div className="mt-6 mb-4">
 				<CliDiagram />
 			</div>
-			<div className="mt-auto flex items-center justify-start border-stroke-soft-200 border-t pt-4 dark:border-white/10">
+			<div className="mt-auto flex items-center justify-start border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
 					<span>CLI Reference</span>
 					<Icon
@@ -499,7 +499,7 @@ function SkillsCard() {
 			<div className="mt-6 mb-4">
 				<SkillsDiagram />
 			</div>
-			<div className="mt-auto flex items-center justify-start border-stroke-soft-200 border-t pt-4 dark:border-white/10">
+			<div className="mt-auto flex items-center justify-start border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
 					<span>Install Agent Skills</span>
 					<Icon
@@ -531,7 +531,7 @@ function CardHeader({
 					height="48"
 					viewBox="0 0 22 48"
 					fill="none"
-					className="stroke-stroke-soft-200 dark:stroke-white/10"
+					className="stroke-stroke-soft-100 dark:stroke-white/10"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 				>
@@ -702,7 +702,7 @@ function McpCard() {
 			<div className="mt-6 mb-4">
 				<McpDiagram />
 			</div>
-			<div className="mt-auto flex items-center justify-start border-stroke-soft-200 border-t pt-4 dark:border-white/10">
+			<div className="mt-auto flex items-center justify-start border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-strong-950 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
 					<span>Explore MCP Server</span>
 					<Icon
@@ -737,7 +737,7 @@ export function AgentCards() {
 					</p>
 				</div>
 			</div>
-			<div className="grid grid-cols-1 gap-px border-stroke-soft-200 border-y bg-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10 dark:bg-white/10">
+			<div className="grid grid-cols-1 gap-px border-stroke-soft-100 border-y bg-stroke-soft-100 sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10 dark:bg-white/10">
 				<McpCard />
 				<ApiCard />
 				<CliCard />

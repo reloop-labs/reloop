@@ -78,7 +78,7 @@ export function IncomingEmails() {
 
 	return (
 		<div ref={rootRef} className="flex h-full min-h-[22rem] flex-col">
-			<div className="flex shrink-0 items-center justify-between border-stroke-soft-200 border-b px-4 py-2.5 sm:px-5 dark:border-white/10">
+			<div className="flex shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 sm:px-5 dark:border-white/10">
 				<div className="flex items-center gap-2">
 					<span className="relative flex size-1.5">
 						<span className="absolute inline-flex size-full rounded-full bg-emerald-400 opacity-60 motion-safe:animate-ping" />
@@ -116,7 +116,7 @@ export function IncomingEmails() {
 								}
 								transition={{ duration: 0.28, ease: PAGE_EASE }}
 								className={cn(
-									"flex items-center gap-2.5 border-stroke-soft-200 border-b px-4 py-2.5 sm:px-5 dark:border-white/10",
+									"flex items-center gap-2.5 border-stroke-soft-100 border-b px-4 py-2.5 sm:px-5 dark:border-white/10",
 									highlighted && "bg-bg-weak-50 dark:bg-white/[0.04]",
 								)}
 							>

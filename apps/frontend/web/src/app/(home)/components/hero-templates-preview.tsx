@@ -10,7 +10,7 @@ export function HeroTemplatesPreview() {
 	return (
 		<div className="flex h-full flex-col overflow-hidden bg-bg-white-0 text-left font-sans dark:bg-black">
 			{/* Template Toolbar */}
-			<div className="flex shrink-0 items-center justify-between border-stroke-soft-200 border-b px-4 py-2.5 sm:px-6 dark:border-white/10">
+			<div className="flex shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 sm:px-6 dark:border-white/10">
 				<div className="flex items-center gap-2 sm:gap-3">
 					<div className="flex size-7 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:bg-purple-400/10 dark:text-purple-400">
 						<Icon name="layout" className="size-4" />
@@ -31,7 +31,7 @@ export function HeroTemplatesPreview() {
 				</div>
 
 				<div className="flex items-center gap-2">
-					<div className="hidden items-center rounded-lg border border-stroke-soft-200 p-0.5 sm:flex dark:border-white/10">
+					<div className="hidden items-center rounded-lg border border-stroke-soft-100 p-0.5 sm:flex dark:border-white/10">
 						<button
 							type="button"
 							onClick={() => setViewMode("desktop")}
@@ -66,24 +66,24 @@ export function HeroTemplatesPreview() {
 			{/* Template Workspace Grid */}
 			<div className="grid flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[240px_minmax(0,1fr)]">
 				{/* Left: Dynamic Variables & Component Library */}
-				<div className="hidden border-stroke-soft-200 border-r p-4 lg:block dark:border-white/10">
+				<div className="hidden border-stroke-soft-100 border-r p-4 lg:block dark:border-white/10">
 					<p className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider dark:text-white/40">
 						Template Variables
 					</p>
 					<div className="mt-2 space-y-1.5">
-						<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50/50 p-2 text-[11px] dark:border-white/10 dark:bg-white/[0.02]">
+						<div className="rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-2 text-[11px] dark:border-white/10 dark:bg-white/[0.02]">
 							<span className="font-mono text-purple-600 dark:text-purple-400">
 								{"{{ user.name }}"}
 							</span>
 							<p className="text-[10px] text-text-soft-400">Maya Chen</p>
 						</div>
-						<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50/50 p-2 text-[11px] dark:border-white/10 dark:bg-white/[0.02]">
+						<div className="rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-2 text-[11px] dark:border-white/10 dark:bg-white/[0.02]">
 							<span className="font-mono text-purple-600 dark:text-purple-400">
 								{"{{ org.name }}"}
 							</span>
 							<p className="text-[10px] text-text-soft-400">Acme Labs</p>
 						</div>
-						<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50/50 p-2 text-[11px] dark:border-white/10 dark:bg-white/[0.02]">
+						<div className="rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-2 text-[11px] dark:border-white/10 dark:bg-white/[0.02]">
 							<span className="font-mono text-purple-600 dark:text-purple-400">
 								{"{{ cta.url }}"}
 							</span>
@@ -116,12 +116,12 @@ export function HeroTemplatesPreview() {
 				<div className="flex flex-1 items-center justify-center overflow-y-auto bg-bg-weak-50/30 p-4 sm:p-6 dark:bg-white/[0.01]">
 					<div
 						className={cn(
-							"w-full rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-sm transition-all duration-300 dark:border-white/10 dark:bg-[#0c0c0d]",
+							"w-full rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 shadow-sm transition-all duration-300 dark:border-white/10 dark:bg-[#0c0c0d]",
 							viewMode === "mobile" ? "max-w-[340px]" : "max-w-[480px]",
 						)}
 					>
 						{/* Email Header */}
-						<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-4 dark:border-white/10">
+						<div className="flex items-center justify-between border-stroke-soft-100 border-b pb-4 dark:border-white/10">
 							<div className="flex items-center gap-2">
 								<div className="size-6 rounded-md bg-text-strong-950 text-center font-bold text-[11px] text-white leading-6 dark:bg-white dark:text-black">
 									R
@@ -157,7 +157,7 @@ export function HeroTemplatesPreview() {
 						</div>
 
 						{/* Email Footer */}
-						<div className="border-stroke-soft-200 border-t pt-4 text-[11px] text-text-soft-400 dark:border-white/10 dark:text-white/40">
+						<div className="border-stroke-soft-100 border-t pt-4 text-[11px] text-text-soft-400 dark:border-white/10 dark:text-white/40">
 							<p>Reloop Labs · 100% open-source email infrastructure</p>
 							<p className="mt-1">
 								Unsubscribe or manage notification settings

@@ -8,7 +8,7 @@ function Term({ href, children }: { href: string; children: React.ReactNode }) {
 	return (
 		<Link
 			href={href}
-			className="underline decoration-stroke-soft-200 underline-offset-[3px] transition-colors hover:text-text-strong-950 hover:decoration-text-sub-600 dark:decoration-white/20 dark:hover:text-white dark:hover:decoration-white/50"
+			className="underline decoration-stroke-soft-100 underline-offset-[3px] transition-colors hover:text-text-strong-950 hover:decoration-text-sub-600 dark:decoration-white/20 dark:hover:text-white dark:hover:decoration-white/50"
 		>
 			{children}
 		</Link>
@@ -133,9 +133,9 @@ export default function Highlights() {
 		<section
 			id="highlights"
 			aria-labelledby="highlights-heading"
-			className="w-full border-stroke-soft-200 border-b dark:border-white/10"
+			className="w-full border-stroke-soft-100 border-b dark:border-white/10"
 		>
-			<div className="border-stroke-soft-200 border-b px-5 py-8 sm:px-7 lg:px-9 lg:py-10 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-b px-5 py-8 sm:px-7 lg:px-9 lg:py-10 dark:border-white/10">
 				<p className="font-medium text-[12px] text-primary-base uppercase">
 					Deliverability
 				</p>

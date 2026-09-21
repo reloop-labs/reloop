@@ -4,7 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 
 export function HeroDashboardHeader() {
 	return (
-		<header className="flex h-11 shrink-0 items-center justify-between border-stroke-soft-200 border-b px-3 dark:border-white/10">
+		<header className="flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b px-3 dark:border-white/10">
 			<div className="flex items-center gap-1.5">
 				<span className="hidden size-7 items-center justify-center rounded-lg text-text-soft-400 md:flex dark:text-white/35">
 					<svg viewBox="0 0 16 16" className="size-3.5" fill="none">

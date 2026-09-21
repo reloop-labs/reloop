@@ -152,7 +152,7 @@ export function WebhookEvents({ active }: { active: boolean }) {
 	return (
 		<div
 			ref={rootRef}
-			className="w-full max-w-sm overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.14)] sm:p-5 dark:border-white/10 dark:bg-[#141414] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
+			className="w-full max-w-sm overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.14)] sm:p-5 dark:border-white/10 dark:bg-[#141414] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
 		>
 			<div className="mb-2.5 flex items-center justify-between">
 				<div className="flex items-center gap-2">
@@ -255,11 +255,11 @@ export function WebhookEvents({ active }: { active: boolean }) {
 										>
 											{getAvatarInitial(item.email)}
 										</span>
-										<p className="truncate font-medium text-[13px] text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-2 dark:text-white">
+										<p className="truncate font-medium text-[13px] text-text-strong-950 underline decoration-stroke-soft-100 underline-offset-2 dark:text-white">
 											{item.name}
 										</p>
 									</div>
-									<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 px-3.5 py-3 dark:border-white/10 dark:bg-white/[0.03]">
+									<div className="rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/70 px-3.5 py-3 dark:border-white/10 dark:bg-white/[0.03]">
 										<div className="flex items-center gap-2">
 											<span
 												className={cn(

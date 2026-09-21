@@ -37,7 +37,7 @@ export function CloudflareBanner({
 							We've detected your domain is managed by Cloudflare. We can
 							automatically configure all required DNS records for you.
 						</p>
-						<span className="inline-flex items-center gap-1 text-paragraph-xs text-text-sub-600 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4">
+						<span className="inline-flex items-center gap-1 text-paragraph-xs text-text-sub-600 underline decoration-stroke-soft-100 decoration-dashed underline-offset-4">
 							Manual Cloudflare setup guide
 						</span>
 					</div>

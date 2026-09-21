@@ -74,7 +74,7 @@ export function HeroDashboardSidebar({
 	const reduceMotion = useReducedMotion();
 
 	return (
-		<aside className="hidden h-full w-[13.5rem] shrink-0 flex-col border-stroke-soft-200 border-r md:flex dark:border-white/10">
+		<aside className="hidden h-full w-[13.5rem] shrink-0 flex-col border-stroke-soft-100 border-r md:flex dark:border-white/10">
 			<div className="flex h-11 shrink-0 items-center gap-1.5 px-3">
 				<Logo className="-ml-0.5 w-8" />
 				<span className="-ml-1 font-semibold text-[13px] text-text-strong-950 dark:text-white">
@@ -193,7 +193,7 @@ function HeroThemeToggle() {
 	}, []);
 
 	return (
-		<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
+		<div className="inline-flex items-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
 			<button
 				type="button"
 				onClick={() => setTheme("system")}

@@ -1,7 +1,7 @@
 export function TemplatePane() {
 	return (
 		<div className="flex h-full min-h-[22rem] flex-col">
-			<div className="flex shrink-0 items-center justify-between border-stroke-soft-200 border-b px-4 py-2.5 sm:px-5 dark:border-white/10">
+			<div className="flex shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 sm:px-5 dark:border-white/10">
 				<div className="min-w-0">
 					<p className="font-medium text-[12.5px] text-text-strong-950 dark:text-white">
 						welcome.tsx
@@ -16,8 +16,8 @@ export function TemplatePane() {
 			</div>
 
 			<div className="flex flex-1 items-center justify-center p-5 sm:p-6">
-				<div className="w-full max-w-[22rem] rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-5 dark:border-white/10 dark:bg-[#0c0c0d]">
-					<div className="flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
+				<div className="w-full max-w-[22rem] rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-white/10 dark:bg-[#0c0c0d]">
+					<div className="flex items-center justify-between border-stroke-soft-100 border-b pb-3 dark:border-white/10">
 						<div className="flex items-center gap-2">
 							<span className="flex size-6 items-center justify-center rounded-md bg-text-strong-950 font-bold text-[11px] text-white dark:bg-white dark:text-black">
 								A

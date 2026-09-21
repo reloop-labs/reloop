@@ -38,7 +38,7 @@ export function PreviewTabs({
 		<div
 			role="tablist"
 			aria-label="Transactional features"
-			className="grid border-stroke-soft-200 border-t bg-bg-white-0 sm:grid-cols-3 dark:border-white/10 dark:bg-black"
+			className="grid border-stroke-soft-100 border-t bg-bg-white-0 sm:grid-cols-3 dark:border-white/10 dark:bg-black"
 		>
 			{PREVIEW_TABS.map((tab) => {
 				const selected = tab.id === active;
@@ -56,7 +56,7 @@ export function PreviewTabs({
 							}
 						}}
 						className={cn(
-							"group relative cursor-pointer px-5 py-6 text-left transition-colors duration-200 sm:border-stroke-soft-200 sm:border-l sm:px-6 sm:py-7 sm:first:border-l-0 dark:sm:border-white/10",
+							"group relative cursor-pointer px-5 py-6 text-left transition-colors duration-200 sm:border-stroke-soft-100 sm:border-l sm:px-6 sm:py-7 sm:first:border-l-0 dark:sm:border-white/10",
 							"hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
 						)}
 					>

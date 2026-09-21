@@ -82,7 +82,7 @@ export default function Home() {
 		<div className="relative w-full">
 			<JsonLd data={homeSchema} />
 			<Hero />
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<LanguageExplorer
 					framed={false}
 					showTopRule

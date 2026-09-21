@@ -47,7 +47,7 @@ function MicroOpenSource() {
 			href="https://github.com/reloop-labs/reloop"
 			target="_blank"
 			rel="noreferrer"
-			className="group/github flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50/50 px-2.5 py-0.5 font-medium font-mono text-[10.5px] text-text-strong-950 transition-colors hover:border-stroke-strong-950 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:border-white/40 dark:hover:bg-white/[0.08]"
+			className="group/github flex cursor-pointer items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50/50 px-2.5 py-0.5 font-medium font-mono text-[10.5px] text-text-strong-950 transition-colors hover:border-stroke-strong-950 hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:border-white/40 dark:hover:bg-white/[0.08]"
 		>
 			<Icon
 				name="social-github"
@@ -74,7 +74,7 @@ function MicroZeroLockin() {
 
 function MicroDevExp() {
 	return (
-		<div className="pointer-events-none flex select-none items-center rounded border border-stroke-soft-200/80 bg-bg-weak-50/40 px-2 py-0.5 font-mono text-[10px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
+		<div className="pointer-events-none flex select-none items-center rounded border border-stroke-soft-100/80 bg-bg-weak-50/40 px-2 py-0.5 font-mono text-[10px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
 			<span className="text-text-sub-600 dark:text-white/40">&lt;</span>
 			<span className="font-medium">Email</span>
 			<span className="ml-0.5 text-text-sub-600 dark:text-white/50">to</span>
@@ -89,7 +89,7 @@ function MicroDevExp() {
 
 function MicroAgentInbox() {
 	return (
-		<div className="pointer-events-none flex select-none items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50/50 px-2.5 py-0.5 font-mono text-[10.5px] dark:border-white/10 dark:bg-white/[0.04]">
+		<div className="pointer-events-none flex select-none items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50/50 px-2.5 py-0.5 font-mono text-[10.5px] dark:border-white/10 dark:bg-white/[0.04]">
 			<span className="size-1.5 animate-pulse rounded-full bg-amber-500" />
 			<span className="font-medium text-text-strong-950 dark:text-white">
 				mcp: send_email()
@@ -122,7 +122,7 @@ function MicroInbound() {
 		<div className="pointer-events-none flex select-none items-center gap-2 font-mono text-[10.5px] text-text-sub-600 dark:text-white/60">
 			<span className="text-sm text-text-strong-950 dark:text-white">✉</span>
 			<span className="text-text-sub-600/40 dark:text-white/30">→</span>
-			<span className="rounded border border-stroke-soft-200 bg-bg-weak-50/60 px-1.5 py-0.2 font-medium text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
+			<span className="rounded border border-stroke-soft-100 bg-bg-weak-50/60 px-1.5 py-0.2 font-medium text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
 				&#123; webhook &#125;
 			</span>
 		</div>
@@ -156,7 +156,7 @@ function MicroEvents() {
 
 function MicroSelfHost() {
 	return (
-		<div className="pointer-events-none flex select-none items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50/50 px-2.5 py-0.5 font-mono text-[10.5px] dark:border-white/10 dark:bg-white/[0.04]">
+		<div className="pointer-events-none flex select-none items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50/50 px-2.5 py-0.5 font-mono text-[10.5px] dark:border-white/10 dark:bg-white/[0.04]">
 			<span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
 			<span className="font-medium text-text-strong-950 dark:text-white">
 				docker: healthy
@@ -262,7 +262,7 @@ export default function Convictions({
 	return (
 		<section aria-labelledby="convictions-heading">
 			{showHeading ? (
-				<div className="border-stroke-soft-200 border-b px-6 py-12 text-center sm:px-8 sm:py-16 md:px-12 dark:border-white/10">
+				<div className="border-stroke-soft-100 border-b px-6 py-12 text-center sm:px-8 sm:py-16 md:px-12 dark:border-white/10">
 					<h2
 						id="convictions-heading"
 						className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl lg:text-4xl dark:text-white"
@@ -285,7 +285,7 @@ export default function Convictions({
 					<div
 						key={item.title}
 						className={cn(
-							"group relative flex min-h-[13.5rem] flex-col justify-between border-stroke-soft-200 border-r border-b px-6 py-7 sm:min-h-[15rem] lg:px-7 lg:py-8 dark:border-white/10",
+							"group relative flex min-h-[13.5rem] flex-col justify-between border-stroke-soft-100 border-r border-b px-6 py-7 sm:min-h-[15rem] lg:px-7 lg:py-8 dark:border-white/10",
 							"max-sm:border-r-0 max-sm:last:border-b-0 max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(5n)]:border-r-0 sm:max-lg:[&:nth-last-child(-n+2)]:border-b-0 lg:[&:nth-last-child(-n+5)]:border-b-0",
 						)}
 					>

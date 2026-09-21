@@ -95,7 +95,7 @@ export function FeatureHighlightsGrid({
 				<div
 					key={tab.id}
 					className={cn(
-						"flex flex-col border-stroke-soft-200 border-r border-b p-6 sm:p-7 lg:p-8 dark:border-white/10",
+						"flex flex-col border-stroke-soft-100 border-r border-b p-6 sm:p-7 lg:p-8 dark:border-white/10",
 						stacked
 							? "gap-4 py-8 sm:py-9 lg:py-10"
 							: "min-h-[13.5rem] justify-between sm:min-h-[15rem]",
@@ -114,7 +114,7 @@ export function FeatureHighlightsGrid({
 								{tab.title}
 							</p>
 							{tab.badge ? (
-								<span className="rounded-md bg-stroke-soft-200/80 px-1.5 py-0.5 font-semibold text-[10px] text-text-sub-600 dark:bg-white/15 dark:text-white/80">
+								<span className="rounded-md bg-stroke-soft-100/80 px-1.5 py-0.5 font-semibold text-[10px] text-text-sub-600 dark:bg-white/15 dark:text-white/80">
 									{tab.badge}
 								</span>
 							) : null}

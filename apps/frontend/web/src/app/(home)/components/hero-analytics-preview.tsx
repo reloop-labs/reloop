@@ -79,22 +79,22 @@ export function HeroAnalyticsPreview() {
 						Deliverability and engagement metrics for your emails.
 					</p>
 				</div>
-				<span className="hidden h-8 items-center rounded-xl border border-stroke-soft-200 px-3 text-[12px] text-text-sub-600 sm:inline-flex dark:border-white/10 dark:text-white/50">
+				<span className="hidden h-8 items-center rounded-xl border border-stroke-soft-100 px-3 text-[12px] text-text-sub-600 sm:inline-flex dark:border-white/10 dark:text-white/50">
 					Documentation
 				</span>
 			</div>
 
 			<div className="mt-4 flex flex-wrap items-center gap-2">
-				<span className="inline-flex h-8 items-center rounded-xl border border-stroke-soft-200 px-2.5 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
+				<span className="inline-flex h-8 items-center rounded-xl border border-stroke-soft-100 px-2.5 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
 					Last 15 days
 				</span>
-				<span className="inline-flex h-8 items-center rounded-xl border border-stroke-soft-200 px-2.5 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
+				<span className="inline-flex h-8 items-center rounded-xl border border-stroke-soft-100 px-2.5 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
 					All Domains
 				</span>
 			</div>
 
-			<div className="mt-4 min-h-0 flex-1 overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-white/10">
-				<div className="border-stroke-soft-200 border-b bg-bg-weak-50/60 px-4 py-2 dark:border-white/10 dark:bg-white/[0.03]">
+			<div className="mt-4 min-h-0 flex-1 overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-white/10">
+				<div className="border-stroke-soft-100 border-b bg-bg-weak-50/60 px-4 py-2 dark:border-white/10 dark:bg-white/[0.03]">
 					<p className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 						Deliverability
 					</p>
@@ -132,7 +132,7 @@ export function HeroAnalyticsPreview() {
 									x2={W - PAD.r}
 									y1={PAD.t + (H - PAD.t - PAD.b) * t}
 									y2={PAD.t + (H - PAD.t - PAD.b) * t}
-									className="stroke-stroke-soft-200 dark:stroke-white/10"
+									className="stroke-stroke-soft-100 dark:stroke-white/10"
 									strokeWidth="1"
 								/>
 							))}

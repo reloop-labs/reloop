@@ -26,7 +26,7 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 			<article
 				className={cn(
 					"absolute inset-0 overflow-hidden rounded-[22px] border bg-bg-white-0 dark:bg-[#141414]",
-					"border-stroke-soft-200 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-white/10 dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
+					"border-stroke-soft-100 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-white/10 dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
 				)}
 			>
 				<AnimatePresence mode="wait" initial={false}>
@@ -157,7 +157,7 @@ function OtpEmailBody() {
 				This code expires in 10 minutes.
 			</BodyText>
 
-			<div className="my-6 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-5 text-center dark:border-white/10 dark:bg-white/[0.04]">
+			<div className="my-6 rounded-xl border border-stroke-soft-100 bg-bg-weak-50 p-5 text-center dark:border-white/10 dark:bg-white/[0.04]">
 				<p className="m-0 font-bold font-mono text-[26px] text-text-strong-950 tracking-[0.2em] sm:text-[28px] dark:text-white">
 					842 190
 				</p>
@@ -194,7 +194,7 @@ function WelcomeEmailBody() {
 			</BodyText>
 			<BodyText>That&apos;s why Reloop exists.</BodyText>
 
-			<div className="mt-10 mb-10 border-stroke-soft-200 border-l border-solid pl-6 dark:border-white/10">
+			<div className="mt-10 mb-10 border-stroke-soft-100 border-l border-solid pl-6 dark:border-white/10">
 				<MonoLabel>Our Mission</MonoLabel>
 				<p
 					className="mt-4 mb-0 font-serif text-[#0e0e0e] text-[18px] italic leading-[1.6] dark:text-white"
@@ -216,7 +216,7 @@ function WelcomeEmailBody() {
 				and transparent, and self-hostable.
 			</BodyText>
 
-			<div className="mt-10 rounded-lg border border-stroke-soft-200 border-solid p-8 dark:border-white/10">
+			<div className="mt-10 rounded-lg border border-stroke-soft-100 border-solid p-8 dark:border-white/10">
 				<MonoLabel>What you can do with Reloop</MonoLabel>
 				<div className="mt-6 flex gap-2">
 					<p className="m-0 w-8 shrink-0 font-mono text-[#404040] text-[12px]">

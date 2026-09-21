@@ -265,8 +265,8 @@ export default function EmailSystem() {
 				</h2>
 			</div>
 
-			<div className="border-stroke-soft-200 border-t lg:grid lg:grid-cols-[minmax(14rem,18.5rem)_minmax(0,1fr)] dark:border-white/10">
-				<div className="border-stroke-soft-200 border-b lg:overflow-visible lg:border-r lg:border-b-0 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-t lg:grid lg:grid-cols-[minmax(14rem,18.5rem)_minmax(0,1fr)] dark:border-white/10">
+				<div className="border-stroke-soft-100 border-b lg:overflow-visible lg:border-r lg:border-b-0 dark:border-white/10">
 					<aside className="top-16 z-10 overflow-visible bg-bg-white-0 lg:sticky dark:bg-black">
 						<nav
 							ref={navRef}
@@ -477,7 +477,7 @@ export default function EmailSystem() {
 							className={cn(
 								"scroll-mt-24",
 								index < SECTIONS.length - 1 &&
-									"border-stroke-soft-200 border-b dark:border-white/10",
+									"border-stroke-soft-100 border-b dark:border-white/10",
 							)}
 						>
 							{id === "transactional" ? (

@@ -18,7 +18,7 @@ import {
 } from "../_shared/status";
 
 const toolbarControlClassName = cn(
-	"inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-2.5 shadow-none",
+	"inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-2.5 shadow-none",
 	"font-normal text-text-sub-600 text-xs transition duration-200 ease-out",
 	"hover:bg-bg-weak-50 hover:text-text-strong-950",
 	"dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40",
@@ -118,7 +118,7 @@ function DomainRow({
 				)}
 			>
 				<MatrixCell row={row} col={0}>
-					<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
+					<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
 				</MatrixCell>
 				<MatrixCell row={row} col={1}>
 					<div className="flex min-w-0 items-center gap-2">
@@ -180,7 +180,7 @@ function DomainTable({
 				className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
 			>
 				<MatrixCell row={0} col={0}>
-					<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
+					<span className="flex size-4 shrink-0 rounded-sm border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5" />
 				</MatrixCell>
 				<MatrixCell row={0} col={1}>
 					<div className="flex items-center gap-1">

@@ -10,7 +10,7 @@ export function EmailPreviewCard({
 	cta: string;
 }) {
 	return (
-		<article className="w-full overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-white/10 dark:bg-[#141414] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
+		<article className="w-full overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-white/10 dark:bg-[#141414] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
 			<div className="flex items-center justify-between px-5 pt-4 pb-3">
 				<p className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
 					Email preview
@@ -20,8 +20,8 @@ export function EmailPreviewCard({
 				</span>
 			</div>
 
-			<div className="mx-5 mb-5 overflow-hidden rounded-xl border border-stroke-soft-200 dark:border-white/10">
-				<div className="border-stroke-soft-200 border-b px-4 py-3 dark:border-white/10">
+			<div className="mx-5 mb-5 overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-white/10">
+				<div className="border-stroke-soft-100 border-b px-4 py-3 dark:border-white/10">
 					<div className="flex items-center gap-2">
 						<span className="flex size-7 items-center justify-center rounded-md bg-text-strong-950 font-bold text-[12px] text-white dark:bg-white dark:text-black">
 							A

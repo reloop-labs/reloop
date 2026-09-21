@@ -3,7 +3,7 @@
 export function HeroAgentsPreview() {
 	return (
 		<div className="grid h-full lg:grid-cols-[220px_minmax(0,1fr)]">
-			<div className="hidden border-stroke-soft-200 border-r p-4 lg:block dark:border-white/10">
+			<div className="hidden border-stroke-soft-100 border-r p-4 lg:block dark:border-white/10">
 				<p className="px-2 font-medium text-[11px] text-text-soft-400 uppercase tracking-wider dark:text-white/35">
 					Inbox
 				</p>
@@ -27,7 +27,7 @@ export function HeroAgentsPreview() {
 						94%
 					</span>
 				</div>
-				<div className="mt-5 rounded-xl border border-stroke-soft-200 p-4 dark:border-white/10">
+				<div className="mt-5 rounded-xl border border-stroke-soft-100 p-4 dark:border-white/10">
 					<p className="text-[11px] text-text-soft-400 uppercase tracking-wider dark:text-white/35">
 						Agent draft
 					</p>
@@ -40,7 +40,7 @@ export function HeroAgentsPreview() {
 					<span className="inline-flex h-8 items-center rounded-lg bg-text-strong-950 px-3 font-medium text-[12px] text-white dark:bg-white dark:text-black">
 						Approve
 					</span>
-					<span className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-200 px-3 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
+					<span className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-100 px-3 text-[12px] text-text-sub-600 dark:border-white/10 dark:text-white/50">
 						Edit draft
 					</span>
 				</div>

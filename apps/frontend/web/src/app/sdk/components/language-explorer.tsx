@@ -77,11 +77,11 @@ function StepItem({
 	return (
 		<div className="flex gap-3.5">
 			<div className="flex flex-col items-center">
-				<div className="flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 font-mono font-semibold text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75">
+				<div className="flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 font-mono font-semibold text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75">
 					{number}
 				</div>
 				{!isLast && (
-					<div className="my-1.5 w-px flex-1 bg-stroke-soft-200 dark:bg-white/10" />
+					<div className="my-1.5 w-px flex-1 bg-stroke-soft-100 dark:bg-white/10" />
 				)}
 			</div>
 
@@ -268,7 +268,7 @@ export default function LanguageExplorer({
 			{/* Language tabs */}
 			<div
 				className={cn(
-					"border-stroke-soft-200 border-b dark:border-white/10",
+					"border-stroke-soft-100 border-b dark:border-white/10",
 					showHeading && "border-t",
 				)}
 			>
@@ -373,12 +373,12 @@ export default function LanguageExplorer({
 				className="grid grid-cols-1 lg:grid-cols-12"
 			>
 				{/* Left meta & frameworks: compact rail matching framework details */}
-				<aside className="border-stroke-soft-200 border-b bg-transparent lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10">
+				<aside className="border-stroke-soft-100 border-b bg-transparent lg:col-span-3 lg:border-r lg:border-b-0 dark:border-white/10">
 					<div className="flex flex-col gap-4 px-6 py-6 sm:px-10 sm:py-7 lg:sticky lg:top-16 lg:py-8 lg:pr-5 lg:pl-12">
 						<div className="flex items-center gap-3">
 							<div
 								className={cn(
-									"inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black",
+									"inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-black",
 									isDarkBrandColor(headerIcon.hex) &&
 										"text-text-strong-950 dark:text-white",
 								)}
@@ -521,7 +521,7 @@ export default function LanguageExplorer({
 						</div>
 
 						{/* Prerequisite: API key + domain */}
-						<div className="-ml-2.5 mt-2 flex flex-col gap-1 border-stroke-soft-200 border-t pt-4 dark:border-white/10">
+						<div className="-ml-2.5 mt-2 flex flex-col gap-1 border-stroke-soft-100 border-t pt-4 dark:border-white/10">
 							<div className="px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em] dark:text-white/45">
 								Prerequisite
 							</div>

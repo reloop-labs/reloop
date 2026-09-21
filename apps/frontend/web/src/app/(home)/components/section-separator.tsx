@@ -20,7 +20,7 @@ export function SectionSeparator({
 		<div
 			aria-hidden
 			className={cn(
-				"h-8 border-stroke-soft-200 sm:h-9 dark:border-white/10",
+				"h-8 border-stroke-soft-100 sm:h-9 dark:border-white/10",
 				shouldHideTop && shouldHideBottom
 					? "border-y-0"
 					: shouldHideTop

@@ -8,23 +8,23 @@ export function HeroCloudPreview() {
 					All domains
 				</h3>
 				<div className="flex items-center gap-2">
-					<span className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-stroke-soft-200 px-2.5 text-[12px] text-text-soft-400 dark:border-white/10 dark:text-white/40">
+					<span className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-stroke-soft-100 px-2.5 text-[12px] text-text-soft-400 dark:border-white/10 dark:text-white/40">
 						<SearchGlyph />
 						Search domains
 					</span>
-					<span className="hidden h-8 items-center gap-1 rounded-lg border border-stroke-soft-200 px-2.5 text-[12px] text-text-sub-600 sm:inline-flex dark:border-white/10 dark:text-white/50">
+					<span className="hidden h-8 items-center gap-1 rounded-lg border border-stroke-soft-100 px-2.5 text-[12px] text-text-sub-600 sm:inline-flex dark:border-white/10 dark:text-white/50">
 						Sort by activity
 						<CaretGlyph />
 					</span>
-					<span className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-200 px-2.5 font-medium text-[12px] text-text-strong-950 dark:border-white/10 dark:text-white">
+					<span className="inline-flex h-8 items-center rounded-lg border border-stroke-soft-100 px-2.5 font-medium text-[12px] text-text-strong-950 dark:border-white/10 dark:text-white">
 						Add domain
 					</span>
 				</div>
 			</div>
 
-			<div className="mt-6 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black">
+			<div className="mt-6 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-black">
 				<div className="grid gap-0 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
-					<div className="border-stroke-soft-200 border-b p-4 lg:border-r lg:border-b-0 dark:border-white/10">
+					<div className="border-stroke-soft-100 border-b p-4 lg:border-r lg:border-b-0 dark:border-white/10">
 						<EmailThumbnail />
 					</div>
 					<div className="p-5 sm:p-6">
@@ -86,7 +86,7 @@ export function HeroCloudPreview() {
 						</div>
 					</div>
 				</div>
-				<div className="flex items-center justify-between border-stroke-soft-200 border-t px-5 py-3 dark:border-white/10">
+				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-5 py-3 dark:border-white/10">
 					<span className="text-[12px] text-text-soft-400 dark:text-white/40">
 						Domain details
 					</span>
@@ -103,12 +103,12 @@ export function HeroCloudPreview() {
 
 function EmailThumbnail() {
 	return (
-		<div className="overflow-hidden rounded-lg border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black">
-			<div className="flex items-center justify-between border-stroke-soft-200 border-b px-3 py-2 dark:border-white/10">
+		<div className="overflow-hidden rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-black">
+			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-3 py-2 dark:border-white/10">
 				<div className="h-1.5 w-10 rounded-full bg-text-strong-950 dark:bg-white" />
 				<div className="flex gap-1">
-					<div className="h-1.5 w-6 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
-					<div className="h-1.5 w-6 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+					<div className="h-1.5 w-6 rounded-full bg-stroke-soft-100 dark:bg-white/15" />
+					<div className="h-1.5 w-6 rounded-full bg-stroke-soft-100 dark:bg-white/15" />
 				</div>
 			</div>
 			<div className="bg-gradient-to-b from-bg-weak-50 to-bg-white-0 px-4 py-5 dark:from-white/[0.04] dark:to-black">

@@ -24,7 +24,7 @@ export function HeroWorkflowPreview() {
 	return (
 		<div className="flex h-full flex-col overflow-hidden bg-bg-white-0 text-left font-sans dark:bg-black">
 			{/* Workflow Top Toolbar */}
-			<div className="flex shrink-0 items-center justify-between border-stroke-soft-200 border-b px-4 py-2.5 sm:px-6 dark:border-white/10">
+			<div className="flex shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 py-2.5 sm:px-6 dark:border-white/10">
 				<div className="flex items-center gap-2 sm:gap-3">
 					<div className="flex size-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400">
 						<Icon name="workflow" className="size-4" />
@@ -77,7 +77,7 @@ export function HeroWorkflowPreview() {
 							"w-full rounded-xl border bg-bg-white-0 p-3.5 shadow-xs transition-all duration-300 dark:bg-[#111]",
 							activeStep >= 1
 								? "border-blue-500 shadow-blue-500/10 ring-2 ring-blue-500/20"
-								: "border-stroke-soft-200 dark:border-white/10",
+								: "border-stroke-soft-100 dark:border-white/10",
 						)}
 					>
 						<div className="flex items-center justify-between">
@@ -101,7 +101,7 @@ export function HeroWorkflowPreview() {
 					</div>
 
 					{/* Connector */}
-					<div className="h-4 w-px bg-stroke-soft-200 dark:bg-white/15" />
+					<div className="h-4 w-px bg-stroke-soft-100 dark:bg-white/15" />
 
 					{/* Step 2: Send Welcome Email */}
 					<div
@@ -109,7 +109,7 @@ export function HeroWorkflowPreview() {
 							"w-full rounded-xl border bg-bg-white-0 p-3.5 shadow-xs transition-all duration-300 dark:bg-[#111]",
 							activeStep >= 2
 								? "border-blue-500 shadow-blue-500/10 ring-2 ring-blue-500/20"
-								: "border-stroke-soft-200 dark:border-white/10",
+								: "border-stroke-soft-100 dark:border-white/10",
 						)}
 					>
 						<div className="flex items-center justify-between">
@@ -135,7 +135,7 @@ export function HeroWorkflowPreview() {
 					</div>
 
 					{/* Connector */}
-					<div className="h-4 w-px bg-stroke-soft-200 dark:bg-white/15" />
+					<div className="h-4 w-px bg-stroke-soft-100 dark:bg-white/15" />
 
 					{/* Step 3: Condition Branch */}
 					<div
@@ -143,7 +143,7 @@ export function HeroWorkflowPreview() {
 							"w-full rounded-xl border bg-bg-white-0 p-3.5 shadow-xs transition-all duration-300 dark:bg-[#111]",
 							activeStep >= 3
 								? "border-amber-500 shadow-amber-500/10 ring-2 ring-amber-500/20"
-								: "border-stroke-soft-200 dark:border-white/10",
+								: "border-stroke-soft-100 dark:border-white/10",
 						)}
 					>
 						<div className="flex items-center justify-between">
@@ -176,7 +176,7 @@ export function HeroWorkflowPreview() {
 								"rounded-xl border bg-bg-white-0 p-3 shadow-xs transition-all duration-300 dark:bg-[#111]",
 								activeStep >= 4
 									? "border-emerald-500/60 bg-emerald-50/20 dark:bg-emerald-950/10"
-									: "border-stroke-soft-200 dark:border-white/10",
+									: "border-stroke-soft-100 dark:border-white/10",
 							)}
 						>
 							<div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
@@ -194,7 +194,7 @@ export function HeroWorkflowPreview() {
 						</div>
 
 						{/* Branch No */}
-						<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3 shadow-xs dark:border-white/10 dark:bg-[#111]">
+						<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 shadow-xs dark:border-white/10 dark:bg-[#111]">
 							<div className="flex items-center gap-1.5 text-text-soft-400 dark:text-white/40">
 								<span className="size-1.5 rounded-full bg-current" />
 								<span className="font-semibold text-[11px] uppercase tracking-wider">

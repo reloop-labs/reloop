@@ -43,8 +43,8 @@ export function CodeWindow({
 	const shouldReduceMotion = useReducedMotion();
 
 	return (
-		<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_20px_50px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[#161616] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
-			<div className="relative flex h-11 items-end justify-between border-stroke-soft-200 border-b bg-[#eaedf1] px-3.5 dark:border-white/10 dark:bg-[#0e0e0e]">
+		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-[0_20px_50px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[#161616] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
+			<div className="relative flex h-11 items-end justify-between border-stroke-soft-100 border-b bg-[#eaedf1] px-3.5 dark:border-white/10 dark:bg-[#0e0e0e]">
 				<div className="flex items-center gap-3 overflow-hidden">
 					{/* Window control dots */}
 					<div className="flex shrink-0 items-center gap-1.5 pb-2.5">
@@ -66,7 +66,7 @@ export function CodeWindow({
 										className={cn(
 											"group -mb-px relative flex h-8 items-center gap-2 rounded-t-[9px] px-3 font-medium font-mono text-[12px] transition-colors",
 											selected
-												? "border-stroke-soft-200 border-t border-r border-l bg-bg-white-0 text-text-strong-950 shadow-[0_1px_4px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-[#161616] dark:text-white"
+												? "border-stroke-soft-100 border-t border-r border-l bg-bg-white-0 text-text-strong-950 shadow-[0_1px_4px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-[#161616] dark:text-white"
 												: "text-text-sub-600 hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/[0.04] dark:hover:text-white",
 										)}
 									>
@@ -95,7 +95,7 @@ export function CodeWindow({
 								);
 							})
 						) : (
-							<div className="-mb-px flex h-8 items-center gap-2 rounded-t-[9px] border-stroke-soft-200 border-t border-r border-l bg-bg-white-0 px-3 font-medium font-mono text-[12px] text-text-strong-950 shadow-[0_1px_4px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-[#161616] dark:text-white">
+							<div className="-mb-px flex h-8 items-center gap-2 rounded-t-[9px] border-stroke-soft-100 border-t border-r border-l bg-bg-white-0 px-3 font-medium font-mono text-[12px] text-text-strong-950 shadow-[0_1px_4px_rgba(0,0,0,0.04)] dark:border-white/10 dark:bg-[#161616] dark:text-white">
 								<TypeScriptIcon className="size-3.5 shrink-0 rounded-[2.5px]" />
 								<span className="truncate">{file}</span>
 							</div>

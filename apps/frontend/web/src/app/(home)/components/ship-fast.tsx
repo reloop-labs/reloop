@@ -90,7 +90,7 @@ export default function ShipFast() {
 				</div>
 
 				{/* Changelog Minimal Rows */}
-				<div className="mt-8 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t border-b dark:divide-white/10 dark:border-white/10">
+				<div className="mt-8 divide-y divide-stroke-soft-100 border-stroke-soft-100 border-t border-b dark:divide-white/10 dark:border-white/10">
 					{recentReleases.map((release) => (
 						<Link
 							key={release.href}
