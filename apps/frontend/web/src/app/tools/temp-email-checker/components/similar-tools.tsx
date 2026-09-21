@@ -1,101 +1,7 @@
 import { cn } from "@reloop/ui/cn";
-import {
-	Ban,
-	Calendar,
-	Globe,
-	MailCheck,
-	Search,
-	Send,
-	ShieldAlert,
-	ShieldCheck,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import type { ComponentType } from "react";
-
-type SimilarToolItem = {
-	title: string;
-	description: string;
-	icon: ComponentType<{ className?: string }>;
-	path: string;
-};
-
-const SIMILAR_TOOLS: SimilarToolItem[] = [
-	{
-		title: "Free Email Validator",
-		description:
-			"Verify syntax, disposable domains, role addresses, and active MX records for single addresses or bulk CSV lists.",
-		icon: MailCheck,
-		path: "/tools/email-validator",
-	},
-	{
-		title: "Email Deliverability Tester",
-		description:
-			"Send a test email to get a full spam score, diagnostic report on SPF, DKIM, and DMARC alignment, and blacklist checks.",
-		icon: Send,
-		path: "/tools/deliverability-tester",
-	},
-	{
-		title: "Can Anyone Spoof My Domain?",
-		description:
-			"Instant check on whether Gmail, Yahoo, and Outlook will deliver unauthorized spoofed emails using your domain.",
-		icon: ShieldAlert,
-		path: "/tools/spoof-checker",
-	},
-	{
-		title: "IP & Domain DNS Blocklist Checker",
-		description:
-			"Look up any sending IP address or domain name against 50+ public DNS blocklists to ensure your mail isn't blocked.",
-		icon: Ban,
-		path: "/tools/blocklist-checker",
-	},
-	{
-		title: "DNS Lookup & Record Analyzer",
-		description:
-			"Inspect MX, SPF, DKIM, DMARC, and A records in real-time with comprehensive diagnostics and syntax validation.",
-		icon: Globe,
-		path: "/tools/dns-lookup",
-	},
-	{
-		title: "Domain Age & Warmup Checker",
-		description:
-			"Calculate domain age, registration history, and warmup readiness to prevent deliverability issues on fresh domains.",
-		icon: Calendar,
-		path: "/tools/domain-age",
-	},
-	{
-		title: "Who Sends Email From This Domain?",
-		description:
-			"Audit SPF records and inbound mail headers to identify all third-party services authorized to send from your domain.",
-		icon: Search,
-		path: "/tools/who-sends",
-	},
-	{
-		title: "SPF, DKIM & DMARC Checker",
-		description:
-			"Validate email authentication records for your domain to ensure proper alignment and prevent unauthorized senders.",
-		icon: ShieldCheck,
-		path: "/tools/auth-checker",
-	},
-];
-
-function getBorderClass(index: number, total: number) {
-	const isLastRowMobile = index === total - 1;
-	const isLastRowTablet = index >= total - (total % 2 === 0 ? 2 : 1);
-	const isLeftColTablet = index % 2 === 0;
-	const isLastRowDesktop = index >= total - (total % 4 === 0 ? 4 : total % 4);
-	const isRightColDesktop = (index + 1) % 4 === 0;
-
-	return cn(
-		// Mobile borders
-		!isLastRowMobile && "border-b",
-		// Tablet borders
-		isLeftColTablet ? "sm:border-r" : "sm:border-r-0",
-		isLastRowTablet ? "sm:border-b-0" : "sm:border-b",
-		// Desktop borders
-		isRightColDesktop ? "lg:border-r-0" : "lg:border-r",
-		isLastRowDesktop ? "lg:border-b-0" : "lg:border-b",
-	);
-}
+import { ALL_TOOLS, getBorderClass } from "../../components/tools-grid";
 
 export function SimilarTools() {
 	return (
@@ -106,47 +12,54 @@ export function SimilarTools() {
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					Similar tools
+					All tools
 				</p>
 				<h2
 					id="similar-tools-heading"
 					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Explore more free tools like Temp Email Checker.
+					Explore all free email &amp; developer tools.
 				</h2>
 			</div>
 
 			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
-				{SIMILAR_TOOLS.map((tool, index) => {
+				{ALL_TOOLS.map((tool, index) => {
 					const IconComponent = tool.icon;
-					const borderClass = getBorderClass(index, SIMILAR_TOOLS.length);
+					const borderClass = getBorderClass(index, ALL_TOOLS.length);
 
 					return (
 						<Link
 							key={tool.title}
 							href={tool.path}
 							className={cn(
-								"group flex flex-col border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-neutral-50/70 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:border-white/10 dark:hover:bg-white/[0.02]",
+								"group flex flex-col justify-between border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-neutral-50/70 sm:px-6 sm:py-7 lg:px-7 lg:py-8 dark:border-white/10 dark:hover:bg-white/[0.02]",
 								borderClass,
 							)}
 						>
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-primary-base transition-transform group-hover:scale-105 dark:bg-blue-950/40 dark:text-blue-400">
-								<IconComponent className="h-5 w-5 stroke-[1.75]" />
+							<div>
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-primary-base dark:bg-blue-950/40 dark:text-blue-400">
+									<IconComponent className="h-5 w-5 stroke-[1.75]" />
+								</div>
+
+								<div className="mt-5 flex items-start gap-2.5">
+									<span
+										className="mt-1 h-3.5 w-[2px] shrink-0 rounded-full bg-primary-base"
+										aria-hidden="true"
+									/>
+									<h3 className="font-semibold text-[15px] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:text-primary-base sm:text-[15.5px] dark:text-white dark:group-hover:text-blue-400">
+										{tool.title}
+									</h3>
+								</div>
+
+								<p className="mt-2.5 line-clamp-2 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">
+									{tool.description}
+								</p>
 							</div>
 
-							<div className="mt-6 flex items-center gap-2">
-								<span
-									className="h-3.5 w-[2px] shrink-0 rounded-full bg-primary-base transition-all group-hover:h-4"
-									aria-hidden="true"
-								/>
-								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight transition-colors group-hover:text-primary-base sm:text-[16px] dark:text-white dark:group-hover:text-blue-400">
-									{tool.title}
-								</h3>
+							<div className="mt-5 flex items-center gap-1.5 font-medium text-[13px] text-primary-base dark:text-blue-400">
+								<span>Try now</span>
+								<ArrowRight className="h-3.5 w-3.5" />
 							</div>
-
-							<p className="mt-3 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">
-								{tool.description}
-							</p>
 						</Link>
 					);
 				})}
@@ -154,3 +67,5 @@ export function SimilarTools() {
 		</section>
 	);
 }
+
+

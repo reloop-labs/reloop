@@ -373,7 +373,7 @@ export function ResponseCard() {
 									className={cn(
 										"cursor-pointer rounded-lg border px-2.5 py-1 font-medium font-mono text-[12px] transition-colors",
 										isActive
-											? "border-transparent bg-neutral-200/90 text-text-strong-950 dark:bg-white/15 dark:text-white"
+											? "border-black/[0.08] bg-neutral-200/90 text-text-strong-950 dark:border-white/15 dark:bg-white/15 dark:text-white"
 											: "border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 hover:text-text-strong-950 dark:border-white/10 dark:bg-transparent dark:text-white/50 dark:hover:text-white",
 									)}
 								>

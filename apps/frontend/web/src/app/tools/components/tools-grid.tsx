@@ -2,6 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import {
 	Activity,
 	AlertTriangle,
+	ArrowRight,
 	BadgeCheck,
 	Ban,
 	Calendar,
@@ -29,120 +30,120 @@ export type ToolItem = {
 
 export const ALL_TOOLS: ToolItem[] = [
 	{
-		title: "Free Email Validator",
+		title: "Free Email Validator & List Cleaner",
 		description:
-			"Verify syntax, disposable domains, role addresses, and active MX records for single addresses or bulk CSV lists.",
+			"Verify syntax, disposable domains, and active MX records to keep your email list clean.",
 		icon: MailCheck,
 		path: "/tools/email-validator",
 	},
 	{
-		title: "Email Deliverability Tester",
+		title: "Email Deliverability & Spam Tester",
 		description:
-			"Send a test email to get a full spam score, diagnostic report on SPF, DKIM, and DMARC alignment, and blacklist checks.",
+			"Send a test email to analyze inbox placement, spam score, and SPF/DKIM alignment.",
 		icon: Send,
 		path: "/tools/deliverability-tester",
 	},
 	{
-		title: "Can Anyone Spoof My Domain?",
+		title: "Email Spoofing & Phishing Checker",
 		description:
-			"Instant check on whether Gmail, Yahoo, and Outlook will deliver unauthorized spoofed emails using your domain.",
+			"Test whether unauthorized senders can forge your domain to deliver phishing emails.",
 		icon: ShieldAlert,
 		path: "/tools/spoof-checker",
 	},
 	{
 		title: "IP & Domain DNS Blocklist Checker",
 		description:
-			"Look up any sending IP address or domain name against 50+ public DNS blocklists to ensure your mail isn't blocked.",
+			"Check your sending IP address and domain against 50+ public DNS blocklists in real time.",
 		icon: Ban,
 		path: "/tools/blocklist-checker",
 	},
 	{
 		title: "DNS Lookup & Record Analyzer",
 		description:
-			"Inspect MX, SPF, DKIM, DMARC, and A records in real-time with comprehensive diagnostics and syntax validation.",
+			"Inspect MX, SPF, DKIM, DMARC, and A records with syntax validation and live diagnostics.",
 		icon: Globe,
 		path: "/tools/dns-lookup",
 	},
 	{
 		title: "Domain Age & Warmup Checker",
 		description:
-			"Calculate domain age, registration history, and warmup readiness to prevent deliverability issues on fresh domains.",
+			"Check domain registration age and warmup safety to avoid cold-sending spam filters.",
 		icon: Calendar,
 		path: "/tools/domain-age",
 	},
 	{
-		title: "Who Sends Email From This Domain?",
+		title: "Domain ESP & Email Sender Lookup",
 		description:
-			"Audit SPF records and inbound mail headers to identify all third-party services authorized to send from your domain.",
+			"Identify all third-party email service providers authorized to send from your domain.",
 		icon: Search,
 		path: "/tools/who-sends",
 	},
 	{
 		title: "SPF, DKIM & DMARC Checker",
 		description:
-			"Validate email authentication records for your domain to ensure proper alignment and prevent unauthorized senders.",
+			"Validate email authentication records to guarantee proper sender alignment and security.",
 		icon: ShieldCheck,
 		path: "/tools/auth-checker",
 	},
 	{
 		title: "Temp & Disposable Email Checker",
 		description:
-			"Check syntax, known disposable providers, role prefixes, free webmail domains, and MX records before sending.",
+			"Detect throwaway inboxes and burner addresses before they bounce or skew signup metrics.",
 		icon: Clock,
 		path: "/tools/temp-email-checker",
 	},
 	{
-		title: "Domain Reputation Checker",
+		title: "Domain Reputation & Health Checker",
 		description:
-			"Evaluate your sending domain reputation with real-time health score, spam placement risks, and configuration audits.",
+			"Evaluate your domain health score, spam placement risk, and mail configuration flaws.",
 		icon: Activity,
 		path: "/tools/domain-reputation-checker",
 	},
 	{
-		title: "Lookalike Domain Watch & Phish Scanner",
+		title: "Lookalike Domain & Phishing Scanner",
 		description:
-			"Discover registered domain twins, typosquats, and lookalikes impersonating your brand before attackers strike.",
+			"Detect registered typosquats and lookalike domains impersonating your brand online.",
 		icon: Eye,
 		path: "/tools/lookalike-watch",
 	},
 	{
-		title: "Email Spam Words Checker",
+		title: "Email Spam Words & Subject Checker",
 		description:
-			"Scan email subject lines and copy for trigger words, spam patterns, and formatting issues that hurt inbox delivery.",
+			"Scan subject lines and body copy for spam trigger words that hurt inbox deliverability.",
 		icon: AlertTriangle,
 		path: "/tools/email-spam-words-checker",
 	},
 	{
-		title: "BIMI Checker",
+		title: "BIMI & Brand Avatar Checker",
 		description:
-			"Validate your Brand Indicators for Message Identification record and SVG logo to display verified avatars in inboxes.",
+			"Verify your BIMI DNS record and SVG logo to display verified brand avatars in inboxes.",
 		icon: BadgeCheck,
 		path: "/tools/bimi-checker",
 	},
 	{
-		title: "Email HTML Editor",
+		title: "Email HTML Template Editor",
 		description:
-			"Create, edit, and preview responsive email HTML templates in real time across mobile and desktop viewports.",
+			"Design, edit, and preview responsive HTML email templates across mobile and desktop.",
 		icon: Code2,
 		path: "/tools/email-html-editor",
 	},
 	{
-		title: "Developer Tools API",
+		title: "Developer Tools & REST API",
 		description:
-			"Integrate syntax verification, DNS queries, and deliverability checks directly via our low-latency REST API.",
+			"Integrate real-time email verification and DNS lookups via our low-latency REST API.",
 		icon: Terminal,
 		path: "/docs/api",
 	},
 	{
-		title: "Suggest a Tool",
+		title: "Suggest a New Tool",
 		description:
-			"Need an email or DNS utility that isn't listed here? Suggest a tool and we'll build it for the community.",
+			"Need an email or DNS utility that isn't listed here? Suggest a tool and we'll build it.",
 		icon: Sparkles,
 		path: "/contact",
 	},
 ];
 
-function getBorderClass(index: number, total: number) {
+export function getBorderClass(index: number, total: number) {
 	const isLastRowMobile = index === total - 1;
 	const isLastRowTablet = index >= total - (total % 2 === 0 ? 2 : 1);
 	const isLeftColTablet = index % 2 === 0;
@@ -178,27 +179,34 @@ export function ToolsGrid() {
 							key={tool.title}
 							href={tool.path}
 							className={cn(
-								"group flex flex-col border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-neutral-50/70 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:border-white/10 dark:hover:bg-white/[0.02]",
+								"group flex flex-col justify-between border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-neutral-50/70 sm:px-6 sm:py-7 lg:px-7 lg:py-8 dark:border-white/10 dark:hover:bg-white/[0.02]",
 								borderClass,
 							)}
 						>
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition-transform group-hover:scale-105 dark:bg-blue-950/40 dark:text-blue-400">
-								<IconComponent className="h-5 w-5 stroke-[1.75]" />
+							<div>
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+									<IconComponent className="h-5 w-5 stroke-[1.75]" />
+								</div>
+
+								<div className="mt-5 flex items-start gap-2.5">
+									<span
+										className="mt-1 h-3.5 w-[2px] shrink-0 rounded-full bg-blue-600 dark:bg-blue-500"
+										aria-hidden="true"
+									/>
+									<h3 className="font-semibold text-[15px] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:text-blue-600 sm:text-[15.5px] dark:text-white dark:group-hover:text-blue-400">
+										{tool.title}
+									</h3>
+								</div>
+
+								<p className="mt-2.5 line-clamp-2 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">
+									{tool.description}
+								</p>
 							</div>
 
-							<div className="mt-6 flex items-center gap-2">
-								<span
-									className="h-3.5 w-[2px] shrink-0 rounded-full bg-blue-600 transition-all group-hover:h-4 dark:bg-blue-500"
-									aria-hidden="true"
-								/>
-								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight transition-colors group-hover:text-blue-600 sm:text-[16px] dark:text-white dark:group-hover:text-blue-400">
-									{tool.title}
-								</h3>
+							<div className="mt-5 flex items-center gap-1.5 font-medium text-[13px] text-blue-600 dark:text-blue-400">
+								<span>Try now</span>
+								<ArrowRight className="h-3.5 w-3.5" />
 							</div>
-
-							<p className="mt-3 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">
-								{tool.description}
-							</p>
 						</Link>
 					);
 				})}
