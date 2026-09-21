@@ -27,14 +27,14 @@ export function TempEmailHero() {
 						</Link>
 
 						<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-							Free Temp{" "}
+							Free{" "}
 							<span className="bg-gradient-to-b from-primary-base to-primary-base bg-clip-text text-transparent">
-								Email
+								Temp Email
 							</span>{" "}
 							Checker
 						</h1>
 
-						<p className="mt-5 max-w-[46rem] text-balance text-center text-[13px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[13.5px] lg:text-[14px] dark:text-white/60">
+						<p className="mt-5 max-w-[46rem] text-balance text-center text-[13px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-base dark:text-white/60">
 							{toolDescription}
 						</p>
 

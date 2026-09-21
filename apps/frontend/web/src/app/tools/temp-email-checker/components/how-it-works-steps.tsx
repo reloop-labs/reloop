@@ -50,7 +50,7 @@ export function BestFeatures() {
 					id="best-features-heading"
 					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Why use Reloop to check temp email.
+					Why choose Reloop temp email checker
 				</h2>
 			</div>
 

@@ -10,7 +10,7 @@ export const metaDescription =
 	"Free temp email checker and disposable email detector. Instantly detect throwaway inboxes (Mailinator, Yopmail, Temp-Mail), role addresses, and MX records. No signup, no SMTP probing.";
 
 export const toolDescription =
-	"Check inbound emails for disposable and role addresses.";
+	"It's checks dsiposable Email, role addresses, and MX records ";
 
 export const toolKeywords = [
 	"temp email checker",
@@ -35,49 +35,49 @@ export const signals: {
 	title: string;
 	description: string;
 }[] = [
-	{
-		icon: "at-sign",
-		tag: "Syntax",
-		title: "Address syntax",
-		description:
-			"The local-part and domain are parsed against RFC 5322 shape rules. Malformed input never reaches the catalogue or DNS.",
-	},
-	{
-		icon: "shield-cross",
-		tag: "Domain list",
-		title: "Disposable domains",
-		description:
-			"The domain is matched against a vendored catalogue of about 210,000 known throwaway mailbox providers.",
-	},
-	{
-		icon: "route",
-		tag: "Wildcards",
-		title: "Wildcard suffixes",
-		description:
-			"Some providers mint endless subdomains. We match on label boundaries (*.temp.example), not a free-form regex.",
-	},
-	{
-		icon: "shield-check",
-		tag: "Allowlist",
-		title: "Exception list",
-		description:
-			"A local exception list overrides the upstream catalogue when a real domain is wrongly listed as disposable.",
-	},
-	{
-		icon: "user-circle",
-		tag: "Role",
-		title: "Role prefixes",
-		description:
-			"Local-parts like info@, billing@, and support@ are flagged as shared inboxes. They are not treated as disposable.",
-	},
-	{
-		icon: "globe",
-		tag: "MX",
-		title: "MX records",
-		description:
-			"We look up MX hosts for the domain. That confirms mail can be routed to the domain, not that the mailbox exists.",
-	},
-];
+		{
+			icon: "at-sign",
+			tag: "Syntax",
+			title: "Address syntax",
+			description:
+				"The local-part and domain are parsed against RFC 5322 shape rules. Malformed input never reaches the catalogue or DNS.",
+		},
+		{
+			icon: "shield-cross",
+			tag: "Domain list",
+			title: "Disposable domains",
+			description:
+				"The domain is matched against a vendored catalogue of about 210,000 known throwaway mailbox providers.",
+		},
+		{
+			icon: "route",
+			tag: "Wildcards",
+			title: "Wildcard suffixes",
+			description:
+				"Some providers mint endless subdomains. We match on label boundaries (*.temp.example), not a free-form regex.",
+		},
+		{
+			icon: "shield-check",
+			tag: "Allowlist",
+			title: "Exception list",
+			description:
+				"A local exception list overrides the upstream catalogue when a real domain is wrongly listed as disposable.",
+		},
+		{
+			icon: "user-circle",
+			tag: "Role",
+			title: "Role prefixes",
+			description:
+				"Local-parts like info@, billing@, and support@ are flagged as shared inboxes. They are not treated as disposable.",
+		},
+		{
+			icon: "globe",
+			tag: "MX",
+			title: "MX records",
+			description:
+				"We look up MX hosts for the domain. That confirms mail can be routed to the domain, not that the mailbox exists.",
+		},
+	];
 
 export const reasons: {
 	icon: string;
@@ -85,35 +85,35 @@ export const reasons: {
 	title: string;
 	description: string;
 }[] = [
-	{
-		icon: "clock",
-		stat: "Bounces",
-		title: "Throwaway inboxes expire",
-		description:
-			"Most temporary mailboxes are destroyed within an hour. Every send after that is a hard bounce recorded against your domain.",
-	},
-	{
-		icon: "shield",
-		stat: "Reputation",
-		title: "Mailbox providers keep score",
-		description:
-			"Sustained bounce rates push your domain toward the spam folder for every recipient, not just the disposable ones.",
-	},
-	{
-		icon: "database",
-		stat: "Signal",
-		title: "Your metrics stop lying",
-		description:
-			"Burner signups inflate list size and deflate open rates. Filtering them keeps growth numbers honest.",
-	},
-	{
-		icon: "lock",
-		stat: "Abuse",
-		title: "Free tiers get farmed",
-		description:
-			"Unlimited throwaway addresses mean unlimited trial accounts. Blocking them at signup closes the cheapest abuse vector you have.",
-	},
-];
+		{
+			icon: "clock",
+			stat: "Bounces",
+			title: "Throwaway inboxes expire",
+			description:
+				"Most temporary mailboxes are destroyed within an hour. Every send after that is a hard bounce recorded against your domain.",
+		},
+		{
+			icon: "shield",
+			stat: "Reputation",
+			title: "Mailbox providers keep score",
+			description:
+				"Sustained bounce rates push your domain toward the spam folder for every recipient, not just the disposable ones.",
+		},
+		{
+			icon: "database",
+			stat: "Signal",
+			title: "Your metrics stop lying",
+			description:
+				"Burner signups inflate list size and deflate open rates. Filtering them keeps growth numbers honest.",
+		},
+		{
+			icon: "lock",
+			stat: "Abuse",
+			title: "Free tiers get farmed",
+			description:
+				"Unlimited throwaway addresses mean unlimited trial accounts. Blocking them at signup closes the cheapest abuse vector you have.",
+		},
+	];
 
 export const apiEndpoint = `${productionSiteUrl}/api/tools/v1/temp-email-checker`;
 
@@ -427,35 +427,35 @@ export const apiNotes: {
 	title: string;
 	description: string;
 }[] = [
-	{
-		icon: "lock",
-		tag: "Open access",
-		title: "No key, no account",
-		description:
-			"The endpoint is public and unauthenticated. It is rate limited per IP, so keep it to signup-time checks rather than bulk list scrubbing.",
-	},
-	{
-		icon: "zap",
-		tag: "One round trip",
-		title: "Catalogue plus DNS",
-		description:
-			"Disposable matching is in-memory. MX is a DNS lookup with a short timeout. We never open an SMTP session, and we do not store addresses.",
-	},
-	{
-		icon: "refresh-cw",
-		tag: "Fresh catalogue",
-		title: "List refreshed every 2 hours",
-		description:
-			"The disposable-domain catalogue holds ~210,000 providers and is re-synced every 2 hours, so brand-new throwaway services get caught too.",
-	},
-	{
-		icon: "gift",
-		tag: "Free forever",
-		title: "Free to use",
-		description:
-			"This checker is free. It needs no signup and has no credits or expiry.",
-	},
-];
+		{
+			icon: "lock",
+			tag: "Open access",
+			title: "No key, no account",
+			description:
+				"The endpoint is public and unauthenticated. It is rate limited per IP, so keep it to signup-time checks rather than bulk list scrubbing.",
+		},
+		{
+			icon: "zap",
+			tag: "One round trip",
+			title: "Catalogue plus DNS",
+			description:
+				"Disposable matching is in-memory. MX is a DNS lookup with a short timeout. We never open an SMTP session, and we do not store addresses.",
+		},
+		{
+			icon: "refresh-cw",
+			tag: "Fresh catalogue",
+			title: "List refreshed every 2 hours",
+			description:
+				"The disposable-domain catalogue holds ~210,000 providers and is re-synced every 2 hours, so brand-new throwaway services get caught too.",
+		},
+		{
+			icon: "gift",
+			tag: "Free forever",
+			title: "Free to use",
+			description:
+				"This checker is free. It needs no signup and has no credits or expiry.",
+		},
+	];
 
 export const faqGroups: { title: string; items: FaqItem[] }[] = [
 	{
