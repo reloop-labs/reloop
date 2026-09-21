@@ -1,6 +1,7 @@
 "use client";
 
 import * as Slider from "@reloop/ui/slider";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 const formatInt = (n: number) =>
@@ -151,22 +152,30 @@ export function WasteCalculator() {
 						/>
 						<div className="relative z-10">
 							<p className="font-medium text-[16px] text-white leading-snug tracking-tight">
-								Send with Reloop at SES-style pricing.
+								Stop paying for throwaways.
 							</p>
 							<p className="mt-1.5 text-[13px] text-white/85 leading-relaxed">
-								3,000 free emails/mo, then $0.50/1k. No
-								contact-sales phase — self-serve, and flag
-								throwaways free.
+								Reloop flags <span className="font-mono">isDisposable</span>{" "}
+								at signup — same checker, built into the platform. Send
+								3,000 free/mo, then from $10/50k. SES-style pricing, no
+								sales call.
 							</p>
-							<button
-								type="button"
-								onClick={scrollToChecker}
-								className="mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[14px] text-[#0f172a] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98]"
+							<Link
+								href="/dashboard/signup"
+								className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[14px] text-[#0f172a] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98]"
 							>
-								Check an address free
-							</button>
+								Get started free
+							</Link>
 							<p className="mt-2.5 text-center text-[12px] text-white/70">
-								No signup. Estimate only, actual rate varies by audience.
+								No credit card. Wipe that {formatMoney(result.yearly)}/yr
+								waste.{" "}
+								<button
+									type="button"
+									onClick={scrollToChecker}
+									className="cursor-pointer underline underline-offset-2 hover:text-white"
+								>
+									Or check another address
+								</button>
 							</p>
 						</div>
 					</div>
