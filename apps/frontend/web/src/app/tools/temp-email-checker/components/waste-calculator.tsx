@@ -45,7 +45,7 @@ export function WasteCalculator() {
 				</h2>
 			</div>
 
-			<div className="grid grid-cols-1 lg:grid-cols-2">
+			<div className="grid grid-cols-1 border-stroke-soft-100 border-b lg:grid-cols-2 dark:border-white/10">
 				{/* Left: inputs */}
 				<div className="flex flex-col gap-8 border-stroke-soft-100 border-b px-4 py-6 sm:px-6 sm:py-8 lg:border-r lg:border-b-0 lg:px-8 lg:py-10 dark:border-white/10">
 					<div>
@@ -134,51 +134,41 @@ export function WasteCalculator() {
 							Estimated waste
 						</p>
 						<p className="mt-2 font-semibold text-[2.5rem] text-text-strong-950 tabular-nums leading-none tracking-tight sm:text-[3rem] dark:text-white">
-							{formatMoney(result.monthly)}
+							{formatMoney(result.yearly)}
 							<span className="ml-2 align-middle font-normal text-[14px] text-text-sub-600 dark:text-white/50">
-								/ mo
+								/ yr
+							</span>
+							<span className="ml-2 align-middle font-normal text-[14px] text-text-sub-600 tabular-nums dark:text-white/50">
+								({formatMoney(result.monthly)} / mo)
 							</span>
 						</p>
 					</div>
 
-					<dl className="space-y-2.5 border-stroke-soft-100 border-y py-5 text-[14px] dark:border-white/10">
-						<div className="flex items-center justify-between">
-							<dt className="text-text-sub-600 dark:text-white/60">
-								Throwaway signups
-							</dt>
-							<dd className="font-medium font-mono text-text-strong-950 tabular-nums dark:text-white">
-								{formatInt(result.bad)} / mo
-							</dd>
+					<div className="relative overflow-hidden rounded-2xl bg-[#256bf5] p-5 sm:p-6">
+						<div
+							aria-hidden="true"
+							className="pointer-events-none absolute inset-[6px] rounded-[12px] border border-white/25"
+						/>
+						<div className="relative z-10">
+							<p className="font-medium text-[16px] text-white leading-snug tracking-tight">
+								Send with Reloop at SES-style pricing.
+							</p>
+							<p className="mt-1.5 text-[13px] text-white/85 leading-relaxed">
+								3,000 free emails/mo, then $0.50/1k. No
+								contact-sales phase — self-serve, and flag
+								throwaways free.
+							</p>
+							<button
+								type="button"
+								onClick={scrollToChecker}
+								className="mt-4 inline-flex w-full cursor-pointer items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[14px] text-[#0f172a] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98]"
+							>
+								Check an address free
+							</button>
+							<p className="mt-2.5 text-center text-[12px] text-white/70">
+								No signup. Estimate only, actual rate varies by audience.
+							</p>
 						</div>
-						<div className="flex items-center justify-between">
-							<dt className="text-text-sub-600 dark:text-white/60">
-								Wasted per year
-							</dt>
-							<dd className="font-medium font-mono text-text-strong-950 tabular-nums dark:text-white">
-								{formatMoney(result.yearly)}
-							</dd>
-						</div>
-						<div className="flex items-center justify-between">
-							<dt className="text-text-sub-600 dark:text-white/60">
-								Reloop checker
-							</dt>
-							<dd className="font-medium font-mono text-emerald-600 dark:text-emerald-400">
-								$0
-							</dd>
-						</div>
-					</dl>
-
-					<div>
-						<button
-							type="button"
-							onClick={scrollToChecker}
-							className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl bg-primary-base px-6 py-3 font-medium text-[14.5px] text-white transition-colors hover:bg-primary-dark"
-						>
-							Check an address free
-						</button>
-						<p className="mt-3 text-center text-[12.5px] text-text-sub-600 dark:text-white/50">
-							No signup. Estimate only, actual rate varies by audience.
-						</p>
 					</div>
 				</div>
 			</div>
