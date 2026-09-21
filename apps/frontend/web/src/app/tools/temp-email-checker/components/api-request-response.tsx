@@ -244,7 +244,7 @@ export function RequestCard({
 							aria-haspopup="listbox"
 							aria-expanded={open}
 							className={cn(
-								"flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 font-medium text-[12px] text-text-strong-950 transition-colors hover:bg-black/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a9eff] dark:text-white dark:hover:bg-white/10",
+								"flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 font-medium text-[12px] text-text-strong-950 hover:bg-black/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a9eff] dark:text-white dark:hover:bg-white/10",
 								open && "ring-2 ring-[#4a9eff]",
 							)}
 						>
@@ -281,7 +281,7 @@ export function RequestCard({
 															setOpen(false);
 														}}
 														className={cn(
-															"flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-left font-medium text-[12px] transition-colors",
+															"flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-left font-medium text-[12px]",
 															isActive
 																? "bg-black/[0.06] font-medium text-text-strong-950 dark:bg-white/10 dark:text-white"
 																: "text-text-strong-950 hover:bg-black/[0.04] dark:text-white/80 dark:hover:bg-white/5",
