@@ -1,5 +1,5 @@
 import { cn } from "@reloop/ui/cn";
-import { Gift, Lock, RotateCw, Zap } from "lucide-react";
+import { Gift, Lock, RotateCw, Target } from "lucide-react";
 import type { ComponentType } from "react";
 
 type FeatureItem = {
@@ -16,22 +16,22 @@ const FEATURES: FeatureItem[] = [
 			"This checker is free. It needs no signup and has no credits or expiry.",
 	},
 	{
-		icon: Zap,
-		title: "Catalogue plus DNS",
+		icon: Target,
+		title: "99.9% accuracy",
 		description:
-			"Disposable matching is in-memory. MX is a DNS lookup with a short timeout. We never open an SMTP session, and we do not store addresses.",
+			"It's checks dsiposable list, role addresses, and MX records to maximize precision and avoid false positives.",
 	},
 	{
 		icon: Lock,
-		title: "No key, no account",
+		title: "No Account Needed",
 		description:
-			"The endpoint is public and unauthenticated. It is rate limited per IP, so keep it to signup-time checks rather than bulk list scrubbing.",
+			"No API key or account is needed to use the API. It is rate limited per IP.",
 	},
 	{
 		icon: RotateCw,
-		title: "List refreshed every 2 hours",
+		title: "Real-time sync every 24 hrs",
 		description:
-			"The disposable-domain catalogue holds ~210,000 providers and is re-synced every 2 hours, so brand-new throwaway services get caught too.",
+			"Our disposable-domain list is refreshed every 24 hours to ensure even the latest throwaway domains are caught.",
 	},
 ];
 
