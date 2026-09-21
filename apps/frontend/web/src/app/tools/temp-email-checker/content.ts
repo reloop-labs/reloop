@@ -5,8 +5,7 @@ export const toolPath = "/tools/temp-email-checker";
 
 export const toolTitle = "Free Temp Email Checker";
 export const heroHeading = "Free Temp Email Checker";
-export const metaTitle =
-	"Free Temp Email Checker — Disposable Email Detector";
+export const metaTitle = "Free Temp Email Checker — Disposable Email Detector";
 export const metaDescription =
 	"Free temp email checker and disposable email detector. Instantly detect throwaway inboxes (Mailinator, Yopmail, Temp-Mail), role addresses, and MX records — no signup, no SMTP probing.";
 
@@ -134,8 +133,8 @@ export const apiSnippets: [ApiSnippet, ...ApiSnippet[]] = [
   -d '{"email": "you@mailinator.com"}'`,
 	},
 	{
-		id: "node",
-		label: "Node.js",
+		id: "javascript",
+		label: "JavaScript",
 		code: `// No SDK, no API key — it is a plain POST.
 const res = await fetch(
   "${apiEndpoint}",
@@ -147,6 +146,46 @@ const res = await fetch(
 );
 
 const result = await res.json();`,
+	},
+	{
+		id: "typescript",
+		label: "TypeScript",
+		code: `// No SDK, no API key — it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "you@mailinator.com" }),
+  },
+);
+
+const result = (await res.json()) as CheckResult;`,
+	},
+	{
+		id: "node",
+		label: "Node.js",
+		code: `// Node 18+ has a global fetch — no dependencies.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "you@mailinator.com" }),
+  },
+);
+
+const result = await res.json();`,
+	},
+	{
+		id: "axios",
+		label: "Axios",
+		code: `import axios from "axios";
+
+const { data } = await axios.post(
+  "${apiEndpoint}",
+  { email: "you@mailinator.com" },
+);`,
 	},
 	{
 		id: "python",
@@ -171,6 +210,69 @@ res, err := http.Post(
     "application/json",
     bytes.NewReader(body),
 )`,
+	},
+	{
+		id: "java",
+		label: "Java",
+		code: `HttpClient client = HttpClient.newHttpClient();
+String body = "{\\"email\\": \\"you@mailinator.com\\"}";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("${apiEndpoint}"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(body))
+    .build();
+
+HttpResponse<String> response = client.send(
+    request, HttpResponse.BodyHandlers.ofString());`,
+	},
+	{
+		id: "csharp",
+		label: "C#",
+		code: `using var client = new HttpClient();
+
+var response = await client.PostAsJsonAsync(
+    "${apiEndpoint}",
+    new { email = "you@mailinator.com" });`,
+	},
+	{
+		id: "php",
+		label: "PHP",
+		code: `$ch = curl_init("${apiEndpoint}");
+
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => ["Content-Type: application/json"],
+    CURLOPT_POSTFIELDS => json_encode(["email" => "you@mailinator.com"]),
+    CURLOPT_RETURNTRANSFER => true,
+]);
+
+$result = curl_exec($ch);`,
+	},
+	{
+		id: "ruby",
+		label: "Ruby",
+		code: `require "net/http"
+require "json"
+
+uri = URI("${apiEndpoint}")
+
+result = Net::HTTP.post(
+  uri,
+  { email: "you@mailinator.com" }.to_json,
+  "Content-Type" => "application/json"
+)`,
+	},
+	{
+		id: "rust",
+		label: "Rust",
+		code: `let result: serde_json::Value = reqwest::Client::new()
+    .post("${apiEndpoint}")
+    .json(&serde_json::json!({ "email": "you@mailinator.com" }))
+    .send()
+    .await?
+    .json()
+    .await?;`,
 	},
 ];
 
@@ -410,8 +512,7 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 		title: "Privacy & API",
 		items: [
 			{
-				question:
-					"How is this different from Reloop's free email validator?",
+				question: "How is this different from Reloop's free email validator?",
 				answer:
 					"The temp email checker is focused on disposable and throwaway detection at signup time (single address, public API, no key). The free email validator adds bulk CSV cleaning (up to 1,000), fuller health scoring, and list export for campaign hygiene. Use this tool to block burners at registration; use the email validator when you need to clean an entire list.",
 			},

@@ -1,10 +1,30 @@
 "use client";
 
+import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
+import {
+	BrandLanguageIcon,
+	type CopyCodeBlockIcon,
+} from "@reloop/ui/copy-code-block";
 import { Icon } from "@reloop/ui/icon";
+import { JAVA_ICON } from "@reloop/ui/icons/java";
 import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import {
+	siAxios,
+	siCurl,
+	siDotnet,
+	siGo,
+	siJavascript,
+	siNodedotjs,
+	siPhp,
+	siPython,
+	siRuby,
+	siRust,
+	siTypescript,
+} from "simple-icons";
 import {
 	type ApiSnippet,
 	type ApiStatusCode,
@@ -15,34 +35,44 @@ import {
 
 const SNIPPET_LANG: Record<string, string> = {
 	curl: "bash",
+	javascript: "javascript",
+	typescript: "typescript",
 	node: "javascript",
+	nodejs: "javascript",
+	axios: "javascript",
 	python: "python",
 	go: "go",
+	java: "java",
+	csharp: "csharp",
+	php: "php",
+	ruby: "ruby",
+	rust: "rust",
 };
 
-const DEVICON_SRC: Record<string, string> = {
-	node: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
-	python:
-		"https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
-	go: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original.svg",
+const SNIPPET_ICON: Record<string, CopyCodeBlockIcon> = {
+	curl: siCurl,
+	javascript: siJavascript,
+	typescript: siTypescript,
+	node: siNodedotjs,
+	nodejs: siNodedotjs,
+	axios: siAxios,
+	python: siPython,
+	go: siGo,
+	java: JAVA_ICON,
+	csharp: siDotnet,
+	php: siPhp,
+	ruby: siRuby,
+	// Pure black is invisible on dark UI — lift it to Rust orange.
+	rust: { ...siRust, hex: "e24d2b" },
 };
 
 function LangMark({ id, className }: { id: string; className?: string }) {
-	const src = DEVICON_SRC[id];
-	const cls = className ?? "size-4";
-	if (!src) {
+	const icon = SNIPPET_ICON[id];
+	const cls = className ?? "size-[18px]";
+	if (!icon) {
 		return <Icon name="terminal" className={cls} />;
 	}
-	return (
-		<img
-			src={src}
-			alt=""
-			aria-hidden
-			loading="lazy"
-			className={cls}
-			draggable={false}
-		/>
-	);
+	return <BrandLanguageIcon icon={icon} className={cn("shrink-0", cls)} />;
 }
 
 function useCopy(value: string) {
@@ -120,7 +150,7 @@ function CardShell({
 	return (
 		<div
 			className={cn(
-				"overflow-hidden rounded-[16px] border border-black/[0.06] bg-bg-white-0 p-1.5 dark:border-white/[0.06] dark:bg-[#0c0c0c]",
+				"overflow-hidden rounded-[16px] border border-black/[0.06] bg-bg-white-0 p-1 dark:border-white/[0.06] dark:bg-[#0c0c0c]",
 				className,
 			)}
 		>
@@ -140,6 +170,11 @@ export function RequestCard({
 }) {
 	const [open, setOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement | null>(null);
+	const menuListRef = useRef<HTMLDivElement | null>(null);
+	const triggerRef = useRef<HTMLButtonElement | null>(null);
+	const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(
+		null,
+	);
 	const active = snippets.find((s) => s.id === activeId) ?? snippets[0];
 	const lang = SNIPPET_LANG[active.id] ?? "bash";
 	const { copied, copy } = useCopy(active.code);
@@ -147,7 +182,13 @@ export function RequestCard({
 	useEffect(() => {
 		if (!open) return;
 		const onDown = (e: PointerEvent) => {
-			if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+			const target = e.target as Node;
+			if (
+				menuRef.current &&
+				!menuRef.current.contains(target) &&
+				menuListRef.current &&
+				!menuListRef.current.contains(target)
+			) {
 				setOpen(false);
 			}
 		};
@@ -162,7 +203,30 @@ export function RequestCard({
 		};
 	}, [open]);
 
-	const activeLabel = active.id === "node" ? "JavaScript" : active.label;
+	useEffect(() => {
+		if (!open) {
+			setMenuPos(null);
+			return;
+		}
+		const update = () => {
+			const el = triggerRef.current;
+			if (!el) return;
+			const rect = el.getBoundingClientRect();
+			setMenuPos({
+				top: rect.bottom + 6,
+				right: window.innerWidth - rect.right,
+			});
+		};
+		update();
+		window.addEventListener("resize", update);
+		window.addEventListener("scroll", update, true);
+		return () => {
+			window.removeEventListener("resize", update);
+			window.removeEventListener("scroll", update, true);
+		};
+	}, [open]);
+
+	const activeLabel = active.label;
 
 	return (
 		<CardShell>
@@ -173,6 +237,7 @@ export function RequestCard({
 				<div className="flex items-center gap-1.5">
 					<div ref={menuRef} className="relative">
 						<button
+							ref={triggerRef}
 							type="button"
 							onClick={() => setOpen((v) => !v)}
 							aria-label={`Request language ${activeLabel}`}
@@ -193,39 +258,45 @@ export function RequestCard({
 								)}
 							/>
 						</button>
-						{open ? (
-							<div
-								role="listbox"
-								className="absolute right-0 z-20 mt-1.5 w-52 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-lg dark:border-white/10 dark:bg-[#141414]"
-							>
-								{snippets.map((s) => {
-									const isActive = s.id === active.id;
-									const label = s.id === "node" ? "JavaScript" : s.label;
-									return (
-										<button
-											key={s.id}
-											type="button"
-											role="option"
-											aria-selected={isActive}
-											aria-label={`Request language ${label}`}
-											onClick={() => {
-												onChange(s.id);
-												setOpen(false);
-											}}
-											className={cn(
-												"flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[14px] transition-colors",
-												isActive
-													? "bg-black/[0.06] font-medium text-text-strong-950 dark:bg-white/10 dark:text-white"
-													: "text-text-strong-950 hover:bg-black/[0.04] dark:text-white/80 dark:hover:bg-white/5",
-											)}
-										>
-											<LangMark id={s.id} className="size-[18px]" />
-											<span className="flex-1">{label}</span>
-										</button>
-									);
-								})}
-							</div>
-						) : null}
+						{open && menuPos
+							? createPortal(
+									<div
+										ref={menuListRef}
+										role="listbox"
+										style={{ top: menuPos.top, right: menuPos.right }}
+										className="fixed z-50 max-h-72 w-52 overflow-y-auto rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-lg dark:border-white/10 dark:bg-[#141414]"
+									>
+										<div className="flex flex-col gap-0.5">
+											{snippets.map((s) => {
+												const isActive = s.id === active.id;
+												return (
+													<button
+														key={s.id}
+														type="button"
+														role="option"
+														aria-selected={isActive}
+														aria-label={`Request language ${s.label}`}
+														onClick={() => {
+															onChange(s.id);
+															setOpen(false);
+														}}
+														className={cn(
+															"flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-left font-medium text-[12px] transition-colors",
+															isActive
+																? "bg-black/[0.06] font-medium text-text-strong-950 dark:bg-white/10 dark:text-white"
+																: "text-text-strong-950 hover:bg-black/[0.04] dark:text-white/80 dark:hover:bg-white/5",
+														)}
+													>
+														<LangMark id={s.id} className="size-4" />
+														<span className="flex-1">{s.label}</span>
+													</button>
+												);
+											})}
+										</div>
+									</div>,
+									document.body,
+								)
+							: null}
 					</div>
 				</div>
 			</div>
@@ -260,6 +331,7 @@ export function RequestCard({
 }
 
 export function ResponseCard() {
+	const schemaCheckboxId = useId();
 	const [status, setStatus] = useState<ApiStatusCode>("200");
 	const [showSchema, setShowSchema] = useState(false);
 	const code = showSchema
@@ -271,7 +343,7 @@ export function ResponseCard() {
 		<CardShell>
 			<div className="rounded-xl border border-black/[0.05] bg-[#fafafa] px-4 pt-3.5 pb-3 dark:border-white/[0.08] dark:bg-white/[0.03]">
 				<div className="flex items-center justify-between gap-3">
-					<span className="font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
+					<span className="font-semibold text-[12px] text-text-strong-950 tracking-tight dark:text-white">
 						Sample Response
 					</span>
 					<button
@@ -310,33 +382,18 @@ export function ResponseCard() {
 							);
 						})}
 					</div>
-					<button
-						type="button"
-						role="switch"
-						aria-checked={showSchema}
-						onClick={() => setShowSchema((v) => !v)}
-						className="flex cursor-pointer items-center gap-2 text-[13px] text-text-sub-600 dark:text-white/60"
+					<label
+						htmlFor={schemaCheckboxId}
+						className="flex cursor-pointer items-center gap-2 text-[12px] text-text-sub-600 dark:text-white/60"
 					>
 						<span className="font-medium">Schema</span>
-						<span
-							aria-hidden
-							className={cn(
-								"flex h-5 w-9 items-center rounded-full border p-0.5 transition-colors",
-								showSchema
-									? "justify-end border-transparent bg-text-strong-950 dark:bg-white"
-									: "justify-start border-stroke-soft-100 bg-bg-white-0 dark:border-white/15 dark:bg-white/10",
-							)}
-						>
-							<span
-								className={cn(
-									"size-3.5 rounded-full transition-colors",
-									showSchema
-										? "bg-bg-white-0 dark:bg-black"
-										: "bg-neutral-300 dark:bg-white/40",
-								)}
-							/>
-						</span>
-					</button>
+						<Checkbox.Root
+							id={schemaCheckboxId}
+							checked={showSchema}
+							onCheckedChange={(checked) => setShowSchema(checked === true)}
+							aria-label="Show response schema"
+						/>
+					</label>
 				</div>
 			</div>
 			<div className="px-1 pt-1 pb-2">

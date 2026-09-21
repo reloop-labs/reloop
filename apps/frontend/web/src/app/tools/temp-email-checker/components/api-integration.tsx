@@ -11,7 +11,7 @@ import {
 
 export function ApiIntegration() {
 	const [activeId, setActiveId] = useState<string>(
-		apiSnippets.find((s) => s.id === "node")?.id ?? apiSnippets[0].id,
+		apiSnippets.find((s) => s.id === "javascript")?.id ?? apiSnippets[0].id,
 	);
 	const [copiedEndpoint, setCopiedEndpoint] = useState(false);
 	const pathScrollRef = useRef<HTMLDivElement | null>(null);
@@ -57,7 +57,7 @@ export function ApiIntegration() {
 
 			<div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-8">
 				{/* Left: endpoint + Body docs */}
-				<div className="flex min-w-0 flex-col gap-5 px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10">
+				<div className="flex min-w-0 flex-col gap-5 px-4 py-6 sm:px-8 sm:py-8 lg:sticky lg:top-16 lg:self-start lg:px-12 lg:py-10">
 					<div className="api-endpoint-bar flex items-center rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] p-0.5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]">
 						<button
 							type="button"
