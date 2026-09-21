@@ -451,7 +451,7 @@ export const apiNotes: {
 		{
 			icon: "gift",
 			tag: "Free forever",
-			title: "Free to use",
+			title: "Zero limits & 100% Free",
 			description:
 				"This checker is free. It needs no signup and has no credits or expiry.",
 		},

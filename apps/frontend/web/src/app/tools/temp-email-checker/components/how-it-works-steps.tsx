@@ -10,10 +10,10 @@ type FeatureItem = {
 
 const FEATURES: FeatureItem[] = [
 	{
-		icon: Lock,
-		title: "No key, no account",
+		icon: Gift,
+		title: "100% Free & No limits",
 		description:
-			"The endpoint is public and unauthenticated. It is rate limited per IP, so keep it to signup-time checks rather than bulk list scrubbing.",
+			"This checker is free. It needs no signup and has no credits or expiry.",
 	},
 	{
 		icon: Zap,
@@ -22,16 +22,16 @@ const FEATURES: FeatureItem[] = [
 			"Disposable matching is in-memory. MX is a DNS lookup with a short timeout. We never open an SMTP session, and we do not store addresses.",
 	},
 	{
+		icon: Lock,
+		title: "No key, no account",
+		description:
+			"The endpoint is public and unauthenticated. It is rate limited per IP, so keep it to signup-time checks rather than bulk list scrubbing.",
+	},
+	{
 		icon: RotateCw,
 		title: "List refreshed every 2 hours",
 		description:
 			"The disposable-domain catalogue holds ~210,000 providers and is re-synced every 2 hours, so brand-new throwaway services get caught too.",
-	},
-	{
-		icon: Gift,
-		title: "Free to use",
-		description:
-			"This checker is free. It needs no signup and has no credits or expiry.",
 	},
 ];
 
