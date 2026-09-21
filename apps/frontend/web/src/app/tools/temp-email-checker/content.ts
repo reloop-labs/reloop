@@ -3,20 +3,31 @@ import { productionSiteUrl } from "@reloop/web/lib/site";
 
 export const toolPath = "/tools/temp-email-checker";
 
-export const toolTitle = "Temp Email Checker";
+export const toolTitle = "Free Temp Email Checker";
+export const heroHeading = "Free Temp Email Checker";
+export const metaTitle =
+	"Free Temp Email Checker — Disposable Email Detector";
+export const metaDescription =
+	"Free temp email checker and disposable email detector. Instantly detect throwaway inboxes (Mailinator, Yopmail, Temp-Mail), role addresses, and MX records — no signup, no SMTP probing.";
 
 export const toolDescription =
-	"Check syntax, known disposable providers, role prefixes, and MX records. This does not prove the mailbox exists.";
+	"Free temp email checker for disposable and throwaway addresses. Check syntax, ~210k known disposable providers, role prefixes, and MX records — we never probe the mailbox.";
 
 export const toolKeywords = [
 	"temp email checker",
 	"temporary email checker",
 	"disposable email checker",
 	"disposable email detector",
+	"free temp email checker",
 	"fake email checker",
-	"burner email address",
-	"throwaway email domain",
-	"email validation",
+	"throwaway email checker",
+	"burner email detector",
+	"block disposable emails",
+	"detect temporary email",
+	"mailinator checker",
+	"yopmail detector",
+	"temp mail detector",
+	"disposable domain list",
 ];
 
 export const signals: {
@@ -221,6 +232,11 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 		title: "Basics",
 		items: [
 			{
+				question: "How do I check if an email is temporary or disposable?",
+				answer:
+					"Paste the address into Reloop's free temp email checker. We parse RFC syntax, match the domain against a ~210,000-provider disposable catalogue (including Mailinator, Yopmail, and Temp-Mail), flag role prefixes, and look up MX records. A disposable verdict means the domain is a known throwaway provider — not that we probed the mailbox.",
+			},
+			{
 				question: "What is a disposable email address?",
 				answer:
 					"A disposable — or temporary, throwaway, burner — email address is a mailbox created on demand that anyone can read without signing up, and that usually self-destructs within minutes or hours. People use them to get past signup walls without handing over a real address.",
@@ -265,6 +281,12 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 	{
 		title: "Privacy & API",
 		items: [
+			{
+				question:
+					"How is this different from Reloop's free email validator?",
+				answer:
+					"The temp email checker is focused on disposable and throwaway detection at signup time (single address, public API, no key). The free email validator adds bulk CSV cleaning (up to 1,000), fuller health scoring, and list export for campaign hygiene. Use this tool to block burners at registration; use the email validator when you need to clean an entire list.",
+			},
 			{
 				question: "Does this store the addresses I check?",
 				answer:

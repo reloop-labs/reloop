@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Temp Email Checker | Reloop";
+export const alt = "Free Temp Email Checker — Disposable Email Detector | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -434,7 +434,7 @@ export default function OpenGraphImage() {
 							lineHeight: "1.1",
 						}}
 					>
-						Temp Email Checker
+						Free Temp Email Checker
 					</div>
 					<div
 						style={{
@@ -446,8 +446,8 @@ export default function OpenGraphImage() {
 							marginTop: "16px",
 						}}
 					>
-						Check syntax, known disposable providers, role prefixes, and MX
-						records. We do not probe the mailbox.
+						Disposable email detector — ~210k providers, MX checks, no SMTP
+						probing.
 					</div>
 				</div>
 

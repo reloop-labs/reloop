@@ -1,5 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import { CheckerPanel } from "../checker-panel";
+import { toolDescription } from "../content";
 
 export function TempEmailHero() {
 	return (
@@ -22,7 +23,7 @@ export function TempEmailHero() {
 						</div>
 
 						<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-							Temp{" "}
+							Free Temp{" "}
 							<span className="bg-gradient-to-b from-primary-base to-primary-base bg-clip-text text-transparent">
 								Email
 							</span>{" "}
@@ -30,8 +31,7 @@ export function TempEmailHero() {
 						</h1>
 
 						<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
-							Check syntax, known disposable providers, role prefixes, and MX
-							records. We do not probe the mailbox.
+							{toolDescription}
 						</p>
 
 						<div

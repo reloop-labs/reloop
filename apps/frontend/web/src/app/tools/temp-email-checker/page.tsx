@@ -11,7 +11,8 @@ import { WhoIsItFor } from "./components/who-is-it-for";
 import {
 	faqGroups,
 	faqs,
-	toolDescription,
+	metaDescription,
+	metaTitle,
 	toolKeywords,
 	toolPath,
 	toolTitle,
@@ -22,8 +23,8 @@ import {
 export const instant = false;
 
 export const metadata = createPageMetadata({
-	title: toolTitle,
-	description: toolDescription,
+	title: metaTitle,
+	description: metaDescription,
 	path: toolPath,
 	keywords: toolKeywords,
 	ogImage: false,
@@ -41,7 +42,7 @@ export default function TempEmailCheckerPage() {
 						"@type": "WebApplication",
 						name: `${toolTitle} | Reloop`,
 						url: `${siteUrl}${toolPath}`,
-						description: toolDescription,
+						description: metaDescription,
 						applicationCategory: "DeveloperApplication",
 						operatingSystem: "Any",
 						offers: {
@@ -49,6 +50,14 @@ export default function TempEmailCheckerPage() {
 							price: "0",
 							priceCurrency: "USD",
 						},
+						featureList: [
+							"Disposable and temporary email detection",
+							"~210,000 throwaway domain catalogue",
+							"RFC syntax validation",
+							"Role prefix detection",
+							"Live DNS MX lookup without SMTP probing",
+							"Public unauthenticated API",
+						],
 						publisher: {
 							"@type": "Organization",
 							name: "Reloop",
