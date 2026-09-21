@@ -47,7 +47,7 @@ export function BlueprintEmailIllustration() {
 	return (
 		<div className="relative w-full max-w-[460px] select-none">
 			<svg
-				viewBox="20 8 440 280"
+				viewBox="16 -4 448 332"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-auto w-full"
@@ -397,7 +397,7 @@ export function BlueprintCta({
 			{...(id ? { id } : {})}
 			className={cn("w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8", className)}
 		>
-			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#256bf5] px-8 py-14 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-18 lg:px-14 lg:py-20">
+			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#256bf5] px-8 py-16 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-20 lg:px-14 lg:py-24">
 				{/* 8px Inset white border */}
 				<div
 					aria-hidden="true"
