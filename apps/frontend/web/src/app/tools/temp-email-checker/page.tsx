@@ -7,6 +7,7 @@ import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { SimilarTools } from "./components/similar-tools";
 import { TempEmailCta } from "./components/temp-email-cta";
 import { TempEmailHero } from "./components/temp-email-hero";
+import { WasteCalculator } from "./components/waste-calculator";
 import { WhoIsItFor } from "./components/who-is-it-for";
 import {
 	faqGroups,
@@ -105,6 +106,11 @@ export default function TempEmailCheckerPage() {
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
 				<HowItWorksSteps />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
+				<WasteCalculator />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
