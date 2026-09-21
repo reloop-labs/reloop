@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { AiGenerateTransactionalEmailTemplatesArt } from "./ai-generate-transactional-email-templates";
 import { BimiEmailSetupGuideArt } from "./bimi-email-setup-guide";
+import { BlockDisposableEmailsAtSignupArt } from "./block-disposable-emails-at-signup";
 import { BuildAiAgentSendsEmailsArt } from "./build-ai-agent-sends-emails";
 import { BuildingInPublicLessonsArt } from "./building-in-public-lessons";
 import { BuildingWebhookDeliverySystemArt } from "./building-webhook-delivery-system";
@@ -34,6 +35,7 @@ export const blogPostArtRegistry: Record<
 	"ai-generate-transactional-email-templates":
 		AiGenerateTransactionalEmailTemplatesArt,
 	"bimi-email-setup-guide": BimiEmailSetupGuideArt,
+	"block-disposable-emails-at-signup": BlockDisposableEmailsAtSignupArt,
 	"build-ai-agent-sends-emails": BuildAiAgentSendsEmailsArt,
 	"building-in-public-lessons": BuildingInPublicLessonsArt,
 	"building-webhook-delivery-system": BuildingWebhookDeliverySystemArt,

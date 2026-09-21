@@ -21,11 +21,11 @@ author:
 draft: false
 image: /blog/images/disposable-email-blog-banner.png
 relatedSlugs:
+  - block-disposable-emails-at-signup
+  - why-emails-land-in-spam-fix
+  - ip-warming-guide
+  - spf-dkim-dmarc-setup-guide
   - why-we-open-sourced-email-infrastructure
-  - self-hosted-email-infrastructure
-  - email-infrastructure-for-ai-agents
-  - email-provider-comparison-2026
-  - migrating-from-sendgrid
 ---
 
 Every day, millions of users sign up for websites using temporary email addresses. While these emails help protect privacy, they can also create problems for businesses.
@@ -122,7 +122,7 @@ If your website accepts user registrations, checking every email manually isn't 
 
 Instead, integrate disposable email detection into your signup process to automatically flag temporary email addresses before accounts are created.
 
-The [Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker) is a thin wrapper over one public endpoint. `POST` an address to `https://reloop.sh/api/tools/v1/check` — no API key, no account.
+The [Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker) is a thin wrapper over one public endpoint. `POST` an address to `https://reloop.sh/api/tools/v1/temp-email-checker` — no API key, no account.
 
 <TempEmailCheckerCodeSamples />
 

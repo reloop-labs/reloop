@@ -1,0 +1,193 @@
+---
+title: "How to Block Disposable Emails at Signup (Free Temp Email Checker)"
+description: "Stop throwaway signups before they bounce, burn free trials, and tank sender reputation. Use Reloop's free temp email checker — ~210k disposable domains, no SMTP probing."
+keywords:
+  - block disposable emails
+  - temp email checker
+  - disposable email detector
+  - block temporary email at signup
+  - throwaway email signup abuse
+  - burner email detector
+  - free temp email checker
+  - prevent fake signups
+publishedAt: 2026-09-21
+category: Deliverability
+tags: [deliverability, disposable-email, temp-email, signup, email-validation]
+readTime: 9 min read
+author:
+  name: Farhan Shaikh
+  role: Engineering Member
+  avatar: /company/team/farhan-shaikh.png
+draft: false
+relatedSlugs:
+  - disposable-email
+  - why-emails-land-in-spam-fix
+  - ip-warming-guide
+  - spf-dkim-dmarc-setup-guide
+  - why-we-open-sourced-email-infrastructure
+---
+
+Temporary inboxes are useful for privacy. They are expensive for anyone who sends email for a living.
+
+A disposable address often dies within an hour. Every message you send after that is a hard bounce. Sustained bounce rates are how mailbox providers decide your domain belongs in spam, for every recipient, not just the throwaway ones.
+
+If you run a SaaS free tier, a newsletter, or a product waitlist, disposable signups also inflate your metrics and farm your credits. The fix is simple: check the address at signup, before it lands in your database.
+
+This guide covers when to block temporary emails, how a [temp email checker](/tools/temp-email-checker) works, and how to wire Reloop's free public API into a registration flow.
+
+## What a temp email checker actually checks
+
+A temp email checker (also called a disposable email detector) answers one question: *is this address from a known throwaway provider?*
+
+Reloop's [free Temp Email Checker](/tools/temp-email-checker) does more than a domain string match. On each request it:
+
+1. **Parses RFC syntax** — malformed input never reaches the catalogue or DNS.
+2. **Matches ~210,000 disposable providers** — including Mailinator, Yopmail, Temp-Mail, Guerrilla Mail, and 10MinuteMail, plus wildcard suffixes for providers that mint endless subdomains.
+3. **Flags role prefixes** — `info@`, `billing@`, `support@` are shared inboxes, not burners. They are reported separately so you can apply your own policy.
+4. **Looks up MX records** — confirms the domain publishes a mail exchanger. That is routing evidence, not proof the mailbox exists.
+5. **Never opens an SMTP session** — no mailbox probe, no stored addresses, no account required.
+
+A disposable verdict means the domain is on the catalogue. A clear verdict means "not currently known to be disposable" — new temp-mail services appear constantly, so treat the check as a strong signal, not a lifetime guarantee.
+
+For a deeper walkthrough of detection methods, see [how to check if an email is disposable](/blog/disposable-email).
+
+## Why disposable emails damage deliverability
+
+Mailbox providers track bounce rate as a core reputation signal. Industry guidance keeps hard bounces well under ~2%. Throwaway inboxes make that threshold easy to miss:
+
+- The mailbox is deleted minutes or hours after signup.
+- Your welcome email, password reset, or drip sequence hard-bounces.
+- Those failures are scored against your sending domain and IP.
+- Reputation damage spreads to legitimate recipients — password resets and receipts start landing in spam.
+
+That is the same chain that ends with [emails in the spam folder](/blog/why-emails-land-in-spam-fix). Authentication (SPF, DKIM, DMARC) and [IP warming](/blog/ip-warming-guide) matter — but none of them fix a list full of dead temporary addresses.
+
+Prevention sits in front of bounce handling. Validate at signup, then suppress hard bounces immediately so dead temporary addresses never get a second send.
+
+## Signup abuse patterns a checker stops
+
+Deliverability is one reason to block. Product abuse is the other.
+
+| Pattern | What happens without a check | What a temp email checker does |
+| --- | --- | --- |
+| Free trial farming | Unlimited throwaway accounts, unlimited trials | Block at registration when `isDisposable` is true |
+| Coupon / referral fraud | Same offer claimed with a new burner each time | Reject or flag before the promotion is applied |
+| Waitlist inflation | Fake demand, useless launch emails | Keep the list honest before you send |
+| Newsletter padding | Open rates collapse; engagement signals look terrible | Suppress burners before the first campaign |
+| Multi-account bots | Shared disposable domains scale abuse cheaply | Catch the domain family, including wildcard providers |
+
+Role addresses (`admin@`, `sales@`) are a different problem: they are real and persistent, but shared. Reloop flags them separately so you can require a personal inbox without treating Gmail or Outlook as disposable.
+
+## When to block vs when to flag
+
+Blocking every temporary email is not always the right product decision.
+
+**Block at signup when:**
+
+- You offer a free trial, freemium tier, or usage credits
+- You run new-customer discounts or referral rewards
+- Fake accounts distort activation or retention metrics
+- You send transactional email and cannot afford bounce spikes
+
+**Flag or allow when:**
+
+- Privacy-sensitive audiences expect anonymous access
+- The flow is feedback, bug reports, or one-off downloads
+- You will suppress later rather than reject at the door
+
+A practical middle path: block disposable domains on paid or trial signup, and on newsletter forms either soft-warn or accept then suppress before campaigns. Pair the check with email confirmation and CAPTCHA so you are not relying on a single signal.
+
+## How to check an address with Reloop (free)
+
+### Option 1 — Use the web tool
+
+Paste an address into the [Reloop Temp Email Checker](/tools/temp-email-checker). You get a verdict, disposable match details, role and free-provider flags, MX hosts, confidence, and risk score — instantly, with no signup.
+
+Examples:
+
+- `alex@gmail.com` — deliverable consumer mailbox (free provider, not disposable)
+- `you@mailinator.com` — disposable
+- `demo@yopmail.com` — disposable
+
+### Option 2 — Call the public API at signup
+
+The checker is a thin wrapper over one public endpoint. No API key. No account. Rate limited per IP — keep it to signup-time checks, not bulk scrubbing.
+
+`POST https://reloop.sh/api/tools/v1/temp-email-checker`
+
+<TempEmailCheckerCodeSamples />
+
+A throwaway mailbox returns `"verdict": "disposable"` and `"isDisposable": true`:
+
+```json
+{
+  "input": "you@mailinator.com",
+  "kind": "email",
+  "domain": "mailinator.com",
+  "verdict": "disposable",
+  "isValidSyntax": true,
+  "isDisposable": true,
+  "disposableMatch": {
+    "kind": "exact",
+    "domain": "mailinator.com"
+  },
+  "isAllowlisted": false,
+  "isRoleAddress": false,
+  "isFreeProvider": false,
+  "signals": {
+    "syntax": "pass",
+    "disposable": "fail",
+    "role": "pass",
+    "freeProvider": "pass"
+  },
+  "mxRecords": ["spool.mailinator.com"],
+  "confidence": 0.99,
+  "riskScore": 0.95,
+  "flags": ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"]
+}
+```
+
+Reject or challenge the signup when `isDisposable` is `true`. Optionally treat high `riskScore` or role addresses as soft warnings.
+
+Need to clean an existing list rather than gate one registration? Use Reloop's free [email validator](/tools/email-validator) for syntax, disposable detection, live MX, and CSV cleaning (up to 1,000 rows) in one pass. For production volume and policy controls, see [email validation](/features/email-validation) on Reloop.
+
+## Layer checks that protect reputation end to end
+
+Disposable detection is one layer. Strong signup hygiene stacks several:
+
+1. **Temp / disposable check** — [Temp Email Checker](/tools/temp-email-checker) at account creation
+2. **List hygiene before campaigns** — [Email Validator](/tools/email-validator)
+3. **Authentication health** — [SPF, DKIM & DMARC checker](/tools/auth-checker) and the [setup guide](/blog/spf-dkim-dmarc-setup-guide)
+4. **Inbox placement tests** — [Deliverability tester](/tools/deliverability-tester)
+5. **Blocklist monitoring** — [IP & domain blocklist checker](/tools/blocklist-checker)
+6. **Transactional quality** — keep password resets and receipts on a dedicated subdomain with proper auth so the mail you do send deserves the inbox
+
+Reloop is open-source email infrastructure. You can use the hosted tools, call the public checker API, or [run Reloop yourself](/blog/why-we-open-sourced-email-infrastructure) when you want the same checks on your own servers.
+
+## Frequently asked questions
+
+### Is blocking disposable emails legal?
+
+Yes. Temporary email services are legal for users. Choosing not to accept them on your product is a normal terms-of-service and fraud-prevention decision — the same category as blocking known bot ASNs or requiring phone verification.
+
+### Will a temp email checker catch brand-new throwaway domains?
+
+List-based detection only knows what is on the catalogue. Reloop resyncs roughly every two hours across ~210,000 providers, which catches most new services quickly, but a brand-new domain can slip through until it is listed. Combine the check with confirmation email and rate limits.
+
+### Does Reloop prove the mailbox exists?
+
+No. MX lookup shows mail can be routed to the domain. Reloop never probes the mailbox over SMTP. That keeps the tool fast, privacy-friendly, and suitable for a public endpoint.
+
+### Is Gmail or Outlook disposable?
+
+No. Free consumer providers are persistent. Reloop may flag them as free providers so you can apply your own rules; they are not treated as throwaway.
+
+### Temp email checker vs email validator — which should I use?
+
+Use the [temp email checker](/tools/temp-email-checker) to block burners at signup (single address, public API). Use the [email validator](/tools/email-validator) when you need bulk CSV cleaning, fuller health scoring, and export for campaign hygiene.
+
+## Next step
+
+Run a known throwaway address through the [free Temp Email Checker](/tools/temp-email-checker), then wire the same check into your registration handler with the public API above.
+
+If you are already sending through Reloop or evaluating open-source transactional email, start free at [reloop](https://reloop.sh) and keep disposable addresses out of the path that builds your sender reputation.
