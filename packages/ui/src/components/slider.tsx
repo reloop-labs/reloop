@@ -36,8 +36,8 @@ const SliderThumb = React.forwardRef<
 			ref={forwardedRef}
 			className={cn(
 				[
-					// base
-					"box-content block size-1.5 shrink-0 cursor-pointer rounded-full border-[5px] border-static-white bg-primary-base shadow-toggle-switch outline-none",
+					// base - simple white thumb with border
+					"block size-4 shrink-0 cursor-pointer rounded-full border-2 border-primary-base bg-white shadow-toggle-switch outline-none",
 					// focus
 					"focus:outline-none",
 				],
