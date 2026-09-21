@@ -105,18 +105,14 @@ export function SimilarTools() {
 			className="w-full"
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-primary-base">04.</span>{" "}
-					<span className="text-text-sub-600 dark:text-white/50">
-						Similar tools
-					</span>
+				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
+					Similar tools
 				</p>
 				<h2
 					id="similar-tools-heading"
-					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
+					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Explore more <span className="text-primary-base">free tools</span>{" "}
-					like Temp Email Checker
+					Explore more free tools like Temp Email Checker.
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
 					Validate, inspect, and test every part of your email setup. Free, no

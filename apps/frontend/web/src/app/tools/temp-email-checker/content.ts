@@ -175,21 +175,149 @@ res, err := http.Post(
 ];
 
 export const apiResponseSample = `{
-  "input": "alex.hunter@temp-mail.org",
-  "domain": "temp-mail.org",
+  "input": "you@mailinator.com",
+  "kind": "email",
+  "domain": "mailinator.com",
+  "unicodeDomain": null,
   "verdict": "disposable",
+  "isValidSyntax": true,
+  "syntaxFailure": null,
   "isDisposable": true,
+  "disposableMatch": {
+    "kind": "exact",
+    "domain": "mailinator.com"
+  },
+  "isAllowlisted": false,
+  "isRoleAddress": false,
+  "isFreeProvider": false,
+  "signals": {
+    "syntax": "pass",
+    "disposable": "fail",
+    "role": "pass",
+    "freeProvider": "pass"
+  },
   "mxRecords": [
-    "mx1.temp-mail.org",
-    "mx2.temp-mail.org"
+    "spool.mailinator.com"
   ],
-  "confidence": 0.98,
-  "riskScore": 0.94,
+  "confidence": 0.99,
+  "riskScore": 0.95,
   "flags": [
     "DISPOSABLE_DOMAIN",
     "PUBLIC_INBOX_DETECTED"
   ]
 }`;
+
+export type ApiStatusCode = "200" | "400" | "429";
+
+export const apiStatusCodes: ApiStatusCode[] = ["200", "400", "429"];
+
+export const apiResponseSamples: Record<ApiStatusCode, string> = {
+	"200": apiResponseSample,
+	"400": `{
+  "message": "Invalid request",
+  "why": "email is required",
+  "fix": "Send { "email": "you@mailinator.com" } as JSON."
+}`,
+	"429": `{
+  "message": "Rate limited",
+  "why": "Too many checks from this IP.",
+  "fix": "Wait a moment and try again."
+}`,
+};
+
+export const apiResponseSchemas: Record<ApiStatusCode, string> = {
+	"200": `{
+  "input": "string",
+  "kind": "email | domain | null",
+  "domain": "string | null",
+  "unicodeDomain": "string | null",
+  "verdict": "invalid | disposable | risky | deliverable",
+  "isValidSyntax": "boolean",
+  "syntaxFailure": "string | null",
+  "isDisposable": "boolean",
+  "disposableMatch": "{ kind, domain, pattern? } | null",
+  "isAllowlisted": "boolean",
+  "isRoleAddress": "boolean",
+  "isFreeProvider": "boolean",
+  "signals": "{ syntax, disposable, role, freeProvider }",
+  "mxRecords": "string[]",
+  "confidence": "number (0-1)",
+  "riskScore": "number (0-1)",
+  "flags": "string[]"
+}`,
+	"400": `{
+  "message": "string",
+  "why?": "string",
+  "fix?": "string",
+  "link?": "string"
+}`,
+	"429": `{
+  "message": "string",
+  "why?": "string",
+  "fix?": "string",
+  "link?": "string"
+}`,
+};
+
+export type ApiBodyArg = {
+	name: string;
+	type: string;
+	required?: boolean;
+	description: string;
+};
+
+export const apiBodyArgs: ApiBodyArg[] = [
+	{
+		name: "email",
+		type: "string",
+		required: true,
+		description:
+			"An email address or a bare domain to check (e.g. you@mailinator.com or mailinator.com). Trimmed and lowercased before validation.",
+	},
+];
+
+export type ApiReturnField = {
+	name: string;
+	type: string;
+	description: string;
+};
+
+export const apiReturnFields: ApiReturnField[] = [
+	{
+		name: "verdict",
+		type: "string",
+		description:
+			"Final call: invalid, disposable, risky or deliverable. Block disposable at signup.",
+	},
+	{
+		name: "isDisposable",
+		type: "boolean",
+		description:
+			"True when the domain matches the ~210,000-provider disposable catalogue.",
+	},
+	{
+		name: "mxRecords",
+		type: "string[]",
+		description:
+			"MX hosts for the domain, lowest priority first. Empty when DNS did not answer.",
+	},
+	{
+		name: "confidence",
+		type: "number",
+		description: "How sure the engine is of the verdict, from 0 to 1.",
+	},
+	{
+		name: "riskScore",
+		type: "number",
+		description:
+			"Signup and list-quality risk, from 0 (safe) to 1 (throwaway).",
+	},
+	{
+		name: "flags",
+		type: "string[]",
+		description: "Machine-readable reasons behind the verdict and scores.",
+	},
+];
 
 export const apiNotes: {
 	icon: string;

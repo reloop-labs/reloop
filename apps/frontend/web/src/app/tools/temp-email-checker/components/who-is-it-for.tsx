@@ -64,18 +64,14 @@ export function WhoIsItFor() {
 			className="w-full"
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-primary-base">02.</span>{" "}
-					<span className="text-text-sub-600 dark:text-white/50">
-						Who is it for
-					</span>
+				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
+					Who is it for
 				</p>
 				<h2
 					id="who-is-it-for-heading"
-					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
+					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Who is <span className="text-primary-base">Reloop&rsquo;s</span> Temp
-					Email Checker for?
+					Who is Reloop&rsquo;s temp email checker for.
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
 					Anyone who needs to know if an address is real without ever probing

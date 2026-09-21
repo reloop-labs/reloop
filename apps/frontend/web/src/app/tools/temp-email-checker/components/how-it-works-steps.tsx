@@ -43,18 +43,14 @@ export function BestFeatures() {
 			className="w-full"
 		>
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-primary-base">01.</span>{" "}
-					<span className="text-text-sub-600 dark:text-white/50">
-						BEST FEATURES
-					</span>
+				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
+					Best features
 				</p>
 				<h2
 					id="best-features-heading"
-					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
+					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Why <span className="text-primary-base">Reloop</span> is the best temp
-					email checker:
+					Why Reloop is the best temp email checker.
 				</h2>
 			</div>
 

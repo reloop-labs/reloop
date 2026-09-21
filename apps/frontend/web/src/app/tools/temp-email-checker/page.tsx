@@ -127,14 +127,7 @@ export default function TempEmailCheckerPage() {
 					<FaqSection
 						items={faqGroups.flatMap((g) => g.items)}
 						id="faq-section"
-						eyebrow={
-							<>
-								<span className="text-primary-base">05.</span>{" "}
-								<span className="text-text-sub-600 dark:text-white/50">
-									FAQ
-								</span>
-							</>
-						}
+						eyebrow="FAQ"
 						compact
 						plain
 						flush

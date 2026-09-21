@@ -1,10 +1,13 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiBodyArgs, apiEndpoint, apiSnippets } from "../content";
-import { RequestCard, ResponseCard } from "./api-request-response";
+import {
+	AnimatedCopyIcon,
+	RequestCard,
+	ResponseCard,
+} from "./api-request-response";
 
 export function ApiIntegration() {
 	const [activeId, setActiveId] = useState<string>(
@@ -41,27 +44,19 @@ export function ApiIntegration() {
 	return (
 		<section id="api" aria-labelledby="api-heading" className="w-full">
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] uppercase">
-					<span className="text-primary-base">03.</span>{" "}
-					<span className="text-text-sub-600 dark:text-white/50">
-						Use it in code
-					</span>
+				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
+					Use it in code
 				</p>
 				<h2
 					id="api-heading"
-					className="text-balance font-semibold text-2xl text-text-strong-950 tracking-[-0.025em] sm:text-3xl lg:text-[2rem] lg:leading-[1.15] dark:text-white"
+					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Block throwaways <span className="text-primary-base">at signup</span>,
-					not in a spreadsheet
+					Integrate this into the code today.
 				</h2>
-				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					One public POST — no key, no account. Copy a snippet, paste it into
-					your signup flow, and share the result link with your team.
-				</p>
 			</div>
 
 			<div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-8">
-				{/* Left: endpoint + Body / Arguments docs */}
+				{/* Left: endpoint + Body docs */}
 				<div className="flex min-w-0 flex-col gap-5 px-4 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10">
 					<div className="api-endpoint-bar flex items-center rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] p-0.5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]">
 						<button
@@ -103,8 +98,8 @@ export function ApiIntegration() {
 								aria-hidden
 								className="shrink-0 text-text-sub-600 dark:text-white/55"
 							>
-								<Icon
-									name={copiedEndpoint ? "check" : "copy"}
+								<AnimatedCopyIcon
+									copied={copiedEndpoint}
 									className="size-4 stroke-[3px]"
 								/>
 							</span>
@@ -112,11 +107,8 @@ export function ApiIntegration() {
 					</div>
 
 					<div>
-						<p className="font-medium text-[22px] text-text-soft-400 tracking-tight dark:text-white/40">
+						<h3 className="font-semibold text-[18px] text-text-strong-950 tracking-tight dark:text-white">
 							Body
-						</p>
-						<h3 className="mt-4 font-semibold text-[18px] text-text-strong-950 tracking-tight dark:text-white">
-							Arguments
 						</h3>
 						<div
 							aria-hidden
@@ -126,19 +118,19 @@ export function ApiIntegration() {
 							{apiBodyArgs.map((arg) => (
 								<div key={arg.name}>
 									<dt className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-										<code className="font-medium font-mono text-[15px] text-text-strong-950 dark:text-white">
+										<code className="font-medium font-mono text-text-strong-950 dark:text-white">
 											{arg.name}
 										</code>
-										<span className="rounded-md bg-black/[0.05] px-2 py-0.5 font-mono text-[13px] text-text-sub-600 dark:bg-white/10 dark:text-white/60">
+										<span className="rounded-[7px] bg-black/[0.05] px-2 py-0.5 font-medium font-mono text-[12px] text-text-sub-600 dark:bg-white/10 dark:text-white/60">
 											{arg.type}
 										</span>
 										{arg.required ? (
-											<span className="text-[15px] text-red-600 dark:text-red-400">
+											<span className="font-medium text-[12px] text-red-600 dark:text-red-400">
 												required
 											</span>
 										) : null}
 									</dt>
-									<dd className="mt-2 max-w-xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+									<dd className="mt-2 max-w-xl text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
 										{arg.description}
 									</dd>
 								</div>

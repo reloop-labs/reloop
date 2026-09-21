@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import {
 	type ApiSnippet,
@@ -56,6 +57,57 @@ function useCopy(value: string) {
 		}
 	};
 	return { copied, copy };
+}
+
+export function AnimatedCopyIcon({
+	copied,
+	className,
+}: {
+	copied: boolean;
+	className?: string;
+}) {
+	const iconClass = className ?? "size-3.5";
+	return (
+		<span className="relative flex size-4 items-center justify-center">
+			<motion.span
+				className="pointer-events-none absolute inset-0 flex items-center justify-center"
+				initial={false}
+				animate={{ scale: copied ? 0 : 1, opacity: copied ? 0 : 1 }}
+				transition={{ duration: 0.18, ease: "easeInOut" }}
+			>
+				<Icon name="copy" className={iconClass} />
+			</motion.span>
+			<motion.span
+				className="pointer-events-none absolute inset-0 flex items-center justify-center"
+				initial={false}
+				animate={{ scale: copied ? 1 : 0, opacity: copied ? 1 : 0 }}
+				transition={{ duration: 0.18, ease: "easeInOut" }}
+			>
+				<svg
+					viewBox="0 0 20 20"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+					className="size-6 text-primary-base"
+					aria-hidden
+				>
+					<circle
+						cx="10"
+						cy="10"
+						r="8"
+						fill="currentColor"
+						fillOpacity="0.08"
+					/>
+					<path
+						d="M7 10.5L9 12.5L13 7.5"
+						stroke="currentColor"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						strokeWidth="1.5"
+					/>
+				</svg>
+			</motion.span>
+		</span>
+	);
 }
 
 function CardShell({
@@ -179,7 +231,7 @@ export function RequestCard({
 			</div>
 			{/* biome-ignore lint/a11y/useSemanticElements: mirrors reference docs markup (focusable code region) */}
 			<div
-				className="relative px-2 pt-2 pb-3"
+				className="relative px-1 pt-1 pb-2"
 				role="region"
 				aria-label="Code snippet"
 				// biome-ignore lint/a11y/noNoninteractiveTabindex: mirrors reference docs markup (focusable code region)
@@ -192,7 +244,7 @@ export function RequestCard({
 						aria-label={copied ? "Copied" : "Copy code"}
 						className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
 					>
-						<Icon name={copied ? "check" : "copy"} className="size-[13px]" />
+						<AnimatedCopyIcon copied={copied} className="size-[13px]" />
 					</button>
 				</div>
 				<CodeBlock
@@ -200,8 +252,7 @@ export function RequestCard({
 					code={active.code}
 					lang={lang}
 					hideLineNumbers
-					codeExtraPadding
-					className="!text-[13.5px] ![line-height:1.75] sm:!text-[14px]"
+					className="!text-[12px] ![line-height:1.6]"
 				/>
 			</div>
 		</CardShell>
@@ -229,7 +280,7 @@ export function ResponseCard() {
 						aria-label={copied ? "Copied" : "Copy response"}
 						className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
 					>
-						<Icon name={copied ? "check" : "copy"} className="size-3.5" />
+						<AnimatedCopyIcon copied={copied} className="size-3.5" />
 					</button>
 				</div>
 				<div className="mt-2.5 flex items-center justify-between gap-3">
@@ -288,14 +339,13 @@ export function ResponseCard() {
 					</button>
 				</div>
 			</div>
-			<div className="px-2 pt-2 pb-3">
+			<div className="px-1 pt-1 pb-2">
 				<CodeBlock
 					key={`${status}-${showSchema ? "schema" : "example"}`}
 					code={code}
 					lang="json"
 					hideLineNumbers
-					codeExtraPadding
-					className="!text-[13.5px] ![line-height:1.75] sm:!text-[14px]"
+					className="!text-[12px] ![line-height:1.6]"
 				/>
 			</div>
 		</CardShell>
