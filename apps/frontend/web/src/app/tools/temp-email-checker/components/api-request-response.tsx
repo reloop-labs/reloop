@@ -230,7 +230,7 @@ export function RequestCard({
 
 	return (
 		<CardShell>
-			<div className="flex h-[46px] items-center justify-between gap-3 rounded-xl border border-black/[0.05] bg-[#fafafa] px-4 dark:border-white/[0.08] dark:bg-white/[0.03]">
+			<div className="flex h-[46px] items-center justify-between gap-3 rounded-[12px] border border-black/[0.05] bg-[#fafafa] px-4 dark:border-white/[0.08] dark:bg-white/[0.03]">
 				<h2 className="font-semibold text-[12px] text-text-strong-950 tracking-tight dark:text-white">
 					Request
 				</h2>
@@ -313,7 +313,7 @@ export function RequestCard({
 						type="button"
 						onClick={copy}
 						aria-label={copied ? "Copied" : "Copy code"}
-						className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+						className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
 					>
 						<AnimatedCopyIcon copied={copied} className="size-[13px]" />
 					</button>
@@ -341,19 +341,11 @@ export function ResponseCard() {
 
 	return (
 		<CardShell>
-			<div className="rounded-xl border border-black/[0.05] bg-[#fafafa] px-4 pt-3.5 pb-3 dark:border-white/[0.08] dark:bg-white/[0.03]">
+			<div className="rounded-[12px] border border-black/[0.05] bg-[#fafafa] px-4 pt-3.5 pb-3 dark:border-white/[0.08] dark:bg-white/[0.03]">
 				<div className="flex items-center justify-between gap-3">
 					<span className="font-semibold text-[12px] text-text-strong-950 tracking-tight dark:text-white">
 						Sample Response
 					</span>
-					<button
-						type="button"
-						onClick={copy}
-						aria-label={copied ? "Copied" : "Copy response"}
-						className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
-					>
-						<AnimatedCopyIcon copied={copied} className="size-3.5" />
-					</button>
 				</div>
 				<div className="mt-2.5 flex items-center justify-between gap-3">
 					<div
@@ -371,7 +363,7 @@ export function ResponseCard() {
 									aria-selected={isActive}
 									onClick={() => setStatus(code)}
 									className={cn(
-										"cursor-pointer rounded-lg border px-2.5 py-1 font-medium font-mono text-[12px] transition-colors",
+										"cursor-pointer rounded-lg border px-2.5 py-1 font-medium font-mono text-[12px]",
 										isActive
 											? "border-black/[0.08] bg-neutral-200/90 text-text-strong-950 dark:border-white/15 dark:bg-white/15 dark:text-white"
 											: "border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 hover:text-text-strong-950 dark:border-white/10 dark:bg-transparent dark:text-white/50 dark:hover:text-white",
@@ -396,7 +388,24 @@ export function ResponseCard() {
 					</label>
 				</div>
 			</div>
-			<div className="px-1 pt-1 pb-2">
+			{/* biome-ignore lint/a11y/useSemanticElements: mirrors reference docs markup (focusable code region) */}
+			<div
+				className="relative px-1 pt-1 pb-2"
+				role="region"
+				aria-label="Response code snippet"
+				// biome-ignore lint/a11y/noNoninteractiveTabindex: mirrors reference docs markup (focusable code region)
+				tabIndex={0}
+			>
+				<div className="absolute top-4 right-4">
+					<button
+						type="button"
+						onClick={copy}
+						aria-label={copied ? "Copied" : "Copy response"}
+						className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+					>
+						<AnimatedCopyIcon copied={copied} className="size-[13px]" />
+					</button>
+				</div>
 				<CodeBlock
 					key={`${status}-${showSchema ? "schema" : "example"}`}
 					code={code}

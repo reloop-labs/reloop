@@ -81,7 +81,7 @@ export function HowItWorksSection() {
 					id="how-it-works-heading"
 					className="font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl lg:text-[2.65rem] lg:leading-[1.12] dark:text-white"
 				>
-					HOW IT WORKS
+					How it works
 				</h2>
 			</div>
 

@@ -5,12 +5,12 @@ export const toolPath = "/tools/temp-email-checker";
 
 export const toolTitle = "Free Temp Email Checker";
 export const heroHeading = "Free Temp Email Checker";
-export const metaTitle = "Free Temp Email Checker — Disposable Email Detector";
+export const metaTitle = "Free Temp Email Checker: Disposable Email Detector";
 export const metaDescription =
-	"Free temp email checker and disposable email detector. Instantly detect throwaway inboxes (Mailinator, Yopmail, Temp-Mail), role addresses, and MX records — no signup, no SMTP probing.";
+	"Free temp email checker and disposable email detector. Instantly detect throwaway inboxes (Mailinator, Yopmail, Temp-Mail), role addresses, and MX records. No signup, no SMTP probing.";
 
 export const toolDescription =
-	"Free temp email checker for disposable and throwaway addresses. Check syntax, ~210k known disposable providers, role prefixes, and MX records — we never probe the mailbox.";
+	"Check inbound emails for disposable and role addresses.";
 
 export const toolKeywords = [
 	"temp email checker",
@@ -374,7 +374,7 @@ export const apiBodyArgs: ApiBodyArg[] = [
 		type: "string",
 		required: true,
 		description:
-			"An email address or a bare domain to check (e.g. you@mailinator.com or mailinator.com). Trimmed and lowercased before validation.",
+			"An email address or a bare domain to check (e.g. you@mailinator.com or mailinator.com). We trim and lowercase it before validation.",
 	},
 ];
 
@@ -401,7 +401,7 @@ export const apiReturnFields: ApiReturnField[] = [
 		name: "mxRecords",
 		type: "string[]",
 		description:
-			"MX hosts for the domain, lowest priority first. Empty when DNS did not answer.",
+			"MX hosts for the domain, lowest priority first. The list is empty when DNS did not answer.",
 	},
 	{
 		name: "confidence",
@@ -451,9 +451,9 @@ export const apiNotes: {
 	{
 		icon: "gift",
 		tag: "Free forever",
-		title: "Free for life, no catch",
+		title: "Free to use",
 		description:
-			"This checker is completely free — no signup, no credits, no expiry. Come back and use it as often as you need, for as long as you need.",
+			"This checker is free. It needs no signup and has no credits or expiry.",
 	},
 ];
 
@@ -464,22 +464,22 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "How do I check if an email is temporary or disposable?",
 				answer:
-					"Paste the address into Reloop's free temp email checker. We parse RFC syntax, match the domain against a ~210,000-provider disposable catalogue (including Mailinator, Yopmail, and Temp-Mail), flag role prefixes, and look up MX records. A disposable verdict means the domain is a known throwaway provider — not that we probed the mailbox.",
+					"Paste the address into Reloop's free temp email checker. We parse RFC syntax, match the domain against a ~210,000-provider disposable catalogue (including Mailinator, Yopmail, and Temp-Mail), flag role prefixes, and look up MX records. A disposable verdict means the domain is a known throwaway provider. We did not probe the mailbox.",
 			},
 			{
 				question: "What is a disposable email address?",
 				answer:
-					"A disposable — or temporary, throwaway, burner — email address is a mailbox created on demand that anyone can read without signing up, and that usually self-destructs within minutes or hours. People use them to get past signup walls without handing over a real address.",
+					"A disposable email address is a mailbox created on demand that anyone can read without signing up, and that usually self-destructs within minutes or hours. People use them to get past signup walls without handing over a real address.",
 			},
 			{
 				question: "Why should I block disposable email addresses?",
 				answer:
-					"Because they stop existing. Once the mailbox expires, every message you send to it hard-bounces, and mailbox providers read sustained bounce rates as a sign that you send to bad lists. That reputation damage applies to your whole domain, not just the throwaway recipients.",
+					"They stop existing. Once the mailbox expires, every message you send to it hard-bounces, and mailbox providers read sustained bounce rates as a sign that you send to bad lists. That reputation damage applies to your whole domain, not just the throwaway recipients.",
 			},
 			{
 				question: "Should I always block them?",
 				answer:
-					"Not necessarily. Blocking outright at signup is right for free tiers and trials, where throwaway addresses are used to farm accounts. For newsletters or content downloads, flagging and suppressing later is often enough — some people simply value their privacy.",
+					"Not necessarily. Blocking outright at signup is right for free tiers and trials, where throwaway addresses are used to farm accounts. For newsletters or content downloads, flagging and suppressing later is often enough. Some people simply value their privacy.",
 			},
 		],
 	},
@@ -489,7 +489,7 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "How accurate is the check?",
 				answer:
-					"Disposable matching is a list lookup: the domain is on the catalogue or it isn't. We also classify role prefixes and look up MX records. New temp-mail providers appear constantly, so a clear result means 'not currently known to be disposable' — not a guarantee.",
+					"Disposable matching is a list lookup: the domain is on the catalogue or it isn't. We also classify role prefixes and look up MX records. New temp-mail providers appear constantly, so a clear result means 'not currently known to be disposable.' It is not a guarantee.",
 			},
 			{
 				question: "Does this prove the mailbox exists?",
@@ -504,7 +504,7 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "Is a Gmail or Outlook address disposable?",
 				answer:
-					"No. Consumer mailboxes from Gmail, Outlook, Yahoo and similar providers are free, but they are persistent. They are flagged as free providers so you can apply your own policy — they are not treated as throwaway.",
+					"No. Consumer mailboxes from Gmail, Outlook, Yahoo and similar providers are free, but they are persistent. They are flagged as free providers so you can apply your own policy. They are not treated as throwaway.",
 			},
 		],
 	},
@@ -519,12 +519,12 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "Does this store the addresses I check?",
 				answer:
-					"Nothing is written to a database, added to a list, or used for marketing. Request logs may include the domain and verdict, never the mailbox name. The tool is free and needs no account.",
+					"Nothing is written to a database, added to a list, or used for marketing. Request logs may include the domain and verdict. They never include the mailbox name. The tool is free and needs no account.",
 			},
 			{
 				question: "Can I run this check from my own application?",
 				answer:
-					"Yes. Reloop is open-source email infrastructure, so you can run the same validation inside your own signup flow, self-host the whole stack, or use the hosted API. Nothing here is locked behind a proprietary service.",
+					"Yes. Reloop is open-source email infrastructure, so you can run the same validation inside your own signup flow, self-host the whole stack, or use the hosted API.",
 			},
 		],
 	},

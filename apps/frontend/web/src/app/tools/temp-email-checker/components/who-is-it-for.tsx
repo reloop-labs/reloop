@@ -71,7 +71,7 @@ export function WhoIsItFor() {
 					id="who-is-it-for-heading"
 					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Who is Reloop&rsquo;s temp email checker for.
+					Who the temp email checker is for.
 				</h2>
 				<p className="mt-4 max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
 					Anyone who needs to know if an address is real without ever probing

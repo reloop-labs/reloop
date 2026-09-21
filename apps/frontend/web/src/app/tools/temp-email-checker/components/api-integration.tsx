@@ -51,7 +51,7 @@ export function ApiIntegration() {
 					id="api-heading"
 					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Integrate this into the code today.
+					Add it to your signup flow.
 				</h2>
 			</div>
 

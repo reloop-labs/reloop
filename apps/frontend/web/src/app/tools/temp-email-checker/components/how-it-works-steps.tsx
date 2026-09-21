@@ -29,9 +29,9 @@ const FEATURES: FeatureItem[] = [
 	},
 	{
 		icon: Gift,
-		title: "Free for life, no catch",
+		title: "Free to use",
 		description:
-			"This checker is completely free — no signup, no credits, no expiry. Come back and use it as often as you need, for as long as you need.",
+			"This checker is free. It needs no signup and has no credits or expiry.",
 	},
 ];
 
@@ -50,7 +50,7 @@ export function BestFeatures() {
 					id="best-features-heading"
 					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Why Reloop is the best temp email checker.
+					Why use Reloop to check temp email.
 				</h2>
 			</div>
 
