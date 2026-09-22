@@ -131,9 +131,6 @@ export default function TempEmailCheckerPage() {
 					headlineLine1="Stop paying for throwaways emails."
 					subtext="Reloop automatically flags risky contacts before you waste time or money on them. Start with 3,000 free emails per month."
 					primaryLabel="Get started free"
-					secondaryLabel="See pricing"
-					secondaryHref="/pricing"
-					secondaryExternal={false}
 				/>
 				<div aria-hidden className="h-12 sm:h-16" />
 				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
