@@ -19,33 +19,23 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ComponentType } from "react";
-import { TempEmailTimerArt } from "../temp-email-checker/components/temp-email-timer-art";
-
-/**
- * Mini timer mark for the temp-email-checker card.
- * Same face + topper + hands as the OG/hero blueprint timer,
- * simplified to stay crisp at 20px (no grid or dimensions).
- */
-function TempTimerIcon({ className }: { className?: string }) {
-	return (
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			className={className}
-			aria-hidden="true"
-		>
-			<rect x="9.5" y="1.5" width="5" height="2.4" rx="0.8" />
-			<line x1="12" y1="3.9" x2="12" y2="5.4" />
-			<circle cx="12" cy="13.4" r="8" />
-			<line x1="12" y1="13.4" x2="12" y2="9" />
-			<line x1="12" y1="13.4" x2="15.4" y2="15" />
-		</svg>
-	);
-}
+import { ApiBlueprintArt } from "./art/api-art";
+import { AuthBlueprintArt } from "./art/auth-art";
+import { BimiBlueprintArt } from "./art/bimi-art";
+import { BlocklistBlueprintArt } from "./art/blocklist-art";
+import { DeliverabilityBlueprintArt } from "./art/deliverability-art";
+import { DnsBlueprintArt } from "./art/dns-art";
+import { DomainAgeBlueprintArt } from "./art/domain-age-art";
+import { HtmlEditorBlueprintArt } from "./art/html-editor-art";
+import { LookalikeBlueprintArt } from "./art/lookalike-art";
+import { ReputationBlueprintArt } from "./art/reputation-art";
+import { SpamWordsBlueprintArt } from "./art/spam-words-art";
+import { SpoofBlueprintArt } from "./art/spoof-art";
+import { SuggestBlueprintArt } from "./art/suggest-art";
+import { TempTimerIcon } from "./art/temp-timer-icon";
+import { TempEmailTimerArt } from "./art/timer-art";
+import { ValidatorBlueprintArt } from "./art/validator-art";
+import { WhoSendsBlueprintArt } from "./art/who-sends-art";
 
 export type ToolItem = {
 	title: string;
@@ -53,7 +43,7 @@ export type ToolItem = {
 	icon: ComponentType<{ className?: string }>;
 	path: string;
 	/** Render the full blueprint art panel instead of the icon box. */
-	art?: boolean;
+	art?: "timer" | "validator" | "deliverability" | "spoof" | "blocklist" | "dns" | "domain-age" | "who-sends" | "auth" | "reputation" | "lookalike" | "spam-words" | "bimi" | "html-editor" | "api" | "suggest";
 };
 
 export const ALL_TOOLS: ToolItem[] = [
@@ -63,6 +53,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Verify syntax, disposable domains, and active MX records to keep your email list clean.",
 		icon: MailCheck,
 		path: "/tools/email-validator",
+		art: "validator",
 	},
 	{
 		title: "Email Deliverability & Spam Tester",
@@ -70,6 +61,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Send a test email to analyze inbox placement, spam score, and SPF/DKIM alignment.",
 		icon: Send,
 		path: "/tools/deliverability-tester",
+		art: "deliverability",
 	},
 	{
 		title: "Email Spoofing & Phishing Checker",
@@ -77,6 +69,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Test whether unauthorized senders can forge your domain to deliver phishing emails.",
 		icon: ShieldAlert,
 		path: "/tools/spoof-checker",
+		art: "spoof",
 	},
 	{
 		title: "IP & Domain DNS Blocklist Checker",
@@ -84,6 +77,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Check your sending IP address and domain against 50+ public DNS blocklists in real time.",
 		icon: Ban,
 		path: "/tools/blocklist-checker",
+		art: "blocklist",
 	},
 	{
 		title: "DNS Lookup & Record Analyzer",
@@ -91,6 +85,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Inspect MX, SPF, DKIM, DMARC, and A records with syntax validation and live diagnostics.",
 		icon: Globe,
 		path: "/tools/dns-lookup",
+		art: "dns",
 	},
 	{
 		title: "Domain Age & Warmup Checker",
@@ -98,6 +93,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Check domain registration age and warmup safety to avoid cold-sending spam filters.",
 		icon: Calendar,
 		path: "/tools/domain-age",
+		art: "domain-age",
 	},
 	{
 		title: "Domain ESP & Email Sender Lookup",
@@ -105,6 +101,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Identify all third-party email service providers authorized to send from your domain.",
 		icon: Search,
 		path: "/tools/who-sends",
+		art: "who-sends",
 	},
 	{
 		title: "SPF, DKIM & DMARC Checker",
@@ -112,6 +109,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Validate email authentication records to guarantee proper sender alignment and security.",
 		icon: ShieldCheck,
 		path: "/tools/auth-checker",
+		art: "auth",
 	},
 	{
 		title: "Temp & Disposable Email Checker",
@@ -119,7 +117,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Detect throwaway inboxes and burner addresses before they bounce or skew signup metrics.",
 		icon: TempTimerIcon,
 		path: "/tools/temp-email-checker",
-		art: true,
+		art: "timer",
 	},
 	{
 		title: "Domain Reputation & Health Checker",
@@ -127,6 +125,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Evaluate your domain health score, spam placement risk, and mail configuration flaws.",
 		icon: Activity,
 		path: "/tools/domain-reputation-checker",
+		art: "reputation",
 	},
 	{
 		title: "Lookalike Domain & Phishing Scanner",
@@ -134,6 +133,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Detect registered typosquats and lookalike domains impersonating your brand online.",
 		icon: Eye,
 		path: "/tools/lookalike-watch",
+		art: "lookalike",
 	},
 	{
 		title: "Email Spam Words & Subject Checker",
@@ -141,6 +141,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Scan subject lines and body copy for spam trigger words that hurt inbox deliverability.",
 		icon: AlertTriangle,
 		path: "/tools/email-spam-words-checker",
+		art: "spam-words",
 	},
 	{
 		title: "BIMI & Brand Avatar Checker",
@@ -148,6 +149,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Verify your BIMI DNS record and SVG logo to display verified brand avatars in inboxes.",
 		icon: BadgeCheck,
 		path: "/tools/bimi-checker",
+		art: "bimi",
 	},
 	{
 		title: "Email HTML Template Editor",
@@ -155,6 +157,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Design, edit, and preview responsive HTML email templates across mobile and desktop.",
 		icon: Code2,
 		path: "/tools/email-html-editor",
+		art: "html-editor",
 	},
 	{
 		title: "Developer Tools & REST API",
@@ -162,6 +165,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Integrate real-time email verification and DNS lookups via our low-latency REST API.",
 		icon: Terminal,
 		path: "/docs/api",
+		art: "api",
 	},
 	{
 		title: "Suggest a New Tool",
@@ -169,6 +173,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Need an email or DNS utility that isn't listed here? Suggest a tool and we'll build it.",
 		icon: Sparkles,
 		path: "/contact",
+		art: "suggest",
 	},
 ];
 
@@ -190,6 +195,25 @@ export function getBorderClass(index: number, total: number) {
 		isLastRowDesktop ? "lg:border-b-0" : "lg:border-b",
 	);
 }
+
+const TOOL_ART = {
+	timer: TempEmailTimerArt,
+	validator: ValidatorBlueprintArt,
+	deliverability: DeliverabilityBlueprintArt,
+	spoof: SpoofBlueprintArt,
+	blocklist: BlocklistBlueprintArt,
+	dns: DnsBlueprintArt,
+	"domain-age": DomainAgeBlueprintArt,
+	"who-sends": WhoSendsBlueprintArt,
+	auth: AuthBlueprintArt,
+	reputation: ReputationBlueprintArt,
+	lookalike: LookalikeBlueprintArt,
+	"spam-words": SpamWordsBlueprintArt,
+	bimi: BimiBlueprintArt,
+	"html-editor": HtmlEditorBlueprintArt,
+	api: ApiBlueprintArt,
+	suggest: SuggestBlueprintArt,
+} as const;
 
 export function ToolsGrid() {
 	return (
@@ -215,7 +239,16 @@ export function ToolsGrid() {
 						<div>
 							{tool.art ? (
 								<div className="flex h-32 items-center justify-center overflow-hidden rounded-xl bg-[#246BF5] text-white dark:border dark:border-white/10 dark:bg-[#000]">
-									<TempEmailTimerArt className="h-full" />
+									{(() => {
+										const Art = TOOL_ART[tool.art];
+										return (
+											<Art
+												className={
+													tool.art === "timer" ? "h-full" : "h-full w-auto"
+												}
+											/>
+										);
+									})()}
 								</div>
 							) : (
 								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
