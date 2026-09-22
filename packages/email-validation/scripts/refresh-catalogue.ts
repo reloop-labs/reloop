@@ -6,6 +6,15 @@ const DOMAIN_SOURCES = [
 	"https://raw.githubusercontent.com/kslr/disposable-email-domains/master/list.txt",
 	"https://raw.githubusercontent.com/wesbos/burner-email-providers/master/emails.txt",
 	"https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf",
+	"https://raw.githubusercontent.com/email-check-app/disposable-email-providers/master/disposable-email-providers.json",
+	"https://raw.githubusercontent.com/sefinek/temp-email-domains/main/blacklist.txt",
+	"https://raw.githubusercontent.com/disposable/disposable-email-domains/master/domains.txt",
+	"https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/index.json",
+	"https://raw.githubusercontent.com/groundcat/disposable-email-domain-list/master/domains.txt",
+	"https://raw.githubusercontent.com/7c/fakefilter/main/txt/data.txt",
+	"https://raw.githubusercontent.com/micke/valid_email2/master/config/disposable_email_domains.txt",
+	"https://raw.githubusercontent.com/di/disposable-email-domains/master/source_data/disposable_email_blocklist.conf",
+	"https://raw.githubusercontent.com/willwhite/freemail/master/data/disposable.txt",
 ];
 
 const WILDCARD_SOURCES = [
@@ -14,10 +23,11 @@ const WILDCARD_SOURCES = [
 
 const EXCEPTION_SOURCES = [
 	"https://raw.githubusercontent.com/BillionVerify/disposable/main/data/exceptions.txt",
+	"https://raw.githubusercontent.com/groundcat/disposable-email-domain-list/master/allowlist.txt",
 ];
 
-const REQUEST_TIMEOUT_MS = 20_000;
-const MIN_DOMAINS_THRESHOLD = 150_000;
+const REQUEST_TIMEOUT_MS = 25_000;
+const MIN_DOMAINS_THRESHOLD = 200_000;
 
 const dryRun = process.argv.includes("--dry-run");
 
@@ -44,6 +54,25 @@ async function fetchSource(url: string): Promise<Set<string>> {
 		}
 
 		const contents = await response.text();
+		if (url.endsWith(".json")) {
+			try {
+				const parsed = JSON.parse(contents);
+				if (Array.isArray(parsed)) {
+					for (const item of parsed) {
+						if (typeof item === "string") {
+							const entry = normalizeEntry(item);
+							if (entry.length > 0 && !entry.startsWith("#")) {
+								entries.add(entry);
+							}
+						}
+					}
+					return entries;
+				}
+			} catch (jsonError) {
+				console.warn(`⚠️ ${url}: JSON parse failed — ${String(jsonError)}`);
+			}
+		}
+
 		for (const line of contents.split("\n")) {
 			const entry = normalizeEntry(line);
 			if (entry.length > 0 && !entry.startsWith("#")) {
@@ -124,11 +153,14 @@ function readLocalList(name: string): Set<string> {
 const localExceptions = readLocalList("exceptions.txt");
 const localFreeProviders = readLocalList("free-providers.txt");
 
-// Filter out known free providers and local exceptions from disposable domains
+// Filter out known free providers and exceptions from disposable domains
 for (const domain of localFreeProviders) {
 	nextDomains.delete(domain);
 }
 for (const domain of localExceptions) {
+	nextDomains.delete(domain);
+}
+for (const domain of nextExceptions) {
 	nextDomains.delete(domain);
 }
 
