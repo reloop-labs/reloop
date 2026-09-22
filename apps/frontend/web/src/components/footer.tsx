@@ -151,9 +151,7 @@ export const Footer = () => {
 				: pathname === "/features/email-marketing" ||
 						pathname?.startsWith("/features/email-marketing/")
 					? "orange"
-					: pathname === "/tools"
-						? "emerald"
-						: "default";
+					: "default";
 
 	return (
 		<footer className="w-full bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
