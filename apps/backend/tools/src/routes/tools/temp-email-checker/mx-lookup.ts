@@ -1,5 +1,6 @@
 import dns from "node:dns/promises";
 import { withDeadline } from "@be/tools/utils/deadline";
+import { isDisposableMxHost, isDisposableMxIp } from "@reloop/email-validation";
 
 const publicResolver = new dns.Resolver();
 publicResolver.setServers(["1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4"]);
@@ -105,4 +106,61 @@ export function detectSmtpProvider(mxRecords: string[]): string | null {
 		return "Reloop";
 	}
 	return null;
+}
+
+export type MxInspection = {
+	isDisposableMx: boolean;
+	reason?: "mx_host" | "mx_ip";
+	matchedHost?: string;
+	matchedIp?: string;
+};
+
+export async function inspectMxInfrastructure(
+	mxHosts: string[],
+): Promise<MxInspection> {
+	if (mxHosts.length === 0) return { isDisposableMx: false };
+
+	// 1. If it's a known verified provider (Google, Microsoft, Fastmail, Proton, Zoho, etc.), pass immediately
+	if (detectSmtpProvider(mxHosts) !== null) {
+		return { isDisposableMx: false };
+	}
+
+	// 2. Check if any MX host matches a known disposable mail exchange host or suffix
+	for (const host of mxHosts) {
+		if (isDisposableMxHost(host)) {
+			return {
+				isDisposableMx: true,
+				reason: "mx_host",
+				matchedHost: host,
+			};
+		}
+	}
+
+	// 3. Check if primary MX host resolves to a known disposable server IP
+	const primary = mxHosts[0];
+	if (primary) {
+		try {
+			const ips = await withDeadline(
+				publicResolver.resolve4(primary),
+				800,
+				"MX-IP",
+			);
+			if (Array.isArray(ips)) {
+				for (const ip of ips) {
+					if (isDisposableMxIp(ip)) {
+						return {
+							isDisposableMx: true,
+							reason: "mx_ip",
+							matchedHost: primary,
+							matchedIp: ip,
+						};
+					}
+				}
+			}
+		} catch {
+			// Fail open on DNS error/timeout
+		}
+	}
+
+	return { isDisposableMx: false };
 }

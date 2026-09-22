@@ -4,11 +4,17 @@ import { toolsConfig } from "@be/tools/tools.config";
 import { evaluate } from "@reloop/email-validation";
 import { scoreCheck } from "./check-score";
 import { type DnsblLookupResult, lookupDnsbl } from "./dnsbl-lookup";
-import { lookupMxRecords, type MxLookupResult } from "./mx-lookup";
+import {
+	inspectMxInfrastructure,
+	lookupMxRecords,
+	type MxInspection,
+	type MxLookupResult,
+} from "./mx-lookup";
 
 export type TempEmailCheckerDeps = {
 	lookupMx?: (domain: string) => Promise<MxLookupResult>;
 	lookupDnsbl?: (domain: string) => Promise<DnsblLookupResult>;
+	inspectMx?: (mxHosts: string[]) => Promise<MxInspection>;
 };
 
 export async function tempEmailCheckerController(
@@ -25,6 +31,7 @@ export async function tempEmailCheckerController(
 	const result = evaluate(trimmed);
 	const lookupMx = deps.lookupMx ?? lookupMxRecords;
 	const checkDnsbl = deps.lookupDnsbl ?? lookupDnsbl;
+	const checkMxInfra = deps.inspectMx ?? inspectMxInfrastructure;
 
 	const needsDnsbl =
 		result.domain !== null && !result.isDisposable && !result.isAllowlisted;
@@ -38,12 +45,25 @@ export async function tempEmailCheckerController(
 			: Promise.resolve({ listed: false, records: [] }),
 	]);
 
-	const isDisposable = result.isDisposable || dnsbl.listed;
-	const disposableMatch =
+	let isDisposable = result.isDisposable || dnsbl.listed;
+	let disposableMatch =
 		result.disposableMatch ??
 		(dnsbl.listed && result.domain !== null
 			? { kind: "exact" as const, domain: result.domain }
 			: null);
+
+	if (
+		!isDisposable &&
+		!result.isAllowlisted &&
+		mx.status === "ok" &&
+		mx.records.length > 0
+	) {
+		const mxInspection = await checkMxInfra(mx.records);
+		if (mxInspection.isDisposableMx && result.domain !== null) {
+			isDisposable = true;
+			disposableMatch = { kind: "exact" as const, domain: result.domain };
+		}
+	}
 
 	const signals = {
 		...result.signals,

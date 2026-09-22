@@ -33,6 +33,8 @@ export type Catalogue = {
 	allowlist: Set<string>;
 	freeProviders: Set<string>;
 	roleLocalParts: Set<string>;
+	disposableMx: Set<string>;
+	disposableMxIps: Set<string>;
 };
 
 let cached: Catalogue | null = null;
@@ -57,6 +59,11 @@ export function loadCatalogue(): Catalogue {
 		]),
 		freeProviders: new Set(readList("local/free-providers.txt")),
 		roleLocalParts: new Set(readList("local/role-local-parts.txt")),
+		disposableMx: new Set([
+			...readList("upstream/mx-domains.txt"),
+			...readList("local/mx-domains.txt"),
+		]),
+		disposableMxIps: new Set(readList("local/disposable-mx-ips.txt")),
 	};
 
 	return cached;
@@ -118,4 +125,18 @@ export function isFreeProvider(domain: string): boolean {
 
 export function isRoleLocalPart(localPart: string): boolean {
 	return loadCatalogue().roleLocalParts.has(localPart);
+}
+
+export function isDisposableMxHost(mxHost: string): boolean {
+	const catalogue = loadCatalogue();
+	const clean = mxHost.toLowerCase().trim().replace(/\.$/, "");
+	if (!clean) return false;
+	for (const suffix of suffixes(clean)) {
+		if (catalogue.disposableMx.has(suffix)) return true;
+	}
+	return false;
+}
+
+export function isDisposableMxIp(ip: string): boolean {
+	return loadCatalogue().disposableMxIps.has(ip.trim());
 }

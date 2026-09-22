@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import {
+	isDisposableMxHost,
+	isDisposableMxIp,
 	loadCatalogue,
 	matchDisposable,
 	resetCatalogue,
@@ -105,5 +107,36 @@ describe("catalogue loading", () => {
 			(domain) => evaluate(`someone@${domain}`).isDisposable,
 		);
 		expect(contradictions).toEqual([]);
+	});
+});
+
+describe("mx fingerprinting", () => {
+	test("identifies known disposable MX hosts and subdomains", () => {
+		expect(isDisposableMxHost("mail.guerrillamail.com")).toBe(true);
+		expect(isDisposableMxHost("mx1.1secmail.com")).toBe(true);
+		expect(isDisposableMxHost("smtp.yopmail.com")).toBe(true);
+		expect(isDisposableMxHost("mailinator.com")).toBe(true);
+	});
+
+	test("does not flag clean mail hosts as disposable", () => {
+		expect(isDisposableMxHost("aspmx.l.google.com")).toBe(false);
+		expect(isDisposableMxHost("outlook-com.olc.protection.outlook.com")).toBe(
+			false,
+		);
+		expect(isDisposableMxHost("mail.protonmail.ch")).toBe(false);
+		expect(isDisposableMxHost("inbound.reloop.sh")).toBe(false);
+	});
+
+	test("identifies known disposable mail server IPs", () => {
+		expect(isDisposableMxIp("134.199.178.234")).toBe(true);
+		expect(isDisposableMxIp("178.162.170.166")).toBe(true);
+		expect(isDisposableMxIp("178.32.61.35")).toBe(true);
+		expect(isDisposableMxIp("23.239.11.30")).toBe(true);
+		expect(isDisposableMxIp("87.98.164.155")).toBe(true);
+	});
+
+	test("does not flag regular server IPs as disposable", () => {
+		expect(isDisposableMxIp("142.250.190.26")).toBe(false); // Google
+		expect(isDisposableMxIp("127.0.0.1")).toBe(false);
 	});
 });

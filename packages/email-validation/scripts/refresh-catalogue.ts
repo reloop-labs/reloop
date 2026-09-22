@@ -26,6 +26,10 @@ const EXCEPTION_SOURCES = [
 	"https://raw.githubusercontent.com/groundcat/disposable-email-domain-list/master/allowlist.txt",
 ];
 
+const MX_SOURCES = [
+	"https://raw.githubusercontent.com/disposable/disposable-email-domains/master/domains_strict_mx.txt",
+];
+
 const REQUEST_TIMEOUT_MS = 25_000;
 const MIN_DOMAINS_THRESHOLD = 200_000;
 
@@ -119,11 +123,13 @@ function sample(values: string[], limit = 5): string {
 
 console.log("Fetching and aggregating multi-source disposable datasets...");
 
-const [nextDomains, nextWildcards, nextExceptions] = await Promise.all([
-	aggregateSources(DOMAIN_SOURCES),
-	aggregateSources(WILDCARD_SOURCES),
-	aggregateSources(EXCEPTION_SOURCES),
-]);
+const [nextDomains, nextWildcards, nextExceptions, nextMxDomains] =
+	await Promise.all([
+		aggregateSources(DOMAIN_SOURCES),
+		aggregateSources(WILDCARD_SOURCES),
+		aggregateSources(EXCEPTION_SOURCES),
+		aggregateSources(MX_SOURCES),
+	]);
 
 if (nextDomains.size < MIN_DOMAINS_THRESHOLD) {
 	console.error(
@@ -168,6 +174,7 @@ const datasets = [
 	{ name: "domains.txt", next: nextDomains },
 	{ name: "wildcards.txt", next: nextWildcards },
 	{ name: "exceptions.txt", next: nextExceptions },
+	{ name: "mx-domains.txt", next: nextMxDomains },
 ] as const;
 
 let changed = false;
@@ -190,7 +197,7 @@ for (const { name, next } of datasets) {
 	if (removed.length > 0) console.log(`    removed: ${sample(removed)}`);
 
 	if (!dryRun) {
-		const sortedList = [...next].sort().join("\n") + "\n";
+		const sortedList = `${[...next].sort().join("\n")}\n`;
 		writeFileSync(localPath(name), sortedList, "utf8");
 	}
 }

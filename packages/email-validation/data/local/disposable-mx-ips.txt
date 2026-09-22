@@ -1,0 +1,15 @@
+# Curated known disposable email infrastructure IP addresses
+# Temp-Mail (DigitalOcean mail cluster)
+134.199.178.234
+
+# Guerrilla Mail mail cluster
+178.162.170.166
+
+# 1secmail mail cluster
+178.32.61.35
+
+# Mailinator mail cluster
+23.239.11.30
+
+# Yopmail mail cluster
+87.98.164.155

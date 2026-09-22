@@ -245,3 +245,40 @@ describe("dnsbl integration", () => {
 		expect(result.riskScore).toBe(0.02);
 	});
 });
+
+describe("mx infrastructure fingerprinting integration", () => {
+	test("flags domain when MX host belongs to known disposable infrastructure", async () => {
+		const result = await tempEmailCheckerController(
+			"user@brand-new-stealth-domain.io",
+			{
+				lookupMx: mxOk("mx1.1secmail.com"),
+				lookupDnsbl: async () => ({ listed: false, records: [] }),
+			},
+		);
+
+		expect(result.verdict).toBe("disposable");
+		expect(result.isDisposable).toBe(true);
+		expect(result.confidence).toBe(0.999);
+		expect(result.riskScore).toBe(0.94);
+		expect(result.flags).toContain("DISPOSABLE_DOMAIN");
+		expect(result.flags).toContain("PUBLIC_INBOX_DETECTED");
+	});
+
+	test("flags domain when MX IP belongs to known disposable mail server cluster", async () => {
+		const result = await tempEmailCheckerController("user@vanity-domain.xyz", {
+			lookupMx: mxOk("mail.vanity-domain.xyz"),
+			lookupDnsbl: async () => ({ listed: false, records: [] }),
+			inspectMx: async () => ({
+				isDisposableMx: true,
+				reason: "mx_ip",
+				matchedIp: "134.199.178.234",
+			}),
+		});
+
+		expect(result.verdict).toBe("disposable");
+		expect(result.isDisposable).toBe(true);
+		expect(result.confidence).toBe(0.999);
+		expect(result.riskScore).toBe(0.94);
+		expect(result.flags).toContain("DISPOSABLE_DOMAIN");
+	});
+});

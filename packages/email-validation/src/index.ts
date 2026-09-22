@@ -1,5 +1,7 @@
 export {
 	type Catalogue,
+	isDisposableMxHost,
+	isDisposableMxIp,
 	isFreeProvider,
 	isRoleLocalPart,
 	loadCatalogue,
