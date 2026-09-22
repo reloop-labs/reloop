@@ -262,7 +262,7 @@ function ResultCardDetailed({
 		<div className="space-y-2 text-left text-xs">
 			{/* Unified Status Card */}
 			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.02]">
-				<div className="flex items-center justify-between gap-3 px-3.5 py-2 sm:px-4 sm:py-2.5">
+				<div className="flex items-center justify-between gap-3 px-3.5 py-2 pr-2.5! sm:px-4 sm:py-2.5">
 					<div className="flex min-w-0 items-center gap-2">
 						<Icon
 							name={status.icon}
@@ -313,9 +313,9 @@ function ResultCardDetailed({
 								shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }
 							}
 							transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-							className="overflow-hidden border-stroke-soft-100 border-t dark:border-white/10"
+							className="overflow-hidden"
 						>
-							<div className="p-2 sm:p-2.5">
+							<div className="p-2 pt-0! sm:p-2.5">
 								<div className="divide-y divide-stroke-soft-100/50 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
 									{result.displaySignals.map((item) => (
 										<SignalItem
