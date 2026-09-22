@@ -38,12 +38,17 @@ export async function tempEmailCheckerController(
 		mxStatus: mx.status,
 	});
 
+	const verdict =
+		mx.status === "empty" && result.verdict !== "disposable"
+			? "invalid"
+			: result.verdict;
+
 	return {
 		input: result.input,
 		kind: result.kind,
 		domain: result.domain,
 		unicodeDomain: result.unicodeDomain,
-		verdict: result.verdict,
+		verdict,
 		isValidSyntax: result.isValidSyntax,
 		syntaxFailure: result.syntaxFailure,
 		isDisposable: result.isDisposable,

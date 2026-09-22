@@ -74,14 +74,24 @@ function inferredScores(api: ApiCheckResponse): {
 	return { confidence: 0.99, riskScore: 0.02 };
 }
 
+function resolveVerdict(
+	apiVerdict: CheckVerdict,
+	flags: readonly ApiCheckFlag[],
+): CheckVerdict {
+	if (apiVerdict === "disposable") return "disposable";
+	if (hasFlag(flags, "NO_MX_RECORDS")) return "invalid";
+	return apiVerdict;
+}
+
 export function toPublicPayload(api: ApiCheckResponse): PublicCheckPayload {
 	const flags = inferredFlags(api);
 	const scores = inferredScores(api);
+	const verdict = resolveVerdict(api.verdict, flags);
 
 	return {
 		input: api.input,
 		domain: api.domain,
-		verdict: api.verdict,
+		verdict,
 		isDisposable: api.isDisposable,
 		mxRecords: Array.isArray(api.mxRecords) ? api.mxRecords : [],
 		confidence: scores.confidence,
@@ -90,8 +100,12 @@ export function toPublicPayload(api: ApiCheckResponse): PublicCheckPayload {
 	};
 }
 
-function confidenceLabel(verdict: CheckVerdict, confidence: number): string {
-	if (verdict === "invalid") return "Syntax Error";
+function confidenceLabel(
+	_verdict: CheckVerdict,
+	confidence: number,
+	flags?: readonly ApiCheckFlag[],
+): string {
+	if (flags && hasFlag(flags, "INVALID_SYNTAX")) return "Syntax Error";
 	return `${Math.round(confidence * 100)}% confidence`;
 }
 
@@ -128,7 +142,7 @@ function displaySignals(
 		{
 			label: "MX records",
 			value: noMx ? "None" : mxUnknown ? "Unknown" : "Found",
-			status: noMx ? "warn" : mxUnknown ? "neutral" : "pass",
+			status: noMx ? "fail" : mxUnknown ? "neutral" : "pass",
 		},
 		{
 			label: "Role prefix",
@@ -188,12 +202,12 @@ function copyFor(
 
 	if (noMx) {
 		return {
-			headline: "No disposable match",
+			headline: "No MX records found",
 			subtitle: "No MX records published",
 			summary: `${domain} is not on the disposable list, but DNS returned no MX records. Mail cannot be routed to a domain with no exchanger. ${DELIVERY_LIMIT}`,
 			recommendation:
-				"Do not send yet. Confirm the domain is supposed to receive mail.",
-			recommendationTone: "warn",
+				"This address cannot receive email because the domain has no MX records.",
+			recommendationTone: "fail",
 		};
 	}
 
@@ -229,9 +243,13 @@ export function toCheckResult(api: ApiCheckResponse): CheckResult {
 	return {
 		input: api.input,
 		domain: api.domain,
-		verdict: api.verdict,
+		verdict: rawJson.verdict,
 		...copy,
-		confidenceLabel: confidenceLabel(api.verdict, rawJson.confidence),
+		confidenceLabel: confidenceLabel(
+			rawJson.verdict,
+			rawJson.confidence,
+			rawJson.flags,
+		),
 		displaySignals: displaySignals(api, rawJson.flags),
 		rawJson,
 	};

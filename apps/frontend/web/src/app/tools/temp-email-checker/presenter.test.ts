@@ -128,12 +128,13 @@ describe("toCheckResult", () => {
 			}),
 		);
 
+		expect(result.verdict).toBe("invalid");
 		expect(result.subtitle).toBe("No MX records published");
-		expect(result.recommendationTone).toBe("warn");
+		expect(result.recommendationTone).toBe("fail");
 		expect(result.displaySignals[1]).toEqual({
 			label: "MX records",
 			value: "None",
-			status: "warn",
+			status: "fail",
 		});
 	});
 

@@ -18,7 +18,6 @@ import { CheckRequestError, runCheck } from "./check-api";
 import {
 	type CheckResult,
 	type CheckVerdict,
-	type RecommendationTone,
 	type SignalStatus,
 	toCheckResult,
 } from "./presenter";
@@ -179,23 +178,40 @@ const VERDICT_THEME: Record<
 	},
 	invalid: {
 		title: "INVALID",
-		dotColor: "bg-neutral-400",
-		titleClass: "text-neutral-500 dark:text-white/60",
-		badgeBg: "bg-neutral-500/[0.04] dark:bg-white/[0.04]",
-		badgeBorder: "border-neutral-500/20 dark:border-white/15",
+		dotColor: "bg-rose-500",
+		titleClass: "text-rose-500 dark:text-rose-400",
+		badgeBg: "bg-rose-500/[0.04] dark:bg-rose-500/[0.08]",
+		badgeBorder: "border-rose-500/20 dark:border-rose-500/30",
 	},
 };
 
-const REC_TONE: Record<
-	RecommendationTone,
-	{ icon: IconName; iconClass: string }
+const VERDICT_STATUS_CONFIG: Record<
+	CheckVerdict,
+	{
+		label: string;
+		icon: IconName;
+		iconClass: string;
+	}
 > = {
-	fail: { icon: "alert-triangle", iconClass: "text-rose-500" },
-	warn: { icon: "shield-alert", iconClass: "text-amber-500" },
-	pass: { icon: "check-circle", iconClass: "text-emerald-500" },
-	neutral: {
+	deliverable: {
+		label: "Valid email",
+		icon: "check-circle",
+		iconClass: "text-emerald-500",
+	},
+	disposable: {
+		label: "Disposable email",
+		icon: "alert-triangle",
+		iconClass: "text-rose-500",
+	},
+	risky: {
+		label: "Risky email",
+		icon: "shield-alert",
+		iconClass: "text-amber-500",
+	},
+	invalid: {
+		label: "Invalid email",
 		icon: "cross-circle",
-		iconClass: "text-text-sub-600 dark:text-white/50",
+		iconClass: "text-rose-500 dark:text-rose-400",
 	},
 };
 
@@ -249,12 +265,15 @@ function SignalItem({
 function ResultCardDetailed({
 	result,
 	onReset,
+	shouldReduceMotion,
 }: {
 	result: CheckResult;
 	onReset: () => void;
+	shouldReduceMotion?: boolean | null;
 }) {
 	const theme = VERDICT_THEME[result.verdict];
-	const recTone = REC_TONE[result.recommendationTone];
+	const status = VERDICT_STATUS_CONFIG[result.verdict];
+	const [showDetails, setShowDetails] = useState(false);
 	const [copiedLink, setCopiedLink] = useState(false);
 	const [copiedJson, setCopiedJson] = useState(false);
 
@@ -281,70 +300,104 @@ function ResultCardDetailed({
 	};
 
 	return (
-		<div className="space-y-3.5 text-left text-xs">
-			{/* Verdict Hero Card */}
-			<div
-				className={cn(
-					"rounded-xl border p-4 transition-colors sm:p-4.5",
-					theme.badgeBg,
-					theme.badgeBorder,
-				)}
-			>
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2">
-						<span className={cn("size-2 rounded-full", theme.dotColor)} />
-						<span
-							className={cn(
-								"font-bold font-mono text-[13px] uppercase tracking-wider",
-								theme.titleClass,
-							)}
-						>
-							{theme.title}
-						</span>
-					</div>
-					<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/40">
-						{result.confidenceLabel}
-					</span>
-				</div>
-			</div>
-			{/* Signals */}
-			<div className="overflow-hidden rounded-[14px] border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
-				<div className="px-3 pt-2 pb-2.5">
-					<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-						Signals & Detection
-					</p>
-				</div>
-
-				<div className="divide-y divide-stroke-soft-100/50 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
-					{result.displaySignals.map((item) => (
-						<SignalItem
-							key={item.label}
-							label={item.label}
-							value={item.value}
-							status={item.status}
+		<div className="space-y-2 text-left text-xs">
+			{/* Unified Status Card */}
+			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.02]">
+				<div className="flex items-center justify-between gap-3 px-3.5 py-2 sm:px-4 sm:py-2.5">
+					<div className="flex min-w-0 items-center gap-2.5">
+						<Icon
+							name={status.icon}
+							className={cn("size-4 shrink-0", status.iconClass)}
 						/>
-					))}
-				</div>
-			</div>
+						<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							{status.label}
+						</p>
+					</div>
 
-			{/* Recommendation */}
-			<div className="flex items-start gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3.5 sm:p-4 dark:border-white/10 dark:bg-white/[0.02]">
-				<Icon
-					name={recTone.icon}
-					className={cn("mt-0.5 size-4 shrink-0", recTone.iconClass)}
-				/>
-				<div className="min-w-0 flex-1 space-y-0.5 text-left">
-					<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
-						Recommendation
-					</p>
-					<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
-						{result.recommendation}
-					</p>
+					<button
+						type="button"
+						onClick={() => setShowDetails((prev) => !prev)}
+						aria-expanded={showDetails}
+						aria-controls="signals-detection-panel"
+						className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 font-medium text-text-sub-600 text-xs shadow-2xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+					>
+						<span>Details</span>
+						<Icon
+							name="chevron-down"
+							className={cn(
+								"size-3 transition-transform duration-200",
+								showDetails && "rotate-180",
+							)}
+						/>
+					</button>
 				</div>
+
+				{/* Signals & Detection (Expandable inside the card) */}
+				<AnimatePresence initial={false}>
+					{showDetails && (
+						<motion.div
+							id="signals-detection-panel"
+							key="signals-details"
+							initial={
+								shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }
+							}
+							animate={
+								shouldReduceMotion
+									? { opacity: 1 }
+									: { opacity: 1, height: "auto" }
+							}
+							exit={
+								shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }
+							}
+							transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+							className="overflow-hidden border-stroke-soft-100 border-t dark:border-white/10"
+						>
+							<div className="p-1 sm:p-1.5">
+								<div className="flex items-center justify-between px-3 pt-2 pb-2.5">
+									<div className="flex items-center gap-2">
+										<span
+											className={cn("size-2 rounded-full", theme.dotColor)}
+										/>
+										<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
+											Signals & Detection
+										</p>
+									</div>
+									<div className="flex items-center gap-2">
+										<span
+											className={cn(
+												"font-bold font-mono text-[10px] uppercase tracking-wider",
+												theme.titleClass,
+											)}
+										>
+											{theme.title}
+										</span>
+										<span className="text-text-soft-400 dark:text-white/30">
+											•
+										</span>
+										<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/40">
+											{result.confidenceLabel}
+										</span>
+									</div>
+								</div>
+
+								<div className="divide-y divide-stroke-soft-100/50 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
+									{result.displaySignals.map((item) => (
+										<SignalItem
+											key={item.label}
+											label={item.label}
+											value={item.value}
+											status={item.status}
+										/>
+									))}
+								</div>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 
 			{/* Actions Footer */}
-			<div className="flex flex-wrap items-center justify-between gap-2 px-2 pt-1 pb-1">
+			<div className="flex flex-wrap items-center justify-between gap-2 pr-4">
 				<div className="flex items-center gap-1.5">
 					<button
 						type="button"
@@ -464,7 +517,7 @@ export function CheckerPanel() {
 	return (
 		<div className="mx-auto w-full max-w-xl text-left font-sans">
 			{/* Input Check Zone */}
-			<form onSubmit={onSubmit} noValidate className="space-y-4">
+			<form onSubmit={onSubmit} noValidate className="space-y-2.5">
 				<FieldError field={field} messageClassName="text-xs leading-relaxed">
 					<div className="relative w-full">
 						<Input.Root
@@ -533,7 +586,10 @@ export function CheckerPanel() {
 											/>
 										) : (
 											<FancyButton.Icon className="mx-0 size-3.5 dark:text-black">
-												<Icon name="arrow-right" className="size-3.5 text-white dark:text-black" />
+												<Icon
+													name="arrow-right"
+													className="size-3.5 text-white dark:text-black"
+												/>
 											</FancyButton.Icon>
 										)}
 									</FancyButton.Root>
@@ -558,7 +614,11 @@ export function CheckerPanel() {
 							</p>
 						</div>
 					) : result ? (
-						<ResultCardDetailed result={result} onReset={handleReset} />
+						<ResultCardDetailed
+							result={result}
+							onReset={handleReset}
+							shouldReduceMotion={shouldReduceMotion}
+						/>
 					) : null}
 				</MorphSlot>
 			</form>

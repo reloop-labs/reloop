@@ -117,7 +117,7 @@ describe("tempEmailCheckerController", () => {
 		const result = await tempEmailCheckerController("alex@reloop.sh", {
 			lookupMx: mxEmpty,
 		});
-		expect(result.verdict).toBe("deliverable");
+		expect(result.verdict).toBe("invalid");
 		expect(result.mxRecords).toEqual([]);
 		expect(result.flags).toEqual(["NO_MX_RECORDS"]);
 		expect(result.confidence).toBe(0.7);
