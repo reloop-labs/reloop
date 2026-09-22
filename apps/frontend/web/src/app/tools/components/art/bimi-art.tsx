@@ -83,6 +83,30 @@ export function BimiBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
+				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				<rect
+					x="16"
+					y="24"
+					width="388"
+					height="292"
+					rx="28"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1"
+					strokeDasharray="6 5"
+					opacity="0.25"
+				/>
+				{/* CAD intersection ticks */}
+				<g opacity="0.35" stroke="currentColor" strokeWidth="1">
+					<path d="M 12 24 H 20 M 16 20 V 28" />
+					<path d="M 400 24 H 408 M 404 20 V 28" />
+					<path d="M 12 316 H 20 M 16 312 V 320" />
+					<path d="M 400 316 H 408 M 404 312 V 320" />
+					<path d="M 206 24 H 214 M 210 20 V 28" />
+					<path d="M 206 316 H 214 M 210 312 V 320" />
+					<path d="M 12 170 H 20 M 16 166 V 174" />
+					<path d="M 400 170 H 408 M 404 166 V 174" />
+				</g>
 				{/* ribbon tails — drawn first so the badge face covers the joint.
 				    Top edge (y=242) sits 20px inside the face so the
 				    joint is hidden, same layering as the timer topper. */}

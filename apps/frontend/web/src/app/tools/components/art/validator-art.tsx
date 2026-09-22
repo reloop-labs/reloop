@@ -83,13 +83,50 @@ export function ValidatorBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
+				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				<rect
+					x="16"
+					y="24"
+					width="388"
+					height="292"
+					rx="28"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1"
+					strokeDasharray="6 5"
+					opacity="0.25"
+				/>
+				{/* CAD intersection ticks */}
+				<g opacity="0.35" stroke="currentColor" strokeWidth="1">
+					<path d="M 12 24 H 20 M 16 20 V 28" />
+					<path d="M 400 24 H 408 M 404 20 V 28" />
+					<path d="M 12 316 H 20 M 16 312 V 320" />
+					<path d="M 400 316 H 408 M 404 312 V 320" />
+					<path d="M 206 24 H 214 M 210 20 V 28" />
+					<path d="M 206 316 H 214 M 210 312 V 320" />
+					<path d="M 12 170 H 20 M 16 166 V 174" />
+					<path d="M 400 170 H 408 M 404 166 V 174" />
+				</g>
+				{/* corner radius guides — dashed, matching the envelope R20 */}
+				<g
+					stroke="currentColor"
+					strokeWidth="1"
+					strokeDasharray="2 2"
+					opacity="0.3"
+					fill="none"
+				>
+					<circle cx="140" cy="128" r="20" />
+					<circle cx="280" cy="128" r="20" />
+					<circle cx="140" cy="202" r="20" />
+					<circle cx="280" cy="202" r="20" />
+				</g>
 				{/* envelope — centered on (210,170) */}
 				<rect
 					x="120"
 					y="108"
 					width="180"
 					height="114"
-					rx="14"
+					rx="20"
 					stroke="currentColor"
 					strokeWidth="4"
 					fill="currentColor"
@@ -114,6 +151,34 @@ export function ValidatorBlueprintArt({
 					strokeLinejoin="round"
 					fill="none"
 				/>
+				{/* CAD vector anchor handles — same style as the CTA blueprint */}
+				{[
+					{ id: "top-left", x: 120, y: 108 },
+					{ id: "top-right", x: 300, y: 108 },
+					{ id: "bottom-left", x: 120, y: 222 },
+					{ id: "bottom-right", x: 300, y: 222 },
+					{ id: "flap-apex", x: 210, y: 170 },
+				].map((node) => (
+					<g key={node.id}>
+						<rect
+							x={node.x - 8}
+							y={node.y - 8}
+							width="16"
+							height="16"
+							rx="3"
+							fill="#ffffff"
+							stroke="#1660f0"
+							strokeWidth="2.5"
+						/>
+						<rect
+							x={node.x - 2}
+							y={node.y - 2}
+							width="4"
+							height="4"
+							fill="#1660f0"
+						/>
+					</g>
+				))}
 				{/* dimension bars — identical to timer art */}
 				<g opacity="0.6">
 					<line

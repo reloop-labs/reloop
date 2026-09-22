@@ -83,6 +83,30 @@ export function SuggestBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
+				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				<rect
+					x="16"
+					y="24"
+					width="388"
+					height="292"
+					rx="28"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1"
+					strokeDasharray="6 5"
+					opacity="0.25"
+				/>
+				{/* CAD intersection ticks */}
+				<g opacity="0.35" stroke="currentColor" strokeWidth="1">
+					<path d="M 12 24 H 20 M 16 20 V 28" />
+					<path d="M 400 24 H 408 M 404 20 V 28" />
+					<path d="M 12 316 H 20 M 16 312 V 320" />
+					<path d="M 400 316 H 408 M 404 312 V 320" />
+					<path d="M 206 24 H 214 M 210 20 V 28" />
+					<path d="M 206 316 H 214 M 210 312 V 320" />
+					<path d="M 12 170 H 20 M 16 166 V 174" />
+					<path d="M 400 170 H 408 M 404 166 V 174" />
+				</g>
 				{/* hero sparkle — centered on (210,170) */}
 				<path
 					d="M 210 101 C 213 137 219 155 252 170 C 219 185 213 203 210 239 C 207 203 201 185 168 170 C 201 155 207 137 210 101 Z"
