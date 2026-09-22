@@ -37,7 +37,7 @@ describe("tempEmailCheckerController", () => {
 			verdict: "disposable",
 			isDisposable: true,
 			mxRecords: ["mx1.temp-mail.org", "mx2.temp-mail.org"],
-			confidence: 0.98,
+			confidence: 0.999,
 			riskScore: 0.94,
 			flags: ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"],
 		});
@@ -120,8 +120,8 @@ describe("tempEmailCheckerController", () => {
 		expect(result.verdict).toBe("invalid");
 		expect(result.mxRecords).toEqual([]);
 		expect(result.flags).toEqual(["NO_MX_RECORDS"]);
-		expect(result.confidence).toBe(0.7);
-		expect(result.riskScore).toBe(0.38);
+		expect(result.confidence).toBe(1);
+		expect(result.riskScore).toBe(1);
 	});
 
 	test("leaves scores unchanged when MX lookup errors", async () => {
@@ -148,7 +148,7 @@ describe("scoreCheck", () => {
 				mxStatus: "ok",
 			}),
 		).toEqual({
-			confidence: 0.98,
+			confidence: 0.999,
 			riskScore: 0.94,
 			flags: ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"],
 		});

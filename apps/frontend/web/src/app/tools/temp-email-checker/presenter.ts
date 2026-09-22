@@ -65,11 +65,11 @@ function inferredScores(api: ApiCheckResponse): {
 	confidence: number;
 	riskScore: number;
 } {
+	if (!api.isValidSyntax) return { confidence: 1, riskScore: 1 };
+	if (api.isDisposable) return { confidence: 0.999, riskScore: 0.94 };
 	if (typeof api.confidence === "number" && typeof api.riskScore === "number") {
 		return { confidence: api.confidence, riskScore: api.riskScore };
 	}
-	if (!api.isValidSyntax) return { confidence: 1, riskScore: 1 };
-	if (api.isDisposable) return { confidence: 0.98, riskScore: 0.94 };
 	if (api.isRoleAddress) return { confidence: 0.85, riskScore: 0.45 };
 	return { confidence: 0.99, riskScore: 0.02 };
 }
@@ -88,25 +88,40 @@ export function toPublicPayload(api: ApiCheckResponse): PublicCheckPayload {
 	const scores = inferredScores(api);
 	const verdict = resolveVerdict(api.verdict, flags);
 
+	const confidence =
+		verdict === "invalid"
+			? 1
+			: verdict === "disposable" || api.isDisposable
+				? 0.999
+				: scores.confidence;
+	const riskScore = verdict === "invalid" ? 1 : scores.riskScore;
+
 	return {
 		input: api.input,
 		domain: api.domain,
 		verdict,
 		isDisposable: api.isDisposable,
 		mxRecords: Array.isArray(api.mxRecords) ? api.mxRecords : [],
-		confidence: scores.confidence,
-		riskScore: scores.riskScore,
+		confidence,
+		riskScore,
 		flags,
 	};
 }
 
 function confidenceLabel(
-	_verdict: CheckVerdict,
+	verdict: CheckVerdict,
 	confidence: number,
-	flags?: readonly ApiCheckFlag[],
+	_flags?: readonly ApiCheckFlag[],
 ): string {
-	if (flags && hasFlag(flags, "INVALID_SYNTAX")) return "Syntax Error";
-	return `${Math.round(confidence * 100)}% confidence`;
+	if (verdict === "invalid" || confidence === 1) return "100% confidence";
+	if (verdict === "disposable" || confidence === 0.999)
+		return "99.9% confidence";
+
+	const pct = confidence * 100;
+	const formatted = Number.isInteger(pct)
+		? `${pct}`
+		: `${Number.parseFloat(pct.toFixed(1))}`;
+	return `${formatted}% confidence`;
 }
 
 function displaySignals(
@@ -115,13 +130,9 @@ function displaySignals(
 ): DisplaySignal[] {
 	if (!api.isValidSyntax) {
 		return [
-			{
-				label: "Disposable provider",
-				value: "Skipped",
-				status: "neutral",
-			},
-			{ label: "MX records", value: "Skipped", status: "neutral" },
-			{ label: "Role prefix", value: "Skipped", status: "neutral" },
+			{ label: "MX record", value: "---", status: "neutral" },
+			{ label: "Disposable provider", value: "---", status: "neutral" },
+			{ label: "Role prefix", value: "---", status: "neutral" },
 			{ label: "Email syntax", value: "Malformed", status: "fail" },
 		];
 	}
@@ -133,16 +144,46 @@ function displaySignals(
 		!noMx && (!Array.isArray(api.mxRecords) || api.mxRecords.length === 0);
 	const isAddress = api.kind === "email";
 
+	if (noMx) {
+		return [
+			{
+				label: "MX record",
+				value: "Not found",
+				status: "fail",
+			},
+			{ label: "Disposable provider", value: "---", status: "neutral" },
+			{ label: "Role prefix", value: "---", status: "neutral" },
+			{ label: "Email syntax", value: "---", status: "neutral" },
+		];
+	}
+
+	if (disposable) {
+		return [
+			{
+				label: "MX record",
+				value: mxUnknown ? "Unknown" : "Found",
+				status: mxUnknown ? "neutral" : "pass",
+			},
+			{
+				label: "Disposable provider",
+				value: "Yes",
+				status: "fail",
+			},
+			{ label: "Role prefix", value: "---", status: "neutral" },
+			{ label: "Email syntax", value: "---", status: "neutral" },
+		];
+	}
+
 	return [
 		{
-			label: "Disposable provider",
-			value: disposable ? "Detected" : "Clean",
-			status: disposable ? "fail" : "pass",
+			label: "MX record",
+			value: mxUnknown ? "Unknown" : "Found",
+			status: mxUnknown ? "neutral" : "pass",
 		},
 		{
-			label: "MX records",
-			value: noMx ? "None" : mxUnknown ? "Unknown" : "Found",
-			status: noMx ? "fail" : mxUnknown ? "neutral" : "pass",
+			label: "Disposable provider",
+			value: "No",
+			status: "pass",
 		},
 		{
 			label: "Role prefix",

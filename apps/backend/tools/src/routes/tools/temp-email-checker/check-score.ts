@@ -65,27 +65,27 @@ function scoresFor(
 	if (input.isDisposable) {
 		const wildcard = input.disposableMatch?.kind === "wildcard";
 		return {
-			confidence: wildcard ? 0.92 : 0.98,
+			confidence: 0.999,
 			riskScore: wildcard ? 0.9 : 0.94,
 		};
+	}
+
+	if (input.mxStatus === "empty") {
+		return { confidence: 1, riskScore: 1 };
 	}
 
 	if (input.isRoleAddress) {
 		return {
 			confidence: 0.85,
-			riskScore: input.mxStatus === "empty" ? 0.55 : 0.45,
+			riskScore: 0.45,
 		};
 	}
 
 	if (input.isAllowlisted) {
 		return {
 			confidence: 0.95,
-			riskScore: input.mxStatus === "empty" ? 0.22 : 0.08,
+			riskScore: 0.08,
 		};
-	}
-
-	if (input.mxStatus === "empty") {
-		return { confidence: 0.7, riskScore: 0.38 };
 	}
 
 	if (input.isFreeProvider) {

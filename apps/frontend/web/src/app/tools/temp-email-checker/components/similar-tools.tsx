@@ -67,5 +67,3 @@ export function SimilarTools() {
 		</section>
 	);
 }
-
-

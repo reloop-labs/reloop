@@ -46,7 +46,7 @@ describe("toPublicPayload", () => {
 					verdict: "disposable",
 					isDisposable: true,
 					mxRecords: ["mx1.temp-mail.org", "mx2.temp-mail.org"],
-					confidence: 0.98,
+					confidence: 0.999,
 					riskScore: 0.94,
 					flags: ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"],
 				}),
@@ -57,7 +57,7 @@ describe("toPublicPayload", () => {
 			verdict: "disposable",
 			isDisposable: true,
 			mxRecords: ["mx1.temp-mail.org", "mx2.temp-mail.org"],
-			confidence: 0.98,
+			confidence: 0.999,
 			riskScore: 0.94,
 			flags: ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"],
 		});
@@ -71,7 +71,7 @@ describe("toCheckResult", () => {
 				input: "alex.hunter@temp-mail.org",
 				domain: "temp-mail.org",
 				verdict: "disposable",
-				confidence: 0.98,
+				confidence: 0.999,
 				riskScore: 0.94,
 				mxRecords: ["mx1.temp-mail.org", "mx2.temp-mail.org"],
 				flags: ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"],
@@ -79,12 +79,12 @@ describe("toCheckResult", () => {
 		);
 
 		expect(result.verdict).toBe("disposable");
-		expect(result.confidenceLabel).toBe("98% confidence");
+		expect(result.confidenceLabel).toBe("99.9% confidence");
 		expect(result.displaySignals).toEqual([
-			{ label: "Disposable provider", value: "Detected", status: "fail" },
-			{ label: "MX records", value: "Found", status: "pass" },
-			{ label: "Role prefix", value: "None", status: "pass" },
-			{ label: "Email syntax", value: "Valid", status: "pass" },
+			{ label: "MX record", value: "Found", status: "pass" },
+			{ label: "Disposable provider", value: "Yes", status: "fail" },
+			{ label: "Role prefix", value: "---", status: "neutral" },
+			{ label: "Email syntax", value: "---", status: "neutral" },
 		]);
 		expect(result.rawJson.flags).toEqual([
 			"DISPOSABLE_DOMAIN",
@@ -108,8 +108,8 @@ describe("toCheckResult", () => {
 
 		expect(result.confidenceLabel).toBe("85% confidence");
 		expect(result.displaySignals).toEqual([
-			{ label: "Disposable provider", value: "Clean", status: "pass" },
-			{ label: "MX records", value: "Found", status: "pass" },
+			{ label: "MX record", value: "Found", status: "pass" },
+			{ label: "Disposable provider", value: "No", status: "pass" },
 			{ label: "Role prefix", value: "Shared", status: "warn" },
 			{ label: "Email syntax", value: "Valid", status: "pass" },
 		]);
@@ -129,13 +129,14 @@ describe("toCheckResult", () => {
 		);
 
 		expect(result.verdict).toBe("invalid");
+		expect(result.confidenceLabel).toBe("100% confidence");
 		expect(result.subtitle).toBe("No MX records published");
-		expect(result.recommendationTone).toBe("fail");
-		expect(result.displaySignals[1]).toEqual({
-			label: "MX records",
-			value: "None",
-			status: "fail",
-		});
+		expect(result.displaySignals).toEqual([
+			{ label: "MX record", value: "Not found", status: "fail" },
+			{ label: "Disposable provider", value: "---", status: "neutral" },
+			{ label: "Role prefix", value: "---", status: "neutral" },
+			{ label: "Email syntax", value: "---", status: "neutral" },
+		]);
 	});
 
 	test("marks MX as unknown when lookup returned no hosts and no empty flag", () => {
@@ -152,8 +153,8 @@ describe("toCheckResult", () => {
 		);
 
 		expect(result.subtitle).toBe("MX lookup did not return hosts");
-		expect(result.displaySignals[1]).toEqual({
-			label: "MX records",
+		expect(result.displaySignals[0]).toEqual({
+			label: "MX record",
 			value: "Unknown",
 			status: "neutral",
 		});
@@ -173,13 +174,13 @@ describe("toCheckResult", () => {
 			}),
 		);
 
-		expect(result.confidenceLabel).toBe("Syntax Error");
-		expect(result.recommendationTone).toBe("neutral");
-		expect(result.displaySignals[3]).toEqual({
-			label: "Email syntax",
-			value: "Malformed",
-			status: "fail",
-		});
+		expect(result.confidenceLabel).toBe("100% confidence");
+		expect(result.displaySignals).toEqual([
+			{ label: "MX record", value: "---", status: "neutral" },
+			{ label: "Disposable provider", value: "---", status: "neutral" },
+			{ label: "Role prefix", value: "---", status: "neutral" },
+			{ label: "Email syntax", value: "Malformed", status: "fail" },
+		]);
 		expect(result.rawJson.mxRecords).toEqual([]);
 	});
 });

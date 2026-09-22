@@ -145,46 +145,6 @@ function MorphSlot({
 	);
 }
 
-const VERDICT_THEME: Record<
-	CheckVerdict,
-	{
-		title: string;
-		dotColor: string;
-		titleClass: string;
-		badgeBg: string;
-		badgeBorder: string;
-	}
-> = {
-	disposable: {
-		title: "TEMPORARY EMAIL",
-		dotColor: "bg-rose-500",
-		titleClass: "text-rose-500 dark:text-rose-400",
-		badgeBg: "bg-rose-500/[0.04] dark:bg-rose-500/[0.08]",
-		badgeBorder: "border-rose-500/20 dark:border-rose-500/30",
-	},
-	risky: {
-		title: "RISKY",
-		dotColor: "bg-amber-500",
-		titleClass: "text-amber-500 dark:text-amber-400",
-		badgeBg: "bg-amber-500/[0.04] dark:bg-amber-500/[0.08]",
-		badgeBorder: "border-amber-500/20 dark:border-amber-500/30",
-	},
-	deliverable: {
-		title: "CLEAR",
-		dotColor: "bg-emerald-500",
-		titleClass: "text-emerald-600 dark:text-emerald-400",
-		badgeBg: "bg-emerald-500/[0.04] dark:bg-emerald-500/[0.08]",
-		badgeBorder: "border-emerald-500/20 dark:border-emerald-500/30",
-	},
-	invalid: {
-		title: "INVALID",
-		dotColor: "bg-rose-500",
-		titleClass: "text-rose-500 dark:text-rose-400",
-		badgeBg: "bg-rose-500/[0.04] dark:bg-rose-500/[0.08]",
-		badgeBorder: "border-rose-500/20 dark:border-rose-500/30",
-	},
-};
-
 const VERDICT_STATUS_CONFIG: Record<
 	CheckVerdict,
 	{
@@ -271,7 +231,6 @@ function ResultCardDetailed({
 	onReset: () => void;
 	shouldReduceMotion?: boolean | null;
 }) {
-	const theme = VERDICT_THEME[result.verdict];
 	const status = VERDICT_STATUS_CONFIG[result.verdict];
 	const [showDetails, setShowDetails] = useState(false);
 	const [copiedLink, setCopiedLink] = useState(false);
@@ -304,7 +263,7 @@ function ResultCardDetailed({
 			{/* Unified Status Card */}
 			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.02]">
 				<div className="flex items-center justify-between gap-3 px-3.5 py-2 sm:px-4 sm:py-2.5">
-					<div className="flex min-w-0 items-center gap-2.5">
+					<div className="flex min-w-0 items-center gap-2">
 						<Icon
 							name={status.icon}
 							className={cn("size-4 shrink-0", status.iconClass)}
@@ -312,6 +271,10 @@ function ResultCardDetailed({
 						<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							{status.label}
 						</p>
+						<span className="text-text-soft-400 dark:text-white/30">•</span>
+						<span className="font-normal text-text-sub-600 text-xs dark:text-white/50">
+							{result.confidenceLabel}
+						</span>
 					</div>
 
 					<button
@@ -352,34 +315,7 @@ function ResultCardDetailed({
 							transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
 							className="overflow-hidden border-stroke-soft-100 border-t dark:border-white/10"
 						>
-							<div className="p-1 sm:p-1.5">
-								<div className="flex items-center justify-between px-3 pt-2 pb-2.5">
-									<div className="flex items-center gap-2">
-										<span
-											className={cn("size-2 rounded-full", theme.dotColor)}
-										/>
-										<p className="font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-wider dark:text-white">
-											Signals & Detection
-										</p>
-									</div>
-									<div className="flex items-center gap-2">
-										<span
-											className={cn(
-												"font-bold font-mono text-[10px] uppercase tracking-wider",
-												theme.titleClass,
-											)}
-										>
-											{theme.title}
-										</span>
-										<span className="text-text-soft-400 dark:text-white/30">
-											•
-										</span>
-										<span className="font-mono text-[11px] text-text-soft-400 dark:text-white/40">
-											{result.confidenceLabel}
-										</span>
-									</div>
-								</div>
-
+							<div className="p-2 sm:p-2.5">
 								<div className="divide-y divide-stroke-soft-100/50 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
 									{result.displaySignals.map((item) => (
 										<SignalItem
