@@ -5,7 +5,7 @@ export const alt =
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const BLUE = "#246BF5";
+const BG = "#000000";
 
 export default async function OpenGraphImage() {
 	const [interRegularFont, interMediumFont, interBoldFont, interExtraBoldFont] =
@@ -41,7 +41,7 @@ export default async function OpenGraphImage() {
 				flexDirection: "row",
 				alignItems: "center",
 				justifyContent: "space-between",
-				backgroundColor: BLUE,
+				backgroundColor: BG,
 				padding: "64px 72px",
 				fontFamily: "Inter, sans-serif",
 				position: "relative",
@@ -56,7 +56,7 @@ export default async function OpenGraphImage() {
 					left: "12px",
 					right: "12px",
 					bottom: "12px",
-					border: "1px solid rgba(255,255,255,0.35)",
+					border: "1px solid rgba(255,255,255,0.2)",
 					borderRadius: "28px",
 					pointerEvents: "none",
 				}}
@@ -462,7 +462,7 @@ export default async function OpenGraphImage() {
 					xmlns="http://www.w3.org/2000/svg"
 				>
 					{/* faint grid */}
-					<g stroke="white" strokeWidth="1" opacity="0.2">
+					<g stroke="white" strokeWidth="1" opacity="0.12">
 						<line x1="10" y1="20" x2="10" y2="320" />
 						<line x1="50" y1="20" x2="50" y2="320" />
 						<line x1="90" y1="20" x2="90" y2="320" />
@@ -481,12 +481,12 @@ export default async function OpenGraphImage() {
 						<line x1="0" y1="290" x2="420" y2="290" />
 					</g>
 					{/* dotted drafting guides */}
-					<g stroke="white" strokeWidth="1" fill="none" opacity="0.25">
+					<g stroke="white" strokeWidth="1" fill="none" opacity="0.1">
 						<circle cx="210" cy="170" r="140" strokeDasharray="3 4" />
 						<circle cx="210" cy="170" r="48" strokeDasharray="2 3" />
 					</g>
 					{/* diagonal construction rays */}
-					<g stroke="white" strokeWidth="1" opacity="0.16">
+					<g stroke="white" strokeWidth="1" opacity="0.1">
 						<line x1="60" y1="20" x2="360" y2="320" />
 						<line x1="360" y1="20" x2="60" y2="320" />
 						<line
@@ -495,7 +495,7 @@ export default async function OpenGraphImage() {
 							x2="210"
 							y2="260"
 							strokeDasharray="4 4"
-							opacity="0.7"
+							opacity="0.16"
 						/>
 						<line
 							x1="390"
@@ -503,11 +503,16 @@ export default async function OpenGraphImage() {
 							x2="210"
 							y2="260"
 							strokeDasharray="4 4"
-							opacity="0.7"
+							opacity="0.16"
 						/>
 					</g>
 					{/* center axes */}
-					<g stroke="white" strokeWidth="1" strokeDasharray="6 4" opacity="0.4">
+					<g
+						stroke="white"
+						strokeWidth="1"
+						strokeDasharray="6 4"
+						opacity="0.15"
+					>
 						<line x1="210" y1="8" x2="210" y2="312" />
 						<line x1="16" y1="170" x2="404" y2="170" />
 					</g>
@@ -518,7 +523,7 @@ export default async function OpenGraphImage() {
 						r="125"
 						stroke="white"
 						strokeWidth="1"
-						opacity="0.25"
+						opacity="0.1"
 					/>
 					<circle
 						cx="210"
@@ -527,42 +532,40 @@ export default async function OpenGraphImage() {
 						stroke="white"
 						strokeWidth="1"
 						strokeDasharray="4 4"
-						opacity="0.25"
+						opacity="0.1"
 					/>
 
 					{/* open source aperture guidelines */}
-					<g stroke="white" strokeWidth="1" strokeDasharray="3 3" opacity="0.35">
-						<line x1="210" y1="170" x2="160" y2="40" />
-						<line x1="210" y1="170" x2="260" y2="40" />
+					<g stroke="white" strokeWidth="1" strokeDasharray="3 3" opacity="0.1">
+						<line x1="210" y1="170" x2="160" y2="300" />
+						<line x1="210" y1="170" x2="260" y2="300" />
 					</g>
 
 					{/* Open Source Icon in the center */}
 					<g transform="translate(210, 170)">
-						<g transform="rotate(180)">
-							<g transform="scale(5.75)">
-								<g transform="translate(-16, -16)">
-									<path
-										opacity="0.16"
-										d="M-0.136 16.708c0.152-8.765 6.287-15.005 13.797-16.015 8.959-1.199 16.495 4.895 17.943 12.979 1.375 7.667-2.839 14.844-9.787 17.688-0.599 0.244-0.927 0.109-1.156-0.5l-3.453-8.969c-0.197-0.527-0.063-0.855 0.453-1.088 1.563-0.709 2.536-1.896 2.797-3.6 0.411-2.64-1.5-5.077-4.161-5.307-2.423-0.235-4.609 1.453-5 3.853-0.339 2.131 0.713 4.115 2.697 5.016 0.62 0.281 0.745 0.557 0.505 1.188l-3.469 9.031c-0.167 0.443-0.531 0.6-1 0.417-3.661-1.432-6.667-4.167-8.437-7.677-1.609-3.177-1.624-5.661-1.729-7.021z"
-										fill="white"
-									/>
-									<path
-										fillRule="evenodd"
-										clipRule="evenodd"
-										d="M1.213 16.584c0.027 0.427 0.041 0.921 0.084 1.427 0.405 4.64 3.197 9.26 8.452 11.817 0.209 0.093 0.287 0.052 0.365-0.145 0.959-2.527 1.927-5.052 2.901-7.579 0.083-0.208 0.041-0.307-0.152-0.427-2.041-1.287-3.057-3.131-2.943-5.552 0.063-1.391 0.6-2.615 1.537-3.636 1.932-2.109 4.968-2.568 7.453-1.135 2.052 1.187 3.197 3.484 2.916 5.839-0.235 1.968-1.244 3.479-2.953 4.5-0.172 0.104-0.224 0.187-0.145 0.389 0.979 2.532 1.953 5.063 2.916 7.595 0.079 0.203 0.157 0.244 0.36 0.145 2.297-1.068 4.208-2.599 5.688-4.64 2.244-3.115 3.171-6.579 2.728-10.391-0.88-7.584-7.703-13.865-16.489-12.781-6.844 0.839-12.604 6.615-12.719 14.573z"
-										stroke="white"
-										strokeWidth="0.85"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										fill="rgba(255,255,255,0.06)"
-									/>
-								</g>
+						<g transform="scale(5.75)">
+							<g transform="translate(-16, -16)">
+								<path
+									opacity="0.1"
+									d="M-0.136 16.708c0.152-8.765 6.287-15.005 13.797-16.015 8.959-1.199 16.495 4.895 17.943 12.979 1.375 7.667-2.839 14.844-9.787 17.688-0.599 0.244-0.927 0.109-1.156-0.5l-3.453-8.969c-0.197-0.527-0.063-0.855 0.453-1.088 1.563-0.709 2.536-1.896 2.797-3.6 0.411-2.64-1.5-5.077-4.161-5.307-2.423-0.235-4.609 1.453-5 3.853-0.339 2.131 0.713 4.115 2.697 5.016 0.62 0.281 0.745 0.557 0.505 1.188l-3.469 9.031c-0.167 0.443-0.531 0.6-1 0.417-3.661-1.432-6.667-4.167-8.437-7.677-1.609-3.177-1.624-5.661-1.729-7.021z"
+									fill="white"
+								/>
+								<path
+									fillRule="evenodd"
+									clipRule="evenodd"
+									d="M1.213 16.584c0.027 0.427 0.041 0.921 0.084 1.427 0.405 4.64 3.197 9.26 8.452 11.817 0.209 0.093 0.287 0.052 0.365-0.145 0.959-2.527 1.927-5.052 2.901-7.579 0.083-0.208 0.041-0.307-0.152-0.427-2.041-1.287-3.057-3.131-2.943-5.552 0.063-1.391 0.6-2.615 1.537-3.636 1.932-2.109 4.968-2.568 7.453-1.135 2.052 1.187 3.197 3.484 2.916 5.839-0.235 1.968-1.244 3.479-2.953 4.5-0.172 0.104-0.224 0.187-0.145 0.389 0.979 2.532 1.953 5.063 2.916 7.595 0.079 0.203 0.157 0.244 0.36 0.145 2.297-1.068 4.208-2.599 5.688-4.64 2.244-3.115 3.171-6.579 2.728-10.391-0.88-7.584-7.703-13.865-16.489-12.781-6.844 0.839-12.604 6.615-12.719 14.573z"
+									stroke="white"
+									strokeWidth="0.85"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									fill="rgba(255,255,255,0.05)"
+								/>
 							</g>
 						</g>
 					</g>
 
 					{/* top width dimension bar — broken for the label */}
-					<g opacity="0.75">
+					<g opacity="0.35">
 						<line
 							x1="118"
 							y1="40"
@@ -586,7 +589,7 @@ export default async function OpenGraphImage() {
 						/>
 					</g>
 					{/* right height dimension bar — broken for the label */}
-					<g opacity="0.75">
+					<g opacity="0.35">
 						<line
 							x1="330"
 							y1="78"
@@ -608,14 +611,6 @@ export default async function OpenGraphImage() {
 							stroke="white"
 							strokeWidth="1"
 						/>
-					</g>
-					{/* CAD anchor nodes */}
-					<g fill="white">
-						<rect x="204" y="72" width="12" height="12" rx="2" />
-						<rect x="296" y="164" width="12" height="12" rx="2" />
-						<rect x="204" y="256" width="12" height="12" rx="2" />
-						<rect x="112" y="164" width="12" height="12" rx="2" />
-						<rect x="204" y="164" width="12" height="12" rx="2" />
 					</g>
 				</svg>
 			</div>
