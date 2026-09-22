@@ -136,7 +136,7 @@ export default function TempEmailCheckerPage() {
 					secondaryHref="/pricing"
 					secondaryExternal={false}
 				/>
-				<div aria-hidden className="h-16 sm:h-24" />
+				<div aria-hidden className="h-12 sm:h-16" />
 				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
 					<FaqSection
 						items={faqGroups.flatMap((g) => g.items)}
