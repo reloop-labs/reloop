@@ -45,13 +45,13 @@ export function ApiIntegration() {
 		<section id="api" aria-labelledby="api-heading" className="w-full">
 			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
 				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					Use it in code
+					API Integration
 				</p>
 				<h2
 					id="api-heading"
 					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
 				>
-					Add it to your signup flow.
+					Integrate today in your code.
 				</h2>
 			</div>
 

@@ -145,7 +145,7 @@ export function WasteCalculator() {
 						</p>
 					</div>
 
-					<div className="relative overflow-hidden rounded-2xl bg-[#256bf5] p-5 sm:p-6">
+					<div className="relative overflow-hidden rounded-2xl bg-[#246BF5] p-5 sm:p-6">
 						<div
 							aria-hidden="true"
 							className="pointer-events-none absolute inset-[6px] rounded-[12px] border border-white/25"
@@ -155,10 +155,15 @@ export function WasteCalculator() {
 								Stop paying for throwaways.
 							</p>
 							<p className="mt-1.5 text-[13px] text-white/85 leading-relaxed">
-								Reloop flags <span className="font-mono">isDisposable</span>{" "}
-								at signup — same checker, built into the platform. Send
-								3,000 free/mo, then from $10/50k. SES-style pricing, no
-								sales call.
+								When you add a contact, flag it as disposable with the
+								same checker — no separate tool needed. Send 3,000
+								free/mo.{" "}
+								<Link
+									href="/pricing"
+									className="underline underline-offset-2 hover:text-white"
+								>
+									Learn more about pricing
+								</Link>
 							</p>
 							<Link
 								href="/dashboard/signup"
