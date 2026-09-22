@@ -1,7 +1,7 @@
 import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { PixelBlast } from "@reloop/web/components/pixel-blast";
-import { getSiteUrl, socialImage } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { OpenSourceFaq } from "./components/open-source-faq";
 import { OpenSourceSection } from "./components/open-source-section";
@@ -34,7 +34,6 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: socialTitle,
 		description: pageDescription,
-		images: [socialImage],
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -43,7 +42,6 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: socialTitle,
 		description: pageDescription,
-		images: [socialImage.url],
 	},
 };
 
