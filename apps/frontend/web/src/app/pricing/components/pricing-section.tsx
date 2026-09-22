@@ -699,11 +699,11 @@ function PlanCheckmark({ className }: { className?: string }) {
 	return (
 		<svg
 			fill="none"
-			height="20"
+			height="24"
 			viewBox="0 0 20 20"
-			width="20"
+			width="24"
 			xmlns="http://www.w3.org/2000/svg"
-			className={cn("text-primary-base", className)}
+			className={cn("text-primary-base dark:text-emerald-500", className)}
 			style={
 				{
 					"--color-blue-accent": "currentColor",
@@ -716,7 +716,7 @@ function PlanCheckmark({ className }: { className?: string }) {
 				cx="10"
 				cy="10"
 				fill="var(--color-blue-accent)"
-				fillOpacity="0.08"
+				fillOpacity="0.1"
 				r="8"
 			/>
 			<path
