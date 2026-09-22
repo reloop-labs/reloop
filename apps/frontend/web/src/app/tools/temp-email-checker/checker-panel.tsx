@@ -8,6 +8,7 @@ import * as Input from "@reloop/ui/input";
 import { LoadingDot } from "@reloop/ui/loading-dot";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
+	type ClipboardEvent,
 	type FormEvent,
 	type ReactNode,
 	useEffect,
@@ -427,6 +428,22 @@ export function CheckerPanel() {
 		void run(value);
 	};
 
+	const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+		if (isPending) return;
+		const pasted = e.clipboardData.getData("text").trim();
+		if (!pasted) return;
+
+		const validity = validateCheckerInput(pasted);
+		if (validity.ok) {
+			e.preventDefault();
+			setValue(pasted);
+			if (hasFieldError) field.clear();
+			setResult(null);
+			setError(null);
+			void run(pasted);
+		}
+	};
+
 	const handleReset = () => {
 		setResult(null);
 		setError(null);
@@ -477,6 +494,7 @@ export function CheckerPanel() {
 									autoCapitalize="none"
 									spellCheck={false}
 									value={value}
+									onPaste={handlePaste}
 									onChange={(e) => {
 										setValue(e.target.value);
 										if (hasFieldError) field.clear();
