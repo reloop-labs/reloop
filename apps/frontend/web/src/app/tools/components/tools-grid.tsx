@@ -241,15 +241,7 @@ export function ToolsGrid() {
 								<div className="flex h-32 items-center justify-center overflow-hidden rounded-xl bg-[#246BF5] text-white dark:border dark:border-white/10 dark:bg-[#000]">
 									{(() => {
 										const Art = TOOL_ART[tool.art];
-										return (
-											<Art
-												className={
-													tool.art === "timer" || tool.art === "bimi"
-														? "h-full"
-														: "h-full w-auto"
-												}
-											/>
-										);
+										return <Art className="h-full" />;
 									})()}
 								</div>
 							) : (

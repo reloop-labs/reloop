@@ -83,37 +83,41 @@ export function BimiBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* ribbon tails — drawn first so the badge face covers the joint */}
+				{/* ribbon tails — drawn first so the badge face covers the joint.
+				    Top edge (y=242) sits 20px inside the face so the
+				    joint is hidden, same layering as the timer topper. */}
 				<path
-					d="M 160 212 L 134 280 L 174 262 L 210 290 L 246 262 L 286 280 L 260 212"
+					d="M 160 242 L 136 308 L 176 290 L 210 312 L 244 290 L 284 308 L 260 242"
 					stroke="currentColor"
 					strokeWidth="4"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					fill="none"
 				/>
-				{/* badge face — same top edge (y=78) and stroke as the timer face */}
+				{/* badge face — same center (210,170) and radius (92) as the
+				    timer face, so every construction circle stays concentric */}
 				<circle
 					cx="210"
-					cy="158"
-					r="80"
+					cy="170"
+					r="92"
 					stroke="currentColor"
 					strokeWidth="4"
 					fill="currentColor"
 					fillOpacity="0.04"
 				/>
-				{/* inner ring — same weight as the timer tick marks */}
+				{/* inner ring — concentric with the dotted r48 guide and the
+				    dashed r70 construction circle, same weight as timer ticks */}
 				<circle
 					cx="210"
-					cy="158"
-					r="48"
+					cy="170"
+					r="56"
 					stroke="currentColor"
 					strokeWidth="3"
 					fill="none"
 				/>
-				{/* check — same weight and caps as the timer hands */}
+				{/* check — centered on (210,170), same weight/caps as timer hands */}
 				<path
-					d="M 189 158 L 205 174 L 233 139"
+					d="M 188 170 L 204 186 L 234 150"
 					stroke="currentColor"
 					strokeWidth="5"
 					strokeLinecap="round"
