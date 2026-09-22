@@ -1,7 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import { BlueprintCta } from "@reloop/web/components/landing/blueprint-cta";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
-import { Check } from "lucide-react";
 import { ToolsGrid } from "./components/tools-grid";
 import { ToolsHeroBlast } from "./components/tools-hero-blast";
 
@@ -61,22 +60,9 @@ export default function ToolsIndexPage() {
 						</span>
 					</h1>
 
-					<div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:mt-7">
-						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[13px] text-text-sub-600 shadow-2xs dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70">
-							<Check
-								className="size-3.5 text-blue-600 dark:text-blue-400"
-								strokeWidth={2.5}
-							/>
-							No sign up required
-						</span>
-						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[13px] text-text-sub-600 shadow-2xs dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70">
-							<Check
-								className="size-3.5 text-blue-600 dark:text-blue-400"
-								strokeWidth={2.5}
-							/>
-							Free for lifetime
-						</span>
-					</div>
+					<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
+						No sign up required · Free for lifetime
+					</p>
 				</div>
 			</header>
 

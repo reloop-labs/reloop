@@ -406,7 +406,7 @@ export function ShortcutsPage() {
 										key={`${group.id}-${sc.name}-${index}`}
 										className={cn(
 											"flex items-center justify-between gap-3 border-stroke-soft-100 border-b px-1 py-2.5 dark:border-white/5",
-											"transition-colors duration-150 ease-out",
+											"ease-out",
 											"hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]",
 										)}
 									>

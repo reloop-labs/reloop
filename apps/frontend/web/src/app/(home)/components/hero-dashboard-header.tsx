@@ -22,7 +22,7 @@ export function HeroDashboardHeader() {
 				</span>
 				<button
 					type="button"
-					className="flex items-center gap-1.5 rounded-lg px-1.5 py-1 text-left transition-colors duration-150 hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.06]"
+					className="flex items-center gap-1.5 rounded-lg px-1.5 py-1 text-left hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.06]"
 				>
 					<span className="flex size-5 items-center justify-center rounded-md bg-amber-100 font-medium text-[10px] text-amber-900 dark:bg-amber-400/20 dark:text-amber-200">
 						A
@@ -39,13 +39,13 @@ export function HeroDashboardHeader() {
 			<div className="flex items-center gap-1.5">
 				<button
 					type="button"
-					className="hidden h-7 items-center rounded-lg px-2 text-[12px] text-text-sub-600 transition-colors duration-150 hover:bg-bg-weak-50 hover:text-text-strong-950 sm:inline-flex dark:text-white/50 dark:hover:bg-white/[0.04] dark:hover:text-white"
+					className="hidden h-7 items-center rounded-lg px-2 text-[12px] text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 sm:inline-flex dark:text-white/50 dark:hover:bg-white/[0.04] dark:hover:text-white"
 				>
 					Copy prompt
 				</button>
 				<button
 					type="button"
-					className="hidden h-7 items-center gap-1 rounded-lg px-2 text-[12px] text-text-sub-600 transition-colors duration-150 hover:bg-bg-weak-50 hover:text-text-strong-950 sm:inline-flex dark:text-white/50 dark:hover:bg-white/[0.04] dark:hover:text-white"
+					className="hidden h-7 items-center gap-1 rounded-lg px-2 text-[12px] text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 sm:inline-flex dark:text-white/50 dark:hover:bg-white/[0.04] dark:hover:text-white"
 				>
 					<Icon name="question" className="size-3.5" />
 					Support

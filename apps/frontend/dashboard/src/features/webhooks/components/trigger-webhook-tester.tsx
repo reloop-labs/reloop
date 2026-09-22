@@ -513,7 +513,7 @@ export const TriggerWebhookTester = ({
 										>
 											<span
 												className={cn(
-													"mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-150 ease-out",
+													"mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ease-out",
 													isSelected
 														? "border-text-strong-950 bg-text-strong-950 dark:border-white dark:bg-white"
 														: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50",

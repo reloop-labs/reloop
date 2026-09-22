@@ -839,7 +839,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 												}
 											}}
 											className={cn(
-												"group/row grid w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left transition-colors duration-150",
+												"group/row grid w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left",
 												ROW_GRID,
 												"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:bg-bg-weak-50/50",
 												isRowActive &&

@@ -716,7 +716,7 @@ Instructions:
 										risk{" "}
 										<strong
 											className={cn(
-												"ml-1 font-bold text-[16px] leading-none transition-colors duration-150",
+												"ml-1 font-bold text-[16px] leading-none",
 												analysis || isAnalyzing
 													? displayedRiskScore >= SPAM_THRESHOLD
 														? "text-rose-500 dark:text-rose-400"
@@ -738,7 +738,7 @@ Instructions:
 											<span
 												key={`base-bar-${i}`}
 												className={cn(
-													"h-7 w-[3.5px] rounded-full transition-colors duration-150 sm:w-[4px]",
+													"h-7 w-[3.5px] rounded-full sm:w-[4px]",
 													isPastSpamZone
 														? "bg-rose-500/15 dark:bg-rose-500/20"
 														: "bg-neutral-200/80 dark:bg-white/10",

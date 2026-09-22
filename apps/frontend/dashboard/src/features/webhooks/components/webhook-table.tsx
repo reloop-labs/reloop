@@ -635,7 +635,7 @@ export const WebhookTable = ({
 										}
 									}}
 									className={cn(
-										`group/row grid w-full cursor-pointer ${GRID} items-center px-4 py-2.5 text-left transition-colors duration-150`,
+										`group/row grid w-full cursor-pointer ${GRID} items-center px-4 py-2.5 text-left`,
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:bg-bg-weak-50/50",
 										isRowActive && "bg-bg-weak-50/50",
 									)}

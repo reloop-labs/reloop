@@ -64,7 +64,7 @@ export const ThreadSavedDraftBar = ({
 			<button
 				type="button"
 				onClick={onDiscard}
-				className="inline-flex h-7 shrink-0 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)] active:scale-[0.97]"
+				className="inline-flex h-7 shrink-0 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)] active:scale-[0.97]"
 			>
 				Discard
 			</button>

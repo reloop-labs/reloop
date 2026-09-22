@@ -301,7 +301,7 @@ export default function EmailSystem() {
 											type="button"
 											onClick={handleParentClick}
 											className={cn(
-												"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] transition-colors duration-150 focus:outline-hidden lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
+												"relative w-full shrink-0 px-3.5 py-2 text-left font-medium text-[15px] tracking-[-0.01em] focus:outline-hidden lg:py-2 lg:pr-6 lg:pl-8 lg:text-[17px]",
 												selected
 													? "text-text-strong-950 dark:text-white"
 													: "text-text-soft-400 hover:text-text-sub-600 dark:text-white/30 dark:hover:text-white/60",
@@ -312,7 +312,7 @@ export default function EmailSystem() {
 												<motion.span
 													layoutId="email-system-active-indicator"
 													className={cn(
-														"-left-[1.5px] pointer-events-none absolute top-1.5 bottom-1.5 hidden w-0.5 transition-colors duration-150 lg:block",
+														"-left-[1.5px] pointer-events-none absolute top-1.5 bottom-1.5 hidden w-0.5 lg:block",
 														theme.indicator,
 													)}
 													transition={
@@ -429,7 +429,7 @@ export default function EmailSystem() {
 																				type="button"
 																				onClick={handleSubClick}
 																				className={cn(
-																					"group relative flex h-[34px] w-full items-center pr-3 pl-6 text-left text-[13.5px] transition-colors duration-150 focus:outline-hidden",
+																					"group relative flex h-[34px] w-full items-center pr-3 pl-6 text-left text-[13.5px] focus:outline-hidden",
 																					isSubActive
 																						? "font-semibold text-text-strong-950 dark:text-white"
 																						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
@@ -439,7 +439,7 @@ export default function EmailSystem() {
 																				<SubItemIcon
 																					icon={sub.icon}
 																					className={cn(
-																						"mr-2 size-3.5 shrink-0 transition-colors duration-150",
+																						"mr-2 size-3.5 shrink-0",
 																						isSubActive
 																							? theme.iconActive
 																							: theme.iconInactive,

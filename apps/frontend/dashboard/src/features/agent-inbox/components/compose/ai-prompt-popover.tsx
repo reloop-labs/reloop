@@ -105,7 +105,7 @@ export const AiPromptPopover = ({
 								type="button"
 								onClick={() => setTone(option.value)}
 								className={cn(
-									"h-6 rounded-md px-2 font-medium text-[11px] transition-colors duration-150 ease-out",
+									"h-6 rounded-md px-2 font-medium text-[11px] ease-out",
 									tone === option.value
 										? "bg-mail-foreground text-panel-light dark:bg-panel-light dark:text-mail-foreground"
 										: "text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",

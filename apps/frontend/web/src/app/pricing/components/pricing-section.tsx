@@ -936,7 +936,7 @@ function ComparisonTable({
 							>
 								<div
 									className={cn(
-										"flex min-h-[60px] items-center border-stroke-soft-100 border-b px-5 py-4 transition-colors duration-150 sm:px-7 lg:px-9 dark:border-white/[0.07]",
+										"flex min-h-[60px] items-center border-stroke-soft-100 border-b px-5 py-4 sm:px-7 lg:px-9 dark:border-white/[0.07]",
 										"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
 									)}
 								>
@@ -969,7 +969,7 @@ function ComparisonTable({
 										<div
 											key={plan.id}
 											className={cn(
-												"flex min-h-[60px] items-center justify-center border-stroke-soft-100 border-b border-l px-4 py-4 text-center transition-colors duration-150 dark:border-white/[0.07]",
+												"flex min-h-[60px] items-center justify-center border-stroke-soft-100 border-b border-l px-4 py-4 text-center dark:border-white/[0.07]",
 												"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
 												active &&
 													"bg-bg-weak-50/40 group-hover/row:bg-bg-weak-50/90 dark:bg-white/[0.02] dark:group-hover/row:bg-white/[0.05]",

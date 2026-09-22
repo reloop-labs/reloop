@@ -40,7 +40,7 @@ export function FaqGrid({
 										type="button"
 										onClick={() => setOpen(isOpen ? null : faq.question)}
 										aria-expanded={isOpen}
-										className="flex min-h-[60px] w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left transition-colors duration-150 hover:bg-bg-weak-50/70 sm:px-6 md:px-8 dark:hover:bg-white/[0.03]"
+										className="flex min-h-[60px] w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left hover:bg-bg-weak-50/70 sm:px-6 md:px-8 dark:hover:bg-white/[0.03]"
 									>
 										<span className="font-medium text-[15px] text-text-strong-950 leading-snug sm:text-[16px] dark:text-white">
 											{faq.question}

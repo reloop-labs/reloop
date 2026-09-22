@@ -149,7 +149,7 @@ export function HeroDashboardSidebar({
 											<Icon
 												name={item.icon}
 												className={cn(
-													"relative z-10 size-4 shrink-0 transition-colors duration-150",
+													"relative z-10 size-4 shrink-0",
 													active
 														? "text-text-strong-950 dark:text-white"
 														: isHovered
@@ -159,7 +159,7 @@ export function HeroDashboardSidebar({
 											/>
 											<span
 												className={cn(
-													"relative z-10 truncate font-medium text-[13px] transition-colors duration-150",
+													"relative z-10 truncate font-medium text-[13px]",
 													active
 														? "text-text-strong-950 dark:text-white"
 														: isHovered

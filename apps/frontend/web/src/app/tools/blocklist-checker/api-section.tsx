@@ -526,7 +526,7 @@ export function ApiSection() {
 								onClick={() => setActiveSlug(lang.slug)}
 								onPointerEnter={() => setHoveredTabIdx(index)}
 								className={cn(
-									"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs transition-colors duration-150 ease-[cubic-bezier(0.23,1,0.32,1)]",
+									"relative z-10 inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs ease-[cubic-bezier(0.23,1,0.32,1)]",
 									!mounted && isActive
 										? "bg-text-strong-950 text-white shadow-[0_1.5px_0_0_#1a1a1a,inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-white dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.08),inset_0_0.5px_0_0_rgba(255,255,255,0.28)]"
 										: showActiveLabel

@@ -130,7 +130,7 @@ function SmtpLanguagePills({
 						onPointerEnter={() => setHoveredTabIdx(index)}
 						onPointerLeave={() => setHoveredTabIdx(undefined)}
 						className={cn(
-							"relative z-10 flex shrink-0 items-center gap-2 px-3 py-2 font-medium text-sm transition-colors duration-150",
+							"relative z-10 flex shrink-0 items-center gap-2 px-3 py-2 font-medium text-sm",
 							isActive
 								? "text-text-strong-950 dark:text-white"
 								: "text-text-sub-600 dark:text-white/70",
@@ -140,7 +140,7 @@ function SmtpLanguagePills({
 						<svg
 							role="img"
 							viewBox="0 0 24 24"
-							className="size-3.5 shrink-0 transition-colors duration-150"
+							className="size-3.5 shrink-0"
 							fill="currentColor"
 							xmlns="http://www.w3.org/2000/svg"
 							style={{

@@ -223,7 +223,7 @@ export const InboxNavUser = ({
 											}}
 											className={cn(
 												"relative z-10 flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 text-left",
-												"transition-colors duration-150",
+												"",
 												!currentRect &&
 													hoverIdx === idx &&
 													"bg-neutral-alpha-10",
@@ -278,7 +278,7 @@ export const InboxNavUser = ({
 											}}
 											className={cn(
 												"relative z-10 flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2.5 text-left",
-												"transition-colors duration-150",
+												"",
 												!currentRect &&
 													hoverIdx === addIdx &&
 													"bg-neutral-alpha-10",

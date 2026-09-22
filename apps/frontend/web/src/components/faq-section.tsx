@@ -67,7 +67,7 @@ export function FaqSection({
 					aria-expanded={isOpen}
 					aria-controls={panelId}
 					onClick={() => setOpenKey(isOpen ? null : key)}
-					className="t-acc-head flex min-h-[60px] w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left transition-colors duration-150 hover:bg-bg-weak-50/70 focus-visible:bg-bg-weak-50/70 focus-visible:outline-none sm:px-6 lg:px-8 dark:focus-visible:bg-white/[0.03] dark:hover:bg-white/[0.03]"
+					className="t-acc-head flex min-h-[60px] w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left hover:bg-bg-weak-50/70 focus-visible:bg-bg-weak-50/70 focus-visible:outline-none sm:px-6 lg:px-8 dark:focus-visible:bg-white/[0.03] dark:hover:bg-white/[0.03]"
 				>
 					<span className="font-medium text-[15px] text-text-strong-950 leading-snug dark:text-white">
 						{faq.question}
@@ -139,7 +139,7 @@ export function FaqSection({
 						id={`${id}-${group.id ?? gi}`}
 						className={cn(
 							FAQ_GRID,
-							"scroll-mt-24 border-t border-stroke-soft-100 dark:border-white/10",
+							"scroll-mt-24 border-stroke-soft-100 border-t dark:border-white/10",
 						)}
 					>
 						{/* Left title — sticky while its questions scroll */}

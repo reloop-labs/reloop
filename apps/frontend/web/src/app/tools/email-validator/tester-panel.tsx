@@ -425,7 +425,7 @@ export function TesterPanel() {
 								type="button"
 								onClick={() => setActiveTab(tab.id)}
 								onPointerEnter={() => setHoveredTab(tab.id)}
-								className="relative z-10 flex cursor-pointer select-none items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium text-xs transition-colors duration-150"
+								className="relative z-10 flex cursor-pointer select-none items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium text-xs"
 							>
 								{/* Active solid animated pill in Reloop grey */}
 								{isActive && (

@@ -117,7 +117,7 @@ export const DNSRecordTableMinimal = ({
 											handleCopy(record.recordType, `type-${index}`)
 										}
 										className={cn(
-											"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs transition-colors duration-150 ease-out",
+											"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs ease-out",
 											copiedId === `type-${index}`
 												? "bg-success-alpha-10 text-success-dark dark:bg-success-alpha-20"
 												: "bg-neutral-alpha-10 text-text-strong-950 hover:bg-neutral-alpha-20 dark:bg-neutral-alpha-16 hover:dark:bg-neutral-alpha-24",

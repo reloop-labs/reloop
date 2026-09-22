@@ -36,7 +36,7 @@ export const CopyableDnsValue = React.forwardRef<
 		>
 			<span
 				className={cn(
-					"min-w-0 flex-1 select-none truncate text-xs transition-colors duration-150 ease-out",
+					"min-w-0 flex-1 select-none truncate text-xs ease-out",
 					mono ? "font-mono" : "font-medium",
 					copied
 						? "text-success-dark"

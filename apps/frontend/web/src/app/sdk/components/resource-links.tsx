@@ -337,7 +337,7 @@ export function ResourceLinks({
 		<div className={cn("flex flex-col gap-2", className)}>
 			{links.map((link) => {
 				const itemClassName =
-					"inline-flex items-center gap-2 font-medium text-[13px] text-text-strong-950 transition-colors duration-150 hover:text-text-sub-600 dark:text-white dark:hover:text-white/70";
+					"inline-flex items-center gap-2 font-medium text-[13px] text-text-strong-950  hover:text-text-sub-600 dark:text-white dark:hover:text-white/70";
 
 				const content = (
 					<>

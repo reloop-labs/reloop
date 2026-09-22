@@ -437,7 +437,7 @@ export const ApiDetailsDrawer = ({
 									onPointerEnter={() => setHoveredTabIdx(index)}
 									onPointerLeave={() => setHoveredTabIdx(undefined)}
 									className={cn(
-										"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-[17px] transition-colors duration-150",
+										"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-[17px]",
 										isActive
 											? "text-text-strong-950 dark:text-white"
 											: "text-text-sub-600 dark:text-white/70",
@@ -447,7 +447,7 @@ export const ApiDetailsDrawer = ({
 									{icon && (
 										<BrandLanguageIcon
 											icon={icon}
-											className="size-3.5 shrink-0 transition-colors duration-150"
+											className="size-3.5 shrink-0"
 										/>
 									)}
 									{lang.label}
