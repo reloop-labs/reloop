@@ -128,9 +128,9 @@ export default function TempEmailCheckerPage() {
 				<SimilarTools />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<TempEmailCta
-					headlineLine1="Stop paying for throwaways."
-					headlineLine2="Send with Reloop."
-					subtext="When you add a contact, flag it as disposable with the same checker — no separate tool needed. Send 3,000 free/mo."
+					headlineLine1="Stop paying for throwaways emails."
+					headlineLine2="Send email with Reloop."
+					subtext="When you add a contact, flag it as disposable with the same checker no separate tool needed. Send 3,000 free/mo."
 					primaryLabel="Get started free"
 					secondaryLabel="See pricing"
 					secondaryHref="/pricing"
