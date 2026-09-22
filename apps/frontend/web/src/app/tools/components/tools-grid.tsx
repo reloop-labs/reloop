@@ -245,29 +245,23 @@ export function ToolsGrid() {
 									})()}
 								</div>
 							) : (
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-neutral-800 dark:bg-white/[0.05] dark:text-white">
 									<IconComponent className="h-5 w-5 stroke-[1.75]" />
 								</div>
 							)}
 
-								<div className="mt-5 flex items-start gap-2.5">
-									<span
-										className="mt-1 h-3.5 w-[2px] shrink-0 rounded-full bg-blue-600 dark:bg-blue-500"
-										aria-hidden="true"
-									/>
-									<h3 className="font-semibold text-[15px] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:text-blue-600 sm:text-[15.5px] dark:text-white dark:group-hover:text-blue-400">
-										{tool.title}
-									</h3>
-								</div>
+								<h3 className="mt-5 font-semibold text-[15px] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:text-primary-base sm:text-[15.5px] dark:text-white dark:group-hover:text-white">
+									{tool.title}
+								</h3>
 
 								<p className="mt-2.5 line-clamp-2 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">
 									{tool.description}
 								</p>
 							</div>
 
-							<div className="mt-5 flex items-center gap-1.5 font-medium text-[13px] text-blue-600 dark:text-blue-400">
+							<div className="mt-5 flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/55 dark:group-hover:text-white">
 								<span>Try now</span>
-								<ArrowRight className="h-3.5 w-3.5" />
+								<ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
 							</div>
 						</Link>
 					);
