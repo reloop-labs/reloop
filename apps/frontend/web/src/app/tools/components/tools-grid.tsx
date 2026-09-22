@@ -232,7 +232,7 @@ export function ToolsGrid() {
 							key={tool.title}
 							href={tool.path}
 							className={cn(
-								"group flex flex-col justify-between border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-neutral-50/70 sm:px-6 sm:py-7 lg:px-7 lg:py-8 dark:border-white/10 dark:hover:bg-white/[0.02]",
+								"group flex flex-col justify-between border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 sm:py-7 lg:px-7 lg:py-8 dark:border-white/10 dark:hover:bg-white/[0.04]",
 								borderClass,
 							)}
 						>
