@@ -79,7 +79,7 @@ export default function RootLayout({
 				>{`var l=document.createElement('link');l.rel='manifest';l.href='/manifest.json';document.head.appendChild(l)`}</Script>
 			</head>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-bg-white-0 antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-[#fff] antialiased dark:bg-black`}
 				style={{ fontFamily: "var(--font-inter), sans-serif" }}
 			>
 				<PostHogProvider>

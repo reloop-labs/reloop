@@ -37,17 +37,22 @@
 	--border: #1f1f1f;
 }
 
+html,
+body {
+	background-color: #fff;
+}
+
 html.dark,
 body.dark,
 .dark body {
-	background-color: #131313;
+	background-color: #000;
 }
 
-/* Ensure all dark-mode background utilities use the new #131313 color */
+/* Ensure all dark-mode background utilities use true black #000 */
 .dark .dark\:bg-black,
 .dark.dark\:bg-black,
 :is(.dark, .dark *) .dark\:bg-black {
-	background-color: #131313 !important;
+	background-color: #000 !important;
 }
 
 /* Ensure all dark-mode borders and dividers use #1F1F1F */

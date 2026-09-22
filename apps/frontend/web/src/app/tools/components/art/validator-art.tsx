@@ -141,12 +141,12 @@ export function ValidatorBlueprintArt({
 					strokeLinejoin="round"
 					fill="none"
 				/>
-				{/* verified badge disc */}
-				<circle cx="276" cy="206" r="30" fill="#ffffff" />
+				{/* verified badge — smaller, inside the bottom-right corner guide */}
+				<circle cx="280" cy="202" r="13" fill="#ffffff" />
 				<path
-					d="M 262 206 L 273 217 L 291 198"
+					d="M 274 202 L 279 207 L 287 197"
 					stroke="#246BF5"
-					strokeWidth="5"
+					strokeWidth="3"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					fill="none"
