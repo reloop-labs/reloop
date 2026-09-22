@@ -101,12 +101,12 @@ const AboutPage = () => {
 
 							<div className="space-y-1.5">
 								<p>
-									<span className="bg-primary-base box-decoration-clone px-1 py-0.5 text-white leading-[1.9]">
+									<span className="dark:!bg-white dark:!text-black bg-primary-base box-decoration-clone px-1 py-0.5 text-white leading-[1.9]">
 										But inbox placement doesn&apos;t come from secrets.
 									</span>
 								</p>
 								<p>
-									<span className="bg-primary-base box-decoration-clone px-1 py-0.5 text-white leading-[1.9]">
+									<span className="dark:!bg-white dark:!text-black bg-primary-base box-decoration-clone px-1 py-0.5 text-white leading-[1.9]">
 										It comes from a system that warms, watches, and backs off
 										for you.
 									</span>
@@ -124,22 +124,22 @@ const AboutPage = () => {
 
 							{/* selected-frame card */}
 							<div className="pt-4 pb-6">
-								<div className="relative rotate-[1.2deg] border border-primary-base/90 bg-bg-white-0 p-6 sm:p-7 dark:bg-[#0a0a0a]">
+								<div className="dark:!border-neutral-200 relative rotate-[1.2deg] border border-primary-base/90 bg-bg-white-0 p-6 sm:p-7 dark:bg-[#0a0a0a]">
 									<span
 										aria-hidden
-										className="-top-1 -left-1 absolute size-2 border border-primary-base bg-white"
+										className="-top-1 -left-1 dark:!border-neutral-200 dark:!bg-white absolute size-2 border border-primary-base bg-white"
 									/>
 									<span
 										aria-hidden
-										className="-top-1 -right-1 absolute size-2 border border-primary-base bg-white"
+										className="-top-1 -right-1 dark:!border-neutral-200 dark:!bg-white absolute size-2 border border-primary-base bg-white"
 									/>
 									<span
 										aria-hidden
-										className="-bottom-1 -left-1 absolute size-2 border border-primary-base bg-white"
+										className="-bottom-1 -left-1 dark:!border-neutral-200 dark:!bg-white absolute size-2 border border-primary-base bg-white"
 									/>
 									<span
 										aria-hidden
-										className="-right-1 -bottom-1 absolute size-2 border border-primary-base bg-white"
+										className="-right-1 -bottom-1 dark:!border-neutral-200 dark:!bg-white absolute size-2 border border-primary-base bg-white"
 									/>
 									<p className="text-[16px] text-text-strong-950 leading-[1.75] dark:text-neutral-200">
 										That&apos;s the Reloop Engine. Automated IP warmup with
@@ -149,7 +149,7 @@ const AboutPage = () => {
 										engine self-hosted or on reloop.sh. Nothing to babysit. The
 										system does it.
 									</p>
-									<span className="-bottom-[26px] -translate-x-1/2 absolute left-1/2 rounded-[4px] bg-primary-base px-2 py-[3px] font-mono text-[11px] text-white leading-none">
+									<span className="-bottom-[26px] -translate-x-1/2 dark:!bg-white dark:!text-black absolute left-1/2 rounded-[4px] bg-primary-base px-2 py-[3px] font-mono text-[11px] text-white leading-none">
 										warmup × retries × reputation
 									</span>
 								</div>
