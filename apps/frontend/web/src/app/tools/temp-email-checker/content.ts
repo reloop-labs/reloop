@@ -10,7 +10,7 @@ export const metaDescription =
 	"Free temp email checker and disposable email detector. Instantly detect throwaway inboxes (Mailinator, Yopmail, Temp-Mail), role addresses, and MX records. No signup, no SMTP probing.";
 
 export const toolDescription =
-	"It's checks dsiposable Email, role addresses, and MX records ";
+	"It checks disposable Email, role addresses, and MX records";
 
 export const toolKeywords = [
 	"temp email checker",

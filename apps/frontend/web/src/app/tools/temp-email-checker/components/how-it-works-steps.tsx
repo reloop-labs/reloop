@@ -19,7 +19,7 @@ const FEATURES: FeatureItem[] = [
 		icon: Target,
 		title: "99.9% accuracy",
 		description:
-			"It's checks dsiposable list, role addresses, and MX records to maximize precision and avoid false positives.",
+			"It checks disposable list, role addresses, and MX records to maximize precision and avoid false positives.",
 	},
 	{
 		icon: Lock,
