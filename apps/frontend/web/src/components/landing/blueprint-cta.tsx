@@ -395,9 +395,9 @@ export function BlueprintCta({
 	return (
 		<section
 			{...(id ? { id } : {})}
-			className={cn("w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8", className)}
+			className={cn("w-full px-4 py-4 sm:px-6 sm:py-6 lg:px-8", className)}
 		>
-			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#256bf5] px-8 py-16 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-20 lg:px-14 lg:py-24">
+			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#256bf5] px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12">
 				{/* 8px Inset white border */}
 				<div
 					aria-hidden="true"
