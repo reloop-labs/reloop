@@ -481,12 +481,12 @@ export default async function OpenGraphImage() {
 						<line x1="0" y1="290" x2="420" y2="290" />
 					</g>
 					{/* dotted drafting guides */}
-					<g stroke="white" strokeWidth="1" fill="none" opacity="0.1">
+					<g stroke="white" strokeWidth="1" fill="none" opacity="0.12">
 						<circle cx="210" cy="170" r="140" strokeDasharray="3 4" />
 						<circle cx="210" cy="170" r="48" strokeDasharray="2 3" />
 					</g>
 					{/* diagonal construction rays */}
-					<g stroke="white" strokeWidth="1" opacity="0.1">
+					<g stroke="white" strokeWidth="1" opacity="0.12">
 						<line x1="60" y1="20" x2="360" y2="320" />
 						<line x1="360" y1="20" x2="60" y2="320" />
 						<line
@@ -495,7 +495,7 @@ export default async function OpenGraphImage() {
 							x2="210"
 							y2="260"
 							strokeDasharray="4 4"
-							opacity="0.16"
+							opacity="0.18"
 						/>
 						<line
 							x1="390"
@@ -503,7 +503,7 @@ export default async function OpenGraphImage() {
 							x2="210"
 							y2="260"
 							strokeDasharray="4 4"
-							opacity="0.16"
+							opacity="0.18"
 						/>
 					</g>
 					{/* center axes */}
@@ -511,7 +511,7 @@ export default async function OpenGraphImage() {
 						stroke="white"
 						strokeWidth="1"
 						strokeDasharray="6 4"
-						opacity="0.15"
+						opacity="0.16"
 					>
 						<line x1="210" y1="8" x2="210" y2="312" />
 						<line x1="16" y1="170" x2="404" y2="170" />
@@ -523,7 +523,7 @@ export default async function OpenGraphImage() {
 						r="125"
 						stroke="white"
 						strokeWidth="1"
-						opacity="0.1"
+						opacity="0.12"
 					/>
 					<circle
 						cx="210"
@@ -532,11 +532,11 @@ export default async function OpenGraphImage() {
 						stroke="white"
 						strokeWidth="1"
 						strokeDasharray="4 4"
-						opacity="0.1"
+						opacity="0.12"
 					/>
 
 					{/* open source aperture guidelines */}
-					<g stroke="white" strokeWidth="1" strokeDasharray="3 3" opacity="0.1">
+					<g stroke="white" strokeWidth="1" strokeDasharray="3 3" opacity="0.12">
 						<line x1="210" y1="170" x2="160" y2="300" />
 						<line x1="210" y1="170" x2="260" y2="300" />
 					</g>
@@ -546,7 +546,7 @@ export default async function OpenGraphImage() {
 						<g transform="scale(5.75)">
 							<g transform="translate(-16, -16)">
 								<path
-									opacity="0.1"
+									opacity="0.12"
 									d="M-0.136 16.708c0.152-8.765 6.287-15.005 13.797-16.015 8.959-1.199 16.495 4.895 17.943 12.979 1.375 7.667-2.839 14.844-9.787 17.688-0.599 0.244-0.927 0.109-1.156-0.5l-3.453-8.969c-0.197-0.527-0.063-0.855 0.453-1.088 1.563-0.709 2.536-1.896 2.797-3.6 0.411-2.64-1.5-5.077-4.161-5.307-2.423-0.235-4.609 1.453-5 3.853-0.339 2.131 0.713 4.115 2.697 5.016 0.62 0.281 0.745 0.557 0.505 1.188l-3.469 9.031c-0.167 0.443-0.531 0.6-1 0.417-3.661-1.432-6.667-4.167-8.437-7.677-1.609-3.177-1.624-5.661-1.729-7.021z"
 									fill="white"
 								/>
