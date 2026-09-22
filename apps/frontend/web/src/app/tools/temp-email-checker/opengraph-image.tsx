@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Free Temp Email Checker — Disposable Email Detector | Reloop";
+export const alt =
+	"Free Temp Email Checker — Disposable Email Detector | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -61,207 +62,211 @@ export default async function OpenGraphImage() {
 				}}
 			/>
 
-			{/* Left: copy */}
+			{/* Logo — absolute top-left, aligned with the content edge */}
+			<div
+				style={{
+					position: "absolute",
+					top: "45px",
+					left: "65px",
+					display: "flex",
+					alignItems: "center",
+				}}
+			>
+				{" "}
+				<svg
+					width="68"
+					height="68"
+					viewBox="0 0 200 200"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<rect x="55" y="51" width="83" height="8" fill="#ffffff" />
+					<rect
+						x="55"
+						y="59"
+						width="75"
+						height="8"
+						transform="rotate(90 55 59)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="146"
+						y="59"
+						width="46"
+						height="8"
+						transform="rotate(90 146 59)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="154"
+						y="69"
+						width="44"
+						height="8"
+						transform="rotate(90 154 69)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="138"
+						y="59"
+						width="46"
+						height="8"
+						transform="rotate(90 138 59)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="130"
+						y="59"
+						width="46"
+						height="8"
+						transform="rotate(90 130 59)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="90"
+						y="105"
+						width="29"
+						height="8"
+						transform="rotate(90 90 105)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="82"
+						y="105"
+						width="29"
+						height="8"
+						transform="rotate(90 82 105)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="138"
+						y="105"
+						width="8"
+						height="8"
+						transform="rotate(90 138 105)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="146"
+						y="105"
+						width="8"
+						height="8"
+						transform="rotate(90 146 105)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="146"
+						y="134"
+						width="8"
+						height="8"
+						transform="rotate(90 146 134)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="130"
+						y="105"
+						width="8"
+						height="8"
+						transform="rotate(90 130 105)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="122"
+						y="105"
+						width="8"
+						height="8"
+						transform="rotate(90 122 105)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="98"
+						y="77"
+						width="10"
+						height="8"
+						transform="rotate(90 98 77)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="90"
+						y="77"
+						width="10"
+						height="8"
+						transform="rotate(90 90 77)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="82"
+						y="77"
+						width="10"
+						height="8"
+						transform="rotate(90 82 77)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="146"
+						y="113"
+						width="21"
+						height="8"
+						transform="rotate(90 146 113)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="154"
+						y="122"
+						width="20"
+						height="8"
+						transform="rotate(90 154 122)"
+						fill="#ffffff"
+					/>
+					<rect
+						x="138"
+						y="113"
+						width="21"
+						height="8"
+						transform="rotate(90 138 113)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="130"
+						y="113"
+						width="21"
+						height="8"
+						transform="rotate(90 130 113)"
+						fill="rgba(255,255,255,0.55)"
+					/>
+					<rect
+						x="98"
+						y="113"
+						width="21"
+						height="8"
+						transform="rotate(90 98 113)"
+						fill="#ffffff"
+					/>
+					<rect x="55" y="134" width="83" height="8" fill="#ffffff" />
+					<rect x="63" y="142" width="83" height="8" fill="#ffffff" />
+				</svg>
+				<span
+					style={{
+						fontSize: "36px",
+						fontWeight: 800,
+						color: "#ffffff",
+						letterSpacing: "-0.5px",
+						marginLeft: "-4px",
+					}}
+				>
+					Reloop
+				</span>
+			</div>
+
+			{/* Left: copy, vertically centered */}
 			<div
 				style={{
 					display: "flex",
 					flexDirection: "column",
+					justifyContent: "center",
 					width: "560px",
+					height: "100%",
 				}}
 			>
-			{/* Logo — absolute top-left so the content block stays centered */}
-				<div
-					style={{
-						position: "absolute",
-						top: "56px",
-						left: "72px",
-						display: "flex",
-						alignItems: "center",
-					}}
-				>					<svg
-						width="68"
-						height="68"
-						viewBox="0 0 200 200"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<rect x="55" y="51" width="83" height="8" fill="#ffffff" />
-						<rect
-							x="55"
-							y="59"
-							width="75"
-							height="8"
-							transform="rotate(90 55 59)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="146"
-							y="59"
-							width="46"
-							height="8"
-							transform="rotate(90 146 59)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="154"
-							y="69"
-							width="44"
-							height="8"
-							transform="rotate(90 154 69)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="138"
-							y="59"
-							width="46"
-							height="8"
-							transform="rotate(90 138 59)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="130"
-							y="59"
-							width="46"
-							height="8"
-							transform="rotate(90 130 59)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="90"
-							y="105"
-							width="29"
-							height="8"
-							transform="rotate(90 90 105)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="82"
-							y="105"
-							width="29"
-							height="8"
-							transform="rotate(90 82 105)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="138"
-							y="105"
-							width="8"
-							height="8"
-							transform="rotate(90 138 105)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="146"
-							y="105"
-							width="8"
-							height="8"
-							transform="rotate(90 146 105)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="146"
-							y="134"
-							width="8"
-							height="8"
-							transform="rotate(90 146 134)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="130"
-							y="105"
-							width="8"
-							height="8"
-							transform="rotate(90 130 105)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="122"
-							y="105"
-							width="8"
-							height="8"
-							transform="rotate(90 122 105)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="98"
-							y="77"
-							width="10"
-							height="8"
-							transform="rotate(90 98 77)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="90"
-							y="77"
-							width="10"
-							height="8"
-							transform="rotate(90 90 77)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="82"
-							y="77"
-							width="10"
-							height="8"
-							transform="rotate(90 82 77)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="146"
-							y="113"
-							width="21"
-							height="8"
-							transform="rotate(90 146 113)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="154"
-							y="122"
-							width="20"
-							height="8"
-							transform="rotate(90 154 122)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="138"
-							y="113"
-							width="21"
-							height="8"
-							transform="rotate(90 138 113)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="130"
-							y="113"
-							width="21"
-							height="8"
-							transform="rotate(90 130 113)"
-							fill="rgba(255,255,255,0.55)"
-						/>
-						<rect
-							x="98"
-							y="113"
-							width="21"
-							height="8"
-							transform="rotate(90 98 113)"
-							fill="#ffffff"
-						/>
-						<rect x="55" y="134" width="83" height="8" fill="#ffffff" />
-						<rect x="63" y="142" width="83" height="8" fill="#ffffff" />
-					</svg>
-					<span
-						style={{
-							fontSize: "36px",
-							fontWeight: 800,
-							color: "#ffffff",
-							letterSpacing: "-0.5px",
-							marginLeft: "16px",
-						}}
-					>
-						Reloop
-					</span>
-				</div>
-
 				<div
 					style={{
 						display: "flex",
@@ -270,7 +275,6 @@ export default async function OpenGraphImage() {
 						color: "#ffffff",
 						letterSpacing: "-1.5px",
 						lineHeight: "1.06",
-						marginTop: "22px",
 					}}
 				>
 					Free Temp Email Checker
