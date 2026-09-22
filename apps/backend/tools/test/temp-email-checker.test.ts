@@ -200,3 +200,48 @@ describe("isEmptyMxError", () => {
 		);
 	});
 });
+
+describe("dnsbl integration", () => {
+	test("flags a domain as disposable when DNSBL indicates a hit even if absent from static list", async () => {
+		const result = await tempEmailCheckerController(
+			"test@unknown-rotating-temp.xyz",
+			{
+				lookupMx: mxOk("mx.unknown-rotating-temp.xyz"),
+				lookupDnsbl: async () => ({
+					listed: true,
+					records: ["127.0.0.4"],
+					list: "surbl",
+				}),
+			},
+		);
+
+		expect(result.verdict).toBe("disposable");
+		expect(result.isDisposable).toBe(true);
+		expect(result.confidence).toBe(0.999);
+		expect(result.riskScore).toBe(0.94);
+		expect(result.flags).toContain("DISPOSABLE_DOMAIN");
+		expect(result.flags).toContain("PUBLIC_INBOX_DETECTED");
+		expect(result.disposableMatch).toEqual({
+			kind: "exact",
+			domain: "unknown-rotating-temp.xyz",
+		});
+	});
+
+	test("does not flag clean domains when DNSBL returns not listed", async () => {
+		const result = await tempEmailCheckerController(
+			"clean@legitimate-company.org",
+			{
+				lookupMx: mxOk("mail.legitimate-company.org"),
+				lookupDnsbl: async () => ({
+					listed: false,
+					records: [],
+				}),
+			},
+		);
+
+		expect(result.verdict).toBe("deliverable");
+		expect(result.isDisposable).toBe(false);
+		expect(result.confidence).toBe(0.99);
+		expect(result.riskScore).toBe(0.02);
+	});
+});

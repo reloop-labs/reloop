@@ -3,10 +3,12 @@ import type { ToolsModel } from "@be/tools/model/tools.model";
 import { toolsConfig } from "@be/tools/tools.config";
 import { evaluate } from "@reloop/email-validation";
 import { scoreCheck } from "./check-score";
+import { type DnsblLookupResult, lookupDnsbl } from "./dnsbl-lookup";
 import { lookupMxRecords, type MxLookupResult } from "./mx-lookup";
 
 export type TempEmailCheckerDeps = {
 	lookupMx?: (domain: string) => Promise<MxLookupResult>;
+	lookupDnsbl?: (domain: string) => Promise<DnsblLookupResult>;
 };
 
 export async function tempEmailCheckerController(
@@ -22,26 +24,45 @@ export async function tempEmailCheckerController(
 
 	const result = evaluate(trimmed);
 	const lookupMx = deps.lookupMx ?? lookupMxRecords;
+	const checkDnsbl = deps.lookupDnsbl ?? lookupDnsbl;
 
-	const mx: MxLookupResult | { status: "skipped"; records: [] } =
+	const needsDnsbl =
+		result.domain !== null && !result.isDisposable && !result.isAllowlisted;
+
+	const [mx, dnsbl] = await Promise.all([
 		result.domain === null
-			? { status: "skipped", records: [] }
-			: await lookupMx(result.domain);
+			? Promise.resolve({ status: "skipped" as const, records: [] as [] })
+			: lookupMx(result.domain),
+		needsDnsbl && result.domain !== null
+			? checkDnsbl(result.domain)
+			: Promise.resolve({ listed: false, records: [] }),
+	]);
+
+	const isDisposable = result.isDisposable || dnsbl.listed;
+	const disposableMatch =
+		result.disposableMatch ??
+		(dnsbl.listed && result.domain !== null
+			? { kind: "exact" as const, domain: result.domain }
+			: null);
+
+	const signals = {
+		...result.signals,
+		disposable: isDisposable ? ("fail" as const) : result.signals.disposable,
+	};
 
 	const score = scoreCheck({
 		isValidSyntax: result.isValidSyntax,
-		isDisposable: result.isDisposable,
-		disposableMatch: result.disposableMatch,
+		isDisposable,
+		disposableMatch,
 		isAllowlisted: result.isAllowlisted,
 		isRoleAddress: result.isRoleAddress,
 		isFreeProvider: result.isFreeProvider,
 		mxStatus: mx.status,
 	});
 
+	const baseVerdict = isDisposable ? "disposable" : result.verdict;
 	const verdict =
-		mx.status === "empty" && result.verdict !== "disposable"
-			? "invalid"
-			: result.verdict;
+		mx.status === "empty" && !isDisposable ? "invalid" : baseVerdict;
 
 	return {
 		input: result.input,
@@ -51,20 +72,20 @@ export async function tempEmailCheckerController(
 		verdict,
 		isValidSyntax: result.isValidSyntax,
 		syntaxFailure: result.syntaxFailure,
-		isDisposable: result.isDisposable,
-		disposableMatch: result.disposableMatch
+		isDisposable,
+		disposableMatch: disposableMatch
 			? {
-					kind: result.disposableMatch.kind,
-					domain: result.disposableMatch.domain,
-					...(result.disposableMatch.kind === "wildcard"
-						? { pattern: result.disposableMatch.pattern }
+					kind: disposableMatch.kind,
+					domain: disposableMatch.domain,
+					...(disposableMatch.kind === "wildcard"
+						? { pattern: disposableMatch.pattern }
 						: {}),
 				}
 			: null,
 		isAllowlisted: result.isAllowlisted,
 		isRoleAddress: result.isRoleAddress,
 		isFreeProvider: result.isFreeProvider,
-		signals: result.signals,
+		signals,
 		mxRecords: mx.records,
 		confidence: score.confidence,
 		riskScore: score.riskScore,
