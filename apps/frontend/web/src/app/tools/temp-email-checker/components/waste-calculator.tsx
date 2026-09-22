@@ -152,12 +152,11 @@ export function WasteCalculator() {
 						/>
 						<div className="relative z-10">
 							<p className="font-medium text-[16px] text-white leading-snug tracking-tight">
-								Stop paying for throwaways.
+								Stop paying for throwaway emails.
 							</p>
 							<p className="mt-1.5 text-[13px] text-white/85 leading-relaxed">
-								When you add a contact, flag it as disposable with the
-								same checker — no separate tool needed. Send 3,000
-								free/mo.{" "}
+								Reloop automatically flags risky contacts before you waste time
+								or money on them. Start with 3,000 free emails per month.{" "}
 								<Link
 									href="/pricing"
 									className="underline underline-offset-2 hover:text-white"
@@ -167,13 +166,12 @@ export function WasteCalculator() {
 							</p>
 							<Link
 								href="/dashboard/signup"
-								className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[14px] text-[#0f172a] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98]"
+								className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98]"
 							>
 								Get started free
 							</Link>
 							<p className="mt-2.5 text-center text-[12px] text-white/70">
-								No credit card. Wipe that {formatMoney(result.yearly)}/yr
-								waste.{" "}
+								No credit card. Wipe that {formatMoney(result.yearly)}/yr waste.{" "}
 								<button
 									type="button"
 									onClick={scrollToChecker}
