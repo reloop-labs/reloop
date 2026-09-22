@@ -6,7 +6,6 @@ import {
 	BadgeCheck,
 	Ban,
 	Calendar,
-	Clock,
 	Code2,
 	Eye,
 	Globe,
@@ -20,12 +19,41 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ComponentType } from "react";
+import { TempEmailTimerArt } from "../temp-email-checker/components/temp-email-timer-art";
+
+/**
+ * Mini timer mark for the temp-email-checker card.
+ * Same face + topper + hands as the OG/hero blueprint timer,
+ * simplified to stay crisp at 20px (no grid or dimensions).
+ */
+function TempTimerIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			className={className}
+			aria-hidden="true"
+		>
+			<rect x="9.5" y="1.5" width="5" height="2.4" rx="0.8" />
+			<line x1="12" y1="3.9" x2="12" y2="5.4" />
+			<circle cx="12" cy="13.4" r="8" />
+			<line x1="12" y1="13.4" x2="12" y2="9" />
+			<line x1="12" y1="13.4" x2="15.4" y2="15" />
+		</svg>
+	);
+}
 
 export type ToolItem = {
 	title: string;
 	description: string;
 	icon: ComponentType<{ className?: string }>;
 	path: string;
+	/** Render the full blueprint art panel instead of the icon box. */
+	art?: boolean;
 };
 
 export const ALL_TOOLS: ToolItem[] = [
@@ -89,8 +117,9 @@ export const ALL_TOOLS: ToolItem[] = [
 		title: "Temp & Disposable Email Checker",
 		description:
 			"Detect throwaway inboxes and burner addresses before they bounce or skew signup metrics.",
-		icon: Clock,
+		icon: TempTimerIcon,
 		path: "/tools/temp-email-checker",
+		art: true,
 	},
 	{
 		title: "Domain Reputation & Health Checker",
@@ -183,10 +212,16 @@ export function ToolsGrid() {
 								borderClass,
 							)}
 						>
-							<div>
+						<div>
+							{tool.art ? (
+								<div className="flex h-32 items-center justify-center overflow-hidden rounded-xl bg-[#246BF5] text-white dark:border dark:border-white/10 dark:bg-[#000]">
+									<TempEmailTimerArt className="h-full" />
+								</div>
+							) : (
 								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
 									<IconComponent className="h-5 w-5 stroke-[1.75]" />
 								</div>
+							)}
 
 								<div className="mt-5 flex items-start gap-2.5">
 									<span
