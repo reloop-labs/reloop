@@ -1,7 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
-import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { BlueprintCta } from "@reloop/web/components/landing/blueprint-cta";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
-import { hostedSignupHref } from "@reloop/web/lib/site";
 import { Check } from "lucide-react";
 import { ToolsGrid } from "./components/tools-grid";
 import { ToolsHeroBlast } from "./components/tools-hero-blast";
@@ -84,30 +83,15 @@ export default function ToolsIndexPage() {
 			{/* Tools Grid */}
 			<ToolsGrid />
 
-			{/* Global Upsell / Platform CTA */}
-			<div className="border-stroke-soft-100 border-t dark:border-white/10">
-				<BlogCta
-					headline={
-						<span className="block font-semibold text-[3rem] leading-[1.04] tracking-[-0.04em] sm:text-[4.25rem] lg:text-[5.25rem]">
-							Start now
-							<br />
-							<span className="text-primary-base">$0 / mo.</span>
-						</span>
-					}
-					sub="No credit card required. 3,000 emails for free."
-					primaryLabel="Get started"
-					primaryHref={hostedSignupHref}
-					primaryVariant="primary"
-					secondaryLabel="View pricing"
-					secondaryHref="/pricing"
-					accentColor="blue"
-					blast={{ light: "#2563eb", dark: "#93c5fd" }}
-					flush
-					align="center"
-					pill={false}
-					showTopRule={false}
-				/>
-			</div>
+			{/* Global Upsell / Platform CTA — same as temp-email-checker */}
+			<BlueprintCta
+				headlineLine1="Start sending email today"
+				headlineLine2="$0 / mo."
+				subtext="No credit card required. 3,000 emails for free."
+				primaryLabel="Get started free"
+				secondaryLabel="Talk to founder"
+				className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8"
+			/>
 		</div>
 	);
 }
