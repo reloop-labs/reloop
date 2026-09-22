@@ -244,7 +244,9 @@ export function ToolsGrid() {
 										return (
 											<Art
 												className={
-													tool.art === "timer" ? "h-full" : "h-full w-auto"
+													tool.art === "timer" || tool.art === "bimi"
+														? "h-full"
+														: "h-full w-auto"
 												}
 											/>
 										);
