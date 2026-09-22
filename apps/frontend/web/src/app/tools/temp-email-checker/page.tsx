@@ -35,7 +35,7 @@ export default function TempEmailCheckerPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
+		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 dark:bg-black dark:text-white">
 			<JsonLd
 				data={[
 					{
@@ -127,7 +127,15 @@ export default function TempEmailCheckerPage() {
 				/>
 				<SimilarTools />
 				<div aria-hidden className="h-12 sm:h-16" />
-				<TempEmailCta />
+				<TempEmailCta
+					headlineLine1="Stop paying for throwaways."
+					headlineLine2="Send with Reloop."
+					subtext="When you add a contact, flag it as disposable with the same checker — no separate tool needed. Send 3,000 free/mo."
+					primaryLabel="Get started free"
+					secondaryLabel="See pricing"
+					secondaryHref="/pricing"
+					secondaryExternal={false}
+				/>
 				<div aria-hidden className="h-16 sm:h-24" />
 				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
 					<FaqSection

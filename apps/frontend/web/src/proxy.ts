@@ -1,21 +1,7 @@
-import { defineAiCrawlConfig } from "@traceten/ai-crawl";
-import { trackAICrawlerRequest } from "@traceten/ai-crawl/next";
 import {
-	type NextFetchEvent,
 	type NextRequest,
 	NextResponse,
 } from "next/server";
-
-const siteId = process.env.TRACETEN_SITE_ID || "ttid_6w2QYo7Mo23D3Kwk6BJWKj";
-const crawlToken = process.env.TRACETEN_CRAWL_TOKEN;
-
-const aiCrawlConfig =
-	siteId && crawlToken
-		? defineAiCrawlConfig({
-				siteId,
-				authToken: crawlToken,
-			})
-		: null;
 
 /**
  * Better Auth cookiePrefix `reloop` → `reloop.session_token`.
@@ -34,11 +20,7 @@ function hasSessionCookie(cookieHeader: string | null): boolean {
  * Logged-in visitors hitting the marketing homepage should land in the app.
  * Other marketing routes stay reachable so users can still read docs, pricing, etc.
  */
-export function proxy(request: NextRequest, event: NextFetchEvent) {
-	if (aiCrawlConfig) {
-		trackAICrawlerRequest(request, event, aiCrawlConfig);
-	}
-
+export function proxy(request: NextRequest) {
 	if (
 		request.nextUrl.pathname === "/" &&
 		hasSessionCookie(request.headers.get("cookie"))

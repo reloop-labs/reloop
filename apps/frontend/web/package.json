@@ -25,7 +25,6 @@
 		"@reloop/ui": "workspace:*",
 		"@swc/helpers": "catalog:ui",
 		"@tailwindcss/postcss": "catalog:ui",
-		"@traceten/ai-crawl": "^1.0.0",
 		"@tiptap/core": "catalog:ui",
 		"@tiptap/extension-placeholder": "^3.22.5",
 		"@tiptap/html": "3.22.5",

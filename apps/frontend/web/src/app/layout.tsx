@@ -77,12 +77,6 @@ export default function RootLayout({
 					id="manifest-loader"
 					strategy="afterInteractive"
 				>{`var l=document.createElement('link');l.rel='manifest';l.href='/manifest.json';document.head.appendChild(l)`}</Script>
-				<Script
-					async
-					src="https://cdn.traceten.com/tt.min.js"
-					data-site="ttid_6w2QYo7Mo23D3Kwk6BJWKj"
-					strategy="afterInteractive"
-				/>
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-bg-white-0 antialiased`}

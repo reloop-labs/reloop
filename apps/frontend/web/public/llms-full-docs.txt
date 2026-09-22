@@ -7,7 +7,7 @@
 > Product skill: https://reloop.sh/skill.md
 > Prefer per-page markdown: append `.md` under https://reloop.sh/docs/
 
-Generated from 351 source files.
+Generated from 350 source files.
 
 ---
 
@@ -16,7 +16,69 @@ Generated from 351 source files.
 Source: https://reloop.sh/docs
 Markdown: https://reloop.sh/docs/introduction.md
 
-<DocsHome />
+To get started with Reloop, you'll need:
+
+1. Your own domain, [verified with Reloop](/docs/learn/domain)
+2. A Reloop [API key](/docs/learn/api-keys)
+
+Then, you'll be ready to send [transactional emails](/docs/learn/emails):
+
+- **Transactional emails:** personalized, event-driven communication
+- **SMTP relay:** deliver through any standard SMTP client
+
+## Quickstart
+
+Learn how to get Reloop set up in your project.
+
+### Node.js
+
+<CardGroup cols={3}>
+  <Card icon="siNextdotjs" title="Next.js" href="/docs/examples/nodejs/nextjs" noIconFrame />
+  <Card icon="siExpress" title="Express" href="/docs/examples/nodejs/express" noIconFrame />
+</CardGroup>
+
+### Python
+
+<CardGroup cols={3}>
+  <Card icon="siFastapi" title="FastAPI" href="/docs/examples/python/fastapi" noIconFrame />
+  <Card icon="siDjango" title="Django" href="/docs/examples/python/django" noIconFrame />
+  <Card icon="siFlask" title="Flask" href="/docs/examples/python/flask" noIconFrame />
+</CardGroup>
+
+### Go
+
+<CardGroup cols={3}>
+  <Card icon="siGo" title="Gin" href="/docs/examples/go/gin" noIconFrame />
+</CardGroup>
+
+### Ruby
+
+<CardGroup cols={3}>
+  <Card icon="siRubyonrails" title="Rails" href="/docs/examples/ruby/rails" noIconFrame />
+</CardGroup>
+
+### PHP
+
+<CardGroup cols={3}>
+  <Card icon="siLaravel" title="Laravel" href="/docs/examples/php/laravel" noIconFrame />
+</CardGroup>
+
+### Rust
+
+<CardGroup cols={3}>
+  <Card icon="siRust" title="Axum" href="/docs/examples/rust/axum" noIconFrame />
+</CardGroup>
+
+### SMTP
+
+<CardGroup cols={3}>
+  <Card icon="siNodedotjs" title="Nodemailer" href="/docs/examples/smtp/nodemailer" noIconFrame />
+  <Card icon="siPython" title="Python SMTP" href="/docs/examples/smtp/python" noIconFrame />
+  <Card icon="siGo" title="Go SMTP" href="/docs/examples/smtp/go" noIconFrame />
+  <Card icon="siPhp" title="PHP SMTP" href="/docs/examples/smtp/php" noIconFrame />
+  <Card icon="siRuby" title="Ruby SMTP" href="/docs/examples/smtp/ruby" noIconFrame />
+  <Card icon="siRust" title="Rust SMTP" href="/docs/examples/smtp/rust" noIconFrame />
+</CardGroup>
 
 ---
 
@@ -5554,167 +5616,6 @@ func main() {
 
 ---
 
-# examples/index.mdx
-
-Source: https://reloop.sh/docs/examples
-Markdown: https://reloop.sh/docs/examples.md
-
-## Node.js
-
-Integrate Reloop into Node.js applications.
-
-<CardGroup cols={2}>
-  <Card icon="siNextdotjs" title="Next.js">
-    Send emails in Next.js Server Actions and Route Handlers.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/nodejs/nextjs" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/nextjs" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-  <Card icon="siExpress" title="Express">
-    Connect Reloop to an Express REST API backend.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/nodejs/express" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/express" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-</CardGroup>
-
-## Python
-
-Integrate Reloop into Python applications.
-
-<CardGroup cols={3}>
-  <Card icon="siFastapi" title="FastAPI">
-    Asynchronous email sending with FastAPI.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/python/fastapi" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/fastapi" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-  <Card icon="siDjango" title="Django">
-    Configure email sending using Django's backend.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/python/django" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/django" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-  <Card icon="siFlask" title="Flask">
-    Simple email templates in Flask.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/python/flask" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/flask" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-</CardGroup>
-
-## Go
-
-Integrate Reloop into Go applications.
-
-<CardGroup cols={1}>
-  <Card icon="siGo" title="Gin">
-    Send emails through a Go Gin web server.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/go/gin" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/gin" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-</CardGroup>
-
-## Ruby
-
-Integrate Reloop into Ruby applications.
-
-<CardGroup cols={1}>
-  <Card icon="siRubyonrails" title="Ruby on Rails">
-    Configure Rails Action Mailer to send via Reloop.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/ruby/rails" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/rails" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-</CardGroup>
-
-## PHP
-
-Integrate Reloop into PHP applications.
-
-<CardGroup cols={1}>
-  <Card icon="siLaravel" title="Laravel">
-    Configure Laravel Mail driver to route through Reloop.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/php/laravel" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/laravel" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-</CardGroup>
-
-## Rust
-
-Integrate Reloop into Rust applications.
-
-<CardGroup cols={1}>
-  <Card icon="siRust" title="Axum">
-    Asynchronous email dispatch inside an Axum web framework.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/rust/axum" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/axum" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-</CardGroup>
-
-## SMTP Relay
-
-Configure standard SMTP library examples.
-
-<CardGroup cols={3}>
-  <Card icon="siNodedotjs" title="Nodemailer (Node.js)">
-    Standard Node SMTP using Nodemailer.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/smtp/nodemailer" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-nodemailer" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-  <Card icon="siPython" title="Python SMTP">
-    Built-in smtplib Python SMTP.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/smtp/python" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-python" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-  <Card icon="siGo" title="Go SMTP">
-    Built-in net/smtp Go implementation.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/smtp/go" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-go" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-  <Card icon="siPhp" title="PHP SMTP">
-    Standard PHP SMTP connection.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/smtp/php" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-php" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-  <Card icon="siRuby" title="Ruby SMTP">
-    Standard Ruby Net::SMTP integration.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/smtp/ruby" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-ruby" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-  <Card icon="siRust" title="Rust SMTP">
-    Lettre SMTP library for Rust.
-    <span className="mt-4 flex gap-4 text-xs font-semibold">
-      <a href="/docs/examples/smtp/rust" className="text-primary hover:underline">Read Guide →</a>
-      <a href="https://github.com/reloop-labs/reloop-examples/tree/main/smtp-rust" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-white hover:underline">GitHub ↗</a>
-    </span>
-  </Card>
-</CardGroup>
-
----
-
 # examples/nodejs/express.mdx
 
 Source: https://reloop.sh/docs/examples/nodejs/express
@@ -6313,7 +6214,7 @@ Configure standard SMTP library examples or explore step-by-step guides for your
 
 <RelatedTopics>
   <RelatedTopic icon="key-new" title="API Keys Overview" href="/docs/learn/api-keys" />
-  <RelatedTopic icon="code" title="All Examples Overview" href="/docs/examples" />
+  <RelatedTopic icon="code" title="All Examples Overview" href="/docs" />
   <RelatedTopic icon="webhook" title="Webhooks Overview" href="/docs/webhooks" />
 </RelatedTopics>
 
@@ -14690,7 +14591,7 @@ Many providers block outbound port `25` by default. Reloop still sends through t
 | Prompt | Purpose | Default |
 | :--- | :--- | :--- |
 | Primary Reloop domain | The hostname the dashboard and API are served on | — |
-| Administrator email | Let's Encrypt contact and your first Reloop account | — |
+| TLS contact email | Let's Encrypt expiry and account notices | — |
 | Database name | PostgreSQL database | `reloop` |
 | Database user | PostgreSQL role | `reloop` |
 | Run behind an existing reverse proxy | Serve plain HTTP on a local port for your own Caddy, Nginx or Traefik instead of taking `80` and `443`. See [Behind an existing reverse proxy](#behind-an-existing-reverse-proxy) | `no` |
@@ -14709,6 +14610,7 @@ Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloo
 ```text
 /opt/reloop/
 ├── .env                 production configuration and secrets (0600, root)
+├── admin-setup.key      one-time first-run setup key (0600, emptied after setup)
 ├── docker-compose.yml   the production stack
 ├── Caddyfile            reverse proxy and TLS
 └── backups/             automatic database dumps taken before schema changes
@@ -14947,22 +14849,46 @@ that verifies certificates has to be told to accept this one.
 
 ## First sign-in
 
-Reloop sends one-time codes through its own mail pipeline, which needs a verified sending domain — so a fresh installation has no way to email you the first code. The installer generates a bootstrap code, writes it to `DEFAULT_OTP` in `/opt/reloop/.env`, and prints it once.
+The installer prints a one-time administrator setup key when a new installation
+finishes. It also saves the key to `/opt/reloop/admin-setup.key`, a root-only
+file, in case you need to retrieve it before completing setup.
 
-1. Open `https://your-domain/dashboard`
-2. Sign up with the administrator email
-3. Enter the printed code
+1. Open `https://your-domain/dashboard/setup`
+2. Enter the setup key
+3. Choose the first administrator's name, email and password
+4. Name the instance and first organization
+5. Leave **Turn off public sign-ups** selected for a private instance, or clear
+   it if anyone should be able to register
 
-Once one of your domains is verified and sending, remove the `DEFAULT_OTP` line from `/opt/reloop/.env` and run `reloop restart auth`.
+The first account is created as a `super-admin`. Completing setup consumes the
+key, empties `admin-setup.key`, sets `SETUP_MODE=false` and closes the setup
+page. The installer only prints the key once.
 
-To lock the instance down, set these in the same file and restart `auth`:
+To supply your own key, download the installer before running it:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh -o install.sh
+sudo bash install.sh --admin-key='your-long-random-key'
+```
+
+`RELOOP_ADMIN_EMAIL` is only the TLS contact address; it does not preselect or
+create the administrator account. Self-host setup uses a password, not an
+emailed code. Reloop Cloud's one-time-code sign-in is unrelated and unchanged.
+
+If the setup flow is unavailable after an account already exists,
+`apps/backend/admin/scripts/promote-admin.ts` remains available as a
+break-glass recovery tool. It is not the normal first-run setup path.
+
+To change registration or organization creation later, edit these values in
+`/opt/reloop/.env` and run `reloop restart auth`:
 
 | Variable | Effect |
 | :--- | :--- |
 | `DISABLE_SIGNUP=true` | No new accounts on any sign-up path. Existing users still sign in, and invited addresses can still join |
 | `DISABLE_ORG_CREATION=true` | Nobody can create further organizations |
 
-Set `DISABLE_SIGNUP` only after your own account exists. The installer keeps both values across re-runs, so an update will not reopen registration. See [Closing registration](/docs/setup/backend/auth#closing-registration).
+The installer keeps both values across re-runs, so an update will not reopen
+registration. See [Closing registration](/docs/setup/backend/auth#closing-registration).
 
 If sign-in succeeds but the dashboard then answers `401` on every protected
 page, the services cannot reach the auth service over your public origin. Set
@@ -14990,14 +14916,14 @@ command.
 | `RELOOP_VERSION` | Image tag deployed for every service |
 | `RELOOP_DOMAIN` | Dashboard and API hostname |
 | `RELOOP_TRACKING_HOST` / `RELOOP_INBOUND_HOST` | `link.` and `inbound.` hostnames, derived from `RELOOP_DOMAIN` |
-| `RELOOP_ADMIN_EMAIL` | Let's Encrypt contact and the first account |
+| `RELOOP_ADMIN_EMAIL` | Let's Encrypt contact address only |
 | `RELOOP_PUBLIC_IP` | Address printed in the DNS records and SPF |
 | `RELOOP_HTTPS` | Whether Reloop is reached over `https://` |
 | `RELOOP_EXTERNAL_PROXY` / `RELOOP_PROXY_PORT` | Run behind your own proxy, and the local port it forwards to |
 | `BASE_URL` / `TRACKING_BASE_URL` | Public origins used in links and emails, generated from the values above |
 | `RELOOP_SITE_ADDRESS` / `RELOOP_TRACKING_SITE_ADDRESS` | Site addresses for the bundled Caddy, generated |
 | `POSTGRES_*`, `REDIS_PASSWORD`, `BETTER_AUTH_SECRET`, `RELOOP_INTERNAL_SECRET`, `TRACKING_SECRET`, `PREFERENCES_SECRET`, `WEBHOOK_ENCRYPTION_KEY` | Generated once and kept across re-runs. Back them up with the file and don't replace them by hand |
-| `DEFAULT_OTP` | Bootstrap sign-in code, see [First sign-in](#first-sign-in) |
+| `SETUP_MODE` / `ADMIN_SETUP_KEY_FILE` | First-run setup state and the setup key path inside the auth container |
 | `DISABLE_SIGNUP` / `DISABLE_ORG_CREATION` | Close registration and organization creation |
 | `AUTH_INTERNAL_BASE_URL` | Internal origin for session checks between services |
 | `APP_NAME` | Name used in system email. See [Branding system email](/docs/setup/backend/email#branding-system-email) |
@@ -15068,7 +14994,8 @@ curl -fsSL https://reloop.sh/install.sh | sudo \
 | :--- | :--- |
 | `RELOOP_NONINTERACTIVE` | Never prompt; fail if a required value is missing |
 | `RELOOP_DOMAIN` | Primary hostname |
-| `RELOOP_ADMIN_EMAIL` | Administrator email |
+| `RELOOP_ADMIN_EMAIL` | TLS contact email |
+| `RELOOP_ADMIN_SETUP_KEY` | Optional administrator setup key override; equivalent to `--admin-key=` |
 | `RELOOP_DB_NAME` / `RELOOP_DB_USER` | Database name and role |
 | `RELOOP_HTTPS` | `yes` or `no`. Behind your own proxy, whether that proxy serves HTTPS |
 | `RELOOP_EXTERNAL_PROXY` | `yes` to run behind your own reverse proxy instead of taking `80` and `443` |
@@ -15781,9 +15708,14 @@ SMTP_PASSWORD=your-token
 ### Signing in before email works
 
 A fresh install has no sending domain, so it cannot email you a code to log in
-and verify a sending domain. The installer writes a fixed `DEFAULT_OTP` into
-`.env` to break that loop. Use it to sign in, configure a transport above, then
-remove `DEFAULT_OTP` and restart.
+and verify one. Self-host breaks that loop at `/dashboard/setup`: the installer
+prints a one-time setup key, and the wizard creates the first administrator
+with a password, so no email is needed. See
+[VPS install](/docs/self-host/vps).
+
+`DEFAULT_OTP` is a development helper and is left empty on new installations.
+Installations upgraded from an older installer keep the fixed code they were
+given; remove it and restart once a transport above works.
 
 ## Branding system email
 
@@ -16620,7 +16552,7 @@ NATS_URL=nats://localhost:4222
 NODE_ENV=development
 ```
 
-`WEBHOOK_ENCRYPTION_KEY` encrypts stored webhook signing secrets. If unset, secrets are stored in plaintext (local only).
+`WEBHOOK_ENCRYPTION_KEY` encrypts stored webhook signing secrets. If unset, secrets are stored in plaintext (local only). The workflow service decrypts them to sign deliveries, so it needs the same value.
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
@@ -16711,6 +16643,7 @@ PORT=8017
 BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
 NODE_ENV=development
+WEBHOOK_ENCRYPTION_KEY=your-64-char-hex-key
 # Optional basic-auth for Workbench (/api/workflow/jobs)
 # WORKBENCH_USER=admin
 # WORKBENCH_PASS=secret
@@ -16723,8 +16656,15 @@ NODE_ENV=development
 | `PORT` | **YES** | `8017` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `WORKBENCH_USER` | No | empty (open in dev) |
-| `WORKBENCH_PASS` | No | empty (open in dev) |
+| `WEBHOOK_ENCRYPTION_KEY` | Same value as the webhook service | Dev key in `.env.dev` |
+| `WORKBENCH_USER` | Outside development | empty (dashboard disabled) |
+| `WORKBENCH_PASS` | Outside development | empty (dashboard disabled) |
+
+Outside development the dashboard at `/api/workflow/jobs` only mounts when both values are set, and then sits behind HTTP basic auth. The self-host installer generates them.
+
+This service signs outbound webhook deliveries, so it decrypts the secrets the webhook service stored. Both services must use the same `WEBHOOK_ENCRYPTION_KEY`, or every signature will be computed from the ciphertext and fail verification.
+
+With `NODE_ENV=development`, deliveries may target `http://` URLs and private or loopback addresses, so a receiver on `localhost` works. In production only public HTTPS endpoints are allowed.
 
 ## Commands
 

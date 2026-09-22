@@ -6,7 +6,7 @@
 > Docs index: https://reloop.sh/llms-docs.txt
 > Product skill: https://reloop.sh/skill.md
 
-Generated from 19 pages.
+Generated from 20 pages.
 
 ---
 
@@ -35,7 +35,7 @@ Markdown: https://reloop.sh/pricing.md
   - 100 emails / day
   - 1 agent inbox
   - 1 webhook
-  - 1 custom domain
+  - 3 custom domains
   - 1 MB attachments
   - Data retention (45 days)
   - Community support
@@ -137,7 +137,7 @@ Reloop is open-source email infrastructure (Apache 2.0): transactional API, SMTP
 
 ### What counts as an email?
 
-Each successfully sent email counts toward your monthly quota—transactional messages, campaign sends, and SMTP relay deliveries all use credits the same way.
+Each successfully sent email counts toward your monthly quota: transactional messages, campaign sends, and SMTP relay deliveries all use credits the same way.
 
 ### Do I need a credit card to start?
 
@@ -718,6 +718,41 @@ Canonical data: https://reloop.sh/pricing.md
 
 ---
 
+# Developers
+
+Path: /developers
+URL: https://reloop.sh/developers
+Markdown: https://reloop.sh/developers.md
+
+# Developers
+
+Reloop is built for developers who need reliable transactional email, webhooks, and SMTP.
+
+## Quick links
+
+- Docs index: https://reloop.sh/llms-docs.txt
+- API reference: https://reloop.sh/docs/api
+- SDKs: https://reloop.sh/docs/resources/sdks
+- Languages: https://reloop.sh/languages
+- API keys (agent): https://reloop.sh/docs/learn/ai/api-keys.md
+- MCP server: https://reloop.sh/docs/integrations/ai-tools/mcp-server
+- Product skill: https://reloop.sh/skill.md
+
+## Auth
+
+- Header: `x-api-key: <secret>`
+- Key prefix: `rl_`
+
+## Install product MCP
+
+```bash
+npx -y reloop-mcp
+# env: RELOOP_API_KEY=rl_...
+```
+
+
+---
+
 # About Reloop
 
 Path: /about
@@ -758,374 +793,253 @@ Solo developers, startups, and teams that want transactional + marketing email w
 
 ---
 
-# Developers
+# Introducing Reloop: Open-Source Email Infrastructure Developers Actually Want to Use
 
-Path: /developers
-URL: https://reloop.sh/developers
-Markdown: https://reloop.sh/developers.md
+Path: /blog/introducing-reloop
+URL: https://reloop.sh/blog/introducing-reloop
+Markdown: https://reloop.sh/blog/introducing-reloop.md
 
-# Developers
+Open-source email infrastructure for indie hackers, startups, product teams, and enterprises. Ship transactional mail, agent inboxes, and inbound on Reloop Cloud or self-host—same product, no lock-in.
 
-Reloop is built for developers who need reliable transactional email, webhooks, and SMTP.
+Here's the one thing every developer and every company cares about with email infrastructure:
 
-## Quick links
+**Will the mail land, and will we still own the stack when it does?**
 
-- Docs index: https://reloop.sh/llms-docs.txt
-- API reference: https://reloop.sh/docs/api
-- SDKs: https://reloop.sh/docs/resources/sdks
-- Languages: https://reloop.sh/languages
-- API keys (agent): https://reloop.sh/docs/learn/ai/api-keys.md
-- MCP server: https://reloop.sh/docs/integrations/ai-tools/mcp-server
-- Product skill: https://reloop.sh/skill.md
+Pretty dashboards, fancy editors, and feature checklists are secondary. Password resets, receipts, and agent replies only matter if they reach the inbox, stay affordable as you grow, and don't trap you in a vendor you can't leave.
 
-## Auth
+Today we're introducing Reloop: [open-source email infrastructure](https://github.com/reloop-labs/reloop) built around the five things people actually evaluate when they pick (or regret picking) an email provider. Prefer a side-by-side? Start with [Compare Reloop](/compare) or our [2026 provider comparison](/blog/email-provider-comparison-2026).
 
-- Header: `x-api-key: <secret>`
-- Key prefix: `rl_`
+## The five things that matter
 
-## Install product MCP
+### 1. Deliverability
 
-```bash
-npx -y reloop-mcp
-# env: RELOOP_API_KEY=rl_...
-```
+If mail lands in spam, nothing else counts. Reloop is built as real [delivery infrastructure](/features/deliverability): [SMTP](/features/smtp), [DKIM/SPF-oriented setup](/blog/spf-dkim-dmarc-setup-guide), bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. [Self-host](/self-host) when you want the sending path on your own terms—see [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for when that tradeoff is worth it.
 
+### 2. Developer experience
 
----
-
-# Why Your Emails Land In Spam & How to Fix It
-
-Path: /blog/why-emails-land-in-spam-fix
-URL: https://reloop.sh/blog/why-emails-land-in-spam-fix
-Markdown: https://reloop.sh/blog/why-emails-land-in-spam-fix.md
-
-The definitive guide to diagnosing and fixing email spam folder placement — covering authentication, content, reputation, list hygiene, and ISP-specific issues.
-
-**Email deliverability does not fail with an HTTP 404 error or a readable stack trace—it fails silently by routing your mission-critical messages into the recipient's spam folder.**
-
-When auth tokens, password reset links, invoices, and user notifications land in spam, your business is effectively down for those users. Because SMTP technically completes message handoff without an error code, deliverability regressions are notoriously difficult to detect and debug without a systematic methodology.
-
-This guide walks you through every major root cause of spam folder placement, provides exact CLI commands and tools to diagnose your sending path, and details the concrete steps required to fix each issue permanently.
-
-## Start with a spam score baseline
-
-**Before debugging individual infrastructure components, establish an objective spam score baseline.**
-
-Send a test email from your production or staging environment to [mail-tester.com](https://mail-tester.com). The service executes automated SpamAssassin heuristics, analyzes message MIME structure, and checks DNSBL blacklists to return a score from 0 to 10.
-
-- **Score 9.0 to 10.0**: **Optimal deliverability baseline** required for transactional infrastructure.
-- **Score 7.0 to 8.9**: **Active deliverability risks**—minor configuration warnings, missing headers, or slight content penalties.
-- **Score Below 7.0**: **Severe deliverability failure**—failing authentication, blacklisted IP, or broken MIME structure.
-
-In parallel, register your sending domain with [Google Postmaster Tools](https://postmaster.google.com). It provides proprietary Gmail telemetry directly from Google—including **domain reputation**, **IP reputation**, **spam complaint rates**, and **authentication success rates**.
-
-## Cause 1: Missing or broken email authentication
-
-**Probability: Very High. Over 70% of inbox placement failures stem from authentication misconfigurations.**
-
-Major mailbox providers ([Google, Yahoo, and Microsoft](https://blog.google/products/gmail/gmail-security-authentication-spam-protection/)) enforce mandatory authentication for all senders. If your messages fail or lack [SPF, DKIM, or DMARC](/blog/spf-dkim-dmarc-setup-guide), inbox providers will aggressively route your traffic to spam or drop it at the SMTP handshake.
-
-### How to diagnose authentication in DNS
-
-Verify that your DNS records are active and resolving across public resolvers:
-
-```bash
-# 1. Verify SPF record
-dig TXT yourdomain.com +short | grep spf
-
-# 2. Verify DKIM record (Reloop uses the 'reloop' selector)
-dig TXT reloop._domainkey.yourdomain.com +short
-
-# 3. Verify DMARC record
-dig TXT _dmarc.yourdomain.com +short
-```
-
-You can also paste raw message headers into the [MXToolbox Email Header Analyzer](https://mxtoolbox.com/EmailHeaders.aspx) to inspect how receiving mail transfer agents evaluate your records.
-
-### What healthy authentication headers look like
-
-Inspect the `Authentication-Results` header inside a delivered email:
-
-```http
-Authentication-Results: mx.google.com;
-  spf=pass (google.com: domain of notifications@yourdomain.com designates 1.2.3.4 as permitted sender) smtp.mailfrom=notifications@yourdomain.com;
-  dkim=pass header.i=@yourdomain.com header.s=reloop;
-  dmarc=pass (p=REJECT) header.from=yourdomain.com
-```
-
-**If any authentication check shows `fail` or `softfail`, resolve authentication before investigating any other deliverability factor.** See our step-by-step [SPF, DKIM, and DMARC complete setup guide](/blog/spf-dkim-dmarc-setup-guide).
-
-### The DMARC alignment trap
-
-**An email can pass SPF and DKIM individually while still failing DMARC due to identifier misalignment.**
-
-DMARC requires that the domain in the user-visible `From:` header matches either:
-1. The domain in the envelope sender `Return-Path` (**SPF Alignment**)
-2. The domain specified in the `d=` tag of a valid `DKIM-Signature` (**DKIM Alignment**)
-
-If you send from `auth@yourdomain.com` but your DKIM signature is signed under a third-party vendor domain without custom domain alignment, DMARC evaluation will fail.
-
-## Cause 2: Sending from a new IP with no reputation
-
-**Probability: High for freshly provisioned servers and new infrastructure.**
-
-Internet Service Providers (ISPs) maintain rolling reputation scores for every sending IP address. **A brand new IP starts with neutral reputation, which anti-abuse filters treat with heightened suspicion.** Jumping immediately to high sending volume from a cold IP triggers automated rate-limiting, temporary deferrals (`421` / `451` SMTP codes), and spam placement.
-
-### Indicators of an IP reputation issue
-
-- Deliverability was flawless on previous infrastructure before migrating to a new server.
-- You recently provisioned a dedicated IP address or switched email infrastructure providers.
-- [Google Postmaster Tools](https://postmaster.google.com) reports **"Low"** or **"Bad"** IP reputation.
-
-### How to fix it: Structured IP warming
-
-**IP warming is the process of gradually scaling outbound volume over 4 to 6 weeks to establish trusted sender reputation.**
-
-| Week | Recommended Daily Sends | Primary Focus |
-| :--- | :--- | :--- |
-| **Week 1** | **50 – 200 emails/day** | High-intent transactional mail (password resets, welcome emails). |
-| **Week 2** | **200 – 500 emails/day** | Active daily users and transactional notifications. |
-| **Week 3** | **500 – 1,000 emails/day** | Expand to weekly summaries and invoice dispatches. |
-| **Week 4** | **1,000 – 2,500 emails/day** | Begin rolling out product updates to engaged segments. |
-| **Week 5** | **2,500 – 5,000 emails/day** | Monitor spam complaint rate; ensure complaints remain < 0.05%. |
-| **Week 6+** | **5,000 – 10,000+ emails/day** | Full production capacity with established reputation. |
-
-**During the initial warm-up window, send exclusively to your most engaged recipients.** High open rates and user engagement accelerate positive reputation scoring with mailbox algorithms. Follow our detailed [IP warming schedule guide](/blog/ip-warming-guide).
-
-## Cause 3: High bounce rate
-
-**Probability: Moderate to High, particularly after user imports or list migrations.**
-
-**A bounce rate exceeding 2% is an immediate warning signal to ISPs; a bounce rate over 5% triggers automated throttling or domain blacklisting.** High bounce rates indicate that a sender is not validating email addresses at collection or is sending to stale, unverified databases.
-
-### Distinguishing Hard vs. Soft Bounces
-
-- **Hard Bounces (5xx SMTP errors)**: Permanent delivery failures (e.g. `550 5.1.1 User unknown`, invalid mailbox, nonexistent domain).
-- **Soft Bounces (4xx SMTP errors)**: Temporary delivery failures (e.g. `452 Mailbox full`, server busy, transient network timeout).
-
-### How to eliminate bounce penalties
-
-1. **Automatically suppress hard-bounced addresses**: Never retry sending to a hard bounce. [Reloop's delivery engine](/features/deliverability) automatically suppresses hard bounces to protect your domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
-2. **Verify addresses in real-time at signup**: Prevent typos and invalid domains directly at your registration form:
-   ```typescript
-
-     // Basic format validation
-     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-     if (!emailRegex.test(email)) return false;
-
-     // Verify domain has active MX records
-     const domain = email.split("@")[1];
-     try {
-       const mxRecords = await resolver.resolveMx(domain);
-       return mxRecords && mxRecords.length > 0;
-     } catch {
-       return false;
-     }
-   }
-   ```
-3. **Never purchase or scrape email lists**: Third-party lists contain spam traps (honeypot addresses maintained by anti-spam organizations) that immediately ruin domain reputation.
-
-## Cause 4: High spam complaint rate
-
-**Probability: High for mixed transactional and notification streams.**
-
-A spam complaint occurs whenever a recipient clicks "Report Spam" or "Mark as Spam" in Gmail, Apple Mail, or Outlook.
-
-- **Google & Yahoo Warning Threshold**: **0.10%** (1 complaint per 1,000 delivered emails).
-- **Enforcement & Blocking Threshold**: **0.30%** (3 complaints per 1,000 delivered emails).
-
-**Exceeding 0.30% spam complaints will cause mailbox providers to route all subsequent domain traffic directly to the spam folder.**
-
-### How to reduce spam complaints
-
-1. **Isolate transactional from promotional sending**: **Never send marketing blasts from your primary transactional domain.** Isolate critical auth tokens and receipts on a dedicated subdomain (e.g. `auth.yourdomain.com` or `mail.yourdomain.com`) as detailed in our [transactional email best practices](/blog/transactional-email-best-practices).
-2. **Implement RFC 8058 One-Click Unsubscribe**: Gmail and Yahoo require one-click unsubscribe headers for non-transactional messages:
-   ```typescript
-
-   const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-
-   await reloop.emails.send({
-     from: "notifications@yourdomain.com",
-     to: user.email,
-     subject: "Your weekly analytics digest",
-     headers: {
-       "List-Unsubscribe": `<https://yourdomain.com/unsubscribe?token=${user.token}>`,
-       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-     },
-     html: "<p>Your weekly digest content...</p>",
-   });
-   ```
-3. **Sunset inactive recipients**: Implement sunset policies for non-essential notifications. If a user has not opened an email in 90 days, reduce sending frequency or require explicit re-opt-in.
-
-## Cause 5: Content triggering Bayesian spam filters
-
-**Probability: Low for standard transactional receipts; Moderate for notification templates.**
-
-Modern spam filters use natural language processing and Bayesian analysis to evaluate message payloads. While keywords alone rarely cause spam placement, poor HTML formatting combined with aggressive promotional phrasing will penalize your delivery score.
-
-### Content practices that degrade inbox placement
-
-- **Missing `text/plain` multipart MIME**: Sending an HTML-only email without an accompanying plain text alternative is a strong spam signal. Reloop automatically generates plain text fallbacks for all outgoing messages.
-- **Extreme Image-to-Text Ratio**: Single large promotional images with little or no accompanying text mimic phishing campaigns.
-- **Link Text vs. Href Domain Mismatches**: If your link anchor text displays `https://yourdomain.com/login` but the underlying `href` points to an unbranded tracking redirect, filters flag the discrepancy as a potential phishing attempt.
-- **Spam Trigger Patterns**: Excessive capitalization in subject lines (`URGENT: RESET NOW`), repetitive punctuation (`$$$`, `!!!`), and deceptive urgency triggers.
-
-## Cause 6: Sending from unmonitored `noreply@` addresses
-
-**Probability: Measurable impact on recipient engagement signals.**
-
-Using `noreply@yourdomain.com` harms deliverability in two distinct ways:
-1. **Machine Learning Heuristics**: Mailbox algorithms associate `noreply@` with low-engagement bulk blasts.
-2. **Missed Engagement Signals**: When recipients reply to an email (e.g. "Thanks!" or asking a question), mailbox algorithms register that interaction as a strong positive reputation signal. A `noreply@` address blocks this positive feedback loop.
-
-**Best Practice**: Use a recognizable sender address such as `notifications@yourdomain.com` or `team@yourdomain.com`, and set a monitored `Reply-To` header to route inbound responses to your support inbox:
-
-```typescript
-await reloop.emails.send({
-  from: "Acme Support <notifications@yourdomain.com>",
-  replyTo: "support@yourdomain.com",
-  to: user.email,
-  subject: "Your order confirmation",
-  html: "<p>Thank you for your purchase...</p>",
-});
-```
-
-## Cause 7: Sending IP or domain listed on a DNSBL blacklist
-
-**Probability: High if credentials were leaked, sending servers were compromised, or list hygiene was neglected.**
-
-DNSBLs (DNS-based Blackhole Lists) are shared databases of IP addresses and domains flagged for spam transmission or compromised SMTP servers. If your IP or domain appears on an authoritative blocklist (such as **Spamhaus**, **Barracuda**, or **Spamcop**), major ISPs will reject or spam-folder your mail immediately.
-
-### How to check blacklist status
-
-Run an automated scan across all major DNSBL registries using the [MXToolbox Blacklist Checker](https://mxtoolbox.com/blacklists.aspx). Enter your sending IP address and sending domain.
-
-### How to request delisting
-
-1. **Isolate and fix the root cause**: Identify and patch the compromised SMTP credential, stop the rogue sending loop, or purge the failing email list.
-2. **Submit a removal request**: Visit the specific blacklist removal portal (e.g. the [Spamhaus Blocklist Removal Center](https://www.spamhaus.org/removal/)) and provide proof of remediation.
-3. **Monitor clearance**: Most reputable blocklists clear listings within 24 to 48 hours once remediation is verified.
-
-## Cause 8: ISP-specific filtering (Gmail, Microsoft 365, Apple)
-
-Each major mailbox provider utilizes proprietary filtering algorithms beyond baseline standards:
-
-### 1. Google (Gmail)
-- **Primary Tool**: Monitor [Google Postmaster Tools](https://postmaster.google.com).
-- **Tab Placement vs. Spam**: If transactional emails route to the **Promotions** tab instead of **Primary**, this is a classification issue rather than a spam penalty. Keep transactional templates lightweight and free from promotional banners to help Gmail route them to Primary.
-- **BIMI Brand Logo**: Implement [BIMI (Brand Indicators for Message Identification)](/blog/bimi-email-setup-guide) with a valid DMARC enforcement policy (`p=quarantine` or `p=reject`) to display your verified company avatar in Gmail inboxes.
-
-### 2. Microsoft (Outlook / Office 365)
-- Microsoft maintains stringent IP reputation filtering and relies heavily on [Smart Network Data Services (SNDS)](https://sendersupport.olc.protection.outlook.com/snds/).
-- Microsoft frequently returns `550 5.7.1` error codes when an IP reputation drops below acceptable thresholds.
-
-## The 8-Step Deliverability Diagnostic Checklist
-
-When emails are landing in spam, work through this diagnostic sequence in order:
-
-1. **Run a [mail-tester.com](https://mail-tester.com) scan (target score ≥ 9/10)** — Identifies broken MIME syntax, missing DNS tags, and Bayesian spam keyword flags before you touch infrastructure.
-2. **Audit raw authentication headers** — Inspect received headers in an actual test inbox to confirm `SPF: PASS`, `DKIM: PASS`, and `DMARC: PASS` with identifier alignment.
-3. **Check [Google Postmaster Tools](https://postmaster.google.com) telemetry** — Verify that your Domain Reputation is "Good" or "High" and inspect Gmail-specific spam rates.
-4. **Check DNSBL blacklists on [MXToolbox](https://mxtoolbox.com/blacklists.aspx)** — Confirm neither your sending IP nor domain is listed on Spamhaus, Barracuda, or Spamcop.
-5. **Review real-time bounce rates in [Reloop Analytics](/features/email-analytics)** — Confirm that your 30-day hard bounce rate is strictly **below 2%** and that auto-suppression is active.
-6. **Review your spam complaint rate** — Ensure complaints remain strictly **below 0.10%** (1 per 1,000 sends) to prevent algorithmic ISP filtering.
-7. **Audit MIME structure & plain text fallback** — Verify that every outgoing template includes both a valid `text/plain` part and a balanced HTML payload without broken tracking URLs.
-8. **Verify ISP-specific routing & tab placement** — Check whether messages are routing to Gmail's Promotions tab vs. spam, and isolate transactional subdomains from promotional lists.
-
----
-
-# Why We Open-Sourced Our Email Infrastructure
-
-Path: /blog/why-we-open-sourced-email-infrastructure
-URL: https://reloop.sh/blog/why-we-open-sourced-email-infrastructure
-Markdown: https://reloop.sh/blog/why-we-open-sourced-email-infrastructure.md
-
-The story behind Reloop: why we built an open-source alternative to SendGrid, Resend, and Mailgun, why email infrastructure is too critical to rent forever, and what we're changing.
-
-**Email is the most critical communication backbone of modern software, yet it has quietly become one of the most expensive and locked-down tools in SaaS.**
-
-When your auth tokens, receipts, password resets, and user notifications fail, your business is effectively down. Yet for over a decade, developers have been forced to accept a frustrating tradeoff: **either pay skyrocketing bills to closed email vendors**, or **spend months wrestling with fragile mail servers** that lack modern APIs, webhooks, and analytics.
-
-We built [Reloop](https://github.com/reloop-labs/reloop) because we believe **email infrastructure belongs in the open**. Here is the story behind why we started, the structural problems we kept running into, and why we made Reloop [Apache 2.0](/license).
-
----
-
-## The problem: Email became a hostage situation
-
-Every growing startup and engineering team we spoke with was hitting the same predictable wall: **monthly email bills exploding from $20 to $2,000+ as user volume scaled**, without any corresponding increase in value or underlying infrastructure costs.
-
-Beyond pricing, closed-source email providers introduce compounding technical risks:
-
-- **Vendor lock-in by design**: Proprietary APIs, custom template formats, and vendor-specific webhook payloads ensure that **leaving a provider requires a painful, multi-week engineering rewrite**.
-- **Opaque black-box delivery**: When emails silently fail or get flagged as spam, closed vendors offer vague deliverability scores rather than raw [SMTP](/features/smtp) transcripts and transparent queue visibility.
-- **Zero data sovereignty**: Every user interaction, email address, password reset token, and payload metadata passes through third-party servers—**creating compliance headaches for HIPAA, GDPR, and enterprise audits**.
-- **Single point of failure**: If your closed email SaaS suffers an outage, **your entire authentication and notification loop goes dark with zero fallback**.
-
-To see how these tradeoffs compare across the ecosystem, check our [2026 email provider comparison](/blog/email-provider-comparison-2026) or explore side-by-side breakdowns against [SendGrid](/compare/sendgrid), [Resend](/compare/resend), [Mailgun](/compare/mailgun), and [AWS SES](/compare/aws-ses).
-
----
-
-## Why "just use Postfix" isn't the answer
-
-The traditional counterargument from senior engineers has always been: *"Why not just run your own Postfix, KumoMTA or Haraka instance?"*
-
-**The harsh reality is that raw Postfix provides a mail transfer agent, not modern developer infrastructure.** 
-
-Running bare SMTP solves packet transmission, but it leaves you with months of grueling undifferentiated engineering work:
-
-1. **Reputation & protocol engineering**: Configuring [SPF, DKIM, and DMARC](/blog/spf-dkim-dmarc-setup-guide), handling [IP warming sequences](/blog/ip-warming-guide), and managing suppression lists.
-2. **Bounce classification**: Distinguishing between temporary soft bounces and permanent hard bounces automatically to protect domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
-3. **Developer ergonomics**: Building ergonomic REST APIs, multi-language [SDKs](/sdk), and template render engines.
-4. **Visibility & observability**: Parsing real-time delivery events into signed [webhooks](/features/webhooks) and actionable [email analytics](/features/email-analytics).
-
-Building all of this in-house takes **6 to 9 months of full-time platform engineering** before sending your first production receipt. Most teams cannot afford that distraction, so they reluctantly pay the SaaS.
-
----
-
-## What we built with Reloop
-
-Reloop bridges this gap: **a production-grade, fully open-source email engine with the developer experience of modern email SaaS, built to run anywhere.**
+You should ship a [transactional email](/features/transaction-emails) in minutes, not a sprint. Reloop has a clean REST API (familiar if you've used modern email APIs), [SDKs for every major language](/sdk), and [SMTP drop-in](/features/smtp) for Nodemailer, Laravel, Django, and the rest. Prefer the product tour for builders? See [Developers](/developers).
 
 <SendEmailCodeSamples />
 
-Reloop gives you the complete lifecycle out of the box:
+Local and production should feel like the same product. [Docs](/docs) should help you ship, not send you hunting.
 
-- **Unified REST API & Drop-in SDKs**: Ergonomic endpoints and official [SDKs for Node.js, Python, and Go](/sdk) designed for seamless migration from existing providers (see our [SendGrid migration guide](/blog/migrating-from-sendgrid)).
-- **[SMTP relay](/features/smtp) & Drop-in replacement**: Instantly plug Reloop into Nodemailer, Next.js, Django, Laravel, Rails, or Supabase.
-- **Automated deliverability loop**: Built-in [SPF/DKIM validation](/blog/spf-dkim-dmarc-setup-guide), feedback loops, and intelligent retry queues powered by BullMQ (detailed in [how we built our queue engine](/blog/how-we-built-email-delivery-queue-bullmq)).
-- **Real-time [email analytics](/features/email-analytics)**: Full visibility into deliveries, opens, click tracking, bounces, and complaint rates with zero third-party tracking scripts.
-- **Signed [webhook delivery](/features/webhooks)**: Guaranteed event delivery with automatic backoff, replay capabilities, and secret signing.
-- **[AI Agent inboxes & MCP support](/features/ai-agents)**: Two-way inbound parsing and Model Context Protocol tooling so autonomous agents can send, receive, and reason over email safely (explore our [AI agent inbox use case](/use-cases/ai-agent-inbox) and [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents)).
+### 3. Cost that doesn't punish growth
+
+Email SaaS pricing often feels cheap at low volume and painful once you scale. Don't take that on faith—check the numbers yourself:
+
+- [Reloop pricing](/pricing) for hosted plans and what you get at each tier
+- [Compare Reloop vs Resend](/compare/resend), [vs SendGrid](/compare/sendgrid), [vs Mailgun](/compare/mailgun), and [vs AWS SES](/compare/aws-ses)
+- Full grid: [all provider comparisons](/compare)
+- Deeper write-up: [email provider comparison 2026](/blog/email-provider-comparison-2026)
+
+Reloop gives you two answers: a hosted path when you want zero ops, and a [full open-source path](/self-host) when you want to run the stack yourself and stop renting your outbound channel forever—including a [low-cost self-host path](/blog/self-host-email-5-dollars) if you're optimizing ops spend.
+
+### 4. Ownership (no vendor lock-in)
+
+This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/why-open-source).
+
+### 5. Visibility and the full loop
+
+"Did it send?" is not enough. You need deliveries, opens, clicks, bounces, and complaints as signed [webhooks](/features/webhooks) your app can act on: retries, suppressions, support alerts—plus [email analytics](/features/email-analytics) when you need the operational view. And for modern products (especially AI agents), send-only is half a system. Reloop includes inbound parsing, [agent inboxes](/features/ai-agents), and MCP support so agents can send, receive, and inspect mail with structured tools instead of scraping a random mailbox. See [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents) and the [AI agent inbox use case](/use-cases/ai-agent-inbox).
+
+## Why we open-sourced it
+
+Linux, Postgres, Redis, Nginx: the boring foundations of the internet are open. Email sits in that category. If it fails, users can't log in, can't reset passwords, and can't get receipts.
+
+Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a [pricing page](/pricing). Full rationale: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and our [product beliefs](/our-product-beliefs).
+
+We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product—same APIs whether you use [hosted](/pricing) or [self-host](/self-host).
+
+## Who should care
+
+Indie hackers, startups, side projects, product teams, and enterprises—if you're looking for your thing in email, Reloop is built for you.
+
+Maybe that's cheap transactional mail that doesn't become your most expensive utility ([pricing](/pricing)). Maybe it's multi-tenant delivery without standing up an MTA team. Maybe it's self-host or cloud with real ownership and no lock-in. Maybe you're migrating off [SendGrid](/compare/sendgrid), [Resend](/compare/resend), or [Mailgun](/compare/mailgun) and want parity without a science project ([SendGrid migration guide](/blog/migrating-from-sendgrid)). Or you're building AI agents that need inbound and outbound as [real infrastructure](/features/ai-agents).
+
+Whatever your scale or stack, if deliverability, DX, cost, ownership, and visibility are how you judge email tools, keep Reloop on your radar—and verify the claims on [compare](/compare), [pricing](/pricing), and the [docs](/docs).
+
+## Get in
+
+- GitHub: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop) (star it, watch it, contribute)
+- Cloud: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup) (first email in a couple of minutes)
+- Docs: [Docs](/docs) · [Pricing](/pricing) · [Compare](/compare) · [Self-host](/self-host)
+
+We're early, shipping in public, and still at the stage where your feedback bends the curve. If those five things are what you care about, this is the project to watch.
 
 ---
 
-## The open-source bet: Boring infrastructure must be open
+# How to Block Disposable Emails at Signup (Free Temp Email Checker)
 
-Think about the foundational software that powers modern computing: **Linux, PostgreSQL, Redis, Kubernetes, and Nginx**. 
+Path: /blog/block-disposable-emails-at-signup
+URL: https://reloop.sh/blog/block-disposable-emails-at-signup
+Markdown: https://reloop.sh/blog/block-disposable-emails-at-signup.md
 
-Nobody rents their primary database or operating system behind a closed, proprietary paywall where the underlying code cannot be inspected, self-hosted, or audited. **Email sits squarely in that foundational tier.**
+Stop throwaway signups before they bounce, burn free trials, and tank sender reputation. Use Reloop's free temp email checker — ~210k disposable domains, no SMTP probing.
 
-By releasing Reloop under the **[Apache 2.0 license](/license)**, we guarantee:
+Temporary inboxes are useful for privacy. They are expensive for anyone who sends email for a living.
 
-1. **Complete Stack Ownership**: The cloud platform and the open-source release run the **exact same codebase**. You can `docker compose up` locally, host on [Fly.io](/blog/reloop-flyio-deployment) or [Coolify](/blog/reloop-coolify-setup), or run on bare metal for under $5/mo (see [how to self-host email for $5/month](/blog/self-host-email-5-dollars)).
-2. **Auditability & Security**: Security teams can inspect every line of delivery logic and keep sensitive communication strictly within their own VPC boundary.
-3. **No Ransom Pricing**: If your business grows 100x, your outbound communication channel doesn't become your most expensive utility. You can choose managed [Reloop Cloud pricing](/pricing) for zero ops, or [self-host](/self-host) with complete independence.
+A disposable address often dies within an hour. Every message you send after that is a hard bounce. Sustained bounce rates are how mailbox providers decide your domain belongs in spam, for every recipient, not just the throwaway ones.
 
-For a deeper dive into our architectural philosophy, read our [product beliefs](/our-product-beliefs) and [why open source matters](/why-open-source).
+If you run a SaaS free tier, a newsletter, or a product waitlist, disposable signups also inflate your metrics and farm your credits. The fix is simple: check the address at signup, before it lands in your database.
 
----
+This guide covers when to block temporary emails, how a [temp email checker](/tools/temp-email-checker) works, and how to wire Reloop's free public API into a registration flow.
 
-## Where we go from here
+## What a temp email checker actually checks
 
-We are building Reloop in the open with a public roadmap driven by real developer feedback, not arbitrary pricing metrics.
+A temp email checker (also called a disposable email detector) answers one question: *is this address from a known throwaway provider?*
 
-Whether you are an indie hacker shipping your first app, a high-growth startup outgrowing vendor limits, or an enterprise demanding strict compliance: **you should never have to compromise between world-class developer experience and complete infrastructure ownership.**
+Reloop's [free Temp Email Checker](/tools/temp-email-checker) does more than a domain string match. On each request it:
 
-### Get involved
+1. **Parses RFC syntax** — malformed input never reaches the catalogue or DNS.
+2. **Matches ~210,000 disposable providers** — including Mailinator, Yopmail, Temp-Mail, Guerrilla Mail, and 10MinuteMail, plus wildcard suffixes for providers that mint endless subdomains.
+3. **Flags role prefixes** — `info@`, `billing@`, `support@` are shared inboxes, not burners. They are reported separately so you can apply your own policy.
+4. **Looks up MX records** — confirms the domain publishes a mail exchanger. That is routing evidence, not proof the mailbox exists.
+5. **Never opens an SMTP session** — no mailbox probe, no stored addresses, no account required.
 
-- **Star and explore the repository**: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop)
-- **Start sending on Reloop Cloud**: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup)
-- **Browse the documentation**: [Reloop Docs](/docs) · [Self-Host Guide](/self-host) · [Pricing](/pricing) · [Provider Comparisons](/compare)
+A disposable verdict means the domain is on the catalogue. A clear verdict means "not currently known to be disposable" — new temp-mail services appear constantly, so treat the check as a strong signal, not a lifetime guarantee.
+
+For a deeper walkthrough of detection methods, see [how to check if an email is disposable](/blog/disposable-email).
+
+## Why disposable emails damage deliverability
+
+Mailbox providers track bounce rate as a core reputation signal. Industry guidance keeps hard bounces well under ~2%. Throwaway inboxes make that threshold easy to miss:
+
+- The mailbox is deleted minutes or hours after signup.
+- Your welcome email, password reset, or drip sequence hard-bounces.
+- Those failures are scored against your sending domain and IP.
+- Reputation damage spreads to legitimate recipients — password resets and receipts start landing in spam.
+
+That is the same chain that ends with [emails in the spam folder](/blog/why-emails-land-in-spam-fix). Authentication (SPF, DKIM, DMARC) and [IP warming](/blog/ip-warming-guide) matter — but none of them fix a list full of dead temporary addresses.
+
+Prevention sits in front of bounce handling. Validate at signup, then suppress hard bounces immediately so dead temporary addresses never get a second send.
+
+## Signup abuse patterns a checker stops
+
+Deliverability is one reason to block. Product abuse is the other.
+
+| Pattern | What happens without a check | What a temp email checker does |
+| --- | --- | --- |
+| Free trial farming | Unlimited throwaway accounts, unlimited trials | Block at registration when `isDisposable` is true |
+| Coupon / referral fraud | Same offer claimed with a new burner each time | Reject or flag before the promotion is applied |
+| Waitlist inflation | Fake demand, useless launch emails | Keep the list honest before you send |
+| Newsletter padding | Open rates collapse; engagement signals look terrible | Suppress burners before the first campaign |
+| Multi-account bots | Shared disposable domains scale abuse cheaply | Catch the domain family, including wildcard providers |
+
+Role addresses (`admin@`, `sales@`) are a different problem: they are real and persistent, but shared. Reloop flags them separately so you can require a personal inbox without treating Gmail or Outlook as disposable.
+
+## When to block vs when to flag
+
+Blocking every temporary email is not always the right product decision.
+
+**Block at signup when:**
+
+- You offer a free trial, freemium tier, or usage credits
+- You run new-customer discounts or referral rewards
+- Fake accounts distort activation or retention metrics
+- You send transactional email and cannot afford bounce spikes
+
+**Flag or allow when:**
+
+- Privacy-sensitive audiences expect anonymous access
+- The flow is feedback, bug reports, or one-off downloads
+- You will suppress later rather than reject at the door
+
+A practical middle path: block disposable domains on paid or trial signup, and on newsletter forms either soft-warn or accept then suppress before campaigns. Pair the check with email confirmation and CAPTCHA so you are not relying on a single signal.
+
+## How to check an address with Reloop (free)
+
+### Option 1 — Use the web tool
+
+Paste an address into the [Reloop Temp Email Checker](/tools/temp-email-checker). You get a verdict, disposable match details, role and free-provider flags, MX hosts, confidence, and risk score — instantly, with no signup.
+
+Examples:
+
+- `alex@gmail.com` — deliverable consumer mailbox (free provider, not disposable)
+- `you@mailinator.com` — disposable
+- `demo@yopmail.com` — disposable
+
+### Option 2 — Call the public API at signup
+
+The checker is a thin wrapper over one public endpoint. No API key. No account. Rate limited per IP — keep it to signup-time checks, not bulk scrubbing.
+
+`POST https://reloop.sh/api/tools/v1/temp-email-checker`
+
+<TempEmailCheckerCodeSamples />
+
+A throwaway mailbox returns `"verdict": "disposable"` and `"isDisposable": true`:
+
+```json
+{
+  "input": "you@mailinator.com",
+  "kind": "email",
+  "domain": "mailinator.com",
+  "verdict": "disposable",
+  "isValidSyntax": true,
+  "isDisposable": true,
+  "disposableMatch": {
+    "kind": "exact",
+    "domain": "mailinator.com"
+  },
+  "isAllowlisted": false,
+  "isRoleAddress": false,
+  "isFreeProvider": false,
+  "signals": {
+    "syntax": "pass",
+    "disposable": "fail",
+    "role": "pass",
+    "freeProvider": "pass"
+  },
+  "mxRecords": ["spool.mailinator.com"],
+  "confidence": 0.99,
+  "riskScore": 0.95,
+  "flags": ["DISPOSABLE_DOMAIN", "PUBLIC_INBOX_DETECTED"]
+}
+```
+
+Reject or challenge the signup when `isDisposable` is `true`. Optionally treat high `riskScore` or role addresses as soft warnings.
+
+Need to clean an existing list rather than gate one registration? Use Reloop's free [email validator](/tools/email-validator) for syntax, disposable detection, live MX, and CSV cleaning (up to 1,000 rows) in one pass. For production volume and policy controls, see [email validation](/features/email-validation) on Reloop.
+
+## Layer checks that protect reputation end to end
+
+Disposable detection is one layer. Strong signup hygiene stacks several:
+
+1. **Temp / disposable check** — [Temp Email Checker](/tools/temp-email-checker) at account creation
+2. **List hygiene before campaigns** — [Email Validator](/tools/email-validator)
+3. **Authentication health** — [SPF, DKIM & DMARC checker](/tools/auth-checker) and the [setup guide](/blog/spf-dkim-dmarc-setup-guide)
+4. **Inbox placement tests** — [Deliverability tester](/tools/deliverability-tester)
+5. **Blocklist monitoring** — [IP & domain blocklist checker](/tools/blocklist-checker)
+6. **Transactional quality** — keep password resets and receipts on a dedicated subdomain with proper auth so the mail you do send deserves the inbox
+
+Reloop is open-source email infrastructure. You can use the hosted tools, call the public checker API, or [run Reloop yourself](/blog/why-we-open-sourced-email-infrastructure) when you want the same checks on your own servers.
+
+## Frequently asked questions
+
+### Is blocking disposable emails legal?
+
+Yes. Temporary email services are legal for users. Choosing not to accept them on your product is a normal terms-of-service and fraud-prevention decision — the same category as blocking known bot ASNs or requiring phone verification.
+
+### Will a temp email checker catch brand-new throwaway domains?
+
+List-based detection only knows what is on the catalogue. Reloop resyncs roughly every two hours across ~210,000 providers, which catches most new services quickly, but a brand-new domain can slip through until it is listed. Combine the check with confirmation email and rate limits.
+
+### Does Reloop prove the mailbox exists?
+
+No. MX lookup shows mail can be routed to the domain. Reloop never probes the mailbox over SMTP. That keeps the tool fast, privacy-friendly, and suitable for a public endpoint.
+
+### Is Gmail or Outlook disposable?
+
+No. Free consumer providers are persistent. Reloop may flag them as free providers so you can apply your own rules; they are not treated as throwaway.
+
+### Temp email checker vs email validator — which should I use?
+
+Use the [temp email checker](/tools/temp-email-checker) to block burners at signup (single address, public API). Use the [email validator](/tools/email-validator) when you need bulk CSV cleaning, fuller health scoring, and export for campaign hygiene.
+
+## Next step
+
+Run a known throwaway address through the [free Temp Email Checker](/tools/temp-email-checker), then wire the same check into your registration handler with the public API above.
+
+If you are already sending through Reloop or evaluating open-source transactional email, start free at [reloop](https://reloop.sh) and keep disposable addresses out of the path that builds your sender reputation.
 
 ---
 
@@ -1614,296 +1528,245 @@ Details: [Vercel + Reloop](/docs/integrations/vercel).
 
 ---
 
-# How to Check if an Email is Disposable (Free Temp Email Checker)
+# Why Your Emails Land In Spam & How to Fix It
 
-Path: /blog/disposable-email
-URL: https://reloop.sh/blog/disposable-email
-Markdown: https://reloop.sh/blog/disposable-email.md
+Path: /blog/why-emails-land-in-spam-fix
+URL: https://reloop.sh/blog/why-emails-land-in-spam-fix
+Markdown: https://reloop.sh/blog/why-emails-land-in-spam-fix.md
 
-In this guide, you'll learn what disposable emails are, why they matter, and how you can quickly check if an email is disposable.
+The definitive guide to diagnosing and fixing email spam folder placement — covering authentication, content, reputation, list hygiene, and ISP-specific issues.
 
-Every day, millions of users sign up for websites using temporary email addresses. While these emails help protect privacy, they can also create problems for businesses.
+**Email deliverability does not fail with an HTTP 404 error or a readable stack trace—it fails silently by routing your mission-critical messages into the recipient's spam folder.**
 
-If you run a SaaS product, e-commerce store, newsletter, or online community, disposable email addresses can lead to fake accounts, spam, coupon abuse, and inaccurate analytics.
+When auth tokens, password reset links, invoices, and user notifications land in spam, your business is effectively down for those users. Because SMTP technically completes message handoff without an error code, deliverability regressions are notoriously difficult to detect and debug without a systematic methodology.
 
-In this guide, you'll learn what disposable emails are, why they matter, and how you can quickly check if an email is disposable.
+This guide walks you through every major root cause of spam folder placement, provides exact CLI commands and tools to diagnose your sending path, and details the concrete steps required to fix each issue permanently.
 
-## What Is a Disposable Email?
+## Start with a spam score baseline
 
-A disposable email (also called a temporary email or temp mail) is an email address that exists for a short time. Users create these addresses to receive emails without using their personal inbox. Most disposable email services delete emails automatically after a few minutes or hours.
+**Before debugging individual infrastructure components, establish an objective spam score baseline.**
 
-People commonly use disposable emails to:
+Send a test email from your production or staging environment to [mail-tester.com](https://mail-tester.com). The service executes automated SpamAssassin heuristics, analyzes message MIME structure, and checks DNSBL blacklists to return a score from 0 to 10.
 
-- Protect their personal email address
-- Avoid spam and promotional emails
-- Test applications
-- Access free downloads without sharing their main inbox
+- **Score 9.0 to 10.0**: **Optimal deliverability baseline** required for transactional infrastructure.
+- **Score 7.0 to 8.9**: **Active deliverability risks**—minor configuration warnings, missing headers, or slight content penalties.
+- **Score Below 7.0**: **Severe deliverability failure**—failing authentication, blacklisted IP, or broken MIME structure.
 
-While these are valid use cases, disposable emails can also be misused to create fake accounts.
+In parallel, register your sending domain with [Google Postmaster Tools](https://postmaster.google.com). It provides proprietary Gmail telemetry directly from Google—including **domain reputation**, **IP reputation**, **spam complaint rates**, and **authentication success rates**.
 
-## Why Businesses Should Check Disposable Emails
+## Cause 1: Missing or broken email authentication
 
-Not every temporary email is harmful, but many businesses choose to detect them to improve data quality and prevent abuse.
+**Probability: Very High. Over 70% of inbox placement failures stem from authentication misconfigurations.**
 
-Here are the most common reasons.
+Major mailbox providers ([Google, Yahoo, and Microsoft](https://blog.google/products/gmail/gmail-security-authentication-spam-protection/)) enforce mandatory authentication for all senders. If your messages fail or lack [SPF, DKIM, or DMARC](/blog/spf-dkim-dmarc-setup-guide), inbox providers will aggressively route your traffic to spam or drop it at the SMTP handshake.
 
-### 1. Prevent Fake Registrations
+### How to diagnose authentication in DNS
 
-Users can create multiple accounts using different temporary email addresses. This inflates your user numbers without adding real customers.
+Verify that your DNS records are active and resolving across public resolvers:
 
-### 2. Stop Free Trial Abuse
+```bash
+# 1. Verify SPF record
+dig TXT yourdomain.com +short | grep spf
 
-If your product offers a free trial, users can repeatedly sign up with disposable emails to avoid paying for your service.
+# 2. Verify DKIM record (Reloop uses the 'reloop' selector)
+dig TXT reloop._domainkey.yourdomain.com +short
 
-### 3. Reduce Coupon Abuse
-
-Many online stores offer discounts for new customers. Disposable emails make it easy to claim the same offer multiple times.
-
-### 4. Improve Email Deliverability
-
-Marketing emails sent to temporary inboxes often bounce or are never opened, affecting your sender reputation.
-
-### 5. Keep Analytics Clean
-
-Fake accounts can distort important metrics such as:
-
-- Active users
-- Conversion rate
-- Customer retention
-- Marketing performance
-
-Accurate data leads to better business decisions.
-
-## How to Check if an Email Is Disposable
-
-There are several ways to identify temporary email addresses.
-
-### Method 1: Use a Free Disposable Email Checker (Recommended)
-
-The easiest and fastest method is to use an online disposable email checker.
-
-Simply enter an email address, and the tool checks whether the domain belongs to a known temporary email provider.
-
-If you're looking for a free solution, try the **[Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker)**.
-
-It instantly tells you whether an email address is disposable, making it easy to detect fake signups before they enter your system.
-
-Example:
-
-- `john@gmail.com` ✅ Personal email
-- `user@mailinator.com` ❌ Disposable email
-- `demo@tempmail.com` ❌ Disposable email
-
-### Method 2: Check the Email Domain
-
-Many temporary email services use publicly known domains.
-
-Examples include:
-
-- mailinator.com
-- guerrillamail.com
-- yopmail.com
-- 10minutemail.com
-- tempmail.com
-
-If an email belongs to one of these domains, it is likely disposable.
-
-However, this method requires maintaining an updated list because new temporary email providers appear regularly.
-
-### Method 3: Detect Disposable Emails Programmatically (API / Code)
-
-If your website accepts user registrations, checking every email manually isn't practical.
-
-Instead, integrate disposable email detection into your signup process to automatically flag temporary email addresses before accounts are created.
-
-The [Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker) is a thin wrapper over one public endpoint. `POST` an address to `https://reloop.sh/api/tools/v1/check` — no API key, no account.
-
-<TempEmailCheckerCodeSamples />
-
-A throwaway mailbox comes back with `"verdict": "disposable"` and `"isDisposable": true`:
-
-```json
-{
-  "input": "you@mailinator.com",
-  "kind": "email",
-  "domain": "mailinator.com",
-  "verdict": "disposable",
-  "isValidSyntax": true,
-  "isDisposable": true,
-  "disposableMatch": {
-    "kind": "exact",
-    "domain": "mailinator.com"
-  },
-  "isAllowlisted": false,
-  "isRoleAddress": false,
-  "isFreeProvider": false,
-  "signals": {
-    "syntax": "pass",
-    "disposable": "fail",
-    "role": "pass",
-    "freeProvider": "pass"
-  }
-}
+# 3. Verify DMARC record
+dig TXT _dmarc.yourdomain.com +short
 ```
 
-Reject or flag the signup when `isDisposable` is `true`. The endpoint is rate limited per IP, so keep it to signup-time checks rather than bulk list scrubbing.
+You can also paste raw message headers into the [MXToolbox Email Header Analyzer](https://mxtoolbox.com/EmailHeaders.aspx) to inspect how receiving mail transfer agents evaluate your records.
 
-This saves time and helps prevent abuse from the start.
+### What healthy authentication headers look like
 
-## Why We Built the Reloop Temp Email Checker
+Inspect the `Authentication-Results` header inside a delivered email:
 
-At **Reloop**, we build simple and useful developer tools that solve real-world problems.
+```http
+Authentication-Results: mx.google.com;
+  spf=pass (google.com: domain of notifications@yourdomain.com designates 1.2.3.4 as permitted sender) smtp.mailfrom=notifications@yourdomain.com;
+  dkim=pass header.i=@yourdomain.com header.s=reloop;
+  dmarc=pass (p=REJECT) header.from=yourdomain.com
+```
 
-Our **Temp Email Checker** was created to help developers, SaaS founders, and businesses quickly identify disposable email addresses without maintaining large domain lists.
+**If any authentication check shows `fail` or `softfail`, resolve authentication before investigating any other deliverability factor.** See our step-by-step [SPF, DKIM, and DMARC complete setup guide](/blog/spf-dkim-dmarc-setup-guide).
 
-Whether youre validating a single email or checking addresses before user registration, the tool provides instant results.
+### The DMARC alignment trap
 
-You can try it here: **[Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker)**.
+**An email can pass SPF and DKIM individually while still failing DMARC due to identifier misalignment.**
 
-You can also explore more free developer tools on our website: **[Reloop](https://reloop.sh)**.
+DMARC requires that the domain in the user-visible `From:` header matches either:
+1. The domain in the envelope sender `Return-Path` (**SPF Alignment**)
+2. The domain specified in the `d=` tag of a valid `DKIM-Signature` (**DKIM Alignment**)
 
-## When Should You Block Disposable Emails?
+If you send from `auth@yourdomain.com` but your DKIM signature is signed under a third-party vendor domain without custom domain alignment, DMARC evaluation will fail.
 
-Blocking temporary emails isn't always necessary.
+## Cause 2: Sending from a new IP with no reputation
 
-### Consider Blocking Them If:
+**Probability: High for freshly provisioned servers and new infrastructure.**
 
-- You offer free trials
-- You run a paid SaaS product
-- You provide welcome discounts
-- You want high-quality customer data
-- You need verified users
+Internet Service Providers (ISPs) maintain rolling reputation scores for every sending IP address. **A brand new IP starts with neutral reputation, which anti-abuse filters treat with heightened suspicion.** Jumping immediately to high sending volume from a cold IP triggers automated rate-limiting, temporary deferrals (`421` / `451` SMTP codes), and spam placement.
 
-### Consider Allowing Them If:
+### Indicators of an IP reputation issue
 
-- Privacy is important for your audience
-- Users submit anonymous feedback
-- Registration isn't required
-- Your service is completely free
+- Deliverability was flawless on previous infrastructure before migrating to a new server.
+- You recently provisioned a dedicated IP address or switched email infrastructure providers.
+- [Google Postmaster Tools](https://postmaster.google.com) reports **"Low"** or **"Bad"** IP reputation.
 
-Choose the approach that best matches your product and users.
+### How to fix it: Structured IP warming
 
-## Best Practices for Email Validation
+**IP warming is the process of gradually scaling outbound volume over 4 to 6 weeks to establish trusted sender reputation.**
 
-Checking for disposable emails works best when combined with other validation methods.
+| Week | Recommended Daily Sends | Primary Focus |
+| :--- | :--- | :--- |
+| **Week 1** | **50 – 200 emails/day** | High-intent transactional mail (password resets, welcome emails). |
+| **Week 2** | **200 – 500 emails/day** | Active daily users and transactional notifications. |
+| **Week 3** | **500 – 1,000 emails/day** | Expand to weekly summaries and invoice dispatches. |
+| **Week 4** | **1,000 – 2,500 emails/day** | Begin rolling out product updates to engaged segments. |
+| **Week 5** | **2,500 – 5,000 emails/day** | Monitor spam complaint rate; ensure complaints remain < 0.05%. |
+| **Week 6+** | **5,000 – 10,000+ emails/day** | Full production capacity with established reputation. |
 
-We recommend:
+**During the initial warm-up window, send exclusively to your most engaged recipients.** High open rates and user engagement accelerate positive reputation scoring with mailbox algorithms. Follow our detailed [IP warming schedule guide](/blog/ip-warming-guide).
 
-- Validate email format.
-- Detect disposable email domains.
-- Verify ownership with email confirmation.
-- Add CAPTCHA to signup forms.
-- Monitor suspicious signup activity.
-- Limit repeated registrations from the same IP address.
+## Cause 3: High bounce rate
 
-Using multiple layers of protection significantly reduces fake registrations.
+**Probability: Moderate to High, particularly after user imports or list migrations.**
 
-## Frequently Asked Questions
+**A bounce rate exceeding 2% is an immediate warning signal to ISPs; a bounce rate over 5% triggers automated throttling or domain blacklisting.** High bounce rates indicate that a sender is not validating email addresses at collection or is sending to stale, unverified databases.
 
-### Are Disposable Emails Legal?
+### Distinguishing Hard vs. Soft Bounces
 
-Yes. Temporary email services are legal and are widely used to protect personal privacy.
+- **Hard Bounces (5xx SMTP errors)**: Permanent delivery failures (e.g. `550 5.1.1 User unknown`, invalid mailbox, nonexistent domain).
+- **Soft Bounces (4xx SMTP errors)**: Temporary delivery failures (e.g. `452 Mailbox full`, server busy, transient network timeout).
 
-### Can Disposable Emails Receive Verification Emails?
+### How to eliminate bounce penalties
 
-Yes. Most temporary email providers can receive verification emails immediately after the address is created.
+1. **Automatically suppress hard-bounced addresses**: Never retry sending to a hard bounce. [Reloop's delivery engine](/features/deliverability) automatically suppresses hard bounces to protect your domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
+2. **Clean lists before you send**: Before campaigns or imports, run addresses through a [free email validator](/tools/email-validator) to catch invalid syntax, disposable domains, and domains with no MX records — so hard bounces never hit your sending reputation.
+3. **Verify addresses in real-time at signup**: Prevent typos and invalid domains directly at your registration form (or call Reloop's [email validation API](/features/email-validation) / use the free [bulk email verifier](/tools/email-validator) for CSV imports):
+   ```typescript
 
-### Should Every Website Block Disposable Emails?
+     // Basic format validation
+     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+     if (!emailRegex.test(email)) return false;
 
-Not necessarily.
+     // Verify domain has active MX records
+     const domain = email.split("@")[1];
+     try {
+       const mxRecords = await resolver.resolveMx(domain);
+       return mxRecords && mxRecords.length > 0;
+     } catch {
+       return false;
+     }
+   }
+   ```
+4. **Never purchase or scrape email lists**: Third-party lists contain spam traps (honeypot addresses maintained by anti-spam organizations) that immediately ruin domain reputation.
 
-Some websites benefit from anonymous access, while others require verified users. The decision depends on your business goals.
+## Cause 4: High spam complaint rate
 
-### Can Disposable Email Lists Become Outdated?
+**Probability: High for mixed transactional and notification streams.**
 
-Yes. New temporary email domains are created frequently, which is why regularly updated detection tools are much more reliable than static blocklists.
+A spam complaint occurs whenever a recipient clicks "Report Spam" or "Mark as Spam" in Gmail, Apple Mail, or Outlook.
 
-## Final Thoughts
+- **Google & Yahoo Warning Threshold**: **0.10%** (1 complaint per 1,000 delivered emails).
+- **Enforcement & Blocking Threshold**: **0.30%** (3 complaints per 1,000 delivered emails).
 
-Disposable email addresses are useful for protecting user privacy, but they can also be used to create fake accounts, abuse free trials, and reduce the quality of your customer data.
+**Exceeding 0.30% spam complaints will cause mailbox providers to route all subsequent domain traffic directly to the spam folder.**
 
-By checking email addresses during registration, you can improve security, keep your database clean, and make better business decisions.
+### How to reduce spam complaints
 
-If you need a quick and free way to verify an email address, try the **[Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker)**.
+1. **Isolate transactional from promotional sending**: **Never send marketing blasts from your primary transactional domain.** Isolate critical auth tokens and receipts on a dedicated subdomain (e.g. `auth.yourdomain.com` or `mail.yourdomain.com`) as detailed in our [transactional email best practices](/blog/transactional-email-best-practices).
+2. **Implement RFC 8058 One-Click Unsubscribe**: Gmail and Yahoo require one-click unsubscribe headers for non-transactional messages:
+   ```typescript
 
-Looking for more developer tools?
+   const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
 
-Visit **[Reloop](https://reloop.sh)**
+   await reloop.emails.send({
+     from: "notifications@yourdomain.com",
+     to: user.email,
+     subject: "Your weekly analytics digest",
+     headers: {
+       "List-Unsubscribe": `<https://yourdomain.com/unsubscribe?token=${user.token}>`,
+       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+     },
+     html: "<p>Your weekly digest content...</p>",
+   });
+   ```
+3. **Sunset inactive recipients**: Implement sunset policies for non-essential notifications. If a user has not opened an email in 90 days, reduce sending frequency or require explicit re-opt-in.
 
----
+## Cause 5: Content triggering Bayesian spam filters
 
-# Introducing Reloop: Open-Source Email Infrastructure Developers Actually Want to Use
+**Probability: Low for standard transactional receipts; Moderate for notification templates.**
 
-Path: /blog/introducing-reloop
-URL: https://reloop.sh/blog/introducing-reloop
-Markdown: https://reloop.sh/blog/introducing-reloop.md
+Modern spam filters use natural language processing and Bayesian analysis to evaluate message payloads. While keywords alone rarely cause spam placement, poor HTML formatting combined with aggressive promotional phrasing will penalize your delivery score.
 
-Open-source email infrastructure for indie hackers, startups, product teams, and enterprises. Ship transactional mail, agent inboxes, and inbound on Reloop Cloud or self-host—same product, no lock-in.
+### Content practices that degrade inbox placement
 
-Here's the one thing every developer and every company cares about with email infrastructure:
+- **Missing `text/plain` multipart MIME**: Sending an HTML-only email without an accompanying plain text alternative is a strong spam signal. Reloop automatically generates plain text fallbacks for all outgoing messages.
+- **Extreme Image-to-Text Ratio**: Single large promotional images with little or no accompanying text mimic phishing campaigns.
+- **Link Text vs. Href Domain Mismatches**: If your link anchor text displays `https://yourdomain.com/login` but the underlying `href` points to an unbranded tracking redirect, filters flag the discrepancy as a potential phishing attempt.
+- **Spam Trigger Patterns**: Excessive capitalization in subject lines (`URGENT: RESET NOW`), repetitive punctuation (`$$$`, `!!!`), and deceptive urgency triggers.
 
-**Will the mail land, and will we still own the stack when it does?**
+## Cause 6: Sending from unmonitored `noreply@` addresses
 
-Pretty dashboards, fancy editors, and feature checklists are secondary. Password resets, receipts, and agent replies only matter if they reach the inbox, stay affordable as you grow, and don't trap you in a vendor you can't leave.
+**Probability: Measurable impact on recipient engagement signals.**
 
-Today we're introducing Reloop: [open-source email infrastructure](https://github.com/reloop-labs/reloop) built around the five things people actually evaluate when they pick (or regret picking) an email provider. Prefer a side-by-side? Start with [Compare Reloop](/compare) or our [2026 provider comparison](/blog/email-provider-comparison-2026).
+Using `noreply@yourdomain.com` harms deliverability in two distinct ways:
+1. **Machine Learning Heuristics**: Mailbox algorithms associate `noreply@` with low-engagement bulk blasts.
+2. **Missed Engagement Signals**: When recipients reply to an email (e.g. "Thanks!" or asking a question), mailbox algorithms register that interaction as a strong positive reputation signal. A `noreply@` address blocks this positive feedback loop.
 
-## The five things that matter
+**Best Practice**: Use a recognizable sender address such as `notifications@yourdomain.com` or `team@yourdomain.com`, and set a monitored `Reply-To` header to route inbound responses to your support inbox:
 
-### 1. Deliverability
+```typescript
+await reloop.emails.send({
+  from: "Acme Support <notifications@yourdomain.com>",
+  replyTo: "support@yourdomain.com",
+  to: user.email,
+  subject: "Your order confirmation",
+  html: "<p>Thank you for your purchase...</p>",
+});
+```
 
-If mail lands in spam, nothing else counts. Reloop is built as real [delivery infrastructure](/features/deliverability): [SMTP](/features/smtp), [DKIM/SPF-oriented setup](/blog/spf-dkim-dmarc-setup-guide), bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. [Self-host](/self-host) when you want the sending path on your own terms—see [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for when that tradeoff is worth it.
+## Cause 7: Sending IP or domain listed on a DNSBL blacklist
 
-### 2. Developer experience
+**Probability: High if credentials were leaked, sending servers were compromised, or list hygiene was neglected.**
 
-You should ship a [transactional email](/features/transaction-emails) in minutes, not a sprint. Reloop has a clean REST API (familiar if you've used modern email APIs), [SDKs for every major language](/sdk), and [SMTP drop-in](/features/smtp) for Nodemailer, Laravel, Django, and the rest. Prefer the product tour for builders? See [Developers](/developers).
+DNSBLs (DNS-based Blackhole Lists) are shared databases of IP addresses and domains flagged for spam transmission or compromised SMTP servers. If your IP or domain appears on an authoritative blocklist (such as **Spamhaus**, **Barracuda**, or **Spamcop**), major ISPs will reject or spam-folder your mail immediately.
 
-<SendEmailCodeSamples />
+### How to check blacklist status
 
-Local and production should feel like the same product. [Docs](/docs) should help you ship, not send you hunting.
+Run an automated scan across all major DNSBL registries using the [MXToolbox Blacklist Checker](https://mxtoolbox.com/blacklists.aspx). Enter your sending IP address and sending domain.
 
-### 3. Cost that doesn't punish growth
+### How to request delisting
 
-Email SaaS pricing often feels cheap at low volume and painful once you scale. Don't take that on faith—check the numbers yourself:
+1. **Isolate and fix the root cause**: Identify and patch the compromised SMTP credential, stop the rogue sending loop, or purge the failing email list.
+2. **Submit a removal request**: Visit the specific blacklist removal portal (e.g. the [Spamhaus Blocklist Removal Center](https://www.spamhaus.org/removal/)) and provide proof of remediation.
+3. **Monitor clearance**: Most reputable blocklists clear listings within 24 to 48 hours once remediation is verified.
 
-- [Reloop pricing](/pricing) for hosted plans and what you get at each tier
-- [Compare Reloop vs Resend](/compare/resend), [vs SendGrid](/compare/sendgrid), [vs Mailgun](/compare/mailgun), and [vs AWS SES](/compare/aws-ses)
-- Full grid: [all provider comparisons](/compare)
-- Deeper write-up: [email provider comparison 2026](/blog/email-provider-comparison-2026)
+## Cause 8: ISP-specific filtering (Gmail, Microsoft 365, Apple)
 
-Reloop gives you two answers: a hosted path when you want zero ops, and a [full open-source path](/self-host) when you want to run the stack yourself and stop renting your outbound channel forever—including a [low-cost self-host path](/blog/self-host-email-5-dollars) if you're optimizing ops spend.
+Each major mailbox provider utilizes proprietary filtering algorithms beyond baseline standards:
 
-### 4. Ownership (no vendor lock-in)
+### 1. Google (Gmail)
+- **Primary Tool**: Monitor [Google Postmaster Tools](https://postmaster.google.com).
+- **Tab Placement vs. Spam**: If transactional emails route to the **Promotions** tab instead of **Primary**, this is a classification issue rather than a spam penalty. Keep transactional templates lightweight and free from promotional banners to help Gmail route them to Primary.
+- **BIMI Brand Logo**: Implement [BIMI (Brand Indicators for Message Identification)](/blog/bimi-email-setup-guide) with a valid DMARC enforcement policy (`p=quarantine` or `p=reject`) to display your verified company avatar in Gmail inboxes.
 
-This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/why-open-source).
+### 2. Microsoft (Outlook / Office 365)
+- Microsoft maintains stringent IP reputation filtering and relies heavily on [Smart Network Data Services (SNDS)](https://sendersupport.olc.protection.outlook.com/snds/).
+- Microsoft frequently returns `550 5.7.1` error codes when an IP reputation drops below acceptable thresholds.
 
-### 5. Visibility and the full loop
+## The 8-Step Deliverability Diagnostic Checklist
 
-"Did it send?" is not enough. You need deliveries, opens, clicks, bounces, and complaints as signed [webhooks](/features/webhooks) your app can act on: retries, suppressions, support alerts—plus [email analytics](/features/email-analytics) when you need the operational view. And for modern products (especially AI agents), send-only is half a system. Reloop includes inbound parsing, [agent inboxes](/features/ai-agents), and MCP support so agents can send, receive, and inspect mail with structured tools instead of scraping a random mailbox. See [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents) and the [AI agent inbox use case](/use-cases/ai-agent-inbox).
+When emails are landing in spam, work through this diagnostic sequence in order:
 
-## Why we open-sourced it
-
-Linux, Postgres, Redis, Nginx: the boring foundations of the internet are open. Email sits in that category. If it fails, users can't log in, can't reset passwords, and can't get receipts.
-
-Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a [pricing page](/pricing). Full rationale: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and our [product beliefs](/our-product-beliefs).
-
-We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product—same APIs whether you use [hosted](/pricing) or [self-host](/self-host).
-
-## Who should care
-
-Indie hackers, startups, side projects, product teams, and enterprises—if you're looking for your thing in email, Reloop is built for you.
-
-Maybe that's cheap transactional mail that doesn't become your most expensive utility ([pricing](/pricing)). Maybe it's multi-tenant delivery without standing up an MTA team. Maybe it's self-host or cloud with real ownership and no lock-in. Maybe you're migrating off [SendGrid](/compare/sendgrid), [Resend](/compare/resend), or [Mailgun](/compare/mailgun) and want parity without a science project ([SendGrid migration guide](/blog/migrating-from-sendgrid)). Or you're building AI agents that need inbound and outbound as [real infrastructure](/features/ai-agents).
-
-Whatever your scale or stack, if deliverability, DX, cost, ownership, and visibility are how you judge email tools, keep Reloop on your radar—and verify the claims on [compare](/compare), [pricing](/pricing), and the [docs](/docs).
-
-## Get in
-
-- GitHub: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop) (star it, watch it, contribute)
-- Cloud: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup) (first email in a couple of minutes)
-- Docs: [Docs](/docs) · [Pricing](/pricing) · [Compare](/compare) · [Self-host](/self-host)
-
-We're early, shipping in public, and still at the stage where your feedback bends the curve. If those five things are what you care about, this is the project to watch.
+1. **Run a [mail-tester.com](https://mail-tester.com) scan (target score ≥ 9/10)** — Identifies broken MIME syntax, missing DNS tags, and Bayesian spam keyword flags before you touch infrastructure.
+2. **Audit raw authentication headers** — Inspect received headers in an actual test inbox to confirm `SPF: PASS`, `DKIM: PASS`, and `DMARC: PASS` with identifier alignment.
+3. **Check [Google Postmaster Tools](https://postmaster.google.com) telemetry** — Verify that your Domain Reputation is "Good" or "High" and inspect Gmail-specific spam rates.
+4. **Check DNSBL blacklists on [MXToolbox](https://mxtoolbox.com/blacklists.aspx)** — Confirm neither your sending IP nor domain is listed on Spamhaus, Barracuda, or Spamcop.
+5. **Review real-time bounce rates in [Reloop Analytics](/features/email-analytics)** — Confirm that your 30-day hard bounce rate is strictly **below 2%** and that auto-suppression is active.
+6. **Review your spam complaint rate** — Ensure complaints remain strictly **below 0.10%** (1 per 1,000 sends) to prevent algorithmic ISP filtering.
+7. **Audit MIME structure & plain text fallback** — Verify that every outgoing template includes both a valid `text/plain` part and a balanced HTML payload without broken tracking URLs.
+8. **Verify ISP-specific routing & tab placement** — Check whether messages are routing to Gmail's Promotions tab vs. spam, and isolate transactional subdomains from promotional lists.
 
 ---
 
@@ -2133,6 +1996,101 @@ Email authentication establishes your domain identity, but **it does not replace
 
 ---
 
+# Why We Open-Sourced Our Email Infrastructure
+
+Path: /blog/why-we-open-sourced-email-infrastructure
+URL: https://reloop.sh/blog/why-we-open-sourced-email-infrastructure
+Markdown: https://reloop.sh/blog/why-we-open-sourced-email-infrastructure.md
+
+The story behind Reloop: why we built an open-source alternative to SendGrid, Resend, and Mailgun, why email infrastructure is too critical to rent forever, and what we're changing.
+
+**Email is the most critical communication backbone of modern software, yet it has quietly become one of the most expensive and locked-down tools in SaaS.**
+
+When your auth tokens, receipts, password resets, and user notifications fail, your business is effectively down. Yet for over a decade, developers have been forced to accept a frustrating tradeoff: **either pay skyrocketing bills to closed email vendors**, or **spend months wrestling with fragile mail servers** that lack modern APIs, webhooks, and analytics.
+
+We built [Reloop](https://github.com/reloop-labs/reloop) because we believe **email infrastructure belongs in the open**. Here is the story behind why we started, the structural problems we kept running into, and why we made Reloop [Apache 2.0](/license).
+
+---
+
+## The problem: Email became a hostage situation
+
+Every growing startup and engineering team we spoke with was hitting the same predictable wall: **monthly email bills exploding from $20 to $2,000+ as user volume scaled**, without any corresponding increase in value or underlying infrastructure costs.
+
+Beyond pricing, closed-source email providers introduce compounding technical risks:
+
+- **Vendor lock-in by design**: Proprietary APIs, custom template formats, and vendor-specific webhook payloads ensure that **leaving a provider requires a painful, multi-week engineering rewrite**.
+- **Opaque black-box delivery**: When emails silently fail or get flagged as spam, closed vendors offer vague deliverability scores rather than raw [SMTP](/features/smtp) transcripts and transparent queue visibility.
+- **Zero data sovereignty**: Every user interaction, email address, password reset token, and payload metadata passes through third-party servers—**creating compliance headaches for HIPAA, GDPR, and enterprise audits**.
+- **Single point of failure**: If your closed email SaaS suffers an outage, **your entire authentication and notification loop goes dark with zero fallback**.
+
+To see how these tradeoffs compare across the ecosystem, check our [2026 email provider comparison](/blog/email-provider-comparison-2026) or explore side-by-side breakdowns against [SendGrid](/compare/sendgrid), [Resend](/compare/resend), [Mailgun](/compare/mailgun), and [AWS SES](/compare/aws-ses).
+
+---
+
+## Why "just use Postfix" isn't the answer
+
+The traditional counterargument from senior engineers has always been: *"Why not just run your own Postfix, KumoMTA or Haraka instance?"*
+
+**The harsh reality is that raw Postfix provides a mail transfer agent, not modern developer infrastructure.** 
+
+Running bare SMTP solves packet transmission, but it leaves you with months of grueling undifferentiated engineering work:
+
+1. **Reputation & protocol engineering**: Configuring [SPF, DKIM, and DMARC](/blog/spf-dkim-dmarc-setup-guide), handling [IP warming sequences](/blog/ip-warming-guide), and managing suppression lists.
+2. **Bounce classification**: Distinguishing between temporary soft bounces and permanent hard bounces automatically to protect domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
+3. **Developer ergonomics**: Building ergonomic REST APIs, multi-language [SDKs](/sdk), and template render engines.
+4. **Visibility & observability**: Parsing real-time delivery events into signed [webhooks](/features/webhooks) and actionable [email analytics](/features/email-analytics).
+
+Building all of this in-house takes **6 to 9 months of full-time platform engineering** before sending your first production receipt. Most teams cannot afford that distraction, so they reluctantly pay the SaaS.
+
+---
+
+## What we built with Reloop
+
+Reloop bridges this gap: **a production-grade, fully open-source email engine with the developer experience of modern email SaaS, built to run anywhere.**
+
+<SendEmailCodeSamples />
+
+Reloop gives you the complete lifecycle out of the box:
+
+- **Unified REST API & Drop-in SDKs**: Ergonomic endpoints and official [SDKs for Node.js, Python, and Go](/sdk) designed for seamless migration from existing providers (see our [SendGrid migration guide](/blog/migrating-from-sendgrid)).
+- **[SMTP relay](/features/smtp) & Drop-in replacement**: Instantly plug Reloop into Nodemailer, Next.js, Django, Laravel, Rails, or Supabase.
+- **Automated deliverability loop**: Built-in [SPF/DKIM validation](/blog/spf-dkim-dmarc-setup-guide), feedback loops, and intelligent retry queues powered by BullMQ (detailed in [how we built our queue engine](/blog/how-we-built-email-delivery-queue-bullmq)).
+- **Real-time [email analytics](/features/email-analytics)**: Full visibility into deliveries, opens, click tracking, bounces, and complaint rates with zero third-party tracking scripts.
+- **Signed [webhook delivery](/features/webhooks)**: Guaranteed event delivery with automatic backoff, replay capabilities, and secret signing.
+- **[AI Agent inboxes & MCP support](/features/ai-agents)**: Two-way inbound parsing and Model Context Protocol tooling so autonomous agents can send, receive, and reason over email safely (explore our [AI agent inbox use case](/use-cases/ai-agent-inbox) and [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents)).
+
+---
+
+## The open-source bet: Boring infrastructure must be open
+
+Think about the foundational software that powers modern computing: **Linux, PostgreSQL, Redis, Kubernetes, and Nginx**. 
+
+Nobody rents their primary database or operating system behind a closed, proprietary paywall where the underlying code cannot be inspected, self-hosted, or audited. **Email sits squarely in that foundational tier.**
+
+By releasing Reloop under the **[Apache 2.0 license](/license)**, we guarantee:
+
+1. **Complete Stack Ownership**: The cloud platform and the open-source release run the **exact same codebase**. You can `docker compose up` locally, host on [Fly.io](/blog/reloop-flyio-deployment) or [Coolify](/blog/reloop-coolify-setup), or run on bare metal for under $5/mo (see [how to self-host email for $5/month](/blog/self-host-email-5-dollars)).
+2. **Auditability & Security**: Security teams can inspect every line of delivery logic and keep sensitive communication strictly within their own VPC boundary.
+3. **No Ransom Pricing**: If your business grows 100x, your outbound communication channel doesn't become your most expensive utility. You can choose managed [Reloop Cloud pricing](/pricing) for zero ops, or [self-host](/self-host) with complete independence.
+
+For a deeper dive into our architectural philosophy, read our [product beliefs](/our-product-beliefs) and [why open source matters](/why-open-source).
+
+---
+
+## Where we go from here
+
+We are building Reloop in the open with a public roadmap driven by real developer feedback, not arbitrary pricing metrics.
+
+Whether you are an indie hacker shipping your first app, a high-growth startup outgrowing vendor limits, or an enterprise demanding strict compliance: **you should never have to compromise between world-class developer experience and complete infrastructure ownership.**
+
+### Get involved
+
+- **Star and explore the repository**: [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop)
+- **Start sending on Reloop Cloud**: [reloop.sh/dashboard/signup](https://reloop.sh/dashboard/signup)
+- **Browse the documentation**: [Reloop Docs](/docs) · [Self-Host Guide](/self-host) · [Pricing](/pricing) · [Provider Comparisons](/compare)
+
+---
+
 # IP Warming Schedule Guide: How to Build Sender Reputation (2026)
 
 Path: /blog/ip-warming-guide
@@ -2293,3 +2251,225 @@ Once metrics stabilize for 5 to 7 consecutive days, resume the volume schedule.
 - **[Why Emails Land in Spam & How to Fix It](/blog/why-emails-land-in-spam-fix)**: A complete diagnostic checklist for ISP-specific delivery failures.
 - **[Self-Host Reloop for $5/Month](/blog/self-host-email-5-dollars)**: Deploy production-ready email infrastructure on Fly.io, Coolify, or your own VPS.
 - **[Why We Open-Sourced Our Email Infrastructure](/blog/why-we-open-sourced-email-infrastructure)**: The architectural vision and philosophy behind Reloop.
+
+---
+
+# How to Check if an Email is Disposable (Free Temp Email Checker)
+
+Path: /blog/disposable-email
+URL: https://reloop.sh/blog/disposable-email
+Markdown: https://reloop.sh/blog/disposable-email.md
+
+In this guide, you'll learn what disposable emails are, why they matter, and how you can quickly check if an email is disposable.
+
+Every day, millions of users sign up for websites using temporary email addresses. While these emails help protect privacy, they can also create problems for businesses.
+
+If you run a SaaS product, e-commerce store, newsletter, or online community, disposable email addresses can lead to fake accounts, spam, coupon abuse, and inaccurate analytics.
+
+In this guide, you'll learn what disposable emails are, why they matter, and how you can quickly check if an email is disposable.
+
+## What Is a Disposable Email?
+
+A disposable email (also called a temporary email or temp mail) is an email address that exists for a short time. Users create these addresses to receive emails without using their personal inbox. Most disposable email services delete emails automatically after a few minutes or hours.
+
+People commonly use disposable emails to:
+
+- Protect their personal email address
+- Avoid spam and promotional emails
+- Test applications
+- Access free downloads without sharing their main inbox
+
+While these are valid use cases, disposable emails can also be misused to create fake accounts.
+
+## Why Businesses Should Check Disposable Emails
+
+Not every temporary email is harmful, but many businesses choose to detect them to improve data quality and prevent abuse.
+
+Here are the most common reasons.
+
+### 1. Prevent Fake Registrations
+
+Users can create multiple accounts using different temporary email addresses. This inflates your user numbers without adding real customers.
+
+### 2. Stop Free Trial Abuse
+
+If your product offers a free trial, users can repeatedly sign up with disposable emails to avoid paying for your service.
+
+### 3. Reduce Coupon Abuse
+
+Many online stores offer discounts for new customers. Disposable emails make it easy to claim the same offer multiple times.
+
+### 4. Improve Email Deliverability
+
+Marketing emails sent to temporary inboxes often bounce or are never opened, affecting your sender reputation.
+
+### 5. Keep Analytics Clean
+
+Fake accounts can distort important metrics such as:
+
+- Active users
+- Conversion rate
+- Customer retention
+- Marketing performance
+
+Accurate data leads to better business decisions.
+
+## How to Check if an Email Is Disposable
+
+There are several ways to identify temporary email addresses.
+
+### Method 1: Use a Free Disposable Email Checker (Recommended)
+
+The easiest and fastest method is to use an online disposable email checker.
+
+Simply enter an email address, and the tool checks whether the domain belongs to a known temporary email provider.
+
+If you're looking for a free solution, try the **[Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker)**.
+
+It instantly tells you whether an email address is disposable, making it easy to detect fake signups before they enter your system.
+
+Example:
+
+- `john@gmail.com` ✅ Personal email
+- `user@mailinator.com` ❌ Disposable email
+- `demo@tempmail.com` ❌ Disposable email
+
+### Method 2: Check the Email Domain
+
+Many temporary email services use publicly known domains.
+
+Examples include:
+
+- mailinator.com
+- guerrillamail.com
+- yopmail.com
+- 10minutemail.com
+- tempmail.com
+
+If an email belongs to one of these domains, it is likely disposable.
+
+However, this method requires maintaining an updated list because new temporary email providers appear regularly.
+
+### Method 3: Detect Disposable Emails Programmatically (API / Code)
+
+If your website accepts user registrations, checking every email manually isn't practical.
+
+Instead, integrate disposable email detection into your signup process to automatically flag temporary email addresses before accounts are created.
+
+The [Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker) is a thin wrapper over one public endpoint. `POST` an address to `https://reloop.sh/api/tools/v1/temp-email-checker` — no API key, no account.
+
+<TempEmailCheckerCodeSamples />
+
+A throwaway mailbox comes back with `"verdict": "disposable"` and `"isDisposable": true`:
+
+```json
+{
+  "input": "you@mailinator.com",
+  "kind": "email",
+  "domain": "mailinator.com",
+  "verdict": "disposable",
+  "isValidSyntax": true,
+  "isDisposable": true,
+  "disposableMatch": {
+    "kind": "exact",
+    "domain": "mailinator.com"
+  },
+  "isAllowlisted": false,
+  "isRoleAddress": false,
+  "isFreeProvider": false,
+  "signals": {
+    "syntax": "pass",
+    "disposable": "fail",
+    "role": "pass",
+    "freeProvider": "pass"
+  }
+}
+```
+
+Reject or flag the signup when `isDisposable` is `true`. The endpoint is rate limited per IP, so keep it to signup-time checks rather than bulk list scrubbing.
+
+This saves time and helps prevent abuse from the start.
+
+Need more than disposable detection? Use Reloop's free [email validator](/tools/email-validator) to check syntax, role addresses, live MX records, and clean CSV lists (up to 1,000) in one pass.
+
+## Why We Built the Reloop Temp Email Checker
+
+At **Reloop**, we build simple and useful developer tools that solve real-world problems.
+
+Our **Temp Email Checker** was created to help developers, SaaS founders, and businesses quickly identify disposable email addresses without maintaining large domain lists.
+
+Whether youre validating a single email or checking addresses before user registration, the tool provides instant results.
+
+You can try it here: **[Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker)**.
+
+You can also explore more free developer tools on our website: **[Reloop](https://reloop.sh)**.
+
+## When Should You Block Disposable Emails?
+
+Blocking temporary emails isn't always necessary.
+
+### Consider Blocking Them If:
+
+- You offer free trials
+- You run a paid SaaS product
+- You provide welcome discounts
+- You want high-quality customer data
+- You need verified users
+
+### Consider Allowing Them If:
+
+- Privacy is important for your audience
+- Users submit anonymous feedback
+- Registration isn't required
+- Your service is completely free
+
+Choose the approach that best matches your product and users.
+
+## Best Practices for Email Validation
+
+Checking for disposable emails works best when combined with other validation methods.
+
+We recommend:
+
+- Validate email format.
+- Detect disposable email domains.
+- Verify ownership with email confirmation.
+- Add CAPTCHA to signup forms.
+- Monitor suspicious signup activity.
+- Limit repeated registrations from the same IP address.
+
+Using multiple layers of protection significantly reduces fake registrations.
+
+## Frequently Asked Questions
+
+### Are Disposable Emails Legal?
+
+Yes. Temporary email services are legal and are widely used to protect personal privacy.
+
+### Can Disposable Emails Receive Verification Emails?
+
+Yes. Most temporary email providers can receive verification emails immediately after the address is created.
+
+### Should Every Website Block Disposable Emails?
+
+Not necessarily.
+
+Some websites benefit from anonymous access, while others require verified users. The decision depends on your business goals.
+
+### Can Disposable Email Lists Become Outdated?
+
+Yes. New temporary email domains are created frequently, which is why regularly updated detection tools are much more reliable than static blocklists.
+
+## Final Thoughts
+
+Disposable email addresses are useful for protecting user privacy, but they can also be used to create fake accounts, abuse free trials, and reduce the quality of your customer data.
+
+By checking email addresses during registration, you can improve security, keep your database clean, and make better business decisions.
+
+If you need a quick and free way to verify an email address, try the **[Reloop Temp Email Checker](https://reloop.sh/tools/temp-email-checker)**.
+
+For full list cleaning (syntax + disposable + MX), use the free **[Email Validator](/tools/email-validator)**.
+
+Looking for more developer tools?
+
+Visit **[Reloop](https://reloop.sh)**

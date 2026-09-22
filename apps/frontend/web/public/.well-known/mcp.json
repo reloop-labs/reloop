@@ -1,21 +1,21 @@
 {
-	"version": "1.0.0",
-	"transport": "http",
-	"url": "https://reloop.sh/mcp",
-	"servers": [
-		{
-			"name": "site",
-			"url": "https://reloop.sh/mcp",
-			"transport": "http",
-			"authentication": "none",
-			"description": "Search Reloop marketing site content"
-		},
-		{
-			"name": "docs",
-			"url": "https://reloop.sh/docs/mcp",
-			"transport": "http",
-			"authentication": "none",
-			"description": "Search and retrieve Reloop documentation as markdown"
-		}
-	]
+  "version": "1.0.0",
+  "transport": "http",
+  "url": "https://reloop.sh/mcp",
+  "servers": [
+    {
+      "name": "site",
+      "url": "https://reloop.sh/mcp",
+      "transport": "http",
+      "authentication": "none",
+      "description": "Search Reloop marketing site content"
+    },
+    {
+      "name": "docs",
+      "url": "https://reloop.sh/docs/mcp",
+      "transport": "http",
+      "authentication": "none",
+      "description": "Search and retrieve Reloop documentation as markdown"
+    }
+  ]
 }
