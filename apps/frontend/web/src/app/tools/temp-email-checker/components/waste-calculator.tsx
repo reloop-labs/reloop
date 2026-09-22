@@ -145,16 +145,16 @@ export function WasteCalculator() {
 						</p>
 					</div>
 
-					<div className="relative overflow-hidden rounded-2xl bg-[#246BF5] p-5 sm:p-6">
+					<div className="relative overflow-hidden rounded-2xl border border-white/20 bg-[#246BF5] p-5 sm:p-6 dark:border-white/10 dark:bg-[#000]">
 						<div
 							aria-hidden="true"
-							className="pointer-events-none absolute inset-[6px] rounded-[12px] border border-white/25"
+							className="pointer-events-none absolute inset-[6px] rounded-[12px] border border-white/25 dark:border-white/10"
 						/>
 						<div className="relative z-10">
 							<p className="font-medium text-[16px] text-white leading-snug tracking-tight">
 								Stop paying for throwaway emails.
 							</p>
-							<p className="mt-1.5 text-[13px] text-white/85 leading-relaxed">
+							<p className="mt-1.5 text-[13px] text-white/85 leading-relaxed dark:text-white/60">
 								Reloop automatically flags risky contacts before you waste time
 								or money on them. Start with 3,000 free emails per month.{" "}
 								<Link
@@ -166,7 +166,7 @@ export function WasteCalculator() {
 							</p>
 							<Link
 								href="/dashboard/signup"
-								className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98]"
+								className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90"
 							>
 								Get started free
 							</Link>

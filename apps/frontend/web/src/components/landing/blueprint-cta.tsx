@@ -266,7 +266,7 @@ export function BlueprintEmailIllustration() {
 						width="80"
 						height="16"
 						rx="3"
-						fill="#246BF5"
+						className="fill-[#246BF5] dark:fill-black"
 						stroke="white"
 						strokeWidth="0.75"
 						strokeOpacity="0.4"
@@ -305,7 +305,7 @@ export function BlueprintEmailIllustration() {
 						width="28"
 						height="16"
 						rx="3"
-						fill="#246BF5"
+						className="fill-[#246BF5] dark:fill-black"
 						stroke="white"
 						strokeWidth="0.75"
 						strokeOpacity="0.4"
@@ -359,7 +359,7 @@ export function BlueprintEmailIllustration() {
 							height="8"
 							rx="1.5"
 							fill="#ffffff"
-							stroke="#1660f0"
+							className="stroke-[#1660f0] dark:stroke-black"
 							strokeWidth="1.5"
 						/>
 
@@ -369,7 +369,7 @@ export function BlueprintEmailIllustration() {
 							y={node.y - 1}
 							width="2"
 							height="2"
-							fill="#1660f0"
+							className="fill-[#1660f0] dark:fill-black"
 							opacity="0.85"
 						/>
 					</g>
@@ -397,11 +397,11 @@ export function BlueprintCta({
 			{...(id ? { id } : {})}
 			className={cn("w-full px-4 py-4 sm:px-6 sm:py-6 lg:px-8", className)}
 		>
-			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#246BF5] px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12">
+			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#246BF5] px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12 dark:border-white/10 dark:bg-[#000]">
 				{/* 8px Inset white border */}
 				<div
 					aria-hidden="true"
-					className="pointer-events-none absolute inset-[8px] rounded-[20px] border border-white/25 sm:rounded-[24px]"
+					className="pointer-events-none absolute inset-[8px] rounded-[20px] border border-white/25 sm:rounded-[24px] dark:border-white/10"
 				/>
 
 				<div className="relative z-10 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8 xl:gap-12">
@@ -431,7 +431,7 @@ export function BlueprintCta({
 						</h2>
 
 						{subtext && (
-							<p className="mt-4 max-w-lg text-[14.5px] text-white/85 leading-relaxed sm:text-[15.5px]">
+							<p className="mt-4 max-w-lg text-[14.5px] text-white/85 leading-relaxed sm:text-[15.5px] dark:text-white/60">
 								{subtext}
 							</p>
 						)}
@@ -440,7 +440,7 @@ export function BlueprintCta({
 							{/* Primary Button */}
 							<Link
 								href={primaryHref}
-								className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14.5px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98]"
+								className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14.5px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90"
 							>
 								{primaryLabel}
 							</Link>
@@ -451,14 +451,14 @@ export function BlueprintCta({
 									href={secondaryHref}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98]"
+									className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
 								>
 									{secondaryLabel}
 								</a>
 							) : (
 								<Link
 									href={secondaryHref}
-									className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98]"
+									className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
 								>
 									{secondaryLabel}
 								</Link>
