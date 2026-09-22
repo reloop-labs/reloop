@@ -5,8 +5,8 @@ import { useTheme } from "next-themes";
 
 /**
  * Theme-aware PixelBlast for the tools index hero.
- * Light mode uses brand blue (#2563eb); dark mode lifts it to
- * blue-300 (#93c5fd) for contrast on black.
+ * Matches pricing: light mode uses brand blue, dark mode switches to
+ * GitHub gray (#6e7781) for the monochrome dark theme.
  */
 export function ToolsHeroBlast() {
 	const { resolvedTheme } = useTheme();
@@ -15,7 +15,7 @@ export function ToolsHeroBlast() {
 		<PixelBlast
 			variant="square"
 			pixelSize={2}
-			color={resolvedTheme === "dark" ? "#93c5fd" : "#2563eb"}
+			color={resolvedTheme === "dark" ? "#6e7781" : "#2563eb"}
 			patternScale={4}
 			patternDensity={0.45}
 			enableRipples={false}
