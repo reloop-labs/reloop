@@ -2548,7 +2548,7 @@ export const Header = () => {
 								asChild
 								variant="primary"
 								size="xsmall"
-								className="px-3.5!"
+								className="px-3.5! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 							>
 								<a href="/dashboard">Dashboard</a>
 							</FancyButton.Root>
@@ -2557,7 +2557,7 @@ export const Header = () => {
 								asChild
 								variant="primary"
 								size="xsmall"
-								className="px-3.5!"
+								className="px-3.5! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 							>
 								<a href="/dashboard/signup">Get Started</a>
 							</FancyButton.Root>
@@ -2809,7 +2809,7 @@ export const Header = () => {
 											asChild
 											variant="primary"
 											size="medium"
-											className="w-full!"
+											className="w-full! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 										>
 											<a href="/dashboard" onClick={closeMobileMenu}>
 												Dashboard
@@ -2831,7 +2831,7 @@ export const Header = () => {
 												asChild
 												variant="primary"
 												size="medium"
-												className="w-full!"
+												className="w-full! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 											>
 												<a href="/dashboard/signup" onClick={closeMobileMenu}>
 													Sign up
