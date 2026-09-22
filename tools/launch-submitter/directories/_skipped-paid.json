@@ -1,0 +1,17 @@
+{
+	"note": "From the 94 list but not added as free playbooks",
+	"skipped": [
+		{
+			"id": "betalist",
+			"reason": "No free lane (paid listings)"
+		},
+		{
+			"id": "microlaunch",
+			"reason": "Paid-only launch"
+		},
+		{
+			"id": "getapp",
+			"reason": "Vendor marketplace; not a simple free submit"
+		}
+	]
+}

@@ -1,0 +1,24 @@
+{
+	"id": "openalternative",
+	"name": "OpenAlternative",
+	"submitUrl": "https://openalternative.co/submit",
+	"homepage": "https://openalternative.co",
+	"pricing": "free",
+	"domainRating": 52,
+	"linkType": "unknown",
+	"approval": "review",
+	"requiresAccount": false,
+	"accepts": ["open-source", "developer-tools", "any"],
+	"rejects": [],
+	"notes": "Good fit for open-source tools. Prefer GitHub URL in description if asked.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://openalternative.co/submit" },
+		{ "action": "wait", "ms": 1500 },
+		{ "action": "humanGate" },
+		{ "action": "fill", "selector": "input[type='url']", "valueFrom": "url", "optional": true },
+		{ "action": "fill", "selector": "input[name='name']", "valueFrom": "name", "optional": true },
+		{ "action": "fill", "selector": "textarea", "valueFrom": "description", "optional": true },
+		{ "action": "humanGate" }
+	]
+}

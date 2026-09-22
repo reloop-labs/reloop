@@ -1,0 +1,18 @@
+{
+	"id": "example",
+	"name": "Example App",
+	"url": "https://example.com",
+	"tagline": "Replace this with your product tagline.",
+	"description": "Copy products/example.json to products/my-app.json and fill in your real name, URL, and descriptions. Launch Submitter reads any products/*.json pack — it is not tied to one brand.",
+	"shortDescription": "A sample product pack for Launch Submitter.",
+	"logoPath": "",
+	"categories": ["saas", "developer-tools"],
+	"pricing": "freemium",
+	"pricingNote": "Update pricing for your product.",
+	"github": "",
+	"docs": "",
+	"twitter": "",
+	"email": "",
+	"stage": "live",
+	"hasPayingCustomers": false
+}

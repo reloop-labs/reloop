@@ -1,0 +1,29 @@
+{
+	"id": "show-hn",
+	"name": "Show HN",
+	"submitUrl": "https://news.ycombinator.com/submit",
+	"homepage": "https://news.ycombinator.com",
+	"pricing": "free",
+	"domainRating": 91,
+	"linkType": "dofollow",
+	"approval": "instant",
+	"requiresAccount": true,
+	"accepts": ["developer-tools", "open-source", "any"],
+	"rejects": [],
+	"notes": "Human-critical. Tool opens submit form; you write Show HN title/text. Do not spam.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://news.ycombinator.com/submit" },
+		{ "action": "wait", "ms": 1500 },
+		{ "action": "humanGate" },
+		{
+			"action": "fill",
+			"selector": "input[name='title']",
+			"valueFrom": "literal",
+			"literal": "Show HN: Reloop – open-source email infrastructure",
+			"optional": true
+		},
+		{ "action": "fill", "selector": "input[name='url']", "valueFrom": "url", "optional": true },
+		{ "action": "humanGate", "note": "Review tone before submitting. HN is unforgiving." }
+	]
+}

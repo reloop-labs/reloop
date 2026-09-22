@@ -1,0 +1,24 @@
+{
+	"id": "alternativeto",
+	"name": "AlternativeTo",
+	"submitUrl": "https://alternativeto.net/manage/new-item/",
+	"homepage": "https://alternativeto.net",
+	"pricing": "free",
+	"domainRating": 79,
+	"linkType": "unknown",
+	"approval": "months possible",
+	"requiresAccount": true,
+	"accepts": ["saas", "email", "developer-tools", "any"],
+	"rejects": [],
+	"notes": "Long free queue. Account required.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://alternativeto.net/manage/new-item/" },
+		{ "action": "wait", "ms": 2000 },
+		{ "action": "humanGate" },
+		{ "action": "fill", "selector": "input[name='Name'], input#Name", "valueFrom": "name", "optional": true },
+		{ "action": "fill", "selector": "input[name='Url'], input#Url", "valueFrom": "url", "optional": true },
+		{ "action": "fill", "selector": "textarea", "valueFrom": "shortDescription", "optional": true },
+		{ "action": "humanGate" }
+	]
+}

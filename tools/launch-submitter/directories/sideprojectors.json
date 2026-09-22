@@ -1,0 +1,24 @@
+{
+	"id": "sideprojectors",
+	"name": "SideProjectors",
+	"submitUrl": "https://www.sideprojectors.com/project/create/",
+	"homepage": "https://www.sideprojectors.com",
+	"pricing": "free",
+	"domainRating": 71,
+	"linkType": "unknown",
+	"approval": "review",
+	"requiresAccount": true,
+	"accepts": ["saas", "indie", "any"],
+	"rejects": [],
+	"notes": "Marketplace for side projects; free listing path when available.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://www.sideprojectors.com/project/create/" },
+		{ "action": "wait", "ms": 2000 },
+		{ "action": "humanGate" },
+		{ "action": "fill", "selector": "input[name='title'], input[placeholder*='title' i]", "valueFrom": "name", "optional": true },
+		{ "action": "fill", "selector": "input[type='url']", "valueFrom": "url", "optional": true },
+		{ "action": "fill", "selector": "textarea", "valueFrom": "shortDescription", "optional": true },
+		{ "action": "humanGate" }
+	]
+}

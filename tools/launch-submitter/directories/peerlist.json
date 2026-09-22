@@ -1,0 +1,39 @@
+{
+	"id": "peerlist",
+	"name": "Peerlist",
+	"submitUrl": "https://peerlist.io/launch",
+	"homepage": "https://peerlist.io",
+	"pricing": "free",
+	"domainRating": 77,
+	"linkType": "unknown",
+	"approval": "about a week",
+	"requiresAccount": true,
+	"accepts": ["developer-tools", "saas", "open-source", "any"],
+	"rejects": [],
+	"notes": "Requires Peerlist account. Prefer project spotlight flow after login.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://peerlist.io/launch" },
+		{ "action": "wait", "ms": 2000 },
+		{ "action": "humanGate" },
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[placeholder*='project' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[type='url'], input[placeholder*='url' i]",
+			"valueFrom": "url",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea",
+			"valueFrom": "tagline",
+			"optional": true
+		},
+		{ "action": "humanGate" }
+	]
+}

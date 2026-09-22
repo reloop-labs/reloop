@@ -1,0 +1,24 @@
+{
+	"id": "toolfolio",
+	"name": "Toolfolio",
+	"submitUrl": "https://toolfolio.io/submit",
+	"homepage": "https://toolfolio.io",
+	"pricing": "free",
+	"domainRating": 35,
+	"linkType": "unknown",
+	"approval": "review",
+	"requiresAccount": false,
+	"accepts": ["saas", "developer-tools", "any"],
+	"rejects": [],
+	"notes": "Lower DR; free lane for catalog building.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://toolfolio.io/submit" },
+		{ "action": "wait", "ms": 1500 },
+		{ "action": "humanGate" },
+		{ "action": "fill", "selector": "input[type='url']", "valueFrom": "url", "optional": true },
+		{ "action": "fill", "selector": "input[name='name']", "valueFrom": "name", "optional": true },
+		{ "action": "fill", "selector": "textarea", "valueFrom": "tagline", "optional": true },
+		{ "action": "humanGate" }
+	]
+}

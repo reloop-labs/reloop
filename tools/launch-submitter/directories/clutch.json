@@ -1,0 +1,59 @@
+{
+	"id": "clutch",
+	"name": "Clutch",
+	"submitUrl": "https://clutch.co/profile/create",
+	"homepage": "https://clutch.co",
+	"pricing": "free",
+	"domainRating": 91,
+	"linkType": "unknown",
+	"approval": "varies",
+	"requiresAccount": true,
+	"accepts": [
+		"saas",
+		"any"
+	],
+	"rejects": [],
+	"notes": "B2B profile; free basic profile may be limited. Heavy human review.",
+	"lastChecked": "2026-09-22",
+	"source": "https://x.com/hridoyreh/status/2101574360385360122",
+	"steps": [
+		{
+			"action": "goto",
+			"url": "https://clutch.co/profile/create"
+		},
+		{
+			"action": "wait",
+			"ms": 1500
+		},
+		{
+			"action": "humanGate"
+		},
+		{
+			"action": "fill",
+			"selector": "input[type='url'], input[name='url'], input[name='website'], input[placeholder*='URL' i], input[placeholder*='website' i]",
+			"valueFrom": "url",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[name='title'], input[placeholder*='name' i], input[placeholder*='title' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='tagline'], input[placeholder*='tagline' i], input[placeholder*='slogan' i]",
+			"valueFrom": "tagline",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea[name='description'], textarea[placeholder*='description' i], textarea",
+			"valueFrom": "shortDescription",
+			"optional": true
+		},
+		{
+			"action": "humanGate"
+		}
+	]
+}

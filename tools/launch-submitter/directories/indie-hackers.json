@@ -1,0 +1,45 @@
+{
+	"id": "indie-hackers",
+	"name": "Indie Hackers",
+	"submitUrl": "https://www.indiehackers.com/products",
+	"homepage": "https://www.indiehackers.com",
+	"pricing": "free",
+	"domainRating": 81,
+	"linkType": "unknown",
+	"approval": "instant",
+	"requiresAccount": true,
+	"accepts": ["saas", "indie", "developer-tools", "any"],
+	"rejects": [],
+	"notes": "Community product page. Account required. Often better as a post than a cold product form.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://www.indiehackers.com/products" },
+		{ "action": "wait", "ms": 2000 },
+		{ "action": "humanGate" },
+		{
+			"action": "click",
+			"selector": "a[href*='new'], button:has-text('Add'), button:has-text('Submit')",
+			"optional": true
+		},
+		{ "action": "wait", "ms": 1000 },
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[placeholder*='name' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[type='url']",
+			"valueFrom": "url",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea",
+			"valueFrom": "tagline",
+			"optional": true
+		},
+		{ "action": "humanGate" }
+	]
+}

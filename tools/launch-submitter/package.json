@@ -1,0 +1,43 @@
+{
+	"name": "@reloop/launch-submitter",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"description": "Local free-directory launch submitter (CLI + MCP + HTTP + UI). Sidecar tool — no Reloop app/business logic changes.",
+	"bin": {
+		"launch-submitter": "./src/cli.ts"
+	},
+	"scripts": {
+		"cli": "PLAYWRIGHT_BROWSERS_PATH=0 bun run src/cli.ts",
+		"mcp": "PLAYWRIGHT_BROWSERS_PATH=0 bun run src/mcp.ts",
+		"http": "PLAYWRIGHT_BROWSERS_PATH=0 bun run src/http.ts",
+		"ui": "vite --config ui/vite.config.ts",
+		"ui:build": "vite build --config ui/vite.config.ts",
+		"install:browsers": "PLAYWRIGHT_BROWSERS_PATH=0 bunx playwright install chromium",
+		"login": "PLAYWRIGHT_BROWSERS_PATH=0 bun run src/cli.ts login",
+		"plan": "PLAYWRIGHT_BROWSERS_PATH=0 bun run src/cli.ts plan",
+		"run": "PLAYWRIGHT_BROWSERS_PATH=0 bun run src/cli.ts run",
+		"status": "PLAYWRIGHT_BROWSERS_PATH=0 bun run src/cli.ts status",
+		"resume": "PLAYWRIGHT_BROWSERS_PATH=0 bun run src/cli.ts resume",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.18.0",
+		"@reloop/tailwind": "workspace:*",
+		"@reloop/ui": "workspace:*",
+		"hono": "^4.9.6",
+		"playwright": "^1.55.0",
+		"react": "catalog:ui",
+		"react-dom": "catalog:ui",
+		"zod": "^3.25.67"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "catalog:ui",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:ui",
+		"@types/react-dom": "catalog:ui",
+		"@vitejs/plugin-react": "^4.7.0",
+		"typescript": "catalog:",
+		"vite": "^6.3.5"
+	}
+}

@@ -288,7 +288,7 @@ export default async function OpenGraphImage() {
 						marginTop: "16px",
 					}}
 				>
-					It checks disposable Email, role addresses, and MX records
+					It checks disposable Emails, role addresses, and MX records.
 				</div>
 
 				<div

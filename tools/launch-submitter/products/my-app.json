@@ -1,0 +1,18 @@
+{
+	"id": "my-app",
+	"name": "Example Dot Com",
+	"url": "https://example.com",
+	"tagline": "A reserved test website for documentation and demos.",
+	"description": "example.com is the official IANA reserved domain for examples and testing. Safe to use when trying Launch Submitter without submitting a real product.",
+	"shortDescription": "Official example/test website (IANA reserved).",
+	"logoPath": "",
+	"categories": ["saas", "developer-tools"],
+	"pricing": "free",
+	"pricingNote": "Test product only — not a real SaaS.",
+	"github": "",
+	"docs": "https://example.com",
+	"twitter": "",
+	"email": "",
+	"stage": "live",
+	"hasPayingCustomers": false
+}

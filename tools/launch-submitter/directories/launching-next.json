@@ -1,0 +1,24 @@
+{
+	"id": "launching-next",
+	"name": "Launching Next",
+	"submitUrl": "https://www.launchingnext.com/submit/",
+	"homepage": "https://www.launchingnext.com",
+	"pricing": "free",
+	"domainRating": 54,
+	"linkType": "dofollow",
+	"approval": "daily review",
+	"requiresAccount": false,
+	"accepts": ["startup", "saas", "any"],
+	"rejects": [],
+	"notes": "Free submit with optional paid upgrade. Often behind Cloudflare bot check — Playwright may land on a 404 challenge URL; treat as needs_human / skip for fully automated runs.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://www.launchingnext.com/submit/" },
+		{ "action": "wait", "ms": 2500 },
+		{ "action": "humanGate" },
+		{ "action": "fill", "selector": "input[name='title'], input[name='name']", "valueFrom": "name", "optional": true },
+		{ "action": "fill", "selector": "input[type='url'], input[name='url']", "valueFrom": "url", "optional": true },
+		{ "action": "fill", "selector": "textarea", "valueFrom": "shortDescription", "optional": true },
+		{ "action": "humanGate" }
+	]
+}

@@ -1,0 +1,61 @@
+{
+	"id": "product-hunt",
+	"name": "Product Hunt",
+	"submitUrl": "https://www.producthunt.com/posts/new",
+	"homepage": "https://www.producthunt.com",
+	"pricing": "free",
+	"domainRating": 91,
+	"linkType": "dofollow",
+	"approval": "same day when scheduled",
+	"requiresAccount": true,
+	"accepts": [
+		"saas",
+		"developer-tools",
+		"email",
+		"any"
+	],
+	"rejects": [],
+	"notes": "Free. Personal account required. Prefer scheduling a launch day; human review of gallery/tagline is expected.",
+	"lastChecked": "2026-09-22",
+	"source": "https://x.com/hridoyreh/status/2101574360385360122",
+	"steps": [
+		{
+			"action": "goto",
+			"url": "https://www.producthunt.com/posts/new"
+		},
+		{
+			"action": "wait",
+			"ms": 1500
+		},
+		{
+			"action": "humanGate"
+		},
+		{
+			"action": "fill",
+			"selector": "input[type='url'], input[name='url'], input[name='website'], input[placeholder*='URL' i], input[placeholder*='website' i]",
+			"valueFrom": "url",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[name='title'], input[placeholder*='name' i], input[placeholder*='title' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='tagline'], input[placeholder*='tagline' i], input[placeholder*='slogan' i]",
+			"valueFrom": "tagline",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea[name='description'], textarea[placeholder*='description' i], textarea",
+			"valueFrom": "shortDescription",
+			"optional": true
+		},
+		{
+			"action": "humanGate"
+		}
+	]
+}

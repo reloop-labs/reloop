@@ -1,0 +1,60 @@
+{
+	"id": "fazier",
+	"name": "Fazier",
+	"submitUrl": "https://fazier.com/submit",
+	"homepage": "https://fazier.com",
+	"pricing": "free",
+	"domainRating": 83,
+	"linkType": "dofollow",
+	"approval": "within ~30 days free",
+	"requiresAccount": false,
+	"accepts": [
+		"saas",
+		"developer-tools",
+		"any"
+	],
+	"rejects": [],
+	"notes": "Free lane exists; paid skips queue. Free may expect badge/comments.",
+	"lastChecked": "2026-09-22",
+	"source": "https://x.com/hridoyreh/status/2101574360385360122",
+	"steps": [
+		{
+			"action": "goto",
+			"url": "https://fazier.com/submit"
+		},
+		{
+			"action": "wait",
+			"ms": 1500
+		},
+		{
+			"action": "humanGate"
+		},
+		{
+			"action": "fill",
+			"selector": "input[type='url'], input[name='url'], input[name='website'], input[placeholder*='URL' i], input[placeholder*='website' i]",
+			"valueFrom": "url",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[name='title'], input[placeholder*='name' i], input[placeholder*='title' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='tagline'], input[placeholder*='tagline' i], input[placeholder*='slogan' i]",
+			"valueFrom": "tagline",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea[name='description'], textarea[placeholder*='description' i], textarea",
+			"valueFrom": "shortDescription",
+			"optional": true
+		},
+		{
+			"action": "humanGate"
+		}
+	]
+}

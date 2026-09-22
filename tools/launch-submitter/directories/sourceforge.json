@@ -1,0 +1,61 @@
+{
+	"id": "sourceforge",
+	"name": "SourceForge",
+	"submitUrl": "https://sourceforge.net/software/vendors/new",
+	"homepage": "https://sourceforge.net",
+	"pricing": "free",
+	"domainRating": 92,
+	"linkType": "nofollow",
+	"approval": "varies",
+	"requiresAccount": false,
+	"accepts": [
+		"open-source",
+		"developer-tools",
+		"saas",
+		"any"
+	],
+	"rejects": [],
+	"notes": "Business listing free lane; outbound links often redirect/nofollow.",
+	"lastChecked": "2026-09-22",
+	"source": "https://x.com/hridoyreh/status/2101574360385360122",
+	"steps": [
+		{
+			"action": "goto",
+			"url": "https://sourceforge.net/software/vendors/new"
+		},
+		{
+			"action": "wait",
+			"ms": 1500
+		},
+		{
+			"action": "humanGate"
+		},
+		{
+			"action": "fill",
+			"selector": "input[type='url'], input[name='url'], input[name='website'], input[placeholder*='URL' i], input[placeholder*='website' i]",
+			"valueFrom": "url",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[name='title'], input[placeholder*='name' i], input[placeholder*='title' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='tagline'], input[placeholder*='tagline' i], input[placeholder*='slogan' i]",
+			"valueFrom": "tagline",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea[name='description'], textarea[placeholder*='description' i], textarea",
+			"valueFrom": "shortDescription",
+			"optional": true
+		},
+		{
+			"action": "humanGate"
+		}
+	]
+}

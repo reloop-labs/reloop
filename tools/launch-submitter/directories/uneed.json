@@ -1,0 +1,39 @@
+{
+	"id": "uneed",
+	"name": "Uneed",
+	"submitUrl": "https://www.uneed.best/submit-a-tool",
+	"homepage": "https://www.uneed.best",
+	"pricing": "free",
+	"domainRating": 75,
+	"linkType": "unknown",
+	"approval": "varies",
+	"requiresAccount": true,
+	"accepts": ["saas", "ai", "developer-tools", "any"],
+	"rejects": [],
+	"notes": "Account usually required. Run `login` first and sign into Uneed.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://www.uneed.best/submit-a-tool" },
+		{ "action": "wait", "ms": 2000 },
+		{ "action": "humanGate" },
+		{
+			"action": "fill",
+			"selector": "input[name='url'], input[placeholder*='website' i], input[type='url']",
+			"valueFrom": "url",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[placeholder*='name' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea",
+			"valueFrom": "description",
+			"optional": true
+		},
+		{ "action": "humanGate" }
+	]
+}

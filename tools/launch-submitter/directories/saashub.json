@@ -1,0 +1,48 @@
+{
+	"id": "saashub",
+	"name": "SaaSHub",
+	"submitUrl": "https://www.saashub.com/services/submit",
+	"homepage": "https://www.saashub.com",
+	"pricing": "free",
+	"domainRating": 79,
+	"linkType": "nofollow",
+	"approval": "1-2 months free queue",
+	"requiresAccount": false,
+	"accepts": ["saas", "developer-tools", "email", "any"],
+	"rejects": [],
+	"notes": "Real form is /services/submit — /submit is only a directory list landing page. Listing is nofollow. Leave competitors filled or queue is slow.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://www.saashub.com/services/submit" },
+		{ "action": "wait", "ms": 2000 },
+		{ "action": "humanGate" },
+		{
+			"action": "click",
+			"selector": "a:has-text('Submit Product'), button:has-text('Submit Product'), a[href*='services/submit']",
+			"optional": true
+		},
+		{ "action": "wait", "ms": 1500 },
+		{
+			"action": "fill",
+			"selector": "input[type='url'], input[name='url'], input[placeholder*='URL' i], input[placeholder*='website' i]",
+			"valueFrom": "url"
+		},
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[placeholder*='name' i], input[placeholder*='product' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea[name='description'], textarea[placeholder*='description' i], textarea",
+			"valueFrom": "shortDescription",
+			"optional": true
+		},
+		{
+			"action": "humanGate",
+			"force": true,
+			"note": "Review the SaaSHub form, add categories/competitors if asked, then click their Submit. Run resume after."
+		}
+	]
+}

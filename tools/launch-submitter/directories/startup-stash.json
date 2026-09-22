@@ -1,0 +1,24 @@
+{
+	"id": "startup-stash",
+	"name": "Startup Stash",
+	"submitUrl": "https://startupstash.com/add-listing/",
+	"homepage": "https://startupstash.com",
+	"pricing": "free",
+	"domainRating": 65,
+	"linkType": "unknown",
+	"approval": "review",
+	"requiresAccount": false,
+	"accepts": ["startup", "saas", "any"],
+	"rejects": [],
+	"notes": "Confirm free lane is still open before submitting.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://startupstash.com/add-listing/" },
+		{ "action": "wait", "ms": 1500 },
+		{ "action": "humanGate" },
+		{ "action": "fill", "selector": "input[type='url']", "valueFrom": "url", "optional": true },
+		{ "action": "fill", "selector": "input[name='your-name'], input[placeholder*='name' i]", "valueFrom": "name", "optional": true },
+		{ "action": "fill", "selector": "textarea", "valueFrom": "shortDescription", "optional": true },
+		{ "action": "humanGate" }
+	]
+}

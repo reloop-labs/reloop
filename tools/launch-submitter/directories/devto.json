@@ -1,0 +1,28 @@
+{
+	"id": "devto",
+	"name": "DEV Community",
+	"submitUrl": "https://dev.to/new",
+	"homepage": "https://dev.to",
+	"pricing": "free",
+	"domainRating": 91,
+	"linkType": "dofollow",
+	"approval": "instant",
+	"requiresAccount": true,
+	"accepts": ["developer-tools", "open-source", "any"],
+	"rejects": [],
+	"notes": "Not a directory form — publish a post. Tool opens editor; you finish the article. Link in post can be followed.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://dev.to/new" },
+		{ "action": "wait", "ms": 2000 },
+		{ "action": "humanGate" },
+		{
+			"action": "fill",
+			"selector": "#article-form-title, input[placeholder*='Title' i]",
+			"valueFrom": "literal",
+			"literal": "Reloop: open-source email infrastructure you can self-host",
+			"optional": true
+		},
+		{ "action": "humanGate", "note": "Write the post body yourself; tool will not auto-publish." }
+	]
+}

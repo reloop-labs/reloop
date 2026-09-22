@@ -1,0 +1,39 @@
+{
+	"id": "f6s",
+	"name": "F6S",
+	"submitUrl": "https://www.f6s.com/companies/new",
+	"homepage": "https://www.f6s.com",
+	"pricing": "free",
+	"domainRating": 83,
+	"linkType": "nofollow",
+	"approval": "instant profile",
+	"requiresAccount": true,
+	"accepts": ["startup", "saas", "any"],
+	"rejects": [],
+	"notes": "Free company profile. Links are typically nofollow.",
+	"lastChecked": "2026-09-22",
+	"steps": [
+		{ "action": "goto", "url": "https://www.f6s.com/companies/new" },
+		{ "action": "wait", "ms": 2000 },
+		{ "action": "humanGate" },
+		{
+			"action": "fill",
+			"selector": "input[name='name'], input[placeholder*='company' i]",
+			"valueFrom": "name",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "input[type='url'], input[name='website']",
+			"valueFrom": "url",
+			"optional": true
+		},
+		{
+			"action": "fill",
+			"selector": "textarea",
+			"valueFrom": "shortDescription",
+			"optional": true
+		},
+		{ "action": "humanGate" }
+	]
+}
