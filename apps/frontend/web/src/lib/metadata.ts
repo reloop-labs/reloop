@@ -26,6 +26,7 @@ export function createPageMetadata({
 		openGraph: {
 			title: `${title} | Reloop`,
 			description,
+			siteName: "Reloop",
 			type: "website",
 			url: path,
 		},
