@@ -1049,9 +1049,9 @@
 
 	--stroke-strong-950: var(--neutral-0);
 	--stroke-sub-300: var(--neutral-600);
-	--stroke-soft-200: #1f1f1f;
-	--stroke-soft-100: #1f1f1f;
-	--stroke-inbox: #1f1f1f;
+	--stroke-soft-200: rgba(255, 255, 255, 0.07);
+	--stroke-soft-100: rgba(255, 255, 255, 0.07);
+	--stroke-inbox: rgba(255, 255, 255, 0.07);
 	--panel-light: #ffffff;
 	--panel-dark: #1a1a1a;
 	--offset-light: #f5f5f5;

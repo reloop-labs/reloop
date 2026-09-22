@@ -55,7 +55,7 @@ body.dark,
 	background-color: #000 !important;
 }
 
-/* Ensure all dark-mode borders and dividers use #1F1F1F */
+/* Ensure all dark-mode borders and dividers use a subtle, reduced opacity */
 .dark [class*="dark:border-white"],
 .dark [class*="dark:divide-white"],
 :is(.dark, .dark *) [class*="dark:border-white"],
@@ -64,7 +64,7 @@ body.dark,
 :is(.dark, .dark *) [class*="border-stroke-soft"],
 .dark [class*="divide-stroke-soft"],
 :is(.dark, .dark *) [class*="divide-stroke-soft"] {
-	border-color: #1f1f1f !important;
+	border-color: rgba(255, 255, 255, 0.07) !important;
 }
 
 .text-body-default {

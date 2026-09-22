@@ -477,7 +477,7 @@ export function CheckerPanel() {
 									: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
 							)}
 						>
-							<Input.Wrapper className="h-12 pr-1.5 pl-4 dark:bg-[#0c0c0c]">
+							<Input.Wrapper className="h-12 pr-2 pl-4 dark:bg-[#0c0c0c]">
 								<Input.Input
 									id="checker-input"
 									aria-label="Email or domain"
@@ -522,18 +522,18 @@ export function CheckerPanel() {
 										type="submit"
 										variant="primary"
 										size="xsmall"
-										className="!p-0 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg"
+										className="!p-0 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg dark:text-black"
 										aria-label="Verify email or domain"
 									>
 										{isPending ? (
 											<LoadingDot
 												size={13}
 												dotSize={2}
-												className="text-white"
+												className="text-white dark:text-black"
 											/>
 										) : (
-											<FancyButton.Icon className="mx-0 size-3.5">
-												<Icon name="arrow-right" className="size-3.5" />
+											<FancyButton.Icon className="mx-0 size-3.5 dark:text-black">
+												<Icon name="arrow-right" className="size-3.5 text-white dark:text-black" />
 											</FancyButton.Icon>
 										)}
 									</FancyButton.Root>

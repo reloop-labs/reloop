@@ -10,7 +10,7 @@ export function TempEmailHeroBlast() {
 		<PixelBlast
 			variant="square"
 			pixelSize={2}
-			color={resolvedTheme === "dark" ? "#52a8ff" : "#006ffe"}
+			color={resolvedTheme === "dark" ? "#6e7781" : "#006ffe"}
 			patternScale={4}
 			patternDensity={0.45}
 			enableRipples={false}

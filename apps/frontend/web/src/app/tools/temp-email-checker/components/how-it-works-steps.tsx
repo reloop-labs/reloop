@@ -75,7 +75,7 @@ export function BestFeatures() {
 								borderClass,
 							)}
 						>
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-primary-base dark:bg-blue-950/40 dark:text-blue-400">
+							<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-neutral-100 text-neutral-600 dark:border-white/10 dark:bg-white/[0.05] dark:text-neutral-400">
 								<IconComponent className="h-5 w-5 stroke-[1.75]" />
 							</div>
 
