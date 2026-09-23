@@ -3,15 +3,11 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
-import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useRef, useState } from "react";
-import { DNS_RECORD_DOCS } from "#/features/domain/dns-provider";
+import { useRef, useState } from "react";
 import type { DomainResponse } from "#/features/domain/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useClipboard } from "../hooks/use-clipboard";
 import { useDomainActions } from "../hooks/use-domain-actions";
-import { groupDomainDnsRecords } from "./dns-record-groups";
-import { DNSRecordTable } from "./dns-record-table";
 
 interface DomainConfigurationSectionProps {
 	domain?: DomainResponse;
@@ -26,10 +22,6 @@ export const DomainConfigurationSection = ({
 	const domainId = domainIdProp || domain?.id;
 	const { handleUpdateDomain } = useDomainActions(domainId, domain);
 	const { copiedItems, copyToClipboard } = useClipboard();
-	const { trackingRecords } = useMemo(
-		() => groupDomainDnsRecords(domain?.dnsRecords),
-		[domain?.dnsRecords],
-	);
 
 	const [isTLSOpen, setIsTLSOpen] = useState(false);
 	const [tlsHoverIdx, setTlsHoverIdx] = useState<number | undefined>(undefined);
@@ -93,7 +85,6 @@ export const DomainConfigurationSection = ({
 
 	const isClickTrackingEnabled = domain?.isClickTrackingEnabled ?? false;
 	const isOpenTrackingEnabled = domain?.isOpenTrackingEnabled ?? false;
-	const trackingEnabled = isClickTrackingEnabled || isOpenTrackingEnabled;
 
 	return (
 		<div className="mt-6 mb-24 space-y-6">
@@ -146,8 +137,8 @@ export const DomainConfigurationSection = ({
 					<h3 className="font-semibold text-sm">Click & Open Tracking</h3>
 				</div>
 				<p className="mb-4 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
-					Click and open tracking share one CNAME record. Enable either feature,
-					then add the record below at your DNS provider.
+					Click and open tracking share one CNAME record. Enable either feature
+					to start tracking.
 				</p>
 
 				<div className="space-y-3">
@@ -219,41 +210,6 @@ export const DomainConfigurationSection = ({
 						</p>
 					</div>
 				</div>
-
-				<AnimatePresence initial={false}>
-					{(trackingEnabled || trackingRecords.length > 0) && (
-						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							transition={{ duration: 0.2, ease: "easeInOut" }}
-							className="mt-4 overflow-hidden"
-						>
-							<div className="mb-3 flex items-start justify-between gap-4">
-								<a
-									href={DNS_RECORD_DOCS.cname}
-									target="_blank"
-									rel="noreferrer"
-									className="group flex items-center gap-1 hover:underline"
-								>
-									<span className="font-medium text-sm text-text-strong-950">
-										CNAME
-									</span>
-									<Icon
-										name="arrow-up-right"
-										className="h-2.5 w-2.5 stroke-[2.5] text-text-sub-600"
-									/>
-								</a>
-							</div>
-							<DNSRecordTable
-								records={trackingRecords}
-								isLoading={!!isLoading}
-								loadingRows={trackingRecords.length || 1}
-								tableId="config-cname-"
-							/>
-						</motion.div>
-					)}
-				</AnimatePresence>
 			</div>
 
 			{/* TLS Mode Card */}

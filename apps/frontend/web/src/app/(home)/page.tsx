@@ -19,6 +19,7 @@ import EmailSystem from "./components/email-system";
 import Hero from "./components/hero";
 import Highlights from "./components/highlights";
 import { HomeFaq } from "./components/home-faq";
+import PlatformTabs from "./components/platform-tabs";
 import { SectionSeparator } from "./components/section-separator";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -95,6 +96,7 @@ export default function Home() {
 				<SectionSeparator />
 				<EmailSystem />
 				<SectionSeparator />
+				<PlatformTabs />
 				<Highlights />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<CTA />

@@ -34,10 +34,7 @@ export function DomainDetailPage({
 	const router = useRouter();
 	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
-	const [activeTab, setActiveTab] = useQueryState(
-		"tab",
-		parseAsString.withDefault("dns"),
-	);
+	const [activeTabParam, setActiveTab] = useQueryState("tab", parseAsString);
 	const [, setDeleteId] = useQueryState("delete");
 	const [hoveredIdx, setHoveredIdx] = React.useState<number | undefined>();
 	const buttonRefs = React.useRef<HTMLButtonElement[]>([]);
@@ -53,11 +50,6 @@ export function DomainDetailPage({
 		},
 	];
 
-	const activeIndex = tabs.findIndex((t) => t.id === activeTab);
-	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
-	const tab = buttonRefs.current[currentIdx];
-	const rect = tab?.getBoundingClientRect();
-
 	const canFetch = Boolean(domainId && hasInitialized && !orgPending);
 	const {
 		data: domainData,
@@ -67,6 +59,16 @@ export function DomainDetailPage({
 	} = useDomainDetailQuery(domainId, canFetch);
 
 	const showLoading = !canFetch || isPending || (isFetching && !domainData);
+
+	// Verified domains land on Configuration; unverified land on DNS Records.
+	// Explicit ?tab= param always wins.
+	const isVerified = domainData?.status === "active";
+	const activeTab = activeTabParam ?? (isVerified ? "configuration" : "dns");
+
+	const activeIndex = tabs.findIndex((t) => t.id === activeTab);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
+	const tab = buttonRefs.current[currentIdx];
+	const rect = tab?.getBoundingClientRect();
 
 	const actions = React.useMemo<CommandAction[]>(() => {
 		if (!domainData || !domainId) return [];
@@ -219,7 +221,7 @@ export function DomainDetailPage({
 
 	if (rawDomainId && !domainId) {
 		return (
-			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-6xl flex-col items-center justify-center sm:px-8">
 				<DomainNotFound />
 			</div>
 		);
@@ -228,7 +230,7 @@ export function DomainDetailPage({
 	if (error && canFetch && !isPending) {
 		const status = (error as Error & { status?: number }).status;
 		return (
-			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-6xl flex-col items-center justify-center sm:px-8">
 				{status === 404 ? (
 					<DomainNotFound />
 				) : (
@@ -239,7 +241,7 @@ export function DomainDetailPage({
 	}
 
 	return (
-		<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
+		<div className="mx-auto max-w-6xl space-y-8 p-6 lg:p-8">
 			<DomainHeader
 				domain={domainData}
 				domainId={domainId ?? undefined}
@@ -248,7 +250,7 @@ export function DomainDetailPage({
 			<DomainStats domain={domainData} isLoading={showLoading} />
 			<DomainEvents domain={domainData} isLoading={showLoading} />
 			<TabMenu.Root
-				value={activeTab ?? "dns"}
+				value={activeTab}
 				onValueChange={(v) => void setActiveTab(v)}
 				className="mt-7"
 			>

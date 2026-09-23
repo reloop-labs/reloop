@@ -1,5 +1,6 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { ForwardDNSRecordsButton } from "../../add/setup/components/forward-dns-records";
 import { DeleteDomainModal } from "../../components/delete-domain";
 import { DomainAvatar } from "../../components/domain-avatar";
@@ -27,6 +28,9 @@ export function DomainHeader({
 
 	return (
 		<div>
+			<div className="pb-6">
+				<AnimatedBackButton fallbackHref="/domain" />
+			</div>
 			<div className="flex items-center justify-between">
 				<div>
 					{isLoading ? (

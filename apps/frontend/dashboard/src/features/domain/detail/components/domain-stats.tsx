@@ -4,8 +4,8 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import type * as React from "react";
 import type { DomainResponse } from "#/features/domain/types";
 import { getStatusColorClass, getStatusIcon } from "#/features/domain/utils";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import { AnimatedClock } from "../../animated-clock";
+import { CreatedTime } from "./created-time-hover";
 import { DNSProviderInfo } from "./dns-provider-info";
 
 interface DomainStatsProps {
@@ -18,7 +18,7 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 	isLoading,
 }) => {
 	return (
-		<div className="mt-7 grid grid-cols-3 gap-x-12 gap-y-6">
+		<div className="mt-7 grid grid-cols-4 gap-x-12 gap-y-6">
 			{/* Created */}
 			<div className="flex flex-col gap-1.5">
 				<div className="flex items-center gap-1.5">
@@ -30,9 +30,9 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 				{isLoading ? (
 					<Skeleton className="h-5 w-24 rounded-lg" />
 				) : (
-					<span className="font-medium text-paragraph-sm text-text-strong-950">
-						{domain?.createdAt ? formatRelativeTime(domain.createdAt) : "---"}
-					</span>
+					<div className="self-start">
+						<CreatedTime createdAt={domain?.createdAt} />
+					</div>
 				)}
 			</div>
 

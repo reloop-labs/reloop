@@ -194,7 +194,7 @@ export function DomainDetailPage({ domain }: { domain: DemoDomain }) {
 
 	return (
 		<MotionStage
-			className="mx-auto max-w-3xl space-y-8 overflow-hidden p-6 lg:p-8"
+			className="mx-auto max-w-6xl space-y-8 overflow-hidden p-6 lg:p-8"
 			staggerChildren={0.12}
 			delayChildren={0.06}
 			orchestrate

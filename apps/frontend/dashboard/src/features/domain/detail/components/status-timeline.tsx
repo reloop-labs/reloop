@@ -3,6 +3,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { format } from "date-fns";
+import { Fragment } from "react";
 import type { DomainResponse } from "#/features/domain/types";
 
 interface StatusTimelineProps {
@@ -42,8 +43,8 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 					: domain.status === "verifying"
 						? "Verifying DNS"
 						: domain.status === "failed"
-							? "DNS Verification Failed"
-							: "Start verification",
+							? "Verification Failed"
+							: "Start Verification",
 			icon:
 				domain.status === "active"
 					? "shield-check"
@@ -73,144 +74,110 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 					: null,
 		},
 	];
+
+	const getIconStyles = (state: string) => {
+		switch (state) {
+			case "completed":
+				return "border-success-base/20 bg-success-lighter/50 text-success-base";
+			case "active":
+				return "border-warning-base/20 bg-warning-lighter/50 text-warning-base";
+			case "failed":
+				return "border-error-light bg-error-lighter text-error-base";
+			default:
+				return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400";
+		}
+	};
+
+	const getBadgeStyles = (state: string) => {
+		switch (state) {
+			case "completed":
+				return "bg-success-lighter text-success-base";
+			case "active":
+				return "bg-warning-lighter text-warning-base";
+			case "failed":
+				return "bg-error-lighter text-error-base";
+			default:
+				return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900 dark:text-neutral-400";
+		}
+	};
+
 	return (
-		<div className="relative mx-auto flex w-full max-w-md items-start gap-0">
-			{steps.map((step, index) => {
-				const state = getStepState(step.number);
-				const isLast = index === steps.length - 1;
+		<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 py-6 pr-8 pb-5 pl-6 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+			<div className="flex w-full max-w-2xl items-start justify-between">
+				{steps.map((step, index) => {
+					const state = getStepState(step.number);
 
-				const canShowSuccess = step.number !== 1 || domain.status === "active";
-				const shouldForceNeutral =
-					step.number === 1 && domain.status !== "active" && state !== "failed";
-
-				return (
-					<div
-						key={step.number}
-						className={cn("relative flex items-start", !isLast && "flex-1")}
-					>
-						<div className="flex flex-col gap-3">
-							<div className="flex items-center">
-								{/* Circle Indicator */}
-								<div
-									className={cn(
-										"relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border bg-bg-white-0 transition-all duration-300",
-										state === "completed" &&
-											canShowSuccess &&
-											"border-success-base text-success-base",
-										state === "active" &&
-											step.number !== 1 &&
-											!isFailed &&
-											"border-warning-base text-warning-base",
-										state === "failed" && "border-error-base text-error-base",
-										(state === "upcoming" || shouldForceNeutral) &&
-											"border-stroke-soft-200 text-text-soft-400",
-									)}
-								>
-									{/* Colored Shade Overlay */}
+					return (
+						<Fragment key={step.number}>
+							<div className="flex min-w-[90px] flex-col items-center">
+								<div className="flex flex-col items-center gap-2">
 									<div
 										className={cn(
-											"absolute inset-0 rounded-[14px]",
-											state === "completed" &&
-												canShowSuccess &&
-												"bg-success-base/10",
-											state === "active" &&
-												step.number !== 1 &&
-												!isFailed &&
-												"bg-warning-base/10",
-											state === "failed" && "bg-error-base/10",
+											"flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border transition-all duration-300",
+											getIconStyles(state),
 										)}
-									/>
-
-									{domain.status === "verifying" && step.number === 2 ? (
-										<Spinner size={20} color="currentColor" />
-									) : (
-										<Icon
-											name={step.icon}
-											className={cn(
-												"relative z-10 h-5 w-5 transition-colors duration-300",
-												state === "active" && step.number !== 1
-													? "text-warning-base"
-													: state === "completed" && canShowSuccess
-														? "text-success-base"
-														: state === "failed"
-															? "text-error-base"
-															: "text-text-soft-400",
-											)}
-										/>
-									)}
-								</div>
-
-								{/* Connector Line */}
-								{!isLast && (
-									<div className="-right-5 absolute top-5 left-5 h-[1px] bg-stroke-soft-200">
-										<div
-											className={cn(
-												"h-full transition-all duration-700 ease-out",
-												state === "completed" && canShowSuccess
-													? "w-full bg-success-base"
-													: "w-0",
-											)}
-										/>
+									>
+										{domain.status === "verifying" && step.number === 2 ? (
+											<Spinner size={20} color="currentColor" />
+										) : (
+											<Icon name={step.icon} className="h-5 w-5" />
+										)}
 									</div>
-								)}
-							</div>
 
-							{/* Label + Meta */}
-							<div className="flex w-10 flex-col items-center gap-0.5">
-								<p
-									className={cn(
-										"whitespace-nowrap text-center font-medium text-[10px] uppercase tracking-wider transition-colors duration-300",
-										state === "upcoming"
-											? "text-text-soft-400"
-											: "text-text-strong-950",
-									)}
-								>
-									{step.label}
-								</p>
-								{step.timestamp && (
-									<span className="whitespace-nowrap text-center text-[10px] text-text-soft-400 tabular-nums">
-										{step.timestamp}
-									</span>
-								)}
+									<div className="flex flex-col items-center gap-1 text-center">
+										<span
+											className={cn(
+												"whitespace-nowrap rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
+												getBadgeStyles(state),
+											)}
+										>
+											{step.label}
+										</span>
+										<div className="flex h-4 items-center justify-center">
+											{step.timestamp ? (
+												<span className="whitespace-nowrap font-medium text-text-soft-400 text-xs">
+													{step.timestamp}
+												</span>
+											) : (
+												<span
+													className="h-4 w-16 opacity-0"
+													aria-hidden="true"
+												/>
+											)}
+										</div>
+									</div>
+								</div>
 							</div>
-						</div>
-					</div>
-				);
-			})}
+							{index < steps.length - 1 && (
+								<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+							)}
+						</Fragment>
+					);
+				})}
+			</div>
 		</div>
 	);
 };
 
 export const StatusTimelineSkeleton = () => (
-	<div className="relative mx-auto flex w-full max-w-md items-start gap-0">
-		{[1, 2, 3].map((step, index) => {
-			const isLast = index === 2;
-			return (
-				<div
-					key={step}
-					className={cn("relative flex items-start", !isLast && "flex-1")}
-				>
-					<div className="flex flex-col gap-3">
-						<div className="flex items-center">
-							{/* Circle Indicator */}
-							<div className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 transition-all duration-300 dark:border-stroke-soft-100/40">
-								<Skeleton className="h-5 w-5 rounded-md" />
+	<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 py-6 pr-8 pb-5 pl-6 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+		<div className="flex w-full max-w-2xl items-start justify-between">
+			{[1, 2, 3].map((step, index) => (
+				<Fragment key={step}>
+					<div className="flex min-w-[90px] flex-col items-center">
+						<div className="flex flex-col items-center gap-2">
+							<Skeleton className="h-10 w-10 rounded-[10px]" />
+							<div className="flex flex-col items-center gap-1">
+								<Skeleton className="h-6 w-20 rounded-md" />
+								<Skeleton className="h-3 w-16 rounded-md" />
 							</div>
-
-							{/* Connector Line */}
-							{!isLast && (
-								<div className="-right-5 absolute top-5 left-5 h-[1px] w-full bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-							)}
-						</div>
-
-						{/* Label + Meta */}
-						<div className="flex w-10 flex-col items-center gap-1.5">
-							<Skeleton className="h-2 w-12 rounded-sm" />
-							<Skeleton className="h-2 w-16 rounded-sm" />
 						</div>
 					</div>
-				</div>
-			);
-		})}
+					{index < 2 && (
+						<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+					)}
+				</Fragment>
+			))}
+		</div>
 	</div>
 );

@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import type { DomainResponse } from "#/features/domain/types";
@@ -31,39 +32,70 @@ export const DomainEvents = ({
 		return <DomainEventsSkeleton />;
 	}
 
+	// Banner tone by status: gray = not started, blue = verifying,
+	// green = verified, red = error.
+	const tone = (() => {
+		switch (domain.status) {
+			case "active":
+				return {
+					card: "border-success-base/25 bg-success-lighter/50 dark:border-success-base/30 dark:bg-success-base/10",
+					icon: "check-circle",
+					iconClass: "text-success-base",
+				};
+			case "verifying":
+				return {
+					card: "border-information-base/25 bg-information-lighter/50 dark:border-information-base/30 dark:bg-information-base/10",
+					icon: "scan",
+					iconClass: "text-information-base",
+				};
+			case "failed":
+				return {
+					card: "border-error-base/25 bg-error-lighter/40 dark:border-error-base/30 dark:bg-error-base/10",
+					icon: "cross-circle",
+					iconClass: "text-error-base",
+				};
+			default:
+				return {
+					card: "border-stroke-soft-200 bg-bg-weak-50/50 dark:border-stroke-soft-100/40",
+					icon: "activity",
+					iconClass: "text-text-sub-600",
+				};
+		}
+	})();
+
 	return (
-		<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/50 p-6 dark:border-stroke-soft-100/40">
-			{/* Header Status */}
-			<div className="flex flex-col gap-1">
-				<div className="flex items-center gap-1.5">
-					<Icon name="activity" className="h-3.5 w-3.5 text-text-sub-600" />
-					<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-						Status Timeline
-					</span>
-				</div>
+		<div className="mt-7 flex flex-col gap-4">
+			{/* Status banner */}
+			<div
+				className={cn(
+					"flex items-start gap-2.5 rounded-2xl border p-4",
+					tone.card,
+				)}
+			>
+				<Icon
+					name={tone.icon}
+					className={cn("mt-0.5 h-4 w-4 shrink-0", tone.iconClass)}
+				/>
 				<p className="font-medium text-paragraph-sm text-text-strong-950">
 					{bannerMessage()}
 				</p>
 			</div>
 
-			<div className="h-[1px] w-full bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
-
+			{/* Bottom section — timeline steps (email details style) */}
 			<StatusTimeline domain={domain} />
 		</div>
 	);
 };
 
 export const DomainEventsSkeleton = () => (
-	<div className="mt-7 flex flex-col gap-6 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/20 p-6 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
-		<div className="flex flex-col gap-2.5">
+	<div className="mt-7 flex flex-col gap-4">
+		<div className="flex flex-col gap-2.5 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/20 p-6 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
 			<div className="flex items-center gap-1.5">
 				<Skeleton className="h-3.5 w-3.5 rounded-full" />
 				<Skeleton className="h-2.5 w-24 rounded-full" />
 			</div>
 			<Skeleton className="h-4 w-3/4 rounded-full" />
 		</div>
-
-		<div className="h-[1px] w-full bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
 		<StatusTimelineSkeleton />
 	</div>
