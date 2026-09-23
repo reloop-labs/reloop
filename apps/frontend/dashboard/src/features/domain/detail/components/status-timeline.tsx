@@ -19,7 +19,11 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 	const isFailed = domain.status === "failed";
 
 	const getStepState = (stepNumber: number) => {
-		if (domain.status === "active") return "completed";
+		// Domain Added is always gray, in every state.
+		if (stepNumber === 1) return "upcoming";
+		// DNS Verified stays blue once verified; only the final badge turns green.
+		if (domain.status === "active")
+			return stepNumber === 2 ? "active" : "completed";
 		if (isFailed && stepNumber === 2) return "failed";
 		if (stepNumber < currentStep) return "completed";
 		if (stepNumber === currentStep) return "active";
@@ -39,7 +43,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 			number: 2,
 			label:
 				domain.status === "active"
-					? "Verified"
+					? "DNS Verified"
 					: domain.status === "verifying"
 						? "Verifying DNS"
 						: domain.status === "failed"
@@ -47,12 +51,12 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 							: "Start Verification",
 			icon:
 				domain.status === "active"
-					? "shield-check"
+					? "list-check"
 					: domain.status === "verifying"
 						? "scan"
 						: domain.status === "failed"
 							? "cross-circle"
-							: "question",
+							: "list-check",
 			timestamp:
 				(domain.status === "active" ||
 					domain.status === "verifying" ||
@@ -66,8 +70,8 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 		},
 		{
 			number: 3,
-			label: "Ready to Send",
-			icon: "mail-single",
+			label: "Verified",
+			icon: "verified",
 			timestamp:
 				domain.status === "active" && domain.lastVerifiedAt
 					? format(new Date(domain.lastVerifiedAt), "MMM dd, h:mm a")
@@ -80,7 +84,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 			case "completed":
 				return "border-success-base/20 bg-success-lighter/50 text-success-base";
 			case "active":
-				return "border-warning-base/20 bg-warning-lighter/50 text-warning-base";
+				return "border-information-base/20 bg-information-lighter/50 text-information-base";
 			case "failed":
 				return "border-error-light bg-error-lighter text-error-base";
 			default:
@@ -93,7 +97,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 			case "completed":
 				return "bg-success-lighter text-success-base";
 			case "active":
-				return "bg-warning-lighter text-warning-base";
+				return "bg-information-lighter text-information-base";
 			case "failed":
 				return "bg-error-lighter text-error-base";
 			default:
@@ -103,7 +107,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 
 	return (
 		<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 py-6 pr-8 pb-5 pl-6 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
-			<div className="flex w-full max-w-2xl items-start justify-between">
+			<div className="flex w-full max-w-2xl items-start justify-start">
 				{steps.map((step, index) => {
 					const state = getStepState(step.number);
 
@@ -149,7 +153,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 								</div>
 							</div>
 							{index < steps.length - 1 && (
-								<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+								<div className="mt-5 h-0 w-24 flex-none border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
 							)}
 						</Fragment>
 					);
@@ -161,7 +165,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 
 export const StatusTimelineSkeleton = () => (
 	<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 py-6 pr-8 pb-5 pl-6 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
-		<div className="flex w-full max-w-2xl items-start justify-between">
+		<div className="flex w-full max-w-2xl items-start justify-start">
 			{[1, 2, 3].map((step, index) => (
 				<Fragment key={step}>
 					<div className="flex min-w-[90px] flex-col items-center">
@@ -174,7 +178,7 @@ export const StatusTimelineSkeleton = () => (
 						</div>
 					</div>
 					{index < 2 && (
-						<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+						<div className="mt-5 h-0 w-24 flex-none border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
 					)}
 				</Fragment>
 			))}

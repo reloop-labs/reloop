@@ -18,7 +18,7 @@ export const DomainEvents = ({
 			case "verifying":
 				return "Your domain is being verified this can take a few hours depending on your DNS provider.";
 			case "active":
-				return "You're all set! Your domain is ready to send emails.";
+				return "Domain verified: Your domain is ready to send emails.";
 			case "failed":
 				return getVerificationFailedMessage(domain.verificationFailedReason);
 			case "pending":
@@ -39,7 +39,7 @@ export const DomainEvents = ({
 			case "active":
 				return {
 					card: "border-success-base/25 bg-success-lighter/50 dark:border-success-base/30 dark:bg-success-base/10",
-					icon: "check-circle",
+					icon: "confetti",
 					iconClass: "text-success-base",
 				};
 			case "verifying":

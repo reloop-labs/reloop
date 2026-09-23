@@ -3648,6 +3648,15 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol id="list-check" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M11 20H22M11 12H22M11 4H22M2 4l1 1 3-3M2 12l1 1 3-3M2 20l1 1 3-3"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol
 				id="note"
 				viewBox="0 0 24 24"

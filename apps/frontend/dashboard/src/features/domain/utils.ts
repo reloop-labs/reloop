@@ -18,13 +18,12 @@ export const isDomainRecordId = (id: unknown): id is string =>
 export const getStatusLabel = (status: DomainStatus): string => {
 	switch (status) {
 		case "active":
-			return "Active";
+			return "Verified";
 		case "verifying":
-			return "Verifying";
+			return "In progress";
 		case "pending":
-			return "Not Started";
+			return "Not started";
 		case "suspended":
-			return "Suspended";
 		case "failed":
 			return "Failed";
 		default:
@@ -37,7 +36,7 @@ export const getStatusColorClass = (status: DomainStatus): string => {
 		case "pending":
 			return "text-text-sub-600";
 		case "verifying":
-			return "text-warning-base";
+			return "text-information-base";
 		case "active":
 			return "text-success-base";
 		case "failed":
@@ -55,8 +54,9 @@ export const getStatusIcon = (status: DomainStatus): string => {
 		case "verifying":
 			return "time";
 		case "active":
-			return "check-circle";
+			return "shield-check";
 		case "failed":
+		case "suspended":
 			return "cross-circle";
 		default:
 			return "minus-circle";

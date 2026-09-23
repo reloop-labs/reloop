@@ -3,7 +3,11 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import type * as React from "react";
 import type { DomainResponse } from "#/features/domain/types";
-import { getStatusColorClass, getStatusIcon } from "#/features/domain/utils";
+import {
+	getStatusColorClass,
+	getStatusIcon,
+	getStatusLabel,
+} from "#/features/domain/utils";
 import { AnimatedClock } from "../../animated-clock";
 import { CreatedTime } from "./created-time-hover";
 import { DNSProviderInfo } from "./dns-provider-info";
@@ -61,8 +65,8 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 								className="h-3.5 w-3.5"
 							/>
 						)}
-						<p className="font-medium text-paragraph-xs capitalize">
-							{domain?.status || "pending"}
+						<p className="font-medium text-paragraph-xs">
+							{getStatusLabel(domain?.status || "pending")}
 						</p>
 					</div>
 				)}
