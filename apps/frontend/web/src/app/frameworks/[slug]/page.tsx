@@ -1,5 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { BlueprintCta } from "@reloop/web/components/landing/blueprint-cta";
 import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import FrameworkHero from "../../sdk/components/framework-hero";
 import FrameworkMore from "../../sdk/components/framework-more";
 import FrameworkSteps from "../../sdk/components/framework-steps";
+import { SectionFrame } from "../../sdk/components/section-frame";
 import {
 	FRAMEWORK_SLUGS,
 	getFramework,
@@ -93,13 +94,18 @@ export default async function FrameworkPage({ params }: PageProps) {
 			<FrameworkHero framework={framework} />
 			<FrameworkSteps framework={framework} />
 			<FrameworkMore current={framework} />
-			<BlogCta
-				headline={`Send with ${framework.name}.`}
-				sub={`Get an API key and ship transactional email from ${framework.name} using the official ${framework.languageName} SDK.`}
-				primaryLabel="Get API Key"
-				primaryHref="/dashboard/signup"
-				accentHex={framework.icon.hex}
-			/>
+			<SectionFrame>
+				<div aria-hidden className="h-12 sm:h-16" />
+				<BlueprintCta
+					headlineLine1={`Ready to send with ${framework.name}?`}
+					headlineLine2="Let's talk."
+					subtext="3,000 free emails every month. Modern email infrastructure and deliverability built for developers."
+					primaryLabel="Get started free"
+					primaryHref="/dashboard/signup"
+					secondaryLabel="Schedule call"
+					secondaryHref="https://cal.com/pranavp/30"
+				/>
+			</SectionFrame>
 		</main>
 	);
 }
