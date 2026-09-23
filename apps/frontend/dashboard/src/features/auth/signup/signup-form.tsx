@@ -7,7 +7,29 @@ import { useEffect, useRef } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import * as v from "valibot";
-import { toastApiError } from "#/lib/rate-limit-toast";
+import {
+	getRateLimitInfo,
+	showRateLimitCountdownToast,
+	toastApiError,
+} from "#/lib/rate-limit-toast";
+
+/**
+ * Extract a displayable message from a Better Auth client error, which is a
+ * plain object (`{ message }`) rather than an `Error` instance.
+ */
+function getServerMessage(error: unknown, fallback: string): string {
+	if (error && typeof error === "object") {
+		const err = error as { message?: unknown; error?: unknown };
+		if (typeof err.message === "string" && err.message.trim()) {
+			return err.message;
+		}
+		if (typeof err.error === "string" && err.error.trim()) {
+			return err.error;
+		}
+	}
+	if (error instanceof Error && error.message) return error.message;
+	return fallback;
+}
 
 const signupSchema = v.object({
 	email: v.pipe(
@@ -40,6 +62,8 @@ export function SignupForm({
 	const {
 		register,
 		handleSubmit,
+		setError,
+		clearErrors,
 		formState: { errors, isValid },
 	} = useForm<SignupFormData>({
 		resolver: valibotResolver(signupSchema) as Resolver<SignupFormData>,
@@ -48,6 +72,7 @@ export function SignupForm({
 			email: "",
 		},
 	});
+	const emailField = register("email");
 
 	const isBusy = status === "loading" || disabled;
 	const canSubmit = isValid && !isBusy;
@@ -68,6 +93,7 @@ export function SignupForm({
 
 	const onSubmit = async (data: SignupFormData) => {
 		try {
+			clearErrors("email");
 			changeStatus("loading");
 			const email = data.email;
 			const { error } = await authClient.emailOtp.sendVerificationOtp({
@@ -75,7 +101,18 @@ export function SignupForm({
 				type: "sign-in",
 			});
 			if (error) {
-				toastApiError(error, "Could not send the signup code.");
+				// Stay on the signup step and show the failure inline under
+				// the email field (e.g. suspended accounts) — no OTP screen,
+				// and for suspended users no email was sent at all.
+				const message = getServerMessage(
+					error,
+					"Could not send the signup code.",
+				);
+				setError("email", { message });
+				const rateLimit = getRateLimitInfo(error);
+				if (rateLimit) {
+					showRateLimitCountdownToast(rateLimit);
+				}
 				changeStatus("idle");
 				return;
 			}
@@ -83,6 +120,9 @@ export function SignupForm({
 			changeStatus("idle");
 		} catch (e) {
 			changeStatus("idle");
+			setError("email", {
+				message: getServerMessage(e, "An unexpected error occurred."),
+			});
 			toastApiError(e, "An unexpected error occurred.");
 		}
 	};
@@ -108,7 +148,11 @@ export function SignupForm({
 							type="email"
 							placeholder="steve@apple.com"
 							disabled={isBusy}
-							{...register("email")}
+							{...emailField}
+							onChange={(e) => {
+								void emailField.onChange(e);
+								if (errors.email) clearErrors("email");
+							}}
 						/>
 					</Input.Wrapper>
 				</Input.Root>

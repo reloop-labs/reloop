@@ -155,7 +155,19 @@ export function VerifyOTP({
 					setSecondsLeft(info.retryAfter);
 					showRateLimitCountdownToast(info);
 				} else {
-					toastApiError(resendError, "Could not resend the code.");
+					const message =
+						resendError &&
+						typeof resendError === "object" &&
+						"message" in resendError &&
+						typeof (resendError as { message?: unknown }).message ===
+							"string" &&
+						(resendError as { message: string }).message.trim()
+							? (resendError as { message: string }).message
+							: "Could not resend the code.";
+					// Suspended accounts are rejected before any email is sent —
+					// surface it inline on the OTP screen as well.
+					setError({ name: "email", error: message });
+					toastApiError(resendError, message);
 				}
 				return;
 			}

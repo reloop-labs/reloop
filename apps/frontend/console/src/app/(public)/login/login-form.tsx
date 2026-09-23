@@ -22,36 +22,74 @@ const loginSchema = v.object({
 
 type LoginFormData = v.InferInput<typeof loginSchema>;
 
+/**
+ * Extract a displayable message from a Better Auth client error, which is a
+ * plain object (`{ message }`) rather than an `Error` instance.
+ */
+function getServerMessage(error: unknown, fallback: string): string {
+	if (error && typeof error === "object") {
+		const err = error as { message?: unknown; error?: unknown };
+		if (typeof err.message === "string" && err.message.trim()) {
+			return err.message;
+		}
+		if (typeof err.error === "string" && err.error.trim()) {
+			return err.error;
+		}
+	}
+	if (error instanceof Error && error.message) return error.message;
+	return fallback;
+}
+
 export const LoginForm = () => {
 	const { changeStatus, status } = useLoading();
 	const [, setOtpSentEmail] = useQueryState("otpSent");
 	const {
 		register,
 		handleSubmit,
+		setError,
+		clearErrors,
 		formState: { errors, isValid },
 	} = useForm<LoginFormData>({
 		resolver: valibotResolver(loginSchema) as Resolver<LoginFormData>,
 		mode: "onChange",
 	});
+	const emailField = register("email");
 
 	const onSubmit = async (data: LoginFormData) => {
 		try {
+			clearErrors("email");
 			changeStatus("loading");
-			const success = await authClient.emailOtp.sendVerificationOtp({
+			const result = await authClient.emailOtp.sendVerificationOtp({
 				email: data.email,
 				type: "sign-in",
 			});
-			if (success) {
+			const sendError =
+				result && typeof result === "object" && "error" in result
+					? (result as { error?: unknown }).error
+					: null;
+			if (sendError) {
+				// Stay on the login step and show the failure inline under the
+				// email field (e.g. suspended accounts) — no OTP screen, and
+				// for suspended users no email was sent at all.
+				const message = getServerMessage(
+					sendError,
+					"Could not send the login code.",
+				);
+				setError("email", { message });
+				toast.error(message);
+				changeStatus("idle");
+				return;
+			}
+			if (result) {
 				setOtpSentEmail(data.email);
 				changeStatus("idle");
 			}
 		} catch (e) {
 			changeStatus("idle");
-			if (e instanceof Error && e.message) {
-				toast.error(e.message);
-			} else {
-				toast.error("An unexpected error occurred.");
-			}
+			const message = getServerMessage(e, "An unexpected error occurred.");
+			// Inline on the login page itself so the user sees it in context.
+			setError("email", { message });
+			toast.error(message);
 		}
 	};
 
@@ -65,7 +103,11 @@ export const LoginForm = () => {
 							id="email"
 							type="email"
 							placeholder="admin@reloop.sh"
-							{...register("email")}
+							{...emailField}
+							onChange={(e) => {
+								void emailField.onChange(e);
+								if (errors.email) clearErrors("email");
+							}}
 						/>
 					</Input.Wrapper>
 				</Input.Root>

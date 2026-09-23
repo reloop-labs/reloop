@@ -40,6 +40,7 @@ import {
 	REGISTRATION_DISABLED_MESSAGE,
 } from "../registration-controls";
 import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
+import { isUserBanned } from "../user/is-banned";
 import {
 	USER_NAME_PART_MAX_LENGTH,
 	userDisplayNamePartsTooLong,
@@ -123,6 +124,58 @@ async function assertRegistrationAllowed(email: string | undefined) {
 
 	if (!allowed) {
 		throw new APIError("FORBIDDEN", { message: REGISTRATION_DISABLED_MESSAGE });
+	}
+}
+
+/** Shown inline on the login page when a suspended user tries to sign in. */
+export const SUSPENDED_USER_MESSAGE =
+	"Your account has been suspended. Please contact support if you believe this is an error.";
+
+/**
+ * Fail-closed banned check before any OTP email is sent. Better Auth's admin
+ * plugin only rejects banned users at session creation, so without this a
+ * suspended user would still receive a login code by email and only fail at
+ * the verify step. Throwing here means no OTP email is sent and the login
+ * form can show the error inline instead.
+ */
+async function assertUserNotSuspended(email: string): Promise<void> {
+	const normalized = email.trim().toLowerCase();
+	if (!normalized) return;
+	try {
+		let [found] = await db
+			.select({
+				banned: schema.user.banned,
+				banExpires: schema.user.banExpires,
+			})
+			.from(schema.user)
+			.where(eq(schema.user.email, normalized))
+			.limit(1);
+		if (!found) {
+			const raw = email.trim();
+			if (raw && raw !== normalized) {
+				[found] = await db
+					.select({
+						banned: schema.user.banned,
+						banExpires: schema.user.banExpires,
+					})
+					.from(schema.user)
+					.where(eq(schema.user.email, raw))
+					.limit(1);
+			}
+		}
+		if (found && isUserBanned(found)) {
+			throw new APIError("FORBIDDEN", {
+				message: SUSPENDED_USER_MESSAGE,
+			});
+		}
+	} catch (error) {
+		// Re-throw the suspension error; infra failures fail open so login
+		// itself doesn't break when the lookup can't run.
+		if (error instanceof APIError) throw error;
+		log.error({
+			...{ data: error },
+			message: "Failed to check suspended status before sending OTP",
+		});
 	}
 }
 
@@ -432,6 +485,8 @@ export const auth = betterAuth({
 			allowedAttempts: 3,
 			async sendVerificationOTP({ email, otp, type }) {
 				log.info("server", `Sending OTP (${type}) to: ${email}`);
+				// Suspended users get an inline login-page error — no email sent.
+				await assertUserNotSuspended(email);
 				if (
 					authServerConfig.DEFAULT_OTP &&
 					authServerConfig.NODE_ENV !== "development"
