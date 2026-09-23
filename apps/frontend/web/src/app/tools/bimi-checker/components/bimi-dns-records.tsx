@@ -14,7 +14,7 @@ const PARTS: {
 		n: "1",
 		label: "SELECTOR",
 		value: "default._bimi",
-		segment: "default._bimi.example.com",
+		segment: "default._bimi.yourdomain.com",
 		text: "Hostname the assertion lives at, plus TXT type. No record here means no logo, even if everything else is ready.",
 		hex: "#2563eb",
 	},
@@ -232,7 +232,7 @@ export function BimiDnsRecords() {
 										{part.n}. {part.label}
 									</p>
 									<p className="mt-0.5 font-mono text-[11.5px] text-white/85">
-										({part.value})
+										{part.value}
 									</p>
 								</div>
 								<p className="flex-1 bg-white px-4 py-3.5 text-[13px] text-stone-500 leading-relaxed dark:bg-black dark:text-white/60">
