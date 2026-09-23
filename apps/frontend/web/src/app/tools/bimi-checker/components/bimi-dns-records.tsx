@@ -1,3 +1,7 @@
+"use client";
+
+import { useLayoutEffect, useRef, useState } from "react";
+
 const PARTS: {
 	n: string;
 	label: string;
@@ -41,6 +45,52 @@ const PARTS: {
 ];
 
 export function BimiDnsRecords() {
+	const wrapRef = useRef<HTMLDivElement | null>(null);
+	const pillRefs = useRef<(HTMLDivElement | null)[]>([]);
+	const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+	const [paths, setPaths] = useState<string[]>([]);
+	const [box, setBox] = useState({ w: 0, h: 0 });
+
+	useLayoutEffect(() => {
+		const wrap = wrapRef.current;
+		if (!wrap) return;
+		const compute = () => {
+			const wr = wrap.getBoundingClientRect();
+			const d: string[] = [];
+			for (let i = 0; i < PARTS.length; i++) {
+				const p = pillRefs.current[i]?.getBoundingClientRect();
+				const t = dotRefs.current[i]?.getBoundingClientRect();
+				if (!p || !t) continue;
+				const px = p.left + p.width / 2 - wr.left;
+				const py = p.bottom - wr.top;
+				const dx = t.left + t.width / 2 - wr.left;
+				const dy = t.top - wr.top;
+				if (dy - py < 8) {
+					d.push("");
+					continue;
+				}
+				// Z elbow: down from pill, across, down into the dot.
+				// Horizontal run length follows the pill-to-card distance.
+				const my = py + Math.max(14, (dy - py) * 0.45);
+				d.push(
+					`M ${px.toFixed(1)} ${py.toFixed(1)} V ${my.toFixed(1)} H ${dx.toFixed(1)} V ${dy.toFixed(1)}`,
+				);
+			}
+			setPaths(d);
+			setBox({ w: wr.width, h: wr.height });
+		};
+		compute();
+		const ro = new ResizeObserver(compute);
+		ro.observe(wrap);
+		window.addEventListener("resize", compute);
+		const t = setTimeout(compute, 300);
+		return () => {
+			ro.disconnect();
+			window.removeEventListener("resize", compute);
+			clearTimeout(t);
+		};
+	}, []);
+
 	return (
 		<section
 			id="dns-records"
@@ -58,34 +108,77 @@ export function BimiDnsRecords() {
 					What the DNS looks like
 				</h2>
 				<p className="max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					One TXT record, four parts. Each part points to its box.
+					One TXT record: type first, then four values. Each value points to its box.
 				</p>
 			</div>
 
-			<div className="border-stroke-soft-100 border-b px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:border-white/10">
-				<p className="text-center font-mono text-[12px] text-stone-500 tracking-wider sm:text-[12.5px] dark:text-white/40">
-					TXT at default._bimi.{`{domain}`}
-				</p>
+			<div
+				ref={wrapRef}
+				className="relative border-stroke-soft-100 border-b px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:border-white/10"
+			>
+				{/* Full record together, centered: type first, then values */}
+				<div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
+					<div
+						className="flex w-fit max-w-full items-center justify-center rounded-xl border border-stone-400 bg-white p-1 text-center font-mono font-semibold text-[12.5px] text-stone-500 leading-relaxed break-all dark:bg-white/[0.04] dark:text-white/60"
+						style={{ boxShadow: "0 2.5px 0 #78716c" }}
+					>
+						<span>TXT</span>
+					</div>
+					{PARTS.map((part, i) => (
+						<div
+							key={part.n}
+							ref={(el) => {
+								pillRefs.current[i] = el;
+							}}
+							className="flex w-fit max-w-full items-center justify-center rounded-xl border bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed break-all dark:bg-white/[0.04]"
+							style={{
+								borderColor: part.hex,
+								boxShadow: `0 2.5px 0 ${part.hex}`,
+							}}
+						>
+							<span style={{ color: part.hex }}>{part.segment}</span>
+						</div>
+					))}
+				</div>
 
-				{/* 4 columns: segment box -> connector -> explainer card, aligned */}
-				<div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
-					{PARTS.map((part) => (
+				{/* Z-shaped wires: pill -> across -> card dot */}
+				{box.w > 0 ? (
+					<svg
+						aria-hidden
+						className="pointer-events-none absolute inset-0 hidden h-full w-full sm:block"
+						viewBox={`0 0 ${box.w} ${box.h}`}
+						fill="none"
+					>
+						{paths.map((d, i) => {
+							const part = PARTS[i];
+							if (!d || !part) return null;
+							return (
+								<path
+									key={part.n}
+									d={d}
+									stroke={part.hex}
+									strokeWidth={1.5}
+									strokeLinejoin="round"
+									strokeLinecap="round"
+									opacity={0.9}
+								/>
+							);
+						})}
+					</svg>
+				) : null}
+
+				{/* Explainer cards below, color-wired to each part */}
+				<div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+					{PARTS.map((part, i) => (
 						<div key={part.n} className="flex flex-col items-center">
-							{/* Top: square segment box */}
-							<div className="flex w-fit max-w-full items-center justify-center rounded-xl border border-stroke-soft-200 bg-neutral-100 p-1 text-center font-mono text-[12.5px] leading-relaxed break-all dark:border-white/10 dark:bg-white/[0.04]">
-								<span style={{ color: part.hex }}>{part.segment}</span>
-							</div>
-							{/* Connector pointing down to the card */}
+							{/* Connector dot (wire endpoint) */}
 							<div aria-hidden className="flex flex-col items-center py-3">
 								<span
+									ref={(el) => {
+										dotRefs.current[i] = el;
+									}}
 									className="size-2 rounded-full"
 									style={{ backgroundColor: part.hex }}
-								/>
-								<span
-									className="h-10 w-px"
-									style={{
-										background: `linear-gradient(to bottom, ${part.hex}, transparent)`,
-									}}
 								/>
 							</div>
 							{/* Bottom: explainer card */}

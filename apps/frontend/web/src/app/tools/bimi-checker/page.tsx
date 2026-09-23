@@ -9,7 +9,6 @@ import { BimiHero } from "./components/bimi-hero";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { SimilarTools } from "./components/similar-tools";
 import { WhatIsBimi } from "./components/what-is-bimi";
-import { WhatItChecks } from "./components/what-it-checks";
 import {
 	faqGroups,
 	faqs,
@@ -111,11 +110,6 @@ export default function BimiCheckerPage() {
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
 				<HowItWorksSteps />
-				<div
-					aria-hidden
-					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
-				/>
-				<WhatItChecks />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
