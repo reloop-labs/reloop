@@ -36,7 +36,7 @@ export const getStatusColorClass = (status: DomainStatus): string => {
 		case "pending":
 			return "text-text-sub-600";
 		case "verifying":
-			return "text-information-base";
+			return "text-sky-600 dark:text-sky-400";
 		case "active":
 			return "text-success-base";
 		case "failed":

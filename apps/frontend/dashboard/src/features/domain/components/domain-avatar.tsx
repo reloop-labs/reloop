@@ -45,8 +45,8 @@ const STATUS_TONE: Record<DomainStatus, { outer: string; icon: string }> = {
 	},
 	verifying: {
 		outer:
-			"border-warning-base/25 bg-warning-lighter dark:border-warning-base/30 dark:bg-warning-base/10",
-		icon: "text-warning-base",
+			"border-sky-500/25 bg-sky-500/10 dark:border-sky-400/30 dark:bg-sky-400/10",
+		icon: "text-sky-600 dark:text-sky-400",
 	},
 	pending: {
 		outer:

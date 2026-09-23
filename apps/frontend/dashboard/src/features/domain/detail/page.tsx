@@ -254,7 +254,10 @@ export function DomainDetailPage({
 				onValueChange={(v) => void setActiveTab(v)}
 				className="mt-7"
 			>
-				<TabMenu.List className="relative h-12 gap-0 border-b! py-0">
+				<TabMenu.List
+					className="relative h-12 gap-0 border-b! py-0"
+					wrapperClassName="overscroll-auto"
+				>
 					{tabs.map((t, index) => (
 						<TabMenu.Trigger
 							key={t.id}

@@ -5,6 +5,7 @@ import Spinner from "@reloop/ui/spinner";
 import { format } from "date-fns";
 import { Fragment } from "react";
 import type { DomainResponse } from "#/features/domain/types";
+import { TimeHover } from "./created-time-hover";
 
 interface StatusTimelineProps {
 	domain: DomainResponse;
@@ -30,14 +31,14 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 		return "upcoming";
 	};
 
+	const verifiedAt = domain.lastVerifiedAt || domain.updatedAt;
+
 	const steps = [
 		{
 			number: 1,
 			label: "Domain Added",
 			icon: "globe",
-			timestamp: domain.createdAt
-				? format(new Date(domain.createdAt), "MMM dd, h:mm a")
-				: null,
+			rawDate: domain.createdAt ?? null,
 		},
 		{
 			number: 2,
@@ -45,7 +46,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 				domain.status === "active"
 					? "DNS Verified"
 					: domain.status === "verifying"
-						? "Verifying DNS"
+						? "Verifying DNS Records"
 						: domain.status === "failed"
 							? "Verification Failed"
 							: "Start Verification",
@@ -57,24 +58,22 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 						: domain.status === "failed"
 							? "cross-circle"
 							: "list-check",
-			timestamp:
+			timestamp: null,
+			rawDate:
 				(domain.status === "active" ||
 					domain.status === "verifying" ||
 					domain.status === "failed") &&
-				(domain.lastVerifiedAt || domain.updatedAt)
-					? format(
-							new Date(domain.lastVerifiedAt || domain.updatedAt),
-							"MMM dd, h:mm a",
-						)
+				verifiedAt
+					? verifiedAt
 					: null,
 		},
 		{
 			number: 3,
 			label: "Verified",
 			icon: "verified",
-			timestamp:
+			rawDate:
 				domain.status === "active" && domain.lastVerifiedAt
-					? format(new Date(domain.lastVerifiedAt), "MMM dd, h:mm a")
+					? domain.lastVerifiedAt
 					: null,
 		},
 	];
@@ -84,7 +83,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 			case "completed":
 				return "border-success-base/20 bg-success-lighter/50 text-success-base";
 			case "active":
-				return "border-information-base/20 bg-information-lighter/50 text-information-base";
+				return "border-sky-500/25 bg-sky-500/10 text-sky-600 dark:text-sky-400";
 			case "failed":
 				return "border-error-light bg-error-lighter text-error-base";
 			default:
@@ -97,7 +96,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 			case "completed":
 				return "bg-success-lighter text-success-base";
 			case "active":
-				return "bg-information-lighter text-information-base";
+				return "bg-sky-500/10 text-sky-600 dark:bg-sky-400/10 dark:text-sky-400";
 			case "failed":
 				return "bg-error-lighter text-error-base";
 			default:
@@ -110,6 +109,28 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 			<div className="flex w-full max-w-2xl items-start justify-start">
 				{steps.map((step, index) => {
 					const state = getStepState(step.number);
+
+					const textBlock = (
+						<div className="flex cursor-default flex-col items-center gap-1 text-center">
+							<span
+								className={cn(
+									"whitespace-nowrap rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
+									getBadgeStyles(state),
+								)}
+							>
+								{step.label}
+							</span>
+							<div className="flex h-4 items-center justify-center">
+								{step.timestamp ? (
+									<span className="whitespace-nowrap font-medium text-text-soft-400 text-xs">
+										{step.timestamp}
+									</span>
+								) : (
+									<span className="h-4 w-16 opacity-0" aria-hidden="true" />
+								)}
+							</div>
+						</div>
+					);
 
 					return (
 						<Fragment key={step.number}>
@@ -128,28 +149,11 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 										)}
 									</div>
 
-									<div className="flex flex-col items-center gap-1 text-center">
-										<span
-											className={cn(
-												"whitespace-nowrap rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
-												getBadgeStyles(state),
-											)}
-										>
-											{step.label}
-										</span>
-										<div className="flex h-4 items-center justify-center">
-											{step.timestamp ? (
-												<span className="whitespace-nowrap font-medium text-text-soft-400 text-xs">
-													{step.timestamp}
-												</span>
-											) : (
-												<span
-													className="h-4 w-16 opacity-0"
-													aria-hidden="true"
-												/>
-											)}
-										</div>
-									</div>
+									<TimeHover
+										value={step.rawDate}
+										trigger={textBlock}
+										idPrefix={`timeline-step-${step.number}`}
+									/>
 								</div>
 							</div>
 							{index < steps.length - 1 && (

@@ -256,7 +256,7 @@ export const GroupSelect = ({
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -6, scale: 0.96 }}
 							transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-							className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+							className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100"
 						>
 							<div ref={scrollContainerRef} className="relative">
 								{filteredGroups.map((group, idx) => (
@@ -303,7 +303,7 @@ export const GroupSelect = ({
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -6, scale: 0.96 }}
 							transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-							className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+							className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl bg-bg-white-0 p-2 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100"
 						>
 							<p className="px-3 py-4 text-center text-paragraph-xs text-text-soft-400">
 								No groups found for &ldquo;{groupInput}&rdquo;

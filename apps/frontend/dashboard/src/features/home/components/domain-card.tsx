@@ -98,12 +98,12 @@ const getTooltipText = (
 		case "verifying":
 			return "Your domain is being verified this can take a few hours depending on your DNS provider.";
 		case "pending":
-			return "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
+			return "Almost there! Add the DNS records shown below, then click Verify  and you'll be ready to send.";
 		case "failed":
 		case "suspended":
 			return getVerificationFailedMessage(reason);
 		default:
-			return "Checking your domain authentication — this will just take a moment…";
+			return "Checking your domain authentication this will just take a moment…";
 	}
 };
 

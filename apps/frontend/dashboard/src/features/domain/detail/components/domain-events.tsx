@@ -22,9 +22,9 @@ export const DomainEvents = ({
 			case "failed":
 				return getVerificationFailedMessage(domain.verificationFailedReason);
 			case "pending":
-				return "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
+				return "Almost there! Add the DNS records shown below, then click Verify and you'll be ready to send.";
 			default:
-				return "Checking your domain authentication — this will just take a moment…";
+				return "Verifying your DNS records this will just take a moment.";
 		}
 	};
 
@@ -44,9 +44,9 @@ export const DomainEvents = ({
 				};
 			case "verifying":
 				return {
-					card: "border-information-base/25 bg-information-lighter/50 dark:border-information-base/30 dark:bg-information-base/10",
-					icon: "scan",
-					iconClass: "text-information-base",
+					card: "border-sky-500/25 bg-sky-500/10 dark:border-sky-400/30 dark:bg-sky-400/10",
+					icon: "list-check",
+					iconClass: "text-sky-600 dark:text-sky-400",
 				};
 			case "failed":
 				return {

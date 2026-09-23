@@ -1039,7 +1039,7 @@
 	--bg-soft-200: var(--neutral-700);
 	--bg-soft-50: var(--neutral-900);
 	--bg-weak-50: var(--neutral-900);
-	--bg-white-0: #131313;
+	--bg-white-0: #000000;
 
 	--text-strong-950: var(--neutral-0);
 	--text-sub-600: var(--neutral-400);

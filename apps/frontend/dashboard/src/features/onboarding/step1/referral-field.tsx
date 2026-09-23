@@ -79,7 +79,7 @@ export function ReferralField() {
 						showArrow={false}
 						unstyled
 						style={{ width: "var(--radix-popover-trigger-width)" }}
-						className="z-50 flex flex-col rounded-2xl bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+						className="z-50 flex flex-col rounded-2xl bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100"
 					>
 						<div className="flex h-10 items-center gap-2.5 border-stroke-soft-100/80 border-b px-3 pb-1">
 							<Icon name="search" className="h-4 w-4 text-text-soft-400" />
