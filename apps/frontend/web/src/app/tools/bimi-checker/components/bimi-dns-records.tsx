@@ -136,8 +136,7 @@ export function BimiDnsRecords() {
 								</p>
 								<div className="mt-1.5 flex items-stretch">
 									<div
-										className="flex items-center justify-center whitespace-nowrap rounded-xl rounded-r-none border border-r-0 border-stone-400 bg-white p-1 text-center font-mono font-semibold text-[12.5px] text-stone-500 leading-relaxed dark:bg-white/[0.04] dark:text-white/60"
-										style={{ boxShadow: "0 2.5px 0 #78716c" }}
+										className="flex items-center justify-center whitespace-nowrap border-b-[2.5px] border-stone-400 bg-white p-1 text-center font-mono font-semibold text-[12.5px] text-stone-500 leading-relaxed dark:bg-white/[0.04] dark:text-white/60"
 									>
 										<span>TXT</span>
 									</div>
@@ -146,10 +145,9 @@ export function BimiDnsRecords() {
 											ref={(el) => {
 												pillRefs.current[0] = el;
 											}}
-											className="-ml-px flex items-center justify-center whitespace-nowrap rounded-xl rounded-l-none border bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed dark:bg-white/[0.04]"
+											className="-ml-px flex items-center justify-center whitespace-nowrap border-b-[2.5px] bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed dark:bg-white/[0.04]"
 											style={{
-												borderColor: selector.hex,
-												boxShadow: `0 2.5px 0 ${selector.hex}`,
+												borderBottomColor: selector.hex,
 											}}
 										>
 											<span style={{ color: selector.hex }}>
@@ -170,16 +168,9 @@ export function BimiDnsRecords() {
 											ref={(el) => {
 												pillRefs.current[k + 1] = el;
 											}}
-											className={`flex items-center justify-center whitespace-nowrap border bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed dark:bg-white/[0.04] ${
-												k === values.length - 1
-													? "-ml-px rounded-xl rounded-l-none"
-													: k === 0
-														? "rounded-xl rounded-r-none border-r-0"
-														: "-ml-px rounded-none"
-											}`}
+											className={`flex items-center justify-center whitespace-nowrap border-b-[2.5px] bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed dark:bg-white/[0.04] ${k === 0 ? "" : "-ml-px"}`}
 											style={{
-												borderColor: part.hex,
-												boxShadow: `0 2.5px 0 ${part.hex}`,
+												borderBottomColor: part.hex,
 											}}
 										>
 											<span style={{ color: part.hex }}>{part.segment}</span>
