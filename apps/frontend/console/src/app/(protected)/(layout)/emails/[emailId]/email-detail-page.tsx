@@ -1169,6 +1169,26 @@ export default function EmailDetailPage() {
 																{att.contentType} · {formatBytes(att.size)}
 															</p>
 														</div>
+														{email ? (
+															<Button.Root
+																asChild
+																size="xsmall"
+																variant="neutral"
+																mode="stroke"
+																className="shrink-0"
+															>
+																<a
+																	href={`/api/admin/v1/emails/${email.id}/attachments/${att.id}/download`}
+																	download={att.filename}
+																>
+																	<Icon
+																		name="file-download"
+																		className="h-3 w-3"
+																	/>
+																	Download
+																</a>
+															</Button.Root>
+														) : null}
 													</li>
 												))}
 											</ul>

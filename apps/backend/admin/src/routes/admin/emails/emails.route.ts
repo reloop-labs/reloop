@@ -1,7 +1,11 @@
 import { authMiddleware } from "@reloop/admin/middleware/auth-middleware";
 import { AdminModel } from "@reloop/admin/model/admin.model";
 import { Elysia, t } from "elysia";
-import { getEmailController, listEmailsController } from "./emails.controllers";
+import {
+	downloadEmailAttachmentController,
+	getEmailController,
+	listEmailsController,
+} from "./emails.controllers";
 
 export const emailsRoute = new Elysia()
 	.use(authMiddleware)
@@ -49,6 +53,31 @@ export const emailsRoute = new Elysia()
 			detail: {
 				tags: ["Admin"],
 				summary: "Get single email detail with events",
+			},
+		},
+	)
+	.get(
+		"/emails/:emailId/attachments/:attachmentId/download",
+		async ({ params: { emailId, attachmentId }, set }) => {
+			const { bytes, filename, contentType } =
+				await downloadEmailAttachmentController(emailId, attachmentId);
+			set.headers["content-type"] = contentType;
+			set.headers["content-length"] = String(bytes.byteLength);
+			set.headers["content-disposition"] = `attachment; filename="${filename}"`;
+			set.headers["cache-control"] = "private, max-age=60";
+			return bytes;
+		},
+		{
+			authAdmin: true,
+			params: t.Object({
+				emailId: t.String(),
+				attachmentId: t.String(),
+			}),
+			detail: {
+				tags: ["Admin"],
+				summary: "Download an email attachment",
+				description:
+					"Reconstruct a single attachment's bytes from the stored raw MIME and return them as a file download.",
 			},
 		},
 	);

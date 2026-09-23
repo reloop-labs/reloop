@@ -46,10 +46,13 @@ const PARTS: {
 
 export function BimiDnsRecords() {
 	const wrapRef = useRef<HTMLDivElement | null>(null);
+	const scrollerRef = useRef<HTMLDivElement | null>(null);
 	const pillRefs = useRef<(HTMLDivElement | null)[]>([]);
 	const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
 	const [paths, setPaths] = useState<string[]>([]);
 	const [box, setBox] = useState({ w: 0, h: 0 });
+	const selector = PARTS[0];
+	const values = PARTS.slice(1);
 
 	useLayoutEffect(() => {
 		const wrap = wrapRef.current;
@@ -82,10 +85,13 @@ export function BimiDnsRecords() {
 		compute();
 		const ro = new ResizeObserver(compute);
 		ro.observe(wrap);
+		const scroller = scrollerRef.current;
+		scroller?.addEventListener("scroll", compute, { passive: true });
 		window.addEventListener("resize", compute);
 		const t = setTimeout(compute, 300);
 		return () => {
 			ro.disconnect();
+			scroller?.removeEventListener("scroll", compute);
 			window.removeEventListener("resize", compute);
 			clearTimeout(t);
 		};
@@ -108,7 +114,8 @@ export function BimiDnsRecords() {
 					What the DNS looks like
 				</h2>
 				<p className="max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					One TXT record: type first, then four values. Each value points to its box.
+					One TXT record: type first, then four values. Each value points to
+					its box.
 				</p>
 			</div>
 
@@ -116,29 +123,72 @@ export function BimiDnsRecords() {
 				ref={wrapRef}
 				className="relative border-stroke-soft-100 border-b px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:border-white/10"
 			>
-				{/* Full record together, centered: type first, then values */}
-				<div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
+				{/* Full record as two joined groups: Record Type + Value */}
+				<div className="mt-4 flex justify-center">
 					<div
-						className="flex w-fit max-w-full items-center justify-center rounded-xl border border-stone-400 bg-white p-1 text-center font-mono font-semibold text-[12.5px] text-stone-500 leading-relaxed break-all dark:bg-white/[0.04] dark:text-white/60"
-						style={{ boxShadow: "0 2.5px 0 #78716c" }}
+						ref={scrollerRef}
+						className="flex max-w-full overflow-x-auto pb-1"
 					>
-						<span>TXT</span>
-					</div>
-					{PARTS.map((part, i) => (
-						<div
-							key={part.n}
-							ref={(el) => {
-								pillRefs.current[i] = el;
-							}}
-							className="flex w-fit max-w-full items-center justify-center rounded-xl border bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed break-all dark:bg-white/[0.04]"
-							style={{
-								borderColor: part.hex,
-								boxShadow: `0 2.5px 0 ${part.hex}`,
-							}}
-						>
-							<span style={{ color: part.hex }}>{part.segment}</span>
+						<div className="m-auto flex w-max items-start gap-4 sm:gap-6">
+							<div className="flex flex-col">
+								<p className="text-center font-mono text-[11px] uppercase tracking-[0.14em] text-stone-500 dark:text-white/40">
+									Record Type
+								</p>
+								<div className="mt-1.5 flex items-stretch">
+									<div
+										className="flex items-center justify-center whitespace-nowrap rounded-xl rounded-r-none border border-r-0 border-stone-400 bg-white p-1 text-center font-mono font-semibold text-[12.5px] text-stone-500 leading-relaxed dark:bg-white/[0.04] dark:text-white/60"
+										style={{ boxShadow: "0 2.5px 0 #78716c" }}
+									>
+										<span>TXT</span>
+									</div>
+									{selector ? (
+										<div
+											ref={(el) => {
+												pillRefs.current[0] = el;
+											}}
+											className="-ml-px flex items-center justify-center whitespace-nowrap rounded-xl rounded-l-none border bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed dark:bg-white/[0.04]"
+											style={{
+												borderColor: selector.hex,
+												boxShadow: `0 2.5px 0 ${selector.hex}`,
+											}}
+										>
+											<span style={{ color: selector.hex }}>
+												{selector.segment}
+											</span>
+										</div>
+									) : null}
+								</div>
+							</div>
+							<div className="flex flex-col">
+								<p className="text-center font-mono text-[11px] uppercase tracking-[0.14em] text-stone-500 dark:text-white/40">
+									Value
+								</p>
+								<div className="mt-1.5 flex items-stretch">
+									{values.map((part, k) => (
+										<div
+											key={part.n}
+											ref={(el) => {
+												pillRefs.current[k + 1] = el;
+											}}
+											className={`flex items-center justify-center whitespace-nowrap border bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed dark:bg-white/[0.04] ${
+												k === values.length - 1
+													? "-ml-px rounded-xl rounded-l-none"
+													: k === 0
+														? "rounded-xl rounded-r-none border-r-0"
+														: "-ml-px rounded-none"
+											}`}
+											style={{
+												borderColor: part.hex,
+												boxShadow: `0 2.5px 0 ${part.hex}`,
+											}}
+										>
+											<span style={{ color: part.hex }}>{part.segment}</span>
+										</div>
+									))}
+								</div>
+							</div>
 						</div>
-					))}
+					</div>
 				</div>
 
 				{/* Z-shaped wires: pill -> across -> card dot */}
