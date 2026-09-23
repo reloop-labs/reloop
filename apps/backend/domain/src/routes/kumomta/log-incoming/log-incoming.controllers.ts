@@ -7,7 +7,7 @@ import {
 	refundSendCredits,
 	reserveSendCredits,
 } from "@reloop/db/reserve-send-credits";
-import { domain, emailLog } from "@reloop/db/schema";
+import { domain, emailLog, organizationPlan } from "@reloop/db/schema";
 import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
@@ -149,6 +149,26 @@ export async function logIncomingController({
 			message: "No envelope recipients",
 			why: "SMTP quota is charged per envelope recipient. This message has none.",
 			fix: "Provide at least one RCPT TO address",
+		});
+	}
+
+	// ── Plan size gate (mirrors REST send-email size-gate) ──────────────
+	// organization_plan.max_attachment_bytes is the decoded cap per send
+	// (free 1 MB, paid 5 MB). body.size is on-wire MIME, which inflates
+	// ~37% via base64 + boundaries, so allow 1.5x headroom before rejecting.
+	// Keeps tiers proportional (free ~1.5 MB wire, paid ~7.5 MB wire) while
+	// staying under the KumoMTA 15 MB transport ceiling.
+	const planRow = await db.query.organizationPlan.findFirst({
+		where: eq(organizationPlan.organizationId, organizationId),
+		columns: { maxAttachmentBytes: true, planId: true },
+	});
+	const decodedLimit = planRow?.maxAttachmentBytes ?? 1 * 1024 * 1024;
+	const wireLimit = Math.floor(decodedLimit * 1.5);
+	if (body.size > wireLimit) {
+		throw KumoMtaErrors.messageTooLarge({
+			actualBytes: body.size,
+			limitBytes: decodedLimit,
+			planId: planRow?.planId ?? "free",
 		});
 	}
 

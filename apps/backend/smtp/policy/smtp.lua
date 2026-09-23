@@ -242,6 +242,10 @@ local function apply_reloop_logic(msg, api_key, source)
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Email quota exceeded")
       kumo.reject(550, "5.7.1 Email quota exceeded")
       return
+    elseif code == 413 then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Message exceeds plan size limit")
+      kumo.reject(552, "5.3.4 Message too large for your plan; reduce attachments or upgrade")
+      return
     elseif code == 403 then
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Abuse policy")
       kumo.reject(550, "5.7.1 Message rejected")

@@ -36,6 +36,7 @@ export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 			403: ErrorResponseSchema,
 			404: ErrorResponseSchema,
 			409: ErrorResponseSchema,
+			413: ErrorResponseSchema,
 			500: ErrorResponseSchema,
 		},
 		body: t.Object({

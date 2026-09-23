@@ -79,6 +79,7 @@ export const sendEmailRoute = new Elysia()
 				503: MailModel.badRequest,
 				429: MailModel.tooManyRequests,
 				500: MailModel.internalServerError,
+				413: MailModel.badRequest,
 			},
 			afterResponse: auditLogHook({
 				resourceType: "email",

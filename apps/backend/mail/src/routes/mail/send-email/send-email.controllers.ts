@@ -6,6 +6,10 @@ import {
 } from "@reloop/be-mail/lib/credits-gate";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
+import {
+	assertAttachmentsWithinPlan,
+	getOrgAttachmentLimit,
+} from "@reloop/be-mail/lib/size-gate";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
@@ -61,6 +65,15 @@ export async function sendEmailController({
 		to: rawBody.to,
 	});
 	log.info("server", "Initiating email send process");
+
+	// ── Plan size gate ──────────────────────────────────────────────────
+	// Fail fast on per-plan attachment limits (free 1 MB, paid 5 MB) before
+	// credits are reserved, logs created, or KumoMTA is hit. Without this,
+	// oversized sends die deep in the pipeline as KumoMTA 413s surfaced as
+	// generic 500s.
+	const { maxAttachmentBytes, planId } =
+		await getOrgAttachmentLimit(organizationId);
+	assertAttachmentsWithinPlan(rawBody.attachments, maxAttachmentBytes, planId);
 
 	// Fail closed before DNS/log/Kumo work when the monthly meter is empty.
 	await assertHasCredits({ organizationId, body: rawBody });
@@ -190,6 +203,8 @@ export async function sendEmailController({
 			cookie,
 			requestApiKey,
 			useInternalInject,
+			maxAttachmentBytes,
+			planId,
 			onInjected: () => {
 				injected = true;
 			},
@@ -219,6 +234,8 @@ async function sendReservedEmail({
 	cookie,
 	requestApiKey,
 	useInternalInject,
+	maxAttachmentBytes,
+	planId,
 	onInjected,
 }: {
 	organizationId: string;
@@ -232,6 +249,8 @@ async function sendReservedEmail({
 	cookie?: string | null;
 	requestApiKey?: string | null;
 	useInternalInject?: boolean;
+	maxAttachmentBytes?: number;
+	planId?: string;
 	onInjected?: () => void;
 }): Promise<MailModel.SendEmailResponse> {
 	// ── Resolve In-Reply-To header if replying to a thread ────────
@@ -314,6 +333,8 @@ async function sendReservedEmail({
 		requestApiKey,
 		userId,
 		useInternalInject,
+		maxAttachmentBytes,
+		planId,
 	});
 	onInjected?.();
 

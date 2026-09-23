@@ -19,6 +19,8 @@ export async function sendEmail_step6({
 	requestApiKey,
 	userId,
 	useInternalInject = false,
+	maxAttachmentBytes,
+	planId,
 }: {
 	body: MailModel.SendEmailBody;
 	finalSubject: string;
@@ -33,6 +35,8 @@ export async function sendEmail_step6({
 	requestApiKey?: string | null;
 	userId?: string | null;
 	useInternalInject?: boolean;
+	maxAttachmentBytes?: number;
+	planId?: string;
 }) {
 	try {
 		return await kumomtaClient.sendEmail({
@@ -60,6 +64,8 @@ export async function sendEmail_step6({
 			requestApiKey,
 			userId,
 			organizationId,
+			maxAttachmentBytes,
+			planId,
 			customHeaders: {
 				"X-Org-ID": organizationId,
 				"X-Domain-ID": domainId,

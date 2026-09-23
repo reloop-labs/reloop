@@ -159,6 +159,21 @@ export const KumoMtaErrors = {
 			why: `This send matches outbound abuse patterns (${reasons.join(", ")}) and was not accepted`,
 			fix: "Remove phishing content and carrier SMS/MMS gateway recipients, then contact support if this is legitimate mail",
 		}),
+	messageTooLarge: ({
+		actualBytes,
+		limitBytes,
+		planId,
+	}: {
+		actualBytes: number;
+		limitBytes: number;
+		planId: string;
+	}) =>
+		createError({
+			status: 413,
+			message: "Message too large",
+			why: `This message is ${(actualBytes / (1024 * 1024)).toFixed(2)} MB, but your '${planId}' plan allows ${(limitBytes / (1024 * 1024)).toFixed(2)} MB per send`,
+			fix: "Reduce attachment size or upgrade your plan for a larger limit",
+		}),
 	internalError: (reason: string) =>
 		createError({
 			status: 500,

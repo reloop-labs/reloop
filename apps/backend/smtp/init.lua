@@ -133,5 +133,12 @@ kumo.on('init', function()
   kumo.start_http_listener {
     listen = '0.0.0.0:8000',
     trusted_hosts = { '127.0.0.1', '::1', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' },
+    -- Must cover the largest paid plan: 5 MB decoded attachments inflate
+    -- ~33% via base64 + MIME/JSON overhead. Mail service enforces the
+    -- per-plan cap (free 1 MB, paid 5 MB) before inject; this is only the
+    -- transport ceiling. Keep in sync with KUMO_INJECT_PAYLOAD_LIMIT_BYTES
+    -- in apps/backend/mail/src/lib/size-gate.ts. Default is 2 MB, which
+    -- rejects paid-plan sends with 413 "length limit exceeded".
+    request_body_limit = 15 * 1024 * 1024,
   }
 end)

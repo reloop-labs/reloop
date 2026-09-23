@@ -515,6 +515,24 @@ export default function EmailDetailPage() {
 		toast.success(`${label} copied to clipboard`);
 	};
 
+	const downloadEml = (raw: string, filename: string) => {
+		try {
+			const normalized = raw.replace(/\r?\n/g, "\r\n");
+			const blob = new Blob([normalized], { type: "message/rfc822" });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = filename.endsWith(".eml") ? filename : `${filename}.eml`;
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(url);
+			toast.success("EML file downloaded");
+		} catch {
+			toast.error("Failed to download EML file");
+		}
+	};
+
 	const errorDiagnostic = useMemo(() => {
 		if (!email?.errorMessage) return null;
 		return classifyError(email.errorMessage);
@@ -1061,20 +1079,36 @@ export default function EmailDetailPage() {
 													<span className="font-mono text-[11px] text-text-sub-600">
 														RFC822 MIME
 													</span>
-													<Button.Root
-														size="xsmall"
-														variant="neutral"
-														mode="stroke"
-														onClick={() =>
-															copyToClipboard(
-																email.rawMessage || "",
-																"Raw MIME",
-															)
-														}
-													>
-														<Icon name="copy" className="h-3 w-3" />
-														Copy
-													</Button.Root>
+													<div className="flex items-center gap-2">
+														<Button.Root
+															size="xsmall"
+															variant="neutral"
+															mode="stroke"
+															onClick={() =>
+																downloadEml(
+																	email.rawMessage || "",
+																	`${email.id}.eml`,
+																)
+															}
+														>
+															<Icon name="file-download" className="h-3 w-3" />
+															Download .eml
+														</Button.Root>
+														<Button.Root
+															size="xsmall"
+															variant="neutral"
+															mode="stroke"
+															onClick={() =>
+																copyToClipboard(
+																	email.rawMessage || "",
+																	"Raw MIME",
+																)
+															}
+														>
+															<Icon name="copy" className="h-3 w-3" />
+															Copy
+														</Button.Root>
+													</div>
 												</div>
 												<pre className="max-h-[420px] overflow-y-auto whitespace-pre-wrap break-all font-mono text-[11px] text-text-strong-950">
 													{email.rawMessage}

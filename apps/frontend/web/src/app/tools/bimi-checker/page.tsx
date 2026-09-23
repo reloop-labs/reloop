@@ -4,12 +4,12 @@ import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { ApiIntegration } from "./components/api-integration";
 import { BimiCta } from "./components/bimi-cta";
+import { BimiDnsRecords } from "./components/bimi-dns-records";
 import { BimiHero } from "./components/bimi-hero";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { SimilarTools } from "./components/similar-tools";
 import { WhatIsBimi } from "./components/what-is-bimi";
 import { WhatItChecks } from "./components/what-it-checks";
-import { WhoIsItFor } from "./components/who-is-it-for";
 import {
 	faqGroups,
 	faqs,
@@ -120,7 +120,7 @@ export default function BimiCheckerPage() {
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
-				<WhoIsItFor />
+				<BimiDnsRecords />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"

@@ -3,7 +3,8 @@ import { mailConfig } from "../mail.config";
 import { MailErrors } from "./errors";
 
 const UPLOAD_KEY_RE = /(?:^|\/)(uploads\/\d{4}\/\d{2}\/[A-Za-z0-9._-]+)$/;
-const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+/** Fallback only — callers must pass the org's plan limit explicitly. */
+export const DEFAULT_MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
 export type SendAttachment = {
 	content?: string | Buffer | import("stream").Readable;
@@ -31,6 +32,8 @@ export type UploadServiceStoreOptions = {
 	internalSecret?: string | null;
 	userId?: string | null;
 	organizationId?: string | null;
+	/** Per-plan cap (organization_plan.max_attachment_bytes). */
+	maxBytes?: number;
 	/** Test override. Production uses `${BASE_URL}/api/upload`. */
 	baseUrl?: string;
 	fetchImpl?: typeof fetch;
@@ -75,6 +78,7 @@ async function fetchBytes(
 	url: string,
 	fetchImpl: typeof fetch = fetch,
 	headers?: HeadersInit,
+	maxBytes: number = DEFAULT_MAX_ATTACHMENT_BYTES,
 ): Promise<Buffer> {
 	const response = await fetchImpl(url, {
 		redirect: "follow",
@@ -87,9 +91,9 @@ async function fetchBytes(
 		throw new Error(`HTTP ${response.status} fetching ${url}`);
 	}
 	const bytes = Buffer.from(await response.arrayBuffer());
-	if (bytes.byteLength > MAX_ATTACHMENT_BYTES) {
+	if (bytes.byteLength > maxBytes) {
 		throw new Error(
-			`Attachment exceeds ${MAX_ATTACHMENT_BYTES} bytes (${bytes.byteLength})`,
+			`Attachment exceeds ${maxBytes} bytes (${bytes.byteLength})`,
 		);
 	}
 	return bytes;
@@ -98,6 +102,7 @@ async function fetchBytes(
 export async function fetchPublicAttachment(
 	url: string,
 	transport: PinnedTransport = requestPinned,
+	maxBytes: number = DEFAULT_MAX_ATTACHMENT_BYTES,
 ): Promise<Buffer> {
 	if (!isPublicAttachmentUrl(url)) {
 		throw new Error(`attachment URL is not a public http(s) address: ${url}`);
@@ -106,7 +111,7 @@ export async function fetchPublicAttachment(
 		url,
 		method: "GET",
 		allowHttp: true,
-		maxBytes: MAX_ATTACHMENT_BYTES,
+		maxBytes,
 		headers: { "user-agent": "ReloopMail/1.0" },
 	});
 	if (response.status < 200 || response.status >= 300) {
@@ -128,6 +133,7 @@ export function createUploadServiceStore(
 	const userId = opts.userId?.trim() || "";
 	const organizationId = opts.organizationId?.trim() || "";
 	const hasInternalAuth = Boolean(internalSecret && userId && organizationId);
+	const maxBytes = opts.maxBytes ?? DEFAULT_MAX_ATTACHMENT_BYTES;
 
 	return {
 		async get(key: string) {
@@ -137,17 +143,22 @@ export function createUploadServiceStore(
 				);
 			}
 			const url = `${baseUrl}/v1/files/content?path=${encodeURIComponent(key)}`;
-			return fetchBytes(url, fetchImpl, {
-				...(cookie ? { cookie } : {}),
-				...(apiKey ? { "x-api-key": apiKey } : {}),
-				...(hasInternalAuth
-					? {
-							"x-internal-secret": internalSecret,
-							"x-user-id": userId,
-							"x-organization-id": organizationId,
-						}
-					: {}),
-			});
+			return fetchBytes(
+				url,
+				fetchImpl,
+				{
+					...(cookie ? { cookie } : {}),
+					...(apiKey ? { "x-api-key": apiKey } : {}),
+					...(hasInternalAuth
+						? {
+								"x-internal-secret": internalSecret,
+								"x-user-id": userId,
+								"x-organization-id": organizationId,
+							}
+						: {}),
+				},
+				maxBytes,
+			);
 		},
 	};
 }
@@ -156,6 +167,7 @@ async function loadPathBytes(
 	path: string,
 	store: RemoteAttachmentStore,
 	transport: PinnedTransport,
+	maxBytes: number = DEFAULT_MAX_ATTACHMENT_BYTES,
 ): Promise<Buffer> {
 	const key = s3KeyFromAttachmentPath(path);
 	if (key) {
@@ -163,14 +175,14 @@ async function loadPathBytes(
 			return await store.get(key);
 		} catch (error) {
 			if (isPublicAttachmentUrl(path)) {
-				return fetchPublicAttachment(path, transport);
+				return fetchPublicAttachment(path, transport, maxBytes);
 			}
 			throw error;
 		}
 	}
 
 	if (isPublicAttachmentUrl(path)) {
-		return fetchPublicAttachment(path, transport);
+		return fetchPublicAttachment(path, transport, maxBytes);
 	}
 
 	throw new Error("attachment path must be an upload key or a public URL");
@@ -180,7 +192,10 @@ export async function materializeAttachments(
 	attachments: SendAttachment[],
 	store: RemoteAttachmentStore,
 	transport: PinnedTransport = requestPinned,
+	opts?: { maxBytes?: number; planId?: string },
 ): Promise<MaterializedAttachment[]> {
+	const maxBytes = opts?.maxBytes ?? DEFAULT_MAX_ATTACHMENT_BYTES;
+	const planId = opts?.planId ?? "unknown";
 	return Promise.all(
 		attachments.map(async (att) => {
 			if (
@@ -188,6 +203,19 @@ export async function materializeAttachments(
 				att.content !== null &&
 				att.content !== ""
 			) {
+				const size = Buffer.isBuffer(att.content)
+					? att.content.byteLength
+					: typeof att.content === "string"
+						? Buffer.byteLength(att.content, "utf8")
+						: 0;
+				if (size > maxBytes) {
+					throw MailErrors.attachmentTooLarge({
+						filename: att.filename ?? "(unnamed)",
+						actualBytes: size,
+						limitBytes: maxBytes,
+						planId,
+					});
+				}
 				return {
 					filename: att.filename,
 					content: att.content,
@@ -204,7 +232,20 @@ export async function materializeAttachments(
 			}
 
 			try {
-				const content = await loadPathBytes(att.path, store, transport);
+				const content = await loadPathBytes(
+					att.path,
+					store,
+					transport,
+					maxBytes,
+				);
+				if (content.byteLength > maxBytes) {
+					throw MailErrors.attachmentTooLarge({
+						filename: att.filename ?? att.path,
+						actualBytes: content.byteLength,
+						limitBytes: maxBytes,
+						planId,
+					});
+				}
 				return {
 					filename: att.filename,
 					content,
@@ -212,7 +253,22 @@ export async function materializeAttachments(
 					cid: att.content_id,
 				};
 			} catch (error) {
+				// Preserve plan-limit 413s; wrap only fetch failures.
+				if (
+					error instanceof Error &&
+					(error as { status?: number }).status === 413
+				) {
+					throw error;
+				}
 				const reason = error instanceof Error ? error.message : String(error);
+				if (reason.startsWith("Attachment exceeds")) {
+					throw MailErrors.attachmentTooLarge({
+						filename: att.filename ?? att.path ?? "(unnamed)",
+						actualBytes: maxBytes + 1,
+						limitBytes: maxBytes,
+						planId,
+					});
+				}
 				throw MailErrors.attachmentLoadFailed(att.path, reason);
 			}
 		}),

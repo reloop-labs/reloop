@@ -140,12 +140,57 @@ export const MailErrors = {
 			why: `The template with ID ${templateId} was not found or is not authorized for your organization`,
 			fix: "Verify the template ID and ensure it exists and is not deleted",
 		}),
-	kumoMtaError: (status: number, body: string) =>
-		createError({
+	kumoMtaError: (status: number, body: string) => {
+		// Preserve 413 so callers can tell "too large" apart from MTA outages.
+		// KumoMTA's default `request_body_limit` (2 MB) returns exactly:
+		// "Failed to buffer the request body: length limit exceeded".
+		if (status === 413) {
+			return createError({
+				status: 413,
+				message: "Email too large",
+				why: `KumoMTA rejected the request as too large (413): ${body}`,
+				fix: "Reduce attachment size or HTML body, or upgrade your plan for a larger attachment limit, then send again",
+			});
+		}
+		return createError({
 			status: 500,
 			message: "Failed to transmit email",
 			why: `KumoMTA server rejected the request with status ${status}: ${body}`,
 			fix: "Check the mail service logs and ensure KumoMTA is healthy",
+		});
+	},
+	attachmentTooLarge: ({
+		filename,
+		actualBytes,
+		limitBytes,
+		planId,
+	}: {
+		filename: string;
+		actualBytes: number;
+		limitBytes: number;
+		planId: string;
+	}) => {
+		const actualMb = (actualBytes / (1024 * 1024)).toFixed(2);
+		const limitMb = (limitBytes / (1024 * 1024)).toFixed(2);
+		return createError({
+			status: 413,
+			message: "Attachment too large",
+			why: `Attachment '${filename}' is ${actualMb} MB, but your '${planId}' plan allows ${limitMb} MB (per file and total per email)`,
+			fix: "Remove or compress the attachment, or upgrade your plan for a larger attachment limit",
+		});
+	},
+	payloadTooLarge: ({
+		actualBytes,
+		limitBytes,
+	}: {
+		actualBytes: number;
+		limitBytes: number;
+	}) =>
+		createError({
+			status: 413,
+			message: "Email too large",
+			why: `The composed email payload is ${(actualBytes / (1024 * 1024)).toFixed(2)} MB, over the ${(limitBytes / (1024 * 1024)).toFixed(0)} MB inject limit`,
+			fix: "Reduce attachment size or HTML body, or upgrade your plan, then send again",
 		}),
 	databaseError: (message: string) =>
 		createError({

@@ -6,6 +6,10 @@ import {
 	createUploadServiceStore,
 	materializeAttachments,
 } from "./resolve-attachments";
+import {
+	assertInjectPayloadWithinLimit,
+	getOrgAttachmentLimit,
+} from "./size-gate";
 
 export interface KumomtaHttpConfig {
 	baseUrl: string;
@@ -30,6 +34,9 @@ export interface SendEmailOptions {
 	requestApiKey?: string | null;
 	userId?: string | null;
 	organizationId?: string | null;
+	/** Per-plan cap. Resolved from organization_plan when omitted. */
+	maxAttachmentBytes?: number;
+	planId?: string;
 	attachments?: Array<{
 		content?: string | Buffer | import("stream").Readable;
 		filename?: string;
@@ -112,7 +119,19 @@ export class KumomtaClient {
 		options: SendEmailOptions,
 	): Promise<{ id: string; messageId: string }> {
 		const toList = Array.isArray(options.to) ? options.to : [options.to];
-		const content = await buildRfcMessage(options);
+		// Resolve the plan limit first so oversized sends fail before MIME
+		// composition, credit reservation side-effects, or KumoMTA traffic.
+		let maxAttachmentBytes = options.maxAttachmentBytes;
+		let planId = options.planId;
+		if (maxAttachmentBytes == null && options.organizationId) {
+			const limit = await getOrgAttachmentLimit(options.organizationId);
+			maxAttachmentBytes = limit.maxAttachmentBytes;
+			planId = limit.planId;
+		}
+		const content = await buildRfcMessage(options, {
+			maxAttachmentBytes,
+			planId,
+		});
 
 		// Deduplicate recipients across To, CC, and BCC to avoid multiple
 		// deliveries to the same address. Envelope RCPT must be bare emails —
@@ -155,12 +174,17 @@ export class KumomtaClient {
 			authHeaders.Authorization = `Basic ${btoa(`:${options.apiKey}`)}`;
 		}
 
+		// Final guard on the base64-inflated wire payload so we return a
+		// plan-aware 413 instead of leaking KumoMTA's generic 413 as a 500.
+		const wireBody = JSON.stringify(payload);
+		assertInjectPayloadWithinLimit(Buffer.byteLength(wireBody, "utf8"));
+
 		let response: Response;
 		try {
 			response = await fetch(`${this.baseUrl}/api/inject/v1`, {
 				method: "POST",
 				headers: authHeaders,
-				body: JSON.stringify(payload),
+				body: wireBody,
 				signal: AbortSignal.timeout(this.timeoutMs),
 			});
 		} catch (error) {
@@ -251,7 +275,10 @@ export class KumomtaClient {
  * Tracking injection is handled upstream in step-5b — this function
  * only handles MIME composition.
  */
-async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
+async function buildRfcMessage(
+	options: SendEmailOptions,
+	limits?: { maxAttachmentBytes?: number; planId?: string },
+): Promise<string> {
 	const attachments = options.attachments?.length
 		? await materializeAttachments(
 				options.attachments,
@@ -261,7 +288,10 @@ async function buildRfcMessage(options: SendEmailOptions): Promise<string> {
 					internalSecret: mailConfig.RELOOP_INTERNAL_SECRET,
 					userId: options.userId,
 					organizationId: options.organizationId,
+					maxBytes: limits?.maxAttachmentBytes,
 				}),
+				undefined,
+				{ maxBytes: limits?.maxAttachmentBytes, planId: limits?.planId },
 			)
 		: undefined;
 
