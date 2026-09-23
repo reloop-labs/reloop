@@ -52,7 +52,7 @@ export function CreatedTime({ createdAt }: { createdAt?: string | null }) {
 					{formatRelativeTime(createdAt)}
 				</span>
 			}
-			contentClassName="w-80 rounded-xl p-2 shadow-none"
+			contentClassName="w-80 rounded-xl p-2 shadow-none!"
 		>
 			<div className="flex flex-col">
 				{rows.map((row, index) => {
