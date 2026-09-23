@@ -1,7 +1,7 @@
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { db } from "@reloop/db/client";
 import { domain } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 export async function verifyDomainAuth_step2({
 	organizationId,
@@ -20,6 +20,7 @@ export async function verifyDomainAuth_step2({
 			and(
 				eq(domain.organizationId, organizationId),
 				eq(domain.domain, domainName),
+				isNull(domain.deletedAt),
 			),
 		)
 		.limit(1);

@@ -105,6 +105,15 @@ describe("policy sources stay wired", () => {
 		expect(smtpLua).toContain("body.tls or header_tls_mode");
 	});
 
+	test("smtp.lua permanently rejects a domain whose DNS is no longer verified", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("code == 422");
+		expect(smtpLua).toContain("parsed.message");
+		expect(smtpLua).toContain(
+			"Email was not sent. Domain DNS is not verified and the domain status is now failed.",
+		);
+	});
+
 	test("smtp.lua maps 403 abuse rejections from log-incoming", () => {
 		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
 		expect(smtpLua).toContain("code == 403");

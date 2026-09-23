@@ -145,12 +145,31 @@ export async function sendEmailController({
 	const dnsHealthCheck = await checkDnsHealth_step3({
 		domainId: currentDomain.id,
 		organizationId,
-		domainData: currentDomain,
 	});
 
-	if (!dnsHealthCheck.isHealthy) {
-		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
+	if (!dnsHealthCheck.ok) {
+		if (dnsHealthCheck.code === "not_found") {
+			throw MailErrors.domainNotFound(domainName);
+		}
+		if (dnsHealthCheck.code === "suspended") {
+			throw MailErrors.domainSuspended(domainName);
+		}
+		if (dnsHealthCheck.code === "sending_disabled") {
+			throw MailErrors.sendingDisabled(domainName);
+		}
+		if (dnsHealthCheck.code === "lookup_failed") {
+			throw MailErrors.dnsLookupFailed(domainName);
+		}
+		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.reason);
 	}
+
+	// The live check just confirmed the records. The row loaded in step 2
+	// may still say unverified if DNS was fixed after the last stored check.
+	currentDomain.systemVerified = true;
+	currentDomain.status = "active";
+	currentDomain.isTrackingDomain = Boolean(
+		currentDomain.isClickTrackingEnabled || currentDomain.isOpenTrackingEnabled,
+	);
 
 	// Reserve monthly + daily quota under a row lock so concurrent API/SMTP
 	// senders cannot all pass a stale remaining-balance check.

@@ -215,6 +215,16 @@ export namespace MailModel {
 		message: t.String({
 			description: "Error message",
 		}),
+		why: t.Optional(
+			t.String({
+				description: "Why the email was not sent",
+			}),
+		),
+		fix: t.Optional(
+			t.String({
+				description: "How to fix the problem and send again",
+			}),
+		),
 	});
 	export type BadRequest = typeof badRequest.static;
 

@@ -254,6 +254,15 @@ local function apply_reloop_logic(msg, api_key, source)
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Message ID already exists")
       kumo.reject(550, "5.7.1 Message ID already exists")
       return
+    elseif code == 422 then
+      local reason = "Email was not sent. Domain DNS is not verified and the domain status is now failed."
+      local parsed_ok, parsed = pcall(kumo.serde.json_parse, body_text)
+      if parsed_ok and type(parsed) == "table" and parsed.message and tostring(parsed.message) ~= "" then
+        reason = tostring(parsed.message)
+      end
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: " .. reason)
+      kumo.reject(550, "5.7.1 " .. reason)
+      return
     else
       print("[LOG-INCOMING] [" .. msg_id .. "] ERROR: Unhandled status code " .. tostring(code))
       kumo.reject(451, "4.3.0 Temporary failure verifying API key or domain status")

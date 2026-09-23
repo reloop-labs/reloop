@@ -9,6 +9,7 @@
 		"./reserve-send-credits": "./src/reserve-send-credits.ts",
 		"./smtp-recipients": "./src/smtp-recipients.ts",
 		"./outbound-abuse": "./src/outbound-abuse.ts",
+		"./ensure-sending-domain-verified": "./src/ensure-sending-domain-verified.ts",
 		"./webhook-events": "./src/webhook-events.ts",
 		"./utils": "./src/utils/*"
 	},
@@ -31,6 +32,7 @@
 		"migrate": "bun run src/migrate.ts"
 	},
 	"dependencies": {
+		"@reloop/dns": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",

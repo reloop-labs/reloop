@@ -52,6 +52,12 @@ export function DomainHeader({
 								<h1 className="mb-0.5 font-semibold text-title-h6 leading-5">
 									{domainName}
 								</h1>
+								{status === "failed" && domain?.verificationFailedReason ? (
+									<p className="mt-1 max-w-xl text-error-base text-paragraph-xs">
+										{domain.verificationFailedReason}. Sending is blocked until
+										these records verify.
+									</p>
+								) : null}
 							</div>
 						</div>
 					)}

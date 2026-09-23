@@ -81,6 +81,7 @@ export const resendEmailRoute = new Elysia()
 				}),
 				400: MailModel.badRequest,
 				402: MailModel.paymentRequired,
+				503: MailModel.badRequest,
 				429: MailModel.tooManyRequests,
 				500: MailModel.internalServerError,
 			},

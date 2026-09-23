@@ -4,7 +4,9 @@
 	"private": true,
 	"type": "module",
 	"exports": {
-		"./resolver": "./src/resolver.ts"
+		"./resolver": "./src/resolver.ts",
+		"./is-local": "./src/is-local.ts",
+		"./verify-records": "./src/verify-records.ts"
 	},
 	"scripts": {
 		"test": "bun test test/"

@@ -63,9 +63,10 @@ export function useResendEmail() {
 			void queryClient.invalidateQueries({ queryKey: queryKeys.metrics.all });
 		},
 		onError: (err: Error & { why?: string; fix?: string }) => {
-			toast.error(err.message || "Failed to resend email", {
-				description: err.fix || err.why,
+			toast.error(err.message || "Email was not sent", {
+				description: err.why || err.fix,
 			});
+			void queryClient.invalidateQueries({ queryKey: queryKeys.domain.all });
 		},
 	});
 }

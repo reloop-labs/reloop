@@ -1,5 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { ensureSendingDomainVerified } from "@reloop/db/ensure-sending-domain-verified";
 import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import {
 	type CreditReservation,
@@ -101,10 +102,31 @@ export async function logIncomingController({
 		throw KumoMtaErrors.domainNotFound(body.domainName);
 	}
 
-	if (domainRecord.status !== "active") {
+	// Live DNS check. A stored "active" status is not enough if the customer
+	// removed SPF, DKIM, DMARC, or other required records after verification.
+	const dns = await ensureSendingDomainVerified({
+		domainId: domainRecord.id,
+		organizationId,
+	});
+	if (!dns.ok) {
 		log.warn(
-			`[LOG-INCOMING] Domain found but NOT ACTIVE: ${body.domainName} (Status: ${domainRecord.status})`,
+			`[LOG-INCOMING] Domain DNS not verified: ${body.domainName} (${dns.code})`,
 		);
+		if (dns.code === "not_found") {
+			throw KumoMtaErrors.domainNotFound(body.domainName);
+		}
+		if (dns.code === "lookup_failed") {
+			const detail = `Email was not sent. DNS for ${body.domainName} could not be checked just now, so the message was not accepted.`;
+			throw createError({
+				status: 503,
+				message: detail,
+				why: detail,
+				fix: "Retry in a moment. If this keeps happening, confirm the domain's DNS records are still published.",
+			});
+		}
+		if (dns.code === "unverified") {
+			throw KumoMtaErrors.domainDnsNotVerified(body.domainName, dns.reason);
+		}
 		throw KumoMtaErrors.domainNotActive(body.domainName);
 	}
 

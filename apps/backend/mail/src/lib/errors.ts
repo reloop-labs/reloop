@@ -90,13 +90,42 @@ export const MailErrors = {
 			why: `The domain ${domainName} was not found or is not authorized for your organization`,
 			fix: "Ensure the domain is registered and verified in your dashboard",
 		}),
-	dnsHealthError: (domainName: string, missingRecords: string[]) =>
-		createError({
+	dnsHealthError: (domainName: string, reason: string) => {
+		const detail = `Email was not sent. ${domainName} failed DNS verification. ${reason}. The domain status is now failed.`;
+		return createError({
 			status: 400,
-			message: "DNS health check failed",
-			why: `Domain ${domainName} is missing required DNS records: ${missingRecords.join(", ")}`,
-			fix: "Update your DNS configuration with the required SPF, DKIM, and DMARC records",
-		}),
+			message: detail,
+			why: detail,
+			fix: "Update the DNS records at your provider, verify the domain in the dashboard, then send again.",
+		});
+	},
+	dnsLookupFailed: (domainName: string) => {
+		const detail = `Email was not sent. DNS for ${domainName} could not be checked just now, so the message was not accepted.`;
+		return createError({
+			status: 503,
+			message: detail,
+			why: detail,
+			fix: "Retry in a moment. If this keeps happening, confirm the domain's DNS records are still published.",
+		});
+	},
+	sendingDisabled: (domainName: string) => {
+		const detail = `Email was not sent. Sending is turned off for ${domainName}.`;
+		return createError({
+			status: 400,
+			message: detail,
+			why: detail,
+			fix: "Enable sending on this domain in the dashboard, publish the SPF, DKIM, and DMARC records, then try again.",
+		});
+	},
+	domainSuspended: (domainName: string) => {
+		const detail = `Email was not sent. ${domainName} is suspended.`;
+		return createError({
+			status: 400,
+			message: detail,
+			why: detail,
+			fix: "Contact support if this domain should be allowed to send.",
+		});
+	},
 	invalidFromAddress: (from: string) =>
 		createError({
 			status: 400,

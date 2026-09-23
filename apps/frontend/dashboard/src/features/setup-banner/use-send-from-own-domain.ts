@@ -61,9 +61,10 @@ export function useSendFromOwnDomain() {
 			void queryClient.invalidateQueries({ queryKey: queryKeys.metrics.all });
 		},
 		onError: (err: Error & { why?: string; fix?: string }) => {
-			toast.error(err.message || "Failed to send test email", {
-				description: err.fix || err.why,
+			toast.error(err.message || "Email was not sent", {
+				description: err.why || err.fix,
 			});
+			void queryClient.invalidateQueries({ queryKey: queryKeys.domain.all });
 		},
 	});
 }

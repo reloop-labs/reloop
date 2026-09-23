@@ -92,6 +92,15 @@ export const KumoMtaErrors = {
 			why: `The domain ${domainName} is found but is not active or verified.`,
 			fix: "Verify the domain's DNS records and ensure its status is active.",
 		}),
+	domainDnsNotVerified: (domainName: string, reason: string) => {
+		const detail = `Email was not sent. ${domainName} failed DNS verification. ${reason}. The domain status is now failed.`;
+		return createError({
+			status: 422,
+			message: detail,
+			why: detail,
+			fix: "Update the DNS records at your provider, verify the domain in the dashboard, then send again.",
+		});
+	},
 	dkimKeyNotFound: (domainName: string) =>
 		createError({
 			status: 404,
