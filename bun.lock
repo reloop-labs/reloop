@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -732,7 +733,7 @@
         "@base-ui/react": "1.1.0",
         "@codemirror/lang-html": "^6.4.11",
         "@codemirror/view": "^6.43.6",
-        "@dicebear/core": "9.4.1",
+        "@dicebear/core": "9.4.3",
         "@dicebear/shapes": "9.2.2",
         "@floating-ui/react-dom": "^2.1.8",
         "@hookform/resolvers": "catalog:ui",
@@ -1644,7 +1645,7 @@
 
     "@date-fns/tz": ["@date-fns/tz@1.2.0", "", {}, "sha512-LBrd7MiJZ9McsOgxqWX7AaxrDjcFVjWH/tIKJd7pnR7McaslGYOP1QmmiBXdJH/H/yLCT+rcQ7FaPBUxRGUtrg=="],
 
-    "@dicebear/core": ["@dicebear/core@9.4.1", "", { "dependencies": { "@types/json-schema": "^7.0.15" } }, "sha512-yzmoEhAc6CTaY9v0xz4MI3FTt5I5O+cvphpE+kd6Qz8XjW3/YveXEQcdO4CW0CTSUao88a8+/IMvnMGfUmDW1Q=="],
+    "@dicebear/core": ["@dicebear/core@9.4.3", "", { "dependencies": { "@types/json-schema": "^7.0.15" } }, "sha512-9ITrQI57k3p5hKuU8HZJ1d0kPdrmTKEJDOdlKQ8CpaChbtmnD1R+dtWmNz5IesYThXM8F64pJ0ZvJ2rsY8Hciw=="],
 
     "@dicebear/shapes": ["@dicebear/shapes@9.2.2", "", { "peerDependencies": { "@dicebear/core": "^9.0.0" } }, "sha512-e741NNWBa7fg0BjomxXa0fFPME2XCIR0FA+VHdq9AD2taTGHEPsg5x1QJhCRdK6ww85yeu3V3ucpZXdSrHVw5Q=="],
 
