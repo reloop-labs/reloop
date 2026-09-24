@@ -5,10 +5,14 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Search } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
+
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 export function InboxTopNavbar({
 	mailbox: _mailbox,
@@ -26,6 +30,16 @@ export function InboxTopNavbar({
 	const openSearch = () => {
 		window.dispatchEvent(new CustomEvent("inbox:open-search"));
 	};
+
+	// N — Create new inbox (C is taken by Compose)
+	useHotkeys(
+		"n",
+		(e) => {
+			e.preventDefault();
+			onAddMailbox?.();
+		},
+		{ enableOnFormTags: false, preventDefault: true, enabled: !!onAddMailbox },
+	);
 
 	return (
 		<header className="flex h-11 shrink-0 items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-3 dark:border-stroke-soft-100/40 dark:bg-black">
@@ -79,14 +93,18 @@ export function InboxTopNavbar({
 					variant="blue"
 					size="xsmall"
 					onClick={onAddMailbox}
-					title={atInboxCap ? "Upgrade to add an inbox" : "Add inbox address"}
-					aria-label={
-						atInboxCap ? "Upgrade to add an inbox" : "Add inbox address"
+					title={
+						atInboxCap ? "Upgrade to add an inbox" : "Create new inbox (N)"
 					}
-					className="shrink-0 gap-1.5 rounded-xl"
+					aria-label={
+						atInboxCap ? "Upgrade to add an inbox" : "Create new inbox"
+					}
+					aria-keyshortcuts="n"
+					className="ml-auto shrink-0 gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />
-					Create inbox
+					Create new inbox
+					<ActionKbd className={actionKbdOnBlueClassName}>N</ActionKbd>
 				</FancyButton.Root>
 			)}
 		</header>

@@ -1,18 +1,15 @@
 "use client";
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -22,9 +19,12 @@ import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Domain, DomainListResponse } from "#/features/domain/types";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { useAgentInbox } from "./agent-inbox-provider";
+import {
+	deriveInboxDisplayName,
+	InboxEmailAddressInput,
+} from "./email-address-input";
 
 const actionKbdOnBlueClassName =
 	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
@@ -63,18 +63,6 @@ const isSendReceiveReady = (d: Domain) =>
 const pickPreferredDomain = (domains: Domain[]) =>
 	domains.find(isSendReceiveReady) ?? domains[0];
 
-const slugifyEmailPrefix = (name: string): string => {
-	return name
-		.toLowerCase()
-		.trim()
-		.replace(/\s+/g, "-")
-		.replace(/[^a-z0-9.-]/g, "")
-		.replace(/\.{2,}/g, ".")
-		.replace(/^-+|-+$/g, "")
-		.replace(/^\.+|\.+$/g, "")
-		.slice(0, 64);
-};
-
 export function CreateInboxInlineCard({
 	onCreated,
 }: {
@@ -83,17 +71,6 @@ export function CreateInboxInlineCard({
 	const router = useRouter();
 	const { addMailbox } = useAgentInbox();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isLocalPartManuallyEdited, setIsLocalPartManuallyEdited] =
-		useState(false);
-
-	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const [domainTriggerWidth, setDomainTriggerWidth] = useState<number>();
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const domainFieldRef = useRef<HTMLDivElement>(null);
-
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
-	const currentRect = currentTab?.getBoundingClientRect();
 
 	const { data: domainsData } = useSWR<DomainListResponse>(
 		"/api/domain/v1/list",
@@ -160,12 +137,6 @@ export function CreateInboxInlineCard({
 		}
 	}, [verifiedDomains, form]);
 
-	useEffect(() => {
-		if (domainFieldRef.current) {
-			setDomainTriggerWidth(domainFieldRef.current.offsetWidth);
-		}
-	}, []);
-
 	const onSubmit = async (data: AgentAddressFormValues) => {
 		const selectedDomainObj = verifiedDomains.find(
 			(d) => d.domain === data.domain,
@@ -183,7 +154,7 @@ export function CreateInboxInlineCard({
 		try {
 			setIsSubmitting(true);
 			const mailbox = await addMailbox({
-				label: data.label,
+				label: data.label.trim() || deriveInboxDisplayName(data.localPart),
 				localPart: data.localPart,
 				domain: data.domain,
 				domainId: selectedDomainObj.id,
@@ -242,7 +213,8 @@ export function CreateInboxInlineCard({
 									Add address details
 								</h2>
 								<p className="mt-0.5 text-text-sub-600 text-xs leading-relaxed">
-									Configure your mailbox address and display name.
+									Enter an email address — use Name &lt;email@domain&gt; format
+									to set a display name.
 								</p>
 							</div>
 
@@ -273,181 +245,38 @@ export function CreateInboxInlineCard({
 
 							<div className="space-y-1.5">
 								<Label.Root
-									htmlFor="inline-agent-label"
-									className="font-medium text-text-strong-950 text-xs"
-								>
-									Name
-									<Label.Asterisk />
-								</Label.Root>
-								<Input.Root
-									size="medium"
-									hasError={!!form.formState.errors.label}
-								>
-									<Input.Wrapper>
-										<Input.Input
-											id="inline-agent-label"
-											placeholder="e.g. Support"
-											autoFocus
-											{...form.register("label", {
-												onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-													if (!isLocalPartManuallyEdited) {
-														form.setValue(
-															"localPart",
-															slugifyEmailPrefix(e.target.value),
-															{
-																shouldValidate: form.formState.isSubmitted,
-															},
-														);
-													}
-												},
-											})}
-											disabled={isSubmitting}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								{form.formState.errors.label ? (
-									<p className="text-error-base text-paragraph-xs">
-										{form.formState.errors.label.message}
-									</p>
-								) : (
-									<p className="text-paragraph-xs text-text-sub-600">
-										A display name for this address.
-									</p>
-								)}
-							</div>
-
-							<div className="space-y-1.5">
-								<Label.Root
 									htmlFor="inline-agent-email"
 									className="font-medium text-text-strong-950 text-xs"
 								>
 									Email address
 									<Label.Asterisk />
 								</Label.Root>
-								<div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-									<Input.Root
-										size="medium"
-										hasError={!!form.formState.errors.localPart}
-										className="min-w-0"
-									>
-										<Input.Wrapper>
-											<Input.Input
-												id="inline-agent-email"
-												placeholder="support"
-												className="min-w-0"
-												autoComplete="off"
-												spellCheck={false}
-												maxLength={64}
-												{...form.register("localPart", {
-													onChange: () => {
-														setIsLocalPartManuallyEdited(true);
-													},
-												})}
-												disabled={isSubmitting}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-
-									<span
-										aria-hidden
-										className="shrink-0 select-none font-medium text-paragraph-sm text-text-sub-600"
-									>
-										@
-									</span>
-
-									<div ref={domainFieldRef} className="min-w-0">
-										<Input.Root
-											size="medium"
-											hasError={!!form.formState.errors.domain}
-											className="min-w-0"
-										>
-											<Input.Wrapper className="w-full">
-												<Dropdown.Root
-													open={isDropdownOpen}
-													onOpenChange={setIsDropdownOpen}
-												>
-													<Dropdown.Trigger asChild>
-														<button
-															type="button"
-															disabled={isSubmitting}
-															aria-label="Select domain"
-															className="group/trigger flex h-full min-h-10 w-full items-center justify-between gap-1 bg-transparent p-0 text-left font-medium text-paragraph-sm text-text-strong-950 outline-none ring-0 disabled:pointer-events-none disabled:opacity-50"
-														>
-															<span className="truncate">
-																{selectedDomainName || "domain"}
-															</span>
-															<Icon
-																name="chevron-down"
-																className={cn(
-																	"size-4 shrink-0 text-text-sub-600 transition duration-200 ease-out group-hover/trigger:text-text-strong-950 group-data-[state=open]/trigger:rotate-180",
-																	isDropdownOpen &&
-																		"rotate-180 text-text-strong-950",
-																)}
-															/>
-														</button>
-													</Dropdown.Trigger>
-													<Dropdown.Content
-														align="end"
-														className="min-w-0 p-2"
-														style={
-															domainTriggerWidth
-																? { width: domainTriggerWidth }
-																: undefined
-														}
-													>
-														<div className="relative max-h-80 overflow-y-auto">
-															{verifiedDomains.map((d, idx) => {
-																const isSelected =
-																	d.domain === selectedDomainName;
-																return (
-																	<button
-																		key={d.id}
-																		ref={(el) => {
-																			if (el) buttonRefs.current[idx] = el;
-																		}}
-																		type="button"
-																		onPointerEnter={() => setHoverIdx(idx)}
-																		onPointerLeave={() =>
-																			setHoverIdx(undefined)
-																		}
-																		onClick={() => {
-																			form.setValue("domain", d.domain, {
-																				shouldValidate: true,
-																			});
-																			setIsDropdownOpen(false);
-																		}}
-																		className={cn(
-																			"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
-																			"text-text-strong-950",
-																			isSelected && "bg-neutral-alpha-10",
-																			!currentRect &&
-																				hoverIdx === idx &&
-																				"bg-neutral-alpha-10",
-																		)}
-																	>
-																		<span className="truncate text-left font-medium">
-																			{d.domain}
-																		</span>
-																		{isSelected && (
-																			<Icon
-																				name="check"
-																				className="h-3.5 w-3.5 shrink-0 text-text-strong-950"
-																			/>
-																		)}
-																	</button>
-																);
-															})}
-															<AnimatedHoverBackground
-																rect={currentRect}
-																tabElement={currentTab}
-															/>
-														</div>
-													</Dropdown.Content>
-												</Dropdown.Root>
-											</Input.Wrapper>
-										</Input.Root>
-									</div>
-								</div>
+								<InboxEmailAddressInput
+									id="inline-agent-email"
+									localPart={localPartValue ?? ""}
+									domain={selectedDomainName ?? ""}
+									displayName={labelValue ?? ""}
+									verifiedDomains={verifiedDomains}
+									isLoadingDomains={domainsData === undefined}
+									disabled={isSubmitting}
+									autoFocus
+									hasError={
+										!!form.formState.errors.localPart ||
+										!!form.formState.errors.domain
+									}
+									placeholder="e.g. Support <support@domain.com>"
+									onChange={(nextLocalPart, nextDomain, nextName) => {
+										form.setValue("localPart", nextLocalPart, {
+											shouldValidate: form.formState.isSubmitted,
+										});
+										form.setValue("domain", nextDomain, {
+											shouldValidate: true,
+										});
+										form.setValue("label", nextName, {
+											shouldValidate: form.formState.isSubmitted,
+										});
+									}}
+								/>
 								{(form.formState.errors.localPart ||
 									form.formState.errors.domain) && (
 									<p className="text-error-base text-paragraph-xs">
