@@ -101,7 +101,7 @@ export function PageHeader() {
 		useActiveOrganization();
 
 	return (
-		<div className="sticky top-0 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 pr-3 pl-3 dark:border-stroke-soft-100/40 dark:bg-black">
+		<div className="sticky top-0 z-20 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 pr-3 pl-3 dark:border-stroke-soft-100/40 dark:bg-black">
 			<div className="flex items-center gap-1">
 				<SidebarToggleButton />
 				<OrganizationSwitcher

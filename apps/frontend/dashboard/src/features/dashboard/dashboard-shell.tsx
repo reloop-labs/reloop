@@ -33,7 +33,7 @@ function SidebarChrome({
 }) {
 	return (
 		<>
-			<div className="hidden lg:flex">
+			<div className="hidden shrink-0 lg:flex">
 				<MainSidebar />
 			</div>
 			<MobileSidebarSheet isOpen={isMobileNavOpen} onClose={onCloseMobileNav} />
@@ -72,24 +72,30 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
 	return (
 		<CommandMenuProvider>
-			<div className="flex">
+			<div
+				className={cn(
+					"flex",
+					isInbox ? "h-screen overflow-hidden" : "min-h-screen",
+				)}
+			>
 				<SidebarChrome
 					isMobileNavOpen={isMobileNavOpen}
 					onCloseMobileNav={() => setMobileNavOpen(false)}
 				/>
-				<main className="relative flex min-w-0 flex-1 overflow-hidden">
-					<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-						<PageHeader />
-						<div
-							className={cn(
-								"flex-1",
-								isInbox
-									? "flex min-h-0 flex-col overflow-hidden"
-									: "overflow-y-auto",
-							)}
-						>
-							{children}
-						</div>
+				<main
+					className={cn(
+						"relative flex min-w-0 flex-1 flex-col",
+						isInbox && "overflow-hidden",
+					)}
+				>
+					<PageHeader />
+					<div
+						className={cn(
+							"flex-1",
+							isInbox && "flex min-h-0 flex-col overflow-hidden",
+						)}
+					>
+						{children}
 					</div>
 				</main>
 				<AnimatePresence>{isAiPanelOpen ? <AiPanel /> : null}</AnimatePresence>

@@ -5,46 +5,8 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { getLanguageIcon } from "@reloop/web/components/mdx/language-icons";
 import { hostedSignupHref } from "@reloop/web/lib/site";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { HeroWindowChrome } from "./hero-chrome";
-import { HeroDashboardShell } from "./hero-dashboard-shell";
-import {
-	HeroDemoPlaybackButton,
-	HeroDemoPlaybackProvider,
-} from "./hero-demo-playback";
-import { HeroPreviewContent, type HeroTabId } from "./hero-preview-content";
-
-const TAB_TO_NAV: Record<HeroTabId, string> = {
-	overview: "emails",
-	analytics: "metrics",
-	domain: "domain",
-	workflow: "workflow",
-	templates: "templates",
-	dashboard: "emails",
-	sdk: "domain",
-	cloud: "domain",
-	agents: "inbox",
-};
-
-const NAV_TO_TAB: Record<string, HeroTabId> = {
-	emails: "overview",
-	inbox: "overview",
-	contacts: "workflow",
-	templates: "templates",
-	workflow: "workflow",
-	metrics: "analytics",
-	logs: "analytics",
-	"api-keys": "domain",
-	domain: "domain",
-	webhooks: "workflow",
-	integrations: "workflow",
-	smtp: "overview",
-	settings: "overview",
-};
-
-const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
+import { useState } from "react";
 
 type InstallMethod = "curl" | "docker" | "cli";
 
@@ -67,69 +29,9 @@ export interface HeroProps {
 
 export function Hero({ variant = "default" }: HeroProps) {
 	const [installMethod, setInstallMethod] = useState<InstallMethod>("curl");
-	const [active, setActive] = useState<HeroTabId>("overview");
-	const reduceMotion = useReducedMotion();
-
-	const heroRef = useRef<HTMLElement>(null);
-	const panelRef = useRef<HTMLDivElement>(null);
-	const [isScrolledHalf, setIsScrolledHalf] = useState(false);
-
-	useEffect(() => {
-		const checkScroll = () => {
-			if (isScrolledHalf) return;
-			const heroEl = heroRef.current;
-			const panelEl = panelRef.current;
-			if (!heroEl && !panelEl) return;
-
-			const vh = window.innerHeight || 800;
-
-			// Method 1: Hero element scroll position
-			if (heroEl) {
-				const heroRect = heroEl.getBoundingClientRect();
-				if (
-					-heroRect.top >= vh * 0.5 ||
-					-heroRect.top >= heroRect.height * 0.5
-				) {
-					setIsScrolledHalf(true);
-					return;
-				}
-			}
-
-			// Method 2: Dashboard panel scroll position
-			if (panelEl) {
-				const panelRect = panelEl.getBoundingClientRect();
-				if (panelRect.top <= vh * 0.5) {
-					setIsScrolledHalf(true);
-					return;
-				}
-			}
-		};
-
-		checkScroll();
-		window.addEventListener("scroll", checkScroll, { passive: true });
-		window.addEventListener("resize", checkScroll, { passive: true });
-
-		return () => {
-			window.removeEventListener("scroll", checkScroll);
-			window.removeEventListener("resize", checkScroll);
-		};
-	}, [isScrolledHalf]);
-
-	const activeNav = TAB_TO_NAV[active] ?? "emails";
-
-	const handleSidebarClick = useCallback((id: string) => {
-		const targetTab = NAV_TO_TAB[id];
-		if (targetTab) {
-			setActive(targetTab);
-		}
-	}, []);
 
 	return (
-		<section
-			id="features"
-			ref={heroRef}
-			className="relative flex min-h-dvh flex-col bg-transparent"
-		>
+		<section id="features" className="relative flex flex-col bg-transparent">
 			{variant === "self-host" ? (
 				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-100 border-x px-6 pt-36 pb-20 text-center sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28 dark:border-white/10">
 					<h1 className="max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
@@ -200,55 +102,6 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			)}
-
-			<div className="relative w-full flex-1 overflow-hidden border-stroke-soft-100 border-t bg-bg-white-0 dark:border-white/10 dark:bg-black">
-				<div
-					ref={panelRef}
-					className="relative z-10 mx-auto flex h-dvh w-full max-w-5xl flex-col border-stroke-soft-100 border-x px-3 pt-10 pb-10 sm:px-6 sm:pt-14 sm:pb-14 md:max-w-7xl lg:px-8 lg:pt-20 lg:pb-16 dark:border-white/10"
-				>
-					<HeroDemoPlaybackProvider started={isScrolledHalf}>
-						<HeroWindowChrome
-							action={
-								active === "overview" ||
-								active === "sdk" ||
-								active === "domain" ? (
-									<HeroDemoPlaybackButton />
-								) : undefined
-							}
-						>
-							<HeroDashboardShell
-								activeItem={activeNav}
-								onItemClick={handleSidebarClick}
-							>
-								<AnimatePresence mode="wait">
-									<motion.div
-										key={active}
-										className="h-full w-full"
-										initial={
-											reduceMotion
-												? { opacity: 1 }
-												: { opacity: 0, filter: "blur(2px)" }
-										}
-										animate={{ opacity: 1, filter: "blur(0px)" }}
-										exit={
-											reduceMotion
-												? { opacity: 0 }
-												: { opacity: 0, filter: "blur(2px)" }
-										}
-										transition={
-											reduceMotion
-												? { duration: 0 }
-												: { duration: 0.2, ease: EASE_OUT }
-										}
-									>
-										<HeroPreviewContent tab={active} />
-									</motion.div>
-								</AnimatePresence>
-							</HeroDashboardShell>
-						</HeroWindowChrome>
-					</HeroDemoPlaybackProvider>
-				</div>
-			</div>
 		</section>
 	);
 }

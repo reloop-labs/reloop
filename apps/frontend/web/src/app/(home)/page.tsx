@@ -84,6 +84,8 @@ export default function Home() {
 			<JsonLd data={homeSchema} />
 			<Hero />
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<PlatformTabs />
+				<SectionSeparator />
 				<LanguageExplorer
 					framed={false}
 					showTopRule
@@ -96,7 +98,6 @@ export default function Home() {
 				<SectionSeparator />
 				<EmailSystem />
 				<SectionSeparator />
-				<PlatformTabs />
 				<Highlights />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<CTA />

@@ -62,64 +62,86 @@ const TABS: {
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
-// One grainy bg per tab — light + dark.
-const PLATFORM_IMAGES: Record<
-	PlatformTabId,
-	{ src: string; darkSrc: string; alt: string }
-> = {
-	domains: {
-		src: "/backgrounds/grain-blue.png",
-		darkSrc: "/backgrounds/grain-blue-dark.png",
-		alt: "Domains — verify DNS once, send forever",
-	},
-	email: {
-		src: "/backgrounds/grain-amber.png",
-		darkSrc: "/backgrounds/grain-amber-dark.png",
-		alt: "Email — transactional API and SMTP relay",
-	},
-	analytics: {
-		src: "/backgrounds/grain-mint.png",
-		darkSrc: "/backgrounds/grain-mint-dark.png",
-		alt: "Analytics — delivery, opens and bounces live",
-	},
-	templates: {
-		src: "/backgrounds/grain-rose.png",
-		darkSrc: "/backgrounds/grain-rose-dark.png",
-		alt: "Templates — React Email blocks that scale",
-	},
-	agents: {
-		src: "/backgrounds/grain-grape.png",
-		darkSrc: "/backgrounds/grain-grape-dark.png",
-		alt: "Agent Inbox — inbound email for AI agents",
-	},
-	workflows: {
-		src: "/backgrounds/grain-sky.png",
-		darkSrc: "/backgrounds/grain-sky-dark.png",
-		alt: "Workflows — automate lifecycle sends",
-	},
+// Alt text per tab for a11y.
+const PLATFORM_ALT: Record<PlatformTabId, string> = {
+	domains: "Domains — verify DNS once, send forever",
+	email: "Email — transactional API and SMTP relay",
+	analytics: "Analytics — delivery, opens and bounces live",
+	templates: "Templates — React Email blocks that scale",
+	agents: "Agent Inbox — inbound email for AI agents",
+	workflows: "Workflows — automate lifecycle sends",
 };
 
+// Distinct gradient backdrop per tab — light + dark.
+const TAB_GRADIENTS: Record<PlatformTabId, string> = {
+	domains:
+		"from-[#dbe7ff] via-[#eef3ff] to-bg-white-0 dark:from-[#0b1b33] dark:via-[#060b16] dark:to-black",
+	email:
+		"from-[#fdeecd] via-[#fdf6e7] to-bg-white-0 dark:from-[#2a1c07] dark:via-[#120d05] dark:to-black",
+	analytics:
+		"from-[#d2f3e3] via-[#e9faf2] to-bg-white-0 dark:from-[#06281c] dark:via-[#041209] dark:to-black",
+	templates:
+		"from-[#fbdce5] via-[#fdeef2] to-bg-white-0 dark:from-[#33101c] dark:via-[#160609] dark:to-black",
+	agents:
+		"from-[#e3d9fb] via-[#efe9fd] to-bg-white-0 dark:from-[#1e1245] dark:via-[#0d0722] dark:to-black",
+	workflows:
+		"from-[#cfe9fb] via-[#e6f3fd] to-bg-white-0 dark:from-[#08273f] dark:via-[#04121e] dark:to-black",
+};
+
+// TODO: per-tab screenshots — using domain shot as placeholder until others land.
+const TAB_SCREENSHOT: Record<PlatformTabId, { src: string; darkSrc: string }> =
+	{
+		domains: {
+			src: "/platform/domain-light.png",
+			darkSrc: "/platform/domain-dark.png",
+		},
+		email: {
+			src: "/platform/domain-light.png",
+			darkSrc: "/platform/domain-dark.png",
+		},
+		analytics: {
+			src: "/platform/domain-light.png",
+			darkSrc: "/platform/domain-dark.png",
+		},
+		templates: {
+			src: "/platform/domain-light.png",
+			darkSrc: "/platform/domain-dark.png",
+		},
+		agents: {
+			src: "/platform/domain-light.png",
+			darkSrc: "/platform/domain-dark.png",
+		},
+		workflows: {
+			src: "/platform/domain-light.png",
+			darkSrc: "/platform/domain-dark.png",
+		},
+	};
+
 function PlatformPreview({ tab }: { tab: PlatformTabId }) {
-	const img = PLATFORM_IMAGES[tab];
+	const shot = TAB_SCREENSHOT[tab];
 	return (
-		<div className="relative h-full w-full">
-			<Image
-				src={img.src}
-				alt={img.alt}
-				fill
-				sizes="(max-width: 1024px) 100vw, 1200px"
-				className="object-cover object-top dark:hidden"
-				priority={tab === "domains"}
-			/>
-			<Image
-				src={img.darkSrc}
-				alt=""
-				aria-hidden
-				fill
-				sizes="(max-width: 1024px) 100vw, 1200px"
-				className="hidden object-cover object-top dark:block"
-				priority={tab === "domains"}
-			/>
+		<div
+			className={`relative h-full w-full overflow-hidden bg-gradient-to-b px-10 pt-10 ${TAB_GRADIENTS[tab]}`}
+		>
+			<div className="relative h-full w-full overflow-hidden rounded-t-xl border border-stroke-soft-100 border-b-0 bg-bg-white-0 shadow-regular-md dark:border-white/10 dark:bg-black">
+				<Image
+					src={shot.src}
+					alt={PLATFORM_ALT[tab]}
+					fill
+					sizes="100vw"
+					className="object-cover object-top dark:hidden"
+					priority={tab === "domains"}
+				/>
+				<Image
+					src={shot.darkSrc}
+					alt=""
+					aria-hidden
+					fill
+					sizes="100vw"
+					className="hidden object-cover object-top dark:block"
+					priority={tab === "domains"}
+				/>
+			</div>
 		</div>
 	);
 }
@@ -132,7 +154,7 @@ export default function PlatformTabs() {
 		<section
 			id="platform"
 			aria-labelledby="platform-heading"
-			className="w-full border-stroke-soft-100 border-b dark:border-white/10"
+			className="w-full border-stroke-soft-100 border-y dark:border-white/10"
 		>
 			<h2 id="platform-heading" className="sr-only">
 				Reloop platform overview
@@ -157,7 +179,6 @@ export default function PlatformTabs() {
 								"relative border-stroke-soft-100 px-5 py-5 text-left transition-colors sm:px-6 sm:py-6 dark:border-white/10",
 								"border-b sm:border-b-0",
 								"odd:border-r sm:[&:nth-child(3n)]:border-r-0 lg:[&:nth-child(3n)]:border-r",
-								"[&:nth-child(5n)]:border-r-0",
 								"sm:border-r lg:border-r",
 								"last:border-r-0 last:odd:col-span-2 sm:last:odd:col-span-1",
 								"focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-base/40",
@@ -214,7 +235,7 @@ export default function PlatformTabs() {
 				<AnimatePresence mode="wait">
 					<motion.div
 						key={active}
-						className="h-[440px] w-full sm:h-[520px] lg:h-[560px]"
+						className="h-[560px] w-full sm:h-[640px] lg:h-[720px]"
 						initial={
 							reduceMotion
 								? { opacity: 1 }
