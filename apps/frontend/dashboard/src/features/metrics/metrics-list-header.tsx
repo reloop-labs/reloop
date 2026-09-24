@@ -16,9 +16,6 @@ export function MetricsListHeader() {
 						Metrics
 					</h1>
 				</div>
-				<p className="mt-1 text-sm text-text-sub-600">
-					Deliverability and engagement metrics for your emails.
-				</p>
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">

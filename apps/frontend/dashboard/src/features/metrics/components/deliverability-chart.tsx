@@ -132,20 +132,18 @@ export function DeliverabilityChart({
 
 	if (isLoading) {
 		return (
-			<div className="group flex w-full flex-col">
-				<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
-					<div className="h-5 w-28 animate-pulse rounded bg-neutral-alpha-5" />
-				</div>
-				<div className="-mt-1.5 flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
-					<div className="mb-8 flex justify-between">
-						<div className="flex gap-12">
-							<div className="h-12 w-32 animate-pulse rounded bg-neutral-alpha-5" />
-							<div className="h-12 w-32 animate-pulse rounded bg-neutral-alpha-5" />
-						</div>
-						<div className="h-8 w-32 animate-pulse rounded bg-neutral-alpha-5" />
+			<div className="group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
+				<span className="font-medium text-lg text-text-strong-950 dark:text-white">
+					Deliverability
+				</span>
+				<div className="mt-4 mb-8 flex justify-between">
+					<div className="flex gap-12">
+						<div className="h-12 w-32 animate-pulse rounded bg-neutral-alpha-5" />
+						<div className="h-12 w-32 animate-pulse rounded bg-neutral-alpha-5" />
 					</div>
-					<div className="h-[300px] w-full animate-pulse rounded bg-neutral-alpha-5" />
+					<div className="h-8 w-32 animate-pulse rounded bg-neutral-alpha-5" />
 				</div>
+				<div className="h-[300px] w-full animate-pulse rounded bg-neutral-alpha-5" />
 			</div>
 		);
 	}
@@ -157,167 +155,153 @@ export function DeliverabilityChart({
 		: 0;
 
 	return (
-		<div className="group flex w-full flex-col">
-			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-2 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
+		<div className="group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
+			<div className="flex items-center justify-between">
 				<span className="font-medium text-lg text-text-strong-950 dark:text-white">
 					Deliverability
 				</span>
+				<EventSelector value={selectedEvents} onChange={setSelectedEvents} />
 			</div>
 
-			<div className="-mt-1.5 flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
-				<div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-					<div className="flex flex-wrap gap-8 sm:gap-12">
-						<div className="flex flex-col gap-1">
-							<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-								Emails
-							</span>
-							<span className="font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
-								{totalEmails.toLocaleString()}
-							</span>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-								Deliverability Rate
-							</span>
-							<span className="font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
-								{totalEmails > 0 ? `${Math.round(avgRate)}%` : "0%"}
-							</span>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-								Bounces
-							</span>
-							<span className="font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
-								{totalBounced.toLocaleString()}
-							</span>
-						</div>
+			<div className="mt-4 mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+				<div className="flex flex-wrap gap-8 sm:gap-12">
+					<div className="flex flex-col gap-1">
+						<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+							Emails
+						</span>
+						<span className="font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							{totalEmails.toLocaleString()}
+						</span>
 					</div>
-
-					<div className="flex items-center">
-						<EventSelector
-							value={selectedEvents}
-							onChange={setSelectedEvents}
-						/>
+					<div className="flex flex-col gap-1">
+						<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+							Deliverability Rate
+						</span>
+						<span className="font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							{totalEmails > 0 ? `${Math.round(avgRate)}%` : "0%"}
+						</span>
+					</div>
+					<div className="flex flex-col gap-1">
+						<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+							Bounces
+						</span>
+						<span className="font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
+							{totalBounced.toLocaleString()}
+						</span>
 					</div>
 				</div>
+			</div>
 
-				<div className="h-[300px] w-full">
-					{isMounted && (
-						<ResponsiveContainer width="100%" height="100%">
-							<ComposedChart
-								data={chartData}
-								margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-							>
-								<defs>
-									<linearGradient
-										id="colorDelivered"
-										x1="0"
-										y1="0"
-										x2="0"
-										y2="1"
-									>
-										<stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
-										<stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-									</linearGradient>
-								</defs>
-								<CartesianGrid
-									strokeDasharray="3 3"
-									stroke="currentColor"
-									strokeOpacity={0.05}
-									vertical={false}
+			<div className="h-[300px] w-full">
+				{isMounted && (
+					<ResponsiveContainer width="100%" height="100%">
+						<ComposedChart
+							data={chartData}
+							margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+						>
+							<defs>
+								<linearGradient id="colorDelivered" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
+									<stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+								</linearGradient>
+							</defs>
+							<CartesianGrid
+								strokeDasharray="3 3"
+								stroke="currentColor"
+								strokeOpacity={0.05}
+								vertical={false}
+							/>
+							<XAxis
+								dataKey="date"
+								axisLine={false}
+								tickLine={false}
+								tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
+								dy={10}
+							/>
+							<YAxis
+								orientation="right"
+								domain={[0, maxSentValue]}
+								ticks={[0, Math.round(maxSentValue / 2), maxSentValue]}
+								axisLine={false}
+								tickLine={false}
+								tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
+								width={35}
+							/>
+							<Tooltip content={<CustomTooltip />} />
+							{(isAllSelected || selectedEvents.includes("delivered")) && (
+								<Area
+									type="linear"
+									dataKey="delivered"
+									name="Delivered"
+									stroke="#10B981"
+									strokeWidth={2}
+									strokeLinejoin="miter"
+									strokeLinecap="butt"
+									fillOpacity={1}
+									fill="url(#colorDelivered)"
+									isAnimationActive={false}
 								/>
-								<XAxis
-									dataKey="date"
-									axisLine={false}
-									tickLine={false}
-									tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
-									dy={10}
+							)}
+							{(isAllSelected || selectedEvents.includes("bounced")) && (
+								<Line
+									type="linear"
+									dataKey="bounced"
+									name="Bounces"
+									stroke="#EF4444"
+									strokeWidth={2}
+									strokeLinejoin="miter"
+									strokeLinecap="butt"
+									dot={false}
+									activeDot={{ r: 5 }}
+									isAnimationActive={false}
 								/>
-								<YAxis
-									orientation="right"
-									domain={[0, maxSentValue]}
-									ticks={[0, Math.round(maxSentValue / 2), maxSentValue]}
-									axisLine={false}
-									tickLine={false}
-									tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
-									width={35}
+							)}
+							{(isAllSelected || selectedEvents.includes("complained")) && (
+								<Line
+									type="linear"
+									dataKey="complaint"
+									name="Complained"
+									stroke="#D97706"
+									strokeWidth={2}
+									strokeLinejoin="miter"
+									strokeLinecap="butt"
+									dot={false}
+									activeDot={{ r: 5 }}
+									isAnimationActive={false}
 								/>
-								<Tooltip content={<CustomTooltip />} />
-								{(isAllSelected || selectedEvents.includes("delivered")) && (
-									<Area
-										type="linear"
-										dataKey="delivered"
-										name="Delivered"
-										stroke="#10B981"
-										strokeWidth={2}
-										strokeLinejoin="miter"
-										strokeLinecap="butt"
-										fillOpacity={1}
-										fill="url(#colorDelivered)"
-										isAnimationActive={false}
-									/>
-								)}
-								{(isAllSelected || selectedEvents.includes("bounced")) && (
-									<Line
-										type="linear"
-										dataKey="bounced"
-										name="Bounces"
-										stroke="#EF4444"
-										strokeWidth={2}
-										strokeLinejoin="miter"
-										strokeLinecap="butt"
-										dot={false}
-										activeDot={{ r: 5 }}
-										isAnimationActive={false}
-									/>
-								)}
-								{(isAllSelected || selectedEvents.includes("complained")) && (
-									<Line
-										type="linear"
-										dataKey="complaint"
-										name="Complained"
-										stroke="#D97706"
-										strokeWidth={2}
-										strokeLinejoin="miter"
-										strokeLinecap="butt"
-										dot={false}
-										activeDot={{ r: 5 }}
-										isAnimationActive={false}
-									/>
-								)}
-								{!isAllSelected &&
-									selectedEvents
-										.filter(
-											(id) =>
-												id !== "delivered" &&
-												id !== "bounced" &&
-												id !== "complained",
-										)
-										.map((eventId) => {
-											const event = EVENTS.find((e) => e.id === eventId);
-											if (!event) return null;
-											const key =
-												event.id === "complained" ? "complaint" : event.id;
-											return (
-												<Line
-													key={event.id}
-													type="linear"
-													dataKey={key}
-													name={event.label}
-													stroke={event.color}
-													strokeWidth={2}
-													strokeLinejoin="miter"
-													strokeLinecap="butt"
-													dot={false}
-													activeDot={{ r: 5 }}
-													isAnimationActive={false}
-												/>
-											);
-										})}
-							</ComposedChart>
-						</ResponsiveContainer>
-					)}
-				</div>
+							)}
+							{!isAllSelected &&
+								selectedEvents
+									.filter(
+										(id) =>
+											id !== "delivered" &&
+											id !== "bounced" &&
+											id !== "complained",
+									)
+									.map((eventId) => {
+										const event = EVENTS.find((e) => e.id === eventId);
+										if (!event) return null;
+										const key =
+											event.id === "complained" ? "complaint" : event.id;
+										return (
+											<Line
+												key={event.id}
+												type="linear"
+												dataKey={key}
+												name={event.label}
+												stroke={event.color}
+												strokeWidth={2}
+												strokeLinejoin="miter"
+												strokeLinecap="butt"
+												dot={false}
+												activeDot={{ r: 5 }}
+												isAnimationActive={false}
+											/>
+										);
+									})}
+						</ComposedChart>
+					</ResponsiveContainer>
+				)}
 			</div>
 		</div>
 	);
