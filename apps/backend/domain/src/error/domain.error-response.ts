@@ -159,6 +159,25 @@ export const KumoMtaErrors = {
 			why: `This send matches outbound abuse patterns (${reasons.join(", ")}) and was not accepted`,
 			fix: "Remove phishing content and carrier SMS/MMS gateway recipients, then contact support if this is legitimate mail",
 		}),
+	domainAgeDailyCapExceeded: ({
+		domainName,
+		ageDays,
+		cap,
+		sentToday,
+		required,
+	}: {
+		domainName: string;
+		ageDays: number;
+		cap: number;
+		sentToday: number;
+		required: number;
+	}) =>
+		createError({
+			status: 429,
+			message: "New domain daily limit reached",
+			why: `Domain ${domainName} is ${ageDays} day(s) old and limited to ${cap} emails/day for the first 30 days. Already sent ${sentToday} today, this send needs ${required} more`,
+			fix: "Send to highly engaged/verified contacts only for new domains, warm up gradually, or try again tomorrow. Limits automatically increase as the domain ages (20 → 50 → 100 → 250 → 500 → dynamic after 30 days) for all plans",
+		}),
 	messageTooLarge: ({
 		actualBytes,
 		limitBytes,

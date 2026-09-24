@@ -103,6 +103,10 @@ type OrgDetail = {
 		status: string;
 		systemVerified: boolean;
 		createdAt: string;
+		ageDays: number;
+		dailyCap: number | null;
+		sentToday: number;
+		remaining: number | null;
 	}>;
 	apiKeys: Array<{
 		id: string;
@@ -556,8 +560,28 @@ export default function OrganizationDetailPage() {
 			/>
 
 			{tab === "overview" ? (
-				<div className="grid gap-4 lg:grid-cols-2">
-					<SectionCard title="Organization profile">
+				<>
+					{(() => {
+						const warming = data.domains.filter((d) => d.dailyCap !== null);
+						if (warming.length === 0) return null;
+						const atCap = warming.filter((d) => d.dailyCap !== null && d.sentToday >= d.dailyCap);
+						return (
+							<div
+								className={`rounded-xl border px-4 py-3 ${atCap.length ? "border-orange-200 bg-orange-50 dark:border-orange-500/20 dark:bg-orange-500/10" : "border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10"}`}
+							>
+								<p className={`text-[12px] font-medium ${atCap.length ? "text-orange-700 dark:text-orange-300" : "text-amber-700 dark:text-amber-300"}`}>
+									{atCap.length
+										? `${atCap.length} domain(s) at daily cap — further sends get 429`
+										: `${warming.length} domain(s) warming up — capped for first 30 days (all plans)`}
+								</p>
+								<p className="mt-1 text-[12px] leading-relaxed text-text-sub-600 dark:text-white/60">
+									{warming.map((d) => `${d.domain} (${d.ageDays}d: ${d.sentToday}/${d.dailyCap} today)`).join(" · ")} — caps 20→50→100→250→500→dynamic after 30d
+								</p>
+							</div>
+						);
+					})()}
+					<div className="grid gap-4 lg:grid-cols-2">
+						<SectionCard title="Organization profile">
 						<div className="divide-y divide-stroke-soft-100 px-4 py-1 dark:divide-stroke-soft-100/40">
 							{[
 								["Name", data.name],
@@ -830,6 +854,7 @@ export default function OrganizationDetailPage() {
 						</div>
 					</SectionCard>
 				</div>
+				</>
 			) : null}
 
 			{tab === "members" ? (
@@ -887,30 +912,62 @@ export default function OrganizationDetailPage() {
 			{tab === "domains" ? (
 				<SectionCard
 					title={`Domains (${data.domains.length})`}
-					description="Sending domains attached to this org"
+					description="Sending domains attached to this org — age cap applies to all plans"
 				>
 					<DataTable
-						headers={["Domain", "Status", "Verified", "Created"]}
-						colSpan={4}
+						headers={["Domain", "Status", "Age", "Daily cap", "Sent today", "Verified", "Created"]}
+						colSpan={7}
 						empty={data.domains.length === 0}
 					>
-						{data.domains.map((d) => (
-							<tr
-								key={d.id}
-								className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40"
-							>
-								<td className="px-4 py-3 font-medium">{d.domain}</td>
-								<td className="px-4 py-3">
-									<StatusPill status={d.status} />
-								</td>
-								<td className="px-4 py-3 text-text-sub-600">
-									{d.systemVerified ? "Yes" : "No"}
-								</td>
-								<td className="px-4 py-3 text-text-sub-600">
-									{formatRelativeTime(d.createdAt)}
-								</td>
-							</tr>
-						))}
+						{data.domains.map((d) => {
+							const isWarming = d.dailyCap !== null;
+							const isAtCap = d.dailyCap !== null && d.sentToday >= d.dailyCap;
+							return (
+								<tr
+									key={d.id}
+									className={`border-stroke-soft-100 border-t dark:border-stroke-soft-100/40 ${isAtCap ? "bg-orange-50/50 dark:bg-orange-500/5" : ""}`}
+								>
+									<td className="px-4 py-3 font-medium">
+										<div>{d.domain}</div>
+										{isWarming ? (
+											<span className="text-[11px] text-orange-600 dark:text-orange-400">Warming up</span>
+										) : (
+											<span className="text-[11px] text-emerald-600 dark:text-emerald-400">Warm</span>
+										)}
+									</td>
+									<td className="px-4 py-3">
+										<StatusPill status={d.status} />
+									</td>
+									<td className="px-4 py-3 tabular-nums text-text-strong-950">
+										{d.ageDays}d
+										<span className="ml-1 text-[11px] text-text-sub-600">({d.ageDays <= 1 ? "today" : `${d.ageDays}d ago`})</span>
+									</td>
+									<td className="px-4 py-3 tabular-nums">
+										{d.dailyCap === null ? (
+											<span className="text-text-sub-600">Dynamic</span>
+										) : (
+											<span className={isAtCap ? "font-semibold text-orange-600" : ""}>{d.dailyCap}</span>
+										)}
+									</td>
+									<td className="px-4 py-3 tabular-nums">
+										{d.dailyCap === null ? (
+											<span className="text-text-sub-600">{d.sentToday} sent</span>
+										) : (
+											<span className={isAtCap ? "font-semibold text-orange-600" : ""}>
+												{d.sentToday} / {d.dailyCap}
+												<span className="ml-1 text-[11px] text-text-sub-600">· {d.remaining} left</span>
+											</span>
+										)}
+									</td>
+									<td className="px-4 py-3 text-text-sub-600">
+										{d.systemVerified ? "Yes" : "No"}
+									</td>
+									<td className="px-4 py-3 text-text-sub-600">
+										{formatRelativeTime(d.createdAt)}
+									</td>
+								</tr>
+							);
+						})}
 					</DataTable>
 				</SectionCard>
 			) : null}

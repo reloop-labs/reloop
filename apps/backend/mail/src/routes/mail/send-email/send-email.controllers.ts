@@ -6,6 +6,7 @@ import {
 } from "@reloop/be-mail/lib/credits-gate";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
+import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import {
 	assertAttachmentsWithinPlan,
 	getOrgAttachmentLimit,
@@ -183,6 +184,23 @@ export async function sendEmailController({
 	currentDomain.isTrackingDomain = Boolean(
 		currentDomain.isClickTrackingEnabled || currentDomain.isOpenTrackingEnabled,
 	);
+
+	// ── Domain-age initial daily cap (all packages) ───────────────────────
+	// New domains are throttled regardless of plan: 0–1d:20, 2–3d:50, 4–7d:100, 8–14d:250, 15–30d:500, 30+d:dynamic
+	const recipientCount = countEmailRecipients(body);
+	const ageCheck = await checkDomainAgeDailyCap({
+		domain: { id: currentDomain.id, createdAt: currentDomain.createdAt },
+		recipientCount,
+	});
+	if (!ageCheck.allowed && ageCheck.cap !== null) {
+		throw MailErrors.domainAgeDailyCapExceeded({
+			domainName,
+			ageDays: ageCheck.ageDays,
+			cap: ageCheck.cap,
+			sentToday: ageCheck.sentToday,
+			required: recipientCount,
+		});
+	}
 
 	// Reserve monthly + daily quota under a row lock so concurrent API/SMTP
 	// senders cannot all pass a stale remaining-balance check.

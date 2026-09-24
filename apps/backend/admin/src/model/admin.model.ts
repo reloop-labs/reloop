@@ -261,6 +261,10 @@ export namespace AdminModel {
 				status: t.String(),
 				systemVerified: t.Boolean(),
 				createdAt: t.Date(),
+				ageDays: t.Number(),
+				dailyCap: t.Union([t.Number(), t.Null()]),
+				sentToday: t.Number(),
+				remaining: t.Union([t.Number(), t.Null()]),
 			}),
 		),
 		apiKeys: t.Array(

@@ -1,6 +1,11 @@
 import { writeAdminAudit } from "@reloop/admin/utils/audit";
 import { db } from "@reloop/db/client";
 import {
+	getDomainAgeDays,
+	getDomainInitialDailyCap,
+} from "@reloop/db/domain-age-cap";
+import { utcDayStart } from "@reloop/db/reserve-send-credits";
+import {
 	adminAuditLog,
 	apikey,
 	domain,
@@ -433,6 +438,32 @@ export async function getOrganizationController(organizationId: string) {
 		},
 	};
 
+	// ── Per-domain warmup / daily cap (all plans) ─────────────────────────
+	const dayStart = utcDayStart(new Date());
+	const domainIds = domains.map((d) => d.id);
+	const sentByDomainRows =
+		domainIds.length === 0
+			? []
+			: await db
+					.select({ domainId: emailLog.domainId, value: count() })
+					.from(emailLog)
+					.where(and(inArray(emailLog.domainId, domainIds), gte(emailLog.createdAt, dayStart)))
+					.groupBy(emailLog.domainId);
+	const sentByDomain = new Map(sentByDomainRows.map((r) => [r.domainId, r.value]));
+	const enrichedDomains = domains.map((d) => {
+		const ageDays = getDomainAgeDays(d.createdAt, new Date());
+		const dailyCap = getDomainInitialDailyCap(ageDays);
+		const sentTodayForDomain = sentByDomain.get(d.id) ?? 0;
+		const remaining = dailyCap === null ? null : Math.max(0, dailyCap - sentTodayForDomain);
+		return {
+			...d,
+			ageDays,
+			dailyCap,
+			sentToday: sentTodayForDomain,
+			remaining,
+		};
+	});
+
 	return {
 		id: org.id,
 		name: org.name,
@@ -490,7 +521,7 @@ export async function getOrganizationController(organizationId: string) {
 			userRole: m.userRole,
 			createdAt: m.createdAt,
 		})),
-		domains,
+		domains: enrichedDomains,
 		apiKeys: apiKeys.map((k) => ({
 			id: k.id,
 			name: k.name ?? null,

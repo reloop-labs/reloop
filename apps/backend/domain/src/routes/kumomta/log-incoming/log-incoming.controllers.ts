@@ -7,6 +7,7 @@ import {
 	refundSendCredits,
 	reserveSendCredits,
 } from "@reloop/db/reserve-send-credits";
+import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { domain, emailLog, organizationPlan } from "@reloop/db/schema";
 import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
@@ -92,6 +93,7 @@ export async function logIncomingController({
 			domain: true,
 			systemVerified: true,
 			tls: true,
+			createdAt: true,
 		},
 	});
 
@@ -202,6 +204,22 @@ export async function logIncomingController({
 	}
 
 	const recipientCount = toEmails.length;
+
+	// ── Domain-age initial daily cap (all packages) ───────────────────────
+	const ageCheck = await checkDomainAgeDailyCap({
+		domain: { id: domainRecord.id, createdAt: domainRecord.createdAt },
+		recipientCount,
+	});
+	if (!ageCheck.allowed && ageCheck.cap !== null) {
+		throw KumoMtaErrors.domainAgeDailyCapExceeded({
+			domainName: body.domainName,
+			ageDays: ageCheck.ageDays,
+			cap: ageCheck.cap,
+			sentToday: ageCheck.sentToday,
+			required: recipientCount,
+		});
+	}
+
 	const decision = await reserveSendCredits({
 		organizationId: finalOrgId,
 		recipientCount,
