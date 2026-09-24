@@ -1,9 +1,10 @@
-import { useState } from "react";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useState } from "react";
 import type { DomainResponse } from "#/features/domain/types";
 import { getVerificationFailedMessage } from "#/features/domain/utils";
+import { useUIStore } from "#/store/use-ui-store";
 import { StatusTimeline, StatusTimelineSkeleton } from "./status-timeline";
 
 export const DomainEvents = ({
@@ -20,7 +21,12 @@ export const DomainEvents = ({
 		domain?.ageDays != null
 			? domain.ageDays
 			: domain
-				? Math.max(0, Math.floor((Date.now() - new Date(domain.createdAt).getTime()) / 86400000))
+				? Math.max(
+						0,
+						Math.floor(
+							(Date.now() - new Date(domain.createdAt).getTime()) / 86400000,
+						),
+					)
 				: 0;
 	const getCap = (age: number): number | null => {
 		if (age <= 1) return 20;
@@ -30,16 +36,20 @@ export const DomainEvents = ({
 		if (age <= 30) return 500;
 		return null;
 	};
-	const dailyCap = domain?.dailyCap !== undefined ? domain.dailyCap : getCap(ageDays);
+	const dailyCap =
+		domain?.dailyCap !== undefined ? domain.dailyCap : getCap(ageDays);
 	const nextCap = (() => {
 		if (ageDays <= 1) return { cap: 50, inDays: 2 - ageDays };
 		if (ageDays <= 3) return { cap: 100, inDays: 4 - ageDays };
 		if (ageDays <= 7) return { cap: 250, inDays: 8 - ageDays };
 		if (ageDays <= 14) return { cap: 500, inDays: 15 - ageDays };
-		if (ageDays <= 30) return { cap: null, label: "Dynamic" as const, inDays: 31 - ageDays };
+		if (ageDays <= 30)
+			return { cap: null, label: "Dynamic" as const, inDays: 31 - ageDays };
 		return null;
 	})();
-	const registrarCreatedAt = domain?.registrarCreatedAt ? new Date(domain.registrarCreatedAt) : null;
+	const registrarCreatedAt = domain?.registrarCreatedAt
+		? new Date(domain.registrarCreatedAt)
+		: null;
 
 	const bannerMessage = () => {
 		if (!domain) return "";
@@ -109,45 +119,96 @@ export const DomainEvents = ({
 							type="button"
 							onClick={() => setExpanded((v) => !v)}
 							aria-expanded={expanded}
-							aria-label={expanded ? "Hide sending limits" : "Show sending limits"}
+							aria-label={
+								expanded ? "Hide sending limits" : "Show sending limits"
+							}
 							className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60"
 						>
 							<Icon
 								name="chevron-down"
-								className={cn("size-3.5 transition-transform duration-200", expanded && "rotate-180")}
+								className={cn(
+									"size-3.5 transition-transform duration-200",
+									expanded && "rotate-180",
+								)}
 							/>
 						</button>
 					)}
 				</div>
 
 				{expanded && domain?.status === "active" && dailyCap !== null && (
-					<div className="mt-3 border-t border-success-base/15 pl-6 pt-3 dark:border-success-base/20">
-						<p className="text-[12px] leading-relaxed text-text-strong-950 dark:text-white">
-							Your domain is <span className="font-semibold">{ageDays} day{ageDays === 1 ? "" : "s"} old</span>{" "}
+					<div className="mt-3 border-success-base/15 border-t pt-3 pl-6 dark:border-success-base/20">
+						
+						<p className="text-[12px] text-text-strong-950 leading-relaxed dark:text-white">
+							Your domain is{" "}
+							<span className="font-semibold">
+								{ageDays} day{ageDays === 1 ? "" : "s"} old
+							</span>{" "}
 							{registrarCreatedAt ? (
 								<span>
-									(registered {registrarCreatedAt.toLocaleDateString()} via registrar, RDAP
+									(registered {registrarCreatedAt.toLocaleDateString()} via
+									registrar, RDAP
 									{ageDays > 30 ? ` — ${Math.floor(ageDays / 30)} months` : ""})
 								</span>
 							) : (
-								<span>(added {new Date(domain.createdAt).toLocaleDateString()})</span>
-							)}{" "}
-							— you can send up to{" "}
-							<span className="font-semibold">{dailyCap === null ? "as many as your plan allows (reputation-based)" : `${dailyCap.toLocaleString()} emails today`}</span>
-							{dailyCap !== null && ` (resets at 00:00 UTC${domain.sentToday != null ? ` · ${domain.sentToday}/${dailyCap} sent today` : ""})`}.
+								<span>
+									(added {new Date(domain.createdAt).toLocaleDateString()})
+								</span>
+							)}
+							, you can send up to{" "}
+							<span className="font-semibold">
+								{dailyCap === null
+									? "as many as your plan allows (reputation-based)"
+									: `${dailyCap.toLocaleString()} emails today`}
+							</span>
+							{dailyCap !== null &&
+								` (resets at 00:00 UTC${domain.sentToday != null ? ` · ${domain.sentToday}/${dailyCap} sent today` : ""})`}
+							.
 						</p>
 						{nextCap && dailyCap !== null && (
-							<p className="mt-1 text-[12px] leading-relaxed text-text-sub-600 dark:text-white/60">
-								Next increase: {nextCap.cap === null ? "unlimited (reputation-based)" : `${nextCap.cap.toLocaleString()}/day`} in {nextCap.inDays} day{nextCap.inDays === 1 ? "" : "s"} — no action needed, it rises automatically.
+							<p className="mt-1 text-[12px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								Next increase:{" "}
+								{nextCap.cap === null
+									? "unlimited (reputation-based)"
+									: `${nextCap.cap.toLocaleString()}/day`}{" "}
+								in {nextCap.inDays} day{nextCap.inDays === 1 ? "" : "s"} — no
+								action needed, it rises automatically.
 							</p>
 						)}
 						{dailyCap === null && (
-							<p className="mt-1 text-[12px] leading-relaxed text-text-sub-600 dark:text-white/60">
-								Warmup complete — your plan limit now applies (Free 100/day). Keep bounce/complaint low to stay dynamic.
+							<p className="mt-1 text-[12px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								Warmup complete. your plan limit now applies (Free 100/day).
+								Keep bounce/complaint low to stay dynamic.
 							</p>
 						)}
+						<p className="mt-2 text-[11px] text-text-sub-600 leading-relaxed dark:text-white/50">
+							New domains are throttled on all plans to protect your reputation
+							and prevent abuse, sending is temporarily paused when you reach
+							the daily cap and resumes at 00:00 UTC. You’ll see “Daily limit
+							reached” in your email logs.
+						</p>
 						<p className="mt-2 text-[11px] leading-relaxed text-text-sub-600 dark:text-white/50">
-							New domains are throttled for all plans to protect reputation. If you hit the limit you’ll get a 429 and can try again tomorrow.
+							Need to send more than your current cap?{" "}
+							<a
+								href={`mailto:support@reloop.sh?subject=${encodeURIComponent(`Request to increase daily cap for ${domain.domain}`)}&body=${encodeURIComponent(`Hi Reloop team,\n\nI'd like to request a higher daily limit for ${domain.domain} (age: ${ageDays} days, current cap: ${dailyCap ?? "Dynamic"} emails/day${domain.sentToday != null && dailyCap !== null ? `, sent today: ${domain.sentToday}/${dailyCap}` : ""}).\n\nReason / use case:\n[please describe]\n\nThanks!`)}`}
+								className="font-medium text-primary-base underline decoration-primary-base/30 underline-offset-2 hover:text-primary-base/80"
+							>
+								Contact us via email
+							</a>{" "}
+							or{" "}
+							<button
+								type="button"
+								onClick={() => {
+									const msg = `Hi team, please increase my daily cap for ${domain.domain} (age ${ageDays}d, cap ${dailyCap ?? "Dynamic"}). Reason: `;
+									const { setPendingSupportMessage, setAiPanelActiveTab, setIsAiPanelOpen } = useUIStore.getState();
+									setPendingSupportMessage(msg);
+									setAiPanelActiveTab("support");
+									setIsAiPanelOpen(true);
+								}}
+								className="font-medium text-primary-base underline decoration-primary-base/30 underline-offset-2 hover:text-primary-base/80"
+							>
+								chat support
+							</button>{" "}
+							— message is prefilled, just send.
 						</p>
 					</div>
 				)}
