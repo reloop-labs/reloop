@@ -104,7 +104,7 @@ export const DomainEvents = ({
 					<p className="flex-1 font-medium text-paragraph-sm text-text-strong-950">
 						{bannerMessage()}
 					</p>
-					{domain?.status === "active" && (
+					{domain?.status === "active" && dailyCap !== null && (
 						<button
 							type="button"
 							onClick={() => setExpanded((v) => !v)}
@@ -120,8 +120,8 @@ export const DomainEvents = ({
 					)}
 				</div>
 
-				{expanded && domain?.status === "active" && (
-					<div className="mt-3 border-t border-success-base/15 pt-3 dark:border-success-base/20">
+				{expanded && domain?.status === "active" && dailyCap !== null && (
+					<div className="mt-3 border-t border-success-base/15 pl-6 pt-3 dark:border-success-base/20">
 						<p className="text-[12px] leading-relaxed text-text-strong-950 dark:text-white">
 							Your domain is <span className="font-semibold">{ageDays} day{ageDays === 1 ? "" : "s"} old</span>{" "}
 							{registrarCreatedAt ? (
