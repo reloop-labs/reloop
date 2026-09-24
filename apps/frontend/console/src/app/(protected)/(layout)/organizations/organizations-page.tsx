@@ -7,12 +7,14 @@ import {
 	PageHeading,
 } from "@fe/console/components/ui/page-frame";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
+import { TablePagination } from "@fe/console/components/ui/table-pagination";
 import { adminGet, adminPatch } from "@fe/console/lib/admin-api";
 import { formatNumber, formatRelativeTime } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
+import { Search, X } from "lucide-react";
 import Link from "next/link";
-import { parseAsString, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -37,6 +39,11 @@ export default function OrganizationsPage() {
 		"status",
 		parseAsString.withDefault(""),
 	);
+	const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+	const [limit, setLimit] = useQueryState(
+		"limit",
+		parseAsInteger.withDefault(50),
+	);
 	const [draftQ, setDraftQ] = useState(q);
 	const [suspendTarget, setSuspendTarget] = useState<OrgItem | null>(null);
 
@@ -44,15 +51,25 @@ export default function OrganizationsPage() {
 		setDraftQ(q);
 	}, [q]);
 
+	const offset = Math.max(0, (page - 1) * limit);
+
 	const { data, isLoading, mutate } = useSWR<OrgsResponse>(
-		["/organizations", q, status],
+		["/organizations", q, status, page, limit],
 		() =>
 			adminGet<OrgsResponse>("/organizations", {
 				q: q || undefined,
 				status: status || undefined,
-				limit: 50,
+				limit,
+				offset,
 			}),
 	);
+
+	useEffect(() => {
+		if (data?.total) {
+			const totalPages = Math.ceil(data.total / limit);
+			if (page > totalPages && totalPages > 0) setPage(totalPages);
+		}
+	}, [data?.total, limit, page, setPage]);
 
 	return (
 		<PageFrame>
@@ -66,25 +83,44 @@ export default function OrganizationsPage() {
 				}
 				actions={
 					<form
-						className="flex flex-wrap gap-2"
+						className="flex flex-wrap items-center gap-2"
 						onSubmit={(e) => {
 							e.preventDefault();
+							setPage(1);
 							setQ(draftQ.trim() || null);
 						}}
 					>
-						<Input.Root className="w-56">
+						<Input.Root className="w-56 sm:w-64">
 							<Input.Wrapper>
+								<Input.Icon as={Search} className="size-4 text-text-soft-400" />
 								<Input.Input
 									placeholder="Search name or slug"
 									value={draftQ}
 									onChange={(e) => setDraftQ(e.target.value)}
 								/>
+								{draftQ ? (
+									<button
+										type="button"
+										onClick={() => {
+											setDraftQ("");
+											setQ(null);
+											setPage(1);
+										}}
+										className="text-text-soft-400 transition-colors hover:text-text-strong-950"
+										title="Clear search"
+									>
+										<X className="size-3.5" />
+									</button>
+								) : null}
 							</Input.Wrapper>
 						</Input.Root>
 						<select
-							className="h-10 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 text-[13px] dark:bg-transparent"
+							className="h-10 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 font-medium text-[12px] text-text-sub-600 outline-none transition-colors hover:border-stroke-sub-300 dark:border-white/10 dark:bg-transparent"
 							value={status}
-							onChange={(e) => setStatus(e.target.value || null)}
+							onChange={(e) => {
+								setStatus(e.target.value || null);
+								setPage(1);
+							}}
 						>
 							<option value="">All statuses</option>
 							<option value="active">Active</option>
@@ -162,7 +198,12 @@ export default function OrganizationsPage() {
 								{formatNumber(org.creditsRemaining)}
 							</td>
 							<td className="px-4 py-3 text-text-sub-600">
-								{formatRelativeTime(org.createdAt)}
+								<span
+									className="text-[12px] text-text-sub-600 tabular-nums"
+									title={org.createdAt}
+								>
+									{formatRelativeTime(org.createdAt)}
+								</span>
 							</td>
 							<td className="px-4 py-3">
 								<div className="flex flex-wrap gap-1.5">
@@ -209,6 +250,20 @@ export default function OrganizationsPage() {
 						</tr>
 					))}
 				</DataTable>
+
+				<TablePagination
+					total={data?.total ?? 0}
+					page={page}
+					limit={limit}
+					isLoading={isLoading}
+					itemName="organizations"
+					pageSizeOptions={[20, 50, 100]}
+					onPageChange={(nextPage) => setPage(nextPage)}
+					onLimitChange={(nextLimit) => {
+						setLimit(nextLimit);
+						setPage(1);
+					}}
+				/>
 			</div>
 		</PageFrame>
 	);
