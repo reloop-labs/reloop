@@ -854,7 +854,7 @@ export const EmailDetail = ({
 						className={cn(
 							"mb-10",
 							activeTab === "preview" &&
-								"overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50",
+								"overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100",
 						)}
 					>
 						{isLoading ? (
@@ -864,7 +864,7 @@ export const EmailDetail = ({
 						) : (
 							<>
 								<TabMenu.Content value="preview">
-									<div className="bg-white p-6 dark:bg-neutral-950">
+									<div className="bg-white p-6 dark:bg-transparent">
 										{email?.htmlBody && (
 											<EmailHtmlPreview html={email.htmlBody} />
 										)}

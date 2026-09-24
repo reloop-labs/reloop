@@ -241,13 +241,13 @@ export function CampaignPreviewTabs({
 					className={cn(
 						"mb-10",
 						activeTab === "preview" &&
-							"overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50",
+							"overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100",
 					)}
 				>
 					<TabMenu.Content value="preview">
-						<div className="bg-white dark:bg-neutral-950">
+						<div className="bg-white dark:bg-transparent">
 							{/* Delivery Info - Email Header Style */}
-							<div className="divide-y divide-stroke-soft-100 border-stroke-soft-100 border-b dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
+							<div className="divide-y divide-stroke-soft-100 border-stroke-soft-100 border-b dark:divide-stroke-soft-100 dark:border-stroke-soft-100">
 								<div className="flex items-start gap-4 px-6 py-3.5">
 									<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 										From

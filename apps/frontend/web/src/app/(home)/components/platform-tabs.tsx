@@ -108,8 +108,8 @@ const TAB_SCREENSHOT: Record<PlatformTabId, { src: string; darkSrc: string }> =
 			darkSrc: "/platform/domain-dark.png",
 		},
 		agents: {
-			src: "/platform/domain-light.png",
-			darkSrc: "/platform/domain-dark.png",
+			src: "/platform/agent-inbox-light.png",
+			darkSrc: "/platform/agent-inbox-dark.png",
 		},
 		workflows: {
 			src: "/platform/domain-light.png",
