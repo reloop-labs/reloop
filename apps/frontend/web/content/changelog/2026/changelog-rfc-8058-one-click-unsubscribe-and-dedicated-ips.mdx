@@ -1,0 +1,31 @@
+---
+slug: rfc-8058-one-click-unsubscribe-and-dedicated-ips
+version: 0.60.0
+date: September 2026
+launchDate: 16 September 2026
+title: 'RFC 8058 One-Click Unsubscribe & Dedicated IP Management'
+description: >-
+  Implemented RFC 8058 one-click unsubscribe compliance, dedicated sending IP pools with automated mailbox warmup schedules, tabular contact history, and abuse monitoring.
+tags:
+  - Deliverability
+  - Backend
+  - Compliance
+  - Feature
+---
+### DELIVERABILITY & COMPLIANCE
+
+- **RFC 8058 one-click unsubscribe.** Added standard `List-Unsubscribe` and `List-Unsubscribe-Post` headers with signed preference tokens.
+- **Dedicated IP management & warmup.** Added sending IP pool management with provider-specific daily warmup schedules (Google, Yahoo, Microsoft).
+- **Over-quota bounce policy.** Added `mailbox_full` suppression handling and KumoMTA bounce rewrite rules for full recipient inboxes.
+- **Origin resolution & abuse alerts.** Resolved sender origins in email logs and integrated automated Slack alerts for suspicious sending spikes.
+
+### CONTACTS & AUDIENCES
+
+- **Tabular contact history.** Overhauled contact view with grid layouts, activity filtering (sent, opened, clicked, bounced), and 3D status badges.
+- **Asynchronous CSV contact export.** Enabled large contact list CSV exports backed by S3 with 202 Accepted status responses.
+- **Contact group detail views.** Added dedicated group detail views with custom property management and navigation shortcuts.
+
+### SECURITY & CORE
+
+- **Log sanitization.** Enforced strict log filtering to ensure OTP codes and DKIM private keys are never written to disk or logs.
+- **Configurable DNS resolvers.** Allowed custom DNS resolver injection to eliminate timeout bottlenecks during high-throughput validation.

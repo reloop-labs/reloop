@@ -1,0 +1,32 @@
+---
+slug: agent-inbox-compose-and-kumomta-tls
+version: 0.57.0
+date: August 2026
+launchDate: 25 August 2026
+title: 'Agent Inbox Compose Experience & Automated KumoMTA TLS'
+description: >-
+  Enhanced AI email composing with live tone selection and undo-send countdowns, unified mailbox routing, automated KumoMTA Let's Encrypt TLS certificates, and the launch of the backend deliverability test suite.
+tags:
+  - Inbox
+  - Infrastructure
+  - Frontend
+  - Security
+---
+### AGENT INBOX & COMPOSE
+
+- **Undo send countdown.** Added `EmailSentToast` with configurable delay timer and animated navigation to sent logs.
+- **AI prompt popover & subject generator.** Context-aware AI prompt assistant with tone selection and heuristic subject line cleaning.
+- **Centralized folder routing.** Migrated mailbox routing to URL search parameters (`?folder=...`) for instant, cache-friendly view switching.
+- **Redesigned mailbox rail.** Streamlined mailbox rail layout with modal-based creation flow and copy mailbox address shortcut.
+- **Onboarding keyboard shortcuts.** Added animated progress badges and verification shortcuts to the setup banner.
+
+### INFRASTRUCTURE & SECURITY
+
+- **Automated KumoMTA TLS.** Automated Let's Encrypt TLS certificate provisioning with Traefik integration and multi-path ACME discovery.
+- **Outbound domain TLS mode.** Enforced domain-specific TLS cipher requirements for outbound SMTP transport.
+- **Production SMTP verification.** Added automated test scripts (`test-smtp-prod.ts`) to validate relay handshakes.
+
+### DELIVERABILITY TEST ENGINE
+
+- **Backend deliverability test suite.** Sub-addressing receiver architecture with DNSBL verification and S3 attachment retrieval.
+- **LoadingDot matrix animations.** Smooth micro-UI feedback animations for long-running asynchronous test operations.

@@ -211,6 +211,7 @@ export namespace AdminModel {
 			apiKeys: t.Number(),
 			templates: t.Number(),
 			webhooks: t.Number(),
+			mailboxes: t.Number(),
 			emails: t.Number(),
 			supportThreads: t.Number(),
 		}),

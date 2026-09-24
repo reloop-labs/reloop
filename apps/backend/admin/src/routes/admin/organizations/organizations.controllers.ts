@@ -5,6 +5,7 @@ import {
 	apikey,
 	domain,
 	emailLog,
+	mailbox,
 	member,
 	organization,
 	organizationCredits,
@@ -221,6 +222,7 @@ export async function getOrganizationController(organizationId: string) {
 		[apiKeyCount],
 		[templateCount],
 		[webhookCount],
+		[mailboxCount],
 		[emailTotal],
 		sentToday,
 		failedToday,
@@ -386,6 +388,7 @@ export async function getOrganizationController(organizationId: string) {
 			.select({ value: count() })
 			.from(webhook)
 			.where(eq(webhook.organizationId, organizationId)),
+		db.select({ value: count() }).from(mailbox).where(eq(mailbox.organizationId, organizationId)),
 		db
 			.select({ value: count() })
 			.from(emailLog)
@@ -432,6 +435,7 @@ export async function getOrganizationController(organizationId: string) {
 			apiKeys: apiKeyCount?.value ?? 0,
 			templates: templateCount?.value ?? 0,
 			webhooks: webhookCount?.value ?? 0,
+			mailboxes: mailboxCount?.value ?? 0,
 			emails: emailTotal?.value ?? 0,
 			supportThreads: supportThreads.length,
 		},

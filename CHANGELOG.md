@@ -6,6 +6,146 @@ This file follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) conve
 
 ---
 
+## [0.62.0] — 24 September 2026
+
+**DNSBL Fingerprinting, BIMI Dynamic Connectors & Domain Timeline**
+
+Integrated deep DNSBL and MX infrastructure fingerprinting for disposable email detection, dynamic SVG connector lines for BIMI records, domain verification status timelines, and the shared @reloop/dns-verification package.
+
+### Security
+- Multi-vector disposable detection combining real-time DNSBL lookups with MX infrastructure fingerprinting.
+- Automatic invalidation of recipient addresses missing MX mail server records.
+- Daily automated synchronization workflows against upstream disposable email catalogs.
+
+### Frontend
+- Redesigned domain detail view with interactive milestone verification timeline, hover timestamps, and DNS provider links.
+- Dynamic SVG connector lines linking BIMI DNS record pills with status indicators.
+- Inline authentication error alerts for suspended accounts across login, signup, and OTP verification flows.
+- Refined component borders and monochrome dark mode tokens across domain management views.
+
+### Backend
+- Extracted shared `@reloop/dns-verification` package for unified DNS and email authentication checks.
+- Direct email attachment download endpoints and plan-based attachment size gating.
+
+---
+
+## [0.61.0] — 21 September 2026
+
+**Temporary Email Checker, Waste Calculator & Blueprint CAD Design**
+
+Launched the public Temp Email Checker with an interactive Waste Calculator, technical blueprint CAD artwork suite, single-source-of-truth pricing package, and comprehensive SEO improvements.
+
+### Tools
+- Public Temporary Email Checker with real-time scoring, clipboard paste triggers, and instant REST API integration snippets.
+- Interactive Waste Calculator estimating monthly and yearly budget lost to fake and disposable email signups.
+- Refreshed Email Validator tool with keyboard shortcuts, avatar gradients, and detailed MX record inspection.
+
+### Design
+- Technical SVG blueprint artwork suite with squircles and CAD intersection ticks (TempEmailTimerArt, BimiBlueprintArt, ValidatorArt).
+- Clean monochrome dark theme across tools interface with high-contrast badge indicators.
+- Custom gradient footer wordmark and blueprint section frames with Inter typography.
+
+### Infrastructure & SEO
+- Extracted all pricing schemas, tiers, and limits into single-source-of-truth `@reloop/pricing` with CI drift enforcement.
+- Fixed SMTP relay corruption of MIME boundaries that end with `=` character.
+- Supported running the self-hosted installer behind existing reverse proxies (Caddy, Traefik, Nginx).
+- Site-wide SEO audit with canonical URLs, structured JSON-LD schemas, automated sitemaps, and OpenGraph preview cards.
+- Increased free plan custom domain limit from 1 to 3 domains.
+
+---
+
+## [0.60.0] — 16 September 2026
+
+**RFC 8058 One-Click Unsubscribe & Dedicated IP Management**
+
+Implemented RFC 8058 one-click unsubscribe compliance, dedicated sending IP pools with automated mailbox warmup schedules, tabular contact history, and abuse monitoring.
+
+### Deliverability
+- Standard RFC 8058 one-click unsubscribe headers (`List-Unsubscribe` / `List-Unsubscribe-Post`) and signed preference tokens.
+- Dedicated sending IP pool management with mailbox provider-specific warmup schedules (Google, Yahoo, Microsoft).
+- Over-quota bounce handling with `mailbox_full` suppression rules and KumoMTA bounce rewrite policies.
+- Outbound sender origin resolution in email logs and automated Slack alert notifications for suspicious traffic spikes.
+
+### Backend
+- Overhauled contact history view with tabular grid layouts, activity filtering (sent, opened, clicked, bounced), and 3D status badges.
+- Large contact list CSV exports backed by asynchronous S3 storage with 202 Accepted status responses.
+- Dedicated contact group detail pages with custom property management and navigation shortcuts.
+- Strict log sanitization ensuring OTP codes and DKIM private keys are never persisted in logs.
+- Configurable verification DNS resolver injection to eliminate timeout bottlenecks during high-throughput validation.
+
+---
+
+## [0.59.0] — 9 September 2026
+
+**Polar Billing Integration, Pixel-Art Avatars & Editor Overlays**
+
+Shipped full Polar billing and subscription checkout workflows, deterministic 5x7 font glyph pixel-art avatars, interactive email editor overlays, and modernized pricing tables.
+
+### Billing
+- Polar billing integration: Complete checkout flows, subscription lifecycle management, dynamic usage tracking, and unified plan resolution.
+- Live email credit usage tracking against active plan allowances in organization settings.
+
+### Design
+- Custom 5x7 font glyph renderer embedding user initials into deterministic pixel-art avatars across the dashboard.
+- Redesigned pricing comparison matrix with sticky headers, plan column highlights, blueprint styling, and custom checkmark/cross SVGs.
+- Added `FooterPixelStrip`, `FooterBlast`, and dark-mode high contrast theme variables.
+
+### Frontend
+- Interactive email editor image overlays supporting inline image replacement, hyperlinking, and direct resizing.
+- Contextual floating text `BubbleMenu` powered by `@floating-ui/react-dom` with zero layout jitter.
+- Visual style override indicators with one-click reset to template defaults.
+- Updated homepage hero to "Email for React Developers" with interactive PixelBlast background styling.
+
+---
+
+## [0.58.0] — 2 September 2026
+
+**Campaigns Creation Wizard, Public BIMI Checker & Editor V2**
+
+Introduced the multi-step Marketing Campaigns wizard, public BIMI and Domain Age verification tools, iframe-isolated email editing, and mobile navigation sheets.
+
+### Feature
+- Guided multi-step Campaign Creation Wizard covering Audience selection, Sender configuration, Content design, and Review.
+- Database persistence of campaign JSON editor document states with safe draft hydration and input sanitization.
+- Campaign status badges (`CampaignStatusBadge`) and header KPI summaries for draft and active campaigns.
+
+### Tools
+- Public BIMI Inspector verifying `default._bimi` records, DMARC alignment, and SVG Tiny PS logo specifications with multi-language SDK snippets.
+- Domain Age & Warmup Checker calculating domain registration age and sending readiness scores.
+- Upgraded Email Spam Words Scanner with expandable JSON responses and actionable copywriting suggestions.
+
+### Frontend
+- Scoped CSS rendering inside an isolated iframe for 100% email client preview fidelity.
+- Standardized editor inspector layout with flexible Lucide primitives, standardized row heights, and fixed control widths.
+- Added `MobileSidebarSheet` for smooth mobile dashboard navigation and redesigned user dropdown with expanded switcher.
+
+---
+
+## [0.57.0] — 25 August 2026
+
+**Agent Inbox Compose Experience & Automated KumoMTA TLS**
+
+Enhanced AI email composing with live tone selection and undo-send countdowns, unified mailbox routing, automated KumoMTA Let's Encrypt TLS certificates, and the launch of the backend deliverability test suite.
+
+### Inbox
+- Configurable undo-send delay timer (`EmailSentToast`) with smooth progress indicator and animated navigation to sent logs.
+- AI prompt popover with tone selection (professional, casual, assertive, friendly) and heuristic subject line generation.
+- Migrated mailbox routing to URL search parameters (`?folder=...`) for instant, cache-friendly view switching.
+- Redesigned mailbox rail with modal-based creation flow and copy mailbox address shortcut.
+- Interactive onboarding banner with keyboard shortcuts, setup progress tracking, and domain verification steps.
+
+### Infrastructure
+- Automated Let's Encrypt TLS certificate provisioning with Traefik integration and multi-path ACME discovery in KumoMTA.
+- Outbound SMTP transport domain TLS cipher mode enforcement.
+- Production SMTP verification script (`test-smtp-prod.ts`) to validate relay handshakes.
+
+### Deliverability
+- Initial backend deliverability test suite with sub-addressing receiver architecture and S3 attachment retrieval.
+- Backend DNSBL lookup infrastructure with TXT record support and DNS query timeout handling.
+- Added `LoadingDot` matrix animations for asynchronous test operations.
+
+---
+
 ## [0.56.0] — 19 August 2026
 
 **Minimal Shipping Log UI & Homepage Refresh**

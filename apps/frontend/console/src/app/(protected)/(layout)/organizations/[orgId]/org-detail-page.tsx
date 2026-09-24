@@ -28,6 +28,8 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import useSWR from "swr";
+import { OrgSendingIps } from "./org-sending-ips";
 
 const PLAN_LABEL: Record<string, string> = {
 	free: "Free",
@@ -38,8 +40,6 @@ const PLAN_LABEL: Record<string, string> = {
 function planLabel(planId?: string | null): string {
 	return PLAN_LABEL[planId ?? "free"] ?? planId ?? "Free";
 }
-import useSWR from "swr";
-import { OrgSendingIps } from "./org-sending-ips";
 
 type OrgDetail = {
 	id: string;
@@ -58,6 +58,7 @@ type OrgDetail = {
 		apiKeys: number;
 		templates: number;
 		webhooks: number;
+		mailboxes: number;
 		emails: number;
 		supportThreads: number;
 	};
@@ -581,7 +582,12 @@ export default function OrganizationDetailPage() {
 					</SectionCard>
 
 					<SectionCard
-						title="Credits"
+						title="Plan usage"
+						description={
+							data.plan
+								? `${planLabel(data.plan.planId)} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
+								: "Free · 3,000/mo"
+						}
 						action={
 							<button
 								type="button"
@@ -593,29 +599,78 @@ export default function OrganizationDetailPage() {
 						}
 					>
 						{data.credits ? (
-							<div className="grid grid-cols-3 gap-3 p-4">
-								<div>
-									<p className="text-[11px] text-text-sub-600">Remaining</p>
-									<p className="mt-1 font-semibold text-[20px] tabular-nums">
-										{formatNumber(data.credits.creditsRemaining)}
-									</p>
+							<div>
+								<div className="grid grid-cols-3 gap-3 p-4">
+									<div>
+										<p className="text-[11px] text-text-sub-600">Remaining</p>
+										<p className="mt-1 font-semibold text-[20px] tabular-nums">
+											{formatNumber(data.credits.creditsRemaining)}
+										</p>
+									</div>
+									<div>
+										<p className="text-[11px] text-text-sub-600">Used</p>
+										<p className="mt-1 font-semibold text-[20px] tabular-nums">
+											{formatNumber(data.credits.creditsUsed)}
+										</p>
+									</div>
+									<div>
+										<p className="text-[11px] text-text-sub-600">Monthly</p>
+										<p className="mt-1 font-semibold text-[20px] tabular-nums">
+											{formatNumber(data.credits.monthlyCredits)}
+										</p>
+									</div>
+									<div className="col-span-3 text-[12px] text-text-sub-600">
+										Period {formatDateTime(data.credits.currentPeriodStart)} →{" "}
+										{formatDateTime(data.credits.currentPeriodEnd)} · status{" "}
+										{data.credits.status}
+									</div>
 								</div>
-								<div>
-									<p className="text-[11px] text-text-sub-600">Used</p>
-									<p className="mt-1 font-semibold text-[20px] tabular-nums">
-										{formatNumber(data.credits.creditsUsed)}
-									</p>
-								</div>
-								<div>
-									<p className="text-[11px] text-text-sub-600">Monthly</p>
-									<p className="mt-1 font-semibold text-[20px] tabular-nums">
-										{formatNumber(data.credits.monthlyCredits)}
-									</p>
-								</div>
-								<div className="col-span-3 text-[12px] text-text-sub-600">
-									Period {formatDateTime(data.credits.currentPeriodStart)} →{" "}
-									{formatDateTime(data.credits.currentPeriodEnd)} · status{" "}
-									{data.credits.status}
+								<div className="divide-y divide-stroke-soft-100 border-t border-stroke-soft-100 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
+									{[
+										{
+											label: "Custom domains",
+											used: data.domains.length,
+											limit: data.plan?.maxCustomDomains ?? 3,
+										},
+										{
+											label: "Webhooks",
+											used: data.webhooks.length,
+											limit: data.plan?.maxWebhooks ?? 1,
+										},
+										{
+											label: "Agent inboxes",
+											used: data.counts.mailboxes,
+											limit: data.plan?.maxAgentInboxes ?? 1,
+										},
+									].map((row) => {
+										const remaining = Math.max(0, row.limit - row.used);
+										const pct = row.limit > 0 ? Math.min(100, (row.used / row.limit) * 100) : 0;
+										const isAt = row.used >= row.limit;
+										return (
+											<div key={row.label} className="flex items-center gap-3 px-4 py-3">
+												<div className="min-w-0 flex-1">
+													<div className="flex items-baseline justify-between gap-2">
+														<p className="text-[12px] font-medium text-text-strong-950">{row.label}</p>
+														<p className="text-[12px] tabular-nums text-text-sub-600">
+															{row.used} / {row.limit} <span className={isAt ? "text-orange-600" : ""}>· {remaining} remaining</span>
+														</p>
+													</div>
+													<div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/[0.06]">
+														<div
+															className={`h-full rounded-full ${isAt ? "bg-orange-500" : "bg-text-strong-950 dark:bg-white"}`}
+															style={{ width: `${pct}%` }}
+														/>
+													</div>
+												</div>
+											</div>
+										);
+									})}
+									<div className="flex items-center justify-between gap-3 px-4 py-3 text-[12px]">
+										<span className="text-text-sub-600">Attachment limit</span>
+										<span className="font-medium tabular-nums text-text-strong-950">
+											{data.plan ? `${(data.plan.maxAttachmentBytes / (1024 * 1024)).toFixed(0)} MB` : "1 MB"}
+										</span>
+									</div>
 								</div>
 							</div>
 						) : (

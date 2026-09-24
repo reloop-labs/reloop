@@ -1,0 +1,31 @@
+---
+slug: dnsbl-fingerprinting-and-domain-timeline
+version: 0.62.0
+date: September 2026
+launchDate: 24 September 2026
+title: 'DNSBL Fingerprinting, BIMI Dynamic Connectors & Domain Timeline'
+description: >-
+  Integrated deep DNSBL and MX infrastructure fingerprinting for disposable email detection, dynamic SVG connector lines for BIMI records, domain verification status timelines, and the shared @reloop/dns-verification package.
+tags:
+  - Security
+  - Deliverability
+  - Frontend
+  - Tools
+---
+### SECURITY & DELIVERABILITY
+
+- **Multi-vector disposable detection.** Combined real-time DNSBL lookups with MX infrastructure fingerprinting to detect catch-all and temporary mail forwarding domains.
+- **Automatic missing MX invalidation.** Flagged addresses with missing or misconfigured MX records as invalid directly in the checker pipeline.
+- **Daily disposable upstream sync.** Automated daily synchronization workflows against upstream disposable email catalogs.
+
+### FRONTEND & DASHBOARD
+
+- **Interactive domain status timeline.** Redesigned domain detail view with milestone verification history, hover timestamps, and DNS provider lookup links.
+- **BIMI dynamic SVG connectors.** Connected BIMI DNS record pills with interactive SVG path lines and updated status pill badges.
+- **Suspended user auth alerts.** Handled suspended user authentication errors inline across login, signup, and OTP entry modals.
+- **Dark mode component refinement.** Refined border contrast tokens (`stroke-soft-100`) and hover states across domain management cards.
+
+### BACKEND & PACKAGES
+
+- **Shared DNS verification package.** Extracted core DNS resolution and DKIM/SPF/DMARC checks into `@reloop/dns-verification`.
+- **Attachment download & size gating.** Added direct email attachment downloading and plan-based attachment size quota enforcement.

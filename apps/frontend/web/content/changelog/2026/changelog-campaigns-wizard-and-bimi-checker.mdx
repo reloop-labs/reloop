@@ -1,0 +1,31 @@
+---
+slug: campaigns-wizard-and-bimi-checker
+version: 0.58.0
+date: September 2026
+launchDate: 2 September 2026
+title: 'Campaigns Creation Wizard, Public BIMI Checker & Editor V2'
+description: >-
+  Introduced the multi-step Marketing Campaigns wizard, public BIMI and Domain Age verification tools, iframe-isolated email editing, and mobile navigation sheets.
+tags:
+  - Feature
+  - Tools
+  - Frontend
+  - Design
+---
+### MARKETING CAMPAIGNS
+
+- **Multi-step campaign wizard.** Guided creation flow covering Audience selection, Sender configuration, Content design, and Review.
+- **State persistence & sanitization.** Database persistence of JSON editor document states with safe draft hydration.
+- **Campaign status indicators.** Added `CampaignStatusBadge` and header KPI summaries for draft and active campaigns.
+
+### PUBLIC TOOLS
+
+- **Public BIMI Inspector.** Comprehensive BIMI validator inspecting `default._bimi` records, DMARC alignment, and SVG Tiny PS logo specs.
+- **Domain Age & Warmup Checker.** Public tool calculating domain registration age and sending readiness scores.
+- **Spam words checker overhaul.** Upgraded scanner UI with expandable JSON responses and actionable copywriting suggestions.
+
+### EDITOR & FRONTEND
+
+- **Iframe template isolation.** Scoped CSS rendering inside an isolated iframe to guarantee 100% email client preview fidelity.
+- **Modular inspector panels.** Redesigned editor sidebar using flexible Lucide primitives, standardized row heights, and fixed control widths.
+- **Mobile navigation sheet.** Introduced `MobileSidebarSheet` for smooth mobile dashboard navigation and redesigned user dropdown.
