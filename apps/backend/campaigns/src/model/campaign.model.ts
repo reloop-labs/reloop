@@ -121,3 +121,9 @@ export const campaignRecipientSchema = t.Object({
 	uniqueClickCount: t.Optional(t.Number()),
 	updatedAt: t.Optional(t.String()),
 });
+
+export const campaignClickedLinkSchema = t.Object({
+	url: t.String(),
+	clickCount: t.Number(),
+	uniqueClickCount: t.Number(),
+});

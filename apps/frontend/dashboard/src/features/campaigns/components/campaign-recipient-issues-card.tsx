@@ -145,6 +145,7 @@ export function CampaignRecipientIssuesCard({
 
 	const counts = data?.counts;
 	const recipients = data?.recipients ?? [];
+	const links = data?.links ?? [];
 	const activeIndex = TABS.findIndex((tab) => tab.id === activeTab);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const currentTab = buttonRefs.current[currentIdx];
@@ -159,37 +160,39 @@ export function CampaignRecipientIssuesCard({
 				}
 			: null;
 
-	const canExport = recipients.length > 0;
+	const canExport =
+		activeTab === "clicked" ? links.length > 0 : recipients.length > 0;
 
 	const handleExportCsv = useCallback(() => {
-		if (!recipients.length) {
-			toast.info("No recipients to export");
+		const isClicks = activeTab === "clicked";
+		if (isClicks ? !links.length : !recipients.length) {
+			toast.info(isClicks ? "No links to export" : "No recipients to export");
 			return;
 		}
-		const isClicks = activeTab === "clicked";
 		const header = isClicks
-			? "Email,Clicks,Unique Clicks,Status,Contact Name\n"
+			? "URL,Total Clicks,Unique Clicks\n"
 			: "Email,Status,Category,Error,Contact Name\n";
-		const rows = recipients
-			.map((r) =>
-				(isClicks
-					? [
-							`"${r.email}"`,
-							`"${r.clickCount ?? 0}"`,
-							`"${r.uniqueClickCount ?? 0}"`,
-							`"${r.status || ""}"`,
-							`"${(r.contactName || "").replace(/"/g, '""')}"`,
-						]
-					: [
+		const rows = isClicks
+			? links
+					.map((l) =>
+						[
+							`"${l.url.replace(/"/g, '""')}"`,
+							`"${l.clickCount}"`,
+							`"${l.uniqueClickCount}"`,
+						].join(","),
+					)
+					.join("\n")
+			: recipients
+					.map((r) =>
+						[
 							`"${r.email}"`,
 							`"${r.status || ""}"`,
 							`"${r.category || activeTab}"`,
 							`"${(r.error || "").replace(/"/g, '""')}"`,
 							`"${(r.contactName || "").replace(/"/g, '""')}"`,
-						]
-				).join(","),
-			)
-			.join("\n");
+						].join(","),
+					)
+					.join("\n");
 		const blob = new Blob([header + rows], {
 			type: "text/csv;charset=utf-8;",
 		});
@@ -200,7 +203,7 @@ export function CampaignRecipientIssuesCard({
 		a.click();
 		URL.revokeObjectURL(url);
 		toast.success("CSV downloaded");
-	}, [activeTab, campaignId, recipients]);
+	}, [activeTab, campaignId, links, recipients]);
 
 	const refresh = useCallback(() => {
 		void refetch();
@@ -250,7 +253,7 @@ export function CampaignRecipientIssuesCard({
 					value={activeTab}
 					onValueChange={(val) => onActiveTabChange(val as CategoryTab)}
 				>
-					<TabMenu.List className="-mt-0.5 relative h-11 gap-0 border-b-0 py-0">
+					<TabMenu.List className="relative -mt-0.5 h-11 gap-0 border-b-0 py-0">
 						{TABS.map((tab, index) => {
 							const count = counts?.[tab.id];
 							return (
@@ -312,8 +315,12 @@ export function CampaignRecipientIssuesCard({
 							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
 								value={searchQuery}
-								placeholder="Search..."
-								aria-label="Search recipients"
+								placeholder={
+									activeTab === "clicked" ? "Search links..." : "Search..."
+								}
+								aria-label={
+									activeTab === "clicked" ? "Search links" : "Search recipients"
+								}
 								onChange={(e) => setSearchQuery(e.target.value)}
 							/>
 							{searchQuery ? (
@@ -494,6 +501,55 @@ export function CampaignRecipientIssuesCard({
 								</div>
 							))}
 						</div>
+					) : activeTab === "clicked" ? (
+						links.length > 0 ? (
+							<ul className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+								{links.map((link) => (
+									<li key={link.url}>
+										<a
+											href={link.url}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="group flex items-center justify-between gap-3 px-4 py-2.5 transition-colors hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.04]"
+										>
+											<div className="flex min-w-0 items-center gap-3">
+												<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-300">
+													<Icon name="link" className="h-3.5 w-3.5" />
+												</div>
+												<div className="min-w-0">
+													<span className="block truncate font-medium text-paragraph-sm text-text-strong-950 underline decoration-dotted underline-offset-2 group-hover:text-[#1868DF] dark:group-hover:text-blue-400">
+														{link.url}
+													</span>
+												</div>
+											</div>
+											<div className="flex shrink-0 items-center gap-2 text-paragraph-sm tabular-nums">
+												<span className="font-medium text-text-strong-950">
+													{formatClicks(link.clickCount)}
+												</span>
+												<span className="text-text-soft-400">
+													{link.uniqueClickCount.toLocaleString()} unique
+												</span>
+											</div>
+										</a>
+									</li>
+								))}
+							</ul>
+						) : (
+							<div className="flex flex-col items-center px-6 py-12 text-center">
+								<Icon
+									name={searchQuery ? "search" : "cursor-click"}
+									className="mb-4 h-8 w-8 text-text-sub-600"
+								/>
+								<p className="font-semibold text-text-strong-950 text-xl">
+									{searchQuery ? "No matching links" : "No clicks"}
+								</p>
+								<p className="mt-2 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
+									{searchQuery
+										? `No clicked links matching "${searchQuery}".`
+										: "No one has clicked a link in this campaign yet."}
+								</p>
+							</div>
+						)
 					) : recipients.length > 0 ? (
 						<ul className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
 							{recipients.map((recipient) => {
@@ -524,18 +580,7 @@ export function CampaignRecipientIssuesCard({
 													) : null}
 												</div>
 											</div>
-											{activeTab === "clicked" ? (
-												<div className="flex shrink-0 items-center gap-2 text-paragraph-sm tabular-nums">
-													<span className="font-medium text-text-strong-950">
-														{formatClicks(recipient.clickCount ?? 0)}
-													</span>
-													<span className="text-text-soft-400">
-														{(recipient.uniqueClickCount ?? 0).toLocaleString()}{" "}
-														unique
-													</span>
-												</div>
-											) : (recipient.category || activeTab) ===
-												"unsubscribed" ? (
+											{(recipient.category || activeTab) === "unsubscribed" ? (
 												<ContactStatusBadge
 													status="unsubscribed"
 													variant="light"
@@ -571,16 +616,12 @@ export function CampaignRecipientIssuesCard({
 								className="mb-4 h-8 w-8 text-text-sub-600"
 							/>
 							<p className="font-semibold text-text-strong-950 text-xl">
-								{activeTab === "clicked"
-									? "No clicks"
-									: `No ${activeTab} recipients`}
+								{`No ${activeTab} recipients`}
 							</p>
 							<p className="mt-2 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
 								{searchQuery
 									? `No recipients matching "${searchQuery}" in ${activeTab}.`
-									: activeTab === "clicked"
-										? "No one has clicked a link in this campaign yet."
-										: `There are currently no recipients recorded as ${activeTab} for this campaign.`}
+									: `There are currently no recipients recorded as ${activeTab} for this campaign.`}
 							</p>
 						</div>
 					)}

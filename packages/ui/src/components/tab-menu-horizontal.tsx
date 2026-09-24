@@ -59,7 +59,7 @@ const TabMenuHorizontalList = React.forwardRef<
 		<div
 			ref={listWrapperRef}
 			className={cn(
-				"relative grid overflow-x-auto overflow-y-hidden overscroll-contain",
+				"relative grid overflow-x-auto overflow-y-hidden overscroll-x-contain overscroll-y-auto",
 				wrapperClassName,
 			)}
 		>

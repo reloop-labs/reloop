@@ -143,8 +143,15 @@ export interface CampaignRecipient {
 	updatedAt?: string;
 }
 
+export interface CampaignClickedLink {
+	url: string;
+	clickCount: number;
+	uniqueClickCount: number;
+}
+
 export interface CampaignRecipientsResponse {
 	recipients: CampaignRecipient[];
+	links?: CampaignClickedLink[];
 	total: number;
 	page: number;
 	limit: number;

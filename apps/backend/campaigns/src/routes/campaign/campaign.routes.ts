@@ -1,6 +1,7 @@
 import { ErrorResponseSchema } from "@be/campaigns/error/campaign.error";
 import { authMiddleware } from "@be/campaigns/middleware/auth";
 import {
+	campaignClickedLinkSchema,
 	campaignListQuery,
 	campaignRecipientSchema,
 	campaignResponseSchema,
@@ -288,6 +289,7 @@ export const campaignRoutes = new Elysia({
 			response: {
 				200: t.Object({
 					recipients: t.Array(campaignRecipientSchema),
+					links: t.Optional(t.Array(campaignClickedLinkSchema)),
 					total: t.Number(),
 					page: t.Number(),
 					limit: t.Number(),

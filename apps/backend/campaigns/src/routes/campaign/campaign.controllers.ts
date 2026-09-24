@@ -687,93 +687,121 @@ export async function listRecipientsController(params: {
 
 	const where = and(...queryFilter);
 
-	const [rows, totalRow, countsRow, clickedTotalRow] = await Promise.all([
-		db
-			.select(selectFields)
-			.from(schema.campaignRecipient)
-			.leftJoin(
-				schema.contact,
-				and(
-					eq(
-						schema.contact.organizationId,
-						schema.campaignRecipient.organizationId,
+	const [rows, totalRow, countsRow, clickedTotalRow, linksQuery] =
+		await Promise.all([
+			db
+				.select(selectFields)
+				.from(schema.campaignRecipient)
+				.leftJoin(
+					schema.contact,
+					and(
+						eq(
+							schema.contact.organizationId,
+							schema.campaignRecipient.organizationId,
+						),
+						eq(schema.contact.email, schema.campaignRecipient.email),
+						isNull(schema.contact.deletedAt),
 					),
-					eq(schema.contact.email, schema.campaignRecipient.email),
-					isNull(schema.contact.deletedAt),
-				),
-			)
-			.leftJoin(
-				schema.emailLog,
-				eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
-			)
-			.where(where)
-			.orderBy(
-				params.category === "clicked"
-					? desc(clickCountExpr)
-					: desc(schema.campaignRecipient.createdAt),
-			)
-			.limit(limit)
-			.offset(offset),
-		db
-			.select({ value: sql<number>`count(*)` })
-			.from(schema.campaignRecipient)
-			.leftJoin(
-				schema.contact,
-				and(
-					eq(
-						schema.contact.organizationId,
-						schema.campaignRecipient.organizationId,
+				)
+				.leftJoin(
+					schema.emailLog,
+					eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
+				)
+				.where(where)
+				.orderBy(
+					params.category === "clicked"
+						? desc(clickCountExpr)
+						: desc(schema.campaignRecipient.createdAt),
+				)
+				.limit(limit)
+				.offset(offset),
+			db
+				.select({ value: sql<number>`count(*)` })
+				.from(schema.campaignRecipient)
+				.leftJoin(
+					schema.contact,
+					and(
+						eq(
+							schema.contact.organizationId,
+							schema.campaignRecipient.organizationId,
+						),
+						eq(schema.contact.email, schema.campaignRecipient.email),
+						isNull(schema.contact.deletedAt),
 					),
-					eq(schema.contact.email, schema.campaignRecipient.email),
-					isNull(schema.contact.deletedAt),
-				),
-			)
-			.leftJoin(
-				schema.emailLog,
-				eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
-			)
-			.where(where),
-		db
-			.select({
-				unsubscribed: sql<number>`count(*) filter (where ${unsubscribedCondition})`,
-				bounced: sql<number>`count(*) filter (where ${bouncedCondition})`,
-				suppressed: sql<number>`count(*) filter (where ${suppressedTabCondition})`,
-				complained: sql<number>`count(*) filter (where ${complainedCondition})`,
-				clicked: sql<number>`count(*) filter (where ${clickedCondition})`,
-				all: sql<number>`count(*) filter (where ${anyIssueCondition})`,
-			})
-			.from(schema.campaignRecipient)
-			.leftJoin(
-				schema.contact,
-				and(
-					eq(
-						schema.contact.organizationId,
-						schema.campaignRecipient.organizationId,
+				)
+				.leftJoin(
+					schema.emailLog,
+					eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
+				)
+				.where(where),
+			db
+				.select({
+					unsubscribed: sql<number>`count(*) filter (where ${unsubscribedCondition})`,
+					bounced: sql<number>`count(*) filter (where ${bouncedCondition})`,
+					suppressed: sql<number>`count(*) filter (where ${suppressedTabCondition})`,
+					complained: sql<number>`count(*) filter (where ${complainedCondition})`,
+					clicked: sql<number>`count(*) filter (where ${clickedCondition})`,
+					all: sql<number>`count(*) filter (where ${anyIssueCondition})`,
+				})
+				.from(schema.campaignRecipient)
+				.leftJoin(
+					schema.contact,
+					and(
+						eq(
+							schema.contact.organizationId,
+							schema.campaignRecipient.organizationId,
+						),
+						eq(schema.contact.email, schema.campaignRecipient.email),
+						isNull(schema.contact.deletedAt),
 					),
-					eq(schema.contact.email, schema.campaignRecipient.email),
-					isNull(schema.contact.deletedAt),
+				)
+				.leftJoin(
+					schema.emailLog,
+					eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
+				)
+				.where(countsWhere),
+			db
+				.select({ value: sql<number>`count(*)::int` })
+				.from(schema.emailEvent)
+				.innerJoin(
+					schema.campaignRecipient,
+					eq(schema.campaignRecipient.emailLogId, schema.emailEvent.emailLogId),
+				)
+				.where(
+					and(
+						eq(schema.campaignRecipient.campaignId, params.id),
+						eq(schema.campaignRecipient.organizationId, params.organizationId),
+						eq(schema.emailEvent.type, "clicked"),
+					),
 				),
-			)
-			.leftJoin(
-				schema.emailLog,
-				eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
-			)
-			.where(countsWhere),
-		db
-			.select({ value: sql<number>`count(*)::int` })
-			.from(schema.emailEvent)
-			.innerJoin(
-				schema.campaignRecipient,
-				eq(schema.campaignRecipient.emailLogId, schema.emailEvent.emailLogId),
-			)
-			.where(
-				and(
-					eq(schema.campaignRecipient.campaignId, params.id),
-					eq(schema.campaignRecipient.organizationId, params.organizationId),
-					eq(schema.emailEvent.type, "clicked"),
-				),
-			),
-	]);
+			db
+				.select({
+					url: sql<string>`coalesce(${schema.emailEvent.metadata}->>'url', '')`,
+					clickCount: sql<number>`count(*)::int`,
+					uniqueClickCount: sql<number>`count(distinct ${schema.campaignRecipient.id})::int`,
+				})
+				.from(schema.emailEvent)
+				.innerJoin(
+					schema.campaignRecipient,
+					eq(schema.campaignRecipient.emailLogId, schema.emailEvent.emailLogId),
+				)
+				.where(
+					and(
+						eq(schema.campaignRecipient.campaignId, params.id),
+						eq(schema.campaignRecipient.organizationId, params.organizationId),
+						eq(schema.emailEvent.type, "clicked"),
+						sql`coalesce(${schema.emailEvent.metadata}->>'url', '') <> ''`,
+						params.search?.trim()
+							? ilike(
+									sql`${schema.emailEvent.metadata}->>'url'`,
+									`%${params.search.trim().replace(/[%_\\]/g, "\\$&")}%`,
+								)
+							: undefined,
+					),
+				)
+				.groupBy(sql`${schema.emailEvent.metadata}->>'url'`)
+				.orderBy(sql`count(*) desc`),
+		]);
 
 	const recipients = rows.map(
 		({
@@ -848,6 +876,11 @@ export async function listRecipientsController(params: {
 
 	return {
 		recipients,
+		links: linksQuery.map((l) => ({
+			url: l.url,
+			clickCount: Number(l.clickCount),
+			uniqueClickCount: Number(l.uniqueClickCount),
+		})),
 		total: Number(totalRow[0]?.value ?? 0),
 		page,
 		limit,
