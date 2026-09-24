@@ -565,18 +565,64 @@ export default function OrganizationDetailPage() {
 						const warming = data.domains.filter((d) => d.dailyCap !== null);
 						if (warming.length === 0) return null;
 						const atCap = warming.filter((d) => d.dailyCap !== null && d.sentToday >= d.dailyCap);
+						const nextCapFor = (age: number) => {
+							if (age <= 1) return { cap: 50, in: `${2 - age} day(s)` };
+							if (age <= 3) return { cap: 100, in: `${4 - age} day(s)` };
+							if (age <= 7) return { cap: 250, in: `${8 - age} day(s)` };
+							if (age <= 14) return { cap: 500, in: `${15 - age} day(s)` };
+							if (age <= 30) return { cap: null, label: "Dynamic" as const, in: `${31 - age} day(s)` };
+							return null;
+						};
 						return (
 							<div
-								className={`rounded-xl border px-4 py-3 ${atCap.length ? "border-orange-200 bg-orange-50 dark:border-orange-500/20 dark:bg-orange-500/10" : "border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10"}`}
+								className={`rounded-xl border px-4 py-3.5 ${atCap.length ? "border-orange-200 bg-orange-50 dark:border-orange-500/20 dark:bg-orange-500/10" : "border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10"}`}
 							>
-								<p className={`text-[12px] font-medium ${atCap.length ? "text-orange-700 dark:text-orange-300" : "text-amber-700 dark:text-amber-300"}`}>
+								<p className={`text-[12px] font-semibold ${atCap.length ? "text-orange-700 dark:text-orange-300" : "text-amber-700 dark:text-amber-300"}`}>
 									{atCap.length
-										? `${atCap.length} domain(s) at daily cap — further sends get 429`
-										: `${warming.length} domain(s) warming up — capped for first 30 days (all plans)`}
+										? `${atCap.length} domain${atCap.length > 1 ? "s" : ""} at daily limit — new sends are paused until UTC midnight`
+										: `${warming.length} domain${warming.length > 1 ? "s are" : " is"} warming up — daily sends are throttled for the first 30 days`}
 								</p>
-								<p className="mt-1 text-[12px] leading-relaxed text-text-sub-600 dark:text-white/60">
-									{warming.map((d) => `${d.domain} (${d.ageDays}d: ${d.sentToday}/${d.dailyCap} today)`).join(" · ")} — caps 20→50→100→250→500→dynamic after 30d
+								<p className="mt-1 text-[11px] leading-relaxed text-text-sub-600 dark:text-white/60">
+									Applies to <span className="font-medium text-text-strong-950 dark:text-white">all plans (Free / Pro / Growth / Enterprise)</span> to protect reputation and block scam bulk sends from cheap, newly bought domains. Caps rise automatically as the domain ages — no manual action.
 								</p>
+								<div className="mt-3 space-y-2.5">
+									{warming.map((d) => {
+										const pct = d.dailyCap ? Math.min(100, (d.sentToday / d.dailyCap) * 100) : 0;
+										const remaining = d.dailyCap === null ? null : Math.max(0, d.dailyCap - d.sentToday);
+										const next = nextCapFor(d.ageDays);
+										const isAt = d.dailyCap !== null && d.sentToday >= d.dailyCap;
+										return (
+											<div key={d.id} className="rounded-lg border border-stroke-soft-100 bg-white px-3 py-2.5 dark:border-white/10 dark:bg-white/[0.04]">
+												<div className="flex flex-wrap items-baseline justify-between gap-2">
+													<span className="font-mono text-[12px] font-medium text-text-strong-950 dark:text-white">{d.domain}</span>
+													<span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${isAt ? "bg-orange-500/10 text-orange-700 ring-1 ring-orange-500/20 dark:text-orange-300" : "bg-amber-500/10 text-amber-700 ring-1 ring-amber-500/20 dark:text-amber-300"}`}>
+														{d.ageDays}d old · {d.dailyCap !== null ? `${d.sentToday}/${d.dailyCap} today` : "Dynamic"}
+													</span>
+												</div>
+												<div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
+													<div className={`h-full rounded-full ${isAt ? "bg-orange-500" : "bg-amber-500"}`} style={{ width: `${pct}%` }} />
+												</div>
+												<div className="mt-1.5 flex flex-wrap justify-between gap-2 text-[11px] leading-relaxed">
+													<span className={isAt ? "font-medium text-orange-700 dark:text-orange-300" : "text-text-sub-600 dark:text-white/60"}>
+														{isAt ? `At cap — 0 left today` : `${remaining} left today`}
+														{d.dailyCap !== null && d.ageDays <= 1 ? " · send only to highly engaged / verified contacts" : ""}
+													</span>
+													{next && (
+														<span className="text-text-sub-600 dark:text-white/50">
+															Next: {next.cap ?? next.label} in {next.in} {d.dailyCap !== null && next.cap ? `(${d.dailyCap}→${next.cap})` : ""}
+														</span>
+													)}
+												</div>
+											</div>
+										);
+									})}
+								</div>
+								<div className="mt-3 rounded-lg bg-white/60 px-3 py-2.5 text-[11px] leading-relaxed text-text-sub-600 dark:bg-black/20 dark:text-white/60">
+									<p className="font-medium text-text-strong-950 dark:text-white">How caps work</p>
+									<p className="mt-1">
+										<span className="font-mono">0–1d: 20</span> (highly engaged only) → <span className="font-mono">2–3d: 50</span> → <span className="font-mono">4–7d: 100</span> → <span className="font-mono">8–14d: 250</span> → <span className="font-mono">15–30d: 500</span> → <span className="font-mono">30d+: Dynamic</span> (reputation-based; Free still max 100/day). Caps are per-domain per UTC day — resets at 00:00 UTC. If you hit the cap you’ll get <span className="font-mono">429 New domain daily limit reached</span>.
+									</p>
+								</div>
 							</div>
 						);
 					})()}
