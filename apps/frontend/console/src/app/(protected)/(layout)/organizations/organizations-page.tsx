@@ -29,9 +29,20 @@ type OrgItem = {
 	creditsRemaining: number | null;
 	billingEmail: string | null;
 	createdAt: string;
+	planId: string | null;
 };
 
 type OrgsResponse = { items: OrgItem[]; total: number };
+
+const PLAN_LABEL: Record<string, string> = {
+	free: "Free",
+	individual: "Pro",
+	startup: "Growth",
+	enterprise: "Enterprise",
+};
+function planLabel(planId?: string | null): string {
+	return PLAN_LABEL[planId ?? "free"] ?? planId ?? "Free";
+}
 
 export default function OrganizationsPage() {
 	const [q, setQ] = useQueryState("q", parseAsString.withDefault(""));
@@ -39,6 +50,7 @@ export default function OrganizationsPage() {
 		"status",
 		parseAsString.withDefault(""),
 	);
+	const [plan, setPlan] = useQueryState("plan", parseAsString.withDefault(""));
 	const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [limit, setLimit] = useQueryState(
 		"limit",
@@ -54,11 +66,12 @@ export default function OrganizationsPage() {
 	const offset = Math.max(0, (page - 1) * limit);
 
 	const { data, isLoading, mutate } = useSWR<OrgsResponse>(
-		["/organizations", q, status, page, limit],
+		["/organizations", q, status, plan, page, limit],
 		() =>
 			adminGet<OrgsResponse>("/organizations", {
 				q: q || undefined,
 				status: status || undefined,
+				plan: plan || undefined,
 				limit,
 				offset,
 			}),
@@ -127,6 +140,20 @@ export default function OrganizationsPage() {
 							<option value="suspended">Suspended</option>
 							<option value="deleted">Deleted</option>
 						</select>
+						<select
+							className="h-10 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 font-medium text-[12px] text-text-sub-600 outline-none transition-colors hover:border-stroke-sub-300 dark:border-white/10 dark:bg-transparent"
+							value={plan}
+							onChange={(e) => {
+								setPlan(e.target.value || null);
+								setPage(1);
+							}}
+						>
+							<option value="">All plans</option>
+							<option value="free">Free</option>
+							<option value="individual">Pro</option>
+							<option value="startup">Growth</option>
+							<option value="enterprise">Enterprise</option>
+						</select>
 						<Button.Root type="submit" variant="neutral" mode="stroke">
 							Search
 						</Button.Root>
@@ -162,38 +189,50 @@ export default function OrganizationsPage() {
 					headers={[
 						"Organization",
 						"Status",
+						"Plan",
 						"Members",
 						"Domains",
 						"Credits",
 						"Created",
 						"Actions",
 					]}
-					colSpan={7}
+					colSpan={8}
 					loading={isLoading}
 					empty={!isLoading && !data?.items.length}
 				>
-					{data?.items.map((org) => (
-						<tr
-							key={org.id}
-							className="border-stroke-soft-100 border-t transition-colors hover:bg-bg-weak-50/80 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.02]"
-						>
-							<td className="px-4 py-3">
-								<Link
-									href={`/organizations/${org.id}`}
-									className="font-medium text-text-strong-950 hover:underline"
-								>
-									{org.name}
-								</Link>
-								<p className="text-[12px] text-text-sub-600">
-									{org.slug}
-									{org.billingEmail ? ` · ${org.billingEmail}` : ""}
-								</p>
-							</td>
-							<td className="px-4 py-3">
-								<StatusPill status={org.status} />
-							</td>
-							<td className="px-4 py-3 tabular-nums">{org.memberCount}</td>
-							<td className="px-4 py-3 tabular-nums">{org.domainCount}</td>
+					{data?.items.map((org) => {
+						const isPro =
+							org.planId === "individual" ||
+							org.planId === "startup" ||
+							org.planId === "enterprise";
+						return (
+							<tr
+								key={org.id}
+								className="border-stroke-soft-100 border-t transition-colors hover:bg-bg-weak-50/80 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.02]"
+							>
+								<td className="px-4 py-3">
+									<Link
+										href={`/organizations/${org.id}`}
+										className="font-medium text-text-strong-950 hover:underline"
+									>
+										{org.name}
+									</Link>
+									<p className="text-[12px] text-text-sub-600">
+										{org.slug}
+										{org.billingEmail ? ` · ${org.billingEmail}` : ""}
+									</p>
+								</td>
+								<td className="px-4 py-3">
+									<StatusPill status={org.status} />
+								</td>
+								<td className="px-4 py-3">
+									<StatusPill
+										status={planLabel(org.planId)}
+										tone={isPro ? "green" : "gray"}
+									/>
+								</td>
+								<td className="px-4 py-3 tabular-nums">{org.memberCount}</td>
+								<td className="px-4 py-3 tabular-nums">{org.domainCount}</td>
 							<td className="px-4 py-3 tabular-nums">
 								{formatNumber(org.creditsRemaining)}
 							</td>
@@ -248,7 +287,8 @@ export default function OrganizationsPage() {
 								</div>
 							</td>
 						</tr>
-					))}
+						);
+					})}
 				</DataTable>
 
 				<TablePagination

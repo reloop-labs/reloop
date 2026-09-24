@@ -32,11 +32,13 @@ export async function listOrganizationsController({
 	offset = 0,
 	q,
 	status,
+	plan,
 }: {
 	limit?: number;
 	offset?: number;
 	q?: string;
 	status?: "active" | "suspended" | "deleted";
+	plan?: "free" | "individual" | "startup" | "enterprise";
 }) {
 	const conditions = [];
 	if (status) conditions.push(eq(organization.status, status));
@@ -50,10 +52,46 @@ export async function listOrganizationsController({
 	}
 	const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-	const [totalRow] = await db
-		.select({ value: count() })
-		.from(organization)
-		.where(whereClause);
+	// total count – handle plan filter with join when needed
+	let totalRow: { value: number } | undefined;
+	if (plan) {
+		const planCondition =
+			plan === "free"
+				? or(
+						eq(organizationPlan.planId, "free"),
+						sql`${organizationPlan.planId} IS NULL`,
+					)!
+				: eq(organizationPlan.planId, plan);
+		const [row] = await db
+			.select({ value: count() })
+			.from(organization)
+			.leftJoin(
+				organizationPlan,
+				eq(organizationPlan.organizationId, organization.id),
+			)
+			.where(whereClause ? and(whereClause, planCondition) : planCondition);
+		totalRow = row;
+	} else {
+		const [row] = await db
+			.select({ value: count() })
+			.from(organization)
+			.where(whereClause);
+		totalRow = row;
+	}
+
+	const planCondition = plan
+		? plan === "free"
+			? or(
+					eq(organizationPlan.planId, "free"),
+					sql`${organizationPlan.planId} IS NULL`,
+				)!
+			: eq(organizationPlan.planId, plan)
+		: undefined;
+	const orgsWhere = whereClause
+		? planCondition
+			? and(whereClause, planCondition)
+			: whereClause
+		: planCondition;
 
 	const orgs = await db
 		.select({
@@ -75,7 +113,7 @@ export async function listOrganizationsController({
 			organizationPlan,
 			eq(organizationPlan.organizationId, organization.id),
 		)
-		.where(whereClause)
+		.where(orgsWhere)
 		.orderBy(desc(organization.createdAt))
 		.limit(limit)
 		.offset(offset);

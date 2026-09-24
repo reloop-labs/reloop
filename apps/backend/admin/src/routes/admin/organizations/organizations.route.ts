@@ -18,6 +18,7 @@ export const organizationsRoute = new Elysia()
 				offset: query.offset,
 				q: query.q,
 				status: query.status,
+				plan: query.plan,
 			}),
 		{
 			authAdmin: true,
@@ -30,6 +31,14 @@ export const organizationsRoute = new Elysia()
 						t.Literal("active"),
 						t.Literal("suspended"),
 						t.Literal("deleted"),
+					]),
+				),
+				plan: t.Optional(
+					t.Union([
+						t.Literal("free"),
+						t.Literal("individual"),
+						t.Literal("startup"),
+						t.Literal("enterprise"),
 					]),
 				),
 			}),
