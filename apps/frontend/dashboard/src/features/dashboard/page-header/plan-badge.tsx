@@ -12,9 +12,9 @@ const DARK_FLAT =
 
 const PLAN_BADGE_CLASS: Record<PlanId, string> = {
 	free: `border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)] ${DARK_FLAT} ${DARK_SHELF}`,
-	individual: `border-feature-light bg-feature-lighter text-feature-base shadow-[0_1.5px_0_0_var(--color-feature-light)] ${DARK_FLAT} ${DARK_SHELF}`,
-	startup: `border-warning-light bg-warning-lighter text-warning-base shadow-[0_1.5px_0_0_var(--color-warning-light)] ${DARK_FLAT} ${DARK_SHELF}`,
-	enterprise: `border-amber-200 bg-amber-50 text-amber-700 shadow-[0_1.5px_0_0_var(--color-amber-200)] ${DARK_FLAT} ${DARK_SHELF}`,
+	individual: `border-feature-light bg-feature-lighter text-feature-base shadow-[0_1.5px_0_0_var(--color-feature-light)] dark:border-feature-base/30 dark:bg-feature-base/10 ${DARK_SHELF}`,
+	startup: `border-warning-light bg-warning-lighter text-warning-base shadow-[0_1.5px_0_0_var(--color-warning-light)] dark:border-warning-base/30 dark:bg-warning-base/10 ${DARK_SHELF}`,
+	enterprise: `border-sky-500/25 bg-sky-500/10 text-sky-600 shadow-[0_1.5px_0_0_rgba(14,165,233,0.25)] dark:border-sky-400/25 dark:bg-sky-400/10 dark:text-sky-400 ${DARK_SHELF}`,
 };
 
 export function planLabel(planId: string | undefined): string {
