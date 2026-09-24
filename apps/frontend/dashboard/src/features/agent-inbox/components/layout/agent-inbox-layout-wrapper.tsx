@@ -27,23 +27,29 @@ export const AgentInboxLayoutWrapper = ({
 	const inboxLimit = billing?.resources?.agentInboxes.limit ?? 1;
 	const atInboxCap = inboxLimit > 0 && inboxUsed >= inboxLimit;
 
+	const handleAddMailbox = () => {
+		if (atInboxCap) {
+			router.push("/settings/billing");
+			return;
+		}
+		setIsAddOpen(true);
+	};
+
 	return (
 		<div className="flex h-full min-h-0 w-full overflow-hidden bg-bg-white-0 text-text-strong-950 dark:bg-black">
 			<MailboxRail
 				activeMailboxId={mailbox.id}
 				currentFolder={folder}
 				atInboxCap={atInboxCap}
-				onAddMailbox={() => {
-					if (atInboxCap) {
-						router.push("/settings/billing");
-						return;
-					}
-					setIsAddOpen(true);
-				}}
+				onAddMailbox={handleAddMailbox}
 			/>
 			<InboxSidebar mailbox={mailbox} folder={folder} />
 			<div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-				<InboxTopNavbar mailbox={mailbox} />
+				<InboxTopNavbar
+					mailbox={mailbox}
+					onAddMailbox={handleAddMailbox}
+					atInboxCap={atInboxCap}
+				/>
 				<div className="relative z-[5] flex min-h-0 min-w-0 flex-1 overflow-hidden">
 					{children}
 				</div>

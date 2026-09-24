@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import { Search } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
@@ -10,8 +12,12 @@ import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated
 
 export function InboxTopNavbar({
 	mailbox: _mailbox,
+	onAddMailbox,
+	atInboxCap = false,
 }: {
 	mailbox: AgentMailbox;
+	onAddMailbox?: () => void;
+	atInboxCap?: boolean;
 }) {
 	const { collapsed, toggleSidebar } = useInboxSidebar();
 	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
@@ -66,6 +72,23 @@ export function InboxTopNavbar({
 					<ActionKbd>K</ActionKbd>
 				</span>
 			</button>
+
+			{onAddMailbox && (
+				<FancyButton.Root
+					type="button"
+					variant="blue"
+					size="xsmall"
+					onClick={onAddMailbox}
+					title={atInboxCap ? "Upgrade to add an inbox" : "Add inbox address"}
+					aria-label={
+						atInboxCap ? "Upgrade to add an inbox" : "Add inbox address"
+					}
+					className="shrink-0 gap-1.5 rounded-xl"
+				>
+					<Icon name="plus" className="h-4 w-4" />
+					Create inbox
+				</FancyButton.Root>
+			)}
 		</header>
 	);
 }
