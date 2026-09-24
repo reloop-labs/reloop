@@ -152,9 +152,9 @@ export function DomainTable({
 										data-state={row.getIsSelected() ? "selected" : undefined}
 										className={cn(
 											"group/row grid w-full items-center px-4 py-2 text-left",
-											"hover:bg-bg-weak-50",
+											"hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]",
 											(isRowActive || row.getIsSelected()) &&
-												"bg-bg-weak-50/50",
+												"bg-bg-weak-50/50 dark:bg-white/[0.06]",
 										)}
 									>
 										{row.getVisibleCells().map((cell) => (

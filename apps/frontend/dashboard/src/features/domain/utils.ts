@@ -106,5 +106,5 @@ export const getVerificationFailedMessage = (
 	if (!reason) {
 		return "We couldn't verify your domain. Double-check your DNS records and try again.";
 	}
-	return `We couldn't verify your domain — ${formatVerificationFailedReason(reason)}. Double-check your DNS records and try again.`;
+	return `We couldn't verify your domain ${formatVerificationFailedReason(reason)}. Double-check your DNS records and try again.`;
 };
