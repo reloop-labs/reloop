@@ -117,6 +117,7 @@ export async function getThreadController(id: string, organizationId: string) {
 					fromName: msg.fromName ?? null,
 					subject: msg.subject ?? null,
 					preview: msg.preview ?? null,
+					errorMessage: null as string | null,
 					messageAt,
 					rfc822MessageId: msg.rfc822MessageId ?? null,
 					inReplyTo: msg.inReplyTo ?? null,

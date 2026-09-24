@@ -1,12 +1,11 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
-import { forwardRef, type ReactNode } from "react";
+import { type CSSProperties, forwardRef, type ReactNode } from "react";
 import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { InboundThread } from "../../types";
 import { ListAttachmentChip } from "./list-attachment-chip";
-import { useInboxMail } from "./use-inbox-mail";
 
 function formatRecipientLabel(addresses: string[] | undefined): string {
 	if (!addresses?.length) return "No recipients";
@@ -53,20 +52,51 @@ const highlightMatches = (text: string, query?: string): ReactNode => {
 	);
 };
 
-function chipBackground(color: string | undefined): string {
+function hexChannels(hex: string): [number, number, number] {
+	const full =
+		hex.length === 4
+			? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+			: hex;
+	const valid = /^#[0-9a-fA-F]{6}$/.test(full);
+	const safe = valid ? full : "#9B9B9B";
+	return [
+		Number.parseInt(safe.slice(1, 3), 16),
+		Number.parseInt(safe.slice(3, 5), 16),
+		Number.parseInt(safe.slice(5, 7), 16),
+	];
+}
+
+/** Mix a hex color toward a target rgb; amount 0..1. */
+function mixHex(
+	hex: string,
+	target: [number, number, number],
+	amount: number,
+): string {
+	const [r, g, b] = hexChannels(hex);
+	const m = (c: number, t: number) => Math.round(c + (t - c) * amount);
+	return `#${((1 << 24) + (m(r, target[0]) << 16) + (m(g, target[1]) << 8) + m(b, target[2])).toString(16).slice(1)}`;
+}
+
+function rgba(hex: string, alpha: number): string {
+	const [r, g, b] = hexChannels(hex);
+	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
+ * Per-label badge palette that stays readable in both modes:
+ * soft tint + shaded text in light, glowing tint + tinted text in dark.
+ */
+function labelChipVars(color: string | undefined): CSSProperties {
 	const hex = resolveLabelColor(color);
-	// Soft fill from label color (12% opacity)
-	if (hex.startsWith("#") && (hex.length === 7 || hex.length === 4)) {
-		const full =
-			hex.length === 4
-				? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
-				: hex;
-		const r = Number.parseInt(full.slice(1, 3), 16);
-		const g = Number.parseInt(full.slice(3, 5), 16);
-		const b = Number.parseInt(full.slice(5, 7), 16);
-		return `rgba(${r}, ${g}, ${b}, 0.14)`;
-	}
-	return "var(--inbox-chip-bg)";
+	return {
+		"--lb": rgba(hex, 0.1),
+		"--lt": mixHex(hex, [24, 24, 28], 0.45),
+		"--lr": rgba(hex, 0.3),
+		"--ld": hex,
+		"--lbd": rgba(hex, 0.18),
+		"--ltd": mixHex(hex, [255, 255, 255], 0.6),
+		"--lrd": rgba(hex, 0.5),
+	} as CSSProperties;
 }
 
 export interface InboxThreadRowProps {
@@ -80,11 +110,7 @@ export interface InboxThreadRowProps {
 	onSelect: (id: string, event?: React.MouseEvent) => void;
 	onMouseEnter: (id: string) => void;
 	onToggleStar: (id: string, starred: boolean) => void;
-	onArchive: (id: string) => void;
-	onUnarchive?: (id: string) => void;
-	onDelete: (id: string) => void;
 	onToggleBulk: (id: string, event?: React.MouseEvent) => void;
-	isArchived?: boolean;
 }
 
 export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
@@ -98,19 +124,13 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 			onSelect,
 			onMouseEnter,
 			onToggleStar,
-			onArchive,
-			onUnarchive,
-			onDelete,
 			onToggleBulk,
-			isArchived,
 		},
 		ref,
 	) => {
-		const [mail] = useInboxMail();
 		const listId = thread.id;
 		const isUnread = thread.unread;
 		const isOutbound = thread.direction === "outbound";
-		const isSelectMode = mail.bulkSelected.length > 0;
 		const displayName = isOutbound
 			? formatRecipientLabel(thread.toEmails)
 			: thread.from.name ||
@@ -119,7 +139,11 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		const messageCount = thread.messageCount ?? 1;
 		const subject = (thread.subject || "").trim() || "(No Subject)";
 		const preview = (thread.preview || "").trim().replace(/\s+/g, " ");
-		const primaryLabel = thread.labels?.[0];
+		const rowLabels = (thread.labels ?? []).slice(0, 2);
+		const hiddenLabelCount = Math.max(
+			0,
+			(thread.labels ?? []).length - rowLabels.length,
+		);
 		const visibleAttachments = (thread.attachments ?? []).filter(
 			(att) => att.isInline !== true,
 		);
@@ -215,18 +239,6 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				{/* Subject + preview */}
 				<div className="flex min-w-0 flex-1 flex-col justify-start gap-1 overflow-hidden pr-3">
 					<div className="flex min-w-0 items-center gap-1.5">
-						{primaryLabel ? (
-							<span
-								className="mr-1 flex h-5 max-w-30 shrink-0 items-center truncate rounded-[6px] border px-1.5 font-medium text-[11px]"
-								style={{
-									background: chipBackground(primaryLabel.color),
-									color: "var(--inbox-chip-fg)",
-									borderColor: "var(--inbox-chip-border)",
-								}}
-							>
-								{primaryLabel.name}
-							</span>
-						) : null}
 						<span className="truncate text-[14px] leading-5">
 							<span
 								className={cn(
@@ -264,54 +276,29 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 					) : null}
 				</div>
 
-				{/* Hover actions */}
-				<span
-					className={cn(
-						"mt-0.5 ml-2 flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100",
-						isSelectMode && "pointer-events-none opacity-0",
-					)}
-				>
-					{isArchived || thread.isArchived ? (
-						<button
-							type="button"
-							title="Move to inbox"
-							onClick={(e) => {
-								e.stopPropagation();
-								if (onUnarchive) {
-									onUnarchive(listId);
-								} else {
-									onArchive(listId);
-								}
-							}}
-							className="flex size-7 items-center justify-center rounded-md hover:bg-bg-soft-200 dark:hover:bg-neutral-alpha-16"
-						>
-							<Icon name="inbox" className="h-3.5 w-3.5 text-text-sub-600" />
-						</button>
-					) : (
-						<button
-							type="button"
-							title="Archive"
-							onClick={(e) => {
-								e.stopPropagation();
-								onArchive(listId);
-							}}
-							className="flex size-7 items-center justify-center rounded-md hover:bg-bg-soft-200 dark:hover:bg-neutral-alpha-16"
-						>
-							<Icon name="archive" className="h-3.5 w-3.5 text-text-sub-600" />
-						</button>
-					)}
-					<button
-						type="button"
-						title="Delete"
-						onClick={(e) => {
-							e.stopPropagation();
-							onDelete(listId);
-						}}
-						className="flex size-7 items-center justify-center rounded-md hover:bg-red-50 dark:hover:bg-red-950/30"
-					>
-						<Icon name="trash" className="h-3.5 w-3.5 text-red-500" />
-					</button>
-				</span>
+				{/* Labels at the end, before the time */}
+				{rowLabels.length > 0 ? (
+					<span className="mt-0.5 ml-2 flex shrink-0 items-center gap-1">
+						{rowLabels.map((label) => (
+							<span
+								key={label.id}
+								style={labelChipVars(label.color)}
+								className="flex h-[22px] max-w-28 shrink-0 items-center gap-1.5 truncate rounded-[8px] border border-(--lr) bg-(--lb) px-2 font-semibold text-(--lt) text-[11px] dark:border-(--lrd) dark:bg-(--lbd) dark:text-(--ltd)"
+							>
+								<span
+									aria-hidden
+									className="size-1.5 shrink-0 rounded-full bg-(--ld)"
+								/>
+								<span className="truncate">{label.name}</span>
+							</span>
+						))}
+						{hiddenLabelCount > 0 ? (
+							<span className="shrink-0 text-[11px] text-text-soft-400">
+								+{hiddenLabelCount}
+							</span>
+						) : null}
+					</span>
+				) : null}
 
 				{/* Failed label on right-hand side */}
 				{isFailed ? (

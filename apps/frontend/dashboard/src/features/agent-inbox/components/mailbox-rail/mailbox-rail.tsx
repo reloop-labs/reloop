@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -8,15 +7,16 @@ import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { PixelAvatar } from "#/features/dashboard/page-header/pixel-avatar";
+import { getAvatarInitial } from "#/utils/avatar";
 import { MailboxRailSkeleton } from "./mailbox-rail-skeleton";
 
 function mailboxSortKey(m: AgentMailbox) {
 	return (m.label || m.email).toLocaleLowerCase();
 }
 
-/** Active mailbox badge */
-const CircleCheckBadge = ({ className }: { className?: string }) => (
+/** Active mailbox check — white disc badge with blue check in light mode, black check in dark mode. */
+export const CircleCheckBadge = ({ className }: { className?: string }) => (
 	<svg
 		width="14"
 		height="14"
@@ -26,18 +26,10 @@ const CircleCheckBadge = ({ className }: { className?: string }) => (
 		className={className}
 		aria-hidden
 	>
-		<circle
-			cx="10"
-			cy="10"
-			r="8.25"
-			fill="#1868DF"
-			stroke="#ffffff"
-			strokeWidth="1.5"
-		/>
 		<path
 			d="M6.4 10.15L8.85 12.55L13.6 7.45"
-			stroke="#ffffff"
-			strokeWidth="2"
+			stroke="currentColor"
+			strokeWidth="2.5"
 			strokeLinecap="round"
 			strokeLinejoin="round"
 		/>
@@ -67,15 +59,17 @@ const RailMailboxAvatar = ({
 			>
 				<div className="relative">
 					<div
-						className={cn(
-							"flex size-9 items-center justify-center rounded-xl font-bold text-white text-xs uppercase transition-all",
-							getAvatarGradient(mailbox.email || displayName),
-						)}
+						className={`size-9 shrink-0 overflow-hidden rounded-xl ${active ? "ring-2 ring-primary-base ring-offset-1 ring-offset-transparent dark:ring-white" : ""}`}
 					>
-						{getAvatarInitial(mailbox.label, mailbox.email)}
+						<PixelAvatar
+							seed={mailbox.email || displayName}
+							letter={getAvatarInitial(mailbox.label, mailbox.email)}
+						/>
 					</div>
 					{active && (
-						<CircleCheckBadge className="-right-1 -bottom-1 absolute z-10 size-3.5" />
+						<span className="-right-1 -bottom-1 absolute z-10 rounded-full bg-primary-base p-px shadow ring-2 ring-bg-white-0 dark:bg-white! dark:text-white dark:ring-black">
+							<CircleCheckBadge className="block size-2.5 text-white dark:text-black" />
+						</span>
 					)}
 				</div>
 			</button>

@@ -45,7 +45,7 @@ export function InboxCategoryNavbar({
 								className={cn(
 									"h-4 w-4 shrink-0 transition-colors",
 									isActive
-										? "text-zero-blue opacity-100"
+										? "text-zero-blue opacity-100 dark:text-white"
 										: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
 								)}
 								aria-hidden
@@ -55,14 +55,14 @@ export function InboxCategoryNavbar({
 							className={cn(
 								"truncate font-medium text-[13px] tracking-[-0.01em] transition-colors sm:text-[14px]",
 								isActive
-									? "font-semibold text-zero-blue"
+									? "font-semibold text-zero-blue dark:text-white"
 									: "text-text-sub-600 group-hover:text-text-strong-950",
 							)}
 						>
 							{view.label}
 						</span>
 						{isActive ? (
-							<span className="absolute inset-x-0 bottom-0 h-[2px] bg-zero-blue" />
+							<span className="absolute inset-x-0 bottom-0 h-[2px] bg-zero-blue dark:bg-white" />
 						) : null}
 					</button>
 				);

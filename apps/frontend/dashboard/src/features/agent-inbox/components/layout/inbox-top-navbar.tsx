@@ -12,7 +12,11 @@ import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 
 const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/15 dark:bg-black/[0.08] dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.15)]";
+
+/** Pricing-style primary button: blue in light mode, white in dark mode. */
+const primaryDarkWhiteClassName =
+	"dark:text-black dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3]";
 
 export function InboxTopNavbar({
 	mailbox: _mailbox,
@@ -90,7 +94,7 @@ export function InboxTopNavbar({
 			{onAddMailbox && (
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="primary"
 					size="xsmall"
 					onClick={onAddMailbox}
 					title={
@@ -100,7 +104,7 @@ export function InboxTopNavbar({
 						atInboxCap ? "Upgrade to add an inbox" : "Create new inbox"
 					}
 					aria-keyshortcuts="n"
-					className="ml-auto shrink-0 gap-1.5 rounded-xl"
+					className={`ml-auto shrink-0 gap-1.5 rounded-xl ${primaryDarkWhiteClassName}`}
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create new inbox

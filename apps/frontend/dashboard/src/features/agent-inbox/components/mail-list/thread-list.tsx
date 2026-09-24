@@ -52,8 +52,7 @@ export const ThreadList = ({
 	onForward,
 	isLoading = false,
 }: ThreadListProps) => {
-	const { toggleMessageStar, archiveThread, unarchiveThread, trashThread } =
-		useAgentInbox();
+	const { toggleMessageStar } = useAgentInbox();
 	const [mail, setMail] = useInboxMail();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -168,52 +167,6 @@ export const ThreadList = ({
 		}
 	};
 
-	const handleArchive = async (listId: string) => {
-		const thread = threads.find((t) => t.id === listId);
-		const archiveId = thread?.threadId || listId;
-		try {
-			await archiveThread(archiveId);
-			toast.success("Archived", {
-				action: {
-					label: "Undo",
-					onClick: () => void unarchiveThread(archiveId),
-				},
-			});
-		} catch (err: unknown) {
-			toast.error(err instanceof Error ? err.message : "Failed to archive");
-		}
-	};
-
-	const handleUnarchive = async (listId: string) => {
-		const thread = threads.find((t) => t.id === listId);
-		const archiveId = thread?.threadId || listId;
-		try {
-			await unarchiveThread(archiveId);
-			toast.success("Moved to inbox", {
-				action: {
-					label: "Undo",
-					onClick: () => void archiveThread(archiveId),
-				},
-			});
-		} catch (err: unknown) {
-			toast.error(
-				err instanceof Error ? err.message : "Failed to move to inbox",
-			);
-		}
-	};
-
-	const handleDelete = async (listId: string) => {
-		const thread = threads.find((t) => t.id === listId);
-		const trashId = thread?.threadId || listId;
-		if (!confirm("Move this thread to trash?")) return;
-		try {
-			await trashThread(trashId);
-			toast.success("Moved to trash");
-		} catch (err: unknown) {
-			toast.error(err instanceof Error ? err.message : "Failed to trash");
-		}
-	};
-
 	const handleLoadMore = useCallback(() => {
 		if (visibleCount < orderedThreads.length) {
 			setVisibleCount((c) => Math.min(c + PAGE_SIZE, orderedThreads.length));
@@ -289,10 +242,6 @@ export const ThreadList = ({
 									onSelect={handleRowSelect}
 									onMouseEnter={onMouseEnterRow ?? (() => {})}
 									onToggleStar={handleToggleStar}
-									onArchive={handleArchive}
-									onUnarchive={handleUnarchive}
-									isArchived={folder === "archive" || folder === "archived"}
-									onDelete={handleDelete}
 									onToggleBulk={handleToggleBulk}
 								/>
 							</ThreadContextMenu>

@@ -17,6 +17,7 @@ import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 import { SidebarNavIcon } from "#/features/dashboard/sidebar/sidebar-nav-icon";
 import { SidebarNavLink } from "#/features/dashboard/sidebar/sidebar-nav-link";
 import { useSidebarHoverBox } from "#/features/dashboard/sidebar/use-sidebar-hover-box";
@@ -24,7 +25,11 @@ import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-ba
 
 /** Light keycap for blue FancyButton fill */
 const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/15 dark:bg-black/[0.08] dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.15)]";
+
+/** Pricing-style primary button: blue in light mode, white in dark mode. */
+const primaryDarkWhiteClassName =
+	"dark:text-black dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3]";
 
 type NavItem = {
 	id: string;
@@ -208,6 +213,10 @@ export const InboxSidebar = ({
 								title={`Click to copy ${mailbox.email}`}
 								className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
 							>
+								<PixelAvatarTile
+									seed={mailbox.email || "Inbox"}
+									className="size-5"
+								/>
 								<span className="truncate font-semibold text-[13px] text-text-strong-950">
 									{mailbox.email || mailbox.label || "Inbox"}
 								</span>
@@ -245,7 +254,7 @@ export const InboxSidebar = ({
 				>
 					<FancyButton.Root
 						type="button"
-						variant="blue"
+						variant="primary"
 						size="medium"
 						onClick={() => {
 							if (!mailboxReady) return;
@@ -256,8 +265,8 @@ export const InboxSidebar = ({
 						aria-keyshortcuts="c"
 						className={
 							collapsed
-								? "h-8 w-8 rounded-xl p-0"
-								: "h-8.5 w-full justify-between gap-2.5 rounded-xl px-3"
+								? `h-8 w-8 rounded-xl p-0 ${primaryDarkWhiteClassName}`
+								: `h-8.5 w-full justify-between gap-2.5 rounded-xl px-3 ${primaryDarkWhiteClassName}`
 						}
 					>
 						<div className="flex items-center gap-2.5">
