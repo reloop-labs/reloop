@@ -6,7 +6,7 @@
 > Docs index: https://reloop.sh/llms-docs.txt
 > Product skill: https://reloop.sh/skill.md
 
-Generated from 20 pages.
+Generated from 21 pages.
 
 ---
 
@@ -1993,6 +1993,214 @@ Email authentication establishes your domain identity, but **it does not replace
 
 ### 3. Separating transactional and marketing streams
 **Never mix transactional receipts with marketing newsletters on the same sending domain or IP.** Protect your mission-critical password resets and auth tokens by isolating them on a dedicated transactional subdomain (see [transactional email best practices](/blog/transactional-email-best-practices)).
+
+---
+
+# The Hidden Costs of Disposable Emails (And How Blocking Them Saves You Thousands)
+
+Path: /blog/how-temp-email-checker-saves-you-money
+URL: https://reloop.sh/blog/how-temp-email-checker-saves-you-money
+Markdown: https://reloop.sh/blog/how-temp-email-checker-saves-you-money.md
+
+From CRM contact-tier inflation to free-trial credit farming and burned domain reputation—here is the real cost of disposable emails and how a free temp email checker saves thousands.
+
+When builders think about temporary or disposable email addresses, they usually view them as a minor product annoyance: *"A few anonymous users testing the app or downloading a guide. No big deal, right?"*
+
+In reality, disposable emails are a silent drain on your company's balance sheet. 
+
+Every throwaway inbox that slips past your signup form creates a ripple effect of recurring SaaS fees, stolen compute credits, degraded sender reputation, and wasted engineering hours. If you run a SaaS, an e-commerce platform, or a newsletter, unvetted signups can quietly cost you hundreds to thousands of dollars every month.
+
+Here is a financial breakdown of the true costs of disposable emails—and how putting a [free temp email checker](/tools/temp-email-checker) at the front door protects both your margins and your domain.
+
+---
+
+## 1. The "Zombie Contact Tax" on Marketing & CRM Platforms
+
+Most marketing automation platforms and CRMs—including HubSpot, Mailchimp, Klaviyo, ActiveCampaign, and Loops—price their tiers based on **audience size or total stored contacts**.
+
+Here is how the economics work against you:
+
+- A visitor signs up with a 10-minute temporary inbox (`@mailinator.com`, `@guerrillamail.com`, or `@yopmail.com`).
+- Your backend creates the contact record and syncs it to your CRM or marketing tool.
+- Fifteen minutes later, the temporary mailbox ceases to exist.
+- That contact sits in your CRM forever unless you manually audit and purge it.
+
+When your contact list grows from 9,500 to 10,500 contacts because of 1,000 burner emails, you are automatically bumped to the next pricing tier:
+
+| Platform | Tier A (10,000 contacts) | Tier B (15,000+ contacts) | The "Zombie Contact" Cost |
+| :--- | :--- | :--- | :--- |
+| **HubSpot Marketing Hub** | ~$800 / month | ~$1,250 / month | **+$450 / month** |
+| **Klaviyo** | ~$150 / month | ~$245 / month | **+$95 / month** |
+| **Mailchimp Standard** | ~$135 / month | ~$210 / month | **+$75 / month** |
+
+You are literally paying a monthly subscription fee to store dead, unreachable inboxes. Filtering disposable domains at the registration step stops dead records from ever entering your CRM sync pipeline.
+
+---
+
+## 2. Preventing Free Trial and AI Credit Farming Abuse
+
+If your product offers free trial credits, sign-up perks, or API allowances (such as $5 in free LLM tokens, 20 AI generations, or a $10 coupon code), disposable emails are an open invitation for exploit scripts.
+
+Script-kiddies and bot operators use automated disposable email generators to cycle through thousands of accounts:
+1. They script automated signups using disposable domains.
+2. They consume the sign-up compute, AI tokens, or cloud bandwidth for free.
+3. Once credits run dry, they discard the email and trigger another signup.
+
+```
+Without Validation:
+Bot Script ──> Temp Email ──> Free Sign-Up ──> Burns $5 in AI API Credits ──> Discards Inbox
+(Repeated 500x = $2,500 unrecoverable cloud/LLM bill)
+```
+
+If 200 bot signups each consume $3 worth of OpenAI API tokens or GPU inference, that is **$600 per month charged directly to your infrastructure credit card**—with zero conversion chance.
+
+Gating signups with a disposable detector immediately kills 95%+ of low-effort multi-accounting scripts without requiring heavy, high-friction CAPTCHAs for legitimate users.
+
+---
+
+## 3. The $15,000 Deliverability Death Spiral
+
+The most catastrophic cost of disposable emails is not the storage—it is **sender domain reputation**.
+
+Major mailbox providers (Google Workspace, Gmail, Microsoft 365, Yahoo) evaluate how recipients treat your mail. One of their most strictly enforced signals is **hard bounce rate**. 
+- Industry standard delivery targets keep hard bounces **under 2%**. 
+- Exceeding **5%** triggers immediate scrutiny, spam foldering, or rate-limiting.
+
+Because disposable inboxes are deleted minutes after creation, every automated email you send after signup—your welcome email, onboarding sequence, email verification link, or day-3 check-in—will **hard bounce**.
+
+```
+High Disposable Signups
+        │
+        ▼
+Elevated Hard Bounce Rate (>3-5%)
+        │
+        ▼
+Domain Reputation Downgraded by Gmail & Microsoft
+        │
+        ▼
+Legitimate Customer Emails Land in Spam Folder
+        │
+        ▼
+Real Customers Miss Password Resets, Invoices & Onboarding
+        │
+        ▼
+Direct Churn, Lost Revenue, & Costly Remediation
+```
+
+### What does recovering a burned domain cost?
+When your transactional emails start landing in spam:
+* Legitimate paying customers can't log in (missing 2FA and password reset tokens), driving up customer support tickets.
+* Trial activation rates plummet because users never see the onboarding steps.
+* Restoring a burned IP and domain requires hiring deliverability consultants, purchasing dedicated IPs, and executing a multi-month [IP warming schedule](/blog/ip-warming-guide)—often costing **$5,000 to $15,000+** in lost revenue and tooling.
+
+Checking for disposable providers on signup keeps your hard bounce rate near zero, protecting the inbox placement of your revenue-generating emails.
+
+---
+
+## 4. Saving on Expensive Third-Party Verification SaaS
+
+Many engineering teams realize they have a disposable email problem and immediately integrate a commercial verification API (such as ZeroBounce, NeverBounce, or Hunter).
+
+While those platforms work, they are expensive when all you need is a fast check at registration:
+
+* Commercial verification APIs typically charge **$0.008 to $0.015 per check**.
+* If your application receives **25,000 signups or verification requests a month**, you are paying **$200 to $375/month** ($2,400 to $4,500/year) just to know if a domain is a throwaway inbox.
+
+Reloop provides the **[Temp Email Checker](/tools/temp-email-checker)** completely free of charge. You can call the public JSON API without any account registration or API keys:
+
+```bash
+curl -X POST https://reloop.sh/api/tools/v1/temp-email-checker \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@mailinator.com"}'
+```
+
+Response:
+```json
+{
+  "domain": "mailinator.com",
+  "verdict": "disposable",
+  "isDisposable": true,
+  "confidence": 0.99,
+  "riskScore": 0.95,
+  "signals": {
+    "syntax": "pass",
+    "disposable": "fail",
+    "role": "pass",
+    "freeProvider": "pass"
+  }
+}
+```
+
+By substituting a costly verification SaaS with a specialized, continuously updated open-source catalogue of **210,000+ throwaway domains**, you instantly pocket those savings.
+
+---
+
+## 5. Summary: What a Growing Startup Saves Every Month
+
+Let's look at the financial picture for a modern SaaS receiving **5,000 monthly signups**, where roughly **12% (~600 signups)** are disposable addresses:
+
+| Expense Category | Without Temp Email Checking | With Reloop Temp Email Checker | Monthly Savings |
+| :--- | :--- | :--- | :--- |
+| **Marketing CRM Tier Jumps** | Hits next contact threshold (+600 dead contacts/mo) | Kept on lower contact tier | **$75 – $250 / mo** |
+| **Free Trial Compute / AI Tokens** | 600 burners burning free trial compute | Blocked before accounts are provisioned | **$300 – $900 / mo** |
+| **Verification API Costs** | Paid verification service ($0.01/call) | Free Reloop Public API | **$50 / mo** |
+| **Deliverability Risk & Remediation** | Frequent hard bounces, risk of spam foldering | Bounces prevented; >99% sender reputation | **Priceless ($1,000s in downside protection)** |
+| **Total Estimated Savings** | — | — | **$425 – $1,200+ / mo** |
+
+That represents **$5,000 to $14,000+ in annual operational savings** from a single validation check.
+
+---
+
+## How to Implement in Your App in 60 Seconds
+
+You don't need a bulky SDK or a paid subscription to protect your registration endpoints. Here is how you can gate user signups in a standard Next.js, Node.js, or Express backend:
+
+```typescript
+// app/api/signup/route.ts or similar backend registration handler
+  const { email, password } = await req.json();
+
+  // 1. Call Reloop's public checker endpoint
+  const checkRes = await fetch("https://reloop.sh/api/tools/v1/temp-email-checker", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  const check = await checkRes.json();
+
+  // 2. Reject disposable providers before writing to your database
+  if (check.isDisposable) {
+    return Response.json(
+      { error: "Please use a permanent work or personal email address to sign up." },
+      { status: 400 }
+    );
+  }
+
+  // 3. Proceed with normal account creation & CRM sync
+  // await db.user.create({ data: { email, ... } });
+
+  return Response.json({ success: true });
+}
+```
+
+Notice what happens:
+1. Malformed emails and disposable providers are rejected before any row is written to PostgreSQL.
+2. No welcome email is queued in BullMQ or your MTA, so no hard bounce ever happens.
+3. No ghost user is synced to HubSpot or Loops.
+4. No free compute or AI trial tokens are issued.
+
+---
+
+## Complete Your Deliverability Pipeline
+
+Stopping disposable emails at signup is the highest-ROI defensive move you can make for your infrastructure. But deliverability is multi-layered:
+
+1. **Gate signups**: Use the free [Temp Email Checker](/tools/temp-email-checker) or its public API on registration forms.
+2. **Clean historical lists**: If your database already has legacy contacts, run them through the [free Email Validator](/tools/email-validator) to purge expired addresses and syntax errors before launching marketing campaigns.
+3. **Verify DNS & Authentication**: Ensure your [SPF, DKIM, and DMARC](/blog/spf-dkim-dmarc-setup-guide) records are strict so legitimate mail never gets blocked.
+4. **Own your email infrastructure**: If you are tired of opaque pricing and vendor lock-in from proprietary ESPs, explore [Reloop](https://reloop.sh)—open-source email infrastructure built for developers who care about control, performance, and transparent costs.
+
+Protect your signup pipeline today by testing a domain on the [Free Temp Email Checker](/tools/temp-email-checker) or integrating the endpoint directly into your auth flow.
 
 ---
 
