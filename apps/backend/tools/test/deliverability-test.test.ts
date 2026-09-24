@@ -13,6 +13,20 @@ import type { CategoryResult } from "../src/routes/tools/deliverability-test/del
 const stubFetch = (async () =>
 	new Response("", { status: 200 })) as typeof fetch;
 
+const okResult = (status: number) => ({
+	status,
+	headers: {},
+	body: "",
+	bodyBuffer: Buffer.alloc(0),
+	durationMs: 1,
+	resolved: {
+		hostname: "1.1.1.1",
+		pinnedIp: "1.1.1.1",
+		allIps: ["1.1.1.1"],
+		family: 4 as const,
+	},
+});
+
 // CI has no Redis. The real client waits up to 15s to connect, so session
 // create/get/inject hang until bun kills the test. Same seam as rate-limit.test.ts.
 const sessionStore = new Map<string, unknown>();
@@ -123,6 +137,7 @@ Content-Type: text/html
 	it("detects link shorteners and mismatched display text", async () => {
 		const originalFetch = globalThis.fetch;
 		globalThis.fetch = stubFetch;
+		const mockTransport: PinnedTransport = async () => okResult(200);
 
 		try {
 			const phishingMime = `From: info@test.com
@@ -136,7 +151,7 @@ Content-Type: text/html
 </body></html>`;
 
 			const parsed = await parseMime(phishingMime);
-			const linksRes = await checkLinks(parsed);
+			const linksRes = await checkLinks(parsed, mockTransport);
 
 			expect(linksRes.category.status).toBe("fail");
 			expect(linksRes.shorteners).toContain("bit.ly");
@@ -365,20 +380,6 @@ Email six`;
 			globalThis.fetch = originalFetch;
 		}
 	}, 15_000);
-});
-
-const okResult = (status: number) => ({
-	status,
-	headers: {},
-	body: "",
-	bodyBuffer: Buffer.alloc(0),
-	durationMs: 1,
-	resolved: {
-		hostname: "1.1.1.1",
-		pinnedIp: "1.1.1.1",
-		allIps: ["1.1.1.1"],
-		family: 4 as const,
-	},
 });
 
 describe("probeUrl", () => {

@@ -109,6 +109,7 @@ export async function probeUrl(
 
 export async function checkLinks(
 	email: ParsedEmailData,
+	transport: PinnedTransport = requestPinned,
 ): Promise<LinksCheckResult> {
 	const items: CheckItem[] = [];
 	let totalDeduction = 0;
@@ -205,7 +206,7 @@ export async function checkLinks(
 	const sampleToProbe = extracted.slice(0, 5);
 	const probeResults = await Promise.all(
 		sampleToProbe.map(async (l) => {
-			const res = await probeUrl(l.url);
+			const res = await probeUrl(l.url, transport);
 			return { url: l.url, ...res };
 		}),
 	);
