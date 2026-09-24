@@ -100,8 +100,8 @@ const TAB_SCREENSHOT: Record<PlatformTabId, { src: string; darkSrc: string }> =
 			darkSrc: "/platform/email-dark.png",
 		},
 		analytics: {
-			src: "/platform/domain-light.png",
-			darkSrc: "/platform/domain-dark.png",
+			src: "/platform/analytics-light.png",
+			darkSrc: "/platform/analytics-dark.png",
 		},
 		templates: {
 			src: "/platform/domain-light.png",
