@@ -206,8 +206,9 @@ export async function logIncomingController({
 	const recipientCount = toEmails.length;
 
 	// ── Domain-age initial daily cap (all packages) ───────────────────────
+	// Uses registrar registration age via RDAP, not Reloop added date
 	const ageCheck = await checkDomainAgeDailyCap({
-		domain: { id: domainRecord.id, createdAt: domainRecord.createdAt },
+		domain: { id: domainRecord.id, domain: domainRecord.domain, createdAt: domainRecord.createdAt },
 		recipientCount,
 	});
 	if (!ageCheck.allowed && ageCheck.cap !== null) {

@@ -261,10 +261,12 @@ export namespace AdminModel {
 				status: t.String(),
 				systemVerified: t.Boolean(),
 				createdAt: t.Date(),
+				registrarCreatedAt: t.Union([t.Date(), t.Null()]),
 				ageDays: t.Number(),
 				dailyCap: t.Union([t.Number(), t.Null()]),
 				sentToday: t.Number(),
 				remaining: t.Union([t.Number(), t.Null()]),
+				source: t.String(),
 			}),
 		),
 		apiKeys: t.Array(

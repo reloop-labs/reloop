@@ -187,6 +187,14 @@ export namespace DomainModel {
 					description: "Number of emails sent using this domain",
 				}),
 			),
+			registrarCreatedAt: t.Optional(
+				t.Union([t.Date(), t.Null()], { description: "Registrar creation date from RDAP" }),
+			),
+			ageDays: t.Optional(t.Number({ description: "Domain age in days from registrar" })),
+			dailyCap: t.Optional(t.Union([t.Number(), t.Null()], { description: "Initial daily cap based on registrar age" })),
+			sentToday: t.Optional(t.Number({ description: "Emails sent today for this domain" })),
+			remaining: t.Optional(t.Union([t.Number(), t.Null()])),
+			source: t.Optional(t.String({ description: "Age source: rdap or reloop" })),
 			dnsRecords: t.Array(dnsRecordResponse, {
 				description: "DNS records for the domain",
 			}),

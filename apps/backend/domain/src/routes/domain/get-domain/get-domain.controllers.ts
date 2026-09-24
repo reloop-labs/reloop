@@ -1,10 +1,12 @@
 import { db } from "@reloop/db/client";
+import { getDomainAgeDays, getDomainInitialDailyCap, getRegistrarCreationDate } from "@reloop/db/domain-age-cap";
+import { utcDayStart } from "@reloop/db/reserve-send-credits";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { ensureTrackingCnameRecord } from "@reloop/domain/utils/ensure-tracking-cname";
 import { DOMAIN_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, count, eq, gte, isNull } from "drizzle-orm";
 
 import { useLogger } from "evlog/elysia";
 
@@ -64,9 +66,28 @@ export async function getDomainController({
 		}
 
 		log.info("Domain fetched successfully");
+		// ── Registrar age (domain age checker tool) for warmup cap ──────────
+		const registrarCreatedAtStr = await getRegistrarCreationDate(result.domain);
+		const ageDays = registrarCreatedAtStr
+			? getDomainAgeDays(new Date(registrarCreatedAtStr), new Date())
+			: getDomainAgeDays(new Date(result.createdAt), new Date());
+		const dailyCap = getDomainInitialDailyCap(ageDays);
+		const dayStart = utcDayStart(new Date());
+		const [sentRow] = await db
+			.select({ value: count() })
+			.from(schema.emailLog)
+			.where(and(eq(schema.emailLog.domainId, result.id), gte(schema.emailLog.createdAt, dayStart)));
+		const sentToday = sentRow?.value ?? 0;
+		const remaining = dailyCap === null ? null : Math.max(0, dailyCap - sentToday);
 		return {
 			object: "domain" as const,
 			...result,
+			registrarCreatedAt: registrarCreatedAtStr ? new Date(registrarCreatedAtStr) : null,
+			ageDays,
+			dailyCap,
+			sentToday,
+			remaining,
+			source: registrarCreatedAtStr ? "rdap" : "reloop",
 			event: DOMAIN_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {

@@ -43,6 +43,12 @@ export type Domain = {
 	lastVerifiedAt: string | null;
 	createdAt: string;
 	updatedAt: string;
+	registrarCreatedAt?: string | null;
+	ageDays?: number | null;
+	dailyCap?: number | null;
+	sentToday?: number | null;
+	remaining?: number | null;
+	source?: string | null;
 };
 
 export type DomainResponse = Domain & {

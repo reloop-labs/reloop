@@ -3,6 +3,7 @@ import { db } from "@reloop/db/client";
 import {
 	getDomainAgeDays,
 	getDomainInitialDailyCap,
+	getRegistrarCreationDate,
 } from "@reloop/db/domain-age-cap";
 import { utcDayStart } from "@reloop/db/reserve-send-credits";
 import {
@@ -450,19 +451,26 @@ export async function getOrganizationController(organizationId: string) {
 					.where(and(inArray(emailLog.domainId, domainIds), gte(emailLog.createdAt, dayStart)))
 					.groupBy(emailLog.domainId);
 	const sentByDomain = new Map(sentByDomainRows.map((r) => [r.domainId, r.value]));
-	const enrichedDomains = domains.map((d) => {
-		const ageDays = getDomainAgeDays(d.createdAt, new Date());
-		const dailyCap = getDomainInitialDailyCap(ageDays);
-		const sentTodayForDomain = sentByDomain.get(d.id) ?? 0;
-		const remaining = dailyCap === null ? null : Math.max(0, dailyCap - sentTodayForDomain);
-		return {
-			...d,
-			ageDays,
-			dailyCap,
-			sentToday: sentTodayForDomain,
-			remaining,
-		};
-	});
+	const enrichedDomains = await Promise.all(
+		domains.map(async (d) => {
+			const registrarCreatedAtStr = await getRegistrarCreationDate(d.domain);
+			const ageDays = registrarCreatedAtStr
+				? getDomainAgeDays(new Date(registrarCreatedAtStr), new Date())
+				: getDomainAgeDays(d.createdAt, new Date());
+			const dailyCap = getDomainInitialDailyCap(ageDays);
+			const sentTodayForDomain = sentByDomain.get(d.id) ?? 0;
+			const remaining = dailyCap === null ? null : Math.max(0, dailyCap - sentTodayForDomain);
+			return {
+				...d,
+				registrarCreatedAt: registrarCreatedAtStr ? new Date(registrarCreatedAtStr) : null,
+				ageDays,
+				dailyCap,
+				sentToday: sentTodayForDomain,
+				remaining,
+				source: registrarCreatedAtStr ? "rdap" : "reloop",
+			};
+		}),
+	);
 
 	return {
 		id: org.id,

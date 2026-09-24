@@ -186,10 +186,11 @@ export async function sendEmailController({
 	);
 
 	// ── Domain-age initial daily cap (all packages) ───────────────────────
-	// New domains are throttled regardless of plan: 0–1d:20, 2–3d:50, 4–7d:100, 8–14d:250, 15–30d:500, 30+d:dynamic
+	// Uses registrar registration age via RDAP (domain age checker tool), not Reloop added date
+	// 0–1d:20, 2–3d:50, 4–7d:100, 8–14d:250, 15–30d:500, 30+d:dynamic
 	const recipientCount = countEmailRecipients(body);
 	const ageCheck = await checkDomainAgeDailyCap({
-		domain: { id: currentDomain.id, createdAt: currentDomain.createdAt },
+		domain: { id: currentDomain.id, domain: currentDomain.domain, createdAt: currentDomain.createdAt },
 		recipientCount,
 	});
 	if (!ageCheck.allowed && ageCheck.cap !== null) {

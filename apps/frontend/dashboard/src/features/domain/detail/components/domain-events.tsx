@@ -15,9 +15,13 @@ export const DomainEvents = ({
 }) => {
 	const [expanded, setExpanded] = useState(false);
 
-	const ageDays = domain
-		? Math.max(0, Math.floor((Date.now() - new Date(domain.createdAt).getTime()) / 86400000))
-		: 0;
+	// Use registrar age from API (RDAP) if available, fallback to Reloop added date
+	const ageDays =
+		domain?.ageDays != null
+			? domain.ageDays
+			: domain
+				? Math.max(0, Math.floor((Date.now() - new Date(domain.createdAt).getTime()) / 86400000))
+				: 0;
 	const getCap = (age: number): number | null => {
 		if (age <= 1) return 20;
 		if (age <= 3) return 50;
@@ -26,7 +30,7 @@ export const DomainEvents = ({
 		if (age <= 30) return 500;
 		return null;
 	};
-	const dailyCap = getCap(ageDays);
+	const dailyCap = domain?.dailyCap !== undefined ? domain.dailyCap : getCap(ageDays);
 	const nextCap = (() => {
 		if (ageDays <= 1) return { cap: 50, inDays: 2 - ageDays };
 		if (ageDays <= 3) return { cap: 100, inDays: 4 - ageDays };
@@ -35,6 +39,7 @@ export const DomainEvents = ({
 		if (ageDays <= 30) return { cap: null, label: "Dynamic" as const, inDays: 31 - ageDays };
 		return null;
 	})();
+	const registrarCreatedAt = domain?.registrarCreatedAt ? new Date(domain.registrarCreatedAt) : null;
 
 	const bannerMessage = () => {
 		if (!domain) return "";
@@ -89,72 +94,64 @@ export const DomainEvents = ({
 
 	return (
 		<div className="mt-7 flex flex-col gap-4">
-			{/* Status banner */}
-			<div
-				className={cn(
-					"flex items-start gap-2.5 rounded-2xl border p-4",
-					tone.card,
-				)}
-			>
-				<Icon
-					name={tone.icon}
-					className={cn("mt-0.5 h-4 w-4 shrink-0", tone.iconClass)}
-				/>
-				<p className="flex-1 font-medium text-paragraph-sm text-text-strong-950">
-					{bannerMessage()}
-				</p>
-				{domain?.status === "active" && (
-					<button
-						type="button"
-						onClick={() => setExpanded((v) => !v)}
-						aria-expanded={expanded}
-						aria-label={expanded ? "Hide sending limits" : "Show sending limits"}
-						className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60"
-					>
-						<Icon
-							name="chevron-down"
-							className={cn("size-3.5 transition-transform duration-200", expanded && "rotate-180")}
-						/>
-					</button>
+			{/* Status banner — expands in place to show age & cap */}
+			<div className={cn("rounded-2xl border p-4", tone.card)}>
+				<div className="flex items-start gap-2.5">
+					<Icon
+						name={tone.icon}
+						className={cn("mt-0.5 h-4 w-4 shrink-0", tone.iconClass)}
+					/>
+					<p className="flex-1 font-medium text-paragraph-sm text-text-strong-950">
+						{bannerMessage()}
+					</p>
+					{domain?.status === "active" && (
+						<button
+							type="button"
+							onClick={() => setExpanded((v) => !v)}
+							aria-expanded={expanded}
+							aria-label={expanded ? "Hide sending limits" : "Show sending limits"}
+							className="ml-auto flex size-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60"
+						>
+							<Icon
+								name="chevron-down"
+								className={cn("size-3.5 transition-transform duration-200", expanded && "rotate-180")}
+							/>
+						</button>
+					)}
+				</div>
+
+				{expanded && domain?.status === "active" && (
+					<div className="mt-3 border-t border-success-base/15 pt-3 dark:border-success-base/20">
+						<p className="text-[12px] leading-relaxed text-text-strong-950 dark:text-white">
+							Your domain is <span className="font-semibold">{ageDays} day{ageDays === 1 ? "" : "s"} old</span>{" "}
+							{registrarCreatedAt ? (
+								<span>
+									(registered {registrarCreatedAt.toLocaleDateString()} via registrar, RDAP
+									{ageDays > 30 ? ` — ${Math.floor(ageDays / 30)} months` : ""})
+								</span>
+							) : (
+								<span>(added {new Date(domain.createdAt).toLocaleDateString()})</span>
+							)}{" "}
+							— you can send up to{" "}
+							<span className="font-semibold">{dailyCap === null ? "as many as your plan allows (reputation-based)" : `${dailyCap.toLocaleString()} emails today`}</span>
+							{dailyCap !== null && ` (resets at 00:00 UTC${domain.sentToday != null ? ` · ${domain.sentToday}/${dailyCap} sent today` : ""})`}.
+						</p>
+						{nextCap && dailyCap !== null && (
+							<p className="mt-1 text-[12px] leading-relaxed text-text-sub-600 dark:text-white/60">
+								Next increase: {nextCap.cap === null ? "unlimited (reputation-based)" : `${nextCap.cap.toLocaleString()}/day`} in {nextCap.inDays} day{nextCap.inDays === 1 ? "" : "s"} — no action needed, it rises automatically.
+							</p>
+						)}
+						{dailyCap === null && (
+							<p className="mt-1 text-[12px] leading-relaxed text-text-sub-600 dark:text-white/60">
+								Warmup complete — your plan limit now applies (Free 100/day). Keep bounce/complaint low to stay dynamic.
+							</p>
+						)}
+						<p className="mt-2 text-[11px] leading-relaxed text-text-sub-600 dark:text-white/50">
+							New domains are throttled for all plans to protect reputation. If you hit the limit you’ll get a 429 and can try again tomorrow.
+						</p>
+					</div>
 				)}
 			</div>
-
-			{/* Expanded — domain age & cap (all plans) */}
-			{expanded && domain?.status === "active" && (
-				<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-white/10 dark:bg-white/[0.02]">
-					<p className="text-[11px] font-semibold uppercase tracking-wide text-text-sub-600 dark:text-white/50">Sending limits — new domain warmup</p>
-					<div className="mt-3 grid gap-3 sm:grid-cols-3">
-						<div className="rounded-xl bg-bg-weak-50 px-3 py-3 dark:bg-white/[0.04]">
-							<p className="text-[11px] text-text-sub-600 dark:text-white/50">Domain age</p>
-							<p className="mt-1 font-semibold text-sm text-text-strong-950 dark:text-white">
-								{ageDays} day{ageDays === 1 ? "" : "s"}
-								<span className="ml-1 text-[11px] font-normal text-text-sub-600 dark:text-white/50">added {new Date(domain.createdAt).toLocaleDateString()}</span>
-							</p>
-						</div>
-						<div className="rounded-xl bg-bg-weak-50 px-3 py-3 dark:bg-white/[0.04]">
-							<p className="text-[11px] text-text-sub-600 dark:text-white/50">Daily cap today</p>
-							<p className="mt-1 font-semibold text-sm text-text-strong-950 dark:text-white">
-								{dailyCap === null ? "Dynamic" : `${dailyCap.toLocaleString()} emails/day`}
-							</p>
-							<p className="text-[11px] text-text-sub-600 dark:text-white/50">Resets at 00:00 UTC</p>
-						</div>
-						<div className="rounded-xl bg-bg-weak-50 px-3 py-3 dark:bg-white/[0.04]">
-							<p className="text-[11px] text-text-sub-600 dark:text-white/50">Next increase</p>
-							<p className="mt-1 font-semibold text-sm text-text-strong-950 dark:text-white">
-								{nextCap
-									? nextCap.cap === null
-										? `Dynamic in ${nextCap.inDays}d`
-										: `${nextCap.cap.toLocaleString()} in ${nextCap.inDays}d`
-									: "Dynamic — reputation based"}
-							</p>
-							<p className="text-[11px] text-text-sub-600 dark:text-white/50">{dailyCap === null ? "Free still 100/day" : "All plans same"}</p>
-						</div>
-					</div>
-					<div className="mt-3 rounded-xl bg-amber-500/10 px-3 py-2.5 text-[12px] leading-relaxed text-amber-800 dark:bg-amber-500/10 dark:text-amber-200">
-						<p className="font-medium">Warmup schedule (all plans): 0–1d: 20 (highly engaged only) → 2–3d: 50 → 4–7d: 100 → 8–14d: 250 → 15–30d: 500 → 30d+: Dynamic. Hitting the cap returns 429 until midnight.</p>
-					</div>
-				</div>
-			)}
 
 			{/* Bottom section — timeline steps (email details style) */}
 			<StatusTimeline domain={domain} />

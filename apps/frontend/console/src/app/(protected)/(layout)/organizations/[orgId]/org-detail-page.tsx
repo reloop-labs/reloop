@@ -103,10 +103,12 @@ type OrgDetail = {
 		status: string;
 		systemVerified: boolean;
 		createdAt: string;
+		registrarCreatedAt: string | null;
 		ageDays: number;
 		dailyCap: number | null;
 		sentToday: number;
 		remaining: number | null;
+		source: string;
 	}>;
 	apiKeys: Array<{
 		id: string;
@@ -986,7 +988,9 @@ export default function OrganizationDetailPage() {
 									</td>
 									<td className="px-4 py-3 tabular-nums text-text-strong-950">
 										{d.ageDays}d
-										<span className="ml-1 text-[11px] text-text-sub-600">({d.ageDays <= 1 ? "today" : `${d.ageDays}d ago`})</span>
+										<span className="ml-1 text-[11px] text-text-sub-600" title={d.registrarCreatedAt ? `Registrar: ${new Date(d.registrarCreatedAt).toLocaleDateString()} via ${d.source}` : `Added: ${new Date(d.createdAt).toLocaleDateString()}`}>
+											({d.source === "rdap" && d.registrarCreatedAt ? `reg ${new Date(d.registrarCreatedAt).toLocaleDateString()}` : d.ageDays <= 1 ? "today" : `${d.ageDays}d ago`})
+										</span>
 									</td>
 									<td className="px-4 py-3 tabular-nums">
 										{d.dailyCap === null ? (
