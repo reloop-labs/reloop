@@ -216,6 +216,7 @@ export async function getOrganizationController(organizationId: string) {
 		apiKeys,
 		templates,
 		webhooks,
+		mailboxes,
 		recentEmails,
 		supportThreads,
 		recentAuditRows,
@@ -323,6 +324,20 @@ export async function getOrganizationController(organizationId: string) {
 			.where(eq(webhook.organizationId, organizationId))
 			.orderBy(desc(webhook.createdAt))
 			.limit(100),
+		db
+			.select({
+				id: mailbox.id,
+				email: mailbox.email,
+				displayName: mailbox.displayName,
+				status: mailbox.status,
+				domain: domain.domain,
+				createdAt: mailbox.createdAt,
+			})
+			.from(mailbox)
+			.leftJoin(domain, eq(mailbox.domainId, domain.id))
+			.where(eq(mailbox.organizationId, organizationId))
+			.orderBy(desc(mailbox.createdAt))
+			.limit(10),
 		db
 			.select({
 				id: emailLog.id,
@@ -506,6 +521,14 @@ export async function getOrganizationController(organizationId: string) {
 			status: w.status,
 			createdAt: w.createdAt,
 			updatedAt: w.updatedAt,
+		})),
+		mailboxes: mailboxes.map((m) => ({
+			id: m.id,
+			email: m.email,
+			displayName: m.displayName ?? null,
+			status: m.status,
+			domain: m.domain ?? null,
+			createdAt: m.createdAt,
 		})),
 		recentEmails: recentEmails.map((e) => ({
 			id: e.id,

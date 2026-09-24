@@ -300,6 +300,16 @@ export namespace AdminModel {
 				updatedAt: t.Date(),
 			}),
 		),
+		mailboxes: t.Array(
+			t.Object({
+				id: t.String(),
+				email: t.String(),
+				displayName: t.Union([t.String(), t.Null()]),
+				status: t.String(),
+				domain: t.Union([t.String(), t.Null()]),
+				createdAt: t.Date(),
+			}),
+		),
 		recentEmails: t.Array(
 			t.Object({
 				id: t.String(),

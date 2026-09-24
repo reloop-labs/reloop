@@ -135,6 +135,14 @@ type OrgDetail = {
 		createdAt: string;
 		updatedAt: string;
 	}>;
+	mailboxes: Array<{
+		id: string;
+		email: string;
+		displayName: string | null;
+		status: string;
+		domain: string | null;
+		createdAt: string;
+	}>;
 	recentEmails: Array<{
 		id: string;
 		fromEmail: string;
@@ -665,6 +673,35 @@ export default function OrganizationDetailPage() {
 											</div>
 										);
 									})}
+									{/* Used inbox details */}
+									{data.counts.mailboxes > 0 && data.mailboxes.length > 0 ? (
+										<div className="border-t border-stroke-soft-100 bg-bg-weak-50/30 px-4 py-3 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+											<p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-text-sub-600">
+												Used inboxes — {data.mailboxes.length} {data.mailboxes.length === 1 ? "inbox" : "inboxes"}
+											</p>
+											<div className="space-y-2">
+												{data.mailboxes.map((mb) => (
+													<div
+														key={mb.id}
+														className="flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-100 bg-white px-3 py-2.5 dark:border-white/10 dark:bg-white/[0.04]"
+													>
+														<div className="min-w-0 flex-1">
+															<p className="truncate font-medium text-[12px] text-text-strong-950">{mb.email}</p>
+															<p className="truncate text-[11px] text-text-sub-600">
+																{mb.displayName ? `${mb.displayName} · ` : ""}
+																{mb.domain || "—"} · {formatDateTime(mb.createdAt)}
+															</p>
+														</div>
+														<StatusPill status={mb.status} />
+													</div>
+												))}
+											</div>
+										</div>
+									) : data.counts.mailboxes === 0 ? (
+										<div className="border-t border-stroke-soft-100 px-4 py-3 text-[12px] text-text-sub-600 dark:border-stroke-soft-100/40">
+											No agent inboxes yet — {data.plan ? `${data.plan.maxAgentInboxes} available` : "1 available"} on {planLabel(data.plan?.planId)}
+										</div>
+									) : null}
 									<div className="flex items-center justify-between gap-3 px-4 py-3 text-[12px]">
 										<span className="text-text-sub-600">Attachment limit</span>
 										<span className="font-medium tabular-nums text-text-strong-950">
