@@ -28,6 +28,16 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+
+const PLAN_LABEL: Record<string, string> = {
+	free: "Free",
+	individual: "Pro",
+	startup: "Growth",
+	enterprise: "Enterprise",
+};
+function planLabel(planId?: string | null): string {
+	return PLAN_LABEL[planId ?? "free"] ?? planId ?? "Free";
+}
 import useSWR from "swr";
 import { OrgSendingIps } from "./org-sending-ips";
 
@@ -253,7 +263,7 @@ export default function OrganizationDetailPage() {
 					<>
 						<StatusPill status={data.status} />
 						<StatusPill
-							status={data.plan?.planId ?? "free"}
+							status={planLabel(data.plan?.planId)}
 							tone={
 								data.plan?.planId === "individual" ||
 								data.plan?.planId === "startup" ||
@@ -288,7 +298,7 @@ export default function OrganizationDetailPage() {
 								data.plan?.planId === "startup" ||
 								data.plan?.planId === "enterprise";
 							return isPro ? (
-								<StatusPill status={data.plan?.planId ?? "pro"} tone="green" />
+								<StatusPill status={planLabel(data.plan?.planId)} tone="green" />
 							) : (
 								<Button.Root
 									variant="neutral"
@@ -463,7 +473,7 @@ export default function OrganizationDetailPage() {
 							</Input.Wrapper>
 						</Input.Root>
 						<p className="text-[12px] text-text-sub-600">
-							Current: {data.plan?.planId ?? "free"} → Pro (individual).{" "}
+							Current: {planLabel(data.plan?.planId)} → Pro.{" "}
 							{data.plan?.planId && data.plan.planId !== "free"
 								? "Already Pro or higher – conversion blocked."
 								: `New quota: 50,000/month; credits will be topped to ${Math.max(0, 50000 - (data.credits?.creditsUsed ?? 0)).toLocaleString()} remaining.`}
@@ -547,8 +557,8 @@ export default function OrganizationDetailPage() {
 								[
 									"Plan",
 									data.plan
-										? `${data.plan.planId} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
-										: "free · 3,000/mo",
+										? `${planLabel(data.plan.planId)} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
+										: "Free · 3,000/mo",
 								],
 								["Billing email", data.billingEmail || "—"],
 								["Billing name", data.billingName || "—"],

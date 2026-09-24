@@ -29,6 +29,16 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 
+const PLAN_LABEL: Record<string, string> = {
+	free: "Free",
+	individual: "Pro",
+	startup: "Growth",
+	enterprise: "Enterprise",
+};
+function planLabel(planId?: string | null): string {
+	return PLAN_LABEL[planId ?? "free"] ?? planId ?? "Free";
+}
+
 type UserDetail = {
 	id: string;
 	name: string;
@@ -544,7 +554,7 @@ export default function UserDetailPage() {
 											</Link>
 											<div className="flex items-center gap-2">
 												<StatusPill
-													status={org.planId ?? "free"}
+													status={planLabel(org.planId)}
 													tone={isPro ? "green" : "gray"}
 												/>
 												<StatusPill status={org.status} />
@@ -615,7 +625,7 @@ export default function UserDetailPage() {
 									</td>
 									<td className="px-4 py-3">
 										<StatusPill
-											status={org.planId ?? "free"}
+											status={planLabel(org.planId)}
 											tone={isPro ? "green" : "gray"}
 										/>
 									</td>
