@@ -41,11 +41,11 @@ const TABS: Array<{
 	label: string;
 	icon: string;
 }> = [
+	{ id: "clicked", label: "Clicks", icon: "cursor-click" },
 	{ id: "unsubscribed", label: "Unsubscribed", icon: "user-minus" },
 	{ id: "bounced", label: "Bounced", icon: "bounce" },
 	{ id: "suppressed", label: "Suppressed", icon: "slash" },
 	{ id: "complained", label: "Complained", icon: "alert-triangle" },
-	{ id: "clicked", label: "Clicks", icon: "cursor-click" },
 ];
 
 function getCategoryBadge(category?: DeliverabilityCategory | string) {
@@ -245,12 +245,12 @@ export function CampaignRecipientIssuesCard({
 			id="campaign-recipients"
 			className={cn("w-full text-paragraph-sm", className)}
 		>
-			<div className="rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-1 pr-2 pb-2.5 pl-2 dark:border-[#101010] dark:bg-bg-weak-50/40">
+			<div className="rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pr-2 pb-2.5 pl-2 dark:border-[#101010] dark:bg-bg-weak-50/40">
 				<TabMenu.Root
 					value={activeTab}
 					onValueChange={(val) => onActiveTabChange(val as CategoryTab)}
 				>
-					<TabMenu.List className="relative h-11 gap-0 border-b-0 py-0">
+					<TabMenu.List className="-mt-0.5 relative h-11 gap-0 border-b-0 py-0">
 						{TABS.map((tab, index) => {
 							const count = counts?.[tab.id];
 							return (
@@ -302,8 +302,8 @@ export function CampaignRecipientIssuesCard({
 				</TabMenu.Root>
 			</div>
 
-			<div className="-mt-2.5 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
-				<div className="flex items-center justify-between gap-2 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/50">
+			<div className="-mt-2.5 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0">
+				<div className="flex items-center justify-between gap-2 border-stroke-soft-100 border-b px-4 py-2.5">
 					<Input.Root
 						size="small"
 						className="w-full max-w-72 rounded-xl shadow-none!"
@@ -458,7 +458,7 @@ export function CampaignRecipientIssuesCard({
 				</div>
 
 				{activeTab === "clicked" ? (
-					<div className="flex items-center gap-6 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/50">
+					<div className="flex items-center gap-6 border-stroke-soft-100 border-b px-4 py-2.5">
 						<div className="flex items-baseline gap-2">
 							<span className="text-paragraph-xs text-text-sub-600">
 								Unique clicks
@@ -562,7 +562,12 @@ export function CampaignRecipientIssuesCard({
 					) : (
 						<div className="flex flex-col items-center px-6 py-12 text-center">
 							<Icon
-								name={searchQuery ? "search" : "users"}
+								name={
+									searchQuery
+										? "search"
+										: (TABS.find((tab) => tab.id === activeTab)?.icon ??
+											"users")
+								}
 								className="mb-4 h-8 w-8 text-text-sub-600"
 							/>
 							<p className="font-semibold text-text-strong-950 text-xl">

@@ -28,7 +28,7 @@ function CampaignDetailContent() {
 	const campaignQuery = useCampaignQuery(campaignId);
 
 	const [actionPending, setActionPending] = useState(false);
-	const [recipientTab, setRecipientTab] = useState<CategoryTab>("unsubscribed");
+	const [recipientTab, setRecipientTab] = useState<CategoryTab>("clicked");
 
 	const campaign = campaignQuery.data;
 

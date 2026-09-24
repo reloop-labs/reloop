@@ -89,7 +89,7 @@ function MetricTable({
 					{value}
 				</span>
 			</div>
-			<div className="-mt-2.5 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+			<div className="-mt-2.5 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0">
 				{helper ? (
 					<p className="px-4 pt-2 text-paragraph-xs text-text-soft-400">
 						{helper}
