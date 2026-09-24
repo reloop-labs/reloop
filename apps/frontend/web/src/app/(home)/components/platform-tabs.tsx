@@ -4,7 +4,6 @@ import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
-import { HeroWindowChrome } from "./hero-chrome";
 
 type PlatformTabId =
 	| "domains"
@@ -63,31 +62,39 @@ const TABS: {
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
-// Full-window product screenshots (already include sidebar + topbar,
-// so they render directly in HeroWindowChrome with no nested shell).
-const PLATFORM_IMAGES: Record<PlatformTabId, { src: string; alt: string }> = {
+// One grainy bg per tab — light + dark.
+const PLATFORM_IMAGES: Record<
+	PlatformTabId,
+	{ src: string; darkSrc: string; alt: string }
+> = {
 	domains: {
-		src: "/platform/domains.png",
+		src: "/backgrounds/grain-blue.png",
+		darkSrc: "/backgrounds/grain-blue-dark.png",
 		alt: "Domains — verify DNS once, send forever",
 	},
 	email: {
-		src: "/platform/email.png",
+		src: "/backgrounds/grain-amber.png",
+		darkSrc: "/backgrounds/grain-amber-dark.png",
 		alt: "Email — transactional API and SMTP relay",
 	},
 	analytics: {
-		src: "/platform/analytics.png",
+		src: "/backgrounds/grain-mint.png",
+		darkSrc: "/backgrounds/grain-mint-dark.png",
 		alt: "Analytics — delivery, opens and bounces live",
 	},
 	templates: {
-		src: "/platform/templates.png",
+		src: "/backgrounds/grain-rose.png",
+		darkSrc: "/backgrounds/grain-rose-dark.png",
 		alt: "Templates — React Email blocks that scale",
 	},
 	agents: {
-		src: "/platform/agents.png",
+		src: "/backgrounds/grain-grape.png",
+		darkSrc: "/backgrounds/grain-grape-dark.png",
 		alt: "Agent Inbox — inbound email for AI agents",
 	},
 	workflows: {
-		src: "/platform/workflows.png",
+		src: "/backgrounds/grain-sky.png",
+		darkSrc: "/backgrounds/grain-sky-dark.png",
 		alt: "Workflows — automate lifecycle sends",
 	},
 };
@@ -101,7 +108,16 @@ function PlatformPreview({ tab }: { tab: PlatformTabId }) {
 				alt={img.alt}
 				fill
 				sizes="(max-width: 1024px) 100vw, 1200px"
-				className="object-cover object-top"
+				className="object-cover object-top dark:hidden"
+				priority={tab === "domains"}
+			/>
+			<Image
+				src={img.darkSrc}
+				alt=""
+				aria-hidden
+				fill
+				sizes="(max-width: 1024px) 100vw, 1200px"
+				className="hidden object-cover object-top dark:block"
 				priority={tab === "domains"}
 			/>
 		</div>
@@ -126,7 +142,7 @@ export default function PlatformTabs() {
 			<div
 				role="tablist"
 				aria-label="Platform areas"
-				className="grid grid-cols-2 border-stroke-soft-100 border-b sm:grid-cols-3 lg:grid-cols-5 dark:border-white/10"
+				className="grid grid-cols-2 border-stroke-soft-100 border-b sm:grid-cols-3 lg:grid-cols-6 dark:border-white/10"
 			>
 				{TABS.map((tab) => {
 					const selected = tab.id === active;
@@ -194,33 +210,31 @@ export default function PlatformTabs() {
 			</div>
 
 			{/* Preview panel — whole image, no nested dashboard shell */}
-			<div className="bg-bg-weak-50/40 px-3 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:bg-white/[0.015]">
-				<HeroWindowChrome>
-					<AnimatePresence mode="wait">
-						<motion.div
-							key={active}
-							className="h-[440px] w-full sm:h-[520px] lg:h-[560px]"
-							initial={
-								reduceMotion
-									? { opacity: 1 }
-									: { opacity: 0, filter: "blur(2px)" }
-							}
-							animate={{ opacity: 1, filter: "blur(0px)" }}
-							exit={
-								reduceMotion
-									? { opacity: 0 }
-									: { opacity: 0, filter: "blur(2px)" }
-							}
-							transition={
-								reduceMotion
-									? { duration: 0 }
-									: { duration: 0.22, ease: EASE_OUT }
-							}
-						>
-							<PlatformPreview tab={active} />
-						</motion.div>
-					</AnimatePresence>
-				</HeroWindowChrome>
+			<div>
+				<AnimatePresence mode="wait">
+					<motion.div
+						key={active}
+						className="h-[440px] w-full sm:h-[520px] lg:h-[560px]"
+						initial={
+							reduceMotion
+								? { opacity: 1 }
+								: { opacity: 0, filter: "blur(2px)" }
+						}
+						animate={{ opacity: 1, filter: "blur(0px)" }}
+						exit={
+							reduceMotion
+								? { opacity: 0 }
+								: { opacity: 0, filter: "blur(2px)" }
+						}
+						transition={
+							reduceMotion
+								? { duration: 0 }
+								: { duration: 0.22, ease: EASE_OUT }
+						}
+					>
+						<PlatformPreview tab={active} />
+					</motion.div>
+				</AnimatePresence>
 			</div>
 		</section>
 	);

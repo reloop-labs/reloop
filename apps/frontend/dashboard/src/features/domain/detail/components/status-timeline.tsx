@@ -33,6 +33,13 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 
 	const verifiedAt = domain.lastVerifiedAt || domain.updatedAt;
 
+	function formatShort(value?: string | null) {
+		if (!value) return null;
+		const date = new Date(value);
+		if (Number.isNaN(date.getTime())) return null;
+		return format(date, "MMM d, h:mm a");
+	}
+
 	const steps = [
 		{
 			number: 1,
@@ -58,7 +65,6 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 						: domain.status === "failed"
 							? "cross-circle"
 							: "list-check",
-			timestamp: null,
 			rawDate:
 				(domain.status === "active" ||
 					domain.status === "verifying" ||
@@ -109,6 +115,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 			<div className="flex w-full max-w-2xl items-start justify-start">
 				{steps.map((step, index) => {
 					const state = getStepState(step.number);
+					const timeLabel = formatShort(step.rawDate);
 
 					const textBlock = (
 						<div className="flex cursor-default flex-col items-center gap-1 text-center">
@@ -121,9 +128,9 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 								{step.label}
 							</span>
 							<div className="flex h-4 items-center justify-center">
-								{step.timestamp ? (
+								{timeLabel ? (
 									<span className="whitespace-nowrap font-medium text-text-soft-400 text-xs">
-										{step.timestamp}
+										{timeLabel}
 									</span>
 								) : (
 									<span className="h-4 w-16 opacity-0" aria-hidden="true" />

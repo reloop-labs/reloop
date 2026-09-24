@@ -7,7 +7,6 @@ import { CommandMenuProvider } from "#/features/dashboard/command-menu-context";
 import { AiPanel } from "#/features/dashboard/layout/ai-panel";
 import { OpenSupportFromQuery } from "#/features/dashboard/open-support-from-query";
 import { useUIStore } from "#/store/use-ui-store";
-import { FloatingSupportButton } from "./floating-support-button";
 import { PageHeader } from "./page-header/page-header";
 import { MainSidebar } from "./sidebar/main-sidebar";
 import { MobileSidebarSheet } from "./sidebar/mobile-sidebar-sheet";
@@ -95,7 +94,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 					</div>
 				</main>
 				<AnimatePresence>{isAiPanelOpen ? <AiPanel /> : null}</AnimatePresence>
-				<FloatingSupportButton />
 				<CommandMenuGlobal />
 			</div>
 		</CommandMenuProvider>
