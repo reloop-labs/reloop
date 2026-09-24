@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/admin/middleware/auth-middleware";
 import { AdminModel } from "@reloop/admin/model/admin.model";
 import { Elysia, t } from "elysia";
+import { convertOrganizationPlanController } from "./convert-plan.controllers";
 import {
 	getOrganizationController,
 	listOrganizationsController,
@@ -78,6 +79,35 @@ export const organizationsRoute = new Elysia()
 			detail: {
 				tags: ["Admin"],
 				summary: "Update organization status",
+			},
+		},
+	)
+	.post(
+		"/organizations/:organizationId/convert-plan",
+		async ({ params, body, userId }) =>
+			convertOrganizationPlanController({
+				organizationId: params.organizationId,
+				targetPlanId: (body.targetPlanId ?? "individual") as
+					| "individual"
+					| "startup"
+					| "enterprise",
+				mode: (body.mode ?? "comped") as "comped" | "paid",
+				reason: body.reason,
+				actorUserId: userId,
+			}),
+		{
+			authAdmin: true,
+			params: t.Object({ organizationId: t.String() }),
+			body: AdminModel.convertPlanBody,
+			response: {
+				200: AdminModel.convertPlanResponse,
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Admin"],
+				summary: "Convert organization to Pro (or higher)",
+				description:
+					"Admin action to grant Pro/individual plan. Supports comped (free grant) vs paid (external payment). Blocks if already Pro+.",
 			},
 		},
 	);

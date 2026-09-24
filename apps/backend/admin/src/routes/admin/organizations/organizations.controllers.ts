@@ -8,6 +8,7 @@ import {
 	member,
 	organization,
 	organizationCredits,
+	organizationPlan,
 	supportConversation,
 	template,
 	user,
@@ -63,11 +64,16 @@ export async function listOrganizationsController({
 			createdAt: organization.createdAt,
 			billingEmail: organization.billingEmail,
 			creditsRemaining: organizationCredits.creditsRemaining,
+			planId: organizationPlan.planId,
 		})
 		.from(organization)
 		.leftJoin(
 			organizationCredits,
 			eq(organizationCredits.organizationId, organization.id),
+		)
+		.leftJoin(
+			organizationPlan,
+			eq(organizationPlan.organizationId, organization.id),
 		)
 		.where(whereClause)
 		.orderBy(desc(organization.createdAt))
@@ -123,6 +129,7 @@ export async function listOrganizationsController({
 			memberCount: memberMap.get(o.id) ?? 0,
 			domainCount: domainMap.get(o.id) ?? 0,
 			creditsRemaining: o.creditsRemaining ?? null,
+			planId: o.planId ?? null,
 		})),
 		total: totalRow?.value ?? 0,
 	};
@@ -166,6 +173,7 @@ export async function getOrganizationController(organizationId: string) {
 		members,
 		domains,
 		credits,
+		plan,
 		apiKeys,
 		templates,
 		webhooks,
@@ -219,6 +227,9 @@ export async function getOrganizationController(organizationId: string) {
 			.orderBy(desc(domain.createdAt)),
 		db.query.organizationCredits.findFirst({
 			where: eq(organizationCredits.organizationId, organizationId),
+		}),
+		db.query.organizationPlan.findFirst({
+			where: eq(organizationPlan.organizationId, organizationId),
 		}),
 		db
 			.select({
@@ -395,6 +406,20 @@ export async function getOrganizationController(organizationId: string) {
 					status: credits.status,
 					currentPeriodStart: credits.currentPeriodStart,
 					currentPeriodEnd: credits.currentPeriodEnd,
+				}
+			: null,
+		plan: plan
+			? {
+					planId: plan.planId,
+					monthlyEmails: plan.monthlyEmails,
+					dailyEmailLimit: plan.dailyEmailLimit,
+					overageEnabled: plan.overageEnabled,
+					maxAgentInboxes: plan.maxAgentInboxes,
+					maxWebhooks: plan.maxWebhooks,
+					maxCustomDomains: plan.maxCustomDomains,
+					maxAttachmentBytes: plan.maxAttachmentBytes,
+					dataRetentionDays: plan.dataRetentionDays,
+					dedicatedIpCount: plan.dedicatedIpCount,
 				}
 			: null,
 		members: members.map((m) => ({

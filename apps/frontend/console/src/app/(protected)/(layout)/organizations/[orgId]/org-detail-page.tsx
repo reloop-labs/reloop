@@ -63,6 +63,18 @@ type OrgDetail = {
 		currentPeriodStart: string;
 		currentPeriodEnd: string;
 	} | null;
+	plan: {
+		planId: string;
+		monthlyEmails: number;
+		dailyEmailLimit: number | null;
+		overageEnabled: boolean;
+		maxAgentInboxes: number;
+		maxWebhooks: number;
+		maxCustomDomains: number;
+		maxAttachmentBytes: number;
+		dataRetentionDays: number;
+		dedicatedIpCount: number;
+	} | null;
 	members: Array<{
 		id: string;
 		role: string;
@@ -174,6 +186,9 @@ export default function OrganizationDetailPage() {
 	const [topupOpen, setTopupOpen] = useState(false);
 	const [topupAmount, setTopupAmount] = useState("1000");
 	const [topupReason, setTopupReason] = useState("");
+	const [convertOpen, setConvertOpen] = useState(false);
+	const [convertMode, setConvertMode] = useState<"comped" | "paid">("comped");
+	const [convertReason, setConvertReason] = useState("");
 
 	const { data, isLoading, error, mutate } = useSWR<OrgDetail>(
 		orgId ? `/organizations/${orgId}` : null,
@@ -237,6 +252,16 @@ export default function OrganizationDetailPage() {
 				meta={
 					<>
 						<StatusPill status={data.status} />
+						<StatusPill
+							status={data.plan?.planId ?? "free"}
+							tone={
+								data.plan?.planId === "individual" ||
+								data.plan?.planId === "startup" ||
+								data.plan?.planId === "enterprise"
+									? "green"
+									: "gray"
+							}
+						/>
 						<span className="font-mono text-[12px] text-text-sub-600">
 							{data.slug}
 						</span>
@@ -257,6 +282,24 @@ export default function OrganizationDetailPage() {
 				}
 				actions={
 					<>
+						{(() => {
+							const isPro =
+								data.plan?.planId === "individual" ||
+								data.plan?.planId === "startup" ||
+								data.plan?.planId === "enterprise";
+							return isPro ? (
+								<StatusPill status={data.plan?.planId ?? "pro"} tone="green" />
+							) : (
+								<Button.Root
+									variant="neutral"
+									mode="filled"
+									size="small"
+									onClick={() => setConvertOpen(true)}
+								>
+									Convert to Pro
+								</Button.Root>
+							);
+						})()}
 						<Button.Root
 							variant="neutral"
 							mode="stroke"
@@ -370,6 +413,65 @@ export default function OrganizationDetailPage() {
 				</InlineActionPanel>
 			) : null}
 
+			{convertOpen ? (
+				<InlineActionPanel
+					title={`Convert ${data.name} to Pro?`}
+					description="Grants Pro (individual) – 50k emails/month, no daily limit, 5 inboxes/webhooks. Audit-logged. Use Comped for free grants or Paid when payment handled externally."
+					confirmLabel={
+						convertMode === "paid" ? "Convert to Pro (paid)" : "Convert to Pro (comped)"
+					}
+					onCancel={() => setConvertOpen(false)}
+					onConfirm={async () => {
+						await adminPost(`/organizations/${data.id}/convert-plan`, {
+							targetPlanId: "individual",
+							mode: convertMode,
+							reason: convertReason || undefined,
+						});
+						toast.success(
+							`Converted to Pro (${convertMode}) – 50k emails/month`,
+						);
+						setConvertOpen(false);
+						mutate();
+					}}
+				>
+					<div className="grid gap-3">
+						<div className="flex gap-2">
+							<Button.Root
+								variant="neutral"
+								mode={convertMode === "comped" ? "filled" : "stroke"}
+								size="small"
+								onClick={() => setConvertMode("comped")}
+							>
+								Comped (free)
+							</Button.Root>
+							<Button.Root
+								variant="neutral"
+								mode={convertMode === "paid" ? "filled" : "stroke"}
+								size="small"
+								onClick={() => setConvertMode("paid")}
+							>
+								Paid (external)
+							</Button.Root>
+						</div>
+						<Input.Root>
+							<Input.Wrapper>
+								<Input.Input
+									value={convertReason}
+									onChange={(e) => setConvertReason(e.target.value)}
+									placeholder="Reason (optional) – e.g. sales comp, migration"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+						<p className="text-[12px] text-text-sub-600">
+							Current: {data.plan?.planId ?? "free"} → Pro (individual).{" "}
+							{data.plan?.planId && data.plan.planId !== "free"
+								? "Already Pro or higher – conversion blocked."
+								: `New quota: 50,000/month; credits will be topped to ${Math.max(0, 50000 - (data.credits?.creditsUsed ?? 0)).toLocaleString()} remaining.`}
+						</p>
+					</div>
+				</InlineActionPanel>
+			) : null}
+
 			<MetricGrid
 				items={[
 					{
@@ -442,6 +544,12 @@ export default function OrganizationDetailPage() {
 								["Name", data.name],
 								["Slug", data.slug],
 								["Status", data.status],
+								[
+									"Plan",
+									data.plan
+										? `${data.plan.planId} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
+										: "free · 3,000/mo",
+								],
 								["Billing email", data.billingEmail || "—"],
 								["Billing name", data.billingName || "—"],
 								["External customer", data.externalCustomerId || "—"],

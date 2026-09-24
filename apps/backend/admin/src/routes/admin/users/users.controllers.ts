@@ -5,6 +5,7 @@ import {
 	member,
 	organization,
 	organizationCredits,
+	organizationPlan,
 	supportConversation,
 	user,
 } from "@reloop/db/schema";
@@ -48,6 +49,14 @@ export async function getUserController(userId: string) {
 		.orderBy(desc(member.createdAt));
 
 	const orgIds = memberships.map((m) => m.organizationId);
+
+	const planRows =
+		orgIds.length === 0
+			? []
+			: await db.query.organizationPlan.findMany({
+					where: inArray(organizationPlan.organizationId, orgIds),
+				});
+	const planMap = new Map(planRows.map((r) => [r.organizationId, r.planId]));
 
 	const domainCounts =
 		orgIds.length === 0
@@ -131,6 +140,7 @@ export async function getUserController(userId: string) {
 			creditsRemaining: m.creditsRemaining ?? null,
 			creditsUsed: m.creditsUsed ?? null,
 			monthlyCredits: m.monthlyCredits ?? null,
+			planId: planMap.get(m.organizationId) ?? null,
 		})),
 		apiKeys: apiKeys.map((k) => ({
 			id: k.id,

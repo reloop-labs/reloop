@@ -123,6 +123,7 @@ export namespace AdminModel {
 				creditsRemaining: t.Union([t.Number(), t.Null()]),
 				creditsUsed: t.Union([t.Number(), t.Null()]),
 				monthlyCredits: t.Union([t.Number(), t.Null()]),
+				planId: t.Union([t.String(), t.Null()]),
 			}),
 		),
 		apiKeys: t.Array(
@@ -162,11 +163,25 @@ export namespace AdminModel {
 		memberCount: t.Number(),
 		domainCount: t.Number(),
 		creditsRemaining: t.Union([t.Number(), t.Null()]),
+		planId: t.Union([t.String(), t.Null()]),
 	});
 
 	export const organizationsResponse = t.Object({
 		items: t.Array(organizationItem),
 		total: t.Number(),
+	});
+
+	export const planInfo = t.Object({
+		planId: t.String(),
+		monthlyEmails: t.Number(),
+		dailyEmailLimit: t.Union([t.Number(), t.Null()]),
+		overageEnabled: t.Boolean(),
+		maxAgentInboxes: t.Number(),
+		maxWebhooks: t.Number(),
+		maxCustomDomains: t.Number(),
+		maxAttachmentBytes: t.Number(),
+		dataRetentionDays: t.Number(),
+		dedicatedIpCount: t.Number(),
 	});
 
 	export const emailAttachment = t.Object({
@@ -224,6 +239,7 @@ export namespace AdminModel {
 			}),
 			t.Null(),
 		]),
+		plan: t.Union([planInfo, t.Null()]),
 		members: t.Array(
 			t.Object({
 				id: t.String(),
@@ -710,5 +726,33 @@ export namespace AdminModel {
 		dedicatedIpCount: t.Number(),
 		assignedCount: t.Number(),
 		items: t.Array(sendingIpItem),
+	});
+
+	export const convertPlanBody = t.Object({
+		targetPlanId: t.Optional(
+			t.Union([
+				t.Literal("individual"),
+				t.Literal("startup"),
+				t.Literal("enterprise"),
+			]),
+		),
+		mode: t.Optional(t.Union([t.Literal("comped"), t.Literal("paid")])),
+		reason: t.Optional(t.String()),
+	});
+
+	export const convertPlanResponse = t.Object({
+		organizationId: t.String(),
+		previousPlanId: t.String(),
+		planId: t.String(),
+		monthlyEmails: t.Number(),
+		dailyEmailLimit: t.Union([t.Number(), t.Null()]),
+		overageEnabled: t.Boolean(),
+		maxAgentInboxes: t.Number(),
+		maxWebhooks: t.Number(),
+		maxCustomDomains: t.Number(),
+		maxAttachmentBytes: t.Number(),
+		dataRetentionDays: t.Number(),
+		dedicatedIpCount: t.Number(),
+		mode: t.String(),
 	});
 }

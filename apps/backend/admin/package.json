@@ -21,6 +21,7 @@
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/bus": "workspace:*",
+		"@reloop/pricing": "workspace:*",
 		"@elysia/opentelemetry": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",
 		"dotenv": "catalog:backend",

@@ -12,7 +12,7 @@ import {
 } from "@fe/console/components/ui/page-frame";
 import { SectionCard } from "@fe/console/components/ui/section-card";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
-import { adminGet } from "@fe/console/lib/admin-api";
+import { adminGet, adminPost } from "@fe/console/lib/admin-api";
 import {
 	formatDateTime,
 	formatNumber,
@@ -22,6 +22,7 @@ import {
 import { authClient } from "@reloop/auth/client";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import * as Button from "@reloop/ui/button";
+import * as Input from "@reloop/ui/input";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -54,6 +55,7 @@ type UserDetail = {
 		creditsRemaining: number | null;
 		creditsUsed: number | null;
 		monthlyCredits: number | null;
+		planId: string | null;
 	}>;
 	apiKeys: Array<{
 		id: string;
@@ -94,6 +96,9 @@ export default function UserDetailPage() {
 	const [banOpen, setBanOpen] = useState(false);
 	const [promoteOpen, setPromoteOpen] = useState(false);
 	const [impersonateOpen, setImpersonateOpen] = useState(false);
+	const [convertOrgId, setConvertOrgId] = useState<string | null>(null);
+	const [convertMode, setConvertMode] = useState<"comped" | "paid">("comped");
+	const [convertReason, setConvertReason] = useState("");
 
 	const { data, isLoading, error, mutate } = useSWR<UserDetail>(
 		userId ? `/users/${userId}` : null,
@@ -320,6 +325,66 @@ export default function UserDetailPage() {
 				/>
 			) : null}
 
+			{convertOrgId ? (
+				<InlineActionPanel
+					title={"Convert org to Pro?"}
+					description="Grants Pro (individual) – 50k emails/month, no daily limit. Audit-logged. Choose Comped for free grant or Paid when payment handled externally."
+					confirmLabel={
+						convertMode === "paid"
+							? "Convert to Pro (paid)"
+							: "Convert to Pro (comped)"
+					}
+					onCancel={() => setConvertOrgId(null)}
+					onConfirm={async () => {
+						if (!convertOrgId) throw new Error("Select an organization");
+						await adminPost(`/organizations/${convertOrgId}/convert-plan`, {
+							targetPlanId: "individual",
+							mode: convertMode,
+							reason: convertReason || undefined,
+						});
+						toast.success(`Converted to Pro (${convertMode})`);
+						setConvertOrgId(null);
+						setConvertReason("");
+						mutate();
+					}}
+				>
+					<div className="grid gap-3">
+						<div className="flex gap-2">
+							<Button.Root
+								variant="neutral"
+								mode={convertMode === "comped" ? "filled" : "stroke"}
+								size="small"
+								onClick={() => setConvertMode("comped")}
+							>
+								Comped (free)
+							</Button.Root>
+							<Button.Root
+								variant="neutral"
+								mode={convertMode === "paid" ? "filled" : "stroke"}
+								size="small"
+								onClick={() => setConvertMode("paid")}
+							>
+								Paid (external)
+							</Button.Root>
+						</div>
+						<Input.Root>
+							<Input.Wrapper>
+								<Input.Input
+									value={convertReason}
+									onChange={(e) => setConvertReason(e.target.value)}
+									placeholder="Reason (optional)"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+						<p className="text-[12px] text-text-sub-600">
+							Org:{" "}
+							{data.organizations.find((o) => o.id === convertOrgId)?.name ??
+								convertOrgId}
+						</p>
+					</div>
+				</InlineActionPanel>
+			) : null}
+
 			<MetricGrid
 				items={[
 					{
@@ -457,25 +522,50 @@ export default function UserDetailPage() {
 							<EmptyState title="Not a member of any organization" />
 						) : (
 							<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-								{data.organizations.slice(0, 4).map((org) => (
-									<Link
-										key={org.memberId}
-										href={`/organizations/${org.id}`}
-										className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]"
-									>
-										<div className="min-w-0">
-											<p className="font-medium text-[13px]">{org.name}</p>
-											<p className="text-[12px] text-text-sub-600">
-												{org.slug} · {org.domainCount} domains ·{" "}
-												{formatNumber(org.creditsRemaining)} credits
-											</p>
+								{data.organizations.slice(0, 4).map((org) => {
+									const isPro =
+										org.planId === "individual" ||
+										org.planId === "startup" ||
+										org.planId === "enterprise";
+									return (
+										<div
+											key={org.memberId}
+											className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]"
+										>
+											<Link
+												href={`/organizations/${org.id}`}
+												className="min-w-0 flex-1"
+											>
+												<p className="font-medium text-[13px]">{org.name}</p>
+												<p className="text-[12px] text-text-sub-600">
+													{org.slug} · {org.domainCount} domains ·{" "}
+													{formatNumber(org.creditsRemaining)} credits
+												</p>
+											</Link>
+											<div className="flex items-center gap-2">
+												<StatusPill
+													status={org.planId ?? "free"}
+													tone={isPro ? "green" : "gray"}
+												/>
+												<StatusPill status={org.status} />
+												<StatusPill status={org.role} />
+												{isPro ? null : (
+													<Button.Root
+														size="xsmall"
+														variant="neutral"
+														mode="filled"
+														onClick={(e) => {
+															e.preventDefault();
+															setConvertOrgId(org.id);
+														}}
+													>
+														To Pro
+													</Button.Root>
+												)}
+											</div>
 										</div>
-										<div className="flex items-center gap-2">
-											<StatusPill status={org.status} />
-											<StatusPill status={org.role} />
-										</div>
-									</Link>
-								))}
+									);
+								})}
 							</div>
 						)}
 					</SectionCard>
@@ -491,83 +581,106 @@ export default function UserDetailPage() {
 						headers={[
 							"Organization",
 							"Status",
+							"Plan",
 							"Role",
 							"Domains",
 							"Credits",
 							"Joined",
 							"",
 						]}
-						colSpan={7}
+						colSpan={8}
 						empty={data.organizations.length === 0}
 					>
-						{data.organizations.map((org) => (
-							<tr
-								key={org.memberId}
-								className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40"
-							>
-								<td className="px-4 py-3">
-									<Link
-										href={`/organizations/${org.id}`}
-										className="font-medium hover:underline"
-									>
-										{org.name}
-									</Link>
-									<p className="text-[12px] text-text-sub-600">{org.slug}</p>
-								</td>
-								<td className="px-4 py-3">
-									<StatusPill status={org.status} />
-								</td>
-								<td className="px-4 py-3">
-									<StatusPill status={org.role} />
-									{org.id === data.activeOrganizationId ? (
-										<span className="ml-1 text-[11px] text-text-sub-600">
-											active
-										</span>
-									) : null}
-								</td>
-								<td className="px-4 py-3">{org.domainCount}</td>
-								<td className="px-4 py-3 tabular-nums">
-									{formatNumber(org.creditsRemaining)}
-								</td>
-								<td className="px-4 py-3 text-text-sub-600">
-									{formatRelativeTime(org.joinedAt)}
-								</td>
-								<td className="px-4 py-3">
-									<div className="flex flex-wrap justify-end gap-1">
-										<Button.Root
-											asChild
-											size="xsmall"
-											variant="neutral"
-											mode="stroke"
+						{data.organizations.map((org) => {
+							const isPro =
+								org.planId === "individual" ||
+								org.planId === "startup" ||
+								org.planId === "enterprise";
+							return (
+								<tr
+									key={org.memberId}
+									className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40"
+								>
+									<td className="px-4 py-3">
+										<Link
+											href={`/organizations/${org.id}`}
+											className="font-medium hover:underline"
 										>
-											<Link href={`/organizations/${org.id}`}>Hub</Link>
-										</Button.Root>
-										<Button.Root
-											asChild
-											size="xsmall"
-											variant="neutral"
-											mode="ghost"
-										>
-											<Link href={`/credits?organizationId=${org.id}`}>
-												Ledger
-											</Link>
-										</Button.Root>
-										<Button.Root
-											asChild
-											size="xsmall"
-											variant="neutral"
-											mode="ghost"
-										>
-											<Link
-												href={`/emails?organizationId=${org.id}&status=failed`}
+											{org.name}
+										</Link>
+										<p className="text-[12px] text-text-sub-600">{org.slug}</p>
+									</td>
+									<td className="px-4 py-3">
+										<StatusPill status={org.status} />
+									</td>
+									<td className="px-4 py-3">
+										<StatusPill
+											status={org.planId ?? "free"}
+											tone={isPro ? "green" : "gray"}
+										/>
+									</td>
+									<td className="px-4 py-3">
+										<StatusPill status={org.role} />
+										{org.id === data.activeOrganizationId ? (
+											<span className="ml-1 text-[11px] text-text-sub-600">
+												active
+											</span>
+										) : null}
+									</td>
+									<td className="px-4 py-3">{org.domainCount}</td>
+									<td className="px-4 py-3 tabular-nums">
+										{formatNumber(org.creditsRemaining)}
+									</td>
+									<td className="px-4 py-3 text-text-sub-600">
+										{formatRelativeTime(org.joinedAt)}
+									</td>
+									<td className="px-4 py-3">
+										<div className="flex flex-wrap justify-end gap-1">
+											{isPro ? null : (
+												<Button.Root
+													size="xsmall"
+													variant="neutral"
+													mode="filled"
+													onClick={() => setConvertOrgId(org.id)}
+												>
+													To Pro
+												</Button.Root>
+											)}
+											<Button.Root
+												asChild
+												size="xsmall"
+												variant="neutral"
+												mode="stroke"
 											>
-												Fails
-											</Link>
-										</Button.Root>
-									</div>
-								</td>
-							</tr>
-						))}
+												<Link href={`/organizations/${org.id}`}>Hub</Link>
+											</Button.Root>
+											<Button.Root
+												asChild
+												size="xsmall"
+												variant="neutral"
+												mode="ghost"
+											>
+												<Link href={`/credits?organizationId=${org.id}`}>
+													Ledger
+												</Link>
+											</Button.Root>
+											<Button.Root
+												asChild
+												size="xsmall"
+												variant="neutral"
+												mode="ghost"
+											>
+												<Link
+													href={`/emails?organizationId=${org.id}&status=failed`}
+												>
+													Fails
+												</Link>
+											</Button.Root>
+										</div>
+									</td>
+								</tr>
+							);
+						})}
 					</DataTable>
 				</SectionCard>
 			) : null}
