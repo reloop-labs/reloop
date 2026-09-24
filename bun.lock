@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -24,6 +23,7 @@
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
+        "@reloop/pricing": "workspace:*",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
         "elysia": "catalog:backend",
