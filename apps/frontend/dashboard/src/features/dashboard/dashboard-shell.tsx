@@ -72,8 +72,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
 	return (
 		<CommandMenuProvider>
-			<div className="flex h-screen overflow-hidden bg-bg-white-0 dark:bg-black">
-				<OpenSupportFromQuery />
+			<div className="flex">
 				<SidebarChrome
 					isMobileNavOpen={isMobileNavOpen}
 					onCloseMobileNav={() => setMobileNavOpen(false)}
