@@ -19,6 +19,9 @@ body {
 	--animate-door-draw-right: stroke-draw 0.28s ease-out 0.22s both;
 	--animate-inbox-draw-top: stroke-draw 0.3s ease-out both;
 	--animate-inbox-draw-bottom: stroke-draw 0.3s ease-out 0.12s both;
+	--animate-robot-nod: robot-nod 0.7s ease-in-out both;
+	--animate-robot-blink: robot-blink 0.7s ease-in-out both;
+	--animate-robot-antenna: stroke-draw 0.35s ease-out both;
 	--animate-contacts-draw-top: stroke-draw 0.3s ease-out both;
 	--animate-contacts-draw-bottom: stroke-draw 0.3s ease-out 0.12s both;
 	--animate-tag-hole-draw: stroke-draw 0.35s ease-out both;
@@ -85,6 +88,36 @@ body {
 	}
 	to {
 		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes robot-nod {
+	0% {
+		transform: rotate(0deg);
+	}
+	25% {
+		transform: rotate(-9deg);
+	}
+	50% {
+		transform: rotate(7deg);
+	}
+	75% {
+		transform: rotate(-3deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+
+@keyframes robot-blink {
+	0%,
+	30%,
+	62%,
+	100% {
+		transform: scaleY(1);
+	}
+	46% {
+		transform: scaleY(0.12);
 	}
 }
 

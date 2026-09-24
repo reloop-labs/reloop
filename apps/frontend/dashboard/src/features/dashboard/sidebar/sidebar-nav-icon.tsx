@@ -19,6 +19,7 @@ import { AnimatedMailIcon } from "./animated-mail-icon";
 import { AnimatedMetricsIcon } from "./animated-metrics-icon";
 import { AnimatedOrganizationIcon } from "./animated-organization-icon";
 import { AnimatedProfileIcon } from "./animated-profile-icon";
+import { AnimatedRobotIcon } from "./animated-robot-icon";
 import { AnimatedSecurityIcon } from "./animated-security-icon";
 import { AnimatedSmtpIcon } from "./animated-smtp-icon";
 import { AnimatedTagIcon } from "./animated-tag-icon";
@@ -56,6 +57,8 @@ export function SidebarNavIcon({
 			return <AnimatedHomeIcon className={tone} />;
 		case "inbox":
 			return <AnimatedInboxIcon className={tone} />;
+		case "robot":
+			return <AnimatedRobotIcon className={tone} />;
 		case "contacts":
 			return <AnimatedContactsIcon className={tone} />;
 		case "tag":

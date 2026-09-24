@@ -154,7 +154,7 @@ export const InboxSidebar = ({
 			id: "inbox",
 			label: "Inbox",
 			href: `/inbox?mailboxId=${mailboxId}&folder=inbox`,
-			iconName: "inbox",
+			iconName: "robot",
 			showCount: true,
 		},
 		{
@@ -178,29 +178,10 @@ export const InboxSidebar = ({
 			iconName: "mail-send",
 		},
 		{
-			id: "agent",
-			label: "Agent",
-			href: `/inbox?mailboxId=${mailboxId}&folder=agent`,
-			iconName: "agent",
-			showCount: true,
-		},
-		{
-			id: "archive",
-			label: "Archive",
-			href: `/inbox?mailboxId=${mailboxId}&folder=archive`,
-			iconName: "archive",
-		},
-		{
 			id: "spam",
 			label: "Spam",
 			href: `/inbox?mailboxId=${mailboxId}&folder=spam`,
 			iconName: "alert",
-		},
-		{
-			id: "trash",
-			label: "Trash",
-			href: `/inbox?mailboxId=${mailboxId}&folder=trash`,
-			iconName: "trash",
 		},
 	];
 

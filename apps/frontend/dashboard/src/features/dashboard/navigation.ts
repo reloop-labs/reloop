@@ -23,7 +23,7 @@ export const mainNavigation: MainNavigationItem[] = [
 	{
 		label: "Inbox",
 		path: "/inbox",
-		iconName: "inbox",
+		iconName: "robot",
 		shortcut: { label: "G I", keys: ["g i", "g+i"] },
 		section: "Main",
 	},
