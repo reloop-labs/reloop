@@ -11,7 +11,7 @@ type PlatformTabId =
 	| "analytics"
 	| "templates"
 	| "agents"
-	| "workflows";
+	| "campaigns";
 
 const TABS: {
 	id: PlatformTabId;
@@ -53,10 +53,10 @@ const TABS: {
 		nav: "inbox",
 	},
 	{
-		id: "workflows",
-		title: "Workflows",
-		description: "Automate lifecycle sends.",
-		nav: "workflow",
+		id: "campaigns",
+		title: "Campaigns",
+		description: "Send marketing emails in minutes.",
+		nav: "campaigns",
 	},
 ];
 
@@ -69,7 +69,7 @@ const PLATFORM_ALT: Record<PlatformTabId, string> = {
 	analytics: "Analytics — delivery, opens and bounces live",
 	templates: "Templates — React Email blocks that scale",
 	agents: "Agent Inbox — inbound email for AI agents",
-	workflows: "Workflows — automate lifecycle sends",
+	campaigns: "Campaigns — bulk sends that convert",
 };
 
 // Distinct gradient backdrop per tab — light + dark.
@@ -84,8 +84,8 @@ const TAB_GRADIENTS: Record<PlatformTabId, string> = {
 		"from-[#fbdce5] via-[#fdeef2] to-bg-white-0 dark:from-[#33101c] dark:via-[#160609] dark:to-black",
 	agents:
 		"from-[#e3d9fb] via-[#efe9fd] to-bg-white-0 dark:from-[#1e1245] dark:via-[#0d0722] dark:to-black",
-	workflows:
-		"from-[#cfe9fb] via-[#e6f3fd] to-bg-white-0 dark:from-[#08273f] dark:via-[#04121e] dark:to-black",
+	campaigns:
+		"from-[#ffddd2] via-[#fdefe9] to-bg-white-0 dark:from-[#38130a] dark:via-[#190b06] dark:to-black",
 };
 
 // TODO: per-tab screenshots — using domain shot as placeholder until others land.
@@ -111,9 +111,9 @@ const TAB_SCREENSHOT: Record<PlatformTabId, { src: string; darkSrc: string }> =
 			src: "/platform/agent-inbox-light.png",
 			darkSrc: "/platform/agent-inbox-dark.png",
 		},
-		workflows: {
-			src: "/platform/domain-light.png",
-			darkSrc: "/platform/domain-dark.png",
+		campaigns: {
+			src: "/platform/campaign-light.png",
+			darkSrc: "/platform/campaign-dark.png",
 		},
 	};
 
