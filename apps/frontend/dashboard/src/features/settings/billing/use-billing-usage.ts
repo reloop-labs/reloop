@@ -15,10 +15,11 @@ export type BillingEntitlements = {
 
 export type ResourceUsage = {
 	used: number;
-	limit: number;
+	limit: number | null;
 };
 
 export interface BillingUsage {
+	billingEnabled: boolean;
 	plan: {
 		id?: string;
 		name: string;

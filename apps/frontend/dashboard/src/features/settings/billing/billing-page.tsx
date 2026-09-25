@@ -55,6 +55,22 @@ export function BillingPage() {
 		return null;
 	}
 
+	if (usageData?.billingEnabled === false) {
+		return (
+			<div className="w-full space-y-6 pt-5">
+				<div>
+					<h1 className="font-semibold text-text-strong-950 text-title-h5">
+						Billing
+					</h1>
+					<p className="mt-1 text-paragraph-sm text-text-sub-600">
+						This Reloop is self-hosted. No plan limits apply and there is
+						nothing to pay.
+					</p>
+				</div>
+			</div>
+		);
+	}
+
 	const error = usageError;
 	const currentPlanId = resolvePlanId({
 		id: usageData?.plan.id ?? usageData?.subscription.planId,

@@ -260,6 +260,7 @@ export function UsageSection() {
 	}
 
 	const { plan, subscription, resources, daily } = data;
+	const unlimited = !data.billingEnabled;
 	const entitlements = plan.entitlements;
 	const total = Math.max(0, entitlements?.monthlyEmails ?? plan.monthlyCredits);
 	const used = Math.max(0, subscription.creditsUsed);
@@ -297,7 +298,7 @@ export function UsageSection() {
 
 	return (
 		<div className="space-y-4">
-			{nextPlan && (
+			{nextPlan && !unlimited && (
 				<UpgradeBanner
 					planName={currentPlan.name}
 					nextPlanName={nextPlan.name}
@@ -324,13 +325,17 @@ export function UsageSection() {
 							<span className="font-semibold text-text-strong-950 text-title-h5 tabular-nums">
 								<NumberFlow value={used} />
 							</span>
-							<span className="text-paragraph-sm text-text-sub-600">
-								/ {total.toLocaleString()}
-							</span>
+							{unlimited ? null : (
+								<span className="text-paragraph-sm text-text-sub-600">
+									/ {total.toLocaleString()}
+								</span>
+							)}
 						</p>
-						<span className="text-paragraph-xs text-text-soft-400 tabular-nums">
-							{percent}% used
-						</span>
+						{unlimited ? null : (
+							<span className="text-paragraph-xs text-text-soft-400 tabular-nums">
+								{percent}% used
+							</span>
+						)}
 					</div>
 
 					{(() => {
@@ -341,21 +346,25 @@ export function UsageSection() {
 							total > 0 ? Math.min(100 - sentPct, (received / total) * 100) : 0;
 						return (
 							<>
-								<div className="relative h-1.5 w-full overflow-hidden rounded-full bg-bg-soft-200 dark:bg-white/10">
-									<div
-										className="absolute top-0 left-0 h-full rounded-l-full bg-information-base transition-all duration-500"
-										style={{ width: `${Math.max(sentPct, sent > 0 ? 1 : 0)}%` }}
-									/>
-									<div
-										className="absolute top-0 h-full bg-purple-500 transition-all duration-500"
-										style={{
-											left: `${Math.max(sentPct, sent > 0 ? 1 : 0)}%`,
-											width: `${Math.max(recvPct, received > 0 ? 1 : 0)}%`,
-											borderRadius:
-												recvPct > 0 ? "0 9999px 9999px 0" : undefined,
-										}}
-									/>
-								</div>
+								{unlimited ? null : (
+									<div className="relative h-1.5 w-full overflow-hidden rounded-full bg-bg-soft-200 dark:bg-white/10">
+										<div
+											className="absolute top-0 left-0 h-full rounded-l-full bg-information-base transition-all duration-500"
+											style={{
+												width: `${Math.max(sentPct, sent > 0 ? 1 : 0)}%`,
+											}}
+										/>
+										<div
+											className="absolute top-0 h-full bg-purple-500 transition-all duration-500"
+											style={{
+												left: `${Math.max(sentPct, sent > 0 ? 1 : 0)}%`,
+												width: `${Math.max(recvPct, received > 0 ? 1 : 0)}%`,
+												borderRadius:
+													recvPct > 0 ? "0 9999px 9999px 0" : undefined,
+											}}
+										/>
+									</div>
+								)}
 
 								<div className="mt-2.5 flex items-center justify-between gap-4">
 									<div className="flex items-center gap-4">
@@ -378,9 +387,11 @@ export function UsageSection() {
 											</span>
 										</div>
 									</div>
-									<span className="text-paragraph-xs text-text-soft-400 tabular-nums">
-										<NumberFlow value={remaining} /> remaining
-									</span>
+									{unlimited ? null : (
+										<span className="text-paragraph-xs text-text-soft-400 tabular-nums">
+											<NumberFlow value={remaining} /> remaining
+										</span>
+									)}
 								</div>
 							</>
 						);
@@ -396,15 +407,17 @@ export function UsageSection() {
 					/>
 				) : null}
 
-				<SpecRow
-					label="Overage"
-					value={
-						overageEnabled
-							? `$${paidOverageUsdPerThousand.toFixed(2)} / 1,000 emails`
-							: "Sending pauses at the limit"
-					}
-					isLast={false}
-				/>
+				{unlimited ? null : (
+					<SpecRow
+						label="Overage"
+						value={
+							overageEnabled
+								? `$${paidOverageUsdPerThousand.toFixed(2)} / 1,000 emails`
+								: "Sending pauses at the limit"
+						}
+						isLast={false}
+					/>
+				)}
 				<SpecRow
 					label="Max attachment size"
 					value={`${attachmentMb} MB`}
@@ -420,6 +433,7 @@ export function UsageSection() {
 					label="Inboxes"
 					used={inboxUsed}
 					total={inboxLimit}
+					isUnlimited={unlimited}
 					isLast={true}
 				/>
 			</CategoryCard>
@@ -432,29 +446,35 @@ export function UsageSection() {
 					label="Webhooks"
 					used={webhookUsed}
 					total={webhookLimit}
+					isUnlimited={unlimited}
 					isLast={false}
 				/>
 				<UsageRow
 					label="Custom domains"
 					used={domainUsed}
 					total={domainLimit}
-					isLast={false}
+					isUnlimited={unlimited}
+					isLast={unlimited}
 				/>
-				<SpecRow
-					label="Dedicated IP"
-					value={
-						dedicatedIpCount > 0
-							? `${dedicatedIpCount} included`
-							: "Not included"
-					}
-					href="/settings/dedicated-ip"
-					isLast={false}
-				/>
-				<SpecRow
-					label="Data retention"
-					value={`${entitlements?.dataRetentionDays ?? 45} days`}
-					isLast={true}
-				/>
+				{unlimited ? null : (
+					<>
+						<SpecRow
+							label="Dedicated IP"
+							value={
+								dedicatedIpCount > 0
+									? `${dedicatedIpCount} included`
+									: "Not included"
+							}
+							href="/settings/dedicated-ip"
+							isLast={false}
+						/>
+						<SpecRow
+							label="Data retention"
+							value={`${entitlements?.dataRetentionDays ?? 45} days`}
+							isLast={true}
+						/>
+					</>
+				)}
 			</CategoryCard>
 
 			<SwitchPlanModal

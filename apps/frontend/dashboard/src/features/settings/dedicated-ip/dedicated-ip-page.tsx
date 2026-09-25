@@ -256,7 +256,7 @@ export function DedicatedIpPage() {
 	const data = sendingIps.data;
 	const dedicatedIpCount =
 		data?.dedicatedIpCount ?? usage?.plan.entitlements?.dedicatedIpCount ?? 0;
-	const entitled = dedicatedIpCount > 0;
+	const entitled = usage?.billingEnabled === false || dedicatedIpCount > 0;
 	const items = data?.items ?? [];
 	const pendingSlots = Math.max(0, dedicatedIpCount - items.length);
 
@@ -341,6 +341,11 @@ export function DedicatedIpPage() {
 				</div>
 			) : (
 				<div className="space-y-4">
+					{items.length === 0 && pendingSlots === 0 ? (
+						<p className="text-paragraph-sm text-text-sub-600">
+							No dedicated IPs are assigned to this organization yet.
+						</p>
+					) : null}
 					{items.map((ip) => (
 						<IpCard key={ip.id} ip={ip} />
 					))}

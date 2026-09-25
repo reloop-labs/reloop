@@ -1,6 +1,6 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import { InboxErrors } from "../src/lib/errors";
-import { decideInboxSlot } from "../src/lib/inbox-quota";
+import { assertInboxQuota, decideInboxSlot } from "../src/lib/inbox-quota";
 
 describe("decideInboxSlot", () => {
 	test("free plan cap of 1 blocks the second inbox", () => {
@@ -52,5 +52,53 @@ describe("InboxErrors.inboxLimitReached", () => {
 		expect(err.why).toContain("1 agent inbox");
 		expect(err.why).toContain("already have 1");
 		expect(err.fix).toContain("upgrade");
+	});
+});
+
+function fakeTx(args: { maxAgentInboxes: number; used: number }) {
+	let planReads = 0;
+	const tx = {
+		execute: async () => undefined,
+		query: {
+			organizationPlan: {
+				findFirst: async () => {
+					planReads += 1;
+					return { maxAgentInboxes: args.maxAgentInboxes };
+				},
+			},
+		},
+		select: () => ({
+			from: () => ({
+				where: async () => [{ total: args.used }],
+			}),
+		}),
+	};
+	return { tx: tx as never, planReads: () => planReads };
+}
+
+describe("assertInboxQuota", () => {
+	const original = process.env.BILLING_ENABLED;
+	afterEach(() => {
+		if (original === undefined) delete process.env.BILLING_ENABLED;
+		else process.env.BILLING_ENABLED = original;
+	});
+
+	test("Cloud enforces the plan cap", async () => {
+		process.env.BILLING_ENABLED = "true";
+		const full = fakeTx({ maxAgentInboxes: 1, used: 1 });
+		await expect(assertInboxQuota("org_1", full.tx)).rejects.toMatchObject({
+			status: 402,
+		});
+		expect(full.planReads()).toBe(1);
+
+		const room = fakeTx({ maxAgentInboxes: 5, used: 4 });
+		await expect(assertInboxQuota("org_1", room.tx)).resolves.toBeUndefined();
+	});
+
+	test("self-hosted never reads the plan or blocks", async () => {
+		delete process.env.BILLING_ENABLED;
+		const full = fakeTx({ maxAgentInboxes: 1, used: 50 });
+		await expect(assertInboxQuota("org_1", full.tx)).resolves.toBeUndefined();
+		expect(full.planReads()).toBe(0);
 	});
 });
