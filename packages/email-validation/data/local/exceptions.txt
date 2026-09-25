@@ -11,3 +11,5 @@ outlook.de
 # Corporate domains wrongly listed by upstream disposable catalogues.
 starbucks.com
 booklive.com
++alpinepk.net
++geckohost.nz
