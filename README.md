@@ -17,6 +17,13 @@ No vendor lock-in. Full transparency. No proprietary black boxes.
 
 [Website](https://reloop.sh) · [Documentation](https://reloop.sh/docs) · [Hosted Sign-up](https://reloop.sh/dashboard/signup) · [Discord](https://discord.gg/ZBYwWKY96U)
 
+<br/>
+<br/>
+
+<a href="https://reloop.sh">
+  <img src=".github/assets/dashboard.png" alt="Reloop Dashboard" width="100%">
+</a>
+
 </div>
 
 ---
