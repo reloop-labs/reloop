@@ -1,16 +1,13 @@
 "use client";
 
 import * as Alert from "@reloop/ui/alert";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { LoadingDot } from "@reloop/ui/loading-dot";
-import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import Link from "next/link";
 import {
 	type ClipboardEvent,
 	type FormEvent,
@@ -142,6 +139,7 @@ export function CheckerPanel() {
 	const [error, setError] = useState<string | null>(null);
 	const [result, setResult] = useState<DomainAgeReport | null>(null);
 	const [copied, setCopied] = useState(false);
+	const [copiedLink, setCopiedLink] = useState(false);
 	const [showRawRdap, setShowRawRdap] = useState(false);
 	const field = useFieldError();
 	const shouldReduceMotion = useReducedMotion();
@@ -230,6 +228,14 @@ https://reloop.sh/tools/domain-age`;
 		});
 	};
 
+	const handleCopyLink = async () => {
+		try {
+			await navigator.clipboard.writeText(buildShareUrl(domain));
+			setCopiedLink(true);
+			setTimeout(() => setCopiedLink(false), 2000);
+		} catch {}
+	};
+
 	const getTimelineProgress = (days: number | null): number => {
 		if (days === null || days <= 0) return 3;
 		if (days <= 7) return (days / 7) * 25;
@@ -242,7 +248,6 @@ https://reloop.sh/tools/domain-age`;
 
 	return (
 		<div className="mx-auto w-full max-w-xl text-left font-sans">
-			{/* Search Input Box — same as temp-email checker */}
 			<form onSubmit={handleSubmit} noValidate className="space-y-2.5">
 				<FieldError field={field} messageClassName="text-xs leading-relaxed">
 					<div className="relative w-full">
@@ -358,56 +363,38 @@ https://reloop.sh/tools/domain-age`;
 										"border-emerald-500/30 bg-emerald-500/[0.04] dark:border-emerald-500/40 dark:bg-emerald-500/[0.07]",
 								)}
 							>
-								<div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-									<div>
-										<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
-											{result.headline}
-										</h2>
-										{result.age.ageDays !== null && (
-											<div className="mt-2 flex flex-wrap items-baseline gap-2">
-												<span className="font-semibold text-[19px] text-text-strong-950 sm:text-[22px] dark:text-white">
-													Registered{" "}
-													{result.age.ageDays === 0
-														? "today"
-														: `${result.age.ageDays.toLocaleString()} days ago`}
+								<div className="flex flex-col gap-3">
+									<h2 className="font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
+										{result.headline}
+									</h2>
+
+									{result.age.ageDays !== null && (
+										<div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-3.5 py-1.5 dark:border-white/10 dark:bg-white/[0.04]">
+											<span className="font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+												Registered
+											</span>
+											<span className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
+												{result.age.ageDays === 0
+													? "today"
+													: `${result.age.ageDays.toLocaleString()} days ago`}
+											</span>
+											{result.age.createdAt && (
+												<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/50">
+													·{" "}
+													{new Date(result.age.createdAt).toLocaleDateString(
+														"en-US",
+														{ month: "short", day: "numeric", year: "numeric" },
+													)}
 												</span>
-												{result.age.createdAt && (
-													<span className="text-[13.5px] text-text-sub-600 dark:text-white/50">
-														(
-														{new Date(result.age.createdAt).toLocaleDateString(
-															"en-US",
-															{
-																month: "long",
-																day: "numeric",
-																year: "numeric",
-															},
-														)}
-														)
-													</span>
-												)}
-											</div>
-										)}
-										<p className="mt-2 max-w-2xl text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/70">
-											{result.summary}
-										</p>
-									</div>
-									<div className="flex shrink-0 items-center gap-2">
-										<Button.Root
-											type="button"
-											variant="neutral"
-											mode="stroke"
-											size="small"
-											onClick={handleCopyReport}
-										>
-											<Button.Icon
-												as={Icon}
-												name={copied ? "check" : "copy"}
-												className={copied ? "text-emerald-500" : ""}
-											/>
-											<span>{copied ? "Copied" : "Copy summary"}</span>
-										</Button.Root>
-									</div>
+											)}
+										</div>
+									)}
+
+									<p className="max-w-2xl text-[14px] text-text-sub-600 leading-relaxed dark:text-white/65">
+										{result.summary}
+									</p>
 								</div>
+
 								{result.age.ageDays !== null && (
 									<div className="mt-6 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
 										<div className="mb-2 flex items-center justify-between font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
@@ -416,10 +403,10 @@ https://reloop.sh/tools/domain-age`;
 										</div>
 										<div className="relative h-2.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
 											<div className="grid h-full grid-cols-4 divide-x divide-white/20 dark:divide-black/20">
-												<div className="bg-rose-500/70" />
-												<div className="bg-amber-500/70" />
-												<div className="bg-blue-500/70" />
-												<div className="bg-emerald-500/70" />
+												<div className="bg-gradient-to-r from-rose-300 to-rose-400" />
+												<div className="bg-gradient-to-r from-amber-300 to-amber-400" />
+												<div className="bg-gradient-to-r from-blue-300 to-blue-400" />
+												<div className="bg-gradient-to-r from-emerald-300 to-emerald-400" />
 											</div>
 											<div
 												className="-ml-1 absolute top-0 bottom-0 w-2.5 rounded-full bg-text-strong-950 shadow-md ring-2 ring-white dark:bg-white dark:ring-black"
@@ -469,6 +456,40 @@ https://reloop.sh/tools/domain-age`;
 										</div>
 									</div>
 								)}
+
+								<div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+									<div className="flex items-center gap-1.5">
+										<button
+											type="button"
+											onClick={handleCopyLink}
+											className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+										>
+											<Icon
+												name={copiedLink ? "check" : "link"}
+												className="size-3.5"
+											/>
+											{copiedLink ? "Link copied" : "Copy link"}
+										</button>
+										<button
+											type="button"
+											onClick={handleCopyReport}
+											className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+										>
+											<Icon
+												name={copied ? "check" : "copy"}
+												className="size-3.5"
+											/>
+											{copied ? "Copied" : "Copy summary"}
+										</button>
+									</div>
+									<button
+										type="button"
+										onClick={handleReset}
+										className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
+									>
+										Clear result
+									</button>
+								</div>
 							</div>
 						</div>
 					) : null}
