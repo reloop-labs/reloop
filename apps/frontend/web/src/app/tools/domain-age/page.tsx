@@ -1,11 +1,15 @@
-import { Icon } from "@reloop/ui/icon";
+import { FaqSection } from "@reloop/web/components/faq-section";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
-import { Band, SectionIntro } from "../blocklist-checker/grid";
+import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
 import { ApiSection } from "./api-section";
 import { CheckerPanel } from "./checker-panel";
+import { BestFeatures } from "./components/best-features";
+import { WarmupPlanner } from "./components/warmup-planner";
+import { WhoIsItFor } from "./components/who-is-it-for";
 import {
 	faqGroups,
 	faqs,
@@ -16,7 +20,7 @@ import {
 	toolPath,
 	toolTitle,
 } from "./content";
-import { FaqGrid } from "./faq-grid";
+import { Band, SectionIntro } from "../blocklist-checker/grid";
 
 export const instant = false;
 
@@ -32,7 +36,7 @@ export default function DomainAgePage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-		<>
+		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 [--primary-base:#2563eb] [--primary-dark:#1d4ed8] [--primary-darker:#1e40af] [--primary-link:#1d4ed8] dark:bg-black dark:text-white dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 			<JsonLd
 				data={[
 					{
@@ -43,11 +47,7 @@ export default function DomainAgePage() {
 						description: metaDescription,
 						applicationCategory: "DeveloperApplication",
 						operatingSystem: "Any",
-						offers: {
-							"@type": "Offer",
-							price: "0",
-							priceCurrency: "USD",
-						},
+						offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
 						featureList: [
 							"Official RDAP domain registration age query",
 							"Newly registered domain (NRD) spam filter risk detection",
@@ -55,11 +55,7 @@ export default function DomainAgePage() {
 							"SPF and DMARC email authentication readiness audit",
 							"Public unauthenticated JSON REST API",
 						],
-						publisher: {
-							"@type": "Organization",
-							name: "Reloop",
-							url: siteUrl,
-						},
+						publisher: { "@type": "Organization", name: "Reloop", url: siteUrl },
 					},
 					{
 						"@context": "https://schema.org",
@@ -67,111 +63,64 @@ export default function DomainAgePage() {
 						mainEntity: faqs.map((faq) => ({
 							"@type": "Question",
 							name: faq.question,
-							acceptedAnswer: {
-								"@type": "Answer",
-								text: faq.answer,
-							},
+							acceptedAnswer: { "@type": "Answer", text: faq.answer },
 						})),
 					},
 					{
 						"@context": "https://schema.org",
 						"@type": "BreadcrumbList",
 						itemListElement: [
-							{
-								"@type": "ListItem",
-								position: 1,
-								name: "Tools",
-								item: `${siteUrl}/tools`,
-							},
-							{
-								"@type": "ListItem",
-								position: 2,
-								name: toolTitle,
-								item: `${siteUrl}${toolPath}`,
-							},
+							{ "@type": "ListItem", position: 1, name: "Tools", item: `${siteUrl}/tools` },
+							{ "@type": "ListItem", position: 2, name: toolTitle, item: `${siteUrl}${toolPath}` },
 						],
 					},
 				]}
 			/>
 
-			{/* Hero / Interactive Tool Section */}
-			<Band className="relative overflow-hidden pt-16">
-				<div className="relative px-5 pt-14 pb-16 sm:px-6 sm:pt-16 md:px-8 lg:pb-20">
-					<div className="mx-auto max-w-3xl text-center">
-						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
-							<span className="size-1.5 rounded-full bg-emerald-500" />
-							Domain Warmup &amp; NRD Filter Diagnostic
-						</span>
-
-						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
-							Domain Age &amp; Warmup Checker
-						</h1>
-
-						<p className="mx-auto mt-5 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-							{toolDescription}
-						</p>
-					</div>
-
-					<div className="mt-10">
-						<CheckerPanel />
-					</div>
-				</div>
-			</Band>
-
-			{/* Section: Why Domain Age Matters */}
-			<Band id="why-it-matters">
-				<SectionIntro
-					lead="Why domain age impacts your email deliverability."
-					description="Mailbox algorithms automatically scrutinize newly registered domains. Understand cold-domain risks before sending high-volume outreach."
-				/>
-
-				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
-					{reasons.map((reason) => (
-						<div
-							key={reason.title}
-							className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8"
-						>
-							<Icon
-								name={reason.icon}
-								className="size-5 text-text-sub-600 dark:text-white/40"
-							/>
-							<div>
-								<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-									{reason.title}
-								</p>
-								<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-									{reason.description}
-								</p>
+			<div className="relative w-full overflow-hidden">
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+					<header className="relative flex w-full flex-col items-center bg-transparent px-6 pt-[224px] pb-16 text-center sm:px-8 sm:pb-20 lg:px-12 lg:pb-24">
+						<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
+							<Link href="/tools" className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
+								<span aria-hidden className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#30363d]">
+									<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-black dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+										<Icon name="shield-check" className="size-[11px]" />
+									</span>
+								</span>
+								<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight underline decoration-dotted underline-offset-4 dark:text-white">Free Tools</span>
+							</Link>
+							<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
+								Free <span className="bg-gradient-to-b from-primary-base to-primary-base bg-clip-text text-transparent">Domain Age</span> & Warmup Checker
+							</h1>
+							<p className="mt-5 max-w-[46rem] text-balance text-center text-[13px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-base dark:text-white/60">{toolDescription}</p>
+							<div id="checker" className="mt-10 w-full max-w-xl scroll-mt-24 text-left sm:mt-12">
+								<CheckerPanel />
 							</div>
 						</div>
-					))}
+					</header>
 				</div>
-			</Band>
+			</div>
 
-			{/* Section: Programmatic API Integration */}
-			<Band id="api">
-				<SectionIntro
-					lead="Check domain age via API."
-					description="Integrate automated RDAP creation date lookups and warmup health checks into your email verification or customer onboarding pipeline."
-				/>
-
-				<ApiSection />
-			</Band>
-
-			{/* Section: FAQs */}
-			<Band id="faq">
-				<SectionIntro
-					lead="Frequently asked questions."
-					description="Everything you need to know about newly registered domains (NRDs), RDAP queries, cold domain filters, and email warmup timelines."
-				/>
-
-				<FaqGrid groups={faqGroups} />
-			</Band>
-
-			{/* Bottom CTA to sign up */}
-			<Band className="border-b-0">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<div aria-hidden className="h-24 border-stroke-soft-100 border-b dark:border-white/10" />
+				<BestFeatures />
+				<div aria-hidden className="h-24 border-stroke-soft-100 border-b dark:border-white/10" />
+				<WarmupPlanner />
+				<div aria-hidden className="h-24 border-stroke-soft-100 border-b dark:border-white/10" />
+				<WhoIsItFor />
+				<div aria-hidden className="h-24 border-stroke-soft-100 border-b dark:border-white/10" />
+				<Band id="api">
+					<SectionIntro lead="Check domain age via API." description="Integrate automated RDAP creation date lookups and warmup health checks into your email verification or customer onboarding pipeline." />
+					<ApiSection />
+				</Band>
+				<div aria-hidden className="h-24 border-stroke-soft-100 border-b dark:border-white/10" />
+				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
+					<FaqSection items={faqGroups.flatMap((g) => g.items)} id="faq-section" eyebrow="FAQ" compact plain flush />
+				</div>
+				<div aria-hidden className="h-12 sm:h-16" />
 				<BlogCta />
-			</Band>
-		</>
+				<div aria-hidden className="h-12 sm:h-16" />
+			</div>
+		</div>
 	);
 }
