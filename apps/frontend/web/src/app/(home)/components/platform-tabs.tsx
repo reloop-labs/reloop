@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -60,8 +60,6 @@ const TABS: {
 	},
 ];
 
-const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
-
 // Alt text per tab for a11y.
 const PLATFORM_ALT: Record<PlatformTabId, string> = {
 	domains: "Domains — verify DNS once, send forever",
@@ -88,7 +86,7 @@ const TAB_GRADIENTS: Record<PlatformTabId, string> = {
 		"from-[#ffddd2] via-[#fdefe9] to-bg-white-0 dark:from-[#38130a] dark:via-[#190b06] dark:to-black",
 };
 
-// TODO: per-tab screenshots — using domain shot as placeholder until others land.
+// Per-tab screenshots (templates ships a single asset used for light + dark).
 const TAB_SCREENSHOT: Record<PlatformTabId, { src: string; darkSrc: string }> =
 	{
 		domains: {
@@ -104,8 +102,8 @@ const TAB_SCREENSHOT: Record<PlatformTabId, { src: string; darkSrc: string }> =
 			darkSrc: "/platform/analytics-dark.png",
 		},
 		templates: {
-			src: "/platform/domain-light.png",
-			darkSrc: "/platform/domain-dark.png",
+			src: "/platform/template.png",
+			darkSrc: "/platform/template.png",
 		},
 		agents: {
 			src: "/platform/agent-inbox-light.png",
@@ -116,35 +114,6 @@ const TAB_SCREENSHOT: Record<PlatformTabId, { src: string; darkSrc: string }> =
 			darkSrc: "/platform/campaign-dark.png",
 		},
 	};
-
-function PlatformPreview({ tab }: { tab: PlatformTabId }) {
-	const shot = TAB_SCREENSHOT[tab];
-	return (
-		<div
-			className={`relative h-full w-full overflow-hidden bg-gradient-to-b px-10 pt-10 ${TAB_GRADIENTS[tab]}`}
-		>
-			<div className="relative h-full w-full overflow-hidden rounded-t-xl border border-stroke-soft-100 border-b-0 bg-bg-white-0 shadow-regular-md dark:border-white/10 dark:bg-black">
-				<Image
-					src={shot.src}
-					alt={PLATFORM_ALT[tab]}
-					fill
-					sizes="100vw"
-					className="object-cover object-top dark:hidden"
-					priority={tab === "domains"}
-				/>
-				<Image
-					src={shot.darkSrc}
-					alt=""
-					aria-hidden
-					fill
-					sizes="100vw"
-					className="hidden object-cover object-top dark:block"
-					priority={tab === "domains"}
-				/>
-			</div>
-		</div>
-	);
-}
 
 export default function PlatformTabs() {
 	const [active, setActive] = useState<PlatformTabId>("domains");
@@ -230,32 +199,63 @@ export default function PlatformTabs() {
 				})}
 			</div>
 
-			{/* Preview panel — whole image, no nested dashboard shell */}
-			<div>
-				<AnimatePresence mode="wait">
-					<motion.div
-						key={active}
-						className="h-[560px] w-full sm:h-[640px] lg:h-[720px]"
-						initial={
-							reduceMotion
-								? { opacity: 1 }
-								: { opacity: 0, filter: "blur(2px)" }
-						}
-						animate={{ opacity: 1, filter: "blur(0px)" }}
-						exit={
-							reduceMotion
-								? { opacity: 0 }
-								: { opacity: 0, filter: "blur(2px)" }
-						}
-						transition={
-							reduceMotion
-								? { duration: 0 }
-								: { duration: 0.22, ease: EASE_OUT }
-						}
-					>
-						<PlatformPreview tab={active} />
-					</motion.div>
-				</AnimatePresence>
+			{/* Preview panel — stable shell. Background melts via stacked
+			    opacity layers; screenshots do a plain crisp crossfade with
+			    no movement, scale, or blur so text stays sharp. */}
+			<div className="relative h-[560px] w-full overflow-hidden bg-bg-white-0 sm:h-[640px] lg:h-[720px] dark:bg-black">
+				{/* Gradient backdrop — slow melt */}
+				{TABS.map((tab) => (
+					<div
+						key={tab.id}
+						aria-hidden
+						className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-out ${TAB_GRADIENTS[tab.id]} ${
+							tab.id === active
+								? "opacity-100"
+								: "pointer-events-none opacity-0"
+						}`}
+					/>
+				))}
+
+				{/* Stable screenshot frame — never remounts */}
+				<div className="relative h-full w-full px-10 pt-10">
+					<div className="relative h-full w-full overflow-hidden rounded-t-xl border border-stroke-soft-100 border-b-0 bg-bg-white-0 shadow-regular-md dark:border-white/10 dark:bg-black">
+						{TABS.map((tab) => {
+							const selected = tab.id === active;
+							const shot = TAB_SCREENSHOT[tab.id];
+							return (
+								<div
+									key={tab.id}
+									aria-hidden={!selected}
+									className={`absolute inset-0 transition-opacity ease-out ${
+										reduceMotion ? "duration-150" : "duration-300"
+									} ${selected ? "z-10 opacity-100" : "pointer-events-none z-0 opacity-0"}`}
+								>
+									<Image
+										src={shot.src}
+										alt={selected ? PLATFORM_ALT[tab.id] : ""}
+										fill
+										sizes="100vw"
+										className="object-cover object-top dark:hidden"
+										priority={tab.id === "domains"}
+										loading={tab.id === "domains" ? undefined : "eager"}
+										draggable={false}
+									/>
+									<Image
+										src={shot.darkSrc}
+										alt=""
+										aria-hidden
+										fill
+										sizes="100vw"
+										className="hidden object-cover object-top dark:block"
+										priority={tab.id === "domains"}
+										loading={tab.id === "domains" ? undefined : "eager"}
+										draggable={false}
+									/>
+								</div>
+							);
+						})}
+					</div>
+				</div>
 			</div>
 		</section>
 	);
