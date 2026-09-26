@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 import { apiKey } from "@better-auth/api-key";
 import { BusEvent, bus } from "@reloop/bus";
+import { isBillingEnabled } from "@reloop/db/billing-enabled";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { betterAuth } from "better-auth";
@@ -51,6 +52,7 @@ import { redis } from "./redis";
 import { sessionCacheRedis } from "./session-cache-redis";
 
 async function assertCanCreateAnotherOrganization(userId: string) {
+	if (!isBillingEnabled()) return;
 	const memberships = await db.query.member.findMany({
 		where: eq(schema.member.userId, userId),
 		columns: { organizationId: true, role: true },

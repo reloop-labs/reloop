@@ -188,7 +188,7 @@ export function CommandMenuGlobal() {
 	const router = useRouter();
 	const { setTheme, resolvedTheme } = useTheme();
 	const inputRef = React.useRef<HTMLInputElement>(null);
-	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
+	const { isOrgAdmin, canManageTeam, canManageBilling } = useOrgPermissions();
 	const { activeOrganization, organizations, onOrganizationChange } =
 		useActiveOrganization();
 
@@ -217,8 +217,9 @@ export function CommandMenuGlobal() {
 			filterSettingsNavigation(settingsNavigation, {
 				isOrgAdmin,
 				canManageTeam,
+				canManageBilling,
 			}).flatMap((section) => section.items),
-		[isOrgAdmin, canManageTeam],
+		[isOrgAdmin, canManageTeam, canManageBilling],
 	);
 	useHotkeys("mod+k", (e) => {
 		e.preventDefault();

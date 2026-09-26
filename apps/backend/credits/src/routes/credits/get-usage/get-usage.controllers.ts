@@ -1,5 +1,7 @@
+import { creditsConfig } from "@reloop/credits/credits.config";
 import { CreditErrors } from "@reloop/credits/error/credits.error-response";
 import { getOrProvisionOrgBilling } from "@reloop/credits/lib/org-billing";
+import { SELF_HOSTED_MAX_ATTACHMENT_BYTES } from "@reloop/db/billing-enabled";
 import { db } from "@reloop/db/client";
 import {
 	domain,
@@ -86,6 +88,11 @@ export const getUsageController = async ({
 				),
 		]);
 
+		const billingEnabled = creditsConfig.BILLING_ENABLED;
+		const maxAttachmentBytes = billingEnabled
+			? billing.plan.maxAttachmentBytes
+			: SELF_HOSTED_MAX_ATTACHMENT_BYTES;
+
 		const entitlements = {
 			monthlyEmails: billing.plan.monthlyEmails,
 			dailyEmailLimit: billing.plan.dailyEmailLimit,
@@ -93,12 +100,13 @@ export const getUsageController = async ({
 			maxAgentInboxes: billing.plan.maxAgentInboxes,
 			maxWebhooks: billing.plan.maxWebhooks,
 			maxCustomDomains: billing.plan.maxCustomDomains,
-			maxAttachmentBytes: billing.plan.maxAttachmentBytes,
+			maxAttachmentBytes,
 			dataRetentionDays: billing.plan.dataRetentionDays,
 			dedicatedIpCount: billing.plan.dedicatedIpCount,
 		};
 
 		return {
+			billingEnabled,
 			plan: {
 				id: billing.plan.planId,
 				name: catalog?.name ?? "Free",
@@ -109,9 +117,7 @@ export const getUsageController = async ({
 				ratePerSecond: 10,
 				ratePerMinute: billing.plan.dailyEmailLimit ?? 0,
 				ratePerHour: 5000,
-				maxAttachmentSizeMb: Math.round(
-					billing.plan.maxAttachmentBytes / (1024 * 1024),
-				),
+				maxAttachmentSizeMb: Math.round(maxAttachmentBytes / (1024 * 1024)),
 				overageLimit: billing.plan.overageEnabled ? -1 : 0,
 				entitlements,
 			},
@@ -129,20 +135,20 @@ export const getUsageController = async ({
 			resources: {
 				agentInboxes: {
 					used: inboxRows[0]?.value ?? 0,
-					limit: entitlements.maxAgentInboxes,
+					limit: billingEnabled ? entitlements.maxAgentInboxes : null,
 				},
 				webhooks: {
 					used: webhookRows[0]?.value ?? 0,
-					limit: entitlements.maxWebhooks,
+					limit: billingEnabled ? entitlements.maxWebhooks : null,
 				},
 				customDomains: {
 					used: domainRows[0]?.value ?? 0,
-					limit: entitlements.maxCustomDomains,
+					limit: billingEnabled ? entitlements.maxCustomDomains : null,
 				},
 			},
 			daily: {
 				sent: Number(dailyRows[0]?.value ?? 0),
-				limit: entitlements.dailyEmailLimit,
+				limit: billingEnabled ? entitlements.dailyEmailLimit : null,
 			},
 		};
 	} catch (error) {

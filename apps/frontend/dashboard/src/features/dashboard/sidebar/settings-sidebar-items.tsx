@@ -28,7 +28,7 @@ export function SettingsSidebarItems({
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 
-	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
+	const { isOrgAdmin, canManageTeam, canManageBilling } = useOrgPermissions();
 
 	// Members: hide Usage, Billing, Teams, Workspace (profile menu uses the same filter).
 	const filteredSettingsNavigation = useMemo(
@@ -36,8 +36,9 @@ export function SettingsSidebarItems({
 			filterSettingsNavigation(settingsNavigation, {
 				isOrgAdmin,
 				canManageTeam,
+				canManageBilling,
 			}),
-		[isOrgAdmin, canManageTeam],
+		[isOrgAdmin, canManageTeam, canManageBilling],
 	);
 	const flatItems = useMemo(() => {
 		const items: (typeof settingsNavigation)[number]["items"][number][] = [];
@@ -89,7 +90,7 @@ export function SettingsSidebarItems({
 				>
 					<Icon
 						name="arrow-left"
-						className="group-hover:-translate-x-0.5 h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-text-strong-950 group-hover:opacity-100"
+						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:-translate-x-0.5 group-hover:text-text-strong-950 group-hover:opacity-100"
 					/>
 					{!isCollapsed && (
 						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950">

@@ -1,4 +1,4 @@
-import { formatPrice, pricingPlans } from "@reloop/pricing";
+import { communityEdition, formatPrice, pricingPlans } from "@reloop/pricing";
 
 /** Structured pricing markdown for agents (`/pricing.md`). */
 export function buildPricingMarkdown(): string {
@@ -38,7 +38,14 @@ export function buildPricingMarkdown(): string {
 	}
 
 	lines.push(
-		"## Self-host",
+		`## ${communityEdition.name} (self-hosted)`,
+		"",
+		"- Price: $0 / month",
+		`- Note: ${communityEdition.priceSubline}`,
+		`- Description: ${communityEdition.description}`,
+		`- CTA: ${communityEdition.ctaLabel} → https://reloop.sh${communityEdition.ctaHref}`,
+		"- Features:",
+		...communityEdition.features.map((f) => `  - ${f}`),
 		"",
 		"Self-hosting the open-source Reloop stack has no Reloop license fee (infrastructure costs are yours). It is not a Reloop Cloud subscription and does not use the hosted Free / Pro / Growth / Enterprise price list.",
 		"See https://reloop.sh/self-host",

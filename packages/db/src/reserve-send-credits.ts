@@ -1,4 +1,5 @@
 import { and, eq, lte } from "drizzle-orm";
+import { isBillingEnabled } from "./billing-enabled";
 import { type DatabaseInstance, db } from "./client";
 import {
 	creditLedger,
@@ -54,8 +55,10 @@ export function applyCreditReservation(args: {
 	dailyEmailLimit: number | null;
 	recipientCount: number;
 	now: Date;
+	unlimited?: boolean;
 }): ReserveDecision {
 	const n = args.recipientCount;
+	const unlimited = args.unlimited === true;
 	const today = utcDayStart(args.now);
 	const rollsDaily = args.credits.dailyWindowStart < today;
 	const dailyUsedBefore = rollsDaily ? 0 : args.credits.dailyEmailsUsed;
@@ -79,7 +82,7 @@ export function applyCreditReservation(args: {
 		};
 	}
 
-	if (args.credits.creditsRemaining < n) {
+	if (!unlimited && args.credits.creditsRemaining < n) {
 		return {
 			ok: false,
 			reason: "monthly",
@@ -90,7 +93,7 @@ export function applyCreditReservation(args: {
 		};
 	}
 
-	if (dailyLimit != null && dailyUsedAfter > dailyLimit) {
+	if (!unlimited && dailyLimit != null && dailyUsedAfter > dailyLimit) {
 		return {
 			ok: false,
 			reason: "daily",
@@ -101,15 +104,18 @@ export function applyCreditReservation(args: {
 		};
 	}
 
+	const remaining = unlimited
+		? args.credits.creditsRemaining
+		: args.credits.creditsRemaining - n;
 	return {
 		ok: true,
-		remaining: args.credits.creditsRemaining - n,
+		remaining,
 		monthlyCredits: args.credits.monthlyCredits,
 		dailyUsed: dailyUsedAfter,
 		dailyLimit,
 		dailyWindowStart,
 		next: {
-			creditsRemaining: args.credits.creditsRemaining - n,
+			creditsRemaining: remaining,
 			creditsUsed: args.credits.creditsUsed + n,
 			monthlyCredits: args.credits.monthlyCredits,
 			currentPeriodEnd: args.credits.currentPeriodEnd,
@@ -281,15 +287,16 @@ export async function peekSendCredits(args: {
 	const client = args.client ?? db;
 	const now = args.now ?? new Date();
 	const credits = await ensureActiveCredits(args.organizationId, client, now);
-	const dailyEmailLimit = await loadPlanDailyEmailLimit(
-		args.organizationId,
-		client,
-	);
+	const unlimited = !isBillingEnabled();
+	const dailyEmailLimit = unlimited
+		? null
+		: await loadPlanDailyEmailLimit(args.organizationId, client);
 	return applyCreditReservation({
 		credits: snapshotFromRow(credits),
 		dailyEmailLimit,
 		recipientCount: args.recipientCount,
 		now,
+		unlimited,
 	});
 }
 
@@ -349,12 +356,16 @@ export async function reserveSendCredits(args: {
 			throw new Error("Failed to lock organization credits for reservation");
 		}
 
-		const dailyEmailLimit = await loadPlanDailyEmailLimit(organizationId, tx);
+		const unlimited = !isBillingEnabled();
+		const dailyEmailLimit = unlimited
+			? null
+			: await loadPlanDailyEmailLimit(organizationId, tx);
 		const decision = applyCreditReservation({
 			credits: snapshotFromRow(locked),
 			dailyEmailLimit,
 			recipientCount,
 			now,
+			unlimited,
 		});
 
 		if (!decision.ok) {
@@ -418,7 +429,9 @@ export async function refundSendCredits(args: {
 			.update(organizationCredits)
 			.set({
 				creditsUsed: Math.max(0, row.creditsUsed - n),
-				creditsRemaining: row.creditsRemaining + n,
+				creditsRemaining: isBillingEnabled()
+					? row.creditsRemaining + n
+					: row.creditsRemaining,
 				dailyEmailsUsed: sameDay
 					? Math.max(0, row.dailyEmailsUsed - n)
 					: row.dailyEmailsUsed,

@@ -1,3 +1,4 @@
+import { isBillingEnabled } from "@reloop/db/billing-enabled";
 import { type DatabaseInstance, db } from "@reloop/db/client";
 import { domain, organizationPlan } from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
@@ -35,6 +36,7 @@ export async function assertCustomDomainQuota(
 	if (!organizationId) {
 		throw new Error("organizationId is required for domain quota checks");
 	}
+	if (!isBillingEnabled()) return;
 
 	await tx.execute(
 		sql`select pg_advisory_xact_lock(hashtext(${organizationId}))`,

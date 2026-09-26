@@ -15,10 +15,11 @@ export type BillingEntitlements = {
 
 export type ResourceUsage = {
 	used: number;
-	limit: number;
+	limit: number | null;
 };
 
 export interface BillingUsage {
+	billingEnabled: boolean;
 	plan: {
 		id?: string;
 		name: string;
@@ -73,10 +74,11 @@ export interface UsageLiveUpdate {
 	periodEnd: string;
 }
 
-async function fetchBillingUsage(): Promise<BillingUsage> {
+async function fetchBillingUsage(): Promise<BillingUsage | null> {
 	const res = await fetch("/api/credits/v1/usage", {
 		credentials: "include",
 	});
+	if (res.status === 404) return null;
 	if (!res.ok) {
 		throw new Error(`Failed to load billing usage (${res.status})`);
 	}
@@ -102,7 +104,7 @@ export function useBillingUsage() {
 	});
 
 	const applyLiveUpdate = (update: UsageLiveUpdate) => {
-		queryClient.setQueryData<BillingUsage>(
+		queryClient.setQueryData<BillingUsage | null>(
 			queryKeys.billing.usage(),
 			(prev) => {
 				if (!prev) return prev;
@@ -125,7 +127,8 @@ export function useBillingUsage() {
 	};
 
 	return {
-		data: query.data,
+		data: query.data ?? undefined,
+		billingEnabled: query.data !== null && query.data?.billingEnabled !== false,
 		isLoading: query.isPending,
 		error: query.error,
 		refetch: () => query.refetch(),

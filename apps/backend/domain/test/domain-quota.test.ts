@@ -1,9 +1,12 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import {
 	DomainErrors,
 	KumoMtaErrors,
 } from "../src/error/domain.error-response";
-import { decideCustomDomainSlot } from "../src/lib/domain-quota";
+import {
+	assertCustomDomainQuota,
+	decideCustomDomainSlot,
+} from "../src/lib/domain-quota";
 
 describe("decideCustomDomainSlot", () => {
 	test("free plan cap of 3 blocks the fourth domain", () => {
@@ -68,5 +71,57 @@ describe("KumoMtaErrors.abuseBlocked", () => {
 		expect(err.status).toBe(403);
 		expect(err.message).toBe("Message rejected");
 		expect(err.why).toContain("sms_gateway");
+	});
+});
+
+function fakeTx(args: { maxCustomDomains: number; used: number }) {
+	let planReads = 0;
+	const tx = {
+		execute: async () => undefined,
+		query: {
+			organizationPlan: {
+				findFirst: async () => {
+					planReads += 1;
+					return { maxCustomDomains: args.maxCustomDomains };
+				},
+			},
+		},
+		select: () => ({
+			from: () => ({
+				where: async () => [{ total: args.used }],
+			}),
+		}),
+	};
+	return { tx: tx as never, planReads: () => planReads };
+}
+
+describe("assertCustomDomainQuota", () => {
+	const original = process.env.BILLING_ENABLED;
+	afterEach(() => {
+		if (original === undefined) delete process.env.BILLING_ENABLED;
+		else process.env.BILLING_ENABLED = original;
+	});
+
+	test("Cloud enforces the plan cap", async () => {
+		process.env.BILLING_ENABLED = "true";
+		const full = fakeTx({ maxCustomDomains: 3, used: 3 });
+		await expect(
+			assertCustomDomainQuota("org_1", full.tx),
+		).rejects.toMatchObject({ status: 402 });
+		expect(full.planReads()).toBe(1);
+
+		const room = fakeTx({ maxCustomDomains: 5, used: 4 });
+		await expect(
+			assertCustomDomainQuota("org_1", room.tx),
+		).resolves.toBeUndefined();
+	});
+
+	test("self-hosted never reads the plan or blocks", async () => {
+		delete process.env.BILLING_ENABLED;
+		const full = fakeTx({ maxCustomDomains: 3, used: 50 });
+		await expect(
+			assertCustomDomainQuota("org_1", full.tx),
+		).resolves.toBeUndefined();
+		expect(full.planReads()).toBe(0);
 	});
 });

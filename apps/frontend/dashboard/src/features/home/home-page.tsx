@@ -81,7 +81,7 @@ export function HomePage() {
 	const readyDomainName = readyDomains[0]?.domain ?? null;
 
 	const usageRatio = useMemo(() => {
-		if (!canManageBilling || !billing.data) return null;
+		if (!canManageBilling || !billing.data?.billingEnabled) return null;
 		const monthly = billing.data.plan.monthlyCredits;
 		if (!monthly || monthly <= 0) return null;
 		return billing.data.subscription.creditsUsed / monthly;

@@ -1,4 +1,8 @@
 import { BusEvent, bus } from "@reloop/bus";
+import {
+	isBillingEnabled,
+	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
+} from "@reloop/db/billing-enabled";
 import { db } from "@reloop/db/client";
 import { ensureSendingDomainVerified } from "@reloop/db/ensure-sending-domain-verified";
 import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
@@ -160,10 +164,15 @@ export async function logIncomingController({
 	// ~37% via base64 + boundaries, so allow 1.5x headroom before rejecting.
 	// Keeps tiers proportional (free ~1.5 MB wire, paid ~7.5 MB wire) while
 	// staying under the KumoMTA 15 MB transport ceiling.
-	const planRow = await db.query.organizationPlan.findFirst({
-		where: eq(organizationPlan.organizationId, organizationId),
-		columns: { maxAttachmentBytes: true, planId: true },
-	});
+	const planRow = isBillingEnabled()
+		? await db.query.organizationPlan.findFirst({
+				where: eq(organizationPlan.organizationId, organizationId),
+				columns: { maxAttachmentBytes: true, planId: true },
+			})
+		: {
+				maxAttachmentBytes: SELF_HOSTED_MAX_ATTACHMENT_BYTES,
+				planId: "self-hosted",
+			};
 	const decodedLimit = planRow?.maxAttachmentBytes ?? 1 * 1024 * 1024;
 	const wireLimit = Math.floor(decodedLimit * 1.5);
 	if (body.size > wireLimit) {

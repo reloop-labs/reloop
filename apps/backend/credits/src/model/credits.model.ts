@@ -3,10 +3,11 @@ import { t } from "elysia";
 export namespace CreditsModel {
 	export const resourceUsage = t.Object({
 		used: t.Number(),
-		limit: t.Number(),
+		limit: t.Union([t.Number(), t.Null()]),
 	});
 
 	export const usageResponse = t.Object({
+		billingEnabled: t.Boolean(),
 		plan: t.Object({
 			id: t.Optional(t.String()),
 			name: t.String(),

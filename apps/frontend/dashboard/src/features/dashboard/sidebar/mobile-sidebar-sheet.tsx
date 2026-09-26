@@ -43,7 +43,7 @@ export function MobileSidebarSheet({
 	const shouldReduceMotion = useReducedMotion();
 	const { user, activeOrganization } = useActiveOrganization();
 	const signOut = useSignOut();
-	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
+	const { isOrgAdmin, canManageTeam, canManageBilling } = useOrgPermissions();
 
 	const [expandedSections, setExpandedSections] = React.useState<
 		Record<string, boolean>
@@ -72,8 +72,9 @@ export function MobileSidebarSheet({
 			filterSettingsNavigation(settingsNavigation, {
 				isOrgAdmin,
 				canManageTeam,
+				canManageBilling,
 			}),
-		[isOrgAdmin, canManageTeam],
+		[isOrgAdmin, canManageTeam, canManageBilling],
 	);
 
 	const handleDragEnd = (
