@@ -41,9 +41,8 @@ const PrivacyPage = () => {
 	return (
 		<PageLayout
 			title="Privacy Policy"
-			subtitle={`LAST UPDATED: ${LAST_UPDATED}`}
+			subtitle={`Last updated ${LAST_UPDATED}`}
 			description="How Reloop Labs collects and uses information on reloop.sh and in relation to the open-source Reloop email platform."
-			tocPosition="right"
 		>
 			<div>
 				<p>

@@ -96,6 +96,8 @@ const columns: FooterColumn[] = [
 			{ title: "Careers", href: "/careers" },
 			{ title: "Privacy Policy", href: "/privacy" },
 			{ title: "Terms of Service", href: "/terms-and-conditions" },
+			{ title: "DPA", href: "/dpa" },
+			{ title: "Subprocessors", href: "/dpa/subprocessors" },
 			{ title: "License", href: "/license" },
 			{
 				title: "Status",

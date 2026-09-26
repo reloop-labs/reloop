@@ -25,6 +25,8 @@ const STATIC_TITLES: Record<string, string> = {
 	"/community": "Community",
 	"/compare": "Compare",
 	"/contact": "Contact",
+	"/dpa": "Data Processing Addendum",
+	"/dpa/subprocessors": "Subprocessors",
 	"/developers": "Developers",
 	"/docs/resources/sdks": "SDKs Docs",
 	"/features": "Features",

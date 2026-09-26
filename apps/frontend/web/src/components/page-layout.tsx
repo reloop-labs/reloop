@@ -1,93 +1,41 @@
-import { cn } from "@reloop/ui/cn";
 import type React from "react";
-import { MobileTableOfContents, TableOfContents } from "./table-of-contents";
 
 interface PageLayoutProps {
 	title: string;
 	subtitle?: string;
-	category?: string;
 	description?: string;
-	tocPosition?: "left" | "right";
 	children: React.ReactNode;
 }
 
 const PageLayout: React.FC<PageLayoutProps> = ({
 	title,
 	subtitle,
-	category = "LEGAL",
 	description,
-	tocPosition = "left",
 	children,
 }) => {
-	const tocOnRight = tocPosition === "right";
 	return (
 		<div className="min-h-dvh bg-white dark:bg-black">
-			{/* Top Header Section — bottom border terminates at the container's vertical borders */}
-			<div className="w-full">
-				<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x border-b px-4 pt-28 pb-10 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
-					<header className="text-left">
-						<div
-							className={cn(
-								"flex w-full max-w-[680px] flex-col gap-3",
-								tocOnRight && "lg:pl-8",
-							)}
-						>
-							<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-[11px] uppercase tracking-[0.6px]">
-								<span className="text-primary-base">{category}</span>
-								{subtitle && (
-									<>
-										<span className="text-text-soft-400 dark:text-white/30">
-											/
-										</span>
-										<span className="text-text-sub-600 dark:text-white/60">
-											{subtitle}
-										</span>
-									</>
-								)}
-							</div>
-							<h1 className="font-semibold text-2xl text-text-strong-950 leading-[115%] tracking-[-0.5px] sm:text-3xl dark:text-white">
-								{title}
-							</h1>
-							{description && (
-								<p className="text-text-sub-600 text-xs leading-relaxed sm:text-sm dark:text-white/60">
-									{description}
-								</p>
-							)}
-						</div>
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<article className="mx-auto max-w-3xl px-5 pt-20 pb-24 sm:px-8 sm:pt-24 lg:pt-28">
+					<header className="border-stroke-soft-100 border-b pb-10 dark:border-white/10">
+						{subtitle && (
+							<p className="font-medium text-sm text-text-sub-600 dark:text-white/50">
+								{subtitle}
+							</p>
+						)}
+						<h1 className="mt-4 font-medium text-4xl text-text-strong-950 tracking-[-0.04em] sm:text-5xl dark:text-white">
+							{title}
+						</h1>
+						{description && (
+							<p className="mt-5 max-w-2xl text-base text-text-sub-600 leading-7 dark:text-white/60">
+								{description}
+							</p>
+						)}
 					</header>
-				</div>
-			</div>
-
-			{/* Main Article Container */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x border-b px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-0">
-					{/* Table of Contents */}
-					<aside
-						className={cn(
-							"lg:pt-8 lg:pb-16 dark:lg:border-white/10",
-							tocOnRight
-								? "lg:order-2 lg:col-span-3 lg:border-stroke-soft-100 lg:border-l lg:pl-8"
-								: "lg:col-span-3 lg:border-stroke-soft-100 lg:border-r lg:pr-8",
-						)}
-					>
-						<div className="space-y-5 lg:sticky lg:top-28">
-							<TableOfContents />
-						</div>
-					</aside>
-
-					{/* Main Content Column */}
-					<main
-						className={cn(
-							"space-y-6 lg:p-8 lg:pb-16",
-							tocOnRight ? "lg:order-1 lg:col-span-9" : "lg:col-span-9",
-						)}
-					>
-						<MobileTableOfContents />
-						<div className="blog-prose legal-content text-[14px] text-text-strong-950 leading-relaxed sm:text-[15px] dark:text-white/80 [&_a]:text-primary-base [&_a]:underline [&_h2]:mt-8 [&_h2]:mb-2.5 [&_h2]:font-semibold [&_h2]:text-base [&_h2]:text-text-strong-950 [&_h2]:dark:text-white [&_li]:text-text-sub-600 [&_p]:text-text-sub-600 [&_p]:dark:text-white/60 [&_section]:space-y-4 [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-5">
-							{children}
-						</div>
-					</main>
-				</div>
+					<div className="mt-12 text-sm text-text-strong-950/80 leading-7 sm:text-base dark:text-white/80 [&_a]:text-text-strong-950 [&_a]:underline [&_a]:decoration-stroke-soft-200 [&_a]:underline-offset-4 [&_a]:transition-colors hover:[&_a]:decoration-text-strong-950 dark:[&_a]:text-white dark:[&_a]:decoration-white/20 dark:hover:[&_a]:decoration-white [&_div]:space-y-12 [&_h2]:font-medium [&_h2]:text-text-strong-950 [&_h2]:text-xl [&_h2]:tracking-[-0.02em] sm:[&_h2]:text-2xl dark:[&_h2]:text-white [&_li]:text-text-sub-600 dark:[&_li]:text-white/60 [&_section]:space-y-4 [&_strong]:font-semibold [&_strong]:text-text-strong-950 dark:[&_strong]:text-white [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-5">
+						{children}
+					</div>
+				</article>
 			</div>
 		</div>
 	);

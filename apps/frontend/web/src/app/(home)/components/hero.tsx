@@ -92,6 +92,30 @@ export function Hero({ variant = "default" }: HeroProps) {
 							<Link href="/self-host">Self-host Reloop</Link>
 						</FancyButton.Root>
 					</div>
+					<div className="mt-6 flex flex-wrap items-center justify-start gap-x-6 gap-y-2 pl-1 text-[13.5px] text-text-sub-600 dark:text-white/50">
+						<Link
+							href="/pricing"
+							className="inline-flex items-center gap-2 transition-colors hover:text-text-strong-950 dark:hover:text-white"
+						>
+							<Icon
+								name="mail-exchange"
+								className="size-4 shrink-0"
+								aria-hidden="true"
+							/>
+							<span>3,000 emails for free</span>
+						</Link>
+						<Link
+							href="/dpa"
+							className="inline-flex items-center gap-2 transition-colors hover:text-text-strong-950 dark:hover:text-white"
+						>
+							<Icon
+								name="shield"
+								className="size-4 shrink-0"
+								aria-hidden="true"
+							/>
+							<span>GDPR supported</span>
+						</Link>
+					</div>
 				</div>
 			)}
 		</section>
