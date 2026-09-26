@@ -156,13 +156,21 @@ function extractDisplayName(from: string): string {
 	return match[1].trim().replace(/^['"]+|['"]+$/g, "");
 }
 
+function escapeRegExp(s: string): string {
+	return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export function assertDisplayNameNotSpoofed(from: string): void {
 	const displayName = extractDisplayName(from);
 	if (!displayName) return; // bare address — nothing to check
 
-	const lower = displayName.toLowerCase();
 	for (const brand of BRAND_BLOCKLIST) {
-		if (lower.includes(brand)) {
+		// Word-boundary match: "PayPal Support" is blocked, but
+		// "pranavkp.me via Reloop" must NOT match brand "vk",
+		// and "Pineapple Inc" must NOT match brand "apple".
+		// Substring `includes()` caused those false positives.
+		const pattern = new RegExp(`\\b${escapeRegExp(brand)}\\b`, "i");
+		if (pattern.test(displayName)) {
 			throw createError({
 				status: 400,
 				message: "Sender display name not permitted",
