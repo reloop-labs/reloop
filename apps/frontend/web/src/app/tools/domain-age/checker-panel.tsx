@@ -65,6 +65,185 @@ function normalizeDomainInput(raw: string): string {
 	return v;
 }
 
+function formatDateTime(iso: string): string {
+	try {
+		return new Date(iso).toLocaleString("en-US", {
+			month: "short",
+			day: "numeric",
+			year: "numeric",
+			hour: "numeric",
+			minute: "2-digit",
+		});
+	} catch {
+		return iso;
+	}
+}
+
+function formatDaysUntilExpiry(expiresAt: string): string | null {
+	const diffMs = new Date(expiresAt).getTime() - Date.now();
+	if (Number.isNaN(diffMs)) return null;
+	const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+	if (days < 0) return `expired ${Math.abs(days).toLocaleString()}d ago`;
+	if (days === 0) return "expires today";
+	if (days === 1) return "in 1 day";
+	return `in ${days.toLocaleString()} days`;
+}
+
+function formatDateOnly(iso: string): string {
+	try {
+		return new Date(iso).toLocaleDateString("en-US", {
+			month: "short",
+			day: "numeric",
+			year: "numeric",
+		});
+	} catch {
+		return iso;
+	}
+}
+
+function formatWeekday(iso: string): string {
+	try {
+		return new Date(iso).toLocaleDateString("en-US", { weekday: "long" });
+	} catch {
+		return "";
+	}
+}
+
+function formatTimeOnly(iso: string): string {
+	try {
+		return new Date(iso).toLocaleTimeString("en-US", {
+			hour: "numeric",
+			minute: "2-digit",
+		});
+	} catch {
+		return "";
+	}
+}
+
+function formatAgeAgo(ageDays: number): string {
+	if (ageDays <= 0) return "today";
+	if (ageDays === 1) return "1 day ago";
+	return `${ageDays.toLocaleString()} days ago`;
+}
+
+function getSummaryTone(verdict: DomainAgeReport["verdict"]): {
+	icon: string;
+	bar: string;
+	iconWrap: string;
+} {
+	switch (verdict) {
+		case "too_new":
+		case "held":
+		case "not_registered":
+			return {
+				icon: verdict === "not_registered" ? "cross-circle" : "alert-triangle",
+				bar: "border-l-rose-500/70",
+				iconWrap:
+					"bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400",
+			};
+		case "cold":
+		case "unknown_age":
+			return {
+				icon: "alert-triangle",
+				bar: "border-l-amber-500/70",
+				iconWrap:
+					"bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400",
+			};
+		case "warming":
+			return {
+				icon: "info-outline",
+				bar: "border-l-blue-500/70",
+				iconWrap:
+					"bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
+			};
+		default:
+			return {
+				icon: "check-circle",
+				bar: "border-l-emerald-500/70",
+				iconWrap:
+					"bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
+			};
+	}
+}
+
+function getCalloutText(
+	summary: string,
+	verdict: DomainAgeReport["verdict"],
+): string {
+	// Age-known verdicts already state the age in the headline
+	// ("This domain is X old"), so drop the leading "Registered … ago."
+	// sentence and show only the guidance.
+	switch (verdict) {
+		case "too_new":
+		case "cold":
+		case "warming":
+		case "established":
+		case "mature": {
+			const idx = summary.indexOf(". ");
+			return idx === -1 ? summary : summary.slice(idx + 2);
+		}
+		default:
+			return summary;
+	}
+}
+
+function getDeliverabilityInfo(verdict: DomainAgeReport["verdict"]): {
+	status: string;
+	detail: string;
+	dot: string;
+	text: string;
+} {
+	switch (verdict) {
+		case "too_new":
+			return {
+				status: "High risk",
+				detail: "New-domain filters likely to flag mail",
+				dot: "bg-rose-500",
+				text: "text-rose-600 dark:text-rose-400",
+			};
+		case "cold":
+			return {
+				status: "Elevated risk",
+				detail: "Keep sending volume near zero",
+				dot: "bg-amber-500",
+				text: "text-amber-600 dark:text-amber-400",
+			};
+		case "warming":
+			return {
+				status: "Low risk",
+				detail: "Ramp volume up gradually",
+				dot: "bg-blue-500",
+				text: "text-blue-600 dark:text-blue-400",
+			};
+		case "established":
+		case "mature":
+			return {
+				status: "No age risk",
+				detail: "Age won't hurt deliverability",
+				dot: "bg-emerald-500",
+				text: "text-emerald-600 dark:text-emerald-400",
+			};
+		case "held":
+		case "not_registered":
+			return {
+				status: "Blocked",
+				detail:
+					verdict === "held"
+						? "Resolve the registry hold to send"
+						: "Register the domain before sending",
+				dot: "bg-rose-500",
+				text: "text-rose-600 dark:text-rose-400",
+			};
+		default:
+			return {
+				status: "Unknown",
+				detail: "Age unavailable from the registry",
+				dot: "bg-zinc-400",
+				text: "text-text-sub-600 dark:text-white/60",
+			};
+	}
+}
+
 function MorphSlot({
 	activeKey,
 	reduceMotion,
@@ -134,7 +313,7 @@ function MorphSlot({
 }
 
 export function CheckerPanel() {
-	const [domain, setDomain] = useState("somsevicingno.com");
+	const [domain, setDomain] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [result, setResult] = useState<DomainAgeReport | null>(null);
@@ -217,7 +396,8 @@ Domain: ${result.domain}
 Verdict: ${result.verdict.toUpperCase()}
 Headline: ${result.headline}
 Age: ${result.age.ageDays !== null ? `${result.age.ageDays} days` : "Unknown"}
-Registered: ${result.age.createdAt ? new Date(result.age.createdAt).toLocaleDateString() : "Unknown"}
+Registered: ${result.age.createdAt ? formatDateTime(result.age.createdAt) : "Unknown"}
+Expires: ${result.age.expiresAt ? formatDateTime(result.age.expiresAt) : "Unknown"}
 Registrar: ${result.registry.registrar || "Unknown"}
 SPF: ${result.emailSetup.spf ? "Configured" : "Missing"}
 DMARC: ${result.emailSetup.dmarc ? `Configured (${result.emailSetup.dmarcPolicy})` : "Missing"}
@@ -349,18 +529,19 @@ https://reloop.sh/tools/domain-age`;
 						<div className="space-y-6 pt-2">
 							<div
 								className={cn(
-									"rounded-2xl border p-6 shadow-xs transition-colors sm:p-7",
+									"relative overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 bg-gradient-to-b p-6 shadow-xs transition-colors sm:p-7 dark:border-white/10 dark:bg-white/[0.02]",
 									(result.verdict === "too_new" ||
 										result.verdict === "held" ||
 										result.verdict === "not_registered") &&
-										"border-rose-500/30 bg-rose-500/[0.04] dark:border-rose-500/40 dark:bg-rose-500/[0.07]",
+										"from-rose-500/10 via-transparent to-transparent",
 									(result.verdict === "cold" ||
-										result.verdict === "warming" ||
 										result.verdict === "unknown_age") &&
-										"border-amber-500/30 bg-amber-500/[0.04] dark:border-amber-500/40 dark:bg-amber-500/[0.07]",
+										"from-amber-500/10 via-transparent to-transparent",
+									result.verdict === "warming" &&
+										"from-blue-500/10 via-transparent to-transparent",
 									(result.verdict === "established" ||
 										result.verdict === "mature") &&
-										"border-emerald-500/30 bg-emerald-500/[0.04] dark:border-emerald-500/40 dark:bg-emerald-500/[0.07]",
+										"from-emerald-500/10 via-transparent to-transparent",
 								)}
 							>
 								<div className="flex flex-col gap-3">
@@ -368,31 +549,107 @@ https://reloop.sh/tools/domain-age`;
 										{result.headline}
 									</h2>
 
-									{result.age.ageDays !== null && (
-										<div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-3.5 py-1.5 dark:border-white/10 dark:bg-white/[0.04]">
-											<span className="font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-												Registered
-											</span>
-											<span className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
-												{result.age.ageDays === 0
-													? "today"
-													: `${result.age.ageDays.toLocaleString()} days ago`}
-											</span>
-											{result.age.createdAt && (
-												<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/50">
-													·{" "}
-													{new Date(result.age.createdAt).toLocaleDateString(
-														"en-US",
-														{ month: "short", day: "numeric", year: "numeric" },
-													)}
-												</span>
-											)}
-										</div>
-									)}
+									<div
+										className={cn(
+											"grid grid-cols-1 gap-2.5",
+											(result.age.createdAt || result.age.expiresAt) &&
+												"sm:grid-cols-3",
+										)}
+									>
+										{result.age.createdAt && (
+											<div
+												className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-white/10 dark:bg-white/[0.03]"
+												title={`Registered at ${new Date(result.age.createdAt).toISOString()}`}
+											>
+												<div className="flex items-center gap-1.5 font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+													<Icon name="calendar" className="size-3.5" />
+													Registered
+												</div>
+												<div className="mt-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
+													{formatDateOnly(result.age.createdAt)}
+												</div>
+												<div className="mt-0.5 text-xs text-text-sub-600 dark:text-white/55">
+													{formatWeekday(result.age.createdAt)} ·{" "}
+													{formatTimeOnly(result.age.createdAt)}
+												</div>
+												{result.age.ageDays !== null && (
+													<div className="mt-2 inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/[0.06] dark:text-white/60">
+														{formatAgeAgo(result.age.ageDays)}
+													</div>
+												)}
+											</div>
+										)}
+										{result.age.expiresAt && (
+											<div
+												className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-white/10 dark:bg-white/[0.03]"
+												title={`Expires at ${new Date(result.age.expiresAt).toISOString()}`}
+											>
+												<div className="flex items-center gap-1.5 font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+													<Icon name="clock" className="size-3.5" />
+													Expires
+												</div>
+												<div className="mt-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
+													{formatDateOnly(result.age.expiresAt)}
+												</div>
+												<div className="mt-0.5 text-xs text-text-sub-600 dark:text-white/55">
+													{formatWeekday(result.age.expiresAt)} ·{" "}
+													{formatTimeOnly(result.age.expiresAt)}
+												</div>
+												{formatDaysUntilExpiry(result.age.expiresAt) && (
+													<div className="mt-2 inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/[0.06] dark:text-white/60">
+														{formatDaysUntilExpiry(result.age.expiresAt)}
+													</div>
+												)}
+											</div>
+										)}
+										{(() => {
+											const info = getDeliverabilityInfo(result.verdict);
+											return (
+												<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-white/10 dark:bg-white/[0.03]">
+													<div className="flex items-center gap-1.5 font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+														<Icon name="mail-send" className="size-3.5" />
+														Deliverability
+													</div>
+													<div className="mt-1.5 flex items-center gap-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
+														<span
+															className={cn(
+																"size-1.5 shrink-0 rounded-full",
+																info.dot,
+															)}
+														/>
+														<span className={cn(info.text)}>{info.status}</span>
+													</div>
+													<div className="mt-0.5 text-xs text-text-sub-600 dark:text-white/55">
+														{info.detail}
+													</div>
+												</div>
+											);
+										})()}
+									</div>
 
-									<p className="max-w-2xl text-[14px] text-text-sub-600 leading-relaxed dark:text-white/65">
-										{result.summary}
-									</p>
+									{(() => {
+										const tone = getSummaryTone(result.verdict);
+										return (
+											<div
+												className={cn(
+													"flex gap-3 rounded-xl rounded-l-md border border-stroke-soft-200 border-l-[3px] bg-bg-white-0 p-4 dark:border-white/10 dark:bg-white/[0.03]",
+													tone.bar,
+												)}
+											>
+												<span
+													className={cn(
+														"flex size-7 shrink-0 items-center justify-center rounded-lg",
+														tone.iconWrap,
+													)}
+												>
+													<Icon name={tone.icon} className="size-4" />
+												</span>
+												<p className="min-w-0 font-medium text-[13.5px] text-text-strong-950 leading-relaxed dark:text-white/85">
+													{getCalloutText(result.summary, result.verdict)}
+												</p>
+											</div>
+										);
+									})()}
 								</div>
 
 								{result.age.ageDays !== null && (

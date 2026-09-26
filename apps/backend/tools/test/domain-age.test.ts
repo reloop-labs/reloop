@@ -109,7 +109,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 			});
 
 			expect(report.verdict).toBe("too_new");
-			expect(report.headline).toBe("Too new to send — wait");
+			expect(report.headline).toBe("This domain is 4 days old");
 			expect(report.age.ageDays).toBe(4);
 		});
 
@@ -135,7 +135,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 			});
 
 			expect(report.verdict).toBe("cold");
-			expect(report.headline).toBe("Cold domain — send almost nothing");
+			expect(report.headline).toBe("This domain is 14 days old");
 		});
 
 		it("Case 3: Two months old (45 days) -> warming", () => {
@@ -161,7 +161,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 			});
 
 			expect(report.verdict).toBe("warming");
-			expect(report.headline).toBe("Warming — keep volume low");
+			expect(report.headline).toBe("This domain is 1 month, 14 days old");
 		});
 
 		it("Case 4: Four months old (120 days) -> established", () => {
@@ -182,7 +182,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 			});
 
 			expect(report.verdict).toBe("established");
-			expect(report.headline).toBe("Age is not the blocker");
+			expect(report.headline).toBe("This domain is 3 months, 28 days old");
 		});
 
 		it("Case 5: Ancient domain (>1 year) -> mature", () => {
@@ -207,7 +207,9 @@ describe("Domain Age & Warmup Checker Service", () => {
 			});
 
 			expect(report.verdict).toBe("mature");
-			expect(report.headline).toBe("This domain is old enough");
+			expect(report.headline).toBe(
+				"This domain is 28 years, 11 months, 16 days old",
+			);
 		});
 
 		it("Case 6: Perfect DNS on 2-day-old domain -> stays too_new", () => {

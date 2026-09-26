@@ -1045,6 +1045,7 @@
         "drizzle-typebox": "catalog:db",
         "pg": "catalog:db",
         "redis": "catalog:db",
+        "tldts": "^7.4.11",
       },
       "devDependencies": {
         "@reloop/tsconfig": "workspace:*",

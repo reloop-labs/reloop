@@ -135,8 +135,8 @@ export const apiResponseSample = `{
   "resolvedAt": "2026-08-31T12:00:00.000Z",
   "responseTimeMs": 142,
   "verdict": "mature",
-  "headline": "This domain is old enough",
-  "summary": "Registered over 15.0 years ago (5,680 days). Domain age is completely mature and will not impact email deliverability.",
+  "headline": "This domain is 15 years, 6 months, 20 days old",
+  "summary": "Registered 15 years, 6 months, 20 days ago (5,680 days). Domain age is completely mature and will not impact email deliverability.",
   "disclaimer": "Gmail and Outlook do not publish an exact age threshold. This evaluation provides Reloop’s sending guidance based on newly registered domain filters.",
   "age": {
     "createdAt": "2011-02-11T20:29:43.000Z",

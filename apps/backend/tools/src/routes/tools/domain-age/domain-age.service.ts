@@ -157,6 +157,35 @@ export function toRegistrableDomain(input: string): {
 	return { registrableDomain: regDomain, tld };
 }
 
+export function formatPreciseAge(createdAt: string, now: Date): string {
+	const start = new Date(createdAt);
+	let years = now.getUTCFullYear() - start.getUTCFullYear();
+	let months = now.getUTCMonth() - start.getUTCMonth();
+	let days = now.getUTCDate() - start.getUTCDate();
+
+	if (days < 0) {
+		months -= 1;
+		const daysInPrevMonth = new Date(
+			Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 0),
+		).getUTCDate();
+		days += daysInPrevMonth;
+	}
+	if (months < 0) {
+		years -= 1;
+		months += 12;
+	}
+	if (years < 0) {
+		return "0 days";
+	}
+
+	const parts: string[] = [];
+	if (years > 0) parts.push(`${years} year${years === 1 ? "" : "s"}`);
+	if (months > 0) parts.push(`${months} month${months === 1 ? "" : "s"}`);
+	if (days > 0) parts.push(`${days} day${days === 1 ? "" : "s"}`);
+	if (parts.length === 0) return "0 days";
+	return parts.join(", ");
+}
+
 export function classifyNameserverKind(
 	nsHosts: string[],
 ): "production" | "registrar_default" | "parking" | "unknown" {
@@ -510,14 +539,17 @@ export function evaluateColdDomain(
 	}
 
 	// 5. Age Verdict Bands
+	// Headline always shows the numeric age (e.g. "This domain is 4 days old",
+	// "This domain is 1 year, 2 months, 23 days old"). Sending guidance lives
+	// in summary/nextStep/verdict, not in the headline.
 	let verdict: "too_new" | "cold" | "warming" | "established" | "mature";
-	let headline = "";
+	const preciseAge = formatPreciseAge(rdap.createdAt, now);
+	const headline = `This domain is ${preciseAge} old`;
 	let summary = "";
 	let nextStep: { title: string; body: string; href: string };
 
 	if (ageDays <= 7) {
 		verdict = "too_new";
-		headline = "Too new to send — wait";
 		summary = `Registered only ${ageDays === 0 ? "today" : `${ageDays} day${ageDays === 1 ? "" : "s"} ago`}. Major mailbox filters treat brand-new domains as high-risk cold senders. Do not send cold campaigns or newsletter blasts.`;
 		nextStep = {
 			title: "Configure DNS records while you wait",
@@ -526,7 +558,6 @@ export function evaluateColdDomain(
 		};
 	} else if (ageDays <= 30) {
 		verdict = "cold";
-		headline = "Cold domain — send almost nothing";
 		summary = `Registered ${ageDays} days ago. Transactional trickles (e.g. password resets) are acceptable, but mass marketing or cold outreach will trigger spam filters.`;
 		nextStep = {
 			title: "Start gradual warmup with Reloop",
@@ -535,7 +566,6 @@ export function evaluateColdDomain(
 		};
 	} else if (ageDays <= 90) {
 		verdict = "warming";
-		headline = "Warming — keep volume low";
 		summary = `Registered ${ageDays} days ago (${Math.floor(ageDays / 30)} month${Math.floor(ageDays / 30) > 1 ? "s" : ""}). The domain is exiting the initial cold phase, but sudden volume spikes will still trigger spam filters.`;
 		nextStep = {
 			title: "Monitor deliverability with Reloop",
@@ -544,7 +574,6 @@ export function evaluateColdDomain(
 		};
 	} else if (ageDays <= 365) {
 		verdict = "established";
-		headline = "Age is not the blocker";
 		summary = `Registered ${ageDays} days ago. Mailbox providers will not reject your email purely for being newly registered. Inbox placement now depends on authentication and engagement.`;
 		nextStep = {
 			title: "Optimize deliverability with Reloop",
@@ -552,10 +581,8 @@ export function evaluateColdDomain(
 			href: "/dashboard/signup",
 		};
 	} else {
-		const ageYears = (ageDays / 365.25).toFixed(1);
 		verdict = "mature";
-		headline = "This domain is old enough";
-		summary = `Registered over ${ageYears} years ago (${ageDays.toLocaleString()} days). Domain age is completely mature and will not impact email deliverability.`;
+		summary = `Registered ${preciseAge} ago (${ageDays.toLocaleString()} days). Domain age is completely mature and will not impact email deliverability.`;
 		nextStep = {
 			title: "Send high-volume email with Reloop",
 			body: "Scale your transactional and marketing emails with Reloop's developer API and SMTP infrastructure.",
