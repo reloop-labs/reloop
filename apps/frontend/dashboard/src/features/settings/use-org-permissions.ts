@@ -1,5 +1,6 @@
 import { authClient } from "@reloop/auth/client";
 import { useMemo } from "react";
+import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 
 type OrgRole = "owner" | "admin" | "member";
 
@@ -27,6 +28,7 @@ function asOrgRole(role: string): OrgRole | null {
 export function useOrgPermissions() {
 	const { data, isPending, error } = authClient.useActiveMemberRole();
 	const role = data?.role ?? null;
+	const { billingEnabled } = useBillingUsage();
 
 	return useMemo(() => {
 		const isOwner = roleIncludes(role, ["owner"]);
@@ -35,7 +37,7 @@ export function useOrgPermissions() {
 		// Only true once role is known as owner/admin — never while pending/unknown.
 		const isOrgAdmin = !isPending && (isOwner || isAdmin);
 		const canManageTeam = isOrgAdmin;
-		const canManageBilling = isOrgAdmin;
+		const canManageBilling = isOrgAdmin && billingEnabled;
 		const canManageWorkspace = isOrgAdmin;
 
 		const typedRole = role ? asOrgRole(role) : null;
@@ -60,5 +62,5 @@ export function useOrgPermissions() {
 			canManageWorkspace,
 			canInvite,
 		};
-	}, [role, isPending, error]);
+	}, [role, isPending, error, billingEnabled]);
 }

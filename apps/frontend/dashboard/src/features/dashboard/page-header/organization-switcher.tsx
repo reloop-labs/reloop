@@ -70,7 +70,7 @@ export function OrganizationSwitcher({
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
-	const { data: billing } = useBillingUsage();
+	const { billingEnabled: showPlans } = useBillingUsage();
 
 	const activeIndex = activeOrganization
 		? organizations?.findIndex((org) => org.id === activeOrganization.id)
@@ -79,7 +79,6 @@ export function OrganizationSwitcher({
 	const currentTab = buttonRefs.current[currentIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
-	const showPlans = billing?.billingEnabled !== false;
 	const hasFreeOrg =
 		showPlans && organizations?.some((org) => org.planId === "free");
 
