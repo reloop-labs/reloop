@@ -66,21 +66,20 @@ export function Hero({ variant = "default" }: HeroProps) {
 					</div>
 				</div>
 			) : (
-				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center border-stroke-soft-100 border-x px-6 pt-36 pb-20 text-center sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28 dark:border-white/10">
-					<h1 className="max-w-4xl text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-						Open-Source Email Infrastructure for Developers
+				<div className="relative mx-auto flex w-full max-w-5xl flex-col items-start border-stroke-soft-100 border-x px-6 pt-36 pb-20 text-left sm:px-8 sm:pt-44 sm:pb-24 md:max-w-7xl lg:px-12 lg:pt-52 lg:pb-28 dark:border-white/10">
+					<h1 className="max-w-[38rem] text-balance text-left font-medium text-3xl text-text-strong-950 leading-[1.1] tracking-tight sm:text-3xl md:text-4xl lg:text-5xl dark:text-white">
+						Email Infrastructure for Developers
 					</h1>
-					<p className="mt-5 max-w-4xl text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
-						Reloop is a transactional email API, SMTP relay, campaign sender,
-						and inbound agent inbox in one Apache 2.0 codebase. Run it on Reloop
-						Cloud or self-host it.
+					<p className="mt-6 max-w-2xl text-pretty text-left text-lg text-text-sub-600 leading-normal md:text-xl dark:text-white/60">
+						SES like infrastructure with the DX you already love. Agent inboxes,
+						marketing campaigns, drip automations, built in.
 					</p>
-					<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
+					<div className="mt-8 flex flex-wrap items-center justify-start gap-3.5 sm:mt-9 sm:gap-4">
 						<FancyButton.Root
 							asChild
 							variant="primary"
 							size="medium"
-							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+							className="h-11 rounded-xl px-6 font-medium text-[15.5px] dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 						>
 							<a href={hostedSignupHref}>Get Started</a>
 						</FancyButton.Root>
@@ -90,14 +89,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 							size="medium"
 							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
 						>
-							<a
-								href="https://cal.com/pranavp/30"
-								target="_blank"
-								rel="noreferrer"
-							>
-								<Icon name="calendar" className="size-4 shrink-0" />
-								<span>Schedule call</span>
-							</a>
+							<Link href="/self-host">Self-host Reloop</Link>
 						</FancyButton.Root>
 					</div>
 				</div>
