@@ -1,8 +1,10 @@
+import { productionSiteUrl } from "@reloop/web/lib/site";
+
 export const toolPath = "/tools/domain-age";
 export const toolTitle =
 	"Domain Age & Email Warmup Checker — Registration Date & Risk";
 export const toolDescription =
-	"Check when any domain was registered via official RDAP records. Discover whether domain age or cold-sending filters will cause Gmail and Outlook to route your emails to spam.";
+	"The older your domain, the more it's trusted - did you check yours?";
 export const metaDescription =
 	"Free domain age and email warmup checker. Query authoritative RDAP registration dates, detect newly registered domain (NRD) spam filter risks, and verify SPF/DMARC readiness.";
 
@@ -129,6 +131,184 @@ export const faqGroups: FaqGroup[] = [
 
 export const faqs: FaqItem[] = faqGroups.flatMap((group) => group.items);
 
+export const apiEndpoint = `${productionSiteUrl}/api/tools/v1/domain-age`;
+
+export type ApiSnippet = {
+	id: string;
+	label: string;
+	code: string;
+};
+
+/** Non-empty by construction so the page can always fall back to the first tab. */
+export const apiSnippets: [ApiSnippet, ...ApiSnippet[]] = [
+	{
+		id: "curl",
+		label: "cURL",
+		code: `curl -X POST ${apiEndpoint} \\
+  -H "Content-Type: application/json" \\
+  -d '{"domain": "stripe.com"}'`,
+	},
+	{
+		id: "javascript",
+		label: "JavaScript",
+		code: `// No SDK, no API key — it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = await res.json();`,
+	},
+	{
+		id: "typescript",
+		label: "TypeScript",
+		code: `// No SDK, no API key — it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = (await res.json()) as CheckResult;`,
+	},
+	{
+		id: "node",
+		label: "Node.js",
+		code: `// Node 18+ has a global fetch — no dependencies.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = await res.json();`,
+	},
+	{
+		id: "axios",
+		label: "Axios",
+		code: `import axios from "axios";
+
+const { data } = await axios.post(
+  "${apiEndpoint}",
+  { domain: "stripe.com" },
+);`,
+	},
+	{
+		id: "python",
+		label: "Python",
+		code: `# pip install requests
+import requests
+
+result = requests.post(
+    "${apiEndpoint}",
+    json={"domain": "stripe.com"},
+).json()`,
+	},
+	{
+		id: "go",
+		label: "Go",
+		code: `body, _ := json.Marshal(map[string]string{
+    "domain": "stripe.com",
+})
+
+res, err := http.Post(
+    "${apiEndpoint}",
+    "application/json",
+    bytes.NewReader(body),
+)`,
+	},
+	{
+		id: "java",
+		label: "Java",
+		code: `HttpClient client = HttpClient.newHttpClient();
+String body = "{\\"domain\\": \\"stripe.com\\"}";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("${apiEndpoint}"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(body))
+    .build();
+
+HttpResponse<String> response = client.send(
+    request, HttpResponse.BodyHandlers.ofString());`,
+	},
+	{
+		id: "csharp",
+		label: "C#",
+		code: `using var client = new HttpClient();
+
+var response = await client.PostAsJsonAsync(
+    "${apiEndpoint}",
+    new { domain = "stripe.com" });`,
+	},
+	{
+		id: "php",
+		label: "PHP",
+		code: `$ch = curl_init("${apiEndpoint}");
+
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => ["Content-Type: application/json"],
+    CURLOPT_POSTFIELDS => json_encode(["domain" => "stripe.com"]),
+    CURLOPT_RETURNTRANSFER => true,
+]);
+
+$result = curl_exec($ch);`,
+	},
+	{
+		id: "ruby",
+		label: "Ruby",
+		code: `require "net/http"
+require "json"
+
+uri = URI("${apiEndpoint}")
+
+result = Net::HTTP.post(
+  uri,
+  { domain: "stripe.com" }.to_json,
+  "Content-Type" => "application/json"
+)`,
+	},
+	{
+		id: "rust",
+		label: "Rust",
+		code: `let result: serde_json::Value = reqwest::Client::new()
+    .post("${apiEndpoint}")
+    .json(&serde_json::json!({ "domain": "stripe.com" }))
+    .send()
+    .await?
+    .json()
+    .await?;`,
+	},
+];
+
+export type ApiBodyArg = {
+	name: string;
+	type: string;
+	required: boolean;
+	description: string;
+};
+
+export const apiBodyArgs: ApiBodyArg[] = [
+	{
+		name: "domain",
+		type: "string",
+		required: true,
+		description:
+			"Domain or URL to inspect (e.g. stripe.com). Subdomains resolve to their registrable root; IP addresses are rejected.",
+	},
+];
+
 export const apiResponseSample = `{
   "domain": "stripe.com",
   "registrableDomain": "stripe.com",
@@ -167,3 +347,52 @@ export const apiResponseSample = `{
   },
   "warnings": []
 }`;
+
+export type ApiStatusCode = "200" | "400" | "429";
+
+export const apiStatusCodes: ApiStatusCode[] = ["200", "400", "429"];
+
+export const apiResponseSamples: Record<ApiStatusCode, string> = {
+	"200": apiResponseSample,
+	"400": `{
+  "message": "Domain parameter is required.",
+  "why": "Domain age and warmup checks require a registered domain name (e.g. stripe.com).",
+  "fix": "Enter a domain or URL to inspect.",
+  "link": "https://reloop.sh/tools/domain-age"
+}`,
+	"429": `{
+  "message": "Rate limited",
+  "why": "Too many checks from this IP.",
+  "fix": "Wait a moment and try again."
+}`,
+};
+
+export const apiResponseSchemas: Record<ApiStatusCode, string> = {
+	"200": `{
+  "domain": "string",
+  "registrableDomain": "string",
+  "resolvedAt": "string (ISO date)",
+  "responseTimeMs": "number",
+  "verdict": "too_new | cold | warming | established | mature | unknown_age | not_registered | held",
+  "headline": "string",
+  "summary": "string",
+  "disclaimer": "string",
+  "age": "{ createdAt: string | null, ageDays: number | null, expiresAt: string | null, source: rdap | none }",
+  "registry": "{ registrar: string | null, status: string[], tld: string | null }",
+  "nameservers": "{ hosts: string[], provider: string | null, kind: production | registrar_default | parking | unknown }",
+  "emailSetup": "{ spf: boolean, dmarc: boolean, dmarcPolicy: string | null, mx: boolean }",
+  "nextStep": "{ title: string, body: string, href: string }",
+  "warnings": "string[]"
+}`,
+	"400": `{
+  "message": "string",
+  "why": "string",
+  "fix": "string",
+  "link": "string"
+}`,
+	"429": `{
+  "message": "string",
+  "why": "string",
+  "fix": "string"
+}`,
+};
