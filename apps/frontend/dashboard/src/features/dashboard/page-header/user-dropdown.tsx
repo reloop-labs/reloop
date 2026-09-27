@@ -75,15 +75,16 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 			? (search as { from: string }).from
 			: null;
 
-	const { isOrgAdmin, canManageTeam } = useOrgPermissions();
+	const { isOrgAdmin, canManageTeam, canManageBilling } = useOrgPermissions();
 	// Same RBAC as settings sidebar — members only see Account items.
 	const filteredSettings = useMemo(
 		() =>
 			filterSettingsNavigation(settingsNavigation, {
 				isOrgAdmin,
 				canManageTeam,
+				canManageBilling,
 			}),
-		[isOrgAdmin, canManageTeam],
+		[isOrgAdmin, canManageTeam, canManageBilling],
 	);
 	const workspaceSection = filteredSettings.find(
 		(s) => s.section === "Workspace",

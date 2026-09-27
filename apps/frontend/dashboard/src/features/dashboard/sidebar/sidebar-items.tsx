@@ -29,8 +29,10 @@ export function SidebarItems({
 	const mainNavRefs = useRef<HTMLElement[]>([]);
 	const subNavRefs = useRef<Record<string, HTMLAnchorElement[]>>({});
 	const pathname = usePathname();
-	const { isOrgAdmin } = useOrgPermissions();
-	const settingsHref = isOrgAdmin ? SETTINGS_ADMIN_HOME : SETTINGS_MEMBER_HOME;
+	const { canManageBilling } = useOrgPermissions();
+	const settingsHref = canManageBilling
+		? SETTINGS_ADMIN_HOME
+		: SETTINGS_MEMBER_HOME;
 
 	// Router basepath is /dashboard — compare paths without it for active state.
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";

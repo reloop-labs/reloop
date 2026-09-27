@@ -21,6 +21,22 @@ function snapshot(overrides: Partial<CreditSnapshot> = {}): CreditSnapshot {
 describe("applyCreditReservation", () => {
 	const now = new Date("2026-09-16T10:00:00.000Z");
 
+	test("unlimited never denies and leaves remaining untouched", () => {
+		const decision = applyCreditReservation({
+			credits: snapshot({ creditsRemaining: 0 }),
+			dailyEmailLimit: null,
+			recipientCount: 500,
+			now,
+			unlimited: true,
+		});
+		expect(decision.ok).toBe(true);
+		if (!decision.ok) return;
+		expect(decision.remaining).toBe(0);
+		expect(decision.next.creditsRemaining).toBe(0);
+		expect(decision.next.creditsUsed).toBe(500);
+		expect(decision.next.dailyEmailsUsed).toBe(500);
+	});
+
 	test("daily cap of 100 blocks the 101st email on a free plan", () => {
 		let credits = snapshot();
 		let accepted = 0;

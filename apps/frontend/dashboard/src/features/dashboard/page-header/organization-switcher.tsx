@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 import { getAvatarInitial } from "#/utils/avatar";
 import { PixelAvatar } from "./pixel-avatar";
@@ -69,6 +70,7 @@ export function OrganizationSwitcher({
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
+	const { billingEnabled: showPlans } = useBillingUsage();
 
 	const activeIndex = activeOrganization
 		? organizations?.findIndex((org) => org.id === activeOrganization.id)
@@ -77,7 +79,8 @@ export function OrganizationSwitcher({
 	const currentTab = buttonRefs.current[currentIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
 
-	const hasFreeOrg = organizations?.some((org) => org.planId === "free");
+	const hasFreeOrg =
+		showPlans && organizations?.some((org) => org.planId === "free");
 
 	const handleCreateOrganization = () => {
 		if (hasFreeOrg) {
@@ -118,7 +121,9 @@ export function OrganizationSwitcher({
 						<span className="truncate font-medium text-sm text-text-strong-950">
 							{activeOrganization.name}
 						</span>
-						<PlanBadge planId={activeOrganization.planId} compact />
+						{showPlans ? (
+							<PlanBadge planId={activeOrganization.planId} compact />
+						) : null}
 						<Icon
 							name="chevron-down"
 							className="h-3.5 w-3.5 flex-shrink-0 text-text-sub-600"
@@ -164,7 +169,9 @@ export function OrganizationSwitcher({
 									<p className="min-w-0 truncate text-left font-medium text-sm text-text-strong-950">
 										{organization.name}
 									</p>
-									<PlanBadge planId={organization.planId} />
+									{showPlans ? (
+										<PlanBadge planId={organization.planId} />
+									) : null}
 								</div>
 								{organization.id === activeOrganization.id && (
 									<Icon

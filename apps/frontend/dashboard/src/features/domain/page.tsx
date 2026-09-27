@@ -24,10 +24,11 @@ export function DomainPage() {
 	const router = useRouter();
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
 	const { data: billing } = useBillingUsage();
+	const domainLimit = billing?.resources?.customDomains.limit ?? null;
 	const atDomainCap =
-		(billing?.resources?.customDomains.limit ?? 3) > 0 &&
-		(billing?.resources?.customDomains.used ?? 0) >=
-			(billing?.resources?.customDomains.limit ?? 3);
+		domainLimit != null &&
+		domainLimit > 0 &&
+		(billing?.resources?.customDomains.used ?? 0) >= domainLimit;
 	const [statusFilters] = useQueryState(
 		"status",
 		parseAsArrayOf(parseAsString).withDefault([]),
