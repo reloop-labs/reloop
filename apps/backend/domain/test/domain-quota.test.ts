@@ -96,14 +96,14 @@ function fakeTx(args: { maxCustomDomains: number; used: number }) {
 }
 
 describe("assertCustomDomainQuota", () => {
-	const original = process.env.BILLING_ENABLED;
+	const original = process.env.SELF_HOSTED;
 	afterEach(() => {
-		if (original === undefined) delete process.env.BILLING_ENABLED;
-		else process.env.BILLING_ENABLED = original;
+		if (original === undefined) delete process.env.SELF_HOSTED;
+		else process.env.SELF_HOSTED = original;
 	});
 
 	test("Cloud enforces the plan cap", async () => {
-		process.env.BILLING_ENABLED = "true";
+		delete process.env.SELF_HOSTED;
 		const full = fakeTx({ maxCustomDomains: 3, used: 3 });
 		await expect(
 			assertCustomDomainQuota("org_1", full.tx),
@@ -117,7 +117,7 @@ describe("assertCustomDomainQuota", () => {
 	});
 
 	test("self-hosted never reads the plan or blocks", async () => {
-		delete process.env.BILLING_ENABLED;
+		process.env.SELF_HOSTED = "true";
 		const full = fakeTx({ maxCustomDomains: 3, used: 50 });
 		await expect(
 			assertCustomDomainQuota("org_1", full.tx),

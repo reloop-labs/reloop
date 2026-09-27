@@ -266,6 +266,7 @@ RELOOP_TRACKING_SITE_ADDRESS=$RELOOP_TRACKING_SITE_ADDRESS
 RELOOP_ACME_EMAIL=$RELOOP_ADMIN_EMAIL
 
 NODE_ENV=production
+SELF_HOSTED=true
 
 # Your company name for system email: the sender name, the subjects and the
 # message bodies. Anything other than Reloop is shown as

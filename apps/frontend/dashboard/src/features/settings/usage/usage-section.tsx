@@ -260,7 +260,7 @@ export function UsageSection() {
 	}
 
 	const { plan, subscription, resources, daily } = data;
-	const unlimited = !data.billingEnabled;
+	const unlimited = data.selfHosted;
 	const entitlements = plan.entitlements;
 	const total = Math.max(0, entitlements?.monthlyEmails ?? plan.monthlyCredits);
 	const used = Math.max(0, subscription.creditsUsed);

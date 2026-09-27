@@ -19,7 +19,7 @@ export type ResourceUsage = {
 };
 
 export interface BillingUsage {
-	billingEnabled: boolean;
+	selfHosted: boolean;
 	plan: {
 		id?: string;
 		name: string;
@@ -128,7 +128,7 @@ export function useBillingUsage() {
 
 	return {
 		data: query.data ?? undefined,
-		billingEnabled: query.data !== null && query.data?.billingEnabled !== false,
+		billingEnabled: query.data !== null && query.data?.selfHosted !== true,
 		isLoading: query.isPending,
 		error: query.error,
 		refetch: () => query.refetch(),

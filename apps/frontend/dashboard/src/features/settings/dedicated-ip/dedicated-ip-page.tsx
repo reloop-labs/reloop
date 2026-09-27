@@ -256,7 +256,7 @@ export function DedicatedIpPage() {
 	const data = sendingIps.data;
 	const dedicatedIpCount =
 		data?.dedicatedIpCount ?? usage?.plan.entitlements?.dedicatedIpCount ?? 0;
-	const entitled = usage?.billingEnabled === false || dedicatedIpCount > 0;
+	const entitled = usage?.selfHosted === true || dedicatedIpCount > 0;
 	const items = data?.items ?? [];
 	const pendingSlots = Math.max(0, dedicatedIpCount - items.length);
 

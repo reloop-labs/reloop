@@ -1,7 +1,7 @@
 import {
-	isBillingEnabled,
+	isSelfHosted,
 	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
-} from "@reloop/db/billing-enabled";
+} from "@reloop/db/self-hosted";
 import { db } from "@reloop/db/client";
 import { organizationPlan } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
@@ -34,7 +34,7 @@ export const KUMO_INJECT_PAYLOAD_LIMIT_BYTES = 15 * 1024 * 1024;
 export async function getOrgAttachmentLimit(
 	organizationId: string,
 ): Promise<{ maxAttachmentBytes: number; planId: string }> {
-	if (!isBillingEnabled()) {
+	if (isSelfHosted()) {
 		return {
 			maxAttachmentBytes: SELF_HOSTED_MAX_ATTACHMENT_BYTES,
 			planId: "self-hosted",

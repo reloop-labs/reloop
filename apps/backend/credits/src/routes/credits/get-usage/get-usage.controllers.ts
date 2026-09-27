@@ -1,7 +1,10 @@
 import { creditsConfig } from "@reloop/credits/credits.config";
 import { CreditErrors } from "@reloop/credits/error/credits.error-response";
 import { getOrProvisionOrgBilling } from "@reloop/credits/lib/org-billing";
-import { SELF_HOSTED_MAX_ATTACHMENT_BYTES } from "@reloop/db/billing-enabled";
+import {
+	isSelfHosted,
+	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
+} from "@reloop/db/self-hosted";
 import { db } from "@reloop/db/client";
 import {
 	domain,
@@ -88,10 +91,10 @@ export const getUsageController = async ({
 				),
 		]);
 
-		const billingEnabled = creditsConfig.BILLING_ENABLED;
-		const maxAttachmentBytes = billingEnabled
-			? billing.plan.maxAttachmentBytes
-			: SELF_HOSTED_MAX_ATTACHMENT_BYTES;
+		const selfHosted = isSelfHosted();
+		const maxAttachmentBytes = selfHosted
+			? SELF_HOSTED_MAX_ATTACHMENT_BYTES
+			: billing.plan.maxAttachmentBytes;
 
 		const entitlements = {
 			monthlyEmails: billing.plan.monthlyEmails,
@@ -106,7 +109,7 @@ export const getUsageController = async ({
 		};
 
 		return {
-			billingEnabled,
+			selfHosted,
 			plan: {
 				id: billing.plan.planId,
 				name: catalog?.name ?? "Free",
@@ -135,20 +138,20 @@ export const getUsageController = async ({
 			resources: {
 				agentInboxes: {
 					used: inboxRows[0]?.value ?? 0,
-					limit: billingEnabled ? entitlements.maxAgentInboxes : null,
+					limit: selfHosted ? null : entitlements.maxAgentInboxes,
 				},
 				webhooks: {
 					used: webhookRows[0]?.value ?? 0,
-					limit: billingEnabled ? entitlements.maxWebhooks : null,
+					limit: selfHosted ? null : entitlements.maxWebhooks,
 				},
 				customDomains: {
 					used: domainRows[0]?.value ?? 0,
-					limit: billingEnabled ? entitlements.maxCustomDomains : null,
+					limit: selfHosted ? null : entitlements.maxCustomDomains,
 				},
 			},
 			daily: {
 				sent: Number(dailyRows[0]?.value ?? 0),
-				limit: billingEnabled ? entitlements.dailyEmailLimit : null,
+				limit: selfHosted ? null : entitlements.dailyEmailLimit,
 			},
 		};
 	} catch (error) {

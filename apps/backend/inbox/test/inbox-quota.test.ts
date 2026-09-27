@@ -77,14 +77,14 @@ function fakeTx(args: { maxAgentInboxes: number; used: number }) {
 }
 
 describe("assertInboxQuota", () => {
-	const original = process.env.BILLING_ENABLED;
+	const original = process.env.SELF_HOSTED;
 	afterEach(() => {
-		if (original === undefined) delete process.env.BILLING_ENABLED;
-		else process.env.BILLING_ENABLED = original;
+		if (original === undefined) delete process.env.SELF_HOSTED;
+		else process.env.SELF_HOSTED = original;
 	});
 
 	test("Cloud enforces the plan cap", async () => {
-		process.env.BILLING_ENABLED = "true";
+		delete process.env.SELF_HOSTED;
 		const full = fakeTx({ maxAgentInboxes: 1, used: 1 });
 		await expect(assertInboxQuota("org_1", full.tx)).rejects.toMatchObject({
 			status: 402,
@@ -96,7 +96,7 @@ describe("assertInboxQuota", () => {
 	});
 
 	test("self-hosted never reads the plan or blocks", async () => {
-		delete process.env.BILLING_ENABLED;
+		process.env.SELF_HOSTED = "true";
 		const full = fakeTx({ maxAgentInboxes: 1, used: 50 });
 		await expect(assertInboxQuota("org_1", full.tx)).resolves.toBeUndefined();
 		expect(full.planReads()).toBe(0);

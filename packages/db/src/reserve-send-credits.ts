@@ -1,5 +1,5 @@
 import { and, eq, lte } from "drizzle-orm";
-import { isBillingEnabled } from "./billing-enabled";
+import { isSelfHosted } from "./self-hosted";
 import { type DatabaseInstance, db } from "./client";
 import {
 	creditLedger,
@@ -287,7 +287,7 @@ export async function peekSendCredits(args: {
 	const client = args.client ?? db;
 	const now = args.now ?? new Date();
 	const credits = await ensureActiveCredits(args.organizationId, client, now);
-	const unlimited = !isBillingEnabled();
+	const unlimited = isSelfHosted();
 	const dailyEmailLimit = unlimited
 		? null
 		: await loadPlanDailyEmailLimit(args.organizationId, client);
@@ -356,7 +356,7 @@ export async function reserveSendCredits(args: {
 			throw new Error("Failed to lock organization credits for reservation");
 		}
 
-		const unlimited = !isBillingEnabled();
+		const unlimited = isSelfHosted();
 		const dailyEmailLimit = unlimited
 			? null
 			: await loadPlanDailyEmailLimit(organizationId, tx);
@@ -429,7 +429,7 @@ export async function refundSendCredits(args: {
 			.update(organizationCredits)
 			.set({
 				creditsUsed: Math.max(0, row.creditsUsed - n),
-				creditsRemaining: isBillingEnabled()
+				creditsRemaining: !isSelfHosted()
 					? row.creditsRemaining + n
 					: row.creditsRemaining,
 				dailyEmailsUsed: sameDay

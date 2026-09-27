@@ -7,7 +7,7 @@ export namespace CreditsModel {
 	});
 
 	export const usageResponse = t.Object({
-		billingEnabled: t.Boolean(),
+		selfHosted: t.Boolean(),
 		plan: t.Object({
 			id: t.Optional(t.String()),
 			name: t.String(),

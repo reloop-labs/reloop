@@ -1,5 +1,5 @@
 import { InboxErrors } from "@reloop/be-inbox/lib/errors";
-import { isBillingEnabled } from "@reloop/db/billing-enabled";
+import { isSelfHosted } from "@reloop/db/self-hosted";
 import { type DatabaseInstance, db } from "@reloop/db/client";
 import { mailbox, organizationPlan } from "@reloop/db/schema";
 import { count, eq, sql } from "drizzle-orm";
@@ -35,7 +35,7 @@ export async function assertInboxQuota(
 	if (!organizationId) {
 		throw new Error("organizationId is required for inbox quota checks");
 	}
-	if (!isBillingEnabled()) return;
+	if (isSelfHosted()) return;
 
 	await tx.execute(
 		sql`select pg_advisory_xact_lock(hashtext(${`${organizationId}:inbox`}))`,

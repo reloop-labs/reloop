@@ -55,7 +55,7 @@ export function BillingPage() {
 		return null;
 	}
 
-	if (usageData?.billingEnabled === false) {
+	if (usageData?.selfHosted) {
 		return (
 			<div className="w-full space-y-6 pt-5">
 				<div>

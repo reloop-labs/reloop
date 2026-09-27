@@ -1,6 +1,6 @@
 import { isIP } from "node:net";
 import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
-import { isBillingEnabled } from "./billing-enabled";
+import { isSelfHosted } from "./self-hosted";
 import { type DatabaseInstance, db } from "./client";
 import {
 	assertCanAssignDedicatedIp,
@@ -324,7 +324,7 @@ export async function assignDedicatedIp(
 			ip: lockedIp ? { kind: lockedIp.kind, status: lockedIp.status } : null,
 			alreadyAssigned: activeAssignment != null,
 			orgExists: org != null,
-			dedicatedIpCount: isBillingEnabled()
+			dedicatedIpCount: !isSelfHosted()
 				? (plan?.dedicatedIpCount ?? 0)
 				: Number.POSITIVE_INFINITY,
 			currentOrgIpCount: orgAssignments.length,
