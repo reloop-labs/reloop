@@ -78,7 +78,20 @@
   - Data retention (45 days)
   - Dedicated support & SLA
 
-## Self-host
+## Community (self-hosted)
+
+- Price: $0 / month
+- Note: Free forever, self-hosted
+- Description: Self-host Reloop on your own infrastructure. Every feature, no plan limits, no license fee.
+- CTA: Download → https://reloop.sh/docs/self-host
+- Features:
+  - Unlimited emails / month
+  - No daily limit
+  - Unlimited agent inboxes
+  - Unlimited webhooks
+  - Unlimited custom domains
+  - 10 MB attachments
+  - Community support
 
 Self-hosting the open-source Reloop stack has no Reloop license fee (infrastructure costs are yours). It is not a Reloop Cloud subscription and does not use the hosted Free / Pro / Growth / Enterprise price list.
 See https://reloop.sh/self-host
