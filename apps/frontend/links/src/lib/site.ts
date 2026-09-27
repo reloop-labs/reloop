@@ -51,3 +51,7 @@ export function getSiteUrl() {
 
 	return isProd ? siteUrl : "https://local.reloop.sh";
 }
+
+export function redirectToPath(path: string): Response {
+	return new Response(null, { status: 302, headers: { Location: path } });
+}

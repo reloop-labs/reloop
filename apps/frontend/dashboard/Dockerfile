@@ -17,7 +17,7 @@ ENV NODE_ENV=${NODE_ENV}
 # Pass --build-arg NEXT_PUBLIC_URL=https://your-domain.com to pin an absolute origin.
 ARG NEXT_PUBLIC_URL
 ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
-ARG NEXT_PUBLIC_WS_URL=wss://reloop.sh
+ARG NEXT_PUBLIC_WS_URL
 ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
 
 COPY --from=deps /app/node_modules ./node_modules
