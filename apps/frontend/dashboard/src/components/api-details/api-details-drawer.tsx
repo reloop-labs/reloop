@@ -36,6 +36,45 @@ import {
 } from "simple-icons";
 import { useApiLanguage } from "#/hooks/use-api-language";
 
+type PillBox = {
+	width: number;
+	height: number;
+	left: number;
+	top: number;
+};
+
+const PILL_EASE = [0.23, 1, 0.32, 1] as const;
+
+function hexToRgb(hex: string) {
+	const value = hex.replace("#", "");
+	return {
+		r: Number.parseInt(value.slice(0, 2), 16),
+		g: Number.parseInt(value.slice(2, 4), 16),
+		b: Number.parseInt(value.slice(4, 6), 16),
+	};
+}
+
+function hexToRgba(hex: string, alpha: number) {
+	const { r, g, b } = hexToRgb(hex);
+	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** Darker lip under the pill face — same extrusion as the landing page. */
+function darkenHex(hex: string, amount: number) {
+	const { r, g, b } = hexToRgb(hex);
+	return `rgb(${Math.round(r * amount)}, ${Math.round(g * amount)}, ${Math.round(b * amount)})`;
+}
+
+function measureTab(button: HTMLButtonElement | null): PillBox | null {
+	if (!button) return null;
+	return {
+		width: button.offsetWidth,
+		height: button.offsetHeight,
+		left: button.offsetLeft,
+		top: button.offsetTop,
+	};
+}
+
 const langIcons: Record<string, CopyCodeBlockIcon> = {
 	nodejs: siNodedotjs,
 	javascript: siNodedotjs,
@@ -253,47 +292,34 @@ export const ApiDetailsDrawer = ({
 		};
 	}, [docSection]);
 
-	const highlightedTabIndex =
-		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
-	const highlightedBrandColor =
-		highlightedTabIndex >= 0 && languages[highlightedTabIndex]?.id
-			? `#${langIcons[languages[highlightedTabIndex].id]?.hex}`
-			: undefined;
+	const brandColorFor = (id: string | undefined) => {
+		const hex = id ? langIcons[id]?.hex : undefined;
+		return hex ? `#${hex}` : undefined;
+	};
+	const isHoveringOther =
+		hoveredTabIdx !== undefined && hoveredTabIdx !== activeTabIndex;
+	const hoverBrandColor = isHoveringOther
+		? brandColorFor(languages[hoveredTabIdx ?? -1]?.id)
+		: undefined;
+	const activeBrandColor = brandColorFor(languages[activeTabIndex]?.id);
 
-	const [pillPosition, setPillPosition] = useState<{
-		width: number;
-		height: number;
-		left: number;
-		top: number;
-	} | null>(null);
+	const [activePill, setActivePill] = useState<PillBox | null>(null);
+	const [hoverPill, setHoverPill] = useState<PillBox | null>(null);
 
 	useEffect(() => {
 		if (!mounted) {
-			setPillPosition(null);
+			setActivePill(null);
+			setHoverPill(null);
 			return;
 		}
 
 		const updatePosition = () => {
-			const button = tabButtonRefs.current[highlightedTabIndex];
-			if (!button) {
-				setPillPosition(null);
-				return;
-			}
-
-			const position = {
-				width: button.offsetWidth,
-				height: button.offsetHeight,
-				left: button.offsetLeft,
-				top: button.offsetTop,
-			};
-
-			const pillInset = { x: 6, y: 6 };
-			setPillPosition({
-				width: position.width - pillInset.x * 2,
-				height: position.height - pillInset.y * 2,
-				left: position.left + pillInset.x,
-				top: position.top + pillInset.y,
-			});
+			setActivePill(measureTab(tabButtonRefs.current[activeTabIndex] ?? null));
+			setHoverPill(
+				isHoveringOther && hoveredTabIdx !== undefined
+					? measureTab(tabButtonRefs.current[hoveredTabIdx] ?? null)
+					: null,
+			);
 		};
 
 		const handle = requestAnimationFrame(updatePosition);
@@ -306,16 +332,16 @@ export const ApiDetailsDrawer = ({
 			});
 			observer.observe(container);
 		}
+		window.addEventListener("resize", updatePosition);
 
 		return () => {
 			cancelAnimationFrame(handle);
 			if (observer) {
 				observer.disconnect();
 			}
+			window.removeEventListener("resize", updatePosition);
 		};
-	}, [highlightedTabIndex, mounted]);
-
-	const highlightedPillPosition = pillPosition;
+	}, [activeTabIndex, hoveredTabIdx, isHoveringOther, mounted]);
 
 	const {
 		variant = "neutral",
@@ -407,7 +433,10 @@ export const ApiDetailsDrawer = ({
 					{/* Language Tabs */}
 					<div
 						ref={containerRef}
-						className="scrollbar-none relative flex min-w-0 items-center overflow-x-auto px-4 pb-0"
+						role="tablist"
+						aria-label={`${title} languages`}
+						onPointerLeave={() => setHoveredTabIdx(undefined)}
+						className="scrollbar-none relative flex min-w-0 items-center gap-1 overflow-x-auto px-4 py-2"
 						style={{
 							scrollbarWidth: "none",
 							msOverflowStyle: "none",
@@ -416,15 +445,8 @@ export const ApiDetailsDrawer = ({
 						{languages.map((lang, index) => {
 							const icon = langIcons[lang.id];
 							const isActive = selectedLanguage === lang.id;
-							const brandColor = icon ? `#${icon.hex}` : undefined;
-							const isHighlighted = index === highlightedTabIndex;
-
-							let textColorStyle: React.CSSProperties | undefined;
-							if (isHighlighted && highlightedPillPosition) {
-								textColorStyle = { color: "#ffffff" };
-							} else if (isActive && brandColor) {
-								textColorStyle = { color: brandColor };
-							}
+							const showActiveLabel =
+								isActive && Boolean(activePill || !mounted);
 
 							return (
 								<button
@@ -433,48 +455,71 @@ export const ApiDetailsDrawer = ({
 										tabButtonRefs.current[index] = el;
 									}}
 									type="button"
+									role="tab"
+									aria-selected={isActive}
 									onClick={() => setSelectedLanguage(lang.id)}
 									onPointerEnter={() => setHoveredTabIdx(index)}
-									onPointerLeave={() => setHoveredTabIdx(undefined)}
 									className={cn(
-										"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-[17px]",
-										isActive
-											? "text-text-strong-950 dark:text-white"
-											: "text-text-sub-600 dark:text-white/70",
+										"relative z-10 inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 font-medium text-xs ease-[cubic-bezier(0.23,1,0.32,1)]",
+										!mounted && isActive
+											? "bg-text-strong-950 text-white shadow-[0_1.5px_0_0_#1a1a1a,inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-white dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.08),inset_0_0.5px_0_0_rgba(255,255,255,0.28)]"
+											: showActiveLabel
+												? "text-white"
+												: "text-text-sub-600 dark:text-white/60",
+										showActiveLabel &&
+											!activeBrandColor &&
+											"bg-black/[0.04] dark:bg-white/10",
 									)}
-									style={textColorStyle}
 								>
 									{icon && (
-										<BrandLanguageIcon
-											icon={icon}
-											className="size-3.5 shrink-0"
-										/>
+										<span className="inline-flex items-center">
+											<BrandLanguageIcon
+												icon={
+													showActiveLabel && !icon.layers
+														? { ...icon, hex: "ffffff" }
+														: icon
+												}
+												className="size-3.5 shrink-0"
+											/>
+										</span>
 									)}
 									{lang.label}
 								</button>
 							);
 						})}
 						<AnimatePresence>
-							{highlightedPillPosition && highlightedTabIndex !== -1 ? (
+							{hoverPill && hoverBrandColor ? (
 								<motion.div
+									key="hover-pill"
 									className="pointer-events-none absolute top-0 left-0 rounded-full"
 									style={{
-										backgroundColor: highlightedBrandColor || undefined,
+										backgroundColor: hexToRgba(hoverBrandColor, 0.14),
 									}}
-									initial={{
-										...highlightedPillPosition,
-										opacity: 0,
-									}}
-									animate={{
-										...highlightedPillPosition,
-										opacity: 1,
-									}}
-									exit={{
-										...highlightedPillPosition,
-										opacity: 0,
-									}}
-									transition={{ duration: 0.14 }}
+									initial={{ ...hoverPill, opacity: 0 }}
+									animate={{ ...hoverPill, opacity: 1 }}
+									exit={{ ...hoverPill, opacity: 0 }}
+									transition={{ duration: 0.16, ease: PILL_EASE }}
 								/>
+							) : null}
+						</AnimatePresence>
+						<AnimatePresence>
+							{activePill && activeBrandColor ? (
+								<motion.div
+									key="active-pill"
+									className="pointer-events-none absolute top-0 left-0 rounded-full p-px pb-[2px]"
+									style={{
+										backgroundColor: darkenHex(activeBrandColor, 0.55),
+									}}
+									initial={{ ...activePill, opacity: 0 }}
+									animate={{ ...activePill, opacity: 1 }}
+									exit={{ ...activePill, opacity: 0 }}
+									transition={{ duration: 0.2, ease: PILL_EASE }}
+								>
+									<div
+										className="size-full rounded-full shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]"
+										style={{ backgroundColor: activeBrandColor }}
+									/>
+								</motion.div>
 							) : null}
 						</AnimatePresence>
 					</div>
