@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
 	boolean,
+	foreignKey,
 	index,
 	integer,
 	pgEnum,
@@ -196,9 +197,7 @@ export const creditLedger = pgTable(
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),
-		organizationCreditsId: text("organization_credits_id")
-			.notNull()
-			.references(() => organizationCredits.id, { onDelete: "cascade" }),
+		organizationCreditsId: text("organization_credits_id").notNull(),
 		entryType: ledgerEntryTypeEnum("entry_type").notNull(),
 		delta: integer("delta").notNull(),
 		balanceAfter: integer("balance_after").notNull(),
@@ -208,6 +207,11 @@ export const creditLedger = pgTable(
 	},
 	(t) => [
 		index("ledger_organization_id_idx").on(t.organizationId),
+		foreignKey({
+			name: "credit_ledger_organization_credits_id_organization_credits_id_f",
+			columns: [t.organizationCreditsId],
+			foreignColumns: [organizationCredits.id],
+		}).onDelete("cascade"),
 		index("ledger_credits_id_idx").on(t.organizationCreditsId),
 		index("ledger_org_created_idx").on(t.organizationId, t.createdAt),
 	],
