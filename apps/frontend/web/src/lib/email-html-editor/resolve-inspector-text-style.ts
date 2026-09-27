@@ -9,7 +9,7 @@ export type InspectorTextStyleProp =
 	| "fontFamily"
 	| "fontWeight";
 
-/** Inline `style` on the active link mark — Dither CTAs store typography here. */
+/** Inline `style` on the active link mark; Dither CTAs store typography here. */
 export function getActiveLinkCss(editor: Editor | null | undefined): string {
 	if (!editor?.isActive("link")) return "";
 	const fromAttrs = String(editor.getAttributes("link")?.style ?? "");

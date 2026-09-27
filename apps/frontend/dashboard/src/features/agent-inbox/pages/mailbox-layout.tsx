@@ -35,7 +35,7 @@ export function MailboxLayout({ children }: { children: ReactNode }) {
 		);
 	}
 
-	// Mailboxes finished loading and this id is unknown — keep rail via stub
+	// Mailboxes finished loading and this id is unknown, so keep rail via stub
 	// only while loading/error; otherwise show not-found inside the shell.
 	const mailboxMissing = !resolved && !isLoadingMailboxes && !mailboxesError;
 

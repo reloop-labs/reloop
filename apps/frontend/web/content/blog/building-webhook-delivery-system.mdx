@@ -22,11 +22,11 @@ relatedSlugs:
 
 ## The problem with naive webhook delivery
 
-Most webhook implementations fire an HTTP request and forget. If your customer's server is down, or returns a 500, the event is lost forever. We've been on the receiving end of that — it's a terrible developer experience. Here's how we avoided it.
+Most webhook implementations fire an HTTP request and forget. If your customer's server is down, or returns a 500, the event is lost forever. We've been on the receiving end of that, and it's a terrible developer experience. Here's how we avoided it.
 
 ## Delivery guarantees we target
 
-We aim for **at-least-once delivery** with a maximum of 5 attempts over 24 hours. We intentionally avoid exactly-once delivery — it requires distributed transactions that add too much complexity for the value gained at our scale.
+We aim for **at-least-once delivery** with a maximum of 5 attempts over 24 hours. We intentionally avoid exactly-once delivery because it requires distributed transactions that add too much complexity for the value gained at our scale.
 
 ## The retry schedule
 

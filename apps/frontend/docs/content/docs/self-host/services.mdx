@@ -26,7 +26,7 @@ The Reloop stack consists of **20 application services** (3 frontends, 17 backen
 * **`workflow`**: Manages campaign automation workflows, timing wait steps, and drip actions.
 * **`upload`**: Manages file storage attachments and static image uploads.
 * **`template`**: Compiles dynamic template variables before mailing dispatch.
-* **`campaigns`**: Broadcast campaigns — audience snapshot, schedule, send, and engagement stats.
+* **`campaigns`**: Broadcast campaigns with audience snapshot, schedule, send, and engagement stats.
 * **`credits`**: Tracks account credit balances, billing cycles, and quotas.
 * **`email`**: The core API service mapping outbound HTTP sending requests to the queue processor.
 * **`inbox`**: Manages receiving inbox threads and incoming messages.
@@ -46,7 +46,7 @@ The Reloop stack consists of **20 application services** (3 frontends, 17 backen
 
 ## What the VPS installer deploys
 
-The [one-command VPS installer](/docs/self-host/vps) deploys a reduced set — 20 containers instead of the full platform. It leaves out the pieces that only exist for the hosted service:
+The [one-command VPS installer](/docs/self-host/vps) deploys a reduced set: 20 containers instead of the full platform. It leaves out the pieces that only exist for the hosted service:
 
 | Left out | Why |
 | :--- | :--- |

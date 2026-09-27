@@ -1,4 +1,5 @@
 import { getMailTrackClickUrl } from "@reloop/links/lib/mail-api";
+import { redirectToPath } from "@reloop/links/lib/site";
 import { NextResponse } from "next/server";
 
 /**
@@ -15,7 +16,7 @@ export async function GET(
 	const { token } = await context.params;
 
 	if (!token) {
-		return NextResponse.redirect(new URL("/", _request.url), 302);
+		return redirectToPath("/");
 	}
 
 	let destination: string | null = null;
@@ -39,20 +40,20 @@ export async function GET(
 			}
 		}
 	} catch {
-		return NextResponse.redirect(new URL("/", _request.url), 302);
+		return redirectToPath("/");
 	}
 
 	if (!destination) {
-		return NextResponse.redirect(new URL("/", _request.url), 302);
+		return redirectToPath("/");
 	}
 
-	// Absolute external destinations only — never open-redirect to relative paths
+	// Absolute external destinations only; never open-redirect to relative paths
 	// that could bounce around the tracking host.
 	if (
 		!destination.startsWith("http://") &&
 		!destination.startsWith("https://")
 	) {
-		return NextResponse.redirect(new URL("/", _request.url), 302);
+		return redirectToPath("/");
 	}
 
 	return NextResponse.redirect(destination, 302);

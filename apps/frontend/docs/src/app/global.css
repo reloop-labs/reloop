@@ -117,7 +117,7 @@ figure {
 	display: none;
 }
 
-/* API reference surface borders — match docs design tokens */
+/* API reference surface borders match docs design tokens */
 .api-status-tabs {
 	border-color: var(--color-stroke-soft-200);
 	background: var(--color-bg-weak-50);

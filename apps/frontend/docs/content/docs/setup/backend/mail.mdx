@@ -4,7 +4,7 @@ icon: mail-single
 description: Set up, configure, and run the Reloop mail microservice locally.
 ---
 
-Outbound transactional email API — send requests, template compilation, tracking, and SMTP handoff.
+Outbound transactional email API: send requests, template compilation, tracking, and SMTP handoff.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker including [SMTP](/docs/setup/backend/smtp). Mailpit captures local outbound mail at [http://localhost:8025](http://localhost:8025).
@@ -33,7 +33,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/mail/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/mail/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop

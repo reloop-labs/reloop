@@ -431,7 +431,7 @@ export function CommandMenuGlobal() {
 					</CommandMenu.Group>
 				) : (
 					<>
-						{/* Page-specific actions — only shown when on the relevant page */}
+						{/* Page-specific actions, only shown when on the relevant page */}
 						{pageActionGroups.map((group) => (
 							<CommandMenu.Group key={group.heading} heading={group.heading}>
 								{group.actions.map((action) => (

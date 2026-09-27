@@ -1,4 +1,4 @@
-# API Keys — Python
+# API Keys (Python)
 
 > Agent-optimized samples for managing Reloop API keys in Python. Index: [api-keys.md](./api-keys.md)
 

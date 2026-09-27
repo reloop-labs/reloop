@@ -389,7 +389,7 @@ function CreateCampaignPageContent() {
 			}, 50);
 		};
 
-		// Priority 1: From address — empty or invalid → red underline + focus
+		// Priority 1: From address: empty or invalid → red underline + focus
 		const username = fromUsername.trim();
 		if (!username || !/^[^\s@]+$/.test(username)) {
 			setStep("sender");
@@ -404,7 +404,7 @@ function CreateCampaignPageContent() {
 		}
 		setFromUsernameError("");
 
-		// Priority 2: Subject — empty → red underline + focus
+		// Priority 2: Subject: empty → red underline + focus
 		if (!subject.trim()) {
 			setStep("sender");
 			setSubjectError("Please enter a subject line");

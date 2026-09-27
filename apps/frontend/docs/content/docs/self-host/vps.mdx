@@ -39,7 +39,7 @@ sudo bash install.sh
 > [!NOTE]
 > The container images are roughly 22 GB in total, which is why the disk floor is higher than for a source install. The installer refuses to continue on a smaller disk rather than failing halfway through the download.
 
-Many providers block outbound port `25` by default. Reloop still sends through the submission ports, but inbound mail needs `25` open in both directions — ask your provider to unblock it if you plan to receive mail.
+Many providers block outbound port `25` by default. Reloop still sends through the submission ports, but inbound mail needs `25` open in both directions. Ask your provider to unblock it if you plan to receive mail.
 
 ---
 
@@ -47,8 +47,8 @@ Many providers block outbound port `25` by default. Reloop still sends through t
 
 | Prompt | Purpose | Default |
 | :--- | :--- | :--- |
-| Primary Reloop domain | The hostname the dashboard and API are served on | — |
-| TLS contact email | Let's Encrypt expiry and account notices | — |
+| Primary Reloop domain | The hostname the dashboard and API are served on | - |
+| TLS contact email | Let's Encrypt expiry and account notices | - |
 | Database name | PostgreSQL database | `reloop` |
 | Database user | PostgreSQL role | `reloop` |
 | Run behind an existing reverse proxy | Serve plain HTTP on a local port for your own Caddy, Nginx or Traefik instead of taking `80` and `443`. See [Behind an existing reverse proxy](#behind-an-existing-reverse-proxy) | `no` |
@@ -58,7 +58,7 @@ Many providers block outbound port `25` by default. Reloop still sends through t
 
 Everything else is generated: database and Redis passwords, the Better Auth secret, the internal service secret, the tracking and preferences secrets, and the webhook encryption key. They are written to `/opt/reloop/.env` with mode `0600`.
 
-Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloop.example.com` and not `reloop.example.com/admin`.
+Enter the domain as a bare hostname: `reloop.example.com`, not `https://reloop.example.com` and not `reloop.example.com/admin`.
 
 ---
 
@@ -90,7 +90,7 @@ reloop update            # pull the configured version and redeploy
 
 ## File uploads
 
-Reloop stores template images and attachments in S3-compatible object storage. The installer does not bundle a storage server — point it at whichever provider you already use (AWS S3, Cloudflare R2, Hetzner Object Storage, Backblaze B2, a MinIO box of your own).
+Reloop stores template images and attachments in S3-compatible object storage. The installer does not bundle a storage server. Point it at whichever provider you already use (AWS S3, Cloudflare R2, Hetzner Object Storage, Backblaze B2, a MinIO box of your own).
 
 Answer yes to the storage prompt and supply the endpoint, access key, secret key, bucket and region. The `upload` service is then deployed alongside the rest of the stack.
 
@@ -117,7 +117,7 @@ reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
 - `inbound.` is the MX target for mail your verified domains receive.
 - The SPF record authorises the server to send for the host domain, which is what the `include:` in each sending domain's SPF resolves to.
 
-These are separate from the SPF, DKIM, DMARC and MX records for the domains you send from. Those are generated per domain by Reloop — add a domain under **Domains** in the dashboard and it shows the exact records. See [Connect a domain](/docs/guides/connect-domain).
+These are separate from the SPF, DKIM, DMARC and MX records for the domains you send from. Those are generated per domain by Reloop. Add a domain under **Domains** in the dashboard and it shows the exact records. See [Connect a domain](/docs/guides/connect-domain).
 
 You can run the installer before adding DNS. Caddy keeps retrying certificate issuance in the background and HTTPS starts working on its own once the records resolve. Follow it with `reloop logs proxy`.
 

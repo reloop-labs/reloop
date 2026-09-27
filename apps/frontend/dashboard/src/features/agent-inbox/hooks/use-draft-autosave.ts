@@ -24,7 +24,7 @@ type DraftAutosaveInput = {
 	debounceMs?: number;
 };
 
-/** Debounced saveDraft — mirrors compose-modal autosave. */
+/** Debounced saveDraft that mirrors compose-modal autosave. */
 export function useDraftAutosave({
 	enabled,
 	hasContent,
@@ -73,7 +73,7 @@ export function useDraftAutosave({
 						onDraftIdChangeRef.current(saved.id);
 					}
 				} catch {
-					/* silent — same as compose modal */
+					/* silent, same as compose modal */
 				}
 			})();
 		}, debounceMs);

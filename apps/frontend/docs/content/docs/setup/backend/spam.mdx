@@ -4,7 +4,7 @@ icon: shield
 description: Set up and run the Reloop spam scanning backend (Rspamd) locally in Docker.
 ---
 
-Rspamd spam scanner — scores inbound mail for the [inbound](/docs/setup/backend/inbound) MX receiver via HTTP `/checkv2`.
+Rspamd spam scanner that scores inbound mail for the [inbound](/docs/setup/backend/inbound) MX receiver via HTTP `/checkv2`.
 
 <Tip>
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Spam starts with the Compose stack because inbound depends on it.
@@ -41,7 +41,7 @@ Controller / scan endpoint: [http://localhost:11333](http://localhost:11333).
 
 Local overrides live in `apps/backend/spam/local.d/` (mounted into the container).
 
-Spam Redis (set on the **spam** container — native Rspamd `RSPAMD_*` env):
+Spam Redis (set on the **spam** container; native Rspamd `RSPAMD_*` env):
 
 | Variable | Default |
 | :--- | :--- |
@@ -76,7 +76,7 @@ Inbound (KumoMTA) → HTTP POST /checkv2 → Spam (Rspamd) → score / action / 
 | **Scan API** | Accepts raw message bodies on `/checkv2` (port `11333`) |
 | **Headers** | Inbound injects `X-Spam-*` from the response for [inbox](/docs/setup/backend/inbox) |
 | **State** | Uses [Redis](/docs/setup) (`reloop-redis`) for learning / fuzzy storage |
-| **Separate deploy** | Not baked into the inbound image — own Dockerfile and CI (`be-spam`) |
+| **Separate deploy** | Not baked into the inbound image; own Dockerfile and CI (`be-spam`) |
 
 
 ## Next

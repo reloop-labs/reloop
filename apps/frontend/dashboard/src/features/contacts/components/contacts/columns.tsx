@@ -102,7 +102,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
 			return (
 				<div className="flex min-w-0 items-center">
 					<span className="truncate font-medium text-sm text-text-sub-600">
-						{fullName || "—"}
+						{fullName || "-"}
 					</span>
 				</div>
 			);
@@ -151,7 +151,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
 				<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 					{row.original.updatedAt
 						? formatRelativeTime(row.original.updatedAt)
-						: "—"}
+						: "-"}
 				</span>
 			</div>
 		),
@@ -169,7 +169,7 @@ export const contactColumns: ColumnDef<Contact>[] = [
 				<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 					{row.original.createdAt
 						? formatRelativeTime(row.original.createdAt)
-						: "—"}
+						: "-"}
 				</span>
 			</div>
 		),

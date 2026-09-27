@@ -166,7 +166,7 @@ describe("parseGlobalStylesFromHtml canvas defaults", () => {
 /**
  * Decorative glows live on the ~600px wrapper as background-image.
  * Paste must keep the image layer and resolve root-relative asset
- * paths against the document's absolute origin — not the editor host.
+ * paths against the document's absolute origin, not the editor host.
  */
 const GLOW_HTML = `<!DOCTYPE html>
 <html>

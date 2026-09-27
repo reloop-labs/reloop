@@ -1,6 +1,6 @@
 ---
 title: "How We Handle Email Bounce Processing Automatically"
-description: Inside Reloop's bounce processing pipeline — classifying hard vs soft bounces, updating suppression lists, and protecting sender reputation automatically.
+description: "Inside Reloop's bounce processing pipeline: classifying hard vs soft bounces, updating suppression lists, and protecting sender reputation automatically."
 keywords:
   - email bounce processing
   - email bounce handling automation
@@ -22,22 +22,22 @@ relatedSlugs:
 
 ## Why bounce handling matters more than you think
 
-Every hard bounce you re-send to damages your sender reputation. ISPs track your bounce rate, and crossing the 2% threshold can get your domain or IP blacklisted. Proper automated bounce handling isn't optional — it's infrastructure.
+Every hard bounce you re-send to damages your sender reputation. ISPs track your bounce rate, and crossing the 2% threshold can get your domain or IP blacklisted. Proper automated bounce handling isn't optional. It's infrastructure.
 
 Prevention matters too: validate addresses at signup and [clean email lists](/tools/email-validator) before campaigns so invalid and disposable addresses never enter your send path. Reloop's free [email validator](/tools/email-validator) checks syntax, ~210k disposable domains, and live MX records without SMTP mailbox probing.
 
 ## Bounce types we classify
 
-- **Hard bounce** — permanent failure (invalid address, domain doesn't exist). Added to suppression list immediately.
-- **Soft bounce** — temporary failure (mailbox full, server busy). Retried with backoff; suppressed after 3 consecutive soft bounces.
-- **Complaint** — recipient marked as spam. Suppressed immediately, never re-sent.
+- **Hard bounce**: permanent failure (invalid address, domain doesn't exist). Added to suppression list immediately.
+- **Soft bounce**: temporary failure (mailbox full, server busy). Retried with backoff; suppressed after 3 consecutive soft bounces.
+- **Complaint**: recipient marked as spam. Suppressed immediately, never re-sent.
 
 ## How we receive bounce data
 
 Bounces arrive via two channels:
 
-1. **SMTP DSN (Delivery Status Notifications)** — Reloop's inbound SMTP listener captures these and pushes them to a processing queue.
-2. **Provider webhooks** — When routing through a third-party SMTP relay, bounce events arrive as webhook payloads we normalize into our internal format.
+1. **SMTP DSN (Delivery Status Notifications)**: Reloop's inbound SMTP listener captures these and pushes them to a processing queue.
+2. **Provider webhooks**: When routing through a third-party SMTP relay, bounce events arrive as webhook payloads we normalize into our internal format.
 
 ## The processing pipeline
 
@@ -50,7 +50,7 @@ async function processBounce(event: BounceEvent) {
     return;
   }
 
-  // Soft bounce — increment counter
+  // Soft bounce: increment counter
   const count = await bounceCounter.increment(email);
   if (count >= 3) {
     await suppressionList.add(email, { reason: "repeated_soft_bounce" });

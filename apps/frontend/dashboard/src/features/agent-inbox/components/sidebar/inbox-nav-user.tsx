@@ -67,7 +67,7 @@ export const InboxNavUser = ({
 		mailbox.label || session?.user?.name || mailbox.email?.split("@")[0] || "";
 	const initial = getAvatarInitial(mailbox.label, mailbox.email);
 	const firstName = displayName.trim().split(/\s+/)[0] || displayName;
-	/** Other accounts only — current is shown in the top fold. */
+	/** Other accounts only, current is shown in the top fold. */
 	const otherMailboxes = mailboxes.filter((m) => m.id !== mailbox.id);
 
 	const addIdx = otherMailboxes.length;

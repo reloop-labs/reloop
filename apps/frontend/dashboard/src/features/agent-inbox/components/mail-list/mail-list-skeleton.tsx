@@ -75,7 +75,7 @@ const MailListRowSkeleton = ({ index }: { index: number }) => (
 	</div>
 );
 
-/** Thread list placeholder — mirrors dense Superhuman-style InboxThreadRow. */
+/** Thread list placeholder that mirrors dense Superhuman-style InboxThreadRow. */
 export const MailListSkeleton = ({
 	className,
 	rows = 14,

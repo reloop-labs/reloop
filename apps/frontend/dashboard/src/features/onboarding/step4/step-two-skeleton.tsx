@@ -1,7 +1,7 @@
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 
-/** Loading stand-in for step 2 — static copy is real; only the action pulses. */
+/** Loading stand-in for step 2: static copy is real; only the action pulses. */
 export function StepTwoSkeleton() {
 	return (
 		<div aria-busy="true" aria-live="polite">
@@ -23,7 +23,7 @@ export function StepTwoSkeleton() {
 						Create your API key
 					</h3>
 					<p className="mx-auto mb-6 max-w-lg text-balance font-medium text-[12px] text-text-sub-600">
-						This key lets your app send emails through Reloop. Copy it now — for
+						This key lets your app send emails through Reloop. Copy it now. For
 						security, we won&apos;t show it again.
 					</p>
 					<Skeleton className="h-9 w-[140px] rounded-xl" />

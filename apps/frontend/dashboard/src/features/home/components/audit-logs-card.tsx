@@ -86,7 +86,7 @@ const getResource = (log: LogData): string | null => {
 	return null;
 };
 
-// Relative time — "2m ago", "17h ago", "3d ago"
+// Relative time: "2m ago", "17h ago", "3d ago"
 const formatRelativeTime = (isoDate: string): string => {
 	const now = Date.now();
 	const then = new Date(isoDate).getTime();

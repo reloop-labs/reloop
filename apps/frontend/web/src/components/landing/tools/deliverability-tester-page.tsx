@@ -85,7 +85,7 @@ export function DeliverabilityTesterPageView() {
 					{ label: "Deliverability", href: "/tools/deliverability-tester" },
 				]}
 				title="Email Deliverability Tester"
-				subtitle="Paste your subject and body to get a spam score and checklist—like Mail-Tester and GlockApps pre-send checks."
+				subtitle="Paste your subject and body to get a spam score and checklist, like Mail-Tester and GlockApps pre-send checks."
 			/>
 
 			<div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_320px]">
@@ -115,7 +115,7 @@ export function DeliverabilityTesterPageView() {
 							Spam score
 						</p>
 						<p className={`mt-2 font-bold text-6xl ${scoreColor}`}>
-							{content || subject ? analysis.score : "—"}
+							{content || subject ? analysis.score : "-"}
 							<span className="text-2xl text-text-sub-600 dark:text-white/30">
 								/10
 							</span>

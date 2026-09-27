@@ -204,7 +204,7 @@ https://reloop.sh/tools/spoof-checker`;
 								{result.verdict === "protected" && (
 									<div className="inline-flex items-center gap-1.5 rounded-full bg-success-lighter px-3 py-1 font-medium text-[12.5px] text-success-base dark:bg-emerald-500/15 dark:text-emerald-400">
 										<Icon name="shield-check" className="size-4 shrink-0" />
-										<span>Protected — Receivers Reject Fakes</span>
+										<span>Protected: Receivers Reject Fakes</span>
 									</div>
 								)}
 

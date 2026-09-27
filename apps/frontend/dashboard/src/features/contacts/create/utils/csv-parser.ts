@@ -117,7 +117,7 @@ export function normalizeCsvHeader(value: string): string {
 	return value.toLowerCase().replace(/[-_ ]/g, "");
 }
 
-/** Export-only columns (e.g. Resend `id`, `created_at`) — never become properties. */
+/** Export-only columns (e.g. Resend `id`, `created_at`) that never become properties. */
 const SKIP_HEADERS = new Set([
 	"id",
 	"contactid",

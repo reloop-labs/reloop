@@ -91,7 +91,7 @@ export function PostGenerate({
 	const testSent = testStatus === "sent";
 	const provider = inboxProvider(testTo);
 
-	// Enter — send test email, or continue to next step after a successful send.
+	// Enter: send test email, or continue to next step after a successful send.
 	useHotkeys(
 		"enter",
 		(e) => {
@@ -103,7 +103,7 @@ export function PostGenerate({
 		[handleContinue, onSendTest, finishing, testSent, testSending],
 	);
 
-	// ⌥S — skip the test send and continue to next step.
+	// ⌥S: skip the test send and continue to next step.
 	useHotkeys(
 		"alt+s",
 		(e) => {
@@ -114,7 +114,7 @@ export function PostGenerate({
 		[handleSkip, finishing, testSending, testSent],
 	);
 
-	// O — open Gmail / Outlook / etc. after a successful test send.
+	// O: open Gmail / Outlook / etc. after a successful test send.
 	useHotkeys(
 		"o",
 		(e) => {
@@ -139,7 +139,7 @@ export function PostGenerate({
 						API Key
 					</h1>
 					<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
-						Your API key — copy it now, you won&apos;t see it again.
+						Your API key. Copy it now; you won&apos;t see it again.
 					</p>
 				</div>
 
@@ -179,7 +179,7 @@ export function PostGenerate({
 									/>
 									<div className="min-w-0 space-y-0.5">
 										<p className="font-medium text-sm text-success-dark">
-											Email sent — check your inbox
+											Email sent. Check your inbox
 										</p>
 										<p className="text-paragraph-sm text-success-dark/80 leading-relaxed">
 											{testTo ? (
@@ -192,7 +192,7 @@ export function PostGenerate({
 													{testFrom ? (
 														<>
 															{" "}
-															— from{" "}
+															and look for mail from{" "}
 															<span className="break-all font-mono">
 																{testFrom}
 															</span>

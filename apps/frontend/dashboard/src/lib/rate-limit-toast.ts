@@ -143,7 +143,7 @@ export function toastRateLimitIfNeeded(error: unknown): boolean {
 }
 
 /**
- * Prefer this over `toast.error` for API failures — rate limits get a countdown.
+ * Prefer this over `toast.error` for API failures, since rate limits get a countdown.
  */
 export function toastApiError(
 	error: unknown,

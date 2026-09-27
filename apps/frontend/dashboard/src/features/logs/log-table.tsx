@@ -53,7 +53,7 @@ function statusBadge(statusCode: number | null | undefined): {
 	color: BadgeColor;
 } {
 	if (!statusCode) {
-		return { label: "—", color: "gray" };
+		return { label: "-", color: "gray" };
 	}
 	if (statusCode >= 200 && statusCode < 300) {
 		return { label: `${statusCode} OK`, color: "gray" };
@@ -260,7 +260,7 @@ export const LogTable = ({
 					<Tooltip.Provider delayDuration={400}>
 						{groupLogsByDate(logs).map((group) => (
 							<div key={group.dateKey}>
-								{/* Date section — flat label, no band fill */}
+								{/* Date section: flat label, no band fill */}
 								<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 									<span className="font-medium text-[11px] text-text-sub-600 tracking-wide">
 										{group.dateLabel}
@@ -297,7 +297,7 @@ export const LogTable = ({
 													/>
 												)}
 
-												{/* Status badge — "200 OK" pill */}
+												{/* Status badge: "200 OK" pill */}
 												<Badge.Root
 													variant="lighter"
 													color={badge.color}
@@ -325,7 +325,7 @@ export const LogTable = ({
 												{primaryPath ? (
 													<TruncatedPath path={primaryPath} />
 												) : (
-													<span className="text-text-soft-400 text-xs">—</span>
+													<span className="text-text-soft-400 text-xs">-</span>
 												)}
 
 												{/* Time */}
@@ -349,7 +349,7 @@ export const LogTable = ({
 				)}
 			</div>
 
-			{/* Pagination — outside scrollable body */}
+			{/* Pagination, outside scrollable body */}
 			{!isLoading && total > 0 && (
 				<div
 					className={cn(

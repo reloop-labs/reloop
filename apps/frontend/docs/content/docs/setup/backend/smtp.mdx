@@ -4,7 +4,7 @@ icon: smtp
 description: Set up and run the Reloop outbound SMTP engine locally in Docker.
 ---
 
-Outbound KumoMTA engine — accepts mail from [mail](/docs/setup/backend/mail) and delivers via SMTP (Mailpit locally).
+Outbound KumoMTA engine that accepts mail from [mail](/docs/setup/backend/mail) and delivers via SMTP (Mailpit locally).
 
 <Tip>
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. SMTP needs free ports `465` / `587`.
@@ -62,7 +62,7 @@ reloop restart smtp dashboard
 ```
 
 Leave it unset and the dashboard falls back to `smtp.reloop.sh`, which is
-correct for Reloop Cloud and wrong for every self-hosted install — so set it.
+correct for Reloop Cloud and wrong for every self-hosted install, so set it.
 
 
 ## Commands

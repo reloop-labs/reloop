@@ -256,8 +256,8 @@ export function DeleteDomainModal({
 						Warning:
 					</span>{" "}
 					{isBulk
-						? `Deleting ${bulkDomainsToDelete.length > 1 ? `these ${bulkDomainsToDelete.length} domains` : "this domain"} will stop email sending and receiving immediately. DNS records won't be removed automatically — you'll need to delete them from your DNS provider.`
-						: "Deleting this domain will stop email sending and receiving immediately. DNS records won't be removed automatically — you'll need to delete them from your DNS provider."}
+						? `Deleting ${bulkDomainsToDelete.length > 1 ? `these ${bulkDomainsToDelete.length} domains` : "this domain"} will stop email sending and receiving immediately. DNS records won't be removed automatically, so you'll need to delete them from your DNS provider.`
+						: "Deleting this domain will stop email sending and receiving immediately. DNS records won't be removed automatically, so you'll need to delete them from your DNS provider."}
 				</div>
 
 				{/* Domain Details Card */}
@@ -290,7 +290,7 @@ export function DeleteDomainModal({
 							</p>
 							<div className="mt-1 flex items-center">
 								<span className="font-medium text-sm text-text-strong-950">
-									{domainToDelete?.domain || "—"}
+									{domainToDelete?.domain || "-"}
 								</span>
 							</div>
 						</div>

@@ -145,7 +145,7 @@ function BreakdownRow({
 					}
 				>
 					{negative && (value ?? 0) > 0 ? "−" : ""}
-					{value?.toLocaleString() ?? "—"}
+					{value?.toLocaleString() ?? "-"}
 				</span>
 			)}
 		</div>
@@ -314,7 +314,7 @@ export function CampaignSendModal({
 
 									{/* Content */}
 									<div className="space-y-3 px-6 pt-3 pb-5 text-xs">
-										{/* Receipt card — campaign details + delivery summary */}
+										{/* Receipt card: campaign details + delivery summary */}
 										<div className="px-1 py-1">
 											<div className="flex items-center justify-between gap-3 py-2.5">
 												<span className="shrink-0 text-text-sub-600">
@@ -335,7 +335,7 @@ export function CampaignSendModal({
 														</>
 													) : (
 														<span className="text-text-sub-600">
-															(No sender yet — add a From address)
+															(No sender yet, add a From address)
 														</span>
 													)}
 												</span>

@@ -264,7 +264,7 @@ export function CampaignMetricsCards({
 					value={openRatePct}
 					helper={
 						trackingOff
-							? "Tracking disabled — enable in domain settings"
+							? "Tracking disabled. Enable in domain settings"
 							: undefined
 					}
 				>

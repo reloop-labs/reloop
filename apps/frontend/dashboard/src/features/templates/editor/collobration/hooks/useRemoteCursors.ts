@@ -24,7 +24,7 @@ export interface UseRemoteCursorsOptions {
 	awareness: Awareness | null;
 	/**
 	 * Ref to the element whose bounding rect is used to normalise coordinates.
-	 * Attach this to any existing layout element — no wrapper div needed.
+	 * Attach this to any existing layout element; no wrapper div needed.
 	 */
 	containerRef: React.RefObject<HTMLElement | null>;
 	/** Throttle interval for mouse-move broadcasts (ms). Default: 30 */

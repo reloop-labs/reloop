@@ -7,7 +7,7 @@ export const config: AlternativeDefinition = {
 	compareHref: "/compare/sendgrid",
 	titleLines: ["Open-Source SendGrid", "Alternative"],
 	description:
-		"Modern email infrastructure without SendGrid's complexity—open source, developer-first, and self-hostable.",
+		"Modern email infrastructure without SendGrid's complexity: open source, developer-first, and self-hostable.",
 	keywords: [
 		"SendGrid alternative",
 		"SendGrid competitor",
@@ -24,7 +24,7 @@ export const config: AlternativeDefinition = {
 	},
 	highlights: [
 		"Simpler API and dashboard without legacy Twilio baggage",
-		"Self-hostable—no per-email lock-in on proprietary infrastructure",
+		"Self-hostable, with no per-email lock-in on proprietary infrastructure",
 		"Campaigns and transactional on one platform",
 		"Modern SDKs with TypeScript-first developer experience",
 	],
@@ -40,12 +40,12 @@ export const config: AlternativeDefinition = {
 				{
 					title: "Modern DX",
 					description:
-						"Clean APIs, webhooks, and docs built for 2026—not 2012.",
+						"Clean APIs, webhooks, and docs built for 2026, not 2012.",
 				},
 				{
 					title: "Open source",
 					description:
-						"No black box—inspect routing, quotas, and delivery logic.",
+						"No black box. Inspect routing, quotas, and delivery logic.",
 				},
 			],
 		},

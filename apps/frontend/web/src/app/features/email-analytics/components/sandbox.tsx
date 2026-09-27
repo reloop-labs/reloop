@@ -240,7 +240,7 @@ export default function Sandbox() {
 									{TABS.find((t) => t.id === activeTab)?.label}
 								</span>
 								<span className="hidden text-text-sub-600 text-xs sm:inline dark:text-white/40">
-									— {TABS.find((t) => t.id === activeTab)?.description}
+									· {TABS.find((t) => t.id === activeTab)?.description}
 								</span>
 							</div>
 							<div className="flex items-center gap-2 font-mono text-[12px] text-text-sub-600 dark:text-white/45">

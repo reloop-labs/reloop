@@ -4,7 +4,7 @@ icon: shapes
 description: Monorepo layout and technology stack.
 ---
 
-Reloop is a Bun monorepo — Next.js frontends, ElysiaJS microservices, shared packages, and Docker infrastructure.
+Reloop is a Bun monorepo with Next.js frontends, ElysiaJS microservices, shared packages, and Docker infrastructure.
 
 Local URL: [https://local.reloop.sh](https://local.reloop.sh). Bootstrap with [`bun setup`](/docs/setup).
 
@@ -32,16 +32,16 @@ reloop/
 
 <CardGroup cols={2}>
   <Card icon="browser" title="Web" href="/setup/frontend/web">
-    Marketing site — port `3000`
+    Marketing site (port `3000`)
   </Card>
   <Card icon="layout" title="Dashboard" href="/setup/frontend/dashboard">
-    Product UI — port `3001`
+    Product UI (port `3001`)
   </Card>
   <Card icon="book-open" title="Docs" href="/setup/frontend/docs">
-    This documentation — port `3003`
+    This documentation (port `3003`)
   </Card>
   <Card icon="mail-single" title="Links" href="/setup/frontend/links">
-    Preferences and redirects — port `3005`
+    Preferences and redirects (port `3005`)
   </Card>
 </CardGroup>
 
@@ -52,52 +52,52 @@ Stack: [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/),
 
 <CardGroup cols={3}>
   <Card icon="lock" title="Auth" href="/setup/backend/auth">
-    Sessions and orgs — `8000`
+    Sessions and orgs (`8000`)
   </Card>
   <Card icon="globe" title="Domain" href="/setup/backend/domain">
-    Sending domains — `8011`
+    Sending domains (`8011`)
   </Card>
   <Card icon="key-new" title="API Key" href="/setup/backend/api-key">
-    API keys — `8012`
+    API keys (`8012`)
   </Card>
   <Card icon="webhook" title="Webhook" href="/setup/backend/webhook">
-    Event delivery — `8013`
+    Event delivery (`8013`)
   </Card>
   <Card icon="users" title="Contacts" href="/setup/backend/contacts">
-    Audience — `8014`
+    Audience (`8014`)
   </Card>
   <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
-    Send API — `8015`
+    Send API (`8015`)
   </Card>
   <Card icon="logs" title="Logs" href="/setup/backend/logs">
-    Analytics — `8016`
+    Analytics (`8016`)
   </Card>
   <Card icon="workflow" title="Workflow" href="/setup/backend/workflow">
-    Automations — `8017`
+    Automations (`8017`)
   </Card>
   <Card icon="file-upload" title="Upload" href="/setup/backend/upload">
-    Attachments — `8018`
+    Attachments (`8018`)
   </Card>
   <Card icon="layout" title="Template" href="/setup/backend/template">
-    Templates — `8019`
+    Templates (`8019`)
   </Card>
   <Card icon="mega-phone" title="Campaigns" href="/setup/backend/campaigns">
-    Broadcasts — `8027`
+    Broadcasts (`8027`)
   </Card>
   <Card icon="inbox" title="Inbox" href="/setup/backend/inbox">
-    Inbound mail — `8028`
+    Inbound mail (`8028`)
   </Card>
   <Card icon="envelope" title="Email" href="/setup/backend/email">
-    Platform email — `8022`
+    Platform email (`8022`)
   </Card>
   <Card icon="billing-custom" title="Credits" href="/setup/backend/credits">
-    Usage / billing — `8023`
+    Usage / billing (`8023`)
   </Card>
   <Card icon="server" title="SMTP" href="/setup/backend/smtp">
-    Outbound edge — Docker
+    Outbound edge (Docker)
   </Card>
   <Card icon="inbox" title="Inbound" href="/setup/backend/inbound">
-    MX edge — Docker
+    MX edge (Docker)
   </Card>
 </CardGroup>
 
@@ -110,25 +110,25 @@ Started by `bun docker:up` (Postgres, Redis, Caddy, Mailpit, MinIO, NATS, spam, 
 
 <CardGroup cols={2}>
   <Card icon="database" title="PostgreSQL" href="https://www.postgresql.org/">
-    Primary DB — port `5432`
+    Primary DB (port `5432`)
   </Card>
   <Card icon="code" title="Drizzle ORM" href="https://orm.drizzle.team/">
     Schema in `@reloop/db`
   </Card>
   <Card icon="server" title="Redis" href="https://redis.io/">
-    Sessions and cache — `6379`
+    Sessions and cache (`6379`)
   </Card>
   <Card icon="folder-open" title="MinIO" href="https://min.io/">
-    Object storage — `9010` / console `9001`
+    Object storage (`9010` / console `9001`)
   </Card>
   <Card icon="share-nodes" title="NATS" href="https://nats.io/">
-    Event bus — `4222`
+    Event bus (`4222`)
   </Card>
   <Card icon="globe" title="Caddy" href="https://caddyserver.com/">
     TLS proxy for `local.reloop.sh`
   </Card>
   <Card icon="mail-single" title="Mailpit" href="http://localhost:8025">
-    Captured mail UI — `8025`
+    Captured mail UI (`8025`)
   </Card>
 </CardGroup>
 

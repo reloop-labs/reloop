@@ -91,11 +91,11 @@ const ResendComparisonPage = () => {
 						<Link href="/contact" className="font-semibold text-primary-base">
 							Tell us
 						</Link>
-						—we correct comparison pages when the facts change.
+						. We correct comparison pages when the facts change.
 					</p>
 				</CompareSection>
 
-				{/* Migration — Dub-style 3-step cards */}
+				{/* Migration: Dub-style 3-step cards */}
 				<CompareSection maxWidth="full">
 					{resendBrand ? (
 						<CompareMigrate
@@ -117,7 +117,8 @@ const ResendComparisonPage = () => {
 						>
 							SMTP guide
 						</Link>
-						. Reloop is not a drop-in Resend proxy—plan a small client adapter.
+						. Reloop is not a drop-in Resend proxy, so plan a small client
+						adapter.
 					</p>
 				</CompareSection>
 

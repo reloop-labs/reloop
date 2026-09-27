@@ -187,7 +187,7 @@ export function evaluateSpoofability(
 		verdict = "protected";
 		spoofable = false;
 		inboxOutcome = "rejected";
-		headline = `No — receivers are told to reject fakes as you@${domain}`;
+		headline = `No, receivers are told to reject fakes as you@${domain}`;
 		summary =
 			"Your domain enforces strict DMARC ('p=reject') and SPF protection. Major mailbox providers like Gmail, Yahoo, and Outlook are instructed to immediately discard fraudulent emails.";
 		reasons.push({

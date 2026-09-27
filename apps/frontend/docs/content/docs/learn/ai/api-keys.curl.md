@@ -1,4 +1,4 @@
-# API Keys — cURL
+# API Keys (cURL)
 
 > Agent-optimized samples for managing Reloop API keys in cURL. Index: [api-keys.md](./api-keys.md)
 

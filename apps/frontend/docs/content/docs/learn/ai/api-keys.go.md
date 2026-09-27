@@ -1,4 +1,4 @@
-# API Keys — Go
+# API Keys (Go)
 
 > Agent-optimized samples for managing Reloop API keys in Go. Index: [api-keys.md](./api-keys.md)
 

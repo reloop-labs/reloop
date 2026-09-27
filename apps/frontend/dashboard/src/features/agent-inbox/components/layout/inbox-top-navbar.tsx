@@ -35,7 +35,7 @@ export function InboxTopNavbar({
 		window.dispatchEvent(new CustomEvent("inbox:open-search"));
 	};
 
-	// N — Create new inbox (C is taken by Compose)
+	// N: Create new inbox (C is taken by Compose)
 	useHotkeys(
 		"n",
 		(e) => {

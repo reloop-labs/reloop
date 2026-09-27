@@ -1,5 +1,5 @@
 export const toolPath = "/tools/spoof-checker";
-export const toolTitle = "Can Anyone Spoof My Domain? — Email Spoofing Checker";
+export const toolTitle = "Can Anyone Spoof My Domain? Email Spoofing Checker";
 export const toolDescription =
 	"Find out in plain English if someone can send emails pretending to be you. Check whether Gmail, Yahoo, and Outlook will deliver unauthorized fake emails using your domain.";
 export const metaDescription =
@@ -112,7 +112,7 @@ export const apiResponseSample = `{
   "responseTimeMs": 42,
   "spoofable": false,
   "verdict": "protected",
-  "headline": "No — receivers are told to reject fakes as you@stripe.com",
+  "headline": "No, receivers are told to reject fakes as you@stripe.com",
   "summary": "Your domain enforces strict DMARC ('p=reject') and SPF protection. Major mailbox providers are instructed to discard fraudulent emails.",
   "inboxOutcome": "rejected",
   "dmarc": {

@@ -69,7 +69,7 @@ export const LoginForm = () => {
 					: null;
 			if (sendError) {
 				// Stay on the login step and show the failure inline under the
-				// email field (e.g. suspended accounts) — no OTP screen, and
+				// email field (e.g. suspended accounts); no OTP screen, and
 				// for suspended users no email was sent at all.
 				const message = getServerMessage(
 					sendError,

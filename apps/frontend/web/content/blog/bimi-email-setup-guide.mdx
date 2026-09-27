@@ -22,7 +22,7 @@ relatedSlugs:
 
 ## What is BIMI?
 
-BIMI (Brand Indicators for Message Identification) is an email standard that displays your brand logo next to your email in the recipient's inbox. It's supported by Gmail, Apple Mail, Yahoo, and Fastmail. Beyond branding, it signals to recipients — and ISPs — that you're a verified, trustworthy sender.
+BIMI (Brand Indicators for Message Identification) is an email standard that displays your brand logo next to your email in the recipient's inbox. It's supported by Gmail, Apple Mail, Yahoo, and Fastmail. Beyond branding, it signals to recipients (and ISPs) that you're a verified, trustworthy sender.
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ BIMI has strict requirements. You need all of these before starting:
 - ✅ SPF record configured
 - ✅ DKIM configured
 - ✅ DMARC policy set to `p=quarantine` or `p=reject` (not `p=none`)
-- ✅ A Verified Mark Certificate (VMC) — required for Gmail (optional for others)
+- ✅ A Verified Mark Certificate (VMC): required for Gmail (optional for others)
 - ✅ An SVG logo in the specific BIMI format
 
 ## Step 1: Prepare your SVG logo
@@ -44,7 +44,7 @@ BIMI requires a specific SVG profile (Tiny PS). Your regular SVG will likely not
 
 ## Step 2: Host your logo
 
-Upload your BIMI-compliant SVG to a publicly accessible HTTPS URL. It must be served over HTTPS — HTTP won't work.
+Upload your BIMI-compliant SVG to a publicly accessible HTTPS URL. It must be served over HTTPS. HTTP won't work.
 
 ```
 https://yourdomain.com/.well-known/bimi-logo.svg
@@ -68,4 +68,4 @@ Check your BIMI record with [BIMI Inspector](https://bimigroup.org/bimi-generato
 
 ## Is BIMI worth it?
 
-Yes — but only after SPF, DKIM, and DMARC are solid. The brand visibility boost is real, and the DMARC requirement means you're forced into a good security posture to qualify.
+Yes, but only after SPF, DKIM, and DMARC are solid. The brand visibility boost is real, and the DMARC requirement means you're forced into a good security posture to qualify.

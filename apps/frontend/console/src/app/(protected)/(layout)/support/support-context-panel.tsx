@@ -198,7 +198,7 @@ export function SupportContextPanel({
 	);
 
 	const displayName = user?.name || conversation.userName || "Unknown";
-	const displayEmail = user?.email || conversation.userEmail || "—";
+	const displayEmail = user?.email || conversation.userEmail || "-";
 	const displayImage = user?.image || conversation.userImage;
 	const role = user?.role || "user";
 	const isPlatformAdmin = role === PLATFORM_ADMIN_ROLE;
@@ -324,7 +324,7 @@ export function SupportContextPanel({
 								{orgLoading
 									? "…"
 									: balance === null
-										? "—"
+										? "-"
 										: formatNumber(balance)}
 							</p>
 							{lowCredits ? (
@@ -360,14 +360,14 @@ export function SupportContextPanel({
 					) : null}
 				</div>
 
-				{/* Act now — credits */}
+				{/* Act now: credits */}
 				<div className="space-y-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
 						Resolve with credits
 					</p>
 					{!org ? (
 						<p className="text-[12px] text-text-sub-600">
-							No organization linked — open the user hub to pick context.
+							No organization linked. Open the user hub to pick context.
 						</p>
 					) : showTopupConfirm ? (
 						<InlineActionPanel

@@ -217,7 +217,7 @@ export const ForwardDNSRecordsModal = ({
 										</Modal.Title>
 										<Modal.Description className="text-text-sub-600 text-xs leading-relaxed">
 											Send these DNS instructions directly to a teammate or
-											domain administrator — they'll get everything needed to
+											domain administrator. They'll get everything needed to
 											complete setup.
 										</Modal.Description>
 									</div>

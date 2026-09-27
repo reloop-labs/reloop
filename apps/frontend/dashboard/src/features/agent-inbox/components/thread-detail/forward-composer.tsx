@@ -310,7 +310,7 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 						</button>
 					</div>
 
-					{/* Recipients — compose-modal field language */}
+					{/* Recipients: compose-modal field language */}
 					<div className="border-mail-border/40 border-b px-4">
 						<div className="grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
 							<span className="font-medium text-[12px] text-mail-muted leading-none">
@@ -424,7 +424,7 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 						/>
 					</div>
 
-					{/* Forwarded original — compact quote */}
+					{/* Forwarded original: compact quote */}
 					<div className="mx-4 mb-3 rounded-2xl border border-mail-border/40 bg-[var(--inbox-muted-bg)] px-3 py-2.5">
 						<p className="mb-1.5 font-medium text-[11px] text-mail-muted">
 							Forwarded message

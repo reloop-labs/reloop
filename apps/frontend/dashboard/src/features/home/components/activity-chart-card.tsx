@@ -144,7 +144,7 @@ export function ActivityChartCard() {
 					</div>
 				</div>
 
-				{/* Area Chart Container — Recharts loaded lazily */}
+				{/* Area Chart Container (Recharts loaded lazily) */}
 				<div ref={chartContainerRef} className="h-[150px] w-full">
 					{hasSize ? (
 						<Suspense fallback={null}>

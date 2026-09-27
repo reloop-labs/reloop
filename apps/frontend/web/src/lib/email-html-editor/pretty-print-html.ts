@@ -17,7 +17,7 @@ const VOID_TAGS = new Set([
 
 /**
  * Indent HTML for the code editor. Does not rewrite tags, attributes, or
- * compile through TipTap — pasted email markup stays intact.
+ * compile through TipTap; pasted email markup stays intact.
  */
 export function prettyPrintHtml(html: string): string {
 	const trimmed = html.trim();

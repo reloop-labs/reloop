@@ -106,7 +106,7 @@ export default function EmailValidatorPage() {
 					<div className="mx-auto max-w-3xl text-center">
 						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
 							<span className="size-1.5 rounded-full bg-emerald-500" />
-							Free tool — no sign-up required
+							Free tool, no sign-up required
 						</span>
 
 						<h1 className="mt-6 text-balance font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
@@ -128,7 +128,7 @@ export default function EmailValidatorPage() {
 			<Band id="how-it-works">
 				<SectionIntro
 					lead="How this free email validator works."
-					description="Three steps from raw addresses to a cleaner list — syntax, disposable domains, and live MX checks without intrusive SMTP probes."
+					description="Three steps from raw addresses to a cleaner list: syntax, disposable domains, and live MX checks without intrusive SMTP probes."
 				/>
 
 				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-white/10 dark:border-white/10">

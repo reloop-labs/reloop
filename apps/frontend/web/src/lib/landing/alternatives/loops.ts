@@ -7,7 +7,7 @@ export const config: AlternativeDefinition = {
 	compareHref: "/compare/loops",
 	titleLines: ["Open-Source Loops", "Alternative"],
 	description:
-		"Product email for SaaS teams—transactional, lifecycle, and campaigns with open-source flexibility.",
+		"Product email for SaaS teams: transactional, lifecycle, and campaigns with open-source flexibility.",
 	keywords: [
 		"Loops alternative",
 		"Loops competitor",
@@ -38,7 +38,7 @@ export const config: AlternativeDefinition = {
 				},
 				{
 					title: "Infrastructure choice",
-					description: "Hosted or self-hosted—Loops is hosted-only.",
+					description: "Hosted or self-hosted. Loops is hosted-only.",
 				},
 				{
 					title: "Beyond email marketing",

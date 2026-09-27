@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
 import { useState } from "react";
 
 /**
- * In-place confirm / form strip — replaces modals for console actions.
+ * In-place confirm / form strip that replaces modals for console actions.
  * Render next to the control that triggered the action.
  */
 export function InlineActionPanel({

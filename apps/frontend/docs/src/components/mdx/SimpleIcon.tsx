@@ -153,10 +153,10 @@ export function SimpleIcon({
 			);
 		}
 
-		// Rust brand hex is #000000 — use red so the gear is visible on dark UI
+		// Rust brand hex is #000000; use red so the gear is visible on dark UI
 		const resolvedHex = iconKey === "siRust" ? "e24d2b" : icon.hex;
 
-		// Near-black brand marks (Next.js, Express, Vercel…) vanish on dark UI —
+		// Near-black brand marks (Next.js, Express, Vercel…) vanish on dark UI, so
 		// render in currentColor so they stay black in light mode, white in dark mode
 		const adaptiveMono = new Set([
 			"siNextdotjs",

@@ -9,7 +9,7 @@ Domain Chief can use Reloop **Auto-populate** when nameservers match. Manual ste
 First, log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
 
 <DocImage
-	label="Reloop — Add domain"
+	label="Reloop: Add domain"
 	src="/docs/images/docs/guides/connect-domain/shared/add-domain.png"
 	alt="Add Domain dialog in Reloop"
 />
@@ -20,10 +20,10 @@ It is [best practice to use a subdomain](/docs/guides/connect-domain/what-is-a-d
 
 ## Automatic setup (recommended)
 
-The fastest way to verify your domain on Domain Chief is **Auto populate** in Reloop. This uses [Domain Connect](https://www.domainconnect.org/) — Domain Chief indexes public templates automatically ([Domain Chief Domain Connect](https://aka.chief.app/domainconnect)).
+The fastest way to verify your domain on Domain Chief is **Auto populate** in Reloop. This uses [Domain Connect](https://www.domainconnect.org/); Domain Chief indexes public templates automatically ([Domain Chief Domain Connect](https://aka.chief.app/domainconnect)).
 
 1. Go to your [Domains](https://reloop.sh/dashboard/domain) page in Reloop and open the domain.
-2. Check **Email Receiving** before Auto-populate. New domains start with Receiving on, so inbound MX (`inbound.reloop.sh`) is usually included. Turn **Email Receiving** off first if this hostname must keep Google Workspace / Microsoft 365 — or use a [subdomain](/docs/guides/connect-domain/what-is-a-domain). [Learn more below](#receiving-emails).
+2. Check **Email Receiving** before Auto-populate. New domains start with Receiving on, so inbound MX (`inbound.reloop.sh`) is usually included. Turn **Email Receiving** off first if this hostname must keep Google Workspace / Microsoft 365, or use a [subdomain](/docs/guides/connect-domain/what-is-a-domain). [Learn more below](#receiving-emails).
 3. Click **Auto populate** (shown when Reloop detects Domain Chief nameservers).
 4. Authorize Reloop in Domain Chief and approve the records.
 5. Return to Reloop and click **Verify & finish** (setup) or **Verify Domain** (detail) to start checks.
@@ -34,7 +34,7 @@ If Auto-populate fails or Reloop does not offer it, use **Manual setup** below. 
 
 ## Manual setup
 
-If you prefer to add DNS records manually, follow these steps. Always copy Type / Name / Value from your domain page in Reloop — examples below use placeholders.
+If you prefer to add DNS records manually, follow these steps. Always copy Type / Name / Value from your domain page in Reloop. The examples below use placeholders.
 
 ### Log in to Domain Chief
 
@@ -42,7 +42,7 @@ Log in to [Domain Chief](https://domain.chief.app) and open DNS for the domain w
 
 Domain Chief → select domain → DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Add TXT SPF record
 
@@ -55,7 +55,7 @@ Add a record in Domain Chief:
 5. Save.
 
 <DocImage
-	label="Reloop — SPF TXT"
+	label="Reloop: SPF TXT"
 	src="/docs/images/docs/guides/connect-domain/shared/txt-spf-reloop.png"
 	alt="Reloop SPF TXT record"
 />
@@ -86,7 +86,7 @@ Add a record in Domain Chief:
 5. Save.
 
 <DocImage
-	label="Reloop — DKIM TXT"
+	label="Reloop: DKIM TXT"
 	src="/docs/images/docs/guides/connect-domain/shared/txt-dkim-reloop.png"
 	alt="Reloop DKIM TXT record"
 />
@@ -114,7 +114,7 @@ Omit your domain from the Name field when Domain Chief appends it. Paste `reloop
 6. Save.
 
 <DocImage
-	label="Reloop — Receiving MX"
+	label="Reloop: Receiving MX"
 	src="/docs/images/docs/guides/connect-domain/shared/mx-receive-reloop.png"
 	alt="Reloop receiving MX record"
 />
@@ -133,27 +133,27 @@ Publishing Reloop’s inbound MX on a hostname that already has Google/Microsoft
 
 ### Complete verification
 
-Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop. On the setup page click **Verify & finish**; on the domain detail page click **Verify Domain** (menu: **Re-verify DNS**). It may take a few minutes (rarely up to 48–72 hours) — see [propagation](/docs/guides/connect-domain/verification/propagation).
+Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop. On the setup page click **Verify & finish**; on the domain detail page click **Verify Domain** (menu: **Re-verify DNS**). It may take a few minutes (rarely up to 48–72 hours). See [propagation](/docs/guides/connect-domain/verification/propagation).
 
 <DocImage
-	label="Reloop — Verify & finish"
+	label="Reloop: Verify & finish"
 	src="/docs/images/docs/guides/connect-domain/shared/verify-and-finish.png"
 	alt="Verify and finish domain setup in Reloop"
 />
 
-When verification succeeds, Reloop shows **You're all set!** — Domain added → Verified → Ready to send. Your domain is verified and you are good to go.
+When verification succeeds, Reloop shows **You're all set!** (Domain added → Verified → Ready to send). Your domain is verified and you are good to go.
 
 <DocImage
-	label="Reloop — You're all set"
+	label="Reloop: You're all set"
 	src="/docs/images/docs/guides/connect-domain/shared/verified-domain.png"
 	alt="Verified domain ready to send in Reloop"
 />
 
 ## Domain Chief-specific notes
 
-- Domain Chief auto-indexes public Domain Connect templates — prefer **Auto populate** when Reloop offers it.
+- Domain Chief auto-indexes public Domain Connect templates, so prefer **Auto populate** when Reloop offers it.
 - Auto-populate only works when public nameservers point at Domain Chief.
-- **DMARC** is required for verification when Email Sending is on (keep an existing policy if you already have one). **Tracking** CNAME is on by default for new domains — host is usually `link` on apex, or `link.<sub>` for subdomains; copy from the dashboard.
+- **DMARC** is required for verification when Email Sending is on (keep an existing policy if you already have one). **Tracking** CNAME is on by default for new domains. The host is usually `link` on apex, or `link.<sub>` for subdomains; copy from the dashboard.
 
 ## Troubleshooting
 

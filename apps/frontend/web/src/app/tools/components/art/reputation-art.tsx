@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, face stroke 4, mark stroke 5)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function ReputationBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function ReputationBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function ReputationBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function ReputationBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* gauge track — same center (210,170) and radius (92) as the
+				{/* gauge track, same center (210,170) and radius (92) as the
 				    timer face, so every construction circle stays concentric */}
 				<path
 					d="M 210 78 A 92 92 0 1 0 296 200"
@@ -116,7 +116,7 @@ export function ReputationBlueprintArt({
 					strokeLinecap="round"
 					fill="none"
 				/>
-				{/* gauge gap segment — dashed, same track */}
+				{/* gauge gap segment, dashed, same track */}
 				<path
 					d="M 296 200 A 92 92 0 0 0 269 100"
 					stroke="currentColor"
@@ -126,7 +126,7 @@ export function ReputationBlueprintArt({
 					opacity="0.35"
 					strokeDasharray="7 10"
 				/>
-				{/* pulse line — same weight and caps as the timer hands */}
+				{/* pulse line, same weight and caps as the timer hands */}
 				<path
 					d="M 130 170 H 176 L 190 132 L 212 206 L 226 150 H 290"
 					stroke="currentColor"
@@ -135,7 +135,7 @@ export function ReputationBlueprintArt({
 					strokeLinejoin="round"
 					fill="none"
 				/>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

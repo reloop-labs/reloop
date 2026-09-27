@@ -43,7 +43,7 @@ export function DeleteAgentMailboxModal({
 
 	const displayLabel =
 		mailboxToDelete?.label || mailboxToDelete?.email || "Address";
-	const displayEmail = mailboxToDelete?.email || "—";
+	const displayEmail = mailboxToDelete?.email || "-";
 
 	const handleDelete = async () => {
 		if (!mailboxToDelete || deleteState !== "idle") return;

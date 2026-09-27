@@ -14,7 +14,7 @@ description: What Reloop looks up in public DNS when you verify a domain.
 ## What Reloop does *not* do
 
 - Reloop does not log into your registrar for you (except via Domain Connect consent you approve).
-- Reloop does not see private DNS behind a firewall — only what the public internet resolves.
+- Reloop does not see private DNS behind a firewall, only what the public internet resolves.
 - Reloop cannot fix typos in your panel; you must edit DNS and re-verify.
 
 ## Partial matches
@@ -23,7 +23,7 @@ Some records may pass while others fail (e.g. SPF OK, DKIM truncated). The domai
 
 ## Re-verification
 
-After any DNS edit, click **Verify Domain** (or **Re-verify DNS** in the domain menu) again to start a new check. Reloop may retry that job after it starts; it does not silently verify while status stays pending. Cached resolvers may lag — see [propagation](/docs/guides/connect-domain/verification/propagation).
+After any DNS edit, click **Verify Domain** (or **Re-verify DNS** in the domain menu) again to start a new check. Reloop may retry that job after it starts; it does not silently verify while status stays pending. Cached resolvers may lag. See [propagation](/docs/guides/connect-domain/verification/propagation).
 
 ## Related
 

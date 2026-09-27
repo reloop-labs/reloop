@@ -53,7 +53,7 @@ export function ReloopFieldList({
 				</SelectItem>
 			))}
 
-			{/* Footer action — not a SelectItem, so no hover highlight */}
+			{/* Footer action, not a SelectItem, so no hover highlight */}
 			<button
 				type="button"
 				onMouseDown={(e) => {

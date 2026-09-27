@@ -37,7 +37,7 @@ interface AiPromptPopoverProps {
 
 /**
  * Inline prompt surface for "Write with AI" when the body is empty.
- * Prompt is optional — generation falls back to subject + recipients context.
+ * Prompt is optional. Generation falls back to subject + recipients context.
  */
 export const AiPromptPopover = ({
 	open,

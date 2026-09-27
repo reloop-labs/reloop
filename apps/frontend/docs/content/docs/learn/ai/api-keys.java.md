@@ -1,4 +1,4 @@
-# API Keys — Java
+# API Keys (Java)
 
 > Agent-optimized samples for managing Reloop API keys in Java. Index: [api-keys.md](./api-keys.md)
 

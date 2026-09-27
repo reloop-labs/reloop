@@ -4,7 +4,7 @@ const openSourceFaqItems = [
 	{
 		question: "Is Reloop really open source?",
 		answer:
-			"Yes. The code is public on GitHub under Apache 2.0 with Reloop Labs use restrictions — no black-box claims, verify everything in code.",
+			"Yes. The code is public on GitHub under Apache 2.0 with Reloop Labs use restrictions. No black-box claims; verify everything in code.",
 	},
 	{
 		question: "What license does Reloop use?",
@@ -14,7 +14,7 @@ const openSourceFaqItems = [
 	{
 		question: "Can I self-host Reloop?",
 		answer:
-			"Yes. Deploy on your own infrastructure at no Reloop license cost for personal and internal use — you only pay for your own servers and delivery infrastructure.",
+			"Yes. Deploy on your own infrastructure at no Reloop license cost for personal and internal use. You only pay for your own servers and delivery infrastructure.",
 	},
 	{
 		question: "How is this different from closed email providers?",

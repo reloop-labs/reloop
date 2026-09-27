@@ -86,7 +86,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | Service | Port | Notes |
 | :--- | :--- | :--- |
 | Caddy | `80`, `443` | Reverse proxy / TLS |
-| Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) — captured outbound mail |
+| Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) (captured outbound mail) |
 | [SMTP](/docs/setup/backend/smtp) (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA |
 | [Inbound](/docs/setup/backend/inbound) (MX) | `25`, `8030` | KumoMTA |
 
@@ -98,5 +98,5 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | PostgreSQL | `5432` | Shared DB for all backends (including activity logs) |
 | Redis | `6379` | Sessions, OTP, caches |
 | NATS | `4222` | Event bus between services |
-| MinIO | `9010` (API), `9001` (console) | [Upload](/docs/setup/backend/upload) object storage — [console](http://localhost:9001) |
+| MinIO | `9010` (API), `9001` (console) | [Upload](/docs/setup/backend/upload) object storage ([console](http://localhost:9001)) |
 | Spam (Rspamd) | `11332` / `11333` / `11334` | [spam](/docs/setup/backend/spam) scan + UI for [inbound](/docs/setup/backend/inbound) |

@@ -48,7 +48,7 @@ export function toContactVariableName(raw: string): string {
 }
 
 /**
- * System variables — resolved by the sender at send time, not from contact
+ * System variables, resolved by the sender at send time, not from contact
  * properties. Rendered in their own dropdown section so users can place them
  * anywhere in the content.
  */
@@ -68,7 +68,7 @@ export type CampaignContactProperty = {
 };
 
 /**
- * Native contact fields — always available even when they are not present
+ * Native contact fields, always available even when they are not present
  * in the custom properties list (they live as columns on `contact`, not as
  * rows in `contact_property`). Mirrors backend `campaignMergeVars`.
  */

@@ -3,7 +3,7 @@ import { cn } from "@reloop/ui/cn";
 
 const KBD_BASE = "w-auto rounded-[5px] border font-semibold";
 
-// Shelf shadow swaps to the dark keycap style in dark mode — light-mode
+// Shelf shadow swaps to the dark keycap style in dark mode, since light-mode
 // tint tokens (feature/warning/amber) don't adapt and leak a color fringe.
 const DARK_SHELF =
 	"dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.55),0_0_0_0.5px_rgba(255,255,255,0.06),inset_0_0.5px_0_0_rgba(255,255,255,0.08)]";

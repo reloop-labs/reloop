@@ -1,4 +1,4 @@
-/** Central query keys — use these instead of string literals. */
+/** Central query keys. Use these instead of string literals. */
 export const queryKeys = {
 	auth: {
 		all: ["auth"] as const,

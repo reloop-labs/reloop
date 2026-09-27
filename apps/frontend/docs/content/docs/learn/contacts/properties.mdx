@@ -5,7 +5,7 @@ description: Learn how to create, edit, and delete Reloop contact properties, an
 icon: tag
 faq:
   - question: What are contact properties in Reloop?
-    answer: Properties are small details you add to a contact — custom String or Number fields with an optional default. Use them for personalization and targeting (for example company or plan_tier).
+    answer: Properties are small details you add to a contact. They are custom String or Number fields with an optional default. Use them for personalization and targeting (for example company or plan_tier).
   - question: What property types does Reloop support?
     answer: Reloop contact properties support String (free-form text) and Number (integer or decimal), plus an optional fallback default when a contact has no value.
   - question: What happens when I delete a contact property?
@@ -15,7 +15,7 @@ faq:
   - question: Can I rename a property without losing data?
     answer: No. After you create a property, you can only change its default (fallback) value. Name and type are fixed. To use a different name, create a new property and set values on contacts under that name.
   - question: Can two properties have the same name but different casing (for example Company vs company)?
-    answer: No. Property names are unique per organization by exact name. When setting values on a contact, names must be lowercase (a-z, 0-9, underscores) — treat casing variants as unsupported.
+    answer: No. Property names are unique per organization by exact name. When setting values on a contact, names must be lowercase (a-z, 0-9, underscores), so treat casing variants as unsupported.
   - question: Can a property have different values for different contacts?
     answer: Yes. The Properties page defines the shared field (schema). Each contact stores its own value. The optional default is only used when a contact has no value set.
   - question: Can I set a property via CSV import?
@@ -28,7 +28,7 @@ faq:
   <Tab title="Desktop" icon="monitor">
     ## View all contact properties
 
-    The [Properties Dashboard](https://reloop.sh/dashboard/contacts/properties) shows every custom field in your organization — name, type, default, and when it was last updated.
+    The [Properties Dashboard](https://reloop.sh/dashboard/contacts/properties) shows every custom field in your organization: name, type, default, and when it was last updated.
 
     Properties are custom **String** or **Number** fields you attach to a [contact](/docs/learn/contacts). Use them for personalization and targeting (for example `company` or `plan_tier`). An optional default is used when a contact has no value set.
 
@@ -38,7 +38,7 @@ faq:
 
     1. Go to [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
     2. Click **Add property** (or press `C`)
-    3. Enter a name (e.g. `plan_tier` or `company_size`) — letters, numbers, and underscores only
+    3. Enter a name (e.g. `plan_tier` or `company_size`) using letters, numbers, and underscores only
     4. Choose type **String** or **Number**, and optionally set a default
     5. Click **Add property** (or press `Enter`)
 
@@ -58,7 +58,7 @@ faq:
     ## Set values on a contact
 
     <Info>
-    The Properties page defines the **schema**. Values live on each contact — set them when you edit a contact in the dashboard or via the Contacts update API.
+    The Properties page defines the **schema**. Values live on each contact. Set them when you edit a contact in the dashboard or via the Contacts update API.
     </Info>
 
     1. Open [Contacts](https://reloop.sh/dashboard/contacts)
@@ -113,7 +113,7 @@ faq:
 
 <AccordionGroup>
   <Accordion title="What are contact properties in Reloop?">
-    Properties are small details you add to a contact — custom **String** or **Number** fields with an optional default. Use them for personalization and targeting (for example `company` or `plan_tier`).
+    Properties are small details you add to a contact. They are custom **String** or **Number** fields with an optional default. Use them for personalization and targeting (for example `company` or `plan_tier`).
   </Accordion>
 
   <Accordion title="What property types does Reloop support?">
@@ -129,11 +129,11 @@ faq:
   </Accordion>
 
   <Accordion title="Can I rename a property without losing data?">
-    No. After you create a property, you can only change its **default (fallback)** value — name and type stay fixed. To use a different name, create a new property and set values on contacts under that name.
+    No. After you create a property, you can only change its **default (fallback)** value; name and type stay fixed. To use a different name, create a new property and set values on contacts under that name.
   </Accordion>
 
   <Accordion title="Can two properties have the same name but different casing (for example Company vs company)?">
-    No. Names are unique per organization by exact name. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores) — don’t rely on casing variants as separate fields.
+    No. Names are unique per organization by exact name. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores), so don’t rely on casing variants as separate fields.
   </Accordion>
 
   <Accordion title="Can a property have different values for different contacts?">

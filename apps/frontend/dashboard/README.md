@@ -1,6 +1,6 @@
 # Reloop Dashboard (Next.js)
 
-Main Reloop workspace app — campaigns, contacts, templates, analytics, and settings. Mounted at **`/dashboard`**.
+Main Reloop workspace app: campaigns, contacts, templates, analytics, and settings. Mounted at **`/dashboard`**.
 
 ## Run
 
@@ -24,7 +24,7 @@ Via Caddy: [https://local.reloop.sh/dashboard/](https://local.reloop.sh/dashboar
 
 | Path | Description |
 |------|-------------|
-| `/dashboard` | Entry — redirects unauthenticated users to login |
+| `/dashboard` | Entry point that redirects unauthenticated users to login |
 | `/dashboard/login` | Email OTP + Google / GitHub login |
 | `/dashboard/signup` | Email OTP + Google / GitHub signup |
 | `/dashboard/verify` | Email OTP and magic-link verification |
@@ -33,14 +33,14 @@ Via Caddy: [https://local.reloop.sh/dashboard/](https://local.reloop.sh/dashboar
 
 Auth client is `@reloop/auth/client` (Better Auth at `/api/auth/v1/`). UI components come from `@reloop/ui` and tokens from `@reloop/tailwind`.
 
-**Data fetching:** use **TanStack Query** only — no SWR. The query client is provided by the root App Router layout. Shared keys live in `src/lib/query-keys.ts`.
+**Data fetching:** use **TanStack Query** only, no SWR. The query client is provided by the root App Router layout. Shared keys live in `src/lib/query-keys.ts`.
 
 Full email/social flows need the Reloop API / auth backend reachable from the browser origin (or a reverse proxy).
 
 ## Component layout
 
-- **Routes stay thin** — `src/app/*` owns layouts, metadata, and page wrappers while product code remains in `src/features/*`.
-- **Feature folders** group related files (e.g. `login/`, `signup/`) — no nested folder per component.
+- **Routes stay thin**: `src/app/*` owns layouts, metadata, and page wrappers while product code remains in `src/features/*`.
+- **Feature folders** group related files (e.g. `login/`, `signup/`), with no nested folder per component.
 - **Shared auth** pieces live flat under `features/auth/`.
 
 ```

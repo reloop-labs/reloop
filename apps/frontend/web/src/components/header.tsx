@@ -12,7 +12,7 @@ import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-/** CSS `ease` — mega open/close (scaleIn/Out) and directional content slides */
+/** CSS `ease`: mega open/close (scaleIn/Out) and directional content slides */
 const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 /** Horizontal travel for enter/exit when switching mega menus (matches Radix nav motion) */
 const MEGA_SLIDE_PX = 200;
@@ -105,7 +105,7 @@ const DOCS_CARD_THEMES: Record<
 		ink: string;
 	}
 > = {
-	// Documentation — warm paper / book cloth
+	// Documentation, warm paper / book cloth
 	book: {
 		washLight:
 			"linear-gradient(155deg, rgba(254,243,199,0.95) 0%, rgba(253,230,138,0.42) 36%, rgba(255,255,255,0) 72%)",
@@ -114,7 +114,7 @@ const DOCS_CARD_THEMES: Record<
 		gridRgba: "rgba(180, 83, 9, 0.2)",
 		ink: "group-hover:text-amber-800 dark:group-hover:text-amber-400",
 	},
-	// API — teal
+	// API, teal
 	green: {
 		washLight:
 			"linear-gradient(155deg, rgba(20,184,166,0.2) 0%, rgba(45,212,191,0.1) 38%, rgba(255,255,255,0) 72%)",
@@ -123,7 +123,7 @@ const DOCS_CARD_THEMES: Record<
 		gridRgba: "rgba(20, 184, 166, 0.28)",
 		ink: "group-hover:text-teal-600 dark:group-hover:text-teal-400",
 	},
-	// Integrations — multi-hue soft blend
+	// Integrations, multi-hue soft blend
 	multi: {
 		washLight:
 			"linear-gradient(145deg, rgba(237,233,254,0.95) 0%, rgba(252,231,243,0.7) 28%, rgba(224,242,254,0.55) 52%, rgba(255,255,255,0) 78%)",
@@ -132,7 +132,7 @@ const DOCS_CARD_THEMES: Record<
 		gridRgba: "rgba(139, 92, 246, 0.2)",
 		ink: "group-hover:text-violet-600 dark:group-hover:text-violet-300",
 	},
-	// Contact — brand primary #006ffe
+	// Contact, brand primary #006ffe
 	primary: {
 		washLight:
 			"linear-gradient(155deg, rgba(0,111,254,0.16) 0%, rgba(0,111,254,0.08) 38%, rgba(255,255,255,0) 72%)",
@@ -230,7 +230,7 @@ function MarketingDatabaseIcon({ className }: { className?: string }) {
 }
 
 /**
- * Book mark for Documentation featured card — monochrome via currentColor
+ * Book mark for Documentation featured card, monochrome via currentColor
  * so Docs theme hover recolors icon + title together.
  */
 function DocsBookIcon({ className }: { className?: string }) {
@@ -272,7 +272,7 @@ function DocsBookIcon({ className }: { className?: string }) {
 }
 
 /**
- * Stacked blocks mark for Integrations featured card — monochrome via currentColor.
+ * Stacked blocks mark for Integrations featured card, monochrome via currentColor.
  * Mirrored horizontally to match the source glyph orientation.
  */
 function DocsIntegrationsIcon({ className }: { className?: string }) {
@@ -665,7 +665,7 @@ function IntegrationsCardIllustration() {
 }
 
 /**
- * OpenAPI Initiative mark — monochrome glyph via currentColor
+ * OpenAPI Initiative mark, monochrome glyph via currentColor
  * (matches outline icon tone in tiles; solid brand path, not #000).
  */
 function OpenApiIcon({ className }: { className?: string }) {
@@ -685,7 +685,7 @@ function OpenApiIcon({ className }: { className?: string }) {
 }
 
 /**
- * Globe + database mark for API featured card — monochrome via currentColor.
+ * Globe + database mark for API featured card, monochrome via currentColor.
  * Mirrored and rotated −45° to match the source glyph.
  */
 function DocsApiIcon({ className }: { className?: string }) {
@@ -810,7 +810,7 @@ const PRODUCT_CARD_ACCENTS: Record<
 		ink: string;
 	}
 > = {
-	// Transactional — cool blue / sky; effect originates from top-left corner
+	// Transactional, cool blue / sky; effect originates from top-left corner
 	blue: {
 		wash: "bg-gradient-to-br from-sky-100/90 via-blue-50/70 to-indigo-100/80 dark:from-sky-950/40 dark:via-blue-950/30 dark:to-indigo-950/45",
 		glow: "bg-gradient-to-br from-blue-500/[0.16] via-sky-400/[0.10] to-indigo-500/[0.06] dark:from-blue-500/[0.20] dark:via-sky-400/[0.14] dark:to-indigo-500/[0.10]",
@@ -826,7 +826,7 @@ const PRODUCT_CARD_ACCENTS: Record<
 		ringInner: "text-blue-500/30 dark:text-sky-300/32",
 		ink: "group-hover:text-blue-600 dark:group-hover:text-sky-400",
 	},
-	// Marketing — soft orange / amber, same subtlety as Transactional
+	// Marketing, soft orange / amber, same subtlety as Transactional
 	orange: {
 		wash: "bg-gradient-to-bl from-orange-100/90 via-amber-50/70 to-yellow-100/70 dark:from-orange-950/40 dark:via-amber-950/30 dark:to-yellow-950/40",
 		glow: "bg-gradient-to-bl from-orange-500/[0.16] via-amber-400/[0.10] to-yellow-500/[0.06] dark:from-orange-500/[0.20] dark:via-amber-400/[0.14] dark:to-yellow-500/[0.10]",
@@ -847,7 +847,7 @@ const PRODUCT_CARD_ACCENTS: Record<
 type NavCategory = {
 	/** Empty string hides the section label */
 	title: string;
-	/** Larger featured cards (Docs / Help style) — multi-card row */
+	/** Larger featured cards (Docs / Help style), multi-card row */
 	featured?: boolean;
 	/** Single featured card at the top of this column (Product split) */
 	lead?: NavLink;
@@ -893,7 +893,7 @@ const docLanguages: NavLink[] = [
 	{
 		title: "Rust",
 		href: "/sdk/rust",
-		// Brand hex is #000000 — lift so it stays visible on dark UI
+		// Brand hex is #000000; lift so it stays visible on dark UI
 		brand: { ...siRust, hex: "e24d2b" },
 	},
 	{
@@ -1254,7 +1254,7 @@ function NavGlyph({
 }: {
 	link: NavLink;
 	featured?: boolean;
-	/** Icon only — no tile background or border */
+	/** Icon only, no tile background or border */
 	plain?: boolean;
 }) {
 	if (link.customIcon) {
@@ -1539,7 +1539,7 @@ function MegaLink({
 		<>
 			{productCard && (
 				<>
-					{/* Soft color wash — half-card fade (blog CTA), only on hover */}
+					{/* Soft color wash, half-card fade (blog CTA), only on hover */}
 					<div
 						aria-hidden
 						className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${accent.wash}`}
@@ -1548,7 +1548,7 @@ function MegaLink({
 							WebkitMaskImage: accent.hatchMask,
 						}}
 					/>
-					{/* Diagonal hatch — half-card only, soft accent tint, reveal on hover */}
+					{/* Diagonal hatch, half-card only, soft accent tint, reveal on hover */}
 					<div
 						aria-hidden
 						className={`pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${accent.hatch}`}
@@ -1605,17 +1605,17 @@ function MegaLink({
 					</div>
 				</>
 			)}
-			{/* Icon — product: rings/glow; docs: themed ink on hover */}
+			{/* Icon. Product: rings/glow; docs: themed ink on hover */}
 			<div className="relative z-10 flex shrink-0 items-start">
 				<div className="relative flex size-6 items-center justify-center sm:size-7">
 					{productCard && (
 						<>
-							{/* Soft accent glow behind icon — nudged up to match icon optical center */}
+							{/* Soft accent glow behind icon, nudged up to match icon optical center */}
 							<div
 								aria-hidden
 								className={`-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-28 scale-90 rounded-full opacity-0 blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 ${accent.glow}`}
 							/>
-							{/* Concentric rings — centered on icon; stroke via currentColor for even subtlety */}
+							{/* Concentric rings, centered on icon; stroke via currentColor for even subtlety */}
 							<svg
 								aria-hidden
 								className="-translate-x-1/2 -translate-y-[51%] pointer-events-none absolute top-1/2 left-1/2 size-[9.5rem] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -1641,7 +1641,7 @@ function MegaLink({
 										fill="none"
 									/>
 								</g>
-								{/* Inner ring — true dotted line (round caps + short gaps) */}
+								{/* Inner ring, true dotted line (round caps + short gaps) */}
 								<g className={accent.ringInner}>
 									<circle
 										cx="80"
@@ -1736,7 +1736,7 @@ function MegaLink({
 }
 
 /**
- * Divided list column — clean unboxed icons, title + description, full-width dividers between rows.
+ * Divided list column: clean unboxed icons, title + description, full-width dividers between rows.
  */
 function DividedListColumn({
 	title,
@@ -1840,7 +1840,7 @@ function DividedListColumn({
 }
 
 /**
- * Product simple list column — plain row hover (no sliding highlight).
+ * Product simple list column: plain row hover (no sliding highlight).
  */
 function ProductSimpleColumn({ links }: { links: NavLink[] }) {
 	return (
@@ -1855,14 +1855,14 @@ function ProductSimpleColumn({ links }: { links: NavLink[] }) {
 				);
 				const body = (
 					<>
-						{/* Soft icon tile — larger radius for a softer square */}
+						{/* Soft icon tile, larger radius for a softer square */}
 						<span
 							className={cn(
 								"inline-flex shrink-0 items-center justify-center rounded-xl p-2.5",
 								"border border-stroke-soft-200/90 bg-bg-white-0/50 text-text-sub-600",
 								"transition-all duration-200",
 								"group-hover:text-text-strong-950",
-								// Match global black mega — soft tiles, not heavy grey blocks
+								// Match global black mega, soft tiles, not heavy grey blocks
 								"dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-white/65",
 								"dark:group-hover:border-white/15 dark:group-hover:bg-white/[0.08] dark:group-hover:text-white",
 							)}
@@ -1982,7 +1982,7 @@ function BrandLinkRow({ link }: { link: NavLink }) {
 
 /**
  * Dense brand rows for Docs frameworks / languages.
- * Optional multi-column layout — items fill top-to-bottom per column, no titles.
+ * Optional multi-column layout: items fill top-to-bottom per column, no titles.
  */
 function CompactBrandColumn({
 	links,
@@ -2031,7 +2031,7 @@ function CompactBrandColumn({
 }
 
 /**
- * Icon-only social row (no labels) — sits under GitHub in the right Resources column.
+ * Icon-only social row (no labels); sits under GitHub in the right Resources column.
  */
 function MegaSocialIcons({
 	links,
@@ -2200,13 +2200,13 @@ function MegaPanel({ item }: { item: NavItem }) {
 	);
 }
 
-/** Order of mega tabs in the nav — used to derive slide direction on switch */
+/** Order of mega tabs in the nav, used to derive slide direction on switch */
 const megaTabOrder = navItems
 	.filter((item) => item.mega)
 	.map((item) => item.title);
 
 /**
- * Target content width (px) per mega panel shape — springs smoothly on tab switch.
+ * Target content width (px) per mega panel shape; springs smoothly on tab switch.
  * (Separate from featured *tile* width, which is fixed on each Free tools / Marketing card.)
  */
 function getMegaPanelWidthPx(item: NavItem | undefined): number {
@@ -2252,7 +2252,7 @@ export const Header = () => {
 				setMegaDirection(0);
 			}
 		} else {
-			// First open or close — no horizontal slide
+			// First open or close, no horizontal slide
 			setMegaDirection(0);
 		}
 		setActiveMega(title);
@@ -2288,7 +2288,7 @@ export const Header = () => {
 		}
 		const el = megaContentRef.current;
 		if (!el) return;
-		// Sync measure after DOM commit — no double rAF delay
+		// Sync measure after DOM commit, no double rAF delay
 		setMegaHeight(el.offsetHeight);
 	}, [activeMega]);
 
@@ -2345,7 +2345,7 @@ export const Header = () => {
 		>
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10">
 				<div className="relative flex h-16 items-center justify-between gap-4">
-					{/* Left — brand + main nav */}
+					{/* Left: brand + main nav */}
 					<div className="flex items-center gap-6">
 						<Link
 							href="/home"
@@ -2530,7 +2530,7 @@ export const Header = () => {
 						</nav>
 					</div>
 
-					{/* Right — actions */}
+					{/* Right: actions */}
 					<div className="relative z-10 hidden items-center gap-3 lg:flex">
 						<ThemeToggle />
 						<a

@@ -145,7 +145,7 @@ export const ChangeRoleModal = ({
 				className="rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
 				showClose={false}
 			>
-				{/* Header — matches invite modal */}
+				{/* Header, matches invite modal */}
 				<div className="flex items-start justify-between border-stroke-soft-100 border-b px-5 pt-5 pb-4 dark:border-stroke-soft-100/40">
 					<div>
 						<Modal.Title className="font-semibold text-label-md text-text-strong-950">
@@ -166,7 +166,7 @@ export const ChangeRoleModal = ({
 				</div>
 
 				<div className="space-y-2 px-5 pt-3 pb-3">
-					{/* Member row — same card style as pending invites */}
+					{/* Member row, same card style as pending invites */}
 					<div className="space-y-1.5">
 						<span className="font-medium text-label-sm text-text-strong-950">
 							Member
@@ -200,7 +200,7 @@ export const ChangeRoleModal = ({
 						</div>
 					</div>
 
-					{/* Role cards — identical to invite modal */}
+					{/* Role cards, identical to invite modal */}
 					<p className="pt-3 font-medium text-label-sm text-text-strong-950">
 						Select role
 					</p>
@@ -268,7 +268,7 @@ export const ChangeRoleModal = ({
 					</p>
 				</div>
 
-				{/* Footer — matches invite modal */}
+				{/* Footer, matches invite modal */}
 				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
 					<p className="text-paragraph-xs text-text-sub-600">
 						{hasChanges ? `Will update to ${selectedRole}` : "No changes yet"}

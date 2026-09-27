@@ -68,7 +68,7 @@ export function SettingsSidebarItems({
 			)}
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
-			{/* Back to main sidebar — does not change the page */}
+			{/* Back to main sidebar, does not change the page */}
 			<SidebarNavButton
 				ref={backNavRef}
 				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}

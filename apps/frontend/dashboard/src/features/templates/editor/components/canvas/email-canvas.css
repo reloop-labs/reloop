@@ -276,7 +276,7 @@ html.dark .template-editor-canvas [role="option"][aria-selected="true"] {
 
 /*
  * EmailTheming MERGE prepends text-decoration:underline onto every
- * a.node-link. Do not blanket-none all links — that hides Dither CTAs
+ * a.node-link. Do not blanket-none all links; that hides Dither CTAs
  * once TipTap unwraps <u>. Paste stamps data-email-decoration from the
  * source; only those rules use !important so theme merge cannot win.
  */
@@ -297,7 +297,7 @@ html.dark .template-editor-canvas [role="option"][aria-selected="true"] {
 
 /* Social icon rows were flattened to a <p> with left alignment in
  * older pastes. Keep the original table layout (50% right/left) and
- * only center the row itself, not the whole cell — otherwise the
+ * only center the row itself, not the whole cell, otherwise the
  * cursor is trapped in the middle and the gap above the icons
  * doubles (container 30px + 2rem). */
 .tiptap.ProseMirror p[data-icon-row],

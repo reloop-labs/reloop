@@ -60,7 +60,7 @@ export function PropertiesEmptyState({
 			<p className="mx-auto mb-6 max-w-80 text-balance font-medium text-[12px] text-text-sub-600">
 				{isFiltered
 					? "Try adjusting your search or filters."
-					: "Store custom attributes per contact — like plans, regions, or any data your app tracks."}
+					: "Store custom attributes per contact, like plans, regions, or any data your app tracks."}
 			</p>
 			{isFiltered ? (
 				<Button.Root

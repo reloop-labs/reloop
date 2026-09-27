@@ -2,7 +2,7 @@ import { dashboardURL } from "./runtime";
 
 /**
  * Ensure the local stack is reachable before auth E2E runs.
- * Does not start services — see tests/browser/README.md.
+ * Does not start services; see tests/browser/README.md.
  */
 export default async function globalSetup() {
 	const loginURL = dashboardURL("/login");

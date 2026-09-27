@@ -35,7 +35,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 					storageKey="theme"
 				>
 					<Tooltip.Provider>
-						{/* Fallback must match dashboard chrome — AuthSessionLoader caused a
+						{/* Fallback must match dashboard chrome; AuthSessionLoader caused a
 						    hard-refresh flash when Nuqs/useSearchParams suspended. */}
 						<Suspense fallback={<ProvidersSuspenseFallback />}>
 							<NuqsAdapter>{children}</NuqsAdapter>

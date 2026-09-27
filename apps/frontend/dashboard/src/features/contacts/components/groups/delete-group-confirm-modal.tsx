@@ -65,7 +65,7 @@ export function DeleteGroupConfirmModal({
 		? `delete ${bulkGroupsToDelete.length} group${bulkGroupsToDelete.length === 1 ? "" : "s"}`
 		: groupToDelete?.name || "Unnamed group";
 
-	// Exact match only — no partial / substring acceptance (e.g. typing just "delete").
+	// Exact match only, no partial / substring acceptance (e.g. typing just "delete").
 	const isConfirmed = confirmationText === displayName;
 
 	const canDelete =

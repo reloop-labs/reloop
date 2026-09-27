@@ -1,6 +1,6 @@
 ---
 title: How to Send Email in Next.js App Router (2026)
-description: Send transactional email from Next.js App Router with Reloop — complete Server Action and Route Handler examples, env setup, error handling, and Vercel deploy.
+description: "Send transactional email from Next.js App Router with Reloop: complete Server Action and Route Handler examples, env setup, error handling, and Vercel deploy."
 keywords:
   - send email Next.js App Router
   - Next.js Server Action email
@@ -26,7 +26,7 @@ relatedSlugs:
   - vercel-ai-sdk-reloop-notifications
 ---
 
-**To send email in Next.js App Router, call Reloop only on the server** — from a [Server Action](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations) or a [Route Handler](https://nextjs.org/docs/app/building-your-application/routing/route-handlers). Never put your API key in a Client Component or public env var.
+**To send email in Next.js App Router, call Reloop only on the server**, from a [Server Action](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations) or a [Route Handler](https://nextjs.org/docs/app/building-your-application/routing/route-handlers). Never put your API key in a Client Component or public env var.
 
 This guide covers both patterns end-to-end: install, shared client, form + Server Action, API route + `fetch`, error handling, and deploy on Vercel.
 
@@ -47,7 +47,7 @@ Both run on the server. Both use the same Reloop SDK call. Pick Server Actions f
 
 1. A Next.js app on the **App Router** (this guide uses `app/`, not `pages/`)
 2. A Reloop account and API key from the [dashboard](https://app.reloop.sh) (keys look like `rl_…`)
-3. A verified sending domain — see [connect a domain](/docs/guides/connect-domain) and [SPF / DKIM / DMARC](/blog/spf-dkim-dmarc-setup-guide)
+3. A verified sending domain (see [connect a domain](/docs/guides/connect-domain) and [SPF / DKIM / DMARC](/blog/spf-dkim-dmarc-setup-guide))
 
 Optional but useful: the [Node.js SDK docs](/docs/examples/nodejs/nextjs) and full [send mail API](/docs/api/mail/post-api-mail-v1send).
 
@@ -102,7 +102,7 @@ Initialize with an object: `{ apiKey: string }`. Optional: `baseUrl` if you [sel
 
 ---
 
-## 4. Method A — Server Action (forms & app UI)
+## 4. Method A: Server Action (forms & app UI)
 
 ### When to use this
 
@@ -236,7 +236,7 @@ Server Actions work for same-origin app flows. For external HTTP callers, use a 
 
 ---
 
-## 5. Method B — Route Handler (API route)
+## 5. Method B: Route Handler (API route)
 
 ### When to use this
 
@@ -369,14 +369,14 @@ Add `INTERNAL_SEND_SECRET` to `.env.local` and Vercel the same way as the API ke
 
 ---
 
-## 6. Server Action vs Route Handler — pick one
+## 6. Server Action vs Route Handler: pick one
 
 | Question | Prefer Server Action | Prefer Route Handler |
 |----------|----------------------|----------------------|
-| Triggered by a form in this Next app? | Yes | — |
-| Need a public HTTP URL for webhooks / mobile / cron? | — | Yes |
-| Want zero client `fetch` boilerplate? | Yes | — |
-| Called from non-Next code? | — | Yes |
+| Triggered by a form in this Next app? | Yes | No |
+| Need a public HTTP URL for webhooks / mobile / cron? | No | Yes |
+| Want zero client `fetch` boilerplate? | Yes | No |
+| Called from non-Next code? | No | Yes |
 | Same Reloop SDK? | Yes | Yes |
 | Safe for `RELOOP_API_KEY`? | Yes (server) | Yes (server) |
 
@@ -388,7 +388,7 @@ You can use **both** in one app: Server Actions for product UI, Route Handlers f
 
 ```typescript
 const { response, emailError } = await reloop.mail.send({
-  from: "Acme <hello@mail.yourdomain.com>", // required — verified domain
+  from: "Acme <hello@mail.yourdomain.com>", // required, verified domain
   to: "user@example.com",                   // string or string[]
   subject: "Order confirmed",               // required
   html: "<p>Your order shipped.</p>",       // HTML body
@@ -402,14 +402,14 @@ const { response, emailError } = await reloop.mail.send({
 
 More options (attachments, templates, scheduling, headers) are on the [send email API reference](/docs/api/mail/post-api-mail-v1send).
 
-Always send both `html` and `text` when you can — better deliverability and clients that block HTML still get a readable message. See [transactional email best practices](/blog/transactional-email-best-practices).
+Always send both `html` and `text` when you can. You get better deliverability, and clients that block HTML still get a readable message. See [transactional email best practices](/blog/transactional-email-best-practices).
 
 ---
 
 ## 8. Runtime: Node vs Edge
 
 - Prefer the default **Node.js** runtime for the Reloop SDK.
-- Edge Runtime is a restricted environment. If you must run on Edge, call Reloop’s **HTTP API** with `fetch` instead of relying on Node-only modules — same idea as the [Cloudflare Workers guide](/blog/send-email-cloudflare-workers).
+- Edge Runtime is a restricted environment. If you must run on Edge, call Reloop’s **HTTP API** with `fetch` instead of relying on Node-only modules, the same idea as the [Cloudflare Workers guide](/blog/send-email-cloudflare-workers).
 
 ```typescript
 // Edge-friendly alternative (no SDK)
@@ -455,13 +455,13 @@ Details: [Vercel + Reloop](/docs/integrations/vercel).
 
 ## 10. Common mistakes
 
-1. **`NEXT_PUBLIC_RELOOP_API_KEY`** — exposes the key. Use server-only `RELOOP_API_KEY`.
-2. **Calling Reloop from a Client Component** — keys and secrets belong in Server Actions / Route Handlers only.
-3. **Unverified `from` domain** — verify DNS first ([domain guide](/docs/guides/connect-domain)).
-4. **Open `/api/send-email`** — always authenticate or use a shared secret.
-5. **Wrong constructor** — use `new Reloop({ apiKey })`, not a bare string, for the current SDK.
-6. **Ignoring `emailError`** — check it (or catch throws) and return a safe user message.
-7. **HTML only** — include `text` as a fallback.
+1. **`NEXT_PUBLIC_RELOOP_API_KEY`**: exposes the key. Use server-only `RELOOP_API_KEY`.
+2. **Calling Reloop from a Client Component**: keys and secrets belong in Server Actions / Route Handlers only.
+3. **Unverified `from` domain**: verify DNS first ([domain guide](/docs/guides/connect-domain)).
+4. **Open `/api/send-email`**: always authenticate or use a shared secret.
+5. **Wrong constructor**: use `new Reloop({ apiKey })`, not a bare string, for the current SDK.
+6. **Ignoring `emailError`**: check it (or catch throws) and return a safe user message.
+7. **HTML only**: include `text` as a fallback.
 
 ---
 
@@ -512,8 +512,8 @@ Details: [Vercel + Reloop](/docs/integrations/vercel).
 
 ## Next steps
 
-- [Transactional email best practices](/blog/transactional-email-best-practices) — templates, timing, deliverability
-- [Next.js example in docs](/docs/examples/nodejs/nextjs) — short SDK reference
-- [Send mail API](/docs/api/mail/post-api-mail-v1send) — full payload
-- [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications) — tool-calling notifications
+- [Transactional email best practices](/blog/transactional-email-best-practices): templates, timing, deliverability
+- [Next.js example in docs](/docs/examples/nodejs/nextjs): short SDK reference
+- [Send mail API](/docs/api/mail/post-api-mail-v1send): full payload
+- [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications): tool-calling notifications
 - Sibling guides: [SvelteKit](/blog/send-email-sveltekit) · [Remix](/blog/send-email-remix) · [Cloudflare Workers](/blog/send-email-cloudflare-workers)

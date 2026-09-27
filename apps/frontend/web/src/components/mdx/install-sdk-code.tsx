@@ -13,7 +13,7 @@ const INSTALL_COMMANDS: Record<PackageManager, string> = {
 	bun: "bun add reloop-email",
 };
 
-// simple-icons ships Bun as pure black (#000000) — override so the tab stays
+// simple-icons ships Bun as pure black (#000000); override so the tab stays
 // visible on dark UI (same approach as dashboard onboarding).
 const bunTabIcon = { path: siBun.path, hex: "F472B6", title: siBun.title };
 

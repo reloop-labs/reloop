@@ -1,5 +1,5 @@
 /**
- * Dashboard CopyCodeBlock — same card chrome and tab hover/active as
+ * Dashboard CopyCodeBlock: same card chrome and tab hover/active as
  * `@reloop/ui/copy-code-block`.
  */
 import { cn } from "@reloop/ui/cn";
@@ -278,7 +278,7 @@ export function CopyCodeBlock({
 	return (
 		<div
 			className={cn(
-				// Outer shell — same as dashboard `@reloop/ui/copy-code-block`
+				// Outer shell, same as dashboard `@reloop/ui/copy-code-block`
 				"group relative overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]",
 				className,
 			)}
@@ -437,7 +437,7 @@ export function CopyCodeBlock({
 				</div>
 			)}
 
-			{/* Inner code surface — same nested card as the Next dashboard */}
+			{/* Inner code surface, same nested card as the Next dashboard */}
 			<div
 				className={cn(
 					"mx-0.5 mb-0.5 overflow-hidden rounded-2xl border border-stroke-soft-100/70 bg-white dark:border-stroke-soft-100/15 dark:bg-zinc-950",

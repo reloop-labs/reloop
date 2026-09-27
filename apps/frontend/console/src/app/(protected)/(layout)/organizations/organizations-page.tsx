@@ -88,7 +88,7 @@ export default function OrganizationsPage() {
 		<PageFrame>
 			<PageHeading
 				title="Organizations"
-				description="Open any row for the full hub — members, domains, API keys, templates, emails, webhooks, support, and audit."
+				description="Open any row for the full hub: members, domains, API keys, templates, emails, webhooks, support, and audit."
 				meta={
 					<span className="rounded-full bg-bg-weak-50 px-2.5 py-1 font-medium text-[12px] text-text-sub-600 tabular-nums dark:bg-white/[0.06]">
 						{data?.total ?? 0} total

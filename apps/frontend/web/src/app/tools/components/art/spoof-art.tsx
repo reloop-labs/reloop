@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, face stroke 4, mark stroke 5)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function SpoofBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function SpoofBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function SpoofBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function SpoofBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* shield — centered on (210,170), same weight as the timer face */}
+				{/* shield, centered on (210,170), same weight as the timer face */}
 				<path
 					d="M 210 83 L 273 107 V 167 C 273 212 243 242 210 257 C 177 242 147 212 147 167 V 107 Z"
 					stroke="currentColor"
@@ -116,7 +116,7 @@ export function SpoofBlueprintArt({
 					fill="currentColor"
 					fillOpacity="0.04"
 				/>
-				{/* alert bar — same weight as the timer hands */}
+				{/* alert bar, same weight as the timer hands */}
 				<line
 					x1="210"
 					y1="143"
@@ -127,7 +127,7 @@ export function SpoofBlueprintArt({
 					strokeLinecap="round"
 				/>
 				<circle cx="210" cy="212" r="5" fill="currentColor" />
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

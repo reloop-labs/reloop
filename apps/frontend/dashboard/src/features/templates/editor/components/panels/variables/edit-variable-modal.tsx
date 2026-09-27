@@ -246,7 +246,7 @@ export const EditTemplateVariableModal = ({
 								</Label.Root>
 								<FieldError
 									field={nameField}
-									hint="Letters, numbers, and underscores only — spaces auto-convert"
+									hint="Letters, numbers, and underscores only. Spaces auto-convert"
 								>
 									<Input.Root
 										size="medium"

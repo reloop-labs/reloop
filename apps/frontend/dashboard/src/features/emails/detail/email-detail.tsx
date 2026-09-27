@@ -86,7 +86,7 @@ function classifyError(msg: string): ErrorClassification {
 	) {
 		return {
 			category: "Mailbox Rejected",
-			summary: "Receiving server rejected the address — inbox may not exist.",
+			summary: "Receiving server rejected the address. Inbox may not exist.",
 			fixes: [
 				"Confirm recipient address is valid",
 				"Add SPF & DKIM to your domain",
@@ -150,7 +150,7 @@ function classifyError(msg: string): ErrorClassification {
 	) {
 		return {
 			category: "TLS Handshake Error",
-			summary: "TLS/SSL negotiation failed — likely a cert or port mismatch.",
+			summary: "TLS/SSL negotiation failed, likely a cert or port mismatch.",
 			fixes: [
 				"Use port 587 (STARTTLS) or 465 (SSL)",
 				"Renew expired SSL certificate",
@@ -170,7 +170,7 @@ function classifyError(msg: string): ErrorClassification {
 	) {
 		return {
 			category: "Connection Error",
-			summary: "Could not connect to the mail server — firewall or wrong host.",
+			summary: "Could not connect to the mail server: firewall or wrong host.",
 			fixes: [
 				"Check SMTP host & port config",
 				"Allow SMTP egress in firewall",

@@ -63,7 +63,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 
 	const openDocs = () => window.open(DOCS_URL, "_blank");
 
-	// C — Add / create. Select-all lives on the contacts table (⌘A).
+	// C: Add / create. Select-all lives on the contacts table (⌘A).
 	useHotkeys(
 		"c",
 		(e) => {

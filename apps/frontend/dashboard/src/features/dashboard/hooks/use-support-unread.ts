@@ -24,7 +24,7 @@ export function clearSupportUnreadInCache(
 export function useSupportUnread() {
 	const queryClient = useQueryClient();
 	const { isAiPanelOpen, aiPanelActiveTab } = useUIStore();
-	// Ask AI is currently disabled — panel is support-only, but keep the
+	// Ask AI is currently disabled, so the panel is support-only, but keep the
 	// tab check so re-enabling AI does not mark support as "open" incorrectly.
 	const supportOpen = isAiPanelOpen && aiPanelActiveTab === "support";
 
@@ -78,7 +78,7 @@ export function useSupportUnread() {
 		[mutateUnread],
 	);
 
-	// WebSocket only after idle (or when panel is open) — not on first paint.
+	// WebSocket only after idle (or when panel is open), not on first paint.
 	useSupportSocket({
 		enabled: networkEnabled,
 		onEvent,

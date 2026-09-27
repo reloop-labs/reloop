@@ -59,7 +59,7 @@ export async function completeEmailOtpAuth(
 		return;
 	}
 
-	// OTP input is always visible — no "Enter code manually" step.
+	// OTP input is always visible, with no "Enter code manually" step.
 	await fillOtp(page, otp);
 }
 

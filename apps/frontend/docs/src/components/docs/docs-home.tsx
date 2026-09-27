@@ -53,7 +53,7 @@ function SectionHeading({
 	);
 }
 
-/** Outer soft well — same language as api-endpoint-bar */
+/** Outer soft well, same language as api-endpoint-bar */
 function SoftWell({
 	children,
 	className,
@@ -231,7 +231,7 @@ export function DocsHome() {
 						Learn how to send with Reloop
 					</h1>
 					<p className="mt-3.5 text-[16px] text-text-sub-600 leading-relaxed tracking-[-0.01em]">
-						Guides, API reference, SDKs, and agent tooling — everything you need
+						Guides, API reference, SDKs, and agent tooling: everything you need
 						to send, receive, and automate email.
 					</p>
 					<div className="mt-6 flex flex-wrap gap-2.5">

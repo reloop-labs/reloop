@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Apache 2.0 License — Reloop";
+export const alt = "Apache 2.0 License | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -616,7 +616,7 @@ export default async function OpenGraphImage() {
 						</g>
 					</g>
 
-					{/* top width dimension bar — broken for the label */}
+					{/* top width dimension bar, broken for the label */}
 					<g opacity="0.35">
 						<line
 							x1="130"
@@ -640,7 +640,7 @@ export default async function OpenGraphImage() {
 							strokeWidth="1"
 						/>
 					</g>
-					{/* right height dimension bar — broken for the label */}
+					{/* right height dimension bar, broken for the label */}
 					<g opacity="0.35">
 						<line
 							x1="330"

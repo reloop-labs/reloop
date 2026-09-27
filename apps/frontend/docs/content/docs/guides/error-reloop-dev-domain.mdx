@@ -7,7 +7,7 @@ Why you cannot send from the `reloop.sh` domain via the public send API.
 
 ## Overview
 
-`reloop.sh` (or your deployment's `ONBOARDING_TEST_DOMAIN`) is a **Reloop-owned onboarding test domain**. It is reserved for the onboarding **Send email** button — not for arbitrary customer domain setup.
+`reloop.sh` (or your deployment's `ONBOARDING_TEST_DOMAIN`) is a **Reloop-owned onboarding test domain**. It is reserved for the onboarding **Send email** button, not for arbitrary customer domain setup.
 
 If you call `POST /api/mail/v1/send` with a From address on that domain, Reloop returns an error directing you to use your own verified domain.
 

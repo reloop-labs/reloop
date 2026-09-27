@@ -9,7 +9,7 @@ interface ThreadAiSummaryProps {
 }
 
 /**
- * Collapsible AI summary — only renders when text exists; collapsed by default.
+ * Collapsible AI summary. Only renders when text exists; collapsed by default.
  */
 export const ThreadAiSummary = ({
 	summary,

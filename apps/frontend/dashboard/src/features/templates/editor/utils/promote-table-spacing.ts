@@ -125,7 +125,7 @@ function nearestTypography(el: HTMLElement, prop: string): string {
 
 /**
  * Email clients inherit wrapper TD color / size. TipTap + EmailTheming RESET
- * do not — headings become 2.25em/600 and unstyled links become #0670DB.
+ * do not: headings become 2.25em/600 and unstyled links become #0670DB.
  * Copy missing typography onto the nodes that paint. Buttons with their own
  * fill keep their own color so a white CTA is not painted canvas-white.
  */
@@ -164,7 +164,7 @@ const BLOCK_TAGS = new Set(["P", "H1", "H2", "H3", "H4", "H5", "H6"]);
 
 /**
  * EmailTheming RESET paints `.node-heading { padding-top: 0.389em }` without
- * !important. Canvas CSS must not zero padding with !important — that hides
+ * !important. Canvas CSS must not zero padding with !important; that hides
  * source heading padding. Stamp 0 only where the paste had no padding so
  * theme ems cannot invent a gap.
  */
@@ -583,7 +583,7 @@ export function alignImageOnlyRowsInJson(json: JsonNode): boolean {
 
 /**
  * Several icons in one cell (Amazon social row). Do not wrap them in a
- * paragraph — Image is a block atom, so setContent drops that JSON.
+ * paragraph. Image is a block atom, so setContent drops that JSON.
  * Keep them as cell children and stamp inline-block so td text-align works.
  */
 export function alignImageOnlyCellsInJson(json: JsonNode): boolean {

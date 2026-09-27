@@ -19,7 +19,7 @@ export function AnimatedIntegrationIcon({
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0", className)}
 		>
-			{/* Soft fills on bottom squares — static */}
+			{/* Soft fills on bottom squares, static */}
 			<g opacity={0.12}>
 				<path
 					d="M2 17.2C2 16.0799 2 15.5198 2.21799 15.092C2.40973 14.7157 2.71569 14.4097 3.09202 14.218C3.51984 14 4.0799 14 5.2 14H6.8C7.9201 14 8.48016 14 8.90798 14.218C9.28431 14.4097 9.59027 14.7157 9.78201 15.092C10 15.5198 10 16.0799 10 17.2V18.8C10 19.9201 10 20.4802 9.78201 20.908C9.59027 21.2843 9.28431 21.5903 8.90798 21.782C8.48016 22 7.9201 22 6.8 22H5.2C4.0799 22 3.51984 22 3.09202 21.782C2.71569 21.5903 2.40973 21.2843 2.21799 20.908C2 20.4802 2 19.9201 2 18.8V17.2Z"
@@ -31,7 +31,7 @@ export function AnimatedIntegrationIcon({
 				/>
 			</g>
 
-			{/* Plus — static */}
+			{/* Plus, static */}
 			<path
 				d="M14 6H18M18 6H22M18 6V10M18 6V2"
 				stroke="currentColor"
@@ -40,7 +40,7 @@ export function AnimatedIntegrationIcon({
 				strokeLinejoin="round"
 			/>
 
-			{/* Squares — staggered scale from center */}
+			{/* Squares: staggered scale from center */}
 			<path
 				d="M5.2 10H6.8C7.92011 10 8.48016 10 8.90798 9.78201C9.28431 9.59027 9.59027 9.28431 9.78201 8.90798C10 8.48016 10 7.92011 10 6.8V5.2C10 4.07989 10 3.51984 9.78201 3.09202C9.59027 2.71569 9.28431 2.40973 8.90798 2.21799C8.48016 2 7.92011 2 6.8 2H5.2C4.07989 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.07989 2 5.2V6.8C2 7.92011 2 8.48016 2.21799 8.90798C2.40973 9.28431 2.71569 9.59027 3.09202 9.78201C3.51984 10 4.07989 10 5.2 10Z"
 				stroke="currentColor"

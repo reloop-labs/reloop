@@ -84,7 +84,7 @@ export default function FrameworkHero({
 				{/* Product fold: icon + title + sub + CTA */}
 				<div className="relative px-6 py-10 sm:px-10 sm:py-12 lg:px-12 lg:py-14">
 					<div className="relative z-10 flex items-start gap-4 sm:gap-5">
-						{/* App icon tile — same height as the title row so they share one line */}
+						{/* App icon tile, same height as the title row so they share one line */}
 						<div
 							className={cn(
 								"flex size-16 shrink-0 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] sm:size-20 dark:border-white/10 dark:bg-bg-black-950 dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]",

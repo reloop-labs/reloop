@@ -210,7 +210,7 @@ function firstStylesheetBodyBackground(css: string): string {
 	return scratch.style.backgroundColor || scratch.style.background || "";
 }
 
-/** Body fill from inline style, bgcolor, or a `body { }` rule — not an invented white. */
+/** Body fill from inline style, bgcolor, or a `body { }` rule, not an invented white. */
 export function readDocumentBodyBackground(doc: Document): string {
 	const body = doc.body;
 	const inline =

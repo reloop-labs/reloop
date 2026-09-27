@@ -58,7 +58,7 @@ type SearchResponse = {
 };
 
 function warmupLabel(warmup: WarmupView | null): string {
-	if (!warmup) return "—";
+	if (!warmup) return "-";
 	if (warmup.status === "completed") return "Warmed";
 	if (warmup.status === "paused") return "Paused";
 	if (warmup.status === "pending") return "Scheduled";
@@ -400,7 +400,7 @@ export default function SendingIpsPage() {
 									}
 								/>
 							) : (
-								"—"
+								"-"
 							)}
 						</td>
 						<td className="px-4 py-3 text-right">

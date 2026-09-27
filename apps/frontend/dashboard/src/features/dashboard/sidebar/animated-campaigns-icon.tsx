@@ -42,7 +42,7 @@ export function AnimatedCampaignsIcon({
 					/>
 				</g>
 
-				{/* 3 sound lines with clear gap — hidden by default, reveal one by one on hover */}
+				{/* 3 sound lines with clear gap, hidden by default, reveal one by one on hover */}
 				{/* 1. Top ray (angled upward) */}
 				<line
 					x1="19"

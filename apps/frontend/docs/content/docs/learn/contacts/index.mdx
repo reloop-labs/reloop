@@ -7,7 +7,7 @@ faq:
   - question: Is each email its own contact?
     answer: Yes. A Reloop contact is one person record keyed by a unique email address in your organization. Subscription status, custom properties, groups, and channel preferences all live on that same record.
   - question: What happens if I add a duplicate email?
-    answer: Email is unique per organization. Creating a contact with an email that already exists returns an error — update the existing contact instead of creating another one.
+    answer: Email is unique per organization. Creating a contact with an email that already exists returns an error; update the existing contact instead of creating another one.
   - question: What is the difference between unsubscribed and blocked?
     answer: Unsubscribed means the contact opted out of your list. Blocked usually comes from deliverability issues such as a hard bounce or spam complaint, with a suppression reason on the contact.
   - question: Can I export my contacts?
@@ -37,11 +37,11 @@ faq:
     1. Go to [Contacts](https://reloop.sh/dashboard/contacts)
     2. Click **Add contact** (or press `C`)
     3. Choose **Import CSV file**, **Copy paste**, or **Sync via SDK**
-    4. Finish that flow — map CSV columns, paste emails, or follow the SDK snippets
+    4. Finish that flow: map CSV columns, paste emails, or follow the SDK snippets
     5. Confirm to add the contacts
 
     <Info>
-    Email is unique per organization. If the address already exists, Reloop returns an error — update that contact instead of creating another one.
+    Email is unique per organization. If the address already exists, Reloop returns an error; update that contact instead of creating another one.
     </Info>
     <Video src="/docs/images/docs/contacts/overview/create-contact.mp4" autoPlay loop muted playsInline />
 
@@ -50,7 +50,7 @@ faq:
     1. Open [Contacts](https://reloop.sh/dashboard/contacts)
     2. Use **Search contacts…** (or press `/`) to find by email
     3. Optionally filter by **Status** (Subscribed, Unsubscribed, or Blocked)
-    4. Click a row to open detail — or use **Export CSV** (`E`) for an offline copy
+    4. Click a row to open detail, or use **Export CSV** (`E`) for an offline copy
 
     <Video src="/docs/images/docs/contacts/overview/search-filter-contact.mp4" autoPlay loop muted playsInline />
 
@@ -105,7 +105,7 @@ faq:
     <ContactsCodeSamples id="contacts.create" />
 
     <Info>
-    Email is unique per organization. A duplicate email returns an error — update the existing contact instead.
+    Email is unique per organization. A duplicate email returns an error; update the existing contact instead.
     </Info>
 
     ## Edit a contact
@@ -131,7 +131,7 @@ faq:
   </Accordion>
 
   <Accordion title="What happens if I add a duplicate email?">
-    Email is unique per organization. Creating a contact with an email that already exists returns an error — [update](#edit-a-contact) the existing contact instead of creating another one.
+    Email is unique per organization. Creating a contact with an email that already exists returns an error; [update](#edit-a-contact) the existing contact instead of creating another one.
   </Accordion>
 
   <Accordion title="What is the difference between unsubscribed and blocked?">
@@ -143,7 +143,7 @@ faq:
   </Accordion>
 
   <Accordion title="How do I manage contacts with code?">
-    Use the Reloop SDK or REST API to create, list, get, update, and delete contacts — same operations as the dashboard.
+    Use the Reloop SDK or REST API to create, list, get, update, and delete contacts, the same operations as the dashboard.
   </Accordion>
 
   <Accordion title="Does Reloop sync contacts with external CRMs (Salesforce, HubSpot, etc.)?">
@@ -151,7 +151,7 @@ faq:
   </Accordion>
 
   <Accordion title="Are there webhooks for contact events (created, updated, unsubscribed, deleted)?">
-    Yes — `contact.create`, `contact.update`, `contact.delete`, `contact.subscribed`, `contact.unsubscribed`, and `contact.blocked`. See [Contact webhooks](/docs/webhooks/contacts/created) and [event types](/docs/webhooks/event-types).
+    Yes: `contact.create`, `contact.update`, `contact.delete`, `contact.subscribed`, `contact.unsubscribed`, and `contact.blocked`. See [Contact webhooks](/docs/webhooks/contacts/created) and [event types](/docs/webhooks/event-types).
   </Accordion>
 
   <Accordion title="Is there a rate limit on the Contacts API?">

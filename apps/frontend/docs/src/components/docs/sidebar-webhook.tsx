@@ -220,7 +220,7 @@ export function WebhookSidebarSection({
 	onLinkClick?: () => void;
 	depth?: number;
 }) {
-	// Section titles match API resource folders (e.g. "API KEY") — text-sm uppercase
+	// Section titles match API resource folders (e.g. "API KEY"), text-sm uppercase
 	if (node.type === "separator") {
 		const name = node.name as string;
 		const id = name.toLowerCase().replace(/\s+/g, "-");

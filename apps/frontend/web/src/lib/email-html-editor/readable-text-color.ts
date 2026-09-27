@@ -97,7 +97,7 @@ function isTransparentOrEmpty(cssColor: string): boolean {
 	return !v || v === "transparent" || v === "rgba(0,0,0,0)";
 }
 
-/** The surface the text actually sits on — button fill, then ancestors, then canvas. */
+/** The surface the text actually sits on: button fill, then ancestors, then canvas. */
 function nearestBackground(el: HTMLElement, fallback: string): string {
 	let current: HTMLElement | null = el;
 	while (current) {

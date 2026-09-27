@@ -159,7 +159,7 @@ export function DeleteEventModal({ events }: { events: CustomEvent[] }) {
 						</p>
 						<div className="mt-1 flex items-center">
 							<span className="font-medium text-sm text-text-strong-950">
-								{eventToDelete?.name || "—"}
+								{eventToDelete?.name || "-"}
 							</span>
 						</div>
 					</div>
@@ -167,7 +167,7 @@ export function DeleteEventModal({ events }: { events: CustomEvent[] }) {
 						<p className="font-normal text-text-sub-600 text-xs">Key</p>
 						<div className="mt-1 flex items-center">
 							<span className="font-mono text-sm text-text-strong-950">
-								{eventToDelete?.key || "—"}
+								{eventToDelete?.key || "-"}
 							</span>
 						</div>
 					</div>

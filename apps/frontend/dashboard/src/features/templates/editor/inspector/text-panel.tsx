@@ -65,7 +65,7 @@ export function TextPanel() {
 						setAlignment={setAlignment}
 					/>
 
-					{/* Link colour — only when a link is active */}
+					{/* Link colour, only when a link is active */}
 					{isLinkActive && (
 						<ColorRow
 							label="Link color"

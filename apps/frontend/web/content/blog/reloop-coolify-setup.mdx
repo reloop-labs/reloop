@@ -1,6 +1,6 @@
 ---
 title: "Reloop on Coolify: Self-Hosted Email Without the Complexity"
-description: Deploy Reloop using Coolify's UI-driven deployment — no Docker expertise required. Full email infrastructure in under 20 minutes.
+description: Deploy Reloop using Coolify's UI-driven deployment, no Docker expertise required. Full email infrastructure in under 20 minutes.
 keywords:
   - coolify email server
   - reloop coolify deployment
@@ -22,7 +22,7 @@ relatedSlugs:
 
 ## What is Coolify?
 
-Coolify is an open-source, self-hostable platform-as-a-service (think Heroku/Render but self-hosted). It gives you a clean UI to deploy Docker Compose stacks, manage databases, and handle SSL — without writing any infra code.
+Coolify is an open-source, self-hostable platform-as-a-service (think Heroku/Render but self-hosted). It gives you a clean UI to deploy Docker Compose stacks, manage databases, and handle SSL without writing any infra code.
 
 ## Why Coolify + Reloop is a great combo
 
@@ -41,13 +41,13 @@ In the Coolify dashboard, click **New Resource → Docker Compose**. Paste the R
 ## Step 2: Configure environment variables
 
 Coolify provides an environment variable editor. Set:
-- `DATABASE_URL` — Coolify can provision a Postgres instance for you
-- `SMTP_DOMAIN` — your sending domain
-- `RELOOP_API_SECRET` — a secure random string
+- `DATABASE_URL`: Coolify can provision a Postgres instance for you
+- `SMTP_DOMAIN`: your sending domain
+- `RELOOP_API_SECRET`: a secure random string
 
 ## Step 3: Set up SSL
 
-Coolify integrates with Let's Encrypt. Enable SSL for your Reloop domain in one click — no Certbot scripting required.
+Coolify integrates with Let's Encrypt. Enable SSL for your Reloop domain in one click, no Certbot scripting required.
 
 ## Step 4: Deploy
 

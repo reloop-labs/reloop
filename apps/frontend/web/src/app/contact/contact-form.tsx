@@ -24,7 +24,7 @@ function LoginPromptCard({
 				<div className="flex w-full flex-col items-start">
 					<div className="max-w-[90%] rounded-2xl rounded-tl-xs border border-stroke-soft-200/80 bg-bg-white-0 px-4 py-3 text-[14px] text-text-strong-950 leading-relaxed dark:border-white/10 dark:bg-white/[0.05] dark:text-white">
 						<p className="whitespace-pre-wrap break-words">
-							Hey — this goes straight to the founders&apos; inboxes. Log in to
+							Hey, this goes straight to the founders&apos; inboxes. Log in to
 							your Reloop account so we can open live support for you.
 						</p>
 					</div>

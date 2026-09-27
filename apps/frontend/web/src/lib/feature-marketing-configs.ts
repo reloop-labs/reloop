@@ -66,7 +66,7 @@ export const deliverabilityConfig: FeatureMarketingPageConfig = {
 export const developersConfig: FeatureMarketingPageConfig = {
 	titleLines: ["Developer-First", "Email Infrastructure"],
 	description:
-		"Send transactionals and marketing broadcasts with clean APIs, robust SDKs, and fully-managed SMTP relay—built for reliability, speed, and DX.",
+		"Send transactionals and marketing broadcasts with clean APIs, robust SDKs, and fully-managed SMTP relay, built for reliability, speed, and DX.",
 	primaryCta: { label: "Get API key", href: "/dashboard/signup" },
 	secondaryCta: docs,
 	sections: [
@@ -88,7 +88,7 @@ export const developersConfig: FeatureMarketingPageConfig = {
 				{
 					title: "Local Dev Sandbox",
 					description:
-						"Test locally with our SMTP server and sandbox APIs—never send test emails to real users by accident.",
+						"Test locally with our SMTP server and sandbox APIs. Never send test emails to real users by accident.",
 				},
 			],
 		},
@@ -222,7 +222,7 @@ export const webhooksConfig: FeatureMarketingPageConfig = {
 				{
 					title: "Email Opened",
 					description:
-						"Triggered when a recipient opens your email—ideal for engagement workflows.",
+						"Triggered when a recipient opens your email, ideal for engagement workflows.",
 				},
 				{
 					title: "Email Bounced",

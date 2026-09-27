@@ -286,7 +286,7 @@ export function DeleteContactConfirmModal({
 									</div>
 								) : (
 									<span className="font-medium text-text-sub-600 text-xs">
-										—
+										-
 									</span>
 								)}
 							</div>

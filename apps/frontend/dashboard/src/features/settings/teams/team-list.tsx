@@ -432,7 +432,7 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 			<div className="w-full text-paragraph-sm">
 				<TableHeader />
 
-				{/* Table body — stacked over header with rounded corners (same as domains) */}
+				{/* Table body, stacked over header with rounded corners (same as domains) */}
 				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 					{noResults ? (
 						<div className="flex flex-col items-center justify-center py-16">

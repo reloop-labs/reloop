@@ -3,7 +3,7 @@ import { formatPrice, pricingPlans } from "@reloop/pricing";
 /** Structured pricing markdown for agents (`/pricing.md`). */
 export function buildPricingMarkdown(): string {
 	const lines: string[] = [
-		"# Pricing — Reloop",
+		"# Pricing | Reloop",
 		"",
 		"> Scale your email. Control your costs. Hosted Reloop or self-host.",
 		"> HTML page: https://reloop.sh/pricing",

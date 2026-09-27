@@ -21,7 +21,7 @@ interface UIState {
 	 */
 	isShortcutsRevealed: boolean;
 	setShortcutsRevealed: (value: boolean) => void;
-	/** Phone/tablet overlay nav — not persisted. */
+	/** Phone/tablet overlay nav, not persisted. */
 	isMobileNavOpen: boolean;
 	setMobileNavOpen: (value: boolean) => void;
 	toggleMobileNav: () => void;

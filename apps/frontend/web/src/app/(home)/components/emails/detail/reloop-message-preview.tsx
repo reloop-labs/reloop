@@ -34,7 +34,7 @@ export function ReloopMessagePreview({ to }: { to: string }) {
 				<div className="my-6 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />
 
 				<div className="space-y-3.5 text-[#555] text-[14px] leading-[1.65] dark:text-[#b0b0b0]">
-					<p className="text-[#0e0e0e] dark:text-white">Hey {name} —</p>
+					<p className="text-[#0e0e0e] dark:text-white">Hey {name},</p>
 					<p>
 						The list you clicked is a live send feed. This pane is the message.
 						Not an invoice. Not a password reset. Reloop, talking like we do in
@@ -100,7 +100,7 @@ export function ReloopMessagePreview({ to }: { to: string }) {
 
 				<p className="mt-5 mb-0 text-[#888] text-[12px] leading-relaxed dark:text-[#707070]">
 					P.S. If you can read this, the preview rendered. Hit reply in a real
-					Reloop send — someone actually reads it.
+					Reloop send. Someone actually reads it.
 				</p>
 			</div>
 		</div>
@@ -113,7 +113,7 @@ export function reloopMessagePlainText(to: string, subject: string): string {
 To: ${to}
 Subject: ${subject}
 
-Hey ${name} —
+Hey ${name},
 
 The list you clicked is a live send feed. This pane is the message.
 Not an invoice. Not a password reset. Reloop, talking like we do
@@ -125,8 +125,8 @@ API, SMTP, and an inbox your agent can read. On GitHub. Yours to extend.
 Our mission
 "Focus on what you're building, not on deliverability."
 
-01  Developers — Clean API, SMTP, self-host or cloud.
-02  Agents — A real inbox, a webhook, a CLI.
+01  Developers: Clean API, SMTP, self-host or cloud.
+02  Agents: A real inbox, a webhook, a CLI.
 
 Get started: https://reloop.sh/dashboard/signup
 
@@ -148,7 +148,7 @@ export function reloopMessageHtml(to: string, subject: string): string {
       <span style="color:#707070;">built for people who ship.</span>
     </h1>
     <hr style="margin:24px 0;border:none;border-top:1px solid #e0e0e0;">
-    <p style="font-size:15px;line-height:1.6;color:#555;">Hey ${name} —</p>
+    <p style="font-size:15px;line-height:1.6;color:#555;">Hey ${name},</p>
     <p style="font-size:15px;line-height:1.6;color:#555;">The list you clicked is a live send feed. This is the message.</p>
     <p style="margin:24px 0 0;padding-left:16px;border-left:1px solid #e0e0e0;font-family:Georgia,serif;font-size:17px;font-style:italic;color:#0e0e0e;">
       Focus on what you're building, not on deliverability.

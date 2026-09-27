@@ -19,7 +19,7 @@ export function SocialSignup({
 	onEmailLoadingChange,
 	onEmailCanSubmitChange,
 }: {
-	/** Organization Invitation id — preserved through OAuth callback. */
+	/** Organization Invitation id, preserved through OAuth callback. */
 	inviteId?: string;
 	onEmailLoadingChange?: (loading: boolean) => void;
 	onEmailCanSubmitChange?: (canSubmit: boolean) => void;
@@ -128,7 +128,7 @@ export function SocialSignup({
 				<div className="h-px flex-1 border-stroke-soft-200 border-t border-dashed dark:border-stroke-soft-100/40" />
 			</div>
 
-			{/* Email field only — Create account is the shared page CTA */}
+			{/* Email field only. Create account is the shared page CTA */}
 			<SignupForm
 				disabled={socialBusy}
 				onLoadingChange={handleEmailLoadingChange}

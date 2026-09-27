@@ -211,7 +211,7 @@ export function ContactList() {
 
 	return (
 		<div>
-			{/* Audience snapshot + 7-day trend — matches API key detail two-box layout */}
+			{/* Audience snapshot + 7-day trend, matches API key detail two-box layout */}
 			<div className="mb-4 grid items-stretch gap-4 lg:grid-cols-2">
 				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 					<div className="flex h-full flex-col justify-between gap-3 p-4">
@@ -255,14 +255,14 @@ export function ContactList() {
 								<div className="flex items-center gap-1.5">
 									<span className="h-1.5 w-1.5 rounded-full bg-[#1868DF]" />
 									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-										{activityPending ? "—" : weekSubscribed.toLocaleString()}{" "}
+										{activityPending ? "-" : weekSubscribed.toLocaleString()}{" "}
 										subscribed
 									</span>
 								</div>
 								<div className="flex items-center gap-1.5">
 									<span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
 									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-										{activityPending ? "—" : weekUnsubscribed.toLocaleString()}{" "}
+										{activityPending ? "-" : weekUnsubscribed.toLocaleString()}{" "}
 										unsubscribed
 									</span>
 								</div>

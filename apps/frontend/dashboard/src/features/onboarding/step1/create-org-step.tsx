@@ -39,7 +39,7 @@ export function CreateOrgStep() {
 		!(referral === "other" && !otherReferral);
 
 	// Enter in any field inside this form natively submits (type="submit" button).
-	// Prefer form onSubmit over a document-level Enter hotkey — more reliable and
+	// Prefer form onSubmit over a document-level Enter hotkey, more reliable and
 	// matches step 2 (Add Domain). Referral search is portaled outside the form.
 	const handleSubmit = useCallback(
 		(e: FormEvent) => {

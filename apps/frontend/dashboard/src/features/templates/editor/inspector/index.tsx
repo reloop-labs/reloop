@@ -258,11 +258,11 @@ function CampaignVariableInspectorCard({ name }: { name: string }) {
 								: `contact.${matchedProp.propertyName}`
 							: isStandard
 								? `contact.${target}`
-								: "—"}
+								: "-"}
 					</span>
 					{!matchedProp && !isStandard ? (
 						<p className="text-text-sub-600 text-xs leading-normal">
-							Not a contact property — it will render empty at send time.
+							Not a contact property, so it will render empty at send time.
 						</p>
 					) : null}
 				</div>
@@ -281,12 +281,12 @@ function CampaignVariableInspectorCard({ name }: { name: string }) {
 					<span className="truncate text-text-strong-950 text-xs">
 						{fallback !== null && fallback !== undefined && fallback !== ""
 							? String(fallback)
-							: "—"}
+							: "-"}
 					</span>
 				</div>
 
 				<p className="text-text-sub-600 text-xs leading-normal">
-					Read-only — values come from contact properties at send time.
+					Read-only. Values come from contact properties at send time.
 				</p>
 			</div>
 		</InspectorSection>
@@ -302,7 +302,7 @@ function TemplateVariableInspectorCard({
 }) {
 	const { editor } = useCurrentEditor();
 
-	// Template mode only — own editable variable engine.
+	// Template mode only: own editable variable engine.
 	const { data: templateData, mutate } = useSWR(
 		`/api/template/v1/${templateId}`,
 		(url) => fetch(url, { credentials: "include" }).then((res) => res.json()),
@@ -709,7 +709,7 @@ function TextSection({
 		value: string | number,
 	) => {
 		// Standardize on hex for colors; updateParentBlockStyle has no unit
-		// mapping for letterSpacing — pass px explicitly.
+		// mapping for letterSpacing, so pass px explicitly.
 		const normalizedValue =
 			name === "color"
 				? String(value).trim() === ""

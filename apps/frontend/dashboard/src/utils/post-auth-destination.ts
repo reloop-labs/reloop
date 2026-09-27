@@ -103,7 +103,7 @@ export async function resolvePostAuthDestination(
 			return "/";
 		}
 	} catch {
-		// Fall through — treat list failure as orgless and keep routing.
+		// Fall through: treat list failure as orgless and keep routing.
 	}
 
 	try {
@@ -125,7 +125,7 @@ export async function resolvePostAuthDestination(
  * Resolve destination using the shared TanStack Query cache.
  *
  * Uses `fetchQuery` (not `ensureQueryData`) so routing never trusts a stale
- * empty org list — e.g. after creating a workspace during onboarding, the
+ * empty org list: e.g. after creating a workspace during onboarding, the
  * cache may still hold `[]` until a network refetch completes. Returning that
  * empty array would incorrectly send the user back to `/onboarding`.
  */

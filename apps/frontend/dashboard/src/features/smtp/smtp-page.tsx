@@ -202,7 +202,7 @@ export function SmtpPage({
 
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
-			{/* Header — same family as API keys / webhooks */}
+			{/* Header, same family as API keys / webhooks */}
 			<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<div className="flex items-center gap-2.5">
@@ -311,7 +311,7 @@ export function SmtpPage({
 						<span className="font-bold text-[#0C4A8C] dark:text-blue-100">
 							Tip:
 						</span>{" "}
-						Use a Reloop API key as the SMTP password — not your account
+						Use a Reloop API key as the SMTP password, not your account
 						password.{" "}
 						<button
 							type="button"

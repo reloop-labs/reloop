@@ -1,6 +1,6 @@
 import { DashboardLayoutClient } from "./dashboard-layout-client";
 
-// Client chrome + membership gates — not eligible for instant navigation.
+// Client chrome + membership gates, not eligible for instant navigation.
 export const instant = false;
 
 export default function DashboardLayout({

@@ -64,7 +64,7 @@ export const DeleteWebhookModal = ({
 
 	const displayName =
 		webhookToDelete?.name || webhookToDelete?.url || "Webhook";
-	const displayUrl = webhookToDelete?.url || "—";
+	const displayUrl = webhookToDelete?.url || "-";
 	const displayEvents = webhookToDelete?.events ?? [];
 
 	const normalizedInput = confirmationText.trim().toLowerCase();

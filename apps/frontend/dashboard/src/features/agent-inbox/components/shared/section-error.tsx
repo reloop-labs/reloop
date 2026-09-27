@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 
-/** Inline error for a single inbox section — never blanks the full shell. */
+/** Inline error for a single inbox section, never blanks the full shell. */
 export function SectionError({
 	message,
 	onRetry,

@@ -6,7 +6,7 @@ import { useEmailsLive } from "./hooks/use-emails-live";
 
 /**
  * List chrome for the mail home routes only (`/` sent + `/receive`).
- * Mounted exclusively via the `(mail)` route layout — never on email detail.
+ * Mounted exclusively via the `(mail)` route layout, never on email detail.
  */
 export function EmailsShell({ children }: { children: React.ReactNode }) {
 	useEmailsLive();

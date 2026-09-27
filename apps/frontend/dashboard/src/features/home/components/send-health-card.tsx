@@ -188,7 +188,7 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 							<MetricStat
 								label="Delivered"
 								value={
-									totals.sent > 0 ? `${Math.round(totals.deliveryRate)}%` : "—"
+									totals.sent > 0 ? `${Math.round(totals.deliveryRate)}%` : "-"
 								}
 								hint={
 									totals.sent > 0
@@ -204,7 +204,7 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 							<MetricStat
 								label="Bounce rate"
 								value={
-									totals.sent > 0 ? `${totals.bounceRate.toFixed(1)}%` : "—"
+									totals.sent > 0 ? `${totals.bounceRate.toFixed(1)}%` : "-"
 								}
 								hint={
 									totals.sent > 0
@@ -216,7 +216,7 @@ export function SendHealthCard({ enabled }: { enabled: boolean }) {
 							<MetricStat
 								label="Complaints"
 								value={
-									totals.sent > 0 ? `${totals.complaintRate.toFixed(2)}%` : "—"
+									totals.sent > 0 ? `${totals.complaintRate.toFixed(2)}%` : "-"
 								}
 								hint={
 									totals.sent > 0

@@ -212,7 +212,7 @@ export function DualHealthChart({
 					<stop offset="100%" stopColor={FAILURE_COLOR} stopOpacity="0" />
 				</linearGradient>
 			</defs>
-			{/* Success — only when there were successful deliveries */}
+			{/* Success, only when there were successful deliveries */}
 			{hasSuccess && (
 				<>
 					<path d={successPaths.areaPath} fill={`url(#${successGradId})`} />
@@ -226,7 +226,7 @@ export function DualHealthChart({
 					/>
 				</>
 			)}
-			{/* Failures — always when any failed (including failure-only webhooks) */}
+			{/* Failures, always when any failed (including failure-only webhooks) */}
 			{hasFailures && (
 				<>
 					<path d={failurePaths.areaPath} fill={`url(#${failureGradId})`} />
@@ -269,7 +269,7 @@ function HealthCell({
 
 	if (!hasActivity) {
 		return (
-			<span className="font-medium text-[13px] text-text-soft-400">—</span>
+			<span className="font-medium text-[13px] text-text-soft-400">-</span>
 		);
 	}
 
@@ -663,7 +663,7 @@ export const WebhookTable = ({
 										</div>
 									</div>
 
-									{/* Health — last 7 days success + failure lines */}
+									{/* Health: last 7 days success + failure lines */}
 									<div className="flex items-center">
 										<HealthCell
 											healthSeries={webhook.healthSeries}

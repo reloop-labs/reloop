@@ -6,7 +6,7 @@ interface EmailsEmptyStateProps {
 	description?: string;
 	isFiltered?: boolean;
 	onClearFilters?: () => void;
-	/** "sent" (default) or "received" — tweaks empty copy when not filtered */
+	/** "sent" (default) or "received"; tweaks empty copy when not filtered */
 	variant?: "sent" | "received";
 }
 

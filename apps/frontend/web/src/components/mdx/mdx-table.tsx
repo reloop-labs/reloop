@@ -143,7 +143,7 @@ export function MdxTable({
 
 	return (
 		<div className="my-6 w-full overflow-x-auto text-paragraph-sm">
-			{/* Soft header lip — matches dashboard API key list */}
+			{/* Soft header lip, matches dashboard API key list */}
 			<div
 				className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
 				style={{
@@ -162,7 +162,7 @@ export function MdxTable({
 	);
 }
 
-/** Inline code chips — same feel as API key prefix pills. */
+/** Inline code chips, same feel as API key prefix pills. */
 export function MdxInlineCode({
 	className,
 	...props

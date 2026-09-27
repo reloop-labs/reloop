@@ -1,5 +1,5 @@
 /** Empty shell for settings pages that are not ported yet.
- * Padding comes from `SettingsShell` — do not add outer page padding here.
+ * Padding comes from `SettingsShell`; do not add outer page padding here.
  */
 export function SettingsPlaceholderPage({
 	title,

@@ -38,7 +38,7 @@ export function SignupPage() {
 	const { shouldBlockAuthUi } = useRedirectIfAuthenticated(inviteId);
 	const { shouldBlockForSetup } = useRedirectIfSetupRequired();
 
-	// OTP step footer — keep a placeholder so the strip never unmounts mid-transition.
+	// OTP step footer: keep a placeholder so the strip never unmounts mid-transition.
 	const [otpResendFooter, setOtpResendFooter] = useState<ReactNode>(null);
 	const handleResendFooterChange = useCallback((footer: ReactNode | null) => {
 		if (footer != null) setOtpResendFooter(footer);
@@ -83,7 +83,7 @@ export function SignupPage() {
 	);
 
 	const isOtpStep = Boolean(otpSentEmail);
-	// Always provide footer content — never null — so the soft strip doesn't collapse.
+	// Always provide footer content (never null) so the soft strip doesn't collapse.
 	const cardFooter = isOtpStep
 		? (otpResendFooter ?? otpFooterPlaceholder)
 		: loginFooter;
@@ -172,7 +172,7 @@ export function SignupPage() {
 					</AnimatePresence>
 				</div>
 
-				{/* One primary button for both steps — outside AnimatePresence so it stays put */}
+				{/* One primary button for both steps, outside AnimatePresence so it stays put */}
 				<div className="mt-6">
 					<FancyButton.Root
 						type={isOtpStep ? "button" : "submit"}
@@ -226,7 +226,7 @@ export function SignupPage() {
 						</AnimatePresence>
 					</FancyButton.Root>
 
-					{/* Legal notice under CTA — soft dotted underlines so links don’t dominate */}
+					{/* Legal notice under CTA: soft dotted underlines so links don’t dominate */}
 					{!isOtpStep ? (
 						<p className="mt-3 text-center text-[12px] text-text-soft-400 leading-relaxed">
 							By continuing, you agree to our{" "}

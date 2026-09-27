@@ -104,7 +104,7 @@ export function CsvImportStep({ onBack, initialFile }: CsvImportStepProps) {
 					const emailOk = rows.some((r) => r.target === "email");
 					if (!emailOk) {
 						toast.error(
-							"Could not detect an email column — map one in Property mapping.",
+							"Could not detect an email column. Map one in Property mapping.",
 						);
 					} else if (result.validCount === 0) {
 						toast.error("No valid email addresses found in the CSV file.");

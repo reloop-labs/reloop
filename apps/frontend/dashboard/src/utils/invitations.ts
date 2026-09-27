@@ -3,7 +3,7 @@
  *
  * Better Auth keeps expired invites as `status: "pending"` until they are
  * accepted, rejected, or canceled. Callers must treat `expiresAt` as part of
- * "still actionable" — otherwise expired rows block onboarding and re-invites
+ * "still actionable", otherwise expired rows block onboarding and re-invites
  * create duplicate pending rows.
  */
 
@@ -34,7 +34,7 @@ export function isInvitationActionable(
 	return isInvitationPending(invite) && !isInvitationExpired(invite, now);
 }
 
-/** Pending but past `expiresAt` — shown as expired, safe to re-invite. */
+/** Pending but past `expiresAt`: shown as expired, safe to re-invite. */
 export function isInvitationExpiredPending(
 	invite: Pick<InvitationLike, "status" | "expiresAt">,
 	now: Date = new Date(),

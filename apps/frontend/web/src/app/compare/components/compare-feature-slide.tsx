@@ -177,7 +177,7 @@ export function CompareFeatureSlide({
 						/>
 					</div>
 
-					{/* Reloop — clipped from the left up to the slider */}
+					{/* Reloop: clipped from the left up to the slider */}
 					<div
 						className="absolute inset-0"
 						style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}

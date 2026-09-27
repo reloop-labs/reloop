@@ -84,7 +84,7 @@ export function WebhookTestPage({ webhookId }: { webhookId: string }) {
 					<AnimatedBackButton onClick={goBack} />
 				</div>
 
-				{/* Page title — create-style */}
+				{/* Page title, create-style */}
 				<div className="pt-6">
 					<h1 className="font-semibold text-lg text-text-strong-950 tracking-tight">
 						Test webhook events

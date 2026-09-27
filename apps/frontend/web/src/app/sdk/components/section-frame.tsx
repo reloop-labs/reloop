@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 /**
  * Languages/SDKs section chrome:
- * - Top rule on the section (w-full, never w-screen — avoids horizontal scroll)
+ * - Top rule on the section (w-full, never w-screen, avoids horizontal scroll)
  * - Content constrained to max-w-5xl / md:max-w-7xl with left/right borders
  */
 export function SectionFrame({
@@ -42,7 +42,7 @@ export function SectionFrame({
 }
 
 /**
- * Diagonal hatch fill — same language as resource cards / design reference.
+ * Diagonal hatch fill, same language as resource cards / design reference.
  * Width matches section title padding (px-6 / sm:px-10 / lg:px-12) so icon
  * grids line up with headings.
  */

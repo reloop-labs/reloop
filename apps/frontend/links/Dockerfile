@@ -13,7 +13,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Use ARG for build-time variables that can be overridden
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-# NEXT_PUBLIC_* is inlined at build time — default to production links host.
+# NEXT_PUBLIC_* is inlined at build time; default to production links host.
 # Override at build: --build-arg NEXT_PUBLIC_URL=https://link.reloop.sh
 ARG NEXT_PUBLIC_URL=https://link.reloop.sh
 ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}

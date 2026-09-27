@@ -15,7 +15,7 @@ const pageUrl = `${getSiteUrl()}/changelog`;
 export const metadata: Metadata = {
 	title: "Changelog",
 	description:
-		"What's new in Reloop — product releases from September 2025 onward, organized by planning, design, frontend, backend, and DevOps.",
+		"What's new in Reloop: product releases from September 2025 onward, organized by planning, design, frontend, backend, and DevOps.",
 	keywords: [
 		"Reloop changelog",
 		"email platform updates",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Changelog | Reloop",
 		description:
-			"What's new in Reloop — product releases from September 2025 onward.",
+			"What's new in Reloop: product releases from September 2025 onward.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Changelog | Reloop",
 		description:
-			"What's new in Reloop — product releases from September 2025 onward.",
+			"What's new in Reloop: product releases from September 2025 onward.",
 	},
 };
 

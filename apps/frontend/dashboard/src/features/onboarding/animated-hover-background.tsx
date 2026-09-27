@@ -14,11 +14,11 @@ interface AnimatedHoverBackgroundProps {
 	 * Prefer this when the parent tracks layout (collapse, resize, scroll).
 	 */
 	box?: HoverBox | null;
-	/** @deprecated Prefer `box` — kept for flat dropdown lists. */
+	/** @deprecated Prefer `box`, kept for flat dropdown lists. */
 	rect?: DOMRect | undefined;
-	/** @deprecated Prefer `box` — kept for flat dropdown lists. */
+	/** @deprecated Prefer `box`, kept for flat dropdown lists. */
 	tabElement?: HTMLElement | undefined;
-	/** @deprecated Prefer `box` — kept for flat dropdown lists. */
+	/** @deprecated Prefer `box`, kept for flat dropdown lists. */
 	containerElement?: HTMLElement | null;
 	className?: string;
 	isDanger?: boolean;
@@ -83,7 +83,7 @@ export function AnimatedHoverBackground({
 						isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10",
 						className,
 					)}
-					// Avoid opacity 0→1 on every remount/remeasure — that flash
+					// Avoid opacity 0→1 on every remount/remeasure; that flash
 					// showed up as sidebar text flicker when inbox data refreshed.
 					initial={false}
 					animate={{

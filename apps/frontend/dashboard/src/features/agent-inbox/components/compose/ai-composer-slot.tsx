@@ -8,7 +8,7 @@ import { AiThinkingStatus } from "./ai-thinking-status";
 const MICRO_SCALE_EASE = [0.32, 0.72, 0, 1] as const;
 
 /**
- * Lives in the sparkle-button slot — never beside Send/Cancel.
+ * Lives in the sparkle-button slot, never beside Send/Cancel.
  *
  * thinking/streaming → status + circular stop
  * review → Undo (Esc still restores; no Esc chrome while generating)

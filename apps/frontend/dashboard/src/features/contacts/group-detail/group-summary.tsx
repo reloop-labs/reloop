@@ -47,7 +47,7 @@ function CreatedByValue({
 	if (!createdBy) {
 		return (
 			<p className="mt-1 truncate font-medium text-sm text-text-strong-950">
-				—
+				-
 			</p>
 		);
 	}
@@ -149,7 +149,7 @@ export function GroupSummary({
 								<Skeleton className="mt-1 h-5 w-24 rounded-lg" />
 							) : (
 								<p className="mt-1 truncate font-medium text-sm text-text-strong-950">
-									{group?.createdAt ? formatRelativeTime(group.createdAt) : "—"}
+									{group?.createdAt ? formatRelativeTime(group.createdAt) : "-"}
 								</p>
 							)}
 						</div>

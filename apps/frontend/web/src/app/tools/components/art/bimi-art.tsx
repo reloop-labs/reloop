@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, face stroke 4, detail stroke 3, mark stroke 5)
  * so both cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function BimiBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function BimiBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function BimiBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function BimiBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* ribbon tails — drawn first so the badge face covers the joint.
+				{/* ribbon tails, drawn first so the badge face covers the joint.
 				    Top edge (y=242) sits 20px inside the face so the
 				    joint is hidden, same layering as the timer topper. */}
 				<path
@@ -118,7 +118,7 @@ export function BimiBlueprintArt({
 					strokeLinejoin="round"
 					fill="none"
 				/>
-				{/* badge face — same center (210,170) and radius (92) as the
+				{/* badge face, same center (210,170) and radius (92) as the
 				    timer face, so every construction circle stays concentric */}
 				<circle
 					cx="210"
@@ -129,7 +129,7 @@ export function BimiBlueprintArt({
 					fill="currentColor"
 					fillOpacity="0.04"
 				/>
-				{/* inner ring — concentric with the dotted r48 guide and the
+				{/* inner ring, concentric with the dotted r48 guide and the
 				    dashed r70 construction circle, same weight as timer ticks */}
 				<circle
 					cx="210"
@@ -139,7 +139,7 @@ export function BimiBlueprintArt({
 					strokeWidth="3"
 					fill="none"
 				/>
-				{/* check — centered on (210,170), same weight/caps as timer hands */}
+				{/* check, centered on (210,170), same weight/caps as timer hands */}
 				<path
 					d="M 188 170 L 204 186 L 234 150"
 					stroke="currentColor"
@@ -148,7 +148,7 @@ export function BimiBlueprintArt({
 					strokeLinejoin="round"
 					fill="none"
 				/>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

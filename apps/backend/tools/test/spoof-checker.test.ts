@@ -111,7 +111,7 @@ describe("Spoof Checker Service (evaluateSpoofability pure logic)", () => {
 		expect(res.spoofable).toBe(false);
 		expect(res.inboxOutcome).toBe("rejected");
 		expect(res.headline).toContain(
-			"No — receivers are told to reject fakes as you@stripe.com",
+			"No, receivers are told to reject fakes as you@stripe.com",
 		);
 	});
 

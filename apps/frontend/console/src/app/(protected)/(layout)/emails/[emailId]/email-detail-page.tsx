@@ -109,7 +109,7 @@ function formatHtml(html: string): string {
 }
 
 function formatLongDate(value: string | Date | null | undefined) {
-	if (!value) return "—";
+	if (!value) return "-";
 	return new Date(value).toLocaleString(undefined, {
 		weekday: "long",
 		year: "numeric",
@@ -726,7 +726,7 @@ export default function EmailDetailPage() {
 			</div>
 
 			<div className="space-y-6 pb-16">
-				{/* Metadata — dashboard-style key/value rows */}
+				{/* Metadata: dashboard-style key/value rows */}
 				<section>
 					<div className="flex flex-col gap-3.5">
 						<MetaRow label="From">
@@ -818,7 +818,7 @@ export default function EmailDetailPage() {
 							{isLoading ? (
 								<Skeleton className="h-4 w-24 rounded-md" />
 							) : (
-								<span className="capitalize">{email?.provider || "—"}</span>
+								<span className="capitalize">{email?.provider || "-"}</span>
 							)}
 						</MetaRow>
 

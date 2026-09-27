@@ -38,7 +38,7 @@ export function sessionQueryOptions() {
 export function useSessionQuery() {
 	return useQuery({
 		...sessionQueryOptions(),
-		// Skip on the server — no absolute auth baseURL without NEXT_PUBLIC_URL.
+		// Skip on the server: no absolute auth baseURL without NEXT_PUBLIC_URL.
 		enabled: typeof window !== "undefined",
 	});
 }

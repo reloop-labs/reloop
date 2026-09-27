@@ -98,7 +98,7 @@ export default function EmailHtmlEditorPage() {
 					<div className="mx-auto max-w-3xl text-center">
 						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
 							<span className="size-1.5 rounded-full bg-text-strong-950 dark:bg-white" />
-							Free tool — no account
+							Free tool, no account
 						</span>
 						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
 							Email HTML editor
@@ -116,7 +116,7 @@ export default function EmailHtmlEditorPage() {
 			<Band id="why-it-matters">
 				<SectionIntro
 					lead="Paste once. Edit visually. Keep the source."
-					description="A browser-only loop for React Email and table HTML — no login and no send."
+					description="A browser-only loop for React Email and table HTML, with no login and no send."
 				/>
 				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
 					{reasons.map((reason) => (

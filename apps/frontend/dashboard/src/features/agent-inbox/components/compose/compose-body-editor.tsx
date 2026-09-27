@@ -45,7 +45,7 @@ type ComposeBodyEditorProps = {
 	showToolbar?: boolean;
 };
 
-/** Full-width compose theme — no 600px email-canvas gutters. */
+/** Full-width compose theme, no 600px email-canvas gutters. */
 const composeTheme = extendTheme("basic", {
 	container: {
 		width: "100%",
@@ -136,7 +136,7 @@ function ComposeEditorBridge({
 }
 
 /**
- * React Email editor for compose — keeps the inbox toolbar look,
+ * React Email editor for compose. Keeps the inbox toolbar look,
  * with slash commands + email-ready export under the hood.
  */
 export const ComposeBodyEditor = forwardRef<
@@ -241,7 +241,7 @@ export const ComposeBodyEditor = forwardRef<
 });
 
 const COMPOSE_EDITOR_CSS = `
-/* Slash / bubble menus are portaled to body — sit above Radix modal (z-50). */
+/* Slash / bubble menus are portaled to body, so sit above Radix modal (z-50). */
 body > div:has([data-re-slash-command]),
 body > div:has([data-re-bubble-menu]),
 body > div:has([data-re-node-selector-content]),

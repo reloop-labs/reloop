@@ -34,8 +34,8 @@ export default function AlternativesIndexPage() {
 						Reloop vs. the rest
 					</h1>
 					<p className="mt-3 text-[16px] text-text-sub-600 leading-relaxed dark:text-white/50">
-						Side-by-side comparison pages—like alternative.to or G2—with feature
-						tables and migration paths.
+						Side-by-side comparison pages (like alternative.to or G2) with
+						feature tables and migration paths.
 					</p>
 				</div>
 			</div>

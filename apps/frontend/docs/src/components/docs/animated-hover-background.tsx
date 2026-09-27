@@ -17,7 +17,7 @@ interface AnimatedHoverBackgroundProps {
 	className?: string;
 	/** When true, disables the CSS transition so the background snaps instantly. */
 	skipTransition?: boolean;
-	/** HTTP method of the hovered/active item — drives the background tint color. */
+	/** HTTP method of the hovered/active item; drives the background tint color. */
 	method?: string | null;
 }
 

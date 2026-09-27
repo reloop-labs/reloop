@@ -104,7 +104,7 @@ export default function CreditsPage() {
 					)
 				}
 				title="Credits ledger"
-				description="Balances and top-ups for a single organization. From day to day, open the org hub — this page is the deep-link ledger."
+				description="Balances and top-ups for a single organization. From day to day, open the org hub. This page is the deep-link ledger."
 				actions={
 					organizationId ? (
 						<>
@@ -325,7 +325,7 @@ export default function CreditsPage() {
 										{formatNumber(entry.balanceAfter)}
 									</td>
 									<td className="px-4 py-3 text-text-sub-600">
-										{entry.reason || "—"}
+										{entry.reason || "-"}
 									</td>
 								</tr>
 							))}

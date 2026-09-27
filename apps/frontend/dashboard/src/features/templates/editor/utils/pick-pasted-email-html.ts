@@ -28,7 +28,7 @@ function unwrapClipboardHtml(html: string): string {
 /**
  * The HTML code editor pastes `text/plain` (the source string).
  * TipTap's default paste uses `text/html`, which is often empty or a
- * browser wrapper when copying source from a file/demo — then the
+ * browser wrapper when copying source from a file/demo; then the
  * canvas shows the tags as text. Prefer the source string.
  */
 export function pickPastedEmailHtml(

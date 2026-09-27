@@ -1,7 +1,7 @@
 ---
 title: Manual DNS setup
 sidebarTitle: Manual DNS setup
-description: Use manual setup for any DNS host — including every provider where Reloop does not offer Auto populate.
+description: Use manual setup for any DNS host, including every provider where Reloop does not offer Auto populate.
 
 ---
 
@@ -15,7 +15,7 @@ description: Use manual setup for any DNS host — including every provider wher
 
 <Steps>
   <Step title="Open your domain in Reloop">
-    Go to [Domains](https://reloop.sh/dashboard/domain) → select the domain. Keep this tab open — you will copy each row.
+    Go to [Domains](https://reloop.sh/dashboard/domain) → select the domain. Keep this tab open; you will copy each row.
   </Step>
   <Step title="Open your DNS provider">
     Use **Open DNS settings** in Reloop if shown, or jump to the matching [provider guide](/docs/guides/connect-domain/providers).
@@ -26,13 +26,13 @@ description: Use manual setup for any DNS host — including every provider wher
     1. Choose the same **type** (TXT, MX, CNAME)
     2. Set **name/host** as shown (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …)
     3. Paste **value** exactly
-    4. For MX, set **priority** (often `10`) — add **Receiving MX** (`inbound.reloop.sh`) only when Email Receiving is on
+    4. For MX, set **priority** (often `10`); add **Receiving MX** (`inbound.reloop.sh`) only when Email Receiving is on
     5. Save
 
     Provider UIs differ:
 
     - Some want blank host instead of `@`
-    - Some auto-append your domain — do not enter `reloop._domainkey.acme.com` if the UI already adds `acme.com`
+    - Some auto-append your domain, so do not enter `reloop._domainkey.acme.com` if the UI already adds `acme.com`
     - Cloudflare: keep records **DNS only** (grey cloud) unless you know you need a proxy (almost never for mail TXT/MX)
   </Step>
   <Step title="Merge SPF if needed">
@@ -49,7 +49,7 @@ description: Use manual setup for any DNS host — including every provider wher
 - [ ] DKIM TXT is complete (long `p=` value not cut off)
 - [ ] Only one SPF record on that host
 - [ ] DMARC published when Email Sending is on
-- [ ] Email Receiving toggled to match intent ([sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving)) — default is on for new domains
+- [ ] Email Receiving toggled to match intent ([sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving)); default is on for new domains
 - [ ] Tracking CNAME host matches the dashboard (`link` or `link.<sub>`) and is free or intentionally replaced
 
 ## Provider-specific guides

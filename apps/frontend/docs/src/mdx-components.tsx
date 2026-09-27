@@ -100,7 +100,7 @@ export function getMDXComponents(
 		Video: MDXVideo,
 		...restComponents,
 		Card: ({ icon, href, children, ...props }: any) => {
-			// Next.js basePath ("/docs") is applied automatically to <Link> —
+			// Next.js basePath ("/docs") is applied automatically to <Link>, so
 			// strip any hardcoded /docs prefix so links don't resolve to /docs/docs/…
 			const finalHref = href?.startsWith("/docs")
 				? href.slice("/docs".length) || "/"

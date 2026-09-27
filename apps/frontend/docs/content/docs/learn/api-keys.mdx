@@ -10,7 +10,7 @@ faq:
   - question: What happens when I rotate an API key?
     answer: Rotating invalidates the old secret string immediately and issues a new secret string for the same key ID. You must copy the new secret right away and update your applications.
   - question: What is the difference between disabling and deleting an API key?
-    answer: Disabling pauses access temporarily — requests using the key will fail with 401 Unauthorized, but you can re-enable it later. Deleting permanently revokes the key and cannot be undone.
+    answer: Disabling pauses access temporarily. Requests using the key will fail with 401 Unauthorized, but you can re-enable it later. Deleting permanently revokes the key and cannot be undone.
   - question: Can I use the same API key for both REST API and SMTP relay?
     answer: Yes. Reloop API keys work for both REST API requests (as x-api-key header) and SMTP authentication (using the key as password).
   - question: What should I do if an API key leaks?
@@ -69,11 +69,11 @@ faq:
     <Info>
     Disable a key to temporarily block access without deleting it. You can re-enable it at any time. Common reasons:
 
-    - **Security breach** — key was exposed in a public repo or logs.
-    - **System maintenance** — block requests during upgrades to prevent data corruption.
-    - **Testing transitions** — verify your system works with a new key before removing the old one.
-    - **Cost control** — stop billable consumption from a runaway app or loop.
-    - **Suspicious activity** — pause access while you investigate unusual request patterns.
+    - **Security breach**: key was exposed in a public repo or logs.
+    - **System maintenance**: block requests during upgrades to prevent data corruption.
+    - **Testing transitions**: verify your system works with a new key before removing the old one.
+    - **Cost control**: stop billable consumption from a runaway app or loop.
+    - **Suspicious activity**: pause access while you investigate unusual request patterns.
     </Info>
 
     1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
@@ -139,7 +139,7 @@ faq:
   </Accordion>
 
   <Accordion title="What is the difference between disabling and deleting an API key?">
-    **Disabling** pauses access temporarily — requests using the key fail with `401 Unauthorized`, but you can re-enable it later. **Deleting** permanently removes the key record and cannot be undone.
+    **Disabling** pauses access temporarily. Requests using the key fail with `401 Unauthorized`, but you can re-enable it later. **Deleting** permanently removes the key record and cannot be undone.
   </Accordion>
 
   <Accordion title="Can I use the same API key for both REST API and SMTP relay?">

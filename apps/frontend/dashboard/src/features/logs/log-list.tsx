@@ -222,7 +222,7 @@ export function LogList({
 
 	return (
 		<div className="flex min-h-0 flex-col">
-			{/* Outcome tabs — same height as Emails Sent/Received */}
+			{/* Outcome tabs: same height as Emails Sent/Received */}
 			<TabMenuHorizontal.Root
 				value={outcomeTab || "all"}
 				onValueChange={(val) => {
@@ -294,7 +294,7 @@ export function LogList({
 				</TabMenuHorizontal.List>
 			</TabMenuHorizontal.Root>
 
-			{/* Filter bar — all controls share h-9 */}
+			{/* Filter bar: all controls share h-9 */}
 			<div className="flex flex-wrap items-center gap-2 pt-2">
 				<div className="min-w-[200px] flex-1">
 					<Input.Root size="small" className="h-9 rounded-xl">
@@ -392,7 +392,7 @@ export function LogList({
 				</button>
 			</div>
 
-			{/* Unified split pane — Stripe-style list + detail */}
+			{/* Unified split pane: Stripe-style list + detail */}
 			{error ? (
 				<div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-8 dark:border-stroke-soft-100/40">
 					<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
@@ -432,7 +432,7 @@ export function LogList({
 					className="mt-3 flex min-h-0 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5"
 					style={{ height: "calc(100vh - 320px)", minHeight: 400 }}
 				>
-					{/* LEFT — Request list */}
+					{/* LEFT: Request list */}
 					<div className="flex w-[min(480px,42%)] shrink-0 flex-col border-stroke-soft-100 border-r dark:border-stroke-soft-100/40">
 						<LogTable
 							logs={data?.logs || []}
@@ -459,7 +459,7 @@ export function LogList({
 						/>
 					</div>
 
-					{/* RIGHT — Detail panel */}
+					{/* RIGHT: Detail panel */}
 					<div className="min-w-0 flex-1 overflow-y-auto">
 						{selectedLogId ? (
 							<LogDetailPanel logId={selectedLogId} />

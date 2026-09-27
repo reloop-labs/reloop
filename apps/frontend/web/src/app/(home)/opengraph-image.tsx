@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Reloop — Email for AI Agents & Developers";
+export const alt = "Reloop | Email for AI Agents & Developers";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -67,7 +67,7 @@ export default async function OpenGraphImage() {
 				}}
 			/>
 
-			{/* Logo — top left */}
+			{/* Logo, top left */}
 			<div
 				style={{
 					position: "absolute",
@@ -260,7 +260,7 @@ export default async function OpenGraphImage() {
 				</span>
 			</div>
 
-			{/* reloop.sh — top right */}
+			{/* reloop.sh, top right */}
 			<div
 				style={{
 					position: "absolute",
@@ -307,7 +307,7 @@ export default async function OpenGraphImage() {
 					An open-source alternative to SendGrid, Postmark, AWS SES
 				</span>
 
-				{/* headline line 1 — solid white */}
+				{/* headline line 1, solid white */}
 				<span
 					style={{
 						fontSize: "78px",
@@ -320,7 +320,7 @@ export default async function OpenGraphImage() {
 					Email for AI Agents
 				</span>
 
-				{/* headline line 2 — dim white */}
+				{/* headline line 2, dim white */}
 				<span
 					style={{
 						fontSize: "78px",
@@ -344,8 +344,8 @@ export default async function OpenGraphImage() {
 						maxWidth: "620px",
 					}}
 				>
-					High-performance, open-source email infrastructure—the same service as
-					proprietary platforms. Hosted or self-hosted.
+					High-performance, open-source email infrastructure, the same service
+					as proprietary platforms. Hosted or self-hosted.
 				</span>
 			</div>
 

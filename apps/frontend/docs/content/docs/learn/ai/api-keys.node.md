@@ -1,4 +1,4 @@
-# API Keys — Node
+# API Keys (Node)
 
 > Agent-optimized samples for managing Reloop API keys in Node. Index: [api-keys.md](./api-keys.md)
 

@@ -304,7 +304,7 @@ def send_welcome(request):
 		slug: "fastapi",
 		name: "FastAPI",
 		shortDescription:
-			"Async FastAPI endpoints that send email with Reloop—type hints, Pydantic, and OpenAPI included.",
+			"Async FastAPI endpoints that send email with Reloop. Type hints, Pydantic, and OpenAPI included.",
 		languageSlug: "python",
 		languageName: "Python",
 		installCommand: "pip install reloop-email",
@@ -437,7 +437,7 @@ end`,
 		slug: "spring-boot",
 		name: "Spring Boot",
 		shortDescription:
-			"Integrate Reloop into Spring Boot services with the Java SDK—Maven or Gradle ready.",
+			"Integrate Reloop into Spring Boot services with the Java SDK. Maven or Gradle ready.",
 		languageSlug: "java",
 		languageName: "Java",
 		installCommand: "sh.reloop:reloop-email",

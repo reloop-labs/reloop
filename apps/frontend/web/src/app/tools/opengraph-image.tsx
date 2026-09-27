@@ -74,7 +74,7 @@ export default async function OpenGraphImage() {
 				}}
 			/>
 
-			{/* left — essay */}
+			{/* left: essay */}
 			<div
 				style={{
 					display: "flex",
@@ -333,7 +333,7 @@ export default async function OpenGraphImage() {
 				</span>
 			</div>
 
-			{/* right — note frame card */}
+			{/* right: note frame card */}
 			<div
 				style={{
 					display: "flex",

@@ -184,12 +184,12 @@ export default function WorksWith({ topFold = false }: { topFold?: boolean }) {
 					<p
 						className={`mx-auto max-w-xl text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50 ${topFold ? "mt-3" : "mt-4"}`}
 					>
-						No extra setup — plug Reloop into the mailer or platform you already
+						No extra setup. Plug Reloop into the mailer or platform you already
 						use.
 					</p>
 				</div>
 
-				{/* Mobile & tablet — centered wrap grid */}
+				{/* Mobile & tablet: centered wrap grid */}
 				<div
 					className={`mx-auto flex max-w-[20rem] flex-wrap justify-center gap-2.5 sm:max-w-md sm:gap-3 md:max-w-xl lg:hidden ${topFold ? "mt-6 sm:mt-8" : "mt-10 sm:mt-14"}`}
 				>
@@ -198,7 +198,7 @@ export default function WorksWith({ topFold = false }: { topFold?: boolean }) {
 					))}
 				</div>
 
-				{/* Desktop — diamond honeycomb */}
+				{/* Desktop: diamond honeycomb */}
 				<div
 					className={`hidden lg:block ${topFold ? "mt-8 lg:mt-10" : "mt-14 lg:mt-20"}`}
 				>

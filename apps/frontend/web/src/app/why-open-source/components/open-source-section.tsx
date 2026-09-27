@@ -29,7 +29,7 @@ const sections = [
 		title: "Open source isn't enough",
 		lines: [
 			"Free software. Not free time.",
-			"DNS, queues, retries, monitoring — the repo doesn't do that. You do.",
+			"DNS, queues, retries, monitoring: the repo doesn't do that. You do.",
 		],
 		strong: "Reloop ships the part open source leaves out: done.",
 	},

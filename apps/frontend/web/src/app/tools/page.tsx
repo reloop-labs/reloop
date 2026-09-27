@@ -26,7 +26,7 @@ export const metadata = createLandingMetadata(
 export default function ToolsIndexPage() {
 	return (
 		<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#2563eb] [--primary-dark:#1d4ed8] [--primary-darker:#1e40af] [--primary-link:#1d4ed8] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
-			{/* Hero Section — matches pricing / why-open-source */}
+			{/* Hero Section, matches pricing / why-open-source */}
 			<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-28 text-center sm:px-8 sm:pb-36 lg:px-12">
 				<div
 					aria-hidden="true"
@@ -69,7 +69,7 @@ export default function ToolsIndexPage() {
 			{/* Tools Grid */}
 			<ToolsGrid />
 
-			{/* Global Upsell / Platform CTA — same as temp-email-checker */}
+			{/* Global Upsell / Platform CTA, same as temp-email-checker */}
 			<BlueprintCta
 				headlineLine1="Start sending email today"
 				headlineLine2="$0 / mo."

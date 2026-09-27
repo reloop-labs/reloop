@@ -3,7 +3,7 @@ export type PricingFaqItem = {
 	answer: string;
 };
 
-/** Canonical pricing FAQ — UI and JSON-LD must stay in lockstep. */
+/** Canonical pricing FAQ; UI and JSON-LD must stay in lockstep. */
 export const pricingFaqItems: PricingFaqItem[] = [
 	{
 		question: "What counts as an email?",

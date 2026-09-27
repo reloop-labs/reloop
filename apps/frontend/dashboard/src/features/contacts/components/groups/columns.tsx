@@ -27,7 +27,7 @@ function GroupContactsCount({ groupId }: { groupId: string }) {
 	if (isLoading) return <Skeleton className="h-4 w-8" />;
 	return (
 		<span className="font-medium text-sm text-text-sub-600">
-			{data?.total ?? "—"}
+			{data?.total ?? "-"}
 		</span>
 	);
 }
@@ -131,7 +131,7 @@ export const groupColumns: ColumnDef<Group>[] = [
 				<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 					{row.original.updatedAt
 						? formatRelativeTime(row.original.updatedAt)
-						: "—"}
+						: "-"}
 				</span>
 			</div>
 		),
@@ -149,7 +149,7 @@ export const groupColumns: ColumnDef<Group>[] = [
 				<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 					{row.original.createdAt
 						? formatRelativeTime(row.original.createdAt)
-						: "—"}
+						: "-"}
 				</span>
 			</div>
 		),

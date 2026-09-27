@@ -75,7 +75,7 @@ export function Navbar({
 
 	return (
 		<div className="flex h-full w-full min-w-0 items-center justify-between gap-2 px-3">
-			{/* Mobile — match dashboard brand lockup */}
+			{/* Mobile: match dashboard brand lockup */}
 			<div className="flex shrink-0 items-center gap-2 lg:hidden">
 				<button
 					type="button"

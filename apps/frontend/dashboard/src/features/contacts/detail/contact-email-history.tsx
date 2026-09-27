@@ -81,7 +81,7 @@ export type ActivityFilter = "all" | "emails";
 /** Compact time: "4h ago", "2d ago" */
 function formatCompactTime(date: string | Date): string {
 	const target = new Date(date).getTime();
-	if (Number.isNaN(target)) return "—";
+	if (Number.isNaN(target)) return "-";
 
 	const diffSec = Math.max(0, Math.floor((Date.now() - target) / 1000));
 	if (diffSec < 45) return "just now";
@@ -111,7 +111,7 @@ function dayKey(date: string | Date): string {
 /** "FRIDAY, SEPTEMBER 11, 2026" */
 function formatDayHeader(date: string | Date): string {
 	const d = new Date(date);
-	if (Number.isNaN(d.getTime())) return "—";
+	if (Number.isNaN(d.getTime())) return "-";
 	const now = new Date();
 	const withYear = d.getFullYear() !== now.getFullYear();
 	return d
@@ -127,7 +127,7 @@ function formatDayHeader(date: string | Date): string {
 /** "6:19 pm" */
 function formatTimeAmPm(date: string | Date): string {
 	const d = new Date(date);
-	if (Number.isNaN(d.getTime())) return "—";
+	if (Number.isNaN(d.getTime())) return "-";
 	return d
 		.toLocaleTimeString("en-US", {
 			hour: "numeric",
@@ -139,7 +139,7 @@ function formatTimeAmPm(date: string | Date): string {
 
 function formatRowDate(date: string): string {
 	const d = new Date(date);
-	if (Number.isNaN(d.getTime())) return "—";
+	if (Number.isNaN(d.getTime())) return "-";
 	return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
@@ -409,12 +409,12 @@ function PropertyDiffList({ changes }: { changes: HistoryChange[] }) {
 						change.from !== null &&
 						change.from !== undefined &&
 						String(change.from).trim() !== "" &&
-						String(change.from).trim() !== "—";
+						String(change.from).trim() !== "\u2014";
 					const hasTo =
 						change.to !== null &&
 						change.to !== undefined &&
 						String(change.to).trim() !== "" &&
-						String(change.to).trim() !== "—";
+						String(change.to).trim() !== "\u2014";
 
 					return (
 						<span

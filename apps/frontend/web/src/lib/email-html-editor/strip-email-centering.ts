@@ -3,7 +3,7 @@
  * TipTap's AlignmentAttribute treats that as text-align, so every block
  * goes center. Convert *column* centering to margin:auto and drop the attr.
  * Inner tables (buttons, footer) that use align="center" to center *content*
- * must keep text-align:center — the canvas used to force those back to start.
+ * must keep text-align:center; the canvas used to force those back to start.
  */
 export function isEmailContainerTable(table: Element): boolean {
 	const style = table.getAttribute("style") || "";
@@ -449,7 +449,7 @@ function isFullWidthTable(el: HTMLElement): boolean {
  * A nested table with max-width below the column is an inner block and
  * still needs margin:auto from align=center.
  *
- * A 2-cell footer with style width:166px is not a layout row — React Email
+ * A 2-cell footer with style width:166px is not a layout row; React Email
  * also sets width="100%" as a leftover attr. Prefer the CSS width.
  */
 function isLayoutCenteredTable(el: HTMLElement): boolean {

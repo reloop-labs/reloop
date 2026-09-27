@@ -27,7 +27,7 @@ const langIcons: Record<SmtpLanguageId, { path: string; hex: string }> = {
 	go: siGo,
 	php: siPhp,
 	ruby: siRuby,
-	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	// Brand hex is #000000, so override it so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
 	curl: siCurl,
 };

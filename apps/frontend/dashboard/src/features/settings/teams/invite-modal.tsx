@@ -111,7 +111,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 		...(membersData?.members?.map((m: { user: { email: string } }) =>
 			m.user.email.toLowerCase(),
 		) ?? []),
-		// Only block on still-valid pending invites — expired ones can be re-sent.
+		// Only block on still-valid pending invites; expired ones can be re-sent.
 		...(invitesData
 			?.filter((i: { status: string; expiresAt: Date | string }) =>
 				isInvitationActionable(i),

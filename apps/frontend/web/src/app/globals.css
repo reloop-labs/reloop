@@ -86,7 +86,7 @@ body.dark,
 	}
 }
 
-/* Blog post prose — mirrors docs typography */
+/* Blog post prose, mirrors docs typography */
 .blog-prose {
 	color: rgb(23 23 23 / 0.8);
 	font-size: 15px;

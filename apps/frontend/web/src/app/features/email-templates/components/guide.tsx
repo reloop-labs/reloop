@@ -29,8 +29,8 @@ export default function Guide() {
 								Choose a template
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Browse the library by category—newsletters, transactional,
-								marketing—or start from a blank canvas.
+								Browse the library by category (newsletters, transactional,
+								marketing) or start from a blank canvas.
 							</p>
 						</div>
 					</div>

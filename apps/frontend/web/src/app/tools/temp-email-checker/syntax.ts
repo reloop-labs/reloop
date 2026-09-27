@@ -15,17 +15,16 @@ export type SyntaxFailure =
 
 export const SYNTAX_DETAIL: Record<SyntaxFailure, string> = {
 	empty: "Enter an email or a domain to check.",
-	"no-domain": "Nothing after the @ — the domain is missing.",
+	"no-domain": "Nothing after the @, so the domain is missing.",
 	"multiple-at": "An address can only contain one @.",
-	"local-part-empty": "Nothing before the @ — the mailbox name is missing.",
+	"local-part-empty": "Nothing before the @, so the mailbox name is missing.",
 	"local-part-too-long": "The part before the @ is longer than 64 characters.",
 	"local-part-invalid":
 		"The part before the @ contains a stray dot or an illegal character.",
 	"domain-too-long": "The domain is longer than 253 characters.",
 	"domain-invalid": "The domain contains characters that cannot appear in one.",
 	"domain-single-label": "Missing a top-level domain, such as .com.",
-	"domain-label-empty":
-		"The domain has an empty part — check for a double dot.",
+	"domain-label-empty": "The domain has an empty part. Check for a double dot.",
 	"domain-label-too-long":
 		"One part of the domain is longer than 63 characters.",
 	"domain-label-hyphen": "A part of the domain starts or ends with a hyphen.",

@@ -16,7 +16,7 @@ const EXTRA_DIRS = [
 function standardize(content: string): string {
 	let next = content;
 
-	// Node.js — SDK 2.0: named import + { apiKey } (no key/url aliases, no string ctor)
+	// Node.js SDK 2.0: named import + { apiKey } (no key/url aliases, no string ctor)
 	next = next.replace(/@reloop\/node/g, "reloop-email");
 	next = next.replace(
 		/import Reloop from ['"]reloop-email['"];/g,

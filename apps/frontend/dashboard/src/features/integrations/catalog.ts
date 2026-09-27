@@ -1,5 +1,5 @@
 /**
- * Integrations catalog for the dashboard — platform discovery / roadmap.
+ * Integrations catalog for the dashboard: platform discovery / roadmap.
  */
 
 export type IntegrationCategory = "automation" | "commerce" | "developer";

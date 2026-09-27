@@ -2,7 +2,7 @@ import type { CopyCodeBlockIcon } from "@reloop/ui/copy-code-block";
 
 /**
  * Full-color Bun mascot (official cream palette).
- * simple-icons ships a flat black glyph — this multi-layer SVG stays visible on dark UI.
+ * simple-icons ships a flat black glyph; this multi-layer SVG stays visible on dark UI.
  */
 export const bunIcon: CopyCodeBlockIcon = {
 	path: "",

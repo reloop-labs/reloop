@@ -145,7 +145,7 @@ const AboutPage = () => {
 										That&apos;s the Reloop Engine. Automated IP warmup with
 										volume ramps. Smart retries with backoff. Suppression lists
 										that actually suppress. DKIM rotation, SPF/DMARC alignment,
-										blocklist and reputation monitoring — in the open. Same
+										blocklist and reputation monitoring, in the open. Same
 										engine self-hosted or on reloop.sh. Nothing to babysit. The
 										system does it.
 									</p>
@@ -162,11 +162,11 @@ const AboutPage = () => {
 							</p>
 
 							<p className="text-text-strong-950 dark:text-neutral-200">
-								A place where warm-up isn&apos;t a spreadsheet —
+								A place where warm-up isn&apos;t a spreadsheet,
 								<br />
 								it&apos;s the pipeline.
 								<br />
-								Where IP reputation isn&apos;t a score someone sells you —
+								Where IP reputation isn&apos;t a score someone sells you,
 								<br />
 								it&apos;s signals you can see.
 								<br />

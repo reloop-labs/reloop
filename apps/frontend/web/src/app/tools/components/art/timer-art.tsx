@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same visual language as the OG image / CTA drafting art:
  * grid guides, construction circles, dimension bars, anchor nodes.
  * Strokes use currentColor so it picks up `text-primary-base`.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function TempEmailTimerArt({
 	className,
@@ -83,7 +83,7 @@ export function TempEmailTimerArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"

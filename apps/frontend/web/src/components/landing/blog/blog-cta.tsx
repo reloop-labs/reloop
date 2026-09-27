@@ -18,7 +18,7 @@ const DEFAULT_VARIANT: CategoryVariant = {
 const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 	Careers: {
 		headline: "Your commits are your résumé.",
-		sub: "Reloop is fully open-source. Contribute code, fix bugs, or ship features — and if you're good, we'll find you.",
+		sub: "Reloop is fully open-source. Contribute code, fix bugs, or ship features, and if you're good, we'll find you.",
 		primaryLabel: "Start Contributing",
 		secondaryLabel: "Browse Good First Issues",
 	},
@@ -29,17 +29,17 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 	},
 	"AI & Automation": {
 		headline: "Ready to connect your agents?",
-		sub: "Fire transactional emails straight from your LLM workflows — with built-in rate limiting and full logs.",
+		sub: "Fire transactional emails straight from your LLM workflows, with built-in rate limiting and full logs.",
 		primaryLabel: "Try it free",
 	},
 	Growth: {
 		headline: "Ready to grow with email?",
-		sub: "Activation flows, re-engagement sequences, and product-led drips — all from one open-source platform.",
+		sub: "Activation flows, re-engagement sequences, and product-led drips, all from one open-source platform.",
 		primaryLabel: "Get started free",
 	},
 	"Self-Hosting": {
 		headline: "Ready to deploy?",
-		sub: "Self-host Reloop in minutes. Full control over data, routing, and compliance — forever.",
+		sub: "Self-host Reloop in minutes. Full control over data, routing, and compliance, forever.",
 		primaryLabel: "Deploy today",
 	},
 	Deliverability: {
@@ -64,7 +64,7 @@ const CATEGORY_VARIANTS: Record<string, CategoryVariant> = {
 	},
 	Comparison: {
 		headline: "Ready to choose?",
-		sub: "Reloop is open source, self-hostable, and priced for builders — compare plans and features before you commit.",
+		sub: "Reloop is open source, self-hostable, and priced for builders. Compare plans and features before you commit.",
 		primaryLabel: "Get started free",
 	},
 	Glossary: {
@@ -182,7 +182,7 @@ export function BlogCta({
 	tertiaryHref?: string;
 	tertiaryExternal?: boolean;
 	accentColor?: CtaAccentColor;
-	/** Brand hex (e.g. NestJS red) — tints the CTA glow and lines */
+	/** Brand hex (e.g. NestJS red); tints the CTA glow and lines */
 	accentHex?: string;
 	/** Skip inner max-width rails when the page already has a frame. */
 	flush?: boolean;

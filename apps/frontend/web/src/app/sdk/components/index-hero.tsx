@@ -63,7 +63,7 @@ export default function IndexHero() {
 				</h1>
 
 				<p className="mt-3 max-w-2xl text-balance text-[14px] text-text-sub-600 leading-relaxed sm:mt-4 sm:text-[16px] dark:text-white/60">
-					Framework guides for Next.js, Django, Laravel, and more—plus official
+					Framework guides for Next.js, Django, Laravel, and more, plus official
 					SDKs for Node.js, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET.
 				</p>
 

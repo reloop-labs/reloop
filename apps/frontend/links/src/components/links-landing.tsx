@@ -11,7 +11,7 @@ export function LinksLanding() {
 	return (
 		<div className="links-retro flex h-dvh w-full items-center justify-center p-4 sm:p-6">
 			<div className="links-poster relative flex h-full max-h-[820px] w-full max-w-[420px] flex-col">
-				{/* Theme control — top right of the plate */}
+				{/* Theme control, top right of the plate */}
 				<div className="absolute top-3 right-3 z-10 sm:top-4 sm:right-4">
 					<ThemeToggle />
 				</div>
@@ -108,9 +108,8 @@ export function LinksLanding() {
 							About Reloop
 						</p>
 						<p className="links-poster-about mx-auto mt-2 max-w-[36ch] text-[12px] leading-relaxed sm:text-[13px]">
-							Reloop is the email platform behind this host — transactional
-							mail, domains, tracking, and preference pages for modern product
-							teams.
+							Reloop is the email platform behind this host: transactional mail,
+							domains, tracking, and preference pages for modern product teams.
 						</p>
 						<a
 							href={socialProfiles.main}

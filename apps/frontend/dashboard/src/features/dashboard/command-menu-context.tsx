@@ -13,7 +13,7 @@ type RegisterFn = (id: string, group: PageActionGroup) => void;
 type UnregisterFn = (id: string) => void;
 
 /**
- * Stable dispatch context — register/unregister never change identity,
+ * Stable dispatch context: register/unregister never change identity,
  * so the hook's effect doesn't re-fire when groups update.
  */
 const DispatchContext = React.createContext<{
@@ -21,7 +21,7 @@ const DispatchContext = React.createContext<{
 	unregister: UnregisterFn;
 } | null>(null);
 
-/** State context — holds the current set of registered groups. */
+/** State context that holds the current set of registered groups. */
 const StateContext = React.createContext<Map<string, PageActionGroup>>(
 	new Map(),
 );

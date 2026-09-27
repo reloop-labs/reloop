@@ -42,7 +42,7 @@ export const DNSRecordsSection = ({
 	);
 	const hasReceiving = receivingRecords.length > 0;
 
-	// S / R / T — toggle sending, receiving, tracking (hints via long-press Space).
+	// S / R / T: toggle sending, receiving, tracking (hints via long-press Space).
 	useHotkeys(
 		"s",
 		(e) => {
@@ -62,7 +62,7 @@ export const DNSRecordsSection = ({
 	useHotkeys(
 		"r",
 		(e) => {
-			// F→R is reserved for "Forward records" — don't toggle receiving mid-sequence.
+			// F→R is reserved for "Forward records", so don't toggle receiving mid-sequence.
 			if (isForwardRecordsSequence()) return;
 
 			e.preventDefault();
@@ -238,7 +238,7 @@ export const DNSRecordsSection = ({
 				</div>
 			)}
 
-			{/* Tracking Group — always show so users can enable click/open tracking
+			{/* Tracking Group: always show so users can enable click/open tracking
 			    and see the CNAME they need to add (mirrors Email Sending). */}
 			<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 				<div className="flex items-center justify-between">

@@ -20,7 +20,7 @@ type ChatMessage = {
 };
 
 const STUB_REPLY =
-	"Got it. Agent runtime isn’t connected yet — this panel is UI-ready for when it is.";
+	"Got it. Agent runtime isn’t connected yet. This panel is UI-ready for when it is.";
 
 export const AiSidebar = ({
 	open = true,

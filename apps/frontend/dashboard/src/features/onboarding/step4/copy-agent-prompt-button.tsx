@@ -15,7 +15,7 @@ function PromptIcon({ className }: { className?: string }) {
 	);
 }
 
-/** Same control as the marketing hero — copies the onboarding agent prompt. */
+/** Same control as the marketing hero; copies the onboarding agent prompt. */
 export function CopyAgentPromptButton({
 	prompt,
 	className,

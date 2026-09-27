@@ -9,7 +9,7 @@ const smtpFaqItems = [
 	{
 		question: "Do SMTP sends count toward my email quota?",
 		answer:
-			"Yes. Each successfully sent email via SMTP relay counts toward your monthly quota—the same as transactional API sends and campaign deliveries.",
+			"Yes. Each successfully sent email via SMTP relay counts toward your monthly quota, the same as transactional API sends and campaign deliveries.",
 	},
 	{
 		question: "Can I use SMTP without changing my app code?",
@@ -29,7 +29,7 @@ const smtpFaqItems = [
 	{
 		question: "Can I self-host the SMTP relay?",
 		answer:
-			"Yes. Reloop is open source—you can run the full stack including SMTP relay on your own infrastructure, or use the hosted relay from Reloop Labs.",
+			"Yes. Reloop is open source. You can run the full stack including SMTP relay on your own infrastructure, or use the hosted relay from Reloop Labs.",
 	},
 ];
 

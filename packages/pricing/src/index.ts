@@ -106,7 +106,7 @@ export const pricingPlans: PricingPlan[] = [
 		comparison: {
 			monthlyEmails: "3,000",
 			dailyLimit: "100",
-			overage: "—",
+			overage: "-",
 			agentInbox: "1 inbox",
 			webhooks: "1 webhook",
 			customDomains: "3 domains",
@@ -122,7 +122,7 @@ export const pricingPlans: PricingPlan[] = [
 			humanInbox: true,
 			emailAuth: true,
 			pristineSharedIps: true,
-			dedicatedIp: "—",
+			dedicatedIp: "-",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -135,7 +135,7 @@ export const pricingPlans: PricingPlan[] = [
 			integrations: true,
 			auditLogs: true,
 			support: "Community",
-			uptimeSla: "—",
+			uptimeSla: "-",
 		},
 	},
 	{
@@ -178,7 +178,7 @@ export const pricingPlans: PricingPlan[] = [
 			humanInbox: true,
 			emailAuth: true,
 			pristineSharedIps: true,
-			dedicatedIp: "—",
+			dedicatedIp: "-",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -191,7 +191,7 @@ export const pricingPlans: PricingPlan[] = [
 			integrations: true,
 			auditLogs: true,
 			support: "Dedicated",
-			uptimeSla: "—",
+			uptimeSla: "-",
 		},
 	},
 	{
@@ -250,7 +250,7 @@ export const pricingPlans: PricingPlan[] = [
 			integrations: true,
 			auditLogs: true,
 			support: "Dedicated",
-			uptimeSla: "—",
+			uptimeSla: "-",
 		},
 	},
 	{

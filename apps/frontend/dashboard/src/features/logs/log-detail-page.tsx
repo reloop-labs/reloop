@@ -108,7 +108,7 @@ function PropertyValue({
 	copyable?: boolean;
 	maxLength?: number;
 }) {
-	if (!value) return <span className="text-text-soft-400 text-xs">—</span>;
+	if (!value) return <span className="text-text-soft-400 text-xs">-</span>;
 	const isTruncated = maxLength && value.length > maxLength;
 	const display = isTruncated ? `${value.slice(0, maxLength)}…` : value;
 	const content = (
@@ -247,7 +247,7 @@ export function LogDetailPage({ logId }: { logId: string }) {
 											{statusProps.label}
 										</Badge.Root>
 									) : (
-										<span className="text-text-soft-400 text-xs">—</span>
+										<span className="text-text-soft-400 text-xs">-</span>
 									)}
 								</PropertyRow>
 

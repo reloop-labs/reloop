@@ -1,6 +1,6 @@
 ---
 title: "Self-Host Your Email Infrastructure for $5/Month"
-description: A complete guide to running your own transactional email stack with Reloop on a cheap VPS — SMTP, REST API, analytics dashboard, and bounce handling — for less than a cup of coffee a month.
+description: A complete guide to running your own transactional email stack with Reloop on a cheap VPS (SMTP, REST API, analytics dashboard, and bounce handling) for less than a cup of coffee a month.
 keywords:
   - self host email cheap
   - cheap transactional email
@@ -27,7 +27,7 @@ At 10,000 emails/month: SendGrid charges $19.95. Resend charges $20. Mailgun cha
 
 Scale to 50,000/month and you're looking at $89 (SendGrid), $90 (Resend), or $75 (Mailgun). Per month. Every month. With per-email overages if you spike.
 
-A Hetzner CAX11 ARM VPS costs **€3.29/month** (~$3.50). With a custom domain and proper DNS, running Reloop on that server gives you everything those managed providers offer — the REST API, the analytics dashboard, SMTP relay, bounce handling, webhook events, template management — for a fixed cost that doesn't scale with volume.
+A Hetzner CAX11 ARM VPS costs **€3.29/month** (~$3.50). With a custom domain and proper DNS, running Reloop on that server gives you everything those managed providers offer (the REST API, the analytics dashboard, SMTP relay, bounce handling, webhook events, template management) for a fixed cost that doesn't scale with volume.
 
 This guide walks you through the full setup, from provisioning the server to sending your first production email.
 
@@ -84,7 +84,7 @@ For Hetzner specifically: the **CAX11** (ARM, 2 vCPU, 4 GB RAM, 40 GB SSD) at �
 7. Add your SSH public key (or create one: `ssh-keygen -t ed25519 -C "your-email"`)
 8. Click **Create & Buy Now**
 
-Note your server's public IP address — you'll need it shortly.
+Note your server's public IP address. You'll need it shortly.
 
 ### Important: check port 25
 
@@ -98,7 +98,7 @@ While you wait, continue with DNS setup.
 
 Good DNS setup is what separates a self-hosted email stack that lands in the inbox from one that goes straight to spam. Do this before installing anything.
 
-### A record — point your domain to the server
+### A record: point your domain to the server
 
 ```
 Type: A
@@ -111,13 +111,13 @@ This creates `mail.yourdomain.com` pointing to your server.
 
 ### PTR record (reverse DNS)
 
-This is critical and often overlooked. A PTR record is the reverse of an A record — it maps an IP address back to a hostname. ISPs check PTR records to verify that the IP sending email is who it claims to be.
+This is critical and often overlooked. A PTR record is the reverse of an A record: it maps an IP address back to a hostname. ISPs check PTR records to verify that the IP sending email is who it claims to be.
 
 In Hetzner's console, go to your server → **Networking** → **Set rDNS** and set it to `mail.yourdomain.com` (matching your A record).
 
 Most spam issues from fresh self-hosted setups come from missing PTR records. Don't skip this.
 
-### MX record — for receiving email (optional but recommended)
+### MX record: for receiving email (optional but recommended)
 
 If you want to receive email (not just send), add an MX record:
 
@@ -131,7 +131,7 @@ TTL: 3600
 
 ### SPF, DKIM, DMARC
 
-You'll add these after Reloop is running — the dashboard gives you the exact records to add. For now, add a placeholder SPF:
+You'll add these after Reloop is running. The dashboard gives you the exact records to add. For now, add a placeholder SPF:
 
 ```
 Type: TXT
@@ -278,7 +278,7 @@ Open your dashboard at `https://dashboard.yourdomain.com`. On first login:
    - **DKIM**: two CNAME records with your public key
    - **DMARC**: a starter `p=none` record
 
-Add them all to your DNS. Then click **Verify** in the dashboard — it will confirm each record is in place.
+Add them all to your DNS. Then click **Verify** in the dashboard. It will confirm each record is in place.
 
 ---
 
@@ -302,9 +302,9 @@ curl -X POST https://mail.yourdomain.com/v1/emails \
 ```
 
 Check your inbox. If it's not there, check:
-1. `docker compose logs reloop-api` — any errors?
-2. `docker compose logs reloop-smtp` — SMTP handshake issues?
-3. DNS is propagated — `dig TXT yourdomain.com` shows your SPF record?
+1. `docker compose logs reloop-api`: any errors?
+2. `docker compose logs reloop-smtp`: SMTP handshake issues?
+3. DNS is propagated: `dig TXT yourdomain.com` shows your SPF record?
 
 ---
 
@@ -317,7 +317,7 @@ The Reloop API is compatible with the Resend API shape. If you're migrating from
 import { Resend } from "resend";
 const client = new Resend(process.env.RESEND_API_KEY);
 
-// After (Reloop — self-hosted)
+// After (Reloop, self-hosted)
 import { Reloop } from "reloop-email";
 const client = new Reloop(process.env.RELOOP_API_KEY, {
   baseUrl: "https://mail.yourdomain.com/v1",

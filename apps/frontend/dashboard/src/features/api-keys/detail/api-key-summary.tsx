@@ -145,7 +145,7 @@ export function ApiKeySummary({
 					) : (
 						<div className="flex items-center gap-2 rounded-xl bg-bg-weak-50 py-2 pr-2 pl-3 dark:bg-bg-weak-50/50">
 							<code className="min-w-0 flex-1 truncate font-medium font-mono text-[13px] text-text-strong-950">
-								{displayPrefix ? `${displayPrefix}…` : "—"}
+								{displayPrefix ? `${displayPrefix}…` : "-"}
 							</code>
 							{displayPrefix ? (
 								<div className="flex shrink-0 items-center border-stroke-soft-100 border-l pl-1 dark:border-stroke-soft-100/40">

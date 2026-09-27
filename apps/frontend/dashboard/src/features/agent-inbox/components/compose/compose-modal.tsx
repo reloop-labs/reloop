@@ -915,7 +915,7 @@ export const ComposeModal = ({
 								</div>
 							</div>
 
-							{/* To / Cc / Bcc — collapse empty Cc/Bcc when leaving this block */}
+							{/* To / Cc / Bcc: collapse empty Cc/Bcc when leaving this block */}
 							<div ref={addressFieldsRef} onBlur={handleAddressFocusOut}>
 								{/* To */}
 								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
@@ -1117,9 +1117,9 @@ export const ComposeModal = ({
 							</div>
 						</div>
 
-						{/* Body — editor + inline AI status below */}
+						{/* Body: editor + inline AI status below */}
 						<div className="flex flex-col">
-							{/* Editor — always fully visible */}
+							{/* Editor, always fully visible */}
 							<div
 								className={cn(
 									"flex min-h-[200px] flex-1 flex-col",

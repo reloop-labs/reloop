@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, frame stroke 4, mark stroke 5, detail stroke 3/2)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function DeliverabilityBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function DeliverabilityBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function DeliverabilityBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -117,7 +117,7 @@ export function DeliverabilityBlueprintArt({
 					fill="none"
 					opacity="0.7"
 				/>
-				{/* paper plane — same weight as the timer face */}
+				{/* paper plane, same weight as the timer face */}
 				<path
 					d="M 104 145 L 284 97 L 218 226 L 194 184 Z"
 					stroke="currentColor"
@@ -127,7 +127,7 @@ export function DeliverabilityBlueprintArt({
 					fill="currentColor"
 					fillOpacity="0.04"
 				/>
-				{/* wing fold — same weight as the timer tick marks */}
+				{/* wing fold, same weight as the timer tick marks */}
 				<path
 					d="M 194 184 L 284 97"
 					stroke="currentColor"
@@ -154,7 +154,7 @@ export function DeliverabilityBlueprintArt({
 					stroke="currentColor"
 					strokeWidth="2"
 				/>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

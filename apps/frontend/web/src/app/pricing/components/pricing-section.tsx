@@ -763,7 +763,7 @@ function ComparisonCell({
 	type: "text" | "boolean";
 }) {
 	const unavailable =
-		type === "boolean" ? !value : value === "—" || value === "-";
+		type === "boolean" ? !value : value === "-";
 
 	if (unavailable) {
 		return <PlanCrossIcon />;
@@ -845,7 +845,7 @@ function ComparisonTable({
 					COMPARISON_GRID_COLS,
 				)}
 			>
-				{/* Header row — matches reference: eyebrow + title left, plan + pill CTA right */}
+				{/* Header row: matches reference: eyebrow + title left, plan + pill CTA right */}
 				<div className="sticky top-16 z-30 flex flex-col gap-3 border-stroke-soft-100 border-b bg-bg-white-0/95 px-5 py-7 backdrop-blur-md sm:px-7 lg:px-9 dark:border-white/10 dark:bg-black/95">
 					<p className="font-medium text-[12px] text-primary-base uppercase">
 						Features

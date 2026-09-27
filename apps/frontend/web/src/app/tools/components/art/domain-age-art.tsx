@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, frame stroke 4, mark stroke 5, detail stroke 3)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function DomainAgeBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function DomainAgeBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function DomainAgeBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function DomainAgeBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* calendar frame — centered on (210,170) */}
+				{/* calendar frame, centered on (210,170) */}
 				<rect
 					x="138"
 					y="107"
@@ -127,12 +127,12 @@ export function DomainAgeBlueprintArt({
 					stroke="currentColor"
 					strokeWidth="3"
 				/>
-				{/* hangers — same weight as the timer hands */}
+				{/* hangers, same weight as the timer hands */}
 				<g stroke="currentColor" strokeWidth="5" strokeLinecap="round">
 					<line x1="174" y1="92" x2="174" y2="122" />
 					<line x1="246" y1="92" x2="246" y2="122" />
 				</g>
-				{/* clock face — same weight as the timer tick marks */}
+				{/* clock face, same weight as the timer tick marks */}
 				<circle
 					cx="210"
 					cy="191"
@@ -159,7 +159,7 @@ export function DomainAgeBlueprintArt({
 					strokeWidth="3"
 					strokeLinecap="round"
 				/>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

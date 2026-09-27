@@ -150,7 +150,7 @@ export function ChannelList() {
 				/>
 			</div>
 
-			{/* Right: Subscriber preference preview — public channels */}
+			{/* Right: Subscriber preference preview (public channels) channels */}
 			<div className="hidden w-[300px] flex-shrink-0 lg:block">
 				<div className="sticky top-6">
 					<SubscriberPreview channels={allChannels} orgName={orgName} />

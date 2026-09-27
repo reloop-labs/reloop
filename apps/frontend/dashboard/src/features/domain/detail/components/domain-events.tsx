@@ -104,7 +104,7 @@ export const DomainEvents = ({
 
 	return (
 		<div className="mt-7 flex flex-col gap-4">
-			{/* Status banner — expands in place to show age & cap */}
+			{/* Status banner expands in place to show age & cap */}
 			<div className={cn("rounded-2xl border p-4", tone.card)}>
 				<div className="flex items-start gap-2.5">
 					<Icon
@@ -147,7 +147,7 @@ export const DomainEvents = ({
 								<span>
 									(registered {registrarCreatedAt.toLocaleDateString()} via
 									registrar, RDAP
-									{ageDays > 30 ? ` — ${Math.floor(ageDays / 30)} months` : ""})
+									{ageDays > 30 ? `, ${Math.floor(ageDays / 30)} months` : ""})
 								</span>
 							) : (
 								<span>
@@ -170,8 +170,8 @@ export const DomainEvents = ({
 								{nextCap.cap === null
 									? "unlimited (reputation-based)"
 									: `${nextCap.cap.toLocaleString()}/day`}{" "}
-								in {nextCap.inDays} day{nextCap.inDays === 1 ? "" : "s"} — no
-								action needed, it rises automatically.
+								in {nextCap.inDays} day{nextCap.inDays === 1 ? "" : "s"} (no
+								action needed, it rises automatically).
 							</p>
 						)}
 						{dailyCap === null && (
@@ -208,13 +208,13 @@ export const DomainEvents = ({
 							>
 								chat support
 							</button>{" "}
-							— message is prefilled, just send.
+							(the message is prefilled, just send it).
 						</p>
 					</div>
 				)}
 			</div>
 
-			{/* Bottom section — timeline steps (email details style) */}
+			{/* Bottom section: timeline steps (email details style) */}
 			<StatusTimeline domain={domain} />
 		</div>
 	);

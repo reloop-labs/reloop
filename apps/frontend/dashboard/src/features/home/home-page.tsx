@@ -23,7 +23,7 @@ import {
 import { WorkflowsCard } from "./components/workflows-card";
 
 /**
- * Dashboard overview — health, attention, and recent activity.
+ * Dashboard overview: health, attention, and recent activity.
  * Redirects orgless users to onboarding / invite.
  */
 export function HomePage() {
@@ -51,7 +51,7 @@ export function HomePage() {
 
 	useEffect(() => {
 		if (isPending || !session || orgPending) return;
-		// User already has a workspace — never bounce them back to onboarding.
+		// User already has a workspace, so never bounce them back to onboarding.
 		if (organizations && organizations.length > 0) return;
 
 		let cancelled = false;

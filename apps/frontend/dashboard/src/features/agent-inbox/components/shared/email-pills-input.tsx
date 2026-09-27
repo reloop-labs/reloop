@@ -178,7 +178,7 @@ export const EmailPillsInput = ({
 		setListOpen(false);
 		setHighlight(0);
 		// Avoid onChange when nothing was added (e.g. blur committing a typed
-		// fragment like "s") — a stale closure can otherwise wipe recipients.
+		// fragment like "s"), since a stale closure can otherwise wipe recipients.
 		if (added) onChange(updated);
 	};
 

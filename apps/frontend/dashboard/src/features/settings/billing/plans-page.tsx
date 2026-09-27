@@ -253,12 +253,12 @@ function ComparisonCell({
 	value: string | boolean;
 	type: "text" | "boolean";
 }) {
-	const unavailable = type === "boolean" ? !value : value === "—";
+	const unavailable = type === "boolean" ? !value : value === "-";
 
 	if (unavailable) {
 		return (
 			<span className="font-medium text-paragraph-sm text-text-soft-400">
-				—
+				-
 			</span>
 		);
 	}

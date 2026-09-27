@@ -87,7 +87,7 @@ Learn how to get Reloop set up in your project.
 Source: https://reloop.sh/docs/learn/ai/api-keys.curl
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.curl.md
 
-# API Keys — cURL
+# API Keys (cURL)
 
 > Agent-optimized samples for managing Reloop API keys in cURL. Index: [api-keys.md](./api-keys.md)
 
@@ -179,7 +179,7 @@ curl -X DELETE https://reloop.sh/api/api-key/v1/key_123456789 \
 Source: https://reloop.sh/docs/learn/ai/api-keys.dotnet
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.dotnet.md
 
-# API Keys — .NET
+# API Keys (.NET)
 
 > Agent-optimized samples for managing Reloop API keys in .NET. Index: [api-keys.md](./api-keys.md)
 
@@ -303,7 +303,7 @@ await reloop.ApiKeys.DeleteAsync("key_123456789");
 Source: https://reloop.sh/docs/learn/ai/api-keys.go
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.go.md
 
-# API Keys — Go
+# API Keys (Go)
 
 > Agent-optimized samples for managing Reloop API keys in Go. Index: [api-keys.md](./api-keys.md)
 
@@ -430,7 +430,7 @@ _, _ = client.ApiKeys.Delete("key_123456789")
 Source: https://reloop.sh/docs/learn/ai/api-keys.java
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.java.md
 
-# API Keys — Java
+# API Keys (Java)
 
 > Agent-optimized samples for managing Reloop API keys in Java. Index: [api-keys.md](./api-keys.md)
 
@@ -606,7 +606,7 @@ Dashboard UI walkthrough (GIFs, tabs): [/docs/learn/api-keys](https://reloop.sh/
 Source: https://reloop.sh/docs/learn/ai/api-keys.node
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.node.md
 
-# API Keys — Node
+# API Keys (Node)
 
 > Agent-optimized samples for managing Reloop API keys in Node. Index: [api-keys.md](./api-keys.md)
 
@@ -750,7 +750,7 @@ console.log(apiKey.id, apiKey.message);
 Source: https://reloop.sh/docs/learn/ai/api-keys.php
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.php.md
 
-# API Keys — PHP
+# API Keys (PHP)
 
 > Agent-optimized samples for managing Reloop API keys in PHP. Index: [api-keys.md](./api-keys.md)
 
@@ -910,7 +910,7 @@ echo $apiKey['id'] . ' ' . $apiKey['message'] . PHP_EOL;
 Source: https://reloop.sh/docs/learn/ai/api-keys.python
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.python.md
 
-# API Keys — Python
+# API Keys (Python)
 
 > Agent-optimized samples for managing Reloop API keys in Python. Index: [api-keys.md](./api-keys.md)
 
@@ -1070,7 +1070,7 @@ print(result.api_key["id"], result.api_key["message"])
 Source: https://reloop.sh/docs/learn/ai/api-keys.ruby
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.ruby.md
 
-# API Keys — Ruby
+# API Keys (Ruby)
 
 > Agent-optimized samples for managing Reloop API keys in Ruby. Index: [api-keys.md](./api-keys.md)
 
@@ -1182,7 +1182,7 @@ reloop.api_keys.delete("key_123456789")
 Source: https://reloop.sh/docs/learn/ai/api-keys.rust
 Markdown: https://reloop.sh/docs/learn/ai/api-keys.rust.md
 
-# API Keys — Rust
+# API Keys (Rust)
 
 > Agent-optimized samples for managing Reloop API keys in Rust. Index: [api-keys.md](./api-keys.md)
 
@@ -1385,11 +1385,11 @@ Markdown: https://reloop.sh/docs/learn/api-keys.md
     <Info>
     Disable a key to temporarily block access without deleting it. You can re-enable it at any time. Common reasons:
 
-    - **Security breach** — key was exposed in a public repo or logs.
-    - **System maintenance** — block requests during upgrades to prevent data corruption.
-    - **Testing transitions** — verify your system works with a new key before removing the old one.
-    - **Cost control** — stop billable consumption from a runaway app or loop.
-    - **Suspicious activity** — pause access while you investigate unusual request patterns.
+    - **Security breach**: key was exposed in a public repo or logs.
+    - **System maintenance**: block requests during upgrades to prevent data corruption.
+    - **Testing transitions**: verify your system works with a new key before removing the old one.
+    - **Cost control**: stop billable consumption from a runaway app or loop.
+    - **Suspicious activity**: pause access while you investigate unusual request patterns.
     </Info>
 
     1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
@@ -1454,7 +1454,7 @@ Markdown: https://reloop.sh/docs/learn/api-keys.md
   </Accordion>
 
   <Accordion title="What is the difference between disabling and deleting an API key?">
-    **Disabling** pauses access temporarily — requests using the key fail with `401 Unauthorized`, but you can re-enable it later. **Deleting** permanently removes the key record and cannot be undone.
+    **Disabling** pauses access temporarily. Requests using the key fail with `401 Unauthorized`, but you can re-enable it later. **Deleting** permanently removes the key record and cannot be undone.
   </Accordion>
 
   <Accordion title="Can I use the same API key for both REST API and SMTP relay?">
@@ -1953,7 +1953,7 @@ All error responses return a JSON object with four fields:
 
 ## Error Codes Reference
 
-### 400 — Bad Request
+### 400 Bad Request
 
 The request was invalid. This usually means a required parameter is missing, a value is the wrong type, or an input failed validation.
 
@@ -1972,7 +1972,7 @@ The request was invalid. This usually means a required parameter is missing, a v
 
 ---
 
-### 401 — Unauthorized
+### 401 Unauthorized
 
 The API key is missing, invalid, or has been revoked.
 
@@ -1991,7 +1991,7 @@ The API key is missing, invalid, or has been revoked.
 
 ---
 
-### 403 — Forbidden
+### 403 Forbidden
 
 The API key is valid, but it doesn't have permission to access the requested resource.
 
@@ -2009,7 +2009,7 @@ The API key is valid, but it doesn't have permission to access the requested res
 
 ---
 
-### 404 — Not Found
+### 404 Not Found
 
 The requested resource doesn't exist or isn't accessible to your organization.
 
@@ -2027,7 +2027,7 @@ The requested resource doesn't exist or isn't accessible to your organization.
 
 ---
 
-### 409 — Conflict
+### 409 Conflict
 
 The request conflicts with an existing resource.
 
@@ -2045,7 +2045,7 @@ The request conflicts with an existing resource.
 
 ---
 
-### 429 — Too Many Requests
+### 429 Too Many Requests
 
 You've exceeded a rate limit. The response includes additional fields and headers to help you retry.
 
@@ -2062,7 +2062,7 @@ Check the `Retry-After` response header for the number of seconds to wait, or us
 
 ---
 
-### 500 — Internal Server Error
+### 500 Internal Server Error
 
 Something went wrong on Reloop's end. These errors are automatically logged and investigated.
 
@@ -2367,7 +2367,7 @@ Welcome to the Reloop API Reference. The Reloop API is built on **REST** princip
 
 ## Authentication
 
-Every request must include your API key in the `x-api-key` header. API keys are scoped to a single **organization** — all resources you create, read, or modify are automatically associated with that organization.
+Every request must include your API key in the `x-api-key` header. API keys are scoped to a single **organization**: all resources you create, read, or modify are automatically associated with that organization.
 
 ```bash
 curl -X GET "https://reloop.sh/api/domain/v1/list" \
@@ -2385,7 +2385,7 @@ You can create, rotate, and revoke API keys from the [Reloop Dashboard](https://
 
 ## Response Format
 
-All responses — including errors — are returned as JSON. Successful responses typically include an `event` field describing the action performed:
+All responses, including errors, are returned as JSON. Successful responses typically include an `event` field describing the action performed:
 
 ```json
 {
@@ -2402,7 +2402,7 @@ The API uses standard HTTP status codes to indicate the outcome of a request:
 |------|---------|-------------------|
 | `200` | OK | Request succeeded. |
 | `201` | Created | A new resource was created successfully. |
-| `400` | Bad Request | Missing or invalid parameters — check the `why` field for details. |
+| `400` | Bad Request | Missing or invalid parameters. Check the `why` field for details. |
 | `401` | Unauthorized | The `x-api-key` header is missing, invalid, or the key has been revoked. |
 | `403` | Forbidden | The API key doesn't have permission to access the requested resource. |
 | `404` | Not Found | The resource doesn't exist, or it belongs to a different organization. |
@@ -2536,7 +2536,7 @@ All list endpoints in the Reloop API use **offset-based pagination**. You contro
 
 | Parameter | Type | Default | Max | Description |
 |-----------|------|---------|-----|-------------|
-| `page` | `number` | `1` | — | The page number to retrieve (1-indexed). |
+| `page` | `number` | `1` | - | The page number to retrieve (1-indexed). |
 | `limit` | `number` | `20` | `100` | The number of records to return per page. |
 
 **Example request:**
@@ -2949,7 +2949,7 @@ If a limit is exceeded, the API returns a `429 Too Many Requests` response with 
 
 ## Management Endpoint Limits
 
-Management endpoints cover everything outside of email sending — domains, contacts, channels, groups, properties, API keys, and templates. Each endpoint category has its own independent limit.
+Management endpoints cover everything outside of email sending: domains, contacts, channels, groups, properties, API keys, and templates. Each endpoint category has its own independent limit.
 
 ### Domain Service
 
@@ -3022,7 +3022,7 @@ Management endpoints cover everything outside of email sending — domains, cont
 
 ## Email Sending Limits
 
-The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel — if any single layer is exceeded, the request is rejected.
+The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel. If any single layer is exceeded, the request is rejected.
 
 | Layer | Limit | Window | What It Protects |
 |-------|-------|--------|-----------------|
@@ -4061,7 +4061,7 @@ Markdown: https://reloop.sh/docs/webhooks/emails/suppressed.md
 
 The `email.suppressed` event ID is reserved for when Reloop rejects a send because the recipient is on a suppression list.
 
-**Status:** inactive — not available for new webhook subscriptions until pre-send suppression publishes this event. Contact suppressions currently surface as `contact.blocked` when auto-capture blocks a recipient.
+**Status:** inactive. Not available for new webhook subscriptions until pre-send suppression publishes this event. Contact suppressions currently surface as `contact.blocked` when auto-capture blocks a recipient.
 
 ## Planned `data` shape
 
@@ -4574,8 +4574,8 @@ When `rateLimitEnabled` is true (default), Reloop caps outbound POSTs per endpoi
 
 Optional `filteringOptions` on an endpoint:
 
-- **`matchConditions`** — only deliver when every listed top-level `data` field equals the expected value (shallow equality).
-- **`excludeFields`** — strip listed top-level keys from `data` before POST (and in the stored delivery payload).
+- **`matchConditions`**: only deliver when every listed top-level `data` field equals the expected value (shallow equality).
+- **`excludeFields`**: strip listed top-level keys from `data` before POST (and in the stored delivery payload).
 
 Example:
 
@@ -4708,7 +4708,7 @@ Verification is critical because it allows you to:
 Source: https://reloop.sh/docs/integrations/ai-tools/cli-agents
 Markdown: https://reloop.sh/docs/integrations/ai-tools/cli-agents.md
 
-The [Reloop CLI](/sdk/cli) is purpose-built for AI agent workflows — every command supports machine-readable JSON output, deterministic exit codes, and stdin piping. See the full [CLI reference](/sdk/cli) for all available commands.
+The [Reloop CLI](/sdk/cli) is purpose-built for AI agent workflows: every command supports machine-readable JSON output, deterministic exit codes, and stdin piping. See the full [CLI reference](/sdk/cli) for all available commands.
 
 ## Agent Skills
 
@@ -4843,23 +4843,23 @@ Markdown: https://reloop.sh/docs/integrations/ai-tools/mcp-server.md
 
 ## What is an MCP Server?
 
-The Model Context Protocol (MCP) is an open standard that lets AI models connect to external tools and data sources. An MCP server acts as a bridge between your AI agent and the Reloop API, allowing the agent to send emails, manage contacts, handle domains, and more — all through natural language.
+The Model Context Protocol (MCP) is an open standard that lets AI models connect to external tools and data sources. An MCP server acts as a bridge between your AI agent and the Reloop API, allowing the agent to send emails, manage contacts, handle domains, and more, all through natural language.
 
 ## What can Reloop's MCP Server do?
 
 The [Reloop MCP Server](https://github.com/reloop-labs/reloop-mcp) exposes the full Reloop API as MCP tools:
 
-- **Emails** — Send, list, get, cancel, update, and batch send emails. Supports HTML, plain text, attachments (local file, URL, or base64), CC/BCC, reply-to, scheduling, tags, and topic-based sending.
-- **Received Emails** — List and read inbound emails. List and download received email attachments.
-- **Contacts** — Create, list, get, update, and remove contacts. Manage segment memberships and topic subscriptions. Supports custom contact properties.
-- **Broadcasts** — Create, send, list, get, update, and remove broadcast campaigns. Supports scheduling, personalization placeholders, and preview text.
-- **Domains** — Create, list, get, update, remove, and verify sender domains. Configure tracking, TLS, and sending/receiving capabilities.
-- **Segments** — Create, list, get, and remove audience segments.
-- **Topics** — Create, list, get, update, and remove subscription topics.
-- **Contact Properties** — Create, list, get, update, and remove custom contact attributes.
-- **API Keys** — Create, list, and remove API keys.
-- **Webhooks** — Create, list, get, update, and remove webhooks for event notifications.
-- **Templates** — Create, list, get, update, and remove email templates.
+- **Emails**: Send, list, get, cancel, update, and batch send emails. Supports HTML, plain text, attachments (local file, URL, or base64), CC/BCC, reply-to, scheduling, tags, and topic-based sending.
+- **Received Emails**: List and read inbound emails. List and download received email attachments.
+- **Contacts**: Create, list, get, update, and remove contacts. Manage segment memberships and topic subscriptions. Supports custom contact properties.
+- **Broadcasts**: Create, send, list, get, update, and remove broadcast campaigns. Supports scheduling, personalization placeholders, and preview text.
+- **Domains**: Create, list, get, update, remove, and verify sender domains. Configure tracking, TLS, and sending/receiving capabilities.
+- **Segments**: Create, list, get, and remove audience segments.
+- **Topics**: Create, list, get, update, and remove subscription topics.
+- **Contact Properties**: Create, list, get, update, and remove custom contact attributes.
+- **API Keys**: Create, list, and remove API keys.
+- **Webhooks**: Create, list, get, update, and remove webhooks for event notifications.
+- **Templates**: Create, list, get, update, and remove email templates.
 
 ## Prerequisites
 
@@ -5341,11 +5341,11 @@ npx skills add reloop/reloop-skills
 
 The skill includes five security levels you can implement based on your needs:
 
-1. **Strict Allowlist** — Only process emails from pre-approved senders. Recommended for most use cases.
-2. **Domain Allowlist** — Allow emails from any sender at approved domains.
-3. **Content Filtering** — Accept all emails but sanitize content before processing.
-4. **Sandboxed Processing** — Process in a restricted context with limited agent capabilities.
-5. **Human-in-the-Loop** — Queue all emails for human approval before agent processing.
+1. **Strict Allowlist**: Only process emails from pre-approved senders. Recommended for most use cases.
+2. **Domain Allowlist**: Allow emails from any sender at approved domains.
+3. **Content Filtering**: Accept all emails but sanitize content before processing.
+4. **Sandboxed Processing**: Process in a restricted context with limited agent capabilities.
+5. **Human-in-the-Loop**: Queue all emails for human approval before agent processing.
 
 ## How it works
 
@@ -5366,9 +5366,9 @@ The skill includes five security levels you can implement based on your needs:
 
 ## Learn More
 
-- [OpenClaw Guide](/integrations/openclaw-guide) — Step-by-step guide for setting up an agent inbox
-- [Receiving Emails](/learn/receiving) — General guide on receiving emails with Reloop
-- [Webhooks](/docs/webhooks) — Webhook setup and event types
+- [OpenClaw Guide](/integrations/openclaw-guide): Step-by-step guide for setting up an agent inbox
+- [Receiving Emails](/learn/receiving): General guide on receiving emails with Reloop
+- [Webhooks](/docs/webhooks): Webhook setup and event types
 - [View on GitHub](https://github.com/reloop-labs/reloop-skills/tree/main/skills/agent-email-inbox)
 
 ---
@@ -5439,8 +5439,8 @@ The skill provides your agent with actionable rules such as:
 
 ## Learn More
 
-- [Sending Emails](/learn/sending) — Guide to sending emails with Reloop
-- [Domains](/learn/domain) — Domain verification and DNS configuration
+- [Sending Emails](/learn/sending): Guide to sending emails with Reloop
+- [Domains](/learn/domain): Domain verification and DNS configuration
 - [View on GitHub](https://github.com/reloop-labs/reloop-skills/tree/main/skills/email-best-practices)
 
 ---
@@ -5681,7 +5681,7 @@ npm install reloop-email
 
 ## Setup environment variables
 
-Add your Reloop API key to `.env.local` (server-only — do not use `NEXT_PUBLIC_`):
+Add your Reloop API key to `.env.local` (server-only; do not use `NEXT_PUBLIC_`):
 
 ```env
 RELOOP_API_KEY=rl_your_api_key_here
@@ -6817,8 +6817,8 @@ This is the main path from “I have a domain” to “I can send as `@mydomain.
 ## Before you start
 
 - You can log in to the place that manages **nameservers** for the domain ([find your DNS provider](/docs/guides/connect-domain/find-dns-provider)).
-- Decide [root vs subdomain](/docs/guides/connect-domain/what-is-a-domain) — Reloop supports either, or both.
-- Decide if you need [receiving](/docs/guides/connect-domain/sending-vs-receiving) or only sending. New domains start with Email Receiving on — turn it off before publishing DNS if this hostname must keep Google Workspace / Microsoft 365.
+- Decide [root vs subdomain](/docs/guides/connect-domain/what-is-a-domain). Reloop supports either, or both.
+- Decide if you need [receiving](/docs/guides/connect-domain/sending-vs-receiving) or only sending. New domains start with Email Receiving on. Turn it off before publishing DNS if this hostname must keep Google Workspace / Microsoft 365.
 
 ## Steps
 
@@ -7004,7 +7004,7 @@ Trust the dashboard for your domain: if the button is missing, use manual setup 
 New domains start with **Email Receiving** and **click/open tracking** on. Auto-populate therefore typically includes inbound MX (`inbound.reloop.sh`) and the tracking CNAME unless you turn those off first.
 
 <Warning>
-If this hostname already uses Google Workspace, Microsoft 365, or another inbox, turn **Email Receiving** off on the Reloop domain page before Auto-populate — or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain) for Reloop. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+If this hostname already uses Google Workspace, Microsoft 365, or another inbox, turn **Email Receiving** off on the Reloop domain page before Auto-populate, or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain) for Reloop. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## How the flow works
@@ -7067,7 +7067,7 @@ When you add a domain, Reloop generates the exact records to publish. Always pre
 | --- | --- | --- | --- |
 | **SPF** | TXT | `@` | Authorizes Reloop to send for your domain |
 | **DKIM** | TXT | `reloop._domainkey` | Cryptographic signature so receivers trust the message |
-| **DMARC** | TXT | `_dmarc` | Policy if SPF/DKIM fail — required for verification when Email Sending is on |
+| **DMARC** | TXT | `_dmarc` | Policy if SPF/DKIM fail; required for verification when Email Sending is on |
 | **Receiving MX** | MX | `@` or subdomain host | Routes **inbound** mail to Reloop (`inbound.reloop.sh`) when Email Receiving is on (default for new domains) |
 | **Tracking** | CNAME | `link` or `link.<sub>` | Click/open tracking → `link.reloop.sh` (on by default for new domains) |
 
@@ -7085,7 +7085,7 @@ v=spf1 include:reloop.sh -all
 SPF lists which servers may send mail as your domain. Reloop’s include is `include:reloop.sh` (hosted product).
 
 <Warning>
-You may only have **one SPF TXT** on a given host. If you already have SPF (Google, Microsoft, Mailchimp, …), **merge** Reloop’s `include:reloop.sh` into that record — do not add a second SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
+You may only have **one SPF TXT** on a given host. If you already have SPF (Google, Microsoft, Mailchimp, …), **merge** Reloop’s `include:reloop.sh` into that record. Do not add a second SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
 </Warning>
 
 ## DKIM (DomainKeys Identified Mail)
@@ -7110,13 +7110,13 @@ The long `p=` string is your public key. Reloop signs outbound mail with the mat
 v=DMARC1; p=reject;
 ```
 
-DMARC tells receivers what to do when authentication fails. Reloop’s default template uses `p=reject`. When **Email Sending** is on, a matching DMARC record is required for Reloop verification. If you already have DMARC for Google/Microsoft, you can often keep your existing policy — Reloop checks that a valid DMARC record is present; review carefully before overwriting a production policy.
+DMARC tells receivers what to do when authentication fails. Reloop’s default template uses `p=reject`. When **Email Sending** is on, a matching DMARC record is required for Reloop verification. If you already have DMARC for Google/Microsoft, you can often keep your existing policy. Reloop checks that a valid DMARC record is present; review carefully before overwriting a production policy.
 
 ## MX (mail exchange)
 
 MX is **not** required to send mail. Reloop only shows MX when **Email Receiving** is on:
 
-- **Receiving MX** → typically `inbound.reloop.sh`. Used when Email Receiving is on (default for new domains). On the same hostname as Google Workspace / Microsoft 365, this can divert or split inbound delivery — turn Receiving off for send-only, or use a [separate hostname](/docs/guides/connect-domain/what-is-a-domain). See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
+- **Receiving MX** → typically `inbound.reloop.sh`. Used when Email Receiving is on (default for new domains). On the same hostname as Google Workspace / Microsoft 365, this can divert or split inbound delivery. Turn Receiving off for send-only, or use a [separate hostname](/docs/guides/connect-domain/what-is-a-domain). See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
 
 ## Tracking CNAME
 
@@ -7133,8 +7133,8 @@ Conflicts if that host already points elsewhere, or if your provider disallows C
 For each row, match three things in your DNS UI:
 
 1. **Type** (TXT / MX / CNAME)
-2. **Name / Host** — some UIs want `@` for the root; others want a blank host or the bare domain
-3. **Value** — paste exactly; for MX also set **Priority**
+2. **Name / Host**: some UIs want `@` for the root; others want a blank host or the bare domain
+3. **Value**: paste exactly; for MX also set **Priority**
 
 Provider-specific quirks (Cloudflare proxy, GoDaddy host field, Route 53 hosted zone) are in each [provider guide](/docs/guides/connect-domain/providers).
 
@@ -7153,7 +7153,7 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/find-dns-provider.md
 
 You need to know **who hosts your nameservers** before you can publish Reloop records (or before Auto-populate can work).
 
-## Method 1 — Reloop dashboard (easiest)
+## Method 1: Reloop dashboard (easiest)
 
 1. Add the domain at [Domains](https://reloop.sh/dashboard/domain) if you have not already.
 2. Open the domain detail page.
@@ -7166,7 +7166,7 @@ If Reloop shows a provider:
 
 If Reloop cannot detect a provider, use Method 2 or 3.
 
-## Method 2 — Registrar control panel
+## Method 2: Registrar control panel
 
 1. Log in where you **bought / renew** the domain.
 2. Open the domain → **Nameservers** / **DNS** / **Manage DNS**.
@@ -7195,7 +7195,7 @@ If Reloop cannot detect a provider, use Method 2 or 3.
 
 Then open the matching [provider guide](/docs/guides/connect-domain/providers).
 
-## Method 3 — Public lookup
+## Method 3: Public lookup
 
 ### In the browser
 
@@ -7233,7 +7233,7 @@ Use the [Unknown provider](/docs/guides/connect-domain/providers/unknown-provide
 Source: https://reloop.sh/docs/guides/connect-domain
 Markdown: https://reloop.sh/docs/guides/connect-domain.md
 
-Reloop can send and receive email for **any domain you control** (receiving and tracking are on by default for new domains — turn receiving off if you keep another inbox on that hostname). You do not need to buy the domain from Reloop — register it anywhere, point DNS at the records Reloop shows you, and verify.
+Reloop can send and receive email for **any domain you control** (receiving and tracking are on by default for new domains; turn receiving off if you keep another inbox on that hostname). You do not need to buy the domain from Reloop. Register it anywhere, point DNS at the records Reloop shows you, and verify.
 
 The [Domains](https://reloop.sh/dashboard/domain) page lists every sending domain in your organization, with status and shortcuts to DNS guides.
 
@@ -7249,7 +7249,7 @@ The [Domains](https://reloop.sh/dashboard/domain) page lists every sending domai
     Reloop detects your nameservers when possible. If you are unsure who hosts DNS, see [Find your DNS provider](/docs/guides/connect-domain/find-dns-provider).
   </Step>
   <Step title="Publish Reloop DNS records">
-    On the domain page, follow the banner Reloop shows for your DNS host — see below.
+    On the domain page, follow the banner Reloop shows for your DNS host (see below).
   </Step>
   <Step title="Verify">
     Click **Verify & finish** (setup) or **Verify Domain** (domain detail) to start checks. When status is **active**, you can send from that domain.
@@ -7267,7 +7267,7 @@ Either way, Reloop checks public DNS afterward and marks the domain verified whe
 
 ## New to DNS?
 
-Start here — you do not need to be a network engineer:
+Start here. You do not need to be a network engineer:
 
 1. [What is a domain?](/docs/guides/connect-domain/what-is-a-domain)
 2. [What is DNS?](/docs/guides/connect-domain/what-is-dns)
@@ -7277,11 +7277,11 @@ Start here — you do not need to be a network engineer:
 
 ## Full map
 
-- **Setup** — [Add a domain](/docs/guides/connect-domain/add-domain) · [What is a domain?](/docs/guides/connect-domain/what-is-a-domain) · [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving)
-- **DNS guides** — [All DNS hosts](/docs/guides/connect-domain/providers)
-- **Verification** — [Statuses](/docs/guides/connect-domain/verification/statuses) · [Propagation](/docs/guides/connect-domain/verification/propagation)
-- **Troubleshoot** — [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying) and more
-- **After connect** — [Test](/docs/guides/connect-domain/after/test-domain) · [Change DNS](/docs/guides/connect-domain/after/change-dns) · [Remove](/docs/guides/connect-domain/after/remove-domain)
+- **Setup**: [Add a domain](/docs/guides/connect-domain/add-domain) · [What is a domain?](/docs/guides/connect-domain/what-is-a-domain) · [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving)
+- **DNS guides**: [All DNS hosts](/docs/guides/connect-domain/providers)
+- **Verification**: [Statuses](/docs/guides/connect-domain/verification/statuses) · [Propagation](/docs/guides/connect-domain/verification/propagation)
+- **Troubleshoot**: [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying) and more
+- **After connect**: [Test](/docs/guides/connect-domain/after/test-domain) · [Change DNS](/docs/guides/connect-domain/after/change-dns) · [Remove](/docs/guides/connect-domain/after/remove-domain)
 
 <Tip>
 Always copy values from your domain’s page in the Reloop dashboard. Examples in docs use placeholders; your DKIM key and hosts are unique to your domain.
@@ -7303,7 +7303,7 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/manual-setup.md
 
 <Steps>
   <Step title="Open your domain in Reloop">
-    Go to [Domains](https://reloop.sh/dashboard/domain) → select the domain. Keep this tab open — you will copy each row.
+    Go to [Domains](https://reloop.sh/dashboard/domain) → select the domain. Keep this tab open; you will copy each row.
   </Step>
   <Step title="Open your DNS provider">
     Use **Open DNS settings** in Reloop if shown, or jump to the matching [provider guide](/docs/guides/connect-domain/providers).
@@ -7314,13 +7314,13 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/manual-setup.md
     1. Choose the same **type** (TXT, MX, CNAME)
     2. Set **name/host** as shown (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …)
     3. Paste **value** exactly
-    4. For MX, set **priority** (often `10`) — add **Receiving MX** (`inbound.reloop.sh`) only when Email Receiving is on
+    4. For MX, set **priority** (often `10`); add **Receiving MX** (`inbound.reloop.sh`) only when Email Receiving is on
     5. Save
 
     Provider UIs differ:
 
     - Some want blank host instead of `@`
-    - Some auto-append your domain — do not enter `reloop._domainkey.acme.com` if the UI already adds `acme.com`
+    - Some auto-append your domain, so do not enter `reloop._domainkey.acme.com` if the UI already adds `acme.com`
     - Cloudflare: keep records **DNS only** (grey cloud) unless you know you need a proxy (almost never for mail TXT/MX)
   </Step>
   <Step title="Merge SPF if needed">
@@ -7337,7 +7337,7 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/manual-setup.md
 - [ ] DKIM TXT is complete (long `p=` value not cut off)
 - [ ] Only one SPF record on that host
 - [ ] DMARC published when Email Sending is on
-- [ ] Email Receiving toggled to match intent ([sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving)) — default is on for new domains
+- [ ] Email Receiving toggled to match intent ([sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving)); default is on for new domains
 - [ ] Tracking CNAME host matches the dashboard (`link` or `link.<sub>`) and is free or intentionally replaced
 
 ## Provider-specific guides
@@ -7361,7 +7361,7 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/providers/cloudflare.md
 First, log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
 
 <DocImage
-	label="Reloop — Add domain"
+	label="Reloop: Add domain"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/add-domain.png"
 	alt="Add Domain dialog in Reloop"
 />
@@ -7375,7 +7375,7 @@ It is [best practice to use a subdomain](/docs/guides/connect-domain/what-is-a-d
 The fastest way to verify your domain on Cloudflare is **Auto populate** in Reloop. This uses [Domain Connect](https://www.domainconnect.org/) to configure your DNS records.
 
 1. Go to your [Domains](https://reloop.sh/dashboard/domain) page in Reloop and open the domain.
-2. Check **Email Receiving** before Auto-populate. New domains start with Receiving on, so inbound MX (`inbound.reloop.sh`) is usually included. Turn **Email Receiving** off first if this hostname must keep Google Workspace / Microsoft 365 — or use a [subdomain](/docs/guides/connect-domain/what-is-a-domain). [Learn more below](#receiving-emails).
+2. Check **Email Receiving** before Auto-populate. New domains start with Receiving on, so inbound MX (`inbound.reloop.sh`) is usually included. Turn **Email Receiving** off first if this hostname must keep Google Workspace / Microsoft 365, or use a [subdomain](/docs/guides/connect-domain/what-is-a-domain). [Learn more below](#receiving-emails).
 3. Click **Auto populate**.
 4. Authorize Reloop in Cloudflare and approve the records.
 5. Return to Reloop and click **Verify & finish** (setup) or **Verify Domain** (detail) to start checks.
@@ -7388,19 +7388,19 @@ If Auto-populate fails, use **Manual setup** below. See also [Auto-populate DNS]
 
 ## Manual setup
 
-If you prefer to add DNS records manually, follow these steps. Always copy Type / Name / Value from your domain page in Reloop — examples below use placeholders.
+If you prefer to add DNS records manually, follow these steps. Always copy Type / Name / Value from your domain page in Reloop. The examples below use placeholders.
 
 ### Log in to Cloudflare
 
 Log in to your [Cloudflare account](https://dash.cloudflare.com) and open **DNS → Records** for the domain whose nameservers match `*.ns.cloudflare.com`.
 
 <DocImage
-	label="Cloudflare — DNS records"
+	label="Cloudflare: DNS records"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/cloudflare-dashboard.png"
 	alt="Cloudflare DNS records page"
 />
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Add TXT SPF record
 
@@ -7413,13 +7413,13 @@ Click **Add record** on Cloudflare:
 5. Select **Save**.
 
 <DocImage
-	label="Reloop — SPF TXT"
+	label="Reloop: SPF TXT"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/txt-spf-reloop.png"
 	alt="Reloop SPF TXT record"
 />
 
 <DocImage
-	label="Cloudflare — SPF TXT"
+	label="Cloudflare: SPF TXT"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/txt-spf-cloudflare.png"
 	alt="Add SPF TXT record in Cloudflare"
 />
@@ -7450,13 +7450,13 @@ Click **Add record** on Cloudflare:
 5. Select **Save**.
 
 <DocImage
-	label="Reloop — DKIM TXT"
+	label="Reloop: DKIM TXT"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/txt-dkim-reloop.png"
 	alt="Reloop DKIM TXT record"
 />
 
 <DocImage
-	label="Cloudflare — DKIM TXT"
+	label="Cloudflare: DKIM TXT"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/txt-dkim-cloudflare.png"
 	alt="Add DKIM TXT record in Cloudflare"
 />
@@ -7484,13 +7484,13 @@ Omit your domain from the Name field when Cloudflare appends it. Paste `reloop._
 6. Select **Save**.
 
 <DocImage
-	label="Reloop — Receiving MX"
+	label="Reloop: Receiving MX"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/mx-receive-reloop.png"
 	alt="Reloop receiving MX record"
 />
 
 <DocImage
-	label="Cloudflare — Receiving MX"
+	label="Cloudflare: Receiving MX"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/mx-receive-cloudflare.png"
 	alt="Add receiving MX record in Cloudflare"
 />
@@ -7509,18 +7509,18 @@ Publishing Reloop’s inbound MX on a hostname that already has Google/Microsoft
 
 ### Complete verification
 
-Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop. On the setup page click **Verify & finish**; on the domain detail page click **Verify Domain** (menu: **Re-verify DNS**). It may take a few minutes (rarely up to 48–72 hours) — see [propagation](/docs/guides/connect-domain/verification/propagation).
+Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop. On the setup page click **Verify & finish**; on the domain detail page click **Verify Domain** (menu: **Re-verify DNS**). It may take a few minutes (rarely up to 48–72 hours). See [propagation](/docs/guides/connect-domain/verification/propagation).
 
 <DocImage
-	label="Reloop — Verify & finish"
+	label="Reloop: Verify & finish"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/verify-and-finish.png"
 	alt="Verify and finish domain setup in Reloop"
 />
 
-When verification succeeds, Reloop shows **You're all set!** — Domain added → Verified → Ready to send. Your domain is verified and you are good to go.
+When verification succeeds, Reloop shows **You're all set!** (Domain added → Verified → Ready to send). Your domain is verified and you are good to go.
 
 <DocImage
-	label="Reloop — You're all set"
+	label="Reloop: You're all set"
 	src="/docs/images/docs/guides/connect-domain/providers/cloudflare/verified-domain.png"
 	alt="Verified domain ready to send in Reloop"
 />
@@ -7528,7 +7528,7 @@ When verification succeeds, Reloop shows **You're all set!** — Domain added �
 ## Cloudflare-specific notes
 
 - Keep Reloop mail/auth records on **DNS only** (grey cloud). Orange-cloud proxy often breaks verification.
-- **DMARC** is required for verification when Email Sending is on (keep an existing policy if you already have one). **Tracking** CNAME is on by default for new domains — host is usually `link` on apex, or `link.<sub>` for subdomains; copy from the dashboard.
+- **DMARC** is required for verification when Email Sending is on (keep an existing policy if you already have one). **Tracking** CNAME is on by default for new domains. The host is usually `link` on apex, or `link.<sub>` for subdomains; copy from the dashboard.
 
 ## Troubleshooting
 
@@ -7565,7 +7565,7 @@ Domain Chief can use Reloop **Auto-populate** when nameservers match. Manual ste
 First, log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
 
 <DocImage
-	label="Reloop — Add domain"
+	label="Reloop: Add domain"
 	src="/docs/images/docs/guides/connect-domain/shared/add-domain.png"
 	alt="Add Domain dialog in Reloop"
 />
@@ -7576,10 +7576,10 @@ It is [best practice to use a subdomain](/docs/guides/connect-domain/what-is-a-d
 
 ## Automatic setup (recommended)
 
-The fastest way to verify your domain on Domain Chief is **Auto populate** in Reloop. This uses [Domain Connect](https://www.domainconnect.org/) — Domain Chief indexes public templates automatically ([Domain Chief Domain Connect](https://aka.chief.app/domainconnect)).
+The fastest way to verify your domain on Domain Chief is **Auto populate** in Reloop. This uses [Domain Connect](https://www.domainconnect.org/); Domain Chief indexes public templates automatically ([Domain Chief Domain Connect](https://aka.chief.app/domainconnect)).
 
 1. Go to your [Domains](https://reloop.sh/dashboard/domain) page in Reloop and open the domain.
-2. Check **Email Receiving** before Auto-populate. New domains start with Receiving on, so inbound MX (`inbound.reloop.sh`) is usually included. Turn **Email Receiving** off first if this hostname must keep Google Workspace / Microsoft 365 — or use a [subdomain](/docs/guides/connect-domain/what-is-a-domain). [Learn more below](#receiving-emails).
+2. Check **Email Receiving** before Auto-populate. New domains start with Receiving on, so inbound MX (`inbound.reloop.sh`) is usually included. Turn **Email Receiving** off first if this hostname must keep Google Workspace / Microsoft 365, or use a [subdomain](/docs/guides/connect-domain/what-is-a-domain). [Learn more below](#receiving-emails).
 3. Click **Auto populate** (shown when Reloop detects Domain Chief nameservers).
 4. Authorize Reloop in Domain Chief and approve the records.
 5. Return to Reloop and click **Verify & finish** (setup) or **Verify Domain** (detail) to start checks.
@@ -7590,7 +7590,7 @@ If Auto-populate fails or Reloop does not offer it, use **Manual setup** below. 
 
 ## Manual setup
 
-If you prefer to add DNS records manually, follow these steps. Always copy Type / Name / Value from your domain page in Reloop — examples below use placeholders.
+If you prefer to add DNS records manually, follow these steps. Always copy Type / Name / Value from your domain page in Reloop. The examples below use placeholders.
 
 ### Log in to Domain Chief
 
@@ -7598,7 +7598,7 @@ Log in to [Domain Chief](https://domain.chief.app) and open DNS for the domain w
 
 Domain Chief → select domain → DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Add TXT SPF record
 
@@ -7611,7 +7611,7 @@ Add a record in Domain Chief:
 5. Save.
 
 <DocImage
-	label="Reloop — SPF TXT"
+	label="Reloop: SPF TXT"
 	src="/docs/images/docs/guides/connect-domain/shared/txt-spf-reloop.png"
 	alt="Reloop SPF TXT record"
 />
@@ -7642,7 +7642,7 @@ Add a record in Domain Chief:
 5. Save.
 
 <DocImage
-	label="Reloop — DKIM TXT"
+	label="Reloop: DKIM TXT"
 	src="/docs/images/docs/guides/connect-domain/shared/txt-dkim-reloop.png"
 	alt="Reloop DKIM TXT record"
 />
@@ -7670,7 +7670,7 @@ Omit your domain from the Name field when Domain Chief appends it. Paste `reloop
 6. Save.
 
 <DocImage
-	label="Reloop — Receiving MX"
+	label="Reloop: Receiving MX"
 	src="/docs/images/docs/guides/connect-domain/shared/mx-receive-reloop.png"
 	alt="Reloop receiving MX record"
 />
@@ -7689,27 +7689,27 @@ Publishing Reloop’s inbound MX on a hostname that already has Google/Microsoft
 
 ### Complete verification
 
-Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop. On the setup page click **Verify & finish**; on the domain detail page click **Verify Domain** (menu: **Re-verify DNS**). It may take a few minutes (rarely up to 48–72 hours) — see [propagation](/docs/guides/connect-domain/verification/propagation).
+Return to [Domains](https://reloop.sh/dashboard/domain) in Reloop. On the setup page click **Verify & finish**; on the domain detail page click **Verify Domain** (menu: **Re-verify DNS**). It may take a few minutes (rarely up to 48–72 hours). See [propagation](/docs/guides/connect-domain/verification/propagation).
 
 <DocImage
-	label="Reloop — Verify & finish"
+	label="Reloop: Verify & finish"
 	src="/docs/images/docs/guides/connect-domain/shared/verify-and-finish.png"
 	alt="Verify and finish domain setup in Reloop"
 />
 
-When verification succeeds, Reloop shows **You're all set!** — Domain added → Verified → Ready to send. Your domain is verified and you are good to go.
+When verification succeeds, Reloop shows **You're all set!** (Domain added → Verified → Ready to send). Your domain is verified and you are good to go.
 
 <DocImage
-	label="Reloop — You're all set"
+	label="Reloop: You're all set"
 	src="/docs/images/docs/guides/connect-domain/shared/verified-domain.png"
 	alt="Verified domain ready to send in Reloop"
 />
 
 ## Domain Chief-specific notes
 
-- Domain Chief auto-indexes public Domain Connect templates — prefer **Auto populate** when Reloop offers it.
+- Domain Chief auto-indexes public Domain Connect templates, so prefer **Auto populate** when Reloop offers it.
 - Auto-populate only works when public nameservers point at Domain Chief.
-- **DMARC** is required for verification when Email Sending is on (keep an existing policy if you already have one). **Tracking** CNAME is on by default for new domains — host is usually `link` on apex, or `link.<sub>` for subdomains; copy from the dashboard.
+- **DMARC** is required for verification when Email Sending is on (keep an existing policy if you already have one). **Tracking** CNAME is on by default for new domains. The host is usually `link` on apex, or `link.<sub>` for subdomains; copy from the dashboard.
 
 ## Troubleshooting
 
@@ -7746,10 +7746,10 @@ Add Reloop’s DNS records in DreamHost using the values from your domain page i
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -7760,7 +7760,7 @@ Open [DreamHost](https://panel.dreamhost.com) and go to DNS for the domain whose
 
 DreamHost Panel → Domains → DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -7788,7 +7788,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -7801,9 +7801,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -7819,7 +7819,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -7861,10 +7861,10 @@ Add Reloop’s DNS records in Gandi using the values from your domain page in Re
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -7875,7 +7875,7 @@ Open [Gandi](https://admin.gandi.net/domain) and go to DNS for the domain whose 
 
 Gandi Admin → Domain → DNS Records.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -7903,7 +7903,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -7916,9 +7916,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -7934,7 +7934,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -7976,10 +7976,10 @@ Add Reloop’s DNS records in Glauca Digital using the values from your domain p
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -7990,7 +7990,7 @@ Open [Glauca Digital](https://domains.glauca.digital) and go to DNS for the doma
 
 Glauca HexDNS → zone DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -8018,7 +8018,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -8031,9 +8031,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -8041,7 +8041,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 ## Glauca Digital-specific notes
 
-- Glauca Digital supports Domain Connect ([HexDNS](https://docs.glauca.digital/hexdns/domain-connect/)). Reloop’s template may become available after public registry sync — if Reloop does not show **Auto populate**, use manual setup.
+- Glauca Digital supports Domain Connect ([HexDNS](https://docs.glauca.digital/hexdns/domain-connect/)). Reloop’s template may become available after public registry sync. If Reloop does not show **Auto populate**, use manual setup.
 - Default HexDNS nameservers are `ns1`–`ns4.as207960.net`.
 
 ## Receiving emails
@@ -8049,7 +8049,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -8091,10 +8091,10 @@ Add Reloop’s DNS records in GoDaddy using the values from your domain page in 
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -8105,7 +8105,7 @@ Open [GoDaddy](https://dcc.godaddy.com/dns) and go to DNS for the domain whose *
 
 GoDaddy Domain Control Center → DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -8133,7 +8133,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -8146,9 +8146,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -8156,7 +8156,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 ## GoDaddy-specific notes
 
-- GoDaddy supports Domain Connect for some products, but Reloop’s template is **not** onboarded there yet — use manual setup.
+- GoDaddy supports Domain Connect for some products, but Reloop’s template is **not** onboarded there yet. Use manual setup.
 - If nameservers point to Cloudflare (or another host), edit that host instead of GoDaddy DNS.
 - For apex hosts GoDaddy uses `@`.
 
@@ -8165,7 +8165,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -8207,10 +8207,10 @@ Add Reloop’s DNS records in Hetzner using the values from your domain page in 
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -8221,7 +8221,7 @@ Open [Hetzner](https://dns.hetzner.com) and go to DNS for the domain whose **nam
 
 Hetzner DNS Console → zone records.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -8249,7 +8249,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -8262,9 +8262,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -8273,14 +8273,14 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 ## Hetzner-specific notes
 
 - Use the Hetzner DNS Console for zones on Hetzner nameservers.
-- Merge SPF carefully — Hetzner may already have a default TXT.
+- Merge SPF carefully: Hetzner may already have a default TXT.
 
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -8322,10 +8322,10 @@ Add Reloop’s DNS records in Hostinger using the values from your domain page i
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -8336,7 +8336,7 @@ Open [Hostinger](https://hpanel.hostinger.com/domains) and go to DNS for the dom
 
 hPanel → Domains → DNS / Name Servers.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -8364,7 +8364,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -8377,9 +8377,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -8395,7 +8395,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -8434,7 +8434,7 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/providers.md
 
 Pick the company that hosts your **nameservers** (not always where you bought the domain). Unsure? [Find your DNS provider](/docs/guides/connect-domain/find-dns-provider).
 
-Each guide covers adding a domain in Reloop, provider login, field mapping, record-by-record setup, receiving mail, verification, and troubleshooting. If Reloop shows **Auto populate** for a host, that guide includes an **Automatic setup** section first — otherwise follow the manual steps. See [Auto-populate DNS](/docs/guides/connect-domain/auto-populate).
+Each guide covers adding a domain in Reloop, provider login, field mapping, record-by-record setup, receiving mail, verification, and troubleshooting. If Reloop shows **Auto populate** for a host, that guide includes an **Automatic setup** section first. Otherwise, follow the manual steps. See [Auto-populate DNS](/docs/guides/connect-domain/auto-populate).
 
 This set includes common registrars/DNS hosts plus every DNS provider with a live [Domain Connect](https://www.domainconnect.org/dns-providers/) implementation.
 
@@ -8520,10 +8520,10 @@ Add Reloop’s DNS records in IONOS using the values from your domain page in Re
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -8534,7 +8534,7 @@ Open [IONOS](https://my.ionos.com/domains) and go to DNS for the domain whose **
 
 IONOS → Domains → DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -8562,7 +8562,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -8575,9 +8575,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -8585,14 +8585,14 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 ## IONOS-specific notes
 
-- IONOS Domain Connect has not finished Reloop template onboarding — use manual setup.
+- IONOS Domain Connect has not finished Reloop template onboarding. Use manual setup.
 
 ## Receiving emails
 
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -8634,10 +8634,10 @@ Add Reloop’s DNS records in Namecheap using the values from your domain page i
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -8648,7 +8648,7 @@ Open [Namecheap](https://ap.www.namecheap.com/domains/list) and go to DNS for th
 
 Domain List → Manage → Advanced DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -8676,7 +8676,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -8689,9 +8689,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -8707,7 +8707,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -8749,10 +8749,10 @@ NameSilo can use Reloop **Auto-populate** when nameservers match. Manual steps a
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Automatic setup (recommended)
@@ -8764,7 +8764,7 @@ NameSilo supports Reloop **Auto-populate** (Domain Connect). This is usually the
     Go to [Domains](https://reloop.sh/dashboard/domain) and open the domain you added.
   </Step>
   <Step title="Check receiving before Auto-populate">
-    New domains start with **Email Receiving** on, so Auto-populate usually includes inbound MX (`inbound.reloop.sh`). If this hostname must keep Google Workspace / Microsoft 365, turn **Email Receiving** off first — or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain). See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+    New domains start with **Email Receiving** on, so Auto-populate usually includes inbound MX (`inbound.reloop.sh`). If this hostname must keep Google Workspace / Microsoft 365, turn **Email Receiving** off first, or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain). See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
   </Step>
   <Step title="Click Auto populate">
     Reloop opens NameSilo for consent. Sign in if asked, review the records, and approve.
@@ -8784,7 +8784,7 @@ Open [NameSilo](https://www.namesilo.com/account_domain.php) and go to DNS for t
 
 NameSilo → Domain Manager → DNS Manager.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -8812,7 +8812,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -8825,9 +8825,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -8835,7 +8835,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 ## NameSilo-specific notes
 
-- NameSilo syncs Domain Connect templates from the public registry — prefer Auto-populate when offered.
+- NameSilo syncs Domain Connect templates from the public registry, so prefer Auto-populate when offered.
 - Confirm you are editing DNS at NameSilo (not a different host pointed to by custom NS).
 
 ## Receiving emails
@@ -8843,7 +8843,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -8885,10 +8885,10 @@ Add Reloop’s DNS records in Plesk using the values from your domain page in Re
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -8899,7 +8899,7 @@ Open your host’s [Plesk](https://www.plesk.com) panel (URL varies by host) and
 
 Plesk → Domains → DNS Settings.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -8927,7 +8927,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -8940,9 +8940,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -8950,7 +8950,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 ## Plesk-specific notes
 
-- Plesk supports Domain Connect as a DNS provider. Reloop’s template is **not** onboarded for every Plesk installation — use manual setup unless Reloop shows **Auto populate**.
+- Plesk supports Domain Connect as a DNS provider. Reloop’s template is **not** onboarded for every Plesk installation. Use manual setup unless Reloop shows **Auto populate**.
 - Plesk is often behind a hosting brand: open the panel that actually serves your public nameservers.
 - Login URL varies by host; Reloop cannot deep-link to a single Plesk URL.
 
@@ -8959,7 +8959,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -9001,10 +9001,10 @@ Add Reloop’s DNS records in Porkbun using the values from your domain page in 
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -9015,7 +9015,7 @@ Open [Porkbun](https://porkbun.com/account/domains) and go to DNS for the domain
 
 Porkbun → Domain Management → DNS Records.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -9043,7 +9043,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -9056,9 +9056,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -9074,7 +9074,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -9116,10 +9116,10 @@ Add Reloop’s DNS records in AWS Route 53 using the values from your domain pag
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -9130,7 +9130,7 @@ Open [AWS Route 53](https://console.aws.amazon.com/route53) and go to DNS for th
 
 Route 53 → Hosted zones → your zone → Records.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -9158,7 +9158,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -9171,9 +9171,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -9189,7 +9189,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -9231,10 +9231,10 @@ Add Reloop’s DNS records in Squarespace using the values from your domain page
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -9245,7 +9245,7 @@ Open [Squarespace](https://account.squarespace.com/domains) and go to DNS for th
 
 Squarespace → Domains → DNS Settings.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -9273,7 +9273,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -9286,9 +9286,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -9296,7 +9296,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 ## Squarespace-specific notes
 
-- Domains migrated from Google Domains often still show `googledomains.com` nameservers — manage them in Squarespace.
+- Domains migrated from Google Domains often still show `googledomains.com` nameservers. Manage them in Squarespace.
 - Use `@` for the root host when Squarespace requires it.
 
 ## Receiving emails
@@ -9304,7 +9304,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -9346,10 +9346,10 @@ Add Reloop’s DNS records in Strato using the values from your domain page in R
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -9360,7 +9360,7 @@ Open [Strato](https://www.strato.de/apps/CustomerService) and go to DNS for the 
 
 Strato Kunden-Login → Domains → DNS / Domainverwaltung.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -9388,7 +9388,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -9401,9 +9401,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -9419,7 +9419,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -9484,12 +9484,12 @@ Omit your domain from the Name/Host field when the UI appends it automatically.
 </Info>
 
 <Warning>
-Merge `include:reloop.sh` into an existing SPF TXT — do not create two SPF records. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
+Merge `include:reloop.sh` into an existing SPF TXT. Do not create two SPF records. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
 </Warning>
 
 ## Receiving emails
 
-Enable receiving in Reloop only if you want MX for that hostname to point at Reloop (`inbound.reloop.sh`). That can replace another inbox on the same name — see [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
+Enable receiving in Reloop only if you want MX for that hostname to point at Reloop (`inbound.reloop.sh`). That can replace another inbox on the same name. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
 
 ## Complete verification
 
@@ -9512,10 +9512,10 @@ Vercel can use Reloop **Auto-populate** when nameservers match. Manual steps are
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Automatic setup (recommended)
@@ -9527,7 +9527,7 @@ Vercel supports Reloop **Auto-populate** (Domain Connect). This is usually the f
     Go to [Domains](https://reloop.sh/dashboard/domain) and open the domain you added.
   </Step>
   <Step title="Check receiving before Auto-populate">
-    New domains start with **Email Receiving** on, so Auto-populate usually includes inbound MX (`inbound.reloop.sh`). If this hostname must keep Google Workspace / Microsoft 365, turn **Email Receiving** off first — or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain). See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+    New domains start with **Email Receiving** on, so Auto-populate usually includes inbound MX (`inbound.reloop.sh`). If this hostname must keep Google Workspace / Microsoft 365, turn **Email Receiving** off first, or use a [separate subdomain](/docs/guides/connect-domain/what-is-a-domain). See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
   </Step>
   <Step title="Click Auto populate">
     Reloop opens Vercel for consent. Sign in if asked, review the records, and approve.
@@ -9547,7 +9547,7 @@ Open [Vercel](https://vercel.com/dashboard/domains) and go to DNS for the domain
 
 Vercel → Domains → domain DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -9575,7 +9575,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -9588,9 +9588,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -9606,7 +9606,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -9648,10 +9648,10 @@ Add Reloop’s DNS records in WordPress.com using the values from your domain pa
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -9662,7 +9662,7 @@ Open [WordPress.com](https://wordpress.com/domains/manage) and go to DNS for the
 
 WordPress.com → Domains → DNS records.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -9690,7 +9690,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -9703,9 +9703,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -9713,7 +9713,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 
 ## WordPress.com-specific notes
 
-- WordPress.com is listed as a Domain Connect DNS provider. Reloop’s template is **not** onboarded there yet — use manual setup unless Reloop shows **Auto populate**.
+- WordPress.com is listed as a Domain Connect DNS provider. Reloop’s template is **not** onboarded there yet. Use manual setup unless Reloop shows **Auto populate**.
 - If the domain uses custom nameservers elsewhere, edit that host instead.
 
 ## Receiving emails
@@ -9721,7 +9721,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification
@@ -9765,7 +9765,7 @@ Two different jobs are easy to confuse:
 | **Registrar** | Sells/renews the domain name; stores who owns it | Namecheap, GoDaddy, NameSilo, Cloudflare Registrar |
 | **DNS host** | Answers DNS queries for the domain (hosts the zone) | Cloudflare DNS, Route 53, Vercel DNS, the registrar’s own DNS |
 
-Reloop records must be added at the **DNS host** — the place your **nameservers** point to — not necessarily the place you paid for the domain.
+Reloop records must be added at the **DNS host** (the place your **nameservers** point to), not necessarily the place you paid for the domain.
 
 ## Common setups
 
@@ -9790,8 +9790,8 @@ Domains on Vercel, Netlify, or Squarespace often use that product’s nameserver
 
 ## How to tell which you have
 
-1. In Reloop, open the domain — we show the detected provider when nameservers match a known host.
-2. Or look up nameservers — see [Find your DNS provider](/docs/guides/connect-domain/find-dns-provider).
+1. In Reloop, open the domain. We show the detected provider when nameservers match a known host.
+2. Or look up nameservers; see [Find your DNS provider](/docs/guides/connect-domain/find-dns-provider).
 3. Or check your registrar’s “Nameservers” page: if it lists Cloudflare/AWS/Vercel hosts, use that host’s panel.
 
 ## Rule of thumb
@@ -9817,10 +9817,10 @@ Goal: Gmail/Outlook/others accept mail from `you@yourdomain.com` as authenticate
 
 Typically involves:
 
-- **SPF** — authorize Reloop (`include:reloop.sh`)
-- **DKIM** — sign messages (`reloop._domainkey`)
-- **DMARC** — policy for failures (required for Reloop verification when Email Sending is on)
-- **Tracking CNAME** — on by default for new domains (`link` on apex, or `link.<subdomain>` when using a subdomain) → `link.reloop.sh`
+- **SPF**: authorize Reloop (`include:reloop.sh`)
+- **DKIM**: sign messages (`reloop._domainkey`)
+- **DMARC**: policy for failures (required for Reloop verification when Email Sending is on)
+- **Tracking CNAME**: on by default for new domains (`link` on apex, or `link.<subdomain>` when using a subdomain) → `link.reloop.sh`
 
 Sending does **not** require an MX record. MX is only for inbound mail.
 
@@ -9927,7 +9927,7 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/troubleshoot/dkim-dmarc-t
 
 | Check | Details |
 | --- | --- |
-| Host | Usually `reloop._domainkey` — not `reloop._domainkey.yourdomain.com` if the UI adds the domain |
+| Host | Usually `reloop._domainkey`, not `reloop._domainkey.yourdomain.com` if the UI adds the domain |
 | Type | TXT |
 | Value | Starts with `v=DKIM1; k=rsa; p=` and a long base64 key |
 | Length | If the panel truncates, use “split TXT” / multi-string support or a provider that accepts long TXT |
@@ -9982,7 +9982,7 @@ API or SMTP send fails because the `From` address domain is not a verified domai
 
 ## Fix
 
-1. Verify the domain (or subdomain) you want to send from — [Add a domain](/docs/guides/connect-domain/add-domain).
+1. Verify the domain (or subdomain) you want to send from. See [Add a domain](/docs/guides/connect-domain/add-domain).
 2. Send with a `From` on that exact verified hostname (e.g. if you verified `mail.acme.com`, use `you@mail.acme.com`).
 
 Also see: [Domain mismatch](/docs/guides/error-domain-mismatch).
@@ -10020,7 +10020,7 @@ MX records decide **where inbound mail is delivered**. Lower priority number = h
 
 ## Sending-only with an existing inbox
 
-If you only need Reloop to **send**, keep your current inbox MX where it is. Publish SPF, DKIM, DMARC, and tracking as shown in Reloop — and turn **Email Receiving** off so Reloop does not expect inbound MX (`inbound.reloop.sh`). Sending does not require an MX record.
+If you only need Reloop to **send**, keep your current inbox MX where it is. Publish SPF, DKIM, DMARC, and tracking as shown in Reloop, and turn **Email Receiving** off so Reloop does not expect inbound MX (`inbound.reloop.sh`). Sending does not require an MX record.
 
 New domains start with Email Receiving on; turn it off before Auto-populate or manual publish if you must keep Google Workspace / Microsoft 365 on that hostname.
 
@@ -10039,7 +10039,7 @@ Reloop supports the [root, a subdomain, or both](/docs/guides/connect-domain/wha
 
 ## Multiple MX priorities
 
-If you experiment with multiple MX targets, lower priority number = higher preference. Mixing two inbox providers on one hostname is advanced and usually the wrong fix — prefer a separate hostname for Reloop receiving.
+If you experiment with multiple MX targets, lower priority number = higher preference. Mixing two inbox providers on one hostname is advanced and usually the wrong fix. Prefer a separate hostname for Reloop receiving.
 
 ---
 
@@ -10070,15 +10070,15 @@ dig MX yourdomain.com +short
 dig CNAME link.yourdomain.com +short
 ```
 
-Compare to the Reloop dashboard (for subdomains, dig the subdomain hosts Reloop shows — e.g. `link.mail.yourdomain.com`). If dig is empty, wait for [propagation](/docs/guides/connect-domain/verification/propagation) or fix the publish step.
+Compare to the Reloop dashboard (for subdomains, dig the subdomain hosts Reloop shows, e.g. `link.mail.yourdomain.com`). If dig is empty, wait for [propagation](/docs/guides/connect-domain/verification/propagation) or fix the publish step.
 
 ## 3. Fix common record mistakes
 
-- **DKIM truncated** — paste the full `p=` key ([typos](/docs/guides/connect-domain/troubleshoot/dkim-dmarc-typos))
-- **Two SPF TXT records** — merge ([SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts))
-- **Wrong host** — UI double-appended the domain (`reloop._domainkey.example.com.example.com`)
-- **Proxied Cloudflare records** — set mail-related records to DNS only
-- **Missing required group** — receiving MX or tracking still expected while toggles are on (defaults are on for new domains)
+- **DKIM truncated**: paste the full `p=` key ([typos](/docs/guides/connect-domain/troubleshoot/dkim-dmarc-typos))
+- **Two SPF TXT records**: merge ([SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts))
+- **Wrong host**: UI double-appended the domain (`reloop._domainkey.example.com.example.com`)
+- **Proxied Cloudflare records**: set mail-related records to DNS only
+- **Missing required group**: receiving MX or tracking still expected while toggles are on (defaults are on for new domains)
 
 ## 4. Re-verify
 
@@ -10104,7 +10104,7 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/troubleshoot/spf-conflict
 
 ## Rule
 
-A hostname should have **one** SPF policy — one TXT that starts with `v=spf1`. Multiple SPF TXT records cause unpredictable failures.
+A hostname should have **one** SPF policy: one TXT that starts with `v=spf1`. Multiple SPF TXT records cause unpredictable failures.
 
 ## Reloop’s include
 
@@ -10118,13 +10118,13 @@ Example merged record (illustrative):
 v=spf1 include:_spf.google.com include:reloop.sh -all
 ```
 
-Keep your existing includes; add Reloop’s; keep a single ending mechanism (`-all` or `~all` as you prefer — Reloop’s generated record uses `-all` when it creates a fresh SPF).
+Keep your existing includes; add Reloop’s; keep a single ending mechanism (`-all` or `~all` as you prefer; Reloop’s generated record uses `-all` when it creates a fresh SPF).
 
 ## What not to do
 
 - Do not add a second TXT `v=spf1 include:reloop.sh -all` beside Google’s SPF
 - Do not put SPF inside a DMARC or DKIM record
-- Do not use outdated includes like `_spf.reloop.sh` unless your dashboard explicitly shows them — hosted Reloop uses `include:reloop.sh`
+- Do not use outdated includes like `_spf.reloop.sh` unless your dashboard explicitly shows them; hosted Reloop uses `include:reloop.sh`
 
 ## After merging
 
@@ -10234,7 +10234,7 @@ Markdown: https://reloop.sh/docs/guides/connect-domain/verification/how-verifica
 ## What Reloop does *not* do
 
 - Reloop does not log into your registrar for you (except via Domain Connect consent you approve).
-- Reloop does not see private DNS behind a firewall — only what the public internet resolves.
+- Reloop does not see private DNS behind a firewall, only what the public internet resolves.
 - Reloop cannot fix typos in your panel; you must edit DNS and re-verify.
 
 ## Partial matches
@@ -10243,7 +10243,7 @@ Some records may pass while others fail (e.g. SPF OK, DKIM truncated). The domai
 
 ## Re-verification
 
-After any DNS edit, click **Verify Domain** (or **Re-verify DNS** in the domain menu) again to start a new check. Reloop may retry that job after it starts; it does not silently verify while status stays pending. Cached resolvers may lag — see [propagation](/docs/guides/connect-domain/verification/propagation).
+After any DNS edit, click **Verify Domain** (or **Re-verify DNS** in the domain menu) again to start a new check. Reloop may retry that job after it starts; it does not silently verify while status stays pending. Cached resolvers may lag. See [propagation](/docs/guides/connect-domain/verification/propagation).
 
 ## Related
 
@@ -10321,7 +10321,7 @@ Online “DNS checker” sites that query multiple regions are also fine.
 ## Tips
 
 - After Domain Connect approve, wait 1–2 minutes before the first Verify.
-- Do not delete and recreate records repeatedly — that resets TTL clocks.
+- Do not delete and recreate records repeatedly, as that resets TTL clocks.
 - Confirm you edited the live nameserver host ([wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers)).
 
 ## Related
@@ -10363,7 +10363,7 @@ While status is `pending`, `verifying`, or `failed`, the domain page shows the D
 Source: https://reloop.sh/docs/guides/connect-domain/what-is-a-domain
 Markdown: https://reloop.sh/docs/guides/connect-domain/what-is-a-domain.md
 
-A **domain** is the human-readable name for your brand on the internet — for example `acme.com` or `shop.acme.com`.
+A **domain** is the human-readable name for your brand on the internet, for example `acme.com` or `shop.acme.com`.
 
 ## Domain vs website vs email
 
@@ -10373,7 +10373,7 @@ A **domain** is the human-readable name for your brand on the internet — for e
 | **Website** | `https://acme.com` | Pages hosted somewhere (Vercel, Netlify, WordPress, …) |
 | **Email address** | `hello@acme.com` | Mail identity that uses the domain after the `@` |
 
-Reloop is email infrastructure, not a website host. Your site can stay on Vercel, Netlify, WordPress, or anywhere else — Reloop only needs permission (via DNS) to **authenticate and deliver** mail for that domain.
+Reloop is email infrastructure, not a website host. Your site can stay on Vercel, Netlify, WordPress, or anywhere else. Reloop only needs permission (via DNS) to **authenticate and deliver** mail for that domain.
 
 ## Who “owns” a domain?
 
@@ -10397,7 +10397,7 @@ You can connect the **root**, a **subdomain**, or **both** to Reloop.
 - Separate sending reputation from corporate mail
 - Clearer mental model: “product mail lives on `mail.`”
 
-From addresses look like `hello@mail.acme.com` unless you also configure other identities — plan branding accordingly.
+From addresses look like `hello@mail.acme.com` unless you also configure other identities. Plan branding accordingly.
 
 ### Pros of the root domain
 
@@ -10433,7 +10433,7 @@ ada.ns.cloudflare.com
 bob.ns.cloudflare.com
 ```
 
-Whoever runs those nameservers is your **DNS host** — that is where you add Reloop’s records. Often that is the same company as your registrar, but not always (see [Registrar vs DNS host](/docs/guides/connect-domain/registrar-vs-dns-host)).
+Whoever runs those nameservers is your **DNS host**, which is where you add Reloop’s records. Often that is the same company as your registrar, but not always (see [Registrar vs DNS host](/docs/guides/connect-domain/registrar-vs-dns-host)).
 
 ## DNS records
 
@@ -10447,10 +10447,10 @@ A **record** is one instruction in your zone. Reloop asks for several types:
 
 Each record has roughly:
 
-- **Host / Name** — which name the record applies to (`@`, `reloop._domainkey`, `link`, …)
-- **Type** — TXT, MX, CNAME, …
-- **Value / Points to / Content** — the data Reloop shows in the dashboard
-- **TTL** — how long resolvers may cache the answer (Auto / 300 / 3600 are common)
+- **Host / Name**: which name the record applies to (`@`, `reloop._domainkey`, `link`, …)
+- **Type**: TXT, MX, CNAME, …
+- **Value / Points to / Content**: the data Reloop shows in the dashboard
+- **TTL**: how long resolvers may cache the answer (Auto / 300 / 3600 are common)
 
 Copy these **exactly** from Reloop. A missing character in a DKIM key breaks verification.
 
@@ -11153,7 +11153,7 @@ Why you cannot send from the `reloop.sh` domain via the public send API.
 
 ## Overview
 
-`reloop.sh` (or your deployment's `ONBOARDING_TEST_DOMAIN`) is a **Reloop-owned onboarding test domain**. It is reserved for the onboarding **Send email** button — not for arbitrary customer domain setup.
+`reloop.sh` (or your deployment's `ONBOARDING_TEST_DOMAIN`) is a **Reloop-owned onboarding test domain**. It is reserved for the onboarding **Send email** button, not for arbitrary customer domain setup.
 
 If you call `POST /api/mail/v1/send` with a From address on that domain, Reloop returns an error directing you to use your own verified domain.
 
@@ -11233,13 +11233,13 @@ Create keys in the [dashboard](https://reloop.sh/dashboard/api-keys) or with cod
 
 ## Quick rules
 
-- Copy on create/rotate — secret is not shown again  
+- Copy on create/rotate: secret is not shown again  
 - Store as `RELOOP_API_KEY`  
 - Leak? **Disable** → replace → update apps  
 
 ## Guide
 
-[API Keys](/docs/learn/api-keys) — dashboard + code for create, use, rotate, delete.
+[API Keys](/docs/learn/api-keys): dashboard + code for create, use, rotate, delete.
 
 ---
 
@@ -11300,14 +11300,14 @@ Reloop's inbound email feature can be used to forward received emails to another
 Source: https://reloop.sh/docs/guides
 Markdown: https://reloop.sh/docs/guides.md
 
-Practical guides for Reloop — domains, DNS setup by provider, deliverability, sending, troubleshooting, and more.
+Practical guides for Reloop covering domains, DNS setup by provider, deliverability, sending, troubleshooting, and more.
 
 ## Domains & DNS
 
 Domain connection docs now live under **[Connect a domain](/docs/guides/connect-domain)** (foundations, Auto-populate, every provider guide, verification, troubleshooting).
 
-- **[Connect a domain](/docs/guides/connect-domain)** — start here
-- **[Provider guides](/docs/guides/connect-domain/providers)** — Cloudflare, Vercel, GoDaddy, Route 53, NameSilo, and more
+- **[Connect a domain](/docs/guides/connect-domain)**: start here
+- **[Provider guides](/docs/guides/connect-domain/providers)**: Cloudflare, Vercel, GoDaddy, Route 53, NameSilo, and more
 - [Avoid MX Conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts)
 - [Domain not verifying](/docs/guides/connect-domain/troubleshoot/not-verifying)
 
@@ -11523,7 +11523,7 @@ Plan limits are enforced on Reloop Cloud. Dashboard usage: [Account settings](ht
 
 ## Learn more
 
-- [pricing.md](https://reloop.sh/pricing.md) — canonical agent-readable plans
+- [pricing.md](https://reloop.sh/pricing.md): canonical agent-readable plans
 - [Compare Reloop](https://reloop.sh/compare.md)
 - [Handling API Keys](/docs/guides/handling-api-keys)
 
@@ -11697,12 +11697,12 @@ Before going live with Supabase + Reloop, follow this checklist to ensure your a
 
 ## Checklist
 
-- [ ] **Verify your domain** — Complete DNS verification in the [Reloop dashboard](https://app.reloop.sh/domains).
-- [ ] **Use a subdomain** — Send auth emails from a subdomain like `auth.example.com` to protect your root domain reputation.
-- [ ] **Set up DMARC** — Add a DMARC record to monitor and protect against spoofing.
-- [ ] **Test deliverability** — Send test emails to Gmail, Outlook, and Yahoo to confirm inbox placement.
-- [ ] **Warm up your domain** — If you're sending to a large audience, gradually increase volume. See our [Warm-up Guide](/docs/guides/warmup-guide).
-- [ ] **Set appropriate rate limits** — Don't send more than your plan allows. See [Account Quotas](/docs/guides/account-quotas-limits).
+- [ ] **Verify your domain**: Complete DNS verification in the [Reloop dashboard](https://app.reloop.sh/domains).
+- [ ] **Use a subdomain**: Send auth emails from a subdomain like `auth.example.com` to protect your root domain reputation.
+- [ ] **Set up DMARC**: Add a DMARC record to monitor and protect against spoofing.
+- [ ] **Test deliverability**: Send test emails to Gmail, Outlook, and Yahoo to confirm inbox placement.
+- [ ] **Warm up your domain**: If you're sending to a large audience, gradually increase volume. See our [Warm-up Guide](/docs/guides/warmup-guide).
+- [ ] **Set appropriate rate limits**: Don't send more than your plan allows. See [Account Quotas](/docs/guides/account-quotas-limits).
 
 ## Learn More
 
@@ -13243,7 +13243,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/channels.md
 
     The [Channels Dashboard](https://reloop.sh/dashboard/contacts/channels) shows every subscription channel in your organization, including subscriber count, visibility, and default enrollment.
 
-    Channels are topics contacts can opt in or out of — for example **Product Updates** or **Newsletter** — instead of a single global unsubscribe. Visibility and default subscription stay on the channel; enrollments live on each [contact](/docs/learn/contacts).
+    Channels are topics contacts can opt in or out of (for example **Product Updates** or **Newsletter**) instead of a single global unsubscribe. Visibility and default subscription stay on the channel; enrollments live on each [contact](/docs/learn/contacts).
 
     ![Contact channels in the Reloop dashboard](/docs/images/docs/contacts/channels/channels-list.png)
 
@@ -13275,7 +13275,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/channels.md
     ## View channel subscribers
 
     <Info>
-    **View Subscribers** opens Contacts filtered to contacts enrolled in that channel. The subscriber count on the channel card matches this enrolled list — not every contact in your organization.
+    **View Subscribers** opens Contacts filtered to contacts enrolled in that channel. The subscriber count on the channel card matches this enrolled list, not every contact in your organization.
     </Info>
 
     1. Open [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
@@ -13422,7 +13422,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/groups.md
 
     The [Groups Dashboard](https://reloop.sh/dashboard/contacts/groups) shows every group in your organization. Open a group to see its members, rename it, or add and remove contacts.
 
-    Groups are lists you send to. One [contact](/docs/learn/contacts) can sit in many groups; the person stays a single record. Membership does not change subscription status — that stays on the contact.
+    Groups are lists you send to. One [contact](/docs/learn/contacts) can sit in many groups; the person stays a single record. Membership does not change subscription status; that stays on the contact.
 
     ![Contact groups in the Reloop dashboard](/docs/images/docs/contacts/groups/groups-list.png)
 
@@ -13462,7 +13462,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/groups.md
     ## Remove contacts from a group
 
     <Info>
-    Removing a member leaves the contact in your organization — they only leave that list. Their profile, status, properties, and other group memberships are unchanged.
+    Removing a member leaves the contact in your organization; they only leave that list. Their profile, status, properties, and other group memberships are unchanged.
     </Info>
 
     1. Open the group from [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
@@ -13474,7 +13474,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/groups.md
     ## Delete a group
 
     <Info>
-    Deleting soft-deletes the group. Contacts are not deleted — they stay in your organization and are no longer targeted via that group.
+    Deleting soft-deletes the group. Contacts are not deleted; they stay in your organization and are no longer targeted via that group.
     </Info>
 
     1. Open [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups) (or open the group detail)
@@ -13520,7 +13520,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/groups.md
 
 <AccordionGroup>
   <Accordion title="What are contact groups in Reloop?">
-    Groups are lists you send to — for example VIP Customers or Free Trial. One contact can belong to many groups; the person stays a single [contact](/docs/learn/contacts) record.
+    Groups are lists you send to, for example VIP Customers or Free Trial. One contact can belong to many groups; the person stays a single [contact](/docs/learn/contacts) record.
   </Accordion>
 
   <Accordion title="Does putting a contact in a group change their subscription status?">
@@ -13536,7 +13536,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/groups.md
   </Accordion>
 
   <Accordion title="Can I rename a group?">
-    Yes. Update changes the group **name** only — from the group detail header in the dashboard or via the Groups update API.
+    Yes. Update changes the group **name** only, either from the group detail header in the dashboard or via the Groups update API.
   </Accordion>
 
   <Accordion title="Does deleting a group delete its contacts?">
@@ -13615,11 +13615,11 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
     1. Go to [Contacts](https://reloop.sh/dashboard/contacts)
     2. Click **Add contact** (or press `C`)
     3. Choose **Import CSV file**, **Copy paste**, or **Sync via SDK**
-    4. Finish that flow — map CSV columns, paste emails, or follow the SDK snippets
+    4. Finish that flow: map CSV columns, paste emails, or follow the SDK snippets
     5. Confirm to add the contacts
 
     <Info>
-    Email is unique per organization. If the address already exists, Reloop returns an error — update that contact instead of creating another one.
+    Email is unique per organization. If the address already exists, Reloop returns an error; update that contact instead of creating another one.
     </Info>
     <Video src="/docs/images/docs/contacts/overview/create-contact.mp4" autoPlay loop muted playsInline />
 
@@ -13628,7 +13628,7 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
     1. Open [Contacts](https://reloop.sh/dashboard/contacts)
     2. Use **Search contacts…** (or press `/`) to find by email
     3. Optionally filter by **Status** (Subscribed, Unsubscribed, or Blocked)
-    4. Click a row to open detail — or use **Export CSV** (`E`) for an offline copy
+    4. Click a row to open detail, or use **Export CSV** (`E`) for an offline copy
 
     <Video src="/docs/images/docs/contacts/overview/search-filter-contact.mp4" autoPlay loop muted playsInline />
 
@@ -13682,7 +13682,7 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
     <ContactsCodeSamples id="contacts.create" />
 
     <Info>
-    Email is unique per organization. A duplicate email returns an error — update the existing contact instead.
+    Email is unique per organization. A duplicate email returns an error; update the existing contact instead.
     </Info>
 
     ## Edit a contact
@@ -13707,7 +13707,7 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
   </Accordion>
 
   <Accordion title="What happens if I add a duplicate email?">
-    Email is unique per organization. Creating a contact with an email that already exists returns an error — [update](#edit-a-contact) the existing contact instead of creating another one.
+    Email is unique per organization. Creating a contact with an email that already exists returns an error; [update](#edit-a-contact) the existing contact instead of creating another one.
   </Accordion>
 
   <Accordion title="What is the difference between unsubscribed and blocked?">
@@ -13719,7 +13719,7 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
   </Accordion>
 
   <Accordion title="How do I manage contacts with code?">
-    Use the Reloop SDK or REST API to create, list, get, update, and delete contacts — same operations as the dashboard.
+    Use the Reloop SDK or REST API to create, list, get, update, and delete contacts, the same operations as the dashboard.
   </Accordion>
 
   <Accordion title="Does Reloop sync contacts with external CRMs (Salesforce, HubSpot, etc.)?">
@@ -13727,7 +13727,7 @@ Markdown: https://reloop.sh/docs/learn/contacts.md
   </Accordion>
 
   <Accordion title="Are there webhooks for contact events (created, updated, unsubscribed, deleted)?">
-    Yes — `contact.create`, `contact.update`, `contact.delete`, `contact.subscribed`, `contact.unsubscribed`, and `contact.blocked`. See [Contact webhooks](/docs/webhooks/contacts/created) and [event types](/docs/webhooks/event-types).
+    Yes: `contact.create`, `contact.update`, `contact.delete`, `contact.subscribed`, `contact.unsubscribed`, and `contact.blocked`. See [Contact webhooks](/docs/webhooks/contacts/created) and [event types](/docs/webhooks/event-types).
   </Accordion>
 
   <Accordion title="Is there a rate limit on the Contacts API?">
@@ -13784,7 +13784,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/properties.md
   <Tab title="Desktop" icon="monitor">
     ## View all contact properties
 
-    The [Properties Dashboard](https://reloop.sh/dashboard/contacts/properties) shows every custom field in your organization — name, type, default, and when it was last updated.
+    The [Properties Dashboard](https://reloop.sh/dashboard/contacts/properties) shows every custom field in your organization: name, type, default, and when it was last updated.
 
     Properties are custom **String** or **Number** fields you attach to a [contact](/docs/learn/contacts). Use them for personalization and targeting (for example `company` or `plan_tier`). An optional default is used when a contact has no value set.
 
@@ -13794,7 +13794,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/properties.md
 
     1. Go to [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
     2. Click **Add property** (or press `C`)
-    3. Enter a name (e.g. `plan_tier` or `company_size`) — letters, numbers, and underscores only
+    3. Enter a name (e.g. `plan_tier` or `company_size`) using letters, numbers, and underscores only
     4. Choose type **String** or **Number**, and optionally set a default
     5. Click **Add property** (or press `Enter`)
 
@@ -13814,7 +13814,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/properties.md
     ## Set values on a contact
 
     <Info>
-    The Properties page defines the **schema**. Values live on each contact — set them when you edit a contact in the dashboard or via the Contacts update API.
+    The Properties page defines the **schema**. Values live on each contact. Set them when you edit a contact in the dashboard or via the Contacts update API.
     </Info>
 
     1. Open [Contacts](https://reloop.sh/dashboard/contacts)
@@ -13869,7 +13869,7 @@ Markdown: https://reloop.sh/docs/learn/contacts/properties.md
 
 <AccordionGroup>
   <Accordion title="What are contact properties in Reloop?">
-    Properties are small details you add to a contact — custom **String** or **Number** fields with an optional default. Use them for personalization and targeting (for example `company` or `plan_tier`).
+    Properties are small details you add to a contact. They are custom **String** or **Number** fields with an optional default. Use them for personalization and targeting (for example `company` or `plan_tier`).
   </Accordion>
 
   <Accordion title="What property types does Reloop support?">
@@ -13885,11 +13885,11 @@ Markdown: https://reloop.sh/docs/learn/contacts/properties.md
   </Accordion>
 
   <Accordion title="Can I rename a property without losing data?">
-    No. After you create a property, you can only change its **default (fallback)** value — name and type stay fixed. To use a different name, create a new property and set values on contacts under that name.
+    No. After you create a property, you can only change its **default (fallback)** value; name and type stay fixed. To use a different name, create a new property and set values on contacts under that name.
   </Accordion>
 
   <Accordion title="Can two properties have the same name but different casing (for example Company vs company)?">
-    No. Names are unique per organization by exact name. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores) — don’t rely on casing variants as separate fields.
+    No. Names are unique per organization by exact name. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores), so don’t rely on casing variants as separate fields.
   </Accordion>
 
   <Accordion title="Can a property have different values for different contacts?">
@@ -13959,19 +13959,19 @@ Markdown: https://reloop.sh/docs/learn/domain.md
     4. Optionally open **Advanced options** to set click/open tracking defaults
     5. Click **Add Domain**
 
-    Reloop creates the domain in `pending` status and opens the DNS setup page with the records you need to publish. Email Sending, Email Receiving, and click/open tracking start **on** by default — turn Receiving off before publishing DNS if this hostname must keep another inbox.
+    Reloop creates the domain in `pending` status and opens the DNS setup page with the records you need to publish. Email Sending, Email Receiving, and click/open tracking start **on** by default. Turn Receiving off before publishing DNS if this hostname must keep another inbox.
 
     ![Add a domain in the Reloop dashboard](/docs/images/docs/guides/connect-domain/shared/add-domain.png)
 
     <Info>
-    Prefer a guided path for beginners? See the full [Connect a domain](/docs/guides/connect-domain) guide — DNS basics, provider tutorials, and troubleshooting.
+    Prefer a guided path for beginners? See the full [Connect a domain](/docs/guides/connect-domain) guide, with DNS basics, provider tutorials, and troubleshooting.
     </Info>
 
     ## Configure DNS
 
     After you add a domain, Reloop shows the required DNS records (SPF, DKIM, DMARC, and receiving/tracking rows based on your toggles). Sending does not require MX.
 
-    **Auto-populate** (when available — today Cloudflare, Vercel, Domain Chief, and NameSilo):
+    **Auto-populate** (when available; today Cloudflare, Vercel, Domain Chief, and NameSilo):
 
     1. On the setup or domain page, click **Auto populate**
     2. Approve Reloop’s Domain Connect template at your DNS host
@@ -13983,7 +13983,7 @@ Markdown: https://reloop.sh/docs/learn/domain.md
 
     1. Copy each record from the Reloop DNS table
     2. Add them at the host that manages your [nameservers](/docs/guides/connect-domain/find-dns-provider)
-    3. Merge SPF if you already have an SPF TXT — do not create a second SPF record
+    3. Merge SPF if you already have an SPF TXT; do not create a second SPF record
 
     Deep dives: [Auto-populate](/docs/guides/connect-domain/auto-populate) · [Manual setup](/docs/guides/connect-domain/manual-setup) · [DNS records explained](/docs/guides/connect-domain/dns-records-explained) · [Provider guides](/docs/guides/connect-domain/providers)
 
@@ -14012,7 +14012,7 @@ Markdown: https://reloop.sh/docs/learn/domain.md
     <Video src="/docs/images/docs/domain/domain-config.mp4" autoPlay loop muted playsInline />
 
     <Info>
-    Email Receiving is on by default for new domains. Publishing Reloop inbound MX (`inbound.reloop.sh`) on a hostname that already uses Google Workspace or Microsoft 365 can divert or split delivery — turn Receiving off for send-only, or use a subdomain. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving) and [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
+    Email Receiving is on by default for new domains. Publishing Reloop inbound MX (`inbound.reloop.sh`) on a hostname that already uses Google Workspace or Microsoft 365 can divert or split delivery. Turn Receiving off for send-only, or use a subdomain. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving) and [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts).
     </Info>
 
     ## Forward DNS records
@@ -14026,7 +14026,7 @@ Markdown: https://reloop.sh/docs/learn/domain.md
     ## Delete a domain
 
     <Info>
-    Deleting permanently removes the domain from Reloop. You can no longer send with that hostname until you add and verify it again. Optionally remove Reloop DNS rows at your host afterward — see [Remove a domain](/docs/guides/connect-domain/after/remove-domain).
+    Deleting permanently removes the domain from Reloop. You can no longer send with that hostname until you add and verify it again. Optionally remove Reloop DNS rows at your host afterward. See [Remove a domain](/docs/guides/connect-domain/after/remove-domain).
     </Info>
 
     1. Open [Domains](https://reloop.sh/dashboard/domain)
@@ -14100,7 +14100,7 @@ Markdown: https://reloop.sh/docs/learn/domain.md
   </Accordion>
 
   <Accordion title="Are there webhooks for domain events?">
-    Yes — `domain.create`, `domain.updated`, and `domain.deleted`. See [Domain webhooks](/docs/webhooks/domains/created) and [event types](/docs/webhooks/event-types).
+    Yes: `domain.create`, `domain.updated`, and `domain.deleted`. See [Domain webhooks](/docs/webhooks/domains/created) and [event types](/docs/webhooks/event-types).
   </Accordion>
 </AccordionGroup>
 
@@ -14299,7 +14299,206 @@ Coming Soon
 Source: https://reloop.sh/docs/self-host/coolify
 Markdown: https://reloop.sh/docs/self-host/coolify.md
 
-Coming Soon
+Reloop ships a Coolify template at
+[`install/coolify/reloop.yaml`](https://github.com/reloop-labs/reloop/blob/main/install/coolify/reloop.yaml).
+It runs the same stack as the [VPS installer](/docs/self-host/vps), with Coolify
+generating every secret and its proxy handling HTTPS.
+
+---
+
+## Before you start
+
+| Requirement | Value |
+| :--- | :--- |
+| **Coolify** | v4, with the default Traefik proxy |
+| **Architecture** | x86_64 (the dashboard and links images are amd64 only) |
+| **RAM** | 8 GB for Reloop and Coolify together |
+| **Disk** | 50 GB. The container images alone take about 22 GB |
+| **Ports** | `25`, `465` and `587` free on the server, inbound and outbound |
+| **DNS** | Three hostnames pointing at the server, see [DNS](#dns) |
+
+Many providers block port `25` by default. Reloop delivers to recipient mail
+servers on outbound `25`, and receives mail on inbound `25`, so ask your
+provider to open it.
+
+---
+
+## Deploy
+
+1. In Coolify, open your project and choose **New Resource** → **Docker Compose**
+   (called **Docker Compose Empty** in older versions).
+2. Paste the contents of
+   [`reloop.yaml`](https://raw.githubusercontent.com/reloop-labs/reloop/main/install/coolify/reloop.yaml)
+   and save.
+3. Before the first deploy, replace the generated domain of these two services:
+
+   | Service | Domain |
+   | :--- | :--- |
+   | `proxy` | `https://reloop.example.com` |
+   | `links` | `https://link.reloop.example.com` |
+
+   Coolify warns that `proxy` requires port `80` and `links` requires port
+   `3005`. Choose **Use this port anyway**: traffic still goes to those ports,
+   and Reloop's URLs stay without one. **Keep required port** discards the new
+   domain. Leave every other service without a domain.
+4. Click **Deploy**. The first deploy downloads about 5 GB of images, which
+   unpack to about 22 GB.
+
+Coolify creates the database, Redis and every Reloop secret for you and stores
+them under **Environment Variables**. Change none of the generated values after
+the first deploy: the database password is fixed once Postgres initialises,
+changing the tracking or preferences secrets breaks links in mail that was
+already sent, and changing the webhook key breaks the signature on every
+existing webhook.
+
+Coolify passes all of these values to every container in the stack, including
+the public dashboard and links services. Keep `RELOOP_VERSION` on `latest` so
+those services get security fixes.
+
+<Note>
+Set the real domains before you add any sending domain in the dashboard.
+Reloop writes the DNS records it shows you at the moment a domain is created,
+so a domain added while the instance still runs on Coolify's generated
+`sslip.io` address keeps pointing there.
+</Note>
+
+---
+
+## DNS
+
+```text
+reloop.example.com            A    203.0.113.10
+link.reloop.example.com       A    203.0.113.10
+inbound.reloop.example.com    A    203.0.113.10
+reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
+```
+
+- The apex record serves the dashboard and the API.
+- `link.` serves click and open tracking and the unsubscribe pages.
+- `inbound.` is the MX target for mail your verified domains receive. The
+  template always uses `inbound.` plus the `proxy` domain.
+- The SPF record authorises the server to send for the host domain, which is
+  what the `include:` in each sending domain's SPF resolves to.
+
+Also ask your provider for a PTR record on the server IP that resolves to
+`reloop.example.com`. Receiving servers check it.
+
+---
+
+## First sign-in
+
+1. In Coolify, open **Environment Variables** and copy the value of `SERVICE_PASSWORD_64_SETUPKEY`.
+2. Open `https://reloop.example.com/dashboard/setup` and paste it as the setup key.
+3. Choose the first administrator's name, email and password.
+4. Name the first organization. Leave the instance name empty: on Coolify it
+   has no effect, so set `APP_NAME` under **Environment Variables** instead.
+
+The key works once. If you think it leaked before setup, change
+`SERVICE_PASSWORD_64_SETUPKEY` and restart: the old key stops working.
+
+Setup signs you in with a session that lasts 7 days. To sign in again after
+that, Reloop emails you a code, so configure system email before it runs out.
+
+---
+
+## System email
+
+Sign-in codes and invitations need a way out. Set these under **Environment
+Variables**, then restart the service:
+
+| Variable | Value |
+| :--- | :--- |
+| `RELOOP_SENDER_DOMAIN` | The domain system mail is sent from. Always required |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE` | Any SMTP provider you already use (Postmark, SES, your own). `SMTP_SECURE=true` means implicit TLS, normally with port `465` |
+| `RELOOP_API_KEY` | Instead of SMTP: an API key of the organization that owns `RELOOP_SENDER_DOMAIN`, once that domain is verified in this instance |
+
+---
+
+## Configuration
+
+Everything below is optional. Coolify lists each variable under **Environment
+Variables** with its default.
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `DISABLE_SIGNUP` | `true` | Blocks public registration. Invited addresses can still join. If setup leaves public sign-ups off, it also saves that in `/run/reloop/.env` on the `auth` service's volume, which keeps registration closed even when this is `false`. To open it later, set this to `false`, remove the `DISABLE_SIGNUP` line from that file in the `auth` container, and restart |
+| `DISABLE_ORG_CREATION` | `false` | Stops users creating further organizations |
+| `APP_NAME` | `Reloop` | Instance name in system email, shown as `Self-hosted Reloop × <name>` |
+| `S3_ENDPOINT`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | empty | S3-compatible storage for template images and attachments. The bucket must serve objects publicly, because Reloop hands out URLs as `{S3_ENDPOINT}/{S3_BUCKET}/{path}` |
+| `S3_BUCKET` | `reloop-uploads` | Bucket name |
+| `S3_REGION` | `us-east-1` | Bucket region |
+| `DNS_RESOLVERS` | `8.8.8.8,8.8.4.4` | Resolvers used to verify SPF, DKIM, DMARC and MX records |
+| `DKIM_SELECTOR` | `reloop` | Selector for the DKIM keys Reloop generates |
+| `RELOOP_VERSION` | `latest` | Image tag for every Reloop service |
+
+The queue dashboard at `https://reloop.example.com/api/workflow/jobs` uses
+`SERVICE_USER_WORKBENCH` and `SERVICE_PASSWORD_WORKBENCH` for basic auth.
+
+---
+
+## Custom tracking domains
+
+A sending domain with click or open tracking gets a `link.` CNAME pointing at
+`link.reloop.example.com`, so tracked links in its mail use the customer's own
+hostname. Coolify's proxy only issues certificates for domains it knows about,
+so add each tracking hostname to the `links` service after the existing one:
+
+```text
+https://link.reloop.example.com,https://link.customer.com
+```
+
+Keep `https://link.reloop.example.com` first. Reloop uses the first domain in
+the list as the instance's tracking host and as the CNAME target for every new
+sending domain. Choose **Use this port anyway** again when Coolify asks, then
+save and restart. The VPS installer issues these certificates automatically; on
+Coolify this step is manual.
+
+---
+
+## Mail ports and TLS
+
+| Port | Service | Protocol |
+| :--- | :--- | :--- |
+| `25` | `inbound` | SMTP with STARTTLS, for mail your verified domains receive |
+| `587` | `smtp` | Submission with STARTTLS |
+| `465` | `smtp` | The same STARTTLS listener as `587`, not implicit TLS |
+
+Both mail services use a self-signed certificate. Submit on `587` with
+STARTTLS, and tell clients that verify certificates to accept it.
+
+---
+
+## Updates and backups
+
+Pulling the latest images and restarting reruns the `migrate` service, which
+pushes the database schema before the Reloop backend services start. Take a
+backup first: open the `postgres` service, go to **Backups** and schedule one,
+or run a backup on demand before each update.
+
+Updating only changes the images. Coolify keeps the service list and the
+`proxy` Caddyfile from your first install. When a Reloop release changes
+`reloop.yaml`, paste the new file under **Edit Compose File**, then replace the
+Caddyfile under **Persistent Storage** on the `proxy` service with the one from
+the new template, and restart.
+
+---
+
+## Things to avoid
+
+- **Connecting the stack to Coolify's predefined network.** It puts the
+  internal SMTP injection API, NATS and Rspamd on a network every other Coolify
+  resource shares.
+- **arm64 servers.** The dashboard and links images are built for amd64 only.
+- **Routing the mail ports through Coolify's proxy.** SMTP authentication
+  needs the TLS session to reach the `smtp` container directly.
+
+Campaign sends, automation email steps, inbox replies and system mail through
+`RELOOP_API_KEY` call `https://reloop.example.com` from inside the stack, so
+the server must reach its own public address over HTTPS. They fail until
+Coolify has issued the certificate. To check, open a terminal on the `auth`
+container and run
+`wget -qO- https://reloop.example.com/api/auth/v1/get-session`: any response
+other than a connection or TLS error means it works.
 
 ---
 
@@ -14333,11 +14532,11 @@ You can self-host Reloop in production using several approaches:
 
 ## Platform Deployments
 
-Deployment templates and guides for popular cloud providers and self-hosted PaaS solutions are coming soon.
+Guides for Coolify and a plain VPS are ready. Templates for the other platforms below are coming soon.
 
 <CardGroup cols={3}>
   <Card title="Coolify" icon="siCoolify" href="/self-host/coolify">
-    Deploy with one-click on Coolify self-hosted PaaS. (Coming Soon)
+    Deploy the full stack from a Docker Compose template on your Coolify server.
   </Card>
   <Card title="Dokploy" icon="siDocker" href="/self-host/dokploy">
     Easily deploy on your self-hosted Dokploy instance. (Coming Soon)
@@ -14423,7 +14622,7 @@ Verify the following software and runtimes are installed on your hosting server:
 Domain verification reads your published SPF, DKIM, DMARC and MX records from
 public DNS. It queries upstream resolvers directly rather than the host's
 resolver, because a host resolver is frequently a link-local or VPN address that
-is unreachable from inside the container network — the symptom is every record
+is unreachable from inside the container network. The symptom is every record
 failing with `ENOTFOUND` while the same lookup succeeds from the host shell.
 
 The `domain` and `workflow` services need:
@@ -14498,7 +14697,7 @@ The Reloop stack consists of **20 application services** (3 frontends, 17 backen
 * **`workflow`**: Manages campaign automation workflows, timing wait steps, and drip actions.
 * **`upload`**: Manages file storage attachments and static image uploads.
 * **`template`**: Compiles dynamic template variables before mailing dispatch.
-* **`campaigns`**: Broadcast campaigns — audience snapshot, schedule, send, and engagement stats.
+* **`campaigns`**: Broadcast campaigns with audience snapshot, schedule, send, and engagement stats.
 * **`credits`**: Tracks account credit balances, billing cycles, and quotas.
 * **`email`**: The core API service mapping outbound HTTP sending requests to the queue processor.
 * **`inbox`**: Manages receiving inbox threads and incoming messages.
@@ -14518,7 +14717,7 @@ The Reloop stack consists of **20 application services** (3 frontends, 17 backen
 
 ## What the VPS installer deploys
 
-The [one-command VPS installer](/docs/self-host/vps) deploys a reduced set — 20 containers instead of the full platform. It leaves out the pieces that only exist for the hosted service:
+The [one-command VPS installer](/docs/self-host/vps) deploys a reduced set: 20 containers instead of the full platform. It leaves out the pieces that only exist for the hosted service:
 
 | Left out | Why |
 | :--- | :--- |
@@ -14582,7 +14781,7 @@ sudo bash install.sh
 > [!NOTE]
 > The container images are roughly 22 GB in total, which is why the disk floor is higher than for a source install. The installer refuses to continue on a smaller disk rather than failing halfway through the download.
 
-Many providers block outbound port `25` by default. Reloop still sends through the submission ports, but inbound mail needs `25` open in both directions — ask your provider to unblock it if you plan to receive mail.
+Many providers block outbound port `25` by default. Reloop still sends through the submission ports, but inbound mail needs `25` open in both directions. Ask your provider to unblock it if you plan to receive mail.
 
 ---
 
@@ -14590,8 +14789,8 @@ Many providers block outbound port `25` by default. Reloop still sends through t
 
 | Prompt | Purpose | Default |
 | :--- | :--- | :--- |
-| Primary Reloop domain | The hostname the dashboard and API are served on | — |
-| TLS contact email | Let's Encrypt expiry and account notices | — |
+| Primary Reloop domain | The hostname the dashboard and API are served on | - |
+| TLS contact email | Let's Encrypt expiry and account notices | - |
 | Database name | PostgreSQL database | `reloop` |
 | Database user | PostgreSQL role | `reloop` |
 | Run behind an existing reverse proxy | Serve plain HTTP on a local port for your own Caddy, Nginx or Traefik instead of taking `80` and `443`. See [Behind an existing reverse proxy](#behind-an-existing-reverse-proxy) | `no` |
@@ -14601,7 +14800,7 @@ Many providers block outbound port `25` by default. Reloop still sends through t
 
 Everything else is generated: database and Redis passwords, the Better Auth secret, the internal service secret, the tracking and preferences secrets, and the webhook encryption key. They are written to `/opt/reloop/.env` with mode `0600`.
 
-Enter the domain as a bare hostname — `reloop.example.com`, not `https://reloop.example.com` and not `reloop.example.com/admin`.
+Enter the domain as a bare hostname: `reloop.example.com`, not `https://reloop.example.com` and not `reloop.example.com/admin`.
 
 ---
 
@@ -14633,7 +14832,7 @@ reloop update            # pull the configured version and redeploy
 
 ## File uploads
 
-Reloop stores template images and attachments in S3-compatible object storage. The installer does not bundle a storage server — point it at whichever provider you already use (AWS S3, Cloudflare R2, Hetzner Object Storage, Backblaze B2, a MinIO box of your own).
+Reloop stores template images and attachments in S3-compatible object storage. The installer does not bundle a storage server. Point it at whichever provider you already use (AWS S3, Cloudflare R2, Hetzner Object Storage, Backblaze B2, a MinIO box of your own).
 
 Answer yes to the storage prompt and supply the endpoint, access key, secret key, bucket and region. The `upload` service is then deployed alongside the rest of the stack.
 
@@ -14660,7 +14859,7 @@ reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
 - `inbound.` is the MX target for mail your verified domains receive.
 - The SPF record authorises the server to send for the host domain, which is what the `include:` in each sending domain's SPF resolves to.
 
-These are separate from the SPF, DKIM, DMARC and MX records for the domains you send from. Those are generated per domain by Reloop — add a domain under **Domains** in the dashboard and it shows the exact records. See [Connect a domain](/docs/guides/connect-domain).
+These are separate from the SPF, DKIM, DMARC and MX records for the domains you send from. Those are generated per domain by Reloop. Add a domain under **Domains** in the dashboard and it shows the exact records. See [Connect a domain](/docs/guides/connect-domain).
 
 You can run the installer before adding DNS. Caddy keeps retrying certificate issuance in the background and HTTPS starts working on its own once the records resolve. Follow it with `reloop logs proxy`.
 
@@ -15041,7 +15240,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/api-key/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/api-key/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -15132,7 +15331,7 @@ Open the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.s
 
 ## Environment
 
-`apps/backend/auth/.env` — created/merged by `bun setup` / `bun env:setup` from `.env.dev`.
+`apps/backend/auth/.env` (created/merged by `bun setup` / `bun env:setup` from `.env.dev`).
 
 ```bash
 # Database & Cache
@@ -15166,7 +15365,7 @@ GITHUB_CLIENT_SECRET=
 | :--- | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` | Shared Postgres from Docker |
 | `REDIS_URL` | **YES** | `redis://...` | Sessions and rate limits |
-| `BETTER_AUTH_SECRET` | **YES** | — | Session encryption key |
+| `BETTER_AUTH_SECRET` | **YES** | - | Session encryption key |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` | Public origin for OAuth / invites |
 | `PORT` | **YES** | `8000` | Host port |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event bus |
@@ -15177,8 +15376,8 @@ GITHUB_CLIENT_SECRET=
 
 ## Closing registration
 
-`DISABLE_SIGNUP=true` refuses **every** path that would create a new account —
-password sign-up, email code, and social providers — because it is enforced once
+`DISABLE_SIGNUP=true` refuses **every** path that would create a new account
+(password sign-up, email code, and social providers) because it is enforced once
 where the user record is written rather than per method. Existing users keep
 signing in normally.
 
@@ -15206,13 +15405,13 @@ reloop restart auth
 
 > [!WARNING]
 > Set `DISABLE_SIGNUP=true` only after your own account exists. There is no
-> bootstrap exemption — with registration closed and no users, nobody can sign
+> bootstrap exemption: with registration closed and no users, nobody can sign
 > up and no invitation can be issued.
 
 ## Session validation between services
 
 Every backend validates a session by calling `GET /api/auth/v1/get-session` on
-the auth service. It uses `BASE_URL` for that, which is your public origin — so
+the auth service. It uses `BASE_URL` for that, which is your public origin, so
 the call leaves the container, goes back through the reverse proxy and comes
 in again.
 
@@ -15233,7 +15432,7 @@ Then restart the backends. Leave it empty and everything keeps using
 
 > [!NOTE]
 > The path is appended exactly as it is today, so `http://auth:8000` becomes
-> `http://auth:8000/api/auth/v1/get-session` — the same path the proxy forwards
+> `http://auth:8000/api/auth/v1/get-session`, the same path the proxy forwards
 > to that container. Give the origin only: no trailing path, no trailing slash
 > needed.
 
@@ -15283,7 +15482,7 @@ remain correct.
 Source: https://reloop.sh/docs/setup/backend/campaigns
 Markdown: https://reloop.sh/docs/setup/backend/campaigns.md
 
-Broadcast email campaigns — audience targeting, scheduling, send, and engagement stats.
+Broadcast email campaigns: audience targeting, scheduling, send, and engagement stats.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
@@ -15309,7 +15508,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/campaigns/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/campaigns/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -15353,7 +15552,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/contacts/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/contacts/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -15444,7 +15643,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/credits/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/credits/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PORT=8023
@@ -15527,7 +15726,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/domain/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/domain/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -15622,7 +15821,7 @@ Or `bun backend:dev` / `bun dev`. In development, when neither `RELOOP_API_KEY` 
 
 ## Environment
 
-`apps/backend/email/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/email/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 EMAIL_PORT=8022
@@ -15645,13 +15844,13 @@ NODE_ENV=development
 | `EMAIL_PORT` / `PORT` | **YES** | `8022` | Listening port |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` | Platform base URL |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event subscriptions |
-| `RELOOP_API_KEY` | One of | — | API key for the org that owns the sender domain(s); used by `reloop-email` |
-| `RELOOP_SENDER_DOMAIN` | With API key | — | System product mail From domain (auth, billing, invites) |
-| `ONBOARDING_TEST_DOMAIN` | Prod | — | Onboarding “Send email” From domain only (can differ) |
-| `SMTP_HOST` | One of | — | Relay system mail through your own SMTP server instead of Reloop |
+| `RELOOP_API_KEY` | One of | - | API key for the org that owns the sender domain(s); used by `reloop-email` |
+| `RELOOP_SENDER_DOMAIN` | With API key | - | System product mail From domain (auth, billing, invites) |
+| `ONBOARDING_TEST_DOMAIN` | Prod | - | Onboarding “Send email” From domain only (can differ) |
+| `SMTP_HOST` | One of | - | Relay system mail through your own SMTP server instead of Reloop |
 | `SMTP_PORT` | No | `587` | Use `465` with `SMTP_SECURE=true` |
-| `SMTP_USER` | No | — | Omit for an unauthenticated relay |
-| `SMTP_PASSWORD` | No | — | Paired with `SMTP_USER` |
+| `SMTP_USER` | No | - | Omit for an unauthenticated relay |
+| `SMTP_PASSWORD` | No | - | Paired with `SMTP_USER` |
 | `SMTP_SECURE` | No | `false` | `true` for implicit TLS |
 | `MAILPIT_HOST` | No | `localhost` | Development capture host |
 | `MAILPIT_PORT` | No | `1025` | Development capture port |
@@ -15794,7 +15993,7 @@ matching the Billing and Support senders.
 Source: https://reloop.sh/docs/setup/backend/inbound
 Markdown: https://reloop.sh/docs/setup/backend/inbound.md
 
-Inbound KumoMTA MX receiver — accepts external mail, scans with [spam](/docs/setup/backend/spam) (Rspamd), forwards to [inbox](/docs/setup/backend/inbox) via NATS.
+Inbound KumoMTA MX receiver. It accepts external mail, scans with [spam](/docs/setup/backend/spam) (Rspamd), and forwards to [inbox](/docs/setup/backend/inbox) via NATS.
 
 <Tip>
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Inbound needs free port `25`.
@@ -15853,7 +16052,7 @@ External Sender → Port 25 → Recipient Check → Spam (Rspamd) → NATS → I
 | **Validation** | [domain](/docs/setup/backend/domain) service verifies recipients |
 | **Spam scan** | [spam](/docs/setup/backend/spam) backend scores mail via `/checkv2` |
 | **Forwarding** | Accepted messages published to NATS for inbox, then assigned to the `null` queue |
-| **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery — submission is [smtp](/docs/setup/backend/smtp) only |
+| **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery; submission is [smtp](/docs/setup/backend/smtp) only |
 
 ## Next
 
@@ -15882,7 +16081,7 @@ External Sender → Port 25 → Recipient Check → Spam (Rspamd) → NATS → I
 Source: https://reloop.sh/docs/setup/backend/inbox
 Markdown: https://reloop.sh/docs/setup/backend/inbox.md
 
-Agent Inbox API — mailboxes, threads, and messages from inbound email via NATS.
+Agent Inbox API: mailboxes, threads, and messages from inbound email via NATS.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker including [inbound](/docs/setup/backend/inbound) for live MX on port `25`.
@@ -15908,7 +16107,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/inbox/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/inbox/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -15967,7 +16166,7 @@ NODE_ENV=development
 Source: https://reloop.sh/docs/setup/backend/logs
 Markdown: https://reloop.sh/docs/setup/backend/logs.md
 
-Event logging and analytics — activity logs and email delivery data in PostgreSQL.
+Event logging and analytics: activity logs and email delivery data in PostgreSQL.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once so Postgres is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`.
@@ -15993,7 +16192,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/logs/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/logs/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -16053,7 +16252,7 @@ NODE_ENV=development
 Source: https://reloop.sh/docs/setup/backend/mail
 Markdown: https://reloop.sh/docs/setup/backend/mail.md
 
-Outbound transactional email API — send requests, template compilation, tracking, and SMTP handoff.
+Outbound transactional email API: send requests, template compilation, tracking, and SMTP handoff.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker including [SMTP](/docs/setup/backend/smtp). Mailpit captures local outbound mail at [http://localhost:8025](http://localhost:8025).
@@ -16079,7 +16278,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/mail/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/mail/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -16143,7 +16342,7 @@ NODE_ENV=development
 Source: https://reloop.sh/docs/setup/backend/smtp
 Markdown: https://reloop.sh/docs/setup/backend/smtp.md
 
-Outbound KumoMTA engine — accepts mail from [mail](/docs/setup/backend/mail) and delivers via SMTP (Mailpit locally).
+Outbound KumoMTA engine that accepts mail from [mail](/docs/setup/backend/mail) and delivers via SMTP (Mailpit locally).
 
 <Tip>
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. SMTP needs free ports `465` / `587`.
@@ -16198,7 +16397,7 @@ reloop restart smtp dashboard
 ```
 
 Leave it unset and the dashboard falls back to `smtp.reloop.sh`, which is
-correct for Reloop Cloud and wrong for every self-hosted install — so set it.
+correct for Reloop Cloud and wrong for every self-hosted install, so set it.
 
 ## Commands
 
@@ -16242,7 +16441,7 @@ correct for Reloop Cloud and wrong for every self-hosted install — so set it.
 Source: https://reloop.sh/docs/setup/backend/spam
 Markdown: https://reloop.sh/docs/setup/backend/spam.md
 
-Rspamd spam scanner — scores inbound mail for the [inbound](/docs/setup/backend/inbound) MX receiver via HTTP `/checkv2`.
+Rspamd spam scanner that scores inbound mail for the [inbound](/docs/setup/backend/inbound) MX receiver via HTTP `/checkv2`.
 
 <Tip>
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Spam starts with the Compose stack because inbound depends on it.
@@ -16276,7 +16475,7 @@ Controller / scan endpoint: [http://localhost:11333](http://localhost:11333).
 
 Local overrides live in `apps/backend/spam/local.d/` (mounted into the container).
 
-Spam Redis (set on the **spam** container — native Rspamd `RSPAMD_*` env):
+Spam Redis (set on the **spam** container; native Rspamd `RSPAMD_*` env):
 
 | Variable | Default |
 | :--- | :--- |
@@ -16309,7 +16508,7 @@ Inbound (KumoMTA) → HTTP POST /checkv2 → Spam (Rspamd) → score / action / 
 | **Scan API** | Accepts raw message bodies on `/checkv2` (port `11333`) |
 | **Headers** | Inbound injects `X-Spam-*` from the response for [inbox](/docs/setup/backend/inbox) |
 | **State** | Uses [Redis](/docs/setup) (`reloop-redis`) for learning / fuzzy storage |
-| **Separate deploy** | Not baked into the inbound image — own Dockerfile and CI (`be-spam`) |
+| **Separate deploy** | Not baked into the inbound image; own Dockerfile and CI (`be-spam`) |
 
 ## Next
 
@@ -16361,7 +16560,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/template/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/template/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -16421,7 +16620,7 @@ NODE_ENV=development
 Source: https://reloop.sh/docs/setup/backend/upload
 Markdown: https://reloop.sh/docs/setup/backend/upload.md
 
-File uploads — logos, attachments, and assets stored in MinIO/S3.
+File uploads: logos, attachments, and assets stored in MinIO/S3.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once so MinIO is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`. Console: [http://localhost:9001](http://localhost:9001) (`reloop` / `reloop123`).
@@ -16447,7 +16646,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/upload/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/upload/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -16514,7 +16713,7 @@ NODE_ENV=development
 Source: https://reloop.sh/docs/setup/backend/webhook
 Markdown: https://reloop.sh/docs/setup/backend/webhook.md
 
-Outbound event webhooks — subscription management, HMAC signing, delivery, and retries via BullMQ.
+Outbound event webhooks: subscription management, HMAC signing, delivery, and retries via BullMQ.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
@@ -16540,7 +16739,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/webhook/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/webhook/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -16576,7 +16775,7 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Control plane** | This service — CRUD endpoints, list deliveries, manual replay |
+| **Control plane** | This service: CRUD endpoints, list deliveries, manual replay |
 | **Dispatcher** | `be-workflow` NATS queue group `webhook-dispatcher` (email lifecycle + manual trigger) |
 | **Delivery** | Dedicated BullMQ queue `webhook-delivery-queue`; signs with `Reloop-Signature` |
 | **Retries** | Fixed 7-attempt schedule (5s → 5m → 30m → 2h → 5h → 10h) |
@@ -16607,7 +16806,7 @@ NODE_ENV=development
 Source: https://reloop.sh/docs/setup/backend/workflow
 Markdown: https://reloop.sh/docs/setup/backend/workflow.md
 
-Marketing automation — drip campaigns, delays, and multi-step journeys via BullMQ.
+Marketing automation: drip campaigns, delays, and multi-step journeys via BullMQ.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
@@ -16634,7 +16833,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/workflow/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/workflow/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -16708,7 +16907,7 @@ With `NODE_ENV=development`, deliveries may target `http://` URLs and private or
 Source: https://reloop.sh/docs/setup/frontend/dashboard
 Markdown: https://reloop.sh/docs/setup/frontend/dashboard.md
 
-Main workspace app — campaigns, contacts, templates, analytics, and settings.
+Main workspace app: campaigns, contacts, templates, analytics, and settings.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps. The dashboard needs [auth](/docs/setup/backend/auth) (and usually the rest of `bun backend:dev` or `bun dev`).
@@ -16751,7 +16950,7 @@ No committed `.env` is required for local same-origin use via Caddy. The auth cl
 Optional overrides:
 
 ```bash
-# Optional locally — browser origin is used when unset (via Caddy at local.reloop.sh).
+# Optional locally; browser origin is used when unset (via Caddy at local.reloop.sh).
 # Required at Docker/image *build* time for production if you cannot rely on same-origin.
 # NEXT_PUBLIC_URL=https://local.reloop.sh
 # VITE_PUBLIC_URL=https://local.reloop.sh
@@ -16802,7 +17001,7 @@ Auth (`@reloop/auth/client`) resolves the public origin as: `NEXT_PUBLIC_URL` / 
 Source: https://reloop.sh/docs/setup/frontend/docs
 Markdown: https://reloop.sh/docs/setup/frontend/docs.md
 
-This documentation site — MDX guides, API reference, and local setup docs.
+This documentation site: MDX guides, API reference, and local setup docs.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps.
@@ -16844,7 +17043,7 @@ NEXT_PUBLIC_URL=https://local.reloop.sh
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — canonical URLs, OG metadata, and public origin |
+| `NEXT_PUBLIC_URL` | No | `https://reloop.sh` (canonical URLs, OG metadata, and public origin) |
 
 ## Content structure
 
@@ -16944,7 +17143,7 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_URL` | No | `https://link.reloop.sh` — base URL for redirect and preference links |
+| `NEXT_PUBLIC_URL` | No | `https://link.reloop.sh` (base URL for redirect and preference links) |
 | `REDIRECT_SECRET` | No | Shared secret with mail / auth / email backends |
 | `INTERNAL_API_URL` | No | `http://localhost:8014/api/contacts` |
 | `INTERNAL_MAIL_API_URL` | No | Falls back to `{NEXT_PUBLIC_URL}/api/mail` |
@@ -17000,7 +17199,7 @@ Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`
 Source: https://reloop.sh/docs/setup/frontend/web
 Markdown: https://reloop.sh/docs/setup/frontend/web.md
 
-Public marketing site — landing pages, pricing, and product content.
+Public marketing site: landing pages, pricing, and product content.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps.
@@ -17048,7 +17247,7 @@ REDIRECT_SECRET=reloop_tracking_secret_default_123
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — canonical site URL for metadata and OG tags |
+| `NEXT_PUBLIC_URL` | No | `https://reloop.sh` (canonical site URL for metadata and OG tags) |
 | `REDIRECT_SECRET` | No | Shared redirect/tracking secret for local mail links |
 
 ## Commands
@@ -17118,7 +17317,7 @@ bun dev
     Marketing site and entry point
   </Card>
   <Card icon="layout" title="Dashboard" href="https://local.reloop.sh/dashboard">
-    Product UI — use this URL, not `localhost:3001`
+    Product UI. Use this URL, not `localhost:3001`
   </Card>
   <Card icon="book-open" title="Docs" href="https://local.reloop.sh/docs">
     This documentation, served locally
@@ -17292,7 +17491,7 @@ bun backend:dev    # backends only
 Source: https://reloop.sh/docs/setup/overview
 Markdown: https://reloop.sh/docs/setup/overview.md
 
-Reloop is a Bun monorepo — Next.js frontends, ElysiaJS microservices, shared packages, and Docker infrastructure.
+Reloop is a Bun monorepo with Next.js frontends, ElysiaJS microservices, shared packages, and Docker infrastructure.
 
 Local URL: [https://local.reloop.sh](https://local.reloop.sh). Bootstrap with [`bun setup`](/docs/setup).
 
@@ -17318,16 +17517,16 @@ reloop/
 
 <CardGroup cols={2}>
   <Card icon="browser" title="Web" href="/setup/frontend/web">
-    Marketing site — port `3000`
+    Marketing site (port `3000`)
   </Card>
   <Card icon="layout" title="Dashboard" href="/setup/frontend/dashboard">
-    Product UI — port `3001`
+    Product UI (port `3001`)
   </Card>
   <Card icon="book-open" title="Docs" href="/setup/frontend/docs">
-    This documentation — port `3003`
+    This documentation (port `3003`)
   </Card>
   <Card icon="mail-single" title="Links" href="/setup/frontend/links">
-    Preferences and redirects — port `3005`
+    Preferences and redirects (port `3005`)
   </Card>
 </CardGroup>
 
@@ -17337,52 +17536,52 @@ Stack: [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/),
 
 <CardGroup cols={3}>
   <Card icon="lock" title="Auth" href="/setup/backend/auth">
-    Sessions and orgs — `8000`
+    Sessions and orgs (`8000`)
   </Card>
   <Card icon="globe" title="Domain" href="/setup/backend/domain">
-    Sending domains — `8011`
+    Sending domains (`8011`)
   </Card>
   <Card icon="key-new" title="API Key" href="/setup/backend/api-key">
-    API keys — `8012`
+    API keys (`8012`)
   </Card>
   <Card icon="webhook" title="Webhook" href="/setup/backend/webhook">
-    Event delivery — `8013`
+    Event delivery (`8013`)
   </Card>
   <Card icon="users" title="Contacts" href="/setup/backend/contacts">
-    Audience — `8014`
+    Audience (`8014`)
   </Card>
   <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
-    Send API — `8015`
+    Send API (`8015`)
   </Card>
   <Card icon="logs" title="Logs" href="/setup/backend/logs">
-    Analytics — `8016`
+    Analytics (`8016`)
   </Card>
   <Card icon="workflow" title="Workflow" href="/setup/backend/workflow">
-    Automations — `8017`
+    Automations (`8017`)
   </Card>
   <Card icon="file-upload" title="Upload" href="/setup/backend/upload">
-    Attachments — `8018`
+    Attachments (`8018`)
   </Card>
   <Card icon="layout" title="Template" href="/setup/backend/template">
-    Templates — `8019`
+    Templates (`8019`)
   </Card>
   <Card icon="mega-phone" title="Campaigns" href="/setup/backend/campaigns">
-    Broadcasts — `8027`
+    Broadcasts (`8027`)
   </Card>
   <Card icon="inbox" title="Inbox" href="/setup/backend/inbox">
-    Inbound mail — `8028`
+    Inbound mail (`8028`)
   </Card>
   <Card icon="envelope" title="Email" href="/setup/backend/email">
-    Platform email — `8022`
+    Platform email (`8022`)
   </Card>
   <Card icon="billing-custom" title="Credits" href="/setup/backend/credits">
-    Usage / billing — `8023`
+    Usage / billing (`8023`)
   </Card>
   <Card icon="server" title="SMTP" href="/setup/backend/smtp">
-    Outbound edge — Docker
+    Outbound edge (Docker)
   </Card>
   <Card icon="inbox" title="Inbound" href="/setup/backend/inbound">
-    MX edge — Docker
+    MX edge (Docker)
   </Card>
 </CardGroup>
 
@@ -17394,25 +17593,25 @@ Started by `bun docker:up` (Postgres, Redis, Caddy, Mailpit, MinIO, NATS, spam, 
 
 <CardGroup cols={2}>
   <Card icon="database" title="PostgreSQL" href="https://www.postgresql.org/">
-    Primary DB — port `5432`
+    Primary DB (port `5432`)
   </Card>
   <Card icon="code" title="Drizzle ORM" href="https://orm.drizzle.team/">
     Schema in `@reloop/db`
   </Card>
   <Card icon="server" title="Redis" href="https://redis.io/">
-    Sessions and cache — `6379`
+    Sessions and cache (`6379`)
   </Card>
   <Card icon="folder-open" title="MinIO" href="https://min.io/">
-    Object storage — `9010` / console `9001`
+    Object storage (`9010` / console `9001`)
   </Card>
   <Card icon="share-nodes" title="NATS" href="https://nats.io/">
-    Event bus — `4222`
+    Event bus (`4222`)
   </Card>
   <Card icon="globe" title="Caddy" href="https://caddyserver.com/">
     TLS proxy for `local.reloop.sh`
   </Card>
   <Card icon="mail-single" title="Mailpit" href="http://localhost:8025">
-    Captured mail UI — `8025`
+    Captured mail UI (`8025`)
   </Card>
 </CardGroup>
 
@@ -17543,7 +17742,7 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | Service | Port | Notes |
 | :--- | :--- | :--- |
 | Caddy | `80`, `443` | Reverse proxy / TLS |
-| Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) — captured outbound mail |
+| Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) (captured outbound mail) |
 | [SMTP](/docs/setup/backend/smtp) (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA |
 | [Inbound](/docs/setup/backend/inbound) (MX) | `25`, `8030` | KumoMTA |
 
@@ -17554,5 +17753,5 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | PostgreSQL | `5432` | Shared DB for all backends (including activity logs) |
 | Redis | `6379` | Sessions, OTP, caches |
 | NATS | `4222` | Event bus between services |
-| MinIO | `9010` (API), `9001` (console) | [Upload](/docs/setup/backend/upload) object storage — [console](http://localhost:9001) |
+| MinIO | `9010` (API), `9001` (console) | [Upload](/docs/setup/backend/upload) object storage ([console](http://localhost:9001)) |
 | Spam (Rspamd) | `11332` / `11333` / `11334` | [spam](/docs/setup/backend/spam) scan + UI for [inbound](/docs/setup/backend/inbound) |

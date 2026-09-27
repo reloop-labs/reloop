@@ -19,13 +19,13 @@ export function AnimatedOrganizationIcon({
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0", className)}
 		>
-			{/* Shell — builds up from the ground */}
+			{/* Shell builds up from the ground */}
 			<path
 				d="M499.2,486.4h-12.8V179.2c0-14.14-11.46-25.6-25.6-25.6h-256c-14.14,0-25.6,11.46-25.6,25.6v307.2h-128V25.6h230.4V128 h25.6V25.6c0-14.14-11.46-25.6-25.6-25.6H51.2C37.06,0,25.6,11.46,25.6,25.6v460.8H12.8c-7.074,0-12.8,5.726-12.8,12.8 c0,7.074,5.726,12.8,12.8,12.8h486.4c7.074,0,12.8-5.726,12.8-12.8C512,492.126,506.274,486.4,499.2,486.4z M307.2,486.4H256 v-51.2h51.2V486.4z M409.6,486.4H384v-51.2h25.6V486.4z M460.8,486.4h-25.6v-51.2c0-14.14-11.46-25.6-25.6-25.6H384 c-14.14,0-25.6,11.46-25.6,25.6v51.2h-25.6v-51.2c0-14.14-11.46-25.6-25.6-25.6H256c-14.14,0-25.6,11.46-25.6,25.6v51.2h-25.6 V179.2h256V486.4z"
 				className="motion-safe:group-data-[animating=true]:animate-workspace-build"
 			/>
 
-			{/* Floor strips + windows — after the shell */}
+			{/* Floor strips + windows, after the shell */}
 			<path
 				d="M409.6,307.2H256c-14.14,0-25.6,11.46-25.6,25.6v25.6c0,14.14,11.46,25.6,25.6,25.6h153.6c14.14,0,25.6-11.46,25.6-25.6 v-25.6C435.2,318.66,423.74,307.2,409.6,307.2z M409.6,358.4H256v-25.6h153.6V358.4z"
 				className="motion-safe:group-data-[animating=true]:animate-workspace-window-1"

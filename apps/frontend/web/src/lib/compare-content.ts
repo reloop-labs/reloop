@@ -196,7 +196,7 @@ export const comparePages: ComparePageContent[] = [
 		title: "Reloop vs SendGrid",
 		description:
 			"Learn how Reloop compares to SendGrid for transactional and marketing email.",
-		summary: `SendGrid bundles transactional APIs, marketing campaigns, and deliverability tooling—often with annual commits. Reloop is API-first, Apache 2.0, and self-hostable, with campaigns and transactional sends in one codebase. Reloop Cloud Free is ${freePlanSummary}.`,
+		summary: `SendGrid bundles transactional APIs, marketing campaigns, and deliverability tooling, often with annual commits. Reloop is API-first, Apache 2.0, and self-hostable, with campaigns and transactional sends in one codebase. Reloop Cloud Free is ${freePlanSummary}.`,
 		features: sendgridFeatures,
 		faqs: [
 			{
@@ -255,7 +255,7 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "Is Reloop cheaper than SES at 10M emails/month?",
 				answer:
-					"SES raw sending is often cheaper at extreme volume. Reloop competes on platform TCO—engineering time, campaign tooling, support, and unified ops—not on being the cheapest SMTP pipe.",
+					"SES raw sending is often cheaper at extreme volume. Reloop competes on platform TCO (engineering time, campaign tooling, support, and unified ops), not on being the cheapest SMTP pipe.",
 			},
 			{
 				question: "Can we migrate boto3 sends to Reloop?",
@@ -265,7 +265,7 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "Do we need both SES and Reloop?",
 				answer:
-					"Not usually. Self-hosted Reloop includes outbound delivery. Some teams keep SES as an MTA backend during transition—that is an advanced integration, not the default path.",
+					"Not usually. Self-hosted Reloop includes outbound delivery. Some teams keep SES as an MTA backend during transition, but that is an advanced integration, not the default path.",
 			},
 		],
 	},
@@ -281,7 +281,7 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "Does Reloop match Postmark latency?",
 				answer:
-					"Hosted Reloop targets production-grade transactional latency. Self-hosted performance depends on your network and MTA setup—same as any self-managed stack.",
+					"Hosted Reloop targets production-grade transactional latency. Self-hosted performance depends on your network and MTA setup, same as any self-managed stack.",
 			},
 			{
 				question: "Should we use both for streams?",
@@ -329,7 +329,7 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "Can non-technical teammates still send campaigns?",
 				answer:
-					"Yes. Reloop includes a campaign builder and template editor. Mailchimp's visual editor is more mature for pure marketer workflows—evaluate with your marketing lead.",
+					"Yes. Reloop includes a campaign builder and template editor. Mailchimp's visual editor is more mature for pure marketer workflows, so evaluate with your marketing lead.",
 			},
 			{
 				question: "Is Reloop only for developers?",
@@ -442,7 +442,7 @@ export function buildCompareIndexMarkdown(): string {
 	];
 	for (const page of comparePages) {
 		lines.push(
-			`- [${page.title}](${origin}/compare/${page.slug}) — [markdown](${origin}/compare/${page.slug}.md)`,
+			`- [${page.title}](${origin}/compare/${page.slug}): [markdown](${origin}/compare/${page.slug}.md)`,
 		);
 	}
 	lines.push("", "## Hosted pricing (source of truth)", "");

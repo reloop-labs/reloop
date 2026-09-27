@@ -39,7 +39,8 @@ export default function UseCasesIndexPage() {
 
 					<p className="mx-auto mt-4 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed sm:text-[18px] dark:text-white/60">
 						Pick a scenario, copy the code, and go live. Every use case includes
-						a flow diagram and a working API snippet — no boilerplate hunting.
+						a flow diagram and a working API snippet, with no boilerplate
+						hunting.
 					</p>
 				</div>
 			</div>

@@ -13,7 +13,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-# NEXT_PUBLIC_* is inlined at build time — default to production marketing host.
+# NEXT_PUBLIC_* is inlined at build time, so default to production marketing host.
 # Override at build: --build-arg NEXT_PUBLIC_URL=https://reloop.sh
 ARG NEXT_PUBLIC_URL=https://reloop.sh
 ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}

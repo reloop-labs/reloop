@@ -59,7 +59,7 @@ const SendGridComparisonPage = () => {
 				<PageSection flushTop narrow>
 					<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 						SendGrid bundles transactional APIs, marketing campaigns, templates,
-						suppression management, and deliverability tooling—often sold with
+						suppression management, and deliverability tooling, often sold with
 						annual commits and sales-assisted upgrades. It works at scale, but
 						many teams inherit it through acquisition rather than active choice.
 						Reloop offers a modern, API-first platform you can{" "}
@@ -82,8 +82,8 @@ const SendGridComparisonPage = () => {
 								</p>
 								<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
 									Marketing teams use the dashboard; engineering uses APIs. Two
-									products evolved separately—syncing templates and audiences is
-									fragile.
+									products evolved separately, and syncing templates and
+									audiences is fragile.
 								</p>
 							</div>
 							<div>
@@ -134,8 +134,8 @@ const SendGridComparisonPage = () => {
 					<ul className="mx-auto max-w-2xl space-y-3 text-[15px] text-text-sub-600 dark:text-white/60">
 						<li className="flex gap-3">
 							<span className="text-primary-base">▸</span>
-							Inventory subusers, API keys, and IP pools—map each to Reloop orgs
-							or environments.
+							Inventory subusers, API keys, and IP pools, then map each to
+							Reloop orgs or environments.
 						</li>
 						<li className="flex gap-3">
 							<span className="text-primary-base">▸</span>

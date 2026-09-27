@@ -1,4 +1,4 @@
-/** Auto-derived from @reloop/ui icons sprite — used to prefer sidebar icons on MDX cards. */
+/** Auto-derived from @reloop/ui icons sprite; used to prefer sidebar icons on MDX cards. */
 export const RELOOP_ICON_NAMES = new Set<string>([
 	"activity",
 	"activity-2",

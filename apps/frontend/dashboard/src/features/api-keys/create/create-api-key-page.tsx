@@ -47,7 +47,7 @@ const LANGUAGES = [
 	{
 		id: "rust" as const,
 		label: "Rust",
-		// Brand hex is #000000 — override so the gear stays visible on dark UI
+		// Brand hex is #000000, so override so the gear stays visible on dark UI
 		simpleIcon: { path: siRust.path, hex: "e24d2b", title: siRust.title },
 	},
 	{ id: "curl" as const, label: "cURL / REST", iconName: "terminal" },
@@ -85,7 +85,7 @@ const LANG_ICONS = {
 	nodejs: siNodedotjs,
 	python: siPython,
 	go: siGo,
-	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	// Brand hex is #000000, so override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
 	curl: undefined,
 };
@@ -123,7 +123,7 @@ export function CreateApiKeyPage() {
 
 	// cacheComponents keeps this route mounted under React <Activity>.
 	// Effects clean up/re-run when the page is hidden/shown, but useState does
-	// not — so without an explicit reset, a prior success step (and secret key)
+	// not. So without an explicit reset, a prior success step (and secret key)
 	// would reappear on the next visit.
 	useEffect(() => {
 		setCreatedApiKey(null);
@@ -391,7 +391,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 								API Key
 							</h1>
 							<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
-								Your key is generated. Save this secret key now — for security,
+								Your key is generated. Save this secret key now. For security,
 								you won't be able to see it again after leaving this page.
 							</p>
 						</div>

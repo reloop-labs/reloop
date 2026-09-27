@@ -10,7 +10,7 @@ export function extractBareEmail(value: string): string {
 		break;
 	}
 	const match = current.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-	// Never fall back to the raw string — plain names like "Alex Rivers"
+	// Never fall back to the raw string: plain names like "Alex Rivers"
 	// are not emails, and treating them as such breaks display-name parsing.
 	return (match?.[0] ?? "").trim();
 }
@@ -37,7 +37,7 @@ export function extractDisplayName(value: string): string {
 	return name;
 }
 
-/** Canonical "Name <email>" or bare email — never double-wraps. */
+/** Canonical "Name <email>" or bare email, never double-wraps. */
 export function formatRecipient(
 	name: string | undefined | null,
 	emailOrCombined: string,

@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Reloop Links — Manage email preferences on link.reloop.sh";
+export const alt = "Reloop Links: Manage email preferences on link.reloop.sh";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

@@ -272,7 +272,7 @@ function convertValueToJava(value: string, fieldHint?: string): string {
 		return `List.of(${rendered.join(", ")})`;
 	}
 	if (trimmed.startsWith("{")) {
-		// Nested maps rarely needed in samples — stringify as Map.of entries when flat
+		// Nested maps rarely needed in samples; stringify as Map.of entries when flat
 		const entries = parseObjectEntries(trimmed);
 		if (entries.length === 0) return "Map.of()";
 		if (

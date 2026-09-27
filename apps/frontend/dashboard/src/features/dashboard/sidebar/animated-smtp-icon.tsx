@@ -17,7 +17,7 @@ export function AnimatedSmtpIcon({ className }: AnimatedSmtpIconProps) {
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0 overflow-visible", className)}
 		>
-			{/* Top rack — races first */}
+			{/* Top rack races first */}
 			<g
 				className="motion-safe:group-data-[animating=true]:animate-smtp-race-top"
 				style={{ transformBox: "fill-box" }}
@@ -43,7 +43,7 @@ export function AnimatedSmtpIcon({ className }: AnimatedSmtpIconProps) {
 				/>
 			</g>
 
-			{/* Bottom rack — races after top */}
+			{/* Bottom rack races after top */}
 			<g
 				className="motion-safe:group-data-[animating=true]:animate-smtp-race-bottom"
 				style={{ transformBox: "fill-box" }}

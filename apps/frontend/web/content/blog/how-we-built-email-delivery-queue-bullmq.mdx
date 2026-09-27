@@ -1,6 +1,6 @@
 ---
 title: "How We Built a Multi-Tenant Email Delivery Queue with BullMQ"
-description: A deep dive into the job queue architecture powering Reloop's multi-tenant email delivery — rate limiting, priority lanes, and failure recovery.
+description: "A deep dive into the job queue architecture powering Reloop's multi-tenant email delivery: rate limiting, priority lanes, and failure recovery."
 keywords:
   - bullmq email queue
   - multi-tenant email delivery
@@ -26,15 +26,15 @@ Sending email synchronously inside a request handler is the fastest way to have 
 
 ## Choosing BullMQ over alternatives
 
-We evaluated several options — SQS, RabbitMQ, and Inngest — before settling on BullMQ backed by Redis. The key deciding factors were local dev simplicity (one Redis container), mature TypeScript types, and built-in rate limiting primitives that map directly to SMTP provider limits.
+We evaluated several options (SQS, RabbitMQ, and Inngest) before settling on BullMQ backed by Redis. The key deciding factors were local dev simplicity (one Redis container), mature TypeScript types, and built-in rate limiting primitives that map directly to SMTP provider limits.
 
 ## Queue topology
 
 We operate three priority lanes per tenant:
 
-- **Critical** — password resets, 2FA codes. Zero delay, max concurrency.
-- **Standard** — transactional receipts, notifications. Slight delay allowed.
-- **Bulk** — marketing campaigns. Throttled to provider limits.
+- **Critical**: password resets, 2FA codes. Zero delay, max concurrency.
+- **Standard**: transactional receipts, notifications. Slight delay allowed.
+- **Bulk**: marketing campaigns. Throttled to provider limits.
 
 ## Per-tenant rate limiting
 
@@ -56,7 +56,7 @@ Jobs that exhaust their retry budget move to a dead-letter queue. A nightly proc
 
 ## Observability
 
-Every job emits lifecycle events — `active`, `completed`, `failed` — to our metrics pipeline. This drives the real-time delivery dashboard inside Reloop and powers the webhook events we send to customers.
+Every job emits lifecycle events (`active`, `completed`, `failed`) to our metrics pipeline. This drives the real-time delivery dashboard inside Reloop and powers the webhook events we send to customers.
 
 ## What we'd do differently
 

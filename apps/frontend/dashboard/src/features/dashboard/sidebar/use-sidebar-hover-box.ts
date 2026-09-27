@@ -3,7 +3,7 @@
 import { useLayoutEffect, useState } from "react";
 import type { HoverBox } from "#/features/onboarding/animated-hover-background";
 
-/** Sidebar width transition is 200ms — also remeasure after it settles. */
+/** Sidebar width transition is 200ms, so also remeasure after it settles. */
 const COLLAPSE_SETTLE_MS = 220;
 
 /**

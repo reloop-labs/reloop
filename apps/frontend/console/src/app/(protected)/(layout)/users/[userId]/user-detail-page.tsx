@@ -420,7 +420,7 @@ export default function UserDetailPage() {
 						value: formatNumber(primaryOrg?.creditsRemaining),
 						hint: primaryOrg
 							? `${formatNumber(primaryOrg.creditsUsed)} used`
-							: "—",
+							: "-",
 						href: primaryOrg
 							? `/credits?organizationId=${primaryOrg.id}`
 							: undefined,
@@ -444,7 +444,7 @@ export default function UserDetailPage() {
 								["User ID", data.id],
 								["Platform role", data.role],
 								["Status", data.banned ? "Banned" : "Active"],
-								["Ban reason", data.banReason || "—"],
+								["Ban reason", data.banReason || "-"],
 								["Email verified", data.emailVerified ? "Yes" : "No"],
 								["Created", formatDateTime(data.createdAt)],
 								["Updated", formatDateTime(data.updatedAt)],
@@ -585,7 +585,7 @@ export default function UserDetailPage() {
 			{tab === "organizations" ? (
 				<SectionCard
 					title={`Organizations (${data.organizations.length})`}
-					description="Full membership map — open any hub end-to-end"
+					description="Full membership map: open any hub end-to-end"
 				>
 					<DataTable
 						headers={[
@@ -717,7 +717,7 @@ export default function UserDetailPage() {
 								key={k.id}
 								className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40"
 							>
-								<td className="px-4 py-3 font-medium">{k.name || "—"}</td>
+								<td className="px-4 py-3 font-medium">{k.name || "-"}</td>
 								<td className="px-4 py-3 font-mono text-[12px] text-text-sub-600">
 									{k.prefix || k.start || truncateId(k.id, 12)}
 								</td>

@@ -70,7 +70,7 @@ const AwsSesComparisonPage = () => {
 							<strong className="text-text-strong-950 dark:text-white">
 								complete email product
 							</strong>{" "}
-							with APIs, campaigns, analytics, and webhooks—hosted by Reloop
+							with APIs, campaigns, analytics, and webhooks, hosted by Reloop
 							Labs or self-hosted on your AWS account if you want SES-adjacent
 							control without assembling fifteen services.
 						</p>
@@ -107,7 +107,7 @@ const AwsSesComparisonPage = () => {
 								<li>Template editor and campaign builder included</li>
 								<li>Agent inbox for support and AI workflows</li>
 								<li>Single dashboard for ops and developers</li>
-								<li>Open-source—extend instead of fork-lifting glue code</li>
+								<li>Open-source: extend instead of fork-lifting glue code</li>
 							</ul>
 						</div>
 					</div>
@@ -126,7 +126,7 @@ const AwsSesComparisonPage = () => {
 					/>
 					<p className="mx-auto max-w-2xl text-center text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
 						Many SES teams already run on AWS. Reloop deploys via Docker
-						Compose, EKS, or ECS—see our{" "}
+						Compose, EKS, or ECS. See our{" "}
 						<Link href="/self-host" className="font-semibold text-primary-base">
 							self-hosting guide
 						</Link>{" "}

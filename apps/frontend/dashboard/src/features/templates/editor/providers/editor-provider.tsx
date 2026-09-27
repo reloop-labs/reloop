@@ -61,7 +61,7 @@ function isEditorContentEmpty(
 	// Check Tiptap's built-in isEmpty
 	if (editor.isEmpty) return true;
 
-	// Check the actual JSON content — a single empty paragraph means "empty"
+	// Check the actual JSON content: a single empty paragraph means "empty"
 	const json = editor.getJSON();
 	const contentNodes = json.content ?? [];
 	if (contentNodes.length === 0) return true;
@@ -173,7 +173,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			} else {
 				const placeholder = `{{{${name}}}}`;
 				navigator.clipboard.writeText(placeholder);
-				toast.success(`Copied ${placeholder} — paste into your email`);
+				toast.success(`Copied ${placeholder}. Paste it into your email`);
 			}
 
 			// 2. Add to template variables list in DB

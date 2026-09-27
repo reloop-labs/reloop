@@ -414,7 +414,7 @@ export const InboxCommandPalette = ({
 			className={cn(
 				"inbox-zero-theme",
 				isDark && "dark",
-				// Single uniform Raycast surface — shrink-wrap to content, no dead bottom gap
+				// Single uniform Raycast surface: shrink-wrap to content, no dead bottom gap
 				"flex h-auto max-h-[min(520px,72vh)] w-full max-w-[720px] flex-col overflow-hidden rounded-[14px] border p-0 text-mail-foreground",
 				"border-black/[0.1] bg-[#F4F4F5]",
 				"shadow-[0_0_0_0.5px_rgba(0,0,0,0.06),0_24px_80px_rgba(0,0,0,0.18)]",
@@ -424,7 +424,7 @@ export const InboxCommandPalette = ({
 				"[&_[cmdk-root]]:!flex [&_[cmdk-root]]:!h-auto [&_[cmdk-root]]:min-h-0 [&_[cmdk-root]]:flex-col [&_[cmdk-root]]:divide-y-0",
 			)}
 		>
-			{/* Search — Raycast: large text, no leading icon, trailing hint */}
+			{/* Search, Raycast: large text, no leading icon, trailing hint */}
 			<div className="group/cmd-input flex h-[52px] w-full shrink-0 items-center gap-3 border-black/[0.07] border-b px-5 dark:border-white/[0.08]">
 				<CommandMenu.Input
 					value={draftQuery}
@@ -651,7 +651,7 @@ export const InboxCommandPalette = ({
 				)}
 			</CommandMenu.List>
 
-			{/* Footer — logo left; labels then keycaps right (Raycast order) */}
+			{/* Footer: logo left; labels then keycaps right (Raycast order) */}
 			<div className="flex h-10 shrink-0 items-center gap-3 border-black/[0.07] border-t px-3.5 text-[12px] text-mail-muted dark:border-white/[0.08]">
 				<a
 					href="/home"

@@ -90,7 +90,7 @@ export default function OverviewPage() {
 		<PageFrame>
 			<PageHeading
 				title="Overview"
-				description="Platform health and queues — open full hubs from any signal, not thin lists."
+				description="Platform health and queues. Open full hubs from any signal, not thin lists."
 				actions={
 					<button
 						type="button"

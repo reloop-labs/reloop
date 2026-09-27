@@ -62,7 +62,7 @@ const TermsPage = () => {
 					<h2>1. About Reloop</h2>
 					<p>
 						Reloop is email infrastructure for sending, receiving, and managing
-						email—the same class of service as proprietary platforms. Reloop
+						email, the same class of service as proprietary platforms. Reloop
 						Labs offers Reloop as a hosted service and maintains the open-source
 						project, website, documentation, and community channels.
 					</p>
@@ -99,8 +99,8 @@ const TermsPage = () => {
 							Sell, sublicense, or commercially redistribute the software.
 						</li>
 						<li>
-							Offer Reloop—or a modified version—as a commercial hosted service
-							(SaaS, PaaS, or similar).
+							Offer Reloop (or a modified version) as a commercial hosted
+							service (SaaS, PaaS, or similar).
 						</li>
 						<li>
 							Use Reloop in a product or service whose primary purpose is to
@@ -157,8 +157,8 @@ const TermsPage = () => {
 				<section>
 					<h2>5. Acceptable use</h2>
 					<p>
-						You agree not to use Reloop—whether hosted or self-hosted—to engage
-						in, facilitate, or attempt any of the following:
+						You agree not to use Reloop, whether hosted or self-hosted, to
+						engage in, facilitate, or attempt any of the following:
 					</p>
 					<ul>
 						<li>
@@ -239,19 +239,19 @@ const TermsPage = () => {
 					</p>
 					<ul>
 						<li>
-							<strong>High severity</strong> — activity that legitimate
-							customers do not engage in, such as SMS/MMS gateway abuse or
-							stacked phishing or scam lures. High-severity sends may be blocked
+							<strong>High severity:</strong> activity that legitimate customers
+							do not engage in, such as SMS/MMS gateway abuse or stacked
+							phishing or scam lures. High-severity sends may be blocked
 							immediately.
 						</li>
 						<li>
-							<strong>Medium severity</strong> — activity that warrants operator
+							<strong>Medium severity:</strong> activity that warrants operator
 							review (for example suspicious content plus a link, or unusually
 							large recipient sets). Medium-severity sends may still be
 							delivered while we investigate.
 						</li>
 						<li>
-							<strong>None</strong> — ordinary transactional or consented mail
+							<strong>None:</strong> ordinary transactional or consented mail
 							subject only to your plan limits.
 						</li>
 					</ul>
@@ -326,15 +326,15 @@ const TermsPage = () => {
 								No refund outside the window or without a valid reason.
 							</strong>{" "}
 							Requests made more than seven (7) days after payment, or without a
-							proper and valid reason, will not be refunded—whether the account
+							proper and valid reason, will not be refunded, whether the account
 							belongs to a legitimate customer or not.
 						</li>
 						<li>
 							<strong>No refund for abuse or fraud.</strong> No refunds,
 							credits, or chargebacks are available if we suspend or terminate
-							your account for violating these Terms—including acceptable use,
+							your account for violating these Terms (including acceptable use,
 							fraud, phishing, spam, SMS/MMS gateway abuse, or conduct that
-							harms Reloop&rsquo;s sender reputation—regardless of when the
+							harms Reloop&rsquo;s sender reputation), regardless of when the
 							payment was made.
 						</li>
 						<li>
@@ -344,9 +344,9 @@ const TermsPage = () => {
 						</li>
 						<li>
 							Initiating a chargeback or payment dispute instead of contacting
-							us under this section—or after an abuse-related suspension or
-							termination—is a further breach of these Terms. We may contest the
-							dispute and seek recovery of fees, costs, and related damages.
+							us under this section (or after an abuse-related suspension or
+							termination) is a further breach of these Terms. We may contest
+							the dispute and seek recovery of fees, costs, and related damages.
 						</li>
 					</ul>
 				</section>
@@ -387,7 +387,7 @@ const TermsPage = () => {
 						contributors will not be liable for any indirect, incidental,
 						special, consequential, or punitive damages, or for loss of profits,
 						data, goodwill, or business interruption, arising from your use of
-						the website or software—even if we have been advised of the
+						the website or software, even if we have been advised of the
 						possibility of such damages.
 					</p>
 					<p>

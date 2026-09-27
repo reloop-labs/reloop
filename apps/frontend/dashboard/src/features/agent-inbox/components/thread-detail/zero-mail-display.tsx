@@ -199,7 +199,7 @@ export const ZeroMailDisplay = ({
 			return `to me${ccHint}`;
 		}
 		if (!first || toRecipients.length === 0) {
-			return ccRecipients.length > 0 ? `to —${ccHint}` : "to —";
+			return ccRecipients.length > 0 ? `to -${ccHint}` : "to -";
 		}
 		if (toRecipients.length === 1) {
 			const label =
@@ -345,7 +345,7 @@ export const ZeroMailDisplay = ({
 																</span>
 															))
 														) : (
-															<span className="text-mail-muted">—</span>
+															<span className="text-mail-muted">-</span>
 														)}
 													</span>
 												</DetailsRow>
@@ -365,7 +365,7 @@ export const ZeroMailDisplay = ({
 																</span>
 															))
 														) : (
-															<span className="text-mail-muted">—</span>
+															<span className="text-mail-muted">-</span>
 														)}
 													</span>
 												</DetailsRow>
@@ -385,7 +385,7 @@ export const ZeroMailDisplay = ({
 																	</span>
 																))
 															) : (
-																<span className="text-mail-muted">—</span>
+																<span className="text-mail-muted">-</span>
 															)}
 														</span>
 													</DetailsRow>
@@ -413,7 +413,7 @@ export const ZeroMailDisplay = ({
 								)}
 							</div>
 
-							{/* Superhuman-style meta: date · star · reply · more (no emoji) — always visible */}
+							{/* Superhuman-style meta: date · star · reply · more (no emoji), always visible */}
 							<div
 								className="flex shrink-0 items-center gap-0.5 pt-0.5"
 								onClick={(e) => e.stopPropagation()}

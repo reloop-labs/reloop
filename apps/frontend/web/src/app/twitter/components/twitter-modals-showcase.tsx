@@ -254,12 +254,12 @@ function ModalStyleOne({ onClose }: { onClose?: () => void }) {
 								</p>
 							) : (
 								<p className="text-text-sub-600 text-xs dark:text-white/60">
-									Letters, numbers &amp; underscores — spaces auto-convert
+									Letters, numbers &amp; underscores; spaces auto-convert
 								</p>
 							)}
 						</div>
 
-						{/* Type — card picker */}
+						{/* Type: card picker */}
 						<div className="flex flex-col gap-2">
 							<Label.Root>
 								Type
@@ -590,7 +590,7 @@ function ModalStyleTwo({ onClose }: { onClose?: () => void }) {
 							</Label.Root>
 							<FieldError
 								field={nameField}
-								hint="Letters, numbers, and underscores only — spaces auto-convert"
+								hint="Letters, numbers, and underscores only; spaces auto-convert"
 							>
 								<Input.Root
 									size="medium"

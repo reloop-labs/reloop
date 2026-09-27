@@ -91,7 +91,7 @@ export function UndoSendToast({
 	const subtitle =
 		variant === "schedule"
 			? "Undo before it's locked in"
-			: "Not sent yet — you can still undo";
+			: "Not sent yet, you can still undo";
 
 	return (
 		<div className="flex w-[min(100vw-2rem,22rem)] items-center gap-3 rounded-2xl border border-neutral-200/80 bg-white/95 px-3.5 py-3 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-md dark:border-neutral-700/80 dark:bg-neutral-900/95 dark:text-white dark:shadow-[0_8px_30px_rgb(0,0,0,0.35)]">

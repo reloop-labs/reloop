@@ -32,7 +32,7 @@ const OpenSource = () => {
 		<section id="open-source">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
 				<div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
-					{/* Left column — heading + CTA */}
+					{/* Left column: heading + CTA */}
 					<div className="lg:w-[480px] lg:shrink-0">
 						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 							Open source
@@ -43,7 +43,7 @@ const OpenSource = () => {
 							for all.
 						</h2>
 						<p className="mt-6 max-w-[420px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[16px] dark:text-white/60">
-							Reloop is fully open source—the same platform we run as a hosted
+							Reloop is fully open source, the same platform we run as a hosted
 							service. Use ours or self-host on your own terms.
 						</p>
 						<div className="mt-8 flex flex-wrap items-center gap-3">
@@ -59,7 +59,7 @@ const OpenSource = () => {
 						</div>
 					</div>
 
-					{/* Right column — highlight grid */}
+					{/* Right column: highlight grid */}
 					<div className="flex-1">
 						<div className="grid overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 sm:grid-cols-2 dark:border-white/10 dark:bg-transparent">
 							{highlights.map((item) => (

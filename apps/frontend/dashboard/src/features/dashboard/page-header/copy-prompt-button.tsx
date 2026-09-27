@@ -7,7 +7,7 @@ import {
 	siGooglegemini,
 } from "simple-icons";
 
-/** Global prompt for AI editors — no live secrets. */
+/** Global prompt for AI editors, no live secrets. */
 export function buildReloopAiPrompt(): string {
 	return `Integrate Reloop into this project.
 

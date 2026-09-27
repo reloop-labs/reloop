@@ -105,7 +105,7 @@ function typeDelay(char: string) {
 
 function collabTypeDelay(char: string) {
 	if (char === " ") return 32;
-	if (char === "," || char === "." || char === "—" || char === "-") return 90;
+	if (char === "," || char === "." || char === "-") return 90;
 	return 42;
 }
 
@@ -578,7 +578,7 @@ const COLLABORATORS: Record<CollaboratorId, Collaborator> = {
 
 const FROM_NAME = "Maya Chen";
 const LAUNCH_SECTION =
-	"We closed the quarter with the multiplayer editor in production. Customers now write and ship investor notes, receipts, and product emails in one file — copy, from-line, and CTA — without a handoff.";
+	"We closed the quarter with the multiplayer editor in production. Customers now write and ship investor notes, receipts, and product emails in one file (copy, from-line, and CTA) without a handoff.";
 const BODY_EDIT =
 	"New logos came in through the product, not outbound. Most of them started on a template, invited a teammate, and sent from their own domain the same week.";
 
@@ -995,8 +995,7 @@ function RealtimeEditorView() {
 						<div className="relative inline-flex items-center font-medium text-[11.5px] text-text-strong-950 dark:text-white">
 							<span>Q3 note from Reloop</span>
 							<span className="text-text-sub-600 dark:text-white/70">
-								{" "}
-								— the editor is live
+								: the editor is live
 							</span>
 						</div>
 					</div>
@@ -1089,7 +1088,7 @@ function RealtimeEditorView() {
 						<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
 							On the product side: version history, shared templates, and the
 							live editor you are looking at. The goal is one canvas for copy,
-							code, and send — not a Google Doc plus a ticket plus a deploy.
+							code, and send, not a Google Doc plus a ticket plus a deploy.
 						</p>
 					</div>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
@@ -1097,7 +1096,7 @@ function RealtimeEditorView() {
 						note. We will send the next update after close of Q4.
 					</p>
 					<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
-						— Maya, Reloop
+						Maya, Reloop
 					</p>
 				</div>
 			</div>

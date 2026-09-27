@@ -21,7 +21,7 @@ export type CsvPropertyMappingProps = {
 
 /**
  * Domain-table style property mapping panel for CSV import.
- * Orchestrates rows only — selects live in dedicated files.
+ * Orchestrates rows only; selects live in dedicated files.
  */
 export function CsvPropertyMapping({
 	csvHeaders,
@@ -60,7 +60,7 @@ export function CsvPropertyMapping({
 			</div>
 
 			<div className="w-full text-paragraph-sm">
-				{/* Header — DomainTable tokens */}
+				{/* Header: DomainTable tokens */}
 				<div
 					className={cn(
 						"hidden items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 sm:grid dark:border-[#101010] dark:bg-white/[0.03]",

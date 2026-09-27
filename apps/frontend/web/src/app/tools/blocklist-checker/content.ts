@@ -2,7 +2,7 @@ import type { FaqItem } from "@reloop/web/components/faq-section";
 
 export const toolPath = "/tools/blocklist-checker";
 
-/** Display names — keep in sync with `dnsbl-providers.ts`. */
+/** Display names; keep in sync with `dnsbl-providers.ts`. */
 export const ipBlocklistNames = [
 	"Spamhaus ZEN",
 	"Barracuda BRBL",
@@ -60,7 +60,7 @@ export const siteTitle = toolTitle;
 export const metaTitle = toolTitle;
 export const metaDescription = `Look up a sending IP or a domain name against ${publicBlocklistCount} public DNS blocklists (${ipBlocklistCount} IP lists, ${domainBlocklistCount} domain URI lists). Failed queries are errors, not a clean pass.`;
 
-export const toolDescription = `Queries ${publicBlocklistCount} public DNS blocklists — ${ipBlocklistCount} for sending IPs, ${domainBlocklistCount} for the domain name itself (DBL, URIBL, SURBL, and similar). This is a DNS lookup, not a website scan, and not Gmail or Microsoft reputation.`;
+export const toolDescription = `Queries ${publicBlocklistCount} public DNS blocklists: ${ipBlocklistCount} for sending IPs, ${domainBlocklistCount} for the domain name itself (DBL, URIBL, SURBL, and similar). This is a DNS lookup, not a website scan, and not Gmail or Microsoft reputation.`;
 
 export const toolKeywords = [
 	"email blocklist checker",

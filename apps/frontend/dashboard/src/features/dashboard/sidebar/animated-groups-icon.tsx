@@ -17,7 +17,7 @@ export function AnimatedGroupsIcon({ className }: AnimatedGroupsIconProps) {
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0", className)}
 		>
-			{/* Back person — static */}
+			{/* Back person, static */}
 			<path
 				d="M15 10C17.2091 10 19 8.20914 19 6C19 3.79086 17.2091 2 15 2"
 				stroke="currentColor"
@@ -33,7 +33,7 @@ export function AnimatedGroupsIcon({ className }: AnimatedGroupsIconProps) {
 				strokeLinejoin="round"
 			/>
 
-			{/* Front person — head then shoulders */}
+			{/* Front person: head then shoulders */}
 			<path
 				d="M12 6C12 8.20914 10.2091 10 8 10C5.79086 10 4 8.20914 4 6C4 3.79086 5.79086 2 8 2C10.2091 2 12 3.79086 12 6Z"
 				pathLength={1}

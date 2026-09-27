@@ -44,7 +44,7 @@ type OrgSendingIps = {
 type InventoryResponse = { items: SendingIpItem[]; total: number };
 
 function warmupLabel(warmup: WarmupView | null): string {
-	if (!warmup) return "—";
+	if (!warmup) return "-";
 	if (warmup.status === "completed") return "Warmed";
 	if (warmup.status === "paused") return "Paused";
 	if (warmup.status === "pending") return "Scheduled";
@@ -85,7 +85,7 @@ export function OrgSendingIps({
 	return (
 		<SectionCard
 			title="Dedicated IPs"
-			description={`Plan includes ${data?.dedicatedIpCount ?? "—"} · ${data?.assignedCount ?? 0} assigned. Register addresses on Sending IPs, then assign here.`}
+			description={`Plan includes ${data?.dedicatedIpCount ?? "-"} · ${data?.assignedCount ?? 0} assigned. Register addresses on Sending IPs, then assign here.`}
 			action={
 				<div className="flex items-center gap-3">
 					<Link

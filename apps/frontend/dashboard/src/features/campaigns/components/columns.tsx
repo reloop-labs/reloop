@@ -104,7 +104,7 @@ export const campaignColumns: ColumnDef<Campaign>[] = [
 				? formatRelativeTime(campaign.sentAt)
 				: campaign.status === "scheduled" && campaign.scheduledAt
 					? formatRelativeTime(campaign.scheduledAt)
-					: "—";
+					: "-";
 			return (
 				<div className="flex items-center">
 					<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">

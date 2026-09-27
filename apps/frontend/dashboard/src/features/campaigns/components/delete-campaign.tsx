@@ -272,7 +272,7 @@ export function DeleteCampaignModal({
 							</p>
 							<div className="mt-1 flex items-center">
 								<span className="font-medium text-sm text-text-strong-950">
-									{campaignToDelete?.name || "—"}
+									{campaignToDelete?.name || "-"}
 								</span>
 							</div>
 						</div>

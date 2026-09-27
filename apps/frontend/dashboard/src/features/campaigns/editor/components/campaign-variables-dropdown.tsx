@@ -29,7 +29,7 @@ export const CampaignVariablesDropdown = forwardRef(
 
 		const rawProperties = propertiesData?.properties ?? [];
 		// Campaign variables are read-only and come only from contact properties.
-		// No creation or editing here — manage properties under Contacts.
+		// No creation or editing here. Manage properties under Contacts.
 		// Standard fields (email/firstName/lastName) are always included first.
 		const variables = mapContactPropertiesToVariables(rawProperties);
 

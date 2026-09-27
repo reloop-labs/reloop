@@ -6,7 +6,7 @@ export const CODE_SAMPLES_ROOT = path.join(
 	REPO_ROOT,
 	"packages/code-samples/src",
 );
-/** @deprecated Use CODE_SAMPLES_ROOT — samples live in @reloop/code-samples */
+/** @deprecated Use CODE_SAMPLES_ROOT; samples live in @reloop/code-samples */
 export const BACKEND_ROOT = CODE_SAMPLES_ROOT;
 
 export const SERVICE_DIRS = [

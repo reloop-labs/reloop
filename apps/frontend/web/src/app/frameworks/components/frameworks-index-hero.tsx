@@ -63,7 +63,7 @@ export default function FrameworksIndexHero() {
 
 				<p className="mt-3 max-w-2xl text-balance text-[14px] text-text-sub-600 leading-relaxed sm:mt-4 sm:text-[16px] dark:text-white/60">
 					Step-by-step guides for Next.js, Express, Django, FastAPI, Laravel,
-					Rails, Spring Boot, and more—with native idiomatic patterns and
+					Rails, Spring Boot, and more, with native idiomatic patterns and
 					type-safe payloads.
 				</p>
 

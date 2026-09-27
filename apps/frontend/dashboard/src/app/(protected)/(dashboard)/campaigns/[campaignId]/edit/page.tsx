@@ -7,7 +7,7 @@ export const metadata = pageMetadata(
 	"Design and customize your broadcast email campaign draft.",
 );
 
-// Client-only editor (nuqs URL state + email builder) — not eligible for instant navigation.
+// Client-only editor (nuqs URL state + email builder), not eligible for instant navigation.
 export const instant = false;
 
 export default async function CampaignEditorRoute({

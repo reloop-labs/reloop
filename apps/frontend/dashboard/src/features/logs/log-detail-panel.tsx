@@ -126,7 +126,7 @@ function PropertyValue({
 	maxLength?: number;
 	link?: boolean;
 }) {
-	if (!value) return <span className="text-[13px] text-text-soft-400">—</span>;
+	if (!value) return <span className="text-[13px] text-text-soft-400">-</span>;
 
 	const isTruncated = maxLength && value.length > maxLength;
 	const display = isTruncated ? `${value.slice(0, maxLength)}…` : value;
@@ -171,7 +171,7 @@ function PropertyValueSkeleton({ className }: { className?: string }) {
 }
 
 /**
- * Inline log detail panel — used in the right-side split panel of the logs list.
+ * Inline log detail panel, used in the right-side split panel of the logs list.
  * Also used inside the drawer for the mobile/narrow-viewport experience.
  * Layout mirrors Stripe request logs: method+path header, property list, bodies.
  */
@@ -224,7 +224,7 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 
 	return (
 		<div className="flex h-full flex-col">
-			{/* ── Panel Header — METHOD /path ── */}
+			{/* ── Panel Header: METHOD /path ── */}
 			<div className="flex items-center justify-between gap-3 border-stroke-soft-100 border-b px-5 py-3 dark:border-stroke-soft-100/40">
 				<div className="min-w-0 flex-1">
 					{isLoading ? (
@@ -271,10 +271,10 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 
 			{/* ── Body ── */}
 			<div className="flex-1 overflow-y-auto px-5 pb-5">
-				{/* Diagnostic card — only once we know it's an error */}
+				{/* Diagnostic card, only once we know it's an error */}
 				{!isLoading && log && <DiagnosticCard log={log} />}
 
-				{/* Property table — Stripe-style key/value list */}
+				{/* Property table: Stripe-style key/value list */}
 				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 					<PropertyRow label="Status">
 						{isLoading ? (
@@ -289,7 +289,7 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 								{statusProps.label}
 							</Badge.Root>
 						) : (
-							<span className="text-[13px] text-text-soft-400">—</span>
+							<span className="text-[13px] text-text-soft-400">-</span>
 						)}
 					</PropertyRow>
 

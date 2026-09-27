@@ -1,6 +1,6 @@
 ---
 title: "Send Email from Cloudflare Workers"
-description: Send transactional email from Cloudflare Workers using Reloop's HTTP API — no Node.js SDK required, works on the edge runtime.
+description: Send transactional email from Cloudflare Workers using Reloop's HTTP API, with no Node.js SDK required. Works on the edge runtime.
 keywords:
   - cloudflare workers email
   - send email cloudflare workers
@@ -22,7 +22,7 @@ relatedSlugs:
 
 ## Why the SDK doesn't work on Cloudflare Workers
 
-Cloudflare Workers run in a V8 isolate, not a Node.js environment. Node.js built-ins like `net`, `tls`, and `http` are unavailable. The Reloop Node.js SDK uses these for SMTP — so on Workers, you call the HTTP REST API directly instead.
+Cloudflare Workers run in a V8 isolate, not a Node.js environment. Node.js built-ins like `net`, `tls`, and `http` are unavailable. The Reloop Node.js SDK uses these for SMTP, so on Workers, you call the HTTP REST API directly instead.
 
 ## The good news: the HTTP API is simple
 

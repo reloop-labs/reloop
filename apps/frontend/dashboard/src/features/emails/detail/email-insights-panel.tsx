@@ -359,8 +359,8 @@ export function EmailInsightsPanel({ email }: { email: EmailInsightsData }) {
 						<div className="flex items-center gap-3 py-4 text-paragraph-sm text-text-sub-600 dark:text-neutral-400">
 							<Icon name="check-circle" className="h-4 w-4 text-success-base" />
 							<span>
-								No improvements needed — your email meets all deliverability
-								best practices.
+								No improvements needed. Your email meets all deliverability best
+								practices.
 							</span>
 						</div>
 					)}

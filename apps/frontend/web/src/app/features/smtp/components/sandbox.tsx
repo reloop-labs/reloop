@@ -63,7 +63,7 @@ export default function Sandbox() {
 					</h2>
 					<p className="mx-auto mt-6 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
 						Use the connection settings above with your API key as the password.
-						Pick a language—the snippet updates, the guide stays the same.
+						Pick a language. The snippet updates, the guide stays the same.
 					</p>
 				</div>
 

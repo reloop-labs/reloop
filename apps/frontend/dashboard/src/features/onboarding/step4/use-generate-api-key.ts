@@ -7,7 +7,7 @@ import type { LanguageCode } from "./types";
 
 const languageCodes: LanguageCode[] = ["nodejs", "python", "go", "php"];
 
-/** Session-only flag — never stores the secret, only that one was shown. */
+/** Session-only flag: never stores the secret, only that one was shown. */
 const API_KEY_ISSUED_FLAG = "reloop.onboarding.apiKeyIssued";
 
 function readIssuedFlag() {

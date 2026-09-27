@@ -6,7 +6,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 
 /**
  * Smoothly animates height when step content changes size.
- * Only wraps the white panel — the soft footer strip stays outside so it
+ * Only wraps the white panel. The soft footer strip stays outside so it
  * never collapses and "pops" when footer copy swaps.
  */
 function measureHeight(el: HTMLElement) {
@@ -73,7 +73,7 @@ const footerStepVariants = {
 };
 
 /**
- * Auth form card shell — same chrome as the add-contact method card.
+ * Auth form card shell, same chrome as the add-contact method card.
  * Outer soft shell + inset white panel; footer sits in the outer shell and
  * always keeps its strip height. Footer slides horizontally with step direction.
  */
@@ -81,7 +81,7 @@ export function AuthCard({
 	children,
 	footer,
 	footerKey = "footer",
-	/** Step direction from useAuthStepDirection — footer slides with the card body. */
+	/** Step direction from useAuthStepDirection; footer slides with the card body. */
 	direction = 1,
 	showBrandMark = true,
 	headerAside,
@@ -98,7 +98,7 @@ export function AuthCard({
 }) {
 	return (
 		<div className="w-full font-sans">
-			{/* Outer soft shell — same dark chrome as HomeCardShell */}
+			{/* Outer soft shell, same dark chrome as HomeCardShell */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
 				{/* White panel height-animates alone */}
 				<AnimatedHeight>
@@ -123,7 +123,7 @@ export function AuthCard({
 					</div>
 				</AnimatedHeight>
 
-				{/* Footer strip — same L/R slide as the card body steps */}
+				{/* Footer strip, same L/R slide as the card body steps */}
 				{footer != null ? (
 					<div className="relative min-h-12 overflow-hidden px-5 pt-3.5 pb-4 font-medium text-[13px] text-text-sub-600 sm:px-6">
 						<AnimatePresence mode="sync" custom={direction} initial={false}>

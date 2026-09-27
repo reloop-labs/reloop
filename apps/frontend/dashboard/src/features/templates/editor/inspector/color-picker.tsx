@@ -9,7 +9,7 @@ import { normalizeColorToHex } from "../utils/resolve-inspector-text-style";
 import { inspectorFieldClassName } from "./scrub-field";
 
 /* ------------------------------------------------------------------ */
-/* Color picker — swatch trigger + HexAlphaColorPicker + doc colors   */
+/* Color picker: swatch trigger + HexAlphaColorPicker + doc colors   */
 /* ------------------------------------------------------------------ */
 export function ColorPicker({
 	value,

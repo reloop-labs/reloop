@@ -16,7 +16,7 @@ type SendFirstEmailButtonProps = {
 };
 
 /**
- * One-click first email. No modal, no form — server picks domain + template.
+ * One-click first email. No modal, no form: server picks domain + template.
  */
 export function SendFirstEmailButton({
 	variant = "fancy",

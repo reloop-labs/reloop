@@ -133,14 +133,14 @@ export function CreateApiKeyModal({
 					if (createdApiKey) e.preventDefault();
 				}}
 			>
-				{/* Outer motion wrapper — animates height as content changes — KEEP ANIMATION INTACT */}
+				{/* Outer motion wrapper animates height as content changes. KEEP ANIMATION INTACT */}
 				<motion.div
 					layout="size"
 					transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
 				>
-					{/* Inner card — mirrors CreateCampaign / new Delete modal */}
+					{/* Inner card, mirrors CreateCampaign / new Delete modal */}
 					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-						{/* Header — icon + title + close, swapped instantly with step */}
+						{/* Header: icon + title + close, swapped instantly with step */}
 						<div className="flex items-start justify-between gap-4 px-6">
 							<div className="flex items-center gap-2">
 								<Icon
@@ -162,7 +162,7 @@ export function CreateApiKeyModal({
 							</button>
 						</div>
 
-						{/* Center content only — animates on step change — KEEP ANIMATION INTACT */}
+						{/* Center content only, animates on step change. KEEP ANIMATION INTACT */}
 						<div className="px-6 pb-6">
 							<AnimatePresence mode="popLayout" initial={false}>
 								{step === "form" ? (
@@ -206,7 +206,7 @@ export function CreateApiKeyModal({
 						</div>
 					</div>
 
-					{/* Footer — outside inner card, like CreateCampaign — layout animates but not visual animation */}
+					{/* Footer outside inner card, like CreateCampaign. Layout animates but not visual animation */}
 					<motion.div
 						layout
 						className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3"

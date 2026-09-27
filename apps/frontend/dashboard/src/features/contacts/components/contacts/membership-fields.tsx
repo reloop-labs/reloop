@@ -118,7 +118,7 @@ export function ChannelsField({
 
 	const removeChannel = (channelId: string) => {
 		onChange(selectedChannelIds.filter((id) => id !== channelId));
-		// The chip's remove button unmounts — keep focus in the search input
+		// The chip's remove button unmounts, so keep focus in the search input
 		// instead of losing it (Tab would otherwise land on the modal close).
 		channelInputRef.current?.focus();
 	};
@@ -167,7 +167,7 @@ export function ChannelsField({
 							<span
 								key={channelId}
 								onMouseDown={(e) => {
-									// Only the X removes — clicking the badge body does nothing
+									// Only the X removes; clicking the badge body does nothing
 									// (blocks the wrapping label from focusing the input).
 									if ((e.target as HTMLElement).closest("button") === null) {
 										e.preventDefault();
@@ -175,7 +175,7 @@ export function ChannelsField({
 								}}
 								onClick={(e) => {
 									// The X stops propagation itself; anything else reaching
-									// here is a badge-body click — swallow it so the label
+									// here is a badge-body click, so swallow it so the label
 									// doesn't activate any control.
 									e.stopPropagation();
 								}}

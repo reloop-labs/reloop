@@ -6,7 +6,7 @@
  * Single-brace `{name}` is not supported.
  */
 
-/** Strip a supported placeholder — or repair a legacy corrupted stored key — to a bare name. */
+/** Strip a supported placeholder (or repair a legacy corrupted stored key) to a bare name. */
 export function normalizeTemplateVariableName(raw: string): string {
 	const trimmed = raw.trim();
 
@@ -18,7 +18,7 @@ export function normalizeTemplateVariableName(raw: string): string {
 	const doubleName = double?.[1];
 	if (doubleName) return doubleName.trim();
 
-	// Legacy repair only — single-brace is not a supported syntax
+	// Legacy repair only; single-brace is not a supported syntax
 	if (/[{}]/.test(trimmed)) {
 		return trimmed.replace(/[{}]/g, "").trim();
 	}

@@ -67,7 +67,7 @@ function buildLookups() {
 	const releases = new Map(
 		changelogReleases.map((release) => [
 			release.version,
-			`${release.version} — ${release.title}`,
+			`${release.version}: ${release.title}`,
 		]),
 	);
 	const langs = new Map<string, string>(
@@ -224,20 +224,20 @@ export function buildPublicDiscoveryMarkdown(
 		"",
 		"## Discovery surfaces",
 		"",
-		`- [\`/llms.txt\`](${origin}/llms.txt) — site entry index (web source of truth)`,
-		`- [\`/llms-docs.txt\`](${origin}/llms-docs.txt) — curated product docs index`,
-		`- [\`/llms-full.txt\`](${origin}/llms-full.txt) — marketing + blog full corpus`,
-		`- [\`/llms-full-docs.txt\`](${origin}/llms-full-docs.txt) — full docs corpus`,
-		`- [\`/skill.md\`](${origin}/skill.md) — product skill for agents`,
-		`- [\`/pricing.md\`](${origin}/pricing.md) — structured pricing`,
-		`- [\`/mcp\`](${origin}/mcp) — site search MCP`,
-		`- [\`/.well-known/mcp.json\`](${origin}/.well-known/mcp.json) — MCP discovery`,
-		`- [\`/sitemap.md\`](${origin}/sitemap.md) — markdown discovery index`,
-		`- [\`/sitemap.xml\`](${origin}/sitemap.xml) — XML sitemap for crawlers`,
-		`- [\`/glossary/sitemap.xml\`](${origin}/glossary/sitemap.xml) — email glossary terms only`,
-		`- [\`/docs/sitemap.md\`](${origin}/docs/sitemap.md) — full docs page tree`,
-		`- [\`/docs/mcp\`](${origin}/docs/mcp) — docs search MCP (runtime)`,
-		`- [\`/blog/feed.xml\`](${origin}/blog/feed.xml) — blog RSS feed`,
+		`- [\`/llms.txt\`](${origin}/llms.txt): site entry index (web source of truth)`,
+		`- [\`/llms-docs.txt\`](${origin}/llms-docs.txt): curated product docs index`,
+		`- [\`/llms-full.txt\`](${origin}/llms-full.txt): marketing + blog full corpus`,
+		`- [\`/llms-full-docs.txt\`](${origin}/llms-full-docs.txt): full docs corpus`,
+		`- [\`/skill.md\`](${origin}/skill.md): product skill for agents`,
+		`- [\`/pricing.md\`](${origin}/pricing.md): structured pricing`,
+		`- [\`/mcp\`](${origin}/mcp): site search MCP`,
+		`- [\`/.well-known/mcp.json\`](${origin}/.well-known/mcp.json): MCP discovery`,
+		`- [\`/sitemap.md\`](${origin}/sitemap.md): markdown discovery index`,
+		`- [\`/sitemap.xml\`](${origin}/sitemap.xml): XML sitemap for crawlers`,
+		`- [\`/glossary/sitemap.xml\`](${origin}/glossary/sitemap.xml): email glossary terms only`,
+		`- [\`/docs/sitemap.md\`](${origin}/docs/sitemap.md): full docs page tree`,
+		`- [\`/docs/mcp\`](${origin}/docs/mcp): docs search MCP (runtime)`,
+		`- [\`/blog/feed.xml\`](${origin}/blog/feed.xml): blog RSS feed`,
 		"",
 		"## Human URLs",
 		"",
@@ -264,7 +264,7 @@ export function buildPublicDiscoveryMarkdown(
 		const href = entry.path === "/" ? origin : `${origin}${entry.path}`;
 		const mdPath =
 			entry.path === "/" ? `${origin}/index.md` : `${origin}${entry.path}.md`;
-		lines.push(`- [${entry.title}](${href}) (${entry.type}) — [md](${mdPath})`);
+		lines.push(`- [${entry.title}](${href}) (${entry.type}): [md](${mdPath})`);
 	}
 
 	lines.push(

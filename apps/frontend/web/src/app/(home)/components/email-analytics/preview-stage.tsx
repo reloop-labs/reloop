@@ -665,7 +665,7 @@ function BounceErrorPanel() {
 						|
 					</span>
 					<span className="truncate font-medium text-text-sub-600 dark:text-white/70">
-						Receiving server rejected the address — inbox may not exist.
+						Receiving server rejected the address. Inbox may not exist.
 					</span>
 				</div>
 			</div>

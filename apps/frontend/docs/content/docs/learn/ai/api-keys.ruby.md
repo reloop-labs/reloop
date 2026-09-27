@@ -1,4 +1,4 @@
-# API Keys — Ruby
+# API Keys (Ruby)
 
 > Agent-optimized samples for managing Reloop API keys in Ruby. Index: [api-keys.md](./api-keys.md)
 

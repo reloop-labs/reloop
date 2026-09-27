@@ -1,4 +1,4 @@
-# API Keys — .NET
+# API Keys (.NET)
 
 > Agent-optimized samples for managing Reloop API keys in .NET. Index: [api-keys.md](./api-keys.md)
 

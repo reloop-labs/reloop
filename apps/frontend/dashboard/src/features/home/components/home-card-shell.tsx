@@ -37,7 +37,7 @@ export function HomeCardShell({
 				<div className="shrink-0 px-5 pt-3 pb-2.5">{header}</div>
 			) : null}
 
-			{/* Inset white panel — soft outer shows as a frame around this */}
+			{/* Inset white panel; soft outer shows as a frame around this */}
 			<div
 				className={cn(
 					"m-0.5 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]",
@@ -51,7 +51,7 @@ export function HomeCardShell({
 	);
 }
 
-/** Title row for HomeCardShell `header` — no border (sits on soft outer). */
+/** Title row for HomeCardShell `header`, no border (sits on soft outer). */
 export function HomeCardHeader({
 	children,
 	className,

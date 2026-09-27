@@ -215,7 +215,7 @@ export function MainSidebar() {
 						)}
 					</div>
 
-					{/* Animated sidebar content — slides on settings ↔ main switch */}
+					{/* Animated sidebar content slides on settings ↔ main switch */}
 					<div
 						className={cn(
 							"relative flex-1 overflow-y-auto overflow-x-hidden py-2 transition-[padding] duration-200 ease-in-out",
