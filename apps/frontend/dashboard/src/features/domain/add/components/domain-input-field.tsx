@@ -3,6 +3,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as React from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import { HoverPopover } from "#/features/agent-inbox/components/thread-detail/hover-popover";
 import type { DomainFormValues } from "../schema";
 
 interface DomainInputFieldProps {
@@ -49,6 +50,11 @@ export const DomainInputField = ({
 		return domainParts.slice(-2).join(".");
 	}, [domainParts]);
 
+	const showWarningTriangle = !criteria.isSubdomain && domainParts.length > 0;
+	const warningTooltip = !criteria.isValid
+		? "Enter a valid domain name (e.g. send.example.com)."
+		: `Use a subdomain (e.g. send.${rootDomain}) — avoid sending from your root domain.`;
+
 	return (
 		<section className="space-y-1">
 			<div className="space-y-1">
@@ -80,12 +86,37 @@ export const DomainInputField = ({
 							</Input.Icon>
 						)}
 
-						{!criteria.isSubdomain && domainParts.length > 0 && (
+						{showWarningTriangle && (
 							<Input.Icon>
-								<Icon
-									name="alert-triangle"
-									className="h-4 w-4 text-orange-500"
-								/>
+								<HoverPopover
+									side="top"
+									align="center"
+									sideOffset={8}
+									showArrow={false}
+									trigger={
+										<span
+											role="img"
+											aria-label={warningTooltip}
+											className="inline-flex cursor-help items-center"
+										>
+											<Icon
+												name="alert-triangle"
+												className="h-4 w-4 text-orange-500"
+											/>
+										</span>
+									}
+									contentClassName="max-w-xs rounded-xl p-2 shadow-none!"
+								>
+									<div className="flex items-start gap-2 px-2 py-1.5">
+										<Icon
+											name="alert-triangle"
+											className="mt-0.5 h-3.5 w-3.5 shrink-0 text-orange-500"
+										/>
+										<p className="text-text-strong-950 text-xs leading-relaxed">
+											{warningTooltip}
+										</p>
+									</div>
+								</HoverPopover>
 							</Input.Icon>
 						)}
 					</Input.Wrapper>
