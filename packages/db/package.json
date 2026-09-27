@@ -7,6 +7,7 @@
 		"./schema": "./src/schema/index.ts",
 		"./index": "./src/index.ts",
 		"./reserve-send-credits": "./src/reserve-send-credits.ts",
+		"./self-hosted": "./src/self-hosted.ts",
 		"./domain-age-cap": "./src/domain-age-cap.ts",
 		"./smtp-recipients": "./src/smtp-recipients.ts",
 		"./outbound-abuse": "./src/outbound-abuse.ts",

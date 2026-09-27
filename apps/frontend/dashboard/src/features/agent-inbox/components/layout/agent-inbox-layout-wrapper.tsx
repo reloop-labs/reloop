@@ -24,8 +24,9 @@ export const AgentInboxLayoutWrapper = ({
 	const [isAddOpen, setIsAddOpen] = useState(false);
 	const { data: billing } = useBillingUsage();
 	const inboxUsed = billing?.resources?.agentInboxes.used ?? 0;
-	const inboxLimit = billing?.resources?.agentInboxes.limit ?? 1;
-	const atInboxCap = inboxLimit > 0 && inboxUsed >= inboxLimit;
+	const inboxLimit = billing?.resources?.agentInboxes.limit ?? null;
+	const atInboxCap =
+		inboxLimit != null && inboxLimit > 0 && inboxUsed >= inboxLimit;
 
 	const handleAddMailbox = () => {
 		if (atInboxCap) {

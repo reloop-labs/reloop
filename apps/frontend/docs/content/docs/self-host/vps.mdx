@@ -77,6 +77,8 @@ The stack runs 20 containers: 14 Reloop backend services, 2 frontends (dashboard
 
 A self-hosted install deliberately leaves out the parts of Reloop that only make sense for the hosted service: the public documentation site (`/docs` redirects to reloop.sh), the credits and quota service, the public email-validation tools, the operator console, and bundled object storage. Sending is not metered.
 
+The installer writes `SELF_HOSTED=true` to `.env`, which turns off every plan limit: sending quotas, the inbox, domain and organization caps, and dedicated IP entitlements. Installations from before this setting existed need it added by hand: put `SELF_HOSTED=true` in `/opt/reloop/.env` and run `reloop restart`.
+
 A `reloop` command is installed alongside it:
 
 ```bash

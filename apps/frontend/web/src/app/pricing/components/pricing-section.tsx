@@ -6,6 +6,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import type { PlanId } from "@reloop/web/lib/pricing";
 import {
+	communityEdition,
 	comparisonSections,
 	formatPrice,
 	getPlanPrice,
@@ -106,7 +107,7 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 	) {
 		return <Icon name="database" className={className} />;
 	}
-	if (key.includes("day") || key.includes("limit")) {
+	if (key.includes("day") || /\blimit\b/.test(key)) {
 		return <Icon name="limit" className={className} />;
 	}
 	if (
@@ -695,6 +696,53 @@ function PlanColumn({
 	);
 }
 
+function CommunityEditionCard() {
+	return (
+		<div className="-mx-4 sm:-mx-6 lg:-mx-8 grid border-stroke-soft-100 border-b lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)] dark:border-white/[0.07]">
+			<div className="flex flex-col border-stroke-soft-100 border-b p-6 pb-5 sm:p-8 sm:pb-6 lg:border-r lg:border-b-0 dark:border-white/[0.07]">
+				<div className="flex h-6 items-center justify-between gap-2">
+					<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
+						{communityEdition.name}
+					</h3>
+					<span className="shrink-0 rounded-full border border-stroke-soft-200 px-2 py-0.5 text-center font-semibold text-[10px] text-text-sub-600 uppercase tracking-[0.14em] dark:border-white/15 dark:text-white/60">
+						Self-hosted
+					</span>
+				</div>
+				<div className="mt-6 flex items-end gap-1">
+					<span className="font-semibold text-[2rem] text-text-strong-950 leading-none tracking-tight dark:text-white">
+						{formatPrice(0)}
+					</span>
+					<span className="mb-1 text-[15px] text-text-sub-600 dark:text-white/50">
+						{communityEdition.priceSubline}
+					</span>
+				</div>
+				<p className="mt-4 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
+					{communityEdition.description}
+				</p>
+				<div className="mt-6 sm:max-w-[240px]">
+					<PlanCtaLink
+						href={communityEdition.ctaHref}
+						label={communityEdition.ctaLabel}
+					/>
+				</div>
+			</div>
+			<ul className="grid gap-x-8 gap-y-1.5 p-6 sm:grid-cols-2 sm:p-8">
+				{communityEdition.features.map((feature) => (
+					<li
+						key={feature}
+						className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug"
+					>
+						{getFeatureIcon(feature)}
+						<span className="text-text-sub-600 dark:text-white/60">
+							{feature}
+						</span>
+					</li>
+				))}
+			</ul>
+		</div>
+	);
+}
+
 function PlanCheckmark({ className }: { className?: string }) {
 	return (
 		<svg
@@ -1013,6 +1061,7 @@ export function PricingSection({
 					/>
 				))}
 			</div>
+			<CommunityEditionCard />
 			<div className="mt-24">
 				<ComparisonTable recommendedPlanId={recommendedPlanId} />
 			</div>

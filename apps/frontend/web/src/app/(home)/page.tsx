@@ -21,6 +21,7 @@ import Highlights from "./components/highlights";
 import { HomeFaq } from "./components/home-faq";
 import PlatformTabs from "./components/platform-tabs";
 import { SectionSeparator } from "./components/section-separator";
+import { Testimonials } from "./components/testimonials";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -85,7 +86,7 @@ export default function Home() {
 			<Hero />
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<PlatformTabs />
-				<SectionSeparator />
+				<div aria-hidden className="h-16 sm:h-24" />
 				<LanguageExplorer
 					framed={false}
 					showTopRule
@@ -99,7 +100,9 @@ export default function Home() {
 				<EmailSystem />
 				<SectionSeparator />
 				<Highlights />
-				<div aria-hidden className="h-12 sm:h-16" />
+				<div aria-hidden className="h-24" />
+				<Testimonials />
+				<div aria-hidden className="h-24" />
 				<CTA />
 				<div aria-hidden className="h-16 sm:h-24" />
 				<HomeFaq />

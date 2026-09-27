@@ -144,6 +144,7 @@ export type SettingsNavigationItem = {
 	requiresOrgAdmin?: boolean;
 	/** Owner/admin only (team management). */
 	requiresTeamAdmin?: boolean;
+	requiresBilling?: boolean;
 };
 
 export type SettingsNavigationSection = {
@@ -165,21 +166,21 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 				label: "Usage",
 				path: "/settings",
 				iconName: "doughnut",
-				requiresOrgAdmin: true,
+				requiresBilling: true,
 				shortcut: { label: "G U", keys: ["g u", "g+u"] },
 			},
 			{
 				label: "Billing",
 				path: "/settings/billing",
 				iconName: "billing-custom",
-				requiresOrgAdmin: true,
+				requiresBilling: true,
 				shortcut: { label: "G B", keys: ["g b", "g+b"] },
 			},
 			{
 				label: "Dedicated IP",
 				path: "/settings/dedicated-ip",
 				iconName: "dedicated-ip",
-				requiresOrgAdmin: true,
+				requiresBilling: true,
 				shortcut: { label: "G Shift+I", keys: ["g shift+i", "g+shift+i"] },
 			},
 			{
@@ -232,7 +233,11 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 /** Filter settings nav by org role. Empty sections are dropped. */
 export function filterSettingsNavigation(
 	sections: SettingsNavigationSection[],
-	perms: { isOrgAdmin: boolean; canManageTeam: boolean },
+	perms: {
+		isOrgAdmin: boolean;
+		canManageTeam: boolean;
+		canManageBilling: boolean;
+	},
 ): SettingsNavigationSection[] {
 	return sections
 		.map((section) => ({
@@ -240,6 +245,7 @@ export function filterSettingsNavigation(
 			items: section.items.filter((item) => {
 				if (item.requiresOrgAdmin && !perms.isOrgAdmin) return false;
 				if (item.requiresTeamAdmin && !perms.canManageTeam) return false;
+				if (item.requiresBilling && !perms.canManageBilling) return false;
 				return true;
 			}),
 		}))

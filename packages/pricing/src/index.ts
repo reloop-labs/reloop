@@ -310,6 +310,24 @@ export const pricingPlans: PricingPlan[] = [
 	},
 ];
 
+export const communityEdition = {
+	name: "Community",
+	description:
+		"Self-host Reloop on your own infrastructure. Every feature, no plan limits, no license fee.",
+	priceSubline: "Free forever, self-hosted",
+	ctaLabel: "Download",
+	ctaHref: "/docs/self-host",
+	features: [
+		"Unlimited emails / month",
+		"No daily limit",
+		"Unlimited agent inboxes",
+		"Unlimited webhooks",
+		"Unlimited custom domains",
+		"10 MB attachments",
+		"Community support",
+	],
+};
+
 export interface ComparisonSection {
 	title: string;
 	rows: Array<{

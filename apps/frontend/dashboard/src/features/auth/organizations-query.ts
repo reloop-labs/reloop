@@ -34,6 +34,7 @@ async function fetchOrgPlans(): Promise<OrgPlanRow[] | null> {
 			credentials: "include",
 			cache: "no-store",
 		});
+		if (res.status === 404) return [];
 		if (!res.ok) return null;
 		const payload = (await res.json()) as { plans?: OrgPlanRow[] };
 		if (!Array.isArray(payload.plans)) return null;
