@@ -151,7 +151,7 @@ export const apiSnippets: [ApiSnippet, ...ApiSnippet[]] = [
 	{
 		id: "javascript",
 		label: "JavaScript",
-		code: `// No SDK, no API key — it is a plain POST.
+		code: `// No SDK, no API key: it is a plain POST.
 const res = await fetch(
   "${apiEndpoint}",
   {
@@ -166,7 +166,7 @@ const result = await res.json();`,
 	{
 		id: "typescript",
 		label: "TypeScript",
-		code: `// No SDK, no API key — it is a plain POST.
+		code: `// No SDK, no API key: it is a plain POST.
 const res = await fetch(
   "${apiEndpoint}",
   {
@@ -181,7 +181,7 @@ const result = (await res.json()) as CheckResult;`,
 	{
 		id: "node",
 		label: "Node.js",
-		code: `// Node 18+ has a global fetch — no dependencies.
+		code: `// Node 18+ has a global fetch, so no dependencies.
 const res = await fetch(
   "${apiEndpoint}",
   {
