@@ -1,0 +1,375 @@
+# documentation: https://reloop.sh/docs/self-host/coolify
+# slogan: Open-source email platform for transactional mail, campaigns and inbound.
+# category: email
+# tags: email,smtp,transactional,campaigns,newsletter,inbox,marketing
+# logo: svgs/reloop.svg
+# port: 80
+# amd_only: true
+
+x-backend-env: &backend-env
+  RELOOP_VERSION: ${RELOOP_VERSION:-latest}
+  NODE_ENV: production
+  BASE_URL: ${SERVICE_URL_PROXY}
+  HOST_DOMAIN: ${SERVICE_FQDN_PROXY}
+  TRACKING_DOMAIN: ${SERVICE_FQDN_LINKS}
+  TRACKING_BASE_URL: ${SERVICE_URL_LINKS}
+  INBOUND_HOSTNAME: inbound.${SERVICE_FQDN_PROXY}
+  SMTP_HOSTNAME: ${SERVICE_FQDN_PROXY}
+  AUTH_INTERNAL_BASE_URL: http://auth:8000
+  PG_URL: postgresql://${SERVICE_USER_POSTGRES}:${SERVICE_PASSWORD_POSTGRES}@postgres:5432/${POSTGRES_DB:-reloop}
+  REDIS_URL: redis://:${SERVICE_PASSWORD_REDIS}@redis:6379
+  NATS_URL: nats://nats:4222
+  BETTER_AUTH_SECRET: ${SERVICE_PASSWORD_64_BETTERAUTH}
+  RELOOP_INTERNAL_SECRET: ${SERVICE_PASSWORD_64_INTERNAL}
+  TRACKING_SECRET: ${SERVICE_PASSWORD_64_TRACKING}
+  PREFERENCES_SECRET: ${SERVICE_PASSWORD_64_PREFERENCES}
+  WEBHOOK_ENCRYPTION_KEY: ${SERVICE_HEX_64_WEBHOOK}
+  WORKBENCH_USER: ${SERVICE_USER_WORKBENCH}
+  WORKBENCH_PASS: ${SERVICE_PASSWORD_WORKBENCH}
+  APP_NAME: ${APP_NAME:-Reloop}
+  DISABLE_SIGNUP: ${DISABLE_SIGNUP:-true}
+  DISABLE_ORG_CREATION: ${DISABLE_ORG_CREATION:-false}
+  DKIM_SELECTOR: ${DKIM_SELECTOR:-reloop}
+  DNS_RESOLVERS: ${DNS_RESOLVERS:-8.8.8.8,8.8.4.4}
+  RELOOP_API_KEY: ${RELOOP_API_KEY}
+  RELOOP_SENDER_DOMAIN: ${RELOOP_SENDER_DOMAIN}
+  SMTP_HOST: ${SMTP_HOST}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_USER: ${SMTP_USER}
+  SMTP_PASSWORD: ${SMTP_PASSWORD}
+  SMTP_SECURE: ${SMTP_SECURE:-false}
+  S3_ENDPOINT: ${S3_ENDPOINT}
+  S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+  S3_SECRET_KEY: ${S3_SECRET_KEY}
+  S3_BUCKET: ${S3_BUCKET:-reloop-uploads}
+  S3_REGION: ${S3_REGION:-us-east-1}
+  S3_FORCE_PATH_STYLE: "true"
+  KUMOMTA_HTTP_URL: http://smtp:8000
+  KUMOMTA_WEBHOOK_URL: http://domain:8011/api/domain
+  KUMOMTA_CHECK_RECIPIENT_URL: http://domain:8011/api/domain
+  KUMOMTA_RSPAMD_URL: http://spam:11333/checkv2
+  KUMOMTA_MIN_FREE_SPACE: ${KUMOMTA_MIN_FREE_SPACE:-5%}
+  KUMOMTA_MIN_FREE_INODES: ${KUMOMTA_MIN_FREE_INODES:-0}
+
+x-backend-depends: &backend-depends
+  postgres:
+    condition: service_healthy
+  redis:
+    condition: service_healthy
+  nats:
+    condition: service_healthy
+  migrate:
+    condition: service_completed_successfully
+
+services:
+  proxy:
+    image: caddy:2-alpine
+    environment:
+      - SERVICE_URL_PROXY_80
+    volumes:
+      - type: bind
+        source: ./Caddyfile
+        target: /etc/caddy/Caddyfile
+        content: |
+          {
+          	auto_https off
+          	servers {
+          		trusted_proxies static private_ranges
+          	}
+          }
+
+          http:// {
+          	encode zstd gzip
+
+          	handle /dashboard* {
+          		reverse_proxy dashboard:3000
+          	}
+          	handle /docs* {
+          		redir https://reloop.sh{uri} 302
+          	}
+          	handle /preferences* {
+          		reverse_proxy links:3005
+          	}
+          	handle /redirect* {
+          		reverse_proxy links:3005
+          	}
+
+          	handle /api/auth* {
+          		reverse_proxy auth:8000
+          	}
+          	handle /api/domain* {
+          		reverse_proxy domain:8011
+          	}
+          	handle /api/api-key* {
+          		reverse_proxy api-key:8012
+          	}
+          	handle /api/webhook* {
+          		reverse_proxy webhook:8013
+          	}
+          	handle /api/contacts* {
+          		reverse_proxy contacts:8014
+          	}
+          	handle /api/mail* {
+          		reverse_proxy mail:8015
+          	}
+          	handle /api/logs* {
+          		reverse_proxy logs:8016
+          	}
+          	handle /api/workflow* {
+          		reverse_proxy workflow:8017
+          	}
+          	handle /api/upload* {
+          		reverse_proxy upload:8018
+          	}
+          	handle /api/template* {
+          		reverse_proxy template:8019
+          	}
+          	handle /api/campaigns* {
+          		reverse_proxy campaigns:8027
+          	}
+          	handle /api/inbox* {
+          		reverse_proxy inbox:8028
+          	}
+          	handle /api/email* {
+          		reverse_proxy email:8022
+          	}
+
+          	@removed path /api/credits* /api/tool* /api/admin*
+          	handle @removed {
+          		respond 404
+          	}
+
+          	handle {
+          		redir /* /dashboard 302
+          	}
+          }
+
+  links:
+    image: reloopsh/fe-links:${RELOOP_VERSION:-latest}
+    environment:
+      - SERVICE_URL_LINKS_3005
+      - HOSTNAME=0.0.0.0
+      - PORT=3005
+      - INTERNAL_API_URL=http://contacts:8014/api/contacts
+      - INTERNAL_MAIL_API_URL=http://mail:8015/api/mail
+
+  dashboard:
+    image: reloopsh/fe-dashboard:${RELOOP_VERSION:-latest}
+    environment:
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+      SMTP_HOSTNAME: ${SMTP_HOSTNAME}
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-reloop}
+      POSTGRES_USER: ${SERVICE_USER_POSTGRES}
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    command:
+      - redis-server
+      - --requirepass
+      - ${SERVICE_PASSWORD_REDIS}
+      - --appendonly
+      - "yes"
+      - --dir
+      - /data
+    environment:
+      REDIS_PASSWORD: ${SERVICE_PASSWORD_REDIS}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a \"$${REDIS_PASSWORD}\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  nats:
+    image: nats:2.10-alpine
+    command: ["-js", "-sd", "/data", "-m", "8222"]
+    volumes:
+      - nats-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8222/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  migrate:
+    image: reloopsh/be-auth:${RELOOP_VERSION:-latest}
+    restart: "no"
+    exclude_from_hc: true
+    working_dir: /app/packages/db
+    entrypoint: ["/app/node_modules/.bin/drizzle-kit"]
+    command: ["push", "--force"]
+    environment:
+      PG_URL: postgresql://${SERVICE_USER_POSTGRES}:${SERVICE_PASSWORD_POSTGRES}@postgres:5432/${POSTGRES_DB:-reloop}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  auth:
+    image: reloopsh/be-auth:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8000
+      SETUP_MODE: ${SETUP_MODE:-true}
+      ADMIN_SETUP_KEY: ${SERVICE_PASSWORD_64_SETUPKEY}
+    volumes:
+      - reloop-setup:/run/reloop
+    depends_on: *backend-depends
+
+  domain:
+    image: reloopsh/be-domain:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8011
+    depends_on: *backend-depends
+
+  api-key:
+    image: reloopsh/be-api-key:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8012
+    depends_on: *backend-depends
+
+  webhook:
+    image: reloopsh/be-webhook:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8013
+    depends_on: *backend-depends
+
+  contacts:
+    image: reloopsh/be-contacts:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8014
+    depends_on: *backend-depends
+
+  mail:
+    image: reloopsh/be-mail:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8015
+    depends_on: *backend-depends
+
+  logs:
+    image: reloopsh/be-logs:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8016
+    depends_on: *backend-depends
+
+  workflow:
+    image: reloopsh/be-workflow:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8017
+    depends_on: *backend-depends
+
+  upload:
+    image: reloopsh/be-upload:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8018
+    depends_on: *backend-depends
+
+  template:
+    image: reloopsh/be-template:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8019
+    depends_on: *backend-depends
+
+  campaigns:
+    image: reloopsh/be-campaigns:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8027
+    depends_on: *backend-depends
+
+  inbox:
+    image: reloopsh/be-inbox:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8028
+    depends_on: *backend-depends
+
+  email:
+    image: reloopsh/be-email:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      PORT: 8022
+    depends_on: *backend-depends
+
+  spam:
+    image: reloopsh/be-spam:${RELOOP_VERSION:-latest}
+    environment:
+      RSPAMD_REDIS_SERVERS: redis:6379
+      RSPAMD_REDIS_PASSWORD: ${SERVICE_PASSWORD_REDIS}
+    volumes:
+      - rspamd-data:/var/lib/rspamd
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  smtp:
+    image: reloopsh/be-smtp:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+      HOSTNAME: ${SMTP_HOSTNAME}
+    ports:
+      - "465:465"
+      - "587:587"
+    volumes:
+      - smtp-data:/var/spool/kumomta/data
+      - smtp-meta:/var/spool/kumomta/meta
+    depends_on:
+      nats:
+        condition: service_healthy
+      domain:
+        condition: service_started
+      logs:
+        condition: service_started
+      contacts:
+        condition: service_started
+
+  inbound:
+    image: reloopsh/be-inbound:${RELOOP_VERSION:-latest}
+    environment:
+      <<: *backend-env
+    ports:
+      - "25:25"
+    volumes:
+      - inbound-data:/var/spool/kumomta/data
+      - inbound-meta:/var/spool/kumomta/meta
+    depends_on:
+      nats:
+        condition: service_healthy
+      spam:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  redis-data:
+  nats-data:
+  reloop-setup:
+  rspamd-data:
+  smtp-data:
+  smtp-meta:
+  inbound-data:
+  inbound-meta:

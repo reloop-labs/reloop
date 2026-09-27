@@ -4,4 +4,209 @@ description: Learn how to self-host Reloop on Coolify.
 icon: siCoolify
 ---
 
-Coming Soon
+Reloop ships a Coolify template at
+[`install/coolify/reloop.yaml`](https://github.com/reloop-labs/reloop/blob/main/install/coolify/reloop.yaml).
+It runs the same stack as the [VPS installer](/docs/self-host/vps), with Coolify
+generating every secret and its proxy handling HTTPS.
+
+---
+
+## Before you start
+
+| Requirement | Value |
+| :--- | :--- |
+| **Coolify** | v4, with the default Traefik proxy |
+| **Architecture** | x86_64 (the dashboard and links images are amd64 only) |
+| **RAM** | 8 GB for Reloop and Coolify together |
+| **Disk** | 50 GB. The container images alone take about 22 GB |
+| **Ports** | `25`, `465` and `587` free on the server, inbound and outbound |
+| **DNS** | Three hostnames pointing at the server, see [DNS](#dns) |
+
+Many providers block port `25` by default. Reloop delivers to recipient mail
+servers on outbound `25`, and receives mail on inbound `25`, so ask your
+provider to open it.
+
+---
+
+## Deploy
+
+1. In Coolify, open your project and choose **New Resource** → **Docker Compose**
+   (called **Docker Compose Empty** in older versions).
+2. Paste the contents of
+   [`reloop.yaml`](https://raw.githubusercontent.com/reloop-labs/reloop/main/install/coolify/reloop.yaml)
+   and save.
+3. Before the first deploy, replace the generated domain of these two services:
+
+   | Service | Domain |
+   | :--- | :--- |
+   | `proxy` | `https://reloop.example.com` |
+   | `links` | `https://link.reloop.example.com` |
+
+   Coolify warns that `proxy` requires port `80` and `links` requires port
+   `3005`. Choose **Use this port anyway**: traffic still goes to those ports,
+   and Reloop's URLs stay without one. **Keep required port** discards the new
+   domain. Leave every other service without a domain.
+4. Click **Deploy**. The first deploy downloads about 5 GB of images, which
+   unpack to about 22 GB. Coolify stops a deploy after 10 minutes, so on a slow
+   connection the first one can fail before the stack starts. Click **Deploy**
+   again: the images already downloaded are kept.
+
+Coolify creates the database, Redis and every Reloop secret for you and stores
+them under **Environment Variables**. Change none of the generated values after
+the first deploy: the database password is fixed once Postgres initialises,
+changing the tracking or preferences secrets breaks links in mail that was
+already sent, and changing the webhook key breaks the signature on every
+existing webhook.
+
+Coolify passes all of these values to every container in the stack, including
+the public dashboard and links services. Keep `RELOOP_VERSION` on `latest` so
+those services get security fixes.
+
+<Note>
+Set the real domains before you add any sending domain in the dashboard.
+Reloop writes the DNS records it shows you at the moment a domain is created,
+so a domain added while the instance still runs on Coolify's generated
+`sslip.io` address keeps pointing there.
+</Note>
+
+---
+
+## DNS
+
+```text
+reloop.example.com            A    203.0.113.10
+link.reloop.example.com       A    203.0.113.10
+inbound.reloop.example.com    A    203.0.113.10
+reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
+```
+
+- The apex record serves the dashboard and the API.
+- `link.` serves click and open tracking and the unsubscribe pages.
+- `inbound.` is the MX target for mail your verified domains receive. The
+  template always uses `inbound.` plus the `proxy` domain.
+- The SPF record authorises the server to send for the host domain, which is
+  what the `include:` in each sending domain's SPF resolves to.
+
+Also ask your provider for a PTR record on the server IP that resolves to
+`reloop.example.com`. Receiving servers check it.
+
+---
+
+## First sign-in
+
+1. In Coolify, open **Environment Variables** and copy the value of `SERVICE_PASSWORD_64_SETUPKEY`.
+2. Open `https://reloop.example.com/dashboard/setup` and paste it as the setup key.
+3. Choose the first administrator's name, email and password.
+4. Name the first organization. Leave the instance name empty: on Coolify it
+   has no effect, so set `APP_NAME` under **Environment Variables** instead.
+
+The key works once. If you think it leaked before setup, change
+`SERVICE_PASSWORD_64_SETUPKEY` and restart: the old key stops working.
+
+Setup signs you in with a session that lasts 7 days. To sign in again after
+that, Reloop emails you a code, so configure system email before it runs out.
+
+---
+
+## System email
+
+Sign-in codes and invitations need a way out. Set these under **Environment
+Variables**, then restart the service:
+
+| Variable | Value |
+| :--- | :--- |
+| `RELOOP_SENDER_DOMAIN` | The domain system mail is sent from. Always required |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE` | Any SMTP provider you already use (Postmark, SES, your own). `SMTP_SECURE=true` means implicit TLS, normally with port `465` |
+| `RELOOP_API_KEY` | Instead of SMTP: an API key of the organization that owns `RELOOP_SENDER_DOMAIN`, once that domain is verified in this instance |
+
+---
+
+## Configuration
+
+Everything below is optional. Coolify lists each variable under **Environment
+Variables** with its default.
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `DISABLE_SIGNUP` | `true` | Blocks public registration. Invited addresses can still join. If setup leaves public sign-ups off, it also saves that in `/run/reloop/.env` on the `auth` service's volume, which keeps registration closed even when this is `false`. To open it later, set this to `false`, remove the `DISABLE_SIGNUP` line from that file in the `auth` container, and restart |
+| `DISABLE_ORG_CREATION` | `false` | Stops users creating further organizations |
+| `APP_NAME` | `Reloop` | Instance name in system email, shown as `Self-hosted Reloop × <name>` |
+| `S3_ENDPOINT`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | empty | S3-compatible storage for template images and attachments. The bucket must serve objects publicly, because Reloop hands out URLs as `{S3_ENDPOINT}/{S3_BUCKET}/{path}` |
+| `S3_BUCKET` | `reloop-uploads` | Bucket name |
+| `S3_REGION` | `us-east-1` | Bucket region |
+| `DNS_RESOLVERS` | `8.8.8.8,8.8.4.4` | Resolvers used to verify SPF, DKIM, DMARC and MX records |
+| `DKIM_SELECTOR` | `reloop` | Selector for the DKIM keys Reloop generates |
+| `RELOOP_VERSION` | `latest` | Image tag for every Reloop service |
+
+The queue dashboard at `https://reloop.example.com/api/workflow/jobs` uses
+`SERVICE_USER_WORKBENCH` and `SERVICE_PASSWORD_WORKBENCH` for basic auth.
+
+---
+
+## Custom tracking domains
+
+A sending domain with click or open tracking gets a `link.` CNAME pointing at
+`link.reloop.example.com`, so tracked links in its mail use the customer's own
+hostname. Coolify's proxy only issues certificates for domains it knows about,
+so add each tracking hostname to the `links` service after the existing one:
+
+```text
+https://link.reloop.example.com,https://link.customer.com
+```
+
+Keep `https://link.reloop.example.com` first. Reloop uses the first domain in
+the list as the instance's tracking host and as the CNAME target for every new
+sending domain. Choose **Use this port anyway** again when Coolify asks, then
+save and restart. The VPS installer issues these certificates automatically; on
+Coolify this step is manual.
+
+---
+
+## Mail ports and TLS
+
+| Port | Service | Protocol |
+| :--- | :--- | :--- |
+| `25` | `inbound` | SMTP with STARTTLS, for mail your verified domains receive |
+| `587` | `smtp` | Submission with STARTTLS |
+| `465` | `smtp` | The same STARTTLS listener as `587`, not implicit TLS |
+
+Both mail services use a self-signed certificate. Submit on `587` with
+STARTTLS, and tell clients that verify certificates to accept it.
+
+---
+
+## Updates and backups
+
+Pulling the latest images and restarting reruns the `migrate` service, which
+pushes the database schema before the Reloop backend services start. Take a
+backup first: open the `postgres` service, go to **Backups** and schedule one,
+or run a backup on demand before each update.
+
+Updating only changes the images. Coolify keeps the service list and the
+`proxy` Caddyfile from your first install. When a Reloop release changes
+`reloop.yaml`, paste the new file under **Edit Compose File**, then replace the
+Caddyfile under **Persistent Storage** on the `proxy` service with the one from
+the new template, and restart.
+
+Each update leaves the previous images behind, about 4 GB per update. Turn on
+Coolify's Docker cleanup for the server, or run `docker image prune` after
+updating.
+
+---
+
+## Things to avoid
+
+- **Connecting the stack to Coolify's predefined network.** It puts the
+  internal SMTP injection API, NATS and Rspamd on a network every other Coolify
+  resource shares.
+- **arm64 servers.** The dashboard and links images are built for amd64 only.
+- **Routing the mail ports through Coolify's proxy.** SMTP authentication
+  needs the TLS session to reach the `smtp` container directly.
+
+Campaign sends, automation email steps, inbox replies and system mail through
+`RELOOP_API_KEY` call `https://reloop.example.com` from inside the stack, so
+the server must reach its own public address over HTTPS. They fail until
+Coolify has issued the certificate. To check, open a terminal on the `auth`
+container and run
+`wget -qO- https://reloop.example.com/api/auth/v1/get-session`: any response
+other than a connection or TLS error means it works.
