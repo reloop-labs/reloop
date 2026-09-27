@@ -1,3 +1,4 @@
+import { extractApiKey } from "@reloop/auth/middleware";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { authMiddleware } from "@reloop/be-mail/middleware/auth";
 import { checkRateLimit } from "@reloop/be-mail/middleware/rate-limiter";
@@ -45,7 +46,7 @@ export const resendEmailRoute = new Elysia()
 				throw error;
 			}
 
-			const requestApiKey = request.headers.get("x-api-key");
+			const requestApiKey = extractApiKey(request.headers);
 			const useInternalInject = authType !== "apikey";
 			const injectApiKey = useInternalInject
 				? mailConfig.RELOOP_INTERNAL_SECRET
