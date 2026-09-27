@@ -67,7 +67,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 				{...props}
 			/>
 		),
-		// Card table — same two-layer shell as dashboard API key list
+		// Card table, same two-layer shell as dashboard API key list
 		table: MdxTable,
 		thead: MdxThead,
 		tbody: MdxTbody,

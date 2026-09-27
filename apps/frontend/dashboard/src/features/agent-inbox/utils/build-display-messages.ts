@@ -1,7 +1,7 @@
 /**
  * Build the messages shown in thread detail.
  *
- * When a threadId exists, wait for the thread API before painting — the list
+ * When a threadId exists, wait for the thread API before painting. The list
  * row is a single preview and flashing it first (then swapping in replies)
  * causes a visible re-render flicker.
  */
@@ -134,7 +134,7 @@ export function buildDisplayMessages({
 			return next;
 		});
 	} else if (thread.threadId && isLoadingThread && !threadDataMatches) {
-		// Full conversation still loading — do not paint the list preview.
+		// Full conversation still loading, do not paint the list preview.
 		base = [];
 	} else {
 		base = [

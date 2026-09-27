@@ -185,7 +185,7 @@ https://reloop.sh/tools/auth-checker`;
 							className="font-mono text-[11px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 						>
 							{showSelectorInput
-								? "— Hide DKIM selector"
+								? "- Hide DKIM selector"
 								: "+ Specify custom DKIM selector"}
 						</button>
 

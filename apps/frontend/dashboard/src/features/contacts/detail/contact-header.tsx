@@ -341,7 +341,7 @@ function PropertyField({
 
 function EmptyDash() {
 	return (
-		<span className="block font-normal text-text-soft-400 text-xs">—</span>
+		<span className="block font-normal text-text-soft-400 text-xs">-</span>
 	);
 }
 
@@ -349,7 +349,12 @@ function isEmptyPropertyValue(v: string | null | undefined) {
 	if (v == null) return true;
 	const t = v.trim();
 	return (
-		t === "" || t === "-" || t === "—" || t === "–" || t === "--" || t === "---"
+		t === "" ||
+		t === "-" ||
+		t === "\u2014" ||
+		t === "–" ||
+		t === "--" ||
+		t === "---"
 	);
 }
 
@@ -699,7 +704,7 @@ export const ContactHeader = ({
 												"font-medium text-paragraph-sm tabular-nums",
 												scoreColor(engagementRating),
 											)}
-											title={`Engagement ${engagementScore}/100 · ${engagementRating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation — suppress or re-engage.`}
+											title={`Engagement ${engagementScore}/100 · ${engagementRating}. Based on delivery (20%), opens (35%), click-to-open (25%), clicks (20%), minus bounce/fail/complaint penalties. Low scores hurt IP reputation, so suppress or re-engage.`}
 										>
 											{engagementScore.toLocaleString()}
 											<span className="font-normal text-paragraph-xs text-text-sub-600">

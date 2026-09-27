@@ -78,7 +78,7 @@ interface MessageBodyProps {
 	bodyText: string | undefined;
 	isTranslated: boolean;
 	targetLanguage: string;
-	/** Stable id for this message — used to reset image toggle when switching */
+	/** Stable id for this message, used to reset image toggle when switching */
 	messageId?: string;
 }
 

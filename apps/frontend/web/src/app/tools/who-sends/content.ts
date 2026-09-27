@@ -1,6 +1,6 @@
 export const toolPath = "/tools/who-sends";
 export const toolTitle =
-	"Who Sends Email From This Domain? — ESP & Stack Fingerprint";
+	"Who Sends Email From This Domain? ESP & Stack Fingerprint";
 export const toolDescription =
 	"Discover which email service providers (e.g. Google, Amazon SES, SendGrid, Mailchimp) are authorized to send email for any domain, and inspect their inbound mailbox routing.";
 export const metaDescription =

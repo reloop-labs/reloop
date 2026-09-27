@@ -930,7 +930,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					body: JSON.stringify({ isRead }),
 				});
 			} catch (error) {
-				// Network / abort failures — roll back optimistic state
+				// Network / abort failures: roll back optimistic state
 				await Promise.all([mutateMessages(), mutateThreads()]);
 				throw error;
 			}

@@ -65,7 +65,7 @@ export const DeleteChannelModal = ({
 	const channelToDelete = matchedChannel || targetChannelRef.current;
 
 	const displayName = channelToDelete?.name || "Unnamed channel";
-	// Exact match only — no partial / substring acceptance
+	// Exact match only, no partial / substring acceptance
 	const isConfirmed = confirmationText === displayName;
 	const canDelete = isConfirmed && deleteState === "idle" && !!channelToDelete;
 

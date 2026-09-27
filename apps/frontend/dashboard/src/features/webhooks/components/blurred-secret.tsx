@@ -51,5 +51,5 @@ export function StripeSecret({
 	);
 }
 
-/** @deprecated Use StripeSecret — kept as alias for existing imports. */
+/** @deprecated Use StripeSecret; kept as alias for existing imports. */
 export const BlurredSecret = StripeSecret;

@@ -267,7 +267,7 @@ export function DeleteWorkflowModal({
 							</p>
 							<div className="mt-1 flex items-center">
 								<span className="font-medium text-sm text-text-strong-950">
-									{workflowToDelete?.name || "—"}
+									{workflowToDelete?.name || "-"}
 								</span>
 							</div>
 						</div>

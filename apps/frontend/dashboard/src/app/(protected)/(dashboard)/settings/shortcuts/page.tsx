@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ShortcutsPage } from "#/features/settings/shortcuts/shortcuts-page";
 
 export const metadata: Metadata = {
-	title: "Shortcuts — Reloop",
+	title: "Shortcuts",
 	description:
 		"Keyboard shortcuts and navigation hotkeys for Reloop dashboard.",
 };

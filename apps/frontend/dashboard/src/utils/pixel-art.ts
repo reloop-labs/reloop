@@ -1,6 +1,6 @@
 /**
  * Deterministic pixel-art avatar (identicon) from a seed string.
- * Same seed always yields the same grid + palette — no storage needed.
+ * Same seed always yields the same grid + palette, so no storage is needed.
  *
  * Output dialect mirrors the reference artwork: a 32x32 grid encoded as
  * run-length horizontal strokes (`M{x} {y}h{len}` runs joined by relative
@@ -124,7 +124,7 @@ export function encodePixelArt(
 
 /**
  * Grid with a 5x7 initial carved into a cleared center plaque.
- * The glyph reads as light-on-dark plaque and needs no text overlay —
+ * The glyph reads as light-on-dark plaque and needs no text overlay;
  * the whole avatar stays a single stroke path in the reference dialect.
  */
 export function getPixelArtGridWithLetter(

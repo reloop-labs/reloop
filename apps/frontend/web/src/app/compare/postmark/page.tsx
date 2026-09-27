@@ -60,8 +60,8 @@ const PostmarkComparisonPage = () => {
 					<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 						Postmark is deliberately focused: transactional messages, excellent
 						delivery stats, message streams, and a reputation for reliability.
-						They are not trying to be a marketing automation suite—which is fine
-						if that is all you need. Reloop serves teams that want{" "}
+						They are not trying to be a marketing automation suite, which is
+						fine if that is all you need. Reloop serves teams that want{" "}
 						<strong className="text-text-strong-950 dark:text-white">
 							transactional rigor plus growth features
 						</strong>{" "}
@@ -121,7 +121,7 @@ const PostmarkComparisonPage = () => {
 						domains or campaign types. Export templates via API, recreate
 						suppression preferences, and run dual-send in staging until bounce
 						rates match baseline. Postmark&apos;s bounce taxonomy maps to Reloop
-						webhook event types—your handlers need label updates, not
+						webhook event types. Your handlers need label updates, not
 						architecture rewrites.
 					</p>
 				</PageSection>

@@ -12,7 +12,7 @@ export function UsagePage() {
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
-			// Members land on settings via "/settings" — send them to profile
+			// Members land on settings via "/settings", so send them to profile
 			// instead of rendering an empty usage page.
 			router.push(SETTINGS_MEMBER_HOME);
 		}

@@ -34,7 +34,7 @@ function hexToRgba(hex: string, alpha: number) {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-/** Darker lip under the face — same extrusion as SceneGlyph / LanguageExplorer. */
+/** Darker lip under the face, same extrusion as SceneGlyph / LanguageExplorer. */
 function darkenHex(hex: string, amount: number) {
 	const { r, g, b } = hexToRgb(hex);
 	return `rgb(${Math.round(r * amount)}, ${Math.round(g * amount)}, ${Math.round(b * amount)})`;

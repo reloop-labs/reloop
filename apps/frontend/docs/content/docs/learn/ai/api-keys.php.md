@@ -1,4 +1,4 @@
-# API Keys — PHP
+# API Keys (PHP)
 
 > Agent-optimized samples for managing Reloop API keys in PHP. Index: [api-keys.md](./api-keys.md)
 

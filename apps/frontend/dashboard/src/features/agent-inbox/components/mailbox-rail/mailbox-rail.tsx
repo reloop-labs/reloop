@@ -15,7 +15,7 @@ function mailboxSortKey(m: AgentMailbox) {
 	return (m.label || m.email).toLocaleLowerCase();
 }
 
-/** Active mailbox check — white disc badge with blue check in light mode, black check in dark mode. */
+/** Active mailbox check: white disc badge with blue check in light mode, black check in dark mode. */
 export const CircleCheckBadge = ({ className }: { className?: string }) => (
 	<svg
 		width="14"
@@ -114,7 +114,7 @@ export function MailboxRail({
 			aria-label="Mailboxes"
 			className="flex h-full w-[54px] shrink-0 flex-col items-center border-stroke-soft-100 border-r bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
 		>
-			{/* Top header row — aligns with email address & top navbar */}
+			{/* Top header row, aligns with email address & top navbar */}
 			<div className="flex h-11 w-full shrink-0 items-center justify-center border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
 				<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
 			</div>

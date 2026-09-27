@@ -79,7 +79,7 @@ export const automation = pgTable(
 		graph: jsonb("graph")
 			.$type<AutomationGraph>()
 			.notNull()
-			.default({ nodes: [], edges: [] }),
+			.default({ edges: [], nodes: [] }),
 		activeVersionId: text("active_version_id"),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),

@@ -88,8 +88,7 @@ export function WorkflowsCard({ enabled = true }: WorkflowsCardProps) {
 						Build automations without the overhead
 					</h4>
 					<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-						From triggers to multi-step actions — automate your flows in
-						minutes.
+						From triggers to multi-step actions: automate your flows in minutes.
 					</p>
 					<Button.Root
 						variant="neutral"

@@ -8,7 +8,7 @@ import { HexAlphaColorPicker } from "react-colorful";
 import { inspectorFieldClassName } from "./scrub-field";
 
 /* ------------------------------------------------------------------ */
-/* Color picker — swatch trigger + HexAlphaColorPicker + doc colors   */
+/* Color picker: swatch trigger + HexAlphaColorPicker + doc colors    */
 /* ------------------------------------------------------------------ */
 export function ColorPicker({
 	value,

@@ -201,7 +201,7 @@ export const DeletePropertyModal = ({
 									Property name
 								</p>
 								<p className="mt-0.5 truncate font-semibold text-text-strong-950 text-xs">
-									{propertyToDelete?.propertyName || "—"}
+									{propertyToDelete?.propertyName || "-"}
 								</p>
 							</div>
 							<div>
@@ -228,7 +228,7 @@ export const DeletePropertyModal = ({
 								<p className="mt-0.5 truncate font-mono text-text-strong-950 text-xs">
 									{propertyToDelete?.defaultValue
 										? `"${propertyToDelete.defaultValue}"`
-										: "—"}
+										: "-"}
 								</p>
 							</div>
 						</div>

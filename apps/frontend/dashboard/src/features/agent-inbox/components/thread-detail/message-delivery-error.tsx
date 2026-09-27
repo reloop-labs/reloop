@@ -70,7 +70,7 @@ function classifyError(raw: string): ErrorClassification {
 		return {
 			category: "Mailbox Rejected",
 			summary:
-				"Receiving server rejected the address — the inbox may not exist or is inactive.",
+				"Receiving server rejected the address. The inbox may not exist or is inactive.",
 			fixes: [
 				"Confirm the recipient email address is valid",
 				"Verify sender authentication (SPF, DKIM, DMARC)",

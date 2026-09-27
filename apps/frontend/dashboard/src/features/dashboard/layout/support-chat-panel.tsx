@@ -695,7 +695,7 @@ export function SupportChatPanel() {
 				<p className="shrink-0 px-4 pb-1 text-[12px] text-red-500">{error}</p>
 			) : null}
 
-			{/* Composer — matches Ask AI input chrome */}
+			{/* Composer, matches Ask AI input chrome */}
 			<div className="shrink-0 border-stroke-soft-100 border-t bg-white px-4 py-4 dark:border-white/5 dark:bg-[#0c0c0c]/80">
 				{closed ? (
 					<div className="mb-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50 px-3.5 py-3 dark:border-white/8 dark:bg-white/[0.03]">

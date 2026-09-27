@@ -9,10 +9,10 @@ Add Reloop’s DNS records in Namecheap using the values from your domain page i
 ## Add a domain in Reloop
 
 1. Log in to [Reloop](https://reloop.sh/dashboard/domain) and [add a domain](/docs/guides/connect-domain/add-domain).
-2. Keep that tab open — every host and value you paste must match Reloop exactly (especially the DKIM key).
+2. Keep that tab open. Every host and value you paste must match Reloop exactly (especially the DKIM key).
 
 <Tip>
-Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain) — for example `example.com`, `mail.example.com`, or `updates.example.com`.
+Reloop works with the [root domain, a subdomain, or both](/docs/guides/connect-domain/what-is-a-domain), for example `example.com`, `mail.example.com`, or `updates.example.com`.
 </Tip>
 
 ## Manual setup
@@ -23,7 +23,7 @@ Open [Namecheap](https://ap.www.namecheap.com/domains/list) and go to DNS for th
 
 Domain List → Manage → Advanced DNS.
 
-If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead — see [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
+If Reloop or `dig NS yourdomain.com` shows a different host, stop and edit that host instead. See [Wrong nameservers](/docs/guides/connect-domain/troubleshoot/wrong-nameservers).
 
 ### Field mapping
 
@@ -51,7 +51,7 @@ For **each required row** on the Reloop domain page:
     Copy the host from Reloop (`@`, `reloop._domainkey`, `_dmarc`, `link` or `link.<sub>`, …).
   </Step>
   <Step title="Paste the value">
-    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it — otherwise use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
+    Copy the value exactly. For MX, also set **Priority** as shown (often `10`). If priority `10` is already used by another MX you must keep, use the next free value only when Reloop’s UI allows it. Otherwise, use a [subdomain](/docs/guides/connect-domain/what-is-a-domain).
   </Step>
   <Step title="Save">
     Save the record, then continue with the next Reloop row.
@@ -64,9 +64,9 @@ Typical Reloop rows (always confirm in the dashboard):
 | --- | --- | --- | --- |
 | SPF | TXT | `@` | `v=spf1 include:reloop.sh -all` (or merge into existing SPF) |
 | DKIM | TXT | `reloop._domainkey` | `v=DKIM1; k=rsa; p=…` (unique per domain) |
-| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy) — required when Email Sending is on |
+| DMARC | TXT | `_dmarc` | `v=DMARC1; p=reject;` (or your existing policy), required when Email Sending is on |
 | Tracking | CNAME | `link` (or `link.<sub>` for subdomains) | `link.reloop.sh` (on by default for new domains) |
-| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains — turn Email Receiving off if you keep another inbox here) |
+| Receiving MX | MX | `@` or subdomain host | `inbound.reloop.sh` (on by default for new domains; turn Email Receiving off if you keep another inbox here) |
 
 <Warning>
 Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into the existing SPF. See [SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts).
@@ -83,7 +83,7 @@ Never create a second SPF TXT on the same host. Merge `include:reloop.sh` into t
 **Email Receiving** is on by default for new domains. If it stays on, you must publish the inbound **MX** Reloop shows (typically `inbound.reloop.sh`). Turn Email Receiving off for send-only if this hostname must keep another inbox.
 
 <Warning>
-When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name — use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
+When Reloop’s MX is active on a hostname, Reloop receives mail for that hostname according to MX priority. That can conflict with another inbox already using MX on the same name. Use a separate hostname for Reloop receiving if needed. See [MX conflicts](/docs/guides/connect-domain/troubleshoot/mx-conflicts) and [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving).
 </Warning>
 
 ## Complete verification

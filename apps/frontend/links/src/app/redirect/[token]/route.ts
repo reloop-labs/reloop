@@ -1,16 +1,7 @@
 import { resolveClickDestination } from "@reloop/links/lib/mail-api";
+import { redirectToPath } from "@reloop/links/lib/site";
 import { NextResponse } from "next/server";
 
-/**
- * Email click entrypoint on the tracking host.
- *
- * Injected links look like:
- *   https://link.customer.com/redirect/{token}
- * (customer CNAME → link.reloop.sh → this app)
- *
- * Records the click via `${NEXT_PUBLIC_URL}/api/mail/v1/track/click/{token}`
- * (Next API → mail service) and returns a real HTTP 302.
- */
 export async function GET(
 	_request: Request,
 	context: { params: Promise<{ token: string }> },
@@ -18,7 +9,7 @@ export async function GET(
 	const { token } = await context.params;
 
 	if (!token) {
-		return NextResponse.redirect(new URL("/", _request.url), 302);
+		return redirectToPath("/");
 	}
 
 	const destination = await resolveClickDestination(token);
@@ -27,7 +18,7 @@ export async function GET(
 		!destination ||
 		(!destination.startsWith("http://") && !destination.startsWith("https://"))
 	) {
-		return NextResponse.redirect(new URL("/", _request.url), 302);
+		return redirectToPath("/");
 	}
 
 	return NextResponse.redirect(destination, 302);

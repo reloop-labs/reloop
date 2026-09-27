@@ -32,7 +32,7 @@ type TipState = {
 	y: number;
 };
 
-/** One floating label for the whole toolbar — never stacks multiple tooltips. */
+/** One floating label for the whole toolbar, never stacks multiple tooltips. */
 function ToolbarTip({ tip }: { tip: TipState | null }) {
 	const [mounted, setMounted] = useState(false);
 	useEffect(() => setMounted(true), []);

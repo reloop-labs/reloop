@@ -21,15 +21,10 @@ export function getMailApiBaseUrl(): string {
 }
 
 /** Public tracking paths on this app (via NEXT_PUBLIC_URL). */
-export function getPublicTrackClickUrl(token: string): string {
-	return `${getSiteUrl()}/api/mail/v1/track/click/${encodeURIComponent(token)}`;
-}
-
 export function getPublicTrackOpenUrl(token: string): string {
 	return `${getSiteUrl()}/api/mail/v1/track/open/${encodeURIComponent(token)}`;
 }
 
-/** Upstream mail URLs used only inside the Next API proxy routes. */
 export function getMailTrackClickUrl(token: string): string {
 	return `${getMailApiBaseUrl()}/v1/track/click/${encodeURIComponent(token)}`;
 }
@@ -38,17 +33,13 @@ export function getMailTrackOpenUrl(token: string): string {
 	return `${getMailApiBaseUrl()}/v1/track/open/${encodeURIComponent(token)}`;
 }
 
-/**
- * Record a click through this app's public Next API
- * (`NEXT_PUBLIC_URL/api/mail/v1/track/click/...`), which proxies to mail.
- */
 export async function resolveClickDestination(
 	token: string,
 ): Promise<string | null> {
 	let destination: string | null = null;
 
 	try {
-		const res = await fetch(getPublicTrackClickUrl(token), {
+		const res = await fetch(getMailTrackClickUrl(token), {
 			method: "GET",
 			redirect: "manual",
 			cache: "no-store",

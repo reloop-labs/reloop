@@ -114,7 +114,7 @@ export const domainColumns: ColumnDef<Domain>[] = [
 				<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 					{row.original.createdAt
 						? formatRelativeTime(row.original.createdAt)
-						: "—"}
+						: "-"}
 				</span>
 			</div>
 		),

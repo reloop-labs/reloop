@@ -25,7 +25,7 @@ function pixelResponse(body: BodyInit = TRANSPARENT_PIXEL) {
  * Proxies open-tracking pixel requests from custom tracking domains.
  *
  * Customer tracking hosts (e.g. link.example.com) CNAME to link.reloop.sh,
- * so the pixel URL hits this app — not the mail service. We forward to the
+ * so the pixel URL hits this app, not the mail service. We forward to the
  * real open-tracking endpoint on reloop.sh and always return a transparent
  * PNG so email clients never see a broken image.
  */

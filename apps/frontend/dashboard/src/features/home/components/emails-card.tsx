@@ -116,7 +116,7 @@ export function EmailsCard() {
 		activeOrganization?.id ? "/api/logs/v1/emails?limit=10&page=1" : null,
 	);
 
-	// Received preview — tight limit; only fetch when the Received tab is active
+	// Received preview: tight limit; only fetch when the Received tab is active
 	// (default tab is Sent, so skip the heavy inbox list on first paint).
 	const { data: messagesData } = useSWR<BackendMessage[]>(
 		activeOrganization?.id && activeTab === "received"

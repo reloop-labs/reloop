@@ -527,7 +527,7 @@ export function ContactSupportChat({
 						<div className="mb-4 flex w-full flex-col items-start">
 							<div className="max-w-[90%] rounded-2xl rounded-tl-xs border border-stroke-soft-200/80 bg-bg-weak-50 px-4 py-3 text-[14px] text-text-strong-950 leading-relaxed dark:border-white/10 dark:bg-white/[0.05] dark:text-white">
 								<p className="whitespace-pre-wrap break-words">
-									Hey — this goes straight to the founders&apos; inboxes.
+									Hey, this goes straight to the founders&apos; inboxes.
 									Whoever&apos;s free jumps in, so you might hear back from any
 									of us. Tell us what&apos;s up.
 								</p>

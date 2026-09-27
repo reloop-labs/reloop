@@ -178,14 +178,14 @@ export function CampaignEditorHeader() {
 		const address = (match?.[1] ?? raw).trim();
 		const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address);
 
-		// Priority 1: From address — empty or invalid → red underline + focus
+		// Priority 1: From address: empty or invalid → red underline + focus
 		if (!address || !isValid) {
 			flashFromError();
 			focusField("campaign-send-details-from");
 			return;
 		}
 
-		// Priority 2: Subject — empty → red underline + focus
+		// Priority 2: Subject: empty → red underline + focus
 		if (!subject.trim()) {
 			flashSubjectError();
 			focusField("campaign-send-details-subject");

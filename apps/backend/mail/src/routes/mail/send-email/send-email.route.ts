@@ -1,3 +1,4 @@
+import { extractApiKey } from "@reloop/auth/middleware";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { authMiddleware } from "@reloop/be-mail/middleware/auth";
 import { checkRateLimit } from "@reloop/be-mail/middleware/rate-limiter";
@@ -47,7 +48,7 @@ export const sendEmailRoute = new Elysia()
 				throw error;
 			}
 
-			const requestApiKey = request.headers.get("x-api-key");
+			const requestApiKey = extractApiKey(request.headers);
 			// External API key path uses the caller's key for KumoMTA.
 			// Session/internal auth uses the shared internal secret so inject
 			// can authenticate without a recoverable plaintext org API key.

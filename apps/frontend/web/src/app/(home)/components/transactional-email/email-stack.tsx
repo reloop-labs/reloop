@@ -187,7 +187,7 @@ function WelcomeEmailBody() {
 			<Rule />
 			<BodyText>Hey, welcome! Really glad you&apos;re here.</BodyText>
 			<BodyText>
-				A new era of software is being built — AI agents that run autonomously,
+				A new era of software is being built: AI agents that run autonomously,
 				indie developers shipping overnight, and startups moving from idea to
 				launch in days. The builders are getting faster. The tools around email
 				haven&apos;t changed much.
@@ -201,13 +201,13 @@ function WelcomeEmailBody() {
 					style={{ fontFamily: "Georgia, serif" }}
 				>
 					&ldquo;Open-source email infrastructure built for AI agents and
-					developers — so you can focus on what you&apos;re building, and not on
+					developers, so you can focus on what you&apos;re building, and not on
 					email deliverability.&rdquo;
 				</p>
 			</div>
 
 			<BodyText>
-				We&apos;ve seen the next generation of companies — smaller teams, bigger
+				We&apos;ve seen the next generation of companies: smaller teams, bigger
 				ambitions. They&apos;ll be powered by AI, built in the open, and run by
 				founders who care more about their product than their billing stack.
 			</BodyText>
@@ -227,7 +227,7 @@ function WelcomeEmailBody() {
 							AI Agents
 						</p>
 						<p className="mt-1 mb-0 text-[#707070] text-[15px]">
-							A dedicated email inbox for AI agents — a webhook to get notified,
+							A dedicated email inbox for AI agents. A webhook to get notified,
 							CLI to read and respond. Everything your agent needs.
 						</p>
 					</div>
@@ -241,7 +241,7 @@ function WelcomeEmailBody() {
 							Developers
 						</p>
 						<p className="mt-1 mb-0 text-[#707070] text-[15px]">
-							Built for developers — clean APIs, great DX, and full control.
+							Built for developers: clean APIs, great DX, and full control.
 							Self-host or use our cloud. Your stack, your rules.
 						</p>
 					</div>
@@ -253,7 +253,7 @@ function WelcomeEmailBody() {
 			<p className="mt-10 mb-8 text-[#555555] text-[15px] leading-[1.6] dark:text-[#b0b0b0]">
 				Honestly? We&apos;ll probably get things wrong. But that&apos;s exactly
 				why I&apos;m writing to you. Every critique, every &apos;this feels
-				off&apos;, every &apos;why doesn&apos;t it do this&apos; — that&apos;s
+				off&apos;, every &apos;why doesn&apos;t it do this&apos;: that&apos;s
 				what shapes Reloop into something worth using. You&apos;re not just a
 				user here. You&apos;re the reason it gets better. Hit reply. I read
 				everything personally.
@@ -274,8 +274,8 @@ function ResetEmailBody() {
 				This link expires in 20 minutes.
 			</BodyText>
 			<BodyText>
-				If you didn&apos;t ask for this, you can ignore the email — your
-				password stays the same.
+				If you didn&apos;t ask for this, you can ignore the email. Your password
+				stays the same.
 			</BodyText>
 			<Cta>Choose a new password</Cta>
 			<EmailFooter />

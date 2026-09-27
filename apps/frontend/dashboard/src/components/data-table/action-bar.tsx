@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Floating selection ActionBar — visual match for modern pill action docks.
+ * Floating selection ActionBar: visual match for modern pill action docks.
  */
 
 import { cn } from "@reloop/ui/cn";

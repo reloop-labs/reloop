@@ -52,7 +52,7 @@ export function AutomationShell({ children }: { children: ReactNode }) {
 				description={
 					isTriggersPage
 						? "Custom triggers that start automations. Separate from webhooks."
-						: "Trigger emails from events — delays, conditions, and sends."
+						: "Trigger emails from events: delays, conditions, and sends."
 				}
 				icon={isTriggersPage ? "zap" : "workflow"}
 			/>

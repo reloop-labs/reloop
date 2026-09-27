@@ -9,7 +9,7 @@ const licenseFaqItems = [
 	{
 		question: "Can I use Reloop inside my company?",
 		answer:
-			"Yes. Internal business use — including across your team, modified for internal needs, and self-hosted privately — is free with no Reloop license fee.",
+			"Yes. Internal business use (including across your team, modified for internal needs, and self-hosted privately) is free with no Reloop license fee.",
 	},
 	{
 		question: "Can I resell or offer Reloop as a hosted service?",
@@ -19,7 +19,7 @@ const licenseFaqItems = [
 	{
 		question: "Is self-hosting really free?",
 		answer:
-			"Yes for personal and internal use. Deploy on your own infrastructure at no Reloop license cost — you only pay for your own servers and delivery infrastructure.",
+			"Yes for personal and internal use. Deploy on your own infrastructure at no Reloop license cost. You only pay for your own servers and delivery infrastructure.",
 	},
 	{
 		question: "Who do I contact about a commercial license?",

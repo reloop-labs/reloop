@@ -1,6 +1,6 @@
 ---
 title: "Introducing Reloop: Open-Source Email Infrastructure Developers Actually Want to Use"
-description: "Open-source email infrastructure for indie hackers, startups, product teams, and enterprises. Ship transactional mail, agent inboxes, and inbound on Reloop Cloud or self-host—same product, no lock-in."
+description: "Open-source email infrastructure for indie hackers, startups, product teams, and enterprises. Ship transactional mail, agent inboxes, and inbound on Reloop Cloud or self-host: same product, no lock-in."
 keywords:
   - introducing reloop
   - open source email infrastructure
@@ -39,7 +39,7 @@ Today we're introducing Reloop: [open-source email infrastructure](https://githu
 
 ### 1. Deliverability
 
-If mail lands in spam, nothing else counts. Reloop is built as real [delivery infrastructure](/features/deliverability): [SMTP](/features/smtp), [DKIM/SPF-oriented setup](/blog/spf-dkim-dmarc-setup-guide), bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. [Self-host](/self-host) when you want the sending path on your own terms—see [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for when that tradeoff is worth it.
+If mail lands in spam, nothing else counts. Reloop is built as real [delivery infrastructure](/features/deliverability): [SMTP](/features/smtp), [DKIM/SPF-oriented setup](/blog/spf-dkim-dmarc-setup-guide), bounce classification, and the operational pieces that keep reputation from becoming someone else's mystery. Use Reloop Cloud when you want managed reputation and IP pools. [Self-host](/self-host) when you want the sending path on your own terms. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for when that tradeoff is worth it.
 
 ### 2. Developer experience
 
@@ -51,22 +51,22 @@ Local and production should feel like the same product. [Docs](/docs) should hel
 
 ### 3. Cost that doesn't punish growth
 
-Email SaaS pricing often feels cheap at low volume and painful once you scale. Don't take that on faith—check the numbers yourself:
+Email SaaS pricing often feels cheap at low volume and painful once you scale. Don't take that on faith. Check the numbers yourself:
 
 - [Reloop pricing](/pricing) for hosted plans and what you get at each tier
 - [Compare Reloop vs Resend](/compare/resend), [vs SendGrid](/compare/sendgrid), [vs Mailgun](/compare/mailgun), and [vs AWS SES](/compare/aws-ses)
 - Full grid: [all provider comparisons](/compare)
 - Deeper write-up: [email provider comparison 2026](/blog/email-provider-comparison-2026)
 
-Reloop gives you two answers: a hosted path when you want zero ops, and a [full open-source path](/self-host) when you want to run the stack yourself and stop renting your outbound channel forever—including a [low-cost self-host path](/blog/self-host-email-5-dollars) if you're optimizing ops spend.
+Reloop gives you two answers: a hosted path when you want zero ops, and a [full open-source path](/self-host) when you want to run the stack yourself and stop renting your outbound channel forever, including a [low-cost self-host path](/blog/self-host-email-5-dollars) if you're optimizing ops spend.
 
 ### 4. Ownership (no vendor lock-in)
 
-This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines—see [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/why-open-source).
+This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't leave without a rewrite" are how email becomes a hostage situation. Reloop is [Apache 2.0](/license). The cloud product runs the same codebase you can `docker compose up` on Fly, Coolify, Kubernetes, or your own machines. See [Fly.io](/blog/reloop-flyio-deployment) and [Coolify](/blog/reloop-coolify-setup) guides, or the [self-host docs](/self-host). Audit it. Fork it. Move it. Your data and compliance boundary stay yours. More on the bet: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and [why open source](/why-open-source).
 
 ### 5. Visibility and the full loop
 
-"Did it send?" is not enough. You need deliveries, opens, clicks, bounces, and complaints as signed [webhooks](/features/webhooks) your app can act on: retries, suppressions, support alerts—plus [email analytics](/features/email-analytics) when you need the operational view. And for modern products (especially AI agents), send-only is half a system. Reloop includes inbound parsing, [agent inboxes](/features/ai-agents), and MCP support so agents can send, receive, and inspect mail with structured tools instead of scraping a random mailbox. See [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents) and the [AI agent inbox use case](/use-cases/ai-agent-inbox).
+"Did it send?" is not enough. You need deliveries, opens, clicks, bounces, and complaints as signed [webhooks](/features/webhooks) your app can act on: retries, suppressions, support alerts, plus [email analytics](/features/email-analytics) when you need the operational view. And for modern products (especially AI agents), send-only is half a system. Reloop includes inbound parsing, [agent inboxes](/features/ai-agents), and MCP support so agents can send, receive, and inspect mail with structured tools instead of scraping a random mailbox. See [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents) and the [AI agent inbox use case](/use-cases/ai-agent-inbox).
 
 ## Why we open-sourced it
 
@@ -74,15 +74,15 @@ Linux, Postgres, Redis, Nginx: the boring foundations of the internet are open. 
 
 Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a [pricing page](/pricing). Full rationale: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and our [product beliefs](/our-product-beliefs).
 
-We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product—same APIs whether you use [hosted](/pricing) or [self-host](/self-host).
+We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product, with the same APIs whether you use [hosted](/pricing) or [self-host](/self-host).
 
 ## Who should care
 
-Indie hackers, startups, side projects, product teams, and enterprises—if you're looking for your thing in email, Reloop is built for you.
+Indie hackers, startups, side projects, product teams, and enterprises: if you're looking for your thing in email, Reloop is built for you.
 
 Maybe that's cheap transactional mail that doesn't become your most expensive utility ([pricing](/pricing)). Maybe it's multi-tenant delivery without standing up an MTA team. Maybe it's self-host or cloud with real ownership and no lock-in. Maybe you're migrating off [SendGrid](/compare/sendgrid), [Resend](/compare/resend), or [Mailgun](/compare/mailgun) and want parity without a science project ([SendGrid migration guide](/blog/migrating-from-sendgrid)). Or you're building AI agents that need inbound and outbound as [real infrastructure](/features/ai-agents).
 
-Whatever your scale or stack, if deliverability, DX, cost, ownership, and visibility are how you judge email tools, keep Reloop on your radar—and verify the claims on [compare](/compare), [pricing](/pricing), and the [docs](/docs).
+Whatever your scale or stack, if deliverability, DX, cost, ownership, and visibility are how you judge email tools, keep Reloop on your radar, and verify the claims on [compare](/compare), [pricing](/pricing), and the [docs](/docs).
 
 ## Get in
 

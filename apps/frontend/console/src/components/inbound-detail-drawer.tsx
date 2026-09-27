@@ -140,7 +140,7 @@ export function InboundDetailDrawer({
 									<div className="flex items-start justify-between gap-2">
 										<span className="text-text-sub-600">Mailbox</span>
 										<span className="truncate text-right font-medium text-text-strong-950">
-											{email.mailboxEmail || "—"}
+											{email.mailboxEmail || "-"}
 										</span>
 									</div>
 									<div className="flex items-start justify-between gap-2">
@@ -158,7 +158,7 @@ export function InboundDetailDrawer({
 										<span className="text-text-sub-600">Spam score</span>
 										<span className="text-right font-medium text-text-strong-950">
 											{email.spamScore == null
-												? "—"
+												? "-"
 												: email.spamScore.toFixed(2)}
 										</span>
 									</div>
@@ -185,7 +185,7 @@ export function InboundDetailDrawer({
 									<div className="flex items-start justify-between gap-2 sm:col-span-2">
 										<span className="text-text-sub-600">Message ID</span>
 										<div className="flex max-w-[70%] items-center gap-1.5 font-mono text-[11px] text-text-strong-950">
-											<span className="truncate">{email.messageId || "—"}</span>
+											<span className="truncate">{email.messageId || "-"}</span>
 											{email.messageId ? (
 												<button
 													type="button"

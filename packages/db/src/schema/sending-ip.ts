@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
 	boolean,
+	foreignKey,
 	index,
 	jsonb,
 	pgEnum,
@@ -114,9 +115,7 @@ export const ipWarmup = pgTable(
 	"ip_warmup",
 	{
 		id: text("id").$defaultFn(createIpWarmupId).primaryKey(),
-		organizationSendingIpId: text("organization_sending_ip_id")
-			.notNull()
-			.references(() => organizationSendingIp.id, { onDelete: "cascade" }),
+		organizationSendingIpId: text("organization_sending_ip_id").notNull(),
 		sendingIpId: text("sending_ip_id")
 			.notNull()
 			.references(() => sendingIp.id, { onDelete: "cascade" }),
@@ -139,6 +138,11 @@ export const ipWarmup = pgTable(
 	},
 	(t) => [
 		uniqueIndex("ip_warmup_assignment_idx").on(t.organizationSendingIpId),
+		foreignKey({
+			name: "ip_warmup_organization_sending_ip_id_organization_sending_ip_id",
+			columns: [t.organizationSendingIpId],
+			foreignColumns: [organizationSendingIp.id],
+		}).onDelete("cascade"),
 		index("ip_warmup_org_idx").on(t.organizationId),
 		index("ip_warmup_ip_idx").on(t.sendingIpId),
 		index("ip_warmup_status_idx").on(t.status),

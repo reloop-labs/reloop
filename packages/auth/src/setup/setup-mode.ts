@@ -48,6 +48,16 @@ export async function writeAdminSetupKeyFile(
 	await writeFile(filePath, `${key}\n`, { mode: 0o600 });
 }
 
+export async function seedAdminSetupKeyFile(
+	filePath: string,
+	key: string,
+): Promise<boolean> {
+	const current = await readAdminSetupKey(filePath);
+	if (current === "" || current === key) return false;
+	await writeAdminSetupKeyFile(filePath, key);
+	return true;
+}
+
 async function withExclusiveFileLock<T>(
 	lockPath: string,
 	fn: () => Promise<T>,
@@ -148,7 +158,10 @@ export async function patchEnvFile(
 		}
 	}
 
-	const text = await readFile(filePath, "utf8");
+	const text = await readFile(filePath, "utf8").catch((error) => {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") return "";
+		throw error;
+	});
 	const lines = text.split("\n");
 	const remainingUpdates = new Map(Object.entries(updates));
 	const patchedLines = lines.map((line) => {

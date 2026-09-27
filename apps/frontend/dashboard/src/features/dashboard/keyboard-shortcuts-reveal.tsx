@@ -135,7 +135,7 @@ export function KeyboardShortcutsRevealListener() {
 			if (e.metaKey || e.ctrlKey || e.altKey) return;
 			if (isEditableTarget(e.target)) return;
 
-			// Already holding — block page scroll while revealed / waiting.
+			// Already holding: block page scroll while revealed / waiting.
 			if (e.repeat) {
 				if (spaceHeld || revealed) e.preventDefault();
 				return;

@@ -67,10 +67,10 @@ function normalizeKeyToken(token: string): string[] {
 	const lower = trimmed.toLowerCase();
 	if (MODIFIER_MAP[lower]) return [MODIFIER_MAP[lower]];
 
-	// Single letter / number / punctuation — uppercase for consistency
+	// Single letter / number / punctuation: uppercase for consistency
 	if (trimmed.length === 1) return [trimmed.toUpperCase()];
 
-	// Multi-char labels (Space, Hold, Escape, …) — title case
+	// Multi-char labels (Space, Hold, Escape, …): title case
 	return [trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase()];
 }
 

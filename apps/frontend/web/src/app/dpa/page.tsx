@@ -112,7 +112,7 @@ const DpaPage = () => {
 					<ul>
 						<li>
 							<strong>Subject matter:</strong> provision of hosted email
-							infrastructure—sending, receiving, and managing email, including
+							infrastructure: sending, receiving, and managing email, including
 							transactional messages, campaigns, automations, analytics, and
 							related support.
 						</li>
@@ -162,9 +162,9 @@ const DpaPage = () => {
 					<ul>
 						<li>
 							Process Customer Personal Data only on the Customer&rsquo;s
-							documented instructions—given through use of the service, support
-							requests, or this DPA—unless required otherwise by applicable law,
-							in which case we will inform the Customer where permitted.
+							documented instructions (given through use of the service, support
+							requests, or this DPA) unless required otherwise by applicable
+							law, in which case we will inform the Customer where permitted.
 						</li>
 						<li>
 							Ensure personnel authorized to process Customer Personal Data are

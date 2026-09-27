@@ -32,7 +32,7 @@ export function HeroAgentsPreview() {
 						Agent draft
 					</p>
 					<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
-						Hi Alex — I found the duplicate charge on invoice #1024 and issued a
+						Hi Alex, I found the duplicate charge on invoice #1024 and issued a
 						$49 refund to the original card. It should land in 3–5 days.
 					</p>
 				</div>

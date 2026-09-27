@@ -1,7 +1,7 @@
 /** Compact relative time for tables (e.g. "20 min ago"). */
 export function formatRelativeTime(date: string | Date): string {
 	const target = new Date(date).getTime();
-	if (Number.isNaN(target)) return "—";
+	if (Number.isNaN(target)) return "-";
 
 	const diffSec = Math.max(0, Math.floor((Date.now() - target) / 1000));
 	if (diffSec < 30) return "just now";

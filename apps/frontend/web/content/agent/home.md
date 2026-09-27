@@ -1,6 +1,6 @@
 # Reloop
 
-> High-performance, open-source email infrastructure—the same service as proprietary platforms. Use Reloop hosted or deploy it yourself.
+> High-performance, open-source email infrastructure: the same service as proprietary platforms. Use Reloop hosted or deploy it yourself.
 
 Reloop is email infrastructure for developers: transactional and marketing email, real-time webhooks, inbound processing, analytics, and an agent-ready API. Reloop **is** the ESP; it runs an in-house MTA (KumoMTA), not a connector that routes through SendGrid, Mailgun, Resend, or SES.
 
@@ -19,16 +19,16 @@ Developers, startups, and agent products that need transactional + campaign emai
 
 Canonical data: https://reloop.sh/pricing.md
 
-- Free — $0, 3,000 emails / month, **100 / day**
-- Pro — $10 / month, 50,000 emails / month, no daily cap, overage $0.50 / 1,000
-- Growth — $20 / month, 100,000 emails / month, no daily cap, overage $0.50 / 1,000
-- Enterprise — custom volume and billing
+- Free: $0, 3,000 emails / month, **100 / day**
+- Pro: $10 / month, 50,000 emails / month, no daily cap, overage $0.50 / 1,000
+- Growth: $20 / month, 100,000 emails / month, no daily cap, overage $0.50 / 1,000
+- Enterprise: custom volume and billing
 
 ## Why Reloop
 
-- **Open source** — same product you can self-host or use hosted (Apache 2.0)
-- **Developer-first** — REST API, SMTP relay, official SDKs, CLI, MCP
-- **Agent-ready** — API keys, inbound agent inbox, docs as markdown / llms.txt
+- **Open source**: same product you can self-host or use hosted (Apache 2.0)
+- **Developer-first**: REST API, SMTP relay, official SDKs, CLI, MCP
+- **Agent-ready**: API keys, inbound agent inbox, docs as markdown / llms.txt
 
 ## Get started
 

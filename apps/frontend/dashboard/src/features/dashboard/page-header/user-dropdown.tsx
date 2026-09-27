@@ -76,7 +76,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 			: null;
 
 	const { isOrgAdmin, canManageTeam, canManageBilling } = useOrgPermissions();
-	// Same RBAC as settings sidebar — members only see Account items.
+	// Same RBAC as settings sidebar: members only see Account items.
 	const filteredSettings = useMemo(
 		() =>
 			filterSettingsNavigation(settingsNavigation, {

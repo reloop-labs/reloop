@@ -317,12 +317,12 @@ export default async function Page(props: {
 								: "w-full xl:grid xl:grid-cols-[minmax(0,1fr)_260px]"
 					}`}
 				>
-					{/* Agent discovery — top of main content, outside nav */}
+					{/* Agent discovery at top of main content, outside nav */}
 					{!isDocsHome && <AgentDirective markdownPath={markdownPath} />}
 					{/*
 					  Split layout breakpoints (API + webhooks):
-					  - < xl (phone + tablet / iPad): single column — code stacks above docs
-					  - xl+ (desktop): two columns — docs left, sticky code right
+					  - < xl (phone + tablet / iPad): single column (code stacks above docs)
+					  - xl+ (desktop): two columns (docs left, sticky code right)
 					*/}
 					<div
 						className={`min-w-0 ${
@@ -346,7 +346,7 @@ export default async function Page(props: {
 										: "mx-auto w-full max-w-[680px]"
 							}
 						>
-							{/* Title row — hidden on docs home (custom hero owns the H1) */}
+							{/* Title row, hidden on docs home (custom hero owns the H1) */}
 							{!isDocsHome && (
 								<div className="mb-8">
 									{(page.data as any).eyebrow && (
@@ -393,7 +393,7 @@ export default async function Page(props: {
 									previous={previous}
 									next={next}
 									editUrl={
-										// API reference pages are generated — no useful source to edit
+										// API reference pages are generated, so there is no useful source to edit
 										!isApiPage && page.filePath
 											? `https://github.com/reloop-labs/reloop/edit/main/${page.filePath}`
 											: undefined

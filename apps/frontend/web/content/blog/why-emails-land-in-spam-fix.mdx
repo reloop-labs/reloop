@@ -1,6 +1,6 @@
 ---
 title: "Why Your Emails Land In Spam & How to Fix It"
-description: The definitive guide to diagnosing and fixing email spam folder placement — covering authentication, content, reputation, list hygiene, and ISP-specific issues.
+description: The definitive guide to diagnosing and fixing email spam folder placement, covering authentication, content, reputation, list hygiene, and ISP-specific issues.
 keywords:
   - emails going to spam fix
   - why emails land in spam
@@ -28,7 +28,7 @@ relatedSlugs:
   - why-we-open-sourced-email-infrastructure
 ---
 
-**Email deliverability does not fail with an HTTP 404 error or a readable stack trace—it fails silently by routing your mission-critical messages into the recipient's spam folder.**
+**Email deliverability does not fail with an HTTP 404 error or a readable stack trace. It fails silently by routing your mission-critical messages into the recipient's spam folder.**
 
 When auth tokens, password reset links, invoices, and user notifications land in spam, your business is effectively down for those users. Because SMTP technically completes message handoff without an error code, deliverability regressions are notoriously difficult to detect and debug without a systematic methodology.
 
@@ -41,10 +41,10 @@ This guide walks you through every major root cause of spam folder placement, pr
 Send a test email from your production or staging environment to [mail-tester.com](https://mail-tester.com). The service executes automated SpamAssassin heuristics, analyzes message MIME structure, and checks DNSBL blacklists to return a score from 0 to 10.
 
 - **Score 9.0 to 10.0**: **Optimal deliverability baseline** required for transactional infrastructure.
-- **Score 7.0 to 8.9**: **Active deliverability risks**—minor configuration warnings, missing headers, or slight content penalties.
-- **Score Below 7.0**: **Severe deliverability failure**—failing authentication, blacklisted IP, or broken MIME structure.
+- **Score 7.0 to 8.9**: **Active deliverability risks**: minor configuration warnings, missing headers, or slight content penalties.
+- **Score Below 7.0**: **Severe deliverability failure**: failing authentication, blacklisted IP, or broken MIME structure.
 
-In parallel, register your sending domain with [Google Postmaster Tools](https://postmaster.google.com). It provides proprietary Gmail telemetry directly from Google—including **domain reputation**, **IP reputation**, **spam complaint rates**, and **authentication success rates**.
+In parallel, register your sending domain with [Google Postmaster Tools](https://postmaster.google.com). It provides proprietary Gmail telemetry directly from Google, including **domain reputation**, **IP reputation**, **spam complaint rates**, and **authentication success rates**.
 
 ## Cause 1: Missing or broken email authentication
 
@@ -133,7 +133,7 @@ Internet Service Providers (ISPs) maintain rolling reputation scores for every s
 ### How to eliminate bounce penalties
 
 1. **Automatically suppress hard-bounced addresses**: Never retry sending to a hard bounce. [Reloop's delivery engine](/features/deliverability) automatically suppresses hard bounces to protect your domain reputation (see our guide on [email bounce processing automation](/blog/email-bounce-processing-automation)).
-2. **Clean lists before you send**: Before campaigns or imports, run addresses through a [free email validator](/tools/email-validator) to catch invalid syntax, disposable domains, and domains with no MX records — so hard bounces never hit your sending reputation.
+2. **Clean lists before you send**: Before campaigns or imports, run addresses through a [free email validator](/tools/email-validator) to catch invalid syntax, disposable domains, and domains with no MX records, so hard bounces never hit your sending reputation.
 3. **Verify addresses in real-time at signup**: Prevent typos and invalid domains directly at your registration form (or call Reloop's [email validation API](/features/email-validation) / use the free [bulk email verifier](/tools/email-validator) for CSV imports):
    ```typescript
    import { resolver } from "node:dns/promises";
@@ -254,13 +254,13 @@ Each major mailbox provider utilizes proprietary filtering algorithms beyond bas
 
 When emails are landing in spam, work through this diagnostic sequence in order:
 
-1. **Run a [mail-tester.com](https://mail-tester.com) scan (target score ≥ 9/10)** — Identifies broken MIME syntax, missing DNS tags, and Bayesian spam keyword flags before you touch infrastructure.
-2. **Audit raw authentication headers** — Inspect received headers in an actual test inbox to confirm `SPF: PASS`, `DKIM: PASS`, and `DMARC: PASS` with identifier alignment.
-3. **Check [Google Postmaster Tools](https://postmaster.google.com) telemetry** — Verify that your Domain Reputation is "Good" or "High" and inspect Gmail-specific spam rates.
-4. **Check DNSBL blacklists on [MXToolbox](https://mxtoolbox.com/blacklists.aspx)** — Confirm neither your sending IP nor domain is listed on Spamhaus, Barracuda, or Spamcop.
-5. **Review real-time bounce rates in [Reloop Analytics](/features/email-analytics)** — Confirm that your 30-day hard bounce rate is strictly **below 2%** and that auto-suppression is active.
-6. **Review your spam complaint rate** — Ensure complaints remain strictly **below 0.10%** (1 per 1,000 sends) to prevent algorithmic ISP filtering.
-7. **Audit MIME structure & plain text fallback** — Verify that every outgoing template includes both a valid `text/plain` part and a balanced HTML payload without broken tracking URLs.
-8. **Verify ISP-specific routing & tab placement** — Check whether messages are routing to Gmail's Promotions tab vs. spam, and isolate transactional subdomains from promotional lists.
+1. **Run a [mail-tester.com](https://mail-tester.com) scan (target score ≥ 9/10)**: Identifies broken MIME syntax, missing DNS tags, and Bayesian spam keyword flags before you touch infrastructure.
+2. **Audit raw authentication headers**: Inspect received headers in an actual test inbox to confirm `SPF: PASS`, `DKIM: PASS`, and `DMARC: PASS` with identifier alignment.
+3. **Check [Google Postmaster Tools](https://postmaster.google.com) telemetry**: Verify that your Domain Reputation is "Good" or "High" and inspect Gmail-specific spam rates.
+4. **Check DNSBL blacklists on [MXToolbox](https://mxtoolbox.com/blacklists.aspx)**: Confirm neither your sending IP nor domain is listed on Spamhaus, Barracuda, or Spamcop.
+5. **Review real-time bounce rates in [Reloop Analytics](/features/email-analytics)**: Confirm that your 30-day hard bounce rate is strictly **below 2%** and that auto-suppression is active.
+6. **Review your spam complaint rate**: Ensure complaints remain strictly **below 0.10%** (1 per 1,000 sends) to prevent algorithmic ISP filtering.
+7. **Audit MIME structure & plain text fallback**: Verify that every outgoing template includes both a valid `text/plain` part and a balanced HTML payload without broken tracking URLs.
+8. **Verify ISP-specific routing & tab placement**: Check whether messages are routing to Gmail's Promotions tab vs. spam, and isolate transactional subdomains from promotional lists.
 
 

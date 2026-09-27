@@ -220,9 +220,9 @@ export function DeleteApiKeyModal({
 					}, 0);
 				}}
 			>
-				{/* Inner card — mirrors CreateCampaignModal but lighter, no red box */}
+				{/* Inner card, mirrors CreateCampaignModal but lighter, no red box */}
 				<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-					{/* Header — clean title only, no repetitive description */}
+					{/* Header: clean title only, no repetitive description */}
 					<div className="flex items-start justify-between gap-4 px-6">
 						<div className="flex items-center gap-2">
 							<Icon name="trash" className="size-4 text-text-sub-600" />
@@ -244,7 +244,7 @@ export function DeleteApiKeyModal({
 					</div>
 
 					<div className="space-y-4 px-6 pb-6">
-						{/* Lightweight context — prefix + consequence, no red outline/background */}
+						{/* Lightweight context: prefix + consequence, no red outline/background */}
 						{isBulk ? (
 							<div className="space-y-3">
 								<p className="text-sm text-text-sub-600 leading-relaxed">
@@ -357,7 +357,7 @@ export function DeleteApiKeyModal({
 					</div>
 				</div>
 
-				{/* Footer Actions — outside inner card, like CreateCampaignModal */}
+				{/* Footer Actions outside inner card, like CreateCampaignModal */}
 				<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 					<Button.Root
 						type="button"

@@ -14,7 +14,7 @@ import { dashboardURL } from "./runtime";
 // Full signup + multi-step onboarding needs more headroom than pure auth UI.
 test.describe.configure({ timeout: 120_000 });
 
-test.describe("onboarding — new account", () => {
+test.describe("onboarding: new account", () => {
 	test("new signup always lands on onboarding step 1", async ({ page }) => {
 		await signUpToOnboarding(page);
 
@@ -73,7 +73,7 @@ test.describe("onboarding — new account", () => {
 	});
 });
 
-test.describe("onboarding — gates", () => {
+test.describe("onboarding: gates", () => {
 	test("anonymous visit to /onboarding redirects to login", async ({
 		page,
 	}) => {

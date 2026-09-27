@@ -249,7 +249,7 @@ export function BimiDnsRecords() {
 						_dmarc.example.com TXT “v=DMARC1; p=quarantine; pct=100;”
 					</span>
 					<br />
-					DMARC must be at quarantine or reject — p=none never shows a logo.
+					DMARC must be at quarantine or reject. p=none never shows a logo.
 				</p>
 			</div>
 		</section>

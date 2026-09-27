@@ -670,7 +670,7 @@ export function EmailValidatorPageView() {
 														Full Name
 													</span>
 													<span className="font-medium text-paragraph-sm text-text-strong-950 dark:text-white">
-														—
+														-
 													</span>
 												</div>
 												<div className="flex items-center justify-between pr-4">
@@ -696,7 +696,7 @@ export function EmailValidatorPageView() {
 														Gender / Year
 													</span>
 													<span className="font-medium text-paragraph-sm text-text-strong-950 dark:text-white">
-														—
+														-
 													</span>
 												</div>
 												<div className="flex items-center justify-between pr-4">
@@ -717,7 +717,7 @@ export function EmailValidatorPageView() {
 													<span className="font-mono text-paragraph-sm text-primary-base">
 														{singleResult.domain ||
 															singleResult.input.split("@")[1] ||
-															"—"}
+															"-"}
 													</span>
 												</div>
 												<div className="flex items-center justify-between pr-4">
@@ -904,7 +904,7 @@ export function EmailValidatorPageView() {
 													</span>
 													<span className="font-medium text-text-strong-950 dark:text-white">
 														{singleResult.health?.mailServer?.smtpProvider ||
-															"—"}
+															"-"}
 													</span>
 												</div>
 												<div className="flex items-center justify-between pr-4 text-paragraph-sm">
@@ -925,7 +925,7 @@ export function EmailValidatorPageView() {
 														{singleResult.health?.mailServer?.mxRecord ||
 															(singleResult.mxRecords.length > 0
 																? singleResult.mxRecords[0]
-																: singleResult.domain || "—")}
+																: singleResult.domain || "-")}
 													</span>
 												</div>
 											</div>
@@ -1390,7 +1390,7 @@ export function EmailValidatorPageView() {
 
 																<div className="min-w-0 pr-3">
 																	<span className="line-clamp-2 font-medium text-[13px] text-text-sub-600 dark:text-white/55">
-																		{row.health?.summary || "—"}
+																		{row.health?.summary || "-"}
 																	</span>
 																</div>
 

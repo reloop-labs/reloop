@@ -104,7 +104,7 @@ export function CompareHeroIcons({
 
 			{/* Logos overlaid on the panels */}
 			<div className="absolute inset-0 flex items-center">
-				{/* Left: Reloop — sit in the body of the left chevron */}
+				{/* Left: Reloop, sit in the body of the left chevron */}
 				<div className="flex flex-1 items-center justify-center pr-[8%]">
 					<div
 						className="relative flex size-[4.25rem] items-center justify-center rounded-[20px] bg-[#0a0d12] shadow-sm sm:size-[5.25rem] sm:rounded-[24px] md:size-24 md:rounded-[26px]"

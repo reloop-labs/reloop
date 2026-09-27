@@ -179,7 +179,7 @@ export function HeroEmailsPreview() {
 		return () => clearInterval(interval);
 	}, [reduceMotion, view]);
 
-	// Organic status updates stay on the list only — detail uses its own session.
+	// Organic status updates stay on the list only; detail uses its own session.
 	useEffect(() => {
 		if (reduceMotion) return;
 

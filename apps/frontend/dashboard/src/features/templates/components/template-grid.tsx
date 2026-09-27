@@ -342,7 +342,7 @@ export const TemplateGrid = ({
 									key={template.id}
 									className="group/card relative flex cursor-pointer flex-col gap-3.5"
 								>
-									{/* Preview stage — clean rounded card without shadows */}
+									{/* Preview stage: clean rounded card without shadows */}
 									<div
 										className={cn(
 											previewCardClassName,
@@ -382,7 +382,7 @@ export const TemplateGrid = ({
 										/>
 									</div>
 
-									{/* Meta — title + slug, optional status (mockup) */}
+									{/* Meta: title + slug, optional status (mockup) */}
 									<div className="flex items-start justify-between gap-3 px-1">
 										<div className="mr-2 flex min-w-0 flex-1 flex-col gap-0.5">
 											<span

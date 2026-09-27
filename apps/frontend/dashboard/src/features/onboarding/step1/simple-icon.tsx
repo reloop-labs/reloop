@@ -42,7 +42,7 @@ export function SimpleIcon({
 	}
 
 	const isMonochrome = MONOCHROME_SLUGS.includes(slug);
-	// Rust brand hex is #000000 — use red so the gear is visible on dark UI
+	// Rust brand hex is #000000, so use red so the gear is visible on dark UI
 	const hex = slug === "siRust" ? "e24d2b" : icon.hex;
 
 	return (

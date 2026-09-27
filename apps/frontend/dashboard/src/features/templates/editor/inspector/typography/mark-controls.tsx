@@ -1,6 +1,6 @@
 import * as ButtonGroup from "@reloop/ui/button-group";
 
-/** Letter glyphs — sprite has no bold/italic/underline icons. */
+/** Letter glyphs; sprite has no bold/italic/underline icons. */
 function Glyph({ children }: { children: React.ReactNode }) {
 	return (
 		<span className="flex h-4 w-4 items-center justify-center font-semibold text-[12px] leading-none">

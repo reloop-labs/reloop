@@ -213,18 +213,21 @@ function CellValue({
 		normalized === "yes" ||
 		normalized.startsWith("yes ") ||
 		normalized.startsWith("yes(") ||
-		normalized.startsWith("yes—") ||
+		normalized.startsWith(`yes${dash}`) ||
 		normalized.startsWith("yes-");
-	const isNeutralDash = normalized === "—" || normalized === "-";
+	const isNeutralDash = normalized === dash || normalized === "-";
 	const isNo =
 		normalized === "no" ||
 		normalized.startsWith("no ") ||
 		normalized.startsWith("no(") ||
-		normalized.startsWith("no—") ||
+		normalized.startsWith(`no${dash}`) ||
 		normalized.startsWith("no-");
 
 	if (isYes) {
-		const label = value === "Yes" ? null : value.replace(/^Yes[\s—-]*/i, "");
+		const label =
+			value === "Yes"
+				? null
+				: value.replace(new RegExp(`^Yes[\\s${dash}-]*`, "i"), "");
 		return (
 			<div className="flex flex-col items-center justify-center gap-1.5 text-center">
 				<CheckCircleIcon />
@@ -245,7 +248,7 @@ function CellValue({
 	if (isNeutralDash) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-1 text-center">
-				<span className="text-text-sub-600 dark:text-white/30">—</span>
+				<span className="text-text-sub-600 dark:text-white/30">-</span>
 				{note ? (
 					<span className="text-[12px] text-text-sub-600 leading-snug dark:text-white/40">
 						{note}
@@ -256,7 +259,10 @@ function CellValue({
 	}
 
 	if (isNo) {
-		const label = value === "No" ? null : value.replace(/^No[\s—-]*/i, "");
+		const label =
+			value === "No"
+				? null
+				: value.replace(new RegExp(`^No[\\s${dash}-]*`, "i"), "");
 		return (
 			<div className="flex flex-col items-center justify-center gap-1.5 text-center">
 				<CrossCircleIcon />

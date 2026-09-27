@@ -3,7 +3,7 @@ import { dashboardBaseURL } from "./tests/browser/runtime";
 
 /**
  * Auth E2E targets the real local stack (Caddy + dashboard + auth).
- * Cookies only work on https://local.reloop.sh — not bare localhost:3001.
+ * Cookies only work on https://local.reloop.sh, not bare localhost:3001.
  *
  * Prerequisites: local/bootstrap, be:auth:dev, fe:dashboard:dev
  * See tests/browser/README.md
@@ -14,7 +14,7 @@ export default defineConfig({
 	fullyParallel: false,
 	forbidOnly: Boolean(process.env.CI),
 	retries: process.env.CI ? 2 : 0,
-	// Serial by default — auth mutates sessions/cookies against a shared stack.
+	// Serial by default: auth mutates sessions/cookies against a shared stack.
 	workers: 1,
 	timeout: 60_000,
 	expect: {

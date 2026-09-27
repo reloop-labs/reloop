@@ -82,14 +82,14 @@ const langIcons: Record<string, CopyCodeBlockIcon> = {
 	php: siPhp,
 	go: siGo,
 	ruby: siRuby,
-	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	// Brand hex is #000000; override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
 	java: JAVA_ICON,
 	dotnet: siDotnet,
 	curl: siCurl,
 };
 
-/** Public origin for API sample URLs — same resolution as auth client. */
+/** Public origin for API sample URLs (same resolution as auth client). */
 function resolveDocBaseUrl(): string {
 	const fromEnv = (process.env.NEXT_PUBLIC_URL || "").trim();
 	if (fromEnv) return fromEnv.replace(/\/$/, "");

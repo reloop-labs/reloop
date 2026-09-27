@@ -114,7 +114,7 @@ function Shapes({
 }
 
 /**
- * Grainy pastel background — CSS recreation of the reference:
+ * Grainy pastel background: CSS recreation of the reference:
  * soft blurred blob / wave / ring on a tinted base + film grain.
  * Use as a card/section backdrop: <GrainyBg variant="blue" />
  */
@@ -143,7 +143,7 @@ export function GrainyBg({
 			>
 				<Shapes variant={variant} accent={DARK_ACCENT[variant]} />
 			</div>
-			{/* film grain — multiply on light, screen on dark */}
+			{/* film grain: multiply on light, screen on dark */}
 			<div
 				aria-hidden
 				className="pointer-events-none absolute inset-0 dark:hidden"

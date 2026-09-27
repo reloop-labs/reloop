@@ -297,7 +297,7 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 			onFocus={handleEnter}
 			onBlur={handleLeave}
 		>
-			{/* Attention glow — pulses until setup is complete */}
+			{/* Attention glow: pulses until setup is complete */}
 			<motion.span
 				aria-hidden
 				className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-primary-base/60"
@@ -308,7 +308,7 @@ export function OnboardingBanner({ isCollapsed }: { isCollapsed: boolean }) {
 					ease: "easeInOut",
 				}}
 			/>
-			{/* Header — hover expands, mouse-leave collapses (Image 2 ↔ Image 1) */}
+			{/* Header: hover expands, mouse-leave collapses (Image 2 ↔ Image 1) */}
 			<div className="flex w-full items-center gap-2.5 px-4 py-3 text-left">
 				<ProgressRing
 					completed={progress.completedCount}

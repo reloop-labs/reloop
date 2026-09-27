@@ -15,7 +15,7 @@ Important notes:
 
 - [Full documentation](https://reloop.sh/llms-full-docs.txt): Complete Reloop documentation in a single file (web-hosted agent corpus)
 - [Sitemap](https://reloop.sh/docs/sitemap.md): Semantic markdown map of all documentation pages
-- [Product skill](https://reloop.sh/skill.md): Agent skill — capabilities, auth, and constraints
+- [Product skill](https://reloop.sh/skill.md): Agent skill: capabilities, auth, and constraints
 - [Docs MCP](https://reloop.sh/docs/mcp): Search and retrieve documentation via Model Context Protocol
 - [MCP discovery](https://reloop.sh/.well-known/mcp.json): Machine-readable MCP server discovery
 - [Introduction](https://reloop.sh/docs/introduction.md): Welcome to Reloop documentation
@@ -38,7 +38,7 @@ Important notes:
 - [Contact Channels](https://reloop.sh/docs/learn/contacts/channels): Per-topic subscription preferences and opt-in defaults
 - [Domains](https://reloop.sh/docs/learn/domains): Configure and verify sending domains with DNS records
 - [Logs](https://reloop.sh/docs/learn/logs): View email activity and delivery logs
-- [API Keys (agent)](https://reloop.sh/docs/learn/ai/api-keys.md): Programmatic API key management — prefer this over the dashboard page
+- [API Keys (agent)](https://reloop.sh/docs/learn/ai/api-keys.md): Programmatic API key management (prefer this over the dashboard page)
 - [API Keys (dashboard / human UI)](https://reloop.sh/docs/learn/api-keys): Dashboard walkthrough with GIFs and UI steps
 - [Webhooks](https://reloop.sh/docs/learn/webhooks): Set up webhook endpoints for real-time event notifications
 - [Settings](https://reloop.sh/docs/learn/settings): Configure your Reloop account settings
@@ -48,15 +48,15 @@ Important notes:
 Prefer these markdown guides for coding agents. They contain SDK samples for every supported language and omit dashboard UI content.
 
 - [API Keys](https://reloop.sh/docs/learn/ai/api-keys.md): Auth rules, endpoints, and language index
-- [API Keys — Node](https://reloop.sh/docs/learn/ai/api-keys.node.md)
-- [API Keys — cURL](https://reloop.sh/docs/learn/ai/api-keys.curl.md)
-- [API Keys — Python](https://reloop.sh/docs/learn/ai/api-keys.python.md)
-- [API Keys — PHP](https://reloop.sh/docs/learn/ai/api-keys.php.md)
-- [API Keys — Java](https://reloop.sh/docs/learn/ai/api-keys.java.md)
-- [API Keys — .NET](https://reloop.sh/docs/learn/ai/api-keys.dotnet.md)
-- [API Keys — Go](https://reloop.sh/docs/learn/ai/api-keys.go.md)
-- [API Keys — Rust](https://reloop.sh/docs/learn/ai/api-keys.rust.md)
-- [API Keys — Ruby](https://reloop.sh/docs/learn/ai/api-keys.ruby.md)
+- [API Keys: Node](https://reloop.sh/docs/learn/ai/api-keys.node.md)
+- [API Keys: cURL](https://reloop.sh/docs/learn/ai/api-keys.curl.md)
+- [API Keys: Python](https://reloop.sh/docs/learn/ai/api-keys.python.md)
+- [API Keys: PHP](https://reloop.sh/docs/learn/ai/api-keys.php.md)
+- [API Keys: Java](https://reloop.sh/docs/learn/ai/api-keys.java.md)
+- [API Keys: .NET](https://reloop.sh/docs/learn/ai/api-keys.dotnet.md)
+- [API Keys: Go](https://reloop.sh/docs/learn/ai/api-keys.go.md)
+- [API Keys: Rust](https://reloop.sh/docs/learn/ai/api-keys.rust.md)
+- [API Keys: Ruby](https://reloop.sh/docs/learn/ai/api-keys.ruby.md)
 
 ## API Reference
 

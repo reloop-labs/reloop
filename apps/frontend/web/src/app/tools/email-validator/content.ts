@@ -6,12 +6,12 @@ export const toolTitle = "Free Email Validator & Bulk List Cleaner";
 export const siteTitle = toolTitle;
 export const heroHeading = "Free Email Validator";
 export const metaTitle =
-	"Free Email Validator — Bulk Email Verifier & List Cleaner";
+	"Free Email Validator: Bulk Email Verifier & List Cleaner";
 export const metaDescription =
 	"Free bulk email verifier and email list cleaning tool. Clean email lists, find invalid emails in CSV files, check disposable temporary emails, and verify live DNS MX mail servers instantly.";
 
 export const toolDescription =
-	"Free email validator and bulk list cleaner. Check a single address or upload a CSV to find invalid emails, detect ~210k+ disposable domains, and verify live DNS MX records — no signup required.";
+	"Free email validator and bulk list cleaner. Check a single address or upload a CSV to find invalid emails, detect ~210k+ disposable domains, and verify live DNS MX records. No signup required.";
 
 export const toolKeywords = [
 	"free email validator",
@@ -43,7 +43,7 @@ export const howItWorks = [
 		step: "02",
 		title: "Run syntax, disposable, and MX checks",
 		description:
-			"Each address is validated against RFC 5322 grammar, a ~210,000-domain disposable catalogue, role/free-provider signals, and live DNS MX records — without SMTP mailbox probing.",
+			"Each address is validated against RFC 5322 grammar, a ~210,000-domain disposable catalogue, role/free-provider signals, and live DNS MX records, without SMTP mailbox probing.",
 	},
 	{
 		step: "03",
@@ -95,7 +95,7 @@ export const faqs: FaqItem[] = [
 	{
 		question: "How does the disposable email checker detect temporary inboxes?",
 		answer:
-			"The tool checks incoming email domains against an active database of over 210,000 temporary and disposable email providers—including Mailinator, Yopmail, Temp-Mail, 10MinuteMail, and Guerrilla Mail. Throwaway inboxes are flagged with a 0 deliverability score to prevent spam signups.",
+			"The tool checks incoming email domains against an active database of over 210,000 temporary and disposable email providers, including Mailinator, Yopmail, Temp-Mail, 10MinuteMail, and Guerrilla Mail. Throwaway inboxes are flagged with a 0 deliverability score to prevent spam signups.",
 	},
 	{
 		question:

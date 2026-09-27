@@ -129,7 +129,7 @@ const config = {
 		const agentCache = "public, max-age=300, s-maxage=3600, must-revalidate";
 
 		const list = [
-			// Hashed static assets — long cache (must be listed before the catch-all)
+			// Hashed static assets get a long cache (must be listed before the catch-all)
 			...(isDev
 				? []
 				: [
@@ -153,7 +153,7 @@ const config = {
 						},
 					]),
 			{
-				// Docs HTML/API/agent content — short cache so agents see updates promptly.
+				// Docs HTML/API/agent content gets a short cache so agents see updates promptly.
 				// Exclude hashed static assets.
 				source:
 					"/:path((?!_next/static|_next/image|font/|healthz)(?!.*\\.md$).*)",

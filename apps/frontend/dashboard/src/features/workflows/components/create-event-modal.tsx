@@ -292,8 +292,8 @@ export function CreateEventModal({
 
 					{properties.length === 0 ? (
 						<p className="rounded-lg border border-stroke-soft-200 border-dashed bg-bg-weak-50/30 px-3 py-3 text-center text-text-sub-600 text-xs dark:border-stroke-soft-100/40">
-							No properties yet. Add dynamic properties like contact properties
-							— each has a name and a type (no default values).
+							No properties yet. Add dynamic properties like contact properties.
+							Each has a name and a type (no default values).
 						</p>
 					) : (
 						<div className="space-y-2">

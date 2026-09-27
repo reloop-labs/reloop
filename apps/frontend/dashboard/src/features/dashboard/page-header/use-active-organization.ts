@@ -41,7 +41,7 @@ export type ActiveOrganizationValue = {
 	} | null;
 	organizations: Organization[] | undefined;
 	activeOrganization: Organization | null;
-	/** Resolved org id as soon as session (or list) provides it — use for query gates. */
+	/** Resolved org id as soon as session (or list) provides it. Use for query gates. */
 	activeOrganizationId: string | null;
 	sessionActiveOrganizationId: string | null;
 	hasInitialized: boolean;
@@ -49,7 +49,7 @@ export type ActiveOrganizationValue = {
 	/**
 	 * True when the signed-in user's workspace membership is settled enough for
 	 * page content (org list loaded, active org initialized, not mid orgless redirect).
-	 * False while resolving — layouts should keep chrome mounted and show a content skeleton.
+	 * False while resolving; layouts should keep chrome mounted and show a content skeleton.
 	 */
 	isMembershipReady: boolean;
 	onOrganizationChange: (organization: Organization) => Promise<void>;
@@ -172,7 +172,7 @@ function useActiveOrganizationState(): Omit<
 				return;
 			}
 
-			// Session has no usable active org — must setActive before APIs that
+			// Session has no usable active org, so we must setActive before APIs that
 			// rely on session org context. This path is uncommon after first login.
 			setIsSwitching(true);
 			try {
@@ -254,7 +254,7 @@ function useActiveOrganizationState(): Omit<
 		activeOrganizationId: resolvedActiveOrgId,
 		sessionActiveOrganizationId: effectiveSessionOrgId,
 		hasInitialized,
-		// Preference repair no longer sets isSwitching — only real setActive does.
+		// Preference repair no longer sets isSwitching; only real setActive does.
 		isPending: sessionPending || organizationsPending || isSwitching,
 		onOrganizationChange,
 	};
@@ -264,7 +264,7 @@ function useActiveOrganizationState(): Omit<
  * Mount once under the authenticated dashboard layout.
  * All `useActiveOrganization()` consumers share this state (no multi-setActive races).
  *
- * Never swaps the tree for a full-screen loader — that caused a flash of dashboard
+ * Never swaps the tree for a full-screen loader. That caused a flash of dashboard
  * chrome (sidebar) then full-screen spinner on reload. Layouts keep the shell mounted
  * and gate page content on `isMembershipReady`.
  */

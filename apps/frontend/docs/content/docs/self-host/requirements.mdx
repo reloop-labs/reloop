@@ -39,7 +39,7 @@ Verify the following software and runtimes are installed on your hosting server:
 Domain verification reads your published SPF, DKIM, DMARC and MX records from
 public DNS. It queries upstream resolvers directly rather than the host's
 resolver, because a host resolver is frequently a link-local or VPN address that
-is unreachable from inside the container network — the symptom is every record
+is unreachable from inside the container network. The symptom is every record
 failing with `ENOTFOUND` while the same lookup succeeds from the host shell.
 
 The `domain` and `workflow` services need:

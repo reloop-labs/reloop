@@ -7,7 +7,7 @@ export const config: AlternativeDefinition = {
 	compareHref: "/compare/postmark",
 	titleLines: ["Open-Source Postmark", "Alternative"],
 	description:
-		"Transactional email with deliverability focus—plus campaigns, self-hosting, and open-source transparency.",
+		"Transactional email with deliverability focus, plus campaigns, self-hosting, and open-source transparency.",
 	keywords: [
 		"Postmark alternative",
 		"Postmark competitor",

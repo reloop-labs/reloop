@@ -375,7 +375,7 @@ export function EditContactOld() {
 									<span className="text-paragraph-xs text-text-sub-600 dark:text-neutral-400">
 										{isSubscribed
 											? "Can receive marketing and broadcast emails"
-											: "Marketing paused — transactional emails only"}
+											: "Marketing paused: transactional emails only"}
 									</span>
 								</div>
 							</div>
@@ -743,7 +743,7 @@ export function EditContactNew() {
 											<span className="text-paragraph-xs text-text-sub-600 dark:text-neutral-400">
 												{isSubscribed
 													? "Can receive marketing and broadcast emails"
-													: "Marketing paused — transactional emails only"}
+													: "Marketing paused: transactional emails only"}
 											</span>
 										</div>
 									</div>

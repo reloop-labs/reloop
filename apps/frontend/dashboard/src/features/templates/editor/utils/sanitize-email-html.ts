@@ -56,7 +56,7 @@ const FORBIDDEN_TAGS = new Set([
  *     values (paddingTop, borderRadius, etc.) via parseCssValue.
  *  5. Return `body.innerHTML` so `generateJSON` receives clean inner HTML.
  *
- * We do NOT strip tables, divs, or any structural elements — the editor's
+ * We do NOT strip tables, divs, or any structural elements. The editor's
  * own `parseHTML()` rules (container, section, button, image, link, …) are
  * responsible for mapping them to the correct TipTap node types.
  */
@@ -134,7 +134,7 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 			const scratch = doc.createElement("div") as HTMLDivElement;
 			scratch.style.cssText = containerTable.getAttribute("style") || "";
 
-			// Do not copy width="100%" / height="100%" — a div treats those
+			// Do not copy width="100%" / height="100%"; a div treats those
 			// as stretch-to-canvas. Keep node-container even when the table
 			// already has a class (glow, Tailwind utilities).
 			const tableClass = containerTable.getAttribute("class");
@@ -422,7 +422,7 @@ function stripReactEmailColumnMarkersForIconRows(root: Element): void {
  *
  * For the common "social icons" footer pattern, replace the table with a simple
  * inline row of images so the editor renders it tightly without spreading.
- * The row is centered by default to match the React Email preview — a left-clipped
+ * The row is centered by default to match the React Email preview. A left-clipped
  * row (see twitch-reset-password) happens when this falls back to start alignment.
  */
 function replaceSocialIconTablesWithInlineRow(root: Element): void {
@@ -503,7 +503,7 @@ function replaceSocialIconTablesWithInlineRow(root: Element): void {
 				}
 			}
 		}
-		// Do not inject extra margin — the white card already has
+		// Do not inject extra margin; the white card already has
 		// margin-bottom:30px and the footer outer table has no gap.
 		// Adding 2rem here doubles the space vs the HTML/iframe preview.
 		// Cells keep their original align="right"/"left" and padding 8px.

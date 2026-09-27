@@ -62,7 +62,7 @@ const SNIPPET_ICON: Record<string, CopyCodeBlockIcon> = {
 	csharp: siDotnet,
 	php: siPhp,
 	ruby: siRuby,
-	// Pure black is invisible on dark UI — lift it to Rust orange.
+	// Pure black is invisible on dark UI; lift it to Rust orange.
 	rust: { ...siRust, hex: "e24d2b" },
 };
 

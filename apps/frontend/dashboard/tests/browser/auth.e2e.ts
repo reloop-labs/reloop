@@ -7,7 +7,7 @@ import {
 } from "./auth/flows";
 import { dashboardURL } from "./runtime";
 
-test.describe("auth UI — unauthenticated", () => {
+test.describe("auth UI: unauthenticated", () => {
 	test("login page shows social options, email field, and signup link", async ({
 		page,
 	}) => {
@@ -96,7 +96,7 @@ test.describe("auth UI — unauthenticated", () => {
 	});
 });
 
-test.describe("auth OTP — real backend", () => {
+test.describe("auth OTP: real backend", () => {
 	test("login with DEFAULT_OTP lands on onboarding for a new user", async ({
 		page,
 	}) => {

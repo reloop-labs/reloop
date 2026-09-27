@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
 	boolean,
+	foreignKey,
 	index,
 	integer,
 	jsonb,
@@ -209,9 +210,7 @@ export const webhookDeliveryAttempt = pgTable(
 		id: text("id")
 			.$defaultFn(() => createWebhookDeliveryAttemptId())
 			.primaryKey(),
-		webhookDeliveryId: text("webhook_delivery_id")
-			.notNull()
-			.references(() => webhookDelivery.id, { onDelete: "cascade" }),
+		webhookDeliveryId: text("webhook_delivery_id").notNull(),
 		attemptNumber: integer("attempt_number").notNull(),
 		status: webhookDeliveryStatusEnum("status").notNull(),
 		responseStatus: integer("response_status"),
@@ -226,6 +225,11 @@ export const webhookDeliveryAttempt = pgTable(
 			table.webhookDeliveryId,
 		),
 		index("webhook_delivery_attempt_idx_created_at").on(table.createdAt),
+		foreignKey({
+			name: "webhook_delivery_attempt_webhook_delivery_id_webhook_delivery_i",
+			columns: [table.webhookDeliveryId],
+			foreignColumns: [webhookDelivery.id],
+		}).onDelete("cascade"),
 	],
 );
 

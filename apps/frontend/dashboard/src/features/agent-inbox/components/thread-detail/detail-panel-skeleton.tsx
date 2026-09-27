@@ -84,7 +84,7 @@ export const ThreadMessagesSkeleton = () => (
 );
 
 /**
- * Thread detail skeleton — mirrors current ThreadDetail shell:
+ * Thread detail skeleton that mirrors current ThreadDetail shell:
  * toolbar → subject header → message row → indented body → reply actions.
  */
 export const DetailPanelSkeleton = () => (

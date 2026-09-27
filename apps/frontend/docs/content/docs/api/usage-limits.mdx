@@ -9,7 +9,7 @@ If a limit is exceeded, the API returns a `429 Too Many Requests` response with 
 
 ## Management Endpoint Limits
 
-Management endpoints cover everything outside of email sending — domains, contacts, channels, groups, properties, API keys, and templates. Each endpoint category has its own independent limit.
+Management endpoints cover everything outside of email sending: domains, contacts, channels, groups, properties, API keys, and templates. Each endpoint category has its own independent limit.
 
 ### Domain Service
 
@@ -82,7 +82,7 @@ Management endpoints cover everything outside of email sending — domains, cont
 
 ## Email Sending Limits
 
-The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel — if any single layer is exceeded, the request is rejected.
+The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel. If any single layer is exceeded, the request is rejected.
 
 | Layer | Limit | Window | What It Protects |
 |-------|-------|--------|-----------------|

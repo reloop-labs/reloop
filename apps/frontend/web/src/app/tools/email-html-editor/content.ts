@@ -27,7 +27,7 @@ export const reasons = [
 		icon: "settings" as const,
 		title: "Inspect the same tree",
 		description:
-			"Select a heading, cell, or button. Padding, color, and type edit the live document — then source updates to match.",
+			"Select a heading, cell, or button. Padding, color, and type edit the live document, then source updates to match.",
 	},
 	{
 		icon: "layout" as const,

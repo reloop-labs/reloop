@@ -45,7 +45,7 @@ function isLocalDevHost(url: string): boolean {
 
 /**
  * Public site origin for SEO (canonical, Open Graph, sitemap, JSON-LD).
- * Local/dev hosts never leak into absolute URLs — always use production.
+ * Local/dev hosts never leak into absolute URLs; always use production.
  */
 export function getSiteUrl() {
 	// Explicit production override when set (e.g. preview deployments)
@@ -59,7 +59,7 @@ export function getSiteUrl() {
 		"",
 	);
 
-	// Dev: NEXT_PUBLIC_URL is often https://local.reloop.sh — keep browsing local,
+	// Dev: NEXT_PUBLIC_URL is often https://local.reloop.sh; keep browsing local,
 	// but never publish that host in metadata/sitemaps.
 	if (isLocalDevHost(url)) {
 		return productionSiteUrl;

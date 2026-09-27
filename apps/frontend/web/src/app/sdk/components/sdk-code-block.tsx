@@ -63,7 +63,7 @@ export function SdkCodeBlock({
 	slug?: string;
 	/** Override highlighter language (e.g. "bash") */
 	lang?: string;
-	/** Header path, e.g. send_email.ts — omit for shell one-liners */
+	/** Header path, e.g. send_email.ts; omit for shell one-liners */
 	path?: string;
 	tabs?: CopyCodeBlockTab[];
 	activeTab?: string;

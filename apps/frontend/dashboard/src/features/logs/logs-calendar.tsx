@@ -12,7 +12,7 @@ import {
  * Custom calendar for the logs date range filter.
  * Uses react-day-picker v9 API with proper grid layout matching the shadcn calendar style.
  * Includes month/year dropdown selectors for quick navigation.
- * This does NOT modify the global datepicker.tsx — it's a standalone component.
+ * This does NOT modify the global datepicker.tsx; it's a standalone component.
  */
 
 type LogsCalendarProps = React.ComponentProps<typeof DayPicker>;

@@ -204,7 +204,7 @@ export function APIPage(props: APIPageProps) {
 	const method = (operation?.method || "GET").toUpperCase();
 
 	const [copiedEndpoint, setCopiedEndpoint] = useState(false);
-	// Display path only — host is implied; copy still uses the full absolute URL
+	// Display path only (host is implied); copy still uses the full absolute URL
 	const displayPath = path.replace(/\{([^}]+)\}/g, ":$1");
 	const endpointUrl = `https://reloop.sh${displayPath}`;
 	const urlScrollRef = useRef<HTMLDivElement>(null);
@@ -456,7 +456,7 @@ function ParameterRow({
 					</p>
 				)}
 
-			{/* Constraints — shown as bullet points like Resend */}
+			{/* Constraints, shown as bullet points like Resend */}
 			{(param.minimum !== undefined ||
 				param.maximum !== undefined ||
 				param.minLength !== undefined ||
@@ -531,7 +531,7 @@ const LANGUAGE_ICONS: Record<string, any> = {
 	python: siPython,
 	ruby: siRuby,
 	go: siGo,
-	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	// Brand hex is #000000; override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
 	java: JAVA_ICON,
 	dotnet: siDotnet,
@@ -554,7 +554,7 @@ function getIconForSample(sampleId: string, lang: string) {
 		hex = "f59e0b"; // amber gold for JSON readability
 	}
 	if (id === "rust" || l === "rust") {
-		hex = "e24d2b"; // red — brand black is invisible on dark UI
+		hex = "e24d2b"; // red, since brand black is invisible on dark UI
 	}
 
 	// Spread so multi-color marks keep viewBox + layers (Java is 512-space paths)

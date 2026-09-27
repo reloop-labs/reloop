@@ -117,7 +117,7 @@ function HatchGutter({ side }: { side: "left" | "right" }) {
 }
 
 /**
- * Compare top fold — SDK details header language, split around a center vs.
+ * Compare top fold: SDK details header language, split around a center vs.
  * Dashed rules frame the brand row top and bottom.
  */
 export function CompareHero({
@@ -141,7 +141,7 @@ export function CompareHero({
 
 	return (
 		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			{/* Top meta row — same chrome as SDK details */}
+			{/* Top meta row, same chrome as SDK details */}
 			<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b border-dashed px-6 pt-28 pb-4 sm:px-10 sm:pt-32 lg:px-12 dark:border-white/10">
 				<nav
 					aria-label="Breadcrumb"

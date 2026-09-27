@@ -49,7 +49,7 @@ export function CsvColumnSelect({
 				alignItemWithTrigger={false}
 			>
 				<SelectItem value={EMPTY_VALUE}>
-					<span className="text-text-sub-600">—</span>
+					<span className="text-text-sub-600">-</span>
 				</SelectItem>
 				{options.map((header) => (
 					<SelectItem key={header} value={header}>

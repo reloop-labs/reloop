@@ -52,7 +52,7 @@ export function cssPaintedBackgroundValue(cssText: string): string {
 /**
  * React Email's Link.renderHTML prepends the theme's
  * `text-decoration: underline` onto every `a.node-link`. Canvas CSS must not
- * answer that with a blanket `none !important` — that hides Dither CTAs
+ * answer that with a blanket `none !important`; that hides Dither CTAs
  * once TipTap unwraps `<u>`.
  *
  * Stamp the source intent on the anchor. Underline wins when the HTML has

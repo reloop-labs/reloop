@@ -3,7 +3,7 @@ import type React from "react";
 
 /**
  * Dashed crosshair frame from the Add Contacts create flow.
- * Decorative only — wraps a focused product panel.
+ * Decorative only; wraps a focused product panel.
  */
 export function CrosshairFrame({
 	children,
@@ -14,7 +14,7 @@ export function CrosshairFrame({
 }) {
 	return (
 		<div className={cn("relative", className)}>
-			{/* Vertical dashed guides only (desktop) — no full-bleed x-axis lines (overflow). */}
+			{/* Vertical dashed guides only (desktop), no full-bleed x-axis lines (overflow). */}
 			<div className="pointer-events-none absolute inset-0 z-10 hidden overflow-hidden sm:block">
 				<div className="-bottom-[40vh] absolute top-0 left-0 border-stroke-soft-200 border-r dark:border-white/10" />
 				<div className="-bottom-[40vh] absolute top-0 right-0 border-stroke-soft-200 border-r dark:border-white/10" />

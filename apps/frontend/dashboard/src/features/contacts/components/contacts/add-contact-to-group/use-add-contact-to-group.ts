@@ -220,7 +220,7 @@ export const useAddContactToGroup = (
 				onOpenChange(false);
 			} else {
 				toast.error(
-					"No contacts were added — they may already be in this group",
+					"No contacts were added. They may already be in this group",
 				);
 			}
 		} catch (error) {

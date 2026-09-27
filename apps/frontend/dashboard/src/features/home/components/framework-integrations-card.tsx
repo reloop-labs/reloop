@@ -29,7 +29,7 @@ const languages = [
 	{ id: "nodejs" as const, title: "Node.js", icon: siNodedotjs },
 	{ id: "python" as const, title: "Python", icon: siPython },
 	{ id: "go" as const, title: "Go", icon: siGo },
-	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	// Brand hex is #000000, so override it so the gear stays visible on dark UI
 	{
 		id: "rust" as const,
 		title: "Rust",

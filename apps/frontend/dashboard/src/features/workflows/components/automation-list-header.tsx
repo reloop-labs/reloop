@@ -12,7 +12,7 @@ export function AutomationListHeader({
 	onCreate,
 	createLabel = "Create automation",
 	title = "Automation",
-	description = "Trigger emails from events — delays, conditions, and sends.",
+	description = "Trigger emails from events: delays, conditions, and sends.",
 	icon = "workflow",
 }: {
 	onCreate: () => void;

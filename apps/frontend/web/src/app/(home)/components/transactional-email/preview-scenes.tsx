@@ -394,13 +394,13 @@ export const PREVIEW_CARD: Record<
 	send: {
 		badge: "welcome",
 		heading: "Welcome to Acme",
-		body: "Hi Maya — your workspace is ready. Confirm your email and send the first message in a few lines of code.",
+		body: "Hi Maya, your workspace is ready. Confirm your email and send the first message in a few lines of code.",
 		cta: "Confirm email",
 	},
 	templates: {
 		badge: "template",
 		heading: "Reset your password",
-		body: "Hi Alex — we received a request to reset your password. This link expires in 20 minutes.",
+		body: "Hi Alex, we received a request to reset your password. This link expires in 20 minutes.",
 		cta: "Reset password",
 	},
 	events: {

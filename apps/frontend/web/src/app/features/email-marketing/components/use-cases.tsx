@@ -73,7 +73,7 @@ const marketingUseCases: FeatureHighlight[] = [
 		icon: "layout",
 		title: "Campaign analytics",
 		description:
-			"Opens, clicks, unsubscribes, and revenue per send — in real time.",
+			"Opens, clicks, unsubscribes, and revenue per send, in real time.",
 	},
 ];
 

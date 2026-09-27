@@ -34,7 +34,7 @@ export function SidebarItems({
 		? SETTINGS_ADMIN_HOME
 		: SETTINGS_MEMBER_HOME;
 
-	// Router basepath is /dashboard — compare paths without it for active state.
+	// Router basepath is /dashboard, so compare paths without it for active state.
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 
 	const navigation = mainNavigation.filter((item) => !item.hidden);
@@ -64,7 +64,7 @@ export function SidebarItems({
 						changed = true;
 					}
 				} else {
-					// Left the section — clear the manual collapse so the next visit auto-opens.
+					// Left the section: clear the manual collapse so the next visit auto-opens.
 					userCollapsedRef.current.delete(item.path);
 				}
 			}
@@ -89,7 +89,7 @@ export function SidebarItems({
 				pathWithoutSlug.startsWith("/emails")
 			);
 		}
-		// Inbox list only — /inbox/$mailboxId is the full-screen mailbox UI.
+		// Inbox list only; /inbox/$mailboxId is the full-screen mailbox UI.
 		if (item.path === "/inbox") {
 			return pathWithoutSlug === "/inbox";
 		}
@@ -114,7 +114,7 @@ export function SidebarItems({
 		? subNavRefs.current[activeSubInfo.mainPath]?.[activeSubInfo.subIndex]
 		: mainNavRefs.current[activeMainIndex];
 	const currentEl = hoveredEl ?? activeEl;
-	// expandedItems shifts rows below without resizing them — include in layout key.
+	// expandedItems shifts rows below without resizing them, so include in layout key.
 	const expandedKey = Object.entries(expandedItems)
 		.filter(([, open]) => open)
 		.map(([path]) => path)

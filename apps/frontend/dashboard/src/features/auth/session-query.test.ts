@@ -44,7 +44,7 @@ describe("logout session cache", () => {
 
 		// Broken path used by user-dropdown / command-menu before the fix:
 		await signOutMock();
-		// navigate to /login — cache untouched
+		// navigate to /login, cache untouched
 
 		const cachedSession = queryClient.getQueryData(queryKeys.auth.session());
 		const wouldRedirectIfAuthenticated = Boolean(cachedSession);

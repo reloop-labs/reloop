@@ -247,7 +247,7 @@ export function SessionManagement({ className }: SessionManagementProps) {
 										</div>
 
 										<span className="text-label-xs text-text-sub-600">
-											{session.ipAddress || "—"}
+											{session.ipAddress || "-"}
 										</span>
 										<span className="text-label-xs text-text-sub-600">
 											{formatTimeAgo(session.updatedAt)}

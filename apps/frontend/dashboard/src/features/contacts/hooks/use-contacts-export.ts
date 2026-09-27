@@ -31,7 +31,7 @@ function filenameFromDisposition(
  * plus an emailed copy via `POST /api/contacts/export/email`.
  *
  * Why this exists: the old flow fetched `/list?limit=10000` as JSON and
- * built the CSV in memory — silently capped at 100 rows server-side, crashed
+ * built the CSV in memory. It was silently capped at 100 rows server-side, crashed
  * on large audiences, and every retry hammered the list API. The export
  * endpoint streams CSV server-side (rate-limited + single-flight per org);
  * this hook adds the client half of the anti-hammer flow:
@@ -104,7 +104,7 @@ export function useContactsExport() {
 				}
 				if (response.status === 413) {
 					throw new Error(
-						"Export too large — narrow filters and export in smaller batches.",
+						"Export too large. Narrow filters and export in smaller batches.",
 					);
 				}
 				if (!response.ok || !response.body) {
@@ -199,7 +199,7 @@ export function useContactsExport() {
 	/**
 	 * Best-effort emailed copy of the same export. The server returns 202
 	 * and sends a 7-day signed download link to the user's account email.
-	 * Never throws — failures surface as toasts so the instant download
+	 * Never throws; failures surface as toasts so the instant download
 	 * stays the primary result.
 	 */
 	const requestEmailCopy = useCallback(
@@ -226,7 +226,7 @@ export function useContactsExport() {
 					return;
 				}
 				if (response.status === 429) {
-					toast.info("Email copy throttled — your instant download continues");
+					toast.info("Email copy throttled, your instant download continues");
 					return;
 				}
 				if (response.status === 404) {
@@ -235,10 +235,10 @@ export function useContactsExport() {
 				const body = await response.json().catch(() => null);
 				const message = typeof body?.message === "string" ? body.message : null;
 				toast.warning(
-					message ?? "Couldn't queue the email copy — download continues",
+					message ?? "Couldn't queue the email copy. Download continues",
 				);
 			} catch {
-				toast.warning("Couldn't queue the email copy — download continues");
+				toast.warning("Couldn't queue the email copy. Download continues");
 			}
 		},
 		[],

@@ -2,7 +2,7 @@ import { productionSiteUrl } from "@reloop/web/lib/site";
 
 export const toolPath = "/tools/domain-age";
 export const toolTitle =
-	"Domain Age & Email Warmup Checker — Registration Date & Risk";
+	"Domain Age & Email Warmup Checker: Registration Date & Risk";
 export const toolDescription =
 	"The older your domain, the more it's trusted - did you check yours?";
 export const metaDescription =
@@ -111,7 +111,7 @@ export const faqGroups: FaqGroup[] = [
 			},
 			{
 				question:
-					"I send mail from mail.example.com — why is the age for example.com?",
+					"I send mail from mail.example.com, so why is the age for example.com?",
 				answer:
 					"Only the registered domain has a creation date. Subdomains (mail.reloop.sh, www.acme.com) inherit that date. Sending volume from a subdomain does not make the name older in RDAP.",
 			},
@@ -151,7 +151,7 @@ export const apiSnippets: [ApiSnippet, ...ApiSnippet[]] = [
 	{
 		id: "javascript",
 		label: "JavaScript",
-		code: `// No SDK, no API key — it is a plain POST.
+		code: `// No SDK, no API key: it is a plain POST.
 const res = await fetch(
   "${apiEndpoint}",
   {
@@ -166,7 +166,7 @@ const result = await res.json();`,
 	{
 		id: "typescript",
 		label: "TypeScript",
-		code: `// No SDK, no API key — it is a plain POST.
+		code: `// No SDK, no API key: it is a plain POST.
 const res = await fetch(
   "${apiEndpoint}",
   {
@@ -181,7 +181,7 @@ const result = (await res.json()) as CheckResult;`,
 	{
 		id: "node",
 		label: "Node.js",
-		code: `// Node 18+ has a global fetch — no dependencies.
+		code: `// Node 18+ has a global fetch, so no dependencies.
 const res = await fetch(
   "${apiEndpoint}",
   {

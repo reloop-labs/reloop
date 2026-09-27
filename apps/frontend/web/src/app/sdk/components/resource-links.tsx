@@ -152,7 +152,7 @@ function ResourceCard({
 
 	const content = (
 		<>
-			{/* Light: tight, quiet tint — no grain, no full-card fog */}
+			{/* Light: tight, quiet tint, no grain, no full-card fog */}
 			<div
 				aria-hidden
 				className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:hidden"
@@ -164,7 +164,7 @@ function ResourceCard({
 				className="pointer-events-none absolute inset-0 hidden opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
 				style={{ backgroundImage: meshDark }}
 			/>
-			{/* Grain is dark-only — on light it reads as cheap stipple */}
+			{/* Grain is dark-only; on light it reads as cheap stipple */}
 			<div
 				aria-hidden
 				className="pointer-events-none absolute inset-0 hidden opacity-0 mix-blend-soft-light transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
@@ -178,7 +178,7 @@ function ResourceCard({
 						"linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
 				}}
 			/>
-			{/* Glass edge — dark only */}
+			{/* Glass edge, dark only */}
 			<div
 				aria-hidden
 				className="pointer-events-none absolute inset-x-4 top-0 hidden h-px opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"

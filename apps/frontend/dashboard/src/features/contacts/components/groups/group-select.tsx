@@ -51,7 +51,7 @@ export const GroupSelect = ({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
-	// Explicit input id so the wrapping box label activates the search input —
+	// Explicit input id so the wrapping box label activates the search input,
 	// never a chip's remove button.
 	const inputId = id ?? useId();
 
@@ -106,7 +106,7 @@ export const GroupSelect = ({
 
 	const removeGroup = (groupId: string) => {
 		onChange(selectedGroupIds.filter((gid) => gid !== groupId));
-		// The chip's remove button unmounts — keep focus in the search input
+		// The chip's remove button unmounts, so keep focus in the search input
 		// instead of losing it (Tab would otherwise land on the modal close).
 		groupInputRef.current?.focus();
 	};
@@ -165,7 +165,7 @@ export const GroupSelect = ({
 							<span
 								key={groupId}
 								onMouseDown={(e) => {
-									// Only the X removes — clicking the badge body does nothing
+									// Only the X removes; clicking the badge body does nothing
 									// (blocks the wrapping label from focusing the input).
 									if ((e.target as HTMLElement).closest("button") === null) {
 										e.preventDefault();
@@ -173,11 +173,11 @@ export const GroupSelect = ({
 								}}
 								onClick={(e) => {
 									// The X stops propagation itself; anything else reaching
-									// here is a badge-body click — swallow it so the label
+									// here is a badge-body click, so swallow it so the label
 									// doesn't activate any control.
 									e.stopPropagation();
 								}}
-								// NOTE: plain string, not cn() — default twMerge can't tell
+								// NOTE: plain string, not cn(), since default twMerge can't tell
 								// custom text-paragraph-sm (size) apart from text-text-*
 								// (color) and drops the size, rendering 16px instead of 14px.
 								className={`inline-flex h-6 max-w-full shrink-0 cursor-default items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 text-paragraph-sm text-text-strong-950 transition-all dark:border-stroke-soft-100/40 ${

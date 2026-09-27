@@ -43,7 +43,7 @@ const LANGUAGE_ICONS: Record<string, { path: string; hex: string }> = {
 	python: siPython,
 	ruby: siRuby,
 	go: siGo,
-	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	// Brand hex is #000000; override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
 	java: JAVA_ICON,
 	dotnet: siDotnet,

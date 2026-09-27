@@ -1000,7 +1000,7 @@ async function main() {
 
 	if (Object.keys(allGenerated).length === 0) {
 		console.warn(
-			"\n⚠️  No services generated — skipping meta.json update to preserve existing sidebar.",
+			"\n⚠️  No services generated, skipping meta.json update to preserve existing sidebar.",
 		);
 	} else {
 		generateMetaJson(allGenerated);

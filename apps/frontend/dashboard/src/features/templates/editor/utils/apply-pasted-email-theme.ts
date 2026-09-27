@@ -36,7 +36,7 @@ export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(rawHtml, "text/html");
 
-	// 1. Get body background color — do not invent #ffffff when the
+	// 1. Get body background color. Do not invent #ffffff when the
 	// HTML leaves the page gray and paints white only on inner sections.
 	const bodyBgColor = readDocumentBodyBackground(doc) || undefined;
 
@@ -487,7 +487,7 @@ export function parseGlobalStylesFromHtml(html: string) {
 		const baseLetterSpacing = scratch.style.letterSpacing;
 		const mixedSurfaces = emailHasMixedBackgrounds(doc.body);
 
-		// Defaults only — no !important. Pasted inline font-size / family on
+		// Defaults only, no !important. Pasted inline font-size / family on
 		// headings and footers must win over the wrapper td (15px body text
 		// must not paint a 13px / 320px footer at 15px).
 		const proseMirrorBase = [
@@ -534,7 +534,7 @@ export function parseGlobalStylesFromHtml(html: string) {
 		}
 	}
 
-	// Column width from the pasted wrapper — not the outer 100% body table.
+	// Column width from the pasted wrapper, not the outer 100% body table.
 	// Stamp max-width onto the canvas container so `width: 100%` cannot
 	// fill the dashboard. Keep the source string (37.5em stays em).
 	let containerWidth: number | null = null;

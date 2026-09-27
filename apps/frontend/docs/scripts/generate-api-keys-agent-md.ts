@@ -143,7 +143,7 @@ for (const langId of CODE_SAMPLE_LANGUAGE_ORDER) {
 	const fence = fenceFor(langId);
 	const label = labelFor(langId);
 	const sections: string[] = [
-		`# API Keys — ${label}`,
+		`# API Keys (${label})`,
 		"",
 		`> Agent-optimized samples for managing Reloop API keys in ${label}. Index: [api-keys.md](./api-keys.md)`,
 		"",

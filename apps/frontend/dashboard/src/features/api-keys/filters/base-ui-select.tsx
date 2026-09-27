@@ -144,7 +144,7 @@ export function SelectPopup({
 		if (item instanceof HTMLElement && list.contains(item)) {
 			setHoveredItem((prev) => (prev === item ? prev : item));
 		} else {
-			// Pointer over "Add property" / create form — no list highlight
+			// Pointer over "Add property" / create form: no list highlight
 			setHoveredItem(null);
 		}
 	};

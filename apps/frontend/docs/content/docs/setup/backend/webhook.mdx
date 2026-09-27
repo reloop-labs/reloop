@@ -4,7 +4,7 @@ icon: webhook
 description: Set up, configure, and run the Reloop webhook microservice locally.
 ---
 
-Outbound event webhooks — subscription management, HMAC signing, delivery, and retries via BullMQ.
+Outbound event webhooks: subscription management, HMAC signing, delivery, and retries via BullMQ.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
@@ -33,7 +33,7 @@ Or `bun backend:dev` / `bun dev`.
 
 ## Environment
 
-`apps/backend/webhook/.env` — from `bun setup` / `bun env:setup`.
+`apps/backend/webhook/.env` (from `bun setup` / `bun env:setup`).
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -71,7 +71,7 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Control plane** | This service — CRUD endpoints, list deliveries, manual replay |
+| **Control plane** | This service: CRUD endpoints, list deliveries, manual replay |
 | **Dispatcher** | `be-workflow` NATS queue group `webhook-dispatcher` (email lifecycle + manual trigger) |
 | **Delivery** | Dedicated BullMQ queue `webhook-delivery-queue`; signs with `Reloop-Signature` |
 | **Retries** | Fixed 7-attempt schedule (5s → 5m → 30m → 2h → 5h → 10h) |

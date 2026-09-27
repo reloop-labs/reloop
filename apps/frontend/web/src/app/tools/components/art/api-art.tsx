@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, frame stroke 4, mark stroke 5, detail stroke 3/2)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function ApiBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function ApiBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function ApiBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function ApiBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* terminal frame — centered on (210,170) */}
+				{/* terminal frame, centered on (210,170) */}
 				<rect
 					x="110"
 					y="88"
@@ -133,7 +133,7 @@ export function ApiBlueprintArt({
 					<circle cx="134" cy="106" r="6" />
 					<circle cx="154" cy="106" r="6" opacity="0.45" />
 				</g>
-				{/* prompt chevron + cursor — same weight as the timer hands */}
+				{/* prompt chevron + cursor, same weight as the timer hands */}
 				<path
 					d="M 138 150 L 156 166 L 138 182"
 					stroke="currentColor"
@@ -151,7 +151,7 @@ export function ApiBlueprintArt({
 					strokeWidth="5"
 					strokeLinecap="round"
 				/>
-				{/* output line — same weight as the timer tick marks */}
+				{/* output line, same weight as the timer tick marks */}
 				<line
 					x1="138"
 					y1="206"
@@ -162,7 +162,7 @@ export function ApiBlueprintArt({
 					strokeLinecap="round"
 					opacity="0.6"
 				/>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

@@ -48,7 +48,7 @@ const DeliverySkeleton = () => (
 );
 
 /**
- * User-facing delivery outcome — never raw HTTP codes.
+ * User-facing delivery outcome, never raw HTTP codes.
  * success → Delivered · pending/retrying → Pending · failed → Error
  */
 function deliveryOutcomeLabel(
@@ -247,7 +247,7 @@ function statusBadgePresentation(delivery: Delivery): {
 	label: string;
 	icon: string | null;
 	className: string;
-	/** Optional HTTP detail for tooltip only — never the primary label. */
+	/** Optional HTTP detail for tooltip only, never the primary label. */
 	httpHint: string | null;
 } {
 	const label = deliveryOutcomeLabel(delivery.status);
@@ -346,7 +346,7 @@ function AttemptStatusChip({
 		);
 	}
 
-	// Failed / error — always show the status code (parsed from body when needed)
+	// Failed / error: always show the status code (parsed from body when needed)
 	return (
 		<span
 			className="inline-flex h-6 min-w-10 shrink-0 items-center justify-center gap-0.5 rounded-md bg-error-lighter px-1.5 font-medium font-mono text-[11px] text-error-base tabular-nums"
@@ -403,7 +403,7 @@ function DeliveryAttemptsSection({
 
 	return (
 		<div>
-			{/* Title row — Resend sits on the right like Stripe */}
+			{/* Title row: Resend sits on the right like Stripe */}
 			<div className="mb-3 flex items-center justify-between gap-3">
 				<h3 className="font-medium text-[13px] text-text-sub-600">
 					Delivery attempts
@@ -440,7 +440,7 @@ function DeliveryAttemptsSection({
 						</li>
 					) : null}
 
-					{/* Past attempts — newest first */}
+					{/* Past attempts, newest first */}
 					{attempts.map((attempt, index) => (
 						<li
 							key={attempt.id}
@@ -778,7 +778,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 
 			{/* ── Split Panel ── */}
 			<div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start">
-				{/* LEFT — one row per event delivery (no retry rows) */}
+				{/* LEFT: one row per event delivery (no retry rows) */}
 				<div
 					className={cn(
 						"w-full text-paragraph-sm",
@@ -930,7 +930,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 					</div>
 				</div>
 
-				{/* RIGHT — Event detail + combined attempts */}
+				{/* RIGHT: Event detail + combined attempts */}
 				{!isMobile && (
 					<div className="min-h-[500px] min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 						{selectedDelivery ? (

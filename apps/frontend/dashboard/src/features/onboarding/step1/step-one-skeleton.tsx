@@ -6,7 +6,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { parseAsString, useQueryState } from "nuqs";
 import { SidebarPreview } from "../sidebar-preview";
 
-/** Loading stand-in for step 1 — static copy is real; only values pulse. */
+/** Loading stand-in for step 1: static copy is real; only values pulse. */
 export function StepOneSkeleton() {
 	const [name] = useQueryState("name", parseAsString.withDefault(""));
 	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));

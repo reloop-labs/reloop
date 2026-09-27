@@ -130,7 +130,7 @@ export function CollabPresence({ status, isSynced }: CollabPresenceProps) {
 	return (
 		<div className="flex items-center gap-2 pr-1">
 			<div className="-space-x-2 flex items-center">
-				{/* Self avatar — slightly dimmed so it's distinguishable */}
+				{/* Self avatar, slightly dimmed so it's distinguishable */}
 				{self && (
 					<UserAvatar
 						key="self"

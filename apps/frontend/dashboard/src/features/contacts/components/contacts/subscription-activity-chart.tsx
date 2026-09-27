@@ -34,7 +34,7 @@ export function SubscriptionActivityChart({
 						<stop offset="95%" stopColor="#A1A1AA" stopOpacity={0} />
 					</linearGradient>
 				</defs>
-				{/* Compact sparkline — axes hidden; details via tooltip */}
+				{/* Compact sparkline: axes hidden; details via tooltip */}
 				<XAxis dataKey="date" hide />
 				<YAxis hide domain={[0, "auto"]} />
 				<Tooltip

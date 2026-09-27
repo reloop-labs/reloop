@@ -25,7 +25,7 @@ const defaultSteps: MigrateStep[] = [
 	{
 		step: 2,
 		title: "Step 2",
-		body: "Keep your templates. Swap the send client—or point SMTP at Reloop—with a small adapter.",
+		body: "Keep your templates. Swap the send client (or point SMTP at Reloop) with a small adapter.",
 		duration: "5 min",
 		visual: "domains",
 	},

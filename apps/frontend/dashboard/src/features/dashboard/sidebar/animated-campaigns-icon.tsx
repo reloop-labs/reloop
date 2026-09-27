@@ -5,7 +5,7 @@ type AnimatedCampaignsIconProps = {
 };
 
 /**
- * Megaphone/campaigns icon — pixel-identical to the static `mega-phone`
+ * Megaphone/campaigns icon, pixel-identical to the static `mega-phone`
  * sprite at rest (full-size body, no rescale).
  * On animate: a subtle gramophone-style shake around the handle base,
  * plus two sound-wave arcs emanating outward from the bell mouth.
@@ -22,7 +22,7 @@ export function AnimatedCampaignsIcon({
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0 overflow-visible", className)}
 		>
-			{/* Body — exact static mega-phone paths; shakes subtly on animate */}
+			{/* Body: exact static mega-phone paths, shakes subtly on animate */}
 			<g className="origin-[7px_19px] [transform-box:view-box] motion-safe:group-data-[animating=true]:animate-campaign-shake">
 				{/* Megaphone body tint */}
 				<path
@@ -42,7 +42,7 @@ export function AnimatedCampaignsIcon({
 				/>
 			</g>
 
-			{/* Sound waves — hidden at rest, emanate outward from the bell on animate */}
+			{/* Sound waves: hidden at rest, emanate outward from the bell on animate */}
 			<path
 				d="M21.6 8.6C22.7 9.7 22.7 12.3 21.6 13.4"
 				fill="none"

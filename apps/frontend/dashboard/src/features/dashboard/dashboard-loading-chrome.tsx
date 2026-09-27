@@ -43,7 +43,7 @@ function LoadingSidebarNav() {
 /**
  * Static dashboard chrome for route-level and Suspense loading states.
  *
- * Must NOT use `useSearchParams`, org context, or other hooks that suspend —
+ * Must NOT use `useSearchParams`, org context, or other hooks that suspend;
  * those are what cause hard-refresh flashes when the real shell is replaced by
  * a full-viewport spinner.
  *

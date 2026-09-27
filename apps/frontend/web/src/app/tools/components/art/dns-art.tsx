@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, face stroke 4, detail stroke 3)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function DnsBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function DnsBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function DnsBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function DnsBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* globe face — same center (210,170) and radius (92) as the
+				{/* globe face, same center (210,170) and radius (92) as the
 				    timer face, so every construction circle stays concentric */}
 				<circle
 					cx="210"
@@ -118,7 +118,7 @@ export function DnsBlueprintArt({
 					fill="currentColor"
 					fillOpacity="0.04"
 				/>
-				{/* meridian + parallels — same weight as the timer tick marks */}
+				{/* meridian + parallels, same weight as the timer tick marks */}
 				<g
 					stroke="currentColor"
 					strokeWidth="3"
@@ -130,7 +130,7 @@ export function DnsBlueprintArt({
 					<path d="M 134 122 Q 210 152 286 122" />
 					<path d="M 134 218 Q 210 188 286 218" />
 				</g>
-				{/* lookup nodes — rounded dots on all four cardinal
+				{/* lookup nodes, rounded dots on all four cardinal
 				    points of the globe, same r7 dot as the timer pivot */}
 				<g fill="currentColor">
 					<circle cx="210" cy="78" r="7" />
@@ -138,7 +138,7 @@ export function DnsBlueprintArt({
 					<circle cx="210" cy="262" r="7" />
 					<circle cx="118" cy="170" r="7" />
 				</g>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

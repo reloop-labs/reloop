@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, frame stroke 4, mark stroke 5, detail stroke 3)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function WhoSendsBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function WhoSendsBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function WhoSendsBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -127,7 +127,7 @@ export function WhoSendsBlueprintArt({
 					strokeLinejoin="round"
 					fill="none"
 				/>
-				{/* magnifier — same weight as the timer hands */}
+				{/* magnifier, same weight as the timer hands */}
 				<circle
 					cx="252"
 					cy="188"
@@ -145,7 +145,7 @@ export function WhoSendsBlueprintArt({
 					strokeWidth="5"
 					strokeLinecap="round"
 				/>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

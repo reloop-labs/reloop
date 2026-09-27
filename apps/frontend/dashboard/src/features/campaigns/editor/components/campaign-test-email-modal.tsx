@@ -192,7 +192,7 @@ export function CampaignTestEmailModal({
 			});
 		};
 
-		// Priority 1: From address — empty or invalid → red underline + focus
+		// Priority 1: From address: empty or invalid → red underline + focus
 		const rawFrom = fromEmail.trim();
 		const fromMatch = rawFrom.match(/<([^>]+)>/);
 		const fromAddress = (fromMatch?.[1] ?? rawFrom).trim();
@@ -203,7 +203,7 @@ export function CampaignTestEmailModal({
 			return;
 		}
 
-		// Priority 2: Subject — empty → red underline + focus
+		// Priority 2: Subject: empty → red underline + focus
 		if (!subject.trim()) {
 			useCampaignEditorStore.getState().flashSubjectError();
 			onOpenChange(false);

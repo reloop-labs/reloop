@@ -62,7 +62,7 @@ bunx playwright test tests/browser/auth.e2e.ts --headed
 
 In addition to auth + dashboard:
 
-- **API key service** (`be-api-key` / port 8012) — step 4 generates a real key
+- **API key service** (`be-api-key` / port 8012): step 4 generates a real key
 - Domain service is **not** required for the default path (tests **Skip** domain)
 
 ## What is covered
@@ -89,7 +89,7 @@ Coverage:
 
 - New signup always lands on onboarding step 1
 - Create organization → step 2 (Add Domain)
-- Skip domain → step 4 (API key) — does not require domain service
+- Skip domain → step 4 (API key); does not require domain service
 - Full skip-domain path → dashboard home (`{email}'s Account` + org name)
 - After onboarding, re-login goes to **dashboard**, not onboarding
 - Anonymous `/onboarding` → login

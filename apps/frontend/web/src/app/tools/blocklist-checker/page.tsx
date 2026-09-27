@@ -102,7 +102,7 @@ export default function BlocklistCheckerPage() {
 					<div className="mx-auto max-w-3xl text-center">
 						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
 							<span className="size-1.5 rounded-full bg-text-strong-950 dark:bg-white" />
-							Free tool — no account
+							Free tool, no account
 						</span>
 
 						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
@@ -123,7 +123,7 @@ export default function BlocklistCheckerPage() {
 			{/* Section: Why Blocklist Checks Matter - styled exactly like spam-score-checker highlight cards */}
 			<Band id="why-it-matters">
 				<SectionIntro
-					lead="What these DNS blocklists are — and are not."
+					lead="What these DNS blocklists are, and are not."
 					description="They are public DNS zones of IPs and domain names, not websites we crawl. A clean result on these lists is not a promise that Gmail or Microsoft will accept the mail."
 				/>
 

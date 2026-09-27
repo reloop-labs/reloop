@@ -49,7 +49,7 @@ const LANGUAGE_ICONS: Record<string, LanguageIcon> = {
 	php: siPhp,
 	ruby: siRuby,
 	rb: siRuby,
-	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	// Brand hex is #000000; override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b", title: siRust.title },
 	java: JAVA_ICON,
 	html: siHtml5,
@@ -74,7 +74,7 @@ export function getLanguageIcon(lang?: string): LanguageIcon | undefined {
 	const icon = LANGUAGE_ICONS[key];
 	if (!icon) return undefined;
 
-	// simple-icons pure black is invisible on dark chrome — lift a few brands.
+	// simple-icons pure black is invisible on dark chrome; lift a few brands.
 	if (icon.hex.toLowerCase() === "000000") {
 		return { ...icon, hex: "a1a1aa" };
 	}

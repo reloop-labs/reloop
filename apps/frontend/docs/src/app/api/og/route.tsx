@@ -729,7 +729,7 @@ export async function GET(request: NextRequest) {
 						>
 							<path d={siRust.path} />
 						</svg>
-						{/* Java — multi-color cup + steam */}
+						{/* Java: multi-color cup + steam */}
 						<svg
 							width="34"
 							height="34"

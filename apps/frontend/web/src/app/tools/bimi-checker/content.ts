@@ -122,7 +122,7 @@ export const apiSnippets: [ApiSnippet, ...ApiSnippet[]] = [
 	{
 		id: "javascript",
 		label: "JavaScript",
-		code: `// No SDK, no API key — it is a plain POST.
+		code: `// No SDK, no API key: it is a plain POST.
 const res = await fetch(
   "${apiEndpoint}",
   {
@@ -137,7 +137,7 @@ const result = await res.json();`,
 	{
 		id: "typescript",
 		label: "TypeScript",
-		code: `// No SDK, no API key — it is a plain POST.
+		code: `// No SDK, no API key: it is a plain POST.
 const res = await fetch(
   "${apiEndpoint}",
   {
@@ -152,7 +152,7 @@ const result = (await res.json()) as CheckResult;`,
 	{
 		id: "node",
 		label: "Node.js",
-		code: `// Node 18+ has a global fetch — no dependencies.
+		code: `// Node 18+ has a global fetch, no dependencies.
 const res = await fetch(
   "${apiEndpoint}",
   {
@@ -411,7 +411,7 @@ export const apiReturnFields: ApiReturnField[] = [
 		name: "dmarcEnforced",
 		type: "boolean",
 		description:
-			"True when DMARC is at p=quarantine or p=reject with pct=100 — the BIMI prerequisite.",
+			"True when DMARC is at p=quarantine or p=reject with pct=100, the BIMI prerequisite.",
 	},
 	{
 		name: "logo",
@@ -445,7 +445,7 @@ export const apiNotes: {
 		tag: "One round trip",
 		title: "DNS plus HTTPS",
 		description:
-			"BIMI and DMARC are DNS TXT lookups with short timeouts. The logo is fetched over HTTPS and inspected — we never store domains or logos.",
+			"BIMI and DMARC are DNS TXT lookups with short timeouts. The logo is fetched over HTTPS and inspected. We never store domains or logos.",
 	},
 	{
 		icon: "refresh-cw",
@@ -485,7 +485,7 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "Where does the BIMI record live?",
 				answer:
-					"The assertion record is a TXT record at default._bimi.{domain} — for example default._bimi.paypal.com. An empty l= (v=BIMI1; l=;) is a valid assertion that asks receivers not to show a logo.",
+					"The assertion record is a TXT record at default._bimi.{domain}, for example default._bimi.paypal.com. An empty l= (v=BIMI1; l=;) is a valid assertion that asks receivers not to show a logo.",
 			},
 		],
 	},
@@ -510,7 +510,7 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "What does a warn verdict mean?",
 				answer:
-					"The BIMI record exists and DMARC passes, but something needs attention — typically a missing VMC or a logo fetch issue. Fail means the logo cannot show: no record, bad version, bad logo URL, or DMARC not at enforcement.",
+					"The BIMI record exists and DMARC passes, but something needs attention, typically a missing VMC or a logo fetch issue. Fail means the logo cannot show: no record, bad version, bad logo URL, or DMARC not at enforcement.",
 			},
 		],
 	},
@@ -531,7 +531,7 @@ export const faqGroups: { title: string; items: FaqItem[] }[] = [
 			{
 				question: "Can I run this check from my own application?",
 				answer:
-					'Yes. POST https://reloop.sh/api/tools/v1/bimi-check with JSON {"domain":"paypal.com"} — no API key, rate limited to 60 requests per minute per IP. Reloop is open-source email infrastructure, so you can also self-host the whole stack.',
+					'Yes. POST https://reloop.sh/api/tools/v1/bimi-check with JSON {"domain":"paypal.com"} with no API key, rate limited to 60 requests per minute per IP. Reloop is open-source email infrastructure, so you can also self-host the whole stack.',
 			},
 		],
 	},

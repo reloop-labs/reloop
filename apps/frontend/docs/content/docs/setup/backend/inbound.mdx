@@ -4,7 +4,7 @@ icon: mail-receive
 description: Set up and run the Reloop inbound MX receiver locally in Docker.
 ---
 
-Inbound KumoMTA MX receiver — accepts external mail, scans with [spam](/docs/setup/backend/spam) (Rspamd), forwards to [inbox](/docs/setup/backend/inbox) via NATS.
+Inbound KumoMTA MX receiver. It accepts external mail, scans with [spam](/docs/setup/backend/spam) (Rspamd), and forwards to [inbox](/docs/setup/backend/inbox) via NATS.
 
 <Tip>
 Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Inbound needs free port `25`.
@@ -68,7 +68,7 @@ External Sender → Port 25 → Recipient Check → Spam (Rspamd) → NATS → I
 | **Validation** | [domain](/docs/setup/backend/domain) service verifies recipients |
 | **Spam scan** | [spam](/docs/setup/backend/spam) backend scores mail via `/checkv2` |
 | **Forwarding** | Accepted messages published to NATS for inbox, then assigned to the `null` queue |
-| **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery — submission is [smtp](/docs/setup/backend/smtp) only |
+| **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery; submission is [smtp](/docs/setup/backend/smtp) only |
 
 
 ## Next

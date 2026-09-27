@@ -1,6 +1,6 @@
 > For the site documentation index, see [llms.txt](/llms.txt). Docs index: [llms-docs.txt](/llms-docs.txt). Marketing corpus: [llms-full.txt](/llms-full.txt). Docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
 
-# Pricing — Reloop
+# Pricing | Reloop
 
 > Scale your email. Control your costs. Hosted Reloop or self-host.
 > HTML page: https://reloop.sh/pricing

@@ -37,7 +37,7 @@ Open the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.s
 
 ## Environment
 
-`apps/backend/auth/.env` — created/merged by `bun setup` / `bun env:setup` from `.env.dev`.
+`apps/backend/auth/.env` (created/merged by `bun setup` / `bun env:setup` from `.env.dev`).
 
 ```bash
 # Database & Cache
@@ -71,7 +71,7 @@ GITHUB_CLIENT_SECRET=
 | :--- | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` | Shared Postgres from Docker |
 | `REDIS_URL` | **YES** | `redis://...` | Sessions and rate limits |
-| `BETTER_AUTH_SECRET` | **YES** | — | Session encryption key |
+| `BETTER_AUTH_SECRET` | **YES** | - | Session encryption key |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` | Public origin for OAuth / invites |
 | `PORT` | **YES** | `8000` | Host port |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event bus |
@@ -83,8 +83,8 @@ GITHUB_CLIENT_SECRET=
 
 ## Closing registration
 
-`DISABLE_SIGNUP=true` refuses **every** path that would create a new account —
-password sign-up, email code, and social providers — because it is enforced once
+`DISABLE_SIGNUP=true` refuses **every** path that would create a new account
+(password sign-up, email code, and social providers) because it is enforced once
 where the user record is written rather than per method. Existing users keep
 signing in normally.
 
@@ -112,14 +112,14 @@ reloop restart auth
 
 > [!WARNING]
 > Set `DISABLE_SIGNUP=true` only after your own account exists. There is no
-> bootstrap exemption — with registration closed and no users, nobody can sign
+> bootstrap exemption: with registration closed and no users, nobody can sign
 > up and no invitation can be issued.
 
 
 ## Session validation between services
 
 Every backend validates a session by calling `GET /api/auth/v1/get-session` on
-the auth service. It uses `BASE_URL` for that, which is your public origin — so
+the auth service. It uses `BASE_URL` for that, which is your public origin, so
 the call leaves the container, goes back through the reverse proxy and comes
 in again.
 
@@ -140,7 +140,7 @@ Then restart the backends. Leave it empty and everything keeps using
 
 > [!NOTE]
 > The path is appended exactly as it is today, so `http://auth:8000` becomes
-> `http://auth:8000/api/auth/v1/get-session` — the same path the proxy forwards
+> `http://auth:8000/api/auth/v1/get-session`, the same path the proxy forwards
 > to that container. Give the origin only: no trailing path, no trailing slash
 > needed.
 

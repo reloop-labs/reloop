@@ -4,7 +4,7 @@ icon: home
 description: Set up and run the Reloop dashboard app locally.
 ---
 
-Main workspace app — campaigns, contacts, templates, analytics, and settings.
+Main workspace app: campaigns, contacts, templates, analytics, and settings.
 
 <Tip>
 Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps. The dashboard needs [auth](/docs/setup/backend/auth) (and usually the rest of `bun backend:dev` or `bun dev`).
@@ -50,7 +50,7 @@ No committed `.env` is required for local same-origin use via Caddy. The auth cl
 Optional overrides:
 
 ```bash
-# Optional locally — browser origin is used when unset (via Caddy at local.reloop.sh).
+# Optional locally; browser origin is used when unset (via Caddy at local.reloop.sh).
 # Required at Docker/image *build* time for production if you cannot rely on same-origin.
 # NEXT_PUBLIC_URL=https://local.reloop.sh
 # VITE_PUBLIC_URL=https://local.reloop.sh

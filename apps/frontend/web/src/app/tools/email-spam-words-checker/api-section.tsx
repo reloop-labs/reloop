@@ -34,7 +34,7 @@ function getSnippetCode(lang: string, subject: string, body: string) {
     "body": "${body}"
   }'`;
 		case "node":
-			return `// No SDK required — plain POST request.
+			return `// No SDK required: plain POST request.
 const res = await fetch(
   "https://reloop.sh/api/tools/v1/spam-check",
   {

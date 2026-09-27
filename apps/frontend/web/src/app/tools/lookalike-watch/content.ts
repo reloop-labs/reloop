@@ -1,6 +1,6 @@
 export const toolPath = "/tools/lookalike-watch";
 export const toolTitle =
-	"Lookalike Domain Watch — Phishing Twin & Mail-Ready Scanner";
+	"Lookalike Domain Watch: Phishing Twin & Mail-Ready Scanner";
 export const toolDescription =
 	"Check whether someone has registered domains that look like yours (e.g. acme-login.com or acme.co) and whether those lookalikes have active mail servers configured to send email.";
 export const metaDescription =
@@ -120,7 +120,7 @@ export const faqGroups: FaqGroup[] = [
 				question:
 					"What is the difference between domain spoofing and lookalike domains?",
 				answer:
-					"Domain spoofing is sending an email using your exact domain (e.g. 'ceo@acme.com') without permission — this is blocked by publishing a strict DMARC 'p=reject' policy. Lookalikes are entirely separate domains registered by third parties (e.g. 'support@acme-login.com' or 'billing@acme.co'). DMARC on your real domain does not stop someone from sending from a lookalike domain.",
+					"Domain spoofing is sending an email using your exact domain (e.g. 'ceo@acme.com') without permission. This is blocked by publishing a strict DMARC 'p=reject' policy. Lookalikes are entirely separate domains registered by third parties (e.g. 'support@acme-login.com' or 'billing@acme.co'). DMARC on your real domain does not stop someone from sending from a lookalike domain.",
 			},
 			{
 				question: "Why do lookalikes with MX or SPF records matter so much?",

@@ -48,7 +48,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-white-0 dark:bg-black">
 			{/* Top Header - full bleed, logo dead-left aligned with sidebar */}
 			<header className="z-50 flex h-12 w-full min-w-0 shrink-0 border-stroke-soft-100 border-b bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
-				{/* Desktop Logo Area — fixed width matching sidebar, dead left */}
+				{/* Desktop Logo Area: fixed width matching sidebar, dead left */}
 				<div className="hidden w-[272px] shrink-0 items-center border-stroke-soft-100 border-r px-3 lg:flex dark:border-stroke-soft-100/40">
 					<a href="/home" className="flex items-center gap-2">
 						<Logo className="-ml-1 w-10 shrink-0" />
@@ -91,7 +91,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</div>
 			</div>
 
-			{/* Mobile Drawer — CSS transitions only, no framer-motion */}
+			{/* Mobile Drawer: CSS transitions only, no framer-motion */}
 			{/* Overlay */}
 			<div
 				className={`fixed inset-0 z-50 bg-black/15 backdrop-blur-[2px] transition-opacity duration-300 dark:bg-black/40 ${

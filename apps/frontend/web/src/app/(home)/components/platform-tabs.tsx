@@ -62,15 +62,15 @@ const TABS: {
 
 // Alt text per tab for a11y.
 const PLATFORM_ALT: Record<PlatformTabId, string> = {
-	domains: "Domains — verify DNS once, send forever",
-	email: "Email — transactional API and SMTP relay",
-	analytics: "Analytics — delivery, opens and bounces live",
-	templates: "Templates — React Email blocks that scale",
-	agents: "Agent Inbox — inbound email for AI agents",
-	campaigns: "Campaigns — bulk sends that convert",
+	domains: "Domains: verify DNS once, send forever",
+	email: "Email: transactional API and SMTP relay",
+	analytics: "Analytics: delivery, opens and bounces live",
+	templates: "Templates: React Email blocks that scale",
+	agents: "Agent Inbox: inbound email for AI agents",
+	campaigns: "Campaigns: bulk sends that convert",
 };
 
-// Distinct gradient backdrop per tab — light + dark.
+// Distinct gradient backdrop per tab, light + dark.
 const TAB_GRADIENTS: Record<PlatformTabId, string> = {
 	domains:
 		"from-[#dbe7ff] via-[#eef3ff] to-bg-white-0 dark:from-[#0b1b33] dark:via-[#060b16] dark:to-black",
@@ -129,7 +129,7 @@ export default function PlatformTabs() {
 				Reloop platform overview
 			</h2>
 
-			{/* Tab header — mirrors reference: 5 columns, dividers, active underline */}
+			{/* Tab header: mirrors reference: 5 columns, dividers, active underline */}
 			<div
 				role="tablist"
 				aria-label="Platform areas"
@@ -199,11 +199,11 @@ export default function PlatformTabs() {
 				})}
 			</div>
 
-			{/* Preview panel — stable shell. Background melts via stacked
+			{/* Preview panel: stable shell. Background melts via stacked
 			    opacity layers; screenshots do a plain crisp crossfade with
 			    no movement, scale, or blur so text stays sharp. */}
 			<div className="relative h-[560px] w-full overflow-hidden bg-bg-white-0 sm:h-[640px] lg:h-[720px] dark:bg-black">
-				{/* Gradient backdrop — slow melt */}
+				{/* Gradient backdrop, slow melt */}
 				{TABS.map((tab) => (
 					<div
 						key={tab.id}
@@ -216,7 +216,7 @@ export default function PlatformTabs() {
 					/>
 				))}
 
-				{/* Stable screenshot frame — never remounts */}
+				{/* Stable screenshot frame, never remounts */}
 				<div className="relative h-full w-full px-10 pt-10">
 					<div className="relative h-full w-full overflow-hidden rounded-t-xl border border-stroke-soft-100 border-b-0 bg-bg-white-0 shadow-regular-md dark:border-white/10 dark:bg-black">
 						{TABS.map((tab) => {

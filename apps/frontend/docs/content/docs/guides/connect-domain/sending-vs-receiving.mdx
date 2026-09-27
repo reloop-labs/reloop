@@ -14,10 +14,10 @@ Goal: Gmail/Outlook/others accept mail from `you@yourdomain.com` as authenticate
 
 Typically involves:
 
-- **SPF** — authorize Reloop (`include:reloop.sh`)
-- **DKIM** — sign messages (`reloop._domainkey`)
-- **DMARC** — policy for failures (required for Reloop verification when Email Sending is on)
-- **Tracking CNAME** — on by default for new domains (`link` on apex, or `link.<subdomain>` when using a subdomain) → `link.reloop.sh`
+- **SPF**: authorize Reloop (`include:reloop.sh`)
+- **DKIM**: sign messages (`reloop._domainkey`)
+- **DMARC**: policy for failures (required for Reloop verification when Email Sending is on)
+- **Tracking CNAME**: on by default for new domains (`link` on apex, or `link.<subdomain>` when using a subdomain) → `link.reloop.sh`
 
 Sending does **not** require an MX record. MX is only for inbound mail.
 

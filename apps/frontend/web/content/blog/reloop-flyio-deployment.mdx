@@ -1,6 +1,6 @@
 ---
 title: "Reloop on Fly.io: Full Deployment Guide"
-description: Deploy Reloop on Fly.io — from fly launch to a production-ready email infrastructure with persistent volumes and custom domains.
+description: Deploy Reloop on Fly.io, from fly launch to a production-ready email infrastructure with persistent volumes and custom domains.
 keywords:
   - deploy email server fly.io
   - reloop fly.io deployment
@@ -38,7 +38,7 @@ cd reloop
 cp .env.example .env
 ```
 
-Fill in your environment variables — at minimum: `DATABASE_URL`, `SMTP_HOST`, and `RELOOP_API_SECRET`.
+Fill in your environment variables. At minimum: `DATABASE_URL`, `SMTP_HOST`, and `RELOOP_API_SECRET`.
 
 ## Step 2: Initialize the Fly app
 
@@ -46,7 +46,7 @@ Fill in your environment variables — at minimum: `DATABASE_URL`, `SMTP_HOST`, 
 fly launch --name my-reloop --region iad --no-deploy
 ```
 
-This creates your `fly.toml`. Review it and set `auto_stop_machines = false` for the email worker — you don't want it sleeping mid-delivery.
+This creates your `fly.toml`. Review it and set `auto_stop_machines = false` for the email worker. You don't want it sleeping mid-delivery.
 
 ## Step 3: Set up Fly Postgres
 

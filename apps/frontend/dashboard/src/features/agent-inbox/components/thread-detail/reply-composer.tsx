@@ -51,7 +51,7 @@ export type ReplyDraftContext = {
 	subject: string;
 	draftId: string | null;
 	onDraftIdChange: (id: string) => void;
-	/** Explicit Discard — delete draft then close. */
+	/** Explicit Discard: delete draft then close. */
 	onDiscardDraft?: () => void;
 };
 
@@ -65,7 +65,7 @@ interface ReplyComposerProps {
 	canReplyAll?: boolean;
 	/** Inline under a message vs sticky dock at the bottom of the thread. */
 	variant?: "inline" | "dock";
-	/** Skip enter motion (keyboard `R`/`A` — must feel instant). Exit still runs. */
+	/** Skip enter motion (keyboard `R`/`A`, must feel instant). Exit still runs. */
 	skipEnter?: boolean;
 	/** Thread ID for context-aware AI reply drafts (loaded server-side). */
 	threadId?: string | null;
@@ -102,7 +102,7 @@ const modKey =
 const actionKbdOnBlueClassName =
 	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
-/** Linear-style expo ease-out — snappy settle, no lag at the start. */
+/** Linear-style expo ease-out: snappy settle, no lag at the start. */
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
 export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(

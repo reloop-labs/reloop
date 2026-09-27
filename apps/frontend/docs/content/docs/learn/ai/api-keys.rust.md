@@ -1,4 +1,4 @@
-# API Keys — Rust
+# API Keys (Rust)
 
 > Agent-optimized samples for managing Reloop API keys in Rust. Index: [api-keys.md](./api-keys.md)
 

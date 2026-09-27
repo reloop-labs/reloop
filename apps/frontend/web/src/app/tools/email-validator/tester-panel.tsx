@@ -697,7 +697,7 @@ export function TesterPanel() {
 													Full Name
 												</span>
 												<span className="font-medium text-text-strong-950 dark:text-white">
-													—
+													-
 												</span>
 											</div>
 											<div className="flex items-center justify-between pr-4">
@@ -723,7 +723,7 @@ export function TesterPanel() {
 													Gender / Year
 												</span>
 												<span className="font-medium text-text-strong-950 dark:text-white">
-													—
+													-
 												</span>
 											</div>
 											<div className="flex items-center justify-between pr-4">
@@ -744,7 +744,7 @@ export function TesterPanel() {
 												<span className="font-mono text-primary-base">
 													{singleResult.domain ||
 														singleResult.input.split("@")[1] ||
-														"—"}
+														"-"}
 												</span>
 											</div>
 											<div className="flex items-center justify-between pr-4">
@@ -927,7 +927,7 @@ export function TesterPanel() {
 													SMTP Provider
 												</span>
 												<span className="font-medium text-text-strong-950 dark:text-white">
-													{singleResult.health?.mailServer?.smtpProvider || "—"}
+													{singleResult.health?.mailServer?.smtpProvider || "-"}
 												</span>
 											</div>
 											<div className="flex items-center justify-between pr-4">
@@ -948,7 +948,7 @@ export function TesterPanel() {
 													{singleResult.health?.mailServer?.mxRecord ||
 														(singleResult.mxRecords.length > 0
 															? singleResult.mxRecords[0]
-															: singleResult.domain || "—")}
+															: singleResult.domain || "-")}
 												</span>
 											</div>
 										</div>
@@ -1443,7 +1443,7 @@ export function TesterPanel() {
 
 															<div className="min-w-0 pr-3">
 																<span className="line-clamp-2 font-medium text-[13px] text-text-sub-600 dark:text-white/55">
-																	{row.health?.summary || "—"}
+																	{row.health?.summary || "-"}
 																</span>
 															</div>
 

@@ -33,7 +33,7 @@ export const config: ToolDefinition = {
 				{
 					title: "Protect Signups & Fraud",
 					description:
-						"Block throwaway domains at signup using the catalogue, role prefixes, and MX lookup — not an SMTP mailbox probe.",
+						"Block throwaway domains at signup using the catalogue, role prefixes, and MX lookup, not an SMTP mailbox probe.",
 				},
 			],
 		},
@@ -42,7 +42,7 @@ export const config: ToolDefinition = {
 		title: "Check throwaway domains first",
 		titleMuted: "Start free today.",
 		description:
-			"Use the public checker API on signup. You get a verdict, MX hosts, and flags — not a mailbox existence check.",
+			"Use the public checker API on signup. You get a verdict, MX hosts, and flags, not a mailbox existence check.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

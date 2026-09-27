@@ -150,13 +150,13 @@ export function RotateApiKeyModal({
 					if (rotatedApiKey) e.preventDefault();
 				}}
 			>
-				{/* Outer motion wrapper — animates height as content changes — KEEP ANIMATION INTACT */}
+				{/* Outer motion wrapper animates height as content changes. KEEP ANIMATION INTACT */}
 				<motion.div
 					layout="size"
 					transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
 				>
 					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-						{/* Header — icon + title + description update with step — KEEP ORIGINAL LAYOUT FOR ANIMATION */}
+						{/* Header: icon + title + description update with step. KEEP ORIGINAL LAYOUT FOR ANIMATION */}
 						<div className="flex items-start justify-between gap-4 px-6">
 							<div className="space-y-1">
 								<div className="flex items-center gap-2">
@@ -190,7 +190,7 @@ export function RotateApiKeyModal({
 							</button>
 						</div>
 
-						{/* Center content only — animates on step change — KEEP ANIMATION INTACT */}
+						{/* Center content only, animates on step change. KEEP ANIMATION INTACT */}
 						<div className="px-6 pb-6">
 							<AnimatePresence mode="popLayout" initial={false}>
 								{step === "confirm" ? (
@@ -225,7 +225,7 @@ export function RotateApiKeyModal({
 						</div>
 					</div>
 
-					{/* Footer — outside inner card, like Create API Key — KEEP ANIMATION INTACT */}
+					{/* Footer outside inner card, like Create API Key. KEEP ANIMATION INTACT */}
 					<motion.div
 						layout
 						className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3"

@@ -23,7 +23,7 @@ export function AttachmentChips({
 	onAttachmentClick?: (attachment: AttachmentItem) => void;
 }) {
 	if (!attachments || attachments.length === 0) {
-		return <span className="text-[12px] text-text-sub-600">—</span>;
+		return <span className="text-[12px] text-text-sub-600">-</span>;
 	}
 
 	return (

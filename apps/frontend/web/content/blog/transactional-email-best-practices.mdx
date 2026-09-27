@@ -1,6 +1,6 @@
 ---
 title: "Transactional Email Best Practices: The Complete Developer Guide"
-description: Everything you need to send fast, reliable, inbox-landing transactional email — from domain setup and template design to delivery patterns and monitoring.
+description: Everything you need to send fast, reliable, inbox-landing transactional email, from domain setup and template design to delivery patterns and monitoring.
 keywords:
   - transactional email best practices
   - transactional email guide
@@ -23,9 +23,9 @@ relatedSlugs:
 
 ## What makes transactional email different
 
-Transactional emails — password resets, receipts, order confirmations, notifications, onboarding sequences — are different from marketing email in one critical way: **the recipient expects them.** That expectation drives open rates of 45–65%, compared to 20–25% for marketing campaigns.
+Transactional emails (password resets, receipts, order confirmations, notifications, onboarding sequences) are different from marketing email in one critical way: **the recipient expects them.** That expectation drives open rates of 45–65%, compared to 20–25% for marketing campaigns.
 
-But that expectation also creates an obligation. When someone clicks "Forgot password?" and your reset email takes 4 minutes to arrive, or lands in spam, it's not an inconvenience — it's a product failure. Your transactional email infrastructure is part of your product.
+But that expectation also creates an obligation. When someone clicks "Forgot password?" and your reset email takes 4 minutes to arrive, or lands in spam, it's not an inconvenience. It's a product failure. Your transactional email infrastructure is part of your product.
 
 This guide covers everything you need to get transactional email right: from domain architecture to template patterns, delivery behaviour, and what to monitor.
 
@@ -37,10 +37,10 @@ This guide covers everything you need to get transactional email right: from dom
 
 Never send transactional email from your root domain (`yourdomain.com`). Use a dedicated subdomain:
 
-- `mail.yourdomain.com` — clean, generic
-- `notifications.yourdomain.com` — descriptive
-- `noreply.yourdomain.com` — avoid this (more on why below)
-- `tx.yourdomain.com` — short, unambiguous
+- `mail.yourdomain.com`: clean, generic
+- `notifications.yourdomain.com`: descriptive
+- `noreply.yourdomain.com`: avoid this (more on why below)
+- `tx.yourdomain.com`: short, unambiguous
 
 Why it matters: if your marketing emails damage your sender reputation (high unsubscribes, spam complaints from cold outreach), a dedicated transactional subdomain insulates your password resets and receipts from that reputation hit.
 
@@ -55,7 +55,7 @@ Why it matters: if your marketing emails damage your sender reputation (high uns
 
 ### Never send from `noreply@`
 
-`noreply@` is a red flag for spam filters and a poor experience for recipients. Spam filters correlate `noreply` addresses with bulk, impersonal sending. And when a recipient wants to reply to a receipt or reset email — and they can't — it damages trust.
+`noreply@` is a red flag for spam filters and a poor experience for recipients. Spam filters correlate `noreply` addresses with bulk, impersonal sending. And when a recipient wants to reply to a receipt or reset email and they can't, it damages trust.
 
 Use a monitored address like `hello@` or `support@` with a reply-to if you don't want replies going to your engineering inbox. The deliverability improvement alone is worth the setup cost.
 
@@ -65,9 +65,9 @@ Use a monitored address like `hello@` or `support@` with a reply-to if you don't
 
 Before your first production send, your sending domain must have:
 
-- **SPF** — authorizes your sending servers
-- **DKIM** — signs each message cryptographically
-- **DMARC** — sets policy and sends you reports on failures
+- **SPF**: authorizes your sending servers
+- **DKIM**: signs each message cryptographically
+- **DMARC**: sets policy and sends you reports on failures
 
 Gmail and Yahoo have required all three since February 2024. Skipping any one of them will result in your email being rejected or spam-foldered by major ISPs.
 
@@ -77,7 +77,7 @@ See the [complete SPF, DKIM, DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide
 
 ## 3. Sending patterns that affect deliverability
 
-### Send immediately — never batch transactional mail
+### Send immediately, never batch transactional mail
 
 Transactional email must be sent with near-zero latency. A user who triggers a password reset expects that email within 30 seconds. If you're batching emails or running them through a slow queue, you're creating support tickets.
 
@@ -93,19 +93,19 @@ Never schedule transactional emails for "later" or include them in a batch job t
 If you have a job queue, separate email types into priority lanes:
 
 ```typescript
-// High priority — password resets, 2FA codes
+// High priority: password resets, 2FA codes
 await queue.add("send-email", payload, { priority: 1 });
 
-// Standard — receipts, welcome emails
+// Standard: receipts, welcome emails
 await queue.add("send-email", payload, { priority: 5 });
 
-// Low — digest emails, weekly summaries
+// Low: digest emails, weekly summaries
 await queue.add("send-email", payload, { priority: 10 });
 ```
 
 This prevents a surge of digest emails from delaying password resets.
 
-### Implement retry logic — but not for hard bounces
+### Implement retry logic, but not for hard bounces
 
 If a send fails due to a temporary issue (rate limit, provider timeout), retry with exponential backoff:
 
@@ -114,7 +114,7 @@ If a send fails due to a temporary issue (rate limit, provider timeout), retry w
 - Attempt 3: 5 minutes
 - Attempt 4: give up and alert
 
-But never retry a hard bounce (invalid address, domain doesn't exist). Hard bounces are permanent. Re-sending damages your reputation. Reloop's bounce processing handles this automatically — addresses that hard bounce are suppressed and never re-sent to. To reduce hard bounces upstream, verify addresses at collection with a [free email validator](/tools/email-validator) (syntax, disposable domains, and MX checks) before they hit your transactional send queue.
+But never retry a hard bounce (invalid address, domain doesn't exist). Hard bounces are permanent. Re-sending damages your reputation. Reloop's bounce processing handles this automatically: addresses that hard bounce are suppressed and never re-sent to. To reduce hard bounces upstream, verify addresses at collection with a [free email validator](/tools/email-validator) (syntax, disposable domains, and MX checks) before they hit your transactional send queue.
 
 ---
 
@@ -152,7 +152,7 @@ Transactional subject lines should be **specific and functional**, not clever:
 | Type | Bad | Good |
 |------|-----|------|
 | Password reset | "Action required" | "Reset your Reloop password" |
-| Receipt | "Your order" | "Receipt for $49.00 — Order #12345" |
+| Receipt | "Your order" | "Receipt for $49.00 (Order #12345)" |
 | Welcome | "Welcome!" | "Your Reloop account is ready" |
 | Notification | "New activity" | "5 emails failed delivery in the last hour" |
 
@@ -181,7 +181,7 @@ was delivered successfully. <a href="/logs/abc123">View delivery details →</a>
 
 ### Never send to a bounced address
 
-Sending to an address that has previously hard bounced is one of the fastest ways to damage your sender reputation. Reloop maintains a suppression list automatically — addresses that hard bounce or mark your email as spam are added and never re-sent to.
+Sending to an address that has previously hard bounced is one of the fastest ways to damage your sender reputation. Reloop maintains a suppression list automatically: addresses that hard bounce or mark your email as spam are added and never re-sent to.
 
 If you're managing email sends outside of Reloop, implement your own suppression list and check it before every send. For imported or legacy lists, run a [bulk email verifier](/tools/email-validator) first so you suppress (or remove) undeliverable addresses before the first transactional send.
 
@@ -189,7 +189,7 @@ If you're managing email sends outside of Reloop, implement your own suppression
 
 Even transactional emails should have a way for recipients to manage their notification preferences. The legal threshold varies by country (CAN-SPAM, GDPR, etc.), but the practical threshold is simpler: if someone doesn't want an email, give them an easy way to stop receiving it. Frustrated users who can't unsubscribe hit "Report spam" instead.
 
-For truly transactional emails (password resets, receipts), an unsubscribe isn't appropriate — but for notification-style emails, it is.
+For truly transactional emails (password resets, receipts), an unsubscribe isn't appropriate, but for notification-style emails, it is.
 
 ### Monitor your bounce and complaint rates
 
@@ -217,14 +217,14 @@ Measure how long it takes from the send API call to the delivery event. For crit
 
 ### Open rate as a deliverability proxy
 
-A sudden drop in open rate for a specific email type — without a content change — usually means something changed in deliverability. If your password reset open rate drops from 70% to 30%, investigate immediately.
+A sudden drop in open rate for a specific email type (without a content change) usually means something changed in deliverability. If your password reset open rate drops from 70% to 30%, investigate immediately.
 
 ### Use Reloop's webhook events
 
 Reloop emits events for every step of the email lifecycle: `email.sent`, `email.delivered`, `email.opened`, `email.clicked`, `email.bounced`, `email.complained`. Subscribe to these with a webhook and build dashboards, alerts, or automated responses (like removing a complained address from your list in real-time).
 
 ```typescript
-// Webhook handler — remove complaints from your user preferences
+// Webhook handler: remove complaints from your user preferences
 export async function POST(req: Request) {
   const event = await req.json();
 
@@ -247,7 +247,7 @@ The same HTML renders very differently in Gmail, Outlook (desktop), Apple Mail, 
 
 ### Check your spam score
 
-Send a test email to [mail-tester.com](https://mail-tester.com). It scores your email from 0–10 and shows you exactly what's penalizing you — missing authentication, suspicious content patterns, missing plain text part, and so on.
+Send a test email to [mail-tester.com](https://mail-tester.com). It scores your email from 0–10 and shows you exactly what's penalizing you: missing authentication, suspicious content patterns, missing plain text part, and so on.
 
 Target a score of 9 or above before any email type goes to production.
 
@@ -266,7 +266,7 @@ Before any transactional email goes live:
 - [ ] SPF, DKIM, DMARC all configured and verified
 - [ ] Both `html` and `text` parts included
 - [ ] Subject line is specific and functional
-- [ ] Tested at [mail-tester.com](https://mail-tester.com) — score 9+
+- [ ] Tested at [mail-tester.com](https://mail-tester.com) with a score of 9+
 - [ ] Previewed in Gmail, Outlook, and Apple Mail
 - [ ] Sending immediately (not batched) for critical types
 - [ ] Retry logic implemented with exponential backoff

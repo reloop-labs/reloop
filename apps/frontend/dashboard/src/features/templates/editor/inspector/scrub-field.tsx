@@ -10,7 +10,7 @@ import {
 } from "react";
 
 /* ─────────────────────────────────────────────────────────
- * Fine-tune field — compact inspector input.
+ * Fine-tune field: compact inspector input.
  * Hover the label for an ↔ cursor and drag to adjust,
  * use ↑/↓ or ←/→ (⇧ for ×10), or type directly.
  * ───────────────────────────────────────────────────────── */

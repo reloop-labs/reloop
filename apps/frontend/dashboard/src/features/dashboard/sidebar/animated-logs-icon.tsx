@@ -17,7 +17,7 @@ export function AnimatedLogsIcon({ className }: AnimatedLogsIconProps) {
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0 [perspective:48px]", className)}
 		>
-			{/* Document + side brackets — flip */}
+			{/* Document + side brackets: flip */}
 			<g
 				className="origin-center motion-safe:group-data-[animating=true]:animate-logs-flip"
 				style={{ transformBox: "fill-box", transformStyle: "preserve-3d" }}
@@ -45,7 +45,7 @@ export function AnimatedLogsIcon({ className }: AnimatedLogsIconProps) {
 				/>
 			</g>
 
-			{/* Text lines — staggered after flip */}
+			{/* Text lines, staggered after flip */}
 			<path
 				d="M9 7H15"
 				pathLength={1}

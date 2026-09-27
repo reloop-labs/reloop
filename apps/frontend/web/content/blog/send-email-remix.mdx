@@ -1,6 +1,6 @@
 ---
 title: "Send Transactional Email from Remix"
-description: Add reliable transactional email to your Remix app using Reloop's Node.js SDK — from loader/action setup to environment variable handling.
+description: Add reliable transactional email to your Remix app using Reloop's Node.js SDK, from loader/action setup to environment variable handling.
 keywords:
   - send email remix
   - remix transactional email
@@ -22,7 +22,7 @@ relatedSlugs:
 
 ## Why Remix is different
 
-Remix runs loaders and actions on the server by default, which means you can safely call the Reloop SDK without ever exposing your API key to the browser. No API routes, no extra setup — just call it in the action.
+Remix runs loaders and actions on the server by default, which means you can safely call the Reloop SDK without ever exposing your API key to the browser. No API routes, no extra setup. Just call it in the action.
 
 ## Installation
 
@@ -38,7 +38,7 @@ RELOOP_API_KEY=re_your_api_key_here
 
 ## Sending from an action
 
-The most common pattern — trigger an email when a form is submitted:
+The most common pattern: trigger an email when a form is submitted:
 
 ```typescript
 // app/routes/contact.tsx
@@ -89,7 +89,7 @@ export async function action({ request }: { request: Request }) {
 
 ## Error handling
 
-Wrap sends in try/catch and return structured errors to the client. Never let email failures crash your action — degrade gracefully.
+Wrap sends in try/catch and return structured errors to the client. Never let email failures crash your action. Degrade gracefully.
 
 ## Next steps
 

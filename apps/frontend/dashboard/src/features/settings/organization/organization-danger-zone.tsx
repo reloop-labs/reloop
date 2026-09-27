@@ -18,7 +18,7 @@ export function OrganizationDangerZone() {
 							irreversible.
 						</p>
 					</div>
-					{/* Delete flow not ported yet — keep error styling. */}
+					{/* Delete flow not ported yet; keep error styling. */}
 					<FancyButton.Root variant="destructive" size="xsmall" type="button">
 						<FancyButton.Icon
 							as={Icon}

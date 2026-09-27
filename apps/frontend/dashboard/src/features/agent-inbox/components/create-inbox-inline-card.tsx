@@ -213,7 +213,7 @@ export function CreateInboxInlineCard({
 									Add address details
 								</h2>
 								<p className="mt-0.5 text-text-sub-600 text-xs leading-relaxed">
-									Enter an email address — use Name &lt;email@domain&gt; format
+									Enter an email address. Use Name &lt;email@domain&gt; format
 									to set a display name.
 								</p>
 							</div>

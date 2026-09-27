@@ -20,7 +20,7 @@ export function AnimatedThemeIcon({ className }: AnimatedThemeIconProps) {
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0", className)}
 		>
-			{/* 1 — book + rivet (main vertical bar) */}
+			{/* 1: book + rivet (main vertical bar) */}
 			<g
 				className={cn(
 					hinge,
@@ -43,7 +43,7 @@ export function AnimatedThemeIcon({ className }: AnimatedThemeIconProps) {
 				/>
 			</g>
 
-			{/* 2 — fan page */}
+			{/* 2: fan page */}
 			<g
 				className={cn(
 					hinge,
@@ -59,7 +59,7 @@ export function AnimatedThemeIcon({ className }: AnimatedThemeIconProps) {
 				/>
 			</g>
 
-			{/* 3 — bottom page */}
+			{/* 3: bottom page */}
 			<g
 				className={cn(
 					hinge,

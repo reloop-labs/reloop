@@ -18,6 +18,7 @@ export const authServerConfig = {
 	DISABLE_SIGNUP: process.env.DISABLE_SIGNUP,
 	DISABLE_ORG_CREATION: process.env.DISABLE_ORG_CREATION,
 	SETUP_MODE: process.env.SETUP_MODE,
+	ADMIN_SETUP_KEY: process.env.ADMIN_SETUP_KEY,
 	ADMIN_SETUP_KEY_FILE:
 		process.env.ADMIN_SETUP_KEY_FILE || "/run/reloop/admin-setup.key",
 	RELOOP_ENV_FILE: process.env.RELOOP_ENV_FILE || "/run/reloop/.env",

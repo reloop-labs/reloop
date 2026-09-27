@@ -20,12 +20,12 @@ export const EditContactModal = ({
 }: EditContactModalProps) => {
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
-			{/* Transparent shell — the card itself (same nested gray/white layout as
+			{/* Transparent shell. The card itself (same nested gray/white layout as
 			    CreateApiKeyModal) is rendered by EditContactForm. */}
 			<Modal.Content
 				className="border-0 bg-transparent p-0 shadow-none sm:max-w-[520px]"
 				showClose={false}
-				// Don't let Radix auto-focus the header close button on open —
+				// Don't let Radix auto-focus the header close button on open;
 				// the form focuses the first name field instead.
 				onOpenAutoFocus={(e) => e.preventDefault()}
 			>

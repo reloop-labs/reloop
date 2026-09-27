@@ -28,7 +28,7 @@ const PREVIEWS: Record<
 	newsletter: {
 		eyebrow: "Weekly newsletter",
 		title: "October update: what shipped",
-		body: "New templates, segments, and per-link analytics — plus 3 growth teardowns from real sends.",
+		body: "New templates, segments, and per-link analytics, plus 3 growth teardowns from real sends.",
 		cta: "Read the issue",
 		stat: "42% open · 8.1% click",
 	},
@@ -48,7 +48,7 @@ const PREVIEWS: Record<
 	},
 	winback: {
 		eyebrow: "Win-back",
-		title: "We miss you — 20% off Pro",
+		title: "We miss you: 20% off Pro",
 		body: "Re-engage dormant contacts with a single segmented broadcast and auto-suppression.",
 		cta: "Claim the offer",
 		stat: "6.4% reactivated",
@@ -165,7 +165,7 @@ export function MarketingPreviewSection() {
 								Broadcasts that land in the inbox.
 							</h3>
 							<p className="mt-2.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] lg:text-[15px] dark:text-white/60">
-								Newsletters, launches, drip sequences, and win-backs — with
+								Newsletters, launches, drip sequences, and win-backs, with
 								segments, scheduling, and unsubscribe handling built in.
 							</p>
 						</div>

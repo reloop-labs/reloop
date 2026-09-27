@@ -181,7 +181,7 @@ const SPOTLIGHT_DATA: Record<string, ProviderSnapshot> = {
 		href: "/compare/mailchimp",
 		tagline: "Legacy marketing platform with contact-based penalty pricing",
 		keyDiff:
-			"Reloop charges for emails sent—not contacts stored. Reloop provides modern developer APIs alongside intuitive campaign tools.",
+			"Reloop charges for emails sent, not contacts stored. Reloop provides modern developer APIs alongside intuitive campaign tools.",
 		reloopAdvantages: [
 			"Pay for sent volume, not contact list size",
 			"Developer-first REST API & SMTP integration",

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-	"Free Temp Email Checker — Disposable Email Detector | Reloop";
+	"Free Temp Email Checker: Disposable Email Detector | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -391,7 +391,7 @@ export default async function OpenGraphImage() {
 				</div>
 			</div>
 
-			{/* Right: timer blueprint mark — temp email = temporary, with CTA-style measurements */}
+			{/* Right: timer blueprint mark (temp email = temporary), with CTA-style measurements */}
 			<div style={{ position: "relative", display: "flex", width: "400px" }}>
 				<div
 					style={{
@@ -566,7 +566,7 @@ export default async function OpenGraphImage() {
 						<line x1="138" y1="128" x2="148" y2="134" />
 						<line x1="168" y1="97" x2="174" y2="107" />
 					</g>
-					{/* hands — running out of time */}
+					{/* hands, running out of time */}
 					<line
 						x1="210"
 						y1="170"
@@ -586,7 +586,7 @@ export default async function OpenGraphImage() {
 						strokeLinecap="round"
 					/>
 					<circle cx="210" cy="170" r="7" fill="white" />
-					{/* top width dimension bar — broken for the label */}
+					{/* top width dimension bar, broken for the label */}
 					<g opacity="0.75">
 						<line
 							x1="118"
@@ -610,7 +610,7 @@ export default async function OpenGraphImage() {
 							strokeWidth="1"
 						/>
 					</g>
-					{/* right height dimension bar — broken for the label */}
+					{/* right height dimension bar, broken for the label */}
 					<g opacity="0.75">
 						<line
 							x1="330"

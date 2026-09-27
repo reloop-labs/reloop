@@ -57,7 +57,7 @@ export const formatMessageHeaderTime = (dateStr: string): string => {
 		? date.format("ddd, MMM D, h:mm A")
 		: date.format("ddd, MMM D, YYYY, h:mm A");
 
-	// dayjs relativeTime plugin may not be extended here — compute a simple relative.
+	// dayjs relativeTime plugin may not be extended here, so compute a simple relative.
 	const diffDays = now.startOf("day").diff(date.startOf("day"), "day");
 	if (diffDays > 1 && diffDays < 30) {
 		return `${absolute} (${diffDays} days ago)`;

@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, face stroke 4, mark stroke 5)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function BlocklistBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function BlocklistBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function BlocklistBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -126,14 +126,14 @@ export function BlocklistBlueprintArt({
 					strokeWidth="5"
 					strokeLinecap="round"
 				/>
-				{/* result list — same weight family as the timer ticks */}
+				{/* result list, same weight family as the timer ticks */}
 				<g stroke="currentColor" strokeWidth="4" strokeLinecap="round">
 					<line x1="232" y1="126" x2="300" y2="126" />
 					<line x1="232" y1="150" x2="284" y2="150" opacity="0.7" />
 					<line x1="232" y1="174" x2="300" y2="174" />
 					<line x1="232" y1="198" x2="278" y2="198" opacity="0.7" />
 				</g>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

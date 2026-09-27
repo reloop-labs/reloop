@@ -1,4 +1,5 @@
 import { getContactsOneClickUrl } from "@reloop/links/lib/contacts-api";
+import { redirectToPath } from "@reloop/links/lib/site";
 import { NextResponse } from "next/server";
 
 /**
@@ -13,7 +14,7 @@ import { NextResponse } from "next/server";
  * person to the confirmation page instead.
  */
 export async function GET(
-	request: Request,
+	_request: Request,
 	context: { params: Promise<{ token: string }> },
 ) {
 	const { token } = await context.params;
@@ -23,11 +24,9 @@ export async function GET(
 			{ status: 404 },
 		);
 	}
-	const dest = new URL(request.url);
-	dest.pathname = `/preferences/unsubscribe/${encodeURIComponent(token)}`;
-	dest.search = "";
-	dest.hash = "";
-	return NextResponse.redirect(dest, 302);
+	return redirectToPath(
+		`/preferences/unsubscribe/${encodeURIComponent(token)}`,
+	);
 }
 
 export async function POST(

@@ -67,7 +67,7 @@ const CATEGORY_META: Record<string, { label: string; icon: string }> = {
 };
 
 /**
- * Canonical sample for envelope.data — must match builders in @reloop/webhook-events
+ * Canonical sample for envelope.data; must match builders in @reloop/webhook-events
  */
 const getPayloadForEvent = (eventId: string): Record<string, unknown> => {
 	if (eventId === "email.received") {

@@ -1,6 +1,6 @@
 import { ProtectedLayoutClient } from "./protected-layout-client";
 
-// Session gate is client-only — not eligible for instant navigation.
+// Session gate is client-only, so not eligible for instant navigation.
 export const instant = false;
 
 export default function ProtectedLayout({

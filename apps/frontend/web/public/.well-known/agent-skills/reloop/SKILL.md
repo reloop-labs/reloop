@@ -128,9 +128,9 @@ npx skills add reloop/reloop-skills
 
 Includes:
 
-- **Reloop** — send and manage email via the API
-- **Agent Email Inbox** — inbound email for agents
-- **Email Best Practices** — deliverability and compliance guidance
+- **Reloop**: send and manage email via the API
+- **Agent Email Inbox**: inbound email for agents
+- **Email Best Practices**: deliverability and compliance guidance
 
 ## Constraints
 

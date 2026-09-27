@@ -9,7 +9,7 @@ import { DotmSquare12 } from "#/components/ui/dotm-square-12";
 
 const LOADERS = [DotmSquare1, DotmSquare3, DotmSquare11, DotmSquare12];
 
-/** Shared inbox loading indicator — randomizes between Neon Drift, Core Spiral, Echo Ring, and Origin Wave. */
+/** Shared inbox loading indicator that randomizes between Neon Drift, Core Spiral, Echo Ring, and Origin Wave. */
 export function LoadingDot({
 	className,
 	label = "Loading",

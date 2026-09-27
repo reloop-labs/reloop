@@ -174,7 +174,7 @@ const PrivacyPage = () => {
 					<h2>5. Self-hosted deployments and your responsibilities</h2>
 					<p>
 						If you deploy Reloop on your own servers, you are responsible for
-						the personal data processed through your instance—including email
+						the personal data processed through your instance, including email
 						content, recipient addresses, logs, and analytics. You must provide
 						appropriate privacy notices to your own users and comply with
 						applicable data protection laws.

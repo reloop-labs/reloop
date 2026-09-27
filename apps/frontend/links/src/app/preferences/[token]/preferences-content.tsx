@@ -165,7 +165,7 @@ export function PreferencesContent({
 					Manage your preferences
 				</h1>
 				<p className="mt-3 text-[15px] text-white/50">
-					Hi {contact.firstName || "there"} — choose what you want from{" "}
+					Hi {contact.firstName || "there"}, choose what you want from{" "}
 					<span className="font-medium text-white/80">{organization.name}</span>
 				</p>
 			</div>

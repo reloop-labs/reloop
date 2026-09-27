@@ -107,7 +107,7 @@ export function FaqSection({
 		);
 	};
 
-	/* Grouped mode — each section gets its own left-side title,
+	/* Grouped mode: each section gets its own left-side title,
 	   e.g. "API Related" / "Billing" on the left, questions on the right. */
 	if (isGrouped) {
 		return (
@@ -142,7 +142,7 @@ export function FaqSection({
 							"scroll-mt-24 border-stroke-soft-100 border-t dark:border-white/10",
 						)}
 					>
-						{/* Left title — sticky while its questions scroll */}
+						{/* Left title, sticky while its questions scroll */}
 						<div className="flex items-start px-5 py-7 sm:px-7 lg:sticky lg:top-16 lg:self-start lg:px-9 lg:py-9">
 							<h3 className="font-medium text-[1.3rem] text-text-strong-950 leading-tight tracking-tight dark:text-white">
 								{group.label}
@@ -158,7 +158,7 @@ export function FaqSection({
 		);
 	}
 
-	/* Flat mode — single sticky header + question list (pricing, compare). */
+	/* Flat mode: single sticky header + question list (pricing, compare). */
 	return (
 		<section
 			id={id}

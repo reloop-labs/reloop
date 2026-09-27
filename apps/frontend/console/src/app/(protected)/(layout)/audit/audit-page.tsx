@@ -73,7 +73,7 @@ export default function AuditPage() {
 		<PageFrame>
 			<PageHeading
 				title="Audit log"
-				description="Every privileged console action — who did what, on which resource, and why when a reason was provided."
+				description="Every privileged console action: who did what, on which resource, and why when a reason was provided."
 				meta={
 					<span className="rounded-full bg-bg-weak-50 px-2.5 py-1 font-medium text-[12px] text-text-sub-600 tabular-nums dark:bg-white/[0.06]">
 						{data?.total ?? 0} total
@@ -138,7 +138,7 @@ export default function AuditPage() {
 									{item.actorName || truncateId(item.actorUserId, 12)}
 								</p>
 								<p className="text-[12px] text-text-sub-600">
-									{item.actorEmail || "—"}
+									{item.actorEmail || "-"}
 								</p>
 							</td>
 							<td className="px-4 py-3">
@@ -151,7 +151,7 @@ export default function AuditPage() {
 									<StatusPill status={item.resourceType} tone="blue" />
 								</div>
 								<p className="mt-1 font-mono text-[11px] text-text-sub-600">
-									{item.resourceId ? truncateId(item.resourceId, 16) : "—"}
+									{item.resourceId ? truncateId(item.resourceId, 16) : "-"}
 								</p>
 							</td>
 							<td className="px-4 py-3">
@@ -167,7 +167,7 @@ export default function AuditPage() {
 										</Link>
 									</Button.Root>
 								) : (
-									<span className="text-text-soft-400">—</span>
+									<span className="text-text-soft-400">-</span>
 								)}
 							</td>
 							<td className="max-w-[240px] px-4 py-3 text-[12px] text-text-sub-600">
@@ -176,7 +176,7 @@ export default function AuditPage() {
 										{JSON.stringify(item.metadata, null, 0)}
 									</pre>
 								) : (
-									"—"
+									"-"
 								)}
 							</td>
 						</tr>

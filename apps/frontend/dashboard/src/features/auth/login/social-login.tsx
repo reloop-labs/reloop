@@ -133,7 +133,7 @@ export function SocialLogin({
 				<div className="h-px flex-1 border-stroke-soft-200 border-t border-dashed dark:border-stroke-soft-100/40" />
 			</div>
 
-			{/* Email field only — Login is the shared page CTA */}
+			{/* Email field only. Login is the shared page CTA */}
 			<LoginForm
 				disabled={socialBusy}
 				onLoadingChange={handleEmailLoadingChange}

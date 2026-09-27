@@ -106,7 +106,7 @@ export function WarmupSchedule() {
 				</p>
 			</div>
 
-			{/* Schedule table — styled identical to the pricing comparison table */}
+			{/* Schedule table, styled identical to the pricing comparison table */}
 			<div className="w-full overflow-x-auto lg:overflow-visible">
 				<div className={cn("grid w-full min-w-[780px]", SCHEDULE_GRID_COLS)}>
 					{/* Header row */}

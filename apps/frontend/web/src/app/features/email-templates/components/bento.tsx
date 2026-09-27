@@ -23,7 +23,7 @@ export default function Bento() {
 						Templates for every need
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						From newsletters to password resets—curated designs you can ship in
+						From newsletters to password resets, curated designs you can ship in
 						minutes.
 					</p>
 				</div>
@@ -105,7 +105,7 @@ export default function Bento() {
 								Brand customization
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Save brand presets—colors, fonts, logos—and apply them across
+								Save brand presets (colors, fonts, logos) and apply them across
 								every template in your workspace.
 							</p>
 						</div>

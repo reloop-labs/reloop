@@ -158,7 +158,7 @@ function EditContactFields({
 		<>
 			{/* ── Identity ───────────────────────────────────────── */}
 			<section className="space-y-4">
-				{/* Email — identity key, not editable here */}
+				{/* Email: identity key, not editable here */}
 				<div className="flex flex-col gap-1.5">
 					<div className="flex items-center gap-1.5">
 						<Label.Root
@@ -236,7 +236,7 @@ function EditContactFields({
 					</div>
 				</div>
 
-				{/* Custom properties — same identity block, no section header */}
+				{/* Custom properties: same identity block, no section header */}
 				{customProperties.length > 0 && (
 					<div className="grid gap-4 sm:grid-cols-2">
 						{customProperties.map((property) => (
@@ -338,7 +338,7 @@ function EditContactFields({
 							<span className="text-paragraph-xs text-text-sub-600">
 								{isSubscribed
 									? "Can receive marketing and broadcast emails"
-									: "Marketing paused — transactional emails only"}
+									: "Marketing paused: transactional emails only"}
 							</span>
 						</div>
 					</div>
@@ -378,7 +378,7 @@ export function EditContactForm({
 	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>(() =>
 		getInitialGroupIds(contact),
 	);
-	// Snapshot of memberships when the form opened / contact switched — used for diffs on save
+	// Snapshot of memberships when the form opened / contact switched, used for diffs on save
 	const initialChannelIdsRef = useRef(getInitialChannelIds(contact));
 	const initialGroupIdsRef = useRef(getInitialGroupIds(contact));
 
@@ -473,7 +473,7 @@ export function EditContactForm({
 					firstName,
 					lastName,
 					status: isSubscribed ? "subscribed" : "unsubscribed",
-					// Always send properties once defs are loaded — empty {} clears all
+					// Always send properties once defs are loaded; empty {} clears all
 					// (backend upsert is replacement mode)
 					...(propertiesData ? { properties: propertiesPayload } : {}),
 				}),
@@ -546,7 +546,7 @@ export function EditContactForm({
 				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
 					<form onSubmit={handleSubmit}>
 						<div className="relative m-0.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-							{/* Header — icon + title + in-flow close, like CreateApiKeyModal */}
+							{/* Header: icon + title + in-flow close, like CreateApiKeyModal */}
 							<div className="flex items-start justify-between gap-4 px-6">
 								<div className="flex items-center gap-2">
 									<Icon
@@ -591,7 +591,7 @@ export function EditContactForm({
 							</div>
 						</div>
 
-						{/* Bottom Footer / Action Bar — like CreateApiKeyModal */}
+						{/* Bottom Footer / Action Bar, like CreateApiKeyModal */}
 						<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 							<Button.Root
 								type="button"
@@ -665,7 +665,7 @@ export function EditContactForm({
 				<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6">
 					{/* ── Identity ───────────────────────────────────────── */}
 					<section className="space-y-4">
-						{/* Email — identity key, not editable here */}
+						{/* Email: identity key, not editable here */}
 						<div className="flex flex-col gap-1.5">
 							<div className="flex items-center gap-1.5">
 								<Label.Root
@@ -742,7 +742,7 @@ export function EditContactForm({
 							</div>
 						</div>
 
-						{/* Custom properties — same identity block, no section header */}
+						{/* Custom properties: same identity block, no section header */}
 						{customProperties.length > 0 && (
 							<div className="grid gap-4 sm:grid-cols-2">
 								{customProperties.map((property) => (
@@ -846,7 +846,7 @@ export function EditContactForm({
 									<span className="text-paragraph-xs text-text-sub-600">
 										{isSubscribed
 											? "Can receive marketing and broadcast emails"
-											: "Marketing paused — transactional emails only"}
+											: "Marketing paused: transactional emails only"}
 									</span>
 								</div>
 							</div>

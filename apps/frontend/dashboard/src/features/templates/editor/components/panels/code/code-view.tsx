@@ -51,7 +51,7 @@ export function CodeEditor({ onClose }: { onClose?: () => void } = {}) {
 
 	// 3. Sync code changes (Code -> Visual)
 	//
-	// We use `generateJSON` from `@tiptap/html` — the exact same function that
+	// We use `generateJSON` from `@tiptap/html`, the exact same function that
 	// the editor's internal paste handler uses (see createPasteHandler.ts in
 	// @react-email/editor source). It runs the HTML through the editor's own
 	// extension schema (parseHTML rules) which correctly maps:

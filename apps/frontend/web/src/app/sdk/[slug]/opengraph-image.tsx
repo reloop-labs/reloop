@@ -34,7 +34,7 @@ function iconFill(hex: string): string {
 	return luminance < 0.35 ? "#ffffff" : `#${clean}`;
 }
 
-/** Same bloom as BlogCta — lift black marks so the glow still reads. */
+/** Same bloom as BlogCta: lift black marks so the glow still reads. */
 function glowRgb(hex: string): [number, number, number] {
 	const clean = hex.replace("#", "");
 	if (clean.length !== 6) return [56, 189, 248];
@@ -536,7 +536,7 @@ export default async function Image({
 					</div>
 				</div>
 
-				{/* Install window — same chrome as the page code UI */}
+				{/* Install window, same chrome as the page code UI */}
 				<div
 					style={{
 						display: "flex",

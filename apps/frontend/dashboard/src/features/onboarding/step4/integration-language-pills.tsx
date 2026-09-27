@@ -34,7 +34,7 @@ const pills: {
 		id: "php",
 		label: "PHP",
 		iconPath: siPhp.path,
-		// H — P is used by Python
+		// H, since P is used by Python
 		shortcut: "H",
 	},
 ];
@@ -49,7 +49,7 @@ export function IntegrationLanguagePills({
 	value: LanguageCode;
 	onChange: (choice: LanguageCode) => void;
 }) {
-	// Language pills: N / P / G / H — hints reveal on long-press Space.
+	// Language pills: N / P / G / H; hints reveal on long-press Space.
 	useHotkeys(
 		"n",
 		(e) => {

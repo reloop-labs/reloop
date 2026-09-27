@@ -89,7 +89,7 @@ export function recommendPlanIdForVolume(volume: number): PlanId {
 		proBase +
 		(Math.max(0, volume - proIncluded) / 1000) * paidOverageUsdPerThousand;
 	// Once overage pushes Pro within threshold of Growth's base,
-	// the next tier is the better deal — recommend it instead of
+	// the next tier is the better deal, so recommend it instead of
 	// inflating Pro up to (or past) Growth's price.
 	if (proTotal >= growthBase - UPSELL_THRESHOLD_USD) return "startup";
 	return "individual";

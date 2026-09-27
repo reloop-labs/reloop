@@ -370,7 +370,7 @@ export async function createCompareOgImage(pagePath: string) {
 								height: "240px",
 							}}
 						>
-							{/* Logo viewBox is padded — render larger so the mark matches. */}
+							{/* Logo viewBox is padded; render larger so the mark matches. */}
 							<ReloopMark sizePx={400} />
 						</div>
 						<span

@@ -7,7 +7,7 @@ Welcome to the Reloop API Reference. The Reloop API is built on **REST** princip
 
 ## Authentication
 
-Every request must include your API key in the `x-api-key` header. API keys are scoped to a single **organization** — all resources you create, read, or modify are automatically associated with that organization.
+Every request must include your API key in the `x-api-key` header. API keys are scoped to a single **organization**: all resources you create, read, or modify are automatically associated with that organization.
 
 ```bash
 curl -X GET "https://reloop.sh/api/domain/v1/list" \
@@ -25,7 +25,7 @@ You can create, rotate, and revoke API keys from the [Reloop Dashboard](https://
 
 ## Response Format
 
-All responses — including errors — are returned as JSON. Successful responses typically include an `event` field describing the action performed:
+All responses, including errors, are returned as JSON. Successful responses typically include an `event` field describing the action performed:
 
 ```json
 {
@@ -42,7 +42,7 @@ The API uses standard HTTP status codes to indicate the outcome of a request:
 |------|---------|-------------------|
 | `200` | OK | Request succeeded. |
 | `201` | Created | A new resource was created successfully. |
-| `400` | Bad Request | Missing or invalid parameters — check the `why` field for details. |
+| `400` | Bad Request | Missing or invalid parameters. Check the `why` field for details. |
 | `401` | Unauthorized | The `x-api-key` header is missing, invalid, or the key has been revoked. |
 | `403` | Forbidden | The API key doesn't have permission to access the requested resource. |
 | `404` | Not Found | The resource doesn't exist, or it belongs to a different organization. |

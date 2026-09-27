@@ -36,7 +36,7 @@ interface DomainListResponse {
 
 /**
  * Decorative sparkline for the domain row.
- * Does not hit the stats API — per-domain stats on home caused N+1 heavy aggregates.
+ * Does not hit the stats API; per-domain stats on home caused N+1 heavy aggregates.
  * Real activity lives on the activity chart / domain detail.
  */
 const DomainSparkline = ({ domainId }: { domainId: string }) => {
@@ -508,7 +508,7 @@ export function DomainCard() {
 						</div>
 					</motion.div>
 				) : statusFilter ? (
-					/* Filtered empty state — domains exist but none match the chosen filter */
+					/* Filtered empty state: domains exist but none match the chosen filter */
 					<motion.div
 						key="filtered-empty"
 						initial={{ opacity: 0 }}
@@ -546,7 +546,7 @@ export function DomainCard() {
 						</Button.Root>
 					</motion.div>
 				) : (
-					/* Truly empty — no domains at all */
+					/* Truly empty: no domains at all */
 					<motion.div
 						key="empty-state"
 						initial={{ opacity: 0 }}

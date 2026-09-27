@@ -1,5 +1,5 @@
 export function formatRelativeTime(iso: string | Date | null | undefined) {
-	if (!iso) return "—";
+	if (!iso) return "-";
 	const date = typeof iso === "string" ? new Date(iso) : iso;
 	const diffMs = Date.now() - date.getTime();
 	const mins = Math.floor(diffMs / 60_000);
@@ -17,7 +17,7 @@ export function formatRelativeTime(iso: string | Date | null | undefined) {
 }
 
 export function formatDateTime(iso: string | Date | null | undefined) {
-	if (!iso) return "—";
+	if (!iso) return "-";
 	try {
 		const date = typeof iso === "string" ? new Date(iso) : iso;
 		return date.toLocaleString(undefined, {
@@ -33,7 +33,7 @@ export function formatDateTime(iso: string | Date | null | undefined) {
 }
 
 export function formatNumber(n: number | null | undefined) {
-	if (n == null) return "—";
+	if (n == null) return "-";
 	return n.toLocaleString();
 }
 
@@ -45,7 +45,7 @@ export function truncateId(id: string, keep = 10) {
 export function formatRecipients(toEmails: unknown) {
 	if (Array.isArray(toEmails)) return toEmails.join(", ");
 	if (typeof toEmails === "string") return toEmails;
-	return "—";
+	return "-";
 }
 
 export function formatBytes(bytes: number | null | undefined): string {

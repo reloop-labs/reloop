@@ -165,7 +165,7 @@ export function InboxEmailAddressInput({
 
 		const { name, handle, domainQuery: dq } = splitEmailInput(val);
 		if (dq === "") {
-			// Typing the handle (or just typed "@") — keep the current domain.
+			// Typing the handle (or just typed "@"): keep the current domain.
 			commitChange(handle, domain, name);
 			return;
 		}

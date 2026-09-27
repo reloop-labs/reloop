@@ -118,7 +118,7 @@ export function InfrastructureDiagram() {
 
 			<figcaption className="relative text-[11px] text-text-sub-600/40 sm:text-[12px] dark:text-white/20">
 				Architectural difference based on public Resend delivery path (Amazon
-				SES) and Reloop&apos;s KumoMTA stack—not a latency benchmark.
+				SES) and Reloop&apos;s KumoMTA stack, not a latency benchmark.
 			</figcaption>
 		</figure>
 	);

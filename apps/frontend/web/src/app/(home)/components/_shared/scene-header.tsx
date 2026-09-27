@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 export type SceneColor = "orange" | "blue" | "violet" | "emerald" | "pink";
 
 /**
- * Physical keycap — same extrusion language as ActionKbd:
+ * Physical keycap, same extrusion language as ActionKbd:
  * dark shell as the 1.5px lip, flatter face, hairline inset highlight.
  */
 const GLYPH: Record<SceneColor, { shell: string; face: string }> = {

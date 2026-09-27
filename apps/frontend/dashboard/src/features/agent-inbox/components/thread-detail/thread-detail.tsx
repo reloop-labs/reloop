@@ -169,7 +169,7 @@ export const ThreadDetail = ({
 	const [replySeed, setReplySeed] = useState("");
 	const [replyInitialHtml, setReplyInitialHtml] = useState("");
 	const [replyDraftId, setReplyDraftId] = useState<string | null>(null);
-	/** Saved reply draft for this thread — shown when composer is closed. */
+	/** Saved reply draft for this thread, shown when composer is closed. */
 	const [savedReplyDraft, setSavedReplyDraft] = useState<ComposeDraft | null>(
 		null,
 	);
@@ -203,9 +203,9 @@ export const ThreadDetail = ({
 	const replyComposerRef = useRef<HTMLDivElement>(null);
 	const forwardComposerRef = useRef<HTMLDivElement>(null);
 	const reduceMotion = useReducedMotion();
-	/** Keyboard `R`/`A` — no enter animation / no smooth scroll. */
+	/** Keyboard `R`/`A`: no enter animation / no smooth scroll. */
 	const [skipReplyEnter, setSkipReplyEnter] = useState(false);
-	/** Keyboard `F` — no enter animation / no smooth scroll. */
+	/** Keyboard `F`: no enter animation / no smooth scroll. */
 	const [skipForwardEnter, setSkipForwardEnter] = useState(false);
 	const [composeParam, setComposeParam] = useQueryState(
 		"compose",
@@ -231,7 +231,7 @@ export const ThreadDetail = ({
 	const [optimisticReplies, setOptimisticReplies] = useState<any[]>([]);
 
 	// ── Thread fetch (for full conversation when a threadId exists) ───────────
-	// KeepPreviousData is intentionally off — switching threads must not flash
+	// KeepPreviousData is intentionally off: switching threads must not flash
 	// the previous conversation. List payload is enough to render immediately.
 	const {
 		data: threadData,
@@ -315,7 +315,7 @@ export const ThreadDetail = ({
 		void markMessageRead(id, true, {
 			threadId: thread.threadId ?? null,
 		}).catch(() => {
-			// Non-blocking — list row may already have requested mark-read
+			// Non-blocking, list row may already have requested mark-read
 		});
 	}, [
 		thread?.id,

@@ -7,7 +7,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata: Metadata = {
 	title: "Marketing Email & Campaigns",
 	description:
-		"Send newsletters, launches, and automated drip campaigns with Reloop. Broadcasts, segmentation, scheduling, and analytics — open source and self-hostable.",
+		"Send newsletters, launches, and automated drip campaigns with Reloop. Broadcasts, segmentation, scheduling, and analytics. Open source and self-hostable.",
 	keywords: [
 		"marketing email",
 		"email campaigns",

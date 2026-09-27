@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, face stroke 4, detail stroke 3)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function SuggestBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function SuggestBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function SuggestBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function SuggestBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* hero sparkle — centered on (210,170) */}
+				{/* hero sparkle, centered on (210,170) */}
 				<path
 					d="M 210 101 C 213 137 219 155 252 170 C 219 185 213 203 210 239 C 207 203 201 185 168 170 C 201 155 207 137 210 101 Z"
 					stroke="currentColor"
@@ -127,7 +127,7 @@ export function SuggestBlueprintArt({
 					<path d="M 300 78 C 301 94 303 101 317 108 C 303 115 301 122 300 138 C 299 122 297 115 283 108 C 297 101 299 94 300 78 Z" />
 					<path d="M 120 202 C 121 218 123 225 137 232 C 123 239 121 246 120 262 C 119 246 117 239 103 232 C 117 225 119 218 120 202 Z" />
 				</g>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

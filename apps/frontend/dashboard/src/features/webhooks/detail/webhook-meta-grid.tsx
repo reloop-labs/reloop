@@ -199,7 +199,7 @@ export function WebhookMetaGrid({
 	const successRate =
 		totalDeliveries > 0
 			? `${Math.round((webhook.successCount / totalDeliveries) * 100)}%`
-			: "—";
+			: "-";
 
 	const eventsList =
 		webhook.events && webhook.events.length > 0
@@ -211,12 +211,12 @@ export function WebhookMetaGrid({
 	const headersJson =
 		webhook.customHeaders && Object.keys(webhook.customHeaders).length > 0
 			? JSON.stringify(webhook.customHeaders)
-			: "—";
+			: "-";
 
 	return (
 		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 			{/* Identity */}
-			<DetailRow label="Name" value={webhook.name || "—"} />
+			<DetailRow label="Name" value={webhook.name || "-"} />
 			<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 				<div className="min-w-[120px] shrink-0 sm:min-w-[140px]">
 					<span className="font-medium text-text-sub-600 text-xs">Status</span>
@@ -274,7 +274,7 @@ export function WebhookMetaGrid({
 							revealed={secretRevealed}
 						/>
 					) : (
-						<span className="font-mono text-sm text-text-sub-600">—</span>
+						<span className="font-mono text-sm text-text-sub-600">-</span>
 					)}
 				</div>
 				{secret ? (
@@ -365,7 +365,7 @@ export function WebhookMetaGrid({
 					webhook.createdAt ? new Date(webhook.createdAt).toISOString() : ""
 				}
 				displayValue={
-					webhook.createdAt ? formatRelativeTime(webhook.createdAt) : "—"
+					webhook.createdAt ? formatRelativeTime(webhook.createdAt) : "-"
 				}
 				copyable={!!webhook.createdAt}
 			/>
@@ -419,7 +419,7 @@ export function WebhookMetaGrid({
 					webhook.updatedAt ? new Date(webhook.updatedAt).toISOString() : ""
 				}
 				displayValue={
-					webhook.updatedAt ? formatRelativeTime(webhook.updatedAt) : "—"
+					webhook.updatedAt ? formatRelativeTime(webhook.updatedAt) : "-"
 				}
 				copyable={!!webhook.updatedAt}
 			/>
@@ -433,12 +433,12 @@ export function WebhookMetaGrid({
 			/>
 			<DetailRow
 				label="Max per minute"
-				value={String(webhook.maxRequestsPerMinute ?? "—")}
+				value={String(webhook.maxRequestsPerMinute ?? "-")}
 				copyable={false}
 			/>
 			<DetailRow
 				label="Max retries"
-				value={String(webhook.maxRetries ?? "—")}
+				value={String(webhook.maxRetries ?? "-")}
 				copyable={false}
 				tooltip="How many times a failed delivery is retried"
 			/>
@@ -447,17 +447,17 @@ export function WebhookMetaGrid({
 				value={
 					webhook.retryBackoffMultiplier != null
 						? `${webhook.retryBackoffMultiplier}×`
-						: "—"
+						: "-"
 				}
 				copyable={false}
 				tooltip="Multiplier applied between retry attempts"
 			/>
 			<DetailRow
 				label="Custom headers"
-				value={headersJson === "—" ? "" : headersJson}
+				value={headersJson === "-" ? "" : headersJson}
 				displayValue={headersJson}
 				mono
-				copyable={headersJson !== "—"}
+				copyable={headersJson !== "-"}
 				tooltip="Extra HTTP headers sent with each delivery"
 			/>
 		</div>

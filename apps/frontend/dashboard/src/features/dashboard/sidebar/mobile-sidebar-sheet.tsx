@@ -212,7 +212,7 @@ export function MobileSidebarSheet({
 									[],
 								)
 								.map((sectionGroup) => {
-									// Skip desktop settings in the main flow — rendered distinctly below
+									// Skip desktop settings in the main flow; rendered distinctly below
 									const visibleItems = sectionGroup.items.filter(
 										(item) => item.path !== "/settings" && item.path !== "/ai",
 									);

@@ -40,7 +40,7 @@ export function AuthCheckerPageView() {
 						SPF · DKIM · DMARC Lookup
 					</h1>
 					<p className="mt-2 max-w-2xl text-[15px] text-white/55">
-						DNS lookup for sending domains—similar to MXToolbox and DMARC
+						DNS lookup for sending domains, similar to MXToolbox and DMARC
 						analyzers. Enter your domain to inspect authentication records.
 					</p>
 				</div>

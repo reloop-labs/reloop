@@ -13,7 +13,7 @@ export const checkTempEmailXCodeSamples: CodeSample[] = [
 		id: "node",
 		lang: "javascript",
 		label: "Node.js",
-		source: `// No SDK, no API key — it is a plain POST.
+		source: `// No SDK, no API key: it is a plain POST.
 const res = await fetch(
   "https://reloop.sh/api/tools/v1/temp-email-checker",
   {

@@ -108,7 +108,7 @@ export function CreatedTime({ createdAt }: { createdAt?: string | null }) {
 	);
 }
 
-/** Hover time tooltip for timeline steps — opens below the trigger. */
+/** Hover time tooltip for timeline steps, opens below the trigger. */
 export function TimeHover({
 	value,
 	trigger,

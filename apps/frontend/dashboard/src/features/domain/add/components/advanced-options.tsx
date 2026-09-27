@@ -91,10 +91,10 @@ export const AdvancedOptions = ({
 	const trackingHost = hasDomain ? `${TRACKING_SUBDOMAIN}.${domainValue}` : "";
 
 	const receivingTooltip = hasDomain
-		? `Send and receive on the same domain (e.g. hello@${receivingHost}). MX points to inbound.reloop.sh. Managed by Reloop — not configurable.`
+		? `Send and receive on the same domain (e.g. hello@${receivingHost}). MX points to inbound.reloop.sh. Managed by Reloop, not configurable.`
 		: "";
 	const trackingTooltip = hasDomain
-		? `Always ${TRACKING_SUBDOMAIN}.{domain}, CNAME to link.reloop.sh. Managed by Reloop — not configurable.`
+		? `Always ${TRACKING_SUBDOMAIN}.{domain}, CNAME to link.reloop.sh. Managed by Reloop, not configurable.`
 		: "";
 
 	return (

@@ -20,7 +20,7 @@ export type TabProps = {
 	children?: React.ReactNode;
 };
 
-/** Marker component — props are read by `Tabs`; content is rendered in panels. */
+/** Marker component: props are read by `Tabs`; content is rendered in panels. */
 export function Tab(_props: TabProps) {
 	return null;
 }

@@ -156,7 +156,7 @@ export function EmailList() {
 	return (
 		<div>
 			<div className="space-y-2">
-				{/* Filters first — free space for full-width search below */}
+				{/* Filters first, free space for full-width search below */}
 				<div className="flex flex-wrap items-center gap-2">
 					<DateRangeFilter
 						startDate={startDate || null}

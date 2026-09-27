@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
 				],
 			},
 			{
-				// Marketing HTML + agent routes — short cache for AFDocs cache hygiene
+				// Marketing HTML + agent routes: short cache for AFDocs cache hygiene
 				source:
 					"/:path((?!_next/static|_next/image|font/|manifest\\.json|healthz)(?!.*\\.md$).*)",
 				headers: [

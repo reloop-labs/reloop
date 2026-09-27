@@ -40,7 +40,7 @@ export function VerifyOTP({
 	mode = "login",
 	onResendFooterChange,
 	showBack = false,
-	/** When set, primary CTA is owned by the page — wire verify + disabled state. */
+	/** When set, primary CTA is owned by the page: wire verify + disabled state. */
 	onUiStateChange,
 	registerVerify,
 }: {
@@ -79,7 +79,7 @@ export function VerifyOTP({
 	}>({ name: "email", error: null });
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [isResending, setIsResending] = useState(false);
-	// OTP was just sent from login/signup — start cooldown immediately.
+	// OTP was just sent from login/signup, so start cooldown immediately.
 	const [secondsLeft, setSecondsLeft] = useState(OTP_RESEND_COOLDOWN_SECONDS);
 
 	useEffect(() => {
@@ -164,7 +164,7 @@ export function VerifyOTP({
 						(resendError as { message: string }).message.trim()
 							? (resendError as { message: string }).message
 							: "Could not resend the code.";
-					// Suspended accounts are rejected before any email is sent —
+					// Suspended accounts are rejected before any email is sent,
 					// surface it inline on the OTP screen as well.
 					setError({ name: "email", error: message });
 					toastApiError(resendError, message);
@@ -244,7 +244,7 @@ export function VerifyOTP({
 		</>
 	);
 
-	// Push resend into AuthCard footer. Do not clear to null on unmount —
+	// Push resend into AuthCard footer. Do not clear to null on unmount:
 	// that collapses the footer strip before the parent swaps copy (pop/gap).
 	useLayoutEffect(() => {
 		if (!onResendFooterChange || resendLine == null) return;
@@ -254,7 +254,7 @@ export function VerifyOTP({
 
 	return (
 		<div className="flex flex-col gap-5">
-			{/* Six equal digit boxes — left-aligned */}
+			{/* Six equal digit boxes, left-aligned */}
 			<div className="flex w-full flex-col items-start">
 				<DigitInput.Root
 					value={otpValue}

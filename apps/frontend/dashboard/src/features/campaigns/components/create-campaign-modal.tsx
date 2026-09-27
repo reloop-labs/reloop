@@ -83,7 +83,7 @@ export function CreateCampaignModal({
 			setStatus("success");
 			// Single navigation to the editor. Closing the modal via query
 			// state would trigger a competing navigation that can cancel
-			// this push, so we navigate directly — the modal unmounts with
+			// this push, so we navigate directly; the modal unmounts with
 			// the page.
 			navigateTimer.current = setTimeout(() => {
 				setName("");

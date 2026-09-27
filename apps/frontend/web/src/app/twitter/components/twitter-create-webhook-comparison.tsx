@@ -269,7 +269,7 @@ function CreateWebhookNew() {
 						</Input.Root>
 					</div>
 
-					{/* Dashboard-identical Events to subscribe card — copied from webhook-event-inline-selector.tsx */}
+					{/* Dashboard-identical Events to subscribe card, copied from webhook-event-inline-selector.tsx */}
 					<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40">
 						<div className="m-0.5 space-y-4 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 pt-4 pb-3 dark:border-stroke-soft-100/40">
 							<div className="flex items-start justify-between gap-3">

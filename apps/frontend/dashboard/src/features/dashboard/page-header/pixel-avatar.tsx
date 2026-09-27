@@ -14,7 +14,7 @@ import {
  * artwork's dialect: deep-purple ground + light run-length strokes.
  * Scales to any container; pixels stay crisp.
  *
- * Pass `letter` to carve a 5x7 initial into a cleared center plaque —
+ * Pass `letter` to carve a 5x7 initial into a cleared center plaque;
  * no text overlay needed, the glyph is part of the pixel grid.
  */
 export function PixelAvatar({

@@ -334,7 +334,7 @@ export function DraftsFolderPage() {
 								</div>
 								<p className="truncate text-mail-muted text-xs">
 									{d.to?.length ? `To: ${d.to.join(", ")}` : "No recipients"}
-									{d.text ? ` — ${d.text.slice(0, 80)}` : ""}
+									{d.text ? ` · ${d.text.slice(0, 80)}` : ""}
 								</p>
 							</button>
 							<span className="shrink-0 text-[11px] text-mail-muted">

@@ -251,7 +251,7 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 				<span className="whitespace-nowrap font-medium text-sm text-text-sub-600">
 					{row.original.createdAt
 						? formatRelativeTime(row.original.createdAt)
-						: "—"}
+						: "-"}
 				</span>
 			</div>
 		),

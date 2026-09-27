@@ -198,7 +198,7 @@ export default function InboundPage() {
 								</div>
 							</td>
 							<td className="max-w-[160px] truncate px-4 py-3 text-text-sub-600">
-								{email.mailboxEmail || "—"}
+								{email.mailboxEmail || "-"}
 							</td>
 							<td className="px-4 py-3">
 								<Button.Root

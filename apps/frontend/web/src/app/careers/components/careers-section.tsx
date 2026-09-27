@@ -96,12 +96,12 @@ export function CareersHero() {
 
 				{/* Subheadline / Description */}
 				<p className="mx-auto mt-3 max-w-2xl text-balance text-[14px] text-text-sub-600 leading-relaxed sm:mt-4 sm:text-[16px] lg:mx-0 dark:text-white/60">
-					We&apos;re redefining email infrastructure — shipping powerful,
+					We&apos;re redefining email infrastructure, shipping powerful,
 					groundbreaking features at every turn. Join us to revolutionize
 					developer communications.
 				</p>
 
-				{/* GitHub contribution graph — centered until lg */}
+				{/* GitHub contribution graph, centered until lg */}
 				<div className="mx-auto mt-10 w-full max-w-4xl lg:mx-0">
 					<GitHubContributionGraph />
 				</div>
@@ -125,7 +125,7 @@ export function CareersContact() {
 					</h2>
 					<p className="mt-1.5 max-w-2xl text-[13.5px] text-text-sub-600 sm:text-[14.5px] dark:text-white/60">
 						Reloop is open-source email infrastructure for developers. If
-						that&apos;s the work you want to do, send us a note—your GitHub,
+						that&apos;s the work you want to do, send us a note: your GitHub,
 						portfolio, or what you&apos;d help build.
 					</p>
 				</div>

@@ -156,7 +156,7 @@ export function RecentEmailsCard({
 						</h3>
 						<p className="mt-1.5 max-w-[260px] text-paragraph-sm text-text-sub-600">
 							{readyDomainName
-								? `${readyDomainName} is ready — one click sends a test email from hello@${readyDomainName}.`
+								? `${readyDomainName} is ready. One click sends a test email from hello@${readyDomainName}.`
 								: "One click sends a test email to you from your verified domain."}
 						</p>
 						{canSendFirstEmail ? (

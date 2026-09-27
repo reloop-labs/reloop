@@ -54,7 +54,7 @@ export default async function OpenGraphImage() {
 				}}
 			/>
 
-			{/* left — essay */}
+			{/* left: essay */}
 			<div
 				style={{
 					display: "flex",
@@ -313,7 +313,7 @@ export default async function OpenGraphImage() {
 				</span>
 			</div>
 
-			{/* right — selection frame card */}
+			{/* right: selection frame card */}
 			<div
 				style={{
 					display: "flex",
@@ -407,7 +407,7 @@ export default async function OpenGraphImage() {
 							textWrap: "balance",
 						}}
 					>
-						The Reloop Engine. Automated warmup, smart retries, suppression — in
+						The Reloop Engine. Automated warmup, smart retries, suppression, in
 						the open. Nothing to babysit.
 					</p>
 

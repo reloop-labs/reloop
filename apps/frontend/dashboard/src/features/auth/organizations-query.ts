@@ -67,7 +67,7 @@ export function organizationsQueryOptions() {
 			if (plans) {
 				return mergeOrganizationsWithPlans(organizations, plans);
 			}
-			// Credits is down or unauthenticated — keep names, leave planId
+			// Credits is down or unauthenticated: keep names, leave planId
 			// unset so PlanBadge shows a placeholder instead of guessing Free.
 			return organizations.map((org) => ({
 				id: org.id,

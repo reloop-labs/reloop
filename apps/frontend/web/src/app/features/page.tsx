@@ -19,7 +19,7 @@ const pageUrl = `${getSiteUrl()}/features`;
 export const metadata: Metadata = {
 	title: "Features",
 	description:
-		"Explore Reloop features—campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
+		"Explore Reloop features: campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
 	keywords: [
 		"email infrastructure features",
 		"email API features",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Features | Reloop",
 		description:
-			"Explore Reloop features—campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
+			"Explore Reloop features: campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
 	},
 };
 
@@ -122,7 +122,7 @@ const featuresSchema = {
 	"@type": "ItemList" as const,
 	name: "Reloop Features",
 	description:
-		"Explore Reloop features—campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
+		"Explore Reloop features: campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
 	url: pageUrl,
 	numberOfItems: productFeatures.length + platformFeatures.length,
 	itemListElement: [...productFeatures, ...platformFeatures].map(
@@ -142,7 +142,7 @@ export default function FeaturesIndexPage() {
 			<JsonLd data={featuresSchema} />
 			<MarketingPageShell
 				titleLines={["Email infrastructure", "built for builders"]}
-				description="Campaigns, transactionals, SMTP, analytics, and developer tools—on one platform."
+				description="Campaigns, transactionals, SMTP, analytics, and developer tools, on one platform."
 				primaryCta={{ label: "Get started", href: "/dashboard/signup" }}
 				secondaryCta={{ label: "Documentation", href: "/docs" }}
 			>

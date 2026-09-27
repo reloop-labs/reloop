@@ -12,7 +12,7 @@ import {
  * Global header rules:
  * - Left: language logo (from `lang`)
  * - If a file path is provided (or auto-detected from the first `// path` line):
- *   show that path next to the logo — never the raw language name ("typescript")
+ *   show that path next to the logo, never the raw language name ("typescript")
  * - If no path: show the language name next to the logo
  *
  * Path sources (first match wins):

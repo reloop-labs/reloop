@@ -182,7 +182,7 @@ export function Sidebar({
 	// Folder open state. Active folders auto-open, but a user close is sticky
 	// until they leave that folder (or re-open it) so navigation doesn't
 	// immediately re-expand a folder they just collapsed.
-	// Initialize with only active folders open — must match on server and client to avoid hydration mismatch.
+	// Initialize with only active folders open; must match on server and client to avoid hydration mismatch.
 	// sessionStorage restoration happens in the useEffect below, after hydration.
 	const [openFolders, setOpenFolders] = useState<Set<string>>(
 		() => new Set(getActiveFolderUrls(filteredTree)),
@@ -279,7 +279,7 @@ export function Sidebar({
 				const next = new Set(prev);
 				if (next.has(url)) {
 					next.delete(url);
-					// Sticky-collapse only for folders that contain the active page —
+					// Sticky-collapse only for folders that contain the active page;
 					// otherwise auto-open still works the next time you navigate in.
 					if (activeUrls.has(url)) {
 						userCollapsedRef.current.add(url);

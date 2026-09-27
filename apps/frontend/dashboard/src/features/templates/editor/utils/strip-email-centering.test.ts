@@ -174,7 +174,7 @@ const HALO_ORDER_LINES = `
           <tr>
             <td>
               <p>Your order has been placed</p>
-              <p>Order #1234567890 is locked in—we're prepping your Halo rings for shipment and will email the moment they leave our warehouse.</p>
+              <p>Order #1234567890 is locked in, and we're prepping your Halo rings for shipment and will email the moment they leave our warehouse.</p>
               <p>Tracking lands in your inbox as soon as the carrier scans the package.</p>
               <table align="center" width="100%">
                 <tr>

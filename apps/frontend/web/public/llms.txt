@@ -1,15 +1,15 @@
 # Reloop
 
-> Reloop is high-performance, open-source email infrastructure for developers—transactional and marketing email, SMTP, webhooks, analytics, and agent-ready APIs. Use Reloop hosted (Reloop Cloud) or self-host.
+> Reloop is high-performance, open-source email infrastructure for developers: transactional and marketing email, SMTP, webhooks, analytics, and agent-ready APIs. Use Reloop hosted (Reloop Cloud) or self-host.
 
 Important notes:
 
 - Authentication uses the `x-api-key` header with API keys prefixed with `rl_`
 - Prefer markdown: append `.md` where available (blog, pricing, compare, docs)
-- **All agent discovery files are hosted on this site (web)** — not under the docs app
+- **All agent discovery files are hosted on this site (web)**, not under the docs app
 - Product HTML docs still live under `/docs/*` with `.md` twins for page content
 - Canonical hosted pricing: [pricing.md](https://reloop.sh/pricing.md) (generated from `@reloop/pricing`)
-- License: Apache 2.0 with Reloop Labs use restrictions — not MIT
+- License: Apache 2.0 with Reloop Labs use restrictions, not MIT
 
 ## What Reloop is
 
@@ -20,7 +20,7 @@ Reloop is the email service / infrastructure (ESP + MTA). It sends and receives 
 - Not a multi-ESP connector or router that sits on SendGrid, Mailgun, Resend, or Amazon SES
 - Not a contact-list marketing tool that bills by stored subscribers (pricing is send-based on Reloop Cloud)
 - Not MIT-licensed
-- Not a paid self-host SaaS SKU — self-host is the Apache 2.0 codebase; you pay your own servers, not Reloop Cloud tiers
+- Not a paid self-host SaaS SKU: self-host is the Apache 2.0 codebase; you pay your own servers, not Reloop Cloud tiers
 
 ## Who it is for (ICP)
 

@@ -45,7 +45,7 @@ export const languages: LanguageDefinition[] = [
 		slug: "nodejs",
 		name: "Node.js",
 		shortDescription:
-			"Send email from Node.js and TypeScript with the official SDK—async/await, full types, and framework guides for Next.js, Express, and more.",
+			"Send email from Node.js and TypeScript with the official SDK: async/await, full types, and framework guides for Next.js, Express, and more.",
 		installCommand: "npm install reloop-email",
 		packageName: "reloop-email",
 		typeSafety: "Strict TypeScript",
@@ -155,7 +155,7 @@ func main() {
 		concurrency: "Async Tokio Runtime",
 		primaryFramework: "Axum, Actix, Warp",
 		docsPath: "/docs/quickstart/rust",
-		// Brand hex is #000000 — override so the gear stays visible on dark UI
+		// Brand hex is #000000; override so the gear stays visible on dark UI
 		icon: { ...siRust, hex: "e24d2b" },
 		highlights: ["Tokio", "Axum", "Type-safe"],
 		sendCode: `use reloop_email::ReloopEmail;

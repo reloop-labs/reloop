@@ -860,7 +860,7 @@ Instructions:
 															className="size-4 shrink-0 text-emerald-500"
 														/>
 														<span className="font-medium text-xs">
-															No spam trigger words detected — content is clean!
+															No spam trigger words detected. Content is clean!
 														</span>
 													</div>
 												);

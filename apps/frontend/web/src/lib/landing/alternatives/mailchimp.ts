@@ -22,7 +22,7 @@ export const config: AlternativeDefinition = {
 		href: "/compare/mailchimp",
 	},
 	highlights: [
-		"API-first campaigns—not just a drag-and-drop marketing tool",
+		"API-first campaigns, not just a drag-and-drop marketing tool",
 		"Transactional + marketing on one stack",
 		"Self-hostable for teams that outgrow SaaS pricing",
 		"Clean, modern UI without Mailchimp's upsell maze",

@@ -83,7 +83,7 @@ const LoopsComparisonPage = () => {
 			<ComparisonPageShell
 				pagePath={pagePath}
 				titleLines={["Reloop vs Loops"]}
-				description="Loops is great for simple onboarding loops—until engineering needs password resets, billing receipts, and raw API sends. Reloop unifies product email and transactional infrastructure into one open-source platform."
+				description="Loops is great for simple onboarding loops, until engineering needs password resets, billing receipts, and raw API sends. Reloop unifies product email and transactional infrastructure into one open-source platform."
 				primaryCta={{
 					label: "Get Started ",
 					href: "/dashboard/signup",
@@ -194,7 +194,7 @@ const LoopsComparisonPage = () => {
 						<Link href="/contact" className="font-semibold text-primary-base">
 							Tell us
 						</Link>
-						—we correct comparison pages when public features change.
+						. We correct comparison pages when public features change.
 					</p>
 				</CompareSection>
 

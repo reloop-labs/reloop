@@ -45,7 +45,7 @@ const kbdClassName = cn(
 );
 
 function formatTtl(ttl: number | null): string {
-	if (ttl === null || ttl === undefined) return "—";
+	if (ttl === null || ttl === undefined) return "-";
 	if (ttl < 60) return `${ttl}s`;
 	if (ttl < 3600) return `${Math.round(ttl / 60)}m (${ttl}s)`;
 	return `${Math.round(ttl / 3600)}h (${ttl}s)`;

@@ -100,7 +100,7 @@ export function inferDnsProvider(
 			supportsAutoConnect: true,
 		});
 	}
-	// Domain Chief (Chief Tools) — Domain Connect
+	// Domain Chief (Chief Tools): Domain Connect
 	if (normalized.some((server) => server.includes("domainchief."))) {
 		return provider({
 			label: "Domain Chief",
@@ -110,7 +110,7 @@ export function inferDnsProvider(
 			supportsAutoConnect: true,
 		});
 	}
-	// NameSilo (dnsowl) + NameSilo hosting (hostsilo) — Domain Connect
+	// NameSilo (dnsowl) + NameSilo hosting (hostsilo): Domain Connect
 	if (
 		normalized.some(
 			(server) =>
@@ -203,7 +203,7 @@ export function inferDnsProvider(
 			docsSlug: "porkbun",
 		});
 	}
-	// Ionos (1&1) — Domain Connect
+	// Ionos (1&1): Domain Connect
 	if (
 		normalized.some(
 			(server) =>
@@ -248,7 +248,7 @@ export function inferDnsProvider(
 			docsSlug: "dreamhost",
 		});
 	}
-	// Glauca Digital / HexDNS — Domain Connect
+	// Glauca Digital / HexDNS: Domain Connect
 	if (
 		normalized.some(
 			(server) =>
@@ -262,7 +262,7 @@ export function inferDnsProvider(
 			docsSlug: "glauca-digital",
 		});
 	}
-	// WordPress.com — Domain Connect
+	// WordPress.com: Domain Connect
 	if (
 		normalized.some(
 			(server) =>
@@ -276,7 +276,7 @@ export function inferDnsProvider(
 			docsSlug: "wordpress-com",
 		});
 	}
-	// Plesk — Domain Connect (hosted panels often use custom NS)
+	// Plesk: Domain Connect (hosted panels often use custom NS)
 	if (normalized.some((server) => server.includes("plesk"))) {
 		return provider({
 			label: "Plesk",

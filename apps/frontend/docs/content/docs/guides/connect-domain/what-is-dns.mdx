@@ -1,7 +1,7 @@
 ---
 title: What is DNS?
 sidebarTitle: What is DNS?
-description: Nameservers, DNS records, TTL, and propagation — explained for people connecting a domain to Reloop.
+description: Nameservers, DNS records, TTL, and propagation explained for people connecting a domain to Reloop.
 ---
 
 **DNS** (Domain Name System) is the internet’s phone book. When someone sends mail to `hello@acme.com` or opens `acme.com`, computers ask DNS: “Where should this go?” and “Is this sender allowed?”
@@ -19,7 +19,7 @@ ada.ns.cloudflare.com
 bob.ns.cloudflare.com
 ```
 
-Whoever runs those nameservers is your **DNS host** — that is where you add Reloop’s records. Often that is the same company as your registrar, but not always (see [Registrar vs DNS host](/docs/guides/connect-domain/registrar-vs-dns-host)).
+Whoever runs those nameservers is your **DNS host**, which is where you add Reloop’s records. Often that is the same company as your registrar, but not always (see [Registrar vs DNS host](/docs/guides/connect-domain/registrar-vs-dns-host)).
 
 ## DNS records
 
@@ -33,10 +33,10 @@ A **record** is one instruction in your zone. Reloop asks for several types:
 
 Each record has roughly:
 
-- **Host / Name** — which name the record applies to (`@`, `reloop._domainkey`, `link`, …)
-- **Type** — TXT, MX, CNAME, …
-- **Value / Points to / Content** — the data Reloop shows in the dashboard
-- **TTL** — how long resolvers may cache the answer (Auto / 300 / 3600 are common)
+- **Host / Name**: which name the record applies to (`@`, `reloop._domainkey`, `link`, …)
+- **Type**: TXT, MX, CNAME, …
+- **Value / Points to / Content**: the data Reloop shows in the dashboard
+- **TTL**: how long resolvers may cache the answer (Auto / 300 / 3600 are common)
 
 Copy these **exactly** from Reloop. A missing character in a DKIM key breaks verification.
 

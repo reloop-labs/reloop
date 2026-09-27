@@ -179,7 +179,7 @@ function AttachmentCell({
 	attachments?: EmailItem["attachments"];
 }) {
 	if (!attachments || attachments.length === 0) {
-		return <span className="text-[13px] text-text-soft-400">—</span>;
+		return <span className="text-[13px] text-text-soft-400">-</span>;
 	}
 
 	const first = attachments[0];

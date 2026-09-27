@@ -178,7 +178,7 @@ export function Footer() {
 						</div>
 
 						<div className="min-w-0 flex-1">
-							{/* Single continuous grid — reflows cleanly at 2/3/4 cols */}
+							{/* Single continuous grid that reflows cleanly at 2/3/4 cols */}
 							<div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 lg:gap-x-8">
 								{columns.map((column) => (
 									<div key={column.group}>

@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, mark stroke 5, detail stroke 3)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function HtmlEditorBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function HtmlEditorBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function HtmlEditorBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function HtmlEditorBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* code brackets — centered on (210,170),
+				{/* code brackets, centered on (210,170),
 				    same weight and caps as the timer hands */}
 				<g
 					stroke="currentColor"
@@ -120,13 +120,13 @@ export function HtmlEditorBlueprintArt({
 					<path d="M 248 126 L 292 170 L 248 214" />
 					<line x1="226" y1="122" x2="194" y2="218" />
 				</g>
-				{/* layout ticks — same weight as the timer tick marks */}
+				{/* layout ticks, same weight as the timer tick marks */}
 				<g stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity="0.6">
 					<line x1="300" y1="122" x2="348" y2="122" />
 					<line x1="300" y1="142" x2="332" y2="142" />
 					<line x1="72" y1="222" x2="120" y2="222" />
 				</g>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

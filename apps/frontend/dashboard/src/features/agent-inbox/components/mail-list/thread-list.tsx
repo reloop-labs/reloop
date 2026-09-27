@@ -102,7 +102,7 @@ export const ThreadList = ({
 			}
 		}
 
-		// No folder/category section header — title lives in the list chrome.
+		// No folder/category section header, title lives in the list chrome.
 		// Only "Pinned" keeps a subheader when present.
 		for (const thread of visibleRest) {
 			items.push({

@@ -194,14 +194,14 @@ export function ContactExportModal({
 					if (isBusy) e.preventDefault();
 				}}
 			>
-				{/* Outer motion wrapper — animates height as content changes */}
+				{/* Outer motion wrapper animates height as content changes */}
 				<motion.div
 					layout="size"
 					transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
 				>
-					{/* Inner card — mirrors CreateApiKey */}
+					{/* Inner card, mirrors CreateApiKey */}
 					<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-						{/* Header — icon + title + close, swapped instantly with step */}
+						{/* Header: icon + title + close, swapped instantly with step */}
 						<div className="flex items-start justify-between gap-4 px-6">
 							<div className="flex items-center gap-2">
 								<Icon
@@ -223,7 +223,7 @@ export function ContactExportModal({
 							</button>
 						</div>
 
-						{/* Center content only — animates on step change */}
+						{/* Center content only, animates on step change */}
 						<div className="px-6 pb-6">
 							<AnimatePresence mode="wait" initial={false}>
 								{step === "configure" ? (
@@ -281,7 +281,7 @@ export function ContactExportModal({
 												</div>
 											) : (
 												<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
-													Your CSV downloads immediately — we&apos;ll also email
+													Your CSV downloads immediately. We&apos;ll also email
 													you a link valid for 7 days.
 												</p>
 											)}
@@ -314,7 +314,7 @@ export function ContactExportModal({
 												</p>
 												<p className="mt-1 text-text-sub-600 text-xs leading-relaxed dark:text-white/60">
 													Keep this open while we prepare your CSV. Large
-													audiences can take a while — we&apos;ll email you a
+													audiences can take a while, so we&apos;ll email you a
 													download link too.
 												</p>
 											</div>
@@ -349,7 +349,7 @@ export function ContactExportModal({
 											</div>
 											<div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
 												<span className="font-semibold">Important:</span> Your
-												download has started — a backup link was also emailed to
+												download has started. A backup link was also emailed to
 												you and stays valid for 7 days.
 											</div>
 										</div>
@@ -383,7 +383,7 @@ export function ContactExportModal({
 						</div>
 					</div>
 
-					{/* Footer — outside inner card, like CreateApiKey */}
+					{/* Footer outside inner card, like CreateApiKey */}
 					<motion.div
 						layout
 						className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3"

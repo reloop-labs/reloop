@@ -12,7 +12,7 @@ import { useState } from "react";
 import { ScrubField, ScrubHandle } from "./scrub-field";
 
 /* ------------------------------------------------------------------ */
-/* Spacing control — single-row when linked, 2×2 grid when individual  */
+/* Spacing control: single-row when linked, 2×2 grid when individual   */
 /* ------------------------------------------------------------------ */
 export interface SpacingValue {
 	top: number | "";

@@ -62,7 +62,7 @@ const CATEGORIES: ComparisonCategory[] = [
 			},
 			{
 				label: "Dedicated IP Warmup & Pools",
-				selfHost: "—",
+				selfHost: "-",
 				cloud: "Automated by Reloop",
 			},
 			{
@@ -106,17 +106,17 @@ const CATEGORIES: ComparisonCategory[] = [
 		features: [
 			{
 				label: "Database Backups & Scaling",
-				selfHost: "—",
+				selfHost: "-",
 				cloud: "Automated & Zero DevOps",
 			},
 			{
 				label: "High-Availability Multi-Region SLA",
-				selfHost: "—",
+				selfHost: "-",
 				cloud: "99.99% Guaranteed SLA",
 			},
 			{
 				label: "Automatic Updates & Security Patches",
-				selfHost: "—",
+				selfHost: "-",
 				cloud: "Continuous zero-downtime",
 			},
 		],
@@ -163,10 +163,10 @@ function RenderValue({ value }: { value: string | boolean }) {
 		);
 	}
 
-	if (value === "-" || value === "—") {
+	if (value === "-") {
 		return (
 			<span className="font-medium text-[16px] text-text-sub-600/70 dark:text-white/40">
-				—
+				-
 			</span>
 		);
 	}

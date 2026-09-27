@@ -175,7 +175,7 @@ export function AgentInboxCard() {
 						const hasReceived = (mb.receivedCount ?? 0) > 0;
 						const hasActivity = hasSent || hasReceived;
 						return (
-							// Outer row is a plain div — not a link, so 3-dots won't navigate
+							// Outer row is a plain div, not a link, so 3-dots won't navigate
 							<div
 								key={mb.id}
 								className="group/row flex items-center gap-2 border-stroke-soft-100 border-b py-2.5 dark:border-white/5"
@@ -205,7 +205,7 @@ export function AgentInboxCard() {
 
 								{/* Right: activity indicators OR 3-dots on hover */}
 								<div className="relative flex h-5 w-14 shrink-0 items-center justify-end">
-									{/* Activity — hidden on hover / when dropdown open */}
+									{/* Activity: hidden on hover / when dropdown open */}
 									<div
 										className={cn(
 											"flex items-center gap-1",
@@ -233,7 +233,7 @@ export function AgentInboxCard() {
 										)}
 									</div>
 
-									{/* 3-dots — shown on hover OR when dropdown open */}
+									{/* 3-dots: shown on hover OR when dropdown open */}
 									<div
 										className={cn(
 											activeDropdownId === mb.id

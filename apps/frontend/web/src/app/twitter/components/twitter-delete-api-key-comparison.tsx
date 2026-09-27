@@ -31,7 +31,7 @@ function Kbd({
 }
 
 /* -------------------------------------------------------------------------- */
-/* OLD — faithful to screenshot + delete-api-key-modal.tsx before redesign    */
+/* OLD: faithful to screenshot + delete-api-key-modal.tsx before redesign     */
 /* -------------------------------------------------------------------------- */
 function DeleteApiKeyOld() {
 	return (
@@ -123,13 +123,13 @@ function DeleteApiKeyOld() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* NEW — matches current dashboard delete-api-key-modal.tsx                   */
+/* NEW: matches current dashboard delete-api-key-modal.tsx                    */
 /* -------------------------------------------------------------------------- */
 function DeleteApiKeyNew() {
 	return (
 		<div className="w-full max-w-[460px] overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
 			<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
-				{/* Header — title only, like Create Campaign */}
+				{/* Header: title only, like Create Campaign */}
 				<div className="flex items-start justify-between gap-4 px-6">
 					<div className="flex items-center gap-2">
 						<Icon
@@ -146,7 +146,7 @@ function DeleteApiKeyNew() {
 				</div>
 
 				<div className="space-y-4 px-6 pb-6">
-					{/* Lightweight paragraph — prefix inlined, no red box */}
+					{/* Lightweight paragraph: prefix inlined, no red box */}
 					<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/60">
 						This will permanently delete{" "}
 						<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium font-mono text-text-strong-950 text-xs dark:bg-white/[0.06] dark:text-white">
@@ -188,7 +188,7 @@ function DeleteApiKeyNew() {
 				</div>
 			</div>
 
-			{/* Footer outside inner card — like CreateCampaignModal */}
+			{/* Footer outside inner card, like CreateCampaignModal */}
 			<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 				<Button.Root
 					type="button"
@@ -282,7 +282,7 @@ function Annotation({
 }
 
 /* -------------------------------------------------------------------------- */
-/* CREATE API KEY — OLD vs NEW                                                */
+/* CREATE API KEY: OLD vs NEW                                                 */
 /* -------------------------------------------------------------------------- */
 function CreateApiKeyOld() {
 	return (
@@ -396,7 +396,7 @@ function CreateApiKeyNew() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* API KEY DISPLAY — OLD vs NEW (success state after creation)                */
+/* API KEY DISPLAY: OLD vs NEW (success state after creation)                 */
 /* -------------------------------------------------------------------------- */
 function SecretCodeBlock() {
 	return (
@@ -477,7 +477,7 @@ function ApiKeyDisplayNew() {
 					<SecretCodeBlock />
 					<div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-amber-800 text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
 						<span className="font-semibold">Important:</span> Copy and save your
-						secret key now — you won&apos;t be able to see it again.
+						secret key now. You won&apos;t be able to see it again.
 					</div>
 				</div>
 			</div>
@@ -506,7 +506,7 @@ function ApiKeyDisplayNew() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ROTATE API KEY — OLD vs NEW                                                */
+/* ROTATE API KEY: OLD vs NEW                                                 */
 /* -------------------------------------------------------------------------- */
 function RotateApiKeyOld() {
 	return (
@@ -668,7 +668,7 @@ export function TwitterDeleteApiKeyComparison() {
 			data-standalone="true"
 			className="relative flex w-full flex-col bg-white dark:bg-[#080808]"
 		>
-			{/* Section 1: Delete API key — 100dvh */}
+			{/* Section 1: Delete API key, 100dvh */}
 			<div className="flex min-h-[100dvh] w-full items-center justify-center px-6 py-10">
 				<div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 items-start justify-items-center gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
 					<div className="relative flex w-full max-w-[460px] justify-center">
@@ -680,7 +680,7 @@ export function TwitterDeleteApiKeyComparison() {
 				</div>
 			</div>
 
-			{/* Section 2: Create API key — 100dvh */}
+			{/* Section 2: Create API key, 100dvh */}
 			<div className="flex min-h-[100dvh] w-full items-center justify-center px-6 py-10">
 				<div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 items-start justify-items-center gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
 					<div className="relative flex w-full max-w-[460px] justify-center">
@@ -692,7 +692,7 @@ export function TwitterDeleteApiKeyComparison() {
 				</div>
 			</div>
 
-			{/* Section 3: API key display (success) — 100dvh */}
+			{/* Section 3: API key display (success), 100dvh */}
 			<div className="flex min-h-[100dvh] w-full items-center justify-center px-6 py-10">
 				<div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 items-start justify-items-center gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
 					<div className="relative flex w-full max-w-[460px] justify-center">
@@ -704,7 +704,7 @@ export function TwitterDeleteApiKeyComparison() {
 				</div>
 			</div>
 
-			{/* Section 4: Rotate API key — 100dvh */}
+			{/* Section 4: Rotate API key, 100dvh */}
 			<div className="flex min-h-[100dvh] w-full items-center justify-center px-6 py-10">
 				<div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 items-start justify-items-center gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
 					<div className="relative flex w-full max-w-[460px] justify-center">

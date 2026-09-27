@@ -312,7 +312,7 @@ describe("completeSelfHostSetup", () => {
 			harness.calls.filter((call) => call.name === "setRuntimeDisableSignup"),
 		).toEqual([
 			{ name: "setRuntimeDisableSignup", payload: true },
-			{ name: "setRuntimeDisableSignup", payload: false },
+			{ name: "setRuntimeDisableSignup", payload: null },
 		]);
 		expect(harness.keyPresent).toBe(true);
 	});

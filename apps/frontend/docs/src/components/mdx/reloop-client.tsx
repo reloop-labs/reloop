@@ -40,7 +40,7 @@ const LANGUAGE_ICONS: Record<string, any> = {
 	python: siPython,
 	ruby: siRuby,
 	go: siGo,
-	// Brand hex is #000000 — override so the gear stays visible on dark UI
+	// Brand hex is #000000; override so the gear stays visible on dark UI
 	rust: { path: siRust.path, hex: "e24d2b" },
 	java: JAVA_ICON,
 	dotnet: siDotnet,
@@ -64,7 +64,7 @@ function getIconForSample(label: string, lang: string) {
 		hex = "f59e0b"; // amber gold for JSON readability
 	}
 	if (t.includes("rust") || l === "rust") {
-		hex = "e24d2b"; // red — brand black is invisible on dark UI
+		hex = "e24d2b"; // red, since brand black is invisible on dark UI
 	}
 
 	return { ...icon, path: icon.path, hex };

@@ -114,7 +114,7 @@ const ContactPage = () => {
 								</BenefitItem>
 							</ul>
 
-							{/* Contact details sit under the list — not pinned to the bottom */}
+							{/* Contact details sit under the list, not pinned to the bottom */}
 							<div className="mt-8 space-y-3 sm:mt-10">
 								<div className="flex items-center gap-2.5">
 									<Icon
@@ -161,7 +161,7 @@ const ContactPage = () => {
 									</a>
 								</div>
 								<p className="pt-1 text-[13px] text-text-soft-400 leading-relaxed dark:text-white/35">
-									Chat goes straight to the founders — whoever is free jumps in.
+									Chat goes straight to the founders. Whoever is free jumps in.
 								</p>
 							</div>
 						</div>

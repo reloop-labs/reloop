@@ -66,7 +66,7 @@ export function createGlossaryTermMetadata(
 ): Metadata {
 	const path = `/glossary/${term.slug}`;
 	const canonicalUrl = `${siteUrl()}${path}`;
-	// Segment only — root layout template appends " | Reloop"
+	// Segment only; root layout template appends " | Reloop"
 	const title = glossaryTermTitle(term);
 	const titleFull = glossaryTermTitleFull(term);
 	const description = glossaryTermMetaDescription(term);

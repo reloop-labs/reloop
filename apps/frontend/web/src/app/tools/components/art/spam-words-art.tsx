@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, face stroke 4, mark stroke 5, detail stroke 3)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function SpamWordsBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function SpamWordsBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function SpamWordsBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function SpamWordsBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* warning triangle — same weight as the timer face */}
+				{/* warning triangle, same weight as the timer face */}
 				<path
 					d="M 210 95 L 279 218 H 141 Z"
 					stroke="currentColor"
@@ -116,7 +116,7 @@ export function SpamWordsBlueprintArt({
 					fill="currentColor"
 					fillOpacity="0.04"
 				/>
-				{/* alert bar — same weight as the timer hands */}
+				{/* alert bar, same weight as the timer hands */}
 				<line
 					x1="210"
 					y1="143"
@@ -127,13 +127,13 @@ export function SpamWordsBlueprintArt({
 					strokeLinecap="round"
 				/>
 				<circle cx="210" cy="200" r="5" fill="currentColor" />
-				{/* struck lines — same weight as the timer tick marks */}
+				{/* struck lines, same weight as the timer tick marks */}
 				<g stroke="currentColor" strokeWidth="3" strokeLinecap="round">
 					<line x1="285" y1="140" x2="333" y2="140" opacity="0.55" />
 					<line x1="285" y1="167" x2="318" y2="167" opacity="0.55" />
 					<line x1="87" y1="227" x2="333" y2="227" opacity="0.85" />
 				</g>
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

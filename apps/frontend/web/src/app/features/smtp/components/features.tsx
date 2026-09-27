@@ -14,7 +14,7 @@ export default function Features() {
 						Built for every mailer
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						Reloop SMTP relay works with the tools you already run—no SDK swap,
+						Reloop SMTP relay works with the tools you already run: no SDK swap,
 						no proprietary API lock-in.
 					</p>
 				</div>
@@ -77,7 +77,7 @@ export default function Features() {
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
 								Every SMTP send counts toward the same quota and shows up in
-								Reloop analytics—opens, clicks, bounces, and delivery status.
+								Reloop analytics: opens, clicks, bounces, and delivery status.
 							</p>
 						</div>
 					</div>
@@ -95,7 +95,7 @@ export default function Features() {
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
 								SMTP relay shares Reloop's delivery infrastructure with the REST
-								API—webhooks, templates, domains, and deliverability tools all
+								API. Webhooks, templates, domains, and deliverability tools all
 								apply to SMTP sends.
 							</p>
 						</div>
@@ -135,7 +135,7 @@ export default function Features() {
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
 								3,000 emails per month on the Free plan. No credit card
-								required—upgrade when your volume grows.
+								required. Upgrade when your volume grows.
 							</p>
 						</div>
 						<div className="mt-12">

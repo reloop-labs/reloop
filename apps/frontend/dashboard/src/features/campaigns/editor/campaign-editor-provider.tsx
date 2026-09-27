@@ -73,7 +73,7 @@ export function CampaignEditorProvider({
 	}, [campaign, setCampaignData]);
 
 	// Load the visual document once from the detail payload. Never re-apply
-	// after autosave — composed email HTML would re-center blocks.
+	// after autosave, since composed email HTML would re-center blocks.
 	useEffect(() => {
 		if (!editor || !campaign || !campaignReady || hasHydratedEditorRef.current)
 			return;

@@ -16,9 +16,9 @@ export function ApiKeyListHeader() {
 	const openCreateModal = () => void setModal("create-api-key");
 	const openDocs = () => window.open(DOCS_URL, "_blank");
 
-	// A — Browse samples (wired inside ApiKeysApiDetails / ApiDetailsDrawer)
-	// D — Documentation
-	// C — Create API key
+	// A: Browse samples (wired inside ApiKeysApiDetails / ApiDetailsDrawer)
+	// D: Documentation
+	// C: Create API key
 	useHotkeys(
 		"d",
 		(e) => {

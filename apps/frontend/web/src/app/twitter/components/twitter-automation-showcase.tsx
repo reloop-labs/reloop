@@ -20,7 +20,7 @@ function delay(ms: number) {
 }
 
 // ---------------------------------------------------------------------------
-// SlideToPublish — copied from dashboard publish-template-modal, trimmed
+// SlideToPublish: copied from dashboard publish-template-modal, trimmed
 // for standalone Twitter demo (no cuelume sound, no Modal wrapper)
 // ---------------------------------------------------------------------------
 
@@ -261,7 +261,7 @@ function PublishSlideDemo() {
 		await delay(1500);
 		setStatus("success");
 		await delay(1800);
-		// keeps success visible — auto loop will reset
+		// keeps success visible; auto loop will reset
 	};
 
 	// Auto cursor loop
@@ -338,7 +338,7 @@ function PublishSlideDemo() {
 					down: false,
 				});
 				await delay(450);
-				// Grab and drag — keep thumb + cursor locked together
+				// Grab and drag, keep thumb + cursor locked together
 				setCursor((c) => ({ ...c, down: true }));
 				await delay(100);
 				// animate thumb to live measured end, not stale maxDrag
@@ -470,7 +470,7 @@ function PublishSlideDemo() {
 									trackRef={trackRef}
 									maxDrag={maxDrag}
 								/>
-								{/* invisible thumb ref for cursor targeting — actual thumb is inside SlideToPublish */}
+								{/* invisible thumb ref for cursor targeting; actual thumb is inside SlideToPublish */}
 								<div ref={thumbRef} className="pointer-events-none absolute" />
 							</div>
 						</motion.div>

@@ -12,7 +12,7 @@ import { type ComponentType, useEffect, useState } from "react";
  * Icons may be blank for a brief moment on cold load until the chunk arrives.
  *
  * Important: first client render must match SSR (null). Never seed useState from
- * a module-level cache that may resolve before hydration — that caused:
+ * a module-level cache that may resolve before hydration; that caused:
  * "Hydration failed because the server rendered HTML didn't match the client".
  */
 type SpriteComponent = ComponentType;

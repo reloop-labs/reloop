@@ -34,7 +34,7 @@ export function useOrgPermissions() {
 		const isOwner = roleIncludes(role, ["owner"]);
 		const isAdmin = roleIncludes(role, ["admin"]);
 		const isMember = roleIncludes(role, ["member"]);
-		// Only true once role is known as owner/admin — never while pending/unknown.
+		// Only true once role is known as owner/admin, never while pending/unknown.
 		const isOrgAdmin = !isPending && (isOwner || isAdmin);
 		const canManageTeam = isOrgAdmin;
 		const canManageBilling = isOrgAdmin && billingEnabled;

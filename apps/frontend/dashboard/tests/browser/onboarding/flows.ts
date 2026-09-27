@@ -27,7 +27,7 @@ export async function signUpToOnboarding(
 	await expect(page).toHaveURL((url) => url.pathname.includes("/onboarding"), {
 		timeout: 15_000,
 	});
-	// Step indicator uses NumberFlow (split text nodes) — assert by form chrome.
+	// Step indicator uses NumberFlow (split text nodes), so assert by form chrome.
 	await expect(
 		page.getByRole("heading", { name: "Create your account" }),
 	).toBeVisible({ timeout: 15_000 });
@@ -40,7 +40,7 @@ export async function signUpToOnboarding(
 }
 
 /**
- * Step 1 — Create organization (company name is required; referral is optional).
+ * Step 1: Create organization (company name is required; referral is optional).
  * Advances to step 2 (API key).
  */
 export async function completeCreateWorkspace(page: Page, companyName: string) {
@@ -61,7 +61,7 @@ export async function completeCreateWorkspace(page: Page, companyName: string) {
 }
 
 /**
- * Step 2 — Generate API key and go to Dashboard.
+ * Step 2: Generate API key and go to Dashboard.
  */
 export async function completeApiKeyAndGoToDashboard(
 	page: Page,
@@ -80,7 +80,7 @@ export async function completeApiKeyAndGoToDashboard(
 		page.getByRole("heading", { name: "API Key", exact: true }),
 	).toBeVisible({ timeout: 30_000 });
 	await expect(
-		page.getByText("Your API key — copy it now, you won't see it again."),
+		page.getByText("Copy it now; you won't see it again."),
 	).toBeVisible();
 
 	// Skip the optional test send and open the dashboard.
@@ -150,7 +150,7 @@ export async function expectDashboardHome(
 		{ timeout: 20_000 },
 	);
 
-	// Prefer the account heading — org name can lag while the list hydrates
+	// Prefer the account heading; org name can lag while the list hydrates
 	// (ActiveOrganization may briefly expose a stub with name "").
 	if (userEmail) {
 		await expect(

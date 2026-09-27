@@ -4,6 +4,7 @@ import {
 	createSessionCacheRedis,
 	resolveApiKeyInternalOrSession,
 } from "@reloop/auth/middleware";
+import { resolveInternalBaseUrl } from "@reloop/auth/middleware/internal-base-url";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { mailConfig } from "../mail.config";
@@ -30,7 +31,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 		auth: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveApiKeyInternalOrSession(headers, {
-					baseUrl: mailConfig.BASE_URL,
+					baseUrl: resolveInternalBaseUrl(mailConfig.BASE_URL),
 					redis: sessionRedis,
 					ttl: 5,
 					internalSecret: mailConfig.RELOOP_INTERNAL_SECRET,

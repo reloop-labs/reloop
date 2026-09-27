@@ -9,7 +9,7 @@ import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-ba
 export interface InviteDropdownProps {
 	inviteId: string;
 	onResendInvite: (id: string) => Promise<void>;
-	/** Omit for expired invites — the link is no longer usable. */
+	/** Omit for expired invites; the link is no longer usable. */
 	onCopyInviteLink?: (id: string) => void;
 	onRevokeInvite: (id: string) => void;
 	isResending: boolean;

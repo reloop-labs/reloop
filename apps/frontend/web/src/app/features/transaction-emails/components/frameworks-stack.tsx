@@ -121,7 +121,7 @@ export function FrameworksStack() {
 					</h3>
 
 					<p className="mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
-						No extra setup — plug Reloop into the mailer or platform you already
+						No extra setup. Plug Reloop into the mailer or platform you already
 						use.
 					</p>
 

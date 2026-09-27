@@ -26,7 +26,7 @@ export interface CampaignEditorState {
 	viewMode: "visual" | "code" | "preview";
 	isDetailsOpen: boolean;
 
-	// Validation flash counters — incremented to underline a field red
+	// Validation flash counters, incremented to underline a field red
 	// (e.g. when Test email is clicked with missing details).
 	// Fields clear their own counter on edit.
 	fromErrorFlash: number;

@@ -201,7 +201,7 @@ export const DeleteTemplateVariableModal = ({
 									Default value
 								</p>
 								<p className="mt-0.5 truncate font-mono text-text-strong-950 text-xs">
-									{defaultValue ? `"${defaultValue}"` : "—"}
+									{defaultValue ? `"${defaultValue}"` : "-"}
 								</p>
 							</div>
 						</div>

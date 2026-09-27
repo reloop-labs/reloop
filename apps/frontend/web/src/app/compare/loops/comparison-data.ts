@@ -10,7 +10,7 @@ export const loopsComparisonCategories: ComparisonCategory[] = [
 		label: "Pricing & Economic Model",
 		icon: "invoice",
 		intro:
-			"Loops charges based on your contact list size—penalizing list growth even for inactive subscribers. Reloop charges purely for emails sent (or $0 when self-hosted), ensuring your bill scales with activity, not database size.",
+			"Loops charges based on your contact list size, penalizing list growth even for inactive subscribers. Reloop charges purely for emails sent (or $0 when self-hosted), ensuring your bill scales with activity, not database size.",
 		features: [
 			{
 				label: "Pricing basis",

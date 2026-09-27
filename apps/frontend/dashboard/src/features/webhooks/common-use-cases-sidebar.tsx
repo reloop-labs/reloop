@@ -28,7 +28,7 @@ export function WebhooksCommonUseCasesSidebar() {
 		{
 			title: "Handle delivery retries",
 			description:
-				"Failed deliveries retry with backoff — design handlers to be idempotent.",
+				"Failed deliveries retry with backoff, so design handlers to be idempotent.",
 			href: "https://reloop.sh/docs/webhooks",
 		},
 	];

@@ -63,7 +63,7 @@ export const contact = pgTable(
 		index("contact_idx_status").on(table.status),
 		index("contact_idx_user_id").on(table.userId),
 		index("contact_idx_suppression_reason").on(table.suppressionReason),
-		unique("contact_unique_org_email").on(table.organizationId, table.email),
+		unique("contact_unique_org_email").on(table.email, table.organizationId),
 	],
 );
 
@@ -91,8 +91,8 @@ export const contactProperty = pgTable(
 	},
 	(table) => [
 		unique("contact_property_unique_org_property_name").on(
-			table.organizationId,
 			table.propertyName,
+			table.organizationId,
 		),
 		index("contact_property_idx_organization_id").on(table.organizationId),
 		index("contact_property_idx_user_id").on(table.userId),

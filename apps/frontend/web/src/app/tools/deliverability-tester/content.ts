@@ -59,7 +59,7 @@ export const faqs: FaqItem[] = [
 		question:
 			"Is this the same as multi-provider inbox placement (seed list testing)?",
 		answer:
-			"No. This tool tests technical compliance and server configuration—exactly like mail-tester.com. It does not maintain a farm of seed mailboxes on Gmail, Outlook, or Yahoo to test tab placement (e.g. Primary vs Promotions vs Spam tab).",
+			"No. This tool tests technical compliance and server configuration, exactly like mail-tester.com. It does not maintain a farm of seed mailboxes on Gmail, Outlook, or Yahoo to test tab placement (e.g. Primary vs Promotions vs Spam tab).",
 	},
 	{
 		question: "How long is my test email and report stored?",

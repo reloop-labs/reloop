@@ -180,7 +180,7 @@ export const emailAlignmentSync = Extension.create({
 							const match = style.match(/text-align\s*:\s*([^;]+)/i);
 							const currentTextAlign = match?.[1]?.trim()?.toLowerCase();
 							if (currentTextAlign !== alignment) {
-								// Strip horizontal align only — never touch vertical-align.
+								// Strip horizontal align only; never touch vertical-align.
 								const clean = style
 									.replace(/\btext-align\s*:\s*[^;]+;?/gi, "")
 									.replace(/(^|;)\s*align\s*:\s*[^;]+;?/gi, "$1")

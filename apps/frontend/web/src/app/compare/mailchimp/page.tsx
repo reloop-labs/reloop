@@ -64,7 +64,7 @@ const MailchimpComparisonPage = () => {
 				<PageSection flushTop narrow>
 					<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 						<p>
-							Mailchimp prices by how many contacts you store—not how many
+							Mailchimp prices by how many contacts you store, not how many
 							emails you actually send. That model works for newsletters with
 							huge lists and infrequent sends. It punishes API-driven products
 							that email active users often but don&apos;t need to pay for
@@ -72,7 +72,7 @@ const MailchimpComparisonPage = () => {
 						</p>
 						<p>
 							Transactional email (Mandrill) was historically a separate
-							product—and still feels bolted on. Reloop charges by{" "}
+							product, and still feels bolted on. Reloop charges by{" "}
 							<strong className="text-text-strong-950 dark:text-white">
 								send volume
 							</strong>
@@ -94,9 +94,10 @@ const MailchimpComparisonPage = () => {
 								Mailchimp model
 							</h3>
 							<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								10,000 contacts on a free or starter tier—even if only 500
-								receive monthly mail—can force an upgrade. Engineering-triggered
-								sends often require Mandrill or a third integration.
+								10,000 contacts on a free or starter tier (even if only 500
+								receive monthly mail) can force an upgrade.
+								Engineering-triggered sends often require Mandrill or a third
+								integration.
 							</p>
 						</div>
 						<div className="rounded-2xl border border-primary-base/30 bg-primary-base/5 p-6">

@@ -67,13 +67,13 @@ function verdictCopy(
 	}
 	if (verdict === "inconclusive") {
 		return {
-			title: "Inconclusive — Some Lists Did Not Respond",
+			title: "Inconclusive: Some Lists Did Not Respond",
 			badgeLabel: "Inconclusive",
 			icon: "info-outline",
 		};
 	}
 	return {
-		title: "Clean — No Blocklist Listings Found",
+		title: "Clean: No Blocklist Listings Found",
 		badgeLabel: "Clean",
 		icon: "shield-check",
 	};

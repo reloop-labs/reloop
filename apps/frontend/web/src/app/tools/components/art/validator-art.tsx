@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
  * Same canvas, grid, guides, and stroke scale as TempEmailTimerArt
  * (420x340, frame stroke 4, mark stroke 5)
  * so all cards render equally crisp at h-32.
- * Static on purpose — no animation.
+ * Static on purpose, no animation.
  */
 export function ValidatorBlueprintArt({
 	className,
@@ -26,7 +26,7 @@ export function ValidatorBlueprintArt({
 				xmlns="http://www.w3.org/2000/svg"
 				className="h-full w-auto"
 			>
-				{/* faint grid — identical to timer art */}
+				{/* faint grid, identical to timer art */}
 				<g stroke="currentColor" strokeWidth="1" opacity="0.18">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
@@ -83,7 +83,7 @@ export function ValidatorBlueprintArt({
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* bounding squircle — rounded dashed frame, like the CTA blueprint */}
+				{/* bounding squircle, rounded dashed frame, like the CTA blueprint */}
 				<rect
 					x="16"
 					y="24"
@@ -107,7 +107,7 @@ export function ValidatorBlueprintArt({
 					<path d="M 12 170 H 20 M 16 166 V 174" />
 					<path d="M 400 170 H 408 M 404 166 V 174" />
 				</g>
-				{/* corner radius guides — dashed, matching the envelope R20 */}
+				{/* corner radius guides, dashed, matching the envelope R20 */}
 				<g
 					stroke="currentColor"
 					strokeWidth="1"
@@ -120,7 +120,7 @@ export function ValidatorBlueprintArt({
 					<circle cx="140" cy="202" r="20" />
 					<circle cx="280" cy="202" r="20" />
 				</g>
-				{/* envelope — centered on (210,170) */}
+				{/* envelope, centered on (210,170) */}
 				<rect
 					x="120"
 					y="108"
@@ -132,7 +132,7 @@ export function ValidatorBlueprintArt({
 					fill="currentColor"
 					fillOpacity="0.04"
 				/>
-				{/* envelope flap — same weight as the timer hands */}
+				{/* envelope flap, same weight as the timer hands */}
 				<path
 					d="M 126 116 L 198 170 H 222 L 294 116"
 					stroke="currentColor"
@@ -141,7 +141,7 @@ export function ValidatorBlueprintArt({
 					strokeLinejoin="round"
 					fill="none"
 				/>
-				{/* verified badge — smaller, inside the bottom-right corner guide */}
+				{/* verified badge, smaller, inside the bottom-right corner guide */}
 				<circle cx="280" cy="202" r="13" fill="#ffffff" />
 				<path
 					d="M 274 202 L 279 207 L 287 197"
@@ -151,7 +151,7 @@ export function ValidatorBlueprintArt({
 					strokeLinejoin="round"
 					fill="none"
 				/>
-				{/* CAD vector anchor handles — same style as the CTA blueprint */}
+				{/* CAD vector anchor handles, same style as the CTA blueprint */}
 				{[
 					{ id: "top-left", x: 120, y: 108 },
 					{ id: "top-right", x: 300, y: 108 },
@@ -179,7 +179,7 @@ export function ValidatorBlueprintArt({
 						/>
 					</g>
 				))}
-				{/* dimension bars — identical to timer art */}
+				{/* dimension bars, identical to timer art */}
 				<g opacity="0.6">
 					<line
 						x1="118"

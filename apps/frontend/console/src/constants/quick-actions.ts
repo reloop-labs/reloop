@@ -8,7 +8,7 @@ export type ConsoleQuickAction = {
 	isSearch?: boolean;
 };
 
-/** Canonical quick actions — order is the default before usage ranking. */
+/** Canonical quick actions. Order is the default before usage ranking. */
 export const CONSOLE_QUICK_ACTIONS: ConsoleQuickAction[] = [
 	{
 		id: "search",

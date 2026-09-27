@@ -4,7 +4,7 @@ import type { ComparisonCategory } from "../compare-types";
 /**
  * Feature matrix for Reloop vs Resend.
  * Only include claims we can defend from product docs / public Resend docs /
- * Reloop codebase. Prefer "—" or plain text over inventing a win.
+ * Reloop codebase. Prefer "-" or plain text over inventing a win.
  */
 export const resendComparisonCategories: ComparisonCategory[] = [
 	{
@@ -98,7 +98,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				label: "Inbound spam scoring",
 				icon: "alert-triangle",
 				reloop: "Yes",
-				competitor: "—",
+				competitor: "-",
 			},
 			{
 				label: "REST API",
@@ -179,7 +179,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 		label: "Data & analytics",
 		icon: "graph-up",
 		intro:
-			"Core delivery telemetry overlaps. We only mark features Reloop implements in product today—no geolocation or client fingerprinting claims.",
+			"Core delivery telemetry overlaps. We only mark features Reloop implements in product today, with no geolocation or client fingerprinting claims.",
 		features: [
 			{
 				label: "Delivery events",
@@ -242,7 +242,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 		label: "Reliability",
 		icon: "server",
 		intro:
-			"This section is about control plane ownership—not a promise that Reloop is faster or more available than Resend. We do not publish third-party latency benchmarks here.",
+			"This section is about control plane ownership, not a promise that Reloop is faster or more available than Resend. We do not publish third-party latency benchmarks here.",
 		features: [
 			{
 				label: "Direct MTA delivery (no SES hop)",

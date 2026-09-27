@@ -40,7 +40,7 @@ export const WorkflowEmptyState = ({
 				{isFiltered
 					? (description ?? "Try adjusting your search or filters.")
 					: (description ??
-						"Trigger emails from events — delays, conditions, and sends.")}
+						"Trigger emails from events: delays, conditions, and sends.")}
 			</p>
 			{isFiltered ? (
 				<Button.Root

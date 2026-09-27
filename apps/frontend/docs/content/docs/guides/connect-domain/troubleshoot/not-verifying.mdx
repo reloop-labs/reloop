@@ -26,15 +26,15 @@ dig MX yourdomain.com +short
 dig CNAME link.yourdomain.com +short
 ```
 
-Compare to the Reloop dashboard (for subdomains, dig the subdomain hosts Reloop shows — e.g. `link.mail.yourdomain.com`). If dig is empty, wait for [propagation](/docs/guides/connect-domain/verification/propagation) or fix the publish step.
+Compare to the Reloop dashboard (for subdomains, dig the subdomain hosts Reloop shows, e.g. `link.mail.yourdomain.com`). If dig is empty, wait for [propagation](/docs/guides/connect-domain/verification/propagation) or fix the publish step.
 
 ## 3. Fix common record mistakes
 
-- **DKIM truncated** — paste the full `p=` key ([typos](/docs/guides/connect-domain/troubleshoot/dkim-dmarc-typos))
-- **Two SPF TXT records** — merge ([SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts))
-- **Wrong host** — UI double-appended the domain (`reloop._domainkey.example.com.example.com`)
-- **Proxied Cloudflare records** — set mail-related records to DNS only
-- **Missing required group** — receiving MX or tracking still expected while toggles are on (defaults are on for new domains)
+- **DKIM truncated**: paste the full `p=` key ([typos](/docs/guides/connect-domain/troubleshoot/dkim-dmarc-typos))
+- **Two SPF TXT records**: merge ([SPF conflicts](/docs/guides/connect-domain/troubleshoot/spf-conflicts))
+- **Wrong host**: UI double-appended the domain (`reloop._domainkey.example.com.example.com`)
+- **Proxied Cloudflare records**: set mail-related records to DNS only
+- **Missing required group**: receiving MX or tracking still expected while toggles are on (defaults are on for new domains)
 
 ## 4. Re-verify
 

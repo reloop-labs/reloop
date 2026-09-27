@@ -9,7 +9,7 @@ const FALLBACK_MS = 1700;
 const HOVER_DELAY_MS = 300;
 
 /**
- * After a sustained hover, plays CSS animations to completion —
+ * After a sustained hover, plays CSS animations to completion,
  * even if the pointer leaves mid-animation.
  *
  * Pair with `data-animating` on a `group` and

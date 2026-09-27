@@ -284,7 +284,7 @@ export function DeletePropertyConfirmModal({
 									</Badge.Root>
 								) : (
 									<span className="font-medium text-text-sub-600 text-xs">
-										—
+										-
 									</span>
 								)}
 							</div>
