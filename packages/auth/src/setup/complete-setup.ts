@@ -42,7 +42,7 @@ export type CompleteSetupDeps = {
 		userId: string;
 		organizationId: string;
 	}) => Promise<void>;
-	setRuntimeDisableSignup: (value: boolean) => void;
+	setRuntimeDisableSignup: (value: boolean | null) => void;
 	patchEnvFile: (
 		filePath: string,
 		updates: Record<string, string>,
@@ -201,7 +201,7 @@ export async function completeSelfHostSetup(
 			throw error;
 		}
 
-		deps.setRuntimeDisableSignup(false);
+		deps.setRuntimeDisableSignup(null);
 
 		if (envClosed) {
 			throw new SetupFinalizationFailedError(false, error, { envClosed: true });

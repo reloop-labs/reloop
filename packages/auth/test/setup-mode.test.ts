@@ -14,6 +14,7 @@ import {
 	readAdminSetupKey,
 	readEnvFileValue,
 	redeemAdminSetupKey,
+	seedAdminSetupKeyFile,
 	seedRuntimeSignupLockFromEnvFile,
 } from "@reloop/auth/setup/setup-mode";
 
@@ -92,6 +93,27 @@ describe("setup-mode", () => {
 		expect(text).toContain("DISABLE_SIGNUP=true");
 		expect(text).toContain("APP_NAME=Acme");
 		expect(text).toContain("FOO=bar");
+	});
+
+	test("patchEnvFile creates a missing env file", async () => {
+		const dir = await mkdtemp(join(tmpdir(), "reloop-setup-"));
+		const path = join(dir, ".env");
+		await patchEnvFile(path, { SETUP_MODE: "false", DISABLE_SIGNUP: "true" });
+		expect(await readFile(path, "utf8")).toBe(
+			"SETUP_MODE=false\nDISABLE_SIGNUP=true\n",
+		);
+	});
+
+	test("seedAdminSetupKeyFile follows the env key until it is spent", async () => {
+		const dir = await mkdtemp(join(tmpdir(), "reloop-setup-"));
+		const path = join(dir, "admin-setup.key");
+		expect(await seedAdminSetupKeyFile(path, "old-key")).toBe(true);
+		expect(await seedAdminSetupKeyFile(path, "seeded-key")).toBe(true);
+		expect(await seedAdminSetupKeyFile(path, "seeded-key")).toBe(false);
+		expect(await readAdminSetupKey(path)).toBe("seeded-key");
+		await consumeAdminSetupKeyFile(path);
+		expect(await seedAdminSetupKeyFile(path, "seeded-key")).toBe(false);
+		expect(await readAdminSetupKey(path)).toBe("");
 	});
 
 	test("patchEnvFile refuses values that could inject another key", async () => {
