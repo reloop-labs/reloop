@@ -16,6 +16,8 @@ export type SponsorTier = {
 	name: string;
 	icon: string;
 	accent: string;
+	/** Display price, e.g. "$199/mo". Shown under the tier name. */
+	monthly: string;
 	/** Max logo slots in this tier — diamond 5, gold 10, silver 20, bronze 40. */
 	slots: number;
 	/** Logo box size — shrinks per tier: diamond largest, bronze smallest. */
@@ -27,12 +29,13 @@ export type SponsorTier = {
 	sponsors: Sponsor[];
 };
 
-const SPONSOR_HREF = "https://github.com/sponsors/reloop-labs";
+const SPONSOR_HREF = "https://buymeacoffee.com/reloop";
 
 export const SPONSOR_TIERS: SponsorTier[] = [
 	{
 		id: "diamond",
 		name: "Diamond",
+		monthly: "$199/mo",
 		icon: "star-filled",
 		accent:
 			"bg-sky-500/15 text-sky-600 dark:bg-sky-500/25 dark:text-sky-400",
@@ -45,6 +48,7 @@ export const SPONSOR_TIERS: SponsorTier[] = [
 	{
 		id: "gold",
 		name: "Gold",
+		monthly: "$99/mo",
 		icon: "award",
 		accent:
 			"bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400",
@@ -57,6 +61,7 @@ export const SPONSOR_TIERS: SponsorTier[] = [
 	{
 		id: "silver",
 		name: "Silver",
+		monthly: "$49/mo",
 		icon: "star",
 		accent:
 			"bg-slate-500/15 text-slate-600 dark:bg-slate-500/25 dark:text-slate-300",
@@ -69,6 +74,7 @@ export const SPONSOR_TIERS: SponsorTier[] = [
 	{
 		id: "bronze",
 		name: "Bronze",
+		monthly: "$19/mo",
 		icon: "heart",
 		accent:
 			"bg-orange-500/15 text-orange-700 dark:bg-orange-500/25 dark:text-orange-400",
@@ -76,19 +82,35 @@ export const SPONSOR_TIERS: SponsorTier[] = [
 		logoSize: "size-10",
 		slotHeight: "min-h-[4.5rem]",
 		slotGrid: "grid-cols-2 sm:grid-cols-5 lg:grid-cols-10",
-		sponsors: [],
+		sponsors: [
+			{
+				name: "Encrata",
+				href: "https://encrata.com",
+				logo: "/sponsors/encrata-logo.svg",
+			},
+		],
 	},
 ];
 
 export const ONE_TIME_SPONSORS: Sponsor[] = [];
 
-function SponsorLogo({ sponsor, size }: { sponsor: Sponsor; size: string }) {
+function SponsorLogo({
+	sponsor,
+	size,
+	round = false,
+}: {
+	sponsor: Sponsor;
+	size: string;
+	round?: boolean;
+}) {
 	const label = sponsor.name
 		.split(" ")
 		.map((part) => part[0])
 		.slice(0, 2)
 		.join("")
 		.toUpperCase();
+
+	const shape = round ? "rounded-full" : "rounded-xl";
 
 	const inner = (
 		<>
@@ -97,12 +119,12 @@ function SponsorLogo({ sponsor, size }: { sponsor: Sponsor; size: string }) {
 				<img
 					src={sponsor.logo}
 					alt={sponsor.name}
-					className={`${size} rounded-xl object-contain`}
+					className={`${size} ${shape} object-cover`}
 					loading="lazy"
 				/>
 			) : (
 				<span
-					className={`flex ${size} items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 font-semibold text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white`}
+					className={`flex ${size} items-center justify-center ${shape} border border-stroke-soft-200 bg-bg-weak-50 font-semibold text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white`}
 				>
 					{label}
 				</span>
@@ -163,16 +185,21 @@ export function SelfHostSponsors() {
 								className="flex flex-col gap-5 bg-bg-white-0 p-6 sm:p-7 dark:bg-black"
 							>
 								<div className="flex flex-wrap items-center justify-between gap-3">
-									<div className="flex items-center gap-2.5">
-										<span
-											className={`inline-flex size-9 items-center justify-center overflow-hidden rounded-[10px] ${tier.accent}`}
-										>
-											<Icon name={tier.icon} className="size-4" aria-hidden />
-										</span>
-										<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
+								<div className="flex items-center gap-2.5">
+									<span
+										className={`inline-flex size-9 items-center justify-center overflow-hidden rounded-[10px] ${tier.accent}`}
+									>
+										<Icon name={tier.icon} className="size-4" aria-hidden />
+									</span>
+									<div>
+										<h3 className="font-semibold text-[15px] leading-tight text-text-strong-950 dark:text-white">
 											{tier.name}
 										</h3>
+										<p className="text-[12.5px] text-text-sub-600 tabular-nums dark:text-white/50">
+											{tier.monthly}
+										</p>
 									</div>
+								</div>
 									<span className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50/50 px-2.5 py-1 font-medium text-[11.5px] text-text-sub-600 tabular-nums dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
 										{filled} / {tier.slots} sponsors
 									</span>
@@ -210,9 +237,14 @@ export function SelfHostSponsors() {
 								<span className="inline-flex size-9 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50/50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
 									<Icon name="gift" className="size-4" aria-hidden />
 								</span>
-								<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
-									One-time sponsors
-								</h3>
+								<div>
+									<h3 className="font-semibold text-[15px] leading-tight text-text-strong-950 dark:text-white">
+										One-time sponsors
+									</h3>
+									<p className="text-[12.5px] text-text-sub-600 dark:text-white/50">
+										From $5 · one-time
+									</p>
+								</div>
 							</div>
 							<span className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50/50 px-2.5 py-1 font-medium text-[11.5px] text-text-sub-600 tabular-nums dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
 								{ONE_TIME_SPONSORS.length}{" "}
@@ -226,19 +258,21 @@ export function SelfHostSponsors() {
 									<SponsorLogo
 										key={sponsor.name}
 										sponsor={sponsor}
-										size="size-8"
+										size="size-10"
+										round
 									/>
 								))}
 							</div>
 						) : (
-							<div className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-4">
-								{[0, 1, 2, 3].map((index) => (
+							<div className="flex flex-nowrap items-center gap-2.5 overflow-hidden">
+								{Array.from({ length: 30 }).map((_, index) => (
 									<Link
 										key={index}
 										href={SPONSOR_HREF}
-										className="flex h-12 items-center justify-center rounded-xl border border-dashed border-stroke-soft-200 bg-bg-weak-50/50 px-3 text-center font-medium text-[12.5px] text-text-sub-600 transition-colors hover:border-text-sub-600/40 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white/40 dark:hover:border-white/30 dark:hover:text-white"
+										aria-label="Become a one-time sponsor"
+										className="flex size-10 shrink-0 items-center justify-center rounded-full border border-dashed border-stroke-soft-200 bg-bg-weak-50/50 text-text-sub-600 transition-colors hover:border-text-sub-600/40 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white/40 dark:hover:border-white/30 dark:hover:text-white"
 									>
-										Your name here
+										<Icon name="plus" className="size-4" aria-hidden />
 									</Link>
 								))}
 							</div>
