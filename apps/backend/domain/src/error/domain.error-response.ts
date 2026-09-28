@@ -193,6 +193,15 @@ export const KumoMtaErrors = {
 			why: `This message is ${(actualBytes / (1024 * 1024)).toFixed(2)} MB, but your '${planId}' plan allows ${(limitBytes / (1024 * 1024)).toFixed(2)} MB per send`,
 			fix: "Reduce attachment size or upgrade your plan for a larger limit",
 		}),
+	undeliverableRecipientDomain: (recipient: string, domainName: string) => {
+		const detail = `Email was not sent. Recipient "${recipient}" uses "${domainName}", which never accepts mail (reserved for documentation/testing) and delivery would always fail.`;
+		return createError({
+			status: 400,
+			message: `Recipient domain "${domainName}" is not deliverable`,
+			why: detail,
+			fix: "Send to a real mailbox domain instead. Replace example.com / example.org / example.net and .test / .invalid / .example / .localhost recipients",
+		});
+	},
 	internalError: (reason: string) =>
 		createError({
 			status: 500,

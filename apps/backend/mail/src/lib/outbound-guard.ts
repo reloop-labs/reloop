@@ -10,6 +10,7 @@
  *  3. Display-name brand-spoof blocklist
  *  4. URL shortener + domain blocklist (blocks the lix.li / clck.ru attack pattern)
  *  5. Custom header CRLF injection guard + platform-reserved header blocklist
+ *  6. Undeliverable recipient domain blocklist (example.com/org/net, .test/.invalid/.example/.localhost)
  *
  * Operators can tune behaviour with env vars:
  *  ALLOW_NON_LATIN_SUBJECTS=true   → skip script detection (multilingual platforms)
@@ -18,6 +19,10 @@
  */
 
 import { createError } from "evlog";
+import {
+	extractRecipientDomain,
+	isUndeliverableRecipientDomain,
+} from "@reloop/db";
 
 // ─── 1. Body size cap ────────────────────────────────────────────────────────
 
@@ -325,12 +330,43 @@ export function sanitizeCustomHeaders(
 // ─── Composite guard ─────────────────────────────────────────────────────────
 
 /**
+ * Recipient domains that can never receive mail (RFC 2606 example.com /
+ * example.org / example.net, plus .test / .invalid / .example / .localhost).
+ * Accepting these only burns quota — delivery always fails — so reject with
+ * a permanent SMTP-style error before any log, quota, or KumoMTA work.
+ */
+export function assertRecipientsDeliverable(
+	to: string | string[] | undefined,
+	cc?: string | string[] | undefined,
+	bcc?: string | string[] | undefined,
+): void {
+	const groups: Array<string | string[] | undefined> = [to, cc, bcc];
+	for (const group of groups) {
+		const list = group === undefined ? [] : Array.isArray(group) ? group : [group];
+		for (const recipient of list) {
+			const domain = extractRecipientDomain(recipient);
+			if (domain && isUndeliverableRecipientDomain(domain)) {
+				throw createError({
+					status: 400,
+					message: `Recipient domain "${domain}" is not deliverable`,
+					why: `Email was not sent. "${recipient}" uses "${domain}", which never accepts mail (reserved for documentation/testing) and delivery would always fail`,
+					fix: "Send to a real mailbox domain instead. Replace example.com / example.org / example.net and .test / .invalid / .example / .localhost recipients",
+				});
+			}
+		}
+	}
+}
+
+/**
  * Run all outbound content checks in one call before any send-pipeline work.
  * Returns the sanitized custom headers object.
  * Throws a structured 400 error on the first violation.
  */
 export function runOutboundGuard({
 	from,
+	to,
+	cc,
+	bcc,
 	subject,
 	html,
 	text,
@@ -339,6 +375,9 @@ export function runOutboundGuard({
 	attachments,
 }: {
 	from: string;
+	to?: string | string[];
+	cc?: string | string[];
+	bcc?: string | string[];
 	subject: string;
 	html?: string;
 	text?: string;
@@ -346,6 +385,7 @@ export function runOutboundGuard({
 	replyTo?: string | string[];
 	attachments?: Array<{ filename?: string; content_type?: string }>;
 }): { sanitizedHeaders: Record<string, string> } {
+	assertRecipientsDeliverable(to, cc, bcc);
 	assertBodySize(html, text);
 	assertSubjectScript(subject);
 	assertDisplayNameNotSpoofed(from);

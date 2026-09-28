@@ -84,6 +84,9 @@ export async function sendEmailController({
 	// rejected at the API boundary and never touch the mail queue.
 	const { sanitizedHeaders } = runOutboundGuard({
 		from: rawBody.from,
+		to: rawBody.to,
+		cc: rawBody.cc,
+		bcc: rawBody.bcc,
 		subject: rawBody.subject,
 		html: rawBody.html,
 		text: rawBody.text,

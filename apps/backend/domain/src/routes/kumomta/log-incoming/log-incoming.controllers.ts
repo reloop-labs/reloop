@@ -14,6 +14,10 @@ import {
 import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { domain, emailLog, organizationPlan } from "@reloop/db/schema";
 import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
+import {
+	findUndeliverableRecipient,
+	extractRecipientDomain,
+} from "@reloop/db";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
 import { createError } from "evlog";
@@ -156,6 +160,18 @@ export async function logIncomingController({
 			why: "SMTP quota is charged per envelope recipient. This message has none.",
 			fix: "Provide at least one RCPT TO address",
 		});
+	}
+
+	// Reserved documentation/testing domains (example.com, .test, .invalid,
+	// .example, .localhost) never accept mail — reject before quota, DNS, or
+	// log work so the SMTP layer can surface a permanent 550 5.1.1 error.
+	const undeliverable = findUndeliverableRecipient(toEmails);
+	if (undeliverable) {
+		const blockedDomain = extractRecipientDomain(undeliverable);
+		throw KumoMtaErrors.undeliverableRecipientDomain(
+			undeliverable,
+			blockedDomain,
+		);
 	}
 
 	// ── Plan size gate (mirrors REST send-email size-gate) ──────────────

@@ -297,6 +297,15 @@ export const MailErrors = {
 			why: `Domain ${domainName} is ${ageDays} day(s) old and limited to ${cap} emails/day for the first 30 days. Already sent ${sentToday} today, this send needs ${required} more`,
 			fix: "Send to highly engaged/verified contacts only for new domains, warm up gradually, or try again tomorrow. Limits automatically increase as the domain ages (20 → 50 → 100 → 250 → 500 → dynamic after 30 days) for all plans",
 		}),
+	undeliverableRecipientDomain: (recipient: string, domainName: string) => {
+		const detail = `Email was not sent. Recipient "${recipient}" uses "${domainName}", which never accepts mail (reserved for documentation/testing) and delivery would always fail.`;
+		return createError({
+			status: 400,
+			message: `Recipient domain "${domainName}" is not deliverable`,
+			why: detail,
+			fix: "Send to a real mailbox domain instead. Replace example.com / example.org / example.net and .test / .invalid / .example / .localhost recipients",
+		});
+	},
 };
 
 export const RateLimitErrors = {

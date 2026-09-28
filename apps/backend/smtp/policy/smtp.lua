@@ -39,6 +39,48 @@ local function add_unique(emails, seen, email)
   table.insert(emails, email)
 end
 
+-- Reserved documentation/testing domains that never accept mail (RFC 2606).
+-- Accepting these only burns quota — delivery always fails — so reject with
+-- a permanent SMTP error before any log-incoming, quota, or DKIM work.
+local BLOCKED_RECIPIENT_DOMAINS = {
+  ["example.com"] = true,
+  ["example.org"] = true,
+  ["example.net"] = true,
+  ["example.edu"] = true,
+}
+
+local BLOCKED_RECIPIENT_SUFFIXES = {
+  ".test",
+  ".invalid",
+  ".example",
+  ".localhost",
+}
+
+local function recipient_domain(email)
+  local s = string.lower(tostring(email or ""))
+  local at = s:find("@", 1, true)
+  if not at then
+    return ""
+  end
+  local d = s:sub(at + 1):gsub("^%s+", ""):gsub("%s+$", ""):gsub("[>,;%s]+$", "")
+  return d
+end
+
+local function is_undeliverable_domain(d)
+  if d == "" then
+    return false
+  end
+  if BLOCKED_RECIPIENT_DOMAINS[d] then
+    return true
+  end
+  for _, suffix in ipairs(BLOCKED_RECIPIENT_SUFFIXES) do
+    if #d >= #suffix and d:sub(-#suffix) == suffix then
+      return true
+    end
+  end
+  return false
+end
+
 -- Charge quota for envelope RCPT TO, not the visible To header.
 local function collect_send_recipients(msg)
   local seen = {}
@@ -109,6 +151,15 @@ local function apply_reloop_logic(msg, api_key, source)
     print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: No envelope recipients")
     kumo.reject(550, "5.7.1 No envelope recipients")
     return
+  end
+
+  for _, email in ipairs(to_emails) do
+    local recip_domain = recipient_domain(email)
+    if is_undeliverable_domain(recip_domain) then
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Undeliverable recipient domain " .. recip_domain .. " (" .. email .. ")")
+      kumo.reject(550, "5.1.1 Recipient domain \"" .. recip_domain .. "\" is not deliverable; delivery would always fail")
+      return
+    end
   end
 
   local message_id = msg:get_first_named_header_value('Message-ID') or ""
@@ -231,8 +282,13 @@ local function apply_reloop_logic(msg, api_key, source)
         utils.apply_tls_mode(msg, header_tls_mode)
       end
     elseif code == 400 then
-      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Invalid recipients")
-      kumo.reject(550, "5.7.1 Invalid recipients")
+      local reason = "Invalid recipients"
+      local parsed_ok, parsed = pcall(kumo.serde.json_parse, body_text)
+      if parsed_ok and type(parsed) == "table" and parsed.message and tostring(parsed.message) ~= "" then
+        reason = tostring(parsed.message)
+      end
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: " .. reason)
+      kumo.reject(550, "5.1.1 " .. reason)
       return
     elseif code == 401 then
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Invalid API key")

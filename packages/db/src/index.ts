@@ -85,5 +85,10 @@ export {
 	type WarmupAction,
 } from "./sending-ip";
 export { bareEmail, uniqueBareEmails } from "./smtp-recipients";
+export {
+	extractRecipientDomain,
+	findUndeliverableRecipient,
+	isUndeliverableRecipientDomain,
+} from "./undeliverable-recipient-domains";
 export * from "./utils/crypto";
 export * from "./webhook-events";
