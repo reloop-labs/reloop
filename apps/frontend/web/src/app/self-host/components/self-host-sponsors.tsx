@@ -31,6 +31,21 @@ export type SponsorTier = {
 
 const SPONSOR_HREF = "https://buymeacoffee.com/reloop";
 
+/** Attribution ref appended to every outbound sponsor redirect. */
+const SPONSOR_REF = "reloop.sh";
+
+/** Append ?ref=reloop.sh to a sponsor URL, preserving existing params. */
+export function withSponsorRef(href: string) {
+	try {
+		const url = new URL(href);
+		url.searchParams.set("ref", SPONSOR_REF);
+		return url.toString();
+	} catch {
+		const sep = href.includes("?") ? "&" : "?";
+		return `${href}${sep}ref=${SPONSOR_REF}`;
+	}
+}
+
 export const SPONSOR_TIERS: SponsorTier[] = [
 	{
 		id: "diamond",
@@ -138,7 +153,7 @@ function SponsorLogo({
 	if (sponsor.href) {
 		return (
 			<a
-				href={sponsor.href}
+				href={withSponsorRef(sponsor.href)}
 				target="_blank"
 				rel="noopener noreferrer"
 				className="flex flex-col items-center justify-center gap-1.5 transition-opacity hover:opacity-80"
