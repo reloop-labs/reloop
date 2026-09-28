@@ -13,6 +13,7 @@ import { SelfHostComparison } from "./components/self-host-comparison";
 import { SelfHostHero } from "./components/self-host-hero";
 import { SelfHostProviders } from "./components/self-host-providers";
 import { SelfHostRequirements } from "./components/self-host-requirements";
+import { SelfHostSponsors } from "./components/self-host-sponsors";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 export const instant = false;
@@ -76,6 +77,8 @@ export default function SelfHostPage() {
 			<JsonLd data={pageSchema} />
 			<SelfHostHero />
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<SelfHostSponsors />
+				<SectionSeparator />
 				<SelfHostRequirements />
 				<SectionSeparator />
 				<SelfHostProviders />
