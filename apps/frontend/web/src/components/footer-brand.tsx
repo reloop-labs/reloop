@@ -66,11 +66,6 @@ function ApacheMark() {
 	);
 }
 
-const SEAL_POINTS = Array.from({ length: 32 }, (_, i) => {
-	const radius = i % 2 === 0 ? 42 : 36;
-	const angle = (Math.PI * i) / 16 - Math.PI / 2;
-	return `${(44 + radius * Math.cos(angle)).toFixed(1)},${(44 + radius * Math.sin(angle)).toFixed(1)}`;
-}).join(" ");
 
 export type FooterBrandAccent =
 	| "default"
@@ -78,53 +73,6 @@ export type FooterBrandAccent =
 	| "ink"
 	| "orange"
 	| "rose";
-
-const accentSealText: Record<FooterBrandAccent, string> = {
-	default: "text-primary-base",
-	emerald: "text-[#047857] dark:text-[#6ee7b7]",
-	ink: "text-[#24292f] dark:text-white",
-	orange: "text-orange-600 dark:text-orange-400",
-	rose: "text-[#e11d48] dark:text-[#fda4af]",
-};
-
-function OpenSourceSeal({ accent }: { accent: FooterBrandAccent }) {
-	return (
-		<div className="relative flex size-[92px] items-center justify-center">
-			<svg
-				viewBox="0 0 88 88"
-				className="absolute inset-0 size-full"
-				aria-hidden
-			>
-				<polygon
-					points={SEAL_POINTS}
-					className="fill-bg-white-0 stroke-stroke-sub-300 dark:fill-black dark:stroke-white/15"
-					strokeWidth="1"
-				/>
-				<circle
-					cx="44"
-					cy="44"
-					r="31"
-					className="stroke-stroke-sub-300 dark:stroke-white/15"
-					fill="none"
-					strokeWidth=".8"
-				/>
-			</svg>
-			<div className="relative flex flex-col items-center leading-none">
-				<span
-					className={cn(
-						"font-semibold text-[11px] tracking-[0.16em]",
-						accentSealText[accent],
-					)}
-				>
-					OPEN
-				</span>
-				<span className="mt-1 text-[10px] text-text-sub-600 dark:text-white/50">
-					SOURCE
-				</span>
-			</div>
-		</div>
-	);
-}
 
 function BrandCell({
 	href,
@@ -191,20 +139,23 @@ export function FooterBrand({
 			</div>
 
 			<div className="grid grid-cols-2">
-				<Link
-					href="/why-open-source"
-					className="flex flex-col justify-between gap-4 border-stroke-soft-100 border-r border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
+				<a
+					href="https://vercel.com/open-source-program"
+					target="_blank"
+					rel="noreferrer"
+					className="flex flex-col justify-start gap-2.5 border-stroke-soft-100 border-r border-b px-5 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 dark:border-white/10 dark:hover:bg-white/[0.03]"
 				>
-					<p className="inline-flex items-center gap-1.5 text-[13px] text-text-sub-600 dark:text-white/45">
-						Trust
-						<Icon
-							name="shield-check"
-							className="size-3.5 opacity-50"
-							fill="none"
-						/>
+					<p className="text-[13px] text-text-sub-600 dark:text-white/45">
+						Backed by
 					</p>
-					<OpenSourceSeal accent={accent} />
-				</Link>
+					<span className="inline-flex items-center">
+						<img
+							alt="Vercel OSS Program"
+							src="https://vercel.com/oss/program-badge-2026.svg"
+							className="h-6 w-auto max-w-full [color-scheme:light] dark:[color-scheme:dark]"
+						/>
+					</span>
+				</a>
 
 				<Link
 					href="/license"
