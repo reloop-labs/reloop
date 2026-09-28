@@ -135,4 +135,10 @@ Reloop is licensed under the [Apache License 2.0 with additional Reloop Labs use
 
 Built by [Reloop Labs](https://reloop.sh) · Give us a ⭐ if Reloop saves you from vendor lock-in.
 
+<br />
+<br />
+<a href="https://vercel.com/open-source-program">
+  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge-2026.svg" />
+</a>
+
 </div>
