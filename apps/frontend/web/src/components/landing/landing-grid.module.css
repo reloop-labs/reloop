@@ -3,16 +3,16 @@
 	--landing-ink: #09090b;
 	--landing-muted: #52525b;
 	--landing-cell: #ffffff;
-	--landing-seam: rgb(9 9 11 / 6%);
+	--landing-seam: rgb(9 9 11 / 8%);
 	color: var(--landing-ink);
 }
 
 [class~="dark"] .surface {
-	--landing-base: #09090b;
+	--landing-base: #000000;
 	--landing-ink: #fafafa;
 	--landing-muted: #a1a1aa;
-	--landing-cell: #101013;
-	--landing-seam: rgb(250 250 250 / 12%);
+	--landing-cell: #000000;
+	--landing-seam: rgb(250 250 250 / 10%);
 }
 
 .hero {
@@ -28,25 +28,58 @@
 	background: var(--landing-base);
 }
 
-.frame {
-	position: relative;
-	width: calc(100% - 48px);
-	max-width: 1104px;
-	margin-inline: auto;
+.gridViewport {
+	--grid-cell-size: min(110.4px, calc((100vw - 48px) / 10));
+	display: grid;
+	grid-template-columns: minmax(24px, 1fr) minmax(0, 1104px) minmax(24px, 1fr);
+	width: 100%;
 }
 
-/* The exposed base between translucent cells forms the seams and intersections. */
+.frame {
+	position: relative;
+	grid-column: 2;
+	width: 100%;
+}
+
+/* The exposed base between translucent cells forms the seams and intersections.
+	Container padding plus child padding stack to a uniform 1px on every
+	outer edge, matching the 1px interior gaps exactly. */
 .grid {
 	background: var(--landing-seam);
 	position: relative;
 	display: grid;
+	padding: 0.5px;
 }
 
-.grid > :not(.texture) {
+.grid > * {
 	padding: 0.5px;
 }
 
 .grid [data-grid-content] {
+	height: 100%;
+	border-radius: 4px;
+	background: var(--landing-cell);
+}
+
+/* The wide cells outside the 1104px content frame are part of the same
+   grid. Their row boundaries line up with the top band, hero body, and
+   bottom band, so every outer edge ends in a four-way intersection. */
+.outerColumn {
+	display: grid;
+	grid-template-rows: var(--grid-cell-size) minmax(0, 1fr) var(--grid-cell-size);
+	gap: 1px;
+	background: var(--landing-seam);
+}
+
+.outerColumn:first-child {
+	grid-column: 1;
+}
+
+.outerColumn:last-child {
+	grid-column: 3;
+}
+
+.outerColumn [data-grid-content] {
 	height: 100%;
 	border-radius: 4px;
 	background: var(--landing-cell);
@@ -163,63 +196,39 @@
 	outline-offset: 1px;
 }
 
-/* Public Tailark reference texture, mirrored and faded as in the reference. */
-.texture {
-	pointer-events: none;
-	position: absolute;
-	inset: 0;
-	z-index: 0;
-	isolation: isolate;
-	filter: grayscale(1) brightness(1) contrast(120);
-	opacity: 0.4;
-	mask-image:
-		linear-gradient(to left, black 65%, transparent 95%),
-		linear-gradient(to right, black 65%, transparent 95%),
-		linear-gradient(to bottom, black 75%, transparent),
-		linear-gradient(to top, black 75%, transparent);
-	mask-composite: intersect;
-}
-.texture::before {
-	content: "";
-	display: block;
-	width: 100%;
-	height: 100%;
-	background: url("/landing/hero-grid-texture.webp") center / cover;
-	transform: scaleX(-1);
-	filter: brightness(0.75) contrast(0.35);
-}
-.texture::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAu0lEQVQ4T6WSMQqFMBBEE2wDXiVgG8gtglilCuIpcoogVqlEPIVgK3gVIa2Qzw9YbIpttlqGgbcMM5wxlr33LMbI/nccx3I/PQwD0LXPj+OgAaSUBWCtLZ+2bSv308uyAF37/HkeGkAIASL0fQ8yT9MEdO3z67poAKUUiDDPM8i87zvQtc/f96UBmqZBazTG4Ds4z5MG6LoOrTGEgO8gpUQDtG2L1uicw3dw3zcNoLVGa1zXFd9BzpkE+AFp94/4eKx9+AAAAABJRU5ErkJggg==");
-	background-size: 8px 8px;
-	mix-blend-mode: screen;
-}
-
-[class~="dark"] .texture {
-	opacity: 0.18;
-}
-
-[class~="dark"] .texture::before {
-	filter: invert(1) contrast(0.5) brightness(0.7);
-}
-
 .header {
 	background: var(--landing-base);
 	border-top: 1px solid var(--landing-seam);
-	border-bottom: 1px solid var(--landing-seam);
+}
+
+.headerGrid {
+	display: grid;
+	grid-template-columns:
+		minmax(24px, 1fr) 1px minmax(0, 1102px) 1px
+		minmax(24px, 1fr);
+	padding-bottom: 1px;
+	background: var(--landing-seam);
+}
+
+.headerOuterCell {
+	border-radius: 4px;
+	background: var(--landing-cell);
+}
+
+.headerOuterCell:first-child {
+	grid-column: 1;
+}
+
+.headerOuterCell:last-child {
+	grid-column: 5;
 }
 
 .headerFrame {
-	max-width: 1104px;
-	width: calc(100% - 48px);
-	margin-inline: auto;
+	grid-column: 3;
+	width: 100%;
 	padding: 0;
 	border: 0;
-	border-left: 1px solid var(--landing-seam);
-	border-right: 1px solid var(--landing-seam);
+	border-radius: 4px;
 	background: var(--landing-cell);
 }
 
@@ -230,8 +239,6 @@
 	height: 72px;
 	padding-inline: 48px;
 	gap: 16px;
-	border-radius: 0;
-	background: var(--landing-cell);
 }
 
 .brandAndNav {
@@ -277,7 +284,16 @@
 	.header .mobilePanel {
 		display: block;
 	}
+	.headerGrid {
+		grid-template-columns: 24px 1px minmax(0, 1fr) 1px 24px;
+	}
 	.side {
+		display: none;
+	}
+	.gridViewport {
+		grid-template-columns: 24px minmax(0, 1fr) 24px;
+	}
+	.outerColumn {
 		display: none;
 	}
 	.center {
@@ -285,9 +301,6 @@
 	}
 	.copy {
 		padding-inline: 24px;
-	}
-	.texture {
-		opacity: 0.2;
 	}
 }
 
@@ -301,34 +314,21 @@
 }
 
 @media (max-width: 479px) {
-	.frame,
-	.headerFrame {
-		width: calc(100% - 16px);
+	.headerGrid {
+		grid-template-columns: 8px 1px minmax(0, 1fr) 1px 8px;
+	}
+	.gridViewport {
+		grid-template-columns: 8px minmax(0, 1fr) 8px;
 	}
 	.headerRow {
 		padding-inline: 16px;
 	}
 	.copy {
-		padding-inline: 20px;
-	}
-	.title {
-		font-size: 40px;
-		line-height: 1.05;
-	}
-	.description {
-		font-size: 16px;
-		line-height: 26px;
-	}
-	.band {
-		grid-template-columns: repeat(5, minmax(0, 1fr));
-	}
-	.band > div:nth-child(n + 6) {
-		display: none;
+		padding-inline: 0;
 	}
 	.note {
-		max-width: 230px;
+		max-width: none;
 		margin-inline: auto;
-		text-wrap: balance;
 	}
 	.primary {
 		min-height: 44px;

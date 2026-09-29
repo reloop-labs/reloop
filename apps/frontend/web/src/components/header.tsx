@@ -2433,611 +2433,621 @@ export const Header = () => {
 			}}
 			onMouseLeave={() => openMega(null)}
 		>
-			<div
-				ref={frameRef}
-				className={cn(
-					"relative mx-auto w-full",
-					isLanding
-						? landing.headerFrame
-						: "max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10",
-				)}
-			>
+			<div className={isLanding ? landing.headerGrid : "contents"}>
+				{isLanding ? (
+					<div aria-hidden="true" className={landing.headerOuterCell} />
+				) : null}
 				<div
+					ref={frameRef}
 					className={cn(
-						"relative flex h-16 items-center justify-between gap-4",
-						isLanding && landing.headerRow,
+						"relative mx-auto w-full",
+						isLanding
+							? landing.headerFrame
+							: "max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10",
 					)}
 				>
-					{/* Left: brand + main nav */}
 					<div
 						className={cn(
-							"flex items-center gap-6",
-							isLanding && landing.brandAndNav,
+							"relative flex h-16 items-center justify-between gap-4",
+							isLanding && landing.headerRow,
 						)}
 					>
-						<Link
-							href="/home"
-							className="relative z-10 flex shrink-0 items-center gap-2.5"
-							aria-label="Reloop home"
-						>
-							<Logo className="-ml-3 size-11 text-text-strong-950 dark:text-white" />
-							<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
-								Reloop
-							</span>
-						</Link>
-
-						{/* Main nav + sliding active pill */}
-						<nav
-							ref={navRef}
-							aria-label="Main navigation"
+						{/* Left: brand + main nav */}
+						<div
 							className={cn(
-								"relative hidden items-center gap-1 lg:flex",
-								isLanding && landing.nav,
+								"flex items-center gap-6",
+								isLanding && landing.brandAndNav,
 							)}
 						>
-							{/* Pill: on-screen morph → short spring, zero bounce (crisp) */}
-							<motion.div
-								aria-hidden
-								className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-bg-weak-50 dark:bg-white/[0.08]"
-								initial={false}
-								animate={{
-									left: navPill.left,
-									width: navPill.width,
-									opacity: shouldReduceMotion
-										? navPill.opacity
-											? 1
-											: 0
-										: navPill.opacity,
-								}}
-								transition={
-									shouldReduceMotion
-										? { duration: 0 }
-										: { type: "spring", bounce: 0, duration: 0.28 }
-								}
-							/>
-							{navItems.map((item) => (
-								<div
-									key={item.title}
-									ref={(el) => {
-										tabRefs.current[item.title] = el;
-									}}
-									className="relative z-10"
-									onMouseEnter={() => openMega(item.title)}
-								>
-									{item.mega ? (
-										<button
-											type="button"
-											aria-expanded={activeMega === item.title}
-											aria-controls={
-												activeMega === item.title
-													? "desktop-navigation-panel"
-													: undefined
-											}
-											onClick={() =>
-												openMega(activeMega === item.title ? null : item.title)
-											}
-											onKeyDown={(event) => {
-												if (event.key === "ArrowDown") {
-													event.preventDefault();
-													openMega(item.title);
-												}
-											}}
-											className={`inline-flex cursor-default items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
-												activeMega === item.title
-													? "text-text-strong-950 dark:text-white"
-													: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-											}`}
-										>
-											{item.title}
-											<Icon
-												name="chevron-down"
-												className={`size-3 transition-transform duration-200 ${
-													activeMega === item.title
-														? "rotate-180"
-														: "opacity-50"
-												}`}
-											/>
-										</button>
-									) : (
-										<Link
-											href={item.href}
-											className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
-												activeMega === item.title
-													? "text-text-strong-950 dark:text-white"
-													: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-											}`}
-										>
-											{item.title}
-										</Link>
-									)}
-								</div>
-							))}
+							<Link
+								href="/home"
+								className="relative z-10 flex shrink-0 items-center gap-2.5"
+								aria-label="Reloop home"
+							>
+								<Logo className="-ml-3 size-11 text-text-strong-950 dark:text-white" />
+								<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
+									Reloop
+								</span>
+							</Link>
 
-							{/*
+							{/* Main nav + sliding active pill */}
+							<nav
+								ref={navRef}
+								aria-label="Main navigation"
+								className={cn(
+									"relative hidden items-center gap-1 lg:flex",
+									isLanding && landing.nav,
+								)}
+							>
+								{/* Pill: on-screen morph → short spring, zero bounce (crisp) */}
+								<motion.div
+									aria-hidden
+									className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-bg-weak-50 dark:bg-white/[0.08]"
+									initial={false}
+									animate={{
+										left: navPill.left,
+										width: navPill.width,
+										opacity: shouldReduceMotion
+											? navPill.opacity
+												? 1
+												: 0
+											: navPill.opacity,
+									}}
+									transition={
+										shouldReduceMotion
+											? { duration: 0 }
+											: { type: "spring", bounce: 0, duration: 0.28 }
+									}
+								/>
+								{navItems.map((item) => (
+									<div
+										key={item.title}
+										ref={(el) => {
+											tabRefs.current[item.title] = el;
+										}}
+										className="relative z-10"
+										onMouseEnter={() => openMega(item.title)}
+									>
+										{item.mega ? (
+											<button
+												type="button"
+												aria-expanded={activeMega === item.title}
+												aria-controls={
+													activeMega === item.title
+														? "desktop-navigation-panel"
+														: undefined
+												}
+												onClick={() =>
+													openMega(
+														activeMega === item.title ? null : item.title,
+													)
+												}
+												onKeyDown={(event) => {
+													if (event.key === "ArrowDown") {
+														event.preventDefault();
+														openMega(item.title);
+													}
+												}}
+												className={`inline-flex cursor-default items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+													activeMega === item.title
+														? "text-text-strong-950 dark:text-white"
+														: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+												}`}
+											>
+												{item.title}
+												<Icon
+													name="chevron-down"
+													className={`size-3 transition-transform duration-200 ${
+														activeMega === item.title
+															? "rotate-180"
+															: "opacity-50"
+													}`}
+												/>
+											</button>
+										) : (
+											<Link
+												href={item.href}
+												className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+													activeMega === item.title
+														? "text-text-strong-950 dark:text-white"
+														: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+												}`}
+											>
+												{item.title}
+											</Link>
+										)}
+									</div>
+								))}
+
+								{/*
 							  Mega menu motion:
 							  - Open/close: fade + slight drop from top (Tailark feel),
 							    same 0.2s timing as before
 							  - Tab switch: height spring on shell; directional
 							    left/right content slides (unchanged)
 							*/}
-							<AnimatePresence>
-								{activeMega && activeItem?.mega && (
-									<motion.div
-										key="mega-shell"
+								<AnimatePresence>
+									{activeMega && activeItem?.mega && (
+										<motion.div
+											key="mega-shell"
+											initial={
+												shouldReduceMotion
+													? { opacity: 0 }
+													: { opacity: 0, scale: 0.98, y: -10 }
+											}
+											animate={
+												shouldReduceMotion
+													? { opacity: 1 }
+													: { opacity: 1, scale: 1, y: 0 }
+											}
+											exit={
+												shouldReduceMotion
+													? { opacity: 0 }
+													: { opacity: 0, scale: 0.98, y: -10 }
+											}
+											transition={
+												shouldReduceMotion
+													? { duration: 0 }
+													: { duration: 0.2, ease: EASE_DEFAULT }
+											}
+											style={{
+												left: megaLeft,
+												top: isLanding ? "calc(100% + 18px)" : undefined,
+											}}
+											className="absolute top-full z-50 hidden origin-top-left pt-2 lg:block"
+										>
+											{/* Hover bridge so the gap between bar and card doesn't close the menu */}
+											<div
+												className="-top-2 absolute inset-x-0 h-2"
+												aria-hidden
+											/>
+											<section
+												className={cn(
+													"overflow-hidden border border-stroke-soft-200/90 bg-bg-white-0 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]",
+													isLanding ? "rounded-[24px]" : "rounded-[20px]",
+												)}
+												id="desktop-navigation-panel"
+												aria-label={`${activeItem.title} menu`}
+											>
+												{/* Panel shell: width springs per menu; height morphs with content */}
+												<motion.div
+													initial={false}
+													animate={{
+														width: targetMegaWidth,
+														height:
+															shouldReduceMotion || megaHeight === "auto"
+																? "auto"
+																: megaHeight,
+													}}
+													transition={
+														shouldReduceMotion
+															? { duration: 0 }
+															: {
+																	type: "spring",
+																	bounce: 0,
+																	duration: 0.32,
+																}
+													}
+													style={{
+														overflow: "hidden",
+														maxWidth: "calc(100vw - 2rem)",
+														maxHeight: "calc(100dvh - 100px)",
+														overflowY: "auto",
+													}}
+												>
+													<div
+														ref={megaContentRef}
+														className="relative"
+														style={{ width: targetMegaWidth }}
+													>
+														<AnimatePresence
+															initial={false}
+															custom={megaDirection}
+															mode="popLayout"
+														>
+															<motion.div
+																key={activeMega}
+																custom={megaDirection}
+																variants={megaContentVariants}
+																initial={shouldReduceMotion ? false : "enter"}
+																animate="center"
+																exit={shouldReduceMotion ? undefined : "exit"}
+																transition={
+																	shouldReduceMotion
+																		? { duration: 0 }
+																		: {
+																				duration: MEGA_SLIDE_MS,
+																				ease: EASE_DEFAULT,
+																			}
+																}
+																// Keep full width while popLayout takes the exiting panel out of flow
+																className="w-full"
+															>
+																{isLanding ? (
+																	<TailarkMegaPanel item={activeItem} />
+																) : (
+																	<MegaPanel item={activeItem} />
+																)}
+															</motion.div>
+														</AnimatePresence>
+													</div>
+												</motion.div>
+											</section>
+										</motion.div>
+									)}
+								</AnimatePresence>
+							</nav>
+						</div>
+
+						{/* Right: actions */}
+						<div
+							className={cn(
+								"relative z-10 hidden items-center gap-3 lg:flex",
+								isLanding && landing.actions,
+							)}
+						>
+							<ThemeToggle />
+							<a
+								href="https://github.com/reloop-labs/reloop"
+								target="_blank"
+								rel="noreferrer"
+								className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-1 py-2 font-medium text-[13px] text-text-strong-950 transition-opacity hover:opacity-70 dark:text-white"
+							>
+								<Icon name="social-github" className="size-3.5" />
+								<span>{stars}</span>
+							</a>
+
+							{mounted && session ? (
+								<FancyButton.Root
+									asChild
+									variant="primary"
+									size="xsmall"
+									className="px-3.5! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
+								>
+									<a href="/dashboard">Dashboard</a>
+								</FancyButton.Root>
+							) : (
+								<FancyButton.Root
+									asChild
+									variant="primary"
+									size="xsmall"
+									className="px-3.5! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
+								>
+									<a href="/dashboard/signup">Get Started</a>
+								</FancyButton.Root>
+							)}
+						</div>
+
+						<button
+							type="button"
+							className={cn(
+								"inline-flex size-10 items-center justify-center rounded-lg text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] lg:hidden dark:text-white dark:hover:bg-white/[0.06]",
+								isLanding && landing.mobileToggle,
+							)}
+							onClick={toggleMobileMenu}
+							aria-expanded={mobileMenuOpen}
+							aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+						>
+							<span className="relative flex size-5 items-center justify-center">
+								<AnimatePresence initial={false}>
+									<motion.span
+										key={mobileMenuOpen ? "close" : "open"}
 										initial={
 											shouldReduceMotion
-												? { opacity: 0 }
-												: { opacity: 0, scale: 0.98, y: -10 }
+												? false
+												: { opacity: 0, rotate: -90, scale: 0.75 }
 										}
-										animate={
-											shouldReduceMotion
-												? { opacity: 1 }
-												: { opacity: 1, scale: 1, y: 0 }
-										}
+										animate={{ opacity: 1, rotate: 0, scale: 1 }}
 										exit={
 											shouldReduceMotion
-												? { opacity: 0 }
-												: { opacity: 0, scale: 0.98, y: -10 }
+												? undefined
+												: { opacity: 0, rotate: 90, scale: 0.75 }
 										}
 										transition={
 											shouldReduceMotion
 												? { duration: 0 }
 												: { duration: 0.2, ease: EASE_DEFAULT }
 										}
-										style={{
-											left: megaLeft,
-											top: isLanding ? "calc(100% + 18px)" : undefined,
-										}}
-										className="absolute top-full z-50 hidden origin-top-left pt-2 lg:block"
+										className="absolute inset-0 flex items-center justify-center"
 									>
-										{/* Hover bridge so the gap between bar and card doesn't close the menu */}
-										<div
-											className="-top-2 absolute inset-x-0 h-2"
-											aria-hidden
+										<Icon
+											name={mobileMenuOpen ? "cross" : "menu"}
+											className="size-5"
 										/>
-										<section
-											className={cn(
-												"overflow-hidden border border-stroke-soft-200/90 bg-bg-white-0 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]",
-												isLanding ? "rounded-[24px]" : "rounded-[20px]",
-											)}
-											id="desktop-navigation-panel"
-											aria-label={`${activeItem.title} menu`}
-										>
-											{/* Panel shell: width springs per menu; height morphs with content */}
-											<motion.div
-												initial={false}
-												animate={{
-													width: targetMegaWidth,
-													height:
-														shouldReduceMotion || megaHeight === "auto"
-															? "auto"
-															: megaHeight,
-												}}
-												transition={
-													shouldReduceMotion
-														? { duration: 0 }
-														: {
-																type: "spring",
-																bounce: 0,
-																duration: 0.32,
-															}
-												}
-												style={{
-													overflow: "hidden",
-													maxWidth: "calc(100vw - 2rem)",
-													maxHeight: "calc(100dvh - 100px)",
-													overflowY: "auto",
-												}}
-											>
-												<div
-													ref={megaContentRef}
-													className="relative"
-													style={{ width: targetMegaWidth }}
-												>
-													<AnimatePresence
-														initial={false}
-														custom={megaDirection}
-														mode="popLayout"
-													>
-														<motion.div
-															key={activeMega}
-															custom={megaDirection}
-															variants={megaContentVariants}
-															initial={shouldReduceMotion ? false : "enter"}
-															animate="center"
-															exit={shouldReduceMotion ? undefined : "exit"}
-															transition={
-																shouldReduceMotion
-																	? { duration: 0 }
-																	: {
-																			duration: MEGA_SLIDE_MS,
-																			ease: EASE_DEFAULT,
-																		}
-															}
-															// Keep full width while popLayout takes the exiting panel out of flow
-															className="w-full"
-														>
-															{isLanding ? (
-																<TailarkMegaPanel item={activeItem} />
-															) : (
-																<MegaPanel item={activeItem} />
-															)}
-														</motion.div>
-													</AnimatePresence>
-												</div>
-											</motion.div>
-										</section>
-									</motion.div>
+									</motion.span>
+								</AnimatePresence>
+							</span>
+						</button>
+					</div>
+
+					<AnimatePresence>
+						{mobileMenuOpen && (
+							<motion.div
+								initial={
+									shouldReduceMotion
+										? false
+										: { opacity: 0, clipPath: "inset(0 0 100% 0)" }
+								}
+								animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
+								exit={
+									shouldReduceMotion
+										? { opacity: 0 }
+										: { opacity: 0, clipPath: "inset(0 0 100% 0)" }
+								}
+								transition={
+									shouldReduceMotion
+										? { duration: 0 }
+										: { duration: 0.35, ease: [0.32, 0.72, 0, 1] }
+								}
+								className={cn(
+									"overflow-hidden border-stroke-soft-100 border-t lg:hidden dark:border-white/10",
+									isLanding && landing.mobilePanel,
 								)}
-							</AnimatePresence>
-						</nav>
-					</div>
-
-					{/* Right: actions */}
-					<div
-						className={cn(
-							"relative z-10 hidden items-center gap-3 lg:flex",
-							isLanding && landing.actions,
-						)}
-					>
-						<ThemeToggle />
-						<a
-							href="https://github.com/reloop-labs/reloop"
-							target="_blank"
-							rel="noreferrer"
-							className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-1 py-2 font-medium text-[13px] text-text-strong-950 transition-opacity hover:opacity-70 dark:text-white"
-						>
-							<Icon name="social-github" className="size-3.5" />
-							<span>{stars}</span>
-						</a>
-
-						{mounted && session ? (
-							<FancyButton.Root
-								asChild
-								variant="primary"
-								size="xsmall"
-								className="px-3.5! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 							>
-								<a href="/dashboard">Dashboard</a>
-							</FancyButton.Root>
-						) : (
-							<FancyButton.Root
-								asChild
-								variant="primary"
-								size="xsmall"
-								className="px-3.5! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
-							>
-								<a href="/dashboard/signup">Get Started</a>
-							</FancyButton.Root>
-						)}
-					</div>
-
-					<button
-						type="button"
-						className={cn(
-							"inline-flex size-10 items-center justify-center rounded-lg text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] lg:hidden dark:text-white dark:hover:bg-white/[0.06]",
-							isLanding && landing.mobileToggle,
-						)}
-						onClick={toggleMobileMenu}
-						aria-expanded={mobileMenuOpen}
-						aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-					>
-						<span className="relative flex size-5 items-center justify-center">
-							<AnimatePresence initial={false}>
-								<motion.span
-									key={mobileMenuOpen ? "close" : "open"}
-									initial={
-										shouldReduceMotion
-											? false
-											: { opacity: 0, rotate: -90, scale: 0.75 }
-									}
-									animate={{ opacity: 1, rotate: 0, scale: 1 }}
-									exit={
-										shouldReduceMotion
-											? undefined
-											: { opacity: 0, rotate: 90, scale: 0.75 }
-									}
-									transition={
-										shouldReduceMotion
-											? { duration: 0 }
-											: { duration: 0.2, ease: EASE_DEFAULT }
-									}
-									className="absolute inset-0 flex items-center justify-center"
-								>
-									<Icon
-										name={mobileMenuOpen ? "cross" : "menu"}
-										className="size-5"
-									/>
-								</motion.span>
-							</AnimatePresence>
-						</span>
-					</button>
-				</div>
-
-				<AnimatePresence>
-					{mobileMenuOpen && (
-						<motion.div
-							initial={
-								shouldReduceMotion
-									? false
-									: { opacity: 0, clipPath: "inset(0 0 100% 0)" }
-							}
-							animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
-							exit={
-								shouldReduceMotion
-									? { opacity: 0 }
-									: { opacity: 0, clipPath: "inset(0 0 100% 0)" }
-							}
-							transition={
-								shouldReduceMotion
-									? { duration: 0 }
-									: { duration: 0.35, ease: [0.32, 0.72, 0, 1] }
-							}
-							className={cn(
-								"overflow-hidden border-stroke-soft-100 border-t lg:hidden dark:border-white/10",
-								isLanding && landing.mobilePanel,
-							)}
-						>
-							<div className="max-h-[calc(100dvh-4rem)] overflow-y-auto py-4">
-								<nav className="flex flex-col gap-1">
-									{navItems.map((item) =>
-										item.mega ? (
-											<div key={item.title}>
-												<button
-													type="button"
-													className="flex w-full items-center justify-between rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
-													onClick={() =>
-														setExpandedMobile((current) =>
-															current === item.title ? null : item.title,
-														)
-													}
-													aria-expanded={expandedMobile === item.title}
-												>
-													{item.title}
-													<Icon
-														name="chevron-down"
-														className={`size-4 transition-transform duration-200 ${
-															expandedMobile === item.title
-																? "rotate-180"
-																: "opacity-50"
-														}`}
-													/>
-												</button>
-												<AnimatePresence initial={false}>
-													{expandedMobile === item.title && (
-														<motion.div
-															initial={{ height: 0, opacity: 0 }}
-															animate={{ height: "auto", opacity: 1 }}
-															exit={{ height: 0, opacity: 0 }}
-															transition={{
-																duration: 0.2,
-																ease: [0.23, 1, 0.32, 1],
-															}}
-															className="overflow-hidden"
-														>
-															<div className="space-y-6 pb-4 pl-1">
-																{item.mega.categories.map(
-																	(category, categoryIndex) => (
-																		<div
-																			key={
-																				category.title ||
-																				category.lead?.title ||
-																				`mcol-${categoryIndex}`
-																			}
-																			className="space-y-2"
-																		>
-																			{category.title ? (
-																				<div className="mb-2 flex items-center justify-between gap-2 px-2">
-																					<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
-																						{category.title}
-																					</p>
-																					{category.viewAllHref ? (
+								<div className="max-h-[calc(100dvh-4rem)] overflow-y-auto py-4">
+									<nav className="flex flex-col gap-1">
+										{navItems.map((item) =>
+											item.mega ? (
+												<div key={item.title}>
+													<button
+														type="button"
+														className="flex w-full items-center justify-between rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
+														onClick={() =>
+															setExpandedMobile((current) =>
+																current === item.title ? null : item.title,
+															)
+														}
+														aria-expanded={expandedMobile === item.title}
+													>
+														{item.title}
+														<Icon
+															name="chevron-down"
+															className={`size-4 transition-transform duration-200 ${
+																expandedMobile === item.title
+																	? "rotate-180"
+																	: "opacity-50"
+															}`}
+														/>
+													</button>
+													<AnimatePresence initial={false}>
+														{expandedMobile === item.title && (
+															<motion.div
+																initial={{ height: 0, opacity: 0 }}
+																animate={{ height: "auto", opacity: 1 }}
+																exit={{ height: 0, opacity: 0 }}
+																transition={{
+																	duration: 0.2,
+																	ease: [0.23, 1, 0.32, 1],
+																}}
+																className="overflow-hidden"
+															>
+																<div className="space-y-6 pb-4 pl-1">
+																	{item.mega.categories.map(
+																		(category, categoryIndex) => (
+																			<div
+																				key={
+																					category.title ||
+																					category.lead?.title ||
+																					`mcol-${categoryIndex}`
+																				}
+																				className="space-y-2"
+																			>
+																				{category.title ? (
+																					<div className="mb-2 flex items-center justify-between gap-2 px-2">
+																						<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
+																							{category.title}
+																						</p>
+																						{category.viewAllHref ? (
+																							<a
+																								href={category.viewAllHref}
+																								onClick={closeMobileMenu}
+																								className="font-medium text-[12px] text-text-sub-600 dark:text-white/45"
+																							>
+																								View all
+																							</a>
+																						) : null}
+																					</div>
+																				) : null}
+																				{category.lead && (
+																					<div className="min-h-[112px] px-1">
 																						<a
-																							href={category.viewAllHref}
+																							href={category.lead.href}
 																							onClick={closeMobileMenu}
-																							className="font-medium text-[12px] text-text-sub-600 dark:text-white/45"
+																							className="group flex h-full min-h-[112px] flex-col justify-between px-1.5 py-2 transition-opacity hover:opacity-70"
 																						>
-																							View all
-																						</a>
-																					) : null}
-																				</div>
-																			) : null}
-																			{category.lead && (
-																				<div className="min-h-[112px] px-1">
-																					<a
-																						href={category.lead.href}
-																						onClick={closeMobileMenu}
-																						className="group flex h-full min-h-[112px] flex-col justify-between px-1.5 py-2 transition-opacity hover:opacity-70"
-																					>
-																						<NavGlyph
-																							link={category.lead}
-																							featured
-																						/>
-																						<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
-																							{category.lead.title}
-																						</span>
-																					</a>
-																				</div>
-																			)}
-																			<div className="flex flex-col gap-0.5">
-																				{category.links.map((link) => {
-																					const external = isExternalHref(
-																						link.href,
-																						link.external,
-																					);
-																					const crossDomain = isCrossDomain(
-																						link.href,
-																					);
-																					const className =
-																						category.simple ||
-																						category.featured ||
-																						category.compact ||
-																						category.divided
-																							? "flex items-center gap-2.5 rounded-xl px-2 py-2 transition-opacity hover:opacity-70"
-																							: "flex items-start gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-neutral-950/[0.04] dark:hover:bg-white/[0.05]";
-																					const body = (
-																						<>
 																							<NavGlyph
-																								link={link}
-																								featured={category.featured}
-																								plain={
-																									category.simple ||
-																									category.featured ||
-																									category.compact ||
-																									category.divided
-																								}
+																								link={category.lead}
+																								featured
 																							/>
-																							<span className="min-w-0">
-																								<span className="flex items-center gap-1 font-medium text-[14px] text-text-strong-950 dark:text-white">
-																									{link.title}
-																									{external &&
-																										!category.simple &&
-																										!category.compact && (
-																											<span className="text-[11px] text-text-sub-600 dark:text-white/45">
-																												↗
+																							<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+																								{category.lead.title}
+																							</span>
+																						</a>
+																					</div>
+																				)}
+																				<div className="flex flex-col gap-0.5">
+																					{category.links.map((link) => {
+																						const external = isExternalHref(
+																							link.href,
+																							link.external,
+																						);
+																						const crossDomain = isCrossDomain(
+																							link.href,
+																						);
+																						const className =
+																							category.simple ||
+																							category.featured ||
+																							category.compact ||
+																							category.divided
+																								? "flex items-center gap-2.5 rounded-xl px-2 py-2 transition-opacity hover:opacity-70"
+																								: "flex items-start gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-neutral-950/[0.04] dark:hover:bg-white/[0.05]";
+																						const body = (
+																							<>
+																								<NavGlyph
+																									link={link}
+																									featured={category.featured}
+																									plain={
+																										category.simple ||
+																										category.featured ||
+																										category.compact ||
+																										category.divided
+																									}
+																								/>
+																								<span className="min-w-0">
+																									<span className="flex items-center gap-1 font-medium text-[14px] text-text-strong-950 dark:text-white">
+																										{link.title}
+																										{external &&
+																											!category.simple &&
+																											!category.compact && (
+																												<span className="text-[11px] text-text-sub-600 dark:text-white/45">
+																													↗
+																												</span>
+																											)}
+																									</span>
+																									{!category.simple &&
+																										link.description && (
+																											<span className="mt-0.5 block text-[13px] text-text-sub-600 leading-snug dark:text-white/45">
+																												{link.description}
 																											</span>
 																										)}
 																								</span>
-																								{!category.simple &&
-																									link.description && (
-																										<span className="mt-0.5 block text-[13px] text-text-sub-600 leading-snug dark:text-white/45">
-																											{link.description}
-																										</span>
-																									)}
-																							</span>
-																						</>
-																					);
+																							</>
+																						);
 
-																					if (crossDomain || external) {
+																						if (crossDomain || external) {
+																							return (
+																								<a
+																									key={link.title}
+																									href={link.href}
+																									onClick={closeMobileMenu}
+																									className={className}
+																									{...(external
+																										? {
+																												target: "_blank",
+																												rel: "noreferrer",
+																											}
+																										: {})}
+																								>
+																									{body}
+																								</a>
+																							);
+																						}
+
 																						return (
-																							<a
+																							<Link
 																								key={link.title}
 																								href={link.href}
 																								onClick={closeMobileMenu}
 																								className={className}
-																								{...(external
-																									? {
-																											target: "_blank",
-																											rel: "noreferrer",
-																										}
-																									: {})}
 																							>
 																								{body}
-																							</a>
+																							</Link>
 																						);
-																					}
-
-																					return (
-																						<Link
-																							key={link.title}
-																							href={link.href}
-																							onClick={closeMobileMenu}
-																							className={className}
-																						>
-																							{body}
-																						</Link>
-																					);
-																				})}
+																					})}
+																				</div>
 																			</div>
+																		),
+																	)}
+																	{item.mega.social?.length ? (
+																		<div className="flex items-center gap-1.5 px-2 pt-1">
+																			{item.mega.social.map((link) => (
+																				<a
+																					key={link.title}
+																					href={link.href}
+																					onClick={closeMobileMenu}
+																					target="_blank"
+																					rel="noreferrer"
+																					title={link.title}
+																					aria-label={link.title}
+																					className="inline-flex size-9 items-center justify-center rounded-lg border border-stroke-soft-200/80 bg-bg-weak-50/40 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65"
+																				>
+																					{link.icon ? (
+																						<Icon
+																							name={link.icon}
+																							className="size-3.5"
+																						/>
+																					) : null}
+																				</a>
+																			))}
 																		</div>
-																	),
-																)}
-																{item.mega.social?.length ? (
-																	<div className="flex items-center gap-1.5 px-2 pt-1">
-																		{item.mega.social.map((link) => (
-																			<a
-																				key={link.title}
-																				href={link.href}
-																				onClick={closeMobileMenu}
-																				target="_blank"
-																				rel="noreferrer"
-																				title={link.title}
-																				aria-label={link.title}
-																				className="inline-flex size-9 items-center justify-center rounded-lg border border-stroke-soft-200/80 bg-bg-weak-50/40 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65"
-																			>
-																				{link.icon ? (
-																					<Icon
-																						name={link.icon}
-																						className="size-3.5"
-																					/>
-																				) : null}
-																			</a>
-																		))}
-																	</div>
-																) : null}
-															</div>
-														</motion.div>
-													)}
-												</AnimatePresence>
-											</div>
-										) : (
-											<Link
-												key={item.title}
-												href={item.href}
-												onClick={closeMobileMenu}
-												className="rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
-											>
-												{item.title}
-											</Link>
-										),
-									)}
-								</nav>
+																	) : null}
+																</div>
+															</motion.div>
+														)}
+													</AnimatePresence>
+												</div>
+											) : (
+												<Link
+													key={item.title}
+													href={item.href}
+													onClick={closeMobileMenu}
+													className="rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
+												>
+													{item.title}
+												</Link>
+											),
+										)}
+									</nav>
 
-								<div className="mt-6 flex flex-col gap-3 border-stroke-soft-100 border-t pt-6 dark:border-white/10">
-									<div className="px-2">
-										<ThemeToggle />
-									</div>
-									<a
-										href="https://github.com/reloop-labs/reloop"
-										target="_blank"
-										rel="noreferrer"
-										onClick={closeMobileMenu}
-										className="inline-flex items-center gap-2 rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
-									>
-										<Icon name="social-github" className="size-4" />
-										{stars}
-									</a>
-
-									{mounted && session ? (
-										<FancyButton.Root
-											asChild
-											variant="primary"
-											size="medium"
-											className="w-full! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
+									<div className="mt-6 flex flex-col gap-3 border-stroke-soft-100 border-t pt-6 dark:border-white/10">
+										<div className="px-2">
+											<ThemeToggle />
+										</div>
+										<a
+											href="https://github.com/reloop-labs/reloop"
+											target="_blank"
+											rel="noreferrer"
+											onClick={closeMobileMenu}
+											className="inline-flex items-center gap-2 rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
 										>
-											<a href="/dashboard" onClick={closeMobileMenu}>
-												Dashboard
-											</a>
-										</FancyButton.Root>
-									) : (
-										<div className="grid grid-cols-2 gap-3">
-											<FancyButton.Root
-												asChild
-												variant="basic"
-												size="medium"
-												className="w-full!"
-											>
-												<a href="/dashboard/login" onClick={closeMobileMenu}>
-													Log in
-												</a>
-											</FancyButton.Root>
+											<Icon name="social-github" className="size-4" />
+											{stars}
+										</a>
+
+										{mounted && session ? (
 											<FancyButton.Root
 												asChild
 												variant="primary"
 												size="medium"
 												className="w-full! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 											>
-												<a href="/dashboard/signup" onClick={closeMobileMenu}>
-													Sign up
+												<a href="/dashboard" onClick={closeMobileMenu}>
+													Dashboard
 												</a>
 											</FancyButton.Root>
-										</div>
-									)}
+										) : (
+											<div className="grid grid-cols-2 gap-3">
+												<FancyButton.Root
+													asChild
+													variant="basic"
+													size="medium"
+													className="w-full!"
+												>
+													<a href="/dashboard/login" onClick={closeMobileMenu}>
+														Log in
+													</a>
+												</FancyButton.Root>
+												<FancyButton.Root
+													asChild
+													variant="primary"
+													size="medium"
+													className="w-full! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
+												>
+													<a href="/dashboard/signup" onClick={closeMobileMenu}>
+														Sign up
+													</a>
+												</FancyButton.Root>
+											</div>
+										)}
+									</div>
 								</div>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</div>
+				{isLanding ? (
+					<div aria-hidden="true" className={landing.headerOuterCell} />
+				) : null}
 			</div>
 		</header>
 	);
