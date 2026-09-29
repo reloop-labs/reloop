@@ -1,4 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
+import { GridHero } from "@reloop/web/components/landing/grid-hero";
 import { homeFaqItems } from "@reloop/web/lib/home-faq";
 import {
 	faqPageJsonLd,
@@ -15,7 +16,6 @@ import type { Metadata } from "next";
 import { AgentCards } from "../(home)/components/agent-cards";
 import CTA from "../(home)/components/cta";
 import EmailSystem from "../(home)/components/email-system";
-import Hero from "../(home)/components/hero";
 import Highlights from "../(home)/components/highlights";
 import { HomeFaq } from "../(home)/components/home-faq";
 import { SectionSeparator } from "../(home)/components/section-separator";
@@ -71,7 +71,7 @@ export default function HomePage() {
 	return (
 		<div className="relative w-full">
 			<JsonLd data={homeSchema} />
-			<Hero />
+			<GridHero />
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator />
 				<LanguageExplorer

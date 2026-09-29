@@ -1,0 +1,342 @@
+.surface {
+	--landing-base: #ffffff;
+	--landing-ink: #09090b;
+	--landing-muted: #52525b;
+	--landing-cell: #ffffff;
+	--landing-seam: rgb(9 9 11 / 6%);
+	color: var(--landing-ink);
+}
+
+[class~="dark"] .surface {
+	--landing-base: #09090b;
+	--landing-ink: #fafafa;
+	--landing-muted: #a1a1aa;
+	--landing-cell: #101013;
+	--landing-seam: rgb(250 250 250 / 12%);
+}
+
+.hero {
+	/* 1px less than the fixed header's outer height (72px row + 2px
+	   top/bottom borders) so the header's bottom hairline overlaps the
+	   grid's top seam strip instead of stacking into a double dark line. */
+	padding-top: 73px;
+	background: var(--landing-base);
+	overflow: hidden;
+}
+
+.gridBackdrop {
+	background: var(--landing-base);
+}
+
+.frame {
+	position: relative;
+	width: calc(100% - 48px);
+	max-width: 1104px;
+	margin-inline: auto;
+}
+
+/* The exposed base between translucent cells forms the seams and intersections. */
+.grid {
+	background: var(--landing-seam);
+	position: relative;
+	display: grid;
+}
+
+.grid > :not(.texture) {
+	padding: 0.5px;
+}
+
+.grid [data-grid-content] {
+	height: 100%;
+	border-radius: 4px;
+	background: var(--landing-cell);
+}
+
+.band,
+.middle {
+	display: grid;
+	grid-template-columns: repeat(10, minmax(0, 1fr));
+	gap: 1px;
+}
+
+.band > div {
+	aspect-ratio: 1;
+}
+
+.side {
+	display: grid;
+	grid-template-rows: repeat(4, minmax(0, 1fr));
+	gap: 1px;
+}
+
+.center {
+	grid-column: span 8;
+}
+
+.content {
+	padding: 48px 0;
+	text-align: center;
+}
+
+.copy {
+	z-index: 2;
+	position: relative;
+	max-width: 768px;
+	margin-inline: auto;
+	padding-inline: 12px;
+}
+
+.title {
+	font-size: 60px;
+	font-weight: 600;
+	line-height: 1;
+	letter-spacing: -0.035em;
+	text-wrap: balance;
+}
+
+.description {
+	margin: 20px auto 36px;
+	max-width: 640px;
+	font-size: 18px;
+	line-height: 28px;
+	color: var(--landing-muted);
+	text-wrap: balance;
+}
+
+.primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 40px;
+	padding: 0 16px;
+	border: 1px solid rgb(9 9 11 / 15%);
+	border-radius: 8px;
+	background: #27272a;
+	color: white;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 20px;
+	box-shadow:
+		0 12px 20px -12px rgb(49 46 129 / 40%),
+		0 2px 3px rgb(0 0 0 / 10%);
+	transition: background-color 150ms;
+}
+
+.primary:hover {
+	background: #3f3f46;
+}
+
+[class~="dark"] .primary {
+	background: #fafafa;
+	color: #18181b;
+	border-color: rgb(255 255 255 / 15%);
+	box-shadow: 0 12px 24px -16px rgb(165 180 252 / 25%);
+}
+
+[class~="dark"] .primary:hover {
+	background: #e4e4e7;
+}
+
+.note {
+	display: block;
+	margin-top: 12px;
+	color: var(--landing-muted);
+	font-size: 14px;
+	line-height: 20px;
+}
+
+.note a:hover {
+	color: var(--landing-ink);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+.surface a:focus-visible,
+.surface button:focus-visible {
+	outline: 2px solid var(--landing-ink);
+	outline-offset: 4px;
+}
+
+/* Keep the small menu toggle's focus ring tight to its rounded box so it
+   never spills over the header row or crosses the frame hairlines. */
+.header .mobileToggle:focus-visible {
+	outline-offset: 1px;
+}
+
+/* Public Tailark reference texture, mirrored and faded as in the reference. */
+.texture {
+	pointer-events: none;
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	isolation: isolate;
+	filter: grayscale(1) brightness(1) contrast(120);
+	opacity: 0.4;
+	mask-image:
+		linear-gradient(to left, black 65%, transparent 95%),
+		linear-gradient(to right, black 65%, transparent 95%),
+		linear-gradient(to bottom, black 75%, transparent),
+		linear-gradient(to top, black 75%, transparent);
+	mask-composite: intersect;
+}
+.texture::before {
+	content: "";
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: url("/landing/hero-grid-texture.webp") center / cover;
+	transform: scaleX(-1);
+	filter: brightness(0.75) contrast(0.35);
+}
+.texture::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAu0lEQVQ4T6WSMQqFMBBEE2wDXiVgG8gtglilCuIpcoogVqlEPIVgK3gVIa2Qzw9YbIpttlqGgbcMM5wxlr33LMbI/nccx3I/PQwD0LXPj+OgAaSUBWCtLZ+2bSv308uyAF37/HkeGkAIASL0fQ8yT9MEdO3z67poAKUUiDDPM8i87zvQtc/f96UBmqZBazTG4Ds4z5MG6LoOrTGEgO8gpUQDtG2L1uicw3dw3zcNoLVGa1zXFd9BzpkE+AFp94/4eKx9+AAAAABJRU5ErkJggg==");
+	background-size: 8px 8px;
+	mix-blend-mode: screen;
+}
+
+[class~="dark"] .texture {
+	opacity: 0.18;
+}
+
+[class~="dark"] .texture::before {
+	filter: invert(1) contrast(0.5) brightness(0.7);
+}
+
+.header {
+	background: var(--landing-base);
+	border-top: 1px solid var(--landing-seam);
+	border-bottom: 1px solid var(--landing-seam);
+}
+
+.headerFrame {
+	max-width: 1104px;
+	width: calc(100% - 48px);
+	margin-inline: auto;
+	padding: 0;
+	border: 0;
+	border-left: 1px solid var(--landing-seam);
+	border-right: 1px solid var(--landing-seam);
+	background: var(--landing-cell);
+}
+
+.headerRow {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	height: 72px;
+	padding-inline: 48px;
+	gap: 16px;
+	border-radius: 0;
+	background: var(--landing-cell);
+}
+
+.brandAndNav {
+	display: contents;
+}
+
+.headerRow > a:first-child {
+	justify-self: start;
+}
+
+.nav {
+	justify-self: start;
+	margin-left: 24px;
+	gap: 8px;
+}
+
+.actions {
+	justify-self: end;
+	gap: 12px;
+}
+
+.mobilePanel {
+	background: var(--landing-cell);
+	padding-inline: 24px;
+}
+
+@media (max-width: 1099px) {
+	.hero {
+		padding-top: 57px;
+	}
+	.headerRow {
+		display: flex;
+		height: 56px;
+		padding-inline: 24px;
+	}
+	.header .nav,
+	.header .actions {
+		display: none;
+	}
+	.header .mobileToggle {
+		display: inline-flex;
+	}
+	.header .mobilePanel {
+		display: block;
+	}
+	.side {
+		display: none;
+	}
+	.center {
+		grid-column: 1 / -1;
+	}
+	.copy {
+		padding-inline: 24px;
+	}
+	.texture {
+		opacity: 0.2;
+	}
+}
+
+@media (max-width: 767px) {
+	.title {
+		font-size: 48px;
+	}
+	.content {
+		padding-block: 48px;
+	}
+}
+
+@media (max-width: 479px) {
+	.frame,
+	.headerFrame {
+		width: calc(100% - 16px);
+	}
+	.headerRow {
+		padding-inline: 16px;
+	}
+	.copy {
+		padding-inline: 20px;
+	}
+	.title {
+		font-size: 40px;
+		line-height: 1.05;
+	}
+	.description {
+		font-size: 16px;
+		line-height: 26px;
+	}
+	.band {
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+	.band > div:nth-child(n + 6) {
+		display: none;
+	}
+	.note {
+		max-width: 230px;
+		margin-inline: auto;
+		text-wrap: balance;
+	}
+	.primary {
+		min-height: 44px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.primary {
+		transition: none;
+	}
+}

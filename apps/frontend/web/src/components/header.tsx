@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import landing from "./landing/landing-grid.module.css";
 
 /** CSS `ease`: mega open/close (scaleIn/Out) and directional content slides */
 const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -38,25 +39,6 @@ const megaContentVariants = {
 		x: dir > 0 ? -MEGA_SLIDE_PX : dir < 0 ? MEGA_SLIDE_PX : 0,
 	}),
 };
-
-import {
-	siDjango,
-	siDotnet,
-	siElixir,
-	siExpress,
-	siFastapi,
-	siGo,
-	siLaravel,
-	siNestjs,
-	siNextdotjs,
-	siNodedotjs,
-	siPhp,
-	siPython,
-	siRuby,
-	siRubyonrails,
-	siRust,
-	siSpringboot,
-} from "simple-icons";
 
 type BrandIcon = {
 	path: string;
@@ -869,109 +851,26 @@ type NavItem = {
 	href: string;
 	mega?: {
 		categories: NavCategory[];
+		/** Bottom highlight strip in the Tailark-style landing panel */
+		spotlight?: NavLink;
 		/** Optional social strip at the bottom of the panel (e.g. Company) */
 		social?: NavLink[];
 	};
 };
-
-const docLanguages: NavLink[] = [
-	{
-		title: "Node.js",
-		href: "/sdk/nodejs",
-		brand: siNodedotjs,
-	},
-	{
-		title: "Python",
-		href: "/sdk/python",
-		brand: siPython,
-	},
-	{
-		title: "Go",
-		href: "/sdk/go",
-		brand: siGo,
-	},
-	{
-		title: "Rust",
-		href: "/sdk/rust",
-		// Brand hex is #000000; lift so it stays visible on dark UI
-		brand: { ...siRust, hex: "e24d2b" },
-	},
-	{
-		title: "PHP",
-		href: "/sdk/php",
-		brand: siPhp,
-	},
-	{
-		title: "Ruby",
-		href: "/sdk/ruby",
-		brand: siRuby,
-	},
-	{
-		title: "Elixir",
-		href: "/sdk/elixir",
-		brand: siElixir,
-	},
-	{
-		title: "Java",
-		href: "/sdk/java",
-		brand: siSpringboot,
-	},
-	{
-		title: ".NET",
-		href: "/sdk/dotnet",
-		brand: siDotnet,
-	},
-];
-
-/** Curated framework guides shown in the Docs mega menu */
-const docFrameworks: NavLink[] = [
-	{
-		title: "Next.js",
-		href: "/frameworks/nextjs",
-		brand: siNextdotjs,
-	},
-	{
-		title: "Express",
-		href: "/frameworks/express",
-		brand: siExpress,
-	},
-	{
-		title: "NestJS",
-		href: "/frameworks/nestjs",
-		brand: siNestjs,
-	},
-	{
-		title: "Django",
-		href: "/frameworks/django",
-		brand: siDjango,
-	},
-	{
-		title: "FastAPI",
-		href: "/frameworks/fastapi",
-		brand: siFastapi,
-	},
-	{
-		title: "Laravel",
-		href: "/frameworks/laravel",
-		brand: siLaravel,
-	},
-	{
-		title: "Rails",
-		href: "/frameworks/rails",
-		brand: siRubyonrails,
-	},
-	{
-		title: "Spring Boot",
-		href: "/frameworks/spring-boot",
-		brand: siSpringboot,
-	},
-];
 
 const navItems: NavItem[] = [
 	{
 		title: "Features",
 		href: "/features",
 		mega: {
+			// Bottom highlight strip in the Tailark-style landing panel
+			spotlight: {
+				title: "Agent Inbox",
+				href: "/use-cases/ai-agent-inbox",
+				icon: "inbox",
+				description:
+					"Give AI agents their own inboxes to receive, parse, and respond to email.",
+			},
 			// Left: Transactional + Marketing cards
 			// Middle: Email API, Templates, Inbound, Contacts
 			// Right: Agent Inbox, SMTP, Workflows, …
@@ -1063,43 +962,17 @@ const navItems: NavItem[] = [
 		},
 	},
 	{
-		title: "Docs",
-		href: "/docs",
-		mega: {
-			// Left: Documentation + Integrations cards with abstract UI illustrations
-			// Right: frameworks + languages combined into 3 columns (no titles)
-			categories: [
-				{
-					title: "",
-					featured: true,
-					links: [
-						{
-							title: "Documentation",
-							href: "/docs",
-							description: "Interactive guides and architecture overviews.",
-							featuredDocs: true,
-						},
-						{
-							title: "Integrations",
-							href: "/docs/integrations",
-							description: "Native SDKs for Next.js, Python, Rails, and more.",
-							featuredIntegrations: true,
-						},
-					],
-				},
-				{
-					title: "",
-					compact: true,
-					gridCols: 3,
-					links: [...docFrameworks, ...docLanguages],
-				},
-			],
-		},
-	},
-	{
 		title: "Resources",
 		href: "/blog",
 		mega: {
+			// Bottom highlight strip in the Tailark-style landing panel
+			spotlight: {
+				title: "Documentation",
+				href: "/docs",
+				icon: "book-open",
+				description:
+					"Guides, API reference, and quickstarts to help you start sending in minutes.",
+			},
 			// Featured: Free tools + Comparisons
 			// Right: Blog / Changelog / Status / Self-host + social icons
 			categories: [
@@ -1144,6 +1017,18 @@ const navItems: NavItem[] = [
 					divided: true,
 					links: [
 						{
+							title: "Documentation",
+							href: "/docs",
+							icon: "book-open",
+							description: "Guides, API reference, and quickstarts",
+						},
+						{
+							title: "Integrations",
+							href: "/docs/integrations",
+							icon: "code",
+							description: "SDKs and framework guides",
+						},
+						{
 							title: "Blog",
 							href: "/blog",
 							icon: "newspaper",
@@ -1182,6 +1067,13 @@ const navItems: NavItem[] = [
 		title: "Company",
 		href: "/about",
 		mega: {
+			// Bottom highlight strip in the Tailark-style landing panel
+			spotlight: {
+				title: "Support",
+				href: "/contact",
+				icon: "support",
+				description: "Get direct help from the engineers who built Reloop.",
+			},
 			// Contact featured card · compact list (no section titles)
 			categories: [
 				{
@@ -2074,6 +1966,136 @@ function MegaSocialIcons({
 	);
 }
 
+/**
+ * Tailark-style plain row: semibold title + truncated muted description,
+ * no icon tile. Used only in the landing mega panel.
+ */
+function TailarkMegaRow({ link }: { link: NavLink }) {
+	const external = isExternalHref(link.href, link.external);
+	const crossDomain = isCrossDomain(link.href);
+	const className =
+		"group block min-w-0 rounded-xl px-1 py-2 transition-opacity hover:opacity-70";
+	const body = (
+		<>
+			<span className="block truncate font-semibold text-[15px] text-text-strong-950 tracking-[-0.01em] dark:text-white">
+				{link.title}
+			</span>
+			{link.description && (
+				<span className="mt-0.5 block truncate text-[14px] text-text-sub-600 leading-snug dark:text-white/50">
+					{link.description}
+				</span>
+			)}
+		</>
+	);
+
+	const shared = {
+		className,
+		...(external ? { target: "_blank", rel: "noreferrer" } : {}),
+	};
+
+	if (crossDomain || external) {
+		return (
+			<a href={link.href} {...shared}>
+				{body}
+			</a>
+		);
+	}
+
+	return (
+		<Link href={link.href} {...shared}>
+			{body}
+		</Link>
+	);
+}
+
+/**
+ * Tailark-style landing dropdown: section labels with a hairline, three
+ * plain title/description columns, and a bottom spotlight strip.
+ * Motion (directional slides, shell morph) is handled by the caller and
+ * stays identical to the standard MegaPanel.
+ */
+function TailarkMegaPanel({ item }: { item: NavItem }) {
+	if (!item.mega) return null;
+
+	const spotlight = item.mega.spotlight;
+	const all = item.mega.categories
+		.flatMap((category) => category.links)
+		.filter((link) => link.href !== spotlight?.href);
+	const perCol = Math.max(1, Math.ceil(all.length / 3));
+	const columns = [0, 1, 2].map((index) =>
+		all.slice(index * perCol, (index + 1) * perCol),
+	);
+
+	const spotlightExternal = spotlight
+		? isExternalHref(spotlight.href, spotlight.external)
+		: false;
+	const spotlightCrossDomain = spotlight
+		? isCrossDomain(spotlight.href)
+		: false;
+	const spotlightClassName =
+		"group flex min-w-0 items-center gap-4 transition-opacity hover:opacity-70";
+	const spotlightShared = {
+		className: spotlightClassName,
+		...(spotlightExternal ? { target: "_blank", rel: "noreferrer" } : {}),
+	};
+	const spotlightBody = spotlight ? (
+		<>
+			<span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl border border-stroke-soft-200/90 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/70">
+				{spotlight.icon ? (
+					<Icon name={spotlight.icon} className="size-5" />
+				) : null}
+			</span>
+			<span className="min-w-0">
+				<span className="block truncate font-semibold text-[16px] text-text-strong-950 tracking-[-0.01em] dark:text-white">
+					{spotlight.title}
+				</span>
+				{spotlight.description && (
+					<span className="mt-0.5 block truncate text-[14px] text-text-sub-600 leading-snug dark:text-white/50">
+						{spotlight.description}
+					</span>
+				)}
+			</span>
+		</>
+	) : null;
+
+	return (
+		<div className="min-w-0 p-8 sm:p-10">
+			<div className="grid grid-cols-3 gap-x-12 border-stroke-soft-200/80 border-b pb-4 dark:border-white/[0.08]">
+				<p className="truncate font-medium text-[15px] text-text-sub-600 dark:text-white/50">
+					{item.title}
+				</p>
+				<p className="col-span-2 truncate font-medium text-[15px] text-text-sub-600 dark:text-white/50">
+					More {item.title}
+				</p>
+			</div>
+
+			<div className="grid grid-cols-3 gap-x-12 gap-y-1 py-6">
+				{columns.map((links, columnIndex) => (
+					<div key={`tailark-col-${columnIndex}`} className="min-w-0">
+						{links.map((link) => (
+							<TailarkMegaRow key={link.title} link={link} />
+						))}
+					</div>
+				))}
+			</div>
+
+			{spotlight && (
+				<div className="border-stroke-soft-200/80 border-t pt-6 dark:border-white/[0.08]">
+					{spotlightCrossDomain || spotlightExternal ? (
+						<a href={spotlight.href} {...spotlightShared}>
+							{spotlightBody}
+						</a>
+					) : (
+						<Link href={spotlight.href} {...spotlightShared}>
+							{spotlightBody}
+						</Link>
+					)}
+				</div>
+			)}
+		</div>
+	);
+}
+
 function MegaPanel({ item }: { item: NavItem }) {
 	if (!item.mega) return null;
 
@@ -2222,9 +2244,7 @@ function getMegaPanelWidthPx(item: NavItem | undefined): number {
 
 export const Header = () => {
 	const pathname = usePathname();
-	if (pathname === "/twitter" || pathname?.startsWith("/twitter/")) {
-		return null;
-	}
+	const isLanding = pathname === "/" || pathname === "/home";
 	const { useSession } = authClient;
 	const { data: session } = useSession();
 	const shouldReduceMotion = useReducedMotion();
@@ -2234,9 +2254,13 @@ export const Header = () => {
 	const navRef = useRef<HTMLElement | null>(null);
 	const tabRefs = useRef<Record<string, HTMLElement | null>>({});
 	const megaContentRef = useRef<HTMLDivElement | null>(null);
+	const frameRef = useRef<HTMLDivElement | null>(null);
 	const [navPill, setNavPill] = useState({ left: 0, width: 0, opacity: 0 });
 	/** Measured mega content height for smooth panel morph (no layout thrash) */
+	const [megaLeft, setMegaLeft] = useState(0);
 	const [megaHeight, setMegaHeight] = useState<number | "auto">("auto");
+	/** Landing panel tracks the 1104px hero frame width (Tailark parity) */
+	const [landingPanelWidth, setLandingPanelWidth] = useState(1104);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
 	const [mounted, setMounted] = useState(false);
@@ -2270,27 +2294,58 @@ export const Header = () => {
 			setNavPill((p) => ({ ...p, opacity: 0 }));
 			return;
 		}
-		const nr = nav.getBoundingClientRect();
-		const tr = tab.getBoundingClientRect();
-		setNavPill({
-			left: tr.left - nr.left,
-			width: tr.width,
-			opacity: 1,
-		});
+		const measure = () => {
+			const nr = nav.getBoundingClientRect();
+			const tr = tab.getBoundingClientRect();
+			setNavPill({ left: tr.left - nr.left, width: tr.width, opacity: 1 });
+		};
+		measure();
+		const observer = new ResizeObserver(measure);
+		observer.observe(nav);
+		observer.observe(tab);
+		return () => observer.disconnect();
 	}, [activeMega]);
 
-	// Measure mega content height after tab switch for a clean height tween.
-	// Panel shell width springs via targetMegaWidth.
+	// Keep the dropdown inside the viewport as its contents or viewport resize.
+	// On landing the panel matches the hero frame width and left edge.
 	useLayoutEffect(() => {
-		if (!activeMega) {
+		const el = megaContentRef.current;
+		const nav = navRef.current;
+		if (!activeMega || !el || !nav) {
 			setMegaHeight("auto");
 			return;
 		}
-		const el = megaContentRef.current;
-		if (!el) return;
-		// Sync measure after DOM commit, no double rAF delay
-		setMegaHeight(el.offsetHeight);
-	}, [activeMega]);
+		const measure = () => {
+			setMegaHeight(el.offsetHeight);
+			const rect = nav.getBoundingClientRect();
+			let width = getMegaPanelWidthPx(
+				navItems.find((item) => item.title === activeMega),
+			);
+			let desired = 0;
+			if (isLanding && frameRef.current) {
+				const frame = frameRef.current.getBoundingClientRect();
+				width = frame.width;
+				setLandingPanelWidth(frame.width);
+				desired = frame.left - rect.left;
+			}
+			setMegaLeft(
+				Math.max(
+					16 - rect.left,
+					Math.min(desired, window.innerWidth - 16 - rect.left - width),
+				),
+			);
+		};
+		measure();
+		const observer = new ResizeObserver(measure);
+		observer.observe(el);
+		observer.observe(nav);
+		if (frameRef.current) observer.observe(frameRef.current);
+		window.addEventListener("resize", measure);
+		return () => {
+			observer.disconnect();
+			window.removeEventListener("resize", measure);
+		};
+	}, [activeMega, isLanding]);
 
 	useEffect(() => {
 		setMounted(true);
@@ -2312,13 +2367,13 @@ export const Header = () => {
 
 	useEffect(() => {
 		if (!mobileMenuOpen) {
-			document.body.style.overflow = "";
 			return;
 		}
 
+		const previousOverflow = document.body.style.overflow;
 		document.body.style.overflow = "hidden";
 		return () => {
-			document.body.style.overflow = "";
+			document.body.style.overflow = previousOverflow;
 		};
 	}, [mobileMenuOpen]);
 
@@ -2335,18 +2390,71 @@ export const Header = () => {
 		openMega(null);
 	};
 
+	useEffect(() => {
+		const query = window.matchMedia(
+			`(min-width: ${isLanding ? 1100 : 1024}px)`,
+		);
+		const resetMenus = () => {
+			setMobileMenuOpen(false);
+			setExpandedMobile(null);
+			setActiveMega(null);
+		};
+		query.addEventListener("change", resetMenus);
+		return () => query.removeEventListener("change", resetMenus);
+	}, [isLanding]);
+
+	if (pathname === "/twitter" || pathname?.startsWith("/twitter/")) return null;
+
 	const activeItem = navItems.find((item) => item.title === activeMega);
-	const targetMegaWidth = getMegaPanelWidthPx(activeItem);
+	const targetMegaWidth = isLanding
+		? landingPanelWidth
+		: getMegaPanelWidthPx(activeItem);
 
 	return (
 		<header
-			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black"
+			className={cn(
+				"fixed top-0 right-0 left-0 z-50",
+				isLanding
+					? [landing.surface, landing.header]
+					: "border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black",
+			)}
+			onKeyDown={(event) => {
+				if (event.key === "Escape") {
+					const trigger = activeMega
+						? tabRefs.current[activeMega]?.querySelector("button")
+						: null;
+					openMega(null);
+					closeMobileMenu();
+					trigger?.focus();
+				}
+			}}
+			onBlur={(event) => {
+				if (!event.currentTarget.contains(event.relatedTarget)) openMega(null);
+			}}
 			onMouseLeave={() => openMega(null)}
 		>
-			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10">
-				<div className="relative flex h-16 items-center justify-between gap-4">
+			<div
+				ref={frameRef}
+				className={cn(
+					"relative mx-auto w-full",
+					isLanding
+						? landing.headerFrame
+						: "max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10",
+				)}
+			>
+				<div
+					className={cn(
+						"relative flex h-16 items-center justify-between gap-4",
+						isLanding && landing.headerRow,
+					)}
+				>
 					{/* Left: brand + main nav */}
-					<div className="flex items-center gap-6">
+					<div
+						className={cn(
+							"flex items-center gap-6",
+							isLanding && landing.brandAndNav,
+						)}
+					>
 						<Link
 							href="/home"
 							className="relative z-10 flex shrink-0 items-center gap-2.5"
@@ -2361,7 +2469,11 @@ export const Header = () => {
 						{/* Main nav + sliding active pill */}
 						<nav
 							ref={navRef}
-							className="relative hidden items-center gap-1 lg:flex"
+							aria-label="Main navigation"
+							className={cn(
+								"relative hidden items-center gap-1 lg:flex",
+								isLanding && landing.nav,
+							)}
 						>
 							{/* Pill: on-screen morph → short spring, zero bounce (crisp) */}
 							<motion.div
@@ -2393,7 +2505,23 @@ export const Header = () => {
 									onMouseEnter={() => openMega(item.title)}
 								>
 									{item.mega ? (
-										<span
+										<button
+											type="button"
+											aria-expanded={activeMega === item.title}
+											aria-controls={
+												activeMega === item.title
+													? "desktop-navigation-panel"
+													: undefined
+											}
+											onClick={() =>
+												openMega(activeMega === item.title ? null : item.title)
+											}
+											onKeyDown={(event) => {
+												if (event.key === "ArrowDown") {
+													event.preventDefault();
+													openMega(item.title);
+												}
+											}}
 											className={`inline-flex cursor-default items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
 												activeMega === item.title
 													? "text-text-strong-950 dark:text-white"
@@ -2409,7 +2537,7 @@ export const Header = () => {
 														: "opacity-50"
 												}`}
 											/>
-										</span>
+										</button>
 									) : (
 										<Link
 											href={item.href}
@@ -2426,9 +2554,11 @@ export const Header = () => {
 							))}
 
 							{/*
-							  Mega menu motion (Radix nav viewport):
-							  - Open/close: scaleIn / scaleOut from top-left (Product)
-							  - Tab switch: height spring on shell; content slides
+							  Mega menu motion:
+							  - Open/close: fade + slight drop from top (Tailark feel),
+							    same 0.2s timing as before
+							  - Tab switch: height spring on shell; directional
+							    left/right content slides (unchanged)
 							*/}
 							<AnimatePresence>
 								{activeMega && activeItem?.mega && (
@@ -2437,33 +2567,40 @@ export const Header = () => {
 										initial={
 											shouldReduceMotion
 												? { opacity: 0 }
-												: { opacity: 0, scale: 0.98 }
+												: { opacity: 0, scale: 0.98, y: -10 }
 										}
 										animate={
 											shouldReduceMotion
 												? { opacity: 1 }
-												: { opacity: 1, scale: 1 }
+												: { opacity: 1, scale: 1, y: 0 }
 										}
 										exit={
 											shouldReduceMotion
 												? { opacity: 0 }
-												: { opacity: 0, scale: 0.98 }
+												: { opacity: 0, scale: 0.98, y: -10 }
 										}
 										transition={
 											shouldReduceMotion
 												? { duration: 0 }
 												: { duration: 0.2, ease: EASE_DEFAULT }
 										}
-										className="absolute top-full left-0 z-50 hidden origin-top-left pt-2 lg:block"
+										style={{
+											left: megaLeft,
+											top: isLanding ? "calc(100% + 18px)" : undefined,
+										}}
+										className="absolute top-full z-50 hidden origin-top-left pt-2 lg:block"
 									>
 										{/* Hover bridge so the gap between bar and card doesn't close the menu */}
 										<div
 											className="-top-2 absolute inset-x-0 h-2"
 											aria-hidden
 										/>
-										<div
-											className="overflow-hidden rounded-[20px] border border-stroke-soft-200/90 bg-bg-white-0 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]"
-											role="menu"
+										<section
+											className={cn(
+												"overflow-hidden border border-stroke-soft-200/90 bg-bg-white-0 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]",
+												isLanding ? "rounded-[24px]" : "rounded-[20px]",
+											)}
+											id="desktop-navigation-panel"
 											aria-label={`${activeItem.title} menu`}
 										>
 											{/* Panel shell: width springs per menu; height morphs with content */}
@@ -2488,6 +2625,8 @@ export const Header = () => {
 												style={{
 													overflow: "hidden",
 													maxWidth: "calc(100vw - 2rem)",
+													maxHeight: "calc(100dvh - 100px)",
+													overflowY: "auto",
 												}}
 											>
 												<div
@@ -2518,12 +2657,16 @@ export const Header = () => {
 															// Keep full width while popLayout takes the exiting panel out of flow
 															className="w-full"
 														>
-															<MegaPanel item={activeItem} />
+															{isLanding ? (
+																<TailarkMegaPanel item={activeItem} />
+															) : (
+																<MegaPanel item={activeItem} />
+															)}
 														</motion.div>
 													</AnimatePresence>
 												</div>
 											</motion.div>
-										</div>
+										</section>
 									</motion.div>
 								)}
 							</AnimatePresence>
@@ -2531,13 +2674,18 @@ export const Header = () => {
 					</div>
 
 					{/* Right: actions */}
-					<div className="relative z-10 hidden items-center gap-3 lg:flex">
+					<div
+						className={cn(
+							"relative z-10 hidden items-center gap-3 lg:flex",
+							isLanding && landing.actions,
+						)}
+					>
 						<ThemeToggle />
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
 							rel="noreferrer"
-							className="inline-flex items-center gap-2 px-1 py-2 font-medium text-[13px] text-text-strong-950 transition-opacity hover:opacity-70 dark:text-white"
+							className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-1 py-2 font-medium text-[13px] text-text-strong-950 transition-opacity hover:opacity-70 dark:text-white"
 						>
 							<Icon name="social-github" className="size-3.5" />
 							<span>{stars}</span>
@@ -2566,23 +2714,69 @@ export const Header = () => {
 
 					<button
 						type="button"
-						className="inline-flex size-10 items-center justify-center rounded-lg text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] lg:hidden dark:text-white dark:hover:bg-white/[0.06]"
+						className={cn(
+							"inline-flex size-10 items-center justify-center rounded-lg text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] lg:hidden dark:text-white dark:hover:bg-white/[0.06]",
+							isLanding && landing.mobileToggle,
+						)}
 						onClick={toggleMobileMenu}
 						aria-expanded={mobileMenuOpen}
 						aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
 					>
-						<Icon name={mobileMenuOpen ? "cross" : "menu"} className="size-5" />
+						<span className="relative flex size-5 items-center justify-center">
+							<AnimatePresence initial={false}>
+								<motion.span
+									key={mobileMenuOpen ? "close" : "open"}
+									initial={
+										shouldReduceMotion
+											? false
+											: { opacity: 0, rotate: -90, scale: 0.75 }
+									}
+									animate={{ opacity: 1, rotate: 0, scale: 1 }}
+									exit={
+										shouldReduceMotion
+											? undefined
+											: { opacity: 0, rotate: 90, scale: 0.75 }
+									}
+									transition={
+										shouldReduceMotion
+											? { duration: 0 }
+											: { duration: 0.2, ease: EASE_DEFAULT }
+									}
+									className="absolute inset-0 flex items-center justify-center"
+								>
+									<Icon
+										name={mobileMenuOpen ? "cross" : "menu"}
+										className="size-5"
+									/>
+								</motion.span>
+							</AnimatePresence>
+						</span>
 					</button>
 				</div>
 
 				<AnimatePresence>
 					{mobileMenuOpen && (
 						<motion.div
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: "auto" }}
-							exit={{ opacity: 0, height: 0 }}
-							transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-							className="overflow-hidden border-stroke-soft-100 border-t lg:hidden dark:border-white/10"
+							initial={
+								shouldReduceMotion
+									? false
+									: { opacity: 0, clipPath: "inset(0 0 100% 0)" }
+							}
+							animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
+							exit={
+								shouldReduceMotion
+									? { opacity: 0 }
+									: { opacity: 0, clipPath: "inset(0 0 100% 0)" }
+							}
+							transition={
+								shouldReduceMotion
+									? { duration: 0 }
+									: { duration: 0.35, ease: [0.32, 0.72, 0, 1] }
+							}
+							className={cn(
+								"overflow-hidden border-stroke-soft-100 border-t lg:hidden dark:border-white/10",
+								isLanding && landing.mobilePanel,
+							)}
 						>
 							<div className="max-h-[calc(100dvh-4rem)] overflow-y-auto py-4">
 								<nav className="flex flex-col gap-1">
