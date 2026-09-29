@@ -2,9 +2,13 @@
 
 import { createContext, useContext } from "react";
 
+export type InsertStepKind = "send_email" | "condition" | "delay";
+
 interface NodeEditorContextValue {
 	updateNode: (nodeId: string, data: Record<string, unknown>) => void;
 	deleteNode: (nodeId: string) => void;
+	insertStep: (edgeId: string, kind: InsertStepKind) => void;
+	appendStep: (kind: InsertStepKind) => void;
 }
 
 const NodeEditorContext = createContext<NodeEditorContextValue | null>(null);

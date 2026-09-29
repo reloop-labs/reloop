@@ -24,8 +24,8 @@ export const DelayNode = ({
 	return (
 		<SectionNodeCard
 			tone="delay"
-			badge={issue ? "Setup" : "Ready"}
-			badgeTone={issue ? "warning" : "info"}
+			badge={issue ? "Setup" : null}
+			badgeTone="warning"
 			selected={selected}
 			hasTarget
 			hasSource

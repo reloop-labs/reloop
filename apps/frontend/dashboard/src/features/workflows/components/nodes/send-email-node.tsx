@@ -24,8 +24,8 @@ export const SendEmailNode = ({
 	return (
 		<SectionNodeCard
 			tone="send_email"
-			badge={issue ? "Setup" : "Ready"}
-			badgeTone={issue ? "warning" : "info"}
+			badge={issue ? "Setup" : null}
+			badgeTone="warning"
 			selected={selected}
 			hasTarget
 			hasSource

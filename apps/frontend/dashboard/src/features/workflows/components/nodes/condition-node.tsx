@@ -24,8 +24,8 @@ export const ConditionNode = ({
 	return (
 		<SectionNodeCard
 			tone="condition"
-			badge={issue ? "Setup" : "Ready"}
-			badgeTone={issue ? "warning" : "info"}
+			badge={issue ? "Setup" : null}
+			badgeTone="warning"
 			selected={selected}
 			hasTarget
 			sourceHandles={[

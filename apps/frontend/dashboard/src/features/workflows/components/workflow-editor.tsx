@@ -16,7 +16,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Icon } from "@reloop/ui/icon";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
 	createConditionNode,
@@ -33,7 +33,8 @@ import {
 	type WorkflowNode,
 	type WorkflowStatus,
 } from "../workflow-types";
-import { NodeEditorProvider } from "./node-editor-context";
+import { NodeEditorProvider, type InsertStepKind } from "./node-editor-context";
+import { AddStepNode } from "./nodes/add-step-node";
 import { ConditionNode } from "./nodes/condition-node";
 import { DelayNode } from "./nodes/delay-node";
 import { FlowEdge } from "./nodes/flow-edge";
@@ -49,6 +50,7 @@ const nodeTypes = {
 	delay: DelayNode,
 	condition: ConditionNode,
 	group: GroupNode,
+	add_step: AddStepNode,
 };
 
 const edgeTypes = {
@@ -63,6 +65,12 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 /** Horizontal center of the vertical node column (cards are 320px wide). */
 const COLUMN_X = 220;
 const ROW_GAP = 280;
+
+/** Display-only end-cap below the last step (plus button to append). Never persisted. */
+const END_CAP_NODE_ID = "__add_step__";
+const END_CAP_EDGE_ID = "__add_step_edge__";
+/** Gap between the bottom of the last step and the trailing plus. */
+const END_CAP_GAP = 96;
 
 const zoomSelector = (s: { transform: [number, number, number] }) =>
 	s.transform[2];
@@ -253,6 +261,97 @@ const WorkflowEditorInner = ({
 		appendNode(createConditionNode(conditionCount, 0));
 	}, [nodes, appendNode]);
 
+	/** Append a step at the end of the flow (trailing plus / palette). */
+	const appendStep = useCallback(
+		(kind: InsertStepKind) => {
+			if (kind === "send_email") handleAddSendEmail();
+			else if (kind === "delay") handleAddDelay();
+			else handleAddCondition();
+		},
+		[handleAddSendEmail, handleAddDelay, handleAddCondition],
+	);
+
+	/**
+	 * Deepest step with a free output: plain steps with no outgoing edge, or a
+	 * condition with a free Yes/No branch. The trailing plus + stub line
+	 * attaches here.
+	 */
+	const endCapSource = useMemo(() => {
+		const byY = [...nodes].sort((a, b) => b.position.y - a.position.y);
+		for (const n of byY) {
+			if (n.type === "condition") {
+				const hasYes = edges.some(
+					(e) => e.source === n.id && e.sourceHandle === "yes",
+				);
+				const hasNo = edges.some(
+					(e) => e.source === n.id && e.sourceHandle === "no",
+				);
+				if (!hasYes) return { id: n.id, handle: "yes" as const };
+				if (!hasNo) return { id: n.id, handle: "no" as const };
+				continue;
+			}
+			if (n.type === "group") continue;
+			if (!edges.some((e) => e.source === n.id)) {
+				return { id: n.id, handle: undefined as undefined };
+			}
+		}
+		return null;
+	}, [nodes, edges]);
+
+	/** Bottom of the lowest rendered step (measured heights, not tops). */
+	const contentBottom = useStore((s) => {
+		let bottom = 0;
+		s.nodeLookup.forEach((n) => {
+			if (n.id === END_CAP_NODE_ID) return;
+			const y = n.internals?.positionAbsolute?.y ?? n.position.y;
+			const h = n.measured?.height ?? 0;
+			bottom = Math.max(bottom, y + h);
+		});
+		return bottom;
+	});
+
+	// Fit once measured so the trailing plus is in view on load.
+	const didInitFitRef = useRef(false);
+	useEffect(() => {
+		if (didInitFitRef.current || contentBottom <= 0) return;
+		didInitFitRef.current = true;
+		requestAnimationFrame(() => {
+			void fitView({ padding: 0.35, maxZoom: 1, duration: 0 });
+		});
+	}, [contentBottom, fitView]);
+
+	/** Graph + display-only end-cap (plus button below the last step). */
+	const displayNodes = useMemo<WorkflowNode[]>(() => {
+		if (!endCapSource) return nodes;
+		const endCap = {
+			id: END_CAP_NODE_ID,
+			type: "add_step",
+			position: { x: COLUMN_X, y: Math.max(contentBottom, 0) + END_CAP_GAP },
+			data: {},
+			selectable: false,
+			draggable: false,
+		} as unknown as WorkflowNode;
+		return [...nodes, endCap];
+	}, [nodes, endCapSource, contentBottom]);
+
+	const displayEdges = useMemo<WorkflowEdge[]>(() => {
+		if (typeof window !== "undefined") {
+			// eslint-disable-next-line no-console
+			console.log("[debug-flow] endCapSource", endCapSource, "realEdges", edges.length, "contentBottom", contentBottom);
+		}
+		if (!endCapSource) return edges;
+		const stub: WorkflowEdge = {
+			id: END_CAP_EDGE_ID,
+			source: endCapSource.id,
+			target: END_CAP_NODE_ID,
+			type: "flow",
+			selectable: false,
+			data: { tone: "default", stub: true },
+		};
+		if (endCapSource.handle) stub.sourceHandle = endCapSource.handle;
+		return [...edges, stub];
+	}, [edges, endCapSource]);
+
 	const handleDeleteNode = useCallback(
 		(nodeId: string) => {
 			if (nodeId === TRIGGER_NODE_ID) return;
@@ -263,6 +362,82 @@ const WorkflowEditorInner = ({
 			if (selectedNodeId === nodeId) setSelectedNodeId(null);
 		},
 		[setNodes, setEdges, selectedNodeId],
+	);
+
+	/** Insert a new step between the two nodes of an edge (plus button on edges). */
+	const insertStep = useCallback(
+		(edgeId: string, kind: InsertStepKind) => {
+			const edge = edges.find((e) => e.id === edgeId);
+			if (!edge) return;
+			const source = nodes.find((n) => n.id === edge.source);
+			const target = nodes.find((n) => n.id === edge.target);
+			if (!source || !target) return;
+
+			let newNode: WorkflowNode;
+			if (kind === "send_email") {
+				newNode = createSendEmailNode(
+					nodes.filter(isSendEmailNode).length,
+					0,
+				);
+			} else if (kind === "delay") {
+				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
+			} else {
+				newNode = createConditionNode(
+					nodes.filter(isConditionNode).length,
+					0,
+				);
+			}
+
+			// Open room at the target's slot and push it (and everything below) down.
+			const insertY = target.position.y;
+			newNode.position = { x: COLUMN_X, y: insertY };
+			newNode.selected = true;
+			setNodes((nds) => {
+				const next: WorkflowNode[] = nds.map((n) => {
+					const shifted =
+						n.position.y >= insertY
+							? {
+									...n,
+									position: { ...n.position, y: n.position.y + ROW_GAP },
+								}
+							: n;
+					return shifted.selected ? { ...shifted, selected: false } : shifted;
+				});
+				next.push(newNode);
+				return next;
+			});
+			setSelectedNodeId(newNode.id);
+
+			const branch =
+				edge.sourceHandle === "yes" || edge.sourceHandle === "no"
+					? edge.sourceHandle
+					: undefined;
+			const stamp = Date.now();
+			setEdges((eds) => {
+				const rest = eds.filter((e) => e.id !== edgeId);
+				const first: WorkflowEdge = {
+					id: `e_${edge.source}_${newNode.id}_${stamp}`,
+					source: edge.source,
+					target: newNode.id,
+					type: "flow",
+					data: {
+						tone: branch === "yes" ? "accent" : "default",
+						branch,
+					},
+				};
+				if (edge.sourceHandle) first.sourceHandle = edge.sourceHandle;
+				const second: WorkflowEdge = {
+					id: `e_${newNode.id}_${edge.target}_${stamp}`,
+					source: newNode.id,
+					target: edge.target,
+					type: "flow",
+					data: { tone: "default" },
+				};
+				if (edge.targetHandle) second.targetHandle = edge.targetHandle;
+				return [...rest, first, second];
+			});
+		},
+		[edges, nodes, setNodes, setEdges],
 	);
 
 	useHotkeys("backspace", () => {
@@ -288,7 +463,12 @@ const WorkflowEditorInner = ({
 
 	return (
 		<NodeEditorProvider
-			value={{ updateNode: updateNodeData, deleteNode: handleDeleteNode }}
+			value={{
+				updateNode: updateNodeData,
+				deleteNode: handleDeleteNode,
+				insertStep,
+				appendStep,
+			}}
 		>
 			<div className="flex h-full min-h-0 flex-col">
 				<WorkflowEditorToolbar
@@ -306,8 +486,8 @@ const WorkflowEditorInner = ({
 							onAddCondition={handleAddCondition}
 						/>
 						<ReactFlow
-							nodes={nodes}
-							edges={edges}
+							nodes={displayNodes}
+							edges={displayEdges}
 							onNodesChange={onNodesChange}
 							onEdgesChange={onEdgesChange}
 							onConnect={onConnect}
@@ -329,7 +509,6 @@ const WorkflowEditorInner = ({
 							connectionLineStyle={{
 								stroke: "var(--color-stroke-sub-300)",
 								strokeWidth: 1.5,
-								strokeDasharray: "5 5",
 							}}
 						>
 							<Background

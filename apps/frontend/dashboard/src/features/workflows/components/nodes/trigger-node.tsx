@@ -24,8 +24,8 @@ export const TriggerNode = ({
 	return (
 		<SectionNodeCard
 			tone="trigger"
-			badge={issue ? "Setup" : "Ready"}
-			badgeTone={issue ? "warning" : "info"}
+			badge={issue ? "Setup" : null}
+			badgeTone="warning"
 			selected={selected}
 			hasSource
 		>

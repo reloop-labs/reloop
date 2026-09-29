@@ -56,7 +56,7 @@ export const SectionNodeCard = ({
 	return (
 		<div
 			className={cn(
-				"relative w-[320px] overflow-visible rounded-2xl border bg-bg-white-0 p-1.5 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[border-color,box-shadow] duration-150 ease-out dark:border-stroke-soft-100/40 dark:bg-[#141419] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
+				"relative w-[320px] overflow-visible rounded-2xl border bg-bg-white-0 p-1 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[border-color,box-shadow] duration-150 ease-out dark:border-stroke-soft-100/40 dark:bg-[#141419] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
 				selected
 					? meta.selected
 					: "border-stroke-soft-200 dark:border-stroke-soft-100/40",
@@ -71,14 +71,14 @@ export const SectionNodeCard = ({
 				/>
 			) : null}
 
-			<div className="flex items-center gap-2 px-1.5 py-1">
+			<div className="flex items-center gap-2 px-2 py-2">
 				<span
 					className={cn(
-						"flex h-6 w-6 shrink-0 items-center justify-center rounded-md",
-						meta.well,
+						"flex h-6 w-6 shrink-0 items-center justify-center rounded-md border bg-transparent",
+						meta.iconBorder,
 					)}
 				>
-					<Icon name={meta.icon} className="h-3.5 w-3.5" />
+					<Icon name={meta.icon} className={cn("h-3.5 w-3.5", meta.iconClass)} />
 				</span>
 				<p className="min-w-0 flex-1 truncate font-medium text-[14px] text-text-strong-950">
 					{meta.label}
@@ -125,7 +125,7 @@ export const SectionNodeCard = ({
 			</div>
 
 			{collapsed ? null : (
-				<div className="nodrag nopan rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/30 dark:bg-black/40">
+				<div className="nodrag nopan mt-1 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/70 dark:bg-black/40">
 					{children}
 				</div>
 			)}
