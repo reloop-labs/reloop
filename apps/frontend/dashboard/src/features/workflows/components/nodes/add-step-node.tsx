@@ -8,9 +8,9 @@ import { useNodeEditor } from "../node-editor-context";
 import { StepPickerMenu } from "../step-picker-menu";
 
 /**
- * Trailing end-cap rendered after the last step: a stub line lands on the
- * invisible target handle and a plus button opens the step picker to append.
- * Display-only — never persisted (filtered out of the graph state).
+ * Trailing end-cap rendered after the last step: a vertical connector line
+ * drops from the previous card to a circular plus button (see reference)
+ * which opens the step picker to append. Display-only — never persisted.
  */
 export const AddStepNode = () => {
 	const [pickerOpen, setPickerOpen] = useState(false);
@@ -29,28 +29,36 @@ export const AddStepNode = () => {
 	}, [pickerOpen]);
 
 	return (
-		<div ref={ref} className="nodrag nopan relative flex w-[320px] justify-center">
+		<div
+			ref={ref}
+			className="nodrag nopan relative flex w-[320px] flex-col items-center"
+		>
 			<Handle
 				type="target"
 				position={Position.Top}
 				isConnectable={false}
 				className="!h-0 !w-0 !border-0 !bg-transparent opacity-0"
 			/>
+			{/* Vertical connector from the previous card down to the plus. */}
+			<div
+				aria-hidden="true"
+				className="h-16 w-[2px] bg-gray-400/80 dark:bg-white/25"
+			/>
 			<button
 				type="button"
 				aria-label={pickerOpen ? "Close step picker" : "Add step here"}
 				onClick={() => setPickerOpen((o) => !o)}
 				className={cn(
-					"flex h-8 w-8 items-center justify-center rounded-full border shadow-regular-md transition-all duration-150",
+					"flex h-10 w-10 items-center justify-center rounded-full border border-black/10 text-white shadow-[0_4px_14px_rgba(0,0,0,0.28)] transition-all duration-150",
 					pickerOpen
-						? "border-blue-500 bg-blue-500 text-white dark:border-blue-400 dark:bg-blue-500"
-						: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-blue-500 hover:text-blue-600 dark:border-white/10 dark:bg-[#2b3038] dark:text-gray-200 dark:hover:border-blue-400 dark:hover:text-white",
+						? "bg-blue-500 hover:bg-blue-600"
+						: "bg-[#3d444d] hover:bg-[#4d555e] active:scale-95",
 				)}
 			>
 				<Icon
 					name="plus"
 					className={cn(
-						"h-4 w-4 transition-transform duration-150",
+						"h-5 w-5 transition-transform duration-150",
 						pickerOpen && "rotate-45",
 					)}
 				/>

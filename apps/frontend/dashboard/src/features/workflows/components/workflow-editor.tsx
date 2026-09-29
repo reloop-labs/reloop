@@ -42,7 +42,6 @@ import { GroupNode } from "./nodes/group-node";
 import { SendEmailNode } from "./nodes/send-email-node";
 import { TriggerNode } from "./nodes/trigger-node";
 import { WorkflowEditorToolbar } from "./workflow-editor-toolbar";
-import { WorkflowNodePalette } from "./workflow-node-palette";
 
 const nodeTypes = {
 	trigger: TriggerNode,
@@ -69,14 +68,61 @@ const ROW_GAP = 280;
 /** Display-only end-cap below the last step (plus button to append). Never persisted. */
 const END_CAP_NODE_ID = "__add_step__";
 const END_CAP_EDGE_ID = "__add_step_edge__";
-/** Gap between the bottom of the last step and the trailing plus. */
-const END_CAP_GAP = 96;
+/** Gap between the bottom of the last step and the trailing plus node.
+ * The node itself draws a 64px connector line + 40px button, so keep this
+ * small — the visible distance comes from the line inside AddStepNode. */
+const END_CAP_GAP = 12;
 
 const zoomSelector = (s: { transform: [number, number, number] }) =>
 	s.transform[2];
 
-/** Top-right vertical zoom control (75% / 100% / 125%). Zoom only via buttons. */
-const ZOOM_STEPS = [0.75, 1, 1.25];
+/** Bottom of the lowest rendered step (measured heights, not tops).
+ * MUST run inside <ReactFlow> — useStore outside the canvas has no node
+ * lookup and always reads 0, which hid the trailing plus behind tall cards. */
+const contentBottomSelector = (s: {
+	nodeLookup: Map<
+		string,
+		{
+			id: string;
+			position: { x: number; y: number };
+			internals?: { positionAbsolute?: { x: number; y: number } };
+			measured?: { height?: number };
+		}
+	>;
+}) => {
+	let bottom = 0;
+	s.nodeLookup.forEach((n) => {
+		if (n.id === END_CAP_NODE_ID) return;
+		const y = n.internals?.positionAbsolute?.y ?? n.position.y;
+		const h = n.measured?.height ?? 0;
+		bottom = Math.max(bottom, y + h);
+	});
+	return bottom;
+};
+
+const ContentBottomReporter = ({
+	onReport,
+}: {
+	onReport: (bottom: number) => void;
+}) => {
+	const bottom = useStore(contentBottomSelector);
+	useEffect(() => {
+		onReport(bottom);
+	}, [bottom, onReport]);
+	return null;
+};
+
+/** Rough card heights per type so the trailing plus never overlaps the
+ * source card before real measurement arrives. */
+const ESTIMATED_CARD_HEIGHT: Record<string, number> = {
+	trigger: 220,
+	send_email: 760,
+	delay: 260,
+	condition: 380,
+};
+
+/** Top-right vertical zoom control. Zoom only via buttons. */
+const ZOOM_STEPS = [0.5, 0.75, 1, 1.25];
 
 const CanvasZoomControl = () => {
 	const { zoomTo } = useReactFlow();
@@ -85,7 +131,7 @@ const CanvasZoomControl = () => {
 	const nearestIndex = ZOOM_STEPS.reduce(
 		(best, step, i) =>
 			Math.abs(step - zoom) < Math.abs(ZOOM_STEPS[best]! - zoom) ? i : best,
-		1,
+		2,
 	);
 	const canZoomIn = nearestIndex < ZOOM_STEPS.length - 1;
 	const canZoomOut = nearestIndex > 0;
@@ -150,6 +196,9 @@ const WorkflowEditorInner = ({
 	const workflowIdRef = useRef(workflow.id);
 	const skipPersistRef = useRef(false);
 	const { fitView } = useReactFlow();
+	/** Measured bottom reported from inside <ReactFlow> (see reporter). */
+	const [measuredBottom, setMeasuredBottom] = useState(0);
+	const didInitFitRef = useRef(false);
 
 	useEffect(() => {
 		if (workflowIdRef.current !== workflow.id) {
@@ -158,6 +207,8 @@ const WorkflowEditorInner = ({
 			setNodes(workflow.nodes);
 			setEdges(workflow.edges);
 			setSelectedNodeId(null);
+			setMeasuredBottom(0);
+			didInitFitRef.current = false;
 		}
 	}, [workflow.id, workflow.nodes, workflow.edges, setNodes, setEdges]);
 
@@ -286,59 +337,65 @@ const WorkflowEditorInner = ({
 				const hasNo = edges.some(
 					(e) => e.source === n.id && e.sourceHandle === "no",
 				);
-				if (!hasYes) return { id: n.id, handle: "yes" as const };
-				if (!hasNo) return { id: n.id, handle: "no" as const };
+				if (!hasYes)
+					return {
+						id: n.id,
+						handle: "yes" as const,
+						y: n.position.y,
+						type: n.type,
+					};
+				if (!hasNo)
+					return { id: n.id, handle: "no" as const, y: n.position.y, type: n.type };
 				continue;
 			}
 			if (n.type === "group") continue;
 			if (!edges.some((e) => e.source === n.id)) {
-				return { id: n.id, handle: undefined as undefined };
+				return {
+					id: n.id,
+					handle: undefined as undefined,
+					y: n.position.y,
+					type: n.type,
+				};
 			}
 		}
 		return null;
 	}, [nodes, edges]);
 
-	/** Bottom of the lowest rendered step (measured heights, not tops). */
-	const contentBottom = useStore((s) => {
-		let bottom = 0;
-		s.nodeLookup.forEach((n) => {
-			if (n.id === END_CAP_NODE_ID) return;
-			const y = n.internals?.positionAbsolute?.y ?? n.position.y;
-			const h = n.measured?.height ?? 0;
-			bottom = Math.max(bottom, y + h);
-		});
-		return bottom;
-	});
+	const handleBottomReport = useCallback((bottom: number) => {
+		setMeasuredBottom((prev) => (prev === bottom ? prev : bottom));
+	}, []);
 
 	// Fit once measured so the trailing plus is in view on load.
-	const didInitFitRef = useRef(false);
 	useEffect(() => {
-		if (didInitFitRef.current || contentBottom <= 0) return;
+		if (didInitFitRef.current || measuredBottom <= 0) return;
 		didInitFitRef.current = true;
 		requestAnimationFrame(() => {
 			void fitView({ padding: 0.35, maxZoom: 1, duration: 0 });
 		});
-	}, [contentBottom, fitView]);
+	}, [measuredBottom, fitView]);
 
 	/** Graph + display-only end-cap (plus button below the last step). */
 	const displayNodes = useMemo<WorkflowNode[]>(() => {
 		if (!endCapSource) return nodes;
+		// Prefer measured bottom, but fall back to source Y + estimated card
+		// height so the plus is never hidden behind the source on first paint.
+		const estimated =
+			ESTIMATED_CARD_HEIGHT[endCapSource.type] ?? ESTIMATED_CARD_HEIGHT.trigger ?? 220;
+		const fallbackY = endCapSource.y + estimated + END_CAP_GAP;
+		const measuredY = Math.max(measuredBottom, 0) + END_CAP_GAP;
+		const endCapY = Math.max(measuredY, fallbackY);
 		const endCap = {
 			id: END_CAP_NODE_ID,
 			type: "add_step",
-			position: { x: COLUMN_X, y: Math.max(contentBottom, 0) + END_CAP_GAP },
+			position: { x: COLUMN_X, y: endCapY },
 			data: {},
 			selectable: false,
 			draggable: false,
 		} as unknown as WorkflowNode;
 		return [...nodes, endCap];
-	}, [nodes, endCapSource, contentBottom]);
+	}, [nodes, endCapSource, measuredBottom]);
 
 	const displayEdges = useMemo<WorkflowEdge[]>(() => {
-		if (typeof window !== "undefined") {
-			// eslint-disable-next-line no-console
-			console.log("[debug-flow] endCapSource", endCapSource, "realEdges", edges.length, "contentBottom", contentBottom);
-		}
 		if (!endCapSource) return edges;
 		const stub: WorkflowEdge = {
 			id: END_CAP_EDGE_ID,
@@ -436,8 +493,18 @@ const WorkflowEditorInner = ({
 				if (edge.targetHandle) second.targetHandle = edge.targetHandle;
 				return [...rest, first, second];
 			});
+
+			const reduceMotion =
+				typeof window !== "undefined" &&
+				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			requestAnimationFrame(() => {
+				void fitView({
+					padding: 0.3,
+					duration: reduceMotion ? 0 : 220,
+				});
+			});
 		},
-		[edges, nodes, setNodes, setEdges],
+		[edges, nodes, setNodes, setEdges, fitView],
 	);
 
 	useHotkeys("backspace", () => {
@@ -480,11 +547,6 @@ const WorkflowEditorInner = ({
 				/>
 				<div className="relative flex min-h-0 flex-1 overflow-hidden">
 					<div className="relative min-w-0 flex-1">
-						<WorkflowNodePalette
-							onAddSendEmail={handleAddSendEmail}
-							onAddDelay={handleAddDelay}
-							onAddCondition={handleAddCondition}
-						/>
 						<ReactFlow
 							nodes={displayNodes}
 							edges={displayEdges}
@@ -503,7 +565,7 @@ const WorkflowEditorInner = ({
 							zoomOnPinch={false}
 							zoomOnDoubleClick={false}
 							panOnScroll
-							minZoom={0.75}
+							minZoom={0.5}
 							maxZoom={1.25}
 							className="workflow-canvas bg-bg-weak-50 dark:bg-black"
 							connectionLineStyle={{
@@ -518,6 +580,7 @@ const WorkflowEditorInner = ({
 								color="var(--color-stroke-soft-200)"
 							/>
 							<CanvasZoomControl />
+							<ContentBottomReporter onReport={handleBottomReport} />
 						</ReactFlow>
 					</div>
 				</div>

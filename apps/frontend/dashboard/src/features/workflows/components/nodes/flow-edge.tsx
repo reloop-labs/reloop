@@ -68,11 +68,13 @@ export const FlowEdge = ({
 
 	return (
 		<>
-			<BaseEdge
-				path={path}
-				markerEnd={markerEnd}
-				style={{ stroke: color, strokeWidth: 1.5 }}
-			/>
+			{isStub ? null : (
+				<BaseEdge
+					path={path}
+					markerEnd={markerEnd}
+					style={{ stroke: color, strokeWidth: 1.5 }}
+				/>
+			)}
 			{isStub ? null : (
 				<EdgeLabelRenderer>
 					<div
@@ -88,16 +90,16 @@ export const FlowEdge = ({
 							aria-label={pickerOpen ? "Close step picker" : "Insert step here"}
 							onClick={() => setPickerOpen((o) => !o)}
 							className={cn(
-								"flex h-6 w-6 items-center justify-center rounded-full border shadow-regular-sm transition-all duration-150",
+								"flex h-7 w-7 items-center justify-center rounded-full border border-black/10 text-white shadow-[0_2px_10px_rgba(0,0,0,0.25)] transition-all duration-150",
 								pickerOpen
-									? "border-blue-500 bg-blue-500 text-white dark:border-blue-400 dark:bg-blue-500"
-									: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-blue-500 hover:text-blue-600 dark:border-stroke-soft-100/50 dark:bg-[#141419] dark:hover:border-blue-400 dark:hover:text-blue-300",
+									? "bg-blue-500 hover:bg-blue-600"
+									: "bg-[#3d444d] hover:bg-[#4d555e]",
 							)}
 						>
 							<Icon
 								name="plus"
 								className={cn(
-									"h-3.5 w-3.5 transition-transform duration-150",
+									"h-4 w-4 transition-transform duration-150",
 									pickerOpen && "rotate-45",
 								)}
 							/>
