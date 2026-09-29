@@ -42,15 +42,15 @@ export interface DiagnosticReason {
 
 export const reasons: DiagnosticReason[] = [
 	{
-		title: "Newly Registered Domain (NRD) Filters",
+		title: "New-Domain Spam Filter Risk",
 		description:
-			"Mailbox filters like Spamhaus and Gmail automatically penalize domains younger than 14–30 days to defend against disposable spam and phishing campaigns.",
+			"Mailbox filters like Spamhaus, Gmail, and Outlook automatically flag domains younger than 14–30 days to defend against fresh spam.",
 		icon: "alert-triangle",
 	},
 	{
-		title: "Authoritative RDAP Verification",
+		title: "Verified Registry Age Lookup",
 		description:
-			"We query direct ICANN Registration Data Access Protocol (RDAP) endpoints rather than rate-limited, scraped WHOIS port 43 data.",
+			"We query official ICANN registration endpoints directly rather than relying on stale or rate-limited WHOIS scrapers.",
 		icon: "shield-check",
 	},
 	{

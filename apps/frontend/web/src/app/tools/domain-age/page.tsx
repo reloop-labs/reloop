@@ -8,6 +8,7 @@ import Link from "next/link";
 import { SimilarTools } from "../temp-email-checker/components/similar-tools";
 import { CheckerPanel } from "./checker-panel";
 import { ApiIntegration } from "./components/api-integration";
+import { WhyDomainAgeMatters } from "./components/why-domain-age-matters";
 import { DomainAgeCta } from "./components/domain-age-cta";
 import { WarmupSchedule } from "./components/warmup-schedule";
 import {
@@ -164,6 +165,11 @@ export default function DomainAgePage() {
 			</div>
 
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
+				<WhyDomainAgeMatters />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
