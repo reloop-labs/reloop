@@ -5,7 +5,6 @@ import {
 	Background,
 	BackgroundVariant,
 	type Connection,
-	Controls,
 	type DefaultEdgeOptions,
 	ReactFlow,
 	ReactFlowProvider,
@@ -13,9 +12,11 @@ import {
 	useNodesState,
 	useOnSelectionChange,
 	useReactFlow,
+	useStore,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Icon } from "@reloop/ui/icon";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
 	createConditionNode,
@@ -32,7 +33,7 @@ import {
 	type WorkflowNode,
 	type WorkflowStatus,
 } from "../workflow-types";
-import { NodeConfigPanel } from "./node-config-panel";
+import { NodeEditorProvider } from "./node-editor-context";
 import { ConditionNode } from "./nodes/condition-node";
 import { DelayNode } from "./nodes/delay-node";
 import { FlowEdge } from "./nodes/flow-edge";
@@ -59,9 +60,59 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 	data: { tone: "default" },
 };
 
-/** Horizontal center of the vertical node column (cards are 300px wide). */
+/** Horizontal center of the vertical node column (cards are 320px wide). */
 const COLUMN_X = 220;
-const ROW_GAP = 200;
+const ROW_GAP = 280;
+
+const zoomSelector = (s: { transform: [number, number, number] }) =>
+	s.transform[2];
+
+/** Top-right vertical zoom control (75% / 100% / 125%). Zoom only via buttons. */
+const ZOOM_STEPS = [0.75, 1, 1.25];
+
+const CanvasZoomControl = () => {
+	const { zoomTo } = useReactFlow();
+	const zoom = useStore(zoomSelector);
+
+	const nearestIndex = ZOOM_STEPS.reduce(
+		(best, step, i) =>
+			Math.abs(step - zoom) < Math.abs(ZOOM_STEPS[best]! - zoom) ? i : best,
+		1,
+	);
+	const canZoomIn = nearestIndex < ZOOM_STEPS.length - 1;
+	const canZoomOut = nearestIndex > 0;
+
+	return (
+		<div className="absolute top-4 right-4 z-10 flex flex-col items-stretch gap-0.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0/95 p-1 shadow-regular-sm backdrop-blur-sm dark:border-stroke-soft-100/40 dark:bg-[#141419]/95">
+			<button
+				type="button"
+				onClick={() => {
+					if (canZoomIn) void zoomTo(ZOOM_STEPS[nearestIndex + 1]!, { duration: 200 });
+				}}
+				disabled={!canZoomIn}
+				aria-label="Zoom in"
+				className="flex h-7 w-7 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-text-sub-600 dark:hover:bg-white/10"
+			>
+				<Icon name="plus" className="h-4 w-4" />
+			</button>
+			<div
+				aria-hidden="true"
+				className="mx-1 h-px bg-stroke-soft-200 dark:bg-white/10"
+			/>
+			<button
+				type="button"
+				onClick={() => {
+					if (canZoomOut) void zoomTo(ZOOM_STEPS[nearestIndex - 1]!, { duration: 200 });
+				}}
+				disabled={!canZoomOut}
+				aria-label="Zoom out"
+				className="flex h-7 w-7 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-text-sub-600 dark:hover:bg-white/10"
+			>
+				<Icon name="minus" className="h-4 w-4" />
+			</button>
+		</div>
+	);
+};
 
 interface WorkflowEditorProps {
 	workflow: Workflow;
@@ -119,11 +170,6 @@ const WorkflowEditorInner = ({
 			setSelectedNodeId(selected[0]?.id ?? null);
 		},
 	});
-
-	const selectedNode = useMemo(
-		() => nodes.find((n) => n.id === selectedNodeId) ?? null,
-		[nodes, selectedNodeId],
-	);
 
 	const onConnect = useCallback(
 		(connection: Connection) => {
@@ -241,62 +287,63 @@ const WorkflowEditorInner = ({
 	}, [setNodes]);
 
 	return (
-		<div className="flex h-full min-h-0 flex-col">
-			<WorkflowEditorToolbar
-				workflow={{ ...workflow, nodes, edges }}
-				name={workflow.name}
-				onNameChange={onNameChange}
-				onStatusChange={onStatusChange}
-				onSave={handleSave}
-			/>
-			<div className="relative flex min-h-0 flex-1 overflow-hidden">
-				<div className="relative min-w-0 flex-1">
-					<WorkflowNodePalette
-						onAddSendEmail={handleAddSendEmail}
-						onAddDelay={handleAddDelay}
-						onAddCondition={handleAddCondition}
-					/>
-					<ReactFlow
-						nodes={nodes}
-						edges={edges}
-						onNodesChange={onNodesChange}
-						onEdgesChange={onEdgesChange}
-						onConnect={onConnect}
-						nodeTypes={nodeTypes}
-						edgeTypes={edgeTypes}
-						defaultEdgeOptions={defaultEdgeOptions}
-						fitView
-						fitViewOptions={{ padding: 0.35 }}
-						proOptions={{ hideAttribution: true }}
-						onPaneClick={clearSelection}
-						deleteKeyCode={null}
-						className="workflow-canvas bg-bg-weak-50 dark:bg-black"
-						connectionLineStyle={{
-							stroke: "var(--color-stroke-sub-300)",
-							strokeWidth: 1.5,
-						}}
-					>
-						<Background
-							variant={BackgroundVariant.Dots}
-							gap={22}
-							size={1.2}
-							color="var(--color-stroke-soft-200)"
+		<NodeEditorProvider
+			value={{ updateNode: updateNodeData, deleteNode: handleDeleteNode }}
+		>
+			<div className="flex h-full min-h-0 flex-col">
+				<WorkflowEditorToolbar
+					workflow={{ ...workflow, nodes, edges }}
+					name={workflow.name}
+					onNameChange={onNameChange}
+					onStatusChange={onStatusChange}
+					onSave={handleSave}
+				/>
+				<div className="relative flex min-h-0 flex-1 overflow-hidden">
+					<div className="relative min-w-0 flex-1">
+						<WorkflowNodePalette
+							onAddSendEmail={handleAddSendEmail}
+							onAddDelay={handleAddDelay}
+							onAddCondition={handleAddCondition}
 						/>
-						<Controls
-							showInteractive={false}
-							position="bottom-left"
-							className="workflow-controls !shadow-none"
-						/>
-					</ReactFlow>
-					<NodeConfigPanel
-						selectedNode={selectedNode}
-						onUpdateNode={updateNodeData}
-						onDeleteNode={handleDeleteNode}
-						onClose={clearSelection}
-					/>
+						<ReactFlow
+							nodes={nodes}
+							edges={edges}
+							onNodesChange={onNodesChange}
+							onEdgesChange={onEdgesChange}
+							onConnect={onConnect}
+							nodeTypes={nodeTypes}
+							edgeTypes={edgeTypes}
+							defaultEdgeOptions={defaultEdgeOptions}
+							fitView
+							fitViewOptions={{ padding: 0.35, maxZoom: 1 }}
+							proOptions={{ hideAttribution: true }}
+							onPaneClick={clearSelection}
+							deleteKeyCode={null}
+							zoomOnScroll={false}
+							zoomOnPinch={false}
+							zoomOnDoubleClick={false}
+							panOnScroll
+							minZoom={0.75}
+							maxZoom={1.25}
+							className="workflow-canvas bg-bg-weak-50 dark:bg-black"
+							connectionLineStyle={{
+								stroke: "var(--color-stroke-sub-300)",
+								strokeWidth: 1.5,
+								strokeDasharray: "5 5",
+							}}
+						>
+							<Background
+								variant={BackgroundVariant.Dots}
+								gap={22}
+								size={1.2}
+								color="var(--color-stroke-soft-200)"
+							/>
+							<CanvasZoomControl />
+						</ReactFlow>
+					</div>
 				</div>
 			</div>
-		</div>
+		</NodeEditorProvider>
 	);
 };
 

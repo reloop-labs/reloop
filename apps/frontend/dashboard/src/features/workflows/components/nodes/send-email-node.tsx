@@ -3,7 +3,9 @@
 import type { NodeProps } from "@xyflow/react";
 import type { SendEmailNodeData, WorkflowNode } from "../../workflow-types";
 import { getNodeIssue } from "../../workflow-validation";
-import { FlowNodeCard } from "./flow-node-card";
+import { useNodeEditor } from "../node-editor-context";
+import { SendEmailConfigForm } from "../send-email-config-form";
+import { SectionNodeCard } from "./section-node-card";
 
 type SendEmailFlowNode = WorkflowNode & {
 	type: "send_email";
@@ -12,20 +14,28 @@ type SendEmailFlowNode = WorkflowNode & {
 
 export const SendEmailNode = ({
 	data,
+	id,
 	selected,
 	type,
 }: NodeProps<SendEmailFlowNode>) => {
+	const { updateNode, deleteNode } = useNodeEditor();
 	const issue = getNodeIssue({ type, data });
 
 	return (
-		<FlowNodeCard
+		<SectionNodeCard
 			tone="send_email"
-			title={data.subject?.trim() || "No subject"}
-			subtitle={data.to?.trim() || undefined}
-			issue={issue}
+			badge={issue ? "Setup" : "Ready"}
+			badgeTone={issue ? "warning" : "info"}
 			selected={selected}
 			hasTarget
 			hasSource
-		/>
+			onDelete={() => deleteNode(id)}
+		>
+			<SendEmailConfigForm
+				value={data}
+				idPrefix={`${id}-`}
+				onChange={(next) => updateNode(id, next)}
+			/>
+		</SectionNodeCard>
 	);
 };

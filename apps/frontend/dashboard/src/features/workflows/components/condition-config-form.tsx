@@ -9,6 +9,8 @@ import type { ConditionNodeData, ConditionOperator } from "../workflow-types";
 interface ConditionConfigFormProps {
 	value: ConditionNodeData;
 	onChange: (data: ConditionNodeData) => void;
+	/** Prefix for label/input ids so multiple nodes can share the canvas. */
+	idPrefix?: string;
 }
 
 const CONTACT_FIELDS = [
@@ -39,6 +41,7 @@ function eventKeyFromField(field: string): string {
 export const ConditionConfigForm = ({
 	value,
 	onChange,
+	idPrefix = "",
 }: ConditionConfigFormProps) => {
 	const propertiesQuery = useAllPropertiesQuery();
 	const customProperties = propertiesQuery.data?.properties ?? [];
@@ -118,11 +121,13 @@ export const ConditionConfigForm = ({
 				</div>
 			) : (
 				<div className="space-y-1.5">
-					<Label.Root htmlFor="condition-event-key">Event property</Label.Root>
+					<Label.Root htmlFor={`${idPrefix}condition-event-key`}>
+						Event property
+					</Label.Root>
 					<Input.Root>
 						<Input.Wrapper>
 							<Input.Input
-								id="condition-event-key"
+								id={`${idPrefix}condition-event-key`}
 								placeholder="plan"
 								value={eventKeyFromField(value.field ?? "")}
 								onChange={(e) =>
@@ -163,11 +168,11 @@ export const ConditionConfigForm = ({
 
 			{needsValue ? (
 				<div className="space-y-1.5">
-					<Label.Root htmlFor="condition-value">Value</Label.Root>
+					<Label.Root htmlFor={`${idPrefix}condition-value`}>Value</Label.Root>
 					<Input.Root>
 						<Input.Wrapper>
 							<Input.Input
-								id="condition-value"
+								id={`${idPrefix}condition-value`}
 								placeholder="pro"
 								value={value.value ?? ""}
 								onChange={(e) => update({ value: e.target.value })}

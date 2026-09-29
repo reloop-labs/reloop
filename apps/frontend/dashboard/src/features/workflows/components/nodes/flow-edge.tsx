@@ -46,12 +46,12 @@ export const FlowEdge = ({
 			<BaseEdge
 				path={path}
 				markerEnd={markerEnd}
-				style={{ stroke: color, strokeWidth: 1.5 }}
+				style={{ stroke: color, strokeWidth: 1.5, strokeDasharray: "5 5" }}
 			/>
 			<circle
 				cx={sourceX}
 				cy={sourceY}
-				r={3.5}
+				r={3}
 				fill={color}
 				stroke="var(--color-bg-white-0)"
 				strokeWidth={1.5}
@@ -59,7 +59,7 @@ export const FlowEdge = ({
 			<circle
 				cx={targetX}
 				cy={targetY}
-				r={3.5}
+				r={3}
 				fill={color}
 				stroke="var(--color-bg-white-0)"
 				strokeWidth={1.5}

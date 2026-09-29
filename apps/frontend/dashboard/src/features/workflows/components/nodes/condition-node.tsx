@@ -3,47 +3,29 @@
 import type { NodeProps } from "@xyflow/react";
 import type { ConditionNodeData, WorkflowNode } from "../../workflow-types";
 import { getNodeIssue } from "../../workflow-validation";
-import { FlowNodeCard } from "./flow-node-card";
+import { ConditionConfigForm } from "../condition-config-form";
+import { useNodeEditor } from "../node-editor-context";
+import { SectionNodeCard } from "./section-node-card";
 
 type ConditionFlowNode = WorkflowNode & {
 	type: "condition";
 	data: ConditionNodeData;
 };
 
-const OPERATOR_LABEL: Record<string, string> = {
-	eq: "=",
-	neq: "≠",
-	contains: "contains",
-	exists: "is set",
-	not_exists: "is not set",
-	gt: ">",
-	lt: "<",
-};
-
-function formatCondition(data: ConditionNodeData): string {
-	const field = data.field?.trim();
-	if (!field) return "Set condition";
-	const op = OPERATOR_LABEL[data.operator] ?? data.operator;
-	if (data.operator === "exists" || data.operator === "not_exists") {
-		return `${field} ${op}`;
-	}
-	const value = data.value?.trim();
-	if (!value) return `${field} ${op} …`;
-	return `${field} ${op} ${value}`;
-}
-
 export const ConditionNode = ({
 	data,
+	id,
 	selected,
 	type,
 }: NodeProps<ConditionFlowNode>) => {
+	const { updateNode, deleteNode } = useNodeEditor();
 	const issue = getNodeIssue({ type, data });
 
 	return (
-		<FlowNodeCard
+		<SectionNodeCard
 			tone="condition"
-			title={formatCondition(data)}
-			issue={issue}
+			badge={issue ? "Setup" : "Ready"}
+			badgeTone={issue ? "warning" : "info"}
 			selected={selected}
 			hasTarget
 			sourceHandles={[
@@ -59,6 +41,13 @@ export const ConditionNode = ({
 					label: "No",
 				},
 			]}
-		/>
+			onDelete={() => deleteNode(id)}
+		>
+			<ConditionConfigForm
+				value={data}
+				idPrefix={`${id}-`}
+				onChange={(next) => updateNode(id, next)}
+			/>
+		</SectionNodeCard>
 	);
 };

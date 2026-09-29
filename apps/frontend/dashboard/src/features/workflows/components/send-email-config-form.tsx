@@ -8,23 +8,31 @@ import type { SendEmailNodeData } from "../workflow-types";
 interface SendEmailConfigFormProps {
 	value: SendEmailNodeData;
 	onChange: (data: SendEmailNodeData) => void;
+	/** Prefix for label/input ids so multiple nodes can share the canvas. */
+	idPrefix?: string;
 }
 
 export const SendEmailConfigForm = ({
 	value,
 	onChange,
+	idPrefix = "",
 }: SendEmailConfigFormProps) => {
 	const update = (patch: Partial<SendEmailNodeData>) =>
 		onChange({ ...value, ...patch });
+	const toId = `${idPrefix}send-to`;
+	const fromId = `${idPrefix}send-from`;
+	const subjectId = `${idPrefix}send-subject`;
+	const htmlId = `${idPrefix}send-html`;
+	const templateId = `${idPrefix}send-template`;
 
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="space-y-1.5">
-				<Label.Root htmlFor="send-to">To</Label.Root>
+				<Label.Root htmlFor={toId}>To</Label.Root>
 				<Input.Root>
 					<Input.Wrapper>
 						<Input.Input
-							id="send-to"
+							id={toId}
 							placeholder="{{contact.email}}"
 							value={value.to}
 							onChange={(e) => update({ to: e.target.value })}
@@ -37,11 +45,11 @@ export const SendEmailConfigForm = ({
 			</div>
 
 			<div className="space-y-1.5">
-				<Label.Root htmlFor="send-from">From</Label.Root>
+				<Label.Root htmlFor={fromId}>From</Label.Root>
 				<Input.Root>
 					<Input.Wrapper>
 						<Input.Input
-							id="send-from"
+							id={fromId}
 							placeholder="hello@yourdomain.com"
 							value={value.from ?? ""}
 							onChange={(e) => update({ from: e.target.value })}
@@ -54,11 +62,11 @@ export const SendEmailConfigForm = ({
 			</div>
 
 			<div className="space-y-1.5">
-				<Label.Root htmlFor="send-subject">Subject</Label.Root>
+				<Label.Root htmlFor={subjectId}>Subject</Label.Root>
 				<Input.Root>
 					<Input.Wrapper>
 						<Input.Input
-							id="send-subject"
+							id={subjectId}
 							placeholder="Your email subject"
 							value={value.subject}
 							onChange={(e) => update({ subject: e.target.value })}
@@ -68,9 +76,9 @@ export const SendEmailConfigForm = ({
 			</div>
 
 			<div className="space-y-1.5">
-				<Label.Root htmlFor="send-html">HTML body (optional)</Label.Root>
+				<Label.Root htmlFor={htmlId}>HTML body (optional)</Label.Root>
 				<Textarea.Root
-					id="send-html"
+					id={htmlId}
 					placeholder="<p>Welcome…</p>"
 					value={value.html ?? ""}
 					onChange={(e) => update({ html: e.target.value })}
@@ -79,11 +87,11 @@ export const SendEmailConfigForm = ({
 			</div>
 
 			<div className="space-y-1.5">
-				<Label.Root htmlFor="send-template">Template ID (optional)</Label.Root>
+				<Label.Root htmlFor={templateId}>Template ID (optional)</Label.Root>
 				<Input.Root>
 					<Input.Wrapper>
 						<Input.Input
-							id="send-template"
+							id={templateId}
 							placeholder="tmpl_..."
 							value={value.templateId ?? ""}
 							onChange={(e) => update({ templateId: e.target.value })}

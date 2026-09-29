@@ -8,11 +8,18 @@ import type { DelayNodeData, DelayUnit } from "../workflow-types";
 interface DelayConfigFormProps {
 	value: DelayNodeData;
 	onChange: (data: DelayNodeData) => void;
+	/** Prefix for label/input ids so multiple nodes can share the canvas. */
+	idPrefix?: string;
 }
 
-export const DelayConfigForm = ({ value, onChange }: DelayConfigFormProps) => {
+export const DelayConfigForm = ({
+	value,
+	onChange,
+	idPrefix = "",
+}: DelayConfigFormProps) => {
 	const update = (patch: Partial<DelayNodeData>) =>
 		onChange({ ...value, ...patch });
+	const amountId = `${idPrefix}delay-amount`;
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -23,11 +30,11 @@ export const DelayConfigForm = ({ value, onChange }: DelayConfigFormProps) => {
 				</p>
 			</div>
 			<div className="space-y-1.5">
-				<Label.Root htmlFor="delay-amount">Amount</Label.Root>
+				<Label.Root htmlFor={amountId}>Amount</Label.Root>
 				<Input.Root>
 					<Input.Wrapper>
 						<Input.Input
-							id="delay-amount"
+							id={amountId}
 							type="number"
 							min={0}
 							step={1}

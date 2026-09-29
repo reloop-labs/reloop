@@ -62,12 +62,6 @@ export const TriggerConfigForm = ({
 	return (
 		<div className="flex flex-col gap-4">
 			<div>
-				<p className="mb-1 font-medium text-sm text-text-strong-950">
-					Trigger event
-				</p>
-				<p className="mb-3 text-text-sub-600 text-xs">
-					This starts the automation. Custom events are separate from webhooks.
-				</p>
 				<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
 					<Dropdown.Trigger asChild>
 						<Button.Root
@@ -159,28 +153,6 @@ export const TriggerConfigForm = ({
 					</Dropdown.Content>
 				</Dropdown.Root>
 			</div>
-
-			{selected && selected.properties.length > 0 && (
-				<div className="rounded-lg border border-stroke-soft-100 bg-bg-weak-50/40 p-3 dark:border-stroke-soft-100/50">
-					<p className="mb-2 font-medium text-text-sub-600 text-xs uppercase tracking-wide">
-						Properties
-					</p>
-					<ul className="space-y-1">
-						{selected.properties.map((p) => (
-							<li
-								key={p.id}
-								className="flex items-center justify-between text-xs"
-							>
-								<span className="font-mono text-text-strong-950">{p.name}</span>
-								<span className="text-text-sub-600">
-									{p.propertyType}
-									{p.required ? " · required" : ""}
-								</span>
-							</li>
-						))}
-					</ul>
-				</div>
-			)}
 
 			<CreateEventModal
 				open={createOpen}

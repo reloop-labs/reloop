@@ -3,37 +3,39 @@
 import type { NodeProps } from "@xyflow/react";
 import type { DelayNodeData, WorkflowNode } from "../../workflow-types";
 import { getNodeIssue } from "../../workflow-validation";
-import { FlowNodeCard } from "./flow-node-card";
+import { DelayConfigForm } from "../delay-config-form";
+import { useNodeEditor } from "../node-editor-context";
+import { SectionNodeCard } from "./section-node-card";
 
 type DelayFlowNode = WorkflowNode & {
 	type: "delay";
 	data: DelayNodeData;
 };
 
-function formatDelay(data: DelayNodeData): string {
-	const amount = Number(data.amount);
-	const unit = data.unit ?? "minutes";
-	if (!Number.isFinite(amount)) return "Set delay";
-	const label = unit === "days" ? "day" : unit === "hours" ? "hour" : "minute";
-	const plural = amount === 1 ? label : `${label}s`;
-	return `Wait ${amount} ${plural}`;
-}
-
 export const DelayNode = ({
 	data,
+	id,
 	selected,
 	type,
 }: NodeProps<DelayFlowNode>) => {
+	const { updateNode, deleteNode } = useNodeEditor();
 	const issue = getNodeIssue({ type, data });
 
 	return (
-		<FlowNodeCard
+		<SectionNodeCard
 			tone="delay"
-			title={formatDelay(data)}
-			issue={issue}
+			badge={issue ? "Setup" : "Ready"}
+			badgeTone={issue ? "warning" : "info"}
 			selected={selected}
 			hasTarget
 			hasSource
-		/>
+			onDelete={() => deleteNode(id)}
+		>
+			<DelayConfigForm
+				value={data}
+				idPrefix={`${id}-`}
+				onChange={(next) => updateNode(id, next)}
+			/>
+		</SectionNodeCard>
 	);
 };
