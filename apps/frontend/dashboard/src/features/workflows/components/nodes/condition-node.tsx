@@ -23,6 +23,7 @@ export const ConditionNode = ({
 
 	return (
 		<SectionNodeCard
+			nodeId={id}
 			tone="condition"
 			badge={issue ? "Setup" : null}
 			badgeTone="warning"

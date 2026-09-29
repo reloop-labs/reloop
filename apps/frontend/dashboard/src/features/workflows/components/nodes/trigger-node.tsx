@@ -23,6 +23,7 @@ export const TriggerNode = ({
 
 	return (
 		<SectionNodeCard
+			nodeId={id}
 			tone="trigger"
 			badge={issue ? "Setup" : null}
 			badgeTone="warning"

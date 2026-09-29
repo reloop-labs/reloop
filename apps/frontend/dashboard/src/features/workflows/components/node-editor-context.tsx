@@ -9,6 +9,11 @@ interface NodeEditorContextValue {
 	deleteNode: (nodeId: string) => void;
 	insertStep: (edgeId: string, kind: InsertStepKind) => void;
 	appendStep: (kind: InsertStepKind) => void;
+	addStepBelow: (
+		sourceNodeId: string,
+		sourceHandle: string | undefined,
+		kind: InsertStepKind,
+	) => void;
 }
 
 const NodeEditorContext = createContext<NodeEditorContextValue | null>(null);

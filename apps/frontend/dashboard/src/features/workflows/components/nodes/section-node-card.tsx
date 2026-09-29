@@ -2,9 +2,11 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Handle, Position } from "@xyflow/react";
-import { type ReactNode, useState } from "react";
+import { Handle, Position, useEdges, useNodeId } from "@xyflow/react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { nodeTone, type WorkflowNodeTone } from "../../node-tone";
+import { useNodeEditor } from "../node-editor-context";
+import { StepPickerMenu } from "../step-picker-menu";
 
 export interface SectionSourceHandle {
 	id?: string;
@@ -15,6 +17,7 @@ export interface SectionSourceHandle {
 }
 
 interface SectionNodeCardProps {
+	nodeId?: string;
 	tone: WorkflowNodeTone;
 	/** Amber pill (setup needed) or blue pill (ready), echoed from the reference design. */
 	badge?: string | null;
@@ -29,7 +32,83 @@ interface SectionNodeCardProps {
 }
 
 const defaultHandleClass =
-	"!h-2 !w-2 !border-2 !bg-stroke-sub-300 transition-[background-color,box-shadow] duration-150";
+	"!h-3.5 !w-3.5 !border-2 !border-white dark:!border-[#141419] !bg-stroke-sub-300 dark:!bg-white/40 shadow-xs cursor-crosshair transition-all duration-150 z-30 hover:scale-125 hover:!bg-blue-500 hover:!border-white after:absolute after:-inset-2 after:content-['']";
+
+function SourceHandleConnector({
+	nodeId,
+	handleId,
+	left,
+}: {
+	nodeId: string;
+	handleId?: string;
+	left?: string;
+}) {
+	const [pickerOpen, setPickerOpen] = useState(false);
+	const pickerRef = useRef<HTMLDivElement>(null);
+	const { addStepBelow } = useNodeEditor();
+
+	useEffect(() => {
+		if (!pickerOpen) return;
+		const onPointerDown = (e: PointerEvent) => {
+			if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+				setPickerOpen(false);
+			}
+		};
+		document.addEventListener("pointerdown", onPointerDown);
+		return () => document.removeEventListener("pointerdown", onPointerDown);
+	}, [pickerOpen]);
+
+	return (
+		<div
+			ref={pickerRef}
+			className={cn(
+				"pointer-events-none absolute top-full flex flex-col items-center",
+				pickerOpen ? "z-50" : "z-20",
+			)}
+			style={{
+				left: left ?? "50%",
+				transform: "translateX(-50%)",
+			}}
+		>
+			{/* Vertical connector line dropping down from the card handle */}
+			<div
+				aria-hidden="true"
+				className={cn(
+					"pointer-events-none mt-1 w-[1.5px] bg-stroke-sub-300 transition-all duration-150 dark:bg-white/20",
+					pickerOpen ? "h-4" : "h-6",
+				)}
+			/>
+			{!pickerOpen ? (
+				/* Circular plus button */
+				<button
+					type="button"
+					aria-label="Add step here"
+					onClick={(e) => {
+						e.stopPropagation();
+						setPickerOpen(true);
+					}}
+					className="nodrag nopan group pointer-events-auto flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-[#3d444d] text-white shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-150 hover:scale-110 hover:bg-[#4d555e] active:scale-95"
+				>
+					<Icon
+						name="plus"
+						className="h-4 w-4 transition-transform duration-150 group-hover:rotate-90"
+					/>
+				</button>
+			) : (
+				/* Converted: The plus converts directly into the whole node! */
+				<div className="nodrag nopan pointer-events-auto">
+					<StepPickerMenu
+						onPick={(kind) => {
+							addStepBelow?.(nodeId, handleId, kind);
+							setPickerOpen(false);
+						}}
+						onClose={() => setPickerOpen(false)}
+					/>
+				</div>
+			)}
+		</div>
+	);
+}
 
 /**
  * Section-style canvas card (Schedule / Triggers / … in the reference design):
@@ -37,6 +116,7 @@ const defaultHandleClass =
  * node's inputs directly. Editing happens inline — there is no side panel.
  */
 export const SectionNodeCard = ({
+	nodeId,
 	tone,
 	badge,
 	badgeTone = "info",
@@ -52,6 +132,9 @@ export const SectionNodeCard = ({
 	const handles = sourceHandles ?? (hasSource ? [{}] : []);
 	const labeled = handles.some((h) => h.label);
 	const [collapsed, setCollapsed] = useState(false);
+	const fallbackNodeId = useNodeId();
+	const activeNodeId = nodeId ?? fallbackNodeId;
+	const edges = useEdges();
 
 	return (
 		<div
@@ -78,7 +161,10 @@ export const SectionNodeCard = ({
 						meta.iconBorder,
 					)}
 				>
-					<Icon name={meta.icon} className={cn("h-3.5 w-3.5", meta.iconClass)} />
+					<Icon
+						name={meta.icon}
+						className={cn("h-3.5 w-3.5", meta.iconClass)}
+					/>
 				</span>
 				<p className="min-w-0 flex-1 truncate font-medium text-[14px] text-text-strong-950">
 					{meta.label}
@@ -141,13 +227,32 @@ export const SectionNodeCard = ({
 				/>
 			))}
 
+			{activeNodeId
+				? handles.map((handle) => {
+						const isConnected = edges.some(
+							(e) =>
+								e.source === activeNodeId &&
+								(e.sourceHandle ?? null) === (handle.id ?? null),
+						);
+						if (isConnected) return null;
+						return (
+							<SourceHandleConnector
+								key={`connector-${handle.id ?? "source"}`}
+								nodeId={activeNodeId}
+								handleId={handle.id}
+								left={handle.left}
+							/>
+						);
+					})
+				: null}
+
 			{labeled
 				? handles.map((handle) =>
 						handle.label ? (
 							<span
 								key={`${handle.id}-label`}
 								className={cn(
-									"pointer-events-none absolute bottom-0.5 -translate-x-1/2 font-mono text-[10px] text-text-sub-600",
+									"-translate-x-1/2 pointer-events-none absolute bottom-0.5 font-mono text-[10px] text-text-sub-600",
 									handle.labelClassName,
 								)}
 								style={{ left: handle.left }}

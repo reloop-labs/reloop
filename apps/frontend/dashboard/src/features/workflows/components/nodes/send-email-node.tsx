@@ -23,6 +23,7 @@ export const SendEmailNode = ({
 
 	return (
 		<SectionNodeCard
+			nodeId={id}
 			tone="send_email"
 			badge={issue ? "Setup" : null}
 			badgeTone="warning"

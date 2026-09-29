@@ -23,6 +23,7 @@ export const DelayNode = ({
 
 	return (
 		<SectionNodeCard
+			nodeId={id}
 			tone="delay"
 			badge={issue ? "Setup" : null}
 			badgeTone="warning"

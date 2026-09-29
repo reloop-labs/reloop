@@ -33,7 +33,7 @@ import {
 	type WorkflowNode,
 	type WorkflowStatus,
 } from "../workflow-types";
-import { NodeEditorProvider, type InsertStepKind } from "./node-editor-context";
+import { type InsertStepKind, NodeEditorProvider } from "./node-editor-context";
 import { AddStepNode } from "./nodes/add-step-node";
 import { ConditionNode } from "./nodes/condition-node";
 import { DelayNode } from "./nodes/delay-node";
@@ -63,63 +63,87 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 
 /** Horizontal center of the vertical node column (cards are 320px wide). */
 const COLUMN_X = 220;
-const ROW_GAP = 280;
 
-/** Display-only end-cap below the last step (plus button to append). Never persisted. */
-const END_CAP_NODE_ID = "__add_step__";
-const END_CAP_EDGE_ID = "__add_step_edge__";
-/** Gap between the bottom of the last step and the trailing plus node.
- * The node itself draws a 64px connector line + 40px button, so keep this
- * small — the visible distance comes from the line inside AddStepNode. */
-const END_CAP_GAP = 12;
+/** Estimated card heights by type so vertical spacing accounts for tall forms like Send Email */
+export const getNodeEstimatedHeight = (type?: string): number => {
+	switch (type) {
+		case "trigger":
+			return 160;
+		case "delay":
+			return 240;
+		case "condition":
+			return 340;
+		case "send_email":
+			return 540;
+		default:
+			return 240;
+	}
+};
+
+/** Clear vertical gap between the bottom of one node and the top of the next (line height) */
+export const CLEAR_NODE_GAP = 60;
+
+/** Ensures sequential nodes on the canvas don't overlap vertically */
+function sanitizeNodePositions(
+	nodes: WorkflowNode[],
+	edges: WorkflowEdge[],
+): WorkflowNode[] {
+	if (nodes.length <= 1) return nodes;
+	let modified = false;
+	const result = nodes.map((n) => ({ ...n, position: { ...n.position } }));
+	const byY = [...result].sort((a, b) => a.position.y - b.position.y);
+
+	for (const source of byY) {
+		const sourceHeight = getNodeEstimatedHeight(source.type);
+		const minNextY = source.position.y + sourceHeight + CLEAR_NODE_GAP;
+
+		// 1. Direct edge connections (target of source node)
+		const outgoingEdges = edges.filter((e) => e.source === source.id);
+		for (const edge of outgoingEdges) {
+			const target = result.find((n) => n.id === edge.target);
+			if (target && target.position.y < minNextY) {
+				const delta = minNextY - target.position.y;
+				const targetCurrentY = target.position.y;
+				for (const n of result) {
+					if (
+						n.position.y >= targetCurrentY &&
+						Math.abs(n.position.x - target.position.x) < 280
+					) {
+						n.position.y += delta;
+					}
+				}
+				modified = true;
+			}
+		}
+
+		// 2. Unconnected or same-column collisions (nodes overlapping in the vertical track)
+		for (const other of result) {
+			if (
+				other.id !== source.id &&
+				other.position.y >= source.position.y &&
+				Math.abs(other.position.x - source.position.x) < 280 &&
+				other.position.y < minNextY
+			) {
+				const delta = minNextY - other.position.y;
+				const otherCurrentY = other.position.y;
+				for (const n of result) {
+					if (
+						n.position.y >= otherCurrentY &&
+						Math.abs(n.position.x - other.position.x) < 280
+					) {
+						n.position.y += delta;
+					}
+				}
+				modified = true;
+			}
+		}
+	}
+
+	return modified ? result : nodes;
+}
 
 const zoomSelector = (s: { transform: [number, number, number] }) =>
 	s.transform[2];
-
-/** Bottom of the lowest rendered step (measured heights, not tops).
- * MUST run inside <ReactFlow> — useStore outside the canvas has no node
- * lookup and always reads 0, which hid the trailing plus behind tall cards. */
-const contentBottomSelector = (s: {
-	nodeLookup: Map<
-		string,
-		{
-			id: string;
-			position: { x: number; y: number };
-			internals?: { positionAbsolute?: { x: number; y: number } };
-			measured?: { height?: number };
-		}
-	>;
-}) => {
-	let bottom = 0;
-	s.nodeLookup.forEach((n) => {
-		if (n.id === END_CAP_NODE_ID) return;
-		const y = n.internals?.positionAbsolute?.y ?? n.position.y;
-		const h = n.measured?.height ?? 0;
-		bottom = Math.max(bottom, y + h);
-	});
-	return bottom;
-};
-
-const ContentBottomReporter = ({
-	onReport,
-}: {
-	onReport: (bottom: number) => void;
-}) => {
-	const bottom = useStore(contentBottomSelector);
-	useEffect(() => {
-		onReport(bottom);
-	}, [bottom, onReport]);
-	return null;
-};
-
-/** Rough card heights per type so the trailing plus never overlaps the
- * source card before real measurement arrives. */
-const ESTIMATED_CARD_HEIGHT: Record<string, number> = {
-	trigger: 220,
-	send_email: 760,
-	delay: 260,
-	condition: 380,
-};
 
 /** Top-right vertical zoom control. Zoom only via buttons. */
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25];
@@ -141,7 +165,8 @@ const CanvasZoomControl = () => {
 			<button
 				type="button"
 				onClick={() => {
-					if (canZoomIn) void zoomTo(ZOOM_STEPS[nearestIndex + 1]!, { duration: 200 });
+					if (canZoomIn)
+						void zoomTo(ZOOM_STEPS[nearestIndex + 1]!, { duration: 200 });
 				}}
 				disabled={!canZoomIn}
 				aria-label="Zoom in"
@@ -156,7 +181,8 @@ const CanvasZoomControl = () => {
 			<button
 				type="button"
 				onClick={() => {
-					if (canZoomOut) void zoomTo(ZOOM_STEPS[nearestIndex - 1]!, { duration: 200 });
+					if (canZoomOut)
+						void zoomTo(ZOOM_STEPS[nearestIndex - 1]!, { duration: 200 });
 				}}
 				disabled={!canZoomOut}
 				aria-label="Zoom out"
@@ -186,8 +212,13 @@ const WorkflowEditorInner = ({
 	onStatusChange,
 	onSave,
 }: WorkflowEditorProps) => {
+	const sanitizedInitialNodes = useMemo(
+		() => sanitizeNodePositions(workflow.nodes, workflow.edges),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[workflow.id],
+	);
 	const [nodes, setNodes, onNodesChange] = useNodesState<WorkflowNode>(
-		workflow.nodes,
+		sanitizedInitialNodes,
 	);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<WorkflowEdge>(
 		workflow.edges,
@@ -196,19 +227,15 @@ const WorkflowEditorInner = ({
 	const workflowIdRef = useRef(workflow.id);
 	const skipPersistRef = useRef(false);
 	const { fitView } = useReactFlow();
-	/** Measured bottom reported from inside <ReactFlow> (see reporter). */
-	const [measuredBottom, setMeasuredBottom] = useState(0);
-	const didInitFitRef = useRef(false);
 
 	useEffect(() => {
 		if (workflowIdRef.current !== workflow.id) {
 			workflowIdRef.current = workflow.id;
 			skipPersistRef.current = true;
-			setNodes(workflow.nodes);
+			const cleanNodes = sanitizeNodePositions(workflow.nodes, workflow.edges);
+			setNodes(cleanNodes);
 			setEdges(workflow.edges);
 			setSelectedNodeId(null);
-			setMeasuredBottom(0);
-			didInitFitRef.current = false;
 		}
 	}, [workflow.id, workflow.nodes, workflow.edges, setNodes, setEdges]);
 
@@ -236,15 +263,16 @@ const WorkflowEditorInner = ({
 				connection.sourceHandle === "yes" || connection.sourceHandle === "no"
 					? connection.sourceHandle
 					: undefined;
+			let nextEdges: WorkflowEdge[] = [];
 			setEdges((eds) => {
-				const next = eds.filter(
+				const rest = eds.filter(
 					(edge) =>
 						!(
 							edge.source === connection.source &&
 							(edge.sourceHandle ?? null) === (connection.sourceHandle ?? null)
 						),
 				);
-				return addEdge(
+				nextEdges = addEdge(
 					{
 						...connection,
 						type: "flow",
@@ -253,11 +281,14 @@ const WorkflowEditorInner = ({
 							branch,
 						},
 					},
-					next,
+					rest,
 				);
+				return nextEdges;
 			});
+			// Ensure newly connected nodes don't overlap
+			setNodes((nds) => sanitizeNodePositions(nds, nextEdges));
 		},
-		[setEdges],
+		[setEdges, setNodes],
 	);
 
 	const updateNodeData = useCallback(
@@ -273,8 +304,18 @@ const WorkflowEditorInner = ({
 
 	const appendNode = useCallback(
 		(newNode: WorkflowNode) => {
-			const maxY = Math.max(...nodes.map((n) => n.position.y), 0);
-			newNode.position = { x: COLUMN_X, y: maxY + ROW_GAP };
+			if (nodes.length === 0) {
+				newNode.position = { x: COLUMN_X, y: 60 };
+			} else {
+				const deepestNode = [...nodes].sort(
+					(a, b) => b.position.y - a.position.y,
+				)[0]!;
+				const deepestHeight = getNodeEstimatedHeight(deepestNode.type);
+				newNode.position = {
+					x: deepestNode.position.x,
+					y: deepestNode.position.y + deepestHeight + CLEAR_NODE_GAP,
+				};
+			}
 			newNode.selected = true;
 			setNodes((nds) => {
 				const next: WorkflowNode[] = nds.map((n) =>
@@ -312,113 +353,253 @@ const WorkflowEditorInner = ({
 		appendNode(createConditionNode(conditionCount, 0));
 	}, [nodes, appendNode]);
 
-	/** Append a step at the end of the flow (trailing plus / palette). */
-	const appendStep = useCallback(
-		(kind: InsertStepKind) => {
-			if (kind === "send_email") handleAddSendEmail();
-			else if (kind === "delay") handleAddDelay();
-			else handleAddCondition();
+	/** Append a step directly below a specific node/handle and connect it with an edge. */
+	const addStepBelow = useCallback(
+		(
+			sourceNodeId: string,
+			sourceHandle: string | undefined,
+			kind: InsertStepKind,
+		) => {
+			const sourceNode = nodes.find((n) => n.id === sourceNodeId);
+			if (!sourceNode) return;
+
+			let newNode: WorkflowNode;
+			if (kind === "send_email") {
+				newNode = createSendEmailNode(nodes.filter(isSendEmailNode).length, 0);
+			} else if (kind === "delay") {
+				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
+			} else {
+				newNode = createConditionNode(nodes.filter(isConditionNode).length, 0);
+			}
+
+			const sourceHeight = getNodeEstimatedHeight(sourceNode.type);
+			const newNodeHeight = getNodeEstimatedHeight(newNode.type);
+			const targetY = sourceNode.position.y + sourceHeight + CLEAR_NODE_GAP;
+			const shiftDistance = newNodeHeight + CLEAR_NODE_GAP;
+
+			let targetX = sourceNode.position.x;
+			if (sourceHandle === "yes") {
+				targetX = sourceNode.position.x - 180;
+			} else if (sourceHandle === "no") {
+				targetX = sourceNode.position.x + 180;
+			}
+
+			newNode.position = { x: targetX, y: targetY };
+			newNode.selected = true;
+
+			// Push down any existing nodes that would be overlapped
+			setNodes((nds) => {
+				const next: WorkflowNode[] = nds.map((n) => {
+					const shouldShift =
+						n.id !== sourceNodeId &&
+						n.position.y >= targetY &&
+						Math.abs(n.position.x - targetX) < 220;
+					const shifted = shouldShift
+						? {
+								...n,
+								position: { ...n.position, y: n.position.y + shiftDistance },
+							}
+						: n;
+					return shifted.selected ? { ...shifted, selected: false } : shifted;
+				});
+				next.push(newNode);
+				return next;
+			});
+			setSelectedNodeId(newNode.id);
+
+			const branch =
+				sourceHandle === "yes" || sourceHandle === "no"
+					? sourceHandle
+					: undefined;
+			const stamp = Date.now();
+			const newEdge: WorkflowEdge = {
+				id: `e_${sourceNodeId}_${newNode.id}_${stamp}`,
+				source: sourceNodeId,
+				target: newNode.id,
+				type: "flow",
+				data: {
+					tone: branch === "yes" ? "accent" : "default",
+					branch,
+				},
+			};
+			if (sourceHandle) {
+				newEdge.sourceHandle = sourceHandle;
+			}
+
+			setEdges((eds) => [...eds, newEdge]);
+
+			const reduceMotion =
+				typeof window !== "undefined" &&
+				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			requestAnimationFrame(() => {
+				void fitView({
+					padding: 0.35,
+					duration: reduceMotion ? 0 : 220,
+				});
+			});
 		},
-		[handleAddSendEmail, handleAddDelay, handleAddCondition],
+		[nodes, setNodes, setEdges, fitView],
 	);
 
-	/**
-	 * Deepest step with a free output: plain steps with no outgoing edge, or a
-	 * condition with a free Yes/No branch. The trailing plus + stub line
-	 * attaches here.
-	 */
-	const endCapSource = useMemo(() => {
-		const byY = [...nodes].sort((a, b) => b.position.y - a.position.y);
-		for (const n of byY) {
-			if (n.type === "condition") {
-				const hasYes = edges.some(
-					(e) => e.source === n.id && e.sourceHandle === "yes",
-				);
-				const hasNo = edges.some(
-					(e) => e.source === n.id && e.sourceHandle === "no",
-				);
-				if (!hasYes)
-					return {
-						id: n.id,
-						handle: "yes" as const,
-						y: n.position.y,
-						type: n.type,
-					};
-				if (!hasNo)
-					return { id: n.id, handle: "no" as const, y: n.position.y, type: n.type };
-				continue;
+	/** Append a step at the end of the flow (fallback / palette). */
+	const appendStep = useCallback(
+		(kind: InsertStepKind) => {
+			const byY = [...nodes].sort((a, b) => b.position.y - a.position.y);
+			const target = byY.find((n) => n.type !== "group");
+			if (target) {
+				addStepBelow(target.id, undefined, kind);
+			} else {
+				if (kind === "send_email") handleAddSendEmail();
+				else if (kind === "delay") handleAddDelay();
+				else handleAddCondition();
 			}
-			if (n.type === "group") continue;
-			if (!edges.some((e) => e.source === n.id)) {
-				return {
-					id: n.id,
-					handle: undefined as undefined,
-					y: n.position.y,
-					type: n.type,
-				};
-			}
-		}
-		return null;
-	}, [nodes, edges]);
-
-	const handleBottomReport = useCallback((bottom: number) => {
-		setMeasuredBottom((prev) => (prev === bottom ? prev : bottom));
-	}, []);
-
-	// Fit once measured so the trailing plus is in view on load.
-	useEffect(() => {
-		if (didInitFitRef.current || measuredBottom <= 0) return;
-		didInitFitRef.current = true;
-		requestAnimationFrame(() => {
-			void fitView({ padding: 0.35, maxZoom: 1, duration: 0 });
-		});
-	}, [measuredBottom, fitView]);
-
-	/** Graph + display-only end-cap (plus button below the last step). */
-	const displayNodes = useMemo<WorkflowNode[]>(() => {
-		if (!endCapSource) return nodes;
-		// Prefer measured bottom, but fall back to source Y + estimated card
-		// height so the plus is never hidden behind the source on first paint.
-		const estimated =
-			ESTIMATED_CARD_HEIGHT[endCapSource.type] ?? ESTIMATED_CARD_HEIGHT.trigger ?? 220;
-		const fallbackY = endCapSource.y + estimated + END_CAP_GAP;
-		const measuredY = Math.max(measuredBottom, 0) + END_CAP_GAP;
-		const endCapY = Math.max(measuredY, fallbackY);
-		const endCap = {
-			id: END_CAP_NODE_ID,
-			type: "add_step",
-			position: { x: COLUMN_X, y: endCapY },
-			data: {},
-			selectable: false,
-			draggable: false,
-		} as unknown as WorkflowNode;
-		return [...nodes, endCap];
-	}, [nodes, endCapSource, measuredBottom]);
-
-	const displayEdges = useMemo<WorkflowEdge[]>(() => {
-		if (!endCapSource) return edges;
-		const stub: WorkflowEdge = {
-			id: END_CAP_EDGE_ID,
-			source: endCapSource.id,
-			target: END_CAP_NODE_ID,
-			type: "flow",
-			selectable: false,
-			data: { tone: "default", stub: true },
-		};
-		if (endCapSource.handle) stub.sourceHandle = endCapSource.handle;
-		return [...edges, stub];
-	}, [edges, endCapSource]);
+		},
+		[
+			nodes,
+			addStepBelow,
+			handleAddSendEmail,
+			handleAddDelay,
+			handleAddCondition,
+		],
+	);
 
 	const handleDeleteNode = useCallback(
 		(nodeId: string) => {
 			if (nodeId === TRIGGER_NODE_ID) return;
-			setNodes((nds) => nds.filter((n) => n.id !== nodeId));
-			setEdges((eds) =>
-				eds.filter((e) => e.source !== nodeId && e.target !== nodeId),
+
+			const nodeToDelete = nodes.find((n) => n.id === nodeId);
+			if (!nodeToDelete) return;
+
+			const incomingEdges = edges.filter((e) => e.target === nodeId);
+			const outgoingEdges = edges.filter((e) => e.source === nodeId);
+
+			const remainingEdges = edges.filter(
+				(e) => e.source !== nodeId && e.target !== nodeId,
 			);
+
+			// Reconnect upstream nodes to downstream nodes
+			const stamp = Date.now();
+			const bridgeEdges: WorkflowEdge[] = [];
+
+			for (const inEdge of incomingEdges) {
+				for (const outEdge of outgoingEdges) {
+					if (inEdge.source === outEdge.target) continue;
+
+					const alreadyExists =
+						remainingEdges.some(
+							(e) => e.source === inEdge.source && e.target === outEdge.target,
+						) ||
+						bridgeEdges.some(
+							(e) => e.source === inEdge.source && e.target === outEdge.target,
+						);
+					if (alreadyExists) continue;
+
+					// Only inherit sourceHandle from inEdge (the upstream parent's handle)
+					const branch =
+						inEdge.sourceHandle === "yes" || inEdge.sourceHandle === "no"
+							? inEdge.sourceHandle
+							: undefined;
+					const tone = branch === "yes" ? "accent" : "default";
+
+					bridgeEdges.push({
+						id: `e_${inEdge.source}_${outEdge.target}_${stamp}`,
+						source: inEdge.source,
+						target: outEdge.target,
+						...(inEdge.sourceHandle
+							? { sourceHandle: inEdge.sourceHandle }
+							: {}),
+						...(outEdge.targetHandle
+							? { targetHandle: outEdge.targetHandle }
+							: {}),
+						type: "flow",
+						data: {
+							tone,
+							branch,
+						},
+					});
+				}
+			}
+
+			const nextEdges = [...remainingEdges, ...bridgeEdges];
+
+			// Reposition downstream nodes so C connects seamlessly to A with exact 60px line height
+			let nextNodes = nodes.filter((n) => n.id !== nodeId);
+
+			if (incomingEdges.length > 0 && outgoingEdges.length > 0) {
+				const sourceNode = nodes.find((n) => n.id === incomingEdges[0]?.source);
+				const targetNode = nodes.find((n) => n.id === outgoingEdges[0]?.target);
+
+				if (sourceNode && targetNode) {
+					const sourceHeight = getNodeEstimatedHeight(sourceNode.type);
+					const desiredTargetY =
+						sourceNode.position.y + sourceHeight + CLEAR_NODE_GAP;
+					const deltaY = targetNode.position.y - desiredTargetY;
+
+					if (deltaY > 0) {
+						const oldTargetY = targetNode.position.y;
+						const targetX = targetNode.position.x;
+						nextNodes = nextNodes.map((n) => {
+							if (
+								n.position.y >= oldTargetY &&
+								Math.abs(n.position.x - targetX) < 280
+							) {
+								return {
+									...n,
+									position: {
+										...n.position,
+										y: n.position.y - deltaY,
+										...(sourceNode.type !== "condition"
+											? { x: sourceNode.position.x }
+											: {}),
+									},
+								};
+							}
+							return n;
+						});
+					}
+				}
+			} else {
+				// Leaf or unconnected node: shift any lower nodes up by deleted node height + gap
+				const deletedHeight = getNodeEstimatedHeight(nodeToDelete.type);
+				const shiftUpAmount = deletedHeight + CLEAR_NODE_GAP;
+				const deletedY = nodeToDelete.position.y;
+				const deletedX = nodeToDelete.position.x;
+
+				nextNodes = nextNodes.map((n) => {
+					if (
+						n.position.y > deletedY &&
+						Math.abs(n.position.x - deletedX) < 280
+					) {
+						return {
+							...n,
+							position: {
+								...n.position,
+								y: Math.max(deletedY, n.position.y - shiftUpAmount),
+							},
+						};
+					}
+					return n;
+				});
+			}
+
+			// Ensure layout constraints (60px gap) across entire remaining graph
+			const sanitized = sanitizeNodePositions(nextNodes, nextEdges);
+
+			setNodes(sanitized);
+			setEdges(nextEdges);
 			if (selectedNodeId === nodeId) setSelectedNodeId(null);
+
+			const reduceMotion =
+				typeof window !== "undefined" &&
+				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			requestAnimationFrame(() => {
+				void fitView({
+					padding: 0.35,
+					duration: reduceMotion ? 0 : 200,
+				});
+			});
 		},
-		[setNodes, setEdges, selectedNodeId],
+		[nodes, edges, selectedNodeId, setNodes, setEdges, fitView],
 	);
 
 	/** Insert a new step between the two nodes of an edge (plus button on edges). */
@@ -432,32 +613,31 @@ const WorkflowEditorInner = ({
 
 			let newNode: WorkflowNode;
 			if (kind === "send_email") {
-				newNode = createSendEmailNode(
-					nodes.filter(isSendEmailNode).length,
-					0,
-				);
+				newNode = createSendEmailNode(nodes.filter(isSendEmailNode).length, 0);
 			} else if (kind === "delay") {
 				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
 			} else {
-				newNode = createConditionNode(
-					nodes.filter(isConditionNode).length,
-					0,
-				);
+				newNode = createConditionNode(nodes.filter(isConditionNode).length, 0);
 			}
 
-			// Open room at the target's slot and push it (and everything below) down.
+			const newNodeHeight = getNodeEstimatedHeight(newNode.type);
+			const shiftDistance = newNodeHeight + CLEAR_NODE_GAP;
+			const insertX = target.position.x;
 			const insertY = target.position.y;
-			newNode.position = { x: COLUMN_X, y: insertY };
+			newNode.position = { x: insertX, y: insertY };
 			newNode.selected = true;
+
+			// Push target and anything below it down by shiftDistance so no overlap occurs
 			setNodes((nds) => {
 				const next: WorkflowNode[] = nds.map((n) => {
-					const shifted =
-						n.position.y >= insertY
-							? {
-									...n,
-									position: { ...n.position, y: n.position.y + ROW_GAP },
-								}
-							: n;
+					const shouldShift =
+						n.position.y >= insertY && Math.abs(n.position.x - insertX) < 220;
+					const shifted = shouldShift
+						? {
+								...n,
+								position: { ...n.position, y: n.position.y + shiftDistance },
+							}
+						: n;
 					return shifted.selected ? { ...shifted, selected: false } : shifted;
 				});
 				next.push(newNode);
@@ -528,6 +708,10 @@ const WorkflowEditorInner = ({
 		);
 	}, [setNodes]);
 
+	const handleNodeDragStop = useCallback(() => {
+		setNodes((nds) => sanitizeNodePositions(nds, edges));
+	}, [edges, setNodes]);
+
 	return (
 		<NodeEditorProvider
 			value={{
@@ -535,6 +719,7 @@ const WorkflowEditorInner = ({
 				deleteNode: handleDeleteNode,
 				insertStep,
 				appendStep,
+				addStepBelow,
 			}}
 		>
 			<div className="flex h-full min-h-0 flex-col">
@@ -548,10 +733,11 @@ const WorkflowEditorInner = ({
 				<div className="relative flex min-h-0 flex-1 overflow-hidden">
 					<div className="relative min-w-0 flex-1">
 						<ReactFlow
-							nodes={displayNodes}
-							edges={displayEdges}
+							nodes={nodes}
+							edges={edges}
 							onNodesChange={onNodesChange}
 							onEdgesChange={onEdgesChange}
+							onNodeDragStop={handleNodeDragStop}
 							onConnect={onConnect}
 							nodeTypes={nodeTypes}
 							edgeTypes={edgeTypes}
@@ -569,8 +755,8 @@ const WorkflowEditorInner = ({
 							maxZoom={1.25}
 							className="workflow-canvas bg-bg-weak-50 dark:bg-black"
 							connectionLineStyle={{
-								stroke: "var(--color-stroke-sub-300)",
-								strokeWidth: 1.5,
+								stroke: "#3b82f6",
+								strokeWidth: 2,
 							}}
 						>
 							<Background
@@ -580,7 +766,6 @@ const WorkflowEditorInner = ({
 								color="var(--color-stroke-soft-200)"
 							/>
 							<CanvasZoomControl />
-							<ContentBottomReporter onReport={handleBottomReport} />
 						</ReactFlow>
 					</div>
 				</div>

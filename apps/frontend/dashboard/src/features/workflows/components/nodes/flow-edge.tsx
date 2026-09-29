@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import {
 	BaseEdge,
 	EdgeLabelRenderer,
@@ -8,8 +10,6 @@ import {
 	Position,
 } from "@xyflow/react";
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { useNodeEditor } from "../node-editor-context";
 import { StepPickerMenu } from "../step-picker-menu";
 
@@ -55,10 +55,7 @@ export const FlowEdge = ({
 	useEffect(() => {
 		if (!pickerOpen) return;
 		const onPointerDown = (e: PointerEvent) => {
-			if (
-				pickerRef.current &&
-				!pickerRef.current.contains(e.target as Node)
-			) {
+			if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
 				setPickerOpen(false);
 			}
 		};
@@ -79,7 +76,7 @@ export const FlowEdge = ({
 				<EdgeLabelRenderer>
 					<div
 						ref={pickerRef}
-						className="nodrag nopan absolute"
+						className="nodrag nopan absolute z-30"
 						style={{
 							transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
 							pointerEvents: "all",
@@ -90,10 +87,10 @@ export const FlowEdge = ({
 							aria-label={pickerOpen ? "Close step picker" : "Insert step here"}
 							onClick={() => setPickerOpen((o) => !o)}
 							className={cn(
-								"flex h-7 w-7 items-center justify-center rounded-full border border-black/10 text-white shadow-[0_2px_10px_rgba(0,0,0,0.25)] transition-all duration-150",
+								"group flex h-7 w-7 items-center justify-center rounded-full border border-black/10 text-white shadow-[0_2px_10px_rgba(0,0,0,0.25)] transition-all duration-150 active:scale-95",
 								pickerOpen
-									? "bg-blue-500 hover:bg-blue-600"
-									: "bg-[#3d444d] hover:bg-[#4d555e]",
+									? "bg-blue-500 ring-2 ring-blue-400/30 hover:bg-blue-600"
+									: "bg-[#3d444d] hover:scale-110 hover:bg-[#4d555e]",
 							)}
 						>
 							<Icon
@@ -105,12 +102,15 @@ export const FlowEdge = ({
 							/>
 						</button>
 						{pickerOpen ? (
-							<StepPickerMenu
-								onPick={(kind) => {
-									insertStep(id, kind);
-									setPickerOpen(false);
-								}}
-							/>
+							<div className="absolute top-full left-1/2 z-50 mt-2 -translate-x-1/2">
+								<StepPickerMenu
+									onPick={(kind) => {
+										insertStep(id, kind);
+										setPickerOpen(false);
+									}}
+									onClose={() => setPickerOpen(false)}
+								/>
+							</div>
 						) : null}
 					</div>
 					{branch ? (
