@@ -1,46 +1,67 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
-import styles from "./landing-grid.module.css";
 
-function GridCells({ count }: { count: number }) {
+function GridCells({
+	count,
+	cellClassName = "",
+}: {
+	count: number;
+	cellClassName?: string;
+}) {
 	return Array.from({ length: count }, (_, index) => (
-		<div key={index}>
-			<div data-grid-content />
+		<div key={index} className={cellClassName}>
+			<div
+				data-grid-content
+				className="h-full rounded-[4px] bg-white dark:bg-black"
+			/>
 		</div>
 	));
 }
+
+const bandClassName =
+	"grid grid-cols-10 gap-px p-[0.5px] [&>div]:aspect-square";
+const sideClassName = "grid grid-rows-4 gap-px max-[1099px]:hidden";
 
 export function GridHero() {
 	return (
 		<section
 			id="features"
 			aria-labelledby="home-heading"
-			className={`${styles.surface} ${styles.hero}`}
+			className="overflow-hidden bg-white pt-[73px] text-zinc-950 max-[1099px]:pt-[57px] dark:bg-black dark:text-zinc-50"
 		>
-			<div className={styles.gridBackdrop}>
-				<div className={styles.gridViewport}>
-					<div aria-hidden="true" className={styles.outerColumn}>
+			<div className="bg-white dark:bg-black">
+				<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1104px)_minmax(24px,1fr)] [--grid-cell-size:min(110.4px,calc((100vw-48px)/10))] max-[1099px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px]">
+					<div
+						aria-hidden="true"
+						className="col-start-1 grid grid-rows-[var(--grid-cell-size)_minmax(0,1fr)_var(--grid-cell-size)] gap-px bg-zinc-950/[0.08] max-[1099px]:hidden dark:bg-zinc-50/10"
+					>
 						<GridCells count={3} />
 					</div>
-					<div className={styles.frame}>
-						<div className={styles.grid}>
-							<div aria-hidden="true" className={styles.band}>
+					<div className="relative col-start-2 w-full">
+						<div className="relative grid bg-zinc-950/[0.08] p-[0.5px] dark:bg-zinc-50/10">
+							<div aria-hidden="true" className={bandClassName}>
 								<GridCells count={10} />
 							</div>
-							<div className={styles.middle}>
-								<div aria-hidden="true" className={styles.side}>
+							<div className="grid grid-cols-10 gap-px p-[0.5px]">
+								<div aria-hidden="true" className={sideClassName}>
 									<GridCells count={4} />
 								</div>
-								<div className={styles.center}>
-									<div data-grid-content className={styles.content}>
-										<div className={styles.copy}>
-											<h1 id="home-heading" className={styles.title}>
+								<div className="col-span-8 max-[1099px]:col-[1/-1]">
+									<div
+										data-grid-content
+										className="h-full rounded-[4px] bg-white py-12 text-center dark:bg-black"
+									>
+										<div className="relative z-[2] mx-auto max-w-3xl px-3 max-[1099px]:px-6 max-[479px]:px-0">
+											<h1
+												id="home-heading"
+												className="text-balance font-semibold text-6xl leading-none tracking-[-0.035em] max-[767px]:text-5xl"
+											>
 												Email for your app.
 												<br />
 												And your agents.
 											</h1>
-											<p className={styles.description}>
+											<p className="mx-auto mt-5 mb-9 max-w-2xl text-balance text-lg text-zinc-600 leading-7 dark:text-zinc-400">
 												Send transactional emails, run campaigns, and give AI
 												agents their own inboxes—all with Reloop.
 											</p>
@@ -49,7 +70,7 @@ export function GridHero() {
 													asChild
 													variant="neutral"
 													size="medium"
-													className="h-10 rounded-lg px-4 font-medium text-sm sm:h-11 sm:rounded-xl sm:px-6 sm:text-[15.5px] dark:bg-white dark:text-black dark:hover:bg-white/90"
+													className="h-10 rounded-lg px-4 font-medium text-sm max-[479px]:min-h-11 sm:h-11 sm:rounded-xl sm:px-6 sm:text-[15.5px] dark:bg-white dark:text-black dark:hover:bg-white/90"
 												>
 													<a href={hostedSignupHref}>Get Started</a>
 												</FancyButton.Root>
@@ -62,24 +83,26 @@ export function GridHero() {
 													<Link href="/self-host">Self-host Reloop</Link>
 												</FancyButton.Root>
 											</div>
-											<span className={styles.note}>
-												3,000 emails for free
-												<span aria-hidden="true"> · </span>
+											<span className="mt-3 block text-sm text-zinc-600 leading-5 dark:text-zinc-400">
+												3,000 emails for free<span aria-hidden="true"> · </span>
 												No credit card required.
 											</span>
 										</div>
 									</div>
 								</div>
-								<div aria-hidden="true" className={styles.side}>
+								<div aria-hidden="true" className={sideClassName}>
 									<GridCells count={4} />
 								</div>
 							</div>
-							<div aria-hidden="true" className={styles.band}>
+							<div aria-hidden="true" className={bandClassName}>
 								<GridCells count={10} />
 							</div>
 						</div>
 					</div>
-					<div aria-hidden="true" className={styles.outerColumn}>
+					<div
+						aria-hidden="true"
+						className="col-start-3 grid grid-rows-[var(--grid-cell-size)_minmax(0,1fr)_var(--grid-cell-size)] gap-px bg-zinc-950/[0.08] max-[1099px]:hidden dark:bg-zinc-50/10"
+					>
 						<GridCells count={3} />
 					</div>
 				</div>

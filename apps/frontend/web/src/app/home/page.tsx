@@ -1,5 +1,6 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { GridHero } from "@reloop/web/components/landing/grid-hero";
+import { ProductTour } from "@reloop/web/components/landing/product-tour";
 import { homeFaqItems } from "@reloop/web/lib/home-faq";
 import {
 	faqPageJsonLd,
@@ -73,6 +74,8 @@ export default function HomePage() {
 			<JsonLd data={homeSchema} />
 			<GridHero />
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+				<SectionSeparator />
+				<ProductTour />
 				<SectionSeparator />
 				<LanguageExplorer
 					framed={false}

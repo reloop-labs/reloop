@@ -11,7 +11,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import landing from "./landing/landing-grid.module.css";
 
 /** CSS `ease`: mega open/close (scaleIn/Out) and directional content slides */
 const EASE_DEFAULT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -2415,7 +2414,7 @@ export const Header = () => {
 			className={cn(
 				"fixed top-0 right-0 left-0 z-50",
 				isLanding
-					? [landing.surface, landing.header]
+					? "border-zinc-950/[0.08] border-t bg-white text-zinc-950 dark:border-zinc-50/10 dark:bg-black dark:text-zinc-50"
 					: "border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black",
 			)}
 			onKeyDown={(event) => {
@@ -2433,31 +2432,42 @@ export const Header = () => {
 			}}
 			onMouseLeave={() => openMega(null)}
 		>
-			<div className={isLanding ? landing.headerGrid : "contents"}>
+			<div
+				className={
+					isLanding
+						? "grid grid-cols-[minmax(24px,1fr)_1px_minmax(0,1102px)_1px_minmax(24px,1fr)] bg-zinc-950/[0.08] pb-px max-[1099px]:grid-cols-[24px_1px_minmax(0,1fr)_1px_24px] max-[479px]:grid-cols-[8px_1px_minmax(0,1fr)_1px_8px] dark:bg-zinc-50/10"
+						: "contents"
+				}
+			>
 				{isLanding ? (
-					<div aria-hidden="true" className={landing.headerOuterCell} />
+					<div
+						aria-hidden="true"
+						className="col-start-1 rounded-[4px] bg-white dark:bg-black"
+					/>
 				) : null}
 				<div
 					ref={frameRef}
 					className={cn(
 						"relative mx-auto w-full",
 						isLanding
-							? landing.headerFrame
+							? "col-start-3 w-full rounded-[4px] bg-white p-0 dark:bg-black"
 							: "max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10",
 					)}
 				>
 					<div
-						className={cn(
-							"relative flex h-16 items-center justify-between gap-4",
-							isLanding && landing.headerRow,
-						)}
+						className={
+							isLanding
+								? "relative grid h-[72px] grid-cols-[auto_1fr_auto] items-center gap-4 px-12 max-[1099px]:flex max-[1099px]:h-14 max-[1099px]:justify-between max-[1099px]:px-6 max-[479px]:px-4"
+								: "relative flex h-16 items-center justify-between gap-4"
+						}
 					>
 						{/* Left: brand + main nav */}
 						<div
-							className={cn(
-								"flex items-center gap-6",
-								isLanding && landing.brandAndNav,
-							)}
+							className={
+								isLanding
+									? "contents max-[1099px]:flex max-[1099px]:items-center max-[1099px]:gap-6"
+									: "flex items-center gap-6"
+							}
 						>
 							<Link
 								href="/home"
@@ -2475,8 +2485,10 @@ export const Header = () => {
 								ref={navRef}
 								aria-label="Main navigation"
 								className={cn(
-									"relative hidden items-center gap-1 lg:flex",
-									isLanding && landing.nav,
+									"relative hidden items-center gap-1",
+									isLanding
+										? "ml-6 gap-2 justify-self-start min-[1100px]:flex"
+										: "lg:flex",
 								)}
 							>
 								{/* Pill: on-screen morph → short spring, zero bounce (crisp) */}
@@ -2682,8 +2694,8 @@ export const Header = () => {
 						{/* Right: actions */}
 						<div
 							className={cn(
-								"relative z-10 hidden items-center gap-3 lg:flex",
-								isLanding && landing.actions,
+								"relative z-10 hidden items-center gap-3",
+								isLanding ? "justify-self-end min-[1100px]:flex" : "lg:flex",
 							)}
 						>
 							<ThemeToggle />
@@ -2721,8 +2733,10 @@ export const Header = () => {
 						<button
 							type="button"
 							className={cn(
-								"inline-flex size-10 items-center justify-center rounded-lg text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] lg:hidden dark:text-white dark:hover:bg-white/[0.06]",
-								isLanding && landing.mobileToggle,
+								"size-10 items-center justify-center rounded-lg text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]",
+								isLanding
+									? "inline-flex min-[1100px]:hidden"
+									: "inline-flex lg:hidden",
 							)}
 							onClick={toggleMobileMenu}
 							aria-expanded={mobileMenuOpen}
@@ -2780,8 +2794,10 @@ export const Header = () => {
 										: { duration: 0.35, ease: [0.32, 0.72, 0, 1] }
 								}
 								className={cn(
-									"overflow-hidden border-stroke-soft-100 border-t lg:hidden dark:border-white/10",
-									isLanding && landing.mobilePanel,
+									"overflow-hidden border-stroke-soft-100 border-t dark:border-white/10",
+									isLanding
+										? "block bg-white px-6 min-[1100px]:hidden dark:bg-black"
+										: "lg:hidden",
 								)}
 							>
 								<div className="max-h-[calc(100dvh-4rem)] overflow-y-auto py-4">
@@ -3046,7 +3062,10 @@ export const Header = () => {
 					</AnimatePresence>
 				</div>
 				{isLanding ? (
-					<div aria-hidden="true" className={landing.headerOuterCell} />
+					<div
+						aria-hidden="true"
+						className="col-start-5 rounded-[4px] bg-white dark:bg-black"
+					/>
 				) : null}
 			</div>
 		</header>
