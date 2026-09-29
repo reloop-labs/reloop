@@ -2,23 +2,36 @@ import { productionSiteUrl } from "@reloop/web/lib/site";
 
 export const toolPath = "/tools/domain-age";
 export const toolTitle =
-	"Domain Age & Email Warmup Checker: Registration Date & Risk";
+	"Free Domain Age Checker — Registration Date & Warmup Risk";
 export const toolDescription =
-	"The older your domain, the more it's trusted - did you check yours?";
+	"The older your domain, the more email providers trust it. Paste any domain to instantly check its registration date, warmup stage, and deliverability risk — free, no sign-up.";
 export const metaDescription =
-	"Free domain age and email warmup checker. Query authoritative RDAP registration dates, detect newly registered domain (NRD) spam filter risks, and verify SPF/DMARC readiness.";
+	"Check any domain's age instantly — free. See registration date, email deliverability risk, and warmup stage (Too New → Established). No sign-up required.";
 
 export const toolKeywords = [
+	// Core tool keywords
 	"domain age checker",
-	"email warmup checker",
-	"check domain registration date",
-	"newly registered domain spam risk",
-	"cold domain email deliverability",
+	"free domain age checker",
+	"check domain age",
+	"domain registration date lookup",
+	"website age checker",
+	// Email deliverability angle
+	"domain age email deliverability",
+	"newly registered domain spam filter",
+	"cold domain email warmup",
+	"domain warmup stages",
+	"how long before sending cold email",
+	// Technical
 	"RDAP domain lookup",
 	"domain age for email warmup",
 	"Gmail spam new domain filter",
+	"domain warmup checker free",
+	// Long tail
+	"domain age deliverability risk",
+	"is my domain too new to send email",
 	"check when domain was registered",
 	"domain age trust score",
+	"NRD spam risk checker",
 ];
 
 export interface DiagnosticReason {
@@ -68,6 +81,16 @@ export const faqGroups: FaqGroup[] = [
 	{
 		title: "Domain Age & Email Deliverability",
 		items: [
+			{
+				question: "How do I check how old a domain is for free?",
+				answer:
+					"Paste any domain into the Reloop Domain Age Checker above. It queries authoritative RDAP endpoints and returns the exact registration date, domain age in days and years, expiry date, and email deliverability risk — completely free, no account required.",
+			},
+			{
+				question: "Does domain age affect email deliverability?",
+				answer:
+					"Yes. Mailbox providers and blocklists like Spamhaus NRD treat domains registered within the last 14–30 days as high-risk senders. Even perfect SPF, DKIM, and DMARC records cannot override a brand-new domain's cold-domain penalty. You need to warm up your domain gradually over 60–90 days before sending large email volumes.",
+			},
 			{
 				question:
 					"Why do mailbox providers like Gmail treat new domains as spam?",

@@ -86,6 +86,39 @@ export default function DomainAgePage() {
 							},
 						],
 					},
+					{
+						"@context": "https://schema.org",
+						"@type": "HowTo",
+						name: "How to check your domain age for email deliverability",
+						description:
+							"Check any domain registration date and warmup stage using the free Reloop Domain Age Checker.",
+						step: [
+							{
+								"@type": "HowToStep",
+								position: 1,
+								name: "Enter your domain",
+								text: "Paste your domain or URL into the search box.",
+							},
+							{
+								"@type": "HowToStep",
+								position: 2,
+								name: "View domain age",
+								text: "See the exact registration date pulled from RDAP, more reliable than WHOIS.",
+							},
+							{
+								"@type": "HowToStep",
+								position: 3,
+								name: "Check warmup stage",
+								text: "See whether your domain is Too New, Cold, Warming, or Established.",
+							},
+							{
+								"@type": "HowToStep",
+								position: 4,
+								name: "Review SPF and DMARC",
+								text: "Verify email authentication records are published before sending.",
+							},
+						],
+					},
 				]}
 			/>
 
