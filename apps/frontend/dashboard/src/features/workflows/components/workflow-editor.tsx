@@ -12,10 +12,8 @@ import {
 	useNodesState,
 	useOnSelectionChange,
 	useReactFlow,
-	useStore,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { Icon } from "@reloop/ui/icon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
@@ -141,58 +139,6 @@ function sanitizeNodePositions(
 
 	return modified ? result : nodes;
 }
-
-const zoomSelector = (s: { transform: [number, number, number] }) =>
-	s.transform[2];
-
-/** Top-right vertical zoom control. Zoom only via buttons. */
-const ZOOM_STEPS = [0.5, 0.75, 1, 1.25];
-
-const CanvasZoomControl = () => {
-	const { zoomTo } = useReactFlow();
-	const zoom = useStore(zoomSelector);
-
-	const nearestIndex = ZOOM_STEPS.reduce(
-		(best, step, i) =>
-			Math.abs(step - zoom) < Math.abs(ZOOM_STEPS[best]! - zoom) ? i : best,
-		2,
-	);
-	const canZoomIn = nearestIndex < ZOOM_STEPS.length - 1;
-	const canZoomOut = nearestIndex > 0;
-
-	return (
-		<div className="absolute top-4 right-4 z-10 flex flex-col items-stretch gap-0.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0/95 p-1 shadow-regular-sm backdrop-blur-sm dark:border-stroke-soft-100/40 dark:bg-[#141419]/95">
-			<button
-				type="button"
-				onClick={() => {
-					if (canZoomIn)
-						void zoomTo(ZOOM_STEPS[nearestIndex + 1]!, { duration: 200 });
-				}}
-				disabled={!canZoomIn}
-				aria-label="Zoom in"
-				className="flex h-7 w-7 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-text-sub-600 dark:hover:bg-white/10"
-			>
-				<Icon name="plus" className="h-4 w-4" />
-			</button>
-			<div
-				aria-hidden="true"
-				className="mx-1 h-px bg-stroke-soft-200 dark:bg-white/10"
-			/>
-			<button
-				type="button"
-				onClick={() => {
-					if (canZoomOut)
-						void zoomTo(ZOOM_STEPS[nearestIndex - 1]!, { duration: 200 });
-				}}
-				disabled={!canZoomOut}
-				aria-label="Zoom out"
-				className="flex h-7 w-7 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-text-sub-600 dark:hover:bg-white/10"
-			>
-				<Icon name="minus" className="h-4 w-4" />
-			</button>
-		</div>
-	);
-};
 
 interface WorkflowEditorProps {
 	workflow: Workflow;
@@ -763,7 +709,7 @@ const WorkflowEditorInner = ({
 							edgeTypes={edgeTypes}
 							defaultEdgeOptions={defaultEdgeOptions}
 							fitView
-							fitViewOptions={{ padding: 0.35, maxZoom: 1 }}
+							fitViewOptions={{ padding: 0.35, minZoom: 1, maxZoom: 1 }}
 							proOptions={{ hideAttribution: true }}
 							onPaneClick={clearSelection}
 							deleteKeyCode={null}
@@ -771,8 +717,10 @@ const WorkflowEditorInner = ({
 							zoomOnPinch={false}
 							zoomOnDoubleClick={false}
 							panOnScroll
-							minZoom={0.5}
-							maxZoom={1.25}
+							panOnDrag
+							minZoom={1}
+							maxZoom={1}
+							defaultViewport={{ x: 0, y: 0, zoom: 1 }}
 							className="workflow-canvas bg-bg-weak-50 dark:bg-black"
 							connectionLineStyle={{
 								stroke: "#3b82f6",
@@ -785,7 +733,6 @@ const WorkflowEditorInner = ({
 								size={1.2}
 								color="var(--color-stroke-soft-200)"
 							/>
-							<CanvasZoomControl />
 						</ReactFlow>
 						{isReadOnly ? (
 							<LiveAutomationBanner
