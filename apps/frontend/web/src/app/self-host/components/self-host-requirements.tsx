@@ -12,12 +12,16 @@ const REQUIREMENTS = [
 				text: "Dashboard, API, and certificates",
 			},
 			{
-				highlight: "Port 25",
-				text: "Inbound mail. Ask the host if it is blocked.",
+				highlight: "Outbound port 25",
+				text: "Reloop delivers mail to other servers on this port.",
+			},
+			{
+				highlight: "Inbound port 25",
+				text: "Open this only if you want to receive mail.",
 			},
 			{
 				highlight: "465 and 587",
-				text: "Authenticated SMTP submission",
+				text: "Clients submit mail to Reloop on these ports.",
 			},
 		],
 	},
@@ -54,6 +58,10 @@ const REQUIREMENTS = [
 			{
 				highlight: "inbound.reloop.example.com",
 				text: "MX target for mail you receive",
+			},
+			{
+				highlight: "SPF TXT on the primary hostname",
+				text: "Authorizes this server to send for that domain.",
 			},
 		],
 	},

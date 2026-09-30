@@ -90,7 +90,7 @@ export const SERVER_PROVIDERS: ServerProvider[] = [
 		name: "Coolify",
 		slug: "coolify",
 		icon: siCoolify,
-		description: "Template coming soon",
+		description: "Docker Compose template",
 		href: "/docs/self-host/coolify",
 	},
 	{

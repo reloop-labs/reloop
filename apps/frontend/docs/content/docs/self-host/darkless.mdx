@@ -12,7 +12,7 @@ Darkless does not replace the Reloop installer, and you do not have to use Darkl
 
 ## Pick a machine
 
-Use a plan that meets the [self-host requirements](/self-host/requirements) and the [VPS guide](/self-host/vps):
+Use a plan that meets the [self-host requirements](/docs/self-host/requirements) and the [VPS guide](/docs/self-host/vps):
 
 | | |
 | :--- | :--- |
@@ -23,7 +23,7 @@ Use a plan that meets the [self-host requirements](/self-host/requirements) and 
 | **Disk** | 50 GB recommended. The installer refuses to continue below 35 GB because the images are about 22 GB. |
 | **Ports** | `25`, `465`, `587`, plus `80` and `443` |
 
-Ask Darkless to open port `25` if you plan to receive mail. Many providers block it until you request it. Reloop can still submit outbound mail on `465` and `587` without it.
+Ask Darkless to open outbound port `25`. Reloop delivers mail to other servers on that port, so sending fails while it stays blocked. Ports `465` and `587` only accept mail your apps submit to Reloop. Open inbound port `25` as well if you want to receive mail.
 
 ---
 
@@ -37,7 +37,7 @@ less install.sh
 sudo bash install.sh
 ```
 
-The installer asks for your hostname, a TLS contact email, and a few options, then prints the DNS records to add. The rest of the prompts, the layout under `/opt/reloop`, and day-two commands (`reloop status`, `reloop logs`, `reloop update`) are in the [VPS guide](/self-host/vps).
+The installer asks for your hostname, a TLS contact email, and a few options, then prints the DNS records to add. The rest of the prompts, the layout under `/opt/reloop`, and day-two commands (`reloop status`, `reloop logs`, `reloop update`) are in the [VPS guide](/docs/self-host/vps).
 
 ---
 

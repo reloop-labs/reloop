@@ -39,7 +39,7 @@ sudo bash install.sh
 > [!NOTE]
 > The container images are roughly 22 GB in total, which is why the disk floor is higher than for a source install. The installer refuses to continue on a smaller disk rather than failing halfway through the download.
 
-Many providers block outbound port `25` by default. Reloop still sends through the submission ports, but inbound mail needs `25` open in both directions. Ask your provider to unblock it if you plan to receive mail.
+Many providers block outbound port `25` by default. Reloop delivers mail to other servers on that port, so sending fails while it stays blocked. Ports `465` and `587` only accept mail your apps submit to Reloop. Inbound port `25` is separate: open it if you want to receive mail.
 
 ---
 
