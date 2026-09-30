@@ -31,9 +31,10 @@ import {
 	type WorkflowNode,
 	type WorkflowStatus,
 } from "../workflow-types";
-import { type InsertStepKind, NodeEditorProvider } from "./node-editor-context";
 import { LiveAutomationBanner } from "./live-automation-banner";
-import { AddStepNode } from "./nodes/add-step-node";import { ConditionNode } from "./nodes/condition-node";
+import { type InsertStepKind, NodeEditorProvider } from "./node-editor-context";
+import { AddStepNode } from "./nodes/add-step-node";
+import { ConditionNode } from "./nodes/condition-node";
 import { DelayNode } from "./nodes/delay-node";
 import { FlowEdge } from "./nodes/flow-edge";
 import { GroupNode } from "./nodes/group-node";
@@ -68,7 +69,7 @@ export const getNodeEstimatedHeight = (type?: string): number => {
 		case "trigger":
 			return 160;
 		case "delay":
-			return 240;
+			return 170;
 		case "condition":
 			return 340;
 		case "send_email":
@@ -195,9 +196,7 @@ const WorkflowEditorInner = ({
 		if (workflow.status === "active" || workflow.status === "draft") {
 			setSoftStopFlag(false);
 			try {
-				window.localStorage.removeItem(
-					`automation-soft-stop:${workflow.id}`,
-				);
+				window.localStorage.removeItem(`automation-soft-stop:${workflow.id}`);
 			} catch {
 				// ignore
 			}
@@ -216,8 +215,7 @@ const WorkflowEditorInner = ({
 		[softStopKey],
 	);
 	const softStopped = workflow.status === "paused" && softStopFlag;
-	const isReadOnly =
-		workflow.status === "active" || softStopped;
+	const isReadOnly = workflow.status === "active" || softStopped;
 
 	useEffect(() => {
 		if (workflowIdRef.current !== workflow.id) {
