@@ -173,7 +173,51 @@ const WorkflowEditorInner = ({
 	const workflowIdRef = useRef(workflow.id);
 	const skipPersistRef = useRef(false);
 	const { fitView } = useReactFlow();
-	const isReadOnly = workflow.status === "active";
+	const softStopKey = `automation-soft-stop:${workflow.id}`;
+	const [softStopFlag, setSoftStopFlag] = useState(() => {
+		try {
+			return window.localStorage.getItem(softStopKey) === "1";
+		} catch {
+			return false;
+		}
+	});
+	useEffect(() => {
+		try {
+			setSoftStopFlag(
+				window.localStorage.getItem(`automation-soft-stop:${workflow.id}`) ===
+					"1",
+			);
+		} catch {
+			setSoftStopFlag(false);
+		}
+	}, [workflow.id]);
+	useEffect(() => {
+		if (workflow.status === "active" || workflow.status === "draft") {
+			setSoftStopFlag(false);
+			try {
+				window.localStorage.removeItem(
+					`automation-soft-stop:${workflow.id}`,
+				);
+			} catch {
+				// ignore
+			}
+		}
+	}, [workflow.status, workflow.id]);
+	const handleSoftStopChange = useCallback(
+		(soft: boolean) => {
+			setSoftStopFlag(soft);
+			try {
+				if (soft) window.localStorage.setItem(softStopKey, "1");
+				else window.localStorage.removeItem(softStopKey);
+			} catch {
+				// ignore
+			}
+		},
+		[softStopKey],
+	);
+	const softStopped = workflow.status === "paused" && softStopFlag;
+	const isReadOnly =
+		workflow.status === "active" || softStopped;
 
 	useEffect(() => {
 		if (workflowIdRef.current !== workflow.id) {
@@ -690,6 +734,8 @@ const WorkflowEditorInner = ({
 					onNameChange={isReadOnly ? () => {} : onNameChange}
 					onStatusChange={onStatusChange}
 					onSave={handleSave}
+					softStopped={softStopped}
+					onSoftStopChange={handleSoftStopChange}
 				/>
 				<div className="relative flex min-h-0 flex-1 overflow-hidden">
 					<div className="relative min-w-0 flex-1">

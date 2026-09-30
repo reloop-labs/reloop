@@ -28,6 +28,9 @@ interface WorkflowEditorToolbarProps {
 	onNameChange: (name: string) => void;
 	onStatusChange: (status: WorkflowStatus) => Promise<void> | void;
 	onSave: () => Promise<void> | void;
+	/** True after "Stop new automations": running continues, editing stays locked. */
+	softStopped?: boolean;
+	onSoftStopChange?: (soft: boolean) => void;
 }
 
 function SidebarToggleButton() {
@@ -148,6 +151,8 @@ export const WorkflowEditorToolbar = ({
 	onNameChange,
 	onStatusChange,
 	onSave,
+	softStopped = false,
+	onSoftStopChange,
 }: WorkflowEditorToolbarProps) => {
 	const validation = validateWorkflow(workflow);
 	const isActive = workflow.status === "active";
@@ -185,12 +190,28 @@ export const WorkflowEditorToolbar = ({
 		}
 	};
 
-	const handleStop = async () => {
+	const handleStopNew = async () => {
 		if (busy || !isActive) return;
 		setStopOpen(false);
 		setBusy(true);
 		try {
 			await onStatusChange("paused");
+			onSoftStopChange?.(true);
+			toast.success("New enrollments stopped — running automations continue");
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : "Failed to stop");
+		} finally {
+			setBusy(false);
+		}
+	};
+
+	const handleStopNow = async () => {
+		if (busy || (!isActive && !softStopped)) return;
+		setStopOpen(false);
+		setBusy(true);
+		try {
+			await onStatusChange("paused");
+			onSoftStopChange?.(false);
 			toast.success("Automation stopped");
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : "Failed to stop");
@@ -236,8 +257,8 @@ export const WorkflowEditorToolbar = ({
 					<WorkflowNameField
 						name={name}
 						onNameChange={onNameChange}
-						status={workflow.status}
-						readOnly={isActive}
+						status={softStopped ? "active" : workflow.status}
+						readOnly={isActive || softStopped}
 					/>
 				</div>
 			</div>
@@ -308,7 +329,7 @@ export const WorkflowEditorToolbar = ({
 							className="w-64 overflow-hidden rounded-2xl p-1.5"
 						>
 							<Dropdown.Item
-								onSelect={() => void handleStop()}
+								onSelect={() => void handleStopNew()}
 								className="cursor-pointer rounded-xl px-3 py-2.5 outline-none hover:bg-bg-weak-50 dark:hover:bg-white/5"
 							>
 								<div className="flex flex-col">
@@ -321,7 +342,7 @@ export const WorkflowEditorToolbar = ({
 								</div>
 							</Dropdown.Item>
 							<Dropdown.Item
-								onSelect={() => void handleStop()}
+								onSelect={() => void handleStopNow()}
 								className="cursor-pointer rounded-xl px-3 py-2.5 outline-none hover:bg-bg-weak-50 dark:hover:bg-white/5"
 							>
 								<div className="flex flex-col">
@@ -335,6 +356,21 @@ export const WorkflowEditorToolbar = ({
 							</Dropdown.Item>
 						</Dropdown.Content>
 					</Dropdown.Root>
+				) : softStopped ? (
+					<>
+						<FancyButton.Root variant="basic" size="xsmall" disabled>
+							Started
+						</FancyButton.Root>
+						<FancyButton.Root
+							variant="blue"
+							size="xsmall"
+							onClick={() => void handleStopNow()}
+							disabled={busy}
+							className="dark:text-black dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.4),0_0_0_1px_#ffffff] dark:[--zero-blue:#ffffff] dark:[--zero-blue-hover:#e6edf3]"
+						>
+							{busy ? "Stopping…" : "Stop now"}
+						</FancyButton.Root>
+					</>
 				) : (
 					<FancyButton.Root
 						variant="blue"
