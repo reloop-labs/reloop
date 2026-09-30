@@ -135,6 +135,7 @@ export const SectionNodeCard = ({
 	const fallbackNodeId = useNodeId();
 	const activeNodeId = nodeId ?? fallbackNodeId;
 	const edges = useEdges();
+	const { readOnly } = useNodeEditor();
 
 	return (
 		<div
@@ -184,7 +185,7 @@ export const SectionNodeCard = ({
 						{badge}
 					</span>
 				) : null}
-				{onDelete ? (
+				{onDelete && !readOnly ? (
 					<button
 						type="button"
 						onClick={onDelete}
@@ -211,7 +212,12 @@ export const SectionNodeCard = ({
 			</div>
 
 			{collapsed ? null : (
-				<div className="nodrag nopan mt-1 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/70 dark:bg-black/40">
+				<div
+					className={cn(
+						"nodrag nopan mt-1 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/70 dark:bg-black/40",
+						readOnly && "pointer-events-none select-none opacity-80",
+					)}
+				>
 					{children}
 				</div>
 			)}
@@ -227,7 +233,7 @@ export const SectionNodeCard = ({
 				/>
 			))}
 
-			{activeNodeId
+			{activeNodeId && !readOnly
 				? handles.map((handle) => {
 						const isConnected = edges.some(
 							(e) =>

@@ -50,7 +50,7 @@ export const FlowEdge = ({
 
 	const [pickerOpen, setPickerOpen] = useState(false);
 	const pickerRef = useRef<HTMLDivElement>(null);
-	const { insertStep } = useNodeEditor();
+	const { insertStep, readOnly } = useNodeEditor();
 
 	useEffect(() => {
 		if (!pickerOpen) return;
@@ -72,7 +72,7 @@ export const FlowEdge = ({
 					style={{ stroke: color, strokeWidth: 1.5 }}
 				/>
 			)}
-			{isStub ? null : (
+			{isStub || readOnly ? null : (
 				<EdgeLabelRenderer>
 					<div
 						ref={pickerRef}

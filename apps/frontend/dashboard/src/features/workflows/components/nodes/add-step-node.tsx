@@ -15,7 +15,9 @@ import { StepPickerMenu } from "../step-picker-menu";
 export const AddStepNode = () => {
 	const [pickerOpen, setPickerOpen] = useState(false);
 	const ref = useRef<HTMLDivElement>(null);
-	const { appendStep } = useNodeEditor();
+	const { appendStep, readOnly } = useNodeEditor();
+
+	if (readOnly) return null;
 
 	useEffect(() => {
 		if (!pickerOpen) return;

@@ -14,6 +14,7 @@ interface NodeEditorContextValue {
 		sourceHandle: string | undefined,
 		kind: InsertStepKind,
 	) => void;
+	readOnly: boolean;
 }
 
 const NodeEditorContext = createContext<NodeEditorContextValue | null>(null);

@@ -149,7 +149,7 @@ export const EnrollContactModal = ({
 	return (
 		<AutomationModalFrame
 			open={open}
-			title="Enroll a contact"
+			title="Test automation"
 			icon="contacts"
 			status={status}
 			onSubmit={() => void handleSubmit()}

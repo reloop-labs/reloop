@@ -34,8 +34,8 @@ import {
 	type WorkflowStatus,
 } from "../workflow-types";
 import { type InsertStepKind, NodeEditorProvider } from "./node-editor-context";
-import { AddStepNode } from "./nodes/add-step-node";
-import { ConditionNode } from "./nodes/condition-node";
+import { LiveAutomationBanner } from "./live-automation-banner";
+import { AddStepNode } from "./nodes/add-step-node";import { ConditionNode } from "./nodes/condition-node";
 import { DelayNode } from "./nodes/delay-node";
 import { FlowEdge } from "./nodes/flow-edge";
 import { GroupNode } from "./nodes/group-node";
@@ -227,6 +227,7 @@ const WorkflowEditorInner = ({
 	const workflowIdRef = useRef(workflow.id);
 	const skipPersistRef = useRef(false);
 	const { fitView } = useReactFlow();
+	const isReadOnly = workflow.status === "active";
 
 	useEffect(() => {
 		if (workflowIdRef.current !== workflow.id) {
@@ -259,6 +260,7 @@ const WorkflowEditorInner = ({
 
 	const onConnect = useCallback(
 		(connection: Connection) => {
+			if (isReadOnly) return;
 			const branch =
 				connection.sourceHandle === "yes" || connection.sourceHandle === "no"
 					? connection.sourceHandle
@@ -288,22 +290,24 @@ const WorkflowEditorInner = ({
 			// Ensure newly connected nodes don't overlap
 			setNodes((nds) => sanitizeNodePositions(nds, nextEdges));
 		},
-		[setEdges, setNodes],
+		[setEdges, setNodes, isReadOnly],
 	);
 
 	const updateNodeData = useCallback(
 		(nodeId: string, data: Record<string, unknown>) => {
+			if (isReadOnly) return;
 			setNodes((nds) =>
 				nds.map((n) =>
 					n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n,
 				),
 			);
 		},
-		[setNodes],
+		[setNodes, isReadOnly],
 	);
 
 	const appendNode = useCallback(
 		(newNode: WorkflowNode) => {
+			if (isReadOnly) return;
 			if (nodes.length === 0) {
 				newNode.position = { x: COLUMN_X, y: 60 };
 			} else {
@@ -335,7 +339,7 @@ const WorkflowEditorInner = ({
 				});
 			});
 		},
-		[nodes, setNodes, fitView],
+		[nodes, setNodes, fitView, isReadOnly],
 	);
 
 	const handleAddSendEmail = useCallback(() => {
@@ -360,6 +364,7 @@ const WorkflowEditorInner = ({
 			sourceHandle: string | undefined,
 			kind: InsertStepKind,
 		) => {
+			if (isReadOnly) return;
 			const sourceNode = nodes.find((n) => n.id === sourceNodeId);
 			if (!sourceNode) return;
 
@@ -438,12 +443,13 @@ const WorkflowEditorInner = ({
 				});
 			});
 		},
-		[nodes, setNodes, setEdges, fitView],
+		[nodes, setNodes, setEdges, fitView, isReadOnly],
 	);
 
 	/** Append a step at the end of the flow (fallback / palette). */
 	const appendStep = useCallback(
 		(kind: InsertStepKind) => {
+			if (isReadOnly) return;
 			const byY = [...nodes].sort((a, b) => b.position.y - a.position.y);
 			const target = byY.find((n) => n.type !== "group");
 			if (target) {
@@ -460,11 +466,13 @@ const WorkflowEditorInner = ({
 			handleAddSendEmail,
 			handleAddDelay,
 			handleAddCondition,
+			isReadOnly,
 		],
 	);
 
 	const handleDeleteNode = useCallback(
 		(nodeId: string) => {
+			if (isReadOnly) return;
 			if (nodeId === TRIGGER_NODE_ID) return;
 
 			const nodeToDelete = nodes.find((n) => n.id === nodeId);
@@ -599,12 +607,13 @@ const WorkflowEditorInner = ({
 				});
 			});
 		},
-		[nodes, edges, selectedNodeId, setNodes, setEdges, fitView],
+		[nodes, edges, selectedNodeId, setNodes, setEdges, fitView, isReadOnly],
 	);
 
 	/** Insert a new step between the two nodes of an edge (plus button on edges). */
 	const insertStep = useCallback(
 		(edgeId: string, kind: InsertStepKind) => {
+			if (isReadOnly) return;
 			const edge = edges.find((e) => e.id === edgeId);
 			if (!edge) return;
 			const source = nodes.find((n) => n.id === edge.source);
@@ -684,10 +693,11 @@ const WorkflowEditorInner = ({
 				});
 			});
 		},
-		[edges, nodes, setNodes, setEdges, fitView],
+		[edges, nodes, setNodes, setEdges, fitView, isReadOnly],
 	);
 
 	useHotkeys("backspace", () => {
+		if (isReadOnly) return;
 		if (!selectedNodeId || selectedNodeId === TRIGGER_NODE_ID) return;
 		const active = document.activeElement;
 		if (
@@ -697,9 +707,12 @@ const WorkflowEditorInner = ({
 			return;
 		}
 		handleDeleteNode(selectedNodeId);
-	}, [selectedNodeId, handleDeleteNode]);
+	}, [selectedNodeId, handleDeleteNode, isReadOnly]);
 
-	const handleSave = () => onSave(nodes, edges);
+	const handleSave = () => {
+		if (isReadOnly) return;
+		return onSave(nodes, edges);
+	};
 
 	const clearSelection = useCallback(() => {
 		setSelectedNodeId(null);
@@ -709,8 +722,9 @@ const WorkflowEditorInner = ({
 	}, [setNodes]);
 
 	const handleNodeDragStop = useCallback(() => {
+		if (isReadOnly) return;
 		setNodes((nds) => sanitizeNodePositions(nds, edges));
-	}, [edges, setNodes]);
+	}, [edges, setNodes, isReadOnly]);
 
 	return (
 		<NodeEditorProvider
@@ -720,13 +734,14 @@ const WorkflowEditorInner = ({
 				insertStep,
 				appendStep,
 				addStepBelow,
+				readOnly: isReadOnly,
 			}}
 		>
 			<div className="flex h-full min-h-0 flex-col">
 				<WorkflowEditorToolbar
 					workflow={{ ...workflow, nodes, edges }}
 					name={workflow.name}
-					onNameChange={onNameChange}
+					onNameChange={isReadOnly ? () => {} : onNameChange}
 					onStatusChange={onStatusChange}
 					onSave={handleSave}
 				/>
@@ -735,10 +750,15 @@ const WorkflowEditorInner = ({
 						<ReactFlow
 							nodes={nodes}
 							edges={edges}
-							onNodesChange={onNodesChange}
-							onEdgesChange={onEdgesChange}
+							onNodesChange={isReadOnly ? undefined : onNodesChange}
+							onEdgesChange={isReadOnly ? undefined : onEdgesChange}
 							onNodeDragStop={handleNodeDragStop}
-							onConnect={onConnect}
+							onConnect={isReadOnly ? undefined : onConnect}
+							nodesDraggable={!isReadOnly}
+							nodesConnectable={!isReadOnly}
+							nodesFocusable={!isReadOnly}
+							elementsSelectable={!isReadOnly}
+							connectOnClick={false}
 							nodeTypes={nodeTypes}
 							edgeTypes={edgeTypes}
 							defaultEdgeOptions={defaultEdgeOptions}
@@ -767,6 +787,12 @@ const WorkflowEditorInner = ({
 							/>
 							<CanvasZoomControl />
 						</ReactFlow>
+						{isReadOnly ? (
+							<LiveAutomationBanner
+								key={workflow.id}
+								workflow={{ ...workflow, nodes, edges }}
+							/>
+						) : null}
 					</div>
 				</div>
 			</div>
