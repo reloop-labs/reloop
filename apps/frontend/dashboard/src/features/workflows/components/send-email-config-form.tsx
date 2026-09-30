@@ -33,7 +33,7 @@ const templateThumbnailSrc = (template: Template): string => {
 const TemplateThumb = ({ template }: { template: Template }) => {
 	const [failed, setFailed] = useState(false);
 	return (
-		<div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-stroke-soft-100 bg-bg-weak-50">
+		<div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-black/30">
 			{failed ? (
 				<div className="flex h-full w-full items-center justify-center text-text-soft-400">
 					<Icon name="image-upload" className="h-5 w-5" />
@@ -49,7 +49,7 @@ const TemplateThumb = ({ template }: { template: Template }) => {
 				/>
 			)}
 			{template.status === "draft" ? (
-				<span className="absolute top-1 right-1 rounded-full bg-bg-white-0/90 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600">
+				<span className="absolute top-1.5 right-1.5 rounded-full bg-bg-white-0/90 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 shadow-2xs backdrop-blur-xs dark:bg-black/80 dark:text-white/70">
 					Draft
 				</span>
 			) : null}
@@ -134,7 +134,7 @@ const TemplatePicker = ({
 					No templates match “{search.trim()}”.
 				</p>
 			) : null}
-			<div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto">
+			<div className="scrollbar-thin grid max-h-64 grid-cols-2 gap-2 overflow-y-auto overflow-x-hidden p-0.5">
 				{filtered.map((template) => {
 					const isSelected = value.templateId === template.id;
 					return (
@@ -144,25 +144,23 @@ const TemplatePicker = ({
 							onClick={() => selectTemplate(template)}
 							aria-pressed={isSelected}
 							title={template.name}
-							className="group -m-1.5 flex flex-col gap-1.5 rounded-xl p-1.5 text-left transition-colors hover:bg-bg-weak-50"
+							className="group flex min-w-0 flex-col gap-1.5 rounded-xl p-1.5 text-left transition-colors hover:bg-bg-weak-50 dark:hover:bg-white/[0.06]"
 						>
 							<span
 								className={cn(
-									"rounded-lg transition-all",
+									"relative block w-full overflow-hidden rounded-lg transition-all",
 									isSelected &&
-										"ring-2 ring-blue-500 ring-offset-1 ring-offset-bg-weak-50/50",
+										"ring-2 ring-blue-500 ring-offset-1 ring-offset-bg-weak-50/50 dark:ring-offset-black/50",
 								)}
 							>
-								<span className="relative block">
-									<TemplateThumb template={template} />
-									{isSelected ? (
-										<span className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-white">
-											<Icon name="check" className="h-3 w-3" />
-										</span>
-									) : null}
-								</span>
+								<TemplateThumb template={template} />
+								{isSelected ? (
+									<span className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-white shadow-xs">
+										<Icon name="check" className="h-3 w-3" />
+									</span>
+								) : null}
 							</span>
-							<span className="truncate px-0.5 font-medium text-text-strong-950 text-xs">
+							<span className="w-full truncate px-0.5 font-medium text-text-strong-950 text-xs">
 								{template.name}
 							</span>
 						</button>
@@ -172,15 +170,15 @@ const TemplatePicker = ({
 					type="button"
 					onClick={() => void handleCreateNew()}
 					disabled={creating}
-					className="group -m-1.5 flex flex-col gap-1.5 rounded-xl p-1.5 text-left transition-colors hover:bg-bg-weak-50 disabled:cursor-wait disabled:opacity-60"
+					className="group flex min-w-0 flex-col gap-1.5 rounded-xl p-1.5 text-left transition-colors hover:bg-bg-weak-50 disabled:cursor-wait disabled:opacity-60 dark:hover:bg-white/[0.06]"
 				>
-					<span className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 border-dashed text-text-sub-600 transition-colors group-hover:border-blue-500 group-hover:text-text-strong-950">
+					<span className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 border-dashed text-text-sub-600 transition-colors group-hover:border-blue-500 group-hover:text-text-strong-950 dark:border-stroke-soft-100/60 dark:group-hover:border-blue-400 dark:group-hover:text-white">
 						<Icon name="plus" className="h-5 w-5" />
 						<span className="font-medium text-xs">
 							{creating ? "Creating…" : "New template"}
 						</span>
 					</span>
-					<span className="truncate px-0.5 font-medium text-text-sub-600 text-xs transition-colors group-hover:text-text-strong-950">
+					<span className="w-full truncate px-0.5 font-medium text-text-sub-600 text-xs transition-colors group-hover:text-text-strong-950 dark:group-hover:text-white">
 						Create new
 					</span>
 				</button>

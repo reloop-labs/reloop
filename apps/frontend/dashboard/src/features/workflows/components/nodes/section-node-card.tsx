@@ -139,7 +139,7 @@ export const SectionNodeCard = ({
 	return (
 		<div
 			className={cn(
-				"relative w-[420px] overflow-visible rounded-2xl border bg-bg-white-0 p-1 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[border-color,box-shadow] duration-150 ease-out dark:border-stroke-soft-100/40 dark:bg-[#141419] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
+				"relative w-[420px] overflow-visible rounded-[14px] border bg-bg-weak-50/60 p-0.5 transition-colors duration-150 ease-out dark:border-stroke-soft-100/40 dark:bg-[#101014]",
 				selected
 					? meta.selected
 					: "border-stroke-soft-200 dark:border-stroke-soft-100/40",
@@ -154,11 +154,12 @@ export const SectionNodeCard = ({
 				/>
 			) : null}
 
-			<div className="flex items-center gap-2 px-2 py-2">
+			<div className="flex items-center gap-2 px-2.5 py-2">
 				<span
 					className={cn(
-						"flex h-6 w-6 shrink-0 items-center justify-center rounded-md border bg-transparent",
+						"flex h-6 w-6 shrink-0 items-center justify-center rounded-md border",
 						meta.iconBorder,
+						meta.well,
 					)}
 				>
 					<Icon
@@ -198,7 +199,7 @@ export const SectionNodeCard = ({
 
 			<div
 				className={cn(
-					"nodrag nopan mt-1 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3 dark:border-stroke-soft-100/70 dark:bg-black/40",
+					"nodrag nopan rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 dark:border-stroke-soft-100/40 dark:bg-[#141419]",
 					readOnly && "pointer-events-none select-none opacity-80",
 				)}
 			>

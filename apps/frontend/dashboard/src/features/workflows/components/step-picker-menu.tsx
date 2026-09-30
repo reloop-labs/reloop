@@ -96,7 +96,7 @@ export const StepPickerMenu = ({
 	return (
 		<div
 			className={cn(
-				"fade-in zoom-in-95 relative w-[420px] animate-in rounded-2xl border border-blue-500/40 bg-bg-white-0 p-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] ring-2 ring-blue-500/15 transition-all duration-150 ease-out dark:border-blue-500/50 dark:bg-[#141419] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]",
+				"fade-in zoom-in-95 relative w-[420px] animate-in rounded-[14px] border border-blue-500/40 bg-bg-weak-50/60 p-0.5 shadow-[0_8px_30px_rgba(15,23,42,0.12)] ring-2 ring-blue-500/15 transition-all duration-150 ease-out dark:border-blue-500/50 dark:bg-[#101014] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]",
 				className,
 			)}
 		>
@@ -107,7 +107,7 @@ export const StepPickerMenu = ({
 			/>
 
 			{/* Card Header */}
-			<div className="flex items-center gap-2 px-2 py-2">
+			<div className="flex items-center gap-2 px-2.5 py-2">
 				<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-blue-500/30 bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
 					<Icon name="plus" className="h-3.5 w-3.5" />
 				</span>
@@ -133,7 +133,7 @@ export const StepPickerMenu = ({
 			</div>
 
 			{/* Inset Body */}
-			<div className="mt-1 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2 dark:border-stroke-soft-100/70 dark:bg-black/40">
+			<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-2 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
 				{/* Search input */}
 				<div className="relative mb-2 flex items-center">
 					<Icon
