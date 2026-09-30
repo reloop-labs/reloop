@@ -10,6 +10,9 @@ export type Template = {
 	name: string;
 	description: string | null;
 	subject: string | null;
+	fromEmail?: string | null;
+	replyTo?: string | null;
+	previewText?: string | null;
 	status: "draft" | "published" | "archived";
 	content?: unknown[] | null;
 	thumbnailUrl?: string | null;

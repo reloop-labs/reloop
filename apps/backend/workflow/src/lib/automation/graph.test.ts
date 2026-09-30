@@ -70,6 +70,19 @@ describe("validateAutomationGraph", () => {
 		expect(result.isValid).toBe(false);
 		expect(result.errors.some((e) => e.includes("From"))).toBe(true);
 	});
+
+	test("accepts a template-only send email step", () => {
+		const result = validateAutomationGraph(
+			graph({
+				nodes: [
+					trigger,
+					{ ...send, data: { templateId: "tmpl_123" } },
+				],
+				edges: [{ id: "e1", source: "trigger", target: "send-1" }],
+			}),
+		);
+		expect(result.isValid).toBe(true);
+	});
 });
 
 describe("getFirstActionNodeIds", () => {

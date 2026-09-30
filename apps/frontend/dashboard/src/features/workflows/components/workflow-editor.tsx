@@ -60,7 +60,7 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 	data: { tone: "default" },
 };
 
-/** Horizontal center of the vertical node column (cards are 320px wide). */
+/** Horizontal center of the vertical node column (cards are 360px wide). */
 const COLUMN_X = 220;
 
 /** Estimated card heights by type so vertical spacing accounts for tall forms like Send Email */
@@ -73,7 +73,7 @@ export const getNodeEstimatedHeight = (type?: string): number => {
 		case "condition":
 			return 340;
 		case "send_email":
-			return 540;
+			return 560;
 		default:
 			return 240;
 	}

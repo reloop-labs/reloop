@@ -78,12 +78,15 @@ export const validateWorkflow = (
 		warnings.push("Connect the trigger to every step");
 	}
 
-	const unconfiguredSend = sendEmailNodes.filter(
-		(n) =>
-			!n.data.to?.trim() || !n.data.subject?.trim() || !n.data.from?.trim(),
-	);
+	const unconfiguredSend = sendEmailNodes.filter((n) => {
+		if (n.data.templateId?.trim()) return false;
+		// Legacy nodes without a template still pass with To/From/Subject.
+		return (
+			!n.data.to?.trim() || !n.data.subject?.trim() || !n.data.from?.trim()
+		);
+	});
 	if (unconfiguredSend.length > 0) {
-		warnings.push("Complete To, From, and Subject for each Send email step");
+		warnings.push("Select a template for each Send email step");
 	}
 
 	const badDelays = delayNodes.filter((n) => {
@@ -153,8 +156,9 @@ export const getNodeIssue = (
 
 	if (node.type === "send_email") {
 		const data = node.data as SendEmailNodeData;
+		if (data.templateId?.trim()) return null;
 		if (!data.to?.trim() || !data.subject?.trim() || !data.from?.trim()) {
-			return "Needs To, From, and Subject";
+			return "Select a template";
 		}
 		return null;
 	}

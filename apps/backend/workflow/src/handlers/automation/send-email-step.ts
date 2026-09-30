@@ -5,6 +5,7 @@ import {
 	INTERNAL_SECRET_HEADER,
 	INTERNAL_USER_ID_HEADER,
 } from "@reloop/auth/middleware/types";
+import { db } from "@reloop/db/client";
 import { log } from "evlog";
 
 function interpolate(
@@ -38,8 +39,37 @@ export async function sendAutomationEmail(params: {
 	};
 
 	const to = interpolate(params.nodeData.to || "{{contact.email}}", vars);
-	const subject = interpolate(params.nodeData.subject, vars);
-	const from = params.nodeData.from?.trim();
+	const templateId = params.nodeData.templateId?.trim();
+	let subject = interpolate(params.nodeData.subject ?? "", vars);
+	let from = params.nodeData.from?.trim();
+
+	// Template-only nodes: resolve Subject/From from the template itself.
+	if ((!from || !subject) && templateId) {
+		const templateRecord = await db.query.template.findFirst({
+			where: (t, { and: dbAnd, eq: dbEq, isNull: dbIsNull }) =>
+				dbAnd(
+					dbEq(t.id, templateId),
+					dbEq(t.organizationId, params.organizationId),
+					dbIsNull(t.deletedAt),
+				),
+		});
+		if (!subject) {
+			subject = templateRecord?.subject ?? "";
+		}
+		if (!from) {
+			const latestPublished = templateRecord
+				? await db.query.templateVersion.findFirst({
+						where: (tv, { and: dbAnd, eq: dbEq }) =>
+							dbAnd(
+								dbEq(tv.templateId, templateRecord.id),
+								dbEq(tv.isMajor, true),
+							),
+						orderBy: (tv, { desc: dbDesc }) => [dbDesc(tv.version)],
+					})
+				: undefined;
+			from = latestPublished?.fromEmail?.trim() || undefined;
+		}
+	}
 	if (!from) {
 		throw new Error("Send email step is missing a From address");
 	}

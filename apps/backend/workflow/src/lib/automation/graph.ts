@@ -11,10 +11,12 @@ export type DelayNodeData = {
 };
 
 export type SendEmailNodeData = {
-	to: string;
-	subject: string;
-	from?: string;
+	/** Template selected in the node picker (source of To/From/Subject). */
 	templateId?: string;
+	/** Legacy fields (kept for older nodes; new nodes use the template). */
+	to?: string;
+	subject?: string;
+	from?: string;
 	html?: string;
 	text?: string;
 };
@@ -170,10 +172,16 @@ export function validateAutomationGraph(
 			}
 		}
 		if (node.type === "send_email") {
+			const templateId =
+				typeof node.data?.templateId === "string"
+					? node.data.templateId.trim()
+					: "";
+			if (templateId) continue;
 			const to = String(node.data?.to ?? "").trim();
 			const subject = String(node.data?.subject ?? "").trim();
 			const from = String(node.data?.from ?? "").trim();
-			if (!to) errors.push(`Send email step "${node.id}" needs a To address.`);
+			if (!to)
+				errors.push(`Send email step "${node.id}" needs a To address.`);
 			if (!from)
 				errors.push(`Send email step "${node.id}" needs a From address.`);
 			if (!subject)

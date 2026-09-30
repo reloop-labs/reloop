@@ -96,14 +96,14 @@ export const StepPickerMenu = ({
 	return (
 		<div
 			className={cn(
-				"fade-in zoom-in-95 relative w-[320px] animate-in rounded-2xl border border-blue-500/40 bg-bg-white-0 p-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] ring-2 ring-blue-500/15 transition-all duration-150 ease-out dark:border-blue-500/50 dark:bg-[#141419] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]",
+				"fade-in zoom-in-95 relative w-[360px] animate-in rounded-2xl border border-blue-500/40 bg-bg-white-0 p-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] ring-2 ring-blue-500/15 transition-all duration-150 ease-out dark:border-blue-500/50 dark:bg-[#141419] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]",
 				className,
 			)}
 		>
 			{/* Top connector dot anchor */}
 			<div
 				aria-hidden="true"
-				className="absolute -top-1.5 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-bg-white-0 bg-blue-500 shadow-xs dark:border-[#141419]"
+				className="-top-1.5 -translate-x-1/2 absolute left-1/2 h-2.5 w-2.5 rounded-full border-2 border-bg-white-0 bg-blue-500 shadow-xs dark:border-[#141419]"
 			/>
 
 			{/* Card Header */}

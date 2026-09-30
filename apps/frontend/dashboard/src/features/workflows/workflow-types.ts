@@ -43,10 +43,12 @@ export interface TriggerNodeData extends NodeCardMeta {
 }
 
 export interface SendEmailNodeData extends NodeCardMeta {
-	to: string;
-	subject: string;
-	from?: string;
+	/** Template id selected from the template picker. */
 	templateId?: string;
+	/** Legacy fields (kept for older nodes; new nodes use the template). */
+	to?: string;
+	subject?: string;
+	from?: string;
 	html?: string;
 	text?: string;
 	[key: string]: unknown;

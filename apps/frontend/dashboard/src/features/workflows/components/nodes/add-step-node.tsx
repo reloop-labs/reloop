@@ -1,9 +1,9 @@
 "use client";
 
-import { Handle, Position } from "@xyflow/react";
-import { useEffect, useRef, useState } from "react";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { Handle, Position } from "@xyflow/react";
+import { useEffect, useRef, useState } from "react";
 import { useNodeEditor } from "../node-editor-context";
 import { StepPickerMenu } from "../step-picker-menu";
 
@@ -33,7 +33,7 @@ export const AddStepNode = () => {
 	return (
 		<div
 			ref={ref}
-			className="nodrag nopan relative flex w-[320px] flex-col items-center"
+			className="nodrag nopan relative flex w-[300px] flex-col items-center"
 		>
 			<Handle
 				type="target"
