@@ -24,7 +24,7 @@ const CATEGORIES: ComparisonCategory[] = [
 		icon: "server",
 		features: [
 			{
-				label: "100% Open Source (Apache 2.0)",
+				label: "Apache 2.0 plus use restrictions",
 				selfHost: true,
 				cloud: "Managed Cloud",
 			},
@@ -39,7 +39,7 @@ const CATEGORIES: ComparisonCategory[] = [
 				cloud: "Tier-based quota",
 			},
 			{
-				label: "Docker, Compose & Helm Charts",
+				label: "Docker Compose installer",
 				selfHost: true,
 				cloud: "Fully Managed",
 			},
@@ -52,8 +52,8 @@ const CATEGORIES: ComparisonCategory[] = [
 		features: [
 			{
 				label: "SMTP Inbound & Submission",
-				selfHost: "Port 25 / 587",
-				cloud: "Port 25 / 587",
+				selfHost: "Ports 25, 465, and 587",
+				cloud: "Ports 25, 465, and 587",
 			},
 			{
 				label: "SPF, DKIM & DMARC Verification",

@@ -1,0 +1,48 @@
+---
+title: Deploy on Darkless
+description: Self-host Reloop on a Darkless VPS or dedicated server with the standard installer.
+icon: server
+---
+
+[Darkless](https://darkless.cloud) is Reloop's infrastructure partner. If you want to self-host Reloop and do not already have a server, Darkless can provide a VPS or a dedicated machine. You then run the same installer as any other Linux host. Mail data stays on that machine.
+
+Darkless does not replace the Reloop installer, and you do not have to use Darkless to self-host.
+
+---
+
+## Pick a machine
+
+Use a plan that meets the [self-host requirements](/self-host/requirements) and the [VPS guide](/self-host/vps):
+
+| | |
+| :--- | :--- |
+| **OS** | Ubuntu 22.04, Ubuntu 24.04, Debian 12, or Debian 13 |
+| **Architecture** | x86_64 |
+| **CPU** | 2 vCPUs minimum, 4 or more is more comfortable |
+| **RAM** | 4 GB minimum, 8 GB recommended |
+| **Disk** | 50 GB recommended. The installer refuses to continue below 35 GB because the images are about 22 GB. |
+| **Ports** | `25`, `465`, `587`, plus `80` and `443` |
+
+Ask Darkless to open port `25` if you plan to receive mail. Many providers block it until you request it. Reloop can still submit outbound mail on `465` and `587` without it.
+
+---
+
+## Install Reloop
+
+Read the script before you run it as root. The canonical copy is [`install/install.sh`](https://github.com/reloop-labs/reloop/blob/main/install/install.sh).
+
+```bash
+curl -fsSL https://reloop.sh/install.sh -o install.sh
+less install.sh
+sudo bash install.sh
+```
+
+The installer asks for your hostname, a TLS contact email, and a few options, then prints the DNS records to add. The rest of the prompts, the layout under `/opt/reloop`, and day-two commands (`reloop status`, `reloop logs`, `reloop update`) are in the [VPS guide](/self-host/vps).
+
+---
+
+## Community discount
+
+Darkless offers a discount for the Reloop community on VPS and dedicated servers used to run Reloop. The code applies to the first invoice. Renewal stays at the list price you signed up at.
+
+The current code is posted in the [Reloop Discord](https://discord.gg/ZBYwWKY96U).

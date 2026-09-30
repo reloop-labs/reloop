@@ -5,59 +5,55 @@ import { SectionTitle } from "@reloop/web/app/sdk/components/section-title";
 const REQUIREMENTS = [
 	{
 		icon: "shield",
-		title: "Open Cloud Ports",
+		title: "Open these ports",
 		points: [
 			{
-				highlight: "Port 80 & 443",
-				text: "Web UI & REST API traffic",
+				highlight: "80 and 443",
+				text: "Dashboard, API, and certificates",
 			},
 			{
 				highlight: "Port 25",
-				text: "Inbound SMTP mail receiving",
+				text: "Inbound mail. Ask the host if it is blocked.",
 			},
 			{
-				highlight: "Port 587",
-				text: "Authenticated mail submission",
+				highlight: "465 and 587",
+				text: "Authenticated SMTP submission",
 			},
 		],
 	},
 	{
 		icon: "cpu",
-		title: "System Requirements",
+		title: "Server size",
 		points: [
 			{
-				highlight: "4–8 vCPUs & 8–16 GB RAM",
-				text: "Base compute footprint",
+				highlight: "2 vCPU and 4 GB RAM",
+				text: "Minimum. 4 vCPU and 8 GB is more comfortable.",
 			},
 			{
-				highlight: "Docker Engine 24.0+",
-				text: "With Docker Compose v2",
+				highlight: "50 GB disk",
+				text: "Images are about 22 GB. The installer wants 35 GB free.",
 			},
 			{
-				highlight: "PostgreSQL 15+ & Redis 7+",
-				text: "Database and queue runtime",
+				highlight: "Ubuntu or Debian",
+				text: "22.04, 24.04, Debian 12, or 13. The installer sets up Docker.",
 			},
 		],
 	},
 	{
 		icon: "globe",
-		title: "Domain & Subdomains",
+		title: "DNS the installer prints",
 		points: [
 			{
-				highlight: "app.{YOUR_DOMAIN}",
-				text: "Web Dashboard & unified API",
+				highlight: "reloop.example.com",
+				text: "Dashboard, API, and certificates",
 			},
 			{
-				highlight: "inbound.{YOUR_DOMAIN}",
-				text: "Inbound MX mail receiving",
+				highlight: "link.reloop.example.com",
+				text: "Clicks, opens, and unsubscribe pages",
 			},
 			{
-				highlight: "smtp.{YOUR_DOMAIN}",
-				text: "Outbound authenticated SMTP",
-			},
-			{
-				highlight: "link.{YOUR_DOMAIN}",
-				text: "Click tracking & open pixels",
+				highlight: "inbound.reloop.example.com",
+				text: "MX target for mail you receive",
 			},
 		],
 	},

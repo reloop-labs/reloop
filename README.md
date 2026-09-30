@@ -4,71 +4,211 @@
 
 # Reloop
 
-**Open-source email infrastructure — send, receive, and manage emails at scale.**
+**Open-source transactional email for developers.** Send with a REST API or SMTP, receive inbound mail, and run the whole platform on your own servers.
 
-Self-host on your own servers or use the hosted service from Reloop Labs.\
-No vendor lock-in. Full transparency. No proprietary black boxes.
+A self-hostable alternative to [Resend](https://reloop.sh/compare/resend), SendGrid, and Postmark.
 
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-[![GitHub Stars](https://img.shields.io/github/stars/reloop-labs/reloop?style=for-the-badge)](https://github.com/reloop-labs/reloop)
+[![License: Apache 2.0 with restrictions](https://img.shields.io/badge/license-Apache%202.0%20%2B%20restrictions-blue)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/reloop-labs/reloop?style=flat&logo=github)](https://github.com/reloop-labs/reloop/stargazers)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/ZBYwWKY96U)
 
-[Website](https://reloop.sh) · [Documentation](https://reloop.sh/docs) · [Hosted Sign-up](https://reloop.sh/dashboard/signup) · [Discord](https://discord.gg/ZBYwWKY96U)
+<a href="https://vercel.com/oss">
+  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge-2026.svg" />
+</a>
 
-<br/>
+[Website](https://reloop.sh) · [Documentation](https://reloop.sh/docs) · [Self-host](https://reloop.sh/docs/self-host/vps) · [Reloop Cloud](https://reloop.sh/dashboard/signup) · [Discord](https://discord.gg/ZBYwWKY96U)
+
 <br/>
 
 <a href="https://reloop.sh">
-  <img src=".github/assets/dashboard.png" alt="Reloop Dashboard" width="100%">
+  <img src=".github/assets/dashboard.png" alt="Reloop dashboard with email delivery analytics" width="100%">
 </a>
 
 </div>
 
 ---
 
-## What is Reloop?
+## Start here
 
-Reloop gives you the same capabilities as SendGrid, Mailchimp, Resend, and Loops — but the codebase is open source and fully self-hostable.
+| I want to... | Do this |
+| --- | --- |
+| Try Reloop | [Create a Reloop Cloud account](https://reloop.sh/dashboard/signup). The Free plan includes 3,000 emails a month and 100 a day. |
+| Send an email | Use the [API example](#send-an-email) below, then the [send API reference](https://reloop.sh/docs/api/mail/post-api-mail-v1send). |
+| Self-host | Run the [VPS installer](#self-host) on Ubuntu or Debian. [Read the script first](https://reloop.sh/docs/self-host/vps). |
+| Get a server | [Darkless](#hosting-and-infrastructure) is Reloop's infrastructure partner and can provide the machine. |
+| Understand the system | Read [Architecture](#architecture) and the [docs](https://reloop.sh/docs). |
+| Contribute | Follow [CONTRIBUTING.md](CONTRIBUTING.md). Local setup is `bun setup` then `bun dev`. |
 
-- **Transactional email** — REST API and SMTP relay for programmatic sending
-- **Email campaigns** — broadcast and sequence campaigns with audience segmentation
-- **Inbound email** — receive, parse, and process incoming mail at your own domain
-- **Email templates** — a visual drag-and-drop editor built for developers and marketers
-- **Real-time analytics** — open rates, click rates, bounces, and delivery events stored in PostgreSQL
-- **Webhooks** — push delivery events to your own endpoints the moment they happen
-- **Contacts & lists** — manage subscribers, tags, and suppression lists
-- **Workflows** — automate multi-step email sequences triggered by user actions
-- **API keys & auth** — granular API key management with team-level permissions
-
-Use Reloop as a **hosted service** (Reloop Labs handles the infrastructure) or **self-host** on Docker, Kubernetes, or bare metal. Same APIs. Same features. Your choice.
+Personal and internal self-hosting is allowed under the Apache License 2.0 plus extra Reloop Labs terms. Offering Reloop as your own hosted service is not. Details are in [License](#license).
 
 ---
 
-## Why Reloop?
+## What you can do
 
-| | Reloop | SendGrid / Mailchimp / Resend |
-|---|---|---|
-| Open source | ✅ | ❌ |
-| Self-hostable | ✅ | ❌ |
-| Vendor lock-in | ❌ None | ✅ Locked in |
-| Transparent pricing | ✅ | ❌ |
-| Data stays on your servers | ✅ (self-hosted) | ❌ |
+Reloop is one email platform: a transactional API, an SMTP relay, campaigns, and an inbound inbox. Reloop Cloud and a self-hosted install run the same product. Reloop is not a drop-in Resend proxy. Plan a small client change if you are migrating.
+
+**Send**
+
+- Transactional email over `POST /api/mail/v1/send` with an `x-api-key` header
+- SMTP submission on ports 465 and 587
+- Sending domains with SPF, DKIM, and DMARC records generated in the dashboard
+
+**Receive**
+
+- Inbound mail on your domain (MX to the Reloop server, port 25)
+- Agent inbox for reading and working with received mail
+
+**Operate**
+
+- Visual and code templates
+- Broadcast campaigns, contacts, lists, and suppression
+- Webhooks for delivery events
+- Opens, clicks, bounces, and delivery logs stored in PostgreSQL
+- Multi-step workflows (beta)
 
 ---
 
-## Who This Is For
+## Send an email
 
-**Developers** who need a reliable email API without vendor lock-in — integrate via REST or SMTP, manage sending domains, and receive webhook events for every delivery state.
+Create an API key in the dashboard, verify a sending domain, then:
 
-**DevOps and platform teams** who want full control over their email infrastructure — run Reloop on your own servers, inspect every component, and keep all data inside your network.
+```bash
+curl -X POST https://reloop.sh/api/mail/v1/send \
+  -H "x-api-key: rl_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "Reloop <hello@mail.example.com>",
+    "to": "user@example.com",
+    "subject": "Welcome to Reloop",
+    "html": "<p>Thanks for signing up.</p>",
+    "text": "Thanks for signing up."
+  }'
+```
 
-**Marketing and growth teams** who need campaign tools and audience management without depending on a proprietary SaaS platform that can change pricing or terms at any time.
+Node.js, with the published [`reloop-email`](https://www.npmjs.com/package/reloop-email) package:
+
+```bash
+npm install reloop-email
+```
+
+```ts
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+
+await reloop.mail.send({
+  from: "Reloop <hello@mail.example.com>",
+  to: "user@example.com",
+  subject: "Welcome to Reloop",
+  html: "<p>Thanks for signing up.</p>",
+  text: "Thanks for signing up.",
+});
+```
+
+SDKs are also published for Python, Go, PHP, Ruby, Rust, Java, Elixir, and .NET. See the [SDK list](https://reloop.sh/docs/resources/sdks) and the [framework examples](https://reloop.sh/docs/introduction).
+
+On a self-hosted install, send to your own API host instead of `https://reloop.sh`.
 
 ---
 
-## Quick Start
+## Self-host
+
+The supported production install is one command on a fresh server. It installs Docker, writes the Compose stack, generates secrets, applies the database schema, starts the services, checks health, and prints the DNS records to add.
+
+```bash
+curl -fsSL https://reloop.sh/install.sh -o install.sh
+less install.sh
+sudo bash install.sh
+```
+
+| | |
+| --- | --- |
+| OS | Ubuntu 22.04, Ubuntu 24.04, Debian 12, or Debian 13 (x86_64) |
+| Size | 2 vCPU and 4 GB RAM minimum. 4 vCPU, 8 GB RAM, and 50 GB disk is the comfortable size. The installer stops below 35 GB of disk because the images are about 22 GB. |
+| Ports | 80 and 443 for the dashboard and API. 25 for inbound mail. 465 and 587 for SMTP submission. |
+| After install | `reloop status`, `reloop logs`, `reloop restart`, `reloop update` |
+
+Full walkthrough: **[Deploy on a VPS](https://reloop.sh/docs/self-host/vps)**.
+
+A self-hosted install leaves out the pieces that only belong to Reloop Cloud: public docs on that host, credits and quotas, the public validation tools, and the operator console. Sending is not metered.
+
+Kubernetes, Coolify, Dokploy, Railway, and the other one-click targets are not ready yet. Those pages in the docs are marked coming soon. If you do not already have a server, use a VPS that meets the table above. [Darkless](#hosting-and-infrastructure) can provide one.
+
+---
+
+## Reloop Cloud
+
+Reloop Labs runs the same codebase as a hosted service.
+
+- [Sign up](https://reloop.sh/dashboard/signup)
+- Free: 3,000 emails a month, 100 a day
+- Paid plans and overage are on the [pricing page](https://reloop.sh/pricing)
+
+Self-hosting has no Reloop license fee. You still pay for the server, DNS, and any IP or blocklist work your mail volume needs.
+
+---
+
+## Architecture
+
+Reloop is a Bun and Turborepo monorepo.
+
+- **Frontends:** marketing site, dashboard, docs, link tracking, and an operator console
+- **API services:** auth, domains, API keys, mail, templates, campaigns, contacts, webhooks, logs, inbox, workflows, uploads, and related services, written with Elysia
+- **Mail transport:** [KumoMTA](https://github.com/KumoCorp/kumomta) for submission and delivery. Reloop does not sit on Amazon SES.
+- **Data:** PostgreSQL (Drizzle), Redis, BullMQ for jobs, NATS for events
+- **Edge:** Caddy for TLS and routing. Object storage is S3-compatible and optional on a self-hosted install.
+- **Local development:** Docker Compose also runs Mailpit so local sends stay on your machine
+
+Developer setup, ports, and per-service notes: [Setup guide](https://reloop.sh/docs/setup).
+
+---
+
+## Documentation
+
+| | |
+| --- | --- |
+| [Introduction](https://reloop.sh/docs/introduction) | Send your first transactional email |
+| [API reference](https://reloop.sh/docs/api) | HTTP API |
+| [SDKs](https://reloop.sh/docs/resources/sdks) | Official client libraries |
+| [Webhooks](https://reloop.sh/docs/webhooks) | Delivery events |
+| [Self-host on a VPS](https://reloop.sh/docs/self-host/vps) | Production installer |
+| [Self-host on Darkless](https://reloop.sh/docs/self-host/darkless) | Get a server, then run the installer |
+| [Local setup](https://reloop.sh/docs/setup) | Contribute from a checkout |
+| [Compare with Resend](https://reloop.sh/compare/resend) | What changes if you move |
+| [Changelog](https://reloop.sh/changelog) | What shipped |
+
+---
+
+## Hosting and infrastructure
+
+Reloop partners with [Darkless](https://darkless.cloud) to make self-hosting easier for people who do not already have a server. Darkless provides the VPS or dedicated machine. You install Reloop on it. Mail data stays on that machine.
+
+<img src=".github/assets/darkless-x-reloop.png" alt="Partnership announcement: Reloop and Darkless" width="720">
+
+Darkless is a hosting company. The partnership covers infrastructure for Reloop, extra capacity where it helps the project, and a clearer path for anyone who wants to self-host but does not have a server yet. It does not change the Reloop license, and a Darkless server is not required to run Reloop.
+
+What you still do yourself:
+
+1. Pick a machine that meets the [self-host requirements](#self-host). Ubuntu 24.04 or Debian 12 is a good default.
+2. Point a hostname at it and run the installer.
+3. Add the DNS records the installer prints.
+4. If you need to receive mail, confirm port 25 is open. Many hosts block it until you ask.
+
+Guide: **[Deploy Reloop on Darkless](https://reloop.sh/docs/self-host/darkless)**.
+
+### Community discount
+
+Darkless offers a discount for the Reloop community on VPS and dedicated servers used to run Reloop. The code applies to the first invoice. Renewal stays at the list price you signed up at.
+
+The current code is posted in the [Reloop Discord](https://discord.gg/ZBYwWKY96U).
+
+---
+
+## Contributing
+
+Bug reports, docs fixes, and code contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) first.
+
+Local development needs Bun 1.3 or newer, Docker, and mkcert:
 
 ```bash
 git clone https://github.com/reloop-labs/reloop.git
@@ -77,68 +217,48 @@ bun setup
 bun dev
 ```
 
-For full setup instructions — prerequisites, environment config, Docker services, database setup, and per-service commands — see the **[Setup Guide →](https://reloop.sh/docs/setup)**
-
-| Setup Doc | Description |
-|---|---|
-| [Setup overview](https://reloop.sh/docs/setup) | Full step-by-step local setup |
-| [Architecture overview](https://reloop.sh/docs/setup/overview) | Monorepo layout and tech stack |
-| [Port reference](https://reloop.sh/docs/setup/port) | All local ports and gateway routes |
-| [Backend services](https://reloop.sh/docs/setup/backend/auth) | Per-service setup guides |
-| [Frontend apps](https://reloop.sh/docs/setup/frontend/web) | Web, dashboard, docs, links |
+`bun setup` checks those tools, trusts local TLS certificates, installs dependencies, copies env files, starts Postgres and the rest of the Compose stack, and pushes the database schema. The app is served at `https://local.reloop.sh`. The full sequence is in the [setup guide](https://reloop.sh/docs/setup).
 
 ---
 
-## Self-Host
+## Security
 
-Deploy the whole stack on a fresh Ubuntu 22.04/24.04 or Debian 12/13 server with one command:
+Report vulnerabilities in private. Do not open a public issue.
 
-```bash
-curl -fsSL https://reloop.sh/install.sh | sudo bash
-```
+- [GitHub private advisory](https://github.com/reloop-labs/reloop/security/advisories/new)
+- Email `reloop.sh@gmail.com` with the subject `[SECURITY]`
 
-The installer runs preflight checks, installs Docker, prompts for your domain, generates production secrets, deploys every service, verifies health, and prints the DNS records to add. See the **[VPS guide →](https://reloop.sh/docs/self-host/vps)**
-
----
-
-## Hosted Service
-
-Reloop is also available as a fully managed hosted service from Reloop Labs — same codebase, zero infrastructure to run. [Sign up at reloop.sh](https://reloop.sh/dashboard/signup).
+The process, response window, and supported versions are in [SECURITY.md](SECURITY.md).
 
 ---
 
-## Contributing
+## Community
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting bugs, requesting features, branch conventions, commit format, and the pull request process.
-
----
-
-## Community & Support
-
-- 💬 **Discord** — [Join the community](https://discord.gg/ZBYwWKY96U)
-- 🐦 **Twitter/X** — [Follow @reloop_labs](https://x.com/reloop_labs)
-- 💼 **LinkedIn** — [Follow on LinkedIn](https://www.linkedin.com/company/reloop-labs)
-- 🐙 **GitHub Issues** — [Report bugs or request features](https://github.com/reloop-labs/reloop/issues)
-- 📚 **Documentation** — [reloop.sh/docs](https://reloop.sh/docs)
-- 📋 **Changelog** — [CHANGELOG.md](CHANGELOG.md)
-- 🆘 **Support** — [reloop.sh/support](https://reloop.sh/support)
+- [Discord](https://discord.gg/ZBYwWKY96U)
+- [X](https://x.com/reloop_labs)
+- [LinkedIn](https://www.linkedin.com/company/reloop-labs)
+- [GitHub issues](https://github.com/reloop-labs/reloop/issues)
+- [Support](https://reloop.sh/support)
+- [Changelog](CHANGELOG.md)
 
 ---
 
 ## License
 
-Reloop is licensed under the [Apache License 2.0 with additional Reloop Labs use restrictions](LICENSE). Read the LICENSE file for the exact terms before redistributing it or offering it as a hosted service.
+Reloop is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) with additional use restrictions from Reloop Labs. Read [LICENSE](LICENSE) before you redistribute it or run it for other people.
+
+You may use, copy, modify, and run Reloop for personal use and for internal company use, including a private self-hosted install.
+
+You may not sell or sublicense it, offer it as a hosted service, or build a product whose primary purpose is to compete with Reloop Labs. There is no commercial license for third parties to resell Reloop or to operate a competing hosted email service on this code.
+
+Questions: `reloop.sh@gmail.com`. The same terms are summarized at [reloop.sh/license](https://reloop.sh/license).
 
 ---
 
 <div align="center">
 
-Built by [Reloop Labs](https://reloop.sh) · Give us a ⭐ if Reloop saves you from vendor lock-in.
+Reloop is in the [Vercel Open Source Program](https://vercel.com/oss). Infrastructure partnership with [Darkless](https://darkless.cloud).
 
-<br />
-<br />
-<a href="https://vercel.com/open-source-program">
-  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge-2026.svg" />
-</a>
+Built by [Reloop Labs](https://reloop.sh).
 
 </div>

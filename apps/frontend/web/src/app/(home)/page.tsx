@@ -32,12 +32,12 @@ const organizationId = `${siteUrl}/#organization`;
 
 export const metadata: Metadata = {
 	title: {
-		absolute: "Reloop: Open-Source Email API & Infrastructure for Developers",
+		absolute: "Reloop: Open-Source Transactional Email API for Developers",
 	},
 	description: siteDescription,
 	alternates: { canonical: siteUrl },
 	openGraph: {
-		title: "Reloop: Open-Source Email API & Infrastructure for Developers",
+		title: "Reloop: Open-Source Transactional Email API for Developers",
 		description: siteDescription,
 		url: siteUrl,
 		type: "website",

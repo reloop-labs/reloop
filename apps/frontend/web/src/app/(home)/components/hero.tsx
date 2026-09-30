@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
 
-const INSTALL_COMMAND = "curl -fsSL https://reloop.sh/install.sh | bash";
+const INSTALL_COMMAND = "curl -fsSL https://reloop.sh/install.sh | sudo bash";
 
 export interface HeroProps {
 	variant?: "default" | "self-host";
@@ -50,6 +50,17 @@ export function Hero({ variant = "default" }: HeroProps) {
 								aria-hidden="true"
 							/>
 							<span>View deployment docs</span>
+						</Link>
+						<Link
+							href="/docs/self-host/darkless"
+							className="inline-flex items-center gap-2 transition-colors hover:text-text-strong-950 dark:hover:text-white"
+						>
+							<Icon
+								name="server"
+								className="size-4 shrink-0"
+								aria-hidden="true"
+							/>
+							<span>Deploy on Darkless</span>
 						</Link>
 					</div>
 				</div>

@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Reloop | Email for AI Agents & Developers";
+export const alt = "Reloop, open-source transactional email you can self-host";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -304,7 +304,7 @@ export default async function OpenGraphImage() {
 						marginBottom: "32px",
 					}}
 				>
-					An open-source alternative to SendGrid, Postmark, AWS SES
+					A self-hostable alternative to Resend and SendGrid
 				</span>
 
 				{/* headline line 1, solid white */}
@@ -317,7 +317,7 @@ export default async function OpenGraphImage() {
 						lineHeight: 1.0,
 					}}
 				>
-					Email for AI Agents
+					Transactional email
 				</span>
 
 				{/* headline line 2, dim white */}
@@ -330,7 +330,7 @@ export default async function OpenGraphImage() {
 						lineHeight: 1.05,
 					}}
 				>
-					& Developers.
+					you can self-host.
 				</span>
 
 				{/* descriptor */}
@@ -344,8 +344,8 @@ export default async function OpenGraphImage() {
 						maxWidth: "620px",
 					}}
 				>
-					High-performance, open-source email infrastructure, the same service
-					as proprietary platforms. Hosted or self-hosted.
+					REST API, SMTP, inbound mail, and campaigns. Self-host it or use
+					Reloop Cloud.
 				</span>
 			</div>
 
