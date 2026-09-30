@@ -114,8 +114,8 @@ export function BimiDnsRecords() {
 					What the DNS looks like
 				</h2>
 				<p className="max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					One TXT record: type first, then four values. Each value points to
-					its box.
+					One TXT record: type first, then four values. Each value points to its
+					box.
 				</p>
 			</div>
 
@@ -131,13 +131,11 @@ export function BimiDnsRecords() {
 					>
 						<div className="m-auto flex w-max items-start gap-4 sm:gap-6">
 							<div className="flex flex-col">
-								<p className="text-center font-mono text-[11px] uppercase tracking-[0.14em] text-stone-500 dark:text-white/40">
+								<p className="text-center font-mono text-[11px] text-stone-500 uppercase tracking-[0.14em] dark:text-white/40">
 									Record Type
 								</p>
 								<div className="mt-1.5 flex items-stretch">
-									<div
-										className="flex items-center justify-center whitespace-nowrap border-b-[2.5px] border-stone-400 bg-white p-1 text-center font-mono font-semibold text-[12.5px] text-stone-500 leading-relaxed dark:bg-white/[0.04] dark:text-white/60"
-									>
+									<div className="flex items-center justify-center whitespace-nowrap border-stone-400 border-b-[2.5px] bg-white p-1 text-center font-mono font-semibold text-[12.5px] text-stone-500 leading-relaxed dark:bg-white/[0.04] dark:text-white/60">
 										<span>TXT</span>
 									</div>
 									{selector ? (
@@ -158,7 +156,7 @@ export function BimiDnsRecords() {
 								</div>
 							</div>
 							<div className="flex flex-col">
-								<p className="text-center font-mono text-[11px] uppercase tracking-[0.14em] text-stone-500 dark:text-white/40">
+								<p className="text-center font-mono text-[11px] text-stone-500 uppercase tracking-[0.14em] dark:text-white/40">
 									Value
 								</p>
 								<div className="mt-1.5 flex items-stretch">
@@ -244,7 +242,7 @@ export function BimiDnsRecords() {
 				</div>
 
 				{/* Prerequisite line */}
-				<p className="mt-8 border-t border-stroke-soft-100 pt-5 text-center text-[13px] text-stone-500 leading-relaxed dark:border-white/10 dark:text-white/60">
+				<p className="mt-8 border-stroke-soft-100 border-t pt-5 text-center text-[13px] text-stone-500 leading-relaxed dark:border-white/10 dark:text-white/60">
 					<span className="font-mono text-[12.5px] text-text-strong-950 dark:text-white">
 						_dmarc.example.com TXT “v=DMARC1; p=quarantine; pct=100;”
 					</span>

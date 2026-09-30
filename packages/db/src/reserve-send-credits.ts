@@ -1,11 +1,11 @@
 import { and, eq, lte } from "drizzle-orm";
-import { isSelfHosted } from "./self-hosted";
 import { type DatabaseInstance, db } from "./client";
 import {
 	creditLedger,
 	organizationCredits,
 	organizationPlan,
 } from "./schema/billing";
+import { isSelfHosted } from "./self-hosted";
 
 const DEFAULT_MONTHLY_CREDITS = 3000;
 const DEFAULT_DAILY_EMAIL_LIMIT = 100;

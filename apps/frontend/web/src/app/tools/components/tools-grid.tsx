@@ -43,7 +43,23 @@ export type ToolItem = {
 	icon: ComponentType<{ className?: string }>;
 	path: string;
 	/** Render the full blueprint art panel instead of the icon box. */
-	art?: "timer" | "validator" | "deliverability" | "spoof" | "blocklist" | "dns" | "domain-age" | "who-sends" | "auth" | "reputation" | "lookalike" | "spam-words" | "bimi" | "html-editor" | "api" | "suggest";
+	art?:
+		| "timer"
+		| "validator"
+		| "deliverability"
+		| "spoof"
+		| "blocklist"
+		| "dns"
+		| "domain-age"
+		| "who-sends"
+		| "auth"
+		| "reputation"
+		| "lookalike"
+		| "spam-words"
+		| "bimi"
+		| "html-editor"
+		| "api"
+		| "suggest";
 };
 
 export const ALL_TOOLS: ToolItem[] = [
@@ -236,19 +252,19 @@ export function ToolsGrid() {
 								borderClass,
 							)}
 						>
-						<div>
-							{tool.art ? (
-								<div className="flex h-32 items-center justify-center overflow-hidden rounded-xl bg-[#246BF5] text-white dark:border dark:border-white/10 dark:bg-[#000]">
-									{(() => {
-										const Art = TOOL_ART[tool.art];
-										return <Art className="h-full" />;
-									})()}
-								</div>
-							) : (
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-neutral-800 dark:bg-white/[0.05] dark:text-white">
-									<IconComponent className="h-5 w-5 stroke-[1.75]" />
-								</div>
-							)}
+							<div>
+								{tool.art ? (
+									<div className="flex h-32 items-center justify-center overflow-hidden rounded-xl bg-[#246BF5] text-white dark:border dark:border-white/10 dark:bg-[#000]">
+										{(() => {
+											const Art = TOOL_ART[tool.art];
+											return <Art className="h-full" />;
+										})()}
+									</div>
+								) : (
+									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-neutral-800 dark:bg-white/[0.05] dark:text-white">
+										<IconComponent className="h-5 w-5 stroke-[1.75]" />
+									</div>
+								)}
 
 								<h3 className="mt-5 font-semibold text-[15px] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:text-primary-base sm:text-[15.5px] dark:text-white dark:group-hover:text-white">
 									{tool.title}

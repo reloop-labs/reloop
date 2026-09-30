@@ -1,9 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
-import {
-	isSelfHosted,
-	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
-} from "@reloop/db/self-hosted";
+import { extractRecipientDomain, findUndeliverableRecipient } from "@reloop/db";
 import { db } from "@reloop/db/client";
+import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { ensureSendingDomainVerified } from "@reloop/db/ensure-sending-domain-verified";
 import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import {
@@ -11,13 +9,12 @@ import {
 	refundSendCredits,
 	reserveSendCredits,
 } from "@reloop/db/reserve-send-credits";
-import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { domain, emailLog, organizationPlan } from "@reloop/db/schema";
-import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
 import {
-	findUndeliverableRecipient,
-	extractRecipientDomain,
-} from "@reloop/db";
+	isSelfHosted,
+	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
+} from "@reloop/db/self-hosted";
+import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
 import { createError } from "evlog";
@@ -233,7 +230,11 @@ export async function logIncomingController({
 	// ── Domain-age initial daily cap (all packages) ───────────────────────
 	// Uses registrar registration age via RDAP, not Reloop added date
 	const ageCheck = await checkDomainAgeDailyCap({
-		domain: { id: domainRecord.id, domain: domainRecord.domain, createdAt: domainRecord.createdAt },
+		domain: {
+			id: domainRecord.id,
+			domain: domainRecord.domain,
+			createdAt: domainRecord.createdAt,
+		},
 		recipientCount,
 	});
 	if (!ageCheck.allowed && ageCheck.cap !== null) {

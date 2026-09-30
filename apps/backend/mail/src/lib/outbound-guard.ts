@@ -18,11 +18,11 @@
  *  BLOCKED_DOMAINS=evil.com,...    → append to domain blocklist
  */
 
-import { createError } from "evlog";
 import {
 	extractRecipientDomain,
 	isUndeliverableRecipientDomain,
 } from "@reloop/db";
+import { createError } from "evlog";
 
 // ─── 1. Body size cap ────────────────────────────────────────────────────────
 
@@ -342,7 +342,8 @@ export function assertRecipientsDeliverable(
 ): void {
 	const groups: Array<string | string[] | undefined> = [to, cc, bcc];
 	for (const group of groups) {
-		const list = group === undefined ? [] : Array.isArray(group) ? group : [group];
+		const list =
+			group === undefined ? [] : Array.isArray(group) ? group : [group];
 		for (const recipient of list) {
 			const domain = extractRecipientDomain(recipient);
 			if (domain && isUndeliverableRecipientDomain(domain)) {

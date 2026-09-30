@@ -7,7 +7,7 @@ import { TRIGGER_NODE_ID } from "./workflow-types";
 
 const now = () => new Date().toISOString();
 
-/** Horizontal center used so cards (360px wide) line up in a vertical column. */
+/** Horizontal center used so cards (420px wide) line up in a vertical column. */
 const COLUMN_X = 220;
 /** Trigger top (60) + Trigger height (~160) + 60px connection line = 280 */
 const FIRST_ROW_Y = 280;

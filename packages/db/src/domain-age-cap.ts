@@ -1,10 +1,10 @@
-import { and, count, eq, gte } from "drizzle-orm";
 import net from "node:net";
+import { and, count, eq, gte } from "drizzle-orm";
 import { getDomain, getPublicSuffix } from "tldts";
 import { db } from "./client";
 import { rdapEndpointsForDomain } from "./rdap-registry";
-import { emailLog } from "./schema/email";
 import { utcDayStart } from "./reserve-send-credits";
+import { emailLog } from "./schema/email";
 
 /**
  * Domain-age based initial daily cap.
@@ -15,7 +15,10 @@ import { utcDayStart } from "./reserve-send-credits";
 
 export type DomainAgeCap = number | null; // null = dynamic (no age cap, defer to plan)
 
-export function getDomainAgeDays(createdAt: Date, now: Date = new Date()): number {
+export function getDomainAgeDays(
+	createdAt: Date,
+	now: Date = new Date(),
+): number {
 	const ms = now.getTime() - new Date(createdAt).getTime();
 	if (ms <= 0) return 0;
 	return Math.floor(ms / (1000 * 60 * 60 * 24));
@@ -55,7 +58,9 @@ export async function getDomainDailySentCount(
 	const [row] = await db
 		.select({ value: count() })
 		.from(emailLog)
-		.where(and(eq(emailLog.domainId, domainId), gte(emailLog.createdAt, dayStart)));
+		.where(
+			and(eq(emailLog.domainId, domainId), gte(emailLog.createdAt, dayStart)),
+		);
 	return row?.value ?? 0;
 }
 
@@ -69,7 +74,15 @@ type ParsedRdapResult = {
 };
 
 function cleanDomainInput(input: string): string {
-	return input.trim().toLowerCase().replace(/^https?:\/\//, "").split("/")[0]?.split("?")[0]?.split("#")[0] ?? "";
+	return (
+		input
+			.trim()
+			.toLowerCase()
+			.replace(/^https?:\/\//, "")
+			.split("/")[0]
+			?.split("?")[0]
+			?.split("#")[0] ?? ""
+	);
 }
 
 function toRegistrableDomain(input: string): string {
@@ -78,18 +91,39 @@ function toRegistrableDomain(input: string): string {
 	return getDomain(cleaned) || cleaned;
 }
 
-function emptyRdap(status: ParsedRdapResult["lookupStatus"], rawStatus?: number): ParsedRdapResult {
-	return { found: status === "found", lookupStatus: status, createdAt: null, expiresAt: null, rawStatus } as ParsedRdapResult & { rawStatus?: number };
+function emptyRdap(
+	status: ParsedRdapResult["lookupStatus"],
+	rawStatus?: number,
+): ParsedRdapResult {
+	return {
+		found: status === "found",
+		lookupStatus: status,
+		createdAt: null,
+		expiresAt: null,
+		rawStatus,
+	} as ParsedRdapResult & { rawStatus?: number };
 }
 
 function parseRdapResponse(data: any): ParsedRdapResult {
-	if (!data || typeof data !== "object") return { found: false, lookupStatus: "not_found", createdAt: null, expiresAt: null };
+	if (!data || typeof data !== "object")
+		return {
+			found: false,
+			lookupStatus: "not_found",
+			createdAt: null,
+			expiresAt: null,
+		};
 	let createdAt: string | null = null;
 	let expiresAt: string | null = null;
 	if (Array.isArray(data.events)) {
 		for (const ev of data.events) {
-			if (ev.eventAction === "registration" && ev.eventDate) createdAt = new Date(ev.eventDate).toISOString();
-			if ((ev.eventAction === "expiration" || ev.eventAction === "registrar expiration") && ev.eventDate) expiresAt = new Date(ev.eventDate).toISOString();
+			if (ev.eventAction === "registration" && ev.eventDate)
+				createdAt = new Date(ev.eventDate).toISOString();
+			if (
+				(ev.eventAction === "expiration" ||
+					ev.eventAction === "registrar expiration") &&
+				ev.eventDate
+			)
+				expiresAt = new Date(ev.eventDate).toISOString();
 		}
 	}
 	return { found: true, lookupStatus: "found", createdAt, expiresAt };
@@ -97,8 +131,15 @@ function parseRdapResponse(data: any): ParsedRdapResult {
 
 function classifyRdapHttp(status: number, body: unknown): ParsedRdapResult {
 	if (status === 200) return parseRdapResponse(body);
-	const title = body && typeof body === "object" && "title" in body && typeof (body as { title: unknown }).title === "string" ? (body as { title: string }).title : "";
-	if (status === 404 && /no rdap service is available/i.test(title)) return emptyRdap("no_rdap_service", 404);
+	const title =
+		body &&
+		typeof body === "object" &&
+		"title" in body &&
+		typeof (body as { title: unknown }).title === "string"
+			? (body as { title: string }).title
+			: "";
+	if (status === 404 && /no rdap service is available/i.test(title))
+		return emptyRdap("no_rdap_service", 404);
 	if (status === 404) return emptyRdap("not_found", 404);
 	return emptyRdap("error", status);
 }
@@ -107,18 +148,35 @@ async function fetchRdapUrl(rdapUrl: string): Promise<ParsedRdapResult> {
 	const controller = new AbortController();
 	const t = setTimeout(() => controller.abort(), 4000);
 	try {
-		const r = await fetch(rdapUrl, { headers: { Accept: "application/rdap+json, application/json", "User-Agent": "Reloop-Domain-Age-Cap/1.0" }, signal: controller.signal });
+		const r = await fetch(rdapUrl, {
+			headers: {
+				Accept: "application/rdap+json, application/json",
+				"User-Agent": "Reloop-Domain-Age-Cap/1.0",
+			},
+			signal: controller.signal,
+		});
 		let body: unknown = null;
-		try { body = await r.json(); } catch { body = null; }
+		try {
+			body = await r.json();
+		} catch {
+			body = null;
+		}
 		return classifyRdapHttp(r.status, body);
-	} catch { return emptyRdap("error"); } finally { clearTimeout(t); }
+	} catch {
+		return emptyRdap("error");
+	} finally {
+		clearTimeout(t);
+	}
 }
 
 const IANA_RDAP_BOOTSTRAP_URL = "https://data.iana.org/rdap/dns.json";
 const BOOTSTRAP_TTL_MS = 24 * 60 * 60 * 1000;
-let ianaBootstrapCache: { loadedAt: number; map: Map<string, string> } | null = null;
+let ianaBootstrapCache: { loadedAt: number; map: Map<string, string> } | null =
+	null;
 
-function parseIanaRdapBootstrap(data: { services?: Array<[string[], string[]]> }): Map<string, string> {
+function parseIanaRdapBootstrap(data: {
+	services?: Array<[string[], string[]]>;
+}): Map<string, string> {
 	const map = new Map<string, string>();
 	for (const svc of data.services || []) {
 		const [tlds, urls] = svc;
@@ -130,22 +188,40 @@ function parseIanaRdapBootstrap(data: { services?: Array<[string[], string[]]> }
 }
 
 async function loadIanaRdapBootstrap(): Promise<Map<string, string>> {
-	if (ianaBootstrapCache && Date.now() - ianaBootstrapCache.loadedAt < BOOTSTRAP_TTL_MS) return ianaBootstrapCache.map;
+	if (
+		ianaBootstrapCache &&
+		Date.now() - ianaBootstrapCache.loadedAt < BOOTSTRAP_TTL_MS
+	)
+		return ianaBootstrapCache.map;
 	try {
 		const c = new AbortController();
 		const t = setTimeout(() => c.abort(), 8000);
 		try {
-			const r = await fetch(IANA_RDAP_BOOTSTRAP_URL, { headers: { Accept: "application/json", "User-Agent": "Reloop-Domain-Age-Cap/1.0" }, signal: c.signal });
+			const r = await fetch(IANA_RDAP_BOOTSTRAP_URL, {
+				headers: {
+					Accept: "application/json",
+					"User-Agent": "Reloop-Domain-Age-Cap/1.0",
+				},
+				signal: c.signal,
+			});
 			if (!r.ok) return ianaBootstrapCache?.map ?? new Map();
-			const data = (await r.json()) as { services?: Array<[string[], string[]]> };
+			const data = (await r.json()) as {
+				services?: Array<[string[], string[]]>;
+			};
 			const map = parseIanaRdapBootstrap(data);
 			ianaBootstrapCache = { loadedAt: Date.now(), map };
 			return map;
-		} finally { clearTimeout(t); }
-	} catch { return ianaBootstrapCache?.map ?? new Map(); }
+		} finally {
+			clearTimeout(t);
+		}
+	} catch {
+		return ianaBootstrapCache?.map ?? new Map();
+	}
 }
 
-async function fetchRdapForDomain(registrableDomain: string): Promise<ParsedRdapResult> {
+async function fetchRdapForDomain(
+	registrableDomain: string,
+): Promise<ParsedRdapResult> {
 	const bootstrap = await loadIanaRdapBootstrap();
 	const endpoints = rdapEndpointsForDomain(registrableDomain, { bootstrap });
 	let notFound: ParsedRdapResult | null = null;
@@ -159,13 +235,19 @@ async function fetchRdapForDomain(registrableDomain: string): Promise<ParsedRdap
 	return notFound ?? fallback;
 }
 
-const registrarCreationCache = new Map<string, { createdAt: string | null; fetchedAt: number }>();
+const registrarCreationCache = new Map<
+	string,
+	{ createdAt: string | null; fetchedAt: number }
+>();
 const REGISTRAR_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
-export async function getRegistrarCreationDate(domainName: string): Promise<string | null> {
+export async function getRegistrarCreationDate(
+	domainName: string,
+): Promise<string | null> {
 	const key = domainName.toLowerCase();
 	const cached = registrarCreationCache.get(key);
-	if (cached && Date.now() - cached.fetchedAt < REGISTRAR_CACHE_TTL_MS) return cached.createdAt;
+	if (cached && Date.now() - cached.fetchedAt < REGISTRAR_CACHE_TTL_MS)
+		return cached.createdAt;
 	try {
 		const { registrableDomain } = (() => {
 			const cleaned = cleanDomainInput(domainName);
@@ -182,7 +264,10 @@ export async function getRegistrarCreationDate(domainName: string): Promise<stri
 	}
 }
 
-export async function getRegistrarAgeDays(domainName: string, now: Date = new Date()): Promise<number | null> {
+export async function getRegistrarAgeDays(
+	domainName: string,
+	now: Date = new Date(),
+): Promise<number | null> {
 	const createdAt = await getRegistrarCreationDate(domainName);
 	if (!createdAt) return null;
 	return getDomainAgeDays(new Date(createdAt), now);
@@ -214,7 +299,15 @@ export async function checkDomainAgeDailyCap(args: {
 		registrarCreationDate = null;
 	}
 	const cap = getDomainInitialDailyCap(ageDays);
-	if (cap === null) return { allowed: true, cap, ageDays, sentToday: 0, registrarCreationDate, source };
+	if (cap === null)
+		return {
+			allowed: true,
+			cap,
+			ageDays,
+			sentToday: 0,
+			registrarCreationDate,
+			source,
+		};
 	const sentToday = await getDomainDailySentCount(args.domain.id, now);
 	const allowed = sentToday + args.recipientCount <= cap;
 	return { allowed, cap, ageDays, sentToday, registrarCreationDate, source };

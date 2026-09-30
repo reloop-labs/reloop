@@ -96,7 +96,7 @@ export const StepPickerMenu = ({
 	return (
 		<div
 			className={cn(
-				"fade-in zoom-in-95 relative w-[360px] animate-in rounded-2xl border border-blue-500/40 bg-bg-white-0 p-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] ring-2 ring-blue-500/15 transition-all duration-150 ease-out dark:border-blue-500/50 dark:bg-[#141419] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]",
+				"fade-in zoom-in-95 relative w-[420px] animate-in rounded-2xl border border-blue-500/40 bg-bg-white-0 p-1 shadow-[0_8px_30px_rgba(15,23,42,0.12)] ring-2 ring-blue-500/15 transition-all duration-150 ease-out dark:border-blue-500/50 dark:bg-[#141419] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]",
 				className,
 			)}
 		>

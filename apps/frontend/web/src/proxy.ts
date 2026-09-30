@@ -1,7 +1,4 @@
-import {
-	type NextRequest,
-	NextResponse,
-} from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 /**
  * Better Auth cookiePrefix `reloop` → `reloop.session_token`.

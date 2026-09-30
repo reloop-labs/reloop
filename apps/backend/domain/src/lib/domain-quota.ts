@@ -1,6 +1,6 @@
-import { isSelfHosted } from "@reloop/db/self-hosted";
 import { type DatabaseInstance, db } from "@reloop/db/client";
 import { domain, organizationPlan } from "@reloop/db/schema";
+import { isSelfHosted } from "@reloop/db/self-hosted";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { and, count, eq, isNull, sql } from "drizzle-orm";
 

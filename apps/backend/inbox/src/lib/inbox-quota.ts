@@ -1,7 +1,7 @@
 import { InboxErrors } from "@reloop/be-inbox/lib/errors";
-import { isSelfHosted } from "@reloop/db/self-hosted";
 import { type DatabaseInstance, db } from "@reloop/db/client";
 import { mailbox, organizationPlan } from "@reloop/db/schema";
+import { isSelfHosted } from "@reloop/db/self-hosted";
 import { count, eq, sql } from "drizzle-orm";
 
 const DEFAULT_MAX_AGENT_INBOXES = 1;

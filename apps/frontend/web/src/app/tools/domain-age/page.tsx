@@ -8,9 +8,9 @@ import Link from "next/link";
 import { SimilarTools } from "../temp-email-checker/components/similar-tools";
 import { CheckerPanel } from "./checker-panel";
 import { ApiIntegration } from "./components/api-integration";
-import { WhyDomainAgeMatters } from "./components/why-domain-age-matters";
 import { DomainAgeCta } from "./components/domain-age-cta";
 import { WarmupSchedule } from "./components/warmup-schedule";
+import { WhyDomainAgeMatters } from "./components/why-domain-age-matters";
 import {
 	faqGroups,
 	faqs,

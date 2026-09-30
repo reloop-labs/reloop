@@ -1,15 +1,15 @@
 import { createId } from "@paralleldrive/cuid2";
-import { db } from "../packages/db/src/client.js";
-import {
-	emailThread,
-	threadMessage,
-	emailLabel,
-	threadLabel,
-} from "../packages/db/src/schema/thread.js";
-import { inboundEmail, mailbox } from "../packages/db/src/schema/inbox.js";
-import { emailLog } from "../packages/db/src/schema/email.js";
-import { emailSend } from "../packages/db/src/schema/billing.js";
 import { eq, sql } from "drizzle-orm";
+import { db } from "../packages/db/src/client.js";
+import { emailSend } from "../packages/db/src/schema/billing.js";
+import { emailLog } from "../packages/db/src/schema/email.js";
+import { inboundEmail, mailbox } from "../packages/db/src/schema/inbox.js";
+import {
+	emailLabel,
+	emailThread,
+	threadLabel,
+	threadMessage,
+} from "../packages/db/src/schema/thread.js";
 
 const ORG_ID = "iFqWuHdDnZTRpFJZR2K9GCCUM0SUY9cO";
 const DOMAIN_ID = "domain_ty715n44y3e1s21hy71wzkaf";
@@ -45,18 +45,42 @@ const CONTACTS = [
 	{ name: "Evan Wallace", email: "evan@figma.com", company: "Figma" },
 	{ name: "Sho Kuwamoto", email: "sho@figma.com", company: "Figma" },
 	{ name: "Tobi Lütke", email: "tobi@shopify.com", company: "Shopify" },
-	{ name: "Harley Finkelstein", email: "harley@shopify.com", company: "Shopify" },
+	{
+		name: "Harley Finkelstein",
+		email: "harley@shopify.com",
+		company: "Shopify",
+	},
 	{ name: "Jean-Michel Lemieux", email: "jml@shopify.com", company: "Shopify" },
 	{ name: "Avery Penn", email: "avery@tailscale.com", company: "Tailscale" },
-	{ name: "Brad Fitzpatrick", email: "bradfitz@tailscale.com", company: "Tailscale" },
-	{ name: "David Crawshaw", email: "crawshaw@tailscale.com", company: "Tailscale" },
+	{
+		name: "Brad Fitzpatrick",
+		email: "bradfitz@tailscale.com",
+		company: "Tailscale",
+	},
+	{
+		name: "David Crawshaw",
+		email: "crawshaw@tailscale.com",
+		company: "Tailscale",
+	},
 	{ name: "Thomas Dohmke", email: "thomas@github.com", company: "GitHub" },
 	{ name: "Kyle Daigle", email: "kdaigle@github.com", company: "GitHub" },
 	{ name: "Alexis Lê-Quôc", email: "alq@datadoghq.com", company: "Datadog" },
 	{ name: "Olivier Pomel", email: "oli@datadoghq.com", company: "Datadog" },
-	{ name: "Matthew Prince", email: "matthew@cloudflare.com", company: "Cloudflare" },
-	{ name: "Michelle Zatlyn", email: "michelle@cloudflare.com", company: "Cloudflare" },
-	{ name: "John Graham-Cumming", email: "jgc@cloudflare.com", company: "Cloudflare" },
+	{
+		name: "Matthew Prince",
+		email: "matthew@cloudflare.com",
+		company: "Cloudflare",
+	},
+	{
+		name: "Michelle Zatlyn",
+		email: "michelle@cloudflare.com",
+		company: "Cloudflare",
+	},
+	{
+		name: "John Graham-Cumming",
+		email: "jgc@cloudflare.com",
+		company: "Cloudflare",
+	},
 	{ name: "David Hsu", email: "david@retool.com", company: "Retool" },
 	{ name: "Anthony Chen", email: "anthony@retool.com", company: "Retool" },
 	{ name: "Thomas Paul Mann", email: "thomas@raycast.com", company: "Raycast" },
@@ -75,17 +99,30 @@ const CONTACTS = [
 	{ name: "Colin Sidoti", email: "colin@clerk.dev", company: "Clerk" },
 	{ name: "Han Wang", email: "han@mintlify.com", company: "Mintlify" },
 	{ name: "Zeno Rocha", email: "zeno@resend.com", company: "Resend" },
-	{ name: "Mitchell Hashimoto", email: "mitchell@hashicorp.com", company: "HashiCorp" },
+	{
+		name: "Mitchell Hashimoto",
+		email: "mitchell@hashicorp.com",
+		company: "HashiCorp",
+	},
 	{ name: "Dario Amodei", email: "dario@anthropic.com", company: "Anthropic" },
 	{ name: "Arthur Mensch", email: "arthur@mistral.ai", company: "Mistral" },
 	{ name: "Shay Banon", email: "shay@elastic.co", company: "Elastic" },
 	{ name: "Raj Dutt", email: "raj@grafana.com", company: "Grafana" },
-	{ name: "Jennifer Tejada", email: "jennifer@pagerduty.com", company: "PagerDuty" },
+	{
+		name: "Jennifer Tejada",
+		email: "jennifer@pagerduty.com",
+		company: "PagerDuty",
+	},
 	{ name: "Sid Sijbrandij", email: "sid@gitlab.com", company: "GitLab" },
 ];
 
 interface TopicTemplate {
-	category: "Enterprise" | "Performance" | "Security" | "Integration" | "Billing";
+	category:
+		| "Enterprise"
+		| "Performance"
+		| "Security"
+		| "Integration"
+		| "Billing";
 	subject: string;
 	inquiry: string;
 	reply: string;
@@ -165,7 +202,8 @@ const TOPICS: TopicTemplate[] = [
 	},
 	{
 		category: "Enterprise",
-		subject: "Custom reverse DNS (rDNS / PTR) and envelope Return-Path alignment",
+		subject:
+			"Custom reverse DNS (rDNS / PTR) and envelope Return-Path alignment",
 		inquiry:
 			"Hi Support,\n\nWe need custom PTR records pointing to `mail.notifications.{company}.com` for our dedicated senders to satisfy strict enterprise recipient filters. Can you configure this on our dedicated IP block?\n\nThanks,\n{name}",
 		reply:
@@ -175,7 +213,8 @@ const TOPICS: TopicTemplate[] = [
 	},
 	{
 		category: "Enterprise",
-		subject: "SAML 2.0 / Okta SCIM directory sync for enterprise team management",
+		subject:
+			"SAML 2.0 / Okta SCIM directory sync for enterprise team management",
 		inquiry:
 			"Hello,\n\nOur IT team is standardizing all SaaS vendor access through Okta. Does Reloop support SAML 2.0 SSO and automated SCIM provisioning for our organization?\n\nRegards,\n{name}",
 		reply:
@@ -185,7 +224,8 @@ const TOPICS: TopicTemplate[] = [
 	},
 	{
 		category: "Integration",
-		subject: "CSS variables inlining and dark mode rendering in Outlook clients",
+		subject:
+			"CSS variables inlining and dark mode rendering in Outlook clients",
 		inquiry:
 			"Hi Reloop,\n\nDoes your email compilation engine inline modern CSS custom properties (`var(--brand-primary)`) when generating the final MIME body, or will Outlook 2019 strip them out?\n\nBest,\n{name}",
 		reply:
@@ -215,7 +255,8 @@ const TOPICS: TopicTemplate[] = [
 	},
 	{
 		category: "Billing",
-		subject: "Requesting VAT invoice receipt update and quarterly billing breakdown",
+		subject:
+			"Requesting VAT invoice receipt update and quarterly billing breakdown",
 		inquiry:
 			"Hello,\n\nCould you please update our company VAT number (EU123456789) on our latest invoice and send us a PDF receipt for our finance department?\n\nThank you,\n{name}",
 		reply:
@@ -245,7 +286,8 @@ const TOPICS: TopicTemplate[] = [
 	},
 	{
 		category: "Performance",
-		subject: "Investigating 451 4.4.0 transient deferral rates on Microsoft 365 recipients",
+		subject:
+			"Investigating 451 4.4.0 transient deferral rates on Microsoft 365 recipients",
 		inquiry:
 			"Hi team,\n\nWe noticed a minor spike in 451 4.4.0 transient deferrals when delivering password resets to Outlook/Office 365 corporate domains. Is there throttling on our shared pool IP reputation?\n\nRegards,\n{name}",
 		reply:
@@ -277,7 +319,9 @@ const TOPICS: TopicTemplate[] = [
 
 async function main() {
 	console.log(`🚀 Starting inbox generation for ${SUPPORT_EMAIL}...`);
-	console.log(`🎯 Goal: At least 1,000 emails in the agent inbox with realistic threads and replies.`);
+	console.log(
+		"🎯 Goal: At least 1,000 emails in the agent inbox with realistic threads and replies.",
+	);
 
 	const now = Date.now();
 
@@ -291,7 +335,9 @@ async function main() {
 		.where(eq(mailbox.id, MAILBOX_ID));
 
 	// 2. Clear old threads, emails, and labels for this mailbox so we have pristine seed
-	console.log("🧹 Clearing old threads, inbound emails, and labels for mailbox...");
+	console.log(
+		"🧹 Clearing old threads, inbound emails, and labels for mailbox...",
+	);
 	await db.delete(emailThread).where(eq(emailThread.mailboxId, MAILBOX_ID));
 	await db.delete(inboundEmail).where(eq(inboundEmail.mailboxId, MAILBOX_ID));
 	await db.delete(emailLabel).where(eq(emailLabel.mailboxId, MAILBOX_ID));
@@ -368,7 +414,7 @@ async function main() {
 		}
 
 		// Random minutes inside range
-		let mins = Math.floor(baseMin + Math.random() * rangeMin);
+		const mins = Math.floor(baseMin + Math.random() * rangeMin);
 
 		// Bias towards business hours (8:30am - 6:30pm)
 		// We do a gentle modulo hour nudge so it feels organic
@@ -437,9 +483,13 @@ async function main() {
 
 		const t0 = new Date(now - p.createdMinutesAgo * 60 * 1000);
 		// If 2 turns, reply is 20-60 mins after t0
-		const t1 = new Date(t0.getTime() + (20 + Math.floor(Math.random() * 40)) * 60 * 1000);
+		const t1 = new Date(
+			t0.getTime() + (20 + Math.floor(Math.random() * 40)) * 60 * 1000,
+		);
 		// If 3 turns, confirmation is 30-90 mins after t1
-		const t2 = new Date(t1.getTime() + (30 + Math.floor(Math.random() * 60)) * 60 * 1000);
+		const t2 = new Date(
+			t1.getTime() + (30 + Math.floor(Math.random() * 60)) * 60 * 1000,
+		);
 
 		const lastMsgTime = p.turnCount === 1 ? t0 : p.turnCount === 2 ? t1 : t2;
 
@@ -623,9 +673,11 @@ async function main() {
 		}
 	}
 
-	console.log(`📦 Prepared data batches:`);
+	console.log("📦 Prepared data batches:");
 	console.log(`   - emailThread: ${threadBatch.length} rows`);
-	console.log(`   - inboundEmail: ${inboundEmailBatch.length} rows (Goal >= 1,000: ✅)`);
+	console.log(
+		`   - inboundEmail: ${inboundEmailBatch.length} rows (Goal >= 1,000: ✅)`,
+	);
 	console.log(`   - emailLog: ${emailLogBatch.length} rows`);
 	console.log(`   - emailSend: ${emailSendBatch.length} rows`);
 	console.log(`   - threadMessage: ${threadMessageBatch.length} rows`);
@@ -642,7 +694,9 @@ async function main() {
 		for (let i = 0; i < items.length; i += chunkSize) {
 			const chunk = items.slice(i, i + chunkSize);
 			await db.insert(table).values(chunk);
-			process.stdout.write(`   ↳ Inserted ${Math.min(i + chunkSize, items.length)} / ${items.length}\r`);
+			process.stdout.write(
+				`   ↳ Inserted ${Math.min(i + chunkSize, items.length)} / ${items.length}\r`,
+			);
 		}
 		console.log(`\n   ✓ ${label} inserted successfully.`);
 	}
@@ -653,7 +707,12 @@ async function main() {
 	await insertInChunks(inboundEmail, inboundEmailBatch, 250, "inbound_email");
 	await insertInChunks(emailLog, emailLogBatch, 250, "email_log");
 	await insertInChunks(emailSend, emailSendBatch, 250, "email_send");
-	await insertInChunks(threadMessage, threadMessageBatch, 250, "thread_message");
+	await insertInChunks(
+		threadMessage,
+		threadMessageBatch,
+		250,
+		"thread_message",
+	);
 
 	console.log("\n==================================================");
 	console.log("🎉 AGENT INBOX SEED COMPLETE!");
@@ -663,7 +722,9 @@ async function main() {
 	console.log(`📥 Total Inbound Emails: ${inboundEmailBatch.length}`);
 	console.log(`📤 Total Outbound Replies: ${emailLogBatch.length}`);
 	console.log(`💬 Total Thread Messages: ${threadMessageBatch.length}`);
-	console.log(`🔗 Agent Inbox: https://local.reloop.sh/inbox?mailboxId=${MAILBOX_ID}&folder=inbox`);
+	console.log(
+		`🔗 Agent Inbox: https://local.reloop.sh/inbox?mailboxId=${MAILBOX_ID}&folder=inbox`,
+	);
 }
 
 main()

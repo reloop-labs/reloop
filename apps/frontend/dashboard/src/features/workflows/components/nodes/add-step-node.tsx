@@ -33,7 +33,7 @@ export const AddStepNode = () => {
 	return (
 		<div
 			ref={ref}
-			className="nodrag nopan relative flex w-[300px] flex-col items-center"
+			className="nodrag nopan relative flex w-[420px] flex-col items-center"
 		>
 			<Handle
 				type="target"

@@ -1,9 +1,9 @@
 import { createHmac } from "node:crypto";
 import { apiKey } from "@better-auth/api-key";
 import { BusEvent, bus } from "@reloop/bus";
-import { isSelfHosted } from "@reloop/db/self-hosted";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { isSelfHosted } from "@reloop/db/self-hosted";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {

@@ -1,7 +1,7 @@
-import { db } from "../packages/db/src/client.js";
-import { emailLog, emailEvent } from "../packages/db/src/schema/email.js";
-import { emailSend } from "../packages/db/src/schema/billing.js";
 import { eq, inArray } from "drizzle-orm";
+import { db } from "../packages/db/src/client.js";
+import { emailSend } from "../packages/db/src/schema/billing.js";
+import { emailEvent, emailLog } from "../packages/db/src/schema/email.js";
 
 // 16 primary demo emails in desired display order (newest to oldest)
 const primaryEmails = [
@@ -46,9 +46,15 @@ async function main() {
 
 	// 1. Remove earlier test duplicates
 	if (duplicateTestIds.length > 0) {
-		console.log(`🧹 Cleaning up ${duplicateTestIds.length} duplicate test emails...`);
-		await db.delete(emailSend).where(inArray(emailSend.emailLogId, duplicateTestIds));
-		await db.delete(emailEvent).where(inArray(emailEvent.emailLogId, duplicateTestIds));
+		console.log(
+			`🧹 Cleaning up ${duplicateTestIds.length} duplicate test emails...`,
+		);
+		await db
+			.delete(emailSend)
+			.where(inArray(emailSend.emailLogId, duplicateTestIds));
+		await db
+			.delete(emailEvent)
+			.where(inArray(emailEvent.emailLogId, duplicateTestIds));
 		await db.delete(emailLog).where(inArray(emailLog.id, duplicateTestIds));
 	}
 
@@ -90,7 +96,9 @@ async function main() {
 					? `${(item.offsetMinutes / 60).toFixed(1)}h ago`
 					: `${(item.offsetMinutes / 1440).toFixed(1)}d ago`;
 
-		console.log(`  Updated ${item.id} -> ${display} (${targetTime.toISOString()})`);
+		console.log(
+			`  Updated ${item.id} -> ${display} (${targetTime.toISOString()})`,
+		);
 	}
 
 	console.log("\n🎉 Successfully staggered all email dates!");

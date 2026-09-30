@@ -74,10 +74,7 @@ describe("validateAutomationGraph", () => {
 	test("accepts a template-only send email step", () => {
 		const result = validateAutomationGraph(
 			graph({
-				nodes: [
-					trigger,
-					{ ...send, data: { templateId: "tmpl_123" } },
-				],
+				nodes: [trigger, { ...send, data: { templateId: "tmpl_123" } }],
 				edges: [{ id: "e1", source: "trigger", target: "send-1" }],
 			}),
 		);

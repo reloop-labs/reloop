@@ -810,8 +810,7 @@ function ComparisonCell({
 	value: string | boolean;
 	type: "text" | "boolean";
 }) {
-	const unavailable =
-		type === "boolean" ? !value : value === "-";
+	const unavailable = type === "boolean" ? !value : value === "-";
 
 	if (unavailable) {
 		return <PlanCrossIcon />;

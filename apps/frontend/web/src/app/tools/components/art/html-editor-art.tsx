@@ -121,7 +121,12 @@ export function HtmlEditorBlueprintArt({
 					<line x1="226" y1="122" x2="194" y2="218" />
 				</g>
 				{/* layout ticks, same weight as the timer tick marks */}
-				<g stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity="0.6">
+				<g
+					stroke="currentColor"
+					strokeWidth="3"
+					strokeLinecap="round"
+					opacity="0.6"
+				>
 					<line x1="300" y1="122" x2="348" y2="122" />
 					<line x1="300" y1="142" x2="332" y2="142" />
 					<line x1="72" y1="222" x2="120" y2="222" />

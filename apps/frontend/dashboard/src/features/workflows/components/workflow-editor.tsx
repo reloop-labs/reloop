@@ -60,7 +60,7 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 	data: { tone: "default" },
 };
 
-/** Horizontal center of the vertical node column (cards are 360px wide). */
+/** Horizontal center of the vertical node column (cards are 420px wide). */
 const COLUMN_X = 220;
 
 /** Estimated card heights by type so vertical spacing accounts for tall forms like Send Email */
@@ -372,9 +372,9 @@ const WorkflowEditorInner = ({
 
 			let targetX = sourceNode.position.x;
 			if (sourceHandle === "yes") {
-				targetX = sourceNode.position.x - 180;
+				targetX = sourceNode.position.x - 240;
 			} else if (sourceHandle === "no") {
-				targetX = sourceNode.position.x + 180;
+				targetX = sourceNode.position.x + 240;
 			}
 
 			newNode.position = { x: targetX, y: targetY };

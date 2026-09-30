@@ -52,8 +52,7 @@ export const SPONSOR_TIERS: SponsorTier[] = [
 		name: "Diamond",
 		monthly: "$199/mo",
 		icon: "star-filled",
-		accent:
-			"bg-sky-500/15 text-sky-600 dark:bg-sky-500/25 dark:text-sky-400",
+		accent: "bg-sky-500/15 text-sky-600 dark:bg-sky-500/25 dark:text-sky-400",
 		slots: 5,
 		logoSize: "size-20",
 		slotHeight: "min-h-28",
@@ -200,21 +199,21 @@ export function SelfHostSponsors() {
 								className="flex flex-col gap-5 bg-bg-white-0 p-6 sm:p-7 dark:bg-black"
 							>
 								<div className="flex flex-wrap items-center justify-between gap-3">
-								<div className="flex items-center gap-2.5">
-									<span
-										className={`inline-flex size-9 items-center justify-center overflow-hidden rounded-[10px] ${tier.accent}`}
-									>
-										<Icon name={tier.icon} className="size-4" aria-hidden />
-									</span>
-									<div>
-										<h3 className="font-semibold text-[15px] leading-tight text-text-strong-950 dark:text-white">
-											{tier.name}
-										</h3>
-										<p className="text-[12.5px] text-text-sub-600 tabular-nums dark:text-white/50">
-											{tier.monthly}
-										</p>
+									<div className="flex items-center gap-2.5">
+										<span
+											className={`inline-flex size-9 items-center justify-center overflow-hidden rounded-[10px] ${tier.accent}`}
+										>
+											<Icon name={tier.icon} className="size-4" aria-hidden />
+										</span>
+										<div>
+											<h3 className="font-semibold text-[15px] text-text-strong-950 leading-tight dark:text-white">
+												{tier.name}
+											</h3>
+											<p className="text-[12.5px] text-text-sub-600 tabular-nums dark:text-white/50">
+												{tier.monthly}
+											</p>
+										</div>
 									</div>
-								</div>
 									<span className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50/50 px-2.5 py-1 font-medium text-[11.5px] text-text-sub-600 tabular-nums dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
 										{filled} / {tier.slots} sponsors
 									</span>
@@ -233,7 +232,7 @@ export function SelfHostSponsors() {
 										<Link
 											key={index}
 											href={SPONSOR_HREF}
-											className={`flex ${tier.slotHeight} items-center justify-center rounded-xl border border-dashed border-stroke-soft-200 bg-bg-weak-50/50 px-3 text-center font-medium text-[12.5px] text-text-sub-600 transition-colors hover:border-text-sub-600/40 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white/40 dark:hover:border-white/30 dark:hover:text-white`}
+											className={`flex ${tier.slotHeight} items-center justify-center rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 px-3 text-center font-medium text-[12.5px] text-text-sub-600 transition-colors hover:border-text-sub-600/40 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white/40 dark:hover:border-white/30 dark:hover:text-white`}
 										>
 											Your logo here
 										</Link>
@@ -253,7 +252,7 @@ export function SelfHostSponsors() {
 									<Icon name="gift" className="size-4" aria-hidden />
 								</span>
 								<div>
-									<h3 className="font-semibold text-[15px] leading-tight text-text-strong-950 dark:text-white">
+									<h3 className="font-semibold text-[15px] text-text-strong-950 leading-tight dark:text-white">
 										One-time sponsors
 									</h3>
 									<p className="text-[12.5px] text-text-sub-600 dark:text-white/50">
@@ -285,7 +284,7 @@ export function SelfHostSponsors() {
 										key={index}
 										href={SPONSOR_HREF}
 										aria-label="Become a one-time sponsor"
-										className="flex size-10 shrink-0 items-center justify-center rounded-full border border-dashed border-stroke-soft-200 bg-bg-weak-50/50 text-text-sub-600 transition-colors hover:border-text-sub-600/40 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white/40 dark:hover:border-white/30 dark:hover:text-white"
+										className="flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 text-text-sub-600 transition-colors hover:border-text-sub-600/40 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white/40 dark:hover:border-white/30 dark:hover:text-white"
 									>
 										<Icon name="plus" className="size-4" aria-hidden />
 									</Link>

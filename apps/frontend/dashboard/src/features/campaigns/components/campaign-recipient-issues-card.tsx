@@ -253,7 +253,7 @@ export function CampaignRecipientIssuesCard({
 					value={activeTab}
 					onValueChange={(val) => onActiveTabChange(val as CategoryTab)}
 				>
-					<TabMenu.List className="relative -mt-0.5 h-11 gap-0 border-b-0 py-0">
+					<TabMenu.List className="-mt-0.5 relative h-11 gap-0 border-b-0 py-0">
 						{TABS.map((tab, index) => {
 							const count = counts?.[tab.id];
 							return (

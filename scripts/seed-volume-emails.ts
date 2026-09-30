@@ -1,16 +1,16 @@
 import { createId } from "@paralleldrive/cuid2";
+import { eq, inArray, notInArray } from "drizzle-orm";
 import { db } from "../packages/db/src/client.js";
-import {
-	emailLog,
-	emailEvent,
-	type EmailLogTag,
-} from "../packages/db/src/schema/email.js";
 import {
 	emailSend,
 	organizationCredits,
 	organizationPlan,
 } from "../packages/db/src/schema/billing.js";
-import { eq, notInArray, inArray } from "drizzle-orm";
+import {
+	type EmailLogTag,
+	emailEvent,
+	emailLog,
+} from "../packages/db/src/schema/email.js";
 
 const ORG_ID = "iFqWuHdDnZTRpFJZR2K9GCCUM0SUY9cO";
 const DOMAIN_ID = "domain_ty715n44y3e1s21hy71wzkaf";
@@ -386,24 +386,28 @@ function getRandomItem<T>(arr: T[]): T {
 async function main() {
 	console.log("🧹 Clearing flat dummy emails from previous seed...");
 	// 1. Delete previous generated non-primary emails so we have clean slate
-	await db.delete(emailSend).where(
-		inArray(
-			emailSend.emailLogId,
-			db
-				.select({ id: emailLog.id })
-				.from(emailLog)
-				.where(notInArray(emailLog.id, PRIMARY_IDS)),
-		),
-	);
-	await db.delete(emailEvent).where(
-		inArray(
-			emailEvent.emailLogId,
-			db
-				.select({ id: emailLog.id })
-				.from(emailLog)
-				.where(notInArray(emailLog.id, PRIMARY_IDS)),
-		),
-	);
+	await db
+		.delete(emailSend)
+		.where(
+			inArray(
+				emailSend.emailLogId,
+				db
+					.select({ id: emailLog.id })
+					.from(emailLog)
+					.where(notInArray(emailLog.id, PRIMARY_IDS)),
+			),
+		);
+	await db
+		.delete(emailEvent)
+		.where(
+			inArray(
+				emailEvent.emailLogId,
+				db
+					.select({ id: emailLog.id })
+					.from(emailLog)
+					.where(notInArray(emailLog.id, PRIMARY_IDS)),
+			),
+		);
 	await db.delete(emailLog).where(notInArray(emailLog.id, PRIMARY_IDS));
 	console.log("   ✓ Cleaned previous filler emails");
 
@@ -423,11 +427,11 @@ async function main() {
 		// Day-of-week seasonality (Mon-Thu high, Fri medium, Sat-Sun low)
 		const dayMultiplier = [0.58, 1.15, 1.34, 1.28, 1.22, 0.95, 0.48][dayOfWeek];
 		// Natural organic growth curve over the month
-		const growthFactor = 0.75 + (0.60 * ((DAYS - 1 - i) / (DAYS - 1)));
+		const growthFactor = 0.75 + 0.6 * ((DAYS - 1 - i) / (DAYS - 1));
 		// Mid-month product release peak (Sep 14 - Sep 16)
-		const spike = (i >= 8 && i <= 10) ? 1.25 : 1.0;
+		const spike = i >= 8 && i <= 10 ? 1.25 : 1.0;
 		// Micro-variance +/- 7% so line is never mechanically flat
-		const noise = 1 + (Math.sin(i * 1.7) * 0.07);
+		const noise = 1 + Math.sin(i * 1.7) * 0.07;
 
 		const weight = dayMultiplier * growthFactor * spike * noise;
 		weights.push(weight);
@@ -446,8 +450,10 @@ async function main() {
 		dailyWeights.push({ date: d, count: dayCount });
 	}
 
-	console.log(`\n📈 Generated realistic SaaS wave distribution:`);
-	console.log(`   Target volume: ${runningSum.toLocaleString()} emails across 30 days`);
+	console.log("\n📈 Generated realistic SaaS wave distribution:");
+	console.log(
+		`   Target volume: ${runningSum.toLocaleString()} emails across 30 days`,
+	);
 
 	// 3. Upgraded organization plan
 	await db
@@ -485,7 +491,7 @@ async function main() {
 		const { date: baseDate, count: dayEmailCount } = dailyWeights[dayIndex];
 
 		// For this day, determine bounce count (~0.8% - 1.2% with natural jitter)
-		const dayBounceRate = 0.008 + (Math.sin(dayIndex * 2.1) * 0.0035); // 0.65% to 1.15%
+		const dayBounceRate = 0.008 + Math.sin(dayIndex * 2.1) * 0.0035; // 0.65% to 1.15%
 		const dayBounces = Math.max(1, Math.round(dayEmailCount * dayBounceRate));
 		const hasComplaint = complaintDays.has(dayIndex);
 		const dayComplaints = hasComplaint ? 1 : 0;
@@ -509,20 +515,33 @@ async function main() {
 			const status = dayStatuses[k];
 
 			// Distribute time naturally through the day (higher probability between 08:00 and 20:00)
-			const hour = Math.min(23, Math.max(0, Math.floor(
-				Math.random() < 0.8
-					? 8 + Math.random() * 12 // 8am - 8pm business hours (80%)
-					: Math.random() * 24     // off-peak (20%)
-			)));
+			const hour = Math.min(
+				23,
+				Math.max(
+					0,
+					Math.floor(
+						Math.random() < 0.8
+							? 8 + Math.random() * 12 // 8am - 8pm business hours (80%)
+							: Math.random() * 24, // off-peak (20%)
+					),
+				),
+			);
 			const minute = Math.floor(Math.random() * 60);
 			const second = Math.floor(Math.random() * 60);
 
 			const emailDate = new Date(baseDate);
-			emailDate.setUTCHours(hour, minute, second, Math.floor(Math.random() * 900));
+			emailDate.setUTCHours(
+				hour,
+				minute,
+				second,
+				Math.floor(Math.random() * 900),
+			);
 
 			// If it's today (dayIndex === 29), don't exceed current time
 			if (dayIndex === DAYS - 1 && emailDate.getTime() > now.getTime()) {
-				emailDate.setTime(now.getTime() - Math.floor(Math.random() * 8 * 60 * 60 * 1000));
+				emailDate.setTime(
+					now.getTime() - Math.floor(Math.random() * 8 * 60 * 60 * 1000),
+				);
 			}
 
 			const sentTime = new Date(emailDate.getTime() + 150);
@@ -543,7 +562,8 @@ async function main() {
 					? `KumoMTA PermanentFailure: 550 5.1.1 <${recipient}>: Recipient address rejected: User unknown in virtual mailbox table`
 					: `KumoMTA TransientFailure: 452 4.2.2 <${recipient}>: Mailbox is full / quota exceeded`;
 			} else if (status === "spam") {
-				errorMessage = `Feedback loop: Abuse report received from mail service provider (ARF report)`;
+				errorMessage =
+					"Feedback loop: Abuse report received from mail service provider (ARF report)";
 			}
 
 			currentBatchLogs.push({
@@ -582,7 +602,12 @@ async function main() {
 				recipientEmail: recipient,
 				countedInCredits: true,
 				creditsConsumed: 1,
-				status: status === "delivered" ? "sent" : status === "bounced" ? "bounced" : "sent",
+				status:
+					status === "delivered"
+						? "sent"
+						: status === "bounced"
+							? "bounced"
+							: "sent",
 				errorMessage,
 				sentAt: sentTime,
 				createdAt: emailDate,
@@ -598,7 +623,9 @@ async function main() {
 
 				// ~52% open rate
 				if (Math.random() < 0.52) {
-					const openTime = new Date(deliveredTime.getTime() + (2 + Math.random() * 45) * 60 * 1000);
+					const openTime = new Date(
+						deliveredTime.getTime() + (2 + Math.random() * 45) * 60 * 1000,
+					);
 					currentBatchEvents.push({
 						id: `ev_${createId()}`,
 						emailLogId: logId,
@@ -608,7 +635,9 @@ async function main() {
 
 					// ~15% overall click rate
 					if (Math.random() < 0.28) {
-						const clickTime = new Date(openTime.getTime() + (1 + Math.random() * 8) * 60 * 1000);
+						const clickTime = new Date(
+							openTime.getTime() + (1 + Math.random() * 8) * 60 * 1000,
+						);
 						currentBatchEvents.push({
 							id: `ev_${createId()}`,
 							emailLogId: logId,
@@ -643,7 +672,9 @@ async function main() {
 					await db.insert(emailEvent).values(currentBatchEvents);
 				}
 				insertedSoFar += currentBatchLogs.length;
-				process.stdout.write(`\r   Inserted: ${insertedSoFar.toLocaleString()} / ${runningSum.toLocaleString()}`);
+				process.stdout.write(
+					`\r   Inserted: ${insertedSoFar.toLocaleString()} / ${runningSum.toLocaleString()}`,
+				);
 				currentBatchLogs = [];
 				currentBatchSends = [];
 				currentBatchEvents = [];
@@ -659,11 +690,17 @@ async function main() {
 			await db.insert(emailEvent).values(currentBatchEvents);
 		}
 		insertedSoFar += currentBatchLogs.length;
-		process.stdout.write(`\r   Inserted: ${insertedSoFar.toLocaleString()} / ${runningSum.toLocaleString()}\n`);
+		process.stdout.write(
+			`\r   Inserted: ${insertedSoFar.toLocaleString()} / ${runningSum.toLocaleString()}\n`,
+		);
 	}
 
-	console.log(`\n🎉 Successfully seeded ${runningSum.toLocaleString()} organic transactional emails!`);
-	console.log("   • Dynamic weekday / weekend volume curves with realistic growth wave");
+	console.log(
+		`\n🎉 Successfully seeded ${runningSum.toLocaleString()} organic transactional emails!`,
+	);
+	console.log(
+		"   • Dynamic weekday / weekend volume curves with realistic growth wave",
+	);
 	console.log("   • Mid-month release peaks");
 	console.log("   • Bounce rate strictly < 1.1%");
 	console.log("   • Complaint rate strictly < 0.03%");

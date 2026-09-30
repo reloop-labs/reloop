@@ -1,10 +1,6 @@
 import { creditsConfig } from "@reloop/credits/credits.config";
 import { CreditErrors } from "@reloop/credits/error/credits.error-response";
 import { getOrProvisionOrgBilling } from "@reloop/credits/lib/org-billing";
-import {
-	isSelfHosted,
-	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
-} from "@reloop/db/self-hosted";
 import { db } from "@reloop/db/client";
 import {
 	domain,
@@ -13,6 +9,10 @@ import {
 	mailbox,
 	webhook,
 } from "@reloop/db/schema";
+import {
+	isSelfHosted,
+	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
+} from "@reloop/db/self-hosted";
 import { getPlanById } from "@reloop/pricing";
 import { and, count, eq, gte, isNull, ne, sum } from "drizzle-orm";
 

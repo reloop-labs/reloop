@@ -409,7 +409,10 @@ export async function getOrganizationController(organizationId: string) {
 			.select({ value: count() })
 			.from(webhook)
 			.where(eq(webhook.organizationId, organizationId)),
-		db.select({ value: count() }).from(mailbox).where(eq(mailbox.organizationId, organizationId)),
+		db
+			.select({ value: count() })
+			.from(mailbox)
+			.where(eq(mailbox.organizationId, organizationId)),
 		db
 			.select({ value: count() })
 			.from(emailLog)
@@ -448,9 +451,16 @@ export async function getOrganizationController(organizationId: string) {
 			: await db
 					.select({ domainId: emailLog.domainId, value: count() })
 					.from(emailLog)
-					.where(and(inArray(emailLog.domainId, domainIds), gte(emailLog.createdAt, dayStart)))
+					.where(
+						and(
+							inArray(emailLog.domainId, domainIds),
+							gte(emailLog.createdAt, dayStart),
+						),
+					)
 					.groupBy(emailLog.domainId);
-	const sentByDomain = new Map(sentByDomainRows.map((r) => [r.domainId, r.value]));
+	const sentByDomain = new Map(
+		sentByDomainRows.map((r) => [r.domainId, r.value]),
+	);
 	const enrichedDomains = await Promise.all(
 		domains.map(async (d) => {
 			const registrarCreatedAtStr = await getRegistrarCreationDate(d.domain);
@@ -459,10 +469,13 @@ export async function getOrganizationController(organizationId: string) {
 				: getDomainAgeDays(d.createdAt, new Date());
 			const dailyCap = getDomainInitialDailyCap(ageDays);
 			const sentTodayForDomain = sentByDomain.get(d.id) ?? 0;
-			const remaining = dailyCap === null ? null : Math.max(0, dailyCap - sentTodayForDomain);
+			const remaining =
+				dailyCap === null ? null : Math.max(0, dailyCap - sentTodayForDomain);
 			return {
 				...d,
-				registrarCreatedAt: registrarCreatedAtStr ? new Date(registrarCreatedAtStr) : null,
+				registrarCreatedAt: registrarCreatedAtStr
+					? new Date(registrarCreatedAtStr)
+					: null,
 				ageDays,
 				dailyCap,
 				sentToday: sentTodayForDomain,

@@ -1,9 +1,9 @@
+import { db } from "@reloop/db/client";
+import { organizationPlan } from "@reloop/db/schema";
 import {
 	isSelfHosted,
 	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
 } from "@reloop/db/self-hosted";
-import { db } from "@reloop/db/client";
-import { organizationPlan } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 import { MailErrors } from "./errors";
 

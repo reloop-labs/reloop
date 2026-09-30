@@ -313,7 +313,10 @@ export default function OrganizationDetailPage() {
 								data.plan?.planId === "startup" ||
 								data.plan?.planId === "enterprise";
 							return isPro ? (
-								<StatusPill status={planLabel(data.plan?.planId)} tone="green" />
+								<StatusPill
+									status={planLabel(data.plan?.planId)}
+									tone="green"
+								/>
 							) : (
 								<Button.Root
 									variant="neutral"
@@ -443,7 +446,9 @@ export default function OrganizationDetailPage() {
 					title={`Convert ${data.name} to Pro?`}
 					description="Grants Pro (individual) – 50k emails/month, no daily limit, 5 inboxes/webhooks. Audit-logged. Use Comped for free grants or Paid when payment handled externally."
 					confirmLabel={
-						convertMode === "paid" ? "Convert to Pro (paid)" : "Convert to Pro (comped)"
+						convertMode === "paid"
+							? "Convert to Pro (paid)"
+							: "Convert to Pro (comped)"
 					}
 					onCancel={() => setConvertOpen(false)}
 					onConfirm={async () => {
@@ -566,52 +571,99 @@ export default function OrganizationDetailPage() {
 					{(() => {
 						const warming = data.domains.filter((d) => d.dailyCap !== null);
 						if (warming.length === 0) return null;
-						const atCap = warming.filter((d) => d.dailyCap !== null && d.sentToday >= d.dailyCap);
+						const atCap = warming.filter(
+							(d) => d.dailyCap !== null && d.sentToday >= d.dailyCap,
+						);
 						const nextCapFor = (age: number) => {
 							if (age <= 1) return { cap: 50, in: `${2 - age} day(s)` };
 							if (age <= 3) return { cap: 100, in: `${4 - age} day(s)` };
 							if (age <= 7) return { cap: 250, in: `${8 - age} day(s)` };
 							if (age <= 14) return { cap: 500, in: `${15 - age} day(s)` };
-							if (age <= 30) return { cap: null, label: "Dynamic" as const, in: `${31 - age} day(s)` };
+							if (age <= 30)
+								return {
+									cap: null,
+									label: "Dynamic" as const,
+									in: `${31 - age} day(s)`,
+								};
 							return null;
 						};
 						return (
 							<div
 								className={`rounded-xl border px-4 py-3.5 ${atCap.length ? "border-orange-200 bg-orange-50 dark:border-orange-500/20 dark:bg-orange-500/10" : "border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10"}`}
 							>
-								<p className={`text-[12px] font-semibold ${atCap.length ? "text-orange-700 dark:text-orange-300" : "text-amber-700 dark:text-amber-300"}`}>
+								<p
+									className={`font-semibold text-[12px] ${atCap.length ? "text-orange-700 dark:text-orange-300" : "text-amber-700 dark:text-amber-300"}`}
+								>
 									{atCap.length
 										? `${atCap.length} domain${atCap.length > 1 ? "s" : ""} at daily limit. New sends are paused until UTC midnight`
 										: `${warming.length} domain${warming.length > 1 ? "s are" : " is"} warming up. Daily sends are throttled for the first 30 days`}
 								</p>
-								<p className="mt-1 text-[11px] leading-relaxed text-text-sub-600 dark:text-white/60">
-									Applies to <span className="font-medium text-text-strong-950 dark:text-white">all plans (Free / Pro / Growth / Enterprise)</span> to protect reputation and block scam bulk sends from cheap, newly bought domains. Caps rise automatically as the domain ages. No manual action needed.
+								<p className="mt-1 text-[11px] text-text-sub-600 leading-relaxed dark:text-white/60">
+									Applies to{" "}
+									<span className="font-medium text-text-strong-950 dark:text-white">
+										all plans (Free / Pro / Growth / Enterprise)
+									</span>{" "}
+									to protect reputation and block scam bulk sends from cheap,
+									newly bought domains. Caps rise automatically as the domain
+									ages. No manual action needed.
 								</p>
 								<div className="mt-3 space-y-2.5">
 									{warming.map((d) => {
-										const pct = d.dailyCap ? Math.min(100, (d.sentToday / d.dailyCap) * 100) : 0;
-										const remaining = d.dailyCap === null ? null : Math.max(0, d.dailyCap - d.sentToday);
+										const pct = d.dailyCap
+											? Math.min(100, (d.sentToday / d.dailyCap) * 100)
+											: 0;
+										const remaining =
+											d.dailyCap === null
+												? null
+												: Math.max(0, d.dailyCap - d.sentToday);
 										const next = nextCapFor(d.ageDays);
-										const isAt = d.dailyCap !== null && d.sentToday >= d.dailyCap;
+										const isAt =
+											d.dailyCap !== null && d.sentToday >= d.dailyCap;
 										return (
-											<div key={d.id} className="rounded-lg border border-stroke-soft-100 bg-white px-3 py-2.5 dark:border-white/10 dark:bg-white/[0.04]">
+											<div
+												key={d.id}
+												className="rounded-lg border border-stroke-soft-100 bg-white px-3 py-2.5 dark:border-white/10 dark:bg-white/[0.04]"
+											>
 												<div className="flex flex-wrap items-baseline justify-between gap-2">
-													<span className="font-mono text-[12px] font-medium text-text-strong-950 dark:text-white">{d.domain}</span>
-													<span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${isAt ? "bg-orange-500/10 text-orange-700 ring-1 ring-orange-500/20 dark:text-orange-300" : "bg-amber-500/10 text-amber-700 ring-1 ring-amber-500/20 dark:text-amber-300"}`}>
-														{d.ageDays}d old · {d.dailyCap !== null ? `${d.sentToday}/${d.dailyCap} today` : "Dynamic"}
+													<span className="font-medium font-mono text-[12px] text-text-strong-950 dark:text-white">
+														{d.domain}
+													</span>
+													<span
+														className={`rounded-full px-2 py-0.5 font-medium text-[11px] ${isAt ? "bg-orange-500/10 text-orange-700 ring-1 ring-orange-500/20 dark:text-orange-300" : "bg-amber-500/10 text-amber-700 ring-1 ring-amber-500/20 dark:text-amber-300"}`}
+													>
+														{d.ageDays}d old ·{" "}
+														{d.dailyCap !== null
+															? `${d.sentToday}/${d.dailyCap} today`
+															: "Dynamic"}
 													</span>
 												</div>
 												<div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
-													<div className={`h-full rounded-full ${isAt ? "bg-orange-500" : "bg-amber-500"}`} style={{ width: `${pct}%` }} />
+													<div
+														className={`h-full rounded-full ${isAt ? "bg-orange-500" : "bg-amber-500"}`}
+														style={{ width: `${pct}%` }}
+													/>
 												</div>
 												<div className="mt-1.5 flex flex-wrap justify-between gap-2 text-[11px] leading-relaxed">
-													<span className={isAt ? "font-medium text-orange-700 dark:text-orange-300" : "text-text-sub-600 dark:text-white/60"}>
-														{isAt ? `At cap, 0 left today` : `${remaining} left today`}
-														{d.dailyCap !== null && d.ageDays <= 1 ? " · send only to highly engaged / verified contacts" : ""}
+													<span
+														className={
+															isAt
+																? "font-medium text-orange-700 dark:text-orange-300"
+																: "text-text-sub-600 dark:text-white/60"
+														}
+													>
+														{isAt
+															? "At cap, 0 left today"
+															: `${remaining} left today`}
+														{d.dailyCap !== null && d.ageDays <= 1
+															? " · send only to highly engaged / verified contacts"
+															: ""}
 													</span>
 													{next && (
 														<span className="text-text-sub-600 dark:text-white/50">
-															Next: {next.cap ?? next.label} in {next.in} {d.dailyCap !== null && next.cap ? `(${d.dailyCap}→${next.cap})` : ""}
+															Next: {next.cap ?? next.label} in {next.in}{" "}
+															{d.dailyCap !== null && next.cap
+																? `(${d.dailyCap}→${next.cap})`
+																: ""}
 														</span>
 													)}
 												</div>
@@ -619,10 +671,24 @@ export default function OrganizationDetailPage() {
 										);
 									})}
 								</div>
-								<div className="mt-3 rounded-lg bg-white/60 px-3 py-2.5 text-[11px] leading-relaxed text-text-sub-600 dark:bg-black/20 dark:text-white/60">
-									<p className="font-medium text-text-strong-950 dark:text-white">How caps work</p>
+								<div className="mt-3 rounded-lg bg-white/60 px-3 py-2.5 text-[11px] text-text-sub-600 leading-relaxed dark:bg-black/20 dark:text-white/60">
+									<p className="font-medium text-text-strong-950 dark:text-white">
+										How caps work
+									</p>
 									<p className="mt-1">
-										<span className="font-mono">0–1d: 20</span> (highly engaged only) → <span className="font-mono">2–3d: 50</span> → <span className="font-mono">4–7d: 100</span> → <span className="font-mono">8–14d: 250</span> → <span className="font-mono">15–30d: 500</span> → <span className="font-mono">30d+: Dynamic</span> (reputation-based; Free still max 100/day). Caps are per-domain per UTC day and reset at 00:00 UTC. If you hit the cap you’ll get <span className="font-mono">429 New domain daily limit reached</span>.
+										<span className="font-mono">0–1d: 20</span> (highly engaged
+										only) → <span className="font-mono">2–3d: 50</span> →{" "}
+										<span className="font-mono">4–7d: 100</span> →{" "}
+										<span className="font-mono">8–14d: 250</span> →{" "}
+										<span className="font-mono">15–30d: 500</span> →{" "}
+										<span className="font-mono">30d+: Dynamic</span>{" "}
+										(reputation-based; Free still max 100/day). Caps are
+										per-domain per UTC day and reset at 00:00 UTC. If you hit
+										the cap you’ll get{" "}
+										<span className="font-mono">
+											429 New domain daily limit reached
+										</span>
+										.
 									</p>
 								</div>
 							</div>
@@ -630,278 +696,303 @@ export default function OrganizationDetailPage() {
 					})()}
 					<div className="grid gap-4 lg:grid-cols-2">
 						<SectionCard title="Organization profile">
-						<div className="divide-y divide-stroke-soft-100 px-4 py-1 dark:divide-stroke-soft-100/40">
-							{[
-								["Name", data.name],
-								["Slug", data.slug],
-								["Status", data.status],
-								[
-									"Plan",
-									data.plan
-										? `${planLabel(data.plan.planId)} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
-										: "Free · 3,000/mo",
-								],
-								["Billing email", data.billingEmail || "-"],
-								["Billing name", data.billingName || "-"],
-								["External customer", data.externalCustomerId || "-"],
-								["Org ID", data.id],
-								["Created", formatDateTime(data.createdAt)],
-								["Updated", formatDateTime(data.updatedAt)],
-							].map(([label, value]) => (
-								<div
-									key={label as string}
-									className="flex items-start justify-between gap-4 py-2.5"
-								>
-									<span className="text-[12px] text-text-sub-600">{label}</span>
-									<span className="max-w-[60%] break-all text-right font-medium text-[12px] text-text-strong-950">
-										{value}
-									</span>
-								</div>
-							))}
-						</div>
-					</SectionCard>
-
-					<SectionCard
-						title="Plan usage"
-						description={
-							data.plan
-								? `${planLabel(data.plan.planId)} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
-								: "Free · 3,000/mo"
-						}
-						action={
-							<button
-								type="button"
-								className="text-[12px] text-primary-base hover:underline"
-								onClick={() => setTopupOpen(true)}
-							>
-								Top up
-							</button>
-						}
-					>
-						{data.credits ? (
-							<div>
-								<div className="grid grid-cols-3 gap-3 p-4">
-									<div>
-										<p className="text-[11px] text-text-sub-600">Remaining</p>
-										<p className="mt-1 font-semibold text-[20px] tabular-nums">
-											{formatNumber(data.credits.creditsRemaining)}
-										</p>
-									</div>
-									<div>
-										<p className="text-[11px] text-text-sub-600">Used</p>
-										<p className="mt-1 font-semibold text-[20px] tabular-nums">
-											{formatNumber(data.credits.creditsUsed)}
-										</p>
-									</div>
-									<div>
-										<p className="text-[11px] text-text-sub-600">Monthly</p>
-										<p className="mt-1 font-semibold text-[20px] tabular-nums">
-											{formatNumber(data.credits.monthlyCredits)}
-										</p>
-									</div>
-									<div className="col-span-3 text-[12px] text-text-sub-600">
-										Period {formatDateTime(data.credits.currentPeriodStart)} →{" "}
-										{formatDateTime(data.credits.currentPeriodEnd)} · status{" "}
-										{data.credits.status}
-									</div>
-								</div>
-								<div className="divide-y divide-stroke-soft-100 border-t border-stroke-soft-100 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
-									{[
-										{
-											label: "Custom domains",
-											used: data.domains.length,
-											limit: data.plan?.maxCustomDomains ?? 3,
-										},
-										{
-											label: "Webhooks",
-											used: data.webhooks.length,
-											limit: data.plan?.maxWebhooks ?? 1,
-										},
-										{
-											label: "Agent inboxes",
-											used: data.counts.mailboxes,
-											limit: data.plan?.maxAgentInboxes ?? 1,
-										},
-									].map((row) => {
-										const remaining = Math.max(0, row.limit - row.used);
-										const pct = row.limit > 0 ? Math.min(100, (row.used / row.limit) * 100) : 0;
-										const isAt = row.used >= row.limit;
-										return (
-											<div key={row.label} className="flex items-center gap-3 px-4 py-3">
-												<div className="min-w-0 flex-1">
-													<div className="flex items-baseline justify-between gap-2">
-														<p className="text-[12px] font-medium text-text-strong-950">{row.label}</p>
-														<p className="text-[12px] tabular-nums text-text-sub-600">
-															{row.used} / {row.limit} <span className={isAt ? "text-orange-600" : ""}>· {remaining} remaining</span>
-														</p>
-													</div>
-													<div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/[0.06]">
-														<div
-															className={`h-full rounded-full ${isAt ? "bg-orange-500" : "bg-text-strong-950 dark:bg-white"}`}
-															style={{ width: `${pct}%` }}
-														/>
-													</div>
-												</div>
-											</div>
-										);
-									})}
-									{/* Used inbox details */}
-									{data.counts.mailboxes > 0 && data.mailboxes.length > 0 ? (
-										<div className="border-t border-stroke-soft-100 bg-bg-weak-50/30 px-4 py-3 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-											<p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-text-sub-600">
-												Used inboxes: {data.mailboxes.length} {data.mailboxes.length === 1 ? "inbox" : "inboxes"}
-											</p>
-											<div className="space-y-2">
-												{data.mailboxes.map((mb) => (
-													<div
-														key={mb.id}
-														className="flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-100 bg-white px-3 py-2.5 dark:border-white/10 dark:bg-white/[0.04]"
-													>
-														<div className="min-w-0 flex-1">
-															<p className="truncate font-medium text-[12px] text-text-strong-950">{mb.email}</p>
-															<p className="truncate text-[11px] text-text-sub-600">
-																{mb.displayName ? `${mb.displayName} · ` : ""}
-																{mb.domain || "-"} · {formatDateTime(mb.createdAt)}
-															</p>
-														</div>
-														<StatusPill status={mb.status} />
-													</div>
-												))}
-											</div>
-										</div>
-									) : data.counts.mailboxes === 0 ? (
-										<div className="border-t border-stroke-soft-100 px-4 py-3 text-[12px] text-text-sub-600 dark:border-stroke-soft-100/40">
-											No agent inboxes yet ({data.plan ? `${data.plan.maxAgentInboxes} available` : "1 available"} on {planLabel(data.plan?.planId)})
-										</div>
-									) : null}
-									<div className="flex items-center justify-between gap-3 px-4 py-3 text-[12px]">
-										<span className="text-text-sub-600">Attachment limit</span>
-										<span className="font-medium tabular-nums text-text-strong-950">
-											{data.plan ? `${(data.plan.maxAttachmentBytes / (1024 * 1024)).toFixed(0)} MB` : "1 MB"}
+							<div className="divide-y divide-stroke-soft-100 px-4 py-1 dark:divide-stroke-soft-100/40">
+								{[
+									["Name", data.name],
+									["Slug", data.slug],
+									["Status", data.status],
+									[
+										"Plan",
+										data.plan
+											? `${planLabel(data.plan.planId)} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
+											: "Free · 3,000/mo",
+									],
+									["Billing email", data.billingEmail || "-"],
+									["Billing name", data.billingName || "-"],
+									["External customer", data.externalCustomerId || "-"],
+									["Org ID", data.id],
+									["Created", formatDateTime(data.createdAt)],
+									["Updated", formatDateTime(data.updatedAt)],
+								].map(([label, value]) => (
+									<div
+										key={label as string}
+										className="flex items-start justify-between gap-4 py-2.5"
+									>
+										<span className="text-[12px] text-text-sub-600">
+											{label}
+										</span>
+										<span className="max-w-[60%] break-all text-right font-medium text-[12px] text-text-strong-950">
+											{value}
 										</span>
 									</div>
-								</div>
+								))}
 							</div>
-						) : (
-							<EmptyState title="No credits provisioned" />
-						)}
-					</SectionCard>
+						</SectionCard>
 
-					<SectionCard
-						title="Delivery (7 days)"
-						className="lg:col-span-2"
-						description="Volume by status for the last week"
-					>
-						<div className="grid gap-3 p-4 sm:grid-cols-4">
-							{(
-								[
-									["Sent", data.emailStats.week.sent],
-									["Delivered", data.emailStats.week.delivered],
-									["Failed", data.emailStats.week.failed],
-									["Bounced", data.emailStats.week.bounced],
-								] as const
-							).map(([label, value]) => (
-								<div
-									key={label}
-									className="rounded-xl bg-bg-weak-50 px-3 py-3 dark:bg-white/[0.04]"
+						<SectionCard
+							title="Plan usage"
+							description={
+								data.plan
+									? `${planLabel(data.plan.planId)} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
+									: "Free · 3,000/mo"
+							}
+							action={
+								<button
+									type="button"
+									className="text-[12px] text-primary-base hover:underline"
+									onClick={() => setTopupOpen(true)}
 								>
-									<p className="text-[11px] text-text-sub-600">{label}</p>
-									<p className="mt-1 font-semibold text-[18px] tabular-nums">
-										{formatNumber(value)}
-									</p>
-								</div>
-							))}
-						</div>
-					</SectionCard>
-
-					<SectionCard
-						title="Recent members"
-						action={
-							<button
-								type="button"
-								className="text-[12px] text-primary-base hover:underline"
-								onClick={() => setTab("members")}
-							>
-								View all
-							</button>
-						}
-					>
-						<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-							{data.members.slice(0, 5).map((m) => (
-								<Link
-									key={m.id}
-									href={`/users/${m.userId}`}
-									className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]"
-								>
-									<div className="min-w-0">
-										<p className="truncate font-medium text-[13px]">
-											{m.userName}
-										</p>
-										<p className="truncate text-[12px] text-text-sub-600">
-											{m.userEmail}
-										</p>
-									</div>
-									<StatusPill status={m.role} />
-								</Link>
-							))}
-							{data.members.length === 0 ? (
-								<EmptyState title="No members" />
-							) : null}
-						</div>
-					</SectionCard>
-
-					<SectionCard
-						title="Recent emails"
-						action={
-							<button
-								type="button"
-								className="text-[12px] text-primary-base hover:underline"
-								onClick={() => setTab("emails")}
-							>
-								View all
-							</button>
-						}
-					>
-						<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-							{data.recentEmails.slice(0, 6).map((e) => (
-								<div
-									key={e.id}
-									className="group flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
-								>
-									<div className="min-w-0 flex-1">
-										<div className="flex items-center gap-2">
-											<Link
-												href={`/emails/${e.id}`}
-												className="truncate font-medium text-[13px] text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
-											>
-												{e.subject || "(no subject)"}
-											</Link>
-											<StatusPill status={e.status} />
+									Top up
+								</button>
+							}
+						>
+							{data.credits ? (
+								<div>
+									<div className="grid grid-cols-3 gap-3 p-4">
+										<div>
+											<p className="text-[11px] text-text-sub-600">Remaining</p>
+											<p className="mt-1 font-semibold text-[20px] tabular-nums">
+												{formatNumber(data.credits.creditsRemaining)}
+											</p>
 										</div>
-										<p className="mt-0.5 truncate text-[12px] text-text-sub-600">
-											{e.fromEmail} · {formatRelativeTime(e.createdAt)}
+										<div>
+											<p className="text-[11px] text-text-sub-600">Used</p>
+											<p className="mt-1 font-semibold text-[20px] tabular-nums">
+												{formatNumber(data.credits.creditsUsed)}
+											</p>
+										</div>
+										<div>
+											<p className="text-[11px] text-text-sub-600">Monthly</p>
+											<p className="mt-1 font-semibold text-[20px] tabular-nums">
+												{formatNumber(data.credits.monthlyCredits)}
+											</p>
+										</div>
+										<div className="col-span-3 text-[12px] text-text-sub-600">
+											Period {formatDateTime(data.credits.currentPeriodStart)} →{" "}
+											{formatDateTime(data.credits.currentPeriodEnd)} · status{" "}
+											{data.credits.status}
+										</div>
+									</div>
+									<div className="divide-y divide-stroke-soft-100 border-stroke-soft-100 border-t dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
+										{[
+											{
+												label: "Custom domains",
+												used: data.domains.length,
+												limit: data.plan?.maxCustomDomains ?? 3,
+											},
+											{
+												label: "Webhooks",
+												used: data.webhooks.length,
+												limit: data.plan?.maxWebhooks ?? 1,
+											},
+											{
+												label: "Agent inboxes",
+												used: data.counts.mailboxes,
+												limit: data.plan?.maxAgentInboxes ?? 1,
+											},
+										].map((row) => {
+											const remaining = Math.max(0, row.limit - row.used);
+											const pct =
+												row.limit > 0
+													? Math.min(100, (row.used / row.limit) * 100)
+													: 0;
+											const isAt = row.used >= row.limit;
+											return (
+												<div
+													key={row.label}
+													className="flex items-center gap-3 px-4 py-3"
+												>
+													<div className="min-w-0 flex-1">
+														<div className="flex items-baseline justify-between gap-2">
+															<p className="font-medium text-[12px] text-text-strong-950">
+																{row.label}
+															</p>
+															<p className="text-[12px] text-text-sub-600 tabular-nums">
+																{row.used} / {row.limit}{" "}
+																<span className={isAt ? "text-orange-600" : ""}>
+																	· {remaining} remaining
+																</span>
+															</p>
+														</div>
+														<div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/[0.06]">
+															<div
+																className={`h-full rounded-full ${isAt ? "bg-orange-500" : "bg-text-strong-950 dark:bg-white"}`}
+																style={{ width: `${pct}%` }}
+															/>
+														</div>
+													</div>
+												</div>
+											);
+										})}
+										{/* Used inbox details */}
+										{data.counts.mailboxes > 0 && data.mailboxes.length > 0 ? (
+											<div className="border-stroke-soft-100 border-t bg-bg-weak-50/30 px-4 py-3 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+												<p className="mb-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
+													Used inboxes: {data.mailboxes.length}{" "}
+													{data.mailboxes.length === 1 ? "inbox" : "inboxes"}
+												</p>
+												<div className="space-y-2">
+													{data.mailboxes.map((mb) => (
+														<div
+															key={mb.id}
+															className="flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-100 bg-white px-3 py-2.5 dark:border-white/10 dark:bg-white/[0.04]"
+														>
+															<div className="min-w-0 flex-1">
+																<p className="truncate font-medium text-[12px] text-text-strong-950">
+																	{mb.email}
+																</p>
+																<p className="truncate text-[11px] text-text-sub-600">
+																	{mb.displayName ? `${mb.displayName} · ` : ""}
+																	{mb.domain || "-"} ·{" "}
+																	{formatDateTime(mb.createdAt)}
+																</p>
+															</div>
+															<StatusPill status={mb.status} />
+														</div>
+													))}
+												</div>
+											</div>
+										) : data.counts.mailboxes === 0 ? (
+											<div className="border-stroke-soft-100 border-t px-4 py-3 text-[12px] text-text-sub-600 dark:border-stroke-soft-100/40">
+												No agent inboxes yet (
+												{data.plan
+													? `${data.plan.maxAgentInboxes} available`
+													: "1 available"}{" "}
+												on {planLabel(data.plan?.planId)})
+											</div>
+										) : null}
+										<div className="flex items-center justify-between gap-3 px-4 py-3 text-[12px]">
+											<span className="text-text-sub-600">
+												Attachment limit
+											</span>
+											<span className="font-medium text-text-strong-950 tabular-nums">
+												{data.plan
+													? `${(data.plan.maxAttachmentBytes / (1024 * 1024)).toFixed(0)} MB`
+													: "1 MB"}
+											</span>
+										</div>
+									</div>
+								</div>
+							) : (
+								<EmptyState title="No credits provisioned" />
+							)}
+						</SectionCard>
+
+						<SectionCard
+							title="Delivery (7 days)"
+							className="lg:col-span-2"
+							description="Volume by status for the last week"
+						>
+							<div className="grid gap-3 p-4 sm:grid-cols-4">
+								{(
+									[
+										["Sent", data.emailStats.week.sent],
+										["Delivered", data.emailStats.week.delivered],
+										["Failed", data.emailStats.week.failed],
+										["Bounced", data.emailStats.week.bounced],
+									] as const
+								).map(([label, value]) => (
+									<div
+										key={label}
+										className="rounded-xl bg-bg-weak-50 px-3 py-3 dark:bg-white/[0.04]"
+									>
+										<p className="text-[11px] text-text-sub-600">{label}</p>
+										<p className="mt-1 font-semibold text-[18px] tabular-nums">
+											{formatNumber(value)}
 										</p>
 									</div>
-									<Button.Root
-										asChild
-										size="xsmall"
-										variant="neutral"
-										mode="stroke"
-										className="shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+								))}
+							</div>
+						</SectionCard>
+
+						<SectionCard
+							title="Recent members"
+							action={
+								<button
+									type="button"
+									className="text-[12px] text-primary-base hover:underline"
+									onClick={() => setTab("members")}
+								>
+									View all
+								</button>
+							}
+						>
+							<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+								{data.members.slice(0, 5).map((m) => (
+									<Link
+										key={m.id}
+										href={`/users/${m.userId}`}
+										className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]"
 									>
-										<Link href={`/emails/${e.id}`}>
-											<Icon name="eye" className="h-3 w-3" />
-											Open
-										</Link>
-									</Button.Root>
-								</div>
-							))}
-							{data.recentEmails.length === 0 ? (
-								<EmptyState title="No emails yet" />
-							) : null}
-						</div>
-					</SectionCard>
-				</div>
+										<div className="min-w-0">
+											<p className="truncate font-medium text-[13px]">
+												{m.userName}
+											</p>
+											<p className="truncate text-[12px] text-text-sub-600">
+												{m.userEmail}
+											</p>
+										</div>
+										<StatusPill status={m.role} />
+									</Link>
+								))}
+								{data.members.length === 0 ? (
+									<EmptyState title="No members" />
+								) : null}
+							</div>
+						</SectionCard>
+
+						<SectionCard
+							title="Recent emails"
+							action={
+								<button
+									type="button"
+									className="text-[12px] text-primary-base hover:underline"
+									onClick={() => setTab("emails")}
+								>
+									View all
+								</button>
+							}
+						>
+							<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+								{data.recentEmails.slice(0, 6).map((e) => (
+									<div
+										key={e.id}
+										className="group flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
+									>
+										<div className="min-w-0 flex-1">
+											<div className="flex items-center gap-2">
+												<Link
+													href={`/emails/${e.id}`}
+													className="truncate font-medium text-[13px] text-text-strong-950 transition-colors hover:text-primary-base hover:underline"
+												>
+													{e.subject || "(no subject)"}
+												</Link>
+												<StatusPill status={e.status} />
+											</div>
+											<p className="mt-0.5 truncate text-[12px] text-text-sub-600">
+												{e.fromEmail} · {formatRelativeTime(e.createdAt)}
+											</p>
+										</div>
+										<Button.Root
+											asChild
+											size="xsmall"
+											variant="neutral"
+											mode="stroke"
+											className="shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+										>
+											<Link href={`/emails/${e.id}`}>
+												<Icon name="eye" className="h-3 w-3" />
+												Open
+											</Link>
+										</Button.Root>
+									</div>
+								))}
+								{data.recentEmails.length === 0 ? (
+									<EmptyState title="No emails yet" />
+								) : null}
+							</div>
+						</SectionCard>
+					</div>
 				</>
 			) : null}
 
@@ -963,7 +1054,15 @@ export default function OrganizationDetailPage() {
 					description="Sending domains attached to this org (age cap applies to all plans)"
 				>
 					<DataTable
-						headers={["Domain", "Status", "Age", "Daily cap", "Sent today", "Verified", "Created"]}
+						headers={[
+							"Domain",
+							"Status",
+							"Age",
+							"Daily cap",
+							"Sent today",
+							"Verified",
+							"Created",
+						]}
 						colSpan={7}
 						empty={data.domains.length === 0}
 					>
@@ -978,34 +1077,65 @@ export default function OrganizationDetailPage() {
 									<td className="px-4 py-3 font-medium">
 										<div>{d.domain}</div>
 										{isWarming ? (
-											<span className="text-[11px] text-orange-600 dark:text-orange-400">Warming up</span>
+											<span className="text-[11px] text-orange-600 dark:text-orange-400">
+												Warming up
+											</span>
 										) : (
-											<span className="text-[11px] text-emerald-600 dark:text-emerald-400">Warm</span>
+											<span className="text-[11px] text-emerald-600 dark:text-emerald-400">
+												Warm
+											</span>
 										)}
 									</td>
 									<td className="px-4 py-3">
 										<StatusPill status={d.status} />
 									</td>
-									<td className="px-4 py-3 tabular-nums text-text-strong-950">
+									<td className="px-4 py-3 text-text-strong-950 tabular-nums">
 										{d.ageDays}d
-										<span className="ml-1 text-[11px] text-text-sub-600" title={d.registrarCreatedAt ? `Registrar: ${new Date(d.registrarCreatedAt).toLocaleDateString()} via ${d.source}` : `Added: ${new Date(d.createdAt).toLocaleDateString()}`}>
-											({d.source === "rdap" && d.registrarCreatedAt ? `reg ${new Date(d.registrarCreatedAt).toLocaleDateString()}` : d.ageDays <= 1 ? "today" : `${d.ageDays}d ago`})
+										<span
+											className="ml-1 text-[11px] text-text-sub-600"
+											title={
+												d.registrarCreatedAt
+													? `Registrar: ${new Date(d.registrarCreatedAt).toLocaleDateString()} via ${d.source}`
+													: `Added: ${new Date(d.createdAt).toLocaleDateString()}`
+											}
+										>
+											(
+											{d.source === "rdap" && d.registrarCreatedAt
+												? `reg ${new Date(d.registrarCreatedAt).toLocaleDateString()}`
+												: d.ageDays <= 1
+													? "today"
+													: `${d.ageDays}d ago`}
+											)
 										</span>
 									</td>
 									<td className="px-4 py-3 tabular-nums">
 										{d.dailyCap === null ? (
 											<span className="text-text-sub-600">Dynamic</span>
 										) : (
-											<span className={isAtCap ? "font-semibold text-orange-600" : ""}>{d.dailyCap}</span>
+											<span
+												className={
+													isAtCap ? "font-semibold text-orange-600" : ""
+												}
+											>
+												{d.dailyCap}
+											</span>
 										)}
 									</td>
 									<td className="px-4 py-3 tabular-nums">
 										{d.dailyCap === null ? (
-											<span className="text-text-sub-600">{d.sentToday} sent</span>
+											<span className="text-text-sub-600">
+												{d.sentToday} sent
+											</span>
 										) : (
-											<span className={isAtCap ? "font-semibold text-orange-600" : ""}>
+											<span
+												className={
+													isAtCap ? "font-semibold text-orange-600" : ""
+												}
+											>
 												{d.sentToday} / {d.dailyCap}
-												<span className="ml-1 text-[11px] text-text-sub-600">· {d.remaining} left</span>
+												<span className="ml-1 text-[11px] text-text-sub-600">
+													· {d.remaining} left
+												</span>
 											</span>
 										)}
 									</td>

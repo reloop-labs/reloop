@@ -1,6 +1,5 @@
 import { isIP } from "node:net";
 import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
-import { isSelfHosted } from "./self-hosted";
 import { type DatabaseInstance, db } from "./client";
 import {
 	assertCanAssignDedicatedIp,
@@ -23,6 +22,7 @@ import {
 	sendingIp,
 	type WarmupPhase,
 } from "./schema/sending-ip";
+import { isSelfHosted } from "./self-hosted";
 
 export function parseSendingIpAddress(
 	raw: string,

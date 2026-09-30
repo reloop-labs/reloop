@@ -568,7 +568,7 @@ https://reloop.sh/tools/domain-age`;
 												<div className="mt-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
 													{formatDateOnly(result.age.createdAt)}
 												</div>
-												<div className="mt-0.5 text-xs text-text-sub-600 dark:text-white/55">
+												<div className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
 													{formatWeekday(result.age.createdAt)} ·{" "}
 													{formatTimeOnly(result.age.createdAt)}
 												</div>
@@ -591,7 +591,7 @@ https://reloop.sh/tools/domain-age`;
 												<div className="mt-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
 													{formatDateOnly(result.age.expiresAt)}
 												</div>
-												<div className="mt-0.5 text-xs text-text-sub-600 dark:text-white/55">
+												<div className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
 													{formatWeekday(result.age.expiresAt)} ·{" "}
 													{formatTimeOnly(result.age.expiresAt)}
 												</div>
@@ -619,7 +619,7 @@ https://reloop.sh/tools/domain-age`;
 														/>
 														<span className={cn(info.text)}>{info.status}</span>
 													</div>
-													<div className="mt-0.5 text-xs text-text-sub-600 dark:text-white/55">
+													<div className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
 														{info.detail}
 													</div>
 												</div>

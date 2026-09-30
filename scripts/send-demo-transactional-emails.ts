@@ -17,7 +17,8 @@ const demoEmails: DemoEmail[] = [
 	{
 		from: "Linear <notifications@local.reloop.sh>",
 		to: "karri.saarinen@linear.app",
-		subject: '[Linear] Assigned: "Reduce P99 API latency below 45ms" (LIN-1240)',
+		subject:
+			'[Linear] Assigned: "Reduce P99 API latency below 45ms" (LIN-1240)',
 		tags: [
 			{ name: "category", value: "notifications" },
 			{ name: "service", value: "linear" },
@@ -509,7 +510,9 @@ const demoEmails: DemoEmail[] = [
 ];
 
 async function sendEmail(email: DemoEmail, index: number, total: number) {
-	console.log(`[${index + 1}/${total}] Sending "${email.subject}" to ${email.to}...`);
+	console.log(
+		`[${index + 1}/${total}] Sending "${email.subject}" to ${email.to}...`,
+	);
 
 	const res = await fetch(`${BASE_URL}/api/mail/v1/send`, {
 		method: "POST",
@@ -529,7 +532,7 @@ async function sendEmail(email: DemoEmail, index: number, total: number) {
 }
 
 async function run() {
-	console.log(`🚀 Starting transactional email generation...`);
+	console.log("🚀 Starting transactional email generation...");
 	console.log(`📡 Target API: ${BASE_URL}/api/mail/v1/send`);
 	console.log(`🔑 Using Key: ${API_KEY.slice(0, 14)}...`);
 	console.log(`📬 Total Emails to Send: ${demoEmails.length}\n`);
@@ -539,7 +542,7 @@ async function run() {
 		await new Promise((resolve) => setTimeout(resolve, 300));
 	}
 
-	console.log(`\n🎉 Finished sending demo transactional emails!`);
+	console.log("\n🎉 Finished sending demo transactional emails!");
 }
 
 run().catch(console.error);

@@ -6,7 +6,6 @@ import {
 } from "@reloop/be-mail/lib/credits-gate";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
-import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import {
 	assertAttachmentsWithinPlan,
 	getOrgAttachmentLimit,
@@ -14,6 +13,7 @@ import {
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import { emailThread, threadMessage } from "@reloop/db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -193,7 +193,11 @@ export async function sendEmailController({
 	// 0–1d:20, 2–3d:50, 4–7d:100, 8–14d:250, 15–30d:500, 30+d:dynamic
 	const recipientCount = countEmailRecipients(body);
 	const ageCheck = await checkDomainAgeDailyCap({
-		domain: { id: currentDomain.id, domain: currentDomain.domain, createdAt: currentDomain.createdAt },
+		domain: {
+			id: currentDomain.id,
+			domain: currentDomain.domain,
+			createdAt: currentDomain.createdAt,
+		},
 		recipientCount,
 	});
 	if (!ageCheck.allowed && ageCheck.cap !== null) {

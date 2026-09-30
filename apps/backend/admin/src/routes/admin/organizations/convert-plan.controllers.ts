@@ -7,11 +7,7 @@ import {
 	organizationPlan,
 	organizationSubscription,
 } from "@reloop/db/schema";
-import {
-	applyPlanChange,
-	getPlanLimits,
-	type PlanId,
-} from "@reloop/pricing";
+import { applyPlanChange, getPlanLimits, type PlanId } from "@reloop/pricing";
 import { eq } from "drizzle-orm";
 import { createError } from "evlog";
 

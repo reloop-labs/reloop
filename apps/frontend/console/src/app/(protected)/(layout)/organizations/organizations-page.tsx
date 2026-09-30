@@ -233,60 +233,63 @@ export default function OrganizationsPage() {
 								</td>
 								<td className="px-4 py-3 tabular-nums">{org.memberCount}</td>
 								<td className="px-4 py-3 tabular-nums">{org.domainCount}</td>
-							<td className="px-4 py-3 tabular-nums">
-								{formatNumber(org.creditsRemaining)}
-							</td>
-							<td className="px-4 py-3 text-text-sub-600">
-								<span
-									className="text-[12px] text-text-sub-600 tabular-nums"
-									title={org.createdAt}
-								>
-									{formatRelativeTime(org.createdAt)}
-								</span>
-							</td>
-							<td className="px-4 py-3">
-								<div className="flex flex-wrap gap-1.5">
-									<Button.Root
-										asChild
-										size="xsmall"
-										variant="neutral"
-										mode="stroke"
+								<td className="px-4 py-3 tabular-nums">
+									{formatNumber(org.creditsRemaining)}
+								</td>
+								<td className="px-4 py-3 text-text-sub-600">
+									<span
+										className="text-[12px] text-text-sub-600 tabular-nums"
+										title={org.createdAt}
 									>
-										<Link href={`/organizations/${org.id}`}>Open hub</Link>
-									</Button.Root>
-									{org.status === "suspended" ? (
+										{formatRelativeTime(org.createdAt)}
+									</span>
+								</td>
+								<td className="px-4 py-3">
+									<div className="flex flex-wrap gap-1.5">
 										<Button.Root
+											asChild
 											size="xsmall"
 											variant="neutral"
-											mode="ghost"
-											onClick={async () => {
-												try {
-													await adminPatch(`/organizations/${org.id}/status`, {
-														status: "active",
-														reason: "Reactivated by admin",
-													});
-													toast.success("Organization reactivated");
-													mutate();
-												} catch {
-													toast.error("Failed to reactivate organization");
-												}
-											}}
+											mode="stroke"
 										>
-											Reactivate
+											<Link href={`/organizations/${org.id}`}>Open hub</Link>
 										</Button.Root>
-									) : (
-										<Button.Root
-											size="xsmall"
-											variant="error"
-											mode="ghost"
-											onClick={() => setSuspendTarget(org)}
-										>
-											Suspend
-										</Button.Root>
-									)}
-								</div>
-							</td>
-						</tr>
+										{org.status === "suspended" ? (
+											<Button.Root
+												size="xsmall"
+												variant="neutral"
+												mode="ghost"
+												onClick={async () => {
+													try {
+														await adminPatch(
+															`/organizations/${org.id}/status`,
+															{
+																status: "active",
+																reason: "Reactivated by admin",
+															},
+														);
+														toast.success("Organization reactivated");
+														mutate();
+													} catch {
+														toast.error("Failed to reactivate organization");
+													}
+												}}
+											>
+												Reactivate
+											</Button.Root>
+										) : (
+											<Button.Root
+												size="xsmall"
+												variant="error"
+												mode="ghost"
+												onClick={() => setSuspendTarget(org)}
+											>
+												Suspend
+											</Button.Root>
+										)}
+									</div>
+								</td>
+							</tr>
 						);
 					})}
 				</DataTable>

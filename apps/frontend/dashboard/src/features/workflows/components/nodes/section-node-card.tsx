@@ -139,7 +139,7 @@ export const SectionNodeCard = ({
 	return (
 		<div
 			className={cn(
-				"relative w-[300px] overflow-visible rounded-2xl border bg-bg-white-0 p-1 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[border-color,box-shadow] duration-150 ease-out dark:border-stroke-soft-100/40 dark:bg-[#141419] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
+				"relative w-[420px] overflow-visible rounded-2xl border bg-bg-white-0 p-1 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[border-color,box-shadow] duration-150 ease-out dark:border-stroke-soft-100/40 dark:bg-[#141419] dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
 				selected
 					? meta.selected
 					: "border-stroke-soft-200 dark:border-stroke-soft-100/40",

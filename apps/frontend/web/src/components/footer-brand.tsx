@@ -66,7 +66,6 @@ function ApacheMark() {
 	);
 }
 
-
 export type FooterBrandAccent =
 	| "default"
 	| "emerald"

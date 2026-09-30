@@ -91,7 +91,8 @@ export const homeFaqGroups: HomeFaqGroup[] = [
 		label: "Trust & privacy: your email content",
 		items: [
 			{
-				question: "Do you use, read, or sell the emails my app sends through Reloop?",
+				question:
+					"Do you use, read, or sell the emails my app sends through Reloop?",
 				answer:
 					"No. We do not sell your emails, contact lists, or personal information. On Reloop Cloud, email content is processed only to deliver your mail, operate the service, and keep infrastructure safe, never for advertising or resale.",
 			},
@@ -127,7 +128,8 @@ export const homeFaqGroups: HomeFaqGroup[] = [
 		label: "Phishing, scams & abuse",
 		items: [
 			{
-				question: "Can I use Reloop to send phishing emails, fake invoices, or payment scams?",
+				question:
+					"Can I use Reloop to send phishing emails, fake invoices, or payment scams?",
 				answer:
 					"No. Phishing, spoofing, fake payment or invoice lures, crypto and wallet scams, malware, and fraud are strictly prohibited on Reloop Cloud and against our Terms, even if you send from your own domain.",
 			},
@@ -137,7 +139,8 @@ export const homeFaqGroups: HomeFaqGroup[] = [
 					"Fake security alerts, invoice or payment lures, brand impersonation, credential and seed-phrase harvesting, crypto and wallet theft narratives, malware distribution, and unsolicited SMS-gateway blasts all count as abuse under our Terms.",
 			},
 			{
-				question: "How does Reloop prevent phishing and scams sent through the platform?",
+				question:
+					"How does Reloop prevent phishing and scams sent through the platform?",
 				answer:
 					"Reloop Cloud automatically classifies outbound traffic on shared infrastructure. High-severity sends such as stacked phishing or scam lures can be blocked immediately, while suspicious sends are queued for operator review to protect shared IP and domain reputation.",
 			},
@@ -157,7 +160,8 @@ export const homeFaqGroups: HomeFaqGroup[] = [
 					"Medium-severity sends may still be delivered while we investigate. If your sending is throttled or blocked in error, contact support with your account, domain, and a sample message ID so we can review and reclassify it.",
 			},
 			{
-				question: "I received a suspicious email sent via Reloop. How do I report abuse?",
+				question:
+					"I received a suspicious email sent via Reloop. How do I report abuse?",
 				answer:
 					"Forward the full email with headers to reloop.sh@gmail.com and include the subject, sender, and why it looks abusive. Our team investigates reports of phishing, scams, and spam, and takes enforcement action under our Terms of Service.",
 			},

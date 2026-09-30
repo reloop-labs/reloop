@@ -3,7 +3,8 @@ import { getPublicSuffix } from "tldts";
 const IDENTITY_DIGITAL = "https://rdap.identitydigital.services/rdap/domain/";
 const COCCA = "https://rdap.coccaregistry.org/domain/";
 const AFNIC = "https://rdap.nic.fr/domain/";
-const CENTRALNIC = (tld: string) => `https://rdap.centralnic.com/${tld}/domain/`;
+const CENTRALNIC = (tld: string) =>
+	`https://rdap.centralnic.com/${tld}/domain/`;
 
 export const RDAP_REGISTRY_BASES: Record<string, string> = {
 	ac: IDENTITY_DIGITAL,
@@ -106,7 +107,9 @@ export function joinRdapDomainUrl(base: string, domain: string): string {
 
 export function rdapTldCandidates(registrableDomain: string): string[] {
 	const domain = registrableDomain.toLowerCase();
-	const suffix = (getPublicSuffix(domain) || domain.split(".").pop() || "").toLowerCase().replace(/^\.+/, "");
+	const suffix = (getPublicSuffix(domain) || domain.split(".").pop() || "")
+		.toLowerCase()
+		.replace(/^\.+/, "");
 	const last = domain.split(".").pop() || suffix;
 	const out: string[] = [];
 	for (const label of [suffix, last]) {
@@ -129,8 +132,14 @@ export function nicHeuristicBase(registrableDomain: string): string | null {
 	return `https://rdap.nic.${tld}/`;
 }
 
-export function bootstrapBaseForDomain(registrableDomain: string, bootstrap: Map<string, string> | Record<string, string>): string | null {
-	const get = bootstrap instanceof Map ? (key: string) => bootstrap.get(key) : (key: string) => (bootstrap as Record<string, string>)[key];
+export function bootstrapBaseForDomain(
+	registrableDomain: string,
+	bootstrap: Map<string, string> | Record<string, string>,
+): string | null {
+	const get =
+		bootstrap instanceof Map
+			? (key: string) => bootstrap.get(key)
+			: (key: string) => (bootstrap as Record<string, string>)[key];
 	for (const tld of rdapTldCandidates(registrableDomain)) {
 		const base = get(tld);
 		if (base) return base;
@@ -138,7 +147,10 @@ export function bootstrapBaseForDomain(registrableDomain: string, bootstrap: Map
 	return null;
 }
 
-export function rdapEndpointsForDomain(registrableDomain: string, options?: { bootstrap?: Map<string, string> | Record<string, string> }): string[] {
+export function rdapEndpointsForDomain(
+	registrableDomain: string,
+	options?: { bootstrap?: Map<string, string> | Record<string, string> },
+): string[] {
 	const domain = registrableDomain.toLowerCase();
 	const urls: string[] = [];
 	const seen = new Set<string>();
@@ -150,7 +162,8 @@ export function rdapEndpointsForDomain(registrableDomain: string, options?: { bo
 		urls.push(url);
 	};
 	push(catalogBaseForDomain(domain));
-	if (options?.bootstrap) push(bootstrapBaseForDomain(domain, options.bootstrap));
+	if (options?.bootstrap)
+		push(bootstrapBaseForDomain(domain, options.bootstrap));
 	if (urls.length === 0) push(nicHeuristicBase(domain));
 	push("https://rdap.org/");
 	return urls;

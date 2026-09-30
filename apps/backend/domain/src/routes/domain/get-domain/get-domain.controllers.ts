@@ -1,5 +1,9 @@
 import { db } from "@reloop/db/client";
-import { getDomainAgeDays, getDomainInitialDailyCap, getRegistrarCreationDate } from "@reloop/db/domain-age-cap";
+import {
+	getDomainAgeDays,
+	getDomainInitialDailyCap,
+	getRegistrarCreationDate,
+} from "@reloop/db/domain-age-cap";
 import { utcDayStart } from "@reloop/db/reserve-send-credits";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
@@ -76,13 +80,21 @@ export async function getDomainController({
 		const [sentRow] = await db
 			.select({ value: count() })
 			.from(schema.emailLog)
-			.where(and(eq(schema.emailLog.domainId, result.id), gte(schema.emailLog.createdAt, dayStart)));
+			.where(
+				and(
+					eq(schema.emailLog.domainId, result.id),
+					gte(schema.emailLog.createdAt, dayStart),
+				),
+			);
 		const sentToday = sentRow?.value ?? 0;
-		const remaining = dailyCap === null ? null : Math.max(0, dailyCap - sentToday);
+		const remaining =
+			dailyCap === null ? null : Math.max(0, dailyCap - sentToday);
 		return {
 			object: "domain" as const,
 			...result,
-			registrarCreatedAt: registrarCreatedAtStr ? new Date(registrarCreatedAtStr) : null,
+			registrarCreatedAt: registrarCreatedAtStr
+				? new Date(registrarCreatedAtStr)
+				: null,
 			ageDays,
 			dailyCap,
 			sentToday,

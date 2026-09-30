@@ -180,8 +180,7 @@ export function validateAutomationGraph(
 			const to = String(node.data?.to ?? "").trim();
 			const subject = String(node.data?.subject ?? "").trim();
 			const from = String(node.data?.from ?? "").trim();
-			if (!to)
-				errors.push(`Send email step "${node.id}" needs a To address.`);
+			if (!to) errors.push(`Send email step "${node.id}" needs a To address.`);
 			if (!from)
 				errors.push(`Send email step "${node.id}" needs a From address.`);
 			if (!subject)

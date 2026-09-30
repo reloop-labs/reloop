@@ -137,7 +137,6 @@ export const DomainEvents = ({
 
 				{expanded && domain?.status === "active" && dailyCap !== null && (
 					<div className="mt-3 border-success-base/15 border-t pt-3 pl-6 dark:border-success-base/20">
-						
 						<p className="text-[12px] text-text-strong-950 leading-relaxed dark:text-white">
 							Your domain is{" "}
 							<span className="font-semibold">
@@ -186,7 +185,7 @@ export const DomainEvents = ({
 							the daily cap and resumes at 00:00 UTC. You’ll see “Daily limit
 							reached” in your email logs.
 						</p>
-						<p className="mt-2 text-[11px] leading-relaxed text-text-sub-600 dark:text-white/50">
+						<p className="mt-2 text-[11px] text-text-sub-600 leading-relaxed dark:text-white/50">
 							Need to send more than your current cap?{" "}
 							<a
 								href={`mailto:support@reloop.sh?subject=${encodeURIComponent(`Request to increase daily cap for ${domain.domain}`)}&body=${encodeURIComponent(`Hi Reloop team,\n\nI'd like to request a higher daily limit for ${domain.domain} (age: ${ageDays} days, current cap: ${dailyCap ?? "Dynamic"} emails/day${domain.sentToday != null && dailyCap !== null ? `, sent today: ${domain.sentToday}/${dailyCap}` : ""}).\n\nReason / use case:\n[please describe]\n\nThanks!`)}`}
@@ -199,7 +198,11 @@ export const DomainEvents = ({
 								type="button"
 								onClick={() => {
 									const msg = `Hi team, please increase my daily cap for ${domain.domain} (age ${ageDays}d, cap ${dailyCap ?? "Dynamic"}). Reason: `;
-									const { setPendingSupportMessage, setAiPanelActiveTab, setIsAiPanelOpen } = useUIStore.getState();
+									const {
+										setPendingSupportMessage,
+										setAiPanelActiveTab,
+										setIsAiPanelOpen,
+									} = useUIStore.getState();
 									setPendingSupportMessage(msg);
 									setAiPanelActiveTab("support");
 									setIsAiPanelOpen(true);

@@ -1,15 +1,15 @@
 import { createId } from "@paralleldrive/cuid2";
-import { db } from "../packages/db/src/client.js";
-import {
-	emailThread,
-	threadMessage,
-	emailLabel,
-	threadLabel,
-} from "../packages/db/src/schema/thread.js";
-import { inboundEmail, mailbox } from "../packages/db/src/schema/inbox.js";
-import { emailLog } from "../packages/db/src/schema/email.js";
-import { emailSend } from "../packages/db/src/schema/billing.js";
 import { eq } from "drizzle-orm";
+import { db } from "../packages/db/src/client.js";
+import { emailSend } from "../packages/db/src/schema/billing.js";
+import { emailLog } from "../packages/db/src/schema/email.js";
+import { inboundEmail, mailbox } from "../packages/db/src/schema/inbox.js";
+import {
+	emailLabel,
+	emailThread,
+	threadLabel,
+	threadMessage,
+} from "../packages/db/src/schema/thread.js";
 
 const ORG_ID = "iFqWuHdDnZTRpFJZR2K9GCCUM0SUY9cO";
 const DOMAIN_ID = "domain_ty715n44y3e1s21hy71wzkaf";
@@ -114,7 +114,10 @@ const THREADS_DATA: ThreadDef[] = [
 		],
 	},
 	{
-		customer: { name: "Paul Copplestone", email: "paul.copplestone@supabase.io" },
+		customer: {
+			name: "Paul Copplestone",
+			email: "paul.copplestone@supabase.io",
+		},
 		subject: "KumoMTA spool queue persistence during Postgres failover",
 		label: { name: "Integration", color: "blue" },
 		isStarred: false,
@@ -391,10 +394,14 @@ async function main() {
 			}
 		}
 
-		console.log(`   ✓ Thread created: "${threadDef.subject}" (${threadDef.messages.length} messages)`);
+		console.log(
+			`   ✓ Thread created: "${threadDef.subject}" (${threadDef.messages.length} messages)`,
+		);
 	}
 
-	console.log(`\n🎉 Successfully seeded ${THREADS_DATA.length} support conversation threads!`);
+	console.log(
+		`\n🎉 Successfully seeded ${THREADS_DATA.length} support conversation threads!`,
+	);
 	console.log(`📬 Mailbox: ${SUPPORT_EMAIL}`);
 	console.log(`🔗 URL: /inbox?mailboxId=${MAILBOX_ID}&folder=inbox`);
 }
