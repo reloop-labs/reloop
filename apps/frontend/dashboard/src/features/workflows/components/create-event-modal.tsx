@@ -53,6 +53,7 @@ interface CreateEventModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	event?: CustomEvent | null;
+	initialKey?: string;
 	onCreated?: (event: CustomEvent) => void;
 	onUpdated?: (event: CustomEvent) => void;
 }
@@ -64,6 +65,7 @@ export function CreateEventModal({
 	open,
 	onOpenChange,
 	event,
+	initialKey,
 	onCreated,
 	onUpdated,
 }: CreateEventModalProps) {
@@ -233,6 +235,8 @@ export function CreateEventModal({
 						propertyType: p.propertyType,
 					})),
 				);
+			} else if (initialKey?.trim()) {
+				setKeySuffix(suffixFromKey(initialKey.trim()));
 			}
 			return;
 		}
@@ -243,7 +247,7 @@ export function CreateEventModal({
 			setStatus("idle");
 		}, 300);
 		return () => clearTimeout(timer);
-	}, [open, event, clearTriggerError]);
+	}, [open, event, initialKey, clearTriggerError]);
 
 	return (
 		<AutomationModalFrame
