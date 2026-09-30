@@ -90,7 +90,7 @@ curl -X POST https://reloop.sh/api/mail/v1/send \
   }'
 ```
 
-Node.js, with the published `[reloop-email](https://www.npmjs.com/package/reloop-email)` package:
+Node.js, with the published [`reloop-email`](https://www.npmjs.com/package/reloop-email) package:
 
 ```bash
 npm install reloop-email
