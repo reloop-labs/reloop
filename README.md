@@ -183,8 +183,6 @@ Developer setup, ports, and per-service notes: [Setup guide](https://reloop.sh/d
 
 Reloop partners with [Darkless](https://darkless.cloud) to make self-hosting easier for people who do not already have a server. Darkless provides the VPS or dedicated machine. You install Reloop on it. Mail data stays on that machine.
 
-<img src=".github/assets/darkless-x-reloop.png" alt="Partnership announcement: Reloop and Darkless" width="720">
-
 Darkless is a hosting company. The partnership covers infrastructure for Reloop, extra capacity where it helps the project, and a clearer path for anyone who wants to self-host but does not have a server yet. It does not change the Reloop license, and a Darkless server is not required to run Reloop.
 
 What you still do yourself:
@@ -198,9 +196,7 @@ Guide: **[Deploy Reloop on Darkless](https://reloop.sh/docs/self-host/darkless)*
 
 ### Community discount
 
-Darkless offers a discount for the Reloop community on VPS and dedicated servers used to run Reloop. The code applies to the first invoice. Renewal stays at the list price you signed up at.
-
-The current code is posted in the [Reloop Discord](https://discord.gg/ZBYwWKY96U).
+Use code `RELOOP` at [Darkless](https://darkless.cloud) for 15% off your first VM purchase. The code applies to the first invoice. Renewal stays at the list price you signed up at.
 
 ---
 
