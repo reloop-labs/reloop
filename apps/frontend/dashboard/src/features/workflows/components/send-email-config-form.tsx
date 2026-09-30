@@ -33,7 +33,12 @@ const templateThumbnailSrc = (template: Template): string => {
 const TemplateThumb = ({ template }: { template: Template }) => {
 	const [failed, setFailed] = useState(false);
 	return (
-		<div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-black/30">
+		<div
+			className={cn(
+				"relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-stroke-soft-100 dark:border-stroke-soft-100/40",
+				failed ? "bg-transparent" : "bg-bg-weak-50 dark:bg-black/30",
+			)}
+		>
 			{failed ? (
 				<div className="flex h-full w-full items-center justify-center text-text-soft-400">
 					<Icon name="image-upload" className="h-5 w-5" />
