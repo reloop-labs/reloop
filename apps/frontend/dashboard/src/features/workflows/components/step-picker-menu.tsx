@@ -103,7 +103,7 @@ export const StepPickerMenu = ({
 							onClose();
 						}}
 						aria-label="Close step picker"
-						className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
+						className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-soft-400 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 					>
 						<Icon name="cross" className="h-3 w-3" />
 					</button>
@@ -129,11 +129,11 @@ export const StepPickerMenu = ({
 											e.stopPropagation();
 											onPick(item.kind);
 										}}
-										className="group/item flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-left transition-all hover:border-stroke-soft-200 hover:bg-bg-weak-50/60 hover:shadow-2xs dark:hover:border-stroke-soft-100/40 dark:hover:bg-[#18181f]"
+										className="group/item flex w-full items-center gap-3 rounded-xl border border-transparent p-2 text-left hover:border-stroke-soft-200 hover:bg-bg-weak-50/80 dark:hover:border-stroke-soft-100/50 dark:hover:bg-white/[0.04]"
 									>
 										<span
 											className={cn(
-												"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border bg-transparent transition-transform group-hover/item:scale-105",
+												"flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border bg-transparent",
 												meta.iconBorder,
 											)}
 										>
