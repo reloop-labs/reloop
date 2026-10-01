@@ -51,17 +51,6 @@ export function Hero({ variant = "default" }: HeroProps) {
 							/>
 							<span>View deployment docs</span>
 						</Link>
-						<Link
-							href="/docs/self-host/darkless"
-							className="inline-flex items-center gap-2 transition-colors hover:text-text-strong-950 dark:hover:text-white"
-						>
-							<Icon
-								name="server"
-								className="size-4 shrink-0"
-								aria-hidden="true"
-							/>
-							<span>Deploy on Darkless</span>
-						</Link>
 					</div>
 				</div>
 			) : (

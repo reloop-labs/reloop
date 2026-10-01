@@ -35,7 +35,6 @@ A self-hostable alternative to [Resend](https://reloop.sh/compare/resend), SendG
 | Try Reloop            | [Create a Reloop Cloud account](https://reloop.sh/dashboard/signup). The Free plan includes 3,000 emails a month and 100 a day.   |
 | Send an email         | Use the [API example](#send-an-email) below, then the [send API reference](https://reloop.sh/docs/api/mail/post-api-mail-v1send). |
 | Self-host             | Run the [VPS installer](#self-host) on Ubuntu or Debian. [Read the script first](https://reloop.sh/docs/self-host/vps).           |
-| Get a server          | [Darkless](#hosting-and-infrastructure) is Reloop's infrastructure partner and can provide the machine.                           |
 | Understand the system | Read [Architecture](#architecture) and the [docs](https://reloop.sh/docs).                                                        |
 | Contribute            | Follow [CONTRIBUTING.md](CONTRIBUTING.md). Local setup is `bun setup` then `bun dev`.                                             |
 
@@ -141,7 +140,7 @@ Full walkthrough: **[Deploy on a VPS](https://reloop.sh/docs/self-host/vps)**.
 
 A self-hosted install leaves out the pieces that only belong to Reloop Cloud: public docs on that host, credits and quotas, the public validation tools, and the operator console. Sending is not metered.
 
-A Coolify template is ready: [Deploy on Coolify](https://reloop.sh/docs/self-host/coolify). Kubernetes, Dokploy, Railway, and the other one-click targets are not ready yet. If you do not already have a server, use a VPS that meets the table above. [Darkless](#hosting-and-infrastructure) can provide one.
+A Coolify template is ready: [Deploy on Coolify](https://reloop.sh/docs/self-host/coolify). Kubernetes, Dokploy, Railway, and the other one-click targets are not ready yet.
 
 ---
 
@@ -188,34 +187,10 @@ Developer setup, ports, and per-service notes: [Setup guide](https://reloop.sh/d
 | [SDKs](https://reloop.sh/docs/resources/sdks)                      | Official client libraries            |
 | [Webhooks](https://reloop.sh/docs/webhooks)                        | Delivery events                      |
 | [Self-host on a VPS](https://reloop.sh/docs/self-host/vps)         | Production installer                 |
-| [Self-host on Darkless](https://reloop.sh/docs/self-host/darkless) | Get a server, then run the installer |
 | [Local setup](https://reloop.sh/docs/setup)                        | Contribute from a checkout           |
 | [Compare with Resend](https://reloop.sh/compare/resend)            | What changes if you move             |
 | [Changelog](https://reloop.sh/changelog)                           | What shipped                         |
 
-
----
-
-
-
-## Hosting and infrastructure
-
-Reloop partners with [Darkless](https://darkless.cloud) to make self-hosting easier for people who do not already have a server. Darkless provides the VPS or dedicated machine. You install Reloop on it. Mail data stays on that machine.
-
-Darkless is a hosting company. The partnership covers infrastructure for Reloop, extra capacity where it helps the project, and a clearer path for anyone who wants to self-host but does not have a server yet. It does not change the Reloop license, and a Darkless server is not required to run Reloop.
-
-What you still do yourself:
-
-1. Pick a machine that meets the [self-host requirements](#self-host). Ubuntu 24.04 or Debian 12 is a good default.
-2. Point a hostname at it and run the installer.
-3. Add the DNS records the installer prints.
-4. If you need to receive mail, confirm port 25 is open. Many hosts block it until you ask.
-
-Guide: **[Deploy Reloop on Darkless](https://reloop.sh/docs/self-host/darkless)**.
-
-### Community discount
-
-Use code `RELOOP` at [Darkless](https://darkless.cloud) for 15% off your first VM purchase. The code applies to the first invoice. Renewal stays at the list price you signed up at.
 
 ---
 
@@ -280,7 +255,7 @@ Questions: `reloop.sh@gmail.com`. The same terms are summarized at [reloop.sh/li
 
 
 
-Reloop is in the [Vercel Open Source Program](https://vercel.com/oss). Infrastructure partnership with [Darkless](https://darkless.cloud).
+Reloop is in the [Vercel Open Source Program](https://vercel.com/oss).
 
 Built by [Reloop Labs](https://reloop.sh).
 

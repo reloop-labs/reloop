@@ -11,6 +11,7 @@ import {
 	siFlydotio,
 	siGooglecloud,
 	siHetzner,
+	siKubernetes,
 	siRailway,
 	siRender,
 	siVultr,
@@ -28,8 +29,7 @@ const siAmazonaws: BrandIconData = {
 export type ServerProvider = {
 	name: string;
 	slug: string;
-	icon?: BrandIconData;
-	logoSrc?: string;
+	icon: BrandIconData;
 	description: string;
 	href?: string;
 };
@@ -37,13 +37,6 @@ export type ServerProvider = {
 const vpsGuide = "/docs/self-host/vps";
 
 export const SERVER_PROVIDERS: ServerProvider[] = [
-	{
-		name: "Darkless",
-		slug: "darkless",
-		logoSrc: "/partners/darkless-mark.png",
-		description: "Infrastructure partner",
-		href: "/docs/self-host/darkless",
-	},
 	{
 		name: "Hetzner",
 		slug: "hetzner",
@@ -121,28 +114,23 @@ export const SERVER_PROVIDERS: ServerProvider[] = [
 		description: "Template coming soon",
 		href: "/docs/self-host",
 	},
+	{
+		name: "Kubernetes",
+		slug: "kubernetes",
+		icon: siKubernetes,
+		description: "Template coming soon",
+		href: "/docs/self-host",
+	},
 ];
 
-function ProviderIcon({ provider }: { provider: ServerProvider }) {
-	if (provider.logoSrc) {
-		return (
-			<img
-				src={provider.logoSrc}
-				alt=""
-				className="size-5 object-contain transition-transform duration-200 group-hover:scale-110"
-			/>
-		);
-	}
-
-	if (!provider.icon) return null;
-
+function ProviderIcon({ icon }: { icon: BrandIconData }) {
 	return (
 		<svg
 			viewBox="0 0 24 24"
 			className="size-4.5 transition-transform duration-200 group-hover:scale-110"
 			aria-hidden
 		>
-			<path d={provider.icon.path} fill={`#${provider.icon.hex}`} />
+			<path d={icon.path} fill={`#${icon.hex}`} />
 		</svg>
 	);
 }
@@ -212,7 +200,7 @@ export function SelfHostProviders() {
 						>
 							<div className="flex w-full items-start justify-between gap-2">
 								<span className="inline-flex size-9 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.04]">
-									<ProviderIcon provider={provider} />
+									<ProviderIcon icon={provider.icon} />
 								</span>
 								<Icon
 									name="arrow-right"
