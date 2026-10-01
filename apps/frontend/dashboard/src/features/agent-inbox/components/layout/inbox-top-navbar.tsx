@@ -3,7 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { Search } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
@@ -19,7 +19,7 @@ const primaryDarkWhiteClassName =
 	"dark:text-black dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3]";
 
 export function InboxTopNavbar({
-	mailbox: _mailbox,
+	mailbox,
 	onAddMailbox,
 	atInboxCap = false,
 }: {
@@ -29,7 +29,10 @@ export function InboxTopNavbar({
 }) {
 	const { collapsed, toggleSidebar } = useInboxSidebar();
 	const [searchQuery] = useQueryState("q", parseAsString.withDefault(""));
+	const [, setDeleteId] = useQueryState("delete", parseAsString);
 	const activeSearch = searchQuery.trim();
+	const canDelete =
+		Boolean(mailbox.id && mailbox.email) && mailbox.id !== "loading";
 
 	const openSearch = () => {
 		window.dispatchEvent(new CustomEvent("inbox:open-search"));
@@ -92,24 +95,44 @@ export function InboxTopNavbar({
 			</button>
 
 			{onAddMailbox && (
-				<FancyButton.Root
-					type="button"
-					variant="primary"
-					size="xsmall"
-					onClick={onAddMailbox}
-					title={
-						atInboxCap ? "Upgrade to add an inbox" : "Create new inbox (N)"
-					}
-					aria-label={
-						atInboxCap ? "Upgrade to add an inbox" : "Create new inbox"
-					}
-					aria-keyshortcuts="n"
-					className={`ml-auto shrink-0 gap-1.5 rounded-xl ${primaryDarkWhiteClassName}`}
-				>
-					<Icon name="plus" className="h-4 w-4" />
-					Create new inbox
-					<ActionKbd className={actionKbdOnBlueClassName}>N</ActionKbd>
-				</FancyButton.Root>
+				<>
+					{canDelete && (
+						<button
+							type="button"
+							onClick={() => void setDeleteId(mailbox.id)}
+							title={`Delete ${mailbox.email}`}
+							aria-label={`Delete ${mailbox.email}`}
+							className={cn(
+								"ml-auto flex h-8 shrink-0 items-center gap-1.5 rounded-xl px-2.5 font-medium text-[13px]",
+								"text-text-sub-600 ring-1 ring-stroke-soft-200",
+								"transition-colors hover:bg-red-500/10 hover:text-error-base hover:ring-red-500/30",
+								"dark:text-white/60 dark:ring-white/10 dark:hover:text-red-400",
+								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error-base/40",
+							)}
+						>
+							<Trash2 className="h-4 w-4" strokeWidth={1.8} />
+							<span className="hidden sm:inline">Delete</span>
+						</button>
+					)}
+					<FancyButton.Root
+						type="button"
+						variant="primary"
+						size="xsmall"
+						onClick={onAddMailbox}
+						title={
+							atInboxCap ? "Upgrade to add an inbox" : "Create new inbox (N)"
+						}
+						aria-label={
+							atInboxCap ? "Upgrade to add an inbox" : "Create new inbox"
+						}
+						aria-keyshortcuts="n"
+						className={`shrink-0 gap-1.5 rounded-xl ${primaryDarkWhiteClassName} ${canDelete ? "" : "ml-auto"}`}
+					>
+						<Icon name="plus" className="h-4 w-4" />
+						Create new inbox
+						<ActionKbd className={actionKbdOnBlueClassName}>N</ActionKbd>
+					</FancyButton.Root>
+				</>
 			)}
 		</header>
 	);

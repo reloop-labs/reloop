@@ -122,7 +122,11 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 
 	const { data: versions } = useSWR(
 		roomId ? `/api/template/v1/${roomId}/versions` : null,
-		(url) => fetch(url, { credentials: "include" }).then((res) => res.json()),
+		async (url) => {
+			const res = await fetch(url, { credentials: "include" });
+			if (!res.ok) throw new Error(`Failed to fetch: ${res.statusText}`);
+			return res.json();
+		},
 	) as { data: any[] | undefined };
 
 	const hasInitializedRef = useRef(false);

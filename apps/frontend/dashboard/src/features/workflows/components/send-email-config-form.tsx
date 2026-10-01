@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,6 +14,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
+import { TemplateFieldRow } from "#/features/templates/editor/components/send-details/template-field-row";
 import {
 	createTemplate,
 	type Template,
@@ -76,37 +78,48 @@ const TemplateDetailPreview = ({
 	isLoading: boolean;
 }) => {
 	const [failed, setFailed] = useState(false);
+	const [imageLoaded, setImageLoaded] = useState(false);
 	const src = templateThumbnailSrc({
 		id: templateId,
 		updatedAt: detail?.updatedAt ?? "",
 		thumbnailUrl: detail?.thumbnailUrl ?? null,
 	} as Template);
 
+	useEffect(() => {
+		setFailed(false);
+		setImageLoaded(false);
+	}, [src]);
+
 	if (isLoading) {
 		return (
-			<div className="nodrag nopan nowheel flex aspect-[4/3] w-full cursor-default select-none items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 text-xs dark:border-stroke-soft-100/40 dark:bg-[#141419]">
-				Loading preview…
-			</div>
+			<Skeleton className="nodrag nopan nowheel h-72 w-full rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40" />
 		);
 	}
 
 	if (failed) {
 		return (
-			<div className="nodrag nopan nowheel flex aspect-[4/3] w-full cursor-default select-none items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-soft-400 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
+			<div className="nodrag nopan nowheel flex h-72 w-full cursor-default select-none items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 text-text-soft-400 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
 				<Icon name="image-upload" className="pointer-events-none h-6 w-6" />
 			</div>
 		);
 	}
 
 	return (
-		<div className="nodrag nopan nowheel cursor-default select-none overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
+		<div className="nodrag nopan nowheel relative h-72 w-full cursor-default select-none overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
+			{!imageLoaded && (
+				<Skeleton className="absolute inset-0 h-full w-full rounded-none" />
+			)}
 			<img
 				src={src}
 				alt={`Preview of ${templateName}`}
-				className="pointer-events-none max-h-72 w-full select-none object-cover object-top"
+				className={cn(
+					"pointer-events-none h-full w-full select-none object-cover object-top transition-opacity duration-200",
+					imageLoaded ? "opacity-100" : "opacity-0",
+				)}
 				loading="lazy"
 				decoding="async"
 				draggable={false}
+				onLoad={() => setImageLoaded(true)}
 				onError={() => setFailed(true)}
 			/>
 		</div>
@@ -362,14 +375,28 @@ interface SuggestedSender {
 interface WorkflowSenderSectionProps {
 	persistedFrom: string;
 	persistedReply: string;
-	onSave: (data: { fromEmail: string; replyTo: string }) => Promise<void>;
+	persistedSubject: string;
+	persistedPreviewText?: string;
+	onSave: (data: {
+		fromEmail: string;
+		replyTo: string;
+		subject: string;
+		previewText?: string;
+	}) => Promise<void>;
 	isSaving?: boolean;
-	onDraftChange?: (draft: { from?: string; reply?: string }) => void;
+	onDraftChange?: (draft: {
+		from?: string;
+		reply?: string;
+		subject?: string;
+		previewText?: string;
+	}) => void;
 }
 
 const WorkflowSenderSection = ({
 	persistedFrom,
 	persistedReply,
+	persistedSubject,
+	persistedPreviewText = "",
 	onSave,
 	isSaving,
 	onDraftChange,
@@ -384,6 +411,11 @@ const WorkflowSenderSection = ({
 
 	const [inputValue, setInputValue] = useState(persistedFrom);
 	const [replyValue, setReplyValue] = useState(persistedReply);
+	const [subjectValue, setSubjectValue] = useState(persistedSubject);
+	const [previewTextValue, setPreviewTextValue] = useState(persistedPreviewText);
+	const [showReplyTo, setShowReplyTo] = useState(Boolean(persistedReply.trim()));
+	const [showPreview, setShowPreview] = useState(Boolean(persistedPreviewText.trim()));
+
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [highlightIndex, setHighlightIndex] = useState(0);
 
@@ -399,7 +431,17 @@ const WorkflowSenderSection = ({
 
 	useEffect(() => {
 		setReplyValue(persistedReply);
+		if (persistedReply.trim()) setShowReplyTo(true);
 	}, [persistedReply]);
+
+	useEffect(() => {
+		setSubjectValue(persistedSubject);
+	}, [persistedSubject]);
+
+	useEffect(() => {
+		setPreviewTextValue(persistedPreviewText);
+		if (persistedPreviewText.trim()) setShowPreview(true);
+	}, [persistedPreviewText]);
 
 	const verifiedSendingDomains = useMemo(() => {
 		const list = domainsQuery.data?.domains || [];
@@ -560,7 +602,12 @@ const WorkflowSenderSection = ({
 		onDraftChange?.({ from: finalFormatted });
 		setIsDropdownOpen(false);
 		inputRef.current?.focus();
-		void onSave({ fromEmail: finalFormatted, replyTo: replyValue });
+		void onSave({
+			fromEmail: finalFormatted,
+			replyTo: replyValue,
+			subject: subjectValue,
+			previewText: previewTextValue,
+		});
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -616,13 +663,63 @@ const WorkflowSenderSection = ({
 
 	const handleFromBlur = () => {
 		if (inputValue !== persistedFrom) {
-			void onSave({ fromEmail: inputValue, replyTo: replyValue });
+			void onSave({
+				fromEmail: inputValue,
+				replyTo: replyValue,
+				subject: subjectValue,
+				previewText: previewTextValue,
+			});
 		}
 	};
 
 	const handleReplyBlur = () => {
+		if (!replyValue.trim()) {
+			setShowReplyTo(false);
+		}
 		if (replyValue !== persistedReply) {
-			void onSave({ fromEmail: inputValue, replyTo: replyValue });
+			void onSave({
+				fromEmail: inputValue,
+				replyTo: replyValue,
+				subject: subjectValue,
+				previewText: previewTextValue,
+			});
+		}
+	};
+
+	const handleSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const val = e.target.value;
+		setSubjectValue(val);
+		onDraftChange?.({ subject: val });
+	};
+
+	const handleSubjectBlur = () => {
+		if (subjectValue !== persistedSubject) {
+			void onSave({
+				fromEmail: inputValue,
+				replyTo: replyValue,
+				subject: subjectValue,
+				previewText: previewTextValue,
+			});
+		}
+	};
+
+	const handlePreviewTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const val = e.target.value;
+		setPreviewTextValue(val);
+		onDraftChange?.({ previewText: val });
+	};
+
+	const handlePreviewTextBlur = () => {
+		if (!previewTextValue.trim()) {
+			setShowPreview(false);
+		}
+		if (previewTextValue !== (persistedPreviewText ?? "")) {
+			void onSave({
+				fromEmail: inputValue,
+				replyTo: replyValue,
+				subject: subjectValue,
+				previewText: previewTextValue,
+			});
 		}
 	};
 
@@ -679,220 +776,329 @@ const WorkflowSenderSection = ({
 		domainsQuery.isLoading || (isDropdownOpen && domainsQuery.isFetching);
 
 	return (
-		<div className="flex flex-col gap-2 rounded-xl bg-bg-weak-50/60 p-3">
-			<div className="flex items-center justify-between">
-				<p className="font-medium text-sm text-text-strong-950">From</p>
-			</div>
-
-			{/* From input with combobox suggestions */}
-			<div
-				ref={containerRef}
-				className={cn(
-					"nodrag relative flex w-full items-center justify-between gap-2 rounded-xl border bg-bg-white-0 px-3 py-2 text-sm transition-colors dark:border-stroke-soft-100/40 dark:bg-bg-sub-300",
-					fromMissing || fromError
-						? "border-error-base"
-						: isDropdownOpen
-							? "border-blue-500 ring-2 ring-blue-500/10"
-							: "border-stroke-soft-100 hover:border-stroke-soft-200",
-					isSaving && "opacity-60",
-				)}
+		<div className="flex flex-col">
+			{/* From Row */}
+			<TemplateFieldRow
+				id="workflow-send-details-from"
+				label="From"
+				required
+				className="py-2.5"
 			>
-				<input
-					ref={inputRef}
-					type="text"
-					placeholder="Acme <acme@example.com>"
-					value={inputValue}
-					onChange={handleInputChange}
-					onFocus={() => setIsDropdownOpen(true)}
-					onKeyDown={handleKeyDown}
-					onBlur={handleFromBlur}
-					autoComplete="off"
-					role="combobox"
-					aria-expanded={isDropdownOpen}
-					aria-controls={listboxId}
-					aria-label="From email"
-					aria-invalid={fromMissing || Boolean(fromError) || undefined}
-					disabled={isSaving}
-					className="w-full bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-				/>
+				<div
+					ref={containerRef}
+					className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600"
+				>
+					<input
+						ref={inputRef}
+						id="workflow-send-details-from"
+						type="text"
+						placeholder="Acme <acme@example.com>"
+						value={inputValue}
+						onChange={handleInputChange}
+						onFocus={() => setIsDropdownOpen(true)}
+						onKeyDown={handleKeyDown}
+						onBlur={handleFromBlur}
+						autoComplete="off"
+						role="combobox"
+						aria-expanded={isDropdownOpen}
+						aria-controls={listboxId}
+						aria-label="From email"
+						aria-invalid={fromMissing || Boolean(fromError) || undefined}
+						disabled={isSaving}
+						className={cn(
+							"flex-1 bg-transparent text-label-sm text-text-strong-950 outline-none placeholder:text-text-soft-400",
+							(fromMissing || fromError) && "text-error-base",
+							isSaving && "opacity-60",
+						)}
+					/>
 
-				<div className="flex shrink-0 items-center gap-2">
-					{isLoadingDomains && (
-						<div
-							className="flex items-center justify-center text-text-soft-400"
-							title="Loading sending domains..."
+					<div className="flex shrink-0 items-center gap-2">
+						{isLoadingDomains && (
+							<div
+								className="flex items-center justify-center text-text-soft-400"
+								title="Loading sending domains..."
+							>
+								<Spinner size={14} />
+							</div>
+						)}
+
+						{fromError && (
+							<Tooltip.Provider delayDuration={0}>
+								<Tooltip.Root>
+									<Tooltip.Trigger asChild>
+										<button
+											type="button"
+											className="flex cursor-pointer items-center justify-center text-error-base transition-colors hover:text-error-dark"
+											tabIndex={-1}
+										>
+											<Icon name="cross-circle" className="h-4 w-4" />
+										</button>
+									</Tooltip.Trigger>
+									<Tooltip.Content
+										side="top"
+										variant="light"
+										size="medium"
+										className="max-w-[300px]"
+									>
+										<ErrorTooltipContent error={fromError} />
+									</Tooltip.Content>
+								</Tooltip.Root>
+							</Tooltip.Provider>
+						)}
+
+						{!showReplyTo && (
+							<button
+								type="button"
+								onClick={() => setShowReplyTo(true)}
+								className="cursor-pointer font-medium text-paragraph-xs text-text-soft-400 transition-colors hover:text-text-strong-950"
+							>
+								Reply-To
+							</button>
+						)}
+					</div>
+
+					{/* Suggestions Dropdown */}
+					<AnimatePresence>
+						{isDropdownOpen && (
+							<motion.div
+								id={listboxId}
+								role="listbox"
+								initial={{ opacity: 0, y: -4, scale: 0.98 }}
+								animate={{ opacity: 1, y: 0, scale: 1 }}
+								exit={{ opacity: 0, y: -4, scale: 0.98 }}
+								transition={{ duration: 0.15, ease: "easeOut" }}
+								className="nodrag absolute top-full left-0 z-50 mt-1.5 w-full min-w-[280px] max-w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+								onMouseDown={(e) => e.stopPropagation()}
+							>
+								{isLoadingDomains && suggestions.length === 0 ? (
+									<div className="flex items-center justify-center gap-2.5 py-6 text-paragraph-xs text-text-sub-600">
+										<Spinner size={16} />
+										<span>Fetching verified sending domains...</span>
+									</div>
+								) : verifiedSendingDomains.length === 0 ? (
+									<div className="flex flex-col gap-2 p-3 text-left">
+										<div className="flex items-center gap-2 text-text-sub-600">
+											<Icon
+												name="alert-circle"
+												className="h-4 w-4 text-warning-base"
+											/>
+											<span className="font-medium text-label-xs text-text-strong-950">
+												No Sending Domains Found
+											</span>
+										</div>
+										<p className="text-paragraph-xs text-text-sub-600">
+											You must have at least one verified domain with sending
+											enabled to send emails.
+										</p>
+										<Link
+											href="/domain"
+											className="inline-flex items-center gap-1 font-semibold text-paragraph-xs text-primary-base transition-colors hover:text-primary-hover hover:underline"
+										>
+											Configure Domain Settings
+											<Icon name="arrow-right" className="h-3 w-3" />
+										</Link>
+									</div>
+								) : (
+									<div className="max-h-56 overflow-y-auto">
+										{suggestions.map((item, idx) => {
+											const isSelected = idx === highlightIndex;
+											return (
+												<button
+													key={`${item.email}-${idx}`}
+													type="button"
+													role="option"
+													aria-selected={isSelected}
+													onMouseDown={(e) => {
+														e.preventDefault();
+														handleSelectSuggestion(item);
+													}}
+													onMouseEnter={() => setHighlightIndex(idx)}
+													className={cn(
+														"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors",
+														isSelected
+															? "bg-bg-weak-50 text-text-strong-950 dark:bg-bg-sub-300/40"
+															: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
+													)}
+												>
+													<div className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">
+														<span className="shrink-0 font-medium text-text-strong-950">
+															{item.name}
+														</span>
+														<span className="truncate text-text-sub-600">
+															&lt;{item.email}&gt;
+														</span>
+													</div>
+												</button>
+											);
+										})}
+									</div>
+								)}
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</div>
+			</TemplateFieldRow>
+
+			{/* Reply-To Row */}
+			<AnimatePresence initial={false}>
+				{showReplyTo && (
+					<motion.div
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						transition={{ duration: 0.2, ease: "easeInOut" }}
+						className="overflow-hidden"
+					>
+						<TemplateFieldRow
+							id="workflow-send-details-reply-to"
+							label="Reply-To"
+							className="py-2.5"
 						>
-							<Spinner size={14} />
-						</div>
-					)}
+							<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
+								<input
+									id="workflow-send-details-reply-to"
+									type="text"
+									placeholder="replyto@example.com"
+									value={replyValue}
+									onChange={(e) => {
+										setReplyValue(e.target.value);
+										onDraftChange?.({ reply: e.target.value });
+									}}
+									onBlur={handleReplyBlur}
+									onKeyDown={(e) => {
+										e.stopPropagation();
+										if (e.key === "Enter") {
+											e.currentTarget.blur();
+										}
+									}}
+									aria-label="Reply to email"
+									disabled={isSaving}
+									className="flex-1 bg-transparent text-label-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+								/>
+								{replyToError && (
+									<Tooltip.Provider delayDuration={0}>
+										<Tooltip.Root>
+											<Tooltip.Trigger asChild>
+												<button
+													type="button"
+													className="flex cursor-pointer items-center justify-center text-error-base transition-colors hover:text-error-dark"
+													tabIndex={-1}
+												>
+													<Icon name="cross-circle" className="h-4 w-4" />
+												</button>
+											</Tooltip.Trigger>
+											<Tooltip.Content
+												side="top"
+												variant="light"
+												size="medium"
+												className="max-w-[300px]"
+											>
+												<ErrorTooltipContent error={replyToError} />
+											</Tooltip.Content>
+										</Tooltip.Root>
+									</Tooltip.Provider>
+								)}
+							</div>
+						</TemplateFieldRow>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
-					{fromError && (
-						<Tooltip.Provider delayDuration={0}>
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
+			{/* Subject Row */}
+			<TemplateFieldRow
+				id="workflow-send-details-subject"
+				label="Subject"
+				required
+				className="py-2.5"
+			>
+				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
+					<input
+						id="workflow-send-details-subject"
+						type="text"
+						placeholder="Subject line..."
+						value={subjectValue}
+						onChange={handleSubjectChange}
+						onBlur={handleSubjectBlur}
+						onKeyDown={(e) => {
+							e.stopPropagation();
+							if (e.key === "Enter") {
+								e.currentTarget.blur();
+							}
+						}}
+						aria-label="Email subject"
+						disabled={isSaving}
+						className="flex-1 bg-transparent text-label-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+					/>
+					<div className="flex items-center gap-2">
+						{!showPreview && (
+							<button
+								type="button"
+								onClick={() => setShowPreview(true)}
+								className="cursor-pointer font-medium text-paragraph-xs text-text-soft-400 transition-colors hover:text-text-strong-950"
+							>
+								Preview
+							</button>
+						)}
+						<button
+							type="button"
+							className="flex h-5 w-5 items-center justify-center rounded text-text-soft-400 transition-colors hover:text-text-strong-950 focus:outline-none"
+							title="Generate with AI"
+							aria-label="Generate subject with AI"
+						>
+							<Icon name="magic-wand" className="h-3.5 w-3.5" />
+						</button>
+					</div>
+				</div>
+			</TemplateFieldRow>
+
+			{/* Preview Text Row */}
+			<AnimatePresence initial={false}>
+				{showPreview && (
+					<motion.div
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						transition={{ duration: 0.2, ease: "easeInOut" }}
+						className="overflow-hidden"
+					>
+						<TemplateFieldRow
+							id="workflow-send-details-preview-text"
+							label="Preview"
+							className="py-2.5"
+						>
+							<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
+								<input
+									id="workflow-send-details-preview-text"
+									type="text"
+									placeholder="Snippet displayed in inbox preview..."
+									value={previewTextValue}
+									onChange={handlePreviewTextChange}
+									onBlur={handlePreviewTextBlur}
+									onKeyDown={(e) => {
+										e.stopPropagation();
+										if (e.key === "Enter") {
+											e.currentTarget.blur();
+										}
+									}}
+									aria-label="Preview text"
+									disabled={isSaving}
+									className="flex-1 bg-transparent text-label-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+								/>
+								<div className="flex items-center gap-2">
 									<button
 										type="button"
-										className="flex cursor-pointer items-center justify-center text-error-base transition-colors hover:text-error-dark"
-										tabIndex={-1}
+										className="flex h-5 w-5 items-center justify-center rounded text-text-soft-400 transition-colors hover:text-text-strong-950 focus:outline-none"
+										title="Generate with AI"
+										aria-label="Generate preview text with AI"
 									>
-										<Icon name="cross-circle" className="h-4 w-4" />
+										<Icon name="magic-wand" className="h-3.5 w-3.5" />
 									</button>
-								</Tooltip.Trigger>
-								<Tooltip.Content
-									side="top"
-									variant="light"
-									size="medium"
-									className="max-w-[300px]"
-								>
-									<ErrorTooltipContent error={fromError} />
-								</Tooltip.Content>
-							</Tooltip.Root>
-						</Tooltip.Provider>
-					)}
-				</div>
-
-				{/* Suggestions Dropdown */}
-				<AnimatePresence>
-					{isDropdownOpen && (
-						<motion.div
-							id={listboxId}
-							role="listbox"
-							initial={{ opacity: 0, y: -4, scale: 0.98 }}
-							animate={{ opacity: 1, y: 0, scale: 1 }}
-							exit={{ opacity: 0, y: -4, scale: 0.98 }}
-							transition={{ duration: 0.15, ease: "easeOut" }}
-							className="nodrag absolute top-full left-0 z-50 mt-1.5 w-full min-w-[280px] max-w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
-							onMouseDown={(e) => e.stopPropagation()}
-						>
-							{isLoadingDomains && suggestions.length === 0 ? (
-								<div className="flex items-center justify-center gap-2.5 py-6 text-paragraph-xs text-text-sub-600">
-									<Spinner size={16} />
-									<span>Fetching verified sending domains...</span>
 								</div>
-							) : verifiedSendingDomains.length === 0 ? (
-								<div className="flex flex-col gap-2 p-3 text-left">
-									<div className="flex items-center gap-2 text-text-sub-600">
-										<Icon
-											name="alert-circle"
-											className="h-4 w-4 text-warning-base"
-										/>
-										<span className="font-medium text-label-xs text-text-strong-950">
-											No Sending Domains Found
-										</span>
-									</div>
-									<p className="text-paragraph-xs text-text-sub-600">
-										You must have at least one verified domain with sending
-										enabled to send emails.
-									</p>
-									<Link
-										href="/domain"
-										className="inline-flex items-center gap-1 font-semibold text-paragraph-xs text-primary-base transition-colors hover:text-primary-hover hover:underline"
-									>
-										Configure Domain Settings
-										<Icon name="arrow-right" className="h-3 w-3" />
-									</Link>
-								</div>
-							) : (
-								<div className="max-h-56 overflow-y-auto">
-									{suggestions.map((item, idx) => {
-										const isSelected = idx === highlightIndex;
-										return (
-											<button
-												key={`${item.email}-${idx}`}
-												type="button"
-												role="option"
-												aria-selected={isSelected}
-												onMouseDown={(e) => {
-													e.preventDefault();
-													handleSelectSuggestion(item);
-												}}
-												onMouseEnter={() => setHighlightIndex(idx)}
-												className={cn(
-													"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors",
-													isSelected
-														? "bg-bg-weak-50 text-text-strong-950 dark:bg-bg-sub-300/40"
-														: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
-												)}
-											>
-												<div className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">
-													<span className="shrink-0 font-medium text-text-strong-950">
-														{item.name}
-													</span>
-													<span className="truncate text-text-sub-600">
-														&lt;{item.email}&gt;
-													</span>
-												</div>
-											</button>
-										);
-									})}
-								</div>
-							)}
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</div>
-
-			{fromMissing && (
-				<p className="px-1 text-error-base text-xs">From is required</p>
-			)}
-
-			<div className="flex items-center justify-between pt-1">
-				<p className="font-medium text-sm text-text-strong-950">Reply to</p>
-			</div>
-
-			{/* Reply to input */}
-			<div
-				className={cn(
-					"nodrag relative flex w-full items-center justify-between gap-2 rounded-xl border bg-bg-white-0 px-3 py-2 text-sm transition-colors dark:border-stroke-soft-100/40 dark:bg-bg-sub-300",
-					replyToError
-						? "border-error-base"
-						: "border-stroke-soft-100 focus-within:border-blue-500 hover:border-stroke-soft-200",
-					isSaving && "opacity-60",
+							</div>
+						</TemplateFieldRow>
+					</motion.div>
 				)}
-			>
-				<input
-					type="text"
-					placeholder="Reply to (optional)"
-					value={replyValue}
-					onChange={(e) => {
-						setReplyValue(e.target.value);
-						onDraftChange?.({ reply: e.target.value });
-					}}
-					onBlur={handleReplyBlur}
-					onKeyDown={(e) => {
-						e.stopPropagation();
-						if (e.key === "Enter") {
-							e.currentTarget.blur();
-						}
-					}}
-					aria-label="Reply to email"
-					disabled={isSaving}
-					className="w-full bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-				/>
-				{replyToError && (
-					<Tooltip.Provider delayDuration={0}>
-						<Tooltip.Root>
-							<Tooltip.Trigger asChild>
-								<button
-									type="button"
-									className="flex cursor-pointer items-center justify-center text-error-base transition-colors hover:text-error-dark"
-									tabIndex={-1}
-								>
-									<Icon name="cross-circle" className="h-4 w-4" />
-								</button>
-							</Tooltip.Trigger>
-							<Tooltip.Content
-								side="top"
-								variant="light"
-								size="medium"
-								className="max-w-[300px]"
-							>
-								<ErrorTooltipContent error={replyToError} />
-							</Tooltip.Content>
-						</Tooltip.Root>
-					</Tooltip.Provider>
-				)}
-			</div>
+			</AnimatePresence>
 		</div>
 	);
 };
@@ -900,18 +1106,21 @@ const WorkflowSenderSection = ({
 const SelectedTemplateView = ({
 	templateId,
 	templateName,
+	initialStatus,
 	onBack,
 }: {
 	templateId: string;
 	templateName: string;
+	initialStatus?: Template["status"];
 	onBack: () => void;
 }) => {
 	const queryClient = useQueryClient();
-	const [tab, setTab] = useState<"preview" | "settings">("preview");
 	const [publishing, setPublishing] = useState(false);
 	const [savingSender, setSavingSender] = useState(false);
 	const [fromDraft, setFromDraft] = useState<string | null>(null);
 	const [replyDraft, setReplyDraft] = useState<string | null>(null);
+	const [subjectDraft, setSubjectDraft] = useState<string | null>(null);
+	const [previewTextDraft, setPreviewTextDraft] = useState<string | null>(null);
 
 	const detailQuery = useTemplateDetailQuery(templateId);
 	const versionsQuery = useQuery({
@@ -924,18 +1133,23 @@ const SelectedTemplateView = ({
 		[versionsQuery.data],
 	);
 	const latest = versions[0];
-	const status = detail?.status ?? "draft";
+	const status = detail?.status ?? initialStatus ?? "draft";
 	const isDraft = status !== "published";
 
 	const resolvedFrom =
 		fromDraft ?? latest?.fromEmail ?? detail?.fromEmail ?? "";
 	const resolvedReply = replyDraft ?? latest?.replyTo ?? detail?.replyTo ?? "";
+	const resolvedSubject =
+		subjectDraft ?? latest?.subject ?? detail?.subject ?? "";
+	const resolvedPreviewText =
+		previewTextDraft ?? latest?.previewText ?? detail?.previewText ?? "";
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: reset draft on templateId switch
 	useEffect(() => {
 		setFromDraft(null);
 		setReplyDraft(null);
-		setTab("preview");
+		setSubjectDraft(null);
+		setPreviewTextDraft(null);
 	}, [templateId]);
 
 	const invalidateTemplate = async () => {
@@ -953,6 +1167,8 @@ const SelectedTemplateView = ({
 	const saveSenderDirect = async (data: {
 		fromEmail: string;
 		replyTo: string;
+		subject: string;
+		previewText?: string;
 	}) => {
 		setSavingSender(true);
 		try {
@@ -963,14 +1179,20 @@ const SelectedTemplateView = ({
 				body: JSON.stringify({
 					fromEmail: data.fromEmail,
 					replyTo: data.replyTo,
+					subject: data.subject,
+					...(data.previewText !== undefined && {
+						previewText: data.previewText,
+					}),
 				}),
 			});
 			if (!res.ok) throw new Error(`Save failed (${res.status})`);
 			setFromDraft(null);
 			setReplyDraft(null);
+			setSubjectDraft(null);
+			setPreviewTextDraft(null);
 			await invalidateTemplate();
 		} catch {
-			toast.error("Failed to save sender");
+			toast.error("Failed to save template settings");
 		} finally {
 			setSavingSender(false);
 		}
@@ -978,6 +1200,10 @@ const SelectedTemplateView = ({
 
 	const handlePublish = async () => {
 		if (publishing) return;
+		if (!resolvedFrom.trim()) {
+			toast.error("From email is required before publishing");
+			return;
+		}
 		const source = latest;
 		if (!source) {
 			toast.error("Nothing to publish yet — edit the template first");
@@ -993,10 +1219,18 @@ const SelectedTemplateView = ({
 					content: source.content ?? [],
 					renderedHtml: source.renderedHtml ?? undefined,
 					subject:
-						source.subject ?? detail?.subject ?? templateName ?? undefined,
+						resolvedSubject ||
+						source.subject ||
+						detail?.subject ||
+						templateName ||
+						undefined,
 					fromEmail: resolvedFrom || undefined,
 					replyTo: resolvedReply || undefined,
-					previewText: source.previewText ?? detail?.previewText ?? undefined,
+					previewText:
+						resolvedPreviewText ||
+						source.previewText ||
+						detail?.previewText ||
+						undefined,
 					isMajor: true,
 				}),
 			});
@@ -1011,7 +1245,7 @@ const SelectedTemplateView = ({
 	};
 
 	return (
-		<div className="flex flex-col gap-2.5">
+		<div className="flex flex-col gap-3">
 			<button
 				type="button"
 				onClick={onBack}
@@ -1021,47 +1255,23 @@ const SelectedTemplateView = ({
 				<span className="max-w-[260px] truncate">{templateName}</span>
 			</button>
 
-			<div
-				role="tablist"
-				aria-label="Template view"
-				className="grid grid-cols-2 gap-1 rounded-full bg-bg-weak-50 p-1"
-			>
-				{(["preview", "settings"] as const).map((t) => (
-					<button
-						key={t}
-						type="button"
-						role="tab"
-						aria-selected={tab === t}
-						onClick={() => setTab(t)}
-						className={cn(
-							"cursor-pointer rounded-full py-1.5 font-medium text-sm capitalize transition-all",
-							tab === t
-								? "bg-bg-white-0 text-text-strong-950 shadow-sm"
-								: "text-text-sub-600 hover:text-text-strong-950",
-						)}
-					>
-						{t}
-					</button>
-				))}
-			</div>
+			<WorkflowSenderSection
+				persistedFrom={resolvedFrom}
+				persistedReply={resolvedReply}
+				persistedSubject={resolvedSubject}
+				persistedPreviewText={resolvedPreviewText}
+				onSave={saveSenderDirect}
+				isSaving={savingSender}
+				onDraftChange={(draft) => {
+					if (draft.from !== undefined) setFromDraft(draft.from);
+					if (draft.reply !== undefined) setReplyDraft(draft.reply);
+					if (draft.subject !== undefined) setSubjectDraft(draft.subject);
+					if (draft.previewText !== undefined)
+						setPreviewTextDraft(draft.previewText);
+				}}
+			/>
 
-			{isDraft ? (
-				<div className="flex items-center justify-between gap-2 rounded-xl bg-bg-weak-50 py-1.5 pr-1.5 pl-3">
-					<p className="min-w-0 flex-1 truncate text-text-sub-600 text-xs">
-						Draft template. Publish before use
-					</p>
-					<button
-						type="button"
-						onClick={() => void handlePublish()}
-						disabled={publishing || detailQuery.isLoading}
-						className="shrink-0 cursor-pointer rounded-full bg-black px-4 py-1.5 font-medium text-sm text-white transition-opacity disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-black"
-					>
-						{publishing ? "Publishing…" : "Publish"}
-					</button>
-				</div>
-			) : null}
-
-			{tab === "preview" ? (
+			<div className="relative">
 				<TemplateDetailPreview
 					key={`${templateId}-${detail?.updatedAt ?? ""}`}
 					templateId={templateId}
@@ -1069,18 +1279,25 @@ const SelectedTemplateView = ({
 					detail={detail}
 					isLoading={detailQuery.isLoading}
 				/>
-			) : (
-				<WorkflowSenderSection
-					persistedFrom={resolvedFrom}
-					persistedReply={resolvedReply}
-					onSave={saveSenderDirect}
-					isSaving={savingSender}
-					onDraftChange={(draft) => {
-						if (draft.from !== undefined) setFromDraft(draft.from);
-						if (draft.reply !== undefined) setReplyDraft(draft.reply);
-					}}
-				/>
-			)}
+				{isDraft ? (
+					<div className="absolute inset-x-2.5 bottom-2.5 z-10 flex items-center justify-between gap-2 rounded-xl border border-stroke-soft-200/80 bg-bg-white-0/90 py-1.5 pr-1.5 pl-3 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#18181f]/90">
+						<p className="min-w-0 flex-1 truncate text-text-sub-600 text-xs">
+							Draft template. Publish before use
+						</p>
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								void handlePublish();
+							}}
+							disabled={publishing || detailQuery.isLoading}
+							className="shrink-0 cursor-pointer rounded-full bg-black px-4 py-1.5 font-medium text-sm text-white transition-opacity disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-black"
+						>
+							{publishing ? "Publishing…" : "Publish"}
+						</button>
+					</div>
+				) : null}
+			</div>
 		</div>
 	);
 };
@@ -1090,18 +1307,18 @@ export const SendEmailConfigForm = ({
 	onChange,
 }: SendEmailConfigFormProps) => {
 	const templatesQuery = useTemplatesQuery();
-	const selectedName = useMemo(
-		() =>
-			templatesQuery.data?.templates.find((t) => t.id === value.templateId)
-				?.name ?? "Template",
+	const selectedTemplate = useMemo(
+		() => templatesQuery.data?.templates.find((t) => t.id === value.templateId),
 		[templatesQuery.data, value.templateId],
 	);
+	const selectedName = selectedTemplate?.name ?? "Template";
 
 	if (value.templateId) {
 		return (
 			<SelectedTemplateView
 				templateId={value.templateId}
 				templateName={selectedName}
+				initialStatus={selectedTemplate?.status}
 				onBack={() => onChange({ ...value, templateId: "" })}
 			/>
 		);

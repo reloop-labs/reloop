@@ -2,21 +2,23 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import axios from "axios";
-import {
-	AnimatePresence,
-	type AnimationPlaybackControls,
-	animate,
-	motion,
-	useMotionValue,
-} from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { useAgentInbox } from "../components/agent-inbox-provider";
 import type { AgentMailbox } from "../types";
+
+/** Light keycap so it reads on the red/destructive FancyButton fill. */
+const actionKbdOnBlueClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -28,10 +30,11 @@ export function DeleteAgentMailboxModal({
 	onDeleteSuccess?: (deletedLabel: string) => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
+	const [confirmationText, setConfirmationText] = useState("");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
-	const [isHolding, setIsHolding] = useState(false);
-	const holdProgress = useMotionValue(0);
-	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+	const [nameCopied, setNameCopied] = useState(false);
+	const inputRef = useRef<HTMLInputElement | null>(null);
+	const { deleteMailbox } = useAgentInbox();
 
 	// Cache the selected mailbox so details stay stable when the list refreshes
 	const targetMailboxRef = useRef<AgentMailbox | null>(null);
@@ -44,14 +47,27 @@ export function DeleteAgentMailboxModal({
 	const displayLabel =
 		mailboxToDelete?.label || mailboxToDelete?.email || "Address";
 	const displayEmail = mailboxToDelete?.email || "-";
+	const isConfirmed =
+		confirmationText.trim() !== "" && confirmationText.trim() === displayEmail;
+
+	const canDelete = isConfirmed && deleteState === "idle" && !!mailboxToDelete;
+
+	const handleCopyName = async () => {
+		try {
+			await navigator.clipboard.writeText(displayEmail);
+			setNameCopied(true);
+			setTimeout(() => setNameCopied(false), 1500);
+		} catch {
+			// silently fail
+		}
+	};
 
 	const handleDelete = async () => {
-		if (!mailboxToDelete || deleteState !== "idle") return;
+		if (!canDelete) return;
 		try {
 			setDeleteState("deleting");
-			await axios.delete(`/api/inbox/v1/mailboxes/${mailboxToDelete.id}`, {
-				withCredentials: true,
-			});
+			if (!mailboxToDelete) return;
+			await deleteMailbox(mailboxToDelete.id);
 			setDeleteState("success");
 
 			setTimeout(() => {
@@ -59,64 +75,59 @@ export function DeleteAgentMailboxModal({
 				onDeleteSuccess?.(displayLabel);
 				setTimeout(() => {
 					setDeleteState("idle");
+					setConfirmationText("");
+					targetMailboxRef.current = null;
 				}, 300);
-			}, 900);
+			}, 300);
 		} catch (error) {
-			const message = axios.isAxiosError(error)
-				? error.response?.data?.message || "Failed to delete address"
-				: "Failed to delete address";
+			const message =
+				error instanceof Error ? error.message : "Failed to delete address";
 			toast.error(message);
 			setDeleteState("idle");
 		}
 	};
 
-	const startHold = () => {
-		if (deleteState !== "idle") return;
-		setIsHolding(true);
-		holdProgress.set(0);
-		animationRef.current = animate(holdProgress, 1, {
-			duration: 1.2,
-			ease: "linear",
-			onComplete: () => {
-				setIsHolding(false);
-				holdProgress.set(0);
-				void handleDelete();
-			},
-		});
-	};
-
-	const cancelHold = () => {
-		if (!isHolding && holdProgress.get() === 0) return;
-		setIsHolding(false);
-		animationRef.current?.stop();
-		animate(holdProgress, 0, {
-			duration: 0.2,
-			ease: "easeOut",
-		});
-	};
-
 	useHotkeys(
-		"enter",
+		["enter", "mod+enter"],
 		(e) => {
 			e.preventDefault();
-			if (mailboxToDelete && deleteState === "idle") {
+			if (canDelete) {
 				void handleDelete();
 			}
 		},
-		{ enabled: !!deleteId },
+		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
 	);
 
+	useHotkeys(
+		"escape",
+		() => {
+			if (deleteState === "idle") {
+				void setDeleteId(null);
+			}
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
+	);
+
+	// Keep a ref so onOpenChange can read the latest deleteState without stale closure
 	const deleteStateRef = useRef(deleteState);
 	useEffect(() => {
 		deleteStateRef.current = deleteState;
 	}, [deleteState]);
+
+	const handleClose = () => {
+		if (deleteState !== "idle") return;
+		void setDeleteId(null);
+		setTimeout(() => {
+			setDeleteState("idle");
+			setConfirmationText("");
+		}, 300);
+	};
 
 	return (
 		<Modal.Root
 			open={!!deleteId}
 			onOpenChange={(open) => {
 				if (!open) {
-					cancelHold();
 					if (deleteStateRef.current === "success") {
 						const name =
 							targetMailboxRef.current?.label ||
@@ -127,89 +138,147 @@ export function DeleteAgentMailboxModal({
 					void setDeleteId(null);
 					setTimeout(() => {
 						setDeleteState("idle");
+						setConfirmationText("");
 						targetMailboxRef.current = null;
 					}, 300);
 				}
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
-				showClose={true}
+				className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 p-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
+				showClose={false}
+				onOpenAutoFocus={(e) => {
+					e.preventDefault();
+					setTimeout(() => {
+						inputRef.current?.focus();
+					}, 0);
+				}}
 			>
-				<div className="pr-6">
-					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-						Delete address
-					</Modal.Title>
-					<p className="text-sm text-text-sub-600 leading-relaxed">
-						Are you sure you want to delete this address? This action cannot be
-						undone.
-					</p>
-				</div>
-
-				<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
-					<div>
-						<p className="font-normal text-text-sub-600 text-xs">Name</p>
-						<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-							{displayLabel}
-						</p>
+				{/* Inner card, mirrors CreateCampaignModal but lighter, no red box */}
+				<div className="relative m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 pt-5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+					{/* Header: clean title only, no repetitive description */}
+					<div className="flex items-start justify-between gap-4 px-6">
+						<div className="flex items-center gap-2">
+							<Icon name="trash" className="size-4 text-text-sub-600" />
+							<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight">
+								Delete address
+							</Modal.Title>
+						</div>
+						<button
+							type="button"
+							onClick={handleClose}
+							aria-label="Close"
+							disabled={deleteState !== "idle"}
+							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 active:scale-[0.95] disabled:opacity-50 dark:bg-transparent dark:hover:bg-white/[0.05]"
+						>
+							<X className="size-3.5" strokeWidth={2.25} />
+						</button>
 					</div>
-					<div>
-						<p className="font-normal text-text-sub-600 text-xs">
-							Email address
+
+					<div className="space-y-4 px-6 pb-6">
+						{/* Lightweight context: address + consequence, no red outline/background */}
+						<p className="text-sm text-text-sub-600 leading-relaxed">
+							Permanently deletes{" "}
+							<span className="inline-flex items-center rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium font-mono text-text-strong-950 text-xs dark:bg-white/[0.06]">
+								{displayEmail}
+							</span>{" "}
+							and everything in it.{" "}
+							<span className="font-medium text-text-strong-950">
+								This cannot be undone.
+							</span>
 						</p>
-						<p className="mt-0.5 truncate font-medium font-mono text-sm text-text-strong-950">
-							{displayEmail}
-						</p>
+
+						{/* Confirmation Input */}
+						<div className="space-y-2">
+							<Label.Root
+								htmlFor="delete-mailbox-confirmation"
+								className="flex flex-wrap items-center gap-1.5"
+							>
+								<span>Type</span>
+								<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium font-mono text-[12px] text-text-strong-950 dark:bg-bg-weak-50/20">
+									{displayEmail}
+									<button
+										type="button"
+										onClick={(e) => {
+											e.preventDefault();
+											void handleCopyName();
+										}}
+										className="-mr-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors"
+										aria-label={`Copy ${displayEmail}`}
+										title="Copy email"
+									>
+										<AnimatePresence mode="popLayout" initial={false}>
+											<motion.span
+												key={nameCopied ? "check" : "copy"}
+												initial={{ opacity: 0, scale: 0.6 }}
+												animate={{ opacity: 1, scale: 1 }}
+												exit={{ opacity: 0, scale: 0.6 }}
+												transition={{
+													type: "spring",
+													duration: 0.2,
+													bounce: 0.3,
+												}}
+												className="flex items-center justify-center"
+											>
+												<Icon
+													name={nameCopied ? "check" : "copy"}
+													className={cn(
+														"h-3 w-3",
+														nameCopied ? "text-green-500" : "text-text-sub-600",
+													)}
+												/>
+											</motion.span>
+										</AnimatePresence>
+									</button>
+								</span>
+								<span>to confirm</span>
+							</Label.Root>
+							<Input.Root size="medium">
+								<Input.Wrapper>
+									<Input.Input
+										ref={inputRef}
+										id="delete-mailbox-confirmation"
+										value={confirmationText}
+										onChange={(e) => setConfirmationText(e.target.value)}
+										placeholder={displayEmail}
+										disabled={deleteState !== "idle"}
+										autoComplete="off"
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
 					</div>
 				</div>
 
-				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-					<span className="font-bold text-[#6D4000] dark:text-amber-100">
-						Warning:
-					</span>{" "}
-					Deleting this address permanently removes the inbox and all of its
-					messages, drafts, and labels. Integrations using this address will
-					stop receiving mail immediately.
-				</div>
-
-				<div className="mt-6 flex items-center justify-end gap-3">
+				{/* Footer Actions outside inner card, like CreateCampaignModal */}
+				<div className="relative flex items-center justify-between gap-3 px-3 pt-2 pb-3">
 					<Button.Root
 						type="button"
 						variant="neutral"
 						mode="ghost"
 						size="small"
-						onClick={() => {
-							if (deleteState === "idle") {
-								cancelHold();
-								void setDeleteId(null);
-								setDeleteState("idle");
-							}
-						}}
+						onClick={handleClose}
 						className={cn(
-							"transition-opacity duration-200",
+							"gap-1.5 transition-opacity duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-50",
 						)}
 					>
 						Cancel
+						<ActionKbd className="lowercase! w-auto min-w-0 px-1">
+							esc
+						</ActionKbd>
 					</Button.Root>
 					<FancyButton.Root
 						type="button"
 						variant="destructive"
 						size="small"
-						onPointerDown={startHold}
-						onPointerUp={cancelHold}
-						onPointerLeave={cancelHold}
-						onPointerCancel={cancelHold}
+						disabled={!canDelete}
+						onClick={() => void handleDelete()}
 						className={cn(
 							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-90",
 						)}
 					>
-						<motion.div
-							className="pointer-events-none absolute inset-0 origin-left bg-white/25"
-							style={{ scaleX: holdProgress }}
-						/>
-
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
 								key={deleteState}
@@ -218,9 +287,18 @@ export function DeleteAgentMailboxModal({
 									duration: 0.25,
 									bounce: 0,
 								}}
-								initial={{ opacity: 0, y: -14 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 14 }}
+								initial={{
+									opacity: 0,
+									y: -14,
+								}}
+								animate={{
+									opacity: 1,
+									y: 0,
+								}}
+								exit={{
+									opacity: 0,
+									y: 14,
+								}}
 								className="relative z-10 flex items-center justify-center gap-1.5"
 							>
 								{deleteState === "deleting" ? (
@@ -237,7 +315,12 @@ export function DeleteAgentMailboxModal({
 										<span>Deleted</span>
 									</>
 								) : (
-									<span>Hold to delete</span>
+									<>
+										Delete address
+										<ActionKbd className={actionKbdOnBlueClassName}>
+											↵
+										</ActionKbd>
+									</>
 								)}
 							</motion.span>
 						</AnimatePresence>

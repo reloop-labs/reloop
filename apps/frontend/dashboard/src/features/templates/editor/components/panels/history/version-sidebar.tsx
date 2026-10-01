@@ -301,8 +301,13 @@ function PublishVersionModal({
 	);
 }
 
-const fetcher = (url: string) =>
-	fetch(url, { credentials: "include" }).then((res) => res.json());
+const fetcher = async (url: string) => {
+	const res = await fetch(url, { credentials: "include" });
+	if (!res.ok) {
+		throw new Error(`Failed to fetch: ${res.statusText}`);
+	}
+	return res.json();
+};
 
 function formatRelativeTime(dateStr: string) {
 	const date = new Date(dateStr);
@@ -543,7 +548,7 @@ export function VersionSidebar() {
 	};
 
 	// Clean list containing all versions
-	const currentList = versions || [];
+	const currentList = Array.isArray(versions) ? versions : [];
 
 	const majorVersions = currentList.filter((v) => v.isMajor);
 

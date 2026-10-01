@@ -17,8 +17,13 @@ import type { ConnectionStatus as ConnectionStatusType } from "../../collobratio
 import { TestEmailModal } from "../panels/test/test-email-modal";
 import { PublishTemplateModal } from "./publish-template-modal";
 
-const fetcher = (url: string) =>
-	fetch(url, { credentials: "include" }).then((res) => res.json());
+const fetcher = async (url: string) => {
+	const res = await fetch(url, { credentials: "include" });
+	if (!res.ok) {
+		throw new Error(`Failed to fetch: ${res.statusText}`);
+	}
+	return res.json();
+};
 
 interface HeaderActionsProps {
 	connectionStatus: ConnectionStatusType;
@@ -58,7 +63,9 @@ export const HeaderActions = ({
 		templateId ? `/api/template/v1/${templateId}` : null,
 		fetcher,
 	);
-	const latestPublished = versions?.find((v) => v.isMajor) ?? null;
+	const latestPublished = Array.isArray(versions)
+		? (versions.find((v) => v.isMajor) ?? null)
+		: null;
 
 	const handlePublish = async (description?: string) => {
 		if (!editor || !templateId || isPublishing) return;

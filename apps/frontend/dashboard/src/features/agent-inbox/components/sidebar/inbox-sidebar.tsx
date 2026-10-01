@@ -2,8 +2,9 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Check, Copy, Pencil, Plus } from "lucide-react";
+import { Check, Copy, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -90,6 +91,7 @@ export const InboxSidebar = ({
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
 	const [isLabelDialogOpen, setIsLabelDialogOpen] = useState(false);
 	const [emailCopied, setEmailCopied] = useState(false);
+	const [, setDeleteId] = useQueryState("delete", parseAsString);
 
 	const handleCopyEmail = async (e?: React.MouseEvent) => {
 		e?.stopPropagation();
@@ -207,25 +209,38 @@ export const InboxSidebar = ({
 				>
 					{!collapsed ? (
 						mailbox.email ? (
-							<button
-								type="button"
-								onClick={handleCopyEmail}
-								title={`Click to copy ${mailbox.email}`}
-								className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
-							>
-								<PixelAvatarTile
-									seed={mailbox.email || "Inbox"}
-									className="size-5"
-								/>
-								<span className="truncate font-semibold text-[13px] text-text-strong-950">
-									{mailbox.email || mailbox.label || "Inbox"}
-								</span>
-								{emailCopied ? (
-									<Check className="size-3 shrink-0 text-emerald-500" />
-								) : (
-									<Copy className="size-3 shrink-0 text-text-sub-600 transition-opacity" />
+							<div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+								<button
+									type="button"
+									onClick={handleCopyEmail}
+									title={`Click to copy ${mailbox.email}`}
+									className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md text-left transition-opacity hover:opacity-80"
+								>
+									<PixelAvatarTile
+										seed={mailbox.email || "Inbox"}
+										className="size-5"
+									/>
+									<span className="truncate font-semibold text-[13px] text-text-strong-950">
+										{mailbox.email || mailbox.label || "Inbox"}
+									</span>
+									{emailCopied ? (
+										<Check className="size-3 shrink-0 text-emerald-500" />
+									) : (
+										<Copy className="size-3 shrink-0 text-text-sub-600 transition-opacity" />
+									)}
+								</button>
+								{mailboxReady && (
+									<button
+										type="button"
+										onClick={() => void setDeleteId(mailbox.id)}
+										title={`Delete ${mailbox.email}`}
+										aria-label={`Delete ${mailbox.email}`}
+										className="flex size-6 shrink-0 items-center justify-center rounded-md text-text-sub-600 opacity-0 transition-all hover:bg-red-500/10 hover:text-error-base focus:opacity-100 focus-visible:opacity-100 group-hover:opacity-100 [aside:hover_&]:opacity-100"
+									>
+										<Trash2 className="size-3.5" />
+									</button>
 								)}
-							</button>
+							</div>
 						) : (
 							<Skeleton className="h-4 w-36 rounded" />
 						)

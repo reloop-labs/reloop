@@ -168,6 +168,7 @@ interface AgentInboxContextValue {
 	getMailbox: (id: string) => AgentMailbox | undefined;
 	addMailbox: (input: NewAgentAddressInput) => Promise<AgentMailbox>;
 	updateMailboxDisplayName: (id: string, displayName: string) => Promise<void>;
+	deleteMailbox: (id: string) => Promise<void>;
 	refresh: () => Promise<void>;
 	markMessageRead: (
 		id: string,
@@ -875,6 +876,33 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					current?.map((mb) =>
 						mb.id === id ? { ...mb, displayName: trimmed } : mb,
 					),
+				{ revalidate: true },
+			);
+		},
+		[mutateMailboxes],
+	);
+
+	const deleteMailbox = useCallback(
+		async (id: string) => {
+			const res = await apiFetch(
+				`/api/inbox/v1/mailboxes/${encodeURIComponent(id)}`,
+				{ method: "DELETE" },
+			);
+
+			if (!res.ok) {
+				const body = await res.text();
+				let message = "Failed to delete mailbox";
+				try {
+					const parsed = JSON.parse(body) as { message?: string };
+					if (parsed.message) message = parsed.message;
+				} catch {
+					if (body) message = body;
+				}
+				throw new Error(message);
+			}
+
+			await mutateMailboxes(
+				(current) => current?.filter((mb) => mb.id !== id),
 				{ revalidate: true },
 			);
 		},
@@ -1597,6 +1625,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			getMailbox,
 			addMailbox,
 			updateMailboxDisplayName,
+			deleteMailbox,
 			refresh,
 			markMessageRead,
 			deleteMessage,
@@ -1635,6 +1664,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			getMailbox,
 			addMailbox,
 			updateMailboxDisplayName,
+			deleteMailbox,
 			refresh,
 			markMessageRead,
 			deleteMessage,

@@ -4,10 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
+import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { InboxSupportPanel } from "#/features/agent-inbox/components/layout/inbox-support-panel";
 import { InboxTopNavbar } from "#/features/agent-inbox/components/layout/inbox-top-navbar";
 import { MailboxRail } from "#/features/agent-inbox/components/mailbox-rail/mailbox-rail";
 import { InboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar";
+import { DeleteAgentMailboxModal } from "#/features/agent-inbox/modals/delete-agent-mailbox-modal";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 
@@ -23,6 +25,7 @@ export const AgentInboxLayoutWrapper = ({
 	const router = useRouter();
 	const [isAddOpen, setIsAddOpen] = useState(false);
 	const { data: billing } = useBillingUsage();
+	const { mailboxes, refresh } = useAgentInbox();
 	const inboxUsed = billing?.resources?.agentInboxes.used ?? 0;
 	const inboxLimit = billing?.resources?.agentInboxes.limit ?? null;
 	const atInboxCap =
@@ -63,6 +66,17 @@ export const AgentInboxLayoutWrapper = ({
 				onCreated={(created) => {
 					toast.success("Mailbox added");
 					router.push(`/inbox?mailboxId=${encodeURIComponent(created.id)}`);
+				}}
+			/>
+			<DeleteAgentMailboxModal
+				mailboxes={mailboxes}
+				onDeleteSuccess={(name) => {
+					toast.success(`Address "${name}" has been successfully deleted.`);
+					void refresh().then(() => {
+						// If the active mailbox was deleted, fall back to the inbox root
+						// so the next available mailbox is auto-selected.
+						router.push("/inbox");
+					});
 				}}
 			/>
 		</div>

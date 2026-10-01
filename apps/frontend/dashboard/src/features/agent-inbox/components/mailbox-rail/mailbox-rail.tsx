@@ -3,6 +3,7 @@
 import { Icon } from "@reloop/ui/icon";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
@@ -40,10 +41,12 @@ const RailMailboxAvatar = ({
 	mailbox,
 	active,
 	onClick,
+	onDelete,
 }: {
 	mailbox: AgentMailbox;
 	active: boolean;
 	onClick: () => void;
+	onDelete: () => void;
 }) => {
 	const displayName = mailbox.label || mailbox.email.split("@")[0] || "Inbox";
 
@@ -52,7 +55,11 @@ const RailMailboxAvatar = ({
 			<button
 				type="button"
 				onClick={onClick}
-				title={`${displayName} (${mailbox.email})`}
+				onContextMenu={(e) => {
+					e.preventDefault();
+					onDelete();
+				}}
+				title={`${displayName} (${mailbox.email}) — right-click to delete`}
 				aria-label={`${displayName} (${mailbox.email})`}
 				aria-current={active ? "true" : undefined}
 				className="relative flex shrink-0 cursor-pointer items-center justify-center p-0.5 transition-transform duration-150 ease-out focus:outline-none active:scale-[0.96]"
@@ -67,7 +74,7 @@ const RailMailboxAvatar = ({
 						/>
 					</div>
 					{active && (
-						<span className="-right-1 -bottom-1 absolute z-10 rounded-full bg-primary-base p-px shadow ring-2 ring-bg-white-0 dark:bg-white! dark:text-white dark:ring-black">
+						<span className="absolute -right-1 -bottom-1 z-10 rounded-full bg-primary-base p-px shadow ring-2 ring-bg-white-0 dark:bg-white! dark:text-white dark:ring-black">
 							<CircleCheckBadge className="block size-2.5 text-white dark:text-black" />
 						</span>
 					)}
@@ -91,6 +98,7 @@ export function MailboxRail({
 	const router = useRouter();
 	const { mailboxes, isLoadingMailboxes, mailboxesError, retryMailboxes } =
 		useAgentInbox();
+	const [, setDeleteId] = useQueryState("delete", parseAsString);
 
 	const sortedMailboxes = useMemo(
 		() =>
@@ -137,6 +145,7 @@ export function MailboxRail({
 								mailbox={m}
 								active={m.id === activeMailboxId}
 								onClick={() => switchMailbox(m.id)}
+								onDelete={() => void setDeleteId(m.id)}
 							/>
 						))}
 

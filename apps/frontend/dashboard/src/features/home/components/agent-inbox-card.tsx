@@ -50,20 +50,32 @@ interface MailboxActionsDropdownProps {
 const MailboxActionsDropdown = ({
 	mailbox,
 	onOpenChange,
-}: MailboxActionsDropdownProps) => {
+	onDelete,
+}: MailboxActionsDropdownProps & {
+	onDelete: (mailbox: BackendMailbox) => void;
+}) => {
 	const [open, setOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const router = useRouter();
 
 	const menuItems = [
-		{ id: "view", label: "View inbox", icon: "inbox" },
-		{ id: "copy-email", label: "Copy email address", icon: "copy" },
-		{ id: "copy-id", label: "Copy mailbox ID", icon: "copy" },
+		{ id: "view", label: "View inbox", icon: "inbox", isDanger: false },
+		{
+			id: "copy-email",
+			label: "Copy email address",
+			icon: "copy",
+			isDanger: false,
+		},
+		{ id: "copy-id", label: "Copy mailbox ID", icon: "copy", isDanger: false },
+		{ id: "delete", label: "Delete address", icon: "trash", isDanger: true },
 	] as const;
 
 	const currentBtn = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentBtn?.getBoundingClientRect();
+	const isDanger =
+		(menuItems[hoverIdx ?? -1] as { isDanger?: boolean } | undefined)
+			?.isDanger ?? false;
 
 	const handleOpenChange = (val: boolean) => {
 		setOpen(val);
@@ -80,6 +92,8 @@ const MailboxActionsDropdown = ({
 		} else if (itemId === "copy-id") {
 			navigator.clipboard.writeText(mailbox.id);
 			toast.success("Mailbox ID copied");
+		} else if (itemId === "delete") {
+			onDelete(mailbox);
 		}
 	};
 
@@ -111,7 +125,12 @@ const MailboxActionsDropdown = ({
 							onPointerEnter={() => setHoverIdx(idx)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={(e) => handleClick(item.id, e)}
-							className="relative z-10 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+							className={cn(
+								"relative z-10 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs transition-colors",
+								item.isDanger
+									? "text-error-base hover:text-error-base"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
+							)}
 						>
 							<Icon name={item.icon as any} className="h-3.5 w-3.5 shrink-0" />
 							{item.label}
@@ -120,6 +139,7 @@ const MailboxActionsDropdown = ({
 					<AnimatedHoverBackground
 						rect={currentRect}
 						tabElement={currentBtn}
+						isDanger={isDanger}
 						className="bg-bg-weak-50 dark:bg-white/[0.04]"
 					/>
 				</div>
@@ -132,6 +152,7 @@ const MailboxActionsDropdown = ({
 
 export function AgentInboxCard() {
 	const { activeOrganization } = useActiveOrganization();
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const { data: mailboxesData } = useSWR<BackendMailbox[]>(
@@ -139,6 +160,11 @@ export function AgentInboxCard() {
 	);
 
 	const mailboxes = mailboxesData ?? [];
+
+	const handleDeleteFromHome = (mailbox: BackendMailbox) => {
+		// Deletion is confirmed + executed inside /inbox via the global modal.
+		router.push(`/inbox?delete=${encodeURIComponent(mailbox.id)}`);
+	};
 
 	return (
 		<div className="group flex w-full flex-col">
@@ -243,6 +269,7 @@ export function AgentInboxCard() {
 									>
 										<MailboxActionsDropdown
 											mailbox={mb}
+											onDelete={handleDeleteFromHome}
 											onOpenChange={(val) => {
 												if (val) {
 													setActiveDropdownId(mb.id);
