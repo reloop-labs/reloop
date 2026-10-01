@@ -88,6 +88,13 @@ export const domain = pgTable(
 		verificationFailedReason: text("verification_failed_reason"),
 		deletedAt: timestamp("deleted_at"),
 		lastVerifiedAt: timestamp("last_verified_at"),
+		/**
+		 * Registrar registration date (RDAP `registration` event), captured
+		 * once at domain creation. Drives the new-domain daily send cap.
+		 * Never dropped — production holds 119 domains of history here.
+		 */
+		registeredAt: timestamp("registered_at"),
+		registrationAgeCheckedAt: timestamp("registration_age_checked_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
 			.notNull()
@@ -104,6 +111,7 @@ export const domain = pgTable(
 		index("domain_idx_created_at").on(table.createdAt),
 		index("domain_idx_deleted_at").on(table.deletedAt),
 		index("domain_idx_last_verified_at").on(table.lastVerifiedAt),
+		index("domain_idx_registered_at").on(table.registeredAt),
 		index("domain_idx_org_status").on(table.organizationId, table.status),
 		index("domain_idx_org_deleted").on(table.organizationId, table.deletedAt),
 		index("domain_idx_user_status").on(table.userId, table.status),

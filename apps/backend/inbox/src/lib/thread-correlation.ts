@@ -390,7 +390,7 @@ export async function ensureOutboundThreadForEmailLog({
 				fromName: logRow.fromName ?? undefined,
 				subject: logRow.subject,
 				textBody: logRow.textBody || "",
-				messageId: logRow.messageId || "",
+				messageId: logRow.rfcMessageId || logRow.messageId || "",
 				inReplyTo: headerInReplyTo,
 				sentAt: messageAt,
 			});
@@ -418,7 +418,7 @@ export async function ensureOutboundThreadForEmailLog({
 				fromName: logRow.fromName ?? undefined,
 				subject: logRow.subject,
 				textBody: logRow.textBody || "",
-				messageId: logRow.messageId || "",
+				messageId: logRow.rfcMessageId || logRow.messageId || "",
 				sentAt: messageAt,
 			});
 			return { threadId: subjectMatch.id, created: false };
@@ -457,7 +457,7 @@ export async function ensureOutboundThreadForEmailLog({
 		subject: logRow.subject,
 		preview,
 		messageAt,
-		rfc822MessageId: logRow.messageId || undefined,
+		rfc822MessageId: logRow.rfcMessageId || logRow.messageId || undefined,
 	});
 
 	log.info(

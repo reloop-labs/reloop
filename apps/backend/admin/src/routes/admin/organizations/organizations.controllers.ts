@@ -263,6 +263,7 @@ export async function getOrganizationController(organizationId: string) {
 				status: domain.status,
 				systemVerified: domain.systemVerified,
 				createdAt: domain.createdAt,
+				registeredAt: domain.registeredAt,
 			})
 			.from(domain)
 			.where(
@@ -463,7 +464,10 @@ export async function getOrganizationController(organizationId: string) {
 	);
 	const enrichedDomains = await Promise.all(
 		domains.map(async (d) => {
-			const registrarCreatedAtStr = await getRegistrarCreationDate(d.domain);
+			// Prefer age captured at creation; live RDAP only when not stored.
+			const stored = d.registeredAt ? new Date(d.registeredAt) : null;
+			const registrarCreatedAtStr =
+				stored?.toISOString() ?? (await getRegistrarCreationDate(d.domain));
 			const ageDays = registrarCreatedAtStr
 				? getDomainAgeDays(new Date(registrarCreatedAtStr), new Date())
 				: getDomainAgeDays(d.createdAt, new Date());
@@ -480,7 +484,7 @@ export async function getOrganizationController(organizationId: string) {
 				dailyCap,
 				sentToday: sentTodayForDomain,
 				remaining,
-				source: registrarCreatedAtStr ? "rdap" : "reloop",
+				source: stored ? "stored" : registrarCreatedAtStr ? "rdap" : "reloop",
 			};
 		}),
 	);

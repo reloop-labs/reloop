@@ -66,6 +66,7 @@ export async function saveOnboardingCustomerEmailLog({
 						recipientMatch,
 						or(
 							eq(emailLog.messageId, providerMessageId.trim()),
+							eq(emailLog.rfcMessageId, providerMessageId.trim()),
 							eq(emailLog.providerMessageId, providerMessageId.trim()),
 						),
 					),

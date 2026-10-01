@@ -66,6 +66,7 @@ export const sendEmailRoute = new Elysia()
 				cookie: request.headers.get("cookie"),
 				requestApiKey,
 				useInternalInject,
+				idempotencyKey: request.headers.get("idempotency-key"),
 			});
 		},
 		{

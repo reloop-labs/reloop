@@ -4,6 +4,7 @@ import { getDomain, getPublicSuffix } from "tldts";
 import { db } from "./client";
 import { rdapEndpointsForDomain } from "./rdap-registry";
 import { utcDayStart } from "./reserve-send-credits";
+import { domain as domainTable } from "./schema/domain";
 import { emailLog } from "./schema/email";
 
 /**
@@ -274,7 +275,13 @@ export async function getRegistrarAgeDays(
 }
 
 export async function checkDomainAgeDailyCap(args: {
-	domain: { id: string; domain: string; createdAt: Date | string };
+	domain: {
+		id: string;
+		domain: string;
+		createdAt: Date | string;
+		/** Stored registrar date (captured at domain creation). Skips live RDAP. */
+		registeredAt?: Date | string | null;
+	};
 	recipientCount: number;
 	now?: Date;
 }): Promise<{
@@ -283,20 +290,44 @@ export async function checkDomainAgeDailyCap(args: {
 	ageDays: number;
 	sentToday: number;
 	registrarCreationDate: string | null;
-	source: "rdap" | "reloop";
+	source: "stored" | "rdap" | "reloop";
 }> {
 	const now = args.now ?? new Date();
-	const registrarCreatedAt = await getRegistrarCreationDate(args.domain.domain);
 	let ageDays: number;
-	let source: "rdap" | "reloop";
-	let registrarCreationDate: string | null = registrarCreatedAt;
-	if (registrarCreatedAt) {
-		ageDays = getDomainAgeDays(new Date(registrarCreatedAt), now);
-		source = "rdap";
+	let source: "stored" | "rdap" | "reloop";
+	let registrarCreationDate: string | null;
+	if (args.domain.registeredAt) {
+		// Preferred: captured once via RDAP at domain creation.
+		const stored = new Date(args.domain.registeredAt);
+		registrarCreationDate = stored.toISOString();
+		ageDays = getDomainAgeDays(stored, now);
+		source = "stored";
 	} else {
-		ageDays = getDomainAgeDays(new Date(args.domain.createdAt), now);
-		source = "reloop";
-		registrarCreationDate = null;
+		const registrarCreatedAt =
+			await getRegistrarCreationDate(args.domain.domain);
+		if (registrarCreatedAt) {
+			ageDays = getDomainAgeDays(new Date(registrarCreatedAt), now);
+			source = "rdap";
+			registrarCreationDate = registrarCreatedAt;
+			// Write-back: persist the live lookup so the next send reads
+			// the stored value. Fire-and-forget — a lost write just retries
+			// on the next send; the send itself never fails because of this.
+			const created = new Date(registrarCreatedAt);
+			if (!Number.isNaN(created.getTime())) {
+				void db
+					.update(domainTable)
+					.set({
+						registeredAt: created,
+						registrationAgeCheckedAt: now,
+					})
+					.where(eq(domainTable.id, args.domain.id))
+					.catch(() => {});
+			}
+		} else {
+			ageDays = getDomainAgeDays(new Date(args.domain.createdAt), now);
+			source = "reloop";
+			registrarCreationDate = null;
+		}
 	}
 	const cap = getDomainInitialDailyCap(ageDays);
 	if (cap === null)

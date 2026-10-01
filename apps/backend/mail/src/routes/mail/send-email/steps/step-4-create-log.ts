@@ -1,9 +1,10 @@
 import { serializeSendAttachments } from "@reloop/be-mail/lib/email-log-attachments";
-import { MailErrors } from "@reloop/be-mail/lib/errors";
+import { IdempotentReplayError, MailErrors } from "@reloop/be-mail/lib/errors";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { sourceFromTags } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
+import { and, eq } from "drizzle-orm";
 
 function parseFromName(from: string): string {
 	// Handle "Display Name <email@domain.com>" format (incl. nested wrappers)
@@ -43,18 +44,24 @@ export async function createEmailLog_step4({
 	body,
 	apikeyId,
 	userId,
+	idempotencyKey,
 }: {
 	organizationId: string;
 	domainId: string;
 	body: MailModel.SendEmailBody;
 	apikeyId?: string;
 	userId?: string;
+	idempotencyKey?: string;
 }) {
-	const [logRecord] = await db
-		.insert(emailLog)
-		.values({
-			messageId: `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-			organizationId,
+	const key = idempotencyKey?.trim().slice(0, 500) || undefined;
+	let logRecord: { id: string } | undefined;
+	try {
+		[logRecord] = await db
+			.insert(emailLog)
+			.values({
+				messageId: `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+				idempotencyKey: key,
+				organizationId,
 			domainId: domainId,
 			userId: resolveLogUserId(userId),
 			apikeyId,
@@ -85,6 +92,23 @@ export async function createEmailLog_step4({
 			size: (body.text?.length || 0) + (body.html?.length || 0),
 		})
 		.returning({ id: emailLog.id });
+	} catch (error) {
+		// Concurrent same-key send won the race — hand the winner's id back
+		// so the caller refunds its reservation and returns the original.
+		const code = (error as { code?: string })?.code;
+		const msg = error instanceof Error ? error.message : String(error);
+		if (key && (code === "23505" || msg.includes("duplicate key"))) {
+			const winner = await db.query.emailLog.findFirst({
+				where: and(
+					eq(emailLog.organizationId, organizationId),
+					eq(emailLog.idempotencyKey, key),
+				),
+				columns: { id: true },
+			});
+			if (winner) throw new IdempotentReplayError(winner.id);
+		}
+		throw error;
+	}
 
 	if (!logRecord) {
 		throw MailErrors.databaseError("Failed to create email log record");

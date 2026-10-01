@@ -4,7 +4,7 @@ import {
 	refundCreditsForFailedSend,
 	reserveCreditsForSend,
 } from "@reloop/be-mail/lib/credits-gate";
-import { MailErrors } from "@reloop/be-mail/lib/errors";
+import { IdempotentReplayError, MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
 import {
 	assertAttachmentsWithinPlan,
@@ -15,8 +15,8 @@ import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
-import { emailThread, threadMessage } from "@reloop/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { emailLog, emailThread, threadMessage } from "@reloop/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import {
@@ -40,6 +40,35 @@ function parseFromName(from: string): string {
 	return from.split("@")[0] ?? from;
 }
 
+function normalizeIdempotencyKey(value?: string | null): string | undefined {
+	const key = value?.trim().slice(0, 500);
+	return key || undefined;
+}
+
+async function findIdempotentSend({
+	organizationId,
+	idempotencyKey,
+}: {
+	organizationId: string;
+	idempotencyKey: string;
+}): Promise<MailModel.SendEmailResponse | null> {
+	const row = await db.query.emailLog.findFirst({
+		where: and(
+			eq(emailLog.organizationId, organizationId),
+			eq(emailLog.idempotencyKey, idempotencyKey),
+		),
+		columns: { id: true, messageId: true, status: true, createdAt: true },
+	});
+	if (!row) return null;
+	return {
+		success: true,
+		messageId: row.messageId,
+		status: row.status,
+		timestamp: row.createdAt.toISOString(),
+		id: row.id,
+	};
+}
+
 export async function sendEmailController({
 	organizationId,
 	body: rawBody,
@@ -49,6 +78,7 @@ export async function sendEmailController({
 	cookie,
 	requestApiKey,
 	useInternalInject = false,
+	idempotencyKey: rawKey,
 }: {
 	organizationId: string;
 	body: MailModel.SendEmailBody;
@@ -58,6 +88,7 @@ export async function sendEmailController({
 	cookie?: string | null;
 	requestApiKey?: string | null;
 	useInternalInject?: boolean;
+	idempotencyKey?: string | null;
 }): Promise<MailModel.SendEmailResponse> {
 	const logger = useLogger();
 	logger.set({
@@ -66,6 +97,28 @@ export async function sendEmailController({
 		to: rawBody.to,
 	});
 	log.info("server", "Initiating email send process");
+
+	// ── Idempotency ───────────────────────────────────────────────────────
+	// Header Idempotency-Key wins, body idempotency_key is the fallback.
+	// Replays return the original send without reserving credits or
+	// re-injecting to KumoMTA. Checked before any side effects.
+	const idempotencyKey =
+		normalizeIdempotencyKey(rawKey) ??
+		normalizeIdempotencyKey(rawBody.idempotency_key);
+	if (idempotencyKey) {
+		const replay = await findIdempotentSend({
+			organizationId,
+			idempotencyKey,
+		});
+		if (replay) {
+			log.info({
+				message: "Idempotent replay — returning original send",
+				organizationId,
+				emailLogId: replay.id,
+			});
+			return replay;
+		}
+	}
 
 	// ── Plan size gate ──────────────────────────────────────────────────
 	// Fail fast on per-plan attachment limits (free 1 MB, paid 5 MB) before
@@ -189,7 +242,8 @@ export async function sendEmailController({
 	);
 
 	// ── Domain-age initial daily cap (all packages) ───────────────────────
-	// Uses registrar registration age via RDAP (domain age checker tool), not Reloop added date
+	// Prefers registrar age captured at domain creation (stored); falls back
+	// to live RDAP, then Reloop added date.
 	// 0–1d:20, 2–3d:50, 4–7d:100, 8–14d:250, 15–30d:500, 30+d:dynamic
 	const recipientCount = countEmailRecipients(body);
 	const ageCheck = await checkDomainAgeDailyCap({
@@ -197,6 +251,7 @@ export async function sendEmailController({
 			id: currentDomain.id,
 			domain: currentDomain.domain,
 			createdAt: currentDomain.createdAt,
+			registeredAt: currentDomain.registeredAt,
 		},
 		recipientCount,
 	});
@@ -231,11 +286,34 @@ export async function sendEmailController({
 			useInternalInject,
 			maxAttachmentBytes,
 			planId,
+			idempotencyKey,
 			onInjected: () => {
 				injected = true;
 			},
 		});
 	} catch (error) {
+		// Lost the concurrent same-key race: the winner already sent.
+		// Reservation is refunded below (nothing injected), then return
+		// the winner's response instead of surfacing an error.
+		if (error instanceof IdempotentReplayError) {
+			if (!injected) {
+				await refundCreditsForFailedSend(reservation);
+			}
+			const replay =
+				idempotencyKey &&
+				(await findIdempotentSend({
+					organizationId,
+					idempotencyKey,
+				}));
+			if (replay) {
+				log.info({
+					message: "Idempotent race lost — returning winner send",
+					organizationId,
+					emailLogId: replay.id,
+				});
+				return replay;
+			}
+		}
 		if (!injected) {
 			await refundCreditsForFailedSend(reservation);
 		} else {
@@ -262,6 +340,7 @@ async function sendReservedEmail({
 	useInternalInject,
 	maxAttachmentBytes,
 	planId,
+	idempotencyKey,
 	onInjected,
 }: {
 	organizationId: string;
@@ -277,6 +356,7 @@ async function sendReservedEmail({
 	useInternalInject?: boolean;
 	maxAttachmentBytes?: number;
 	planId?: string;
+	idempotencyKey?: string;
 	onInjected?: () => void;
 }): Promise<MailModel.SendEmailResponse> {
 	// ── Resolve In-Reply-To header if replying to a thread ────────
@@ -306,6 +386,7 @@ async function sendReservedEmail({
 		body,
 		apikeyId: apiKeyId,
 		userId,
+		idempotencyKey,
 	});
 
 	const { finalSubject, finalHtml, finalText } = await resolveTemplate_step5({

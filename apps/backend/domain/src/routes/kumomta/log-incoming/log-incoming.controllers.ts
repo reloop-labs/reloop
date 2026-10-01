@@ -99,6 +99,7 @@ export async function logIncomingController({
 			systemVerified: true,
 			tls: true,
 			createdAt: true,
+			registeredAt: true,
 		},
 	});
 
@@ -139,14 +140,41 @@ export async function logIncomingController({
 
 	const finalOrgId = organizationId || domainRecord.organizationId;
 
-	const existingLog = await db.query.emailLog.findFirst({
-		where: eq(emailLog.messageId, body.messageId),
-		columns: { id: true },
-	});
-
-	if (existingLog) {
-		log.info(`[LOG-INCOMING] Message ID already exists: ${body.messageId}`);
-		throw KumoMtaErrors.messageIdConflict(body.messageId);
+	// Idempotency is per Kumo queue entry (providerMessageId = msg:id()),
+	// not per RFC Message-ID. Clients (e.g. Coolify) reuse the same
+	// Message-ID across recipients/retries — each SMTP transaction gets its
+	// own email_log row so the second recipient is not rejected with 409.
+	// Same queue entry retrying returns the existing row instead of inserting.
+	if (body.providerMessageId) {
+		const retryLog = await db.query.emailLog.findFirst({
+			where: and(
+				eq(emailLog.providerMessageId, body.providerMessageId),
+				eq(emailLog.organizationId, finalOrgId),
+			),
+			columns: { id: true },
+		});
+		if (retryLog) {
+			log.info(
+				`[LOG-INCOMING] Duplicate providerMessageId ${body.providerMessageId} — returning existing ${retryLog.id}`,
+			);
+			const isVerified =
+				domainRecord.systemVerified && domainRecord.status === "active";
+			const hasCustomTracking =
+				isVerified &&
+				domainRecord.isTrackingDomain &&
+				domainRecord.trackingSubdomain &&
+				(domainRecord.isClickTrackingEnabled ||
+					domainRecord.isOpenTrackingEnabled);
+			return {
+				id: retryLog.id,
+				trackingDomain: hasCustomTracking
+					? `${domainRecord.trackingSubdomain}.${domainRecord.domain}`
+					: null,
+				clickTracking: domainRecord.isClickTrackingEnabled,
+				openTracking: domainRecord.isOpenTrackingEnabled,
+				tls: domainRecord.tls ?? "opportunistic",
+			};
+		}
 	}
 
 	const toEmails = uniqueBareEmails(body.toEmails);
@@ -228,12 +256,14 @@ export async function logIncomingController({
 	const recipientCount = toEmails.length;
 
 	// ── Domain-age initial daily cap (all packages) ───────────────────────
-	// Uses registrar registration age via RDAP, not Reloop added date
+	// Prefers registrar age captured at domain creation (stored); falls back
+	// to live RDAP, then Reloop added date.
 	const ageCheck = await checkDomainAgeDailyCap({
 		domain: {
 			id: domainRecord.id,
 			domain: domainRecord.domain,
 			createdAt: domainRecord.createdAt,
+			registeredAt: domainRecord.registeredAt,
 		},
 		recipientCount,
 	});
@@ -272,9 +302,11 @@ export async function logIncomingController({
 		inserted = await db
 			.insert(emailLog)
 			.values({
-				messageId:
-					body.messageId ||
-					`msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+				// Internal unique id — never the client Message-ID. The RFC
+				// header is stored in rfcMessageId (non-unique) so the same
+				// Message-ID across recipients/retries creates distinct rows.
+				messageId: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+				rfcMessageId: body.messageId?.slice(0, 500) || null,
 				organizationId: finalOrgId,
 				domainId: domainRecord.id,
 				userId: userId || null,

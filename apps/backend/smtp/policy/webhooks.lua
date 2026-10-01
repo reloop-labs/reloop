@@ -22,6 +22,18 @@ log_hooks:new {
     local connection = {}
 
     function connection:send(message)
+      -- Drop pre-queue rejections at source: kumo.reject() in smtp.lua
+      -- (409 duplicate, bad auth, undeliverable domain, quota, abuse)
+      -- never got an X-Email-Log-ID, so the logs worker can only warn
+      -- "missing X-Email-Log-ID ... skipping". Skipping here saves NATS
+      -- traffic and SigNoz warn spam. Delivery-state types always publish.
+      local ok_parse, record = pcall(function()
+        return kumo.serde.json_parse(message:get_data())
+      end)
+      if ok_parse and type(record) == "table" and record.type == "Rejection" then
+        return "250 Skipped (Rejection)"
+      end
+
       local nc = get_nats_client()
       local ok, err = pcall(function()
         nc:publish {

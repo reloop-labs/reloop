@@ -13,7 +13,8 @@ export type KumomtaEventType =
 	| "Expiration"
 	| "OOB"
 	| "Feedback"
-	| "AdminBounce";
+	| "AdminBounce"
+	| "Rejection";
 
 /** Map Kumo log type → email_log.status (omit types that only create events). */
 const EVENT_STATUS_MAP: Partial<
@@ -156,7 +157,13 @@ export async function initKumomtaSubscriber() {
 				}
 
 				if (!emailLogId) {
-					log.warn({
+					// Pre-queue rejections (and any record without an ID) are
+					// expected noise — webhooks.lua already drops Rejection at
+					// source, this covers any stragglers. Debug, not warn.
+					const rawType = event.type as string;
+					const noIdLog =
+						rawType === "Rejection" || !event.id ? log.debug : log.warn;
+					noIdLog({
 						kumomtaId: event.id,
 						type: event.type,
 						recipient: event.recipient,
@@ -167,6 +174,16 @@ export async function initKumomtaSubscriber() {
 				}
 
 				const kumoType = event.type as KumomtaEventType;
+				// Rejection never maps to a status/event — acknowledged and ignored.
+				if (kumoType === "Rejection") {
+					log.debug({
+						emailLogId,
+						kumomtaId: event.id,
+						message: "KumoMTA Rejection event received (no status change)",
+					});
+					await broadcastEmailLogLive(emailLogId);
+					return;
+				}
 				let eventType = EVENT_TYPE_MAP[kumoType];
 				let newStatus = EVENT_STATUS_MAP[kumoType];
 				const metadata = buildEventMetadata(event);

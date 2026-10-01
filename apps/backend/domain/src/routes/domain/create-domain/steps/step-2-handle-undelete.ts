@@ -1,5 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { getRegistrarCreationDate } from "@reloop/db/domain-age-cap";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { assertCustomDomainQuota } from "@reloop/domain/lib/domain-quota";
@@ -39,6 +40,17 @@ export async function handleUndelete_step2({
 		const now = new Date();
 		log.info("Undeleting existing domain");
 
+		// Refresh the stored registrar age — fail-open like creation.
+		let registeredAt: Date | null = deletedDomain.registeredAt ?? null;
+		try {
+			const registrarCreatedAt = await getRegistrarCreationDate(domain);
+			if (registrarCreatedAt) registeredAt = new Date(registrarCreatedAt);
+		} catch (error) {
+			log.warn(
+				`[DOMAIN-AGE] RDAP refresh failed for ${domain}: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+
 		await db.transaction(async (tx) => {
 			await assertCustomDomainQuota(organizationId, tx);
 			await tx
@@ -55,6 +67,8 @@ export async function handleUndelete_step2({
 					tls,
 					isSendingEmailEnabled,
 					isReceivingEmailEnabled,
+					registeredAt,
+					registrationAgeCheckedAt: now,
 				})
 				.where(eq(schema.domain.id, domainId));
 

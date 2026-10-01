@@ -70,8 +70,14 @@ export async function getDomainController({
 		}
 
 		log.info("Domain fetched successfully");
-		// ── Registrar age (domain age checker tool) for warmup cap ──────────
-		const registrarCreatedAtStr = await getRegistrarCreationDate(result.domain);
+		// ── Registrar age (captured at creation) for warmup cap ─────────────
+		// Stored value first; live RDAP only when the domain predates capture.
+		const storedAge = result.registeredAt
+			? new Date(result.registeredAt)
+			: null;
+		const registrarCreatedAtStr =
+			storedAge?.toISOString() ??
+			(await getRegistrarCreationDate(result.domain));
 		const ageDays = registrarCreatedAtStr
 			? getDomainAgeDays(new Date(registrarCreatedAtStr), new Date())
 			: getDomainAgeDays(new Date(result.createdAt), new Date());

@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
 	bigint,
 	index,
@@ -8,6 +8,7 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uniqueIndex,
 	varchar,
 } from "drizzle-orm/pg-core";
 import { apikey } from "./api-key";
@@ -67,6 +68,8 @@ export const emailLog = pgTable(
 			.$defaultFn(() => createEmailLogId())
 			.primaryKey(),
 		messageId: varchar("message_id", { length: 500 }).notNull().unique(),
+		/** Original RFC 5322 Message-ID header (client-controlled, not unique). */
+		rfcMessageId: varchar("rfc_message_id", { length: 500 }),
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),
@@ -103,6 +106,8 @@ export const emailLog = pgTable(
 			>()
 			.notNull()
 			.default([]),
+		/** Client idempotency key (API Idempotency-Key header). Unique per org. */
+		idempotencyKey: varchar("idempotency_key", { length: 500 }),
 		status: emailStatusEnum("status").notNull().default("pending"),
 		priority: emailPriorityEnum("priority").notNull().default("normal"),
 		/**
@@ -127,6 +132,8 @@ export const emailLog = pgTable(
 	},
 	(table) => [
 		index("email_log_idx_message_id").on(table.messageId),
+		index("email_log_idx_rfc_message_id").on(table.rfcMessageId),
+		index("email_log_idx_provider_message_id").on(table.providerMessageId),
 		index("email_log_idx_organization_id").on(table.organizationId),
 		index("email_log_idx_domain_id").on(table.domainId),
 		index("email_log_idx_from_email").on(table.fromEmail),
@@ -136,6 +143,9 @@ export const emailLog = pgTable(
 		index("email_log_idx_created_at").on(table.createdAt),
 		index("email_log_idx_org_status").on(table.organizationId, table.status),
 		index("email_log_idx_domain_status").on(table.domainId, table.status),
+		uniqueIndex("email_log_uidx_org_idempotency_key")
+			.on(table.organizationId, table.idempotencyKey)
+			.where(sql`${table.idempotencyKey} is not null`),
 	],
 );
 

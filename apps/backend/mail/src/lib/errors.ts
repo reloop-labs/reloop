@@ -11,6 +11,18 @@ export class MailError extends Error {
 	}
 }
 
+/**
+ * Internal signal — never surfaces to clients. Thrown when a concurrent
+ * same-key send won the insert race; the loser refunds its credit
+ * reservation and returns the winner's response instead of re-sending.
+ */
+export class IdempotentReplayError extends Error {
+	constructor(public emailLogId: string) {
+		super("Idempotent replay");
+		this.name = "IdempotentReplayError";
+	}
+}
+
 export class BadRequestError extends MailError {
 	constructor(message: string) {
 		super(400, message, "BAD_REQUEST");

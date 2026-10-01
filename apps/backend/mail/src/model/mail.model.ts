@@ -154,6 +154,14 @@ export namespace MailModel {
 				examples: ["thr_abc123xyz"],
 			}),
 		),
+		idempotency_key: t.Optional(
+			t.String({
+				maxLength: 500,
+				description:
+					"Client idempotency key — retries with the same key return the original send without duplicate delivery. Header Idempotency-Key takes precedence.",
+				examples: ["order-123-confirmation"],
+			}),
+		),
 	});
 
 	export type SendEmailBody = typeof sendEmailBody.static;

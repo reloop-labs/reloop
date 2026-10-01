@@ -2,10 +2,17 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import type React from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import {
 	createTemplate,
 	type Template,
@@ -258,8 +265,633 @@ const fetchVersions = async (
 	return res.json() as Promise<TemplateVersion[]>;
 };
 
-const inputClassName =
-	"w-full rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus:border-blue-500";
+interface ErrorDetails {
+	title: string;
+	description: string;
+	actionText?: string;
+	actionLink?: string;
+}
+
+const ErrorTooltipContent = ({ error }: { error: ErrorDetails }) => {
+	return (
+		<div className="flex w-72 flex-col gap-2 p-0.5 text-left">
+			<div className="flex items-start gap-2.5">
+				<div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-error-lighter">
+					<Icon name="alert-circle" className="h-3.5 w-3.5 text-error-base" />
+				</div>
+				<div className="flex flex-col gap-0.5">
+					<h4 className="font-semibold text-label-xs text-text-strong-950 leading-snug">
+						{error.title}
+					</h4>
+					<p className="text-paragraph-xs text-text-sub-600 leading-normal">
+						{error.description}
+					</p>
+				</div>
+			</div>
+
+			{error.actionLink && error.actionText && (
+				<div className="border-stroke-soft-200 border-t pt-2">
+					<Link
+						href={error.actionLink}
+						className="inline-flex items-center gap-1 font-semibold text-paragraph-xs text-primary-base transition-colors hover:text-primary-hover hover:underline"
+					>
+						{error.actionText}
+						<Icon name="arrow-right" className="h-3 w-3" />
+					</Link>
+				</div>
+			)}
+		</div>
+	);
+};
+
+const getAppropriateSenderName = (
+	handle: string,
+	userName?: string | null,
+	userEmail?: string | null,
+	explicitName?: string,
+) => {
+	if (explicitName?.trim()) {
+		return explicitName.trim();
+	}
+
+	const cleanHandle = handle.toLowerCase();
+	const userHandle = userEmail?.split("@")[0]?.toLowerCase();
+
+	if (userHandle && cleanHandle === userHandle) {
+		return (
+			userName || cleanHandle.charAt(0).toUpperCase() + cleanHandle.slice(1)
+		);
+	}
+
+	switch (cleanHandle) {
+		case "team":
+			return "Team";
+		case "support":
+		case "help":
+			return "Support";
+		case "notifications":
+		case "alerts":
+			return "Notifications";
+		case "newsletter":
+		case "news":
+		case "updates":
+			return "Newsletter";
+		case "hello":
+		case "hi":
+		case "contact":
+		case "info":
+			return "Hello";
+		case "billing":
+			return "Billing";
+		case "security":
+			return "Security";
+		default: {
+			return cleanHandle.charAt(0).toUpperCase() + cleanHandle.slice(1);
+		}
+	}
+};
+
+interface SuggestedSender {
+	name: string;
+	email: string;
+	handle: string;
+	domain: string;
+	formatted: string;
+}
+
+interface WorkflowSenderSectionProps {
+	persistedFrom: string;
+	persistedReply: string;
+	onSave: (data: { fromEmail: string; replyTo: string }) => Promise<void>;
+	isSaving?: boolean;
+	onDraftChange?: (draft: { from?: string; reply?: string }) => void;
+}
+
+const WorkflowSenderSection = ({
+	persistedFrom,
+	persistedReply,
+	onSave,
+	isSaving,
+	onDraftChange,
+}: WorkflowSenderSectionProps) => {
+	const { user } = useActiveOrganization();
+	const domainsQuery = useDomainsQuery({
+		page: 1,
+		limit: 100,
+		q: "",
+		status: [],
+	});
+
+	const [inputValue, setInputValue] = useState(persistedFrom);
+	const [replyValue, setReplyValue] = useState(persistedReply);
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [highlightIndex, setHighlightIndex] = useState(0);
+
+	const containerRef = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const listboxId = useId();
+
+	useEffect(() => {
+		if (!isDropdownOpen) {
+			setInputValue(persistedFrom);
+		}
+	}, [persistedFrom, isDropdownOpen]);
+
+	useEffect(() => {
+		setReplyValue(persistedReply);
+	}, [persistedReply]);
+
+	const verifiedSendingDomains = useMemo(() => {
+		const list = domainsQuery.data?.domains || [];
+		return list.filter((d) => {
+			const isVerified =
+				d.status === "active" || d.systemVerified || d.userVerifiedDomain;
+			const isSending = d.isSendingEmailEnabled !== false;
+			return isVerified && isSending;
+		});
+	}, [domainsQuery.data?.domains]);
+
+	const verifiedDomainNames = useMemo(
+		() => verifiedSendingDomains.map((d) => d.domain.toLowerCase()),
+		[verifiedSendingDomains],
+	);
+
+	const parsedInput = useMemo(() => {
+		const trimmed = inputValue.trim();
+		const angleMatch = trimmed.match(/^(.*?)\s*<([^>]*)>?$/);
+		if (angleMatch) {
+			const namePart = angleMatch[1]?.trim() || "";
+			const emailPart = angleMatch[2]?.trim() || "";
+			const isComplete = Boolean(
+				emailPart.includes("@") && emailPart.includes("."),
+			);
+			const [handlePart = "", domainPart = ""] = emailPart.split("@");
+			return {
+				name: namePart,
+				email: emailPart,
+				handle: handlePart,
+				domain: domainPart,
+				isComplete,
+				query: isComplete ? "" : emailPart.toLowerCase(),
+			};
+		}
+
+		if (trimmed.includes("@")) {
+			const isComplete = Boolean(trimmed.includes("."));
+			const [handlePart = "", domainPart = ""] = trimmed.split("@");
+			return {
+				name: "",
+				email: trimmed,
+				handle: handlePart,
+				domain: domainPart,
+				isComplete,
+				query: isComplete ? "" : trimmed.toLowerCase(),
+			};
+		}
+
+		return {
+			name: "",
+			email: "",
+			handle: trimmed,
+			domain: "",
+			isComplete: false,
+			query: trimmed.toLowerCase(),
+		};
+	}, [inputValue]);
+
+	const suggestions = useMemo((): SuggestedSender[] => {
+		if (verifiedSendingDomains.length === 0) return [];
+
+		const standardHandles = [
+			"team",
+			"hello",
+			"newsletter",
+			"notifications",
+			"support",
+		];
+
+		const userHandle = user?.email?.split("@")[0]?.toLowerCase();
+		if (userHandle && !standardHandles.includes(userHandle)) {
+			standardHandles.unshift(userHandle);
+		}
+
+		const typedHandle = parsedInput.handle.toLowerCase();
+		const typedDomain = parsedInput.domain.toLowerCase();
+
+		const result: SuggestedSender[] = [];
+		const allDefaults: SuggestedSender[] = [];
+
+		for (const domainObj of verifiedSendingDomains) {
+			const domainName = domainObj.domain.toLowerCase();
+
+			if (typedHandle && !standardHandles.includes(typedHandle)) {
+				const itemName = getAppropriateSenderName(
+					typedHandle,
+					user?.name,
+					user?.email,
+					parsedInput.name,
+				);
+				const customItem = {
+					name: itemName,
+					email: `${typedHandle}@${domainName}`,
+					handle: typedHandle,
+					domain: domainName,
+					formatted: `${itemName} <${typedHandle}@${domainName}>`,
+				};
+				allDefaults.push(customItem);
+				if (!typedDomain || domainName.includes(typedDomain)) {
+					result.push(customItem);
+				}
+			}
+
+			for (const handle of standardHandles) {
+				const itemName = getAppropriateSenderName(
+					handle,
+					user?.name,
+					user?.email,
+					parsedInput.name,
+				);
+				const email = `${handle}@${domainName}`;
+				const formatted = `${itemName} <${email}>`;
+				const standardItem = {
+					name: itemName,
+					email,
+					handle,
+					domain: domainName,
+					formatted,
+				};
+
+				allDefaults.push(standardItem);
+
+				if (
+					parsedInput.query &&
+					!email.includes(parsedInput.query) &&
+					!domainName.includes(parsedInput.query) &&
+					!itemName.toLowerCase().includes(parsedInput.query)
+				) {
+					continue;
+				}
+
+				if (typedDomain && !domainName.includes(typedDomain)) {
+					continue;
+				}
+
+				result.push(standardItem);
+			}
+		}
+
+		const finalSuggestions = result.length > 0 ? result : allDefaults;
+		return finalSuggestions.slice(0, 8);
+	}, [verifiedSendingDomains, parsedInput, user?.name, user?.email]);
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const val = e.target.value;
+		setInputValue(val);
+		setHighlightIndex(0);
+		if (!isDropdownOpen) {
+			setIsDropdownOpen(true);
+		}
+		onDraftChange?.({ from: val });
+	};
+
+	const handleSelectSuggestion = (suggestion: SuggestedSender) => {
+		const finalFormatted = suggestion.formatted;
+		setInputValue(finalFormatted);
+		onDraftChange?.({ from: finalFormatted });
+		setIsDropdownOpen(false);
+		inputRef.current?.focus();
+		void onSave({ fromEmail: finalFormatted, replyTo: replyValue });
+	};
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		e.stopPropagation();
+		if (!isDropdownOpen) {
+			if (e.key === "ArrowDown" || e.key === "Enter") {
+				setIsDropdownOpen(true);
+				e.preventDefault();
+			}
+			return;
+		}
+
+		if (e.key === "ArrowDown") {
+			e.preventDefault();
+			setHighlightIndex((prev) =>
+				suggestions.length > 0 ? (prev + 1) % suggestions.length : 0,
+			);
+		} else if (e.key === "ArrowUp") {
+			e.preventDefault();
+			setHighlightIndex((prev) =>
+				suggestions.length > 0
+					? (prev - 1 + suggestions.length) % suggestions.length
+					: 0,
+			);
+		} else if (e.key === "Enter") {
+			e.preventDefault();
+			if (suggestions.length > 0 && suggestions[highlightIndex]) {
+				handleSelectSuggestion(suggestions[highlightIndex]);
+			} else {
+				setIsDropdownOpen(false);
+				inputRef.current?.blur();
+			}
+		} else if (e.key === "Escape" || e.key === "Tab") {
+			setIsDropdownOpen(false);
+		}
+	};
+
+	useEffect(() => {
+		const handleClickOutside = (e: PointerEvent) => {
+			if (
+				containerRef.current &&
+				!containerRef.current.contains(e.target as Node)
+			) {
+				setIsDropdownOpen(false);
+			}
+		};
+
+		document.addEventListener("pointerdown", handleClickOutside);
+		return () => {
+			document.removeEventListener("pointerdown", handleClickOutside);
+		};
+	}, []);
+
+	const handleFromBlur = () => {
+		if (inputValue !== persistedFrom) {
+			void onSave({ fromEmail: inputValue, replyTo: replyValue });
+		}
+	};
+
+	const handleReplyBlur = () => {
+		if (replyValue !== persistedReply) {
+			void onSave({ fromEmail: inputValue, replyTo: replyValue });
+		}
+	};
+
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	const parseEmailAddress = (input: string) => {
+		const match = input.match(/<([^>]+)>/);
+		if (match?.[1]) return match[1].trim();
+		return input.trim();
+	};
+
+	const fromEmailAddress = parseEmailAddress(inputValue);
+	const fromDomain = fromEmailAddress.includes("@")
+		? fromEmailAddress.split("@")[1]?.toLowerCase() || ""
+		: "";
+
+	const isFromEmailValid = !inputValue || emailRegex.test(fromEmailAddress);
+	const isFromDomainVerified =
+		!fromEmailAddress ||
+		!isFromEmailValid ||
+		verifiedDomainNames.includes(fromDomain);
+
+	let fromError: ErrorDetails | null = null;
+	if (inputValue.trim()) {
+		if (!isFromEmailValid) {
+			fromError = {
+				title: "Invalid Email Format",
+				description:
+					"Please enter a valid email address (e.g., sender@example.com).",
+			};
+		} else if (!isFromDomainVerified && !domainsQuery.isLoading) {
+			fromError = {
+				title: "Domain Verification Required",
+				description:
+					"You cannot send from unverified domains. Please verify this domain to use it.",
+				actionText: "Configure Domain Settings",
+				actionLink: "/domain",
+			};
+		}
+	}
+
+	const isReplyToValid =
+		!replyValue.trim() || emailRegex.test(replyValue.trim());
+	let replyToError: ErrorDetails | null = null;
+	if (replyValue.trim() && !isReplyToValid) {
+		replyToError = {
+			title: "Invalid Reply-To Format",
+			description:
+				"Please enter a valid email address (e.g., replyto@example.com).",
+		};
+	}
+
+	const fromMissing = inputValue.trim().length === 0;
+	const isLoadingDomains =
+		domainsQuery.isLoading || (isDropdownOpen && domainsQuery.isFetching);
+
+	return (
+		<div className="flex flex-col gap-2 rounded-xl bg-bg-weak-50/60 p-3">
+			<div className="flex items-center justify-between">
+				<p className="font-medium text-sm text-text-strong-950">From</p>
+			</div>
+
+			{/* From input with combobox suggestions */}
+			<div
+				ref={containerRef}
+				className={cn(
+					"nodrag relative flex w-full items-center justify-between gap-2 rounded-xl border bg-bg-white-0 px-3 py-2 text-sm transition-colors dark:border-stroke-soft-100/40 dark:bg-bg-sub-300",
+					fromMissing || fromError
+						? "border-error-base"
+						: isDropdownOpen
+							? "border-blue-500 ring-2 ring-blue-500/10"
+							: "border-stroke-soft-100 hover:border-stroke-soft-200",
+					isSaving && "opacity-60",
+				)}
+			>
+				<input
+					ref={inputRef}
+					type="text"
+					placeholder="Acme <acme@example.com>"
+					value={inputValue}
+					onChange={handleInputChange}
+					onFocus={() => setIsDropdownOpen(true)}
+					onKeyDown={handleKeyDown}
+					onBlur={handleFromBlur}
+					autoComplete="off"
+					role="combobox"
+					aria-expanded={isDropdownOpen}
+					aria-controls={listboxId}
+					aria-label="From email"
+					aria-invalid={fromMissing || Boolean(fromError) || undefined}
+					disabled={isSaving}
+					className="w-full bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+				/>
+
+				<div className="flex shrink-0 items-center gap-2">
+					{isLoadingDomains && (
+						<div
+							className="flex items-center justify-center text-text-soft-400"
+							title="Loading sending domains..."
+						>
+							<Spinner size={14} />
+						</div>
+					)}
+
+					{fromError && (
+						<Tooltip.Provider delayDuration={0}>
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<button
+										type="button"
+										className="flex cursor-pointer items-center justify-center text-error-base transition-colors hover:text-error-dark"
+										tabIndex={-1}
+									>
+										<Icon name="cross-circle" className="h-4 w-4" />
+									</button>
+								</Tooltip.Trigger>
+								<Tooltip.Content
+									side="top"
+									variant="light"
+									size="medium"
+									className="max-w-[300px]"
+								>
+									<ErrorTooltipContent error={fromError} />
+								</Tooltip.Content>
+							</Tooltip.Root>
+						</Tooltip.Provider>
+					)}
+				</div>
+
+				{/* Suggestions Dropdown */}
+				<AnimatePresence>
+					{isDropdownOpen && (
+						<motion.div
+							id={listboxId}
+							role="listbox"
+							initial={{ opacity: 0, y: -4, scale: 0.98 }}
+							animate={{ opacity: 1, y: 0, scale: 1 }}
+							exit={{ opacity: 0, y: -4, scale: 0.98 }}
+							transition={{ duration: 0.15, ease: "easeOut" }}
+							className="nodrag absolute top-full left-0 z-50 mt-1.5 w-full min-w-[280px] max-w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+							onMouseDown={(e) => e.stopPropagation()}
+						>
+							{isLoadingDomains && suggestions.length === 0 ? (
+								<div className="flex items-center justify-center gap-2.5 py-6 text-paragraph-xs text-text-sub-600">
+									<Spinner size={16} />
+									<span>Fetching verified sending domains...</span>
+								</div>
+							) : verifiedSendingDomains.length === 0 ? (
+								<div className="flex flex-col gap-2 p-3 text-left">
+									<div className="flex items-center gap-2 text-text-sub-600">
+										<Icon
+											name="alert-circle"
+											className="h-4 w-4 text-warning-base"
+										/>
+										<span className="font-medium text-label-xs text-text-strong-950">
+											No Sending Domains Found
+										</span>
+									</div>
+									<p className="text-paragraph-xs text-text-sub-600">
+										You must have at least one verified domain with sending
+										enabled to send emails.
+									</p>
+									<Link
+										href="/domain"
+										className="inline-flex items-center gap-1 font-semibold text-paragraph-xs text-primary-base transition-colors hover:text-primary-hover hover:underline"
+									>
+										Configure Domain Settings
+										<Icon name="arrow-right" className="h-3 w-3" />
+									</Link>
+								</div>
+							) : (
+								<div className="max-h-56 overflow-y-auto">
+									{suggestions.map((item, idx) => {
+										const isSelected = idx === highlightIndex;
+										return (
+											<button
+												key={`${item.email}-${idx}`}
+												type="button"
+												role="option"
+												aria-selected={isSelected}
+												onMouseDown={(e) => {
+													e.preventDefault();
+													handleSelectSuggestion(item);
+												}}
+												onMouseEnter={() => setHighlightIndex(idx)}
+												className={cn(
+													"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors",
+													isSelected
+														? "bg-bg-weak-50 text-text-strong-950 dark:bg-bg-sub-300/40"
+														: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
+												)}
+											>
+												<div className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">
+													<span className="shrink-0 font-medium text-text-strong-950">
+														{item.name}
+													</span>
+													<span className="truncate text-text-sub-600">
+														&lt;{item.email}&gt;
+													</span>
+												</div>
+											</button>
+										);
+									})}
+								</div>
+							)}
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</div>
+
+			{fromMissing && (
+				<p className="px-1 text-error-base text-xs">From is required</p>
+			)}
+
+			{/* Reply to input */}
+			<div
+				className={cn(
+					"nodrag relative flex w-full items-center justify-between gap-2 rounded-xl border bg-bg-white-0 px-3 py-2 text-sm transition-colors dark:border-stroke-soft-100/40 dark:bg-bg-sub-300",
+					replyToError
+						? "border-error-base"
+						: "border-stroke-soft-100 focus-within:border-blue-500 hover:border-stroke-soft-200",
+					isSaving && "opacity-60",
+				)}
+			>
+				<input
+					type="text"
+					placeholder="Reply to (optional)"
+					value={replyValue}
+					onChange={(e) => {
+						setReplyValue(e.target.value);
+						onDraftChange?.({ reply: e.target.value });
+					}}
+					onBlur={handleReplyBlur}
+					onKeyDown={(e) => {
+						e.stopPropagation();
+						if (e.key === "Enter") {
+							e.currentTarget.blur();
+						}
+					}}
+					aria-label="Reply to email"
+					disabled={isSaving}
+					className="w-full bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+				/>
+				{replyToError && (
+					<Tooltip.Provider delayDuration={0}>
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild>
+								<button
+									type="button"
+									className="flex cursor-pointer items-center justify-center text-error-base transition-colors hover:text-error-dark"
+									tabIndex={-1}
+								>
+									<Icon name="cross-circle" className="h-4 w-4" />
+								</button>
+							</Tooltip.Trigger>
+							<Tooltip.Content
+								side="top"
+								variant="light"
+								size="medium"
+								className="max-w-[300px]"
+							>
+								<ErrorTooltipContent error={replyToError} />
+							</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
+				)}
+			</div>
+		</div>
+	);
+};
 
 const SelectedTemplateView = ({
 	templateId,
@@ -294,8 +926,8 @@ const SelectedTemplateView = ({
 	const resolvedFrom =
 		fromDraft ?? latest?.fromEmail ?? detail?.fromEmail ?? "";
 	const resolvedReply = replyDraft ?? latest?.replyTo ?? detail?.replyTo ?? "";
-	const fromMissing = resolvedFrom.trim().length === 0;
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset draft on templateId switch
 	useEffect(() => {
 		setFromDraft(null);
 		setReplyDraft(null);
@@ -314,8 +946,10 @@ const SelectedTemplateView = ({
 		});
 	};
 
-	const saveSender = async () => {
-		if (fromDraft === null && replyDraft === null) return;
+	const saveSenderDirect = async (data: {
+		fromEmail: string;
+		replyTo: string;
+	}) => {
 		setSavingSender(true);
 		try {
 			const res = await fetch(`/api/template/v1/${templateId}`, {
@@ -323,8 +957,8 @@ const SelectedTemplateView = ({
 				headers: { "Content-Type": "application/json" },
 				credentials: "include",
 				body: JSON.stringify({
-					fromEmail: fromDraft ?? resolvedFrom,
-					replyTo: replyDraft ?? resolvedReply,
+					fromEmail: data.fromEmail,
+					replyTo: data.replyTo,
 				}),
 			});
 			if (!res.ok) throw new Error(`Save failed (${res.status})`);
@@ -432,39 +1066,16 @@ const SelectedTemplateView = ({
 					isLoading={detailQuery.isLoading}
 				/>
 			) : (
-				<div className="flex flex-col gap-2 rounded-xl bg-bg-weak-50/60 p-3">
-					<p className="font-medium text-sm text-text-strong-950">Sender</p>
-					<input
-						type="text"
-						placeholder="Acme <acme@example.com>"
-						value={resolvedFrom}
-						onChange={(e) => setFromDraft(e.target.value)}
-						onBlur={() => void saveSender()}
-						onKeyDown={(e) => e.stopPropagation()}
-						aria-label="Sender email"
-						aria-invalid={fromMissing || undefined}
-						disabled={savingSender}
-						className={cn(
-							inputClassName,
-							fromMissing && "border-error-base",
-							savingSender && "opacity-60",
-						)}
-					/>
-					{fromMissing ? (
-						<p className="px-1 text-error-base text-xs">From is required</p>
-					) : null}
-					<input
-						type="text"
-						placeholder="Reply to (optional)"
-						value={resolvedReply}
-						onChange={(e) => setReplyDraft(e.target.value)}
-						onBlur={() => void saveSender()}
-						onKeyDown={(e) => e.stopPropagation()}
-						aria-label="Reply to email"
-						disabled={savingSender}
-						className={cn(inputClassName, savingSender && "opacity-60")}
-					/>
-				</div>
+				<WorkflowSenderSection
+					persistedFrom={resolvedFrom}
+					persistedReply={resolvedReply}
+					onSave={saveSenderDirect}
+					isSaving={savingSender}
+					onDraftChange={(draft) => {
+						if (draft.from !== undefined) setFromDraft(draft.from);
+						if (draft.reply !== undefined) setReplyDraft(draft.reply);
+					}}
+				/>
 			)}
 		</div>
 	);
