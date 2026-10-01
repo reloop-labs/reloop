@@ -34,6 +34,7 @@ fastmail.com
 hey.com
 pm.me
 proton.me
+protonmail.ch
 protonmail.com
 tuta.com
 tutanota.com

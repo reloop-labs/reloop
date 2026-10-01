@@ -20900,9 +20900,7 @@ hotmail.co.il
 hotmail.co.jp
 hotmail.co.nz
 hotmail.co.th
-hotmail.co.uk
 hotmail.co.za
-hotmail.com
 hotmail.com.ar
 hotmail.com.au
 hotmail.com.br
@@ -20922,11 +20920,9 @@ hotmail.dk
 hotmail.ee
 hotmail.es
 hotmail.fi
-hotmail.fr
 hotmail.gr
 hotmail.hu
 hotmail.ie
-hotmail.it
 hotmail.lt
 hotmail.lu
 hotmail.lv
@@ -26261,9 +26257,7 @@ live.ca
 live.ch
 live.cl
 live.cn
-live.co.uk
 live.co.za
-live.com
 live.com.ar
 live.com.au
 live.com.mx
@@ -26279,7 +26273,6 @@ live.ie
 live.in
 live.it
 live.jp
-live.nl
 live.no
 live.ru
 live.se
@@ -31554,7 +31547,6 @@ msn-mail-free-9649.dynv6.net
 msn-mail-free-9734.dynv6.net
 msn-mail-free-9921.dynv6.net
 msn-mail-free-9990.dynv6.net
-msn.com
 msn.com.au
 msn.com.se
 msn.nl
@@ -34830,7 +34822,6 @@ outlook.co.id
 outlook.co.il
 outlook.co.nz
 outlook.co.th
-outlook.com
 outlook.com.ar
 outlook.com.au
 outlook.com.br
@@ -34844,7 +34835,6 @@ outlook.com.vn
 outlook.corbyrise.com
 outlook.cz
 outlook.dawsoncountygunclub.org
-outlook.de
 outlook.dk
 outlook.dynamailbox.com
 outlook.edu.pl
@@ -34852,7 +34842,6 @@ outlook.epurcf.org
 outlook.es
 outlook.fightingzebras.org
 outlook.findmeghana.org
-outlook.fr
 outlook.frankhealeyfoundation.org
 outlook.freedomcentremereside.org
 outlook.gemmarosefoundation.co.uk
@@ -36318,7 +36307,6 @@ plxa.com
 plymouthhalfmarathon.com
 plymouthrotarynh.org
 pm.emlpro.com
-pm.me
 pm8m8g.spymail.one
 pmail.asia
 pmail.net
@@ -37183,11 +37171,8 @@ protempmail.com
 protestore.co
 proto2mail.com
 proton-team.com
-proton.me
 protonamail.com
 protonmail.at
-protonmail.ch
-protonmail.com
 protonmail.nz
 protonmail55.lady-and-lunch.lady-and-lunch.xyz
 protonmaill.com
@@ -45778,10 +45763,8 @@ tushmail.com
 tusitiowebgratis.com.ar
 tuskcasino.com
 tusu.blyxen.org
-tuta.com
 tuta.io
 tutamail.com
-tutanota.com
 tutanota.de
 tutg.10mail.org
 tutis.me

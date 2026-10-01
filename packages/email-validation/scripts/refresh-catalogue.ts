@@ -159,15 +159,18 @@ function readLocalList(name: string): Set<string> {
 const localExceptions = readLocalList("exceptions.txt");
 const localFreeProviders = readLocalList("free-providers.txt");
 
-// Filter out known free providers and exceptions from disposable domains
+// Filter out known free providers and exceptions from disposable domains and MX domains
 for (const domain of localFreeProviders) {
 	nextDomains.delete(domain);
+	nextMxDomains.delete(domain);
 }
 for (const domain of localExceptions) {
 	nextDomains.delete(domain);
+	nextMxDomains.delete(domain);
 }
 for (const domain of nextExceptions) {
 	nextDomains.delete(domain);
+	nextMxDomains.delete(domain);
 }
 
 const datasets = [
