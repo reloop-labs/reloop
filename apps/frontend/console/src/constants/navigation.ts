@@ -25,6 +25,12 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
 				description: "Attention & health",
 			},
 			{
+				href: "/suspects",
+				label: "Suspects",
+				iconName: "alert-triangle",
+				description: "Spam & scam review",
+			},
+			{
 				href: "/support",
 				label: "Support",
 				iconName: "comment-text",

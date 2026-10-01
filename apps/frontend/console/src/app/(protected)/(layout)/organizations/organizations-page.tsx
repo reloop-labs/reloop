@@ -8,11 +8,12 @@ import {
 } from "@fe/console/components/ui/page-frame";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { TablePagination } from "@fe/console/components/ui/table-pagination";
+import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
 import { adminGet, adminPatch } from "@fe/console/lib/admin-api";
 import { formatNumber, formatRelativeTime } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
-import { Search, X } from "lucide-react";
+import { Search, ShieldAlert, X } from "lucide-react";
 import Link from "next/link";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
@@ -30,6 +31,11 @@ type OrgItem = {
 	billingEmail: string | null;
 	createdAt: string;
 	planId: string | null;
+	isSuspect?: boolean;
+	suspectReason?: string | null;
+	suspectSeverity?: "low" | "medium" | "high" | "critical" | null;
+	suspectCategory?: "spam" | "phishing" | "fraud" | "abuse" | "other" | null;
+	suspectUpdatedAt?: string | null;
 };
 
 type OrgsResponse = { items: OrgItem[]; total: number };
@@ -58,6 +64,7 @@ export default function OrganizationsPage() {
 	);
 	const [draftQ, setDraftQ] = useState(q);
 	const [suspendTarget, setSuspendTarget] = useState<OrgItem | null>(null);
+	const [suspectTarget, setSuspectTarget] = useState<OrgItem | null>(null);
 
 	useEffect(() => {
 		setDraftQ(q);
@@ -65,13 +72,17 @@ export default function OrganizationsPage() {
 
 	const offset = Math.max(0, (page - 1) * limit);
 
+	const isSuspectOnly = status === "suspect";
+	const effectiveStatus = isSuspectOnly ? undefined : status || undefined;
+
 	const { data, isLoading, mutate } = useSWR<OrgsResponse>(
 		["/organizations", q, status, plan, page, limit],
 		() =>
 			adminGet<OrgsResponse>("/organizations", {
 				q: q || undefined,
-				status: status || undefined,
+				status: effectiveStatus,
 				plan: plan || undefined,
+				isSuspect: isSuspectOnly ? true : undefined,
 				limit,
 				offset,
 			}),
@@ -139,6 +150,7 @@ export default function OrganizationsPage() {
 							<option value="active">Active</option>
 							<option value="suspended">Suspended</option>
 							<option value="deleted">Deleted</option>
+							<option value="suspect">Suspects Only</option>
 						</select>
 						<select
 							className="h-10 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 font-medium text-[12px] text-text-sub-600 outline-none transition-colors hover:border-stroke-sub-300 dark:border-white/10 dark:bg-transparent"
@@ -223,7 +235,19 @@ export default function OrganizationsPage() {
 									</p>
 								</td>
 								<td className="px-4 py-3">
-									<StatusPill status={org.status} />
+									<div className="flex flex-col gap-1 items-start">
+										<StatusPill status={org.status} />
+										{org.isSuspect ? (
+											<StatusPill
+												status={
+													org.suspectCategory
+														? `suspect (${org.suspectCategory})`
+														: "suspect"
+												}
+												tone="red"
+											/>
+										) : null}
+									</div>
 								</td>
 								<td className="px-4 py-3">
 									<StatusPill
@@ -246,6 +270,16 @@ export default function OrganizationsPage() {
 								</td>
 								<td className="px-4 py-3">
 									<div className="flex flex-wrap gap-1.5">
+										<Button.Root
+											size="xsmall"
+											variant={org.isSuspect ? "error" : "neutral"}
+											mode={org.isSuspect ? "filled" : "stroke"}
+											onClick={() => setSuspectTarget(org)}
+											title="Mark or edit suspect status"
+										>
+											<ShieldAlert className="size-3 mr-1" />
+											{org.isSuspect ? "Suspect" : "Suspect"}
+										</Button.Root>
 										<Button.Root
 											asChild
 											size="xsmall"
@@ -308,6 +342,23 @@ export default function OrganizationsPage() {
 					}}
 				/>
 			</div>
+
+			{suspectTarget ? (
+				<SuspectionDrawer
+					open={Boolean(suspectTarget)}
+					onOpenChange={(open) => !open && setSuspectTarget(null)}
+					entityType="organization"
+					entityId={suspectTarget.id}
+					entityName={suspectTarget.name}
+					entityIdentifier={suspectTarget.slug}
+					initialIsSuspect={suspectTarget.isSuspect}
+					initialReason={suspectTarget.suspectReason}
+					initialSeverity={suspectTarget.suspectSeverity}
+					initialCategory={suspectTarget.suspectCategory}
+					associatedCount={suspectTarget.memberCount}
+					onSuccess={() => mutate()}
+				/>
+			) : null}
 		</PageFrame>
 	);
 }

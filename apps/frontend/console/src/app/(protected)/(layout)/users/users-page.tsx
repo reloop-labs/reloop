@@ -9,6 +9,8 @@ import {
 import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { TablePagination } from "@fe/console/components/ui/table-pagination";
 import { formatDateTime, formatRelativeTime } from "@fe/console/lib/format";
+import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
+import { adminGet } from "@fe/console/lib/admin-api";
 import { authClient } from "@reloop/auth/client";
 import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import * as Button from "@reloop/ui/button";
@@ -18,6 +20,7 @@ import {
 	RotateCcw,
 	Search,
 	Shield,
+	ShieldAlert,
 	UserCheck,
 	Users as UsersIcon,
 	UserX,
@@ -36,6 +39,12 @@ type AdminUser = {
 	banned?: boolean | null;
 	banReason?: string | null;
 	createdAt?: string | Date;
+	isSuspect?: boolean;
+	suspectReason?: string | null;
+	suspectSeverity?: "low" | "medium" | "high" | "critical" | null;
+	suspectCategory?: "spam" | "phishing" | "fraud" | "abuse" | "other" | null;
+	suspectUpdatedAt?: string | Date | null;
+	organizationCount?: number;
 };
 
 const SORT_OPTIONS = [
@@ -94,6 +103,7 @@ export default function UsersPage() {
 
 	const [draftQ, setDraftQ] = useState(q);
 	const [loading, setLoading] = useState(true);
+	const [suspectTarget, setSuspectTarget] = useState<AdminUser | null>(null);
 	const [banTarget, setBanTarget] = useState<AdminUser | null>(null);
 	const [promoteTarget, setPromoteTarget] = useState<AdminUser | null>(null);
 	const [impersonateTarget, setImpersonateTarget] = useState<AdminUser | null>(
@@ -113,82 +123,23 @@ export default function UsersPage() {
 			const sortParams = getSortParams(sort);
 			const offset = Math.max(0, (page - 1) * limit);
 
-			// Server-side filter field selection
-			let filterFieldParam: string | undefined;
-			let filterValueParam: unknown;
-
-			if (role && role !== "all") {
-				filterFieldParam = "role";
-				filterValueParam = role;
-			} else if (status && status !== "all") {
-				filterFieldParam = "banned";
-				filterValueParam = status === "banned";
-			}
-
-			const queryPayload: Record<string, unknown> = {
+			const params: Record<string, unknown> = {
 				limit,
 				offset,
 				sortBy: sortParams.sortBy,
 				sortDirection: sortParams.sortDirection,
+				q: q.trim() || undefined,
+				searchField: searchField === "name" ? "name" : "email",
+				role: role !== "all" ? role : undefined,
+				status: status !== "all" ? status : undefined,
 			};
 
-			if (q.trim()) {
-				queryPayload.searchValue = q.trim();
-				queryPayload.searchField = searchField === "name" ? "name" : "email";
-				queryPayload.searchOperator = "contains";
-			}
-
-			if (filterFieldParam !== undefined && filterValueParam !== undefined) {
-				queryPayload.filterField = filterFieldParam;
-				queryPayload.filterValue = filterValueParam;
-				queryPayload.filterOperator = "eq";
-			}
-
-			const { data, error } = await authClient.admin.listUsers({
-				query: queryPayload,
-			});
-
-			if (error) {
-				// Resilient fallback: if server throws on boolean filter operator, fallback to unconstrained query with client filter
-				if (filterFieldParam) {
-					delete queryPayload.filterField;
-					delete queryPayload.filterValue;
-					delete queryPayload.filterOperator;
-					const fallbackRes = await authClient.admin.listUsers({
-						query: queryPayload,
-					});
-					if (!fallbackRes.error && fallbackRes.data) {
-						let fallbackUsers = (fallbackRes.data.users as AdminUser[]) ?? [];
-						if (role && role !== "all") {
-							fallbackUsers = fallbackUsers.filter(
-								(u) => (u.role || DEFAULT_USER_ROLE) === role,
-							);
-						}
-						if (status && status !== "all") {
-							fallbackUsers = fallbackUsers.filter((u) =>
-								status === "banned" ? Boolean(u.banned) : !u.banned,
-							);
-						}
-						setUsers(fallbackUsers);
-						setTotal(fallbackUsers.length);
-						return;
-					}
-				}
-				toast.error(error.message || "Failed to list users");
-				return;
-			}
-
-			let resultUsers = (data?.users as AdminUser[]) ?? [];
-
-			// Multi-filter refinement: when both role and status are set, role was filtered on server, refine status here
-			if (role && role !== "all" && status && status !== "all") {
-				resultUsers = resultUsers.filter((u) =>
-					status === "banned" ? Boolean(u.banned) : !u.banned,
-				);
-			}
-
-			setUsers(resultUsers);
-			setTotal(data?.total ?? resultUsers.length);
+			const data = await adminGet<{ items: AdminUser[]; total: number }>(
+				"/users",
+				params,
+			);
+			setUsers(data.items);
+			setTotal(data.total);
 		} catch (err) {
 			const message =
 				err instanceof Error ? err.message : "Failed to load users";
@@ -228,6 +179,7 @@ export default function UsersPage() {
 
 	const quickTabs = [
 		{ id: "all", label: "All users", icon: UsersIcon },
+		{ id: "suspect", label: "Suspects", icon: ShieldAlert },
 		{ id: "active", label: "Active", icon: UserCheck },
 		{ id: "banned", label: "Banned", icon: UserX },
 		{ id: "super-admins", label: "Super-admins", icon: Shield },
@@ -236,20 +188,25 @@ export default function UsersPage() {
 	const activeQuickTab =
 		status === "all" && role === "all"
 			? "all"
-			: status === "active" && role === "all"
-				? "active"
-				: status === "banned" && role === "all"
-					? "banned"
-					: status === "all" && role === PLATFORM_ADMIN_ROLE
-						? "super-admins"
-						: null;
+			: status === "suspect" && role === "all"
+				? "suspect"
+				: status === "active" && role === "all"
+					? "active"
+					: status === "banned" && role === "all"
+						? "banned"
+						: status === "all" && role === PLATFORM_ADMIN_ROLE
+							? "super-admins"
+							: null;
 
 	const handleSelectQuickTab = (
-		tabId: "all" | "active" | "banned" | "super-admins",
+		tabId: "all" | "suspect" | "active" | "banned" | "super-admins",
 	) => {
 		setPage(1);
 		if (tabId === "all") {
 			setStatus("all");
+			setRole("all");
+		} else if (tabId === "suspect") {
+			setStatus("suspect");
 			setRole("all");
 		} else if (tabId === "active") {
 			setStatus("active");
@@ -389,6 +346,7 @@ export default function UsersPage() {
 							<option value="all">All statuses</option>
 							<option value="active">Active</option>
 							<option value="banned">Banned</option>
+							<option value="suspect">Suspects Only</option>
 						</select>
 					</div>
 
@@ -621,7 +579,19 @@ export default function UsersPage() {
 								<StatusPill status={user.role || DEFAULT_USER_ROLE} />
 							</td>
 							<td className="px-4 py-3">
-								<StatusPill status={user.banned ? "banned" : "active"} />
+								<div className="flex flex-col gap-1 items-start">
+									<StatusPill status={user.banned ? "banned" : "active"} />
+									{user.isSuspect ? (
+										<StatusPill
+											status={
+												user.suspectCategory
+													? `suspect (${user.suspectCategory})`
+													: "suspect"
+											}
+											tone="red"
+										/>
+									) : null}
+								</div>
 							</td>
 							<td className="px-4 py-3">
 								<span
@@ -633,6 +603,16 @@ export default function UsersPage() {
 							</td>
 							<td className="px-4 py-3">
 								<div className="flex flex-wrap gap-1.5">
+									<Button.Root
+										size="xsmall"
+										variant={user.isSuspect ? "error" : "neutral"}
+										mode={user.isSuspect ? "filled" : "stroke"}
+										onClick={() => setSuspectTarget(user)}
+										title="Mark or edit suspect status"
+									>
+										<ShieldAlert className="size-3 mr-1" />
+										{user.isSuspect ? "Suspect" : "Suspect"}
+									</Button.Root>
 									<Button.Root
 										asChild
 										size="xsmall"
@@ -728,6 +708,23 @@ export default function UsersPage() {
 					}}
 				/>
 			</div>
+
+			{suspectTarget ? (
+				<SuspectionDrawer
+					open={Boolean(suspectTarget)}
+					onOpenChange={(open) => !open && setSuspectTarget(null)}
+					entityType="user"
+					entityId={suspectTarget.id}
+					entityName={suspectTarget.name}
+					entityIdentifier={suspectTarget.email}
+					initialIsSuspect={suspectTarget.isSuspect}
+					initialReason={suspectTarget.suspectReason}
+					initialSeverity={suspectTarget.suspectSeverity}
+					initialCategory={suspectTarget.suspectCategory}
+					associatedCount={suspectTarget.organizationCount}
+					onSuccess={loadUsers}
+				/>
+			) : null}
 		</PageFrame>
 	);
 }

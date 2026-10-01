@@ -6,6 +6,7 @@ import {
 	getOrganizationController,
 	listOrganizationsController,
 	updateOrganizationStatusController,
+	updateOrganizationSuspectController,
 } from "./organizations.controllers";
 
 export const organizationsRoute = new Elysia()
@@ -19,6 +20,7 @@ export const organizationsRoute = new Elysia()
 				q: query.q,
 				status: query.status,
 				plan: query.plan,
+				isSuspect: query.isSuspect,
 			}),
 		{
 			authAdmin: true,
@@ -26,6 +28,7 @@ export const organizationsRoute = new Elysia()
 				limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
 				offset: t.Optional(t.Numeric({ default: 0, minimum: 0 })),
 				q: t.Optional(t.String()),
+				isSuspect: t.Optional(t.Boolean()),
 				status: t.Optional(
 					t.Union([
 						t.Literal("active"),
@@ -117,6 +120,32 @@ export const organizationsRoute = new Elysia()
 				summary: "Convert organization to Pro (or higher)",
 				description:
 					"Admin action to grant Pro/individual plan. Supports comped (free grant) vs paid (external payment). Blocks if already Pro+.",
+			},
+		},
+	)
+	.patch(
+		"/organizations/:organizationId/suspect",
+		async ({ params, body, userId }) =>
+			updateOrganizationSuspectController({
+				organizationId: params.organizationId,
+				isSuspect: body.isSuspect,
+				reason: body.reason,
+				severity: body.severity,
+				category: body.category,
+				flagUsers: body.flagUsers,
+				actorUserId: userId,
+			}),
+		{
+			authAdmin: true,
+			params: t.Object({ organizationId: t.String() }),
+			body: AdminModel.updateSuspectBody,
+			response: {
+				200: AdminModel.successResponse,
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Admin"],
+				summary: "Update organization suspect / spam status",
 			},
 		},
 	);

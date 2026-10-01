@@ -109,6 +109,11 @@ export namespace AdminModel {
 		activeOrganizationId: t.Union([t.String(), t.Null()]),
 		createdAt: t.Date(),
 		updatedAt: t.Date(),
+		isSuspect: t.Boolean(),
+		suspectReason: t.Union([t.String(), t.Null()]),
+		suspectSeverity: t.Union([t.String(), t.Null()]),
+		suspectCategory: t.Union([t.String(), t.Null()]),
+		suspectUpdatedAt: t.Union([t.Date(), t.Null()]),
 		organizations: t.Array(
 			t.Object({
 				memberId: t.String(),
@@ -164,6 +169,11 @@ export namespace AdminModel {
 		domainCount: t.Number(),
 		creditsRemaining: t.Union([t.Number(), t.Null()]),
 		planId: t.Union([t.String(), t.Null()]),
+		isSuspect: t.Boolean(),
+		suspectReason: t.Union([t.String(), t.Null()]),
+		suspectSeverity: t.Union([t.String(), t.Null()]),
+		suspectCategory: t.Union([t.String(), t.Null()]),
+		suspectUpdatedAt: t.Union([t.Date(), t.Null()]),
 	});
 
 	export const organizationsResponse = t.Object({
@@ -205,6 +215,11 @@ export namespace AdminModel {
 		billingName: t.Union([t.String(), t.Null()]),
 		logo: t.Union([t.String(), t.Null()]),
 		externalCustomerId: t.Union([t.String(), t.Null()]),
+		isSuspect: t.Boolean(),
+		suspectReason: t.Union([t.String(), t.Null()]),
+		suspectSeverity: t.Union([t.String(), t.Null()]),
+		suspectCategory: t.Union([t.String(), t.Null()]),
+		suspectUpdatedAt: t.Union([t.Date(), t.Null()]),
 		counts: t.Object({
 			members: t.Number(),
 			domains: t.Number(),
@@ -771,5 +786,81 @@ export namespace AdminModel {
 		dataRetentionDays: t.Number(),
 		dedicatedIpCount: t.Number(),
 		mode: t.String(),
+	});
+
+	export const suspectSeverity = t.Union([
+		t.Literal("low"),
+		t.Literal("medium"),
+		t.Literal("high"),
+		t.Literal("critical"),
+	]);
+
+	export const suspectCategory = t.Union([
+		t.Literal("spam"),
+		t.Literal("phishing"),
+		t.Literal("fraud"),
+		t.Literal("abuse"),
+		t.Literal("other"),
+	]);
+
+	export const updateSuspectBody = t.Object({
+		isSuspect: t.Boolean(),
+		reason: t.Optional(t.Union([t.String(), t.Null()])),
+		severity: t.Optional(t.Union([suspectSeverity, t.Null()])),
+		category: t.Optional(t.Union([suspectCategory, t.Null()])),
+		flagOrganizations: t.Optional(t.Boolean()),
+		flagUsers: t.Optional(t.Boolean()),
+	});
+
+	export const suspectItem = t.Object({
+		type: t.Union([t.Literal("user"), t.Literal("organization")]),
+		id: t.String(),
+		name: t.String(),
+		identifier: t.String(),
+		isSuspect: t.Boolean(),
+		suspectReason: t.Union([t.String(), t.Null()]),
+		suspectSeverity: t.Union([t.String(), t.Null()]),
+		suspectCategory: t.Union([t.String(), t.Null()]),
+		suspectUpdatedAt: t.Union([t.Date(), t.Null()]),
+		createdAt: t.Date(),
+		associatedCount: t.Number(),
+		associatedName: t.Optional(t.Union([t.String(), t.Null()])),
+	});
+
+	export const suspectsListResponse = t.Object({
+		items: t.Array(suspectItem),
+		total: t.Number(),
+		stats: t.Object({
+			totalSuspects: t.Number(),
+			usersCount: t.Number(),
+			orgsCount: t.Number(),
+			criticalCount: t.Number(),
+			highCount: t.Number(),
+		}),
+	});
+
+	export const adminUserItem = t.Object({
+		id: t.String(),
+		name: t.String(),
+		email: t.String(),
+		image: t.Union([t.String(), t.Null()]),
+		role: t.String(),
+		banned: t.Boolean(),
+		banReason: t.Union([t.String(), t.Null()]),
+		emailVerified: t.Boolean(),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
+		isSuspect: t.Boolean(),
+		suspectReason: t.Union([t.String(), t.Null()]),
+		suspectSeverity: t.Union([t.String(), t.Null()]),
+		suspectCategory: t.Union([t.String(), t.Null()]),
+		suspectUpdatedAt: t.Union([t.Date(), t.Null()]),
+		organizationCount: t.Number(),
+		activeOrgName: t.Union([t.String(), t.Null()]),
+	});
+
+	export const adminUsersResponse = t.Object({
+		items: t.Array(adminUserItem),
+		total: t.Number(),
 	});
 }

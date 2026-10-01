@@ -40,14 +40,17 @@ export async function listOrganizationsController({
 	q,
 	status,
 	plan,
+	isSuspect,
 }: {
 	limit?: number;
 	offset?: number;
 	q?: string;
 	status?: "active" | "suspended" | "deleted";
 	plan?: "free" | "individual" | "startup" | "enterprise";
+	isSuspect?: boolean;
 }) {
 	const conditions = [];
+	if (isSuspect !== undefined) conditions.push(eq(organization.isSuspect, isSuspect));
 	if (status) conditions.push(eq(organization.status, status));
 	if (q) {
 		conditions.push(
@@ -110,6 +113,11 @@ export async function listOrganizationsController({
 			billingEmail: organization.billingEmail,
 			creditsRemaining: organizationCredits.creditsRemaining,
 			planId: organizationPlan.planId,
+			isSuspect: organization.isSuspect,
+			suspectReason: organization.suspectReason,
+			suspectSeverity: organization.suspectSeverity,
+			suspectCategory: organization.suspectCategory,
+			suspectUpdatedAt: organization.suspectUpdatedAt,
 		})
 		.from(organization)
 		.leftJoin(
@@ -175,6 +183,11 @@ export async function listOrganizationsController({
 			domainCount: domainMap.get(o.id) ?? 0,
 			creditsRemaining: o.creditsRemaining ?? null,
 			planId: o.planId ?? null,
+			isSuspect: o.isSuspect ?? false,
+			suspectReason: o.suspectReason ?? null,
+			suspectSeverity: o.suspectSeverity ?? null,
+			suspectCategory: o.suspectCategory ?? null,
+			suspectUpdatedAt: o.suspectUpdatedAt ?? null,
 		})),
 		total: totalRow?.value ?? 0,
 	};
@@ -500,6 +513,11 @@ export async function getOrganizationController(organizationId: string) {
 		billingName: org.billingName ?? null,
 		logo: org.logo ?? null,
 		externalCustomerId: org.externalCustomerId ?? null,
+		isSuspect: org.isSuspect ?? false,
+		suspectReason: org.suspectReason ?? null,
+		suspectSeverity: org.suspectSeverity ?? null,
+		suspectCategory: org.suspectCategory ?? null,
+		suspectUpdatedAt: org.suspectUpdatedAt ?? null,
 		counts: {
 			members: members.length,
 			domains: domains.length,
@@ -667,3 +685,98 @@ export async function updateOrganizationStatusController({
 
 	return { success: true };
 }
+
+export async function updateOrganizationSuspectController({
+	organizationId,
+	isSuspect,
+	reason,
+	severity,
+	category,
+	flagUsers = false,
+	actorUserId,
+}: {
+	organizationId: string;
+	isSuspect: boolean;
+	reason?: string | null;
+	severity?: "low" | "medium" | "high" | "critical" | null;
+	category?: "spam" | "phishing" | "fraud" | "abuse" | "other" | null;
+	flagUsers?: boolean;
+	actorUserId: string;
+}) {
+	const org = await db.query.organization.findFirst({
+		where: eq(organization.id, organizationId),
+	});
+
+	if (!org) {
+		throw createError({
+			status: 404,
+			message: "Organization not found",
+			why: `No organization with id ${organizationId}`,
+			fix: "Check the organization id and try again",
+		});
+	}
+
+	const now = new Date();
+
+	await db
+		.update(organization)
+		.set({
+			isSuspect,
+			suspectReason: isSuspect ? (reason ?? null) : null,
+			suspectSeverity: isSuspect ? (severity ?? null) : null,
+			suspectCategory: isSuspect ? (category ?? null) : null,
+			suspectUpdatedAt: now,
+		})
+		.where(eq(organization.id, organizationId));
+
+	let affectedUserCount = 0;
+	if (flagUsers) {
+		const memberships = await db
+			.select({ userId: member.userId })
+			.from(member)
+			.where(eq(member.organizationId, organizationId));
+
+		const userIds = memberships.map((m) => m.userId);
+		if (userIds.length > 0) {
+			await db
+				.update(user)
+				.set({
+					isSuspect,
+					suspectReason: isSuspect
+						? (reason ?? `Flagged via suspected organization (${org.name})`)
+						: null,
+					suspectSeverity: isSuspect ? (severity ?? null) : null,
+					suspectCategory: isSuspect ? (category ?? null) : null,
+					suspectUpdatedAt: now,
+				})
+				.where(inArray(user.id, userIds));
+
+			affectedUserCount = userIds.length;
+		}
+	}
+
+	await writeAdminAudit({
+		actorUserId,
+		action: isSuspect
+			? "organization.suspect.flagged"
+			: "organization.suspect.cleared",
+		resourceType: "organization",
+		resourceId: organizationId,
+		organizationId,
+		metadata: {
+			isSuspect,
+			reason,
+			severity,
+			category,
+			flagUsers,
+			affectedUserCount,
+		},
+	});
+
+	return {
+		success: true,
+		isSuspect,
+		affectedUserCount,
+	};
+}
+

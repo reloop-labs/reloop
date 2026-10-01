@@ -21,9 +21,11 @@ import {
 	formatRelativeTime,
 	truncateId,
 } from "@fe/console/lib/format";
+import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -52,6 +54,11 @@ type OrgDetail = {
 	billingName: string | null;
 	logo: string | null;
 	externalCustomerId: string | null;
+	isSuspect?: boolean;
+	suspectReason?: string | null;
+	suspectSeverity?: "low" | "medium" | "high" | "critical" | null;
+	suspectCategory?: "spam" | "phishing" | "fraud" | "abuse" | "other" | null;
+	suspectUpdatedAt?: string | null;
 	counts: {
 		members: number;
 		domains: number;
@@ -208,6 +215,7 @@ export default function OrganizationDetailPage() {
 	const router = useRouter();
 	const [tab, setTab] = useState<TabId>("overview");
 	const [suspendOpen, setSuspendOpen] = useState(false);
+	const [suspectOpen, setSuspectOpen] = useState(false);
 	const [topupOpen, setTopupOpen] = useState(false);
 	const [topupAmount, setTopupAmount] = useState("1000");
 	const [topupReason, setTopupReason] = useState("");
@@ -277,6 +285,12 @@ export default function OrganizationDetailPage() {
 				meta={
 					<>
 						<StatusPill status={data.status} />
+						{data.isSuspect ? (
+							<StatusPill
+								status={`Suspect (${data.suspectCategory || "abuse"})`}
+								tone="red"
+							/>
+						) : null}
 						<StatusPill
 							status={planLabel(data.plan?.planId)}
 							tone={
@@ -371,9 +385,50 @@ export default function OrganizationDetailPage() {
 								Suspend
 							</Button.Root>
 						)}
+						<Button.Root
+							variant={data.isSuspect ? "error" : "neutral"}
+							mode={data.isSuspect ? "filled" : "stroke"}
+							size="small"
+							onClick={() => setSuspectOpen(true)}
+						>
+							<ShieldAlert className="mr-1.5 h-3.5 w-3.5" />
+							{data.isSuspect ? "Suspect ⚠️" : "Suspection"}
+						</Button.Root>
 					</>
 				}
 			/>
+
+			{data.isSuspect ? (
+				<div className="flex items-start justify-between gap-3 rounded-2xl border border-red-500/30 bg-red-500/[0.06] p-4 text-[13px] dark:border-red-500/40 dark:bg-red-500/10">
+					<div className="flex items-start gap-3">
+						<ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+						<div>
+							<p className="font-semibold text-red-700 dark:text-red-300">
+								Organization Flagged as Suspect ({data.suspectCategory || "Spam"}) ·{" "}
+								{data.suspectSeverity?.toUpperCase() || "HIGH"} RISK
+							</p>
+							<p className="mt-0.5 text-red-600 dark:text-red-400">
+								{data.suspectReason ||
+									"Flagged in database for spamming or scamming activity."}
+							</p>
+							{data.suspectUpdatedAt ? (
+								<p className="mt-1 text-[11px] text-red-500/80">
+									Flagged {formatDateTime(data.suspectUpdatedAt)} (
+									{formatRelativeTime(data.suspectUpdatedAt)})
+								</p>
+							) : null}
+						</div>
+					</div>
+					<Button.Root
+						variant="error"
+						mode="stroke"
+						size="small"
+						onClick={() => setSuspectOpen(true)}
+					>
+						Edit Suspection
+					</Button.Root>
+				</div>
+			) : null}
 
 			{suspendOpen ? (
 				<InlineActionPanel
@@ -1409,6 +1464,21 @@ export default function OrganizationDetailPage() {
 					</DataTable>
 				</SectionCard>
 			) : null}
+
+			<SuspectionDrawer
+				open={suspectOpen}
+				onOpenChange={setSuspectOpen}
+				entityType="organization"
+				entityId={data.id}
+				entityName={data.name}
+				entityIdentifier={data.slug}
+				initialIsSuspect={data.isSuspect}
+				initialReason={data.suspectReason}
+				initialSeverity={data.suspectSeverity}
+				initialCategory={data.suspectCategory}
+				associatedCount={data.counts.members}
+				onSuccess={() => mutate()}
+			/>
 		</PageFrame>
 	);
 }

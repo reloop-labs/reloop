@@ -11,24 +11,33 @@ import {
 /** Platform user roles (Better Auth admin plugin). Distinct from org member.role. */
 export const userRoleEnum = pgEnum("user_role", ["user", "super-admin"]);
 
-export const user = pgTable("user", {
-	id: text("id").primaryKey(),
-	name: text("name").notNull(),
-	email: text("email").notNull().unique(),
-	emailVerified: boolean("email_verified").default(false).notNull(),
-	image: text("image"),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at")
-		.defaultNow()
-		.$onUpdate(() => /* @__PURE__ */ new Date())
-		.notNull(),
-	role: userRoleEnum("role").default("user").notNull(),
-	banned: boolean("banned").default(false),
-	banReason: text("ban_reason"),
-	banExpires: timestamp("ban_expires"),
-	activeOrganizationId: text("active_organization_id"),
-	mode: text("mode").default("dev"),
-});
+export const user = pgTable(
+	"user",
+	{
+		id: text("id").primaryKey(),
+		name: text("name").notNull(),
+		email: text("email").notNull().unique(),
+		emailVerified: boolean("email_verified").default(false).notNull(),
+		image: text("image"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.$onUpdate(() => /* @__PURE__ */ new Date())
+			.notNull(),
+		role: userRoleEnum("role").default("user").notNull(),
+		banned: boolean("banned").default(false),
+		banReason: text("ban_reason"),
+		banExpires: timestamp("ban_expires"),
+		activeOrganizationId: text("active_organization_id"),
+		mode: text("mode").default("dev"),
+		isSuspect: boolean("is_suspect").default(false).notNull(),
+		suspectReason: text("suspect_reason"),
+		suspectSeverity: text("suspect_severity"),
+		suspectCategory: text("suspect_category"),
+		suspectUpdatedAt: timestamp("suspect_updated_at"),
+	},
+	(table) => [index("user_isSuspect_idx").on(table.isSuspect)],
+);
 
 export const account = pgTable(
 	"account",
@@ -84,22 +93,31 @@ export const organizationStatusEnum = pgEnum("organization_status", [
 	"deleted",
 ]);
 
-export const organization = pgTable("organization", {
-	id: text("id").primaryKey(),
-	name: text("name").notNull(),
-	slug: text("slug").notNull().unique(),
-	logo: text("logo"),
-	createdAt: timestamp("created_at").notNull(),
-	updatedAt: timestamp("updated_at")
-		.notNull()
-		.defaultNow()
-		.$onUpdate(() => new Date()),
-	metadata: text("metadata"),
-	billingEmail: text("billing_email"),
-	billingName: text("billing_name"),
-	externalCustomerId: text("external_customer_id").unique(),
-	status: organizationStatusEnum("status").notNull().default("active"),
-});
+export const organization = pgTable(
+	"organization",
+	{
+		id: text("id").primaryKey(),
+		name: text("name").notNull(),
+		slug: text("slug").notNull().unique(),
+		logo: text("logo"),
+		createdAt: timestamp("created_at").notNull(),
+		updatedAt: timestamp("updated_at")
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+		metadata: text("metadata"),
+		billingEmail: text("billing_email"),
+		billingName: text("billing_name"),
+		externalCustomerId: text("external_customer_id").unique(),
+		status: organizationStatusEnum("status").notNull().default("active"),
+		isSuspect: boolean("is_suspect").default(false).notNull(),
+		suspectReason: text("suspect_reason"),
+		suspectSeverity: text("suspect_severity"),
+		suspectCategory: text("suspect_category"),
+		suspectUpdatedAt: timestamp("suspect_updated_at"),
+	},
+	(table) => [index("organization_isSuspect_idx").on(table.isSuspect)],
+);
 
 export const member = pgTable(
 	"member",
