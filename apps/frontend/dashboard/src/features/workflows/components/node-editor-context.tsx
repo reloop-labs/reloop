@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from "react";
 
-export type InsertStepKind = "send_email" | "condition" | "delay";
+export type InsertStepKind = "send_email" | "condition" | "delay" | "add_step";
 
 interface NodeEditorContextValue {
 	updateNode: (nodeId: string, data: Record<string, unknown>) => void;
@@ -13,6 +13,10 @@ interface NodeEditorContextValue {
 		sourceNodeId: string,
 		sourceHandle: string | undefined,
 		kind: InsertStepKind,
+	) => void;
+	replaceStep: (
+		nodeId: string,
+		kind: "send_email" | "condition" | "delay",
 	) => void;
 	readOnly: boolean;
 }

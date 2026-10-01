@@ -276,11 +276,7 @@ export const WorkflowEditorToolbar = ({
 							<Icon name="more-horizontal" className="h-4 w-4" />
 						</FancyButton.Root>
 					</Dropdown.Trigger>
-					<Dropdown.Content
-						align="end"
-						sideOffset={6}
-						className="w-48 p-1.5"
-					>
+					<Dropdown.Content align="end" sideOffset={6} className="w-48 p-1.5">
 						<Dropdown.Item
 							onSelect={() => {
 								setMoreOpen(false);
@@ -289,7 +285,9 @@ export const WorkflowEditorToolbar = ({
 							className="cursor-pointer"
 						>
 							<Icon name="play" className="size-3.5 text-text-sub-600" />
-							<span className="flex-1 font-medium text-xs">Test automation</span>
+							<span className="flex-1 font-medium text-xs">
+								Test automation
+							</span>
 						</Dropdown.Item>
 						<Dropdown.Item
 							onSelect={() => void handleDuplicate()}
@@ -314,11 +312,7 @@ export const WorkflowEditorToolbar = ({
 				{isActive ? (
 					<Dropdown.Root open={stopOpen} onOpenChange={setStopOpen}>
 						<Dropdown.Trigger asChild>
-							<FancyButton.Root
-								variant="basic"
-								size="xsmall"
-								disabled={busy}
-							>
+							<FancyButton.Root variant="basic" size="xsmall" disabled={busy}>
 								{busy ? "Stopping…" : "Stop"}
 								<Icon name="chevron-down" className="h-3.5 w-3.5" />
 							</FancyButton.Root>
@@ -336,7 +330,7 @@ export const WorkflowEditorToolbar = ({
 									<p className="font-medium text-[13px] text-text-strong-950">
 										Stop new automations
 									</p>
-									<p className="mt-0.5 text-xs leading-relaxed text-text-sub-600">
+									<p className="mt-0.5 text-text-sub-600 text-xs leading-relaxed">
 										Automations that are currently running will continue.
 									</p>
 								</div>
@@ -349,7 +343,7 @@ export const WorkflowEditorToolbar = ({
 									<p className="font-medium text-[13px] text-text-strong-950">
 										Stop now
 									</p>
-									<p className="mt-0.5 text-xs leading-relaxed text-text-sub-600">
+									<p className="mt-0.5 text-text-sub-600 text-xs leading-relaxed">
 										All automations will stop immediately
 									</p>
 								</div>
@@ -366,7 +360,7 @@ export const WorkflowEditorToolbar = ({
 							size="xsmall"
 							onClick={() => void handleStopNow()}
 							disabled={busy}
-							className="dark:text-black dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.4),0_0_0_1px_#ffffff] dark:[--zero-blue:#ffffff] dark:[--zero-blue-hover:#e6edf3]"
+							className="dark:text-black dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.4),0_0_0_1px_#ffffff] dark:[--zero-blue-hover:#e6edf3] dark:[--zero-blue:#ffffff]"
 						>
 							{busy ? "Stopping…" : "Stop now"}
 						</FancyButton.Root>
@@ -377,7 +371,7 @@ export const WorkflowEditorToolbar = ({
 						size="xsmall"
 						onClick={() => void handleStart()}
 						disabled={busy || !validation.isValid}
-						className="dark:text-black dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.4),0_0_0_1px_#ffffff] dark:[--zero-blue:#ffffff] dark:[--zero-blue-hover:#e6edf3]"
+						className="dark:text-black dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.4),0_0_0_1px_#ffffff] dark:[--zero-blue-hover:#e6edf3] dark:[--zero-blue:#ffffff]"
 					>
 						{busy ? "Starting…" : "Start"}
 					</FancyButton.Root>

@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
 	BaseEdge,
@@ -9,9 +8,7 @@ import {
 	getSmoothStepPath,
 	Position,
 } from "@xyflow/react";
-import { useEffect, useRef, useState } from "react";
 import { useNodeEditor } from "../node-editor-context";
-import { StepPickerMenu } from "../step-picker-menu";
 
 export type EdgeTone = "accent" | "default";
 
@@ -48,20 +45,7 @@ export const FlowEdge = ({
 	const branch =
 		data?.branch === "yes" || data?.branch === "no" ? data.branch : undefined;
 
-	const [pickerOpen, setPickerOpen] = useState(false);
-	const pickerRef = useRef<HTMLDivElement>(null);
 	const { insertStep, readOnly } = useNodeEditor();
-
-	useEffect(() => {
-		if (!pickerOpen) return;
-		const onPointerDown = (e: PointerEvent) => {
-			if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-				setPickerOpen(false);
-			}
-		};
-		document.addEventListener("pointerdown", onPointerDown);
-		return () => document.removeEventListener("pointerdown", onPointerDown);
-	}, [pickerOpen]);
 
 	return (
 		<>
@@ -75,7 +59,6 @@ export const FlowEdge = ({
 			{isStub || readOnly ? null : (
 				<EdgeLabelRenderer>
 					<div
-						ref={pickerRef}
 						className="nodrag nopan absolute z-30"
 						style={{
 							transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
@@ -84,34 +67,18 @@ export const FlowEdge = ({
 					>
 						<button
 							type="button"
-							aria-label={pickerOpen ? "Close step picker" : "Insert step here"}
-							onClick={() => setPickerOpen((o) => !o)}
-							className={cn(
-								"group flex h-7 w-7 items-center justify-center rounded-full border border-black/10 text-white shadow-[0_2px_10px_rgba(0,0,0,0.25)] transition-all duration-150 active:scale-95",
-								pickerOpen
-									? "bg-blue-500 ring-2 ring-blue-400/30 hover:bg-blue-600"
-									: "bg-[#3d444d] hover:scale-110 hover:bg-[#4d555e]",
-							)}
+							aria-label="Insert step here"
+							onClick={(e) => {
+								e.stopPropagation();
+								insertStep(id, "add_step");
+							}}
+							className="group flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-[#3d444d] text-white shadow-[0_2px_10px_rgba(0,0,0,0.25)] transition-all duration-150 hover:scale-110 hover:bg-[#4d555e] active:scale-95"
 						>
 							<Icon
 								name="plus"
-								className={cn(
-									"h-4 w-4 transition-transform duration-150",
-									pickerOpen && "rotate-45",
-								)}
+								className="h-4 w-4 transition-transform duration-150 group-hover:rotate-90"
 							/>
 						</button>
-						{pickerOpen ? (
-							<div className="absolute top-full left-1/2 z-50 mt-2 -translate-x-1/2">
-								<StepPickerMenu
-									onPick={(kind) => {
-										insertStep(id, kind);
-										setPickerOpen(false);
-									}}
-									onClose={() => setPickerOpen(false)}
-								/>
-							</div>
-						) : null}
 					</div>
 					{branch ? (
 						<div

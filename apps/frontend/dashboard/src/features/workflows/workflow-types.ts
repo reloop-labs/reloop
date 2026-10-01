@@ -9,7 +9,8 @@ export type WorkflowNodeType =
 	| "send_email"
 	| "delay"
 	| "condition"
-	| "group";
+	| "group"
+	| "add_step";
 
 export type ConditionOperator =
 	| "eq"

@@ -3,10 +3,9 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Handle, Position, useEdges, useNodeId } from "@xyflow/react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { nodeTone, type WorkflowNodeTone } from "../../node-tone";
 import { useNodeEditor } from "../node-editor-context";
-import { StepPickerMenu } from "../step-picker-menu";
 
 export interface SectionSourceHandle {
 	id?: string;
@@ -32,7 +31,7 @@ interface SectionNodeCardProps {
 }
 
 const defaultHandleClass =
-	"!h-3.5 !w-3.5 !border-2 !border-white dark:!border-[#141419] !bg-stroke-sub-300 dark:!bg-white/40 shadow-xs cursor-crosshair transition-all duration-150 z-30 hover:scale-125 hover:!bg-blue-500 hover:!border-white after:absolute after:-inset-2 after:content-['']";
+	"!h-3 !w-3 !border-2 !border-white dark:!border-[#141419] !bg-stroke-sub-300 dark:!bg-white/40 shadow-xs pointer-events-none cursor-default z-10 transition-colors";
 
 function SourceHandleConnector({
 	nodeId,
@@ -43,28 +42,11 @@ function SourceHandleConnector({
 	handleId?: string;
 	left?: string;
 }) {
-	const [pickerOpen, setPickerOpen] = useState(false);
-	const pickerRef = useRef<HTMLDivElement>(null);
 	const { addStepBelow } = useNodeEditor();
-
-	useEffect(() => {
-		if (!pickerOpen) return;
-		const onPointerDown = (e: PointerEvent) => {
-			if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-				setPickerOpen(false);
-			}
-		};
-		document.addEventListener("pointerdown", onPointerDown);
-		return () => document.removeEventListener("pointerdown", onPointerDown);
-	}, [pickerOpen]);
 
 	return (
 		<div
-			ref={pickerRef}
-			className={cn(
-				"pointer-events-none absolute top-full flex flex-col items-center",
-				pickerOpen ? "z-50" : "z-20",
-			)}
+			className="pointer-events-none absolute top-full z-20 flex flex-col items-center"
 			style={{
 				left: left ?? "50%",
 				transform: "translateX(-50%)",
@@ -73,39 +55,23 @@ function SourceHandleConnector({
 			{/* Vertical connector line dropping down from the card handle */}
 			<div
 				aria-hidden="true"
-				className={cn(
-					"pointer-events-none mt-1 w-[1.5px] bg-stroke-sub-300 transition-all duration-150 dark:bg-white/20",
-					pickerOpen ? "h-4" : "h-6",
-				)}
+				className="pointer-events-none mt-1 h-6 w-[1.5px] bg-stroke-sub-300 transition-all duration-150 dark:bg-white/20"
 			/>
-			{!pickerOpen ? (
-				/* Circular plus button */
-				<button
-					type="button"
-					aria-label="Add step here"
-					onClick={(e) => {
-						e.stopPropagation();
-						setPickerOpen(true);
-					}}
-					className="nodrag nopan group pointer-events-auto flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-[#3d444d] text-white shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-150 hover:scale-110 hover:bg-[#4d555e] active:scale-95"
-				>
-					<Icon
-						name="plus"
-						className="h-4 w-4 transition-transform duration-150 group-hover:rotate-90"
-					/>
-				</button>
-			) : (
-				/* Converted: The plus converts directly into the whole node! */
-				<div className="nodrag nopan pointer-events-auto">
-					<StepPickerMenu
-						onPick={(kind) => {
-							addStepBelow?.(nodeId, handleId, kind);
-							setPickerOpen(false);
-						}}
-						onClose={() => setPickerOpen(false)}
-					/>
-				</div>
-			)}
+			{/* Circular plus button */}
+			<button
+				type="button"
+				aria-label="Add step here"
+				onClick={(e) => {
+					e.stopPropagation();
+					addStepBelow(nodeId, handleId, "add_step");
+				}}
+				className="nodrag nopan group pointer-events-auto flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-[#3d444d] text-white shadow-[0_2px_8px_rgba(0,0,0,0.2)] transition-all duration-150 hover:scale-110 hover:bg-[#4d555e] active:scale-95"
+			>
+				<Icon
+					name="plus"
+					className="h-4 w-4 transition-transform duration-150 group-hover:rotate-90"
+				/>
+			</button>
 		</div>
 	);
 }
@@ -150,6 +116,7 @@ export const SectionNodeCard = ({
 				<Handle
 					type="target"
 					position={Position.Top}
+					isConnectable={false}
 					className={cn(defaultHandleClass, selected && meta.handleClass)}
 				/>
 			) : null}
@@ -213,6 +180,7 @@ export const SectionNodeCard = ({
 					type="source"
 					id={handle.id}
 					position={Position.Bottom}
+					isConnectable={false}
 					className={cn(defaultHandleClass, selected && meta.handleClass)}
 					style={handle.left ? { left: handle.left } : undefined}
 				/>

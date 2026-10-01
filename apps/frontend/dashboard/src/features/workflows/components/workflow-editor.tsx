@@ -1,11 +1,9 @@
 "use client";
 
 import {
-	addEdge,
 	applyNodeChanges,
 	Background,
 	BackgroundVariant,
-	type Connection,
 	type DefaultEdgeOptions,
 	type NodeChange,
 	type NodePositionChange,
@@ -19,6 +17,7 @@ import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
+	createAddStepNode,
 	createConditionNode,
 	createDelayNode,
 	createSendEmailNode,
@@ -76,6 +75,8 @@ export const getNodeEstimatedHeight = (type?: string): number => {
 			return 340;
 		case "send_email":
 			return 560;
+		case "add_step":
+			return 360;
 		default:
 			return 240;
 	}
@@ -306,41 +307,6 @@ const WorkflowEditorInner = ({
 		},
 	});
 
-	const onConnect = useCallback(
-		(connection: Connection) => {
-			if (isReadOnly) return;
-			const branch =
-				connection.sourceHandle === "yes" || connection.sourceHandle === "no"
-					? connection.sourceHandle
-					: undefined;
-			let nextEdges: WorkflowEdge[] = [];
-			setEdges((eds) => {
-				const rest = eds.filter(
-					(edge) =>
-						!(
-							edge.source === connection.source &&
-							(edge.sourceHandle ?? null) === (connection.sourceHandle ?? null)
-						),
-				);
-				nextEdges = addEdge(
-					{
-						...connection,
-						type: "flow",
-						data: {
-							tone: branch === "yes" ? "accent" : "default",
-							branch,
-						},
-					},
-					rest,
-				);
-				return nextEdges;
-			});
-			// Ensure newly connected nodes don't overlap
-			setNodes((nds) => sanitizeNodePositions(nds, nextEdges));
-		},
-		[setEdges, setNodes, isReadOnly],
-	);
-
 	const updateNodeData = useCallback(
 		(nodeId: string, data: Record<string, unknown>) => {
 			if (isReadOnly) return;
@@ -413,6 +379,11 @@ const WorkflowEditorInner = ({
 			kind: InsertStepKind,
 		) => {
 			if (isReadOnly) return;
+			const existingAddStep = nodes.find((n) => n.type === "add_step");
+			if (existingAddStep && existingAddStep.id !== sourceNodeId) {
+				handleDeleteNode(existingAddStep.id);
+			}
+
 			const sourceNode = nodes.find((n) => n.id === sourceNodeId);
 			if (!sourceNode) return;
 
@@ -421,8 +392,10 @@ const WorkflowEditorInner = ({
 				newNode = createSendEmailNode(nodes.filter(isSendEmailNode).length, 0);
 			} else if (kind === "delay") {
 				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
-			} else {
+			} else if (kind === "condition") {
 				newNode = createConditionNode(nodes.filter(isConditionNode).length, 0);
+			} else {
+				newNode = createAddStepNode(sourceHandle);
 			}
 
 			const sourceHeight = getNodeEstimatedHeight(sourceNode.type);
@@ -662,6 +635,11 @@ const WorkflowEditorInner = ({
 	const insertStep = useCallback(
 		(edgeId: string, kind: InsertStepKind) => {
 			if (isReadOnly) return;
+			const existingAddStep = nodes.find((n) => n.type === "add_step");
+			if (existingAddStep) {
+				handleDeleteNode(existingAddStep.id);
+			}
+
 			const edge = edges.find((e) => e.id === edgeId);
 			if (!edge) return;
 			const source = nodes.find((n) => n.id === edge.source);
@@ -673,8 +651,10 @@ const WorkflowEditorInner = ({
 				newNode = createSendEmailNode(nodes.filter(isSendEmailNode).length, 0);
 			} else if (kind === "delay") {
 				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
-			} else {
+			} else if (kind === "condition") {
 				newNode = createConditionNode(nodes.filter(isConditionNode).length, 0);
+			} else {
+				newNode = createAddStepNode(edge.sourceHandle ?? undefined);
 			}
 
 			const newNodeHeight = getNodeEstimatedHeight(newNode.type);
@@ -759,6 +739,32 @@ const WorkflowEditorInner = ({
 
 	const handleSave = () => {
 		if (isReadOnly) return;
+		const addStepNode = nodes.find((n) => n.type === "add_step");
+		if (addStepNode) {
+			const inEdge = edges.find((e) => e.target === addStepNode.id);
+			const outEdge = edges.find((e) => e.source === addStepNode.id);
+			const cleanNodes = nodes.filter((n) => n.id !== addStepNode.id);
+			const remainingEdges = edges.filter(
+				(e) => e.source !== addStepNode.id && e.target !== addStepNode.id,
+			);
+			if (inEdge && outEdge && inEdge.source !== outEdge.target) {
+				remainingEdges.push({
+					id: `e_${inEdge.source}_${outEdge.target}_${Date.now()}`,
+					source: inEdge.source,
+					target: outEdge.target,
+					...(inEdge.sourceHandle ? { sourceHandle: inEdge.sourceHandle } : {}),
+					...(outEdge.targetHandle
+						? { targetHandle: outEdge.targetHandle }
+						: {}),
+					type: "flow",
+					data: {
+						tone: inEdge.data?.tone ?? "default",
+						branch: inEdge.data?.branch,
+					},
+				});
+			}
+			return onSave(cleanNodes, remainingEdges);
+		}
 		return onSave(nodes, edges);
 	};
 
@@ -774,6 +780,85 @@ const WorkflowEditorInner = ({
 		setNodes((nds) => sanitizeNodePositions(nds, edges));
 	}, [edges, setNodes, isReadOnly]);
 
+	const replaceStep = useCallback(
+		(nodeId: string, kind: "send_email" | "condition" | "delay") => {
+			if (isReadOnly) return;
+			const targetNode = nodes.find((n) => n.id === nodeId);
+			if (!targetNode) return;
+
+			let newNode: WorkflowNode;
+			if (kind === "send_email") {
+				newNode = createSendEmailNode(nodes.filter(isSendEmailNode).length, 0);
+			} else if (kind === "delay") {
+				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
+			} else {
+				newNode = createConditionNode(nodes.filter(isConditionNode).length, 0);
+			}
+
+			newNode.position = { ...targetNode.position };
+			newNode.selected = true;
+
+			const oldHeight = getNodeEstimatedHeight(targetNode.type);
+			const newHeight = getNodeEstimatedHeight(newNode.type);
+			const heightDelta = oldHeight - newHeight;
+
+			const nextEdges = edges.map((e) => {
+				let updated = e;
+				if (e.target === nodeId) {
+					updated = { ...updated, target: newNode.id };
+				}
+				if (e.source === nodeId) {
+					updated = {
+						...updated,
+						source: newNode.id,
+						sourceHandle: kind === "condition" ? "yes" : undefined,
+					};
+				}
+				return updated;
+			});
+
+			let nextNodes = nodes.map((n) => (n.id === nodeId ? newNode : n));
+
+			if (heightDelta > 0) {
+				const targetY = targetNode.position.y;
+				const targetX = targetNode.position.x;
+				nextNodes = nextNodes.map((n) => {
+					if (
+						n.id !== newNode.id &&
+						n.position.y > targetY &&
+						Math.abs(n.position.x - targetX) < 280
+					) {
+						return {
+							...n,
+							position: {
+								...n.position,
+								y: n.position.y - heightDelta,
+							},
+						};
+					}
+					return n;
+				});
+			}
+
+			const sanitized = sanitizeNodePositions(nextNodes, nextEdges);
+
+			setNodes(sanitized);
+			setEdges(nextEdges);
+			setSelectedNodeId(newNode.id);
+
+			const reduceMotion =
+				typeof window !== "undefined" &&
+				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			requestAnimationFrame(() => {
+				void fitView({
+					padding: 0.35,
+					duration: reduceMotion ? 0 : 220,
+				});
+			});
+		},
+		[nodes, edges, setNodes, setEdges, fitView, isReadOnly],
+	);
+
 	return (
 		<NodeEditorProvider
 			value={{
@@ -782,6 +867,7 @@ const WorkflowEditorInner = ({
 				insertStep,
 				appendStep,
 				addStepBelow,
+				replaceStep,
 				readOnly: isReadOnly,
 			}}
 		>
@@ -803,9 +889,8 @@ const WorkflowEditorInner = ({
 							onNodesChange={isReadOnly ? undefined : handleNodesChange}
 							onEdgesChange={isReadOnly ? undefined : onEdgesChange}
 							onNodeDragStop={handleNodeDragStop}
-							onConnect={isReadOnly ? undefined : onConnect}
 							nodesDraggable={!isReadOnly}
-							nodesConnectable={!isReadOnly}
+							nodesConnectable={false}
 							nodesFocusable={!isReadOnly}
 							elementsSelectable={!isReadOnly}
 							connectOnClick={false}

@@ -56,6 +56,15 @@ export const createConditionNode = (
 	},
 });
 
+export const createAddStepNode = (sourceHandle?: string): WorkflowNode => ({
+	id: `add_step_${Date.now()}`,
+	type: "add_step",
+	position: { x: COLUMN_X, y: 0 },
+	data: {
+		sourceHandle,
+	},
+});
+
 /** Local-only helper for optimistic UI before API round-trip. */
 export const createEmptyWorkflow = (input: CreateWorkflowInput): Workflow => {
 	const timestamp = now();

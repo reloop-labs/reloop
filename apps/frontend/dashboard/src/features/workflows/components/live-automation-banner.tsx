@@ -51,13 +51,16 @@ export const LiveAutomationBanner = ({ workflow }: { workflow: Workflow }) => {
 			</button>
 			<div className="flex items-start gap-3">
 				<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-bg-weak-50 dark:bg-white/10">
-					<Icon name="lock" className="h-4 w-4 text-text-sub-600 dark:text-white/80" />
+					<Icon
+						name="lock"
+						className="h-4 w-4 text-text-sub-600 dark:text-white/80"
+					/>
 				</span>
 				<div className="min-w-0 flex-1 pr-6">
 					<p className="font-semibold text-[14px] leading-snug">
 						You cannot edit a live automation
 					</p>
-					<p className="mt-1 text-[13px] leading-snug text-text-sub-600 dark:text-white/60">
+					<p className="mt-1 text-[13px] text-text-sub-600 leading-snug dark:text-white/60">
 						Duplicate it to make changes. In-flight runs will keep executing
 						this version.
 					</p>
