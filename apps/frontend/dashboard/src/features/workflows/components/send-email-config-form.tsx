@@ -836,6 +836,10 @@ const WorkflowSenderSection = ({
 				<p className="px-1 text-error-base text-xs">From is required</p>
 			)}
 
+			<div className="flex items-center justify-between pt-1">
+				<p className="font-medium text-sm text-text-strong-950">Reply to</p>
+			</div>
+
 			{/* Reply to input */}
 			<div
 				className={cn(
