@@ -8,7 +8,6 @@ import { useHotkeys } from "react-hotkeys-hook";
 import * as simpleIcons from "simple-icons";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { DomainResponse } from "#/features/domain/types";
-import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 import {
 	DNS_SETUP_HUB_URL,
 	type InferredDnsProvider,
@@ -167,7 +166,6 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	);
 	const { data: nameserverData, isPending: isLoading } =
 		useDomainNameserversQuery(typeof domainId === "string" ? domainId : null);
-	const { data: usage, isLoading: isUsageLoading } = useBillingUsage();
 
 	const nameservers = nameserverData?.nameservers;
 
@@ -188,12 +186,15 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 		return null;
 	}
 
-	if (isLoading || isUsageLoading) {
+	if (isLoading) {
 		return <DNSAutoConnectBannerSkeleton />;
 	}
 
 	// Auto-populate: provider has onboarded Reloop's Domain Connect template
-	if (provider?.supportsAutoConnect && usage?.selfHosted === false) {
+	if (
+		provider?.supportsAutoConnect &&
+		process.env.NEXT_PUBLIC_SELFHOSTED !== "true"
+	) {
 		return (
 			<AutoPopulateBanner
 				provider={provider}
