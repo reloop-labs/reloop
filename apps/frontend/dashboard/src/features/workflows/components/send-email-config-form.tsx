@@ -33,12 +33,7 @@ const templateThumbnailSrc = (template: Template): string => {
 const TemplateThumb = ({ template }: { template: Template }) => {
 	const [failed, setFailed] = useState(false);
 	return (
-		<div
-			className={cn(
-				"relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-stroke-soft-100 dark:border-stroke-soft-100/40",
-				failed ? "bg-transparent" : "bg-bg-weak-50 dark:bg-black/30",
-			)}
-		>
+		<div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
 			{failed ? (
 				<div className="flex h-full w-full items-center justify-center text-text-soft-400">
 					<Icon name="image-upload" className="h-5 w-5" />
@@ -139,7 +134,7 @@ const TemplatePicker = ({
 					No templates match “{search.trim()}”.
 				</p>
 			) : null}
-			<div className="scrollbar-thin grid max-h-64 grid-cols-2 gap-2 overflow-y-auto overflow-x-hidden p-0.5">
+			<div className="nowheel scrollbar-thin grid max-h-64 grid-cols-2 gap-2 overflow-y-auto overflow-x-hidden overscroll-contain p-0.5">
 				{filtered.map((template) => {
 					const isSelected = value.templateId === template.id;
 					return (
@@ -177,7 +172,7 @@ const TemplatePicker = ({
 					disabled={creating}
 					className="group flex min-w-0 flex-col gap-1.5 rounded-xl p-1.5 text-left transition-colors hover:bg-bg-weak-50 disabled:cursor-wait disabled:opacity-60 dark:hover:bg-white/[0.06]"
 				>
-					<span className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 border-dashed text-text-sub-600 transition-colors group-hover:border-blue-500 group-hover:text-text-strong-950 dark:border-stroke-soft-100/60 dark:group-hover:border-blue-400 dark:group-hover:text-white">
+					<span className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 border-dashed bg-bg-white-0 text-text-sub-600 transition-colors group-hover:border-blue-500 group-hover:text-text-strong-950 dark:border-stroke-soft-100/60 dark:bg-[#141419] dark:group-hover:border-blue-400 dark:group-hover:text-white">
 						<Icon name="plus" className="h-5 w-5" />
 						<span className="font-medium text-xs">
 							{creating ? "Creating…" : "New template"}

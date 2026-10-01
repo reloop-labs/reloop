@@ -211,7 +211,7 @@ export const TriggerConfigForm = ({
 				</div>
 				{isOpen ? (
 					<div className="absolute top-full right-0 left-0 z-50 mt-1 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-regular-md dark:border-stroke-soft-100/40">
-						<div className="max-h-56 space-y-0.5 overflow-y-auto p-1">
+						<div className="nowheel max-h-56 space-y-0.5 overflow-y-auto overscroll-contain p-1">
 							{eventsQuery.isLoading ? (
 								<div className="px-3 py-6 text-center text-sm text-text-soft-400">
 									Loading…

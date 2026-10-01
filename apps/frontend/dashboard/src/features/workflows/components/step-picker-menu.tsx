@@ -151,7 +151,7 @@ export const StepPickerMenu = ({
 				</div>
 
 				{/* Step items list */}
-				<div className="max-h-[260px] space-y-2.5 overflow-y-auto pr-0.5">
+				<div className="nowheel max-h-[260px] space-y-2.5 overflow-y-auto overscroll-contain pr-0.5">
 					{filteredSections.length === 0 ? (
 						<div className="py-4 text-center text-text-sub-600 text-xs">
 							No steps matching &quot;{searchQuery}&quot;

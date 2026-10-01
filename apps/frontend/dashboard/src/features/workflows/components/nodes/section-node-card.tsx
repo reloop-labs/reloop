@@ -139,7 +139,7 @@ export const SectionNodeCard = ({
 	return (
 		<div
 			className={cn(
-				"relative w-[420px] overflow-visible rounded-[14px] border bg-bg-weak-50/60 p-0.5 transition-colors duration-150 ease-out dark:border-stroke-soft-100/40 dark:bg-[#101014]",
+				"nowheel relative w-[420px] overflow-visible rounded-[14px] border bg-bg-weak-50/60 p-0.5 transition-colors duration-150 ease-out dark:border-stroke-soft-100/40 dark:bg-[#101014]",
 				selected
 					? meta.selected
 					: "border-stroke-soft-200 dark:border-stroke-soft-100/40",
@@ -199,7 +199,7 @@ export const SectionNodeCard = ({
 
 			<div
 				className={cn(
-					"nodrag nopan rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 dark:border-stroke-soft-100/40 dark:bg-[#141419]",
+					"nodrag nopan nowheel rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 dark:border-stroke-soft-100/40 dark:bg-[#141419]",
 					readOnly && "pointer-events-none select-none opacity-80",
 				)}
 			>
