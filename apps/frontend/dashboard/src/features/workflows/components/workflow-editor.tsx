@@ -2,14 +2,16 @@
 
 import {
 	addEdge,
+	applyNodeChanges,
 	Background,
 	BackgroundVariant,
 	type Connection,
 	type DefaultEdgeOptions,
+	type NodeChange,
+	type NodePositionChange,
 	ReactFlow,
 	ReactFlowProvider,
 	useEdgesState,
-	useNodesState,
 	useOnSelectionChange,
 	useReactFlow,
 } from "@xyflow/react";
@@ -82,15 +84,38 @@ export const getNodeEstimatedHeight = (type?: string): number => {
 /** Clear vertical gap between the bottom of one node and the top of the next (line height) */
 export const CLEAR_NODE_GAP = 60;
 
-/** Ensures sequential nodes on the canvas don't overlap vertically */
+/** Ensures sequential nodes on the canvas don't overlap vertically and stay in a straight line */
 function sanitizeNodePositions(
 	nodes: WorkflowNode[],
 	edges: WorkflowEdge[],
 ): WorkflowNode[] {
-	if (nodes.length <= 1) return nodes;
+	if (nodes.length === 0) return nodes;
 	let modified = false;
 	const result = nodes.map((n) => ({ ...n, position: { ...n.position } }));
 	const byY = [...result].sort((a, b) => a.position.y - b.position.y);
+
+	// 1. Enforce straight-line X alignment for linear nodes
+	const rootNode = result.find((n) => n.id === TRIGGER_NODE_ID) ?? byY[0];
+	const rootX = rootNode ? rootNode.position.x : COLUMN_X;
+
+	for (const node of byY) {
+		const incomingEdge = edges.find((e) => e.target === node.id);
+		let expectedX = rootX;
+		if (incomingEdge) {
+			const parent = result.find((n) => n.id === incomingEdge.source);
+			if (incomingEdge.sourceHandle === "yes") {
+				expectedX = (parent ? parent.position.x : rootX) - 240;
+			} else if (incomingEdge.sourceHandle === "no") {
+				expectedX = (parent ? parent.position.x : rootX) + 240;
+			} else if (parent) {
+				expectedX = parent.position.x;
+			}
+		}
+		if (node.position.x !== expectedX) {
+			node.position.x = expectedX;
+			modified = true;
+		}
+	}
 
 	for (const source of byY) {
 		const sourceHeight = getNodeEstimatedHeight(source.type);
@@ -164,8 +189,43 @@ const WorkflowEditorInner = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[workflow.id],
 	);
-	const [nodes, setNodes, onNodesChange] = useNodesState<WorkflowNode>(
-		sanitizedInitialNodes,
+	const [nodes, setNodes] = useState<WorkflowNode[]>(sanitizedInitialNodes);
+
+	const handleNodesChange = useCallback(
+		(changes: NodeChange<WorkflowNode>[]) => {
+			setNodes((currentNodes) => {
+				const posChange = changes.find(
+					(c): c is NodePositionChange => c.type === "position" && !!c.position,
+				);
+
+				if (posChange?.position) {
+					const draggedNode = currentNodes.find((n) => n.id === posChange.id);
+					if (draggedNode) {
+						const dx = posChange.position.x - draggedNode.position.x;
+						const dy = posChange.position.y - draggedNode.position.y;
+
+						if (dx !== 0 || dy !== 0) {
+							// Move the entire tree together so individual nodes cannot be detached
+							const movedNodes = currentNodes.map((node) => ({
+								...node,
+								position: {
+									x: node.position.x + dx,
+									y: node.position.y + dy,
+								},
+							}));
+
+							const otherChanges = changes.filter((c) => c.type !== "position");
+							return otherChanges.length > 0
+								? applyNodeChanges(otherChanges, movedNodes)
+								: movedNodes;
+						}
+					}
+				}
+
+				return applyNodeChanges(changes, currentNodes);
+			});
+		},
+		[setNodes],
 	);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<WorkflowEdge>(
 		workflow.edges,
@@ -740,7 +800,7 @@ const WorkflowEditorInner = ({
 						<ReactFlow
 							nodes={nodes}
 							edges={edges}
-							onNodesChange={isReadOnly ? undefined : onNodesChange}
+							onNodesChange={isReadOnly ? undefined : handleNodesChange}
 							onEdgesChange={isReadOnly ? undefined : onEdgesChange}
 							onNodeDragStop={handleNodeDragStop}
 							onConnect={isReadOnly ? undefined : onConnect}

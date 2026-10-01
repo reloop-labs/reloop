@@ -345,6 +345,10 @@ body {
 		sans-serif;
 }
 
+.workflow-canvas .react-flow__node .nodrag {
+	cursor: default;
+}
+
 .workflow-canvas .react-flow__handle {
 	width: 10px;
 	height: 10px;

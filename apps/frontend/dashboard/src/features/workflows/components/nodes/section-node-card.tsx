@@ -154,7 +154,7 @@ export const SectionNodeCard = ({
 				/>
 			) : null}
 
-			<div className="flex items-center gap-2 px-2.5 py-2">
+			<div className="flex cursor-grab items-center gap-2 px-2.5 py-2 active:cursor-grabbing">
 				<span
 					className={cn(
 						"flex h-6 w-6 shrink-0 items-center justify-center rounded-md border",
@@ -198,8 +198,9 @@ export const SectionNodeCard = ({
 			</div>
 
 			<div
+				onPointerDown={(e) => e.stopPropagation()}
 				className={cn(
-					"nodrag nopan nowheel rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 dark:border-stroke-soft-100/40 dark:bg-[#141419]",
+					"nodrag nopan nowheel cursor-default rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 dark:border-stroke-soft-100/40 dark:bg-[#141419]",
 					readOnly && "pointer-events-none select-none opacity-80",
 				)}
 			>

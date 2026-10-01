@@ -57,6 +57,55 @@ const TemplateThumb = ({ template }: { template: Template }) => {
 	);
 };
 
+const TemplateDetailPreview = ({
+	templateId,
+	templateName,
+	detail,
+	isLoading,
+}: {
+	templateId: string;
+	templateName: string;
+	detail?: Template | null;
+	isLoading: boolean;
+}) => {
+	const [failed, setFailed] = useState(false);
+	const src = templateThumbnailSrc({
+		id: templateId,
+		updatedAt: detail?.updatedAt ?? "",
+		thumbnailUrl: detail?.thumbnailUrl ?? null,
+	} as Template);
+
+	if (isLoading) {
+		return (
+			<div className="nodrag nopan nowheel flex aspect-[4/3] w-full cursor-default select-none items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 text-xs dark:border-stroke-soft-100/40 dark:bg-[#141419]">
+				Loading preview…
+			</div>
+		);
+	}
+
+	if (failed) {
+		return (
+			<div className="nodrag nopan nowheel flex aspect-[4/3] w-full cursor-default select-none items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-soft-400 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
+				<Icon name="image-upload" className="pointer-events-none h-6 w-6" />
+			</div>
+		);
+	}
+
+	return (
+		<div className="nodrag nopan nowheel cursor-default select-none overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
+			<img
+				src={src}
+				alt={`Preview of ${templateName}`}
+				className="pointer-events-none max-h-72 w-full select-none object-cover object-top"
+				loading="lazy"
+				decoding="async"
+				draggable={false}
+				onError={() => setFailed(true)}
+			/>
+		</div>
+	);
+};
+
 const TemplatePicker = ({
 	value,
 	onChange,
@@ -328,7 +377,7 @@ const SelectedTemplateView = ({
 			<button
 				type="button"
 				onClick={onBack}
-				className="inline-flex w-fit items-center gap-1 rounded-md px-1 py-0.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
+				className="inline-flex w-fit cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
 			>
 				<Icon name="chevron-left" className="h-3.5 w-3.5" />
 				<span className="max-w-[260px] truncate">{templateName}</span>
@@ -347,7 +396,7 @@ const SelectedTemplateView = ({
 						aria-selected={tab === t}
 						onClick={() => setTab(t)}
 						className={cn(
-							"rounded-full py-1.5 font-medium text-sm capitalize transition-all",
+							"cursor-pointer rounded-full py-1.5 font-medium text-sm capitalize transition-all",
 							tab === t
 								? "bg-bg-white-0 text-text-strong-950 shadow-sm"
 								: "text-text-sub-600 hover:text-text-strong-950",
@@ -367,7 +416,7 @@ const SelectedTemplateView = ({
 						type="button"
 						onClick={() => void handlePublish()}
 						disabled={publishing || detailQuery.isLoading}
-						className="shrink-0 rounded-full bg-black px-4 py-1.5 font-medium text-sm text-white transition-opacity disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-black"
+						className="shrink-0 cursor-pointer rounded-full bg-black px-4 py-1.5 font-medium text-sm text-white transition-opacity disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-black"
 					>
 						{publishing ? "Publishing…" : "Publish"}
 					</button>
@@ -375,25 +424,13 @@ const SelectedTemplateView = ({
 			) : null}
 
 			{tab === "preview" ? (
-				<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0">
-					{detailQuery.isLoading ? (
-						<p className="px-3 py-8 text-center text-text-sub-600 text-xs">
-							Loading preview…
-						</p>
-					) : (
-						<img
-							src={templateThumbnailSrc({
-								id: templateId,
-								updatedAt: detail?.updatedAt ?? "",
-								thumbnailUrl: detail?.thumbnailUrl ?? null,
-							} as Template)}
-							alt={`Preview of ${templateName}`}
-							className="max-h-72 w-full object-cover object-top"
-							loading="lazy"
-							decoding="async"
-						/>
-					)}
-				</div>
+				<TemplateDetailPreview
+					key={`${templateId}-${detail?.updatedAt ?? ""}`}
+					templateId={templateId}
+					templateName={templateName}
+					detail={detail}
+					isLoading={detailQuery.isLoading}
+				/>
 			) : (
 				<div className="flex flex-col gap-2 rounded-xl bg-bg-weak-50/60 p-3">
 					<p className="font-medium text-sm text-text-strong-950">Sender</p>
