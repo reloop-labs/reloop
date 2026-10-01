@@ -28,6 +28,20 @@ interface EmailSuggestion {
 	ready: boolean;
 }
 
+/** Common inbox handles suggested when the user hasn't typed a specific one. */
+const DEFAULT_HANDLE_SUGGESTIONS = [
+	"support",
+	"hello",
+	"help",
+	"info",
+	"contact",
+	"sales",
+	"team",
+	"hi",
+] as const;
+
+const MAX_SUGGESTIONS = 8;
+
 function splitEmailInput(value: string): {
 	name: string;
 	handle: string;
@@ -116,18 +130,47 @@ export function InboxEmailAddressInput({
 	} = useMemo(() => splitEmailInput(inputValue), [inputValue]);
 
 	const suggestions = useMemo((): EmailSuggestion[] => {
-		const q = domainQuery.toLowerCase();
-		const displayHandle = typedHandle || "support";
-		return verifiedDomains
-			.filter((d) => !q || d.domain.toLowerCase().includes(q))
-			.slice(0, 8)
+		const q = domainQuery.toLowerCase().trim();
+		const trimmedHandle = typedHandle.trim();
+		const displayHandle = trimmedHandle || "support";
+		const matchedDomains = verifiedDomains.filter(
+			(d) => !q || d.domain.toLowerCase().includes(q),
+		);
+		if (matchedDomains.length === 0) return [];
+
+		// Primary: what the user typed (or `support` placeholder) across matched domains.
+		const primary: EmailSuggestion[] = matchedDomains
+			.slice(0, MAX_SUGGESTIONS)
 			.map((d) => ({
 				email: `${displayHandle}@${d.domain}`,
 				handle: displayHandle,
 				domain: d.domain,
 				ready: isSendReceiveReady(d),
 			}));
-	}, [verifiedDomains, typedHandle, domainQuery]);
+		if (primary.length >= MAX_SUGGESTIONS) return primary;
+
+		// Fill remaining slots with preset handles on the preferred domain so a
+		// single-domain user still sees multiple useful options.
+		const preferredDomain =
+			matchedDomains.find((d) => d.domain === domain) ?? matchedDomains[0];
+		if (!preferredDomain) return primary;
+		const seen = new Set(primary.map((s) => s.email.toLowerCase()));
+		const extras: EmailSuggestion[] = [];
+		for (const preset of DEFAULT_HANDLE_SUGGESTIONS) {
+			if (primary.length + extras.length >= MAX_SUGGESTIONS) break;
+			if (preset.toLowerCase() === displayHandle.toLowerCase()) continue;
+			const email = `${preset}@${preferredDomain.domain}`;
+			if (seen.has(email.toLowerCase())) continue;
+			seen.add(email.toLowerCase());
+			extras.push({
+				email,
+				handle: preset,
+				domain: preferredDomain.domain,
+				ready: isSendReceiveReady(preferredDomain),
+			});
+		}
+		return [...primary, ...extras].slice(0, MAX_SUGGESTIONS);
+	}, [verifiedDomains, typedHandle, domainQuery, domain]);
 
 	useEffect(() => {
 		const onPointerDown = (e: PointerEvent) => {
@@ -141,6 +184,17 @@ export function InboxEmailAddressInput({
 		document.addEventListener("pointerdown", onPointerDown);
 		return () => document.removeEventListener("pointerdown", onPointerDown);
 	}, []);
+
+	// Keep keyboard highlight inside bounds as the suggestion list changes.
+	useEffect(() => {
+		setHighlightIndex((prev) =>
+			suggestions.length === 0
+				? 0
+				: prev >= suggestions.length
+					? suggestions.length - 1
+					: prev,
+		);
+	}, [suggestions.length]);
 
 	const commitChange = (
 		nextHandle: string,
@@ -176,11 +230,11 @@ export function InboxEmailAddressInput({
 	};
 
 	const handleSelect = (s: EmailSuggestion) => {
-		const handle = s.handle === "support" && !typedHandle ? "" : s.handle;
-		commitChange(handle, s.domain, typedName);
+		commitChange(s.handle, s.domain, typedName);
 		setInputValue(
 			typedName.trim() ? `${typedName.trim()} <${s.email}>` : s.email,
 		);
+		setHighlightIndex(0);
 		setIsOpen(false);
 		inputRef.current?.focus();
 	};
@@ -247,8 +301,11 @@ export function InboxEmailAddressInput({
 						tabIndex={-1}
 						aria-label="Toggle domain suggestions"
 						onClick={() => {
-							if (!disabled) {
-								setIsOpen((v) => !v);
+							if (disabled) return;
+							if (isOpen) {
+								setIsOpen(false);
+							} else {
+								setIsOpen(true);
 								inputRef.current?.focus();
 							}
 						}}
