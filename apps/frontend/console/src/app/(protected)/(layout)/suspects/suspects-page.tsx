@@ -53,6 +53,7 @@ type SuspectItem = {
 	createdAt: string;
 	associatedCount: number;
 	associatedName?: string | null;
+	isSuspended?: boolean;
 };
 
 type SuspectsResponse = {
@@ -97,6 +98,10 @@ export default function SuspectsPage() {
 		"category",
 		parseAsString.withDefault("all"),
 	);
+	const [status, setStatus] = useQueryState(
+		"status",
+		parseAsString.withDefault("active"),
+	);
 	const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [limit, setLimit] = useQueryState(
 		"limit",
@@ -119,20 +124,25 @@ export default function SuspectsPage() {
 	const offset = Math.max(0, (page - 1) * limit);
 
 	const { data, isLoading, mutate } = useSWR<SuspectsResponse>(
-		["/suspects", q, type, severity, category, page, limit],
+		["/suspects", q, type, severity, category, status, page, limit],
 		() =>
 			adminGet<SuspectsResponse>("/suspects", {
 				q: q || undefined,
 				type: type !== "all" ? type : undefined,
 				severity: severity !== "all" ? severity : undefined,
 				category: category !== "all" ? category : undefined,
+				status: status !== "active" ? status : undefined,
 				limit,
 				offset,
 			}),
 	);
 
 	const hasActiveFilters =
-		Boolean(q) || type !== "all" || severity !== "all" || category !== "all";
+		Boolean(q) ||
+		type !== "all" ||
+		severity !== "all" ||
+		category !== "all" ||
+		status !== "active";
 
 	const resetFilters = () => {
 		setQ("");
@@ -140,6 +150,7 @@ export default function SuspectsPage() {
 		setType("all");
 		setSeverity("all");
 		setCategory("all");
+		setStatus("active");
 		setPage(1);
 	};
 
@@ -290,6 +301,20 @@ export default function SuspectsPage() {
 							<option value="other">Other</option>
 						</select>
 
+						{/* Lifecycle / Status Filter */}
+						<select
+							value={status}
+							onChange={(e) => {
+								setStatus(e.target.value);
+								setPage(1);
+							}}
+							className="h-8 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-2.5 text-[12px] text-text-strong-950 outline-none hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#121212] dark:hover:bg-white/[0.04]"
+						>
+							<option value="active">Active Only (Excl. Suspended)</option>
+							<option value="suspended">Suspended / Banned Only</option>
+							<option value="all">All (Active & Suspended)</option>
+						</select>
+
 						{hasActiveFilters ? (
 							<Button.Root
 								variant="neutral"
@@ -373,6 +398,11 @@ export default function SuspectsPage() {
 												<span className="rounded border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0.5 text-[10px] text-text-sub-600 uppercase tracking-wider dark:border-white/10 dark:bg-white/[0.04]">
 													{item.type}
 												</span>
+												{item.isSuspended ? (
+													<span className="rounded border border-red-500/20 bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-600 dark:text-red-400">
+														Suspended
+													</span>
+												) : null}
 											</div>
 											{resolvedEmail ? (
 												<div className="flex items-center gap-1.5 text-text-sub-600 mt-0.5">

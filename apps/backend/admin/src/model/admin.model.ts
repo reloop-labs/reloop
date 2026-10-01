@@ -827,6 +827,7 @@ export namespace AdminModel {
 		createdAt: t.Date(),
 		associatedCount: t.Number(),
 		associatedName: t.Optional(t.Union([t.String(), t.Null()])),
+		isSuspended: t.Optional(t.Boolean()),
 	});
 
 	export const suspectsListResponse = t.Object({

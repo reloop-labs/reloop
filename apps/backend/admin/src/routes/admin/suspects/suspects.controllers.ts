@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
 import { member, organization, user } from "@reloop/db/schema";
-import { and, count, desc, eq, inArray, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, ne, or, sql } from "drizzle-orm";
 
 export async function listSuspectsController({
 	limit = 50,
@@ -9,6 +9,7 @@ export async function listSuspectsController({
 	type = "all",
 	severity,
 	category,
+	status = "active",
 }: {
 	limit?: number;
 	offset?: number;
@@ -16,7 +17,24 @@ export async function listSuspectsController({
 	type?: "all" | "user" | "organization";
 	severity?: "low" | "medium" | "high" | "critical";
 	category?: "spam" | "phishing" | "fraud" | "abuse" | "other";
+	status?: "active" | "suspended" | "all";
 }) {
+	// Base filter conditions based on suspension / ban lifecycle
+	const userBaseConditions = [eq(user.isSuspect, true)];
+	const orgBaseConditions = [eq(organization.isSuspect, true)];
+
+	if (status === "active") {
+		// Do not show users who have been banned/suspended
+		userBaseConditions.push(
+			or(eq(user.banned, false), sql`${user.banned} IS NULL`)!,
+		);
+		// Do not show orgs that have been suspended
+		orgBaseConditions.push(ne(organization.status, "suspended"));
+	} else if (status === "suspended") {
+		userBaseConditions.push(eq(user.banned, true));
+		orgBaseConditions.push(eq(organization.status, "suspended"));
+	}
+
 	// ── Overall Stats ────────────────────────────────────────────────────────
 	const [[userStats], [orgStats]] = await Promise.all([
 		db
@@ -30,7 +48,7 @@ export async function listSuspectsController({
 				),
 			})
 			.from(user)
-			.where(eq(user.isSuspect, true)),
+			.where(and(...userBaseConditions)),
 		db
 			.select({
 				total: count(),
@@ -42,7 +60,7 @@ export async function listSuspectsController({
 				),
 			})
 			.from(organization)
-			.where(eq(organization.isSuspect, true)),
+			.where(and(...orgBaseConditions)),
 	]);
 
 	const usersCount = Number(userStats?.total ?? 0);
@@ -66,6 +84,7 @@ export async function listSuspectsController({
 		identifier: string;
 		email?: string | null;
 		slug?: string | null;
+		isSuspended?: boolean;
 		isSuspect: boolean;
 		suspectReason: string | null;
 		suspectSeverity: string | null;
@@ -80,7 +99,7 @@ export async function listSuspectsController({
 
 	// ── Query Suspected Users ──────────────────────────────────────────────
 	if (type === "all" || type === "user") {
-		const userConditions = [eq(user.isSuspect, true)];
+		const userConditions = [...userBaseConditions];
 		if (severity) userConditions.push(eq(user.suspectSeverity, severity));
 		if (category) userConditions.push(eq(user.suspectCategory, category));
 		if (q && q.trim()) {
@@ -99,6 +118,7 @@ export async function listSuspectsController({
 				id: user.id,
 				name: user.name,
 				email: user.email,
+				banned: user.banned,
 				isSuspect: user.isSuspect,
 				suspectReason: user.suspectReason,
 				suspectSeverity: user.suspectSeverity,
@@ -143,6 +163,7 @@ export async function listSuspectsController({
 				identifier: u.email,
 				email: u.email,
 				slug: null,
+				isSuspended: Boolean(u.banned),
 				isSuspect: u.isSuspect,
 				suspectReason: u.suspectReason ?? null,
 				suspectSeverity: u.suspectSeverity ?? null,
@@ -159,7 +180,7 @@ export async function listSuspectsController({
 
 	// ── Query Suspected Organizations ──────────────────────────────────────
 	if (type === "all" || type === "organization") {
-		const orgConditions = [eq(organization.isSuspect, true)];
+		const orgConditions = [...orgBaseConditions];
 		if (severity)
 			orgConditions.push(eq(organization.suspectSeverity, severity));
 		if (category)
@@ -181,6 +202,7 @@ export async function listSuspectsController({
 				id: organization.id,
 				name: organization.name,
 				slug: organization.slug,
+				status: organization.status,
 				billingEmail: organization.billingEmail,
 				isSuspect: organization.isSuspect,
 				suspectReason: organization.suspectReason,
@@ -236,6 +258,7 @@ export async function listSuspectsController({
 				identifier: contactEmail || o.slug,
 				email: contactEmail,
 				slug: o.slug,
+				isSuspended: o.status === "suspended",
 				isSuspect: o.isSuspect,
 				suspectReason: o.suspectReason ?? null,
 				suspectSeverity: o.suspectSeverity ?? null,

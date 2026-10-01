@@ -15,6 +15,7 @@ export const suspectsRoute = new Elysia()
 				type: query.type,
 				severity: query.severity,
 				category: query.category,
+				status: query.status,
 			}),
 		{
 			authAdmin: true,
@@ -22,6 +23,13 @@ export const suspectsRoute = new Elysia()
 				limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
 				offset: t.Optional(t.Numeric({ default: 0, minimum: 0 })),
 				q: t.Optional(t.String()),
+				status: t.Optional(
+					t.Union([
+						t.Literal("active"),
+						t.Literal("suspended"),
+						t.Literal("all"),
+					]),
+				),
 				type: t.Optional(
 					t.Union([
 						t.Literal("all"),
