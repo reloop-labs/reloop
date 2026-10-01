@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { nodeTone, type WorkflowNodeTone } from "../node-tone";
 import type { InsertStepKind } from "./node-editor-context";
 
@@ -55,21 +55,14 @@ interface StepPickerMenuProps {
 
 /**
  * Full node card rendered when the plus button converts into a step selection node.
- * Features a closable header, search filter, and categorized step list.
+ * Features a closable header and categorized step list without search, select pill, or shadows.
  */
 export const StepPickerMenu = ({
 	onPick,
 	onClose,
 	className,
 }: StepPickerMenuProps) => {
-	const [searchQuery, setSearchQuery] = useState("");
-	const inputRef = useRef<HTMLInputElement>(null);
-
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			inputRef.current?.focus();
-		}, 50);
-
 		const onKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "Escape") {
 				onClose?.();
@@ -77,26 +70,14 @@ export const StepPickerMenu = ({
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => {
-			clearTimeout(timer);
 			window.removeEventListener("keydown", onKeyDown);
 		};
 	}, [onClose]);
 
-	const query = searchQuery.trim().toLowerCase();
-	const filteredSections = PICKER_SECTIONS.map((section) => ({
-		...section,
-		items: section.items.filter(
-			(item) =>
-				item.title.toLowerCase().includes(query) ||
-				item.description.toLowerCase().includes(query) ||
-				section.label.toLowerCase().includes(query),
-		),
-	})).filter((section) => section.items.length > 0);
-
 	return (
 		<div
 			className={cn(
-				"fade-in zoom-in-95 relative w-[420px] animate-in rounded-[14px] border border-blue-500/40 bg-bg-weak-50/60 p-0.5 shadow-[0_8px_30px_rgba(15,23,42,0.12)] ring-2 ring-blue-500/15 transition-all duration-150 ease-out dark:border-blue-500/50 dark:bg-[#101014] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]",
+				"relative w-[420px] rounded-[14px] border border-blue-500/40 bg-bg-weak-50/60 p-0.5 ring-2 ring-blue-500/15 transition-all duration-150 ease-out dark:border-blue-500/50 dark:bg-[#101014]",
 				className,
 			)}
 		>
@@ -114,9 +95,6 @@ export const StepPickerMenu = ({
 				<p className="min-w-0 flex-1 truncate font-medium text-[14px] text-text-strong-950">
 					Add a step
 				</p>
-				<span className="flex shrink-0 items-center rounded-full border border-blue-500/25 bg-blue-50 px-2 py-0.5 font-medium text-[11px] text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
-					Select
-				</span>
 				{onClose ? (
 					<button
 						type="button"
@@ -134,75 +112,53 @@ export const StepPickerMenu = ({
 
 			{/* Inset Body */}
 			<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-2 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
-				{/* Search input */}
-				<div className="relative mb-2 flex items-center">
-					<Icon
-						name="search"
-						className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-text-soft-400"
-					/>
-					<input
-						ref={inputRef}
-						type="text"
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						placeholder="Search steps..."
-						className="h-8 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 pr-2 pl-8 text-text-strong-950 text-xs placeholder:text-text-soft-400 focus:border-blue-500 focus:outline-none dark:border-stroke-soft-100/40 dark:bg-[#18181f]"
-					/>
-				</div>
-
 				{/* Step items list */}
-				<div className="nowheel max-h-[260px] space-y-2.5 overflow-y-auto overscroll-contain pr-0.5">
-					{filteredSections.length === 0 ? (
-						<div className="py-4 text-center text-text-sub-600 text-xs">
-							No steps matching &quot;{searchQuery}&quot;
-						</div>
-					) : (
-						filteredSections.map((section) => (
-							<div key={section.label} className="space-y-1">
-								<p className="px-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-									{section.label}
-								</p>
-								{section.items.map((item) => {
-									const meta = nodeTone[item.tone];
-									return (
-										<button
-											key={item.kind}
-											type="button"
-											onClick={(e) => {
-												e.stopPropagation();
-												onPick(item.kind);
-											}}
-											className="group/item flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-left transition-all hover:border-stroke-soft-200 hover:bg-bg-white-0 hover:shadow-2xs dark:hover:border-stroke-soft-100/40 dark:hover:bg-[#18181f]"
+				<div className="nowheel space-y-2.5">
+					{PICKER_SECTIONS.map((section) => (
+						<div key={section.label} className="space-y-1">
+							<p className="px-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+								{section.label}
+							</p>
+							{section.items.map((item) => {
+								const meta = nodeTone[item.tone];
+								return (
+									<button
+										key={item.kind}
+										type="button"
+										onClick={(e) => {
+											e.stopPropagation();
+											onPick(item.kind);
+										}}
+										className="group/item flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-left transition-all hover:border-stroke-soft-200 hover:bg-bg-weak-50/60 hover:shadow-2xs dark:hover:border-stroke-soft-100/40 dark:hover:bg-[#18181f]"
+									>
+										<span
+											className={cn(
+												"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border bg-transparent transition-transform group-hover/item:scale-105",
+												meta.iconBorder,
+											)}
 										>
-											<span
-												className={cn(
-													"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border bg-transparent transition-transform group-hover/item:scale-105",
-													meta.iconBorder,
-												)}
-											>
-												<Icon
-													name={meta.icon}
-													className={cn("h-3.5 w-3.5", meta.iconClass)}
-												/>
-											</span>
-											<div className="min-w-0 flex-1">
-												<p className="font-medium text-[13px] text-text-strong-950">
-													{item.title}
-												</p>
-												<p className="truncate text-[11px] text-text-sub-600">
-													{item.description}
-												</p>
-											</div>
 											<Icon
-												name="chevron-right"
-												className="h-3.5 w-3.5 shrink-0 text-text-soft-400 opacity-0 transition-opacity group-hover/item:opacity-100"
+												name={meta.icon}
+												className={cn("h-3.5 w-3.5", meta.iconClass)}
 											/>
-										</button>
-									);
-								})}
-							</div>
-						))
-					)}
+										</span>
+										<div className="min-w-0 flex-1">
+											<p className="font-medium text-[13px] text-text-strong-950">
+												{item.title}
+											</p>
+											<p className="truncate text-[11px] text-text-sub-600">
+												{item.description}
+											</p>
+										</div>
+										<Icon
+											name="chevron-right"
+											className="h-3.5 w-3.5 shrink-0 text-text-soft-400 opacity-0 transition-opacity group-hover/item:opacity-100"
+										/>
+									</button>
+								);
+							})}
+						</div>
+					))}
 				</div>
 			</div>
 		</div>

@@ -76,7 +76,7 @@ export const getNodeEstimatedHeight = (type?: string): number => {
 		case "send_email":
 			return 260;
 		case "add_step":
-			return 340;
+			return 230;
 		default:
 			return 140;
 	}
