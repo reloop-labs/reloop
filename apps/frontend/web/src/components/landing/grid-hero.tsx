@@ -19,8 +19,7 @@ function GridCells({
 	));
 }
 
-const bandClassName =
-	"grid grid-cols-10 gap-px p-[0.5px] [&>div]:aspect-square";
+const bandClassName = "grid grid-cols-10 gap-px [&>div]:aspect-square";
 const sideClassName = "grid grid-rows-4 gap-px max-[1099px]:hidden";
 
 export function GridHero() {
@@ -31,19 +30,19 @@ export function GridHero() {
 			className="overflow-hidden bg-white pt-[73px] text-zinc-950 max-[1099px]:pt-[57px] dark:bg-black dark:text-zinc-50"
 		>
 			<div className="bg-white dark:bg-black">
-				<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1104px)_minmax(24px,1fr)] [--grid-cell-size:min(110.4px,calc((100vw-48px)/10))] max-[1099px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px]">
-					<div
-						aria-hidden="true"
-						className="col-start-1 grid grid-rows-[var(--grid-cell-size)_minmax(0,1fr)_var(--grid-cell-size)] gap-px bg-zinc-950/[0.08] max-[1099px]:hidden dark:bg-zinc-50/10"
-					>
-						<GridCells count={3} />
+				<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1102px)_minmax(24px,1fr)] gap-px bg-[#ebebeb] max-[1099px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-[#292929]">
+					<div aria-hidden="true" className="col-start-1 max-[1099px]:hidden">
+						<div
+							data-grid-content
+							className="h-full rounded-[4px] bg-white dark:bg-black"
+						/>
 					</div>
 					<div className="relative col-start-2 w-full">
-						<div className="relative grid bg-zinc-950/[0.08] p-[0.5px] dark:bg-zinc-50/10">
+						<div className="relative grid gap-x-px bg-[#ebebeb] dark:bg-[#292929]">
 							<div aria-hidden="true" className={bandClassName}>
 								<GridCells count={10} />
 							</div>
-							<div className="grid grid-cols-10 gap-px p-[0.5px]">
+							<div className="grid grid-cols-10 gap-px border-[#ebebeb] border-y dark:border-[#292929]">
 								<div aria-hidden="true" className={sideClassName}>
 									<GridCells count={4} />
 								</div>
@@ -99,11 +98,11 @@ export function GridHero() {
 							</div>
 						</div>
 					</div>
-					<div
-						aria-hidden="true"
-						className="col-start-3 grid grid-rows-[var(--grid-cell-size)_minmax(0,1fr)_var(--grid-cell-size)] gap-px bg-zinc-950/[0.08] max-[1099px]:hidden dark:bg-zinc-50/10"
-					>
-						<GridCells count={3} />
+					<div aria-hidden="true" className="col-start-3 max-[1099px]:hidden">
+						<div
+							data-grid-content
+							className="h-full rounded-[4px] bg-white dark:bg-black"
+						/>
 					</div>
 				</div>
 			</div>

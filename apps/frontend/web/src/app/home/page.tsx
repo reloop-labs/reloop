@@ -1,6 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { GridHero } from "@reloop/web/components/landing/grid-hero";
-import { ProductTour } from "@reloop/web/components/landing/product-tour";
 import { homeFaqItems } from "@reloop/web/lib/home-faq";
 import {
 	faqPageJsonLd,
@@ -16,11 +15,12 @@ import {
 import type { Metadata } from "next";
 import { AgentCards } from "../(home)/components/agent-cards";
 import CTA from "../(home)/components/cta";
+import { DeveloperProof } from "../(home)/components/developer-proof";
 import EmailSystem from "../(home)/components/email-system";
 import Highlights from "../(home)/components/highlights";
 import { HomeFaq } from "../(home)/components/home-faq";
+import { ReloopStory } from "../(home)/components/reloop-story";
 import { SectionSeparator } from "../(home)/components/section-separator";
-import LanguageExplorer from "../sdk/components/language-explorer";
 
 // Non-indexable replica of the landing page
 export const metadata: Metadata = {
@@ -73,20 +73,10 @@ export default function HomePage() {
 		<div className="relative w-full">
 			<JsonLd data={homeSchema} />
 			<GridHero />
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-				<SectionSeparator />
-				<ProductTour />
-				<SectionSeparator />
-				<LanguageExplorer
-					framed={false}
-					showTopRule={false}
-					showHeading
-					showHelp={false}
-					id="sdks"
-				/>
-				<SectionSeparator />
-				<AgentCards />
-				<SectionSeparator />
+			<AgentCards />
+			<DeveloperProof />
+			<ReloopStory />
+			<div className="relative mx-auto flex w-full max-w-[1104px] flex-col border-[#ebebeb] border-x dark:border-[#292929]">
 				<EmailSystem />
 				<SectionSeparator />
 				<Highlights />

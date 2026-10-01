@@ -2414,7 +2414,7 @@ export const Header = () => {
 			className={cn(
 				"fixed top-0 right-0 left-0 z-50",
 				isLanding
-					? "border-zinc-950/[0.08] border-t bg-white text-zinc-950 dark:border-zinc-50/10 dark:bg-black dark:text-zinc-50"
+					? "border-[#ebebeb] border-t bg-white text-zinc-950 dark:border-[#292929] dark:bg-black dark:text-zinc-50"
 					: "border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black",
 			)}
 			onKeyDown={(event) => {
@@ -2435,7 +2435,7 @@ export const Header = () => {
 			<div
 				className={
 					isLanding
-						? "grid grid-cols-[minmax(24px,1fr)_1px_minmax(0,1102px)_1px_minmax(24px,1fr)] bg-zinc-950/[0.08] pb-px max-[1099px]:grid-cols-[24px_1px_minmax(0,1fr)_1px_24px] max-[479px]:grid-cols-[8px_1px_minmax(0,1fr)_1px_8px] dark:bg-zinc-50/10"
+						? "grid grid-cols-[minmax(24px,1fr)_1px_minmax(0,1102px)_1px_minmax(24px,1fr)] bg-[#ebebeb] pb-px max-[1099px]:grid-cols-[24px_1px_minmax(0,1fr)_1px_24px] max-[479px]:grid-cols-[8px_1px_minmax(0,1fr)_1px_8px] dark:bg-[#292929]"
 						: "contents"
 				}
 			>

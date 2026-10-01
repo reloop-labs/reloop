@@ -62,7 +62,7 @@ export function ProductTour() {
 			aria-labelledby="product-tour-heading"
 			className="bg-white dark:bg-black"
 		>
-			<div className="border-stroke-soft-100 border-b px-6 py-14 text-center sm:px-10 sm:py-20 dark:border-white/10">
+			<div className="border-zinc-950/[0.08] border-b px-6 py-14 text-center sm:px-10 sm:py-20 dark:border-white/10">
 				<p className="font-medium text-[12px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
 					Interactive product tour
 				</p>
