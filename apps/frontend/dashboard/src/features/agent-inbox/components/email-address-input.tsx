@@ -346,6 +346,8 @@ export function InboxEmailAddressInput({
 							<div className="max-h-56 overflow-y-auto">
 								{suggestions.map((item, idx) => {
 									const isSelected = idx === highlightIndex;
+									const suggestionDisplayName =
+										typedName.trim() || deriveInboxDisplayName(item.handle);
 									return (
 										<button
 											key={item.email}
@@ -365,21 +367,14 @@ export function InboxEmailAddressInput({
 											)}
 										>
 											<span className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">
-												{typedName.trim() && (
-													<span className="shrink-0 font-medium text-text-strong-950">
-														{typedName.trim()}
-													</span>
-												)}
+												<span className="shrink-0 font-medium text-text-strong-950">
+													{suggestionDisplayName}
+												</span>
 												<span className="truncate text-text-sub-600">
 													&lt;{item.email}&gt;
 												</span>
 											</span>
-											{item.ready ? (
-												<Icon
-													name="check"
-													className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
-												/>
-											) : (
+											{!item.ready && (
 												<span className="shrink-0 rounded bg-bg-soft-200 px-1.5 py-0.25 font-medium text-[10px] text-text-sub-600">
 													Setup needed
 												</span>

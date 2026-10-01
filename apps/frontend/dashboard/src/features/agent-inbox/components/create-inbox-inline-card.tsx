@@ -175,7 +175,7 @@ export function CreateInboxInlineCard({
 	return (
 		<div className="w-full space-y-6 font-sans">
 			{/* Main Card Container with Double Shell */}
-			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
+			<div className="overflow-visible rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
 				{hasNoDomains ? (
 					<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 py-12 text-center dark:border-stroke-soft-100/40">
 						<div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-bg-weak-50 text-text-sub-600 dark:bg-white/[0.04]">

@@ -210,7 +210,7 @@ export const AddAgentAddressModal = ({
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				className="overflow-visible rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={false}
 				onEscapeKeyDown={(e) => {
 					if (isSubmitting) e.preventDefault();
