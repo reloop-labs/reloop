@@ -9,9 +9,9 @@ const now = () => new Date().toISOString();
 
 /** Horizontal center used so cards (420px wide) line up in a vertical column. */
 const COLUMN_X = 220;
-/** Trigger top (60) + Trigger height (~160) + 60px connection line = 280 */
-const FIRST_ROW_Y = 280;
-const STEP_GAP = 300;
+/** Trigger top (60) + Trigger height (~108) + 60px connection line = 228 */
+const FIRST_ROW_Y = 228;
+const STEP_GAP = 188;
 
 export const createTriggerNode = (): WorkflowNode => ({
 	id: TRIGGER_NODE_ID,
