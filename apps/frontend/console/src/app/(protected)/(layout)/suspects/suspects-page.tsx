@@ -17,6 +17,7 @@ import { adminGet } from "@fe/console/lib/admin-api";
 import { formatDateTime, formatRelativeTime } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Drawer from "@reloop/ui/drawer";
 import * as Input from "@reloop/ui/input";
 import {
 	AlertOctagon,
@@ -25,6 +26,7 @@ import {
 	ExternalLink,
 	Flame,
 	Info,
+	Mail,
 	RotateCcw,
 	Search,
 	ShieldAlert,
@@ -41,6 +43,8 @@ type SuspectItem = {
 	id: string;
 	name: string;
 	identifier: string;
+	email?: string | null;
+	slug?: string | null;
 	isSuspect: boolean;
 	suspectReason: string | null;
 	suspectSeverity: SuspectSeverity | null;
@@ -104,6 +108,9 @@ export default function SuspectsPage() {
 		null,
 	);
 	const [drawerOpen, setDrawerOpen] = useState(false);
+	const [inspectEmailItem, setInspectEmailItem] = useState<SuspectItem | null>(
+		null,
+	);
 
 	useEffect(() => {
 		setDraftQ(q);
@@ -327,6 +334,9 @@ export default function SuspectsPage() {
 							? (SEVERITY_TONE[item.suspectSeverity] ?? "red")
 							: "red";
 
+						const resolvedEmail =
+							item.email || (item.type === "user" ? item.identifier : null);
+
 						return (
 							<tr
 								key={`${item.type}-${item.id}`}
@@ -358,15 +368,29 @@ export default function SuspectsPage() {
 													}
 													className="truncate font-semibold text-[13px] text-text-strong-950 hover:underline"
 												>
-													{item.name}
+													{item.name || (item.type === "user" ? "Unnamed User" : "Unnamed Org")}
 												</Link>
 												<span className="rounded border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0.5 text-[10px] text-text-sub-600 uppercase tracking-wider dark:border-white/10 dark:bg-white/[0.04]">
 													{item.type}
 												</span>
 											</div>
-											<p className="truncate font-mono text-[11px] text-text-sub-600">
-												{item.identifier}
-											</p>
+											{resolvedEmail ? (
+												<div className="flex items-center gap-1.5 text-text-sub-600 mt-0.5">
+													<Mail className="h-3 w-3 text-text-soft-400 shrink-0" />
+													<span className="truncate font-mono text-[11px] text-text-strong-950 dark:text-gray-200">
+														{resolvedEmail}
+													</span>
+													{item.slug ? (
+														<span className="text-[10px] text-text-soft-400 font-mono shrink-0">
+															({item.slug})
+														</span>
+													) : null}
+												</div>
+											) : (
+												<p className="truncate font-mono text-[11px] text-text-sub-600 mt-0.5">
+													{item.identifier}
+												</p>
+											)}
 										</div>
 									</div>
 								</td>
@@ -414,6 +438,16 @@ export default function SuspectsPage() {
 								</td>
 								<td className="px-4 py-3">
 									<div className="flex items-center gap-2">
+										<Button.Root
+											variant="neutral"
+											mode="stroke"
+											size="small"
+											onClick={() => setInspectEmailItem(item)}
+											title="Inspect recent outbound emails"
+										>
+											<Mail className="mr-1.5 h-3.5 w-3.5 text-blue-500" />
+											Emails
+										</Button.Root>
 										<Button.Root
 											variant="neutral"
 											mode="stroke"
@@ -471,6 +505,8 @@ export default function SuspectsPage() {
 					entityId={activeDrawerItem.id}
 					entityName={activeDrawerItem.name}
 					entityIdentifier={activeDrawerItem.identifier}
+					entityEmail={activeDrawerItem.email}
+					entitySlug={activeDrawerItem.slug}
 					initialIsSuspect={activeDrawerItem.isSuspect}
 					initialReason={activeDrawerItem.suspectReason}
 					initialSeverity={activeDrawerItem.suspectSeverity}
@@ -481,6 +517,234 @@ export default function SuspectsPage() {
 					}}
 				/>
 			) : null}
+
+			{/* Slide-over Drawer for Inspecting Outbound Emails */}
+			<SuspectEmailsDrawer
+				open={Boolean(inspectEmailItem)}
+				onOpenChange={(open) => {
+					if (!open) setInspectEmailItem(null);
+				}}
+				item={inspectEmailItem}
+			/>
 		</PageFrame>
+	);
+}
+
+type EmailPreviewItem = {
+	id: string;
+	organizationId: string;
+	fromEmail: string;
+	toEmails: string[] | unknown;
+	subject: string;
+	status: string;
+	createdAt: string;
+	sentAt: string | null;
+};
+
+type EmailsPreviewResponse = {
+	items: EmailPreviewItem[];
+	total: number;
+};
+
+function SuspectEmailsDrawer({
+	open,
+	onOpenChange,
+	item,
+}: {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	item: SuspectItem | null;
+}) {
+	const shouldFetch = open && Boolean(item);
+	const { data, isLoading } = useSWR<EmailsPreviewResponse>(
+		shouldFetch
+			? ["/emails/suspect-preview", item?.type, item?.id]
+			: null,
+		() =>
+			adminGet<EmailsPreviewResponse>("/emails", {
+				organizationId: item?.type === "organization" ? item.id : undefined,
+				userId: item?.type === "user" ? item.id : undefined,
+				limit: 20,
+				offset: 0,
+			}),
+	);
+
+	if (!item) return null;
+
+	const resolvedEmail =
+		item.email || (item.type === "user" ? item.identifier : null);
+	const hubUrl =
+		item.type === "organization"
+			? `/emails?organizationId=${item.id}`
+			: `/emails?userId=${item.id}`;
+
+	return (
+		<Drawer.Root open={open} onOpenChange={onOpenChange}>
+			<Drawer.Content className="w-full max-w-2xl border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#121212]">
+				<Drawer.Header className="flex items-center justify-between border-stroke-soft-100 border-b px-6 py-4.5 dark:border-stroke-soft-100/40">
+					<div className="flex min-w-0 items-center gap-3">
+						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+							<Mail className="h-5 w-5" />
+						</div>
+						<div className="min-w-0">
+							<Drawer.Title className="truncate font-semibold text-[16px] text-text-strong-950">
+								Outbound Emails · {item.name}
+							</Drawer.Title>
+							<p className="truncate text-[12px] text-text-sub-600">
+								Inspect recent email activity to identify spam or scam abuse
+							</p>
+						</div>
+					</div>
+				</Drawer.Header>
+
+				<Drawer.Body className="space-y-4 overflow-y-auto px-6 py-5">
+					{/* Target Entity Card */}
+					<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/60 p-4 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+						<div className="flex flex-wrap items-center justify-between gap-3">
+							<div className="min-w-0">
+								<div className="flex items-center gap-2">
+									<span className="font-semibold text-[14px] text-text-strong-950">
+										{item.name}
+									</span>
+									<span className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1.5 py-0.5 text-[10px] text-text-sub-600 uppercase tracking-wider dark:border-white/10 dark:bg-white/[0.04]">
+										{item.type}
+									</span>
+								</div>
+								<div className="mt-1 flex items-center gap-1.5 text-text-sub-600">
+									<Mail className="h-3.5 w-3.5 text-text-soft-400 shrink-0" />
+									<span className="font-mono text-[12px] text-text-strong-950 dark:text-gray-200">
+										{resolvedEmail || "No direct email linked"}
+									</span>
+									{item.slug ? (
+										<span className="text-[11px] text-text-soft-400 font-mono">
+											(slug: {item.slug})
+										</span>
+									) : null}
+								</div>
+							</div>
+							<div className="flex items-center gap-2">
+								<span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2.5 py-1 font-semibold text-[11px] text-orange-600 capitalize dark:text-orange-400">
+									Flagged for {item.suspectCategory || "spam"}
+								</span>
+							</div>
+						</div>
+					</div>
+
+					{/* Outbound Email Logs */}
+					<div className="space-y-2">
+						<div className="flex items-center justify-between">
+							<h4 className="font-semibold text-[12px] text-text-strong-950 uppercase tracking-wider">
+								Recent Sends ({data?.total ?? (isLoading ? "…" : 0)})
+							</h4>
+							<a
+								href={hubUrl}
+								target="_blank"
+								rel="noreferrer"
+								className="inline-flex items-center gap-1 text-[12px] text-text-sub-600 hover:text-text-strong-950 underline"
+							>
+								Open in Emails Hub
+								<ExternalLink className="h-3 w-3" />
+							</a>
+						</div>
+
+						{isLoading ? (
+							<div className="space-y-2 py-4">
+								{[...Array(4)].map((_, i) => (
+									<div
+										key={i}
+										className="h-16 animate-pulse rounded-xl border border-stroke-soft-100 bg-bg-weak-50/40 p-3"
+									/>
+								))}
+							</div>
+						) : !data?.items?.length ? (
+							<div className="rounded-xl border border-dashed border-stroke-soft-200 py-10 text-center dark:border-white/10">
+								<Mail className="mx-auto h-8 w-8 text-text-soft-400" />
+								<p className="mt-2 font-medium text-[13px] text-text-strong-950">
+									No outbound emails recorded
+								</p>
+								<p className="mt-1 text-[12px] text-text-sub-600">
+									This account has not sent any emails through the platform yet.
+								</p>
+							</div>
+						) : (
+							<div className="divide-y divide-stroke-soft-100 rounded-xl border border-stroke-soft-100 overflow-hidden dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
+								{data.items.map((email) => {
+									const recipients = Array.isArray(email.toEmails)
+										? email.toEmails.join(", ")
+										: String(email.toEmails || "");
+									return (
+										<div
+											key={email.id}
+											className="flex items-start justify-between gap-3 p-3 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.02]"
+										>
+											<div className="min-w-0 flex-1">
+												<div className="flex items-center gap-2">
+													<p className="truncate font-semibold text-[13px] text-text-strong-950">
+														{email.subject || "(No subject)"}
+													</p>
+													<span
+														className={cn(
+															"rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider",
+															email.status === "delivered" || email.status === "sent"
+																? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+																: email.status === "failed" || email.status === "bounced" || email.status === "spam"
+																	? "bg-red-500/10 text-red-600 dark:text-red-400"
+																	: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+														)}
+													>
+														{email.status}
+													</span>
+												</div>
+												<p className="mt-1 truncate text-[11px] text-text-sub-600">
+													<span className="text-text-soft-400">To:</span>{" "}
+													<span className="font-mono text-text-strong-950 dark:text-gray-300">
+														{recipients}
+													</span>
+													{" · "}
+													<span className="text-text-soft-400">From:</span>{" "}
+													<span className="font-mono">{email.fromEmail}</span>
+												</p>
+											</div>
+											<div className="shrink-0 text-right">
+												<p className="text-[11px] text-text-sub-600">
+													{formatRelativeTime(email.createdAt)}
+												</p>
+												<Link
+													href={`/emails/${email.id}`}
+													className="mt-1 inline-flex items-center gap-1 text-[11px] text-blue-600 hover:underline dark:text-blue-400"
+												>
+													View Email
+													<ExternalLink className="h-2.5 w-2.5" />
+												</Link>
+											</div>
+										</div>
+									);
+								})}
+							</div>
+						)}
+					</div>
+				</Drawer.Body>
+
+				<Drawer.Footer className="border-stroke-soft-100 border-t px-6 py-3.5 dark:border-stroke-soft-100/40">
+					<div className="flex items-center justify-between w-full">
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="small"
+							onClick={() => onOpenChange(false)}
+						>
+							Close
+						</Button.Root>
+						<Button.Root asChild variant="neutral" mode="stroke" size="small">
+							<a href={hubUrl} target="_blank" rel="noreferrer">
+								<Mail className="mr-1.5 h-3.5 w-3.5" />
+								Open All {data?.total ?? ""} Sends in Hub
+								<ExternalLink className="ml-1 h-3 w-3" />
+							</a>
+						</Button.Root>
+					</div>
+				</Drawer.Footer>
+			</Drawer.Content>
+		</Drawer.Root>
 	);
 }

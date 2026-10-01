@@ -64,6 +64,8 @@ export async function listSuspectsController({
 		id: string;
 		name: string;
 		identifier: string;
+		email?: string | null;
+		slug?: string | null;
 		isSuspect: boolean;
 		suspectReason: string | null;
 		suspectSeverity: string | null;
@@ -139,6 +141,8 @@ export async function listSuspectsController({
 				id: u.id,
 				name: u.name,
 				identifier: u.email,
+				email: u.email,
+				slug: null,
 				isSuspect: u.isSuspect,
 				suspectReason: u.suspectReason ?? null,
 				suspectSeverity: u.suspectSeverity ?? null,
@@ -166,6 +170,7 @@ export async function listSuspectsController({
 				or(
 					sql`${organization.name} ILIKE ${term}`,
 					sql`${organization.slug} ILIKE ${term}`,
+					sql`${organization.billingEmail} ILIKE ${term}`,
 					sql`${organization.suspectReason} ILIKE ${term}`,
 				)!,
 			);
@@ -176,6 +181,7 @@ export async function listSuspectsController({
 				id: organization.id,
 				name: organization.name,
 				slug: organization.slug,
+				billingEmail: organization.billingEmail,
 				isSuspect: organization.isSuspect,
 				suspectReason: organization.suspectReason,
 				suspectSeverity: organization.suspectSeverity,
@@ -188,24 +194,48 @@ export async function listSuspectsController({
 			.orderBy(desc(organization.suspectUpdatedAt));
 
 		const oIds = suspectedOrgs.map((o) => o.id);
-		const memberCounts =
+		const [memberCounts, orgMembers] = await Promise.all([
 			oIds.length === 0
 				? []
-				: await db
+				: db
 						.select({ organizationId: member.organizationId, value: count() })
 						.from(member)
 						.where(inArray(member.organizationId, oIds))
-						.groupBy(member.organizationId);
+						.groupBy(member.organizationId),
+			oIds.length === 0
+				? []
+				: db
+						.select({
+							organizationId: member.organizationId,
+							role: member.role,
+							email: user.email,
+						})
+						.from(member)
+						.innerJoin(user, eq(member.userId, user.id))
+						.where(inArray(member.organizationId, oIds)),
+		]);
+
 		const memberCountMap = new Map(
 			memberCounts.map((r) => [r.organizationId, r.value]),
 		);
+		const orgEmailMap = new Map<string, string>();
+		for (const m of orgMembers) {
+			if (!m.email) continue;
+			const current = orgEmailMap.get(m.organizationId);
+			if (!current || m.role === "owner" || m.role === "admin") {
+				orgEmailMap.set(m.organizationId, m.email);
+			}
+		}
 
 		for (const o of suspectedOrgs) {
+			const contactEmail = o.billingEmail || orgEmailMap.get(o.id) || null;
 			items.push({
 				type: "organization",
 				id: o.id,
 				name: o.name,
-				identifier: o.slug,
+				identifier: contactEmail || o.slug,
+				email: contactEmail,
+				slug: o.slug,
 				isSuspect: o.isSuspect,
 				suspectReason: o.suspectReason ?? null,
 				suspectSeverity: o.suspectSeverity ?? null,

@@ -47,16 +47,21 @@ export async function listEmailsController({
 	q,
 	status,
 	organizationId,
+	userId,
 }: {
 	limit?: number;
 	offset?: number;
 	q?: string;
 	status?: string;
 	organizationId?: string;
+	userId?: string;
 }) {
 	const conditions = [];
 	if (organizationId) {
 		conditions.push(eq(emailLog.organizationId, organizationId));
+	}
+	if (userId) {
+		conditions.push(eq(emailLog.userId, userId));
 	}
 	if (status) {
 		conditions.push(

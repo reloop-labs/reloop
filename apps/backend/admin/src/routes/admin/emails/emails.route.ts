@@ -18,6 +18,7 @@ export const emailsRoute = new Elysia()
 				q: query.q,
 				status: query.status,
 				organizationId: query.organizationId,
+				userId: query.userId,
 			}),
 		{
 			authAdmin: true,
@@ -27,6 +28,7 @@ export const emailsRoute = new Elysia()
 				q: t.Optional(t.String()),
 				status: t.Optional(t.String()),
 				organizationId: t.Optional(t.String()),
+				userId: t.Optional(t.String()),
 			}),
 			response: {
 				200: AdminModel.emailsResponse,

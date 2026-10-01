@@ -10,8 +10,10 @@ import {
 	AlertTriangle,
 	Building2,
 	CheckCircle2,
+	ExternalLink,
 	Flame,
 	Info,
+	Mail,
 	Shield,
 	ShieldAlert,
 	ShieldCheck,
@@ -30,6 +32,8 @@ export type SuspectionDrawerProps = {
 	entityId: string;
 	entityName: string;
 	entityIdentifier: string; // email for user, slug for org
+	entityEmail?: string | null;
+	entitySlug?: string | null;
 	initialIsSuspect?: boolean;
 	initialReason?: string | null;
 	initialSeverity?: SuspectSeverity | null;
@@ -124,6 +128,8 @@ export function SuspectionDrawer({
 	entityId,
 	entityName,
 	entityIdentifier,
+	entityEmail,
+	entitySlug,
 	initialIsSuspect = false,
 	initialReason = "",
 	initialSeverity = "high",
@@ -245,12 +251,28 @@ export function SuspectionDrawer({
 									)}
 								</div>
 								<div className="min-w-0">
-									<p className="truncate font-medium text-[13px] text-text-strong-950">
+									<p className="truncate font-semibold text-[13px] text-text-strong-950">
 										{entityName}
 									</p>
-									<p className="truncate font-mono text-[11px] text-text-sub-600">
-										{entityIdentifier}
-									</p>
+									<div className="flex items-center gap-1.5 text-text-sub-600">
+										{entityEmail || (entityType === "user" ? entityIdentifier : null) ? (
+											<div className="flex items-center gap-1">
+												<Mail className="h-3 w-3 text-text-soft-400 shrink-0" />
+												<span className="truncate font-mono text-[11px] text-text-strong-950 dark:text-gray-200">
+													{entityEmail || entityIdentifier}
+												</span>
+											</div>
+										) : (
+											<p className="truncate font-mono text-[11px] text-text-sub-600">
+												{entityIdentifier}
+											</p>
+										)}
+									</div>
+									{entitySlug ? (
+										<p className="text-[10px] text-text-soft-400 font-mono">
+											slug: {entitySlug}
+										</p>
+									) : null}
 								</div>
 							</div>
 							<div className="text-right">
@@ -264,6 +286,29 @@ export function SuspectionDrawer({
 									</p>
 								) : null}
 							</div>
+						</div>
+
+						{/* Quick Link to inspect their sent emails */}
+						<div className="mt-3 flex items-center justify-between border-t border-stroke-soft-100 pt-2.5 dark:border-white/5">
+							<span className="text-[11px] text-text-sub-600">
+								Inspect sent spam / outbound logs:
+							</span>
+							<Button.Root asChild variant="neutral" mode="stroke" size="small">
+								<a
+									href={
+										entityType === "organization"
+											? `/emails?organizationId=${entityId}`
+											: `/emails?userId=${entityId}`
+									}
+									target="_blank"
+									rel="noreferrer"
+									className="inline-flex items-center gap-1.5 text-[11px]"
+								>
+									<Mail className="h-3 w-3" />
+									View Sent Emails
+									<ExternalLink className="h-2.5 w-2.5 opacity-60" />
+								</a>
+							</Button.Root>
 						</div>
 					</div>
 

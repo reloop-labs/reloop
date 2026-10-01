@@ -817,6 +817,8 @@ export namespace AdminModel {
 		id: t.String(),
 		name: t.String(),
 		identifier: t.String(),
+		email: t.Optional(t.Union([t.String(), t.Null()])),
+		slug: t.Optional(t.Union([t.String(), t.Null()])),
 		isSuspect: t.Boolean(),
 		suspectReason: t.Union([t.String(), t.Null()]),
 		suspectSeverity: t.Union([t.String(), t.Null()]),

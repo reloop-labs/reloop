@@ -220,6 +220,10 @@ export default function EmailsPage() {
 		"organizationId",
 		parseAsString.withDefault(""),
 	);
+	const [userId, setUserId] = useQueryState(
+		"userId",
+		parseAsString.withDefault(""),
+	);
 	const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [limit, setLimit] = useQueryState(
 		"limit",
@@ -234,12 +238,13 @@ export default function EmailsPage() {
 	const offset = Math.max(0, (page - 1) * limit);
 
 	const { data, isLoading } = useSWR<EmailsResponse>(
-		["/emails", q, status, organizationId, page, limit],
+		["/emails", q, status, organizationId, userId, page, limit],
 		() =>
 			adminGet<EmailsResponse>("/emails", {
 				q: q || undefined,
 				status: status || undefined,
 				organizationId: organizationId || undefined,
+				userId: userId || undefined,
 				limit,
 				offset,
 			}),
@@ -319,6 +324,24 @@ export default function EmailsPage() {
 								</Button.Root>
 							</>
 						) : null}
+						{userId ? (
+							<>
+								<Button.Root asChild variant="neutral" mode="stroke">
+									<Link href={`/users/${userId}`}>User hub</Link>
+								</Button.Root>
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="ghost"
+									onClick={() => {
+										setPage(1);
+										setUserId(null);
+									}}
+								>
+									Clear user
+								</Button.Root>
+							</>
+						) : null}
 						<Button.Root type="submit" variant="neutral" mode="stroke">
 							Search
 						</Button.Root>
@@ -330,6 +353,12 @@ export default function EmailsPage() {
 				<p className="rounded-xl bg-bg-weak-50 px-3 py-2 text-[12px] text-text-sub-600 dark:bg-white/[0.04]">
 					Filtered to organization{" "}
 					<code className="font-mono text-[11px]">{organizationId}</code>
+				</p>
+			) : null}
+			{userId ? (
+				<p className="rounded-xl bg-bg-weak-50 px-3 py-2 text-[12px] text-text-sub-600 dark:bg-white/[0.04]">
+					Filtered to user{" "}
+					<code className="font-mono text-[11px]">{userId}</code>
 				</p>
 			) : null}
 
