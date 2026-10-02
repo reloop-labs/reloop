@@ -124,10 +124,14 @@ export function CompareHero({
 	titleLines,
 	competitorName,
 	icon,
+	description,
+	updatedAt,
 }: {
 	titleLines: string[];
 	competitorName?: string;
 	icon?: Pick<SimpleIcon, "hex" | "path">;
+	description?: string;
+	updatedAt?: string;
 }) {
 	const parsed =
 		competitorName ??
@@ -161,7 +165,29 @@ export function CompareHero({
 				</span>
 			</div>
 
-			<h1 className="sr-only">{title}</h1>
+			{/* Visible H1: brand tiles are logos, this text heading carries keyword intent. */}
+			<div className="relative border-stroke-soft-200 border-b border-dashed px-6 py-10 text-center sm:px-10 sm:py-12 dark:border-white/10">
+				<SubtleCtaAtmosphere hex={icon?.hex} />
+				<h1 className="relative font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl dark:text-white">
+					{title}
+				</h1>
+				{description ? (
+					<p className="relative mx-auto mt-4 max-w-2xl text-balance font-medium text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/55">
+						{description}
+					</p>
+				) : null}
+				{updatedAt ? (
+					<p className="relative mt-4 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+						Last updated {updatedAt} · By Reloop Labs ·{" "}
+						<Link
+							href="#methodology"
+							className="underline underline-offset-2 transition-colors hover:text-text-strong-950 dark:hover:text-white"
+						>
+							Methodology
+						</Link>
+					</p>
+				) : null}
+			</div>
 
 			{/* Divided brand row: larger tiles, titles centered underneath */}
 			<div className="relative flex overflow-hidden border-stroke-soft-200 border-b border-dashed dark:border-white/10">

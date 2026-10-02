@@ -45,6 +45,8 @@ export type AlternativeDefinition = LandingPageDefinition & {
 	competitorName: string;
 	compareHref: string;
 	highlights: string[];
+	faqs?: { question: string; answer: string }[];
+	updatedAt?: string;
 };
 
 export type GlossaryTermDefinition = {

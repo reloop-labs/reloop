@@ -16,6 +16,7 @@ import {
 	breadcrumbJsonLd,
 	type FaqEntry,
 	faqPageJsonLd,
+	pricingOffersJsonLd,
 	pricingProductJsonLd,
 } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
@@ -26,6 +27,8 @@ export type ComparePageContent = {
 	title: string;
 	description: string;
 	summary: string;
+	/** ISO date the comparison was last verified. Rendered as trust signal. */
+	lastUpdated?: string;
 	categories?: ComparisonCategory[];
 	features?: ComparisonFeatureRow[];
 	faqs: FaqEntry[];
@@ -169,24 +172,55 @@ export const comparePages: ComparePageContent[] = [
 		competitor: "Resend",
 		title: "Reloop vs Resend",
 		description:
-			"Learn how Reloop compares to Resend and why Reloop is an open-source alternative for developer email.",
+			"Reloop vs Resend compared for 2026: open-source email API with self-hosting vs hosted Resend. Pricing, features, deliverability, and migration.",
 		summary: `Reloop is email infrastructure you can host or self-host (Apache 2.0, KumoMTA). Resend is a hosted DX layer over Amazon SES. Reloop Free is ${freePlanSummary}; Pro is $10/month for 50,000 emails with no daily cap. Reloop is not a drop-in Resend proxy.`,
+		lastUpdated: "2026-09-17",
 		categories: resendComparisonCategories,
 		faqs: [
+			{
+				question: "Is Reloop a good Resend alternative in 2026?",
+				answer:
+					"Yes, if you want an open-source Resend alternative with self-hosting. Reloop matches Resend on REST API, SMTP relay, SDKs, templates, scheduled delivery, and open/click tracking, and adds an agent inbox, human inbox, AI composer, and its own MTA stack. Choose Resend if you want a hosted-only DX layer and are comfortable paying per send with no self-host path.",
+			},
+			{
+				question: "How does Reloop pricing compare to Resend?",
+				answer:
+					"Both offer 3,000 free emails per month with a 100/day cap. Reloop Pro is $10/month for 50,000 emails and Growth is $20/month for 100,000 emails; Resend Pro is $20/month for 50,000 emails and roughly $90/month at 100,000 emails. Reloop overage is $0.50 per 1,000 vs Resend $0.90 per 1,000. Self-hosted Reloop has no Reloop license fee — you pay your own infrastructure. Prices are public list prices as of September 17, 2026; see reloop.sh/pricing and resend.com/pricing.",
+			},
+			{
+				question: "Is Reloop open source?",
+				answer:
+					"Yes. Reloop is licensed under Apache License 2.0 plus additional Reloop Labs terms: personal and internal self-host is allowed; commercial redistribution, third-party hosted services, and competing products are not. See https://reloop.sh/license. Reloop Cloud is the official hosted service.",
+			},
+			{
+				question: "Is Reloop a drop-in Resend API?",
+				answer:
+					"No. Reloop is not a Resend proxy. Plan a small client adapter when migrating. Auth uses the x-api-key header with rl_ keys. SMTP senders only need to change host, port, and credentials.",
+			},
 			{
 				question: "Does Reloop Free have a daily send limit?",
 				answer:
 					"Yes. Reloop Free includes 3,000 emails per month and 100 emails per day. Pro ($10/mo), Growth ($20/mo), and Enterprise have no daily cap. Self-hosted Reloop is limited by your own infrastructure, not Reloop Cloud quotas.",
 			},
 			{
-				question: "Is Reloop a drop-in Resend API?",
+				question: "How is deliverability different from Resend?",
 				answer:
-					"No. Reloop is not a Resend proxy. Plan a small client adapter when migrating. Auth uses the x-api-key header with rl_ keys.",
+					"Both support SPF, DKIM, DMARC, shared and dedicated IPs, and bounce/complaint handling. The architectural difference: Reloop runs its own MTA delivery path (KumoMTA) while Resend's public sending path goes through Amazon SES. Deliverability itself still depends on domain reputation, content, and list hygiene — not the dashboard brand. Self-hosted Reloop lets you own IPs directly.",
 			},
 			{
-				question: "Is Reloop open source?",
+				question: "Does Reloop support inbound email like Resend?",
 				answer:
-					"Yes. Reloop is licensed under Apache License 2.0 plus additional Reloop Labs terms: personal and internal self-host is allowed; commercial redistribution, third-party hosted services, and competing products are not. See https://reloop.sh/license. Reloop Cloud is the official hosted service.",
+					"Yes, and it goes further. Resend offers webhook-oriented inbound receiving. Reloop adds an agent inbox with inbound spam scoring (Rspamd), a human inbox, and an AI composer — transactional, marketing, and agent email in one codebase.",
+			},
+			{
+				question: "How long does migration from Resend take?",
+				answer:
+					"Most teams ship the swap in an afternoon: verify your domain in Reloop, swap the send client or point SMTP at Reloop with a small adapter, then re-wire delivery webhooks (Reloop uses HMAC-SHA256 X-Webhook-Signature; Resend uses Svix-style headers). Keep templates — they port directly.",
+			},
+			{
+				question: "When should we stay on Resend instead of switching?",
+				answer:
+					"Stay on Resend if you are deeply embedded in its Audiences/broadcast workflow with no need for self-hosting, source access, inbound agent inboxes, or lower per-send overage at scale — and your volume fits comfortably in Resend's tiers. Reloop wins on ownership, platform breadth, and send-based pricing at 50k–100k+ emails per month.",
 			},
 		],
 	},
@@ -462,11 +496,19 @@ export function buildCompareJsonLd(page: ComparePageContent) {
 			name: page.title,
 			description: page.description,
 			url,
+			...(page.lastUpdated ? { dateModified: page.lastUpdated } : {}),
+			author: {
+				"@type": "Organization",
+				name: "Reloop Labs",
+				url: siteUrl,
+			},
 			about: {
 				"@type": "SoftwareApplication",
 				name: "Reloop",
 				applicationCategory: "DeveloperApplication",
+				operatingSystem: "All",
 				url: siteUrl,
+				offers: pricingOffersJsonLd(siteUrl),
 			},
 		},
 		pricingProductJsonLd(siteUrl),

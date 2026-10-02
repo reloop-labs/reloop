@@ -5,7 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 import type { AlternativeDefinition } from "@reloop/web/lib/landing/types";
-import { breadcrumbJsonLd } from "@reloop/web/lib/schema";
+import { breadcrumbJsonLd, faqPageJsonLd } from "@reloop/web/lib/schema";
 import Link from "next/link";
 
 const competitorAccent: Record<string, string> = {
@@ -29,10 +29,13 @@ export function AlternativePageView({
 	return (
 		<div className="min-h-screen bg-[#fafafa] dark:bg-black">
 			<JsonLd
-				data={breadcrumbJsonLd([
-					{ name: "Alternatives", path: "/alternatives" },
-					{ name: `${config.competitorName} alternative`, path: config.path },
-				])}
+				data={[
+					breadcrumbJsonLd([
+						{ name: "Alternatives", path: "/alternatives" },
+						{ name: `${config.competitorName} alternative`, path: config.path },
+					]),
+					...(config.faqs?.length ? [faqPageJsonLd(config.faqs)] : []),
+				]}
 			/>
 			{/* VS header: alternative.to / G2 pattern */}
 			<div className="border-stroke-soft-200 border-b bg-white dark:border-white/10 dark:bg-[#0a0a0a]">
@@ -63,6 +66,11 @@ export function AlternativePageView({
 					<p className="mx-auto mt-4 max-w-2xl text-[16px] text-text-sub-600 dark:text-white/50">
 						{config.description}
 					</p>
+					{config.updatedAt ? (
+						<p className="mt-4 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+							Last updated {config.updatedAt} · By Reloop Labs
+						</p>
+					) : null}
 					<div className="mt-8 flex flex-wrap justify-center gap-3">
 						<Link
 							href={config.primaryCta?.href ?? "/dashboard/signup"}
@@ -124,6 +132,77 @@ export function AlternativePageView({
 						))}
 					</div>
 				)}
+
+				{/* Honest trade-offs: balanced presentation builds trust + targets "should I switch" queries */}
+				<div className="mt-12 rounded-2xl border border-stroke-soft-200 bg-white p-6 sm:p-8 dark:border-white/10 dark:bg-[#111]">
+					<h2 className="font-semibold text-lg text-text-strong-950 dark:text-white">
+						Honest trade-offs
+					</h2>
+					<div className="mt-4 grid gap-6 text-[14px] leading-relaxed sm:grid-cols-2">
+						<div>
+							<p className="font-semibold text-emerald-600 dark:text-emerald-400">
+								Choose Reloop when…
+							</p>
+							<ul className="mt-2 list-disc space-y-1.5 pl-5 text-text-sub-600 dark:text-white/60">
+								<li>You want source access and a self-host exit ramp.</li>
+								<li>You send 50k+ emails/month and overage stings.</li>
+								<li>
+									You need campaigns, inbound, and agent email in one place.
+								</li>
+							</ul>
+						</div>
+						<div>
+							<p className="font-semibold text-text-strong-950 dark:text-white">
+								Stay on {config.competitorName} when…
+							</p>
+							<ul className="mt-2 list-disc space-y-1.5 pl-5 text-text-sub-600 dark:text-white/60">
+								<li>Hosted-only simplicity already fits your workflow.</li>
+								<li>Volume is low and migration cost outweighs savings.</li>
+								<li>
+									Your team lives in {config.competitorName}-native features.
+								</li>
+							</ul>
+						</div>
+					</div>
+					<p className="mt-5 text-[13px] text-text-sub-600 dark:text-white/50">
+						This page is by Reloop Labs, the team behind Reloop. Pricing is
+						public list prices as of {config.updatedAt ?? "2026"} — verify on{" "}
+						<Link href="/pricing" className="underline underline-offset-2">
+							reloop.sh/pricing
+						</Link>{" "}
+						and the competitor&apos;s site. Full head-to-head:{" "}
+						<Link
+							href={config.compareHref}
+							className="font-semibold text-primary-base"
+						>
+							Reloop vs {config.competitorName}
+						</Link>
+						.
+					</p>
+				</div>
+
+				{config.faqs?.length ? (
+					<div className="mt-12">
+						<h2 className="font-semibold text-text-strong-950 text-xl dark:text-white">
+							{config.competitorName} alternative FAQ
+						</h2>
+						<div className="mt-6 space-y-3">
+							{config.faqs.map((faq) => (
+								<details
+									key={faq.question}
+									className="group rounded-xl border border-stroke-soft-200 bg-white p-5 dark:border-white/10 dark:bg-[#111]"
+								>
+									<summary className="cursor-pointer font-semibold text-[15px] text-text-strong-950 dark:text-white">
+										{faq.question}
+									</summary>
+									<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
+										{faq.answer}
+									</p>
+								</details>
+							))}
+						</div>
+					</div>
+				) : null}
 			</div>
 
 			<ToolUpsell
