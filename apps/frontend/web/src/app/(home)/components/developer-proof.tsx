@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import type { SimpleIcon } from "simple-icons";
 import {
 	siAnthropic,
@@ -19,25 +16,18 @@ import {
 
 type Brand = { name: string; icon: SimpleIcon };
 
-const brandSets: Brand[][] = [
-	[
-		{ name: "Claude", icon: siAnthropic },
-		{ name: "Cursor", icon: siCursor },
-		{ name: "GitHub", icon: siGithub },
-		{ name: "Vercel", icon: siVercel },
-	],
-	[
-		{ name: "Node.js", icon: siNodedotjs },
-		{ name: "Python", icon: siPython },
-		{ name: "Docker", icon: siDocker },
-		{ name: "React", icon: siReact },
-	],
-	[
-		{ name: "Next.js", icon: siNextdotjs },
-		{ name: "Cloudflare", icon: siCloudflare },
-		{ name: "Gmail", icon: siGmail },
-		{ name: "Bun", icon: siBun },
-	],
+// 10 developer tools displayed in a 5x2 grid
+const brands: Brand[] = [
+	{ name: "Claude", icon: siAnthropic },
+	{ name: "Cursor", icon: siCursor },
+	{ name: "GitHub", icon: siGithub },
+	{ name: "Vercel", icon: siVercel },
+	{ name: "Next.js", icon: siNextdotjs },
+	{ name: "React", icon: siReact },
+	{ name: "Node.js", icon: siNodedotjs },
+	{ name: "Python", icon: siPython },
+	{ name: "Docker", icon: siDocker },
+	{ name: "Cloudflare", icon: siCloudflare },
 ];
 
 function BrandMark({ brand }: { brand: Brand }) {
@@ -50,7 +40,7 @@ function BrandMark({ brand }: { brand: Brand }) {
 			>
 				<path d={brand.icon.path} />
 			</svg>
-			<span className="font-semibold text-base tracking-[-0.025em]">
+			<span className="font-semibold text-sm tracking-[-0.025em] sm:text-base">
 				{brand.name}
 			</span>
 		</div>
@@ -58,38 +48,6 @@ function BrandMark({ brand }: { brand: Brand }) {
 }
 
 export function DeveloperProof() {
-	const [setIndex, setSetIndex] = useState(0);
-	const [phase, setPhase] = useState<"idle" | "exit" | "enter">("idle");
-
-	useEffect(() => {
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-		let swapTimer: ReturnType<typeof setTimeout> | undefined;
-		let settleTimer: ReturnType<typeof setTimeout> | undefined;
-		const interval = setInterval(() => {
-			setPhase("exit");
-			swapTimer = setTimeout(() => {
-				setSetIndex((current) => (current + 1) % brandSets.length);
-				setPhase("enter");
-				settleTimer = setTimeout(() => setPhase("idle"), 40);
-			}, 320);
-		}, 2600);
-
-		return () => {
-			clearInterval(interval);
-			if (swapTimer) clearTimeout(swapTimer);
-			if (settleTimer) clearTimeout(settleTimer);
-		};
-	}, []);
-
-	const brands = brandSets[setIndex] ?? brandSets[0] ?? [];
-	const motionClass =
-		phase === "exit"
-			? "translate-y-2 scale-[0.98] opacity-0 blur-[6px]"
-			: phase === "enter"
-				? "-translate-y-2 scale-[0.98] opacity-0 blur-[6px]"
-				: "translate-y-0 scale-100 opacity-100 blur-0";
-
 	return (
 		<section
 			aria-labelledby="developer-proof-heading"
@@ -119,18 +77,14 @@ export function DeveloperProof() {
 					</div>
 					<ul
 						aria-label="Developer tools supported by Reloop"
-						className="grid grid-cols-2 gap-px bg-[#ebebeb] md:grid-cols-4 dark:bg-[#292929]"
+						className="grid grid-cols-2 gap-px bg-[#ebebeb] sm:grid-cols-5 dark:bg-[#292929]"
 					>
 						{brands.map((brand) => (
 							<li
-								key={`${setIndex}-${brand.name}`}
-								className="flex h-24 items-center justify-center overflow-hidden rounded-[4px] bg-white px-4 dark:bg-black"
+								key={brand.name}
+								className="flex h-24 items-center justify-center overflow-hidden rounded-[4px] bg-white px-2 sm:px-4 dark:bg-black"
 							>
-								<div
-									className={`transition-[transform,opacity,filter] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:blur-0 ${motionClass}`}
-								>
-									<BrandMark brand={brand} />
-								</div>
+								<BrandMark brand={brand} />
 							</li>
 						))}
 					</ul>
@@ -143,3 +97,4 @@ export function DeveloperProof() {
 		</section>
 	);
 }
+
