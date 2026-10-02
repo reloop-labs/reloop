@@ -4,8 +4,10 @@ import {
 	refundCreditsForFailedSend,
 	reserveCreditsForSend,
 } from "@reloop/be-mail/lib/credits-gate";
+import { assertNotDuplicateBurst } from "@reloop/be-mail/lib/duplicate-guard";
 import { IdempotentReplayError, MailErrors } from "@reloop/be-mail/lib/errors";
 import { runOutboundGuard } from "@reloop/be-mail/lib/outbound-guard";
+import { assertReputationAllowed } from "@reloop/be-mail/lib/reputation-guard";
 import {
 	assertAttachmentsWithinPlan,
 	getOrgAttachmentLimit,
@@ -119,6 +121,27 @@ export async function sendEmailController({
 			return replay;
 		}
 	}
+
+	// ── Reputation + duplicate burst guards ─────────────────────────────
+	// Reputation first (org is paused → 403 with cooldown, no quota burned).
+	// Duplicate second (identical re-send within 10 min, or >3/min to the
+	// same address → 429). Both run before credits/log/KumoMTA so abusive
+	// bursts never consume quota or damage shared IP reputation.
+	const { redis } = await import("@reloop/be-mail/utils/loader");
+	await assertReputationAllowed(
+		{ redisGet: (key: string) => redis.get(key) },
+		{ organizationId },
+	);
+	await assertNotDuplicateBurst(redis, {
+		organizationId,
+		from: rawBody.from,
+		to: rawBody.to,
+		cc: rawBody.cc,
+		bcc: rawBody.bcc,
+		subject: rawBody.subject,
+		html: rawBody.html,
+		text: rawBody.text,
+	});
 
 	// ── Plan size gate ──────────────────────────────────────────────────
 	// Fail fast on per-plan attachment limits (free 1 MB, paid 5 MB) before

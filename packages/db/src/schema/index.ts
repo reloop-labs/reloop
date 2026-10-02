@@ -13,6 +13,7 @@ export * from "./domain";
 export * from "./email";
 export * from "./group";
 export * from "./inbox";
+export * from "./reputation";
 export * from "./sending-ip";
 export * from "./support";
 export * from "./template";

@@ -56,6 +56,15 @@ export {
 	scoreOutboundAbuse,
 } from "./outbound-abuse";
 export {
+	blockTtlSeconds,
+	evaluateReputation,
+	REPUTATION_THRESHOLDS,
+	type ReputationCounts,
+	type ReputationReason,
+	type ReputationVerdict,
+	reputationRates,
+} from "./reputation";
+export {
 	applyCreditReservation,
 	type CreditReservation,
 	type CreditSnapshot,

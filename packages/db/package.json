@@ -11,6 +11,7 @@
 		"./domain-age-cap": "./src/domain-age-cap.ts",
 		"./smtp-recipients": "./src/smtp-recipients.ts",
 		"./outbound-abuse": "./src/outbound-abuse.ts",
+		"./reputation": "./src/reputation.ts",
 		"./ensure-sending-domain-verified": "./src/ensure-sending-domain-verified.ts",
 		"./webhook-events": "./src/webhook-events.ts",
 		"./utils": "./src/utils/*"
