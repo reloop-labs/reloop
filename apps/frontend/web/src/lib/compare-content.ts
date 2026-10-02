@@ -229,10 +229,21 @@ export const comparePages: ComparePageContent[] = [
 		competitor: "SendGrid",
 		title: "Reloop vs SendGrid",
 		description:
-			"Learn how Reloop compares to SendGrid for transactional and marketing email.",
+			"Reloop vs SendGrid compared for 2026: API-first open-source email with self-hosting vs Twilio bundle. Pricing, platform, and enterprise migration.",
 		summary: `SendGrid bundles transactional APIs, marketing campaigns, and deliverability tooling, often with annual commits. Reloop is API-first, Apache 2.0, and self-hostable, with campaigns and transactional sends in one codebase. Reloop Cloud Free is ${freePlanSummary}.`,
+		lastUpdated: "2026-09-17",
 		features: sendgridFeatures,
 		faqs: [
+			{
+				question: "Is Reloop a good SendGrid alternative in 2026?",
+				answer:
+					"Yes, for teams that want a modern API-first platform without Twilio bundle pressure or annual commits. Reloop matches SendGrid on transactional API, marketing campaigns, template editor, SMTP relay, and webhooks, and adds self-hosting, an agent inbox, and monthly tiers with a self-host exit ramp. Stay on SendGrid if you are deeply embedded in subuser/IP-pool workflows with deliverability tooling your team already operates.",
+			},
+			{
+				question: "How does Reloop pricing compare to SendGrid?",
+				answer:
+					"Reloop Pro is $10/month for 50,000 emails and Growth is $20/month for 100,000 emails, with overage at $0.50 per 1,000. SendGrid Essentials lists around $19.95/month for 50,000 emails and roughly $34.95/month at 100,000 emails — often with annual enterprise commits on top. Self-hosted Reloop has no Reloop license fee. Prices are public list prices as of September 17, 2026; verify on sendgrid.com/pricing and reloop.sh/pricing.",
+			},
 			{
 				question: "Can Reloop handle SendGrid-scale volume?",
 				answer:
@@ -243,6 +254,26 @@ export const comparePages: ComparePageContent[] = [
 				answer:
 					"Growth includes 1 dedicated IP and Enterprise is optional/custom. Self-hosted deployments can attach your own IPs directly to your MTA layer.",
 			},
+			{
+				question: "How do templates and subusers migrate from SendGrid?",
+				answer:
+					"Inventory subusers, API keys, and IP pools and map each to Reloop orgs or environments. Export dynamic templates and contact segments, rebuild automations in Reloop campaigns or via API triggers, then run shadow traffic by duplicating transactional sends to Reloop in staging with real payloads before cutover.",
+			},
+			{
+				question: "Does Reloop replace SendGrid marketing campaigns?",
+				answer:
+					"Yes. Reloop includes broadcast campaigns, templates, and contacts alongside transactional sends in one codebase — so marketing and engineering share a single template source of truth instead of a dashboard/API split.",
+			},
+			{
+				question: "Is Reloop open source?",
+				answer:
+					"Yes. Reloop is Apache 2.0 licensed plus additional Reloop Labs terms: personal and internal self-host is allowed; commercial redistribution, third-party hosted services, and competing products are not. See https://reloop.sh/license.",
+			},
+			{
+				question: "When should we stay on SendGrid?",
+				answer:
+					"Stay if your subuser hierarchy, IP pools, and deliverability tooling are already tuned, your annual commit pricing is favorable, and you have no need for source access, self-hosting, or agent-inbox workflows. Reloop wins on ownership, monthly flexibility, and unified transactional plus marketing sends.",
+			},
 		],
 	},
 	{
@@ -250,10 +281,16 @@ export const comparePages: ComparePageContent[] = [
 		competitor: "Mailgun",
 		title: "Reloop vs Mailgun",
 		description:
-			"Learn how Reloop compares to Mailgun for developer email APIs and SMTP.",
+			"Reloop vs Mailgun compared for 2026: self-hostable open-source email API with agent inbox vs hosted Mailgun. Pricing, inbound, and SMTP migration.",
 		summary: `Reloop offers REST + SMTP, inbound agent inbox, and Apache 2.0 self-host. Mailgun is hosted SaaS with inbound routes. Reloop Free is ${freePlanSummary}.`,
+		lastUpdated: "2026-09-17",
 		categories: mailgunComparisonCategories,
 		faqs: [
+			{
+				question: "Is Reloop a good Mailgun alternative in 2026?",
+				answer:
+					"Yes, for teams that want the same REST + SMTP sending surface with source access and a self-host path. Reloop adds an agent inbox with spam scoring and threading, campaigns beyond pure transactional sends, and send-based pricing ($10/month for 50,000 emails vs Mailgun Foundation $35/month). Stay on Mailgun if inbound routes and Sinch-bundled tooling already fit and volume sits comfortably in your current tier.",
+			},
 			{
 				question: "Can Reloop replace Mailgun inbound routes?",
 				answer:
@@ -267,12 +304,27 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "How does Reloop Cloud pricing compare to Mailgun?",
 				answer:
-					"Mailgun Basic is $15/month for 10,000 emails and Foundation is $35/month for 50,000, with overage from $1.30 per 1,000. Reloop Pro is $10/month for 50,000 emails and Growth is $20/month for 100,000, with overage at $0.50 per 1,000. Self-hosted Reloop has no Reloop license fee; you pay your own infrastructure.",
+					"Mailgun Basic is $15/month for 10,000 emails and Foundation is $35/month for 50,000, with overage from $1.30 per 1,000. Reloop Pro is $10/month for 50,000 emails and Growth is $20/month for 100,000, with overage at $0.50 per 1,000. Self-hosted Reloop has no Reloop license fee; you pay your own infrastructure. Prices are public list prices as of September 17, 2026.",
 			},
 			{
 				question: "Do SMTP senders need code changes?",
 				answer:
 					"No. Applications sending over SMTP change host, port, and credentials only. API senders need a small client adapter, since Reloop is not a drop-in Mailgun proxy.",
+			},
+			{
+				question: "How do Mailgun validation and dedicated IPs map to Reloop?",
+				answer:
+					"Mailgun prices validation and dedicated IPs as add-ons above Foundation tiers. Reloop includes validation in-platform and Growth includes 1 dedicated IP; self-hosted deployments attach your own IPs directly to the MTA layer — so compare the all-in bill, not just the base tier.",
+			},
+			{
+				question: "How long does migration from Mailgun take?",
+				answer:
+					"SMTP senders cut over in minutes (host, port, credentials) while both providers stay live during DKIM/SPF propagation. API senders need a small adapter plus inbound-route remapping and suppression-list import — most teams finish domain by domain in an afternoon.",
+			},
+			{
+				question: "Is Reloop open source?",
+				answer:
+					"Yes. Reloop is Apache 2.0 licensed plus additional Reloop Labs terms: personal and internal self-host is allowed; commercial redistribution, third-party hosted services, and competing products are not. See https://reloop.sh/license.",
 			},
 		],
 	},

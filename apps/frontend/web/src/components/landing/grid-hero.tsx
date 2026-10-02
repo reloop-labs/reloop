@@ -62,7 +62,7 @@ export function GridHero() {
 											</h1>
 											<p className="mx-auto mt-5 mb-9 max-w-2xl text-balance text-lg text-zinc-600 leading-7 dark:text-zinc-400">
 												Send transactional emails, run campaigns, and give AI
-												agents their own inboxes—all with Reloop.
+												agents their own inboxes all with Reloop.
 											</p>
 											<div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4">
 												<FancyButton.Root

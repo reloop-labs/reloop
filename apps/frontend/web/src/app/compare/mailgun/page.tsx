@@ -21,29 +21,33 @@ const pagePath = "/compare/mailgun";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
-	title: "Reloop vs Mailgun | Email Provider Comparison",
+	title: "Reloop vs Mailgun: Self-Hostable Email API & Inbox (2026)",
 	description:
-		"Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs.",
+		"Compare Reloop vs Mailgun in 2026: open-source Mailgun alternative with self-hosting, $10/50k vs $35/50k, agent inbox, and 3-field SMTP cutover.",
 	keywords: [
 		"Reloop vs Mailgun",
 		"Mailgun alternative",
+		"Mailgun alternatives 2026",
+		"open source Mailgun alternative",
+		"self-hosted Mailgun alternative",
+		"Mailgun vs Reloop pricing",
+		"best Mailgun alternative",
 		"SMTP comparison",
 		"email API comparison",
-		"open source Mailgun alternative",
 	],
 	openGraph: {
-		title: "Reloop vs Mailgun",
+		title: "Reloop vs Mailgun: Self-Hostable Email API & Inbox (2026)",
 		description:
-			"Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs.",
+			"Compare Reloop vs Mailgun in 2026: open-source Mailgun alternative with self-hosting, $10/50k vs $35/50k, agent inbox, and 3-field SMTP cutover.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Reloop vs Mailgun | Email Provider Comparison",
+		title: "Reloop vs Mailgun: Self-Hostable Email API & Inbox (2026)",
 		description:
-			"Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs.",
+			"Compare Reloop vs Mailgun in 2026: open-source Mailgun alternative with self-hosting, $10/50k vs $35/50k, agent inbox, and 3-field SMTP cutover.",
 	},
 	alternates: { canonical: pageUrl },
 };
@@ -105,7 +109,8 @@ const MailgunComparisonPage = () => {
 			<ComparisonPageShell
 				pagePath={pagePath}
 				titleLines={["Reloop vs Mailgun"]}
-				description="Mailgun gives you REST, SMTP, and inbound routes as a hosted service under Sinch. Reloop gives you the same sending surface with the source code and a self-host path behind it."
+				description="The open-source Mailgun alternative for 2026: same REST + SMTP surface with self-hosting, send-based pricing, and an agent inbox. By Reloop Labs."
+				updatedAt="September 17, 2026"
 				primaryCta={{
 					label: "Get Started ",
 					href: "/dashboard/signup",
@@ -168,6 +173,31 @@ const MailgunComparisonPage = () => {
 								</p>
 							</div>
 						</div>
+
+						<div className="mx-auto mt-6 max-w-3xl rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.06] p-5 text-left sm:p-6">
+							<p className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
+								Verdict: choose Reloop for per-send pricing and exit option;
+								stay on Mailgun if routes and tiers already fit.
+							</p>
+							<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								At 50,000 emails/month Reloop Pro is $10 vs Mailgun Foundation
+								$35; overage is $0.50 vs from $1.30 per 1,000 — and SMTP senders
+								cut over in 3 fields with no rewrite. Stay on Mailgun if inbound
+								routes, validation add-ons, and Sinch-bundled tooling already
+								fit your volume. Pricing as of September 17, 2026 — see{" "}
+								<Link href="/pricing" className="underline underline-offset-2">
+									reloop.sh/pricing
+								</Link>{" "}
+								and{" "}
+								<Link
+									href="/alternatives/mailgun"
+									className="font-semibold text-primary-base"
+								>
+									best Mailgun alternative
+								</Link>
+								.
+							</p>
+						</div>
 					</div>
 				</CompareSection>
 
@@ -225,6 +255,61 @@ const MailgunComparisonPage = () => {
 					compact
 					flush
 				/>
+
+				<CompareSection maxWidth="2xl">
+					<div id="methodology" className="scroll-mt-28">
+						<p className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
+							Methodology · trust
+						</p>
+						<h2 className="mt-3 font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl dark:text-white">
+							How we compared — and who wrote this
+						</h2>
+						<div className="mt-5 space-y-4 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+							<p>
+								This page is written and maintained by Reloop Labs, the team
+								behind Reloop — so treat it as our perspective, not a neutral
+								third party. Feature claims come from public docs (Mailgun
+								pricing and docs, the Reloop codebase), not from private
+								benchmarks. Unknowns are marked “—” rather than guessed.
+							</p>
+							<p>
+								Pricing reflects public list prices last checked September 17,
+								2026 — Mailgun Basic $15/mo (10k), Foundation $35/mo (50k),
+								overage from $1.30/1k; Reloop Pro $10/mo (50k), Growth $20/mo
+								(100k), overage $0.50/1k. Verify on their pricing page and{" "}
+								<Link href="/pricing" className="underline underline-offset-2">
+									reloop.sh/pricing
+								</Link>
+								. Seen something inaccurate?{" "}
+								<Link
+									href="/contact"
+									className="font-semibold text-primary-base"
+								>
+									Tell us
+								</Link>{" "}
+								— we correct comparison pages when the facts change. Related:{" "}
+								<Link
+									href="/alternatives/mailgun"
+									className="font-semibold text-primary-base"
+								>
+									best Mailgun alternative
+								</Link>
+								,{" "}
+								<Link
+									href="/features/smtp"
+									className="font-semibold text-primary-base"
+								>
+									SMTP relay
+								</Link>
+								,{" "}
+								<Link href="/docs" className="font-semibold text-primary-base">
+									API docs
+								</Link>
+								.
+							</p>
+						</div>
+					</div>
+				</CompareSection>
 
 				<CompareSection maxWidth="full" noDivider>
 					<CompareOtherLinks currentHref={pagePath} />
