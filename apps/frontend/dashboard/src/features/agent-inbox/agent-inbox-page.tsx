@@ -2,12 +2,14 @@
 
 import { parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { AgentInboxCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { useAgentInbox } from "./components/agent-inbox-provider";
 import { CreateInboxInlineCard } from "./components/create-inbox-inline-card";
 import { AgentInboxLayoutWrapper } from "./components/layout/agent-inbox-layout-wrapper";
 import { AgentInboxContent } from "./components/mail-list/agent-inbox-content";
 import { SectionError } from "./components/shared/section-error";
+import { useSelectedMailboxPersistence } from "./lib/use-selected-mailbox";
 import { AgentMailboxListHeader } from "./list/agent-mailbox-list-header";
 import {
 	AgentFolderPage,
@@ -44,6 +46,14 @@ export function AgentInboxPage() {
 		"folder",
 		parseAsString.withDefault("inbox"),
 	);
+	const { activeOrganizationId } = useActiveOrganization();
+
+	// Remember the user's selected inbox per user + org, restore on return.
+	useSelectedMailboxPersistence({
+		mailboxes,
+		isLoadingMailboxes,
+		orgId: activeOrganizationId,
+	});
 
 	const activeMailbox = useMemo(() => {
 		if (!mailboxes || mailboxes.length === 0) return undefined;

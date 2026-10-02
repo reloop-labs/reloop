@@ -8,13 +8,14 @@ import {
 	jsonb,
 	pgEnum,
 	pgTable,
+	primaryKey,
 	real,
 	text,
 	timestamp,
 	unique,
 	varchar,
 } from "drizzle-orm/pg-core";
-import { organization } from "./auth";
+import { organization, user } from "./auth";
 import { domain } from "./domain";
 
 // Custom ID generation functions with prefixes
@@ -157,6 +158,36 @@ export const inboundAttachment = pgTable(
 	],
 );
 
+// ─── inbox_mailbox_selection ─────────────────────────────────────────
+// Last mailbox (+ folder) each user selected, scoped to user + org.
+// Shared orgs stay isolated: PK (user_id, organization_id) → one row each.
+
+export const inboxMailboxSelection = pgTable(
+	"inbox_mailbox_selection",
+	{
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		organizationId: text("organization_id")
+			.notNull()
+			.references(() => organization.id, { onDelete: "cascade" }),
+		mailboxId: text("mailbox_id")
+			.notNull()
+			.references(() => mailbox.id, { onDelete: "cascade" }),
+		folder: varchar("folder", { length: 64 }).notNull().default("inbox"),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at")
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		primaryKey({ columns: [table.userId, table.organizationId] }),
+		index("inbox_mailbox_selection_idx_org").on(table.organizationId),
+		index("inbox_mailbox_selection_idx_mailbox").on(table.mailboxId),
+	],
+);
+
 // ─── Relations ───────────────────────────────────────────────────────
 
 export const mailboxRelations = relations(mailbox, ({ one, many }) => ({
@@ -196,7 +227,26 @@ export const inboundAttachmentRelations = relations(
 	}),
 );
 
+export const inboxMailboxSelectionRelations = relations(
+	inboxMailboxSelection,
+	({ one }) => ({
+		user: one(user, {
+			fields: [inboxMailboxSelection.userId],
+			references: [user.id],
+		}),
+		organization: one(organization, {
+			fields: [inboxMailboxSelection.organizationId],
+			references: [organization.id],
+		}),
+		mailbox: one(mailbox, {
+			fields: [inboxMailboxSelection.mailboxId],
+			references: [mailbox.id],
+		}),
+	}),
+);
+
 export const inboxTables = {
+	inboxMailboxSelection,
 	mailbox,
 	inboundEmail,
 	inboundAttachment,

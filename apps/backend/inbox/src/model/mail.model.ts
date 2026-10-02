@@ -362,6 +362,11 @@ export namespace MailModel {
 		updatedAt: t.Union([t.Date(), t.String()]),
 	});
 
+	export const selectedMailboxResponse = t.Object({
+		mailboxId: t.Union([t.String(), t.Null()]),
+		folder: t.Union([t.String(), t.Null()]),
+	});
+
 	export const messageAttachmentResponse = t.Object({
 		id: t.String(),
 		filename: t.String(),
