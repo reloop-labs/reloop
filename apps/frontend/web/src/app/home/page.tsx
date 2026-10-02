@@ -16,11 +16,19 @@ import type { Metadata } from "next";
 import { AgentCards } from "../(home)/components/agent-cards";
 import CTA from "../(home)/components/cta";
 import { DeveloperProof } from "../(home)/components/developer-proof";
-import EmailSystem from "../(home)/components/email-system";
 import Highlights from "../(home)/components/highlights";
 import { HomeFaq } from "../(home)/components/home-faq";
 import { ReloopStory } from "../(home)/components/reloop-story";
 import { SectionSeparator } from "../(home)/components/section-separator";
+import { ConnectApplications } from "../(home)/components/connect-applications";
+import { CustomerReviews } from "../(home)/components/customer-reviews";
+import { CustomerTestimonial } from "../(home)/components/customer-testimonial";
+import { DataVisualization } from "../(home)/components/data-visualization";
+import { EnterpriseSecurity } from "../(home)/components/enterprise-security";
+import { GridSeparator } from "../(home)/components/grid-separator";
+import { PaymentSolutions } from "../(home)/components/payment-solutions";
+import { SecureVerification } from "../(home)/components/secure-verification";
+import { TransactionalInvoicing } from "../(home)/components/transactional-invoicing";
 
 // Non-indexable replica of the landing page
 export const metadata: Metadata = {
@@ -76,9 +84,19 @@ export default function HomePage() {
 			<AgentCards />
 			<DeveloperProof />
 			<ReloopStory />
+			<TransactionalInvoicing />
+			<GridSeparator />
+			<SecureVerification />
+			<GridSeparator />
+			<PaymentSolutions />
+			<GridSeparator />
+			<CustomerTestimonial />
+			<GridSeparator />
+			<DataVisualization />
+			<ConnectApplications />
+			<EnterpriseSecurity />
+			<CustomerReviews />
 			<div className="relative mx-auto flex w-full max-w-[1104px] flex-col border-[#ebebeb] border-x dark:border-[#292929]">
-				<EmailSystem />
-				<SectionSeparator />
 				<Highlights />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<CTA />

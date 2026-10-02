@@ -7,6 +7,35 @@
 	--font-mono: var(--font-geist-mono), monospace;
 	--color-blue-accent: var(--blue-accent);
 	--color-text-opaque-disabled: var(--text-opaque-disabled);
+	--color-card: var(--card);
+	--color-foreground: var(--foreground);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--spacing-276: 69rem;
+}
+
+@utility max-w-276 {
+	max-width: 69rem;
+}
+
+@utility min-w-276 {
+	min-width: 69rem;
+}
+
+@utility w-276 {
+	width: 69rem;
+}
+
+@utility grid-cols-23 {
+	grid-template-columns: repeat(23, minmax(0, 1fr));
+}
+
+@utility col-span-19 {
+	grid-column: span 19 / span 19;
+}
+
+@utility col-span-23 {
+	grid-column: span 23 / span 23;
 }
 
 :root {
@@ -17,6 +46,10 @@
 	--color-blue-accent: #0066ff;
 	--blue-accent: #0066ff;
 	--text-opaque-disabled: rgba(0, 0, 0, 0.25);
+	--card: #ffffff;
+	--foreground: #09090b;
+	--muted-foreground: #71717a;
+	--muted: #f4f4f5;
 	--acc-expand: 250ms;
 	--acc-collapse: 250ms;
 	--acc-chevron: 250ms;
@@ -27,6 +60,10 @@
 	--color-blue-accent: #52a8ff;
 	--blue-accent: #52a8ff;
 	--text-opaque-disabled: rgba(255, 255, 255, 0.25);
+	--card: #000000;
+	--foreground: #fafafa;
+	--muted-foreground: #a1a1aa;
+	--muted: #27272a;
 	--bg-white-0: #131313;
 	--color-bg-white-0: #131313;
 	--stroke-soft-200: #1f1f1f;
