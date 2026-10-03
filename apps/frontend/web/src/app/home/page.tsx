@@ -28,7 +28,7 @@ import { EnterpriseSecurity } from "../(home)/components/enterprise-security";
 import { GridSeparator } from "../(home)/components/grid-separator";
 import { PaymentSolutions } from "../(home)/components/payment-solutions";
 import { SecureVerification } from "../(home)/components/secure-verification";
-import { TransactionalInvoicing } from "../(home)/components/transactional-invoicing";
+import { TransactionalEmails } from "../(home)/components/transactional-emails";
 
 // Non-indexable replica of the landing page
 export const metadata: Metadata = {
@@ -84,7 +84,7 @@ export default function HomePage() {
 			<AgentCards />
 			<DeveloperProof />
 			<ReloopStory />
-			<TransactionalInvoicing />
+			<TransactionalEmails />
 			<GridSeparator />
 			<SecureVerification />
 			<GridSeparator />
