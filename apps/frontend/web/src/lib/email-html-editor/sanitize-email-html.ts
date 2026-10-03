@@ -70,6 +70,12 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 	// and unwrap the container table. Otherwise TipTap keeps the class names
 	// but the heading sits flush to the canvas.
 	inlineEmailStylesheet(doc);
+	const hasDocumentBody = /<body\b/i.test(rawHtml);
+	if (hasDocumentBody && !doc.body.style.lineHeight) {
+		// A standalone email uses the browser's normal line height, not the
+		// editor theme's 155%. Keep that inherited default when unwrapping it.
+		doc.body.style.lineHeight = "normal";
+	}
 
 	expandShorthandStyles(doc.body);
 	promoteTableSpacingToCells(doc.body);
@@ -432,6 +438,13 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 	promoteTableSpacingToCells(doc.body);
 	promoteCellTypographyToBlocks(doc.body);
 	promoteInheritedTypography(doc.body);
+	if (hasDocumentBody) {
+		for (const paragraph of Array.from(doc.body.querySelectorAll("p"))) {
+			// Explicit or inherited source sizes were promoted above. Unstyled
+			// HTML paragraphs otherwise use 16px, rather than the editor's 14px.
+			if (!paragraph.style.fontSize) paragraph.style.fontSize = "16px";
+		}
+	}
 	stampThemeNeutralBlockPadding(doc.body);
 	alignImageOnlyTableRows(doc.body);
 	alignImageOnlyCells(doc.body);
