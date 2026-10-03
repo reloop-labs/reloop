@@ -7,7 +7,7 @@ import {
 	PageHeading,
 } from "@fe/console/components/ui/page-frame";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
-import { adminGet, adminPatch } from "@fe/console/lib/admin-api";
+import { adminGet, adminPatch, adminPost } from "@fe/console/lib/admin-api";
 import { formatRelativeTime } from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
@@ -37,6 +37,7 @@ export default function DomainsPage() {
 	);
 	const [draftQ, setDraftQ] = useState(q);
 	const [suspendTarget, setSuspendTarget] = useState<DomainItem | null>(null);
+	const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
 	useEffect(() => {
 		setDraftQ(q);
@@ -170,6 +171,28 @@ export default function DomainsPage() {
 										<Link href={`/organizations/${d.organizationId}`}>
 											Org hub
 										</Link>
+									</Button.Root>
+									<Button.Root
+										size="xsmall"
+										variant="neutral"
+										mode="ghost"
+										disabled={verifyingId === d.id}
+										onClick={async () => {
+											try {
+												setVerifyingId(d.id);
+												await adminPost(`/domains/${d.id}/verify`);
+												toast.success(
+													`Reverification started for ${d.domain}`,
+												);
+												mutate();
+											} catch {
+												toast.error("Failed to start reverification");
+											} finally {
+												setVerifyingId(null);
+											}
+										}}
+									>
+										{verifyingId === d.id ? "Verifying..." : "Reverify"}
 									</Button.Root>
 									{d.status === "suspended" ? (
 										<Button.Root

@@ -222,6 +222,9 @@ export default function OrganizationDetailPage() {
 	const [convertOpen, setConvertOpen] = useState(false);
 	const [convertMode, setConvertMode] = useState<"comped" | "paid">("comped");
 	const [convertReason, setConvertReason] = useState("");
+	const [verifyingDomainId, setVerifyingDomainId] = useState<string | null>(
+		null,
+	);
 
 	const { data, isLoading, error, mutate } = useSWR<OrgDetail>(
 		orgId ? `/organizations/${orgId}` : null,
@@ -1117,8 +1120,9 @@ export default function OrganizationDetailPage() {
 							"Sent today",
 							"Verified",
 							"Created",
+							"Actions",
 						]}
-						colSpan={7}
+						colSpan={8}
 						empty={data.domains.length === 0}
 					>
 						{data.domains.map((d) => {
@@ -1199,6 +1203,32 @@ export default function OrganizationDetailPage() {
 									</td>
 									<td className="px-4 py-3 text-text-sub-600">
 										{formatRelativeTime(d.createdAt)}
+									</td>
+									<td className="px-4 py-3">
+										<Button.Root
+											size="xsmall"
+											variant="neutral"
+											mode="ghost"
+											disabled={verifyingDomainId === d.id}
+											onClick={async () => {
+												try {
+													setVerifyingDomainId(d.id);
+													await adminPost(`/domains/${d.id}/verify`);
+													toast.success(
+														`Reverification started for ${d.domain}`,
+													);
+													mutate();
+												} catch {
+													toast.error("Failed to start reverification");
+												} finally {
+													setVerifyingDomainId(null);
+												}
+											}}
+										>
+											{verifyingDomainId === d.id
+												? "Verifying..."
+												: "Reverify"}
+										</Button.Root>
 									</td>
 								</tr>
 							);

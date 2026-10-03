@@ -1,7 +1,8 @@
 import { writeAdminAudit } from "@reloop/admin/utils/audit";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
-import { domain, organization } from "@reloop/db/schema";
-import { and, count, desc, eq, ilike, sql } from "drizzle-orm";
+import { domain, domainDnsRecord, organization } from "@reloop/db/schema";
+import { and, count, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { createError } from "evlog";
 
 export async function listDomainsController({
@@ -86,6 +87,84 @@ export async function updateDomainStatusController({
 			previousStatus: existing.status,
 			domain: existing.domain,
 			reason,
+		},
+	});
+
+	return { success: true };
+}
+
+export async function reverifyDomainController({
+	domainId,
+	actorUserId,
+}: {
+	domainId: string;
+	actorUserId: string;
+}) {
+	const existing = await db.query.domain.findFirst({
+		where: and(eq(domain.id, domainId), isNull(domain.deletedAt)),
+		with: {
+			dnsRecords: {
+				where: isNull(domainDnsRecord.deletedAt),
+				columns: { id: true },
+			},
+		},
+	});
+	if (!existing) {
+		throw createError({
+			status: 404,
+			message: "Domain not found",
+			why: `No domain with id ${domainId}`,
+			fix: "Check the domain id and try again",
+		});
+	}
+
+	const previousStatus = existing.status;
+
+	await db
+		.update(domain)
+		.set({
+			status: "verifying",
+			userVerifiedDomain: true,
+			updatedAt: new Date(),
+		})
+		.where(eq(domain.id, domainId));
+
+	if (existing.dnsRecords.length > 0) {
+		await db
+			.update(domainDnsRecord)
+			.set({ status: "verifying", verificationError: null })
+			.where(eq(domainDnsRecord.domainId, domainId));
+	}
+
+	try {
+		await bus.publish(BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED, {
+			domainId,
+			organizationId: existing.organizationId,
+			domain: existing.domain,
+			triggeredAt: new Date().toISOString(),
+		});
+	} catch (error) {
+		await db
+			.update(domain)
+			.set({ status: previousStatus, updatedAt: new Date() })
+			.where(eq(domain.id, domainId));
+		throw createError({
+			status: 503,
+			message: "Failed to enqueue domain verification",
+			why: error instanceof Error ? error.message : String(error),
+			fix: "Retry in a moment. If this keeps happening, check the worker/NATS connectivity.",
+		});
+	}
+
+	await writeAdminAudit({
+		actorUserId,
+		action: "domain.reverify",
+		resourceType: "domain",
+		resourceId: domainId,
+		organizationId: existing.organizationId,
+		metadata: {
+			previousStatus,
+			domain: existing.domain,
 		},
 	});
 

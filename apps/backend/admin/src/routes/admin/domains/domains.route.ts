@@ -3,6 +3,7 @@ import { AdminModel } from "@reloop/admin/model/admin.model";
 import { Elysia, t } from "elysia";
 import {
 	listDomainsController,
+	reverifyDomainController,
 	updateDomainStatusController,
 } from "./domains.controllers";
 
@@ -63,6 +64,26 @@ export const domainsRoute = new Elysia()
 			detail: {
 				tags: ["Admin"],
 				summary: "Update domain status",
+			},
+		},
+	)
+	.post(
+		"/domains/:domainId/verify",
+		async ({ params, userId }) =>
+			reverifyDomainController({
+				domainId: params.domainId,
+				actorUserId: userId,
+			}),
+		{
+			authAdmin: true,
+			params: t.Object({ domainId: t.String() }),
+			response: {
+				200: AdminModel.successResponse,
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Admin"],
+				summary: "Reverify domain DNS",
 			},
 		},
 	);
