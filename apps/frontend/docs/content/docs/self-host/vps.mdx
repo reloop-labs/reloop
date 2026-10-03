@@ -119,7 +119,7 @@ reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
 - `inbound.` is the MX target for mail your verified domains receive.
 - The SPF record authorises the server to send for the host domain, which is what the `include:` in each sending domain's SPF resolves to.
 
-These are separate from the SPF, DKIM, DMARC and MX records for the domains you send from. Those are generated per domain by Reloop. Add a domain under **Domains** in the dashboard and it shows the exact records. See [Connect a domain](/docs/guides/connect-domain).
+These are separate from the SPF, DKIM, DMARC and MX records for the domains you send from. Those are generated per domain by Reloop. Add a domain under **Domains** in the dashboard and it shows the exact records. See [Connect a domain](/docs/guides/connect-domain). **Auto populate** only works on Reloop Cloud, because the Domain Connect template is tied to it, so add these records by hand with [manual setup](/docs/guides/connect-domain/manual-setup).
 
 You can run the installer before adding DNS. Caddy keeps retrying certificate issuance in the background and HTTPS starts working on its own once the records resolve. Follow it with `reloop logs proxy`.
 

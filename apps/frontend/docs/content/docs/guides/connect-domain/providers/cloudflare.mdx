@@ -22,6 +22,8 @@ It is [best practice to use a subdomain](/docs/guides/connect-domain/what-is-a-d
 
 The fastest way to verify your domain on Cloudflare is **Auto populate** in Reloop. This uses [Domain Connect](https://www.domainconnect.org/) to configure your DNS records.
 
+Auto populate is only on Reloop Cloud. On a [self-hosted](/docs/self-host) instance, skip to [Manual setup](#manual-setup).
+
 1. Go to your [Domains](https://reloop.sh/dashboard/domain) page in Reloop and open the domain.
 2. Check **Email Receiving** before Auto-populate. New domains start with Receiving on, so inbound MX (`inbound.reloop.sh`) is usually included. Turn **Email Receiving** off first if this hostname must keep Google Workspace / Microsoft 365, or use a [subdomain](/docs/guides/connect-domain/what-is-a-domain). [Learn more below](#receiving-emails).
 3. Click **Auto populate**.

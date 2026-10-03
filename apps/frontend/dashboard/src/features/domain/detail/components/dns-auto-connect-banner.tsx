@@ -191,7 +191,10 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	}
 
 	// Auto-populate: provider has onboarded Reloop's Domain Connect template
-	if (provider?.supportsAutoConnect) {
+	if (
+		provider?.supportsAutoConnect &&
+		process.env.NEXT_PUBLIC_SELFHOSTED !== "true"
+	) {
 		return (
 			<AutoPopulateBanner
 				provider={provider}
