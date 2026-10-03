@@ -153,12 +153,7 @@ function CliDiagram() {
 
 function CliCard() {
 	return (
-		<a
-			href="/docs/integrations/ai-tools/cli-agents"
-			target="_blank"
-			rel="noreferrer"
-			className="group grid gap-px md:grid-rows-[196px_280px]"
-		>
+		<div className="grid gap-px md:grid-rows-[196px_280px]">
 			<div
 				data-grid-content="true"
 				data-slot="feature-card-content"
@@ -191,7 +186,7 @@ function CliCard() {
 					<CliDiagram />
 				</div>
 			</div>
-		</a>
+		</div>
 	);
 }
 
@@ -247,7 +242,7 @@ const SATELLITE_NODES = [
 		x: 105,
 		y: 40,
 		path: siClaude.path,
-		wire: "M105 59 V82 H186 V105",
+		wire: "M105 59 V76 Q105 82 111 82 H180 Q186 82 186 88 V105",
 		port: { x: 182, y: 101 },
 	},
 	{
@@ -265,7 +260,7 @@ const SATELLITE_NODES = [
 		x: 335,
 		y: 40,
 		path: siCursor.path,
-		wire: "M335 59 V82 H254 V105",
+		wire: "M335 59 V76 Q335 82 329 82 H260 Q254 82 254 88 V105",
 		port: { x: 250, y: 101 },
 	},
 	{
@@ -274,7 +269,7 @@ const SATELLITE_NODES = [
 		x: 105,
 		y: 220,
 		path: siMistralai.path,
-		wire: "M105 201 V178 H186 V155",
+		wire: "M105 201 V184 Q105 178 111 178 H180 Q186 178 186 172 V155",
 		port: { x: 182, y: 151 },
 	},
 	{
@@ -292,14 +287,14 @@ const SATELLITE_NODES = [
 		x: 335,
 		y: 220,
 		path: siOpenrouter.path,
-		wire: "M335 201 V178 H254 V155",
+		wire: "M335 201 V184 Q335 178 329 178 H260 Q254 178 254 172 V155",
 		port: { x: 250, y: 151 },
 	},
 ];
 
 function McpDiagram() {
 	const line = "#ebebeb";
-	const accent = "#006ffe";
+	const accent = "#09090b";
 
 	return (
 		<svg
@@ -313,6 +308,8 @@ function McpDiagram() {
 			<g
 				stroke={line}
 				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
 				className="stroke-[#ebebeb] dark:stroke-white/15"
 			>
 				{SATELLITE_NODES.map((item) => (
@@ -322,40 +319,8 @@ function McpDiagram() {
 				<path d="M274 130 H366" />
 			</g>
 
-			{/* animated signal data flow pulses from agents into MCP Server */}
-			<g stroke={accent} strokeWidth="1.5" strokeLinecap="round" opacity="0.65">
-				{SATELLITE_NODES.map((item) => (
-					<path
-						key={`pulse-${item.id}`}
-						d={item.wire}
-						strokeDasharray="4 16"
-					>
-						<animate
-							attributeName="stroke-dashoffset"
-							from="20"
-							to="0"
-							dur="2.5s"
-							repeatCount="indefinite"
-						/>
-					</path>
-				))}
-				{/* animated signal data flow from MCP Server to Reloop API */}
-				<path
-					d="M274 130 H366"
-					strokeDasharray="4 10"
-				>
-					<animate
-						attributeName="stroke-dashoffset"
-						from="14"
-						to="0"
-						dur="1.3s"
-						repeatCount="indefinite"
-					/>
-				</path>
-			</g>
-
 			{/* terminal port chips on the central MCP pill */}
-			<g fill={accent}>
+			<g fill={accent} className="fill-zinc-950 dark:fill-white">
 				{SATELLITE_NODES.map((item) => (
 					<rect
 						key={`port-${item.id}`}
@@ -372,20 +337,6 @@ function McpDiagram() {
 				<rect x="362" y="126" width="8" height="8" rx="1.5" />
 			</g>
 
-			{/* MCP pill subtle outer halo */}
-			<rect
-				x="162"
-				y="101"
-				width="116"
-				height="58"
-				rx="18"
-				fill="none"
-				stroke={accent}
-				strokeWidth="1"
-				strokeDasharray="4 4"
-				opacity="0.3"
-			/>
-
 			{/* central MCP Server pill */}
 			<rect
 				x="166"
@@ -396,7 +347,7 @@ function McpDiagram() {
 				fill="#ffffff"
 				stroke={accent}
 				strokeWidth="1.5"
-				className="fill-white stroke-blue-500 dark:fill-[#161619] dark:stroke-blue-400"
+				className="fill-white stroke-zinc-950 dark:fill-[#161619] dark:stroke-white"
 			/>
 
 			{/* MCP Icon */}
@@ -406,7 +357,7 @@ function McpDiagram() {
 				width="20"
 				height="20"
 				viewBox="0 0 24 24"
-				className="fill-blue-600 dark:fill-blue-400"
+				className="fill-zinc-950 dark:fill-white"
 			>
 				<path d={siModelcontextprotocol.path} />
 			</svg>
@@ -422,7 +373,7 @@ function McpDiagram() {
 				MCP Server
 			</text>
 
-			{/* right-side Reloop API pill */}
+			{/* right-side data pill — where MCP connects */}
 			<rect
 				x="366"
 				y="105"
@@ -435,40 +386,23 @@ function McpDiagram() {
 				className="fill-white stroke-[#ebebeb] dark:fill-[#161619] dark:stroke-white/15"
 			/>
 
-			{/* Reloop mark */}
+			{/* database / server icon */}
 			<svg
-				x="409"
-				y="110"
-				width="22"
-				height="22"
-				viewBox="0 0 200 200"
+				x="410"
+				y="111"
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
 				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				className="overflow-visible"
+				strokeWidth="1.8"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				className="stroke-zinc-950 dark:stroke-white"
+				aria-hidden
 			>
-				<rect x={55} y={51} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={55} y={59} width={75} height={8} transform="rotate(90 55 59)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={146} y={59} width={46} height={8} transform="rotate(90 146 59)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={154} y={69} width={44} height={8} transform="rotate(90 154 69)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={138} y={59} width={46} height={8} transform="rotate(90 138 59)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={130} y={59} width={46} height={8} transform="rotate(90 130 59)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={90} y={105} width={29} height={8} transform="rotate(90 90 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={82} y={105} width={29} height={8} transform="rotate(90 82 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={138} y={105} width={8} height={8} transform="rotate(90 138 105)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={146} y={105} width={8} height={8} transform="rotate(90 146 105)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={146} y={134} width={8} height={8} transform="rotate(90 146 134)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={130} y={105} width={8} height={8} transform="rotate(90 130 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={122} y={105} width={8} height={8} transform="rotate(90 122 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={98} y={77} width={10} height={8} transform="rotate(90 98 77)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={90} y={77} width={10} height={8} transform="rotate(90 90 77)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={82} y={77} width={10} height={8} transform="rotate(90 82 77)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={146} y={113} width={21} height={8} transform="rotate(90 146 113)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={154} y={122} width={20} height={8} transform="rotate(90 154 122)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={138} y={113} width={21} height={8} transform="rotate(90 138 113)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={130} y={113} width={21} height={8} transform="rotate(90 130 113)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-				<rect x={98} y={113} width={21} height={8} transform="rotate(90 98 113)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={55} y={134} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-				<rect x={63} y={142} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+				<ellipse cx="12" cy="5" rx="8" ry="3" />
+				<path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5" />
+				<path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" />
 			</svg>
 			<text
 				x="420"
@@ -479,7 +413,7 @@ function McpDiagram() {
 				letterSpacing="-0.02em"
 				className="fill-zinc-950 font-sans tracking-tight dark:fill-white"
 			>
-				Reloop API
+				Your Data
 			</text>
 
 			{/* outer satellite nodes */}
@@ -495,7 +429,7 @@ function McpDiagram() {
 						fill="#ffffff"
 						stroke={line}
 						strokeWidth="1.5"
-						className="fill-white stroke-[#ebebeb] transition-all duration-200 group-hover/node:stroke-blue-500 dark:fill-[#161619] dark:stroke-white/15"
+						className="fill-white stroke-[#ebebeb] transition-all duration-200 group-hover/node:stroke-zinc-950 dark:fill-[#161619] dark:stroke-white/15 dark:group-hover/node:stroke-white"
 					/>
 
 					{/* brand icon */}
@@ -505,7 +439,7 @@ function McpDiagram() {
 						width="18"
 						height="18"
 						viewBox="0 0 24 24"
-						className="fill-zinc-700 transition-colors duration-200 group-hover/node:fill-blue-600 dark:fill-zinc-300 dark:group-hover/node:fill-blue-400"
+						className="fill-zinc-700 transition-colors duration-200 group-hover/node:fill-zinc-950 dark:fill-zinc-300 dark:group-hover/node:fill-white"
 					>
 						<path d={item.path} />
 					</svg>
@@ -517,12 +451,7 @@ function McpDiagram() {
 
 function McpCard() {
 	return (
-		<a
-			href="/docs/integrations/ai-tools/mcp-server"
-			target="_blank"
-			rel="noreferrer"
-			className="group grid gap-px md:grid-rows-[196px_280px]"
-		>
+		<div className="grid gap-px md:grid-rows-[196px_280px]">
 			<div
 				data-grid-content="true"
 				data-slot="feature-card-content"
@@ -535,7 +464,7 @@ function McpCard() {
 							height="22"
 							viewBox="0 0 24 24"
 							fill="currentColor"
-							className="text-zinc-400 group-hover:text-blue-500 dark:text-zinc-500 dark:group-hover:text-blue-400 transition-colors"
+							className="text-zinc-400 dark:text-zinc-500"
 							aria-hidden
 						>
 							<path d={siModelcontextprotocol.path} />
@@ -551,7 +480,7 @@ function McpCard() {
 					<McpDiagram />
 				</div>
 			</div>
-		</a>
+		</div>
 	);
 }
 
