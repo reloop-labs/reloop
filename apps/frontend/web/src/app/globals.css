@@ -11,19 +11,19 @@
 	--color-foreground: var(--foreground);
 	--color-muted-foreground: var(--muted-foreground);
 	--color-muted: var(--muted);
-	--spacing-276: 69rem;
+	--spacing-276: 80rem;
 }
 
 @utility max-w-276 {
-	max-width: 69rem;
+	max-width: 80rem;
 }
 
 @utility min-w-276 {
-	min-width: 69rem;
+	min-width: 80rem;
 }
 
 @utility w-276 {
-	width: 69rem;
+	width: 80rem;
 }
 
 @utility grid-cols-23 {

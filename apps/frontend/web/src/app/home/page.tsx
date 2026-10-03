@@ -96,7 +96,7 @@ export default function HomePage() {
 			<ConnectApplications />
 			<EnterpriseSecurity />
 			<CustomerReviews />
-			<div className="relative mx-auto flex w-full max-w-[1104px] flex-col border-[#ebebeb] border-x dark:border-[#292929]">
+			<div className="relative mx-auto flex w-full max-w-[1280px] flex-col border-[#ebebeb] border-x dark:border-[#292929]">
 				<Highlights />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<CTA />

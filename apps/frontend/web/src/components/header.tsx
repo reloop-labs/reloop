@@ -2258,8 +2258,8 @@ export const Header = () => {
 	/** Measured mega content height for smooth panel morph (no layout thrash) */
 	const [megaLeft, setMegaLeft] = useState(0);
 	const [megaHeight, setMegaHeight] = useState<number | "auto">("auto");
-	/** Landing panel tracks the 1104px hero frame width (Tailark parity) */
-	const [landingPanelWidth, setLandingPanelWidth] = useState(1104);
+	/** Landing panel tracks the 1280px hero frame width (Tailark parity) */
+	const [landingPanelWidth, setLandingPanelWidth] = useState(1280);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
 	const [mounted, setMounted] = useState(false);
@@ -2435,7 +2435,7 @@ export const Header = () => {
 			<div
 				className={
 					isLanding
-						? "grid grid-cols-[minmax(24px,1fr)_1px_minmax(0,1102px)_1px_minmax(24px,1fr)] bg-[#ebebeb] pb-px max-[1099px]:grid-cols-[24px_1px_minmax(0,1fr)_1px_24px] max-[479px]:grid-cols-[8px_1px_minmax(0,1fr)_1px_8px] dark:bg-[#292929]"
+						? "grid grid-cols-[minmax(24px,1fr)_1px_minmax(0,1280px)_1px_minmax(24px,1fr)] bg-[#ebebeb] pb-px max-[1279px]:grid-cols-[24px_1px_minmax(0,1fr)_1px_24px] max-[479px]:grid-cols-[8px_1px_minmax(0,1fr)_1px_8px] dark:bg-[#292929]"
 						: "contents"
 				}
 			>
@@ -2457,7 +2457,7 @@ export const Header = () => {
 					<div
 						className={
 							isLanding
-								? "relative grid h-[72px] grid-cols-[auto_1fr_auto] items-center gap-4 px-12 max-[1099px]:flex max-[1099px]:h-14 max-[1099px]:justify-between max-[1099px]:px-6 max-[479px]:px-4"
+								? "relative grid h-[72px] grid-cols-[auto_1fr_auto] items-center gap-4 px-12 max-[1279px]:flex max-[1279px]:h-14 max-[1279px]:justify-between max-[1279px]:px-6 max-[479px]:px-4"
 								: "relative flex h-16 items-center justify-between gap-4"
 						}
 					>
@@ -2465,7 +2465,7 @@ export const Header = () => {
 						<div
 							className={
 								isLanding
-									? "contents max-[1099px]:flex max-[1099px]:items-center max-[1099px]:gap-6"
+									? "contents max-[1279px]:flex max-[1279px]:items-center max-[1279px]:gap-6"
 									: "flex items-center gap-6"
 							}
 						>

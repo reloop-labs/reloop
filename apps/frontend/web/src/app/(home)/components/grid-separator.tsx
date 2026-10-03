@@ -12,7 +12,7 @@ export function GridSeparator({ className }: { className?: string } = {}) {
 					<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
 				</div>
 			</div>
-			<div className="mx-auto w-full max-w-276 max-w-[1104px] p-[0.5px] lg:min-w-276 lg:min-w-[1104px]">
+			<div className="mx-auto w-full max-w-276 max-w-[1280px] p-[0.5px] lg:min-w-276 lg:min-w-[1280px]">
 				<div data-slot="content" className="h-full rounded bg-card/90">
 					<div className="h-24" />
 				</div>

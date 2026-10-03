@@ -53,10 +53,10 @@ export function DeveloperProof() {
 			aria-labelledby="developer-proof-heading"
 			className="w-full overflow-hidden bg-white dark:bg-black"
 		>
-			<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1102px)_minmax(24px,1fr)] gap-x-px bg-[#ebebeb] max-[1099px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-[#292929]">
+			<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1280px)_minmax(24px,1fr)] gap-x-px bg-[#ebebeb] max-[1279px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-[#292929]">
 				<div
 					aria-hidden
-					className="rounded-[4px] bg-white max-[1099px]:hidden dark:bg-black"
+					className="rounded-[4px] bg-white max-[1279px]:hidden dark:bg-black"
 				/>
 				<div className="grid gap-y-px bg-[#ebebeb] dark:bg-[#292929]">
 					<div className="rounded-[4px] bg-white px-6 py-20 dark:bg-black">
@@ -91,7 +91,7 @@ export function DeveloperProof() {
 				</div>
 				<div
 					aria-hidden
-					className="rounded-[4px] bg-white max-[1099px]:hidden dark:bg-black"
+					className="rounded-[4px] bg-white max-[1279px]:hidden dark:bg-black"
 				/>
 			</div>
 		</section>

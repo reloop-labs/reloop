@@ -20,18 +20,18 @@ function GridCells({
 }
 
 const bandClassName = "grid grid-cols-10 gap-px [&>div]:aspect-square";
-const sideClassName = "grid grid-rows-4 gap-px max-[1099px]:hidden";
+const sideClassName = "grid grid-rows-4 gap-px max-[1279px]:hidden";
 
 export function GridHero() {
 	return (
 		<section
 			id="features"
 			aria-labelledby="home-heading"
-			className="overflow-hidden bg-white pt-[73px] text-zinc-950 max-[1099px]:pt-[57px] dark:bg-black dark:text-zinc-50"
+			className="overflow-hidden bg-white pt-[73px] text-zinc-950 max-[1279px]:pt-[57px] dark:bg-black dark:text-zinc-50"
 		>
 			<div className="bg-white dark:bg-black">
-				<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1102px)_minmax(24px,1fr)] gap-px bg-[#ebebeb] max-[1099px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-[#292929]">
-					<div aria-hidden="true" className="col-start-1 max-[1099px]:hidden">
+				<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1280px)_minmax(24px,1fr)] gap-px bg-[#ebebeb] max-[1279px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-[#292929]">
+					<div aria-hidden="true" className="col-start-1 max-[1279px]:hidden">
 						<div
 							data-grid-content
 							className="h-full rounded-[4px] bg-white dark:bg-black"
@@ -46,19 +46,19 @@ export function GridHero() {
 								<div aria-hidden="true" className={sideClassName}>
 									<GridCells count={4} />
 								</div>
-								<div className="col-span-8 max-[1099px]:col-[1/-1]">
+								<div className="col-span-8 max-[1279px]:col-[1/-1]">
 									<div
 										data-grid-content
 										className="h-full rounded-[4px] bg-white py-12 text-center dark:bg-black"
 									>
-										<div className="relative z-[2] mx-auto max-w-3xl px-3 max-[1099px]:px-6 max-[479px]:px-0">
+										<div className="relative z-[2] mx-auto max-w-3xl px-3 max-[1279px]:px-6 max-[479px]:px-0">
 											<h1
 												id="home-heading"
 												className="text-balance font-semibold text-6xl leading-none tracking-[-0.035em] max-[767px]:text-5xl"
 											>
 												Email for your app.
 												<br />
-												And your agents.
+												And your AI agents.
 											</h1>
 											<p className="mx-auto mt-5 mb-9 max-w-2xl text-balance text-lg text-zinc-600 leading-7 dark:text-zinc-400">
 												Send transactional emails, run campaigns, and give AI
@@ -98,7 +98,7 @@ export function GridHero() {
 							</div>
 						</div>
 					</div>
-					<div aria-hidden="true" className="col-start-3 max-[1099px]:hidden">
+					<div aria-hidden="true" className="col-start-3 max-[1279px]:hidden">
 						<div
 							data-grid-content
 							className="h-full rounded-[4px] bg-white dark:bg-black"

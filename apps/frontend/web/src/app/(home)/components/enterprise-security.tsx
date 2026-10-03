@@ -27,7 +27,7 @@ export function EnterpriseSecurity() {
 				</div>
 
 				{/* Center Content Column */}
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] p-[0.5px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] p-[0.5px] lg:min-w-276 lg:min-w-[1280px]">
 					<div
 						data-slot="content"
 						className="h-full rounded bg-card/90 py-16 lg:py-24"
@@ -72,7 +72,7 @@ export function EnterpriseSecurity() {
 				</div>
 
 				{/* Center Content Column */}
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] lg:min-w-276 lg:min-w-[1280px]">
 					<div className="grid bg-[#ebebeb] *:p-[0.5px] **:data-grid-content:h-full **:data-grid-content:rounded **:data-grid-content:bg-card/90 dark:bg-[#292929]">
 						<div className="grid grid-cols-1 gap-px @2xl:grid-cols-2 @4xl:grid-cols-10">
 							{/* Left border spacer on 4xl screens */}
@@ -272,7 +272,7 @@ export function EnterpriseSecurity() {
 				</div>
 
 				{/* Center Content: 8-column 3/4-item grid */}
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] lg:min-w-276 lg:min-w-[1280px]">
 					<div className="grid grid-cols-2 bg-[#ebebeb] *:p-[0.5px] **:data-grid-content:h-full **:data-grid-content:rounded **:data-grid-content:bg-card/90 **:data-grid-content:p-6 @4xl:grid-cols-10 @4xl:**:data-grid-content:p-8 @5xl:**:data-grid-content:p-12 dark:bg-[#292929]">
 						<div aria-hidden="true" className="@max-4xl:hidden">
 							<div data-grid-content="true" />

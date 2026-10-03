@@ -19,7 +19,7 @@ export function CustomerReviews() {
 				</div>
 
 				{/* Center Content Column */}
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] p-[0.5px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] p-[0.5px] lg:min-w-276 lg:min-w-[1280px]">
 					<div
 						data-slot="content"
 						className="h-full rounded bg-card/90 py-16 lg:py-24"
@@ -65,7 +65,7 @@ export function CustomerReviews() {
 				</div>
 
 				{/* Center Content Column */}
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] lg:min-w-276 lg:min-w-[1280px]">
 					<div className="grid bg-[#ebebeb] *:p-[0.5px] @4xl:grid-cols-23 **:data-grid-content:h-full **:data-grid-content:rounded **:data-grid-content:bg-card/90 dark:bg-[#292929]">
 						{/* Left border spacer on 4xl screens (2 cols) */}
 						<div aria-hidden="true" className="col-span-2 @max-4xl:hidden">
@@ -252,7 +252,7 @@ export function CustomerReviews() {
 						<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
 					</div>
 				</div>
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] p-[0.5px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] p-[0.5px] lg:min-w-276 lg:min-w-[1280px]">
 					<div data-slot="content" className="h-full rounded bg-card/90">
 						<div className="h-12" />
 					</div>
@@ -280,7 +280,7 @@ export function CustomerReviews() {
 				</div>
 
 				{/* Center Content Column */}
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] lg:min-w-276 lg:min-w-[1280px]">
 					<div className="grid grid-cols-1 bg-[#ebebeb] *:p-[0.5px] @2xl:grid-cols-2 @4xl:grid-cols-23 **:data-grid-content:h-full **:data-grid-content:rounded **:data-grid-content:bg-card/90 dark:bg-[#292929]">
 						{/* Left spacer on 4xl screens (2 cols) */}
 						<div aria-hidden="true" className="col-span-2 @max-4xl:hidden">
@@ -441,7 +441,7 @@ export function CustomerReviews() {
 						<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
 					</div>
 				</div>
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] p-[0.5px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] p-[0.5px] lg:min-w-276 lg:min-w-[1280px]">
 					<div data-slot="content" className="h-full rounded bg-card/90">
 						<div className="h-12" />
 					</div>

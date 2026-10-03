@@ -21,7 +21,7 @@ export function CustomerTestimonial() {
 				</div>
 
 				{/* Center Content Column */}
-				<div className="mx-auto w-full max-w-276 max-w-[1104px] p-[0.5px] lg:min-w-276 lg:min-w-[1104px]">
+				<div className="mx-auto w-full max-w-276 max-w-[1280px] p-[0.5px] lg:min-w-276 lg:min-w-[1280px]">
 					<div
 						data-slot="content"
 						className="h-full rounded border border-zinc-200 border-dashed bg-card dark:border-zinc-800"
