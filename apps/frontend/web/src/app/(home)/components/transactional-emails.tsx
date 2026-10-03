@@ -1,6 +1,15 @@
 import * as Button from "@reloop/ui/button";
-import { BadgeCheck, Mail } from "lucide-react";
+import { BadgeCheck, Inbox, Mail } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+
+const providers = [
+	{ name: "Gmail", src: "/company-logos/gmail.svg" },
+	{ name: "Outlook", src: "/company-logos/outlook.svg" },
+	{ name: "Yahoo", src: "/company-logos/yahoo.svg" },
+	{ name: "Apple", src: "/company-logos/apple.svg", invert: true },
+	{ name: "Inbox" },
+];
 
 export function TransactionalEmails() {
 	return (
@@ -84,168 +93,144 @@ export function TransactionalEmails() {
 						</Button.Root>
 					</div>
 
-					{/* Right Column: Visual Invoicing & Delivery Grid from reference */}
-					<div className="flex h-full items-center justify-center overflow-hidden bg-white dark:bg-black">
-						<div className="mx-auto w-full self-center">
-							<div aria-hidden="true" className="relative">
-								<div className="grid @3xl:grid-cols-4 grid-cols-7 gap-px bg-[#ebebeb] dark:bg-[#292929]">
-									{/* Left Grid Rows */}
-									<div className="grid grid-rows-3 gap-y-px bg-[#ebebeb] dark:bg-[#292929]">
-										<div
-											data-grid-content="true"
-											className="h-full min-h-[60px] bg-white dark:bg-black"
-										/>
-										<div
-											data-grid-content="true"
-											className="h-full min-h-[60px] bg-white dark:bg-black"
-										/>
-										<div
-											data-grid-content="true"
-											className="h-full min-h-[60px] bg-white dark:bg-black"
-										/>
-									</div>
-
-								{/* Center Column: Deliverability Snapshot */}
-								<div className="@3xl:col-span-2 col-span-5 space-y-px bg-[#ebebeb] dark:bg-[#292929]">
-									{/* Delivery notification */}
-									<div
-										data-grid-content="true"
-										className="h-fit bg-white p-6 dark:bg-black"
-									>
-										<div className="flex items-center gap-3">
-											<span
-												aria-hidden
-												className="relative flex size-2.5"
-											>
-												<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-												<span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
-											</span>
-											<p className="text-sm text-zinc-600 dark:text-zinc-400">
-												<span className="font-mono text-xs">
-													INV-456789
-												</span>{" "}
-												<span className="font-medium text-zinc-950 dark:text-white">
-													delivered to inbox
-												</span>{" "}
-												· just now
-											</p>
+					{/* Right Column: App -> Reloop -> Inbox providers flow */}
+					<div className="flex h-full flex-col items-center justify-center rounded-[4px] bg-white px-6 py-12 sm:px-12 dark:bg-black">
+						<div className="flex w-full max-w-sm flex-col items-center">
+							{/* Top node: email template file */}
+							<div
+								aria-hidden="true"
+								className="relative size-fit"
+							>
+								<div className="absolute -right-3 bottom-2 z-[2] rounded bg-zinc-600 px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-lg">
+									email
+								</div>
+								<div className="relative z-[1] w-16 space-y-2 rounded-md rounded-tr-[15%] bg-white p-2.5 ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10">
+									<div className="space-y-1.5">
+										<div className="flex items-center gap-1">
+											<div className="text-[6px] font-bold text-zinc-300 dark:text-zinc-600">
+												#
+											</div>
+											<div className="h-[3px] w-6 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+										</div>
+										<div className="space-y-0.5 pl-0.5">
+											<div className="h-0.5 w-full rounded-full bg-zinc-200 dark:bg-zinc-800" />
+											<div className="h-0.5 w-9 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+											<div className="h-0.5 w-10 rounded-full bg-zinc-200 dark:bg-zinc-800" />
 										</div>
 									</div>
+									<div className="space-y-1.5">
+										<div className="flex items-center gap-1">
+											<div className="text-[6px] font-bold text-zinc-300 dark:text-zinc-600">
+												##
+											</div>
+											<div className="h-[3px] w-5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+										</div>
+										<div className="space-y-0.5 pl-0.5">
+											<div className="h-0.5 w-10 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+											<div className="h-0.5 w-7 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+										</div>
+										<div className="space-y-0.5 pl-0.5">
+											<div className="h-0.5 w-10 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+											<div className="h-0.5 w-7 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+											<div className="h-0.5 w-full rounded-full bg-zinc-200 dark:bg-zinc-800" />
+										</div>
+									</div>
+								</div>
+							</div>
 
-									{/* Main Elevated Invoice Card with Gradient Glow */}
-									<div
-										data-grid-content="true"
-										className="relative h-fit bg-white p-2 dark:bg-black"
+							{/* Connector: top to center */}
+							<span
+								aria-hidden
+								className="h-10 w-0 border-l border-solid border-zinc-300 dark:border-zinc-700"
+							/>
+
+							{/* Center node: Reloop */}
+							<span className="relative flex items-center justify-center">
+								<span className="relative flex size-12 items-center justify-center rounded-full bg-white ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10">
+									<svg
+										width="38"
+										height="38"
+										viewBox="0 0 200 200"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+										aria-hidden
+										className="overflow-visible"
 									>
-										<div className="absolute inset-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 opacity-25 blur-2xl" />
-										<div className="relative rounded-xl border border-zinc-200/90 bg-white p-6 shadow-black/5 shadow-xl ring-1 ring-zinc-950/5 dark:border-zinc-800 dark:bg-zinc-900 dark:ring-white/10">
-											<div className="space-y-0.5">
-												<svg
-													width="18"
-													height="18"
-													viewBox="0 0 18 18"
-													fill="none"
-													xmlns="http://www.w3.org/2000/svg"
-													className="size-5"
+										<rect x={55} y={51} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={55} y={59} width={75} height={8} transform="rotate(90 55 59)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={146} y={59} width={46} height={8} transform="rotate(90 146 59)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={154} y={69} width={44} height={8} transform="rotate(90 154 69)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={138} y={59} width={46} height={8} transform="rotate(90 138 59)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={130} y={59} width={46} height={8} transform="rotate(90 130 59)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={90} y={105} width={29} height={8} transform="rotate(90 90 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={82} y={105} width={29} height={8} transform="rotate(90 82 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={138} y={105} width={8} height={8} transform="rotate(90 138 105)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={146} y={105} width={8} height={8} transform="rotate(90 146 105)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={146} y={134} width={8} height={8} transform="rotate(90 146 134)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={130} y={105} width={8} height={8} transform="rotate(90 130 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={122} y={105} width={8} height={8} transform="rotate(90 122 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={98} y={77} width={10} height={8} transform="rotate(90 98 77)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={90} y={77} width={10} height={8} transform="rotate(90 90 77)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={82} y={77} width={10} height={8} transform="rotate(90 82 77)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={146} y={113} width={21} height={8} transform="rotate(90 146 113)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={154} y={122} width={20} height={8} transform="rotate(90 154 122)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={138} y={113} width={21} height={8} transform="rotate(90 138 113)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={130} y={113} width={21} height={8} transform="rotate(90 130 113)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
+										<rect x={98} y={113} width={21} height={8} transform="rotate(90 98 113)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={55} y={134} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect x={63} y={142} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+									</svg>
+								</span>
+							</span>
+
+							{/* Curved connectors to providers */}
+							<svg
+								aria-hidden
+								viewBox="0 0 300 72"
+								preserveAspectRatio="none"
+								className="h-28 w-full max-w-sm"
+							>
+								{["30", "90", "150", "210", "270"].map((x) => (
+									<path
+										key={x}
+										d={`M150 0 C150 36 ${x} 36 ${x} 72`}
+										fill="none"
+										strokeWidth="1"
+										strokeLinecap="round"
+										strokeDasharray="1 5"
+										vectorEffect="non-scaling-stroke"
+										className="stroke-zinc-300 dark:stroke-zinc-700"
+									/>
+								))}
+							</svg>
+
+							{/* Provider nodes */}
+							<div className="flex w-full max-w-md items-start justify-between">
+								{providers.map((provider) => (
+									<div
+										key={provider.name}
+										className="flex w-16 flex-col items-center gap-2"
+									>
+										<span className="flex size-12 items-center justify-center rounded-full bg-white p-2 ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10">
+											{"src" in provider && provider.src ? (
+												<Image
+													alt={provider.name}
+													src={provider.src}
+													width={32}
+													height={32}
+													loading="lazy"
+													className={`h-6 w-6 object-contain ${"invert" in provider && provider.invert ? "dark:invert" : ""}`}
+												/>
+											) : (
+												<Inbox
 													aria-hidden
-												>
-													<path
-														d="M3 0H5V18H3V0ZM13 0H15V18H13V0ZM18 3V5H0V3H18ZM0 15V13H18V15H0Z"
-														fill="url(#invoice-logo-gradient)"
-													/>
-													<defs>
-														<linearGradient
-															id="invoice-logo-gradient"
-															x1="10"
-															y1="0"
-															x2="10"
-															y2="20"
-															gradientUnits="userSpaceOnUse"
-														>
-															<stop stopColor="#9B99FE" />
-															<stop offset="1" stopColor="#2BC8B7" />
-														</linearGradient>
-													</defs>
-												</svg>
-												<div className="mt-4 font-mono text-xs text-zinc-600 dark:text-zinc-400">
-													INV-456789
-												</div>
-												<div className="-translate-x-1 mt-1 font-mono font-semibold text-2xl text-zinc-950 dark:text-white">
-													$284,342.57
-												</div>
-												<div className="font-medium text-xs text-zinc-600 dark:text-zinc-400">
-													Due in 15 days
-												</div>
-											</div>
-											<div className="mt-6 flex h-16 items-center justify-center rounded-md border border-zinc-950/15 border-dashed bg-zinc-950/[0.03] dark:border-white/15 dark:bg-white/[0.03]">
-												<div className="border-zinc-950/35 border-b px-6 font-serif text-lg text-zinc-950/50 dark:border-white/35 dark:text-white/50">
-													Sign here
-												</div>
-											</div>
-											<div className="my-5 border-zinc-200 border-t dark:border-zinc-800" />
-											<ul className="space-y-2.5 text-sm">
-												{[
-													"SPF verified",
-													"DKIM verified",
-													"DMARC verified",
-													"Dedicated IP",
-												].map((check) => (
-													<li
-														key={check}
-														className="flex items-center gap-2.5 text-zinc-600 dark:text-zinc-400"
-													>
-														<BadgeCheck
-															aria-hidden
-															className="size-4 shrink-0 fill-zinc-950 text-white dark:fill-white dark:text-zinc-950"
-														/>
-														<span>{check}</span>
-													</li>
-												))}
-											</ul>
-										</div>
+													className="size-6 text-zinc-500 dark:text-zinc-400"
+													strokeWidth={1.75}
+												/>
+											)}
+										</span>
 									</div>
-
-									{/* Secondary Peeking Inbox Placement Card */}
-									<div
-										data-grid-content="true"
-										className="h-fit bg-white p-6 dark:bg-black"
-									>
-										<div className="flex items-center justify-between">
-											<p className="font-mono text-xs tracking-[0.2em] text-zinc-500 uppercase dark:text-zinc-400">
-												Inbox placement
-											</p>
-											<p className="font-semibold text-xl text-zinc-950 tracking-tight dark:text-white">
-												99.2%
-											</p>
-										</div>
-										<div
-											aria-hidden
-											className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"
-										>
-											<div className="h-full w-[99%] rounded-full bg-gradient-to-r from-emerald-500 to-teal-400" />
-										</div>
-										<p className="mt-3 font-medium text-xs text-zinc-600 dark:text-zinc-400">
-											12,482 delivered today · 37 bounced
-										</p>
-									</div>
-								</div>
-
-									{/* Right Grid Rows */}
-									<div className="grid grid-rows-3 gap-y-px bg-[#ebebeb] dark:bg-[#292929]">
-										<div
-											data-grid-content="true"
-											className="h-full min-h-[60px] bg-white dark:bg-black"
-										/>
-										<div
-											data-grid-content="true"
-											className="h-full min-h-[60px] bg-white dark:bg-black"
-										/>
-										<div
-											data-grid-content="true"
-											className="h-full min-h-[60px] bg-white dark:bg-black"
-										/>
-									</div>
-								</div>
+								))}
 							</div>
 						</div>
 					</div>
