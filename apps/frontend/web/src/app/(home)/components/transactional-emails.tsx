@@ -40,11 +40,9 @@ export function TransactionalEmails() {
 
 						{/* Description */}
 						<p className="text-balance text-zinc-600 dark:text-zinc-400">
-							Own infrastructure with{" "}
-							<strong className="font-semibold text-zinc-950 dark:text-white">
-								warmed IPs.
-							</strong>{" "}
-							Emails land in the inbox, not spam.
+							Get your emails where they belong. We handle
+							authentication, IP reputation and warmups so your
+							messages land in inboxes, not spam folders.
 						</p>
 
 						{/* Checklist */}
@@ -54,28 +52,21 @@ export function TransactionalEmails() {
 									className="size-4 shrink-0 fill-zinc-950 text-white dark:fill-white dark:text-zinc-950"
 									strokeWidth={2}
 								/>
-								<span>SPF record verification</span>
+								<span>SPF, DKIM & DMARC Authentication</span>
 							</li>
 							<li className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
 								<BadgeCheck
 									className="size-4 shrink-0 fill-zinc-950 text-white dark:fill-white dark:text-zinc-950"
 									strokeWidth={2}
 								/>
-								<span>DKIM key verification</span>
+								<span>IP Reputation & Warmup Management</span>
 							</li>
 							<li className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
 								<BadgeCheck
 									className="size-4 shrink-0 fill-zinc-950 text-white dark:fill-white dark:text-zinc-950"
 									strokeWidth={2}
 								/>
-								<span>DMARC policy verification</span>
-							</li>
-							<li className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-								<BadgeCheck
-									className="size-4 shrink-0 fill-zinc-950 text-white dark:fill-white dark:text-zinc-950"
-									strokeWidth={2}
-								/>
-								<span>Dedicated IP supported</span>
+								<span>Real-time Deliverability & Blocklist Tracking</span>
 							</li>
 						</ul>
 
