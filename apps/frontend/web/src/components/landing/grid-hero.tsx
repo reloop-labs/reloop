@@ -1,6 +1,7 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
+import { RotatingAlternative } from "./rotating-alternative";
 
 function GridCells({
 	count,
@@ -52,6 +53,9 @@ export function GridHero() {
 										className="h-full rounded-[4px] bg-white py-12 text-center dark:bg-black"
 									>
 										<div className="relative z-[2] mx-auto max-w-3xl px-3 max-[1279px]:px-6 max-[479px]:px-0">
+											<p className="mb-4 text-sm text-muted-foreground sm:mb-6">
+												An alternative to <RotatingAlternative />
+											</p>
 											<h1
 												id="home-heading"
 												className="text-balance font-semibold text-6xl leading-none tracking-[-0.035em] max-[767px]:text-5xl"

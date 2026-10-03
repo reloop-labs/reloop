@@ -1,6 +1,7 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
+import * as Button from "@reloop/ui/button";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
 export function ReloopStory() {
@@ -29,67 +30,110 @@ export function ReloopStory() {
 							}
 						>
 							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
-								Your agents can write code.{" "}
 								<strong className="font-medium text-zinc-950 dark:text-white">
-									Now let them answer email.
+									You don&apos;t need to learn a tutorial to send
+									an email.
 								</strong>
 							</p>
 
 							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
-								Reloop gives every agent its own inbox:{" "}
+								You shouldn&apos;t need to read docs, create API
+								keys, configure domains, figure out DNS, and spend
+								hours connecting email infrastructure{" "}
 								<strong className="font-medium text-zinc-950 dark:text-white">
-									send, receive, and reply through one API.
+									just to send your first email.
 								</strong>
 							</p>
 
 							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
-								Plug it into{"\u00a0"}
-								<strong className="font-medium text-zinc-950 dark:text-white">
-									Claude, Cursor, or Codex over MCP
-								</strong>
-								{"\u00a0"}
-								and let them handle the replies, receipts, and follow-ups.
+								Just tell your agent what you want.
 							</p>
 
 							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
-								And it is not just inboxes. Reloop brings the{" "}
 								<strong className="font-medium text-zinc-950 dark:text-white">
-									whole email stack into one open-source codebase.
-								</strong>
-							</p>
-
-							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
-								Transactional email, campaigns, inbound mail, analytics, AI
-								templates, deliverability tools, and agent workflows all live in
-								one platform.{" "}
-								<strong className="font-medium text-zinc-950 dark:text-white">
-									One stack for every email your product and its agents handle.
+									&ldquo;Set up email for my app using
+									Reloop.&rdquo;
 								</strong>
 							</p>
 
 							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
 								<strong className="font-medium text-zinc-950 dark:text-white">
-									Our goal is to build the best open-source email infrastructure
-									for developers, products, and agents.
+									Reloop handles the rest.
+								</strong>
+							</p>
+
+							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
+								<span className="block">
+									Prefer agents?{" "}
+									<strong className="font-medium text-zinc-950 dark:text-white">
+										We&apos;ve got you.
+									</strong>
+								</span>
+								<span className="block">
+									Prefer the UI?{" "}
+									<strong className="font-medium text-zinc-950 dark:text-white">
+										We&apos;ve got you.
+									</strong>
+								</span>
+								<span className="block">
+									Love great DX?{" "}
+									<strong className="font-medium text-zinc-950 dark:text-white">
+										We&apos;ve got you.
+									</strong>
+								</span>
+								<span className="block">
+									Love great UI/UX?{" "}
+									<strong className="font-medium text-zinc-950 dark:text-white">
+										We&apos;ve got you.
+									</strong>
+								</span>
+							</p>
+
+							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
+								<strong className="font-medium text-zinc-950 dark:text-white">
+									Reloop is built for the way you work.
+								</strong>
+							</p>
+
+							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
+								Still not convinced? Reloop is{" "}
+								<strong className="font-medium text-zinc-950 dark:text-white">
+									open source and self-hostable.
+								</strong>
+							</p>
+
+							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
+								<strong className="font-medium text-zinc-950 dark:text-white">
+									Run it yourself. Own your infrastructure.
 								</strong>
 							</p>
 						</div>
 
-						<button
+						<Button.Root
 							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="small"
 							onClick={() => setExpanded((current) => !current)}
 							aria-expanded={expanded}
-							className="group mt-6 inline-flex h-9 cursor-pointer items-center gap-2.5 rounded-full border border-[#ebebeb] bg-white px-4 font-medium text-sm text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/40 dark:border-[#292929] dark:bg-black dark:text-zinc-300 dark:hover:bg-zinc-950 dark:hover:text-white"
+							className="mt-6 rounded-full"
 						>
 							<span>{expanded ? "Show less" : "Read more"}</span>
-							<span className="grid size-5 place-items-center rounded-full bg-zinc-100 text-zinc-500 transition-transform group-hover:text-zinc-900 dark:bg-zinc-900 dark:text-zinc-400 dark:group-hover:text-white">
+							<Button.Icon
+								as="span"
+								className="grid size-5 place-items-center rounded-full bg-zinc-100 text-zinc-500 group-hover:text-zinc-900 dark:bg-zinc-900 dark:text-zinc-400 dark:group-hover:text-white"
+							>
 								{expanded ? (
-									<Minus aria-hidden className="size-3" strokeWidth={2} />
+									<ChevronUp aria-hidden className="size-3" strokeWidth={2} />
 								) : (
-									<Plus aria-hidden className="size-3" strokeWidth={2} />
+									<ChevronDown
+										aria-hidden
+										className="size-3"
+										strokeWidth={2}
+									/>
 								)}
-							</span>
-						</button>
+							</Button.Icon>
+						</Button.Root>
 					</div>
 				</div>
 				<div

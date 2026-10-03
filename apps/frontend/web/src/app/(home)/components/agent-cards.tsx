@@ -294,7 +294,7 @@ const SATELLITE_NODES = [
 
 function McpDiagram() {
 	const line = "#ebebeb";
-	const accent = "#09090b";
+	const port = "#d4d4d8";
 
 	return (
 		<svg
@@ -320,7 +320,7 @@ function McpDiagram() {
 			</g>
 
 			{/* terminal port chips on the central MCP pill */}
-			<g fill={accent} className="fill-zinc-950 dark:fill-white">
+			<g fill={port} className="fill-zinc-300 dark:fill-white/25">
 				{SATELLITE_NODES.map((item) => (
 					<rect
 						key={`port-${item.id}`}
@@ -345,9 +345,9 @@ function McpDiagram() {
 				height="50"
 				rx="14"
 				fill="#ffffff"
-				stroke={accent}
+				stroke={line}
 				strokeWidth="1.5"
-				className="fill-white stroke-zinc-950 dark:fill-[#161619] dark:stroke-white"
+				className="fill-white stroke-[#ebebeb] dark:fill-[#161619] dark:stroke-white/15"
 			/>
 
 			{/* MCP Icon */}

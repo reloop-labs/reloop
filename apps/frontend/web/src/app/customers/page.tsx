@@ -1,8 +1,17 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import type { SimpleIcon } from "simple-icons";
+import {
+	siAtandt,
+	siAtlassian,
+	siGithub,
+	siNotion,
+	siShopify,
+	siTrello,
+	siZoho,
+} from "simple-icons";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -11,7 +20,7 @@ export const instant = false;
 const pageUrl = `${getSiteUrl()}/customers`;
 const pageTitle = "Customers | Teams that run on Reloop";
 const pageDescription =
-	"Trusted by 250+ developers and used by people working at Chatbase, Instinct, Darkless, Ironwill Capital, Avanet, and True Heal.";
+	"Trusted by 250+ developers and used by people working at Shopify, GitHub, Zoho, AT&T, Notion, Trello, and Atlassian.";
 
 export const metadata: Metadata = {
 	title: pageTitle,
@@ -37,15 +46,16 @@ export const metadata: Metadata = {
 	},
 };
 
-type Customer = { name: string; src: string };
+type Customer = { name: string; icon: SimpleIcon };
 
 const customers: Customer[] = [
-	{ name: "Chatbase", src: "/company-logos/chatbase.svg" },
-	{ name: "Instinct", src: "/company-logos/instinct.png" },
-	{ name: "Darkless", src: "/company-logos/darkless.svg" },
-	{ name: "Ironwill Capital", src: "/company-logos/ironwillcapital.png" },
-	{ name: "Avanet", src: "/company-logos/avanet.svg" },
-	{ name: "True Heal", src: "/company-logos/trueheal.png" },
+	{ name: "Shopify", icon: siShopify },
+	{ name: "GitHub", icon: siGithub },
+	{ name: "Zoho", icon: siZoho },
+	{ name: "AT&T", icon: siAtandt },
+	{ name: "Notion", icon: siNotion },
+	{ name: "Trello", icon: siTrello },
+	{ name: "Atlassian", icon: siAtlassian },
 ];
 
 const customersSchema = {
@@ -77,7 +87,8 @@ export default function CustomersPage() {
 							Trusted by{" "}
 							<span className="font-semibold text-zinc-950 dark:text-white">
 								250+ developers
-							</span>{" "}
+							</span>
+							<br />
 							and used by people working at these companies.
 						</p>
 					</div>
@@ -90,31 +101,18 @@ export default function CustomersPage() {
 								key={customer.name}
 								className="flex min-h-56 items-center justify-center bg-white px-8 py-10 dark:bg-black"
 							>
-								{customer.name === "Instinct" ||
-								customer.name === "True Heal" ? (
-									<span className="flex items-center gap-2.5">
-										<Image
-											alt={customer.name}
-											src={customer.src}
-											width={27}
-											height={71}
-											loading="lazy"
-											className="h-10 w-auto object-contain dark:invert"
-										/>
-										<span className="font-semibold text-lg text-zinc-950 tracking-tight dark:text-white">
-											{customer.name}
-										</span>
+								<span className="flex items-center gap-3 text-zinc-950 dark:text-white">
+									<svg
+										viewBox="0 0 24 24"
+										aria-hidden="true"
+										className="size-7 shrink-0 fill-current"
+									>
+										<path d={customer.icon.path} />
+									</svg>
+									<span className="font-semibold text-xl tracking-tight">
+										{customer.name}
 									</span>
-								) : (
-									<Image
-										alt={customer.name}
-										src={customer.src}
-										width={200}
-										height={64}
-										loading="lazy"
-										className="h-12 w-auto object-contain opacity-90 md:h-14 dark:invert"
-									/>
-								)}
+								</span>
 							</li>
 						))}
 					</ul>
