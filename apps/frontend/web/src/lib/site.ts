@@ -6,7 +6,7 @@ export const contactEmail = "reloop.sh@gmail.com";
 export const hostedSignupHref = "/dashboard/signup";
 
 export const siteDescription =
-	"Open-source email infrastructure for developers: transactional email API, SMTP relay, campaigns, webhooks, and agent inboxes. Reloop Cloud or self-hosted.";
+	"Self-hostable transactional email API for developers, with SMTP, inbound mail, and campaigns. An open-source alternative to Resend.";
 
 export const defaultOgImage = "/web-app-manifest-512x512.png";
 
@@ -14,7 +14,7 @@ export const socialImage = {
 	url: "/opengraph-image",
 	width: 1200,
 	height: 630,
-	alt: "Reloop, open-source email infrastructure for developers",
+	alt: "Reloop, open-source transactional email you can self-host",
 };
 
 export const socialProfiles = {

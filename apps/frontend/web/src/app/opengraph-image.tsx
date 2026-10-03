@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Reloop, open-source email infrastructure for developers";
+export const alt = "Reloop, open-source transactional email you can self-host";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -48,7 +48,7 @@ export default function OpenGraphImage() {
 						maxWidth: "980px",
 					}}
 				>
-					Open-source email infrastructure for developers
+					Open-source transactional email for developers
 				</div>
 				<div
 					style={{
@@ -58,8 +58,8 @@ export default function OpenGraphImage() {
 						maxWidth: "980px",
 					}}
 				>
-					Transactional email API, SMTP relay, campaigns, webhooks, and agent
-					inboxes. Reloop Cloud or self-hosted.
+					REST API, SMTP, inbound mail, and campaigns. Self-host it or use
+					Reloop Cloud.
 				</div>
 			</div>
 			<div
@@ -71,7 +71,7 @@ export default function OpenGraphImage() {
 				}}
 			>
 				<div>reloop.sh</div>
-				<div>Apache 2.0 · Self-hostable</div>
+				<div>Self-host or Reloop Cloud</div>
 			</div>
 		</div>,
 		size,

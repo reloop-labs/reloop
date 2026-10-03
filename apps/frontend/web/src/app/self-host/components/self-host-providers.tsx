@@ -34,90 +34,92 @@ export type ServerProvider = {
 	href?: string;
 };
 
+const vpsGuide = "/docs/self-host/vps";
+
 export const SERVER_PROVIDERS: ServerProvider[] = [
 	{
-		name: "Coolify",
-		slug: "coolify",
-		icon: siCoolify,
-		description: "1-Click self-hosted PaaS template",
-		href: "/docs",
-	},
-	{
-		name: "AWS",
-		slug: "aws",
-		icon: siAmazonaws,
-		description: "EC2, ECS, or EKS clusters",
-		href: "/docs",
+		name: "Hetzner",
+		slug: "hetzner",
+		icon: siHetzner,
+		description: "Ubuntu or Debian VPS",
+		href: vpsGuide,
 	},
 	{
 		name: "DigitalOcean",
 		slug: "digitalocean",
 		icon: siDigitalocean,
-		description: "Droplets & Managed Kubernetes",
-		href: "/docs",
-	},
-	{
-		name: "Cloudflare",
-		slug: "cloudflare",
-		icon: siCloudflare,
-		description: "Tunnels and Workers edge routing",
-		href: "/docs",
-	},
-	{
-		name: "Hetzner",
-		slug: "hetzner",
-		icon: siHetzner,
-		description: "Bare-metal & cloud VPS instances",
-		href: "/docs",
-	},
-	{
-		name: "Railway",
-		slug: "railway",
-		icon: siRailway,
-		description: "Instant deploy with managed Postgres",
-		href: "/docs",
-	},
-	{
-		name: "Fly.io",
-		slug: "fly-io",
-		icon: siFlydotio,
-		description: "Global edge Docker micro-VMs",
-		href: "/docs",
-	},
-	{
-		name: "Render",
-		slug: "render",
-		icon: siRender,
-		description: "Web services & background workers",
-		href: "/docs",
-	},
-	{
-		name: "Google Cloud",
-		slug: "gcp",
-		icon: siGooglecloud,
-		description: "Compute Engine & GKE clusters",
-		href: "/docs",
+		description: "Ubuntu or Debian VPS",
+		href: vpsGuide,
 	},
 	{
 		name: "Vultr",
 		slug: "vultr",
 		icon: siVultr,
-		description: "High frequency compute & bare metal",
-		href: "/docs",
+		description: "Ubuntu or Debian VPS",
+		href: vpsGuide,
+	},
+	{
+		name: "AWS",
+		slug: "aws",
+		icon: siAmazonaws,
+		description: "Ubuntu or Debian on EC2",
+		href: vpsGuide,
+	},
+	{
+		name: "Google Cloud",
+		slug: "gcp",
+		icon: siGooglecloud,
+		description: "Ubuntu or Debian VM",
+		href: vpsGuide,
 	},
 	{
 		name: "Docker",
 		slug: "docker",
 		icon: siDocker,
-		description: "Standard Compose on any Linux host",
-		href: "/docs",
+		description: "What the installer runs",
+		href: vpsGuide,
+	},
+	{
+		name: "Coolify",
+		slug: "coolify",
+		icon: siCoolify,
+		description: "Docker Compose template",
+		href: "/docs/self-host/coolify",
+	},
+	{
+		name: "Railway",
+		slug: "railway",
+		icon: siRailway,
+		description: "Template coming soon",
+		href: "/docs/self-host/railway",
+	},
+	{
+		name: "Cloudflare",
+		slug: "cloudflare",
+		icon: siCloudflare,
+		description: "Template coming soon",
+		href: "/docs/self-host/cloudflare",
+	},
+	{
+		name: "Fly.io",
+		slug: "fly-io",
+		icon: siFlydotio,
+		description: "Template coming soon",
+		href: "/docs/self-host",
+	},
+	{
+		name: "Render",
+		slug: "render",
+		icon: siRender,
+		description: "Template coming soon",
+		href: "/docs/self-host",
 	},
 	{
 		name: "Kubernetes",
 		slug: "kubernetes",
 		icon: siKubernetes,
-		description: "Production Helm charts & ingress",
-		href: "/docs",
+		description: "Template coming soon",
+		href: "/docs/self-host",
 	},
 ];
 
@@ -168,16 +170,16 @@ export function SelfHostProviders() {
 	return (
 		<section id="providers" className="w-full">
 			<SectionTitle
-				title="Host on the cloud you love."
+				title="Install it on a Linux VPS."
 				icon={
 					<CloudCustomIcon className="size-5 text-text-strong-950 dark:text-white" />
 				}
 				action={
 					<Link
-						href="/docs"
+						href="/docs/self-host/vps"
 						className="group inline-flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 					>
-						<span>View all guides</span>
+						<span>Read the install guide</span>
 						<Icon
 							name="arrow-right"
 							className="size-3.5 transition-transform duration-150 group-hover:translate-x-0.5"

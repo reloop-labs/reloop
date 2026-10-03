@@ -42,7 +42,10 @@ export const metadata: Metadata = {
 	keywords: [
 		"email infrastructure",
 		"open source email",
+		"open source email API",
 		"self-hosted email",
+		"self-hosted email API",
+		"self-hosted transactional email",
 		"email API",
 		"transactional email",
 		"email campaigns",

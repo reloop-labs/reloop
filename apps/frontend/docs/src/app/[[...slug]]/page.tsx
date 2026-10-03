@@ -128,13 +128,15 @@ export async function generateMetadata(props: {
 		if (!params.slug || params.slug.length === 0) {
 			const searchParams = new URLSearchParams({
 				title: "Documentation",
-				description: "The modern email infrastructure for developers.",
+				description:
+					"Guides for the Reloop email API, SMTP, inbound mail, domains, and self-hosting.",
 				category: "Documentation",
 			});
 			const ogImage = `${appUrl}/docs/api/og/general?${searchParams.toString()}`;
 			return {
-				title: "Reloop Docs - Modern Email Infrastructure",
-				description: "The modern email infrastructure for developers.",
+				title: "Reloop Docs: Transactional Email API and Self-Hosting",
+				description:
+					"Guides for the Reloop email API, SMTP, inbound mail, domains, and self-hosting.",
 				metadataBase: new URL(appUrl),
 				alternates: {
 					canonical: `${appUrl}/docs`,
@@ -144,22 +146,24 @@ export async function generateMetadata(props: {
 					follow: true,
 				},
 				openGraph: {
-					title: "Reloop Docs - Modern Email Infrastructure",
-					description: "The modern email infrastructure for developers.",
+					title: "Reloop Docs: Transactional Email API and Self-Hosting",
+					description:
+						"Guides for the Reloop email API, SMTP, inbound mail, domains, and self-hosting.",
 					url: `${appUrl}/docs`,
 					images: [
 						{
 							url: ogImage,
 							width: 1200,
 							height: 630,
-							alt: "Reloop Docs - Modern Email Infrastructure",
+							alt: "Reloop Docs: Transactional Email API and Self-Hosting",
 						},
 					],
 				},
 				twitter: {
 					card: "summary_large_image",
-					title: "Reloop Docs - Modern Email Infrastructure",
-					description: "The modern email infrastructure for developers.",
+					title: "Reloop Docs: Transactional Email API and Self-Hosting",
+					description:
+						"Guides for the Reloop email API, SMTP, inbound mail, domains, and self-hosting.",
 					images: [ogImage],
 				},
 			};
