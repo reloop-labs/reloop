@@ -92,8 +92,8 @@ export default function HomePage() {
 			<GridSeparator />
 			<CustomerTestimonial />
 			<GridSeparator />
-			<DataVisualization />
 			<ConnectApplications />
+			<DataVisualization />
 			<EnterpriseSecurity />
 			<CustomerReviews />
 			<div className="relative mx-auto flex w-full max-w-[1280px] flex-col border-[#ebebeb] border-x dark:border-[#292929]">
