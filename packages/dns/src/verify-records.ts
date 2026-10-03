@@ -72,9 +72,16 @@ export function spfRecordMatches(
 		.split(/\s+/)
 		.filter((part) => part.startsWith("include:"));
 
-	return flattenedRecords.some((record) => {
+	// RFC 7208 §3.1: a domain MUST NOT publish more than one v=spf1 record.
+	// Receivers (e.g. Orange OFR003_398) return PermError on duplicates,
+	// so a second SPF record must fail verification even if one matches.
+	const spfRecords = flattenedRecords.filter((record) =>
+		record.trim().toLowerCase().startsWith("v=spf1"),
+	);
+	if (spfRecords.length !== 1) return false;
+
+	return spfRecords.some((record) => {
 		const normalizedRecord = record.trim().replace(/\s+/g, " ");
-		if (!normalizedRecord.startsWith("v=spf1")) return false;
 		return requiredIncludes.every((inc) => normalizedRecord.includes(inc));
 	});
 }

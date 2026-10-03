@@ -55,6 +55,13 @@ export async function verifySpfRecord(
 		]);
 		const flattenedRecords = records.flat();
 
+		// RFC 7208 §3.1: more than one v=spf1 record = PermError at
+		// receivers (Orange OFR003_398). Fail closed on duplicates.
+		const spfRecords = flattenedRecords.filter((record) =>
+			record.trim().toLowerCase().startsWith("v=spf1"),
+		);
+		if (spfRecords.length !== 1) return false;
+
 		// Extract the required include directives from the expected value
 		// e.g. "v=spf1 include:reloop.sh -all" → ["include:reloop.sh"]
 		const requiredIncludes = value
@@ -62,11 +69,8 @@ export async function verifySpfRecord(
 			.split(/\s+/)
 			.filter((part) => part.startsWith("include:"));
 
-		return flattenedRecords.some((record) => {
+		return spfRecords.some((record) => {
 			const normalizedRecord = record.trim().replace(/\s+/g, " ");
-
-			// Must be an SPF record
-			if (!normalizedRecord.startsWith("v=spf1")) return false;
 
 			// Check that every required include is present in the actual record
 			return requiredIncludes.every((inc) => normalizedRecord.includes(inc));

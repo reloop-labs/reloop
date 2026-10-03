@@ -25,6 +25,27 @@ describe("spfRecordMatches", () => {
 			spfRecordMatches(["v=spf1 -all"], "v=spf1 include:reloop.sh -all"),
 		).toBe(false);
 	});
+
+	test("rejects duplicate SPF records (PermError, e.g. Orange OFR003_398)", () => {
+		expect(
+			spfRecordMatches(
+				[
+					"v=spf1 include:reloop.sh -all",
+					"v=spf1 include:_spf.mail.hostinger.com ~all",
+				],
+				"v=spf1 include:reloop.sh -all",
+			),
+		).toBe(false);
+	});
+
+	test("rejects when no SPF record exists", () => {
+		expect(
+			spfRecordMatches(
+				["brevo-code:bbdb9dc3f83166b4819fd4ccc4ebcc04"],
+				"v=spf1 include:reloop.sh -all",
+			),
+		).toBe(false);
+	});
 });
 
 describe("dkimRecordMatches", () => {
