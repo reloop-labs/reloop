@@ -25,6 +25,7 @@ import { CustomerReviews } from "../(home)/components/customer-reviews";
 import { CustomerTestimonial } from "../(home)/components/customer-testimonial";
 import { DataVisualization } from "../(home)/components/data-visualization";
 import { EnterpriseSecurity } from "../(home)/components/enterprise-security";
+import { ContactSolutions } from "../(home)/components/contact-solutions";
 import { GridSeparator } from "../(home)/components/grid-separator";
 import { PaymentSolutions } from "../(home)/components/payment-solutions";
 import { SecureVerification } from "../(home)/components/secure-verification";
@@ -89,6 +90,8 @@ export default function HomePage() {
 			<SecureVerification />
 			<GridSeparator />
 			<PaymentSolutions />
+			<GridSeparator />
+			<ContactSolutions />
 			<GridSeparator />
 			<CustomerTestimonial />
 			<GridSeparator />

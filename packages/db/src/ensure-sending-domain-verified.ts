@@ -4,8 +4,12 @@ import {
 	checkDmarcRecord,
 	checkMxRecord,
 	checkSpfRecord,
+	countSpfRecords,
+	duplicateSpfReason,
 	type DnsCheckOutcome,
 } from "@reloop/dns/verify-records";
+import { isLocal } from "@reloop/dns/is-local";
+import { resolver } from "@reloop/dns/resolver";
 import { and, eq, isNull } from "drizzle-orm";
 import { type DatabaseInstance, db as defaultDb } from "./client";
 import { domain, domainDnsRecord } from "./schema/domain";
@@ -203,6 +207,26 @@ export type SendingDomainDnsResult =
 	  };
 
 /**
+ * When SPF fails, check whether the cause is duplicate v=spf1 records so the
+ * customer sees an actionable reason instead of a generic mismatch message.
+ * Returns null when records are fine (or unresolvable) — caller then falls
+ * back to the generic reason. Local/dev domains are skipped.
+ */
+async function duplicateSpfDetail(
+	spfFqdn: string | undefined,
+): Promise<string | null> {
+	if (!spfFqdn || isLocal(spfFqdn)) return null;
+	try {
+		const records = await resolver.resolveTxt(spfFqdn);
+		const count = countSpfRecords(records.flat());
+		if (count > 1) return duplicateSpfReason(count);
+	} catch {
+		// Resolver errors fall through to the generic reason.
+	}
+	return null;
+}
+
+/**
  * Live-check every DNS record required for this domain before a send.
  * A stored "active" flag is not enough: the customer may have deleted the
  * records at their DNS host since the last verification job.
@@ -335,13 +359,24 @@ export async function ensureSendingDomainVerified(
 		.filter((result) => result.outcome === "match")
 		.map((result) => result.id);
 
+	// Surface an actionable reason when SPF fails due to duplicate records.
+	let detailReason: string | null = null;
+	if (summary.code === "unverified" && summary.missing.includes("SPF")) {
+		const spfFqdn = row.dnsRecords.find(
+			(record) =>
+				record.recordType === "TXT" && record.value.startsWith("v=spf1"),
+		)?.fqdn;
+		detailReason = await duplicateSpfDetail(spfFqdn);
+	}
+	const failureReason = detailReason ?? summary.reason;
+
 	await Promise.all([
 		database
 			.update(domain)
 			.set({
 				status: "failed",
 				systemVerified: false,
-				verificationFailedReason: summary.reason,
+				verificationFailedReason: failureReason,
 				isTrackingDomain: false,
 			})
 			.where(eq(domain.id, domainId)),
@@ -350,7 +385,7 @@ export async function ensureSendingDomainVerified(
 				.update(domainDnsRecord)
 				.set({
 					status: "failed",
-					verificationError: "DNS record is missing or does not match",
+					verificationError: detailReason ?? "DNS record is missing or does not match",
 				})
 				.where(eq(domainDnsRecord.id, id)),
 		),
@@ -362,5 +397,8 @@ export async function ensureSendingDomainVerified(
 		),
 	]);
 
+	if (summary.code === "unverified") {
+		return { ...summary, reason: failureReason };
+	}
 	return summary;
 }

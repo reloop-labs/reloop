@@ -63,6 +63,19 @@ async function defaultAddresses(name: string): Promise<string[]> {
 	return [...v4, ...v6];
 }
 
+export function countSpfRecords(flattenedRecords: string[]): number {
+	return flattenedRecords.filter((record) =>
+		record.trim().toLowerCase().startsWith("v=spf1"),
+	).length;
+}
+
+export function duplicateSpfReason(count: number): string {
+	return (
+		`Your domain publishes ${count} SPF records, but only one SPF record is allowed. ` +
+		`Merge them into a single TXT record at your DNS provider, wait for propagation, then retry verification.`
+	);
+}
+
 export function spfRecordMatches(
 	flattenedRecords: string[],
 	expectedValue: string,

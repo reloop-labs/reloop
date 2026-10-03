@@ -3,8 +3,10 @@ import {
 	checkDkimRecord,
 	checkSpfRecord,
 	classifyDnsError,
+	countSpfRecords,
 	dkimRecordMatches,
 	dmarcRecordMatches,
+	duplicateSpfReason,
 	mxRecordMatches,
 	normalizeMxLookupName,
 	spfRecordMatches,
@@ -45,6 +47,26 @@ describe("spfRecordMatches", () => {
 				"v=spf1 include:reloop.sh -all",
 			),
 		).toBe(false);
+	});
+});
+
+describe("countSpfRecords / duplicateSpfReason", () => {
+	test("counts only v=spf1 records", () => {
+		expect(
+			countSpfRecords([
+				"v=spf1 include:reloop.sh -all",
+				"v=spf1 include:_spf.mail.hostinger.com ~all",
+				"brevo-code:bbdb9dc3f83166b4819fd4ccc4ebcc04",
+			]),
+		).toBe(2);
+		expect(countSpfRecords(["v=spf1 include:reloop.sh -all"])).toBe(1);
+		expect(countSpfRecords([])).toBe(0);
+	});
+
+	test("duplicate reason names the count and the fix", () => {
+		const reason = duplicateSpfReason(2);
+		expect(reason).toContain("2 SPF records");
+		expect(reason).toContain("single TXT record");
 	});
 });
 

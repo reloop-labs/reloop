@@ -13,6 +13,9 @@ import {
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { countSpfRecords, duplicateSpfReason } from "@reloop/dns/verify-records";
+import { isLocal } from "@reloop/dns/is-local";
+import { resolver } from "@reloop/dns/resolver";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 
@@ -307,13 +310,27 @@ export async function processDomainVerification({
 	]);
 
 	const allPassed = dkimOk && spfOk && dmarcOk && mxOk && cnameOk;
-	const failureReason = buildFailureReason({
+	let failureReason = buildFailureReason({
 		DKIM: dkimOk,
 		SPF: spfOk,
 		DMARC: dmarcOk,
 		MX: mxOk,
 		CNAME: cnameOk,
 	});
+
+	// When SPF fails, say exactly why if the domain publishes duplicates.
+	// Receivers (e.g. Orange OFR003_398) reject these with PermError.
+	if (!spfOk && !isLocal(domainName)) {
+		try {
+			const liveTxt = await resolver.resolveTxt(domainName);
+			const liveSpfCount = countSpfRecords(liveTxt.flat());
+			if (liveSpfCount > 1) {
+				failureReason = duplicateSpfReason(liveSpfCount);
+			}
+		} catch {
+			// Resolver errors keep the generic reason.
+		}
+	}
 
 	if (allPassed) {
 		await db
