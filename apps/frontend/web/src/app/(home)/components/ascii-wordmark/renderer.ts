@@ -81,12 +81,16 @@ export class AsciiWordmarkRenderer {
 		const { clientWidth: w, clientHeight: h } = this.host;
 		const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
 
-		this.renderer = new THREE.WebGLRenderer({
-			alpha: true,
-			antialias: false,
-			powerPreference: "high-performance",
-			failIfMajorPerformanceCaveat: false,
-		});
+		try {
+			this.renderer = new THREE.WebGLRenderer({
+				alpha: true,
+				antialias: false,
+				powerPreference: "high-performance",
+				failIfMajorPerformanceCaveat: false,
+			});
+		} catch {
+			return false;
+		}
 		this.renderer.setPixelRatio(dpr);
 		this.renderer.setSize(w, h);
 		this.renderer.setClearColor(0x000000, 0);

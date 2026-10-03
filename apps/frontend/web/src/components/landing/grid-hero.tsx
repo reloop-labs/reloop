@@ -56,9 +56,9 @@ export function GridHero() {
 												id="home-heading"
 												className="text-balance font-semibold text-6xl leading-none tracking-[-0.035em] max-[767px]:text-5xl"
 											>
-												Email for your app.
+												Email for developers
 												<br />
-												And your AI agents.
+												who ship with AI.
 											</h1>
 											<p className="mx-auto mt-5 mb-9 max-w-2xl text-balance text-lg text-zinc-600 leading-7 dark:text-zinc-400">
 												Send transactional emails, run campaigns, and give AI

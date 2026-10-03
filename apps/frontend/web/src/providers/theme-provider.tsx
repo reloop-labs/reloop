@@ -8,7 +8,8 @@ if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
 	console.error = (...args: unknown[]) => {
 		if (
 			typeof args[0] === "string" &&
-			args[0].includes("Encountered a script tag")
+			(args[0].includes("Encountered a script tag") ||
+				args[0].includes("THREE.WebGLRenderer"))
 		) {
 			return;
 		}
