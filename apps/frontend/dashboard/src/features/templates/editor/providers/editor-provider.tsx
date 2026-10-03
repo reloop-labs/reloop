@@ -6,26 +6,17 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { useEditorHook } from "#/features/templates/editor/hooks/use-editor-hooks";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
+import { clearImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
 import {
-	applyImportedEmailCss,
-	clearImportedEmailCss,
-} from "#/features/templates/editor/utils/apply-imported-email-css";
-import {
-	extractThemingStylesFromHtml,
-	findStyleInputValue,
+	applyPastedEmailTheme,
 	getGlobalStylesArray,
-	mergeParsedStyles,
-	parseGlobalStylesFromHtml,
 	updateGlobalStyleValue,
 } from "#/features/templates/editor/utils/apply-pasted-email-theme";
 import {
+	isFullEmailHtml,
 	pickSavedEmailHtml,
 	restoreImportedEmailCssFromHtml,
 } from "#/features/templates/editor/utils/load-html-into-editor";
-import {
-	emailHasMixedBackgrounds,
-	readableTextColor,
-} from "#/features/templates/editor/utils/readable-text-color";
 import { sanitizeEmailHtml } from "#/features/templates/editor/utils/sanitize-email-html";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 import {
@@ -299,7 +290,34 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 
 	const initializeEditor = useCallback(
 		(template: any, versionList: any[]) => {
-			if (isSynced && !isEditorContentEmpty(editor, ydoc)) {
+			let sourceToLoad: any = null;
+
+			if (template.status === "published") {
+				const latestPublished = versionList.find((v: any) => v.isMajor);
+				if (latestPublished) {
+					sourceToLoad = latestPublished;
+				}
+			}
+
+			if (!sourceToLoad) {
+				const latestVersion = versionList[0];
+				if (latestVersion?.content && latestVersion.content.length > 0) {
+					sourceToLoad = latestVersion;
+				}
+			}
+
+			if (!sourceToLoad && template.content && template.content.length > 0) {
+				sourceToLoad = template;
+			}
+
+			const sourceNodes = Array.isArray(sourceToLoad?.content)
+				? sourceToLoad.content
+				: [];
+			const currentNodes = editor?.getJSON()?.content ?? [];
+			const isMissingSavedNodes =
+				sourceNodes.length > 1 && currentNodes.length < sourceNodes.length;
+
+			if (isSynced && !isEditorContentEmpty(editor, ydoc) && !isMissingSavedNodes) {
 				const subjectToSet = resolveSubject(template, versionList);
 				if (subjectToSet) {
 					setSubject(subjectToSet);
@@ -321,26 +339,6 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					editor.commands.setGlobalContent("styles", styles);
 				}
 				return;
-			}
-
-			let sourceToLoad: any = null;
-
-			if (template.status === "published") {
-				const latestPublished = versionList.find((v: any) => v.isMajor);
-				if (latestPublished) {
-					sourceToLoad = latestPublished;
-				}
-			}
-
-			if (!sourceToLoad) {
-				const latestVersion = versionList[0];
-				if (latestVersion?.content && latestVersion.content.length > 0) {
-					sourceToLoad = latestVersion;
-				}
-			}
-
-			if (!sourceToLoad && template.content && template.content.length > 0) {
-				sourceToLoad = template;
 			}
 
 			let htmlStringToProcess = "";
@@ -393,76 +391,11 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 
 			if (htmlStringToProcess && editor) {
 				try {
+					if (isFullEmailHtml(htmlStringToProcess)) {
+						setHtmlLocked(true);
+					}
 					setCodeHtml(htmlStringToProcess);
-					const parsed = parseGlobalStylesFromHtml(htmlStringToProcess);
-					if (parsed.css) {
-						applyImportedEmailCss(parsed.css);
-						setImportedEmailCss(parsed.css);
-					}
-					const existingAfterSeed = getGlobalStylesArray(editor);
-					const parsedBodyAndContainer =
-						extractThemingStylesFromHtml(htmlStringToProcess);
-					let mergedStyles = mergeParsedStyles(
-						existingAfterSeed,
-						parsedBodyAndContainer,
-					);
-
-					if (parsed.bodyBg) {
-						mergedStyles = updateGlobalStyleValue(
-							mergedStyles,
-							"body",
-							"backgroundColor",
-							parsed.bodyBg,
-						);
-					}
-
-					const containerBg =
-						parsed.bodyBg ||
-						findStyleInputValue(mergedStyles, "container", "backgroundColor");
-					const extractedColor = findStyleInputValue(
-						mergedStyles,
-						"container",
-						"color",
-					);
-					const mixedSurfaces = emailHasMixedBackgrounds(
-						new DOMParser().parseFromString(htmlStringToProcess, "text/html")
-							.body,
-					);
-					const textColor = mixedSurfaces
-						? undefined
-						: readableTextColor(
-								typeof containerBg === "string" ? containerBg : undefined,
-								typeof extractedColor === "string" ? extractedColor : undefined,
-							);
-					if (textColor) {
-						mergedStyles = updateGlobalStyleValue(
-							mergedStyles,
-							"container",
-							"color",
-							textColor,
-						);
-						mergedStyles = updateGlobalStyleValue(
-							mergedStyles,
-							"body",
-							"color",
-							textColor,
-						);
-					}
-
-					mergedStyles = updateGlobalStyleValue(
-						mergedStyles,
-						"container",
-						"height",
-						undefined,
-					);
-					mergedStyles = updateGlobalStyleValue(
-						mergedStyles,
-						"container",
-						"borderWidth",
-						0,
-					);
-
-					editor.commands.setGlobalContent("styles", mergedStyles);
+					applyPastedEmailTheme(editor, htmlStringToProcess);
 				} catch (err) {
 					console.error(
 						"Failed to extract and apply global styles on template init:",

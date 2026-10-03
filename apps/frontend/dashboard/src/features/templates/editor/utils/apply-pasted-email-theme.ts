@@ -3,6 +3,7 @@ import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-sto
 import { applyImportedEmailCss } from "#/features/templates/editor/utils/apply-imported-email-css";
 import {
 	absolutizeEmailAssetUrls,
+	inlineEmailStylesheet,
 	readDocumentBodyBackground,
 	scopeEmailCssForEditor,
 } from "#/features/templates/editor/utils/inline-email-stylesheet";
@@ -35,13 +36,54 @@ function parseCssUnit(val: string | null | undefined): number | undefined {
 export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(rawHtml, "text/html");
+	inlineEmailStylesheet(doc);
 
 	// 1. Get body background color. Do not invent #ffffff when the
 	// HTML leaves the page gray and paints white only on inner sections.
 	const bodyBgColor = readDocumentBodyBackground(doc) || undefined;
 
+	// Extract font family from body, wrapper, cells or style tags
+	let baseFontFamily: string | undefined =
+		doc.body?.style?.fontFamily || undefined;
+	if (!baseFontFamily) {
+		const elWithFont = doc.querySelector<HTMLElement>("[style*='font-family']");
+		if (elWithFont?.style.fontFamily) {
+			baseFontFamily = elWithFont.style.fontFamily;
+		}
+	}
+	if (!baseFontFamily) {
+		for (const styleTag of Array.from(doc.querySelectorAll("style"))) {
+			const match = styleTag.textContent?.match(
+				/font-family\s*:\s*([^;}\r\n]+)/i,
+			);
+			if (match?.[1]?.trim()) {
+				baseFontFamily = match[1].trim();
+				break;
+			}
+		}
+	}
+	if (!baseFontFamily) {
+		baseFontFamily = "Arial, Helvetica, sans-serif";
+	}
+
+	let baseFontSize: number | undefined;
+	if (doc.body?.style?.fontSize) {
+		baseFontSize = parseCssUnit(doc.body.style.fontSize);
+	}
+
 	// 2. Find the innermost email column table
 	const containerTable = findEmailContainerTable(doc);
+	// The importer removes scaffolding outside the content column. Transfer
+	// its padding to the page theme, separate from the column's own padding.
+	const pagePadding = { paddingTop: 0, paddingRight: 0, paddingBottom: 0, paddingLeft: 0 };
+	let wrapper: HTMLElement | null = containerTable?.parentElement ?? doc.body;
+	while (wrapper) {
+		for (const prop of Object.keys(pagePadding) as (keyof typeof pagePadding)[]) {
+			pagePadding[prop] += parseCssUnit(wrapper.style[prop]) ?? 0;
+		}
+		if (wrapper === doc.body) break;
+		wrapper = wrapper.parentElement;
+	}
 
 	let containerBg: string | undefined;
 	let containerTextColor: string | undefined;
@@ -220,7 +262,7 @@ export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 				{
 					label: "Padding Top",
 					type: "number",
-					value: undefined,
+					value: pagePadding.paddingTop,
 					unit: "px",
 					prop: "paddingTop",
 					classReference: "body",
@@ -228,7 +270,7 @@ export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 				{
 					label: "Padding Right",
 					type: "number",
-					value: undefined,
+					value: pagePadding.paddingRight,
 					unit: "px",
 					prop: "paddingRight",
 					classReference: "body",
@@ -236,7 +278,7 @@ export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 				{
 					label: "Padding Bottom",
 					type: "number",
-					value: undefined,
+					value: pagePadding.paddingBottom,
 					unit: "px",
 					prop: "paddingBottom",
 					classReference: "body",
@@ -244,9 +286,16 @@ export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 				{
 					label: "Padding Left",
 					type: "number",
-					value: undefined,
+					value: pagePadding.paddingLeft,
 					unit: "px",
 					prop: "paddingLeft",
+					classReference: "body",
+				},
+				{
+					label: "Font family",
+					type: "text",
+					value: baseFontFamily,
+					prop: "fontFamily",
 					classReference: "body",
 				},
 			],
@@ -346,6 +395,66 @@ export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 				},
 			],
 		},
+		{
+			id: "typography",
+			title: "Text",
+			classReference: "body",
+			inputs: [
+				{
+					label: "Font family",
+					type: "text",
+					value: baseFontFamily,
+					prop: "fontFamily",
+					classReference: "body",
+				},
+				{
+					label: "Font size",
+					type: "number",
+					value: baseFontSize ?? 16,
+					unit: "px",
+					prop: "fontSize",
+					classReference: "body",
+				},
+				{
+					label: "Line Height",
+					type: "number",
+					value: 150,
+					unit: "%",
+					prop: "lineHeight",
+					classReference: "container",
+				},
+			],
+		},
+		{
+			id: "text",
+			title: "Paragraph",
+			classReference: "paragraph",
+			inputs: [
+				{
+					label: "Font family",
+					type: "text",
+					value: baseFontFamily,
+					prop: "fontFamily",
+					classReference: "paragraph",
+				},
+				{
+					label: "Padding Top",
+					type: "number",
+					value: 0,
+					unit: "px",
+					prop: "paddingTop",
+					classReference: "paragraph",
+				},
+				{
+					label: "Padding Bottom",
+					type: "number",
+					value: 0,
+					unit: "px",
+					prop: "paddingBottom",
+					classReference: "paragraph",
+				},
+			],
+		},
 	];
 }
 
@@ -423,7 +532,31 @@ export function mergeParsedStyles(
 	return baseGroups.map((group) => {
 		const parsedGroup = parsedMap.get(group.id);
 		if (parsedGroup) {
-			return parsedGroup;
+			const existingInputs = Array.isArray(group.inputs) ? group.inputs : [];
+			const parsedInputs = Array.isArray(parsedGroup.inputs)
+				? parsedGroup.inputs
+				: [];
+			const parsedPropMap = new Map(
+				parsedInputs.map((inp: any) => [inp.prop, inp]),
+			);
+
+			const mergedInputs = existingInputs.map((input: any) => {
+				const override = parsedPropMap.get(input.prop);
+				if (override) {
+					parsedPropMap.delete(input.prop);
+					return { ...input, ...override };
+				}
+				return input;
+			});
+			for (const remaining of parsedPropMap.values()) {
+				mergedInputs.push(remaining);
+			}
+
+			return {
+				...group,
+				...parsedGroup,
+				inputs: mergedInputs,
+			};
 		}
 		return group;
 	});
@@ -475,43 +608,48 @@ export function parseGlobalStylesFromHtml(html: string) {
 	const wrapperTd =
 		doc.querySelector('td[style*="min-height:100%"]') ||
 		doc.querySelector('td[style*="min-height: 100%"]');
+	const scratch = doc.createElement("div") as HTMLDivElement;
 	if (wrapperTd) {
-		const scratch = doc.createElement("div") as HTMLDivElement;
 		scratch.style.cssText = wrapperTd.getAttribute("style") || "";
-
-		const baseFontFamily = scratch.style.fontFamily;
-		const baseFontSize = scratch.style.fontSize;
-		const baseLineHeight = scratch.style.lineHeight;
-		const baseColor = scratch.style.color;
-		const baseBg = scratch.style.backgroundColor;
-		const baseLetterSpacing = scratch.style.letterSpacing;
-		const mixedSurfaces = emailHasMixedBackgrounds(doc.body);
-
-		// Defaults only, no !important. Pasted inline font-size / family on
-		// headings and footers must win over the wrapper td (15px body text
-		// must not paint a 13px / 320px footer at 15px).
-		const proseMirrorBase = [
-			".tiptap.ProseMirror, .ProseMirror{",
-			baseFontFamily ? `font-family:${baseFontFamily};` : "",
-			baseFontSize ? `font-size:${baseFontSize};` : "",
-			baseLineHeight ? `line-height:${baseLineHeight};` : "",
-			baseColor && !mixedSurfaces ? `color:${baseColor};` : "",
-			baseBg && !mixedSurfaces ? `background-color:${baseBg};` : "",
-			baseLetterSpacing ? `letter-spacing:${baseLetterSpacing};` : "",
-			"}",
-			// Kill TipTap/EmailTheming block padding without !important on
-			// margin so pasted inline spacing (Dither 2.5rem) still wins.
-			".tiptap.ProseMirror p, .ProseMirror p{margin:0;}",
-			".tiptap.ProseMirror h1, .tiptap.ProseMirror h2, .tiptap.ProseMirror h3, .ProseMirror h1, .ProseMirror h2, .ProseMirror h3{margin:0;}",
-			".tiptap.ProseMirror table, .ProseMirror table{border-collapse:separate !important;}",
-			".tiptap.ProseMirror img, .ProseMirror img{display:block;}",
-			"",
-		]
-			.filter(Boolean)
-			.join("");
-
-		cssString = proseMirrorBase + cssString;
+	} else if (doc.body?.getAttribute("style")) {
+		scratch.style.cssText = doc.body.getAttribute("style") || "";
 	}
+
+	const baseFontFamily =
+		scratch.style.fontFamily ||
+		doc.body?.style?.fontFamily ||
+		"Arial, Helvetica, sans-serif";
+	const baseFontSize = scratch.style.fontSize;
+	const baseLineHeight = scratch.style.lineHeight;
+	const baseColor = scratch.style.color;
+	const baseBg = scratch.style.backgroundColor;
+	const baseLetterSpacing = scratch.style.letterSpacing;
+	const mixedSurfaces = emailHasMixedBackgrounds(doc.body);
+
+	// Defaults only, no !important. Pasted inline font-size / family on
+	// headings and footers must win over the wrapper td (15px body text
+	// must not paint a 13px / 320px footer at 15px).
+	const proseMirrorBase = [
+		".tiptap.ProseMirror, .ProseMirror{",
+		baseFontFamily ? `font-family:${baseFontFamily};` : "",
+		baseFontSize ? `font-size:${baseFontSize};` : "",
+		baseLineHeight ? `line-height:${baseLineHeight};` : "",
+		baseColor && !mixedSurfaces ? `color:${baseColor};` : "",
+		baseBg && !mixedSurfaces ? `background-color:${baseBg};` : "",
+		baseLetterSpacing ? `letter-spacing:${baseLetterSpacing};` : "",
+		"}",
+		// Kill TipTap/EmailTheming block padding without !important on
+		// margin so pasted inline spacing (Dither 2.5rem) still wins.
+		".tiptap.ProseMirror p, .ProseMirror p{margin:0;}",
+		".tiptap.ProseMirror h1, .tiptap.ProseMirror h2, .tiptap.ProseMirror h3, .ProseMirror h1, .ProseMirror h2, .ProseMirror h3{margin:0;}",
+		".tiptap.ProseMirror table, .ProseMirror table{border-collapse:separate !important;}",
+		".tiptap.ProseMirror img, .ProseMirror img{display:block;}",
+		"",
+	]
+		.filter(Boolean)
+		.join("");
+
+	cssString = proseMirrorBase + cssString;
 
 	// Body canvas only. Do not steal an inner section color (Halo gray)
 	// or the footer, which sits on white, goes gray with the rest.
@@ -524,9 +662,9 @@ export function parseGlobalStylesFromHtml(html: string) {
 	// vs the iframe preview which already has body gray. Inject it globally
 	// here so visual == code preview for any template.
 	if (!wrapperTd && bodyBg) {
-		const scratch = doc.createElement("div") as HTMLDivElement;
-		scratch.style.backgroundColor = bodyBg;
-		const normalizedBg = scratch.style.backgroundColor;
+		const scratchBg = doc.createElement("div") as HTMLDivElement;
+		scratchBg.style.backgroundColor = bodyBg;
+		const normalizedBg = scratchBg.style.backgroundColor;
 		if (normalizedBg) {
 			const bodyRule = `.tiptap.ProseMirror, .ProseMirror{background-color:${normalizedBg};}`;
 			// Prepend so container white (via node-container) can overlay.
@@ -626,7 +764,61 @@ export function applyPastedEmailTheme(editor: Editor, rawHtml: string): void {
 				0,
 			);
 
+			const baseFontFamily =
+				findStyleInputValue(mergedStyles, "body", "fontFamily") ||
+				findStyleInputValue(mergedStyles, "typography", "fontFamily") ||
+				"Arial, Helvetica, sans-serif";
+			if (baseFontFamily) {
+				mergedStyles = updateGlobalStyleValue(
+					mergedStyles,
+					"body",
+					"fontFamily",
+					baseFontFamily,
+				);
+				mergedStyles = updateGlobalStyleValue(
+					mergedStyles,
+					"typography",
+					"fontFamily",
+					baseFontFamily,
+				);
+				mergedStyles = updateGlobalStyleValue(
+					mergedStyles,
+					"text",
+					"fontFamily",
+					baseFontFamily,
+				);
+				mergedStyles = updateGlobalStyleValue(
+					mergedStyles,
+					"text",
+					"paddingTop",
+					0,
+				);
+				mergedStyles = updateGlobalStyleValue(
+					mergedStyles,
+					"text",
+					"paddingBottom",
+					0,
+				);
+			}
+
 			editor.commands.setGlobalContent("styles", mergedStyles);
+
+			const emailBaseCss = `
+body, table, td, p, a, li, blockquote {
+	font-family: ${baseFontFamily};
+}
+p {
+	margin: 0;
+}
+table, td {
+	border-collapse: separate;
+}
+`;
+			try {
+				editor.commands.setGlobalContent("css", emailBaseCss.trim());
+			} catch {
+				// command might not be registered in tests without theme extension
+			}
 		} catch (err) {
 			console.error("Failed to apply pasted email theme:", err);
 		}
@@ -664,9 +856,26 @@ export function updateGlobalStyleValue(
 	if (!styles || !Array.isArray(styles)) return styles;
 	return styles.map((group) => {
 		if (group.id !== componentId) return group;
+		const inputs = Array.isArray(group.inputs) ? group.inputs : [];
+		const hasProp = inputs.some((input: any) => input.prop === prop);
+		if (!hasProp) {
+			return {
+				...group,
+				inputs: [
+					...inputs,
+					{
+						label: prop,
+						type: typeof value === "number" ? "number" : "text",
+						prop,
+						value,
+						classReference: group.classReference || componentId,
+					},
+				],
+			};
+		}
 		return {
 			...group,
-			inputs: group.inputs.map((input: any) => {
+			inputs: inputs.map((input: any) => {
 				if (input.prop !== prop) return input;
 				return { ...input, value };
 			}),

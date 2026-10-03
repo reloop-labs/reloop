@@ -5,6 +5,96 @@
 	width: 100%;
 }
 
+/* Button tables (Shopify, Klaviyo, Litmus bulletproof buttons) must shrink to button size and not stretch to 100% width */
+.tiptap.ProseMirror table.button,
+.tiptap.ProseMirror table.main-action-cell,
+.tiptap.ProseMirror table[class*="button"],
+.tiptap.ProseMirror table:has(> tbody > tr > td.button__cell),
+.tiptap.ProseMirror table:has(> tr > td.button__cell),
+.tiptap.ProseMirror table:has(> tbody > tr > td[class*="button"]),
+.tiptap.ProseMirror table:has(> tr > td[class*="button"]),
+.ProseMirror table.button,
+.ProseMirror table.main-action-cell,
+.ProseMirror table[class*="button"],
+.ProseMirror table:has(> tbody > tr > td.button__cell),
+.ProseMirror table:has(> tr > td.button__cell),
+.ProseMirror table:has(> tbody > tr > td[class*="button"]),
+.ProseMirror table:has(> tr > td[class*="button"]) {
+	width: auto !important;
+	max-width: max-content !important;
+	display: inline-table !important;
+	vertical-align: middle !important;
+	margin: 0 !important;
+	border-collapse: separate !important;
+}
+
+.tiptap.ProseMirror .button__cell,
+.tiptap.ProseMirror td[class*="button"],
+.ProseMirror .button__cell,
+.ProseMirror td[class*="button"] {
+	text-align: center !important;
+	vertical-align: middle !important;
+	border-radius: 4px !important;
+	padding: 0 !important;
+}
+
+.tiptap.ProseMirror .button__cell p,
+.tiptap.ProseMirror td[class*="button"] p,
+.ProseMirror .button__cell p,
+.ProseMirror td[class*="button"] p {
+	text-align: center !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.tiptap.ProseMirror .button__text,
+.tiptap.ProseMirror a[class*="button"],
+.tiptap.ProseMirror .button__cell a,
+.tiptap.ProseMirror td[class*="button"] a,
+.ProseMirror .button__text,
+.ProseMirror a[class*="button"],
+.ProseMirror .button__cell a,
+.ProseMirror td[class*="button"] a {
+	display: inline-block !important;
+	text-align: center !important;
+	padding: 20px 25px !important;
+	font-size: 16px !important;
+	color: #ffffff !important;
+	text-decoration: none !important;
+	line-height: normal !important;
+	box-sizing: border-box !important;
+}
+
+/* Footer rows (Shopify, Klaviyo dark footers) */
+.tiptap.ProseMirror table.row.footer,
+.tiptap.ProseMirror table.footer,
+.tiptap.ProseMirror table[class*="footer"],
+.ProseMirror table.row.footer,
+.ProseMirror table.footer,
+.ProseMirror table[class*="footer"] {
+	background-color: #000000 !important;
+	width: 100% !important;
+}
+
+.tiptap.ProseMirror .footer__cell,
+.tiptap.ProseMirror td[class*="footer"],
+.ProseMirror .footer__cell,
+.ProseMirror td[class*="footer"] {
+	background-color: #000000 !important;
+	text-align: center !important;
+	padding-top: 40px !important;
+	padding-bottom: 70px !important;
+}
+
+.tiptap.ProseMirror .footer__copy,
+.tiptap.ProseMirror .footer__copy p,
+.tiptap.ProseMirror [class*="footer"] p,
+.ProseMirror .footer__copy,
+.ProseMirror .footer__copy p,
+.ProseMirror [class*="footer"] p {
+	text-align: center !important;
+}
+
 /* Shrink-wrapped rows (Nike footer 166px, nav 370px). Canvas `width:100%`
  * plus leftover width="100%" left-aligns the group. Inline pixel width
  * + margin:auto must win. */
@@ -23,10 +113,10 @@
 
 .tiptap.ProseMirror,
 .ProseMirror {
-	/* Email body background must meet the canvas edge. Chrome padding
-	 * here would show as a white strip above a gray section. */
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
+	/* No extra canvas spacing. Authored page padding from EmailTheming wins. */
+	padding-top: 0;
+	padding-bottom: 0;
+	box-sizing: border-box;
 	min-height: 100% !important;
 	color-scheme: light;
 	color: #000000;
@@ -65,13 +155,12 @@ html.dark .template-editor-canvas {
 	--stroke-inbox: #e4dfd6;
 }
 
-/* Ensure editor content and scroll containers inside canvas are white */
+/* Keep email colors independent of app dark mode. The email theme and
+ * imported CSS own the content background; white is only the shell fallback. */
 .template-editor-canvas .tiptap.ProseMirror,
 .template-editor-canvas .ProseMirror,
 html.dark .template-editor-canvas .tiptap.ProseMirror,
 html.dark .template-editor-canvas .ProseMirror {
-	background-color: #ffffff !important;
-	color: #000000 !important;
 	color-scheme: light !important;
 	min-height: 100% !important;
 }

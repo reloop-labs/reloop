@@ -22,8 +22,6 @@ export function applyImportedEmailCss(css: string): void {
 	min-height: 100% !important;
 	width: 100% !important;
 	outline: none !important;
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
 	color-scheme: light;
 	color: #000000;
 }

@@ -86,6 +86,37 @@ export function sanitizePreviewHtml(rawHtml: string): string {
 		}
 	}
 
+	// Guarantee cross-client standard email typography baseline so the preview iframe
+	// never falls back to browser default serif (Times New Roman).
+	const head = doc.head || doc.createElement("head");
+	if (!doc.head && doc.documentElement) {
+		doc.documentElement.prepend(head);
+	}
+
+	let baselineStyle = head.querySelector("style[data-reloop-baseline]");
+	if (!baselineStyle) {
+		baselineStyle = doc.createElement("style");
+		baselineStyle.setAttribute("data-reloop-baseline", "true");
+		baselineStyle.textContent = `
+body {
+	margin: 0;
+	padding: 0;
+	-webkit-font-smoothing: antialiased;
+}
+body, table, td, p, a, li, blockquote {
+	font-family: inherit;
+}
+table, td {
+	border-collapse: separate;
+}
+`;
+		head.prepend(baselineStyle);
+	}
+
+	if (doc.body && !doc.body.style.fontFamily) {
+		doc.body.style.fontFamily = "Arial, Helvetica, sans-serif";
+	}
+
 	const doctype = doc.doctype
 		? `<!DOCTYPE ${doc.doctype.name}>`
 		: "<!DOCTYPE html>";

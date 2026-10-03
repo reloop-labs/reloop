@@ -81,9 +81,7 @@ describe("email canvas container centering", () => {
 		);
 
 		expect(builder).not.toMatch(/py-6/);
-		expect(css).toMatch(
-			/\.ProseMirror[^{]*\{[^}]*padding-top:\s*0\s*!important/,
-		);
+		expect(css).not.toMatch(/padding-(?:top|bottom):\s*0\s*!important/);
 		expect(css).toMatch(/color-scheme:\s*light/);
 		expect(css).not.toMatch(
 			/\.node-heading[^{]*\{[^}]*padding-top:\s*0\s*!important/,

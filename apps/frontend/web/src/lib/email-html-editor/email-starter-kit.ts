@@ -1,5 +1,5 @@
 import { StarterKit } from "@react-email/editor/extensions";
-import { Extension, Mark } from "@tiptap/core";
+import { Extension, Mark, mergeAttributes, Node } from "@tiptap/core";
 import {
 	NodeSelection,
 	Plugin,
@@ -10,6 +10,91 @@ import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { EMAIL_DECORATION_ATTR } from "./preserve-email-link-underlines";
 
 export const EMAIL_FONT_COLOR_MARK = "emailFontColor";
+
+export const EmailImage = Node.create({
+	name: "image",
+	group: "block",
+	atom: true,
+	draggable: true,
+	addAttributes() {
+		return {
+			src: {
+				default: "",
+				parseHTML: (element) => element.getAttribute("src") || "",
+				renderHTML: (attributes) => {
+					if (!attributes.src) return {};
+					return { src: attributes.src };
+				},
+			},
+			alt: {
+				default: "",
+				parseHTML: (element) => element.getAttribute("alt") || "",
+				renderHTML: (attributes) => {
+					if (!attributes.alt) return {};
+					return { alt: attributes.alt };
+				},
+			},
+			width: {
+				default: "auto",
+				parseHTML: (element) => element.getAttribute("width") || "auto",
+				renderHTML: (attributes) => {
+					if (!attributes.width || attributes.width === "auto") return {};
+					return { width: attributes.width };
+				},
+			},
+			height: {
+				default: "auto",
+				parseHTML: (element) => element.getAttribute("height") || "auto",
+				renderHTML: (attributes) => {
+					if (!attributes.height || attributes.height === "auto") return {};
+					return { height: attributes.height };
+				},
+			},
+			alignment: {
+				default: "center",
+				parseHTML: (element) =>
+					element.getAttribute("alignment") ||
+					element.getAttribute("align") ||
+					"center",
+				renderHTML: (attributes) => {
+					if (!attributes.alignment) return {};
+					return { alignment: attributes.alignment };
+				},
+			},
+			href: {
+				default: null,
+				parseHTML: (element) =>
+					element.getAttribute("href") ||
+					element.getAttribute("data-href"),
+				renderHTML: (attributes) => {
+					if (!attributes.href) return {};
+					return {
+						href: attributes.href,
+						"data-href": attributes.href,
+					};
+				},
+			},
+		};
+	},
+	parseHTML() {
+		return [{ tag: "img[src]" }];
+	},
+	renderHTML({ HTMLAttributes }) {
+		return ["img", mergeAttributes(HTMLAttributes)];
+	},
+	addCommands() {
+		return {
+			setImage:
+				(attrs: Record<string, unknown>) =>
+				({ commands }: any) => {
+					return commands.insertContent({
+						type: this.name,
+						attrs,
+					});
+				},
+		};
+	},
+});
 
 /** Selection color so inspect can paint a word, not only the parent block. */
 const emailFontColor = Mark.create({
@@ -78,6 +163,35 @@ const emailLinkDecoration = Extension.create({
 							const value = attributes[EMAIL_DECORATION_ATTR];
 							if (!value) return {};
 							return { [EMAIL_DECORATION_ATTR]: value };
+						},
+					},
+					style: {
+						default: null,
+						parseHTML: (element) => element.getAttribute("style"),
+						renderHTML: (attributes) => {
+							if (!attributes.style) return {};
+							return { style: attributes.style };
+						},
+					},
+				},
+			},
+			{
+				types: ["table", "tableRow", "tableCell", "tableHeader"],
+				attributes: {
+					style: {
+						default: null,
+						parseHTML: (element) => element.getAttribute("style"),
+						renderHTML: (attributes) => {
+							if (!attributes.style) return {};
+							return { style: attributes.style };
+						},
+					},
+					bgcolor: {
+						default: null,
+						parseHTML: (element) => element.getAttribute("bgcolor"),
+						renderHTML: (attributes) => {
+							if (!attributes.bgcolor) return {};
+							return { bgcolor: attributes.bgcolor };
 						},
 					},
 				},
@@ -584,6 +698,7 @@ export function emailStarterKit() {
 					StyleAttribute: { types: LAYOUT_STYLE_TYPES },
 					ClassAttribute: { types: LAYOUT_STYLE_TYPES },
 				}),
+				EmailImage,
 				emailLinkDecoration,
 				emailFontColor,
 				emailAlignmentSync,

@@ -71,6 +71,12 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 	// and unwrap the container table. Otherwise TipTap keeps the class names
 	// but the heading sits flush to the canvas.
 	inlineEmailStylesheet(doc);
+	const hasDocumentBody = /<body\b/i.test(rawHtml);
+	if (hasDocumentBody && !doc.body.style.lineHeight) {
+		// A standalone email uses the browser's normal line height, not the
+		// editor theme's 155%. Keep that inherited default when unwrapping it.
+		doc.body.style.lineHeight = "normal";
+	}
 
 	expandShorthandStyles(doc.body);
 	promoteTableSpacingToCells(doc.body);
@@ -229,6 +235,9 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 				}
 				if (!(node instanceof Element)) return false;
 				const tag = node.tagName.toLowerCase();
+				if (tag === "script" || tag === "style" || tag === "meta" || tag === "link") {
+					return false;
+				}
 				return (
 					tag === "table" ||
 					tag === "section" ||
@@ -236,36 +245,112 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 					tag === "h1" ||
 					tag === "h2" ||
 					tag === "h3" ||
+					tag === "h4" ||
+					tag === "h5" ||
+					tag === "h6" ||
 					tag === "p" ||
-					tag === "div"
+					tag === "div" ||
+					tag === "center" ||
+					tag === "tr" ||
+					tag === "tbody" ||
+					tag === "thead" ||
+					tag === "tfoot" ||
+					tag === "td" ||
+					tag === "th" ||
+					tag === "a" ||
+					tag === "hr" ||
+					Boolean(node.textContent?.trim()) ||
+					node.children.length > 0
 				);
+			};
+
+			const normalizeSibling = (node: Node, parentEl: Element): Node | null => {
+				if (!isSectionLikeSiblingLocal(node)) return null;
+				if (node instanceof Element) {
+					const nodeTag = node.tagName.toUpperCase();
+					if (nodeTag === "TR") {
+						const parentTable =
+							node.closest("table") ||
+							(parentEl.tagName.toUpperCase() === "TABLE"
+								? parentEl
+								: parentEl.closest("table"));
+						const table = doc.createElement("table");
+						if (parentTable) {
+							const width = parentTable.getAttribute("width");
+							if (width) table.setAttribute("width", width);
+							const style = parentTable.getAttribute("style");
+							if (style) table.setAttribute("style", style);
+							const cls = parentTable.getAttribute("class");
+							if (cls) table.setAttribute("class", cls);
+						}
+						const tbody = doc.createElement("tbody");
+						tbody.appendChild(node.cloneNode(true));
+						table.appendChild(tbody);
+						return table;
+					}
+					if (
+						nodeTag === "TBODY" ||
+						nodeTag === "THEAD" ||
+						nodeTag === "TFOOT"
+					) {
+						const parentTable =
+							parentEl.tagName.toUpperCase() === "TABLE"
+								? parentEl
+								: parentEl.closest("table");
+						const table = doc.createElement("table");
+						if (parentTable) {
+							const width = parentTable.getAttribute("width");
+							if (width) table.setAttribute("width", width);
+							const style = parentTable.getAttribute("style");
+							if (style) table.setAttribute("style", style);
+							const cls = parentTable.getAttribute("class");
+							if (cls) table.setAttribute("class", cls);
+						}
+						table.appendChild(node.cloneNode(true));
+						return table;
+					}
+				}
+				return node;
 			};
 
 			const siblingBefore: Node[] = [];
 			const siblingAfter: Node[] = [];
 			{
+				// If containerTable itself has other rows outside contentCell's row,
+				// preserve them so multi-row container tables don't lose rows.
+				const contentRow = contentCell.closest("tr");
+				if (contentRow && contentRow.parentElement) {
+					const rowKids = Array.from(contentRow.parentElement.children);
+					const rowIdx = rowKids.indexOf(contentRow);
+					if (rowIdx >= 0) {
+						const preRows = rowKids
+							.slice(0, rowIdx)
+							.map((r) => normalizeSibling(r, containerTable))
+							.filter((n): n is Node => n !== null);
+						const postRows = rowKids
+							.slice(rowIdx + 1)
+							.map((r) => normalizeSibling(r, containerTable))
+							.filter((n): n is Node => n !== null);
+						siblingBefore.unshift(...preRows);
+						siblingAfter.push(...postRows);
+					}
+				}
+
 				let cur: Element | null = containerTable;
 				let par: Element | null = cur.parentElement;
 				while (par) {
-					const tag = par.tagName;
-					if (
-						tag === "TR" ||
-						tag === "TBODY" ||
-						tag === "THEAD" ||
-						tag === "TFOOT"
-					) {
-						cur = par;
-						par = par.parentElement;
-						continue;
-					}
+					const tag = par.tagName.toUpperCase();
 					const kids = Array.from(par.childNodes);
 					const idx = kids.indexOf(cur);
-					if (
-						idx >= 0 &&
-						(tag === "TD" || tag === "TH" || tag === "BODY" || tag === "DIV")
-					) {
-						const before = kids.slice(0, idx).filter(isSectionLikeSiblingLocal);
-						const after = kids.slice(idx + 1).filter(isSectionLikeSiblingLocal);
+					if (idx >= 0) {
+						const before = kids
+							.slice(0, idx)
+							.map((n) => normalizeSibling(n, par!))
+							.filter((n): n is Node => n !== null);
+						const after = kids
+							.slice(idx + 1)
+							.map((n) => normalizeSibling(n, par!))
+							.filter((n): n is Node => n !== null);
 						siblingBefore.unshift(...before);
 						siblingAfter.push(...after);
 					}
@@ -372,6 +457,13 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 	promoteTableSpacingToCells(doc.body);
 	promoteCellTypographyToBlocks(doc.body);
 	promoteInheritedTypography(doc.body);
+	if (hasDocumentBody) {
+		for (const paragraph of Array.from(doc.body.querySelectorAll("p"))) {
+			// Explicit or inherited source sizes were promoted above. Unstyled
+			// HTML paragraphs otherwise use 16px, rather than the editor's 14px.
+			if (!paragraph.style.fontSize) paragraph.style.fontSize = "16px";
+		}
+	}
 	stampThemeNeutralBlockPadding(doc.body);
 	alignImageOnlyTableRows(doc.body);
 	alignImageOnlyCells(doc.body);
