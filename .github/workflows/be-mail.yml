@@ -5,12 +5,30 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/mail/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-delivery/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-mail.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/mail/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-delivery/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-mail.yml'
   workflow_dispatch:

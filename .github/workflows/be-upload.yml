@@ -5,12 +5,26 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/upload/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-upload.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/upload/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-upload.yml'
   workflow_dispatch:

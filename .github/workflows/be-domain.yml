@@ -5,12 +5,28 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/domain/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-domain.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/domain/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-domain.yml'
   workflow_dispatch:

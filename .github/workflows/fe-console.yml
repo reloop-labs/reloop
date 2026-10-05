@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - 'apps/frontend/console/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tailwind/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'packages/ui/**'
       - 'packages/auth/**'
       - '.github/workflows/fe-console.yml'

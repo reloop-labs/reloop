@@ -5,12 +5,26 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/campaigns/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-campaigns.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/campaigns/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-campaigns.yml'
   workflow_dispatch:

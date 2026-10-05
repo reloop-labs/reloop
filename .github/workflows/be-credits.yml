@@ -5,12 +5,28 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/credits/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/pricing/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - '.github/workflows/be-credits.yml'
       - 'docker-compose.setup.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/credits/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/pricing/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - '.github/workflows/be-credits.yml'
       - 'docker-compose.setup.yml'
   workflow_dispatch:

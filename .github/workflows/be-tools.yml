@@ -5,12 +5,30 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/tools/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-delivery/**'
+      - 'packages/webhook-events/**'
       - 'packages/email-validation/**'
       - '.github/workflows/be-tools.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/tools/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-delivery/**'
+      - 'packages/webhook-events/**'
       - 'packages/email-validation/**'
       - '.github/workflows/be-tools.yml'
   workflow_dispatch:

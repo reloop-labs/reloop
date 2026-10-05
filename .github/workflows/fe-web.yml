@@ -6,6 +6,17 @@ on:
       - main
     paths:
       - 'apps/frontend/web/**'
+      - 'packages/analytics/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/pricing/**'
+      - 'packages/tailwind/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'packages/ui/**'
       - 'install/install.sh'
       - '.github/workflows/fe-web.yml'

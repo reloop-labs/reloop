@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - 'apps/frontend/dashboard/**'
+      - 'packages/analytics/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
       - 'packages/auth/**'
       - 'packages/pricing/**'
       - 'packages/tailwind/**'
