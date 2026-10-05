@@ -31,7 +31,7 @@ export function SecureVerification() {
 											data-grid-content="true"
 											className="flex h-full min-h-[60px] items-center justify-center bg-white p-4 sm:p-6 dark:bg-black"
 										>
-											<div className="flex size-16 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 opacity-60 [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:border-zinc-800 dark:bg-zinc-900">
+											<div className="flex size-16 items-center justify-center rounded-xl border border-stroke-soft-100 bg-zinc-50 opacity-60 [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:border-white/10 dark:bg-zinc-900">
 												<Mail className="size-5 text-zinc-400 dark:text-zinc-500" />
 											</div>
 										</div>
@@ -49,7 +49,7 @@ export function SecureVerification() {
 											className="h-fit bg-white p-6 dark:bg-black"
 										>
 											<div className="w-full space-y-1 text-sm">
-												<span className="mb-3 flex size-12 items-center justify-center rounded border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+												<span className="mb-3 flex size-12 items-center justify-center rounded border border-stroke-soft-100 bg-zinc-50 dark:border-white/10 dark:bg-zinc-900">
 													<Server className="size-5 text-zinc-400 dark:text-zinc-500" />
 												</span>
 												<div className="grid grid-cols-[auto_1fr] items-center gap-2">
@@ -84,7 +84,7 @@ export function SecureVerification() {
 											data-grid-content="true"
 											className="relative h-fit bg-white p-2 dark:bg-black"
 										>
-											<div className="relative rounded-xl border border-zinc-200/90 bg-white p-6 shadow-black/5 shadow-xl ring-1 ring-zinc-950/5 dark:border-zinc-800 dark:bg-zinc-900 dark:ring-white/10">
+											<div className="relative rounded-xl border border-stroke-soft-100 bg-white p-6 shadow-black/5 shadow-xl ring-1 ring-zinc-950/5 dark:border-white/10 dark:bg-zinc-900 dark:ring-white/10">
 												<div>
 													<div className="flex items-center justify-between">
 														<p className="font-mono text-[11px] text-zinc-500 uppercase dark:text-zinc-400">
@@ -99,7 +99,7 @@ export function SecureVerification() {
 														{credentialRows.map((row) => (
 															<div
 																key={row.label}
-																className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200/80 bg-zinc-50/60 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-950/50"
+																className="flex items-center justify-between gap-3 rounded-lg border border-stroke-soft-100 bg-zinc-50/60 px-3 py-2 dark:border-white/10 dark:bg-zinc-950/50"
 															>
 																<div className="min-w-0">
 																	<p className="text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -109,12 +109,12 @@ export function SecureVerification() {
 																		{row.value}
 																	</p>
 																</div>
-																<span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500">
+																<span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-stroke-soft-100 bg-white text-zinc-400 dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-500">
 																	<Copy className="size-3.5" />
 																</span>
 															</div>
 														))}
-														<div className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200/80 bg-zinc-50/60 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-950/50">
+														<div className="flex items-center justify-between gap-3 rounded-lg border border-stroke-soft-100 bg-zinc-50/60 px-3 py-2 dark:border-white/10 dark:bg-zinc-950/50">
 															<div className="min-w-0">
 																<p className="text-[11px] text-zinc-500 dark:text-zinc-400">
 																	Password
@@ -123,7 +123,7 @@ export function SecureVerification() {
 																	••••••••••••
 																</p>
 															</div>
-															<span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500">
+															<span className="flex size-7 shrink-0 items-center justify-center rounded-md border border-stroke-soft-100 bg-white text-zinc-400 dark:border-white/10 dark:bg-zinc-900 dark:text-zinc-500">
 																<Copy className="size-3.5" />
 															</span>
 														</div>
@@ -162,7 +162,7 @@ export function SecureVerification() {
 											data-grid-content="true"
 											className="flex h-full min-h-[60px] items-center justify-center bg-white p-4 sm:p-6 dark:bg-black"
 										>
-											<div className="flex size-16 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 opacity-60 [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:border-zinc-800 dark:bg-zinc-900">
+											<div className="flex size-16 items-center justify-center rounded-xl border border-stroke-soft-100 bg-zinc-50 opacity-60 [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:border-white/10 dark:bg-zinc-900">
 												<Mail className="size-5 text-zinc-400 dark:text-zinc-500" />
 											</div>
 										</div>

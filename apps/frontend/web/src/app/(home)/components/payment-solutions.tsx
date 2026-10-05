@@ -111,10 +111,10 @@ export function PaymentSolutions() {
 										data-grid-content="true"
 										className="relative h-fit bg-white p-2 dark:bg-black"
 									>
-										<div className="relative z-10 w-full overflow-hidden rounded-2xl border border-zinc-200/90 bg-white px-6 py-5 shadow-2xl shadow-emerald-950/15 ring-1 ring-zinc-950/10 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none dark:ring-white/15">
+										<div className="relative z-10 w-full overflow-hidden rounded-2xl border border-stroke-soft-100 bg-white px-6 py-5 shadow-2xl shadow-emerald-950/15 ring-1 ring-zinc-950/10 dark:border-white/10 dark:bg-zinc-900 dark:shadow-none dark:ring-white/15">
 											{/* Toggle: Monthly / Credits */}
 											<div className="flex items-center justify-between">
-												<div className="flex rounded-full border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-700 dark:bg-zinc-950">
+												<div className="flex rounded-full border border-stroke-soft-100 bg-zinc-50 p-1 dark:border-white/10 dark:bg-zinc-950">
 													<span className="rounded-full bg-white px-3 py-1 font-medium text-[11px] text-zinc-900 shadow-sm ring-1 ring-zinc-950/10 dark:bg-zinc-800 dark:text-white dark:ring-white/10">
 														Monthly
 													</span>
