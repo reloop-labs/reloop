@@ -1,3 +1,4 @@
+import { productionSiteUrl } from "@reloop/web/lib/site";
 import { ImageResponse } from "next/og";
 
 export const alt = "Domain Age Checker | Reloop";
@@ -112,97 +113,73 @@ function formatDateOnly(iso: string): string {
 	}
 }
 
-async function fetchJsonWithTimeout(
-	url: string,
-	ms: number,
-): Promise<{ status: number; body: unknown } | null> {
-	const controller = new AbortController();
-	const t = setTimeout(() => controller.abort(), ms);
-	try {
-		const res = await fetch(url, {
-			headers: {
-				Accept: "application/rdap+json, application/json",
-				"User-Agent": "Reloop-Domain-Age-OG/1.0",
-			},
-			signal: controller.signal,
-		});
-		let body: unknown = null;
-		try {
-			body = await res.json();
-		} catch {
-			body = null;
-		}
-		return { status: res.status, body };
-	} catch {
-		return null;
-	} finally {
-		clearTimeout(t);
-	}
-}
+type DomainAgeApiReport = {
+	verdict:
+		| "too_new"
+		| "cold"
+		| "warming"
+		| "established"
+		| "mature"
+		| "unknown_age"
+		| "not_registered"
+		| "held";
+	headline: string;
+	age: { createdAt: string | null; ageDays: number | null };
+};
 
+/**
+ * Single source of truth: the tools API already combines RDAP (with its
+ * ccTLD registry catalog), DNS auth, and warmup classification — the OG
+ * image just renders whatever it reports.
+ */
 async function lookupAge(domain: string): Promise<{
 	createdAt: string | null;
 	ageDays: number | null;
 	verdict: Verdict;
 	ageLabel: string | null;
 }> {
-	const now = new Date();
-	// rdap.org follows the IANA bootstrap to the authoritative registry.
-	const result = await fetchJsonWithTimeout(
-		`https://rdap.org/domain/${encodeURIComponent(domain)}`,
-		4500,
-	);
-	if (!result || result.status !== 200 || !result.body) {
-		return {
-			createdAt: null,
-			ageDays: null,
-			verdict: "unknown",
-			ageLabel: null,
-		};
-	}
-	const data = result.body as {
-		events?: Array<{ eventAction?: string; eventDate?: string }>;
+	const unknown = {
+		createdAt: null,
+		ageDays: null,
+		verdict: "unknown" as Verdict,
+		ageLabel: null,
 	};
-	let createdAt: string | null = null;
-	if (Array.isArray(data.events)) {
-		for (const ev of data.events) {
-			if (ev.eventAction === "registration" && ev.eventDate) {
-				try {
-					createdAt = new Date(ev.eventDate).toISOString();
-				} catch {
-					createdAt = null;
-				}
-			}
-		}
-	}
-	if (!createdAt) {
+	try {
+		// POST: the GET endpoint 500s for some inputs (e.g. ?domain=reloop.sh
+		// returns text/plain "Something went wrong!" while the identical POST
+		// succeeds) — backend issue to investigate separately.
+		const res = await fetch(`${productionSiteUrl}/api/tools/v1/domain-age`, {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"User-Agent": "Reloop-Domain-Age-OG/1.0",
+			},
+			body: JSON.stringify({ domain }),
+			next: { revalidate: 86_400 },
+			signal: AbortSignal.timeout(8000),
+		});
+		if (!res.ok) return unknown;
+		const report = (await res.json()) as DomainAgeApiReport;
+		const createdAt = report.age?.createdAt ?? null;
+		const ageDays = report.age?.ageDays ?? null;
+		const verdict: Verdict =
+			report.verdict === "too_new" ||
+			report.verdict === "cold" ||
+			report.verdict === "warming" ||
+			report.verdict === "established" ||
+			report.verdict === "mature"
+				? report.verdict
+				: "unknown";
 		return {
-			createdAt: null,
-			ageDays: null,
-			verdict: "unknown",
-			ageLabel: null,
+			createdAt,
+			ageDays,
+			verdict,
+			ageLabel: createdAt ? formatPreciseAge(createdAt, new Date()) : null,
 		};
+	} catch {
+		return unknown;
 	}
-	const ageDays = Math.max(
-		0,
-		Math.floor((now.getTime() - new Date(createdAt).getTime()) / 86_400_000),
-	);
-	const verdict: Verdict =
-		ageDays <= 7
-			? "too_new"
-			: ageDays <= 30
-				? "cold"
-				: ageDays <= 90
-					? "warming"
-					: ageDays <= 365
-						? "established"
-						: "mature";
-	return {
-		createdAt,
-		ageDays,
-		verdict,
-		ageLabel: formatPreciseAge(createdAt, now),
-	};
 }
 
 async function loadFonts(): Promise<
