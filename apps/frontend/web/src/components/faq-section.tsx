@@ -149,7 +149,7 @@ export function FaqSection({
 							</h3>
 						</div>
 						{/* Right questions */}
-						<div className="col-span-full border-stroke-soft-100 border-t lg:col-span-4 lg:border-t-0 dark:border-white/10">
+						<div className="col-span-full border-stroke-soft-100 border-t lg:col-span-4 lg:border-t-0 lg:border-l dark:border-white/10">
 							{group.items.map((faq, i) => renderItem(faq, `${gi}-${i}`))}
 						</div>
 					</div>
@@ -183,7 +183,7 @@ export function FaqSection({
 					</h2>
 				</header>
 
-				<div className="col-span-full border-stroke-soft-100 lg:col-span-4 dark:border-white/10">
+				<div className="col-span-full border-stroke-soft-100 lg:col-span-4 lg:border-l dark:border-white/10">
 					{resolvedGroups.flatMap((group, gi) =>
 						group.items.map((faq, i) => renderItem(faq, `${gi}-${i}`)),
 					)}

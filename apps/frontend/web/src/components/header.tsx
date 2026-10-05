@@ -2598,19 +2598,16 @@ export const Header = () => {
 											}
 											style={{
 												left: megaLeft,
-												top: isLanding ? "calc(100% + 18px)" : undefined,
+												top: "100%",
 											}}
-											className="absolute top-full z-50 hidden origin-top-left pt-2 lg:block"
+											className="absolute top-full z-50 hidden origin-top-left lg:block"
 										>
-											{/* Hover bridge so the gap between bar and card doesn't close the menu */}
-											<div
-												className="-top-2 absolute inset-x-0 h-2"
-												aria-hidden
-											/>
 											<section
 												className={cn(
-													"overflow-hidden border border-stroke-soft-200/90 bg-bg-white-0 shadow-[0_18px_50px_-12px_rgba(15,23,42,0.14),0_6px_18px_-6px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-black dark:shadow-[0_20px_56px_-12px_rgba(0,0,0,0.65)]",
-													isLanding ? "rounded-[24px]" : "rounded-[20px]",
+													"overflow-hidden border-x border-b border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-black",
+													isLanding
+														? "rounded-b-[24px]"
+														: "rounded-b-[20px]",
 												)}
 												id="desktop-navigation-panel"
 												aria-label={`${activeItem.title} menu`}
@@ -2706,7 +2703,7 @@ export const Header = () => {
 							{mounted && session ? (
 								<FancyButton.Root
 									asChild
-									variant="primary"
+									variant="neutral"
 									size="xsmall"
 									className="px-3.5! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 								>
@@ -2715,7 +2712,7 @@ export const Header = () => {
 							) : (
 								<FancyButton.Root
 									asChild
-									variant="primary"
+									variant="neutral"
 									size="xsmall"
 									className="px-3.5! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 								>
@@ -3039,7 +3036,7 @@ export const Header = () => {
 												</FancyButton.Root>
 												<FancyButton.Root
 													asChild
-													variant="primary"
+													variant="neutral"
 													size="medium"
 													className="w-full! dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 												>
