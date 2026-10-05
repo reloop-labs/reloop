@@ -25,18 +25,29 @@ const MEGA_SLIDE_MS = 0.25;
  * dir = 0: first open (no horizontal slide)
  */
 const megaContentVariants = {
-	enter: (dir: number) => ({
-		opacity: 0,
-		x: dir > 0 ? MEGA_SLIDE_PX : dir < 0 ? -MEGA_SLIDE_PX : 0,
-	}),
+	// First open/close (dir = 0): plain fade — the shell already drops.
+	// Tab switch: directional horizontal slides.
+	enter: (dir: number) =>
+		dir === 0
+			? { opacity: 0, x: 0, y: 0 }
+			: {
+					opacity: 0,
+					x: dir > 0 ? MEGA_SLIDE_PX : -MEGA_SLIDE_PX,
+					y: 0,
+				},
 	center: {
 		opacity: 1,
 		x: 0,
+		y: 0,
 	},
-	exit: (dir: number) => ({
-		opacity: 0,
-		x: dir > 0 ? -MEGA_SLIDE_PX : dir < 0 ? MEGA_SLIDE_PX : 0,
-	}),
+	exit: (dir: number) =>
+		dir === 0
+			? { opacity: 0, x: 0, y: 0 }
+			: {
+					opacity: 0,
+					x: dir > 0 ? -MEGA_SLIDE_PX : MEGA_SLIDE_PX,
+					y: 0,
+				},
 };
 
 type BrandIcon = {
@@ -866,7 +877,7 @@ const navItems: NavItem[] = [
 			spotlight: {
 				title: "Agent Inbox",
 				href: "/use-cases/ai-agent-inbox",
-				icon: "inbox",
+				icon: "agent",
 				description:
 					"Give AI agents their own inboxes to receive, parse, and respond to email.",
 			},
@@ -881,6 +892,7 @@ const navItems: NavItem[] = [
 						{
 							title: "Transactional",
 							href: "/features/transaction-emails",
+							icon: "mail-send",
 							description:
 								"High-deliverability APIs for auth, receipts, and system alerts.",
 							featuredTransactional: true,
@@ -889,6 +901,7 @@ const navItems: NavItem[] = [
 						{
 							title: "Marketing",
 							href: "/features/email-marketing",
+							icon: "mega-phone",
 							description:
 								"Broadcasts, automated drip flows, and audience segments.",
 							featuredMarketing: true,
@@ -905,25 +918,29 @@ const navItems: NavItem[] = [
 							title: "Email API",
 							href: "/docs/api",
 							customIcon: <OpenApiIcon className="size-3.5" />,
-							description: "Send mail with REST",
+							description:
+								"Send transactional and batch emails via resilient REST APIs.",
 						},
 						{
 							title: "Templates",
 							href: "/features/email-templates",
 							icon: "layout",
-							description: "Design reusable emails",
+							description:
+								"Design, version, and preview reusable templates with React & code.",
 						},
 						{
 							title: "Inbound",
 							href: "/use-cases/inbound-email",
 							icon: "mail-receive",
-							description: "Receive and parse mail",
+							description:
+								"Receive, parse, and route incoming emails directly to webhooks.",
 						},
 						{
 							title: "Contacts",
 							href: "/docs/learn/contacts",
 							icon: "contacts",
-							description: "Audiences and segments",
+							description:
+								"Manage subscriber lists, custom properties, and audience segments.",
 						},
 					],
 				},
@@ -935,25 +952,29 @@ const navItems: NavItem[] = [
 							title: "Agent Inbox",
 							href: "/use-cases/ai-agent-inbox",
 							icon: "inbox",
-							description: "Email for AI agents",
+							description:
+								"Give AI agents dedicated inboxes to receive, parse, and respond.",
 						},
 						{
 							title: "SMTP",
 							href: "/features/smtp",
 							icon: "smtp",
-							description: "Drop-in SMTP relay",
+							description:
+								"Drop-in SMTP relay with high deliverability and instant auth.",
 						},
 						{
 							title: "Workflows",
 							href: "/docs/learn/workflows",
 							icon: "workflow",
-							description: "Automate email sequences",
+							description:
+								"Build event-driven email automations and scheduled drip sequences.",
 						},
 						{
 							title: "Webhooks",
 							href: "/features/webhooks",
 							icon: "webhook",
-							description: "Realtime delivery events",
+							description:
+								"Stream realtime delivery, bounce, and engagement events to your app.",
 						},
 					],
 				},
@@ -1966,24 +1987,46 @@ function MegaSocialIcons({
 }
 
 /**
- * Tailark-style plain row: semibold title + truncated muted description,
- * no icon tile. Used only in the landing mega panel.
+ * Tailark-style row with plain line icon (no tile / bg).
+ * Apple-style minimal outline icon + text.
+ * Used only in the landing mega panel.
  */
 function TailarkMegaRow({ link }: { link: NavLink }) {
 	const external = isExternalHref(link.href, link.external);
 	const crossDomain = isCrossDomain(link.href);
 	const className =
-		"group block min-w-0 rounded-xl px-1 py-2 transition-opacity hover:opacity-70";
+		"group flex min-w-0 items-start gap-3.5 rounded-xl p-2 -mx-2 hover:bg-neutral-100 dark:hover:bg-white/10";
 	const body = (
 		<>
-			<span className="block truncate font-semibold text-[15px] text-text-strong-950 tracking-[-0.01em] dark:text-white">
-				{link.title}
+			<span className="mt-0.5 inline-flex shrink-0 text-text-sub-600 dark:text-white/70">
+				{link.customIcon ? (
+					<span className="inline-flex size-5 items-center justify-center [&>svg]:size-5">
+						{link.customIcon}
+					</span>
+				) : link.brand ? (
+					<svg
+						viewBox="0 0 24 24"
+						className="size-5"
+						fill="currentColor"
+						aria-hidden
+					>
+						<title>{link.brand.title}</title>
+						<path d={link.brand.path} />
+					</svg>
+				) : link.icon ? (
+					<Icon name={link.icon} className="size-5" />
+				) : null}
 			</span>
-			{link.description && (
-				<span className="mt-0.5 block truncate text-[14px] text-text-sub-600 leading-snug dark:text-white/50">
-					{link.description}
+			<span className="min-w-0 flex-1">
+				<span className="block truncate font-semibold text-[15px] text-text-strong-950 tracking-[-0.01em] dark:text-white">
+					{link.title}
 				</span>
-			)}
+				{link.description && (
+					<span className="mt-0.5 block text-[13px] text-text-sub-600 leading-normal line-clamp-2 dark:text-white/50">
+						{link.description}
+					</span>
+				)}
+			</span>
 		</>
 	);
 
@@ -2032,24 +2075,24 @@ function TailarkMegaPanel({ item }: { item: NavItem }) {
 		? isCrossDomain(spotlight.href)
 		: false;
 	const spotlightClassName =
-		"group flex min-w-0 items-center gap-4 transition-opacity hover:opacity-70";
+		"group flex min-w-0 items-start gap-3.5 rounded-xl p-2 -mx-2 hover:bg-neutral-100 dark:hover:bg-white/10";
 	const spotlightShared = {
 		className: spotlightClassName,
 		...(spotlightExternal ? { target: "_blank", rel: "noreferrer" } : {}),
 	};
 	const spotlightBody = spotlight ? (
 		<>
-			<span className="inline-flex size-12 shrink-0 items-center justify-center rounded-2xl border border-stroke-soft-200/90 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/70">
+			<span className="mt-0.5 inline-flex shrink-0 text-text-sub-600 dark:text-white/70">
 				{spotlight.icon ? (
 					<Icon name={spotlight.icon} className="size-5" />
 				) : null}
 			</span>
-			<span className="min-w-0">
-				<span className="block truncate font-semibold text-[16px] text-text-strong-950 tracking-[-0.01em] dark:text-white">
+			<span className="min-w-0 flex-1">
+				<span className="block truncate font-semibold text-[15px] text-text-strong-950 tracking-[-0.01em] dark:text-white">
 					{spotlight.title}
 				</span>
 				{spotlight.description && (
-					<span className="mt-0.5 block truncate text-[14px] text-text-sub-600 leading-snug dark:text-white/50">
+					<span className="mt-0.5 block text-[13px] text-text-sub-600 leading-normal line-clamp-2 dark:text-white/50">
 						{spotlight.description}
 					</span>
 				)}
@@ -2057,18 +2100,21 @@ function TailarkMegaPanel({ item }: { item: NavItem }) {
 		</>
 	) : null;
 
-	return (
-		<div className="min-w-0 p-8 sm:p-10">
-			<div className="grid grid-cols-3 gap-x-12 border-stroke-soft-200/80 border-b pb-4 dark:border-white/[0.08]">
-				<p className="truncate font-medium text-[15px] text-text-sub-600 dark:text-white/50">
-					{item.title}
-				</p>
-				<p className="col-span-2 truncate font-medium text-[15px] text-text-sub-600 dark:text-white/50">
-					More {item.title}
-				</p>
-			</div>
+	const isFeatures = item.title === "Features";
 
-			<div className="grid grid-cols-3 gap-x-12 gap-y-1 py-6">
+	return (
+		<div
+			className={cn(
+				"min-w-0 px-6 md:px-12",
+				isFeatures ? "pt-3.5 pb-4" : "py-8",
+			)}
+		>
+			<div
+				className={cn(
+					"grid grid-cols-3 gap-x-10 gap-y-2",
+					isFeatures ? "pt-0 pb-1" : "py-1",
+				)}
+			>
 				{columns.map((links, columnIndex) => (
 					<div key={`tailark-col-${columnIndex}`} className="min-w-0">
 						{links.map((link) => (
@@ -2079,7 +2125,12 @@ function TailarkMegaPanel({ item }: { item: NavItem }) {
 			</div>
 
 			{spotlight && (
-				<div className="border-stroke-soft-200/80 border-t pt-6 dark:border-white/[0.08]">
+				<div
+					className={cn(
+						"border-stroke-soft-200/80 border-t dark:border-white/[0.08]",
+						isFeatures ? "mt-4 pt-4" : "mt-6 pt-6",
+					)}
+				>
 					{spotlightCrossDomain || spotlightExternal ? (
 						<a href={spotlight.href} {...spotlightShared}>
 							{spotlightBody}
@@ -2258,8 +2309,6 @@ export const Header = () => {
 	/** Measured mega content height for smooth panel morph (no layout thrash) */
 	const [megaLeft, setMegaLeft] = useState(0);
 	const [megaHeight, setMegaHeight] = useState<number | "auto">("auto");
-	/** Landing panel tracks the 1280px hero frame width (Tailark parity) */
-	const [landingPanelWidth, setLandingPanelWidth] = useState(1280);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
 	const [mounted, setMounted] = useState(false);
@@ -2316,21 +2365,15 @@ export const Header = () => {
 		}
 		const measure = () => {
 			setMegaHeight(el.offsetHeight);
+			if (isLanding) return;
 			const rect = nav.getBoundingClientRect();
-			let width = getMegaPanelWidthPx(
+			const width = getMegaPanelWidthPx(
 				navItems.find((item) => item.title === activeMega),
 			);
-			let desired = 0;
-			if (isLanding && frameRef.current) {
-				const frame = frameRef.current.getBoundingClientRect();
-				width = frame.width;
-				setLandingPanelWidth(frame.width);
-				desired = frame.left - rect.left;
-			}
 			setMegaLeft(
 				Math.max(
 					16 - rect.left,
-					Math.min(desired, window.innerWidth - 16 - rect.left - width),
+					Math.min(0, window.innerWidth - 16 - rect.left - width),
 				),
 			);
 		};
@@ -2405,9 +2448,7 @@ export const Header = () => {
 	if (pathname === "/twitter" || pathname?.startsWith("/twitter/")) return null;
 
 	const activeItem = navItems.find((item) => item.title === activeMega);
-	const targetMegaWidth = isLanding
-		? landingPanelWidth
-		: getMegaPanelWidthPx(activeItem);
+	const targetMegaWidth = getMegaPanelWidthPx(activeItem);
 
 	return (
 		<header
@@ -2567,118 +2608,110 @@ export const Header = () => {
 
 								{/*
 							  Mega menu motion:
-							  - Open/close: fade + slight drop from top (Tailark feel),
-							    same 0.2s timing as before
+							  - Open/close: single fade + 8px drop from the bar,
+							    0.25s (no scale — keeps the flush frame edges crisp)
+							  - First open content: fades in place
 							  - Tab switch: height spring on shell; directional
 							    left/right content slides (unchanged)
 							*/}
-								<AnimatePresence>
-									{activeMega && activeItem?.mega && (
-										<motion.div
-											key="mega-shell"
-											initial={
-												shouldReduceMotion
-													? { opacity: 0 }
-													: { opacity: 0, scale: 0.98, y: -10 }
-											}
-											animate={
-												shouldReduceMotion
-													? { opacity: 1 }
-													: { opacity: 1, scale: 1, y: 0 }
-											}
-											exit={
-												shouldReduceMotion
-													? { opacity: 0 }
-													: { opacity: 0, scale: 0.98, y: -10 }
-											}
-											transition={
-												shouldReduceMotion
-													? { duration: 0 }
-													: { duration: 0.2, ease: EASE_DEFAULT }
-											}
-											style={{
-												left: megaLeft,
-												top: "100%",
-											}}
-											className="absolute top-full z-50 hidden origin-top-left lg:block"
-										>
-											<section
-												className={cn(
-													"overflow-hidden border-x border-b border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-black",
-													isLanding
-														? "rounded-b-[24px]"
-														: "rounded-b-[20px]",
-												)}
-												id="desktop-navigation-panel"
-												aria-label={`${activeItem.title} menu`}
+								{!isLanding && (
+									<AnimatePresence>
+										{activeMega && activeItem?.mega && (
+											<motion.div
+												key="mega-shell"
+												initial={
+													shouldReduceMotion
+														? { opacity: 0 }
+														: { opacity: 0, y: -8 }
+												}
+												animate={
+													shouldReduceMotion
+														? { opacity: 1 }
+														: { opacity: 1, y: 0 }
+												}
+												exit={
+													shouldReduceMotion
+														? { opacity: 0 }
+														: { opacity: 0, y: -8 }
+												}
+												transition={
+													shouldReduceMotion
+														? { duration: 0 }
+														: { duration: 0.25, ease: EASE_DEFAULT }
+												}
+												style={{
+													left: megaLeft,
+													top: "100%",
+												}}
+												className="absolute top-full z-50 hidden lg:block"
 											>
-												{/* Panel shell: width springs per menu; height morphs with content */}
-												<motion.div
-													initial={false}
-													animate={{
-														width: targetMegaWidth,
-														height:
-															shouldReduceMotion || megaHeight === "auto"
-																? "auto"
-																: megaHeight,
-													}}
-													transition={
-														shouldReduceMotion
-															? { duration: 0 }
-															: {
-																	type: "spring",
-																	bounce: 0,
-																	duration: 0.32,
-																}
-													}
-													style={{
-														overflow: "hidden",
-														maxWidth: "calc(100vw - 2rem)",
-														maxHeight: "calc(100dvh - 100px)",
-														overflowY: "auto",
-													}}
+												<section
+													className="overflow-hidden rounded-b-[20px] border-x border-b border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-black"
+													id="desktop-navigation-panel"
+													aria-label={`${activeItem.title} menu`}
 												>
-													<div
-														ref={megaContentRef}
-														className="relative"
-														style={{ width: targetMegaWidth }}
+													<motion.div
+														initial={false}
+														animate={{
+															width: targetMegaWidth,
+															height:
+																shouldReduceMotion || megaHeight === "auto"
+																	? "auto"
+																	: megaHeight,
+														}}
+														transition={
+															shouldReduceMotion
+																? { duration: 0 }
+																: {
+																		type: "spring",
+																		bounce: 0,
+																		duration: 0.32,
+																	}
+														}
+														style={{
+															overflow: "hidden",
+															maxWidth: "calc(100vw - 2rem)",
+														}}
 													>
-														<AnimatePresence
-															initial={false}
-															custom={megaDirection}
-															mode="popLayout"
+														<div
+															ref={megaContentRef}
+															className="relative"
+															style={{
+																width: targetMegaWidth,
+															}}
 														>
-															<motion.div
-																key={activeMega}
+															<AnimatePresence
+																initial={false}
 																custom={megaDirection}
-																variants={megaContentVariants}
-																initial={shouldReduceMotion ? false : "enter"}
-																animate="center"
-																exit={shouldReduceMotion ? undefined : "exit"}
-																transition={
-																	shouldReduceMotion
-																		? { duration: 0 }
-																		: {
-																				duration: MEGA_SLIDE_MS,
-																				ease: EASE_DEFAULT,
-																			}
-																}
-																// Keep full width while popLayout takes the exiting panel out of flow
-																className="w-full"
+																mode="popLayout"
 															>
-																{isLanding ? (
-																	<TailarkMegaPanel item={activeItem} />
-																) : (
+																<motion.div
+																	key={activeMega}
+																	custom={megaDirection}
+																	variants={megaContentVariants}
+																	initial={shouldReduceMotion ? false : "enter"}
+																	animate="center"
+																	exit={shouldReduceMotion ? undefined : "exit"}
+																	transition={
+																		shouldReduceMotion
+																			? { duration: 0 }
+																			: {
+																					duration: MEGA_SLIDE_MS,
+																					ease: EASE_DEFAULT,
+																				}
+																	}
+																	className="w-full"
+																>
 																	<MegaPanel item={activeItem} />
-																)}
-															</motion.div>
-														</AnimatePresence>
-													</div>
-												</motion.div>
-											</section>
-										</motion.div>
-									)}
-								</AnimatePresence>
+																</motion.div>
+															</AnimatePresence>
+														</div>
+													</motion.div>
+												</section>
+											</motion.div>
+										)}
+									</AnimatePresence>
+								)}
 							</nav>
 						</div>
 
@@ -2764,6 +2797,90 @@ export const Header = () => {
 							</span>
 						</button>
 					</div>
+
+					{/* Desktop Mega Menu for Landing (spans the entire frame width flush with borders) */}
+					{isLanding && (
+						<AnimatePresence>
+							{activeMega && activeItem?.mega && (
+								<motion.div
+									key="mega-shell-landing"
+									initial={
+										shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }
+									}
+									animate={
+										shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }
+									}
+									exit={
+										shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }
+									}
+									transition={
+										shouldReduceMotion
+											? { duration: 0 }
+											: { duration: 0.25, ease: EASE_DEFAULT }
+									}
+									className="absolute top-full -left-px -right-px z-50 hidden lg:block"
+								>
+									<section
+										className="overflow-hidden rounded-b-[24px] border-x border-b border-stroke-soft-100 bg-bg-white-0 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] dark:border-white/10 dark:bg-black dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)]"
+										id="desktop-navigation-panel"
+										aria-label={`${activeItem.title} menu`}
+									>
+										<motion.div
+											initial={false}
+											animate={{
+												width: "100%",
+												height:
+													shouldReduceMotion || megaHeight === "auto"
+														? "auto"
+														: megaHeight,
+											}}
+											transition={
+												shouldReduceMotion
+													? { duration: 0 }
+													: {
+															type: "spring",
+															bounce: 0,
+															duration: 0.32,
+														}
+											}
+											style={{
+												overflow: "hidden",
+												maxWidth: "100%",
+											}}
+										>
+											<div ref={megaContentRef} className="relative w-full">
+												<AnimatePresence
+													initial={false}
+													custom={megaDirection}
+													mode="popLayout"
+												>
+													<motion.div
+														key={activeMega}
+														custom={megaDirection}
+														variants={megaContentVariants}
+														initial={shouldReduceMotion ? false : "enter"}
+														animate="center"
+														exit={shouldReduceMotion ? undefined : "exit"}
+														transition={
+															shouldReduceMotion
+																? { duration: 0 }
+																: {
+																		duration: MEGA_SLIDE_MS,
+																		ease: EASE_DEFAULT,
+																	}
+														}
+														className="w-full"
+													>
+														<TailarkMegaPanel item={activeItem} />
+													</motion.div>
+												</AnimatePresence>
+											</div>
+										</motion.div>
+									</section>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					)}
 
 					<AnimatePresence>
 						{mobileMenuOpen && (

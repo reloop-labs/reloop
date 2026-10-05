@@ -23,7 +23,8 @@ const FIELD_ERROR_MESSAGE = "Please enter a valid domain (e.g. example.com).";
 function getDomainParam(): string | null {
 	if (typeof window === "undefined") return null;
 	try {
-		const param = new URLSearchParams(window.location.search).get("domain");
+		const params = new URLSearchParams(window.location.search);
+		const param = params.get("domainName") ?? params.get("domain");
 		return param && param.trim().length > 0 ? param.trim().slice(0, 253) : null;
 	} catch {
 		return null;
@@ -34,9 +35,14 @@ function syncDomainParam(value: string | null) {
 	if (typeof window === "undefined") return;
 	try {
 		const url = new URL(window.location.href);
-		if (value && value.trim().length > 0)
-			url.searchParams.set("domain", value.trim());
-		else url.searchParams.delete("domain");
+		if (value && value.trim().length > 0) {
+			url.searchParams.set("domainName", value.trim());
+			// Drop the legacy key so shared URLs stay canonical.
+			url.searchParams.delete("domain");
+		} else {
+			url.searchParams.delete("domainName");
+			url.searchParams.delete("domain");
+		}
 		window.history.replaceState(null, "", url.toString());
 	} catch {}
 }
@@ -46,7 +52,7 @@ function buildShareUrl(input: string): string {
 		typeof window !== "undefined"
 			? `${window.location.origin}${window.location.pathname}`
 			: "/tools/domain-age";
-	return `${base}?domain=${encodeURIComponent(input)}`;
+	return `${base}?domainName=${encodeURIComponent(input)}`;
 }
 
 function validateInput(raw: string): { ok: boolean } {
@@ -333,6 +339,9 @@ export function CheckerPanel() {
 		}
 		field.clear();
 		const clean = normalizeDomainInput(targetDomain);
+		// Shareable URL from the moment a check starts, so reload or a
+		// shared link re-runs the same check even if it errors.
+		syncDomainParam(clean);
 		abortRef.current?.abort();
 		const controller = new AbortController();
 		abortRef.current = controller;
@@ -357,6 +366,21 @@ export function CheckerPanel() {
 		},
 		[],
 	);
+
+	// Deep-link support: ?domainName= (legacy ?domain=) pre-fills and auto-runs.
+	// The timeout defers past StrictMode's remount simulation (whose cleanup
+	// aborts in-flight fetches); the cleanup below clears the first timer so
+	// the check still runs exactly once.
+	useEffect(() => {
+		const preset = getDomainParam();
+		if (!preset) return;
+		setDomain(normalizeDomainInput(preset) || preset);
+		const t = setTimeout(() => {
+			void executeCheck(preset);
+		}, 0);
+		return () => clearTimeout(t);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
@@ -401,7 +425,7 @@ Expires: ${result.age.expiresAt ? formatDateTime(result.age.expiresAt) : "Unknow
 Registrar: ${result.registry.registrar || "Unknown"}
 SPF: ${result.emailSetup.spf ? "Configured" : "Missing"}
 DMARC: ${result.emailSetup.dmarc ? `Configured (${result.emailSetup.dmarcPolicy})` : "Missing"}
-https://reloop.sh/tools/domain-age`;
+https://reloop.sh/tools/domain-age?domainName=${encodeURIComponent(result.domain)}`;
 		navigator.clipboard.writeText(report).then(() => {
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
@@ -409,8 +433,11 @@ https://reloop.sh/tools/domain-age`;
 	};
 
 	const handleCopyLink = async () => {
+		const shareDomain =
+			normalizeDomainInput(domain) || result?.domain || getDomainParam();
+		if (!shareDomain) return;
 		try {
-			await navigator.clipboard.writeText(buildShareUrl(domain));
+			await navigator.clipboard.writeText(buildShareUrl(shareDomain));
 			setCopiedLink(true);
 			setTimeout(() => setCopiedLink(false), 2000);
 		} catch {}

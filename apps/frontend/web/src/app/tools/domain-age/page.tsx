@@ -5,6 +5,8 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import Link from "next/link";
+import { connection } from "next/server";
+import { Suspense } from "react";
 import { SimilarTools } from "../temp-email-checker/components/similar-tools";
 import { CheckerPanel } from "./checker-panel";
 import { ApiIntegration } from "./components/api-integration";
@@ -23,19 +25,66 @@ import {
 } from "./content";
 export const instant = false;
 
-export const metadata = createPageMetadata({
-	title: toolTitle,
-	description: metaDescription,
-	path: toolPath,
-	keywords: toolKeywords,
-	ogImage: "/tools/opengraph-image",
-});
+async function DynamicMetadataMarker() {
+	// Opts this route into dynamic rendering so generateMetadata can read
+	// ?domainName= for per-domain OG tags. Rendered inside <Suspense> below.
+	await connection();
+	return null;
+}
+
+function normalizeDomainParam(
+	raw: string | string[] | undefined,
+): string | null {
+	const first = Array.isArray(raw) ? raw[0] : raw;
+	if (!first) return null;
+	let v = first.trim().toLowerCase();
+	if (!v) return null;
+	v = v.replace(/^https?:\/\//, "").split("/")[0] ?? "";
+	v = v.split("?")[0] ?? "";
+	v = v.split("#")[0] ?? "";
+	v = v.split(":")[0] ?? "";
+	v = v.replace(/[^a-z0-9.-]/g, "");
+	if (!v.includes(".") || v.length < 3 || v.length > 253) return null;
+	return v;
+}
+
+type PageProps = {
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export async function generateMetadata({ searchParams }: PageProps) {
+	const params = await searchParams;
+	const domain =
+		normalizeDomainParam(params.domainName) ??
+		normalizeDomainParam(params.domain);
+
+	if (!domain) {
+		return createPageMetadata({
+			title: toolTitle,
+			description: metaDescription,
+			path: toolPath,
+			keywords: toolKeywords,
+			ogImage: "/tools/opengraph-image",
+		});
+	}
+
+	return createPageMetadata({
+		title: `${domain} — Domain Age, Registration Date & Warmup Check`,
+		description: `How old is ${domain}? Check its registration date, warmup stage (Too New → Established) and email deliverability risk — free, no sign-up.`,
+		path: toolPath,
+		keywords: toolKeywords,
+		ogImage: `/tools/domain-age/og/${encodeURIComponent(domain)}/opengraph-image`,
+	});
+}
 
 export default function DomainAgePage() {
 	const siteUrl = getSiteUrl();
 
 	return (
 		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 [--primary-base:#2563eb] [--primary-dark:#1d4ed8] [--primary-darker:#1e40af] [--primary-link:#1d4ed8] dark:bg-black dark:text-white dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
+			<Suspense>
+				<DynamicMetadataMarker />
+			</Suspense>
 			<JsonLd
 				data={[
 					{

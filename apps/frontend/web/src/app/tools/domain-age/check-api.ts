@@ -58,9 +58,17 @@ export async function runDomainAge(
 
 	if (!res.ok) {
 		const err = await res.json().catch(() => null);
-		throw new Error(
-			err?.message || `Domain age check failed with status ${res.status}.`,
-		);
+		if (err?.message) throw new Error(err.message);
+		// The backend never answers 404 for this route (unknown domains return
+		// 200 with verdict "not_registered"), so a 404 means the tool API isn't
+		// reachable here — e.g. plain localhost:3000 without the backend stack.
+		// Use the full local stack (https://local.reloop.sh) instead.
+		if (res.status === 404) {
+			throw new Error(
+				"Domain age service isn't reachable from this page. Run the full local stack and use https://local.reloop.sh/tools/domain-age instead of plain localhost.",
+			);
+		}
+		throw new Error(`Domain age check failed with status ${res.status}.`);
 	}
 
 	return res.json();
