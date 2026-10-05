@@ -2414,7 +2414,7 @@ export const Header = () => {
 			className={cn(
 				"fixed top-0 right-0 left-0 z-50",
 				isLanding
-					? "border-[#ebebeb] border-t bg-white text-zinc-950 dark:border-[#292929] dark:bg-black dark:text-zinc-50"
+					? "border-stroke-soft-100 border-b bg-white text-zinc-950 dark:border-white/10 dark:bg-black dark:text-zinc-50"
 					: "border-stroke-soft-100 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black",
 			)}
 			onKeyDown={(event) => {
@@ -2435,22 +2435,16 @@ export const Header = () => {
 			<div
 				className={
 					isLanding
-						? "grid grid-cols-[minmax(24px,1fr)_1px_minmax(0,1280px)_1px_minmax(24px,1fr)] bg-[#ebebeb] pb-px max-[1279px]:grid-cols-[24px_1px_minmax(0,1fr)_1px_24px] max-[479px]:grid-cols-[8px_1px_minmax(0,1fr)_1px_8px] dark:bg-[#292929]"
+						? "relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10"
 						: "contents"
 				}
 			>
-				{isLanding ? (
-					<div
-						aria-hidden="true"
-						className="col-start-1 rounded-[4px] bg-white dark:bg-black"
-					/>
-				) : null}
 				<div
 					ref={frameRef}
 					className={cn(
 						"relative mx-auto w-full",
 						isLanding
-							? "col-start-3 w-full rounded-[4px] bg-white p-0 dark:bg-black"
+							? "w-full bg-white p-0 dark:bg-black"
 							: "max-w-5xl border-stroke-soft-100 border-x px-6 md:max-w-7xl dark:border-white/10",
 					)}
 				>
@@ -3061,12 +3055,6 @@ export const Header = () => {
 						)}
 					</AnimatePresence>
 				</div>
-				{isLanding ? (
-					<div
-						aria-hidden="true"
-						className="col-start-5 rounded-[4px] bg-white dark:bg-black"
-					/>
-				) : null}
 			</div>
 		</header>
 	);

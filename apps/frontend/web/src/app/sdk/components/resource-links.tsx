@@ -138,76 +138,22 @@ function ResourceCard({
 	const darkRgb: Rgb = dim ? [228, 228, 231] : brand;
 	const inkLight = `rgb(${lightRgb[0]}, ${lightRgb[1]}, ${lightRgb[2]})`;
 	const inkDark = `rgb(${darkRgb[0]}, ${darkRgb[1]}, ${darkRgb[2]})`;
-	const meshDark = [
-		`radial-gradient(ellipse 110% 85% at 14% 8%, ${rgba(darkRgb, 0.36)} 0%, transparent 58%)`,
-		`radial-gradient(ellipse 80% 70% at 100% 100%, ${rgba(darkRgb, 0.14)} 0%, transparent 52%)`,
-	].join(", ");
-	const meshLight = `radial-gradient(ellipse 80% 60% at 16% 12%, ${rgba(lightRgb, 0.16)} 0%, transparent 68%)`;
 
 	const className = cn(
-		"group relative flex h-full min-h-[180px] w-full max-w-[154px] flex-col justify-between overflow-hidden rounded-[18px] border border-stroke-soft-200/80 bg-bg-white-0 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-[border-color,transform,color,box-shadow] duration-300 ease-out sm:min-h-[200px] sm:p-5",
-		"text-text-strong-950 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-white dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
-		"hover:border-[color:var(--card-ring)] hover:text-[var(--card-ink)] active:scale-[0.98] dark:hover:border-[color:var(--card-ring-dark)] dark:hover:text-[var(--card-ink-dark)]",
+		"group relative flex h-full min-h-[180px] w-full max-w-[154px] flex-col justify-between overflow-hidden border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors duration-200 ease-out sm:min-h-[200px] sm:p-5",
+		"text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white",
+		"hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.03]",
 	);
 
 	const content = (
 		<>
-			{/* Light: tight, quiet tint, no grain, no full-card fog */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:hidden"
-				style={{ backgroundImage: meshLight }}
-			/>
-			{/* Dark: fuller lantern bloom */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-0 hidden opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
-				style={{ backgroundImage: meshDark }}
-			/>
-			{/* Grain is dark-only; on light it reads as cheap stipple */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-0 hidden opacity-0 mix-blend-soft-light transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
-				style={{
-					backgroundImage:
-						"radial-gradient(rgba(255,255,255,0.22) 0.55px, transparent 0.55px)",
-					backgroundSize: "3px 3px",
-					maskImage:
-						"linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
-					WebkitMaskImage:
-						"linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
-				}}
-			/>
-			{/* Glass edge, dark only */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-x-4 top-0 hidden h-px opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
-				style={{
-					background: `linear-gradient(90deg, transparent, ${rgba(darkRgb, 0.7)}, transparent)`,
-				}}
-			/>
-
 			<div className="relative z-10 flex shrink-0 items-start justify-between">
-				<div className="relative flex size-9 items-center justify-center sm:size-10">
-					<span
-						aria-hidden
-						className="absolute inset-0 rounded-xl opacity-0 blur-lg transition-opacity duration-300 ease-out group-hover:opacity-100 dark:hidden"
-						style={{ background: rgba(lightRgb, 0.28) }}
-					/>
-					<span
-						aria-hidden
-						className="absolute inset-0 hidden rounded-xl opacity-0 blur-xl transition-opacity duration-300 ease-out group-hover:opacity-100 dark:block"
-						style={{ background: rgba(darkRgb, 0.55) }}
-					/>
-					<span
-						aria-hidden
-						className="absolute inset-0 rounded-xl bg-bg-weak-50 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] transition-shadow duration-300 ease-out group-hover:shadow-[inset_0_0_0_1px_var(--card-ring)] dark:bg-white/[0.03] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
-					/>
+				<div className="relative flex size-9 items-center justify-center border border-stroke-soft-100 sm:size-10 dark:border-white/10">
 					<span className="relative z-10">{icon}</span>
 				</div>
 				<Icon
 					name="arrow-up-right"
-					className="group-hover:-translate-y-0.5 size-3.5 text-[var(--card-ink)] opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100 dark:text-[var(--card-ink-dark)]"
+					className="group-hover:-translate-y-0.5 size-3.5 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100"
 					aria-hidden
 				/>
 			</div>

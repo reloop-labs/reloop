@@ -139,10 +139,6 @@ export function PreviewStage({
 						</motion.div>
 					</AnimatePresence>
 				</div>
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-15% from-bg-white-0 via-bg-white-0/80 to-transparent dark:from-black dark:via-black/80"
-				/>
 			</div>
 			<PreviewTabs active={active} onChange={handleTabChange} />
 		</div>

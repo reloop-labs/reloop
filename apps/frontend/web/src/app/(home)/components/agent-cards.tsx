@@ -12,7 +12,7 @@ import {
 const OPENAI_PATH =
 	"M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4947zm-9.66-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1402-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1683a.0757.0757 0 0 1-.071 0l-4.8303-2.7866A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1635a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.6069 1.4997-2.602-1.4997z";
 
-function CliDiagram() {
+export function CliDiagram() {
 	const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 
 	return (
@@ -69,7 +69,7 @@ function CliDiagram() {
 				y1="72"
 				x2="476"
 				y2="72"
-				className="stroke-zinc-200 dark:stroke-zinc-800"
+				className="stroke-stroke-soft-100 dark:stroke-white/10"
 				strokeWidth="1"
 				strokeDasharray="3 3"
 			/>
@@ -157,7 +157,7 @@ function CliCard() {
 			<div
 				data-grid-content="true"
 				data-slot="feature-card-content"
-				className="space-y-4 rounded-[4px] bg-white p-6 md:px-12 md:pt-12 md:pb-6 dark:bg-black"
+				className="space-y-4 bg-white p-6 md:px-12 md:pt-12 md:pb-6 dark:bg-black"
 			>
 				<CardHeader
 					icon={
@@ -181,7 +181,7 @@ function CliCard() {
 					description="Test deliveries and fix configuration without a dashboard."
 				/>
 			</div>
-			<div className="flex min-h-[280px] flex-col rounded-[4px] bg-white p-4 sm:p-5 md:min-h-0 md:px-5 md:py-5 dark:bg-black">
+			<div className="flex min-h-[280px] flex-col bg-white p-4 sm:p-5 md:min-h-0 md:px-5 md:py-5 dark:bg-black">
 				<div className="flex min-h-0 flex-1 items-center justify-center [&>svg]:max-h-[220px] [&>svg]:w-full">
 					<CliDiagram />
 				</div>
@@ -190,7 +190,7 @@ function CliCard() {
 	);
 }
 
-function CardHeader({
+export function CardHeader({
 	icon,
 	title,
 	lede,
@@ -292,8 +292,8 @@ const SATELLITE_NODES = [
 	},
 ];
 
-function McpDiagram() {
-	const line = "#ebebeb";
+export function McpDiagram() {
+	const line = "#f5f5f5";
 	const port = "#d4d4d8";
 
 	return (
@@ -310,7 +310,7 @@ function McpDiagram() {
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
-				className="stroke-[#ebebeb] dark:stroke-white/15"
+				className="stroke-stroke-soft-100 dark:stroke-white/10"
 			>
 				{SATELLITE_NODES.map((item) => (
 					<path key={`wire-${item.id}`} d={item.wire} />
@@ -347,7 +347,7 @@ function McpDiagram() {
 				fill="#ffffff"
 				stroke={line}
 				strokeWidth="1.5"
-				className="fill-white stroke-[#ebebeb] dark:fill-[#161619] dark:stroke-white/15"
+				className="fill-white stroke-stroke-soft-100 dark:fill-[#161619] dark:stroke-white/10"
 			/>
 
 			{/* MCP Icon */}
@@ -383,7 +383,7 @@ function McpDiagram() {
 				fill="#ffffff"
 				stroke={line}
 				strokeWidth="1.5"
-				className="fill-white stroke-[#ebebeb] dark:fill-[#161619] dark:stroke-white/15"
+				className="fill-white stroke-stroke-soft-100 dark:fill-[#161619] dark:stroke-white/10"
 			/>
 
 			{/* database / server icon */}
@@ -429,7 +429,7 @@ function McpDiagram() {
 						fill="#ffffff"
 						stroke={line}
 						strokeWidth="1.5"
-						className="fill-white stroke-[#ebebeb] transition-all duration-200 group-hover/node:stroke-zinc-950 dark:fill-[#161619] dark:stroke-white/15 dark:group-hover/node:stroke-white"
+						className="fill-white stroke-stroke-soft-100 transition-all duration-200 group-hover/node:stroke-zinc-950 dark:fill-[#161619] dark:stroke-white/10 dark:group-hover/node:stroke-white"
 					/>
 
 					{/* brand icon */}
@@ -455,7 +455,7 @@ function McpCard() {
 			<div
 				data-grid-content="true"
 				data-slot="feature-card-content"
-				className="space-y-4 rounded-[4px] bg-white p-6 md:px-12 md:pt-12 md:pb-6 dark:bg-black"
+				className="space-y-4 bg-white p-6 md:px-12 md:pt-12 md:pb-6 dark:bg-black"
 			>
 				<CardHeader
 					icon={
@@ -475,7 +475,7 @@ function McpCard() {
 					description="Let Claude, Cursor, or Codex send and manage email."
 				/>
 			</div>
-			<div className="flex min-h-[280px] flex-col rounded-[4px] bg-white p-4 sm:p-5 md:min-h-0 md:px-5 md:py-5 dark:bg-black">
+			<div className="flex min-h-[280px] flex-col bg-white p-4 sm:p-5 md:min-h-0 md:px-5 md:py-5 dark:bg-black">
 				<div className="flex min-h-0 flex-1 items-center justify-center [&>svg]:max-h-[240px] [&>svg]:w-full">
 					<McpDiagram />
 				</div>
@@ -489,36 +489,16 @@ export function AgentCards() {
 		<section
 			id="integrations"
 			aria-label="Four ways to use Reloop"
-			className="w-full overflow-hidden border-[#ebebeb] border-y bg-white dark:border-[#292929] dark:bg-black"
+			className="w-full overflow-hidden bg-white dark:bg-black"
 		>
-			<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1280px)_minmax(24px,1fr)] gap-px bg-[#ebebeb] max-[1279px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-[#292929]">
-				<div aria-hidden className="col-start-1 max-[1279px]:hidden">
-					<div
-						data-grid-content
-						className="h-full rounded-[4px] bg-white dark:bg-black"
-					/>
-				</div>
-				<div className="col-start-2 grid grid-cols-10 gap-px bg-[#ebebeb] dark:bg-[#292929]">
-					<div
-						aria-hidden
-						data-grid-content
-						className="rounded-[4px] bg-white max-[1279px]:hidden dark:bg-black"
-					/>
-					<div className="col-span-8 grid gap-px max-[1279px]:col-[1/-1] md:grid-cols-2">
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<div className="grid w-full md:grid-cols-2">
+					<div className="flex flex-col border-stroke-soft-100 border-t md:border-r dark:border-white/10">
 						<McpCard />
+					</div>
+					<div className="flex flex-col border-stroke-soft-100 border-t dark:border-white/10">
 						<CliCard />
 					</div>
-					<div
-						aria-hidden
-						data-grid-content
-						className="rounded-[4px] bg-white max-[1279px]:hidden dark:bg-black"
-					/>
-				</div>
-				<div aria-hidden className="col-start-3 max-[1279px]:hidden">
-					<div
-						data-grid-content
-						className="h-full rounded-[4px] bg-white dark:bg-black"
-					/>
 				</div>
 			</div>
 		</section>

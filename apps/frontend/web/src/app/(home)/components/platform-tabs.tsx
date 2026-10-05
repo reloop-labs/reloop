@@ -4,116 +4,12 @@ import { cn } from "@reloop/ui/cn";
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
-
-type PlatformTabId =
-	| "domains"
-	| "email"
-	| "analytics"
-	| "templates"
-	| "agents"
-	| "campaigns";
-
-const TABS: {
-	id: PlatformTabId;
-	title: string;
-	description: string;
-	badge?: string;
-	nav: string;
-}[] = [
-	{
-		id: "domains",
-		title: "Domains",
-		description: "Verify DNS once, send forever.",
-		nav: "domain",
-	},
-	{
-		id: "email",
-		title: "Email",
-		description: "Transactional API and SMTP relay.",
-		nav: "emails",
-	},
-	{
-		id: "analytics",
-		title: "Analytics",
-		description: "Delivery, opens and bounces live.",
-		nav: "metrics",
-	},
-	{
-		id: "templates",
-		title: "Templates",
-		description: "React Email blocks that scale.",
-		badge: "AI",
-		nav: "templates",
-	},
-	{
-		id: "agents",
-		title: "Agent Inbox",
-		description: "Inbound email for AI agents.",
-		badge: "AI",
-		nav: "inbox",
-	},
-	{
-		id: "campaigns",
-		title: "Campaigns",
-		description: "Send marketing emails in minutes.",
-		nav: "campaigns",
-	},
-];
-
-// Alt text per tab for a11y.
-const PLATFORM_ALT: Record<PlatformTabId, string> = {
-	domains: "Domains: verify DNS once, send forever",
-	email: "Email: transactional API and SMTP relay",
-	analytics: "Analytics: delivery, opens and bounces live",
-	templates: "Templates: React Email blocks that scale",
-	agents: "Agent Inbox: inbound email for AI agents",
-	campaigns: "Campaigns: bulk sends that convert",
-};
-
-// Distinct gradient backdrop per tab, light + dark.
-const TAB_GRADIENTS: Record<PlatformTabId, string> = {
-	domains:
-		"from-[#dbe7ff] via-[#eef3ff] to-bg-white-0 dark:from-[#0b1b33] dark:via-[#060b16] dark:to-black",
-	email:
-		"from-[#fdeecd] via-[#fdf6e7] to-bg-white-0 dark:from-[#2a1c07] dark:via-[#120d05] dark:to-black",
-	analytics:
-		"from-[#d2f3e3] via-[#e9faf2] to-bg-white-0 dark:from-[#06281c] dark:via-[#041209] dark:to-black",
-	templates:
-		"from-[#fbdce5] via-[#fdeef2] to-bg-white-0 dark:from-[#33101c] dark:via-[#160609] dark:to-black",
-	agents:
-		"from-[#e3d9fb] via-[#efe9fd] to-bg-white-0 dark:from-[#1e1245] dark:via-[#0d0722] dark:to-black",
-	campaigns:
-		"from-[#ffddd2] via-[#fdefe9] to-bg-white-0 dark:from-[#38130a] dark:via-[#190b06] dark:to-black",
-};
-
-// Per-tab screenshots (templates ships a single asset used for light + dark).
-const TAB_SCREENSHOT: Record<PlatformTabId, { src: string; darkSrc: string }> =
-	{
-		domains: {
-			src: "/platform/domain-light.png",
-			darkSrc: "/platform/domain-dark.png",
-		},
-		email: {
-			src: "/platform/email-light.png",
-			darkSrc: "/platform/email-dark.png",
-		},
-		analytics: {
-			src: "/platform/analytics-light.png",
-			darkSrc: "/platform/analytics-dark.png",
-		},
-		templates: {
-			src: "/platform/template.png",
-			darkSrc: "/platform/template.png",
-		},
-		agents: {
-			src: "/platform/agent-inbox-light.png",
-			darkSrc: "/platform/agent-inbox-dark.png",
-		},
-		campaigns: {
-			src: "/platform/campaign-light.png",
-			darkSrc: "/platform/campaign-dark.png",
-		},
-	};
+import {
+	PLATFORM_ALT,
+	type PlatformTabId,
+	TAB_SCREENSHOT,
+	TABS,
+} from "./platform-tabs-data";
 
 export default function PlatformTabs() {
 	const [active, setActive] = useState<PlatformTabId>("domains");
@@ -199,26 +95,12 @@ export default function PlatformTabs() {
 				})}
 			</div>
 
-			{/* Preview panel: stable shell. Background melts via stacked
-			    opacity layers; screenshots do a plain crisp crossfade with
-			    no movement, scale, or blur so text stays sharp. */}
+			{/* Preview panel: stable shell. Screenshots do a plain crisp crossfade with
+		    no movement, scale, or blur so text stays sharp. */}
 			<div className="relative h-[560px] w-full overflow-hidden bg-bg-white-0 sm:h-[640px] lg:h-[720px] dark:bg-black">
-				{/* Gradient backdrop, slow melt */}
-				{TABS.map((tab) => (
-					<div
-						key={tab.id}
-						aria-hidden
-						className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-out ${TAB_GRADIENTS[tab.id]} ${
-							tab.id === active
-								? "opacity-100"
-								: "pointer-events-none opacity-0"
-						}`}
-					/>
-				))}
-
 				{/* Stable screenshot frame, never remounts */}
 				<div className="relative h-full w-full px-10 pt-10">
-					<div className="relative h-full w-full overflow-hidden rounded-t-xl border border-stroke-soft-100 border-b-0 bg-bg-white-0 shadow-regular-md dark:border-white/10 dark:bg-black">
+					<div className="relative h-full w-full overflow-hidden border border-stroke-soft-100 border-b-0 bg-bg-white-0 dark:border-white/10 dark:bg-black">
 						{TABS.map((tab) => {
 							const selected = tab.id === active;
 							const shot = TAB_SCREENSHOT[tab.id];

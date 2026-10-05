@@ -8,7 +8,7 @@ function Term({ href, children }: { href: string; children: React.ReactNode }) {
 	return (
 		<Link
 			href={href}
-			className="underline decoration-stroke-soft-100 underline-offset-[3px] transition-colors hover:text-text-strong-950 hover:decoration-text-sub-600 dark:decoration-white/20 dark:hover:text-white dark:hover:decoration-white/50"
+			className="underline decoration-stroke-soft-100 decoration-wavy underline-offset-[4px] transition-colors hover:text-text-strong-950 hover:decoration-text-sub-600 dark:decoration-white/20 dark:hover:text-white dark:hover:decoration-white/50"
 		>
 			{children}
 		</Link>

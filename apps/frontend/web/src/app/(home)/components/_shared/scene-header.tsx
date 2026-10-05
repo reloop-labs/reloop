@@ -7,30 +7,22 @@ import type { ReactNode } from "react";
 
 export type SceneColor = "orange" | "blue" | "violet" | "emerald" | "pink";
 
-/**
- * Physical keycap, same extrusion language as ActionKbd:
- * dark shell as the 1.5px lip, flatter face, hairline inset highlight.
- */
-const GLYPH: Record<SceneColor, { shell: string; face: string }> = {
+/** Flat bordered glyph: solid fill, no extrusion, no inset highlight. */
+const GLYPH: Record<SceneColor, { face: string }> = {
 	orange: {
-		shell: "bg-[#9a3412] dark:bg-[#7c2d12]",
-		face: "bg-[#f97316] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#ea580c] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+		face: "bg-[#f97316] dark:bg-[#ea580c]",
 	},
 	blue: {
-		shell: "bg-[#1e3a8a] dark:bg-[#172554]",
-		face: "bg-[#2563eb] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#1d4ed8] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+		face: "bg-[#2563eb] dark:bg-[#1d4ed8]",
 	},
 	violet: {
-		shell: "bg-[#4c1d95] dark:bg-[#2e1065]",
-		face: "bg-[#7c3aed] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#6d28d9] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+		face: "bg-[#7c3aed] dark:bg-[#6d28d9]",
 	},
 	emerald: {
-		shell: "bg-[#064e3b] dark:bg-[#022c22]",
-		face: "bg-[#059669] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#047857] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+		face: "bg-[#059669] dark:bg-[#047857]",
 	},
 	pink: {
-		shell: "bg-[#831843] dark:bg-[#500724]",
-		face: "bg-[#db2777] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:bg-[#be185d] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]",
+		face: "bg-[#db2777] dark:bg-[#be185d]",
 	},
 };
 
@@ -47,18 +39,11 @@ export function SceneGlyph({
 		<span
 			aria-hidden
 			className={cn(
-				"inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] p-px pb-[2px]",
-				glyph.shell,
+				"inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] border border-stroke-soft-100 text-white dark:border-white/10",
+				glyph.face,
 			)}
 		>
-			<span
-				className={cn(
-					"flex size-full items-center justify-center rounded-[4px] text-white",
-					glyph.face,
-				)}
-			>
-				<Icon name={icon} className="size-3 text-white" />
-			</span>
+			<Icon name={icon} className="size-3 text-white" />
 		</span>
 	);
 }

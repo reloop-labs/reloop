@@ -25,8 +25,8 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 		<div className="relative mx-auto h-[30rem] w-full">
 			<article
 				className={cn(
-					"absolute inset-0 overflow-hidden rounded-[22px] border bg-bg-white-0 dark:bg-[#141414]",
-					"border-stroke-soft-100 shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:border-white/10 dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
+					"absolute inset-0 overflow-hidden rounded-[22px] border bg-bg-white-0 dark:bg-black",
+					"border-stroke-soft-100 dark:border-white/10",
 				)}
 			>
 				<AnimatePresence mode="wait" initial={false}>
@@ -40,10 +40,6 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 						{email.body}
 					</motion.div>
 				</AnimatePresence>
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-15% from-bg-white-0 to-transparent dark:from-[#141414]"
-				/>
 			</article>
 		</div>
 	);
@@ -51,7 +47,7 @@ export function EmailStack({ activeId = "otp" }: { activeId?: string }) {
 
 function EmailShell({ children }: { children: ReactNode }) {
 	return (
-		<div className="bg-bg-white-0 px-5 pt-6 pb-8 text-text-strong-950 sm:px-6 sm:pt-7 sm:pb-9 dark:bg-[#141414] dark:text-white">
+		<div className="bg-bg-white-0 px-5 pt-6 pb-8 text-text-strong-950 sm:px-6 sm:pt-7 sm:pb-9 dark:bg-black dark:text-white">
 			<Logo className="-ml-1.5 mb-4 size-[40px] dark:invert" />
 			{children}
 		</div>
@@ -85,7 +81,9 @@ function SerifHeading({
 }
 
 function Rule() {
-	return <div className="my-5 h-px w-full bg-[#e0e0e0] dark:bg-[#222]" />;
+	return (
+		<div className="my-5 h-px w-full bg-stroke-soft-100 dark:bg-white/10" />
+	);
 }
 
 function BodyText({

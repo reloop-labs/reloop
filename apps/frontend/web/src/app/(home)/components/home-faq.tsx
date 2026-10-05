@@ -7,7 +7,7 @@ const linkClassName =
 
 export function HomeFaq() {
 	return (
-		<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
+		<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-t border-b md:max-w-7xl dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
 			<FaqSection
 				groups={homeFaqGroups}
 				id="faq-section"
@@ -19,7 +19,7 @@ export function HomeFaq() {
 			/>
 			<div className="grid border-stroke-soft-100 border-t lg:grid-cols-[minmax(220px,1.45fr)_repeat(4,minmax(0,1fr))] dark:border-white/10">
 				<div aria-hidden className="hidden lg:block" />
-				<p className="col-span-full border-stroke-soft-100 px-5 py-10 text-[14px] text-text-sub-600 leading-[1.7] sm:px-7 sm:text-[15px] lg:col-span-4 lg:border-l lg:px-9 lg:py-12 dark:border-white/10 dark:text-white/55">
+				<p className="col-span-full border-stroke-soft-100 px-5 py-6 text-[14px] text-text-sub-600 leading-[1.7] sm:px-6 sm:text-[15px] lg:col-span-4 dark:border-white/10 dark:text-white/55">
 					Have any questions outside of these? Email us at{" "}
 					<a href={`mailto:${contactEmail}`} className={linkClassName}>
 						{contactEmail}

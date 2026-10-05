@@ -288,12 +288,7 @@ function AiTemplatesView() {
 							}
 							className="w-full max-w-md"
 						>
-							<div
-								className={cn(
-									"overflow-hidden rounded-[22px] border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-[#0c0c0e]",
-									"shadow-[0_24px_60px_rgba(15,23,42,0.14)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]",
-								)}
-							>
+							<div className="overflow-hidden rounded-[22px] border border-stroke-soft-200 bg-bg-white-0 p-5 sm:p-6 dark:border-white/10 dark:bg-black">
 								<GeneratedOtpEmail
 									reveal={reveal}
 									headingDone={headingDone}
@@ -432,7 +427,7 @@ function GeneratedOtpEmail({
 					!reveal.otp && "opacity-0",
 				)}
 			>
-				<span className="inline-flex items-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-2 font-mono font-semibold text-[18px] text-text-strong-950 tracking-wide dark:border-white/15 dark:bg-[#151518] dark:text-white">
+				<span className="inline-flex items-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-2 font-mono font-semibold text-[18px] text-text-strong-950 tracking-wide dark:border-white/15 dark:bg-black dark:text-white">
 					{"{{{OTP}}}"}
 				</span>
 				<p className="mt-2.5 mb-0 text-[#707070] text-[11.5px]">
@@ -483,7 +478,7 @@ function AiPromptBar({
 	}, [value, inputRef]);
 
 	return (
-		<div className="flex items-end gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 pl-3 dark:border-white/10 dark:bg-[#0c0c0e]">
+		<div className="flex items-end gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 pl-3 dark:border-white/10 dark:bg-black">
 			<textarea
 				ref={inputRef}
 				value={value}
@@ -505,7 +500,7 @@ function AiPromptBar({
 				disabled={disabled || value.trim().length === 0}
 				aria-busy={loading}
 				className={cn(
-					"flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#FF5722] text-white shadow-xs transition-[transform,opacity] duration-150 ease-out dark:bg-[#FF6E40]",
+					"flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#FF5722] text-white transition-[transform,opacity] duration-150 ease-out dark:bg-[#FF6E40]",
 					loading
 						? "opacity-100"
 						: "hover:opacity-90 active:scale-[0.97] disabled:opacity-40",
@@ -880,7 +875,7 @@ function RealtimeEditorView() {
 	}, [shouldReduceMotion]);
 
 	return (
-		<div className="relative mx-auto w-full max-w-3xl overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0c0c0e]">
+		<div className="relative mx-auto w-full max-w-3xl overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/10 dark:bg-black">
 			{/* Top Bar with Document Title & Multiplayer Avatars */}
 			<div className="flex items-center justify-between border-stroke-soft-100 px-4 py-2.5 dark:border-white/10">
 				<div className="flex items-center gap-2">
@@ -1337,7 +1332,7 @@ function VersionHistoryView() {
 				) : null}
 			</AnimatePresence>
 
-			<div className="relative h-full overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 shadow-xs sm:p-8 dark:border-white/10 dark:bg-[#0c0c0e]">
+			<div className="relative h-full overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 sm:p-8 dark:border-white/10 dark:bg-black">
 				<div className="mb-6 flex items-center justify-between">
 					<h3 className="font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
 						Version history
@@ -1430,7 +1425,7 @@ function VersionHistoryView() {
 													restore(item.id);
 												}}
 												className={cn(
-													"inline-flex h-6 items-center justify-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 font-medium text-[11px] text-neutral-900 leading-none shadow-xs transition-opacity duration-150 dark:border-white/10 dark:bg-[#1c1c21] dark:text-white dark:shadow-none",
+													"inline-flex h-6 items-center justify-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 font-medium text-[11px] text-neutral-900 leading-none transition-opacity duration-150 dark:border-white/10 dark:bg-black dark:text-white",
 													isActive
 														? "opacity-100"
 														: "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100",
@@ -1447,14 +1442,6 @@ function VersionHistoryView() {
 					</div>
 				</div>
 
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40"
-				>
-					<div className="absolute inset-0 backdrop-blur-[10px] [mask-image:linear-gradient(to_bottom,transparent,black_60%)]" />
-					<div className="absolute inset-0 bg-gradient-to-t from-15% from-bg-white-0 via-bg-white-0/75 to-transparent dark:from-[#0c0c0e] dark:via-[#0c0c0e]/75" />
-				</div>
-
 				<AnimatePresence>
 					{toast ? (
 						<motion.div
@@ -1462,7 +1449,7 @@ function VersionHistoryView() {
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: 6, scale: 0.97 }}
 							transition={{ duration: 0.2, ease: EASE_OUT }}
-							className="-translate-x-1/2 absolute bottom-4 left-1/2 z-30 flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[11.5px] text-text-strong-950 shadow-lg dark:border-white/10 dark:bg-[#151518] dark:text-white"
+							className="-translate-x-1/2 absolute bottom-4 left-1/2 z-30 flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3.5 py-1.5 font-medium text-[11.5px] text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white"
 						>
 							<span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-success-base text-static-white">
 								<Icon name="check" className="size-2.5" />
@@ -1535,10 +1522,6 @@ export function PreviewStage({
 						</motion.div>
 					</AnimatePresence>
 				</div>
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-44 bg-gradient-to-t from-15% from-[#fbfbfb] via-[#fbfbfb]/80 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/80"
-				/>
 			</div>
 			<PreviewTabs active={active} onChange={handleTabChange} />
 		</div>

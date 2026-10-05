@@ -152,7 +152,7 @@ export function WebhookEvents({ active }: { active: boolean }) {
 	return (
 		<div
 			ref={rootRef}
-			className="w-full max-w-sm overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.14)] sm:p-5 dark:border-white/10 dark:bg-[#141414] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
+			className="w-full max-w-sm overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 sm:p-5 dark:border-white/10 dark:bg-black"
 		>
 			<div className="mb-2.5 flex items-center justify-between">
 				<div className="flex items-center gap-2">

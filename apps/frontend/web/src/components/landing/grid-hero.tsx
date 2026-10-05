@@ -31,7 +31,7 @@ export function GridHero() {
 			className="overflow-hidden bg-white pt-[73px] text-zinc-950 max-[1279px]:pt-[57px] dark:bg-black dark:text-zinc-50"
 		>
 			<div className="bg-white dark:bg-black">
-				<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1280px)_minmax(24px,1fr)] gap-px bg-[#ebebeb] max-[1279px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-[#292929]">
+				<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1280px)_minmax(24px,1fr)] gap-px bg-stroke-soft-100 max-[1279px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-white/10">
 					<div aria-hidden="true" className="col-start-1 max-[1279px]:hidden">
 						<div
 							data-grid-content
@@ -39,11 +39,11 @@ export function GridHero() {
 						/>
 					</div>
 					<div className="relative col-start-2 w-full">
-						<div className="relative grid gap-x-px bg-[#ebebeb] dark:bg-[#292929]">
+						<div className="relative grid gap-x-px bg-stroke-soft-100 dark:bg-white/10">
 							<div aria-hidden="true" className={bandClassName}>
 								<GridCells count={10} />
 							</div>
-							<div className="grid grid-cols-10 gap-px border-[#ebebeb] border-y dark:border-[#292929]">
+							<div className="grid grid-cols-10 gap-px border-stroke-soft-100 border-y dark:border-white/10">
 								<div aria-hidden="true" className={sideClassName}>
 									<GridCells count={4} />
 								</div>

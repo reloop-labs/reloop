@@ -7,19 +7,14 @@ export function PaymentSolutions() {
 			aria-labelledby="payment-solutions-heading"
 			className="w-full overflow-hidden bg-white dark:bg-black"
 		>
-			<div className="grid w-full grid-cols-[minmax(24px,1fr)_minmax(0,1280px)_minmax(24px,1fr)] gap-x-px bg-[#ebebeb] max-[1279px]:grid-cols-[24px_minmax(0,1fr)_24px] max-[479px]:grid-cols-[8px_minmax(0,1fr)_8px] dark:bg-[#292929]">
-				<div
-					aria-hidden
-					className="rounded-[4px] bg-white max-[1279px]:hidden dark:bg-black"
-				/>
-
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				{/* 2-column main split */}
-				<div className="grid grid-cols-1 gap-px bg-[#ebebeb] lg:grid-cols-2 dark:bg-[#292929]">
+				<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 border-stroke-soft-100 border-t lg:grid-cols-2 lg:divide-x lg:divide-y-0 dark:divide-white/10 dark:border-white/10">
 					{/* Left Column: Copy & Checklist */}
 					<div
 						data-grid-content="true"
 						data-slot="feature-card-content"
-						className="flex h-full flex-col space-y-6 rounded-[4px] bg-white p-6 sm:p-8 lg:p-12 dark:bg-black"
+						className="flex h-full flex-col space-y-6 bg-white p-6 sm:p-8 lg:p-12 dark:bg-black"
 					>
 						{/* Icon Circle */}
 						<div className="flex size-12 rounded-full bg-white shadow-black/5 shadow-xl ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10">
@@ -87,9 +82,9 @@ export function PaymentSolutions() {
 					{/* Right Column: Monthly / Credits visual */}
 					<div className="flex h-full items-center justify-center overflow-hidden bg-white p-4 sm:p-6 lg:p-8 dark:bg-black">
 						<div className="mx-auto w-full self-center">
-							<div aria-hidden="true" className="grid h-full grid-cols-6 gap-px bg-[#ebebeb] dark:bg-[#292929]">
+							<div aria-hidden="true" className="grid h-full grid-cols-6 gap-px bg-stroke-soft-100 dark:bg-white/10">
 								{/* Left Grid Rows */}
-								<div className="grid grid-rows-3 gap-y-px bg-[#ebebeb] dark:bg-[#292929]">
+								<div className="grid grid-rows-3 gap-y-px bg-stroke-soft-100 dark:bg-white/10">
 									<div
 										data-grid-content="true"
 										className="h-full min-h-[50px] bg-white p-2 dark:bg-black"
@@ -105,7 +100,7 @@ export function PaymentSolutions() {
 								</div>
 
 								{/* Center Column: Billing card */}
-								<div className="col-span-4 grid grid-rows-[1fr_auto_1fr] gap-y-px bg-[#ebebeb] dark:bg-[#292929]">
+								<div className="col-span-4 grid grid-rows-[1fr_auto_1fr] gap-y-px bg-stroke-soft-100 dark:bg-white/10">
 									<div
 										data-grid-content="true"
 										className="min-h-[40px] bg-white dark:bg-black"
@@ -164,7 +159,7 @@ export function PaymentSolutions() {
 									</div>
 
 									{/* Bottom 3 reassurance cells */}
-									<div className="grid grid-cols-3 gap-x-px bg-[#ebebeb] dark:bg-[#292929]">
+									<div className="grid grid-cols-3 gap-x-px bg-stroke-soft-100 dark:bg-white/10">
 										<div
 											data-grid-content="true"
 											className="flex items-center justify-center bg-white p-4 dark:bg-black"
@@ -193,7 +188,7 @@ export function PaymentSolutions() {
 								</div>
 
 								{/* Right Grid Rows */}
-								<div className="grid grid-rows-3 gap-y-px bg-[#ebebeb] dark:bg-[#292929]">
+								<div className="grid grid-rows-3 gap-y-px bg-stroke-soft-100 dark:bg-white/10">
 									<div
 										data-grid-content="true"
 										className="h-full min-h-[50px] bg-white p-2 dark:bg-black"
@@ -211,11 +206,6 @@ export function PaymentSolutions() {
 						</div>
 					</div>
 				</div>
-
-				<div
-					aria-hidden
-					className="rounded-[4px] bg-white max-[1279px]:hidden dark:bg-black"
-				/>
 			</div>
 		</section>
 	);

@@ -1,5 +1,7 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { GridHero } from "@reloop/web/components/landing/grid-hero";
+import { LandingAgentCards } from "@reloop/web/components/landing/landing-agent-cards";
+import { LandingDeveloperProof } from "@reloop/web/components/landing/landing-developer-proof";
+import { LandingHero } from "@reloop/web/components/landing/landing-hero";
 import { homeFaqItems } from "@reloop/web/lib/home-faq";
 import {
 	faqPageJsonLd,
@@ -13,21 +15,17 @@ import {
 	socialProfiles,
 } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { AgentCards } from "../(home)/components/agent-cards";
-import CTA from "../(home)/components/cta";
-import { DeveloperProof } from "../(home)/components/developer-proof";
-import Highlights from "../(home)/components/highlights";
-import { HomeFaq } from "../(home)/components/home-faq";
-import { ReloopStory } from "../(home)/components/reloop-story";
-import { SectionSeparator } from "../(home)/components/section-separator";
 import { ConnectApplications } from "../(home)/components/connect-applications";
-import { CustomerReviews } from "../(home)/components/customer-reviews";
-import { CustomerTestimonial } from "../(home)/components/customer-testimonial";
+import { ContactSolutions } from "../(home)/components/contact-solutions";
+import CTA from "../(home)/components/cta";
 import { DataVisualization } from "../(home)/components/data-visualization";
 import { EnterpriseSecurity } from "../(home)/components/enterprise-security";
-import { ContactSolutions } from "../(home)/components/contact-solutions";
 import { GridSeparator } from "../(home)/components/grid-separator";
+import Highlights from "../(home)/components/highlights";
+import { HomeFaq } from "../(home)/components/home-faq";
 import { PaymentSolutions } from "../(home)/components/payment-solutions";
+import { PlatformShowcase } from "../(home)/components/platform-showcase";
+import { ReloopStory } from "../(home)/components/reloop-story";
 import { SecureVerification } from "../(home)/components/secure-verification";
 import { TransactionalEmails } from "../(home)/components/transactional-emails";
 
@@ -81,9 +79,9 @@ export default function HomePage() {
 	return (
 		<div className="relative w-full">
 			<JsonLd data={homeSchema} />
-			<GridHero />
-			<AgentCards />
-			<DeveloperProof />
+			<LandingHero />
+			<LandingAgentCards />
+			<LandingDeveloperProof />
 			<ReloopStory />
 			<TransactionalEmails />
 			<GridSeparator />
@@ -93,12 +91,11 @@ export default function HomePage() {
 			<GridSeparator />
 			<ContactSolutions />
 			<GridSeparator />
-			<CustomerTestimonial />
+			<PlatformShowcase />
 			<GridSeparator />
 			<ConnectApplications />
 			<DataVisualization />
 			<EnterpriseSecurity />
-			<CustomerReviews />
 			<div className="relative mx-auto flex w-full max-w-[1280px] flex-col border-[#ebebeb] border-x dark:border-[#292929]">
 				<Highlights />
 				<div aria-hidden className="h-12 sm:h-16" />

@@ -1,5 +1,7 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { GridHero } from "@reloop/web/components/landing/grid-hero";
+import { LandingAgentCards } from "@reloop/web/components/landing/landing-agent-cards";
+import { LandingDeveloperProof } from "@reloop/web/components/landing/landing-developer-proof";
+import { LandingHero } from "@reloop/web/components/landing/landing-hero";
 import { homeFaqItems } from "@reloop/web/lib/home-faq";
 import {
 	faqPageJsonLd,
@@ -13,15 +15,18 @@ import {
 	socialProfiles,
 } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import LanguageExplorer from "../sdk/components/language-explorer";
-import { AgentCards } from "./components/agent-cards";
+import { ConnectApplications } from "./components/connect-applications";
+import { ContactSolutions } from "./components/contact-solutions";
 import CTA from "./components/cta";
-import EmailSystem from "./components/email-system";
-import Highlights from "./components/highlights";
+import { DataVisualization } from "./components/data-visualization";
+import { EnterpriseSecurity } from "./components/enterprise-security";
+import { GridSeparator } from "./components/grid-separator";
 import { HomeFaq } from "./components/home-faq";
-import PlatformTabs from "./components/platform-tabs";
-import { SectionSeparator } from "./components/section-separator";
-import { Testimonials } from "./components/testimonials";
+import { PaymentSolutions } from "./components/payment-solutions";
+import { PlatformShowcase } from "./components/platform-showcase";
+import { ReloopStory } from "./components/reloop-story";
+import { SecureVerification } from "./components/secure-verification";
+import { TransactionalEmails } from "./components/transactional-emails";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -83,26 +88,24 @@ export default function Home() {
 	return (
 		<div className="relative w-full">
 			<JsonLd data={homeSchema} />
-			<GridHero />
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
-				<PlatformTabs />
-				<div aria-hidden className="h-16 sm:h-24" />
-				<LanguageExplorer
-					framed={false}
-					showTopRule
-					showHeading
-					showHelp={false}
-					id="sdks"
-				/>
-				<SectionSeparator />
-				<AgentCards />
-				<SectionSeparator />
-				<EmailSystem />
-				<SectionSeparator />
-				<Highlights />
-				<div aria-hidden className="h-24" />
-				<Testimonials />
-				<div aria-hidden className="h-24" />
+			<LandingHero />
+			<LandingAgentCards />
+			<LandingDeveloperProof />
+			<ReloopStory />
+			<TransactionalEmails />
+			<GridSeparator />
+			<SecureVerification />
+			<GridSeparator />
+			<PaymentSolutions />
+			<GridSeparator />
+			<ContactSolutions />
+			<GridSeparator />
+			<PlatformShowcase />
+			<GridSeparator />
+			<ConnectApplications />
+			<DataVisualization />
+			<EnterpriseSecurity />
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x border-t md:max-w-7xl dark:border-white/10">
 				<CTA />
 				<div aria-hidden className="h-16 sm:h-24" />
 				<HomeFaq />

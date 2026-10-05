@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -194,7 +193,7 @@ function MetricsLayeredView() {
 				transition={{ duration: 0.4, delay: 0.3 }}
 				className="pointer-events-none absolute top-5 right-5 z-20 flex items-center gap-2 sm:top-7 sm:right-8"
 			>
-				<div className="flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0/80 px-2.5 py-1 font-medium text-[11px] text-text-sub-600 shadow-xs backdrop-blur-sm dark:border-white/10 dark:bg-[#141416]/80 dark:text-white/70">
+				<div className="flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 font-medium text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-black dark:text-white/70">
 					<span className="size-1.5 rounded-full bg-blue-500" />
 					<span className="uppercase tracking-wider">{curDate}</span>
 				</div>
@@ -602,11 +601,6 @@ function InsightsPreviewCard() {
 				</div>
 			</div>
 
-			{/* Right-side smooth fade overlay */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-y-0 right-0 z-10 w-[174px] bg-gradient-to-l from-white to-transparent dark:from-black"
-			/>
 		</div>
 	);
 }
@@ -650,7 +644,7 @@ function EngagementView() {
 /* --- Scene 3: Bounces & Diagnostics --- */
 function BounceErrorPanel() {
 	return (
-		<div className="overflow-hidden rounded-2xl border border-red-500/20 bg-red-50/40 shadow-xs dark:border-red-500/20 dark:bg-red-950/20">
+		<div className="overflow-hidden rounded-2xl border border-red-500/20 bg-red-50/40 dark:border-red-500/20 dark:bg-red-950/20">
 			{/* Top row */}
 			<div className="flex items-center justify-between gap-3 px-4 py-2.5 text-xs sm:text-sm">
 				<div className="flex min-w-0 items-center gap-2.5">
@@ -756,15 +750,6 @@ export function PreviewStage({
 						</motion.div>
 					</AnimatePresence>
 				</div>
-				<div
-					aria-hidden
-					className={cn(
-						"pointer-events-none absolute inset-x-0 bottom-0 z-20 transition-all duration-300",
-						active === "engagement"
-							? "hidden"
-							: "h-6 bg-gradient-to-t from-[#fbfbfb]/50 to-transparent dark:from-black/50",
-					)}
-				/>
 			</div>
 			<PreviewTabs active={active} onChange={handleTabChange} />
 		</div>
