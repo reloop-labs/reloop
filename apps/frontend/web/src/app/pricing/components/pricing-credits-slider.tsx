@@ -8,8 +8,12 @@ export const CREDIT_MAX_VOLUME = 100000;
 
 const CREDIT_TICKS = [
 	{ value: 3000, label: "3k" },
+	{ value: 5000, label: "5k" },
 	{ value: 10000, label: "10k" },
-	{ value: 25000, label: "25k" },
+	{ value: 15000, label: "15k" },
+	{ value: 20000, label: "20k" },
+	{ value: 30000, label: "30k" },
+	{ value: 40000, label: "40k" },
 	{ value: 50000, label: "50k" },
 	{ value: 75000, label: "75k" },
 	{ value: 100000, label: "100k" },
@@ -18,7 +22,6 @@ const CREDIT_TICKS = [
 const CREDIT_SEGMENTS = CREDIT_TICKS.length - 1;
 const SEGMENT_WIDTH = 100 / CREDIT_SEGMENTS;
 const MINOR_TICKS_PER_GAP = 4;
-const SNAP_THRESHOLD = 3;
 
 const THUMB_HALF_WIDTH = 8;
 const alignOffset = (percent: number) =>
@@ -47,23 +50,11 @@ const toPosition = (volume: number) => {
 };
 
 const toVolume = (position: number) => {
-	const clamped = clamp(position, 0, 100);
-	const nearestBoundary = Math.round(clamped / SEGMENT_WIDTH);
-	if (Math.abs(clamped - nearestBoundary * SEGMENT_WIDTH) <= SNAP_THRESHOLD) {
-		return (
-			CREDIT_TICKS[nearestBoundary]?.value ?? CREDIT_TICKS[0]?.value ?? 3000
-		);
-	}
 	const index = Math.min(
-		Math.floor(clamped / SEGMENT_WIDTH),
-		CREDIT_SEGMENTS - 1,
+		CREDIT_SEGMENTS,
+		Math.max(0, Math.round(clamp(position, 0, 100) / SEGMENT_WIDTH)),
 	);
-	const low = CREDIT_TICKS[index]?.value ?? 3000;
-	const high = CREDIT_TICKS[index + 1]?.value ?? low;
-	const fraction = clamped / SEGMENT_WIDTH - index;
-	const raw = low + fraction * (high - low);
-	const granularity = raw < 10000 ? 100 : 1000;
-	return Math.round(raw / granularity) * granularity;
+	return CREDIT_TICKS[index]?.value ?? CREDIT_TICKS[0]?.value ?? 3000;
 };
 
 export function creditsCostForVolume(volume: number) {

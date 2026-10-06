@@ -1,3 +1,4 @@
+import CTA from "@reloop/web/app/(home)/components/cta";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
 import { ArrowUpRight } from "lucide-react";
@@ -302,13 +303,10 @@ function ClaudeIcon({ className = "size-5" }: { className?: string }) {
 
 function TweetCard({ item }: { item: TweetItem }) {
 	return (
-		<div
-			data-grid-content="true"
-			className="@4xl:p-12 flex flex-col justify-between space-y-6 rounded bg-card/90 p-6 transition-colors duration-200 hover:bg-card"
-		>
+		<div className="flex flex-col justify-between space-y-6 bg-white p-6 sm:p-8 lg:p-12 transition-colors duration-200 hover:bg-zinc-50/60 dark:bg-black dark:hover:bg-zinc-950/70">
 			<div>
 				<div className="flex items-center gap-3">
-					<div className="after:border-foreground/10 relative size-7 sm:size-8 shrink-0 overflow-hidden rounded-xl after:absolute after:inset-0 after:rounded-xl after:border">
+					<div className="relative size-8 shrink-0 overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-white/10">
 						<img
 							alt={item.name}
 							loading="lazy"
@@ -320,54 +318,23 @@ function TweetCard({ item }: { item: TweetItem }) {
 						/>
 					</div>
 					<div className="flex min-w-0 items-center gap-1.5">
-						<h3 className="truncate font-medium text-muted-foreground text-xl lg:tracking-tight">
+						<h3 className="truncate font-medium text-zinc-950 text-xl lg:tracking-tight dark:text-white">
 							{item.name}
 						</h3>
 						{item.verified && <VerifiedBadge />}
 					</div>
 				</div>
-				<p className="mt-4 text-pretty font-medium text-foreground text-xl leading-relaxed whitespace-pre-line">
+				<p className="mt-4 text-pretty font-medium text-zinc-900 text-lg sm:text-xl leading-relaxed whitespace-pre-line dark:text-zinc-100">
 					{item.content}
 				</p>
 			</div>
 			{item.handle && (
 				<div className="pt-2">
-					<span className="font-mono text-muted-foreground/60 text-xs">
+					<span className="font-mono text-zinc-400 text-xs dark:text-zinc-500">
 						@{item.handle}
 					</span>
 				</div>
 			)}
-		</div>
-	);
-}
-
-function GridSpacer({ heightClass = "h-12" }: { heightClass?: string }) {
-	return (
-		<div
-			aria-hidden="true"
-			className="@container grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr]"
-		>
-			<div
-				className="grid"
-				style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-			>
-				<div aria-hidden="true" className="w-full p-[0.5px]">
-					<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-				</div>
-			</div>
-			<div className="mx-auto w-full max-w-276 p-[0.5px] lg:min-w-276">
-				<div data-slot="content" className="h-full rounded bg-card/90">
-					<div className={heightClass} />
-				</div>
-			</div>
-			<div
-				className="grid"
-				style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-			>
-				<div aria-hidden="true" className="p-[0.5px]">
-					<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-				</div>
-			</div>
 		</div>
 	);
 }
@@ -385,258 +352,108 @@ export default function WallOfLovePage() {
 	const tweetChunks = chunkArray(wallOfLoveTweets, 4);
 
 	return (
-		<div className="w-full bg-foreground/3 pt-16 sm:pt-20">
+		<div className="w-full bg-white text-zinc-950 dark:bg-black dark:text-zinc-50">
 			<JsonLd data={wallOfLoveSchema} />
 
-			{/* Hero & AI Summary Section */}
-			<section id="home" className="overflow-hidden">
-				{/* Title row */}
-				<div className="@container grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr]">
-					<div
-						className="grid"
-						style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-					>
-						<div aria-hidden="true" className="w-full p-[0.5px]">
-							<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-						</div>
-					</div>
-					<div className="mx-auto w-full max-w-276 lg:min-w-276">
-						<div className="grid *:p-[0.5px] **:data-grid-content:h-full **:data-grid-content:rounded **:data-grid-content:bg-card/90">
-							<div className="grid grid-cols-10 gap-px">
-								<div aria-hidden="true" className="max-sm:hidden">
-									<div
-										data-grid-content="true"
-										className="h-full rounded bg-card/90"
-									/>
-								</div>
-								<div
-									data-grid-content="true"
-									className="@4xl:p-12 col-span-full rounded bg-card/90 p-6 sm:col-span-8"
-								>
-									<h1 className="text-balance font-semibold text-5xl text-foreground tracking-tight lg:text-6xl">
-										Wall of love
-									</h1>
-									<p className="mx-auto mt-4 text-balance text-lg text-muted-foreground">
-										Real feedback from our community that fuels our passion to
-										create.
-									</p>
-								</div>
-								<div aria-hidden="true" className="max-sm:hidden">
-									<div
-										data-grid-content="true"
-										className="h-full rounded bg-card/90"
-									/>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div
-						className="grid"
-						style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-					>
-						<div aria-hidden="true" className="p-[0.5px]">
-							<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-						</div>
-					</div>
-				</div>
-
-				{/* AI Summary row */}
-				<div className="@container grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr]">
-					<div
-						className="grid"
-						style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-					>
-						<div aria-hidden="true" className="w-full p-[0.5px]">
-							<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-						</div>
-					</div>
-					<div className="mx-auto w-full max-w-276 lg:min-w-276">
-						<div className="grid *:p-[0.5px] **:data-grid-content:h-full **:data-grid-content:rounded **:data-grid-content:bg-card/90">
-							<div className="grid grid-cols-10 gap-px">
-								<div aria-hidden="true" className="max-sm:hidden">
-									<div
-										data-grid-content="true"
-										className="h-full rounded bg-card/90"
-									/>
-								</div>
-								<div className="col-span-full sm:col-span-8">
-									<div
-										data-grid-content="true"
-										className="@4xl:p-12 rounded bg-card/90 p-6"
-									>
-										<h2 className="text-balance font-medium text-foreground text-xl lg:tracking-tight">
-											Get AI Summary
-										</h2>
-										<p className="mt-2 text-balance text-muted-foreground">
-											Need help understanding this document? Get an AI-powered
-											explanation from your favorite AI models.
-										</p>
-										<div className="mt-6 flex flex-wrap gap-3">
-											{/* ChatGPT */}
-											<div className="group relative flex cursor-pointer items-center gap-3 rounded-xl border border-border/50 bg-card/50 p-4 transition-colors hover:bg-card">
-												<ChatGptIcon className="size-5" />
-												<a
-													target="_blank"
-													rel="noopener noreferrer"
-													className="font-medium text-foreground text-sm after:absolute after:inset-0"
-													href="https://chatgpt.com/?q=Explain%20the%20following%20%22Wall%20of%20love%22%20document%20in%20simple%20terms%3A%20"
-												>
-													ChatGPT
-												</a>
-												<ArrowUpRight className="size-4 opacity-50 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-											</div>
-
-											{/* Gemini */}
-											<div className="group relative flex cursor-pointer items-center gap-3 rounded-xl border border-border/50 bg-card/50 p-4 transition-colors hover:bg-card">
-												<GeminiIcon className="size-5" />
-												<a
-													target="_blank"
-													rel="noopener noreferrer"
-													className="font-medium text-foreground text-sm after:absolute after:inset-0"
-													href="https://gemini.google.com/search?udm=Explain%20the%20following%20%22Wall%20of%20love%22%20document%20in%20simple%20terms%3A%20"
-												>
-													Gemini
-												</a>
-												<ArrowUpRight className="size-4 opacity-50 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-											</div>
-
-											{/* Claude */}
-											<div className="group relative flex cursor-pointer items-center gap-3 rounded-xl border border-border/50 bg-card/50 p-4 transition-colors hover:bg-card">
-												<ClaudeIcon className="size-5" />
-												<a
-													target="_blank"
-													rel="noopener noreferrer"
-													className="font-medium text-foreground text-sm after:absolute after:inset-0"
-													href="https://claude.ai/new?q=Explain%20the%20following%20%22Wall%20of%20love%22%20document%20in%20simple%20terms%3A%20"
-												>
-													Claude
-												</a>
-												<ArrowUpRight className="size-4 opacity-50 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-											</div>
-										</div>
-									</div>
-								</div>
-								<div aria-hidden="true" className="max-sm:hidden">
-									<div
-										data-grid-content="true"
-										className="h-full rounded bg-card/90"
-									/>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div
-						className="grid"
-						style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-					>
-						<div aria-hidden="true" className="p-[0.5px]">
-							<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-						</div>
-					</div>
-				</div>
-			</section>
-
-			{/* Testimonial Tweet Sections */}
-			{tweetChunks.map((chunk, chunkIndex) => (
-				<section key={`chunk-${chunkIndex}`} className="overflow-hidden">
-					<div className="@container grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr]">
-						{/* Left Spacer */}
-						<div
-							className="grid"
-							style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-						>
-							<div aria-hidden="true" className="w-full p-[0.5px]">
-								<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-							</div>
-						</div>
-
-						{/* Center Grid */}
-						<div className="mx-auto w-full max-w-276 lg:min-w-276">
-							<div className="grid *:p-[0.5px] **:data-grid-content:h-full **:data-grid-content:rounded **:data-grid-content:bg-card/90">
-								<div className="grid grid-cols-10 gap-px">
-									<div aria-hidden="true" className="max-sm:hidden">
-										<div
-											data-grid-content="true"
-											className="h-full rounded bg-card/90"
-										/>
-									</div>
-									<div className="@4xl:grid-cols-2 col-span-full grid gap-px sm:col-span-8">
-										{chunk.map((item) => (
-											<TweetCard key={item.id} item={item} />
-										))}
-									</div>
-									<div aria-hidden="true" className="max-sm:hidden">
-										<div
-											data-grid-content="true"
-											className="h-full rounded bg-card/90"
-										/>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						{/* Right Spacer */}
-						<div
-							className="grid"
-							style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-						>
-							<div aria-hidden="true" className="p-[0.5px]">
-								<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-							</div>
-						</div>
-					</div>
-
-					{/* Spacer between sections */}
-					<GridSpacer heightClass="h-12" />
+			{/* Main responsive grid shell with exact home page max-width and border colors */}
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				{/* Hero Title Section */}
+				<section className="px-6 pt-24 pb-16 text-center sm:px-8 md:pt-32">
+					<p className="font-mono text-xs tracking-[0.2em] text-zinc-500 uppercase dark:text-zinc-400">
+						Community
+					</p>
+					<h1 className="mx-auto mt-4 max-w-3xl text-balance font-semibold text-4xl text-zinc-950 leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl dark:text-white">
+						Wall of love
+					</h1>
+					<p className="mx-auto mt-5 max-w-2xl text-balance text-base text-zinc-600 leading-relaxed md:text-lg dark:text-zinc-400">
+						Real feedback from our community that fuels our passion to create.
+					</p>
 				</section>
-			))}
 
-			{/* Bottom CTA Section */}
-			<section className="overflow-hidden">
-				<GridSpacer heightClass="h-16" />
+				{/* AI Summary Section */}
+				<section className="border-stroke-soft-100 border-t p-6 sm:p-8 lg:p-12 dark:border-white/10">
+					<div className="mx-auto max-w-2xl text-center">
+						<h2 className="font-medium text-xl text-zinc-950 tracking-tight dark:text-white">
+							Get AI Summary
+						</h2>
+						<p className="mt-2 text-balance text-sm text-zinc-600 dark:text-zinc-400">
+							Need help understanding this document? Get an AI-powered
+							explanation from your favorite AI models.
+						</p>
+						<div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+							{/* ChatGPT */}
+							<div className="group relative flex cursor-pointer items-center gap-3 rounded-xl border border-stroke-soft-100 bg-white p-3.5 transition-colors hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/40 dark:hover:bg-zinc-900">
+								<ChatGptIcon className="size-5 text-zinc-900 dark:text-white" />
+								<a
+									target="_blank"
+									rel="noopener noreferrer"
+									className="font-medium text-sm text-zinc-950 after:absolute after:inset-0 dark:text-white"
+									href="https://chatgpt.com/?q=Explain%20the%20following%20%22Wall%20of%20love%22%20document%20in%20simple%20terms%3A%20"
+								>
+									ChatGPT
+								</a>
+								<ArrowUpRight className="size-4 text-zinc-400 opacity-70 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
+							</div>
 
-				<div className="@container grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr]">
-					<div
-						className="grid"
-						style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-					>
-						<div aria-hidden="true" className="w-full p-[0.5px]">
-							<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-						</div>
-					</div>
-					<div className="mx-auto w-full max-w-276 p-[0.5px] lg:min-w-276">
-						<div data-slot="content" className="h-full rounded bg-card/90">
-							<div className="@3xl:p-20 @lg:p-8 relative overflow-hidden p-6 py-16 text-center">
-								<div className="mx-auto max-w-xl text-center">
-									<h2 className="text-balance font-semibold text-4xl text-foreground lg:text-5xl">
-										Create, Sell and Grow
-									</h2>
-									<p className="mt-4 mb-8 text-balance text-lg text-muted-foreground">
-										Join a community of over 1,000+ companies and developers
-										who have already discovered the power of Reloop.
-									</p>
-									<Link
-										className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-foreground px-6 font-medium text-background text-sm shadow-xl transition-all duration-200 hover:bg-foreground/90 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-										href={hostedSignupHref}
-									>
-										Start Testing for free
-									</Link>
-								</div>
+							{/* Gemini */}
+							<div className="group relative flex cursor-pointer items-center gap-3 rounded-xl border border-stroke-soft-100 bg-white p-3.5 transition-colors hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/40 dark:hover:bg-zinc-900">
+								<GeminiIcon className="size-5" />
+								<a
+									target="_blank"
+									rel="noopener noreferrer"
+									className="font-medium text-sm text-zinc-950 after:absolute after:inset-0 dark:text-white"
+									href="https://gemini.google.com/search?udm=Explain%20the%20following%20%22Wall%20of%20love%22%20document%20in%20simple%20terms%3A%20"
+								>
+									Gemini
+								</a>
+								<ArrowUpRight className="size-4 text-zinc-400 opacity-70 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
+							</div>
+
+							{/* Claude */}
+							<div className="group relative flex cursor-pointer items-center gap-3 rounded-xl border border-stroke-soft-100 bg-white p-3.5 transition-colors hover:bg-zinc-50 dark:border-white/10 dark:bg-zinc-900/40 dark:hover:bg-zinc-900">
+								<ClaudeIcon className="size-5" />
+								<a
+									target="_blank"
+									rel="noopener noreferrer"
+									className="font-medium text-sm text-zinc-950 after:absolute after:inset-0 dark:text-white"
+									href="https://claude.ai/new?q=Explain%20the%20following%20%22Wall%20of%20love%22%20document%20in%20simple%20terms%3A%20"
+								>
+									Claude
+								</a>
+								<ArrowUpRight className="size-4 text-zinc-400 opacity-70 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
 							</div>
 						</div>
 					</div>
-					<div
-						className="grid"
-						style={{ gridTemplateColumns: "repeat(1, minmax(0, 1fr))" }}
-					>
-						<div aria-hidden="true" className="p-[0.5px]">
-							<div className="h-full w-2 rounded bg-card/90 md:w-6 lg:w-full" />
-						</div>
-					</div>
-				</div>
+				</section>
 
-				<GridSpacer heightClass="h-16" />
-			</section>
+				{/* Testimonial Tweet Sections with home page border separators and grid styling */}
+				{tweetChunks.map((chunk, chunkIndex) => (
+					<section key={`chunk-${chunkIndex}`} className="flex flex-col">
+						{chunkIndex > 0 && (
+							<div
+								aria-hidden="true"
+								className="h-14 border-stroke-soft-100 border-t bg-white dark:bg-black dark:border-white/10"
+							/>
+						)}
+						<div className="grid grid-cols-1 gap-px border-stroke-soft-100 border-t bg-stroke-soft-100 sm:grid-cols-2 dark:border-white/10 dark:bg-white/10">
+							{chunk.map((item) => (
+								<TweetCard key={item.id} item={item} />
+							))}
+						</div>
+					</section>
+				))}
+
+				{/* Bottom CTA Section */}
+				<div className="border-stroke-soft-100 border-t py-12 sm:py-16 dark:border-white/10">
+					<CTA
+						headlineLine1="Create, Sell"
+						headlineLine2="and Grow."
+						subtext="Join a community of over 1,000+ companies and developers who have already discovered the power of Reloop."
+						primaryLabel="Start Testing for free"
+						primaryHref={hostedSignupHref}
+					/>
+				</div>
+			</div>
 		</div>
 	);
 }

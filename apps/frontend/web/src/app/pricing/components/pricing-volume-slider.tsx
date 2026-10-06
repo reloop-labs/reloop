@@ -10,18 +10,16 @@ import {
 
 const TICKS = [
 	{ value: 3000, label: "3k", plan: "Free" },
-	{ value: 10000, label: "10k", plan: "Pro" },
 	{ value: 50000, label: "50k", plan: "Pro" },
 	{ value: 100000, label: "100k", plan: "Growth" },
 	{ value: 250000, label: "250k", plan: "Growth" },
-	{ value: 500000, label: "500k", plan: "Growth" },
+	{ value: 500000, label: "500k", plan: "Enterprise" },
 	{ value: 1000000, label: "1M", plan: "Enterprise" },
 ];
 
 const SEGMENTS = TICKS.length - 1;
 const SEGMENT_WIDTH = 100 / SEGMENTS;
 const MINOR_TICKS_PER_GAP = 4;
-const SNAP_THRESHOLD = 3;
 
 /**
  * Radix positions the thumb at `left: calc(percent% + offset)` and keeps it
@@ -55,18 +53,11 @@ const toPosition = (volume: number) => {
 };
 
 const toVolume = (position: number) => {
-	const clamped = clamp(position, 0, 100);
-	const nearestBoundary = Math.round(clamped / SEGMENT_WIDTH);
-	if (Math.abs(clamped - nearestBoundary * SEGMENT_WIDTH) <= SNAP_THRESHOLD) {
-		return TICKS[nearestBoundary]?.value ?? TICKS[0]?.value ?? 3000;
-	}
-	const index = Math.min(Math.floor(clamped / SEGMENT_WIDTH), SEGMENTS - 1);
-	const low = TICKS[index]?.value ?? 3000;
-	const high = TICKS[index + 1]?.value ?? low;
-	const fraction = clamped / SEGMENT_WIDTH - index;
-	const raw = low + fraction * (high - low);
-	const granularity = raw < 10000 ? 100 : 1000;
-	return Math.round(raw / granularity) * granularity;
+	const index = Math.min(
+		SEGMENTS,
+		Math.max(0, Math.round(clamp(position, 0, 100) / SEGMENT_WIDTH)),
+	);
+	return TICKS[index]?.value ?? TICKS[0]?.value ?? 3000;
 };
 
 /**
@@ -77,7 +68,7 @@ const toVolume = (position: number) => {
 const UPSELL_THRESHOLD_USD = 2;
 
 export function recommendPlanIdForVolume(volume: number): PlanId {
-	if (volume > 500000) return "enterprise";
+	if (volume >= 500000) return "enterprise";
 	if (volume <= 3000) return "free";
 	const pro = getPlanById("individual");
 	const growth = getPlanById("startup");
