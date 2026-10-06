@@ -71,6 +71,7 @@ const columns: FooterColumn[] = [
 		group: "Resources",
 		items: [
 			{ title: "Community", href: "/community" },
+			{ title: "Wall of Love", href: "/wall-of-love" },
 			{ title: "Blog", href: "/blog" },
 			{ title: "Changelog", href: "/changelog" },
 			{ title: "Engineering", href: "/docs/setup" },

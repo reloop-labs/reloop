@@ -19,7 +19,8 @@ const billingTabs: Array<{ id: BillingMode; label: string }> = [
 ];
 
 export function PricingExplorer() {
-	const [volume, setVolume] = useState(100000);
+	const [monthlyVolume, setMonthlyVolume] = useState(50000);
+	const [creditsVolume, setCreditsVolume] = useState(10000);
 	const [mode, setMode] = useState<BillingMode>("credits");
 
 	return (
@@ -55,19 +56,25 @@ export function PricingExplorer() {
 			</div>
 			{mode === "monthly" ? (
 				<>
-					<PricingVolumeSlider volume={volume} onVolumeChange={setVolume} />
+					<PricingVolumeSlider
+						volume={monthlyVolume}
+						onVolumeChange={setMonthlyVolume}
+					/>
 					<PageSection flushTop flushBottom>
 						<PricingSection
-							recommendedPlanId={recommendPlanIdForVolume(volume)}
-							volume={volume}
+							recommendedPlanId={recommendPlanIdForVolume(monthlyVolume)}
+							volume={monthlyVolume}
 						/>
 					</PageSection>
 				</>
 			) : (
 				<>
-					<CreditsVolumeSlider volume={volume} onVolumeChange={setVolume} />
+					<CreditsVolumeSlider
+						volume={creditsVolume}
+						onVolumeChange={setCreditsVolume}
+					/>
 					<PageSection flushTop flushBottom>
-						<PricingCreditsSection volume={volume} />
+						<PricingCreditsSection volume={creditsVolume} />
 					</PageSection>
 				</>
 			)}

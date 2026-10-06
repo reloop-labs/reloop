@@ -22,7 +22,7 @@ type CreditColumn = {
 	middleStrong?: boolean;
 	middleSecondary?: string;
 	highlight?: boolean;
-	features: string[];
+	features: Array<string | ((volume: number) => string)>;
 	ctaLabel: string;
 	ctaHref: string;
 	ctaExternal?: boolean;
@@ -65,7 +65,8 @@ const creditColumns: CreditColumn[] = [
 		middleSecondary: "Extra emails: $0.50 / 1,000",
 		highlight: true,
 		features: [
-			"50,000 emails / month",
+			(volume: number) =>
+				`${new Intl.NumberFormat("en-US").format(volume)} emails / 6 months`,
 			"No daily limit",
 			"5 agent inboxes",
 			"5 webhooks",
@@ -211,17 +212,21 @@ function CreditColumnCard({
 			/>
 
 			<ul className="flex-1 space-y-1.5 pt-6">
-				{column.features.map((feature) => (
-					<li
-						key={feature}
-						className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug"
-					>
-						{getFeatureIcon(feature)}
-						<span className="text-text-sub-600 dark:text-white/60">
-							{feature}
-						</span>
-					</li>
-				))}
+				{column.features.map((feature) => {
+					const label =
+						typeof feature === "function" ? feature(volume) : feature;
+					return (
+						<li
+							key={label}
+							className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug"
+						>
+							{getFeatureIcon(label)}
+							<span className="text-text-sub-600 dark:text-white/60">
+								{label}
+							</span>
+						</li>
+					);
+				})}
 			</ul>
 		</div>
 	);
