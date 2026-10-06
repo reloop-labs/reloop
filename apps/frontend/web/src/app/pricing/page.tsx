@@ -54,7 +54,7 @@ const PricingPage = () => {
 	return (
 		<>
 			<JsonLd data={pricingSchema} />
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#006ffe] [--primary-dark:#0056cc] [--primary-darker:#0056cc] [--primary-link:#0056cc] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#171717] [--primary-dark:#171717] [--primary-darker:#000000] [--primary-link:#171717] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
 					<div
 						aria-hidden="true"

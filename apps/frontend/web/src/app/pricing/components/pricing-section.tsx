@@ -81,7 +81,7 @@ function PlanCtaLink({
 	);
 }
 
-function getFeatureIcon(feature: string, customClassName?: string) {
+export function getFeatureIcon(feature: string, customClassName?: string) {
 	const key = feature.toLowerCase().trim();
 	const className =
 		customClassName ??
@@ -90,7 +90,7 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 	if (key.includes("all ") && key.includes("features")) {
 		return (
 			<Icon
-				name="sparkling"
+				name="magic-wand"
 				className={
 					customClassName
 						? className
@@ -239,7 +239,7 @@ function getFeatureIcon(feature: string, customClassName?: string) {
 		return <Icon name="alert-triangle" className={className} />;
 	}
 
-	return <Icon name="sparkling" className={className} />;
+	return <Icon name="magic-wand" className={className} />;
 }
 
 function getSectionIcon(section: string, customClassName?: string) {
@@ -257,7 +257,7 @@ function getSectionIcon(section: string, customClassName?: string) {
 		return <Icon name="api" className={className} />;
 	}
 	if (key.includes("inbox") || key.includes("ai")) {
-		return <Icon name="sparkling" className={className} />;
+		return <Icon name="magic-wand" className={className} />;
 	}
 	if (key.includes("deliver")) {
 		return <Icon name="shield" className={className} />;
@@ -274,7 +274,7 @@ function getSectionIcon(section: string, customClassName?: string) {
 	if (key.includes("security") || key.includes("compliance")) {
 		return <Icon name="lock" className={className} />;
 	}
-	return <Icon name="sparkling" className={className} />;
+	return <Icon name="magic-wand" className={className} />;
 }
 
 const FEATURE_TOOLTIPS: Record<
@@ -528,7 +528,7 @@ function FeatureTooltipContent({
 			<div className="flex items-center gap-2">
 				{getFeatureIcon(
 					label,
-					"size-4 shrink-0 text-blue-accent dark:text-[#52a8ff]",
+					"size-4 shrink-0 text-text-strong-950 dark:text-white",
 				)}
 				<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 					{label}
@@ -645,6 +645,11 @@ function PlanColumn({
 						{plan.extraEmailsLabel}
 					</p>
 				)}
+				{isCustom && (
+					<p className="mt-0.5 text-[12px] text-text-sub-600 dark:text-white/50">
+						Volume discounts available.
+					</p>
+				)}
 			</div>
 
 			<div
@@ -695,7 +700,6 @@ function PlanColumn({
 	);
 }
 
-
 function PlanCheckmark({ className }: { className?: string }) {
 	return (
 		<svg
@@ -704,7 +708,7 @@ function PlanCheckmark({ className }: { className?: string }) {
 			viewBox="0 0 20 20"
 			width="24"
 			xmlns="http://www.w3.org/2000/svg"
-			className={cn("text-primary-base dark:text-emerald-500", className)}
+			className={cn("text-text-strong-950 dark:text-white", className)}
 			style={
 				{
 					"--color-blue-accent": "currentColor",
@@ -942,7 +946,7 @@ function ComparisonTable({
 								>
 									<HoverCard.Root openDelay={100} closeDelay={150}>
 										<HoverCard.Trigger asChild>
-											<span className="relative cursor-pointer text-body-default text-text-strong-950 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-blue-accent dark:text-white">
+											<span className="relative cursor-pointer text-body-default text-text-strong-950 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-text-strong-950 dark:text-white dark:hover:decoration-white">
 												{row.label}
 											</span>
 										</HoverCard.Trigger>

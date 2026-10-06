@@ -5,10 +5,9 @@ import { useTheme } from "next-themes";
 
 /**
  * Theme-aware PixelBlast for the pricing hero.
- * Light mode keeps the brand blue; dark mode switches to GitHub gray
- * to match the monochrome dark theme. PixelBlast applies `color`
- * changes to its `uColor` uniform without re-creating the WebGL
- * session, so toggling the theme transitions smoothly.
+ * Uses neutral monochrome to match the navbar Dashboard button.
+ * PixelBlast applies `color` changes to its `uColor` uniform without
+ * re-creating the WebGL session, so toggling the theme transitions smoothly.
  */
 export function PricingHeroBlast() {
 	const { resolvedTheme } = useTheme();
@@ -17,7 +16,7 @@ export function PricingHeroBlast() {
 		<PixelBlast
 			variant="square"
 			pixelSize={2}
-			color={resolvedTheme === "dark" ? "#6e7781" : "#3B82F6"}
+			color={resolvedTheme === "dark" ? "#6e7781" : "#171717"}
 			patternScale={4}
 			patternDensity={0.45}
 			enableRipples={false}
