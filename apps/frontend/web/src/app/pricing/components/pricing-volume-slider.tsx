@@ -10,6 +10,10 @@ import {
 
 const TICKS = [
 	{ value: 3000, label: "3k", plan: "Free" },
+	{ value: 10000, label: "10k", plan: "Pro" },
+	{ value: 20000, label: "20k", plan: "Pro" },
+	{ value: 30000, label: "30k", plan: "Pro" },
+	{ value: 40000, label: "40k", plan: "Pro" },
 	{ value: 50000, label: "50k", plan: "Pro" },
 	{ value: 100000, label: "100k", plan: "Growth" },
 	{ value: 250000, label: "250k", plan: "Growth" },

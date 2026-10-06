@@ -554,16 +554,8 @@ function PlanColumn({
 }) {
 	const price = getPlanPrice(plan);
 	const isCustom = price === null;
-	const volumeLabel =
-		selectedVolume == null
-			? null
-			: `${new Intl.NumberFormat("en-US").format(selectedVolume)} emails / month`;
 	const emailsLine =
-		recommended && volumeLabel
-			? volumeLabel
-			: isCustom || price === 0
-				? plan.priceSubline
-				: plan.emailsLabel;
+		isCustom || price === 0 ? plan.priceSubline : plan.emailsLabel;
 	const includedVolume = Number(
 		plan.comparison.monthlyEmails.replace(/,/g, ""),
 	);
