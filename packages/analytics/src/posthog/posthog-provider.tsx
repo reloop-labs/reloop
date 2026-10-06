@@ -18,6 +18,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 			api_host: "https://r.reloop.sh",
 			ui_host: "https://us.i.posthog.com",
 			defaults: "2026-05-30",
+			persistence: "memory",
 			loaded: (ph) => {
 				(window as unknown as { posthog: typeof ph }).posthog = ph;
 			},
