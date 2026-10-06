@@ -173,7 +173,11 @@ function SupportPersonAvatar({
 
 const NEAR_BOTTOM_PX = 80;
 
-export function SupportChatPanel() {
+export function SupportChatPanel({
+	hideCloseButton = false,
+}: {
+	hideCloseButton?: boolean;
+} = {}) {
 	const { user } = useActiveOrganization();
 	const queryClient = useQueryClient();
 	const firstName = user?.name?.split(" ")[0] || "there";
@@ -529,14 +533,16 @@ export function SupportChatPanel() {
 					>
 						<RotateCcw className="h-3.5 w-3.5" />
 					</button>
-					<button
-						type="button"
-						onClick={() => setIsAiPanelOpen(false)}
-						title="Close support"
-						className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke-soft-100 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
-					>
-						<X className="h-3.5 w-3.5" />
-					</button>
+					{hideCloseButton ? null : (
+						<button
+							type="button"
+							onClick={() => setIsAiPanelOpen(false)}
+							title="Close support"
+							className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke-soft-100 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
+						>
+							<X className="h-3.5 w-3.5" />
+						</button>
+					)}
 				</div>
 			</div>
 
