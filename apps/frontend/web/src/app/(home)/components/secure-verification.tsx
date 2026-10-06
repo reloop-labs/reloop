@@ -204,8 +204,7 @@ export function SecureVerification() {
 							<strong className="font-semibold text-zinc-950 dark:text-white">
 								standard SMTP credentials
 							</strong>
-							. One endpoint, encrypted by default, ready in
-							minutes.
+							. One endpoint, encrypted by default, ready in minutes.
 						</p>
 
 						{/* Checklist */}

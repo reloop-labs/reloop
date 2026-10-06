@@ -64,8 +64,8 @@ export function DataVisualization() {
 						delivery.
 					</Card>
 					<Card icon="server" title="Managed dedicated IPs">
-						A <Term href="/glossary/dedicated-ip">dedicated IP</Term> that
-						warms with your sending volume.
+						A <Term href="/glossary/dedicated-ip">dedicated IP</Term> that warms
+						with your sending volume.
 					</Card>
 					<Card icon="bounce" title="Smart bounce handling">
 						Distinguish <Term href="/glossary/hard-bounce">hard</Term> from{" "}
@@ -73,24 +73,24 @@ export function DataVisualization() {
 						auto-retry with backoff.
 					</Card>
 					<Card icon="shield-check" title="Phishing protection">
-						Detect <Term href="/tools/lookalike-watch">lookalike</Term>{" "}
-						domains and block impersonation attacks.
+						Detect <Term href="/tools/lookalike-watch">lookalike</Term> domains
+						and block impersonation attacks.
 					</Card>
 					<Card icon="lock" title="Strict TLS delivery">
-						Enforce <Term href="/glossary/starttls">STARTTLS</Term> on every
-						hop so messages stay encrypted in flight.
+						Enforce <Term href="/glossary/starttls">STARTTLS</Term> on every hop
+						so messages stay encrypted in flight.
 					</Card>
 					<Card icon="list" title="Dynamic suppression list">
 						Never mail bounces, complaints, or unsubs.
 					</Card>
 					<Card icon="activity" title="IP and domain monitoring">
 						Watch <Term href="/glossary/dns">DNS</Term> and{" "}
-						<Term href="/glossary/ip-reputation">IP reputation</Term>. Get
-						told when they drift.
+						<Term href="/glossary/ip-reputation">IP reputation</Term>. Get told
+						when they drift.
 					</Card>
 					<Card icon="fingerprint" title="Prevent spoofing">
-						<Term href="/glossary/dmarc">DMARC</Term> stops impersonation
-						before it hits the inbox.
+						<Term href="/glossary/dmarc">DMARC</Term> stops impersonation before
+						it hits the inbox.
 					</Card>
 					<Card icon="zap" title="Automated IP warmup">
 						Volume ramps that protect your{" "}

@@ -40,7 +40,7 @@ export function CustomerTestimonial() {
 								</p>
 								<Link
 									href="/features/email-templates"
-									className="inline-flex h-8 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-card px-3 font-medium text-xs text-foreground shadow-black/15 shadow-sm ring-1 ring-foreground/10 duration-200 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 dark:ring-foreground/15 dark:hover:bg-muted/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+									className="inline-flex h-8 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-card px-3 font-medium text-foreground text-xs shadow-black/15 shadow-sm ring-1 ring-foreground/10 duration-200 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 dark:ring-foreground/15 dark:hover:bg-muted/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
 								>
 									Explore AI templates
 								</Link>
@@ -74,10 +74,7 @@ export function CustomerTestimonial() {
 
 				{/* Center Content Column */}
 				<div className="mx-auto w-full max-w-276 max-w-[1280px] p-[0.5px] lg:min-w-276 lg:min-w-[1280px]">
-					<div
-						data-slot="content"
-						className="h-full rounded bg-card"
-					>
+					<div data-slot="content" className="h-full rounded bg-card">
 						{/* Preview panel: same UI as landing PlatformTabs templates tab */}
 						<div className="relative h-[560px] w-full overflow-hidden bg-bg-white-0 sm:h-[640px] lg:h-[720px] dark:bg-black">
 							{/* Gradient backdrop, templates tint */}

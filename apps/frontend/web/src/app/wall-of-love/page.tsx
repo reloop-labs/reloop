@@ -151,11 +151,7 @@ function GeminiIcon({ className = "size-5" }: { className?: string }) {
 					filterUnits="userSpaceOnUse"
 				>
 					<feFlood floodOpacity="0" result="BackgroundImageFix" />
-					<feBlend
-						in="SourceGraphic"
-						in2="BackgroundImageFix"
-						result="shape"
-					/>
+					<feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur
 						result="effect1_foregroundBlur_69_17998"
 						stdDeviation="18"
@@ -171,11 +167,7 @@ function GeminiIcon({ className = "size-5" }: { className?: string }) {
 					filterUnits="userSpaceOnUse"
 				>
 					<feFlood floodOpacity="0" result="BackgroundImageFix" />
-					<feBlend
-						in="SourceGraphic"
-						in2="BackgroundImageFix"
-						result="shape"
-					/>
+					<feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur
 						result="effect1_foregroundBlur_69_17998"
 						stdDeviation="32"
@@ -191,11 +183,7 @@ function GeminiIcon({ className = "size-5" }: { className?: string }) {
 					filterUnits="userSpaceOnUse"
 				>
 					<feFlood floodOpacity="0" result="BackgroundImageFix" />
-					<feBlend
-						in="SourceGraphic"
-						in2="BackgroundImageFix"
-						result="shape"
-					/>
+					<feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur
 						result="effect1_foregroundBlur_69_17998"
 						stdDeviation="32"
@@ -211,11 +199,7 @@ function GeminiIcon({ className = "size-5" }: { className?: string }) {
 					filterUnits="userSpaceOnUse"
 				>
 					<feFlood floodOpacity="0" result="BackgroundImageFix" />
-					<feBlend
-						in="SourceGraphic"
-						in2="BackgroundImageFix"
-						result="shape"
-					/>
+					<feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur
 						result="effect1_foregroundBlur_69_17998"
 						stdDeviation="32"
@@ -231,11 +215,7 @@ function GeminiIcon({ className = "size-5" }: { className?: string }) {
 					filterUnits="userSpaceOnUse"
 				>
 					<feFlood floodOpacity="0" result="BackgroundImageFix" />
-					<feBlend
-						in="SourceGraphic"
-						in2="BackgroundImageFix"
-						result="shape"
-					/>
+					<feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur
 						result="effect1_foregroundBlur_69_17998"
 						stdDeviation="32"
@@ -251,11 +231,7 @@ function GeminiIcon({ className = "size-5" }: { className?: string }) {
 					filterUnits="userSpaceOnUse"
 				>
 					<feFlood floodOpacity="0" result="BackgroundImageFix" />
-					<feBlend
-						in="SourceGraphic"
-						in2="BackgroundImageFix"
-						result="shape"
-					/>
+					<feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur
 						result="effect1_foregroundBlur_69_17998"
 						stdDeviation="32"
@@ -271,11 +247,7 @@ function GeminiIcon({ className = "size-5" }: { className?: string }) {
 					filterUnits="userSpaceOnUse"
 				>
 					<feFlood floodOpacity="0" result="BackgroundImageFix" />
-					<feBlend
-						in="SourceGraphic"
-						in2="BackgroundImageFix"
-						result="shape"
-					/>
+					<feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur
 						result="effect1_foregroundBlur_69_17998"
 						stdDeviation="32"
@@ -303,7 +275,7 @@ function ClaudeIcon({ className = "size-5" }: { className?: string }) {
 
 function TweetCard({ item }: { item: TweetItem }) {
 	return (
-		<div className="flex flex-col justify-between space-y-6 bg-white p-6 sm:p-8 lg:p-12 transition-colors duration-200 hover:bg-zinc-50/60 dark:bg-black dark:hover:bg-zinc-950/70">
+		<div className="flex flex-col justify-between space-y-6 bg-white p-6 transition-colors duration-200 hover:bg-zinc-50/60 sm:p-8 lg:p-12 dark:bg-black dark:hover:bg-zinc-950/70">
 			<div>
 				<div className="flex items-center gap-3">
 					<div className="relative size-8 shrink-0 overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-white/10">
@@ -318,19 +290,19 @@ function TweetCard({ item }: { item: TweetItem }) {
 						/>
 					</div>
 					<div className="flex min-w-0 items-center gap-1.5">
-						<h3 className="truncate font-medium text-zinc-950 text-xl lg:tracking-tight dark:text-white">
+						<h3 className="truncate font-medium text-xl text-zinc-950 lg:tracking-tight dark:text-white">
 							{item.name}
 						</h3>
 						{item.verified && <VerifiedBadge />}
 					</div>
 				</div>
-				<p className="mt-4 text-pretty font-medium text-zinc-900 text-lg sm:text-xl leading-relaxed whitespace-pre-line dark:text-zinc-100">
+				<p className="mt-4 whitespace-pre-line text-pretty font-medium text-lg text-zinc-900 leading-relaxed sm:text-xl dark:text-zinc-100">
 					{item.content}
 				</p>
 			</div>
 			{item.handle && (
 				<div className="pt-2">
-					<span className="font-mono text-zinc-400 text-xs dark:text-zinc-500">
+					<span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
 						@{item.handle}
 					</span>
 				</div>
@@ -359,7 +331,7 @@ export default function WallOfLovePage() {
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				{/* Hero Title Section */}
 				<section className="px-6 pt-24 pb-16 text-center sm:px-8 md:pt-32">
-					<p className="font-mono text-xs tracking-[0.2em] text-zinc-500 uppercase dark:text-zinc-400">
+					<p className="font-mono text-xs text-zinc-500 uppercase tracking-[0.2em] dark:text-zinc-400">
 						Community
 					</p>
 					<h1 className="mx-auto mt-4 max-w-3xl text-balance font-semibold text-4xl text-zinc-950 leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl dark:text-white">
@@ -392,7 +364,7 @@ export default function WallOfLovePage() {
 								>
 									ChatGPT
 								</a>
-								<ArrowUpRight className="size-4 text-zinc-400 opacity-70 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
+								<ArrowUpRight className="group-hover:-translate-y-0.5 size-4 text-zinc-400 opacity-70 duration-200 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
 							</div>
 
 							{/* Gemini */}
@@ -406,7 +378,7 @@ export default function WallOfLovePage() {
 								>
 									Gemini
 								</a>
-								<ArrowUpRight className="size-4 text-zinc-400 opacity-70 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
+								<ArrowUpRight className="group-hover:-translate-y-0.5 size-4 text-zinc-400 opacity-70 duration-200 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
 							</div>
 
 							{/* Claude */}
@@ -420,7 +392,7 @@ export default function WallOfLovePage() {
 								>
 									Claude
 								</a>
-								<ArrowUpRight className="size-4 text-zinc-400 opacity-70 duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
+								<ArrowUpRight className="group-hover:-translate-y-0.5 size-4 text-zinc-400 opacity-70 duration-200 group-hover:translate-x-0.5 group-hover:text-zinc-900 dark:group-hover:text-white" />
 							</div>
 						</div>
 					</div>
@@ -432,7 +404,7 @@ export default function WallOfLovePage() {
 						{chunkIndex > 0 && (
 							<div
 								aria-hidden="true"
-								className="h-14 border-stroke-soft-100 border-t bg-white dark:bg-black dark:border-white/10"
+								className="h-14 border-stroke-soft-100 border-t bg-white dark:border-white/10 dark:bg-black"
 							/>
 						)}
 						<div className="grid grid-cols-1 gap-px border-stroke-soft-100 border-t bg-stroke-soft-100 sm:grid-cols-2 dark:border-white/10 dark:bg-white/10">

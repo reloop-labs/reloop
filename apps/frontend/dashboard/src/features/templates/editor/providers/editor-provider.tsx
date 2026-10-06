@@ -317,7 +317,11 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			const isMissingSavedNodes =
 				sourceNodes.length > 1 && currentNodes.length < sourceNodes.length;
 
-			if (isSynced && !isEditorContentEmpty(editor, ydoc) && !isMissingSavedNodes) {
+			if (
+				isSynced &&
+				!isEditorContentEmpty(editor, ydoc) &&
+				!isMissingSavedNodes
+			) {
 				const subjectToSet = resolveSubject(template, versionList);
 				if (subjectToSet) {
 					setSubject(subjectToSet);

@@ -64,8 +64,7 @@ export const EmailImage = Node.create({
 			href: {
 				default: null,
 				parseHTML: (element) =>
-					element.getAttribute("href") ||
-					element.getAttribute("data-href"),
+					element.getAttribute("href") || element.getAttribute("data-href"),
 				renderHTML: (attributes) => {
 					if (!attributes.href) return {};
 					return {

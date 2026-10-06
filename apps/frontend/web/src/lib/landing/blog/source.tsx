@@ -199,6 +199,26 @@ function readPostFile(slug: string) {
 	};
 }
 
+function readPostMetadata(slug: string): BlogPostDefinition | null {
+	const filePath = path.join(blogDir, `${slug}.mdx`);
+
+	if (!fs.existsSync(filePath)) {
+		return null;
+	}
+
+	const fileContent = fs.readFileSync(filePath, "utf8");
+	const { data } = matter(fileContent, {
+		engines: {
+			yaml: (s) => yaml.load(s) as object,
+		},
+	});
+	const post = parseFrontmatter(slug, data);
+
+	validateCategory(post.category);
+
+	return post;
+}
+
 function listPostSlugs() {
 	if (!fs.existsSync(blogDir)) {
 		return [];
@@ -236,8 +256,8 @@ export function getCategoryByName(name: string) {
 
 export function getAllPosts(): BlogPostDefinition[] {
 	return listPostSlugs()
-		.map((slug) => readPostFile(slug)?.post)
-		.filter((post): post is BlogPostDefinition => post !== undefined)
+		.map((slug) => readPostMetadata(slug))
+		.filter((post): post is BlogPostDefinition => post !== null)
 		.sort(
 			(a, b) =>
 				new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),

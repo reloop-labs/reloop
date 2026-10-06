@@ -188,7 +188,7 @@ The Reloop Team`;
 	return (
 		<div
 			className={cn(
-				"relative flex min-h-dvh w-full flex-col items-center justify-center p-6 antialiased sm:p-12 md:p-16 transition-colors duration-300",
+				"relative flex min-h-dvh w-full flex-col items-center justify-center p-6 antialiased transition-colors duration-300 sm:p-12 md:p-16",
 				bgTone === "polar" ? "bg-[#0e0e10]" : "bg-black",
 			)}
 		>
@@ -225,13 +225,15 @@ The Reloop Team`;
 			{showControls && (
 				<div className="fixed top-14 right-4 z-40 flex flex-col gap-2 rounded-xl border border-white/10 bg-[#161619] p-3 text-xs shadow-2xl backdrop-blur-xl">
 					<div className="flex items-center justify-between gap-4">
-						<span className="text-zinc-400 font-mono text-[11px]">Background</span>
+						<span className="font-mono text-[11px] text-zinc-400">
+							Background
+						</span>
 						<div className="flex rounded-lg bg-black/40 p-0.5">
 							<button
 								type="button"
 								onClick={() => setBgTone("polar")}
 								className={cn(
-									"rounded px-2 py-0.5 text-[11px] font-mono",
+									"rounded px-2 py-0.5 font-mono text-[11px]",
 									bgTone === "polar"
 										? "bg-white/20 text-white"
 										: "text-zinc-400",
@@ -243,7 +245,7 @@ The Reloop Team`;
 								type="button"
 								onClick={() => setBgTone("black")}
 								className={cn(
-									"rounded px-2 py-0.5 text-[11px] font-mono",
+									"rounded px-2 py-0.5 font-mono text-[11px]",
 									bgTone === "black"
 										? "bg-white/20 text-white"
 										: "text-zinc-400",
@@ -255,13 +257,13 @@ The Reloop Team`;
 					</div>
 
 					<div className="flex items-center justify-between gap-4">
-						<span className="text-zinc-400 font-mono text-[11px]">Size</span>
+						<span className="font-mono text-[11px] text-zinc-400">Size</span>
 						<div className="flex rounded-lg bg-black/40 p-0.5">
 							<button
 								type="button"
 								onClick={() => setFontSize("standard")}
 								className={cn(
-									"rounded px-2 py-0.5 text-[11px] font-mono",
+									"rounded px-2 py-0.5 font-mono text-[11px]",
 									fontSize === "standard"
 										? "bg-white/20 text-white"
 										: "text-zinc-400",
@@ -273,7 +275,7 @@ The Reloop Team`;
 								type="button"
 								onClick={() => setFontSize("large")}
 								className={cn(
-									"rounded px-2 py-0.5 text-[11px] font-mono",
+									"rounded px-2 py-0.5 font-mono text-[11px]",
 									fontSize === "large"
 										? "bg-white/20 text-white"
 										: "text-zinc-400",
@@ -303,7 +305,7 @@ The Reloop Team`;
 				{/* Manifesto Text Content */}
 				<div
 					className={cn(
-						"space-y-6 sm:space-y-7 font-sans font-normal tracking-[-0.01em]",
+						"space-y-6 font-normal font-sans tracking-[-0.01em] sm:space-y-7",
 						"text-[#e1e1e4] selection:bg-white/20 selection:text-white",
 						fontSize === "standard"
 							? "text-[18px] leading-[1.65] sm:text-[20px] sm:leading-[1.65]"
@@ -313,9 +315,9 @@ The Reloop Team`;
 					<p>You don’t need to learn a tutorial to send an email.</p>
 
 					<p>
-						You shouldn’t need to read docs, create API keys, configure
-						domains, figure out DNS, and spend hours connecting email
-						infrastructure just to send your first email.
+						You shouldn’t need to read docs, create API keys, configure domains,
+						figure out DNS, and spend hours connecting email infrastructure just
+						to send your first email.
 					</p>
 
 					<p>Just tell your agent what you want.</p>
@@ -341,7 +343,7 @@ The Reloop Team`;
 					<p>Run it yourself. Own your infrastructure.</p>
 
 					{/* Polar-style Em-dash & Sign-off */}
-					<div className="pt-2 space-y-4">
+					<div className="space-y-4 pt-2">
 						<p className="text-zinc-500">—</p>
 						<p className="leading-snug">
 							With love,

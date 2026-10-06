@@ -17,12 +17,12 @@ export function ConnectApplications() {
 								Connect all your preferred applications
 							</h2>
 							<p className="mb-8 text-balance text-lg text-muted-foreground">
-								Reloop provides a seamless integration experience, allowing you to
-								connect and synchronize data from multiple sources with ease.
+								Reloop provides a seamless integration experience, allowing you
+								to connect and synchronize data from multiple sources with ease.
 							</p>
 							<Link
 								href="/integrations"
-								className="inline-flex h-8 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-card px-3 font-medium text-xs text-foreground shadow-black/15 shadow-sm ring-1 ring-foreground/10 duration-200 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 dark:ring-foreground/15 dark:hover:bg-muted/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+								className="inline-flex h-8 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-card px-3 font-medium text-foreground text-xs shadow-black/15 shadow-sm ring-1 ring-foreground/10 duration-200 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 dark:ring-foreground/15 dark:hover:bg-muted/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
 							>
 								See all integrations
 							</Link>
@@ -47,7 +47,7 @@ export function ConnectApplications() {
 
 					{/* Tile 1: Cloudflare */}
 					<div className="group relative flex aspect-square bg-white hover:z-10 hover:bg-card dark:bg-black">
-						<div className="pointer-events-none absolute inset-0 z-1 flex size-full duration-200 ease-out *:m-auto *:size-10 *:duration-200 group-hover:opacity-65 group-hover:*:-translate-y-3">
+						<div className="group-hover:*:-translate-y-3 pointer-events-none absolute inset-0 z-1 flex size-full duration-200 ease-out *:m-auto *:size-10 *:duration-200 group-hover:opacity-65">
 							<svg viewBox="0 0 256 116" preserveAspectRatio="xMidYMid">
 								<path
 									fill="#FFF"
@@ -63,11 +63,11 @@ export function ConnectApplications() {
 								/>
 							</svg>
 						</div>
-						<span className="pointer-events-none absolute inset-0 z-10 m-auto block size-fit translate-y-[125%] font-medium text-sm text-foreground opacity-0 duration-200 group-hover:scale-100 group-hover:opacity-100">
+						<span className="pointer-events-none absolute inset-0 z-10 m-auto block size-fit translate-y-[125%] font-medium text-foreground text-sm opacity-0 duration-200 group-hover:scale-100 group-hover:opacity-100">
 							Cloudflare
 						</span>
 						<div className="absolute inset-0 rounded opacity-0 shadow-2xl shadow-indigo-900/15 duration-200 group-hover:opacity-100" />
-						<div className="relative flex size-full *:m-auto *:size-10 *:duration-200 **:fill-foreground group-hover:**:fill-muted-foreground group-hover:*:-translate-y-3">
+						<div className="group-hover:*:-translate-y-3 relative flex size-full *:m-auto *:size-10 **:fill-foreground *:duration-200 group-hover:**:fill-muted-foreground">
 							<svg viewBox="0 0 256 116" preserveAspectRatio="xMidYMid">
 								<path
 									fill="#FFF"
@@ -87,7 +87,7 @@ export function ConnectApplications() {
 
 					{/* Tile 2: Vercel */}
 					<div className="group relative flex aspect-square bg-white hover:z-10 hover:bg-card dark:bg-black">
-						<div className="pointer-events-none absolute inset-0 z-1 flex size-full duration-200 ease-out *:m-auto *:size-10 *:duration-200 group-hover:opacity-65 group-hover:*:-translate-y-3">
+						<div className="group-hover:*:-translate-y-3 pointer-events-none absolute inset-0 z-1 flex size-full duration-200 ease-out *:m-auto *:size-10 *:duration-200 group-hover:opacity-65">
 							<svg
 								viewBox="0 0 256 222"
 								preserveAspectRatio="xMidYMid"
@@ -96,11 +96,11 @@ export function ConnectApplications() {
 								<path d="m128 0 128 221.705H0z" />
 							</svg>
 						</div>
-						<span className="pointer-events-none absolute inset-0 z-10 m-auto block size-fit translate-y-[125%] font-medium text-sm text-foreground opacity-0 duration-200 group-hover:scale-100 group-hover:opacity-100">
+						<span className="pointer-events-none absolute inset-0 z-10 m-auto block size-fit translate-y-[125%] font-medium text-foreground text-sm opacity-0 duration-200 group-hover:scale-100 group-hover:opacity-100">
 							Vercel
 						</span>
 						<div className="absolute inset-0 rounded opacity-0 shadow-2xl shadow-indigo-900/15 duration-200 group-hover:opacity-100" />
-						<div className="relative flex size-full *:m-auto *:size-10 *:duration-200 **:fill-foreground group-hover:**:fill-muted-foreground group-hover:*:-translate-y-3">
+						<div className="group-hover:*:-translate-y-3 relative flex size-full *:m-auto *:size-10 **:fill-foreground *:duration-200 group-hover:**:fill-muted-foreground">
 							<svg
 								viewBox="0 0 256 222"
 								preserveAspectRatio="xMidYMid"
@@ -113,7 +113,7 @@ export function ConnectApplications() {
 
 					{/* Tile 3: Google PaLM */}
 					<div className="group relative flex aspect-square bg-white hover:z-10 hover:bg-card dark:bg-black">
-						<div className="pointer-events-none absolute inset-0 z-1 flex size-full duration-200 ease-out *:m-auto *:size-10 *:duration-200 group-hover:opacity-65 group-hover:*:-translate-y-3">
+						<div className="group-hover:*:-translate-y-3 pointer-events-none absolute inset-0 z-1 flex size-full duration-200 ease-out *:m-auto *:size-10 *:duration-200 group-hover:opacity-65">
 							<svg preserveAspectRatio="xMidYMid" viewBox="0 0 256 229">
 								<path
 									fill="#F9AB00"
@@ -145,11 +145,11 @@ export function ConnectApplications() {
 								/>
 							</svg>
 						</div>
-						<span className="pointer-events-none absolute inset-0 z-10 m-auto block size-fit translate-y-[125%] font-medium text-sm text-foreground opacity-0 duration-200 group-hover:scale-100 group-hover:opacity-100">
+						<span className="pointer-events-none absolute inset-0 z-10 m-auto block size-fit translate-y-[125%] font-medium text-foreground text-sm opacity-0 duration-200 group-hover:scale-100 group-hover:opacity-100">
 							Google PaLM
 						</span>
 						<div className="absolute inset-0 rounded opacity-0 shadow-2xl shadow-indigo-900/15 duration-200 group-hover:opacity-100" />
-						<div className="relative flex size-full *:m-auto *:size-10 *:duration-200 **:fill-foreground group-hover:**:fill-muted-foreground group-hover:*:-translate-y-3">
+						<div className="group-hover:*:-translate-y-3 relative flex size-full *:m-auto *:size-10 **:fill-foreground *:duration-200 group-hover:**:fill-muted-foreground">
 							<svg preserveAspectRatio="xMidYMid" viewBox="0 0 256 229">
 								<path
 									fill="#F9AB00"
@@ -185,7 +185,7 @@ export function ConnectApplications() {
 
 					{/* Tile 4: Claude AI */}
 					<div className="group relative flex aspect-square bg-white hover:z-10 hover:bg-card dark:bg-black">
-						<div className="pointer-events-none absolute inset-0 z-1 flex size-full duration-200 ease-out *:m-auto *:size-10 *:duration-200 group-hover:opacity-65 group-hover:*:-translate-y-3">
+						<div className="group-hover:*:-translate-y-3 pointer-events-none absolute inset-0 z-1 flex size-full duration-200 ease-out *:m-auto *:size-10 *:duration-200 group-hover:opacity-65">
 							<svg preserveAspectRatio="xMidYMid" viewBox="0 0 256 257">
 								<path
 									fill="#D97757"
@@ -193,11 +193,11 @@ export function ConnectApplications() {
 								/>
 							</svg>
 						</div>
-						<span className="pointer-events-none absolute inset-0 z-10 m-auto block size-fit translate-y-[125%] font-medium text-sm text-foreground opacity-0 duration-200 group-hover:scale-100 group-hover:opacity-100">
+						<span className="pointer-events-none absolute inset-0 z-10 m-auto block size-fit translate-y-[125%] font-medium text-foreground text-sm opacity-0 duration-200 group-hover:scale-100 group-hover:opacity-100">
 							Claude AI
 						</span>
 						<div className="absolute inset-0 rounded opacity-0 shadow-2xl shadow-indigo-900/15 duration-200 group-hover:opacity-100" />
-						<div className="relative flex size-full *:m-auto *:size-10 *:duration-200 **:fill-foreground group-hover:**:fill-muted-foreground group-hover:*:-translate-y-3">
+						<div className="group-hover:*:-translate-y-3 relative flex size-full *:m-auto *:size-10 **:fill-foreground *:duration-200 group-hover:**:fill-muted-foreground">
 							<svg preserveAspectRatio="xMidYMid" viewBox="0 0 256 257">
 								<path
 									fill="#D97757"

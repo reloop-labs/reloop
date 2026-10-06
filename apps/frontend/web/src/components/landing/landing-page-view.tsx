@@ -1,3 +1,15 @@
+import { ConnectApplications } from "@reloop/web/app/(home)/components/connect-applications";
+import { ContactSolutions } from "@reloop/web/app/(home)/components/contact-solutions";
+import CTA from "@reloop/web/app/(home)/components/cta";
+import { DataVisualization } from "@reloop/web/app/(home)/components/data-visualization";
+import { EnterpriseSecurity } from "@reloop/web/app/(home)/components/enterprise-security";
+import { GridSeparator } from "@reloop/web/app/(home)/components/grid-separator";
+import { HomeFaq } from "@reloop/web/app/(home)/components/home-faq";
+import { PaymentSolutions } from "@reloop/web/app/(home)/components/payment-solutions";
+import { PlatformShowcase } from "@reloop/web/app/(home)/components/platform-showcase";
+import { ReloopStory } from "@reloop/web/app/(home)/components/reloop-story";
+import { SecureVerification } from "@reloop/web/app/(home)/components/secure-verification";
+import { TransactionalEmails } from "@reloop/web/app/(home)/components/transactional-emails";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { LandingAgentCards } from "@reloop/web/components/landing/landing-agent-cards";
 import { LandingDeveloperProof } from "@reloop/web/components/landing/landing-developer-proof";
@@ -14,18 +26,6 @@ import {
 	siteName,
 	socialProfiles,
 } from "@reloop/web/lib/site";
-import { ConnectApplications } from "@reloop/web/app/(home)/components/connect-applications";
-import { ContactSolutions } from "@reloop/web/app/(home)/components/contact-solutions";
-import CTA from "@reloop/web/app/(home)/components/cta";
-import { DataVisualization } from "@reloop/web/app/(home)/components/data-visualization";
-import { EnterpriseSecurity } from "@reloop/web/app/(home)/components/enterprise-security";
-import { GridSeparator } from "@reloop/web/app/(home)/components/grid-separator";
-import { HomeFaq } from "@reloop/web/app/(home)/components/home-faq";
-import { PaymentSolutions } from "@reloop/web/app/(home)/components/payment-solutions";
-import { PlatformShowcase } from "@reloop/web/app/(home)/components/platform-showcase";
-import { ReloopStory } from "@reloop/web/app/(home)/components/reloop-story";
-import { SecureVerification } from "@reloop/web/app/(home)/components/secure-verification";
-import { TransactionalEmails } from "@reloop/web/app/(home)/components/transactional-emails";
 
 const siteUrl = getSiteUrl();
 const organizationId = `${siteUrl}/#organization`;

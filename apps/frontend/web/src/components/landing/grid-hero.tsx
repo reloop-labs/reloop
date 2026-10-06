@@ -53,7 +53,7 @@ export function GridHero() {
 										className="h-full rounded-[4px] bg-white py-12 text-center dark:bg-black"
 									>
 										<div className="relative z-[2] mx-auto max-w-3xl px-3 max-[1279px]:px-6 max-[479px]:px-0">
-											<p className="mb-4 text-sm text-muted-foreground sm:mb-6">
+											<p className="mb-4 text-muted-foreground text-sm sm:mb-6">
 												An alternative to <RotatingAlternative />
 											</p>
 											<h1

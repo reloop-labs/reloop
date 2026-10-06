@@ -14342,7 +14342,9 @@ provider to open it.
    and Reloop's URLs stay without one. **Keep required port** discards the new
    domain. Leave every other service without a domain.
 4. Click **Deploy**. The first deploy downloads about 5 GB of images, which
-   unpack to about 22 GB.
+   unpack to about 22 GB. Coolify stops a deploy after 10 minutes, so on a slow
+   connection the first one can fail before the stack starts. Click **Deploy**
+   again: the images already downloaded are kept.
 
 Coolify creates the database, Redis and every Reloop secret for you and stores
 them under **Environment Variables**. Change none of the generated values after
@@ -14481,6 +14483,10 @@ Updating only changes the images. Coolify keeps the service list and the
 Caddyfile under **Persistent Storage** on the `proxy` service with the one from
 the new template, and restart.
 
+Each update leaves the previous images behind, about 4 GB per update. Turn on
+Coolify's Docker cleanup for the server, or run `docker image prune` after
+updating.
+
 ---
 
 ## Things to avoid
@@ -14507,7 +14513,168 @@ other than a connection or TLS error means it works.
 Source: https://reloop.sh/docs/self-host/dokploy
 Markdown: https://reloop.sh/docs/self-host/dokploy.md
 
-Coming Soon
+Reloop is available as a Dokploy template. It runs the same stack as the
+[VPS installer](/docs/self-host/vps), with Dokploy generating every secret and
+Traefik handling HTTPS.
+
+---
+
+## Before you start
+
+| Requirement | Value |
+| :--- | :--- |
+| **Dokploy** | A recent release, with the default Traefik proxy |
+| **Architecture** | x86_64 (the dashboard and links images are amd64 only) |
+| **RAM** | 8 GB for Reloop and Dokploy together |
+| **Disk** | 50 GB. The container images alone take about 22 GB |
+| **Ports** | `25`, `465` and `587` free on the server, inbound and outbound |
+| **DNS** | Three hostnames pointing at the server, see [DNS](#dns) |
+
+Many providers block port `25` by default. Reloop delivers to recipient mail
+servers on outbound `25`, and receives mail on inbound `25`, so ask your
+provider to open it.
+
+---
+
+## Deploy
+
+1. In Dokploy, open your project and choose **Create Service** → **Template**.
+2. Search for **Reloop** and create it.
+3. Before the first deploy, open **Domains** and replace the generated host of
+   both domains, keeping HTTPS on:
+
+   | Service | Host |
+   | :--- | :--- |
+   | `proxy` | `reloop.example.com` |
+   | `links` | `link.reloop.example.com` |
+
+4. Open **Environment** and set the same hosts in `BASE_URL`, `HOST_DOMAIN`,
+   `SMTP_HOSTNAME`, `TRACKING_DOMAIN` and `TRACKING_BASE_URL`. The URL variables
+   start with `https://`, the others are the bare hostname.
+5. Click **Deploy**. The first deploy downloads about 5 GB of images, which
+   unpack to about 22 GB.
+
+Dokploy generates the database password, the Redis password and every Reloop
+secret, and stores them under **Environment**. Change none of the generated
+values after the first deploy: the database password is fixed once Postgres
+initialises, changing the tracking or preferences secrets breaks links in mail
+that was already sent, and changing the webhook key breaks the signature on
+every existing webhook.
+
+<Note>
+Set the real domains before you add any sending domain in the dashboard.
+Reloop writes the DNS records it shows you at the moment a domain is created,
+so a domain added while the instance still runs on Dokploy's generated
+`sslip.io` address keeps pointing there.
+</Note>
+
+---
+
+## DNS
+
+```text
+reloop.example.com            A    203.0.113.10
+link.reloop.example.com       A    203.0.113.10
+inbound.reloop.example.com    A    203.0.113.10
+reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
+```
+
+- The apex record serves the dashboard and the API.
+- `link.` serves click and open tracking and the unsubscribe pages.
+- `inbound.` is the MX target for mail your verified domains receive. The
+  template always uses `inbound.` plus `HOST_DOMAIN`.
+- The SPF record authorises the server to send for the host domain, which is
+  what the `include:` in each sending domain's SPF resolves to.
+
+Also ask your provider for a PTR record on the server IP that resolves to
+`reloop.example.com`. Receiving servers check it.
+
+---
+
+## First sign-in
+
+1. In Dokploy, open **Environment** and copy the value of `ADMIN_SETUP_KEY`.
+2. Open `https://reloop.example.com/dashboard/setup` and paste it as the setup key.
+3. Choose the first administrator's name, email and password.
+4. Name the first organization. Leave the instance name empty: on Dokploy it
+   has no effect, so set `APP_NAME` under **Environment** instead.
+
+The key works once. If you think it leaked before setup, change
+`ADMIN_SETUP_KEY` and redeploy: the old key stops working.
+
+Setup signs you in with a session that lasts 7 days. To sign in again after
+that, Reloop emails you a code, so configure system email before it runs out.
+
+---
+
+## System email
+
+Sign-in codes and invitations need a way out. Set these under **Environment**,
+then redeploy:
+
+| Variable | Value |
+| :--- | :--- |
+| `RELOOP_SENDER_DOMAIN` | The domain system mail is sent from. Always required |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE` | Any SMTP provider you already use (Postmark, SES, your own). `SMTP_SECURE=true` means implicit TLS, normally with port `465` |
+| `RELOOP_API_KEY` | Instead of SMTP: an API key of the organization that owns `RELOOP_SENDER_DOMAIN`, once that domain is verified in this instance |
+
+---
+
+## Configuration
+
+Everything below is optional and listed under **Environment** with its default.
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `DISABLE_SIGNUP` | `true` | Blocks public registration. Invited addresses can still join. If setup leaves public sign-ups off, it also saves that in `/run/reloop/.env` on the `auth` service's volume, which keeps registration closed even when this is `false`. To open it later, set this to `false`, remove the `DISABLE_SIGNUP` line from that file in the `auth` container, and redeploy |
+| `DISABLE_ORG_CREATION` | `false` | Stops users creating further organizations |
+| `APP_NAME` | `Reloop` | Instance name in system email, shown as `Self-hosted Reloop × <name>` |
+| `S3_ENDPOINT`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | empty | S3-compatible storage for template images and attachments. The bucket must serve objects publicly, because Reloop hands out URLs as `{S3_ENDPOINT}/{S3_BUCKET}/{path}` |
+| `S3_BUCKET` | `reloop-uploads` | Bucket name |
+| `S3_REGION` | `us-east-1` | Bucket region |
+| `RELOOP_VERSION` | `latest` | Image tag for every Reloop service |
+
+The queue dashboard at `https://reloop.example.com/api/workflow/jobs` uses
+`WORKBENCH_USER` and `WORKBENCH_PASS` for basic auth.
+
+---
+
+## Custom tracking domains
+
+A sending domain with click or open tracking gets a `link.` CNAME pointing at
+`link.reloop.example.com`, so tracked links in its mail use the customer's own
+hostname. Traefik only issues certificates for domains it knows about, so add
+each tracking hostname as another domain on the `links` service, port `3005`,
+with HTTPS on. Keep `TRACKING_DOMAIN` set to `link.reloop.example.com`: Reloop
+uses it as the CNAME target for every new sending domain.
+
+---
+
+## Mail ports and TLS
+
+| Port | Service | Protocol |
+| :--- | :--- | :--- |
+| `25` | `inbound` | SMTP with STARTTLS, for mail your verified domains receive |
+| `587` | `smtp` | Submission with STARTTLS |
+| `465` | `smtp` | The same STARTTLS listener as `587`, not implicit TLS |
+
+The template publishes these ports on the host directly, outside Traefik, so
+the deploy fails if another mail server already binds them. Both mail services
+use a self-signed certificate. Submit on `587` with STARTTLS, and tell clients
+that verify certificates to accept it.
+
+---
+
+## Updates and backups
+
+Dokploy only pulls new images on redeploy when pulling images is enabled in the
+service's settings. With it on, each redeploy fetches the tag in
+`RELOOP_VERSION` and reruns the `migrate` service, which pushes the database
+schema before the Reloop backend services start. Take a backup of the
+`postgres-data` volume first.
+
+Each update leaves the previous images behind, about 4 GB per update. Run
+`docker image prune` on the server after updating.
 
 ---
 
@@ -14818,6 +14985,8 @@ Enter the domain as a bare hostname: `reloop.example.com`, not `https://reloop.e
 The stack runs 20 containers: 14 Reloop backend services, 2 frontends (dashboard, links), PostgreSQL, Redis, NATS and Caddy. Only Caddy (`80` and `443`, or `127.0.0.1:<port>` behind your own proxy) and the two mail transports (`25` inbound, `465`/`587` submission) publish host ports. The database and event bus stay on the internal Docker network.
 
 A self-hosted install deliberately leaves out the parts of Reloop that only make sense for the hosted service: the public documentation site (`/docs` redirects to reloop.sh), the credits and quota service, the public email-validation tools, the operator console, and bundled object storage. Sending is not metered.
+
+The installer writes `SELF_HOSTED=true` to `.env`, which turns off every plan limit: sending quotas, the inbox, domain and organization caps, and dedicated IP entitlements. Installations from before this setting existed need it added by hand: put `SELF_HOSTED=true` in `/opt/reloop/.env` and run `reloop restart`.
 
 A `reloop` command is installed alongside it:
 

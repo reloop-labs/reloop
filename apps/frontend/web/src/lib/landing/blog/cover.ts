@@ -71,10 +71,14 @@ export async function statBlogCoverFile(publicPath: string) {
 		return null;
 	}
 
-	const info = await stat(filePath);
+	try {
+		const info = await stat(filePath);
 
-	return {
-		contentType,
-		byteLength: info.size,
-	};
+		return {
+			contentType,
+			byteLength: info.size,
+		};
+	} catch {
+		return null;
+	}
 }

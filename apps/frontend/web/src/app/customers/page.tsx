@@ -77,7 +77,7 @@ export default function CustomersPage() {
 				/>
 				<div className="grid gap-px bg-[#ebebeb] dark:bg-[#292929]">
 					<div className="rounded-[4px] bg-white px-6 pt-24 pb-16 text-center md:pt-32 dark:bg-black">
-						<p className="font-mono text-xs tracking-[0.2em] text-zinc-500 uppercase dark:text-zinc-400">
+						<p className="font-mono text-xs text-zinc-500 uppercase tracking-[0.2em] dark:text-zinc-400">
 							Customers
 						</p>
 						<h1 className="mx-auto mt-4 max-w-2xl text-balance font-medium text-4xl text-zinc-950 leading-[1.1] tracking-tight md:text-5xl dark:text-white">
@@ -122,8 +122,7 @@ export default function CustomersPage() {
 								Join them.
 							</p>
 							<p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-								Send your first email in minutes with the Reloop
-								API.
+								Send your first email in minutes with the Reloop API.
 							</p>
 						</div>
 						<Link

@@ -38,9 +38,8 @@ export function PaymentSolutions() {
 							<strong className="font-semibold text-zinc-950 dark:text-white">
 								monthly or credits
 							</strong>{" "}
-							— whatever fits how you send. Credits last 3 months
-							on a rolling basis, so you never pay for what you
-							don&apos;t use.
+							— whatever fits how you send. Credits last 3 months on a rolling
+							basis, so you never pay for what you don&apos;t use.
 						</p>
 
 						{/* Checklist */}
@@ -64,9 +63,7 @@ export function PaymentSolutions() {
 									className="size-4 shrink-0 text-emerald-500"
 									strokeWidth={2}
 								/>
-								<span>
-									Credits valid 3 months, rolling — switch anytime
-								</span>
+								<span>Credits valid 3 months, rolling — switch anytime</span>
 							</li>
 						</ul>
 
@@ -82,7 +79,10 @@ export function PaymentSolutions() {
 					{/* Right Column: Monthly / Credits visual */}
 					<div className="flex h-full items-center justify-center overflow-hidden bg-white p-4 sm:p-6 lg:p-8 dark:bg-black">
 						<div className="mx-auto w-full self-center">
-							<div aria-hidden="true" className="grid h-full grid-cols-6 gap-px bg-stroke-soft-100 dark:bg-white/10">
+							<div
+								aria-hidden="true"
+								className="grid h-full grid-cols-6 gap-px bg-stroke-soft-100 dark:bg-white/10"
+							>
 								{/* Left Grid Rows */}
 								<div className="grid grid-rows-3 gap-y-px bg-stroke-soft-100 dark:bg-white/10">
 									<div
@@ -152,8 +152,8 @@ export function PaymentSolutions() {
 												<div className="h-full w-[68%] rounded-full bg-emerald-500" />
 											</div>
 											<p className="mt-2 font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
-												Rolls forward every month — never
-												expires in under 3 months
+												Rolls forward every month — never expires in under 3
+												months
 											</p>
 										</div>
 									</div>

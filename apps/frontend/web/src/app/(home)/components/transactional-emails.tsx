@@ -44,9 +44,9 @@ export function TransactionalEmails() {
 
 						{/* Description */}
 						<p className="text-balance text-zinc-600 dark:text-zinc-400">
-							Get your emails where they belong. We handle
-							authentication, IP reputation and warmups so your
-							messages land in inboxes, not spam folders.
+							Get your emails where they belong. We handle authentication, IP
+							reputation and warmups so your messages land in inboxes, not spam
+							folders.
 						</p>
 
 						{/* Checklist */}
@@ -82,9 +82,7 @@ export function TransactionalEmails() {
 							asChild
 							className="mt-auto w-fit"
 						>
-							<Link href="/features/transaction-emails">
-								Learn more
-							</Link>
+							<Link href="/features/transaction-emails">Learn more</Link>
 						</Button.Root>
 					</div>
 
@@ -92,17 +90,14 @@ export function TransactionalEmails() {
 					<div className="flex h-full flex-col items-center justify-center bg-white px-6 py-12 sm:px-12 dark:bg-black">
 						<div className="flex w-full max-w-sm flex-col items-center">
 							{/* Top node: email template file */}
-							<div
-								aria-hidden="true"
-								className="relative size-fit"
-							>
-								<div className="absolute -right-3 bottom-2 z-[2] rounded bg-zinc-600 px-1.5 py-0.5 text-[10px] font-semibold text-white shadow-lg">
+							<div aria-hidden="true" className="relative size-fit">
+								<div className="-right-3 absolute bottom-2 z-[2] rounded bg-zinc-600 px-1.5 py-0.5 font-semibold text-[10px] text-white shadow-lg">
 									email
 								</div>
 								<div className="relative z-[1] w-16 space-y-2 rounded-md rounded-tr-[15%] bg-white p-2.5 ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10">
 									<div className="space-y-1.5">
 										<div className="flex items-center gap-1">
-											<div className="text-[6px] font-bold text-zinc-300 dark:text-zinc-600">
+											<div className="font-bold text-[6px] text-zinc-300 dark:text-zinc-600">
 												#
 											</div>
 											<div className="h-[3px] w-6 rounded-full bg-zinc-300 dark:bg-zinc-700" />
@@ -115,7 +110,7 @@ export function TransactionalEmails() {
 									</div>
 									<div className="space-y-1.5">
 										<div className="flex items-center gap-1">
-											<div className="text-[6px] font-bold text-zinc-300 dark:text-zinc-600">
+											<div className="font-bold text-[6px] text-zinc-300 dark:text-zinc-600">
 												##
 											</div>
 											<div className="h-[3px] w-5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
@@ -136,7 +131,7 @@ export function TransactionalEmails() {
 							{/* Connector: top to center */}
 							<span
 								aria-hidden
-								className="h-10 w-0 border-l border-solid border-stroke-soft-100 dark:border-white/10"
+								className="h-10 w-0 border-stroke-soft-100 border-l border-solid dark:border-white/10"
 							/>
 
 							{/* Center node: Reloop */}
@@ -151,29 +146,187 @@ export function TransactionalEmails() {
 										aria-hidden
 										className="overflow-visible"
 									>
-										<rect x={55} y={51} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={55} y={59} width={75} height={8} transform="rotate(90 55 59)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={146} y={59} width={46} height={8} transform="rotate(90 146 59)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={154} y={69} width={44} height={8} transform="rotate(90 154 69)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={138} y={59} width={46} height={8} transform="rotate(90 138 59)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={130} y={59} width={46} height={8} transform="rotate(90 130 59)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={90} y={105} width={29} height={8} transform="rotate(90 90 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={82} y={105} width={29} height={8} transform="rotate(90 82 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={138} y={105} width={8} height={8} transform="rotate(90 138 105)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={146} y={105} width={8} height={8} transform="rotate(90 146 105)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={146} y={134} width={8} height={8} transform="rotate(90 146 134)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={130} y={105} width={8} height={8} transform="rotate(90 130 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={122} y={105} width={8} height={8} transform="rotate(90 122 105)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={98} y={77} width={10} height={8} transform="rotate(90 98 77)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={90} y={77} width={10} height={8} transform="rotate(90 90 77)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={82} y={77} width={10} height={8} transform="rotate(90 82 77)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={146} y={113} width={21} height={8} transform="rotate(90 146 113)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={154} y={122} width={20} height={8} transform="rotate(90 154 122)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={138} y={113} width={21} height={8} transform="rotate(90 138 113)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={130} y={113} width={21} height={8} transform="rotate(90 130 113)" className="fill-[#4D4D4D] dark:fill-[#878787]" />
-										<rect x={98} y={113} width={21} height={8} transform="rotate(90 98 113)" className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={55} y={134} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
-										<rect x={63} y={142} width={83} height={8} className="fill-[#2C2C2C] dark:fill-[#D2D2D2]" />
+										<rect
+											x={55}
+											y={51}
+											width={83}
+											height={8}
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={55}
+											y={59}
+											width={75}
+											height={8}
+											transform="rotate(90 55 59)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={146}
+											y={59}
+											width={46}
+											height={8}
+											transform="rotate(90 146 59)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={154}
+											y={69}
+											width={44}
+											height={8}
+											transform="rotate(90 154 69)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={138}
+											y={59}
+											width={46}
+											height={8}
+											transform="rotate(90 138 59)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={130}
+											y={59}
+											width={46}
+											height={8}
+											transform="rotate(90 130 59)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={90}
+											y={105}
+											width={29}
+											height={8}
+											transform="rotate(90 90 105)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={82}
+											y={105}
+											width={29}
+											height={8}
+											transform="rotate(90 82 105)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={138}
+											y={105}
+											width={8}
+											height={8}
+											transform="rotate(90 138 105)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={146}
+											y={105}
+											width={8}
+											height={8}
+											transform="rotate(90 146 105)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={146}
+											y={134}
+											width={8}
+											height={8}
+											transform="rotate(90 146 134)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={130}
+											y={105}
+											width={8}
+											height={8}
+											transform="rotate(90 130 105)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={122}
+											y={105}
+											width={8}
+											height={8}
+											transform="rotate(90 122 105)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={98}
+											y={77}
+											width={10}
+											height={8}
+											transform="rotate(90 98 77)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={90}
+											y={77}
+											width={10}
+											height={8}
+											transform="rotate(90 90 77)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={82}
+											y={77}
+											width={10}
+											height={8}
+											transform="rotate(90 82 77)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={146}
+											y={113}
+											width={21}
+											height={8}
+											transform="rotate(90 146 113)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={154}
+											y={122}
+											width={20}
+											height={8}
+											transform="rotate(90 154 122)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={138}
+											y={113}
+											width={21}
+											height={8}
+											transform="rotate(90 138 113)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={130}
+											y={113}
+											width={21}
+											height={8}
+											transform="rotate(90 130 113)"
+											className="fill-[#4D4D4D] dark:fill-[#878787]"
+										/>
+										<rect
+											x={98}
+											y={113}
+											width={21}
+											height={8}
+											transform="rotate(90 98 113)"
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={55}
+											y={134}
+											width={83}
+											height={8}
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
+										<rect
+											x={63}
+											y={142}
+											width={83}
+											height={8}
+											className="fill-[#2C2C2C] dark:fill-[#D2D2D2]"
+										/>
 									</svg>
 								</span>
 							</span>

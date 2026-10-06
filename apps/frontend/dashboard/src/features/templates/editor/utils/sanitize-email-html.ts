@@ -235,7 +235,12 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 				}
 				if (!(node instanceof Element)) return false;
 				const tag = node.tagName.toLowerCase();
-				if (tag === "script" || tag === "style" || tag === "meta" || tag === "link") {
+				if (
+					tag === "script" ||
+					tag === "style" ||
+					tag === "meta" ||
+					tag === "link"
+				) {
 					return false;
 				}
 				return (

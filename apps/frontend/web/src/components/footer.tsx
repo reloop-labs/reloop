@@ -158,7 +158,7 @@ export const Footer = () => {
 
 	return (
 		<footer className="w-full bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 md:max-w-7xl border-x dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				{pathname !== "/tools" && <div aria-hidden className="h-24" />}
 				<FooterBrand accent={accent} />
 				<div aria-hidden className="h-24" />

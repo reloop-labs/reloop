@@ -454,24 +454,6 @@ export function SupportChatPanel({
 		});
 	};
 
-	if (loading) {
-		return (
-			<div className="flex flex-1 flex-col items-center justify-center gap-3 px-6">
-				<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10">
-					<LifeBuoy className="h-5 w-5 animate-pulse text-blue-600 dark:text-blue-400" />
-				</div>
-				<div className="text-center">
-					<p className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-						Connecting you to support
-					</p>
-					<p className="mt-0.5 text-[12px] text-text-sub-600 dark:text-white/40">
-						One moment…
-					</p>
-				</div>
-			</div>
-		);
-	}
-
 	if (error && !conversation) {
 		return (
 			<div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
@@ -546,10 +528,22 @@ export function SupportChatPanel({
 					<button
 						type="button"
 						onClick={() => void bootstrap()}
-						title={closed ? "Start a new conversation" : "Refresh"}
-						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
+						disabled={loading}
+						title={
+							loading
+								? "Refreshing…"
+								: closed
+									? "Start a new conversation"
+									: "Refresh"
+						}
+						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 disabled:opacity-70 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
 					>
-						<RotateCcw className="h-3.5 w-3.5" />
+						<RotateCcw
+							className={cn(
+								"h-3.5 w-3.5 transition-transform",
+								loading && "animate-spin",
+							)}
+						/>
 					</button>
 					{hideCloseButton ? null : (
 						<button

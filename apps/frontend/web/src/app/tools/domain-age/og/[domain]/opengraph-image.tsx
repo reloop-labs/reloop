@@ -167,10 +167,30 @@ async function loadFonts() {
 		).then((r) => r.arrayBuffer()),
 	]);
 	return [
-		{ name: "Inter", data: regular, weight: 400 as const, style: "normal" as const },
-		{ name: "Inter", data: medium, weight: 500 as const, style: "normal" as const },
-		{ name: "Inter", data: bold, weight: 700 as const, style: "normal" as const },
-		{ name: "Inter", data: extraBold, weight: 800 as const, style: "normal" as const },
+		{
+			name: "Inter",
+			data: regular,
+			weight: 400 as const,
+			style: "normal" as const,
+		},
+		{
+			name: "Inter",
+			data: medium,
+			weight: 500 as const,
+			style: "normal" as const,
+		},
+		{
+			name: "Inter",
+			data: bold,
+			weight: 700 as const,
+			style: "normal" as const,
+		},
+		{
+			name: "Inter",
+			data: extraBold,
+			weight: 800 as const,
+			style: "normal" as const,
+		},
 	];
 }
 
@@ -840,8 +860,7 @@ export default async function OpenGraphImage({
 		? [displayDomain, `is ${lookup.ageLabel} old`]
 		: ["How old is", `${displayDomain}?`];
 	const longestLine = Math.max(...titleLines.map((l) => l.length));
-	const headlineFontSize =
-		longestLine > 30 ? 36 : longestLine > 22 ? 44 : 56;
+	const headlineFontSize = longestLine > 30 ? 36 : longestLine > 22 ? 44 : 56;
 	const registered = lookup.createdAt
 		? `Registered ${formatDateOnly(lookup.createdAt)}`
 		: "Registration date unavailable";

@@ -44,7 +44,11 @@ export function DeveloperProof() {
 			aria-labelledby="developer-proof-heading"
 			className="w-full overflow-hidden bg-white dark:bg-black"
 		>
-			<style>{`@keyframes developer-proof-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
+			<style>
+				{
+					"@keyframes developer-proof-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }"
+				}
+			</style>
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<div className="border-stroke-soft-100 border-t px-6 py-20 dark:border-white/10">
 					<h2
@@ -62,10 +66,9 @@ export function DeveloperProof() {
 				<div className="overflow-hidden border-stroke-soft-100 border-y dark:border-white/10">
 					<ul
 						aria-label="Companies using Reloop"
-						className="flex w-max divide-x divide-stroke-soft-100 hover:[animation-play-state:paused] motion-reduce:animate-none dark:divide-white/10"
+						className="flex w-max divide-x divide-stroke-soft-100 motion-reduce:animate-none dark:divide-white/10 hover:[animation-play-state:paused]"
 						style={{
-							animation:
-								"developer-proof-marquee 60s linear infinite",
+							animation: "developer-proof-marquee 60s linear infinite",
 						}}
 					>
 						{[...brands, ...brands].map((brand, i) => (

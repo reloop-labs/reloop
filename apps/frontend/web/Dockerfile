@@ -50,12 +50,19 @@ ENV NEXT_PUBLIC_URL=https://reloop.sh
 ENV NEXT_PUBLIC_SITE_URL=https://reloop.sh
 
 # Copy standalone build
+COPY --from=builder /app/apps/frontend/web/content ./content
 COPY --from=builder /app/apps/frontend/web/public ./public
 COPY --from=builder /app/apps/frontend/web/.next/standalone ./
 COPY --from=builder /app/apps/frontend/web/.next/standalone/apps/frontend/web ./
 COPY --from=builder /app/apps/frontend/web/.next/static ./.next/static
 
-RUN rm -rf apps
+# Re-link external modules dynamically and clean up
+RUN rm -rf apps && \
+	for link in $(find .next/node_modules -type l 2>/dev/null); do \
+		target=$(readlink "$link"); \
+		new_target=$(echo "$target" | sed 's|\.\./\.\./\.\./\.\./\.\./|../../|'); \
+		ln -sf "$new_target" "$link"; \
+	done
 
 EXPOSE 3000
 

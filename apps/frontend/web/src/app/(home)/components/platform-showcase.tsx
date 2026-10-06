@@ -63,7 +63,7 @@ function ShowcaseBlock({ id }: { id: PlatformTabId }) {
 	if (!tab || !copy) return null;
 
 	return (
-		<div className="relative mx-auto w-full max-w-5xl border-x border-t border-stroke-soft-100 md:max-w-7xl dark:border-white/10">
+		<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x border-t md:max-w-7xl dark:border-white/10">
 			<div className="bg-white py-16 lg:py-24 dark:bg-black">
 				<div className="mx-auto w-full max-w-5xl px-6 xl:px-0">
 					<div className="mx-auto max-w-2xl space-y-6 text-center">

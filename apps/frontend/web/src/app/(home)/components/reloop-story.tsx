@@ -27,15 +27,14 @@ export function ReloopStory() {
 						>
 							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
 								<strong className="font-medium text-zinc-950 dark:text-white">
-									You don&apos;t need to learn a tutorial to send
-									an email.
+									You don&apos;t need to learn a tutorial to send an email.
 								</strong>
 							</p>
 
 							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
-								You shouldn&apos;t need to read docs, create API
-								keys, configure domains, figure out DNS, and spend
-								hours connecting email infrastructure{" "}
+								You shouldn&apos;t need to read docs, create API keys, configure
+								domains, figure out DNS, and spend hours connecting email
+								infrastructure{" "}
 								<strong className="font-medium text-zinc-950 dark:text-white">
 									just to send your first email.
 								</strong>
@@ -47,8 +46,7 @@ export function ReloopStory() {
 
 							<p className="text-xl text-zinc-600 leading-relaxed md:text-2xl dark:text-zinc-400">
 								<strong className="font-medium text-zinc-950 dark:text-white">
-									&ldquo;Set up email for my app using
-									Reloop.&rdquo;
+									&ldquo;Set up email for my app using Reloop.&rdquo;
 								</strong>
 							</p>
 
@@ -122,11 +120,7 @@ export function ReloopStory() {
 								{expanded ? (
 									<ChevronUp aria-hidden className="size-3" strokeWidth={2} />
 								) : (
-									<ChevronDown
-										aria-hidden
-										className="size-3"
-										strokeWidth={2}
-									/>
+									<ChevronDown aria-hidden className="size-3" strokeWidth={2} />
 								)}
 							</Button.Icon>
 						</Button.Root>

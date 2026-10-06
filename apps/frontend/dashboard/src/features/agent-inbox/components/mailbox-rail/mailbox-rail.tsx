@@ -74,7 +74,7 @@ const RailMailboxAvatar = ({
 						/>
 					</div>
 					{active && (
-						<span className="absolute -right-1 -bottom-1 z-10 rounded-full bg-primary-base p-px shadow ring-2 ring-bg-white-0 dark:bg-white! dark:text-white dark:ring-black">
+						<span className="-right-1 -bottom-1 absolute z-10 rounded-full bg-primary-base p-px shadow ring-2 ring-bg-white-0 dark:bg-white! dark:text-white dark:ring-black">
 							<CircleCheckBadge className="block size-2.5 text-white dark:text-black" />
 						</span>
 					)}

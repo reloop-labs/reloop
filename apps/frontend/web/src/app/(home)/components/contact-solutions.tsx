@@ -75,7 +75,7 @@ export function ContactSolutions() {
 													<span className="block text-xs text-zinc-500 dark:text-zinc-400">
 														Storage fee
 													</span>
-													<span className="block font-medium font-mono text-sm text-emerald-600 dark:text-emerald-400">
+													<span className="block font-medium font-mono text-emerald-600 text-sm dark:text-emerald-400">
 														$0.00
 													</span>
 												</div>
@@ -167,9 +167,8 @@ export function ContactSolutions() {
 							<strong className="font-semibold text-zinc-950 dark:text-white">
 								unlimited contacts
 							</strong>{" "}
-							without paying penalties for inactive leads. Segment freely,
-							track custom properties, and only pay for the emails you
-							actually send.
+							without paying penalties for inactive leads. Segment freely, track
+							custom properties, and only pay for the emails you actually send.
 						</p>
 
 						{/* Checklist */}

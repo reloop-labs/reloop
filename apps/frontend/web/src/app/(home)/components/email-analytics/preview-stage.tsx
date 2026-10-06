@@ -600,7 +600,6 @@ function InsightsPreviewCard() {
 					))}
 				</div>
 			</div>
-
 		</div>
 	);
 }

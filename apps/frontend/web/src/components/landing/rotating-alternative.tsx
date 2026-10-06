@@ -19,7 +19,11 @@ export function RotatingAlternative() {
 
 	return (
 		<>
-			<style>{`@keyframes hero-alternative-swap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+			<style>
+				{
+					"@keyframes hero-alternative-swap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }"
+				}
+			</style>
 			<span
 				aria-live="polite"
 				className="inline-flex min-w-24 justify-start font-semibold text-zinc-950 sm:min-w-28 dark:text-white"

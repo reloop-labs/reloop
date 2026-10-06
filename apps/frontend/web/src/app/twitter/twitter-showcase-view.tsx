@@ -31,7 +31,8 @@ const SHOWCASES: { id: ShowcaseKey; label: string; badge?: string }[] = [
 ];
 
 export function TwitterShowcaseView() {
-	const [activeShowcase, setActiveShowcase] = useState<ShowcaseKey>("manifesto");
+	const [activeShowcase, setActiveShowcase] =
+		useState<ShowcaseKey>("manifesto");
 	const [selectorOpen, setSelectorOpen] = useState(false);
 	const [showBar, setShowBar] = useState(false);
 
@@ -39,23 +40,25 @@ export function TwitterShowcaseView() {
 		<div className="relative min-h-dvh w-full">
 			{/* Top Bar Switcher (Hidden by default for pristine screenshotting, toggleable with hovering or button) */}
 			{showBar ? (
-				<div className="sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-black/90 px-4 py-2 text-xs text-white backdrop-blur-md">
+				<div className="sticky top-0 z-50 flex items-center justify-between border-white/10 border-b bg-black/90 px-4 py-2 text-white text-xs backdrop-blur-md">
 					<div className="flex items-center gap-2">
 						<div className="flex h-5 w-5 items-center justify-center rounded bg-zinc-800 font-bold text-[10px] text-white">
 							𝕏
 						</div>
-						<span className="font-semibold text-zinc-300">Twitter Graphic Lab</span>
+						<span className="font-semibold text-zinc-300">
+							Twitter Graphic Lab
+						</span>
 					</div>
 
 					{/* Showcase picker pills */}
-					<div className="flex items-center gap-1 overflow-x-auto py-0.5 no-scrollbar max-md:hidden">
+					<div className="no-scrollbar flex items-center gap-1 overflow-x-auto py-0.5 max-md:hidden">
 						{SHOWCASES.map((item) => (
 							<button
 								key={item.id}
 								type="button"
 								onClick={() => setActiveShowcase(item.id)}
 								className={cn(
-									"flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition",
+									"flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-medium text-xs transition",
 									activeShowcase === item.id
 										? "bg-white text-black shadow-sm"
 										: "text-zinc-400 hover:bg-white/10 hover:text-white",
@@ -63,7 +66,7 @@ export function TwitterShowcaseView() {
 							>
 								<span>{item.label}</span>
 								{item.badge && (
-									<span className="rounded bg-white/20 px-1 py-0.2 font-mono text-[9px] text-zinc-200 font-semibold">
+									<span className="rounded bg-white/20 px-1 py-0.2 font-mono font-semibold text-[9px] text-zinc-200">
 										{item.badge}
 									</span>
 								)}
@@ -76,7 +79,7 @@ export function TwitterShowcaseView() {
 						<button
 							type="button"
 							onClick={() => setSelectorOpen((v) => !v)}
-							className="flex items-center gap-1 rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 text-xs font-medium text-white"
+							className="flex items-center gap-1 rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-medium text-white text-xs"
 						>
 							<span>
 								{SHOWCASES.find((s) => s.id === activeShowcase)?.label}
@@ -85,7 +88,7 @@ export function TwitterShowcaseView() {
 						</button>
 
 						{selectorOpen && (
-							<div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-white/15 bg-zinc-950 p-1 shadow-2xl">
+							<div className="absolute top-full right-0 mt-2 w-48 rounded-xl border border-white/15 bg-zinc-950 p-1 shadow-2xl">
 								{SHOWCASES.map((item) => (
 									<button
 										key={item.id}
@@ -97,7 +100,7 @@ export function TwitterShowcaseView() {
 										className={cn(
 											"flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left text-xs",
 											activeShowcase === item.id
-												? "bg-white/20 text-white font-semibold"
+												? "bg-white/20 font-semibold text-white"
 												: "text-zinc-400 hover:bg-white/10 hover:text-white",
 										)}
 									>
@@ -125,7 +128,7 @@ export function TwitterShowcaseView() {
 				<button
 					type="button"
 					onClick={() => setShowBar(true)}
-					className="fixed top-3 left-3 z-50 rounded-full border border-white/10 bg-black/40 px-3 py-1 font-mono text-[10px] text-zinc-500 backdrop-blur-sm transition opacity-20 hover:opacity-100 hover:text-zinc-200"
+					className="fixed top-3 left-3 z-50 rounded-full border border-white/10 bg-black/40 px-3 py-1 font-mono text-[10px] text-zinc-500 opacity-20 backdrop-blur-sm transition hover:text-zinc-200 hover:opacity-100"
 				>
 					Switch Showcase
 				</button>

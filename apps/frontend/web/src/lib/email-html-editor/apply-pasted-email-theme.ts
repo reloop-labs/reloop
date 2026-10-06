@@ -1,5 +1,4 @@
 import type { Editor } from "@tiptap/react";
-import { useEmailHtmlEditorStore } from "./store";
 import { applyImportedEmailCss } from "./apply-imported-email-css";
 import {
 	absolutizeEmailAssetUrls,
@@ -11,6 +10,7 @@ import {
 	emailHasMixedBackgrounds,
 	readableTextColor,
 } from "./readable-text-color";
+import { useEmailHtmlEditorStore } from "./store";
 import {
 	emailColumnMaxWidthCss,
 	findEmailContainerTable,
@@ -75,10 +75,17 @@ export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 	const containerTable = findEmailContainerTable(doc);
 	// The importer removes scaffolding outside the content column. Transfer
 	// its padding to the page theme, separate from the column's own padding.
-	const pagePadding = { paddingTop: 0, paddingRight: 0, paddingBottom: 0, paddingLeft: 0 };
+	const pagePadding = {
+		paddingTop: 0,
+		paddingRight: 0,
+		paddingBottom: 0,
+		paddingLeft: 0,
+	};
 	let wrapper: HTMLElement | null = containerTable?.parentElement ?? doc.body;
 	while (wrapper) {
-		for (const prop of Object.keys(pagePadding) as (keyof typeof pagePadding)[]) {
+		for (const prop of Object.keys(
+			pagePadding,
+		) as (keyof typeof pagePadding)[]) {
 			pagePadding[prop] += parseCssUnit(wrapper.style[prop]) ?? 0;
 		}
 		if (wrapper === doc.body) break;

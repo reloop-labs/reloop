@@ -50,9 +50,8 @@ export function EnterpriseSecurity() {
 							Scale to Infinity
 						</h3>
 						<p className="text-balance text-muted-foreground">
-							Reloop is built to handle the largest volumes of transactions
-							with ease, ensuring that your business can scale to any
-							size.
+							Reloop is built to handle the largest volumes of transactions with
+							ease, ensuring that your business can scale to any size.
 						</p>
 
 						{/* Bullet Checklist */}
@@ -145,7 +144,7 @@ export function EnterpriseSecurity() {
 											M. Irung
 										</span>
 									</div>
-									<div className="mt-1.5 w-4/5 rounded-tl rounded-2xl bg-muted p-3 text-foreground text-xs shadow-black/5 shadow-md ring-1 ring-foreground/5">
+									<div className="mt-1.5 w-4/5 rounded-2xl rounded-tl bg-muted p-3 text-foreground text-xs shadow-black/5 shadow-md ring-1 ring-foreground/5">
 										Hey, I'm having trouble with my account.
 									</div>
 								</div>
@@ -154,7 +153,7 @@ export function EnterpriseSecurity() {
 							{/* Row 3: Support Agent Reply Bubble */}
 							<div className="flex flex-col justify-center bg-white p-4 dark:bg-black">
 								<div>
-									<div className="mb-1 ml-auto w-4/5 rounded-br rounded-2xl bg-zinc-950 p-3 text-white text-xs shadow-black/5 shadow-md ring-1 ring-white/10 dark:bg-zinc-100 dark:text-zinc-950">
+									<div className="mb-1 ml-auto w-4/5 rounded-2xl rounded-br bg-zinc-950 p-3 text-white text-xs shadow-black/5 shadow-md ring-1 ring-white/10 dark:bg-zinc-100 dark:text-zinc-950">
 										Distinctio provident nobis repudiandae deleniti
 										necessitatibus.
 									</div>
@@ -205,9 +204,7 @@ export function EnterpriseSecurity() {
 					</div>
 					<div className="space-y-3 bg-white p-6 lg:p-8 dark:bg-black">
 						<CalendarDays className="size-4" strokeWidth={2} />
-						<h3 className="mt-3 font-medium text-foreground">
-							Event Planning
-						</h3>
+						<h3 className="mt-3 font-medium text-foreground">Event Planning</h3>
 						<p className="line-clamp-2 text-muted-foreground text-sm">
 							Plan and keep track of your events effortlessly.
 						</p>

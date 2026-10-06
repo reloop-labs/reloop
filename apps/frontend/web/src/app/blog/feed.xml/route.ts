@@ -12,12 +12,20 @@ export async function GET() {
 			posts.map(async (post) => {
 				const url = `${siteUrl}/blog/${post.slug}`;
 				const coverUrl = blogCoverAbsoluteUrl(post.image);
-				const cover = post.image ? await statBlogCoverFile(post.image) : null;
-				const enclosure =
-					coverUrl && cover
-						? `
-      <enclosure url="${coverUrl}" type="${cover.contentType}" length="${cover.byteLength}" />`
-						: "";
+				let enclosure = "";
+				try {
+					const cover = post.image ? await statBlogCoverFile(post.image) : null;
+					if (coverUrl && cover) {
+						enclosure = `\n      <enclosure url="${coverUrl}" type="${cover.contentType}" length="${cover.byteLength}" />`;
+					}
+				} catch {
+					// Omit enclosure if cover file cannot be inspected
+				}
+
+				const pubDateObj = new Date(post.publishedAt);
+				const pubDate = Number.isNaN(pubDateObj.getTime())
+					? new Date().toUTCString()
+					: pubDateObj.toUTCString();
 
 				return `
     <item>
@@ -25,7 +33,7 @@ export async function GET() {
       <link>${url}</link>
       <guid>${url}</guid>
       <description><![CDATA[${post.description}]]></description>
-      <pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>
+      <pubDate>${pubDate}</pubDate>
       <category><![CDATA[${post.category}]]></category>${enclosure}
     </item>`;
 			}),

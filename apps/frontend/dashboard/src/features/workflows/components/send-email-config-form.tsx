@@ -412,9 +412,14 @@ const WorkflowSenderSection = ({
 	const [inputValue, setInputValue] = useState(persistedFrom);
 	const [replyValue, setReplyValue] = useState(persistedReply);
 	const [subjectValue, setSubjectValue] = useState(persistedSubject);
-	const [previewTextValue, setPreviewTextValue] = useState(persistedPreviewText);
-	const [showReplyTo, setShowReplyTo] = useState(Boolean(persistedReply.trim()));
-	const [showPreview, setShowPreview] = useState(Boolean(persistedPreviewText.trim()));
+	const [previewTextValue, setPreviewTextValue] =
+		useState(persistedPreviewText);
+	const [showReplyTo, setShowReplyTo] = useState(
+		Boolean(persistedReply.trim()),
+	);
+	const [showPreview, setShowPreview] = useState(
+		Boolean(persistedPreviewText.trim()),
+	);
 
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [highlightIndex, setHighlightIndex] = useState(0);
