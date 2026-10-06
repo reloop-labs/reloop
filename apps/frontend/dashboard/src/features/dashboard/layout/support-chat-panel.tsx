@@ -1,10 +1,10 @@
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import {
 	ArrowDown,
-	ArrowUp,
 	CheckCircle2,
 	CreditCard,
 	Globe,
@@ -13,6 +13,7 @@ import {
 	LifeBuoy,
 	Mail,
 	MessageSquare,
+	Paperclip,
 	RotateCcw,
 	Send,
 	X,
@@ -168,6 +169,25 @@ function SupportPersonAvatar({
 				</Avatar.Image>
 			)}
 		</Avatar.Root>
+	);
+}
+
+function FounderAvatar() {
+	const [failed, setFailed] = useState(false);
+	if (failed) {
+		return (
+			<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-blue-600 font-semibold text-[11px] text-white">
+				P
+			</div>
+		);
+	}
+	return (
+		<img
+			src="/team/pranav-patel.png"
+			alt="Pranav Patel, Reloop founder"
+			onError={() => setFailed(true)}
+			className="size-8 shrink-0 rounded-full bg-blue-600 object-cover"
+		/>
 	);
 }
 
@@ -482,26 +502,24 @@ export function SupportChatPanel({
 	const hasMessages = messages.length > 0;
 
 	return (
-		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-white dark:bg-[#0c0c0c]">
-			{/* Header */}
-			<div className="flex shrink-0 items-center justify-between gap-3 border-stroke-soft-100 border-b px-4 py-3.5 dark:border-white/8">
+		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-bg-weak-50/50 dark:bg-bg-weak-50/40">
+			{/* Title bar — gray like API key table header */}
+			<div className="flex shrink-0 items-center justify-between gap-3 px-5 pt-3.5 pb-6">
 				<div className="flex min-w-0 items-center gap-3">
-					<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
-						<Headphones className="h-4 w-4" />
-					</div>
+					<FounderAvatar />
 					<div className="min-w-0">
-						<div className="flex flex-wrap items-center gap-2">
-							<h2 className="font-semibold text-[14px] text-text-strong-950 tracking-tight dark:text-white">
+						<div className="flex items-center gap-1.5">
+							<span className="truncate font-medium text-[13px] text-text-strong-950 dark:text-white">
 								Reloop support
-							</h2>
+							</span>
 							<span
 								className={cn(
-									"inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-medium text-[10px]",
+									"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-medium text-[10px]",
 									closed
-										? "bg-bg-weak-50 text-text-sub-600 dark:bg-white/5 dark:text-white/40"
+										? "bg-bg-weak-100 text-text-sub-600 dark:bg-white/5 dark:text-white/40"
 										: ready
 											? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-											: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/5 dark:text-white/40",
+											: "bg-bg-weak-100 text-text-sub-600 dark:bg-white/5 dark:text-white/40",
 								)}
 							>
 								<span
@@ -520,16 +538,16 @@ export function SupportChatPanel({
 						<p className="mt-0.5 truncate text-[11px] text-text-sub-600 dark:text-white/40">
 							{closed
 								? "This conversation was closed by our team"
-								: "Real people · usually replies within a few hours"}
+								: "Replies in ~2–3 min"}
 						</p>
 					</div>
 				</div>
-				<div className="flex shrink-0 items-center gap-1.5">
+				<div className="flex shrink-0 items-center gap-0.5">
 					<button
 						type="button"
 						onClick={() => void bootstrap()}
 						title={closed ? "Start a new conversation" : "Refresh"}
-						className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke-soft-100 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
+						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
 					>
 						<RotateCcw className="h-3.5 w-3.5" />
 					</button>
@@ -538,257 +556,270 @@ export function SupportChatPanel({
 							type="button"
 							onClick={() => setIsAiPanelOpen(false)}
 							title="Close support"
-							className="flex h-8 w-8 items-center justify-center rounded-xl border border-stroke-soft-100 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
+							className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
 						>
 							<X className="h-3.5 w-3.5" />
 						</button>
 					)}
 				</div>
 			</div>
-
-			{/* Transcript */}
-			<div
-				ref={viewportRef}
-				onScroll={onViewportScroll}
-				className="scrollbar-thin relative min-h-0 flex-1 overflow-y-auto"
-				role="log"
-				aria-label="Support messages"
-				aria-relevant="additions"
-				data-autoscrolling={followOutput ? "true" : "false"}
-			>
-				{!hasMessages ? (
-					<div className="flex h-full min-h-[280px] flex-col px-4 py-6">
-						<div className="flex flex-1 flex-col items-center justify-center text-center">
-							<div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/15 to-violet-500/10 ring-1 ring-blue-500/10">
-								<LifeBuoy className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-							</div>
-							<p className="font-semibold text-[17px] text-text-strong-950 dark:text-white">
-								{greetingForHour()}, {firstName}
-							</p>
-							<p className="mt-1.5 max-w-[280px] text-[13px] text-text-sub-600 leading-relaxed dark:text-white/45">
-								We’re here to help with domains, sending, billing, and API
-								issues. Pick a topic or type your own message.
-							</p>
-						</div>
-
-						{!closed ? (
-							<div className="mx-auto w-full max-w-sm space-y-2 pb-2">
-								<p className="text-center font-medium text-[11px] text-text-soft-400 uppercase tracking-wide dark:text-white/30">
-									Common topics
-								</p>
-								<div className="grid grid-cols-2 gap-2">
-									{QUICK_TOPICS.map((topic) => {
-										const Icon = topic.icon;
-										return (
-											<button
-												key={topic.id}
-												type="button"
-												onClick={() => applyTopic(topic.message)}
-												className="group flex items-center gap-2.5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/80 px-3 py-2.5 text-left transition-all hover:border-blue-500/30 hover:bg-white dark:border-white/8 dark:bg-white/[0.03] dark:hover:border-blue-500/25 dark:hover:bg-white/[0.05]"
-											>
-												<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-text-sub-600 ring-1 ring-stroke-soft-100 transition-colors group-hover:text-blue-600 dark:bg-white/5 dark:ring-white/10 dark:group-hover:text-blue-400">
-													<Icon className="h-3.5 w-3.5" />
-												</span>
-												<span className="min-w-0 font-medium text-[12px] text-text-strong-950 dark:text-white">
-													{topic.label}
-												</span>
-											</button>
-										);
-									})}
+			{/* Body card — white with rounded corners like API key table body */}
+			<div className="-mt-3 relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[20px] border-stroke-soft-100 border-t bg-white dark:border-stroke-soft-100/70 dark:bg-black">
+				<div
+					ref={viewportRef}
+					onScroll={onViewportScroll}
+					className="scrollbar-thin min-h-0 flex-1 overflow-y-auto"
+					role="log"
+					aria-label="Support messages"
+					aria-relevant="additions"
+					data-autoscrolling={followOutput ? "true" : "false"}
+				>
+					{!hasMessages ? (
+						<div className="flex h-full min-h-[280px] flex-col px-4 py-6">
+							<div className="flex flex-1 flex-col items-center justify-center text-center">
+								<div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/15 to-violet-500/10 ring-1 ring-blue-500/10">
+									<LifeBuoy className="h-6 w-6 text-blue-600 dark:text-blue-400" />
 								</div>
+								<p className="font-semibold text-[17px] text-text-strong-950 dark:text-white">
+									{greetingForHour()}, {firstName}
+								</p>
+								<p className="mt-1.5 max-w-[280px] text-[13px] text-text-sub-600 leading-relaxed dark:text-white/45">
+									We’re here to help with domains, sending, billing, and API
+									issues. Pick a topic or type your own message.
+								</p>
 							</div>
-						) : null}
-					</div>
-				) : (
-					<div className="mx-auto flex w-full max-w-md flex-col gap-1 px-4 py-5">
-						{/* Thread intro chip */}
-						<div className="mb-3 flex justify-center">
-							<span className="rounded-full bg-bg-weak-50 px-3 py-1 text-[11px] text-text-sub-600 dark:bg-white/5 dark:text-white/40">
-								Conversation with Reloop support
-							</span>
-						</div>
 
-						{messages.map((m, idx) => {
-							const mine = m.senderRole === "user";
-							const showUnreadBanner = m.id === unreadAnchorId;
-							const prev = messages[idx - 1];
-							const showMeta = !prev || prev.senderRole !== m.senderRole;
-							return (
-								<Fragment key={m.id}>
-									{showUnreadBanner ? (
-										<div ref={unreadBannerRef}>
-											<UnreadMessagesBanner />
-										</div>
-									) : null}
-									<div
-										data-message-id={m.id}
-										className={cn(
-											"flex w-full flex-col",
-											mine ? "items-end" : "items-start",
-											showMeta ? "mt-4" : "mt-1",
-										)}
-									>
+							{!closed ? (
+								<div className="mx-auto w-full max-w-sm space-y-2 pb-2">
+									<p className="text-center font-medium text-[11px] text-text-soft-400 uppercase tracking-wide dark:text-white/30">
+										Common topics
+									</p>
+									<div className="grid grid-cols-2 gap-2">
+										{QUICK_TOPICS.map((topic) => {
+											const Icon = topic.icon;
+											return (
+												<button
+													key={topic.id}
+													type="button"
+													onClick={() => applyTopic(topic.message)}
+													className="group flex items-center gap-2.5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/80 px-3 py-2.5 text-left transition-all hover:border-blue-500/30 hover:bg-white dark:border-white/8 dark:bg-white/[0.03] dark:hover:border-blue-500/25 dark:hover:bg-white/[0.05]"
+												>
+													<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-text-sub-600 ring-1 ring-stroke-soft-100 transition-colors group-hover:text-blue-600 dark:bg-white/5 dark:ring-white/10 dark:group-hover:text-blue-400">
+														<Icon className="h-3.5 w-3.5" />
+													</span>
+													<span className="min-w-0 font-medium text-[12px] text-text-strong-950 dark:text-white">
+														{topic.label}
+													</span>
+												</button>
+											);
+										})}
+									</div>
+								</div>
+							) : null}
+						</div>
+					) : (
+						<div className="mx-auto flex w-full max-w-md flex-col gap-1 px-4 py-5">
+							{/* Thread intro chip */}
+							<div className="mb-3 flex justify-center">
+								<span className="rounded-full bg-bg-weak-50 px-3 py-1 text-[11px] text-text-sub-600 dark:bg-white/5 dark:text-white/40">
+									Conversation with Reloop support
+								</span>
+							</div>
+
+							{messages.map((m, idx) => {
+								const mine = m.senderRole === "user";
+								const showUnreadBanner = m.id === unreadAnchorId;
+								const prev = messages[idx - 1];
+								const showMeta = !prev || prev.senderRole !== m.senderRole;
+								return (
+									<Fragment key={m.id}>
+										{showUnreadBanner ? (
+											<div ref={unreadBannerRef}>
+												<UnreadMessagesBanner />
+											</div>
+										) : null}
 										<div
+											data-message-id={m.id}
 											className={cn(
-												"flex max-w-[92%] items-end gap-2",
-												mine ? "flex-row-reverse" : "flex-row",
+												"flex w-full flex-col",
+												mine ? "items-end" : "items-start",
+												showMeta ? "mt-4" : "mt-1",
 											)}
 										>
-											{showMeta ? (
-												<SupportPersonAvatar
-													name={
-														mine
-															? user?.name || m.senderName
-															: m.senderName || "Support"
-													}
-													email={
-														mine ? user?.email || m.senderEmail : m.senderEmail
-													}
-													image={
-														mine ? user?.image || m.senderImage : m.senderImage
-													}
-													size="24"
-													supportAgent={!mine}
-												/>
-											) : (
-												<span className="w-6 shrink-0" />
-											)}
 											<div
 												className={cn(
-													"min-w-0 px-3.5 py-2.5 text-[13px] leading-relaxed",
-													mine
-														? "rounded-2xl rounded-br-md bg-blue-600 text-white"
-														: "rounded-2xl rounded-bl-md border border-stroke-soft-100 bg-bg-weak-50 text-text-strong-950 dark:border-white/8 dark:bg-white/[0.06] dark:text-white/90",
+													"flex max-w-[92%] items-end gap-2",
+													mine ? "flex-row-reverse" : "flex-row",
 												)}
 											>
-												<SupportChatMarkdown content={m.body} mine={mine} />
+												{showMeta ? (
+													<SupportPersonAvatar
+														name={
+															mine
+																? user?.name || m.senderName
+																: m.senderName || "Support"
+														}
+														email={
+															mine
+																? user?.email || m.senderEmail
+																: m.senderEmail
+														}
+														image={
+															mine
+																? user?.image || m.senderImage
+																: m.senderImage
+														}
+														size="24"
+														supportAgent={!mine}
+													/>
+												) : (
+													<span className="w-6 shrink-0" />
+												)}
+												<div
+													className={cn(
+														"min-w-0 px-3.5 py-2.5 text-[13px] leading-relaxed",
+														mine
+															? "rounded-2xl rounded-br-md bg-blue-600 text-white"
+															: "rounded-2xl rounded-bl-md border border-stroke-soft-100 bg-bg-weak-50 text-text-strong-950 dark:border-white/8 dark:bg-white/[0.06] dark:text-white/90",
+													)}
+												>
+													<SupportChatMarkdown content={m.body} mine={mine} />
+												</div>
 											</div>
+											{showMeta ? (
+												<p
+													className={cn(
+														"mt-1 text-[10px] text-text-soft-400 dark:text-white/30",
+														mine ? "mr-8" : "ml-8",
+													)}
+												>
+													{mine ? "You" : m.senderName || "Reloop support"} ·{" "}
+													{formatTime(m.createdAt)}
+												</p>
+											) : null}
 										</div>
-										{showMeta ? (
-											<p
-												className={cn(
-													"mt-1 text-[10px] text-text-soft-400 dark:text-white/30",
-													mine ? "mr-8" : "ml-8",
-												)}
-											>
-												{mine ? "You" : m.senderName || "Reloop support"} ·{" "}
-												{formatTime(m.createdAt)}
-											</p>
-										) : null}
-									</div>
-								</Fragment>
-							);
-						})}
-						<div ref={bottomRef} className="h-px w-full shrink-0" />
-					</div>
-				)}
-			</div>
-
-			{showJumpLatest ? (
-				<div className="pointer-events-none absolute inset-x-0 bottom-[100px] z-10 flex justify-center">
-					<button
-						type="button"
-						onClick={() => scrollToLatest()}
-						className="pointer-events-auto inline-flex h-8 items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-white px-3 font-medium text-[12px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-[#161616] dark:text-white dark:hover:bg-white/5"
-					>
-						Jump to latest
-						<ArrowDown className="h-3.5 w-3.5" />
-					</button>
+									</Fragment>
+								);
+							})}
+							{showJumpLatest ? (
+								<div className="pointer-events-none sticky bottom-4 z-10 flex justify-center">
+									<button
+										type="button"
+										onClick={() => scrollToLatest()}
+										className="pointer-events-auto inline-flex h-8 items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-white px-3 font-medium text-[12px] text-text-strong-950 shadow-md transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-[#161616] dark:text-white dark:hover:bg-white/5"
+									>
+										Jump to latest
+										<ArrowDown className="h-3.5 w-3.5" />
+									</button>
+								</div>
+							) : null}
+							<div ref={bottomRef} className="h-px w-full shrink-0" />
+						</div>
+					)}
 				</div>
-			) : null}
+				{error ? (
+					<p className="shrink-0 px-4 pb-1 text-[12px] text-red-500">{error}</p>
+				) : null}
+				<div className="shrink-0 px-4 pt-2 pb-4">
+					{closed ? (
+						<div className="mb-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50 px-3.5 py-3 dark:border-white/8 dark:bg-white/[0.03]">
+							<div className="flex items-start gap-2.5">
+								<CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-sub-600 dark:text-white/40" />
+								<div className="min-w-0 flex-1">
+									<p className="font-medium text-[12px] text-text-strong-950 dark:text-white">
+										This conversation is closed
+									</p>
+									<p className="mt-0.5 text-[11px] text-text-sub-600 dark:text-white/40">
+										Need more help? Start a fresh conversation with the team.
+									</p>
+									<button
+										type="button"
+										onClick={() => {
+											autoSentRef.current = false;
+											void bootstrap();
+										}}
+										className="mt-2 inline-flex h-8 items-center gap-1.5 rounded-lg bg-text-strong-950 px-3 font-medium text-[11px] text-white dark:bg-white dark:text-black"
+									>
+										<Send className="h-3 w-3" />
+										Start new conversation
+									</button>
+								</div>
+							</div>
+						</div>
+					) : null}
 
-			{error ? (
-				<p className="shrink-0 px-4 pb-1 text-[12px] text-red-500">{error}</p>
-			) : null}
+					{!closed && !hasMessages ? (
+						<p className="mb-2 text-center text-[11px] text-text-soft-400 dark:text-white/30">
+							Or write your own message below
+						</p>
+					) : null}
 
-			{/* Composer, matches Ask AI input chrome */}
-			<div className="shrink-0 border-stroke-soft-100 border-t bg-white px-4 py-4 dark:border-white/5 dark:bg-[#0c0c0c]/80">
-				{closed ? (
-					<div className="mb-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50 px-3.5 py-3 dark:border-white/8 dark:bg-white/[0.03]">
-						<div className="flex items-start gap-2.5">
-							<CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-text-sub-600 dark:text-white/40" />
-							<div className="min-w-0 flex-1">
-								<p className="font-medium text-[12px] text-text-strong-950 dark:text-white">
-									This conversation is closed
-								</p>
-								<p className="mt-0.5 text-[11px] text-text-sub-600 dark:text-white/40">
-									Need more help? Start a fresh conversation with the team.
-								</p>
+					<div
+						className={cn(
+							"flex flex-col overflow-hidden rounded-[20px] border border-stroke-soft-100 bg-bg-weak-50/50 transition-all focus-within:border-stroke-soft-300 dark:border-stroke-soft-100/70 dark:bg-bg-weak-50/40 dark:focus-within:border-white/20",
+							closed && "pointer-events-none opacity-40",
+						)}
+					>
+						{/* Textarea */}
+						<div className="relative overflow-hidden rounded-b-[18px] border-stroke-soft-100 border-b bg-white dark:border-stroke-soft-100/70 dark:bg-black">
+							<textarea
+								ref={textareaRef}
+								value={draft}
+								maxLength={1000}
+								onChange={(e) => {
+									setDraft(e.target.value);
+									e.target.style.height = "auto";
+									e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
+								}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" && !e.shiftKey) {
+										e.preventDefault();
+										void handleSend();
+									}
+								}}
+								disabled={closed}
+								placeholder={
+									closed ? "Conversation closed" : "Write your message..."
+								}
+								title={
+									closed
+										? "Closed"
+										: ready
+											? "Live · Enter to send"
+											: "Reconnecting…"
+								}
+								rows={3}
+								className="scrollbar-none min-h-[76px] w-full resize-none bg-transparent px-4 pt-3.5 pr-11 pb-2.5 text-[14px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/30"
+							/>
+							<button
+								type="button"
+								onClick={() => void handleSend()}
+								disabled={!draft.trim() || sending || closed}
+								title={ready ? "Send · Enter" : "Reconnecting…"}
+								className={cn(
+									"absolute top-3 right-3 flex size-7 items-center justify-center rounded-lg transition-all",
+									draft.trim() && !closed
+										? "cursor-pointer text-teal-600 hover:bg-teal-500/10 dark:text-teal-400"
+										: "cursor-not-allowed text-text-soft-400/60 dark:text-white/20",
+								)}
+							>
+								<Icon name="send-1" className="h-[18px] w-[18px]" />
+							</button>
+						</div>
+
+						{/* Action toolbar on the bottom tray */}
+						<div className="flex items-center justify-between gap-2 px-3 py-2">
+							<div className="flex items-center gap-1.5">
 								<button
 									type="button"
-									onClick={() => {
-										autoSentRef.current = false;
-										void bootstrap();
-									}}
-									className="mt-2 inline-flex h-8 items-center gap-1.5 rounded-lg bg-text-strong-950 px-3 font-medium text-[11px] text-white dark:bg-white dark:text-black"
+									title="Attach a file (coming soon)"
+									className="flex h-7 items-center gap-1.5 rounded-lg px-2 font-medium text-[12px] text-text-sub-600 transition-colors hover:bg-bg-weak-100 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/5 dark:hover:text-white"
 								>
-									<Send className="h-3 w-3" />
-									Start new conversation
+									<Paperclip className="h-3.5 w-3.5 opacity-70" />
+									Attach
 								</button>
 							</div>
 						</div>
-					</div>
-				) : null}
-
-				{!closed && !hasMessages ? (
-					<p className="mb-2 text-center text-[11px] text-text-soft-400 dark:text-white/30">
-						Or write your own message below
-					</p>
-				) : null}
-
-				<div
-					className={cn(
-						"flex flex-col rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 focus-within:border-orange-500/40 focus-within:ring-2 focus-within:ring-orange-500/10 dark:border-white/10 dark:bg-white/[0.02]",
-						closed && "pointer-events-none opacity-40",
-					)}
-				>
-					<textarea
-						ref={textareaRef}
-						value={draft}
-						onChange={(e) => {
-							setDraft(e.target.value);
-							e.target.style.height = "auto";
-							e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
-						}}
-						onKeyDown={(e) => {
-							if (e.key === "Enter" && !e.shiftKey) {
-								e.preventDefault();
-								void handleSend();
-							}
-						}}
-						disabled={closed}
-						placeholder={
-							closed
-								? "Conversation closed"
-								: hasMessages
-									? "Reply to support…"
-									: "What can we help you with?"
-						}
-						rows={2}
-						className="scrollbar-none w-full resize-none bg-transparent px-2.5 py-1 text-text-strong-950 text-xs placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/20"
-					/>
-					<div className="mt-2.5 flex items-center justify-between border-stroke-soft-100/50 border-t pt-2 dark:border-white/5">
-						<span className="px-1.5 text-[10px] text-text-soft-400 dark:text-white/25">
-							{closed
-								? "Closed"
-								: ready
-									? "Live · Enter to send"
-									: "Reconnecting…"}
-						</span>
-						<button
-							type="button"
-							onClick={() => void handleSend()}
-							disabled={!draft.trim() || sending || closed}
-							className={cn(
-								"flex h-7 items-center gap-1 rounded-lg px-3 font-semibold text-xs transition-all",
-								draft.trim() && !closed
-									? "bg-orange-500 text-white hover:bg-orange-600"
-									: "bg-bg-weak-100 text-text-sub-400 dark:bg-white/5 dark:text-white/20",
-							)}
-						>
-							{sending ? "Sending" : "Send"}
-							<ArrowUp className="h-3.5 w-3.5" />
-						</button>
 					</div>
 				</div>
 			</div>

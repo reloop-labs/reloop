@@ -29,7 +29,7 @@ export const AiPanel = () => {
 				animate={{ x: 0 }}
 				exit={{ x: "100%" }}
 				transition={{ type: "spring", stiffness: 350, damping: 35 }}
-				className="absolute inset-y-0 right-0 flex h-full w-full flex-col overflow-hidden border-stroke-soft-100 bg-white shadow-2xl md:w-[400px] md:border-l dark:border-white/5 dark:bg-[#0c0c0c]"
+				className="absolute inset-y-0 right-0 flex h-full w-full flex-col overflow-hidden border-stroke-soft-100 bg-white shadow-2xl md:w-[400px] md:border-l dark:border-stroke-soft-100/70 dark:bg-black"
 			>
 				<div className="flex h-full w-full flex-col overflow-hidden">
 					<SupportChatPanel />
