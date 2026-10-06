@@ -125,7 +125,7 @@ export function PageHeader() {
 					aria-label="Go to Help & support"
 					aria-current={isHelpActive ? "page" : undefined}
 					className={cn(
-						"flex h-7 items-center gap-1.5 rounded-lg px-2.5 font-medium text-[12px] text-text-sub-600 transition-colors",
+						"flex h-7 items-center gap-1.5 rounded-full px-2.5 font-medium text-[12px] text-text-sub-600 transition-colors",
 						"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5 dark:hover:text-white",
 						isHelpActive &&
 							"bg-bg-weak-50 text-text-strong-950 dark:bg-white/5 dark:text-white",
