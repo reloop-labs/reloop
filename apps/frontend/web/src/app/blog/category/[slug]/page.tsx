@@ -1,3 +1,4 @@
+import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { BlogIndex } from "@reloop/web/components/landing/blog/blog-index";
 import { createBlogCategoryMetadata } from "@reloop/web/lib/landing/blog/seo";
 import {
@@ -57,6 +58,8 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 					<span>{category.name}</span>
 				</nav>
 			}
-		/>
+		>
+			<BlogCta category={category.name} />
+		</BlogIndex>
 	);
 }
