@@ -112,7 +112,9 @@ type OrgDetail = {
 		createdAt: string;
 		registrarCreatedAt: string | null;
 		ageDays: number;
+		ageCap?: number | null;
 		dailyCap: number | null;
+		dailyCapOverride?: number | null;
 		sentToday: number;
 		remaining: number | null;
 		source: string;
@@ -225,6 +227,14 @@ export default function OrganizationDetailPage() {
 	const [verifyingDomainId, setVerifyingDomainId] = useState<string | null>(
 		null,
 	);
+	const [capTarget, setCapTarget] = useState<{
+		id: string;
+		domain: string;
+		current: number | null;
+		value: string;
+		reason: string;
+	} | null>(null);
+	const [savingCap, setSavingCap] = useState(false);
 
 	const { data, isLoading, error, mutate } = useSWR<OrgDetail>(
 		orgId ? `/organizations/${orgId}` : null,
@@ -560,6 +570,85 @@ export default function OrganizationDetailPage() {
 				</InlineActionPanel>
 			) : null}
 
+			{capTarget ? (
+				<InlineActionPanel
+					title={`Increase limit for ${capTarget.domain}?`}
+					description={`Current effective cap: ${capTarget.current ?? "Dynamic"} / day. Set a higher daily cap (takes effect immediately, resets still at 00:00 UTC). Audit-logged. Clear to restore the automatic age-based cap.`}
+					confirmLabel={savingCap ? "Saving…" : "Set cap"}
+					onCancel={() => (savingCap ? null : setCapTarget(null))}
+					onConfirm={async () => {
+						const amount = Number(capTarget.value);
+						if (!Number.isInteger(amount) || amount < 1 || amount > 1000000) {
+							toast.error("Enter a whole number between 1 and 1,000,000");
+							throw new Error("invalid cap");
+						}
+						try {
+							setSavingCap(true);
+							await adminPatch(`/domains/${capTarget.id}/cap`, {
+								dailyCapOverride: amount,
+								reason: capTarget.reason || "Limit raised by admin",
+							});
+							toast.success(`Daily cap for ${capTarget.domain} set to ${amount}`);
+							setCapTarget(null);
+							mutate();
+						} finally {
+							setSavingCap(false);
+						}
+					}}
+				>
+					<div className="grid gap-2 sm:grid-cols-2">
+						<Input.Root>
+							<Input.Wrapper>
+								<Input.Input
+									type="number"
+									min={1}
+									max={1000000}
+									value={capTarget.value}
+									onChange={(e) =>
+										setCapTarget({ ...capTarget, value: e.target.value })
+									}
+									placeholder="New daily cap"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+						<Input.Root>
+							<Input.Wrapper>
+								<Input.Input
+									value={capTarget.reason}
+									onChange={(e) =>
+										setCapTarget({ ...capTarget, reason: e.target.value })
+									}
+									placeholder="Reason (audit log)"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+					</div>
+					<button
+						type="button"
+						disabled={savingCap}
+						onClick={async () => {
+							try {
+								setSavingCap(true);
+								await adminPatch(`/domains/${capTarget.id}/cap`, {
+									dailyCapOverride: null,
+									reason: capTarget.reason || "Override cleared by admin",
+								});
+								toast.success(`Restored automatic cap for ${capTarget.domain}`);
+								setCapTarget(null);
+								mutate();
+							} catch {
+								toast.error("Failed to clear override");
+							} finally {
+								setSavingCap(false);
+							}
+						}}
+						className="mt-2 text-[12px] text-text-sub-600 underline underline-offset-2 hover:text-text-strong-950"
+					>
+						Restore automatic cap instead
+					</button>
+				</InlineActionPanel>
+			) : null}
+
 			<MetricGrid
 				items={[
 					{
@@ -649,13 +738,34 @@ export default function OrganizationDetailPage() {
 							<div
 								className={`rounded-xl border px-4 py-3.5 ${atCap.length ? "border-orange-200 bg-orange-50 dark:border-orange-500/20 dark:bg-orange-500/10" : "border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10"}`}
 							>
-								<p
-									className={`font-semibold text-[12px] ${atCap.length ? "text-orange-700 dark:text-orange-300" : "text-amber-700 dark:text-amber-300"}`}
-								>
-									{atCap.length
-										? `${atCap.length} domain${atCap.length > 1 ? "s" : ""} at daily limit. New sends are paused until UTC midnight`
-										: `${warming.length} domain${warming.length > 1 ? "s are" : " is"} warming up. Daily sends are throttled for the first 30 days`}
-								</p>
+								<div className="flex flex-wrap items-center justify-between gap-2">
+									<p
+										className={`font-semibold text-[12px] ${atCap.length ? "text-orange-700 dark:text-orange-300" : "text-amber-700 dark:text-amber-300"}`}
+									>
+										{atCap.length
+											? `${atCap.length} domain${atCap.length > 1 ? "s" : ""} at daily limit. New sends are paused until UTC midnight`
+											: `${warming.length} domain${warming.length > 1 ? "s are" : " is"} warming up. Daily sends are throttled for the first 30 days`}
+									</p>
+									<Button.Root
+										variant="neutral"
+										mode="filled"
+										size="xsmall"
+										onClick={() => {
+											const target =
+												atCap[0] ?? warming.find((d) => d.dailyCap !== null);
+											if (!target || target.dailyCap === null) return;
+											setCapTarget({
+												id: target.id,
+												domain: target.domain,
+												current: target.dailyCap,
+												value: String(target.dailyCap),
+												reason: "",
+											});
+										}}
+									>
+										Increase limit
+									</Button.Root>
+								</div>
 								<p className="mt-1 text-[11px] text-text-sub-600 leading-relaxed dark:text-white/60">
 									Applies to{" "}
 									<span className="font-medium text-text-strong-950 dark:text-white">
@@ -663,7 +773,8 @@ export default function OrganizationDetailPage() {
 									</span>{" "}
 									to protect reputation and block scam bulk sends from cheap,
 									newly bought domains. Caps rise automatically as the domain
-									ages. No manual action needed.
+									ages. Admins can raise a cap now with “Increase limit”
+									(audit-logged).
 								</p>
 								<div className="mt-3 space-y-2.5">
 									{warming.map((d) => {
@@ -685,14 +796,39 @@ export default function OrganizationDetailPage() {
 												<div className="flex flex-wrap items-baseline justify-between gap-2">
 													<span className="font-medium font-mono text-[12px] text-text-strong-950 dark:text-white">
 														{d.domain}
+														{d.dailyCapOverride != null ? (
+															<span
+																className="ml-1.5 rounded-full bg-blue-500/10 px-1.5 py-0.5 font-sans font-medium text-[10px] text-blue-700 ring-1 ring-blue-500/20 dark:text-blue-300"
+																title={`Admin override (automatic would be ${d.ageCap ?? "dynamic"})`}
+															>
+																raised
+															</span>
+														) : null}
 													</span>
-													<span
-														className={`rounded-full px-2 py-0.5 font-medium text-[11px] ${isAt ? "bg-orange-500/10 text-orange-700 ring-1 ring-orange-500/20 dark:text-orange-300" : "bg-amber-500/10 text-amber-700 ring-1 ring-amber-500/20 dark:text-amber-300"}`}
-													>
-														{d.ageDays}d old ·{" "}
-														{d.dailyCap !== null
-															? `${d.sentToday}/${d.dailyCap} today`
-															: "Dynamic"}
+													<span className="flex flex-wrap items-center gap-1.5">
+														<span
+															className={`rounded-full px-2 py-0.5 font-medium text-[11px] ${isAt ? "bg-orange-500/10 text-orange-700 ring-1 ring-orange-500/20 dark:text-orange-300" : "bg-amber-500/10 text-amber-700 ring-1 ring-amber-500/20 dark:text-amber-300"}`}
+														>
+															{d.ageDays}d old ·{" "}
+															{d.dailyCap !== null
+																? `${d.sentToday}/${d.dailyCap} today`
+																: "Dynamic"}
+														</span>
+														<button
+															type="button"
+															onClick={() =>
+																setCapTarget({
+																	id: d.id,
+																	domain: d.domain,
+																	current: d.dailyCap,
+																	value: String(d.dailyCap ?? ""),
+																	reason: "",
+																})
+															}
+															className="rounded-full px-2 py-0.5 font-medium text-[11px] text-primary-base ring-1 ring-primary-base/20 transition hover:bg-primary-base/10"
+														>
+															Increase
+														</button>
 													</span>
 												</div>
 												<div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
@@ -1177,6 +1313,14 @@ export default function OrganizationDetailPage() {
 												}
 											>
 												{d.dailyCap}
+												{d.dailyCapOverride != null ? (
+													<span
+														className="ml-1 text-[10px] font-medium text-blue-600"
+														title={`Admin override (automatic would be ${d.ageCap ?? "dynamic"})`}
+													>
+														· raised
+													</span>
+												) : null}
 											</span>
 										)}
 									</td>
@@ -1205,30 +1349,48 @@ export default function OrganizationDetailPage() {
 										{formatRelativeTime(d.createdAt)}
 									</td>
 									<td className="px-4 py-3">
-										<Button.Root
-											size="xsmall"
-											variant="neutral"
-											mode="ghost"
-											disabled={verifyingDomainId === d.id}
-											onClick={async () => {
-												try {
-													setVerifyingDomainId(d.id);
-													await adminPost(`/domains/${d.id}/verify`);
-													toast.success(
-														`Reverification started for ${d.domain}`,
-													);
-													mutate();
-												} catch {
-													toast.error("Failed to start reverification");
-												} finally {
-													setVerifyingDomainId(null);
+										<div className="flex flex-wrap gap-1.5">
+											<Button.Root
+												size="xsmall"
+												variant="neutral"
+												mode="ghost"
+												disabled={verifyingDomainId === d.id}
+												onClick={async () => {
+													try {
+														setVerifyingDomainId(d.id);
+														await adminPost(`/domains/${d.id}/verify`);
+														toast.success(
+															`Reverification started for ${d.domain}`,
+														);
+														mutate();
+													} catch {
+														toast.error("Failed to start reverification");
+													} finally {
+														setVerifyingDomainId(null);
+													}
+												}}
+											>
+												{verifyingDomainId === d.id
+													? "Verifying..."
+													: "Reverify"}
+											</Button.Root>
+											<Button.Root
+												size="xsmall"
+												variant="neutral"
+												mode={isAtCap ? "filled" : "stroke"}
+												onClick={() =>
+													setCapTarget({
+														id: d.id,
+														domain: d.domain,
+														current: d.dailyCap,
+														value: String(d.dailyCap ?? ""),
+														reason: "",
+													})
 												}
-											}}
-										>
-											{verifyingDomainId === d.id
-												? "Verifying..."
-												: "Reverify"}
-										</Button.Root>
+											>
+												Increase
+											</Button.Root>
+										</div>
 									</td>
 								</tr>
 							);

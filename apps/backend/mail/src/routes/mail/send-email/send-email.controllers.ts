@@ -275,6 +275,11 @@ export async function sendEmailController({
 			domain: currentDomain.domain,
 			createdAt: currentDomain.createdAt,
 			registeredAt: currentDomain.registeredAt,
+			dailyCapOverride:
+				"dailyCapOverride" in currentDomain
+					? (currentDomain as { dailyCapOverride?: number | null })
+							.dailyCapOverride ?? null
+					: null,
 		},
 		recipientCount,
 	});

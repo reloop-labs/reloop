@@ -278,7 +278,9 @@ export namespace AdminModel {
 				createdAt: t.Date(),
 				registrarCreatedAt: t.Union([t.Date(), t.Null()]),
 				ageDays: t.Number(),
+				ageCap: t.Optional(t.Union([t.Number(), t.Null()])),
 				dailyCap: t.Union([t.Number(), t.Null()]),
+				dailyCapOverride: t.Optional(t.Union([t.Number(), t.Null()])),
 				sentToday: t.Number(),
 				remaining: t.Union([t.Number(), t.Null()]),
 				source: t.String(),
@@ -402,6 +404,11 @@ export namespace AdminModel {
 			t.Literal("suspended"),
 			t.Literal("failed"),
 		]),
+		reason: t.Optional(t.String()),
+	});
+
+	export const updateDomainCapBody = t.Object({
+		dailyCapOverride: t.Union([t.Number({ minimum: 1, maximum: 1000000 }), t.Null()]),
 		reason: t.Optional(t.String()),
 	});
 

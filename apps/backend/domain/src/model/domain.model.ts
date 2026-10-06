@@ -197,7 +197,12 @@ export namespace DomainModel {
 			),
 			dailyCap: t.Optional(
 				t.Union([t.Number(), t.Null()], {
-					description: "Initial daily cap based on registrar age",
+					description: "Effective daily cap (override wins over age band)",
+				}),
+			),
+			dailyCapOverride: t.Optional(
+				t.Union([t.Number(), t.Null()], {
+					description: "Admin override for the daily cap (null = automatic)",
 				}),
 			),
 			sentToday: t.Optional(

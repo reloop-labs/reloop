@@ -4,6 +4,7 @@ import {
 	getDomainAgeDays,
 	getDomainInitialDailyCap,
 	getRegistrarCreationDate,
+	resolveEffectiveDailyCap,
 } from "@reloop/db/domain-age-cap";
 import { utcDayStart } from "@reloop/db/reserve-send-credits";
 import {
@@ -277,6 +278,7 @@ export async function getOrganizationController(organizationId: string) {
 				systemVerified: domain.systemVerified,
 				createdAt: domain.createdAt,
 				registeredAt: domain.registeredAt,
+				dailyCapOverride: domain.dailyCapOverride,
 			})
 			.from(domain)
 			.where(
@@ -484,7 +486,8 @@ export async function getOrganizationController(organizationId: string) {
 			const ageDays = registrarCreatedAtStr
 				? getDomainAgeDays(new Date(registrarCreatedAtStr), new Date())
 				: getDomainAgeDays(d.createdAt, new Date());
-			const dailyCap = getDomainInitialDailyCap(ageDays);
+			const ageCap = getDomainInitialDailyCap(ageDays);
+			const dailyCap = resolveEffectiveDailyCap(ageCap, d.dailyCapOverride);
 			const sentTodayForDomain = sentByDomain.get(d.id) ?? 0;
 			const remaining =
 				dailyCap === null ? null : Math.max(0, dailyCap - sentTodayForDomain);
@@ -494,10 +497,18 @@ export async function getOrganizationController(organizationId: string) {
 					? new Date(registrarCreatedAtStr)
 					: null,
 				ageDays,
+				ageCap,
 				dailyCap,
 				sentToday: sentTodayForDomain,
 				remaining,
-				source: stored ? "stored" : registrarCreatedAtStr ? "rdap" : "reloop",
+				source:
+					d.dailyCapOverride != null
+						? "override"
+						: stored
+							? "stored"
+							: registrarCreatedAtStr
+								? "rdap"
+								: "reloop",
 			};
 		}),
 	);

@@ -16,6 +16,18 @@ import { emailLog } from "./schema/email";
 
 export type DomainAgeCap = number | null; // null = dynamic (no age cap, defer to plan)
 
+/**
+ * Resolve the effective daily cap: admin override wins over the age band.
+ * Null override = automatic. Set override = effective cap (even when the
+ * age band itself is dynamic).
+ */
+export function resolveEffectiveDailyCap(
+	ageCap: DomainAgeCap,
+	override: number | null | undefined,
+): DomainAgeCap {
+	if (override != null) return override;
+	return ageCap;
+}
 export function getDomainAgeDays(
 	createdAt: Date,
 	now: Date = new Date(),
@@ -281,6 +293,8 @@ export async function checkDomainAgeDailyCap(args: {
 		createdAt: Date | string;
 		/** Stored registrar date (captured at domain creation). Skips live RDAP. */
 		registeredAt?: Date | string | null;
+		/** Admin override — when set, wins over the age band. */
+		dailyCapOverride?: number | null;
 	};
 	recipientCount: number;
 	now?: Date;
@@ -290,11 +304,11 @@ export async function checkDomainAgeDailyCap(args: {
 	ageDays: number;
 	sentToday: number;
 	registrarCreationDate: string | null;
-	source: "stored" | "rdap" | "reloop";
+	source: "stored" | "rdap" | "reloop" | "override";
 }> {
 	const now = args.now ?? new Date();
 	let ageDays: number;
-	let source: "stored" | "rdap" | "reloop";
+	let source: "stored" | "rdap" | "reloop" | "override";
 	let registrarCreationDate: string | null;
 	if (args.domain.registeredAt) {
 		// Preferred: captured once via RDAP at domain creation.
@@ -329,7 +343,11 @@ export async function checkDomainAgeDailyCap(args: {
 			registrarCreationDate = null;
 		}
 	}
-	const cap = getDomainInitialDailyCap(ageDays);
+	const cap = resolveEffectiveDailyCap(
+		getDomainInitialDailyCap(ageDays),
+		args.domain.dailyCapOverride,
+	);
+	if (args.domain.dailyCapOverride != null) source = "override";
 	if (cap === null)
 		return {
 			allowed: true,

@@ -4,6 +4,7 @@ import { Elysia, t } from "elysia";
 import {
 	listDomainsController,
 	reverifyDomainController,
+	updateDomainCapController,
 	updateDomainStatusController,
 } from "./domains.controllers";
 
@@ -84,6 +85,29 @@ export const domainsRoute = new Elysia()
 			detail: {
 				tags: ["Admin"],
 				summary: "Reverify domain DNS",
+			},
+		},
+	)
+	.patch(
+		"/domains/:domainId/cap",
+		async ({ params, body, userId }) =>
+			updateDomainCapController({
+				domainId: params.domainId,
+				dailyCapOverride: body.dailyCapOverride,
+				reason: body.reason,
+				actorUserId: userId,
+			}),
+		{
+			authAdmin: true,
+			params: t.Object({ domainId: t.String() }),
+			body: AdminModel.updateDomainCapBody,
+			response: {
+				200: AdminModel.successResponse,
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Admin"],
+				summary: "Set or clear domain daily-cap override",
 			},
 		},
 	);

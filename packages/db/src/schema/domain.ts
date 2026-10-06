@@ -95,6 +95,12 @@ export const domain = pgTable(
 		 */
 		registeredAt: timestamp("registered_at"),
 		registrationAgeCheckedAt: timestamp("registration_age_checked_at"),
+		/**
+		 * Admin override for the new-domain daily send cap.
+		 * Null = automatic (age-based). Set = effective daily cap.
+		 * Raised via admin console "Increase limit" with audit log.
+		 */
+		dailyCapOverride: integer("daily_cap_override"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
 			.notNull()

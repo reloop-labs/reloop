@@ -100,6 +100,7 @@ export async function logIncomingController({
 			tls: true,
 			createdAt: true,
 			registeredAt: true,
+			dailyCapOverride: true,
 		},
 	});
 
@@ -264,6 +265,7 @@ export async function logIncomingController({
 			domain: domainRecord.domain,
 			createdAt: domainRecord.createdAt,
 			registeredAt: domainRecord.registeredAt,
+			dailyCapOverride: domainRecord.dailyCapOverride ?? null,
 		},
 		recipientCount,
 	});

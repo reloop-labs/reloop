@@ -81,7 +81,10 @@ export async function getDomainController({
 		const ageDays = registrarCreatedAtStr
 			? getDomainAgeDays(new Date(registrarCreatedAtStr), new Date())
 			: getDomainAgeDays(new Date(result.createdAt), new Date());
-		const dailyCap = getDomainInitialDailyCap(ageDays);
+		const ageCap = getDomainInitialDailyCap(ageDays);
+		const override = (result as { dailyCapOverride?: number | null })
+			.dailyCapOverride ?? null;
+		const dailyCap = override ?? ageCap;
 		const dayStart = utcDayStart(new Date());
 		const [sentRow] = await db
 			.select({ value: count() })
@@ -103,9 +106,10 @@ export async function getDomainController({
 				: null,
 			ageDays,
 			dailyCap,
+			dailyCapOverride: override,
 			sentToday,
 			remaining,
-			source: registrarCreatedAtStr ? "rdap" : "reloop",
+			source: override != null ? "override" : registrarCreatedAtStr ? "rdap" : "reloop",
 			event: DOMAIN_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {

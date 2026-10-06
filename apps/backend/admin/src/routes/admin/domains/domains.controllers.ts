@@ -93,6 +93,70 @@ export async function updateDomainStatusController({
 	return { success: true };
 }
 
+export async function updateDomainCapController({
+	domainId,
+	dailyCapOverride,
+	reason,
+	actorUserId,
+}: {
+	domainId: string;
+	dailyCapOverride: number | null;
+	reason?: string;
+	actorUserId: string;
+}) {
+	const existing = await db.query.domain.findFirst({
+		where: eq(domain.id, domainId),
+	});
+	if (!existing || existing.deletedAt) {
+		throw createError({
+			status: 404,
+			message: "Domain not found",
+			why: `No domain with id ${domainId}`,
+			fix: "Check the domain id and try again",
+		});
+	}
+	if (dailyCapOverride !== null) {
+		if (
+			!Number.isInteger(dailyCapOverride) ||
+			dailyCapOverride < 1 ||
+			dailyCapOverride > 1000000
+		) {
+			throw createError({
+				status: 400,
+				message: "Invalid daily cap override",
+				why: `Got ${dailyCapOverride}`,
+				fix: "Pass an integer between 1 and 1000000, or null to restore automatic caps",
+			});
+		}
+	}
+
+	await db
+		.update(domain)
+		.set({ dailyCapOverride, updatedAt: new Date() })
+		.where(eq(domain.id, domainId));
+
+	await writeAdminAudit({
+		actorUserId,
+		action:
+			dailyCapOverride === null
+				? "domain.cap_override_cleared"
+				: "domain.cap_override_set",
+		resourceType: "domain",
+		resourceId: domainId,
+		organizationId: existing.organizationId,
+		metadata: {
+			previousOverride:
+				(existing as { dailyCapOverride?: number | null }).dailyCapOverride ??
+				null,
+			dailyCapOverride,
+			domain: existing.domain,
+			reason,
+		},
+	});
+
+	return { success: true };
+}
+
 export async function reverifyDomainController({
 	domainId,
 	actorUserId,
