@@ -68,7 +68,7 @@ const toVolume = (position: number) => {
 const UPSELL_THRESHOLD_USD = 2;
 
 export function recommendPlanIdForVolume(volume: number): PlanId {
-	if (volume >= 500000) return "enterprise";
+	if (volume > 250000) return "enterprise";
 	if (volume <= 3000) return "free";
 	const pro = getPlanById("individual");
 	const growth = getPlanById("startup");
