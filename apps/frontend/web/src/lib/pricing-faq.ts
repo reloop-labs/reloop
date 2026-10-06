@@ -21,6 +21,31 @@ export const pricingFaqItems: PricingFaqItem[] = [
 			"On paid plans, overage emails are billed at $0.50 per 1,000. On the Free plan, sending pauses at 3,000 emails per month or 100 emails per day until the next period unless you upgrade. Free has no overage.",
 	},
 	{
+		question: "How do Credits work?",
+		answer:
+			"Credits are one-time, pay-as-you-go email volume with no subscription: 1 credit sends 1 email at $5 per 10,000 emails ($0.50 per 1,000). There is no minimum, so you can top up any amount whenever you need it.",
+	},
+	{
+		question: "How long are Credits valid?",
+		answer:
+			"Credits stay valid for 6 months from purchase, so irregular or seasonal senders can buy once and send over half a year with no monthly fee.",
+	},
+	{
+		question: "Should I choose Credits or a Monthly plan?",
+		answer:
+			"Choose Credits when your volume is irregular or seasonal, you want no subscription, or you prefer to top up any amount as you go. Choose Monthly when your volume is steady and predictable: bundled plans beat pay-as-you-go on price once you send around 50,000 emails every month.",
+	},
+	{
+		question: "What happens when my Credits run out?",
+		answer:
+			"Sending pauses when your balance reaches zero. Top up any amount to resume immediately — you never go negative and there are no surprise charges.",
+	},
+	{
+		question: "What is the Dedicated IP add-on?",
+		answer:
+			"For $10 per month billed annually ($120/yr), you get your own sending IP with full reputation control, warm-up guidance, and isolation from shared senders. It is available on any plan, including Free and Credits.",
+	},
+	{
 		question: "Is self-hosting really free?",
 		answer:
 			"Yes. Reloop is open source under Apache 2.0 with Reloop Labs use restrictions. You can deploy on your own infrastructure at no Reloop license cost: you pay only for your servers and email delivery infrastructure. Self-host is not a Reloop Cloud subscription.",

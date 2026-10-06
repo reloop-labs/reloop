@@ -101,9 +101,9 @@ const creditColumns: CreditColumn[] = [
 ];
 
 const columnBorders = [
-	"border-b sm:border-r sm:border-b-0",
-	"border-b sm:border-r sm:border-b-0",
-	"",
+	"border-b sm:border-b lg:border-b-0 sm:border-r lg:border-l",
+	"border-b sm:border-b lg:border-b-0 lg:border-r",
+	"border-b sm:border-b-0 sm:border-r lg:border-r",
 ];
 
 function CreditColumnCard({
@@ -122,7 +122,7 @@ function CreditColumnCard({
 	return (
 		<div
 			className={cn(
-				"flex min-h-[440px] flex-col border-stroke-soft-100 p-6 pb-5 sm:min-h-[460px] sm:p-8 sm:pb-6 dark:border-white/[0.07]",
+				"flex min-h-[440px] flex-col border-stroke-soft-100 p-6 pb-5 sm:min-h-[460px] sm:p-8 sm:pb-6 lg:p-6 lg:pb-5 xl:p-8 xl:pb-6 dark:border-white/[0.07]",
 				column.highlight && "bg-bg-weak-50 dark:bg-white/[0.03]",
 				columnBorders[index],
 			)}
@@ -155,7 +155,7 @@ function CreditColumnCard({
 
 			<div
 				aria-hidden
-				className="-mx-6 sm:-mx-8 mt-6 border-stroke-soft-100 border-t dark:border-white/[0.07]"
+				className="-mx-6 sm:-mx-8 lg:-mx-6 xl:-mx-8 mt-6 border-stroke-soft-100 border-t dark:border-white/[0.07]"
 			/>
 
 			<div className="flex h-[100px] flex-col justify-center py-4">
@@ -180,7 +180,7 @@ function CreditColumnCard({
 
 			<div
 				aria-hidden
-				className="-mx-6 sm:-mx-8 border-stroke-soft-100 border-t dark:border-white/[0.07]"
+				className="-mx-6 sm:-mx-8 lg:-mx-6 xl:-mx-8 border-stroke-soft-100 border-t dark:border-white/[0.07]"
 			/>
 
 			<div className="flex flex-col gap-3 py-6">
@@ -207,7 +207,7 @@ function CreditColumnCard({
 
 			<div
 				aria-hidden
-				className="-mx-6 sm:-mx-8 border-stroke-soft-100 border-t dark:border-white/[0.07]"
+				className="-mx-6 sm:-mx-8 lg:-mx-6 xl:-mx-8 border-stroke-soft-100 border-t dark:border-white/[0.07]"
 			/>
 
 			<ul className="flex-1 space-y-1.5 pt-6">
@@ -230,13 +230,13 @@ function CreditColumnCard({
 function DedicatedIpStrip() {
 	return (
 		<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-100 border-b dark:border-white/[0.07]">
-			<div className="flex flex-col gap-5 px-6 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+			<div className="mx-auto flex w-full flex-col gap-5 border-stroke-soft-100 px-6 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:mx-auto lg:w-3/4 lg:border-x lg:px-6 xl:px-8 dark:border-white/[0.07]">
 				<div>
 					<p className="font-medium text-[12px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/55">
 						Add-on
 					</p>
 					<p className="mt-2 text-[15px] text-text-strong-950 dark:text-white">
-						<span className="font-semibold">Dedicated IP — $10/mo</span>{" "}
+						<span className="font-semibold">Dedicated IP $10/mo</span>{" "}
 						<span className="text-text-sub-600 dark:text-white/55">
 							billed annually ($120/yr). Your own sending IP with full
 							reputation control, available on any plan.
@@ -253,37 +253,6 @@ function DedicatedIpStrip() {
 						<span className="font-medium text-[14px]">Contact sales</span>
 					</Link>
 				</FancyButton.Root>
-			</div>
-		</div>
-	);
-}
-
-function ChooseGuide() {
-	return (
-		<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-100 border-b dark:border-white/[0.07]">
-			<div className="mx-auto w-full max-w-2xl px-6 py-14 text-center sm:py-16">
-				<p className="font-medium text-[12px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/55">
-					How to choose
-				</p>
-				<p className="mt-5 text-balance font-medium text-[1.65rem] text-text-strong-950 leading-[1.25] tracking-tight sm:text-[2rem] dark:text-white">
-					“Credits for flexibility, Monthly for scale.”
-				</p>
-				<div className="mx-auto mt-8 max-w-xl space-y-3">
-					<p className="text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
-						<span className="font-semibold text-text-strong-950 dark:text-white">
-							Choose Credits
-						</span>{" "}
-						when volume is irregular or seasonal no subscription, top up any
-						amount as you go.
-					</p>
-					<p className="text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
-						<span className="font-semibold text-text-strong-950 dark:text-white">
-							Choose Monthly
-						</span>{" "}
-						when volume is steady and predictable bundled at a lower rate for
-						50,000+ emails a month.
-					</p>
-				</div>
 			</div>
 		</div>
 	);
@@ -592,7 +561,7 @@ export function CreditsComparisonTable() {
 export function PricingCreditsSection({ volume }: { volume: number }) {
 	return (
 		<>
-			<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-100 border-y sm:grid sm:grid-cols-3 dark:border-white/[0.07]">
+			<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-100 border-y sm:grid sm:grid-cols-2 lg:grid-cols-[repeat(3,25%)] lg:justify-center dark:border-white/[0.07]">
 				{creditColumns.map((column, index) => (
 					<CreditColumnCard
 						key={column.name}
@@ -603,8 +572,9 @@ export function PricingCreditsSection({ volume }: { volume: number }) {
 				))}
 			</div>
 			<DedicatedIpStrip />
-			<ChooseGuide />
-			<CreditsComparisonTable />
+			<div className="mt-24">
+				<CreditsComparisonTable />
+			</div>
 		</>
 	);
 }
