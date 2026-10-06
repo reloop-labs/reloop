@@ -33,5 +33,15 @@
 		"slug": "tutorials",
 		"name": "Tutorials",
 		"description": "Step-by-step guides for integrating Reloop into Next.js, Remix, Python, and more."
+	},
+	{
+		"slug": "comparison",
+		"name": "Comparison",
+		"description": "Side-by-side breakdowns of email providers, architectures, and costs."
+	},
+	{
+		"slug": "migration",
+		"name": "Migration",
+		"description": "Step-by-step guides for switching to Reloop from SendGrid, Mailgun, Resend, and more."
 	}
 ]

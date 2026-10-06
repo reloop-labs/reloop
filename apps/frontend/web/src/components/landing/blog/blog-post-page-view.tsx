@@ -464,7 +464,8 @@ export function BlogPostPageView({
 			{/* CTA Section */}
 			<BlogCta
 				category={post.category}
-				headline="Ship your first email with Reloop in minutes"
+				headlineLine1="Ship your first email with Reloop"
+				headlineLine2="in minutes."
 				sub="Open-source, deliverability-focused, and yours to self-host or run on Reloop Cloud. No lock-in, no rewrite later."
 			/>
 		</div>

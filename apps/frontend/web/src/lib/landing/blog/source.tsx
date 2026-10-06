@@ -368,6 +368,8 @@ export function generateCategoryStaticParams() {
 	return getCategories().map((category) => ({ slug: category.slug }));
 }
 
-export function getCategoryPath(slug: string) {
-	return `/blog/category/${slug}`;
+export function getCategoryPath(slugOrName: string) {
+	const category =
+		getCategoryByName(slugOrName) ?? getCategoryBySlug(slugOrName);
+	return `/blog/category/${category ? category.slug : slugOrName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
