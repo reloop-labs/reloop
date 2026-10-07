@@ -1,12 +1,18 @@
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { templateVersionModel } from "@be/template/model/template-version.model";
-import { BusEvent, bus } from "@reloop/bus";
+import { templateConfig } from "@be/template/template.config";
+import {
+	INTERNAL_ORG_ID_HEADER,
+	INTERNAL_SECRET_HEADER,
+	INTERNAL_USER_ID_HEADER,
+} from "@reloop/auth/middleware";
 import { log } from "evlog";
 
 export async function sendTestEmail(params: {
 	templateId: string;
 	organizationId: string;
+	userId?: string;
 	to: string;
 	fromEmail?: string;
 	subject?: string;
@@ -16,6 +22,7 @@ export async function sendTestEmail(params: {
 	const {
 		templateId,
 		organizationId,
+		userId,
 		to,
 		fromEmail,
 		subject,
@@ -104,31 +111,84 @@ export async function sendTestEmail(params: {
 	const finalSubject = substitute(resolvedSubject);
 	const finalHtml = substitute(resolvedHtml);
 
-	// 6. Publish the SEND_TEST_EMAIL event via NATS
+	const effectiveUserId = userId || template.createdByUserId || "";
+
+	// 6. Send the test email via the Mail service to use the organization's credits and verified domain
 	log.info({
-		message: "Publishing SEND_TEST_EMAIL NATS event",
+		message: "Sending template test email via mail service",
 		templateId,
 		organizationId,
+		userId: effectiveUserId,
 		to,
 		from: resolvedFromEmail,
 		subject: finalSubject,
 	});
 
+	const mailBaseUrl = (
+		process.env.MAIL_INTERNAL_BASE_URL || templateConfig.BASE_URL
+	).replace(/\/$/, "");
+	const url = `${mailBaseUrl}/api/mail/v1/send`;
+
 	try {
-		await bus.publish(BusEvent.SEND_TEST_EMAIL, {
-			to,
-			from: resolvedFromEmail,
-			subject: finalSubject,
-			html: finalHtml,
+		const res = await fetch(url, {
+			method: "POST",
+			headers: {
+				"content-type": "application/json",
+				"user-agent": "reloop-template/1.0",
+				[INTERNAL_SECRET_HEADER]: templateConfig.RELOOP_INTERNAL_SECRET,
+				[INTERNAL_USER_ID_HEADER]: effectiveUserId,
+				[INTERNAL_ORG_ID_HEADER]: organizationId,
+			},
+			body: JSON.stringify({
+				from: resolvedFromEmail,
+				to,
+				subject: finalSubject,
+				html: finalHtml,
+				reply_to: template.replyTo || undefined,
+				tags: [
+					{ name: "template", value: templateId },
+					{ name: "test", value: "true" },
+				],
+			}),
 		});
+
+		const payload = (await res.json().catch(() => ({}))) as {
+			id?: string;
+			messageId?: string;
+			message?: string;
+			why?: string;
+			fix?: string;
+		};
+
+		if (!res.ok) {
+			const why =
+				payload.why ||
+				payload.message ||
+				`Mail service returned status ${res.status}`;
+			log.error({
+				message: "Template test email send failed via mail service",
+				status: res.status,
+				why,
+				to,
+			});
+			throw TemplateErrors.testFailed(why, payload.fix);
+		}
 	} catch (error) {
+		if (
+			error &&
+			typeof error === "object" &&
+			"status" in error &&
+			(error as any).status === 400
+		) {
+			throw error;
+		}
 		log.error({
-			message: "Failed to publish SEND_TEST_EMAIL NATS event",
+			message: "Failed to send template test email",
 			error: error instanceof Error ? error.message : String(error),
 		});
 		throw TemplateErrors.testFailed(
-			"Failed to queue the test email via the message bus.",
-			"Verify that the NATS server is running.",
+			error instanceof Error ? error.message : "Failed to send test email.",
+			"Check that the sender domain is verified and you have sufficient email credits.",
 		);
 	}
 

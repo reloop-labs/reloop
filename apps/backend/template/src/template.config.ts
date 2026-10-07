@@ -7,6 +7,9 @@ export const templateConfig = {
 	NODE_ENV: process.env.NODE_ENV || "development",
 	NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED || "0",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
+	/** Shared secret for service-to-service calls (e.g. mail send). */
+	RELOOP_INTERNAL_SECRET:
+		process.env.RELOOP_INTERNAL_SECRET || "reloop_internal_secret_default_123",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 	OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || "http://localhost:11434",

@@ -5,12 +5,13 @@ import { sendTestEmail } from "./test-template.controllers";
 
 export const testTemplateRoute = new Elysia().use(authMiddleware).post(
 	"/:id/test",
-	async ({ params, body, organizationId }) => {
+	async ({ params, body, organizationId, userId }) => {
 		const { id } = params;
 
 		const result = await sendTestEmail({
 			templateId: id,
 			organizationId,
+			userId,
 			to: body.to,
 			fromEmail: body.fromEmail,
 			subject: body.subject,
