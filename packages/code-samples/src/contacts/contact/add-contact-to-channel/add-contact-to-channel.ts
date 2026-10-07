@@ -11,7 +11,7 @@ const reloop = new Reloop({ apiKey: "rl_123456789" });
 
 const { channel, channelError } = await reloop.contacts.channels.addContact(
   "chn_123456789",
-  { contact_id: "con_123456789", subscription: "opt_in" },
+  { email: "john.doe@example.com", subscription: "opt_in" },
 );
 
 if (channelError) throw channelError;
@@ -25,7 +25,7 @@ console.log(channel.subscriptionId, channel.contact.id);`,
 		source: `curl -X POST https://reloop.sh/api/contacts/channel/chn_123456789 \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{"contact_id": "con_123456789","subscription": "opt_in"}'`,
+  -d '{"email": "john.doe@example.com","subscription": "opt_in"}'`,
 	},
 	{
 		id: "python",
@@ -36,7 +36,7 @@ console.log(channel.subscriptionId, channel.contact.id);`,
 reloop = Reloop(api_key="rl_123456789")
 
 result = reloop.contacts.channels.addContact("chn_123456789", {
-  "contact_id": "con_123456789",
+  "email": "john.doe@example.com",
   "subscription": "opt_in",
 })
 
@@ -58,7 +58,7 @@ use Reloop\\Reloop;
 $reloop = Reloop::client('rl_123456789');
 
 $channel = $reloop->contacts->channels->addContact('chn_123456789', [
-    'contact_id' => 'con_123456789',
+    'email' => 'john.doe@example.com',
     'subscription' => 'opt_in',
 ]);
 echo $channel['subscriptionId'] . ' ' . $channel['contact'].id . PHP_EOL;`,
@@ -71,7 +71,7 @@ echo $channel['subscriptionId'] . ' ' . $channel['contact'].id . PHP_EOL;`,
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
 AddChannelContactParams params = new AddChannelContactParams();
-params.contactId = "con_123456789";
+params.email = "john.doe@example.com";
 params.subscription = "opt_in";
 var channel = reloop.contacts.channels.addContact("chn_123456789", params);
 System.out.println(channel.subscriptionId + " " + channel.contact.id);`,
@@ -85,7 +85,7 @@ using Reloop.Models;
 
 var reloop = new ReloopClient("rl_123456789");
 
-await reloop.Contacts.Channels.AddContactAsync("chn_123456789", new Dictionary<string, object?> { ["contact_id"] = "con_123456789", ["subscription"] = "opt_in" });`,
+await reloop.Contacts.Channels.AddContactAsync("chn_123456789", new Dictionary<string, object?> { ["email"] = "john.doe@example.com", ["subscription"] = "opt_in" });`,
 	},
 	{
 		id: "go",
@@ -97,7 +97,7 @@ client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
 })
 
-_, _ = client.Contacts.Channels.AddContact("chn_123456789", map[string]interface{"contact_id": "con_123456789", "subscription": "opt_in"})`,
+_, _ = client.Contacts.Channels.AddContact("chn_123456789", map[string]interface{"email": "john.doe@example.com", "subscription": "opt_in"})`,
 	},
 	{
 		id: "rust",
@@ -108,7 +108,7 @@ _, _ = client.Contacts.Channels.AddContact("chn_123456789", map[string]interface
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reloop = ReloopClient::new("rl_123456789".to_string(), None);
 
-    reloop.contacts().channels().add_contact("chn_123456789", AddContactToChannelParams { contact_id: Some("con_123456789".to_string()), subscription: Some("opt_in".to_string()), ..Default::default() }).await?;
+    reloop.contacts().channels().add_contact("chn_123456789", AddContactToChannelParams { email: Some("john.doe@example.com".to_string()), subscription: Some("opt_in".to_string()), ..Default::default() }).await?;
 
     Ok(())
 }`,
@@ -121,7 +121,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 reloop = Reloop::Client.new(api_key: "rl_123456789")
 
-reloop.contacts.channels.add_contact("chn_123456789", contact_id: "con_123456789", subscription: "opt_in")`,
+reloop.contacts.channels.add_contact("chn_123456789", email: "john.doe@example.com", subscription: "opt_in")`,
 	},
 	{
 		id: "elixir",
@@ -129,6 +129,6 @@ reloop.contacts.channels.add_contact("chn_123456789", contact_id: "con_123456789
 		label: "Elixir",
 		source: `client = Reloop.client("rl_123456789")
 
-{:ok, result} = Reloop.Services.ContactChannels.add_contact(client, "chn_123456789", %{contact_id: "con_123456789", subscription: "opt_in"})`,
+{:ok, result} = Reloop.Services.ContactChannels.add_contact(client, "chn_123456789", %{email: "john.doe@example.com", subscription: "opt_in"})`,
 	},
 ];

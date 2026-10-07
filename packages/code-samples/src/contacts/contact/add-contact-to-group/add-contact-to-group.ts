@@ -11,7 +11,7 @@ const reloop = new Reloop({ apiKey: "rl_123456789" });
 
 const { group, groupError } = await reloop.contacts.groups.addContact(
   "grp_123456789",
-  { contact_id: "con_123456789" },
+  { email: "john.doe@example.com" },
 );
 
 if (groupError) throw groupError;
@@ -25,7 +25,7 @@ console.log(group.id, group.success);`,
 		source: `curl -X POST https://reloop.sh/api/contacts/group/grp_123456789 \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{"contact_id": "con_123456789"}'`,
+  -d '{"email": "john.doe@example.com"}'`,
 	},
 	{
 		id: "python",
@@ -36,7 +36,7 @@ console.log(group.id, group.success);`,
 reloop = Reloop(api_key="rl_123456789")
 
 result = reloop.contacts.groups.addContact("grp_123456789", {
-  "contact_id": "con_123456789",
+  "email": "john.doe@example.com",
 })
 
 if result.group_error:
@@ -57,7 +57,7 @@ use Reloop\\Reloop;
 $reloop = Reloop::client('rl_123456789');
 
 $group = $reloop->contacts->groups->addContact('grp_123456789', [
-    'contact_id' => 'con_123456789',
+    'email' => 'john.doe@example.com',
 ]);
 echo $group['id'] . ' ' . $group['success'] . PHP_EOL;`,
 	},
@@ -69,7 +69,7 @@ echo $group['id'] . ' ' . $group['success'] . PHP_EOL;`,
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
 AddGroupContactParams params = new AddGroupContactParams();
-params.contactId = "con_123456789";
+params.email = "john.doe@example.com";
 var group = reloop.contacts.groups.addContact("grp_123456789", params);
 System.out.println(group.id + " " + group.success);`,
 	},
@@ -82,7 +82,7 @@ using Reloop.Models;
 
 var reloop = new ReloopClient("rl_123456789");
 
-await reloop.Contacts.Groups.AddContactAsync("grp_123456789", new Dictionary<string, object?> { ["contact_id"] = "con_123456789" });`,
+await reloop.Contacts.Groups.AddContactAsync("grp_123456789", new Dictionary<string, object?> { ["email"] = "john.doe@example.com" });`,
 	},
 	{
 		id: "go",
@@ -94,7 +94,7 @@ client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
 })
 
-_, _ = client.Contacts.Groups.AddContact("grp_123456789", map[string]interface{"contact_id": "con_123456789"})`,
+_, _ = client.Contacts.Groups.AddContact("grp_123456789", map[string]interface{"email": "john.doe@example.com"})`,
 	},
 	{
 		id: "rust",
@@ -105,7 +105,7 @@ _, _ = client.Contacts.Groups.AddContact("grp_123456789", map[string]interface{"
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reloop = ReloopClient::new("rl_123456789".to_string(), None);
 
-    reloop.contacts().groups().add_contact("grp_123456789", AddContactToGroupParams { contact_id: Some("con_123456789".to_string()), ..Default::default() }).await?;
+    reloop.contacts().groups().add_contact("grp_123456789", AddContactToGroupParams { email: Some("john.doe@example.com".to_string()), ..Default::default() }).await?;
 
     Ok(())
 }`,
@@ -118,7 +118,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 reloop = Reloop::Client.new(api_key: "rl_123456789")
 
-reloop.contacts.groups.add_contact("grp_123456789", contact_id: "con_123456789")`,
+reloop.contacts.groups.add_contact("grp_123456789", email: "john.doe@example.com")`,
 	},
 	{
 		id: "elixir",
@@ -126,6 +126,6 @@ reloop.contacts.groups.add_contact("grp_123456789", contact_id: "con_123456789")
 		label: "Elixir",
 		source: `client = Reloop.client("rl_123456789")
 
-{:ok, result} = Reloop.Services.ContactGroups.add_contact(client, "grp_123456789", %{contact_id: "con_123456789"})`,
+{:ok, result} = Reloop.Services.ContactGroups.add_contact(client, "grp_123456789", %{email: "john.doe@example.com"})`,
 	},
 ];
