@@ -3,6 +3,7 @@ name: BE SMTP Docker
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
     paths:
       - 'apps/backend/smtp/**'
       - 'apps/backend/mail/src/lib/crypto.ts'
@@ -65,7 +66,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: latest=false
           tags: |
+            type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,format=short
 
@@ -85,7 +88,7 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
       - name: Trigger Coolify Deploy
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref_type != 'tag'
         run: |
           curl --fail -i -X POST "https://coolify.reloop.sh/api/v1/deploy?uuid=k98bskknpear19vezb1mfw0x&force=false" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"

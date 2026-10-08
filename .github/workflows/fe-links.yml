@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
     paths:
       - 'apps/frontend/links/**'
       - 'packages/ui/**'
@@ -30,15 +32,26 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/fe-links
+          flavor: latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
       - name: Build and push links image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./apps/frontend/links/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-links:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
       - name: Trigger Coolify Deploy
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref_type != 'tag'
         run: |
           curl --fail -i -X POST "https://coolify.reloop.sh/api/v1/deploy?uuid=odffkhqpd1m8u8touszzcp31&force=false" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"

@@ -3,6 +3,7 @@ name: BE Upload Docker
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
     paths:
       - 'apps/backend/upload/**'
       - 'docker-compose.setup.yml'
@@ -45,6 +46,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: latest=false
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
@@ -65,7 +67,7 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
       - name: Trigger Coolify Deploy
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref_type != 'tag'
         run: |
           curl --fail -i -X POST "https://coolify.reloop.sh/api/v1/deploy?uuid=hvz7b5sw46hutdk2fkb2g6g1&force=false" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"

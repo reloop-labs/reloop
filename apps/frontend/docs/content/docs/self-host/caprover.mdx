@@ -1,0 +1,213 @@
+---
+title: Deploy on CapRover
+description: Learn how to self-host Reloop on CapRover.
+icon: siCaprover
+---
+
+Reloop ships a CapRover one-click template at
+[`install/caprover/reloop.yml`](https://github.com/reloop-labs/reloop/blob/main/install/caprover/reloop.yml).
+It runs the same stack as the [VPS installer](/docs/self-host/vps), with
+CapRover generating every secret and its nginx handling HTTPS.
+
+---
+
+## Before you start
+
+| Requirement | Value |
+| :--- | :--- |
+| **CapRover** | A working instance with a wildcard root domain, for example `*.captain.example.com` |
+| **Architecture** | x86_64 (the dashboard and links images are amd64 only) |
+| **RAM** | 8 GB for Reloop and CapRover together |
+| **Disk** | 50 GB. The container images alone take about 22 GB |
+| **Ports** | `25`, `465` and `587` free on the server, inbound and outbound |
+| **DNS** | Two extra records, see [DNS](#dns) |
+
+Many providers block port `25` by default. Reloop delivers to recipient mail
+servers on outbound `25`, and receives mail on inbound `25`, so ask your
+provider to open it.
+
+---
+
+## Deploy
+
+1. In CapRover, open **Apps** → **One-Click Apps/Databases**.
+2. Select **&gt;&gt; TEMPLATE &lt;&lt;** at the bottom of the list, paste the contents of
+   [`reloop.yml`](https://raw.githubusercontent.com/reloop-labs/reloop/main/install/caprover/reloop.yml)
+   and click **Next**.
+3. Enter an app name, for example `reloop`. The examples below assume it.
+4. Copy the **Administrator Setup Key** somewhere safe. You need it to sign in.
+5. Leave the domains on their defaults unless you already know your custom
+   domains, see [Custom domains](#custom-domains).
+6. Click **Deploy**. The first deploy downloads about 5 GB of images.
+
+CapRover creates 22 apps, all named after the app name: `reloop` (the proxy),
+`reloop-links`, `reloop-dashboard`, `reloop-postgres`, `reloop-redis`,
+`reloop-nats`, `reloop-smtp`, `reloop-inbound`, `reloop-spam` and one app per
+backend service.
+
+`reloop-auth` creates the database schema before it starts. Until it has, the
+other backend apps fail and CapRover restarts them, so expect a few restarts
+in the first minutes.
+
+Every generated value is fixed after the first deploy. The database password
+is set once Postgres initialises, changing the tracking or preferences secrets
+breaks links in mail that was already sent, and changing the webhook key breaks
+the signature on every existing webhook.
+
+### Enable HTTPS
+
+1. Open the `reloop` app, click **Enable HTTPS**, then turn on **Force HTTPS by
+   redirecting all HTTP traffic to HTTPS** and save.
+2. Do the same on `reloop-links`.
+
+Campaign sends, automation email steps, inbox replies and system mail through
+`RELOOP_API_KEY` call `https://reloop.captain.example.com` from inside the
+stack, so they fail until the certificate is issued.
+
+---
+
+## DNS
+
+The wildcard record CapRover already needs covers the dashboard, the API and
+tracking. Add these:
+
+```text
+reloop-inbound.captain.example.com    A    203.0.113.10
+reloop.captain.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
+```
+
+- `reloop-inbound.` is the MX target for mail your verified domains receive.
+  The wildcard covers it too, but add the `A` record if your wildcard is a
+  `CNAME`, since MX targets must not be one.
+- The SPF record authorises the server to send for the host domain, which is
+  what the `include:` in each sending domain's SPF resolves to.
+
+Also ask your provider for a PTR record on the server IP that resolves to
+`reloop.captain.example.com`. Receiving servers check it.
+
+---
+
+## Custom domains
+
+To run on `reloop.example.com` instead of the CapRover subdomain, set the
+**Reloop Domain**, **Tracking Domain** and **Inbound Mail Hostname** variables
+when you deploy, then:
+
+1. Point the three hostnames at the server with `A` records.
+2. Open `reloop`, add `reloop.example.com` under **HTTP Settings** →
+   **Connect New Domain**, then enable HTTPS on it.
+3. Do the same on `reloop-links` with the tracking domain.
+
+<Note>
+Set the real domains before you add any sending domain in the dashboard.
+Reloop writes the DNS records it shows you at the moment a domain is created,
+so a domain added while the instance still runs on the CapRover subdomain keeps
+pointing there.
+</Note>
+
+A sending domain with click or open tracking gets a `link.` CNAME pointing at
+the tracking domain. CapRover only issues certificates for domains attached to
+an app, so connect each customer tracking hostname, such as
+`link.customer.com`, to `reloop-links` and enable HTTPS on it.
+
+---
+
+## First sign-in
+
+1. Open `/dashboard/setup` on your Reloop domain, for example
+   `https://reloop.captain.example.com/dashboard/setup`.
+2. Paste the Administrator Setup Key you copied during deploy.
+3. Choose the first administrator's name, email and password.
+4. Name the first organization.
+
+The key works once. If you lost it, it is the `ADMIN_SETUP_KEY` variable under
+**App Configs** on `reloop-auth`. If you think it leaked before setup, change
+it there and save: the old key stops working.
+
+Setup signs you in with a session that lasts 7 days. To sign in again after
+that, Reloop emails you a code, so configure system email before it runs out.
+
+---
+
+## System email
+
+Until system email is configured, Reloop sends no sign-in codes, invitations
+or notifications. Fill in the **System Email** variables when you deploy, or
+set these later:
+
+| Variable | Value |
+| :--- | :--- |
+| `RELOOP_SENDER_DOMAIN` | The domain system mail is sent from. Always required |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_SECURE` | Any SMTP provider you already use (Postmark, SES, your own). `SMTP_SECURE=true` means implicit TLS, normally with port `465` |
+| `RELOOP_API_KEY` | Instead of SMTP: an API key of the organization that owns `RELOOP_SENDER_DOMAIN`, once that domain is verified in this instance |
+
+---
+
+## Configuration
+
+Each CapRover app has its own copy of the environment. To change a value after
+deploy, open **App Configs** on every app that lists it, change it, and save.
+CapRover restarts the app.
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `DISABLE_SIGNUP` | `true` | Blocks public registration. Invited addresses can still join. If setup leaves public sign-ups off, it also saves that in `/run/reloop/.env` on the `reloop-auth` volume, which keeps registration closed even when this is `false` |
+| `DISABLE_ORG_CREATION` | `false` | Stops users creating further organizations |
+| `APP_NAME` | `Reloop` | Instance name in system email, shown as `Self-hosted Reloop × <name>` |
+| `S3_ENDPOINT`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | empty | S3-compatible storage for template images and attachments. The bucket must serve objects publicly, because Reloop hands out URLs as `{S3_ENDPOINT}/{S3_BUCKET}/{path}` |
+| `S3_BUCKET` | `reloop-uploads` | Bucket name |
+| `S3_REGION` | `us-east-1` | Bucket region |
+| `DNS_RESOLVERS` | `8.8.8.8,8.8.4.4` | Resolvers used to verify SPF, DKIM, DMARC and MX records |
+| `DKIM_SELECTOR` | `reloop` | Selector for the DKIM keys Reloop generates |
+
+The queue dashboard at `https://reloop.captain.example.com/api/workflow/jobs`
+uses basic auth with the user `admin` and the **Queue Dashboard Password**.
+
+---
+
+## Mail ports and TLS
+
+| Port | App | Protocol |
+| :--- | :--- | :--- |
+| `25` | `reloop-inbound` | SMTP with STARTTLS, for mail your verified domains receive |
+| `587` | `reloop-smtp` | Submission with STARTTLS |
+| `465` | `reloop-smtp` | The same STARTTLS listener as `587`, not implicit TLS |
+
+Both mail apps use a self-signed certificate. Submit on `587` with STARTTLS,
+and tell clients that verify certificates to accept it.
+
+CapRover publishes these ports through Docker Swarm's ingress network, which
+replaces the connecting client's address with an internal one. Spam checks on
+inbound mail that rely on the sender's IP see that internal address instead.
+If you depend on them, use the [VPS installer](/docs/self-host/vps).
+
+---
+
+## Updates and backups
+
+Back up the database before each update:
+
+```bash
+docker exec $(docker ps -qf name=srv-captain--reloop-postgres) \
+  pg_dump -U reloop reloop > reloop-$(date +%F).sql
+```
+
+To update, open each Reloop app's **Deployment** tab and deploy its image again
+under **Deploy via ImageName**, for example `reloopsh/be-auth:latest`. Update
+`reloop-auth` first: it pushes the database schema before it starts.
+
+The proxy routes live in the `reloop` app's image. When a Reloop release changes
+them in `reloop.yml`, open the `reloop` app's **Deployment** tab and paste the
+new `dockerfileLines` of the proxy service under **Deploy captain-definition
+file**.
+
+---
+
+## Things to avoid
+
+- **arm64 servers.** The dashboard and links images are built for amd64 only.
+- **Exposing the internal apps.** Only `reloop` and `reloop-links` are web apps.
+  Exposing any other one puts the internal SMTP injection API, NATS or Rspamd on
+  the internet.
+- **Routing the mail ports through CapRover's nginx.** SMTP authentication
+  needs the TLS session to reach `reloop-smtp` directly.
