@@ -144,8 +144,15 @@ export function createHandler(
 						await response.body?.cancel();
 						return false;
 					}
-					const result = await response.json();
-					return result.success === true && result.status !== "failed";
+					const result: unknown = await response.json();
+					return (
+						typeof result === "object" &&
+						result !== null &&
+						"success" in result &&
+						result.success === true &&
+						"status" in result &&
+						(result.status === "sent" || result.status === "delivered")
+					);
 				}),
 			);
 			if (results.some((success) => !success)) {

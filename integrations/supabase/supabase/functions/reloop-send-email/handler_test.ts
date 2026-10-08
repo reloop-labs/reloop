@@ -42,7 +42,9 @@ function signedRequest(body: unknown, date = new Date()): Request {
 	);
 }
 
-function setup(response = () => Response.json({ success: true })) {
+function setup(
+	response = () => Response.json({ success: true, status: "sent" }),
+) {
 	const requests: Request[] = [];
 	const send: typeof fetch = (input, init) => {
 		requests.push(new Request(input, init));
@@ -181,7 +183,7 @@ Deno.test("retry after a partial failure reuses a distinct idempotency key per r
 		calls += 1;
 		return calls === 2
 			? new Response("private provider details", { status: 429 })
-			: Response.json({ success: true });
+			: Response.json({ success: true, status: "sent" });
 	});
 	assert.equal(
 		(await handler(signedRequest(payload("email_change")))).status,
@@ -204,6 +206,8 @@ Deno.test("retry after a partial failure reuses a distinct idempotency key per r
 for (const response of [
 	() => new Response("private provider details", { status: 500 }),
 	() => Response.json({ success: false }),
+	() => Response.json(null),
+	() => Response.json({ success: true, status: "pending" }),
 	() => Response.json({ success: true, status: "failed" }),
 	() => new Response("invalid JSON"),
 	() => {
@@ -226,7 +230,7 @@ Deno.test("supports an HTTPS self-hosted API and rejects insecure configuration"
 		{ ...configuration, apiUrl: "https://mail.example.com/api/mail/v1/send" },
 		(input) => {
 			url = String(input);
-			return Promise.resolve(Response.json({ success: true }));
+			return Promise.resolve(Response.json({ success: true, status: "sent" }));
 		},
 	);
 	assert.equal((await handler(signedRequest(payload()))).status, 200);
@@ -242,12 +246,30 @@ Deno.test("supports an HTTPS self-hosted API and rejects insecure configuration"
 	}
 });
 
-Deno.test("aborts a stalled provider within the hook time budget", async () => {
+Deno.test("a timeout followed by a pending replay stays an error until the send completes", async () => {
+	const requests: Request[] = [];
 	const handler = createHandler(configuration, (input, init) => {
-		const { signal } = new Request(input, init);
+		const request = new Request(input, init);
+		requests.push(request);
+		if (requests.length > 1) {
+			return Promise.resolve(
+				Response.json({
+					success: true,
+					status: requests.length === 2 ? "pending" : "sent",
+				}),
+			);
+		}
+		const { signal } = request;
 		return new Promise((_resolve, reject) => {
 			signal.addEventListener("abort", () => reject(signal.reason));
 		});
 	});
 	assert.equal((await handler(signedRequest(payload()))).status, 502);
+	assert.equal((await handler(signedRequest(payload()))).status, 502);
+	assert.equal((await handler(signedRequest(payload()))).status, 200);
+	assert.equal(
+		new Set(requests.map((request) => request.headers.get("Idempotency-Key")))
+			.size,
+		1,
+	);
 });
