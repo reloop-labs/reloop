@@ -42,23 +42,23 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 }
 
 async function defaultTxt(name: string): Promise<string[][]> {
-	return withTimeout(resolver.resolveTxt(name), 10_000);
+	return withTimeout(resolver.resolveTxt(name), 5_000);
 }
 
 async function defaultMx(
 	name: string,
 ): Promise<{ exchange: string; priority: number }[]> {
-	return withTimeout(resolver.resolveMx(name), 10_000);
+	return withTimeout(resolver.resolveMx(name), 5_000);
 }
 
 async function defaultCname(name: string): Promise<string[]> {
-	return withTimeout(resolver.resolveCname(name), 10_000);
+	return withTimeout(resolver.resolveCname(name), 5_000);
 }
 
 async function defaultAddresses(name: string): Promise<string[]> {
 	const [v4, v6] = await Promise.all([
-		withTimeout(resolver.resolve4(name), 5_000).catch(() => [] as string[]),
-		withTimeout(resolver.resolve6(name), 5_000).catch(() => [] as string[]),
+		withTimeout(resolver.resolve4(name), 2_500).catch(() => [] as string[]),
+		withTimeout(resolver.resolve6(name), 2_500).catch(() => [] as string[]),
 	]);
 	return [...v4, ...v6];
 }
