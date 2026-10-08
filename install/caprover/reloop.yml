@@ -1,0 +1,1020 @@
+captainVersion: 4
+
+services:
+    $$cap_appname:
+        caproverExtra:
+            containerHttpPort: '80'
+            dockerfileLines:
+                - FROM caddy:2-alpine
+                - RUN printf '%s\n' \
+                - "'{' \\"
+                - "'    auto_https off' \\"
+                - "'    servers {' \\"
+                - "'        trusted_proxies static private_ranges' \\"
+                - "'    }' \\"
+                - "'}' \\"
+                - "'' \\"
+                - "'http:// {' \\"
+                - "'    encode zstd gzip' \\"
+                - "'' \\"
+                - "'    handle /dashboard* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-dashboard:3000' \\"
+                - "'    }' \\"
+                - "'    handle /docs* {' \\"
+                - "'        redir https://reloop.sh{uri} 302' \\"
+                - "'    }' \\"
+                - "'    handle /preferences* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-links:3005' \\"
+                - "'    }' \\"
+                - "'    handle /redirect* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-links:3005' \\"
+                - "'    }' \\"
+                - "'    handle /api/auth* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-auth:8000' \\"
+                - "'    }' \\"
+                - "'    handle /api/domain* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-domain:8011' \\"
+                - "'    }' \\"
+                - "'    handle /api/api-key* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-api-key:8012' \\"
+                - "'    }' \\"
+                - "'    handle /api/webhook* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-webhook:8013' \\"
+                - "'    }' \\"
+                - "'    handle /api/contacts* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-contacts:8014' \\"
+                - "'    }' \\"
+                - "'    handle /api/mail* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-mail:8015' \\"
+                - "'    }' \\"
+                - "'    handle /api/logs* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-logs:8016' \\"
+                - "'    }' \\"
+                - "'    handle /api/workflow* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-workflow:8017' \\"
+                - "'    }' \\"
+                - "'    handle /api/upload* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-upload:8018' \\"
+                - "'    }' \\"
+                - "'    handle /api/template* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-template:8019' \\"
+                - "'    }' \\"
+                - "'    handle /api/campaigns* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-campaigns:8027' \\"
+                - "'    }' \\"
+                - "'    handle /api/inbox* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-inbox:8028' \\"
+                - "'    }' \\"
+                - "'    handle /api/email* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-email:8022' \\"
+                - "'    }' \\"
+                - "'' \\"
+                - "'    @removed path /api/credits* /api/tool* /api/admin*' \\"
+                - "'    handle @removed {' \\"
+                - "'        respond 404' \\"
+                - "'    }' \\"
+                - "'' \\"
+                - "'    handle {' \\"
+                - "'        redir /* /dashboard 302' \\"
+                - "'    }' \\"
+                - "'}' \\"
+                - '> /etc/caddy/Caddyfile'
+        depends_on:
+            - $$cap_appname-dashboard
+            - $$cap_appname-links
+            - $$cap_appname-auth
+    $$cap_appname-postgres:
+        image: postgres:17-alpine
+        volumes:
+            - $$cap_appname-postgres-data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_DB: reloop
+            POSTGRES_USER: reloop
+            POSTGRES_PASSWORD: $$cap_postgres_password
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+    $$cap_appname-redis:
+        image: redis:7-alpine
+        command: redis-server --requirepass $$cap_redis_password --appendonly yes --dir /data
+        volumes:
+            - $$cap_appname-redis-data:/data
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+    $$cap_appname-nats:
+        image: nats:2.10-alpine
+        command: nats-server -js -sd /data -m 8222
+        volumes:
+            - $$cap_appname-nats-data:/data
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+    $$cap_appname-auth:
+        image: reloopsh/be-auth:$$cap_reloop_version
+        command:
+            - 'sh'
+            - -c
+            - 'cd /app/packages/db && /app/node_modules/.bin/drizzle-kit push --force && cd /app && exec bun run dist/index.js'
+        volumes:
+            - $$cap_appname-setup:/run/reloop
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8000'
+            SETUP_MODE: 'true'
+            ADMIN_SETUP_KEY: $$cap_admin_setup_key
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-postgres
+            - $$cap_appname-redis
+            - $$cap_appname-nats
+    $$cap_appname-domain:
+        image: reloopsh/be-domain:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8011'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-api-key:
+        image: reloopsh/be-api-key:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8012'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-webhook:
+        image: reloopsh/be-webhook:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8013'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-contacts:
+        image: reloopsh/be-contacts:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8014'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-mail:
+        image: reloopsh/be-mail:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8015'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-logs:
+        image: reloopsh/be-logs:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8016'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-workflow:
+        image: reloopsh/be-workflow:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8017'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-upload:
+        image: reloopsh/be-upload:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8018'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-template:
+        image: reloopsh/be-template:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8019'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-campaigns:
+        image: reloopsh/be-campaigns:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8027'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-inbox:
+        image: reloopsh/be-inbox:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8028'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-email:
+        image: reloopsh/be-email:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            PORT: '8022'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-auth
+    $$cap_appname-dashboard:
+        image: reloopsh/fe-dashboard:$$cap_reloop_version
+        environment:
+            HOSTNAME: 0.0.0.0
+            PORT: '3000'
+            SMTP_HOSTNAME: $$cap_reloop_domain
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+    $$cap_appname-links:
+        image: reloopsh/fe-links:$$cap_reloop_version
+        environment:
+            HOSTNAME: 0.0.0.0
+            PORT: '3005'
+            INTERNAL_API_URL: http://srv-captain--$$cap_appname-contacts:8014/api/contacts
+            INTERNAL_MAIL_API_URL: http://srv-captain--$$cap_appname-mail:8015/api/mail
+        caproverExtra:
+            containerHttpPort: '3005'
+    $$cap_appname-spam:
+        image: reloopsh/be-spam:$$cap_reloop_version
+        volumes:
+            - $$cap_appname-rspamd-data:/var/lib/rspamd
+        environment:
+            RSPAMD_REDIS_SERVERS: srv-captain--$$cap_appname-redis:6379
+            RSPAMD_REDIS_PASSWORD: $$cap_redis_password
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-redis
+    $$cap_appname-smtp:
+        image: reloopsh/be-smtp:$$cap_reloop_version
+        ports:
+            - '465:465'
+            - '587:587'
+        volumes:
+            - $$cap_appname-smtp-data:/var/spool/kumomta/data
+            - $$cap_appname-smtp-meta:/var/spool/kumomta/meta
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+            HOSTNAME: $$cap_reloop_domain
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-nats
+            - $$cap_appname-domain
+            - $$cap_appname-logs
+            - $$cap_appname-contacts
+    $$cap_appname-inbound:
+        image: reloopsh/be-inbound:$$cap_reloop_version
+        ports:
+            - '25:25'
+        volumes:
+            - $$cap_appname-inbound-data:/var/spool/kumomta/data
+            - $$cap_appname-inbound-meta:/var/spool/kumomta/meta
+        environment:
+            NODE_ENV: production
+            BASE_URL: https://$$cap_reloop_domain
+            HOST_DOMAIN: $$cap_reloop_domain
+            TRACKING_DOMAIN: $$cap_reloop_links_domain
+            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
+            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
+            SMTP_HOSTNAME: $$cap_reloop_domain
+            AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
+            PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
+            REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
+            NATS_URL: nats://srv-captain--$$cap_appname-nats:4222
+            BETTER_AUTH_SECRET: $$cap_better_auth_secret
+            RELOOP_INTERNAL_SECRET: $$cap_internal_secret
+            TRACKING_SECRET: $$cap_tracking_secret
+            PREFERENCES_SECRET: $$cap_preferences_secret
+            WEBHOOK_ENCRYPTION_KEY: $$cap_webhook_encryption_key
+            WORKBENCH_USER: admin
+            WORKBENCH_PASS: $$cap_workbench_password
+            APP_NAME: $$cap_reloop_app_name
+            DISABLE_SIGNUP: 'true'
+            DISABLE_ORG_CREATION: 'false'
+            DKIM_SELECTOR: reloop
+            DNS_RESOLVERS: 8.8.8.8,8.8.4.4
+            RELOOP_SENDER_DOMAIN: $$cap_reloop_sender_domain
+            SMTP_HOST: $$cap_smtp_host
+            SMTP_PORT: $$cap_smtp_port
+            SMTP_USER: $$cap_smtp_user
+            SMTP_PASSWORD: $$cap_smtp_password
+            SMTP_SECURE: $$cap_smtp_secure
+            S3_ENDPOINT: $$cap_s3_endpoint
+            S3_ACCESS_KEY: $$cap_s3_access_key
+            S3_SECRET_KEY: $$cap_s3_secret_key
+            S3_BUCKET: $$cap_s3_bucket
+            S3_REGION: $$cap_s3_region
+            S3_FORCE_PATH_STYLE: 'true'
+            KUMOMTA_HTTP_URL: http://srv-captain--$$cap_appname-smtp:8000
+            KUMOMTA_WEBHOOK_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_CHECK_RECIPIENT_URL: http://srv-captain--$$cap_appname-domain:8011/api/domain
+            KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
+            KUMOMTA_MIN_FREE_SPACE: 5%
+            KUMOMTA_MIN_FREE_INODES: '0'
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+        depends_on:
+            - $$cap_appname-nats
+            - $$cap_appname-spam
+
+caproverOneClickApp:
+    variables:
+        - id: $$cap_reloop_version
+          label: Reloop Version
+          defaultValue: latest
+          description: Image tag for every Reloop service. Check https://hub.docker.com/r/reloopsh/be-auth/tags for valid tags.
+          validRegex: /^([^\s^\/])+$/
+        - id: $$cap_reloop_domain
+          label: Reloop Domain
+          defaultValue: $$cap_appname.$$cap_root_domain
+          description: Serves the dashboard and the API. Leave the default unless you will attach a custom domain to the main Reloop app before signing in.
+          validRegex: /^[a-z0-9.-]+$/
+        - id: $$cap_reloop_links_domain
+          label: Tracking Domain
+          defaultValue: $$cap_appname-links.$$cap_root_domain
+          description: Serves click and open tracking and unsubscribe pages. Must point at the links app (the app name followed by -links).
+          validRegex: /^[a-z0-9.-]+$/
+        - id: $$cap_reloop_inbound_hostname
+          label: Inbound Mail Hostname
+          defaultValue: $$cap_appname-inbound.$$cap_root_domain
+          description: MX target for mail your verified domains receive. Needs an A record pointing at this server.
+          validRegex: /^[a-z0-9.-]+$/
+        - id: $$cap_reloop_app_name
+          label: Instance Name
+          defaultValue: Reloop
+          description: Shown in system email as "Self-hosted Reloop × <name>".
+          validRegex: /.{1,}/
+        - id: $$cap_reloop_sender_domain
+          label: System Email Sender Domain
+          description: Optional. Domain that sign-in codes and invitations are sent from. Required before the first 7-day session expires.
+        - id: $$cap_smtp_host
+          label: System Email SMTP Host
+          description: Optional. Any SMTP provider you already use, for sign-in codes and invitations.
+        - id: $$cap_smtp_port
+          label: System Email SMTP Port
+          defaultValue: '587'
+          validRegex: /^\d+$/
+        - id: $$cap_smtp_user
+          label: System Email SMTP User
+        - id: $$cap_smtp_password
+          label: System Email SMTP Password
+        - id: $$cap_smtp_secure
+          label: System Email SMTP Implicit TLS
+          defaultValue: 'false'
+          description: Set to true for implicit TLS, normally with port 465.
+          validRegex: /^(true|false)$/
+        - id: $$cap_s3_endpoint
+          label: S3 Endpoint
+          description: Optional. S3-compatible storage for template images and attachments. The bucket must serve objects publicly.
+        - id: $$cap_s3_access_key
+          label: S3 Access Key
+        - id: $$cap_s3_secret_key
+          label: S3 Secret Key
+        - id: $$cap_s3_bucket
+          label: S3 Bucket
+          defaultValue: reloop-uploads
+        - id: $$cap_s3_region
+          label: S3 Region
+          defaultValue: us-east-1
+        - id: $$cap_postgres_password
+          label: Postgres Password
+          defaultValue: $$cap_gen_random_hex(32)
+          validRegex: /^[a-f0-9]{16,}$/
+        - id: $$cap_redis_password
+          label: Redis Password
+          defaultValue: $$cap_gen_random_hex(32)
+          validRegex: /^[a-f0-9]{16,}$/
+        - id: $$cap_better_auth_secret
+          label: Auth Secret
+          defaultValue: $$cap_gen_random_hex(64)
+          validRegex: /.{32,}/
+        - id: $$cap_internal_secret
+          label: Internal Service Secret
+          defaultValue: $$cap_gen_random_hex(64)
+          validRegex: /.{32,}/
+        - id: $$cap_tracking_secret
+          label: Tracking Secret
+          defaultValue: $$cap_gen_random_hex(64)
+          description: Changing it later breaks tracked links in mail that was already sent.
+          validRegex: /.{32,}/
+        - id: $$cap_preferences_secret
+          label: Preferences Secret
+          defaultValue: $$cap_gen_random_hex(64)
+          description: Changing it later breaks unsubscribe links in mail that was already sent.
+          validRegex: /.{32,}/
+        - id: $$cap_webhook_encryption_key
+          label: Webhook Encryption Key
+          defaultValue: $$cap_gen_random_hex(64)
+          description: 64 hex characters. Changing it later breaks the signature on every existing webhook.
+          validRegex: /^[a-f0-9]{64}$/
+        - id: $$cap_workbench_password
+          label: Queue Dashboard Password
+          defaultValue: $$cap_gen_random_hex(32)
+          description: Basic auth password for /api/workflow/jobs, user admin.
+          validRegex: /.{12,}/
+        - id: $$cap_admin_setup_key
+          label: Administrator Setup Key
+          defaultValue: $$cap_gen_random_hex(64)
+          description: Copy this now. You paste it at /dashboard/setup to create the first administrator. It works once.
+          validRegex: /.{32,}/
+    instructions:
+        start: |-
+            Reloop is an open-source email platform for transactional mail, campaigns and inbound.
+
+            Before you deploy:
+            - The server must be x86_64 with at least 8 GB of RAM and 50 GB of disk.
+            - Ports 25, 465 and 587 must be free on the server and open inbound and outbound. Many providers block port 25 until you ask.
+            - Copy the Administrator Setup Key below. You need it to create the first administrator.
+
+            The first deploy downloads about 5 GB of images. Full guide: https://reloop.sh/docs/self-host/caprover
+        end: |-
+            Reloop is deploying. The backend services restart a few times until $$cap_appname-auth has created the database schema.
+
+            Next steps:
+            1. Open the $$cap_appname and $$cap_appname-links apps, click Enable HTTPS on each, then turn on Force HTTPS.
+            2. Add DNS records: an A record for $$cap_reloop_inbound_hostname and an SPF TXT record "v=spf1 ip4:<server ip> -all" on $$cap_reloop_domain.
+            3. Open https://$$cap_reloop_domain/dashboard/setup and paste the Administrator Setup Key.
+
+            Full guide: https://reloop.sh/docs/self-host/caprover
+    displayName: Reloop
+    isOfficial: false
+    description: Open-source email platform for transactional mail, campaigns and inbound, with its own MTA, tracking and webhooks.
+    documentation: https://reloop.sh/docs/self-host/caprover

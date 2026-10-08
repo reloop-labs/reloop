@@ -5,6 +5,7 @@ import { JAVA_ICON } from "@reloop/ui/icons/java";
 import type { SVGProps } from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import {
+	siCaprover,
 	siCloudflare,
 	siCoolify,
 	siCursor,
@@ -60,6 +61,7 @@ const Icons: Record<string, SimpleIconType> = {
 	siCursor,
 	siReadthedocs,
 	siCoolify,
+	siCaprover,
 	siVercel,
 	siRailway,
 	siCloudflare,
