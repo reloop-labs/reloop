@@ -1,42 +1,109 @@
 ---
 title: Supabase Reloop Quickstart
 sidebarTitle: Supabase Quickstart
-description: Get started with Reloop and Supabase for transactional emails.
+description: Send Supabase authentication emails through Reloop using an Auth hook or SMTP.
 ---
 
-Learn how to set up Reloop as the email provider for your Supabase project.
+Use Reloop to send Supabase signup confirmations, invitations, magic links,
+password recovery emails, email-change confirmations, and reauthentication codes.
 
 ## Prerequisites
 
-- A [Supabase](https://supabase.com) project
-- A [Reloop API key](https://app.reloop.sh/api-keys)
-- A [verified domain](https://app.reloop.sh/domains) in Reloop
+- A [Supabase](https://supabase.com) project with the Email provider enabled
+- A verified sending domain and an API key with mail-send permission in the
+  [Reloop dashboard](https://reloop.sh/dashboard)
+- A sender address on that verified domain
 
-## Setup
+## Send Email hook
+
+Reloop includes a deployable Supabase Edge Function in
+[`integrations/supabase`](https://github.com/reloop-labs/reloop/tree/main/integrations/supabase).
+It verifies signed Auth hooks, sends through the Reloop HTTP API, and supplies
+idempotency keys so retries reuse the same sends.
 
 <Steps>
-  <Step title="Get your Reloop API key">
-    Go to [app.reloop.sh/api-keys](https://app.reloop.sh/api-keys) and create a new API key.
-  </Step>
-  <Step title="Configure Supabase SMTP">
-    In your Supabase dashboard, go to **Settings → Auth → SMTP Settings** and enable the custom SMTP option.
+  <Step title="Deploy the function">
+    Install the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started),
+    clone the Reloop repository, and run:
 
-    Configure with the following values:
-
-    | Setting | Value |
-    |---------|-------|
-    | Host | `smtp.reloop.sh` |
-    | Port | `465` |
-    | Username | `reloop` |
-    | Password | Your Reloop API key |
-    | Sender email | An address from your verified domain |
+    ```bash
+    cd integrations/supabase
+    supabase login
+    supabase link --project-ref YOUR_PROJECT_REF
+    supabase functions deploy reloop-send-email --no-verify-jwt
+    ```
   </Step>
-  <Step title="Test your setup">
-    Trigger a test email (e.g., a password reset) to confirm everything works.
+  <Step title="Create a signed Auth hook">
+    In Supabase, open **Authentication > Hooks** and add a **Send Email** HTTP
+    hook with this URL:
+
+    ```text
+    https://YOUR_PROJECT_REF.supabase.co/functions/v1/reloop-send-email
+    ```
+
+    Generate a hook secret and leave the hook disabled until the next step is complete.
+  </Step>
+  <Step title="Configure secrets and enable the hook">
+    Create an ignored `.env.hook` file in `integrations/supabase`:
+
+    ```dotenv
+    RELOOP_API_KEY=YOUR_RELOOP_API_KEY
+    RELOOP_FROM="Example <auth@example.com>"
+    SEND_EMAIL_HOOK_SECRET="v1,whsec_YOUR_GENERATED_SECRET"
+    ```
+
+    Upload it, then enable the hook in Supabase:
+
+    ```bash
+    supabase secrets set --env-file .env.hook
+    ```
+
+    Supabase supplies `SUPABASE_URL`. To use self-hosted Reloop, add
+    `RELOOP_API_URL=https://reloop.example.com/api/mail/v1/send` to the secrets file.
+  </Step>
+  <Step title="Test authentication emails">
+    Trigger each Auth flow in a test project. Check Reloop's email logs and the
+    receiving inbox, then use the code or link in your application. For Secure
+    Email Change, confirm that both the current and new address receive their
+    own confirmation message.
   </Step>
 </Steps>
 
-## Learn More
+<Note>
+The function authenticates requests with the hook signature, so JWT verification
+is disabled for this endpoint. Keep both secrets server-side. An enabled Send
+Email hook replaces SMTP delivery and uses the function's plain-text messages,
+not Supabase's dashboard email templates. Security notification action types
+require extending the handler before enabling those notifications.
+</Note>
 
+Set Supabase's Site URL and redirect allowlist to your application URLs. The
+function sends verification links to Supabase's `/auth/v1/verify` endpoint and
+includes the Auth request's redirect URL. Provider errors return a hook error
+rather than reporting a successful send.
+
+## SMTP alternative
+
+To keep Supabase's built-in email templates, disable the Send Email hook and
+configure **Authentication > Email > SMTP Settings** instead:
+
+| Setting | Value |
+|---------|-------|
+| Host | `smtp.reloop.sh`, or your Reloop submission hostname |
+| Port | `587` with STARTTLS |
+| Username | `reloop` |
+| Password | Your Reloop API key |
+| Sender email | An address on your verified domain |
+| Sender name | Your application's name |
+
+The SMTP hostname must present a trusted TLS certificate. A default self-hosted
+installation uses a self-signed certificate; configure a trusted certificate or
+use the HTTPS hook. Port `465` in the repository's default SMTP configuration
+also uses STARTTLS, so do not assume it provides implicit TLS.
+
+## Learn more
+
+- [Function setup and local tests](https://github.com/reloop-labs/reloop/tree/main/integrations/supabase)
+- [Supabase Send Email Hook](https://supabase.com/docs/guides/auth/auth-hooks/send-email-hook)
 - [Supabase Go-Live Checklist](/docs/guides/supabase-deliverability)
 - [Sending Emails](/docs/learn/sending)
