@@ -1,5 +1,9 @@
 # Supabase Auth emails through Reloop
 
+To use Supabase-hosted PostgreSQL for Reloop itself, see the
+[backend setup guide](https://reloop.sh/docs/guides/supabase-backend).
+That setup keeps Reloop's existing authentication and is independent of this hook.
+
 This Edge Function connects Supabase's Send Email Hook to Reloop's mail API.
 It sends signup confirmations, invitations, magic links, password recovery,
 email-change confirmations, and reauthentication codes. It verifies the hook

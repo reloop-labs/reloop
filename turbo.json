@@ -2,6 +2,7 @@
 	"$schema": "https://turbo.build/schema.json",
 	"ui": "tui",
 	"concurrency": "30",
+	"globalPassThroughEnv": ["PG_URL", "PG_POOL_MAX"],
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
@@ -24,18 +25,22 @@
 			"persistent": true
 		},
 		"db:push": {
+			"passThroughEnv": ["PG_MIGRATION_URL"],
 			"cache": false,
 			"persistent": true
 		},
 		"db:studio": {
+			"passThroughEnv": ["PG_MIGRATION_URL"],
 			"cache": false,
 			"persistent": true
 		},
 		"db:migrate": {
+			"passThroughEnv": ["PG_MIGRATION_URL"],
 			"cache": false,
 			"persistent": true
 		},
 		"db:generate": {
+			"passThroughEnv": ["PG_MIGRATION_URL"],
 			"cache": false,
 			"persistent": true
 		},
