@@ -3,6 +3,7 @@ name: BE Mail Docker
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
     paths:
       - 'apps/backend/mail/**'
       - 'docker-compose.setup.yml'
@@ -70,7 +71,7 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
       - name: Trigger Coolify Deploy
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref_type != 'tag'
         run: |
           curl --fail -i -X POST "https://coolify.reloop.sh/api/v1/deploy?uuid=boakz1dln4jrodkhm68nul5b&force=false" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"

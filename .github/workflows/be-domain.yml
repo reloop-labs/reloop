@@ -3,6 +3,7 @@ name: BE Domain Docker
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
     paths:
       - 'apps/backend/domain/**'
       - 'docker-compose.setup.yml'
@@ -65,7 +66,7 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
       - name: Trigger Coolify Deploy
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref_type != 'tag'
         run: |
           curl --fail -i -X POST "https://coolify.reloop.sh/api/v1/deploy?uuid=unv6l043wqj0q06915k0gadd&force=false" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
