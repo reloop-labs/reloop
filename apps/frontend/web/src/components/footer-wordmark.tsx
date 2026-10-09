@@ -24,15 +24,21 @@ interface LetterBox {
 
 /** Offscreen raster for glyph ink scanning (reused across measures) */
 let scanCanvas: HTMLCanvasElement | null = null;
-const SCAN_SIZE = 384;
+const SCAN_W = 1024;
+const SCAN_H = 384;
 const SCAN_PEN_X = 48;
 const SCAN_BASELINE = 224;
 /** Alpha threshold — skips faint antialiasing fringe */
 const SCAN_ALPHA = 8;
 
 /**
- * Rasterize each glyph of the wordmark with the element's own computed
- * font and scan the alpha channel for exact ink bounds.
+ * Rasterize the whole wordmark with the element's own computed font and
+ * scan the alpha channel for exact per-glyph ink bounds.
+ *
+ * The full string must be drawn together: isolated glyphs can shape
+ * differently than in-string glyphs, so each character is measured in
+ * its real context and attributed to its advance slice.
+ *
  * Returns per-glyph boxes relative to pen x=0 / alphabetic baseline y=0,
  * plus the main-text baseline in SVG units — or null when the canvas
  * font doesn't match the SVG layout (e.g. webfont still loading).
@@ -44,8 +50,8 @@ function scanGlyphInk(
 	try {
 		if (!scanCanvas) {
 			scanCanvas = document.createElement("canvas");
-			scanCanvas.width = SCAN_SIZE;
-			scanCanvas.height = SCAN_SIZE;
+			scanCanvas.width = SCAN_W;
+			scanCanvas.height = SCAN_H;
 		}
 		const ctx = scanCanvas.getContext("2d", { willReadFrequently: true });
 		if (!ctx) return null;
@@ -63,30 +69,53 @@ function scanGlyphInk(
 		const fd = probe.fontBoundingBoxDescent;
 		if (!fa || !fd) return null;
 
-		const boxes = FULL_TEXT.split("").map((ch) => {
-			ctx.clearRect(0, 0, SCAN_SIZE, SCAN_SIZE);
-			ctx.fillText(ch, SCAN_PEN_X, SCAN_BASELINE);
-			const data = ctx.getImageData(0, 0, SCAN_SIZE, SCAN_SIZE).data;
-			let minX = Number.POSITIVE_INFINITY;
-			let minY = Number.POSITIVE_INFINITY;
-			let maxX = -1;
-			let maxY = -1;
-			for (let y = 0; y < SCAN_SIZE; y++) {
-				for (let x = 0; x < SCAN_SIZE; x++) {
-					if ((data[(y * SCAN_SIZE + x) * 4 + 3] ?? 0) >= SCAN_ALPHA) {
-						if (x < minX) minX = x;
-						if (x > maxX) maxX = x;
-						if (y < minY) minY = y;
-						if (y > maxY) maxY = y;
-					}
+		// Pen position of each char within the drawn string (kerning-aware
+		// via cumulative prefix widths).
+		const pens: number[] = [];
+		for (let i = 0; i <= FULL_TEXT.length; i++) {
+			pens.push(SCAN_PEN_X + ctx.measureText(FULL_TEXT.slice(0, i)).width);
+		}
+
+		ctx.clearRect(0, 0, SCAN_W, SCAN_H);
+		ctx.fillText(FULL_TEXT, SCAN_PEN_X, SCAN_BASELINE);
+		const data = ctx.getImageData(0, 0, SCAN_W, SCAN_H).data;
+
+		// Attribute each ink pixel to the advance slice it falls in.
+		// Slices tile exactly; a neighbor's slight overhang may widen a
+		// box by a pixel or two, which the INK_PAD absorbs.
+		const mins = FULL_TEXT.split("").map(() => ({
+			minX: Number.POSITIVE_INFINITY,
+			minY: Number.POSITIVE_INFINITY,
+			maxX: -1,
+			maxY: -1,
+		}));
+		const sliceOf = (x: number): number => {
+			for (let i = 0; i < FULL_TEXT.length; i++) {
+				if (x < (pens[i + 1] ?? Number.POSITIVE_INFINITY)) return i;
+			}
+			return FULL_TEXT.length - 1;
+		};
+		for (let y = 0; y < SCAN_H; y++) {
+			for (let x = 0; x < SCAN_W; x++) {
+				if ((data[(y * SCAN_W + x) * 4 + 3] ?? 0) >= SCAN_ALPHA) {
+					const m = mins[sliceOf(x)];
+					if (!m) continue;
+					if (x < m.minX) m.minX = x;
+					if (x > m.maxX) m.maxX = x;
+					if (y < m.minY) m.minY = y;
+					if (y > m.maxY) m.maxY = y;
 				}
 			}
-			if (maxX < 0) return null;
+		}
+		const boxes = mins.map((m, i) => {
+			if (m.maxX < 0) return null;
+			// Origin is this char's own pen, not the string pen.
+			const pen = pens[i] ?? SCAN_PEN_X;
 			return {
-				x: minX - SCAN_PEN_X,
-				y: minY - SCAN_BASELINE,
-				width: maxX - minX + 1,
-				height: maxY - minY + 1,
+				x: m.minX - pen,
+				y: m.minY - SCAN_BASELINE,
+				width: m.maxX - m.minX + 1,
+				height: m.maxY - m.minY + 1,
 			};
 		});
 
@@ -128,10 +157,10 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 			}
 			setCells(nextCells);
 
-			// Tight ink bounds per glyph via pixel scanning.
-			// Neither SVG getBBox nor canvas actualBoundingBox returns
-			// tight glyph ink in this setup (both yield full em-height
-			// boxes), so rasterize each glyph and scan the alpha channel:
+			// Tight ink bounds per glyph via pixel scanning of the full
+			// string. Neither SVG getBBox nor canvas actualBoundingBox
+			// returns tight glyph ink in this setup (both yield full
+			// em-height boxes), so rasterize and scan the alpha channel:
 			// ground truth of what's actually painted.
 			// - pen X comes from getStartPositionOfChar (includes kerning
 			//   and the textAnchor="middle" centering shift),
