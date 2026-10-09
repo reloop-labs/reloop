@@ -263,7 +263,7 @@ export function CareersValues() {
 			{/* Subtle ambient light gradient at the top */}
 			<div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/[0.04] via-sky-400/[0.02] to-transparent dark:from-blue-500/[0.08] dark:via-transparent" />
 
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				{/* Left-Aligned Header with Flag Icon */}
 				<div className="flex flex-col items-start gap-2.5 px-6 py-12 sm:px-10 sm:py-14 lg:px-12">
 					<svg

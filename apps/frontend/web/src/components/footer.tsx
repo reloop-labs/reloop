@@ -160,7 +160,9 @@ export const Footer = () => {
 	return (
 		<footer className="w-full bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
-				{pathname !== "/tools" && <div aria-hidden className="h-24" />}
+				{pathname !== "/tools" && pathname !== "/contact" && (
+					<div aria-hidden className="h-24" />
+				)}
 				<FooterBrand accent={accent} />
 				<div aria-hidden className="h-24" />
 				<div className="grid grid-cols-2 border-stroke-soft-100 border-t border-b lg:grid-cols-5 dark:border-white/10">

@@ -131,7 +131,7 @@ const ChangelogPage = async ({ searchParams }: PageProps) => {
 			{/* Full-width Year Navigation Bar with top border touching the whole width */}
 			{(newerYear || olderYear) && (
 				<section className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-					<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+					<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 						<div className="grid grid-cols-2 divide-x divide-stroke-soft-200 dark:divide-white/10">
 							{/* Left half */}
 							{newerYear ? (

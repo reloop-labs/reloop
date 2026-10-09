@@ -69,7 +69,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 					{ name: release.title, path: `/changelog/${release.version}` },
 				])}
 			/>
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 pt-28 pb-14 sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-6 pt-28 pb-14 sm:px-10 sm:pt-32 sm:pb-16 md:max-w-7xl lg:px-12 dark:border-white/10">
 				{/* Breadcrumb Header */}
 				<div className="flex items-center gap-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
 					<Link

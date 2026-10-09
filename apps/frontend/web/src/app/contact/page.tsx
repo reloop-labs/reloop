@@ -111,9 +111,9 @@ const ContactPage = () => {
 									</h2>
 									<a
 										className="font-medium text-[14px] text-text-strong-950 hover:underline dark:text-white"
-										href={`mailto:${contactEmail}`}
+										href="mailto:support@reloop.sh"
 									>
-										{contactEmail}
+										support@reloop.sh
 									</a>
 								</div>
 								<div>
@@ -156,6 +156,8 @@ const ContactPage = () => {
 				secondaryHref="https://discord.gg/ZBYwWKY96U"
 				secondaryExternal
 				accentColor="blue"
+				showTopRule={false}
+				insetBorder={false}
 			/>
 		</>
 	);

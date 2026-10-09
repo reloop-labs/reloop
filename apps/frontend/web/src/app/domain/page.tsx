@@ -59,7 +59,7 @@ export default function DomainPage() {
 		<div className="relative w-full">
 			<JsonLd data={pageSchema} />
 			<DomainHero />
-			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator />
 				<CTA />
 			</div>

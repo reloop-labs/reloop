@@ -21,7 +21,7 @@ const philosophyCards = [
 export function AboutPhilosophyCompass() {
 	return (
 		<section className="relative w-full border-stroke-soft-200 border-t bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-6 py-14 sm:px-10 sm:py-16 md:max-w-7xl lg:px-12 lg:py-20 xl:px-14 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-6 py-14 sm:px-10 sm:py-16 md:max-w-7xl lg:px-12 lg:py-20 xl:px-14 dark:border-white/10">
 				<div className="text-left">
 					<h2 className="font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 						Explore our philosophy.

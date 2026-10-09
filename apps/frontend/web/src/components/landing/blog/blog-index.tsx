@@ -55,7 +55,7 @@ export function BlogIndex({
 	return (
 		<div className="min-h-dvh bg-white dark:bg-black">
 			{/* Header & Filter Section */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 pb-0 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 pt-32 pb-0 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{breadcrumb}
 				<h1 className="font-sans font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.2rem] lg:text-[3.6rem] dark:text-white">
 					{title}
@@ -128,7 +128,7 @@ export function BlogIndex({
 			</div>
 
 			{/* Grid Section */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-10 pb-20 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 pt-10 pb-20 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{filteredPosts.length === 0 ? (
 					<div className="rounded-2xl border border-stroke-soft-200 border-dashed px-6 py-16 text-center dark:border-white/10">
 						<p className="font-semibold text-[17px] text-text-strong-950 dark:text-white">

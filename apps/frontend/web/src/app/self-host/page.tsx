@@ -76,7 +76,7 @@ export default function SelfHostPage() {
 		<div className="relative w-full">
 			<JsonLd data={pageSchema} />
 			<SelfHostHero />
-			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<SelfHostSponsors />
 				<SectionSeparator />
 				<SelfHostRequirements />

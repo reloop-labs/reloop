@@ -127,7 +127,7 @@ export function BlogPostPageView({
 		<div className="min-h-dvh bg-white dark:bg-black">
 			{/* Top Header Section with Full-Width Horizontal Border */}
 			<div className="w-full border-stroke-soft-200 border-b dark:border-white/10">
-				<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 pt-32 pb-14 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
+				<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 pt-32 pb-14 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 					<header className="text-left">
 						<div className="flex w-full max-w-[680px] flex-col gap-4">
 							<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
@@ -157,7 +157,7 @@ export function BlogPostPageView({
 			</div>
 
 			{/* Main Article Container */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-200 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
+			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
 				{/* 3-Column Content Grid */}
 				<div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr_240px] lg:gap-0">
 					{/* Left Column: Table of Contents */}

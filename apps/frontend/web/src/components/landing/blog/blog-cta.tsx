@@ -151,6 +151,7 @@ export interface BlogCtaProps {
 	showTopRule?: boolean;
 	blast?: boolean | BlastColors;
 	illustrationPosition?: "left" | "right";
+	insetBorder?: boolean;
 }
 
 export function BlogCta({
@@ -174,6 +175,7 @@ export function BlogCta({
 	flush = false,
 	showTopRule = true,
 	illustrationPosition = "right",
+	insetBorder = true,
 }: BlogCtaProps) {
 	const categoryVariant = category ? CATEGORY_VARIANTS[category] : undefined;
 
@@ -221,15 +223,17 @@ export function BlogCta({
 	const isSecondaryExternal =
 		secondaryExternal !== undefined
 			? secondaryExternal
-			: (resolvedSecondaryHref.startsWith("http://") ||
-				resolvedSecondaryHref.startsWith("https://"));
+			: resolvedSecondaryHref.startsWith("http://") ||
+				resolvedSecondaryHref.startsWith("https://");
 
 	return (
 		<section
 			{...(id ? { id } : {})}
 			className={cn(
 				"w-full",
-				showTopRule ? "border-stroke-soft-200 border-t dark:border-white/10" : "",
+				showTopRule
+					? "border-stroke-soft-200 border-t dark:border-white/10"
+					: "",
 				className,
 			)}
 		>
@@ -238,15 +242,17 @@ export function BlogCta({
 					"mx-auto w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8",
 					flush
 						? ""
-						: "max-w-5xl border-stroke-soft-200 md:max-w-7xl xl:border-x dark:border-white/10",
+						: "max-w-5xl border-stroke-soft-100 md:max-w-7xl xl:border-x dark:border-white/10",
 				)}
 			>
 				<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#246BF5] px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12 dark:border-white/10 dark:bg-[#000]">
 					{/* 8px Inset white border matching landing page */}
-					<div
-						aria-hidden="true"
-						className="pointer-events-none absolute inset-[8px] rounded-[20px] border border-white/25 sm:rounded-[24px] dark:border-white/10"
-					/>
+					{insetBorder ? (
+						<div
+							aria-hidden="true"
+							className="pointer-events-none absolute inset-[8px] rounded-[20px] border border-white/25 sm:rounded-[24px] dark:border-white/10"
+						/>
+					) : null}
 
 					<div className="relative z-10 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8 xl:gap-12">
 						{/* Blueprint Email CAD Illustration */}
@@ -313,8 +319,8 @@ export function BlogCta({
 								)}
 
 								{/* Secondary Button */}
-								{resolvedSecondaryLabel && (
-									isSecondaryExternal ? (
+								{resolvedSecondaryLabel &&
+									(isSecondaryExternal ? (
 										<a
 											href={resolvedSecondaryHref}
 											target="_blank"
@@ -330,12 +336,12 @@ export function BlogCta({
 										>
 											{resolvedSecondaryLabel}
 										</Link>
-									)
-								)}
+									))}
 
 								{/* Tertiary Button */}
-								{tertiaryLabel && tertiaryHref && (
-									tertiaryExternal ? (
+								{tertiaryLabel &&
+									tertiaryHref &&
+									(tertiaryExternal ? (
 										<a
 											href={tertiaryHref}
 											target="_blank"
@@ -351,8 +357,7 @@ export function BlogCta({
 										>
 											{tertiaryLabel}
 										</Link>
-									)
-								)}
+									))}
 							</div>
 						</div>
 					</div>
