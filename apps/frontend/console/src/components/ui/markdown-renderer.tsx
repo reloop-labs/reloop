@@ -95,6 +95,14 @@ export function MarkdownRenderer({
 					strong: ({ children }) => (
 						<strong className="font-semibold">{children}</strong>
 					),
+					img: ({ src, alt }) => (
+						<img
+							src={src}
+							alt={alt ?? "Attached image"}
+							loading="lazy"
+							className="my-2 h-auto max-w-full rounded-xl"
+						/>
+					),
 					em: ({ children }) => <em className="italic">{children}</em>,
 					ul: ({ children }) => (
 						<ul className="my-1.5 list-disc space-y-1 pl-5">{children}</ul>

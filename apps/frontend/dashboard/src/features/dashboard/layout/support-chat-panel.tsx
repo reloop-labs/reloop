@@ -11,6 +11,7 @@ import {
 	Headphones,
 	KeyRound,
 	LifeBuoy,
+	LoaderCircle,
 	Mail,
 	MessageSquare,
 	Paperclip,
@@ -19,6 +20,7 @@ import {
 	X,
 } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { uploadComposeFile } from "#/features/agent-inbox/components/compose/compose-attachments";
 import { useSupportSocket } from "#/features/dashboard/hooks/use-support-socket";
 import { clearSupportUnreadInCache } from "#/features/dashboard/hooks/use-support-unread";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -66,6 +68,22 @@ const QUICK_TOPICS = [
 			"I need help with the API or SMTP integration. Here's what I'm trying to do:",
 	},
 ] as const;
+
+type PendingImage = {
+	key: string;
+	name: string;
+	previewUrl: string;
+	status: "uploading" | "ready" | "error";
+	url?: string;
+};
+
+const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg"];
+const MAX_ATTACHED_IMAGES = 5;
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+function sanitizeImageName(name: string) {
+	return name.replace(/[[\]]/g, "").slice(0, 80) || "image";
+}
 
 function formatTime(value: string) {
 	try {
@@ -222,6 +240,7 @@ export function SupportChatPanel({
 	const [followOutput, setFollowOutput] = useState(true);
 	const [showJumpLatest, setShowJumpLatest] = useState(false);
 	const [unreadAnchorId, setUnreadAnchorId] = useState<string | null>(null);
+	const [attachments, setAttachments] = useState<PendingImage[]>([]);
 
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const bottomRef = useRef<HTMLDivElement>(null);
@@ -229,8 +248,80 @@ export function SupportChatPanel({
 	const didScrollToUnreadRef = useRef(false);
 	const followRef = useRef(true);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 	const conversationIdRef = useRef<string | null>(null);
 	conversationIdRef.current = conversation?.id ?? null;
+
+	const uploadImage = useCallback(async (key: string, file: File) => {
+		try {
+			const { url } = await uploadComposeFile(file);
+			setAttachments((prev) =>
+				prev.map((a) => (a.key === key ? { ...a, status: "ready", url } : a)),
+			);
+		} catch {
+			setAttachments((prev) =>
+				prev.map((a) =>
+					a.key === key ? { ...a, status: "error" as const } : a,
+				),
+			);
+		}
+	}, []);
+
+	const addImageFiles = useCallback(
+		(files: File[]) => {
+			const images = files.filter((f) => ACCEPTED_IMAGE_TYPES.includes(f.type));
+			if (images.length === 0) {
+				if (files.length > 0) {
+					setError("Only PNG and JPEG images can be attached.");
+				}
+				return;
+			}
+			const valid = images.filter((file) => {
+				if (file.size > MAX_IMAGE_BYTES) {
+					setError(`"${file.name}" is larger than 10MB.`);
+					return false;
+				}
+				return true;
+			});
+			if (valid.length === 0) return;
+			const room = MAX_ATTACHED_IMAGES - attachments.length;
+			if (room <= 0) {
+				setError(`You can attach up to ${MAX_ATTACHED_IMAGES} images.`);
+				return;
+			}
+			const picked = valid.slice(0, room);
+			if (valid.length > room) {
+				setError(`You can attach up to ${MAX_ATTACHED_IMAGES} images.`);
+			}
+			const next: PendingImage[] = picked.map((file) => ({
+				key: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+				name: sanitizeImageName(file.name),
+				previewUrl: URL.createObjectURL(file),
+				status: "uploading" as const,
+			}));
+			setAttachments((prev) => [...prev, ...next]);
+			next.forEach((item, i) => {
+				const file = picked[i];
+				if (file) void uploadImage(item.key, file);
+			});
+		},
+		[attachments.length, uploadImage],
+	);
+
+	const removeAttachment = useCallback((key: string) => {
+		setAttachments((prev) => {
+			const target = prev.find((a) => a.key === key);
+			if (target) URL.revokeObjectURL(target.previewUrl);
+			return prev.filter((a) => a.key !== key);
+		});
+	}, []);
+
+	const clearAttachments = useCallback(() => {
+		setAttachments((prev) => {
+			for (const a of prev) URL.revokeObjectURL(a.previewUrl);
+			return [];
+		});
+	}, []);
 
 	const bootstrap = useCallback(async () => {
 		setLoading(true);
@@ -404,7 +495,18 @@ export function SupportChatPanel({
 	]);
 
 	const handleSend = async (override?: string) => {
-		const body = (override ?? draft).trim();
+		const text = (override ?? draft).trim();
+		const readyImages = attachments.filter(
+			(a) => a.status === "ready" && a.url,
+		);
+		if (attachments.some((a) => a.status === "uploading")) {
+			setError("Please wait for images to finish uploading.");
+			return;
+		}
+		const imageMarkdown = readyImages
+			.map((a) => `![${a.name}](${a.url})`)
+			.join("\n");
+		const body = [text, imageMarkdown].filter(Boolean).join("\n\n");
 		if (!body || !conversation || sending || conversation.status === "closed") {
 			return;
 		}
@@ -429,6 +531,7 @@ export function SupportChatPanel({
 			setConversation(data.conversation);
 			if (!override) {
 				setDraft("");
+				clearAttachments();
 				if (textareaRef.current) {
 					textareaRef.current.style.height = "auto";
 				}
@@ -484,6 +587,13 @@ export function SupportChatPanel({
 
 	const closed = conversation?.status === "closed";
 	const hasMessages = messages.length > 0;
+	const isUploadingImages = attachments.some((a) => a.status === "uploading");
+	const hasReadyImages = attachments.some((a) => a.status === "ready" && a.url);
+	const canSend =
+		Boolean(draft.trim() || hasReadyImages) &&
+		!sending &&
+		!closed &&
+		!isUploadingImages;
 
 	return (
 		<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-bg-weak-50/50 dark:bg-bg-weak-50/40">
@@ -560,7 +670,7 @@ export function SupportChatPanel({
 				</div>
 			</div>
 			{/* Body card — white with rounded corners like API key table body */}
-			<div className="-mt-3 relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[20px] border-stroke-soft-100 border-t bg-white dark:border-stroke-soft-100/70 dark:bg-black">
+			<div className="relative -mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[20px] border-stroke-soft-100 border-t bg-white dark:border-stroke-soft-100/70 dark:bg-black">
 				<div
 					ref={viewportRef}
 					onScroll={onViewportScroll}
@@ -620,10 +730,8 @@ export function SupportChatPanel({
 								const showUnreadBanner = m.id === unreadAnchorId;
 								const prev = messages[idx - 1];
 								const next = messages[idx + 1];
-								const isGroupStart =
-									!prev || prev.senderRole !== m.senderRole;
-								const isGroupEnd =
-									!next || next.senderRole !== m.senderRole;
+								const isGroupStart = !prev || prev.senderRole !== m.senderRole;
+								const isGroupEnd = !next || next.senderRole !== m.senderRole;
 								return (
 									<Fragment key={m.id}>
 										{showUnreadBanner ? (
@@ -668,10 +776,7 @@ export function SupportChatPanel({
 													/>
 												) : (
 													<span
-														className={cn(
-															"w-6 shrink-0",
-															mine && "mr-3",
-														)}
+														className={cn("w-6 shrink-0", mine && "mr-3")}
 													/>
 												)}
 												<div
@@ -761,6 +866,41 @@ export function SupportChatPanel({
 							closed && "pointer-events-none opacity-40",
 						)}
 					>
+						{/* Attached image previews */}
+						{attachments.length > 0 ? (
+							<div className="flex flex-wrap gap-2 px-4 pt-3">
+								{attachments.map((a) => (
+									<div
+										key={a.key}
+										className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white dark:border-white/10 dark:bg-white/5"
+									>
+										<img
+											src={a.previewUrl}
+											alt={a.name}
+											className="h-full w-full object-cover"
+										/>
+										{a.status === "uploading" ? (
+											<div className="absolute inset-0 flex items-center justify-center bg-black/40">
+												<LoaderCircle className="h-4 w-4 animate-spin text-white" />
+											</div>
+										) : null}
+										{a.status === "error" ? (
+											<div className="absolute inset-0 flex items-center justify-center bg-red-500/80 px-1 text-center font-medium text-[9px] text-white leading-tight">
+												Failed
+											</div>
+										) : null}
+										<button
+											type="button"
+											onClick={() => removeAttachment(a.key)}
+											title="Remove image"
+											className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80"
+										>
+											<X className="h-3 w-3" />
+										</button>
+									</div>
+								))}
+							</div>
+						) : null}
 						{/* Textarea */}
 						<div className="relative overflow-hidden rounded-b-[18px] border-stroke-soft-100 border-b bg-white dark:border-stroke-soft-100/70 dark:bg-black">
 							<textarea
@@ -771,6 +911,14 @@ export function SupportChatPanel({
 									setDraft(e.target.value);
 									e.target.style.height = "auto";
 									e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
+								}}
+								onPaste={(e) => {
+									const files = Array.from(e.clipboardData?.files ?? []).filter(
+										(f) => f.type.startsWith("image/"),
+									);
+									if (files.length > 0) {
+										addImageFiles(files);
+									}
 								}}
 								onKeyDown={(e) => {
 									if (e.key === "Enter" && !e.shiftKey) {
@@ -795,11 +943,17 @@ export function SupportChatPanel({
 							<button
 								type="button"
 								onClick={() => void handleSend()}
-								disabled={!draft.trim() || sending || closed}
-								title={ready ? "Send · Enter" : "Reconnecting…"}
+								disabled={!canSend}
+								title={
+									isUploadingImages
+										? "Uploading images…"
+										: ready
+											? "Send · Enter"
+											: "Reconnecting…"
+								}
 								className={cn(
 									"absolute top-3 right-3 flex size-7 items-center justify-center rounded-lg transition-all",
-									draft.trim() && !closed
+									canSend
 										? "cursor-pointer text-teal-600 hover:bg-teal-500/10 dark:text-teal-400"
 										: "cursor-not-allowed text-text-soft-400/60 dark:text-white/20",
 								)}
@@ -811,10 +965,23 @@ export function SupportChatPanel({
 						{/* Action toolbar on the bottom tray */}
 						<div className="flex items-center justify-between gap-2 px-3 py-2">
 							<div className="flex items-center gap-1.5">
+								<input
+									ref={fileInputRef}
+									type="file"
+									accept="image/png,image/jpeg"
+									multiple
+									className="hidden"
+									onChange={(e) => {
+										addImageFiles(Array.from(e.target.files ?? []));
+										e.target.value = "";
+									}}
+								/>
 								<button
 									type="button"
-									title="Attach a file (coming soon)"
-									className="flex h-7 items-center gap-1.5 rounded-lg px-2 font-medium text-[12px] text-text-sub-600 transition-colors hover:bg-bg-weak-100 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/5 dark:hover:text-white"
+									onClick={() => fileInputRef.current?.click()}
+									disabled={closed}
+									title="Attach PNG or JPEG images"
+									className="flex h-7 items-center gap-1.5 rounded-lg px-2 font-medium text-[12px] text-text-sub-600 transition-colors hover:bg-bg-weak-100 hover:text-text-strong-950 disabled:opacity-50 dark:text-white/55 dark:hover:bg-white/5 dark:hover:text-white"
 								>
 									<Paperclip className="h-3.5 w-3.5 opacity-70" />
 									Attach

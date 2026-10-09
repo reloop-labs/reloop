@@ -64,7 +64,7 @@ export function SupportChatMarkdown({
 	return (
 		<div
 			className={cn(
-				"break-words [overflow-wrap:anywhere] text-[13px] leading-relaxed",
+				"break-words text-[13px] leading-relaxed [overflow-wrap:anywhere]",
 				mine ? "text-white" : "text-text-strong-950 dark:text-white/90",
 				className,
 			)}
@@ -92,6 +92,14 @@ export function SupportChatMarkdown({
 					),
 					strong: ({ children }) => (
 						<strong className="font-semibold">{children}</strong>
+					),
+					img: ({ src, alt }) => (
+						<img
+							src={src}
+							alt={alt ?? "Attached image"}
+							loading="lazy"
+							className="my-2 h-auto max-w-full rounded-xl"
+						/>
 					),
 					em: ({ children }) => <em className="italic">{children}</em>,
 					ul: ({ children }) => (
