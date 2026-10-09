@@ -3,6 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
@@ -372,24 +373,67 @@ export function LogList({
 					</Button.Root>
 				)}
 
-				<button
-					type="button"
-					onClick={handleRefresh}
-					disabled={isFetching}
-					className={cn(
-						"flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
-						isFetching ? "pointer-events-none" : "cursor-pointer",
-					)}
-					title="Refresh logs (R)"
-					aria-label="Refresh logs"
-					aria-busy={isFetching}
-				>
-					<Icon
-						name="rotate-cw"
-						className={cn("h-4 w-4", isFetching && "animate-spin")}
-					/>
-					<ActionKbd className="w-auto min-w-4 px-1">R</ActionKbd>
-				</button>
+				<Tooltip.Provider delayDuration={200}>
+					<Tooltip.Root>
+						<Tooltip.Trigger asChild>
+							<button
+								type="button"
+								onClick={handleRefresh}
+								disabled={isFetching}
+								className={cn(
+									"flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
+									isFetching ? "pointer-events-none" : "cursor-pointer",
+								)}
+								aria-label="Refresh logs"
+								aria-keyshortcuts="r"
+								aria-busy={isFetching}
+							>
+								<Icon
+									name="rotate-cw"
+									className={cn("h-4 w-4", isFetching && "animate-spin")}
+								/>
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content
+							side="top"
+							sideOffset={-1}
+							size="medium"
+							variant="light"
+							className="max-w-63 p-2.5"
+						>
+							<div className="flex items-start gap-2.5">
+								<div
+									className={cn(
+										"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
+										"bg-bg-weak-50 ring-1 ring-stroke-soft-200",
+									)}
+									aria-hidden
+								>
+									<Icon
+										name="rotate-cw"
+										className={cn(
+											"h-3.5 w-3.5 text-text-sub-600",
+											isFetching && "animate-spin",
+										)}
+									/>
+								</div>
+								<div className="min-w-0 flex-1">
+									<div className="flex items-center justify-between gap-3">
+										<p className="font-medium text-label-sm text-text-strong-950">
+											{isFetching ? "Refreshing…" : "Refresh logs"}
+										</p>
+										<ActionKbd>R</ActionKbd>
+									</div>
+									<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
+										{isFetching
+											? "Fetching the latest logs."
+											: "Reload logs from the server."}
+									</p>
+								</div>
+							</div>
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
 			</div>
 
 			{/* Unified split pane: Stripe-style list + detail */}
