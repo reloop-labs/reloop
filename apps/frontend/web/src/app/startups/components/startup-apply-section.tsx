@@ -40,15 +40,6 @@ export function StartupApplySection() {
 							</li>
 						))}
 					</ul>
-					<div className="mt-8 text-[14px] text-text-sub-600 dark:text-white/55">
-						Existing customer?{" "}
-						<a
-							href="/contact"
-							className="font-medium text-text-strong-950 hover:underline dark:text-white"
-						>
-							Talk to support instead
-						</a>
-					</div>
 					<div className="mt-10 space-y-5 *:space-y-1.5">
 						<div>
 							<h3 className="text-[14px] text-text-sub-600 dark:text-white/55">
