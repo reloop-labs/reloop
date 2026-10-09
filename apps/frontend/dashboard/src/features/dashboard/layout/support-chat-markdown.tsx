@@ -40,7 +40,7 @@ function CodeBlockWithCopy({
 						"absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded transition-opacity",
 						"opacity-0 focus:opacity-100 group-hover/code:opacity-100",
 						mine
-							? "bg-white/20 text-white hover:bg-white/30 dark:bg-bg-white-0/80 dark:text-text-sub-600 dark:hover:bg-bg-white-0"
+							? "bg-black/10 text-neutral-700 hover:bg-black/[0.15] dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
 							: "bg-bg-white-0/80 text-text-sub-600 shadow-sm hover:bg-bg-white-0 dark:bg-white/10 dark:text-white/80 dark:hover:bg-white/20",
 					)}
 				>
@@ -66,7 +66,7 @@ export function SupportChatMarkdown({
 			className={cn(
 				"break-words text-[13px] leading-relaxed [overflow-wrap:anywhere]",
 				mine
-					? "text-white dark:text-text-strong-950"
+					? "text-neutral-900 dark:text-white"
 					: "text-text-strong-950 dark:text-white/90",
 				className,
 			)}
@@ -85,7 +85,7 @@ export function SupportChatMarkdown({
 							className={cn(
 								"font-medium underline underline-offset-2 transition-colors",
 								mine
-									? "text-white decoration-white/60 hover:decoration-white dark:text-blue-600 dark:decoration-blue-600/60 dark:hover:decoration-blue-600"
+									? "text-blue-700 decoration-blue-700/50 hover:decoration-blue-700 dark:text-blue-400 dark:decoration-blue-400/50 dark:hover:decoration-blue-400"
 									: "text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
 							)}
 						>
@@ -100,7 +100,7 @@ export function SupportChatMarkdown({
 							src={src}
 							alt={alt ?? "Attached image"}
 							loading="lazy"
-							className="my-2 h-auto max-w-full rounded-xl"
+							className="my-2 h-auto max-w-full rounded-xl dark:brightness-[0.92]"
 						/>
 					),
 					em: ({ children }) => <em className="italic">{children}</em>,
@@ -116,7 +116,7 @@ export function SupportChatMarkdown({
 							className={cn(
 								"my-2 border-l-2 pl-3 italic",
 								mine
-									? "border-white/40 text-white/90 dark:border-stroke-soft-200 dark:text-text-sub-600"
+									? "border-black/15 text-neutral-700 dark:border-white/25 dark:text-white/80"
 									: "border-stroke-soft-200 text-text-sub-600 dark:border-white/20 dark:text-white/70",
 							)}
 						>
@@ -137,7 +137,7 @@ export function SupportChatMarkdown({
 							className={cn(
 								"my-2.5 border-t",
 								mine
-									? "border-white/20 dark:border-stroke-soft-200"
+									? "border-black/15 dark:border-white/20"
 									: "border-stroke-soft-200 dark:border-white/10",
 							)}
 						/>
@@ -154,7 +154,7 @@ export function SupportChatMarkdown({
 							className={cn(
 								"border-b pb-1.5 font-semibold",
 								mine
-									? "border-white/20 dark:border-stroke-soft-200"
+									? "border-black/15 dark:border-white/20"
 									: "border-stroke-soft-200 dark:border-white/20",
 							)}
 						>
@@ -166,7 +166,7 @@ export function SupportChatMarkdown({
 							className={cn(
 								"border-b py-1.5",
 								mine
-									? "border-white/10 dark:border-stroke-soft-100"
+									? "border-black/10 dark:border-white/10"
 									: "border-stroke-soft-100 dark:border-white/10",
 							)}
 						>
@@ -196,7 +196,7 @@ export function SupportChatMarkdown({
 									className={cn(
 										"my-1.5 overflow-x-auto rounded-xl p-3 font-mono text-[12px] leading-snug",
 										mine
-											? "border border-white/15 bg-black/25 text-white selection:bg-white/30 dark:border-stroke-soft-200 dark:bg-bg-weak-100 dark:text-text-strong-950"
+											? "border border-black/10 bg-black/[0.08] text-neutral-900 selection:bg-black/15 dark:border-white/15 dark:bg-black/30 dark:text-white dark:selection:bg-white/20"
 											: "border border-stroke-soft-200 bg-bg-weak-100 text-text-strong-950 dark:border-white/10 dark:bg-black/40 dark:text-white/90",
 									)}
 								>
@@ -216,7 +216,7 @@ export function SupportChatMarkdown({
 									className={cn(
 										"rounded px-1.5 py-0.5 font-mono text-[12px]",
 										mine
-											? "bg-white/20 text-white dark:border dark:border-stroke-soft-200 dark:bg-bg-weak-100 dark:text-text-strong-950"
+											? "bg-black/[0.08] text-neutral-900 dark:bg-white/20 dark:text-white"
 											: "border border-stroke-soft-200 bg-bg-weak-100 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.08] dark:text-white/90",
 									)}
 									{...props}

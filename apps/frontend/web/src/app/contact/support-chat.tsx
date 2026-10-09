@@ -562,7 +562,7 @@ export function ContactSupportChat({
 													"min-w-0 px-4 py-3 text-[14px] leading-relaxed",
 													mine
 														? "rounded-2xl rounded-br-xs bg-blue-600 text-white"
-														: "rounded-2xl rounded-bl-xs border border-stroke-soft-200/80 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white",
+														: "rounded-2xl rounded-bl-xs border border-stroke-soft-200/80 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white",
 												)}
 											>
 												<p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">

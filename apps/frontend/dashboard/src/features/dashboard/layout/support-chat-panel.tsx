@@ -807,7 +807,7 @@ export function SupportChatPanel({
 													className={cn(
 														"min-w-0 rounded-2xl text-[13px] leading-relaxed",
 														mine
-															? "bg-text-strong-950 text-white dark:bg-white dark:text-text-strong-950"
+															? "bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-white"
 															: "border border-stroke-soft-100 bg-bg-weak-50 text-text-strong-950 dark:border-white/8 dark:bg-white/[0.06] dark:text-white/90",
 														isGroupEnd &&
 															(mine ? "rounded-br-md" : "rounded-bl-md"),
@@ -822,7 +822,7 @@ export function SupportChatPanel({
 																	src={image.url}
 																	alt={image.alt || "Attached image"}
 																	loading="lazy"
-																	className="mx-auto block h-auto w-auto max-w-full"
+																	className="mx-auto block h-auto w-auto max-w-full dark:brightness-[0.92]"
 																/>
 															))}
 															{caption ? (
