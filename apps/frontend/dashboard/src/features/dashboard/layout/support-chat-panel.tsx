@@ -85,6 +85,26 @@ function sanitizeImageName(name: string) {
 	return name.replace(/[[\]]/g, "").slice(0, 80) || "image";
 }
 
+const IMAGE_LINE_RE = /^!\[([^\]]*)\]\(([^)\s]+)\)\s*$/;
+
+function splitMessageImages(body: string): {
+	images: { alt: string; url: string }[];
+	caption: string;
+} {
+	const lines = body.split("\n");
+	const images: { alt: string; url: string }[] = [];
+	const captionLines: string[] = [];
+	for (const line of lines) {
+		const match = line.trim().match(IMAGE_LINE_RE);
+		if (match && match[2]) {
+			images.push({ alt: match[1] ?? "", url: match[2] });
+		} else {
+			captionLines.push(line);
+		}
+	}
+	return { images, caption: captionLines.join("\n").trim() };
+}
+
 function formatTime(value: string) {
 	try {
 		const d = new Date(value);
@@ -241,6 +261,7 @@ export function SupportChatPanel({
 	const [showJumpLatest, setShowJumpLatest] = useState(false);
 	const [unreadAnchorId, setUnreadAnchorId] = useState<string | null>(null);
 	const [attachments, setAttachments] = useState<PendingImage[]>([]);
+	const [isDraggingImages, setIsDraggingImages] = useState(false);
 
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const bottomRef = useRef<HTMLDivElement>(null);
@@ -249,6 +270,7 @@ export function SupportChatPanel({
 	const followRef = useRef(true);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const dragCounterRef = useRef(0);
 	const conversationIdRef = useRef<string | null>(null);
 	conversationIdRef.current = conversation?.id ?? null;
 
@@ -506,7 +528,7 @@ export function SupportChatPanel({
 		const imageMarkdown = readyImages
 			.map((a) => `![${a.name}](${a.url})`)
 			.join("\n");
-		const body = [text, imageMarkdown].filter(Boolean).join("\n\n");
+		const body = [imageMarkdown, text].filter(Boolean).join("\n\n");
 		if (!body || !conversation || sending || conversation.status === "closed") {
 			return;
 		}
@@ -732,6 +754,8 @@ export function SupportChatPanel({
 								const next = messages[idx + 1];
 								const isGroupStart = !prev || prev.senderRole !== m.senderRole;
 								const isGroupEnd = !next || next.senderRole !== m.senderRole;
+								const { images, caption } = splitMessageImages(m.body);
+								const hasImages = images.length > 0;
 								return (
 									<Fragment key={m.id}>
 										{showUnreadBanner ? (
@@ -781,15 +805,38 @@ export function SupportChatPanel({
 												)}
 												<div
 													className={cn(
-														"min-w-0 rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed",
+														"min-w-0 rounded-2xl text-[13px] leading-relaxed",
 														mine
-															? "bg-blue-600 text-white"
+															? "bg-text-strong-950 text-white dark:bg-white dark:text-text-strong-950"
 															: "border border-stroke-soft-100 bg-bg-weak-50 text-text-strong-950 dark:border-white/8 dark:bg-white/[0.06] dark:text-white/90",
 														isGroupEnd &&
 															(mine ? "rounded-br-md" : "rounded-bl-md"),
+														hasImages ? "overflow-hidden" : "px-3.5 py-2.5",
 													)}
 												>
-													<SupportChatMarkdown content={m.body} mine={mine} />
+													{hasImages ? (
+														<>
+															{images.map((image, imageIdx) => (
+																<img
+																	key={`${image.url}-${imageIdx}`}
+																	src={image.url}
+																	alt={image.alt || "Attached image"}
+																	loading="lazy"
+																	className="mx-auto block h-auto w-auto max-w-full"
+																/>
+															))}
+															{caption ? (
+																<div className="px-3.5 py-2.5">
+																	<SupportChatMarkdown
+																		content={caption}
+																		mine={mine}
+																	/>
+																</div>
+															) : null}
+														</>
+													) : (
+														<SupportChatMarkdown content={m.body} mine={mine} />
+													)}
 												</div>
 											</div>
 											{isGroupEnd ? (
@@ -862,47 +909,87 @@ export function SupportChatPanel({
 
 					<div
 						className={cn(
-							"flex flex-col overflow-hidden rounded-[20px] border border-stroke-soft-100 bg-bg-weak-50/50 transition-all focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/70 dark:bg-bg-weak-50/40",
+							"relative flex flex-col overflow-hidden rounded-[20px] border border-stroke-soft-100 bg-bg-weak-50/50 transition-all focus-within:border-text-strong-950 focus-within:ring-4 focus-within:ring-text-strong-950/10 dark:border-stroke-soft-100/70 dark:bg-bg-weak-50/40 dark:focus-within:border-white dark:focus-within:ring-white/20",
 							closed && "pointer-events-none opacity-40",
+							isDraggingImages &&
+								"border-primary-base ring-4 ring-primary-base/10",
 						)}
+						onDragEnter={(e) => {
+							if (closed) return;
+							if (Array.from(e.dataTransfer.types).includes("Files")) {
+								dragCounterRef.current += 1;
+								setIsDraggingImages(true);
+							}
+						}}
+						onDragOver={(e) => {
+							if (isDraggingImages) {
+								e.preventDefault();
+								e.dataTransfer.dropEffect = "copy";
+							}
+						}}
+						onDragLeave={() => {
+							dragCounterRef.current = Math.max(dragCounterRef.current - 1, 0);
+							if (dragCounterRef.current === 0) {
+								setIsDraggingImages(false);
+							}
+						}}
+						onDrop={(e) => {
+							e.preventDefault();
+							dragCounterRef.current = 0;
+							setIsDraggingImages(false);
+							if (closed) return;
+							const files = Array.from(e.dataTransfer.files ?? []).filter((f) =>
+								f.type.startsWith("image/"),
+							);
+							if (files.length > 0) {
+								addImageFiles(files);
+							}
+						}}
 					>
-						{/* Attached image previews */}
-						{attachments.length > 0 ? (
-							<div className="flex flex-wrap gap-2 px-4 pt-3">
-								{attachments.map((a) => (
-									<div
-										key={a.key}
-										className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white dark:border-white/10 dark:bg-white/5"
-									>
-										<img
-											src={a.previewUrl}
-											alt={a.name}
-											className="h-full w-full object-cover"
-										/>
-										{a.status === "uploading" ? (
-											<div className="absolute inset-0 flex items-center justify-center bg-black/40">
-												<LoaderCircle className="h-4 w-4 animate-spin text-white" />
-											</div>
-										) : null}
-										{a.status === "error" ? (
-											<div className="absolute inset-0 flex items-center justify-center bg-red-500/80 px-1 text-center font-medium text-[9px] text-white leading-tight">
-												Failed
-											</div>
-										) : null}
-										<button
-											type="button"
-											onClick={() => removeAttachment(a.key)}
-											title="Remove image"
-											className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80"
-										>
-											<X className="h-3 w-3" />
-										</button>
-									</div>
-								))}
+						{isDraggingImages ? (
+							<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[20px] border-2 border-primary-base border-dashed bg-primary-base/5 backdrop-blur-[1px] dark:bg-primary-base/10">
+								<p className="font-medium text-[13px] text-primary-base">
+									Drop PNG or JPEG images to attach
+								</p>
 							</div>
 						) : null}
 						{/* Textarea */}
 						<div className="relative overflow-hidden rounded-b-[18px] border-stroke-soft-100 border-b bg-white dark:border-stroke-soft-100/70 dark:bg-black">
+							{/* Attached image previews */}
+							{attachments.length > 0 ? (
+								<div className="flex flex-wrap gap-2 px-4 pt-3">
+									{attachments.map((a) => (
+										<div
+											key={a.key}
+											className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white dark:border-white/10 dark:bg-white/5"
+										>
+											<img
+												src={a.previewUrl}
+												alt={a.name}
+												className="h-full w-full object-cover"
+											/>
+											{a.status === "uploading" ? (
+												<div className="absolute inset-0 flex items-center justify-center bg-black/40">
+													<LoaderCircle className="h-4 w-4 animate-spin text-white" />
+												</div>
+											) : null}
+											{a.status === "error" ? (
+												<div className="absolute inset-0 flex items-center justify-center bg-red-500/80 px-1 text-center font-medium text-[9px] text-white leading-tight">
+													Failed
+												</div>
+											) : null}
+											<button
+												type="button"
+												onClick={() => removeAttachment(a.key)}
+												title="Remove image"
+												className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/80"
+											>
+												<X className="h-3 w-3" />
+											</button>
+										</div>
+									))}
+								</div>
+							) : null}
 							<textarea
 								ref={textareaRef}
 								value={draft}
@@ -954,7 +1041,7 @@ export function SupportChatPanel({
 								className={cn(
 									"absolute top-3 right-3 flex size-7 items-center justify-center rounded-lg transition-all",
 									canSend
-										? "cursor-pointer text-teal-600 hover:bg-teal-500/10 dark:text-teal-400"
+										? "cursor-pointer text-text-strong-950 hover:bg-bg-weak-100 dark:text-white dark:hover:bg-white/10"
 										: "cursor-not-allowed text-text-soft-400/60 dark:text-white/20",
 								)}
 							>
