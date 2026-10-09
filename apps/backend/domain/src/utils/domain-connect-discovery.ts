@@ -38,6 +38,7 @@ export async function discoverDomainConnect(
 		urlAPI: null,
 	};
 
+	const t0 = Date.now();
 	try {
 		// Step 1: DNS TXT lookup for _domainconnect
 		const dcHost = await resolveDCHost(rootDomain);
@@ -66,6 +67,10 @@ export async function discoverDomainConnect(
 			serviceId,
 		);
 
+		log.info(
+			`DC discovery for ${rootDomain}: supported=${true} templateSupported=${templateOk} provider=${settings.providerDisplayName || settings.providerName} (${Date.now() - t0}ms)`,
+		);
+
 		return {
 			supported: true,
 			templateSupported: templateOk,
@@ -81,7 +86,9 @@ export async function discoverDomainConnect(
 				: "DNS provider supports Domain Connect but has not onboarded the Reloop template yet",
 		};
 	} catch (error) {
-		log.error(`Domain Connect discovery failed for ${rootDomain}: ${error}`);
+		log.error(
+			`Domain Connect discovery failed for ${rootDomain} (${Date.now() - t0}ms): ${error}`,
+		);
 		return { ...notSupported, error: "Discovery failed" };
 	}
 }
@@ -92,11 +99,20 @@ export async function discoverDomainConnect(
 export async function resolveDCHost(
 	rootDomain: string,
 ): Promise<string | null> {
+	const log = useLogger();
+	const t0 = Date.now();
 	try {
 		const records = await resolver.resolveTxt(`_domainconnect.${rootDomain}`);
 		const flat = records.flat();
-		return flat[0] || null;
-	} catch {
+		const host = flat[0] || null;
+		log.info(
+			`DC DNS lookup _domainconnect.${rootDomain}: ${host || "(empty)"} (${Date.now() - t0}ms)`,
+		);
+		return host;
+	} catch (error) {
+		log.warn(
+			`DC DNS lookup failed for _domainconnect.${rootDomain} (${Date.now() - t0}ms): ${error}`,
+		);
 		return null;
 	}
 }
@@ -108,14 +124,28 @@ export async function fetchDCSettings(
 	dcHost: string,
 	domain: string,
 ): Promise<DCSettings | null> {
+	const log = useLogger();
+	const url = `https://${dcHost}/v2/${domain}/settings`;
+	const t0 = Date.now();
 	try {
-		const url = `https://${dcHost}/v2/${domain}/settings`;
 		const response = await fetch(url, {
 			signal: AbortSignal.timeout(10_000),
 		});
-		if (!response.ok) return null;
-		return (await response.json()) as DCSettings;
-	} catch {
+		if (!response.ok) {
+			log.warn(
+				`DC settings fetch failed: ${url} → HTTP ${response.status} (${Date.now() - t0}ms)`,
+			);
+			return null;
+		}
+		const settings = (await response.json()) as DCSettings;
+		log.info(
+			`DC settings fetch: ${url} → provider=${settings.providerDisplayName || settings.providerName} (${Date.now() - t0}ms)`,
+		);
+		return settings;
+	} catch (error) {
+		log.error(
+			`DC settings fetch error: ${url} (${Date.now() - t0}ms): ${error}`,
+		);
 		return null;
 	}
 }
@@ -128,13 +158,27 @@ export async function checkTemplateSupport(
 	providerId: string,
 	serviceId: string,
 ): Promise<boolean> {
+	const log = useLogger();
+	const url = `${urlAPI}/v2/domainTemplates/providers/${providerId}/services/${serviceId}`;
+	const t0 = Date.now();
 	try {
-		const url = `${urlAPI}/v2/domainTemplates/providers/${providerId}/services/${serviceId}`;
 		const response = await fetch(url, {
 			signal: AbortSignal.timeout(10_000),
 		});
+		const elapsed = Date.now() - t0;
+		if (!response.ok) {
+			log.warn(
+				`DC template check failed: ${url} → HTTP ${response.status} (${elapsed}ms)`,
+			);
+		}
+		log.info(
+			`DC template check: ${providerId}/${serviceId} → HTTP ${response.status} (${elapsed}ms)`,
+		);
 		return response.ok;
-	} catch {
+	} catch (error) {
+		log.error(
+			`DC template check error: ${url} (${Date.now() - t0}ms): ${error}`,
+		);
 		return false;
 	}
 }
