@@ -59,6 +59,7 @@ export function StartupApplyForm() {
 				credentials: "include",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
+					type: "startup",
 					email: data.email.trim(),
 					fullName: `${data.firstName.trim()} ${data.lastName.trim()}`,
 					company: data.company.trim(),
