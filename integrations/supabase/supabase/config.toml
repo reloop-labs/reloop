@@ -1,0 +1,4 @@
+project_id = "reloop-auth-email"
+
+[functions.reloop-send-email]
+verify_jwt = false

@@ -1,0 +1,8 @@
+{
+	"imports": {
+		"standardwebhooks": "npm:standardwebhooks@1.0.0"
+	},
+	"compilerOptions": {
+		"strict": true
+	}
+}

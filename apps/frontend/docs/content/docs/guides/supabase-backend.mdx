@@ -1,0 +1,112 @@
+---
+title: Supabase PostgreSQL backend
+sidebarTitle: Supabase Backend
+description: Run Reloop against Supabase-hosted PostgreSQL while keeping Reloop's existing authentication.
+---
+
+Reloop can store its application data in Supabase-hosted PostgreSQL through its
+existing Drizzle and node-postgres client. Reloop continues to manage login,
+organizations, permissions, and API keys through Better Auth. This database
+setup is independent of the [Supabase Auth email hook](/docs/guides/supabase-quickstart).
+
+Redis, NATS, the application services, and the mail transport still run on your
+own infrastructure. Supabase Storage and Realtime are not used by this integration.
+
+## Prepare a database
+
+Use a new Supabase project dedicated to Reloop. Before creating Reloop's tables,
+disable the **Data API** in the project's API settings. Reloop's tables contain
+sessions, API-key data, and organization records. They use application-level
+authorization and do not define Supabase RLS policies for direct client access.
+Keep the Data API disabled and never put the database URL in frontend code.
+
+Do not point the schema command at the Supabase project your customer-facing app
+already uses. Reloop manages tables in `public`; its schema push can change or
+remove unrelated tables there. Supabase's `auth` and `storage` schemas are outside
+the configured `public` schema filter.
+
+## Connection settings
+
+Copy a connection string from Supabase's **Connect** dialog. Use a direct
+connection on a network with IPv6 or Supabase's IPv4 add-on. On an IPv4-only
+network, use the **Session pooler** on port `5432`. Copy the actual pooler host
+from the dialog; it cannot be derived reliably from your region.
+
+Use a direct or session connection for schema operations too. This guide does
+not use transaction pooling on port `6543`.
+
+| Variable | Purpose |
+|----------|---------|
+| `PG_URL` | Runtime PostgreSQL connection string for every Reloop backend process |
+| `PG_POOL_MAX` | Maximum connections per process, for example `2`. If unset, node-postgres keeps its default |
+| `PG_MIGRATION_URL` | Optional schema-management connection used by Drizzle Kit. Falls back to `PG_URL` |
+
+Require verified TLS. Add `sslmode=verify-full` to the URL. If your connection
+needs Supabase's database CA, download it from the database settings and add
+`sslrootcert=/absolute/path/to/supabase-ca.crt` to the URL. URL-encode the database
+password and query values. For containers, the certificate path must exist
+inside each container. Do not disable certificate verification to bypass an error.
+
+Example session-pooler URL:
+
+```text
+postgresql://postgres.PROJECT_REF:ENCODED_PASSWORD@POOLER_HOST:5432/postgres?sslmode=verify-full&sslrootcert=%2Frun%2Fsecrets%2Fsupabase-ca.crt
+```
+
+`PG_POOL_MAX` applies separately to each service process and replica. At `2`,
+fifteen processes can reserve up to thirty connections. Choose a total below
+your project's connection budget, leaving room for Supabase's own services and
+schema operations.
+
+## Run from source
+
+From a fresh checkout, prepare the local configuration without starting a local
+database or pushing its schema:
+
+```bash
+bun setup --skip-docker
+```
+
+Set the database variables in the shell that will run Reloop. Use your secret
+manager or an ignored environment file rather than committing credentials.
+The root Turbo configuration passes these variables to its child tasks.
+
+```bash
+export PG_URL='YOUR_SUPABASE_POSTGRES_URL'
+export PG_POOL_MAX=2
+export PG_MIGRATION_URL='YOUR_SUPABASE_DIRECT_OR_SESSION_URL'
+docker compose -f local/docker-compose.yml up -d --scale reloop-postgres=0
+bun db:push
+bun dev
+```
+
+Review the schema plan before accepting it. `PG_MIGRATION_URL` must point to the
+same database as `PG_URL`. Leave it unset if both use the same connection.
+The local services still use development credentials and settings; the local
+setup is for development, not a production deployment.
+
+For a custom production deployment, inject `PG_URL` and `PG_POOL_MAX` into every
+backend service and `PG_MIGRATION_URL` into the schema job. Keep schema credentials
+out of runtime services when using separate database roles. Build and deploy
+images containing this change before using the new pool setting.
+
+The standard VPS installer currently provisions local PostgreSQL and writes its
+own `PG_URL`. This guide configures source or custom container deployments; it
+does not change that installer's database lifecycle or backup commands.
+
+## Verify and operate
+
+After the schema push, check that Reloop's tables exist in the Supabase project's
+`public` schema. Start Reloop and verify its backend health checks, create an
+organization, sign in, and create a test API key. Existing users are not imported
+from Supabase Auth. A database connection alone does not verify email delivery.
+
+Keep Supabase backups enabled according to your plan. For an existing Reloop
+installation, migrate data separately with a backup and restore process, then
+switch all services together. Never run `db:reset` against a managed database.
+The VPS `reloop backup` command targets its local PostgreSQL container and is not
+a backup of this Supabase database.
+
+- [Supabase PostgreSQL connections](https://supabase.com/docs/guides/database/connecting-to-postgres)
+- [Supabase with Drizzle and the Data API setting](https://supabase.com/docs/guides/database/drizzle)
+- [node-postgres TLS configuration](https://node-postgres.com/features/ssl)
