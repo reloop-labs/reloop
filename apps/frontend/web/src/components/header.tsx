@@ -557,6 +557,12 @@ const navItems: NavItem[] = [
 							description: "Transparency and developer freedom",
 						},
 						{
+							title: "Startups",
+							href: "/startups",
+							icon: "rocket",
+							description: "$1,000 in credits for early-stage teams",
+						},
+						{
 							title: "License",
 							href: "/license",
 							customIcon: <LicenseDocIcon className="size-[14px]" />,

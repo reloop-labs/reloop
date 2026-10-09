@@ -8,6 +8,7 @@ import { adminRoutes } from "@reloop/admin/routes/admin/admin.routes";
 import { agentCardRoute } from "@reloop/admin/routes/landing/agent-card.route";
 import { healthRoute } from "@reloop/admin/routes/landing/health.route";
 import { landingRoute } from "@reloop/admin/routes/landing/landing.route";
+import { startupApplicationPublicRoute } from "@reloop/admin/routes/landing/startup-application.route";
 import { loader } from "@reloop/admin/utils/loader";
 import {
 	requireUserAgentPlugin,
@@ -67,6 +68,7 @@ const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)
+	.use(startupApplicationPublicRoute)
 	.use(adminRoutes)
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);

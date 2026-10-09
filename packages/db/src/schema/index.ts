@@ -15,6 +15,7 @@ export * from "./group";
 export * from "./inbox";
 export * from "./reputation";
 export * from "./sending-ip";
+export * from "./startup-application";
 export * from "./support";
 export * from "./template";
 export * from "./thread";

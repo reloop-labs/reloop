@@ -94,6 +94,7 @@ const columns: FooterColumn[] = [
 			{ title: "About", href: "/about" },
 			{ title: "Contact", href: "/contact" },
 			{ title: "Pricing", href: "/pricing" },
+			{ title: "Startups", href: "/startups" },
 			{ title: "Careers", href: "/careers" },
 			{ title: "Privacy Policy", href: "/privacy" },
 			{ title: "Terms of Service", href: "/terms-and-conditions" },

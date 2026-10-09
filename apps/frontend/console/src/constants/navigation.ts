@@ -60,6 +60,12 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
 				iconName: "dedicated-ip",
 				description: "Inventory and org assignment",
 			},
+			{
+				href: "/startups",
+				label: "Startups",
+				iconName: "rocket",
+				description: "$1k credit applications",
+			},
 		],
 	},
 	{
