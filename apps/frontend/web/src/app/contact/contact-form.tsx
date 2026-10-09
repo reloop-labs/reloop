@@ -138,27 +138,34 @@ export function ContactForm() {
 						initial={{ height: 0, opacity: 0 }}
 						animate={{ height: "auto", opacity: 1 }}
 						exit={{ height: 0, opacity: 0 }}
-						transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+						transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
 						className="overflow-hidden"
 					>
-						<div className="mt-6 flex items-center justify-between gap-4 rounded-xl border border-stroke-soft-200 px-4 py-3 dark:border-white/10">
-							<div className="min-w-0">
-								<p className="truncate font-medium text-[14px] text-text-strong-950 dark:text-white">
-									Logged in as {session.user.email ?? ""}
-								</p>
-								<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
-									Chat with the founders to get help — live reply in ~2 mins.
-								</p>
+						<motion.div
+							initial={{ y: -12, opacity: 0 }}
+							animate={{ y: 0, opacity: 1 }}
+							exit={{ y: -8, opacity: 0 }}
+							transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+						>
+							<div className="mt-6 flex items-center justify-between gap-4 rounded-xl border border-stroke-soft-200 px-4 py-3 dark:border-white/10">
+								<div className="min-w-0">
+									<p className="truncate font-medium text-[14px] text-text-strong-950 dark:text-white">
+										Logged in as {session.user.email ?? ""}
+									</p>
+									<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
+										Chat with the founders to get help — live reply in ~2 mins.
+									</p>
+								</div>
+								<FancyButton.Root
+									asChild
+									variant="basic"
+									size="small"
+									className="shrink-0"
+								>
+									<a href="/dashboard/help">Chat now</a>
+								</FancyButton.Root>
 							</div>
-							<FancyButton.Root
-								asChild
-								variant="basic"
-								size="small"
-								className="shrink-0"
-							>
-								<a href="/dashboard/help">Chat now</a>
-							</FancyButton.Root>
-						</div>
+						</motion.div>
 					</motion.div>
 				) : null}
 			</AnimatePresence>
