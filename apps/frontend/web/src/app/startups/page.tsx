@@ -58,7 +58,7 @@ const StartupsPage = () => {
 	return (
 		<>
 			<JsonLd data={schema} />
-			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#171717] [--primary-dark:#171717] [--primary-darker:#000000] [--primary-link:#171717] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 				<div aria-hidden className="h-[72px] max-[1279px]:h-14" />
 				<StartupApplySection />
 			</div>

@@ -3,48 +3,54 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import * as Textarea from "@reloop/ui/textarea";
-import { type FormEvent, useState } from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 type Status = "idle" | "sending" | "done" | "error";
 
-function FieldLabel({
-	htmlFor,
-	children,
-}: {
-	htmlFor: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<label
-			htmlFor={htmlFor}
-			className="block select-none font-medium text-[14px] text-text-strong-950 dark:text-white"
-		>
-			{children}
-		</label>
-	);
-}
+const MESSAGE_MIN_LENGTH = 20;
+const MESSAGE_MAX_LENGTH = 500;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type StartupApplyValues = {
+	firstName: string;
+	lastName: string;
+	email: string;
+	company: string;
+	useCase: string;
+};
+
+const labelClassName =
+	"block gap-1 font-medium text-sm text-text-strong-950 dark:text-white";
 
 export function StartupApplyForm() {
-	const [firstName, setFirstName] = useState("");
-	const [lastName, setLastName] = useState("");
-	const [email, setEmail] = useState("");
-	const [company, setCompany] = useState("");
-	const [useCase, setUseCase] = useState("");
 	const [status, setStatus] = useState<Status>("idle");
 	const [error, setError] = useState<string | null>(null);
+	const [sentEmail, setSentEmail] = useState("");
 
-	const valid =
-		firstName.trim().length > 0 &&
-		lastName.trim().length > 0 &&
-		/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
-		company.trim().length > 0 &&
-		useCase.trim().length >= 10;
+	const {
+		register,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm<StartupApplyValues>({
+		defaultValues: {
+			firstName: "",
+			lastName: "",
+			email: "",
+			company: "",
+			useCase: "",
+		},
+	});
 
-	async function handleSubmit(e: FormEvent) {
-		e.preventDefault();
-		if (!valid || status === "sending") return;
+	const useCaseValue = watch("useCase") ?? "";
+	const useCaseError = errors.useCase?.message;
+
+	async function onSubmit(data: StartupApplyValues) {
+		if (status === "sending") return;
 		setStatus("sending");
 		setError(null);
 		try {
@@ -53,10 +59,10 @@ export function StartupApplyForm() {
 				credentials: "include",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					email: email.trim(),
-					fullName: `${firstName.trim()} ${lastName.trim()}`,
-					company: company.trim(),
-					useCase: useCase.trim(),
+					email: data.email.trim(),
+					fullName: `${data.firstName.trim()} ${data.lastName.trim()}`,
+					company: data.company.trim(),
+					useCase: data.useCase.trim(),
 				}),
 			});
 			if (!res.ok) {
@@ -73,6 +79,7 @@ export function StartupApplyForm() {
 				}
 				throw new Error(message);
 			}
+			setSentEmail(data.email.trim());
 			setStatus("done");
 		} catch (err) {
 			setStatus("error");
@@ -93,7 +100,7 @@ export function StartupApplyForm() {
 					Thanks — we review startup applications within 2 business days. Keep
 					an eye on{" "}
 					<span className="font-medium text-text-strong-950 dark:text-white">
-						{email}
+						{sentEmail}
 					</span>{" "}
 					for your $1,000 credit approval.
 				</p>
@@ -112,85 +119,165 @@ export function StartupApplyForm() {
 			<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/55">
 				Fill out the form and we&apos;ll be in touch within 2 business days.
 			</p>
-			<form onSubmit={handleSubmit} className="relative mt-7 space-y-5">
+			<form
+				onSubmit={handleSubmit(onSubmit)}
+				noValidate
+				className="relative mt-7 space-y-5"
+			>
 				<div className="grid gap-4 sm:grid-cols-2">
-					<div className="space-y-2.5">
-						<FieldLabel htmlFor="su-first-name">First name</FieldLabel>
-						<Input.Root size="small">
+					<div className="space-y-1">
+						<Label.Root htmlFor="su-first-name" className={labelClassName}>
+							First name
+							<Label.Asterisk className="text-error-base" />
+						</Label.Root>
+						<div className="relative">
+							<Input.Root
+								size="small"
+								className="w-full rounded-xl"
+								hasError={!!errors.firstName}
+							>
+								<Input.Wrapper>
+									<Input.Input
+										id="su-first-name"
+										placeholder="John"
+										autoComplete="given-name"
+										{...register("firstName", {
+											required: "First name is required",
+										})}
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+						{errors.firstName ? (
+							<p className="text-error-base text-xs">
+								{errors.firstName.message}
+							</p>
+						) : null}
+					</div>
+					<div className="space-y-1">
+						<Label.Root htmlFor="su-last-name" className={labelClassName}>
+							Last name
+							<Label.Asterisk className="text-error-base" />
+						</Label.Root>
+						<div className="relative">
+							<Input.Root
+								size="small"
+								className="w-full rounded-xl"
+								hasError={!!errors.lastName}
+							>
+								<Input.Wrapper>
+									<Input.Input
+										id="su-last-name"
+										placeholder="Doe"
+										autoComplete="family-name"
+										{...register("lastName", {
+											required: "Last name is required",
+										})}
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+						{errors.lastName ? (
+							<p className="text-error-base text-xs">
+								{errors.lastName.message}
+							</p>
+						) : null}
+					</div>
+				</div>
+				<div className="space-y-1">
+					<Label.Root htmlFor="su-email" className={labelClassName}>
+						Professional Email
+						<Label.Asterisk className="text-error-base" />
+					</Label.Root>
+					<div className="relative">
+						<Input.Root
+							size="small"
+							className="w-full rounded-xl"
+							hasError={!!errors.email}
+						>
 							<Input.Wrapper>
 								<Input.Input
-									id="su-first-name"
-									value={firstName}
-									onChange={(e) => setFirstName(e.target.value)}
-									placeholder="John"
-									required
-									autoComplete="given-name"
+									id="su-email"
+									type="email"
+									placeholder="name@company.com"
+									autoComplete="email"
+									{...register("email", {
+										required: "Email is required",
+										pattern: {
+											value: EMAIL_PATTERN,
+											message: "Enter a valid email address",
+										},
+									})}
 								/>
 							</Input.Wrapper>
 						</Input.Root>
 					</div>
-					<div className="space-y-2.5">
-						<FieldLabel htmlFor="su-last-name">Last name</FieldLabel>
-						<Input.Root size="small">
+					{errors.email ? (
+						<p className="text-error-base text-xs">{errors.email.message}</p>
+					) : null}
+				</div>
+				<div className="space-y-1">
+					<Label.Root htmlFor="su-company" className={labelClassName}>
+						Company
+						<Label.Asterisk className="text-error-base" />
+					</Label.Root>
+					<div className="relative">
+						<Input.Root
+							size="small"
+							className="w-full rounded-xl"
+							hasError={!!errors.company}
+						>
 							<Input.Wrapper>
 								<Input.Input
-									id="su-last-name"
-									value={lastName}
-									onChange={(e) => setLastName(e.target.value)}
-									placeholder="Doe"
-									required
-									autoComplete="family-name"
+									id="su-company"
+									type="text"
+									placeholder="Company Name"
+									autoComplete="organization"
+									{...register("company", {
+										required: "Company is required",
+									})}
 								/>
 							</Input.Wrapper>
 						</Input.Root>
 					</div>
+					{errors.company ? (
+						<p className="text-error-base text-xs">{errors.company.message}</p>
+					) : null}
 				</div>
-				<div className="space-y-2.5">
-					<FieldLabel htmlFor="su-email">Professional Email</FieldLabel>
-					<Input.Root size="small">
-						<Input.Wrapper>
-							<Input.Input
-								id="su-email"
-								type="email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								placeholder="name@company.com"
-								required
-								autoComplete="email"
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-				<div className="space-y-2.5">
-					<FieldLabel htmlFor="su-company">Company</FieldLabel>
-					<Input.Root size="small">
-						<Input.Wrapper>
-							<Input.Input
-								id="su-company"
-								type="text"
-								value={company}
-								onChange={(e) => setCompany(e.target.value)}
-								placeholder="Company Name"
-								required
-								autoComplete="organization"
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-				<div className="space-y-2.5">
-					<FieldLabel htmlFor="su-message">Message</FieldLabel>
+				<div className="space-y-1">
+					<Label.Root htmlFor="su-message" className={labelClassName}>
+						Message
+						<Label.Asterisk className="text-error-base" />
+					</Label.Root>
 					<Textarea.Root
-						simple
 						id="su-message"
-						value={useCase}
-						onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-							setUseCase(e.target.value)
-						}
 						placeholder="Tell us about your product and how you'll use email…"
 						rows={6}
-						required
-						className="min-h-32"
-					/>
+						maxLength={MESSAGE_MAX_LENGTH}
+						hasError={!!errors.useCase}
+						{...register("useCase", {
+							required: "Message is required",
+							maxLength: {
+								value: MESSAGE_MAX_LENGTH,
+								message: `Keep it under ${MESSAGE_MAX_LENGTH} characters`,
+							},
+							validate: (value) => {
+								const remaining = MESSAGE_MIN_LENGTH - value.trim().length;
+								return (
+									remaining <= 0 ||
+									`Write at least ${remaining} more characters (minimum ${MESSAGE_MIN_LENGTH})`
+								);
+							},
+						})}
+					>
+						<Textarea.CharCounter
+							current={useCaseValue.length}
+							max={MESSAGE_MAX_LENGTH}
+						/>
+					</Textarea.Root>
+					{useCaseError ? (
+						<p className="text-error-base text-xs">{useCaseError}</p>
+					) : null}
 				</div>
 
 				{status === "error" && error ? (
@@ -211,8 +298,7 @@ export function StartupApplyForm() {
 						mode="filled"
 						size="medium"
 						type="submit"
-						disabled={!valid || status === "sending"}
-						className="max-sm:row-start-1"
+						className="max-sm:row-start-1 dark:text-black"
 					>
 						{status === "sending" ? (
 							<>
