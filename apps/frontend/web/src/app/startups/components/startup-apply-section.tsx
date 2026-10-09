@@ -2,8 +2,8 @@ import { Icon } from "@reloop/ui/icon";
 import { StartupApplyForm } from "./startup-apply-form";
 
 const checklist = [
-	"$1,000 in credits, valid 12 months",
-	"Decision within 2 business days",
+	"Up to $1,000 in credits, valid 12 months",
+	"Decision within 5 business days",
 	"Engineer-level deliverability help",
 	"No signup, no credit card",
 ];
@@ -14,16 +14,18 @@ export function StartupApplySection() {
 			id="apply"
 			className="scroll-mt-[72px] border-stroke-soft-100 border-y max-[1279px]:scroll-mt-14 dark:border-white/10"
 		>
-			<h1 className="sr-only">Reloop for Startups — $1,000 in email credits</h1>
-			<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 lg:grid-cols-[1fr_1fr] lg:divide-x lg:divide-y-0 dark:divide-white/10">
+			<h1 className="sr-only">
+				Reloop for Startups — Up to $1,000 in email credits
+			</h1>
+			<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 lg:grid-cols-[1fr_1fr] lg:divide-x lg:divide-y-0 dark:divide-white/10">
 				{/* Left: pitch column */}
 				<div className="flex w-full min-w-0 flex-col px-6 py-10 sm:px-10 sm:py-12 lg:p-12 xl:p-16">
 					<h2 className="text-balance font-semibold text-[30px] text-text-strong-950 leading-tight tracking-tight dark:text-white">
-						$1k transactional email credits for startups
+						Up to $1k transactional email credits for startups
 					</h2>
 					<p className="mt-4 text-balance text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
-						Get $1,000 in Reloop Cloud credits and engineer-level support for
-						your transactional email.
+						Get up to $1,000 in Reloop Cloud credits and engineer-level support
+						for your transactional email.
 					</p>
 					<ul className="mt-8 space-y-3">
 						{checklist.map((item) => (
@@ -64,7 +66,7 @@ export function StartupApplySection() {
 								Response time
 							</h3>
 							<p className="font-medium text-[14px] text-text-strong-950 dark:text-white">
-								Within 2 business days
+								Within 5 business days
 							</p>
 						</div>
 						<div>

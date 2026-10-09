@@ -9,9 +9,9 @@ export const instant = false;
 
 const siteUrl = getSiteUrl();
 const pageUrl = `${siteUrl}/startups`;
-const pageTitle = "Reloop for Startups — $1,000 in Email Credits";
+const pageTitle = "Reloop for Startups — Up to $1,000 in Email Credits";
 const pageDescription =
-	"Early-stage startups get $1,000 in Reloop Cloud credits for 12 months. Transactional + campaign email, no signup needed to apply, decision in 2 business days.";
+	"Early-stage startups get up to $1,000 in Reloop Cloud credits for 12 months. Transactional + campaign email, no signup needed to apply, decision in 5 business days.";
 
 export const metadata: Metadata = {
 	title: pageTitle,

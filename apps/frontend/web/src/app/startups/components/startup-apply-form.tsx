@@ -1,6 +1,6 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
@@ -97,12 +97,12 @@ export function StartupApplyForm() {
 					Application received
 				</h2>
 				<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
-					Thanks — we review startup applications within 2 business days. Keep
+					Thanks — we review startup applications within 5 business days. Keep
 					an eye on{" "}
 					<span className="font-medium text-text-strong-950 dark:text-white">
 						{sentEmail}
 					</span>{" "}
-					for your $1,000 credit approval.
+					for your credit approval of up to $1,000.
 				</p>
 				<p className="mt-6 font-mono text-[11px] text-text-soft-400 uppercase tracking-wider dark:text-white/35">
 					No signup needed · No card required
@@ -117,7 +117,7 @@ export function StartupApplyForm() {
 				Apply for credits
 			</h2>
 			<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/55">
-				Fill out the form and we&apos;ll be in touch within 2 business days.
+				Fill out the form and we&apos;ll be in touch within 5 business days.
 			</p>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
@@ -273,6 +273,7 @@ export function StartupApplyForm() {
 						<Textarea.CharCounter
 							current={useCaseValue.length}
 							max={MESSAGE_MAX_LENGTH}
+							className="text-[10px]"
 						/>
 					</Textarea.Root>
 					{useCaseError ? (
@@ -288,17 +289,16 @@ export function StartupApplyForm() {
 
 				<div className="grid items-center gap-4 pt-2 sm:grid-cols-[1fr_auto]">
 					<p className="text-[14px] text-text-sub-600 dark:text-white/55">
-						By submitting this form, you agree to our{" "}
-						<a href="/privacy" className="font-medium underline">
-							Privacy Policy
+						By submitting, you agree to our{" "}
+						<a href="/terms-and-conditions" className="font-medium underline">
+							T&C
 						</a>
 					</p>
-					<Button.Root
-						variant="primary"
-						mode="filled"
+					<FancyButton.Root
+						variant="neutral"
 						size="medium"
 						type="submit"
-						className="max-sm:row-start-1 dark:text-black"
+						className="max-sm:row-start-1 dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 					>
 						{status === "sending" ? (
 							<>
@@ -308,7 +308,7 @@ export function StartupApplyForm() {
 						) : (
 							<span>Apply for credits</span>
 						)}
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 			</form>
 		</div>
