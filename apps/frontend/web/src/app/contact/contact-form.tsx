@@ -1,12 +1,13 @@
 "use client";
 
+import { authClient } from "@reloop/auth/client";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import * as Textarea from "@reloop/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 type Status = "idle" | "sending" | "done" | "error";
@@ -35,6 +36,13 @@ export function ContactForm() {
 	const [status, setStatus] = useState<Status>("idle");
 	const [error, setError] = useState<string | null>(null);
 	const [sentEmail, setSentEmail] = useState("");
+	const [mounted, setMounted] = useState(false);
+	const { useSession } = authClient;
+	const { data: session, isPending } = useSession();
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	const {
 		register,
@@ -122,6 +130,26 @@ export function ContactForm() {
 			<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/55">
 				Fill out the form and we&apos;ll get back to you within 2 business days.
 			</p>
+			{mounted && !isPending && session ? (
+				<div className="mt-6 flex items-center justify-between gap-4 rounded-xl border border-stroke-soft-200 px-4 py-3 dark:border-white/10">
+					<div className="min-w-0">
+						<p className="truncate font-medium text-[14px] text-text-strong-950 dark:text-white">
+							You are logged in as: {session.user.email ?? ""}
+						</p>
+						<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
+							Chat with the founders to get help live reply in ~2 mins.
+						</p>
+					</div>
+					<FancyButton.Root
+						asChild
+						variant="basic"
+						size="small"
+						className="shrink-0"
+					>
+						<a href="/dashboard/help">Chat now</a>
+					</FancyButton.Root>
+				</div>
+			) : null}
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				noValidate
@@ -181,7 +209,7 @@ export function ContactForm() {
 				</div>
 				<div className="space-y-1">
 					<Label.Root htmlFor="ct-email" className={labelClassName}>
-						Professional Email
+						Email
 						<Label.Asterisk className="text-error-base" />
 					</Label.Root>
 					<div className="relative">
@@ -270,18 +298,12 @@ export function ContactForm() {
 					</p>
 				) : null}
 
-				<div className="grid items-center gap-4 pt-2 sm:grid-cols-[1fr_auto]">
-					<p className="text-[14px] text-text-sub-600 dark:text-white/55">
-						By submitting, you agree to our{" "}
-						<a href="/terms-and-conditions" className="font-medium underline">
-							T&C
-						</a>
-					</p>
+				<div className="pt-2">
 					<FancyButton.Root
 						variant="neutral"
 						size="medium"
 						type="submit"
-						className="max-sm:row-start-1 dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
+						className="w-full dark:bg-white dark:text-black dark:hover:bg-white/90 dark:[--primary-base:#ffffff]"
 					>
 						{status === "sending" ? (
 							<>
