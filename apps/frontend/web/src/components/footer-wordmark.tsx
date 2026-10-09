@@ -73,7 +73,7 @@ function scanGlyphInk(
 			let maxY = -1;
 			for (let y = 0; y < SCAN_SIZE; y++) {
 				for (let x = 0; x < SCAN_SIZE; x++) {
-					if (data[(y * SCAN_SIZE + x) * 4 + 3] >= SCAN_ALPHA) {
+					if ((data[(y * SCAN_SIZE + x) * 4 + 3] ?? 0) >= SCAN_ALPHA) {
 						if (x < minX) minX = x;
 						if (x > maxX) maxX = x;
 						if (y < minY) minY = y;
@@ -173,11 +173,28 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 
 	useEffect(() => {
 		let raf = 0;
+		let cancelled = false;
 		let ro: ResizeObserver | null = null;
+		const kick = () => {
+			if (!cancelled) measure();
+		};
 		measure();
 		raf = requestAnimationFrame(measure);
-		if (document.fonts?.ready) {
-			document.fonts.ready.then(() => measure()).catch(() => {});
+		// The scan must run against the real Geist outlines — a fallback
+		// font has matching advances by design but different ink, and the
+		// svg element never resizes on a font swap (fixed aspect ratio),
+		// so re-measure on every font arrival signal, not just ready.
+		const fonts = document.fonts;
+		if (fonts) {
+			fonts.ready.then(kick).catch(() => {});
+			// Explicitly wait for the exact face + glyphs we rasterize.
+			if (typeof fonts.load === "function") {
+				fonts
+					.load("800 180px Geist", FULL_TEXT)
+					.then(kick)
+					.catch(() => {});
+			}
+			fonts.addEventListener("loadingdone", kick);
 		}
 		if (typeof ResizeObserver !== "undefined") {
 			ro = new ResizeObserver(() => measure());
@@ -187,8 +204,10 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 		}
 		window.addEventListener("resize", measure);
 		return () => {
+			cancelled = true;
 			cancelAnimationFrame(raf);
 			ro?.disconnect();
+			fonts?.removeEventListener("loadingdone", kick);
 			window.removeEventListener("resize", measure);
 		};
 	}, [measure]);

@@ -811,7 +811,7 @@ export function SupportChatPanel({
 															: "border border-stroke-soft-100 bg-bg-weak-50 text-text-strong-950 dark:border-white/8 dark:bg-white/[0.06] dark:text-white/90",
 														isGroupEnd &&
 															(mine ? "rounded-br-md" : "rounded-bl-md"),
-														hasImages ? "overflow-hidden" : "px-3.5 py-2.5",
+														hasImages ? "overflow-hidden" : "px-4.5 py-3.5",
 													)}
 												>
 													{hasImages ? (
@@ -826,7 +826,7 @@ export function SupportChatPanel({
 																/>
 															))}
 															{caption ? (
-																<div className="px-3.5 py-2.5">
+																<div className="px-4.5 py-3.5">
 																	<SupportChatMarkdown
 																		content={caption}
 																		mine={mine}
