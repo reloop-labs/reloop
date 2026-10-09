@@ -46,7 +46,7 @@ Both run on the server. Both use the same Reloop SDK call. Pick Server Actions f
 ## Prerequisites
 
 1. A Next.js app on the **App Router** (this guide uses `app/`, not `pages/`)
-2. A Reloop account and API key from the [dashboard](https://app.reloop.sh) (keys look like `rl_…`)
+2. A Reloop account and API key from the [dashboard](https://reloop.sh/dashboard) (keys look like `rl_…`)
 3. A verified sending domain (see [connect a domain](/docs/guides/connect-domain) and [SPF / DKIM / DMARC](/blog/spf-dkim-dmarc-setup-guide))
 
 Optional but useful: the [Node.js SDK docs](/docs/examples/nodejs/nextjs) and full [send mail API](/docs/api/mail/post-api-mail-v1send).
@@ -447,7 +447,7 @@ For most App Router apps on Vercel, stick with the SDK on Node.
 1. Push the app and import it in [Vercel](https://vercel.com)
 2. Add env vars: `RELOOP_API_KEY` (and `INTERNAL_SEND_SECRET` if you use it)
 3. Redeploy so server functions pick up the vars
-4. Send a test from production; confirm delivery in the [Reloop logs](https://app.reloop.sh)
+4. Send a test from production; confirm delivery in the [Reloop logs](https://reloop.sh/dashboard/logs)
 
 Details: [Vercel + Reloop](/docs/integrations/vercel).
 

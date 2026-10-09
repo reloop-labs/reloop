@@ -88,7 +88,7 @@ export function HeroTemplatesPreview() {
 								{"{{ cta.url }}"}
 							</span>
 							<p className="text-[10px] text-text-soft-400">
-								https://app.reloop.sh
+								https://reloop.sh/dashboard
 							</p>
 						</div>
 					</div>

@@ -6,7 +6,7 @@
 > Docs index: https://reloop.sh/llms-docs.txt
 > Product skill: https://reloop.sh/skill.md
 
-Generated from 21 pages.
+Generated from 43 pages.
 
 ---
 
@@ -870,6 +870,383 @@ Solo developers, startups, and teams that want transactional + marketing email w
 
 ---
 
+# Self-Host Your Email Infrastructure for $5/Month
+
+Path: /blog/self-host-email-5-dollars
+URL: https://reloop.sh/blog/self-host-email-5-dollars
+Markdown: https://reloop.sh/blog/self-host-email-5-dollars.md
+
+A complete guide to running your own transactional email stack with Reloop on a cheap VPS (SMTP, REST API, analytics dashboard, and bounce handling) for less than a cup of coffee a month.
+
+## The math on managed email providers
+
+At 10,000 emails/month: SendGrid charges $19.95. Resend charges $20. Mailgun charges $35. Postmark charges $15.
+
+Scale to 50,000/month and you're looking at $89 (SendGrid), $90 (Resend), or $75 (Mailgun). Per month. Every month. With per-email overages if you spike.
+
+A Hetzner CAX11 ARM VPS costs **€3.29/month** (~$3.50). With a custom domain and proper DNS, running Reloop on that server gives you everything those managed providers offer (the REST API, the analytics dashboard, SMTP relay, bounce handling, webhook events, template management) for a fixed cost that doesn't scale with volume.
+
+This guide walks you through the full setup, from provisioning the server to sending your first production email.
+
+---
+
+## What you get with a self-hosted Reloop stack
+
+| Feature | Managed providers | Self-hosted Reloop |
+|---------|-------------------|-------------------|
+| REST API | ✅ | ✅ |
+| SMTP relay | ✅ | ✅ |
+| Analytics (opens, clicks, bounces) | ✅ | ✅ |
+| Webhook events | ✅ | ✅ |
+| Template management | ✅ | ✅ |
+| Multi-tenancy | Paid plan | ✅ |
+| Data ownership | ❌ | ✅ |
+| Source code access | ❌ | ✅ |
+| Monthly cost at 50k emails | $75–$90 | ~$4 |
+
+---
+
+## Prerequisites
+
+Before starting, you need:
+
+- A **VPS provider account** (we'll use Hetzner, but DigitalOcean, Linode, OVH, or Vultr all work)
+- A **domain name** with DNS access (Cloudflare DNS is free and recommended)
+- Basic comfort with **SSH and the Linux command line**
+- About **45 minutes**
+
+---
+
+## Step 1: Choose and provision your server
+
+### Minimum specs
+
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| CPU | 1 vCPU | 2 vCPU |
+| RAM | 1 GB | 4 GB |
+| Disk | 20 GB | 40 GB |
+| OS | Ubuntu 22.04 | Ubuntu 22.04 LTS |
+
+For Hetzner specifically: the **CAX11** (ARM, 2 vCPU, 4 GB RAM, 40 GB SSD) at €3.29/month is the sweet spot. ARM instances have excellent price/performance for this workload.
+
+### Provision on Hetzner
+
+1. Go to [hetzner.com/cloud](https://hetzner.com/cloud) and create an account
+2. Create a new project
+3. Click **Add Server**
+4. Select location closest to your users (Nuremberg/Helsinki for EU, Ashburn for US East)
+5. Image: **Ubuntu 22.04**
+6. Type: **CAX11** (ARM)
+7. Add your SSH public key (or create one: `ssh-keygen -t ed25519 -C "your-email"`)
+8. Click **Create & Buy Now**
+
+Note your server's public IP address. You'll need it shortly.
+
+### Important: check port 25
+
+Many VPS providers block outbound SMTP (port 25) by default to prevent spam abuse. Hetzner blocks it initially. Before setting up email, **request port 25 to be opened** through Hetzner's support panel. They typically approve within a few hours for legitimate use cases.
+
+While you wait, continue with DNS setup.
+
+---
+
+## Step 2: Configure DNS
+
+Good DNS setup is what separates a self-hosted email stack that lands in the inbox from one that goes straight to spam. Do this before installing anything.
+
+### A record: point your domain to the server
+
+```
+Type: A
+Name: mail (or reloop, or whatever subdomain you prefer)
+Value: YOUR_SERVER_IP
+TTL: 300
+```
+
+This creates `mail.yourdomain.com` pointing to your server.
+
+### PTR record (reverse DNS)
+
+This is critical and often overlooked. A PTR record is the reverse of an A record: it maps an IP address back to a hostname. ISPs check PTR records to verify that the IP sending email is who it claims to be.
+
+In Hetzner's console, go to your server → **Networking** → **Set rDNS** and set it to `mail.yourdomain.com` (matching your A record).
+
+Most spam issues from fresh self-hosted setups come from missing PTR records. Don't skip this.
+
+### MX record: for receiving email (optional but recommended)
+
+If you want to receive email (not just send), add an MX record:
+
+```
+Type: MX
+Name: @ (root domain)
+Value: mail.yourdomain.com
+Priority: 10
+TTL: 3600
+```
+
+### SPF, DKIM, DMARC
+
+You'll add these after Reloop is running. The dashboard gives you the exact records to add. For now, add a placeholder SPF:
+
+```
+Type: TXT
+Name: @ (root domain)
+Value: v=spf1 ~all
+TTL: 300
+```
+
+You'll update this once Reloop is running.
+
+---
+
+## Step 3: Install Docker and Docker Compose
+
+SSH into your server:
+
+```bash
+ssh root@YOUR_SERVER_IP
+```
+
+Install Docker:
+
+```bash
+# Update package index
+apt update && apt upgrade -y
+
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Install Docker Compose plugin
+apt install docker-compose-plugin -y
+
+# Verify
+docker --version
+docker compose version
+```
+
+---
+
+## Step 4: Deploy Reloop
+
+### Clone the repository
+
+```bash
+git clone https://github.com/reloop-labs/reloop /opt/reloop
+cd /opt/reloop
+```
+
+### Configure environment variables
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+The critical variables to set:
+
+```bash
+# Your sending domain
+MAIL_DOMAIN=mail.yourdomain.com
+
+# A secure random string for API auth
+RELOOP_API_SECRET=your-very-secure-random-string-here
+
+# Database (Reloop includes Postgres in the compose file)
+DATABASE_URL=postgresql://reloop:reloop@postgres:5432/reloop
+
+# Your server's public IP or domain
+PUBLIC_URL=https://mail.yourdomain.com
+
+# SMTP settings (Reloop IS the SMTP server, but it needs your hostname)
+SMTP_HOSTNAME=mail.yourdomain.com
+```
+
+Generate a secure API secret:
+```bash
+openssl rand -base64 32
+```
+
+### Start the stack
+
+```bash
+docker compose up -d
+```
+
+This pulls all images and starts:
+- Reloop API server (port 3000)
+- Reloop dashboard (port 3001)
+- Reloop SMTP server (port 25, 587)
+- PostgreSQL database
+- Redis (for the job queue)
+
+Check all services are healthy:
+
+```bash
+docker compose ps
+docker compose logs --tail=50
+```
+
+---
+
+## Step 5: Set up SSL with Caddy
+
+You need HTTPS for the dashboard and API. Caddy is the easiest way to add automatic SSL:
+
+```bash
+apt install caddy -y
+```
+
+Create the Caddyfile:
+
+```bash
+nano /etc/caddy/Caddyfile
+```
+
+```
+mail.yourdomain.com {
+  reverse_proxy localhost:3000
+}
+
+dashboard.yourdomain.com {
+  reverse_proxy localhost:3001
+}
+```
+
+Start Caddy:
+
+```bash
+systemctl enable caddy
+systemctl start caddy
+```
+
+Caddy automatically obtains Let's Encrypt certificates and handles renewal. Your API is now available at `https://mail.yourdomain.com/v1` and your dashboard at `https://dashboard.yourdomain.com`.
+
+---
+
+## Step 6: Configure authentication records
+
+Open your dashboard at `https://dashboard.yourdomain.com`. On first login:
+
+1. Add your sending domain (`mail.yourdomain.com`)
+2. The dashboard shows you the exact DNS records to add:
+   - **SPF**: the `include:` directive for your server
+   - **DKIM**: two CNAME records with your public key
+   - **DMARC**: a starter `p=none` record
+
+Add them all to your DNS. Then click **Verify** in the dashboard. It will confirm each record is in place.
+
+---
+
+## Step 7: Send your first email
+
+Create an API key in the dashboard under **Settings → API Keys**.
+
+Test with curl:
+
+```bash
+curl -X POST https://mail.yourdomain.com/v1/emails \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "hello@yourdomain.com",
+    "to": "your-personal-email@gmail.com",
+    "subject": "Hello from my self-hosted Reloop!",
+    "html": "<p>It works. 🎉</p>",
+    "text": "It works."
+  }'
+```
+
+Check your inbox. If it's not there, check:
+1. `docker compose logs reloop-api`: any errors?
+2. `docker compose logs reloop-smtp`: SMTP handshake issues?
+3. DNS is propagated: `dig TXT yourdomain.com` shows your SPF record?
+
+---
+
+## Step 8: Integrate with your application
+
+The Reloop API is compatible with the Resend API shape. If you're migrating from Resend, it's usually a one-line change:
+
+```typescript
+// Before (Resend)
+const client = new Resend(process.env.RESEND_API_KEY);
+
+// After (Reloop, self-hosted)
+const client = new Reloop(process.env.RELOOP_API_KEY, {
+  baseUrl: "https://mail.yourdomain.com/v1",
+});
+
+// The send call is identical
+await client.emails.send({
+  from: "hello@yourdomain.com",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+---
+
+## Ongoing maintenance
+
+### What needs attention
+
+| Task | Frequency | Time |
+|------|-----------|------|
+| OS security updates | Monthly | 5 min |
+| Reloop updates | As released | 10 min |
+| Disk space check | Monthly | 2 min |
+| Review DMARC reports | Weekly | 5 min |
+| Monitor bounce/complaint rate | Weekly | 5 min |
+
+### Updating Reloop
+
+```bash
+cd /opt/reloop
+git pull
+docker compose pull
+docker compose up -d
+```
+
+Rolling restart with zero downtime for the API. SMTP connections in flight will complete before the old container stops.
+
+### Monitoring disk usage
+
+Email logs can grow fast. Set up a log rotation policy:
+
+```bash
+# Check current disk usage
+df -h
+docker system df
+
+# Clean up old logs
+docker system prune --volumes
+```
+
+Consider adding a monitoring alert when disk usage exceeds 80%.
+
+---
+
+## Is self-hosting right for you?
+
+**Self-hosting is the right choice if:**
+- You send predictable, moderate volume (< 500k/month)
+- You care about data sovereignty or have GDPR/compliance requirements
+- You want to eliminate per-email pricing as you scale
+- You have basic DevOps comfort (or someone on your team does)
+
+**A managed provider is better if:**
+- You need zero operational overhead
+- You're sending at very high volume (millions/month) where infrastructure complexity is real
+- You need guaranteed SLAs with financial backing
+- Your team has no one comfortable maintaining a Linux server
+
+For most early-stage and growing startups, self-hosting Reloop on a $4–6/month VPS is the highest-leverage infrastructure decision you can make. The cost savings compound and the control you gain is permanent.
+
+---
+
 # Introducing Reloop: Open-Source Email Infrastructure Developers Actually Want to Use
 
 Path: /blog/introducing-reloop
@@ -1120,6 +1497,390 @@ If you are already sending through Reloop or evaluating open-source transactiona
 
 ---
 
+# Building a Webhook Delivery System That Actually Retries
+
+Path: /blog/building-webhook-delivery-system
+URL: https://reloop.sh/blog/building-webhook-delivery-system
+Markdown: https://reloop.sh/blog/building-webhook-delivery-system.md
+
+How Reloop built a reliable, observable webhook delivery system with exponential backoff, signature verification, and replay support.
+
+## The problem with naive webhook delivery
+
+Most webhook implementations fire an HTTP request and forget. If your customer's server is down, or returns a 500, the event is lost forever. We've been on the receiving end of that, and it's a terrible developer experience. Here's how we avoided it.
+
+## Delivery guarantees we target
+
+We aim for **at-least-once delivery** with a maximum of 5 attempts over 24 hours. We intentionally avoid exactly-once delivery because it requires distributed transactions that add too much complexity for the value gained at our scale.
+
+## The retry schedule
+
+Retries follow exponential backoff with jitter to avoid thundering herds:
+
+- Attempt 1: immediate
+- Attempt 2: 30 seconds
+- Attempt 3: 5 minutes
+- Attempt 4: 30 minutes
+- Attempt 5: 6 hours
+
+```typescript
+function nextRetryDelay(attempt: number): number {
+  const base = Math.pow(2, attempt) * 1000; // exponential
+  const jitter = Math.random() * 1000;       // ±1s jitter
+  return Math.min(base + jitter, 6 * 60 * 60 * 1000);
+}
+```
+
+## Signature verification
+
+Every webhook payload is signed with HMAC-SHA256 using a per-endpoint secret. This lets customers verify that requests genuinely come from Reloop.
+
+## The replay UI
+
+Failed deliveries are surfaced in the dashboard with full request/response details. One click re-queues the event. This turns webhook debugging from a black box into a transparent, self-service experience.
+
+## Lessons learned
+
+- **Log everything**: store the raw outbound payload and the response body, not just the status code.
+- **Separate delivery from processing**: webhook workers should not share a process with API workers.
+- **Circuit break slow endpoints**: if an endpoint consistently times out, back off aggressively before burning through retries.
+
+---
+
+# Reloop on Coolify: Self-Hosted Email Without the Complexity
+
+Path: /blog/reloop-coolify-setup
+URL: https://reloop.sh/blog/reloop-coolify-setup
+Markdown: https://reloop.sh/blog/reloop-coolify-setup.md
+
+Deploy Reloop using Coolify's UI-driven deployment, no Docker expertise required. Full email infrastructure in under 20 minutes.
+
+## What is Coolify?
+
+Coolify is an open-source, self-hostable platform-as-a-service (think Heroku/Render but self-hosted). It gives you a clean UI to deploy Docker Compose stacks, manage databases, and handle SSL without writing any infra code.
+
+## Why Coolify + Reloop is a great combo
+
+Both tools are open-source. Both are designed for developers who want control without complexity. Coolify handles the deployment ops; Reloop handles the email ops.
+
+## Prerequisites
+
+- A VPS with Coolify installed (see [coolify.io/docs](https://coolify.io/docs))
+- A domain with DNS access
+- 2 GB RAM minimum (4 GB recommended)
+
+## Step 1: Add Reloop as a new resource in Coolify
+
+In the Coolify dashboard, click **New Resource → Docker Compose**. Paste the Reloop `docker-compose.yml` URL or upload it directly.
+
+## Step 2: Configure environment variables
+
+Coolify provides an environment variable editor. Set:
+- `DATABASE_URL`: Coolify can provision a Postgres instance for you
+- `SMTP_DOMAIN`: your sending domain
+- `RELOOP_API_SECRET`: a secure random string
+
+## Step 3: Set up SSL
+
+Coolify integrates with Let's Encrypt. Enable SSL for your Reloop domain in one click, no Certbot scripting required.
+
+## Step 4: Deploy
+
+Click **Deploy**. Coolify pulls the image, runs migrations, and starts all services. Watch the real-time deployment log.
+
+## Step 5: Configure DNS
+
+Add your SPF, DKIM, and DMARC records. The Reloop dashboard shows you exactly what to add after your first login.
+
+## Ongoing maintenance
+
+Coolify shows you when new Reloop versions are available and handles rolling restarts. Most updates take under 60 seconds with zero downtime.
+
+---
+
+# BIMI: Show Your Logo in the Gmail Inbox
+
+Path: /blog/bimi-email-setup-guide
+URL: https://reloop.sh/blog/bimi-email-setup-guide
+Markdown: https://reloop.sh/blog/bimi-email-setup-guide.md
+
+BIMI (Brand Indicators for Message Identification) lets verified senders display their logo next to emails in Gmail and Apple Mail. Here's how to set it up.
+
+## What is BIMI?
+
+BIMI (Brand Indicators for Message Identification) is an email standard that displays your brand logo next to your email in the recipient's inbox. It's supported by Gmail, Apple Mail, Yahoo, and Fastmail. Beyond branding, it signals to recipients (and ISPs) that you're a verified, trustworthy sender.
+
+## Prerequisites
+
+BIMI has strict requirements. You need all of these before starting:
+
+- ✅ SPF record configured
+- ✅ DKIM configured
+- ✅ DMARC policy set to `p=quarantine` or `p=reject` (not `p=none`)
+- ✅ A Verified Mark Certificate (VMC): required for Gmail (optional for others)
+- ✅ An SVG logo in the specific BIMI format
+
+## Step 1: Prepare your SVG logo
+
+BIMI requires a specific SVG profile (Tiny PS). Your regular SVG will likely not work. Requirements:
+- Square aspect ratio
+- SVG 1.2 Tiny PS format
+- No external resources
+- Validated at [bimigroup.org/svg-validator](https://bimigroup.org/svg-validator/)
+
+## Step 2: Host your logo
+
+Upload your BIMI-compliant SVG to a publicly accessible HTTPS URL. It must be served over HTTPS. HTTP won't work.
+
+```
+https://yourdomain.com/.well-known/bimi-logo.svg
+```
+
+## Step 3: Add the BIMI DNS record
+
+```
+v=BIMI1; l=https://yourdomain.com/.well-known/bimi-logo.svg; a=https://yourdomain.com/.well-known/vmc.pem
+```
+
+The `a=` parameter points to your VMC. For non-Gmail clients, you can omit `a=` and the logo will still appear.
+
+## Step 4: Obtain a VMC (for Gmail)
+
+A Verified Mark Certificate is issued by authorized CAs (DigiCert, Entrust). It verifies that you own the trademarked logo. Cost is ~$1,200–$1,500/year. For most early-stage startups, the non-Gmail BIMI (without VMC) is a reasonable starting point.
+
+## Verifying your setup
+
+Check your BIMI record with [BIMI Inspector](https://bimigroup.org/bimi-generator/) and then send a test email to a Gmail address to confirm the logo appears.
+
+## Is BIMI worth it?
+
+Yes, but only after SPF, DKIM, and DMARC are solid. The brand visibility boost is real, and the DMARC requirement means you're forced into a good security posture to qualify.
+
+---
+
+# Email Provider Comparison: Resend vs SendGrid vs Reloop
+
+Path: /blog/email-provider-comparison-2026
+URL: https://reloop.sh/blog/email-provider-comparison-2026
+Markdown: https://reloop.sh/blog/email-provider-comparison-2026.md
+
+A 2026 comparison of developer email providers on open source, self-hosting, campaigns, and pricing.
+
+## What developers actually need
+
+Transactional API, webhooks, SDKs, and deliverability are the baseline. The differentiators are self-hosting, campaigns, open source, and total cost at scale.
+
+## Resend
+
+Excellent DX for hosted transactional email. Proprietary, no self-hosting, limited marketing features.
+
+## SendGrid
+
+Mature but complex. Legacy pricing and Twilio ownership. Still widely used for high volume.
+
+## Reloop
+
+Open source, self-hostable, campaigns + transactional + agent inbox. Hosted free tier or deploy yourself.
+
+<Callout type="tip">
+  Compare total cost at your projected volume, including self-hosting ops time if data residency matters.
+</Callout>
+
+---
+
+# How to Use Email to Reduce Churn: Sequences That Work
+
+Path: /blog/email-reduce-churn-sequences
+URL: https://reloop.sh/blog/email-reduce-churn-sequences
+Markdown: https://reloop.sh/blog/email-reduce-churn-sequences.md
+
+A practical breakdown of the email sequences that reduce SaaS churn, from early warning signals to win-back campaigns.
+
+## Churn is usually predictable, if you're watching
+
+Most churn doesn't happen suddenly. It follows a pattern: decreased logins → fewer API calls → silence → cancellation. Email sequences, triggered by these behavioral signals, can interrupt that pattern before the user is mentally gone.
+
+## The three churn windows
+
+### 1. Day 1–14: Activation churn
+Users who never activate are the most likely to churn. Identify your activation event (first email sent, first domain verified, first API call) and build a sequence around it.
+
+- **Day 2**: "One thing to try today": single CTA to the activation step
+- **Day 5**: "Here's how [similar company] got started": social proof
+- **Day 10**: "Need help?": personal outreach from a founder
+
+### 2. Day 30–90: Engagement churn
+Users who activated but stopped engaging. These are often users who got distracted or didn't see enough value.
+
+- Trigger: No login in 14 days
+- Email: Surface a specific piece of value they haven't discovered yet
+- Follow-up: Offer a 1:1 call or product walkthrough
+
+### 3. Day 90+: Win-back
+Users who've fully disengaged. Low-probability but still worth a single, honest outreach.
+
+- Don't oversell. Acknowledge the silence.
+- Offer something concrete: a feature they requested, a pricing adjustment, a migration path.
+- One email. If no response, let them go.
+
+## What to measure
+
+Track churn rate segmented by whether a user received the at-risk sequence vs. didn't. This lets you A/B test the sequences themselves over time.
+
+## Building this with Reloop
+
+Use Reloop's webhook events (login events, API call events from your backend) to trigger sequences. When you detect the inactivity signal, enqueue the appropriate email sequence via the Reloop API.
+
+---
+
+# Email with SvelteKit: A Developer's Guide
+
+Path: /blog/send-email-sveltekit
+URL: https://reloop.sh/blog/send-email-sveltekit
+Markdown: https://reloop.sh/blog/send-email-sveltekit.md
+
+Send transactional email from SvelteKit server endpoints and form actions using Reloop's Node.js SDK, with full TypeScript support.
+
+## SvelteKit's server-side model
+
+SvelteKit form actions and `+server.ts` endpoints run exclusively on the server, perfect for API key usage. You never have to worry about the Reloop key leaking to the client.
+
+## Installation
+
+```bash
+npm install reloop-email
+```
+
+Add to `.env`:
+
+```env
+RELOOP_API_KEY=re_your_api_key_here
+```
+
+## Sending from a form action
+
+The cleanest pattern for contact forms, signup flows, or any user-triggered email:
+
+```typescript
+// src/routes/contact/+page.server.ts
+
+const reloop = new Reloop(import.meta.env.RELOOP_API_KEY);
+
+  default: async ({ request }) => {
+    const data = await request.formData();
+    const email = data.get("email") as string;
+
+    await reloop.emails.send({
+      from: "hello@yourdomain.com",
+      to: email,
+      subject: "Thanks for reaching out",
+      html: "<p>We'll be in touch soon.</p>",
+    });
+
+    return { success: true };
+  },
+};
+```
+
+## Sending from a server endpoint
+
+For API-style sends (webhooks, cron jobs, programmatic triggers):
+
+```typescript
+// src/routes/api/send-welcome/+server.ts
+
+const reloop = new Reloop(import.meta.env.RELOOP_API_KEY);
+
+  const { email, name } = await request.json();
+
+  await reloop.emails.send({
+    from: "onboarding@yourdomain.com",
+    to: email,
+    subject: `Welcome, ${name}!`,
+    html: `<p>Your account is ready.</p>`,
+  });
+
+  return json({ sent: true });
+};
+```
+
+## Environment variable note
+
+SvelteKit uses `import.meta.env` for environment variables. Private variables (not exposed to the client) should be prefixed with nothing or `SECRET_`. Never use `PUBLIC_` for API keys.
+
+## Deploying
+
+SvelteKit works on Node.js, Vercel, Netlify, Cloudflare Workers, and more. The Reloop SDK is compatible with all Node.js-based adapters. For the Cloudflare adapter, see our [Cloudflare Workers guide](/blog/send-email-cloudflare-workers).
+
+---
+
+# Building in Public: Lessons From Growing Reloop
+
+Path: /blog/building-in-public-lessons
+URL: https://reloop.sh/blog/building-in-public-lessons
+Markdown: https://reloop.sh/blog/building-in-public-lessons.md
+
+What we've learned building Reloop in public, from the first commit to shipping real features, growing the community, and staying focused.
+
+## Why we build in public
+
+Building in public forces clarity. When you have to explain what you're working on and why, you can't hide behind vague roadmap items. It also builds an audience before you have a product, and creates accountability that solo or small-team projects often lack.
+
+## Lesson 1: Ship something embarrassingly early
+
+The first version of Reloop was a Docker Compose file and a basic SMTP relay. No dashboard, no API, no analytics. We shared it anyway. The feedback shaped every subsequent decision more than any internal planning session.
+
+## Lesson 2: Documentation is marketing
+
+Every time we wrote a "how to deploy on Coolify" or "how to configure DKIM" guide, we got inbound traffic from people who needed exactly that. Documentation compounds. It's the gift that keeps giving without ongoing effort.
+
+## Lesson 3: GitHub stars lag real interest by weeks
+
+When something gets shared on Hacker News or a relevant subreddit, stars spike 3–5 days later, not immediately. Don't judge the success of a post by the day-of numbers.
+
+## Lesson 4: The community knows what to build next
+
+Our most-requested features have consistently surprised us. Things we assumed were "nice to have" turned out to be table stakes for certain users. The issues tab and Discord are better product research than any framework.
+
+## Lesson 5: Consistency beats intensity
+
+Shipping once a month consistently, with updates and changelogs, compounds over time. A two-week sprint followed by silence loses momentum and community trust.
+
+## What's next
+
+We'll keep shipping in public. If you want to follow along, watch the [GitHub repo](https://github.com/reloop-labs/reloop), join the Discord, or subscribe to the blog. We're just getting started.
+
+---
+
+# Self-Hosted Email Infrastructure: When and How
+
+Path: /blog/self-hosted-email-infrastructure
+URL: https://reloop.sh/blog/self-hosted-email-infrastructure
+Markdown: https://reloop.sh/blog/self-hosted-email-infrastructure.md
+
+Why teams self-host email, what Reloop gives you out of the box, and how to deploy with Docker Compose.
+
+## When self-hosting makes sense
+
+Data residency requirements, cost at scale, security review of source code, or simply not wanting vendor lock-in: these are the common drivers.
+
+## What you get with Reloop
+
+Reloop is Apache 2.0: transactional API, campaigns, SMTP, webhooks, templates, and analytics; it's the same product hosted or self-deployed.
+
+## Docker Compose quickstart
+
+Clone the repo, configure environment variables, and `docker compose up`. See our self-hosting guide for production hardening.
+
+<Cta
+  title="Deploy Reloop yourself"
+  description="Follow the self-hosting guide for Docker Compose and production hardening."
+  href="/self-host"
+  label="Read the guide"
+/>
+
+---
+
 # How to Send Email in Next.js App Router (2026)
 
 Path: /blog/send-email-nextjs-app-router
@@ -1148,7 +1909,7 @@ Both run on the server. Both use the same Reloop SDK call. Pick Server Actions f
 ## Prerequisites
 
 1. A Next.js app on the **App Router** (this guide uses `app/`, not `pages/`)
-2. A Reloop account and API key from the [dashboard](https://app.reloop.sh) (keys look like `rl_…`)
+2. A Reloop account and API key from the [dashboard](https://reloop.sh/dashboard) (keys look like `rl_…`)
 3. A verified sending domain (see [connect a domain](/docs/guides/connect-domain) and [SPF / DKIM / DMARC](/blog/spf-dkim-dmarc-setup-guide))
 
 Optional but useful: the [Node.js SDK docs](/docs/examples/nodejs/nextjs) and full [send mail API](/docs/api/mail/post-api-mail-v1send).
@@ -1532,7 +2293,7 @@ For most App Router apps on Vercel, stick with the SDK on Node.
 1. Push the app and import it in [Vercel](https://vercel.com)
 2. Add env vars: `RELOOP_API_KEY` (and `INTERNAL_SEND_SECRET` if you use it)
 3. Redeploy so server functions pick up the vars
-4. Send a test from production; confirm delivery in the [Reloop logs](https://app.reloop.sh)
+4. Send a test from production; confirm delivery in the [Reloop logs](https://reloop.sh/dashboard/logs)
 
 Details: [Vercel + Reloop](/docs/integrations/vercel).
 
@@ -1602,6 +2363,64 @@ Details: [Vercel + Reloop](/docs/integrations/vercel).
 - [Send mail API](/docs/api/mail/post-api-mail-v1send): full payload
 - [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications): tool-calling notifications
 - Sibling guides: [SvelteKit](/blog/send-email-sveltekit) · [Remix](/blog/send-email-remix) · [Cloudflare Workers](/blog/send-email-cloudflare-workers)
+
+---
+
+# Build an AI Agent That Sends Emails on Your Behalf
+
+Path: /blog/build-ai-agent-sends-emails
+URL: https://reloop.sh/blog/build-ai-agent-sends-emails
+Markdown: https://reloop.sh/blog/build-ai-agent-sends-emails.md
+
+Learn how to build an autonomous AI agent that composes and sends emails using tool calling, with Reloop handling delivery.
+
+## What an email-capable agent looks like
+
+Modern LLMs support tool calling: you define a function, describe it in natural language, and the model decides when and how to call it. Wiring `send_email` as a tool turns any LLM into an agent that can compose, address, and dispatch email without a human in the loop.
+
+## Defining the send_email tool
+
+```typescript
+const tools = {
+  send_email: {
+    description: "Send an email to one or more recipients.",
+    parameters: z.object({
+      to: z.string().email(),
+      subject: z.string(),
+      body: z.string(),
+    }),
+    execute: async ({ to, subject, body }) => {
+      await reloop.emails.send({
+        from: "agent@yourdomain.com",
+        to,
+        subject,
+        html: `<p>${body}</p>`,
+      });
+      return { sent: true };
+    },
+  },
+};
+```
+
+## Building the agent loop
+
+The agent loop runs until the model stops requesting tool calls. Each iteration feeds previous tool results back as context so the model can reason about whether the task is complete.
+
+## Guardrails you need
+
+- **Allowlist recipients**: never let the agent send to arbitrary addresses without approval.
+- **Rate limiting**: cap the number of emails per agent session.
+- **Human-in-the-loop for bulk**: any send to more than one recipient should require confirmation.
+
+## Real-world use cases
+
+- Customer support agent that drafts and sends resolution emails
+- Scheduling assistant that confirms meetings via email
+- Onboarding bot that triggers personalized welcome sequences
+
+## What's next
+
+Combine this with Reloop's webhook events. When an email is opened or clicked, feed that signal back to the agent as context to trigger a follow-up action.
 
 ---
 
@@ -1847,6 +2666,49 @@ When emails are landing in spam, work through this diagnostic sequence in order:
 
 ---
 
+# Transactional Email as a Growth Channel (Not Just Notifications)
+
+Path: /blog/transactional-email-as-growth-channel
+URL: https://reloop.sh/blog/transactional-email-as-growth-channel
+Markdown: https://reloop.sh/blog/transactional-email-as-growth-channel.md
+
+Most teams treat transactional email as infrastructure. The best SaaS companies use it as a retention and expansion channel. Here's how.
+
+## The missed opportunity
+
+A transactional email has a 45–55% open rate. A marketing email has 20% on a good day. Yet most teams invest 90% of their email effort on the marketing side. Flipping that equation is one of the highest-leverage moves in SaaS growth.
+
+## The key principle: add value, don't just report status
+
+A "Your payment was processed" email is a notification. A "Your payment was processed. Here's your monthly usage summary and 3 tips to get more out of your plan" email is a growth touchpoint.
+
+## High-leverage transactional emails to upgrade
+
+### Welcome email
+The most-opened email you'll ever send. Don't waste it on "Thanks for signing up." Include:
+- The single most important action to take in the first session
+- A link to your best getting-started resource
+- A personal note from a founder or team member
+
+### Usage milestone emails
+When a user hits 100 sends, 1,000 sends, 10,000 sends, celebrate it. These emails remind users of the value they're getting and create natural upsell moments.
+
+### Inactivity nudges
+If a user hasn't logged in for 7 days, send a lightweight prompt. Not "We miss you!" That's generic. Instead, surface something specific: "You have 3 unread webhook failures from last week."
+
+## Measuring transactional email as growth
+
+Track these metrics per email type:
+- **Click-to-dashboard rate**: do they click through?
+- **Feature adoption rate after email**: do they use the feature mentioned?
+- **Upgrade conversion**: do upsell CTAs in transactional emails convert?
+
+## Where Reloop fits in
+
+All of this requires reliable delivery and detailed analytics. Reloop's per-email metrics let you measure open rates and click rates on transactional emails with the same granularity you'd expect from a marketing platform.
+
+---
+
 # SPF, DKIM, and DMARC: The Complete Setup Guide (2026)
 
 Path: /blog/spf-dkim-dmarc-setup-guide
@@ -2070,6 +2932,41 @@ Email authentication establishes your domain identity, but **it does not replace
 
 ### 3. Separating transactional and marketing streams
 **Never mix transactional receipts with marketing newsletters on the same sending domain or IP.** Protect your mission-critical password resets and auth tokens by isolating them on a dedicated transactional subdomain (see [transactional email best practices](/blog/transactional-email-best-practices)).
+
+---
+
+# Migrating from SendGrid to Reloop
+
+Path: /blog/migrating-from-sendgrid
+URL: https://reloop.sh/blog/migrating-from-sendgrid
+Markdown: https://reloop.sh/blog/migrating-from-sendgrid.md
+
+Step-by-step migration: map APIs, switch SMTP, update webhooks, and validate deliverability during the cutover.
+
+## Plan the cutover
+
+Run Reloop in parallel before switching DNS or API keys. Send test traffic to seed inboxes and compare delivery rates.
+
+Map SendGrid endpoints to Reloop's REST API or use SMTP relay for drop-in compatibility with existing code.
+
+<Callout type="info">
+  Keep SendGrid active during a parallel run period so you can roll back quickly if deliverability dips.
+</Callout>
+
+## Update DNS
+
+Replace SendGrid SPF includes with Reloop's. Add new DKIM selectors before removing old ones to avoid a gap in signing.
+
+## Rewire webhooks
+
+Reloop webhook payloads differ from SendGrid's. Update your handlers for delivered, bounce, and spam complaint events.
+
+<Cta
+  title="Ready to migrate?"
+  description="Open-source email infrastructure with a free hosted tier."
+  href="/dashboard/signup"
+  label="Get started"
+/>
 
 ---
 
@@ -2539,6 +3436,431 @@ Once metrics stabilize for 5 to 7 consecutive days, resume the volume schedule.
 
 ---
 
+# How We Built a Multi-Tenant Email Delivery Queue with BullMQ
+
+Path: /blog/how-we-built-email-delivery-queue-bullmq
+URL: https://reloop.sh/blog/how-we-built-email-delivery-queue-bullmq
+Markdown: https://reloop.sh/blog/how-we-built-email-delivery-queue-bullmq.md
+
+A deep dive into the job queue architecture powering Reloop's multi-tenant email delivery: rate limiting, priority lanes, and failure recovery.
+
+## Why a queue, not direct SMTP calls
+
+Sending email synchronously inside a request handler is the fastest way to have unreliable delivery. A dedicated queue decouples the trigger from the send, giving you retries, back-pressure control, and observability for free. Here's how we designed ours.
+
+## Choosing BullMQ over alternatives
+
+We evaluated several options (SQS, RabbitMQ, and Inngest) before settling on BullMQ backed by Redis. The key deciding factors were local dev simplicity (one Redis container), mature TypeScript types, and built-in rate limiting primitives that map directly to SMTP provider limits.
+
+## Queue topology
+
+We operate three priority lanes per tenant:
+
+- **Critical**: password resets, 2FA codes. Zero delay, max concurrency.
+- **Standard**: transactional receipts, notifications. Slight delay allowed.
+- **Bulk**: marketing campaigns. Throttled to provider limits.
+
+## Per-tenant rate limiting
+
+Each tenant gets a sliding-window rate limiter keyed by `tenantId:providerId`. We use BullMQ's `RateLimiter` to cap sends per second and per day, respecting each provider's API limits without cross-tenant interference.
+
+```typescript
+const queue = new Queue("email-delivery", {
+  connection: redis,
+  defaultJobOptions: {
+    attempts: 4,
+    backoff: { type: "exponential", delay: 2000 },
+  },
+});
+```
+
+## Failure recovery and dead-letter handling
+
+Jobs that exhaust their retry budget move to a dead-letter queue. A nightly process reviews these, attempts to categorize failures (bounce vs. rate limit vs. provider outage), and re-queues or surfaces them in the dashboard.
+
+## Observability
+
+Every job emits lifecycle events (`active`, `completed`, `failed`) to our metrics pipeline. This drives the real-time delivery dashboard inside Reloop and powers the webhook events we send to customers.
+
+## What we'd do differently
+
+Running BullMQ workers in the same Node process as the API works fine at small scale. As volume grows, we plan to extract workers into dedicated containers with independent autoscaling.
+
+---
+
+# I Let an AI Agent Read and Reply to My Emails. Here's How the Infrastructure Works.
+
+Path: /blog/email-infrastructure-for-ai-agents
+URL: https://reloop.sh/blog/email-infrastructure-for-ai-agents
+Markdown: https://reloop.sh/blog/email-infrastructure-for-ai-agents.md
+
+Building an AI agent that reads and replies to email is easy in LangChain. Owning the send-and-receive layer is the hard part, and why open-source email infrastructure matters.
+
+Right now, everyone's building AI agents that do everything: book flights, negotiate contracts, run support, chase down leads. They all hit the exact same wall.
+
+An AI can write the perfect reply in two seconds. But if it can't receive what the customer writes back, it's not having a conversation. It's just sending one message into the void.
+
+Building the reply logic in something like LangChain is maybe an hour of work. Getting it to actually send and receive real email is where things get complicated, often taking far longer than the AI part itself.
+
+## The default move: a third-party API key
+
+The obvious first move: grab a Resend or SendGrid key, wire it to the agent, ship it.
+
+It doesn't take much to go wrong this way. An agent that occasionally sends a slightly repetitive or oddly-formatted reply is normal LLM behavior, not a bug. Managed providers run abuse and compliance systems for a reason. Unexpected send patterns can get an account restricted, sometimes quickly.
+
+That's the trap: when you send through someone else's platform, you don't own your sending reputation. They do. An autonomous agent is, by definition, going to occasionally do something a little weird. Building on infrastructure where a third-party compliance decision can take your whole send path offline is a real product risk.
+
+Self-hosting doesn't mean Gmail and Outlook stop filtering mail. What changes is who controls your domain, your keys, and your operational rules, and whether a vendor's compliance queue can shut you down overnight.
+
+## Sending is only half the job
+
+For an agent to be useful, it also has to **read replies**.
+
+If your agent offers a calendar slot and the customer writes back *"Actually, can we do Saturday at 2 PM?"*, that reply has to land somewhere your code can process, as structured fields, not a raw MIME blob sitting in someone's personal Gmail.
+
+Many teams still treat email as send-only. Some providers do offer inbound parsing. The harder part is usually the whole loop in one place:
+
+- receive at your domain
+- parse MIME into text, HTML, headers, and attachments
+- keep thread context
+- send authenticated replies from the same identity
+- keep data and ops under your control when you need to
+
+That loop is the product surface agents actually need. The model is the brain. Email is the mouth and the ears.
+
+## Reloop is the plumbing, not the AI
+
+To be clear: **Reloop is not an AI calendar bot.** Reloop is open-source email infrastructure.
+
+Your agent (LangChain, Autogen, a custom Python service, whatever you build) is the brain. Reloop is the send-and-receive layer: APIs, SMTP, inbound mailboxes, parsing, DKIM, and the option to self-host.
+
+Think of it this way: you bring the LLM. Reloop gives that LLM a real mailbox.
+
+Here's how that wiring looks in practice:
+
+### 1. Inbound (the ears)
+
+Point your domain's MX records at your Reloop instance (or use Reloop hosted). When mail hits `support@yourcompany.com`, Reloop accepts it, runs spam checks, and parses the MIME message into plain text, HTML, headers, and attachments.
+
+### 2. Handoff
+
+Reloop stores the message against a mailbox and correlates it into a thread. Your agent reads that clean payload through the inbox APIs, or you work from the agent inbox when you want a human in the loop.
+
+### 3. Your LLM brain
+
+Your code, not Reloop, decides what the message means. Check a calendar. Look up an order. Draft a reply. Apply your own allowlists, rate limits, and approval rules.
+
+### 4. Outbound (the mouth)
+
+Your app sends the reply through Reloop's REST API (or SMTP). Reloop signs the message with DKIM and delivers it. Same domain identity on the way out as on the way in.
+
+When you self-host, that path runs on infrastructure you operate. You own the data plane. You make the operational rules.
+
+## What you get that agents actually need
+
+For agent workflows, the useful Reloop surface looks like this:
+
+- **Inbound + outbound in one stack**: receive at your domain and reply from the same platform
+- **MIME parsing**: plain text, HTML, headers, and attachments ready for your agent context
+- **Thread correlation**: replies stay attached to the conversation
+- **Agent inbox**: a mailbox UI and APIs built for programmatic and human-assisted workflows
+- **DKIM-signed sending**: REST and SMTP with authentication you configure on your domain
+- **Delivery events**: opens, clicks, bounces, and complaints via webhooks so your agent can react to what happened after send
+- **Hosted or self-hosted**: same product idea either way; self-host when ownership and data residency matter
+
+Reloop also covers the rest of a modern email platform (templates, campaigns, contacts, analytics), but for agents, the core loop is inbound, parse, decide, send.
+
+<Callout type="info">
+  **Coming next: inbound notify.** Today your agent pulls new mail from the inbox APIs (or the agent inbox UI). We're building inbound webhooks so Reloop can push a notification to your app the moment a message arrives, using the same event-driven pattern as delivery webhooks, for the receive side. Not shipped yet; watch the repo for it.
+</Callout>
+
+## Your agent. Your rules.
+
+Owning the email layer doesn't make an unsupervised agent safe. Self-hosting means you own the reputation, and the responsibility.
+
+Allowlist recipients. Rate-limit sends. Keep a human in the loop when it matters.
+
+Reloop moves mail. You decide what the model is allowed to say.
+
+## The takeaway
+
+AI agents are becoming real participants in businesses: negotiating, following up, handling support. But an agent that can't reliably talk to a human, both ways, is just a very good draft generator.
+
+If you're building agents that need to hold a real conversation, you need infrastructure that receives, not just sends, and you need to own it, not rent it.
+
+[Check out Reloop on GitHub](https://github.com/reloop-labs/reloop) and see the inbound flow yourself. Build the brain. Let Reloop be the ears and the mouth.
+
+<Cta
+  title="Give your agent a mailbox"
+  description="Open-source email infrastructure with inbound, outbound, and an agent inbox, hosted or self-hosted."
+  href="/features/ai-agents"
+  label="Explore AI agent email"
+/>
+
+---
+
+# Transactional Email Best Practices: The Complete Developer Guide
+
+Path: /blog/transactional-email-best-practices
+URL: https://reloop.sh/blog/transactional-email-best-practices
+Markdown: https://reloop.sh/blog/transactional-email-best-practices.md
+
+Everything you need to send fast, reliable, inbox-landing transactional email, from domain setup and template design to delivery patterns and monitoring.
+
+## What makes transactional email different
+
+Transactional emails (password resets, receipts, order confirmations, notifications, onboarding sequences) are different from marketing email in one critical way: **the recipient expects them.** That expectation drives open rates of 45–65%, compared to 20–25% for marketing campaigns.
+
+But that expectation also creates an obligation. When someone clicks "Forgot password?" and your reset email takes 4 minutes to arrive, or lands in spam, it's not an inconvenience. It's a product failure. Your transactional email infrastructure is part of your product.
+
+This guide covers everything you need to get transactional email right: from domain architecture to template patterns, delivery behaviour, and what to monitor.
+
+---
+
+## 1. Domain and subdomain architecture
+
+### Use a dedicated sending subdomain
+
+Never send transactional email from your root domain (`yourdomain.com`). Use a dedicated subdomain:
+
+- `mail.yourdomain.com`: clean, generic
+- `notifications.yourdomain.com`: descriptive
+- `noreply.yourdomain.com`: avoid this (more on why below)
+- `tx.yourdomain.com`: short, unambiguous
+
+Why it matters: if your marketing emails damage your sender reputation (high unsubscribes, spam complaints from cold outreach), a dedicated transactional subdomain insulates your password resets and receipts from that reputation hit.
+
+### Separate transactional from marketing at the subdomain level
+
+| Email type | Subdomain |
+|------------|-----------|
+| Password resets, 2FA | `mail.yourdomain.com` |
+| Receipts, order confirmations | `mail.yourdomain.com` |
+| Product notifications | `notifications.yourdomain.com` |
+| Newsletter, campaigns | `marketing.yourdomain.com` |
+
+### Never send from `noreply@`
+
+`noreply@` is a red flag for spam filters and a poor experience for recipients. Spam filters correlate `noreply` addresses with bulk, impersonal sending. And when a recipient wants to reply to a receipt or reset email and they can't, it damages trust.
+
+Use a monitored address like `hello@` or `support@` with a reply-to if you don't want replies going to your engineering inbox. The deliverability improvement alone is worth the setup cost.
+
+---
+
+## 2. Authentication: table stakes, not optional
+
+Before your first production send, your sending domain must have:
+
+- **SPF**: authorizes your sending servers
+- **DKIM**: signs each message cryptographically
+- **DMARC**: sets policy and sends you reports on failures
+
+Gmail and Yahoo have required all three since February 2024. Skipping any one of them will result in your email being rejected or spam-foldered by major ISPs.
+
+See the [complete SPF, DKIM, DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide) for step-by-step configuration.
+
+---
+
+## 3. Sending patterns that affect deliverability
+
+### Send immediately, never batch transactional mail
+
+Transactional email must be sent with near-zero latency. A user who triggers a password reset expects that email within 30 seconds. If you're batching emails or running them through a slow queue, you're creating support tickets.
+
+The correct pattern:
+1. User action triggers email send
+2. API call to Reloop is made inline or in an immediate background job
+3. Email departs within seconds
+
+Never schedule transactional emails for "later" or include them in a batch job that runs every few minutes.
+
+### Use dedicated queues for different priority tiers
+
+If you have a job queue, separate email types into priority lanes:
+
+```typescript
+// High priority: password resets, 2FA codes
+await queue.add("send-email", payload, { priority: 1 });
+
+// Standard: receipts, welcome emails
+await queue.add("send-email", payload, { priority: 5 });
+
+// Low: digest emails, weekly summaries
+await queue.add("send-email", payload, { priority: 10 });
+```
+
+This prevents a surge of digest emails from delaying password resets.
+
+### Implement retry logic, but not for hard bounces
+
+If a send fails due to a temporary issue (rate limit, provider timeout), retry with exponential backoff:
+
+- Attempt 1: immediate
+- Attempt 2: 30 seconds
+- Attempt 3: 5 minutes
+- Attempt 4: give up and alert
+
+But never retry a hard bounce (invalid address, domain doesn't exist). Hard bounces are permanent. Re-sending damages your reputation. Reloop's bounce processing handles this automatically: addresses that hard bounce are suppressed and never re-sent to. To reduce hard bounces upstream, verify addresses at collection with a [free email validator](/tools/email-validator) (syntax, disposable domains, and MX checks) before they hit your transactional send queue.
+
+---
+
+## 4. Template design for transactional email
+
+### Keep HTML minimal
+
+Heavy, image-rich email templates built for marketing campaigns perform poorly as transactional email. Spam filters treat complex HTML with many images, heavy CSS, and tracking pixels with more suspicion.
+
+For transactional email, aim for:
+- Simple one-column layout
+- System fonts or Google Fonts (not embedded fonts)
+- Inline CSS (email clients ignore `<style>` blocks)
+- Single, clear CTA button
+- No background images
+
+### Always include a plain text version
+
+Every transactional email must have both `html` and `text` parts. Some email clients prefer plain text. Others use the presence of a text part as a positive signal.
+
+```typescript
+await reloop.emails.send({
+  from: "mail@yourdomain.com",
+  to: user.email,
+  subject: "Reset your password",
+  html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 15 minutes.</p>`,
+  text: `Reset your password: ${resetUrl}\n\nThis link expires in 15 minutes.`,
+});
+```
+
+### The right subject lines for transactional email
+
+Transactional subject lines should be **specific and functional**, not clever:
+
+| Type | Bad | Good |
+|------|-----|------|
+| Password reset | "Action required" | "Reset your Reloop password" |
+| Receipt | "Your order" | "Receipt for $49.00 (Order #12345)" |
+| Welcome | "Welcome!" | "Your Reloop account is ready" |
+| Notification | "New activity" | "5 emails failed delivery in the last hour" |
+
+Specificity reduces support tickets ("I never got my reset email") because users can search their inbox for it by keyword.
+
+### Personalise beyond first name
+
+First-name personalisation is table stakes. Go further:
+
+- Include the specific action the user took that triggered the email
+- Reference the specific resource (order number, domain name, project name)
+- Show the current state they care about (balance, count, status)
+
+```html
+<!-- Weak -->
+<p>Hi Sarah, your email was sent.</p>
+
+<!-- Strong -->
+<p>Hi Sarah, your email to 3 recipients from <strong>onboarding@acme.com</strong>
+was delivered successfully. <a href="/logs/abc123">View delivery details →</a></p>
+```
+
+---
+
+## 5. Managing suppression and bounces
+
+### Never send to a bounced address
+
+Sending to an address that has previously hard bounced is one of the fastest ways to damage your sender reputation. Reloop maintains a suppression list automatically: addresses that hard bounce or mark your email as spam are added and never re-sent to.
+
+If you're managing email sends outside of Reloop, implement your own suppression list and check it before every send. For imported or legacy lists, run a [bulk email verifier](/tools/email-validator) first so you suppress (or remove) undeliverable addresses before the first transactional send.
+
+### Handle unsubscribes for every email type
+
+Even transactional emails should have a way for recipients to manage their notification preferences. The legal threshold varies by country (CAN-SPAM, GDPR, etc.), but the practical threshold is simpler: if someone doesn't want an email, give them an easy way to stop receiving it. Frustrated users who can't unsubscribe hit "Report spam" instead.
+
+For truly transactional emails (password resets, receipts), an unsubscribe isn't appropriate, but for notification-style emails, it is.
+
+### Monitor your bounce and complaint rates
+
+Track these metrics per sending domain:
+
+| Metric | Healthy threshold | Action if exceeded |
+|--------|------------------|--------------------|
+| Hard bounce rate | < 2% | Stop, audit list quality |
+| Spam complaint rate | < 0.1% | Audit content + list |
+| Soft bounce rate | < 5% | Review and retry strategy |
+
+Google Postmaster Tools provides domain-level reputation data for Gmail. Register your domain there and check it weekly.
+
+---
+
+## 6. What to monitor in production
+
+### Delivery rate per email type
+
+Don't just track aggregate delivery rate. Break it down by email type (password reset, welcome, receipt) and by ISP (Gmail, Outlook, Yahoo). A deliverability problem at one ISP with one email type is invisible in aggregate metrics.
+
+### Time to delivery
+
+Measure how long it takes from the send API call to the delivery event. For critical email types (password resets, 2FA), set an alert if P95 exceeds 30 seconds.
+
+### Open rate as a deliverability proxy
+
+A sudden drop in open rate for a specific email type (without a content change) usually means something changed in deliverability. If your password reset open rate drops from 70% to 30%, investigate immediately.
+
+### Use Reloop's webhook events
+
+Reloop emits events for every step of the email lifecycle: `email.sent`, `email.delivered`, `email.opened`, `email.clicked`, `email.bounced`, `email.complained`. Subscribe to these with a webhook and build dashboards, alerts, or automated responses (like removing a complained address from your list in real-time).
+
+```typescript
+// Webhook handler: remove complaints from your user preferences
+  const event = await req.json();
+
+  if (event.type === "email.complained") {
+    await db.userPreferences.update({
+      where: { email: event.data.to },
+      data: { marketingEmails: false },
+    });
+  }
+}
+```
+
+---
+
+## 7. Testing before you ship
+
+### Test in multiple email clients
+
+The same HTML renders very differently in Gmail, Outlook (desktop), Apple Mail, and Gmail on Android. Use a tool like [Litmus](https://litmus.com) or [Email on Acid](https://www.emailonacid.com) to preview across clients before shipping.
+
+### Check your spam score
+
+Send a test email to [mail-tester.com](https://mail-tester.com). It scores your email from 0–10 and shows you exactly what's penalizing you: missing authentication, suspicious content patterns, missing plain text part, and so on.
+
+Target a score of 9 or above before any email type goes to production.
+
+### Load test your send path
+
+If you have a feature that sends email on every user action, test what happens when 1,000 users trigger it simultaneously. Make sure your queue doesn't back up and that rate limiting is in place before you're in that situation in production.
+
+---
+
+## Quick-reference checklist
+
+Before any transactional email goes live:
+
+- [ ] Sending from a dedicated subdomain, not the root domain
+- [ ] `From` address is a monitored inbox, not `noreply@`
+- [ ] SPF, DKIM, DMARC all configured and verified
+- [ ] Both `html` and `text` parts included
+- [ ] Subject line is specific and functional
+- [ ] Tested at [mail-tester.com](https://mail-tester.com) with a score of 9+
+- [ ] Previewed in Gmail, Outlook, and Apple Mail
+- [ ] Sending immediately (not batched) for critical types
+- [ ] Retry logic implemented with exponential backoff
+- [ ] Bounced addresses suppressed and never re-sent to
+- [ ] Webhook handler set up for `email.bounced` and `email.complained` events
+- [ ] Delivery rate and time-to-delivery monitored in production
+
+---
+
 # How to Check if an Email is Disposable (Free Temp Email Checker)
 
 Path: /blog/disposable-email
@@ -2758,3 +4080,450 @@ For full list cleaning (syntax + disposable + MX), use the free **[Email Validat
 Looking for more developer tools?
 
 Visit **[Reloop](https://reloop.sh)**
+
+---
+
+# Welcome Email Sequences That Actually Convert
+
+Path: /blog/welcome-email-sequences-that-convert
+URL: https://reloop.sh/blog/welcome-email-sequences-that-convert
+Markdown: https://reloop.sh/blog/welcome-email-sequences-that-convert.md
+
+The anatomy of a high-converting SaaS welcome email sequence, from the first send to the first meaningful action.
+
+## The welcome email is your highest-leverage send
+
+Your welcome email is opened by ~80% of new signups. Nothing else you send will get that attention. Most teams waste it on a generic "Thanks for signing up" message. The best teams treat it as the beginning of an activation sequence.
+
+## What a welcome sequence should accomplish
+
+By the end of your welcome sequence (typically 5–7 days), a user should have:
+1. Completed their first key action (your activation event)
+2. Understood the top 2–3 things Reloop can do for them
+3. Had at least one touchpoint with a human
+
+## The 5-email sequence
+
+### Email 1 (Immediate): The warm welcome
+Send within 60 seconds of signup. Include:
+- A genuine thank you (not corporate-speak)
+- One thing to do right now (not a list of 10)
+- A face and name: personal sender beats noreply@
+
+### Email 2 (Day 1): The quick win
+Show them how to get value in 5 minutes. Video > text. Numbered steps > prose.
+
+### Email 3 (Day 3): Social proof
+A case study or quote from a customer who faced the same problem they signed up to solve. Specificity wins here: "a startup like yours" is better than "thousands of customers."
+
+### Email 4 (Day 5): Feature spotlight
+Surface one advanced feature they probably haven't discovered yet. Frame it around the outcome, not the feature itself.
+
+### Email 5 (Day 7): Personal check-in
+Send from a real person with a real reply-to. Ask one question: "What's stopping you from [activation event]?" Replies become your best product feedback.
+
+## Subject line patterns that work
+
+- Curiosity: "One thing most people miss in Reloop"
+- Specificity: "Your domain is verified here's what to do next"
+- Personalization: "[First name], your first email is 3 steps away"
+
+## Building this with Reloop
+
+Use Reloop's API to enqueue the sequence at signup and pause/skip emails based on user actions. If they complete the activation event after email 2, skip email 3's call-to-action and pivot to a feature discovery message instead.
+
+---
+
+# How to Use AI to Generate Transactional Email Templates
+
+Path: /blog/ai-generate-transactional-email-templates
+URL: https://reloop.sh/blog/ai-generate-transactional-email-templates
+Markdown: https://reloop.sh/blog/ai-generate-transactional-email-templates.md
+
+Use LLMs to generate, personalize, and iterate on transactional email templates, then send them reliably with Reloop.
+
+## The problem with hand-written templates
+
+Most teams have a handful of email templates written years ago. They're generic, outdated, and nobody owns them. AI gives you a practical way to generate, personalize, and continuously improve them without a designer.
+
+## Prompt patterns that work
+
+The key is specificity. A vague prompt produces a vague template. Give the model your product context, the trigger event, the recipient's state, and the desired tone.
+
+```typescript
+const prompt = `
+  Write a transactional email for a SaaS product called "${productName}".
+  Event: User just completed onboarding.
+  Recipient: ${user.name}, joined ${daysAgo} days ago, hasn't sent their first email yet.
+  Goal: Encourage them to send their first email using a code example.
+  Tone: Friendly, developer-focused, concise.
+  Format: Subject line + plain HTML body.
+`;
+```
+
+## Streaming the template into your editor
+
+Use streaming responses to show the template generating in real-time in your admin UI. It feels fast and gives your team confidence they can iterate quickly.
+
+## Personalization at send time
+
+Generate a base template with the LLM, then swap in per-recipient variables at send time using Reloop's template engine. You get AI quality without per-send LLM latency.
+
+## Evaluating quality
+
+Before shipping AI-generated templates, run them through:
+- A spam scorer (check subject line trigger words)
+- A readability check (Flesch-Kincaid score)
+- A preview across major email clients (Gmail, Outlook, Apple Mail)
+
+## Iterating with feedback loops
+
+Log open rates and click rates per template variant. Feed low-performing metrics back to the LLM as context to generate improved versions. This creates a continuous improvement loop without manual A/B testing setup.
+
+---
+
+# How We Handle Email Bounce Processing Automatically
+
+Path: /blog/email-bounce-processing-automation
+URL: https://reloop.sh/blog/email-bounce-processing-automation
+Markdown: https://reloop.sh/blog/email-bounce-processing-automation.md
+
+Inside Reloop's bounce processing pipeline: classifying hard vs soft bounces, updating suppression lists, and protecting sender reputation automatically.
+
+## Why bounce handling matters more than you think
+
+Every hard bounce you re-send to damages your sender reputation. ISPs track your bounce rate, and crossing the 2% threshold can get your domain or IP blacklisted. Proper automated bounce handling isn't optional. It's infrastructure.
+
+Prevention matters too: validate addresses at signup and [clean email lists](/tools/email-validator) before campaigns so invalid and disposable addresses never enter your send path. Reloop's free [email validator](/tools/email-validator) checks syntax, ~210k disposable domains, and live MX records without SMTP mailbox probing.
+
+## Bounce types we classify
+
+- **Hard bounce**: permanent failure (invalid address, domain doesn't exist). Added to suppression list immediately.
+- **Soft bounce**: temporary failure (mailbox full, server busy). Retried with backoff; suppressed after 3 consecutive soft bounces.
+- **Complaint**: recipient marked as spam. Suppressed immediately, never re-sent.
+
+## How we receive bounce data
+
+Bounces arrive via two channels:
+
+1. **SMTP DSN (Delivery Status Notifications)**: Reloop's inbound SMTP listener captures these and pushes them to a processing queue.
+2. **Provider webhooks**: When routing through a third-party SMTP relay, bounce events arrive as webhook payloads we normalize into our internal format.
+
+## The processing pipeline
+
+```typescript
+async function processBounce(event: BounceEvent) {
+  const { email, type, reason } = event;
+
+  if (type === "hard" || type === "complaint") {
+    await suppressionList.add(email, { reason, suppressedAt: new Date() });
+    return;
+  }
+
+  // Soft bounce: increment counter
+  const count = await bounceCounter.increment(email);
+  if (count >= 3) {
+    await suppressionList.add(email, { reason: "repeated_soft_bounce" });
+  }
+}
+```
+
+## Surfacing data to customers
+
+Suppressed addresses appear in the Reloop dashboard. Customers can review them, export for CRM hygiene, or manually remove addresses if they believe the suppression was erroneous.
+
+## What's next
+
+We're working on enriched bounce classification using the SMTP enhanced status codes (e.g., 5.1.1 vs 5.7.1) to give customers more actionable feedback rather than just "hard bounce."
+
+---
+
+# Reloop on Fly.io: Full Deployment Guide
+
+Path: /blog/reloop-flyio-deployment
+URL: https://reloop.sh/blog/reloop-flyio-deployment
+Markdown: https://reloop.sh/blog/reloop-flyio-deployment.md
+
+Deploy Reloop on Fly.io, from fly launch to a production-ready email infrastructure with persistent volumes and custom domains.
+
+## Why Fly.io?
+
+Fly.io is a developer-first platform with global edge locations, built-in Postgres, and a generous free tier. It's an excellent choice for self-hosting Reloop if you want managed infrastructure without giving up control over your data.
+
+## Prerequisites
+
+- Fly.io account (free tier works for getting started)
+- Fly CLI installed: `curl -L https://fly.io/install.sh | sh`
+- Docker installed locally for building
+
+## Step 1: Clone and configure
+
+```bash
+git clone https://github.com/reloop-labs/reloop
+cd reloop
+cp .env.example .env
+```
+
+Fill in your environment variables. At minimum: `DATABASE_URL`, `SMTP_HOST`, and `RELOOP_API_SECRET`.
+
+## Step 2: Initialize the Fly app
+
+```bash
+fly launch --name my-reloop --region iad --no-deploy
+```
+
+This creates your `fly.toml`. Review it and set `auto_stop_machines = false` for the email worker. You don't want it sleeping mid-delivery.
+
+## Step 3: Set up Fly Postgres
+
+```bash
+fly postgres create --name my-reloop-db --region iad
+fly postgres attach my-reloop-db
+```
+
+This automatically sets `DATABASE_URL` in your app's secrets.
+
+## Step 4: Add a persistent volume for email storage
+
+```bash
+fly volumes create reloop_data --size 10 --region iad
+```
+
+Mount it in `fly.toml` under `[mounts]` so email logs and attachments survive restarts.
+
+## Step 5: Deploy
+
+```bash
+fly deploy
+```
+
+Watch the logs with `fly logs` to confirm the SMTP server and API are both healthy.
+
+## Step 6: Configure your domain
+
+Point your domain's MX records to your Fly app's hostname, then add SPF, DKIM, and DMARC records as prompted by the Reloop dashboard.
+
+## Scaling considerations
+
+Fly.io makes it easy to scale horizontally. Email delivery workers should run on dedicated machines to isolate queue processing from API traffic.
+
+---
+
+# Send Transactional Email from Remix
+
+Path: /blog/send-email-remix
+URL: https://reloop.sh/blog/send-email-remix
+Markdown: https://reloop.sh/blog/send-email-remix.md
+
+Add reliable transactional email to your Remix app using Reloop's Node.js SDK, from loader/action setup to environment variable handling.
+
+## Why Remix is different
+
+Remix runs loaders and actions on the server by default, which means you can safely call the Reloop SDK without ever exposing your API key to the browser. No API routes, no extra setup. Just call it in the action.
+
+## Installation
+
+```bash
+npm install reloop-email
+```
+
+Add your API key to `.env`:
+
+```env
+RELOOP_API_KEY=re_your_api_key_here
+```
+
+## Sending from an action
+
+The most common pattern: trigger an email when a form is submitted:
+
+```typescript
+// app/routes/contact.tsx
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+
+  const formData = await request.formData();
+  const email = formData.get("email") as string;
+
+  await reloop.emails.send({
+    from: "hello@yourdomain.com",
+    to: email,
+    subject: "Thanks for reaching out",
+    html: "<p>We'll get back to you within 24 hours.</p>",
+  });
+
+  return { success: true };
+}
+```
+
+## Sending from a resource route
+
+For webhook-triggered emails or programmatic sends, use a resource route:
+
+```typescript
+// app/routes/api.send-welcome.ts
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+
+  const { email, name } = await request.json();
+
+  await reloop.emails.send({
+    from: "onboarding@yourdomain.com",
+    to: email,
+    subject: `Welcome, ${name}!`,
+    html: `<p>Your account is ready. Let's get started.</p>`,
+  });
+
+  return json({ sent: true });
+}
+```
+
+## Error handling
+
+Wrap sends in try/catch and return structured errors to the client. Never let email failures crash your action. Degrade gracefully.
+
+## Next steps
+
+- Add [React Email](https://react.email) for beautiful HTML templates
+- Use Reloop's webhook events to track opens and clicks
+- See the [Reloop SDK docs](/docs/examples/nodejs) for the full API reference
+
+---
+
+# Vercel AI SDK + Reloop: Send Smart Notifications from Your AI App
+
+Path: /blog/vercel-ai-sdk-reloop-notifications
+URL: https://reloop.sh/blog/vercel-ai-sdk-reloop-notifications
+Markdown: https://reloop.sh/blog/vercel-ai-sdk-reloop-notifications.md
+
+Combine the Vercel AI SDK's tool calling with Reloop to trigger intelligent, context-aware email notifications from any AI-powered Next.js application.
+
+## Why combine Vercel AI SDK with Reloop
+
+The Vercel AI SDK makes it trivially easy to add tool calling to any Next.js app. Reloop gives you reliable, observable email delivery. Together, they let your AI decide *when* to send an email and *what* to say, while Reloop handles the infrastructure.
+
+## Setting up the tool
+
+Define a `notifyUser` tool using the AI SDK's `tool()` helper and the Zod schema it expects:
+
+```typescript
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+
+  description: "Send an email notification to the user about a task or event.",
+  parameters: z.object({
+    email: z.string().email(),
+    subject: z.string(),
+    message: z.string(),
+  }),
+  execute: async ({ email, subject, message }) => {
+    await reloop.emails.send({
+      from: "notifications@yourdomain.com",
+      to: email,
+      subject,
+      html: `<p>${message}</p>`,
+    });
+    return { delivered: true };
+  },
+});
+```
+
+## Wiring it into a Server Action
+
+```typescript
+
+  return streamText({
+    model: openai("gpt-4o"),
+    prompt,
+    tools: { notifyUser },
+  });
+}
+```
+
+## Example: a task completion agent
+
+When a long-running background task finishes, the model can decide to notify the user by email rather than just returning a response. This keeps the user in the loop without polling.
+
+## Observability
+
+Every email triggered by the AI agent appears in Reloop's logs with full metadata: subject, recipient, timestamp, delivery status. You can see exactly what your agent sent and when.
+
+---
+
+# Send Email from Cloudflare Workers
+
+Path: /blog/send-email-cloudflare-workers
+URL: https://reloop.sh/blog/send-email-cloudflare-workers
+Markdown: https://reloop.sh/blog/send-email-cloudflare-workers.md
+
+Send transactional email from Cloudflare Workers using Reloop's HTTP API, with no Node.js SDK required. Works on the edge runtime.
+
+## Why the SDK doesn't work on Cloudflare Workers
+
+Cloudflare Workers run in a V8 isolate, not a Node.js environment. Node.js built-ins like `net`, `tls`, and `http` are unavailable. The Reloop Node.js SDK uses these for SMTP, so on Workers, you call the HTTP REST API directly instead.
+
+## The good news: the HTTP API is simple
+
+Everything the SDK does, the HTTP API does too. And `fetch` is available natively in Workers.
+
+## Setting up your Worker
+
+```typescript
+// src/index.ts
+  async fetch(request: Request, env: Env): Promise<Response> {
+    if (request.method === "POST" && new URL(request.url).pathname === "/send") {
+      return sendEmail(env);
+    }
+    return new Response("Not found", { status: 404 });
+  },
+};
+```
+
+## Sending an email via the HTTP API
+
+```typescript
+async function sendEmail(env: Env): Promise<Response> {
+  const response = await fetch("https://api.reloop.sh/v1/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RELOOP_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "hello@yourdomain.com",
+      to: "user@example.com",
+      subject: "Hello from the edge",
+      html: "<p>Sent from a Cloudflare Worker.</p>",
+    }),
+  });
+
+  const data = await response.json();
+  return Response.json(data);
+}
+```
+
+## Storing your API key securely
+
+Never hardcode the API key. Add it as a Cloudflare secret:
+
+```bash
+wrangler secret put RELOOP_API_KEY
+```
+
+Access it as `env.RELOOP_API_KEY` in your Worker.
+
+## Defining the Env type
+
+```typescript
+interface Env {
+  RELOOP_API_KEY: string;
+}
+```
+
+## Deploying
+
+```bash
+wrangler deploy
+```
+
+Your Worker is now live globally on Cloudflare's edge network with email sending built in.

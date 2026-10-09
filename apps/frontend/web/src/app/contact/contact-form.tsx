@@ -7,6 +7,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import * as Textarea from "@reloop/ui/textarea";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -130,26 +131,37 @@ export function ContactForm() {
 			<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/55">
 				Fill out the form and we&apos;ll get back to you within 2 business days.
 			</p>
-			{mounted && !isPending && session ? (
-				<div className="mt-6 flex items-center justify-between gap-4 rounded-xl border border-stroke-soft-200 px-4 py-3 dark:border-white/10">
-					<div className="min-w-0">
-						<p className="truncate font-medium text-[14px] text-text-strong-950 dark:text-white">
-							You are logged in as: {session.user.email ?? ""}
-						</p>
-						<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
-							Chat with the founders to get help live reply in ~2 mins.
-						</p>
-					</div>
-					<FancyButton.Root
-						asChild
-						variant="basic"
-						size="small"
-						className="shrink-0"
+			<AnimatePresence initial={false}>
+				{mounted && !isPending && session ? (
+					<motion.div
+						key="logged-in-banner"
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+						className="overflow-hidden"
 					>
-						<a href="/dashboard/help">Chat now</a>
-					</FancyButton.Root>
-				</div>
-			) : null}
+						<div className="mt-6 flex items-center justify-between gap-4 rounded-xl border border-stroke-soft-200 px-4 py-3 dark:border-white/10">
+							<div className="min-w-0">
+								<p className="truncate font-medium text-[14px] text-text-strong-950 dark:text-white">
+									Logged in as {session.user.email ?? ""}
+								</p>
+								<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
+									Chat with the founders to get help — live reply in ~2 mins.
+								</p>
+							</div>
+							<FancyButton.Root
+								asChild
+								variant="basic"
+								size="small"
+								className="shrink-0"
+							>
+								<a href="/dashboard/help">Chat now</a>
+							</FancyButton.Root>
+						</div>
+					</motion.div>
+				) : null}
+			</AnimatePresence>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				noValidate
