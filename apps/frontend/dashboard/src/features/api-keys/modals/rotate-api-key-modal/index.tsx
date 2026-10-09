@@ -17,9 +17,9 @@ import type { ApiKeyData } from "../../types";
 import { ConfirmStep } from "./confirm-step";
 import { SuccessStep } from "./success-step";
 
-/** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+/** Light keycap so it reads on the dark FancyButton fill. */
+const actionKbdOnDarkFillClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]";
 
 type RotatedKey = {
 	id: string;
@@ -251,7 +251,7 @@ export function RotateApiKeyModal({
 						{step === "confirm" ? (
 							<FancyButton.Root
 								type="button"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								onClick={handleRotate}
 								disabled={!canRotate}
@@ -279,7 +279,7 @@ export function RotateApiKeyModal({
 										) : (
 											<>
 												Rotate API key
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnDarkFillClassName}>
 													↵
 												</ActionKbd>
 											</>
@@ -290,7 +290,7 @@ export function RotateApiKeyModal({
 						) : (
 							<FancyButton.Root
 								type="button"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								onClick={handleCopyKey}
 								className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
@@ -309,7 +309,7 @@ export function RotateApiKeyModal({
 										) : (
 											<>
 												Copy API key
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnDarkFillClassName}>
 													↵
 												</ActionKbd>
 											</>

@@ -18,7 +18,7 @@ function CreatedByCell({ createdBy }: { createdBy: ApiKeyData["createdBy"] }) {
 	if (!createdBy) {
 		return (
 			<div className="flex min-w-0 items-center gap-2">
-				<Avatar.Root size="20" color="blue" className="shrink-0">
+				<Avatar.Root size="20" color="gray" className="shrink-0">
 					<Avatar.Image asChild>
 						<div
 							className={cn(
@@ -54,7 +54,7 @@ function CreatedByCell({ createdBy }: { createdBy: ApiKeyData["createdBy"] }) {
 
 	return (
 		<div className="flex min-w-0 items-center gap-2">
-			<Avatar.Root size="20" color="blue" className="shrink-0">
+			<Avatar.Root size="20" color="gray" className="shrink-0">
 				{showImage ? (
 					<Avatar.Image
 						src={createdBy.image ?? undefined}
@@ -139,7 +139,7 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 					<Icon name="key-new" className="h-4 w-4 shrink-0 text-text-sub-600" />
 					<Link
 						href={`/api-keys/${apiKey.id}`}
-						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-strong-950 dark:text-white dark:hover:text-white"
 						onClick={(e) => {
 							if (isEditing) e.preventDefault();
 						}}

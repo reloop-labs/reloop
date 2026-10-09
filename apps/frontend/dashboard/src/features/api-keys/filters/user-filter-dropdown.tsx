@@ -32,7 +32,7 @@ function UserAvatar({
 	const showImage = hasImage && !imgError;
 
 	return (
-		<Avatar.Root size="16" color="blue" className="shrink-0">
+		<Avatar.Root size="16" color="gray" className="shrink-0">
 			{showImage ? (
 				<Avatar.Image
 					src={image ?? undefined}

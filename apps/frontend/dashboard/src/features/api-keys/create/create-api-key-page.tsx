@@ -338,7 +338,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 						</Button.Root>
 						<FancyButton.Root
 							type="submit"
-							variant="blue"
+							variant="neutral"
 							size="small"
 							disabled={isLoading}
 							className={cn(
@@ -420,7 +420,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 										<FancyButton.Root
 											key={lang.id}
 											type="button"
-											variant="blue"
+											variant="neutral"
 											size="xsmall"
 											onClick={() => handleLangChange(lang.id)}
 											className="gap-1.5 rounded-xl"
@@ -550,7 +550,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 						</Button.Root>
 						<FancyButton.Root
 							type="button"
-							variant="blue"
+							variant="neutral"
 							size="small"
 							onClick={handleContinue}
 							className="rounded-xl"

@@ -21,9 +21,9 @@ import type { ApiKeyWithSecret } from "../../types";
 import { type ApiKeyFormValues, FormStep } from "./form-step";
 import { SuccessStep } from "./success-step";
 
-/** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+/** Light keycap so it reads on the dark FancyButton fill. */
+const actionKbdOnDarkFillClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]";
 
 const apiKeySchema = v.object({
 	name: v.pipe(v.string(), v.minLength(1, "Name must be at least 1 character")),
@@ -233,7 +233,7 @@ export function CreateApiKeyModal({
 							<FancyButton.Root
 								type="submit"
 								form="create-api-key-form"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								disabled={isLoading}
 								className={cn(
@@ -258,7 +258,7 @@ export function CreateApiKeyModal({
 										) : (
 											<>
 												Create API key
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnDarkFillClassName}>
 													↵
 												</ActionKbd>
 											</>
@@ -269,7 +269,7 @@ export function CreateApiKeyModal({
 						) : (
 							<FancyButton.Root
 								type="button"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								onClick={handleCopyKey}
 								className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
@@ -288,7 +288,7 @@ export function CreateApiKeyModal({
 										) : (
 											<>
 												Copy API key
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnDarkFillClassName}>
 													↵
 												</ActionKbd>
 											</>

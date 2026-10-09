@@ -14,9 +14,9 @@ import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../types";
 
-/** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+/** Light keycap so it reads on the dark FancyButton fill. */
+const actionKbdOnDarkFillClassName =
+	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]";
 
 interface EditApiKeyFormProps {
 	apiKey: ApiKeyData;
@@ -172,7 +172,7 @@ export function EditApiKeyForm({
 
 					<FancyButton.Root
 						type="submit"
-						variant={status === "success" ? "success" : "blue"}
+						variant={status === "success" ? "success" : "neutral"}
 						size="small"
 						disabled={!canSubmit}
 						className={cn(
@@ -206,7 +206,7 @@ export function EditApiKeyForm({
 								) : (
 									<>
 										Save changes
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnDarkFillClassName}>
 											↵
 										</ActionKbd>
 									</>

@@ -242,7 +242,7 @@ export const SelectItem = React.forwardRef<
 			<SelectPrimitive.ItemText className="flex min-w-0 flex-1 items-center gap-2">
 				{children}
 			</SelectPrimitive.ItemText>
-			<SelectPrimitive.ItemIndicator className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2.5 text-text-strong-950">
+			<SelectPrimitive.ItemIndicator className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-text-strong-950">
 				<svg
 					aria-hidden="true"
 					fill="none"
