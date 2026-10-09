@@ -40,7 +40,7 @@ export function AgentDirective({
 				)}
 				. Product skill: <a href="/skill.md">skill.md</a>. Pricing:{" "}
 				<a href="/pricing.md">pricing.md</a>. Docs MCP:{" "}
-				<a href="/docs/mcp">/docs/mcp</a>. Site MCP: <a href="/mcp">/mcp</a>.
+				<a href="/docs/mcp">/docs/mcp</a>.
 			</p>
 		</div>
 	);

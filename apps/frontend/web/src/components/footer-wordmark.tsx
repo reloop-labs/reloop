@@ -31,6 +31,157 @@ const SCAN_BASELINE = 224;
 /** Alpha threshold — skips faint antialiasing fringe */
 const SCAN_ALPHA = 8;
 
+/** Cached embedded-font CSS for SVG rasterization */
+let rasterFontCss: Promise<string | null> | null = null;
+
+/** Find the Geist woff2 covering ASCII (U+0-FF range). */
+function findGeistLatinUrl(): string | null {
+	try {
+		for (const sh of Array.from(document.styleSheets)) {
+			let rs: CSSRuleList | null = null;
+			try {
+				rs = sh.cssRules;
+			} catch {
+				continue;
+			}
+			if (!rs) continue;
+			for (const r of Array.from(rs)) {
+				if (r.constructor.name !== "CSSFontFaceRule") continue;
+				const st = (r as CSSFontFaceRule).style;
+				const fam = st
+					.getPropertyValue("font-family")
+					.replace(/["']/g, "")
+					.trim();
+				const range = st.getPropertyValue("unicode-range");
+				const weight = st.getPropertyValue("font-weight");
+				if (
+					fam === "Geist" &&
+					range.includes("U+0-") &&
+					(weight.includes("800") || weight.includes("100"))
+				) {
+					const src = st.getPropertyValue("src");
+					const m = /url\(["']?([^"')]+)["']?\)/.exec(src);
+					if (m?.[1]) return new URL(m[1], document.baseURI).toString();
+				}
+			}
+		}
+	} catch {
+		// ignore
+	}
+	return null;
+}
+
+function getRasterFontCss(): Promise<string | null> {
+	if (!rasterFontCss) {
+		rasterFontCss = (async () => {
+			try {
+				const url = findGeistLatinUrl();
+				if (!url) return null;
+				const res = await fetch(url);
+				if (!res.ok) return null;
+				const buf = await res.arrayBuffer();
+				const bytes = new Uint8Array(buf);
+				let bin = "";
+				const CHUNK = 0x8000;
+				for (let i = 0; i < bytes.length; i += CHUNK) {
+					bin += String.fromCharCode.apply(
+						null,
+						Array.from(bytes.subarray(i, i + CHUNK)) as number[],
+					);
+				}
+				const b64 = btoa(bin);
+				return `@font-face{font-family:"RM";src:url(data:font/woff2;base64,${b64}) format("woff2");font-weight:100 900;font-style:normal;}`;
+			} catch {
+				return null;
+			}
+		})();
+	}
+	return rasterFontCss;
+}
+
+/**
+ * Rasterize the wordmark through the SVG engine itself (serialized SVG
+ * with the real font embedded) and scan per-glyph ink bounds. This is
+ * the ground-truth path: canvas text shaping can render different
+ * glyphs than SVG text for the same font, but the serialized SVG uses
+ * the identical layout engine as the visible wordmark.
+ *
+ * Boxes come back directly in main-SVG coordinates (same viewBox).
+ */
+async function rasterGlyphInkSvg(
+	pens: number[],
+	endX: number,
+): Promise<LetterBox[] | null> {
+	try {
+		const css = await getRasterFontCss();
+		if (!css) return null;
+		const texts = FULL_TEXT.split("")
+			.map((ch, i) => {
+				const x = pens[i] ?? 0;
+				return i < 7
+					? `<text x="${x}" y="90" dominant-baseline="central" font-family="RM" font-weight="800" font-size="180" fill="none" stroke="black" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ch}</text>`
+					: `<text x="${x}" y="90" dominant-baseline="central" font-family="RM" font-weight="800" font-size="180" fill="black" stroke="none">${ch}</text>`;
+			})
+			.join("");
+		const svg =
+			`<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="180" viewBox="0 0 1000 180"><style>${css}</style>` +
+			`<rect width="1000" height="180" fill="white"/>${texts}</svg>`;
+		const img = new Image();
+		await new Promise<void>((resolve, reject) => {
+			img.onload = () => resolve();
+			img.onerror = () => reject(new Error("svg decode failed"));
+			img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+		});
+		const cv = document.createElement("canvas");
+		cv.width = 1000;
+		cv.height = 180;
+		const ctx = cv.getContext("2d", { willReadFrequently: true });
+		if (!ctx) return null;
+		ctx.drawImage(img, 0, 0, 1000, 180);
+		const data = ctx.getImageData(0, 0, 1000, 180).data;
+		// Ink = non-white pixels (black glyphs on white).
+		const isInk = (x: number, y: number): boolean => {
+			const o = (y * 1000 + x) * 4;
+			const r = data[o] ?? 255;
+			const g = data[o + 1] ?? 255;
+			const b = data[o + 2] ?? 255;
+			return r < 200 || g < 200 || b < 200;
+		};
+		const bounds: LetterBox[] = [];
+		for (let i = 0; i < FULL_TEXT.length; i++) {
+			const x0 = Math.max(0, Math.floor(pens[i] ?? 0));
+			const x1 = Math.min(
+				1000,
+				Math.ceil(i + 1 < pens.length ? (pens[i + 1] ?? endX) : endX),
+			);
+			let minX = Number.POSITIVE_INFINITY;
+			let minY = Number.POSITIVE_INFINITY;
+			let maxX = -1;
+			let maxY = -1;
+			for (let y = 0; y < 180; y++) {
+				for (let x = x0; x < x1; x++) {
+					if (isInk(x, y)) {
+						if (x < minX) minX = x;
+						if (x > maxX) maxX = x;
+						if (y < minY) minY = y;
+						if (y > maxY) maxY = y;
+					}
+				}
+			}
+			if (maxX < 0) return null;
+			bounds.push({
+				x: minX,
+				y: minY,
+				width: maxX - minX + 1,
+				height: maxY - minY + 1,
+			});
+		}
+		return bounds;
+	} catch {
+		return null;
+	}
+}
+
 /**
  * Rasterize the whole wordmark with the element's own computed font and
  * scan the alpha channel for exact per-glyph ink bounds.
@@ -129,11 +280,33 @@ function scanGlyphInk(
 	}
 }
 
+/**
+ * Sanity check for scanned boxes: the "p" must be clearly taller than
+ * the "o" (ascender + descender) and the period tiny. Rejects scans
+ * from a wrong rasterizer face instead of showing bad boxes.
+ */
+function passesCanary(boxes: LetterBox[]): boolean {
+	const p = boxes[5];
+	const o = boxes[3];
+	const dot = boxes[6];
+	return (
+		p != null &&
+		o != null &&
+		dot != null &&
+		p.height > o.height + 30 &&
+		dot.height < 60
+	);
+}
+
 export function FooterWordmark({ className }: FooterWordmarkProps) {
 	const textRef = useRef<SVGTextElement>(null);
 	/** Bounded re-scan attempts while the canary rejects the scan */
 	const retryRef = useRef(0);
 	const timerRef = useRef(0);
+	/** Best committed box source: -1 none, 0 cells, 1 canvas, 2 svg raster */
+	const sourceRef = useRef(-1);
+	/** Guards stale async raster runs */
+	const runRef = useRef(0);
 	/** Full em cells from the browser layout — used as hover targets */
 	const [cells, setCells] = useState<LetterBox[] | null>(null);
 	/** Tight per-glyph ink boxes — used for the selection box */
@@ -142,6 +315,13 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 	/** Last hovered ink box, so fade-out happens in place */
 	const [resting, setResting] = useState<LetterBox | null>(null);
 	// Calibrated coordinates for viewBox="0 0 1000 180"
+
+	const commitInk = useCallback((rank: number, boxes: LetterBox[]) => {
+		if (rank >= sourceRef.current) {
+			sourceRef.current = rank;
+			setInk(boxes);
+		}
+	}, []);
 
 	const measure = useCallback(() => {
 		const el = textRef.current;
@@ -201,41 +381,71 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 			// clearly taller than the "o" (ascender + descender) and the
 			// period is tiny. If the rasterizer served a wrong face, the
 			// scan is rejected and retried instead of showing bad boxes.
-			const p = nextInk[5];
-			const o = nextInk[3];
-			const dot = nextInk[6];
-			const sane =
-				p != null &&
-				o != null &&
-				dot != null &&
-				p.height > o.height + 30 &&
-				dot.height < 60;
-			if (!sane) {
-				if (retryRef.current < 12) {
+			if (!passesCanary(nextInk)) {
+				if (sourceRef.current < 2 && retryRef.current < 12) {
 					retryRef.current += 1;
 					window.clearTimeout(timerRef.current);
 					timerRef.current = window.setTimeout(measure, 500);
-				} else {
+				} else if (sourceRef.current < 0) {
 					// Give up gracefully: fall back to full-cell boxes.
+					sourceRef.current = 0;
 					setInk(nextCells);
 				}
 				return;
 			}
 			retryRef.current = 0;
-			setInk(nextInk);
+			commitInk(1, nextInk);
 		} catch {
 			// Fonts not ready yet — retry on fonts.ready / rAF
 		}
-	}, []);
+	}, [commitInk]);
+
+	// Ground-truth ink via the SVG engine itself (serialized SVG with the
+	// real font embedded). Async: fetch + rasterize, then commit if fresh.
+	const measureRaster = useCallback(async () => {
+		const el = textRef.current;
+		if (!el) return;
+		const run = ++runRef.current;
+		try {
+			const n =
+				typeof el.getNumberOfChars === "function"
+					? el.getNumberOfChars()
+					: FULL_TEXT.length;
+			if (!n) return;
+			const pens: number[] = [];
+			for (let i = 0; i < n; i++) {
+				try {
+					pens.push(el.getStartPositionOfChar(i).x);
+				} catch {
+					return;
+				}
+			}
+			let endX = 1000;
+			try {
+				endX = el.getEndPositionOfChar(n - 1).x;
+			} catch {
+				// keep fallback
+			}
+			const boxes = await rasterGlyphInkSvg(pens, endX);
+			if (run !== runRef.current || !boxes || boxes.length !== n) return;
+			if (!passesCanary(boxes)) return;
+			commitInk(2, boxes);
+		} catch {
+			// raster path failed — canvas/cell fallbacks cover it
+		}
+	}, [commitInk]);
 
 	useEffect(() => {
 		let raf = 0;
 		let cancelled = false;
 		let ro: ResizeObserver | null = null;
 		const kick = () => {
-			if (!cancelled) measure();
+			if (cancelled) return;
+			measure();
+			void measureRaster();
 		};
 		measure();
+		void measureRaster();
 		raf = requestAnimationFrame(measure);
 		// The scan must run against the real Geist outlines — a fallback
 		// font has matching advances by design but different ink, and the
@@ -262,13 +472,14 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 		window.addEventListener("resize", measure);
 		return () => {
 			cancelled = true;
+			runRef.current += 1;
 			cancelAnimationFrame(raf);
 			ro?.disconnect();
 			fonts?.removeEventListener("loadingdone", kick);
 			window.removeEventListener("resize", measure);
 			window.clearTimeout(timerRef.current);
 		};
-	}, [measure]);
+	}, [measure, measureRaster]);
 
 	useEffect(() => {
 		if (hovered != null && ink?.[hovered]) setResting(ink[hovered]);
