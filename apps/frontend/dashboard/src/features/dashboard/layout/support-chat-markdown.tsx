@@ -64,7 +64,7 @@ export function SupportChatMarkdown({
 	return (
 		<div
 			className={cn(
-				"break-words text-[13px] leading-relaxed",
+				"break-words [overflow-wrap:anywhere] text-[13px] leading-relaxed",
 				mine ? "text-white" : "text-text-strong-950 dark:text-white/90",
 				className,
 			)}

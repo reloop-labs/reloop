@@ -517,7 +517,7 @@ export function ContactSupportChat({
 					<div
 						ref={viewportRef}
 						onScroll={onViewportScroll}
-						className="relative min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20"
+						className="relative min-h-0 flex-1 overflow-y-auto pt-4 pr-2 pb-20 pl-5"
 						role="log"
 						aria-label="Support messages"
 						aria-relevant="additions"
@@ -565,7 +565,7 @@ export function ContactSupportChat({
 														: "rounded-2xl rounded-bl-xs border border-stroke-soft-200/80 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.05] dark:text-white",
 												)}
 											>
-												<p className="whitespace-pre-wrap break-words">
+												<p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
 													{m.body}
 												</p>
 											</div>

@@ -131,17 +131,19 @@ function SupportPersonAvatar({
 	image,
 	size = "32",
 	supportAgent = false,
+	className,
 }: {
 	name: string | null;
 	email: string | null;
 	image: string | null;
 	size?: "24" | "32";
 	supportAgent?: boolean;
+	className?: string;
 }) {
 	const label = name || email || "User";
 	const seed = email || name || "user";
 	return (
-		<Avatar.Root size={size} color="gray" className="shrink-0">
+		<Avatar.Root size={size} color="gray" className={cn("shrink-0", className)}>
 			{image ? (
 				<Avatar.Image src={image} alt={label} />
 			) : supportAgent ? (
@@ -612,19 +614,16 @@ export function SupportChatPanel({
 							) : null}
 						</div>
 					) : (
-						<div className="mx-auto flex w-full max-w-md flex-col gap-1 px-4 py-5">
-							{/* Thread intro chip */}
-							<div className="mb-3 flex justify-center">
-								<span className="rounded-full bg-bg-weak-50 px-3 py-1 text-[11px] text-text-sub-600 dark:bg-white/5 dark:text-white/40">
-									Conversation with Reloop support
-								</span>
-							</div>
-
+						<div className="flex w-full flex-col gap-1 py-5 pr-0 pl-3">
 							{messages.map((m, idx) => {
 								const mine = m.senderRole === "user";
 								const showUnreadBanner = m.id === unreadAnchorId;
 								const prev = messages[idx - 1];
-								const showMeta = !prev || prev.senderRole !== m.senderRole;
+								const next = messages[idx + 1];
+								const isGroupStart =
+									!prev || prev.senderRole !== m.senderRole;
+								const isGroupEnd =
+									!next || next.senderRole !== m.senderRole;
 								return (
 									<Fragment key={m.id}>
 										{showUnreadBanner ? (
@@ -637,7 +636,7 @@ export function SupportChatPanel({
 											className={cn(
 												"flex w-full flex-col",
 												mine ? "items-end" : "items-start",
-												showMeta ? "mt-4" : "mt-1",
+												isGroupStart ? "mt-4" : "mt-1",
 											)}
 										>
 											<div
@@ -646,8 +645,9 @@ export function SupportChatPanel({
 													mine ? "flex-row-reverse" : "flex-row",
 												)}
 											>
-												{showMeta ? (
+												{isGroupEnd ? (
 													<SupportPersonAvatar
+														className={mine ? "mr-3" : undefined}
 														name={
 															mine
 																? user?.name || m.senderName
@@ -667,24 +667,31 @@ export function SupportChatPanel({
 														supportAgent={!mine}
 													/>
 												) : (
-													<span className="w-6 shrink-0" />
+													<span
+														className={cn(
+															"w-6 shrink-0",
+															mine && "mr-3",
+														)}
+													/>
 												)}
 												<div
 													className={cn(
-														"min-w-0 px-3.5 py-2.5 text-[13px] leading-relaxed",
+														"min-w-0 rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed",
 														mine
-															? "rounded-2xl rounded-br-md bg-blue-600 text-white"
-															: "rounded-2xl rounded-bl-md border border-stroke-soft-100 bg-bg-weak-50 text-text-strong-950 dark:border-white/8 dark:bg-white/[0.06] dark:text-white/90",
+															? "bg-blue-600 text-white"
+															: "border border-stroke-soft-100 bg-bg-weak-50 text-text-strong-950 dark:border-white/8 dark:bg-white/[0.06] dark:text-white/90",
+														isGroupEnd &&
+															(mine ? "rounded-br-md" : "rounded-bl-md"),
 													)}
 												>
 													<SupportChatMarkdown content={m.body} mine={mine} />
 												</div>
 											</div>
-											{showMeta ? (
+											{isGroupEnd ? (
 												<p
 													className={cn(
 														"mt-1 text-[10px] text-text-soft-400 dark:text-white/30",
-														mine ? "mr-8" : "ml-8",
+														mine ? "mr-11" : "ml-8",
 													)}
 												>
 													{mine ? "You" : m.senderName || "Reloop support"} ·{" "}
@@ -750,7 +757,7 @@ export function SupportChatPanel({
 
 					<div
 						className={cn(
-							"flex flex-col overflow-hidden rounded-[20px] border border-stroke-soft-100 bg-bg-weak-50/50 transition-all focus-within:border-stroke-soft-300 dark:border-stroke-soft-100/70 dark:bg-bg-weak-50/40 dark:focus-within:border-white/20",
+							"flex flex-col overflow-hidden rounded-[20px] border border-stroke-soft-100 bg-bg-weak-50/50 transition-all focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/70 dark:bg-bg-weak-50/40",
 							closed && "pointer-events-none opacity-40",
 						)}
 					>
