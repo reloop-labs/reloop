@@ -131,6 +131,9 @@ function scanGlyphInk(
 
 export function FooterWordmark({ className }: FooterWordmarkProps) {
 	const textRef = useRef<SVGTextElement>(null);
+	/** Bounded re-scan attempts while the canary rejects the scan */
+	const retryRef = useRef(0);
+	const timerRef = useRef(0);
 	/** Full em cells from the browser layout — used as hover targets */
 	const [cells, setCells] = useState<LetterBox[] | null>(null);
 	/** Tight per-glyph ink boxes — used for the selection box */
@@ -194,6 +197,31 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 					height: g.height,
 				};
 			});
+			// Canary: in any sane rendering of this wordmark the "p" is
+			// clearly taller than the "o" (ascender + descender) and the
+			// period is tiny. If the rasterizer served a wrong face, the
+			// scan is rejected and retried instead of showing bad boxes.
+			const p = nextInk[5];
+			const o = nextInk[3];
+			const dot = nextInk[6];
+			const sane =
+				p != null &&
+				o != null &&
+				dot != null &&
+				p.height > o.height + 30 &&
+				dot.height < 60;
+			if (!sane) {
+				if (retryRef.current < 12) {
+					retryRef.current += 1;
+					window.clearTimeout(timerRef.current);
+					timerRef.current = window.setTimeout(measure, 500);
+				} else {
+					// Give up gracefully: fall back to full-cell boxes.
+					setInk(nextCells);
+				}
+				return;
+			}
+			retryRef.current = 0;
 			setInk(nextInk);
 		} catch {
 			// Fonts not ready yet — retry on fonts.ready / rAF
