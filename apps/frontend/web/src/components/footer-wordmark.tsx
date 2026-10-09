@@ -266,6 +266,7 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 			ro?.disconnect();
 			fonts?.removeEventListener("loadingdone", kick);
 			window.removeEventListener("resize", measure);
+			window.clearTimeout(timerRef.current);
 		};
 	}, [measure]);
 
