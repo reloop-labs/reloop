@@ -1,9 +1,9 @@
 FROM oven/bun:1-alpine AS build
 WORKDIR /app
-COPY package.json bun.lock bunfig.toml tsconfig.json ./
-RUN bun install --frozen-lockfile
+COPY package.json bunfig.toml tsconfig.json ./
+RUN bun install
 COPY src ./src
-RUN bun run build:cli && bun install --frozen-lockfile --production
+RUN bun run build:cli && bun install --production
 
 FROM oven/bun:1-alpine
 WORKDIR /app
