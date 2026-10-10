@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
 
-const INSTALL_COMMAND = "curl -fsSL https://reloop.sh/install.sh | bash";
+const INSTALL_COMMAND = "curl -fsSL https://reloop.sh/install.sh | sudo bash";
 
 export interface HeroProps {
 	variant?: "default" | "self-host";

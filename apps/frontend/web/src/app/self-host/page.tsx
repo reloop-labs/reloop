@@ -20,24 +20,21 @@ export const instant = false;
 
 const siteUrl = getSiteUrl();
 const pageUrl = `${siteUrl}/self-host`;
-const pageTitle = "Self-Host Email Infrastructure";
+const pageTitle = "Self-Host Transactional Email";
 const socialTitle = `${pageTitle} | Reloop`;
 const pageDescription =
-	"Deploy full-featured email infrastructure on your own servers. Apache 2.0 open-source transactional APIs, webhooks, SMTP routing, and agent inboxes with 100% data sovereignty.";
+	"Install Reloop on an Ubuntu or Debian server with one command. Transactional email API, SMTP, inbound mail, and campaigns, with your data on that machine.";
 
 export const metadata: Metadata = {
 	title: pageTitle,
 	description: pageDescription,
 	keywords: [
 		"self-hosted email API",
+		"self-hosted transactional email",
 		"open source email infrastructure",
+		"open source Resend alternative",
 		"self-host SMTP server",
-		"docker email server",
-		"coolify email server",
-		"kubernetes email infrastructure",
-		"Apache 2.0 email API",
 		"transactional email self-host",
-		"on-premise email server",
 	],
 	alternates: { canonical: pageUrl },
 	openGraph: {
@@ -61,7 +58,7 @@ const pageSchema = {
 	"@type": "SoftwareApplication" as const,
 	name: "Reloop Self-Hosted",
 	applicationCategory: "DeveloperApplication",
-	operatingSystem: "Linux, macOS, Docker, Kubernetes",
+	operatingSystem: "Linux",
 	offers: {
 		"@type": "Offer" as const,
 		price: "0",

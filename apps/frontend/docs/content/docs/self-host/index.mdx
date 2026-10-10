@@ -1,27 +1,36 @@
 ---
 title: Introduction
-description: Learn how to deploy and run the complete Reloop suite on your own infrastructure.
+description: Self-host Reloop on your own server. The production path is a one-command installer for Ubuntu and Debian.
 ---
 
-Reloop is fully open-source and designed to be easily self-hosted on your own servers or cloud providers. By hosting Reloop yourself, you maintain complete ownership of your email data, templates, and analytics logs.
+Reloop can run on a server you control. The production path today is a single command on a fresh Ubuntu or Debian VPS. The installer uses Docker Compose, generates secrets, and prints the DNS records to add.
 
----
+The VPS installer and a Coolify template are ready. Kubernetes manifests and the other platform templates are not.
 
-## Deployment Options
-
-You can self-host Reloop in production using several approaches:
-
-- **Docker Compose**: Recommended for small to medium deployments, staging environments, and single-instance setups.
-- **Kubernetes**: Recommended for high-availability, auto-scaling production deployments.
-- **Bare Metal / Virtual Machines**: For running the services directly using Bun/Node.js.
+If you do not already have a server, [Darkless](/docs/self-host/darkless) is Reloop's infrastructure partner and can provide the machine. You still run the same installer.
 
 ---
 
-## Platform Deployments
+## Deployment options
+
+- **VPS installer:** the supported production install. Ubuntu 22.04, Ubuntu 24.04, Debian 12, or Debian 13.
+- **Darkless:** a VPS or dedicated server from Reloop's infrastructure partner, then the same installer.
+- **Coolify:** a Docker Compose template on a Coolify server.
+- **Other platforms:** Dokploy, Railway, and the rest of the cards below are coming soon.
+
+---
+
+## Platform deployments
 
 Guides for Coolify, CapRover and a plain VPS are ready. Templates for the other platforms below are coming soon.
 
 <CardGroup cols={3}>
+  <Card title="VPS" icon="server" href="/self-host/vps">
+    One-command installer for a fresh Ubuntu or Debian server.
+  </Card>
+  <Card title="Darkless" icon="server" href="/self-host/darkless">
+    Get a server from Reloop's infrastructure partner, then run the VPS installer.
+  </Card>
   <Card title="Coolify" icon="siCoolify" href="/self-host/coolify">
     Deploy the full stack from a Docker Compose template on your Coolify server.
   </Card>
@@ -30,9 +39,6 @@ Guides for Coolify, CapRover and a plain VPS are ready. Templates for the other 
   </Card>
   <Card title="Dokploy" icon="siDocker" href="/self-host/dokploy">
     Easily deploy on your self-hosted Dokploy instance. (Coming Soon)
-  </Card>
-  <Card title="VPS" icon="server" href="/self-host/vps">
-    One-command installer for a fresh Ubuntu or Debian server.
   </Card>
   <Card title="Vercel" icon="siVercel" href="/self-host/vercel">
     Deploy the frontend and serverless endpoints on Vercel. (Coming Soon)
