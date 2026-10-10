@@ -52,6 +52,7 @@ import {
 } from "../user-name-limits";
 import { fetchClientMetadataResourceBun } from "./cimd-transport";
 import { authServerConfig } from "./config";
+import { withNativeApplicationTypeDefault } from "./dcr-application-type";
 import { redis } from "./redis";
 import { sessionCacheRedis } from "./session-cache-redis";
 
@@ -362,6 +363,11 @@ export const auth = betterAuth({
 		},
 	},
 	hooks: {
+		before: createAuthMiddleware(async (ctx) => {
+			if (ctx.path !== "/oauth2/register") return;
+			const body = withNativeApplicationTypeDefault(ctx.body);
+			if (body) return { context: { body } };
+		}),
 		after: createAuthMiddleware(async (ctx) => {
 			const { path, context } = ctx;
 			log.info({ message: String(ctx.path) });
@@ -473,13 +479,18 @@ export const auth = betterAuth({
 	plugins: [
 		jwt(),
 		// OAuth 2.1 authorization server + RFC 9728 protected resource for
-		// MCP clients. DCR stays disabled (MCP deprecates it); client
-		// identity comes from CIMD documents below. Do NOT also register a
-		// separate oauthProvider() — mcp() already is the provider.
+		// MCP clients. Client identity comes from CIMD documents below, with
+		// open dynamic client registration (RFC 7591) as the fallback for
+		// clients that only support DCR (Cursor, Windsurf). Registering grants
+		// nothing: users still sign in and approve on the consent page. Do
+		// NOT also register a separate oauthProvider() — mcp() already is the
+		// provider.
 		mcp({
 			loginPage: authServerConfig.MCP_LOGIN_PAGE,
 			consentPage: authServerConfig.MCP_CONSENT_PAGE,
 			resource: authServerConfig.MCP_RESOURCE,
+			allowDynamicClientRegistration: true,
+			allowUnauthenticatedClientRegistration: true,
 		}),
 		// Client ID Metadata Documents, MCP 2026-07-28 profile (pins CIMD
 		// draft-00). Bun has no @better-auth/cimd/node equivalent, so the

@@ -1,8 +1,8 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { connect } from "node:tls";
-import { isPublicRoutableIP } from "./ssrf-guard";
 import type { ClientMetadataResourceFetch } from "@better-auth/oauth-provider";
+import { isPublicRoutableIP } from "./ssrf-guard";
 
 /**
  * Bun-native CIMD metadata transport.

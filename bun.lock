@@ -1197,6 +1197,9 @@
     "@tailwindcss/oxide",
     "protobufjs",
   ],
+  "patchedDependencies": {
+    "@better-auth/oauth-provider@1.7.7": "patches/@better-auth%2Foauth-provider@1.7.7.patch",
+  },
   "overrides": {
     "@swc/helpers": "0.5.21",
   },
