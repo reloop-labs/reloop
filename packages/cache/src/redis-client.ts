@@ -218,6 +218,53 @@ export class RedisCache {
 	}
 
 	/**
+	 * Atomically get a value and delete it (GETDEL), honoring the instance prefix.
+	 * Best-effort like {@link get}: returns undefined on error so session and
+	 * one-time-code paths stay available when Redis is down.
+	 */
+	async getAndDelete<T>(key: string): Promise<T | undefined> {
+		try {
+			const redis = await this.getRedisClient();
+			const value = await redis.getDel(this.getKey(key));
+			return this.parseValue<T>(value as string);
+		} catch (error) {
+			console.error(
+				`Redis getAndDelete error for ${this.prefix} cache, key "${key}":`,
+				error,
+			);
+			this.redis = null;
+			return undefined;
+		}
+	}
+
+	/**
+	 * Secondary-storage counter: INCR with the TTL applied only on creation,
+	 * honoring the instance prefix. Matches Better Auth 1.7 `SecondaryStorage`
+	 * semantics (fixed window from first increment).
+	 *
+	 * Fail-open (returns 1) when Redis is unavailable, matching this class'
+	 * availability posture elsewhere: rate limiting degrades, auth stays up.
+	 */
+	async incrementWithTtl(key: string, ttlSeconds: number): Promise<number> {
+		try {
+			const redis = await this.getRedisClient();
+			const redisKey = this.getKey(key);
+			const value = await redis.incr(redisKey);
+			if (value === 1 && ttlSeconds > 0) {
+				await redis.expire(redisKey, ttlSeconds);
+			}
+			return value;
+		} catch (error) {
+			console.error(
+				`Redis incrementWithTtl error for ${this.prefix} cache, key "${key}":`,
+				error,
+			);
+			this.redis = null;
+			return 1;
+		}
+	}
+
+	/**
 	 * Set a TTL (expiry) on a key, in seconds.
 	 * Uses the raw key (no prefix).
 	 */

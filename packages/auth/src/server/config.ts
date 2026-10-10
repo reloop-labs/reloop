@@ -23,4 +23,24 @@ export const authServerConfig = {
 		process.env.ADMIN_SETUP_KEY_FILE || "/run/reloop/admin-setup.key",
 	RELOOP_ENV_FILE: process.env.RELOOP_ENV_FILE || "/run/reloop/.env",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
+	/**
+	 * Canonical MCP protected-resource identifier (RFC 8707 / RFC 9728).
+	 * Issued MCP tokens are audience-bound to this value. Must be HTTPS
+	 * (HTTP loopback only for local dev). Defaults to `<BASE_URL>/mcp`;
+	 * set explicitly once the dedicated MCP service host is known.
+	 */
+	MCP_RESOURCE:
+		process.env.MCP_RESOURCE ||
+		`${(process.env.BASE_URL || "https://local.reloop.sh").replace(/\/$/, "")}/mcp`,
+	/** Browser path users sign in at when an MCP authorize flow needs them. */
+	MCP_LOGIN_PAGE: process.env.MCP_LOGIN_PAGE || "/dashboard/login",
+	/** Browser path users approve/deny client scopes at. Must be built. */
+	MCP_CONSENT_PAGE: process.env.MCP_CONSENT_PAGE || "/dashboard/consent",
+	/**
+	 * Device-flow verification page (RFC 8628). Returned as
+	 * `verification_uri` in device-code responses; users open it to enter
+	 * the user code and approve the device.
+	 */
+	DEVICE_VERIFICATION_URI:
+		process.env.DEVICE_VERIFICATION_URI || "/dashboard/device",
 };

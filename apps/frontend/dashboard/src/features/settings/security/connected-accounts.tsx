@@ -137,19 +137,23 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 		}
 	};
 
-	const handleDisconnect = async (providerId: string) => {
+	const handleDisconnect = async (account: Account) => {
+		const key = account.providerId;
 		try {
-			setStatusMap((prev) => ({ ...prev, [providerId]: "disconnecting" }));
-			const res = await authClient.unlinkAccount({ providerId });
+			setStatusMap((prev) => ({ ...prev, [key]: "disconnecting" }));
+			// Better Auth 1.7 unlinks by the provider account ID, not the provider.
+			const res = await authClient.unlinkAccount({
+				accountId: account.accountId,
+			});
 			if (res.error) throw res.error;
 			await invalidateAccounts();
-			setStatusMap((prev) => ({ ...prev, [providerId]: "success" }));
+			setStatusMap((prev) => ({ ...prev, [key]: "success" }));
 			setTimeout(() => {
-				setStatusMap((prev) => ({ ...prev, [providerId]: "idle" }));
+				setStatusMap((prev) => ({ ...prev, [key]: "idle" }));
 			}, 1500);
 		} catch (error) {
-			console.error(`Failed to disconnect ${providerId}:`, error);
-			setStatusMap((prev) => ({ ...prev, [providerId]: "idle" }));
+			console.error(`Failed to disconnect ${key}:`, error);
+			setStatusMap((prev) => ({ ...prev, [key]: "idle" }));
 		}
 	};
 
@@ -215,7 +219,7 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 														}
 														size="xsmall"
 														disabled={itemStatus !== "idle"}
-														onClick={() => handleDisconnect(account.providerId)}
+														onClick={() => handleDisconnect(account)}
 														className={cn(
 															"min-w-[110px] justify-center overflow-hidden font-medium transition-all duration-200",
 															itemStatus === "disconnecting" && "opacity-90",

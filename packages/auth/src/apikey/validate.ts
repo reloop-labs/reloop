@@ -184,6 +184,13 @@ export async function validateApiKey(
 		return null;
 	}
 
+	// organizationId/userId are nullable at the DB level (Better Auth 1.7
+	// startup schema check). A key row without an owner org cannot
+	// authenticate to org-scoped endpoints, so reject it fail-closed.
+	if (!apiKeyRecord.userId || !apiKeyRecord.organizationId) {
+		return null;
+	}
+
 	if (isApiKeyExpired(apiKeyRecord.expiresAt, nowMs)) {
 		return null;
 	}

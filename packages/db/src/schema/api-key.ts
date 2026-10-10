@@ -13,16 +13,24 @@ export const apikey = pgTable(
 	"apikey",
 	{
 		id: text("id").primaryKey(),
+		// Better Auth 1.7 apiKey plugin columns. The product control plane
+		// (apps/backend/api-key) owns key lifecycle and never sets these;
+		// they exist so the adapter's startup schema check passes.
+		configId: text("config_id").default("default").notNull(),
 		name: text("name"),
 		start: text("start"),
+		referenceId: text("reference_id"),
 		prefix: text("prefix"),
 		key: text("key").notNull(),
-		organizationId: text("organization_id")
-			.notNull()
-			.references(() => organization.id, { onDelete: "cascade" }),
-		userId: text("user_id")
-			.notNull()
-			.references(() => user.id, { onDelete: "cascade" }),
+		// Nullable at the DB level because Better Auth 1.7's startup schema
+		// check requires every column it doesn't write to be nullable (or
+		// defaulted). The product invariant (every key belongs to a user +
+		// organization) is enforced by the control plane on write and by a
+		// fail-closed null guard on verify.
+		organizationId: text("organization_id").references(() => organization.id, {
+			onDelete: "cascade",
+		}),
+		userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
 		refillInterval: integer("refill_interval"),
 		refillAmount: integer("refill_amount"),
 		lastRefillAt: timestamp("last_refill_at"),

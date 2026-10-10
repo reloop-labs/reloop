@@ -225,6 +225,20 @@
       "when": 1791543374746,
       "tag": "0031_startup_application",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1791601701464,
+      "tag": "0032_mcp_oauth_provider",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1791603693000,
+      "tag": "0033_device_authorization",
+      "breakpoints": true
     }
   ]
 }

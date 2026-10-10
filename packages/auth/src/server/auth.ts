@@ -1,5 +1,8 @@
 import { createHmac } from "node:crypto";
 import { apiKey } from "@better-auth/api-key";
+import { cimd } from "@better-auth/cimd";
+import { mcp } from "@better-auth/mcp";
+import { oauthDeviceAuthorization } from "@better-auth/oauth-provider";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -47,6 +50,7 @@ import {
 	userDisplayNamePartsTooLong,
 	userNamePartMaxLengthMessage,
 } from "../user-name-limits";
+import { fetchClientMetadataResourceBun } from "./cimd-transport";
 import { authServerConfig } from "./config";
 import { redis } from "./redis";
 import { sessionCacheRedis } from "./session-cache-redis";
@@ -348,6 +352,14 @@ export const auth = betterAuth({
 		delete: async (key) => {
 			await redis.delete(key);
 		},
+		// Required by Better Auth 1.7 SecondaryStorage (rate limiting, OTP
+		// single-use reads). Backed by the same prefixed RedisCache.
+		getAndDelete: async (key) => {
+			return await redis.getAndDelete(key);
+		},
+		increment: async (key, ttl) => {
+			return await redis.incrementWithTtl(key, ttl);
+		},
 	},
 	hooks: {
 		after: createAuthMiddleware(async (ctx) => {
@@ -451,10 +463,62 @@ export const auth = betterAuth({
 	session: {
 		expiresIn: 60 * 60 * 24 * 7,
 		updateAge: 60 * 60 * 24,
+		// Required by the MCP OAuth provider when secondaryStorage is set:
+		// sessions are persisted to PG (new `session` table) in addition to
+		// Redis. Reads still come from secondary storage, so existing
+		// Redis-only sessions keep working with no mass logout.
+		storeSessionInDatabase: true,
 	},
 	trustedOrigins: ["*"],
 	plugins: [
 		jwt(),
+		// OAuth 2.1 authorization server + RFC 9728 protected resource for
+		// MCP clients. DCR stays disabled (MCP deprecates it); client
+		// identity comes from CIMD documents below. Do NOT also register a
+		// separate oauthProvider() — mcp() already is the provider.
+		mcp({
+			loginPage: authServerConfig.MCP_LOGIN_PAGE,
+			consentPage: authServerConfig.MCP_CONSENT_PAGE,
+			resource: authServerConfig.MCP_RESOURCE,
+		}),
+		// Client ID Metadata Documents, MCP 2026-07-28 profile (pins CIMD
+		// draft-00). Bun has no @better-auth/cimd/node equivalent, so the
+		// fetch transport is the Bun-native resolve-once + connection-pinning
+		// implementation in ./cimd-transport.
+		cimd({
+			fetchClientMetadataResource: fetchClientMetadataResourceBun,
+			metadataProfile: "mcp-2026-07-28",
+		}),
+		// RFC 8628 device flow issuing OAuth access tokens (the CLI path).
+		// Registered OAuth clients poll /oauth2/token with the device_code
+		// grant; users approve at DEVICE_VERIFICATION_URI. Every code issued
+		// here carries OAuth fields, so /device/token (Better Auth session
+		// issuance) rejects them via assertSessionRedemption: device codes
+		// cannot be redeemed for a session token, only for OAuth tokens.
+		oauthDeviceAuthorization({
+			verificationUri: authServerConfig.DEVICE_VERIFICATION_URI,
+			validateClient: async (clientId) => {
+				// Unknown client IDs are rejected: only registered, enabled
+				// OAuth clients may start a device flow. (CIMD-identified
+				// clients must be discovered/registered first.)
+				const [row] = await db
+					.select({
+						id: schema.oauthClient.id,
+						disabled: schema.oauthClient.disabled,
+					})
+					.from(schema.oauthClient)
+					.where(eq(schema.oauthClient.clientId, clientId))
+					.limit(1);
+				if (!row) return false;
+				return !row.disabled;
+			},
+			onDeviceAuthRequest: async (clientId, scope) => {
+				log.info({
+					...{ data: { clientId, scope } },
+					message: "Device authorization requested:",
+				});
+			},
+		}),
 		bearer(),
 		admin({
 			defaultRole: DEFAULT_USER_ROLE,
@@ -698,11 +762,28 @@ export const auth = betterAuth({
 	},
 });
 
-let _schema: ReturnType<typeof auth.api.generateOpenAPISchema> | null = null;
+interface OpenAPISchemaDocument {
+	paths: Record<string, OpenAPIPathItem | undefined>;
+	components: Record<string, unknown>;
+}
 
-const getSchema = async () => {
+let _schema: OpenAPISchemaDocument | null = null;
+
+const getSchema = async (): Promise<OpenAPISchemaDocument> => {
 	if (!_schema) {
-		_schema = auth.api.generateOpenAPISchema();
+		// Better Auth 1.7 serves schema generation as the openAPI plugin's
+		// public `/open-api/generate-schema` endpoint. Dispatch internally so
+		// this helper never depends on plugin barrel internals.
+		const basePath = auth.options.basePath ?? "/api/auth/v1";
+		const res = await auth.handler(
+			new Request(
+				`${authServerConfig.BASE_URL}${basePath}/open-api/generate-schema`,
+			),
+		);
+		if (!res.ok) {
+			throw new Error(`openapi generate-schema failed: ${res.status}`);
+		}
+		_schema = (await res.json()) as OpenAPISchemaDocument;
 	}
 	return _schema;
 };

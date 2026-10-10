@@ -12,8 +12,11 @@
 		"catalog": {
 			"typescript": "5.9.2",
 			"@types/node": "24.0.15",
-			"better-auth": "1.6.9",
-			"@better-auth/api-key": "^1.6.9",
+			"better-auth": "1.7.7",
+			"@better-auth/api-key": "^1.7.7",
+			"@better-auth/mcp": "1.7.7",
+			"@better-auth/cimd": "1.7.7",
+			"@better-auth/oauth-provider": "1.7.7",
 			"axios": "1.12.2"
 		},
 		"catalogs": {
