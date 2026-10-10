@@ -1,7 +1,7 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { connect } from "node:tls";
-import { isPublicRoutableHost } from "@better-auth/core/utils/host";
+import { isPublicRoutableIP } from "./ssrf-guard";
 import type { ClientMetadataResourceFetch } from "@better-auth/oauth-provider";
 
 /**
@@ -157,7 +157,7 @@ export const fetchClientMetadataResourceBun: ClientMetadataResourceFetch =
 		if (answers.length === 0)
 			throw new TypeError("metadata hostname returned no DNS addresses");
 		for (const answer of answers) {
-			if (!isPublicRoutableHost(answer.address))
+			if (!isPublicRoutableIP(answer.address))
 				throw new TypeError(
 					"metadata hostname must resolve only to public-routable addresses",
 				);
