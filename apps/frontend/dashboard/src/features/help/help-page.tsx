@@ -48,8 +48,8 @@ export function HelpPage() {
 						Help
 					</h1>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
-						Chat directly with the founders. Whoever is free jumps in —
-						typically replies in 2 to 3 minutes.
+						Chat directly with the founders. Whoever is free jumps in typically
+						replies in 2 to 3 minutes.
 					</p>
 				</div>
 			</div>
