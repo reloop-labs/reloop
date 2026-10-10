@@ -68,6 +68,18 @@ services:
                 - "'    handle /api/email* {' \\"
                 - "'        reverse_proxy srv-captain--$$cap_appname-email:8022' \\"
                 - "'    }' \\"
+                - "'    handle /mcp* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-mcp:8029' \\"
+                - "'    }' \\"
+                - "'    handle /.well-known/oauth-protected-resource* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-mcp:8029' \\"
+                - "'    }' \\"
+                - "'    handle /.well-known/oauth-authorization-server* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-auth:8000' \\"
+                - "'    }' \\"
+                - "'    handle /.well-known/openid-configuration* {' \\"
+                - "'        reverse_proxy srv-captain--$$cap_appname-auth:8000' \\"
+                - "'    }' \\"
                 - "'' \\"
                 - "'    @removed path /api/credits* /api/tool* /api/admin*' \\"
                 - "'    handle @removed {' \\"
@@ -656,6 +668,15 @@ services:
             notExposeAsWebApp: 'true'
         depends_on:
             - $$cap_appname-auth
+    $$cap_appname-mcp:
+        image: reloopsh/be-mcp:$$cap_reloop_version
+        environment:
+            NODE_ENV: production
+            HOST: 0.0.0.0
+            PORT: '8029'
+            RELOOP_BASE_URL: https://$$cap_reloop_domain
+        caproverExtra:
+            notExposeAsWebApp: 'true'
     $$cap_appname-inbox:
         image: reloopsh/be-inbox:$$cap_reloop_version
         environment:

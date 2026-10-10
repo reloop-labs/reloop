@@ -133,6 +133,18 @@ services:
           	handle /api/email* {
           		reverse_proxy email:8022
           	}
+          	handle /mcp* {
+          		reverse_proxy mcp:8029
+          	}
+          	handle /.well-known/oauth-protected-resource* {
+          		reverse_proxy mcp:8029
+          	}
+          	handle /.well-known/oauth-authorization-server* {
+          		reverse_proxy auth:8000
+          	}
+          	handle /.well-known/openid-configuration* {
+          		reverse_proxy auth:8000
+          	}
 
           	@removed path /api/credits* /api/tool* /api/admin*
           	handle @removed {
@@ -315,6 +327,14 @@ services:
       <<: *backend-env
       PORT: 8022
     depends_on: *backend-depends
+
+  mcp:
+    image: reloopsh/be-mcp:${RELOOP_VERSION:-latest}
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8029
+      RELOOP_BASE_URL: ${SERVICE_URL_PROXY}
 
   spam:
     image: reloopsh/be-spam:${RELOOP_VERSION:-latest}

@@ -12,6 +12,7 @@ import { authConfig } from "./auth.config";
 import { landing } from "./landing";
 import { auth, OpenAPI } from "./lib/auth";
 import { loader } from "./loader";
+import { handleOAuthDiscovery } from "./routes/discovery/oauth-discovery";
 import { setupRoutes } from "./routes/setup/setup.route";
 
 const parseOtlpHeaders = (
@@ -44,6 +45,9 @@ initLogger({
 const port = authConfig.port;
 
 const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
+	// Root /.well-known OAuth discovery sits outside the /api/auth prefix, so
+	// it is answered before routing.
+	.onRequest(({ request }) => handleOAuthDiscovery(request))
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(requireUserAgentPlugin())
 	.use(cors({ origin: "*" }))

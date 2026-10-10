@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { authServerConfig } from "@reloop/auth/server/config";
 import { auth } from "../src/lib/auth";
+import {
+	handleOAuthDiscovery,
+	oauthDiscoveryPath,
+} from "../src/routes/discovery/oauth-discovery";
 
 const ISSUER = `${authServerConfig.BASE_URL}/api/auth/v1`;
 const RESOURCE = authServerConfig.MCP_RESOURCE;
@@ -39,5 +43,34 @@ describe("mcp authorization-server discovery", () => {
 	test("userinfo without a token is rejected, not misrouted", async () => {
 		const res = await handle(`${ISSUER}/oauth2/userinfo`);
 		expect(res.status).toBe(401);
+	});
+});
+
+describe("root-level oauth discovery", () => {
+	test("maps root and path-inserted discovery URLs to the issuer document", () => {
+		expect(oauthDiscoveryPath("/.well-known/oauth-authorization-server")).toBe(
+			"/api/auth/v1/.well-known/oauth-authorization-server",
+		);
+		expect(
+			oauthDiscoveryPath("/.well-known/oauth-authorization-server/api/auth/v1"),
+		).toBe("/api/auth/v1/.well-known/oauth-authorization-server");
+		expect(
+			oauthDiscoveryPath("/.well-known/openid-configuration/api/auth/v1"),
+		).toBe("/api/auth/v1/.well-known/openid-configuration");
+		expect(
+			oauthDiscoveryPath("/.well-known/oauth-authorization-server/other"),
+		).toBeNull();
+		expect(oauthDiscoveryPath("/api/auth/v1/session")).toBeNull();
+	});
+
+	test("serves issuer metadata at the path-inserted URL", async () => {
+		const res = await handleOAuthDiscovery(
+			new Request(
+				`${authServerConfig.BASE_URL}/.well-known/oauth-authorization-server/api/auth/v1`,
+			),
+		);
+		expect(res?.status).toBe(200);
+		const meta = (await res?.json()) as Record<string, unknown>;
+		expect(meta.issuer).toBe(ISSUER);
 	});
 });

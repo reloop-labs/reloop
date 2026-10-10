@@ -223,6 +223,19 @@ services:
     environment:
       PORT: 8022
 
+  mcp:
+    image: reloopsh/be-mcp:${RELOOP_VERSION}
+    container_name: reloop-mcp
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8029
+      RELOOP_BASE_URL: ${BASE_URL}
+    networks:
+      - reloop
+    <<: *logging
+
   spam:
     image: reloopsh/be-spam:${RELOOP_VERSION}
     container_name: reloop-spam

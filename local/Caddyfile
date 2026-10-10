@@ -159,6 +159,21 @@ local.reloop.sh, *.local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
+    # OAuth authorization server discovery (root + RFC 8414 path-inserted); auth serves these itself
+    handle /.well-known/oauth-authorization-server* {
+        reverse_proxy host.docker.internal:8000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /.well-known/openid-configuration* {
+        reverse_proxy host.docker.internal:8000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
     # Preferences and Redirect service
     handle /preferences* {
         reverse_proxy host.docker.internal:3005 {
