@@ -96,11 +96,11 @@ curl -s http://127.0.0.1:3000/mcp/healthz
 | `RELOOP_TIMEOUT_MS` | `30000` | Per-request upstream timeout, 1000 to 600000 |
 | `HOST` | `127.0.0.1` | HTTP bind hostname |
 | `PORT` | `3000` | HTTP bind port |
-| `MCP_ALLOWED_HOSTS` | loopback names | Comma-separated `Host` header allowlist |
+| `MCP_ALLOWED_HOSTS` | `*` | Comma-separated `Host` header allowlist; `*` or unset accepts any host |
 | `MCP_ALLOWED_ORIGINS` | loopback origins | Comma-separated `Origin` header allowlist |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error`, or `silent` |
 
-When the server binds to a non-loopback host and `MCP_ALLOWED_HOSTS` is empty, the `Host` header is not validated. Behind a proxy, set it to the public hostname.
+When `MCP_ALLOWED_HOSTS` is unset or `*`, the `Host` header is not validated; every request still needs an API key or OAuth token. Set it to restrict which hostnames the server answers on.
 
 Embedding the handler in any fetch-based server:
 
@@ -275,7 +275,8 @@ Writes (`contacts_create`, `email_send`) are never marked retryable after a time
 
 ```bash
 bun install
-bun run dev
+bun run dev        # HTTP via .env (local: cp .env.dev .env → https://local.reloop.sh/mcp)
+bun run dev:stdio
 bun run dev:http
 bun run lint
 bun run format

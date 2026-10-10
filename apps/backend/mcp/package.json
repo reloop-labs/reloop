@@ -42,7 +42,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"dev": "bun src/cli.ts --transport stdio",
+		"dev": "bun --watch src/cli.ts --transport http",
+		"dev:stdio": "bun src/cli.ts --transport stdio",
 		"dev:http": "bun --watch src/cli.ts --transport http",
 		"build": "bun run build:cli && bun run build:lib && bun run build:types",
 		"build:cli": "bun build src/cli.ts --outfile dist/cli.js --target node --format esm --packages external --banner '#!/usr/bin/env node'",

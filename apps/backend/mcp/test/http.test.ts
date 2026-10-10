@@ -237,8 +237,17 @@ describe("host validation", () => {
 		await handler.close();
 	});
 
-	test("accepts any host when bound publicly without an allowlist", async () => {
-		const handler = handlerFor({ host: "0.0.0.0" });
+	test("accepts any host when the allowlist is a wildcard", async () => {
+		const handler = handlerFor({ host: "127.0.0.1", allowedHosts: ["*"] });
+		const response = await handler.fetch(
+			mcpRequest({ host: "anything.example", "x-api-key": API_KEY }),
+		);
+		expect(response.status).not.toBe(403);
+		await handler.close();
+	});
+
+	test("accepts any host without an allowlist", async () => {
+		const handler = handlerFor({ host: "127.0.0.1" });
 		const response = await handler.fetch(
 			mcpRequest({ host: "anything.example", "x-api-key": API_KEY }),
 		);
@@ -272,28 +281,6 @@ describe("request hardening", () => {
 			);
 			expect(response.status).toBe(413);
 		}
-		await handler.close();
-	});
-
-	test("treats a bracketed IPv6 loopback bind as loopback", async () => {
-		const handler = handlerFor({ host: "[::1]" });
-		const rejected = await handler.fetch(
-			mcpRequest({ host: "evil.example", "x-api-key": API_KEY }),
-		);
-		expect(rejected.status).toBe(403);
-		await handler.close();
-	});
-
-	test("warns when host validation is off", async () => {
-		const { logger, lines } = capturingLogger();
-		const handler = createHttpHandler({
-			config: testConfig({ host: "0.0.0.0" }),
-			logger,
-			fetch: mockReloop([]).fetch,
-		});
-		expect(
-			lines.some((line) => line.includes("Host header validation is off")),
-		).toBe(true);
 		await handler.close();
 	});
 });

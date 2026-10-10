@@ -1,7 +1,6 @@
 import {
 	createMcpHandler,
 	hostHeaderValidationResponse,
-	localhostAllowedHostnames,
 	localhostAllowedOrigins,
 	originValidationResponse,
 } from "@modelcontextprotocol/server";
@@ -86,6 +85,7 @@ function exceedsBodyLimit(request: Request): boolean {
 	return !Number.isFinite(declared) || declared > MAX_REQUEST_BODY_BYTES;
 }
 const LOOPBACK_HOSTS = ["127.0.0.1", "localhost", "::1", "[::1]"];
+const ANY_HOST = "*";
 
 function isLoopback(host: string): boolean {
 	return LOOPBACK_HOSTS.includes(host);
@@ -139,24 +139,15 @@ export function createHttpHandler(
 		{ legacy: "stateless" },
 	);
 
-	const allowedHosts =
-		config.allowedHosts.length > 0
-			? config.allowedHosts
-			: isLoopback(config.host)
-				? localhostAllowedHostnames()
-				: [];
+	const allowedHosts = config.allowedHosts.includes(ANY_HOST)
+		? []
+		: config.allowedHosts;
 	const allowedOrigins =
 		config.allowedOrigins.length > 0
 			? config.allowedOrigins
 			: isLoopback(config.host)
 				? localhostAllowedOrigins()
 				: [];
-	if (allowedHosts.length === 0) {
-		logger.warn(
-			"Host header validation is off: bound to a non-loopback host without MCP_ALLOWED_HOSTS",
-			{ host: config.host },
-		);
-	}
 
 	const serve = async (request: Request, url: URL): Promise<Response> => {
 		if (

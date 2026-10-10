@@ -2,6 +2,8 @@ node_modules/
 dist/
 .env
 .env.*
+!.env.dev
+!.env.prod
 *.log
 docs/
 tsconfig.tsbuildinfo

@@ -54,9 +54,8 @@ export async function createEmailLog_step4({
 	idempotencyKey?: string;
 }) {
 	const key = idempotencyKey?.trim().slice(0, 500) || undefined;
-	let logRecord: { id: string } | undefined;
-	try {
-		[logRecord] = await db
+	async function insertLog() {
+		const [record] = await db
 			.insert(emailLog)
 			.values({
 				messageId: `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -92,9 +91,16 @@ export async function createEmailLog_step4({
 			size: (body.text?.length || 0) + (body.html?.length || 0),
 		})
 		.returning({ id: emailLog.id });
+		return record;
+	}
+	let logRecord: { id: string } | undefined;
+	try {
+		logRecord = await insertLog();
 	} catch (error) {
 		// Concurrent same-key send won the race — hand the winner's id back
 		// so the caller refunds its reservation and returns the original.
+		// Exception: the winner failed transmission — free its key and retry
+		// as a fresh send instead of replaying the failure.
 		const code = (error as { code?: string })?.code;
 		const msg = error instanceof Error ? error.message : String(error);
 		if (key && (code === "23505" || msg.includes("duplicate key"))) {
@@ -103,11 +109,24 @@ export async function createEmailLog_step4({
 					eq(emailLog.organizationId, organizationId),
 					eq(emailLog.idempotencyKey, key),
 				),
-				columns: { id: true },
+				columns: { id: true, status: true },
 			});
-			if (winner) throw new IdempotentReplayError(winner.id);
+			if (winner) {
+				if (winner.status === "failed") {
+					await db
+						.update(emailLog)
+						.set({ idempotencyKey: null })
+						.where(eq(emailLog.id, winner.id));
+					logRecord = await insertLog();
+				} else {
+					throw new IdempotentReplayError(winner.id);
+				}
+			} else {
+				throw error;
+			}
+		} else {
+			throw error;
 		}
-		throw error;
 	}
 
 	if (!logRecord) {

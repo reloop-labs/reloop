@@ -59,9 +59,22 @@ async function findIdempotentSend({
 			eq(emailLog.organizationId, organizationId),
 			eq(emailLog.idempotencyKey, idempotencyKey),
 		),
-		columns: { id: true, messageId: true, status: true, createdAt: true },
+		columns: {
+			id: true,
+			messageId: true,
+			status: true,
+			errorMessage: true,
+			createdAt: true,
+		},
 	});
 	if (!row) return null;
+	// Transmission failures never block retries — a retry with the same key
+	// is treated as a fresh send. Every other status (pending/sent/
+	// delivered/bounced/spam/…) keeps classic idempotent replay.
+	// "failed" is only ever written when KumoMTA injection/transmission did
+	// not succeed (step-6) or delivery expired afterwards, i.e. nothing was
+	// actually delivered.
+	if (row.status === "failed") return null;
 	return {
 		success: true,
 		messageId: row.messageId,
@@ -69,6 +82,38 @@ async function findIdempotentSend({
 		timestamp: row.createdAt.toISOString(),
 		id: row.id,
 	};
+}
+
+/**
+ * Free an idempotency key held by a transmission-failed row so a retry with
+ * the same key can insert a fresh log row instead of hitting the
+ * (organization_id, idempotency_key) unique constraint. No-op when the key
+ * is held by a non-failed row (those keep replay semantics) or not held.
+ */
+async function releaseFailedIdempotencyKey({
+	organizationId,
+	idempotencyKey,
+}: {
+	organizationId: string;
+	idempotencyKey: string;
+}): Promise<void> {
+	const row = await db.query.emailLog.findFirst({
+		where: and(
+			eq(emailLog.organizationId, organizationId),
+			eq(emailLog.idempotencyKey, idempotencyKey),
+		),
+		columns: { id: true, status: true },
+	});
+	if (!row || row.status !== "failed") return;
+	await db
+		.update(emailLog)
+		.set({ idempotencyKey: null })
+		.where(eq(emailLog.id, row.id));
+	log.info({
+		message: "Released idempotency key from transmission-failed send",
+		organizationId,
+		emailLogId: row.id,
+	});
 }
 
 export async function sendEmailController({
@@ -120,6 +165,11 @@ export async function sendEmailController({
 			});
 			return replay;
 		}
+		// Previous attempt with this key failed transmission — free the key
+		// so this retry inserts a fresh row instead of colliding on the
+		// unique (organization_id, idempotency_key) index. Non-failed rows
+		// would have returned above, so this only touches failed rows.
+		await releaseFailedIdempotencyKey({ organizationId, idempotencyKey });
 	}
 
 	// ── Reputation + duplicate burst guards ─────────────────────────────

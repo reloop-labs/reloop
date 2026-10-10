@@ -80,13 +80,18 @@ export async function sendEmail_step6({
 		const errorMessage = error instanceof Error ? error.message : String(error);
 
 		// Mark the log record as failed before re-throwing so it is never
-		// stuck permanently in "pending" status.
+		// stuck permanently in "pending" status. The idempotency key is
+		// released (set to NULL) so a retry with the same key is treated as
+		// a fresh send instead of replaying this transmission failure.
+		// Non-transmission failures never reach this step (they throw before
+		// log creation), so every row marked here is a transmission failure.
 		await db
 			.update(emailLog)
 			.set({
 				status: "failed",
 				errorMessage,
 				failedAt: new Date(),
+				idempotencyKey: null,
 			})
 			.where(eq(emailLog.id, emailLogId))
 			// Swallow the DB error so the original send error always propagates.

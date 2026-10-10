@@ -32,7 +32,7 @@ Environment:
   RELOOP_AUTH_ISSUER   Better Auth issuer (default: <base>/api/auth/v1)
   RELOOP_TIMEOUT_MS    Request timeout in milliseconds (default: 30000)
   HOST, PORT           HTTP bind address
-  MCP_ALLOWED_HOSTS    Comma separated Host header allowlist
+  MCP_ALLOWED_HOSTS    Comma separated Host header allowlist (default *)
   MCP_ALLOWED_ORIGINS  Comma separated Origin header allowlist
   LOG_LEVEL            debug | info | warn | error | silent`;
 

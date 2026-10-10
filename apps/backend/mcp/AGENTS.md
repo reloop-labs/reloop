@@ -23,7 +23,8 @@ This is **not** the marketing and documentation MCP server at `reloop.sh/mcp`. T
 
 ```bash
 bun install
-bun run dev
+bun run dev        # HTTP via .env (local: cp .env.dev .env → https://local.reloop.sh/mcp)
+bun run dev:stdio
 bun run dev:http
 bun run lint
 bun run format
