@@ -1,0 +1,26 @@
+name: mcp
+
+services:
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp:local
+    container_name: mcp
+    ports:
+      - "3000:3000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - RELOOP_BASE_URL=${RELOOP_BASE_URL:-https://reloop.sh}
+      - RELOOP_TIMEOUT_MS=${RELOOP_TIMEOUT_MS:-30000}
+      - MCP_ALLOWED_HOSTS=${MCP_ALLOWED_HOSTS:-}
+      - MCP_ALLOWED_ORIGINS=${MCP_ALLOWED_ORIGINS:-}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch(`http://127.0.0.1:3000/mcp/healthz`).then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
