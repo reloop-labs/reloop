@@ -131,6 +131,17 @@ export function describeCapabilities(input: {
 	return capabilities;
 }
 
+/** One-line summary for the access row, e.g. "View and manage contacts, send email". */
+export function summarizeAccess(capabilities: ConsentCapability[]): string {
+	const summary = capabilities
+		.filter((capability) => capability.id !== "offline")
+		.map((capability) => capability.title.toLowerCase())
+		.join(", ");
+	return summary
+		? summary.charAt(0).toUpperCase() + summary.slice(1)
+		: "Confirm your account";
+}
+
 export function redirectHost(redirectUri: string): string {
 	try {
 		return new URL(redirectUri).host;

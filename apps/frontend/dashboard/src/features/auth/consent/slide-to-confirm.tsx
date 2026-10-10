@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import {
 	animate,
@@ -11,8 +12,8 @@ import {
 } from "framer-motion";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-const KNOB_WIDTH = 136;
-const TRACK_PADDING = 6;
+const KNOB_WIDTH = 64;
+const TRACK_PADDING = 4;
 const CONFIRM_RATIO = 0.82;
 const SPRING = { type: "spring", stiffness: 520, damping: 40 } as const;
 
@@ -31,7 +32,7 @@ export function SlideToConfirm({
 }: {
 	label: string;
 	pendingLabel: string;
-	knob: ReactNode;
+	knob?: ReactNode;
 	disabled?: boolean;
 	pending?: boolean;
 	onConfirm: () => void;
@@ -40,7 +41,18 @@ export function SlideToConfirm({
 	const [maxX, setMaxX] = useState(0);
 	const x = useMotionValue(0);
 	const labelOpacity = useTransform(x, [0, Math.max(maxX * 0.6, 1)], [1, 0]);
-	const fillWidth = useTransform(x, (value) => value + KNOB_WIDTH);
+	const fillWidth = useTransform(x, (value) => {
+		if (value <= 0) return 0;
+		if (maxX <= 0) return 0;
+		const progress = Math.min(Math.max(value / maxX, 0), 1);
+		const base = value + KNOB_WIDTH / 2 + TRACK_PADDING;
+		const full = maxX + KNOB_WIDTH + TRACK_PADDING * 2;
+		if (progress > 0.7) {
+			const t = (progress - 0.7) / 0.3;
+			return base + (full - base) * t;
+		}
+		return base;
+	});
 
 	useEffect(() => {
 		const track = trackRef.current;
@@ -74,7 +86,7 @@ export function SlideToConfirm({
 		<div
 			ref={trackRef}
 			className={cn(
-				"relative h-[60px] w-full select-none overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]",
+				"relative h-12 w-full select-none overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]",
 				disabled && "opacity-50",
 			)}
 		>
@@ -86,7 +98,7 @@ export function SlideToConfirm({
 			<motion.span
 				aria-hidden
 				style={{ opacity: pending ? 1 : labelOpacity }}
-				className="pointer-events-none absolute inset-0 flex items-center justify-center pl-[136px] font-medium text-sm text-text-sub-600"
+				className="pointer-events-none absolute inset-0 flex items-center justify-center font-medium text-sm text-text-sub-600"
 			>
 				{pending ? pendingLabel : label}
 			</motion.span>
@@ -114,14 +126,19 @@ export function SlideToConfirm({
 					x,
 					width: KNOB_WIDTH,
 					top: TRACK_PADDING,
+					bottom: TRACK_PADDING,
 					left: TRACK_PADDING,
 				}}
 				className={cn(
-					"absolute bottom-[6px] flex items-center justify-center rounded-full bg-bg-white-0 text-text-strong-950 shadow-regular-xs outline-none ring-1 ring-stroke-soft-200 ring-inset focus-visible:ring-2 focus-visible:ring-primary-base dark:bg-white dark:text-black dark:ring-0",
+					"absolute flex items-center justify-center rounded-full bg-bg-white-0 text-text-strong-950 shadow-regular-xs outline-none ring-1 ring-stroke-soft-200 ring-inset focus-visible:ring-2 focus-visible:ring-primary-base dark:bg-white dark:text-black dark:ring-0",
 					locked ? "cursor-default" : "cursor-grab active:cursor-grabbing",
 				)}
 			>
-				{pending ? <Spinner size={16} color="currentColor" /> : knob}
+				{pending ? (
+					<Spinner size={16} color="currentColor" />
+				) : (
+					(knob ?? <Icon name="chevron-right" className="size-4.5" />)
+				)}
 			</motion.button>
 		</div>
 	);
