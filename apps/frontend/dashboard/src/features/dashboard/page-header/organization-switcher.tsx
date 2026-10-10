@@ -8,49 +8,9 @@ import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-ba
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 import { getAvatarInitial } from "#/utils/avatar";
-import { PixelAvatar } from "./pixel-avatar";
+import { OrgAvatar } from "./org-avatar";
 import { PlanBadge } from "./plan-badge";
 import type { Organization } from "./use-active-organization";
-
-function OrgAvatar({
-	org,
-	size,
-}: {
-	org: { id: string; name: string; logo?: string | null };
-	size: number;
-}) {
-	const [imgError, setImgError] = useState(false);
-	const logoSrc = ensureAbsoluteUrl(org.logo);
-	const initial = getAvatarInitial(org.name, org.name);
-	const dim = size === 20 ? "h-5 w-5" : "h-6 w-6";
-
-	if (logoSrc && !imgError) {
-		return (
-			<div
-				className={cn(
-					"flex flex-shrink-0 items-center justify-center overflow-hidden rounded-lg",
-					dim,
-				)}
-			>
-				<img
-					src={logoSrc}
-					alt={org.name}
-					className="h-full w-full object-cover"
-					onError={() => setImgError(true)}
-					referrerPolicy="no-referrer"
-				/>
-			</div>
-		);
-	}
-
-	return (
-		<div
-			className={cn("relative flex-shrink-0 overflow-hidden rounded-lg", dim)}
-		>
-			<PixelAvatar seed={org.id} letter={initial} />
-		</div>
-	);
-}
 
 interface OrganizationSwitcherProps {
 	organizations: Organization[] | undefined;

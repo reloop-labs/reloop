@@ -51,6 +51,86 @@ export function describeScope(scope: string): string {
 	return scope.replace(/[_:-]+/g, " ").trim() || scope;
 }
 
+export interface ConsentCapability {
+	id: string;
+	icon: string;
+	title: string;
+	description: string;
+}
+
+function isMcpResource(resource: string): boolean {
+	try {
+		return new URL(resource).pathname.replace(/\/+$/, "").endsWith("/mcp");
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Plain-language list of what approving grants. Identity scopes collapse into
+ * one line; an MCP resource adds the Reloop tools the token unlocks in the
+ * chosen workspace (mirrors the reloop-mcp tool set).
+ */
+export function describeCapabilities(input: {
+	scopes: string[];
+	resources: string[];
+}): ConsentCapability[] {
+	const capabilities: ConsentCapability[] = [];
+	if (input.resources.some(isMcpResource)) {
+		capabilities.push(
+			{
+				id: "contacts",
+				icon: "contacts",
+				title: "View and manage contacts",
+				description: "List, create, update and delete contacts.",
+			},
+			{
+				id: "email",
+				icon: "mail-send",
+				title: "Send email",
+				description: "Send email from this workspace's verified domains.",
+			},
+		);
+	}
+	const identity = ["openid", "profile", "email"].filter((scope) =>
+		input.scopes.includes(scope),
+	);
+	if (identity.length > 0) {
+		const parts = [
+			input.scopes.includes("profile") ? "name" : null,
+			input.scopes.includes("email") ? "email address" : null,
+		].filter(Boolean);
+		capabilities.push({
+			id: "identity",
+			icon: "user-circle",
+			title: "Know who you are",
+			description:
+				parts.length > 0
+					? `See your ${parts.join(" and ")}.`
+					: "Confirm your Reloop account.",
+		});
+	}
+	if (input.scopes.includes("offline_access")) {
+		capabilities.push({
+			id: "offline",
+			icon: "refresh",
+			title: "Stay connected",
+			description: "Keep access until you revoke it.",
+		});
+	}
+	const known = new Set(["openid", "profile", "email", "offline_access"]);
+	for (const scope of input.scopes) {
+		if (known.has(scope)) continue;
+		capabilities.push({
+			id: `scope:${scope}`,
+			icon: "key",
+			title: describeScope(scope),
+			description: scope,
+		});
+	}
+	return capabilities;
+}
+
 export function redirectHost(redirectUri: string): string {
 	try {
 		return new URL(redirectUri).host;

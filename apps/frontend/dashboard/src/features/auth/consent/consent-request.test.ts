@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+	describeCapabilities,
 	describeScope,
 	parseOAuthAuthorizationRequest,
 	redirectHost,
@@ -49,5 +50,32 @@ describe("redirectHost", () => {
 			"client.example.com",
 		);
 		expect(redirectHost("not a url")).toBe("not a url");
+	});
+});
+
+describe("describeCapabilities", () => {
+	test("an MCP resource lists the Reloop tools plus identity", () => {
+		const ids = describeCapabilities({
+			scopes: ["openid", "profile", "email", "offline_access"],
+			resources: ["https://reloop.sh/mcp"],
+		}).map((c) => c.id);
+		expect(ids).toEqual(["contacts", "email", "identity", "offline"]);
+	});
+
+	test("identity scopes collapse into one line describing what is shared", () => {
+		const [identity] = describeCapabilities({
+			scopes: ["openid", "email"],
+			resources: [],
+		});
+		expect(identity?.id).toBe("identity");
+		expect(identity?.description).toBe("See your email address.");
+	});
+
+	test("unknown scopes are still surfaced", () => {
+		const ids = describeCapabilities({
+			scopes: ["contacts:write"],
+			resources: ["https://api.example.com/other"],
+		}).map((c) => c.id);
+		expect(ids).toEqual(["scope:contacts:write"]);
 	});
 });
