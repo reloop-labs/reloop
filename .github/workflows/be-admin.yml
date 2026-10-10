@@ -5,6 +5,13 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/admin/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/dns/**'
+      - 'packages/pricing/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'packages/db/**'
       - '.github/workflows/be-admin.yml'
       - 'docker-compose.setup.yml'
@@ -12,6 +19,13 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/admin/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/dns/**'
+      - 'packages/pricing/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'packages/db/**'
       - '.github/workflows/be-admin.yml'
       - 'docker-compose.setup.yml'

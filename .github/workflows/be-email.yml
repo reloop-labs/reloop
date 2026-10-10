@@ -6,12 +6,28 @@ on:
     tags: [ 'v*' ]
     paths:
       - 'apps/backend/email/**'
+      - 'packages/auth/**'
+      - 'packages/brand/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-email.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/email/**'
+      - 'packages/auth/**'
+      - 'packages/brand/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-email.yml'
   workflow_dispatch:

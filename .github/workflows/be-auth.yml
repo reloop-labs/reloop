@@ -6,6 +6,13 @@ on:
     tags: [ 'v*' ]
     paths:
       - 'apps/backend/auth/**'
+      - 'packages/brand/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'packages/auth/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-auth.yml'
@@ -13,6 +20,13 @@ on:
     branches: [ main ]
     paths:
       - 'apps/backend/auth/**'
+      - 'packages/brand/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'packages/auth/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-auth.yml'

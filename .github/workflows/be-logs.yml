@@ -6,12 +6,30 @@ on:
     tags: [ 'v*' ]
     paths:
       - 'apps/backend/logs/**'
+      - 'packages/auth/**'
+      - 'packages/brand/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-logs.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/logs/**'
+      - 'packages/auth/**'
+      - 'packages/brand/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'docker-compose.setup.yml'
       - '.github/workflows/be-logs.yml'
   workflow_dispatch:

@@ -6,6 +6,17 @@ on:
       - main
     paths:
       - 'apps/frontend/docs/**'
+      - 'packages/analytics/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/code-samples/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tailwind/**'
+      - 'packages/tsconfig/**'
+      - 'packages/ui/**'
+      - 'packages/webhook-events/**'
   workflow_dispatch:
 
 permissions:

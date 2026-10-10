@@ -8,6 +8,14 @@ on:
       - 'v*'
     paths:
       - 'apps/frontend/links/**'
+      - 'packages/auth/**'
+      - 'packages/bus/**'
+      - 'packages/cache/**'
+      - 'packages/db/**'
+      - 'packages/dns/**'
+      - 'packages/tailwind/**'
+      - 'packages/tsconfig/**'
+      - 'packages/webhook-events/**'
       - 'packages/ui/**'
       - '.github/workflows/fe-links.yml'
   workflow_dispatch:
