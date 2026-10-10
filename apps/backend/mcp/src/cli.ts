@@ -28,6 +28,8 @@ Options:
 Environment:
   RELOOP_API_KEY       Reloop API key (required for the stdio transport)
   RELOOP_BASE_URL      Reloop instance origin
+  RELOOP_MCP_RESOURCE  Canonical MCP resource identifier (default: <base>/mcp)
+  RELOOP_AUTH_ISSUER   Better Auth issuer (default: <base>/api/auth/v1)
   RELOOP_TIMEOUT_MS    Request timeout in milliseconds (default: 30000)
   HOST, PORT           HTTP bind address
   MCP_ALLOWED_HOSTS    Comma separated Host header allowlist

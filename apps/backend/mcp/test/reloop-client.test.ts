@@ -54,6 +54,27 @@ describe("ReloopClient", () => {
 		expect(call?.headers["content-type"]).toBeUndefined();
 	});
 
+	test("sends OAuth tokens as an authorization bearer upstream", async () => {
+		const jwt = "eyJhbGciOiJFZERTQSJ9.eyJzdWIiOiJ1c2VyLTEifQ.c2lnbmF0dXJl";
+		const mock = mockReloop([
+			{ method: "GET", path: "/api/contacts/list", body: {} },
+		]);
+		const reloop = new ReloopClient({
+			baseUrl: BASE_URL,
+			apiKey: jwt,
+			fetch: mock.fetch,
+			timeoutMs: 5000,
+		});
+		await reloop.request({
+			method: "GET",
+			path: "/api/contacts/list",
+			idempotent: true,
+		});
+		const call = mock.calls[0];
+		expect(call?.headers["authorization"]).toBe(`Bearer ${jwt}`);
+		expect(call?.headers["x-api-key"]).toBeUndefined();
+	});
+
 	test("sets content-type only for requests with a body", async () => {
 		const { mock, client: reloop } = client([
 			{ method: "POST", path: "/api/contacts/create", status: 201, body: {} },

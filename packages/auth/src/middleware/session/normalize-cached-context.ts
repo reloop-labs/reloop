@@ -7,7 +7,8 @@ export function normalizeCachedContext(
 	if (
 		cached.authType !== "session" &&
 		cached.authType !== "apikey" &&
-		cached.authType !== "internal"
+		cached.authType !== "internal" &&
+		cached.authType !== "oauth"
 	) {
 		return null;
 	}

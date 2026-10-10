@@ -5,9 +5,27 @@ The official [Model Context Protocol](https://modelcontextprotocol.io) server fo
 ## Transports
 
 - **stdio** — the client spawns the server as a child process and talks to it over stdin/stdout. Use this for local clients such as Claude Code, Claude Desktop, Cursor, and Codex. The key comes from `RELOOP_API_KEY`.
-- **Streamable HTTP** — one `POST /mcp` endpoint, stateless: no sessions, no sticky load balancing, horizontally scalable behind any load balancer. `GET /mcp/healthz` reports liveness (`GET /healthz` serves the same probe). This is the production and hosted model, and each client sends its own API key on every request.
+- **Streamable HTTP** — one `POST /mcp` endpoint, stateless: no sessions, no sticky load balancing, horizontally scalable behind any load balancer. `GET /mcp/healthz` reports liveness (`GET /healthz` serves the same probe). This is the production and hosted model. Each client authenticates per request with a Better Auth OAuth token (Connect) or its own API key.
 
 Legacy HTTP+SSE (two-endpoint transport) is not served.
+
+## Connect with OAuth (Better Auth)
+
+The HTTP transport is a Better Auth OAuth protected resource. OAuth-capable
+clients discover it automatically: `GET /.well-known/oauth-protected-resource/mcp`
+advertises the canonical resource (`RELOOP_MCP_RESOURCE`, default
+`<RELOOP_BASE_URL>/mcp`) and the authorization server (`RELOOP_AUTH_ISSUER`,
+default `<RELOOP_BASE_URL>/api/auth/v1`). Unauthenticated requests are
+challenged with `WWW-Authenticate: Bearer ... resource_metadata=...` per
+RFC 9728, so the client starts the browser authorize flow against the Reloop
+auth server and presents the issued access token as
+`Authorization: Bearer <oauth-token>`.
+
+The MCP server forwards the token to Reloop, which verifies the JWT signature
+against the auth server JWKS, checks issuer and audience, and resolves the
+user's organization (the `x-organization-id` header selects one when the user
+belongs to several). Reloop remains the authorization boundary: forged,
+expired, or wrong-audience tokens fail at Reloop, not here.
 
 ## Quick start (stdio)
 
@@ -52,7 +70,10 @@ bunx reloop-mcp --transport http --host 0.0.0.0 --port 3000
 
 The standalone HTTP server requires Bun. Node users run the Docker image or embed the exported fetch handler.
 
-Clients connect to `http://host:3000/mcp` and send their own Reloop key on every request as `Authorization: Bearer rl_prod_...` (or `x-api-key: rl_prod_...`). `RELOOP_API_KEY` is not used by the HTTP transport.
+Clients connect to `http://host:3000/mcp` and authenticate on every request:
+a Better Auth OAuth access token as `Authorization: Bearer <token>` (Connect,
+recommended), or a Reloop key as `Authorization: Bearer rl_prod_...` (or
+`x-api-key: rl_prod_...`). `RELOOP_API_KEY` is not used by the HTTP transport.
 
 ```bash
 docker build -t reloop/mcp .
@@ -70,6 +91,8 @@ curl -s http://127.0.0.1:3000/mcp/healthz
 | Variable | Default | Meaning |
 |---|---|---|
 | `RELOOP_BASE_URL` | `https://reloop.sh` | Origin of the Reloop instance |
+| `RELOOP_MCP_RESOURCE` | `<base>/mcp` | Canonical MCP resource identifier; must match the auth server `MCP_RESOURCE` |
+| `RELOOP_AUTH_ISSUER` | `<base>/api/auth/v1` | Better Auth issuer advertised in protected-resource metadata |
 | `RELOOP_TIMEOUT_MS` | `30000` | Per-request upstream timeout, 1000 to 600000 |
 | `HOST` | `127.0.0.1` | HTTP bind hostname |
 | `PORT` | `3000` | HTTP bind port |
@@ -93,12 +116,22 @@ export default { fetch: (request: Request) => handler.fetch(request) };
 
 ## Authentication
 
-Reloop API keys (`rl_prod_...`) are organization-scoped. The server never stores a key: it forwards the key of the current request to Reloop as an `x-api-key` header, and Reloop enforces authorization on every call.
+Reloop API keys (`rl_prod_...`) are organization-scoped. Better Auth OAuth
+access tokens are user-scoped and audience-bound to the MCP resource. The
+server never stores a credential: it forwards the credential of the current
+request to Reloop, and Reloop enforces authorization on every call.
 
-- **stdio** — the key comes from `RELOOP_API_KEY` in the process environment.
-- **HTTP** — each request carries its own key as a bearer token or `x-api-key` header. Requests without a plausibly shaped key are rejected with `401` before any upstream call.
+- **OAuth (Connect)** — `Authorization: Bearer <oauth-token>` on the HTTP
+  transport. Verified by Reloop via JWKS with issuer/audience checks, then
+  mapped to the user's organization. This is the recommended path for shared
+  and hosted deployments: no long-lived secrets on the client.
+- **API key (fallback)** — `RELOOP_API_KEY` for stdio; `Authorization: Bearer`
+  or `x-api-key` per request for HTTP. Use it for local single-user setups and
+  for clients without OAuth discovery.
 
-OAuth is not offered yet. Keys never appear in logs or tool output.
+Requests without a JWT-shaped bearer or a plausibly shaped key are rejected
+with `401` and an RFC 9728 `WWW-Authenticate` challenge naming the protected
+resource metadata. Keys and tokens never appear in logs or tool output.
 
 ## Tools
 

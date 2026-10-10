@@ -13,6 +13,8 @@ export type Config = {
 	allowedHosts: string[];
 	allowedOrigins: string[];
 	logLevel: LogLevel;
+	resource: string;
+	authIssuer: string;
 };
 
 export const DEFAULT_BASE_URL = "https://reloop.sh";
@@ -31,6 +33,10 @@ const LOG_LEVELS: readonly LogLevel[] = [
 ];
 const BASE_URL_FIX =
 	"Set RELOOP_BASE_URL to the origin of your Reloop instance, for example https://mail.example.com";
+const RESOURCE_FIX =
+	"Set RELOOP_MCP_RESOURCE to the canonical MCP resource identifier, for example https://mail.example.com/mcp. It must match the auth server MCP_RESOURCE.";
+const ISSUER_FIX =
+	"Set RELOOP_AUTH_ISSUER to the Better Auth issuer, for example https://mail.example.com/api/auth/v1.";
 
 export class ConfigError extends Error {
 	readonly code = "config_error";
@@ -77,6 +83,31 @@ export function validateBaseUrl(raw: string): string {
 function readText(env: Env, name: string): string | undefined {
 	const raw = env[name]?.trim();
 	return raw !== undefined && raw.length > 0 ? raw : undefined;
+}
+
+function readResourceUrl(raw: string, name: string, fix: string): string {
+	let url: URL;
+	try {
+		url = new URL(raw);
+	} catch {
+		throw new ConfigError(`${name} is not a valid URL: ${raw}`, fix);
+	}
+	if (url.protocol !== "http:" && url.protocol !== "https:") {
+		throw new ConfigError(
+			`${name} must use http or https, got ${url.protocol.replace(":", "")}`,
+			fix,
+		);
+	}
+	if (url.username !== "" || url.password !== "") {
+		throw new ConfigError(`${name} must not contain credentials`, fix);
+	}
+	if (url.search !== "" || url.hash !== "") {
+		throw new ConfigError(
+			`${name} must not contain a query string or fragment`,
+			fix,
+		);
+	}
+	return `${url.origin}${url.pathname}`.replace(/\/+$/, "");
 }
 
 function readInteger(
@@ -138,10 +169,11 @@ function readApiKey(env: Env): string | undefined {
 }
 
 export function readConfig(env: Env): Config {
+	const baseUrl = validateBaseUrl(
+		readText(env, "RELOOP_BASE_URL") ?? DEFAULT_BASE_URL,
+	);
 	return {
-		baseUrl: validateBaseUrl(
-			readText(env, "RELOOP_BASE_URL") ?? DEFAULT_BASE_URL,
-		),
+		baseUrl,
 		apiKey: readApiKey(env),
 		timeoutMs: readInteger(
 			env,
@@ -155,5 +187,15 @@ export function readConfig(env: Env): Config {
 		allowedHosts: readList(env, "MCP_ALLOWED_HOSTS"),
 		allowedOrigins: readList(env, "MCP_ALLOWED_ORIGINS"),
 		logLevel: readLogLevel(env),
+		resource: readResourceUrl(
+			readText(env, "RELOOP_MCP_RESOURCE") ?? `${baseUrl}/mcp`,
+			"RELOOP_MCP_RESOURCE",
+			RESOURCE_FIX,
+		),
+		authIssuer: readResourceUrl(
+			readText(env, "RELOOP_AUTH_ISSUER") ?? `${baseUrl}/api/auth/v1`,
+			"RELOOP_AUTH_ISSUER",
+			ISSUER_FIX,
+		),
 	};
 }

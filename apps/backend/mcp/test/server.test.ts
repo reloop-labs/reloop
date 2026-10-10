@@ -10,6 +10,7 @@ import {
 	contactFixture,
 	errorJson,
 	firstText,
+	listFixture,
 	mockReloop,
 	type Route,
 	readProperty,
@@ -232,6 +233,29 @@ describe("mcp server over streamable http", () => {
 		});
 		expect(first.isError).toBeUndefined();
 		expect(second.isError).toBeUndefined();
+		await close();
+		await handler.close();
+	});
+
+	test("serves OAuth clients with the bearer forwarded upstream", async () => {
+		const { mock, handler } = harness([
+			{
+				method: "GET",
+				path: "/api/contacts/list",
+				body: listFixture([contactFixture()]),
+			},
+		]);
+		const jwt = "eyJhbGciOiJFZERTQSJ9.eyJzdWIiOiJ1c2VyLTEifQ.c2lnbmF0dXJl";
+		const { client, close } = await connectHttpClient(handler, {
+			apiKey: jwt,
+		});
+		const result = await client.callTool({
+			name: "contacts_list",
+			arguments: {},
+		});
+		expect(result.isError).toBeUndefined();
+		expect(mock.calls[0]?.headers["authorization"]).toBe(`Bearer ${jwt}`);
+		expect(mock.calls[0]?.headers["x-api-key"]).toBeUndefined();
 		await close();
 		await handler.close();
 	});

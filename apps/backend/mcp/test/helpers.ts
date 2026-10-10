@@ -219,6 +219,8 @@ export function testConfig(over: Partial<Config> = {}): Config {
 		allowedHosts: [],
 		allowedOrigins: [],
 		logLevel: "silent",
+		resource: `${BASE_URL}/mcp`,
+		authIssuer: `${BASE_URL}/api/auth/v1`,
 		...over,
 	};
 }

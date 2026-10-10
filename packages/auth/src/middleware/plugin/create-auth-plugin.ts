@@ -26,7 +26,13 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 	const ttl = config.ttl ?? DEFAULT_SESSION_CACHE_TTL_SECONDS;
 	// Drop known-insecure defaults in production so internal auth cannot be spoofed.
 	const internalSecret = sanitizeInternalSecret(config.internalSecret);
-	const deps = { baseUrl, redis, ttl, internalSecret };
+	const deps = {
+		baseUrl,
+		redis,
+		ttl,
+		internalSecret,
+		oauthResource: config.oauthResource,
+	};
 
 	return new Elysia({ name: "reloop-auth-middleware" }).macro({
 		auth: {

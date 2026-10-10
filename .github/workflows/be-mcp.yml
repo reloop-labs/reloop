@@ -1,0 +1,116 @@
+name: BE MCP Docker
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+    paths:
+      - 'apps/backend/mcp/**'
+      - 'packages/auth/**'
+      - '.github/workflows/be-mcp.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'apps/backend/mcp/**'
+      - 'packages/auth/**'
+      - '.github/workflows/be-mcp.yml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-mcp
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          # Keep in sync with local Bun used to generate bun.lock (frozen install fails across major patch skew).
+          bun-version: 1.3.14
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint MCP server
+        run: bun run lint
+        working-directory: apps/backend/mcp
+
+      - name: Typecheck MCP server
+        run: bun run typecheck
+        working-directory: apps/backend/mcp
+
+      - name: Test MCP server
+        run: bun run test
+        working-directory: apps/backend/mcp
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Generate MCP lockfile for the Docker build context
+        # apps/backend/mcp ships without a committed bun.lock (monorepo
+        # workspace member); its Dockerfile runs a frozen install, so mint a
+        # lockfile from its own package.json before building.
+        run: bun install
+        working-directory: apps/backend/mcp
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: apps/backend/mcp
+          file: ./apps/backend/mcp/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Image digest
+        run: echo ${{ steps.build.outputs.digest }}
+
+      # No Coolify trigger yet: add one once the be-mcp service UUID exists.
+      # Example:
+      # - name: Trigger Coolify Deploy
+      #   if: github.event_name != 'pull_request' && github.ref_type != 'tag'
+      #   run: |
+      #     curl --fail -i -X POST "https://coolify.reloop.sh/api/v1/deploy?uuid=<be-mcp-uuid>&force=false" \
+      #       -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"

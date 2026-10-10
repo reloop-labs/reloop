@@ -44,6 +44,7 @@ export {
 	resolveInternalAuth,
 	timingSafeStringEqual,
 } from "./resolve/resolve-internal-auth";
+export { resolveOAuthAuth } from "./resolve/resolve-oauth-auth";
 export { resolvePlatformAdmin } from "./resolve/resolve-platform-admin";
 export { resolveSessionAuth } from "./resolve/resolve-session-auth";
 export { resolveSessionAuthWithProfile } from "./resolve/resolve-session-auth-with-profile";

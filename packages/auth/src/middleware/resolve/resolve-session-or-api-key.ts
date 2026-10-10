@@ -1,4 +1,5 @@
 import { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
+import { resolveOAuthAuth } from "@reloop/auth/middleware/resolve/resolve-oauth-auth";
 import { resolveSessionAuth } from "@reloop/auth/middleware/resolve/resolve-session-auth";
 import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
 import type { AuthContext } from "@reloop/auth/middleware/types";
@@ -14,5 +15,8 @@ export async function resolveSessionOrApiKey(
 	if (keyResult.ok) return keyResult.ctx;
 	if (keyResult.invalid) return null;
 
-	return resolveSessionAuth(headers, deps, opts);
+	const session = await resolveSessionAuth(headers, deps, opts);
+	if (session) return session;
+
+	return resolveOAuthAuth(headers, deps, opts);
 }

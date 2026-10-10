@@ -3,7 +3,7 @@ export type AuthContext = {
 	organizationId: string | null;
 
 	platformRole: string | null;
-	authType: "session" | "apikey" | "internal";
+	authType: "session" | "apikey" | "internal" | "oauth";
 
 	apiKeyId?: string;
 };
@@ -45,6 +45,12 @@ export type AuthMiddlewareConfig = {
 	ttl?: number;
 
 	internalSecret?: string;
+
+	/**
+	 * Canonical MCP protected-resource identifier (RFC 8707 / RFC 9728).
+	 * OAuth access tokens must carry this audience. Defaults to `<baseUrl>/mcp`.
+	 */
+	oauthResource?: string;
 };
 
 export const DEFAULT_SESSION_CACHE_TTL_SECONDS = 5;

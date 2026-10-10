@@ -20,6 +20,16 @@ export function maskApiKey(key: string): string {
 	return `${key.slice(0, MASK_PREFIX_LENGTH)}…`;
 }
 
+const JWT_PART = /^[A-Za-z0-9_-]+$/;
+
+export function isOAuthBearer(value: string): boolean {
+	const parts = value.split(".");
+	return (
+		parts.length === 3 &&
+		parts.every((part) => part.length > 0 && JWT_PART.test(part))
+	);
+}
+
 export function extractRequestApiKey(request: Request): string | undefined {
 	const authorization = request.headers.get("authorization");
 	if (authorization !== null) {

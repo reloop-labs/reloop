@@ -1,3 +1,4 @@
+import { isOAuthBearer } from "../auth/api-key";
 import {
 	type ErrorCodeMap,
 	malformedResponseError,
@@ -170,10 +171,14 @@ export class ReloopClient {
 
 	#buildHeaders(hasBody: boolean): Record<string, string> {
 		const headers: Record<string, string> = {
-			"x-api-key": this.#apiKey,
 			accept: "application/json",
 			"user-agent": USER_AGENT,
 		};
+		if (isOAuthBearer(this.#apiKey)) {
+			headers["authorization"] = `Bearer ${this.#apiKey}`;
+		} else {
+			headers["x-api-key"] = this.#apiKey;
+		}
 		if (hasBody) {
 			headers["content-type"] = "application/json";
 		}

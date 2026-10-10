@@ -91,7 +91,7 @@ export async function checkRateLimit({
 	activeOrganizationId: string;
 	userId?: string;
 	/** Internal service-to-service sends share a datacenter IP; skip the IP layer. */
-	authType?: "session" | "apikey" | "internal";
+	authType?: "session" | "apikey" | "internal" | "oauth";
 	log: {
 		warn: (msg: string, meta?: Record<string, unknown>) => void;
 		error: (msg: string, meta?: Record<string, unknown>) => void;

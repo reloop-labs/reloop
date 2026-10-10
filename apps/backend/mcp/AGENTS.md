@@ -50,7 +50,7 @@ cli.ts
 ## Verified Reloop facts
 
 - The base URL is a bare origin (default `https://reloop.sh`); services mount at `/api/<service>`.
-- Auth header is `x-api-key`. A non-empty `User-Agent` is required or Reloop answers 400.
+- Auth header is `x-api-key` for API keys and `Authorization: Bearer` for Better Auth OAuth tokens. A non-empty `User-Agent` is required or Reloop answers 400.
 - Error bodies are `{ message, why, fix, link? }`. 429 adds a `retryAfter` body field and a `retry-after` header; rate-limit headers are `ratelimit-limit`, `ratelimit-remaining`, `ratelimit-reset`.
 - Pagination is offset based: `page` (1-based) and `limit` (max 100).
 - Contacts: `properties` on update **replaces** the whole property set, so read before writing. There is no bulk route; `contacts_get` by email is a `search` on `/api/contacts/list` plus an exact match.

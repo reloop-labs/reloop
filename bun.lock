@@ -1010,6 +1010,7 @@
         "drizzle-orm": "catalog:db",
         "elysia": "catalog:backend",
         "evlog": "catalog:backend",
+        "jose": "catalog:",
       },
       "devDependencies": {
         "@reloop/tsconfig": "workspace:*",
@@ -1206,6 +1207,7 @@
     "@types/node": "24.0.15",
     "axios": "1.12.2",
     "better-auth": "1.7.7",
+    "jose": "6.2.3",
     "typescript": "5.9.2",
   },
   "catalogs": {

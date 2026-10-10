@@ -5,7 +5,11 @@ import {
 	localhostAllowedOrigins,
 	originValidationResponse,
 } from "@modelcontextprotocol/server";
-import { extractRequestApiKey, isPlausibleApiKey } from "../auth/api-key";
+import {
+	extractRequestApiKey,
+	isOAuthBearer,
+	isPlausibleApiKey,
+} from "../auth/api-key";
 import { type Config, ConfigError } from "../config/env";
 import type { Logger } from "../observability/log";
 import { createReloopApi } from "../reloop/api";
@@ -16,6 +20,42 @@ import { SERVER_NAME, VERSION } from "../version";
 export const MCP_PATH = "/mcp";
 export const HEALTH_PATH = "/healthz";
 export const MCP_HEALTH_PATH = `${MCP_PATH}${HEALTH_PATH}`;
+export const PROTECTED_RESOURCE_METADATA_PATH =
+	"/.well-known/oauth-protected-resource";
+
+export function protectedResourceMetadataUrl(resource: string): string {
+	const url = new URL(resource);
+	const path = url.pathname === "/" ? "" : url.pathname;
+	return `${url.origin}${PROTECTED_RESOURCE_METADATA_PATH}${path}`;
+}
+
+export function wwwAuthenticateChallenge(
+	resource: string,
+	realm = "reloop",
+): string {
+	return `Bearer realm="${realm}", resource_metadata="${protectedResourceMetadataUrl(resource)}"`;
+}
+
+export function protectedResourceMetadata(config: Config): {
+	resource: string;
+	authorization_servers: string[];
+	scopes_supported: string[];
+	bearer_methods_supported: string[];
+} {
+	return {
+		resource: config.resource,
+		authorization_servers: [config.authIssuer],
+		scopes_supported: ["openid", "profile", "email"],
+		bearer_methods_supported: ["header"],
+	};
+}
+
+function isProtectedResourceMetadataPath(pathname: string): boolean {
+	return (
+		pathname === PROTECTED_RESOURCE_METADATA_PATH ||
+		pathname.startsWith(`${PROTECTED_RESOURCE_METADATA_PATH}/`)
+	);
+}
 
 export type HttpHandler = {
 	fetch(request: Request): Promise<Response>;
@@ -129,6 +169,12 @@ export function createHttpHandler(
 				version: VERSION,
 			});
 		}
+		if (
+			request.method === "GET" &&
+			isProtectedResourceMetadataPath(url.pathname)
+		) {
+			return Response.json(protectedResourceMetadata(config));
+		}
 		if (url.pathname !== MCP_PATH) {
 			return Response.json(
 				{ error: "not_found", message: `MCP endpoint is ${MCP_PATH}` },
@@ -158,23 +204,30 @@ export function createHttpHandler(
 			);
 		}
 
-		const apiKey = extractRequestApiKey(request);
-		if (apiKey === undefined || !isPlausibleApiKey(apiKey)) {
+		const token = extractRequestApiKey(request);
+		if (token !== undefined && isOAuthBearer(token)) {
+			return mcp.fetch(request, {
+				authInfo: { token, clientId: "reloop-oauth", scopes: [] },
+			});
+		}
+		if (token === undefined || !isPlausibleApiKey(token)) {
 			return Response.json(
 				{
 					error: "unauthorized",
 					message:
-						"Provide a Reloop API key as 'Authorization: Bearer <key>' or an 'x-api-key' header.",
+						"Connect with Better Auth OAuth or provide a Reloop API key as 'Authorization: Bearer <key>' or an 'x-api-key' header.",
 				},
 				{
 					status: 401,
-					headers: { "www-authenticate": 'Bearer realm="reloop"' },
+					headers: {
+						"www-authenticate": wwwAuthenticateChallenge(config.resource),
+					},
 				},
 			);
 		}
 
 		return mcp.fetch(request, {
-			authInfo: { token: apiKey, clientId: "reloop-api-key", scopes: [] },
+			authInfo: { token, clientId: "reloop-api-key", scopes: [] },
 		});
 	};
 

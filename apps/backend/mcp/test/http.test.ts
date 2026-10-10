@@ -108,10 +108,59 @@ describe("authentication gate", () => {
 		await handler.close();
 	});
 
+	test("forwards a Better Auth OAuth bearer instead of rejecting it", async () => {
+		const handler = handlerFor();
+		const jwt = "eyJhbGciOiJFZERTQSJ9.eyJzdWIiOiJ1c2VyLTEifQ.c2lnbmF0dXJl";
+		const response = await handler.fetch(
+			mcpRequest({ authorization: `Bearer ${jwt}` }),
+		);
+		expect(response.status).not.toBe(401);
+		await handler.close();
+	});
+
+	test("challenges unauthenticated clients with resource metadata", async () => {
+		const handler = handlerFor();
+		const response = await handler.fetch(mcpRequest({}));
+		expect(response.status).toBe(401);
+		const challenge = response.headers.get("www-authenticate") ?? "";
+		expect(challenge.startsWith("Bearer")).toBe(true);
+		expect(challenge).toContain("resource_metadata=");
+		expect(challenge).toContain(".well-known/oauth-protected-resource");
+		await handler.close();
+	});
+
 	test("rejects an implausible key", async () => {
 		const handler = handlerFor();
 		const response = await handler.fetch(mcpRequest({ "x-api-key": "nope" }));
 		expect(response.status).toBe(401);
+		await handler.close();
+	});
+});
+
+describe("protected resource metadata", () => {
+	test("advertises the resource and authorization server", async () => {
+		const handler = handlerFor();
+		for (const path of [
+			"/.well-known/oauth-protected-resource",
+			"/.well-known/oauth-protected-resource/mcp",
+		]) {
+			const response = await handler.fetch(
+				new Request(`http://127.0.0.1${path}`, {
+					headers: { host: "127.0.0.1" },
+				}),
+			);
+			expect(response.status).toBe(200);
+			const body = (await response.json()) as {
+				resource?: string;
+				authorization_servers?: string[];
+				bearer_methods_supported?: string[];
+			};
+			expect(body.resource).toBe("http://reloop.test/mcp");
+			expect(body.authorization_servers).toEqual([
+				"http://reloop.test/api/auth/v1",
+			]);
+			expect(body.bearer_methods_supported).toEqual(["header"]);
+		}
 		await handler.close();
 	});
 });

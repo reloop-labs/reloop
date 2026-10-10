@@ -41,7 +41,8 @@
 		"better-auth": "catalog:",
 		"drizzle-orm": "catalog:db",
 		"elysia": "catalog:backend",
-		"evlog": "catalog:backend"
+		"evlog": "catalog:backend",
+		"jose": "catalog:"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

@@ -35,9 +35,9 @@ The `reloop-email` SDK cannot express what a server needs: no request timeout, n
 
 ## Authentication
 
-Reloop authenticates with organization-scoped API keys (`rl_prod_...`) sent as `x-api-key`. Over stdio the key comes from `RELOOP_API_KEY`; over HTTP it comes from `Authorization: Bearer` or `x-api-key` on each request. The shape of the key is validated before any upstream call so malformed credentials never leave the process, and Reloop itself remains the authorization boundary.
+Reloop authenticates with organization-scoped API keys (`rl_prod_...`) sent as `x-api-key`, and with Better Auth OAuth access tokens sent as `Authorization: Bearer`. Over stdio the key comes from `RELOOP_API_KEY`; over HTTP each request carries its own credential: a JWT-shaped bearer is forwarded as `Authorization: Bearer` and verified by Reloop (JWKS signature, issuer, and resource-audience checks, then organization resolution), while an API key travels as `x-api-key`. The shape of an API key is validated before any upstream call so malformed credentials never leave the process, and Reloop itself remains the authorization boundary.
 
-OAuth is not implemented. Reloop has no OAuth authorization server, and API keys are the platform credential; the MCP specification's authorization section is optional for API-key resource servers. The 401 response deliberately sends `WWW-Authenticate: Bearer realm="reloop"` **without** a `resource_metadata` parameter, so OAuth-capable clients do not start a discovery flow that cannot succeed.
+The HTTP transport is an RFC 9728 protected resource: `GET /.well-known/oauth-protected-resource/mcp` advertises the canonical resource and its authorization servers, and unauthenticated `POST /mcp` calls are challenged with `WWW-Authenticate: Bearer ... resource_metadata=...` so OAuth-capable clients start the Better Auth Connect flow.
 
 ## Error model
 

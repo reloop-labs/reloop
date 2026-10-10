@@ -34,6 +34,19 @@ You'll need a supported MCP client and `npx` installed on your machine.
 
 Replace `rl_xxxxxxxxx` with your actual Reloop API key.
 
+### OAuth Connect (Better Auth)
+
+For shared or hosted deployments, connect with OAuth instead of an API key.
+Point your MCP client at your Reloop MCP HTTP endpoint (for example
+`https://mail.example.com/mcp` for self-hosted, backed by `reloop-mcp
+--transport http`). OAuth-capable clients discover the flow automatically via
+`/.well-known/oauth-protected-resource/mcp`: the client opens the Reloop
+login page, you approve the consent screen, and the client presents the
+issued access token as `Authorization: Bearer <token>` on every request.
+Tokens are audience-bound to the MCP resource and resolve to your
+organization — no long-lived secrets live on the client. When you belong to
+several organizations, send `x-organization-id` to select one.
+
 ### Stdio Transport (Default)
 
 <Tabs>

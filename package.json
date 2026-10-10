@@ -17,6 +17,7 @@
 			"@better-auth/mcp": "1.7.7",
 			"@better-auth/cimd": "1.7.7",
 			"@better-auth/oauth-provider": "1.7.7",
+			"jose": "6.2.3",
 			"axios": "1.12.2"
 		},
 		"catalogs": {

@@ -7,6 +7,8 @@ const README = await Bun.file(new URL("../README.md", import.meta.url)).text();
 const ENV_NAMES = [
 	"RELOOP_API_KEY",
 	"RELOOP_BASE_URL",
+	"RELOOP_MCP_RESOURCE",
+	"RELOOP_AUTH_ISSUER",
 	"RELOOP_TIMEOUT_MS",
 	"HOST",
 	"PORT",

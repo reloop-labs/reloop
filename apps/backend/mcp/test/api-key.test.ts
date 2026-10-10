@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	extractRequestApiKey,
+	isOAuthBearer,
 	isPlausibleApiKey,
 	maskApiKey,
 } from "../src/auth/api-key";
@@ -68,5 +69,21 @@ describe("extractRequestApiKey", () => {
 			headers: { authorization: "Basic xyz" },
 		});
 		expect(extractRequestApiKey(request)).toBeUndefined();
+	});
+});
+
+describe("isOAuthBearer", () => {
+	const jwt = "eyJhbGciOiJFZERTQSJ9.eyJzdWIiOiJ1c2VyLTEifQ.c2lnbmF0dXJl";
+
+	test("accepts a JWT-shaped token", () => {
+		expect(isOAuthBearer(jwt)).toBe(true);
+	});
+
+	test("rejects API keys and malformed tokens", () => {
+		expect(isOAuthBearer(API_KEY)).toBe(false);
+		expect(isOAuthBearer("nope")).toBe(false);
+		expect(isOAuthBearer("a.b")).toBe(false);
+		expect(isOAuthBearer("a..c")).toBe(false);
+		expect(isOAuthBearer("a.b.c.d")).toBe(false);
 	});
 });

@@ -83,7 +83,7 @@ describe("redact hardening", () => {
 		expect(redact("org_live_ABCDEFGHIJKLMNOPQRSTUV")).toBe(
 			"org_live_[redacted]",
 		);
-		expect(redact('{"x-api-key":"' + API_KEY + '"}')).not.toContain(API_KEY);
+		expect(redact(`{"x-api-key":"${API_KEY}"}`)).not.toContain(API_KEY);
 	});
 
 	test("leaves ordinary identifiers alone", () => {
