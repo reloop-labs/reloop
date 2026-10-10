@@ -8,7 +8,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 COPY . .
-RUN bun --filter=be-auth install
+RUN bun --filter=be-auth install --frozen-lockfile
 
 # Stage 2: Build the application
 FROM base AS builder
