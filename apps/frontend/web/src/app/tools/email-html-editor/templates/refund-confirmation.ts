@@ -1,0 +1,19 @@
+/** Transactional refund confirmation with email-safe layout and font fallbacks. */
+export function refundConfirmationHtml(_origin: string): string {
+	const body = "Outfit,Arial,sans-serif";
+	const display = "'IBM Plex Mono','Courier New',monospace";
+	return `<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Your refund is on its way</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet" />
+<style>@media only screen and (max-width:480px){.outer{padding:24px 12px!important}.content{padding:28px 22px!important}.display{font-size:36px!important;line-height:40px!important}.stack{display:block!important;width:auto!important}.date{padding-bottom:20px!important}}</style></head>
+<body style="margin:0;padding:0;background:#eaf0ff;color:#182c62;font-family:${body}">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">Your refund has been issued to your original payment method.</div>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td class="outer" style="padding:48px 24px">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width:560px;margin:0 auto"><tbody>
+<tr><td style="padding:0 0 24px;font-size:24px;font-weight:700;color:#254fbd">loopback ↩</td></tr>
+<tr><td class="content" style="padding:36px;background:#254fbd;color:#ffffff;border-radius:24px 24px 0 0"><p style="margin:0 0 24px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#dae5ff">Refund issued / All sorted</p><h1 class="display" style="margin:0 0 14px;font-size:42px;line-height:46px;font-weight:600;letter-spacing:-1.5px">Back to you.</h1><p style="margin:0;font-size:16px;line-height:25px;color:#e3ebff">Hi <span data-variable="first_name">{{{first_name}}}</span>, we’ve issued your refund. Here’s everything you need for your records.</p></td></tr>
+<tr><td class="content" style="padding:36px;background:#ffffff;border-radius:0 0 24px 24px;box-shadow:0 20px 40px -24px #5573b5"><p style="margin:0 0 8px;font-size:12px;letter-spacing:1px;color:#52638d">AMOUNT REFUNDED</p><p class="display" style="margin:0 0 28px;font-size:48px;line-height:56px;letter-spacing:-2px;font-weight:600"><span data-variable="refund_amount">{{{refund_amount}}}</span></p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:22px;border-top:1px solid #dce5f6"><tbody><tr><td style="padding:16px 0;color:#52638d">Order</td><td style="text-align:right;font-family:${display}">#<span data-variable="order_number">{{{order_number}}}</span></td></tr><tr><td style="padding:0 0 16px;color:#52638d">Returning to</td><td style="padding:0 0 16px;text-align:right">Visa ···· 4242</td></tr><tr><td style="padding:0 0 16px;color:#52638d">Expected arrival</td><td style="padding:0 0 16px;text-align:right;font-weight:600">5–10 business days</td></tr></tbody></table>
+<p style="margin:8px 0 24px;padding:16px;background:#eef4ff;border-left:3px solid #254fbd;font-size:13px;line-height:21px;color:#52638d">Your bank may take a few days to show the credit. You don’t need to do anything else.</p><a href="{{{refund_url}}}" data-id="react-email-button" style="display:inline-block;padding:15px 24px;background:#254fbd;color:#fff;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600">View refund details ↗</a></td></tr>
+<tr><td style="padding:24px 12px;font-size:12px;line-height:20px;color:#52638d">Questions about your refund? Reply to this email.<br />Loopback · 548 Market St · San Francisco, CA 94104</td></tr></tbody></table></td></tr></tbody></table></body></html>`;
+}
