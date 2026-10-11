@@ -30,9 +30,9 @@ export function AgentToolsSection() {
 				</p>
 			</div>
 
-			<div className="grid w-full grid-cols-1 md:grid-cols-2 [&>*]:min-w-0">
+			<div className="grid w-full grid-cols-1 lg:grid-cols-2 [&>*]:min-w-0">
 				{/* MCP Server */}
-				<div className="flex flex-col border-stroke-soft-100 md:border-r dark:border-white/10">
+				<div className="flex flex-col border-stroke-soft-100 lg:border-r dark:border-white/10">
 					<div className="space-y-4 p-6 md:px-12 md:pt-12 md:pb-6">
 						<CardHeader
 							icon={
@@ -61,7 +61,7 @@ export function AgentToolsSection() {
 				</div>
 
 				{/* Developer CLI */}
-				<div className="flex flex-col border-stroke-soft-100 border-t md:border-t-0 dark:border-white/10">
+				<div className="flex flex-col border-stroke-soft-100 border-t lg:border-t-0 dark:border-white/10">
 					<div className="space-y-4 p-6 md:px-12 md:pt-12 md:pb-6">
 						<CardHeader
 							icon={

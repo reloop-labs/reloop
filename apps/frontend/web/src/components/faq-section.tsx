@@ -58,7 +58,12 @@ export function FaqSection({
 		return (
 			<div
 				key={faq.question}
-				className="t-acc border-stroke-soft-100 border-b dark:border-white/10"
+				className={cn(
+					"t-acc border-stroke-soft-100 border-b dark:border-white/10",
+					// Plain FAQs sit between section separators, which draw the
+					// closing rule; avoid a double line under the last item.
+					plain && "last:border-b-0",
+				)}
 				data-open={isOpen ? "true" : "false"}
 			>
 				<button

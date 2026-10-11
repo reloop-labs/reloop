@@ -295,7 +295,7 @@ export function BlogCta({
 
 						{/* Heading, Subtext, and Action Buttons */}
 						<div
-							className={`flex flex-col items-start text-left lg:col-span-7 ${
+							className={`flex flex-col items-center text-center lg:col-span-7 lg:items-start lg:text-left ${
 								illustrationPosition === "left"
 									? "order-1 lg:order-2"
 									: "order-1 lg:order-1"
@@ -325,21 +325,21 @@ export function BlogCta({
 								</p>
 							)}
 
-							<div className="mt-8 flex flex-wrap items-center gap-3.5 sm:mt-10">
+							<div className="mt-8 flex w-full flex-col gap-3 sm:mt-10 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-3.5 lg:justify-start">
 								{/* Primary Button */}
 								{primaryExternal ? (
 									<a
 										href={primaryHref}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14.5px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90"
+										className="inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14.5px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] sm:w-auto dark:bg-white dark:text-black dark:hover:bg-white/90"
 									>
 										{resolvedPrimaryLabel}
 									</a>
 								) : (
 									<CtaLink
 										href={primaryHref}
-										className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14.5px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90"
+										className="inline-flex w-full items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14.5px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] sm:w-auto dark:bg-white dark:text-black dark:hover:bg-white/90"
 									>
 										{resolvedPrimaryLabel}
 									</CtaLink>
@@ -352,14 +352,14 @@ export function BlogCta({
 											href={resolvedSecondaryHref}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
+											className="inline-flex w-full items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] sm:w-auto dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
 										>
 											{resolvedSecondaryLabel}
 										</a>
 									) : (
 										<CtaLink
 											href={resolvedSecondaryHref}
-											className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
+											className="inline-flex w-full items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] sm:w-auto dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
 										>
 											{resolvedSecondaryLabel}
 										</CtaLink>
@@ -373,14 +373,14 @@ export function BlogCta({
 											href={tertiaryHref}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
+											className="inline-flex w-full items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] sm:w-auto dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
 										>
 											{tertiaryLabel}
 										</a>
 									) : (
 										<CtaLink
 											href={tertiaryHref}
-											className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
+											className="inline-flex w-full items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] sm:w-auto dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
 										>
 											{tertiaryLabel}
 										</CtaLink>
