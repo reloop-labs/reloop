@@ -1,59 +1,25 @@
-"use client";
-
 import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
-import { PixelBlast } from "@reloop/web/components/pixel-blast";
 import { hostedSignupHref } from "@reloop/web/lib/site";
-import { useTheme } from "next-themes";
+import Image from "next/image";
+import {
+	PLATFORM_ALT,
+	TAB_GRADIENTS,
+	TAB_SCREENSHOT,
+} from "../../../(home)/components/platform-tabs-data";
+import { CopyPromptButton } from "./copy-prompt-button";
 
 export function TransactionalHero() {
-	const { resolvedTheme } = useTheme();
+	const shot = TAB_SCREENSHOT.email;
 
 	return (
 		<header className="relative w-full bg-transparent [--primary-base:#2563eb] [--primary-dark:#1d4ed8] [--primary-darker:#1e40af] [--primary-link:#1d4ed8] dark:[--primary-base:#2563eb] dark:[--primary-dark:#2563eb] dark:[--primary-darker:#1d4ed8] dark:[--primary-link:#93c5fd]">
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center overflow-hidden border-stroke-soft-200 border-x px-6 pt-[224px] pb-40 text-center sm:px-8 md:max-w-7xl lg:px-12 dark:border-white/10">
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
-				>
-					<PixelBlast
-						variant="square"
-						pixelSize={2}
-						color={resolvedTheme === "dark" ? "#93c5fd" : "#2563eb"}
-						patternScale={4}
-						patternDensity={0.45}
-						enableRipples={false}
-						rippleSpeed={0.05}
-						rippleThickness={0.09}
-						rippleIntensityScale={2.5}
-						speed={0.2}
-						transparent
-						edgeFade={0.65}
-					/>
-				</div>
-				<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
-					<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
-						<span
-							aria-hidden
-							className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#1e3a8a]"
-						>
-							<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
-								<Icon name="send-2" className="size-[11px]" />
-							</span>
-						</span>
-						<span className="font-medium text-[13.5px] text-text-strong-950 tracking-tight dark:text-white">
-							Transactional Email
-						</span>
-					</div>
-
-					<h1 className="max-w-3xl text-balance text-center font-semibold text-[2.5rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.25rem] dark:text-white">
-						Send transactional email{" "}
-						<span className="bg-gradient-to-b from-primary-base to-primary-base bg-clip-text text-transparent">
-							in 5 minutes.
-						</span>
+			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<div className="flex flex-col items-center px-4 pt-[152px] pb-16 text-center sm:px-8 sm:pt-[176px] sm:pb-20 lg:px-12">
+					<h1 className="max-w-4xl text-balance font-semibold text-[2.4rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.1rem] dark:text-white">
+						Transactional emails developers love to use.
 					</h1>
 
-					<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
+					<p className="mt-5 max-w-[42rem] text-balance text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] dark:text-white/60">
 						Start sending transactional emails with a robust REST API, native
 						SDKs, and reliable SMTP service.
 					</p>
@@ -61,31 +27,49 @@ export function TransactionalHero() {
 					<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
 						<FancyButton.Root
 							asChild
-							variant="primary"
+							variant="neutral"
 							size="medium"
 							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
 						>
 							<a href={hostedSignupHref}>Start for free</a>
 						</FancyButton.Root>
-						<FancyButton.Root
-							asChild
-							variant="basic"
-							size="medium"
-							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
-						>
-							<a
-								href="https://cal.com/pranavp/30"
-								target="_blank"
-								rel="noreferrer"
-							>
-								<Icon name="calendar" className="size-4 shrink-0" />
-								<span>Schedule call</span>
-							</a>
-						</FancyButton.Root>
+						<CopyPromptButton />
 					</div>
-					<p className="mt-4 text-center text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
+					<p className="mt-4 text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
 						Free plan: 3,000 emails a month. No credit card.
 					</p>
+				</div>
+
+				<div className="border-stroke-soft-100 border-t dark:border-white/10">
+					<div className="relative h-[420px] w-full overflow-hidden bg-bg-white-0 sm:h-[560px] lg:h-[680px] dark:bg-black">
+						<div
+							aria-hidden
+							className={`absolute inset-0 bg-gradient-to-b ${TAB_GRADIENTS.email}`}
+						/>
+						<div className="relative h-full w-full px-4 pt-6 sm:px-10 sm:pt-10">
+							<div className="relative h-full w-full overflow-hidden border border-stroke-soft-100 border-b-0 bg-bg-white-0 dark:border-white/10 dark:bg-black">
+								<Image
+									src={shot.src}
+									alt={PLATFORM_ALT.email}
+									fill
+									sizes="(min-width: 1280px) 1200px, 100vw"
+									className="object-cover object-top-left dark:hidden"
+									preload
+									draggable={false}
+								/>
+								<Image
+									src={shot.darkSrc}
+									alt=""
+									aria-hidden
+									fill
+									sizes="(min-width: 1280px) 1200px, 100vw"
+									className="hidden object-cover object-top-left dark:block"
+									loading="eager"
+									draggable={false}
+								/>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</header>

@@ -98,8 +98,8 @@ export function StartupApplyForm() {
 					Application received
 				</h2>
 				<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
-					Thanks — we review startup applications within 5 business days. Keep
-					an eye on{" "}
+					Thanks. We review startup applications within 5 business days. Keep an
+					eye on{" "}
 					<span className="font-medium text-text-strong-950 dark:text-white">
 						{sentEmail}
 					</span>{" "}

@@ -7,7 +7,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata: Metadata = {
 	title: "Transactional Email API",
 	description:
-		"Low-latency transactional email delivery for developers. Send password resets, order confirmations, and welcome emails with a simple API. Open source and self-hostable.",
+		"Transactional email that actually arrives. Delivery logs, webhooks, idempotent retries, automatic bounce suppression, and guided SPF/DKIM/DMARC. 3,000 emails a month free. Open source.",
 	keywords: [
 		"transactional email API",
 		"transactional email service",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Transactional Email API | Reloop",
 		description:
-			"Low-latency transactional email delivery for developers. Password resets, receipts, and welcome emails with a simple API.",
+			"Transactional email that actually arrives. See every delivery, retry safely, and switch from SendGrid in one config change.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Transactional Email API | Reloop",
 		description:
-			"Low-latency transactional email delivery for developers. Password resets, receipts, and welcome emails with a simple API.",
+			"Transactional email that actually arrives. See every delivery, retry safely, and switch from SendGrid in one config change.",
 	},
 };
 

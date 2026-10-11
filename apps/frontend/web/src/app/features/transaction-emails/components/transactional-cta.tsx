@@ -11,7 +11,7 @@ export function TransactionalCta() {
 					<span className="text-blue-600 dark:text-blue-400">$0 / mo.</span>
 				</span>
 			}
-			sub="No credit card required. 3,000 emails for free."
+			sub="Send your first email in minutes. 3,000 emails a month free, no credit card."
 			primaryLabel="Get started"
 			primaryHref={hostedSignupHref}
 			secondaryLabel="View pricing"

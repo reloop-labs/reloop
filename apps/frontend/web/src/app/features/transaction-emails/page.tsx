@@ -1,23 +1,37 @@
+import { JsonLd } from "@reloop/web/components/json-ld";
+import { breadcrumbJsonLd, faqPageJsonLd } from "@reloop/web/lib/schema";
 import { SectionSeparator } from "../../(home)/components/section-separator";
-import { AiNativeSection } from "./components/ai-native-section";
-import { FrameworksStack } from "./components/frameworks-stack";
+import { SwitchSection } from "./components/switch-section";
 import { TransactionalCta } from "./components/transactional-cta";
+import {
+	TransactionalFaq,
+	transactionalFaq,
+} from "./components/transactional-faq";
 import { TransactionalHero } from "./components/transactional-hero";
 import { TransactionalPreviewSection } from "./components/transactional-preview-section";
-import { UseCases } from "./components/use-cases";
 
 const TransactionEmailsPage = () => {
 	return (
 		<div className="relative min-h-screen overflow-x-hidden bg-bg-white-0 font-sans text-text-strong-950 selection:bg-neutral-200 dark:bg-black dark:text-white dark:selection:bg-neutral-800">
+			<JsonLd
+				data={[
+					breadcrumbJsonLd([
+						{ name: "Features", path: "/features" },
+						{
+							name: "Transactional email",
+							path: "/features/transaction-emails",
+						},
+					]),
+					faqPageJsonLd(transactionalFaq),
+				]}
+			/>
 			<TransactionalHero />
 			<TransactionalPreviewSection />
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator />
-				<AiNativeSection />
+				<SwitchSection />
 				<SectionSeparator />
-				<FrameworksStack />
-				<SectionSeparator />
-				<UseCases />
+				<TransactionalFaq />
 				<SectionSeparator />
 				<TransactionalCta />
 			</div>
