@@ -2,6 +2,7 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { LandingDeveloperProof } from "@reloop/web/components/landing/landing-developer-proof";
 import { breadcrumbJsonLd, faqPageJsonLd } from "@reloop/web/lib/schema";
 import { SectionSeparator } from "../../(home)/components/section-separator";
+import { AgentToolsSection } from "./components/agent-tools-section";
 import { ConnectServicesSection } from "./components/connect-services-section";
 import { IntegrateSection } from "./components/integrate-section";
 import { ObservabilitySection } from "./components/observability-section";
@@ -39,6 +40,8 @@ const TransactionEmailsPage = () => {
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator hideTop className="h-24 sm:h-24" />
 				<IntegrateSection />
+				<SectionSeparator className="h-24 sm:h-24" />
+				<AgentToolsSection />
 				<SectionSeparator className="h-24 sm:h-24" />
 				<ConnectServicesSection />
 				<SectionSeparator className="h-24 sm:h-24" />
