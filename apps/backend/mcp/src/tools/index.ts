@@ -17,6 +17,7 @@ import { deleteContact } from "./contacts/delete";
 import { getContact } from "./contacts/get";
 import { listContacts } from "./contacts/list";
 import { updateContact } from "./contacts/update";
+import type { AnyToolDefinition } from "./define";
 import { createDomain } from "./domains/create";
 import { deleteDomain } from "./domains/delete";
 import { getDomain } from "./domains/get";
@@ -33,7 +34,7 @@ import { listGroupContacts } from "./groups/list-contacts";
 import { removeContactFromGroup } from "./groups/remove-contact";
 import { updateGroup } from "./groups/update";
 
-export const tools = [
+export const tools: readonly AnyToolDefinition[] = [
 	listContacts,
 	getContact,
 	createContact,
@@ -68,4 +69,4 @@ export const tools = [
 	updateDomain,
 	verifyDomain,
 	deleteDomain,
-] as const;
+];
