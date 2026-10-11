@@ -24,7 +24,11 @@ import { getDomain } from "./domains/get";
 import { listDomains } from "./domains/list";
 import { updateDomain } from "./domains/update";
 import { verifyDomain } from "./domains/verify";
+import { getEmail } from "./email/get";
+import { listEmails } from "./email/list";
+import { resendEmail } from "./email/resend";
 import { sendEmail } from "./email/send";
+import { getEmailStats } from "./email/stats";
 import { addContactToGroup } from "./groups/add-contact";
 import { createGroup } from "./groups/create";
 import { deleteGroup } from "./groups/delete";
@@ -33,6 +37,13 @@ import { listGroups } from "./groups/list";
 import { listGroupContacts } from "./groups/list-contacts";
 import { removeContactFromGroup } from "./groups/remove-contact";
 import { updateGroup } from "./groups/update";
+import { createProperty } from "./properties/create";
+import { deleteProperty } from "./properties/delete";
+import { listProperties } from "./properties/list";
+import { updateProperty } from "./properties/update";
+import { getTemplate } from "./templates/get";
+import { listTemplates } from "./templates/list";
+import { sendTestEmail } from "./templates/send-test";
 
 export const tools: readonly AnyToolDefinition[] = [
 	listContacts,
@@ -40,6 +51,10 @@ export const tools: readonly AnyToolDefinition[] = [
 	createContact,
 	updateContact,
 	deleteContact,
+	listProperties,
+	createProperty,
+	updateProperty,
+	deleteProperty,
 	listGroups,
 	getGroup,
 	createGroup,
@@ -55,6 +70,13 @@ export const tools: readonly AnyToolDefinition[] = [
 	deleteChannel,
 	setChannelSubscription,
 	sendEmail,
+	listEmails,
+	getEmail,
+	getEmailStats,
+	resendEmail,
+	listTemplates,
+	getTemplate,
+	sendTestEmail,
 	listApiKeys,
 	getApiKey,
 	createApiKey,

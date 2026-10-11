@@ -380,3 +380,170 @@ export type ChannelSubscriptionResponse = {
 	subscription?: ChannelSubscription;
 	event: string;
 };
+
+export type EmailOrigin = {
+	type: "campaign" | "automation";
+	id: string;
+	name: string;
+};
+
+export type EmailLogSummary = {
+	id: string;
+	subject: string;
+	fromEmail: string;
+	toEmails: string[];
+	status: string;
+	createdAt: string;
+	hasAttachments?: boolean;
+	source?: string;
+	origin?: EmailOrigin | null;
+};
+
+export type ListEmailLogsQuery = {
+	page?: number;
+	limit?: number;
+	search?: string;
+	status?: string;
+	domain?: string;
+	recipient?: string;
+	start_date?: string;
+	end_date?: string;
+};
+
+export type EmailLogListResponse = {
+	object: "list";
+	data: EmailLogSummary[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
+export type EmailLogAttachment = {
+	id: string;
+	filename: string;
+	contentType: string;
+	size: number;
+};
+
+export type EmailLogEvent = {
+	id: string;
+	type: string;
+	metadata: unknown;
+	createdAt: string;
+};
+
+export type EmailLog = {
+	id: string;
+	messageId: string;
+	domainId: string;
+	fromEmail: string;
+	fromName: string | null;
+	toEmails: string[];
+	ccEmails: string[] | null;
+	bccEmails: string[] | null;
+	replyTo: string | null;
+	subject: string;
+	textBody: string | null;
+	htmlBody: string | null;
+	status: string;
+	errorMessage: string | null;
+	size: number;
+	sentAt: string | null;
+	deliveredAt: string | null;
+	failedAt: string | null;
+	createdAt: string;
+	updatedAt: string;
+	attachments?: EmailLogAttachment[];
+	events?: EmailLogEvent[];
+	source?: string;
+	origin?: EmailOrigin | null;
+};
+
+export type EmailStatsQuery = {
+	domain_id?: string;
+	start_date?: string;
+	end_date?: string;
+	interval?: "day" | "hour";
+};
+
+export type EmailStatsResponse = {
+	dates: string[];
+	sent: number[];
+	delivered: number[];
+	bounced: number[];
+	complaint: number[];
+	opened: number[];
+	unsubscribed?: number[];
+	rate: number[];
+};
+
+export type TemplateVariable = {
+	name: string;
+	type: "string" | "number";
+	defaultValue: string | null;
+};
+
+export type Template = {
+	id: string;
+	name: string;
+	description: string | null;
+	subject: string | null;
+	fromEmail: string | null;
+	replyTo: string | null;
+	previewText: string | null;
+	status: "draft" | "published" | "archived";
+	variables: TemplateVariable[] | null;
+	currentVersion: number | null;
+	thumbnailUrl: string | null;
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type TemplateListResponse = {
+	templates: Template[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
+export type TestTemplateInput = {
+	to: string;
+	fromEmail?: string;
+	subject?: string;
+	variables?: Record<string, string | number>;
+};
+
+export type PropertyType = "string" | "number";
+
+export type ContactProperty = {
+	object?: "contact_property";
+	id: string;
+	propertyName: string;
+	propertyType: string;
+	defaultValue: string | null;
+	createdAt: string;
+	updatedAt: string;
+	event?: string;
+};
+
+export type ListPropertiesQuery = {
+	page?: number;
+	limit?: number;
+	search?: string;
+	type?: PropertyType;
+};
+
+export type PropertyListResponse = {
+	object: "contact_property";
+	properties: ContactProperty[];
+	total: number;
+	page: number;
+	limit: number;
+	event: string;
+};
+
+export type CreatePropertyInput = {
+	name: string;
+	type: PropertyType;
+	fallbackValue?: string;
+};

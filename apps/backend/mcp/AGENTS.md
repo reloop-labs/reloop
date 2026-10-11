@@ -55,6 +55,9 @@ cli.ts
 - Error bodies are `{ message, why, fix, link? }`. 429 adds a `retryAfter` body field and a `retry-after` header; rate-limit headers are `ratelimit-limit`, `ratelimit-remaining`, `ratelimit-reset`.
 - Pagination is offset based: `page` (1-based) and `limit` (max 100).
 - Contacts: `properties` on update **replaces** the whole property set, so read before writing. There is no bulk route; `get_contact` by email is a `search` on `/api/contacts/list` plus an exact match.
+- Email logs: `GET /api/logs/v1/emails` (filters `recipient`, `status`, `domain`, `search` on subject or sender, `start_date`, `end_date`), `/emails/:id`, `/emails/stats` (parallel arrays per date). Resend is `POST /api/mail/v1/resend/:id` and returns the send response.
+- Templates: `/api/template/v1/list`, `/:id`, `POST /:id/test`. Responses carry editor `content` blocks that tools drop.
+- Properties: `/api/contacts/v1/properties/{list,create,:id}`. `PATCH` only accepts `fallbackValue`; name and type are immutable.
 - Groups and channels: CRUD lives under `/api/contacts/v1/groups` and `/api/contacts/v1/channels`; membership lives on contact routes: `POST`/`DELETE /api/contacts/group/:id` (idempotent, body `contact_id` or `email`) and `PATCH /api/contacts/channel/:id`, an idempotent upsert of the subscription. `POST /api/contacts/channel/:id` returns 409 on an unchanged state, so tools use the PATCH. None of these create the contact.
 - API keys: routes live under `/api/api-key/v1`; the collection is `/api/api-key/v1/` with a trailing slash, and state changes are `POST /rotate|enable|disable/:id`. Only create and rotate return the plaintext `key`.
 - Domains: routes live under `/api/domain/v1` (`/list`, `/create`, `/:id`, `POST /verify/:id`). Verify returns `active` synchronously when DNS already resolves, otherwise `verifying` while a background job retries.

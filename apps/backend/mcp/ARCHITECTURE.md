@@ -43,7 +43,7 @@ The HTTP transport is an RFC 9728 protected resource: `GET /.well-known/oauth-pr
 
 Everything upstream becomes a `ReloopError` with a stable `code`, a `message`, and optional `why`, `fix`, `status`, `retryAfterSeconds`, and `fields`. `registerTools` catches it and returns `isError: true` whose text content is a JSON `{ error }` document (never `structuredContent`, which clients validate against the output schema), so a model gets a machine-readable code and a human-readable next step instead of a stack trace.
 
-`retryable` is computed from the HTTP status and from whether the request was idempotent. Writes without an idempotency key — `create_contact`, `create_group`, `create_channel`, `send_email`, `create_api_key`, `rotate_api_key`, and `create_domain` — are never retryable after a timeout or a network failure, because the request may have reached Reloop and the email may already be out.
+`retryable` is computed from the HTTP status and from whether the request was idempotent. Writes without an idempotency key — `create_contact`, `create_property`, `create_group`, `create_channel`, `send_email`, `resend_email`, `send_test_email`, `create_api_key`, `rotate_api_key`, and `create_domain` — are never retryable after a timeout or a network failure, because the request may have reached Reloop and the email may already be out.
 
 ## No resources, no prompts
 

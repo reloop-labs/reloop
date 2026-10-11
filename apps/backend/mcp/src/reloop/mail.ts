@@ -17,4 +17,13 @@ export class MailApi {
 			idempotent: false,
 		});
 	}
+
+	resend(id: string): Promise<SendEmailResponse> {
+		return this.#client.request<SendEmailResponse>({
+			method: "POST",
+			path: mailEndpoints.resend(id),
+			codes: { 404: "email_not_found" },
+			idempotent: false,
+		});
+	}
 }

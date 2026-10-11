@@ -1,6 +1,6 @@
 # Reloop MCP
 
-The official [Model Context Protocol](https://modelcontextprotocol.io) server for [Reloop](https://reloop.sh), open-source email infrastructure. It lets MCP clients and coding agents operate a Reloop organization through typed tools: read and manage contacts, groups, and subscription channels, send transactional email, and manage API keys and sending domains. The npm package is `reloop-mcp` and the binary is `reloop-mcp`; the source lives at [github.com/reloop-labs/reloop-mcp](https://github.com/reloop-labs/reloop-mcp). It implements MCP revision 2026-07-28 with the official TypeScript SDK v2 over stateless Streamable HTTP, and still serves 2025-era clients through the SDK's legacy compatibility layer.
+The official [Model Context Protocol](https://modelcontextprotocol.io) server for [Reloop](https://reloop.sh), open-source email infrastructure. It lets MCP clients and coding agents operate a Reloop organization through typed tools: read and manage contacts, contact properties, groups, and subscription channels, send transactional email and inspect what was sent, look up templates, and manage API keys and sending domains. The npm package is `reloop-mcp` and the binary is `reloop-mcp`; the source lives at [github.com/reloop-labs/reloop-mcp](https://github.com/reloop-labs/reloop-mcp). It implements MCP revision 2026-07-28 with the official TypeScript SDK v2 over stateless Streamable HTTP, and still serves 2025-era clients through the SDK's legacy compatibility layer.
 
 ## Transports
 
@@ -208,6 +208,60 @@ Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
 | Input | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | yes | Contact ID as returned by Reloop, for example con_123456789 |
+
+Returns: `deleted`, `id`
+
+### `list_properties`
+
+List the custom contact property definitions of the authenticated Reloop organization: each key, its type, and its fallback value, with offset pagination. Use this before create_contact or update_contact to learn which `properties` keys exist and whether they hold strings or numbers.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Properties per page, 1 to 100 |
+| `search` | string | no | Case-insensitive substring to match against the property name |
+| `type` | string \| number | no | Only return properties of this type |
+
+Returns: `properties`, `pagination`
+
+### `create_property`
+
+Define a new custom contact property, such as company_name or plan_seats. Contacts can then store a value for it under that key in `properties`. Fails with `property_already_exists` when the name is taken; use list_properties first when unsure.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Property key used in contact properties and as a template variable, for example company_name |
+| `type` | string \| number | yes | string or number |
+| `fallbackValue` | string | no | Value used in emails when a contact has no value for this property |
+
+Returns: `property`
+
+### `update_property`
+
+Change the fallback value of a contact property by ID, or clear it with null. The name and type cannot be changed; to rename, create a new property and migrate contact values with update_contact.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Property ID as returned by list_properties, for example prop_123456789 |
+| `fallbackValue` | string or null | yes |  |
+
+Returns: `property`
+
+### `delete_property`
+
+Delete a contact property definition by ID. Use list_properties to confirm the right property first.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Property ID as returned by list_properties, for example prop_123456789 |
 
 Returns: `deleted`, `id`
 
@@ -425,6 +479,106 @@ Read-only: no · Destructive: yes · Idempotent: no · Open world: yes
 
 Returns: `id`, `messageId`, `status`, `timestamp`
 
+### `list_emails`
+
+List emails sent by the authenticated Reloop organization, newest first, with offset pagination. Covers API, SMTP, campaign, and automation sends. Filter by `recipient` (exact address), `status`, sending `domain`, a `search` on subject or sender, or a time window. Use this to answer whether an email reached someone, then get_email for its delivery events.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Emails per page, 1 to 100 |
+| `recipient` | string | no | Only emails sent to exactly this address |
+| `status` | pending \| sent \| delivered \| opened \| clicked \| bounced \| failed \| spam \| archived | no | Only emails whose latest status is this |
+| `domain` | string | no | Only emails sent from this domain, for example send.example.com |
+| `search` | string | no | Case-insensitive substring to match against the subject or sender address; use recipient to filter by recipient |
+| `since` | string | no | Only emails created at or after this ISO 8601 timestamp |
+| `until` | string | no | Only emails created at or before this ISO 8601 timestamp |
+
+Returns: `emails`, `pagination`
+
+### `get_email`
+
+Get one sent email by its log ID, with its delivery timeline (`events` such as delivered, opened, clicked, bounced) and the error message when delivery failed. Bodies are omitted unless `includeBody` is true, because HTML bodies can be large. Returns an `email_not_found` error when no email matches.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Email log ID, as returned by send_email or list_emails |
+| `includeBody` | boolean | no | Also return the text and HTML bodies |
+
+Returns: `email`
+
+### `get_email_stats`
+
+Get sending statistics for the organization over a time window: totals plus a per-day (or per-hour) series of sent, delivered, opened, bounced, complaint, and unsubscribe counts, with the delivery rate. Optionally limit to one sending domain by ID (from list_domains). Use this to judge deliverability or spot a bounce spike; use list_emails to inspect individual emails.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `since` | string | no | Start of the window as an ISO 8601 timestamp |
+| `until` | string | no | End of the window as an ISO 8601 timestamp |
+| `interval` | day \| hour | no | Bucket size of the series |
+| `domainId` | string | no | Only count emails sent from this domain ID |
+
+Returns: `totals`, `series`
+
+### `resend_email`
+
+Send a previously sent email again, by its log ID, with the same sender, recipients, subject, and body. This delivers a real, new email immediately and cannot be recalled, so confirm with the user first; check list_emails or get_email to make sure the original did not already arrive. Returns the new email log `id`. Fails with `email_not_found` when the ID does not exist.
+
+Read-only: no · Destructive: yes · Idempotent: no · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Email log ID, as returned by send_email or list_emails |
+
+Returns: `id`, `messageId`, `status`, `timestamp`
+
+### `list_templates`
+
+List the email templates of the authenticated Reloop organization with their subject, sender, status, and variables, with offset pagination. Use this to find a template ID and the variables it expects before send_email with `template`.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Templates per page, 1 to 100 |
+
+Returns: `templates`, `pagination`
+
+### `get_template`
+
+Get one email template by ID: its subject, sender, status, and the variables it expects. The visual editor content is not returned; use send_test_email to see the rendered result. Returns a `template_not_found` error when no template matches.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Template ID as returned by list_templates |
+
+Returns: `template`
+
+### `send_test_email`
+
+Render a template with the given variables and send it as a test to one address, usually the user's own, to preview it in a real inbox. This sends a real email. Use send_email with `template` for real recipients.
+
+Read-only: no · Destructive: yes · Idempotent: no · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `templateId` | string | yes | Template ID as returned by list_templates |
+| `to` | string | yes | Single address to receive the test |
+| `fromEmail` | string | no | Sender on a verified domain; defaults to the template's sender |
+| `subject` | string | no | Subject override; defaults to the template's subject |
+| `variables` | object | no | Values substituted into the template. FIRST_NAME, LAST_NAME, EMAIL, and UNSUBSCRIBE_URL are reserved and filled by Reloop. |
+
+Returns: `sent`
+
 ### `list_api_keys`
 
 List the API keys of the authenticated Reloop organization, newest first, with offset pagination. Secrets are never returned here; each key shows only its `start` prefix. Use `search` to match on the key name or prefix and `enabled` to filter by state. Use this to find a key ID before get_api_key, update_api_key, rotate_api_key, enable_api_key, disable_api_key, or delete_api_key.
@@ -623,8 +777,8 @@ Every failed call returns `isError: true` and no `structuredContent`; the text c
 | `validation_error` | Input failed schema validation, or Reloop returned 400/422 (including a failed sending-domain DNS check) | no |
 | `unauthorized` | The API key is missing, malformed, or rejected (401) | no |
 | `forbidden` | The key is valid but not allowed to perform the operation (403) | no |
-| `not_found` / `contact_not_found` / `group_not_found` / `channel_not_found` / `api_key_not_found` / `domain_not_found` | The contact, group, channel, API key, template, or sending domain does not exist (404) | no |
-| `conflict` / `contact_already_exists` / `group_already_exists` / `channel_already_exists` / `domain_already_exists` | The resource already exists (409) | no |
+| `not_found` / `contact_not_found` / `property_not_found` / `group_not_found` / `channel_not_found` / `email_not_found` / `template_not_found` / `api_key_not_found` / `domain_not_found` | The resource does not exist (404) | no |
+| `conflict` / `contact_already_exists` / `property_already_exists` / `group_already_exists` / `channel_already_exists` / `domain_already_exists` | The resource already exists (409) | no |
 | `rate_limited` | A Reloop rate limit was hit (429) | yes, after `retryAfterSeconds` |
 | `quota_exceeded` | The organization's email quota is exhausted (402) | no |
 | `upstream_error` | Reloop returned 5xx | only for reads |
@@ -633,7 +787,7 @@ Every failed call returns `isError: true` and no `structuredContent`; the text c
 | `malformed_response` | The response was not JSON, usually a wrong `RELOOP_BASE_URL` | no |
 | `internal_error` | A bug in this server | no |
 
-Writes without an idempotency key (`create_contact`, `create_group`, `create_channel`, `send_email`, `create_api_key`, `rotate_api_key`, `create_domain`) are never marked retryable after a timeout or network failure: the request may already have reached Reloop, and the email may already have been sent. Check the current state before repeating a write.
+Writes without an idempotency key (`create_contact`, `create_property`, `create_group`, `create_channel`, `send_email`, `resend_email`, `send_test_email`, `create_api_key`, `rotate_api_key`, `create_domain`) are never marked retryable after a timeout or network failure: the request may already have reached Reloop, and the email may already have been sent. Check the current state before repeating a write.
 
 ## Security
 
@@ -644,7 +798,7 @@ Writes without an idempotency key (`create_contact`, `create_group`, `create_cha
 - Request bodies are capped at 8 MB and upstream responses at 16 MB; record inputs are capped at 100 keys, recipients at 50.
 - `RELOOP_BASE_URL` is trusted server configuration and is never a tool parameter, so a model cannot redirect traffic to another host.
 - Reloop remains the authorization boundary: a key without access to an operation fails at Reloop, not here.
-- Destructive tools carry `destructiveHint` so clients can ask for confirmation. `send_email` sends real email that cannot be recalled, `delete_contact`, `delete_group`, `delete_channel`, `delete_api_key`, and `delete_domain` cannot be undone, and `rotate_api_key` and `disable_api_key` break every service using that key.
+- Destructive tools carry `destructiveHint` so clients can ask for confirmation. `send_email`, `resend_email`, and `send_test_email` send real email that cannot be recalled, `delete_contact`, `delete_property`, `delete_group`, `delete_channel`, `delete_api_key`, and `delete_domain` cannot be undone, and `rotate_api_key` and `disable_api_key` break every service using that key.
 
 ## Development
 

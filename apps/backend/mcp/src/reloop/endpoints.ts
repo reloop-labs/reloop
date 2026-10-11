@@ -11,6 +11,14 @@ export const contactEndpoints = {
 		`${CONTACTS}/channel/${encodeURIComponent(channelId)}`,
 } as const;
 
+const PROPERTIES = `${CONTACTS}/v1/properties`;
+
+export const propertyEndpoints = {
+	list: `${PROPERTIES}/list`,
+	create: `${PROPERTIES}/create`,
+	byId: (id: string) => `${PROPERTIES}/${encodeURIComponent(id)}`,
+} as const;
+
 const GROUPS = `${CONTACTS}/v1/groups`;
 
 export const groupEndpoints = {
@@ -28,7 +36,26 @@ export const channelEndpoints = {
 	byId: (id: string) => `${CHANNELS}/${encodeURIComponent(id)}`,
 } as const;
 
-export const mailEndpoints = { send: "/api/mail/v1/send" } as const;
+export const mailEndpoints = {
+	send: "/api/mail/v1/send",
+	resend: (id: string) => `/api/mail/v1/resend/${encodeURIComponent(id)}`,
+} as const;
+
+const EMAIL_LOGS = "/api/logs/v1/emails";
+
+export const emailLogEndpoints = {
+	list: EMAIL_LOGS,
+	stats: `${EMAIL_LOGS}/stats`,
+	byId: (id: string) => `${EMAIL_LOGS}/${encodeURIComponent(id)}`,
+} as const;
+
+const TEMPLATES = "/api/template/v1";
+
+export const templateEndpoints = {
+	list: `${TEMPLATES}/list`,
+	byId: (id: string) => `${TEMPLATES}/${encodeURIComponent(id)}`,
+	test: (id: string) => `${TEMPLATES}/${encodeURIComponent(id)}/test`,
+} as const;
 
 const API_KEYS = "/api/api-key/v1";
 
