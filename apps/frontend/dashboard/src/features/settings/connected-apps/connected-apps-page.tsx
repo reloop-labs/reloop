@@ -291,7 +291,7 @@ export function ConnectedAppsPage() {
 						})}
 				{!loading && apps.length === 0 && (
 					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<Icon name="link" className="mb-3 h-8 w-8 text-text-sub-600" />
+						<Icon name="plug-custom" className="mb-3 h-8 w-8 text-text-sub-600" />
 						<p className="font-medium text-text-strong-950">
 							No connected apps
 						</p>

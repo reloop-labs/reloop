@@ -18,6 +18,7 @@ import { AnimatedMailActionIcon } from "./animated-mail-action-icon";
 import { AnimatedMailIcon } from "./animated-mail-icon";
 import { AnimatedMetricsIcon } from "./animated-metrics-icon";
 import { AnimatedOrganizationIcon } from "./animated-organization-icon";
+import { AnimatedPlugIcon } from "./animated-plug-icon";
 import { AnimatedProfileIcon } from "./animated-profile-icon";
 import { AnimatedRobotIcon } from "./animated-robot-icon";
 import { AnimatedSecurityIcon } from "./animated-security-icon";
@@ -105,6 +106,8 @@ export function SidebarNavIcon({
 			return <AnimatedTeamsIcon className={tone} />;
 		case "workspace-custom":
 			return <AnimatedOrganizationIcon className={tone} />;
+		case "plug-custom":
+			return <AnimatedPlugIcon className={tone} />;
 		case "user":
 			return <AnimatedProfileIcon className={tone} />;
 		case "shield-check":

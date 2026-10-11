@@ -198,7 +198,7 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 			{
 				label: "Connected Apps",
 				path: "/settings/connected-apps",
-				iconName: "link",
+				iconName: "plug-custom",
 				shortcut: { label: "G Shift+A", keys: ["g shift+a", "g+shift+a"] },
 			},
 		],
