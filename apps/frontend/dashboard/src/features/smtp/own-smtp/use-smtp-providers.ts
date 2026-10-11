@@ -37,9 +37,10 @@ export type SmtpProviderInput = {
 	host: string;
 	port: number;
 	security: SmtpSecurity;
-	username?: string | null;
+	/** Required on create. */
+	username?: string;
 	/** Omit on update to keep the stored password. */
-	password?: string | null;
+	password?: string;
 };
 
 const BASE = "/api/domain/v1/smtp-providers";
@@ -110,12 +111,21 @@ export function useSaveSmtpProvider() {
 export function useTestSmtpProvider() {
 	const invalidate = useInvalidate();
 	return useMutation({
-		mutationFn: async (id: string) => {
+		/** Pass `to` to deliver a real test email instead of only logging in. */
+		mutationFn: async (
+			arg: string | { id: string; to?: string; from?: string },
+		) => {
+			const { id, to, from } =
+				typeof arg === "string"
+					? { id: arg, to: undefined, from: undefined }
+					: arg;
 			const res = await axios.post<{
 				ok: boolean;
 				error: string | null;
 				provider: SmtpProvider;
-			}>(`${BASE}/${id}/test`, undefined, { withCredentials: true });
+			}>(`${BASE}/${id}/test`, to ? { to, from } : undefined, {
+				withCredentials: true,
+			});
 			return res.data;
 		},
 		onSuccess: () => invalidate(),
@@ -130,4 +140,22 @@ export function useDeleteSmtpProvider() {
 		},
 		onSuccess: () => invalidate(),
 	});
+}
+
+/** Turn a raw SMTP error into a hint the user can act on. */
+export function explainSmtpError(error: string): string | null {
+	const e = error.toLowerCase();
+	if (/\b535\b|auth|credentials|username and password/.test(e)) {
+		return "The server rejected the username or password.";
+	}
+	if (/\b55[0-4]\b|sender|from address|not owned|unverified|relay/.test(e)) {
+		return "The server refused this From address. Verify the sender or domain with your provider.";
+	}
+	if (/econnrefused|etimedout|timeout|ehostunreach|enotfound/.test(e)) {
+		return "Couldn't reach the server. Check the host and port.";
+	}
+	if (/starttls|tls|certificate|ssl/.test(e)) {
+		return "TLS failed. Use port 587 (or 2525) with STARTTLS.";
+	}
+	return null;
 }

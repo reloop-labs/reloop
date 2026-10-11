@@ -50,10 +50,11 @@ export class SmtpProvidersApi {
 		});
 	}
 
-	test(id: string): Promise<TestSmtpProviderResponse> {
+	test(id: string, to?: string): Promise<TestSmtpProviderResponse> {
 		return this.#client.request<TestSmtpProviderResponse>({
 			method: "POST",
 			path: smtpProviderEndpoints.test(id),
+			body: to ? { to } : undefined,
 			codes: SMTP_PROVIDER_CODES,
 			idempotent: true,
 		});

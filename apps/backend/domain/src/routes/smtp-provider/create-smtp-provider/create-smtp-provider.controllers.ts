@@ -48,7 +48,7 @@ export async function createSmtpProviderController({
 	const domainName = normalizeRelayDomain(body.domain);
 	assertSecurityAllowed(security);
 	await resolveSmtpHost(host);
-	const passwordEnc = body.password ? encryptSmtpPassword(body.password) : null;
+	const passwordEnc = encryptSmtpPassword(body.password);
 
 	const { row, attached } = await db.transaction(async (tx) => {
 		await assertSmtpProviderQuota(organizationId, tx);
@@ -60,7 +60,7 @@ export async function createSmtpProviderController({
 				host,
 				port: body.port,
 				security,
-				username: body.username?.trim() || null,
+				username: body.username.trim(),
 				passwordEnc,
 			})
 			.returning();

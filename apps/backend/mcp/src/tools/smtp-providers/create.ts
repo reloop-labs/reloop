@@ -25,8 +25,8 @@ export const createSmtpProvider = defineTool({
 		host: smtpHostSchema,
 		port: smtpPortSchema,
 		security: smtpSecuritySchema.optional(),
-		username: z.string().max(255).optional().describe("SMTP login"),
-		password: z.string().max(1024).optional().describe("SMTP password"),
+		username: z.string().min(1).max(255).describe("SMTP login"),
+		password: z.string().min(1).max(1024).describe("SMTP password"),
 		name: z
 			.string()
 			.min(1)

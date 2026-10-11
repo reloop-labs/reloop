@@ -10,12 +10,18 @@ export const testSmtpProviderRoute = new Elysia()
 	.use(rateLimitPlugin({ max: 5, windowSeconds: 60, namespace: "smtp-test" }))
 	.post(
 		"/smtp-providers/:provider_id/test",
-		async ({ params: { provider_id }, organizationId }) =>
-			testSmtpProviderController({ organizationId, providerId: provider_id }),
+		async ({ params: { provider_id }, organizationId, body }) =>
+			testSmtpProviderController({
+				organizationId,
+				providerId: provider_id,
+				to: body?.to,
+				from: body?.from,
+			}),
 		{
 			auth: true,
 			rateLimit: true,
 			params: SmtpProviderModel.params,
+			body: SmtpProviderModel.testBody,
 			response: {
 				200: SmtpProviderModel.testResponse,
 				400: ErrorResponseSchema,
@@ -25,7 +31,7 @@ export const testSmtpProviderRoute = new Elysia()
 				tags: ["SMTP Providers"],
 				summary: "Test SMTP provider",
 				description:
-					"Connects to the relay, negotiates STARTTLS and authenticates. No mail is sent.",
+					"Connects to the relay, negotiates STARTTLS and authenticates. Pass `to` to also deliver a real test email (from `from`, default hello@ the first sending domain).",
 			},
 		},
 	);

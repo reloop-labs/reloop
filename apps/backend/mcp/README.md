@@ -784,8 +784,8 @@ Read-only: no · Destructive: no · Idempotent: no · Open world: yes
 | `host` | string | yes | SMTP server hostname, for example smtp.sendgrid.net |
 | `port` | integer | yes | SMTP server port, usually 587 |
 | `security` | starttls \| none | no | starttls requires STARTTLS with a valid certificate (ports 587, 25, 2525). none is plaintext and only allowed on self-hosted Reloop. Port 465 implicit TLS is not supported. |
-| `username` | string | no | SMTP login |
-| `password` | string | no | SMTP password |
+| `username` | string | yes | SMTP login |
+| `password` | string | yes | SMTP password |
 | `name` | string | no | Label for the server; defaults to the domain |
 
 Returns: `provider`
@@ -804,20 +804,21 @@ Read-only: no · Destructive: no · Idempotent: yes · Open world: no
 | `host` | string | no | SMTP server hostname, for example smtp.sendgrid.net |
 | `port` | integer | no | SMTP server port, usually 587 |
 | `security` | starttls \| none | no | starttls requires STARTTLS with a valid certificate (ports 587, 25, 2525). none is plaintext and only allowed on self-hosted Reloop. Port 465 implicit TLS is not supported. |
-| `username` | string or null | no |  |
-| `password` | string or null | no | New password; null clears it |
+| `username` | string | no |  |
+| `password` | string | no | New password; omit to keep the stored one |
 
 Returns: `provider`
 
 ### `test_smtp_provider`
 
-Connect to an SMTP provider by ID, negotiate STARTTLS, and log in, without sending mail. Returns `ok` and the server's `error` message when it fails, and stores the result on the provider.
+Connect to an SMTP provider by ID, negotiate STARTTLS, and log in. Pass `to` to also deliver a real test email so the user can confirm it lands. Returns `ok` and the server's `error` message when it fails, and stores the result on the provider.
 
 Read-only: no · Destructive: no · Idempotent: yes · Open world: yes
 
 | Input | Type | Required | Description |
 |---|---|---|---|
 | `id` | string | yes | SMTP provider ID as returned by Reloop, for example smtp_123456789 |
+| `to` | string | no | Send a real test email to this address |
 
 Returns: `ok`, `error`, `provider`
 

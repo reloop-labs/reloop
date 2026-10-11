@@ -1,6 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import type { CommandAction } from "#/features/dashboard/command-menu";
@@ -14,11 +15,12 @@ import {
 	type SmtpProvider,
 	useSmtpProviders,
 } from "./own-smtp/use-smtp-providers";
+import { SMTP_DOCS_URL, SmtpCodeDrawer } from "./smtp-code-drawer";
 import { DEFAULT_SMTP_HOST } from "./smtp-code-examples";
+import { ReloopSmtpSection } from "./smtp-servers/reloop-smtp-panel";
 import { SmtpServersTable } from "./smtp-servers/smtp-servers-table";
 
-const DOCS_URL = "https://reloop.sh/docs/examples/smtp/introduction";
-const openDocs = () => window.open(DOCS_URL, "_blank");
+const openDocs = () => window.open(SMTP_DOCS_URL, "_blank");
 
 const darkKbd =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]";
@@ -32,10 +34,10 @@ export function SmtpPage({
 }: {
 	smtpHost?: string;
 }) {
+	const router = useRouter();
 	const { isOrgAdmin } = useOrgPermissions();
 	const { data: usage } = useBillingUsage();
 	const providersQuery = useSmtpProviders();
-	const [formOpen, setFormOpen] = useState(false);
 	const [editing, setEditing] = useState<SmtpProvider | null>(null);
 	const [deleting, setDeleting] = useState<SmtpProvider | null>(null);
 
@@ -46,14 +48,8 @@ export function SmtpPage({
 	const canAdd = isOrgAdmin && entitled && !atLimit;
 
 	const openAdd = useCallback(() => {
-		if (!canAdd) return;
-		setEditing(null);
-		setFormOpen(true);
-	}, [canAdd]);
-	const openEdit = (provider: SmtpProvider) => {
-		setEditing(provider);
-		setFormOpen(true);
-	};
+		if (canAdd) router.push("/smtp/add");
+	}, [canAdd, router]);
 	useHotkeys(
 		"d",
 		(e) => {
@@ -78,13 +74,25 @@ export function SmtpPage({
 				? [
 						{
 							id: "add-smtp-server",
-							label: "Add SMTP server",
+							label: "Connect to SMTP Server",
 							icon: "plus",
 							shortcut: { label: "C", keys: ["c"] },
 							onSelect: openAdd,
 						},
 					]
 				: []),
+			{
+				id: "smtp-code",
+				label: "Open SMTP code samples",
+				icon: "code",
+				shortcut: { label: "S", keys: ["s"] },
+				onSelect: () =>
+					window.dispatchEvent(
+						new CustomEvent("api-details:open", {
+							detail: { docSection: "smtp" },
+						}),
+					),
+			},
 			{
 				id: "smtp-docs",
 				label: "Go to Docs",
@@ -110,6 +118,24 @@ export function SmtpPage({
 				</div>
 
 				<div className="flex shrink-0 items-center gap-2">
+					<SmtpCodeDrawer
+						smtpHost={smtpHost}
+						renderTrigger={({ open }) => (
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="small"
+								onClick={open}
+								className="gap-1.5 rounded-xl"
+								aria-keyshortcuts="s"
+							>
+								<Icon name="code" className="h-4 w-4 text-text-sub-600" />
+								Code
+								<ActionKbd>S</ActionKbd>
+							</Button.Root>
+						)}
+					/>
 					<Button.Root
 						type="button"
 						variant="neutral"
@@ -122,6 +148,23 @@ export function SmtpPage({
 						Documentation
 						<ActionKbd>D</ActionKbd>
 					</Button.Root>
+				</div>
+			</div>
+
+			<ReloopSmtpSection smtpHost={smtpHost} />
+
+			<section className="space-y-4 pt-4 pb-8">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+					<div>
+						<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight">
+							Bring your own SMTP
+						</h2>
+						<p className="mt-1 max-w-2xl text-text-sub-600 text-xs leading-relaxed">
+							Already use SendGrid, Postmark, Microsoft 365 or your own server?
+							Send through it and keep templates, tracking, logs and webhooks in
+							Reloop. No DNS setup.
+						</p>
+					</div>
 					{isOrgAdmin && entitled ? (
 						<FancyButton.Root
 							type="button"
@@ -138,14 +181,12 @@ export function SmtpPage({
 							aria-keyshortcuts="c"
 						>
 							<Icon name="plus" className="h-4 w-4" />
-							Add SMTP server
+							Connect to SMTP Server
 							<ActionKbd className={darkKbd}>C</ActionKbd>
 						</FancyButton.Root>
 					) : null}
 				</div>
-			</div>
 
-			<div className="pb-8">
 				{providersQuery.error ? (
 					<p className="mb-3 text-error-base text-paragraph-xs">
 						Couldn't load your SMTP servers.{" "}
@@ -160,30 +201,29 @@ export function SmtpPage({
 				) : null}
 
 				<SmtpServersTable
-					smtpHost={smtpHost}
 					providers={providers}
 					isLoading={providersQuery.isPending}
 					entitled={entitled}
 					canManage={Boolean(isOrgAdmin)}
 					onAdd={openAdd}
-					onEdit={openEdit}
+					onEdit={setEditing}
 					onDelete={setDeleting}
 				/>
 
 				{providers.length > 0 ? (
-					<p className="mt-3 text-[12px] text-text-soft-400 leading-relaxed">
+					<p className="text-[12px] text-text-soft-400 leading-relaxed">
 						Mail from your own servers still gets Reloop's checks, templates,
 						tracking, logs and webhooks. “Delivered” means your server accepted
 						the message; later bounces go to your provider.
 					</p>
 				) : null}
-			</div>
+			</section>
 
 			<ProviderFormModal
-				open={formOpen}
+				open={!!editing}
 				provider={editing}
 				selfHosted={usage?.selfHosted === true}
-				onClose={() => setFormOpen(false)}
+				onClose={() => setEditing(null)}
 			/>
 			<DeleteProviderModal
 				provider={deleting}

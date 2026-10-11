@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { buildReloopAiPrompt } from "#/features/dashboard/page-header/copy-prompt-button";
 import { SMTP_USER } from "../smtp-code-examples";
-import { SmtpCodePanel } from "../smtp-code-panel";
 
 /** All supported SMTP ports, shown slash-separated in the credentials table. */
 export const SMTP_PORTS = "465 / 587 / 2587 / 2465";
@@ -169,56 +168,79 @@ function CredentialRow({
 	);
 }
 
-/** Expanded body of the built-in "Reloop SMTP" row: credentials + samples. */
-export function ReloopSmtpPanel({ smtpHost }: { smtpHost: string }) {
+export function openSmtpCodeDrawer() {
+	window.dispatchEvent(
+		new CustomEvent("api-details:open", { detail: { docSection: "smtp" } }),
+	);
+}
+
+/** Reloop's own SMTP relay: always available, credentials up front. */
+export function ReloopSmtpSection({ smtpHost }: { smtpHost: string }) {
 	const router = useRouter();
 
 	return (
-		<div className="grid grid-cols-1 gap-6 border-stroke-soft-100 border-t bg-bg-weak-50/40 p-4 lg:grid-cols-12 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-			<div className="space-y-3 lg:col-span-5">
-				<p className="text-text-sub-600 text-xs leading-relaxed">
-					Point any SMTP client or library at Reloop and authenticate with an
-					API key. No server of your own needed.
-				</p>
-				<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
-					<CredentialRow label="Host" value={smtpHost} mono />
-					<CredentialRow
-						label="Port"
-						value={SMTP_PORTS}
-						mono
-						tooltip="465 SSL/TLS · 587 STARTTLS · 2587 STARTTLS · 2465 TLS"
-					/>
-					<CredentialRow label="User" value={SMTP_USER} mono />
-					<CredentialRow
-						label="Password"
-						value="YOUR_API_KEY"
-						mono
-						copyable={false}
-						tooltip="Use any workspace API key as the SMTP password."
-						action={
-							<FancyButton.Root
-								type="button"
-								variant="neutral"
-								size="xsmall"
-								onClick={() => router.push("/api-keys/create")}
-								className="gap-1.5 rounded-lg"
-							>
-								<Icon name="key-new" className="h-3.5 w-3.5" />
-								Get API key
-							</FancyButton.Root>
-						}
-					/>
+		<section className="space-y-4 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/40 p-4 sm:p-5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+				<div className="min-w-0">
+					<div className="flex flex-wrap items-center gap-2">
+						<Icon name="smtp" className="h-4 w-4 shrink-0 text-text-sub-600" />
+						<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight">
+							Reloop SMTP
+						</h2>
+						<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100 dark:bg-black">
+							Built-in
+						</span>
+						<span className="flex items-center gap-1 font-medium text-[12px] text-success-base">
+							<Icon name="check-circle" className="h-3.5 w-3.5" />
+							Active
+						</span>
+					</div>
+					<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+						Point any SMTP client at Reloop and use an API key as the password.
+						No server of your own needed.
+					</p>
 				</div>
-				<div className="flex flex-wrap items-center gap-2">
-					<CopySkillPromptButton />
-					<span className="text-[11px] text-text-soft-400">
-						Paste into your coding agent to wire Reloop SMTP into your app.
-					</span>
+				<div className="flex shrink-0 items-center gap-2">
+					<CopySkillPromptButton className="h-8" />
+					<button
+						type="button"
+						onClick={openSmtpCodeDrawer}
+						className="inline-flex h-8 items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3.5 font-medium text-text-strong-950 text-xs hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50 dark:text-white"
+					>
+						<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
+						View code samples
+					</button>
 				</div>
 			</div>
-			<div className="min-w-0 lg:col-span-7">
-				<SmtpCodePanel apiKeyPlaceholder="YOUR_API_KEY" smtpHost={smtpHost} />
+			<div className="grid grid-cols-1 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 md:grid-cols-2 dark:border-stroke-soft-100/40 dark:bg-black md:[&>*:nth-child(odd)]:border-r md:[&>*:nth-last-child(-n+2)]:border-b-0">
+				<CredentialRow label="Host" value={smtpHost} mono />
+				<CredentialRow
+					label="Port"
+					value={SMTP_PORTS}
+					mono
+					tooltip="465 SSL/TLS · 587 STARTTLS · 2587 STARTTLS · 2465 TLS"
+				/>
+				<CredentialRow label="User" value={SMTP_USER} mono />
+				<CredentialRow
+					label="Password"
+					value="YOUR_API_KEY"
+					mono
+					copyable={false}
+					tooltip="Use any workspace API key as the SMTP password."
+					action={
+						<FancyButton.Root
+							type="button"
+							variant="neutral"
+							size="xsmall"
+							onClick={() => router.push("/api-keys/create")}
+							className="gap-1.5 rounded-lg"
+						>
+							<Icon name="key-new" className="h-3.5 w-3.5" />
+							Get API key
+						</FancyButton.Root>
+					}
+				/>
 			</div>
-		</div>
+		</section>
 	);
 }

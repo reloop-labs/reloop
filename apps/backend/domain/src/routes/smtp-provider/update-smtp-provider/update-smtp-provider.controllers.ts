@@ -42,12 +42,10 @@ export async function updateSmtpProviderController({
 		update.security = body.security;
 	}
 	if (body.username !== undefined) {
-		update.username = body.username?.trim() || null;
+		update.username = body.username.trim();
 	}
 	if (body.password !== undefined) {
-		update.passwordEnc = body.password
-			? encryptSmtpPassword(body.password)
-			: null;
+		update.passwordEnc = encryptSmtpPassword(body.password);
 	}
 
 	// Any connection change invalidates the last test result.

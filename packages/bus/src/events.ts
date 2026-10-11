@@ -74,4 +74,7 @@ export enum BusEvent {
 	INBOUND_EMAIL_RECEIVED = "inbox.inbound_received",
 	MAILBOX_CREATED = "mailbox.created",
 	MAILBOX_DELETED = "mailbox.deleted",
+
+	// Startup Program Events
+	STARTUP_APPLICATION_APPROVED = "startup.application.approved",
 }

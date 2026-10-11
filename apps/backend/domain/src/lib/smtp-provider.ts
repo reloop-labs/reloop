@@ -153,12 +153,9 @@ export function assertSecurityAllowed(security: SmtpSecurity): void {
 	}
 }
 
-/** Connect, negotiate TLS and authenticate. Returns null on success. */
-export async function testSmtpConnection(
-	config: SmtpConnectionConfig,
-): Promise<string | null> {
+async function createRelayTransport(config: SmtpConnectionConfig) {
 	const target = await resolveSmtpHost(config.host);
-	const transporter = nodemailer.createTransport({
+	return nodemailer.createTransport({
 		// Connect to the vetted IP; keep the name for SNI/certificate checks.
 		host: target.pinnedIp,
 		port: config.port,
@@ -174,11 +171,48 @@ export async function testSmtpConnection(
 		greetingTimeout: 10_000,
 		socketTimeout: 15_000,
 	});
+}
+
+function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
+}
+
+/** Connect, negotiate TLS and authenticate. Returns null on success. */
+export async function testSmtpConnection(
+	config: SmtpConnectionConfig,
+): Promise<string | null> {
+	const transporter = await createRelayTransport(config);
 	try {
 		await transporter.verify();
 		return null;
 	} catch (error) {
-		return error instanceof Error ? error.message : String(error);
+		return errorMessage(error);
+	} finally {
+		transporter.close();
+	}
+}
+
+/**
+ * Send a real message through the relay so the user can see it land. Proves
+ * more than `verify()`: the server must also accept this From address.
+ * Returns null on success, else the server's error.
+ */
+export async function sendSmtpTestEmail(
+	config: SmtpConnectionConfig,
+	message: { from: string; to: string },
+): Promise<string | null> {
+	const transporter = await createRelayTransport(config);
+	try {
+		await transporter.sendMail({
+			from: { name: "Reloop", address: message.from },
+			to: message.to,
+			subject: "Your SMTP server is connected to Reloop",
+			text: `This is a test email sent through ${config.host}:${config.port}.\n\nIf you're reading this, your SMTP server works. Mail you send from Reloop will now go through it, with templates, tracking, logs and webhooks still in Reloop.`,
+			html: `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;line-height:1.6;color:#0e121b"><p style="font-size:16px;font-weight:600;margin:0 0 12px">Your SMTP server works 🎉</p><p style="margin:0 0 12px">This test email was sent through <b>${config.host}:${config.port}</b>.</p><p style="margin:0;color:#525866">Mail you send from Reloop will now go through it, with templates, tracking, logs and webhooks still in Reloop.</p></div>`,
+		});
+		return null;
+	} catch (error) {
+		return errorMessage(error);
 	} finally {
 		transporter.close();
 	}

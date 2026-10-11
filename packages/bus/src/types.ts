@@ -399,6 +399,13 @@ export interface MailboxDeletedPayload {
 	email: string;
 }
 
+export interface StartupApplicationApprovedPayload {
+	applicationId: string;
+	email: string;
+	fullName: string;
+	company: string;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -453,4 +460,5 @@ export interface EventPayloads {
 	[BusEvent.INBOUND_EMAIL_RECEIVED]: InboundEmailReceivedPayload;
 	[BusEvent.MAILBOX_CREATED]: MailboxCreatedPayload;
 	[BusEvent.MAILBOX_DELETED]: MailboxDeletedPayload;
+	[BusEvent.STARTUP_APPLICATION_APPROVED]: StartupApplicationApprovedPayload;
 }

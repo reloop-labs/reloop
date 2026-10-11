@@ -65,8 +65,8 @@ export namespace SmtpProviderModel {
 		host,
 		port,
 		security: t.Optional(security),
-		username: t.Optional(t.String({ maxLength: 255 })),
-		password: t.Optional(t.String({ maxLength: 1024 })),
+		username: t.String({ minLength: 1, maxLength: 255 }),
+		password: t.String({ minLength: 1, maxLength: 1024 }),
 	});
 
 	export const updateBody = t.Object({
@@ -75,10 +75,12 @@ export namespace SmtpProviderModel {
 		host: t.Optional(host),
 		port: t.Optional(port),
 		security: t.Optional(security),
-		username: t.Optional(t.Union([t.String({ maxLength: 255 }), t.Null()])),
+		username: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
 		password: t.Optional(
-			t.Union([t.String({ maxLength: 1024 }), t.Null()], {
-				description: "Omit to keep the stored password, null to clear it",
+			t.String({
+				minLength: 1,
+				maxLength: 1024,
+				description: "Omit to keep the stored password",
 			}),
 		),
 	});
@@ -91,6 +93,39 @@ export namespace SmtpProviderModel {
 		provider,
 	});
 
+	const email = t.String({ format: "email", maxLength: 320 });
+
+	/** Send a real test email through credentials that aren't saved yet. */
+	export const sendTestBody = t.Object({
+		host,
+		port,
+		security: t.Optional(security),
+		username: t.String({ minLength: 1, maxLength: 255 }),
+		password: t.String({ minLength: 1, maxLength: 1024 }),
+		from: t.String({
+			...email,
+			description: "From address on the sending domain, e.g. hello@example.com",
+		}),
+		to: t.String({ ...email, description: "Where to deliver the test email" }),
+	});
+
+	export const testBody = t.Optional(
+		t.Object({
+			to: t.Optional(
+				t.String({
+					...email,
+					description: "Also send a real test email to this address",
+				}),
+			),
+			from: t.Optional(email),
+		}),
+	);
+
+	export const sendTestResponse = t.Object({
+		ok: t.Boolean(),
+		error: t.Union([t.String(), t.Null()]),
+	});
+
 	export const deleteResponse = t.Object({
 		object: t.Literal("smtp_provider"),
 		id: t.String(),
@@ -100,3 +135,4 @@ export namespace SmtpProviderModel {
 
 export type SmtpProviderCreateBody = typeof SmtpProviderModel.createBody.static;
 export type SmtpProviderUpdateBody = typeof SmtpProviderModel.updateBody.static;
+export type SmtpSendTestBody = typeof SmtpProviderModel.sendTestBody.static;

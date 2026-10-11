@@ -28,13 +28,13 @@ export const updateSmtpProvider = defineTool({
 		host: smtpHostSchema.optional(),
 		port: smtpPortSchema.optional(),
 		security: smtpSecuritySchema.optional(),
-		username: z.string().max(255).nullable().optional(),
+		username: z.string().min(1).max(255).optional(),
 		password: z
 			.string()
+			.min(1)
 			.max(1024)
-			.nullable()
 			.optional()
-			.describe("New password; null clears it"),
+			.describe("New password; omit to keep the stored one"),
 	}),
 	output: z.object({ provider: smtpProviderSchema }),
 	async run({ id, ...input }, api) {

@@ -33,10 +33,7 @@ export function normalizeRelayDomain(input: string): string {
  * usable at once; receiving and tracking stay on only if their DNS record is
  * already verified — otherwise the live send check would fail the domain.
  */
-export async function relayActivation(
-	tx: DatabaseInstance,
-	domainId: string,
-) {
+export async function relayActivation(tx: DatabaseInstance, domainId: string) {
 	const records = await tx
 		.select({
 			recordType: domainDnsRecord.recordType,

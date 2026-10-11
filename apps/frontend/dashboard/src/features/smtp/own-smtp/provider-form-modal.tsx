@@ -116,6 +116,9 @@ export function ProviderFormModal({
 		Number.isInteger(portNumber) &&
 		portNumber > 0 &&
 		portNumber <= 65535 &&
+		username.trim() !== "" &&
+		// Editing keeps the saved password when left blank.
+		(password !== "" || Boolean(provider?.hasPassword)) &&
 		!save.isPending;
 
 	const onSubmit = async (e: FormEvent) => {
@@ -126,11 +129,10 @@ export function ProviderFormModal({
 			host: host.trim(),
 			port: portNumber,
 			security,
-			username: username.trim() || null,
+			username: username.trim(),
 		};
 		// Blank password on edit keeps the stored one.
-		if (password !== "" || !provider) input.password = password || null;
-		if (!provider && !input.username) delete input.username;
+		if (password !== "") input.password = password;
 		if (provider) input.name = name.trim();
 		if (domain.trim()) input.domain = domain.trim().toLowerCase();
 		try {
@@ -153,7 +155,7 @@ export function ProviderFormModal({
 				showClose={false}
 			>
 				<ModalHeader
-					title={provider ? "Edit SMTP server" : "Add your SMTP server"}
+					title={provider ? "Edit SMTP server" : "Connect to SMTP Server"}
 					subtitle={
 						provider
 							? provider.host
@@ -214,8 +216,9 @@ export function ProviderFormModal({
 							<TextInput
 								id="smtp-port"
 								value={port}
-								onChange={setPort}
-								type="number"
+								onChange={(value) =>
+									setPort(value.replace(/\D/g, "").slice(0, 5))
+								}
 							/>
 						</Field>
 					</div>
@@ -241,7 +244,7 @@ export function ProviderFormModal({
 						</Select.Root>
 					</Field>
 
-					<Field id="smtp-username" label="Username">
+					<Field id="smtp-username" label="Username" required>
 						<TextInput
 							id="smtp-username"
 							value={username}
@@ -253,13 +256,14 @@ export function ProviderFormModal({
 									setDomain(fromLogin.toLowerCase());
 								}
 							}}
-							placeholder="apikey or you@example.com"
+							placeholder="username"
 						/>
 					</Field>
 
 					<Field
 						id="smtp-password"
 						label="Password"
+						required={!provider?.hasPassword}
 						hint={
 							provider?.hasPassword
 								? "Leave blank to keep the saved password."
@@ -301,7 +305,7 @@ export function ProviderFormModal({
 								? "Testing connection…"
 								: provider
 									? "Save"
-									: "Add SMTP server"}
+									: "Connect to SMTP Server"}
 						</FancyButton.Root>
 					</div>
 				</form>

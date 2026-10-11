@@ -6,10 +6,9 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { toast } from "@reloop/ui/toast";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { type ReactNode, useState } from "react";
+import { useSessionQuery } from "#/features/auth/session-query";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import {
@@ -17,7 +16,6 @@ import {
 	type SmtpProvider,
 	useTestSmtpProvider,
 } from "../own-smtp/use-smtp-providers";
-import { ReloopSmtpPanel } from "./reloop-smtp-panel";
 import {
 	type RowAction,
 	RowActionsMenu,
@@ -28,8 +26,6 @@ import {
 const GRID = {
 	gridTemplateColumns: "minmax(0,1fr) 210px 190px 120px 110px 100px 32px",
 } as const;
-
-const DOCS_URL = "https://reloop.sh/docs/examples/smtp/introduction";
 
 function HeaderCell({ icon, label }: { icon: string; label: string }) {
 	return (
@@ -132,119 +128,6 @@ function rowClass(active: boolean) {
 	);
 }
 
-function ReloopRow({
-	smtpHost,
-	expanded,
-	onToggle,
-}: {
-	smtpHost: string;
-	expanded: boolean;
-	onToggle: () => void;
-}) {
-	const router = useRouter();
-	const [menuOpen, setMenuOpen] = useState(false);
-	const actions: RowAction[] = [
-		{
-			id: "setup",
-			label: expanded ? "Hide setup" : "View setup",
-			icon: "code",
-			onSelect: onToggle,
-		},
-		{
-			id: "copy-host",
-			label: "Copy host",
-			icon: "copy",
-			onSelect: () => {
-				void navigator.clipboard.writeText(smtpHost);
-				toast.success("SMTP host copied");
-			},
-		},
-		{
-			id: "api-key",
-			label: "Get API key",
-			icon: "key-new",
-			onSelect: () => router.push("/api-keys/create"),
-		},
-		{
-			id: "docs",
-			label: "Documentation",
-			icon: "external-link",
-			onSelect: () => window.open(DOCS_URL, "_blank"),
-		},
-	];
-
-	return (
-		<div>
-			<RowContextMenu actions={actions} onOpenChange={setMenuOpen}>
-				{/* biome-ignore lint/a11y/useSemanticElements: row holds the actions menu button, so it can't be a <button> */}
-				<div
-					role="button"
-					tabIndex={0}
-					aria-expanded={expanded}
-					style={GRID}
-					onClick={onToggle}
-					onKeyDown={(e) => {
-						if (e.key === "Enter" || e.key === " ") {
-							e.preventDefault();
-							onToggle();
-						}
-					}}
-					className={cn(rowClass(menuOpen || expanded), "cursor-pointer")}
-				>
-					<div className="flex min-w-0 items-center gap-2">
-						<Icon
-							name="chevron-right"
-							className={cn(
-								"h-3.5 w-3.5 shrink-0 text-text-soft-400 transition-transform duration-200",
-								expanded && "rotate-90",
-							)}
-						/>
-						<Icon name="smtp" className="h-4 w-4 shrink-0 text-text-sub-600" />
-						<span className="truncate font-semibold text-label-sm text-text-strong-950 dark:text-white">
-							Reloop SMTP
-						</span>
-						<span className="shrink-0 rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
-							Built-in
-						</span>
-					</div>
-					<div className="flex min-w-0 items-center">
-						<Pill mono>{smtpHost}</Pill>
-					</div>
-					<Muted>All your domains</Muted>
-					<span className="flex items-center gap-2 font-medium text-[13px] text-success-base">
-						<Icon name="check-circle" className="h-3.5 w-3.5 shrink-0" />
-						Active
-					</span>
-					<Muted>—</Muted>
-					<Muted>Included</Muted>
-					<RowActionsMenu
-						label="Reloop SMTP"
-						actions={actions}
-						onOpenChange={setMenuOpen}
-					/>
-				</div>
-			</RowContextMenu>
-			<AnimatePresence initial={false}>
-				{expanded ? (
-					<motion.div
-						key="reloop-setup"
-						initial={{ height: 0, opacity: 0 }}
-						animate={{ height: "auto", opacity: 1 }}
-						exit={{ height: 0, opacity: 0 }}
-						transition={{
-							height: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
-							opacity: { duration: 0.2, ease: "easeOut" },
-						}}
-						className="overflow-hidden"
-					>
-						<ReloopSmtpPanel smtpHost={smtpHost} />
-					</motion.div>
-				) : null}
-			</AnimatePresence>
-		</div>
-	);
-}
-
 function ProviderRow({
 	provider,
 	canManage,
@@ -257,15 +140,22 @@ function ProviderRow({
 	onDelete: (provider: SmtpProvider) => void;
 }) {
 	const test = useTestSmtpProvider();
+	const { data: session } = useSessionQuery();
+	const me = session?.user?.email;
 	const [menuOpen, setMenuOpen] = useState(false);
 
-	const runTest = async () => {
-		const pending = toast.loading(`Connecting to ${provider.host}…`);
+	const runTest = async (to?: string) => {
+		const pending = toast.loading(
+			to ? `Sending a test email to ${to}…` : `Connecting to ${provider.host}…`,
+		);
 		try {
-			const result = await test.mutateAsync(provider.id);
+			const result = await test.mutateAsync({ id: provider.id, to });
 			toast.dismiss(pending);
-			if (result.ok) toast.success(`Connected to ${provider.host}`);
-			else toast.error(result.error ?? "Connection failed");
+			if (result.ok) {
+				toast.success(
+					to ? `Test email sent to ${to}` : `Connected to ${provider.host}`,
+				);
+			} else toast.error(result.error ?? "Connection failed");
 		} catch (err) {
 			toast.dismiss(pending);
 			toast.error(apiErrorMessage(err, "Connection test failed"));
@@ -280,6 +170,17 @@ function ProviderRow({
 			disabled: test.isPending,
 			onSelect: () => void runTest(),
 		},
+		...(me
+			? [
+					{
+						id: "send-test",
+						label: "Send test email",
+						icon: "mail-send",
+						disabled: test.isPending,
+						onSelect: () => void runTest(me),
+					},
+				]
+			: []),
 		{
 			id: "edit",
 			label: "Edit server",
@@ -307,7 +208,6 @@ function ProviderRow({
 	const row = (
 		<div style={GRID} className={rowClass(menuOpen)}>
 			<div className="flex min-w-0 items-center gap-2">
-				<span className="w-3.5 shrink-0" />
 				<Icon name="server" className="h-4 w-4 shrink-0 text-text-sub-600" />
 				{canManage ? (
 					<button
@@ -357,7 +257,7 @@ function ProviderRow({
 	);
 }
 
-/** Inline call to action under the built-in row when the org has no servers. */
+/** Empty state for the bring-your-own table. */
 function OwnSmtpPrompt({
 	entitled,
 	canManage,
@@ -371,7 +271,7 @@ function OwnSmtpPrompt({
 		<div className="flex flex-col items-center px-6 py-10 text-center dark:bg-bg-weak-50/30">
 			<Icon name="server" className="mb-3 h-7 w-7 text-text-sub-600" />
 			<h3 className="mb-1.5 font-semibold text-lg text-text-strong-950">
-				Already have an SMTP server?
+				Connect your first SMTP server
 			</h3>
 			<p className="mx-auto mb-5 max-w-[360px] text-balance font-medium text-[12px] text-text-sub-600">
 				Connect SendGrid, Postmark, Microsoft 365 or your own Postfix. We add
@@ -391,7 +291,7 @@ function OwnSmtpPrompt({
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />
-					Add SMTP server
+					Connect to SMTP Server
 					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]">
 						C
 					</ActionKbd>
@@ -410,7 +310,6 @@ function OwnSmtpPrompt({
 }
 
 export function SmtpServersTable({
-	smtpHost,
 	providers,
 	isLoading,
 	entitled,
@@ -419,7 +318,6 @@ export function SmtpServersTable({
 	onEdit,
 	onDelete,
 }: {
-	smtpHost: string;
 	providers: SmtpProvider[];
 	isLoading: boolean;
 	entitled: boolean;
@@ -428,10 +326,6 @@ export function SmtpServersTable({
 	onEdit: (provider: SmtpProvider) => void;
 	onDelete: (provider: SmtpProvider) => void;
 }) {
-	// Built-in row starts open when it's the only thing to look at.
-	const [reloopOpen, setReloopOpen] = useState<boolean | null>(null);
-	const expanded = reloopOpen ?? (!isLoading && providers.length === 0);
-
 	return (
 		<div className="w-full overflow-x-auto text-paragraph-sm">
 			<div className="min-w-[880px]">
@@ -439,7 +333,7 @@ export function SmtpServersTable({
 					style={GRID}
 					className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
 				>
-					<HeaderCell icon="smtp" label="Server" />
+					<HeaderCell icon="server" label="Server" />
 					<HeaderCell icon="link" label="Host" />
 					<HeaderCell icon="globe" label="Domains" />
 					<HeaderCell icon="activity" label="Status" />
@@ -449,11 +343,6 @@ export function SmtpServersTable({
 				</div>
 
 				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
-					<ReloopRow
-						smtpHost={smtpHost}
-						expanded={expanded}
-						onToggle={() => setReloopOpen(!expanded)}
-					/>
 					{isLoading && providers.length === 0 ? (
 						<div style={GRID} className="grid items-center px-4 py-2.5">
 							<Skeleton className="h-4 w-40" />

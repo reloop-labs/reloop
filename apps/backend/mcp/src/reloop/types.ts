@@ -579,8 +579,8 @@ export type CreateSmtpProviderInput = {
 	host: string;
 	port: number;
 	security?: SmtpSecurity;
-	username?: string;
-	password?: string;
+	username: string;
+	password: string;
 };
 
 export type UpdateSmtpProviderInput = {
@@ -589,8 +589,8 @@ export type UpdateSmtpProviderInput = {
 	host?: string;
 	port?: number;
 	security?: SmtpSecurity;
-	username?: string | null;
-	password?: string | null;
+	username?: string;
+	password?: string;
 };
 
 export type TestSmtpProviderResponse = {

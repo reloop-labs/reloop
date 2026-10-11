@@ -167,6 +167,8 @@ export interface OperationConfig {
 	id: string;
 	label: string;
 	docSlug?: string;
+	/** Full docs URL; overrides the `/docs/api/{section}/{slug}` default. */
+	href?: string;
 	icon?: React.ReactNode;
 }
 
@@ -550,7 +552,9 @@ export const ApiDetailsDrawer = ({
 									lang={currentLanguageConfig?.shikiLang || "javascript"}
 									label={filename}
 									title={op.label}
-									titleHref={`${docBaseUrl}/docs/api/${docSection}/${docSlug}`}
+									titleHref={
+										op.href ?? `${docBaseUrl}/docs/api/${docSection}/${docSlug}`
+									}
 									noScroll={false}
 									codeExtraPadding={codeExtraPadding}
 									icon={op.icon || getDefaultOpIcon(op.id)}

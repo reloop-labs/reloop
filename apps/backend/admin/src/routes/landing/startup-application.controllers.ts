@@ -1,7 +1,8 @@
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { startupApplication } from "@reloop/db/schema";
 import { count, desc, eq, ilike, or } from "drizzle-orm";
-import { createError } from "evlog";
+import { createError, log } from "evlog";
 
 export type CreateStartupApplicationInput = {
 	email: string;
@@ -119,6 +120,8 @@ export async function updateStartupApplicationController(
 		reviewNote?: string;
 	},
 ) {
+	const existing = await getStartupApplicationController(id);
+
 	const [row] = await db
 		.update(startupApplication)
 		.set({
@@ -138,5 +141,31 @@ export async function updateStartupApplicationController(
 			fix: "Check the id and try again.",
 		});
 	}
+
+	// Fire-and-forget: approval email is sent by the email service.
+	// Only publish on the transition into approved so re-saving an
+	// already-approved application doesn't re-send.
+	if (existing.status !== "approved" && row.status === "approved") {
+		try {
+			await bus.publish(
+				BusEvent.STARTUP_APPLICATION_APPROVED,
+				{
+					applicationId: row.id,
+					email: row.email,
+					fullName: row.fullName,
+					company: row.company,
+				},
+				{ msgId: `startup-approved:${row.id}` },
+			);
+		} catch (error) {
+			log.error({
+				error: error instanceof Error ? error.message : String(error),
+				applicationId: row.id,
+				message:
+					"Failed to publish STARTUP_APPLICATION_APPROVED; approval saved but email not queued",
+			});
+		}
+	}
+
 	return row;
 }
