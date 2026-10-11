@@ -65,6 +65,8 @@ export function useInvalidateTemplates() {
 export type CreateTemplateInput = {
 	name?: string;
 	subject?: string;
+	fromEmail?: string;
+	replyTo?: string;
 	content?: unknown[];
 };
 
@@ -78,6 +80,8 @@ export async function createTemplate(
 		body: JSON.stringify({
 			name: input.name || "Untitled",
 			subject: input.subject,
+			fromEmail: input.fromEmail,
+			replyTo: input.replyTo,
 			content: input.content ?? [],
 		}),
 	});

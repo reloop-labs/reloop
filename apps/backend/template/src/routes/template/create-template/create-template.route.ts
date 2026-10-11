@@ -9,7 +9,7 @@ import { createTemplate } from "./create-template.controllers";
 export const createTemplateRoute = new Elysia().use(authMiddleware).post(
 	"/create",
 	async ({ body, userId, organizationId }) => {
-		const { name, description, subject, content } = body;
+		const { name, description, subject, fromEmail, replyTo, content } = body;
 
 		const result = await createTemplate({
 			organizationId,
@@ -17,6 +17,8 @@ export const createTemplateRoute = new Elysia().use(authMiddleware).post(
 			name,
 			description,
 			subject,
+			fromEmail,
+			replyTo,
 			content,
 		});
 
@@ -28,6 +30,8 @@ export const createTemplateRoute = new Elysia().use(authMiddleware).post(
 			name: t.String({ minLength: 1, maxLength: 255 }),
 			description: t.Optional(t.String()),
 			subject: t.Optional(t.String({ maxLength: 500 })),
+			fromEmail: t.Optional(t.String({ maxLength: 255 })),
+			replyTo: t.Optional(t.String({ maxLength: 255 })),
 			content: t.Optional(t.Array(t.Any())),
 		}),
 		response: {

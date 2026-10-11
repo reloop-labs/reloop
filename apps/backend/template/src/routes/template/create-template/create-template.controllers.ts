@@ -13,10 +13,20 @@ export async function createTemplate(params: {
 	name: string;
 	description?: string;
 	subject?: string;
+	fromEmail?: string;
+	replyTo?: string;
 	content?: TemplateBlock[];
 }) {
-	const { organizationId, userId, name, description, subject, content } =
-		params;
+	const {
+		organizationId,
+		userId,
+		name,
+		description,
+		subject,
+		fromEmail,
+		replyTo,
+		content,
+	} = params;
 
 	try {
 		if (!name || name.trim().length === 0) {
@@ -37,6 +47,8 @@ export async function createTemplate(params: {
 			name: name.trim(),
 			description,
 			subject,
+			fromEmail,
+			replyTo,
 			organizationId,
 			createdByUserId: userId,
 			content: content || [],

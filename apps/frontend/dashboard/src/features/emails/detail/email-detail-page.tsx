@@ -56,6 +56,11 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 		void createTemplate({
 			name: (subject || "Untitled").slice(0, 255),
 			subject: subject?.slice(0, 500),
+			fromEmail: (data.fromName
+				? `${data.fromName} <${data.fromEmail}>`
+				: data.fromEmail
+			)?.slice(0, 255),
+			replyTo: data.replyTo?.slice(0, 255) || undefined,
 			content: html ? [{ html }] : [],
 		});
 	}, [data, createTemplate]);
