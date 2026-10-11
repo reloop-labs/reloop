@@ -37,7 +37,13 @@ export async function getDkimKeyController({
 		throw KumoMtaErrors.domainNotFound(domainName);
 	}
 
-	if (domainRecord.status !== "active") {
+	// Relay domains route even mid re-verify (status "verifying"/"pending"):
+	// the send was already checked upstream, and falling through here would
+	// send from Reloop IPs instead of the customer's server.
+	const relayRoutable =
+		domainRecord.smtpProviderId !== null && domainRecord.status !== "suspended";
+
+	if (domainRecord.status !== "active" && !relayRoutable) {
 		log.warn(
 			`[DKIM-KEY] Domain found but NOT ACTIVE: ${domainName} (Status: ${domainRecord.status})`,
 		);

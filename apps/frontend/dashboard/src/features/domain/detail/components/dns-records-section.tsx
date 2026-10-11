@@ -40,7 +40,10 @@ export const DNSRecordsSection = ({
 	const trackingEnabled = Boolean(
 		domain?.isClickTrackingEnabled || domain?.isOpenTrackingEnabled,
 	);
-	const hasReceiving = receivingRecords.length > 0;
+	// Relay domains send through the customer's SMTP: no Reloop sending DNS.
+	const isRelay = Boolean(domain?.smtpProviderId);
+	// Relay domains start without an MX row; turning receiving on creates it.
+	const hasReceiving = receivingRecords.length > 0 || isRelay;
 
 	// S / R / T: toggle sending, receiving, tracking (hints via long-press Space).
 	useHotkeys(
@@ -115,19 +118,34 @@ export const DNSRecordsSection = ({
 			)}
 
 			{/* Domain Verification Group */}
-			<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
-				<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
-					<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
-					<h3 className="font-semibold">Domain Verification</h3>
+			{isRelay ? (
+				<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
+					<div className="mb-2 flex items-center gap-2 text-base text-text-strong-950">
+						<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
+						<h3 className="font-semibold">Sending through your SMTP</h3>
+					</div>
+					<p className="max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
+						This domain relays through your own SMTP server, so no DKIM, SPF,
+						or DMARC records are needed in Reloop. Your provider's existing
+						setup keeps working. Receiving and tracking below still need their
+						records.
+					</p>
 				</div>
-				<DNSRecordSectionGroup
-					title="DKIM"
-					docsUrl={DNS_RECORD_DOCS.dkim}
-					records={dkimRecords}
-					isLoading={!!isLoading}
-					tableId="dkim-"
-				/>
-			</div>
+			) : (
+				<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
+					<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
+						<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
+						<h3 className="font-semibold">Domain Verification</h3>
+					</div>
+					<DNSRecordSectionGroup
+						title="DKIM"
+						docsUrl={DNS_RECORD_DOCS.dkim}
+						records={dkimRecords}
+						isLoading={!!isLoading}
+						tableId="dkim-"
+					/>
+				</div>
+			)}
 
 			{/* Enable Sending Group */}
 			<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
@@ -156,7 +174,7 @@ export const DNSRecordsSection = ({
 					</div>
 				</div>
 				<AnimatePresence initial={false}>
-					{domain?.isSendingEmailEnabled && (
+					{domain?.isSendingEmailEnabled && !isRelay && (
 						<motion.div
 							initial={{ height: 0, opacity: 0 }}
 							animate={{ height: "auto", opacity: 1 }}
@@ -188,7 +206,7 @@ export const DNSRecordsSection = ({
 			</div>
 
 			{/* Enable Receiving Group */}
-			{receivingRecords.length > 0 && (
+			{hasReceiving && (
 				<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2 text-base text-text-strong-950">

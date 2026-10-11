@@ -114,6 +114,13 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 		}
 	};
 
+	// Relay domains have no DNS to set up; send them to the domain page.
+	const relayDomainId = domainData?.smtpProviderId ? domainData.id : null;
+	React.useEffect(() => {
+		if (relayDomainId) router.replace(`/domain/${relayDomainId}`);
+	}, [relayDomainId, router]);
+	if (relayDomainId) return null;
+
 	if (
 		(!domainData ||
 			!domainData.dnsRecords ||

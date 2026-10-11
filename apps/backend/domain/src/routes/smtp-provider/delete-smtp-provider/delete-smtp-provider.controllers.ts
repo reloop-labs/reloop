@@ -2,6 +2,8 @@ import { db } from "@reloop/db/client";
 import { domain, domainDnsRecord, smtpProvider } from "@reloop/db/schema";
 import { findOrgSmtpProvider } from "@reloop/domain/lib/smtp-provider";
 import { and, eq, inArray, isNull, notExists } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
+import { verifyDNSRecordController } from "../../domain/verify-dns/verify-dns.controllers";
 
 /**
  * Domains that only existed for this relay (no Reloop DNS records) are
@@ -17,7 +19,7 @@ export async function deleteSmtpProviderController({
 }) {
 	await findOrgSmtpProvider(organizationId, providerId);
 
-	await db.transaction(async (tx) => {
+	const fallback = await db.transaction(async (tx) => {
 		const relayOnly = await tx
 			.select({ id: domain.id })
 			.from(domain)
@@ -53,12 +55,13 @@ export async function deleteSmtpProviderController({
 		}
 
 		// Remaining domains go back to Reloop delivery and need our DNS again.
-		await tx
+		const remaining = await tx
 			.update(domain)
 			.set({ status: "pending", systemVerified: false })
 			.where(
 				and(eq(domain.smtpProviderId, providerId), isNull(domain.deletedAt)),
-			);
+			)
+			.returning({ id: domain.id });
 
 		await tx
 			.delete(smtpProvider)
@@ -68,7 +71,20 @@ export async function deleteSmtpProviderController({
 					eq(smtpProvider.organizationId, organizationId),
 				),
 			);
+		return remaining;
 	});
+
+	// Start DNS verification so those domains become active again on their own.
+	const log = useLogger();
+	for (const { id } of fallback) {
+		try {
+			await verifyDNSRecordController({ domainId: id, organizationId });
+		} catch (error) {
+			log.warn(
+				`Re-verify after SMTP provider delete failed for ${id}: ${error instanceof Error ? error.message : String(error)}`,
+			);
+		}
+	}
 
 	return {
 		object: "smtp_provider" as const,

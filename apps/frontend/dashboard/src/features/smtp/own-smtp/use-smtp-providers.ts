@@ -73,8 +73,14 @@ function useInvalidate() {
 	return () =>
 		Promise.all([
 			queryClient.invalidateQueries({ queryKey: queryKeys.smtpProviders.all }),
-			// Deleting a provider detaches it from domains.
+			// Adding/deleting a provider creates or removes domains.
 			queryClient.invalidateQueries({ queryKey: queryKeys.domain.all }),
+			// Agent-inbox domain pickers cache the list under their own key.
+			queryClient.invalidateQueries({
+				predicate: (q) =>
+					q.queryKey[0] === "agent-inbox" &&
+					String(q.queryKey[1] ?? "").startsWith("/api/domain/v1/list"),
+			}),
 		]);
 }
 

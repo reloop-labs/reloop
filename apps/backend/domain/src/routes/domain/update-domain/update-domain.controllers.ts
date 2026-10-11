@@ -3,6 +3,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { assertCustomDomainQuota } from "@reloop/domain/lib/domain-quota";
+import { relayActivation } from "@reloop/domain/lib/relay-domain";
 import { findOrgSmtpProvider } from "@reloop/domain/lib/smtp-provider";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import {
@@ -106,10 +107,8 @@ export async function updateDomainController({
 		if (body.smtp_provider_id !== undefined) {
 			if (body.smtp_provider_id !== null) {
 				await findOrgSmtpProvider(organizationId, body.smtp_provider_id);
-				// Relay domains need no Reloop DNS — usable right away.
-				updateData.status = "active";
-				updateData.systemVerified = true;
-				updateData.verificationFailedReason = null;
+				// Relay domains need no Reloop sending DNS — usable right away.
+				Object.assign(updateData, await relayActivation(db, domainId));
 			} else if (existingDomain.smtpProviderId) {
 				leavingRelay = true;
 				// Direct delivery needs our DNS; re-verify below.

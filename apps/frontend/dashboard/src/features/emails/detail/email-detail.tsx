@@ -18,6 +18,7 @@ import { EmailInsightsPanel } from "./email-insights-panel";
 import { formatHtml } from "./format-html";
 import { type SmtpDetailRow, SmtpResponseDrawer } from "./smtp-response-drawer";
 import { EmailTimeline } from "./timeline";
+import { useSmtpProviders } from "#/features/smtp/own-smtp/use-smtp-providers";
 
 // ─── Error classification ──────────────────────────────────────────────────
 
@@ -699,6 +700,9 @@ export const EmailDetail = ({
 							)}
 						</span>
 					</div>
+					{email?.provider?.startsWith("smtp:") ? (
+						<SentViaRow providerId={email.provider.slice(5)} />
+					) : null}
 					<div className="flex items-start gap-4">
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							Subject
@@ -947,3 +951,19 @@ export const EmailDetail = ({
 		</div>
 	);
 };
+
+/** Emails relayed through a customer's own SMTP server. */
+function SentViaRow({ providerId }: { providerId: string }) {
+	const { data } = useSmtpProviders();
+	const name = data?.items.find((p) => p.id === providerId)?.name;
+	return (
+		<div className="flex items-start gap-4">
+			<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+				Sent via
+			</span>
+			<span className="font-medium text-paragraph-sm text-text-strong-950">
+				{name ? `Your SMTP (${name})` : "Your SMTP server"}
+			</span>
+		</div>
+	);
+}

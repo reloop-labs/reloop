@@ -64,6 +64,7 @@ export interface PricingPlan {
 		emailAuth: boolean;
 		pristineSharedIps: boolean;
 		dedicatedIp: string;
+		ownSmtp: string;
 		spamTesting: boolean;
 		reputationMonitoring: boolean;
 		// Analytics
@@ -123,6 +124,7 @@ export const pricingPlans: PricingPlan[] = [
 			emailAuth: true,
 			pristineSharedIps: true,
 			dedicatedIp: "-",
+			ownSmtp: "-",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -155,6 +157,7 @@ export const pricingPlans: PricingPlan[] = [
 			"5 agent inboxes",
 			"5 webhooks",
 			"5 custom domains",
+			"Bring your own SMTP",
 			"5 MB attachments",
 			"Data retention (45 days)",
 			"Dedicated support",
@@ -179,6 +182,7 @@ export const pricingPlans: PricingPlan[] = [
 			emailAuth: true,
 			pristineSharedIps: true,
 			dedicatedIp: "-",
+			ownSmtp: "1 server",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -211,6 +215,7 @@ export const pricingPlans: PricingPlan[] = [
 			"100,000 emails / month",
 			"No daily limit",
 			"1 dedicated IP",
+			"Bring your own SMTP (3 servers)",
 			"10 agent inboxes",
 			"10 webhooks",
 			"10 custom domains",
@@ -238,6 +243,7 @@ export const pricingPlans: PricingPlan[] = [
 			emailAuth: true,
 			pristineSharedIps: true,
 			dedicatedIp: "1 included",
+			ownSmtp: "3 servers",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -293,6 +299,7 @@ export const pricingPlans: PricingPlan[] = [
 			emailAuth: true,
 			pristineSharedIps: true,
 			dedicatedIp: "Optional / custom",
+			ownSmtp: "Custom",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -385,6 +392,7 @@ export const comparisonSections: ComparisonSection[] = [
 				type: "boolean",
 			},
 			{ label: "Dedicated IP", key: "dedicatedIp", type: "text" },
+			{ label: "Bring your own SMTP", key: "ownSmtp", type: "text" },
 			{ label: "Spam testing", key: "spamTesting", type: "boolean" },
 			{
 				label: "Reputation monitoring",

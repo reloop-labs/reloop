@@ -58,7 +58,7 @@ export function DomainSmtpRelayCard({
 				</p>
 				{items.length === 0 && !current ? (
 					<Link
-						href="/smtp#own-smtp"
+						href="/smtp"
 						className="font-medium text-paragraph-xs text-text-sub-600 underline transition-colors hover:text-text-strong-950"
 					>
 						Use your own SMTP server

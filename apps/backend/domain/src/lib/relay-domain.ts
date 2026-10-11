@@ -1,6 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import type { DatabaseInstance } from "@reloop/db/client";
-import { domain as domainTable } from "@reloop/db/schema";
+import { domainDnsRecord, domain as domainTable } from "@reloop/db/schema";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull, sql } from "drizzle-orm";
@@ -26,6 +26,49 @@ export function normalizeRelayDomain(input: string): string {
 		);
 	}
 	return name;
+}
+
+/**
+ * Settings to apply when an existing domain switches to a relay. Sending is
+ * usable at once; receiving and tracking stay on only if their DNS record is
+ * already verified — otherwise the live send check would fail the domain.
+ */
+export async function relayActivation(
+	tx: DatabaseInstance,
+	domainId: string,
+) {
+	const records = await tx
+		.select({
+			recordType: domainDnsRecord.recordType,
+			purpose: domainDnsRecord.purpose,
+			status: domainDnsRecord.status,
+		})
+		.from(domainDnsRecord)
+		.where(
+			and(
+				eq(domainDnsRecord.domainId, domainId),
+				isNull(domainDnsRecord.deletedAt),
+			),
+		);
+	const verified = (type: string) =>
+		records.some((r) => r.recordType === type && r.status === "active");
+	const keepReceiving = verified("MX");
+	const keepTracking = verified("CNAME");
+	return {
+		status: "active" as const,
+		systemVerified: true,
+		userVerifiedDomain: true,
+		verificationFailedReason: null,
+		isSendingEmailEnabled: true,
+		...(keepReceiving ? {} : { isReceivingEmailEnabled: false }),
+		...(keepTracking
+			? {}
+			: {
+					isClickTrackingEnabled: false,
+					isOpenTrackingEnabled: false,
+					isTrackingDomain: false,
+				}),
+	};
 }
 
 export type RelayDomainResult = {
@@ -62,7 +105,10 @@ export async function attachRelayDomain(
 	if (active) {
 		await tx
 			.update(domainTable)
-			.set({ smtpProviderId: args.smtpProviderId, isSendingEmailEnabled: true })
+			.set({
+				smtpProviderId: args.smtpProviderId,
+				...(await relayActivation(tx, active.id)),
+			})
 			.where(eq(domainTable.id, active.id));
 		return { domainId: active.id, domain: active.domain, event: "attached" };
 	}
@@ -71,6 +117,7 @@ export async function attachRelayDomain(
 		smtpProviderId: args.smtpProviderId,
 		status: "active" as const,
 		systemVerified: true,
+		userVerifiedDomain: true,
 		verificationFailedReason: null,
 		isSendingEmailEnabled: true,
 		isReceivingEmailEnabled: false,

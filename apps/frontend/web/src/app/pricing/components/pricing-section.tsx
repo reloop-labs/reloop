@@ -426,6 +426,13 @@ const FEATURE_TOOLTIPS: Record<
 		badge: "ISOLATED",
 		status: "DEDICATED",
 	},
+	ownSmtp: {
+		description:
+			"Relay through your own SMTP server (SendGrid, Postmark, Microsoft 365, Postfix) while keeping Reloop templates, tracking, logs, and webhooks. No DNS setup.",
+		version: "v1.0",
+		badge: "BYO",
+		status: "RELAY",
+	},
 	spamTesting: {
 		description:
 			"Pre-send spam score analysis and content checking against major spam filter engines.",
