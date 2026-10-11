@@ -47,7 +47,7 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 
 	if (error && !data) {
 		return (
-			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-6xl flex-col items-center justify-center p-6 lg:p-8">
 				<EmailNotFound />
 			</div>
 		);
@@ -55,15 +55,15 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 
 	if (!data && !isLoading) {
 		return (
-			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-6xl flex-col items-center justify-center p-6 lg:p-8">
 				<EmailNotFound />
 			</div>
 		);
 	}
 
 	return (
-		<div className="mx-auto max-w-3xl sm:px-8">
-			<div className="flex items-center justify-between pt-10 pb-8">
+		<div className="mx-auto max-w-6xl p-6 lg:p-8">
+			<div className="flex items-center justify-between pb-6">
 				<AnimatedBackButton fallbackHref="/" />
 				{isFailed && (
 					<Button.Root

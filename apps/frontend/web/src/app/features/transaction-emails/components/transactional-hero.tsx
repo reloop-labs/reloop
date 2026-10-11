@@ -13,8 +13,12 @@ export function TransactionalHero() {
 
 	return (
 		<header className="relative w-full bg-transparent [--primary-base:#2563eb] [--primary-dark:#1d4ed8] [--primary-darker:#1e40af] [--primary-link:#1d4ed8] dark:[--primary-base:#2563eb] dark:[--primary-dark:#2563eb] dark:[--primary-darker:#1d4ed8] dark:[--primary-link:#93c5fd]">
-			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
-				<div className="flex flex-col items-center px-4 pt-[152px] pb-16 text-center sm:px-8 sm:pt-[176px] sm:pb-20 lg:px-12">
+			<div className="relative mx-auto mt-14 w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl min-[1280px]:mt-[72px] dark:border-white/10">
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-t sm:h-24 dark:border-white/10"
+				/>
+				<div className="flex flex-col items-start px-4 pt-0 pb-16 text-left sm:px-8 sm:pb-20 lg:px-12">
 					<h1 className="max-w-4xl text-balance font-semibold text-[2.4rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.1rem] dark:text-white">
 						Transactional emails developers love to use.
 					</h1>
@@ -24,7 +28,7 @@ export function TransactionalHero() {
 						SDKs, and reliable SMTP service.
 					</p>
 
-					<div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:mt-9 sm:gap-4">
+					<div className="mt-8 flex flex-wrap items-center justify-start gap-3.5 sm:mt-9 sm:gap-4">
 						<FancyButton.Root
 							asChild
 							variant="neutral"

@@ -682,6 +682,18 @@ export const EmailDetail = ({
 					)}
 					<div className="flex items-start gap-4">
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+							Subject
+						</span>
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{isLoading ? (
+								<Skeleton className="h-4 w-80 rounded-md" />
+							) : (
+								email?.subject
+							)}
+						</span>
+					</div>
+					<div className="flex items-start gap-4">
+						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							Date
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
@@ -703,18 +715,6 @@ export const EmailDetail = ({
 					{email?.provider?.startsWith("smtp:") ? (
 						<SentViaRow providerId={email.provider.slice(5)} />
 					) : null}
-					<div className="flex items-start gap-4">
-						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
-							Subject
-						</span>
-						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{isLoading ? (
-								<Skeleton className="h-4 w-80 rounded-md" />
-							) : (
-								email?.subject
-							)}
-						</span>
-					</div>
 					<div className="flex items-start gap-4">
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							Via
