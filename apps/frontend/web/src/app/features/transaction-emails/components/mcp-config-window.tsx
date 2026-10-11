@@ -244,7 +244,7 @@ export function McpConfigWindow() {
 			<div
 				role="tabpanel"
 				aria-label={`${tab.name} setup`}
-				className="min-h-[368px] flex-1 px-6 py-6 md:px-12"
+				className="min-h-[382px] flex-1 px-6 py-6 md:px-12"
 			>
 				<ol className="relative space-y-5">
 					{tab.steps.map((step, i) => {
@@ -262,10 +262,15 @@ export function McpConfigWindow() {
 									{i + 1}
 								</span>
 								<div className="min-w-0 flex-1">
-									<div className="flex items-center justify-between gap-3">
-										<p className="font-medium text-[13px] text-text-strong-950 leading-5 dark:text-white">
-											{step.title}
-										</p>
+									<div className="flex items-center justify-between gap-4">
+										<div className="min-w-0">
+											<p className="font-medium text-[13px] text-text-strong-950 leading-5 dark:text-white">
+												{step.title}
+											</p>
+											<p className="mt-0.5 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
+												{step.body}
+											</p>
+										</div>
 										{i === 0 && tab.install && (
 											<a
 												href={tab.install.href}
@@ -282,43 +287,42 @@ export function McpConfigWindow() {
 											</a>
 										)}
 									</div>
-									<p className="mt-0.5 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
-										{step.body}
-									</p>
 									{step.code && (
-										<div className="relative mt-2.5 rounded-xl border border-stroke-soft-100 dark:border-white/10">
-											<button
-												type="button"
-												onClick={() => {
-													navigator.clipboard
-														.writeText(step.code?.value ?? "")
-														.then(() => setCopied(key))
-														.catch(() => {});
-												}}
-												aria-label={copied === key ? "Copied" : "Copy"}
-												className="absolute top-1.5 right-1.5 flex size-7 cursor-pointer items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-zinc-200/70 hover:text-text-strong-950 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
-											>
-												<Icon
-													name={copied === key ? "check" : "copy"}
-													className={cn(
-														"size-3.5",
-														copied === key && "text-emerald-600",
-													)}
-													aria-hidden
-												/>
-											</button>
-											<pre
-												className="overflow-x-auto py-2.5 pr-10 pl-3 text-[12px] leading-[1.7] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-												style={{ fontFamily: MONO }}
-											>
-												<code>
-													{step.code.value.split("\n").map((line, j) => (
-														<span key={`${key}-${j}`} className="block">
-															{highlight(step.code?.lang ?? "text", line)}
-														</span>
-													))}
-												</code>
-											</pre>
+										<div className="mt-2.5 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+											<div className="relative rounded-[13px] border border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-black">
+												<button
+													type="button"
+													onClick={() => {
+														navigator.clipboard
+															.writeText(step.code?.value ?? "")
+															.then(() => setCopied(key))
+															.catch(() => {});
+													}}
+													aria-label={copied === key ? "Copied" : "Copy"}
+													className="absolute top-1.5 right-1.5 flex size-7 cursor-pointer items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-zinc-200/70 hover:text-text-strong-950 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
+												>
+													<Icon
+														name={copied === key ? "check" : "copy"}
+														className={cn(
+															"size-3.5",
+															copied === key && "text-emerald-600",
+														)}
+														aria-hidden
+													/>
+												</button>
+												<pre
+													className="overflow-x-auto py-2.5 pr-10 pl-3 text-[12px] leading-[1.7] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+													style={{ fontFamily: MONO }}
+												>
+													<code>
+														{step.code.value.split("\n").map((line, j) => (
+															<span key={`${key}-${j}`} className="block">
+																{highlight(step.code?.lang ?? "text", line)}
+															</span>
+														))}
+													</code>
+												</pre>
+											</div>
 										</div>
 									)}
 								</div>

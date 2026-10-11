@@ -14,27 +14,14 @@ const BANNER = `██████╗ ███████╗██╗      █
  */
 export function CliTerminal() {
 	return (
-		<div className="@container w-full px-[4.8%]" style={{ fontFamily: MONO }}>
-			<div className="text-[2cqi] text-zinc-500 leading-none dark:text-zinc-400">
-				<span
-					aria-hidden
-					className="mr-3 inline-flex gap-[1.2cqi] align-middle"
-				>
-					<span className="size-[1.6cqi] rounded-full bg-zinc-300 dark:bg-zinc-700" />
-					<span className="size-[1.6cqi] rounded-full bg-zinc-300 dark:bg-zinc-700" />
-					<span className="size-[1.6cqi] rounded-full bg-zinc-300 dark:bg-zinc-700" />
-				</span>
-				<span className="font-semibold text-zinc-400 dark:text-zinc-500">
-					⌘1
-				</span>
-				<span className="text-zinc-300 dark:text-zinc-700"> · </span>
-				developer@mac ~ reloop
-			</div>
-
+		<div
+			className="@container w-full px-6 md:px-12"
+			style={{ fontFamily: MONO }}
+		>
 			<span className="sr-only">Reloop CLI</span>
 			<pre
 				aria-hidden
-				className="mt-[5.4cqi] overflow-hidden text-[1.95cqi] text-zinc-950 leading-none dark:text-white"
+				className="overflow-hidden text-[1.95cqi] text-zinc-950 leading-none dark:text-white"
 				style={{ fontFamily: MONO }}
 			>
 				{BANNER}
@@ -80,6 +67,30 @@ export function CliTerminal() {
 					<span className="animate-pulse text-zinc-950 dark:text-white">█</span>
 				</p>
 			</div>
+		</div>
+	);
+}
+
+/** Window bar for the terminal; matches the MCP card's tab bar height. */
+export function CliTitleBar() {
+	return (
+		<div
+			aria-hidden
+			className="flex h-[60px] items-center gap-3 border-stroke-soft-100 border-b px-6 font-mono text-[12px] text-zinc-500 md:px-12 dark:border-white/10 dark:text-zinc-400"
+			style={{ fontFamily: MONO }}
+		>
+			<span className="flex gap-1.5">
+				<span className="size-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+				<span className="size-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+				<span className="size-2.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+			</span>
+			<span>
+				<span className="font-semibold text-zinc-400 dark:text-zinc-500">
+					⌘1
+				</span>
+				<span className="text-zinc-300 dark:text-zinc-700"> · </span>
+				developer@mac ~ reloop
+			</span>
 		</div>
 	);
 }

@@ -1,7 +1,7 @@
 import { Icon } from "@reloop/ui/icon";
 import { siModelcontextprotocol } from "simple-icons";
 import { CardHeader } from "../../../(home)/components/agent-cards";
-import { CliTerminal } from "./cli-terminal";
+import { CliTerminal, CliTitleBar } from "./cli-terminal";
 import { LearnMoreLink, McpConfigWindow } from "./mcp-config-window";
 
 export function AgentToolsSection() {
@@ -85,8 +85,11 @@ export function AgentToolsSection() {
 							description="Test deliveries and fix configuration without a dashboard."
 						/>
 					</div>
-					<div className="flex flex-1 items-center border-stroke-soft-100 border-t py-8 dark:border-white/10">
-						<CliTerminal />
+					<div className="flex flex-1 flex-col border-stroke-soft-100 border-t dark:border-white/10">
+						<CliTitleBar />
+						<div className="flex flex-1 items-center py-8">
+							<CliTerminal />
+						</div>
 					</div>
 					<div className="border-stroke-soft-100 border-t px-6 py-4 md:px-12 dark:border-white/10">
 						<LearnMoreLink href="/features/cli" />
