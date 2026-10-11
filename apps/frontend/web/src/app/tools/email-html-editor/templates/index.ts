@@ -227,8 +227,8 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 
 /**
  * One brand (Acme) across every email, for the transactional email feature
- * page. Kept out of the editor gallery, which shows varied designs, but
- * still opens in the editor.
+ * page. Only the ids in `ACME_GALLERY_IDS` also appear in the editor
+ * gallery; every one still opens in the editor.
  */
 export const acmeTemplateExamples: EmailTemplateExample[] = [
 	{
@@ -596,6 +596,17 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 			{ name: "comment_url", type: "string", defaultValue: null },
 		],
 	},
+];
+
+/** Acme templates that also appear in the editor gallery. */
+const ACME_GALLERY_IDS = new Set(["acme-verify-email"]);
+
+/** Cards on /tools/email-html-editor: the varied designs, then picked Acme ones. */
+export const galleryTemplateExamples: EmailTemplateExample[] = [
+	...emailTemplateExamples,
+	...acmeTemplateExamples.filter((template) =>
+		ACME_GALLERY_IDS.has(template.id),
+	),
 ];
 
 export function getEmailTemplateExample(

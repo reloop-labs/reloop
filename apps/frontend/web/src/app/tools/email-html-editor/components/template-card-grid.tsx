@@ -4,7 +4,10 @@ import { cn } from "@reloop/ui/cn";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toolPath } from "../content";
-import { type EmailTemplateExample, emailTemplateExamples } from "../templates";
+import {
+	type EmailTemplateExample,
+	galleryTemplateExamples,
+} from "../templates";
 
 /** Width the email is laid out at before it is scaled into the card. */
 const EMAIL_RENDER_WIDTH = 600;
@@ -80,7 +83,7 @@ export function TemplatePreview({
 export function TemplateCardGrid() {
 	return (
 		<div className="flex w-full flex-wrap justify-center gap-8 lg:gap-x-8 lg:gap-y-10">
-			{emailTemplateExamples.map((template) => (
+			{galleryTemplateExamples.map((template) => (
 				<Link
 					key={template.id}
 					href={`${toolPath}/${template.id}`}
