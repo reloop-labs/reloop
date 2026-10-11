@@ -1,3 +1,4 @@
+import { Icon } from "@reloop/ui/icon";
 import { FaqSection } from "@reloop/web/components/faq-section";
 
 export const transactionalFaq = [
@@ -38,6 +39,13 @@ export function TransactionalFaq() {
 		<FaqSection
 			items={transactionalFaq}
 			id="transactional-faq"
+			eyebrow={
+				<>
+					<Icon name="question" className="size-3.5" aria-hidden />
+					FAQ
+				</>
+			}
+			eyebrowClassName="inline-flex items-center gap-1.5 text-[13px] text-text-sub-600 normal-case dark:text-white/60"
 			title="Questions before you switch."
 			compact
 			plain

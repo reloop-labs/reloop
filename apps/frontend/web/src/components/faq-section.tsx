@@ -23,6 +23,7 @@ export function FaqSection({
 	items,
 	groups,
 	eyebrow = "FAQ",
+	eyebrowClassName,
 	title = "Frequently asked questions.",
 	id = "faq",
 	compact = false,
@@ -32,6 +33,8 @@ export function FaqSection({
 	items?: FaqItem[];
 	groups?: FaqGroup[];
 	eyebrow?: ReactNode;
+	/** Overrides the default accent-colored, uppercase eyebrow. */
+	eyebrowClassName?: string;
 	title?: string;
 	id?: string;
 	compact?: boolean;
@@ -130,7 +133,12 @@ export function FaqSection({
 						compact ? "py-8 lg:py-10" : "py-10 lg:py-12",
 					)}
 				>
-					<p className="font-medium text-[12px] text-primary-base uppercase">
+					<p
+						className={cn(
+							"font-medium text-[12px] text-primary-base uppercase",
+							eyebrowClassName,
+						)}
+					>
 						{eyebrow}
 					</p>
 					<h2 className="mt-3 font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white">
@@ -180,7 +188,12 @@ export function FaqSection({
 						compact ? "py-8 lg:py-10" : "py-10 lg:py-12",
 					)}
 				>
-					<p className="font-medium text-[12px] text-primary-base uppercase">
+					<p
+						className={cn(
+							"font-medium text-[12px] text-primary-base uppercase",
+							eyebrowClassName,
+						)}
+					>
 						{eyebrow}
 					</p>
 					<h2 className="font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white">
