@@ -19,7 +19,7 @@ const TABS: Tab[] = [
 	{
 		id: "email",
 		label: "Email details",
-		icon: "mail",
+		icon: "mail-single",
 		description: "Track every message from sent to clicked.",
 		light: "/platform/observability/email-light.png",
 		dark: "/platform/observability/email-dark.png",
@@ -27,7 +27,7 @@ const TABS: Tab[] = [
 	{
 		id: "logs",
 		label: "Logs",
-		icon: "eye-outline",
+		icon: "logs",
 		description: "Inspect the request and response of every API call.",
 		light: "/platform/observability/logs-light.png",
 		dark: "/platform/observability/logs-dark.png",
@@ -35,7 +35,7 @@ const TABS: Tab[] = [
 	{
 		id: "webhooks",
 		label: "Webhooks",
-		icon: "arrow-swap",
+		icon: "webhook",
 		description: "Stream every event into your own database.",
 		light: "/platform/observability/webhooks-light.png",
 		dark: "/platform/observability/webhooks-dark.png",
@@ -104,7 +104,7 @@ export function ObservabilitySection() {
 								setAutoplay(false);
 							}}
 							className={cn(
-								"relative flex flex-col gap-1.5 px-4 py-6 text-left transition-colors sm:px-8 sm:py-7 lg:px-10",
+								"relative flex items-start gap-4 px-4 py-6 text-left transition-colors sm:px-8 sm:py-7 lg:px-10",
 								selected
 									? "bg-bg-white-0 dark:bg-black"
 									: "bg-bg-white-0 hover:bg-bg-weak-50 dark:bg-black dark:hover:bg-white/[0.03]",
@@ -112,16 +112,28 @@ export function ObservabilitySection() {
 						>
 							<span
 								className={cn(
-									"font-medium text-[14px] sm:text-[16px]",
+									"flex size-10 shrink-0 items-center justify-center rounded-xl border shadow-xs transition-colors sm:size-11",
 									selected
-										? "text-text-strong-950 dark:text-white"
-										: "text-text-sub-600 dark:text-white/50",
+										? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
+										: "border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-white/50",
 								)}
 							>
-								{t.label}
+								<Icon name={t.icon} className="size-5" aria-hidden />
 							</span>
-							<span className="hidden text-[13px] text-text-sub-600 leading-relaxed sm:block sm:text-[15px] dark:text-white/50">
-								{t.description}
+							<span className="flex min-w-0 flex-col gap-1">
+								<span
+									className={cn(
+										"font-semibold text-[15px] sm:text-[17px]",
+										selected
+											? "text-text-strong-950 dark:text-white"
+											: "text-text-sub-600 dark:text-white/50",
+									)}
+								>
+									{t.label}
+								</span>
+								<span className="hidden text-[13px] text-text-sub-600 leading-relaxed sm:line-clamp-2 sm:text-[14px] dark:text-white/50">
+									{t.description}
+								</span>
 							</span>
 							<span className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden">
 								{selected &&
@@ -149,38 +161,36 @@ export function ObservabilitySection() {
 				id="observability-panel"
 				role="tabpanel"
 				aria-labelledby={`observability-tab-${tab.id}`}
-				className="px-4 py-6 sm:px-8 sm:py-8 lg:px-12"
+				className="relative h-[420px] w-full overflow-hidden bg-gradient-to-b from-orange-100 via-amber-50 to-bg-white-0 px-6 pt-6 sm:h-[560px] sm:px-10 sm:pt-10 lg:h-[640px] lg:px-14 lg:pt-14 dark:from-orange-950/40 dark:via-orange-950/10 dark:to-black"
 			>
-				<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.35)] dark:border-white/10 dark:bg-[#080808] dark:shadow-black/60">
-					<div className="relative aspect-[4/3] overflow-hidden sm:aspect-[16/9]">
-						{failed[tab.id] ? (
-							<div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-text-soft-400 dark:text-white/30">
-								<Icon name={tab.icon} className="size-6" aria-hidden />
-								<span className="text-[13px]">{tab.label}</span>
-							</div>
-						) : (
-							<>
-								<Image
-									key={`${tab.id}-light`}
-									src={tab.light}
-									alt={`${tab.label} in the Reloop dashboard`}
-									fill
-									className="object-cover object-left-top dark:hidden"
-									sizes="(max-width: 1280px) 100vw, 1200px"
-									onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
-								/>
-								<Image
-									key={`${tab.id}-dark`}
-									src={tab.dark}
-									alt=""
-									fill
-									className="hidden object-cover object-left-top dark:block"
-									sizes="(max-width: 1280px) 100vw, 1200px"
-									onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
-								/>
-							</>
-						)}
-					</div>
+				<div className="relative h-full w-full overflow-hidden rounded-t-xl border border-stroke-soft-100 border-b-0 bg-bg-white-0 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.35)] sm:rounded-t-2xl dark:border-white/10 dark:bg-black dark:shadow-black/60">
+					{failed[tab.id] ? (
+						<div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-text-soft-400 dark:text-white/30">
+							<Icon name={tab.icon} className="size-6" aria-hidden />
+							<span className="text-[13px]">{tab.label}</span>
+						</div>
+					) : (
+						<>
+							<Image
+								key={`${tab.id}-light`}
+								src={tab.light}
+								alt={`${tab.label} in the Reloop dashboard`}
+								fill
+								className="object-cover object-top dark:hidden"
+								sizes="(max-width: 1280px) 100vw, 1200px"
+								onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
+							/>
+							<Image
+								key={`${tab.id}-dark`}
+								src={tab.dark}
+								alt=""
+								fill
+								className="hidden object-cover object-top dark:block"
+								sizes="(max-width: 1280px) 100vw, 1200px"
+								onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
+							/>
+						</>
+					)}
 				</div>
 			</div>
 		</section>

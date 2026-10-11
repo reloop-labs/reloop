@@ -51,7 +51,7 @@ export function TransactionalHero() {
 							className={`absolute inset-0 bg-gradient-to-b ${TAB_GRADIENTS.email}`}
 						/>
 						<div className="relative h-full w-full px-4 pt-6 sm:px-10 sm:pt-10">
-							<div className="relative h-full w-full overflow-hidden border border-stroke-soft-100 border-b-0 bg-bg-white-0 dark:border-white/10 dark:bg-black">
+							<div className="relative h-full w-full overflow-hidden rounded-t-xl border border-stroke-soft-100 border-b-0 bg-bg-white-0 sm:rounded-t-2xl dark:border-white/10 dark:bg-black">
 								<Image
 									src={shot.src}
 									alt={PLATFORM_ALT.email}

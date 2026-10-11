@@ -5,7 +5,7 @@ import type { FooterBrandAccent } from "./footer-brand";
 import { PixelBlastLazy } from "./pixel-blast";
 
 const accentPixelColorLight: Record<FooterBrandAccent, string> = {
-	default: "#3B82F6",
+	default: "#000000",
 	emerald: "#10B981",
 	ink: "#6e7781",
 	orange: "#ea580c",

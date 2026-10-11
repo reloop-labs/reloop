@@ -2,16 +2,15 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { LandingDeveloperProof } from "@reloop/web/components/landing/landing-developer-proof";
 import { breadcrumbJsonLd, faqPageJsonLd } from "@reloop/web/lib/schema";
 import { SectionSeparator } from "../../(home)/components/section-separator";
+import { ConnectServicesSection } from "./components/connect-services-section";
 import { IntegrateSection } from "./components/integrate-section";
 import { ObservabilitySection } from "./components/observability-section";
-import { SwitchSection } from "./components/switch-section";
 import { TransactionalCta } from "./components/transactional-cta";
 import {
 	TransactionalFaq,
 	transactionalFaq,
 } from "./components/transactional-faq";
 import { TransactionalHero } from "./components/transactional-hero";
-import { TransactionalPreviewSection } from "./components/transactional-preview-section";
 
 const TransactionEmailsPage = () => {
 	return (
@@ -40,13 +39,9 @@ const TransactionEmailsPage = () => {
 				<SectionSeparator hideTop />
 				<IntegrateSection />
 				<SectionSeparator />
-				<ObservabilitySection />
-				<SectionSeparator hideBottom />
-			</div>
-			<TransactionalPreviewSection />
-			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<ConnectServicesSection />
 				<SectionSeparator />
-				<SwitchSection />
+				<ObservabilitySection />
 				<SectionSeparator />
 				<TransactionalFaq />
 				<SectionSeparator />
