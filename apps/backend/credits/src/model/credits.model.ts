@@ -30,6 +30,7 @@ export namespace CreditsModel {
 					maxAttachmentBytes: t.Number(),
 					dataRetentionDays: t.Number(),
 					dedicatedIpCount: t.Number(),
+					maxSmtpProviders: t.Number(),
 				}),
 			),
 		}),
@@ -108,6 +109,7 @@ export namespace CreditsModel {
 		maxAttachmentBytes: t.Optional(t.Number()),
 		dataRetentionDays: t.Optional(t.Number()),
 		dedicatedIpCount: t.Optional(t.Number()),
+		maxSmtpProviders: t.Optional(t.Number()),
 	});
 
 	export const adminPlanPatchResponse = t.Object({
@@ -122,6 +124,7 @@ export namespace CreditsModel {
 		maxAttachmentBytes: t.Number(),
 		dataRetentionDays: t.Number(),
 		dedicatedIpCount: t.Number(),
+		maxSmtpProviders: t.Number(),
 	});
 
 	export const periodsResponse = t.Array(

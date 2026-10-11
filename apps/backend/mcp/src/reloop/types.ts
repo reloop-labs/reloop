@@ -547,3 +547,54 @@ export type CreatePropertyInput = {
 	type: PropertyType;
 	fallbackValue?: string;
 };
+
+export type SmtpSecurity = "starttls" | "none";
+
+export type SmtpProvider = {
+	object: "smtp_provider";
+	id: string;
+	name: string;
+	host: string;
+	port: number;
+	security: SmtpSecurity;
+	username: string | null;
+	hasPassword: boolean;
+	domains: { id: string; domain: string }[];
+	status: "unverified" | "ok" | "failing";
+	lastTestedAt: string | null;
+	lastError: string | null;
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type SmtpProviderListResponse = {
+	object: "list";
+	limit: number | null;
+	items: SmtpProvider[];
+};
+
+export type CreateSmtpProviderInput = {
+	domain: string;
+	name?: string;
+	host: string;
+	port: number;
+	security?: SmtpSecurity;
+	username?: string;
+	password?: string;
+};
+
+export type UpdateSmtpProviderInput = {
+	domain?: string;
+	name?: string;
+	host?: string;
+	port?: number;
+	security?: SmtpSecurity;
+	username?: string | null;
+	password?: string | null;
+};
+
+export type TestSmtpProviderResponse = {
+	ok: boolean;
+	error: string | null;
+	provider: SmtpProvider;
+};

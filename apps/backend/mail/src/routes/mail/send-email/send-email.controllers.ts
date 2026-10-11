@@ -461,6 +461,7 @@ async function sendReservedEmail({
 	const { emailLogId } = await createEmailLog_step4({
 		organizationId,
 		domainId: currentDomain.id,
+		smtpProviderId: currentDomain.smtpProviderId,
 		body,
 		apikeyId: apiKeyId,
 		userId,

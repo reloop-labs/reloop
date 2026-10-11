@@ -11,6 +11,7 @@ export type PlanLimits = {
 	maxAttachmentBytes: number;
 	dataRetentionDays: number;
 	dedicatedIpCount: number;
+	maxSmtpProviders: number;
 };
 
 const MB = 1024 * 1024;
@@ -27,6 +28,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 		maxAttachmentBytes: 1 * MB,
 		dataRetentionDays: 45,
 		dedicatedIpCount: 0,
+		maxSmtpProviders: 0,
 	},
 	individual: {
 		planId: "individual",
@@ -39,6 +41,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 		maxAttachmentBytes: 5 * MB,
 		dataRetentionDays: 45,
 		dedicatedIpCount: 0,
+		maxSmtpProviders: 1,
 	},
 	startup: {
 		planId: "startup",
@@ -51,6 +54,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 		maxAttachmentBytes: 5 * MB,
 		dataRetentionDays: 45,
 		dedicatedIpCount: 1,
+		maxSmtpProviders: 3,
 	},
 	enterprise: {
 		planId: "enterprise",
@@ -63,6 +67,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 		maxAttachmentBytes: 5 * MB,
 		dataRetentionDays: 45,
 		dedicatedIpCount: 1,
+		maxSmtpProviders: 5,
 	},
 };
 
@@ -93,6 +98,7 @@ const LIMIT_KEYS = [
 	"maxAttachmentBytes",
 	"dataRetentionDays",
 	"dedicatedIpCount",
+	"maxSmtpProviders",
 ] as const;
 
 type LimitKey = (typeof LIMIT_KEYS)[number];

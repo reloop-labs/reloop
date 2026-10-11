@@ -11,6 +11,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
+import { smtpProvider } from "./smtp-provider";
 
 // Custom ID generation functions with prefixes
 const createDomainId = () => `domain_${createId()}`;
@@ -78,6 +79,12 @@ export const domain = pgTable(
 			.notNull()
 			.default(false),
 		tls: tlsModeEnum("tls").notNull().default("opportunistic"),
+		/**
+		 * Bring-your-own SMTP relay. Null = deliver direct-to-MX from Reloop IPs.
+		 */
+		smtpProviderId: text("smtp_provider_id").references(() => smtpProvider.id, {
+			onDelete: "set null",
+		}),
 		isTrackingDomain: boolean("is_tracking_domain").notNull().default(false),
 		isSendingEmailEnabled: boolean("is_sending_email_enabled")
 			.notNull()
@@ -187,6 +194,10 @@ export const domainRelations = relations(domain, ({ many, one }) => ({
 		references: [user.id],
 	}),
 	dnsRecords: many(domainDnsRecord),
+	smtpProvider: one(smtpProvider, {
+		fields: [domain.smtpProviderId],
+		references: [smtpProvider.id],
+	}),
 }));
 
 export const domainDnsRecordRelations = relations(

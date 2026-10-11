@@ -88,6 +88,7 @@ export const organizationPlan = pgTable(
 			.default(1048576),
 		dataRetentionDays: integer("data_retention_days").notNull().default(45),
 		dedicatedIpCount: integer("dedicated_ip_count").notNull().default(0),
+		maxSmtpProviders: integer("max_smtp_providers").notNull().default(0),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at").notNull().defaultNow(),
 	},

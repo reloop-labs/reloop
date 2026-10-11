@@ -9,6 +9,7 @@ import { updateDomainRoute } from "@reloop/domain/routes/domain/update-domain/up
 import { verifyDNSRecordRoute } from "@reloop/domain/routes/domain/verify-dns/verify-dns.route";
 import { domainConnectRoutes } from "@reloop/domain/routes/domain-connect/domain-connect.routes";
 import { kumomtaRoutes } from "@reloop/domain/routes/kumomta/kumomta.routes";
+import { smtpProviderRoutes } from "@reloop/domain/routes/smtp-provider/smtp-provider.routes";
 import { Elysia } from "elysia";
 
 // Register static paths before `/:domain_id` so list/create/verify never
@@ -17,6 +18,7 @@ export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })
 	.use(createDomainRoute)
 	.use(listDomainsRoute)
 	.use(listSendingIpsRoute)
+	.use(smtpProviderRoutes)
 	.use(getDomainNameserversRoute)
 	.use(verifyDNSRecordRoute)
 	.use(domainConnectRoutes)

@@ -75,3 +75,12 @@ export const domainEndpoints = {
 	byId: (id: string) => `${DOMAINS}/${encodeURIComponent(id)}`,
 	verify: (id: string) => `${DOMAINS}/verify/${encodeURIComponent(id)}`,
 } as const;
+
+const SMTP_PROVIDERS = `${DOMAINS}/smtp-providers`;
+
+export const smtpProviderEndpoints = {
+	list: SMTP_PROVIDERS,
+	create: SMTP_PROVIDERS,
+	byId: (id: string) => `${SMTP_PROVIDERS}/${encodeURIComponent(id)}`,
+	test: (id: string) => `${SMTP_PROVIDERS}/${encodeURIComponent(id)}/test`,
+} as const;

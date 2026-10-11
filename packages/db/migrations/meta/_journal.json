@@ -239,6 +239,13 @@
       "when": 1791603693000,
       "tag": "0033_device_authorization",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1791700000000,
+      "tag": "0034_byo_smtp_provider",
+      "breakpoints": true
     }
   ]
 }

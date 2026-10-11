@@ -198,6 +198,7 @@ async function tryFastVerify({
 						isReceivingEmailEnabled: domain.isReceivingEmailEnabled,
 						isClickTrackingEnabled: domain.isClickTrackingEnabled,
 						isOpenTrackingEnabled: domain.isOpenTrackingEnabled,
+						usesExternalRelay: domain.smtpProviderId !== null,
 					},
 				);
 

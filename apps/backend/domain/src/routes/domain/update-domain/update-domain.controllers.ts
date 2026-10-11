@@ -2,6 +2,8 @@ import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
+import { assertCustomDomainQuota } from "@reloop/domain/lib/domain-quota";
+import { findOrgSmtpProvider } from "@reloop/domain/lib/smtp-provider";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import {
 	receivingTurnedOff,
@@ -14,7 +16,41 @@ import { ensureTrackingCnameRecord } from "@reloop/domain/utils/ensure-tracking-
 import { DOMAIN_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
+import {
+	createDnsRecords_step5,
+	generateDnsRecords_step3,
+} from "../create-domain/steps";
 import { verifyDNSRecordController } from "../verify-dns/verify-dns.controllers";
+
+/** Domains auto-created for a relay have no DKIM/SPF/DMARC yet; add them. */
+async function ensureReloopDnsRecords(args: {
+	domainId: string;
+	organizationId: string;
+	userId: string;
+	domain: string;
+	trackingSubdomain: string;
+}) {
+	const dkim = await db.query.domainDnsRecord.findFirst({
+		where: and(
+			eq(schema.domainDnsRecord.domainId, args.domainId),
+			eq(schema.domainDnsRecord.recordTypeName, "DKIM"),
+			isNull(schema.domainDnsRecord.deletedAt),
+		),
+		columns: { id: true },
+	});
+	if (dkim) return;
+	const { dnsRecords, receivingMxRecord, trackingRecord } =
+		await generateDnsRecords_step3({
+			domain: args.domain,
+			trackingSubdomain: args.trackingSubdomain,
+		});
+	await createDnsRecords_step5({
+		...args,
+		dnsRecords,
+		receivingMxRecord,
+		trackingRecord,
+	});
+}
 
 export async function updateDomainController({
 	domainId,
@@ -66,6 +102,36 @@ export async function updateDomainController({
 			updateData.tls = body.tls;
 		}
 
+		let leavingRelay = false;
+		if (body.smtp_provider_id !== undefined) {
+			if (body.smtp_provider_id !== null) {
+				await findOrgSmtpProvider(organizationId, body.smtp_provider_id);
+				// Relay domains need no Reloop DNS — usable right away.
+				updateData.status = "active";
+				updateData.systemVerified = true;
+				updateData.verificationFailedReason = null;
+			} else if (existingDomain.smtpProviderId) {
+				leavingRelay = true;
+				// Direct delivery needs our DNS; re-verify below.
+				updateData.status = "pending";
+				updateData.systemVerified = false;
+			}
+			updateData.smtpProviderId = body.smtp_provider_id;
+		}
+
+		if (leavingRelay) {
+			// Relay domains don't count toward the custom-domain cap; this one
+			// is about to, so check the slot under the same lock.
+			await db.transaction((tx) => assertCustomDomainQuota(organizationId, tx));
+			await ensureReloopDnsRecords({
+				domainId,
+				organizationId,
+				userId: existingDomain.userId,
+				domain: existingDomain.domain,
+				trackingSubdomain: existingDomain.trackingSubdomain,
+			});
+		}
+
 		await db
 			.update(schema.domain)
 			.set(updateData)
@@ -90,11 +156,13 @@ export async function updateDomainController({
 			openTracking: body.open_tracking,
 		});
 		const trackingEnabled = nextFlags.clickTracking || nextFlags.openTracking;
-		const shouldReverify = shouldReverifyDomainAfterFeatureUpdate({
-			previousStatus: existingDomain.status,
-			previous: previousFlags,
-			next: nextFlags,
-		});
+		const shouldReverify =
+			leavingRelay ||
+			shouldReverifyDomainAfterFeatureUpdate({
+				previousStatus: existingDomain.status,
+				previous: previousFlags,
+				next: nextFlags,
+			});
 
 		if (sendingTurnedOff(previousFlags, nextFlags)) {
 			await db
@@ -183,6 +251,7 @@ export async function updateDomainController({
 			isOpenTrackingEnabled: updatedDomain.isOpenTrackingEnabled,
 			tls: updatedDomain.tls,
 			isTrackingDomain: updatedDomain.isTrackingDomain,
+			smtpProviderId: updatedDomain.smtpProviderId,
 			isSendingEmailEnabled: updatedDomain.isSendingEmailEnabled,
 			isReceivingEmailEnabled: updatedDomain.isReceivingEmailEnabled,
 			verificationFailedReason: updatedDomain.verificationFailedReason,

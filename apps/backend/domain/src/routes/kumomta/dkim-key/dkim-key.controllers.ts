@@ -10,7 +10,12 @@ export async function getDkimKeyController({
 }: {
 	domainName: string;
 	organizationId: string;
-}): Promise<{ selector: string; privateKey: string }> {
+}): Promise<{
+	/** Null only for relay domains without a verified Reloop DKIM record. */
+	selector: string | null;
+	privateKey: string | null;
+	smtpProviderId: string | null;
+}> {
 	const log = useLogger();
 	const domainQuery = and(
 		eq(domain.domain, domainName),
@@ -24,7 +29,7 @@ export async function getDkimKeyController({
 
 	const domainRecord = await db.query.domain.findFirst({
 		where: domainQuery,
-		columns: { id: true, status: true },
+		columns: { id: true, status: true, smtpProviderId: true },
 	});
 
 	if (!domainRecord) {
@@ -45,8 +50,18 @@ export async function getDkimKeyController({
 			eq(domainDnsRecord.recordTypeName, "DKIM"),
 			isNull(domainDnsRecord.deletedAt),
 		),
-		columns: { name: true, privateKey: true },
+		columns: { name: true, privateKey: true, status: true },
 	});
+
+	// Routing piggybacks on this org-scoped lookup so KumoMTA never trusts a
+	// provider id supplied by the sender.
+	const smtpProviderId = domainRecord.smtpProviderId;
+
+	// Relay domains may have no Reloop DNS at all; only sign with our key when
+	// the customer actually published it, otherwise the signature would fail.
+	if (smtpProviderId && dkimRecord?.status !== "active") {
+		return { selector: null, privateKey: null, smtpProviderId };
+	}
 
 	if (!dkimRecord || !dkimRecord.privateKey) {
 		throw KumoMtaErrors.dkimKeyNotFound(domainName);
@@ -54,5 +69,9 @@ export async function getDkimKeyController({
 
 	const selector = dkimRecord.name.replace(/\._domainkey.*$/, "");
 
-	return { selector, privateKey: dkimRecord.privateKey };
+	return {
+		selector,
+		privateKey: dkimRecord.privateKey,
+		smtpProviderId,
+	};
 }

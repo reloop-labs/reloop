@@ -26,6 +26,10 @@ export const queryKeys = {
 		periods: () => [...queryKeys.billing.all, "periods"] as const,
 		sendingIps: () => [...queryKeys.billing.all, "sending-ips"] as const,
 	},
+	smtpProviders: {
+		all: ["smtp-providers"] as const,
+		list: () => [...queryKeys.smtpProviders.all, "list"] as const,
+	},
 	apiKeys: {
 		all: ["api-keys"] as const,
 		list: (params: {

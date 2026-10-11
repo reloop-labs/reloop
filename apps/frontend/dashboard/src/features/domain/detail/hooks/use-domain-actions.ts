@@ -53,6 +53,7 @@ export function useDomainActions(
 					| "isClickTrackingEnabled"
 					| "isOpenTrackingEnabled"
 					| "tls"
+					| "smtpProviderId"
 				>
 			>,
 			successMessage: string,
@@ -69,6 +70,7 @@ export function useDomainActions(
 				click_tracking?: boolean;
 				open_tracking?: boolean;
 				tls?: "opportunistic" | "enforced";
+				smtp_provider_id?: string | null;
 			} = {};
 			if (payload.isSendingEmailEnabled !== undefined) {
 				apiPayload.sending_email = payload.isSendingEmailEnabled;
@@ -84,6 +86,9 @@ export function useDomainActions(
 			}
 			if (payload.tls !== undefined) {
 				apiPayload.tls = payload.tls;
+			}
+			if (payload.smtpProviderId !== undefined) {
+				apiPayload.smtp_provider_id = payload.smtpProviderId;
 			}
 
 			const defaultLoading = loadingMessage || "Updating domain settings...";

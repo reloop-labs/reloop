@@ -98,5 +98,6 @@ export namespace DomainTypes {
 		sending_email?: boolean;
 		receiving_email?: boolean;
 		tls?: "opportunistic" | "enforced";
+		smtp_provider_id?: string | null;
 	}
 }

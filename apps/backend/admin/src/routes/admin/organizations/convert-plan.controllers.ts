@@ -79,6 +79,7 @@ export async function convertOrganizationPlanController(args: {
 				maxAttachmentBytes: currentPlanRow.maxAttachmentBytes,
 				dataRetentionDays: currentPlanRow.dataRetentionDays,
 				dedicatedIpCount: currentPlanRow.dedicatedIpCount,
+				maxSmtpProviders: currentPlanRow.maxSmtpProviders,
 			}
 		: null;
 
@@ -105,6 +106,7 @@ export async function convertOrganizationPlanController(args: {
 					maxAttachmentBytes: nextLimits.maxAttachmentBytes,
 					dataRetentionDays: nextLimits.dataRetentionDays,
 					dedicatedIpCount: nextLimits.dedicatedIpCount,
+					maxSmtpProviders: nextLimits.maxSmtpProviders,
 					updatedAt: now,
 				})
 				.where(eq(organizationPlan.id, currentPlanRow.id));
@@ -121,6 +123,7 @@ export async function convertOrganizationPlanController(args: {
 				maxAttachmentBytes: nextLimits.maxAttachmentBytes,
 				dataRetentionDays: nextLimits.dataRetentionDays,
 				dedicatedIpCount: nextLimits.dedicatedIpCount,
+				maxSmtpProviders: nextLimits.maxSmtpProviders,
 			});
 		}
 
@@ -258,6 +261,7 @@ export async function convertOrganizationPlanController(args: {
 		maxAttachmentBytes: nextLimits.maxAttachmentBytes,
 		dataRetentionDays: nextLimits.dataRetentionDays,
 		dedicatedIpCount: nextLimits.dedicatedIpCount,
+		maxSmtpProviders: nextLimits.maxSmtpProviders,
 		mode,
 	};
 }

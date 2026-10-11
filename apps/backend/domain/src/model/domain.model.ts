@@ -2,7 +2,7 @@ import { t } from "elysia";
 
 export namespace DomainModel {
 	// Domain validation pattern - supports domains and subdomains
-	const domainPattern =
+	export const domainPattern =
 		/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
 	export const createDomainBody = t.Object(
 		{
@@ -173,6 +173,12 @@ export namespace DomainModel {
 			isTrackingDomain: t.Boolean({
 				description: "Whether domain is used for tracking",
 			}),
+			smtpProviderId: t.Optional(
+				t.Union([t.String(), t.Null()], {
+					description:
+						"Bring-your-own SMTP relay used for this domain (null = Reloop delivery)",
+				}),
+			),
 			isSendingEmailEnabled: t.Boolean({
 				description: "Whether sending email is enabled for the domain",
 			}),
@@ -318,6 +324,12 @@ export namespace DomainModel {
 			tls: t.Optional(
 				t.Union([t.Literal("opportunistic"), t.Literal("enforced")], {
 					description: "TLS mode for the domain",
+				}),
+			),
+			smtp_provider_id: t.Optional(
+				t.Union([t.String(), t.Null()], {
+					description:
+						"Relay mail for this domain through a bring-your-own SMTP provider. null = send through Reloop.",
 				}),
 			),
 		},

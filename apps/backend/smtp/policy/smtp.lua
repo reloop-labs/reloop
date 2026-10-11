@@ -1,6 +1,7 @@
 local kumo = require 'kumo'
 local constants = require 'policy.constants'
 local utils = require 'policy.utils'
+local byo = require 'policy.byo'
 utils.init(kumo)
 
 
@@ -380,8 +381,18 @@ local function apply_reloop_logic(msg, api_key, source)
     local dkim_code = dkim_resp:status_code()
     local dkim_body = dkim_resp:text()
     if dkim_code == 200 then
-      local dkim_data = kumo.serde.json_parse(dkim_body)
-      if dkim_data and dkim_data.privateKey and dkim_data.selector then
+      local dkim_data = kumo.serde.json_parse(dkim_body) or {}
+
+      -- Domain is assigned to a bring-your-own SMTP provider (from this
+      -- org-scoped lookup, never from a sender-supplied header).
+      local relay_domain = byo.routing_domain_for(dkim_data.smtpProviderId)
+      if relay_domain then
+        msg:set_meta('routing_domain', relay_domain)
+        print("[BYO-SMTP] [" .. msg_id .. "] relaying via " .. tostring(dkim_data.smtpProviderId))
+      end
+
+      -- JSON null decodes to a truthy sentinel, so check for real strings.
+      if type(dkim_data.privateKey) == 'string' and type(dkim_data.selector) == 'string' then
         local sign_ok, sign_err = pcall(function()
           -- RFC 6376 5.4.1 plus List-Unsubscribe-Post (RFC 8058). Gmail will
           -- not offer one-click unsubscribe unless those two list headers are
@@ -407,6 +418,8 @@ local function apply_reloop_logic(msg, api_key, source)
         else
           print("[DKIM] [" .. msg_id .. "] signing failed: " .. tostring(sign_err))
         end
+      elseif relay_domain then
+        print("[DKIM] [" .. msg_id .. "] skipped: relay provider signs for this domain")
       else
         print("[DKIM] [" .. msg_id .. "] ERROR: key data missing in response")
       end

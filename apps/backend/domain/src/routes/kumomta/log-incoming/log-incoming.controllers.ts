@@ -98,6 +98,7 @@ export async function logIncomingController({
 			domain: true,
 			systemVerified: true,
 			tls: true,
+			smtpProviderId: true,
 			createdAt: true,
 			registeredAt: true,
 			dailyCapOverride: true,
@@ -321,7 +322,9 @@ export async function logIncomingController({
 				rawMessage: body.rawMessage || null,
 				status: "pending",
 				size: body.size || 0,
-				provider: "kumomta",
+				provider: domainRecord.smtpProviderId
+					? `smtp:${domainRecord.smtpProviderId}`
+					: "kumomta",
 				providerMessageId: body.providerMessageId,
 				source: "smtp",
 			})

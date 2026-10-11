@@ -58,6 +58,8 @@ export async function assertCustomDomainQuota(
 				eq(domain.organizationId, organizationId),
 				isNull(domain.deletedAt),
 				eq(domain.isSendingEmailEnabled, true),
+				// Bring-your-own SMTP domains are covered by the provider cap.
+				isNull(domain.smtpProviderId),
 			),
 		);
 

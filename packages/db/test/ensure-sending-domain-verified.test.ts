@@ -66,6 +66,20 @@ describe("planDomainDnsChecks", () => {
 		expect(plan.missingConfig).toEqual(["SPF"]);
 		expect(plan.checks.map((check) => check.label)).not.toContain("SPF");
 	});
+
+	test("relay domains need no Reloop sending DNS", () => {
+		const relayFlags = { ...sendingFlags, usesExternalRelay: true };
+		const stored = planDomainDnsChecks(records, relayFlags);
+		expect(stored.missingConfig).toEqual([]);
+		expect(stored.checks.map((check) => check.label)).toEqual(["CNAME"]);
+
+		const bare = planDomainDnsChecks([], {
+			...relayFlags,
+			isClickTrackingEnabled: false,
+		});
+		expect(bare.missingConfig).toEqual([]);
+		expect(bare.checks).toEqual([]);
+	});
 });
 
 describe("summarizeDnsChecks", () => {

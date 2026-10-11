@@ -90,3 +90,34 @@ export function decryptSecret(ciphertext: string): string {
 		return ciphertext;
 	}
 }
+
+/**
+ * Fail-closed variant for credentials that must never sit in plaintext
+ * (e.g. customer SMTP passwords). Throws instead of falling back.
+ */
+export function encryptSecretStrict(plaintext: string): string {
+	const key = getEncryptionKey();
+	if (!key) {
+		throw new Error(
+			"WEBHOOK_ENCRYPTION_KEY must be set (32 bytes or 64 hex chars) to store this secret.",
+		);
+	}
+	const iv = crypto.randomBytes(IV_LENGTH);
+	const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+	let ciphertext = cipher.update(plaintext, "utf8", "hex");
+	ciphertext += cipher.final("hex");
+	const tag = cipher.getAuthTag();
+	return `${PREFIX}${iv.toString("hex")}:${tag.toString("hex")}:${ciphertext}`;
+}
+
+/** Throws if the value is not encrypted or cannot be decrypted. */
+export function decryptSecretStrict(ciphertext: string): string {
+	if (!ciphertext.startsWith(PREFIX)) {
+		throw new Error("Secret is not encrypted.");
+	}
+	const plaintext = decryptSecret(ciphertext);
+	if (plaintext === ciphertext) {
+		throw new Error("Failed to decrypt secret.");
+	}
+	return plaintext;
+}

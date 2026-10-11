@@ -20,6 +20,7 @@ export type AdminPlanPatch = Partial<
 		| "maxAttachmentBytes"
 		| "dataRetentionDays"
 		| "dedicatedIpCount"
+		| "maxSmtpProviders"
 	>
 >;
 
@@ -46,6 +47,8 @@ export async function patchOrgPlanController(args: {
 			args.patch.dataRetentionDays ?? billing.plan.dataRetentionDays,
 		dedicatedIpCount:
 			args.patch.dedicatedIpCount ?? billing.plan.dedicatedIpCount,
+		maxSmtpProviders:
+			args.patch.maxSmtpProviders ?? billing.plan.maxSmtpProviders,
 	};
 
 	const saved = await db.transaction(async (tx) => {
@@ -78,5 +81,6 @@ export async function patchOrgPlanController(args: {
 		maxAttachmentBytes: saved.maxAttachmentBytes,
 		dataRetentionDays: saved.dataRetentionDays,
 		dedicatedIpCount: saved.dedicatedIpCount,
+		maxSmtpProviders: saved.maxSmtpProviders,
 	};
 }

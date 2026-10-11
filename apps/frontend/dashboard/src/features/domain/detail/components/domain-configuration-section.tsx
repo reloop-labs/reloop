@@ -8,6 +8,7 @@ import type { DomainResponse } from "#/features/domain/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useClipboard } from "../hooks/use-clipboard";
 import { useDomainActions } from "../hooks/use-domain-actions";
+import { DomainSmtpRelayCard } from "./domain-smtp-relay-card";
 
 interface DomainConfigurationSectionProps {
 	domain?: DomainResponse;
@@ -350,6 +351,12 @@ export const DomainConfigurationSection = ({
 					</div>
 				</div>
 			</div>
+
+			<DomainSmtpRelayCard
+				domain={domain}
+				domainId={domainId}
+				isLoading={isLoading}
+			/>
 		</div>
 	);
 };

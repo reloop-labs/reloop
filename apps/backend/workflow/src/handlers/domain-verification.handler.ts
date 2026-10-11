@@ -13,9 +13,9 @@ import {
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { countSpfRecords, duplicateSpfReason } from "@reloop/dns/verify-records";
 import { isLocal } from "@reloop/dns/is-local";
 import { resolver } from "@reloop/dns/resolver";
+import { countSpfRecords, duplicateSpfReason } from "@reloop/dns/verify-records";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 
@@ -112,12 +112,18 @@ export async function processDomainVerification({
 		recordTypeNames: records.map((r) => r.recordTypeName),
 	});
 
-	// Find mandatory DKIM verification record
-	const dkimRecord = records.find(
-		(r) => r.recordType === "TXT" && r.value.startsWith("v=DKIM1"),
-	);
+	// Bring-your-own SMTP: the customer's provider owns SPF/DKIM/DMARC, so
+	// none of Reloop's sending records are required.
+	const usesRelay = domainWithRecords.smtpProviderId !== null;
 
-	if (!dkimRecord) {
+	// Find mandatory DKIM verification record (not needed for relay domains)
+	const dkimRecord = usesRelay
+		? undefined
+		: records.find(
+				(r) => r.recordType === "TXT" && r.value.startsWith("v=DKIM1"),
+			);
+
+	if (!dkimRecord && !usesRelay) {
 		log.warn({
 			message: "Missing mandatory DKIM record for verification",
 			domainId,
@@ -131,7 +137,8 @@ export async function processDomainVerification({
 	}
 
 	// Conditionally verify SPF and DMARC (Enable Sending)
-	const isSendingEnabled = domainWithRecords.isSendingEmailEnabled;
+	const isSendingEnabled =
+		domainWithRecords.isSendingEmailEnabled && !usesRelay;
 	const spfRecord = isSendingEnabled
 		? records.find(
 				(r) => r.recordType === "TXT" && r.value.startsWith("v=spf1"),
@@ -213,10 +220,12 @@ export async function processDomainVerification({
 	// Compile active verifications dynamically
 	const activeResults: { record: any; verifyFn: () => Promise<boolean> }[] = [];
 
-	activeResults.push({
-		record: dkimRecord,
-		verifyFn: () => verifyDkimRecord(dkimRecord.fqdn, dkimRecord.value),
-	});
+	if (dkimRecord) {
+		activeResults.push({
+			record: dkimRecord,
+			verifyFn: () => verifyDkimRecord(dkimRecord.fqdn, dkimRecord.value),
+		});
+	}
 
 	if (isSendingEnabled && spfRecord && dmarcRecord) {
 		activeResults.push({
@@ -257,8 +266,9 @@ export async function processDomainVerification({
 		ok: verificationResults[index],
 	}));
 
-	const dkimOk =
-		results.find((r) => r.record.id === dkimRecord.id)?.ok ?? false;
+	const dkimOk = dkimRecord
+		? (results.find((r) => r.record.id === dkimRecord.id)?.ok ?? false)
+		: true;
 	const spfOk = spfRecord
 		? (results.find((r) => r.record.id === spfRecord.id)?.ok ?? false)
 		: true;

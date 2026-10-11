@@ -61,6 +61,7 @@ cli.ts
 - Groups and channels: CRUD lives under `/api/contacts/v1/groups` and `/api/contacts/v1/channels`; membership lives on contact routes: `POST`/`DELETE /api/contacts/group/:id` (idempotent, body `contact_id` or `email`) and `PATCH /api/contacts/channel/:id`, an idempotent upsert of the subscription. `POST /api/contacts/channel/:id` returns 409 on an unchanged state, so tools use the PATCH. None of these create the contact.
 - API keys: routes live under `/api/api-key/v1`; the collection is `/api/api-key/v1/` with a trailing slash, and state changes are `POST /rotate|enable|disable/:id`. Only create and rotate return the plaintext `key`.
 - Domains: routes live under `/api/domain/v1` (`/list`, `/create`, `/:id`, `POST /verify/:id`). Verify returns `active` synchronously when DNS already resolves, otherwise `verifying` while a background job retries.
+- SMTP providers (bring your own SMTP): routes live under `/api/domain/v1/smtp-providers` (`GET`/`POST`, `PATCH`/`DELETE /:id`, `POST /:id/test`). Create takes a sending `domain` and adds it automatically with no DNS; passwords are write-only.
 - Mail: `POST /api/mail/v1/send` has **no idempotency key**. A timeout or network failure may still have delivered the email, which is why writes are never marked `retryable`.
 
 ## Tool conventions

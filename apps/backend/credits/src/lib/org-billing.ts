@@ -44,6 +44,7 @@ function limitsFromRow(row: typeof organizationPlan.$inferSelect): PlanLimits {
 		maxAttachmentBytes: row.maxAttachmentBytes,
 		dataRetentionDays: row.dataRetentionDays,
 		dedicatedIpCount: row.dedicatedIpCount,
+		maxSmtpProviders: row.maxSmtpProviders,
 	};
 }
 
@@ -59,6 +60,7 @@ function planValues(limits: PlanLimits) {
 		maxAttachmentBytes: limits.maxAttachmentBytes,
 		dataRetentionDays: limits.dataRetentionDays,
 		dedicatedIpCount: limits.dedicatedIpCount,
+		maxSmtpProviders: limits.maxSmtpProviders,
 		updatedAt: new Date(),
 	};
 }

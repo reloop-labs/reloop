@@ -34,6 +34,8 @@ export type Domain = {
 	isClickTrackingEnabled: boolean;
 	isOpenTrackingEnabled: boolean;
 	tls: "opportunistic" | "enforced";
+	/** Bring-your-own SMTP relay; null = Reloop delivery. */
+	smtpProviderId?: string | null;
 	isTrackingDomain: boolean;
 	isSendingEmailEnabled: boolean;
 	isReceivingEmailEnabled: boolean;

@@ -77,6 +77,54 @@ export const DomainErrors = {
 		}),
 };
 
+export const SmtpProviderErrors = {
+	notFound: (id: string) =>
+		createError({
+			status: 404,
+			message: "SMTP provider not found",
+			why: `The SMTP provider ${id} was not found or you don't have permission to access it.`,
+			fix: "Verify the provider ID and ensure it belongs to your active organization.",
+		}),
+	limitReached: ({ used, limit }: { used: number; limit: number }) =>
+		createError({
+			status: 402,
+			message: "SMTP provider limit reached",
+			why:
+				limit === 0
+					? "Your plan does not include bring-your-own SMTP."
+					: `Your plan allows ${limit} SMTP provider${limit === 1 ? "" : "s"} and you already have ${used}.`,
+			fix: "Delete an existing provider or upgrade your plan.",
+		}),
+	hostBlocked: (host: string) =>
+		createError({
+			status: 400,
+			message: "SMTP host not allowed",
+			why: `${host} resolves to a private, local, or reserved address.`,
+			fix: "Use the public hostname of your SMTP server.",
+		}),
+	hostUnresolvable: (host: string) =>
+		createError({
+			status: 400,
+			message: "SMTP host could not be resolved",
+			why: `DNS lookup for ${host} failed.`,
+			fix: "Check the hostname spelling.",
+		}),
+	plaintextNotAllowed: () =>
+		createError({
+			status: 400,
+			message: "Plaintext SMTP is not allowed",
+			why: "Relaying without STARTTLS would send your SMTP password in clear text.",
+			fix: 'Use security "starttls" on port 587 (or 25/2525).',
+		}),
+	encryptionUnavailable: () =>
+		createError({
+			status: 500,
+			message: "Secret storage is not configured",
+			why: "WEBHOOK_ENCRYPTION_KEY is not set, so SMTP passwords cannot be stored safely.",
+			fix: "Set WEBHOOK_ENCRYPTION_KEY (32 bytes or 64 hex chars) on the domain service.",
+		}),
+};
+
 export const KumoMtaErrors = {
 	domainNotFound: (domainName: string) =>
 		createError({

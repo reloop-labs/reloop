@@ -44,6 +44,9 @@
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
+		"@reloop/webhook-delivery": "workspace:*",
+		"@reloop/pricing": "workspace:*",
+		"nodemailer": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"mailparser": "catalog:backend",
 		"@reloop/code-samples": "workspace:*"
@@ -56,6 +59,7 @@
 		"drizzle-kit": "catalog:db",
 		"@types/pg": "catalog:db",
 		"@better-auth/cli": "catalog:backend",
-		"@types/mailparser": "catalog:backend"
+		"@types/mailparser": "catalog:backend",
+		"@types/nodemailer": "catalog:backend"
 	}
 }

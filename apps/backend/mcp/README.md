@@ -764,6 +764,75 @@ Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
 
 Returns: `deleted`, `id`
 
+### `list_smtp_providers`
+
+List the organization's own SMTP servers (bring your own SMTP) with the sending domains relayed through each and the last connection test result. Passwords are never returned. `limit` is the plan's cap on providers (null means unlimited).
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+Returns: `providers`, `limit`
+
+### `create_smtp_provider`
+
+Connect the user's own SMTP server (SendGrid, Postmark, Microsoft 365, their own Postfix…) and route a sending domain through it in one step. Reloop adds the domain automatically if it is not there yet; it needs no DNS records and can send immediately with all normal Reloop checks, logs, tracking, and webhooks. The connection is tested right away; check `status` and `lastError` in the result. Fails with `quota_exceeded` when the plan's provider limit is reached.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `domain` | string | yes | Domain the user sends from (the part after @ in From). Reloop adds it automatically if missing; no DNS records are needed when relaying. |
+| `host` | string | yes | SMTP server hostname, for example smtp.sendgrid.net |
+| `port` | integer | yes | SMTP server port, usually 587 |
+| `security` | starttls \| none | no | starttls requires STARTTLS with a valid certificate (ports 587, 25, 2525). none is plaintext and only allowed on self-hosted Reloop. Port 465 implicit TLS is not supported. |
+| `username` | string | no | SMTP login |
+| `password` | string | no | SMTP password |
+| `name` | string | no | Label for the server; defaults to the domain |
+
+Returns: `provider`
+
+### `update_smtp_provider`
+
+Change an SMTP provider by ID, or route one more sending domain through it with `domain` (added to Reloop automatically). Only the fields you pass change; omit `password` to keep the stored one. Changing connection details resets `status` to unverified, so call test_smtp_provider afterwards.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | SMTP provider ID as returned by Reloop, for example smtp_123456789 |
+| `domain` | string | no | Domain the user sends from (the part after @ in From). Reloop adds it automatically if missing; no DNS records are needed when relaying. |
+| `name` | string | no |  |
+| `host` | string | no | SMTP server hostname, for example smtp.sendgrid.net |
+| `port` | integer | no | SMTP server port, usually 587 |
+| `security` | starttls \| none | no | starttls requires STARTTLS with a valid certificate (ports 587, 25, 2525). none is plaintext and only allowed on self-hosted Reloop. Port 465 implicit TLS is not supported. |
+| `username` | string or null | no |  |
+| `password` | string or null | no | New password; null clears it |
+
+Returns: `provider`
+
+### `test_smtp_provider`
+
+Connect to an SMTP provider by ID, negotiate STARTTLS, and log in, without sending mail. Returns `ok` and the server's `error` message when it fails, and stores the result on the provider.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | SMTP provider ID as returned by Reloop, for example smtp_123456789 |
+
+Returns: `ok`, `error`, `provider`
+
+### `delete_smtp_provider`
+
+Permanently delete an SMTP provider by ID and its stored credentials. Domains that were added only for it are removed; domains that also have Reloop DNS records go back to sending through Reloop and need those records verified. Use list_smtp_providers to confirm the right provider first.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | SMTP provider ID as returned by Reloop, for example smtp_123456789 |
+
+Returns: `deleted`, `id`
+
 ## Errors
 
 Every failed call returns `isError: true` and no `structuredContent`; the text content is a JSON document with an `error` object (structured content must match the tool's output schema, so errors travel in the text block):

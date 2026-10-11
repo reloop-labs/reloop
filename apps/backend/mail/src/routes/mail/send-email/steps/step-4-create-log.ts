@@ -41,6 +41,7 @@ function resolveLogUserId(userId?: string): string | undefined {
 export async function createEmailLog_step4({
 	organizationId,
 	domainId,
+	smtpProviderId,
 	body,
 	apikeyId,
 	userId,
@@ -48,6 +49,8 @@ export async function createEmailLog_step4({
 }: {
 	organizationId: string;
 	domainId: string;
+	/** Bring-your-own SMTP relay; KumoMTA routes it from the domain record. */
+	smtpProviderId?: string | null;
 	body: MailModel.SendEmailBody;
 	apikeyId?: string;
 	userId?: string;
@@ -85,7 +88,7 @@ export async function createEmailLog_step4({
 			htmlBody: body.html,
 			attachments: serializeSendAttachments(body.attachments),
 			status: "pending",
-			provider: "kumomta",
+			provider: smtpProviderId ? `smtp:${smtpProviderId}` : "kumomta",
 			source: sourceFromTags(body.tags),
 			tags: body.tags ?? [],
 			size: (body.text?.length || 0) + (body.html?.length || 0),

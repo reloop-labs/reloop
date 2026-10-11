@@ -11,6 +11,7 @@ export type BillingEntitlements = {
 	maxAttachmentBytes: number;
 	dataRetentionDays: number;
 	dedicatedIpCount: number;
+	maxSmtpProviders: number;
 };
 
 export type ResourceUsage = {

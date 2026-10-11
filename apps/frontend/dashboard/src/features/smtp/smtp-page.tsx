@@ -9,6 +9,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { buildReloopAiPrompt } from "#/features/dashboard/page-header/copy-prompt-button";
+import { OwnSmtpSection } from "./own-smtp/own-smtp-section";
 import { DEFAULT_SMTP_HOST, SMTP_USER } from "./smtp-code-examples";
 import { SmtpCodePanel } from "./smtp-code-panel";
 
@@ -328,6 +329,8 @@ export function SmtpPage({
 					<SmtpCodePanel apiKeyPlaceholder="YOUR_API_KEY" smtpHost={smtpHost} />
 				</div>
 			</div>
+
+			<OwnSmtpSection />
 		</div>
 	);
 }

@@ -1,3 +1,5 @@
+import { isLocal } from "@reloop/dns/is-local";
+import { resolver } from "@reloop/dns/resolver";
 import {
 	checkCnameRecord,
 	checkDkimRecord,
@@ -5,11 +7,9 @@ import {
 	checkMxRecord,
 	checkSpfRecord,
 	countSpfRecords,
-	duplicateSpfReason,
 	type DnsCheckOutcome,
+	duplicateSpfReason,
 } from "@reloop/dns/verify-records";
-import { isLocal } from "@reloop/dns/is-local";
-import { resolver } from "@reloop/dns/resolver";
 import { and, eq, isNull } from "drizzle-orm";
 import { type DatabaseInstance, db as defaultDb } from "./client";
 import { domain, domainDnsRecord } from "./schema/domain";
@@ -28,6 +28,12 @@ export type DomainCheckFlags = {
 	isReceivingEmailEnabled: boolean;
 	isClickTrackingEnabled: boolean;
 	isOpenTrackingEnabled: boolean;
+	/**
+	 * Mail is relayed through a bring-your-own SMTP provider, which owns the
+	 * domain's SPF/DKIM/DMARC, so no Reloop sending DNS is required. KumoMTA
+	 * only adds Reloop's DKIM signature when that record is already verified.
+	 */
+	usesExternalRelay?: boolean;
 };
 
 export type PlannedDnsCheck = {
@@ -38,7 +44,9 @@ export type PlannedDnsCheck = {
 
 /**
  * Records the domain must still publish for its enabled features.
- * Sending always requires DKIM, SPF, and DMARC. Receiving adds MX.
+ * Sending always requires DKIM, SPF, and DMARC — except through a customer's
+ * own SMTP relay, which needs none of them.
+ * Receiving adds MX.
  * Click or open tracking adds the tracking CNAME.
  */
 export function planDomainDnsChecks(
@@ -52,17 +60,20 @@ export function planDomainDnsChecks(
 		(record) =>
 			record.recordType === "TXT" && record.value.startsWith("v=DKIM1"),
 	);
-	if (!dkim) {
-		missingConfig.push("DKIM");
-	} else {
-		checks.push({
-			id: dkim.id,
-			label: "DKIM",
-			run: () => checkDkimRecord(dkim.fqdn, dkim.value),
-		});
+	// Relay provider signs; Reloop DKIM is optional (see dkim-key).
+	if (!flags.usesExternalRelay) {
+		if (!dkim) {
+			missingConfig.push("DKIM");
+		} else {
+			checks.push({
+				id: dkim.id,
+				label: "DKIM",
+				run: () => checkDkimRecord(dkim.fqdn, dkim.value),
+			});
+		}
 	}
 
-	if (flags.isSendingEmailEnabled) {
+	if (flags.isSendingEmailEnabled && !flags.usesExternalRelay) {
 		const spf = records.find(
 			(record) =>
 				record.recordType === "TXT" && record.value.startsWith("v=spf1"),
@@ -259,6 +270,7 @@ export async function ensureSendingDomainVerified(
 			isReceivingEmailEnabled: true,
 			isClickTrackingEnabled: true,
 			isOpenTrackingEnabled: true,
+			smtpProviderId: true,
 		},
 		with: {
 			dnsRecords: {
@@ -287,6 +299,7 @@ export async function ensureSendingDomainVerified(
 		isReceivingEmailEnabled: row.isReceivingEmailEnabled,
 		isClickTrackingEnabled: row.isClickTrackingEnabled,
 		isOpenTrackingEnabled: row.isOpenTrackingEnabled,
+		usesExternalRelay: row.smtpProviderId !== null,
 	};
 	const trackingEnabled =
 		flags.isClickTrackingEnabled || flags.isOpenTrackingEnabled;
@@ -385,7 +398,8 @@ export async function ensureSendingDomainVerified(
 				.update(domainDnsRecord)
 				.set({
 					status: "failed",
-					verificationError: detailReason ?? "DNS record is missing or does not match",
+					verificationError:
+						detailReason ?? "DNS record is missing or does not match",
 				})
 				.where(eq(domainDnsRecord.id, id)),
 		),

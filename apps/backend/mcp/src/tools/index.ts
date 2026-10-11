@@ -41,6 +41,11 @@ import { createProperty } from "./properties/create";
 import { deleteProperty } from "./properties/delete";
 import { listProperties } from "./properties/list";
 import { updateProperty } from "./properties/update";
+import { createSmtpProvider } from "./smtp-providers/create";
+import { deleteSmtpProvider } from "./smtp-providers/delete";
+import { listSmtpProviders } from "./smtp-providers/list";
+import { testSmtpProvider } from "./smtp-providers/test";
+import { updateSmtpProvider } from "./smtp-providers/update";
 import { getTemplate } from "./templates/get";
 import { listTemplates } from "./templates/list";
 import { sendTestEmail } from "./templates/send-test";
@@ -91,4 +96,9 @@ export const tools: readonly AnyToolDefinition[] = [
 	updateDomain,
 	verifyDomain,
 	deleteDomain,
+	listSmtpProviders,
+	createSmtpProvider,
+	updateSmtpProvider,
+	testSmtpProvider,
+	deleteSmtpProvider,
 ];

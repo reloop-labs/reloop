@@ -16,8 +16,9 @@ export const dkimKeyRoute = new Elysia().use(authMiddleware).post(
 		authKeyInternal: true,
 		response: {
 			200: t.Object({
-				selector: t.String(),
-				privateKey: t.String(),
+				selector: t.Union([t.String(), t.Null()]),
+				privateKey: t.Union([t.String(), t.Null()]),
+				smtpProviderId: t.Union([t.String(), t.Null()]),
 			}),
 			401: ErrorResponseSchema,
 			404: ErrorResponseSchema,

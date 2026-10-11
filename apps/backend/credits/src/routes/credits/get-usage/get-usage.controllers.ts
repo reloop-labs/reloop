@@ -106,6 +106,7 @@ export const getUsageController = async ({
 			maxAttachmentBytes,
 			dataRetentionDays: billing.plan.dataRetentionDays,
 			dedicatedIpCount: billing.plan.dedicatedIpCount,
+			maxSmtpProviders: billing.plan.maxSmtpProviders,
 		};
 
 		return {
