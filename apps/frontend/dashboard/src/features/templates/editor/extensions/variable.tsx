@@ -72,7 +72,7 @@ export function VariableNodeView({
 		<NodeViewWrapper
 			as="span"
 			onClick={handleClick}
-			className="mx-0.5 inline-flex cursor-pointer select-all items-center gap-1 rounded-xl border border-stroke-soft-200 bg-bg-soft-50 px-1 py-px pl-2 font-semibold"
+			className="-my-0.5 mx-0.5 inline-flex cursor-pointer select-all items-center gap-1 rounded-xl border border-current/25 bg-current/10 px-1 py-px pl-2 font-semibold"
 			style={{
 				fontSize: "inherit",
 			}}

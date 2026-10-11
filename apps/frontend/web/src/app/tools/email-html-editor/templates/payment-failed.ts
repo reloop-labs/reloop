@@ -18,12 +18,12 @@ export function paymentFailedHtml(_origin: string): string {
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
 </head>
 <body style="background-color:${blush};margin:0;padding:0;font-family:${font}">
-<div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0" data-skip-in-text="true">We couldn't charge your card. Update it to keep your Pulse membership active.</div>
+<div style="display:none;overflow:hidden;line-height:1px;opacity:0;max-height:0;max-width:0" data-skip-in-text="true">We couldn't charge your card. Update it to keep your Puulsee membership active.</div>
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:0 auto;background-color:${blush}">
 <tbody>
 <tr style="width:100%">
 <td style="padding:48px 24px">
-<p style="margin:0 0 32px 0;font-size:22px;line-height:28px;font-weight:700;letter-spacing:-0.03em;color:${ink};text-align:center;font-family:${font}">pulse<span style="color:${rose}">.</span></p>
+<p style="margin:0 0 32px 0;font-size:22px;line-height:28px;font-weight:700;letter-spacing:-0.03em;color:${ink};text-align:center;font-family:${font}">puulsee<span style="color:${rose}">.</span></p>
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#ffffff;border-radius:32px;box-shadow:0 2px 4px rgba(225,29,72,0.04),0 40px 80px -32px rgba(225,29,72,0.35)">
 <tbody>
 <tr>
@@ -38,7 +38,7 @@ export function paymentFailedHtml(_origin: string): string {
 </tbody>
 </table>
 <h1 style="margin:0 0 14px 0;font-size:36px;line-height:42px;font-weight:600;letter-spacing:-0.03em;color:${ink};text-align:center;font-family:${font}">Let's keep your streak alive</h1>
-<p style="margin:0 0 32px 0;font-size:17px;line-height:27px;font-weight:300;color:${muted};text-align:center;font-family:${font}">Hi <span data-variable="first_name">{{{first_name}}}</span>, we tried to renew your Pulse Unlimited membership but your card was declined. Update it in a few seconds and you won't miss a single class.</p>
+<p style="margin:0 0 32px 0;font-size:17px;line-height:27px;font-weight:300;color:${muted};text-align:center;font-family:${font}">Hi <span data-variable="first_name">{{{first_name}}}</span>, we tried to renew your Puulsee Unlimited membership but your card was declined. Update it in a few seconds and you won't miss a single class.</p>
 </td>
 </tr>
 <tr>
@@ -47,7 +47,7 @@ export function paymentFailedHtml(_origin: string): string {
 <tbody>
 <tr>
 <td style="padding:24px 26px 0 26px">
-<p style="margin:0;font-size:15px;line-height:20px;font-weight:700;font-style:italic;letter-spacing:0.02em;color:#ffffff;font-family:${font}">VISA</p>
+<p style="margin:0;font-size:15px;line-height:20px;font-weight:700;font-style:italic;letter-spacing:0.02em;color:#ffffff;font-family:${font}">CARD</p>
 </td>
 <td style="padding:24px 26px 0 26px;text-align:right">
 <p style="margin:0;font-size:11px;line-height:16px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#fda4af;text-align:right;font-family:${font}">Declined</p>
@@ -89,7 +89,7 @@ export function paymentFailedHtml(_origin: string): string {
 </tbody>
 </table>
 <p style="margin:32px 0 6px 0;font-size:14px;line-height:22px;color:${muted};text-align:center;font-family:${font}">Questions? <a href="#" style="color:${rose};font-weight:600;text-decoration:none">Chat with us</a>, we usually reply in minutes.</p>
-<p style="margin:0 0 4px 0;font-size:12px;line-height:18px;color:#a8a29e;text-align:center;font-family:${font}">Pulse Fitness Inc. · 400 Congress Ave · Austin, TX 78701</p>
+<p style="margin:0 0 4px 0;font-size:12px;line-height:18px;color:#a8a29e;text-align:center;font-family:${font}">Puulsee Fitness · Fictional sample company · 24 Sample Avenue · Example City</p>
 <p style="margin:0;font-size:12px;line-height:18px;color:#a8a29e;text-align:center;font-family:${font}">You're receiving this because a payment on your account needs attention.</p>
 </td>
 </tr>

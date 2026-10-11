@@ -49,7 +49,7 @@ export default function EmailHtmlEditorPage() {
 							"Free email templates to start from",
 							"Visual canvas with inspector and variables",
 							"Source stays in sync with canvas edits",
-							"No account, save, or send",
+							"No account needed to edit; save to Reloop for free",
 						],
 						publisher: {
 							"@type": "Organization",

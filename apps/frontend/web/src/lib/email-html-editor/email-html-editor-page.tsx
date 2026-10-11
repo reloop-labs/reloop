@@ -2,14 +2,17 @@
 
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { EditorContext } from "@tiptap/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import { FullEmailBuilder } from "./components/canvas/email-builder";
 import { EmailSlashCommand } from "./components/canvas/email-slash-command";
 import { HtmlEmailPreview } from "./components/canvas/html-preview";
 import { CenterNav } from "./components/header/center-nav";
+import { SaveTemplateButton } from "./components/header/save-template-button";
 import { CodeEditor } from "./components/panels/code/code-view";
 import { AddTemplateVariableModal } from "./components/panels/variables/add-variable-modal";
 import { VariablesPanel } from "./components/panels/variables/variables-panel";
@@ -29,15 +32,19 @@ const TAB_ORDER: Record<string, number> = {
 /**
  * Public tool version of the dashboard `TemplateEditorPage`: same canvas,
  * inspector, code split, and variables, without send details, history,
- * publish, collaboration, or saving. Everything stays in this tab.
+ * publish, or collaboration. "Save template" hands the email to the
+ * dashboard, which creates the template after sign-up or sign-in.
  */
 export function EmailHtmlEditorPage({
 	html,
 	variables,
+	templateName,
 }: {
 	/** Absolute-URL email HTML to load on the canvas. */
 	html: string;
 	variables: ToolVariable[];
+	/** Fallback template name when the email has no subject. */
+	templateName: string;
 }) {
 	const editor = useToolEditor();
 	const shouldReduceMotion = useReducedMotion();
@@ -127,7 +134,39 @@ export function EmailHtmlEditorPage({
 			<Toaster position="bottom-center" />
 			<div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 				<div className="relative flex shrink-0 items-center border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
-					<CenterNav />
+					<div className="flex shrink-0 items-center">
+						<CenterNav />
+					</div>
+					<nav
+						aria-label="Template breadcrumb"
+						className="mx-4 flex min-w-0 flex-1 items-center justify-center sm:absolute sm:inset-x-36 sm:mx-0"
+					>
+						<div className="hidden shrink-0 items-center gap-1.5 sm:flex">
+							<Icon name="layout" className="size-4 text-text-sub-600" />
+							<Link
+								href="/tools/email-html-editor"
+								className="font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950"
+							>
+								Templates
+							</Link>
+						</div>
+						<span
+							aria-hidden="true"
+							className="ml-2.5 hidden text-text-disabled-300 text-xs sm:inline"
+						>
+							/
+						</span>
+						<span
+							className="ml-1 truncate rounded-md px-2 py-1 font-semibold text-label-sm text-text-strong-950"
+							title={templateName}
+							aria-current="page"
+						>
+							{templateName}
+						</span>
+					</nav>
+					<div className="ml-auto shrink-0">
+						<SaveTemplateButton templateName={templateName} />
+					</div>
 				</div>
 				<div className="flex min-h-0 flex-1 items-stretch overflow-hidden bg-bg-white-0 dark:bg-black">
 					<div className="flex h-full min-h-0 flex-1 overflow-hidden">

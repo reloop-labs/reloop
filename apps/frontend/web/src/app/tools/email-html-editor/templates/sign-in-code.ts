@@ -33,7 +33,7 @@ export function signInCodeHtml(_origin: string): string {
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="dark" />
-<title>Your Orbit sign-in code</title>
+<title>Your Ooorbitoooo sign-in code</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet" />
 </head>
 <body style="background-color:${page};margin:0;padding:0;font-family:${font}">
@@ -42,14 +42,14 @@ export function signInCodeHtml(_origin: string): string {
 <tbody>
 <tr style="width:100%">
 <td style="padding:56px 24px 48px 24px">
-<p style="margin:0 0 40px 0;font-size:20px;line-height:24px;font-weight:700;letter-spacing:-0.04em;color:${text};font-family:${font}"><span style="color:${lime}">●</span> orbit</p>
+<p style="margin:0 0 40px 0;font-size:20px;line-height:24px;font-weight:700;letter-spacing:-0.04em;color:${text};font-family:${font}"><span style="color:${lime}">●</span> oorbitoo</p>
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${card};border:1px solid ${line};border-radius:24px;box-shadow:0 0 0 1px rgba(198,244,50,0.05),0 30px 80px -20px rgba(198,244,50,0.22)">
 <tbody>
 <tr>
 <td style="padding:44px 44px 40px 44px">
 <p style="margin:0 0 16px 0;font-size:12px;line-height:16px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:${lime};font-family:${mono}">// Sign-in request</p>
 <h1 style="margin:0 0 14px 0;font-size:34px;line-height:40px;font-weight:700;letter-spacing:-0.035em;color:${text};font-family:${font}">Here's your code, <span data-variable="first_name">{{{first_name}}}</span>.</h1>
-<p style="margin:0 0 32px 0;font-size:16px;line-height:26px;color:${muted};font-family:${font}">Enter it in the Orbit window you just opened. For your security, never share this code with anyone, including us.</p>
+<p style="margin:0 0 32px 0;font-size:16px;line-height:26px;color:${muted};font-family:${font}">Enter it in the Ooorbitoooo window you just opened. For your security, never share this code with anyone, including us.</p>
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#0a0c11;border:1px solid #2c3446;border-radius:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04),0 0 40px -8px rgba(198,244,50,0.25)">
 <tbody>
 <tr>
@@ -65,7 +65,7 @@ export function signInCodeHtml(_origin: string): string {
 <tr>
 <td style="padding:32px 0 36px 0">
 <p style="margin:0 0 16px 0;font-size:14px;line-height:22px;color:${muted};font-family:${font}">Prefer one click? Use the magic link instead.</p>
-<a href="{{{magic_link_url}}}" data-id="react-email-button" target="_blank" style="line-height:100%;text-decoration:none;display:inline-block;max-width:100%;background-color:${lime};color:#0b0d12;font-size:15px;font-weight:700;letter-spacing:-0.01em;font-family:${font};border-radius:999px;padding:15px 28px;box-shadow:0 10px 30px -6px rgba(198,244,50,0.55)">Sign in to Orbit →</a>
+<a href="{{{magic_link_url}}}" data-id="react-email-button" target="_blank" style="line-height:100%;text-decoration:none;display:inline-block;max-width:100%;background-color:${lime};color:#0b0d12;font-size:15px;font-weight:700;letter-spacing:-0.01em;font-family:${font};border-radius:999px;padding:15px 28px;box-shadow:0 10px 30px -6px rgba(198,244,50,0.55)">Sign in to Ooorbitoooo →</a>
 </td>
 </tr>
 </tbody>
@@ -73,7 +73,7 @@ export function signInCodeHtml(_origin: string): string {
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-top:1px solid ${line}">
 <tbody>
 <tr>
-<td>${meta("Device", "Chrome · macOS")}${meta("Location", "Lisbon, PT")}${meta("Requested", "Oct 11, 09:42 UTC")}
+<td>${meta("Device", "Desktop browser")}${meta("Location", "Lisbon, PT")}${meta("Requested", "Oct 11, 09:42 UTC")}
 </td>
 </tr>
 </tbody>
@@ -83,7 +83,7 @@ export function signInCodeHtml(_origin: string): string {
 </tr>
 </tbody>
 </table>
-<p style="margin:36px 0 6px 0;font-size:12px;line-height:18px;color:${faint};font-family:${mono}">Orbit Labs · 12 Rua das Flores · Lisbon 1200-195</p>
+<p style="margin:36px 0 6px 0;font-size:12px;line-height:18px;color:${faint};font-family:${mono}">Ooorbitoooo · Fictional sample company · 36 Sample Road · Example City</p>
 <p style="margin:0;font-size:12px;line-height:18px;color:${faint};font-family:${mono}">Sent because a sign-in was requested for this address.</p>
 </td>
 </tr>

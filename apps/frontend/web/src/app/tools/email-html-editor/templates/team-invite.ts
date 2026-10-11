@@ -28,7 +28,7 @@ export function teamInviteHtml(_origin: string): string {
 <head>
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>You've been invited to join Northwind Design on Kanbo</title>
+<title>You've been invited to join Norrwilo Design on Kaanboo</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&amp;display=swap" rel="stylesheet" />
 </head>
 <body style="background-color:${canvas};margin:0;padding:0;font-family:${font}">
@@ -41,7 +41,7 @@ export function teamInviteHtml(_origin: string): string {
 <tbody>
 <tr>
 <td style="padding:40px 44px 0 44px">
-<p style="margin:0 0 36px 0;font-size:20px;line-height:24px;font-weight:800;letter-spacing:-0.03em;color:${indigo};font-family:${font}">▦ kanbo</p>
+<p style="margin:0 0 36px 0;font-size:20px;line-height:24px;font-weight:800;letter-spacing:-0.03em;color:${indigo};font-family:${font}">▦ kaanboo</p>
 <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 28px 0">
 <tbody>
 <tr>${avatar("MR", "#fde047", ink)}${avatar("JS", "#6ee7b7", ink)}${avatar("AK", "#f9a8d4", ink)}${avatar("+9", indigo, "#ffffff")}
@@ -49,7 +49,7 @@ export function teamInviteHtml(_origin: string): string {
 </tbody>
 </table>
 <h1 style="margin:0 0 16px 0;font-size:40px;line-height:44px;font-weight:800;letter-spacing:-0.04em;color:${ink};font-family:${font}"><span data-variable="inviter_name">{{{inviter_name}}}</span> wants you on the team</h1>
-<p style="margin:0 0 32px 0;font-size:17px;line-height:27px;color:${muted};font-family:${font}">Hey <span data-variable="first_name">{{{first_name}}}</span>, you've been invited to join <strong style="color:${ink}"><span data-variable="workspace_name">{{{workspace_name}}}</span></strong> on Kanbo, where the team plans sprints, ships work, and celebrates the wins.</p>
+<p style="margin:0 0 32px 0;font-size:17px;line-height:27px;color:${muted};font-family:${font}">Hey <span data-variable="first_name">{{{first_name}}}</span>, you've been invited to join <strong style="color:${ink}"><span data-variable="workspace_name">{{{workspace_name}}}</span></strong> on Kaanboo, where the team plans sprints, ships work, and celebrates the wins.</p>
 </td>
 </tr>
 <tr>
@@ -69,7 +69,7 @@ export function teamInviteHtml(_origin: string): string {
 </table>
 </td>
 <td style="padding:20px 20px 20px 16px;vertical-align:middle">
-<p style="margin:0 0 2px 0;font-size:18px;line-height:24px;font-weight:700;color:${ink};font-family:${font}">Northwind Design</p>
+<p style="margin:0 0 2px 0;font-size:18px;line-height:24px;font-weight:700;color:${ink};font-family:${font}">Norrwilo Design</p>
 <p style="margin:0;font-size:14px;line-height:20px;color:${muted};font-family:${font}">12 members · 4 active boards · You'll join as <strong style="color:${indigo}">Editor</strong></p>
 </td>
 </tr>
@@ -93,8 +93,8 @@ export function teamInviteHtml(_origin: string): string {
 <tbody>
 <tr>
 <td style="padding:36px 8px 0 8px">
-<p style="margin:0 0 6px 0;font-size:13px;line-height:20px;color:${muted};font-family:${font}">Sent by Kanbo on behalf of <span data-variable="inviter_name">{{{inviter_name}}}</span>.</p>
-<p style="margin:0;font-size:12px;line-height:18px;color:#8e8ca8;font-family:${font}">Kanbo Software GmbH · Torstraße 109 · 10119 Berlin</p>
+<p style="margin:0 0 6px 0;font-size:13px;line-height:20px;color:${muted};font-family:${font}">Sent by Kaanboo on behalf of <span data-variable="inviter_name">{{{inviter_name}}}</span>.</p>
+<p style="margin:0;font-size:12px;line-height:18px;color:#8e8ca8;font-family:${font}">Kaanboo · Fictional sample company · 48 Sample Street · Example City</p>
 </td>
 </tr>
 </tbody>

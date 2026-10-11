@@ -47,14 +47,19 @@
 	padding: 0 !important;
 }
 
-.tiptap.ProseMirror .button__text,
-.tiptap.ProseMirror a[class*="button"],
-.tiptap.ProseMirror .button__cell a,
-.tiptap.ProseMirror td[class*="button"] a,
-.ProseMirror .button__text,
-.ProseMirror a[class*="button"],
-.ProseMirror .button__cell a,
-.ProseMirror td[class*="button"] a {
+/*
+ * Pasted bulletproof-button markup only. The editor's own button node
+ * (`a.node-button`) carries its size and colors inline; forcing these
+ * values on it made every template button 16px / 20px 25px / white text.
+ */
+.tiptap.ProseMirror .button__text:not(.node-button),
+.tiptap.ProseMirror a[class*="button"]:not(.node-button),
+.tiptap.ProseMirror .button__cell a:not(.node-button),
+.tiptap.ProseMirror td[class*="button"] a:not(.node-button),
+.ProseMirror .button__text:not(.node-button),
+.ProseMirror a[class*="button"]:not(.node-button),
+.ProseMirror .button__cell a:not(.node-button),
+.ProseMirror td[class*="button"] a:not(.node-button) {
 	display: inline-block !important;
 	text-align: center !important;
 	padding: 20px 25px !important;
@@ -203,12 +208,13 @@ html.dark .template-editor-canvas [role="option"][aria-selected="true"] {
 	background-color: #f4f4f5 !important;
 }
 
+/* Browser / email-client default; source `valign` is kept as inline style. */
 .tiptap.ProseMirror td,
 .tiptap.ProseMirror th,
 .ProseMirror td,
 .ProseMirror th {
 	border: none;
-	vertical-align: top;
+	vertical-align: middle;
 }
 
 /* Table alignment aligns the table box using margins */

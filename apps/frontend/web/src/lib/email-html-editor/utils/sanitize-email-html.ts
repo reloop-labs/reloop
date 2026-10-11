@@ -25,6 +25,7 @@ import {
 import {
 	applyEmailColumnWidth,
 	findEmailContainerTable,
+	isMultiCellEmailColumn,
 	prepareEmailHtmlForParse,
 	stripEmailCentering,
 } from "@reloop/web/lib/email-html-editor/utils/strip-email-centering";
@@ -79,6 +80,8 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 	}
 
 	expandShorthandStyles(doc.body);
+	preserveSourceTableLayout(doc.body);
+	moveFormattingStylesToSpans(doc.body);
 	promoteTableSpacingToCells(doc.body);
 
 	// 1. Extract and clean preview text
@@ -130,6 +133,11 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 			containerTable.querySelector("tr > td") ||
 			containerTable.querySelector("td");
 
+		// A column with several rows or cells has no single content cell. Keep
+		// its rows together as a table inside the card; treating the first cell
+		// as the card dropped its background and pushed later rows out.
+		const isMultiCellColumn = isMultiCellEmailColumn(containerTable);
+
 		if (contentCell) {
 			// Create a standard container div that TipTap schema matches perfectly
 			const containerDiv = doc.createElement("div");
@@ -152,7 +160,9 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 			if (tableId) containerDiv.setAttribute("id", tableId);
 
 			// Merge contentCell style (like padding)
-			const cellStyleText = contentCell.getAttribute("style") || "";
+			const cellStyleText = isMultiCellColumn
+				? ""
+				: contentCell.getAttribute("style") || "";
 			if (cellStyleText) {
 				const cellScratch = doc.createElement("div") as HTMLDivElement;
 				cellScratch.style.cssText = cellStyleText;
@@ -323,7 +333,7 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 			{
 				// If containerTable itself has other rows outside contentCell's row,
 				// preserve them so multi-row container tables don't lose rows.
-				const contentRow = contentCell.closest("tr");
+				const contentRow = isMultiCellColumn ? null : contentCell.closest("tr");
 				if (contentRow && contentRow.parentElement) {
 					const rowKids = Array.from(contentRow.parentElement.children);
 					const rowIdx = rowKids.indexOf(contentRow);
@@ -365,9 +375,23 @@ export function sanitizeEmailHtml(rawHtml: string): string {
 				}
 			}
 
-			// Only the container cell's children go inside the white card.
-			for (const node of Array.from(contentCell.childNodes)) {
-				containerDiv.appendChild(node);
+			if (isMultiCellColumn) {
+				// Column sizing and background already moved to the card div.
+				const rowsTable = doc.createElement("table");
+				for (const attr of ["width", "cellpadding", "cellspacing", "border"]) {
+					const value = containerTable.getAttribute(attr);
+					if (value) rowsTable.setAttribute(attr, value);
+				}
+				rowsTable.setAttribute("width", "100%");
+				for (const node of Array.from(containerTable.childNodes)) {
+					rowsTable.appendChild(node);
+				}
+				containerDiv.appendChild(rowsTable);
+			} else {
+				// Only the container cell's children go inside the white card.
+				for (const node of Array.from(contentCell.childNodes)) {
+					containerDiv.appendChild(node);
+				}
 			}
 
 			// Keep sibling chrome outside the card so their background stays
@@ -664,6 +688,54 @@ const SHORTHAND_ROOTS = new Set([
 	"border-color",
 	"border-style",
 ]);
+
+const FORMATTING_TAGS = new Set(["B", "EM", "I", "S", "STRONG", "U"]);
+
+/**
+ * Bold / italic / underline marks keep their formatting but drop inline
+ * styles, so `<em style="color:…">` lost its color on the canvas. The editor
+ * keeps styles from `span[style]`, so move them onto an inner span.
+ */
+function moveFormattingStylesToSpans(root: Element): void {
+	for (const el of Array.from(
+		root.querySelectorAll("b, em, i, s, strong, u"),
+	)) {
+		if (!FORMATTING_TAGS.has(el.tagName)) continue;
+		const style = el.getAttribute("style");
+		if (!style?.trim()) continue;
+		const span = el.ownerDocument.createElement("span");
+		span.setAttribute("style", style);
+		while (el.firstChild) span.appendChild(el.firstChild);
+		el.appendChild(span);
+		el.removeAttribute("style");
+	}
+}
+
+/**
+ * Keep table layout the way a browser renders the source email:
+ *  - `valign` becomes `vertical-align` so the canvas (and composed HTML)
+ *    keep it; cells without one use the browser default (middle).
+ *  - Tables with no width shrink to fit their content. The canvas makes
+ *    tables 100% wide, which stretched pills and badges across the card.
+ */
+function preserveSourceTableLayout(root: Element): void {
+	for (const cell of Array.from(root.querySelectorAll("td, th"))) {
+		if (!(cell instanceof HTMLElement)) continue;
+		const valign = cell.getAttribute("valign")?.trim().toLowerCase();
+		if (valign && !cell.style.verticalAlign) {
+			cell.style.verticalAlign = valign;
+		}
+	}
+	for (const table of Array.from(root.querySelectorAll("table"))) {
+		if (!(table instanceof HTMLElement)) continue;
+		const hasWidth =
+			table.hasAttribute("width") ||
+			Boolean(table.style.width) ||
+			Boolean(table.style.maxWidth) ||
+			Boolean(table.style.minWidth);
+		if (!hasWidth) table.style.width = "auto";
+	}
+}
 
 /**
  * Walks every element under `root` and rewrites its `style` attribute so that

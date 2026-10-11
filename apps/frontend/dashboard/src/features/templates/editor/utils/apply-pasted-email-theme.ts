@@ -14,6 +14,7 @@ import {
 import {
 	emailColumnMaxWidthCss,
 	findEmailContainerTable,
+	isMultiCellEmailColumn,
 } from "#/features/templates/editor/utils/strip-email-centering";
 
 function parseCssUnit(val: string | null | undefined): number | undefined {
@@ -103,10 +104,13 @@ export function extractThemingStylesFromHtml(rawHtml: string): any[] {
 	let containerAlign = "center";
 
 	if (containerTable) {
-		const contentCell =
-			containerTable.querySelector("tbody > tr > td") ||
-			containerTable.querySelector("tr > td") ||
-			containerTable.querySelector("td");
+		// Multi-row columns keep each row's padding and color on the row; they
+		// are not card-wide settings.
+		const contentCell = isMultiCellEmailColumn(containerTable)
+			? null
+			: containerTable.querySelector("tbody > tr > td") ||
+				containerTable.querySelector("tr > td") ||
+				containerTable.querySelector("td");
 
 		const tableScratch = document.createElement("div");
 		tableScratch.style.cssText = containerTable.getAttribute("style") || "";

@@ -23,13 +23,13 @@ export function passwordResetHtml(_origin: string): string {
 <tbody>
 <tr style="width:100%">
 <td style="padding:48px 24px">
-<p style="margin:0 0 32px 0;font-size:18px;line-height:24px;font-weight:600;letter-spacing:-0.02em;color:${ink};font-family:${font}">Lumen</p>
+<p style="margin:0 0 32px 0;font-size:18px;line-height:24px;font-weight:600;letter-spacing:-0.02em;color:${ink};font-family:${font}">Luumioo</p>
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#ffffff;border:1px solid ${line};border-radius:12px">
 <tbody>
 <tr>
 <td style="padding:40px 40px 36px 40px">
 <h1 style="margin:0 0 12px 0;font-size:24px;line-height:32px;font-weight:600;letter-spacing:-0.02em;color:${ink};font-family:${font}">Reset your password</h1>
-<p style="margin:0 0 28px 0;font-size:15px;line-height:24px;color:${muted};font-family:${font}">Hi <span data-variable="first_name">{{{first_name}}}</span>, we got a request to reset the password for your Lumen account. Click the button below to choose a new one.</p>
+<p style="margin:0 0 28px 0;font-size:15px;line-height:24px;color:${muted};font-family:${font}">Hi <span data-variable="first_name">{{{first_name}}}</span>, we got a request to reset the password for your Luumioo account. Click the button below to choose a new one.</p>
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
 <tbody>
 <tr>
@@ -41,12 +41,12 @@ export function passwordResetHtml(_origin: string): string {
 </table>
 <p style="margin:0 0 20px 0;font-size:13px;line-height:20px;color:${muted};font-family:${font}">This link expires in 30 minutes. If you didn't request a reset, you can safely ignore this email. Your password won't change.</p>
 <hr style="width:100%;border:none;border-top:1px solid ${line};margin:0 0 20px 0" />
-<p style="margin:0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">Button not working? Paste this link into your browser:<br /><a href="{{{reset_url}}}" target="_blank" style="color:${ink};text-decoration:underline">https://lumen.app/reset/••••••••</a></p>
+<p style="margin:0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">Button not working? Paste this link into your browser:<br /><a href="{{{reset_url}}}" target="_blank" style="color:${ink};text-decoration:underline">https://luumioo.example/reset/••••••••</a></p>
 </td>
 </tr>
 </tbody>
 </table>
-<p style="margin:32px 0 4px 0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">Lumen Inc. · 548 Market St · San Francisco, CA 94104</p>
+<p style="margin:32px 0 4px 0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">Luumioo · Fictional sample company · 12 Sample Lane · Example City</p>
 <p style="margin:0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">You're receiving this because a password reset was requested for your account.</p>
 </td>
 </tr>

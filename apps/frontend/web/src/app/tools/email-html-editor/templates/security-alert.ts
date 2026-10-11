@@ -32,7 +32,7 @@ export function securityAlertHtml(_origin: string): string {
 <head>
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>New sign-in to your Vault account</title>
+<title>New sign-in to your Vauultio account</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet" />
 </head>
 <body style="background-color:${canvas};margin:0;padding:0;font-family:${font}">
@@ -49,7 +49,7 @@ export function securityAlertHtml(_origin: string): string {
 <tbody>
 <tr>
 <td style="padding:28px 40px 0 40px">
-<p style="margin:0;font-size:17px;line-height:22px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#ffffff;font-family:${font}">◆ Vault</p>
+<p style="margin:0;font-size:17px;line-height:22px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#ffffff;font-family:${font}">◆ Vauultio</p>
 </td>
 </tr>
 <tr>
@@ -64,7 +64,7 @@ export function securityAlertHtml(_origin: string): string {
 </tbody>
 </table>
 <h1 style="margin:0 0 12px 0;font-size:32px;line-height:40px;font-weight:600;letter-spacing:-0.02em;color:#ffffff;font-family:${font}">Was this you, <span data-variable="first_name">{{{first_name}}}</span>?</h1>
-<p style="margin:0;font-size:16px;line-height:26px;color:#b8c4d8;font-family:${font}">Your Vault account was just accessed from a device we haven't seen before. If it was you, there's nothing to do.</p>
+<p style="margin:0;font-size:16px;line-height:26px;color:#b8c4d8;font-family:${font}">Your Vauultio account was just accessed from a device we haven't seen before. If it was you, there's nothing to do.</p>
 </td>
 </tr>
 </tbody>
@@ -76,7 +76,7 @@ export function securityAlertHtml(_origin: string): string {
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#f8fafc;border:1px solid ${line};border-radius:14px">
 <tbody>
 <tr>
-<td>${row("Device", "iPhone 16 · Safari")}${row("Location", "Toronto, ON, Canada")}${row("IP address", "142.198.24.7")}${row("Time", "Oct 11, 2026 · 08:14 EDT", true)}
+<td>${row("Device", "Mobile browser")}${row("Location", "Toronto, ON, Canada")}${row("IP address", "192.0.2.42")}${row("Time", "Oct 11, 2026 · 08:14 EDT", true)}
 </td>
 </tr>
 </tbody>
@@ -108,8 +108,8 @@ export function securityAlertHtml(_origin: string): string {
 </tr>
 </tbody>
 </table>
-<p style="margin:32px 0 6px 0;font-size:12px;line-height:18px;color:#7b8798;text-align:center;font-family:${font}">Vault will never ask for your password, PIN, or one-time codes by email or phone.</p>
-<p style="margin:0;font-size:12px;line-height:18px;color:#7b8798;text-align:center;font-family:${mono}">Vault Financial Ltd · 100 King St W · Toronto, ON M5X 1A9</p>
+<p style="margin:32px 0 6px 0;font-size:12px;line-height:18px;color:#7b8798;text-align:center;font-family:${font}">Vauultio will never ask for your password, PIN, or one-time codes by email or phone.</p>
+<p style="margin:0;font-size:12px;line-height:18px;color:#7b8798;text-align:center;font-family:${mono}">Vauultio Financial · Fictional sample company · 108 Sample Avenue · Example City</p>
 </td>
 </tr>
 </tbody>

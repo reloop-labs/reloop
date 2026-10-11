@@ -65,7 +65,7 @@ export function orderShippedHtml(_origin: string): string {
 <tbody>
 <tr style="width:100%">
 <td style="padding:44px 24px 48px 24px">
-<p style="margin:0 0 32px 0;font-size:24px;line-height:28px;font-style:italic;color:${forest};text-align:center;font-family:${serif}">Field &amp; Fern</p>
+<p style="margin:0 0 32px 0;font-size:24px;line-height:28px;font-style:italic;color:${forest};text-align:center;font-family:${serif}">Fielld &amp; Ferrno</p>
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:${card};border:1px solid ${line};border-radius:28px;box-shadow:0 1px 2px rgba(60,40,20,0.06),0 28px 50px -24px rgba(60,40,20,0.28)">
 <tbody>
 <tr>
@@ -91,7 +91,7 @@ export function orderShippedHtml(_origin: string): string {
 <td style="padding:26px 28px">
 <p style="margin:0 0 6px 0;font-size:12px;line-height:16px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#b9c4a7;font-family:${sans}">Estimated arrival</p>
 <p style="margin:0 0 6px 0;font-size:30px;line-height:36px;font-weight:400;color:#fffaf2;font-family:${serif}">Thursday, <em>Oct 15</em></p>
-<p style="margin:0;font-size:13px;line-height:20px;color:#d5dcc8;font-family:${sans}">UPS Ground · 1Z 999 AA1 0123 4567 84</p>
+<p style="margin:0;font-size:13px;line-height:20px;color:#d5dcc8;font-family:${sans}">Standard delivery · 1Z 999 AA1 0123 4567 84</p>
 </td>
 </tr>
 </tbody>
@@ -107,13 +107,13 @@ export function orderShippedHtml(_origin: string): string {
 <td style="padding:28px 44px 40px 44px">
 <p style="margin:0 0 4px 0;font-size:12px;line-height:16px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#a49d8f;font-family:${sans}">In this box</p>
 ${item("🪴", "#e3ead8", "Monstera Deliciosa", "Medium · Terracotta pot · Qty 1")}${item("🌿", "#f3e1d6", "Pothos Marble Queen", "Small · Hanging planter · Qty 2")}
-<p style="margin:24px 0 0 0;font-size:14px;line-height:22px;color:${muted};font-family:${sans}"><strong style="color:${ink}">Shipping to</strong><br />Ana Morales · 221 Grove St, Apt 4B · Brooklyn, NY 11201</p>
+<p style="margin:24px 0 0 0;font-size:14px;line-height:22px;color:${muted};font-family:${sans}"><strong style="color:${ink}">Shipping to</strong><br />Ana Morales · 132 Sample Road, Apt 4B · Example City</p>
 </td>
 </tr>
 </tbody>
 </table>
 <p style="margin:32px 0 6px 0;font-size:15px;line-height:22px;font-style:italic;color:${forest};text-align:center;font-family:${serif}">Unbox within a day and give them some light. They'll thank you.</p>
-<p style="margin:0 0 4px 0;font-size:12px;line-height:18px;color:#958e80;text-align:center;font-family:${sans}">Field &amp; Fern · 88 Greenhouse Lane · Portland, OR 97214</p>
+<p style="margin:0 0 4px 0;font-size:12px;line-height:18px;color:#958e80;text-align:center;font-family:${sans}">Fielld &amp; Ferrno · Fictional sample company · 120 Sample Lane · Example City</p>
 <p style="margin:0;font-size:12px;line-height:18px;color:#958e80;text-align:center;font-family:${sans}">You're getting this because you placed an order with us.</p>
 </td>
 </tr>

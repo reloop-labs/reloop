@@ -718,6 +718,28 @@ const emailActiveTextBlock = Extension.create({
 });
 
 /**
+ * Mod-a inside a text block selects that block's text first; a second press
+ * selects the whole email. Plain select-all made the next keystroke replace
+ * every section of the template.
+ */
+const emailScopedSelectAll = Extension.create({
+	name: "emailScopedSelectAll",
+	addKeyboardShortcuts() {
+		return {
+			"Mod-a": ({ editor }) => {
+				const { selection } = editor.state;
+				const { $from, $to } = selection;
+				if (!$from.sameParent($to) || !$from.parent.isTextblock) return false;
+				const start = $from.start();
+				const end = $from.end();
+				if (selection.from === start && selection.to === end) return false;
+				return editor.commands.setTextSelection({ from: start, to: end });
+			},
+		};
+	},
+});
+
+/**
  * React Email's StyleAttribute list omits `container`, so pasted
  * padding / max-width / background on the email wrapper are dropped.
  */
@@ -726,8 +748,8 @@ export function emailStarterKit() {
 		name: "emailEditorKit",
 		addExtensions() {
 			return [
+				// No Yjs here, so the tool needs StarterKit's own undo history.
 				StarterKit.configure({
-					UndoRedo: false,
 					StyleAttribute: { types: LAYOUT_STYLE_TYPES },
 					ClassAttribute: { types: LAYOUT_STYLE_TYPES },
 				}),
@@ -739,6 +761,7 @@ export function emailStarterKit() {
 				emailImageSelection,
 				emailSectionSelection,
 				emailActiveTextBlock,
+				emailScopedSelectAll,
 			];
 		},
 	});

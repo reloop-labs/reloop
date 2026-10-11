@@ -42,7 +42,7 @@ export function orderReceiptHtml(_origin: string): string {
 <head>
 <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Your receipt from Lumen</title>
+<title>Your receipt from Luumioo</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet" />
 </head>
 <body style="background-color:#fafafa;margin:0;padding:0;font-family:${font}">
@@ -51,7 +51,7 @@ export function orderReceiptHtml(_origin: string): string {
 <tbody>
 <tr style="width:100%">
 <td style="padding:48px 24px">
-<p style="margin:0 0 32px 0;font-size:18px;line-height:24px;font-weight:600;letter-spacing:-0.02em;color:${ink};font-family:${font}">Lumen</p>
+<p style="margin:0 0 32px 0;font-size:18px;line-height:24px;font-weight:600;letter-spacing:-0.02em;color:${ink};font-family:${font}">Luumioo</p>
 <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#ffffff;border:1px solid ${line};border-radius:12px">
 <tbody>
 <tr>
@@ -85,13 +85,13 @@ export function orderReceiptHtml(_origin: string): string {
 </tbody>
 </table>
 <hr style="width:100%;border:none;border-top:1px solid ${line};margin:0 0 20px 0" />
-<p style="margin:0;font-size:13px;line-height:20px;color:${muted};font-family:${font}">Paid with Visa ending in 4242 on Oct 10, 2026. Questions about this charge? Just reply to this email.</p>
+<p style="margin:0;font-size:13px;line-height:20px;color:${muted};font-family:${font}">Paid with Card ending in 4242 on Oct 10, 2026. Questions about this charge? Just reply to this email.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<p style="margin:32px 0 4px 0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">Lumen Inc. · 548 Market St · San Francisco, CA 94104</p>
-<p style="margin:0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">This receipt was sent to you because you made a purchase on lumen.app.</p>
+<p style="margin:32px 0 4px 0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">Luumioo · Fictional sample company · 12 Sample Lane · Example City</p>
+<p style="margin:0;font-size:12px;line-height:18px;color:#9a9a9a;font-family:${font}">This receipt was sent to you because you made a purchase on luumioo.example.</p>
 </td>
 </tr>
 </tbody>

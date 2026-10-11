@@ -72,6 +72,48 @@ const TYPOGRAPHY_BLOCKS = new Set([
 	"LI",
 ]);
 
+const INLINE_CELL_TAGS = new Set([
+	"A",
+	"ABBR",
+	"B",
+	"BR",
+	"CODE",
+	"EM",
+	"FONT",
+	"I",
+	"S",
+	"SMALL",
+	"SPAN",
+	"STRONG",
+	"SUB",
+	"SUP",
+	"U",
+]);
+
+/**
+ * `<td style="font-family:…">Brand</td>` has no block for the typography to
+ * land on; TipTap adds the paragraph later, after promotion, so the text
+ * fell back to the theme font. Wrap loose inline content in a margin-less
+ * paragraph first.
+ */
+function wrapLooseCellText(cell: HTMLElement): void {
+	const hasLooseText = Array.from(cell.childNodes).some(
+		(node) =>
+			node.nodeType === Node.TEXT_NODE &&
+			(node.textContent ?? "").replace(/\u00a0/g, " ").trim(),
+	);
+	if (!hasLooseText) return;
+	if (
+		Array.from(cell.children).some((el) => !INLINE_CELL_TAGS.has(el.tagName))
+	) {
+		return;
+	}
+	const paragraph = cell.ownerDocument.createElement("p");
+	paragraph.style.margin = "0";
+	while (cell.firstChild) paragraph.appendChild(cell.firstChild);
+	cell.appendChild(paragraph);
+}
+
 /**
  * TipTap wraps cell text in a paragraph that does not copy the td's
  * typography. Theme `font-size: 1em` then resolves against the editor root
@@ -82,6 +124,7 @@ export function promoteCellTypographyToBlocks(root: Element): void {
 	const cells = Array.from(root.querySelectorAll("td, th"));
 	for (const cell of cells) {
 		if (!(cell instanceof HTMLElement)) continue;
+		wrapLooseCellText(cell);
 		for (const child of Array.from(cell.children)) {
 			if (!(child instanceof HTMLElement)) continue;
 			if (!TYPOGRAPHY_BLOCKS.has(child.tagName)) continue;
@@ -160,11 +203,11 @@ export function flattenedIconRowMarginTop(table: HTMLElement): string {
 	return "2rem";
 }
 
-const BLOCK_TAGS = new Set(["P", "H1", "H2", "H3", "H4", "H5", "H6"]);
+const BLOCK_TAGS = new Set(["P", "H1", "H2", "H3", "H4", "H5", "H6", "HR"]);
 
 /**
- * EmailTheming RESET paints `.node-heading { padding-top: 0.389em }` without
- * !important. Canvas CSS must not zero padding with !important; that hides
+ * EmailTheming RESET paints `.node-heading { padding-top: 0.389em }` and
+ * `.node-hr { padding-bottom: 1em }` without !important. Canvas CSS must not zero padding with !important; that hides
  * source heading padding. Stamp 0 only where the paste had no padding so
  * theme ems cannot invent a gap.
  */

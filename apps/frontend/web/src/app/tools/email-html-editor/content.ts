@@ -4,7 +4,7 @@ export const toolPath = "/tools/email-html-editor";
 export const toolTitle = "Email HTML Editor";
 export const metaTitle = "Free Email HTML Editor";
 export const metaDescription =
-	"Open a free email template on a visual canvas, tweak styles in the inspector, add variables, and flip to the HTML source. Same editor as Reloop Templates. No account, no save, no send.";
+	"Open a free email template on a visual canvas, tweak styles in the inspector, add variables, and flip to the HTML source. Same editor as Reloop Templates. No account needed to edit.";
 export const toolDescription =
 	"Pick a template to open it on the canvas. Edit styles, add variables, and flip to the HTML source. Nothing leaves your browser.";
 
@@ -37,9 +37,9 @@ export const reasons = [
 	},
 	{
 		icon: "lock" as const,
-		title: "Nothing leaves the browser",
+		title: "No account to start",
 		description:
-			"No account, save, send, or test. The document lives in this tab until you copy it out.",
+			"Edit freely in this tab. When you're happy, save it to Reloop Templates with a free account.",
 	},
 ];
 
@@ -52,7 +52,7 @@ export const faqs: FaqItem[] = [
 	{
 		question: "Is this the same as Reloop Templates?",
 		answer:
-			"The canvas, inspector, variables, and code view are the same as the Templates editor. This page does not include save, history, publish, send, or collaboration.",
+			"The canvas, inspector, variables, and code view are the same as the Templates editor. Click Save template to keep it in your Reloop workspace, where you get history, publish, send, and collaboration.",
 	},
 	{
 		question: "Will inspect change the source?",

@@ -488,3 +488,19 @@ function stampShrinkWrappedTables(root: Element): void {
 		table.setAttribute("data-shrink-row", "true");
 	}
 }
+
+/**
+ * True when the email column has several rows or cells (a colored header row
+ * plus a body row, each with its own background, padding, and radius). Such
+ * a column has no single content cell whose styles describe the whole card.
+ */
+export function isMultiCellEmailColumn(table: Element): boolean {
+	const rows = Array.from(table.querySelectorAll("tr")).filter(
+		(row) => row.closest("table") === table,
+	);
+	if (rows.length > 1) return true;
+	const cells = Array.from(rows[0]?.children ?? []).filter(
+		(cell) => cell.tagName === "TD" || cell.tagName === "TH",
+	);
+	return cells.length > 1;
+}

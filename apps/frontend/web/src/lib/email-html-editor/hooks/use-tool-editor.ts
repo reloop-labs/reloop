@@ -1,6 +1,8 @@
 import { composeReactEmail } from "@react-email/editor/core";
 import { EmailTheming, useEditorImage } from "@react-email/editor/plugins";
+import { Extension } from "@tiptap/core";
 import Placeholder from "@tiptap/extension-placeholder";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { type Editor, useEditor } from "@tiptap/react";
 import { useCallback, useEffect, useRef } from "react";
 import { UnsubscribeLink } from "../extensions/unsubscribe-link";
@@ -13,6 +15,28 @@ import { readImageFileAsDataUrl } from "../utils/read-image-file";
 import { useEditorStore } from "./use-editor-store";
 
 const COMPOSE_DEBOUNCE_MS = 250;
+
+/**
+ * Loading a template or code-view source is not a user edit, so it stays
+ * out of undo history. Otherwise the first Mod-z empties the canvas.
+ */
+const sourceLoadsSkipHistory = Extension.create({
+	name: "sourceLoadsSkipHistory",
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				key: new PluginKey("sourceLoadsSkipHistory"),
+				// Runs before the history plugin records the transaction.
+				filterTransaction(tr) {
+					if (tr.docChanged && useEditorStore.getState().applyingFromSource) {
+						tr.setMeta("addToHistory", false);
+					}
+					return true;
+				},
+			}),
+		];
+	},
+});
 
 /**
  * Dashboard `useEditorHook` without collaboration or uploads. Canvas edits
@@ -73,6 +97,7 @@ export function useToolEditor() {
 				Variable,
 				VariableSuggestion as any,
 				imageExtension,
+				sourceLoadsSkipHistory,
 			] as any[],
 			immediatelyRender: false,
 			onUpdate({ editor: next, transaction }) {

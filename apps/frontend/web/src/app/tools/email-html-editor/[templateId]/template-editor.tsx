@@ -30,6 +30,7 @@ export function TemplateEditor({ templateId }: { templateId: string }) {
 		<EmailHtmlEditorPage
 			html={template.html(origin)}
 			variables={template.variables}
+			templateName={template.name}
 		/>
 	);
 }

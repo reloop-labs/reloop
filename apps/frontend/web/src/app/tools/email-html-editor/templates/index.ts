@@ -114,7 +114,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 			{
 				name: "workspace_name",
 				type: "string",
-				defaultValue: "Northwind Design",
+				defaultValue: "Norrwilo Design",
 			},
 			{ name: "invite_url", type: "string", defaultValue: null },
 		],
@@ -187,7 +187,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 			{
 				name: "file_name",
 				type: "string",
-				defaultValue: "northwind-workspace.zip",
+				defaultValue: "norrwilo-workspace.zip",
 			},
 			{ name: "expiry_date", type: "string", defaultValue: "OCT 18, 2026" },
 			{ name: "download_url", type: "string", defaultValue: null },

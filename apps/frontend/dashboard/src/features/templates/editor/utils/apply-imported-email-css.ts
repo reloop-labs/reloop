@@ -1,5 +1,21 @@
 const STYLE_ID = "reloop-imported-email-css";
 
+/** `@import url(...)` or `@import "..."`; Google Fonts URLs contain `;`. */
+const CSS_IMPORT =
+	/@import\s+(?:url\(\s*(['"]?)[^'")]*\1\s*\)|(['"])[^'"]*\2)[^;]*;/g;
+
+/**
+ * Browsers ignore `@import` after any other rule. Theme parsing prepends
+ * base and body rules ahead of the email's font imports, which silently
+ * dropped web fonts (Google Fonts links) from the canvas.
+ */
+export function hoistCssImports(css: string): string {
+	const imports = css.match(CSS_IMPORT);
+	if (!imports) return css;
+	const rest = css.replace(CSS_IMPORT, "").trim();
+	return `${[...new Set(imports)].join("\n")}\n${rest}`;
+}
+
 /**
  * EmailTheming's `setGlobalContent("css")` wraps the string in one selector,
  * which breaks `@import`, `@media`, and rewritten `body` rules. Inject the
@@ -9,7 +25,7 @@ export function applyImportedEmailCss(css: string): void {
 	if (typeof document === "undefined") return;
 
 	let el = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
-	const trimmed = css.trim();
+	const trimmed = hoistCssImports(css.trim());
 
 	if (!el) {
 		el = document.createElement("style");
