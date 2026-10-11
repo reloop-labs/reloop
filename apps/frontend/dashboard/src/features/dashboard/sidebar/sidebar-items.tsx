@@ -7,9 +7,11 @@ import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import {
-	mainNavigation,
+	getActiveMainNav,
+	getAutoExpandedNav,
 	SETTINGS_ADMIN_HOME,
 	SETTINGS_MEMBER_HOME,
+	visibleMainNavigation,
 } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
@@ -37,9 +39,11 @@ export function SidebarItems({
 	// Router basepath is /dashboard, so compare paths without it for active state.
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 
-	const navigation = mainNavigation.filter((item) => !item.hidden);
+	const navigation = visibleMainNavigation;
+	// Seed from the path so the active section paints open on mount instead of
+	// animating open after the first effect (layout shift vs loading chrome).
 	const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
-		{},
+		() => getAutoExpandedNav(pathWithoutSlug, navigation),
 	);
 	// User-closed sections stay closed until they leave that section or re-open it.
 	// Without this, the active-path effect re-opens the dropdown after every close.
@@ -71,44 +75,12 @@ export function SidebarItems({
 
 			return changed ? next : prev;
 		});
-	}, [pathWithoutSlug, navigation]);
+	}, [pathWithoutSlug]);
 
-	const activeMainIndex = navigation.findIndex((item) => {
-		if (item.items?.some((sub) => pathWithoutSlug.startsWith(sub.path))) {
-			return false;
-		}
-		// Settings lives in its own sidebar; do not highlight it in main nav.
-		if (item.path === "/settings") {
-			return false;
-		}
-		// Emails is dashboard home + receive + email detail.
-		if (item.path === "/") {
-			return (
-				pathWithoutSlug === "/" ||
-				pathWithoutSlug.startsWith("/receive") ||
-				pathWithoutSlug.startsWith("/emails")
-			);
-		}
-		// Inbox list only; /inbox/$mailboxId is the full-screen mailbox UI.
-		if (item.path === "/inbox") {
-			return pathWithoutSlug === "/inbox";
-		}
-		return pathWithoutSlug.startsWith(item.path);
-	});
-
-	const activeSubInfo = navigation
-		.map((item) => {
-			const subIndex = item.items?.findIndex((sub) =>
-				sub.path === "/settings"
-					? pathWithoutSlug === "/settings"
-					: pathWithoutSlug.startsWith(sub.path),
-			);
-			if (subIndex !== undefined && subIndex !== -1) {
-				return { mainPath: item.path, subIndex };
-			}
-			return null;
-		})
-		.find((info) => info !== null);
+	const { activeMainIndex, activeSubInfo } = getActiveMainNav(
+		pathWithoutSlug,
+		navigation,
+	);
 
 	const activeEl = activeSubInfo
 		? subNavRefs.current[activeSubInfo.mainPath]?.[activeSubInfo.subIndex]

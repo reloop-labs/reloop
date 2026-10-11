@@ -133,6 +133,77 @@ export const mainNavigation: MainNavigationItem[] = [
 	},
 ];
 
+/** Sidebar-visible main nav items. */
+export const visibleMainNavigation = mainNavigation.filter(
+	(item) => !item.hidden,
+);
+
+/**
+ * Active main item and sub item for a basepath-stripped pathname.
+ * Shared by the live sidebar and its loading chrome so both paint the same rows.
+ */
+export function getActiveMainNav(
+	pathWithoutSlug: string,
+	navigation: MainNavigationItem[] = visibleMainNavigation,
+): {
+	activeMainIndex: number;
+	activeSubInfo: { mainPath: string; subIndex: number } | null;
+} {
+	const activeMainIndex = navigation.findIndex((item) => {
+		if (item.items?.some((sub) => pathWithoutSlug.startsWith(sub.path))) {
+			return false;
+		}
+		// Settings lives in its own sidebar; do not highlight it in main nav.
+		if (item.path === "/settings") {
+			return false;
+		}
+		// Emails is dashboard home + receive + email detail.
+		if (item.path === "/") {
+			return (
+				pathWithoutSlug === "/" ||
+				pathWithoutSlug.startsWith("/receive") ||
+				pathWithoutSlug.startsWith("/emails")
+			);
+		}
+		// Inbox list only; /inbox/$mailboxId is the full-screen mailbox UI.
+		if (item.path === "/inbox") {
+			return pathWithoutSlug === "/inbox";
+		}
+		return pathWithoutSlug.startsWith(item.path);
+	});
+
+	const activeSubInfo =
+		navigation
+			.map((item) => {
+				const subIndex = item.items?.findIndex((sub) =>
+					sub.path === "/settings"
+						? pathWithoutSlug === "/settings"
+						: pathWithoutSlug.startsWith(sub.path),
+				);
+				if (subIndex !== undefined && subIndex !== -1) {
+					return { mainPath: item.path, subIndex };
+				}
+				return null;
+			})
+			.find((info) => info !== null) ?? null;
+
+	return { activeMainIndex, activeSubInfo };
+}
+
+/** Sections whose sub nav contains the current path (auto-expanded). */
+export function getAutoExpandedNav(
+	pathWithoutSlug: string,
+	navigation: MainNavigationItem[] = visibleMainNavigation,
+): Record<string, boolean> {
+	const expanded: Record<string, boolean> = {};
+	for (const item of navigation) {
+		if (item.items?.some((sub) => pathWithoutSlug.startsWith(sub.path))) {
+			expanded[item.path] = true;
+		}
+	}
+	return expanded;
+}
+
 export type SettingsNavigationItem = {
 	label: string;
 	path: string;

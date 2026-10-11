@@ -27,20 +27,43 @@ interface UIState {
 	toggleMobileNav: () => void;
 }
 
+const SIDEBAR_COLLAPSED_KEY = "isSidebarCollapsed";
+
+/**
+ * Read synchronously so the sidebar mounts at its saved width instead of
+ * animating from expanded. Safe because the dashboard shell is client-only
+ * (session is browser-only), so there is no SSR markup to mismatch.
+ */
+function readSidebarCollapsed(): boolean {
+	try {
+		return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
+	} catch {
+		return false;
+	}
+}
+
+/** Persist and mirror onto <html> so loading chrome keeps the same width. */
+function persistSidebarCollapsed(value: boolean) {
+	try {
+		localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(value));
+		if (value) {
+			document.documentElement.dataset.sidebarCollapsed = "true";
+		} else {
+			delete document.documentElement.dataset.sidebarCollapsed;
+		}
+	} catch {}
+}
+
 export const useUIStore = create<UIState>((set) => ({
-	isSidebarCollapsed: false,
+	isSidebarCollapsed: readSidebarCollapsed(),
 	setIsSidebarCollapsed: (value) => {
-		try {
-			localStorage.setItem("isSidebarCollapsed", String(value));
-		} catch {}
+		persistSidebarCollapsed(value);
 		set({ isSidebarCollapsed: value });
 	},
 	toggleSidebarCollapse: () =>
 		set((state) => {
 			const next = !state.isSidebarCollapsed;
-			try {
-				localStorage.setItem("isSidebarCollapsed", String(next));
-			} catch {}
+			persistSidebarCollapsed(next);
 			return { isSidebarCollapsed: next };
 		}),
 	isEditorSidebarPinned: false,

@@ -1,8 +1,6 @@
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useUIStore } from "#/store/use-ui-store";
-
-const STORAGE_KEY = "isSidebarCollapsed";
 
 /** Full-viewport canvas editors: templates, campaign edit, automation builder. */
 export function isCanvasEditorPath(pathname: string): boolean {
@@ -29,17 +27,6 @@ export function useSidebarCollapse() {
 	const isEditorPinned = useUIStore((s) => s.isEditorSidebarPinned);
 	const setIsEditorPinned = useUIStore((s) => s.setIsEditorSidebarPinned);
 	const toggleEditorPinned = useUIStore((s) => s.toggleEditorSidebarPinned);
-
-	useEffect(() => {
-		try {
-			const saved = localStorage.getItem(STORAGE_KEY);
-			if (saved !== null) {
-				setDashboardCollapsed(saved === "true");
-			}
-		} catch {
-			// ignore
-		}
-	}, [setDashboardCollapsed]);
 
 	const isCollapsed = isTemplateEditor ? !isEditorPinned : isDashboardCollapsed;
 

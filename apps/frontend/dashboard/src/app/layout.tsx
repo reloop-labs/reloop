@@ -54,6 +54,9 @@ export const metadata: Metadata = {
 	},
 };
 
+// Runs before paint so SSR'd loading chrome renders the saved sidebar width.
+const sidebarCollapsedScript = `try{if(localStorage.getItem("isSidebarCollapsed")==="true")document.documentElement.dataset.sidebarCollapsed="true"}catch(e){}`;
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -65,6 +68,9 @@ export default function RootLayout({
 			suppressHydrationWarning
 			className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}
 		>
+			<head>
+				<script dangerouslySetInnerHTML={{ __html: sidebarCollapsedScript }} />
+			</head>
 			<body
 				className="bg-bg-white-0 font-sans text-text-strong-950 antialiased"
 				style={{

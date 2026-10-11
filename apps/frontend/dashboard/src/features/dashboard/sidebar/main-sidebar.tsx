@@ -311,15 +311,13 @@ export function MainSidebar() {
 	);
 }
 
-function CollapsedThemeToggle() {
+export function CollapsedThemeToggle() {
 	const { setTheme, resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
-
-	if (!mounted) return null;
 
 	const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
 	return (
@@ -329,10 +327,13 @@ function CollapsedThemeToggle() {
 			className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
 			title={`Switch to ${nextTheme} theme`}
 		>
-			<Icon
-				name={resolvedTheme === "dark" ? "sun" : "moon"}
-				className="h-4 w-4"
-			/>
+			{/* Keep the 28px slot before mount so the footer doesn't jump. */}
+			{mounted ? (
+				<Icon
+					name={resolvedTheme === "dark" ? "sun" : "moon"}
+					className="h-4 w-4"
+				/>
+			) : null}
 		</button>
 	);
 }

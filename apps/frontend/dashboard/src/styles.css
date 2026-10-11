@@ -374,6 +374,8 @@ body {
 
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant light (&:where(.light, .light *));
+/* Set pre-paint from localStorage so loading chrome matches the collapsed rail. */
+@custom-variant sidebar-collapsed (&:where([data-sidebar-collapsed="true"] *));
 
 :root {
 	--font-geist-sans: var(--font-open-runde);
