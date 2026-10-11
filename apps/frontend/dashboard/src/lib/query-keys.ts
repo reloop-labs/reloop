@@ -10,6 +10,8 @@ export const queryKeys = {
 			[...queryKeys.auth.all, "oauth-public-client", clientId] as const,
 		accounts: () => [...queryKeys.auth.all, "accounts"] as const,
 		sessions: () => [...queryKeys.auth.all, "sessions"] as const,
+		connectedApps: (organizationId: string | null) =>
+			[...queryKeys.auth.all, "connected-apps", organizationId] as const,
 	},
 	organization: {
 		all: ["organization"] as const,

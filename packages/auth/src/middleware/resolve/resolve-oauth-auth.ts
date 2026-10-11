@@ -1,4 +1,8 @@
 import { createHash } from "node:crypto";
+import {
+	OAUTH_ORG_CLAIM,
+	oauthGrantRevocationKey,
+} from "@reloop/auth/middleware/keys";
 import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
 import type { AuthContext } from "@reloop/auth/middleware/types";
 import { isUserBanned } from "@reloop/auth/user/is-banned";
@@ -16,8 +20,10 @@ export type OAuthVerify = (
 
 export type OAuthTokenCacheEntry = {
 	userId: string;
-	organizationId: string | null;
+	organizationId: string;
 	expiresAtMs: number;
+	clientId: string;
+	issuedAtSeconds: number;
 };
 
 const OAUTH_TOKEN_MAX_LENGTH = 8192;
@@ -84,6 +90,45 @@ export function oauthResource(baseUrl: string, override?: string): string {
 
 type OAuthDb = typeof defaultDb;
 
+function tokenOrganizationId(payload: JWTPayload): string | null {
+	const value = payload[OAUTH_ORG_CLAIM];
+	return typeof value === "string" && value ? value : null;
+}
+
+function tokenClientId(payload: JWTPayload): string | null {
+	if (typeof payload.azp === "string" && payload.azp) return payload.azp;
+	const clientId = payload.client_id;
+	return typeof clientId === "string" && clientId ? clientId : null;
+}
+
+/**
+ * A token is bound to one organization; it may not be pointed at another one
+ * through `x-organization-id`.
+ */
+function conflictsWithBinding(
+	headers: Headers,
+	organizationId: string,
+): boolean {
+	const requested = headers.get("x-organization-id")?.trim() || null;
+	return requested !== null && requested !== organizationId;
+}
+
+/** True when the grant was disconnected after the token was issued. */
+async function isGrantRevoked(
+	deps: ResolverDeps,
+	userId: string,
+	clientId: string,
+	organizationId: string,
+	issuedAtSeconds: number,
+): Promise<boolean> {
+	const revokedAtSeconds = await deps.redis
+		.get<number>(oauthGrantRevocationKey(userId, clientId, organizationId))
+		.catch(() => undefined);
+	return (
+		typeof revokedAtSeconds === "number" && issuedAtSeconds <= revokedAtSeconds
+	);
+}
+
 async function findUser(
 	db: OAuthDb,
 	userId: string,
@@ -92,7 +137,6 @@ async function findUser(
 	role: string;
 	banned: boolean | null;
 	banExpires: Date | null;
-	activeOrganizationId: string | null;
 } | null> {
 	const row = await db.query.user.findFirst({
 		where: eq(user.id, userId),
@@ -101,7 +145,6 @@ async function findUser(
 			role: true,
 			banned: true,
 			banExpires: true,
-			activeOrganizationId: true,
 		},
 	});
 	if (!row) return null;
@@ -110,7 +153,6 @@ async function findUser(
 		role: row.role,
 		banned: row.banned,
 		banExpires: row.banExpires,
-		activeOrganizationId: row.activeOrganizationId,
 	};
 }
 
@@ -129,6 +171,12 @@ async function isMember(
 	return Boolean(row);
 }
 
+/**
+ * Resolves a Reloop OAuth access token. Every user grant is bound to the
+ * organization chosen when it was approved (the `org_id` claim), so the
+ * context always carries that organization and `requireOrg` holds by
+ * construction; tokens without the claim are refused.
+ */
 export async function resolveOAuthAuth(
 	headers: Headers,
 	deps: ResolverDeps,
@@ -149,24 +197,38 @@ export async function resolveOAuthAuth(
 		.get<OAuthTokenCacheEntry>(cacheKey)
 		.catch(() => undefined);
 	if (cached) {
-		if (cached.expiresAtMs <= Date.now()) {
+		if (
+			cached.expiresAtMs <= Date.now() ||
+			!cached.organizationId ||
+			!cached.clientId ||
+			typeof cached.issuedAtSeconds !== "number"
+		) {
 			await deps.redis.delete(cacheKey).catch(() => undefined);
 			return null;
 		}
+		if (
+			await isGrantRevoked(
+				deps,
+				cached.userId,
+				cached.clientId,
+				cached.organizationId,
+				cached.issuedAtSeconds,
+			)
+		) {
+			await deps.redis.delete(cacheKey).catch(() => undefined);
+			return null;
+		}
+		if (conflictsWithBinding(headers, cached.organizationId)) return null;
 		const account = await findUser(db, cached.userId).catch(() => null);
 		if (!account || isUserBanned(account)) {
 			await deps.redis.delete(cacheKey).catch(() => undefined);
 			return null;
 		}
-		if (cached.organizationId) {
-			const ok = await isMember(db, account.id, cached.organizationId).catch(
-				() => false,
-			);
-			if (!ok) {
-				await deps.redis.delete(cacheKey).catch(() => undefined);
-				return null;
-			}
-		} else if (opts.requireOrg) {
+		const ok = await isMember(db, account.id, cached.organizationId).catch(
+			() => false,
+		);
+		if (!ok) {
+			await deps.redis.delete(cacheKey).catch(() => undefined);
 			return null;
 		}
 		return {
@@ -185,19 +247,27 @@ export async function resolveOAuthAuth(
 	}
 	if (typeof payload.sub !== "string" || !payload.sub) return null;
 
-	const account = await findUser(db, payload.sub).catch(() => null);
-	if (!account || isUserBanned(account)) return null;
-
-	const requested = headers.get("x-organization-id")?.trim() || null;
-	const organizationId = requested ?? account.activeOrganizationId;
-	if (organizationId) {
-		const ok = await isMember(db, account.id, organizationId).catch(
-			() => false,
-		);
-		if (!ok) return null;
-	} else if (opts.requireOrg) {
+	const organizationId = tokenOrganizationId(payload);
+	const clientId = tokenClientId(payload);
+	const issuedAtSeconds = typeof payload.iat === "number" ? payload.iat : null;
+	if (!organizationId || !clientId || issuedAtSeconds === null) return null;
+	if (
+		await isGrantRevoked(
+			deps,
+			payload.sub,
+			clientId,
+			organizationId,
+			issuedAtSeconds,
+		)
+	) {
 		return null;
 	}
+	if (conflictsWithBinding(headers, organizationId)) return null;
+
+	const account = await findUser(db, payload.sub).catch(() => null);
+	if (!account || isUserBanned(account)) return null;
+	const ok = await isMember(db, account.id, organizationId).catch(() => false);
+	if (!ok) return null;
 
 	const expiresAtMs =
 		typeof payload.exp === "number" ? payload.exp * 1000 : Date.now() + 60000;
@@ -211,7 +281,13 @@ export async function resolveOAuthAuth(
 	await deps.redis
 		.set(
 			cacheKey,
-			{ userId: account.id, organizationId, expiresAtMs },
+			{
+				userId: account.id,
+				organizationId,
+				expiresAtMs,
+				clientId,
+				issuedAtSeconds,
+			} satisfies OAuthTokenCacheEntry,
 			ttlSeconds,
 		)
 		.catch(() => undefined);

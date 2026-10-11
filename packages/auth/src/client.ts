@@ -10,7 +10,13 @@ import {
 import { createAuthClient } from "better-auth/react";
 import { ac, orgRoles } from "./permissions";
 import { platformAc, platformRoles } from "./platform-permissions";
+import type { connectedApps } from "./server/connected-apps";
 import type { AuthInstance } from "./types";
+
+const connectedAppsClient = () => ({
+	id: "connected-apps",
+	$InferServerPlugin: {} as ReturnType<typeof connectedApps>,
+});
 
 /**
  * Public site origin for Better Auth (reverse-proxied at `/api/auth/v1`).
@@ -54,5 +60,6 @@ export const authClient = createAuthClient({
 		inferAdditionalFields<AuthInstance>({}),
 		emailOTPClient(),
 		lastLoginMethodClient(),
+		connectedAppsClient(),
 	],
 });

@@ -43,7 +43,8 @@
 		"drizzle-orm": "catalog:db",
 		"elysia": "catalog:backend",
 		"evlog": "catalog:backend",
-		"jose": "catalog:"
+		"jose": "catalog:",
+		"zod": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

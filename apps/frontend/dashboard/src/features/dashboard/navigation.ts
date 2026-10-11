@@ -195,6 +195,12 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 				requiresOrgAdmin: true,
 				shortcut: { label: "G Shift+W", keys: ["g shift+w", "g+shift+w"] },
 			},
+			{
+				label: "Connected Apps",
+				path: "/settings/connected-apps",
+				iconName: "link",
+				shortcut: { label: "G Shift+A", keys: ["g shift+a", "g+shift+a"] },
+			},
 		],
 	},
 	{

@@ -26,6 +26,7 @@ import {
 import { and, eq, gt, inArray } from "drizzle-orm";
 import { log } from "evlog";
 import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
+import { OAUTH_ORG_CLAIM } from "../middleware/keys";
 import {
 	canCreateAnotherOrganization,
 	createOrganizationQuotaMessage,
@@ -52,7 +53,12 @@ import {
 } from "../user-name-limits";
 import { fetchClientMetadataResourceBun } from "./cimd-transport";
 import { authServerConfig } from "./config";
+import { connectedApps } from "./connected-apps";
 import { withNativeApplicationTypeDefault } from "./dcr-application-type";
+import {
+	deviceOrgBinding,
+	deviceOrgClaimsExtension,
+} from "./device-org-binding";
 import { redis } from "./redis";
 import { sessionCacheRedis } from "./session-cache-redis";
 
@@ -491,6 +497,23 @@ export const auth = betterAuth({
 			resource: authServerConfig.MCP_RESOURCE,
 			allowDynamicClientRegistration: true,
 			allowUnauthenticatedClientRegistration: true,
+			// Bind every grant to the organization chosen on the consent page
+			// (it is made active before consent is submitted). The org rides on
+			// the consent, its tokens, and the access token's org_id claim, and
+			// the resolver refuses to use the token in any other org.
+			postLogin: {
+				page: authServerConfig.MCP_CONSENT_PAGE,
+				shouldRedirect: () => false,
+				consentReferenceId: ({ session }) => {
+					const organizationId = (
+						session as { activeOrganizationId?: string | null } | undefined
+					)?.activeOrganizationId;
+					return organizationId ?? undefined;
+				},
+			},
+			customAccessTokenClaims: ({ referenceId }) =>
+				referenceId ? { [OAUTH_ORG_CLAIM]: referenceId } : {},
+			extensions: [deviceOrgClaimsExtension(sessionCacheRedis)],
 		}),
 		// Client ID Metadata Documents, MCP 2026-07-28 profile (pins CIMD
 		// draft-00). Bun has no @better-auth/cimd/node equivalent, so the
@@ -530,6 +553,8 @@ export const auth = betterAuth({
 				});
 			},
 		}),
+		connectedApps({ redis: sessionCacheRedis }),
+		deviceOrgBinding({ redis: sessionCacheRedis }),
 		bearer(),
 		admin({
 			defaultRole: DEFAULT_USER_ROLE,

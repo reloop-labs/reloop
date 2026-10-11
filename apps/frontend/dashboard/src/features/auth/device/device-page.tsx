@@ -290,6 +290,7 @@ export function DevicePage() {
 		setError(null);
 		try {
 			if (decision === "approve") {
+				await organization.commitOrganization();
 				await approveDeviceCode(verification.user_code);
 				setStep({ name: "approved" });
 			} else {

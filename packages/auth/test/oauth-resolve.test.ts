@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { oauthGrantRevocationKey } from "@reloop/auth/middleware/keys";
 import {
 	extractOAuthToken,
 	resolveOAuthAuth,
@@ -48,13 +49,20 @@ function fakeDb(
 	};
 }
 
+const ISSUED_AT = Math.floor(Date.now() / 1000) - 60;
+
 function verifyOk(payload: Record<string, unknown> = {}) {
 	return async () => ({
 		sub: "user-1",
+		azp: "client-a",
+		iat: ISSUED_AT,
+		org_id: "org-1",
 		exp: Math.floor(Date.now() / 1000) + 3600,
 		...payload,
 	});
 }
+
+const OTHER_JWT = "eyJhbGciOiJFZERTQSJ9.eyJzdWIiOiJ1c2VyLTIifQ.b3RoZXI";
 
 describe("extractOAuthToken", () => {
 	test("accepts JWT-shaped bearer tokens", () => {
@@ -71,11 +79,12 @@ describe("extractOAuthToken", () => {
 });
 
 describe("resolveOAuthAuth", () => {
-	test("returns an oauth context for a verified member", async () => {
-		const db = fakeDb({ id: "user-1", activeOrganizationId: "org-1" }, true);
+	const member = fakeDb({ id: "user-1", activeOrganizationId: "org-9" }, true);
+
+	test("acts in the org the token is bound to, not the active org", async () => {
 		const ctx = await resolveOAuthAuth(headers(JWT), deps(), {
 			requireOrg: true,
-			db: db as never,
+			db: member as never,
 			verify: verifyOk(),
 		});
 		expect(ctx).toEqual({
@@ -86,44 +95,67 @@ describe("resolveOAuthAuth", () => {
 		});
 	});
 
-	test("honors a verified x-organization-id override", async () => {
-		const db = fakeDb({ id: "user-1", activeOrganizationId: "org-1" }, true);
-		const ctx = await resolveOAuthAuth(headers(JWT, "org-2"), deps(), {
-			requireOrg: true,
-			db: db as never,
-			verify: verifyOk(),
+	test("refuses tokens that are not bound to an org", async () => {
+		const ctx = await resolveOAuthAuth(headers(JWT), deps(), {
+			requireOrg: false,
+			db: member as never,
+			verify: verifyOk({ org_id: undefined }),
 		});
-		expect(ctx?.organizationId).toBe("org-2");
+		expect(ctx).toBeNull();
 	});
 
-	test("rejects when the user is not a member", async () => {
-		const db = fakeDb({ id: "user-1", activeOrganizationId: "org-9" }, false);
+	test("refuses tokens without a client or issue time", async () => {
+		for (const missing of [{ azp: undefined }, { iat: undefined }]) {
+			const ctx = await resolveOAuthAuth(headers(JWT), deps(), {
+				requireOrg: true,
+				db: member as never,
+				verify: verifyOk(missing),
+			});
+			expect(ctx).toBeNull();
+		}
+	});
+
+	test("refuses an x-organization-id other than the bound org", async () => {
+		const redis = new MemoryRedis();
+		const options = {
+			requireOrg: true,
+			db: member as never,
+			verify: verifyOk(),
+		};
+		expect(
+			await resolveOAuthAuth(headers(JWT, "org-2"), deps(redis), options),
+		).toBeNull();
+		expect(
+			(await resolveOAuthAuth(headers(JWT, "org-1"), deps(redis), options))
+				?.organizationId,
+		).toBe("org-1");
+		expect(
+			await resolveOAuthAuth(headers(JWT, "org-2"), deps(redis), options),
+		).toBeNull();
+	});
+
+	test("rejects when the user is not a member of the bound org", async () => {
 		const ctx = await resolveOAuthAuth(headers(JWT), deps(), {
 			requireOrg: true,
-			db: db as never,
+			db: fakeDb({ id: "user-1" }, false) as never,
 			verify: verifyOk(),
 		});
 		expect(ctx).toBeNull();
 	});
 
 	test("rejects banned users", async () => {
-		const db = fakeDb(
-			{ id: "user-1", banned: true, activeOrganizationId: "org-1" },
-			true,
-		);
 		const ctx = await resolveOAuthAuth(headers(JWT), deps(), {
 			requireOrg: true,
-			db: db as never,
+			db: fakeDb({ id: "user-1", banned: true }, true) as never,
 			verify: verifyOk(),
 		});
 		expect(ctx).toBeNull();
 	});
 
 	test("rejects when verification fails", async () => {
-		const db = fakeDb({ id: "user-1", activeOrganizationId: "org-1" }, true);
 		const ctx = await resolveOAuthAuth(headers(JWT), deps(), {
 			requireOrg: true,
-			db: db as never,
+			db: member as never,
 			verify: async () => {
 				throw new Error("invalid signature");
 			},
@@ -131,9 +163,41 @@ describe("resolveOAuthAuth", () => {
 		expect(ctx).toBeNull();
 	});
 
-	test("requires an org when requireOrg is set", async () => {
-		const db = fakeDb({ id: "user-1", activeOrganizationId: null }, false);
-		const ctx = await resolveOAuthAuth(headers(JWT), deps(), {
+	test("caches the verified identity and skips verify on hit", async () => {
+		const redis = new MemoryRedis();
+		let calls = 0;
+		const first = await resolveOAuthAuth(headers(JWT), deps(redis), {
+			requireOrg: true,
+			db: member as never,
+			verify: async () => {
+				calls += 1;
+				return verifyOk()();
+			},
+		});
+		const second = await resolveOAuthAuth(headers(JWT), deps(redis), {
+			requireOrg: true,
+			db: member as never,
+			verify: async () => {
+				calls += 1;
+				throw new Error("must not be called");
+			},
+		});
+		expect(first?.organizationId).toBe("org-1");
+		expect(second?.organizationId).toBe("org-1");
+		expect(calls).toBe(1);
+	});
+});
+
+describe("resolveOAuthAuth grant revocation", () => {
+	const db = fakeDb({ id: "user-1" }, true);
+
+	test("rejects tokens issued before the grant was disconnected", async () => {
+		const redis = new MemoryRedis();
+		await redis.set(
+			oauthGrantRevocationKey("user-1", "client-a", "org-1"),
+			ISSUED_AT + 1,
+		);
+		const ctx = await resolveOAuthAuth(headers(JWT), deps(redis), {
 			requireOrg: true,
 			db: db as never,
 			verify: verifyOk(),
@@ -141,28 +205,49 @@ describe("resolveOAuthAuth", () => {
 		expect(ctx).toBeNull();
 	});
 
-	test("caches the verified identity and skips verify on hit", async () => {
+	test("accepts reconnected grants and the same app in another org", async () => {
 		const redis = new MemoryRedis();
-		const db = fakeDb({ id: "user-1", activeOrganizationId: "org-1" }, true);
-		let calls = 0;
+		await redis.set(
+			oauthGrantRevocationKey("user-1", "client-a", "org-1"),
+			ISSUED_AT - 1,
+		);
+		await redis.set(
+			oauthGrantRevocationKey("user-1", "client-a", "org-2"),
+			ISSUED_AT + 1,
+		);
+		const reconnected = await resolveOAuthAuth(headers(JWT), deps(redis), {
+			requireOrg: true,
+			db: db as never,
+			verify: verifyOk(),
+		});
+		expect(reconnected?.organizationId).toBe("org-1");
+		const otherOrg = await resolveOAuthAuth(headers(OTHER_JWT), deps(redis), {
+			requireOrg: true,
+			db: db as never,
+			verify: verifyOk({ org_id: "org-3" }),
+		});
+		expect(otherOrg?.organizationId).toBe("org-3");
+	});
+
+	test("rejects a cached token once its grant is disconnected", async () => {
+		const redis = new MemoryRedis();
 		const first = await resolveOAuthAuth(headers(JWT), deps(redis), {
 			requireOrg: true,
 			db: db as never,
-			verify: async () => {
-				calls += 1;
-				return { sub: "user-1", exp: Math.floor(Date.now() / 1000) + 3600 };
-			},
+			verify: verifyOk(),
 		});
+		expect(first).not.toBeNull();
+		await redis.set(
+			oauthGrantRevocationKey("user-1", "client-a", "org-1"),
+			Math.floor(Date.now() / 1000),
+		);
 		const second = await resolveOAuthAuth(headers(JWT), deps(redis), {
 			requireOrg: true,
 			db: db as never,
 			verify: async () => {
-				calls += 1;
-				throw new Error("must not be called");
+				throw new Error("cache should answer first");
 			},
 		});
-		expect(first?.authType).toBe("oauth");
-		expect(second?.authType).toBe("oauth");
-		expect(calls).toBe(1);
+		expect(second).toBeNull();
 	});
 });

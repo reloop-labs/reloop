@@ -392,7 +392,30 @@ export function useConsentOrganization(onError: (message: string) => void) {
 		}
 	};
 
-	return { orgsQuery, orgs, effectiveOrgId, switchingOrgId, selectOrg };
+	/**
+	 * The server binds the grant to the session's active organization, so the
+	 * organization shown as selected must be active before consent is sent.
+	 */
+	const commitOrganization = async () => {
+		if (!effectiveOrgId || effectiveOrgId === sessionActiveOrgId) return;
+		const { error } = await authClient.organization.setActive({
+			organizationId: effectiveOrgId,
+		});
+		if (error)
+			throw new Error(error.message || "Could not switch organization");
+		await queryClient.invalidateQueries({
+			queryKey: queryKeys.auth.session(),
+		});
+	};
+
+	return {
+		orgsQuery,
+		orgs,
+		effectiveOrgId,
+		switchingOrgId,
+		selectOrg,
+		commitOrganization,
+	};
 }
 
 export function OrganizationSection({

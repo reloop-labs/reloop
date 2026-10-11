@@ -94,6 +94,7 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			I: "/settings/dedicated-ip",
 			W: "/settings/organization",
 			O: "/settings/organization",
+			A: "/settings/connected-apps",
 			P: "/settings/profile",
 			S: "/settings/security",
 			K: "/settings/shortcuts",

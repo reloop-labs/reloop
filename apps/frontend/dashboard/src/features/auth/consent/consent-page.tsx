@@ -126,6 +126,7 @@ export function ConsentPage() {
 		setSubmitting(accept ? "allow" : "deny");
 		setSubmitError(null);
 		try {
+			if (accept) await organization.commitOrganization();
 			const url = await submitOAuthConsent({
 				oauthQuery: oauthRequest.rawQuery,
 				accept,
