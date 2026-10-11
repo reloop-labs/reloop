@@ -2,7 +2,6 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -43,31 +42,19 @@ const TABS: Tab[] = [
 	},
 ];
 
-const TAB_DURATION = 6000;
-
 export function ObservabilitySection() {
 	const [active, setActive] = useState(0);
-	const [autoplay, setAutoplay] = useState(true);
 	const [failed, setFailed] = useState<Record<string, boolean>>({});
 	const tablistRef = useRef<HTMLDivElement>(null);
 
-	// On phones the tabs scroll sideways; keep the active one in view as
-	// autoplay advances without scrolling the page itself.
+	// On phones the tabs scroll sideways; keep the selected one in view
+	// without scrolling the page itself.
 	useEffect(() => {
 		const list = tablistRef.current;
 		const tabEl = list?.children[active] as HTMLElement | undefined;
 		if (!list || !tabEl || list.scrollWidth <= list.clientWidth) return;
 		list.scrollTo({ left: tabEl.offsetLeft, behavior: "smooth" });
 	}, [active]);
-
-	useEffect(() => {
-		if (!autoplay) return;
-		const timer = window.setInterval(
-			() => setActive((current) => (current + 1) % TABS.length),
-			TAB_DURATION,
-		);
-		return () => window.clearInterval(timer);
-	}, [autoplay]);
 
 	const tab = TABS[active] ?? TABS[0];
 	if (!tab) return null;
@@ -111,10 +98,7 @@ export function ObservabilitySection() {
 							id={`observability-tab-${t.id}`}
 							aria-selected={selected}
 							aria-controls="observability-panel"
-							onClick={() => {
-								setActive(index);
-								setAutoplay(false);
-							}}
+							onClick={() => setActive(index)}
 							className={cn(
 								"relative flex w-[78%] shrink-0 snap-start items-start gap-4 border-stroke-soft-100 border-r px-4 py-6 text-left transition-colors last:border-r-0 sm:w-auto sm:px-8 sm:py-7 lg:px-10 dark:border-white/10",
 								selected
@@ -148,21 +132,9 @@ export function ObservabilitySection() {
 								</span>
 							</span>
 							<span className="absolute inset-x-0 bottom-0 h-0.5 overflow-hidden">
-								{selected &&
-									(autoplay ? (
-										<motion.span
-											key={active}
-											className="block h-full origin-left bg-text-strong-950 motion-reduce:hidden dark:bg-white"
-											initial={{ scaleX: 0 }}
-											animate={{ scaleX: 1 }}
-											transition={{
-												duration: TAB_DURATION / 1000,
-												ease: "linear",
-											}}
-										/>
-									) : (
-										<span className="block h-full bg-text-strong-950 dark:bg-white" />
-									))}
+								{selected && (
+									<span className="block h-full bg-text-strong-950 dark:bg-white" />
+								)}
 							</span>
 						</button>
 					);
