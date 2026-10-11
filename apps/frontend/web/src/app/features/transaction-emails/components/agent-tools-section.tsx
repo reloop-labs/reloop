@@ -52,7 +52,7 @@ export function AgentToolsSection() {
 							description="Let Claude, Cursor, or Codex send and manage email."
 						/>
 					</div>
-					<div className="flex flex-1 items-center justify-center border-stroke-soft-100 border-t px-4 py-8 sm:px-5 dark:border-white/10">
+					<div className="flex flex-1 flex-col border-stroke-soft-100 border-t dark:border-white/10">
 						<McpConfigWindow />
 					</div>
 					<div className="border-stroke-soft-100 border-t px-6 py-4 md:px-12 dark:border-white/10">
