@@ -1,5 +1,6 @@
 "use client";
 
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
@@ -253,7 +254,34 @@ function EmailPreview({ template }: { template: EmailTemplateExample }) {
 	);
 }
 
+/** Cards shown before "Show more". */
+const INITIAL_VISIBLE = 12;
+
 export function UseCasesSection() {
+	const [showAll, setShowAll] = useState(false);
+	const toggleRef = useRef<HTMLDivElement>(null);
+	const visibleUseCases = showAll
+		? USE_CASES
+		: USE_CASES.slice(0, INITIAL_VISIBLE);
+	const hiddenCount = USE_CASES.length - INITIAL_VISIBLE;
+
+	const toggleShowAll = () => {
+		const collapsing = showAll;
+		setShowAll(!collapsing);
+		if (!collapsing) return;
+		// Collapsing removes rows above the button; keep it under the pointer
+		// instead of leaving the reader deep in the next section.
+		requestAnimationFrame(() => {
+			const reduceMotion = window.matchMedia(
+				"(prefers-reduced-motion: reduce)",
+			).matches;
+			toggleRef.current?.scrollIntoView({
+				block: "center",
+				behavior: reduceMotion ? "auto" : "smooth",
+			});
+		});
+	};
+
 	return (
 		<section
 			id="use-cases"
@@ -277,8 +305,11 @@ export function UseCasesSection() {
 				</p>
 			</div>
 
-			<div className="flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 py-10 [scrollbar-width:none] sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-8 sm:py-12 lg:grid-cols-3 lg:px-12 [&::-webkit-scrollbar]:hidden">
-				{USE_CASES.map((useCase) => {
+			<div
+				id="use-cases-grid"
+				className="grid grid-cols-1 gap-4 px-4 py-10 sm:grid-cols-2 sm:gap-6 sm:px-8 sm:py-12 lg:grid-cols-3 lg:px-12"
+			>
+				{visibleUseCases.map((useCase) => {
 					const template = previewTemplates.get(useCase.id);
 					if (!template) return null;
 					return (
@@ -287,7 +318,7 @@ export function UseCasesSection() {
 							href={`${toolPath}/${template.id}`}
 							aria-label={`Open the ${useCase.title.toLowerCase()} template in the editor`}
 							className={cn(
-								"group/card flex w-[82%] shrink-0 snap-start flex-col gap-3 rounded-[28px] bg-bg-white-0 p-2.5 sm:w-auto dark:bg-transparent",
+								"group/card flex flex-col gap-3 rounded-[28px] bg-bg-white-0 p-2.5 dark:bg-transparent",
 								"transition-colors duration-200 ease-out",
 								"hover:bg-bg-weak-50 dark:hover:bg-white/[0.06]",
 								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-sub-300",
@@ -314,6 +345,32 @@ export function UseCasesSection() {
 					);
 				})}
 			</div>
+			{hiddenCount > 0 && (
+				<div
+					ref={toggleRef}
+					className="flex justify-center px-4 pb-12 sm:px-8 lg:px-12"
+				>
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						size="small"
+						aria-controls="use-cases-grid"
+						aria-expanded={showAll}
+						onClick={toggleShowAll}
+					>
+						{showAll ? "Show less" : "Show more"}
+						<Icon
+							name="chevron-down"
+							aria-hidden
+							className={cn(
+								"size-3.5 transition-transform duration-200 ease-out motion-reduce:transition-none",
+								showAll && "rotate-180",
+							)}
+						/>
+					</Button.Root>
+				</div>
+			)}
 		</section>
 	);
 }

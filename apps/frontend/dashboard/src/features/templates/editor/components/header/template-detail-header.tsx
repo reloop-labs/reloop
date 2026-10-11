@@ -1,8 +1,15 @@
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
+import { useMediaQuery } from "usehooks-ts";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
 import type { ConnectionStatus as ConnectionStatusType } from "../../collobration/hooks/useCollaboration";
+import {
+	PHONE_QUERY,
+	useInspectorSheet,
+} from "../../hooks/use-inspector-sheet";
 import { CenterNav } from "./center-nav";
 import { HeaderActions } from "./header-actions";
 import { TemplateName } from "./template-name";
@@ -44,10 +51,66 @@ interface TemplateDetailHeaderProps {
 	isSynced: boolean;
 }
 
+const VIEW_MODES = ["visual", "code", "history", "variables"] as const;
+
+/** Phone-only: opens the inspector bottom sheet. Hidden in code view. */
+function StyleSheetButton() {
+	const isOpen = useInspectorSheet((s) => s.open);
+	const toggle = useInspectorSheet((s) => s.toggle);
+	return (
+		<button
+			type="button"
+			onClick={toggle}
+			aria-label="Style panel"
+			aria-expanded={isOpen}
+			aria-controls="template-inspector-sheet"
+			className={cn(
+				"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97] dark:border-stroke-soft-100/40",
+				isOpen
+					? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
+					: "text-text-sub-600",
+			)}
+		>
+			<Icon name="brush" className="size-3.5" />
+		</button>
+	);
+}
+
 export function TemplateDetailHeader({
 	connectionStatus,
 	isSynced,
 }: TemplateDetailHeaderProps) {
+	const isPhone = useMediaQuery(PHONE_QUERY);
+	const [viewMode] = useQueryState(
+		"mode",
+		parseAsStringLiteral(VIEW_MODES).withDefault("visual"),
+	);
+	const isCodeView = viewMode === "code";
+
+	// Phones can't fit the centered name over the actions; stack them instead.
+	if (isPhone) {
+		return (
+			<div className="flex shrink-0 flex-col gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-3 py-2 dark:border-stroke-soft-100/40 dark:bg-black">
+				<div className="flex min-w-0 items-center gap-2">
+					<SidebarToggleButton />
+					<CenterNav />
+					<div className="min-w-0 flex-1 overflow-hidden">
+						<TemplateName />
+					</div>
+					{!isCodeView && <StyleSheetButton />}
+				</div>
+				<div className="-mx-3 overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+					<div className="flex w-max min-w-full justify-end">
+						<HeaderActions
+							connectionStatus={connectionStatus}
+							isSynced={isSynced}
+						/>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="relative flex shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
 			<div className="flex min-w-0 flex-1 items-center gap-2">

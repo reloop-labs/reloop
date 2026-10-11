@@ -86,24 +86,28 @@ export const TemplateName = () => {
 	};
 
 	if (isLoading && !name) {
-		return <div className="h-7 w-48 animate-pulse rounded-md bg-bg-weak-50" />;
+		return (
+			<div className="h-7 w-48 max-w-full animate-pulse rounded-md bg-bg-weak-50" />
+		);
 	}
 
 	return (
-		<div className="flex items-center">
-			<div className="flex items-center gap-1.5">
-				<Icon name="layout" className="size-4 text-text-sub-600" />
-				<Link
-					href="/templates"
-					className="font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950"
-				>
-					Templates
-				</Link>
-			</div>
+		<div className="flex min-w-0 items-center">
+			{/* Phones keep the link as its icon so the name has room. */}
+			<Link
+				href="/templates"
+				aria-label="Templates"
+				className="flex shrink-0 items-center gap-1.5 font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950"
+			>
+				<Icon name="layout" className="size-4" />
+				<span className="hidden sm:inline">Templates</span>
+			</Link>
 
-			<span className="ml-2.5 text-text-disabled-300 text-xs">/</span>
+			<span className="ml-2.5 hidden text-text-disabled-300 text-xs sm:inline">
+				/
+			</span>
 
-			<div className="group ml-1 flex items-center">
+			<div className="group ml-1 flex min-w-0 items-center">
 				<span
 					ref={measureRef}
 					className="invisible absolute whitespace-pre px-2 py-1 font-semibold text-label-sm"
@@ -116,7 +120,7 @@ export const TemplateName = () => {
 					value={name}
 					onChange={handleChange}
 					placeholder="Template name"
-					className="rounded-md bg-transparent px-2 py-1 font-semibold text-label-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:ring-0"
+					className="min-w-0 max-w-full rounded-md bg-transparent px-2 py-1 font-semibold text-label-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:ring-0"
 				/>
 				{data?.status ? <TemplateStatusBadge status={data.status} /> : null}
 			</div>

@@ -11,7 +11,7 @@ export const SendDetails = () => {
 
 	return (
 		<div
-			className="mx-auto mt-4 w-full"
+			className="mx-auto mt-4 w-full px-4 md:px-0"
 			style={{ maxWidth: `${containerWidth}px` }}
 		>
 			<TemplateFromField />
