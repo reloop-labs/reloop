@@ -63,7 +63,7 @@ export function BlueprintEmailIllustration() {
 						gradientUnits="userSpaceOnUse"
 					>
 						<stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-						<stop offset="50%" stopColor="#dbeafe" stopOpacity="0.95" />
+						<stop offset="50%" stopColor="#ffffff" stopOpacity="0.95" />
 						<stop offset="100%" stopColor="#ffffff" stopOpacity="0.85" />
 					</linearGradient>
 
@@ -266,7 +266,7 @@ export function BlueprintEmailIllustration() {
 						width="80"
 						height="16"
 						rx="3"
-						className="fill-[#246BF5] dark:fill-black"
+						className="fill-black"
 						stroke="white"
 						strokeWidth="0.75"
 						strokeOpacity="0.4"
@@ -305,7 +305,7 @@ export function BlueprintEmailIllustration() {
 						width="28"
 						height="16"
 						rx="3"
-						className="fill-[#246BF5] dark:fill-black"
+						className="fill-black"
 						stroke="white"
 						strokeWidth="0.75"
 						strokeOpacity="0.4"
@@ -359,7 +359,7 @@ export function BlueprintEmailIllustration() {
 							height="8"
 							rx="1.5"
 							fill="#ffffff"
-							className="stroke-[#1660f0] dark:stroke-black"
+							className="stroke-black"
 							strokeWidth="1.5"
 						/>
 
@@ -369,7 +369,7 @@ export function BlueprintEmailIllustration() {
 							y={node.y - 1}
 							width="2"
 							height="2"
-							className="fill-[#1660f0] dark:fill-black"
+							className="fill-black"
 							opacity="0.85"
 						/>
 					</g>
@@ -397,11 +397,11 @@ export function BlueprintCta({
 			{...(id ? { id } : {})}
 			className={cn("w-full px-4 py-4 sm:px-6 sm:py-6 lg:px-8", className)}
 		>
-			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#246BF5] px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12 dark:border-white/10 dark:bg-[#000]">
+			<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/10 bg-black px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12 dark:border-white/10 dark:bg-[#000]">
 				{/* 8px Inset white border */}
 				<div
 					aria-hidden="true"
-					className="pointer-events-none absolute inset-[8px] rounded-[20px] border border-white/25 sm:rounded-[24px] dark:border-white/10"
+					className="pointer-events-none absolute inset-[8px] rounded-[20px] border border-white/10 sm:rounded-[24px]"
 				/>
 
 				<div className="relative z-10 grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-8 xl:gap-12">

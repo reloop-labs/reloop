@@ -8,7 +8,9 @@ export function TransactionalCta() {
 				<span className="block font-semibold text-[3rem] leading-[1.04] tracking-[-0.04em] sm:text-[4.25rem] lg:text-[5.25rem]">
 					Start now
 					<br />
-					<span className="text-blue-600 dark:text-blue-400">$0 / mo.</span>
+					<span className="mt-2 inline-block rounded-xl bg-white px-3 pb-1 text-black sm:rounded-2xl sm:px-4">
+						$0 / mo.
+					</span>
 				</span>
 			}
 			sub="Send your first email in minutes. 3,000 emails a month free, no credit card."
@@ -16,8 +18,6 @@ export function TransactionalCta() {
 			primaryHref={hostedSignupHref}
 			secondaryLabel="View pricing"
 			secondaryHref="/pricing"
-			accentHex="#2563eb"
-			accentColor="blue"
 			primaryVariant="primary"
 			align="center"
 			flush

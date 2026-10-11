@@ -281,9 +281,10 @@ function scanGlyphInk(
 }
 
 /**
- * Sanity check for scanned boxes: the "p" must be clearly taller than
- * the "o" (ascender + descender) and the period tiny. Rejects scans
- * from a wrong rasterizer face instead of showing bad boxes.
+ * Sanity check for scanned boxes: the "p" descender must reach clearly
+ * below the "o" and the period must be tiny. Rejects scans from a wrong
+ * rasterizer face instead of showing bad boxes. (Geist 800's "p" has no
+ * ascender, so it is only ~24 units taller than the "o".)
  */
 function passesCanary(boxes: LetterBox[]): boolean {
 	const p = boxes[5];
@@ -293,7 +294,7 @@ function passesCanary(boxes: LetterBox[]): boolean {
 		p != null &&
 		o != null &&
 		dot != null &&
-		p.height > o.height + 30 &&
+		p.y + p.height > o.y + o.height + 12 &&
 		dot.height < 60
 	);
 }
@@ -312,6 +313,10 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 	/** Tight per-glyph ink boxes — used for the selection box */
 	const [ink, setInk] = useState<LetterBox[] | null>(null);
 	const [hovered, setHovered] = useState<number | null>(null);
+	/** Mirrors `hovered` so enter handlers know if a new hover is starting */
+	const hoveredRef = useRef<number | null>(null);
+	/** Bumped on each fresh hover so the box remounts and plays its intro */
+	const [introKey, setIntroKey] = useState(0);
 	/** Last hovered ink box, so fade-out happens in place */
 	const [resting, setResting] = useState<LetterBox | null>(null);
 	// Calibrated coordinates for viewBox="0 0 1000 180"
@@ -485,6 +490,16 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 		if (hovered != null && ink?.[hovered]) setResting(ink[hovered]);
 	}, [hovered, ink]);
 
+	const enterLetter = (i: number) => {
+		if (hoveredRef.current == null) setIntroKey((k) => k + 1);
+		hoveredRef.current = i;
+		setHovered(i);
+	};
+	const leaveWordmark = () => {
+		hoveredRef.current = null;
+		setHovered(null);
+	};
+
 	const target = hovered != null && ink?.[hovered] ? ink[hovered] : null;
 	const display = target ?? resting;
 	const visible = target != null && display != null;
@@ -514,17 +529,16 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 						opacity var(--duration-fast, 250ms) var(--ease-out, ease-out);
 					will-change: left, top, width, height;
 				}
+				.wordmark-intro { animation: wordmark-box-in var(--duration-fast, 250ms) var(--ease-smooth-out, cubic-bezier(0.22, 1, 0.36, 1)); }
+				@keyframes wordmark-box-in { from { opacity: 0; scale: 0.92; } to { opacity: 1; scale: 1; } }
 				.wordmark-handle { animation: wordmark-handle-pop var(--duration-fast, 250ms) var(--ease-bounce, cubic-bezier(0.34, 1.36, 0.64, 1)) backwards; }
 				@keyframes wordmark-handle-pop { from { opacity: 0; scale: 0.4; } to { opacity: 1; scale: 1; } }
 				@media (prefers-reduced-motion: reduce) {
 					.wordmark-glide { transition: none !important; }
-					.wordmark-handle { animation: none !important; }
+					.wordmark-intro, .wordmark-handle { animation: none !important; }
 				}
 			`}</style>
-			<div
-				className="block w-full max-w-4xl px-4"
-				onMouseLeave={() => setHovered(null)}
-			>
+			<div className="block w-full max-w-4xl px-4" onMouseLeave={leaveWordmark}>
 				<span className="sr-only">reloop.sh</span>
 				<div className="relative w-full">
 					<svg
@@ -533,40 +547,8 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 						xmlns="http://www.w3.org/2000/svg"
 						className="block h-auto w-full overflow-visible"
 						role="img"
-						aria-label="Reloop.sh wordmark — hover each letter to inspect"
+						aria-label="Reloop.sh wordmark"
 					>
-						<defs>
-							{/* Fancy blue gradient for the wordmark */}
-							<linearGradient
-								id="wordmark-fancy-gradient"
-								x1="0%"
-								y1="0%"
-								x2="100%"
-								y2="100%"
-							>
-								<stop offset="0%" stopColor="#60a5fa" />
-								<stop offset="100%" stopColor="#2563eb" />
-							</linearGradient>
-
-							{/* Soft glow filter */}
-							<filter
-								id="cursor-glow"
-								x="-30%"
-								y="-30%"
-								width="160%"
-								height="160%"
-								filterUnits="userSpaceOnUse"
-							>
-								<feDropShadow
-									dx="0"
-									dy="2"
-									stdDeviation="4"
-									floodColor="#3b82f6"
-									floodOpacity="0.45"
-								/>
-							</filter>
-						</defs>
-
 						{/* Combined wordmark text for optimal natural font kerning */}
 						<text
 							ref={textRef}
@@ -588,23 +570,18 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 								strokeWidth="2.2"
 								strokeLinecap="round"
 								strokeLinejoin="round"
-								stroke="url(#wordmark-fancy-gradient)"
-								className="transition-all duration-300 dark:stroke-white/80"
+								stroke="currentColor"
 							>
 								Reloop.
 							</tspan>
 
-							{/* "sh" in solid fill with fancy gradient */}
-							<tspan
-								stroke="none"
-								fill="url(#wordmark-fancy-gradient)"
-								className="transition-colors duration-200 dark:fill-white"
-							>
+							{/* "sh" in solid fill */}
+							<tspan stroke="none" fill="currentColor">
 								sh
 							</tspan>
 						</text>
 
-						{/* Per-letter hit areas (transparent, capture hover/focus) */}
+						{/* Per-letter hover areas (transparent, mouse only — not focusable) */}
 						{cells?.map((b, i) => (
 							<rect
 								key={`hit-${i}`}
@@ -614,21 +591,21 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 								height={b.height + HIT_PAD * 2}
 								fill="transparent"
 								style={{ cursor: "default" }}
-								onMouseEnter={() => setHovered(i)}
-								onFocus={() => setHovered(i)}
-								onBlur={() => setHovered((h) => (h === i ? null : h))}
-								tabIndex={0}
-								aria-label={`Letter ${FULL_TEXT[i]}`}
+								onMouseEnter={() => enterLetter(i)}
+								data-letter={FULL_TEXT[i]}
 							/>
 						))}
 					</svg>
 
 					{/* Figma-style selection box — HTML overlay so it glides
-					    smoothly between letters via CSS transitions */}
+					    smoothly between letters via CSS transitions. Remounts
+					    (introKey) on each fresh hover so it fades/scales in at
+					    the letter instead of popping or gliding from a stale spot. */}
 					{sel && (
 						<div
+							key={introKey}
 							aria-hidden="true"
-							className="wordmark-glide pointer-events-none absolute border-2 border-[#3b82f6] bg-[#3b82f6]/10"
+							className="wordmark-glide wordmark-intro pointer-events-none absolute border-2 border-text-strong-950 bg-text-strong-950/5 dark:border-white! dark:bg-white/10"
 							style={{
 								left: `${(sel.x / VIEW_W) * 100}%`,
 								top: `${(sel.y / VIEW_H) * 100}%`,
@@ -637,32 +614,28 @@ export function FooterWordmark({ className }: FooterWordmarkProps) {
 								opacity: visible ? 1 : 0,
 							}}
 						>
-							{visible &&
-								[
-									{ left: "0%", top: "0%" },
-									{ left: "50%", top: "0%" },
-									{ left: "100%", top: "0%" },
-									{ left: "100%", top: "50%" },
-									{ left: "100%", top: "100%" },
-									{ left: "50%", top: "100%" },
-									{ left: "0%", top: "100%" },
-									{ left: "0%", top: "50%" },
-								].map((p, i) => (
-									<span
-										key={`handle-${i}`}
-										className="wordmark-handle -translate-x-1/2 -translate-y-1/2 absolute size-2 border-[#3b82f6] border-[1.5px] bg-white"
-										style={{
-											left: p.left,
-											top: p.top,
-											animationDelay: `${i * 40}ms`,
-										}}
-									/>
-								))}
+							{[
+								{ left: "0%", top: "0%" },
+								{ left: "50%", top: "0%" },
+								{ left: "100%", top: "0%" },
+								{ left: "100%", top: "50%" },
+								{ left: "100%", top: "100%" },
+								{ left: "50%", top: "100%" },
+								{ left: "0%", top: "100%" },
+								{ left: "0%", top: "50%" },
+							].map((p, i) => (
+								<span
+									key={`handle-${i}`}
+									className="wordmark-handle -translate-x-1/2 -translate-y-1/2 absolute size-1.5 border border-text-strong-950 bg-bg-white-0 dark:border-white! dark:bg-black"
+									style={{
+										left: p.left,
+										top: p.top,
+										animationDelay: `${i * 25}ms`,
+									}}
+								/>
+							))}
 							{/* Figma-style size badge, rides along with the box */}
-							<div
-								className="-translate-x-1/2 absolute top-full left-1/2 mt-2 whitespace-nowrap rounded-md bg-[#3b82f6] px-1.5 py-0.5 font-medium text-[11px] text-white tabular-nums shadow-sm"
-								style={{ opacity: visible ? 1 : 0 }}
-							>
+							<div className="-translate-x-1/2 absolute top-full left-1/2 mt-2 whitespace-nowrap rounded-md bg-text-strong-950 px-1.5 py-0.5 font-medium text-[11px] text-white tabular-nums shadow-sm dark:bg-white dark:text-black">
 								{display &&
 									`${Math.round(display.width)} × ${Math.round(display.height)}`}
 							</div>

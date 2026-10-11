@@ -307,15 +307,14 @@ const navItems: NavItem[] = [
 		mega: {
 			// Bottom highlight strip in the Tailark-style landing panel
 			spotlight: {
-				title: "Agent Inbox",
-				href: "/use-cases/ai-agent-inbox",
-				icon: "agent",
+				title: "Engine",
+				href: "/engine",
+				icon: "layers",
 				description:
-					"Give AI agents their own inboxes to receive, parse, and respond to email.",
+					"How Reloop is built, from the KumoMTA sending core to the REST API.",
 			},
 			// Left: Transactional + Marketing cards
-			// Middle: Email API, Templates, Inbound, Contacts
-			// Right: Agent Inbox, SMTP, Workflows, …
+			// Middle: sending building blocks · Right: delivery + insight
 			categories: [
 				{
 					title: "",
@@ -375,11 +374,11 @@ const navItems: NavItem[] = [
 								"Manage subscriber lists, custom properties, and audience segments.",
 						},
 						{
-							title: "MCP Server",
-							href: "/features/mcp",
-							icon: "connector",
+							title: "SMTP",
+							href: "/features/smtp",
+							icon: "smtp",
 							description:
-								"Connect Claude, Cursor, Codex, and other AI clients to Reloop.",
+								"Drop-in SMTP relay with high deliverability and instant auth.",
 						},
 					],
 				},
@@ -387,20 +386,6 @@ const navItems: NavItem[] = [
 					title: "",
 					simple: true,
 					links: [
-						{
-							title: "Agent Inbox",
-							href: "/use-cases/ai-agent-inbox",
-							icon: "inbox",
-							description:
-								"Give AI agents dedicated inboxes to receive, parse, and respond.",
-						},
-						{
-							title: "SMTP",
-							href: "/features/smtp",
-							icon: "smtp",
-							description:
-								"Drop-in SMTP relay with high deliverability and instant auth.",
-						},
 						{
 							title: "Workflows",
 							href: "/docs/learn/workflows",
@@ -416,11 +401,24 @@ const navItems: NavItem[] = [
 								"Stream realtime delivery, bounce, and engagement events to your app.",
 						},
 						{
-							title: "CLI",
-							href: "/features/cli",
-							icon: "terminal",
+							title: "Analytics",
+							href: "/features/email-analytics",
+							icon: "delivery-analytics",
 							description:
-								"Send, schedule, and receive email from your terminal or agent.",
+								"Track opens, clicks, bounces, and domain reputation in real time.",
+						},
+						{
+							title: "Validation",
+							href: "/features/email-validation",
+							icon: "check-circle",
+							description: "Verify addresses before you send to cut bounces.",
+						},
+						{
+							title: "Deliverability",
+							href: "/features/deliverability",
+							icon: "shield-check",
+							description:
+								"Reputation monitoring and authentication to reach the inbox.",
 						},
 					],
 				},
@@ -428,22 +426,78 @@ const navItems: NavItem[] = [
 		},
 	},
 	{
-		title: "Resources",
-		href: "/blog",
+		title: "AI",
+		href: "/features/ai-agents",
 		mega: {
-			// Bottom highlight strip in the Tailark-style landing panel
 			spotlight: {
-				title: "Documentation",
-				href: "/docs",
-				icon: "book-open",
+				title: "AI Agents",
+				href: "/features/ai-agents",
+				icon: "robot",
 				description:
-					"Guides, API reference, and quickstarts to help you start sending in minutes.",
+					"Give agents an email address, an inbound webhook, an MCP server, and a send API.",
 			},
-			// Featured: Free tools + Comparisons
-			// Right: Blog / Changelog / Status / Self-host + social icons
 			categories: [
 				{
-					title: "Free Tools",
+					title: "",
+					divided: true,
+					links: [
+						{
+							title: "Agent Inbox",
+							href: "/use-cases/ai-agent-inbox",
+							icon: "inbox",
+							description:
+								"Dedicated inboxes for agents to receive, parse, and respond.",
+						},
+						{
+							title: "MCP Server",
+							href: "/features/mcp",
+							icon: "connector",
+							description:
+								"Connect Claude, Cursor, Codex, and other AI clients to Reloop.",
+						},
+						{
+							title: "CLI",
+							href: "/features/cli",
+							icon: "terminal",
+							description:
+								"Send, schedule, and receive email from your terminal or agent.",
+						},
+						{
+							title: "skills.md",
+							href: "/skill.md",
+							icon: "magic-wand",
+							description: "Drop-in skill so coding agents can use Reloop",
+						},
+						{
+							title: "llms.txt",
+							href: "/llms.txt",
+							icon: "file-text",
+							description: "Machine-readable index of the Reloop docs",
+						},
+						{
+							title: "sitemap.md",
+							href: "/sitemap.md",
+							icon: "list-bullets",
+							description: "Every page on reloop.sh, as Markdown",
+						},
+					],
+				},
+			],
+		},
+	},
+	{
+		title: "Tools",
+		href: "/tools",
+		mega: {
+			spotlight: {
+				title: "All free tools",
+				href: "/tools",
+				icon: "grid",
+				description: "Free email and DNS checkers. No sign-up required.",
+			},
+			categories: [
+				{
+					title: "",
 					divided: true,
 					links: [
 						{
@@ -451,6 +505,30 @@ const navItems: NavItem[] = [
 							href: "/tools/email-validator",
 							icon: "mail",
 							description: "Verify syntax, MX & disposable emails",
+						},
+						{
+							title: "Temp Email Checker",
+							href: "/tools/temp-email-checker",
+							icon: "mail-single",
+							description: "Detect disposable and role addresses",
+						},
+						{
+							title: "Spam Words Checker",
+							href: "/tools/email-spam-words-checker",
+							icon: "alert-triangle",
+							description: "Score your copy against spam filters",
+						},
+						{
+							title: "Deliverability Tester",
+							href: "/tools/deliverability-tester",
+							icon: "shield-check",
+							description: "Spam score & inbox placement audit",
+						},
+						{
+							title: "HTML Editor",
+							href: "/tools/email-html-editor",
+							icon: "code",
+							description: "Live responsive email template builder",
 						},
 						{
 							title: "DNS Lookup",
@@ -465,35 +543,124 @@ const navItems: NavItem[] = [
 							description: "Verify SPF, DKIM & DMARC alignment",
 						},
 						{
-							title: "Deliverability Tester",
-							href: "/tools/deliverability-tester",
-							icon: "shield-check",
-							description: "Spam score & inbox placement audit",
+							title: "Spoof Checker",
+							href: "/tools/spoof-checker",
+							icon: "shield-cross",
+							description: "Test if your domain can be forged",
 						},
 						{
-							title: "HTML Editor",
-							href: "/tools/email-html-editor",
-							icon: "code",
-							description: "Live responsive email template builder",
+							title: "BIMI Checker",
+							href: "/tools/bimi-checker",
+							icon: "verified",
+							description: "Validate your BIMI record and logo",
+						},
+						{
+							title: "Who Sends",
+							href: "/tools/who-sends",
+							icon: "search",
+							description: "Find every ESP allowed to send as a domain",
+						},
+						{
+							title: "Domain Reputation",
+							href: "/tools/domain-reputation-checker",
+							icon: "graph-up",
+							description: "Full sender reputation audit",
+						},
+						{
+							title: "Blocklist Checker",
+							href: "/tools/blocklist-checker",
+							icon: "alert-octagon",
+							description: "Check an IP or domain on 42 blocklists",
+						},
+						{
+							title: "Domain Age",
+							href: "/tools/domain-age",
+							icon: "hourglass",
+							description: "Registration date and warmup stage",
+						},
+						{
+							title: "Lookalike Watch",
+							href: "/tools/lookalike-watch",
+							icon: "eye-outline",
+							description: "Find typosquats with live mail records",
 						},
 					],
 				},
+			],
+		},
+	},
+	{
+		title: "Developers",
+		href: "/docs",
+		mega: {
+			spotlight: {
+				title: "Documentation",
+				href: "/docs",
+				icon: "book-open",
+				description:
+					"Guides, API reference, and quickstarts to help you start sending in minutes.",
+			},
+			categories: [
 				{
-					title: "Resources",
+					title: "",
 					divided: true,
 					links: [
 						{
-							title: "Documentation",
-							href: "/docs",
-							icon: "book-open",
-							description: "Guides, API reference, and quickstarts",
+							title: "API Reference",
+							href: "/docs/api",
+							customIcon: <DocsApiIcon className="size-[14px]" />,
+							description: "Every endpoint, with request examples",
+						},
+						{
+							title: "SDKs",
+							href: "/sdk",
+							icon: "brackets",
+							description: "Official SDKs for every major language",
+						},
+						{
+							title: "Frameworks",
+							href: "/frameworks",
+							icon: "modules",
+							description: "Guides for Next.js, Django, Laravel, and more",
 						},
 						{
 							title: "Integrations",
 							href: "/docs/integrations",
-							icon: "code",
-							description: "SDKs and framework guides",
+							icon: "integration",
+							description: "Connect Reloop to the tools you use",
 						},
+						{
+							title: "Webhooks",
+							href: "/docs/webhooks",
+							icon: "webhook",
+							description: "Event types, payloads, and signing",
+						},
+						{
+							title: "Self-host",
+							href: "/self-host",
+							icon: "server",
+							description: "Deploy on your own infrastructure",
+						},
+					],
+				},
+			],
+		},
+	},
+	{
+		title: "Resources",
+		href: "/blog",
+		mega: {
+			spotlight: {
+				title: "Changelog",
+				href: "/changelog",
+				icon: "changelog",
+				description: "See what's new in Reloop, shipped every week.",
+			},
+			categories: [
+				{
+					title: "",
+					divided: true,
+					links: [
 						{
 							title: "Blog",
 							href: "/blog",
@@ -501,10 +668,10 @@ const navItems: NavItem[] = [
 							description: "Articles and product updates",
 						},
 						{
-							title: "Changelog",
-							href: "/changelog",
-							icon: "note",
-							description: "See what's new in Reloop",
+							title: "Customers",
+							href: "/customers",
+							icon: "users",
+							description: "Teams building on Reloop",
 						},
 						{
 							title: "Compare",
@@ -513,16 +680,22 @@ const navItems: NavItem[] = [
 							description: "Reloop vs Resend, SendGrid, and more",
 						},
 						{
+							title: "Community",
+							href: "/community",
+							icon: "social-discord",
+							description: "Join us on Discord, GitHub, and X",
+						},
+						{
+							title: "Wall of Love",
+							href: "/wall-of-love",
+							icon: "heart",
+							description: "What developers say about Reloop",
+						},
+						{
 							title: "Status",
 							href: "https://status.reloop.sh/status/live",
 							icon: "activity",
 							description: "Realtime uptime and system health",
-						},
-						{
-							title: "Self-host",
-							href: "/self-host",
-							icon: "server",
-							description: "Deploy on your own infrastructure",
 						},
 					],
 				},
@@ -576,6 +749,12 @@ const navItems: NavItem[] = [
 							href: "/startups",
 							icon: "rocket",
 							description: "$1,000 in credits for early-stage teams",
+						},
+						{
+							title: "Careers",
+							href: "/careers",
+							icon: "briefcase",
+							description: "Build open-source email infrastructure",
 						},
 						{
 							title: "License",
@@ -986,7 +1165,7 @@ export const Header = () => {
 	};
 
 	useEffect(() => {
-		const query = window.matchMedia("(min-width: 1100px)");
+		const query = window.matchMedia("(min-width: 1200px)");
 		const resetMenus = () => {
 			setMobileMenuOpen(false);
 			setExpandedMobile(null);
@@ -1046,7 +1225,7 @@ export const Header = () => {
 								aria-label="Main navigation"
 								className={cn(
 									"relative hidden items-center gap-1",
-									"ml-6 gap-2 justify-self-start min-[1100px]:flex",
+									"ml-6 justify-self-start min-[1200px]:flex",
 								)}
 							>
 								{/* Pill: on-screen morph → short spring, zero bounce (crisp) */}
@@ -1107,10 +1286,8 @@ export const Header = () => {
 												{item.title}
 												<Icon
 													name="chevron-down"
-													className={`size-3 transition-transform duration-200 ${
-														activeMega === item.title
-															? "rotate-180"
-															: "opacity-50"
+													className={`size-4 shrink-0 transition-transform duration-200 ${
+														activeMega === item.title ? "rotate-180" : ""
 													}`}
 												/>
 											</button>
@@ -1135,7 +1312,7 @@ export const Header = () => {
 						<div
 							className={cn(
 								"relative z-10 hidden items-center gap-3",
-								"justify-self-end min-[1100px]:flex",
+								"justify-self-end min-[1200px]:flex",
 							)}
 						>
 							<ThemeToggle />
@@ -1174,7 +1351,7 @@ export const Header = () => {
 							type="button"
 							className={cn(
 								"size-10 items-center justify-center rounded-lg text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]",
-								"inline-flex min-[1100px]:hidden",
+								"inline-flex min-[1200px]:hidden",
 							)}
 							onClick={toggleMobileMenu}
 							aria-expanded={mobileMenuOpen}
@@ -1315,7 +1492,7 @@ export const Header = () => {
 								}
 								className={cn(
 									"overflow-hidden border-stroke-soft-100 border-t dark:border-white/10",
-									"block bg-white px-6 min-[1100px]:hidden dark:bg-black",
+									"block bg-white px-6 min-[1200px]:hidden dark:bg-black",
 								)}
 							>
 								<div className="max-h-[calc(100dvh-4rem)] overflow-y-auto py-4">

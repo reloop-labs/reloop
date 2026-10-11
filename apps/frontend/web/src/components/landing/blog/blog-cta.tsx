@@ -239,18 +239,20 @@ export function BlogCta({
 		>
 			<div
 				className={cn(
-					"mx-auto w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8",
+					"mx-auto w-full px-4 sm:px-6 lg:px-8",
+					// Flush CTAs end the page: the footer opens with its own h-24
+					// spacer, so mirror it on top to center the card between rules.
 					flush
-						? ""
-						: "max-w-5xl border-stroke-soft-100 md:max-w-7xl xl:border-x dark:border-white/10",
+						? "pt-24"
+						: "max-w-5xl border-stroke-soft-100 py-8 sm:py-12 md:max-w-7xl xl:border-x dark:border-white/10",
 				)}
 			>
-				<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/20 bg-[#246BF5] px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12 dark:border-white/10 dark:bg-[#000]">
+				<div className="group relative mx-auto w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/10 bg-black px-8 py-8 transition-all duration-300 sm:rounded-[32px] sm:px-12 sm:py-10 lg:px-14 lg:py-12 dark:border-white/10 dark:bg-[#000]">
 					{/* 8px Inset white border matching landing page */}
 					{insetBorder ? (
 						<div
 							aria-hidden="true"
-							className="pointer-events-none absolute inset-[8px] rounded-[20px] border border-white/25 sm:rounded-[24px] dark:border-white/10"
+							className="pointer-events-none absolute inset-[8px] rounded-[20px] border border-white/10 sm:rounded-[24px]"
 						/>
 					) : null}
 
