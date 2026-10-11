@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { EditorContext } from "@tiptap/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Toaster, toast } from "sonner";
 import { FullEmailBuilder } from "./components/canvas/email-builder";
 import { EmailSlashCommand } from "./components/canvas/email-slash-command";
@@ -28,6 +28,23 @@ const TAB_ORDER: Record<string, number> = {
 	visual: 0,
 	variables: 1,
 };
+
+/** Below Tailwind `md`: the inspector becomes a bottom sheet. */
+const PHONE_QUERY = "(max-width: 767px)";
+
+function subscribePhone(onChange: () => void) {
+	const query = window.matchMedia(PHONE_QUERY);
+	query.addEventListener("change", onChange);
+	return () => query.removeEventListener("change", onChange);
+}
+
+function useIsPhone() {
+	return useSyncExternalStore(
+		subscribePhone,
+		() => window.matchMedia(PHONE_QUERY).matches,
+		() => false,
+	);
+}
 
 /**
  * Public tool version of the dashboard `TemplateEditorPage`: same canvas,
@@ -62,6 +79,14 @@ export function EmailHtmlEditorPage({
 	});
 	const currentTab = viewMode === "variables" ? "variables" : "visual";
 	const [direction, setDirection] = useState(1);
+	const isPhone = useIsPhone();
+	const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+	// The sheet only exists on phones; leaving that width or opening code
+	// view closes it so it never reappears unexpectedly.
+	useEffect(() => {
+		if (!isPhone || isCodeSplit) setIsSheetOpen(false);
+	}, [isPhone, isCodeSplit]);
 
 	useEffect(() => {
 		useEditorStore.getState().reset();
@@ -129,6 +154,29 @@ export function EmailHtmlEditorPage({
 		}),
 	};
 
+	const inspectorPanels = (
+		<AnimatePresence mode="popLayout" custom={direction} initial={false}>
+			<motion.div
+				key={currentTab}
+				custom={direction}
+				variants={slideVariants}
+				initial="enter"
+				animate="center"
+				exit="exit"
+				transition={{
+					duration: 0.28,
+					ease: [0.32, 0.72, 0, 1],
+				}}
+				className="absolute inset-0 overflow-y-auto overflow-x-hidden"
+			>
+				{currentTab === "variables" && (
+					<VariablesPanel onClose={() => handleSelectTab("visual")} />
+				)}
+				{currentTab === "visual" && <EmailInspector />}
+			</motion.div>
+		</AnimatePresence>
+	);
+
 	return (
 		<EditorContext.Provider value={{ editor }}>
 			<Toaster position="bottom-center" />
@@ -164,23 +212,46 @@ export function EmailHtmlEditorPage({
 							{templateName}
 						</span>
 					</nav>
-					<div className="ml-auto shrink-0">
+					<div className="ml-auto flex shrink-0 items-center gap-2">
+						{isPhone && !isCodeSplit && (
+							<button
+								type="button"
+								onClick={() => setIsSheetOpen((open) => !open)}
+								aria-expanded={isSheetOpen}
+								aria-controls="email-inspector-sheet"
+								className={cn(
+									"flex h-8 items-center gap-1.5 rounded-lg border border-stroke-soft-100 px-2.5 font-medium text-label-xs text-text-sub-600 transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97] dark:border-stroke-soft-100/40",
+									isSheetOpen
+										? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
+										: "bg-bg-white-0 dark:bg-black",
+								)}
+							>
+								<Icon name="brush" className="size-3.5" />
+								Style
+							</button>
+						)}
 						<SaveTemplateButton templateName={templateName} />
 					</div>
 				</div>
 				<div className="flex min-h-0 flex-1 items-stretch overflow-hidden bg-bg-white-0 dark:bg-black">
 					<div className="flex h-full min-h-0 flex-1 overflow-hidden">
 						{isCodeSplit && (
-							<div className="relative flex w-1/2 min-w-[480px] shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-r transition-all duration-300 dark:border-stroke-soft-100/40">
+							<div className="relative flex w-full shrink-0 flex-col overflow-hidden border-stroke-soft-100 transition-all duration-300 md:w-1/2 md:min-w-[480px] md:border-r dark:border-stroke-soft-100/40">
 								<CodeEditor onClose={() => setViewMode("visual")} />
 							</div>
 						)}
 
-						<div className="relative flex min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black">
+						<div
+							className={cn(
+								"relative min-h-0 flex-1 overflow-hidden bg-bg-white-0 dark:bg-black",
+								// Phones show code full-screen; the pencil toggle returns to the canvas.
+								isCodeSplit ? "hidden md:flex" : "flex",
+							)}
+						>
 							<main
 								className={cn(
 									"template-editor-canvas flex h-full flex-1 flex-col overflow-hidden bg-white text-neutral-950",
-									!isCodeSplit && "pr-72",
+									!isCodeSplit && "md:pr-72",
 								)}
 							>
 								{showHtmlCanvas ? (
@@ -197,7 +268,7 @@ export function EmailHtmlEditorPage({
 										</ScrollAreaPrimitive.Viewport>
 										<ScrollAreaPrimitive.Scrollbar
 											orientation="vertical"
-											className="absolute top-0 right-72 bottom-0 z-20 flex w-2.5 touch-none select-none p-0.5 transition-[right] duration-300"
+											className="absolute top-0 right-0 bottom-0 z-20 flex w-2.5 touch-none select-none p-0.5 transition-[right] duration-300 md:right-72"
 										>
 											<ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-stroke-soft-200 hover:bg-stroke-sub-300" />
 										</ScrollAreaPrimitive.Scrollbar>
@@ -205,7 +276,7 @@ export function EmailHtmlEditorPage({
 								)}
 							</main>
 							<AnimatePresence initial={false}>
-								{!isCodeSplit && (
+								{!isCodeSplit && !isPhone && (
 									<motion.div
 										initial={{ width: 0, opacity: 0 }}
 										animate={{ width: "288px", opacity: 1 }}
@@ -224,32 +295,7 @@ export function EmailHtmlEditorPage({
 										/>
 
 										<div className="relative h-full w-72 flex-1 overflow-hidden">
-											<AnimatePresence
-												mode="popLayout"
-												custom={direction}
-												initial={false}
-											>
-												<motion.div
-													key={currentTab}
-													custom={direction}
-													variants={slideVariants}
-													initial="enter"
-													animate="center"
-													exit="exit"
-													transition={{
-														duration: 0.28,
-														ease: [0.32, 0.72, 0, 1],
-													}}
-													className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-												>
-													{currentTab === "variables" && (
-														<VariablesPanel
-															onClose={() => handleSelectTab("visual")}
-														/>
-													)}
-													{currentTab === "visual" && <EmailInspector />}
-												</motion.div>
-											</AnimatePresence>
+											{inspectorPanels}
 										</div>
 									</motion.div>
 								)}
@@ -257,6 +303,54 @@ export function EmailHtmlEditorPage({
 						</div>
 					</div>
 				</div>
+				<AnimatePresence>
+					{isPhone && isSheetOpen && !isCodeSplit && (
+						<>
+							<motion.button
+								key="sheet-backdrop"
+								type="button"
+								aria-label="Close style panel"
+								onClick={() => setIsSheetOpen(false)}
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.2 }}
+								className="fixed inset-0 z-40 bg-black/20"
+							/>
+							<motion.div
+								key="sheet"
+								id="email-inspector-sheet"
+								role="dialog"
+								aria-label="Style panel"
+								initial={{ transform: "translateY(100%)" }}
+								animate={{ transform: "translateY(0%)" }}
+								exit={{ transform: "translateY(100%)" }}
+								transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+								className="fixed inset-x-0 bottom-0 z-50 flex h-[62dvh] flex-col overflow-hidden rounded-t-2xl border-stroke-soft-100 border-t bg-bg-white-0 pb-[env(safe-area-inset-bottom)] shadow-[0_-12px_32px_-12px_rgba(0,0,0,0.25)] dark:border-stroke-soft-100/40 dark:bg-black"
+							>
+								<div className="flex items-center pr-2">
+									<div className="min-w-0 flex-1">
+										<TemplateInspectorTabs
+											viewMode={viewMode}
+											onSelectTab={handleSelectTab}
+										/>
+									</div>
+									<button
+										type="button"
+										onClick={() => setIsSheetOpen(false)}
+										aria-label="Close style panel"
+										className="flex size-8 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
+									>
+										<Icon name="cross" className="size-4" />
+									</button>
+								</div>
+								<div className="relative min-h-0 flex-1 overflow-hidden">
+									{inspectorPanels}
+								</div>
+							</motion.div>
+						</>
+					)}
+				</AnimatePresence>
 				<EmailSlashCommand />
 			</div>
 			<AddTemplateVariableModal

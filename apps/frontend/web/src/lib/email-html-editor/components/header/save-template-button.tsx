@@ -88,7 +88,14 @@ export function SaveTemplateButton({ templateName }: { templateName: string }) {
 			disabled={!editor || isSaving}
 			onClick={handleSave}
 		>
-			{isSaving ? "Saving…" : "Save template"}
+			{isSaving ? (
+				"Saving…"
+			) : (
+				<>
+					<span className="sm:hidden">Save</span>
+					<span className="hidden sm:inline">Save template</span>
+				</>
+			)}
 		</Button.Root>
 	);
 }

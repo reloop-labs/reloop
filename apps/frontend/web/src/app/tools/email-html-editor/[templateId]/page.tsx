@@ -2,7 +2,11 @@ import { createPageMetadata } from "@reloop/web/lib/metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { toolPath, toolTitle } from "../content";
-import { emailTemplateExamples, getEmailTemplateExample } from "../templates";
+import {
+	acmeTemplateExamples,
+	emailTemplateExamples,
+	getEmailTemplateExample,
+} from "../templates";
 import { TemplateEditor } from "./template-editor";
 
 type PageProps = {
@@ -10,7 +14,11 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-	return emailTemplateExamples.map((template) => ({ templateId: template.id }));
+	return [...emailTemplateExamples, ...acmeTemplateExamples].map(
+		(template) => ({
+			templateId: template.id,
+		}),
+	);
 }
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
