@@ -1,3 +1,4 @@
+import type React from "react";
 import type { SimpleIcon } from "simple-icons";
 
 export type CustomBrandIcon = {
@@ -59,9 +60,11 @@ export function getBrandColorStyle(hex: string): { color: string } | undefined {
 export function LanguageIcon({
 	icon,
 	className = "size-6",
+	style,
 }: {
 	icon: BrandIcon;
 	className?: string;
+	style?: React.CSSProperties;
 }) {
 	if (isCustomBrandIcon(icon)) {
 		return (
@@ -89,6 +92,7 @@ export function LanguageIcon({
 		<svg
 			viewBox="0 0 24 24"
 			className={`fill-current ${className}`}
+			style={style}
 			aria-hidden
 		>
 			<path d={icon.path} />

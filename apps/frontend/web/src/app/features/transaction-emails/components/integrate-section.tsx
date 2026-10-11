@@ -3,10 +3,14 @@
 import { sendEmailXCodeSamples } from "@reloop/code-samples/mail";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { motion } from "framer-motion";
 import Link from "next/link";
+import type React from "react";
 import { useState } from "react";
 import {
 	type BrandIcon,
+	getBrandColorStyle,
+	isDarkBrandColor,
 	LanguageIcon,
 } from "../../../sdk/components/language-icon";
 import { SdkCodeBlock } from "../../../sdk/components/sdk-code-block";
@@ -118,14 +122,115 @@ const STACKS: Stack[] = [
 
 function StackIcon({
 	icon,
+	active,
 	className,
 }: {
 	icon: Stack["icon"];
+	active: boolean;
 	className: string;
 }) {
 	if ("sprite" in icon)
 		return <Icon name={icon.sprite} className={className} />;
-	return <LanguageIcon icon={icon} className={className} />;
+	return (
+		<LanguageIcon
+			icon={icon}
+			className={className}
+			style={active ? getBrandColorStyle(icon.hex) : undefined}
+		/>
+	);
+}
+
+const PILL_TRANSITION = { duration: 0.2, ease: "easeOut" } as const;
+
+function FrameworkTabs({
+	snippets,
+	activeId,
+	onSelect,
+}: {
+	snippets: Snippet[];
+	activeId: string;
+	onSelect: (id: string) => void;
+}) {
+	const [hoveredId, setHoveredId] = useState<string>();
+
+	return (
+		<div
+			role="tablist"
+			aria-label="Framework"
+			className="-mx-1 flex gap-1 overflow-x-auto"
+			onPointerLeave={() => setHoveredId(undefined)}
+		>
+			{snippets.map((s) => {
+				const active = s.id === activeId;
+				const hovered = s.id === hoveredId && !active;
+				// Near-black brands (Next.js, Express) would vanish in dark mode,
+				// so they fall back to the neutral text color instead.
+				const neutral = !s.icon || isDarkBrandColor(s.icon.hex);
+				return (
+					<button
+						key={s.id}
+						type="button"
+						role="tab"
+						aria-selected={active}
+						onPointerEnter={() => setHoveredId(s.id)}
+						onClick={() => onSelect(s.id)}
+						style={
+							neutral
+								? undefined
+								: ({ "--brand": `#${s.icon?.hex}` } as React.CSSProperties)
+						}
+						className={cn(
+							"relative isolate flex h-8 shrink-0 cursor-pointer items-center gap-2 rounded-full px-3.5 font-medium text-[13px] transition-colors",
+							active
+								? neutral
+									? "text-white dark:text-black"
+									: "text-white"
+								: hovered
+									? "text-text-strong-950 dark:text-white"
+									: "text-text-sub-600 dark:text-white/60",
+						)}
+					>
+						{active && (
+							<motion.span
+								aria-hidden
+								layoutId="integrate-framework-active"
+								transition={PILL_TRANSITION}
+								className={cn(
+									"-z-10 absolute inset-0 rounded-full border",
+									neutral
+										? "border-text-strong-950 bg-text-strong-950 dark:border-white dark:bg-white"
+										: "border-[color-mix(in_srgb,var(--brand),black_25%)] bg-(--brand) shadow-[inset_0_1px_0_rgb(255_255_255/0.2)]",
+								)}
+							/>
+						)}
+						{hovered && (
+							<motion.span
+								aria-hidden
+								layoutId="integrate-framework-hover"
+								transition={PILL_TRANSITION}
+								className={cn(
+									"-z-20 absolute inset-0 rounded-full",
+									neutral
+										? "bg-neutral-alpha-10 dark:bg-white/[0.08]"
+										: "bg-[color-mix(in_srgb,var(--brand)_14%,transparent)]",
+								)}
+							/>
+						)}
+						{s.icon && (
+							<LanguageIcon
+								icon={s.icon}
+								className={cn(
+									"size-3.5",
+									!neutral && (active ? "text-white" : "text-(--brand)"),
+								)}
+							/>
+						)}
+						{s.name}
+					</button>
+				);
+			})}
+		</div>
+	);
 }
 
 export function IntegrateSection() {
@@ -186,16 +291,17 @@ export function IntegrateSection() {
 							{active && (
 								<span
 									aria-hidden
-									className="absolute inset-x-0 top-0 h-0.5 bg-text-strong-950 dark:bg-white"
+									className="absolute inset-x-0 bottom-0 h-0.5 bg-text-strong-950 dark:bg-white"
 								/>
 							)}
 							<StackIcon
 								icon={s.icon}
+								active={active}
 								className={cn(
 									"size-6 transition-all",
 									active
 										? "text-text-strong-950 dark:text-white"
-										: "text-text-sub-600 opacity-70 grayscale group-hover:opacity-100 group-hover:grayscale-0 dark:text-white/60",
+										: "text-text-sub-600 opacity-70 grayscale group-hover:opacity-100 dark:text-white/60",
 								)}
 							/>
 							<span
@@ -214,33 +320,11 @@ export function IntegrateSection() {
 			</div>
 
 			<div className="flex flex-col gap-3 border-stroke-soft-100 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12 dark:border-white/10">
-				<div
-					role="tablist"
-					aria-label="Framework"
-					className="-mx-1 flex gap-1 overflow-x-auto"
-				>
-					{stack.snippets.map((s) => {
-						const active = s.id === snippet.id;
-						return (
-							<button
-								key={s.id}
-								type="button"
-								role="tab"
-								aria-selected={active}
-								onClick={() => setSnippetId(s.id)}
-								className={cn(
-									"flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-medium text-[13px] transition-colors",
-									active
-										? "bg-bg-weak-50 text-text-strong-950 ring-1 ring-stroke-soft-200 dark:bg-white/[0.06] dark:text-white dark:ring-white/10"
-										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
-								)}
-							>
-								{s.icon && <LanguageIcon icon={s.icon} className="size-3.5" />}
-								{s.name}
-							</button>
-						);
-					})}
-				</div>
+				<FrameworkTabs
+					snippets={stack.snippets}
+					activeId={snippet.id}
+					onSelect={setSnippetId}
+				/>
 				{stack.install && (
 					<code className="shrink-0 font-mono text-[12.5px] text-text-sub-600 dark:text-white/50">
 						<span className="text-text-soft-400 dark:text-white/30">$ </span>
