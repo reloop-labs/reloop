@@ -28,7 +28,7 @@ function asOrgRole(role: string): OrgRole | null {
 export function useOrgPermissions() {
 	const { data, isPending, error } = authClient.useActiveMemberRole();
 	const role = data?.role ?? null;
-	const { billingEnabled } = useBillingUsage();
+	const { billingEnabled, isLoading: isBillingLoading } = useBillingUsage();
 
 	return useMemo(() => {
 		const isOwner = roleIncludes(role, ["owner"]);
@@ -52,6 +52,8 @@ export function useOrgPermissions() {
 		return {
 			role,
 			isPending,
+			/** Role and billing both resolved, so the flags below are final. */
+			isSettled: !isPending && !isBillingLoading,
 			error,
 			isOwner,
 			isAdmin,
@@ -62,5 +64,5 @@ export function useOrgPermissions() {
 			canManageWorkspace,
 			canInvite,
 		};
-	}, [role, isPending, error, billingEnabled]);
+	}, [role, isPending, error, billingEnabled, isBillingLoading]);
 }

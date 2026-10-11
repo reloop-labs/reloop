@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../styles.css";
+import { SETTINGS_NAV_PRE_PAINT_SCRIPT } from "#/features/dashboard/sidebar/settings-nav-cache";
 import { Providers } from "./providers";
 
 // TODO: Remove this opt-out after the dashboard supports Cache Components.
@@ -69,7 +70,11 @@ export default function RootLayout({
 			className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`}
 		>
 			<head>
-				<script dangerouslySetInnerHTML={{ __html: sidebarCollapsedScript }} />
+				<script
+					dangerouslySetInnerHTML={{
+						__html: sidebarCollapsedScript + SETTINGS_NAV_PRE_PAINT_SCRIPT,
+					}}
+				/>
 			</head>
 			<body
 				className="bg-bg-white-0 font-sans text-text-strong-950 antialiased"

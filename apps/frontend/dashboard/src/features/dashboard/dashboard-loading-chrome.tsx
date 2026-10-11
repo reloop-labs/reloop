@@ -8,6 +8,8 @@ import { DashboardContentSkeleton } from "./dashboard-content-skeleton";
 import {
 	getActiveMainNav,
 	getAutoExpandedNav,
+	type SettingsNavigationItem,
+	settingsNavigation,
 	visibleMainNavigation,
 } from "./navigation";
 import { PageHeaderSkeleton } from "./page-header/page-header";
@@ -148,6 +150,92 @@ function LoadingSidebarNav() {
 	);
 }
 
+/** Permission-gated rows use the pre-paint `<html>` flags (see settings-nav-cache). */
+function settingsItemVisibility(item: SettingsNavigationItem): string | false {
+	if (item.requiresBilling) return "hidden settings-billing:flex";
+	if (item.requiresOrgAdmin || item.requiresTeamAdmin) {
+		return "hidden settings-org-admin:flex";
+	}
+	return false;
+}
+
+/** Mirrors `SettingsSidebarItems` row-for-row for `/settings/*` loads. */
+function LoadingSettingsNav({ pathWithoutSlug }: { pathWithoutSlug: string }) {
+	return (
+		<div className="relative flex w-full flex-col sidebar-collapsed:items-center">
+			<div className="relative z-10 mb-4 flex h-8 sidebar-collapsed:w-8 w-full items-center justify-start sidebar-collapsed:justify-center gap-2.5 rounded-lg px-2.5 sidebar-collapsed:px-0">
+				<span className="flex min-w-0 items-center gap-2.5 sidebar-collapsed:gap-0">
+					<Icon
+						name="arrow-left"
+						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70"
+					/>
+					<span
+						className={cn(
+							"font-medium text-[13px] text-text-sub-600",
+							EXPANDED_ONLY,
+						)}
+					>
+						Back to app
+					</span>
+				</span>
+			</div>
+
+			{settingsNavigation.map((section, sectionIdx) => (
+				<div
+					key={section.section}
+					className="flex sidebar-collapsed:w-auto w-full flex-col sidebar-collapsed:items-center"
+				>
+					<div
+						className={cn(
+							"px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]",
+							sectionIdx === 0 && "pt-1.5",
+							EXPANDED_ONLY,
+						)}
+					>
+						{section.section}
+					</div>
+					{sectionIdx > 0 ? (
+						<div
+							className={cn(
+								"my-2 h-[1px] w-6 self-center bg-stroke-soft-200",
+								COLLAPSED_ONLY,
+							)}
+						/>
+					) : null}
+					{section.items.map((item) => {
+						const isActive =
+							item.path === "/settings"
+								? pathWithoutSlug === "/settings"
+								: pathWithoutSlug.startsWith(item.path);
+						return (
+							<div
+								key={item.path}
+								className={cn(
+									"relative z-10 flex h-8 w-full items-center justify-start gap-2.5 rounded-lg px-2.5",
+									"sidebar-collapsed:w-8 sidebar-collapsed:justify-center sidebar-collapsed:gap-0 sidebar-collapsed:px-0",
+									isActive && "bg-neutral-alpha-10",
+									settingsItemVisibility(item),
+								)}
+							>
+								<SidebarNavIcon name={item.iconName} isActive={isActive} />
+								<span
+									className={cn(
+										"truncate font-medium text-[13px]",
+										isActive ? "text-text-strong-950" : "text-text-sub-600",
+										EXPANDED_ONLY,
+									)}
+								>
+									{item.label}
+								</span>
+							</div>
+						);
+					})}
+				</div>
+			))}
+		</div>
+	);
+}
+
 /**
  * Static dashboard chrome for route-level and Suspense loading states.
  *
@@ -160,6 +248,11 @@ function LoadingSidebarNav() {
  * because the live shell also hides the rail on mobile.
  */
 export function DashboardLoadingChrome() {
+	const pathname = usePathname() ?? "/";
+	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
+	// Live sidebar swaps to the settings nav on /settings/*; match it.
+	const isSettingsRoute = pathWithoutSlug.startsWith("/settings");
+
 	return (
 		<div className="flex h-screen overflow-hidden bg-bg-white-0 dark:bg-black">
 			<div className="sticky top-0 z-10 hidden h-screen sidebar-collapsed:w-14 w-60 flex-col overflow-hidden border-stroke-soft-100 border-r bg-bg-white-0 lg:flex dark:border-stroke-soft-100/40 dark:bg-black">
@@ -187,7 +280,11 @@ export function DashboardLoadingChrome() {
 					</a>
 				</div>
 				<div className="relative flex-1 overflow-y-auto overflow-x-hidden px-2 sidebar-collapsed:px-0 py-2">
-					<LoadingSidebarNav />
+					{isSettingsRoute ? (
+						<LoadingSettingsNav pathWithoutSlug={pathWithoutSlug} />
+					) : (
+						<LoadingSidebarNav />
+					)}
 				</div>
 				{/* Same footer as the live rail; setup banner is data-driven so it fades in later. */}
 				<div className="mt-auto flex sidebar-collapsed:w-14 w-full shrink-0 flex-col sidebar-collapsed:items-center gap-2 px-2 sidebar-collapsed:px-0 py-3">

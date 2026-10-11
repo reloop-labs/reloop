@@ -1,11 +1,15 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { usePathname } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { filterSettingsNavigation, settingsNavigation } from "../navigation";
+import {
+	readSettingsNavPerms,
+	writeSettingsNavPerms,
+} from "./settings-nav-cache";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavButton, SidebarNavLink } from "./sidebar-nav-link";
 import { useSidebarHoverBox } from "./use-sidebar-hover-box";
@@ -28,17 +32,31 @@ export function SettingsSidebarItems({
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 
-	const { isOrgAdmin, canManageTeam, canManageBilling } = useOrgPermissions();
+	const { isSettled, isOrgAdmin, canManageTeam, canManageBilling } =
+		useOrgPermissions();
+	// Until role + billing resolve, reuse the last-known flags so admin rows
+	// don't pop in (and shift everything below) after the sidebar paints.
+	const [cachedPerms] = useState(readSettingsNavPerms);
+	const perms =
+		!isSettled && cachedPerms
+			? cachedPerms
+			: { isOrgAdmin, canManageTeam, canManageBilling };
+
+	useEffect(() => {
+		if (isSettled) {
+			writeSettingsNavPerms({ isOrgAdmin, canManageTeam, canManageBilling });
+		}
+	}, [isSettled, isOrgAdmin, canManageTeam, canManageBilling]);
 
 	// Members: hide Usage, Billing, Teams, Workspace (profile menu uses the same filter).
 	const filteredSettingsNavigation = useMemo(
 		() =>
 			filterSettingsNavigation(settingsNavigation, {
-				isOrgAdmin,
-				canManageTeam,
-				canManageBilling,
+				isOrgAdmin: perms.isOrgAdmin,
+				canManageTeam: perms.canManageTeam,
+				canManageBilling: perms.canManageBilling,
 			}),
-		[isOrgAdmin, canManageTeam, canManageBilling],
+		[perms.isOrgAdmin, perms.canManageTeam, perms.canManageBilling],
 	);
 	const flatItems = useMemo(() => {
 		const items: (typeof settingsNavigation)[number]["items"][number][] = [];
@@ -90,7 +108,7 @@ export function SettingsSidebarItems({
 				>
 					<Icon
 						name="arrow-left"
-						className="group-hover:-translate-x-0.5 h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-text-strong-950 group-hover:opacity-100"
+						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:-translate-x-0.5 group-hover:text-text-strong-950 group-hover:opacity-100"
 					/>
 					{!isCollapsed && (
 						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950">
