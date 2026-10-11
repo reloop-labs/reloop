@@ -4,7 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Tab = {
 	id: string;
@@ -49,6 +49,16 @@ export function ObservabilitySection() {
 	const [active, setActive] = useState(0);
 	const [autoplay, setAutoplay] = useState(true);
 	const [failed, setFailed] = useState<Record<string, boolean>>({});
+	const tablistRef = useRef<HTMLDivElement>(null);
+
+	// On phones the tabs scroll sideways; keep the active one in view as
+	// autoplay advances without scrolling the page itself.
+	useEffect(() => {
+		const list = tablistRef.current;
+		const tabEl = list?.children[active] as HTMLElement | undefined;
+		if (!list || !tabEl || list.scrollWidth <= list.clientWidth) return;
+		list.scrollTo({ left: tabEl.offsetLeft, behavior: "smooth" });
+	}, [active]);
 
 	useEffect(() => {
 		if (!autoplay) return;
@@ -88,7 +98,8 @@ export function ObservabilitySection() {
 			<div
 				role="tablist"
 				aria-label="Observability views"
-				className="grid grid-cols-3 border-stroke-soft-100 border-b dark:border-white/10"
+				ref={tablistRef}
+				className="flex snap-x snap-mandatory overflow-x-auto border-stroke-soft-100 border-b [scrollbar-width:none] sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible dark:border-white/10 [&::-webkit-scrollbar]:hidden"
 			>
 				{TABS.map((t, index) => {
 					const selected = index === active;
@@ -105,7 +116,7 @@ export function ObservabilitySection() {
 								setAutoplay(false);
 							}}
 							className={cn(
-								"relative flex flex-col items-center gap-2 border-stroke-soft-100 border-r px-2 py-5 text-center transition-colors last:border-r-0 sm:flex-row sm:items-start sm:gap-4 sm:px-8 sm:py-7 sm:text-left lg:px-10 dark:border-white/10",
+								"relative flex w-[78%] shrink-0 snap-start items-start gap-4 border-stroke-soft-100 border-r px-4 py-6 text-left transition-colors last:border-r-0 sm:w-auto sm:px-8 sm:py-7 lg:px-10 dark:border-white/10",
 								selected
 									? "bg-bg-white-0 dark:bg-black"
 									: "bg-bg-white-0 hover:bg-bg-weak-50 dark:bg-black dark:hover:bg-white/[0.03]",
@@ -113,7 +124,7 @@ export function ObservabilitySection() {
 						>
 							<span
 								className={cn(
-									"flex size-9 shrink-0 items-center justify-center rounded-xl border shadow-xs transition-colors sm:size-11",
+									"flex size-10 shrink-0 items-center justify-center rounded-xl border shadow-xs transition-colors sm:size-11",
 									selected
 										? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 dark:border-white/10 dark:bg-white/[0.06] dark:text-white"
 										: "border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-white/50",
@@ -124,7 +135,7 @@ export function ObservabilitySection() {
 							<span className="flex min-w-0 flex-col gap-1">
 								<span
 									className={cn(
-										"whitespace-nowrap font-semibold text-[13px] sm:text-[17px]",
+										"font-semibold text-[15px] sm:text-[17px]",
 										selected
 											? "text-text-strong-950 dark:text-white"
 											: "text-text-sub-600 dark:text-white/50",
@@ -132,7 +143,7 @@ export function ObservabilitySection() {
 								>
 									{t.label}
 								</span>
-								<span className="hidden text-[13px] text-text-sub-600 leading-relaxed sm:line-clamp-2 sm:text-[14px] dark:text-white/50">
+								<span className="line-clamp-2 text-[13px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/50">
 									{t.description}
 								</span>
 							</span>
@@ -162,14 +173,12 @@ export function ObservabilitySection() {
 				id="observability-panel"
 				role="tabpanel"
 				aria-labelledby={`observability-tab-${tab.id}`}
-				className="relative w-full overflow-hidden bg-gradient-to-t from-orange-100 via-amber-50 to-bg-white-0 pt-6 pb-6 pl-4 sm:px-10 sm:pt-10 sm:pb-10 lg:px-14 lg:pt-14 lg:pb-14 dark:from-orange-950/40 dark:via-orange-950/10 dark:to-black"
+				className="relative w-full overflow-hidden bg-gradient-to-t from-orange-100 via-amber-50 to-bg-white-0 px-4 pt-6 pb-6 sm:px-10 sm:pt-10 sm:pb-10 lg:px-14 lg:pt-14 lg:pb-14 dark:from-orange-950/40 dark:via-orange-950/10 dark:to-black"
 			>
-				<div className="relative w-full overflow-hidden rounded-l-xl border border-stroke-soft-100 border-r-0 bg-bg-white-0 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.35)] sm:rounded-2xl sm:border-r dark:border-white/10 dark:bg-black dark:shadow-black/60">
-					{/* Full-height screenshot. On phones it renders wider than the
-					    frame so the dashboard stays legible and runs off the right. */}
-					<div className="relative aspect-[2794/1924] w-[760px] sm:w-full">
+				<div className="relative w-full overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.35)] sm:rounded-2xl dark:border-white/10 dark:bg-black dark:shadow-black/60">
+					<div className="relative aspect-[2794/1924] w-full">
 						{failed[tab.id] ? (
-							<div className="absolute inset-0 flex max-w-[calc(100vw-1rem)] flex-col items-center justify-center gap-2 text-text-soft-400 sm:max-w-none dark:text-white/30">
+							<div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-text-soft-400 dark:text-white/30">
 								<Icon name={tab.icon} className="size-6" aria-hidden />
 								<span className="text-[13px]">{tab.label}</span>
 							</div>
@@ -181,7 +190,7 @@ export function ObservabilitySection() {
 									alt={`${tab.label} in the Reloop dashboard`}
 									fill
 									className="object-cover object-top-left dark:hidden"
-									sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
+									sizes="(min-width: 1280px) 1200px, 100vw"
 									onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
 								/>
 								<Image
@@ -190,7 +199,7 @@ export function ObservabilitySection() {
 									alt=""
 									fill
 									className="hidden object-cover object-top-left dark:block"
-									sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
+									sizes="(min-width: 1280px) 1200px, 100vw"
 									onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
 								/>
 							</>

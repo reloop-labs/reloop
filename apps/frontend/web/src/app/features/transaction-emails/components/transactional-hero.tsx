@@ -50,16 +50,14 @@ export function TransactionalHero() {
 							aria-hidden
 							className={`absolute inset-0 bg-gradient-to-t ${TAB_GRADIENTS.email}`}
 						/>
-						<div className="relative w-full pt-6 pb-6 pl-4 sm:px-10 sm:pt-10 sm:pb-10">
-							<div className="relative w-full overflow-hidden rounded-l-xl border border-stroke-soft-100 border-r-0 bg-bg-white-0 sm:rounded-2xl sm:border-r dark:border-white/10 dark:bg-black">
-								{/* Full-height screenshot. On phones it renders wider than the
-								    frame so the dashboard stays legible and runs off the right. */}
-								<div className="relative aspect-[2794/1924] w-[760px] sm:w-full">
+						<div className="relative w-full px-4 pt-6 pb-6 sm:px-10 sm:pt-10 sm:pb-10">
+							<div className="relative w-full overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 sm:rounded-2xl dark:border-white/10 dark:bg-black">
+								<div className="relative aspect-[2794/1924] w-full">
 									<Image
 										src={shot.src}
 										alt={PLATFORM_ALT.email}
 										fill
-										sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
+										sizes="(min-width: 1280px) 1200px, 100vw"
 										className="object-cover object-top-left dark:hidden"
 										preload
 										draggable={false}
@@ -69,7 +67,7 @@ export function TransactionalHero() {
 										alt=""
 										aria-hidden
 										fill
-										sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
+										sizes="(min-width: 1280px) 1200px, 100vw"
 										className="hidden object-cover object-top-left dark:block"
 										loading="eager"
 										draggable={false}
