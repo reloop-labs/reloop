@@ -20,7 +20,8 @@ const TABS: Tab[] = [
 		id: "email",
 		label: "Email details",
 		icon: "mail-single",
-		description: "Track every message from sent to clicked.",
+		description:
+			"Track every message from sent to delivered, opened, and clicked.",
 		light: "/platform/observability/email-light.png",
 		dark: "/platform/observability/email-dark.png",
 	},

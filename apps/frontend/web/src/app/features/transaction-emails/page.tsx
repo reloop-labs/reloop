@@ -11,6 +11,7 @@ import {
 	transactionalFaq,
 } from "./components/transactional-faq";
 import { TransactionalHero } from "./components/transactional-hero";
+import { UseCasesSection } from "./components/use-cases-section";
 
 const TransactionEmailsPage = () => {
 	return (
@@ -42,6 +43,8 @@ const TransactionEmailsPage = () => {
 				<ConnectServicesSection />
 				<SectionSeparator />
 				<ObservabilitySection />
+				<SectionSeparator />
+				<UseCasesSection />
 				<SectionSeparator />
 				<TransactionalFaq />
 				<SectionSeparator />

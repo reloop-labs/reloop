@@ -12,10 +12,14 @@ const EMAIL_RENDER_WIDTH = 600;
 /** Soft inset so the email sits in a padded stage, like the dashboard grid. */
 const PAPER_INSET = 16;
 
-const previewCardClassName =
+export const previewCardClassName =
 	"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]";
 
-function TemplatePreview({ template }: { template: EmailTemplateExample }) {
+export function TemplatePreview({
+	template,
+}: {
+	template: EmailTemplateExample;
+}) {
 	const paperRef = useRef<HTMLDivElement>(null);
 	const [scale, setScale] = useState(0);
 	const [srcDoc, setSrcDoc] = useState<string | null>(null);

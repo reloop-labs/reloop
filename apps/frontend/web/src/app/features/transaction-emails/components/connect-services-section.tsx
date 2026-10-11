@@ -46,7 +46,13 @@ const SERVICES: Service[] = [
 	{ label: "Vercel", href: "/docs/integrations/vercel", icon: siVercel },
 ];
 
-function ServiceTile({ service }: { service: Service }) {
+function ServiceTile({
+	service,
+	hidden,
+}: {
+	service: Service;
+	hidden?: boolean;
+}) {
 	// Near-black brands (Vercel, Ghost, Make) use the text color so they stay
 	// visible in dark mode.
 	const dark = isDarkBrandColor(service.icon.hex);
@@ -54,12 +60,9 @@ function ServiceTile({ service }: { service: Service }) {
 	return (
 		<a
 			href={service.href}
-			className="group relative flex aspect-square bg-bg-white-0 transition-colors duration-200 hover:z-10 dark:bg-black"
+			tabIndex={hidden ? -1 : undefined}
+			className="group relative flex size-full bg-bg-white-0 transition-colors duration-200 hover:z-10 dark:bg-black"
 		>
-			<span
-				aria-hidden
-				className="absolute inset-0 opacity-0 shadow-2xl shadow-indigo-900/15 duration-200 group-hover:opacity-100 dark:shadow-black/60"
-			/>
 			<svg
 				viewBox="0 0 24 24"
 				aria-hidden
@@ -85,8 +88,13 @@ export function ConnectServicesSection() {
 		<section
 			id="connect-services"
 			aria-labelledby="connect-services-heading"
-			className="w-full bg-bg-white-0 dark:bg-black"
+			className="w-full overflow-hidden bg-bg-white-0 dark:bg-black"
 		>
+			<style>
+				{
+					"@keyframes connect-services-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }"
+				}
+			</style>
 			<div className="border-stroke-soft-100 border-b px-4 py-16 text-center sm:px-8 sm:py-20 lg:px-12 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
 					<Icon name="clock" className="size-3.5" aria-hidden />
@@ -104,10 +112,21 @@ export function ConnectServicesSection() {
 				</p>
 			</div>
 
-			<div className="grid grid-cols-3 gap-px bg-stroke-soft-100 sm:grid-cols-4 lg:grid-cols-6 dark:bg-white/10">
-				{SERVICES.map((service) => (
-					<ServiceTile key={service.label} service={service} />
-				))}
+			<div className="overflow-hidden">
+				<ul
+					aria-label="Services that work with Reloop"
+					className="flex w-max animate-[connect-services-marquee_60s_linear_infinite] divide-x divide-stroke-soft-100 motion-reduce:animate-none dark:divide-white/10 hover:[animation-play-state:paused]"
+				>
+					{[...SERVICES, ...SERVICES].map((service, i) => (
+						<li
+							key={`${service.label}-${i}`}
+							aria-hidden={i >= SERVICES.length}
+							className="size-36 shrink-0 sm:size-44"
+						>
+							<ServiceTile service={service} hidden={i >= SERVICES.length} />
+						</li>
+					))}
+				</ul>
 			</div>
 		</section>
 	);
