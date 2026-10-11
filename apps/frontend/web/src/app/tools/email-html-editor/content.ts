@@ -4,9 +4,9 @@ export const toolPath = "/tools/email-html-editor";
 export const toolTitle = "Email HTML Editor";
 export const metaTitle = "Free Email HTML Editor";
 export const metaDescription =
-	"Paste React Email or raw HTML, see it on a visual canvas, tweak styles in inspect, and flip to source. Same editor loop as Reloop Templates. No account, no save, no send.";
+	"Open a free email template on a visual canvas, tweak styles in the inspector, add variables, and flip to the HTML source. Same editor as Reloop Templates. No account, no save, no send.";
 export const toolDescription =
-	"Paste a full email HTML document. The canvas reconstructs it so you can inspect spacing and type, then open source and see the same markup.";
+	"Pick a template to open it on the canvas. Edit styles, add variables, and flip to the HTML source. Nothing leaves your browser.";
 
 export const toolKeywords = [
 	"email HTML editor",
@@ -19,9 +19,9 @@ export const toolKeywords = [
 export const reasons = [
 	{
 		icon: "code" as const,
-		title: "Paste, don’t rebuild",
+		title: "Start from a template",
 		description:
-			"Drop in React Email or table-based HTML. The canvas keeps the column, images, and buttons instead of flattening the layout.",
+			"Open a ready-made email on the canvas. Columns, images, and buttons stay editable blocks, and you can paste your own HTML over it.",
 	},
 	{
 		icon: "settings" as const,
@@ -33,7 +33,7 @@ export const reasons = [
 		icon: "layout" as const,
 		title: "Source stays in sync",
 		description:
-			"Flip to <>. Canvas typing and inspect writes compose back into the HTML. Edit source and the canvas updates.",
+			"Flip to code. Canvas typing and inspect writes compose back into the HTML. Edit source and the canvas updates.",
 	},
 	{
 		icon: "lock" as const,
@@ -52,12 +52,12 @@ export const faqs: FaqItem[] = [
 	{
 		question: "Is this the same as Reloop Templates?",
 		answer:
-			"The paste cleanup, canvas, and inspect loop are the same idea as the Templates editor. This page does not include save, variables, history, publish, or collaboration.",
+			"The canvas, inspector, variables, and code view are the same as the Templates editor. This page does not include save, history, publish, send, or collaboration.",
 	},
 	{
 		question: "Will inspect change the source?",
 		answer:
-			"Yes. After you tweak a block or type on the canvas, opening <> shows the composed HTML. Editing source updates the canvas.",
+			"Yes. After you tweak a block or type on the canvas, the code view shows the composed HTML. Editing source updates the canvas.",
 	},
 	{
 		question: "Is there an API?",

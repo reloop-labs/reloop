@@ -132,7 +132,17 @@ export function ScrubField({
 		step,
 	);
 	const [draft, setDraft] = useState<string | null>(null);
+	const [focused, setFocused] = useState(false);
 	const display = draft ?? (numeric !== null ? String(numeric) : "");
+
+	// Reset stale drafts when selection changes elsewhere (e.g. new node selected).
+	const prevValueRef = useRef<string | number | undefined>(value);
+	if (prevValueRef.current !== value) {
+		prevValueRef.current = value;
+		if (!focused && draft !== null) {
+			setDraft(null);
+		}
+	}
 
 	return (
 		<div
@@ -162,6 +172,7 @@ export function ScrubField({
 				placeholder={placeholder}
 				aria-label={`${label} value`}
 				onFocus={() => {
+					setFocused(true);
 					setDraft(numeric !== null ? String(numeric) : "");
 				}}
 				onChange={(e) => {
@@ -174,6 +185,7 @@ export function ScrubField({
 					if (!Number.isNaN(n)) onChange(n);
 				}}
 				onBlur={() => {
+					setFocused(false);
 					setDraft(null);
 					if (numeric === null) return;
 					onChange(clamp(numeric));

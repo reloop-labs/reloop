@@ -1,12 +1,30 @@
 "use client";
 
 import { Inspector } from "@react-email/editor/ui";
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import { useEditorStore } from "@reloop/web/lib/email-html-editor/hooks/use-editor-store";
+import {
+	formatTemplateVariable,
+	mapTemplateVariables,
+	normalizeTemplateVariableName,
+} from "@reloop/web/lib/email-html-editor/lib/template-variables";
+import {
+	UNSUBSCRIBE_HREF_PLACEHOLDER,
+	unsubscribeLinkTitle,
+} from "@reloop/web/lib/email-html-editor/lib/unsubscribe-link";
+import { getMarkRange } from "@tiptap/core";
 import { useCurrentEditor, useEditorState } from "@tiptap/react";
-import type React from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { DeleteTemplateVariableModal } from "../components/panels/variables/delete-variable-modal";
 import {
 	cssHasPaintedBackground,
 	cssPaintedBackgroundValue,
-} from "../preserve-email-link-underlines";
+} from "../utils/preserve-email-link-underlines";
 import {
 	applySelectionFontColor,
 	applyTextAlignment,
@@ -19,15 +37,17 @@ import {
 	getSelectionFontColor,
 	getSelectionMarkColor,
 	getThemeColorFallback,
-	type InspectorTextStyleProp,
 	normalizeColorToHex,
+	normalizeFontWeightDisplay,
 	numericPxFromCss,
 	resolveInspectorTextStyle,
 	setInlineCssDeclaration,
 	setInlineCssProp,
-} from "../resolve-inspector-text-style";
+} from "../utils/resolve-inspector-text-style";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
+import { FontFamilySelect } from "./font-family-select";
+import { FontWeightSelect } from "./font-weight-select";
 import { ImageSrcControl } from "./image-src-control";
 import { PropRow } from "./prop-row";
 import { ScrubRow } from "./scrub-field";
@@ -38,6 +58,105 @@ import { ToggleSwitch } from "./toggle-switch";
 import { AlignControls } from "./typography/align-controls";
 import { TypographyControls } from "./typography/typography-controls";
 import { UrlInput } from "./url-input";
+
+const TYPE_OPTIONS = [
+	{
+		value: "string" as const,
+		label: "String",
+		description: "Plain text, name, email, etc.",
+		icon: "type",
+		color: "text-blue-500",
+		badgeColor: "blue" as const,
+	},
+	{
+		value: "number" as const,
+		label: "Number",
+		description: "Integers, decimals, prices, etc.",
+		icon: "hash",
+		color: "text-purple-500",
+		badgeColor: "purple" as const,
+	},
+];
+
+/* ------------------------------------------------------------------ */
+/* Shared section wrapper                                              */
+/* ------------------------------------------------------------------ */
+function UnsubscribeLinkInspector() {
+	const { editor } = useCurrentEditor();
+	const isActive = Boolean(editor?.isActive("unsubscribeLink"));
+	const markType = editor?.state.schema.marks.unsubscribeLink;
+	const range =
+		editor && markType
+			? getMarkRange(editor.state.selection.$from, markType)
+			: null;
+	const currentTitle = range
+		? editor?.state.doc.textBetween(range.from, range.to)
+		: unsubscribeLinkTitle();
+	const [title, setTitle] = useState(currentTitle ?? "");
+
+	useEffect(() => {
+		setTitle(currentTitle ?? "");
+	}, [currentTitle]);
+
+	if (!editor || !isActive) return null;
+
+	const commitTitle = () => {
+		if (!range) return;
+		const next = unsubscribeLinkTitle(title);
+		if (next === currentTitle) return;
+		editor
+			.chain()
+			.focus()
+			.insertContentAt(
+				{ from: range.from, to: range.to },
+				{
+					type: "text",
+					text: next,
+					marks: [
+						{
+							type: "unsubscribeLink",
+							attrs: { href: UNSUBSCRIBE_HREF_PLACEHOLDER },
+						},
+					],
+				},
+			)
+			.run();
+	};
+
+	return (
+		<InspectorSection>
+			<SectionHeader label="Unsubscribe link" />
+			<PropRow label="Title">
+				<Input.Root size="small" className="w-full">
+					<Input.Wrapper>
+						<Input.Input
+							value={title}
+							onChange={(event) => setTitle(event.target.value)}
+							onBlur={commitTitle}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") {
+									event.preventDefault();
+									commitTitle();
+									(event.target as HTMLElement).blur();
+								}
+							}}
+							placeholder="Unsubscribe"
+						/>
+					</Input.Wrapper>
+				</Input.Root>
+			</PropRow>
+			<PropRow label="Link">
+				<span className="truncate font-mono text-text-sub-600 text-xs">
+					{UNSUBSCRIBE_HREF_PLACEHOLDER}
+				</span>
+			</PropRow>
+			<p className="px-4 text-text-soft-400 text-xs leading-normal">
+				The title is the clickable text. Underline, bold, and color it like any
+				other link.
+			</p>
+		</InspectorSection>
+	);
+}
 
 function InspectorSection({ children }: { children: React.ReactNode }) {
 	return <div className="flex flex-col py-2">{children}</div>;
@@ -59,6 +178,263 @@ function ColorRow({
 			</div>
 		</PropRow>
 	);
+}
+
+function TemplateVariableInspectorCard({ name }: { name: string }) {
+	const { editor } = useCurrentEditor();
+
+	// Variables live in the browser-only tool store.
+	const templateVariables = mapTemplateVariables(
+		useEditorStore((s) => s.variables),
+	);
+	const upsertVariable = useEditorStore((s) => s.upsertVariable);
+	const removeVariable = useEditorStore((s) => s.removeVariable);
+	const normalizedTarget = normalizeTemplateVariableName(name);
+	const matchedVar = templateVariables.find(
+		(v) => normalizeTemplateVariableName(v.name) === normalizedTarget,
+	);
+
+	const varType = matchedVar?.type ?? "string";
+	const defaultValue = matchedVar?.defaultValue ?? "";
+
+	const [localType, setLocalType] = useState(varType);
+	const [localDefaultValue, setLocalDefaultValue] = useState(defaultValue);
+
+	const [isSaving, setIsSaving] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
+
+	// Synchronize local state when selection changes
+	useEffect(() => {
+		setLocalType(varType);
+		setLocalDefaultValue(defaultValue);
+	}, [varType, defaultValue]);
+
+	const handleSave = async () => {
+		setIsSaving(true);
+		try {
+			// Capture the selection before mutation
+			const selectionRange = editor
+				? { from: editor.state.selection.from, to: editor.state.selection.to }
+				: null;
+
+			const updatedVar = {
+				name,
+				type: localType,
+				defaultValue: localDefaultValue,
+			};
+			upsertVariable(updatedVar, matchedVar?.name);
+			toast.success("Saved variable properties");
+
+			// Restore selection and focus to keep the inspector open on this variable node
+			if (editor && selectionRange) {
+				editor.commands.focus();
+				const { tr, doc } = editor.state;
+				try {
+					const SelectionClass = editor.state.selection.constructor as any;
+					const selection = SelectionClass.create(
+						doc,
+						selectionRange.from,
+						selectionRange.to,
+					);
+					tr.setSelection(selection);
+					editor.view.dispatch(tr);
+				} catch (err) {
+					console.warn("Failed to restore exact selection:", err);
+				}
+			}
+		} catch (error: any) {
+			console.error("Error saving variable config:", error);
+			toast.error(error.message || "Failed to update variable properties");
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleDelete = async () => {
+		setIsDeleting(true);
+		try {
+			removeVariable(matchedVar?.name ?? name);
+			toast.success(`Deleted variable ${name}`);
+
+			// Delete the active variable node in the editor
+			if (editor) {
+				editor.commands.deleteSelection();
+			}
+		} catch (error: any) {
+			toast.error(error.message || "Failed to delete variable");
+		} finally {
+			setIsDeleting(false);
+		}
+	};
+
+	return (
+		<InspectorSection>
+			<div className="flex flex-col gap-4 px-4 py-2">
+				{/* ── Name (Read-only reference) ── */}
+				<div className="flex flex-col gap-1">
+					<div className="select-all font-mono font-semibold text-text-strong-950">
+						{formatTemplateVariable(name, 3)}
+					</div>
+				</div>
+
+				{/* ── Type picker cards ── */}
+				<div className="flex flex-col gap-2">
+					<div className="grid grid-cols-2 gap-2">
+						{TYPE_OPTIONS.map((opt) => {
+							const isSelected = localType === opt.value;
+							return (
+								<motion.button
+									whileTap={{ scale: 0.98 }}
+									key={opt.value}
+									type="button"
+									onClick={() => {
+										setLocalType(opt.value);
+									}}
+									className={cn(
+										"flex cursor-pointer flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
+										isSelected
+											? "border-primary-base bg-primary-light/10"
+											: "border-stroke-soft-200 bg-bg-soft-200/20 hover:border-stroke-soft-300 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
+									)}
+								>
+									<div className="flex w-full justify-between">
+										<div
+											className={cn(
+												"flex h-6 w-6 items-center justify-center rounded-lg border",
+												isSelected
+													? "border-primary-base/30 bg-primary-light/20"
+													: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40",
+											)}
+										>
+											<Icon
+												name={opt.icon as Parameters<typeof Icon>[0]["name"]}
+												className={cn(
+													"h-3 w-3",
+													isSelected ? opt.color : "text-text-sub-600",
+												)}
+											/>
+										</div>
+										<AnimatePresence>
+											{isSelected && (
+												<motion.div
+													initial={{ scale: 0, opacity: 0 }}
+													animate={{ scale: 1, opacity: 1 }}
+													exit={{ scale: 0, opacity: 0 }}
+													transition={{
+														type: "spring",
+														stiffness: 500,
+														damping: 30,
+													}}
+													className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary-base"
+												>
+													<Icon name="check" className="h-2 w-2 text-white" />
+												</motion.div>
+											)}
+										</AnimatePresence>
+									</div>
+									<div>
+										<p className="font-semibold text-text-strong-950 text-xs">
+											{opt.label}
+										</p>
+										<p className="text-[10px] text-text-sub-600 leading-tight">
+											{opt.description}
+										</p>
+									</div>
+								</motion.button>
+							);
+						})}
+					</div>
+				</div>
+
+				{/* ── Default Value ── */}
+				<div className="flex flex-col gap-1.5">
+					<label
+						htmlFor="variable-default-value"
+						className="font-semibold text-text-sub-600 text-xs"
+					>
+						Default Value
+					</label>
+					<Input.Root size="small" className="rounded-xl">
+						<Input.Wrapper>
+							<Input.Input
+								id="variable-default-value"
+								type="text"
+								value={localDefaultValue}
+								onChange={(e) => {
+									const val = e.target.value;
+									if (localType === "number") {
+										if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+											setLocalDefaultValue(val);
+										}
+									} else {
+										setLocalDefaultValue(val);
+									}
+								}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										handleSave();
+										(e.target as HTMLElement).blur();
+									}
+								}}
+								placeholder={
+									localType === "number" ? "e.g., 0" : "e.g., unknown"
+								}
+								inputMode={localType === "number" ? "numeric" : "text"}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+					<p className="text-text-sub-600 text-xs leading-normal">
+						Used when a contact doesn&apos;t have this variable set
+					</p>
+				</div>
+
+				{/* ── Actions ── */}
+				<div className="mt-4 flex items-center justify-end gap-2">
+					<Button.Root
+						type="button"
+						variant="error"
+						mode="lighter"
+						size="small"
+						onClick={() => setIsDeleteModalOpen(true)}
+						disabled={isSaving || isDeleting}
+						className="justify-center rounded-xl py-2"
+					>
+						Delete
+					</Button.Root>
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="filled"
+						size="small"
+						onClick={handleSave}
+						disabled={
+							isSaving ||
+							isDeleting ||
+							(localType === varType && localDefaultValue === defaultValue)
+						}
+						className="w-32 justify-center rounded-xl"
+					>
+						{isSaving ? "Saving..." : "Save"}
+					</Button.Root>
+				</div>
+			</div>
+
+			<DeleteTemplateVariableModal
+				isOpen={isDeleteModalOpen}
+				onClose={() => setIsDeleteModalOpen(false)}
+				variableName={name}
+				variableType={varType}
+				defaultValue={defaultValue}
+				onConfirm={handleDelete}
+				isSubmitting={isDeleting}
+			/>
+		</InspectorSection>
+	);
+}
+
+function VariableInspectorCard({ name }: { name: string }) {
+	return <TemplateVariableInspectorCard name={name} />;
 }
 
 type InspectorStyleProperty = any;
@@ -96,6 +472,7 @@ function TextSection({
 	const selectionColor =
 		useEditorState({
 			editor,
+			// emailFontColor mark first, then any other color-carrying mark.
 			selector: ({ editor: ed }) =>
 				getSelectionFontColor(ed) || getSelectionMarkColor(ed),
 		}) ?? "";
@@ -121,7 +498,7 @@ function TextSection({
 	): string | number | undefined => {
 		if (name === "color" && selectionColor) return selectionColor;
 		const direct = resolveInspectorTextStyle({
-			prop: name as InspectorTextStyleProp,
+			prop: name,
 			parentValue: getStyle(name),
 			linkCss: linkCss || undefined,
 		});
@@ -144,11 +521,14 @@ function TextSection({
 			name === "color" ||
 			name === "fontSize" ||
 			name === "lineHeight" ||
-			name === "letterSpacing"
+			name === "letterSpacing" ||
+			name === "fontFamily" ||
+			name === "fontWeight"
 		) {
 			const raw = rawEffectiveStyle(name);
 			if (raw === undefined || raw === "") return raw;
 			if (name === "color") return normalizeColorToHex(raw);
+			if (name === "fontWeight") return normalizeFontWeightDisplay(raw);
 			if (name === "lineHeight") {
 				const fontSizePx = fontSizePxFromRaw(rawEffectiveStyle("fontSize"));
 				return displayLineHeightPercent(raw, fontSizePx);
@@ -162,6 +542,8 @@ function TextSection({
 		name: InspectorStyleProperty,
 		value: string | number,
 	) => {
+		// Standardize on hex for colors; updateParentBlockStyle has no unit
+		// mapping for letterSpacing, so pass px explicitly.
 		const normalizedValue =
 			name === "color"
 				? String(value).trim() === ""
@@ -170,7 +552,6 @@ function TextSection({
 				: name === "letterSpacing" && typeof value === "number"
 					? `${value}px`
 					: value;
-
 		if (
 			name === "color" &&
 			editor &&
@@ -184,7 +565,9 @@ function TextSection({
 			(name === "color" ||
 				name === "fontSize" ||
 				name === "lineHeight" ||
-				name === "letterSpacing")
+				name === "letterSpacing" ||
+				name === "fontFamily" ||
+				name === "fontWeight")
 		) {
 			const next = setInlineCssProp(linkCss, name, normalizedValue);
 			editor
@@ -225,19 +608,27 @@ function TextSection({
 	return (
 		<InspectorSection>
 			<SectionHeader label="Text" />
-
-			{showLinkFill && (
-				<ColorRow
-					label="Background"
-					value={filledLinkBackground}
-					onChange={setLinkBackground}
-				/>
-			)}
 			<ColorRow
 				label="Color"
 				value={String(resolvedGetStyle("color") ?? "")}
 				onChange={(v) => resolvedSetStyle("color", v)}
 			/>
+			<PropRow label="Font">
+				<div className="w-36">
+					<FontFamilySelect
+						value={String(resolvedGetStyle("fontFamily") ?? "")}
+						onChange={(v) => resolvedSetStyle("fontFamily", v)}
+					/>
+				</div>
+			</PropRow>
+			<PropRow label="Weight">
+				<div className="w-36">
+					<FontWeightSelect
+						value={String(resolvedGetStyle("fontWeight") ?? "")}
+						onChange={(v) => resolvedSetStyle("fontWeight", v)}
+					/>
+				</div>
+			</PropRow>
 			<ScrubRow
 				label="Font size"
 				value={resolvedGetStyle("fontSize")}
@@ -604,6 +995,8 @@ function InspectorNodeStyles({
 										}
 
 										if (align) {
+											// Image schema uses `alignment`; also sync legacy `align`
+											// attr + centering margins so canvas + export stay in sync.
 											setAttr("alignment", align);
 											setAttr("align", align);
 											if (align === "center") {
@@ -635,6 +1028,7 @@ function InspectorNodeStyles({
 
 										batchSetStyle(styleChanges);
 
+										// Synchronously commit via nodeEditor to guarantee atomic update across attrs + style
 										if (nodeEditor && nodePos?.pos !== undefined) {
 											const currentNode = nodeEditor.state.doc.nodeAt(
 												nodePos.pos,
@@ -698,7 +1092,7 @@ function InspectorNodeStyles({
 														nextStyle = setInlineCssDeclaration(
 															nextStyle,
 															"marginRight",
-															"auto",
+															"0px",
 														);
 													} else {
 														nextStyle = setInlineCssDeclaration(
@@ -740,27 +1134,25 @@ function InspectorNodeStyles({
 						</InspectorSection>
 					);
 				})()}
-			{nodeType !== "image" && (
-				<InspectorSection>
-					<SectionHeader label="Spacing" />
-					<SpacingControl
-						value={{
-							top: pad("paddingTop"),
-							right: pad("paddingRight"),
-							bottom: pad("paddingBottom"),
-							left: pad("paddingLeft"),
-						}}
-						onChange={({ top, right, bottom, left }) =>
-							applyBox([
-								{ prop: "paddingTop", value: top as number },
-								{ prop: "paddingRight", value: right as number },
-								{ prop: "paddingBottom", value: bottom as number },
-								{ prop: "paddingLeft", value: left as number },
-							])
-						}
-					/>
-				</InspectorSection>
-			)}
+			<InspectorSection>
+				<SectionHeader label="Spacing" />
+				<SpacingControl
+					value={{
+						top: pad("paddingTop"),
+						right: pad("paddingRight"),
+						bottom: pad("paddingBottom"),
+						left: pad("paddingLeft"),
+					}}
+					onChange={({ top, right, bottom, left }) =>
+						applyBox([
+							{ prop: "paddingTop", value: top as number },
+							{ prop: "paddingRight", value: right as number },
+							{ prop: "paddingBottom", value: bottom as number },
+							{ prop: "paddingLeft", value: left as number },
+						])
+					}
+				/>
+			</InspectorSection>
 			{nodeType === "button" &&
 				(() => {
 					const nodeAtPos = nodePos
@@ -815,6 +1207,7 @@ function InspectorNodeStyles({
 										getAttr("alignment") ?? getAttr("align") ?? "left",
 									)}
 									setAlignment={(align) => {
+										// Button schema uses `alignment`; sync legacy `align` too.
 										setAttr("alignment", align);
 										setAttr("align", align);
 									}}
@@ -921,8 +1314,31 @@ function InspectorNodeStyles({
 					}
 					onChange={(v) => {
 						const hex = v.trim() === "" ? "" : normalizeColorToHex(v) || v;
-						if (box.filled) box.write([{ prop: "borderColor", value: hex }]);
-						else setStyle("borderColor", hex);
+						if (box.filled) {
+							box.write([
+								{ prop: "borderColor", value: hex },
+								{ prop: "borderTopColor", value: hex },
+								{ prop: "borderRightColor", value: hex },
+								{ prop: "borderBottomColor", value: hex },
+								{ prop: "borderLeftColor", value: hex },
+							]);
+						} else if (hex) {
+							batchSetStyle([
+								{ prop: "borderColor", value: hex },
+								{ prop: "borderTopColor", value: hex },
+								{ prop: "borderRightColor", value: hex },
+								{ prop: "borderBottomColor", value: hex },
+								{ prop: "borderLeftColor", value: hex },
+							]);
+						} else {
+							batchSetStyle([
+								{ prop: "borderColor", value: "" },
+								{ prop: "borderTopColor", value: "" },
+								{ prop: "borderRightColor", value: "" },
+								{ prop: "borderBottomColor", value: "" },
+								{ prop: "borderLeftColor", value: "" },
+							]);
+						}
 					}}
 				/>
 			</InspectorSection>
@@ -954,9 +1370,26 @@ export const EmailInspector = () => {
 
 			{/* ── All sections in one flat scroll container ── */}
 			<div className="flex flex-col divide-y divide-stroke-soft-100 pb-6">
+				<UnsubscribeLinkInspector />
 				{/* ── Text card (Handles both text selection and node selection) ── */}
 				<Inspector.Text>
-					{(textProps) => <TextSection {...textProps} />}
+					{(textProps) => (
+						<>
+							<TextSection {...textProps} />
+							<InspectorNodeStyles
+								nodeType="paragraph"
+								getStyle={textProps.getStyle}
+								setStyle={textProps.setStyle}
+								batchSetStyle={(changes) => {
+									for (const change of changes) {
+										textProps.setStyle(change.prop, change.value);
+									}
+								}}
+								getAttr={() => undefined}
+								setAttr={() => {}}
+							/>
+						</>
+					)}
 				</Inspector.Text>
 
 				<Inspector.Node>
@@ -987,20 +1420,25 @@ export const EmailInspector = () => {
 							if (editor && applyTextAlignment(editor, align)) {
 								return;
 							}
+							// Fallback: sync both attr spellings + inline text-align style.
 							nodeProps.setAttr("alignment", align);
 							nodeProps.setAttr("align", align);
 							(nodeProps.setStyle as any)("textAlign", align);
 						};
 
-						const isLinkActive = editor.isActive("link");
+						const linkMark = editor.isActive("unsubscribeLink")
+							? "unsubscribeLink"
+							: "link";
+						const isLinkActive =
+							editor.isActive("link") || editor.isActive("unsubscribeLink");
 						const linkColor =
-							(editor.getAttributes("link").color as string) || "";
+							(editor.getAttributes(linkMark).color as string) || "";
 						const setLinkColor = (color: string) =>
 							editor
 								.chain()
 								.focus()
-								.extendMarkRange("link")
-								.updateAttributes("link", { color })
+								.extendMarkRange(linkMark)
+								.updateAttributes(linkMark, { color })
 								.run();
 
 						return (
@@ -1016,6 +1454,15 @@ export const EmailInspector = () => {
 								showLists={nodeProps.nodeType !== "button"}
 							/>
 						);
+					}}
+				</Inspector.Node>
+
+				{/* ── Variable Properties inspector card ── */}
+				<Inspector.Node>
+					{({ nodeType, getAttr }) => {
+						if (nodeType !== "variable") return null;
+						const name = (getAttr("name") as string) || "";
+						return <VariableInspectorCard name={name} />;
 					}}
 				</Inspector.Node>
 
@@ -1041,38 +1488,42 @@ export const EmailInspector = () => {
 								property,
 								(v.trim() === "" ? v : normalizeColorToHex(v) || v) as never,
 							);
-
 						return (
 							<>
 								<InspectorSection>
 									<ColorRow
 										label="Background"
-										value={String(
-											findStyleValue("body", "backgroundColor") ?? "",
+										value={normalizeColorToHex(
+											String(findStyleValue("body", "backgroundColor") ?? ""),
 										)}
 										onChange={(v) =>
 											setColorGlobal("body", "backgroundColor", v)
 										}
 									/>
 									<SpacingControl
+										key={`body-padding-${String(findStyleValue("body", "paddingTop") ?? "")}-${String(findStyleValue("body", "padding") ?? "")}`}
 										label="Padding"
 										value={{
-											top:
-												(findStyleValue("body", "paddingTop") as number) ??
-												(findStyleValue("body", "padding") as number) ??
-												"",
-											right:
-												(findStyleValue("body", "paddingRight") as number) ??
-												(findStyleValue("body", "padding") as number) ??
-												"",
-											bottom:
-												(findStyleValue("body", "paddingBottom") as number) ??
-												(findStyleValue("body", "padding") as number) ??
-												"",
-											left:
-												(findStyleValue("body", "paddingLeft") as number) ??
-												(findStyleValue("body", "padding") as number) ??
-												"",
+											top: toPxNumber(
+												(findStyleValue("body", "paddingTop") ??
+													findStyleValue("body", "padding") ??
+													"") as string | number | undefined,
+											),
+											right: toPxNumber(
+												(findStyleValue("body", "paddingRight") ??
+													findStyleValue("body", "padding") ??
+													"") as string | number | undefined,
+											),
+											bottom: toPxNumber(
+												(findStyleValue("body", "paddingBottom") ??
+													findStyleValue("body", "padding") ??
+													"") as string | number | undefined,
+											),
+											left: toPxNumber(
+												(findStyleValue("body", "paddingLeft") ??
+													findStyleValue("body", "padding") ??
+													"") as string | number | undefined,
+											),
 										}}
 										onChange={({ top, right, bottom, left }) =>
 											batchSetGlobalStyle([
@@ -1116,10 +1567,12 @@ export const EmailInspector = () => {
 									</div>
 									<ColorRow
 										label="Text"
-										value={String(
-											findStyleValue("body", "color") ??
-												findStyleValue("container", "color") ??
-												"",
+										value={normalizeColorToHex(
+											String(
+												findStyleValue("body", "color") ??
+													findStyleValue("container", "color") ??
+													"",
+											),
 										)}
 										onChange={(v) => {
 											setColorGlobal("body", "color", v);
@@ -1128,8 +1581,10 @@ export const EmailInspector = () => {
 									/>
 									<ColorRow
 										label="Background"
-										value={String(
-											findStyleValue("container", "backgroundColor") ?? "",
+										value={normalizeColorToHex(
+											String(
+												findStyleValue("container", "backgroundColor") ?? "",
+											),
 										)}
 										onChange={(v) =>
 											setColorGlobal("container", "backgroundColor", v)
@@ -1152,33 +1607,29 @@ export const EmailInspector = () => {
 										suffix="px"
 									/>
 									<SpacingControl
+										key={`container-padding-${String(findStyleValue("container", "paddingTop") ?? "")}-${String(findStyleValue("container", "padding") ?? "")}`}
 										label="Padding"
 										value={{
-											top:
-												(findStyleValue("container", "paddingTop") as number) ??
-												(findStyleValue("container", "padding") as number) ??
-												"",
-											right:
-												(findStyleValue(
-													"container",
-													"paddingRight",
-												) as number) ??
-												(findStyleValue("container", "padding") as number) ??
-												"",
-											bottom:
-												(findStyleValue(
-													"container",
-													"paddingBottom",
-												) as number) ??
-												(findStyleValue("container", "padding") as number) ??
-												"",
-											left:
-												(findStyleValue(
-													"container",
-													"paddingLeft",
-												) as number) ??
-												(findStyleValue("container", "padding") as number) ??
-												"",
+											top: toPxNumber(
+												(findStyleValue("container", "paddingTop") ??
+													findStyleValue("container", "padding") ??
+													"") as string | number | undefined,
+											),
+											right: toPxNumber(
+												(findStyleValue("container", "paddingRight") ??
+													findStyleValue("container", "padding") ??
+													"") as string | number | undefined,
+											),
+											bottom: toPxNumber(
+												(findStyleValue("container", "paddingBottom") ??
+													findStyleValue("container", "padding") ??
+													"") as string | number | undefined,
+											),
+											left: toPxNumber(
+												(findStyleValue("container", "paddingLeft") ??
+													findStyleValue("container", "padding") ??
+													"") as string | number | undefined,
+											),
 										}}
 										onChange={({ top, right, bottom, left }) =>
 											batchSetGlobalStyle([
@@ -1205,66 +1656,52 @@ export const EmailInspector = () => {
 											])
 										}
 									/>
-									<SpacingControl
+									<ScrubRow
 										label="Margin"
-										value={{
-											top:
-												(findStyleValue("container", "margin") as number) ?? "",
-											right:
-												(findStyleValue("container", "margin") as number) ?? "",
-											bottom:
-												(findStyleValue("container", "margin") as number) ?? "",
-											left:
-												(findStyleValue("container", "margin") as number) ?? "",
-										}}
-										onChange={({ top }) =>
-											setGlobalStyle("container", "margin", top as number)
+										value={toPxNumber(
+											findStyleValue("container", "margin") as
+												| string
+												| number
+												| undefined,
+										)}
+										onChange={(v) =>
+											setGlobalStyle("container", "margin", v as number)
 										}
+										min={0}
+										max={200}
+										suffix="px"
 									/>
 									<SpacingControl
+										key={`container-radius-${String(findStyleValue("container", "borderTopLeftRadius") ?? "")}-${String(findStyleValue("container", "borderRadius") ?? "")}`}
 										label="Corner radius"
 										variant="corners"
 										value={{
-											top:
-												(findStyleValue(
-													"container",
-													"borderTopLeftRadius",
-												) as number) ??
-												(findStyleValue(
-													"container",
-													"borderRadius",
-												) as number) ??
-												"",
-											right:
-												(findStyleValue(
-													"container",
-													"borderTopRightRadius",
-												) as number) ??
-												(findStyleValue(
-													"container",
-													"borderRadius",
-												) as number) ??
-												"",
-											bottom:
+											top: toPxNumber(
+												(findStyleValue("container", "borderTopLeftRadius") ??
+													findStyleValue("container", "borderRadius") ??
+													"") as string | number | undefined,
+											),
+											right: toPxNumber(
+												(findStyleValue("container", "borderTopRightRadius") ??
+													findStyleValue("container", "borderRadius") ??
+													"") as string | number | undefined,
+											),
+											bottom: toPxNumber(
 												(findStyleValue(
 													"container",
 													"borderBottomRightRadius",
-												) as number) ??
-												(findStyleValue(
-													"container",
-													"borderRadius",
-												) as number) ??
-												"",
-											left:
+												) ??
+													findStyleValue("container", "borderRadius") ??
+													"") as string | number | undefined,
+											),
+											left: toPxNumber(
 												(findStyleValue(
 													"container",
 													"borderBottomLeftRadius",
-												) as number) ??
-												(findStyleValue(
-													"container",
-													"borderRadius",
-												) as number) ??
-												"",
+												) ??
+													findStyleValue("container", "borderRadius") ??
+													"") as string | number | undefined,
+											),
 										}}
 										onChange={({ top, right, bottom, left }) =>
 											batchSetGlobalStyle([
@@ -1292,48 +1729,29 @@ export const EmailInspector = () => {
 										}
 									/>
 									<SpacingControl
+										key={`container-border-${String(findStyleValue("container", "borderTopWidth") ?? "")}-${String(findStyleValue("container", "borderWidth") ?? "")}`}
 										label="Border"
 										value={{
-											top:
-												(findStyleValue(
-													"container",
-													"borderTopWidth",
-												) as number) ??
-												(findStyleValue(
-													"container",
-													"borderWidth",
-												) as number) ??
-												"",
-											right:
-												(findStyleValue(
-													"container",
-													"borderRightWidth",
-												) as number) ??
-												(findStyleValue(
-													"container",
-													"borderWidth",
-												) as number) ??
-												"",
-											bottom:
-												(findStyleValue(
-													"container",
-													"borderBottomWidth",
-												) as number) ??
-												(findStyleValue(
-													"container",
-													"borderWidth",
-												) as number) ??
-												"",
-											left:
-												(findStyleValue(
-													"container",
-													"borderLeftWidth",
-												) as number) ??
-												(findStyleValue(
-													"container",
-													"borderWidth",
-												) as number) ??
-												"",
+											top: toPxNumber(
+												(findStyleValue("container", "borderTopWidth") ??
+													findStyleValue("container", "borderWidth") ??
+													"") as string | number | undefined,
+											),
+											right: toPxNumber(
+												(findStyleValue("container", "borderRightWidth") ??
+													findStyleValue("container", "borderWidth") ??
+													"") as string | number | undefined,
+											),
+											bottom: toPxNumber(
+												(findStyleValue("container", "borderBottomWidth") ??
+													findStyleValue("container", "borderWidth") ??
+													"") as string | number | undefined,
+											),
+											left: toPxNumber(
+												(findStyleValue("container", "borderLeftWidth") ??
+													findStyleValue("container", "borderWidth") ??
+													"") as string | number | undefined,
+											),
 										}}
 										onChange={({ top, right, bottom, left }) =>
 											batchSetGlobalStyle([
@@ -1362,8 +1780,8 @@ export const EmailInspector = () => {
 									/>
 									<ColorRow
 										label="Border color"
-										value={String(
-											findStyleValue("container", "borderColor") ?? "",
+										value={normalizeColorToHex(
+											String(findStyleValue("container", "borderColor") ?? ""),
 										)}
 										onChange={(v) =>
 											setColorGlobal("container", "borderColor", v)

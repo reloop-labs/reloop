@@ -1,9 +1,9 @@
 "use client";
 
+import { readImageFileAsDataUrl } from "@reloop/web/lib/email-html-editor/utils/read-image-file";
 import { Loader2, RefreshCw, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { ensureAbsoluteUrl } from "../absolute-url";
 import { ScrubField } from "./scrub-field";
 import { TextInput } from "./text-input";
 import { AlignControls } from "./typography/align-controls";
@@ -28,7 +28,7 @@ export function ImageSrcControl({
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [isUploading, setIsUploading] = useState(false);
 
-	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
@@ -43,23 +43,17 @@ export function ImageSrcControl({
 		}
 
 		setIsUploading(true);
-		const reader = new FileReader();
-		reader.onload = (event) => {
-			const dataUrl = event.target?.result as string;
-			if (dataUrl) {
-				const uploadedUrl = ensureAbsoluteUrl(dataUrl);
-				onChange({ ...value, src: uploadedUrl });
-				toast.success("Image uploaded successfully");
-			}
+		try {
+			const uploadedUrl = await readImageFileAsDataUrl(file);
+			onChange({ ...value, src: uploadedUrl });
+			toast.success("Image added");
+		} catch (error) {
+			console.error("Inspector image upload error:", error);
+			toast.error("Failed to read image. Please try again.");
+		} finally {
 			setIsUploading(false);
 			if (fileInputRef.current) fileInputRef.current.value = "";
-		};
-		reader.onerror = () => {
-			toast.error("Failed to read image file");
-			setIsUploading(false);
-			if (fileInputRef.current) fileInputRef.current.value = "";
-		};
-		reader.readAsDataURL(file);
+		}
 	};
 
 	return (

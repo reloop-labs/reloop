@@ -2,12 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useEffect, useState } from "react";
-import {
-	siCursor,
-	siVscodium,
-	siWindsurf,
-	siZedindustries,
-} from "simple-icons";
+import { siCursor, siVscodium, siZedindustries } from "simple-icons";
 import { CopyCodeBlock } from "./copy-code-block";
 
 type Editor = {
@@ -29,12 +24,6 @@ const EDITORS: Editor[] = [
 		name: "VS Code",
 		icon: siVscodium,
 		getUrl: (prompt) => `vscode://?prompt=${encodeURIComponent(prompt)}`,
-	},
-	{
-		id: "windsurf",
-		name: "Windsurf",
-		icon: siWindsurf,
-		getUrl: (prompt) => `windsurf://?prompt=${encodeURIComponent(prompt)}`,
 	},
 	{
 		id: "zed",

@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { FooterBrand } from "@reloop/web/components/footer-brand";
 import { FooterWordmark } from "@reloop/web/components/footer-wordmark";
+import { isChromelessPath } from "@reloop/web/lib/chromeless-paths";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -142,7 +143,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 
 export const Footer = () => {
 	const pathname = usePathname();
-	if (pathname === "/twitter" || pathname?.startsWith("/twitter/")) {
+	if (isChromelessPath(pathname)) {
 		return null;
 	}
 

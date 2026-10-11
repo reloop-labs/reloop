@@ -91,6 +91,37 @@ export const platformIntegrations: PlatformIntegration[] = [
 	},
 ];
 
+export type AiIntegrationId = "mcp" | "cli";
+
+export type AiIntegration = {
+	id: AiIntegrationId;
+	name: string;
+	description: string;
+	/** simple-icons export key */
+	simpleIconKey: string;
+	href: string;
+};
+
+/** Ways for agents and terminals to drive Reloop. Available today. */
+export const aiIntegrations: AiIntegration[] = [
+	{
+		id: "mcp",
+		name: "MCP server",
+		description:
+			"Do everything you can in the dashboard from Claude, Cursor, Codex, or any MCP client.",
+		simpleIconKey: "siModelcontextprotocol",
+		href: "/integrations/mcp",
+	},
+	{
+		id: "cli",
+		name: "Reloop CLI",
+		description:
+			"Send, schedule, and inspect email from your terminal, scripts, and coding agents.",
+		simpleIconKey: "siGnubash",
+		href: "/integrations/cli",
+	},
+];
+
 export const categoryFilters: {
 	id: "all" | IntegrationCategory;
 	label: string;

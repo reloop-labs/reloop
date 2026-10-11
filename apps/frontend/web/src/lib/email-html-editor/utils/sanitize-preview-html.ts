@@ -1,0 +1,158 @@
+import { absolutizeEmailAssetUrls } from "./inline-email-stylesheet";
+
+/**
+ * Sanitize HTML for a sandboxed email preview iframe.
+ *
+ * Unlike the visual-editor sanitizer, this keeps email layout intact
+ * (`<style>`, tables, `align`, fonts, media-query classes). It only strips
+ * executable markup so `srcDoc` cannot run scripts.
+ */
+
+const EXECUTABLE_TAGS = new Set([
+	"script",
+	"iframe",
+	"object",
+	"embed",
+	"applet",
+	"base",
+]);
+
+const URL_ATTRS = [
+	"href",
+	"src",
+	"action",
+	"formaction",
+	"xlink:href",
+] as const;
+
+function isJavascriptUrl(value: string): boolean {
+	const trimmed = value.trim().toLowerCase();
+	return (
+		trimmed.startsWith("javascript:") ||
+		trimmed.startsWith("vbscript:") ||
+		trimmed.startsWith("data:text/html")
+	);
+}
+
+export function sanitizePreviewHtml(rawHtml: string): string {
+	if (!rawHtml.trim()) return "";
+
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(rawHtml, "text/html");
+
+	// Resolve /static/... against the paste origin before <base> is stripped.
+	// The iframe has no document base, so those backgrounds 404 on the app host.
+	absolutizeEmailAssetUrls(doc);
+
+	for (const tag of EXECUTABLE_TAGS) {
+		for (const el of Array.from(doc.querySelectorAll(tag))) {
+			el.remove();
+		}
+	}
+
+	for (const el of Array.from(doc.querySelectorAll("meta"))) {
+		const httpEquiv = el.getAttribute("http-equiv")?.toLowerCase();
+		if (httpEquiv === "refresh") {
+			el.remove();
+		}
+	}
+
+	const walker = doc.createTreeWalker(
+		doc.documentElement,
+		NodeFilter.SHOW_ELEMENT,
+	);
+	const elements: Element[] = [];
+	let node: Node | null = walker.currentNode;
+	while (node) {
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			elements.push(node as Element);
+		}
+		node = walker.nextNode();
+	}
+
+	for (const el of elements) {
+		for (const attr of Array.from(el.attributes)) {
+			const name = attr.name.toLowerCase();
+			if (name.startsWith("on")) {
+				el.removeAttribute(attr.name);
+			}
+		}
+
+		for (const attr of URL_ATTRS) {
+			const value = el.getAttribute(attr);
+			if (value && isJavascriptUrl(value)) {
+				el.removeAttribute(attr);
+			}
+		}
+	}
+
+	// Guarantee cross-client standard email typography baseline so the preview iframe
+	// never falls back to browser default serif (Times New Roman).
+	const head = doc.head || doc.createElement("head");
+	if (!doc.head && doc.documentElement) {
+		doc.documentElement.prepend(head);
+	}
+
+	let baselineStyle = head.querySelector("style[data-reloop-baseline]");
+	if (!baselineStyle) {
+		baselineStyle = doc.createElement("style");
+		baselineStyle.setAttribute("data-reloop-baseline", "true");
+		baselineStyle.textContent = `
+body {
+	margin: 0;
+	padding: 0;
+	-webkit-font-smoothing: antialiased;
+}
+body, table, td, p, a, li, blockquote {
+	font-family: inherit;
+}
+table, td {
+	border-collapse: separate;
+}
+`;
+		head.prepend(baselineStyle);
+	}
+
+	if (doc.body && !doc.body.style.fontFamily) {
+		doc.body.style.fontFamily = "Arial, Helvetica, sans-serif";
+	}
+
+	const doctype = doc.doctype
+		? `<!DOCTYPE ${doc.doctype.name}>`
+		: "<!DOCTYPE html>";
+	return `${doctype}${doc.documentElement.outerHTML}`;
+}
+
+/**
+ * Drop attributes the in-canvas editor adds so persisting a keystroke
+ * does not rewrite the email's markup.
+ */
+export function withoutEditorChrome(rawHtml: string): string {
+	if (!rawHtml.trim()) return "";
+
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(rawHtml, "text/html");
+	doc.documentElement.removeAttribute("contenteditable");
+	if (doc.body) {
+		doc.body.removeAttribute("contenteditable");
+		doc.body.removeAttribute("spellcheck");
+	}
+
+	const walker = doc.createTreeWalker(
+		doc.documentElement,
+		NodeFilter.SHOW_ELEMENT,
+	);
+	let node: Node | null = walker.currentNode;
+	while (node) {
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			(node as Element).removeAttribute("contenteditable");
+			(node as Element).removeAttribute("spellcheck");
+		}
+		node = walker.nextNode();
+	}
+
+	const nextDoctype = doc.doctype
+		? `<!DOCTYPE ${doc.doctype.name}>`
+		: "<!DOCTYPE html>";
+	return `${nextDoctype}${doc.documentElement.outerHTML}`;
+}

@@ -6,6 +6,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { ThemeToggle } from "@reloop/web/components/theme-toggle";
+import { isChromelessPath } from "@reloop/web/lib/chromeless-paths";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -981,7 +982,7 @@ export const Header = () => {
 		return () => query.removeEventListener("change", resetMenus);
 	}, []);
 
-	if (pathname === "/twitter" || pathname?.startsWith("/twitter/")) return null;
+	if (isChromelessPath(pathname)) return null;
 
 	const activeItem = navItems.find((item) => item.title === activeMega);
 
