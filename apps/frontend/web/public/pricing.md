@@ -38,6 +38,7 @@
   - 5 agent inboxes
   - 5 webhooks
   - 5 custom domains
+  - Bring your own SMTP
   - 5 MB attachments
   - Data retention (45 days)
   - Dedicated support
@@ -54,6 +55,7 @@
   - 100,000 emails / month
   - No daily limit
   - 1 dedicated IP
+  - Bring your own SMTP (3 servers)
   - 10 agent inboxes
   - 10 webhooks
   - 10 custom domains

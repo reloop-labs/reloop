@@ -6,7 +6,7 @@
 > Docs index: https://reloop.sh/llms-docs.txt
 > Product skill: https://reloop.sh/skill.md
 
-Generated from 43 pages.
+Generated from 50 pages.
 
 ---
 
@@ -54,6 +54,7 @@ Markdown: https://reloop.sh/pricing.md
   - 5 agent inboxes
   - 5 webhooks
   - 5 custom domains
+  - Bring your own SMTP
   - 5 MB attachments
   - Data retention (45 days)
   - Dedicated support
@@ -70,6 +71,7 @@ Markdown: https://reloop.sh/pricing.md
   - 100,000 emails / month
   - No daily limit
   - 1 dedicated IP
+  - Bring your own SMTP (3 servers)
   - 10 agent inboxes
   - 10 webhooks
   - 10 custom domains
@@ -730,6 +732,529 @@ Reloop is developer-first but not developer-only. Teams that want API control an
 - Pricing: https://reloop.sh/pricing.md
 - Compare index: https://reloop.sh/compare.md
 - License (Apache 2.0): https://reloop.sh/license
+
+
+---
+
+# Reloop MCP server
+
+Path: /features/mcp
+URL: https://reloop.sh/features/mcp
+Markdown: https://reloop.sh/features/mcp.md
+
+# Reloop MCP server
+
+> Connect any AI agent or MCP client to Reloop. It can do everything you can do in the Reloop dashboard.
+
+HTML: https://reloop.sh/features/mcp
+Server URL: https://reloop.sh/mcp
+Connect from the dashboard: https://reloop.sh/dashboard/integrations/mcp
+Docs: https://reloop.sh/docs/integrations/ai-tools/mcp-server
+
+## How it works
+
+1. **Add the server URL.** Paste the Reloop server URL into your client, or use its one-click install link.
+2. **Sign in with Reloop.** Your client opens the browser. Sign in and approve the workspace. OAuth handles the token, so there is no API key to copy or rotate.
+3. **Ask in plain language.** Ask for what you need. The agent picks the right Reloop tool, runs it against your workspace and tells you what happened.
+
+## What it can do
+
+- **Emails**: Send, batch, schedule and cancel email, and look up any message and its delivery status.
+- **Contacts**: Add and update contacts, manage custom properties, segments and topic subscriptions.
+- **Campaigns**: Draft a broadcast, pick the audience, schedule it or send it now.
+- **Templates**: Create and edit reusable templates, such as a password reset that matches your brand.
+- **Automation**: Build workflows that react to events, like a welcome series when someone signs up.
+- **Inbox**: Read inbound email and attachments, and follow threads in your agent inboxes.
+- **Metrics & logs**: Check delivery, bounce and open rates, and read the logs behind a change.
+- **Domains**: Add a sending domain, get the DNS records and check verification.
+- **Webhooks & API keys**: Create webhooks for delivery and inbound events, and manage API keys.
+
+## Setup by client
+
+- [Reloop MCP for Claude Code](https://reloop.sh/features/mcp/claude-code)
+- [Reloop MCP for Claude](https://reloop.sh/features/mcp/claude)
+- [Reloop MCP for Cursor](https://reloop.sh/features/mcp/cursor)
+- [Reloop MCP for VS Code](https://reloop.sh/features/mcp/vscode)
+- [Reloop MCP for Codex](https://reloop.sh/features/mcp/codex)
+
+## Ask your agent to…
+
+- Send a welcome email to user@example.com with a personalized greeting.
+- List all emails I sent today and show their delivery status.
+- Add a new contact with their name and email.
+- Create a campaign for our product launch announcement.
+- Verify my domain and check the DNS configuration status.
+- Show me all inbound emails I received this week.
+- Set up a webhook to notify me when an email bounces.
+- Create a contact group for users who signed up this month.
+- Send a batch of onboarding emails to these five new users.
+- Create a password reset email template that matches our brand.
+- Why did my bounce rate go up yesterday?
+- Build an automation that sends a welcome series when someone signs up.
+
+## Self-host and local (stdio)
+
+Reloop is open source. Remote clients can use the /mcp endpoint of your own install. Clients that only launch local servers can run reloop-mcp with an API key:
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "reloop-mcp"
+      ],
+      "env": {
+        "RELOOP_API_KEY": "YOUR_API_KEY",
+        "RELOOP_BASE_URL": "https://mail.example.com"
+      }
+    }
+  }
+}
+```
+
+## FAQ
+
+### What is the Reloop MCP server?
+
+A Model Context Protocol server at https://reloop.sh/mcp that connects AI clients to your Reloop workspace. It can do everything you can do in the Reloop dashboard: send email, manage contacts, run campaigns, edit templates, build automations, read the inbox, check metrics and logs, verify domains, and manage webhooks and API keys.
+
+### Do I need an API key?
+
+Not for the hosted server. Your client signs in with Reloop over OAuth: the browser opens, you approve the workspace, and the client receives a token scoped to it. API keys are only needed when you run reloop-mcp locally over stdio.
+
+### Which AI clients work with it?
+
+Claude Code, Claude (web and desktop), Cursor, VS Code with GitHub Copilot agent mode, and Codex have setup guides. Any client that supports remote MCP servers over Streamable HTTP can connect with the server URL, and clients that only launch local servers can run reloop-mcp over stdio.
+
+### Can I use it with a self-hosted Reloop install?
+
+Yes. Reloop is open source. Point remote clients at the /mcp endpoint of your own install, or run npx -y reloop-mcp with RELOOP_API_KEY set to a key from your install and RELOOP_BASE_URL set to its public URL.
+
+### Should I use the MCP server or the CLI?
+
+Use the MCP server in chat and IDE clients that support MCP, where you ask in plain language. Use the Reloop CLI in shells, CI jobs and agents that run commands: every command takes --json and returns predictable exit codes.
+
+
+---
+
+# Reloop MCP for Claude Code
+
+Path: /features/mcp/claude-code
+URL: https://reloop.sh/features/mcp/claude-code
+Markdown: https://reloop.sh/features/mcp/claude-code.md
+
+# Reloop MCP for Claude Code
+
+> Add Reloop to Claude Code with one command, sign in through your browser, and send email, manage contacts and check deliverability without leaving the terminal.
+
+HTML: https://reloop.sh/features/mcp/claude-code
+Server URL: https://reloop.sh/mcp
+Docs: https://reloop.sh/docs/integrations/ai-tools/mcp-server
+
+## Setup
+
+### 1. Add the Reloop server
+
+Run this in your terminal. Add --scope user to make Reloop available in every project.
+
+```bash
+claude mcp add --transport http reloop https://reloop.sh/mcp
+```
+
+### 2. Sign in
+
+Start Claude Code, run /mcp, pick reloop and choose Authenticate. Your browser opens so you can approve access to this workspace.
+
+```text
+/mcp
+```
+
+## Try a prompt
+
+- Send a welcome email to user@example.com with a personalized greeting.
+- List all emails I sent today and show their delivery status.
+- Add a new contact with their name and email.
+- Create a campaign for our product launch announcement.
+- Verify my domain and check the DNS configuration status.
+- Show me all inbound emails I received this week.
+
+## Other clients
+
+- [Reloop MCP for Claude](https://reloop.sh/features/mcp/claude)
+- [Reloop MCP for Cursor](https://reloop.sh/features/mcp/cursor)
+- [Reloop MCP for VS Code](https://reloop.sh/features/mcp/vscode)
+- [Reloop MCP for Codex](https://reloop.sh/features/mcp/codex)
+- [Reloop MCP server overview](https://reloop.sh/features/mcp)
+
+
+---
+
+# Reloop MCP for Claude
+
+Path: /features/mcp/claude
+URL: https://reloop.sh/features/mcp/claude
+Markdown: https://reloop.sh/features/mcp/claude.md
+
+# Reloop MCP for Claude
+
+> Add Reloop as a custom connector in Claude on the web or the desktop app. Sign in once and ask Claude to send email, draft campaigns or explain a bounce.
+
+HTML: https://reloop.sh/features/mcp/claude
+Server URL: https://reloop.sh/mcp
+Docs: https://reloop.sh/docs/integrations/ai-tools/mcp-server
+
+## Setup
+
+### 1. Open Connectors
+
+In Claude, go to Settings → Connectors and click Add custom connector. On Team and Enterprise plans an owner adds it under Organization settings first.
+
+### 2. Paste the server URL
+
+Name it Reloop and use this URL. Leave the advanced OAuth fields empty; Reloop registers the client automatically.
+
+```text
+https://reloop.sh/mcp
+```
+
+### 3. Connect
+
+Click Connect, sign in to Reloop and approve the workspace. Then turn Reloop on from the tools menu in any chat.
+
+## Try a prompt
+
+- Send a welcome email to user@example.com with a personalized greeting.
+- List all emails I sent today and show their delivery status.
+- Add a new contact with their name and email.
+- Create a campaign for our product launch announcement.
+- Verify my domain and check the DNS configuration status.
+- Show me all inbound emails I received this week.
+
+## Other clients
+
+- [Reloop MCP for Claude Code](https://reloop.sh/features/mcp/claude-code)
+- [Reloop MCP for Cursor](https://reloop.sh/features/mcp/cursor)
+- [Reloop MCP for VS Code](https://reloop.sh/features/mcp/vscode)
+- [Reloop MCP for Codex](https://reloop.sh/features/mcp/codex)
+- [Reloop MCP server overview](https://reloop.sh/features/mcp)
+
+
+---
+
+# Reloop MCP for Cursor
+
+Path: /features/mcp/cursor
+URL: https://reloop.sh/features/mcp/cursor
+Markdown: https://reloop.sh/features/mcp/cursor.md
+
+# Reloop MCP for Cursor
+
+> Install Reloop in Cursor with one click, sign in through your browser, and let the agent send test email, set up webhooks and verify domains while you build.
+
+HTML: https://reloop.sh/features/mcp/cursor
+Server URL: https://reloop.sh/mcp
+Docs: https://reloop.sh/docs/integrations/ai-tools/mcp-server
+
+One-click install: [Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=reloop&config=eyJ1cmwiOiJodHRwczovL3JlbG9vcC5zaC9tY3AifQ%3D%3D)
+
+## Setup
+
+### 1. Add the server
+
+Use the one-click install link above, or add this to .cursor/mcp.json in your project (~/.cursor/mcp.json for every project).
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "url": "https://reloop.sh/mcp"
+    }
+  }
+}
+```
+
+### 2. Sign in
+
+Open Cursor Settings → MCP & Integrations and click Connect next to reloop. Approve the workspace in your browser.
+
+## Try a prompt
+
+- Send a welcome email to user@example.com with a personalized greeting.
+- List all emails I sent today and show their delivery status.
+- Add a new contact with their name and email.
+- Create a campaign for our product launch announcement.
+- Verify my domain and check the DNS configuration status.
+- Show me all inbound emails I received this week.
+
+## Other clients
+
+- [Reloop MCP for Claude Code](https://reloop.sh/features/mcp/claude-code)
+- [Reloop MCP for Claude](https://reloop.sh/features/mcp/claude)
+- [Reloop MCP for VS Code](https://reloop.sh/features/mcp/vscode)
+- [Reloop MCP for Codex](https://reloop.sh/features/mcp/codex)
+- [Reloop MCP server overview](https://reloop.sh/features/mcp)
+
+
+---
+
+# Reloop MCP for VS Code
+
+Path: /features/mcp/vscode
+URL: https://reloop.sh/features/mcp/vscode
+Markdown: https://reloop.sh/features/mcp/vscode.md
+
+# Reloop MCP for VS Code
+
+> Install Reloop in VS Code with one click and use it from GitHub Copilot agent mode. Sign in through your browser; there is no API key to paste into settings.
+
+HTML: https://reloop.sh/features/mcp/vscode
+Server URL: https://reloop.sh/mcp
+Docs: https://reloop.sh/docs/integrations/ai-tools/mcp-server
+
+One-click install: [Install in VS Code](vscode:mcp/install?%7B%22name%22%3A%22reloop%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Freloop.sh%2Fmcp%22%7D)
+
+## Setup
+
+### 1. Add the server
+
+Use the one-click install link above, or add this to .vscode/mcp.json in your workspace.
+
+```json
+{
+  "servers": {
+    "reloop": {
+      "type": "http",
+      "url": "https://reloop.sh/mcp"
+    }
+  }
+}
+```
+
+### 2. Start and sign in
+
+Click Start above the server in mcp.json (or run MCP: List Servers). VS Code asks you to sign in to Reloop in the browser.
+
+## Try a prompt
+
+- Send a welcome email to user@example.com with a personalized greeting.
+- List all emails I sent today and show their delivery status.
+- Add a new contact with their name and email.
+- Create a campaign for our product launch announcement.
+- Verify my domain and check the DNS configuration status.
+- Show me all inbound emails I received this week.
+
+## Other clients
+
+- [Reloop MCP for Claude Code](https://reloop.sh/features/mcp/claude-code)
+- [Reloop MCP for Claude](https://reloop.sh/features/mcp/claude)
+- [Reloop MCP for Cursor](https://reloop.sh/features/mcp/cursor)
+- [Reloop MCP for Codex](https://reloop.sh/features/mcp/codex)
+- [Reloop MCP server overview](https://reloop.sh/features/mcp)
+
+
+---
+
+# Reloop MCP for Codex
+
+Path: /features/mcp/codex
+URL: https://reloop.sh/features/mcp/codex
+Markdown: https://reloop.sh/features/mcp/codex.md
+
+# Reloop MCP for Codex
+
+> Add Reloop to Codex with two lines of config and one login command. Then ask Codex to send email, add contacts or read your delivery logs.
+
+HTML: https://reloop.sh/features/mcp/codex
+Server URL: https://reloop.sh/mcp
+Docs: https://reloop.sh/docs/integrations/ai-tools/mcp-server
+
+## Setup
+
+### 1. Add the server
+
+Add this to ~/.codex/config.toml.
+
+```toml
+[mcp_servers.reloop]
+url = "https://reloop.sh/mcp"
+```
+
+### 2. Sign in
+
+Run the login command and approve the workspace in your browser.
+
+```bash
+codex mcp login reloop
+```
+
+## Try a prompt
+
+- Send a welcome email to user@example.com with a personalized greeting.
+- List all emails I sent today and show their delivery status.
+- Add a new contact with their name and email.
+- Create a campaign for our product launch announcement.
+- Verify my domain and check the DNS configuration status.
+- Show me all inbound emails I received this week.
+
+## Other clients
+
+- [Reloop MCP for Claude Code](https://reloop.sh/features/mcp/claude-code)
+- [Reloop MCP for Claude](https://reloop.sh/features/mcp/claude)
+- [Reloop MCP for Cursor](https://reloop.sh/features/mcp/cursor)
+- [Reloop MCP for VS Code](https://reloop.sh/features/mcp/vscode)
+- [Reloop MCP server overview](https://reloop.sh/features/mcp)
+
+
+---
+
+# Reloop CLI
+
+Path: /features/cli
+URL: https://reloop.sh/features/cli
+Markdown: https://reloop.sh/features/cli.md
+
+# Reloop CLI
+
+> Send, schedule and receive email from your terminal, CI or a coding agent. Every command supports --json.
+
+HTML: https://reloop.sh/features/cli
+Docs: https://reloop.sh/docs/integrations/ai-tools/cli-agents
+
+## Install and sign in
+
+```bash
+npx -y reloop-cli init --all --browser
+```
+
+## Agent skill
+
+```bash
+npx skills add reloop/reloop-cli
+```
+
+## Send an email
+
+```bash
+reloop emails send \
+  --from "you@yourdomain.com" \
+  --to "user@example.com" \
+  --subject "Hello from Reloop" \
+  --text "It works."
+```
+
+## JSON output for agents
+
+Add --json to any command. Output goes to stdout with no spinners, exit codes are 0 for success and 1 for errors, and every error has a message and a code.
+
+```json
+{
+  "error": {
+    "message": "No API key found",
+    "code": "auth_error"
+  }
+}
+```
+
+## Pipe content from stdin
+
+Pass - to any file flag to read from stdin. Works with --text-file, --html-file and --file.
+
+```bash
+echo "Your order has shipped." | reloop emails send \
+  --from "Acme <onboarding@example.com>" \
+  --to delivered@example.com \
+  --subject "Order update" \
+  --text-file -
+```
+
+## Batch sending
+
+Send up to 100 emails in one request from a JSON file or a pipe.
+
+```bash
+cat emails.json | reloop emails batch --file -
+```
+
+## Safe retries
+
+Retry a failed send with the same --idempotency-key and Reloop won't deliver it twice. Supported on emails send and emails batch.
+
+```bash
+reloop emails send \
+  --from "Acme <onboarding@example.com>" \
+  --to delivered@example.com \
+  --subject "Welcome" \
+  --text "Hello!" \
+  --idempotency-key "welcome-user-123"
+```
+
+## Scheduling
+
+Schedule with --scheduled-at, then cancel or reschedule by id.
+
+```bash
+reloop emails send \
+  --from "Acme <onboarding@example.com>" \
+  --to delivered@example.com \
+  --subject "Your trial ends soon" \
+  --text "Your free trial expires in 3 days." \
+  --scheduled-at "tomorrow at 9am ET"
+
+reloop emails cancel <id>
+reloop emails update <id> --scheduled-at <datetime>
+```
+
+## Read inbound email
+
+Stream new inbound email as JSON from a long-running process, or fetch one by id. Needs a verified domain with receiving enabled.
+
+```bash
+reloop emails receiving listen --json
+
+reloop emails receiving get <email-id>
+```
+
+## Webhooks in your terminal
+
+Subscribe to webhook events and stream them to your terminal, or forward them to a local server. The webhook is removed when you disconnect.
+
+```bash
+reloop webhooks listen \
+  --url https://hostname.tailnet-name.ts.net \
+  --events email.delivered email.bounced email.received
+
+reloop webhooks listen \
+  --url https://hostname.tailnet-name.ts.net \
+  --forward-to http://localhost:4321/api/webhook
+```
+
+## FAQ
+
+### How do I install the Reloop CLI?
+
+Run npx -y reloop-cli init --all --browser. It sets up the CLI and opens your browser so you can authorize your workspace.
+
+### How do AI agents use the CLI?
+
+Install the agent skill with npx skills add reloop/reloop-cli so Claude Code, Codex and other skill-aware agents know the commands. Agents pass --json to get machine-readable output, exit code 0 on success and 1 on errors, and errors with a message and a code.
+
+### Can I send email in bulk?
+
+Yes. reloop emails batch sends up to 100 emails in a single request. Pass a JSON file, or use --file - to read it from stdin.
+
+### How do I avoid duplicate sends when retrying?
+
+Pass --idempotency-key with a stable value, such as welcome-user-123. Retrying with the same key won't send the email again. It works on emails send and emails batch.
+
+### Can the CLI receive email?
+
+Yes. reloop emails receiving listen --json streams new inbound email, and reloop emails receiving get fetches one by id. You need a verified domain with receiving enabled.
+
+### How do I test webhooks locally?
+
+Run reloop webhooks listen with a public --url (Tailscale Funnel, ngrok or similar) and the events you want. Add --forward-to to send them to a local server. The webhook is removed when you press Ctrl+C.
 
 
 ---
