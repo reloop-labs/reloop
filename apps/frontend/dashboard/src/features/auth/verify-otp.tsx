@@ -58,16 +58,6 @@ export function VerifyOTP({
 }) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
-	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-	useEffect(() => {
-		return () => {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
-		};
-	}, []);
-
 	const [otpValue, setOtpValue] = useQueryState(
 		"otp",
 		parseAsString.withDefault(""),
@@ -116,9 +106,7 @@ export function VerifyOTP({
 					queryClient,
 					{ inviteId: inviteId || null, redirectTo: redirectTo || null },
 				);
-				timeoutRef.current = setTimeout(() => {
-					void navigatePostAuth(router, destination);
-				}, 2000);
+				await navigatePostAuth(router, destination);
 			} else {
 				changeStatus("idle");
 				setError({

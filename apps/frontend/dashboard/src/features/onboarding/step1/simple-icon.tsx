@@ -1,6 +1,31 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as simpleIcons from "simple-icons";
+import {
+	siDiscord,
+	siGithub,
+	siGoogle,
+	siGoogleads,
+	siMedium,
+	siSafari,
+	siSpotify,
+	siSubstack,
+	siX,
+	siYoutube,
+} from "simple-icons";
+
+// Named imports only: `import *` with a dynamic key ships all ~3k icons (~2 MB gz).
+const ICONS: Record<string, { path: string; hex: string }> = {
+	siDiscord,
+	siGithub,
+	siGoogle,
+	siGoogleads,
+	siMedium,
+	siSafari,
+	siSpotify,
+	siSubstack,
+	siX,
+	siYoutube,
+};
 
 const FALLBACK_MAP: Record<string, string> = {
 	siLinkedin: "linkedin",
@@ -24,9 +49,7 @@ export function SimpleIcon({
 	slug: string;
 	className?: string;
 }) {
-	const icon = (
-		simpleIcons as Record<string, { path: string; hex: string } | undefined>
-	)[slug];
+	const icon = ICONS[slug];
 
 	if (!icon) {
 		const fallbackName = FALLBACK_MAP[slug];
@@ -42,8 +65,6 @@ export function SimpleIcon({
 	}
 
 	const isMonochrome = MONOCHROME_SLUGS.includes(slug);
-	// Rust brand hex is #000000, so use red so the gear is visible on dark UI
-	const hex = slug === "siRust" ? "e24d2b" : icon.hex;
 
 	return (
 		<svg
@@ -52,7 +73,7 @@ export function SimpleIcon({
 			className={cn(className, isMonochrome ? "text-text-sub-600" : "")}
 			fill="currentColor"
 			xmlns="http://www.w3.org/2000/svg"
-			style={!isMonochrome ? { color: `#${hex}` } : undefined}
+			style={!isMonochrome ? { color: `#${icon.hex}` } : undefined}
 			aria-hidden="true"
 		>
 			<path d={icon.path} />
