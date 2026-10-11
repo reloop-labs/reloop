@@ -35,7 +35,7 @@ export function InsightAccordionItem({
 	const isImprovement = item.status === "improvement";
 
 	return (
-		<div className="border-stroke-soft-100/60 border-b last:border-b-0 dark:border-neutral-800/80">
+		<div className="border-stroke-soft-100/60 border-b last:border-b-0 dark:border-stroke-soft-100">
 			<button
 				type="button"
 				onClick={onToggle}
@@ -345,7 +345,7 @@ export function EmailInsightsPanel({ email }: { email: EmailInsightsData }) {
 				<h4 className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-neutral-400">
 					POSSIBLE IMPROVEMENTS
 				</h4>
-				<div className="border-stroke-soft-100/60 border-t dark:border-neutral-800/80">
+				<div className="border-stroke-soft-100/60 border-t dark:border-stroke-soft-100">
 					{improvements.length > 0 ? (
 						improvements.map((item) => (
 							<InsightAccordionItem
@@ -372,7 +372,7 @@ export function EmailInsightsPanel({ email }: { email: EmailInsightsData }) {
 					<h4 className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-neutral-400">
 						DOING GREAT
 					</h4>
-					<div className="border-stroke-soft-100/60 border-t dark:border-neutral-800/80">
+					<div className="border-stroke-soft-100/60 border-t dark:border-stroke-soft-100">
 						{doingGreat.map((item) => (
 							<InsightAccordionItem
 								key={item.id}

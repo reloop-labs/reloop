@@ -113,7 +113,7 @@ export function SmtpResponseDrawer({
 	return (
 		<Drawer.Root open={open} onOpenChange={onOpenChange}>
 			<Drawer.Content className="max-w-[440px]">
-				<Drawer.Header className="border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
+				<Drawer.Header className="border-stroke-soft-100 border-b">
 					<div className="flex min-w-0 flex-1 flex-col gap-1 pr-2">
 						<Drawer.Title className="font-semibold text-[22px] tracking-tight">
 							{copy?.title ?? "SMTP response"}
@@ -129,7 +129,7 @@ export function SmtpResponseDrawer({
 							</p>
 
 							{(row.recipient || row.classification || code != null) && (
-								<div className="space-y-2 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/40 px-3.5 py-3 dark:border-stroke-soft-100/40">
+								<div className="space-y-2 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/40 px-3.5 py-3">
 									{row.recipient ? (
 										<div className="flex items-start justify-between gap-2">
 											<div className="min-w-0">
@@ -195,7 +195,7 @@ export function SmtpResponseDrawer({
 								<p className="mb-2 font-semibold text-[11px] text-text-soft-400 uppercase tracking-wide">
 									SMTP response
 								</p>
-								<div className="relative overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
+								<div className="relative overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:bg-bg-weak-50/20">
 									{content ? (
 										<>
 											<div className="absolute top-2.5 right-2.5 z-10">

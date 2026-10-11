@@ -790,7 +790,7 @@ export const EmailDetail = ({
 			{/* Content Preview Tabs */}
 			<section>
 				<TabMenu.Root value={activeTab} onValueChange={setActiveTab}>
-					<TabMenu.List className="relative mb-6 h-11 gap-0 border-b! py-0">
+					<TabMenu.List className="relative mb-6 h-11 gap-0 border-b! py-0 dark:border-stroke-soft-100">
 						{tabItems.map((item, index) => (
 							<TabMenu.Trigger
 								key={item.value}
@@ -858,7 +858,7 @@ export const EmailDetail = ({
 						className={cn(
 							"mb-10",
 							activeTab === "preview" &&
-								"overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100",
+								"overflow-hidden rounded-xl border border-stroke-soft-100",
 						)}
 					>
 						{isLoading ? (
@@ -881,6 +881,7 @@ export const EmailDetail = ({
 											code={email.textBody}
 											lang="text"
 											label="Plain Text"
+											codeExtraPadding
 										/>
 									) : (
 										<div className="p-6 text-paragraph-sm text-text-sub-600">
@@ -895,6 +896,7 @@ export const EmailDetail = ({
 											code={formatHtml(email.htmlBody)}
 											lang="html"
 											label="HTML Source"
+											codeExtraPadding
 										/>
 									) : (
 										<div className="p-6 text-paragraph-sm text-text-sub-600">
@@ -909,6 +911,7 @@ export const EmailDetail = ({
 											code={email.rawMessage}
 											lang="text"
 											label="Raw message"
+											codeExtraPadding
 										/>
 									) : (
 										<p className="p-6 text-paragraph-sm text-text-sub-600">
@@ -941,7 +944,7 @@ export const EmailDetail = ({
 								label="Headers"
 							/>
 						</div>
-						<div className="overflow-auto rounded-xl border border-stroke-soft-100 p-6 dark:border-stroke-soft-100/50">
+						<div className="overflow-auto rounded-xl border border-stroke-soft-100 p-6">
 							<pre className="font-mono text-[11px] text-text-sub-600 leading-relaxed">
 								{JSON.stringify(email.headers, null, 2)}
 							</pre>

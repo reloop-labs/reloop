@@ -14,7 +14,7 @@ export const EmailNotFound: React.FC = () => {
 
 	return (
 		<div className="flex flex-col items-center justify-center">
-			<div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+			<div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0">
 				<Icon name="mail-single" className="h-8 w-8 text-text-sub-600" />
 			</div>
 			<div className="text-center">
