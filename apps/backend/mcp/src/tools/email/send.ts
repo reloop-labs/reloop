@@ -10,8 +10,8 @@ import {
 	templateSchema,
 } from "./schemas";
 
-export const emailSend = defineTool({
-	name: "email_send",
+export const sendEmail = defineTool({
+	name: "send_email",
 	title: "Send email",
 	description:
 		"Send a transactional email through Reloop. This delivers real email to the recipients immediately (or at `scheduledAt`) and cannot be recalled, so confirm the sender, recipients, subject, and body before calling. `from` must use a sending domain that is verified in the Reloop organization; otherwise the call fails with `not_found` or a DNS `validation_error`. Provide `html` and/or `text`, or a `template` with variables. Returns the email log `id` for later inspection. Do not use this for bulk or marketing sends to many contacts.",

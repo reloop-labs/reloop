@@ -9,11 +9,11 @@ import {
 	toContactOutput,
 } from "./schemas";
 
-export const contactsUpdate = defineTool({
-	name: "contacts_update",
+export const updateContact = defineTool({
+	name: "update_contact",
 	title: "Update contact",
 	description:
-		"Update an existing contact by ID. Only the fields you pass change, except `properties`, which replaces the contact's entire property set: read the current properties with contacts_get and pass the full merged object to keep existing values. Use contacts_get to resolve an email address to an ID first.",
+		"Update an existing contact by ID. Only the fields you pass change, except `properties`, which replaces the contact's entire property set: read the current properties with get_contact and pass the full merged object to keep existing values. Use get_contact to resolve an email address to an ID first.",
 	annotations: {
 		readOnlyHint: false,
 		destructiveHint: false,

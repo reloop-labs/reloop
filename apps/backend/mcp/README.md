@@ -1,6 +1,6 @@
 # Reloop MCP
 
-The official [Model Context Protocol](https://modelcontextprotocol.io) server for [Reloop](https://reloop.sh), open-source email infrastructure. It lets MCP clients and coding agents operate a Reloop organization through typed tools: read and manage contacts, and send transactional email. The npm package is `reloop-mcp` and the binary is `reloop-mcp`; the source lives at [github.com/reloop-labs/reloop-mcp](https://github.com/reloop-labs/reloop-mcp). It implements MCP revision 2026-07-28 with the official TypeScript SDK v2 over stateless Streamable HTTP, and still serves 2025-era clients through the SDK's legacy compatibility layer.
+The official [Model Context Protocol](https://modelcontextprotocol.io) server for [Reloop](https://reloop.sh), open-source email infrastructure. It lets MCP clients and coding agents operate a Reloop organization through typed tools: read and manage contacts, groups, and subscription channels, send transactional email, and manage API keys and sending domains. The npm package is `reloop-mcp` and the binary is `reloop-mcp`; the source lives at [github.com/reloop-labs/reloop-mcp](https://github.com/reloop-labs/reloop-mcp). It implements MCP revision 2026-07-28 with the official TypeScript SDK v2 over stateless Streamable HTTP, and still serves 2025-era clients through the SDK's legacy compatibility layer.
 
 ## Transports
 
@@ -131,11 +131,11 @@ request to Reloop, and Reloop enforces authorization on every call.
 
 Requests without a JWT-shaped bearer or a plausibly shaped key are rejected
 with `401` and an RFC 9728 `WWW-Authenticate` challenge naming the protected
-resource metadata. Keys and tokens never appear in logs or tool output.
+resource metadata. Keys and tokens never appear in logs or tool output, except the newly issued secret that `create_api_key` and `rotate_api_key` return once.
 
 ## Tools
 
-### `contacts_list`
+### `list_contacts`
 
 List contacts in the authenticated Reloop organization, newest first, with offset pagination. Use `search` for a case-insensitive substring match on the email address and `status` to filter by subscription state. Use this to look up recipients or audit the audience before creating, updating, or emailing contacts. Results are paginated: check `pagination.hasMore` and request the next `page` instead of raising `limit` beyond 100.
 
@@ -151,9 +151,9 @@ Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
 
 Returns: `contacts`, `pagination`, `counts`
 
-### `contacts_get`
+### `get_contact`
 
-Get one contact by ID or by exact email address. Pass exactly one of `id` or `email`. Use this to check whether a contact already exists (for example before contacts_create) or to read the current properties before contacts_update. Returns a `contact_not_found` error when no contact matches.
+Get one contact by ID or by exact email address. Pass exactly one of `id` or `email`. Use this to check whether a contact already exists (for example before create_contact) or to read the current properties before update_contact. Returns a `contact_not_found` error when no contact matches.
 
 Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
 
@@ -164,9 +164,9 @@ Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
 
 Returns: `contact`
 
-### `contacts_create`
+### `create_contact`
 
-Create a new contact in the Reloop organization. Fails with `contact_already_exists` if the email is already a contact; use contacts_get first when unsure. Optionally set name, subscription status (defaults to subscribed), custom properties, group memberships, and channel subscriptions. Creating a contact does not send any email.
+Create a new contact in the Reloop organization. Fails with `contact_already_exists` if the email is already a contact; use get_contact first when unsure. Optionally set name, subscription status (defaults to subscribed), custom properties, group memberships, and channel subscriptions. Creating a contact does not send any email.
 
 Read-only: no · Destructive: no · Idempotent: no · Open world: no
 
@@ -182,9 +182,9 @@ Read-only: no · Destructive: no · Idempotent: no · Open world: no
 
 Returns: `contact`
 
-### `contacts_update`
+### `update_contact`
 
-Update an existing contact by ID. Only the fields you pass change, except `properties`, which replaces the contact's entire property set: read the current properties with contacts_get and pass the full merged object to keep existing values. Use contacts_get to resolve an email address to an ID first.
+Update an existing contact by ID. Only the fields you pass change, except `properties`, which replaces the contact's entire property set: read the current properties with get_contact and pass the full merged object to keep existing values. Use get_contact to resolve an email address to an ID first.
 
 Read-only: no · Destructive: no · Idempotent: yes · Open world: no
 
@@ -199,9 +199,9 @@ Read-only: no · Destructive: no · Idempotent: yes · Open world: no
 
 Returns: `contact`
 
-### `contacts_delete`
+### `delete_contact`
 
-Permanently delete a contact by ID. This cannot be undone and removes the contact from all groups and channels. To stop emailing someone without deleting their record, prefer contacts_update with status "unsubscribed". Use contacts_get to resolve an email to an ID and confirm the right record first.
+Permanently delete a contact by ID. This cannot be undone and removes the contact from all groups and channels. To stop emailing someone without deleting their record, prefer update_contact with status "unsubscribed". Use get_contact to resolve an email to an ID and confirm the right record first.
 
 Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
 
@@ -211,7 +211,197 @@ Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
 
 Returns: `deleted`, `id`
 
-### `email_send`
+### `list_groups`
+
+List the contact groups of the authenticated Reloop organization with offset pagination. Groups are internal segments for organizing contacts (for example Beta testers or Enterprise customers); contacts never see them. Use this to find a group ID before list_group_contacts, add_contact_to_group, or create_contact with groupIds.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Groups per page, 1 to 100 |
+| `search` | string | no | Case-insensitive substring to match against the group name |
+
+Returns: `groups`, `pagination`
+
+### `get_group`
+
+Get one contact group by ID. Returns a `group_not_found` error when no group matches; use list_groups to find the ID. Use list_group_contacts for its members.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Group ID as returned by Reloop, for example grp_123456789 |
+
+Returns: `group`
+
+### `create_group`
+
+Create an empty contact group. Fails with `group_already_exists` when a group with that name exists; use list_groups first when unsure. Add members afterwards with add_contact_to_group, or pass the group ID in create_contact's groupIds.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Group name, up to 50 characters |
+
+Returns: `group`
+
+### `update_group`
+
+Rename a contact group by ID. Members are unchanged. Fails with `group_already_exists` when another group already has that name.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Group ID as returned by Reloop, for example grp_123456789 |
+| `name` | string | yes | New group name |
+
+Returns: `group`
+
+### `delete_group`
+
+Delete a contact group by ID. The contacts themselves are kept; they only lose this membership. Use get_group to confirm the right group first.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Group ID as returned by Reloop, for example grp_123456789 |
+
+Returns: `deleted`, `id`
+
+### `list_group_contacts`
+
+List the contacts that belong to one group, with offset pagination. Use `search` for a case-insensitive substring match on the email address and `status` to filter by subscription state. Items are lean: use get_contact for a member's groups and channels.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Group ID as returned by Reloop, for example grp_123456789 |
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Contacts per page, 1 to 100 |
+| `search` | string | no | Case-insensitive substring to match against contact email addresses |
+| `status` | subscribed \| unsubscribed \| blocked | no | Only return members with this subscription status |
+
+Returns: `group`, `contacts`, `pagination`, `counts`
+
+### `add_contact_to_group`
+
+Add an existing contact to a group, identified by `contactId` or by `email` (exactly one). Adding a contact that is already a member changes nothing. The contact must already exist: create it with create_contact first, which can also take groupIds directly. Fails with `not_found` when the group or contact does not exist.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `groupId` | string | yes | Group ID as returned by Reloop, for example grp_123456789 |
+| `contactId` | string | no | Contact ID as returned by Reloop, for example con_123456789 |
+| `email` | string | no | Email address of an existing contact, instead of contactId |
+
+Returns: `contactId`, `groupId`, `groupName`
+
+### `remove_contact_from_group`
+
+Remove a contact from a group, identified by `contactId` or by `email` (exactly one). The contact itself is kept, with its other groups and channel subscriptions; removing a non-member changes nothing. Fails with `not_found` when the group or contact does not exist.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `groupId` | string | yes | Group ID as returned by Reloop, for example grp_123456789 |
+| `contactId` | string | no | Contact ID as returned by Reloop, for example con_123456789 |
+| `email` | string | no | Email address of an existing contact, instead of contactId |
+
+Returns: `contactId`, `groupId`, `groupName`
+
+### `list_channels`
+
+List the subscription channels of the authenticated Reloop organization with their subscriber counts, with offset pagination. Channels are the email topics contacts can subscribe to or unsubscribe from on their preference page (for example Product updates or Newsletter). Use this to find a channel ID for send_email's channelId, list_contacts' channelId filter, or set_channel_subscription.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Channels per page, 1 to 100 |
+
+Returns: `channels`, `pagination`
+
+### `get_channel`
+
+Get one subscription channel by ID. Returns a `channel_not_found` error when no channel matches; use list_channels to find the ID. Use list_contacts with channelId to see its subscribers.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Channel ID as returned by Reloop, for example chn_123456789 |
+
+Returns: `channel`
+
+### `create_channel`
+
+Create a subscription channel. Defaults to `opt_in` and `private`. Fails with `channel_already_exists` when a channel with that name exists; use list_channels first when unsure. Enroll contacts with set_channel_subscription or create_contact's channels.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Channel name |
+| `description` | string | no | What subscribers receive on this channel |
+| `defaultSubscription` | opt_in \| opt_out | no | opt_in: contacts receive this channel until they unsubscribe. opt_out: contacts receive it only after opting in |
+| `visibility` | private \| public | no | public channels appear on the contact's email preference page; private channels are internal |
+
+Returns: `channel`
+
+### `update_channel`
+
+Update a subscription channel by ID: name, description, default subscription, or visibility. Only the fields you pass change. Changing `defaultSubscription` affects contacts enrolled from now on, not existing subscriptions. Fails with `channel_already_exists` when another channel already has the new name.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Channel ID as returned by Reloop, for example chn_123456789 |
+| `name` | string | no | New channel name |
+| `description` | string | no | What subscribers receive on this channel |
+| `defaultSubscription` | opt_in \| opt_out | no | opt_in: contacts receive this channel until they unsubscribe. opt_out: contacts receive it only after opting in |
+| `visibility` | private \| public | no | public channels appear on the contact's email preference page; private channels are internal |
+
+Returns: `channel`
+
+### `delete_channel`
+
+Delete a subscription channel by ID, together with every contact's subscription to it. The contacts themselves are kept. Use get_channel to confirm the right channel first.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Channel ID as returned by Reloop, for example chn_123456789 |
+
+Returns: `deleted`, `id`
+
+### `set_channel_subscription`
+
+Subscribe (`opt_in`) or unsubscribe (`opt_out`) an existing contact on one channel, identified by `contactId` or by `email` (exactly one). Enrolls the contact if they were never on the channel; setting the state they already have changes nothing. Only change a subscription when the contact asked for it or the user has their consent: opting someone back in after they unsubscribed can violate anti-spam law. Fails with `not_found` when the channel or contact does not exist.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `channelId` | string | yes | Channel ID as returned by Reloop, for example chn_123456789 |
+| `contactId` | string | no | Contact ID as returned by Reloop, for example con_123456789 |
+| `email` | string | no | Email address of an existing contact, instead of contactId |
+| `subscription` | opt_in \| opt_out | yes | opt_in to receive this channel, opt_out to stop receiving it |
+
+Returns: `contactId`, `channelId`, `channelName`, `subscription`, `status`
+
+### `send_email`
 
 Send a transactional email through Reloop. This delivers real email to the recipients immediately (or at `scheduledAt`) and cannot be recalled, so confirm the sender, recipients, subject, and body before calling. `from` must use a sending domain that is verified in the Reloop organization; otherwise the call fails with `not_found` or a DNS `validation_error`. Provide `html` and/or `text`, or a `template` with variables. Returns the email log `id` for later inspection. Do not use this for bulk or marketing sends to many contacts.
 
@@ -235,6 +425,191 @@ Read-only: no · Destructive: yes · Idempotent: no · Open world: yes
 
 Returns: `id`, `messageId`, `status`, `timestamp`
 
+### `list_api_keys`
+
+List the API keys of the authenticated Reloop organization, newest first, with offset pagination. Secrets are never returned here; each key shows only its `start` prefix. Use `search` to match on the key name or prefix and `enabled` to filter by state. Use this to find a key ID before get_api_key, update_api_key, rotate_api_key, enable_api_key, disable_api_key, or delete_api_key.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | API keys per page, 1 to 100 |
+| `search` | string | no | Case-insensitive substring to match against the key name or prefix |
+| `enabled` | boolean | no | Only return enabled (true) or disabled (false) keys |
+
+Returns: `apiKeys`, `pagination`
+
+### `get_api_key`
+
+Get one API key by ID: its name, enabled state, usage count, last use, and creator. The secret is never returned. Returns an `api_key_not_found` error when no key matches; use list_api_keys to find the ID.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | API key ID as returned by Reloop |
+
+Returns: `apiKey`
+
+### `create_api_key`
+
+Create a new organization-wide Reloop API key. The response contains the full secret `key`, which Reloop shows only once: hand it to the user immediately and tell them to store it in a secret manager; it cannot be read back later. Do not write the key into source code, logs, or chat history beyond what the user asked for.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Human-readable name for the key, for example Production server |
+
+Returns: `apiKey`
+
+### `update_api_key`
+
+Rename an API key by ID. The secret and enabled state are unchanged; use rotate_api_key to replace the secret and enable_api_key or disable_api_key to change its state.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | API key ID as returned by Reloop |
+| `name` | string | yes | Human-readable name for the key, for example Production server |
+
+Returns: `apiKey`
+
+### `rotate_api_key`
+
+Replace the secret of an API key while keeping its ID. The old secret stops working immediately, so every service still using it will fail until it is updated; if this MCP server authenticates with that same key, it will lose access too. The response contains the new secret `key`, shown only once: hand it to the user immediately.
+
+Read-only: no · Destructive: yes · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | API key ID as returned by Reloop |
+
+Returns: `apiKey`
+
+### `enable_api_key`
+
+Re-enable a disabled API key by ID so requests made with its existing secret are accepted again. Enabling an already enabled key changes nothing.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | API key ID as returned by Reloop |
+
+Returns: `apiKey`
+
+### `disable_api_key`
+
+Disable an API key by ID without deleting it. Every request made with it is rejected until enable_api_key is called, so services using it stop working; if this MCP server authenticates with that same key, it will lose access too. Prefer this over delete_api_key when the key may be needed again.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | API key ID as returned by Reloop |
+
+Returns: `apiKey`
+
+### `delete_api_key`
+
+Permanently delete an API key by ID. This cannot be undone: every request made with it is rejected from now on, and if this MCP server authenticates with that same key, it will lose access too. Prefer disable_api_key when the key may be needed again. Use get_api_key to confirm the right key first.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | API key ID as returned by Reloop |
+
+Returns: `deleted`, `id`
+
+### `list_domains`
+
+List the sending domains of the authenticated Reloop organization with their verification status and settings, with offset pagination. Use this to pick a verified `from` domain before send_email (only `active` domains can send) or to find a domain ID. DNS records are omitted here; use get_domain for them.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Domains per page, 1 to 100 |
+| `search` | string | no | Case-insensitive substring to match against the domain name |
+| `status` | pending \| verifying \| active \| suspended \| failed | no | Only return domains with this verification status |
+
+Returns: `domains`, `pagination`
+
+### `get_domain`
+
+Get one sending domain by ID, including the DNS records the user must add at their DNS provider and the verification status of each. Use this to show setup instructions or to diagnose why a domain is not `active`. Returns a `domain_not_found` error when no domain matches; use list_domains to find the ID.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Domain ID as returned by Reloop, for example dom_123456789 |
+
+Returns: `domain`
+
+### `create_domain`
+
+Add a sending domain to the Reloop organization. The domain starts as `pending` and cannot send until verified: show the user the returned `dnsRecords` to add at their DNS provider, then call verify_domain. Fails with `domain_already_exists` if the domain is already registered, or `quota_exceeded` when the plan's domain limit is reached. Settings default to sending, receiving, click and open tracking enabled, and opportunistic TLS.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `domain` | string | yes | Domain or subdomain to send from, for example send.example.com. A dedicated subdomain keeps the root domain's reputation separate. |
+| `clickTracking` | boolean | no | Rewrite links to track clicks |
+| `openTracking` | boolean | no | Embed a pixel to track opens |
+| `sendingEmail` | boolean | no | Allow sending email from this domain |
+| `receivingEmail` | boolean | no | Accept inbound email for this domain; requires an MX record |
+| `tls` | opportunistic \| enforced | no | opportunistic uses TLS when the receiver supports it; enforced refuses to deliver without it |
+
+Returns: `domain`
+
+### `update_domain`
+
+Change the settings of a sending domain by ID: sending, receiving, click tracking, open tracking, or TLS mode. Only the fields you pass change. Enabling receiving or tracking can add DNS records the user must create; check `dnsRecords` in the result and call verify_domain afterwards. The domain name itself cannot be changed.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Domain ID as returned by Reloop, for example dom_123456789 |
+| `clickTracking` | boolean | no | Rewrite links to track clicks |
+| `openTracking` | boolean | no | Embed a pixel to track opens |
+| `sendingEmail` | boolean | no | Allow sending email from this domain |
+| `receivingEmail` | boolean | no | Accept inbound email for this domain; requires an MX record |
+| `tls` | opportunistic \| enforced | no | opportunistic uses TLS when the receiver supports it; enforced refuses to deliver without it |
+
+Returns: `domain`
+
+### `verify_domain`
+
+Check the DNS records of a sending domain by ID. If every record is already in place the domain becomes `active` immediately and `verified` is true. Otherwise the status is `verifying` and Reloop keeps re-checking in the background while DNS propagates, which can take minutes to hours; call get_domain later to see the outcome and which records still fail.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Domain ID as returned by Reloop, for example dom_123456789 |
+
+Returns: `id`, `status`, `verified`
+
+### `delete_domain`
+
+Permanently delete a sending domain by ID, with its DNS configuration and signing keys. This cannot be undone: email can no longer be sent from addresses on it, inbound mail for it stops, and adding it again generates new DNS records the user must re-create. Use get_domain to confirm the right domain first.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Domain ID as returned by Reloop, for example dom_123456789 |
+
+Returns: `deleted`, `id`
+
 ## Errors
 
 Every failed call returns `isError: true` and no `structuredContent`; the text content is a JSON document with an `error` object (structured content must match the tool's output schema, so errors travel in the text block):
@@ -248,8 +623,8 @@ Every failed call returns `isError: true` and no `structuredContent`; the text c
 | `validation_error` | Input failed schema validation, or Reloop returned 400/422 (including a failed sending-domain DNS check) | no |
 | `unauthorized` | The API key is missing, malformed, or rejected (401) | no |
 | `forbidden` | The key is valid but not allowed to perform the operation (403) | no |
-| `not_found` / `contact_not_found` | The contact, template, or sending domain does not exist (404) | no |
-| `conflict` / `contact_already_exists` | The resource already exists (409) | no |
+| `not_found` / `contact_not_found` / `group_not_found` / `channel_not_found` / `api_key_not_found` / `domain_not_found` | The contact, group, channel, API key, template, or sending domain does not exist (404) | no |
+| `conflict` / `contact_already_exists` / `group_already_exists` / `channel_already_exists` / `domain_already_exists` | The resource already exists (409) | no |
 | `rate_limited` | A Reloop rate limit was hit (429) | yes, after `retryAfterSeconds` |
 | `quota_exceeded` | The organization's email quota is exhausted (402) | no |
 | `upstream_error` | Reloop returned 5xx | only for reads |
@@ -258,7 +633,7 @@ Every failed call returns `isError: true` and no `structuredContent`; the text c
 | `malformed_response` | The response was not JSON, usually a wrong `RELOOP_BASE_URL` | no |
 | `internal_error` | A bug in this server | no |
 
-Writes (`contacts_create`, `email_send`) are never marked retryable after a timeout or network failure: the request may already have reached Reloop, and the email may already have been sent. Check the current state before repeating a write.
+Writes without an idempotency key (`create_contact`, `create_group`, `create_channel`, `send_email`, `create_api_key`, `rotate_api_key`, `create_domain`) are never marked retryable after a timeout or network failure: the request may already have reached Reloop, and the email may already have been sent. Check the current state before repeating a write.
 
 ## Security
 
@@ -269,7 +644,7 @@ Writes (`contacts_create`, `email_send`) are never marked retryable after a time
 - Request bodies are capped at 8 MB and upstream responses at 16 MB; record inputs are capped at 100 keys, recipients at 50.
 - `RELOOP_BASE_URL` is trusted server configuration and is never a tool parameter, so a model cannot redirect traffic to another host.
 - Reloop remains the authorization boundary: a key without access to an operation fails at Reloop, not here.
-- Destructive tools carry `destructiveHint` so clients can ask for confirmation. `email_send` sends real email that cannot be recalled, and `contacts_delete` cannot be undone.
+- Destructive tools carry `destructiveHint` so clients can ask for confirmation. `send_email` sends real email that cannot be recalled, `delete_contact`, `delete_group`, `delete_channel`, `delete_api_key`, and `delete_domain` cannot be undone, and `rotate_api_key` and `disable_api_key` break every service using that key.
 
 ## Development
 

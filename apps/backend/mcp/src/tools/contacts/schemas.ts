@@ -86,3 +86,32 @@ export function toContactOutput(contact: Contact): ContactOutput {
 		updatedAt: contact.updatedAt,
 	};
 }
+
+export const contactSelectorShape = {
+	contactId: contactIdSchema.optional(),
+	email: emailSchema
+		.optional()
+		.describe("Email address of an existing contact, instead of contactId"),
+};
+
+export function hasOneContactSelector(value: {
+	contactId?: string;
+	email?: string;
+}): boolean {
+	return (value.contactId === undefined) !== (value.email === undefined);
+}
+
+export const contactSelectorMessage = "Pass exactly one of contactId or email";
+
+export function toContactSelector(value: {
+	contactId?: string;
+	email?: string;
+}): { contact_id?: string; email?: string } {
+	return value.contactId !== undefined
+		? { contact_id: value.contactId }
+		: { email: value.email };
+}
+
+export const creatorSchema = z
+	.object({ id: z.string(), name: z.string().nullable(), email: z.string() })
+	.nullable();

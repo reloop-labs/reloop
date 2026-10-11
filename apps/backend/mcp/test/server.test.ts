@@ -3,6 +3,7 @@ import {
 	Client,
 	StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
+import { tools } from "../src/tools/index";
 import { createHttpHandler } from "../src/transports/http";
 import {
 	API_KEY,
@@ -36,12 +37,40 @@ describe("mcp server over streamable http", () => {
 		expect(client.getProtocolEra()).toBe("modern");
 		const listed = await client.listTools();
 		expect(listed.tools.map((tool) => tool.name)).toEqual([
-			"contacts_list",
-			"contacts_get",
-			"contacts_create",
-			"contacts_update",
-			"contacts_delete",
-			"email_send",
+			"list_contacts",
+			"get_contact",
+			"create_contact",
+			"update_contact",
+			"delete_contact",
+			"list_groups",
+			"get_group",
+			"create_group",
+			"update_group",
+			"delete_group",
+			"list_group_contacts",
+			"add_contact_to_group",
+			"remove_contact_from_group",
+			"list_channels",
+			"get_channel",
+			"create_channel",
+			"update_channel",
+			"delete_channel",
+			"set_channel_subscription",
+			"send_email",
+			"list_api_keys",
+			"get_api_key",
+			"create_api_key",
+			"update_api_key",
+			"rotate_api_key",
+			"enable_api_key",
+			"disable_api_key",
+			"delete_api_key",
+			"list_domains",
+			"get_domain",
+			"create_domain",
+			"update_domain",
+			"verify_domain",
+			"delete_domain",
 		]);
 		for (const tool of listed.tools) {
 			expect(tool.inputSchema).toBeDefined();
@@ -52,31 +81,31 @@ describe("mcp server over streamable http", () => {
 		const byName = new Map(
 			listed.tools.map((tool) => [tool.name, tool.annotations]),
 		);
-		expect(byName.get("contacts_list")).toMatchObject({
+		expect(byName.get("list_contacts")).toMatchObject({
 			readOnlyHint: true,
 			destructiveHint: false,
 			idempotentHint: true,
 			openWorldHint: false,
 		});
-		expect(byName.get("contacts_get")).toMatchObject({
+		expect(byName.get("get_contact")).toMatchObject({
 			readOnlyHint: true,
 			destructiveHint: false,
 			idempotentHint: true,
 			openWorldHint: false,
 		});
-		expect(byName.get("contacts_create")).toMatchObject({
+		expect(byName.get("create_contact")).toMatchObject({
 			readOnlyHint: false,
 			destructiveHint: false,
 			idempotentHint: false,
 			openWorldHint: false,
 		});
-		expect(byName.get("contacts_update")).toMatchObject({
+		expect(byName.get("update_contact")).toMatchObject({
 			readOnlyHint: false,
 			destructiveHint: false,
 			idempotentHint: true,
 			openWorldHint: false,
 		});
-		expect(byName.get("contacts_delete")).toMatchObject({
+		expect(byName.get("delete_contact")).toMatchObject({
 			readOnlyHint: false,
 			destructiveHint: true,
 			idempotentHint: true,
@@ -90,7 +119,7 @@ describe("mcp server over streamable http", () => {
 		const { handler } = harness([]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_list",
+			name: "list_contacts",
 			arguments: { limit: 500 },
 		});
 		expect(result.isError).toBe(true);
@@ -99,17 +128,17 @@ describe("mcp server over streamable http", () => {
 		await handler.close();
 	});
 
-	test("rejects contacts_get with both or neither selector", async () => {
+	test("rejects get_contact with both or neither selector", async () => {
 		const { handler } = harness([]);
 		const { client, close } = await connectHttpClient(handler);
 		const both = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { id: "con_123", email: "luna@example.com" },
 		});
 		expect(both.isError).toBe(true);
 		expect(firstText(both)).toContain("exactly one");
 		const neither = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: {},
 		});
 		expect(neither.isError).toBe(true);
@@ -127,7 +156,7 @@ describe("mcp server over streamable http", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { id: "con_123" },
 		});
 		const data = structuredContent(result);
@@ -150,7 +179,7 @@ describe("mcp server over streamable http", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { id: "con_missing" },
 		});
 		expect(result.isError).toBe(true);
@@ -173,7 +202,7 @@ describe("mcp server over streamable http", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { id: "con_123" },
 		});
 		expect(readProperty(errorJson(result), "code")).toBe("unauthorized");
@@ -202,9 +231,9 @@ describe("mcp server over streamable http", () => {
 		await client.connect(transport);
 		expect(client.getProtocolEra()).toBe("legacy");
 		const listed = await client.listTools();
-		expect(listed.tools).toHaveLength(6);
+		expect(listed.tools).toHaveLength(tools.length);
 		const result = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { id: "con_123" },
 		});
 		expect(
@@ -224,11 +253,11 @@ describe("mcp server over streamable http", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const first = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { id: "con_123" },
 		});
 		const second = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { id: "con_123" },
 		});
 		expect(first.isError).toBeUndefined();
@@ -250,7 +279,7 @@ describe("mcp server over streamable http", () => {
 			apiKey: jwt,
 		});
 		const result = await client.callTool({
-			name: "contacts_list",
+			name: "list_contacts",
 			arguments: {},
 		});
 		expect(result.isError).toBeUndefined();

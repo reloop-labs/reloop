@@ -5,6 +5,46 @@ export const contactEndpoints = {
 	create: `${CONTACTS}/create`,
 	retrieve: (id: string) => `${CONTACTS}/retrieve/${encodeURIComponent(id)}`,
 	byId: (id: string) => `${CONTACTS}/${encodeURIComponent(id)}`,
+	groupMembership: (groupId: string) =>
+		`${CONTACTS}/group/${encodeURIComponent(groupId)}`,
+	channelSubscription: (channelId: string) =>
+		`${CONTACTS}/channel/${encodeURIComponent(channelId)}`,
+} as const;
+
+const GROUPS = `${CONTACTS}/v1/groups`;
+
+export const groupEndpoints = {
+	list: `${GROUPS}/list`,
+	create: `${GROUPS}/create`,
+	byId: (id: string) => `${GROUPS}/${encodeURIComponent(id)}`,
+	contacts: (id: string) => `${GROUPS}/${encodeURIComponent(id)}/contacts`,
+} as const;
+
+const CHANNELS = `${CONTACTS}/v1/channels`;
+
+export const channelEndpoints = {
+	list: `${CHANNELS}/list`,
+	create: `${CHANNELS}/create`,
+	byId: (id: string) => `${CHANNELS}/${encodeURIComponent(id)}`,
 } as const;
 
 export const mailEndpoints = { send: "/api/mail/v1/send" } as const;
+
+const API_KEYS = "/api/api-key/v1";
+
+export const apiKeyEndpoints = {
+	collection: `${API_KEYS}/`,
+	byId: (id: string) => `${API_KEYS}/${encodeURIComponent(id)}`,
+	rotate: (id: string) => `${API_KEYS}/rotate/${encodeURIComponent(id)}`,
+	enable: (id: string) => `${API_KEYS}/enable/${encodeURIComponent(id)}`,
+	disable: (id: string) => `${API_KEYS}/disable/${encodeURIComponent(id)}`,
+} as const;
+
+const DOMAINS = "/api/domain/v1";
+
+export const domainEndpoints = {
+	list: `${DOMAINS}/list`,
+	create: `${DOMAINS}/create`,
+	byId: (id: string) => `${DOMAINS}/${encodeURIComponent(id)}`,
+	verify: (id: string) => `${DOMAINS}/verify/${encodeURIComponent(id)}`,
+} as const;

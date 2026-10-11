@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { tools } from "../src/tools/index";
 import { createHttpHandler } from "../src/transports/http";
 import {
 	API_KEY,
@@ -48,7 +49,7 @@ async function callSend(
 	args: Record<string, unknown>,
 ) {
 	const { client, close } = await connectHttpClient(handler);
-	const result = await client.callTool({ name: "email_send", arguments: args });
+	const result = await client.callTool({ name: "send_email", arguments: args });
 	await close();
 	await handler.close();
 	return result;
@@ -58,7 +59,7 @@ function errorField(result: unknown, key: string): unknown {
 	return readProperty(errorJson(result), key);
 }
 
-describe("email_send", () => {
+describe("send_email", () => {
 	test("forwards the full payload with API field names", async () => {
 		const { calls, handler } = harness([
 			{ method: "POST", path: SEND_PATH, body: SENT },
@@ -124,7 +125,7 @@ describe("email_send", () => {
 		});
 		const { client, close } = await connectHttpClient(handler);
 		await client.callTool({
-			name: "email_send",
+			name: "send_email",
 			arguments: {
 				from: "jane@example.com",
 				to: "luna@example.com",
@@ -141,7 +142,7 @@ describe("email_send", () => {
 	});
 });
 
-describe("email_send validation", () => {
+describe("send_email validation", () => {
 	const base = {
 		from: "jane@example.com",
 		to: "luna@example.com",
@@ -236,7 +237,7 @@ describe("email_send validation", () => {
 	});
 });
 
-describe("email_send errors", () => {
+describe("send_email errors", () => {
 	const base = {
 		from: "jane@example.com",
 		to: "luna@example.com",
@@ -356,13 +357,13 @@ describe("email_send errors", () => {
 });
 
 describe("tool registry", () => {
-	test("lists email_send last with its annotations", async () => {
+	test("registers send_email with its annotations", async () => {
 		const { handler } = harness([]);
 		const { client, close } = await connectHttpClient(handler);
 		const listed = await client.listTools();
-		expect(listed.tools).toHaveLength(6);
-		expect(listed.tools[5]?.name).toBe("email_send");
-		expect(listed.tools[5]?.annotations).toMatchObject({
+		expect(listed.tools).toHaveLength(tools.length);
+		const sendEmail = listed.tools.find((tool) => tool.name === "send_email");
+		expect(sendEmail?.annotations).toMatchObject({
 			readOnlyHint: false,
 			destructiveHint: true,
 			idempotentHint: false,
@@ -373,7 +374,7 @@ describe("tool registry", () => {
 	});
 });
 
-describe("email_send hardening", () => {
+describe("send_email hardening", () => {
 	const base = {
 		from: "jane@example.com",
 		to: "luna@example.com",

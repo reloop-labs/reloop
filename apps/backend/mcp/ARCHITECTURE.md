@@ -43,7 +43,7 @@ The HTTP transport is an RFC 9728 protected resource: `GET /.well-known/oauth-pr
 
 Everything upstream becomes a `ReloopError` with a stable `code`, a `message`, and optional `why`, `fix`, `status`, `retryAfterSeconds`, and `fields`. `registerTools` catches it and returns `isError: true` whose text content is a JSON `{ error }` document (never `structuredContent`, which clients validate against the output schema), so a model gets a machine-readable code and a human-readable next step instead of a stack trace.
 
-`retryable` is computed from the HTTP status and from whether the request was idempotent. Writes without an idempotency key — `contacts_create` and `email_send` — are never retryable after a timeout or a network failure, because the request may have reached Reloop and the email may already be out.
+`retryable` is computed from the HTTP status and from whether the request was idempotent. Writes without an idempotency key — `create_contact`, `create_group`, `create_channel`, `send_email`, `create_api_key`, `rotate_api_key`, and `create_domain` — are never retryable after a timeout or a network failure, because the request may have reached Reloop and the email may already be out.
 
 ## No resources, no prompts
 
@@ -51,7 +51,7 @@ Tools with output schemas already return structured, typed data, which is what r
 
 ## No elicitation on destructive tools
 
-`email_send` and `contacts_delete` are irreversible, and the MCP elicitation flow would be the natural confirmation mechanism. Client support for it is not universal, and a tool that requires an unsupported feature is simply unusable on those clients. The current safety layer is `destructiveHint` on the annotations plus descriptions that state the consequence in the first sentence, which every client can act on. Revisit once the major clients implement elicitation.
+`send_email` and `delete_contact` are irreversible, and the MCP elicitation flow would be the natural confirmation mechanism. Client support for it is not universal, and a tool that requires an unsupported feature is simply unusable on those clients. The current safety layer is `destructiveHint` on the annotations plus descriptions that state the consequence in the first sentence, which every client can act on. Revisit once the major clients implement elicitation.
 
 ## Where Tasks would fit
 

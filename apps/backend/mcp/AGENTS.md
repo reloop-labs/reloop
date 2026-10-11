@@ -14,7 +14,7 @@ This is **not** the marketing and documentation MCP server at `reloop.sh/mcp`. T
 - **No `any`, no `@ts-ignore`, no unexplained casts, no dead code.** Tabs, double quotes, Biome formatting.
 - **API client only.** Never add server code, database access, or Postgres queries. Everything goes through the Reloop HTTP API.
 - **Only two runtime dependencies:** `@modelcontextprotocol/server` and `zod`. Adding a third needs a very good reason.
-- **Never log, print, or return an API key**, not in an error message, not in a debug field. `redact` in `src/observability/log.ts` is the backstop, not the plan.
+- **Never log, print, or return an API key**, not in an error message, not in a debug field. `redact` in `src/observability/log.ts` is the backstop, not the plan. The one exception is the newly issued secret that `create_api_key` and `rotate_api_key` return once, in the tool result only.
 - **stdout belongs to the stdio protocol.** All logging goes to stderr.
 - **Read the backend route before adding a tool.** The Reloop monorepo is the contract; do not guess field names.
 - **Ship only what is asked.** No speculative tools, options, or abstractions.
@@ -54,12 +54,15 @@ cli.ts
 - Auth header is `x-api-key` for API keys and `Authorization: Bearer` for Better Auth OAuth tokens. A non-empty `User-Agent` is required or Reloop answers 400.
 - Error bodies are `{ message, why, fix, link? }`. 429 adds a `retryAfter` body field and a `retry-after` header; rate-limit headers are `ratelimit-limit`, `ratelimit-remaining`, `ratelimit-reset`.
 - Pagination is offset based: `page` (1-based) and `limit` (max 100).
-- Contacts: `properties` on update **replaces** the whole property set, so read before writing. There is no bulk route; `contacts_get` by email is a `search` on `/api/contacts/list` plus an exact match.
+- Contacts: `properties` on update **replaces** the whole property set, so read before writing. There is no bulk route; `get_contact` by email is a `search` on `/api/contacts/list` plus an exact match.
+- Groups and channels: CRUD lives under `/api/contacts/v1/groups` and `/api/contacts/v1/channels`; membership lives on contact routes: `POST`/`DELETE /api/contacts/group/:id` (idempotent, body `contact_id` or `email`) and `PATCH /api/contacts/channel/:id`, an idempotent upsert of the subscription. `POST /api/contacts/channel/:id` returns 409 on an unchanged state, so tools use the PATCH. None of these create the contact.
+- API keys: routes live under `/api/api-key/v1`; the collection is `/api/api-key/v1/` with a trailing slash, and state changes are `POST /rotate|enable|disable/:id`. Only create and rotate return the plaintext `key`.
+- Domains: routes live under `/api/domain/v1` (`/list`, `/create`, `/:id`, `POST /verify/:id`). Verify returns `active` synchronously when DNS already resolves, otherwise `verifying` while a background job retries.
 - Mail: `POST /api/mail/v1/send` has **no idempotency key**. A timeout or network failure may still have delivered the email, which is why writes are never marked `retryable`.
 
 ## Tool conventions
 
-- Names are `<resource>_<verb>` with a plural resource: `contacts_list`, `contacts_get`, `email_send`.
+- Names are `<verb>_<noun>`, singular for one record and plural for collections: `list_contacts`, `get_contact`, `send_email`.
 - Tool inputs are camelCase and are mapped to the API's field names inside `run` (`replyTo` → `reply_to`, `scheduledAt` → `scheduled_at`).
 - Every tool has a title, a description written for a model, all four annotations, an input schema, and an output schema.
 - Failures are thrown as `ReloopError`; `registerTools` turns them into `isError` results whose text block is a JSON `{ error }` document; never put an error in `structuredContent`, clients validate it against the output schema.

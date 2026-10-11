@@ -8,11 +8,11 @@ import {
 	toContactOutput,
 } from "./schemas";
 
-export const contactsGet = defineTool({
-	name: "contacts_get",
+export const getContact = defineTool({
+	name: "get_contact",
 	title: "Get contact",
 	description:
-		"Get one contact by ID or by exact email address. Pass exactly one of `id` or `email`. Use this to check whether a contact already exists (for example before contacts_create) or to read the current properties before contacts_update. Returns a `contact_not_found` error when no contact matches.",
+		"Get one contact by ID or by exact email address. Pass exactly one of `id` or `email`. Use this to check whether a contact already exists (for example before create_contact) or to read the current properties before update_contact. Returns a `contact_not_found` error when no contact matches.",
 	annotations: {
 		readOnlyHint: true,
 		destructiveHint: false,
@@ -50,7 +50,7 @@ export const contactsGet = defineTool({
 				message: `No contact exists with email ${email}.`,
 				status: 404,
 				retryable: false,
-				fix: "Use contacts_list with search to find similar addresses, or contacts_create to add the contact.",
+				fix: "Use list_contacts with search to find similar addresses, or create_contact to add the contact.",
 			});
 		}
 		return { contact: toContactOutput(contact) };

@@ -9,11 +9,11 @@ import {
 	toContactOutput,
 } from "./schemas";
 
-export const contactsCreate = defineTool({
-	name: "contacts_create",
+export const createContact = defineTool({
+	name: "create_contact",
 	title: "Create contact",
 	description:
-		"Create a new contact in the Reloop organization. Fails with `contact_already_exists` if the email is already a contact; use contacts_get first when unsure. Optionally set name, subscription status (defaults to subscribed), custom properties, group memberships, and channel subscriptions. Creating a contact does not send any email.",
+		"Create a new contact in the Reloop organization. Fails with `contact_already_exists` if the email is already a contact; use get_contact first when unsure. Optionally set name, subscription status (defaults to subscribed), custom properties, group memberships, and channel subscriptions. Creating a contact does not send any email.",
 	annotations: {
 		readOnlyHint: false,
 		destructiveHint: false,

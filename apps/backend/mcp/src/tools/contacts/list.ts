@@ -7,8 +7,8 @@ import {
 	toContactOutput,
 } from "./schemas";
 
-export const contactsList = defineTool({
-	name: "contacts_list",
+export const listContacts = defineTool({
+	name: "list_contacts",
 	title: "List contacts",
 	description:
 		"List contacts in the authenticated Reloop organization, newest first, with offset pagination. Use `search` for a case-insensitive substring match on the email address and `status` to filter by subscription state. Use this to look up recipients or audit the audience before creating, updating, or emailing contacts. Results are paginated: check `pagination.hasMore` and request the next `page` instead of raising `limit` beyond 100.",

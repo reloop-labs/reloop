@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
+import { tools } from "../src/tools/index";
 import { API_KEY, contactFixture, readProperty } from "./helpers";
 
 let upstream: ReturnType<typeof Bun.serve>;
@@ -71,9 +72,9 @@ describe("stdio transport", () => {
 		});
 		await client.connect(transport);
 		const listed = await client.listTools();
-		expect(listed.tools).toHaveLength(6);
+		expect(listed.tools).toHaveLength(tools.length);
 		const result = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { id: "con_123" },
 		});
 		const contact = readProperty(

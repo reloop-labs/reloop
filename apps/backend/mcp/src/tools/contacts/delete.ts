@@ -2,11 +2,11 @@ import * as z from "zod";
 import { defineTool } from "../define";
 import { contactIdSchema } from "./schemas";
 
-export const contactsDelete = defineTool({
-	name: "contacts_delete",
+export const deleteContact = defineTool({
+	name: "delete_contact",
 	title: "Delete contact",
 	description:
-		'Permanently delete a contact by ID. This cannot be undone and removes the contact from all groups and channels. To stop emailing someone without deleting their record, prefer contacts_update with status "unsubscribed". Use contacts_get to resolve an email to an ID and confirm the right record first.',
+		'Permanently delete a contact by ID. This cannot be undone and removes the contact from all groups and channels. To stop emailing someone without deleting their record, prefer update_contact with status "unsubscribed". Use get_contact to resolve an email to an ID and confirm the right record first.',
 	annotations: {
 		readOnlyHint: false,
 		destructiveHint: true,

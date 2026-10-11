@@ -33,7 +33,7 @@ function upstream(calls: RecordedCall[], path: string): RecordedCall {
 	return call;
 }
 
-describe("contacts_list", () => {
+describe("list_contacts", () => {
 	test("forwards the query and maps pagination and counts", async () => {
 		const { calls, handler } = harness([
 			{
@@ -51,7 +51,7 @@ describe("contacts_list", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_list",
+			name: "list_contacts",
 			arguments: { page: 2, limit: 10, status: "subscribed", search: "luna" },
 		});
 		expect(upstream(calls, "/api/contacts/list").query).toEqual({
@@ -93,7 +93,7 @@ describe("contacts_list", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_list",
+			name: "list_contacts",
 			arguments: {},
 		});
 		expect(
@@ -107,7 +107,7 @@ describe("contacts_list", () => {
 	});
 });
 
-describe("contacts_get by email", () => {
+describe("get_contact by email", () => {
 	test("searches by email and prefers the exact match", async () => {
 		const { calls, handler } = harness([
 			{
@@ -121,7 +121,7 @@ describe("contacts_get by email", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { email: "luna@example.com" },
 		});
 		expect(upstream(calls, "/api/contacts/list").query.search).toBe(
@@ -140,7 +140,7 @@ describe("contacts_get by email", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_get",
+			name: "get_contact",
 			arguments: { email: "nobody@example.com" },
 		});
 		expect(result.isError).toBe(true);
@@ -150,7 +150,7 @@ describe("contacts_get by email", () => {
 	});
 });
 
-describe("contacts_create", () => {
+describe("create_contact", () => {
 	test("forwards the body and maps the created contact", async () => {
 		const { calls, handler } = harness([
 			{
@@ -169,7 +169,7 @@ describe("contacts_create", () => {
 			channels: [{ channelId: "chn_1", subscription: "opt_in" }],
 		};
 		const result = await client.callTool({
-			name: "contacts_create",
+			name: "create_contact",
 			arguments: args,
 		});
 		expect(upstream(calls, "/api/contacts/create").body).toEqual(args);
@@ -191,7 +191,7 @@ describe("contacts_create", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_create",
+			name: "create_contact",
 			arguments: { email: "luna@example.com" },
 		});
 		expect(result.isError).toBe(true);
@@ -203,7 +203,7 @@ describe("contacts_create", () => {
 	});
 });
 
-describe("contacts_update", () => {
+describe("update_contact", () => {
 	test("patches only the fields that were passed", async () => {
 		const { calls, handler } = harness([
 			{
@@ -217,7 +217,7 @@ describe("contacts_update", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_update",
+			name: "update_contact",
 			arguments: { id: "con_123", status: "unsubscribed" },
 		});
 		const call = upstream(calls, "/api/contacts/con_123");
@@ -237,7 +237,7 @@ describe("contacts_update", () => {
 		const { handler } = harness([]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_update",
+			name: "update_contact",
 			arguments: { id: "con_123" },
 		});
 		expect(result.isError).toBe(true);
@@ -247,7 +247,7 @@ describe("contacts_update", () => {
 	});
 });
 
-describe("contacts_delete", () => {
+describe("delete_contact", () => {
 	test("deletes by id", async () => {
 		const { calls, handler } = harness([
 			{
@@ -263,7 +263,7 @@ describe("contacts_delete", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_delete",
+			name: "delete_contact",
 			arguments: { id: "con_123" },
 		});
 		expect(upstream(calls, "/api/contacts/con_123").method).toBe("DELETE");
@@ -283,7 +283,7 @@ describe("contacts_delete", () => {
 		]);
 		const { client, close } = await connectHttpClient(handler);
 		const result = await client.callTool({
-			name: "contacts_delete",
+			name: "delete_contact",
 			arguments: { id: "con_missing" },
 		});
 		expect(result.isError).toBe(true);
@@ -299,7 +299,7 @@ describe("identifier hardening", () => {
 			const { calls, handler } = harness([]);
 			const { client, close } = await connectHttpClient(handler);
 			const result = await client.callTool({
-				name: "contacts_delete",
+				name: "delete_contact",
 				arguments: { id },
 			});
 			expect(result.isError).toBe(true);
@@ -319,7 +319,7 @@ describe("identifier hardening", () => {
 			properties[`key_${index}`] = "v";
 		}
 		const result = await client.callTool({
-			name: "contacts_create",
+			name: "create_contact",
 			arguments: { email: "luna@example.com", properties },
 		});
 		expect(result.isError).toBe(true);
