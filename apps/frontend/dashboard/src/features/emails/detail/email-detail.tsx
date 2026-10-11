@@ -13,12 +13,12 @@ import { MessageAttachments } from "#/features/agent-inbox/components/thread-det
 import { ShortcutHint } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { emailSendVia } from "#/features/emails/lib/email-send-via";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
+import { useSmtpProviders } from "#/features/smtp/own-smtp/use-smtp-providers";
 import { EmailHtmlPreview } from "./email-html-preview";
 import { EmailInsightsPanel } from "./email-insights-panel";
 import { formatHtml } from "./format-html";
 import { type SmtpDetailRow, SmtpResponseDrawer } from "./smtp-response-drawer";
 import { EmailTimeline } from "./timeline";
-import { useSmtpProviders } from "#/features/smtp/own-smtp/use-smtp-providers";
 
 // ─── Error classification ──────────────────────────────────────────────────
 

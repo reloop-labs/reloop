@@ -62,39 +62,51 @@ export function useInvalidateTemplates() {
 		queryClient.invalidateQueries({ queryKey: queryKeys.templates.all });
 }
 
-export async function createTemplate(): Promise<Template> {
+export type CreateTemplateInput = {
+	name?: string;
+	subject?: string;
+	content?: unknown[];
+};
+
+export async function createTemplate(
+	input: CreateTemplateInput = {},
+): Promise<Template> {
 	const res = await fetch("/api/template/v1/create", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		credentials: "include",
 		body: JSON.stringify({
-			name: "Untitled",
-			content: [],
+			name: input.name || "Untitled",
+			subject: input.subject,
+			content: input.content ?? [],
 		}),
 	});
 	if (!res.ok) throw new Error(`Failed to create template (${res.status})`);
 	return res.json() as Promise<Template>;
 }
 
-/** Create a new template and navigate directly to the editor. Shared by header, empty state, and ⌘K. */
+/** Create a new template and navigate directly to the editor. Shared by header, empty state, ⌘K, and "Save as template" on email detail. */
 export function useCreateTemplate() {
 	const router = useRouter();
 	const invalidate = useInvalidateTemplates();
 	const [isCreating, setIsCreating] = useState(false);
 
-	const create = useCallback(async () => {
-		if (isCreating) return;
-		setIsCreating(true);
-		try {
-			const template = await createTemplate();
-			await invalidate();
-			router.push(`/templates/${template.id}`);
-		} catch (error) {
-			console.error("Failed to create template:", error);
-			toast.error("Failed to create template. Please try again.");
-			setIsCreating(false);
-		}
-	}, [isCreating, invalidate, router]);
+	const create = useCallback(
+		async (input?: CreateTemplateInput) => {
+			if (isCreating) return;
+			setIsCreating(true);
+			try {
+				const template = await createTemplate(input);
+				await invalidate();
+				router.push(`/templates/${template.id}`);
+			} catch (error) {
+				console.error("Failed to create template:", error);
+				toast.error("Failed to create template. Please try again.");
+				setIsCreating(false);
+			}
+		},
+		[isCreating, invalidate, router],
+	);
 
 	return { isCreating, create };
 }
