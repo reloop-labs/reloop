@@ -93,25 +93,12 @@ export function TemplateCardGrid() {
 						<TemplatePreview template={template} />
 					</div>
 
-					<div className="flex items-start justify-between gap-3 px-1">
-						<div className="mr-2 flex min-w-0 flex-1 flex-col gap-0.5">
-							<span
-								className="truncate font-semibold text-label-sm text-text-strong-950"
-								title={template.name}
-							>
-								{template.name}
-							</span>
-							<span
-								className="truncate text-paragraph-xs text-text-sub-600"
-								title={template.slug}
-							>
-								{template.slug}
-							</span>
-						</div>
-						<span className="shrink-0 select-none rounded-full bg-bg-weak-50 px-2.5 py-1 font-medium text-[11px] text-text-sub-600 leading-none ring-1 ring-stroke-soft-100 ring-inset dark:bg-bg-soft-200 dark:ring-stroke-soft-100/40">
-							Example
-						</span>
-					</div>
+					<span
+						className="truncate px-1 font-semibold text-label-sm text-text-strong-950"
+						title={template.name}
+					>
+						{template.name}
+					</span>
 				</Link>
 			))}
 		</div>
