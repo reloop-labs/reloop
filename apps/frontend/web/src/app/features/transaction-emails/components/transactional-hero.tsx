@@ -45,16 +45,16 @@ export function TransactionalHero() {
 				</div>
 
 				<div className="border-stroke-soft-100 border-t dark:border-white/10">
-					<div className="relative h-[420px] w-full overflow-hidden bg-bg-white-0 sm:h-[560px] lg:h-[680px] dark:bg-black">
+					<div className="relative w-full overflow-hidden bg-bg-white-0 dark:bg-black">
 						<div
 							aria-hidden
-							className={`absolute inset-0 bg-gradient-to-b ${TAB_GRADIENTS.email}`}
+							className={`absolute inset-0 bg-gradient-to-t ${TAB_GRADIENTS.email}`}
 						/>
-						<div className="relative h-full w-full pt-6 pl-4 sm:px-10 sm:pt-10">
-							<div className="relative h-full w-full overflow-hidden rounded-tl-xl border border-stroke-soft-100 border-r-0 border-b-0 bg-bg-white-0 sm:rounded-t-2xl sm:border-r dark:border-white/10 dark:bg-black">
-								{/* On phones, render the screenshot wider than the frame so the
-								    dashboard stays legible and crops from the top left. */}
-								<div className="relative h-full w-[760px] sm:w-full">
+						<div className="relative w-full pt-6 pb-6 pl-4 sm:px-10 sm:pt-10 sm:pb-10">
+							<div className="relative w-full overflow-hidden rounded-l-xl border border-stroke-soft-100 border-r-0 bg-bg-white-0 sm:rounded-2xl sm:border-r dark:border-white/10 dark:bg-black">
+								{/* Full-height screenshot. On phones it renders wider than the
+								    frame so the dashboard stays legible and runs off the right. */}
+								<div className="relative aspect-[2794/1924] w-[760px] sm:w-full">
 									<Image
 										src={shot.src}
 										alt={PLATFORM_ALT.email}

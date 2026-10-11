@@ -162,38 +162,40 @@ export function ObservabilitySection() {
 				id="observability-panel"
 				role="tabpanel"
 				aria-labelledby={`observability-tab-${tab.id}`}
-				className="relative h-[420px] w-full overflow-hidden bg-gradient-to-b from-orange-100 via-amber-50 to-bg-white-0 pt-6 pl-4 sm:h-[560px] sm:px-10 sm:pt-10 lg:h-[640px] lg:px-14 lg:pt-14 dark:from-orange-950/40 dark:via-orange-950/10 dark:to-black"
+				className="relative w-full overflow-hidden bg-gradient-to-t from-orange-100 via-amber-50 to-bg-white-0 pt-6 pb-6 pl-4 sm:px-10 sm:pt-10 sm:pb-10 lg:px-14 lg:pt-14 lg:pb-14 dark:from-orange-950/40 dark:via-orange-950/10 dark:to-black"
 			>
-				<div className="relative h-full w-full overflow-hidden rounded-tl-xl border border-stroke-soft-100 border-r-0 border-b-0 bg-bg-white-0 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.35)] sm:rounded-t-2xl sm:border-r dark:border-white/10 dark:bg-black dark:shadow-black/60">
-					{failed[tab.id] ? (
-						<div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-text-soft-400 dark:text-white/30">
-							<Icon name={tab.icon} className="size-6" aria-hidden />
-							<span className="text-[13px]">{tab.label}</span>
-						</div>
-					) : (
-						// On phones, render the screenshot wider than the frame so the
-						// dashboard stays legible and crops from the top left.
-						<div className="relative h-full w-[760px] sm:w-full">
-							<Image
-								key={`${tab.id}-light`}
-								src={tab.light}
-								alt={`${tab.label} in the Reloop dashboard`}
-								fill
-								className="object-cover object-top-left dark:hidden"
-								sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
-								onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
-							/>
-							<Image
-								key={`${tab.id}-dark`}
-								src={tab.dark}
-								alt=""
-								fill
-								className="hidden object-cover object-top-left dark:block"
-								sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
-								onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
-							/>
-						</div>
-					)}
+				<div className="relative w-full overflow-hidden rounded-l-xl border border-stroke-soft-100 border-r-0 bg-bg-white-0 shadow-[0_22px_60px_-38px_rgba(15,23,42,0.35)] sm:rounded-2xl sm:border-r dark:border-white/10 dark:bg-black dark:shadow-black/60">
+					{/* Full-height screenshot. On phones it renders wider than the
+					    frame so the dashboard stays legible and runs off the right. */}
+					<div className="relative aspect-[2794/1924] w-[760px] sm:w-full">
+						{failed[tab.id] ? (
+							<div className="absolute inset-0 flex max-w-[calc(100vw-1rem)] flex-col items-center justify-center gap-2 text-text-soft-400 sm:max-w-none dark:text-white/30">
+								<Icon name={tab.icon} className="size-6" aria-hidden />
+								<span className="text-[13px]">{tab.label}</span>
+							</div>
+						) : (
+							<>
+								<Image
+									key={`${tab.id}-light`}
+									src={tab.light}
+									alt={`${tab.label} in the Reloop dashboard`}
+									fill
+									className="object-cover object-top-left dark:hidden"
+									sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
+									onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
+								/>
+								<Image
+									key={`${tab.id}-dark`}
+									src={tab.dark}
+									alt=""
+									fill
+									className="hidden object-cover object-top-left dark:block"
+									sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
+									onError={() => setFailed((f) => ({ ...f, [tab.id]: true }))}
+								/>
+							</>
+						)}
+					</div>
 				</div>
 			</div>
 		</section>

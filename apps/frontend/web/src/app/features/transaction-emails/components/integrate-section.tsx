@@ -139,6 +139,7 @@ function StackIcon({
 
 const PILL_TRANSITION = { duration: 0.2, ease: "easeOut" } as const;
 const UNDERLINE_TRANSITION = { duration: 0.3, ease: "easeInOut" } as const;
+const FILL_TRANSITION = { duration: 0.45, ease: "easeOut" } as const;
 
 function FrameworkTabs({
 	snippets,
@@ -296,14 +297,25 @@ export function IntegrateSection() {
 							}
 							className={cn(
 								"group relative flex flex-[1_0_7rem] flex-col items-center gap-2.5 border-stroke-soft-100 border-r px-2 py-5 transition-colors duration-300 last:border-r-0 dark:border-white/10",
-								!active &&
-									"bg-bg-white-0 hover:bg-bg-weak-50 dark:bg-black dark:hover:bg-[#080808]",
-								active &&
-									(neutral
-										? "bg-bg-weak-50 dark:bg-[#0c0c0c]"
-										: "bg-[color-mix(in_srgb,var(--brand)_8%,white)] dark:bg-[color-mix(in_srgb,var(--brand)_14%,black)]"),
+								"bg-bg-white-0 dark:bg-black",
+								!active && "hover:bg-bg-weak-50 dark:hover:bg-[#080808]",
 							)}
 						>
+							{active && (
+								// Active tint grows out from the center of the tab.
+								<motion.span
+									aria-hidden
+									initial={{ clipPath: "circle(0% at 50% 50%)" }}
+									animate={{ clipPath: "circle(100% at 50% 50%)" }}
+									transition={FILL_TRANSITION}
+									className={cn(
+										"absolute inset-0",
+										neutral
+											? "bg-bg-weak-50 dark:bg-[#0c0c0c]"
+											: "bg-[color-mix(in_srgb,var(--brand)_8%,white)] dark:bg-[color-mix(in_srgb,var(--brand)_14%,black)]",
+									)}
+								/>
+							)}
 							{active && (
 								<motion.span
 									aria-hidden
@@ -321,7 +333,7 @@ export function IntegrateSection() {
 								icon={s.icon}
 								active={active}
 								className={cn(
-									"size-6 transition-all",
+									"relative size-6 transition-all",
 									active
 										? "text-text-strong-950 dark:text-white"
 										: "text-text-sub-600 opacity-70 grayscale group-hover:opacity-100 dark:text-white/60",
@@ -329,7 +341,7 @@ export function IntegrateSection() {
 							/>
 							<span
 								className={cn(
-									"font-medium text-[13px]",
+									"relative font-medium text-[13px]",
 									active
 										? "text-text-strong-950 dark:text-white"
 										: "text-text-sub-600 dark:text-white/50",

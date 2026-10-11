@@ -39,15 +39,15 @@ const TransactionEmailsPage = () => {
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<SectionSeparator hideTop className="h-24 sm:h-24" />
 				<IntegrateSection />
-				<SectionSeparator />
+				<SectionSeparator className="h-24 sm:h-24" />
 				<ConnectServicesSection />
-				<SectionSeparator />
+				<SectionSeparator className="h-24 sm:h-24" />
 				<ObservabilitySection />
-				<SectionSeparator />
+				<SectionSeparator className="h-24 sm:h-24" />
 				<UseCasesSection />
-				<SectionSeparator />
+				<SectionSeparator className="h-24 sm:h-24" />
 				<TransactionalFaq />
-				<SectionSeparator />
+				<SectionSeparator className="h-24 sm:h-24" />
 				<TransactionalCta />
 			</div>
 		</div>

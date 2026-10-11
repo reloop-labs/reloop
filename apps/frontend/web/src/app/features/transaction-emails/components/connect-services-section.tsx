@@ -93,7 +93,9 @@ export function ConnectServicesSection() {
 					id="connect-services-heading"
 					className="mt-3 text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.6rem] dark:text-white"
 				>
-					Connect easily with any service
+					Connect easily
+					<br />
+					with any service
 				</h2>
 				<p className="mt-3 max-w-md text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
 					Add Reloop to your existing stack, with the tools you already know and
