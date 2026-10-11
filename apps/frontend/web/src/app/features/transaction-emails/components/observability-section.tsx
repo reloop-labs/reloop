@@ -99,7 +99,7 @@ export function ObservabilitySection() {
 				role="tablist"
 				aria-label="Observability views"
 				ref={tablistRef}
-				className="flex snap-x snap-mandatory overflow-x-auto border-stroke-soft-100 border-b [scrollbar-width:none] sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible dark:border-white/10 [&::-webkit-scrollbar]:hidden"
+				className="relative flex snap-x snap-mandatory overflow-x-auto border-stroke-soft-100 border-b [scrollbar-width:none] sm:grid sm:snap-none sm:grid-cols-3 sm:overflow-visible dark:border-white/10 [&::-webkit-scrollbar]:hidden"
 			>
 				{TABS.map((t, index) => {
 					const selected = index === active;
