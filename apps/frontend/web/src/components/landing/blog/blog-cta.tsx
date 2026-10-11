@@ -154,6 +154,31 @@ export interface BlogCtaProps {
 	insetBorder?: boolean;
 }
 
+// The dashboard is a separate app, so client-side navigation can't reach it;
+// use a plain anchor to force a full page load.
+function CtaLink({
+	href,
+	className,
+	children,
+}: {
+	href: string;
+	className: string;
+	children: ReactNode;
+}) {
+	if (href.startsWith("/dashboard")) {
+		return (
+			<a href={href} className={className}>
+				{children}
+			</a>
+		);
+	}
+	return (
+		<Link href={href} className={className}>
+			{children}
+		</Link>
+	);
+}
+
 export function BlogCta({
 	id,
 	className,
@@ -312,12 +337,12 @@ export function BlogCta({
 										{resolvedPrimaryLabel}
 									</a>
 								) : (
-									<Link
+									<CtaLink
 										href={primaryHref}
 										className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-2.5 font-medium text-[#0f172a] text-[14.5px] transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90"
 									>
 										{resolvedPrimaryLabel}
-									</Link>
+									</CtaLink>
 								)}
 
 								{/* Secondary Button */}
@@ -332,12 +357,12 @@ export function BlogCta({
 											{resolvedSecondaryLabel}
 										</a>
 									) : (
-										<Link
+										<CtaLink
 											href={resolvedSecondaryHref}
 											className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
 										>
 											{resolvedSecondaryLabel}
-										</Link>
+										</CtaLink>
 									))}
 
 								{/* Tertiary Button */}
@@ -353,12 +378,12 @@ export function BlogCta({
 											{tertiaryLabel}
 										</a>
 									) : (
-										<Link
+										<CtaLink
 											href={tertiaryHref}
 											className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/12 px-6 py-2.5 font-medium text-[14.5px] text-white backdrop-blur-xs transition-all duration-200 hover:border-white/40 hover:bg-white/20 active:scale-[0.98] dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.1]"
 										>
 											{tertiaryLabel}
-										</Link>
+										</CtaLink>
 									))}
 							</div>
 						</div>

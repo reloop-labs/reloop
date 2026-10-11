@@ -8,12 +8,10 @@ export function TransactionalCta() {
 				<span className="block font-semibold text-[3rem] leading-[1.04] tracking-[-0.04em] sm:text-[4.25rem] lg:text-[5.25rem]">
 					Start now
 					<br />
-					<span className="mt-2 inline-block rounded-xl bg-white px-3 pb-1 text-black sm:rounded-2xl sm:px-4">
-						$0 / mo.
-					</span>
+					$0 / mo.
 				</span>
 			}
-			sub="Send your first email in minutes. 3,000 emails a month free, no credit card."
+			sub=""
 			primaryLabel="Get started"
 			primaryHref={hostedSignupHref}
 			secondaryLabel="View pricing"
