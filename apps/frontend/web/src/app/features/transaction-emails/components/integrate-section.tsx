@@ -32,7 +32,6 @@ type Stack = {
 	id: string;
 	name: string;
 	icon: BrandIcon | { sprite: string };
-	install?: string;
 	href: string;
 	snippets: Snippet[];
 };
@@ -62,7 +61,6 @@ const STACKS: Stack[] = [
 		id: language.slug,
 		name: language.name,
 		icon: language.icon,
-		install: language.installCommand,
 		href: `/sdk/${language.slug}`,
 		snippets: [
 			{
@@ -105,7 +103,6 @@ const STACKS: Stack[] = [
 		id: "smtp",
 		name: "SMTP",
 		icon: { sprite: "smtp" },
-		install: "npm install nodemailer",
 		href: "/docs/examples/smtp/introduction",
 		snippets: [
 			{
@@ -141,6 +138,7 @@ function StackIcon({
 }
 
 const PILL_TRANSITION = { duration: 0.2, ease: "easeOut" } as const;
+const UNDERLINE_TRANSITION = { duration: 0.3, ease: "easeInOut" } as const;
 
 function FrameworkTabs({
 	snippets,
@@ -157,7 +155,7 @@ function FrameworkTabs({
 		<div
 			role="tablist"
 			aria-label="Framework"
-			className="-mx-1 flex gap-1 overflow-x-auto"
+			className="-mx-1 flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 			onPointerLeave={() => setHoveredId(undefined)}
 		>
 			{snippets.map((s) => {
@@ -254,14 +252,20 @@ export function IntegrateSection() {
 			aria-labelledby="integrate-heading"
 			className="w-full bg-bg-white-0 dark:bg-black"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-16 text-center sm:px-8 sm:py-20 lg:px-12 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-b px-4 py-16 text-left sm:px-8 sm:py-20 sm:text-center lg:px-12 dark:border-white/10">
+				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
+					<Icon name="code" className="size-3.5" aria-hidden />
+					Developer first
+				</span>
 				<h2
 					id="integrate-heading"
-					className="text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.6rem] dark:text-white"
+					className="mt-3 text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.6rem] dark:text-white"
 				>
-					Integrate in minutes
+					Integrate in minutes,
+					<br />
+					with AI agent or by hand
 				</h2>
-				<p className="mx-auto mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
+				<p className="mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
 					A simple API that fits right into your code, with official SDKs for
 					your language and a drop-in SMTP relay for everything else.
 				</p>
@@ -270,10 +274,14 @@ export function IntegrateSection() {
 			<div
 				role="tablist"
 				aria-label="Language"
-				className="flex gap-px overflow-x-auto border-stroke-soft-100 border-b bg-stroke-soft-100 lg:grid lg:grid-cols-11 lg:overflow-visible dark:border-white/10 dark:bg-white/10"
+				className="flex overflow-x-auto border-stroke-soft-100 border-b [scrollbar-width:none] dark:border-white/10 [&::-webkit-scrollbar]:hidden"
 			>
 				{STACKS.map((s) => {
 					const active = s.id === stack.id;
+					// Tint the active tab with the brand color; sprites (REST, SMTP)
+					// and near-black brands fall back to the neutral text color.
+					const hex = "sprite" in s.icon ? null : s.icon.hex;
+					const neutral = !hex || isDarkBrandColor(hex);
 					return (
 						<button
 							key={s.id}
@@ -281,17 +289,32 @@ export function IntegrateSection() {
 							role="tab"
 							aria-selected={active}
 							onClick={() => selectStack(s.id)}
+							style={
+								neutral
+									? undefined
+									: ({ "--brand": `#${hex}` } as React.CSSProperties)
+							}
 							className={cn(
-								"group relative flex min-w-[88px] flex-1 flex-col items-center gap-2.5 px-2 py-5 transition-colors",
-								active
-									? "bg-bg-weak-50 dark:bg-white/[0.04]"
-									: "bg-bg-white-0 hover:bg-bg-weak-50 dark:bg-black dark:hover:bg-white/[0.03]",
+								"group relative flex flex-[1_0_7rem] flex-col items-center gap-2.5 border-stroke-soft-100 border-r px-2 py-5 transition-colors duration-300 last:border-r-0 dark:border-white/10",
+								!active &&
+									"bg-bg-white-0 hover:bg-bg-weak-50 dark:bg-black dark:hover:bg-[#080808]",
+								active &&
+									(neutral
+										? "bg-bg-weak-50 dark:bg-[#0c0c0c]"
+										: "bg-[color-mix(in_srgb,var(--brand)_8%,white)] dark:bg-[color-mix(in_srgb,var(--brand)_14%,black)]"),
 							)}
 						>
 							{active && (
-								<span
+								<motion.span
 									aria-hidden
-									className="absolute inset-x-0 bottom-0 h-0.5 bg-text-strong-950 dark:bg-white"
+									layoutId="integrate-language-underline"
+									transition={UNDERLINE_TRANSITION}
+									className={cn(
+										"absolute inset-x-0 bottom-0 z-10 h-0.5",
+										neutral
+											? "bg-text-strong-950 dark:bg-white"
+											: "bg-(--brand)",
+									)}
 								/>
 							)}
 							<StackIcon
@@ -319,18 +342,12 @@ export function IntegrateSection() {
 				})}
 			</div>
 
-			<div className="flex flex-col gap-3 border-stroke-soft-100 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-b px-4 py-3 sm:px-8 lg:px-12 dark:border-white/10">
 				<FrameworkTabs
 					snippets={stack.snippets}
 					activeId={snippet.id}
 					onSelect={setSnippetId}
 				/>
-				{stack.install && (
-					<code className="shrink-0 font-mono text-[12.5px] text-text-sub-600 dark:text-white/50">
-						<span className="text-text-soft-400 dark:text-white/30">$ </span>
-						{stack.install}
-					</code>
-				)}
 			</div>
 
 			<div className="px-4 py-6 sm:px-8 sm:py-8 lg:px-12">

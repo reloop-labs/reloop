@@ -50,7 +50,7 @@ export function CopyPromptButton() {
 			size="medium"
 			onClick={handleCopy}
 			aria-label={copied ? "Copied" : "Copy prompt"}
-			className="h-11 min-w-[10.5rem] overflow-hidden rounded-xl px-6 font-medium text-[15.5px]"
+			className="h-10 min-w-[9.5rem] overflow-hidden rounded-xl px-5 font-medium text-[14.5px] sm:h-11 sm:min-w-[10.5rem] sm:px-6 sm:text-[15.5px]"
 		>
 			<AnimatePresence mode="popLayout" initial={false}>
 				<motion.span

@@ -65,7 +65,7 @@ export function UseCasesSection() {
 			aria-labelledby="use-cases-heading"
 			className="w-full bg-bg-white-0 dark:bg-black"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-16 text-center sm:px-8 sm:py-20 lg:px-12 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-b px-4 py-16 text-left sm:px-8 sm:py-20 sm:text-center lg:px-12 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
 					<Icon name="layout" className="size-3.5" aria-hidden />
 					Templates
@@ -76,13 +76,13 @@ export function UseCasesSection() {
 				>
 					Ready for every use case
 				</h2>
-				<p className="mx-auto mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
+				<p className="mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
 					Whether you need to send welcome emails or notify users of important
 					events, start from a ready-made template.
 				</p>
 			</div>
 
-			<div className="grid grid-cols-1 gap-x-8 gap-y-10 px-4 py-10 sm:grid-cols-2 sm:px-8 sm:py-12 lg:grid-cols-3 lg:px-12">
+			<div className="flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 py-10 [scrollbar-width:none] sm:grid sm:snap-none sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 sm:overflow-visible sm:px-8 sm:py-12 lg:grid-cols-3 lg:px-12 [&::-webkit-scrollbar]:hidden">
 				{USE_CASES.map((useCase) => {
 					const template = emailTemplateExamples.find(
 						(t) => t.id === useCase.id,
@@ -92,7 +92,7 @@ export function UseCasesSection() {
 						<Link
 							key={useCase.id}
 							href={`${toolPath}/${template.id}`}
-							className="group/card flex flex-col gap-4"
+							className="group/card flex w-[82%] shrink-0 snap-start flex-col gap-4 sm:w-auto"
 						>
 							<div
 								className={cn(

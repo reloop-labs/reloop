@@ -37,7 +37,7 @@ const TransactionEmailsPage = () => {
 			</div>
 			<LandingDeveloperProof />
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
-				<SectionSeparator hideTop />
+				<SectionSeparator hideTop className="h-24 sm:h-24" />
 				<IntegrateSection />
 				<SectionSeparator />
 				<ConnectServicesSection />

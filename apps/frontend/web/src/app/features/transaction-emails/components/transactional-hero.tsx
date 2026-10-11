@@ -16,30 +16,30 @@ export function TransactionalHero() {
 			<div className="relative mx-auto mt-14 w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl min-[1280px]:mt-[72px] dark:border-white/10">
 				<div
 					aria-hidden
-					className="h-24 border-stroke-soft-100 border-t sm:h-24 dark:border-white/10"
+					className="h-10 border-stroke-soft-100 border-t sm:h-24 dark:border-white/10"
 				/>
 				<div className="flex flex-col items-start px-4 pt-0 pb-16 text-left sm:px-8 sm:pb-20 lg:px-12">
-					<h1 className="max-w-4xl text-balance font-semibold text-[2.4rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.1rem] dark:text-white">
+					<h1 className="max-w-4xl text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.06] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.1rem] dark:text-white">
 						Transactional emails developers love to use.
 					</h1>
 
-					<p className="mt-5 max-w-[42rem] text-balance text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] dark:text-white/60">
+					<p className="mt-4 max-w-[42rem] text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] dark:text-white/60">
 						Start sending transactional emails with a robust REST API, native
 						SDKs, and reliable SMTP service.
 					</p>
 
-					<div className="mt-8 flex flex-wrap items-center justify-start gap-3.5 sm:mt-9 sm:gap-4">
+					<div className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:gap-4">
 						<FancyButton.Root
 							asChild
 							variant="neutral"
 							size="medium"
-							className="h-11 rounded-xl px-6 font-medium text-[15.5px]"
+							className="h-10 rounded-xl px-5 font-medium text-[14.5px] sm:h-11 sm:px-6 sm:text-[15.5px]"
 						>
 							<a href={hostedSignupHref}>Start for free</a>
 						</FancyButton.Root>
 						<CopyPromptButton />
 					</div>
-					<p className="mt-4 text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
+					<p className="mt-3.5 text-[12.5px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
 						Free plan: 3,000 emails a month. No credit card.
 					</p>
 				</div>
@@ -50,27 +50,31 @@ export function TransactionalHero() {
 							aria-hidden
 							className={`absolute inset-0 bg-gradient-to-b ${TAB_GRADIENTS.email}`}
 						/>
-						<div className="relative h-full w-full px-4 pt-6 sm:px-10 sm:pt-10">
-							<div className="relative h-full w-full overflow-hidden rounded-t-xl border border-stroke-soft-100 border-b-0 bg-bg-white-0 sm:rounded-t-2xl dark:border-white/10 dark:bg-black">
-								<Image
-									src={shot.src}
-									alt={PLATFORM_ALT.email}
-									fill
-									sizes="(min-width: 1280px) 1200px, 100vw"
-									className="object-cover object-top-left dark:hidden"
-									preload
-									draggable={false}
-								/>
-								<Image
-									src={shot.darkSrc}
-									alt=""
-									aria-hidden
-									fill
-									sizes="(min-width: 1280px) 1200px, 100vw"
-									className="hidden object-cover object-top-left dark:block"
-									loading="eager"
-									draggable={false}
-								/>
+						<div className="relative h-full w-full pt-6 pl-4 sm:px-10 sm:pt-10">
+							<div className="relative h-full w-full overflow-hidden rounded-tl-xl border border-stroke-soft-100 border-r-0 border-b-0 bg-bg-white-0 sm:rounded-t-2xl sm:border-r dark:border-white/10 dark:bg-black">
+								{/* On phones, render the screenshot wider than the frame so the
+								    dashboard stays legible and crops from the top left. */}
+								<div className="relative h-full w-[760px] sm:w-full">
+									<Image
+										src={shot.src}
+										alt={PLATFORM_ALT.email}
+										fill
+										sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
+										className="object-cover object-top-left dark:hidden"
+										preload
+										draggable={false}
+									/>
+									<Image
+										src={shot.darkSrc}
+										alt=""
+										aria-hidden
+										fill
+										sizes="(min-width: 1280px) 1200px, (min-width: 640px) 100vw, 760px"
+										className="hidden object-cover object-top-left dark:block"
+										loading="eager"
+										draggable={false}
+									/>
+								</div>
 							</div>
 						</div>
 					</div>

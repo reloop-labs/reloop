@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { AutoScrollRow } from "@reloop/web/components/landing/auto-scroll-row";
 import type { SimpleIcon } from "simple-icons";
 import {
 	siCloudflare,
@@ -46,13 +47,7 @@ const SERVICES: Service[] = [
 	{ label: "Vercel", href: "/docs/integrations/vercel", icon: siVercel },
 ];
 
-function ServiceTile({
-	service,
-	hidden,
-}: {
-	service: Service;
-	hidden?: boolean;
-}) {
+function ServiceTile({ service }: { service: Service }) {
 	// Near-black brands (Vercel, Ghost, Make) use the text color so they stay
 	// visible in dark mode.
 	const dark = isDarkBrandColor(service.icon.hex);
@@ -60,7 +55,6 @@ function ServiceTile({
 	return (
 		<a
 			href={service.href}
-			tabIndex={hidden ? -1 : undefined}
 			className="group relative flex size-full bg-bg-white-0 transition-colors duration-200 hover:z-10 dark:bg-black"
 		>
 			<svg
@@ -90,12 +84,7 @@ export function ConnectServicesSection() {
 			aria-labelledby="connect-services-heading"
 			className="w-full overflow-hidden bg-bg-white-0 dark:bg-black"
 		>
-			<style>
-				{
-					"@keyframes connect-services-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }"
-				}
-			</style>
-			<div className="border-stroke-soft-100 border-b px-4 py-16 text-center sm:px-8 sm:py-20 lg:px-12 dark:border-white/10">
+			<div className="border-stroke-soft-100 border-b px-4 py-16 text-left sm:px-8 sm:py-20 sm:text-center lg:px-12 dark:border-white/10">
 				<span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
 					<Icon name="clock" className="size-3.5" aria-hidden />
 					Quick integration
@@ -106,28 +95,22 @@ export function ConnectServicesSection() {
 				>
 					Connect easily with any service
 				</h2>
-				<p className="mx-auto mt-3 max-w-md text-balance text-[15px] text-text-sub-600 leading-relaxed sm:text-base dark:text-white/60">
+				<p className="mt-3 max-w-md text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
 					Add Reloop to your existing stack, with the tools you already know and
 					love.
 				</p>
 			</div>
 
-			<div className="overflow-hidden">
-				<ul
-					aria-label="Services that work with Reloop"
-					className="flex w-max animate-[connect-services-marquee_60s_linear_infinite] divide-x divide-stroke-soft-100 motion-reduce:animate-none dark:divide-white/10 hover:[animation-play-state:paused]"
-				>
-					{[...SERVICES, ...SERVICES].map((service, i) => (
-						<li
-							key={`${service.label}-${i}`}
-							aria-hidden={i >= SERVICES.length}
-							className="size-36 shrink-0 sm:size-44"
-						>
-							<ServiceTile service={service} hidden={i >= SERVICES.length} />
-						</li>
-					))}
-				</ul>
-			</div>
+			<AutoScrollRow label="Services that work with Reloop">
+				{SERVICES.map((service) => (
+					<div
+						key={service.label}
+						className="size-36 shrink-0 border-stroke-soft-100 border-r sm:size-44 dark:border-white/10"
+					>
+						<ServiceTile service={service} />
+					</div>
+				))}
+			</AutoScrollRow>
 		</section>
 	);
 }
