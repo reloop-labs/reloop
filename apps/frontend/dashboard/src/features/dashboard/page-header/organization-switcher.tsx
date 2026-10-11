@@ -19,6 +19,16 @@ interface OrganizationSwitcherProps {
 	side?: "bottom" | "right";
 }
 
+/** Same box as the trigger button (20px avatar, px-2 py-1.5). */
+export function OrganizationSwitcherSkeleton() {
+	return (
+		<div className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5">
+			<div className="h-5 w-5 flex-shrink-0 animate-pulse rounded-[6px] bg-bg-weak-50" />
+			<div className="h-3.5 w-24 animate-pulse rounded bg-bg-weak-50" />
+		</div>
+	);
+}
+
 export function OrganizationSwitcher({
 	organizations,
 	activeOrganization,
@@ -30,7 +40,8 @@ export function OrganizationSwitcher({
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
-	const { billingEnabled: showPlans } = useBillingUsage();
+	const { billingEnabled: showPlans, isLoading: isBillingLoading } =
+		useBillingUsage();
 
 	const activeIndex = activeOrganization
 		? organizations?.findIndex((org) => org.id === activeOrganization.id)
@@ -57,14 +68,14 @@ export function OrganizationSwitcher({
 		setIsOpen(false);
 	};
 
-	if (!activeOrganization) {
-		return (
-			<div className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5">
-				<div className="h-5 w-5 flex-shrink-0 animate-pulse rounded-[6px] bg-bg-weak-50" />
-				<div className="h-3.5 w-24 animate-pulse rounded bg-bg-weak-50" />
-			</div>
-		);
+	// One skeleton until everything the trigger shows is known, then swap in
+	// the full row at once (no second placeholder for the plan badge).
+	if (!activeOrganization || isBillingLoading) {
+		return <OrganizationSwitcherSkeleton />;
 	}
+	// planId is missing only when credits is down; hide the badge rather than
+	// leaving a pulsing placeholder inside an otherwise loaded trigger.
+	const showTriggerBadge = showPlans && Boolean(activeOrganization.planId);
 
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -81,7 +92,7 @@ export function OrganizationSwitcher({
 						<span className="truncate font-medium text-sm text-text-strong-950">
 							{activeOrganization.name}
 						</span>
-						{showPlans ? (
+						{showTriggerBadge ? (
 							<PlanBadge planId={activeOrganization.planId} compact />
 						) : null}
 						<Icon

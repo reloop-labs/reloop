@@ -10,6 +10,7 @@ import {
 	getAutoExpandedNav,
 	visibleMainNavigation,
 } from "./navigation";
+import { PageHeaderSkeleton } from "./page-header/page-header";
 import { ThemeToggle } from "./page-header/theme-toggle";
 import { CollapsedThemeToggle } from "./sidebar/main-sidebar";
 import { SidebarNavIcon } from "./sidebar/sidebar-nav-icon";
@@ -200,11 +201,7 @@ export function DashboardLoadingChrome() {
 			</div>
 			<main className="relative flex min-w-0 flex-1 overflow-hidden">
 				<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-					<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
-						<div className="flex items-center gap-2">
-							<div className="h-7 w-7" />
-						</div>
-					</div>
+					<PageHeaderSkeleton />
 					<div className="flex-1 overflow-y-auto">
 						<DashboardContentSkeleton />
 					</div>

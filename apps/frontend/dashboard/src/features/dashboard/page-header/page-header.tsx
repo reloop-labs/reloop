@@ -6,9 +6,12 @@ import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
 import { useUIStore } from "#/store/use-ui-store";
-import { OrganizationSwitcher } from "./organization-switcher";
+import {
+	OrganizationSwitcher,
+	OrganizationSwitcherSkeleton,
+} from "./organization-switcher";
 import { useActiveOrganization } from "./use-active-organization";
-import { UserDropdown } from "./user-dropdown";
+import { UserDropdown, UserDropdownSkeleton } from "./user-dropdown";
 
 function HamburgerIcon({ open }: { open: boolean }) {
 	return (
@@ -47,7 +50,15 @@ function HamburgerIcon({ open }: { open: boolean }) {
 	);
 }
 
-function SidebarToggleButton() {
+/**
+ * `collapsedFromDom`: take the arrow direction from `<html data-sidebar-collapsed>`
+ * instead of store state, so SSR'd loading chrome hydrates without a mismatch.
+ */
+function SidebarToggleButton({
+	collapsedFromDom = false,
+}: {
+	collapsedFromDom?: boolean;
+}) {
 	const { isCollapsed, toggle } = useSidebarCollapse();
 	const isMobileNavOpen = useUIStore((s) => s.isMobileNavOpen);
 	const toggleMobileNav = useUIStore((s) => s.toggleMobileNav);
@@ -88,10 +99,61 @@ function SidebarToggleButton() {
 				className={cn(btnClass, "hidden lg:flex")}
 			>
 				<AnimatedSidebarToggleIcon
-					className={cn("h-4 w-4", isCollapsed && "rotate-180")}
+					className={cn(
+						"h-4 w-4",
+						collapsedFromDom
+							? "sidebar-collapsed:rotate-180"
+							: isCollapsed && "rotate-180",
+					)}
 				/>
 			</button>
 		</>
+	);
+}
+
+function HelpLink() {
+	const pathname = usePathname() ?? "/";
+	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
+	const isHelpActive = pathWithoutSlug === "/help";
+
+	return (
+		<Link
+			href="/help"
+			title="Help & support"
+			aria-label="Go to Help & support"
+			aria-current={isHelpActive ? "page" : undefined}
+			className={cn(
+				"flex h-7 items-center gap-1.5 rounded-full px-2.5 font-medium text-[12px] text-text-sub-600 transition-colors",
+				"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5 dark:hover:text-white",
+				isHelpActive &&
+					"bg-bg-weak-50 text-text-strong-950 dark:bg-white/5 dark:text-white",
+			)}
+		>
+			<LifeBuoy className="h-4 w-4" />
+			<span className="hidden sm:inline">Help</span>
+		</Link>
+	);
+}
+
+const HEADER_CLASS =
+	"sticky top-0 z-20 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 pr-3 pl-3 dark:border-stroke-soft-100/40 dark:bg-black";
+
+/**
+ * Header for loading chrome: same frame and controls as `PageHeader`, with
+ * skeletons where session / org data goes. Uses no suspending hooks.
+ */
+export function PageHeaderSkeleton() {
+	return (
+		<div className={HEADER_CLASS}>
+			<div className="flex items-center gap-1">
+				<SidebarToggleButton collapsedFromDom />
+				<OrganizationSwitcherSkeleton />
+			</div>
+			<div className="flex items-center gap-1.5">
+				<HelpLink />
+				<UserDropdownSkeleton />
+			</div>
+		</div>
 	);
 }
 
@@ -102,12 +164,9 @@ function SidebarToggleButton() {
 export function PageHeader() {
 	const { user, organizations, activeOrganization, onOrganizationChange } =
 		useActiveOrganization();
-	const pathname = usePathname();
-	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
-	const isHelpActive = pathWithoutSlug === "/help";
 
 	return (
-		<div className="sticky top-0 z-20 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 pr-3 pl-3 dark:border-stroke-soft-100/40 dark:bg-black">
+		<div className={HEADER_CLASS}>
 			<div className="flex items-center gap-1">
 				<SidebarToggleButton />
 				<OrganizationSwitcher
@@ -119,21 +178,7 @@ export function PageHeader() {
 			</div>
 
 			<div className="flex items-center gap-1.5">
-				<Link
-					href="/help"
-					title="Help & support"
-					aria-label="Go to Help & support"
-					aria-current={isHelpActive ? "page" : undefined}
-					className={cn(
-						"flex h-7 items-center gap-1.5 rounded-full px-2.5 font-medium text-[12px] text-text-sub-600 transition-colors",
-						"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5 dark:hover:text-white",
-						isHelpActive &&
-							"bg-bg-weak-50 text-text-strong-950 dark:bg-white/5 dark:text-white",
-					)}
-				>
-					<LifeBuoy className="h-4 w-4" />
-					<span className="hidden sm:inline">Help</span>
-				</Link>
+				<HelpLink />
 				<UserDropdown
 					user={
 						user

@@ -59,6 +59,11 @@ const UserDropdownItem = forwardRef<HTMLDivElement, UserDropdownItemProps>(
 	},
 );
 
+/** Same 28px circle as the avatar trigger. */
+export function UserDropdownSkeleton() {
+	return <div className="h-7 w-7 animate-pulse rounded-full bg-bg-weak-50" />;
+}
+
 export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const { theme } = useTheme();
 	const [isOpen, setIsOpen] = useState(false);
@@ -110,7 +115,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	};
 
 	if (!user) {
-		return <div className="h-7 w-7 animate-pulse rounded-full bg-bg-weak-50" />;
+		return <UserDropdownSkeleton />;
 	}
 
 	const workspaceItems = workspaceSection?.items ?? [];
