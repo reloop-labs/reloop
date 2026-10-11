@@ -1,5 +1,6 @@
 import { planLimits } from "@reloop/pricing";
 import { FaqSection } from "@reloop/web/components/faq-section";
+import { MCP_SERVER_URL } from "@reloop/web/lib/landing/ai-tools/mcp";
 import type { FaqEntry } from "@reloop/web/lib/schema";
 import Link from "next/link";
 
@@ -59,9 +60,9 @@ const facts = [
 const commands = [
 	{
 		title: "Give Claude Code the Reloop MCP server",
-		code: "claude mcp add reloop -e RELOOP_API_KEY=rl_xxxxxxxxx -- npx -y reloop-mcp",
-		href: "/docs/integrations/ai-tools/mcp-server",
-		linkLabel: "MCP server guide",
+		code: `claude mcp add --transport http reloop ${MCP_SERVER_URL}`,
+		href: "/features/mcp/claude-code",
+		linkLabel: "Claude Code setup",
 	},
 	{
 		title: "Install the agent skills",
@@ -72,8 +73,8 @@ const commands = [
 	{
 		title: "Stream inbound mail to a script",
 		code: "reloop emails receiving listen --json",
-		href: "/docs/integrations/ai-tools/cli-agents",
-		linkLabel: "CLI for agents",
+		href: "/features/cli",
+		linkLabel: "Reloop CLI",
 	},
 ];
 
@@ -89,6 +90,8 @@ const inboundPayload = `{
 }`;
 
 const reading = [
+	{ href: "/features/mcp", label: "Reloop MCP server" },
+	{ href: "/features/cli", label: "Reloop CLI" },
 	{ href: "/use-cases/ai-agent-inbox", label: "Use case: AI agent inbox" },
 	{ href: "/docs/learn/agent-inbox", label: "Docs: agent inbox" },
 	{ href: "/docs/webhooks/event-types", label: "Docs: webhook events" },

@@ -6,6 +6,7 @@ import {
 } from "../app/changelog/changelog-utils";
 import { FRAMEWORK_SLUGS } from "../app/sdk/frameworks";
 import { LANGUAGE_SLUGS } from "../app/sdk/languages";
+import { MCP_CLIENT_SLUGS } from "./landing/ai-tools/mcp";
 import {
 	generateStaticParams as generateBlogStaticParams,
 	generateCategoryStaticParams,
@@ -58,6 +59,10 @@ function collectStaticRoutes(dir: string, segments: string[] = []): string[] {
 			} else if (entry === "[slug]" && segmentPath === "frameworks") {
 				for (const slug of FRAMEWORK_SLUGS) {
 					routes.push(`/frameworks/${slug}`);
+				}
+			} else if (entry === "[client]" && segmentPath === "features/mcp") {
+				for (const client of MCP_CLIENT_SLUGS) {
+					routes.push(`/features/mcp/${client}`);
 				}
 			} else if (entry === "[slug]" && segmentPath === "blog") {
 				for (const { slug } of generateBlogStaticParams()) {

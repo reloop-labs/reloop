@@ -374,6 +374,13 @@ const navItems: NavItem[] = [
 							description:
 								"Manage subscriber lists, custom properties, and audience segments.",
 						},
+						{
+							title: "MCP Server",
+							href: "/features/mcp",
+							icon: "connector",
+							description:
+								"Connect Claude, Cursor, Codex, and other AI clients to Reloop.",
+						},
 					],
 				},
 				{
@@ -407,6 +414,13 @@ const navItems: NavItem[] = [
 							icon: "webhook",
 							description:
 								"Stream realtime delivery, bounce, and engagement events to your app.",
+						},
+						{
+							title: "CLI",
+							href: "/features/cli",
+							icon: "terminal",
+							description:
+								"Send, schedule, and receive email from your terminal or agent.",
 						},
 					],
 				},

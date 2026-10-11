@@ -5,6 +5,10 @@ import {
 	buildCompareMarkdown,
 	listComparePages,
 } from "@reloop/web/lib/compare-content";
+import {
+	listAiToolsPages,
+	resolveAiToolsMarkdown,
+} from "@reloop/web/lib/landing/ai-tools/markdown";
 import { buildPricingMarkdown } from "@reloop/web/lib/pricing-md";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
 import matter from "gray-matter";
@@ -113,6 +117,12 @@ export function resolveMarketingMarkdown(path: string): string | null {
 		const home = readAgentPage("home.md");
 		if (home) return injectMarkdownAgentDirective(home);
 		return injectMarkdownAgentDirective(buildHomeMarkdown());
+	}
+
+	// MCP server and CLI feature pages
+	const aiToolsMarkdown = resolveAiToolsMarkdown(normalized);
+	if (aiToolsMarkdown) {
+		return injectMarkdownAgentDirective(aiToolsMarkdown);
 	}
 
 	// Static agent pages: content/agent/<slug>.md
@@ -236,6 +246,8 @@ export function loadMarketingCorpus(): SearchablePage[] {
 			body,
 		});
 	}
+
+	pages.push(...listAiToolsPages());
 
 	const home = readAgentPage("home.md") ?? buildHomeMarkdown();
 	pages.push({ title: siteName, path: "/", body: home });

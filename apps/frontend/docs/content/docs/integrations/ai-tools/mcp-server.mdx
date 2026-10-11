@@ -1,329 +1,439 @@
 ---
 title: MCP Server
-description: Learn how to use the MCP Server to send emails with Reloop.
+description: Connect Claude, Cursor, VS Code, Codex, and other MCP clients to Reloop with the hosted MCP server and sign in with your Reloop account.
 ---
 
-## What is an MCP Server?
+The [Model Context Protocol](https://modelcontextprotocol.io) (MCP) is an open standard that lets AI assistants call external tools. The Reloop MCP server connects your assistant to your Reloop organization, so you can send email, manage contacts, check deliverability, and more by describing what you want in plain language.
 
-The Model Context Protocol (MCP) is an open standard that lets AI models connect to external tools and data sources. An MCP server acts as a bridge between your AI agent and the Reloop API, allowing the agent to send emails, manage contacts, handle domains, and more, all through natural language.
+Reloop runs a hosted MCP server for you. Add one URL to your client, sign in with your Reloop account, and you're done. There's no API key to copy and nothing to install.
 
-## What can Reloop's MCP Server do?
+| Setting | Value |
+|---|---|
+| **Server URL** | `https://reloop.sh/mcp` |
+| **Transport** | Streamable HTTP |
+| **Authentication** | Sign in with Reloop (OAuth) |
 
-The [Reloop MCP Server](https://github.com/reloop-labs/reloop-mcp) exposes the full Reloop API as MCP tools:
+<Tip>
+The [MCP page in your dashboard](https://reloop.sh/dashboard/integrations/mcp) has setup steps, one-click install buttons, and copyable config for each client.
+</Tip>
 
-- **Emails**: Send, list, get, cancel, update, and batch send emails. Supports HTML, plain text, attachments (local file, URL, or base64), CC/BCC, reply-to, scheduling, tags, and topic-based sending.
-- **Received Emails**: List and read inbound emails. List and download received email attachments.
-- **Contacts**: Create, list, get, update, and remove contacts. Manage segment memberships and topic subscriptions. Supports custom contact properties.
-- **Broadcasts**: Create, send, list, get, update, and remove broadcast campaigns. Supports scheduling, personalization placeholders, and preview text.
-- **Domains**: Create, list, get, update, remove, and verify sender domains. Configure tracking, TLS, and sending/receiving capabilities.
-- **Segments**: Create, list, get, and remove audience segments.
-- **Topics**: Create, list, get, update, and remove subscription topics.
-- **Contact Properties**: Create, list, get, update, and remove custom contact attributes.
-- **API Keys**: Create, list, and remove API keys.
-- **Webhooks**: Create, list, get, update, and remove webhooks for event notifications.
-- **Templates**: Create, list, get, update, and remove email templates.
+## What you can do
 
-## Prerequisites
+The MCP server is built to do everything you can do in the Reloop dashboard:
 
-You'll need a supported MCP client and `npx` installed on your machine.
+- **Emails**: Send transactional email with HTML or plain text, CC/BCC, reply-to, tags, templates, and scheduled delivery. Check what you sent and its delivery status.
+- **Contacts**: Look up, create, update, unsubscribe, and delete contacts. Manage custom properties, groups, and channel subscriptions.
+- **Campaigns**: Draft, schedule, and send campaigns to your audience.
+- **Templates**: Create and edit email templates and reuse them when sending.
+- **Automation**: Build flows such as a welcome series that runs when someone signs up.
+- **Inbox**: Read inbound email and attachments on your receiving domains.
+- **Metrics & logs**: Inspect email logs, bounces, and engagement, and ask why a number changed.
+- **Domains**: Add sending domains, check DNS records, and verify them.
+- **Webhooks & API keys**: Create and manage webhooks for email events, and manage API keys.
 
-- [Create an API key](https://reloop.sh/dashboard/api-keys)
-- [Verify your domain](https://reloop.sh/dashboard/domain)
+See [example prompts](/docs/integrations/ai-tools/mcp-prompts) for ideas.
 
-## How to use the MCP Server
+<Warning>
+Sending email is real and can't be undone. Most clients ask you to approve each tool call; read the sender, recipients, and content before you approve a send or a delete.
+</Warning>
 
-Replace `rl_xxxxxxxxx` with your actual Reloop API key.
+## Quick setup
 
-### OAuth Connect (Better Auth)
+Pick your client for full steps, including how to verify the connection and fix common problems.
 
-For shared or hosted deployments, connect with OAuth instead of an API key.
-Point your MCP client at your Reloop MCP HTTP endpoint (for example
-`https://mail.example.com/mcp` for self-hosted, backed by `reloop-mcp
---transport http`). OAuth-capable clients discover the flow automatically via
-`/.well-known/oauth-protected-resource/mcp`: the client opens the Reloop
-login page, you approve the consent screen, and the client presents the
-issued access token as `Authorization: Bearer <token>` on every request.
-Tokens are audience-bound to the MCP resource and resolve to your
-organization — no long-lived secrets live on the client. When you belong to
-several organizations, send `x-organization-id` to select one.
+<CardGroup cols={3}>
+  <Card icon="siClaude" title="Claude Code" href="/docs/integrations/ai-tools/mcp/claude-code">
+    Add Reloop with one `claude mcp add` command.
+  </Card>
+  <Card icon="siClaude" title="Claude" href="/docs/integrations/ai-tools/mcp/claude">
+    Add a custom connector on the web or in the desktop app.
+  </Card>
+  <Card icon="siCursor" title="Cursor" href="/docs/integrations/ai-tools/mcp/cursor">
+    One-click install or `.cursor/mcp.json`.
+  </Card>
+  <Card icon="code" title="VS Code" href="/docs/integrations/ai-tools/mcp/vscode">
+    GitHub Copilot agent mode with `.vscode/mcp.json`.
+  </Card>
+  <Card icon="terminal" title="Codex" href="/docs/integrations/ai-tools/mcp/codex">
+    Add Reloop to `~/.codex/config.toml`.
+  </Card>
+</CardGroup>
 
-### Stdio Transport (Default)
+The short version for each:
 
 <Tabs>
   <Tab title="Claude Code">
-    ```bash
-    claude mcp add reloop -e RELOOP_API_KEY=rl_xxxxxxxxx -- npx -y reloop-mcp
-    ```
+```bash
+claude mcp add --transport http reloop https://reloop.sh/mcp
+```
+
+Then run `/mcp` in Claude Code, pick **reloop**, and choose **Authenticate**.
+  </Tab>
+  <Tab title="Claude">
+In Claude, go to **Settings → Connectors**, click **Add custom connector**, name it `Reloop`, and use this URL:
+
+```text
+https://reloop.sh/mcp
+```
+
+Click **Connect** and sign in to Reloop.
+  </Tab>
+  <Tab title="Cursor">
+Add to `.cursor/mcp.json` (or `~/.cursor/mcp.json` for every project):
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "url": "https://reloop.sh/mcp"
+    }
+  }
+}
+```
+
+Then click **Connect** next to reloop in **Cursor Settings → MCP & Integrations**.
+  </Tab>
+  <Tab title="VS Code">
+Add to `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "reloop": {
+      "type": "http",
+      "url": "https://reloop.sh/mcp"
+    }
+  }
+}
+```
+
+Click **Start** above the server and sign in to Reloop when asked.
   </Tab>
   <Tab title="Codex">
-    ```bash
-    codex mcp add reloop \
-      --env RELOOP_API_KEY=rl_xxxxxxxxx \
-      -- npx -y reloop-mcp
-    ```
-  </Tab>
-  <Tab title="Cursor">
-    ```json
-    {
-      "mcpServers": {
-        "reloop": {
-          "command": "npx",
-          "args": ["-y", "reloop-mcp"],
-          "env": {
-            "RELOOP_API_KEY": "rl_xxxxxxxxx"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-  <Tab title="Claude Desktop">
-    ```json
-    {
-      "mcpServers": {
-        "reloop": {
-          "command": "npx",
-          "args": ["-y", "reloop-mcp"],
-          "env": {
-            "RELOOP_API_KEY": "rl_xxxxxxxxx"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-  <Tab title="Copilot">
-    Add the following to your VS Code `settings.json`:
+Add to `~/.codex/config.toml`:
 
-    ```json
-    {
-      "mcp": {
-        "servers": {
-          "reloop": {
-            "command": "npx",
-            "args": ["-y", "reloop-mcp"],
-            "env": {
-              "RELOOP_API_KEY": "rl_xxxxxxxxx"
-            }
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-  <Tab title="Gemini CLI">
-    ```json
-    {
-      "mcpServers": {
-        "reloop": {
-          "command": "npx",
-          "args": ["-y", "reloop-mcp"],
-          "env": {
-            "RELOOP_API_KEY": "rl_xxxxxxxxx"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-  <Tab title="OpenCode">
-    Add to your `opencode.json`:
+```toml
+[mcp_servers.reloop]
+url = "https://reloop.sh/mcp"
+```
 
-    ```json
-    {
-      "$schema": "https://opencode.ai/config.json",
-      "mcp": {
-        "reloop": {
-          "type": "local",
-          "command": ["npx", "-y", "reloop-mcp"],
-          "enabled": true,
-          "environment": {
-            "RELOOP_API_KEY": "rl_xxxxxxxxx"
-          }
-        }
-      }
-    }
-    ```
+Then sign in:
+
+```bash
+codex mcp login reloop
+```
   </Tab>
-  <Tab title="Windsurf">
-    ```json
-    {
-      "mcpServers": {
-        "reloop": {
-          "command": "npx",
-          "args": ["-y", "reloop-mcp"],
-          "env": {
-            "RELOOP_API_KEY": "rl_xxxxxxxxx"
-          }
-        }
-      }
-    }
-    ```
+  <Tab title="Other clients">
+Point any client that supports Streamable HTTP at this URL:
+
+```text
+https://reloop.sh/mcp
+```
+
+It discovers Reloop's OAuth server and signs you in through the browser. If your client can only launch local servers, use the [local server](#local-server-stdio) instead.
   </Tab>
 </Tabs>
 
-### HTTP Transport
+## How sign-in works
 
-For HTTP transport, the API key is passed via the `Authorization` header instead of an environment variable.
+The hosted server is an OAuth protected resource. You don't need an API key.
 
-Start the server:
+1. Your client connects to `https://reloop.sh/mcp` and gets a `401` with a `WWW-Authenticate` challenge.
+2. It reads `https://reloop.sh/.well-known/oauth-protected-resource/mcp` to find Reloop's authorization server, and registers itself automatically.
+3. Your browser opens the Reloop sign-in page. You sign in, pick the organization the client can access, and approve.
+4. The client sends the access token as `Authorization: Bearer <token>` on every request.
 
-```bash
-npx -y reloop-mcp --http --port 3000
-```
+Tokens are short-lived, scoped to the MCP server, and tied to the organization you approved. Reloop checks every call against your permissions, so the assistant can only do what your account can do.
 
-The server will be available at `http://127.0.0.1:3000` with the MCP endpoint at `/mcp`.
+### Choosing an organization
+
+If you belong to several organizations, you pick one on the consent screen. To switch, sign in again from your client and pick a different one. Clients that support custom headers can also send an `x-organization-id` header to select an organization per request.
+
+## Local server (stdio)
+
+Use the local server when your client can't connect to a remote URL, or when you prefer an API key over signing in. Your client starts `reloop-mcp` as a child process and talks to it over stdin/stdout.
+
+You'll need Node.js 20 or later (for `npx`) and a [Reloop API key](https://reloop.sh/dashboard/api-keys). Replace `rl_prod_your_api_key` with your key.
 
 <Tabs>
   <Tab title="Claude Code">
-    ```bash
-    claude mcp add reloop --transport http http://127.0.0.1:3000/mcp --header "Authorization: Bearer rl_xxxxxxxxx"
-    ```
+```bash
+claude mcp add reloop --env RELOOP_API_KEY=rl_prod_your_api_key -- npx -y reloop-mcp
+```
   </Tab>
-  <Tab title="Cursor">
-    ```json
-    {
-      "mcpServers": {
-        "reloop": {
-          "url": "http://127.0.0.1:3000/mcp",
-          "headers": {
-            "Authorization": "Bearer rl_xxxxxxxxx"
-          }
-        }
+  <Tab title="Claude Desktop / Cursor">
+Add to `claude_desktop_config.json` (Claude Desktop) or `.cursor/mcp.json` (Cursor):
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "command": "npx",
+      "args": ["-y", "reloop-mcp"],
+      "env": {
+        "RELOOP_API_KEY": "rl_prod_your_api_key"
       }
     }
-    ```
+  }
+}
+```
+  </Tab>
+  <Tab title="VS Code">
+Add to `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "reloop": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "reloop-mcp"],
+      "env": {
+        "RELOOP_API_KEY": "rl_prod_your_api_key"
+      }
+    }
+  }
+}
+```
+  </Tab>
+  <Tab title="Codex">
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.reloop]
+command = "npx"
+args = ["-y", "reloop-mcp"]
+env = { RELOOP_API_KEY = "rl_prod_your_api_key" }
+```
+  </Tab>
+  <Tab title="Gemini CLI">
+Add to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "command": "npx",
+      "args": ["-y", "reloop-mcp"],
+      "env": {
+        "RELOOP_API_KEY": "rl_prod_your_api_key"
+      }
+    }
+  }
+}
+```
+  </Tab>
+  <Tab title="OpenCode">
+Add to `opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "reloop": {
+      "type": "local",
+      "command": ["npx", "-y", "reloop-mcp"],
+      "enabled": true,
+      "environment": {
+        "RELOOP_API_KEY": "rl_prod_your_api_key"
+      }
+    }
+  }
+}
+```
   </Tab>
 </Tabs>
 
-You can customize the port with the `MCP_PORT` environment variable:
+For any other stdio client, run `npx -y reloop-mcp` (or `bunx reloop-mcp`) with `RELOOP_API_KEY` in the environment.
 
-```bash
-MCP_PORT=3000 npx -y reloop-mcp --http
+<Note>
+An API key is scoped to the organization it was created in, so the local server always acts in that organization.
+</Note>
+
+## Self-hosted Reloop
+
+If you run your own Reloop instance, set `RELOOP_BASE_URL` to its origin. Nothing is tied to `reloop.sh` beyond the default.
+
+For the hosted-style setup, your instance serves the MCP endpoint at `https://<your-domain>/mcp` and every remote setup above works with that URL in place of `https://reloop.sh/mcp`.
+
+For the local server, add `RELOOP_BASE_URL` next to your key:
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "command": "npx",
+      "args": ["-y", "reloop-mcp"],
+      "env": {
+        "RELOOP_API_KEY": "rl_prod_your_api_key",
+        "RELOOP_BASE_URL": "https://mail.example.com"
+      }
+    }
+  }
+}
 ```
 
-### Options
+## Run the HTTP server yourself
 
-**CLI flags:**
-- `--key`: Your Reloop API key (stdio mode only; HTTP mode uses the Bearer token from the client)
-- `--sender`: Default sender email address from a verified domain
-- `--reply-to`: Default reply-to email address (can be specified multiple times)
-- `--http`: Use HTTP transport instead of stdio (default: stdio)
-- `--port`: HTTP port when using `--http` (default: 3000, or `MCP_PORT` env var)
+You can run the Streamable HTTP server on your own infrastructure. It's stateless: there are no sessions, so you can run several instances behind any load balancer.
 
-**Environment variables:**
-- `RELOOP_API_KEY`: Your Reloop API key (required for stdio, optional for HTTP)
-- `SENDER_EMAIL_ADDRESS`: Default sender email address from a verified domain (optional)
-- `REPLY_TO_EMAIL_ADDRESSES`: Comma-separated reply-to email addresses (optional)
-- `MCP_PORT`: HTTP port when using `--http` (optional)
+```bash
+bunx reloop-mcp --transport http --host 0.0.0.0 --port 3000
+```
 
-## Local Development
+The standalone HTTP server needs [Bun](https://bun.sh). On Node.js, use the Docker image instead:
+
+```bash
+docker build -t reloop/mcp .
+docker run --rm -p 3000:3000 -e RELOOP_BASE_URL=https://mail.example.com reloop/mcp
+```
+
+Clients connect to `http://<host>:3000/mcp` and authenticate on every request with one of:
+
+- An OAuth access token: `Authorization: Bearer <token>` (recommended; clients get this by signing in)
+- A Reloop API key: `Authorization: Bearer rl_prod_...` or `x-api-key: rl_prod_...`
+
+`RELOOP_API_KEY` is not used by the HTTP transport. For example, to connect Claude Code with an API key:
+
+```bash
+claude mcp add --transport http reloop http://127.0.0.1:3000/mcp \
+  --header "Authorization: Bearer rl_prod_your_api_key"
+```
+
+Check that the server is up:
+
+```bash
+curl -s http://127.0.0.1:3000/mcp/healthz
+```
+
+```json
+{ "status": "ok", "name": "reloop", "version": "0.1.0" }
+```
+
+`GET /healthz` returns the same response.
+
+## Options
+
+**CLI flags**
+
+| Flag | Default | Description |
+|---|---|---|
+| `--transport <stdio\|http>` | `stdio` | Transport to serve |
+| `--host <hostname>` | `127.0.0.1` | HTTP bind hostname |
+| `--port <number>` | `3000` | HTTP bind port |
+| `--base-url <url>` | `https://reloop.sh` | Origin of the Reloop instance |
+| `--version` | | Print the version and exit |
+| `--help` | | Print help and exit |
+
+**Environment variables**
+
+| Variable | Default | Description |
+|---|---|---|
+| `RELOOP_API_KEY` | | Reloop API key. Required for stdio, ignored by HTTP |
+| `RELOOP_BASE_URL` | `https://reloop.sh` | Origin of the Reloop instance |
+| `RELOOP_MCP_RESOURCE` | `<base>/mcp` | Canonical MCP resource identifier. Must match the auth server's `MCP_RESOURCE` |
+| `RELOOP_AUTH_ISSUER` | `<base>/api/auth/v1` | OAuth issuer advertised in the protected resource metadata |
+| `RELOOP_TIMEOUT_MS` | `30000` | Per-request timeout to Reloop, from 1000 to 600000 |
+| `HOST` | `127.0.0.1` | HTTP bind hostname |
+| `PORT` | `3000` | HTTP bind port |
+| `MCP_ALLOWED_HOSTS` | `*` | Comma-separated `Host` header allowlist. `*` or unset accepts any host |
+| `MCP_ALLOWED_ORIGINS` | loopback origins | Comma-separated `Origin` header allowlist |
+| `LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error`, or `silent` |
+
+Even with `MCP_ALLOWED_HOSTS` unset, every request still needs an OAuth token or API key. Set it to restrict which hostnames the server answers on.
+
+## Security
+
+- Credentials are per request. The server forwards the caller's token or key to Reloop and never stores, caches, or shares it.
+- API keys and tokens are redacted from logs, and email content is never logged.
+- `Host` and `Origin` headers are validated to block DNS-rebinding attacks from a browser.
+- `RELOOP_BASE_URL` is server configuration, never a tool parameter, so a model can't redirect traffic to another host.
+- Tools that send email or delete data are marked destructive, so clients can ask you to confirm before they run.
+
+## Local development
+
+The server's source is at [github.com/reloop-labs/reloop-mcp](https://github.com/reloop-labs/reloop-mcp).
 
 ```bash
 git clone https://github.com/reloop-labs/reloop-mcp.git
-pnpm install
-pnpm run build
+cd reloop-mcp
+bun install
+bun run dev:stdio   # stdio transport
+bun run dev:http    # HTTP transport on http://127.0.0.1:3000/mcp, reloads on change
+bun run build       # builds dist/cli.js
 ```
 
-Replace `npx` commands above with direct `node` commands.
+To point a stdio client at your local build, replace `npx -y reloop-mcp` with `node`:
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "command": "node",
+      "args": ["ABSOLUTE_PATH_TO_PROJECT/dist/cli.js"],
+      "env": {
+        "RELOOP_API_KEY": "rl_prod_your_api_key"
+      }
+    }
+  }
+}
+```
+
+Before opening a pull request, run `bun run lint`, `bun run typecheck`, and `bun test`.
+
+## Test with MCP Inspector
+
+[MCP Inspector](https://github.com/modelcontextprotocol/inspector) is a browser UI for calling MCP tools by hand.
 
 ### Stdio
 
-<Tabs>
-  <Tab title="Claude Code">
-    ```bash
-    claude mcp add reloop -e RELOOP_API_KEY=rl_xxxxxxxxx -- node ABSOLUTE_PATH_TO_PROJECT/dist/index.js
-    ```
-  </Tab>
-  <Tab title="Codex">
-    ```bash
-    codex mcp add reloop \
-      --env RELOOP_API_KEY=rl_xxxxxxxxx \
-      -- node ABSOLUTE_PATH_TO_PROJECT/dist/index.js
-    ```
-  </Tab>
-  <Tab title="Cursor / Claude Desktop / Gemini CLI">
-    ```json
-    {
-      "mcpServers": {
-        "reloop": {
-          "command": "node",
-          "args": ["ABSOLUTE_PATH_TO_PROJECT/dist/index.js"],
-          "env": {
-            "RELOOP_API_KEY": "rl_xxxxxxxxx"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-</Tabs>
+From the `reloop-mcp` folder:
+
+```bash
+npx @modelcontextprotocol/inspector -e RELOOP_API_KEY=rl_prod_your_api_key bun src/cli.ts
+```
+
+Inspector opens in your browser with the server already configured. Click **Connect**, then **List Tools**.
 
 ### HTTP
 
-```bash
-node ABSOLUTE_PATH_TO_PROJECT/dist/index.js --http --port 3000
-```
+1. Start the server:
 
-<Tabs>
-  <Tab title="Claude Code">
     ```bash
-    claude mcp add reloop --transport http http://127.0.0.1:3000/mcp --header "Authorization: Bearer rl_xxxxxxxxx"
+    bun run dev:http
     ```
-  </Tab>
-  <Tab title="Cursor">
-    ```json
-    {
-      "mcpServers": {
-        "reloop": {
-          "url": "http://127.0.0.1:3000/mcp",
-          "headers": {
-            "Authorization": "Bearer rl_xxxxxxxxx"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-</Tabs>
 
-## Testing with MCP Inspector
+2. Start Inspector:
 
-Follow the [Local Development](#local-development) steps above first.
-
-### Using Stdio Transport
-
-1. Set your API key:
     ```bash
-    export RELOOP_API_KEY=rl_your_key_here
+    npx @modelcontextprotocol/inspector
     ```
 
-2. Start the inspector:
-    ```bash
-    pnpm inspector
-    ```
+3. In the browser, choose **Streamable HTTP** and set the URL to `http://127.0.0.1:3000/mcp`.
+4. Add a header `Authorization: Bearer rl_prod_your_api_key` and turn it on.
+5. Click **Connect**, then **List Tools**.
 
-3. Configure in the browser:
-    - Choose **stdio** (launch a process)
-    - Command: `node`
-    - Args: `dist/index.js` (or the full path to `dist/index.js`)
-    - Env: `RELOOP_API_KEY=rl_your_key_here`
-    - Click **Connect**, then use "List tools" to verify the server is working
+To test against the hosted server, use `https://reloop.sh/mcp` without a header. Inspector walks you through the OAuth sign-in.
 
-### Using HTTP Transport
+## Troubleshooting
 
-1. Start the HTTP server:
-    ```bash
-    node dist/index.js --http --port 3000
-    ```
-
-2. Start the inspector:
-    ```bash
-    pnpm inspector
-    ```
-
-3. Configure in the browser:
-    - Choose **Streamable HTTP** (connect to URL)
-    - URL: `http://127.0.0.1:3000/mcp`
-    - Add a custom header: `Authorization: Bearer rl_your_key_here` and activate the toggle
-    - Click **Connect**, then use "List tools" to verify the server is working
+<AccordionGroup>
+  <Accordion title="My client says it can't authenticate or keeps asking me to sign in">
+    Remove the saved sign-in from your client and authenticate again. Each client page above has the exact steps. If you're on a self-hosted instance, check that `RELOOP_MCP_RESOURCE` matches the auth server's `MCP_RESOURCE`.
+  </Accordion>
+  <Accordion title="Tools act on the wrong organization">
+    Sign in again and pick the right organization on the consent screen, or send an `x-organization-id` header if your client supports custom headers. With an API key, create the key in the organization you want.
+  </Accordion>
+  <Accordion title="Sending fails with not_found or validation_error">
+    The `from` address must use a sending domain that's verified in your organization. Ask your assistant to list your domains, or check [Domains](https://reloop.sh/dashboard/domain).
+  </Accordion>
+  <Accordion title="The local server exits with an error about RELOOP_API_KEY">
+    The stdio transport needs `RELOOP_API_KEY`, and the key has to look like a Reloop key (for example `rl_prod_...`). Copy it again from the [API keys page](https://reloop.sh/dashboard/api-keys).
+  </Accordion>
+  <Accordion title="I get malformed_response errors">
+    The server reached something that isn't a Reloop API, which usually means `RELOOP_BASE_URL` is wrong. Set it to the origin of your instance, without a path.
+  </Accordion>
+  <Accordion title="Calls time out">
+    Retry reads. Don't blindly retry a send: the first one may have gone out. Check your email logs first. You can raise `RELOOP_TIMEOUT_MS` if you run the server yourself.
+  </Accordion>
+</AccordionGroup>

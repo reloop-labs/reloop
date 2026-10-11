@@ -1,0 +1,5 @@
+{
+	"title": "MCP Clients",
+	"icon": "workflow",
+	"pages": ["claude-code", "claude", "cursor", "vscode", "codex"]
+}

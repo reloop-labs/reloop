@@ -29,6 +29,8 @@ const columns: FooterColumn[] = [
 			{ title: "Email Validation", href: "/features/email-validation" },
 			{ title: "Email Templates", href: "/features/email-templates" },
 			{ title: "AI Agents", href: "/features/ai-agents" },
+			{ title: "MCP Server", href: "/features/mcp" },
+			{ title: "CLI", href: "/features/cli" },
 			{ title: "Webhooks", href: "/features/webhooks" },
 			{ title: "Deliverability", href: "/features/deliverability" },
 			{ title: "Engine", href: "/engine" },

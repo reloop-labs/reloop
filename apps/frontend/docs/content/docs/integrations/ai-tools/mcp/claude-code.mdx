@@ -1,0 +1,84 @@
+---
+title: Connect Claude Code to Reloop
+sidebarTitle: Claude Code
+icon: siClaude
+description: Add the Reloop MCP server to Claude Code and sign in with your Reloop account.
+---
+
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's coding agent for the terminal. Once you add Reloop, Claude Code can send email, manage contacts, check domains, and more from your terminal session.
+
+## Prerequisites
+
+- Claude Code installed and signed in
+- A [Reloop account](https://reloop.sh/dashboard)
+- A [verified domain](https://reloop.sh/dashboard/domain) if you want to send email
+
+## Setup
+
+<Steps>
+  <Step title="Add the Reloop server">
+Run this in your terminal:
+
+```bash
+claude mcp add --transport http reloop https://reloop.sh/mcp
+```
+
+This adds Reloop to the current project. Add `--scope user` to make it available in every project:
+
+```bash
+claude mcp add --transport http --scope user reloop https://reloop.sh/mcp
+```
+  </Step>
+  <Step title="Sign in">
+Start Claude Code and run:
+
+```text
+/mcp
+```
+
+Pick **reloop** and choose **Authenticate**. Your browser opens the Reloop sign-in page. Sign in, choose the organization Claude Code can access, and approve.
+  </Step>
+</Steps>
+
+## Verify it works
+
+Run `/mcp` again. **reloop** should show as connected, with its tools listed. From your shell, `claude mcp list` also shows the server and its status.
+
+Then ask something read-only to confirm it reaches your organization:
+
+> "List my Reloop domains and tell me which ones are verified."
+
+## Example prompts
+
+- "Send a welcome email to user@example.com with a personalized greeting."
+- "Add a new contact for jane@example.com named Jane Doe."
+- "List all emails I sent today and show their delivery status."
+
+See [more example prompts](/docs/integrations/ai-tools/mcp-prompts).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Claude Code shows reloop as needing authentication">
+    Run `/mcp`, pick **reloop**, and choose **Authenticate** again. If sign-in keeps failing, choose **Clear authentication** first, then authenticate.
+  </Accordion>
+  <Accordion title="Tools act on the wrong organization">
+    Clear authentication from `/mcp`, authenticate again, and pick the right organization on the consent screen. You can also pin an organization with a header:
+
+```bash
+claude mcp remove reloop
+claude mcp add --transport http reloop https://reloop.sh/mcp \
+  --header "x-organization-id: YOUR_ORGANIZATION_ID"
+```
+  </Accordion>
+  <Accordion title="reloop doesn't appear in /mcp">
+    You may have added it in a different project. Run `claude mcp list` in the project you're working in, or add it again with `--scope user`.
+  </Accordion>
+  <Accordion title="I'd rather use an API key">
+    Use the [local server](/docs/integrations/ai-tools/mcp-server#local-server-stdio):
+
+```bash
+claude mcp add reloop --env RELOOP_API_KEY=rl_prod_your_api_key -- npx -y reloop-mcp
+```
+  </Accordion>
+</AccordionGroup>

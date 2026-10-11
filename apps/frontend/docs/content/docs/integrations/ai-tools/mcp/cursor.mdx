@@ -1,0 +1,81 @@
+---
+title: Connect Cursor to Reloop
+sidebarTitle: Cursor
+icon: siCursor
+description: Add the Reloop MCP server to Cursor with one click or mcp.json, and sign in with your Reloop account.
+---
+
+Add Reloop to [Cursor](https://cursor.com) so the agent can send test emails, look up contacts, check domains, and manage templates while you build.
+
+## Prerequisites
+
+- Cursor installed
+- A [Reloop account](https://reloop.sh/dashboard)
+- A [verified domain](https://reloop.sh/dashboard/domain) if you want to send email
+
+## Setup
+
+<Steps>
+  <Step title="Add the server">
+The quickest way is the **Add to Cursor** button on the [Cursor page in your dashboard](https://reloop.sh/dashboard/integrations/mcp/cursor). It opens Cursor with Reloop filled in.
+
+Or add this to `.cursor/mcp.json` in your project. Use `~/.cursor/mcp.json` to make it available in every project.
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "url": "https://reloop.sh/mcp"
+    }
+  }
+}
+```
+  </Step>
+  <Step title="Sign in">
+Open **Cursor Settings → MCP & Integrations** and click **Connect** next to **reloop**. Your browser opens the Reloop sign-in page. Sign in, choose the organization Cursor can access, and approve.
+  </Step>
+</Steps>
+
+## Verify it works
+
+In **Cursor Settings → MCP & Integrations**, reloop shows a green status dot and lists its tools. Then ask the agent something read-only:
+
+> "List my Reloop domains and tell me which ones are verified."
+
+## Example prompts
+
+- "Send a test email to me@example.com with the HTML from emails/welcome.html."
+- "Create a webhook that notifies https://example.com/hooks/reloop when an email bounces."
+- "Verify my domain and check the DNS configuration status."
+
+See [more example prompts](/docs/integrations/ai-tools/mcp-prompts).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="reloop shows an error or keeps asking me to connect">
+    In **Cursor Settings → MCP & Integrations**, turn reloop off and on, then click **Connect**. If that doesn't help, remove the server, add it again, and sign in.
+  </Accordion>
+  <Accordion title="Tools act on the wrong organization">
+    Sign in again and pick the right organization on the consent screen, or pin one with a header:
+
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "url": "https://reloop.sh/mcp",
+      "headers": {
+        "x-organization-id": "YOUR_ORGANIZATION_ID"
+      }
+    }
+  }
+}
+```
+  </Accordion>
+  <Accordion title="The agent doesn't use Reloop">
+    Check that reloop is turned on in settings, and mention Reloop in your prompt.
+  </Accordion>
+  <Accordion title="I'd rather use an API key">
+    Use the [local server](/docs/integrations/ai-tools/mcp-server#local-server-stdio) with `npx -y reloop-mcp` and `RELOOP_API_KEY`.
+  </Accordion>
+</AccordionGroup>

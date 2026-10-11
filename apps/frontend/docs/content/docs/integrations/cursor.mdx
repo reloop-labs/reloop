@@ -2,32 +2,35 @@
 title: Cursor Integration
 sidebarTitle: Cursor
 icon: "siCursor"
-description: Connect Cursor's Composer and chat features to Reloop using the MCP Server.
+description: Connect Cursor's agent and chat to Reloop using the Reloop MCP server.
 ---
 
-[Cursor](https://cursor.com) is an AI-first code editor. By connecting Cursor to the Reloop Model Context Protocol (MCP) server, your Cursor agent can send test emails, check domain logs, and manage templates directly from the chat window.
+[Cursor](https://cursor.com) is an AI-first code editor. Connect it to the Reloop MCP server and the Cursor agent can send test emails, look up contacts, check domains, and manage templates directly from the chat window.
 
----
+## Connect Cursor
 
-## Step 1: Configure Reloop MCP in Cursor
+Add the hosted server and sign in with your Reloop account. No API key needed.
 
-1. Open Cursor and navigate to **Cursor Settings** (Gear icon on the top right) → **Features** → **MCP**.
-2. Click **+ Add New MCP Server**.
-3. Fill in the configuration:
-   - **Name**: `reloop`
-   - **Type**: `command`
-   - **Command**: `npx -y reloop-mcp`
-4. Under environment variables in the dialog, add:
-   - **Key**: `RELOOP_API_KEY`
-   - **Value**: `rl_your_api_key_here`
-5. Click **Save**.
+```json
+{
+  "mcpServers": {
+    "reloop": {
+      "url": "https://reloop.sh/mcp"
+    }
+  }
+}
+```
 
-Cursor will initialize the MCP server and list all available tools.
+Put this in `.cursor/mcp.json`, then click **Connect** next to reloop in **Cursor Settings → MCP & Integrations**.
 
----
+<Card icon="siCursor" title="Full Cursor setup guide" href="/docs/integrations/ai-tools/mcp/cursor">
+  One-click install, sign-in, verifying the connection, and troubleshooting.
+</Card>
 
-## Step 2: Use in Chat
+## Use it in chat
 
-In the Cursor chat panel, type:
+In the Cursor chat panel, try:
 
-> "Send a test email to customer@example.com saying 'Hello from Cursor Composer!' using the Reloop MCP tool."
+> "Send a test email to customer@example.com saying 'Hello from Cursor!' using Reloop."
+
+See [example prompts](/docs/integrations/ai-tools/mcp-prompts) for more, and the [MCP server overview](/docs/integrations/ai-tools/mcp-server) for everything the server can do.

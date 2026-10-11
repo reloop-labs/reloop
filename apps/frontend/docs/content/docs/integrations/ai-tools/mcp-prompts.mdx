@@ -1,0 +1,84 @@
+---
+title: MCP Prompt Examples
+sidebarTitle: Prompt Examples
+description: Example prompts to try once your AI assistant is connected to the Reloop MCP server.
+---
+
+Once your client is connected to the [Reloop MCP server](/docs/integrations/ai-tools/mcp-server), you can ask for things in plain language. Here are prompts to start with, grouped by area. Swap in your own addresses, names, and details.
+
+<Tip>
+Your assistant shows each tool call before it runs. Read sends and deletes before you approve them: email that's been sent can't be recalled.
+</Tip>
+
+## Emails
+
+> "Send a welcome email to user@example.com with a personalized greeting."
+
+Writes a welcome email and sends it from a verified domain in your organization.
+
+> "List all emails I sent today and show their delivery status."
+
+Pulls today's email logs and reports whether each one was delivered, bounced, or is still queued.
+
+> "Send a batch of onboarding emails to these five new users."
+
+Sends one onboarding email to each address you list, in a single batch.
+
+## Contacts
+
+> "Add a new contact with their name and email."
+
+Creates a contact with the name and email you give it. Creating a contact doesn't send anything.
+
+> "Create a contact group for users who signed up this month."
+
+Creates a group and adds the contacts that signed up this month, so you can target them later.
+
+## Campaigns
+
+> "Create a campaign for our product launch announcement."
+
+Drafts a launch campaign with a subject line and content, ready for you to review, schedule, or send.
+
+## Domains
+
+> "Verify my domain and check the DNS configuration status."
+
+Checks your domain's DNS records, runs verification, and tells you which records are missing or wrong.
+
+## Inbound
+
+> "Show me all inbound emails I received this week."
+
+Lists the emails your receiving domains got this week, with senders and subjects.
+
+## Webhooks
+
+> "Set up a webhook to notify me when an email bounces."
+
+Creates a webhook subscribed to bounce events and sends them to the URL you choose.
+
+## Templates
+
+> "Create a password reset email template that matches our brand."
+
+Builds a reusable password reset template with a variable for the reset link.
+
+## Metrics
+
+> "Why did my bounce rate go up yesterday?"
+
+Compares yesterday's bounces with earlier days and points out the domains, recipients, or messages behind the change.
+
+## Automation
+
+> "Build an automation that sends a welcome series when someone signs up."
+
+Sets up a flow that starts when a contact signs up and sends a sequence of welcome emails.
+
+## Tips for better results
+
+- **Name the sender.** Say which address to send from, for example "from hello@example.com". It has to be on a verified domain.
+- **Ask before you act.** For bulk changes, ask for a preview first: "Show me who would get this before sending."
+- **Be specific about time.** "Today", "this week", and "yesterday" work, and so do exact dates.
+- **Mention Reloop.** If your assistant has several tools, saying "in Reloop" helps it pick the right one.

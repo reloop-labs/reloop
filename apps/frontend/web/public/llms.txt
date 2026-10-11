@@ -80,6 +80,8 @@ Prefer `.md` twins. Reloop Free has a monthly and a daily cap (see the pricing s
 - [Developers](https://reloop.sh/developers) · [markdown](https://reloop.sh/developers.md)
 - [About](https://reloop.sh/about) · [markdown](https://reloop.sh/about.md)
 - [Features](https://reloop.sh/features)
+- [MCP server](https://reloop.sh/features/mcp) · [markdown](https://reloop.sh/features/mcp.md): Connect any AI agent or MCP client to Reloop (hosted server URL https://reloop.sh/mcp, OAuth sign-in). Client guides: [Claude Code](https://reloop.sh/features/mcp/claude-code), [Claude](https://reloop.sh/features/mcp/claude), [Cursor](https://reloop.sh/features/mcp/cursor), [VS Code](https://reloop.sh/features/mcp/vscode), [Codex](https://reloop.sh/features/mcp/codex)
+- [CLI](https://reloop.sh/features/cli) · [markdown](https://reloop.sh/features/cli.md): Send, schedule and receive email from a terminal or coding agent
 - [Blog](https://reloop.sh/blog)
 - [Changelog](https://reloop.sh/changelog)
 - [Compare](https://reloop.sh/compare) · [markdown](https://reloop.sh/compare.md)

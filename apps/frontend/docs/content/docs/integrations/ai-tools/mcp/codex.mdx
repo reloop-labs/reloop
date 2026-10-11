@@ -1,0 +1,85 @@
+---
+title: Connect Codex to Reloop
+sidebarTitle: Codex
+icon: terminal
+description: Add the Reloop MCP server to the Codex CLI and IDE extension, and sign in with your Reloop account.
+---
+
+[Codex](https://developers.openai.com/codex) is OpenAI's coding agent for the terminal and IDE. The CLI and the IDE extension share one config file, so you set up Reloop once for both.
+
+## Prerequisites
+
+- The Codex CLI or IDE extension installed
+- A [Reloop account](https://reloop.sh/dashboard)
+- A [verified domain](https://reloop.sh/dashboard/domain) if you want to send email
+
+## Setup
+
+<Steps>
+  <Step title="Add the server">
+Add this to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.reloop]
+url = "https://reloop.sh/mcp"
+```
+  </Step>
+  <Step title="Sign in">
+Run the login command:
+
+```bash
+codex mcp login reloop
+```
+
+Your browser opens the Reloop sign-in page. Sign in, choose the organization Codex can access, and approve.
+  </Step>
+</Steps>
+
+## Verify it works
+
+Run `codex mcp list` and check that reloop is listed. In a Codex session, run `/mcp` to see its tools. Then ask something read-only:
+
+> "List my Reloop domains and tell me which ones are verified."
+
+## Example prompts
+
+- "Create a campaign for our product launch announcement."
+- "Create a contact group for users who signed up this month."
+- "Build an automation that sends a welcome series when someone signs up."
+
+See [more example prompts](/docs/integrations/ai-tools/mcp-prompts).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Codex asks me to sign in again or calls fail with unauthorized">
+    Log out and back in:
+
+```bash
+codex mcp logout reloop
+codex mcp login reloop
+```
+  </Accordion>
+  <Accordion title="codex mcp login says the server doesn't support login">
+    Update Codex to the latest version. Remote servers with OAuth need a recent release.
+  </Accordion>
+  <Accordion title="Tools act on the wrong organization">
+    Log out, log in again, and pick the right organization on the consent screen. Or pin one with a header:
+
+```toml
+[mcp_servers.reloop]
+url = "https://reloop.sh/mcp"
+http_headers = { "x-organization-id" = "YOUR_ORGANIZATION_ID" }
+```
+  </Accordion>
+  <Accordion title="I'd rather use an API key">
+    Use the [local server](/docs/integrations/ai-tools/mcp-server#local-server-stdio):
+
+```toml
+[mcp_servers.reloop]
+command = "npx"
+args = ["-y", "reloop-mcp"]
+env = { RELOOP_API_KEY = "rl_prod_your_api_key" }
+```
+  </Accordion>
+</AccordionGroup>

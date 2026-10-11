@@ -1,4 +1,5 @@
 {
 	"title": "AI Tools",
-	"pages": ["mcp-server", "cli-agents", "openclaw-guide"]
+	"icon": "robot",
+	"pages": ["mcp-server", "mcp", "mcp-prompts", "cli-agents", "openclaw-guide"]
 }

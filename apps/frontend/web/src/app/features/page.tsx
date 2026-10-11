@@ -53,6 +53,12 @@ const productFeatures = [
 		description: "Email infrastructure for autonomous agents and LLMs.",
 	},
 	{
+		title: "MCP Server",
+		href: "/features/mcp",
+		description:
+			"Connect any AI agent to Reloop. Everything the dashboard does.",
+	},
+	{
 		title: "Transaction Emails",
 		href: "/features/transaction-emails",
 		description: "Low-latency transactional delivery for developers.",
@@ -114,6 +120,11 @@ const platformFeatures = [
 		title: "Webhooks",
 		href: "/features/webhooks",
 		description: "Real-time events for delivery and engagement.",
+	},
+	{
+		title: "CLI",
+		href: "/features/cli",
+		description: "Send, schedule, and receive email from your terminal.",
 	},
 ];
 

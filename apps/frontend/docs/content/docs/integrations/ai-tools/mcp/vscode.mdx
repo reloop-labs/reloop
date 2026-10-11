@@ -1,0 +1,83 @@
+---
+title: Connect VS Code to Reloop
+sidebarTitle: VS Code
+icon: code
+description: Add the Reloop MCP server to GitHub Copilot agent mode in Visual Studio Code.
+---
+
+Add Reloop to [Visual Studio Code](https://code.visualstudio.com) so GitHub Copilot in agent mode can send email, manage contacts, and check your Reloop setup from the editor.
+
+## Prerequisites
+
+- VS Code with GitHub Copilot and agent mode available
+- A [Reloop account](https://reloop.sh/dashboard)
+- A [verified domain](https://reloop.sh/dashboard/domain) if you want to send email
+
+## Setup
+
+<Steps>
+  <Step title="Add the server">
+The quickest way is the **Install in VS Code** button on the [VS Code page in your dashboard](https://reloop.sh/dashboard/integrations/mcp/vscode).
+
+Or add this to `.vscode/mcp.json` in your workspace:
+
+```json
+{
+  "servers": {
+    "reloop": {
+      "type": "http",
+      "url": "https://reloop.sh/mcp"
+    }
+  }
+}
+```
+  </Step>
+  <Step title="Start and sign in">
+Click **Start** above the server in `mcp.json`, or run **MCP: List Servers** from the Command Palette and start **reloop**. VS Code asks you to sign in to Reloop in the browser. Sign in, choose the organization VS Code can access, and approve.
+  </Step>
+</Steps>
+
+## Verify it works
+
+Run **MCP: List Servers**. reloop shows as running. Open Copilot Chat in **Agent** mode and click the tools icon; the Reloop tools are listed. Then ask something read-only:
+
+> "List my Reloop domains and tell me which ones are verified."
+
+## Example prompts
+
+- "Add a new contact with their name and email."
+- "Send a batch of onboarding emails to these five new users."
+- "List all emails I sent today and show their delivery status."
+
+See [more example prompts](/docs/integrations/ai-tools/mcp-prompts).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The server stopped or asks me to sign in again">
+    Run **MCP: List Servers**, pick reloop, and restart it. To sign in from scratch, sign out of Reloop from the **Accounts** menu in the activity bar, then start the server again.
+  </Accordion>
+  <Accordion title="Tools act on the wrong organization">
+    Sign out, start the server again, and pick the right organization on the consent screen. Or pin one with a header:
+
+```json
+{
+  "servers": {
+    "reloop": {
+      "type": "http",
+      "url": "https://reloop.sh/mcp",
+      "headers": {
+        "x-organization-id": "YOUR_ORGANIZATION_ID"
+      }
+    }
+  }
+}
+```
+  </Accordion>
+  <Accordion title="Copilot doesn't use Reloop">
+    Make sure Chat is in **Agent** mode and the Reloop tools are checked in the tools picker.
+  </Accordion>
+  <Accordion title="I'd rather use an API key">
+    Use the [local server](/docs/integrations/ai-tools/mcp-server#local-server-stdio) with `npx -y reloop-mcp` and `RELOOP_API_KEY`.
+  </Accordion>
+</AccordionGroup>

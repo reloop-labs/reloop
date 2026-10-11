@@ -6,6 +6,7 @@ import type { SVGProps } from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import {
 	siCaprover,
+	siClaude,
 	siCloudflare,
 	siCoolify,
 	siCursor,
@@ -59,6 +60,7 @@ const Icons: Record<string, SimpleIconType> = {
 	siOpenjdk,
 	siDotnet,
 	siCursor,
+	siClaude,
 	siReadthedocs,
 	siCoolify,
 	siCaprover,

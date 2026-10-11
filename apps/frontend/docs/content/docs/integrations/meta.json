@@ -3,6 +3,7 @@
 	"icon": "integration",
 	"pages": [
 		"index",
+		"ai-tools",
 		"n8n",
 		"make",
 		"zapier",

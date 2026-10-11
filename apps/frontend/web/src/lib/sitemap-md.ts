@@ -1,6 +1,7 @@
 import { changelogReleases } from "@reloop/web/app/changelog/changelog-utils";
 import { frameworks } from "@reloop/web/app/sdk/frameworks";
 import { languages } from "@reloop/web/app/sdk/languages";
+import { mcpClients } from "@reloop/web/lib/landing/ai-tools/mcp";
 import {
 	getCategories,
 	getPublishedPosts,
@@ -48,6 +49,8 @@ function humanizeSlug(slug: string): string {
 		.map((part) => {
 			if (part.toLowerCase() === "ai") return "AI";
 			if (part.toLowerCase() === "smtp") return "SMTP";
+			if (part.toLowerCase() === "mcp") return "MCP";
+			if (part.toLowerCase() === "cli") return "CLI";
 			if (part.toLowerCase() === "sdk" || part.toLowerCase() === "sdks") {
 				return part.toUpperCase();
 			}
@@ -80,7 +83,11 @@ function buildLookups() {
 		glossaryTerms.map((term) => [term.slug, term.title]),
 	);
 
-	return { posts, categories, releases, langs, fws, glossary };
+	const mcp = new Map<string, string>(
+		mcpClients.map((client) => [client.slug, client.name]),
+	);
+
+	return { posts, categories, releases, langs, fws, glossary, mcpClients: mcp };
 }
 
 function classifyRoute(
@@ -148,6 +155,16 @@ function classifyRoute(
 			path,
 			title: lookups.glossary.get(slug) ?? humanizeSlug(slug),
 			type: "glossary-entry",
+		};
+	}
+
+	const mcpClientMatch = path.match(/^\/features\/mcp\/([^/]+)$/);
+	if (mcpClientMatch?.[1]) {
+		const slug = mcpClientMatch[1];
+		return {
+			path,
+			title: `Reloop MCP for ${lookups.mcpClients.get(slug) ?? humanizeSlug(slug)}`,
+			type: "feature",
 		};
 	}
 

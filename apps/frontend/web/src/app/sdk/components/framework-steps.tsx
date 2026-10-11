@@ -5,7 +5,7 @@ import { NodeInstallBlock } from "./node-install-block";
 import { ResourceLinks } from "./resource-links";
 import { SdkCodeBlock } from "./sdk-code-block";
 
-function StepItem({
+export function StepItem({
 	number,
 	title,
 	isLast = false,
