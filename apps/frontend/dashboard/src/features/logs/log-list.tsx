@@ -427,7 +427,7 @@ export function LogList({
 				</Tooltip.Provider>
 			</div>
 
-			{/* Unified split pane: Stripe-style list + detail */}
+			{/* Split pane: list and detail as separate cards */}
 			{error ? (
 				<div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-8 dark:border-stroke-soft-100/40">
 					<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
@@ -464,11 +464,11 @@ export function LogList({
 				</div>
 			) : (
 				<div
-					className="mt-3 flex min-h-0 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5"
+					className="mt-3 flex min-h-0 gap-3"
 					style={{ height: "calc(100vh - 320px)", minHeight: 400 }}
 				>
 					{/* LEFT: Request list */}
-					<div className="flex w-[min(480px,42%)] shrink-0 flex-col border-stroke-soft-100 border-r dark:border-stroke-soft-100/40">
+					<div className="flex w-[min(480px,42%)] shrink-0 flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 						<LogTable
 							logs={data?.logs || []}
 							isLoading={isLoading}
@@ -495,7 +495,7 @@ export function LogList({
 					</div>
 
 					{/* RIGHT: Detail panel */}
-					<div className="min-w-0 flex-1 overflow-y-auto">
+					<div className="min-w-0 flex-1 overflow-y-auto rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 						{selectedLogId ? (
 							<LogDetailPanel logId={selectedLogId} />
 						) : (
