@@ -15,19 +15,25 @@ export function GrantedPlanBanner({
 	grantedAt: string;
 }) {
 	return (
-		<div className="flex items-start gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50 p-4 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
-			<Icon
-				name="gift"
-				className="mt-px h-4 w-4 shrink-0 text-text-strong-950"
+		<div className="relative overflow-hidden rounded-2xl bg-neutral-950 p-4 text-white shadow-regular-xs ring-1 ring-black/5 dark:ring-white/10">
+			{/* Soft celebratory glow, kept behind the content */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_140%_at_0%_0%,rgba(251,191,36,0.32),transparent_60%),radial-gradient(60%_140%_at_100%_0%,rgba(236,72,153,0.26),transparent_60%),radial-gradient(80%_120%_at_60%_130%,rgba(139,92,246,0.34),transparent_60%)]"
 			/>
-			<div className="min-w-0">
-				<p className="font-medium text-paragraph-sm text-text-strong-950">
-					You&apos;ve been upgraded to the {planName} plan
-				</p>
-				<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-					The Reloop team upgraded this organization on{" "}
-					{formatGrantedDate(grantedAt)}. Enjoy the higher limits.
-				</p>
+			<div className="relative flex items-start gap-3">
+				<span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur-sm">
+					<Icon name="gift" className="h-4 w-4 text-white" />
+				</span>
+				<div className="min-w-0 pt-px">
+					<p className="font-semibold text-paragraph-sm text-white">
+						You&apos;ve been upgraded to the {planName} plan 🎉
+					</p>
+					<p className="mt-0.5 text-paragraph-xs text-white/70">
+						The Reloop team upgraded this organization on{" "}
+						{formatGrantedDate(grantedAt)}. Enjoy the higher limits.
+					</p>
+				</div>
 			</div>
 		</div>
 	);
