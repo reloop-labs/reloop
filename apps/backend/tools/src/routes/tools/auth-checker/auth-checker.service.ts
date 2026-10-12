@@ -391,7 +391,30 @@ export async function checkDomainAuth(
 			"MX Lookup",
 		);
 
-		if (mxList && mxList.length > 0) {
+		// RFC 7505 null MX ("MX 0 ."): the domain explicitly accepts no email
+		const isNullMx =
+			mxList?.length === 1 &&
+			(mxList[0]?.exchange === "" || mxList[0]?.exchange === ".");
+
+		if (isNullMx) {
+			mxResult = {
+				status: "info",
+				published: false,
+				provider: null,
+				records: [],
+				warnings: [
+					"Null MX published (RFC 7505). This domain explicitly accepts no email.",
+				],
+			};
+			diagnostics.push({
+				id: "mx-records",
+				name: "Mail Routing (MX)",
+				category: "mx",
+				status: "info",
+				message: "Null MX published — domain does not accept email",
+				details: "0 .",
+			});
+		} else if (mxList && mxList.length > 0) {
 			const sorted = [...mxList].sort((a, b) => a.priority - b.priority);
 			const provider = detectMxProvider(sorted);
 			mxResult = {

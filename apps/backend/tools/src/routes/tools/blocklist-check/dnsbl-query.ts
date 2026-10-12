@@ -101,12 +101,25 @@ export function reverseIpForDnsbl(ip: string): string {
  * Interprets DNSBL A records per RFC 5782.
  * 127.0.0.1 is never a listing. 127.255.255.x is a query error, not a hit.
  * Addresses outside 127.0.0.0/8 are treated as resolver hijacking.
+ * `refusedCodes` are list-specific "query refused" answers (URIBL/SURBL use 127.0.0.1).
  */
 export function evaluateListingStatus(
 	addresses: string[] | null | undefined,
+	refusedCodes: string[] = [],
 ): ListingEvaluation {
 	if (!addresses || addresses.length === 0) {
 		return { status: "not_listed", validCodes: [] };
+	}
+
+	if (
+		refusedCodes.length > 0 &&
+		addresses.every((code) => refusedCodes.includes(code))
+	) {
+		return {
+			status: "error",
+			validCodes: [],
+			error: `Query refused (${addresses.join(", ")}). This list blocked the resolver — not a clean result.`,
+		};
 	}
 
 	const errorCodes = addresses.filter((code) => isRfc5782ErrorCode(code));
@@ -167,7 +180,7 @@ export async function querySingleDnsbl(options: {
 			`${provider.name} DNSBL`,
 		);
 		const elapsed = Date.now() - start;
-		const evaluation = evaluateListingStatus(addresses);
+		const evaluation = evaluateListingStatus(addresses, provider.refusedCodes);
 
 		let txtRecord: string | undefined;
 		if (evaluation.status === "listed") {

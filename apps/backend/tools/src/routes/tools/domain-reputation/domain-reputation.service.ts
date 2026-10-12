@@ -6,7 +6,10 @@ import {
 	type DomainAuthReport,
 } from "@be/tools/routes/tools/auth-checker/auth-checker.service";
 import { DOMAIN_DNSBL_PROVIDERS } from "@be/tools/routes/tools/blocklist-check/dnsbl-providers";
-import { querySingleDnsbl } from "@be/tools/routes/tools/blocklist-check/dnsbl-query";
+import {
+	aggregateVerdict,
+	querySingleDnsbl,
+} from "@be/tools/routes/tools/blocklist-check/dnsbl-query";
 import {
 	checkDomainAge,
 	type DomainAgeReport,
@@ -188,17 +191,15 @@ async function queryDomainDnsbl(domain: string) {
 		),
 	);
 
-	const listedCount = results.filter(
-		(r) => r.isListed || r.status === "listed",
-	).length;
-	const cleanCount = results.filter(
-		(r) => !r.isListed && r.status !== "listed",
-	).length;
+	// Only a real NXDOMAIN answer is "clean" — refused/timed-out queries are unknown
+	const verdict = aggregateVerdict(results);
 
 	return {
 		totalChecked: results.length,
-		listedCount,
-		cleanCount,
+		listedCount: verdict.listedCount,
+		cleanCount: verdict.cleanCount,
+		errorCount: verdict.errorCount,
+		inconclusive: verdict.verdict === "inconclusive",
 		results,
 	};
 }
@@ -227,7 +228,9 @@ export async function checkDomainReputation(
 				totalChecked: 0,
 				listedCount: 0,
 				cleanCount: 0,
-				results: [],
+				errorCount: 0,
+				inconclusive: true,
+				results: [] as Awaited<ReturnType<typeof querySingleDnsbl>>[],
 			})),
 			checkSsl(domain),
 			dns.resolve4(domain).catch(() => [] as string[]),
@@ -251,10 +254,14 @@ export async function checkDomainReputation(
 				? "warn"
 				: "fail"
 	) as "pass" | "warn" | "fail";
+	// DKIM selectors can't be enumerated from DNS: "not found on common selectors"
+	// is unknown, not a failure (e.g. google.com signs with selector 20230601).
+	const dkimUnknown =
+		!authReport?.dkim.published && authReport?.dkim.status === "info";
 	const dkimStatus = (
 		authReport?.dkim.status === "pass"
 			? "pass"
-			: authReport?.dkim.status === "warn"
+			: authReport?.dkim.status === "warn" || dkimUnknown
 				? "warn"
 				: "fail"
 	) as "pass" | "warn" | "fail";
@@ -272,7 +279,9 @@ export async function checkDomainReputation(
 
 	const dkimSummary = authReport?.dkim.published
 		? `DKIM active on selector '${authReport.dkim.selector || "default"}'${authReport.dkim.keyLength ? ` (${authReport.dkim.keyLength}-bit ${authReport.dkim.algorithm || "rsa"})` : ""}.`
-		: "No standard DKIM selector detected in DNS.";
+		: dkimUnknown
+			? "No DKIM key found on common selectors. Selectors can't be discovered from DNS, so DKIM may still be active under your provider's selector."
+			: "No DKIM record found.";
 
 	const dmarcSummary = authReport?.dmarc.published
 		? `DMARC policy is set to '${authReport.dmarc.policy || "none"}' (pct=${authReport.dmarc.percentage ?? 100}%).`
@@ -282,13 +291,24 @@ export async function checkDomainReputation(
 	const listedCount = blocklistReport.listedCount;
 	const totalBlocklists = blocklistReport.totalChecked;
 	const cleanCount = blocklistReport.cleanCount;
+	const errorCount = blocklistReport.errorCount;
+	const listedResults = blocklistReport.results.filter(
+		(r) => r.status === "listed",
+	);
+	// Spamhaus DBL / URIBL / SURBL hits get mail rejected at major receivers
+	const highImpactListed = listedResults.some((r) => r.impact === "high");
 
 	let blocklistScore = 100;
-	if (listedCount === 1) blocklistScore = 50;
-	else if (listedCount > 1) blocklistScore = 0;
+	if (highImpactListed || listedCount > 1) blocklistScore = 0;
+	else if (listedCount === 1) blocklistScore = 50;
+	else if (blocklistReport.inconclusive) blocklistScore = 75;
 
 	const blocklistStatus: "pass" | "warn" | "fail" =
-		listedCount === 0 ? "pass" : listedCount === 1 ? "warn" : "fail";
+		highImpactListed || listedCount > 1
+			? "fail"
+			: listedCount === 1 || blocklistReport.inconclusive
+				? "warn"
+				: "pass";
 
 	const listings = blocklistReport.results.map((r) => ({
 		zone: r.host || r.id || "unknown",
@@ -340,6 +360,7 @@ export async function checkDomainReputation(
 
 	// 4. Process DNS & Infrastructure (15% weight)
 	const mxRecords = authReport?.mx.records || [];
+	const nullMx = authReport?.mx.status === "info" && !authReport.mx.published;
 	const resolvedNameservers = ageReport?.nameservers.hosts.length
 		? ageReport.nameservers.hosts
 		: nsRecords;
@@ -366,12 +387,18 @@ export async function checkDomainReputation(
 		dnsCategoryScore >= 75 ? "pass" : dnsCategoryScore >= 50 ? "warn" : "fail";
 
 	// Overall composite score (0–100)
-	const overallScore = Math.round(
+	const weightedScore = Math.round(
 		authCategoryScore * 0.35 +
 			blocklistScore * 0.3 +
 			ageCategoryScore * 0.2 +
 			dnsCategoryScore * 0.15,
 	);
+	// A blocklist hit outweighs good DNS hygiene: cap it so a listed domain can't grade A
+	const overallScore = highImpactListed
+		? Math.min(weightedScore, 39)
+		: listedCount > 0
+			? Math.min(weightedScore, 69)
+			: weightedScore;
 
 	// Grade & Verdict
 	let grade: "A+" | "A" | "B" | "C" | "D" | "F" = "F";
@@ -404,6 +431,14 @@ export async function checkDomainReputation(
 			"Poor reputation. Missing critical records or flagged on blocklists.";
 	}
 
+	const listedNames = listedResults.map((r) => r.name).join(", ");
+	if (highImpactListed) {
+		verdictLabel = `Listed on ${listedNames}. Mail mentioning this domain is likely to be rejected or junked until it is delisted.`;
+	} else if (nullMx && listedCount === 0) {
+		verdictLabel =
+			"This domain is set up to send and receive no email (null MX). The score reflects its anti-spoofing protection, not sending reputation.";
+	}
+
 	// Flat Checks List
 	const checks: ReputationCheck[] = [
 		{
@@ -418,7 +453,7 @@ export async function checkDomainReputation(
 			id: "auth_dkim",
 			category: "authentication",
 			label: "DKIM Signature",
-			status: dkimStatus,
+			status: dkimUnknown ? "info" : dkimStatus,
 			detail: dkimSummary,
 			record: authReport?.dkim.rawRecord || undefined,
 		},
@@ -436,9 +471,11 @@ export async function checkDomainReputation(
 			label: "Domain & URI Blocklists",
 			status: blocklistStatus,
 			detail:
-				listedCount === 0
-					? `Clean across all ${cleanCount} monitored domain DNS blocklist zones.`
-					: `Flagged on ${listedCount} of ${totalBlocklists} domain blocklists.`,
+				listedCount > 0
+					? `Flagged on ${listedCount} of ${totalBlocklists} domain blocklists: ${listedNames}.`
+					: errorCount > 0 || totalBlocklists === 0
+						? `Not listed on ${cleanCount} of ${totalBlocklists} domain blocklists; ${errorCount || "all"} could not be queried, so the result is incomplete.`
+						: `Clean across all ${cleanCount} monitored domain DNS blocklist zones.`,
 		},
 		{
 			id: "age_maturity",
@@ -455,11 +492,13 @@ export async function checkDomainReputation(
 			id: "dns_mx",
 			category: "dns_health",
 			label: "Mail Server Routing (MX)",
-			status: mxRecords.length > 0 ? "pass" : "fail",
+			status: mxRecords.length > 0 ? "pass" : nullMx ? "info" : "fail",
 			detail:
 				mxRecords.length > 0
 					? `${mxRecords.length} MX server(s) configured${authReport?.mx.provider ? ` (${authReport.mx.provider})` : ""}.`
-					: "No MX records found for receiving reply mail.",
+					: nullMx
+						? "Null MX published (RFC 7505): this domain explicitly accepts no email."
+						: "No MX records found for receiving reply mail.",
 		},
 		{
 			id: "dns_resolution",

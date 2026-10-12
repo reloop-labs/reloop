@@ -13,6 +13,8 @@ export interface DnsblProvider {
 	supportsIpv6: boolean;
 	delistUrl: string;
 	description: string;
+	/** Answers this list uses to say "query refused" (e.g. blocked public/high-volume resolver). */
+	refusedCodes?: string[];
 }
 
 /**
@@ -483,6 +485,7 @@ export const DOMAIN_DNSBL_PROVIDERS: DnsblProvider[] = [
 		delistUrl: "https://uribl.com",
 		description:
 			"URI blocklist of domains seen in spam message bodies and links.",
+		refusedCodes: ["127.0.0.1"],
 	},
 	{
 		id: "surbl-multi",
@@ -496,6 +499,7 @@ export const DOMAIN_DNSBL_PROVIDERS: DnsblProvider[] = [
 		delistUrl: "https://www.surbl.org",
 		description:
 			"SURBL combined URI list of domains found in unsolicited mail.",
+		refusedCodes: ["127.0.0.1"],
 	},
 	{
 		id: "sem-uribl",
