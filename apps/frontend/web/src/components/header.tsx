@@ -576,7 +576,13 @@ const navItems: NavItem[] = [
 							title: "Domain Age",
 							href: "/tools/domain-age",
 							icon: "hourglass",
-							description: "Registration date and warmup stage",
+							description: "Registration date, age and expiry",
+						},
+						{
+							title: "Domain Warmup",
+							href: "/tools/domain-warmup-checker",
+							icon: "rocket",
+							description: "Warmup stage and sending readiness",
 						},
 						{
 							title: "Lookalike Watch",

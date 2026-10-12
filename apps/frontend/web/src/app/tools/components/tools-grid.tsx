@@ -8,6 +8,7 @@ import {
 	Calendar,
 	Code2,
 	Eye,
+	Gauge,
 	Globe,
 	MailCheck,
 	Search,
@@ -97,13 +98,21 @@ export const ALL_TOOLS: ToolItem[] = [
 		art: "dns",
 	},
 	{
-		title: "Domain Age & Warmup Checker",
+		title: "Domain Age Calculator",
 		description:
-			"Check domain registration age and warmup safety to avoid cold-sending spam filters.",
+			"See exactly how old any domain is, with its registration date, expiry date and registrar.",
 		icon: Calendar,
 		path: "/tools/domain-age",
 		category: "domain",
 		art: "domain-age",
+	},
+	{
+		title: "Domain Warmup Checker",
+		description:
+			"Check a domain's warmup stage and SPF, DMARC and MX readiness before you start sending.",
+		icon: Gauge,
+		path: "/tools/domain-warmup-checker",
+		category: "domain",
 	},
 	{
 		title: "Domain ESP & Email Sender Lookup",

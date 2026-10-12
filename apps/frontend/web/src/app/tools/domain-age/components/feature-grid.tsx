@@ -1,39 +1,12 @@
 import { cn } from "@reloop/ui/cn";
-import { CalendarSearch, Clock, ShieldCheck, Zap } from "lucide-react";
 import type { ComponentType } from "react";
+import { SectionHeading } from "../../components/section-heading";
 
-type FeatureItem = {
+export type FeatureItem = {
 	icon: ComponentType<{ className?: string }>;
 	title: string;
 	description: string;
 };
-
-const FEATURES: FeatureItem[] = [
-	{
-		icon: Zap,
-		title: "100% free, instant results",
-		description:
-			"No account, credit card, or API key needed. Check any domain in under a second with zero friction.",
-	},
-	{
-		icon: CalendarSearch,
-		title: "Verified registration date",
-		description:
-			"We pull official registry records directly — not outdated WHOIS caches — so your domain's exact creation date is always accurate.",
-	},
-	{
-		icon: Clock,
-		title: "Email warmup timeline",
-		description:
-			"Know exactly when it's safe to send: Too New (0–7 days), Cold (8–30 days), Warming (31–90 days), or Established (90+ days).",
-	},
-	{
-		icon: ShieldCheck,
-		title: "Spam filter risk check",
-		description:
-			"Instantly see if mailbox providers like Gmail and Outlook treat your domain as high-risk before you start sending emails.",
-	},
-];
 
 function AccentBar() {
 	return (
@@ -44,27 +17,33 @@ function AccentBar() {
 	);
 }
 
-export function WhyDomainAgeMatters() {
+export function FeatureGrid({
+	id,
+	eyebrow,
+	icon,
+	title,
+	description,
+	features,
+}: {
+	id: string;
+	eyebrow: string;
+	icon: string;
+	title: readonly [string, string];
+	description: string;
+	features: FeatureItem[];
+}) {
 	return (
-		<section
-			id="why-domain-age-matters"
-			aria-labelledby="why-domain-age-heading"
-			className="w-full"
-		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					Why it matters
-				</p>
-				<h2
-					id="why-domain-age-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					Why domain age affects email deliverability
-				</h2>
-			</div>
+		<section id={id} aria-labelledby={`${id}-heading`} className="w-full">
+			<SectionHeading
+				id={`${id}-heading`}
+				eyebrow={eyebrow}
+				icon={icon}
+				title={title}
+				description={description}
+			/>
 
 			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
-				{FEATURES.map((feature, index) => {
+				{features.map((feature, index) => {
 					const borderClass =
 						index === 0
 							? "border-b sm:border-r lg:border-b-0 lg:border-r"

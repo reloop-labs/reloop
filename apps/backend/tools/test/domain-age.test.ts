@@ -79,6 +79,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 			expect(parsed.found).toBe(true);
 			expect(parsed.createdAt).toBe("2026-08-27T00:00:00.000Z");
 			expect(parsed.expiresAt).toBe("2027-08-27T00:00:00.000Z");
+			expect(parsed.updatedAt).toBe("2026-08-28T00:00:00.000Z");
 			expect(parsed.registrar).toBe("Namecheap, Inc.");
 			expect(parsed.nameservers[0]).toBe("dns1.registrar-servers.com");
 			// ensure no personal leak
@@ -96,6 +97,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: "2026-08-27T12:00:00.000Z", // 4 days before 2026-08-31
 					expiresAt: "2027-08-27T12:00:00.000Z",
+					updatedAt: null,
 					status: ["clientTransferProhibited"],
 					registrar: "Namecheap",
 					nameservers: ["dns1.registrar-servers.com"],
@@ -122,6 +124,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: "2026-08-17T12:00:00.000Z", // 14 days
 					expiresAt: "2027-08-17T12:00:00.000Z",
+					updatedAt: null,
 					status: [],
 					registrar: "Cloudflare",
 					nameservers: ["ns1.cloudflare.com"],
@@ -147,6 +150,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: "2026-07-17T12:00:00.000Z", // 45 days
 					expiresAt: "2027-07-17T12:00:00.000Z",
+					updatedAt: null,
 					status: [],
 					registrar: "Google Domains",
 					nameservers: [],
@@ -173,6 +177,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: "2026-05-03T12:00:00.000Z", // 120 days
 					expiresAt: "2027-05-03T12:00:00.000Z",
+					updatedAt: null,
 					status: [],
 					registrar: "GoDaddy",
 					nameservers: [],
@@ -194,6 +199,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: "1997-09-15T00:00:00.000Z",
 					expiresAt: "2028-09-14T00:00:00.000Z",
+					updatedAt: null,
 					status: ["clientTransferProhibited"],
 					registrar: "MarkMonitor Inc.",
 					nameservers: ["ns1.google.com"],
@@ -221,6 +227,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: "2026-08-29T12:00:00.000Z", // 2 days
 					expiresAt: "2027-08-29T12:00:00.000Z",
+					updatedAt: null,
 					status: [],
 					registrar: "Cloudflare",
 					nameservers: [],
@@ -241,6 +248,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: false,
 					createdAt: null,
 					expiresAt: null,
+					updatedAt: null,
 					status: [],
 					registrar: null,
 					nameservers: [],
@@ -263,6 +271,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					lookupStatus: "no_rdap_service",
 					createdAt: null,
 					expiresAt: null,
+					updatedAt: null,
 					status: [],
 					registrar: null,
 					nameservers: [],
@@ -288,6 +297,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: "2025-07-03T06:17:03.176Z",
 					expiresAt: "2027-07-03T06:17:03.176Z",
+					updatedAt: null,
 					status: ["client transfer prohibited"],
 					registrar: "Spaceship, Inc.",
 					nameservers: ["elijah.ns.cloudflare.com"],
@@ -314,6 +324,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: null,
 					expiresAt: null,
+					updatedAt: null,
 					status: ["connect"],
 					registrar: "DENIC",
 					nameservers: [],
@@ -335,6 +346,7 @@ describe("Domain Age & Warmup Checker Service", () => {
 					found: true,
 					createdAt: "2020-01-01T00:00:00.000Z",
 					expiresAt: "2027-01-01T00:00:00.000Z",
+					updatedAt: null,
 					status: ["clientHold", "serverHold"],
 					registrar: "Namecheap",
 					nameservers: [],
@@ -355,7 +367,8 @@ describe("Domain Age & Warmup Checker Service", () => {
 				rdap: {
 					found: true,
 					createdAt: "2022-01-01T00:00:00.000Z",
-					expiresAt: "2026-09-10T12:00:00.000Z", // 10 days after Aug 31
+					expiresAt: "2026-09-10T12:00:00.000Z",
+					updatedAt: null, // 10 days after Aug 31
 					status: [],
 					registrar: "GoDaddy",
 					nameservers: [],

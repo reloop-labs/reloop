@@ -20,6 +20,7 @@ export interface ParsedRdapResult {
 	lookupStatus?: RdapLookupStatus;
 	createdAt: string | null;
 	expiresAt: string | null;
+	updatedAt: string | null;
 	status: string[];
 	registrar: string | null;
 	nameservers: string[];
@@ -34,6 +35,7 @@ const emptyRdap = (
 	lookupStatus,
 	createdAt: null,
 	expiresAt: null,
+	updatedAt: null,
 	status: [],
 	registrar: null,
 	nameservers: [],
@@ -114,6 +116,7 @@ export interface DomainAgeReport {
 		createdAt: string | null;
 		ageDays: number | null;
 		expiresAt: string | null;
+		updatedAt: string | null;
 		source: "rdap" | "none";
 	};
 	registry: {
@@ -236,6 +239,7 @@ export function parseRdapResponse(data: any): ParsedRdapResult {
 			lookupStatus: "not_found",
 			createdAt: null,
 			expiresAt: null,
+			updatedAt: null,
 			status: [],
 			registrar: null,
 			nameservers: [],
@@ -244,6 +248,7 @@ export function parseRdapResponse(data: any): ParsedRdapResult {
 
 	let createdAt: string | null = null;
 	let expiresAt: string | null = null;
+	let updatedAt: string | null = null;
 
 	// Extract events
 	if (Array.isArray(data.events)) {
@@ -257,6 +262,9 @@ export function parseRdapResponse(data: any): ParsedRdapResult {
 				ev.eventDate
 			) {
 				expiresAt = new Date(ev.eventDate).toISOString();
+			}
+			if (ev.eventAction === "last changed" && ev.eventDate) {
+				updatedAt = new Date(ev.eventDate).toISOString();
 			}
 		}
 	}
@@ -302,6 +310,7 @@ export function parseRdapResponse(data: any): ParsedRdapResult {
 		lookupStatus: "found",
 		createdAt,
 		expiresAt,
+		updatedAt,
 		status,
 		registrar,
 		nameservers,
@@ -356,6 +365,7 @@ export function evaluateColdDomain(
 					createdAt: null,
 					ageDays: null,
 					expiresAt: null,
+					updatedAt: null,
 					source: "none",
 				},
 				registry: {
@@ -394,6 +404,7 @@ export function evaluateColdDomain(
 				createdAt: null,
 				ageDays: null,
 				expiresAt: null,
+				updatedAt: null,
 				source: "none",
 			},
 			registry: {
@@ -446,6 +457,7 @@ export function evaluateColdDomain(
 						)
 					: null,
 				expiresAt: rdap.expiresAt,
+				updatedAt: rdap.updatedAt,
 				source: "rdap",
 			},
 			registry: {
@@ -484,6 +496,7 @@ export function evaluateColdDomain(
 				createdAt: null,
 				ageDays: null,
 				expiresAt: rdap.expiresAt,
+				updatedAt: rdap.updatedAt,
 				source: "none",
 			},
 			registry: {
@@ -603,6 +616,7 @@ export function evaluateColdDomain(
 			createdAt: rdap.createdAt,
 			ageDays,
 			expiresAt: rdap.expiresAt,
+			updatedAt: rdap.updatedAt,
 			source: "rdap",
 		},
 		registry: {

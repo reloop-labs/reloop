@@ -19,7 +19,7 @@ const TOOL_BY_TERM: Record<string, string> = {
 	"hard-bounce": "/tools/email-validator",
 	"inbox-placement": "/tools/deliverability-tester",
 	"ip-reputation": "/tools/blocklist-checker",
-	"ip-warming": "/tools/domain-age",
+	"ip-warming": "/tools/domain-warmup-checker",
 	"list-hygiene": "/tools/temp-email-checker",
 	"mx-record": "/tools/dns-lookup",
 	rbl: "/tools/blocklist-checker",

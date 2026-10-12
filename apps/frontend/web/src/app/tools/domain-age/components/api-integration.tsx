@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SectionHeading } from "../../components/section-heading";
 import { apiBodyArgs, apiEndpoint, apiSnippets } from "../content";
 import {
 	AnimatedCopyIcon,
@@ -9,7 +10,13 @@ import {
 	ResponseCard,
 } from "./api-request-response";
 
-export function ApiIntegration() {
+export function ApiIntegration({
+	title,
+	description,
+}: {
+	title: readonly [string, string];
+	description: string;
+}) {
 	const [activeId, setActiveId] = useState<string>(
 		apiSnippets.find((s) => s.id === "javascript")?.id ?? apiSnippets[0].id,
 	);
@@ -43,17 +50,13 @@ export function ApiIntegration() {
 
 	return (
 		<section id="api" aria-labelledby="api-heading" className="w-full">
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					API Integration
-				</p>
-				<h2
-					id="api-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					Check domain age via API.
-				</h2>
-			</div>
+			<SectionHeading
+				id="api-heading"
+				eyebrow="API integration"
+				icon="code"
+				title={title}
+				description={description}
+			/>
 
 			<div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-8">
 				{/* Left: endpoint + Body docs */}
@@ -68,7 +71,7 @@ export function ApiIntegration() {
 							title={copiedEndpoint ? "Copied" : "Copy endpoint URL"}
 							className="flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-[16px] border border-stroke-soft-100/70 bg-white px-3 py-2.5 text-left transition-colors hover:border-stroke-soft-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a9eff] dark:border-stroke-soft-100/15 dark:bg-zinc-950 dark:hover:border-stroke-soft-100/30"
 						>
-							<span className="shrink-0 rounded-[10px] bg-blue-600 px-2 py-0.5 font-bold text-[11px] text-white uppercase tracking-wider dark:bg-blue-600 dark:text-white">
+							<span className="shrink-0 rounded-[10px] bg-primary-base px-2 py-0.5 font-bold text-[11px] text-white uppercase tracking-wider dark:text-black">
 								POST
 							</span>
 							<div className="relative min-w-0 flex-1">

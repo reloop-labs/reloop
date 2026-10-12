@@ -670,3 +670,42 @@ export type DomainReputationReport = {
 	checks: DomainReputationCheck[];
 	recommendations: string[];
 };
+
+export type DomainAgeVerdict =
+	| "too_new"
+	| "cold"
+	| "warming"
+	| "established"
+	| "mature"
+	| "unknown_age"
+	| "not_registered"
+	| "held";
+
+export type DomainAgeReport = {
+	domain: string;
+	registrableDomain: string;
+	verdict: DomainAgeVerdict;
+	headline: string;
+	summary: string;
+	age: {
+		createdAt: string | null;
+		ageDays: number | null;
+		expiresAt: string | null;
+		updatedAt: string | null;
+	};
+	registry: {
+		registrar: string | null;
+		status: string[];
+	};
+	nameservers: {
+		provider: string | null;
+		kind: "production" | "registrar_default" | "parking" | "unknown";
+	};
+	emailSetup: {
+		spf: boolean;
+		dmarc: boolean;
+		dmarcPolicy: string | null;
+		mx: boolean;
+	};
+	warnings: string[];
+};

@@ -908,6 +908,7 @@ export namespace ToolsModel {
 			createdAt: t.Union([t.String(), t.Null()]),
 			ageDays: t.Union([t.Number(), t.Null()]),
 			expiresAt: t.Union([t.String(), t.Null()]),
+			updatedAt: t.Union([t.String(), t.Null()]),
 			source: t.Union([t.Literal("rdap"), t.Literal("none")]),
 		}),
 		registry: t.Object({

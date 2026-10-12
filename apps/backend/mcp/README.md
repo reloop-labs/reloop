@@ -858,6 +858,18 @@ Read-only: yes · Destructive: no · Idempotent: yes · Open world: yes
 
 Returns: `domain`, `score`, `grade`, `verdict`, `verdictLabel`, `breakdown`, `checks`, `recommendations`
 
+### `check_domain_age`
+
+Look up how old a domain is from its official registry over RDAP: registration date, age in days, last update date, expiry date and registrar. The `verdict` is also its email warmup stage: `too_new` (0 to 7 days) and `cold` (8 to 30 days) mean mailbox providers will filter mail from it, `warming` (31 to 90 days) means ramp volume up gradually, and `established` or `mature` means age no longer hurts deliverability. `not_registered`, `held` and `unknown_age` mean no usable age. It also reports whether SPF, DMARC and MX are published and whether the nameservers are parked. Nothing is sent and nothing is stored. Use this before sending from a new domain or before trusting an unfamiliar one.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `domain` | string | yes | Domain or URL, for example reloop.sh or https://reloop.sh |
+
+Returns: `domain`, `registrableDomain`, `verdict`, `headline`, `summary`, `createdAt`, `ageDays`, `expiresAt`, `updatedAt`, `registrar`, `registryStatus`, `nameserverProvider`, `nameserverKind`, `emailSetup`, `warnings`
+
 ## Errors
 
 Every failed call returns `isError: true` and no `structuredContent`; the text content is a JSON document with an `error` object (structured content must match the tool's output schema, so errors travel in the text block):

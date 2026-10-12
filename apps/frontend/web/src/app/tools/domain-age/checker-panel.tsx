@@ -107,31 +107,6 @@ function formatDateOnly(iso: string): string {
 	}
 }
 
-function formatWeekday(iso: string): string {
-	try {
-		return new Date(iso).toLocaleDateString("en-US", { weekday: "long" });
-	} catch {
-		return "";
-	}
-}
-
-function formatTimeOnly(iso: string): string {
-	try {
-		return new Date(iso).toLocaleTimeString("en-US", {
-			hour: "numeric",
-			minute: "2-digit",
-		});
-	} catch {
-		return "";
-	}
-}
-
-function formatAgeAgo(ageDays: number): string {
-	if (ageDays <= 0) return "today";
-	if (ageDays === 1) return "1 day ago";
-	return `${ageDays.toLocaleString()} days ago`;
-}
-
 function getSummaryTone(verdict: DomainAgeReport["verdict"]): {
 	icon: string;
 	bar: string;
@@ -318,7 +293,430 @@ function MorphSlot({
 	);
 }
 
-export function CheckerPanel() {
+export const WARMUP_TOOL_PATH = "/tools/domain-warmup-checker";
+export const AGE_TOOL_PATH = "/tools/domain-age";
+
+function getTimelineProgress(days: number | null): number {
+	if (days === null || days <= 0) return 3;
+	if (days <= 7) return (days / 7) * 25;
+	if (days <= 30) return 25 + ((days - 7) / 23) * 25;
+	if (days <= 90) return 50 + ((days - 30) / 60) * 25;
+	return Math.min(100, 75 + ((days - 90) / 275) * 25);
+}
+
+function hasKnownAge(verdict: DomainAgeReport["verdict"]) {
+	return (
+		verdict === "too_new" ||
+		verdict === "cold" ||
+		verdict === "warming" ||
+		verdict === "established" ||
+		verdict === "mature"
+	);
+}
+
+function ResultTile({
+	icon,
+	label,
+	title,
+	value,
+	sub,
+	badge,
+}: {
+	icon: string;
+	label: string;
+	title?: string;
+	value: ReactNode;
+	sub?: ReactNode;
+	badge?: ReactNode;
+}) {
+	return (
+		<div
+			className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-white/10 dark:bg-white/[0.03]"
+			title={title}
+		>
+			<div className="flex items-center gap-1.5 font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+				<Icon name={icon} className="size-3.5" />
+				{label}
+			</div>
+			<div className="mt-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
+				{value}
+			</div>
+			{sub ? (
+				<div className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
+					{sub}
+				</div>
+			) : null}
+			{badge ? (
+				<div className="mt-2 inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/[0.06] dark:text-white/60">
+					{badge}
+				</div>
+			) : null}
+		</div>
+	);
+}
+
+function SummaryCallout({ result }: { result: DomainAgeReport }) {
+	const tone = getSummaryTone(result.verdict);
+	return (
+		<div
+			className={cn(
+				"flex gap-3 rounded-xl rounded-l-md border border-stroke-soft-200 border-l-[3px] bg-bg-white-0 p-4 dark:border-white/10 dark:bg-white/[0.03]",
+				tone.bar,
+			)}
+		>
+			<span
+				className={cn(
+					"flex size-7 shrink-0 items-center justify-center rounded-lg",
+					tone.iconWrap,
+				)}
+			>
+				<Icon name={tone.icon} className="size-4" />
+			</span>
+			<p className="min-w-0 font-medium text-[13.5px] text-text-strong-950 leading-relaxed dark:text-white/85">
+				{getCalloutText(result.summary, result.verdict)}
+			</p>
+		</div>
+	);
+}
+
+function CrossToolLink({
+	href,
+	domain,
+	label,
+}: {
+	href: string;
+	domain: string;
+	label: string;
+}) {
+	return (
+		<a
+			href={`${href}?domainName=${encodeURIComponent(domain)}`}
+			className="group flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-3 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03] dark:text-white dark:hover:bg-white/[0.06]"
+		>
+			<span>{label}</span>
+			<Icon
+				name="arrow-right"
+				className="size-3.5 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/50"
+			/>
+		</a>
+	);
+}
+
+/** Years, months and days since registration, e.g. "1 year, 3 months, 9 days". */
+function formatPreciseAge(createdAt: string): string | null {
+	const start = new Date(createdAt);
+	const now = new Date();
+	if (Number.isNaN(start.getTime()) || start > now) return null;
+	let years = now.getUTCFullYear() - start.getUTCFullYear();
+	let months = now.getUTCMonth() - start.getUTCMonth();
+	let days = now.getUTCDate() - start.getUTCDate();
+	if (days < 0) {
+		months -= 1;
+		days += new Date(
+			Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 0),
+		).getUTCDate();
+	}
+	if (months < 0) {
+		years -= 1;
+		months += 12;
+	}
+	const parts = [
+		[years, "year"],
+		[months, "month"],
+		[days, "day"],
+	] as const;
+	const text = parts
+		.filter(([value]) => value > 0)
+		.map(([value, unit]) => `${value} ${unit}${value === 1 ? "" : "s"}`)
+		.join(", ");
+	return text || "0 days";
+}
+
+/** Registry timestamps as "2025-07-03" and "06:17:03 UTC", the format people expect from WHOIS tools. */
+function splitUtc(iso: string): { date: string; time: string } {
+	const [date = iso, rest = ""] = new Date(iso).toISOString().split("T");
+	return { date, time: `${rest.slice(0, 8)} UTC` };
+}
+
+function AgeTableCell({
+	label,
+	children,
+	sub,
+	title,
+}: {
+	label: string;
+	children: ReactNode;
+	sub?: ReactNode;
+	title?: string;
+}) {
+	return (
+		<div
+			className="flex min-w-0 border-stroke-soft-200 border-t first:border-t-0 sm:flex-col sm:border-t-0 sm:border-l sm:first:border-l-0 dark:border-white/10"
+			title={title}
+		>
+			<div className="flex w-[104px] shrink-0 items-center bg-bg-weak-50 px-3 py-3 font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider sm:w-auto sm:border-stroke-soft-200 sm:border-b sm:px-3.5 dark:bg-white/[0.03] dark:text-white/40 sm:dark:border-white/10">
+				{label}
+			</div>
+			<div className="min-w-0 flex-1 px-3 py-3 sm:px-3.5">
+				<div className="break-words font-semibold text-[13.5px] text-text-strong-950 tabular-nums dark:text-white">
+					{children}
+				</div>
+				{sub ? (
+					<div className="mt-0.5 text-[12px] text-text-sub-600 tabular-nums dark:text-white/55">
+						{sub}
+					</div>
+				) : null}
+			</div>
+		</div>
+	);
+}
+
+function UtcCellValue({ iso }: { iso: string | null }) {
+	if (!iso) {
+		return (
+			<span className="font-medium text-text-sub-600 dark:text-white/50">
+				Unknown
+			</span>
+		);
+	}
+	return <>{splitUtc(iso).date}</>;
+}
+
+function AgeResult({ result }: { result: DomainAgeReport }) {
+	const { createdAt, expiresAt, updatedAt } = result.age;
+	const hasDates = Boolean(createdAt || expiresAt || updatedAt);
+	const preciseAge = createdAt ? formatPreciseAge(createdAt) : null;
+	return (
+		<div className="flex flex-col gap-3">
+			<h2 className="font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
+				{result.headline}
+			</h2>
+
+			{hasDates ? (
+				<div className="grid grid-cols-1 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 sm:grid-cols-[1.15fr_1fr_1.1fr_1fr_1fr] dark:border-white/10 dark:bg-white/[0.02]">
+					<AgeTableCell
+						label="Domain"
+						sub={
+							result.domain !== result.registrableDomain
+								? `for ${result.domain}`
+								: undefined
+						}
+					>
+						{result.registrableDomain}
+					</AgeTableCell>
+					<AgeTableCell
+						label="Created on"
+						sub={createdAt ? splitUtc(createdAt).time : undefined}
+						title={createdAt ?? undefined}
+					>
+						<UtcCellValue iso={createdAt} />
+					</AgeTableCell>
+					<AgeTableCell
+						label="Age"
+						sub={
+							result.age.ageDays !== null
+								? `${result.age.ageDays.toLocaleString()} days`
+								: undefined
+						}
+					>
+						{preciseAge ?? (
+							<span className="font-medium text-text-sub-600 dark:text-white/50">
+								Unknown
+							</span>
+						)}
+					</AgeTableCell>
+					<AgeTableCell
+						label="Updated on"
+						sub={updatedAt ? splitUtc(updatedAt).time : undefined}
+						title={updatedAt ?? undefined}
+					>
+						<UtcCellValue iso={updatedAt} />
+					</AgeTableCell>
+					<AgeTableCell
+						label="Expires on"
+						sub={
+							expiresAt
+								? (formatDaysUntilExpiry(expiresAt) ?? undefined)
+								: undefined
+						}
+						title={expiresAt ?? undefined}
+					>
+						<UtcCellValue iso={expiresAt} />
+					</AgeTableCell>
+				</div>
+			) : null}
+
+			{result.registry.registrar ? (
+				<p className="flex flex-wrap items-center gap-x-1.5 text-[12.5px] text-text-sub-600 dark:text-white/55">
+					<Icon name="globe" className="size-3.5" />
+					Registered with
+					<span className="font-medium text-text-strong-950 dark:text-white">
+						{result.registry.registrar}
+					</span>
+					{result.registry.tld ? (
+						<span>· .{result.registry.tld} registry</span>
+					) : null}
+				</p>
+			) : null}
+
+			{hasKnownAge(result.verdict) ? null : <SummaryCallout result={result} />}
+
+			{hasKnownAge(result.verdict) ? (
+				<CrossToolLink
+					href={WARMUP_TOOL_PATH}
+					domain={result.domain}
+					label="Ready to send email? Check its warmup stage"
+				/>
+			) : null}
+		</div>
+	);
+}
+
+const WARMUP_STAGES = [
+	{ label: "Too New (0–7d)", match: ["too_new"], active: "text-rose-500" },
+	{ label: "Cold (8–30d)", match: ["cold"], active: "text-amber-500" },
+	{ label: "Warming (31–90d)", match: ["warming"], active: "text-blue-500" },
+	{
+		label: "Established (90d+)",
+		match: ["established", "mature"],
+		active: "text-emerald-500",
+	},
+] as const;
+
+function SetupChip({
+	label,
+	ok,
+	detail,
+}: {
+	label: string;
+	ok: boolean;
+	detail?: string;
+}) {
+	return (
+		<span
+			className={cn(
+				"inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-medium text-[12px]",
+				ok
+					? "border-emerald-500/20 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400"
+					: "border-rose-500/20 bg-rose-500/5 text-rose-600 dark:text-rose-400",
+			)}
+		>
+			<Icon name={ok ? "check" : "cross"} className="size-3" />
+			{label}
+			{detail ? (
+				<span className="text-text-sub-600 dark:text-white/50">{detail}</span>
+			) : null}
+		</span>
+	);
+}
+
+function WarmupResult({ result }: { result: DomainAgeReport }) {
+	const info = getDeliverabilityInfo(result.verdict);
+	const { spf, dmarc, dmarcPolicy, mx } = result.emailSetup;
+	const setupCount = [spf, dmarc, mx].filter(Boolean).length;
+	return (
+		<div className="flex flex-col gap-3">
+			<h2 className="font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
+				{result.headline}
+			</h2>
+
+			<div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+				<ResultTile
+					icon="mail-send"
+					label="Deliverability"
+					value={
+						<span className="flex items-center gap-1.5">
+							<span
+								className={cn("size-1.5 shrink-0 rounded-full", info.dot)}
+							/>
+							<span className={info.text}>{info.status}</span>
+						</span>
+					}
+					sub={info.detail}
+				/>
+				<ResultTile
+					icon="hourglass"
+					label="Domain age"
+					value={
+						result.age.ageDays !== null
+							? `${result.age.ageDays.toLocaleString()} days`
+							: "Unknown"
+					}
+					sub={
+						result.age.createdAt
+							? `Since ${formatDateOnly(result.age.createdAt)}`
+							: undefined
+					}
+				/>
+				<ResultTile
+					icon="shield-check"
+					label="Email setup"
+					value={`${setupCount} of 3 ready`}
+					sub="SPF, DMARC and MX records"
+				/>
+			</div>
+
+			<SummaryCallout result={result} />
+
+			{result.age.ageDays !== null ? (
+				<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
+					<div className="mb-2 flex items-center justify-between font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+						<span>Domain Warmup Stages</span>
+						<span>Current Age: {result.age.ageDays}d</span>
+					</div>
+					<div className="relative h-2.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
+						<div className="grid h-full grid-cols-4 divide-x divide-white/20 dark:divide-black/20">
+							<div className="bg-gradient-to-r from-rose-300 to-rose-400" />
+							<div className="bg-gradient-to-r from-amber-300 to-amber-400" />
+							<div className="bg-gradient-to-r from-blue-300 to-blue-400" />
+							<div className="bg-gradient-to-r from-emerald-300 to-emerald-400" />
+						</div>
+						<div
+							className="-ml-1 absolute top-0 bottom-0 w-2.5 rounded-full bg-text-strong-950 shadow-md ring-2 ring-white dark:bg-white dark:ring-black"
+							style={{ left: `${getTimelineProgress(result.age.ageDays)}%` }}
+						/>
+					</div>
+					<div className="mt-2.5 grid grid-cols-4 text-center font-mono text-[10.5px] text-text-sub-600 dark:text-white/50">
+						{WARMUP_STAGES.map((stage) => (
+							<div
+								key={stage.label}
+								className={
+									(stage.match as readonly string[]).includes(result.verdict)
+										? cn("font-semibold", stage.active)
+										: ""
+								}
+							>
+								{stage.label}
+							</div>
+						))}
+					</div>
+				</div>
+			) : null}
+
+			<div className="flex flex-wrap items-center gap-2">
+				<SetupChip label="SPF" ok={spf} />
+				<SetupChip
+					label="DMARC"
+					ok={dmarc}
+					detail={dmarc && dmarcPolicy ? `p=${dmarcPolicy}` : undefined}
+				/>
+				<SetupChip label="MX" ok={mx} />
+			</div>
+
+			<CrossToolLink
+				href={AGE_TOOL_PATH}
+				domain={result.domain}
+				label="See full registration details for this domain"
+			/>
+		</div>
+	);
+}
+
+export function CheckerPanel({
+	variant = "age",
+}: {
+	variant?: "age" | "warmup";
+}) {
 	const [domain, setDomain] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -415,17 +813,18 @@ export function CheckerPanel() {
 
 	const handleCopyReport = () => {
 		if (!result) return;
-		const report = `[Reloop Domain Age & Warmup Report]
+		const report = `[Reloop ${variant === "age" ? "Domain Age" : "Domain Warmup"} Report]
 Domain: ${result.domain}
 Verdict: ${result.verdict.toUpperCase()}
 Headline: ${result.headline}
 Age: ${result.age.ageDays !== null ? `${result.age.ageDays} days` : "Unknown"}
 Registered: ${result.age.createdAt ? formatDateTime(result.age.createdAt) : "Unknown"}
+Updated: ${result.age.updatedAt ? formatDateTime(result.age.updatedAt) : "Unknown"}
 Expires: ${result.age.expiresAt ? formatDateTime(result.age.expiresAt) : "Unknown"}
 Registrar: ${result.registry.registrar || "Unknown"}
 SPF: ${result.emailSetup.spf ? "Configured" : "Missing"}
 DMARC: ${result.emailSetup.dmarc ? `Configured (${result.emailSetup.dmarcPolicy})` : "Missing"}
-https://reloop.sh/tools/domain-age?domainName=${encodeURIComponent(result.domain)}`;
+https://reloop.sh${variant === "age" ? AGE_TOOL_PATH : WARMUP_TOOL_PATH}?domainName=${encodeURIComponent(result.domain)}`;
 		navigator.clipboard.writeText(report).then(() => {
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
@@ -443,100 +842,103 @@ https://reloop.sh/tools/domain-age?domainName=${encodeURIComponent(result.domain
 		} catch {}
 	};
 
-	const getTimelineProgress = (days: number | null): number => {
-		if (days === null || days <= 0) return 3;
-		if (days <= 7) return (days / 7) * 25;
-		if (days <= 30) return 25 + ((days - 7) / 23) * 25;
-		if (days <= 90) return 50 + ((days - 30) / 60) * 25;
-		return Math.min(100, 75 + ((days - 90) / 275) * 25);
-	};
-
 	const hasChecked = Boolean(result || error);
 
 	return (
-		<div className="mx-auto w-full max-w-xl text-left font-sans">
+		<div
+			className={cn(
+				"mx-auto w-full text-left font-sans",
+				variant === "age" ? "max-w-4xl" : "max-w-xl",
+			)}
+		>
 			<form onSubmit={handleSubmit} noValidate className="space-y-2.5">
-				<FieldError field={field} messageClassName="text-xs leading-relaxed">
-					<div className="relative w-full">
-						<Input.Root
-							size="medium"
-							hasError={hasFieldError}
-							className={cn(
-								"relative z-10 w-full rounded-xl bg-bg-white-0 shadow-xs transition-shadow sm:rounded-2xl dark:bg-[#0c0c0c]",
-								hasFieldError
-									? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
-									: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
-							)}
-						>
-							<Input.Wrapper className="h-12 pr-2 pl-4 dark:bg-[#0c0c0c]">
-								<Input.Input
-									id="checker-input"
-									aria-label="Domain"
-									{...field.controlProps}
-									type="text"
-									inputMode="url"
-									autoComplete="off"
-									autoCapitalize="none"
-									spellCheck={false}
-									value={domain}
-									onPaste={handlePaste}
-									onChange={(e) => {
-										setDomain(e.target.value);
-										if (hasFieldError) field.clear();
-										if (result) setResult(null);
-										if (error) setError(null);
-									}}
-									placeholder="Enter domain or URL (e.g. acme.com, https://acme.com)"
-									className="font-medium text-[15px]"
-								/>
-								{hasChecked ? (
-									<button
-										type="button"
-										onClick={handleReset}
-										className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
-										aria-label="Clear check"
-									>
-										<svg
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											strokeWidth="2.5"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											className="size-3.5"
-											aria-hidden="true"
-										>
-											<path d="M18 6L6 18M6 6l12 12" />
-										</svg>
-									</button>
-								) : (
-									<FancyButton.Root
-										type="submit"
-										variant="primary"
-										size="xsmall"
-										className="!p-0 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg dark:text-black"
-										aria-label="Check domain age"
-									>
-										{isLoading ? (
-											<LoadingDot
-												size={13}
-												dotSize={2}
-												className="text-white dark:text-black"
-											/>
-										) : (
-											<FancyButton.Icon className="mx-0 size-3.5 dark:text-black">
-												<Icon
-													name="arrow-right"
-													className="size-3.5 text-white dark:text-black"
-												/>
-											</FancyButton.Icon>
-										)}
-									</FancyButton.Root>
+				<div className="mx-auto w-full max-w-xl">
+					<FieldError field={field} messageClassName="text-xs leading-relaxed">
+						<div className="relative w-full">
+							<Input.Root
+								size="medium"
+								hasError={hasFieldError}
+								className={cn(
+									"relative z-10 w-full rounded-xl bg-bg-white-0 shadow-xs transition-shadow sm:rounded-2xl dark:bg-[#0c0c0c]",
+									hasFieldError
+										? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
+										: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
 								)}
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-				</FieldError>
+							>
+								<Input.Wrapper className="h-12 pr-2 pl-4 dark:bg-[#0c0c0c]">
+									<Input.Input
+										id="checker-input"
+										aria-label="Domain"
+										{...field.controlProps}
+										type="text"
+										inputMode="url"
+										autoComplete="off"
+										autoCapitalize="none"
+										spellCheck={false}
+										value={domain}
+										onPaste={handlePaste}
+										onChange={(e) => {
+											setDomain(e.target.value);
+											if (hasFieldError) field.clear();
+											if (result) setResult(null);
+											if (error) setError(null);
+										}}
+										placeholder="Enter domain or URL (e.g. acme.com, https://acme.com)"
+										className="font-medium text-[15px]"
+									/>
+									{hasChecked ? (
+										<button
+											type="button"
+											onClick={handleReset}
+											className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+											aria-label="Clear check"
+										>
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2.5"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												className="size-3.5"
+												aria-hidden="true"
+											>
+												<path d="M18 6L6 18M6 6l12 12" />
+											</svg>
+										</button>
+									) : (
+										<FancyButton.Root
+											type="submit"
+											variant="primary"
+											size="xsmall"
+											className="!p-0 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg dark:text-black"
+											aria-label={
+												variant === "age"
+													? "Check domain age"
+													: "Check warmup stage"
+											}
+										>
+											{isLoading ? (
+												<LoadingDot
+													size={13}
+													dotSize={2}
+													className="text-white dark:text-black"
+												/>
+											) : (
+												<FancyButton.Icon className="mx-0 size-3.5 dark:text-black">
+													<Icon
+														name="arrow-right"
+														className="size-3.5 text-white dark:text-black"
+													/>
+												</FancyButton.Icon>
+											)}
+										</FancyButton.Root>
+									)}
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+					</FieldError>
+				</div>
 
 				<MorphSlot
 					activeKey={error ? "error" : result ? "result" : null}
@@ -554,191 +956,11 @@ https://reloop.sh/tools/domain-age?domainName=${encodeURIComponent(result.domain
 						</div>
 					) : result ? (
 						<div className="space-y-6 pt-2">
-							<div
-								className={cn(
-									"relative overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 bg-gradient-to-b p-6 shadow-xs transition-colors sm:p-7 dark:border-white/10 dark:bg-white/[0.02]",
-									(result.verdict === "too_new" ||
-										result.verdict === "held" ||
-										result.verdict === "not_registered") &&
-										"from-rose-500/10 via-transparent to-transparent",
-									(result.verdict === "cold" ||
-										result.verdict === "unknown_age") &&
-										"from-amber-500/10 via-transparent to-transparent",
-									result.verdict === "warming" &&
-										"from-blue-500/10 via-transparent to-transparent",
-									(result.verdict === "established" ||
-										result.verdict === "mature") &&
-										"from-emerald-500/10 via-transparent to-transparent",
-								)}
-							>
-								<div className="flex flex-col gap-3">
-									<h2 className="font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
-										{result.headline}
-									</h2>
-
-									<div
-										className={cn(
-											"grid grid-cols-1 gap-2.5",
-											(result.age.createdAt || result.age.expiresAt) &&
-												"sm:grid-cols-3",
-										)}
-									>
-										{result.age.createdAt && (
-											<div
-												className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-white/10 dark:bg-white/[0.03]"
-												title={`Registered at ${new Date(result.age.createdAt).toISOString()}`}
-											>
-												<div className="flex items-center gap-1.5 font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-													<Icon name="calendar" className="size-3.5" />
-													Registered
-												</div>
-												<div className="mt-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
-													{formatDateOnly(result.age.createdAt)}
-												</div>
-												<div className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
-													{formatWeekday(result.age.createdAt)} ·{" "}
-													{formatTimeOnly(result.age.createdAt)}
-												</div>
-												{result.age.ageDays !== null && (
-													<div className="mt-2 inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/[0.06] dark:text-white/60">
-														{formatAgeAgo(result.age.ageDays)}
-													</div>
-												)}
-											</div>
-										)}
-										{result.age.expiresAt && (
-											<div
-												className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-white/10 dark:bg-white/[0.03]"
-												title={`Expires at ${new Date(result.age.expiresAt).toISOString()}`}
-											>
-												<div className="flex items-center gap-1.5 font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-													<Icon name="clock" className="size-3.5" />
-													Expires
-												</div>
-												<div className="mt-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
-													{formatDateOnly(result.age.expiresAt)}
-												</div>
-												<div className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
-													{formatWeekday(result.age.expiresAt)} ·{" "}
-													{formatTimeOnly(result.age.expiresAt)}
-												</div>
-												{formatDaysUntilExpiry(result.age.expiresAt) && (
-													<div className="mt-2 inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/[0.06] dark:text-white/60">
-														{formatDaysUntilExpiry(result.age.expiresAt)}
-													</div>
-												)}
-											</div>
-										)}
-										{(() => {
-											const info = getDeliverabilityInfo(result.verdict);
-											return (
-												<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 dark:border-white/10 dark:bg-white/[0.03]">
-													<div className="flex items-center gap-1.5 font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-														<Icon name="mail-send" className="size-3.5" />
-														Deliverability
-													</div>
-													<div className="mt-1.5 flex items-center gap-1.5 font-semibold text-[15px] text-text-strong-950 dark:text-white">
-														<span
-															className={cn(
-																"size-1.5 shrink-0 rounded-full",
-																info.dot,
-															)}
-														/>
-														<span className={cn(info.text)}>{info.status}</span>
-													</div>
-													<div className="mt-0.5 text-text-sub-600 text-xs dark:text-white/55">
-														{info.detail}
-													</div>
-												</div>
-											);
-										})()}
-									</div>
-
-									{(() => {
-										const tone = getSummaryTone(result.verdict);
-										return (
-											<div
-												className={cn(
-													"flex gap-3 rounded-xl rounded-l-md border border-stroke-soft-200 border-l-[3px] bg-bg-white-0 p-4 dark:border-white/10 dark:bg-white/[0.03]",
-													tone.bar,
-												)}
-											>
-												<span
-													className={cn(
-														"flex size-7 shrink-0 items-center justify-center rounded-lg",
-														tone.iconWrap,
-													)}
-												>
-													<Icon name={tone.icon} className="size-4" />
-												</span>
-												<p className="min-w-0 font-medium text-[13.5px] text-text-strong-950 leading-relaxed dark:text-white/85">
-													{getCalloutText(result.summary, result.verdict)}
-												</p>
-											</div>
-										);
-									})()}
-								</div>
-
-								{result.age.ageDays !== null && (
-									<div className="mt-6 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-										<div className="mb-2 flex items-center justify-between font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-											<span>Domain Warmup Stages</span>
-											<span>Current Age: {result.age.ageDays}d</span>
-										</div>
-										<div className="relative h-2.5 w-full overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
-											<div className="grid h-full grid-cols-4 divide-x divide-white/20 dark:divide-black/20">
-												<div className="bg-gradient-to-r from-rose-300 to-rose-400" />
-												<div className="bg-gradient-to-r from-amber-300 to-amber-400" />
-												<div className="bg-gradient-to-r from-blue-300 to-blue-400" />
-												<div className="bg-gradient-to-r from-emerald-300 to-emerald-400" />
-											</div>
-											<div
-												className="-ml-1 absolute top-0 bottom-0 w-2.5 rounded-full bg-text-strong-950 shadow-md ring-2 ring-white dark:bg-white dark:ring-black"
-												style={{
-													left: `${getTimelineProgress(result.age.ageDays)}%`,
-												}}
-											/>
-										</div>
-										<div className="mt-2.5 grid grid-cols-4 text-center font-mono text-[10.5px] text-text-sub-600 dark:text-white/50">
-											<div
-												className={
-													result.verdict === "too_new"
-														? "font-semibold text-rose-500"
-														: ""
-												}
-											>
-												Too New (0–7d)
-											</div>
-											<div
-												className={
-													result.verdict === "cold"
-														? "font-semibold text-amber-500"
-														: ""
-												}
-											>
-												Cold (8–30d)
-											</div>
-											<div
-												className={
-													result.verdict === "warming"
-														? "font-semibold text-blue-500"
-														: ""
-												}
-											>
-												Warming (31–90d)
-											</div>
-											<div
-												className={
-													result.verdict === "established" ||
-													result.verdict === "mature"
-														? "font-semibold text-emerald-500"
-														: ""
-												}
-											>
-												Established (90d+)
-											</div>
-										</div>
-									</div>
+							<div className="relative overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs sm:p-7 dark:border-white/10 dark:bg-white/[0.02]">
+								{variant === "age" ? (
+									<AgeResult result={result} />
+								) : (
+									<WarmupResult result={result} />
 								)}
 
 								<div className="flex flex-wrap items-center justify-between gap-2 pt-2">

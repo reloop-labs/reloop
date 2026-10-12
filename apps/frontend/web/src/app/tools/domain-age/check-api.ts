@@ -19,6 +19,7 @@ export interface DomainAgeReport {
 		createdAt: string | null;
 		ageDays: number | null;
 		expiresAt: string | null;
+		updatedAt: string | null;
 		source: "rdap" | "none";
 	};
 	registry: {

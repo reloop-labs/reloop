@@ -187,7 +187,10 @@ export function buildFixes(result: DomainReputationResponse): Fix[] {
 				"Start with small daily volumes to your most engaged recipients and grow gradually.",
 				"Keep bounces and complaints low while volume ramps up.",
 			],
-			link: { href: "/tools/domain-age", label: "See your warmup stage" },
+			link: {
+				href: "/tools/domain-warmup-checker",
+				label: "See your warmup stage",
+			},
 		});
 	}
 

@@ -3,6 +3,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { Fragment } from "react";
+import { SectionHeading } from "../../components/section-heading";
 
 type ScheduleRow = {
 	age: string;
@@ -90,21 +91,13 @@ export function WarmupSchedule() {
 			aria-labelledby="warmup-schedule-heading"
 			className="w-full"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					Warmup schedule
-				</p>
-				<h2
-					id="warmup-schedule-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					Domain warmup schedule.
-				</h2>
-				<p className="mt-2 max-w-2xl text-[14px] text-stone-500 leading-relaxed dark:text-white/60">
-					Safe daily send caps by domain age - the same caps Reloop enforces
-					automatically for every new domain.
-				</p>
-			</div>
+			<SectionHeading
+				id="warmup-schedule-heading"
+				eyebrow="Warmup schedule"
+				icon="calendar"
+				title={["How fast can a new", "domain send email?"]}
+				description="Safe daily send caps by domain age: the same caps Reloop enforces automatically for every new domain."
+			/>
 
 			{/* Schedule table, styled identical to the pricing comparison table */}
 			<div className="w-full overflow-x-auto lg:overflow-visible">

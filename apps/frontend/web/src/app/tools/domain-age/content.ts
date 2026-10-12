@@ -2,69 +2,25 @@ import { productionSiteUrl } from "@reloop/web/lib/site";
 
 export const toolPath = "/tools/domain-age";
 export const toolTitle =
-	"Free Domain Age Checker — Registration Date & Warmup Risk";
+	"Free Domain Age Calculator — Registration Date, Age & Expiry";
 export const toolDescription =
-	"The older your domain, the more email providers trust it. Paste any domain to instantly check its registration date, warmup stage, and deliverability risk — free, no sign-up.";
+	"Find out exactly how old any domain is. Paste a domain to see its registration date, its age in years, months and days, when it expires, and who it's registered with. Free, no sign-up.";
 export const metaDescription =
-	"Check any domain's age instantly — free. See registration date, email deliverability risk, and warmup stage (Too New → Established). No sign-up required.";
+	"Check how old any domain is, free. See the exact registration date, age in years, months and days, expiry date and registrar from official RDAP records. No sign-up required.";
 
 export const toolKeywords = [
-	// Core tool keywords
-	"domain age checker",
+	"domain age calculator",
 	"free domain age checker",
 	"check domain age",
+	"how old is this domain",
 	"domain registration date lookup",
+	"domain creation date",
 	"website age checker",
-	// Email deliverability angle
-	"domain age email deliverability",
-	"newly registered domain spam filter",
-	"cold domain email warmup",
-	"domain warmup stages",
-	"how long before sending cold email",
-	// Technical
+	"domain expiry date checker",
+	"domain registrar lookup",
 	"RDAP domain lookup",
-	"domain age for email warmup",
-	"Gmail spam new domain filter",
-	"domain warmup checker free",
-	// Long tail
-	"domain age deliverability risk",
-	"is my domain too new to send email",
+	"WHOIS domain age",
 	"check when domain was registered",
-	"domain age trust score",
-	"NRD spam risk checker",
-];
-
-export interface DiagnosticReason {
-	title: string;
-	description: string;
-	icon: string;
-}
-
-export const reasons: DiagnosticReason[] = [
-	{
-		title: "New-Domain Spam Filter Risk",
-		description:
-			"Mailbox filters like Spamhaus, Gmail, and Outlook automatically flag domains younger than 14–30 days to defend against fresh spam.",
-		icon: "alert-triangle",
-	},
-	{
-		title: "Verified Registry Age Lookup",
-		description:
-			"We query official ICANN registration endpoints directly rather than relying on stale or rate-limited WHOIS scrapers.",
-		icon: "shield-check",
-	},
-	{
-		title: "Age vs. Authentication Separation",
-		description:
-			"An 8-year-old domain can still fail if SPF/DMARC are missing, while a 4-day-old domain will trigger cold-domain filters even with perfect DNS.",
-		icon: "lock",
-	},
-	{
-		title: "Domain Parking & Status Detection",
-		description:
-			"Detect registrar parking pages, clientHold suspensions, and upcoming domain expiration before sending valuable campaign volume.",
-		icon: "server",
-	},
 ];
 
 export interface FaqItem {
@@ -79,46 +35,33 @@ export interface FaqGroup {
 
 export const faqGroups: FaqGroup[] = [
 	{
-		title: "Domain Age & Email Deliverability",
+		title: "Domain age",
 		items: [
 			{
 				question: "How do I check how old a domain is for free?",
 				answer:
-					"Paste any domain into the Reloop Domain Age Checker above. It queries authoritative RDAP endpoints and returns the exact registration date, domain age in days and years, expiry date, and email deliverability risk — completely free, no account required.",
+					"Paste any domain into the Reloop Domain Age Calculator above. It queries authoritative RDAP endpoints and returns the exact registration date, the domain's age in years, months and days, its expiry date and its registrar. It's completely free and needs no account.",
 			},
 			{
-				question: "Does domain age affect email deliverability?",
+				question: "How is the domain age calculated?",
 				answer:
-					"Yes. Mailbox providers and blocklists like Spamhaus NRD treat domains registered within the last 14–30 days as high-risk senders. Even perfect SPF, DKIM, and DMARC records cannot override a brand-new domain's cold-domain penalty. You need to warm up your domain gradually over 60–90 days before sending large email volumes.",
-			},
-			{
-				question:
-					"Why do mailbox providers like Gmail treat new domains as spam?",
-				answer:
-					"Spammers frequently register brand-new domains, blast hundreds of thousands of unsolicited emails over 48 hours, and abandon them. To protect recipients, mailbox algorithms (and blocklists like Spamhaus NRD) automatically treat domains registered within the last 14 to 30 days as high-risk cold senders.",
-			},
-			{
-				question:
-					"Does perfect SPF, DKIM, and DMARC override a brand-new domain?",
-				answer:
-					"No. Authentication proves that the sender authorized the email, but it does not give the domain a positive sending reputation history. A 3-day-old domain with valid SPF and DMARC will still face severe inbox filtering if it suddenly sends high-volume marketing emails.",
-			},
-			{
-				question:
-					"How long should I wait before sending marketing or cold emails?",
-				answer:
-					"We recommend waiting at least 14 days after domain registration before beginning initial sending warmups. During the first 14 days, publish SPF, DKIM, and DMARC in DNS. Start warmups slowly between days 15 and 90, gradually scaling daily volume.",
+					"We read the domain's creation event from its registry over RDAP and count the time from that moment to now. The result is shown as years, months and days, and as a total day count in the API.",
 			},
 			{
 				question:
 					"What happens if an expired domain was dropped and re-registered?",
 				answer:
-					"When an old domain drops and is registered by a new owner, the registry resets the creation date. Mailbox providers treat the newly registered owner as a cold domain with no prior positive sending credit. Our RDAP check reflects the latest active registration date.",
+					"When an old domain drops and is registered by a new owner, the registry resets the creation date. The age you see is the age of the current registration, not the first time the name was ever registered.",
+			},
+			{
+				question: "Does domain age affect email deliverability?",
+				answer:
+					"Yes. Mailbox providers treat domains registered in the last 14 to 30 days as high-risk senders. To see whether a domain is ready to send and how fast to ramp up, use the free Domain Warmup Checker.",
 			},
 		],
 	},
 	{
-		title: "RDAP, Privacy & Nameservers",
+		title: "RDAP & registries",
 		items: [
 			{
 				question:
@@ -136,17 +79,12 @@ export const faqGroups: FaqGroup[] = [
 				question:
 					"I send mail from mail.example.com, so why is the age for example.com?",
 				answer:
-					"Only the registered domain has a creation date. Subdomains (mail.reloop.sh, www.acme.com) inherit that date. Sending volume from a subdomain does not make the name older in RDAP.",
+					"Only the registered domain has a creation date. Subdomains (mail.reloop.sh, www.acme.com) inherit that date.",
 			},
 			{
-				question: "What does 'Parking Nameservers' mean?",
+				question: "Is the domain age calculator free?",
 				answer:
-					"If your domain's DNS points to default registrar parking servers (e.g. Sedo, Bodis, or Namecheap parking), receiving mail servers cannot resolve production mail exchanges. Switch your nameservers to a production DNS provider (like Cloudflare, Route 53, or Google Cloud) to send email.",
-			},
-			{
-				question: "How does Reloop help warm up newly registered domains?",
-				answer:
-					"Reloop provides built-in SPF/DKIM/DMARC setup, gradual volume ramp-up scheduling, and real-time bounce/spam monitoring so you can safely build high sender reputation without triggering mailbox spam filters.",
+					"Yes. The calculator and its API are free with no sign-up, no API key, no credits and no expiry.",
 			},
 		],
 	},
@@ -335,26 +273,27 @@ export const apiBodyArgs: ApiBodyArg[] = [
 export const apiResponseSample = `{
   "domain": "stripe.com",
   "registrableDomain": "stripe.com",
-  "resolvedAt": "2026-08-31T12:00:00.000Z",
-  "responseTimeMs": 142,
+  "resolvedAt": "2026-10-12T17:46:45.966Z",
+  "responseTimeMs": 211,
   "verdict": "mature",
-  "headline": "This domain is 15 years, 6 months, 20 days old",
-  "summary": "Registered 15 years, 6 months, 20 days ago (5,680 days). Domain age is completely mature and will not impact email deliverability.",
+  "headline": "This domain is 31 years, 1 month old",
+  "summary": "Registered 31 years, 1 month ago (11,353 days). Domain age is completely mature and will not impact email deliverability.",
   "disclaimer": "Gmail and Outlook do not publish an exact age threshold. This evaluation provides Reloop’s sending guidance based on newly registered domain filters.",
   "age": {
-    "createdAt": "2011-02-11T20:29:43.000Z",
-    "ageDays": 5680,
-    "expiresAt": "2027-02-11T20:29:43.000Z",
+    "createdAt": "1995-09-12T04:00:00.000Z",
+    "ageDays": 11353,
+    "expiresAt": "2027-09-11T04:00:00.000Z",
+    "updatedAt": "2025-10-01T01:39:51.000Z",
     "source": "rdap"
   },
   "registry": {
-    "registrar": "MarkMonitor Inc.",
-    "status": ["clientTransferProhibited"],
+    "registrar": "SafeNames Ltd.",
+    "status": ["client delete prohibited", "client transfer prohibited", "client update prohibited", "server delete prohibited", "server transfer prohibited", "server update prohibited"],
     "tld": "com"
   },
   "nameservers": {
-    "hosts": ["dns1.p01.nsone.net", "dns2.p01.nsone.net"],
-    "provider": "NS1",
+    "hosts": ["ns-705.awsdns-24.net", "ns-1087.awsdns-07.org", "ns-1882.awsdns-43.co.uk", "ns-423.awsdns-52.com"],
+    "provider": "AWS Route 53",
     "kind": "production"
   },
   "emailSetup": {
@@ -400,7 +339,7 @@ export const apiResponseSchemas: Record<ApiStatusCode, string> = {
   "headline": "string",
   "summary": "string",
   "disclaimer": "string",
-  "age": "{ createdAt: string | null, ageDays: number | null, expiresAt: string | null, source: rdap | none }",
+  "age": "{ createdAt: string | null, ageDays: number | null, expiresAt: string | null, updatedAt: string | null, source: rdap | none }",
   "registry": "{ registrar: string | null, status: string[], tld: string | null }",
   "nameservers": "{ hosts: string[], provider: string | null, kind: production | registrar_default | parking | unknown }",
   "emailSetup": "{ spf: boolean, dmarc: boolean, dmarcPolicy: string | null, mx: boolean }",
