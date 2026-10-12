@@ -6,7 +6,7 @@ export const metaTitle = "Free Domain Reputation Checker & Sender Score";
 export const metaDescription =
 	"Free domain reputation check, no signup. Check sender authentication (SPF, DKIM, DMARC), real-time DNS blocklists, domain maturity, and DNS health with an instant 0–100 score and letter grade.";
 export const toolDescription =
-	"Check your overall sending domain reputation across authentication, blocklists, domain age, and DNS infrastructure. Get an instant score from 0 to 100 with an A+ to F grade and actionable fixes.";
+	"Check your domain reputation in seconds. Get a 0–100 score from SPF, DKIM, DMARC, 7 domain blocklists, domain age, and DNS, plus the exact DNS records to fix what's wrong.";
 
 export const toolKeywords = [
 	"domain reputation checker",
@@ -19,33 +19,6 @@ export const toolKeywords = [
 	"check domain sender score",
 ];
 
-export const reasons = [
-	{
-		icon: "shield-check",
-		title: "Authentication (35%)",
-		description:
-			"SPF alignment, active DKIM key discovery, and DMARC enforcement policy (reject or quarantine).",
-	},
-	{
-		icon: "ban",
-		title: "Real-time Blocklists (30%)",
-		description:
-			"Independent live DNSBL lookups across Spamhaus DBL, URIBL Multi, SURBL, SEM URIBL, SEM Fresh, and NordSpam.",
-	},
-	{
-		icon: "clock",
-		title: "Domain Age & Warmup (20%)",
-		description:
-			"Direct RDAP registration age audit. Young (<90 days) and brand-new domains face strict mailbox filter throttling.",
-	},
-	{
-		icon: "activity",
-		title: "DNS & Infrastructure (15%)",
-		description:
-			"Verifies MX exchange reachability, IPv4/IPv6 host resolution, redundant nameservers, and TLS/SSL certificate status.",
-	},
-];
-
 export const faqs: FaqItem[] = [
 	{
 		question: "What is domain reputation?",
@@ -55,7 +28,7 @@ export const faqs: FaqItem[] = [
 	{
 		question: "How do I check my domain reputation?",
 		answer:
-			"Enter your sending domain (for example example.com) in the checker above. In a few seconds you get a 0–100 score and an A+ to F grade, built from SPF, DKIM, and DMARC, six live domain blocklists, domain age, and DNS health, plus a list of fixes. It's free and needs no signup.",
+			"Enter your sending domain (for example example.com) in the checker above. In a few seconds you get a 0–100 score and an A+ to F grade, built from SPF, DKIM, and DMARC, seven live domain blocklists, domain age, and DNS health, plus a list of fixes. It's free and needs no signup.",
 	},
 	{
 		question: "What is a good domain reputation score?",
@@ -88,6 +61,22 @@ export const faqs: FaqItem[] = [
 			"First, stop all outbound mass mailings and investigate recent bounce spikes or compromised sender credentials. Once the root cause is resolved, submit a delisting request directly to the listing organization.",
 	},
 	{
+		question: "Does it tell me how to fix problems?",
+		answer:
+			"Yes. Every failing check comes with the exact DNS record to add or change, such as a DMARC record that moves you from p=none to quarantine while keeping your report address. Copy the value into your DNS provider, wait for it to propagate, and run the check again.",
+	},
+	{
+		question:
+			"Does my domain meet Gmail, Yahoo, Outlook, and iCloud sender requirements?",
+		answer:
+			"The Inbox providers tab checks each provider's published DNS rules. Gmail and Yahoo need SPF or DKIM from every sender; iCloud needs SPF, DKIM, and DMARC from everyone; and Gmail, Yahoo, and Outlook need all three once you send 5,000+ messages a day. Alignment, reverse DNS, and unsubscribe headers need a real message, so test those with the free deliverability tester.",
+	},
+	{
+		question: "Can I share my report or show my score?",
+		answer:
+			"Every report has its own link (for example /tools/domain-reputation-checker?domain=yourdomain.com) that re-runs the check when opened. You can also embed a live badge in a README or website footer. It refreshes daily and links back to your report.",
+	},
+	{
 		question: "Can I check my domain reputation via API?",
 		answer:
 			'Yes. Send a POST request to https://reloop.sh/api/tools/v1/domain-reputation with JSON {"domain":"example.com"}, or use HTTP GET with ?domain=example.com. No API key required.',
@@ -98,64 +87,22 @@ export const faqGroups = [{ title: "Domain Reputation", items: faqs }];
 
 export const apiResponseSample = `{
   "domain": "reloop.sh",
-  "resolvedAt": "2026-09-13T03:45:00.000Z",
-  "responseTimeMs": 342,
   "score": 95,
   "grade": "A+",
   "verdict": "excellent",
-  "verdictLabel": "Outstanding reputation. Maximum deliverability confidence.",
   "breakdown": {
-    "authentication": {
-      "score": 100,
-      "weight": 35,
-      "status": "pass",
-      "summary": "SPF pass, DKIM pass, DMARC pass"
-    },
-    "blocklist": {
-      "score": 100,
-      "weight": 30,
-      "status": "pass",
-      "summary": "6/6 domain blocklists clean"
-    },
-    "domainAge": {
-      "score": 80,
-      "weight": 20,
-      "status": "pass",
-      "summary": "240 days old (established)"
-    },
-    "dnsHealth": {
-      "score": 100,
-      "weight": 15,
-      "status": "pass",
-      "summary": "2 MX, 2 NS, SSL active"
-    }
+    "authentication": { "score": 100, "weight": 35, "status": "pass" },
+    "blocklist": { "score": 100, "weight": 30, "status": "pass" },
+    "domainAge": { "score": 80, "weight": 20, "status": "pass" },
+    "dnsHealth": { "score": 100, "weight": 15, "status": "pass" }
   },
   "checks": [
     {
-      "id": "auth_spf",
-      "category": "authentication",
-      "label": "SPF Record",
-      "status": "pass",
-      "detail": "SPF record configured with softfail (~all). Strong, standard deliverability.",
-      "record": "v=spf1 include:_spf.reloop.sh ~all"
-    },
-    {
       "id": "auth_dmarc",
-      "category": "authentication",
       "label": "DMARC Policy",
       "status": "pass",
-      "detail": "DMARC policy is set to full reject (p=reject, pct=100). Maximum protection & sender credibility.",
-      "record": "v=DMARC1; p=reject; pct=100; rua=mailto:dmarc@reloop.sh"
-    },
-    {
-      "id": "blocklist_domain",
-      "category": "blocklist",
-      "label": "Domain Blocklists (RBL/URI)",
-      "status": "pass",
-      "detail": "Clean across all 6 major domain blocklists (Spamhaus DBL, URIBL, SURBL, SEM, NordSpam)."
+      "record": "v=DMARC1; p=reject; pct=100"
     }
   ],
-  "recommendations": [
-    "All domain reputation checks passed. Maintain high sender reputation by monitoring engagement and spam complaint rates below 0.1%."
-  ]
+  "recommendations": []
 }`;
