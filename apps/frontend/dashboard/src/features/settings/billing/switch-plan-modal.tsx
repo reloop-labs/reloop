@@ -11,6 +11,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
+import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
@@ -153,26 +154,38 @@ export function SwitchPlanModal({
 									key={plan.id}
 									type="button"
 									onClick={() => setSelectedId(plan.id)}
+									aria-pressed={isSelected}
 									className={cn(
-										"rounded-2xl border p-4 text-left transition-colors",
+										"flex items-center justify-between gap-3 rounded-2xl border p-4 text-left transition-[border-color,box-shadow,background-color] duration-150",
+										"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-strong-950/20",
 										isSelected
-											? "border-text-strong-950 bg-bg-weak-50 dark:border-white dark:bg-white/[0.06]"
-											: "border-stroke-soft-100 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40",
+											? "border-transparent bg-bg-white-0 shadow-xs ring-[1.5px] ring-text-strong-950 dark:bg-white/[0.04] dark:ring-white"
+											: "border-stroke-soft-100 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04]",
 									)}
 								>
-									<div className="flex items-center gap-2">
-										<span className="font-medium text-label-sm text-text-strong-950">
-											{plan.name}
-										</span>
-										{isCurrent && (
-											<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
-												Current plan
+									<div className="min-w-0">
+										<div className="flex items-center gap-2">
+											<span className="font-medium text-label-sm text-text-strong-950">
+												{plan.name}
 											</span>
-										)}
+											{isCurrent && (
+												<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
+													Current plan
+												</span>
+											)}
+										</div>
+										<p className="text-[12px] text-text-sub-600">
+											{renderPlanPrice(plan)}
+										</p>
 									</div>
-									<p className="text-[12px] text-text-sub-600">
-										{renderPlanPrice(plan)}
-									</p>
+									{isSelected ? (
+										<span
+											aria-hidden
+											className="flex size-5 shrink-0 items-center justify-center rounded-full bg-bg-strong-950 text-text-white-0"
+										>
+											<Check className="size-3" strokeWidth={3} />
+										</span>
+									) : null}
 								</button>
 							);
 						})}

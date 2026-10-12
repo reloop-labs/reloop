@@ -107,7 +107,7 @@ export function PlansPage() {
 		const isCheckingOut = checkout.isPending && checkout.variables === plan.id;
 		return (
 			<FancyButton.Root
-				variant={isNext ? "blue" : "basic"}
+				variant={isNext ? "neutral" : "basic"}
 				size="small"
 				className="w-full rounded-full font-semibold"
 				disabled={checkout.isPending}
