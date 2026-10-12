@@ -30,6 +30,7 @@ import { acmeVerifyEmailHtml } from "./acme/verify-email";
 import { acmeWeeklyReportHtml } from "./acme/weekly-report";
 import { acmeWelcomeHtml } from "./acme/welcome";
 import { appointmentReminderHtml } from "./appointment-reminder";
+import { blankHtml } from "./blank";
 import { eventTicketHtml } from "./event-ticket";
 import { fileDeliveryHtml } from "./file-delivery";
 import { orderReceiptHtml } from "./order-receipt";
@@ -52,6 +53,16 @@ export interface EmailTemplateExample {
 	html: (origin: string) => string;
 	variables: ToolVariable[];
 }
+
+/** Empty canvas; the gallery shows it as the first card. */
+export const blankTemplateExample: EmailTemplateExample = {
+	id: "blank",
+	name: "Blank",
+	slug: "blank",
+	description: "An empty email to build from scratch on the canvas.",
+	html: blankHtml,
+	variables: [],
+};
 
 export const emailTemplateExamples: EmailTemplateExample[] = [
 	{
@@ -603,16 +614,22 @@ const ACME_GALLERY_IDS = new Set(["acme-verify-email"]);
 
 /** Cards on /tools/email-html-editor: the varied designs, then picked Acme ones. */
 export const galleryTemplateExamples: EmailTemplateExample[] = [
+	blankTemplateExample,
 	...emailTemplateExamples,
 	...acmeTemplateExamples.filter((template) =>
 		ACME_GALLERY_IDS.has(template.id),
 	),
 ];
 
+/** Every template that opens at /tools/email-html-editor/[id]. */
+export const editorTemplateExamples: EmailTemplateExample[] = [
+	blankTemplateExample,
+	...emailTemplateExamples,
+	...acmeTemplateExamples,
+];
+
 export function getEmailTemplateExample(
 	id: string,
 ): EmailTemplateExample | undefined {
-	return [...emailTemplateExamples, ...acmeTemplateExamples].find(
-		(template) => template.id === id,
-	);
+	return editorTemplateExamples.find((template) => template.id === id);
 }

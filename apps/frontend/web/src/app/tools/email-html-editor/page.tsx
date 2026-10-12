@@ -4,6 +4,7 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { EmailHtmlEditorHero } from "./components/email-html-editor-hero";
+import { TemplatesSection } from "./components/templates-section";
 import {
 	faqGroups,
 	faqs,
@@ -29,7 +30,7 @@ export default function EmailHtmlEditorPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 [--primary-base:#2563eb] [--primary-dark:#1d4ed8] [--primary-darker:#1e40af] [--primary-link:#1d4ed8] dark:bg-black dark:text-white dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
+		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 [--primary-base:#171717] [--primary-dark:#000000] [--primary-darker:#000000] [--primary-link:#171717] dark:bg-black dark:text-white dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 			<JsonLd
 				data={[
 					{
@@ -95,7 +96,12 @@ export default function EmailHtmlEditorPage() {
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<div
 					aria-hidden
-					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+					className="h-24 border-stroke-soft-100 border-y dark:border-white/10"
+				/>
+				<TemplatesSection />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-y dark:border-white/10"
 				/>
 				<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 border-stroke-soft-100 border-b sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
 					{reasons.map((reason) => (

@@ -1,10 +1,12 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toolPath } from "../content";
 import {
+	blankTemplateExample,
 	type EmailTemplateExample,
 	galleryTemplateExamples,
 } from "../templates";
@@ -80,6 +82,29 @@ export function TemplatePreview({
 	);
 }
 
+/** Same paper as a template preview, with a plus where the email would be. */
+function BlankPreview() {
+	return (
+		<div
+			className="pointer-events-none absolute inset-0 select-none overflow-hidden"
+			style={{
+				paddingTop: PAPER_INSET,
+				paddingRight: PAPER_INSET,
+				paddingLeft: PAPER_INSET,
+			}}
+		>
+			<div className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-t-2xl border-stroke-soft-100 border-x border-t bg-bg-white-0 dark:border-stroke-soft-100/40">
+				<span className="flex size-10 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors duration-200 group-hover/card:text-text-strong-950 dark:border-stroke-soft-100/40">
+					<Icon name="plus" className="size-5" />
+				</span>
+				<span className="text-[13px] text-text-sub-600">
+					Start from scratch
+				</span>
+			</div>
+		</div>
+	);
+}
+
 export function TemplateCardGrid() {
 	return (
 		<div className="flex w-full flex-wrap justify-center gap-8 lg:gap-x-8 lg:gap-y-10">
@@ -97,7 +122,11 @@ export function TemplateCardGrid() {
 							"group-hover/card:border-stroke-sub-300 dark:group-hover/card:border-stroke-soft-100/70",
 						)}
 					>
-						<TemplatePreview template={template} />
+						{template.id === blankTemplateExample.id ? (
+							<BlankPreview />
+						) : (
+							<TemplatePreview template={template} />
+						)}
 					</div>
 
 					<span

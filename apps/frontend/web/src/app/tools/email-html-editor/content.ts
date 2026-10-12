@@ -6,7 +6,7 @@ export const metaTitle = "Free Email HTML Editor";
 export const metaDescription =
 	"Open a free email template on a visual canvas, tweak styles in the inspector, add variables, and flip to the HTML source. Same editor as Reloop Templates. No account needed to edit.";
 export const toolDescription =
-	"Pick a template to open it on the canvas. Edit styles, add variables, and flip to the HTML source. Nothing leaves your browser.";
+	"Edit email templates on a visual canvas. Tweak styles, add variables, and flip to the HTML source. Nothing leaves your browser.";
 
 export const toolKeywords = [
 	"email HTML editor",
