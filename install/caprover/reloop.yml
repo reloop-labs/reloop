@@ -129,12 +129,12 @@ services:
             - $$cap_appname-setup:/run/reloop
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -182,12 +182,12 @@ services:
         image: reloopsh/be-domain:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -231,12 +231,12 @@ services:
         image: reloopsh/be-api-key:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -280,12 +280,12 @@ services:
         image: reloopsh/be-webhook:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -329,12 +329,12 @@ services:
         image: reloopsh/be-contacts:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -378,12 +378,12 @@ services:
         image: reloopsh/be-mail:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -427,12 +427,12 @@ services:
         image: reloopsh/be-logs:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -476,12 +476,12 @@ services:
         image: reloopsh/be-workflow:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -525,12 +525,12 @@ services:
         image: reloopsh/be-upload:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -574,12 +574,12 @@ services:
         image: reloopsh/be-template:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -623,12 +623,12 @@ services:
         image: reloopsh/be-campaigns:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -681,12 +681,12 @@ services:
         image: reloopsh/be-inbox:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -730,12 +730,12 @@ services:
         image: reloopsh/be-email:$$cap_reloop_version
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -780,7 +780,7 @@ services:
         environment:
             HOSTNAME: 0.0.0.0
             PORT: '3000'
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
         caproverExtra:
             notExposeAsWebApp: 'true'
     $$cap_appname-links:
@@ -813,12 +813,12 @@ services:
             - $$cap_appname-smtp-meta:/var/spool/kumomta/meta
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -853,7 +853,7 @@ services:
             KUMOMTA_RSPAMD_URL: http://srv-captain--$$cap_appname-spam:11333/checkv2
             KUMOMTA_MIN_FREE_SPACE: 5%
             KUMOMTA_MIN_FREE_INODES: '0'
-            HOSTNAME: $$cap_reloop_domain
+            HOSTNAME: $$cap_appname.$$cap_root_domain
         caproverExtra:
             notExposeAsWebApp: 'true'
         depends_on:
@@ -870,12 +870,12 @@ services:
             - $$cap_appname-inbound-meta:/var/spool/kumomta/meta
         environment:
             NODE_ENV: production
-            BASE_URL: https://$$cap_reloop_domain
-            HOST_DOMAIN: $$cap_reloop_domain
-            TRACKING_DOMAIN: $$cap_reloop_links_domain
-            TRACKING_BASE_URL: https://$$cap_reloop_links_domain
-            INBOUND_HOSTNAME: $$cap_reloop_inbound_hostname
-            SMTP_HOSTNAME: $$cap_reloop_domain
+            BASE_URL: https://$$cap_appname.$$cap_root_domain
+            HOST_DOMAIN: $$cap_appname.$$cap_root_domain
+            TRACKING_DOMAIN: $$cap_appname-links.$$cap_root_domain
+            TRACKING_BASE_URL: https://$$cap_appname-links.$$cap_root_domain
+            INBOUND_HOSTNAME: $$cap_appname-inbound.$$cap_root_domain
+            SMTP_HOSTNAME: $$cap_appname.$$cap_root_domain
             AUTH_INTERNAL_BASE_URL: http://srv-captain--$$cap_appname-auth:8000
             PG_URL: postgresql://reloop:$$cap_postgres_password@srv-captain--$$cap_appname-postgres:5432/reloop
             REDIS_URL: redis://:$$cap_redis_password@srv-captain--$$cap_appname-redis:6379
@@ -923,21 +923,6 @@ caproverOneClickApp:
           defaultValue: latest
           description: Image tag for every Reloop service. Check https://hub.docker.com/r/reloopsh/be-auth/tags for valid tags.
           validRegex: /^([^\s^\/])+$/
-        - id: $$cap_reloop_domain
-          label: Reloop Domain
-          defaultValue: $$cap_appname.$$cap_root_domain
-          description: Serves the dashboard and the API. Leave the default unless you will attach a custom domain to the main Reloop app before signing in.
-          validRegex: /^[a-z0-9.-]+$/
-        - id: $$cap_reloop_links_domain
-          label: Tracking Domain
-          defaultValue: $$cap_appname-links.$$cap_root_domain
-          description: Serves click and open tracking and unsubscribe pages. Must point at the links app (the app name followed by -links).
-          validRegex: /^[a-z0-9.-]+$/
-        - id: $$cap_reloop_inbound_hostname
-          label: Inbound Mail Hostname
-          defaultValue: $$cap_appname-inbound.$$cap_root_domain
-          description: MX target for mail your verified domains receive. Needs an A record pointing at this server.
-          validRegex: /^[a-z0-9.-]+$/
         - id: $$cap_reloop_app_name
           label: Instance Name
           defaultValue: Reloop
@@ -1031,8 +1016,8 @@ caproverOneClickApp:
 
             Next steps:
             1. Open the $$cap_appname and $$cap_appname-links apps, click Enable HTTPS on each, then turn on Force HTTPS.
-            2. Add DNS records: an A record for $$cap_reloop_inbound_hostname and an SPF TXT record "v=spf1 ip4:<server ip> -all" on $$cap_reloop_domain.
-            3. Open https://$$cap_reloop_domain/dashboard/setup and paste the Administrator Setup Key.
+            2. Add DNS records: an A record for $$cap_appname-inbound.$$cap_root_domain and an SPF TXT record "v=spf1 ip4:<server ip> -all" on $$cap_appname.$$cap_root_domain.
+            3. Open https://$$cap_appname.$$cap_root_domain/dashboard/setup and paste the Administrator Setup Key.
 
             Full guide: https://reloop.sh/docs/self-host/caprover
     displayName: Reloop
