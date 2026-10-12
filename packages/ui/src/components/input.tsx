@@ -27,7 +27,7 @@ export const inputVariants = tv({
 			// hover
 			"hover:shadow-none",
 			// focus
-			"has-[input:focus]:shadow-none has-[input:focus]:ring-4 has-[input:focus]:ring-primary-base/10 has-[input:focus]:before:ring-primary-base",
+			"has-[input:focus]:shadow-none has-[input:focus]:ring-4 has-[input:focus]:ring-text-strong-950/10 has-[input:focus]:before:ring-text-strong-950",
 			// disabled
 			"has-[input:disabled]:shadow-none has-[input:disabled]:before:ring-transparent",
 		],

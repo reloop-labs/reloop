@@ -1,6 +1,7 @@
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -42,17 +43,19 @@ interface Invite {
 
 interface TeamListProps {
 	searchQuery: string;
-	filters?: "invited" | "suspended" | "active" | "all";
+	filters?: TeamFilterValue;
+	/** Opens the invite modal prefilled with the given email. */
+	onInvite?: (email: string) => void;
 }
 
 const getRoleBadgeStyles = (role: string) => {
 	switch (role.toLowerCase()) {
 		case "owner":
-			return "border border-warning-light bg-warning-lighter text-warning-base";
+			return "border border-bg-strong-950 bg-bg-strong-950 text-text-white-0";
 		case "admin":
-			return "border border-feature-light bg-feature-lighter text-feature-base";
+			return "border border-stroke-sub-300 bg-bg-white-0 text-text-strong-950 dark:border-white/20 dark:bg-transparent";
 		default:
-			return "border border-neutral-alpha-10 bg-neutral-alpha-10 text-text-sub-600";
+			return "border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.04]";
 	}
 };
 
@@ -68,6 +71,8 @@ const formatRoleLabel = (role: string) => {
 			return role;
 	}
 };
+
+const isEmailLike = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 const primaryRole = (role: string) =>
 	role.split(",")[0]?.trim().toLowerCase() ?? role.toLowerCase();
@@ -96,7 +101,7 @@ const TeamSkeleton = () => (
 
 const TableHeader = () => (
 	<div
-		className={`grid ${GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-white/[0.03]`}
+		className={`grid ${GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40`}
 	>
 		<div className="flex items-center gap-1">
 			<Icon name="user" className="h-3 w-3" />
@@ -119,8 +124,13 @@ import { InviteDropdown } from "./invite-dropdown";
 import { MemberDropdown } from "./member-dropdown";
 import { RemoveMemberModal } from "./remove-member-modal";
 import { RevokeInviteModal } from "./revoke-invite-modal";
+import type { TeamFilterValue } from "./team-filter-dropdown";
 
-export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
+export function TeamList({
+	searchQuery,
+	filters = "all",
+	onInvite,
+}: TeamListProps) {
 	const queryClient = useQueryClient();
 	const { activeOrganization } = useActiveOrganization();
 	const { canManageTeam, isOwner } = useOrgPermissions();
@@ -207,26 +217,9 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 			);
 		}
 
-		// Apply type filter (single-select)
-		if (filters !== "all") {
-			const showInvited = filters === "invited";
-			const showSuspended = filters === "suspended";
-			const showActive = filters === "active";
-
-			// If only specific filters are selected, filter accordingly
-			if (!showInvited) {
-				filteredInvites = [];
-			}
-			if (!showActive && !showSuspended) {
-				filteredMembers = [];
-			} else if (showSuspended && !showActive) {
-				// TODO: Filter by suspended status when available
-				filteredMembers = [];
-			} else if (showActive && !showSuspended) {
-				// Show only active members
-				// filteredMembers already contains all members
-			}
-		}
+		// Apply status filter (single-select)
+		if (filters === "active") filteredInvites = [];
+		if (filters === "invited") filteredMembers = [];
 
 		// Ensure current user is always at the top
 		const sortedMembers = [...filteredMembers].sort((a, b) => {
@@ -244,17 +237,16 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 			const { error } = await authClient.organization.removeMember({
 				memberIdOrEmail: memberId,
 			});
-			if (error) {
-				toast.error(error.message || "Failed to remove member");
-				return;
-			}
+			if (error) throw new Error(error.message || "Failed to remove member");
 			await invalidateMembers();
-		} catch (_err) {
-			toast.error("Failed to remove member");
+			toast.success("Member removed");
+		} catch (err) {
+			toast.error(
+				err instanceof Error ? err.message : "Failed to remove member",
+			);
+			throw err;
 		} finally {
 			setRemovingMember(null);
-			setRemoveMemberModalOpen(false);
-			setMemberToRemove(null);
 		}
 	};
 
@@ -303,12 +295,8 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 
 	const handleConfirmChangeRole = async (role: AssignableRole) => {
 		const member = memberToChangeRole;
-		if (!member || !activeOrganization?.id) return;
-		if (primaryRole(member.role) === role) {
-			setChangeRoleModalOpen(false);
-			setMemberToChangeRole(null);
-			return;
-		}
+		if (!member || !activeOrganization?.id) return false;
+		if (primaryRole(member.role) === role) return true;
 
 		setUpdatingRole(true);
 		try {
@@ -319,13 +307,14 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 			});
 			if (error) {
 				toast.error(error.message || "Failed to update role");
-				return;
+				return false;
 			}
 			await invalidateMembers();
-			setChangeRoleModalOpen(false);
-			setMemberToChangeRole(null);
+			toast.success(`Role changed to ${formatRoleLabel(role)}`);
+			return true;
 		} catch {
 			toast.error("Failed to update role");
+			return false;
 		} finally {
 			setUpdatingRole(false);
 		}
@@ -337,13 +326,15 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 			const { error } = await authClient.organization.cancelInvitation({
 				invitationId,
 			});
-			if (error) {
-				toast.error(error.message || "Failed to cancel invitation");
-				return;
-			}
+			if (error)
+				throw new Error(error.message || "Failed to cancel invitation");
 			await invalidateInvites();
-		} catch (_err) {
-			toast.error("Failed to cancel invitation");
+			toast.success("Invitation revoked");
+		} catch (err) {
+			toast.error(
+				err instanceof Error ? err.message : "Failed to cancel invitation",
+			);
+			throw err;
 		} finally {
 			setCancellingInvite(null);
 		}
@@ -383,6 +374,7 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 				return;
 			}
 			await invalidateInvites();
+			toast.success(`Invite resent to ${invite.email}`);
 		} catch (_err) {
 			toast.error("Failed to resend invitation");
 			await invalidateInvites();
@@ -393,7 +385,10 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 
 	const handleCopyInviteLink = (inviteId: string) => {
 		const inviteLink = `${window.location.origin}/dashboard/invite?id=${inviteId}`;
-		navigator.clipboard.writeText(inviteLink);
+		navigator.clipboard.writeText(inviteLink).then(
+			() => toast.success("Invite link copied"),
+			() => toast.error("Couldn't copy the invite link"),
+		);
 	};
 
 	const handleRevokeInviteClick = (inviteId: string) => {
@@ -414,7 +409,7 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 		return (
 			<div className="w-full text-paragraph-sm">
 				<TableHeader />
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
 					{Array.from({ length: 3 }).map((_, index) => (
 						// biome-ignore lint/suspicious/noArrayIndexKey: static skeleton rows
 						<TeamSkeleton key={`skeleton-${index}`} />
@@ -433,23 +428,46 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 				<TableHeader />
 
 				{/* Table body, stacked over header with rounded corners (same as domains) */}
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
 					{noResults ? (
 						<div className="flex flex-col items-center justify-center py-16">
 							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
 								<Icon
-									name={searchQuery ? "search" : "users"}
+									name={searchQuery || filters !== "all" ? "search" : "users"}
 									className="h-6 w-6 text-text-sub-600"
 								/>
 							</div>
-							<p className="mt-4 font-medium text-text-strong-950">
-								{searchQuery ? "No results found" : "No team members yet"}
+							<p className="mt-4 max-w-full truncate px-4 font-medium text-text-strong-950">
+								{searchQuery
+									? `No results for “${searchQuery.trim()}”`
+									: filters === "invited"
+										? "No pending invites"
+										: "No team members yet"}
 							</p>
 							<p className="mt-1 text-sm text-text-sub-600">
 								{searchQuery
-									? "Try a different search term"
-									: "Invite members to get started"}
+									? onInvite
+										? isEmailLike(searchQuery.trim())
+											? "They're not on your team yet. Send them an invite."
+											: "Not on your team yet. Invite them by email."
+										: "Try a different search term"
+									: filters === "invited"
+										? "Invites you send will show up here"
+										: "Invite members to get started"}
 							</p>
+							{searchQuery.trim() && onInvite ? (
+								<FancyButton.Root
+									variant="neutral"
+									size="small"
+									className="mt-5 max-w-full rounded-full font-medium"
+									onClick={() => onInvite(searchQuery.trim())}
+								>
+									<FancyButton.Icon as={Icon} name="user-plus" />
+									<span className="max-w-[260px] truncate">
+										Invite {searchQuery.trim()}
+									</span>
+								</FancyButton.Root>
+							) : null}
 						</div>
 					) : (
 						<>
@@ -467,8 +485,8 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 										key={rowId}
 										className={cn(
 											`group/row grid ${GRID} items-center px-4 py-2 text-left transition-colors`,
-											"hover:bg-bg-weak-50/50",
-											isRowActive && "bg-bg-weak-50/50",
+											"hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]",
+											isRowActive && "bg-bg-weak-50 dark:bg-white/[0.04]",
 										)}
 									>
 										{/* User Column */}
@@ -547,8 +565,8 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 										key={rowId}
 										className={cn(
 											`group/row grid ${GRID} items-center px-4 py-2 text-left transition-colors`,
-											"hover:bg-bg-weak-50/50",
-											(isRowActive || isCurrentUser) && "bg-bg-weak-50/50",
+											"hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]",
+											isRowActive && "bg-bg-weak-50 dark:bg-white/[0.04]",
 										)}
 									>
 										{/* User Column */}
@@ -581,7 +599,7 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 															member.user.email.split("@")[0]}
 													</span>
 													{isCurrentUser && (
-														<span className="inline-flex flex-shrink-0 items-center rounded-full bg-gray-950 px-1.5 py-0.5 font-bold text-[9px] text-bg-white-0 leading-none tracking-wider">
+														<span className="inline-flex flex-shrink-0 items-center rounded-full border border-stroke-soft-200 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 leading-none dark:border-white/10">
 															You
 														</span>
 													)}

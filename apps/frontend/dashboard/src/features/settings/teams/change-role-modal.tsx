@@ -10,8 +10,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnNeutralClassName =
+	"border-text-white-0/25 bg-text-white-0/15 text-text-white-0 shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]";
 
 export type AssignableRole = "admin" | "member";
 
@@ -25,20 +25,20 @@ const ROLE_CONFIG: {
 		value: "admin",
 		label: "Admin",
 		description: "Invite users, update payment, and delete the team.",
-		dotColor: "bg-feature-base",
+		dotColor: "bg-bg-strong-950",
 	},
 	{
 		value: "member",
 		label: "Member",
 		description: "Manage emails, domains, and webhooks.",
-		dotColor: "bg-neutral-600",
+		dotColor: "bg-neutral-400",
 	},
 ];
 
 const getRoleBadgeStyles = (role: AssignableRole) => {
 	switch (role) {
 		case "admin":
-			return "border border-feature-light bg-feature-lighter text-feature-base";
+			return "border border-stroke-sub-300 bg-bg-white-0 text-text-strong-950 dark:border-white/20 dark:bg-transparent";
 		default:
 			return "border border-neutral-alpha-10 bg-neutral-alpha-10 text-text-sub-600";
 	}
@@ -48,17 +48,17 @@ const getRoleCardStyles = (role: AssignableRole) => {
 	switch (role) {
 		case "admin":
 			return {
-				card: "border-feature-base bg-feature-lighter/40 ring-1 ring-feature-base",
-				label: "text-feature-base",
-				desc: "text-feature-base/70",
-				check: "bg-feature-base",
+				card: "border-transparent bg-bg-white-0 ring-[1.5px] ring-text-strong-950 dark:bg-white/[0.04] dark:ring-white",
+				label: "text-text-strong-950",
+				desc: "text-text-sub-600",
+				check: "bg-bg-strong-950",
 			};
 		default:
 			return {
-				card: "border-stroke-base bg-bg-weak-50 ring-1 ring-stroke-base",
+				card: "border-transparent bg-bg-white-0 ring-[1.5px] ring-text-strong-950 dark:bg-white/[0.04] dark:ring-white",
 				label: "text-text-strong-950",
 				desc: "text-text-sub-600",
-				check: "bg-neutral-600",
+				check: "bg-bg-strong-950",
 			};
 	}
 };
@@ -246,7 +246,10 @@ export const ChangeRoleModal = ({
 													styles.check,
 												)}
 											>
-												<Icon name="check" className="h-2.5 w-2.5 text-white" />
+												<Icon
+													name="check"
+													className="h-2.5 w-2.5 text-text-white-0"
+												/>
 											</span>
 										)}
 									</div>
@@ -286,7 +289,7 @@ export const ChangeRoleModal = ({
 						</FancyButton.Root>
 						<FancyButton.Root
 							type="button"
-							variant={status === "success" ? "success" : "blue"}
+							variant={status === "success" ? "success" : "neutral"}
 							size="xsmall"
 							className={cn(
 								"min-w-[140px] justify-center overflow-hidden font-medium transition-all duration-200",
@@ -323,10 +326,10 @@ export const ChangeRoleModal = ({
 											<FancyButton.Icon as={Icon} name="user-role" />
 											<span>Update role</span>
 											<span className="inline-flex items-center gap-0.5 opacity-90">
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnNeutralClassName}>
 													⌘
 												</ActionKbd>
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnNeutralClassName}>
 													↵
 												</ActionKbd>
 											</span>

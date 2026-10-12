@@ -18,6 +18,7 @@ import { TeamList } from "./team-list";
 export function TeamsPage() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [filters, setFilters] = useState<TeamFilterValue>("all");
+	const [inviteEmail, setInviteEmail] = useState("");
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 	const router = useRouter();
 	const { canManageTeam, canInvite, isPending } = useOrgPermissions();
@@ -28,11 +29,17 @@ export function TeamsPage() {
 		}
 	}, [canManageTeam, isPending, router]);
 
+	// Carry whatever is in the search box into the invite form.
+	const openInvite = (email = searchQuery.trim()) => {
+		setInviteEmail(email);
+		void setModal("invite");
+	};
+
 	useHotkeys(
 		"mod+a",
 		(e) => {
 			e.preventDefault();
-			if (canInvite) void setModal("invite");
+			if (canInvite) openInvite();
 		},
 		{ enabled: canInvite },
 	);
@@ -70,9 +77,9 @@ export function TeamsPage() {
 
 				{canInvite && (
 					<FancyButton.Root
-						variant="blue"
+						variant="neutral"
 						size="small"
-						onClick={() => void setModal("invite")}
+						onClick={() => openInvite()}
 						className="h-9 rounded-xl font-medium"
 					>
 						<FancyButton.Icon as={Icon} name="user-plus" />
@@ -80,9 +87,9 @@ export function TeamsPage() {
 						<span className="inline-flex items-center gap-0.5 opacity-90">
 							<Icon
 								name="command"
-								className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+								className="h-3.5 w-3.5 rounded-sm border border-text-white-0/25 p-px"
 							/>
-							<span className="flex h-3.5 w-3.5 items-center justify-center rounded-sm border border-white/20 p-px font-medium text-[9px] uppercase">
+							<span className="flex h-3.5 w-3.5 items-center justify-center rounded-sm border border-text-white-0/25 p-px font-medium text-[9px] uppercase">
 								a
 							</span>
 						</span>
@@ -90,12 +97,21 @@ export function TeamsPage() {
 				)}
 			</div>
 
-			<TeamList searchQuery={searchQuery} filters={filters} />
+			<TeamList
+				searchQuery={searchQuery}
+				filters={filters}
+				onInvite={canInvite ? openInvite : undefined}
+			/>
 
 			{canInvite && (
 				<InviteModal
 					open={modal === "invite"}
 					onOpenChange={(open) => void setModal(open ? "invite" : null)}
+					initialEmail={inviteEmail}
+					onInvited={() => {
+						setSearchQuery("");
+						setInviteEmail("");
+					}}
 				/>
 			)}
 		</div>

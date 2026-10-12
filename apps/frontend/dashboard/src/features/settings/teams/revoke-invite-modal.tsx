@@ -106,9 +106,8 @@ export const RevokeInviteModal = ({
 	const getRoleTextColor = (role: string) => {
 		switch (role.toLowerCase()) {
 			case "owner":
-				return "text-warning-base";
 			case "admin":
-				return "text-feature-base";
+				return "text-text-strong-950";
 			default:
 				return "text-text-sub-600";
 		}

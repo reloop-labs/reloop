@@ -195,7 +195,7 @@ function OrganizationForm({
 					</div>
 					<div className="flex justify-end">
 						<FancyButton.Root
-							variant={status === "success" ? "success" : "blue"}
+							variant={status === "success" ? "success" : "neutral"}
 							size="small"
 							type="submit"
 							className={cn(

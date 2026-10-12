@@ -8,7 +8,7 @@ import {
 	SelectValue,
 } from "#/features/api-keys/filters/base-ui-select";
 
-export type TeamFilterOption = "invited" | "suspended" | "active";
+export type TeamFilterOption = "invited" | "active";
 export type TeamFilterValue = TeamFilterOption | "all";
 
 interface TeamFilterDropdownProps {
@@ -28,12 +28,6 @@ const filterOptions: {
 		label: "Active",
 		icon: "check-circle",
 		colorClass: "text-success-base",
-	},
-	{
-		id: "suspended",
-		label: "Suspended",
-		icon: "cross-circle",
-		colorClass: "text-error-base",
 	},
 	{
 		id: "invited",

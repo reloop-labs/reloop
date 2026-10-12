@@ -8,7 +8,7 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -20,6 +20,10 @@ type Role = "member" | "admin";
 interface InviteModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	/** Prefills the email field (e.g. from the Teams search box). */
+	initialEmail?: string;
+	/** Called once an invitation has been sent successfully. */
+	onInvited?: (email: string) => void;
 }
 
 const ROLE_CONFIG: {
@@ -32,13 +36,13 @@ const ROLE_CONFIG: {
 		value: "member",
 		label: "Member",
 		description: "Manage emails, domains, and webhooks.",
-		dotColor: "bg-neutral-600",
+		dotColor: "bg-neutral-400",
 	},
 	{
 		value: "admin",
 		label: "Admin",
 		description: "Invite users, update payment, and delete the team.",
-		dotColor: "bg-feature-base",
+		dotColor: "bg-bg-strong-950",
 	},
 ];
 
@@ -46,17 +50,17 @@ const getRoleCardStyles = (role: Role) => {
 	switch (role) {
 		case "admin":
 			return {
-				card: "border-feature-base bg-feature-lighter/40 ring-1 ring-feature-base",
-				label: "text-feature-base",
-				desc: "text-feature-base/70",
-				check: "bg-feature-base",
+				card: "border-transparent bg-bg-white-0 ring-[1.5px] ring-text-strong-950 dark:bg-white/[0.04] dark:ring-white",
+				label: "text-text-strong-950",
+				desc: "text-text-sub-600",
+				check: "bg-bg-strong-950",
 			};
 		default:
 			return {
-				card: "border-stroke-base bg-bg-weak-50 ring-1 ring-stroke-base",
+				card: "border-transparent bg-bg-white-0 ring-[1.5px] ring-text-strong-950 dark:bg-white/[0.04] dark:ring-white",
 				label: "text-text-strong-950",
 				desc: "text-text-sub-600",
-				check: "bg-neutral-600",
+				check: "bg-bg-strong-950",
 			};
 	}
 };
@@ -64,7 +68,12 @@ const getRoleCardStyles = (role: Role) => {
 const isValidEmail = (email: string) =>
 	/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-export function InviteModal({ open, onOpenChange }: InviteModalProps) {
+export function InviteModal({
+	open,
+	onOpenChange,
+	initialEmail = "",
+	onInvited,
+}: InviteModalProps) {
 	const queryClient = useQueryClient();
 	const { activeOrganization } = useActiveOrganization();
 	const orgId = activeOrganization?.id;
@@ -74,6 +83,19 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 	const [emailError, setEmailError] = useState<string | null>(null);
 	const [selectedRole, setSelectedRole] = useState<Role>("member");
 	const inputRef = useRef<HTMLInputElement>(null);
+
+	// Prefill from search and focus the email field each time the modal opens.
+	// Selecting the text lets the user hit Enter to send or type to replace it.
+	useEffect(() => {
+		if (!open) return;
+		setEmail(initialEmail);
+		setEmailError(null);
+		const id = requestAnimationFrame(() => {
+			inputRef.current?.focus();
+			inputRef.current?.select();
+		});
+		return () => cancelAnimationFrame(id);
+	}, [open, initialEmail]);
 
 	const { data: membersData } = useQuery({
 		queryKey: queryKeys.organization.members(orgId ?? ""),
@@ -170,6 +192,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 				queryKey: queryKeys.organization.invitations(orgId),
 			});
 			setStatus("success");
+			onInvited?.(email.trim());
 			setTimeout(() => {
 				handleOpenChange(false);
 			}, 1500);
@@ -312,7 +335,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 													>
 														<Icon
 															name="check"
-															className="h-2.5 w-2.5 text-white"
+															className="h-2.5 w-2.5 text-text-white-0"
 														/>
 													</span>
 												)}
@@ -354,7 +377,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 						</Button.Root>
 						<FancyButton.Root
 							type="button"
-							variant={status === "success" ? "success" : "blue"}
+							variant={status === "success" ? "success" : "neutral"}
 							size="small"
 							className={cn(
 								"min-w-[130px] justify-center overflow-hidden transition-all duration-200",
@@ -400,11 +423,11 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 											<span className="inline-flex items-center gap-0.5 opacity-80">
 												<Icon
 													name="command"
-													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+													className="h-3.5 w-3.5 rounded-sm border border-text-white-0/25 p-px"
 												/>
 												<Icon
 													name="enter"
-													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+													className="h-3.5 w-3.5 rounded-sm border border-text-white-0/25 p-px"
 												/>
 											</span>
 										</>
