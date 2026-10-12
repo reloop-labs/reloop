@@ -137,7 +137,7 @@ services:
     restart: unless-stopped
 
   reloop-minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    image: pgsty/silo:RELEASE.2026-09-16T00-00-00Z
     container_name: reloop-minio
     ports:
       - "9010:9000"
