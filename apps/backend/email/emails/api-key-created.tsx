@@ -11,6 +11,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -26,10 +27,6 @@ interface ApiKeyCreatedEmailProps {
 	theme?: "light" | "dark";
 }
 
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
-
 export const ApiKeyCreatedEmail = ({
 	fullName = "User",
 	keyName = "Production Key",
@@ -37,7 +34,7 @@ export const ApiKeyCreatedEmail = ({
 	createdAt = "May 6, 2026 at 15:27 UTC",
 	ipAddress = "192.168.1.1",
 	location = "San Francisco, CA",
-	manageKeysUrl = "https://reloop.sh/dashboard/settings/api-keys",
+	manageKeysUrl = `${defaultBaseUrl}/dashboard/api-keys`,
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: ApiKeyCreatedEmailProps) => {

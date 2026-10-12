@@ -49,6 +49,7 @@ export async function initApiKeySubscribers() {
 						ipAddress: "Unknown",
 						location: "Unknown",
 						manageKeysUrl: `${emailConfig.BASE_URL}/dashboard/api-keys`,
+						baseUrl: emailConfig.BASE_URL,
 					}),
 				);
 

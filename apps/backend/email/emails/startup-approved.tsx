@@ -11,6 +11,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -21,10 +22,6 @@ interface StartupApprovedEmailProps {
 	baseUrl?: string;
 	theme?: "light" | "dark";
 }
-
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
 
 export const StartupApprovedEmail = ({
 	fullName = "there",

@@ -11,6 +11,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -24,7 +25,7 @@ interface OTPTokenEmailProps {
 export const OTPTokenEmail = ({
 	otp = "888888",
 	email = "user@example.com",
-	baseUrl = "https://reloop.sh",
+	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: OTPTokenEmailProps) => {
 	const url = `${baseUrl}/dashboard/verify?otpSent=${encodeURIComponent(

@@ -11,6 +11,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -24,16 +25,12 @@ interface InviteEmailProps {
 	theme?: "light" | "dark";
 }
 
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
-
 export const InviteEmail = ({
 	inviteeName,
 	inviterName = "Pranav Patel",
 	inviterEmail = "reloop.sh@gmail.com",
 	teamName = "Reloop",
-	inviteUrl = "https://reloop.sh/invite/abc123",
+	inviteUrl = `${defaultBaseUrl}/dashboard/signup?inviteId=abc123`,
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: InviteEmailProps) => {

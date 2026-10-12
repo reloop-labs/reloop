@@ -121,6 +121,7 @@ export async function initDomainSubscribers() {
 						fullName: domain.user.name || "User",
 						domain: payload.domain,
 						dashboardUrl: `${emailConfig.BASE_URL}/dashboard/domain`,
+						baseUrl: emailConfig.BASE_URL,
 						isSendingEmailEnabled: domain.isSendingEmailEnabled,
 						isReceivingEmailEnabled: domain.isReceivingEmailEnabled,
 						isTrackingEnabled:
@@ -174,6 +175,7 @@ export async function initDomainSubscribers() {
 						receivingRecords,
 						trackingRecords,
 						dashboardUrl: `${emailConfig.BASE_URL}/dashboard/domain`,
+						baseUrl: emailConfig.BASE_URL,
 					}),
 				);
 

@@ -10,6 +10,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -25,18 +26,14 @@ interface QuotaWarningEmailProps {
 	theme?: "light" | "dark";
 }
 
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
-
 export const QuotaWarningEmail = ({
 	fullName = "User",
 	percentUsed = 80,
 	emailsSent = 8000,
 	emailsLimit = 10000,
 	resetDate = "June 1, 2026",
-	upgradeUrl = "https://reloop.sh/dashboard/billing",
-	dashboardUrl = "https://reloop.sh/dashboard",
+	upgradeUrl = `${defaultBaseUrl}/dashboard/settings/billing/plans`,
+	dashboardUrl = `${defaultBaseUrl}/dashboard`,
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: QuotaWarningEmailProps) => {

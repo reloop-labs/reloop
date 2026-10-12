@@ -10,6 +10,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -23,16 +24,12 @@ interface ExportReadyEmailProps {
 	theme?: "light" | "dark";
 }
 
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
-
 export const ExportReadyEmail = ({
 	totalRows = 0,
 	fileName = "contacts.csv",
-	downloadUrl = "https://reloop.sh/dashboard/contacts",
+	downloadUrl = `${defaultBaseUrl}/dashboard/contacts`,
 	expiresAt = "",
-	dashboardUrl = "https://reloop.sh/dashboard/contacts",
+	dashboardUrl = `${defaultBaseUrl}/dashboard/contacts`,
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: ExportReadyEmailProps) => {

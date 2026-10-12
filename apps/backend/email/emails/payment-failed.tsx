@@ -11,6 +11,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -25,17 +26,13 @@ interface PaymentFailedEmailProps {
 	theme?: "light" | "dark";
 }
 
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
-
 export const PaymentFailedEmail = ({
 	fullName = "User",
 	planName = "Pro",
 	amount = "$29.00",
 	failureReason = "Your card was declined.",
 	nextRetryDate = "May 13, 2026",
-	updateBillingUrl = "https://reloop.sh/dashboard/billing",
+	updateBillingUrl = `${defaultBaseUrl}/dashboard/settings/billing`,
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: PaymentFailedEmailProps) => {

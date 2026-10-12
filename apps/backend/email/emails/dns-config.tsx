@@ -11,6 +11,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -42,10 +43,6 @@ interface DnsConfigEmailProps {
 	baseUrl?: string;
 	theme?: "light" | "dark";
 }
-
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
 
 const sampleDkim: DNSRecord[] = [
 	{
@@ -111,7 +108,7 @@ export const DnsConfigEmail = ({
 	receivingRecords = sampleReceiving,
 	trackingRecords = sampleTracking,
 	spfRecords,
-	dashboardUrl = "https://reloop.sh/dashboard",
+	dashboardUrl = `${defaultBaseUrl}/dashboard`,
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: DnsConfigEmailProps) => {
@@ -582,7 +579,7 @@ export const DnsConfigEmail = ({
 						<Text className={cls.bodyText}>
 							Need help? Visit our{" "}
 							<a
-								href="https://reloop.sh/docs/guides/connect-domain/dns-records-explained"
+								href={`${baseUrl}/docs/guides/connect-domain/dns-records-explained`}
 								style={{ color: "inherit" }}
 							>
 								DNS setup docs

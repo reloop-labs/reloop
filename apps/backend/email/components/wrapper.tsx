@@ -1,6 +1,7 @@
 import { appName } from "@reloop/email/brand";
 import type * as React from "react";
 import { Img, Link, Section } from "react-email";
+import { defaultBaseUrl } from "./base-url";
 
 interface WrapperProps {
 	children: React.ReactNode;
@@ -10,7 +11,7 @@ interface WrapperProps {
 
 export const Wrapper = ({
 	children,
-	baseUrl = "https://reloop.sh",
+	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: WrapperProps) => {
 	const isDark = theme === "dark";

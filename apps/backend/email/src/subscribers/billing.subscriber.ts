@@ -25,7 +25,8 @@ export async function initBillingSubscribers() {
 						nextRetryDate: new Date(
 							Date.now() + 7 * 24 * 60 * 60 * 1000,
 						).toLocaleDateString(),
-						updateBillingUrl: `${emailConfig.BASE_URL}/dashboard/billing`,
+						updateBillingUrl: `${emailConfig.BASE_URL}/dashboard/settings/billing`,
+						baseUrl: emailConfig.BASE_URL,
 					}),
 				);
 
@@ -60,7 +61,8 @@ export async function initBillingSubscribers() {
 						emailsSent: 8000,
 						emailsLimit: 10000,
 						resetDate: "Next Month",
-						upgradeUrl: `${emailConfig.BASE_URL}/dashboard/billing/upgrade`,
+						upgradeUrl: `${emailConfig.BASE_URL}/dashboard/settings/billing/plans`,
+						baseUrl: emailConfig.BASE_URL,
 						dashboardUrl: `${emailConfig.BASE_URL}/dashboard`,
 					}),
 				);
@@ -101,7 +103,8 @@ export async function initBillingSubscribers() {
 							Date.now() + payload.daysLeft * 24 * 60 * 60 * 1000,
 						).toLocaleDateString(),
 						currentPlan: "Pro Trial",
-						upgradeUrl: `${emailConfig.BASE_URL}/dashboard/billing/upgrade`,
+						upgradeUrl: `${emailConfig.BASE_URL}/dashboard/settings/billing/plans`,
+						baseUrl: emailConfig.BASE_URL,
 					}),
 				);
 

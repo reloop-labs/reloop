@@ -12,6 +12,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -26,10 +27,6 @@ interface SignInDetectedEmailProps {
 	baseUrl?: string;
 	theme?: "light" | "dark";
 }
-
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
 
 export const SignInDetectedEmail = ({
 	fullName = "User",
@@ -253,17 +250,10 @@ export const SignInDetectedEmail = ({
 							<Text className={cls.alertText}>
 								Review your{" "}
 								<Link
-									href={`${baseUrl}/dashboard/activity`}
-									className={cls.link}
-								>
-									recent activity
-								</Link>{" "}
-								and{" "}
-								<Link
 									href={`${baseUrl}/dashboard/settings/security`}
 									className={cls.link}
 								>
-									security settings
+									active sessions and security settings
 								</Link>{" "}
 								now.
 							</Text>

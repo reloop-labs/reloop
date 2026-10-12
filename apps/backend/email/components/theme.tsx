@@ -1,5 +1,6 @@
 import type React from "react";
 import { Font, Head, Html, Tailwind } from "react-email";
+import { defaultBaseUrl } from "./base-url";
 
 // Email-optimized theme colors (avoiding pure white/black for better email client compatibility)
 export const emailTheme = {
@@ -219,7 +220,7 @@ export function EmailThemeProvider({
 					fontFamily="Open Runde"
 					fallbackFontFamily="Helvetica"
 					webFont={{
-						url: "https://reloop.sh/font/openRunde/OpenRunde-Regular.woff2",
+						url: `${defaultBaseUrl}/font/openRunde/OpenRunde-Regular.woff2`,
 						format: "woff2",
 					}}
 					fontWeight={400}
@@ -230,7 +231,7 @@ export function EmailThemeProvider({
 					fontFamily="Open Runde"
 					fallbackFontFamily="Helvetica"
 					webFont={{
-						url: "https://reloop.sh/font/openRunde/OpenRunde-Medium.woff2",
+						url: `${defaultBaseUrl}/font/openRunde/OpenRunde-Medium.woff2`,
 						format: "woff2",
 					}}
 					fontWeight={500}
@@ -241,7 +242,7 @@ export function EmailThemeProvider({
 					fontFamily="Open Runde"
 					fallbackFontFamily="Helvetica"
 					webFont={{
-						url: "https://reloop.sh/font/openRunde/OpenRunde-Semibold.woff2",
+						url: `${defaultBaseUrl}/font/openRunde/OpenRunde-Semibold.woff2`,
 						format: "woff2",
 					}}
 					fontWeight={600}

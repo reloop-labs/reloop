@@ -11,6 +11,7 @@ import {
 	Tailwind,
 	Text,
 } from "react-email";
+import { defaultBaseUrl } from "../components/base-url";
 import { Footer } from "../components/footer";
 import { Wrapper } from "../components/wrapper";
 
@@ -24,16 +25,12 @@ interface TrialEndingEmailProps {
 	theme?: "light" | "dark";
 }
 
-const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
-	? `https://${process.env.NEXT_PUBLIC_BASE_URL}`
-	: "https://reloop.sh";
-
 export const TrialEndingEmail = ({
 	fullName = "User",
 	daysLeft = 3,
 	trialEndDate = "May 9, 2026",
 	currentPlan = "Pro Trial",
-	upgradeUrl = "https://reloop.sh/dashboard/billing",
+	upgradeUrl = `${defaultBaseUrl}/dashboard/settings/billing/plans`,
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: TrialEndingEmailProps) => {

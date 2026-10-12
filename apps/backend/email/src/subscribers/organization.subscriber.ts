@@ -34,6 +34,7 @@ export async function initOrgSubscribers() {
 						inviterEmail: payload.inviterEmail,
 						teamName: payload.organizationName,
 						inviteUrl: payload.inviteLink,
+						baseUrl: emailConfig.BASE_URL,
 					}),
 				);
 
@@ -83,6 +84,7 @@ export async function initOrgSubscribers() {
 						role: payload.role,
 						inviterName: payload.inviterName,
 						dashboardUrl: `${emailConfig.BASE_URL}/dashboard`,
+						baseUrl: emailConfig.BASE_URL,
 					}),
 				);
 
