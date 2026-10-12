@@ -4,8 +4,9 @@ import { BlueprintCta } from "@reloop/web/components/landing/blueprint-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { SimilarTools } from "../components/similar-tools";
-import { ApiSection } from "./api-section";
+import { ApiIntegration } from "./components/api-integration";
 import { ReputationHero } from "./components/hero";
+import { McpSection } from "./components/mcp-section";
 import { HowWeScore, WhatYouGet, WhoIsItFor } from "./components/sections";
 import {
 	faqGroups,
@@ -112,7 +113,9 @@ export default function DomainReputationCheckerPage() {
 				<Spacer />
 				<WhoIsItFor />
 				<Spacer />
-				<ApiSection />
+				<ApiIntegration />
+				<Spacer />
+				<McpSection />
 				<Spacer edge="y" />
 				<SimilarTools currentPath={toolPath} />
 				<div aria-hidden className="h-12 sm:h-16" />

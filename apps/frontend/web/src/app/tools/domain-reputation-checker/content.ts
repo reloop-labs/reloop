@@ -1,4 +1,5 @@
 import type { FaqItem } from "@reloop/web/components/faq-section";
+import { productionSiteUrl } from "@reloop/web/lib/site";
 
 export const toolPath = "/tools/domain-reputation-checker";
 export const toolTitle = "Domain Reputation Checker";
@@ -85,24 +86,366 @@ export const faqs: FaqItem[] = [
 
 export const faqGroups = [{ title: "Domain Reputation", items: faqs }];
 
+export const apiEndpoint = `${productionSiteUrl}/api/tools/v1/domain-reputation`;
+
+export type ApiSnippet = {
+	id: string;
+	label: string;
+	code: string;
+};
+
+/** Non-empty by construction so the page can always fall back to the first tab. */
+export const apiSnippets: [ApiSnippet, ...ApiSnippet[]] = [
+	{
+		id: "curl",
+		label: "cURL",
+		code: `curl -X POST ${apiEndpoint} \\
+  -H "Content-Type: application/json" \\
+  -d '{"domain": "reloop.sh"}'`,
+	},
+	{
+		id: "javascript",
+		label: "JavaScript",
+		code: `// No SDK, no API key: it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "reloop.sh" }),
+  },
+);
+
+const report = await res.json();`,
+	},
+	{
+		id: "typescript",
+		label: "TypeScript",
+		code: `// No SDK, no API key: it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "reloop.sh" }),
+  },
+);
+
+const report = (await res.json()) as ReputationReport;`,
+	},
+	{
+		id: "node",
+		label: "Node.js",
+		code: `// Node 18+ has a global fetch, no dependencies.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "reloop.sh" }),
+  },
+);
+
+const report = await res.json();`,
+	},
+	{
+		id: "axios",
+		label: "Axios",
+		code: `import axios from "axios";
+
+const { data: report } = await axios.post(
+  "${apiEndpoint}",
+  { domain: "reloop.sh" },
+);`,
+	},
+	{
+		id: "python",
+		label: "Python",
+		code: `# pip install requests
+import requests
+
+report = requests.post(
+    "${apiEndpoint}",
+    json={"domain": "reloop.sh"},
+).json()`,
+	},
+	{
+		id: "go",
+		label: "Go",
+		code: `body, _ := json.Marshal(map[string]string{
+    "domain": "reloop.sh",
+})
+
+res, err := http.Post(
+    "${apiEndpoint}",
+    "application/json",
+    bytes.NewReader(body),
+)`,
+	},
+	{
+		id: "java",
+		label: "Java",
+		code: `HttpClient client = HttpClient.newHttpClient();
+String body = "{\\"domain\\": \\"reloop.sh\\"}";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("${apiEndpoint}"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(body))
+    .build();
+
+HttpResponse<String> response = client.send(
+    request, HttpResponse.BodyHandlers.ofString());`,
+	},
+	{
+		id: "csharp",
+		label: "C#",
+		code: `using var client = new HttpClient();
+
+var response = await client.PostAsJsonAsync(
+    "${apiEndpoint}",
+    new { domain = "reloop.sh" });`,
+	},
+	{
+		id: "php",
+		label: "PHP",
+		code: `$ch = curl_init("${apiEndpoint}");
+
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => ["Content-Type: application/json"],
+    CURLOPT_POSTFIELDS => json_encode(["domain" => "reloop.sh"]),
+    CURLOPT_RETURNTRANSFER => true,
+]);
+
+$report = curl_exec($ch);`,
+	},
+	{
+		id: "ruby",
+		label: "Ruby",
+		code: `require "net/http"
+require "json"
+
+uri = URI("${apiEndpoint}")
+
+report = Net::HTTP.post(
+  uri,
+  { domain: "reloop.sh" }.to_json,
+  "Content-Type" => "application/json"
+)`,
+	},
+	{
+		id: "rust",
+		label: "Rust",
+		code: `let report: serde_json::Value = reqwest::Client::new()
+    .post("${apiEndpoint}")
+    .json(&serde_json::json!({ "domain": "reloop.sh" }))
+    .send()
+    .await?
+    .json()
+    .await?;`,
+	},
+];
+
 export const apiResponseSample = `{
   "domain": "reloop.sh",
-  "score": 95,
+  "resolvedAt": "2026-10-12T17:23:07.410Z",
+  "responseTimeMs": 2487,
+  "score": 97,
   "grade": "A+",
   "verdict": "excellent",
+  "verdictLabel": "Outstanding reputation. Maximum deliverability confidence.",
   "breakdown": {
-    "authentication": { "score": 100, "weight": 35, "status": "pass" },
-    "blocklist": { "score": 100, "weight": 30, "status": "pass" },
-    "domainAge": { "score": 80, "weight": 20, "status": "pass" },
-    "dnsHealth": { "score": 100, "weight": 15, "status": "pass" }
+    "authentication": {
+      "score": 90,
+      "weight": 35,
+      "status": "pass",
+      "summary": "SPF pass, DKIM fail, DMARC pass"
+    },
+    "blocklist": {
+      "score": 100,
+      "weight": 30,
+      "status": "pass",
+      "summary": "7/7 domain blocklists clean"
+    },
+    "domainAge": {
+      "score": 100,
+      "weight": 20,
+      "status": "pass",
+      "summary": "466 days old (mature)"
+    },
+    "dnsHealth": {
+      "score": 100,
+      "weight": 15,
+      "status": "pass",
+      "summary": "2 MX, 2 NS, SSL active"
+    }
+  },
+  "details": {
+    "authentication": {
+      "spf": {
+        "exists": true,
+        "record": "v=spf1 ip4:46.62.131.111 include:reloop.sh ~all",
+        "qualifier": "~all",
+        "status": "pass",
+        "detail": "SPF record published with qualifier '~all' (1/10 lookups)."
+      },
+      "dkim": {
+        "detected": false,
+        "status": "fail",
+        "detail": "No standard DKIM selector detected in DNS."
+      },
+      "dmarc": {
+        "exists": true,
+        "record": "v=DMARC1; p=reject;",
+        "policy": "reject",
+        "pct": 100,
+        "status": "pass",
+        "detail": "DMARC policy is set to 'reject' (pct=100%)."
+      }
+    },
+    "blocklist": {
+      "cleanCount": 7,
+      "listedCount": 0,
+      "totalChecked": 7,
+      "listings": [
+        {
+          "zone": "dbl.spamhaus.org",
+          "name": "Spamhaus DBL",
+          "listed": false
+        },
+        {
+          "zone": "multi.uribl.com",
+          "name": "URIBL Multi",
+          "listed": false
+        }
+      ]
+    },
+    "domainAge": {
+      "ageDays": 466,
+      "createdDate": "2025-07-03T06:17:03.176Z",
+      "expiryDate": "2027-07-03T06:17:03.176Z",
+      "registrar": "Spaceship, Inc.",
+      "tier": "mature",
+      "detail": "Registered 1 year, 3 months, 9 days ago (466 days). Domain age is completely mature and will not impact email deliverability."
+    },
+    "dnsHealth": {
+      "mxRecords": [
+        {
+          "exchange": "inbound.reloop.sh",
+          "priority": 10
+        },
+        {
+          "exchange": "reloop.sh",
+          "priority": 10
+        }
+      ],
+      "aRecords": [
+        "46.62.131.111"
+      ],
+      "nsRecords": [
+        "elijah.ns.cloudflare.com",
+        "leanna.ns.cloudflare.com"
+      ],
+      "hasPtr": true,
+      "sslValid": true,
+      "sslDaysRemaining": 74,
+      "sslIssuer": "Let's Encrypt"
+    }
   },
   "checks": [
     {
+      "id": "auth_dkim",
+      "category": "authentication",
+      "label": "DKIM Signature",
+      "status": "fail",
+      "detail": "No standard DKIM selector detected in DNS."
+    },
+    {
       "id": "auth_dmarc",
+      "category": "authentication",
       "label": "DMARC Policy",
       "status": "pass",
-      "record": "v=DMARC1; p=reject; pct=100"
+      "detail": "DMARC policy is set to 'reject' (pct=100%).",
+      "record": "v=DMARC1; p=reject;"
     }
   ],
-  "recommendations": []
+  "recommendations": [
+    "No aggregate reporting address ('rua=') configured. You will not receive DMARC delivery reports."
+  ]
 }`;
+
+export type ApiStatusCode = "200" | "400" | "429";
+
+export const apiStatusCodes: ApiStatusCode[] = ["200", "400", "429"];
+
+export const apiResponseSamples: Record<ApiStatusCode, string> = {
+	"200": apiResponseSample,
+	"400": `{
+  "message": "Invalid domain",
+  "why": "The value was not a valid domain name.",
+  "fix": "Enter a valid root or sending domain like example.com — without protocol or path prefixes."
+}`,
+	"429": `{
+  "message": "Too many requests",
+  "why": "This endpoint allows a limited number of checks per window from one IP address.",
+  "fix": "Wait a few seconds before retrying."
+}`,
+};
+
+const categoryResultSchema = "{ score, weight, status, summary }";
+
+export const apiResponseSchemas: Record<ApiStatusCode, string> = {
+	"200": `{
+  "domain": "string",
+  "resolvedAt": "string (ISO 8601)",
+  "responseTimeMs": "number",
+  "score": "number (0-100)",
+  "grade": "A+ | A | B | C | D | F",
+  "verdict": "excellent | good | fair | poor | critical",
+  "verdictLabel": "string",
+  "breakdown": {
+    "authentication": "${categoryResultSchema}",
+    "blocklist": "${categoryResultSchema}",
+    "domainAge": "${categoryResultSchema}",
+    "dnsHealth": "${categoryResultSchema}"
+  },
+  "details": {
+    "authentication": "{ spf, dkim, dmarc }",
+    "blocklist": "{ cleanCount, listedCount, totalChecked, listings[] }",
+    "domainAge": "{ ageDays?, createdDate?, expiryDate?, registrar?, tier, detail }",
+    "dnsHealth": "{ mxRecords[], aRecords[], nsRecords[], hasPtr, sslValid, sslDaysRemaining?, sslIssuer? }"
+  },
+  "checks": "{ id, category, label, status, detail, record? }[]",
+  "recommendations": "string[]"
+}`,
+	"400": `{
+  "message": "string",
+  "why?": "string",
+  "fix?": "string",
+  "link?": "string"
+}`,
+	"429": `{
+  "message": "string",
+  "why?": "string",
+  "fix?": "string",
+  "link?": "string"
+}`,
+};
+
+export type ApiBodyArg = {
+	name: string;
+	type: string;
+	required?: boolean;
+	description: string;
+};
+
+export const apiBodyArgs: ApiBodyArg[] = [
+	{
+		name: "domain",
+		type: "string",
+		required: true,
+		description:
+			"The root or sending domain to score (e.g. reloop.sh). Leave out the protocol and path. You can also send it as a query string with GET ?domain=reloop.sh.",
+	},
+];

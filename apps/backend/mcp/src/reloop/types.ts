@@ -629,3 +629,44 @@ export type TempEmailCheck = {
 	riskScore: number;
 	flags: TempEmailFlag[];
 };
+
+export type DomainReputationGrade = "A+" | "A" | "B" | "C" | "D" | "F";
+
+export type DomainReputationVerdict =
+	| "excellent"
+	| "good"
+	| "fair"
+	| "poor"
+	| "critical";
+
+export type DomainReputationCategory = {
+	score: number;
+	weight: number;
+	status: "pass" | "warn" | "fail";
+	summary: string;
+};
+
+export type DomainReputationCheck = {
+	id: string;
+	category: "authentication" | "blocklist" | "domain_age" | "dns_health";
+	label: string;
+	status: "pass" | "warn" | "fail" | "info";
+	detail: string;
+	record?: string;
+};
+
+export type DomainReputationReport = {
+	domain: string;
+	score: number;
+	grade: DomainReputationGrade;
+	verdict: DomainReputationVerdict;
+	verdictLabel: string;
+	breakdown: {
+		authentication: DomainReputationCategory;
+		blocklist: DomainReputationCategory;
+		domainAge: DomainReputationCategory;
+		dnsHealth: DomainReputationCategory;
+	};
+	checks: DomainReputationCheck[];
+	recommendations: string[];
+};

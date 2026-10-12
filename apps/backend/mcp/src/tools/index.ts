@@ -18,6 +18,7 @@ import { getContact } from "./contacts/get";
 import { listContacts } from "./contacts/list";
 import { updateContact } from "./contacts/update";
 import type { AnyToolDefinition } from "./define";
+import { checkDomainReputation } from "./domain-reputation/check";
 import { createDomain } from "./domains/create";
 import { deleteDomain } from "./domains/delete";
 import { getDomain } from "./domains/get";
@@ -103,4 +104,5 @@ export const tools: readonly AnyToolDefinition[] = [
 	testSmtpProvider,
 	deleteSmtpProvider,
 	checkTempEmail,
+	checkDomainReputation,
 ];

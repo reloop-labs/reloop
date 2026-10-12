@@ -846,6 +846,18 @@ Read-only: yes · Destructive: no · Idempotent: yes · Open world: yes
 
 Returns: `input`, `kind`, `domain`, `verdict`, `isValidSyntax`, `isDisposable`, `isRoleAddress`, `isFreeProvider`, `mxRecords`, `confidence`, `riskScore`, `flags`
 
+### `check_domain_reputation`
+
+Score the sender reputation of a domain from 0 to 100 with an A+ to F grade. It audits SPF, DKIM and DMARC, checks 7 domain blocklists live, and looks at domain age and DNS health (MX, A, NS, PTR, TLS). Nothing is sent and nothing is stored. Use this before sending from a domain, after changing its DNS, or when deliverability drops: each failing or warning entry in `checks` names the problem and often the current `record`, and `recommendations` lists the fixes in plain language. Treat `poor` and `critical` verdicts as not ready to send.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `domain` | string | yes | Root or sending domain without protocol or path, for example reloop.sh |
+
+Returns: `domain`, `score`, `grade`, `verdict`, `verdictLabel`, `breakdown`, `checks`, `recommendations`
+
 ## Errors
 
 Every failed call returns `isError: true` and no `structuredContent`; the text content is a JSON document with an `error` object (structured content must match the tool's output schema, so errors travel in the text block):

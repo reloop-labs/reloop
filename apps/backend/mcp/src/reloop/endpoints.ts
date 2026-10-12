@@ -88,3 +88,7 @@ export const smtpProviderEndpoints = {
 export const tempEmailEndpoints = {
 	check: "/api/tools/v1/temp-email-checker",
 } as const;
+
+export const domainReputationEndpoints = {
+	check: "/api/tools/v1/domain-reputation",
+} as const;

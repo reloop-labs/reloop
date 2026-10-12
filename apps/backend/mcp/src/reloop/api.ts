@@ -2,6 +2,7 @@ import { ApiKeysApi } from "./api-keys";
 import { ChannelsApi } from "./channels";
 import { ReloopClient, type ReloopClientOptions } from "./client";
 import { ContactsApi } from "./contacts";
+import { DomainReputationApi } from "./domain-reputation";
 import { DomainsApi } from "./domains";
 import { EmailLogsApi } from "./email-logs";
 import { GroupsApi } from "./groups";
@@ -23,6 +24,7 @@ export type ReloopApi = {
 	domains: DomainsApi;
 	smtpProviders: SmtpProvidersApi;
 	tempEmail: TempEmailApi;
+	domainReputation: DomainReputationApi;
 };
 
 export function createReloopApi(options: ReloopClientOptions): ReloopApi {
@@ -39,5 +41,6 @@ export function createReloopApi(options: ReloopClientOptions): ReloopApi {
 		domains: new DomainsApi(client),
 		smtpProviders: new SmtpProvidersApi(client),
 		tempEmail: new TempEmailApi(client),
+		domainReputation: new DomainReputationApi(client),
 	};
 }
