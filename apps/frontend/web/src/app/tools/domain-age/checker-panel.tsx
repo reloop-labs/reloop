@@ -488,10 +488,6 @@ function AgeResult({ result }: { result: DomainAgeReport }) {
 	const preciseAge = createdAt ? formatPreciseAge(createdAt) : null;
 	return (
 		<div className="flex flex-col gap-3">
-			<h2 className="font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
-				{result.headline}
-			</h2>
-
 			{hasDates ? (
 				<div className="grid grid-cols-1 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 sm:grid-cols-[1.15fr_1fr_1.1fr_1fr_1fr] dark:border-white/10 dark:bg-white/[0.02]">
 					<AgeTableCell
@@ -956,7 +952,7 @@ https://reloop.sh${variant === "age" ? AGE_TOOL_PATH : WARMUP_TOOL_PATH}?domainN
 						</div>
 					) : result ? (
 						<div className="space-y-6 pt-2">
-							<div className="relative overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs sm:p-7 dark:border-white/10 dark:bg-white/[0.02]">
+							<div className="relative pt-2">
 								{variant === "age" ? (
 									<AgeResult result={result} />
 								) : (
