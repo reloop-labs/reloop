@@ -462,7 +462,6 @@ export function TeamList({
 									className="mt-5 max-w-full rounded-full font-medium"
 									onClick={() => onInvite(searchQuery.trim())}
 								>
-									<FancyButton.Icon as={Icon} name="user-plus" />
 									<span className="max-w-[260px] truncate">
 										Invite {searchQuery.trim()}
 									</span>

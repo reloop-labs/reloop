@@ -82,7 +82,6 @@ export function TeamsPage() {
 						onClick={() => openInvite()}
 						className="h-9 rounded-xl font-medium"
 					>
-						<FancyButton.Icon as={Icon} name="user-plus" />
 						<span>Invite member</span>
 						<span className="inline-flex items-center gap-0.5 opacity-90">
 							<Icon
