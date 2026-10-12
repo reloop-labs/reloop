@@ -149,24 +149,13 @@ export const Footer = () => {
 		return null;
 	}
 
-	const accent =
-		pathname === "/license" || pathname?.startsWith("/license/")
-			? "emerald"
-			: pathname === "/why-open-source" ||
-					pathname?.startsWith("/why-open-source/")
-				? "ink"
-				: pathname === "/features/email-marketing" ||
-						pathname?.startsWith("/features/email-marketing/")
-					? "orange"
-					: "default";
-
 	return (
 		<footer className="w-full bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
 			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				{pathname !== "/tools" && pathname !== "/contact" && (
 					<div aria-hidden className="h-24" />
 				)}
-				<FooterBrand accent={accent} />
+				<FooterBrand />
 				<div aria-hidden className="h-24" />
 				<div className="grid grid-cols-2 border-stroke-soft-100 border-t border-b lg:grid-cols-5 dark:border-white/10">
 					{columns.map((column, index) => (

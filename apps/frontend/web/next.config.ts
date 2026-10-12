@@ -12,9 +12,9 @@ const nextConfig: NextConfig = {
 	},
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 	cacheComponents: true,
-	experimental: {
-		inlineCss: true,
-	},
+	// No experimental.inlineCss: it embedded the full ~470KB stylesheet in every
+	// HTML response three times (<style> + twice in the RSC payload), pushing the
+	// landing page past Googlebot's 2MB HTML limit. External CSS is cached instead.
 	async headers() {
 		const isDev = process.env.NODE_ENV === "development";
 		return [

@@ -5,7 +5,6 @@ import { socialProfiles } from "@reloop/web/lib/site";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { siApache } from "simple-icons";
-import { FooterBlast } from "./footer-blast";
 
 const socials: {
 	label: string;
@@ -66,13 +65,6 @@ function ApacheMark() {
 	);
 }
 
-export type FooterBrandAccent =
-	| "default"
-	| "emerald"
-	| "ink"
-	| "orange"
-	| "rose";
-
 function BrandCell({
 	href,
 	external,
@@ -108,20 +100,10 @@ function BrandCell({
 	);
 }
 
-export function FooterBrand({
-	accent = "default",
-}: {
-	accent?: FooterBrandAccent;
-}) {
+export function FooterBrand() {
 	return (
 		<div className="grid border-stroke-soft-100 border-t border-b lg:grid-cols-2 dark:border-white/10">
 			<div className="relative overflow-hidden border-stroke-soft-100 border-b p-8 sm:p-10 lg:border-r lg:border-b-0 dark:border-white/10">
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 opacity-80 [-webkit-mask-image:radial-gradient(ellipse_75%_85%_at_78%_45%,black_20%,transparent_70%)] [mask-image:radial-gradient(ellipse_75%_85%_at_78%_45%,black_20%,transparent_70%)] dark:opacity-60"
-				>
-					<FooterBlast accent={accent} />
-				</div>
 				<Link
 					href="/home"
 					className="relative z-10 inline-flex items-center gap-2"

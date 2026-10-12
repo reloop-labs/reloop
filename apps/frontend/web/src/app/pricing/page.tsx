@@ -6,7 +6,6 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { PricingExplorer } from "./components/pricing-explorer";
 import { PricingFaq } from "./components/pricing-faq";
-import { PricingHeroBlast } from "./components/pricing-hero-blast";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -56,12 +55,6 @@ const PricingPage = () => {
 			<JsonLd data={pricingSchema} />
 			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#171717] [--primary-dark:#171717] [--primary-darker:#000000] [--primary-link:#171717] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
-					<div
-						aria-hidden="true"
-						className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
-					>
-						<PricingHeroBlast />
-					</div>
 					<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
 						<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 							<span

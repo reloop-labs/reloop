@@ -2,35 +2,12 @@
 
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { PixelBlast } from "@reloop/web/components/pixel-blast";
 import { hostedSignupHref } from "@reloop/web/lib/site";
-import { useTheme } from "next-themes";
 
 export function MarketingHero() {
-	const { resolvedTheme } = useTheme();
-
 	return (
 		<header className="relative w-full bg-transparent [--primary-base:#ea580c] [--primary-dark:#c2410c] [--primary-darker:#9a3412] [--primary-link:#c2410c] dark:[--primary-base:#ea580c] dark:[--primary-dark:#ea580c] dark:[--primary-darker:#c2410c] dark:[--primary-link:#fdba74]">
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col items-center overflow-hidden border-stroke-soft-200 border-x px-6 pt-[224px] pb-40 text-center sm:px-8 md:max-w-7xl lg:px-12 dark:border-white/10">
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
-				>
-					<PixelBlast
-						variant="square"
-						pixelSize={2}
-						color={resolvedTheme === "dark" ? "#fdba74" : "#ea580c"}
-						patternScale={4}
-						patternDensity={0.45}
-						enableRipples={false}
-						rippleSpeed={0.05}
-						rippleThickness={0.09}
-						rippleIntensityScale={2.5}
-						speed={0.2}
-						transparent
-						edgeFade={0.65}
-					/>
-				</div>
 				<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
 					<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 						<span

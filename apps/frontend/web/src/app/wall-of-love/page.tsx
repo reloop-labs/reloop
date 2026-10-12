@@ -1,3 +1,5 @@
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import CTA from "@reloop/web/app/(home)/components/cta";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
@@ -113,17 +115,32 @@ export default function WallOfLovePage() {
 
 			{/* Main responsive grid shell with exact home page max-width and border colors */}
 			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
-				{/* Hero Title Section */}
-				<section className="px-6 pt-24 pb-16 text-center sm:px-8 md:pt-32">
-					<p className="font-mono text-xs text-zinc-500 uppercase tracking-[0.2em] dark:text-zinc-400">
-						Community
-					</p>
-					<h1 className="mx-auto mt-4 max-w-3xl text-balance font-semibold text-4xl text-zinc-950 leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl dark:text-white">
+				{/* Hero: left-aligned, same layout as /changelog */}
+				<section className="px-6 pt-28 pb-14 text-left sm:px-10 sm:pt-32 sm:pb-16 lg:px-12">
+					<h1 className="max-w-3xl font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
 						Wall of love
 					</h1>
-					<p className="mx-auto mt-5 max-w-2xl text-balance text-base text-zinc-600 leading-relaxed md:text-lg dark:text-zinc-400">
-						What developers are saying about Reloop, in their own words.
+					<p className="mt-3 max-w-2xl text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
+						What developers are saying about Reloop, in their own words. Built
+						something with Reloop? Tell us about it.
 					</p>
+					<div className="mt-6 flex w-fit items-center gap-2">
+						<Button.Root variant="neutral" mode="stroke" size="small" asChild>
+							<a href={shareOnXHref} target="_blank" rel="noopener noreferrer">
+								<Icon name="twitter" className="size-3.5" aria-hidden="true" />
+								Post on X
+							</a>
+						</Button.Root>
+						<Button.Root variant="neutral" mode="stroke" size="small" asChild>
+							<a
+								href={socialProfiles.discord}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Join the Discord
+							</a>
+						</Button.Root>
+					</div>
 				</section>
 
 				<section className="grid grid-cols-1 gap-px border-stroke-soft-100 border-t bg-stroke-soft-100 sm:grid-cols-2 dark:border-white/10 dark:bg-white/10">
@@ -132,35 +149,8 @@ export default function WallOfLovePage() {
 					))}
 				</section>
 
-				{/* Invite more posts — every new entry in lib/testimonials.ts shows up here and on the home page */}
-				<section className="flex flex-col items-center gap-4 border-stroke-soft-100 border-t px-6 py-12 text-center sm:px-8 dark:border-white/10">
-					<p className="text-balance text-base text-zinc-600 dark:text-zinc-400">
-						Built something with Reloop? Tell us about it.
-					</p>
-					<div className="flex flex-wrap items-center justify-center gap-3">
-						<a
-							href={shareOnXHref}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="inline-flex h-9 items-center gap-1.5 rounded-md bg-zinc-950 px-4 font-medium text-sm text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-						>
-							Post on X
-							<ArrowUpRight className="size-4" />
-						</a>
-						<a
-							href={socialProfiles.discord}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="inline-flex h-9 items-center gap-1.5 rounded-md border border-stroke-soft-100 px-4 font-medium text-sm text-zinc-950 transition-colors hover:bg-zinc-50 dark:border-white/10 dark:text-white dark:hover:bg-zinc-900"
-						>
-							Join the Discord
-							<ArrowUpRight className="size-4" />
-						</a>
-					</div>
-				</section>
-
 				{/* Bottom CTA Section */}
-				<div className="border-stroke-soft-100 border-t py-12 sm:py-16 dark:border-white/10">
+				<div className="border-stroke-soft-100 border-t pt-24 dark:border-white/10">
 					<CTA
 						headlineLine1="Start sending email today"
 						headlineLine2="$0 / mo."

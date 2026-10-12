@@ -48,7 +48,6 @@
 		"next-mdx-remote": "catalog:ui",
 		"next-themes": "catalog:ui",
 		"postcss": "catalog:ui",
-		"postprocessing": "^6.39.4",
 		"react": "catalog:ui",
 		"react-colorful": "catalog:ui",
 		"react-dom": "catalog:ui",

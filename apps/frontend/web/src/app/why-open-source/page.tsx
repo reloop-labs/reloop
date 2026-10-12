@@ -1,6 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { PixelBlast } from "@reloop/web/components/pixel-blast";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { OpenSourceFaq } from "./components/open-source-faq";
@@ -73,25 +72,6 @@ const WhyOpenSourcePage = () => {
 			<JsonLd data={jsonLd} />
 			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x [--primary-base:#24292f] [--primary-dark:#24292f] [--primary-darker:#1f2328] [--primary-link:#24292f] md:max-w-7xl dark:border-white/10 dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 				<header className="relative flex w-full flex-col items-center overflow-hidden bg-transparent px-6 pt-[224px] pb-40 text-center sm:px-8 lg:px-12">
-					<div
-						aria-hidden="true"
-						className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)] [mask-image:linear-gradient(to_right,black_0%,black_28%,transparent_42%,transparent_58%,black_72%,black_100%)]"
-					>
-						<PixelBlast
-							variant="square"
-							pixelSize={2}
-							color="#6e7781"
-							patternScale={4}
-							patternDensity={0.45}
-							enableRipples={false}
-							rippleSpeed={0.05}
-							rippleThickness={0.09}
-							rippleIntensityScale={2.5}
-							speed={0.2}
-							transparent
-							edgeFade={0.65}
-						/>
-					</div>
 					<div className="relative z-10 flex w-auto max-w-full flex-col items-center px-8 py-6">
 						<div className="mb-5 flex items-center justify-center gap-2 sm:mb-6">
 							<span

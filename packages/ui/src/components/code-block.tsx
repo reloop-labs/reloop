@@ -3,7 +3,7 @@
  */
 "use client";
 
-import { highlight, type LanguageAlias, type Token } from "@code-hike/lighter";
+import type { LanguageAlias, Token } from "@code-hike/lighter";
 import { cn } from "@reloop/ui/cn";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useState } from "react";
@@ -56,7 +56,10 @@ function getHighlightPromise(
 	if (existing) return existing;
 
 	const theme = themeForColorScheme(scheme);
-	const promise = highlight(code, lang as LanguageAlias, theme)
+	// Lazy-loaded: the lighter engine + grammar registry is ~700KB, so it must not
+	// ship in the initial bundle of pages that render a code block (e.g. the hero).
+	const promise = import("@code-hike/lighter")
+		.then(({ highlight }) => highlight(code, lang as LanguageAlias, theme))
 		.then((result) => {
 			const next = { lines: result.lines as unknown as Token[][] };
 			resultCache.set(key, next);
