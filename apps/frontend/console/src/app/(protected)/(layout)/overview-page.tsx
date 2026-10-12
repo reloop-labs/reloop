@@ -1,5 +1,16 @@
 "use client";
 
+import {
+	type AnalyticsRange,
+	DomainStatusCard,
+	EmailKpis,
+	EmailVolumeCard,
+	GrowthTiles,
+	type OverviewAnalytics,
+	RANGE_LABEL,
+	RecentDomainsCard,
+	TopSendersCard,
+} from "@fe/console/components/overview/analytics-sections";
 import { MetricGrid } from "@fe/console/components/ui/metric-grid";
 import { PageFrame, PageHeading } from "@fe/console/components/ui/page-frame";
 import { SectionCard } from "@fe/console/components/ui/section-card";
@@ -20,6 +31,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import Link from "next/link";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
@@ -60,6 +72,38 @@ function openCommandPalette() {
 	window.dispatchEvent(new Event("console:open-command-palette"));
 }
 
+const RANGES = ["7d", "30d", "90d"] as const;
+
+function RangeSwitcher({
+	value,
+	onChange,
+}: {
+	value: AnalyticsRange;
+	onChange: (range: AnalyticsRange) => void;
+}) {
+	return (
+		<fieldset className="inline-flex rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5 dark:bg-transparent">
+			<legend className="sr-only">Date range</legend>
+			{RANGES.map((range) => (
+				<button
+					key={range}
+					type="button"
+					aria-pressed={value === range}
+					onClick={() => onChange(range)}
+					className={cn(
+						"rounded-[10px] px-3 py-1.5 text-[13px] transition-colors",
+						value === range
+							? "bg-text-strong-950 font-medium text-bg-white-0"
+							: "text-text-sub-600 hover:text-text-strong-950",
+					)}
+				>
+					{RANGE_LABEL[range]}
+				</button>
+			))}
+		</fieldset>
+	);
+}
+
 function severityDot(severity: Overview["attention"][number]["severity"]) {
 	if (severity === "critical") return "bg-error-base";
 	if (severity === "warning") return "bg-orange-500";
@@ -68,10 +112,19 @@ function severityDot(severity: Overview["attention"][number]["severity"]) {
 
 export default function OverviewPage() {
 	const [usageTick, setUsageTick] = useState(0);
+	const [range, setRange] = useQueryState(
+		"range",
+		parseAsStringLiteral(RANGES).withDefault("30d"),
+	);
 	const { data, isLoading, error } = useSWR<Overview>(
 		"/api/console/v1/overview",
 		() => adminGet<Overview>("/overview"),
 		{ refreshInterval: 30_000 },
+	);
+	const { data: analytics, error: analyticsError } = useSWR<OverviewAnalytics>(
+		["/overview/analytics", range],
+		() => adminGet<OverviewAnalytics>("/overview/analytics", { range }),
+		{ refreshInterval: 60_000, keepPreviousData: true },
 	);
 
 	useEffect(() => {
@@ -90,24 +143,27 @@ export default function OverviewPage() {
 		<PageFrame>
 			<PageHeading
 				title="Overview"
-				description="Platform health and queues. Open full hubs from any signal, not thin lists."
+				description="Platform activity, growth and deliverability. Click any number to open its hub."
 				actions={
-					<button
-						type="button"
-						onClick={openCommandPalette}
-						className="inline-flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2 text-[13px] text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:bg-transparent dark:hover:bg-white/5"
-					>
-						<Icon name="search" className="h-4 w-4" />
-						<span>Search platform</span>
-						<span className="ml-1 hidden items-center gap-0.5 sm:inline-flex">
-							<KbdKeyOutline className="h-[18px] w-auto min-w-[18px] px-1 font-sans text-[10px] text-text-soft-400">
-								⌘
-							</KbdKeyOutline>
-							<KbdKeyOutline className="h-[18px] w-auto min-w-[18px] px-1 font-sans text-[10px] text-text-soft-400">
-								K
-							</KbdKeyOutline>
-						</span>
-					</button>
+					<>
+						<RangeSwitcher value={range} onChange={(r) => void setRange(r)} />
+						<button
+							type="button"
+							onClick={openCommandPalette}
+							className="inline-flex items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2 text-[13px] text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:bg-transparent dark:hover:bg-white/5"
+						>
+							<Icon name="search" className="h-4 w-4" />
+							<span>Search platform</span>
+							<span className="ml-1 hidden items-center gap-0.5 sm:inline-flex">
+								<KbdKeyOutline className="h-[18px] w-auto min-w-[18px] px-1 font-sans text-[10px] text-text-soft-400">
+									⌘
+								</KbdKeyOutline>
+								<KbdKeyOutline className="h-[18px] w-auto min-w-[18px] px-1 font-sans text-[10px] text-text-soft-400">
+									K
+								</KbdKeyOutline>
+							</span>
+						</button>
+					</>
 				}
 			/>
 
@@ -132,12 +188,12 @@ export default function OverviewPage() {
 							) : null}
 						</div>
 						{data.attention.length === 0 ? (
-							<div className="rounded-2xl border border-stroke-soft-200 border-dashed px-4 py-8 text-center text-[13px] text-text-sub-600">
+							<div className="rounded-2xl border border-stroke-soft-200 border-dashed px-4 py-4 text-center text-[13px] text-text-sub-600">
 								No critical queues. Use ⌘K or quick actions when a ticket comes
 								in.
 							</div>
 						) : (
-							<div className="grid gap-2">
+							<div className="grid gap-2 lg:grid-cols-2">
 								{data.attention.map((item) => (
 									<Link
 										key={item.id}
@@ -168,6 +224,38 @@ export default function OverviewPage() {
 										</span>
 									</Link>
 								))}
+							</div>
+						)}
+					</section>
+
+					<section className="space-y-3">
+						<div className="flex items-center justify-between gap-2">
+							<h2 className="font-semibold text-[13px] text-text-strong-950">
+								Analytics
+							</h2>
+							<span className="text-[12px] text-text-sub-600">
+								Last {RANGE_LABEL[range]}
+							</span>
+						</div>
+						{analyticsError ? (
+							<p className="text-[13px] text-error-base">
+								Failed to load analytics.
+							</p>
+						) : !analytics ? (
+							<div className="grid gap-3">
+								<div className="h-[104px] animate-pulse rounded-2xl bg-bg-weak-50 dark:bg-white/[0.03]" />
+								<div className="h-[340px] animate-pulse rounded-2xl bg-bg-weak-50 dark:bg-white/[0.03]" />
+							</div>
+						) : (
+							<div className="space-y-3">
+								<EmailKpis data={analytics} range={range} />
+								<EmailVolumeCard data={analytics} range={range} />
+								<GrowthTiles data={analytics} range={range} />
+								<div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
+									<DomainStatusCard data={analytics} />
+									<RecentDomainsCard data={analytics} />
+								</div>
+								<TopSendersCard data={analytics} range={range} />
 							</div>
 						)}
 					</section>
@@ -238,7 +326,7 @@ export default function OverviewPage() {
 
 					<section className="space-y-3">
 						<h2 className="font-semibold text-[13px] text-text-strong-950">
-							Platform health
+							Platform totals
 						</h2>
 						<MetricGrid
 							items={[
@@ -254,13 +342,6 @@ export default function OverviewPage() {
 									href: "/organizations",
 								},
 								{
-									label: "Domains",
-									value: formatNumber(data.domains.total),
-									hint: `${data.domains.failed} failed · ${data.domains.suspended} suspended`,
-									href: "/domains",
-									tone: data.domains.failed > 0 ? "danger" : "default",
-								},
-								{
 									label: "Emails today",
 									value: formatNumber(data.emails.sentToday),
 									hint: `${data.emails.failedToday} failed · ${data.emails.bouncedToday} bounced`,
@@ -271,29 +352,11 @@ export default function OverviewPage() {
 											: "default",
 								},
 								{
-									label: "Credits remaining",
-									value: formatNumber(data.credits.totalRemaining),
-									hint: "Sum across all orgs · open an org hub to top up",
-									href: "/organizations",
-								},
-								{
 									label: "Support unread",
 									value: formatNumber(data.support.unreadMessages),
 									hint: `${data.support.openConversations} open threads`,
 									href: "/support",
 									tone: data.support.unreadMessages > 0 ? "warning" : "default",
-								},
-								{
-									label: "Failed domains",
-									value: formatNumber(data.domains.failed),
-									href: "/domains?status=failed",
-									tone: data.domains.failed > 0 ? "danger" : "success",
-								},
-								{
-									label: "Failed emails today",
-									value: formatNumber(data.emails.failedToday),
-									href: "/emails?status=failed",
-									tone: data.emails.failedToday > 0 ? "danger" : "success",
 								},
 							]}
 						/>
@@ -304,7 +367,7 @@ export default function OverviewPage() {
 						action={
 							<Link
 								href="/audit"
-								className="text-[12px] text-primary-base hover:underline"
+								className="text-[12px] text-text-sub-600 hover:text-text-strong-950"
 							>
 								Full audit log →
 							</Link>

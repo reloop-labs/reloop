@@ -67,6 +67,71 @@ export namespace AdminModel {
 		recentAudit: t.Array(overviewRecentAuditItem),
 	});
 
+	const overviewAnalyticsTotals = t.Object({
+		emails: t.Number(),
+		delivered: t.Number(),
+		bounced: t.Number(),
+		failed: t.Number(),
+		users: t.Number(),
+		organizations: t.Number(),
+		domains: t.Number(),
+	});
+
+	export const overviewAnalyticsResponse = t.Object({
+		range: t.Union([t.Literal("7d"), t.Literal("30d"), t.Literal("90d")]),
+		from: t.Date(),
+		to: t.Date(),
+		totals: t.Object({
+			current: overviewAnalyticsTotals,
+			previous: overviewAnalyticsTotals,
+		}),
+		daily: t.Array(
+			t.Object({
+				date: t.String(),
+				delivered: t.Number(),
+				bounced: t.Number(),
+				failed: t.Number(),
+				other: t.Number(),
+				users: t.Number(),
+				organizations: t.Number(),
+				domains: t.Number(),
+			}),
+		),
+		domainStatus: t.Object({
+			pending: t.Number(),
+			verifying: t.Number(),
+			active: t.Number(),
+			suspended: t.Number(),
+			failed: t.Number(),
+		}),
+		recentDomains: t.Array(
+			t.Object({
+				id: t.String(),
+				domain: t.String(),
+				status: t.Union([
+					t.Literal("pending"),
+					t.Literal("verifying"),
+					t.Literal("active"),
+					t.Literal("suspended"),
+					t.Literal("failed"),
+				]),
+				organizationId: t.String(),
+				organizationName: t.Union([t.String(), t.Null()]),
+				createdAt: t.Date(),
+			}),
+		),
+		topOrganizations: t.Array(
+			t.Object({
+				organizationId: t.String(),
+				organizationName: t.Union([t.String(), t.Null()]),
+				total: t.Number(),
+				delivered: t.Number(),
+				bounced: t.Number(),
+				failed: t.Number(),
+			}),
+		),
+	});
+
 	export const searchUserItem = t.Object({
 		id: t.String(),
 		name: t.String(),
@@ -408,7 +473,10 @@ export namespace AdminModel {
 	});
 
 	export const updateDomainCapBody = t.Object({
-		dailyCapOverride: t.Union([t.Number({ minimum: 1, maximum: 1000000 }), t.Null()]),
+		dailyCapOverride: t.Union([
+			t.Number({ minimum: 1, maximum: 1000000 }),
+			t.Null(),
+		]),
 		reason: t.Optional(t.String()),
 	});
 

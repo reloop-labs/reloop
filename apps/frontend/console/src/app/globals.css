@@ -24,3 +24,24 @@ body {
 
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant light (&:where(.light, .light *));
+
+/* Overview analytics charts. Delivered is brand ink; bounced/failed are status hues. */
+:root {
+	--chart-delivered: #27272a;
+	--chart-bounced: #ec835a;
+	--chart-failed: #d03b3b;
+	--chart-other: #d4d4d8;
+	--chart-grid: #f0f0f1;
+	--chart-axis: #8a8a8e;
+	--chart-surface: #ffffff;
+}
+
+.dark {
+	--chart-delivered: #d4d4d8;
+	--chart-bounced: #ec835a;
+	--chart-failed: #d03b3b;
+	--chart-other: #3f3f46;
+	--chart-grid: #1c1c1f;
+	--chart-axis: #71717a;
+	--chart-surface: #0c0c0c;
+}
