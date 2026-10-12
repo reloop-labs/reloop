@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { createContext, useContext } from "react";
+import React from "react";
 import {
 	siDotnet,
 	siElixir,
@@ -402,8 +402,6 @@ export function Warning(props: React.ComponentProps<typeof Callout>) {
 
 /* ─── Native Steps ─── */
 
-const StepsContext = createContext<{ count: number }>({ count: 0 });
-
 export function Steps({
 	children,
 	className,
@@ -411,14 +409,21 @@ export function Steps({
 	children: React.ReactNode;
 	className?: string;
 }) {
+	const items = React.Children.toArray(children).filter((child) =>
+		React.isValidElement(child),
+	);
+
 	return (
-		<div
-			className={cn(
-				"my-6 ml-3 flex flex-col border-stroke-soft-100 border-l pl-5 dark:border-stroke-soft-100/40",
-				className,
+		<div className={cn("my-6 flex flex-col", className)}>
+			{items.map((child, index) =>
+				React.cloneElement(
+					child as React.ReactElement<{ step?: number; isLast?: boolean }>,
+					{
+						step: index + 1,
+						isLast: index === items.length - 1,
+					},
+				),
 			)}
-		>
-			{children}
 		</div>
 	);
 }
@@ -427,23 +432,34 @@ export function Step({
 	title,
 	children,
 	className,
+	step,
+	isLast = false,
 }: {
 	title?: string;
 	children: React.ReactNode;
 	className?: string;
+	step?: number;
+	isLast?: boolean;
 }) {
 	return (
-		<div className={cn("relative pb-6 last:pb-1", className)}>
-			<div className="-left-[29px] absolute top-0 flex size-5 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-medium font-mono text-[10px] text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-black dark:text-white">
-				✓
+		<div className={cn("flex gap-3.5", className)}>
+			<div className="flex flex-col items-center">
+				<div className="flex size-6 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 font-mono font-semibold text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.06] dark:text-white/75">
+					{step}
+				</div>
+				{!isLast && (
+					<div className="my-1.5 w-px flex-1 bg-stroke-soft-200 dark:bg-white/10" />
+				)}
 			</div>
-			{title && (
-				<h4 className="mt-0 mb-2 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-					{title}
-				</h4>
-			)}
-			<div className="text-[14px] text-text-sub-600 leading-relaxed dark:text-white/80 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
-				{children}
+			<div className={cn("min-w-0 flex-1", isLast ? "" : "pb-8")}>
+				{title && (
+					<h3 className="mt-0.5! mb-2! font-medium! text-[13.5px]! text-text-strong-950! tracking-normal! dark:text-white!">
+						{title}
+					</h3>
+				)}
+				<div className="text-[14px] text-text-sub-600 leading-relaxed dark:text-white/80 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
+					{children}
+				</div>
 			</div>
 		</div>
 	);
