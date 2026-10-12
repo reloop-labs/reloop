@@ -76,7 +76,9 @@ export async function generateMetadata({ searchParams }: PageProps) {
 			description: metaDescription,
 			path: toolPath,
 			keywords: toolKeywords,
-			ogImage: "/tools/opengraph-image",
+			// Not a domain, so the og/[domain] route renders the default card. A
+			// file-based opengraph-image here would override per-domain images.
+			ogImage: "/tools/domain-age/og/default/opengraph-image",
 		});
 	}
 
