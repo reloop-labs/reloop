@@ -53,6 +53,26 @@ export const faqs: FaqItem[] = [
 			"Domain reputation is a score that major mailbox providers (like Google, Microsoft, and Yahoo) assign to your sending domain. It determines whether your emails land in the primary inbox, promotions tab, or spam folder.",
 	},
 	{
+		question: "How do I check my domain reputation?",
+		answer:
+			"Enter your sending domain (for example example.com) in the checker above. In a few seconds you get a 0–100 score and an A+ to F grade, built from SPF, DKIM, and DMARC, six live domain blocklists, domain age, and DNS health, plus a list of fixes. It's free and needs no signup.",
+	},
+	{
+		question: "What is a good domain reputation score?",
+		answer:
+			"90 or above (A+) is excellent and 80–89 (A) is strong. 70–79 (B) is good with minor fixes to make. 55–69 (C) means you're exposed to spam filtering or spoofing, and below 55 (D or F) usually means missing authentication records or a blocklist listing.",
+	},
+	{
+		question: "How do I improve my domain reputation?",
+		answer:
+			"Fix the lowest-scoring pillar first. Publish SPF and DKIM, then move DMARC from p=none to quarantine or reject. If you're on a blocklist, stop the cause and request delisting. Warm up domains younger than 90 days with small, engaged sends, and keep MX, nameservers, and TLS healthy.",
+	},
+	{
+		question: "Is this the same as my Gmail or Google Postmaster reputation?",
+		answer:
+			"No. Gmail and Microsoft keep their own internal reputation based on how recipients engage with your mail, which you can only see in tools like Google Postmaster Tools. This checker scores the public signals those providers also look at: authentication, blocklists, domain age, and DNS. Fixing these is the foundation for a good mailbox-provider reputation.",
+	},
+	{
 		question: "How is the overall reputation score calculated?",
 		answer:
 			"Our composite score evaluates 4 key pillars: Email Authentication (35%), Live Domain Blocklists (30%), Domain Age and Maturity (20%), and DNS Infrastructure Health (15%). Points are deducted for missing records, relaxed policies, recent registrations, or blocklist listings.",

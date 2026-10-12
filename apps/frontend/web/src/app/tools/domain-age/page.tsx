@@ -7,7 +7,6 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { SimilarTools } from "../temp-email-checker/components/similar-tools";
 import { CheckerPanel } from "./checker-panel";
 import { ApiIntegration } from "./components/api-integration";
 import { DomainAgeCta } from "./components/domain-age-cta";
@@ -23,6 +22,7 @@ import {
 	toolPath,
 	toolTitle,
 } from "./content";
+import { SimilarTools } from "../components/similar-tools";
 export const instant = false;
 
 async function DynamicMetadataMarker() {
@@ -233,7 +233,7 @@ export default function DomainAgePage() {
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
-				<SimilarTools />
+				<SimilarTools currentPath={toolPath} />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<DomainAgeCta
 					headlineLine1="Stop warming up manually."

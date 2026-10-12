@@ -1,6 +1,8 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
+import { ALL_TOOLS } from "@reloop/web/app/tools/components/tools-grid";
+import { relatedToolPath } from "@reloop/web/lib/landing/glossary/related-tools";
 import { buildGlossaryTermJsonLd } from "@reloop/web/lib/landing/glossary/seo";
 import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
 import Link from "next/link";
@@ -51,6 +53,8 @@ export function GlossaryTermPageView({
 }) {
 	const initial = term.title.trim().charAt(0).toUpperCase() || "#";
 	const jsonLd = buildGlossaryTermJsonLd(term);
+	const toolPath = relatedToolPath(term.slug);
+	const relatedTool = ALL_TOOLS.find((tool) => tool.path === toolPath);
 
 	return (
 		<article itemScope itemType="https://schema.org/DefinedTerm">
@@ -146,6 +150,43 @@ export function GlossaryTermPageView({
 					</div>
 				</div>
 			</section>
+
+			{/* Free tool that checks this term */}
+			{relatedTool && (
+				<section className={rail}>
+					<div className="h-10 bg-transparent sm:h-12" aria-hidden />
+					<Link
+						href={relatedTool.path}
+						className="group flex flex-col gap-4 border-stroke-soft-200 border-y bg-bg-white-0 px-5 py-7 transition-colors hover:bg-bg-weak-50 sm:flex-row sm:items-center sm:justify-between sm:px-8 dark:border-white/10 dark:bg-black dark:hover:bg-white/[0.03]"
+					>
+						<div className="flex min-w-0 items-start gap-3.5">
+							<span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-200 text-text-sub-600 dark:border-white/10 dark:text-white/60">
+								<relatedTool.icon className="size-[18px] stroke-[1.75]" />
+							</span>
+							<div className="min-w-0">
+								<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
+									Free tool
+								</p>
+								<p className="mt-1 font-semibold text-[15px] text-text-strong-950 dark:text-white">
+									{relatedTool.title}
+								</p>
+								<p className="mt-1 text-[13px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/55">
+									{relatedTool.description}
+								</p>
+							</div>
+						</div>
+						<span className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-[14px] text-text-strong-950 transition-colors group-hover:text-primary-base dark:text-white">
+							Try it free
+							<span
+								aria-hidden
+								className="transition-transform duration-200 group-hover:translate-x-0.5"
+							>
+								→
+							</span>
+						</span>
+					</Link>
+				</section>
+			)}
 
 			{/* In Reloop  -  clear gap after detail border (no gray bg), then hatch band */}
 			{term.relatedFeatureHref && (

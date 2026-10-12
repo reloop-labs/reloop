@@ -16,6 +16,7 @@ import {
 } from "./content";
 import { FaqGrid } from "./faq-grid";
 import { SectionIntro } from "./grid";
+import { SimilarTools } from "../components/similar-tools";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -99,6 +100,8 @@ export default function SpamScoreCheckerPage() {
 					<SectionIntro lead="Frequently asked questions" align="left" />
 					<FaqGrid groups={faqGroups} />
 				</section>
+				<SectionSeparator />
+				<SimilarTools currentPath={toolPath} />
 				<SectionSeparator />
 				<BlogCta
 					headline={

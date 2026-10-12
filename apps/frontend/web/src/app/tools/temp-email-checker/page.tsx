@@ -5,7 +5,6 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import { ApiIntegration } from "./components/api-integration";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { McpSection } from "./components/mcp-section";
-import { SimilarTools } from "./components/similar-tools";
 import { TempEmailCta } from "./components/temp-email-cta";
 import { TempEmailHero } from "./components/temp-email-hero";
 import { WasteCalculator } from "./components/waste-calculator";
@@ -19,6 +18,7 @@ import {
 	toolPath,
 	toolTitle,
 } from "./content";
+import { SimilarTools } from "../components/similar-tools";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -131,7 +131,7 @@ export default function TempEmailCheckerPage() {
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-y dark:border-white/10"
 				/>
-				<SimilarTools />
+				<SimilarTools currentPath={toolPath} />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<TempEmailCta
 					headlineLine1="Stop paying for throwaways emails."

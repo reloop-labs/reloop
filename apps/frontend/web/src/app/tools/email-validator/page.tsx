@@ -20,6 +20,7 @@ import {
 } from "./content";
 import { FaqGrid } from "./faq-grid";
 import { TesterPanel } from "./tester-panel";
+import { SimilarTools } from "../components/similar-tools";
 
 export const instant = false;
 
@@ -204,6 +205,10 @@ export default function EmailValidatorPage() {
 			</Band>
 
 			{/* Bottom CTA to sign up */}
+			<Band>
+				<SimilarTools currentPath={toolPath} />
+			</Band>
+
 			<Band className="border-b-0">
 				<BlogCta />
 			</Band>

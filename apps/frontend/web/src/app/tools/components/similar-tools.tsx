@@ -1,16 +1,16 @@
 import { cn } from "@reloop/ui/cn";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { SectionHeading } from "../../components/section-heading";
-import { ALL_TOOLS } from "../../components/tools-grid";
-import { toolPath } from "../content";
+import { SectionHeading } from "./section-heading";
+import { ALL_TOOLS } from "./tools-grid";
 
-/** Free tools other than this one; the API docs and suggestion link aren't tools. */
-const OTHER_TOOLS = ALL_TOOLS.filter(
-	(tool) => tool.path.startsWith("/tools/") && tool.path !== toolPath,
-);
+/** Links every tool page to its siblings, so no tool is a crawl dead end. */
+export function SimilarTools({ currentPath }: { currentPath: string }) {
+	// The API docs and suggestion link in ALL_TOOLS aren't tools.
+	const otherTools = ALL_TOOLS.filter(
+		(tool) => tool.path.startsWith("/tools/") && tool.path !== currentPath,
+	);
 
-export function SimilarTools() {
 	return (
 		<section
 			id="similar-tools"
@@ -28,7 +28,7 @@ export function SimilarTools() {
 			{/* Every cell gets a bottom and right hairline; clipping 1px on those edges hides the outer ones, and the wrapper border closes the grid full-width even when the last row is partial. */}
 			<div className="overflow-hidden border-stroke-soft-100 border-b dark:border-white/10">
 				<ul className="-mr-px -mb-px grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-					{OTHER_TOOLS.map((tool) => {
+					{otherTools.map((tool) => {
 						const IconComponent = tool.icon;
 						return (
 							<li

@@ -18,6 +18,7 @@ import {
 	toolPath,
 	toolTitle,
 } from "./content";
+import { SimilarTools } from "../components/similar-tools";
 
 export const instant = false;
 
@@ -159,6 +160,10 @@ export default function DomainReputationCheckerPage() {
 					description="Learn how domain reputation impacts deliverability, how scoring works, and how to recover from blocklists."
 				/>
 				<FaqGrid groups={faqGroups} />
+			</Band>
+
+			<Band>
+				<SimilarTools currentPath={toolPath} />
 			</Band>
 
 			<Band className="border-b-0">

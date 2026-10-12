@@ -18,6 +18,7 @@ import {
 	toolTitle,
 } from "./content";
 import { FaqGrid } from "./faq-grid";
+import { SimilarTools } from "../components/similar-tools";
 
 export const instant = false;
 
@@ -105,7 +106,7 @@ export default function SpoofCheckerPage() {
 						</span>
 
 						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
-							Can Anyone Spoof My Domain?
+							Email Spoofing Test: Can Anyone Spoof My Domain?
 						</h1>
 
 						<p className="mx-auto mt-5 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
@@ -170,6 +171,10 @@ export default function SpoofCheckerPage() {
 			</Band>
 
 			{/* Bottom CTA to sign up */}
+			<Band>
+				<SimilarTools currentPath={toolPath} />
+			</Band>
+
 			<Band className="border-b-0">
 				<BlogCta />
 			</Band>

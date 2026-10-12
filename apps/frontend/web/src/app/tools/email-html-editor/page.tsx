@@ -6,7 +6,6 @@ import { BestFeatures } from "./components/best-features";
 import { EmailHtmlEditorCta } from "./components/email-html-editor-cta";
 import { EmailHtmlEditorHero } from "./components/email-html-editor-hero";
 import { PixelPerfectSection } from "./components/pixel-perfect-section";
-import { SimilarTools } from "./components/similar-tools";
 import { TemplatesSection } from "./components/templates-section";
 import { WhoIsItFor } from "./components/who-is-it-for";
 import {
@@ -18,6 +17,7 @@ import {
 	toolPath,
 	toolTitle,
 } from "./content";
+import { SimilarTools } from "../components/similar-tools";
 
 export const instant = false;
 
@@ -121,7 +121,7 @@ export default function EmailHtmlEditorPage() {
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
-				<SimilarTools />
+				<SimilarTools currentPath={toolPath} />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"

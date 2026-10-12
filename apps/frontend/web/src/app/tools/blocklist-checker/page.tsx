@@ -20,6 +20,7 @@ import {
 } from "./content";
 import { FaqGrid } from "./faq-grid";
 import { Band, SectionIntro } from "./grid";
+import { SimilarTools } from "../components/similar-tools";
 
 export const instant = false;
 
@@ -171,6 +172,10 @@ export default function BlocklistCheckerPage() {
 			</Band>
 
 			{/* Bottom CTA to sign up */}
+			<Band>
+				<SimilarTools currentPath={toolPath} />
+			</Band>
+
 			<Band className="border-b-0">
 				<BlogCta />
 			</Band>

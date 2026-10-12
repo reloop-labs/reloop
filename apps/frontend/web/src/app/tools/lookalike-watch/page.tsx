@@ -18,6 +18,7 @@ import {
 	trickCards,
 } from "./content";
 import { FaqGrid } from "./faq-grid";
+import { SimilarTools } from "../components/similar-tools";
 
 export const instant = false;
 
@@ -437,6 +438,10 @@ export default function LookalikeWatchPage() {
 			</Band>
 
 			{/* Bottom CTA */}
+			<Band>
+				<SimilarTools currentPath={toolPath} />
+			</Band>
+
 			<Band className="border-b-0">
 				<BlogCta />
 			</Band>

@@ -67,6 +67,11 @@ export const faqGroups: FaqGroup[] = [
 		title: "Understanding Email Spoofing",
 		items: [
 			{
+				question: "How do I test if my domain can be spoofed?",
+				answer:
+					"Enter your domain in the spoofing test above. It reads your public SPF, DKIM, and DMARC records and tells you in plain English whether Gmail, Yahoo, and Outlook would deliver a forged email sent from your domain. Nothing is sent, so it's safe to run on any domain you own.",
+			},
+			{
 				question: "What does it mean to spoof a domain?",
 				answer:
 					"Email protocols (SMTP) do not verify sender identity by default. A stranger can configure their mail server to send emails displaying your company's domain in the 'From:' header (e.g. ceo@yourcompany.com) without having access to your email passwords or servers.",

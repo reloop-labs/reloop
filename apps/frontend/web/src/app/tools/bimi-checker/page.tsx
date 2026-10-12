@@ -7,7 +7,6 @@ import { BimiCta } from "./components/bimi-cta";
 import { BimiDnsRecords } from "./components/bimi-dns-records";
 import { BimiHero } from "./components/bimi-hero";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
-import { SimilarTools } from "./components/similar-tools";
 import { WhatIsBimi } from "./components/what-is-bimi";
 import {
 	faqGroups,
@@ -18,6 +17,7 @@ import {
 	toolPath,
 	toolTitle,
 } from "./content";
+import { SimilarTools } from "../components/similar-tools";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -124,7 +124,7 @@ export default function BimiCheckerPage() {
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
 				/>
-				<SimilarTools />
+				<SimilarTools currentPath={toolPath} />
 				<div aria-hidden className="h-12 sm:h-16" />
 				<BimiCta
 					headlineLine1="Show your logo in every inbox."
