@@ -30,7 +30,7 @@ export async function generateMetadata({
 		title: `${template.name} email template | ${toolTitle}`,
 		description: template.description,
 		path: `${toolPath}/${template.id}`,
-		ogImage: "/tools/opengraph-image",
+		ogImage: `${toolPath}/opengraph-image`,
 	});
 }
 
