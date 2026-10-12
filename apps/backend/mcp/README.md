@@ -834,6 +834,18 @@ Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
 
 Returns: `deleted`, `id`
 
+### `check_temp_email`
+
+Check whether an email address or bare domain is disposable (a temp or throwaway inbox), a role address such as admin@ or support@, or from a free consumer provider, and whether its domain has MX records. Nothing is sent to the mailbox and nothing is stored. Use this before creating a contact or sending to an address you do not trust: treat `disposable` and `invalid` verdicts as reject, `risky` as review, and `deliverable` as safe. `riskScore` runs from 0 (safe) to 1 (throwaway).
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `email` | string | yes | Email address or bare domain, for example you@mailinator.com |
+
+Returns: `input`, `kind`, `domain`, `verdict`, `isValidSyntax`, `isDisposable`, `isRoleAddress`, `isFreeProvider`, `mxRecords`, `confidence`, `riskScore`, `flags`
+
 ## Errors
 
 Every failed call returns `isError: true` and no `structuredContent`; the text content is a JSON document with an `error` object (structured content must match the tool's output schema, so errors travel in the text block):

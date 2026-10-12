@@ -598,3 +598,34 @@ export type TestSmtpProviderResponse = {
 	error: string | null;
 	provider: SmtpProvider;
 };
+
+export type TempEmailVerdict =
+	| "invalid"
+	| "disposable"
+	| "risky"
+	| "deliverable";
+
+export type TempEmailFlag =
+	| "INVALID_SYNTAX"
+	| "DISPOSABLE_DOMAIN"
+	| "WILDCARD_DISPOSABLE"
+	| "PUBLIC_INBOX_DETECTED"
+	| "ROLE_BASED_PREFIX"
+	| "FREE_PROVIDER"
+	| "ALLOWLISTED"
+	| "NO_MX_RECORDS";
+
+export type TempEmailCheck = {
+	input: string;
+	kind: "email" | "domain" | null;
+	domain: string | null;
+	verdict: TempEmailVerdict;
+	isValidSyntax: boolean;
+	isDisposable: boolean;
+	isRoleAddress: boolean;
+	isFreeProvider: boolean;
+	mxRecords: string[];
+	confidence: number;
+	riskScore: number;
+	flags: TempEmailFlag[];
+};

@@ -113,15 +113,14 @@ function confidenceLabel(
 	confidence: number,
 	_flags?: readonly ApiCheckFlag[],
 ): string {
-	if (verdict === "invalid" || confidence === 1) return "100% confidence";
-	if (verdict === "disposable" || confidence === 0.999)
-		return "99.9% confidence";
+	if (verdict === "invalid" || confidence === 1) return "100%";
+	if (verdict === "disposable" || confidence === 0.999) return "99.9%";
 
 	const pct = confidence * 100;
 	const formatted = Number.isInteger(pct)
 		? `${pct}`
 		: `${Number.parseFloat(pct.toFixed(1))}`;
-	return `${formatted}% confidence`;
+	return `${formatted}%`;
 }
 
 function displaySignals(
@@ -130,8 +129,8 @@ function displaySignals(
 ): DisplaySignal[] {
 	if (!api.isValidSyntax) {
 		return [
-			{ label: "MX record", value: "---", status: "neutral" },
 			{ label: "Disposable provider", value: "---", status: "neutral" },
+			{ label: "MX record", value: "---", status: "neutral" },
 			{ label: "Role prefix", value: "---", status: "neutral" },
 			{ label: "Email syntax", value: "Malformed", status: "fail" },
 		];
@@ -146,12 +145,12 @@ function displaySignals(
 
 	if (noMx) {
 		return [
+			{ label: "Disposable provider", value: "---", status: "neutral" },
 			{
 				label: "MX record",
 				value: "Not found",
 				status: "fail",
 			},
-			{ label: "Disposable provider", value: "---", status: "neutral" },
 			{ label: "Role prefix", value: "---", status: "neutral" },
 			{ label: "Email syntax", value: "---", status: "neutral" },
 		];
@@ -160,14 +159,14 @@ function displaySignals(
 	if (disposable) {
 		return [
 			{
-				label: "MX record",
-				value: mxUnknown ? "Unknown" : "Found",
-				status: mxUnknown ? "neutral" : "pass",
-			},
-			{
 				label: "Disposable provider",
 				value: "Yes",
 				status: "fail",
+			},
+			{
+				label: "MX record",
+				value: mxUnknown ? "Unknown" : "Found",
+				status: mxUnknown ? "neutral" : "pass",
 			},
 			{ label: "Role prefix", value: "---", status: "neutral" },
 			{ label: "Email syntax", value: "---", status: "neutral" },
@@ -176,14 +175,14 @@ function displaySignals(
 
 	return [
 		{
-			label: "MX record",
-			value: mxUnknown ? "Unknown" : "Found",
-			status: mxUnknown ? "neutral" : "pass",
-		},
-		{
 			label: "Disposable provider",
 			value: "No",
 			status: "pass",
+		},
+		{
+			label: "MX record",
+			value: mxUnknown ? "Unknown" : "Found",
+			status: mxUnknown ? "neutral" : "pass",
 		},
 		{
 			label: "Role prefix",

@@ -97,7 +97,7 @@ export function WhoIsItFor() {
 									className="flex w-[17px] shrink-0 justify-center"
 									aria-hidden="true"
 								>
-									<span className="h-3.5 w-[2px] rounded-full bg-primary-base" />
+									<span className="h-3.5 w-[2px] rounded-full bg-text-strong-950 dark:bg-white" />
 								</span>
 								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
 									{column.title}
@@ -112,7 +112,7 @@ export function WhoIsItFor() {
 										className="flex items-start gap-2.5 text-[13.5px] text-text-sub-600 leading-snug sm:text-[14px] dark:text-white/70"
 									>
 										<span
-											className="mt-0.5 flex size-[17px] shrink-0 items-center justify-center rounded-full bg-primary-base/10 text-primary-base dark:bg-primary-base/20"
+											className="mt-0.5 flex size-[17px] shrink-0 items-center justify-center rounded-full bg-neutral-100 text-text-strong-950 dark:bg-white/10 dark:text-white"
 											aria-hidden="true"
 										>
 											<svg

@@ -79,10 +79,10 @@ describe("toCheckResult", () => {
 		);
 
 		expect(result.verdict).toBe("disposable");
-		expect(result.confidenceLabel).toBe("99.9% confidence");
+		expect(result.confidenceLabel).toBe("99.9%");
 		expect(result.displaySignals).toEqual([
-			{ label: "MX record", value: "Found", status: "pass" },
 			{ label: "Disposable provider", value: "Yes", status: "fail" },
+			{ label: "MX record", value: "Found", status: "pass" },
 			{ label: "Role prefix", value: "---", status: "neutral" },
 			{ label: "Email syntax", value: "---", status: "neutral" },
 		]);
@@ -106,10 +106,10 @@ describe("toCheckResult", () => {
 			}),
 		);
 
-		expect(result.confidenceLabel).toBe("85% confidence");
+		expect(result.confidenceLabel).toBe("85%");
 		expect(result.displaySignals).toEqual([
-			{ label: "MX record", value: "Found", status: "pass" },
 			{ label: "Disposable provider", value: "No", status: "pass" },
+			{ label: "MX record", value: "Found", status: "pass" },
 			{ label: "Role prefix", value: "Shared", status: "warn" },
 			{ label: "Email syntax", value: "Valid", status: "pass" },
 		]);
@@ -129,11 +129,11 @@ describe("toCheckResult", () => {
 		);
 
 		expect(result.verdict).toBe("invalid");
-		expect(result.confidenceLabel).toBe("100% confidence");
+		expect(result.confidenceLabel).toBe("100%");
 		expect(result.subtitle).toBe("No MX records published");
 		expect(result.displaySignals).toEqual([
-			{ label: "MX record", value: "Not found", status: "fail" },
 			{ label: "Disposable provider", value: "---", status: "neutral" },
+			{ label: "MX record", value: "Not found", status: "fail" },
 			{ label: "Role prefix", value: "---", status: "neutral" },
 			{ label: "Email syntax", value: "---", status: "neutral" },
 		]);
@@ -153,7 +153,7 @@ describe("toCheckResult", () => {
 		);
 
 		expect(result.subtitle).toBe("MX lookup did not return hosts");
-		expect(result.displaySignals[0]).toEqual({
+		expect(result.displaySignals[1]).toEqual({
 			label: "MX record",
 			value: "Unknown",
 			status: "neutral",
@@ -174,10 +174,10 @@ describe("toCheckResult", () => {
 			}),
 		);
 
-		expect(result.confidenceLabel).toBe("100% confidence");
+		expect(result.confidenceLabel).toBe("100%");
 		expect(result.displaySignals).toEqual([
-			{ label: "MX record", value: "---", status: "neutral" },
 			{ label: "Disposable provider", value: "---", status: "neutral" },
+			{ label: "MX record", value: "---", status: "neutral" },
 			{ label: "Role prefix", value: "---", status: "neutral" },
 			{ label: "Email syntax", value: "Malformed", status: "fail" },
 		]);

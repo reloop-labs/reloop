@@ -87,6 +87,7 @@ describe("mcp server over streamable http", () => {
 			"update_smtp_provider",
 			"test_smtp_provider",
 			"delete_smtp_provider",
+			"check_temp_email",
 		]);
 		for (const tool of listed.tools) {
 			expect(tool.inputSchema).toBeDefined();

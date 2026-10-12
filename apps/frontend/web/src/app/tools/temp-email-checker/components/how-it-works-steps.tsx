@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Gift, Lock, RotateCw, Target } from "lucide-react";
 import type { ComponentType } from "react";
+import { SectionHeading } from "../../components/section-heading";
 
 type FeatureItem = {
 	icon: ComponentType<{ className?: string }>;
@@ -42,17 +43,13 @@ export function BestFeatures() {
 			aria-labelledby="best-features-heading"
 			className="w-full"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					Best features
-				</p>
-				<h2
-					id="best-features-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					Why choose Reloop temp email checker
-				</h2>
-			</div>
+			<SectionHeading
+				id="best-features-heading"
+				eyebrow="Best features"
+				icon="star"
+				title={["Why choose Reloop's", "temp email checker?"]}
+				description="Free, no account needed, and backed by a disposable-domain list that refreshes every 24 hours."
+			/>
 
 			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
 				{FEATURES.map((feature, index) => {

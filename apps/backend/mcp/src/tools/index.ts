@@ -46,6 +46,7 @@ import { deleteSmtpProvider } from "./smtp-providers/delete";
 import { listSmtpProviders } from "./smtp-providers/list";
 import { testSmtpProvider } from "./smtp-providers/test";
 import { updateSmtpProvider } from "./smtp-providers/update";
+import { checkTempEmail } from "./temp-email/check";
 import { getTemplate } from "./templates/get";
 import { listTemplates } from "./templates/list";
 import { sendTestEmail } from "./templates/send-test";
@@ -101,4 +102,5 @@ export const tools: readonly AnyToolDefinition[] = [
 	updateSmtpProvider,
 	testSmtpProvider,
 	deleteSmtpProvider,
+	checkTempEmail,
 ];

@@ -84,3 +84,7 @@ export const smtpProviderEndpoints = {
 	byId: (id: string) => `${SMTP_PROVIDERS}/${encodeURIComponent(id)}`,
 	test: (id: string) => `${SMTP_PROVIDERS}/${encodeURIComponent(id)}/test`,
 } as const;
+
+export const tempEmailEndpoints = {
+	check: "/api/tools/v1/temp-email-checker",
+} as const;

@@ -269,13 +269,9 @@ function ResultCardDetailed({
 							name={status.icon}
 							className={cn("size-4 shrink-0", status.iconClass)}
 						/>
-						<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
+						<p className="truncate font-semibold text-sm text-text-strong-950 dark:text-white">
 							{status.label}
 						</p>
-						<span className="text-text-soft-400 dark:text-white/30">•</span>
-						<span className="font-normal text-text-sub-600 text-xs dark:text-white/50">
-							{result.confidenceLabel}
-						</span>
 					</div>
 
 					<button
@@ -326,6 +322,11 @@ function ResultCardDetailed({
 											status={item.status}
 										/>
 									))}
+									<SignalItem
+										label="Confidence"
+										value={result.confidenceLabel}
+										status="neutral"
+									/>
 								</div>
 							</div>
 						</motion.div>
@@ -334,8 +335,8 @@ function ResultCardDetailed({
 			</div>
 
 			{/* Actions Footer */}
-			<div className="flex flex-wrap items-center justify-between gap-2 pr-4">
-				<div className="flex items-center gap-1.5">
+			<div className="-mx-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+				<div className="flex items-center gap-0.5 sm:gap-1.5">
 					<button
 						type="button"
 						onClick={handleCopyLink}
@@ -356,7 +357,7 @@ function ResultCardDetailed({
 				<button
 					type="button"
 					onClick={onReset}
-					className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
+					className="cursor-pointer rounded-lg px-2 py-1.5 font-medium text-primary-base text-xs hover:underline"
 				>
 					Clear result
 				</button>

@@ -3,6 +3,7 @@
 import * as Slider from "@reloop/ui/slider";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { SectionHeading } from "../../components/section-heading";
 
 const formatInt = (n: number) =>
 	new Intl.NumberFormat("en-US").format(Math.round(n));
@@ -34,17 +35,13 @@ export function WasteCalculator() {
 			aria-labelledby="savings-calculator-heading"
 			className="w-full"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					Savings calculator
-				</p>
-				<h2
-					id="savings-calculator-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					Calculate what throwaways cost you.
-				</h2>
-			</div>
+			<SectionHeading
+				id="savings-calculator-heading"
+				eyebrow="Savings calculator"
+				icon="dollar"
+				title={["Calculate what", "throwaways cost you"]}
+				description="Set your monthly signups, disposable rate, and cost per bad signup to see what throwaway emails cost you."
+			/>
 
 			<div className="grid grid-cols-1 border-stroke-soft-100 border-b lg:grid-cols-2 dark:border-white/10">
 				{/* Left: inputs */}
@@ -145,16 +142,16 @@ export function WasteCalculator() {
 						</p>
 					</div>
 
-					<div className="relative overflow-hidden rounded-2xl border border-white/20 bg-[#246BF5] p-5 sm:p-6 dark:border-white/10 dark:bg-[#000]">
+					<div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#171717] p-5 sm:p-6 dark:border-white/10 dark:bg-[#000]">
 						<div
 							aria-hidden="true"
-							className="pointer-events-none absolute inset-[6px] rounded-[12px] border border-white/25 dark:border-white/10"
+							className="pointer-events-none absolute inset-[6px] rounded-[12px] border border-white/10"
 						/>
 						<div className="relative z-10">
 							<p className="font-medium text-[16px] text-white leading-snug tracking-tight">
 								Stop paying for throwaway emails.
 							</p>
-							<p className="mt-1.5 text-[13px] text-white/85 leading-relaxed dark:text-white/60">
+							<p className="mt-1.5 text-[13px] text-white/60 leading-relaxed">
 								Reloop automatically flags risky contacts before you waste time
 								or money on them. Start with 3,000 free emails per month.{" "}
 								<Link

@@ -30,72 +30,85 @@ export function AgentToolsSection() {
 				</p>
 			</div>
 
-			<div className="grid w-full grid-cols-1 lg:grid-cols-2 [&>*]:min-w-0">
-				{/* MCP Server */}
-				<div className="flex flex-col border-stroke-soft-100 lg:border-r dark:border-white/10">
-					<div className="space-y-4 p-6 md:px-12 md:pt-12 md:pb-6">
-						<CardHeader
-							icon={
-								<svg
-									width="22"
-									height="22"
-									viewBox="0 0 24 24"
-									fill="currentColor"
-									className="text-zinc-400 dark:text-zinc-500"
-									aria-hidden
-								>
-									<path d={siModelcontextprotocol.path} />
-								</svg>
-							}
-							title="MCP Server"
-							lede="Connect Reloop to your AI agent."
-							description="Let Claude, Cursor, or Codex send and manage email."
-						/>
-					</div>
-					<div className="flex flex-1 flex-col border-stroke-soft-100 border-t dark:border-white/10">
-						<McpConfigWindow />
-					</div>
-					<div className="border-stroke-soft-100 border-t px-6 py-4 md:px-12 dark:border-white/10">
-						<LearnMoreLink href="/features/mcp" />
-					</div>
-				</div>
+			<AgentToolsGrid />
+		</section>
+	);
+}
 
-				{/* Developer CLI */}
-				<div className="flex flex-col border-stroke-soft-100 border-t lg:border-t-0 dark:border-white/10">
-					<div className="space-y-4 p-6 md:px-12 md:pt-12 md:pb-6">
-						<CardHeader
-							icon={
-								<svg
-									width="22"
-									height="22"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="#9ca3af"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									aria-hidden
-								>
-									<path d="M4 17 L9 12 L4 7" />
-									<path d="M12 19 H20" />
-								</svg>
-							}
-							title="Developer CLI"
-							lede="Send email from your terminal."
-							description="Test deliveries and fix configuration without a dashboard."
-						/>
-					</div>
-					<div className="flex flex-1 flex-col border-stroke-soft-100 border-t dark:border-white/10">
-						<CliTitleBar />
-						<div className="flex flex-1 items-center py-8">
-							<CliTerminal />
-						</div>
-					</div>
-					<div className="border-stroke-soft-100 border-t px-6 py-4 md:px-12 dark:border-white/10">
-						<LearnMoreLink href="/features/cli" />
-					</div>
+/** MCP setup and CLI cards, shared by pages that pitch the agent tooling. */
+export function AgentToolsGrid({
+	mcpLede = "Connect Reloop to your AI agent.",
+	mcpDescription = "Let Claude, Cursor, or Codex send and manage email.",
+}: {
+	mcpLede?: string;
+	mcpDescription?: string;
+}) {
+	return (
+		<div className="grid w-full grid-cols-1 lg:grid-cols-2 [&>*]:min-w-0">
+			{/* MCP Server */}
+			<div className="flex flex-col border-stroke-soft-100 lg:border-r dark:border-white/10">
+				<div className="space-y-4 p-6 md:px-12 md:pt-12 md:pb-6">
+					<CardHeader
+						icon={
+							<svg
+								width="22"
+								height="22"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								className="text-zinc-400 dark:text-zinc-500"
+								aria-hidden
+							>
+								<path d={siModelcontextprotocol.path} />
+							</svg>
+						}
+						title="MCP Server"
+						lede={mcpLede}
+						description={mcpDescription}
+					/>
+				</div>
+				<div className="flex flex-1 flex-col border-stroke-soft-100 border-t dark:border-white/10">
+					<McpConfigWindow />
+				</div>
+				<div className="border-stroke-soft-100 border-t px-6 py-4 md:px-12 dark:border-white/10">
+					<LearnMoreLink href="/features/mcp" />
 				</div>
 			</div>
-		</section>
+
+			{/* Developer CLI */}
+			<div className="flex flex-col border-stroke-soft-100 border-t lg:border-t-0 dark:border-white/10">
+				<div className="space-y-4 p-6 md:px-12 md:pt-12 md:pb-6">
+					<CardHeader
+						icon={
+							<svg
+								width="22"
+								height="22"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="#9ca3af"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								aria-hidden
+							>
+								<path d="M4 17 L9 12 L4 7" />
+								<path d="M12 19 H20" />
+							</svg>
+						}
+						title="Developer CLI"
+						lede="Send email from your terminal."
+						description="Test deliveries and fix configuration without a dashboard."
+					/>
+				</div>
+				<div className="flex flex-1 flex-col border-stroke-soft-100 border-t dark:border-white/10">
+					<CliTitleBar />
+					<div className="flex flex-1 items-center py-8">
+						<CliTerminal />
+					</div>
+				</div>
+				<div className="border-stroke-soft-100 border-t px-6 py-4 md:px-12 dark:border-white/10">
+					<LearnMoreLink href="/features/cli" />
+				</div>
+			</div>
+		</div>
 	);
 }
