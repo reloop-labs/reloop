@@ -1,7 +1,14 @@
 import { cn } from "@reloop/ui/cn";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { ALL_TOOLS, getBorderClass } from "../../components/tools-grid";
+import { SectionHeading } from "../../components/section-heading";
+import { ALL_TOOLS } from "../../components/tools-grid";
+import { toolPath } from "../content";
+
+/** Free tools other than this one; the API docs and suggestion link aren't tools. */
+const OTHER_TOOLS = ALL_TOOLS.filter(
+	(tool) => tool.path.startsWith("/tools/") && tool.path !== toolPath,
+);
 
 export function SimilarTools() {
 	return (
@@ -10,59 +17,55 @@ export function SimilarTools() {
 			aria-labelledby="similar-tools-heading"
 			className="w-full"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					All tools
-				</p>
-				<h2
-					id="similar-tools-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					Explore all free email &amp; developer tools.
-				</h2>
-			</div>
+			<SectionHeading
+				id="similar-tools-heading"
+				eyebrow="All tools"
+				icon="grid"
+				title={["Explore all free email", "& developer tools"]}
+				description="More free utilities for checking deliverability, DNS records, and email authentication before you hit send."
+			/>
 
-			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
-				{ALL_TOOLS.map((tool, index) => {
-					const IconComponent = tool.icon;
-					const borderClass = getBorderClass(index, ALL_TOOLS.length);
-
-					return (
-						<Link
-							key={tool.title}
-							href={tool.path}
-							className={cn(
-								"group flex flex-col justify-between border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 sm:py-7 lg:px-7 lg:py-8 dark:border-white/10 dark:hover:bg-white/[0.04]",
-								borderClass,
-							)}
-						>
-							<div>
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-neutral-100 text-neutral-600 dark:border-white/10 dark:bg-white/[0.05] dark:text-neutral-400">
-									<IconComponent className="h-5 w-5 stroke-[1.75]" />
-								</div>
-
-								<div className="mt-5 flex items-start gap-2.5">
-									<span
-										className="mt-1 h-3.5 w-[2px] shrink-0 rounded-full bg-primary-base"
-										aria-hidden="true"
-									/>
-									<h3 className="font-semibold text-[15px] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:text-primary-base sm:text-[15.5px] dark:text-white dark:group-hover:text-white">
-										{tool.title}
-									</h3>
-								</div>
-
-								<p className="mt-2.5 line-clamp-2 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">
-									{tool.description}
-								</p>
-							</div>
-
-							<div className="mt-5 flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/55 dark:group-hover:text-white">
-								<span>Try now</span>
-								<ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
-							</div>
-						</Link>
-					);
-				})}
+			{/* Every cell gets a bottom and right hairline; clipping 1px on those edges hides the outer ones, and the wrapper border closes the grid full-width even when the last row is partial. */}
+			<div className="overflow-hidden border-stroke-soft-100 border-b dark:border-white/10">
+				<ul className="-mr-px -mb-px grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+					{OTHER_TOOLS.map((tool) => {
+						const IconComponent = tool.icon;
+						return (
+							<li
+								key={tool.path}
+								className="border-stroke-soft-100 border-r border-b dark:border-white/10"
+							>
+								<Link
+									href={tool.path}
+									className={cn(
+										"group flex h-full items-start gap-3.5 px-4 py-6 sm:px-6 lg:px-8",
+										"transition-colors duration-200 ease-out hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]",
+										"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-sub-300 focus-visible:ring-inset",
+										"motion-reduce:transition-none",
+									)}
+								>
+									<span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:group-hover:text-white">
+										<IconComponent className="size-[18px] stroke-[1.75]" />
+									</span>
+									<div className="min-w-0 flex-1">
+										<div className="flex items-center justify-between gap-2">
+											<h3 className="truncate font-medium text-[14.5px] text-text-strong-950 tracking-tight dark:text-white">
+												{tool.title}
+											</h3>
+											<ArrowUpRight
+												aria-hidden
+												className="-translate-x-1 size-4 shrink-0 text-text-sub-600 opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 motion-reduce:transition-none dark:text-white/60"
+											/>
+										</div>
+										<p className="mt-1 line-clamp-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/55">
+											{tool.description}
+										</p>
+									</div>
+								</Link>
+							</li>
+						);
+					})}
+				</ul>
 			</div>
 		</section>
 	);

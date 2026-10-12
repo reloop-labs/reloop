@@ -1,4 +1,4 @@
-import { SectionHeading } from "./section-heading";
+import { SectionHeading } from "../../components/section-heading";
 import { TemplateCardGrid } from "./template-card-grid";
 
 export function TemplatesSection() {

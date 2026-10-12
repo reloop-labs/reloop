@@ -1,9 +1,9 @@
 import { cn } from "@reloop/ui/cn";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { SectionHeading } from "../../components/section-heading";
 import { ALL_TOOLS } from "../../components/tools-grid";
 import { toolPath } from "../content";
-import { SectionHeading } from "./section-heading";
 
 /** Free tools other than this one; the API docs and suggestion link aren't tools. */
 const OTHER_TOOLS = ALL_TOOLS.filter(
@@ -25,8 +25,8 @@ export function SimilarTools() {
 				description="More free utilities for checking deliverability, DNS records, and email authentication before you hit send."
 			/>
 
-			{/* Every cell gets a bottom and right hairline; clipping 1px on those edges hides the outer ones so the side rails and footer border close the grid. */}
-			<div className="overflow-hidden">
+			{/* Every cell gets a bottom and right hairline; clipping 1px on those edges hides the outer ones, and the wrapper border closes the grid full-width even when the last row is partial. */}
+			<div className="overflow-hidden border-stroke-soft-100 border-b dark:border-white/10">
 				<ul className="-mr-px -mb-px grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 					{OTHER_TOOLS.map((tool) => {
 						const IconComponent = tool.icon;
@@ -66,25 +66,6 @@ export function SimilarTools() {
 						);
 					})}
 				</ul>
-			</div>
-
-			<div className="flex flex-col items-start justify-between gap-3 border-stroke-soft-100 border-t px-4 py-5 sm:flex-row sm:items-center sm:px-8 lg:px-12 dark:border-white/10">
-				<p className="text-[13.5px] text-text-sub-600 dark:text-white/60">
-					Need something that isn't here?{" "}
-					<Link
-						href="/contact"
-						className="font-medium text-text-strong-950 underline decoration-stroke-sub-300 underline-offset-4 transition-colors hover:decoration-text-strong-950 dark:text-white dark:decoration-white/30 dark:hover:decoration-white"
-					>
-						Suggest a tool
-					</Link>
-				</p>
-				<Link
-					href="/tools"
-					className="group inline-flex items-center gap-1.5 font-medium text-[13.5px] text-text-strong-950 dark:text-white"
-				>
-					Browse all tools
-					<ArrowRight className="size-3.5 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" />
-				</Link>
 			</div>
 		</section>
 	);

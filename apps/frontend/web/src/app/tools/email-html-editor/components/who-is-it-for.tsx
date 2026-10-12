@@ -1,5 +1,5 @@
 import { cn } from "@reloop/ui/cn";
-import { SectionHeading } from "./section-heading";
+import { SectionHeading } from "../../components/section-heading";
 
 type AudienceColumn = {
 	title: string;

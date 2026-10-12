@@ -1,8 +1,8 @@
 "use client";
 
+import { SectionHeading } from "../../components/section-heading";
 import { toolPath } from "../content";
 import { acmeTemplateExamples } from "../templates";
-import { SectionHeading } from "./section-heading";
 import {
 	CARD_ONLY_PREVIEW_CSS,
 	EmailPreview,

@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { SectionHeading } from "../../components/section-heading";
 
 type AudienceColumn = {
 	title: string;
@@ -63,21 +64,13 @@ export function WhoIsItFor() {
 			aria-labelledby="who-is-it-for-heading"
 			className="w-full"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					Who is it for
-				</p>
-				<h2
-					id="who-is-it-for-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					Where can I use reloop’s temp email checker?
-				</h2>
-				<p className="max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					Anyone who needs to know if an address is real without ever probing
-					the mailbox.
-				</p>
-			</div>
+			<SectionHeading
+				id="who-is-it-for-heading"
+				eyebrow="Who is it for"
+				icon="users"
+				title={["Where can I use Reloop's", "temp email checker?"]}
+				description="Anyone who needs to know if an address is real without ever probing the mailbox."
+			/>
 
 			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
 				{AUDIENCE_COLUMNS.map((column, index) => {
@@ -98,12 +91,14 @@ export function WhoIsItFor() {
 								borderClass,
 							)}
 						>
-							{/* Column header with vertical accent bar */}
-							<div className="flex items-center gap-2">
+							{/* Bar sits in a checkmark-width slot so it centers on the checks and the title lines up with the item text. */}
+							<div className="flex items-center gap-2.5">
 								<span
-									className="h-3.5 w-[2px] shrink-0 rounded-full bg-primary-base"
+									className="flex w-[17px] shrink-0 justify-center"
 									aria-hidden="true"
-								/>
+								>
+									<span className="h-3.5 w-[2px] rounded-full bg-primary-base" />
+								</span>
 								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
 									{column.title}
 								</h3>

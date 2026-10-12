@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Code, LayoutTemplate, Lock, MousePointerClick } from "lucide-react";
 import type { ComponentType } from "react";
-import { SectionHeading } from "./section-heading";
+import { SectionHeading } from "../../components/section-heading";
 
 type FeatureItem = {
 	icon: ComponentType<{ className?: string }>;
