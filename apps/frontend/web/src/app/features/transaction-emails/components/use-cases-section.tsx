@@ -1,10 +1,13 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import {
+	CARD_ONLY_PREVIEW_CSS,
+	EmailPreview,
+	ShowMoreGrid,
+	TemplateCard,
+	withSampleValues,
+} from "../../../tools/email-html-editor/components/template-card";
 import { toolPath } from "../../../tools/email-html-editor/content";
 import {
 	acmeTemplateExamples,
@@ -135,120 +138,13 @@ const USE_CASES: { id: string; title: string }[] = [
 	},
 ];
 
-/** Marketing previews read better with sample values than `{{{otp_code}}}`. */
-function withSampleValues(
-	template: EmailTemplateExample,
-): EmailTemplateExample {
-	return {
-		...template,
-		html: (origin) =>
-			template.variables.reduce(
-				(html, variable) =>
-					variable.defaultValue === null
-						? html
-						: html.replaceAll(`{{{${variable.name}}}}`, variable.defaultValue),
-				template.html(origin),
-			),
-	};
-}
-
 const previewTemplates = new Map<string, EmailTemplateExample>([
 	...acmeTemplateExamples.map(
 		(template) => [template.id, withSampleValues(template)] as const,
 	),
 ]);
 
-/** Width the email is laid out at before it is scaled into the card. */
-const EMAIL_RENDER_WIDTH = 600;
-
-/**
- * Previews show only the white email card: the email's gray page and the
- * padding around the card are dropped so every side has the same inset.
- */
-const PREVIEW_CSS =
-	"<style>body,body>table{background:#ffffff!important}body>table>tbody>tr>td{padding:0!important}</style>";
-
-function EmailPreview({ template }: { template: EmailTemplateExample }) {
-	const frameRef = useRef<HTMLDivElement>(null);
-	const [scale, setScale] = useState(0);
-	const [srcDoc, setSrcDoc] = useState<string | null>(null);
-	const [loaded, setLoaded] = useState(false);
-
-	useEffect(() => {
-		setSrcDoc(
-			template
-				.html(window.location.origin)
-				.replace("</head>", `${PREVIEW_CSS}</head>`),
-		);
-	}, [template]);
-
-	useEffect(() => {
-		const frame = frameRef.current;
-		if (!frame) return;
-		const observer = new ResizeObserver(([entry]) => {
-			if (entry) setScale(entry.contentRect.width / EMAIL_RENDER_WIDTH);
-		});
-		observer.observe(frame);
-		return () => observer.disconnect();
-	}, []);
-
-	return (
-		<div
-			ref={frameRef}
-			className="pointer-events-none relative aspect-[5/4] w-full select-none overflow-hidden rounded-[18px] bg-white ring-1 ring-stroke-soft-100 dark:ring-white/10"
-		>
-			{srcDoc && scale > 0 ? (
-				<iframe
-					title={`Preview of ${template.name}`}
-					srcDoc={srcDoc}
-					sandbox=""
-					tabIndex={-1}
-					aria-hidden
-					scrolling="no"
-					onLoad={() => setLoaded(true)}
-					className={cn(
-						"absolute top-0 left-0 origin-top-left border-0 bg-white transition-opacity duration-300",
-						loaded ? "opacity-100" : "opacity-0",
-					)}
-					style={{
-						width: EMAIL_RENDER_WIDTH,
-						height: `${100 / scale}%`,
-						transform: `scale(${scale})`,
-					}}
-				/>
-			) : null}
-		</div>
-	);
-}
-
-/** Cards shown before "Show more". */
-const INITIAL_VISIBLE = 12;
-
 export function UseCasesSection() {
-	const [showAll, setShowAll] = useState(false);
-	const toggleRef = useRef<HTMLDivElement>(null);
-	const visibleUseCases = showAll
-		? USE_CASES
-		: USE_CASES.slice(0, INITIAL_VISIBLE);
-	const hiddenCount = USE_CASES.length - INITIAL_VISIBLE;
-
-	const toggleShowAll = () => {
-		const collapsing = showAll;
-		setShowAll(!collapsing);
-		if (!collapsing) return;
-		// Collapsing removes rows above the button; keep it under the pointer
-		// instead of leaving the reader deep in the next section.
-		requestAnimationFrame(() => {
-			const reduceMotion = window.matchMedia(
-				"(prefers-reduced-motion: reduce)",
-			).matches;
-			toggleRef.current?.scrollIntoView({
-				block: "center",
-				behavior: reduceMotion ? "auto" : "smooth",
-			});
-		});
-	};
-
 	return (
 		<section
 			id="use-cases"
@@ -272,69 +168,26 @@ export function UseCasesSection() {
 				</p>
 			</div>
 
-			<div
-				id="use-cases-grid"
-				className="grid grid-cols-1 gap-6 px-4 py-10 sm:grid-cols-2 sm:gap-12 sm:px-8 sm:py-12 lg:grid-cols-3 lg:px-12"
-			>
-				{visibleUseCases.map((useCase) => {
+			<ShowMoreGrid id="use-cases-grid">
+				{USE_CASES.flatMap((useCase) => {
 					const template = previewTemplates.get(useCase.id);
-					if (!template) return null;
+					if (!template) return [];
 					return (
-						<Link
+						<TemplateCard
 							key={useCase.id}
 							href={`${toolPath}/${template.id}`}
-							aria-label={`Open the ${useCase.title.toLowerCase()} template in the editor`}
-							className={cn(
-								"group/card flex flex-col gap-2 rounded-t-[24px] rounded-b-[20px] bg-bg-weak-50 p-1.5 dark:bg-white/[0.03]",
-								"transition-colors duration-200 ease-out",
-								"hover:bg-bg-soft-200 dark:hover:bg-white/[0.07]",
-								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-sub-300",
-								"motion-reduce:transition-none",
-							)}
-						>
-							<EmailPreview template={template} />
-							<div className="flex flex-col gap-1 px-3 pt-1 pb-2.5">
-								<div className="flex items-center justify-between gap-2">
-									<h3 className="font-medium text-[16px] text-text-strong-950 dark:text-white">
-										{useCase.title}
-									</h3>
-									<Icon
-										name="arrow-up-right"
-										aria-hidden
-										className="-translate-x-1 size-4 shrink-0 text-text-sub-600 opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover/card:translate-x-0 group-hover/card:opacity-100 group-focus-visible/card:translate-x-0 group-focus-visible/card:opacity-100 motion-reduce:transition-none dark:text-white/60"
-									/>
-								</div>
-							</div>
-						</Link>
+							title={useCase.title}
+							ariaLabel={`Open the ${useCase.title.toLowerCase()} template in the editor`}
+							preview={
+								<EmailPreview
+									template={template}
+									previewCss={CARD_ONLY_PREVIEW_CSS}
+								/>
+							}
+						/>
 					);
 				})}
-			</div>
-			{hiddenCount > 0 && (
-				<div
-					ref={toggleRef}
-					className="flex justify-center px-4 pb-12 sm:px-8 lg:px-12"
-				>
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode="stroke"
-						size="small"
-						aria-controls="use-cases-grid"
-						aria-expanded={showAll}
-						onClick={toggleShowAll}
-					>
-						{showAll ? "Show less" : "Show more"}
-						<Icon
-							name="chevron-down"
-							aria-hidden
-							className={cn(
-								"size-3.5 transition-transform duration-200 ease-out motion-reduce:transition-none",
-								showAll && "rotate-180",
-							)}
-						/>
-					</Button.Root>
-				</div>
-			)}
+			</ShowMoreGrid>
 		</section>
 	);
 }

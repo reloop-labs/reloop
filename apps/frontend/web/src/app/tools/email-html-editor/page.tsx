@@ -1,16 +1,19 @@
-import { Icon } from "@reloop/ui/icon";
 import { FaqSection } from "@reloop/web/components/faq-section";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
+import { BestFeatures } from "./components/best-features";
+import { EmailHtmlEditorCta } from "./components/email-html-editor-cta";
 import { EmailHtmlEditorHero } from "./components/email-html-editor-hero";
+import { PixelPerfectSection } from "./components/pixel-perfect-section";
+import { SimilarTools } from "./components/similar-tools";
 import { TemplatesSection } from "./components/templates-section";
+import { WhoIsItFor } from "./components/who-is-it-for";
 import {
 	faqGroups,
 	faqs,
 	metaDescription,
 	metaTitle,
-	reasons,
 	toolKeywords,
 	toolPath,
 	toolTitle,
@@ -98,32 +101,27 @@ export default function EmailHtmlEditorPage() {
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-y dark:border-white/10"
 				/>
+				<BestFeatures />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
 				<TemplatesSection />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-y dark:border-white/10"
 				/>
-				<div className="grid grid-cols-1 divide-y divide-stroke-soft-100 border-stroke-soft-100 border-b sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
-					{reasons.map((reason) => (
-						<div
-							key={reason.title}
-							className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8"
-						>
-							<Icon
-								name={reason.icon}
-								className="size-5 text-text-sub-600 dark:text-white/40"
-							/>
-							<div>
-								<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-									{reason.title}
-								</p>
-								<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-									{reason.description}
-								</p>
-							</div>
-						</div>
-					))}
-				</div>
+				<PixelPerfectSection />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-y dark:border-white/10"
+				/>
+				<WhoIsItFor />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
+				<SimilarTools />
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
@@ -138,7 +136,11 @@ export default function EmailHtmlEditorPage() {
 						flush
 					/>
 				</div>
-				<div aria-hidden className="h-12 sm:h-16" />
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
+				<EmailHtmlEditorCta />
 			</div>
 		</div>
 	);

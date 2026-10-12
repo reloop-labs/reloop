@@ -16,33 +16,6 @@ export const toolKeywords = [
 	"email source editor",
 ];
 
-export const reasons = [
-	{
-		icon: "code" as const,
-		title: "Start from a template",
-		description:
-			"Open a ready-made email on the canvas. Columns, images, and buttons stay editable blocks, and you can paste your own HTML over it.",
-	},
-	{
-		icon: "settings" as const,
-		title: "Inspect the same tree",
-		description:
-			"Select a heading, cell, or button. Padding, color, and type edit the live document, then source updates to match.",
-	},
-	{
-		icon: "layout" as const,
-		title: "Source stays in sync",
-		description:
-			"Flip to code. Canvas typing and inspect writes compose back into the HTML. Edit source and the canvas updates.",
-	},
-	{
-		icon: "lock" as const,
-		title: "No account to start",
-		description:
-			"Edit freely in this tab. When you're happy, save it to Reloop Templates with a free account.",
-	},
-];
-
 export const faqs: FaqItem[] = [
 	{
 		question: "Does this send email?",
