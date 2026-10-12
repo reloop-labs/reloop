@@ -1,6 +1,9 @@
 import { Icon } from "@reloop/ui/icon";
 
-/** Centered section header matching the transactional email page. */
+/**
+ * Centered section header matching the transactional email page. The title
+ * is two lines from `sm` up; on phones it wraps naturally.
+ */
 export function SectionHeading({
 	id,
 	eyebrow,
@@ -11,7 +14,7 @@ export function SectionHeading({
 	id: string;
 	eyebrow: string;
 	icon?: string;
-	title: string;
+	title: readonly [string, string];
 	description?: string;
 }) {
 	return (
@@ -24,10 +27,11 @@ export function SectionHeading({
 				id={id}
 				className="mt-3 text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.6rem] dark:text-white"
 			>
-				{title}
+				{title[0]} <br className="hidden sm:block" />
+				{title[1]}
 			</h2>
 			{description ? (
-				<p className="mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
+				<p className="mt-3 max-w-xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
 					{description}
 				</p>
 			) : null}

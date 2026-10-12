@@ -24,8 +24,8 @@ export function PixelPerfectSection() {
 				id="pixel-perfect-heading"
 				eyebrow="Pixel-perfect"
 				icon="paint-bucket"
-				title="Pixel-perfect email templates"
-				description={`${previewTemplates.length} transactional emails from one design system, with the same type, spacing, and components in every message. Open any of them and make it yours.`}
+				title={["Pixel-perfect templates", "for every transactional email"]}
+				description={`${previewTemplates.length} transactional emails from one design system, with the same type, spacing, and components. Open any of them and make it yours.`}
 			/>
 
 			<ShowMoreGrid id="pixel-perfect-grid">

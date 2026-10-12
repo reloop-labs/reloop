@@ -46,9 +46,9 @@ export function BestFeatures() {
 			<SectionHeading
 				id="best-features-heading"
 				eyebrow="Best features"
-				icon="sparkling"
-				title="Why choose Reloop email HTML editor"
-				description="A visual canvas and the HTML source, kept in sync and free to use in your browser."
+				icon="star"
+				title={["Why choose Reloop's", "email HTML editor"]}
+				description="A visual canvas and the HTML source, kept in sync as you edit. Free to use in your browser, with nothing to install."
 			/>
 
 			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">

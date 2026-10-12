@@ -68,8 +68,8 @@ export function WhoIsItFor() {
 				id="who-is-it-for-heading"
 				eyebrow="Who is it for"
 				icon="users"
-				title="Where can I use Reloop's email HTML editor?"
-				description="Anyone who edits email HTML and wants to see the result while they work."
+				title={["Where can I use Reloop's", "email HTML editor?"]}
+				description="Anyone who edits email HTML and wants to see the result while they work, from developers to support teams."
 			/>
 
 			<div className="grid grid-cols-1 border-stroke-soft-100 border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
@@ -91,12 +91,14 @@ export function WhoIsItFor() {
 								borderClass,
 							)}
 						>
-							{/* Column header with vertical accent bar */}
-							<div className="flex items-center gap-2">
+							{/* Bar sits in a checkmark-width slot so it centers on the checks and the title lines up with the item text. */}
+							<div className="flex items-center gap-2.5">
 								<span
-									className="h-3.5 w-[2px] shrink-0 rounded-full bg-primary-base"
+									className="flex w-[17px] shrink-0 justify-center"
 									aria-hidden="true"
-								/>
+								>
+									<span className="h-3.5 w-[2px] rounded-full bg-primary-base" />
+								</span>
 								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight sm:text-[16px] dark:text-white">
 									{column.title}
 								</h3>

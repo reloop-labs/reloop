@@ -21,8 +21,8 @@ export function SimilarTools() {
 				id="similar-tools-heading"
 				eyebrow="All tools"
 				icon="grid"
-				title="Explore all free email & developer tools"
-				description="More free utilities for deliverability, DNS, and email authentication."
+				title={["Explore all free email", "& developer tools"]}
+				description="More free utilities for checking deliverability, DNS records, and email authentication before you hit send."
 			/>
 
 			{/* Every cell gets a bottom and right hairline; clipping 1px on those edges hides the outer ones so the side rails and footer border close the grid. */}
