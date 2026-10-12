@@ -19,11 +19,8 @@ export function EmailHtmlEditorHero() {
 					aria-hidden
 					className="h-10 border-stroke-soft-100 border-t sm:h-24 dark:border-white/10"
 				/>
-				<div className="flex flex-col items-center px-4 pt-0 pb-16 text-center sm:px-8 sm:pb-20 lg:px-12">
-					<Link
-						href="/tools"
-						className="mb-5 flex items-center justify-center gap-2 sm:mb-6"
-					>
+				<div className="flex flex-col items-start px-4 pt-0 pb-16 text-left sm:items-center sm:px-8 sm:pb-20 sm:text-center lg:px-12">
+					<Link href="/tools" className="mb-5 flex items-center gap-2 sm:mb-6">
 						<span
 							aria-hidden
 							className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#30363d]"
@@ -45,7 +42,7 @@ export function EmailHtmlEditorHero() {
 						{toolDescription}
 					</p>
 
-					<div className="mt-7 flex flex-wrap items-center justify-center gap-3 sm:mt-9 sm:gap-4">
+					<div className="mt-7 flex flex-wrap items-center justify-start gap-3 sm:mt-9 sm:justify-center sm:gap-4">
 						<FancyButton.Root
 							asChild
 							variant="neutral"
