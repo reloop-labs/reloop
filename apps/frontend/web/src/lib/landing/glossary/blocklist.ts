@@ -3,6 +3,7 @@ import type { GlossaryTermDefinition } from "../types";
 export const term: GlossaryTermDefinition = {
 	slug: "blocklist",
 	title: "Blocklist",
+	metaTitle: "What Is an Email Blocklist? Meaning & Definition",
 	description:
 		"A public list of IPs or domains that receivers treat as risky or refuse to accept.",
 	keywords: ["email blocklist", "blacklist", "RBL", "DNSBL"],

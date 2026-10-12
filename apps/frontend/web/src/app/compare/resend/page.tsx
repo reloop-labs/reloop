@@ -21,7 +21,7 @@ const siteUrl = getSiteUrl();
 const pageUrl = `${siteUrl}${pagePath}`;
 
 export const metadata: Metadata = {
-	title: "Reloop vs Resend: Open-Source Email API with Self-Hosting (2026)",
+	title: "Open-Source Resend Alternative: Reloop vs Resend (2026)",
 	description:
 		"Compare Reloop vs Resend in 2026: open-source Resend alternative with self-hosting, $10/50k pricing vs $20/50k, own MTA, agent inbox, and migration guide.",
 	keywords: [
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 		"KumoMTA email",
 	],
 	openGraph: {
-		title: "Reloop vs Resend: Open-Source Email API with Self-Hosting (2026)",
+		title: "Open-Source Resend Alternative: Reloop vs Resend (2026)",
 		description:
 			"Compare Reloop vs Resend in 2026: open-source Resend alternative with self-hosting, $10/50k pricing vs $20/50k, own MTA, agent inbox, and migration guide.",
 		type: "website",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Reloop vs Resend: Open-Source Email API with Self-Hosting (2026)",
+		title: "Open-Source Resend Alternative: Reloop vs Resend (2026)",
 		description:
 			"Compare Reloop vs Resend in 2026: open-source Resend alternative with self-hosting, $10/50k pricing vs $20/50k, own MTA, agent inbox, and migration guide.",
 	},

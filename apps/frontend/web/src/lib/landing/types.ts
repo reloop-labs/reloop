@@ -52,6 +52,8 @@ export type AlternativeDefinition = LandingPageDefinition & {
 export type GlossaryTermDefinition = {
 	slug: string;
 	title: string;
+	/** SERP title override; defaults to "What Is {title}? Meaning & Definition". */
+	metaTitle?: string;
 	description: string;
 	keywords: string[];
 	body: string;

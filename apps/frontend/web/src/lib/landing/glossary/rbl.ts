@@ -3,10 +3,11 @@ import type { GlossaryTermDefinition } from "../types";
 export const term: GlossaryTermDefinition = {
 	slug: "rbl",
 	title: "RBL",
+	metaTitle: "What Is an RBL? Realtime Blocklists Explained",
 	description:
 		"A DNS-based blocklist queried in realtime while mail is handled (Realtime Blackhole List).",
 	keywords: ["RBL", "DNSBL", "realtime blackhole list"],
-	body: `RBL is an older term for DNS-based blocklists that mail systems query in realtime. You look up a reversed IP (or sometimes a domain) in a special DNS zone; a positive answer means “listed.”
+	body: `An RBL (Realtime Blackhole List) is a DNS-based list of IP addresses and domains known for sending spam. Mail servers check it in realtime and reject or score mail from listed senders. RBL is the older name for what is now usually called a DNSBL. You look up a reversed IP (or sometimes a domain) in a special DNS zone; a positive answer means “listed.”
 
 Operators use RBLs with different policies: some reject, some only score. Being listed is a symptom. Fix the cause (spam, open relay, compromised host), then request delisting per the list's process.
 

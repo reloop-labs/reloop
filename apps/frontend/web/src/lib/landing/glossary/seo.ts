@@ -24,10 +24,10 @@ function clampDescription(text: string, keywordHint?: string): string {
 
 /**
  * Title segment for Next's root template (`%s | Reloop`).
- * Primary keyword first: "{Term} | Email Glossary" → SERP "… | Reloop".
+ * Phrased as the question searchers type ("what is X", "X meaning").
  */
 export function glossaryTermTitle(term: GlossaryTermDefinition): string {
-	return `${term.title} | Email Glossary`;
+	return term.metaTitle ?? `What Is ${term.title}? Meaning & Definition`;
 }
 
 /** Full title string for Open Graph / JSON-LD (includes brand). */

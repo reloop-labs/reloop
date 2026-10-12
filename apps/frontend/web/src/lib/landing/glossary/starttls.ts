@@ -3,6 +3,7 @@ import type { GlossaryTermDefinition } from "../types";
 export const term: GlossaryTermDefinition = {
 	slug: "starttls",
 	title: "STARTTLS",
+	metaTitle: "What Is STARTTLS? SMTP Encryption Explained",
 	description:
 		"A way to upgrade an SMTP connection from plain text to TLS encryption.",
 	keywords: ["STARTTLS", "SMTP TLS", "opportunistic TLS email"],

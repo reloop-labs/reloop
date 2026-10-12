@@ -3,6 +3,7 @@ import type { GlossaryTermDefinition } from "../types";
 export const term: GlossaryTermDefinition = {
 	slug: "hard-bounce",
 	title: "Hard Bounce",
+	metaTitle: "What Is a Hard Bounce? Meaning & Definition",
 	description:
 		"A permanent delivery failure: the address or domain cannot receive the message.",
 	keywords: ["hard bounce", "permanent bounce", "user unknown"],

@@ -2,9 +2,9 @@ import type { FaqItem } from "@reloop/web/components/faq-section";
 
 export const toolPath = "/tools/domain-reputation-checker";
 export const toolTitle = "Domain Reputation Checker";
-export const metaTitle = "Domain Reputation Checker & Sender Health Score";
+export const metaTitle = "Free Domain Reputation Checker & Sender Score";
 export const metaDescription =
-	"Free overall domain reputation audit. Check sender authentication (SPF, DKIM, DMARC), real-time DNS blocklists, domain maturity, and DNS health with an instant 0–100 score and letter grade.";
+	"Free domain reputation check, no signup. Check sender authentication (SPF, DKIM, DMARC), real-time DNS blocklists, domain maturity, and DNS health with an instant 0–100 score and letter grade.";
 export const toolDescription =
 	"Check your overall sending domain reputation across authentication, blocklists, domain age, and DNS infrastructure. Get an instant score from 0 to 100 with an A+ to F grade and actionable fixes.";
 

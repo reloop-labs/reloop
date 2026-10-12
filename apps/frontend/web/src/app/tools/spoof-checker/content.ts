@@ -1,5 +1,6 @@
 export const toolPath = "/tools/spoof-checker";
 export const toolTitle = "Can Anyone Spoof My Domain? Email Spoofing Checker";
+export const metaTitle = "Free Email Spoofing Test: Can My Domain Be Spoofed?";
 export const toolDescription =
 	"Find out in plain English if someone can send emails pretending to be you. Check whether Gmail, Yahoo, and Outlook will deliver unauthorized fake emails using your domain.";
 export const metaDescription =

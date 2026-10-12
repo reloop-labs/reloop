@@ -32,6 +32,8 @@ export const metadata: Metadata = {
 	},
 	description:
 		"Manage your email infrastructure, sending domains, API keys, and transactional emails with the Reloop Developer Dashboard.",
+	// App pages are private; public entry points (login, signup) opt back in.
+	robots: { index: false, follow: false },
 	manifest: "/dashboard/manifest.json",
 	icons: {
 		icon: [

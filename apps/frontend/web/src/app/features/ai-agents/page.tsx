@@ -17,7 +17,7 @@ const pagePath = "/features/ai-agents";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {
-	title: "Email API for AI Agents: Inbox, MCP and Inbound Email",
+	title: "Email API for AI Agents: Agent Inbox API + MCP Server",
 	description:
 		"Give AI agents an email address, an inbound webhook, an MCP server and a send API. Open-source email infrastructure for agents, hosted or self-hosted.",
 	keywords: [

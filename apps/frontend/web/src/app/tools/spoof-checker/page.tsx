@@ -10,6 +10,7 @@ import {
 	faqGroups,
 	faqs,
 	metaDescription,
+	metaTitle,
 	reasons,
 	toolDescription,
 	toolKeywords,
@@ -21,7 +22,7 @@ import { FaqGrid } from "./faq-grid";
 export const instant = false;
 
 export const metadata = createPageMetadata({
-	title: toolTitle,
+	title: metaTitle,
 	description: metaDescription,
 	path: toolPath,
 	keywords: toolKeywords,
