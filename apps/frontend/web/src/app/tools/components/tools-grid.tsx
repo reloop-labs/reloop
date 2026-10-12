@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import {
 	Activity,
 	AlertTriangle,
-	ArrowRight,
+	ArrowUpRight,
 	BadgeCheck,
 	Ban,
 	Calendar,
@@ -18,30 +18,18 @@ import {
 	Terminal,
 } from "lucide-react";
 import Link from "next/link";
-import type { ComponentType } from "react";
-import { ApiBlueprintArt } from "./art/api-art";
-import { AuthBlueprintArt } from "./art/auth-art";
-import { BimiBlueprintArt } from "./art/bimi-art";
-import { BlocklistBlueprintArt } from "./art/blocklist-art";
-import { DeliverabilityBlueprintArt } from "./art/deliverability-art";
-import { DnsBlueprintArt } from "./art/dns-art";
-import { DomainAgeBlueprintArt } from "./art/domain-age-art";
-import { HtmlEditorBlueprintArt } from "./art/html-editor-art";
-import { LookalikeBlueprintArt } from "./art/lookalike-art";
-import { ReputationBlueprintArt } from "./art/reputation-art";
-import { SpamWordsBlueprintArt } from "./art/spam-words-art";
-import { SpoofBlueprintArt } from "./art/spoof-art";
-import { SuggestBlueprintArt } from "./art/suggest-art";
+import { type ComponentType, Fragment } from "react";
 import { TempTimerIcon } from "./art/temp-timer-icon";
-import { TempEmailTimerArt } from "./art/timer-art";
-import { ValidatorBlueprintArt } from "./art/validator-art";
-import { WhoSendsBlueprintArt } from "./art/who-sends-art";
+
+export type ToolCategory = "deliverability" | "auth" | "domain" | "content";
 
 export type ToolItem = {
 	title: string;
 	description: string;
 	icon: ComponentType<{ className?: string }>;
 	path: string;
+	/** Group on the /tools index; unset for links that aren't tools (API docs, suggestions). */
+	category?: ToolCategory;
 	/** Render the full blueprint art panel instead of the icon box. */
 	art?:
 		| "timer"
@@ -69,6 +57,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Verify syntax, disposable domains, and active MX records to keep your email list clean.",
 		icon: MailCheck,
 		path: "/tools/email-validator",
+		category: "deliverability",
 		art: "validator",
 	},
 	{
@@ -77,6 +66,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Send a test email to analyze inbox placement, spam score, and SPF/DKIM alignment.",
 		icon: Send,
 		path: "/tools/deliverability-tester",
+		category: "deliverability",
 		art: "deliverability",
 	},
 	{
@@ -85,6 +75,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Test whether unauthorized senders can forge your domain to deliver phishing emails.",
 		icon: ShieldAlert,
 		path: "/tools/spoof-checker",
+		category: "auth",
 		art: "spoof",
 	},
 	{
@@ -93,6 +84,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Check your sending IP address and domain against 50+ public DNS blocklists in real time.",
 		icon: Ban,
 		path: "/tools/blocklist-checker",
+		category: "deliverability",
 		art: "blocklist",
 	},
 	{
@@ -101,6 +93,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Inspect MX, SPF, DKIM, DMARC, and A records with syntax validation and live diagnostics.",
 		icon: Globe,
 		path: "/tools/dns-lookup",
+		category: "auth",
 		art: "dns",
 	},
 	{
@@ -109,6 +102,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Check domain registration age and warmup safety to avoid cold-sending spam filters.",
 		icon: Calendar,
 		path: "/tools/domain-age",
+		category: "domain",
 		art: "domain-age",
 	},
 	{
@@ -117,6 +111,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Identify all third-party email service providers authorized to send from your domain.",
 		icon: Search,
 		path: "/tools/who-sends",
+		category: "domain",
 		art: "who-sends",
 	},
 	{
@@ -125,6 +120,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Validate email authentication records to guarantee proper sender alignment and security.",
 		icon: ShieldCheck,
 		path: "/tools/auth-checker",
+		category: "auth",
 		art: "auth",
 	},
 	{
@@ -133,6 +129,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Detect throwaway inboxes and burner addresses before they bounce or skew signup metrics.",
 		icon: TempTimerIcon,
 		path: "/tools/temp-email-checker",
+		category: "deliverability",
 		art: "timer",
 	},
 	{
@@ -141,6 +138,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Evaluate your domain health score, spam placement risk, and mail configuration flaws.",
 		icon: Activity,
 		path: "/tools/domain-reputation-checker",
+		category: "domain",
 		art: "reputation",
 	},
 	{
@@ -149,6 +147,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Detect registered typosquats and lookalike domains impersonating your brand online.",
 		icon: Eye,
 		path: "/tools/lookalike-watch",
+		category: "domain",
 		art: "lookalike",
 	},
 	{
@@ -157,6 +156,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Scan subject lines and body copy for spam trigger words that hurt inbox deliverability.",
 		icon: AlertTriangle,
 		path: "/tools/email-spam-words-checker",
+		category: "content",
 		art: "spam-words",
 	},
 	{
@@ -165,6 +165,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Verify your BIMI DNS record and SVG logo to display verified brand avatars in inboxes.",
 		icon: BadgeCheck,
 		path: "/tools/bimi-checker",
+		category: "auth",
 		art: "bimi",
 	},
 	{
@@ -173,6 +174,7 @@ export const ALL_TOOLS: ToolItem[] = [
 			"Design, edit, and preview responsive HTML email templates across mobile and desktop.",
 		icon: Code2,
 		path: "/tools/email-html-editor",
+		category: "content",
 		art: "html-editor",
 	},
 	{
@@ -212,24 +214,70 @@ export function getBorderClass(index: number, total: number) {
 	);
 }
 
-const TOOL_ART = {
-	timer: TempEmailTimerArt,
-	validator: ValidatorBlueprintArt,
-	deliverability: DeliverabilityBlueprintArt,
-	spoof: SpoofBlueprintArt,
-	blocklist: BlocklistBlueprintArt,
-	dns: DnsBlueprintArt,
-	"domain-age": DomainAgeBlueprintArt,
-	"who-sends": WhoSendsBlueprintArt,
-	auth: AuthBlueprintArt,
-	reputation: ReputationBlueprintArt,
-	lookalike: LookalikeBlueprintArt,
-	"spam-words": SpamWordsBlueprintArt,
-	bimi: BimiBlueprintArt,
-	"html-editor": HtmlEditorBlueprintArt,
-	api: ApiBlueprintArt,
-	suggest: SuggestBlueprintArt,
-} as const;
+export const CATEGORIES: {
+	id: ToolCategory;
+	title: string;
+	description: string;
+}[] = [
+	{
+		id: "deliverability",
+		title: "Deliverability",
+		description:
+			"Check that your list is clean and your mail lands in the inbox.",
+	},
+	{
+		id: "auth",
+		title: "Authentication & DNS",
+		description: "Verify the records that prove your mail is really from you.",
+	},
+	{
+		id: "domain",
+		title: "Domain intelligence",
+		description:
+			"See how a domain looks to inbox providers, and who sends for it.",
+	},
+	{
+		id: "content",
+		title: "Content & templates",
+		description: "Write and design emails that read well and stay out of spam.",
+	},
+];
+
+function ToolCard({ tool }: { tool: ToolItem }) {
+	const IconComponent = tool.icon;
+
+	return (
+		<li className="border-stroke-soft-100 border-r border-b dark:border-white/10">
+			<Link
+				href={tool.path}
+				className={cn(
+					"group flex h-full items-start gap-3.5 px-4 py-6 sm:px-6 lg:px-7",
+					"transition-colors duration-200 ease-out hover:bg-bg-weak-50 dark:hover:bg-white/[0.03]",
+					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-sub-300 focus-visible:ring-inset",
+					"motion-reduce:transition-none",
+				)}
+			>
+				<span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:group-hover:text-white">
+					<IconComponent className="size-[18px] stroke-[1.75]" />
+				</span>
+				<div className="min-w-0 flex-1">
+					<div className="flex items-start justify-between gap-2">
+						<h3 className="font-medium text-[14.5px] text-text-strong-950 leading-snug tracking-tight dark:text-white">
+							{tool.title}
+						</h3>
+						<ArrowUpRight
+							aria-hidden
+							className="-translate-x-1 mt-0.5 size-4 shrink-0 text-text-sub-600 opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 motion-reduce:transition-none dark:text-white/60"
+						/>
+					</div>
+					<p className="mt-1 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/55">
+						{tool.description}
+					</p>
+				</div>
+			</Link>
+		</li>
+	);
+}
 
 export function ToolsGrid() {
 	return (
@@ -238,51 +286,56 @@ export function ToolsGrid() {
 			aria-label="All Free Developer Tools"
 			className="w-full"
 		>
-			<div className="grid grid-cols-1 border-stroke-soft-100 border-t border-b sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
-				{ALL_TOOLS.map((tool, index) => {
-					const IconComponent = tool.icon;
-					const borderClass = getBorderClass(index, ALL_TOOLS.length);
+			{CATEGORIES.map((category) => {
+				const tools = ALL_TOOLS.filter((tool) => tool.category === category.id);
+				if (tools.length === 0) return null;
+				const headingId = `tools-${category.id}`;
 
-					return (
-						<Link
-							key={tool.title}
-							href={tool.path}
-							className={cn(
-								"group flex flex-col justify-between border-stroke-soft-100 px-4 py-6 transition-colors hover:bg-bg-weak-50 sm:px-6 sm:py-7 lg:px-7 lg:py-8 dark:border-white/10 dark:hover:bg-white/[0.04]",
-								borderClass,
-							)}
+				return (
+					<Fragment key={category.id}>
+						{/* separator band, same as between sections on the tool pages */}
+						<div
+							aria-hidden
+							className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+						/>
+						<section
+							aria-labelledby={headingId}
+							className="border-stroke-soft-100 border-b dark:border-white/10"
 						>
-							<div>
-								{tool.art ? (
-									<div className="flex h-32 items-center justify-center overflow-hidden rounded-xl bg-[#246BF5] text-white dark:border dark:border-white/10 dark:bg-[#000]">
-										{(() => {
-											const Art = TOOL_ART[tool.art];
-											return <Art className="h-full" />;
-										})()}
-									</div>
-								) : (
-									<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 text-neutral-800 dark:bg-white/[0.05] dark:text-white">
-										<IconComponent className="h-5 w-5 stroke-[1.75]" />
-									</div>
-								)}
-
-								<h3 className="mt-5 font-semibold text-[15px] text-text-strong-950 leading-snug tracking-tight transition-colors group-hover:text-primary-base sm:text-[15.5px] dark:text-white dark:group-hover:text-white">
-									{tool.title}
-								</h3>
-
-								<p className="mt-2.5 line-clamp-2 text-[13px] text-stone-500 leading-relaxed dark:text-white/60">
-									{tool.description}
-								</p>
+							<div className="flex items-end justify-between gap-6 border-stroke-soft-100 border-b px-4 py-6 sm:px-8 lg:px-12 dark:border-white/10">
+								<div className="flex flex-col gap-1">
+									<h2
+										id={headingId}
+										className="font-medium text-[18px] text-text-strong-950 tracking-tight sm:text-[20px] dark:text-white"
+									>
+										{category.title}
+									</h2>
+									<p className="text-[13.5px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/60">
+										{category.description}
+									</p>
+								</div>
+								<span className="hidden shrink-0 text-[13px] text-text-sub-600 tabular-nums sm:block dark:text-white/50">
+									{tools.length} {tools.length === 1 ? "tool" : "tools"}
+								</span>
 							</div>
 
-							<div className="mt-5 flex items-center gap-1.5 font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/55 dark:group-hover:text-white">
-								<span>Try now</span>
-								<ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
+							{/* Cells draw right and bottom hairlines; clipping 1px hides the outer ones. */}
+							<div className="overflow-hidden">
+								<ul className="-mr-px -mb-px grid grid-cols-1 sm:grid-cols-2">
+									{tools.map((tool) => (
+										<ToolCard key={tool.path} tool={tool} />
+									))}
+								</ul>
 							</div>
-						</Link>
-					);
-				})}
-			</div>
+						</section>
+					</Fragment>
+				);
+			})}
+
+			<div
+				aria-hidden
+				className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+			/>
 		</section>
 	);
 }
