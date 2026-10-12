@@ -16250,8 +16250,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/api-key` |
 | **Port** | `8012` |
-| **Local URL** | [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) |
-| **Swagger UI** | [https://local.reloop.sh/api/api-key/openapi](https://local.reloop.sh/api/api-key/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/api-key` |
+| **Swagger UI** | `https://local.reloop.sh/api/api-key/openapi` |
 | **Stack** | ElysiaJS · Better Auth API Key · PostgreSQL · Redis · NATS |
 
 ## Quick start
@@ -16337,8 +16337,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root (Postgres + Redis via
 | :--- | :--- |
 | **Directory** | `apps/backend/auth` |
 | **Port** | `8000` |
-| **Local URL** | [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) |
-| **Swagger UI** | [https://local.reloop.sh/api/auth/openapi](https://local.reloop.sh/api/auth/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/auth` |
+| **Swagger UI** | `https://local.reloop.sh/api/auth/openapi` |
 | **Stack** | ElysiaJS · Better Auth · PostgreSQL · Redis · NATS |
 
 ## Quick start
@@ -16350,7 +16350,7 @@ bun be:auth:dev
 Or start every backend: `bun backend:dev` / `bun dev`.
 
 <Warning>
-Open the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`. Session cookies are scoped to `local.reloop.sh`. Local OTP is `888888`.
+Open the dashboard at `https://local.reloop.sh/dashboard`, not `localhost:3001`. Session cookies are scoped to `local.reloop.sh`. Local OTP is `888888`.
 </Warning>
 
 ## Environment
@@ -16518,8 +16518,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/campaigns` |
 | **Port** | `8027` |
-| **Local URL** | [https://local.reloop.sh/api/campaigns](https://local.reloop.sh/api/campaigns) |
-| **Swagger UI** | [https://local.reloop.sh/api/campaigns/openapi](https://local.reloop.sh/api/campaigns/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/campaigns` |
+| **Swagger UI** | `https://local.reloop.sh/api/campaigns/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
 ## Quick start
@@ -16562,8 +16562,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/contacts` |
 | **Port** | `8014` |
-| **Local URL** | [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) |
-| **Swagger UI** | [https://local.reloop.sh/api/contacts/openapi](https://local.reloop.sh/api/contacts/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/contacts` |
+| **Swagger UI** | `https://local.reloop.sh/api/contacts/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
 ## Quick start
@@ -16653,8 +16653,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/credits` |
 | **Port** | `8023` |
-| **Local URL** | [https://local.reloop.sh/api/credits](https://local.reloop.sh/api/credits) |
-| **Swagger UI** | [https://local.reloop.sh/api/credits/openapi](https://local.reloop.sh/api/credits/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/credits` |
+| **Swagger UI** | `https://local.reloop.sh/api/credits/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · NATS |
 
 ## Quick start
@@ -16736,8 +16736,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/domain` |
 | **Port** | `8011` |
-| **Local URL** | [https://local.reloop.sh/api/domain](https://local.reloop.sh/api/domain) |
-| **Swagger UI** | [https://local.reloop.sh/api/domain/openapi](https://local.reloop.sh/api/domain/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/domain` |
+| **Swagger UI** | `https://local.reloop.sh/api/domain/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
 ## Quick start
@@ -16831,8 +16831,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/email` |
 | **Port** | `8022` |
-| **Local URL** | [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) |
-| **Swagger UI** | [https://local.reloop.sh/api/email/openapi](https://local.reloop.sh/api/email/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/email` |
+| **Swagger UI** | `https://local.reloop.sh/api/email/openapi` |
 | **Stack** | ElysiaJS · Redis · NATS |
 
 ## Quick start
@@ -17039,7 +17039,7 @@ Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. Inboun
 bun docker:up
 ```
 
-Health check: [http://localhost:8030/health](http://localhost:8030/health).
+Health check: `http://localhost:8030/health`.
 
 ## Configuration
 
@@ -17117,8 +17117,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker i
 | :--- | :--- |
 | **Directory** | `apps/backend/inbox` |
 | **Port** | `8028` |
-| **Local URL** | [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) |
-| **Swagger UI** | [https://local.reloop.sh/api/inbox/openapi](https://local.reloop.sh/api/inbox/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/inbox` |
+| **Swagger UI** | `https://local.reloop.sh/api/inbox/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
 ## Quick start
@@ -17202,8 +17202,8 @@ Run [`bun setup`](/docs/setup) once so Postgres is up (`bun docker:up`). Env fil
 | :--- | :--- |
 | **Directory** | `apps/backend/logs` |
 | **Port** | `8016` |
-| **Local URL** | [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs) |
-| **Swagger UI** | [https://local.reloop.sh/api/logs/openapi](https://local.reloop.sh/api/logs/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/logs` |
+| **Swagger UI** | `https://local.reloop.sh/api/logs/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
 ## Quick start
@@ -17279,7 +17279,7 @@ Markdown: https://reloop.sh/docs/setup/backend/mail.md
 Outbound transactional email API: send requests, template compilation, tracking, and SMTP handoff.
 
 <Tip>
-Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker including [SMTP](/docs/setup/backend/smtp). Mailpit captures local outbound mail at [http://localhost:8025](http://localhost:8025).
+Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker including [SMTP](/docs/setup/backend/smtp). Mailpit captures local outbound mail at `http://localhost:8025`.
 </Tip>
 
 ## Overview
@@ -17288,8 +17288,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. That starts Docker i
 | :--- | :--- |
 | **Directory** | `apps/backend/mail` |
 | **Port** | `8015` |
-| **Local URL** | [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail) |
-| **Swagger UI** | [https://local.reloop.sh/api/mail/openapi](https://local.reloop.sh/api/mail/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/mail` |
+| **Swagger UI** | `https://local.reloop.sh/api/mail/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
 ## Quick start
@@ -17388,7 +17388,7 @@ Run [`bun setup`](/docs/setup) or `bun docker:up` from the monorepo root. SMTP n
 bun docker:up
 ```
 
-View captured mail at [http://localhost:8025](http://localhost:8025) (Mailpit).
+View captured mail at `http://localhost:8025` (Mailpit).
 
 ## Configuration
 
@@ -17438,7 +17438,7 @@ correct for Reloop Cloud and wrong for every self-hosted install, so set it.
 | :--- | :--- |
 | **Submission** | Accepts outbound mail on ports `465` / `587` / `2025` / `2465` / `2587` |
 | **Policies** | Lua scripts in `apps/backend/smtp/policy/` handle routing and DKIM |
-| **Local delivery** | Captured by Mailpit at [http://localhost:8025](http://localhost:8025) |
+| **Local delivery** | Captured by Mailpit at `http://localhost:8025` |
 | **Inbound** | Port `25` MX is handled by [inbound](/docs/setup/backend/inbound), not this service |
 
 ## Next
@@ -17493,7 +17493,7 @@ Or rebuild after config changes:
 docker compose -f local/docker-compose.yml up -d --build reloop-spam
 ```
 
-Controller / scan endpoint: [http://localhost:11333](http://localhost:11333).
+Controller / scan endpoint: `http://localhost:11333`.
 
 ## Configuration
 
@@ -17570,8 +17570,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/template` |
 | **Port** | `8019` |
-| **Local URL** | [https://local.reloop.sh/api/template](https://local.reloop.sh/api/template) |
-| **Swagger UI** | [https://local.reloop.sh/api/template/openapi](https://local.reloop.sh/api/template/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/template` |
+| **Swagger UI** | `https://local.reloop.sh/api/template/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
 ## Quick start
@@ -17647,7 +17647,7 @@ Markdown: https://reloop.sh/docs/setup/backend/upload.md
 File uploads: logos, attachments, and assets stored in MinIO/S3.
 
 <Tip>
-Run [`bun setup`](/docs/setup) once so MinIO is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`. Console: [http://localhost:9001](http://localhost:9001) (`reloop` / `reloop123`).
+Run [`bun setup`](/docs/setup) once so MinIO is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`. Console: `http://localhost:9001` (`reloop` / `reloop123`).
 </Tip>
 
 ## Overview
@@ -17656,8 +17656,8 @@ Run [`bun setup`](/docs/setup) once so MinIO is up (`bun docker:up`). Env files 
 | :--- | :--- |
 | **Directory** | `apps/backend/upload` |
 | **Port** | `8018` |
-| **Local URL** | [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) |
-| **Swagger UI** | [https://local.reloop.sh/api/upload/openapi](https://local.reloop.sh/api/upload/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/upload` |
+| **Swagger UI** | `https://local.reloop.sh/api/upload/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · MinIO/S3 · NATS |
 
 ## Quick start
@@ -17749,8 +17749,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/webhook` |
 | **Port** | `8013` |
-| **Local URL** | [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook) |
-| **Swagger UI** | [https://local.reloop.sh/api/webhook/openapi](https://local.reloop.sh/api/webhook/openapi) |
+| **Local URL** | `https://local.reloop.sh/api/webhook` |
+| **Swagger UI** | `https://local.reloop.sh/api/webhook/openapi` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
 ## Quick start
@@ -17842,9 +17842,9 @@ Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from 
 | :--- | :--- |
 | **Directory** | `apps/backend/workflow` |
 | **Port** | `8017` |
-| **Local URL** | [https://local.reloop.sh/api/workflow](https://local.reloop.sh/api/workflow) |
-| **Swagger UI** | [https://local.reloop.sh/api/workflow/openapi](https://local.reloop.sh/api/workflow/openapi) |
-| **Workbench** | [https://local.reloop.sh/api/workflow/jobs](https://local.reloop.sh/api/workflow/jobs) |
+| **Local URL** | `https://local.reloop.sh/api/workflow` |
+| **Swagger UI** | `https://local.reloop.sh/api/workflow/openapi` |
+| **Workbench** | `https://local.reloop.sh/api/workflow/jobs` |
 | **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
 ## Quick start
@@ -17943,8 +17943,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root before starting indiv
 | :--- | :--- |
 | **Directory** | `apps/frontend/dashboard` |
 | **Port** | `3001` |
-| **Local URL** | [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) |
-| **Direct URL** | [http://localhost:3001/dashboard](http://localhost:3001/dashboard) |
+| **Local URL** | `https://local.reloop.sh/dashboard` |
+| **Direct URL** | `http://localhost:3001/dashboard` |
 | **Stack** | TanStack Start · Vite · React 19 · Tailwind CSS |
 
 ## Quick start
@@ -17964,7 +17964,7 @@ bun frontend:dev
 Vite HMR serves the app on port `3001` with base path `/dashboard`.
 
 <Warning>
-Open [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`, so session cookies work with [auth](/docs/setup/backend/auth). Local OTP is `888888`.
+Open `https://local.reloop.sh/dashboard`, not `localhost:3001`, so session cookies work with [auth](/docs/setup/backend/auth). Local OTP is `888888`.
 </Warning>
 
 ## Environment
@@ -18037,8 +18037,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root before starting indiv
 | :--- | :--- |
 | **Directory** | `apps/frontend/docs` |
 | **Port** | `3003` |
-| **Local URL** | [https://local.reloop.sh/docs](https://local.reloop.sh/docs) |
-| **Direct URL** | [http://localhost:3003](http://localhost:3003) |
+| **Local URL** | `https://local.reloop.sh/docs` |
+| **Direct URL** | `http://localhost:3003` |
 | **Stack** | Next.js · MDX · Tailwind CSS |
 
 ## Quick start
@@ -18055,7 +18055,7 @@ Or start every frontend together:
 bun frontend:dev
 ```
 
-Turbopack serves the app on port `3003`. Prefer [https://local.reloop.sh/docs](https://local.reloop.sh/docs) when Caddy is running.
+Turbopack serves the app on port `3003`. Prefer `https://local.reloop.sh/docs` when Caddy is running.
 
 ## Environment
 
@@ -18122,9 +18122,9 @@ Run [`bun setup`](/docs/setup) once from the monorepo root before starting indiv
 | :--- | :--- |
 | **Directory** | `apps/frontend/links` |
 | **Port** | `3005` |
-| **Preferences** | [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) |
-| **Redirect** | [https://local.reloop.sh/redirect](https://local.reloop.sh/redirect) |
-| **Open tracking** | [https://local.reloop.sh/api/mail/v1/track/open](https://local.reloop.sh/api/mail/v1/track/open) |
+| **Preferences** | `https://local.reloop.sh/preferences` |
+| **Redirect** | `https://local.reloop.sh/redirect` |
+| **Open tracking** | `https://local.reloop.sh/api/mail/v1/track/open` |
 | **Stack** | Next.js · React 19 · Tailwind CSS |
 
 ## Quick start
@@ -18235,8 +18235,8 @@ Run [`bun setup`](/docs/setup) once from the monorepo root before starting indiv
 | :--- | :--- |
 | **Directory** | `apps/frontend/web` |
 | **Port** | `3000` |
-| **Local URL** | [https://local.reloop.sh](https://local.reloop.sh) |
-| **Direct URL** | [http://localhost:3000](http://localhost:3000) |
+| **Local URL** | `https://local.reloop.sh` |
+| **Direct URL** | `http://localhost:3000` |
 | **Stack** | Next.js · React 19 · Tailwind CSS |
 
 ## Quick start
@@ -18253,7 +18253,7 @@ Or start every frontend together:
 bun frontend:dev
 ```
 
-Turbopack serves the app on port `3000`. Prefer [https://local.reloop.sh](https://local.reloop.sh) when Caddy is running.
+Turbopack serves the app on port `3000`. Prefer `https://local.reloop.sh` when Caddy is running.
 
 <Warning>
 Use `https://local.reloop.sh`, not `localhost:3000`, when testing flows that share cookies or link into the dashboard.
@@ -18301,7 +18301,7 @@ REDIRECT_SECRET=reloop_tracking_secret_default_123
 Source: https://reloop.sh/docs/setup
 Markdown: https://reloop.sh/docs/setup.md
 
-One command from the monorepo root. Full stack at [https://local.reloop.sh](https://local.reloop.sh).
+One command from the monorepo root. Full stack at `https://local.reloop.sh`.
 
 ## Prerequisites
 
@@ -18337,17 +18337,17 @@ bun dev
 ## After setup
 
 <CardGroup cols={2}>
-  <Card icon="browser" title="App" href="https://local.reloop.sh">
-    Marketing site and entry point
+  <Card icon="browser" title="App">
+    Marketing site and entry point at `https://local.reloop.sh`
   </Card>
-  <Card icon="layout" title="Dashboard" href="https://local.reloop.sh/dashboard">
-    Product UI. Use this URL, not `localhost:3001`
+  <Card icon="layout" title="Dashboard">
+    Product UI at `https://local.reloop.sh/dashboard`, not `localhost:3001`
   </Card>
-  <Card icon="book-open" title="Docs" href="https://local.reloop.sh/docs">
-    This documentation, served locally
+  <Card icon="book-open" title="Docs">
+    This documentation, served locally at `https://local.reloop.sh/docs`
   </Card>
-  <Card icon="mail-single" title="Mailpit" href="http://localhost:8025">
-    Captured outbound email for local testing
+  <Card icon="mail-single" title="Mailpit">
+    Captured outbound email at `http://localhost:8025`
   </Card>
 </CardGroup>
 
@@ -18517,7 +18517,7 @@ Markdown: https://reloop.sh/docs/setup/overview.md
 
 Reloop is a Bun monorepo with Next.js frontends, ElysiaJS microservices, shared packages, and Docker infrastructure.
 
-Local URL: [https://local.reloop.sh](https://local.reloop.sh). Bootstrap with [`bun setup`](/docs/setup).
+Local URL: `https://local.reloop.sh`. Bootstrap with [`bun setup`](/docs/setup).
 
 ## Structure
 
@@ -18634,8 +18634,8 @@ Started by `bun docker:up` (Postgres, Redis, Caddy, Mailpit, MinIO, NATS, spam, 
   <Card icon="globe" title="Caddy" href="https://caddyserver.com/">
     TLS proxy for `local.reloop.sh`
   </Card>
-  <Card icon="mail-single" title="Mailpit" href="http://localhost:8025">
-    Captured mail UI (`8025`)
+  <Card icon="mail-single" title="Mailpit">
+    Captured mail UI at `http://localhost:8025`
   </Card>
 </CardGroup>
 
@@ -18688,7 +18688,7 @@ Started by `bun docker:up` (Postgres, Redis, Caddy, Mailpit, MinIO, NATS, spam, 
 Source: https://reloop.sh/docs/setup/port
 Markdown: https://reloop.sh/docs/setup/port.md
 
-Use [https://local.reloop.sh](https://local.reloop.sh) for day-to-day work. Caddy routes traffic and keeps auth cookies scoped correctly.
+Use `https://local.reloop.sh` for day-to-day work. Caddy routes traffic and keeps auth cookies scoped correctly.
 
 ## Free these ports first
 
@@ -18710,63 +18710,63 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 
 | Route | Service | Port |
 | :--- | :--- | :--- |
-| [https://local.reloop.sh/](https://local.reloop.sh/) | [Web](/docs/setup/frontend/web) | `3000` |
-| [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) | [Dashboard](/docs/setup/frontend/dashboard) | `3001` |
-| [https://local.reloop.sh/console](https://local.reloop.sh/console) | Console | `3002` |
-| [https://local.reloop.sh/docs](https://local.reloop.sh/docs) | [Docs](/docs/setup/frontend/docs) | `3003` |
-| [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) | [Links](/docs/setup/frontend/links) | `3005` |
-| [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) | [Auth](/docs/setup/backend/auth) | `8000` |
-| [https://local.reloop.sh/api/domain](https://local.reloop.sh/api/domain) | [Domain](/docs/setup/backend/domain) | `8011` |
-| [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) | [API Key](/docs/setup/backend/api-key) | `8012` |
-| [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook) | [Webhook](/docs/setup/backend/webhook) | `8013` |
-| [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) | [Contacts](/docs/setup/backend/contacts) | `8014` |
-| [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail) | [Mail](/docs/setup/backend/mail) | `8015` |
-| [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs) | [Logs](/docs/setup/backend/logs) | `8016` |
-| [https://local.reloop.sh/api/workflow](https://local.reloop.sh/api/workflow) | [Workflow](/docs/setup/backend/workflow) | `8017` |
-| [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) | [Upload](/docs/setup/backend/upload) | `8018` |
-| [https://local.reloop.sh/api/template](https://local.reloop.sh/api/template) | [Template](/docs/setup/backend/template) | `8019` |
-| [https://local.reloop.sh/api/campaigns](https://local.reloop.sh/api/campaigns) | [Campaigns](/docs/setup/backend/campaigns) | `8027` |
-| [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) | [Inbox](/docs/setup/backend/inbox) | `8028` |
-| [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) | [Email](/docs/setup/backend/email) | `8022` |
-| [https://local.reloop.sh/api/credits](https://local.reloop.sh/api/credits) | [Credits](/docs/setup/backend/credits) | `8023` |
-| [https://local.reloop.sh/api/admin](https://local.reloop.sh/api/admin) | Admin | `8024` |
+| `https://local.reloop.sh/` | [Web](/docs/setup/frontend/web) | `3000` |
+| `https://local.reloop.sh/dashboard` | [Dashboard](/docs/setup/frontend/dashboard) | `3001` |
+| `https://local.reloop.sh/console` | Console | `3002` |
+| `https://local.reloop.sh/docs` | [Docs](/docs/setup/frontend/docs) | `3003` |
+| `https://local.reloop.sh/preferences` | [Links](/docs/setup/frontend/links) | `3005` |
+| `https://local.reloop.sh/api/auth` | [Auth](/docs/setup/backend/auth) | `8000` |
+| `https://local.reloop.sh/api/domain` | [Domain](/docs/setup/backend/domain) | `8011` |
+| `https://local.reloop.sh/api/api-key` | [API Key](/docs/setup/backend/api-key) | `8012` |
+| `https://local.reloop.sh/api/webhook` | [Webhook](/docs/setup/backend/webhook) | `8013` |
+| `https://local.reloop.sh/api/contacts` | [Contacts](/docs/setup/backend/contacts) | `8014` |
+| `https://local.reloop.sh/api/mail` | [Mail](/docs/setup/backend/mail) | `8015` |
+| `https://local.reloop.sh/api/logs` | [Logs](/docs/setup/backend/logs) | `8016` |
+| `https://local.reloop.sh/api/workflow` | [Workflow](/docs/setup/backend/workflow) | `8017` |
+| `https://local.reloop.sh/api/upload` | [Upload](/docs/setup/backend/upload) | `8018` |
+| `https://local.reloop.sh/api/template` | [Template](/docs/setup/backend/template) | `8019` |
+| `https://local.reloop.sh/api/campaigns` | [Campaigns](/docs/setup/backend/campaigns) | `8027` |
+| `https://local.reloop.sh/api/inbox` | [Inbox](/docs/setup/backend/inbox) | `8028` |
+| `https://local.reloop.sh/api/email` | [Email](/docs/setup/backend/email) | `8022` |
+| `https://local.reloop.sh/api/credits` | [Credits](/docs/setup/backend/credits) | `8023` |
+| `https://local.reloop.sh/api/admin` | Admin | `8024` |
 
 ## Frontend
 
 | App | Direct URL | Port |
 | :--- | :--- | :--- |
-| [Web](/docs/setup/frontend/web) | [http://localhost:3000](http://localhost:3000) | `3000` |
-| [Dashboard](/docs/setup/frontend/dashboard) | [http://localhost:3001](http://localhost:3001) | `3001` |
-| Console | [http://localhost:3002](http://localhost:3002) | `3002` |
-| [Docs](/docs/setup/frontend/docs) | [http://localhost:3003](http://localhost:3003) | `3003` |
-| [Links](/docs/setup/frontend/links) | [http://localhost:3005](http://localhost:3005) | `3005` |
+| [Web](/docs/setup/frontend/web) | `http://localhost:3000` | `3000` |
+| [Dashboard](/docs/setup/frontend/dashboard) | `http://localhost:3001` | `3001` |
+| Console | `http://localhost:3002` | `3002` |
+| [Docs](/docs/setup/frontend/docs) | `http://localhost:3003` | `3003` |
+| [Links](/docs/setup/frontend/links) | `http://localhost:3005` | `3005` |
 
 ## Backend APIs
 
 | Service | Caddy route | Port |
 | :--- | :--- | :--- |
-| [Auth](/docs/setup/backend/auth) | [`/api/auth`](https://local.reloop.sh/api/auth) | `8000` |
-| [Domain](/docs/setup/backend/domain) | [`/api/domain`](https://local.reloop.sh/api/domain) | `8011` |
-| [API Key](/docs/setup/backend/api-key) | [`/api/api-key`](https://local.reloop.sh/api/api-key) | `8012` |
-| [Webhook](/docs/setup/backend/webhook) | [`/api/webhook`](https://local.reloop.sh/api/webhook) | `8013` |
-| [Contacts](/docs/setup/backend/contacts) | [`/api/contacts`](https://local.reloop.sh/api/contacts) | `8014` |
-| [Mail](/docs/setup/backend/mail) | [`/api/mail`](https://local.reloop.sh/api/mail) | `8015` |
-| [Logs](/docs/setup/backend/logs) | [`/api/logs`](https://local.reloop.sh/api/logs) | `8016` |
-| [Workflow](/docs/setup/backend/workflow) | [`/api/workflow`](https://local.reloop.sh/api/workflow) | `8017` |
-| [Upload](/docs/setup/backend/upload) | [`/api/upload`](https://local.reloop.sh/api/upload) | `8018` |
-| [Template](/docs/setup/backend/template) | [`/api/template`](https://local.reloop.sh/api/template) | `8019` |
-| [Campaigns](/docs/setup/backend/campaigns) | [`/api/campaigns`](https://local.reloop.sh/api/campaigns) | `8027` |
-| [Inbox](/docs/setup/backend/inbox) | [`/api/inbox`](https://local.reloop.sh/api/inbox) | `8028` |
-| [Email](/docs/setup/backend/email) | [`/api/email`](https://local.reloop.sh/api/email) | `8022` |
-| [Credits](/docs/setup/backend/credits) | [`/api/credits`](https://local.reloop.sh/api/credits) | `8023` |
-| Admin | [`/api/admin`](https://local.reloop.sh/api/admin) | `8024` |
+| [Auth](/docs/setup/backend/auth) | `/api/auth` | `8000` |
+| [Domain](/docs/setup/backend/domain) | `/api/domain` | `8011` |
+| [API Key](/docs/setup/backend/api-key) | `/api/api-key` | `8012` |
+| [Webhook](/docs/setup/backend/webhook) | `/api/webhook` | `8013` |
+| [Contacts](/docs/setup/backend/contacts) | `/api/contacts` | `8014` |
+| [Mail](/docs/setup/backend/mail) | `/api/mail` | `8015` |
+| [Logs](/docs/setup/backend/logs) | `/api/logs` | `8016` |
+| [Workflow](/docs/setup/backend/workflow) | `/api/workflow` | `8017` |
+| [Upload](/docs/setup/backend/upload) | `/api/upload` | `8018` |
+| [Template](/docs/setup/backend/template) | `/api/template` | `8019` |
+| [Campaigns](/docs/setup/backend/campaigns) | `/api/campaigns` | `8027` |
+| [Inbox](/docs/setup/backend/inbox) | `/api/inbox` | `8028` |
+| [Email](/docs/setup/backend/email) | `/api/email` | `8022` |
+| [Credits](/docs/setup/backend/credits) | `/api/credits` | `8023` |
+| Admin | `/api/admin` | `8024` |
 
 ## Docker & Mail
 
 | Service | Port | Notes |
 | :--- | :--- | :--- |
 | Caddy | `80`, `443` | Reverse proxy / TLS |
-| Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) (captured outbound mail) |
+| Mailpit | `8025` | `http://localhost:8025` (captured outbound mail) |
 | [SMTP](/docs/setup/backend/smtp) (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA |
 | [Inbound](/docs/setup/backend/inbound) (MX) | `25`, `8030` | KumoMTA |
 
@@ -18777,5 +18777,5 @@ Free mail ports (`25`, `465`, `587`) if host mail or another MTA is already boun
 | PostgreSQL | `5432` | Shared DB for all backends (including activity logs) |
 | Redis | `6379` | Sessions, OTP, caches |
 | NATS | `4222` | Event bus between services |
-| MinIO | `9010` (API), `9001` (console) | [Upload](/docs/setup/backend/upload) object storage ([console](http://localhost:9001)) |
+| MinIO | `9010` (API), `9001` (console) | [Upload](/docs/setup/backend/upload) object storage (console at `http://localhost:9001`) |
 | Spam (Rspamd) | `11332` / `11333` / `11334` | [spam](/docs/setup/backend/spam) scan + UI for [inbound](/docs/setup/backend/inbound) |

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { getSiteUrl } from "@reloop/fe-docs/lib/site";
 import { type NextRequest, NextResponse } from "next/server";
 import { injectMarkdownAgentDirective } from "../../../../lib/agent-directive";
 import {
@@ -56,7 +57,7 @@ export async function GET(
 				"x-markdown-tokens": estimatedTokens.toString(),
 				"Content-Signal": AGENT_CONTENT_SIGNAL,
 				"Cache-Control": AGENT_CACHE_CONTROL,
-				Link: `${AGENT_LINK_HEADER}, <${(process.env.NEXT_PUBLIC_URL || "https://reloop.sh").replace(/\/$/, "")}/docs/${slug.join("/")}>; rel="canonical"`,
+				Link: `${AGENT_LINK_HEADER}, <${getSiteUrl()}/docs/${slug.join("/")}>; rel="canonical"`,
 			},
 		});
 	} catch (error: any) {

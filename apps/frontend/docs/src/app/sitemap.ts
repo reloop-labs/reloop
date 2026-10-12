@@ -1,11 +1,9 @@
+import { getSiteUrl } from "@reloop/fe-docs/lib/site";
 import { source } from "@reloop/fe-docs/lib/source";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-	const baseUrl = (process.env.NEXT_PUBLIC_URL || "https://reloop.sh").replace(
-		/\/$/,
-		"",
-	);
+	const baseUrl = getSiteUrl();
 	const paths = source
 		.generateParams()
 		.map(({ slug }) => slug.join("/"))

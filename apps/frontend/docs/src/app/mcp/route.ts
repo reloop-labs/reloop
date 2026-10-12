@@ -1,8 +1,9 @@
+import { getSiteUrl } from "@reloop/fe-docs/lib/site";
 import { type NextRequest, NextResponse } from "next/server";
 import { AGENT_CACHE_CONTROL } from "../../lib/agent-headers";
 import { type DocsTextFile, loadAllDocsText } from "../../lib/docs-content-fs";
 
-const ORIGIN = process.env.NEXT_PUBLIC_URL || "https://reloop.sh";
+const ORIGIN = getSiteUrl();
 const SERVER_INFO = {
 	name: "reloop-docs",
 	version: "1.0.0",

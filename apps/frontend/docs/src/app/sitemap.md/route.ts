@@ -1,10 +1,11 @@
+import { getSiteUrl } from "@reloop/fe-docs/lib/site";
 import { buildSitemapMarkdown } from "@reloop/fe-docs/lib/sitemap-md";
 import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem } from "@reloop/fe-docs/lib/types";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(_request: NextRequest) {
-	const baseUrl = process.env.NEXT_PUBLIC_URL || "https://reloop.sh";
+	const baseUrl = getSiteUrl();
 	const tree = source.pageTree.children as PageTreeItem[];
 	const content = buildSitemapMarkdown(tree, baseUrl);
 
