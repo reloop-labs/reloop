@@ -22,25 +22,10 @@ import { StatusFilterDropdown } from "./status-filter-dropdown";
 /** Outcome tab type */
 type OutcomeTab = "all" | "succeeded" | "failed";
 
-const OUTCOME_TABS: {
-	id: OutcomeTab;
-	label: string;
-	icon?: string;
-	iconColor?: string;
-}[] = [
-	{ id: "all", label: "All" },
-	{
-		id: "succeeded",
-		label: "Success",
-		icon: "check-circle",
-		iconColor: "text-success-base",
-	},
-	{
-		id: "failed",
-		label: "Failed",
-		icon: "cross-circle",
-		iconColor: "text-error-base",
-	},
+const OUTCOME_TABS: { id: OutcomeTab; label: string; icon: string }[] = [
+	{ id: "all", label: "All", icon: "list" },
+	{ id: "succeeded", label: "Success", icon: "check-circle" },
+	{ id: "failed", label: "Failed", icon: "cross-circle" },
 ];
 
 const useMediaQuery = (query: string) => {
@@ -178,8 +163,9 @@ export function LogList({
 		});
 	};
 
+	// "slash" matches e.code (Slash). "/" alone never fires under react-hotkeys-hook.
 	useHotkeys(
-		"f, /",
+		"f, slash",
 		(e) => {
 			e.preventDefault();
 			searchInputRef.current?.focus();
@@ -223,82 +209,114 @@ export function LogList({
 
 	return (
 		<div className="flex min-h-0 flex-col">
-			{/* Outcome tabs: same height as Emails Sent/Received */}
-			<TabMenuHorizontal.Root
-				value={outcomeTab || "all"}
-				onValueChange={(val) => {
-					void setOutcomeTab(val);
-					void setCurrentPage(1);
-				}}
-			>
-				<TabMenuHorizontal.List className="relative h-9 gap-0 border-b-0! py-0 [&_[aria-hidden=true]]:hidden">
-					{OUTCOME_TABS.map((tab, index) => (
-						<TabMenuHorizontal.Trigger
-							key={tab.id}
-							ref={(el) => {
-								if (el) buttonRefs.current[index] = el;
-							}}
-							value={tab.id}
-							onPointerEnter={() => setHoveredIdx(index)}
-							onPointerLeave={() => setHoveredIdx(undefined)}
-							className={cn(
-								"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
-								hoveredIdx === undefined &&
-									activeIndex === index &&
-									"text-text-strong-950",
-							)}
-						>
-							{tab.icon && (
-								<Icon
-									name={tab.icon}
-									className={cn("h-4 w-4", tab.iconColor)}
+			{/* Outcome tabs + actions: same style as Emails Sent/Received */}
+			<div className="flex items-center">
+				<TabMenuHorizontal.Root
+					className="min-w-0 flex-1"
+					value={outcomeTab || "all"}
+					onValueChange={(val) => {
+						void setOutcomeTab(val);
+						void setCurrentPage(1);
+					}}
+				>
+					<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
+						{OUTCOME_TABS.map((tab, index) => (
+							<TabMenuHorizontal.Trigger
+								key={tab.id}
+								ref={(el) => {
+									if (el) buttonRefs.current[index] = el;
+								}}
+								value={tab.id}
+								onPointerEnter={() => setHoveredIdx(index)}
+								onPointerLeave={() => setHoveredIdx(undefined)}
+								className={cn(
+									"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
+									hoveredIdx === undefined &&
+										activeIndex === index &&
+										"text-text-strong-950",
+								)}
+							>
+								<Icon name={tab.icon} className="h-4 w-4" />
+								{tab.label}
+							</TabMenuHorizontal.Trigger>
+						))}
+						<AnimatePresence>
+							{rect && activeIndex !== -1 ? (
+								<motion.div
+									className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
+									initial={{
+										pointerEvents: "none",
+										width: rect.width,
+										height: rect.height - 14,
+										left:
+											rect.left -
+											(tabEl?.offsetParent?.getBoundingClientRect().left || 0),
+										top:
+											rect.top -
+											(tabEl?.offsetParent?.getBoundingClientRect().top || 0) +
+											7,
+										opacity: 0,
+									}}
+									animate={{
+										pointerEvents: "none",
+										width: rect.width,
+										height: rect.height - 14,
+										left:
+											rect.left -
+											(tabEl?.offsetParent?.getBoundingClientRect().left || 0),
+										top:
+											rect.top -
+											(tabEl?.offsetParent?.getBoundingClientRect().top || 0) +
+											7,
+										opacity: 1,
+									}}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.14 }}
 								/>
-							)}
-							{tab.label}
-						</TabMenuHorizontal.Trigger>
-					))}
-					<AnimatePresence>
-						{rect && activeIndex !== -1 ? (
-							<motion.div
-								className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
-								initial={{
-									pointerEvents: "none",
-									width: rect.width,
-									height: rect.height - 8,
-									left:
-										rect.left -
-										(tabEl?.offsetParent?.getBoundingClientRect().left || 0),
-									top:
-										rect.top -
-										(tabEl?.offsetParent?.getBoundingClientRect().top || 0) +
-										4,
-									opacity: 0,
-								}}
-								animate={{
-									pointerEvents: "none",
-									width: rect.width,
-									height: rect.height - 8,
-									left:
-										rect.left -
-										(tabEl?.offsetParent?.getBoundingClientRect().left || 0),
-									top:
-										rect.top -
-										(tabEl?.offsetParent?.getBoundingClientRect().top || 0) +
-										4,
-									opacity: 1,
-								}}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.14 }}
-							/>
-						) : null}
-					</AnimatePresence>
-				</TabMenuHorizontal.List>
-			</TabMenuHorizontal.Root>
+							) : null}
+						</AnimatePresence>
+					</TabMenuHorizontal.List>
+				</TabMenuHorizontal.Root>
+
+				<div className="flex h-11 shrink-0 items-center gap-2 border-stroke-soft-100 border-b dark:border-stroke-soft-100/50">
+					<DateRangeFilter
+						startDate={startDate || null}
+						endDate={endDate || null}
+						activePreset={datePreset || null}
+						onDateChange={handleDateChange}
+					/>
+
+					<StatusFilterDropdown
+						value={statusCode || null}
+						onChange={(val) => {
+							void setStatusCode(val || "");
+							void setCurrentPage(1);
+						}}
+					/>
+
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						size="small"
+						onClick={handleDownloadCSV}
+						disabled={!data?.logs || data.logs.length === 0}
+						title="Export CSV"
+						className="h-9 rounded-xl"
+					>
+						<Icon name="file-download" className="h-4 w-4" />
+						<span className="hidden sm:inline">Export</span>
+					</Button.Root>
+				</div>
+			</div>
 
 			{/* Filter bar: all controls share h-9 */}
-			<div className="flex flex-wrap items-center gap-2 pt-2">
-				<div className="min-w-[200px] flex-1">
-					<Input.Root size="small" className="h-9 rounded-xl">
+			<div className="flex flex-wrap items-center gap-2 pt-4">
+				<div className="min-w-[200px] flex-1 sm:max-w-[50%]">
+					<Input.Root
+						size="small"
+						className="h-9 rounded-xl has-[input:focus]:ring-text-strong-950/10 has-[input:focus]:before:ring-text-strong-950 dark:has-[input:focus]:ring-white/10 dark:has-[input:focus]:before:ring-white"
+					>
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
@@ -331,35 +349,6 @@ export function LogList({
 					</Input.Root>
 				</div>
 
-				<DateRangeFilter
-					startDate={startDate || null}
-					endDate={endDate || null}
-					activePreset={datePreset || null}
-					onDateChange={handleDateChange}
-				/>
-
-				<StatusFilterDropdown
-					value={statusCode || null}
-					onChange={(val) => {
-						void setStatusCode(val || "");
-						void setCurrentPage(1);
-					}}
-				/>
-
-				<Button.Root
-					type="button"
-					variant="neutral"
-					mode="stroke"
-					size="small"
-					onClick={handleDownloadCSV}
-					disabled={!data?.logs || data.logs.length === 0}
-					title="Export CSV"
-					className="h-9 rounded-xl"
-				>
-					<Icon name="file-download" className="h-4 w-4" />
-					<span className="hidden sm:inline">Export</span>
-				</Button.Root>
-
 				{hasAnyFilter && (
 					<Button.Root
 						type="button"
@@ -376,13 +365,15 @@ export function LogList({
 				<Tooltip.Provider delayDuration={200}>
 					<Tooltip.Root>
 						<Tooltip.Trigger asChild>
-							<button
+							<Button.Root
 								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="small"
 								onClick={handleRefresh}
-								disabled={isFetching}
 								className={cn(
-									"flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
-									isFetching ? "pointer-events-none" : "cursor-pointer",
+									"ml-auto size-9 shrink-0 rounded-xl px-0",
+									isFetching && "pointer-events-none",
 								)}
 								aria-label="Refresh logs"
 								aria-keyshortcuts="r"
@@ -392,7 +383,7 @@ export function LogList({
 									name="rotate-cw"
 									className={cn("h-4 w-4", isFetching && "animate-spin")}
 								/>
-							</button>
+							</Button.Root>
 						</Tooltip.Trigger>
 						<Tooltip.Content
 							side="top"

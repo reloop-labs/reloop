@@ -170,8 +170,10 @@ function LogRowSkeleton() {
 
 function LogDateBandSkeleton() {
 	return (
-		<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-			<Skeleton className="h-3 w-28 rounded" />
+		<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+			<div className="flex h-[22px] items-center">
+				<Skeleton className="h-3 w-28 rounded" />
+			</div>
 		</div>
 	);
 }
@@ -258,11 +260,16 @@ export const LogTable = ({
 					)
 				) : (
 					<Tooltip.Provider delayDuration={400}>
-						{groupLogsByDate(logs).map((group) => (
+						{groupLogsByDate(logs).map((group, groupIdx) => (
 							<div key={group.dateKey}>
-								{/* Date section: flat label, no band fill */}
-								<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-									<span className="font-medium text-[11px] text-text-sub-600 tracking-wide">
+								{/* Date section: flat label, no band fill; divider above all but the first */}
+								<div
+									className={cn(
+										"sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5",
+										groupIdx > 0 && "border-t",
+									)}
+								>
+									<span className="flex h-[22px] items-center font-medium text-[11px] text-text-sub-600 tracking-wide">
 										{group.dateLabel}
 									</span>
 								</div>
