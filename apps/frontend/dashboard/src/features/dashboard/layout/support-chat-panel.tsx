@@ -233,11 +233,7 @@ function FounderAvatar() {
 
 const NEAR_BOTTOM_PX = 80;
 
-export function SupportChatPanel({
-	hideCloseButton = false,
-}: {
-	hideCloseButton?: boolean;
-} = {}) {
+export function SupportChatPanel() {
 	const { user } = useActiveOrganization();
 	const queryClient = useQueryClient();
 	const firstName = user?.name?.split(" ")[0] || "there";
@@ -246,7 +242,6 @@ export function SupportChatPanel({
 	const setPendingSupportMessage = useUIStore(
 		(s) => s.setPendingSupportMessage,
 	);
-	const setIsAiPanelOpen = useUIStore((s) => s.setIsAiPanelOpen);
 	const autoSentRef = useRef(false);
 
 	const [conversation, setConversation] = useState<SupportConversation | null>(
@@ -679,20 +674,10 @@ export function SupportChatPanel({
 							)}
 						/>
 					</button>
-					{hideCloseButton ? null : (
-						<button
-							type="button"
-							onClick={() => setIsAiPanelOpen(false)}
-							title="Close support"
-							className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-black/[0.04] hover:text-text-strong-950 dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
-						>
-							<X className="h-3.5 w-3.5" />
-						</button>
-					)}
 				</div>
 			</div>
 			{/* Body card — white with rounded corners like API key table body */}
-			<div className="relative -mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[20px] border-stroke-soft-100 border-t bg-white dark:border-stroke-soft-100/70 dark:bg-black">
+			<div className="-mt-3 relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[20px] border-stroke-soft-100 border-t bg-white dark:border-stroke-soft-100/70 dark:bg-black">
 				<div
 					ref={viewportRef}
 					onScroll={onViewportScroll}

@@ -3,6 +3,7 @@ import { CreditErrors } from "@reloop/credits/error/credits.error-response";
 import { getOrProvisionOrgBilling } from "@reloop/credits/lib/org-billing";
 import { db } from "@reloop/db/client";
 import {
+	adminAuditLog,
 	domain,
 	emailSend,
 	inboundEmail,
@@ -14,7 +15,7 @@ import {
 	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
 } from "@reloop/db/self-hosted";
 import { getPlanById } from "@reloop/pricing";
-import { and, count, eq, gte, isNull, ne, sum } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNull, like, ne, sum } from "drizzle-orm";
 
 export const getUsageController = async ({
 	organizationId,
@@ -37,6 +38,7 @@ export const getUsageController = async ({
 			webhookRows,
 			domainRows,
 			dailyRows,
+			conversionRows,
 		] = await Promise.all([
 			db
 				.select({ value: count() })
@@ -89,7 +91,35 @@ export const getUsageController = async ({
 						gte(emailSend.sentAt, todayStart),
 					),
 				),
+			db
+				.select({
+					metadata: adminAuditLog.metadata,
+					createdAt: adminAuditLog.createdAt,
+				})
+				.from(adminAuditLog)
+				.where(
+					and(
+						eq(adminAuditLog.organizationId, organizationId),
+						like(adminAuditLog.action, "organization.convert_to_%"),
+					),
+				)
+				.orderBy(desc(adminAuditLog.createdAt))
+				.limit(1),
 		]);
+
+		// Plan granted by a Reloop admin (convert-plan action) that is still the
+		// active plan and isn't backed by a Polar subscription.
+		const conversion = conversionRows[0];
+		const grantedPlan =
+			conversion &&
+			conversion.metadata?.toPlan === billing.plan.planId &&
+			!billing.subscription.polarSubscriptionId
+				? {
+						planId: billing.plan.planId,
+						name: catalog?.name ?? billing.plan.planId,
+						grantedAt: conversion.createdAt.toISOString(),
+					}
+				: null;
 
 		const selfHosted = isSelfHosted();
 		const maxAttachmentBytes = selfHosted
@@ -136,6 +166,7 @@ export const getUsageController = async ({
 				currentPeriodStart: billing.credits.currentPeriodStart.toISOString(),
 				currentPeriodEnd: billing.credits.currentPeriodEnd.toISOString(),
 			},
+			grantedPlan,
 			resources: {
 				agentInboxes: {
 					used: inboxRows[0]?.value ?? 0,

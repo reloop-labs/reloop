@@ -272,7 +272,7 @@ export function DedicatedIpPage() {
 			return;
 		}
 		if (nextPlan.monthlyPrice === null) {
-			contactEnterprise();
+			contactEnterprise(router);
 			return;
 		}
 		if (isCheckoutPlanId(nextPlan.id)) {

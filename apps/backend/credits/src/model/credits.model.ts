@@ -45,6 +45,16 @@ export namespace CreditsModel {
 			cancelAtPeriodEnd: t.Optional(t.Boolean()),
 			planId: t.Optional(t.String()),
 		}),
+		grantedPlan: t.Optional(
+			t.Union([
+				t.Object({
+					planId: t.String(),
+					name: t.String(),
+					grantedAt: t.String(),
+				}),
+				t.Null(),
+			]),
+		),
 		resources: t.Optional(
 			t.Object({
 				agentInboxes: resourceUsage,

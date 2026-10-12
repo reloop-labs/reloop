@@ -45,6 +45,12 @@ export interface BillingUsage {
 		cancelAtPeriodEnd?: boolean;
 		planId?: string;
 	};
+	/** Set when a Reloop admin granted the current plan (not paid via checkout). */
+	grantedPlan?: {
+		planId: string;
+		name: string;
+		grantedAt: string;
+	} | null;
 	resources?: {
 		agentInboxes: ResourceUsage;
 		webhooks: ResourceUsage;

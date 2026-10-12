@@ -1,17 +1,9 @@
 import NumberFlow from "@number-flow/react";
-import {
-	defaultPlan,
-	getNextPlan,
-	getPlanById,
-	paidOverageUsdPerThousand,
-} from "@reloop/pricing";
+import { paidOverageUsdPerThousand } from "@reloop/pricing";
 import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import Link from "next/link";
 import { Circle } from "rc-progress";
-import { useState } from "react";
-import { resolvePlanId } from "#/features/settings/billing/plan-id";
-import { SwitchPlanModal } from "#/features/settings/billing/switch-plan-modal";
+import { GrantedPlanBanner } from "#/features/settings/billing/granted-plan-banner";
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 
 type UsageStatus = "healthy" | "warning" | "critical" | "unlimited";
@@ -176,39 +168,6 @@ function CategoryCard({
 	);
 }
 
-function UpgradeBanner({
-	planName,
-	nextPlanName,
-	onUpgrade,
-}: {
-	planName: string;
-	nextPlanName: string;
-	onUpgrade: () => void;
-}) {
-	return (
-		<div className="flex items-center justify-between gap-4 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-			<div className="min-w-0">
-				<p className="font-medium text-paragraph-sm text-text-strong-950">
-					You&apos;re on the{" "}
-					<span className="text-text-strong-950">{planName} plan</span>
-				</p>
-				<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-					Upgrade to {nextPlanName} for higher limits on emails, inboxes, and
-					more.
-				</p>
-			</div>
-			<FancyButton.Root
-				variant="blue"
-				size="xsmall"
-				className="shrink-0 rounded-full font-medium"
-				onClick={onUpgrade}
-			>
-				Upgrade plan
-			</FancyButton.Root>
-		</div>
-	);
-}
-
 function SkeletonCard() {
 	return (
 		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 sm:grid sm:grid-cols-[200px_1fr] dark:border-stroke-soft-100/40">
@@ -246,12 +205,10 @@ function formatDate(dateStr: string): string {
 
 export function UsageSection() {
 	const { data, isLoading } = useBillingUsage();
-	const [switchOpen, setSwitchOpen] = useState(false);
 
 	if (isLoading || !data) {
 		return (
 			<div className="space-y-4">
-				<div className="h-16 animate-pulse rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]" />
 				<SkeletonCard />
 				<SkeletonCard />
 				<SkeletonCard />
@@ -275,12 +232,6 @@ export function UsageSection() {
 		subscription.currentPeriodEnd,
 	)}`;
 
-	const currentPlanId = resolvePlanId({
-		id: plan.id ?? subscription.planId,
-		name: plan.name,
-	});
-	const currentPlan = getPlanById(currentPlanId) ?? defaultPlan;
-	const nextPlan = getNextPlan(currentPlanId);
 	const attachmentMb =
 		entitlements != null
 			? Math.round(entitlements.maxAttachmentBytes / (1024 * 1024))
@@ -298,13 +249,12 @@ export function UsageSection() {
 
 	return (
 		<div className="space-y-4">
-			{nextPlan && !unlimited && (
-				<UpgradeBanner
-					planName={currentPlan.name}
-					nextPlanName={nextPlan.name}
-					onUpgrade={() => setSwitchOpen(true)}
+			{data.grantedPlan ? (
+				<GrantedPlanBanner
+					planName={data.grantedPlan.name}
+					grantedAt={data.grantedPlan.grantedAt}
 				/>
-			)}
+			) : null}
 
 			<CategoryCard
 				title="Emails"
@@ -476,12 +426,6 @@ export function UsageSection() {
 					</>
 				)}
 			</CategoryCard>
-
-			<SwitchPlanModal
-				open={switchOpen}
-				onOpenChange={setSwitchOpen}
-				currentPlanId={currentPlanId}
-			/>
 		</div>
 	);
 }

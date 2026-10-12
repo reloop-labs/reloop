@@ -1,10 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useSupportSocket } from "#/features/dashboard/hooks/use-support-socket";
 import { queryKeys } from "#/lib/query-keys";
 import type { SupportServerEvent } from "#/lib/support-types";
-import { useUIStore } from "#/store/use-ui-store";
 
 async function fetchUnreadCount() {
 	const { data } = await axios.get<{ count: number }>(
@@ -14,7 +14,7 @@ async function fetchUnreadCount() {
 	return data.count;
 }
 
-/** Imperative clear for support chat panel (sets cache to 0). */
+/** Imperative clear for the Help page chat (sets cache to 0). */
 export function clearSupportUnreadInCache(
 	queryClient: ReturnType<typeof useQueryClient>,
 ) {
@@ -23,13 +23,11 @@ export function clearSupportUnreadInCache(
 
 export function useSupportUnread() {
 	const queryClient = useQueryClient();
-	const { isAiPanelOpen, aiPanelActiveTab } = useUIStore();
-	// Ask AI is currently disabled, so the panel is support-only, but keep the
-	// tab check so re-enabling AI does not mark support as "open" incorrectly.
-	const supportOpen = isAiPanelOpen && aiPanelActiveTab === "support";
+	const pathname = usePathname() ?? "/";
+	const supportOpen = (pathname.replace(/^\/dashboard/, "") || "/") === "/help";
 
 	// Defer non-critical support work off the initial paint critical path.
-	// Enable after idle (or 2s), or immediately when the support panel opens.
+	// Enable after idle (or 2s), or immediately on the Help page.
 	const [networkEnabled, setNetworkEnabled] = useState(false);
 	useEffect(() => {
 		if (supportOpen) {
@@ -78,7 +76,7 @@ export function useSupportUnread() {
 		[mutateUnread],
 	);
 
-	// WebSocket only after idle (or when panel is open), not on first paint.
+	// WebSocket only after idle (or on the Help page), not on first paint.
 	useSupportSocket({
 		enabled: networkEnabled,
 		onEvent,

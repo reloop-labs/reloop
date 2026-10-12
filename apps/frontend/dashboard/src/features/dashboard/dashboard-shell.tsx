@@ -1,11 +1,8 @@
 import { cn } from "@reloop/ui/cn";
-import { AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect } from "react";
 import { CommandMenuGlobal } from "#/features/dashboard/command-menu";
 import { CommandMenuProvider } from "#/features/dashboard/command-menu-context";
-import { AiPanel } from "#/features/dashboard/layout/ai-panel";
-import { OpenSupportFromQuery } from "#/features/dashboard/open-support-from-query";
 import { useUIStore } from "#/store/use-ui-store";
 import { PageHeader } from "./page-header/page-header";
 import { MainSidebar } from "./sidebar/main-sidebar";
@@ -21,8 +18,6 @@ function useIsCanvasEditor() {
  * App chrome for authenticated dashboard pages.
  * Flush Vercel-style shell: shared page bg, sidebar rail border, top bar.
  * Agent mailbox and template editor get a full-viewport shell without global sidebar/header.
- * Support slide-in panel mounts beside the main content.
- * (Ask AI is hidden until assistant API integration.)
  */
 function SidebarChrome({
 	isMobileNavOpen,
@@ -45,7 +40,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 	const pathname = usePathname();
 	const isInbox = pathname === "/inbox" || pathname.startsWith("/inbox");
 	const isTemplateEditor = useIsCanvasEditor();
-	const isAiPanelOpen = useUIStore((s) => s.isAiPanelOpen);
 	const isMobileNavOpen = useUIStore((s) => s.isMobileNavOpen);
 	const setMobileNavOpen = useUIStore((s) => s.setMobileNavOpen);
 
@@ -98,7 +92,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 						{children}
 					</div>
 				</main>
-				<AnimatePresence>{isAiPanelOpen ? <AiPanel /> : null}</AnimatePresence>
 				<CommandMenuGlobal />
 			</div>
 		</CommandMenuProvider>

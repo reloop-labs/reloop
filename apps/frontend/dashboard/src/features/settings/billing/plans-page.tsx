@@ -12,8 +12,8 @@ import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { openHelpWithMessage } from "#/features/help/open-help";
 import { resolvePlanId } from "./plan-id";
-import { requestPlanSupport } from "./request-support";
 import {
 	contactEnterprise,
 	useBillingCheckout,
@@ -82,7 +82,7 @@ export function PlansPage() {
 					variant="basic"
 					size="small"
 					className="w-full rounded-full font-semibold"
-					onClick={contactEnterprise}
+					onClick={() => contactEnterprise(router)}
 				>
 					Contact sales
 				</FancyButton.Root>
@@ -144,7 +144,8 @@ export function PlansPage() {
 					<button
 						type="button"
 						onClick={() =>
-							requestPlanSupport(
+							openHelpWithMessage(
+								router,
 								"Hi! I have a question about my plan. Can you help?",
 							)
 						}

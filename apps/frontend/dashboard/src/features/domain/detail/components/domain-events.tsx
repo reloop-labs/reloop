@@ -1,10 +1,11 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { DomainResponse } from "#/features/domain/types";
 import { getVerificationFailedMessage } from "#/features/domain/utils";
-import { useUIStore } from "#/store/use-ui-store";
+import { openHelpWithMessage } from "#/features/help/open-help";
 import { StatusTimeline, StatusTimelineSkeleton } from "./status-timeline";
 
 export const DomainEvents = ({
@@ -14,6 +15,7 @@ export const DomainEvents = ({
 	domain?: DomainResponse;
 	isLoading?: boolean;
 }) => {
+	const router = useRouter();
 	const [expanded, setExpanded] = useState(false);
 
 	// Use registrar age from API (RDAP) if available, fallback to Reloop added date
@@ -187,29 +189,17 @@ export const DomainEvents = ({
 						</p>
 						<p className="mt-2 text-[11px] text-text-sub-600 leading-relaxed dark:text-white/50">
 							Need to send more than your current cap?{" "}
-							<a
-								href={`mailto:support@reloop.sh?subject=${encodeURIComponent(`Request to increase daily cap for ${domain.domain}`)}&body=${encodeURIComponent(`Hi Reloop team,\n\nI'd like to request a higher daily limit for ${domain.domain} (age: ${ageDays} days, current cap: ${dailyCap ?? "Dynamic"} emails/day${domain.sentToday != null && dailyCap !== null ? `, sent today: ${domain.sentToday}/${dailyCap}` : ""}).\n\nReason / use case:\n[please describe]\n\nThanks!`)}`}
-								className="font-medium text-primary-base underline decoration-primary-base/30 underline-offset-2 hover:text-primary-base/80"
-							>
-								Contact us via email
-							</a>{" "}
-							or{" "}
 							<button
 								type="button"
-								onClick={() => {
-									const msg = `Hi team, please increase my daily cap for ${domain.domain} (age ${ageDays}d, cap ${dailyCap ?? "Dynamic"}). Reason: `;
-									const {
-										setPendingSupportMessage,
-										setAiPanelActiveTab,
-										setIsAiPanelOpen,
-									} = useUIStore.getState();
-									setPendingSupportMessage(msg);
-									setAiPanelActiveTab("support");
-									setIsAiPanelOpen(true);
-								}}
+								onClick={() =>
+									openHelpWithMessage(
+										router,
+										`Hi team, please increase my daily cap for ${domain.domain} (age ${ageDays}d, cap ${dailyCap ?? "Dynamic"}). Reason: `,
+									)
+								}
 								className="font-medium text-primary-base underline decoration-primary-base/30 underline-offset-2 hover:text-primary-base/80"
 							>
-								chat support
+								Contact us
 							</button>{" "}
 							(the message is prefilled, just send it).
 						</p>

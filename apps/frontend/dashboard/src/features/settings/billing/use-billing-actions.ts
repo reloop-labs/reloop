@@ -1,7 +1,7 @@
 import type { CheckoutPlanId } from "@reloop/pricing";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { requestPlanSupport } from "./request-support";
+import { openHelpWithMessage } from "#/features/help/open-help";
 
 type ApiErrorBody = {
 	message?: string;
@@ -71,8 +71,9 @@ export function useBillingPortal() {
 	});
 }
 
-export function contactEnterprise() {
-	requestPlanSupport(
+export function contactEnterprise(router: { push: (href: string) => void }) {
+	openHelpWithMessage(
+		router,
 		"Hi! I'm interested in the Enterprise plan. Can you help me get set up?",
 	);
 }

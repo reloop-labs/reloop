@@ -1,6 +1,10 @@
+import { getNextPlan } from "@reloop/pricing";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
+import { resolvePlanId } from "#/features/settings/billing/plan-id";
+import { SwitchPlanModal } from "#/features/settings/billing/switch-plan-modal";
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { UsageSection } from "./usage-section";
@@ -9,6 +13,7 @@ export function UsagePage() {
 	const router = useRouter();
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const { data, error: usageError, refetch: refetchUsage } = useBillingUsage();
+	const [switchOpen, setSwitchOpen] = useState(false);
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
@@ -22,17 +27,36 @@ export function UsagePage() {
 		return null;
 	}
 
+	const currentPlanId = resolvePlanId({
+		id: data?.plan.id ?? data?.subscription.planId,
+		name: data?.plan.name,
+	});
+	const canUpgrade =
+		data != null && !data.selfHosted && getNextPlan(currentPlanId) != null;
+
 	return (
 		<div className="w-full space-y-6 pt-5">
-			<div>
-				<h1 className="font-semibold text-text-strong-950 text-title-h5">
-					Usage
-				</h1>
-				<p className="mt-1 text-paragraph-sm text-text-sub-600">
-					{data
-						? `${data.subscription.creditsRemaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period.`
-						: "Track your plan limits and resource usage for this billing period."}
-				</p>
+			<div className="flex items-end justify-between gap-4">
+				<div>
+					<h1 className="font-semibold text-text-strong-950 text-title-h5">
+						Usage
+					</h1>
+					<p className="mt-1 text-paragraph-sm text-text-sub-600">
+						{data
+							? `${data.subscription.creditsRemaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period.`
+							: "Track your plan limits and resource usage for this billing period."}
+					</p>
+				</div>
+				{canUpgrade ? (
+					<FancyButton.Root
+						variant="neutral"
+						size="xsmall"
+						className="shrink-0 rounded-full font-medium"
+						onClick={() => setSwitchOpen(true)}
+					>
+						Upgrade plan
+					</FancyButton.Root>
+				) : null}
 			</div>
 
 			{usageError && (
@@ -49,6 +73,12 @@ export function UsagePage() {
 			)}
 
 			<UsageSection />
+
+			<SwitchPlanModal
+				open={switchOpen}
+				onOpenChange={setSwitchOpen}
+				currentPlanId={currentPlanId}
+			/>
 		</div>
 	);
 }

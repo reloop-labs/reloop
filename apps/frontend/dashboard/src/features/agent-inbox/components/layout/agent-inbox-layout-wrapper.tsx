@@ -5,7 +5,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
-import { InboxSupportPanel } from "#/features/agent-inbox/components/layout/inbox-support-panel";
 import { InboxTopNavbar } from "#/features/agent-inbox/components/layout/inbox-top-navbar";
 import { MailboxRail } from "#/features/agent-inbox/components/mailbox-rail/mailbox-rail";
 import { InboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar";
@@ -58,7 +57,6 @@ export const AgentInboxLayoutWrapper = ({
 					{children}
 				</div>
 			</div>
-			<InboxSupportPanel />
 
 			<AddAgentAddressModal
 				isOpen={isAddOpen}

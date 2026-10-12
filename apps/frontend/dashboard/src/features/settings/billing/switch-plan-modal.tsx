@@ -101,7 +101,7 @@ export function SwitchPlanModal({
 
 	const handleSwitch = () => {
 		if (isEnterprise) {
-			contactEnterprise();
+			contactEnterprise(router);
 			onOpenChange(false);
 			return;
 		}
@@ -241,7 +241,7 @@ export function SwitchPlanModal({
 						</Button.Root>
 						<FancyButton.Root
 							type="button"
-							variant="blue"
+							variant="neutral"
 							size="small"
 							className="font-medium"
 							disabled={selectedId === currentPlanId || checkout.isPending}

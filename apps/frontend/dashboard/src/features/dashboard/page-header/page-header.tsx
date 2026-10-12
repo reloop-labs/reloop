@@ -2,6 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { LifeBuoy } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSupportUnread } from "#/features/dashboard/hooks/use-support-unread";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
@@ -111,26 +112,55 @@ function SidebarToggleButton({
 	);
 }
 
-function HelpLink() {
+function HelpLink({ unreadCount = 0 }: { unreadCount?: number }) {
 	const pathname = usePathname() ?? "/";
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 	const isHelpActive = pathWithoutSlug === "/help";
+	const hasUnread = unreadCount > 0 && !isHelpActive;
+	const unreadLabel = unreadCount > 9 ? "9+" : String(unreadCount);
 
 	return (
 		<Link
 			href="/help"
-			title="Help & support"
-			aria-label="Go to Help & support"
+			title={
+				hasUnread ? `Help & support (${unreadCount} unread)` : "Help & support"
+			}
+			aria-label={
+				hasUnread
+					? `Go to Help & support, ${unreadCount} unread ${unreadCount === 1 ? "message" : "messages"}`
+					: "Go to Help & support"
+			}
 			aria-current={isHelpActive ? "page" : undefined}
 			className={cn(
 				"flex h-7 items-center gap-1.5 rounded-full px-2.5 font-medium text-[12px] text-text-sub-600 transition-colors",
 				"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5 dark:hover:text-white",
 				isHelpActive &&
 					"bg-bg-weak-50 text-text-strong-950 dark:bg-white/5 dark:text-white",
+				hasUnread &&
+					"bg-bg-weak-50 text-text-strong-950 dark:bg-white/5 dark:text-white",
 			)}
 		>
-			<LifeBuoy className="h-4 w-4" />
+			<span className="relative flex">
+				<LifeBuoy className="h-4 w-4" />
+				{hasUnread ? (
+					<span
+						aria-hidden
+						className="-top-0.5 -right-0.5 absolute flex h-2 w-2"
+					>
+						<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error-base opacity-75" />
+						<span className="relative inline-flex h-2 w-2 rounded-full bg-error-base ring-2 ring-bg-white-0 dark:ring-black" />
+					</span>
+				) : null}
+			</span>
 			<span className="hidden sm:inline">Help</span>
+			{hasUnread ? (
+				<span
+					aria-hidden
+					className="flex h-4 min-w-4 items-center justify-center rounded-full bg-error-base px-1 font-semibold text-[10px] text-white tabular-nums"
+				>
+					{unreadLabel}
+				</span>
+			) : null}
 		</Link>
 	);
 }
@@ -164,6 +194,7 @@ export function PageHeaderSkeleton() {
 export function PageHeader() {
 	const { user, organizations, activeOrganization, onOrganizationChange } =
 		useActiveOrganization();
+	const { unreadCount } = useSupportUnread();
 
 	return (
 		<div className={HEADER_CLASS}>
@@ -178,7 +209,7 @@ export function PageHeader() {
 			</div>
 
 			<div className="flex items-center gap-1.5">
-				<HelpLink />
+				<HelpLink unreadCount={unreadCount} />
 				<UserDropdown
 					user={
 						user

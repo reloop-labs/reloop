@@ -12,9 +12,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatedForwardButton } from "#/features/dashboard/animated-forward-button";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
+import { openHelpWithMessage } from "#/features/help/open-help";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import { GrantedPlanBanner } from "./granted-plan-banner";
 import { resolvePlanId } from "./plan-id";
-import { requestPlanSupport } from "./request-support";
 import { SwitchPlanModal } from "./switch-plan-modal";
 import {
 	contactEnterprise,
@@ -93,14 +94,14 @@ export function BillingPage() {
 	const handleUpgrade = () => {
 		if (!nextPlan) return;
 		if (nextPlan.monthlyPrice === null) {
-			contactEnterprise();
+			contactEnterprise(router);
 			return;
 		}
 		if (isCheckoutPlanId(nextPlan.id)) {
 			checkout.mutate(nextPlan.id);
 			return;
 		}
-		contactEnterprise();
+		contactEnterprise(router);
 	};
 
 	const handleManage = () => {
@@ -110,6 +111,9 @@ export function BillingPage() {
 	};
 
 	const periods = periodsQuery.data ?? [];
+	// Nothing to manage in the billing portal on Free or an admin-granted plan.
+	const canManageSubscription =
+		currentPlanId !== "free" && !usageData?.grantedPlan;
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -126,7 +130,8 @@ export function BillingPage() {
 						<button
 							type="button"
 							onClick={() =>
-								requestPlanSupport(
+								openHelpWithMessage(
+									router,
 									"Hi! I have a question about billing. Can you help?",
 								)
 							}
@@ -154,6 +159,13 @@ export function BillingPage() {
 					</button>
 				</div>
 			)}
+
+			{usageData?.grantedPlan ? (
+				<GrantedPlanBanner
+					planName={usageData.grantedPlan.name}
+					grantedAt={usageData.grantedPlan.grantedAt}
+				/>
+			) : null}
 
 			<div className={CARD}>
 				<div className="flex items-center justify-between">
@@ -184,15 +196,17 @@ export function BillingPage() {
 								: null}
 						</p>
 					</div>
-					<FancyButton.Root
-						variant="basic"
-						size="xsmall"
-						className="rounded-full font-medium"
-						disabled={portal.isPending}
-						onClick={handleManage}
-					>
-						{portal.isPending ? "Opening…" : "Manage"}
-					</FancyButton.Root>
+					{canManageSubscription ? (
+						<FancyButton.Root
+							variant="basic"
+							size="xsmall"
+							className="rounded-full font-medium"
+							disabled={portal.isPending}
+							onClick={handleManage}
+						>
+							{portal.isPending ? "Opening…" : "Manage"}
+						</FancyButton.Root>
+					) : null}
 				</div>
 			</div>
 
@@ -219,7 +233,7 @@ export function BillingPage() {
 								View all plans
 							</FancyButton.Root>
 							<FancyButton.Root
-								variant="blue"
+								variant="neutral"
 								size="small"
 								className="rounded-full font-semibold"
 								disabled={checkout.isPending}

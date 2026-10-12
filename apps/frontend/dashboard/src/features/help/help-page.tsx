@@ -60,7 +60,7 @@ export function HelpPage() {
 					aria-label="Support chat"
 					className="flex h-[560px] flex-col overflow-hidden rounded-[20px] border border-stroke-soft-100 bg-white lg:sticky lg:top-16 lg:h-[720px] dark:border-stroke-soft-100/70 dark:bg-black"
 				>
-					<SupportChatPanel hideCloseButton />
+					<SupportChatPanel />
 				</section>
 
 				{/* Right: contact details */}
