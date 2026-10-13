@@ -49,6 +49,7 @@ import { deleteSmtpProvider } from "./smtp-providers/delete";
 import { listSmtpProviders } from "./smtp-providers/list";
 import { testSmtpProvider } from "./smtp-providers/test";
 import { updateSmtpProvider } from "./smtp-providers/update";
+import { getReloopStatus } from "./status/get";
 import { checkTempEmail } from "./temp-email/check";
 import { createTemplate } from "./templates/create";
 import { getTemplate } from "./templates/get";
@@ -56,6 +57,7 @@ import { listTemplates } from "./templates/list";
 import { sendTestEmail } from "./templates/send-test";
 
 export const tools: readonly AnyToolDefinition[] = [
+	getReloopStatus,
 	listContacts,
 	getContact,
 	createContact,

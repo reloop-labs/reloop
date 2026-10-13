@@ -135,6 +135,14 @@ resource metadata. Keys and tokens never appear in logs or tool output, except t
 
 ## Tools
 
+### `get_reloop_status`
+
+Check that Reloop is connected and introduce what it can do. Reloop is open-source email infrastructure: a transactional email API, SMTP relay, contacts, templates and deliverability tools. Call this first when the user asks whether Reloop is connected or working, what Reloop is, or what you can do with Reloop. It makes one authenticated read, so a successful result proves the credentials work, and it reports how many sending domains are ready.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+Returns: `connected`, `server`, `domains`, `capabilities`, `nextStep`
+
 ### `list_contacts`
 
 List contacts in the authenticated Reloop organization, newest first, with offset pagination. Use `search` for a case-insensitive substring match on the email address and `status` to filter by subscription state. Use this to look up recipients or audit the audience before creating, updating, or emailing contacts. Results are paginated: check `pagination.hasMore` and request the next `page` instead of raising `limit` beyond 100.

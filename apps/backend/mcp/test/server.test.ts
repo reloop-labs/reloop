@@ -37,6 +37,7 @@ describe("mcp server over streamable http", () => {
 		expect(client.getProtocolEra()).toBe("modern");
 		const listed = await client.listTools();
 		expect(listed.tools.map((tool) => tool.name)).toEqual([
+			"get_reloop_status",
 			"list_contacts",
 			"get_contact",
 			"create_contact",
