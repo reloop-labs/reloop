@@ -26,7 +26,7 @@ export const metadata = createPageMetadata({
 	description: metaDescription,
 	path: toolPath,
 	keywords: toolKeywords,
-	ogImage: "/tools/opengraph-image",
+	ogImage: false,
 });
 
 function Spacer({ edge = "b" }: { edge?: "b" | "y" }) {

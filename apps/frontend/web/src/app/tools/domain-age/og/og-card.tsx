@@ -3,8 +3,12 @@ import type { ReactNode } from "react";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const BACKGROUND = "#000000";
-
+const THEME = {
+	background: "#000000",
+	ink: "#ffffff",
+	muted: "rgba(255,255,255,0.85)",
+	rule: "rgba(255,255,255,0.35)",
+};
 export async function loadFonts() {
 	const [regular, medium, bold, extraBold] = await Promise.all([
 		fetch(
@@ -48,7 +52,7 @@ export async function loadFonts() {
 	];
 }
 
-function Logo() {
+export function Logo() {
 	return (
 		<div
 			style={{
@@ -64,14 +68,14 @@ function Logo() {
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
 			>
-				<rect x="55" y="51" width="83" height="8" fill="#ffffff" />
+				<rect x="55" y="51" width="83" height="8" fill="currentColor" />
 				<rect
 					x="55"
 					y="59"
 					width="75"
 					height="8"
 					transform="rotate(90 55 59)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="146"
@@ -79,7 +83,7 @@ function Logo() {
 					width="46"
 					height="8"
 					transform="rotate(90 146 59)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="154"
@@ -87,7 +91,7 @@ function Logo() {
 					width="44"
 					height="8"
 					transform="rotate(90 154 69)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="138"
@@ -95,7 +99,8 @@ function Logo() {
 					width="46"
 					height="8"
 					transform="rotate(90 138 59)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="130"
@@ -103,7 +108,8 @@ function Logo() {
 					width="46"
 					height="8"
 					transform="rotate(90 130 59)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="90"
@@ -111,7 +117,8 @@ function Logo() {
 					width="29"
 					height="8"
 					transform="rotate(90 90 105)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="82"
@@ -119,7 +126,8 @@ function Logo() {
 					width="29"
 					height="8"
 					transform="rotate(90 82 105)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="138"
@@ -127,7 +135,7 @@ function Logo() {
 					width="8"
 					height="8"
 					transform="rotate(90 138 105)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="146"
@@ -135,7 +143,7 @@ function Logo() {
 					width="8"
 					height="8"
 					transform="rotate(90 146 105)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="146"
@@ -143,7 +151,7 @@ function Logo() {
 					width="8"
 					height="8"
 					transform="rotate(90 146 134)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="130"
@@ -151,7 +159,8 @@ function Logo() {
 					width="8"
 					height="8"
 					transform="rotate(90 130 105)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="122"
@@ -159,7 +168,8 @@ function Logo() {
 					width="8"
 					height="8"
 					transform="rotate(90 122 105)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="98"
@@ -167,7 +177,7 @@ function Logo() {
 					width="10"
 					height="8"
 					transform="rotate(90 98 77)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="90"
@@ -175,7 +185,8 @@ function Logo() {
 					width="10"
 					height="8"
 					transform="rotate(90 90 77)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="82"
@@ -183,7 +194,8 @@ function Logo() {
 					width="10"
 					height="8"
 					transform="rotate(90 82 77)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="146"
@@ -191,7 +203,7 @@ function Logo() {
 					width="21"
 					height="8"
 					transform="rotate(90 146 113)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="154"
@@ -199,7 +211,7 @@ function Logo() {
 					width="20"
 					height="8"
 					transform="rotate(90 154 122)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
 				<rect
 					x="138"
@@ -207,7 +219,8 @@ function Logo() {
 					width="21"
 					height="8"
 					transform="rotate(90 138 113)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="130"
@@ -215,7 +228,8 @@ function Logo() {
 					width="21"
 					height="8"
 					transform="rotate(90 130 113)"
-					fill="rgba(255,255,255,0.55)"
+					fill="currentColor"
+					opacity="0.55"
 				/>
 				<rect
 					x="98"
@@ -223,16 +237,15 @@ function Logo() {
 					width="21"
 					height="8"
 					transform="rotate(90 98 113)"
-					fill="#ffffff"
+					fill="currentColor"
 				/>
-				<rect x="55" y="134" width="83" height="8" fill="#ffffff" />
-				<rect x="63" y="142" width="83" height="8" fill="#ffffff" />
+				<rect x="55" y="134" width="83" height="8" fill="currentColor" />
+				<rect x="63" y="142" width="83" height="8" fill="currentColor" />
 			</svg>
 			<span
 				style={{
 					fontSize: "36px",
 					fontWeight: 800,
-					color: "#ffffff",
 					letterSpacing: "-0.5px",
 					marginLeft: "-4px",
 				}}
@@ -243,7 +256,12 @@ function Logo() {
 	);
 }
 
-function CalendarBlueprint() {
+/**
+ * Drafting-table frame (grid, guides, dimension marks) around a glyph drawn
+ * in its 420×340 viewBox; the glyph should sit in the 180×140 box at
+ * x 120–300, y 106–246.
+ */
+export function BlueprintArt({ children }: { children: ReactNode }) {
 	return (
 		<div style={{ position: "relative", display: "flex", width: "400px" }}>
 			<div
@@ -260,7 +278,6 @@ function CalendarBlueprint() {
 				<div
 					style={{
 						display: "flex",
-						color: "#ffffff",
 						fontSize: "12px",
 						fontWeight: 500,
 						letterSpacing: "0.5px",
@@ -282,7 +299,6 @@ function CalendarBlueprint() {
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-						color: "#ffffff",
 						fontSize: "12px",
 						fontWeight: 500,
 						letterSpacing: "0.5px",
@@ -310,7 +326,7 @@ function CalendarBlueprint() {
 				xmlns="http://www.w3.org/2000/svg"
 			>
 				{/* faint grid */}
-				<g stroke="white" strokeWidth="1" opacity="0.2">
+				<g stroke="currentColor" strokeWidth="1" opacity="0.2">
 					<line x1="10" y1="20" x2="10" y2="320" />
 					<line x1="50" y1="20" x2="50" y2="320" />
 					<line x1="90" y1="20" x2="90" y2="320" />
@@ -329,12 +345,12 @@ function CalendarBlueprint() {
 					<line x1="0" y1="290" x2="420" y2="290" />
 				</g>
 				{/* dotted drafting guides */}
-				<g stroke="white" strokeWidth="1" fill="none" opacity="0.25">
+				<g stroke="currentColor" strokeWidth="1" fill="none" opacity="0.25">
 					<circle cx="210" cy="170" r="140" strokeDasharray="3 4" />
 					<circle cx="210" cy="170" r="48" strokeDasharray="2 3" />
 				</g>
 				{/* diagonal construction rays */}
-				<g stroke="white" strokeWidth="1" opacity="0.16">
+				<g stroke="currentColor" strokeWidth="1" opacity="0.16">
 					<line x1="60" y1="20" x2="360" y2="320" />
 					<line x1="360" y1="20" x2="60" y2="320" />
 					<line
@@ -355,7 +371,12 @@ function CalendarBlueprint() {
 					/>
 				</g>
 				{/* center axes */}
-				<g stroke="white" strokeWidth="1" strokeDasharray="6 4" opacity="0.4">
+				<g
+					stroke="currentColor"
+					strokeWidth="1"
+					strokeDasharray="6 4"
+					opacity="0.4"
+				>
 					<line x1="210" y1="8" x2="210" y2="312" />
 					<line x1="16" y1="170" x2="404" y2="170" />
 				</g>
@@ -364,7 +385,7 @@ function CalendarBlueprint() {
 					cx="210"
 					cy="170"
 					r="125"
-					stroke="white"
+					stroke="currentColor"
 					strokeWidth="1"
 					opacity="0.25"
 				/>
@@ -372,71 +393,12 @@ function CalendarBlueprint() {
 					cx="210"
 					cy="170"
 					r="70"
-					stroke="white"
+					stroke="currentColor"
 					strokeWidth="1"
 					strokeDasharray="4 4"
 					opacity="0.25"
 				/>
-				{/* calendar hangers */}
-				<rect
-					x="166"
-					y="86"
-					width="14"
-					height="30"
-					rx="4"
-					stroke="white"
-					strokeWidth="3"
-				/>
-				<rect
-					x="240"
-					y="86"
-					width="14"
-					height="30"
-					rx="4"
-					stroke="white"
-					strokeWidth="3"
-				/>
-				{/* calendar body */}
-				<rect
-					x="120"
-					y="106"
-					width="180"
-					height="140"
-					rx="10"
-					stroke="white"
-					strokeWidth="4"
-					fill="rgba(255,255,255,0.04)"
-				/>
-				<line
-					x1="120"
-					y1="142"
-					x2="300"
-					y2="142"
-					stroke="white"
-					strokeWidth="3"
-				/>
-				{/* month dots */}
-				<g fill="white" opacity="0.85">
-					<circle cx="146" cy="124" r="4" />
-					<circle cx="164" cy="124" r="4" opacity="0.45" />
-					<circle cx="182" cy="124" r="4" opacity="0.45" />
-				</g>
-				{/* day cells */}
-				<g fill="white">
-					<rect x="138" y="158" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="164" y="158" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="190" y="158" width="18" height="18" rx="4" />
-					<rect x="216" y="158" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="242" y="158" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="138" y="184" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="164" y="184" width="18" height="18" rx="4" />
-					<rect x="190" y="184" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="216" y="184" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="242" y="184" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="138" y="210" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="164" y="210" width="18" height="18" rx="4" opacity="0.45" />
-					<rect x="190" y="210" width="18" height="18" rx="4" opacity="0.45" />
-				</g>
+				{children}
 				{/* top width dimension bar, broken for the label */}
 				<g opacity="0.75">
 					<line
@@ -444,7 +406,7 @@ function CalendarBlueprint() {
 						y1="40"
 						x2="168"
 						y2="40"
-						stroke="white"
+						stroke="currentColor"
 						strokeWidth="1"
 					/>
 					<line
@@ -452,12 +414,12 @@ function CalendarBlueprint() {
 						y1="40"
 						x2="302"
 						y2="40"
-						stroke="white"
+						stroke="currentColor"
 						strokeWidth="1"
 					/>
 					<path
 						d="M 118 35 V 45 M 302 35 V 45"
-						stroke="white"
+						stroke="currentColor"
 						strokeWidth="1"
 					/>
 				</g>
@@ -468,7 +430,7 @@ function CalendarBlueprint() {
 						y1="78"
 						x2="330"
 						y2="114"
-						stroke="white"
+						stroke="currentColor"
 						strokeWidth="1"
 					/>
 					<line
@@ -476,17 +438,17 @@ function CalendarBlueprint() {
 						y1="216"
 						x2="330"
 						y2="262"
-						stroke="white"
+						stroke="currentColor"
 						strokeWidth="1"
 					/>
 					<path
 						d="M 325 78 H 335 M 325 262 H 335"
-						stroke="white"
+						stroke="currentColor"
 						strokeWidth="1"
 					/>
 				</g>
 				{/* CAD anchor nodes */}
-				<g fill="white">
+				<g fill="currentColor">
 					<rect x="114" y="100" width="12" height="12" rx="2" />
 					<rect x="294" y="100" width="12" height="12" rx="2" />
 					<rect x="114" y="240" width="12" height="12" rx="2" />
@@ -498,6 +460,76 @@ function CalendarBlueprint() {
 	);
 }
 
+const CALENDAR_GLYPH = (
+	<g>
+		{/* calendar hangers */}
+		<rect
+			x="166"
+			y="86"
+			width="14"
+			height="30"
+			rx="4"
+			stroke="currentColor"
+			strokeWidth="3"
+		/>
+		<rect
+			x="240"
+			y="86"
+			width="14"
+			height="30"
+			rx="4"
+			stroke="currentColor"
+			strokeWidth="3"
+		/>
+		{/* calendar body */}
+		<rect
+			x="120"
+			y="106"
+			width="180"
+			height="140"
+			rx="10"
+			stroke="currentColor"
+			strokeWidth="4"
+			fill="currentColor"
+			fillOpacity="0.04"
+		/>
+		<line
+			x1="120"
+			y1="142"
+			x2="300"
+			y2="142"
+			stroke="currentColor"
+			strokeWidth="3"
+		/>
+		{/* month dots */}
+		<g fill="currentColor" opacity="0.85">
+			<circle cx="146" cy="124" r="4" />
+			<circle cx="164" cy="124" r="4" opacity="0.45" />
+			<circle cx="182" cy="124" r="4" opacity="0.45" />
+		</g>
+		{/* day cells */}
+		<g fill="currentColor">
+			<rect x="138" y="158" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="164" y="158" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="190" y="158" width="18" height="18" rx="4" />
+			<rect x="216" y="158" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="242" y="158" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="138" y="184" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="164" y="184" width="18" height="18" rx="4" />
+			<rect x="190" y="184" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="216" y="184" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="242" y="184" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="138" y="210" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="164" y="210" width="18" height="18" rx="4" opacity="0.45" />
+			<rect x="190" y="210" width="18" height="18" rx="4" opacity="0.45" />
+		</g>
+	</g>
+);
+
+function CalendarBlueprint() {
+	return <BlueprintArt>{CALENDAR_GLYPH}</BlueprintArt>;
+}
+
 export type OgFeature = { title: string; icon: ReactNode };
 
 /** Black Reloop card shared by the domain age and domain warmup share images. */
@@ -506,12 +538,15 @@ export function OgCard({
 	titleFontSize,
 	subtitle,
 	features,
+	art = <CalendarBlueprint />,
 }: {
 	titleLines: string[];
 	titleFontSize: number;
 	subtitle: string;
 	features: OgFeature[];
+	art?: ReactNode;
 }) {
+	const t = THEME;
 	return (
 		<div
 			style={{
@@ -521,7 +556,8 @@ export function OgCard({
 				flexDirection: "row",
 				alignItems: "center",
 				justifyContent: "space-between",
-				backgroundColor: BACKGROUND,
+				backgroundColor: t.background,
+				color: t.ink,
 				padding: "64px 72px",
 				fontFamily: "Inter, sans-serif",
 				position: "relative",
@@ -536,9 +572,8 @@ export function OgCard({
 					left: "12px",
 					right: "12px",
 					bottom: "12px",
-					border: "1px solid rgba(255,255,255,0.35)",
+					border: `1px solid ${t.rule}`,
 					borderRadius: "28px",
-					pointerEvents: "none",
 				}}
 			/>
 
@@ -568,7 +603,7 @@ export function OgCard({
 								display: "flex",
 								fontSize: titleFontSize,
 								fontWeight: 700,
-								color: "#ffffff",
+								color: t.ink,
 								letterSpacing: "-1.5px",
 								lineHeight: "1.06",
 								whiteSpace: "nowrap",
@@ -584,7 +619,7 @@ export function OgCard({
 						display: "flex",
 						fontSize: "22px",
 						fontWeight: 400,
-						color: "rgba(255,255,255,0.85)",
+						color: t.muted,
 						lineHeight: "1.45",
 						marginTop: "16px",
 					}}
@@ -618,7 +653,7 @@ export function OgCard({
 									display: "flex",
 									fontSize: "20px",
 									fontWeight: 600,
-									color: "#ffffff",
+									color: t.ink,
 									letterSpacing: "-0.2px",
 								}}
 							>
@@ -629,14 +664,14 @@ export function OgCard({
 				</div>
 			</div>
 
-			<CalendarBlueprint />
+			{art}
 		</div>
 	);
 }
 
 export const calendarIcon = (
 	<g
-		stroke="white"
+		stroke="currentColor"
 		strokeWidth="2"
 		fill="none"
 		strokeLinecap="round"
@@ -649,15 +684,15 @@ export const calendarIcon = (
 	</g>
 );
 export const targetIcon = (
-	<g stroke="white" strokeWidth="2" fill="none" strokeLinecap="round">
+	<g stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round">
 		<circle cx="12" cy="12" r="8" />
 		<circle cx="12" cy="12" r="4.5" />
-		<circle cx="12" cy="12" r="1.2" fill="white" />
+		<circle cx="12" cy="12" r="1.2" fill="currentColor" />
 	</g>
 );
 export const refreshIcon = (
 	<g
-		stroke="white"
+		stroke="currentColor"
 		strokeWidth="2"
 		fill="none"
 		strokeLinecap="round"
@@ -669,7 +704,7 @@ export const refreshIcon = (
 );
 export const giftIcon = (
 	<g
-		stroke="white"
+		stroke="currentColor"
 		strokeWidth="2"
 		fill="none"
 		strokeLinecap="round"
@@ -683,7 +718,7 @@ export const giftIcon = (
 );
 export const clockIcon = (
 	<g
-		stroke="white"
+		stroke="currentColor"
 		strokeWidth="2"
 		fill="none"
 		strokeLinecap="round"
@@ -695,7 +730,7 @@ export const clockIcon = (
 );
 export const shieldIcon = (
 	<g
-		stroke="white"
+		stroke="currentColor"
 		strokeWidth="2"
 		fill="none"
 		strokeLinecap="round"
