@@ -1,8 +1,9 @@
 import { type Config, ConfigError, type Env, readConfig } from "./config/env";
 import { createLogger, redact } from "./observability/log";
+import { createOtlpExporter, parseOtlpHeaders } from "./observability/otlp";
 import { startHttp } from "./transports/http";
 import { startStdio } from "./transports/stdio";
-import { PACKAGE_NAME, VERSION } from "./version";
+import { COMMIT, PACKAGE_NAME, VERSION } from "./version";
 
 type Transport = "stdio" | "http";
 
@@ -34,7 +35,9 @@ Environment:
   HOST, PORT           HTTP bind address
   MCP_ALLOWED_HOSTS    Comma separated Host header allowlist (default *)
   MCP_ALLOWED_ORIGINS  Comma separated Origin header allowlist
-  LOG_LEVEL            debug | info | warn | error | silent`;
+  LOG_LEVEL            debug | info | warn | error | silent
+  OTEL_EXPORTER_OTLP_ENDPOINT  OTLP/HTTP endpoint for log export, e.g. SigNoz (optional)
+  OTEL_EXPORTER_OTLP_HEADERS   OTLP headers as key=value,key2=value2 (optional)`;
 
 class UsageError extends Error {}
 
@@ -95,13 +98,44 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
 }
 
 function start(args: ParsedArgs, config: Config): () => Promise<void> {
-	const logger = createLogger({ level: config.logLevel });
+	const otlp =
+		config.otlpEndpoint !== undefined
+			? createOtlpExporter({
+					endpoint: config.otlpEndpoint,
+					headers: parseOtlpHeaders(config.otlpHeaders),
+					service: "mcp",
+					environment: config.environment,
+					version: VERSION,
+					commit: COMMIT,
+					onError: (cause) =>
+						process.stderr.write(
+							`${JSON.stringify({ level: "warn", msg: "otlp export failed", cause: redact(String(cause)) })}\n`,
+						),
+				})
+			: undefined;
+	const logger = createLogger({
+		level: config.logLevel,
+		fields: { version: VERSION, commit: COMMIT },
+		exporter: otlp?.export,
+	});
+	const flush = async () => {
+		await otlp?.flush();
+	};
 	if (args.transport === "stdio") {
 		const handle = startStdio({ config, logger });
-		return () => handle.close();
+		return async () => {
+			await handle.close();
+			await flush();
+		};
 	}
 	const server = startHttp({ config, logger });
-	return () => server.stop();
+	if (otlp !== undefined) {
+		logger.info("otlp log export enabled", { endpoint: config.otlpEndpoint });
+	}
+	return async () => {
+		await server.stop();
+		await flush();
+	};
 }
 
 function main(argv: readonly string[], env: Env): void {

@@ -14,6 +14,8 @@ export type LoggerOptions = {
 	level: LogLevel;
 	sink?: (line: string) => void;
 	fields?: Fields;
+	/** Receives each emitted record after redaction, e.g. an OTLP exporter. */
+	exporter?: (record: Fields) => void;
 };
 
 type EmittableLevel = Exclude<LogLevel, "silent">;
@@ -55,6 +57,13 @@ function redactValue(value: unknown): unknown {
 	return redact(serialized ?? String(value));
 }
 
+/**
+ * Fields whose values come from the server's own registry (tool names), never
+ * from credentials. Tool names like `list_group_contacts` match the API key
+ * pattern, so they skip redaction.
+ */
+const TRUSTED_FIELDS = new Set(["tool"]);
+
 function writeToStderr(line: string): void {
 	process.stderr.write(`${line}\n`);
 }
@@ -74,9 +83,10 @@ export function createLogger(options: LoggerOptions): Logger {
 			msg: redact(msg),
 		};
 		for (const [key, value] of Object.entries({ ...baseFields, ...fields })) {
-			payload[key] = redactValue(value);
+			payload[key] = TRUSTED_FIELDS.has(key) ? value : redactValue(value);
 		}
 		sink(JSON.stringify(payload));
+		options.exporter?.(payload);
 	};
 
 	return {
@@ -89,6 +99,7 @@ export function createLogger(options: LoggerOptions): Logger {
 				level: options.level,
 				sink,
 				fields: { ...baseFields, ...fields },
+				exporter: options.exporter,
 			}),
 	};
 }

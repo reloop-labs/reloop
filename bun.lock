@@ -467,12 +467,13 @@
     },
     "apps/backend/mcp": {
       "name": "reloop-mcp",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "bin": {
         "reloop-mcp": "dist/cli.js",
       },
       "dependencies": {
         "@modelcontextprotocol/server": "2.0.0",
+        "evlog": "2.10.0",
         "zod": "^4.2.0",
       },
       "devDependencies": {

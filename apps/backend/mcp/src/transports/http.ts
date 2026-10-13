@@ -9,11 +9,13 @@ import {
 	isOAuthBearer,
 	isPlausibleApiKey,
 } from "../auth/api-key";
+import { isExpired, readOAuthClaims } from "../auth/oauth-claims";
 import { type Config, ConfigError } from "../config/env";
 import type { Logger } from "../observability/log";
 import { createReloopApi } from "../reloop/api";
 import type { FetchLike } from "../reloop/client";
 import { createReloopServer } from "../server/create-server";
+import { tools } from "../tools/index";
 import { COMMIT, SERVER_NAME, VERSION } from "../version";
 
 export const MCP_PATH = "/mcp";
@@ -31,8 +33,81 @@ export function protectedResourceMetadataUrl(resource: string): string {
 export function wwwAuthenticateChallenge(
 	resource: string,
 	realm = "reloop",
+	error?: { code: "invalid_token"; description: string },
 ): string {
-	return `Bearer realm="${realm}", resource_metadata="${protectedResourceMetadataUrl(resource)}"`;
+	const problem =
+		error === undefined
+			? ""
+			: `, error="${error.code}", error_description="${error.description}"`;
+	return `Bearer realm="${realm}"${problem}, resource_metadata="${protectedResourceMetadataUrl(resource)}"`;
+}
+
+type AuthKind = "oauth" | "api_key" | "none" | "malformed";
+
+const TOOL_NAMES = new Set(tools.map((tool) => tool.name));
+
+/** Credential type plus, for OAuth, the unverified identity claims. Never the token. */
+function describeAuth(request: Request): Record<string, unknown> {
+	const token = extractRequestApiKey(request);
+	let auth: AuthKind;
+	if (token === undefined) {
+		auth = "none";
+	} else if (isOAuthBearer(token)) {
+		auth = "oauth";
+	} else {
+		auth = isPlausibleApiKey(token) ? "api_key" : "malformed";
+	}
+	if (auth !== "oauth" || token === undefined) {
+		return { auth };
+	}
+	const claims = readOAuthClaims(token);
+	if (claims === undefined) {
+		return { auth, tokenUnreadable: true };
+	}
+	return {
+		auth,
+		userId: claims.userId,
+		orgId: claims.orgId,
+		oauthClientId: claims.clientId,
+		tokenAudience: claims.audience.join(" "),
+		tokenExpired: isExpired(claims),
+	};
+}
+
+/** JSON-RPC method(s) and, for tools/call, the tool name from a POST body. */
+async function describeRpc(request: Request): Promise<Record<string, unknown>> {
+	if (request.method !== "POST") {
+		return {};
+	}
+	let body: unknown;
+	try {
+		body = await request.clone().json();
+	} catch {
+		return { rpcParseError: true };
+	}
+	const messages = Array.isArray(body) ? body : [body];
+	const methods: string[] = [];
+	const toolNames: string[] = [];
+	for (const message of messages) {
+		if (message === null || typeof message !== "object") {
+			continue;
+		}
+		const { method, params } = message as {
+			method?: unknown;
+			params?: { name?: unknown };
+		};
+		if (typeof method === "string") {
+			methods.push(method);
+		}
+		const name = params?.name;
+		if (method === "tools/call" && typeof name === "string") {
+			toolNames.push(TOOL_NAMES.has(name) ? name : "unknown");
+		}
+	}
+	return {
+		rpcMethod: methods.length > 0 ? methods.join(",") : undefined,
+		tool: toolNames.length > 0 ? toolNames.join(",") : undefined,
+	};
 }
 
 export function protectedResourceMetadata(config: Config): {
@@ -127,14 +202,17 @@ export function createHttpHandler(
 					"authInfo missing: the API key gate must run before the MCP handler",
 				);
 			}
+			const requestId = authInfo.extra?.requestId;
+			const requestLogger =
+				typeof requestId === "string" ? logger.child({ requestId }) : logger;
 			const api = createReloopApi({
 				baseUrl: config.baseUrl,
 				apiKey: authInfo.token,
 				timeoutMs: config.timeoutMs,
 				fetch: options.fetch,
-				logger,
+				logger: requestLogger,
 			});
-			return createReloopServer({ api });
+			return createReloopServer({ api, logger: requestLogger });
 		},
 		{ legacy: "stateless" },
 	);
@@ -149,7 +227,11 @@ export function createHttpHandler(
 				? localhostAllowedOrigins()
 				: [];
 
-	const serve = async (request: Request, url: URL): Promise<Response> => {
+	const serve = async (
+		request: Request,
+		url: URL,
+		requestId: string,
+	): Promise<Response> => {
 		if (
 			request.method === "GET" &&
 			(url.pathname === HEALTH_PATH || url.pathname === MCP_HEALTH_PATH)
@@ -198,8 +280,32 @@ export function createHttpHandler(
 
 		const token = extractRequestApiKey(request);
 		if (token !== undefined && isOAuthBearer(token)) {
+			const claims = readOAuthClaims(token);
+			if (claims !== undefined && isExpired(claims)) {
+				return Response.json(
+					{ error: "invalid_token", message: "The access token expired" },
+					{
+						status: 401,
+						headers: {
+							"www-authenticate": wwwAuthenticateChallenge(
+								config.resource,
+								"reloop",
+								{
+									code: "invalid_token",
+									description: "The access token expired",
+								},
+							),
+						},
+					},
+				);
+			}
 			return mcp.fetch(request, {
-				authInfo: { token, clientId: "reloop-oauth", scopes: [] },
+				authInfo: {
+					token,
+					clientId: "reloop-oauth",
+					scopes: [],
+					extra: { requestId },
+				},
 			});
 		}
 		if (token === undefined || !isPlausibleApiKey(token)) {
@@ -219,15 +325,28 @@ export function createHttpHandler(
 		}
 
 		return mcp.fetch(request, {
-			authInfo: { token, clientId: "reloop-api-key", scopes: [] },
+			authInfo: {
+				token,
+				clientId: "reloop-api-key",
+				scopes: [],
+				extra: { requestId },
+			},
 		});
 	};
 
-	const serveSafely = async (request: Request, url: URL): Promise<Response> => {
+	const serveSafely = async (
+		request: Request,
+		url: URL,
+		requestId: string,
+	): Promise<Response> => {
 		try {
-			return await serve(request, url);
+			return await serve(request, url, requestId);
 		} catch (cause) {
-			logger.error("http request failed", { path: url.pathname, cause });
+			logger.error("http request failed", {
+				requestId,
+				path: url.pathname,
+				cause,
+			});
 			return Response.json({ error: "internal_error" }, { status: 500 });
 		}
 	};
@@ -237,18 +356,34 @@ export function createHttpHandler(
 			const requestId = resolveRequestId(request);
 			const url = new URL(request.url);
 			const startedAt = Date.now();
+			const isHealth =
+				url.pathname === HEALTH_PATH || url.pathname === MCP_HEALTH_PATH;
+			const rpc = url.pathname === MCP_PATH ? await describeRpc(request) : {};
 			const response = withRequestId(
-				await serveSafely(request, url),
+				await serveSafely(request, url, requestId),
 				requestId,
 			);
-			logger.info("http request", {
+			const fields = {
 				requestId,
 				method: request.method,
 				path: url.pathname,
 				status: response.status,
 				durationMs: Date.now() - startedAt,
-				mcpMethod: request.headers.get("mcp-method") ?? undefined,
-			});
+				userAgent: request.headers.get("user-agent") ?? undefined,
+				protocolVersion:
+					request.headers.get("mcp-protocol-version") ?? undefined,
+				...(url.pathname === MCP_PATH ? describeAuth(request) : {}),
+				...rpc,
+			};
+			if (isHealth) {
+				logger.debug("http request", fields);
+			} else if (response.status >= 500) {
+				logger.error("http request", fields);
+			} else if (response.status >= 400) {
+				logger.warn("http request", fields);
+			} else {
+				logger.info("http request", fields);
+			}
 			return response;
 		},
 		close() {

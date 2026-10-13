@@ -99,6 +99,8 @@ curl -s http://127.0.0.1:3000/mcp/healthz
 | `MCP_ALLOWED_HOSTS` | `*` | Comma-separated `Host` header allowlist; `*` or unset accepts any host |
 | `MCP_ALLOWED_ORIGINS` | loopback origins | Comma-separated `Origin` header allowlist |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error`, or `silent` |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | unset | OTLP/HTTP endpoint (for example SigNoz). When set, every log line is also exported there |
+| `OTEL_EXPORTER_OTLP_HEADERS` | unset | Headers for the OTLP endpoint as `key=value,key2=value2`, for example `signoz-ingestion-key=<key>` |
 
 When `MCP_ALLOWED_HOSTS` is unset or `*`, the `Host` header is not validated; every request still needs an API key or OAuth token. Set it to restrict which hostnames the server answers on.
 

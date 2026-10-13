@@ -15,6 +15,9 @@ export type Config = {
 	logLevel: LogLevel;
 	resource: string;
 	authIssuer: string;
+	otlpEndpoint?: string;
+	otlpHeaders?: string;
+	environment: string;
 };
 
 export const DEFAULT_BASE_URL = "https://reloop.sh";
@@ -192,6 +195,9 @@ export function readConfig(env: Env): Config {
 			"RELOOP_MCP_RESOURCE",
 			RESOURCE_FIX,
 		),
+		otlpEndpoint: readText(env, "OTEL_EXPORTER_OTLP_ENDPOINT"),
+		otlpHeaders: readText(env, "OTEL_EXPORTER_OTLP_HEADERS"),
+		environment: readText(env, "NODE_ENV") ?? "development",
 		authIssuer: readResourceUrl(
 			readText(env, "RELOOP_AUTH_ISSUER") ?? `${baseUrl}/api/auth/v1`,
 			"RELOOP_AUTH_ISSUER",

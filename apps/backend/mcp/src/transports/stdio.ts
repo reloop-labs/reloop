@@ -32,7 +32,7 @@ export function startStdio(options: StartStdioOptions): StdioServerHandle {
 		fetch: options.fetch,
 		logger,
 	});
-	const handle = serveStdio(() => createReloopServer({ api }));
+	const handle = serveStdio(() => createReloopServer({ api, logger }));
 	logger.info("reloop mcp listening on stdio", {
 		baseUrl: config.baseUrl,
 		apiKey: maskApiKey(apiKey),

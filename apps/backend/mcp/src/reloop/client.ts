@@ -128,12 +128,22 @@ export class ReloopClient {
 			clearTimeout(timer);
 		}
 
-		this.#logger?.debug("reloop request", {
+		const upstream = {
 			method: spec.method,
 			path: spec.path,
 			status: response.status,
 			durationMs: Date.now() - startedAt,
-		});
+		};
+		if (response.ok) {
+			this.#logger?.debug("reloop request", upstream);
+		} else {
+			// Upstream rejections (401 bad token, 403 scope, 5xx) are the usual
+			// reason a tool call fails; keep them visible at the default level.
+			this.#logger?.warn("reloop request", {
+				...upstream,
+				upstreamRequestId: response.headers.get("x-request-id") ?? undefined,
+			});
+		}
 
 		if (response.status === NO_CONTENT) {
 			return undefined as T;

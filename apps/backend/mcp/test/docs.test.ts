@@ -15,6 +15,8 @@ const ENV_NAMES = [
 	"MCP_ALLOWED_HOSTS",
 	"MCP_ALLOWED_ORIGINS",
 	"LOG_LEVEL",
+	"OTEL_EXPORTER_OTLP_ENDPOINT",
+	"OTEL_EXPORTER_OTLP_HEADERS",
 ];
 
 function toolsSection(readme: string): string {

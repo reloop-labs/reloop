@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import type * as z from "zod";
 import { toReloopError } from "../errors/reloop-error";
+import type { Logger } from "../observability/log";
 import type { ReloopApi } from "../reloop/api";
 import { errorResult, okResult } from "./result";
 
@@ -37,6 +38,7 @@ export function registerTools(
 	server: McpServer,
 	api: ReloopApi,
 	tools: readonly AnyToolDefinition[],
+	logger?: Logger,
 ): void {
 	for (const tool of tools) {
 		server.registerTool(
@@ -49,10 +51,26 @@ export function registerTools(
 				annotations: tool.annotations,
 			},
 			async (args) => {
+				const startedAt = Date.now();
 				try {
-					return okResult(await tool.run(args, api));
+					const result = okResult(await tool.run(args, api));
+					logger?.info("tool call", {
+						tool: tool.name,
+						ok: true,
+						durationMs: Date.now() - startedAt,
+					});
+					return result;
 				} catch (cause) {
-					return errorResult(toReloopError(cause));
+					const error = toReloopError(cause);
+					logger?.warn("tool call", {
+						tool: tool.name,
+						ok: false,
+						durationMs: Date.now() - startedAt,
+						errorCode: error.code,
+						errorStatus: error.status,
+						errorMessage: error.message,
+					});
+					return errorResult(error);
 				}
 			},
 		);
