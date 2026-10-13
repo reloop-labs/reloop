@@ -17,7 +17,7 @@ export function BimiHero() {
 								aria-hidden
 								className="inline-flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-primary-dark p-px pb-[2px] dark:bg-[#30363d]"
 							>
-								<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.45)] dark:text-black dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.28),0_0_0_0.5px_rgba(255,255,255,0.08)]">
+								<span className="flex size-full items-center justify-center rounded-[4px] bg-primary-base text-white dark:text-black">
 									<Icon name="verified" className="size-[11px]" />
 								</span>
 							</span>

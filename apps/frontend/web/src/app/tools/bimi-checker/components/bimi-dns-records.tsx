@@ -1,59 +1,87 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { useLayoutEffect, useRef, useState } from "react";
 import { SectionHeading } from "../../components/section-heading";
 
-const PARTS: {
+type Part = {
 	n: string;
 	label: string;
 	value: string;
 	segment: string;
+	requirement: string;
 	text: string;
 	hex: string;
-}[] = [
+};
+
+const PARTS: Part[] = [
 	{
 		n: "1",
-		label: "SELECTOR",
+		label: "Selector",
 		value: "default._bimi",
 		segment: "default._bimi.yourdomain.com",
-		text: "Hostname the assertion lives at, plus TXT type. No record here means no logo, even if everything else is ready.",
+		requirement: "Required",
+		text: "Where the record lives. No TXT record at this name means no logo, even if everything else is ready.",
 		hex: "#2563eb",
 	},
 	{
 		n: "2",
-		label: "VERSION",
+		label: "Version",
 		value: "v=BIMI1;",
 		segment: "v=BIMI1;",
+		requirement: "Required",
 		text: "Must come first and match exactly. A missing or wrong version fails the whole record.",
 		hex: "#16a34a",
 	},
 	{
 		n: "3",
-		label: "LOGO",
+		label: "Logo",
 		value: "l=….svg;",
 		segment: "l=https://example.com/logo.svg;",
-		text: "HTTPS URL to an SVG Tiny PS logo. Square canvas, no scripts, no animation, no remote refs.",
+		requirement: "Required",
+		text: "HTTPS link to your SVG logo. Square, with no scripts, animation, or remote images.",
 		hex: "#ea580c",
 	},
 	{
 		n: "4",
-		label: "CERTIFICATE",
+		label: "Certificate",
 		value: "a=….pem",
 		segment: "a=https://example.com/vmc.pem",
-		text: "HTTPS URL to your VMC or CMC. Gmail generally requires it; other inboxes treat a missing a= as a warning.",
+		requirement: "Needed for Gmail",
+		text: "HTTPS link to your VMC or CMC. Gmail and Apple Mail need it; other inboxes show the logo without one.",
 		hex: "#7c3aed",
 	},
 ];
 
+const CORNER = 8;
+
+/** Down from the segment, across, down into the card, with rounded corners. */
+function wirePath(px: number, py: number, dx: number, dy: number): string {
+	const my = py + Math.max(16, (dy - py) * 0.5);
+	const run = dx - px;
+	if (Math.abs(run) < CORNER * 2) {
+		return `M ${px} ${py} V ${my} H ${dx} V ${dy}`;
+	}
+	const dir = Math.sign(run);
+	return [
+		`M ${px} ${py}`,
+		`V ${my - CORNER}`,
+		`Q ${px} ${my} ${px + dir * CORNER} ${my}`,
+		`H ${dx - dir * CORNER}`,
+		`Q ${dx} ${my} ${dx} ${my + CORNER}`,
+		`V ${dy}`,
+	].join(" ");
+}
+
 export function BimiDnsRecords() {
 	const wrapRef = useRef<HTMLDivElement | null>(null);
 	const scrollerRef = useRef<HTMLDivElement | null>(null);
-	const pillRefs = useRef<(HTMLDivElement | null)[]>([]);
+	const segmentRefs = useRef<(HTMLSpanElement | null)[]>([]);
 	const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
 	const [paths, setPaths] = useState<string[]>([]);
 	const [box, setBox] = useState({ w: 0, h: 0 });
-	const selector = PARTS[0];
-	const values = PARTS.slice(1);
+	const [active, setActive] = useState<string | null>(null);
+	const [selector, ...values] = PARTS as [Part, ...Part[]];
 
 	useLayoutEffect(() => {
 		const wrap = wrapRef.current;
@@ -62,23 +90,17 @@ export function BimiDnsRecords() {
 			const wr = wrap.getBoundingClientRect();
 			const d: string[] = [];
 			for (let i = 0; i < PARTS.length; i++) {
-				const p = pillRefs.current[i]?.getBoundingClientRect();
+				const p = segmentRefs.current[i]?.getBoundingClientRect();
 				const t = dotRefs.current[i]?.getBoundingClientRect();
-				if (!p || !t) continue;
+				if (!p || !t) {
+					d.push("");
+					continue;
+				}
 				const px = p.left + p.width / 2 - wr.left;
 				const py = p.bottom - wr.top;
 				const dx = t.left + t.width / 2 - wr.left;
 				const dy = t.top - wr.top;
-				if (dy - py < 8) {
-					d.push("");
-					continue;
-				}
-				// Z elbow: down from pill, across, down into the dot.
-				// Horizontal run length follows the pill-to-card distance.
-				const my = py + Math.max(14, (dy - py) * 0.45);
-				d.push(
-					`M ${px.toFixed(1)} ${py.toFixed(1)} V ${my.toFixed(1)} H ${dx.toFixed(1)} V ${dy.toFixed(1)}`,
-				);
+				d.push(dy - py < 8 ? "" : wirePath(px, py, dx, dy));
 			}
 			setPaths(d);
 			setBox({ w: wr.width, h: wr.height });
@@ -98,6 +120,25 @@ export function BimiDnsRecords() {
 		};
 	}, []);
 
+	const segment = (part: Part, index: number) => (
+		<span
+			key={part.n}
+			ref={(el) => {
+				segmentRefs.current[index] = el;
+			}}
+			className={cn(
+				"whitespace-nowrap rounded-md px-1.5 py-1 transition-opacity",
+				active && active !== part.n && "opacity-35",
+			)}
+			style={{
+				color: part.hex,
+				backgroundColor: `${part.hex}${active === part.n ? "24" : "12"}`,
+			}}
+		>
+			{part.segment}
+		</span>
+	);
+
 	return (
 		<section
 			id="dns-records"
@@ -109,71 +150,47 @@ export function BimiDnsRecords() {
 				eyebrow="DNS records"
 				icon="globe"
 				title={["What the BIMI", "DNS record looks like"]}
-				description="One TXT record: the type first, then four values. Each value points to the box that explains it."
+				description="One TXT record with four parts. Each color points to the box that explains it."
 			/>
 
 			<div
 				ref={wrapRef}
-				className="relative border-stroke-soft-100 border-b px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10 dark:border-white/10"
+				className="relative border-stroke-soft-100 border-b px-4 py-10 sm:px-6 sm:py-12 lg:px-8 dark:border-white/10"
 			>
-				{/* Full record as two joined groups: Record Type + Value */}
-				<div className="mt-4 flex justify-center">
+				{/* The record, each part tinted in its color */}
+				<div className="flex justify-center">
 					<div
 						ref={scrollerRef}
-						className="flex max-w-full overflow-x-auto pb-1"
+						className="max-w-full overflow-x-auto rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-1.5 dark:border-white/10 dark:bg-[#0c0c0c]"
 					>
-						<div className="m-auto flex w-max items-start gap-4 sm:gap-6">
-							<div className="flex flex-col">
-								<p className="text-center font-mono text-[11px] text-stone-500 uppercase tracking-[0.14em] dark:text-white/40">
-									Record Type
-								</p>
-								<div className="mt-1.5 flex items-stretch">
-									<div className="flex items-center justify-center whitespace-nowrap border-stone-400 border-b-[2.5px] bg-white p-1 text-center font-mono font-semibold text-[12.5px] text-stone-500 leading-relaxed dark:bg-white/[0.04] dark:text-white/60">
-										<span>TXT</span>
-									</div>
-									{selector ? (
-										<div
-											ref={(el) => {
-												pillRefs.current[0] = el;
-											}}
-											className="-ml-px flex items-center justify-center whitespace-nowrap border-b-[2.5px] bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed dark:bg-white/[0.04]"
-											style={{
-												borderBottomColor: selector.hex,
-											}}
-										>
-											<span style={{ color: selector.hex }}>
-												{selector.segment}
-											</span>
-										</div>
-									) : null}
-								</div>
+						<div className="flex w-max items-stretch font-mono text-[12.5px]">
+							<div className="flex flex-col justify-center gap-1 border-stroke-soft-100 border-r px-3 py-1.5 dark:border-white/10">
+								<span className="text-[10px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
+									Type
+								</span>
+								<span className="font-semibold text-text-strong-950 dark:text-white">
+									TXT
+								</span>
 							</div>
-							<div className="flex flex-col">
-								<p className="text-center font-mono text-[11px] text-stone-500 uppercase tracking-[0.14em] dark:text-white/40">
+							<div className="flex flex-col justify-center gap-1 border-stroke-soft-100 border-r px-2 py-1.5 dark:border-white/10">
+								<span className="px-1.5 text-[10px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
+									Name
+								</span>
+								{segment(selector, 0)}
+							</div>
+							<div className="flex flex-col justify-center gap-1 px-2 py-1.5">
+								<span className="px-1.5 text-[10px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
 									Value
-								</p>
-								<div className="mt-1.5 flex items-stretch">
-									{values.map((part, k) => (
-										<div
-											key={part.n}
-											ref={(el) => {
-												pillRefs.current[k + 1] = el;
-											}}
-											className={`flex items-center justify-center whitespace-nowrap border-b-[2.5px] bg-white p-1 text-center font-mono text-[12.5px] leading-relaxed dark:bg-white/[0.04] ${k === 0 ? "" : "-ml-px"}`}
-											style={{
-												borderBottomColor: part.hex,
-											}}
-										>
-											<span style={{ color: part.hex }}>{part.segment}</span>
-										</div>
-									))}
-								</div>
+								</span>
+								<span className="flex items-center gap-1">
+									{values.map((part, k) => segment(part, k + 1))}
+								</span>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* Z-shaped wires: pill -> across -> card dot */}
+				{/* Wires from each part to its card */}
 				{box.w > 0 ? (
 					<svg
 						aria-hidden
@@ -189,44 +206,71 @@ export function BimiDnsRecords() {
 									key={part.n}
 									d={d}
 									stroke={part.hex}
-									strokeWidth={1.5}
-									strokeLinejoin="round"
+									strokeWidth={1.25}
 									strokeLinecap="round"
-									opacity={0.9}
+									className="transition-opacity"
+									opacity={active ? (active === part.n ? 1 : 0.15) : 0.55}
 								/>
 							);
 						})}
 					</svg>
 				) : null}
 
-				{/* Explainer cards below, color-wired to each part */}
-				<div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+				{/* What each part does */}
+				<div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 					{PARTS.map((part, i) => (
-						<div key={part.n} className="flex flex-col items-center">
-							{/* Connector dot (wire endpoint) */}
-							<div aria-hidden className="flex flex-col items-center py-3">
-								<span
-									ref={(el) => {
-										dotRefs.current[i] = el;
-									}}
-									className="size-2 rounded-full"
-									style={{ backgroundColor: part.hex }}
-								/>
-							</div>
-							{/* Bottom: explainer card */}
-							<div className="flex w-full flex-1 flex-col overflow-hidden rounded-xl border border-stroke-soft-200 dark:border-white/10">
-								<div
-									className="px-4 py-3 text-white"
-									style={{ backgroundColor: part.hex }}
-								>
-									<p className="font-semibold text-[13px] tracking-tight">
-										{part.n}. {part.label}
-									</p>
-									<p className="mt-0.5 font-mono text-[11.5px] text-white/85">
-										{part.value}
-									</p>
+						<div
+							key={part.n}
+							onMouseEnter={() => setActive(part.n)}
+							onMouseLeave={() => setActive(null)}
+							className="relative flex flex-col"
+						>
+							<span
+								aria-hidden
+								ref={(el) => {
+									dotRefs.current[i] = el;
+								}}
+								className="-top-[3px] -translate-x-1/2 absolute left-1/2 z-10 hidden size-1.5 rounded-full sm:block"
+								style={{ backgroundColor: part.hex }}
+							/>
+							<div
+								className={cn(
+									"flex flex-1 flex-col rounded-xl border bg-bg-white-0 p-5 transition-colors dark:bg-[#0b0b0b]",
+									active !== part.n &&
+										"border-stroke-soft-100 dark:border-white/10",
+								)}
+								style={
+									active === part.n
+										? { borderColor: `${part.hex}66` }
+										: undefined
+								}
+							>
+								<div className="flex items-center justify-between gap-2">
+									<span className="flex items-center gap-2">
+										<span
+											className="flex size-6 items-center justify-center rounded-md font-mono font-semibold text-[11.5px]"
+											style={{
+												color: part.hex,
+												backgroundColor: `${part.hex}14`,
+											}}
+										>
+											{part.n}
+										</span>
+										<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+											{part.label}
+										</h3>
+									</span>
+									<span className="whitespace-nowrap rounded-full bg-bg-weak-50 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 dark:bg-white/[0.06] dark:text-white/60">
+										{part.requirement}
+									</span>
 								</div>
-								<p className="flex-1 bg-white px-4 py-3.5 text-[13px] text-stone-500 leading-relaxed dark:bg-black dark:text-white/60">
+								<code
+									className="mt-3 font-mono text-[12px]"
+									style={{ color: part.hex }}
+								>
+									{part.value}
+								</code>
+								<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
 									{part.text}
 								</p>
 							</div>
@@ -234,14 +278,21 @@ export function BimiDnsRecords() {
 					))}
 				</div>
 
-				{/* Prerequisite line */}
-				<p className="mt-8 border-stroke-soft-100 border-t pt-5 text-center text-[13px] text-stone-500 leading-relaxed dark:border-white/10 dark:text-white/60">
-					<span className="font-mono text-[12.5px] text-text-strong-950 dark:text-white">
-						_dmarc.example.com TXT “v=DMARC1; p=quarantine; pct=100;”
-					</span>
-					<br />
-					DMARC must be at quarantine or reject. p=none never shows a logo.
-				</p>
+				{/* Prerequisite */}
+				<div className="mt-4 flex flex-col gap-3 rounded-xl border border-stroke-soft-100 border-dashed px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
+					<div>
+						<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+							Also required: DMARC at enforcement
+						</p>
+						<p className="mt-1 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
+							DMARC must be at quarantine or reject. With p=none, no inbox shows
+							your logo.
+						</p>
+					</div>
+					<code className="shrink-0 break-all rounded-lg bg-bg-weak-50 px-3 py-2 font-mono text-[12px] text-text-strong-950 dark:bg-white/[0.04] dark:text-white/85">
+						_dmarc TXT "v=DMARC1; p=quarantine; pct=100;"
+					</code>
+				</div>
 			</div>
 		</section>
 	);

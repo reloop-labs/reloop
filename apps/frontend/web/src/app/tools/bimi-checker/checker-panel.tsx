@@ -663,7 +663,7 @@ export function CheckerPanel() {
 								size="medium"
 								hasError={hasFieldError}
 								className={cn(
-									"relative z-10 w-full rounded-xl bg-bg-white-0 shadow-xs transition-shadow sm:rounded-2xl dark:bg-[#0c0c0c]",
+									"relative z-10 w-full rounded-xl bg-bg-white-0 transition-shadow sm:rounded-2xl dark:bg-[#0c0c0c]",
 									hasFieldError
 										? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
 										: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",

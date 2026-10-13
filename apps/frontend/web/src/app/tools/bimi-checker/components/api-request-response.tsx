@@ -264,7 +264,7 @@ export function RequestCard({
 										ref={menuListRef}
 										role="listbox"
 										style={{ top: menuPos.top, right: menuPos.right }}
-										className="fixed z-50 max-h-72 w-52 overflow-y-auto rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-lg dark:border-white/10 dark:bg-[#141414]"
+										className="fixed z-50 max-h-72 w-52 overflow-y-auto rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-1.5 dark:border-white/10 dark:bg-[#141414]"
 									>
 										<div className="flex flex-col gap-0.5">
 											{snippets.map((s) => {
