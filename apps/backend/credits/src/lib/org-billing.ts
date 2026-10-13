@@ -200,6 +200,61 @@ export async function refillCreditsFromPlan(args: {
 	return updated;
 }
 
+/**
+ * Subscription ended (revoked / canceled at period end): record the paid
+ * period, move the org to the free plan and start a fresh free period.
+ * No-op on the plan when the org is already free (duplicate webhooks).
+ */
+export async function downgradeOrgToFree(args: {
+	billing: OrgBillingRow;
+	tx: DatabaseInstance;
+	now?: Date;
+}): Promise<{ downgraded: boolean; periodStart: Date; periodEnd: Date }> {
+	const { billing, tx } = args;
+	const now = args.now ?? new Date();
+
+	if (billing.plan.planId === "free") {
+		return {
+			downgraded: false,
+			periodStart: billing.credits.currentPeriodStart,
+			periodEnd: billing.credits.currentPeriodEnd,
+		};
+	}
+
+	const paidPeriodEnd =
+		now < billing.credits.currentPeriodEnd
+			? now
+			: billing.credits.currentPeriodEnd;
+	await closeBillingPeriod({
+		organizationId: billing.plan.organizationId,
+		periodStart: billing.credits.currentPeriodStart,
+		periodEnd: paidPeriodEnd,
+		planId: billing.plan.planId,
+		includedEmails: billing.credits.monthlyCredits,
+		emailsUsed: billing.credits.creditsUsed,
+		tx,
+	});
+
+	const free = await changeOrgPlan({
+		organizationId: billing.plan.organizationId,
+		nextPlanId: "free",
+		tx,
+	});
+
+	const periodStart = now;
+	const periodEnd = nextMonth(now);
+	await refillCreditsFromPlan({
+		creditsId: billing.credits.id,
+		organizationId: billing.plan.organizationId,
+		monthlyEmails: free.monthlyEmails,
+		periodStart,
+		periodEnd,
+		tx,
+	});
+
+	return { downgraded: true, periodStart, periodEnd };
+}
+
 export async function getOrProvisionOrgBilling(
 	orgId: string,
 	tx?: DatabaseInstance,

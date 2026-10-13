@@ -1,6 +1,7 @@
 import {
 	changeOrgPlan,
 	closeBillingPeriod,
+	downgradeOrgToFree,
 	getOrProvisionOrgBilling,
 	linkPolarCustomerToOrg,
 	refillCreditsFromPlan,
@@ -159,6 +160,58 @@ async function applySubscription(data: Record<string, unknown>) {
 	const cancelAtPeriodEnd =
 		bool(field(data, "cancelAtPeriodEnd", "cancel_at_period_end")) ?? false;
 	const canceledAt = date(field(data, "canceledAt", "canceled_at")) ?? null;
+
+	// Ended subscription (Polar `revoked`, or `canceled` once the period is over).
+	// A cancel that only sets cancel_at_period_end stays `active` and keeps the
+	// paid plan until Polar revokes it.
+	if (status === "cancelled") {
+		const storedSubscriptionId = billing.subscription.polarSubscriptionId;
+		const isOlderSubscription =
+			storedSubscriptionId != null &&
+			polarSubscriptionId != null &&
+			storedSubscriptionId !== polarSubscriptionId &&
+			billing.subscription.status !== "cancelled";
+		if (isOlderSubscription) {
+			log.info({
+				message: "Ignoring cancellation of a replaced Polar subscription",
+				organizationId: orgId,
+				polarSubscriptionId,
+				activeSubscriptionId: storedSubscriptionId,
+			});
+			return { ok: true as const, organizationId: orgId };
+		}
+
+		await db.transaction(async (tx) => {
+			const period = await downgradeOrgToFree({ billing, tx });
+			await tx
+				.update(organizationSubscription)
+				.set({
+					planId: "free",
+					status,
+					polarSubscriptionId:
+						polarSubscriptionId ?? billing.subscription.polarSubscriptionId,
+					polarCustomerId:
+						polarCustomerId ?? billing.subscription.polarCustomerId,
+					currentPeriodStart: period.periodStart,
+					currentPeriodEnd: period.periodEnd,
+					cancelAtPeriodEnd,
+					canceledAt:
+						canceledAt ?? billing.subscription.canceledAt ?? new Date(),
+					updatedAt: new Date(),
+				})
+				.where(eq(organizationSubscription.id, billing.subscription.id));
+
+			if (polarCustomerId) {
+				await linkPolarCustomerToOrg({
+					organizationId: orgId,
+					polarCustomerId,
+					tx,
+				});
+			}
+		});
+
+		return { ok: true as const, organizationId: orgId };
+	}
 
 	const periodChanged =
 		billing.credits.currentPeriodStart.getTime() !== periodStart.getTime();
