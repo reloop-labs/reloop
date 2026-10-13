@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SectionHeading } from "../../components/section-heading";
 import { apiBodyArgs, apiEndpoint, apiSnippets } from "../content";
 import {
 	AnimatedCopyIcon,
@@ -43,17 +44,13 @@ export function ApiIntegration() {
 
 	return (
 		<section id="api" aria-labelledby="api-heading" className="w-full">
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					API Integration
-				</p>
-				<h2
-					id="api-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					Integrate today in your code.
-				</h2>
-			</div>
+			<SectionHeading
+				id="api-heading"
+				eyebrow="API integration"
+				icon="code"
+				title={["Integrate today", "in your code"]}
+				description="One request checks the BIMI record, DMARC enforcement and the SVG logo. No API key or account needed."
+			/>
 
 			<div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-8">
 				{/* Left: endpoint + Body docs */}

@@ -151,25 +151,35 @@ const VERDICT_STATUS_CONFIG: Record<
 	CheckStatus,
 	{
 		label: string;
+		hint: string;
 		icon: IconName;
 		iconClass: string;
 	}
 > = {
 	pass: {
 		label: "BIMI ready",
+		hint: "Your logo can show next to your mail in inboxes that support BIMI.",
 		icon: "check-circle",
 		iconClass: "text-emerald-500",
 	},
 	warn: {
 		label: "BIMI with warnings",
-		icon: "shield-alert",
+		hint: "Your logo may show in some inboxes. Fix the warnings below to show it everywhere.",
+		icon: "alert-triangle",
 		iconClass: "text-amber-500",
 	},
 	fail: {
 		label: "BIMI not ready",
+		hint: "Your logo won't show anywhere until the failing checks below are fixed.",
 		icon: "cross-circle",
 		iconClass: "text-rose-500 dark:text-rose-400",
 	},
+};
+
+const STATUS_LABEL: Record<CheckStatus, string> = {
+	pass: "Pass",
+	warn: "Warning",
+	fail: "Fail",
 };
 
 function CheckItem({
@@ -200,7 +210,7 @@ function CheckItem({
 				: "border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400";
 
 	return (
-		<div className="py-3 first:pt-1 last:pb-1">
+		<div className="py-3 last:pb-0">
 			<div className="flex items-center justify-between gap-3">
 				<div className="flex items-center gap-2.5">
 					<span className={cn("size-2 rounded-full", dotColor)} />
@@ -214,7 +224,7 @@ function CheckItem({
 						badgeStyles,
 					)}
 				>
-					{status}
+					{STATUS_LABEL[status]}
 				</code>
 			</div>
 			<p className="mt-1.5 pl-[18px] text-text-sub-600 text-xs leading-relaxed dark:text-white/55">
@@ -226,8 +236,8 @@ function CheckItem({
 				</code>
 			)}
 			{fix && status !== "pass" && (
-				<p className="mt-1.5 pl-[18px] text-text-strong-950 text-xs dark:text-white/70">
-					Fix: {fix}
+				<p className="mt-1.5 pl-[18px] text-text-strong-950 text-xs leading-relaxed dark:text-white/80">
+					<span className="font-semibold">How to fix:</span> {fix}
 				</p>
 			)}
 		</div>
@@ -270,14 +280,18 @@ function LogoPreview({ url, domain }: { url: string; domain: string }) {
 function ResultCardDetailed({
 	result,
 	onReset,
-	shouldReduceMotion,
 }: {
 	result: BimiCheckResponse;
 	onReset: () => void;
-	shouldReduceMotion?: boolean | null;
 }) {
 	const status = VERDICT_STATUS_CONFIG[result.verdict];
-	const [showDetails, setShowDetails] = useState(false);
+	// Most recommendations repeat a check's own "How to fix"; only list new ones.
+	const shownFixes = new Set(
+		result.checks.filter((c) => c.status !== "pass").map((c) => c.fix),
+	);
+	const extraRecommendations = result.recommendations.filter(
+		(rec) => !shownFixes.has(rec),
+	);
 	const [copiedLink, setCopiedLink] = useState(false);
 	const [copiedJson, setCopiedJson] = useState(false);
 
@@ -303,99 +317,70 @@ function ResultCardDetailed({
 
 	return (
 		<div className="space-y-2 text-left text-xs">
-			{/* Unified Status Card */}
 			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.02]">
-				<div className="flex items-center justify-between gap-3 px-3.5 py-2 pr-2.5! sm:px-4 sm:py-2.5">
-					<div className="flex min-w-0 items-center gap-2">
-						{isPreviewableLogoUrl(result.logoUrl) ? (
-							<LogoPreview url={result.logoUrl} domain={result.domain} />
-						) : (
+				{/* Verdict */}
+				<div className="flex items-start gap-3 px-3.5 py-3 sm:px-4">
+					{isPreviewableLogoUrl(result.logoUrl) ? (
+						<LogoPreview url={result.logoUrl} domain={result.domain} />
+					) : null}
+					<div className="min-w-0">
+						<div className="flex items-center gap-1.5">
 							<Icon
 								name={status.icon}
 								className={cn("size-4 shrink-0", status.iconClass)}
 							/>
-						)}
-						<div className="min-w-0">
 							<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
 								{status.label}
 							</p>
-							<p className="truncate font-mono text-[11px] text-text-sub-600 dark:text-white/50">
-								{result.queryName}
-							</p>
 						</div>
+						<p className="mt-1 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
+							{status.hint}
+						</p>
+						<p className="mt-1 truncate font-mono text-[11px] text-text-soft-400 dark:text-white/40">
+							{result.queryName}
+						</p>
 					</div>
-
-					<button
-						type="button"
-						onClick={() => setShowDetails((prev) => !prev)}
-						aria-expanded={showDetails}
-						aria-controls="bimi-checks-panel"
-						className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 font-medium text-text-sub-600 text-xs shadow-2xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
-					>
-						<span>Details</span>
-						<Icon
-							name="chevron-down"
-							className={cn(
-								"size-3 transition-transform duration-200",
-								showDetails && "rotate-180",
-							)}
-						/>
-					</button>
 				</div>
 
-				{/* Checks (Expandable inside the card) */}
-				<AnimatePresence initial={false}>
-					{showDetails && (
-						<motion.div
-							id="bimi-checks-panel"
-							key="bimi-details"
-							initial={
-								shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }
-							}
-							animate={
-								shouldReduceMotion
-									? { opacity: 1 }
-									: { opacity: 1, height: "auto" }
-							}
-							exit={
-								shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }
-							}
-							transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-							className="overflow-hidden"
-						>
-							<div className="p-2 pt-0! sm:p-2.5">
-								<div className="divide-y divide-stroke-soft-100/50 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-1 dark:divide-white/5 dark:border-white/10 dark:bg-[#070707]">
-									{result.checks.map((check) => (
-										<CheckItem
-											key={check.id}
-											label={check.label}
-											status={check.status}
-											detail={check.detail}
-											record={check.record}
-											fix={check.fix}
-										/>
-									))}
-								</div>
-								{result.recommendations.length > 0 && (
-									<div className="mt-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-white/10 dark:bg-[#070707]">
-										<p className="font-semibold text-text-strong-950 text-xs dark:text-white">
-											What to fix next
-										</p>
-										<ul className="mt-1.5 list-disc space-y-1 pl-4 text-text-sub-600 text-xs leading-relaxed dark:text-white/55">
-											{result.recommendations.map((rec) => (
-												<li key={rec}>{rec}</li>
-											))}
-										</ul>
-									</div>
-								)}
-							</div>
-						</motion.div>
+				{/* Checks */}
+				<div className="p-2 pt-0 sm:p-2.5 sm:pt-0">
+					<div className="rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-white/10 dark:bg-[#070707]">
+						<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							What we checked
+						</p>
+						<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
+							Inboxes only show your logo when every check below passes.
+						</p>
+						<div className="mt-2 divide-y divide-stroke-soft-100/50 border-stroke-soft-100/50 border-t dark:divide-white/5 dark:border-white/5">
+							{result.checks.map((check) => (
+								<CheckItem
+									key={check.id}
+									label={check.label}
+									status={check.status}
+									detail={check.detail}
+									record={check.record}
+									fix={check.fix}
+								/>
+							))}
+						</div>
+					</div>
+					{extraRecommendations.length > 0 && (
+						<div className="mt-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-white/10 dark:bg-[#070707]">
+							<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
+								What to fix next
+							</p>
+							<ul className="mt-1.5 list-disc space-y-1 pl-4 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								{extraRecommendations.map((rec) => (
+									<li key={rec}>{rec}</li>
+								))}
+							</ul>
+						</div>
 					)}
-				</AnimatePresence>
+				</div>
 			</div>
 
 			{/* Actions Footer */}
-			<div className="flex flex-wrap items-center justify-between gap-2 pr-4">
+			<div className="-mx-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
 				<div className="flex items-center gap-1.5">
 					<button
 						type="button"
@@ -417,7 +402,7 @@ function ResultCardDetailed({
 				<button
 					type="button"
 					onClick={onReset}
-					className="cursor-pointer font-medium text-primary-base text-xs hover:underline"
+					className="cursor-pointer rounded-lg px-2 py-1.5 font-medium text-primary-base text-xs hover:underline"
 				>
 					Clear result
 				</button>
@@ -434,7 +419,6 @@ export function CheckerPanel() {
 	const field = useFieldError();
 	const shouldReduceMotion = useReducedMotion();
 	const hasFieldError = field.hasError;
-	const autoRanRef = useRef(false);
 	const abortRef = useRef<AbortController | null>(null);
 
 	const showFieldError = (message: string) => {
@@ -512,106 +496,117 @@ export function CheckerPanel() {
 		setTimeout(() => field.inputRef.current?.focus(), 50);
 	};
 
+	useEffect(
+		() => () => {
+			abortRef.current?.abort();
+		},
+		[],
+	);
+
 	// Deep-link support: /tools/bimi-checker?domain=paypal.com
-	// auto-fills and runs once so results are shareable.
+	// auto-fills and runs once so results are shareable. The timeout defers
+	// past StrictMode's remount simulation (whose cleanup would otherwise
+	// abort the only run); the cleanup clears the first timer so the check
+	// still runs exactly once.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: run once on mount
 	useEffect(() => {
-		if (autoRanRef.current) return;
-		autoRanRef.current = true;
 		const initial = getDomainParam();
-		if (initial) {
-			setValue(normalizeDomainInput(initial));
+		if (!initial) return;
+		setValue(normalizeDomainInput(initial));
+		const t = setTimeout(() => {
 			void run(initial);
-		}
-		return () => abortRef.current?.abort();
+		}, 0);
+		return () => clearTimeout(t);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
-		<div className="mx-auto w-full max-w-xl text-left font-sans">
+		<div className="mx-auto w-full max-w-2xl text-left font-sans">
 			{/* Input Check Zone */}
 			<form onSubmit={onSubmit} noValidate className="space-y-2.5">
-				<FieldError field={field} messageClassName="text-xs leading-relaxed">
-					<div className="relative w-full">
-						<Input.Root
-							size="medium"
-							hasError={hasFieldError}
-							className={cn(
-								"relative z-10 w-full rounded-xl bg-bg-white-0 shadow-xs transition-shadow sm:rounded-2xl dark:bg-[#0c0c0c]",
-								hasFieldError
-									? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
-									: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
-							)}
-						>
-							<Input.Wrapper className="h-12 pr-2 pl-4 dark:bg-[#0c0c0c]">
-								<Input.Input
-									id="checker-input"
-									aria-label="Domain"
-									{...field.controlProps}
-									type="text"
-									inputMode="url"
-									autoComplete="off"
-									autoCapitalize="none"
-									spellCheck={false}
-									value={value}
-									onPaste={handlePaste}
-									onChange={(e) => {
-										setValue(e.target.value);
-										if (hasFieldError) field.clear();
-										if (result) setResult(null);
-										if (error) setError(null);
-									}}
-									placeholder="example.com"
-									className="font-medium text-[15px]"
-								/>
-								{hasChecked ? (
-									<button
-										type="button"
-										onClick={handleReset}
-										className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
-										aria-label="Clear check"
-									>
-										<svg
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											strokeWidth="2.5"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											className="size-3.5"
-											aria-hidden="true"
-										>
-											<path d="M18 6L6 18M6 6l12 12" />
-										</svg>
-									</button>
-								) : (
-									<FancyButton.Root
-										type="submit"
-										variant="primary"
-										size="xsmall"
-										className="!p-0 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg dark:text-black"
-										aria-label="Check BIMI record"
-									>
-										{isPending ? (
-											<LoadingDot
-												size={13}
-												dotSize={2}
-												className="text-white dark:text-black"
-											/>
-										) : (
-											<FancyButton.Icon className="mx-0 size-3.5 dark:text-black">
-												<Icon
-													name="arrow-right"
-													className="size-3.5 text-white dark:text-black"
-												/>
-											</FancyButton.Icon>
-										)}
-									</FancyButton.Root>
+				<div className="mx-auto w-full max-w-xl">
+					<FieldError field={field} messageClassName="text-xs leading-relaxed">
+						<div className="relative w-full">
+							<Input.Root
+								size="medium"
+								hasError={hasFieldError}
+								className={cn(
+									"relative z-10 w-full rounded-xl bg-bg-white-0 shadow-xs transition-shadow sm:rounded-2xl dark:bg-[#0c0c0c]",
+									hasFieldError
+										? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
+										: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
 								)}
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-				</FieldError>
+							>
+								<Input.Wrapper className="h-12 pr-2 pl-4 dark:bg-[#0c0c0c]">
+									<Input.Input
+										id="checker-input"
+										aria-label="Domain"
+										{...field.controlProps}
+										type="text"
+										inputMode="url"
+										autoComplete="off"
+										autoCapitalize="none"
+										spellCheck={false}
+										value={value}
+										onPaste={handlePaste}
+										onChange={(e) => {
+											setValue(e.target.value);
+											if (hasFieldError) field.clear();
+											if (result) setResult(null);
+											if (error) setError(null);
+										}}
+										placeholder="example.com"
+										className="font-medium text-[15px]"
+									/>
+									{hasChecked ? (
+										<button
+											type="button"
+											onClick={handleReset}
+											className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+											aria-label="Clear check"
+										>
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2.5"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												className="size-3.5"
+												aria-hidden="true"
+											>
+												<path d="M18 6L6 18M6 6l12 12" />
+											</svg>
+										</button>
+									) : (
+										<FancyButton.Root
+											type="submit"
+											variant="primary"
+											size="xsmall"
+											className="!p-0 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg dark:text-black"
+											aria-label="Check BIMI record"
+										>
+											{isPending ? (
+												<LoadingDot
+													size={13}
+													dotSize={2}
+													className="text-white dark:text-black"
+												/>
+											) : (
+												<FancyButton.Icon className="mx-0 size-3.5 dark:text-black">
+													<Icon
+														name="arrow-right"
+														className="size-3.5 text-white dark:text-black"
+													/>
+												</FancyButton.Icon>
+											)}
+										</FancyButton.Root>
+									)}
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+					</FieldError>
+				</div>
 
 				<MorphSlot
 					activeKey={error ? "error" : result ? "result" : null}
@@ -628,11 +623,7 @@ export function CheckerPanel() {
 							</p>
 						</div>
 					) : result ? (
-						<ResultCardDetailed
-							result={result}
-							onReset={handleReset}
-							shouldReduceMotion={shouldReduceMotion}
-						/>
+						<ResultCardDetailed result={result} onReset={handleReset} />
 					) : null}
 				</MorphSlot>
 			</form>

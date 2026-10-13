@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
+import { SectionHeading } from "../../components/section-heading";
 
 const PARTS: {
 	n: string;
@@ -103,21 +104,13 @@ export function BimiDnsRecords() {
 			aria-labelledby="dns-records-heading"
 			className="w-full"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					DNS records
-				</p>
-				<h2
-					id="dns-records-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					What the DNS looks like
-				</h2>
-				<p className="max-w-3xl text-[15px] text-stone-500 leading-relaxed sm:text-[16px] dark:text-white/60">
-					One TXT record: type first, then four values. Each value points to its
-					box.
-				</p>
-			</div>
+			<SectionHeading
+				id="dns-records-heading"
+				eyebrow="DNS records"
+				icon="globe"
+				title={["What the BIMI", "DNS record looks like"]}
+				description="One TXT record: the type first, then four values. Each value points to the box that explains it."
+			/>
 
 			<div
 				ref={wrapRef}

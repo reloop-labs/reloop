@@ -1,6 +1,9 @@
+import { SectionHeading } from "../../components/section-heading";
+
 type BimiLetter = {
 	letter: string;
 	word: string;
+	text: string;
 	hex: string;
 };
 
@@ -8,21 +11,25 @@ const LETTERS: BimiLetter[] = [
 	{
 		letter: "B",
 		word: "Brand",
+		text: "Your logo, published by you.",
 		hex: "#2563eb",
 	},
 	{
 		letter: "I",
 		word: "Indicators",
+		text: "Shown next to your name in the inbox.",
 		hex: "#10b981",
 	},
 	{
 		letter: "M",
 		word: "Message",
+		text: "On every email you send.",
 		hex: "#f59e0b",
 	},
 	{
 		letter: "I",
 		word: "Identification",
+		text: "Only on mail that passes DMARC.",
 		hex: "#f43f5e",
 	},
 ];
@@ -34,17 +41,12 @@ export function WhatIsBimi() {
 			aria-labelledby="what-is-bimi-heading"
 			className="w-full"
 		>
-			<div className="border-stroke-soft-100 border-b px-4 py-8 sm:px-8 sm:py-10 lg:px-12 dark:border-white/10">
-				<p className="mb-3 font-medium text-[12px] text-primary-base uppercase">
-					What is BIMI
-				</p>
-				<h2
-					id="what-is-bimi-heading"
-					className="text-balance font-medium text-[1.45rem] text-text-strong-950 leading-[1.12] tracking-tight sm:text-[1.7rem] dark:text-white"
-				>
-					BIMI, letter by letter
-				</h2>
-			</div>
+			<SectionHeading
+				id="what-is-bimi-heading"
+				eyebrow="What is BIMI"
+				icon="info-outline"
+				title={["BIMI,", "letter by letter"]}
+			/>
 
 			<div className="border-stroke-soft-100 border-b px-4 py-10 sm:px-8 sm:py-12 lg:px-12 dark:border-white/10">
 				{/* Giant word */}
@@ -103,6 +105,9 @@ export function WhatIsBimi() {
 									{item.word}
 								</h3>
 							</div>
+							<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								{item.text}
+							</p>
 						</div>
 					))}
 				</div>
@@ -118,15 +123,20 @@ export function WhatIsBimi() {
 							>
 								{item.letter}
 							</span>
-							<div className="flex items-center gap-2">
-								<span
-									className="h-3.5 w-[2px] shrink-0 rounded-full"
-									style={{ backgroundColor: item.hex }}
-									aria-hidden="true"
-								/>
-								<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-									{item.word}
-								</h3>
+							<div>
+								<div className="flex items-center gap-2">
+									<span
+										className="h-3.5 w-[2px] shrink-0 rounded-full"
+										style={{ backgroundColor: item.hex }}
+										aria-hidden="true"
+									/>
+									<h3 className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+										{item.word}
+									</h3>
+								</div>
+								<p className="mt-1 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
+									{item.text}
+								</p>
 							</div>
 						</div>
 					))}

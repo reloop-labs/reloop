@@ -40,7 +40,7 @@ export function BimiHero() {
 
 						<div
 							id="checker"
-							className="mt-10 w-full max-w-xl scroll-mt-24 text-left sm:mt-12"
+							className="mt-10 w-full max-w-2xl scroll-mt-24 text-left sm:mt-12"
 						>
 							<CheckerPanel />
 						</div>
