@@ -1,23 +1,23 @@
-import { Icon } from "@reloop/ui/icon";
+import { FaqSection } from "@reloop/web/components/faq-section";
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { BlueprintCta } from "@reloop/web/components/landing/blueprint-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
-import { Band, SectionIntro } from "../blocklist-checker/grid";
-import { ApiSection } from "./api-section";
-import { CheckerPanel } from "./checker-panel";
+import { Gift, Layers, Lock, ScanSearch } from "lucide-react";
+import { SimilarTools } from "../components/similar-tools";
+import { FeatureGrid } from "../domain-age/components/feature-grid";
+import { McpSection } from "../domain-age/components/mcp-section";
+import { WhoIsItFor } from "../domain-age/components/who-is-it-for";
+import { ApiIntegration } from "./components/api-integration";
+import { WhoSendsHero } from "./components/who-sends-hero";
 import {
 	faqGroups,
 	faqs,
 	metaDescription,
-	reasons,
-	toolDescription,
 	toolKeywords,
 	toolPath,
 	toolTitle,
 } from "./content";
-import { FaqGrid } from "./faq-grid";
-import { SimilarTools } from "../components/similar-tools";
 
 export const instant = false;
 
@@ -29,11 +29,24 @@ export const metadata = createPageMetadata({
 	ogImage: "/tools/opengraph-image",
 });
 
+function Spacer({ edge = "b" }: { edge?: "b" | "y" }) {
+	return (
+		<div
+			aria-hidden
+			className={
+				edge === "y"
+					? "h-24 border-stroke-soft-100 border-y dark:border-white/10"
+					: "h-24 border-stroke-soft-100 border-b dark:border-white/10"
+			}
+		/>
+	);
+}
+
 export default function WhoSendsPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-		<>
+		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 [--primary-base:#171717] [--primary-dark:#000000] [--primary-darker:#000000] [--primary-link:#171717] dark:bg-black dark:text-white dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 			<JsonLd
 				data={[
 					{
@@ -95,88 +108,131 @@ export default function WhoSendsPage() {
 				]}
 			/>
 
-			{/* Hero / Interactive Tool Section */}
-			<Band className="relative overflow-hidden pt-16">
-				<div className="relative px-5 pt-14 pb-16 sm:px-6 sm:pt-16 md:px-8 lg:pb-20">
-					<div className="mx-auto max-w-3xl text-center">
-						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
-							<span className="size-1.5 rounded-full bg-emerald-500" />
-							Email Infrastructure &amp; ESP Fingerprint
-						</span>
+			<WhoSendsHero />
 
-						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
-							Who Sends Email From This Domain?
-						</h1>
-
-						<p className="mx-auto mt-5 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-							{toolDescription}
-						</p>
-					</div>
-
-					<div className="mt-10">
-						<CheckerPanel />
-					</div>
-				</div>
-			</Band>
-
-			{/* Section: Why ESP Fingerprinting Matters */}
-			<Band id="why-it-matters">
-				<SectionIntro
-					lead="Why analyzing your sending roster matters."
-					description="Clean up vendor sprawl, prevent SPF lookup limit errors, and understand your company's true email sending footprint."
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<Spacer />
+				<FeatureGrid
+					id="best-features"
+					eyebrow="Best features"
+					icon="star"
+					title={["Why choose Reloop's", "email sender lookup?"]}
+					description="Free, no account needed, and read straight from the domain's public DNS."
+					features={[
+						{
+							icon: Gift,
+							title: "100% Free & No limits",
+							description:
+								"This lookup is free. It needs no signup and has no credits or expiry.",
+						},
+						{
+							icon: ScanSearch,
+							title: "Unrolls nested SPF",
+							description:
+								"We follow branded includes like spf.acme.com down to the real provider underneath.",
+						},
+						{
+							icon: Layers,
+							title: "Flags leftover vendors",
+							description:
+								"Providers still in SPF with no DKIM key are marked as likely leftovers you can remove.",
+						},
+						{
+							icon: Lock,
+							title: "No Account Needed",
+							description:
+								"Use the lookup or the API without an account or an API key. We never send email.",
+						},
+					]}
 				/>
-
-				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
-					{reasons.map((reason) => (
-						<div
-							key={reason.title}
-							className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8"
-						>
-							<Icon
-								name={reason.icon}
-								className="size-5 text-text-sub-600 dark:text-white/40"
-							/>
-							<div>
-								<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-									{reason.title}
-								</p>
-								<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-									{reason.description}
-								</p>
-							</div>
-						</div>
-					))}
-				</div>
-			</Band>
-
-			{/* Section: Programmatic API Integration */}
-			<Band id="api">
-				<SectionIntro
-					lead="Identify email senders via API."
-					description="Integrate automated vendor discovery and SPF permission mapping into your security audits or customer onboarding flows."
+				<Spacer />
+				<WhoIsItFor
+					title={["Where can I use Reloop's", "email sender lookup?"]}
+					description="Anyone who needs to know which services can send email as a domain."
+					columns={[
+						{
+							title: "Email admins",
+							items: [
+								"SPF cleanup",
+								"10-lookup limit fixes",
+								"Vendor offboarding",
+								"DMARC rollout prep",
+								"Migration planning",
+								"Inbox vs. sender audits",
+								"Subdomain policy checks",
+							],
+						},
+						{
+							title: "Security teams",
+							items: [
+								"Shadow IT discovery",
+								"Spoofing exposure",
+								"+all misconfigurations",
+								"Vendor risk reviews",
+								"Phishing triage",
+								"M&A due diligence",
+								"Compliance audits",
+							],
+						},
+						{
+							title: "Sales & Growth",
+							items: [
+								"Tech stack research",
+								"Competitor ESP lookup",
+								"Lead enrichment",
+								"Account qualification",
+								"Migration prospecting",
+								"Partner vetting",
+								"Market mapping",
+							],
+						},
+						{
+							title: "Developers",
+							items: [
+								"Onboarding checks",
+								"Custom domain setup",
+								"Multi-tenant sending",
+								"Customer DNS support",
+								"Deliverability debugging",
+								"ESP detection APIs",
+								"Internal tooling",
+							],
+						},
+					]}
 				/>
-
-				<ApiSection />
-			</Band>
-
-			{/* Section: FAQs */}
-			<Band id="faq">
-				<SectionIntro
-					lead="Frequently asked questions."
-					description="Everything you need to know about SPF includes, nested unrolling, DKIM selectors, and inbox/outbound separation."
+				<Spacer />
+				<ApiIntegration
+					title={["Integrate today", "in your code"]}
+					description="One request returns the inbox provider, every authorized sender and the SPF policy for any domain. No API key or account needed."
 				/>
-
-				<FaqGrid groups={faqGroups} />
-			</Band>
-
-			{/* Bottom CTA to sign up */}
-			<Band>
+				<Spacer />
+				<McpSection
+					title={["Look up email senders", "from your AI agent"]}
+					description="Connect Claude, Cursor, or any MCP client to Reloop and let your agent see who sends email for a domain on its own."
+					mcpDescription="Let Claude, Cursor, or Codex check a domain's sending stack before they act."
+				/>
+				<Spacer edge="y" />
 				<SimilarTools currentPath={toolPath} />
-			</Band>
-
-			<Band className="border-b-0">
-				<BlogCta />
-			</Band>
-		</>
+				<div aria-hidden className="h-12 sm:h-16" />
+				<BlueprintCta
+					headlineLine1="Too many senders?"
+					headlineLine2="Send it all through Reloop."
+					subtext="Replace scattered sending vendors with one SPF include and one API. Start with 3,000 free emails per month."
+					primaryLabel="Get started free"
+					secondaryLabel="Talk to founder"
+				/>
+				<div aria-hidden className="h-12 sm:h-16" />
+				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
+					<FaqSection
+						items={faqGroups.flatMap((g) => g.items)}
+						id="faq-section"
+						eyebrow="FAQ"
+						compact
+						plain
+						flush
+					/>
+				</div>
+			</div>
+		</div>
 	);
 }

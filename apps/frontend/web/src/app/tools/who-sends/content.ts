@@ -1,8 +1,10 @@
+import { productionSiteUrl } from "@reloop/web/lib/site";
+
 export const toolPath = "/tools/who-sends";
 export const toolTitle =
 	"Who Sends Email From This Domain? ESP & Stack Fingerprint";
 export const toolDescription =
-	"Discover which email service providers (e.g. Google, Amazon SES, SendGrid, Mailchimp) are authorized to send email for any domain, and inspect their inbound mailbox routing.";
+	"See which email providers are allowed to send as any domain, and who receives its mail. We read public MX, SPF and DKIM records and never send email. Free, no sign-up.";
 export const metaDescription =
 	"Free email sender fingerprint tool. Analyze public SPF includes, nested DNS records, and DKIM selectors to identify every third-party ESP authorized to send as any domain.";
 
@@ -17,39 +19,6 @@ export const toolKeywords = [
 	"find company email service",
 	"detect SendGrid SES Mailgun",
 	"MX mailbox detector",
-];
-
-export interface DiagnosticReason {
-	title: string;
-	description: string;
-	icon: string;
-}
-
-export const reasons: DiagnosticReason[] = [
-	{
-		title: "Audit Third-Party ESP Sprawl",
-		description:
-			"Identify forgotten marketing tools, old transactional providers, and legacy CRM vendors still authorized to send from your domain.",
-		icon: "server",
-	},
-	{
-		title: "Prevent SPF 10-Lookup PermErrors",
-		description:
-			"Every third-party 'include:' eats into your RFC 7208 10-lookup limit. Finding and removing unused providers fixes delivery failures.",
-		icon: "alert-triangle",
-	},
-	{
-		title: "Unroll Hidden Nested Includes",
-		description:
-			"Many domains delegate SPF through 'include:spf.acme.com'. Our engine recursively follows up to depth 2 to reveal true underlying ESPs.",
-		icon: "shield-check",
-	},
-	{
-		title: "Inspect Inbound vs. Outbound Separation",
-		description:
-			"Understand whether a domain runs a unified stack (e.g. Google Workspace) or splits inbox routing from automated sending pipelines.",
-		icon: "mail",
-	},
 ];
 
 export interface FaqItem {
@@ -118,6 +87,184 @@ export const faqGroups: FaqGroup[] = [
 
 export const faqs: FaqItem[] = faqGroups.flatMap((group) => group.items);
 
+export const apiEndpoint = `${productionSiteUrl}/api/tools/v1/who-sends`;
+
+export type ApiSnippet = {
+	id: string;
+	label: string;
+	code: string;
+};
+
+/** Non-empty by construction so the page can always fall back to the first tab. */
+export const apiSnippets: [ApiSnippet, ...ApiSnippet[]] = [
+	{
+		id: "curl",
+		label: "cURL",
+		code: `curl -X POST ${apiEndpoint} \\
+  -H "Content-Type: application/json" \\
+  -d '{"domain": "stripe.com"}'`,
+	},
+	{
+		id: "javascript",
+		label: "JavaScript",
+		code: `// No SDK, no API key: it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = await res.json();`,
+	},
+	{
+		id: "typescript",
+		label: "TypeScript",
+		code: `// No SDK, no API key: it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = (await res.json()) as CheckResult;`,
+	},
+	{
+		id: "node",
+		label: "Node.js",
+		code: `// Node 18+ has a global fetch, so no dependencies.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = await res.json();`,
+	},
+	{
+		id: "axios",
+		label: "Axios",
+		code: `import axios from "axios";
+
+const { data } = await axios.post(
+  "${apiEndpoint}",
+  { domain: "stripe.com" },
+);`,
+	},
+	{
+		id: "python",
+		label: "Python",
+		code: `# pip install requests
+import requests
+
+result = requests.post(
+    "${apiEndpoint}",
+    json={"domain": "stripe.com"},
+).json()`,
+	},
+	{
+		id: "go",
+		label: "Go",
+		code: `body, _ := json.Marshal(map[string]string{
+    "domain": "stripe.com",
+})
+
+res, err := http.Post(
+    "${apiEndpoint}",
+    "application/json",
+    bytes.NewReader(body),
+)`,
+	},
+	{
+		id: "java",
+		label: "Java",
+		code: `HttpClient client = HttpClient.newHttpClient();
+String body = "{\\"domain\\": \\"stripe.com\\"}";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("${apiEndpoint}"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(body))
+    .build();
+
+HttpResponse<String> response = client.send(
+    request, HttpResponse.BodyHandlers.ofString());`,
+	},
+	{
+		id: "csharp",
+		label: "C#",
+		code: `using var client = new HttpClient();
+
+var response = await client.PostAsJsonAsync(
+    "${apiEndpoint}",
+    new { domain = "stripe.com" });`,
+	},
+	{
+		id: "php",
+		label: "PHP",
+		code: `$ch = curl_init("${apiEndpoint}");
+
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => ["Content-Type: application/json"],
+    CURLOPT_POSTFIELDS => json_encode(["domain" => "stripe.com"]),
+    CURLOPT_RETURNTRANSFER => true,
+]);
+
+$result = curl_exec($ch);`,
+	},
+	{
+		id: "ruby",
+		label: "Ruby",
+		code: `require "net/http"
+require "json"
+
+uri = URI("${apiEndpoint}")
+
+result = Net::HTTP.post(
+  uri,
+  { domain: "stripe.com" }.to_json,
+  "Content-Type" => "application/json"
+)`,
+	},
+	{
+		id: "rust",
+		label: "Rust",
+		code: `let result: serde_json::Value = reqwest::Client::new()
+    .post("${apiEndpoint}")
+    .json(&serde_json::json!({ "domain": "stripe.com" }))
+    .send()
+    .await?
+    .json()
+    .await?;`,
+	},
+];
+
+export type ApiBodyArg = {
+	name: string;
+	type: string;
+	required: boolean;
+	description: string;
+};
+
+export const apiBodyArgs: ApiBodyArg[] = [
+	{
+		name: "domain",
+		type: "string",
+		required: true,
+		description:
+			"Domain or URL to inspect (e.g. stripe.com). We read its public MX, SPF and DKIM records; no email is sent.",
+	},
+];
+
 export const apiResponseSample = `{
   "domain": "stripe.com",
   "resolvedAt": "2026-08-31T12:00:00.000Z",
@@ -169,3 +316,51 @@ export const apiResponseSample = `{
   },
   "subdomainNote": null
 }`;
+
+export type ApiStatusCode = "200" | "400" | "429";
+
+export const apiStatusCodes: ApiStatusCode[] = ["200", "400", "429"];
+
+export const apiResponseSamples: Record<ApiStatusCode, string> = {
+	"200": apiResponseSample,
+	"400": `{
+  "message": "Domain parameter is required.",
+  "why": "Identifying authorized senders requires a sending domain name (e.g. stripe.com).",
+  "fix": "Provide a root domain or URL to inspect.",
+  "link": "https://reloop.sh/tools/who-sends"
+}`,
+	"429": `{
+  "message": "Rate limited",
+  "why": "Too many checks from this IP.",
+  "fix": "Wait a moment and try again."
+}`,
+};
+
+export const apiResponseSchemas: Record<ApiStatusCode, string> = {
+	"200": `{
+  "domain": "string",
+  "resolvedAt": "string (ISO date)",
+  "responseTimeMs": "number",
+  "verdict": "single_stack | split_stack | crowded | send_only | opaque | unpublished | wide_open",
+  "headline": "string",
+  "summary": "string",
+  "disclaimer": "string",
+  "inbox": "{ provider: string | null, exchanges: string[] }",
+  "senders": "{ vendor: string, role: inbox_and_send | inbox_only | send | dkim_only, confidence: high | medium | low, leftover: boolean, evidence: { type: string, value: string }[] }[]",
+  "unnamed": "{ ip4: string[], ip6: string[], includes: string[] }",
+  "spf": "{ published: boolean, qualifier: string | null, lookupCount: number, rawRecord: string | null }",
+  "nextStep": "{ title: string, body: string, href: string }",
+  "subdomainNote": "string | null"
+}`,
+	"400": `{
+  "message": "string",
+  "why": "string",
+  "fix": "string",
+  "link": "string"
+}`,
+	"429": `{
+  "message": "string",
+  "why": "string",
+  "fix": "string"
+}`,
+};
