@@ -93,6 +93,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            RELOOP_COMMIT=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
@@ -100,10 +102,36 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
 
-      # No Coolify trigger yet: add one once the be-mcp service UUID exists.
-      # Example:
-      # - name: Trigger Coolify Deploy
-      #   if: github.event_name != 'pull_request' && github.ref_type != 'tag'
-      #   run: |
-      #     curl --fail -i -X POST "https://coolify.reloop.sh/api/v1/deploy?uuid=<be-mcp-uuid>&force=false" \
-      #       -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
+      - name: Trigger Coolify Deploy
+        if: github.event_name != 'pull_request' && github.ref_type != 'tag'
+        run: |
+          curl --fail -i -X POST "https://coolify.reloop.sh/api/v1/deploy?uuid=0x9z0cap542jwrhdpf7z3cev&force=false" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
+
+      # Coolify answers the trigger before the new container is live. Wait until
+      # production reports this commit, so a stale container fails the run
+      # instead of silently serving old code.
+      - name: Verify production is on this commit
+        if: github.event_name != 'pull_request' && github.ref_type != 'tag'
+        run: |
+          for attempt in $(seq 1 60); do
+            live=$(curl -fsS https://reloop.sh/mcp/healthz | jq -r '.commit // "none"' || echo "unreachable")
+            if [ "$live" = "$GITHUB_SHA" ]; then
+              echo "reloop.sh/mcp is on $GITHUB_SHA"
+              break
+            fi
+            echo "attempt $attempt: live commit is $live, waiting for $GITHUB_SHA"
+            sleep 10
+          done
+          if [ "$live" != "$GITHUB_SHA" ]; then
+            echo "::error::reloop.sh/mcp is still on $live after 10 minutes, expected $GITHUB_SHA"
+            exit 1
+          fi
+          challenge=$(curl -sS -o /dev/null -D - -X POST https://reloop.sh/mcp -H 'content-type: application/json' -d '{}' | grep -i '^www-authenticate:' || true)
+          echo "$challenge"
+          case "$challenge" in
+            *resource_metadata=*) ;;
+            *) echo "::error::/mcp 401 is missing resource_metadata; OAuth clients cannot discover sign-in"; exit 1 ;;
+          esac
+          curl -fsS https://reloop.sh/.well-known/oauth-protected-resource/mcp | jq -e '.resource and .authorization_servers' > /dev/null
+          curl -fsS https://reloop.sh/.well-known/oauth-authorization-server | jq -e '.registration_endpoint' > /dev/null

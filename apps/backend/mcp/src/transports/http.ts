@@ -14,7 +14,7 @@ import type { Logger } from "../observability/log";
 import { createReloopApi } from "../reloop/api";
 import type { FetchLike } from "../reloop/client";
 import { createReloopServer } from "../server/create-server";
-import { SERVER_NAME, VERSION } from "../version";
+import { COMMIT, SERVER_NAME, VERSION } from "../version";
 
 export const MCP_PATH = "/mcp";
 export const HEALTH_PATH = "/healthz";
@@ -158,6 +158,7 @@ export function createHttpHandler(
 				status: "ok",
 				name: SERVER_NAME,
 				version: VERSION,
+				commit: COMMIT,
 			});
 		}
 		if (

@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { VERSION } from "../../version";
+import { COMMIT, VERSION } from "../../version";
 import { defineTool } from "../define";
 
 const CAPABILITIES = [
@@ -27,7 +27,11 @@ export const getReloopStatus = defineTool({
 		connected: z
 			.literal(true)
 			.describe("The credentials reached the Reloop API successfully"),
-		server: z.object({ name: z.string(), version: z.string() }),
+		server: z.object({
+			name: z.string(),
+			version: z.string(),
+			commit: z.string().describe("Git commit of the running build"),
+		}),
 		domains: z.object({
 			total: z.number().int().describe("Sending domains in the organization"),
 			active: z
@@ -47,7 +51,7 @@ export const getReloopStatus = defineTool({
 		});
 		return {
 			connected: true as const,
-			server: { name: "Reloop", version: VERSION },
+			server: { name: "Reloop", version: VERSION, commit: COMMIT },
 			domains: { total: all.total, active: active.total },
 			capabilities: CAPABILITIES,
 			nextStep:

@@ -5,7 +5,7 @@ import {
 	type HttpHandler,
 	MAX_REQUEST_BODY_BYTES,
 } from "../src/transports/http";
-import { VERSION } from "../src/version";
+import { COMMIT, VERSION } from "../src/version";
 import {
 	API_KEY,
 	capturingLogger,
@@ -51,6 +51,7 @@ describe("health endpoint", () => {
 			status: "ok",
 			name: "reloop",
 			version: VERSION,
+			commit: COMMIT,
 		});
 		expect(response.headers.get("x-request-id")).toBeTruthy();
 		await handler.close();
@@ -68,6 +69,7 @@ describe("health endpoint", () => {
 			status: "ok",
 			name: "reloop",
 			version: VERSION,
+			commit: COMMIT,
 		});
 		await handler.close();
 	});

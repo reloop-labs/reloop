@@ -1,6 +1,6 @@
 {
 	"name": "reloop-mcp",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "The official MCP server for Reloop — open-source email infrastructure",
 	"type": "module",
 	"license": "Apache-2.0",
