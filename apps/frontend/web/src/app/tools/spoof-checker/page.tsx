@@ -1,24 +1,23 @@
-import { Icon } from "@reloop/ui/icon";
+import { FaqSection } from "@reloop/web/components/faq-section";
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { BlueprintCta } from "@reloop/web/components/landing/blueprint-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
-import { Band, SectionIntro } from "../blocklist-checker/grid";
-import { ApiSection } from "./api-section";
-import { CheckerPanel } from "./checker-panel";
+import { Gift, Inbox, Lock, ScanSearch } from "lucide-react";
+import { SimilarTools } from "../components/similar-tools";
+import { FeatureGrid } from "../domain-age/components/feature-grid";
+import { WhoIsItFor } from "../domain-age/components/who-is-it-for";
+import { ApiIntegration } from "./components/api-integration";
+import { SpoofHero } from "./components/spoof-hero";
 import {
 	faqGroups,
 	faqs,
 	metaDescription,
 	metaTitle,
-	reasons,
-	toolDescription,
 	toolKeywords,
 	toolPath,
 	toolTitle,
 } from "./content";
-import { FaqGrid } from "./faq-grid";
-import { SimilarTools } from "../components/similar-tools";
 
 export const instant = false;
 
@@ -30,11 +29,24 @@ export const metadata = createPageMetadata({
 	ogImage: "/tools/opengraph-image",
 });
 
+function Spacer({ edge = "b" }: { edge?: "b" | "y" }) {
+	return (
+		<div
+			aria-hidden
+			className={
+				edge === "y"
+					? "h-24 border-stroke-soft-100 border-y dark:border-white/10"
+					: "h-24 border-stroke-soft-100 border-b dark:border-white/10"
+			}
+		/>
+	);
+}
+
 export default function SpoofCheckerPage() {
 	const siteUrl = getSiteUrl();
 
 	return (
-		<>
+		<div className="relative min-h-screen overflow-x-clip bg-bg-white-0 font-sans text-text-strong-950 [--primary-base:#171717] [--primary-dark:#000000] [--primary-darker:#000000] [--primary-link:#171717] dark:bg-black dark:text-white dark:[--primary-base:#ffffff] dark:[--primary-dark:#ffffff] dark:[--primary-darker:#e6edf3] dark:[--primary-link:#ffffff]">
 			<JsonLd
 				data={[
 					{
@@ -96,88 +108,125 @@ export default function SpoofCheckerPage() {
 				]}
 			/>
 
-			{/* Hero / Interactive Tool Section */}
-			<Band className="relative overflow-hidden pt-16">
-				<div className="relative px-5 pt-14 pb-16 sm:px-6 sm:pt-16 md:px-8 lg:pb-20">
-					<div className="mx-auto max-w-3xl text-center">
-						<span className="inline-flex items-center gap-2 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:border-white/12 dark:bg-black dark:text-white/45">
-							<span className="size-1.5 rounded-full bg-emerald-500" />
-							Domain Security &amp; Anti-Spoofing Tool
-						</span>
+			<SpoofHero />
 
-						<h1 className="mt-6 font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-[-1.4px] sm:text-[3.4rem] dark:text-white">
-							Email Spoofing Test: Can Anyone Spoof My Domain?
-						</h1>
-
-						<p className="mx-auto mt-5 max-w-xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-							{toolDescription}
-						</p>
-					</div>
-
-					<div className="mt-10">
-						<CheckerPanel />
-					</div>
-				</div>
-			</Band>
-
-			{/* Section: Why Anti-Spoofing Matters */}
-			<Band id="why-it-matters">
-				<SectionIntro
-					lead="Why domain spoofing protection matters."
-					description="Phishing and CEO fraud cost businesses billions every year. Protect your brand reputation and customers from forged emails."
+			<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
+				<Spacer />
+				<FeatureGrid
+					id="best-features"
+					eyebrow="Best features"
+					icon="star"
+					title={["Why choose Reloop's", "email spoofing checker?"]}
+					description="Free, no account needed, and read straight from your domain's public DNS."
+					features={[
+						{
+							icon: Gift,
+							title: "100% Free & No limits",
+							description:
+								"This checker is free. It needs no signup and has no credits or expiry.",
+						},
+						{
+							icon: Inbox,
+							title: "See what a fake would do",
+							description:
+								"We show whether a forged email from your domain lands in the inbox, goes to spam, or gets blocked.",
+						},
+						{
+							icon: ScanSearch,
+							title: "Plain-English reasons",
+							description:
+								"Every finding from DMARC, SPF and DKIM is explained, with the raw records one click away.",
+						},
+						{
+							icon: Lock,
+							title: "No Account Needed",
+							description:
+								"Use the checker or the API without an account or an API key. We never send email.",
+						},
+					]}
 				/>
-
-				<div className="grid grid-cols-1 divide-y divide-stroke-soft-200 border-stroke-soft-200 border-t sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4 dark:divide-white/10 dark:border-white/10">
-					{reasons.map((reason) => (
-						<div
-							key={reason.title}
-							className="flex min-h-[14rem] flex-col justify-between p-6 sm:p-7 lg:p-8"
-						>
-							<Icon
-								name={reason.icon}
-								className="size-5 text-text-sub-600 dark:text-white/40"
-							/>
-							<div>
-								<p className="font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-									{reason.title}
-								</p>
-								<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
-									{reason.description}
-								</p>
-							</div>
-						</div>
-					))}
-				</div>
-			</Band>
-
-			{/* Section: Programmatic API Integration */}
-			<Band id="api">
-				<SectionIntro
-					lead="Check domain spoofability via API."
-					description="Integrate automated domain impersonation tests into your security dashboard or customer onboarding pipeline."
+				<Spacer />
+				<WhoIsItFor
+					title={["Where can I use Reloop's", "email spoofing checker?"]}
+					description="Anyone who needs to know if a domain can be impersonated over email."
+					columns={[
+						{
+							title: "Security teams",
+							items: [
+								"Phishing risk reviews",
+								"CEO fraud prevention",
+								"Invoice fraud defense",
+								"Vendor risk audits",
+								"Pen test prep",
+								"Compliance evidence",
+								"Incident follow-up",
+							],
+						},
+						{
+							title: "Email admins",
+							items: [
+								"DMARC rollout",
+								"Moving off p=none",
+								"Subdomain policy checks",
+								"SPF cleanup",
+								"New domain setup",
+								"Migration checks",
+								"Parked domain lockdown",
+							],
+						},
+						{
+							title: "Founders & IT",
+							items: [
+								"Company domain checks",
+								"Brand protection",
+								"Customer trust",
+								"Board security reports",
+								"Insurance questionnaires",
+								"M&A due diligence",
+								"Agency client audits",
+							],
+						},
+						{
+							title: "Developers",
+							items: [
+								"Customer domain onboarding",
+								"Custom sending domains",
+								"Multi-tenant sending",
+								"Signup risk scoring",
+								"Security dashboards",
+								"Automated audits",
+								"Internal tooling",
+							],
+						},
+					]}
 				/>
-
-				<ApiSection />
-			</Band>
-
-			{/* Section: FAQs */}
-			<Band id="faq">
-				<SectionIntro
-					lead="Frequently asked questions."
-					description="Everything you need to know about email spoofing, DMARC policies, SPF alignment, and inbox protections."
+				<Spacer />
+				<ApiIntegration
+					title={["Integrate today", "in your code"]}
+					description="One request tells you whether a domain can be spoofed and why. No API key or account needed."
 				/>
-
-				<FaqGrid groups={faqGroups} />
-			</Band>
-
-			{/* Bottom CTA to sign up */}
-			<Band>
+				<Spacer edge="y" />
 				<SimilarTools currentPath={toolPath} />
-			</Band>
-
-			<Band className="border-b-0">
-				<BlogCta />
-			</Band>
-		</>
+				<div aria-hidden className="h-12 sm:h-16" />
+				<BlueprintCta
+					headlineLine1="Lock down your domain."
+					headlineLine2="Send with Reloop."
+					subtext="Reloop sets up SPF, DKIM and DMARC for your sending domain so fakes get rejected and real mail lands. Start with 3,000 free emails per month."
+					primaryLabel="Get started free"
+					secondaryLabel="Talk to founder"
+				/>
+				<div aria-hidden className="h-12 sm:h-16" />
+				<div className="border-stroke-soft-100 border-y dark:border-white/10 [&_.t-acc:last-child]:border-b-0">
+					<FaqSection
+						items={faqGroups.flatMap((g) => g.items)}
+						id="faq-section"
+						eyebrow="FAQ"
+						compact
+						plain
+						flush
+					/>
+				</div>
+			</div>
+		</div>
 	);
 }

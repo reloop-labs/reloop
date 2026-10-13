@@ -1,520 +1,732 @@
 "use client";
 
-import * as Alert from "@reloop/ui/alert";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as CompactButton from "@reloop/ui/compact-button";
-import { Icon } from "@reloop/ui/icon";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { FieldError, useFieldError } from "@reloop/ui/field-error";
+import { Icon, type IconName } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import Spinner from "@reloop/ui/spinner";
-import Link from "next/link";
-import { type FormEvent, useEffect, useRef, useState } from "react";
-import { runSpoofCheck, type SpoofCheckResult } from "./check-api";
+import { LoadingDot } from "@reloop/ui/loading-dot";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import {
+	type ClipboardEvent,
+	type FormEvent,
+	type ReactNode,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+import {
+	runSpoofCheck,
+	type SpoofCheckResult,
+	type SpoofReason,
+} from "./check-api";
+import { toolPath } from "./content";
 
-const PRESETS = [
-	{ label: "stripe.com (Locked)", value: "stripe.com" },
-	{ label: "github.com (Locked)", value: "github.com" },
-	{ label: "reloop.sh", value: "reloop.sh" },
-	{ label: "google.com", value: "google.com" },
-	{ label: "apple.com", value: "apple.com" },
-];
+const FIELD_ERROR_MESSAGE = "Please enter a valid domain (e.g. stripe.com).";
+
+function getDomainParam(): string | null {
+	if (typeof window === "undefined") return null;
+	try {
+		const param = new URLSearchParams(window.location.search).get("domain");
+		return param && param.trim().length > 0 ? param.trim().slice(0, 253) : null;
+	} catch {
+		return null;
+	}
+}
+
+function syncDomainParam(value: string | null) {
+	if (typeof window === "undefined") return;
+	try {
+		const url = new URL(window.location.href);
+		if (value && value.trim().length > 0) {
+			url.searchParams.set("domain", value.trim());
+		} else {
+			url.searchParams.delete("domain");
+		}
+		window.history.replaceState(null, "", url.toString());
+	} catch {
+		// Ignore history errors (e.g. non-HTTP contexts).
+	}
+}
+
+function buildShareUrl(domain: string): string {
+	const base =
+		typeof window !== "undefined"
+			? `${window.location.origin}${window.location.pathname}`
+			: toolPath;
+	return `${base}?domain=${encodeURIComponent(domain)}`;
+}
+
+function validateInput(raw: string): { ok: boolean } {
+	const v = raw.trim();
+	if (!v || v.length < 3 || v.length > 253) return { ok: false };
+	if (!v.includes(".")) return { ok: false };
+	return { ok: true };
+}
+
+function normalizeDomainInput(raw: string): string {
+	let v = raw.trim().toLowerCase();
+	v = v.replace(/^https?:\/\//, "").split("/")[0] ?? "";
+	v = v.split("?")[0] ?? "";
+	v = v.split("#")[0] ?? "";
+	v = v.split(":")[0] ?? "";
+	// Accept a pasted email address and check its domain.
+	return v.includes("@") ? (v.split("@").pop() ?? "") : v;
+}
+
+function MorphSlot({
+	activeKey,
+	reduceMotion,
+	children,
+}: {
+	activeKey: string | null;
+	reduceMotion: boolean | null;
+	children: ReactNode;
+}) {
+	const [height, setHeight] = useState<number | "auto">("auto");
+	const [canAnimate, setCanAnimate] = useState(false);
+	const innerRef = useRef<HTMLDivElement | null>(null);
+	const setInnerRef = (node: HTMLDivElement | null) => {
+		if (node) innerRef.current = node;
+	};
+	useEffect(() => setCanAnimate(true), []);
+	useEffect(() => {
+		if (!activeKey) {
+			setHeight(0);
+			return;
+		}
+		const el = innerRef.current;
+		if (!el) return;
+		const update = () =>
+			setHeight(Math.ceil(el.getBoundingClientRect().height));
+		update();
+		if (typeof ResizeObserver === "undefined") return;
+		const ro = new ResizeObserver(update);
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, [activeKey]);
+	return (
+		<motion.div
+			initial={false}
+			animate={{ height: reduceMotion ? "auto" : height }}
+			transition={
+				reduceMotion || !canAnimate
+					? { duration: 0 }
+					: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const }
+			}
+			className="relative overflow-hidden"
+		>
+			<AnimatePresence initial={false} mode="sync">
+				{activeKey ? (
+					<motion.div
+						key={activeKey}
+						initial={reduceMotion ? false : { opacity: 0, filter: "blur(2px)" }}
+						animate={{ opacity: 1, filter: "blur(0px)", pointerEvents: "auto" }}
+						exit={
+							reduceMotion
+								? { opacity: 0, pointerEvents: "none" }
+								: { opacity: 0, filter: "blur(2px)", pointerEvents: "none" }
+						}
+						transition={
+							reduceMotion
+								? { duration: 0 }
+								: { duration: 0.22, ease: [0.22, 1, 0.36, 1] as const }
+						}
+						className="absolute inset-x-0 top-0"
+					>
+						<div ref={setInnerRef}>{children}</div>
+					</motion.div>
+				) : null}
+			</AnimatePresence>
+		</motion.div>
+	);
+}
+
+const VERDICT: Record<
+	SpoofCheckResult["verdict"],
+	{ label: string; icon: IconName; iconClass: string }
+> = {
+	protected: {
+		label: "Protected",
+		icon: "shield-check",
+		iconClass: "text-emerald-500",
+	},
+	partially_protected: {
+		label: "Partially protected",
+		icon: "alert-triangle",
+		iconClass: "text-amber-500",
+	},
+	spoofable: {
+		label: "Spoofable",
+		icon: "cross-circle",
+		iconClass: "text-rose-500 dark:text-rose-400",
+	},
+};
+
+const OUTCOME: Record<
+	SpoofCheckResult["inboxOutcome"],
+	{ label: string; hint: string; icon: IconName; className: string }
+> = {
+	delivered: {
+		label: "Lands in the inbox",
+		hint: "Nothing stops a forged email. Your team or customers would see it like a real one.",
+		icon: "alert-triangle",
+		className:
+			"border-rose-500/20 bg-rose-500/[0.08] text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400",
+	},
+	spam: {
+		label: "Goes to spam",
+		hint: "Inboxes are told to quarantine forged mail, so it usually lands in spam instead of the inbox.",
+		icon: "alert-triangle",
+		className:
+			"border-amber-500/20 bg-amber-500/[0.08] text-amber-600 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400",
+	},
+	rejected: {
+		label: "Blocked before the inbox",
+		hint: "Inboxes are told to reject forged mail outright, so nobody ever sees it.",
+		icon: "shield-check",
+		className:
+			"border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400",
+	},
+};
+
+const SEVERITY: Record<
+	SpoofReason["severity"],
+	{ icon: IconName; className: string }
+> = {
+	critical: {
+		icon: "cross-circle",
+		className: "text-rose-500 dark:text-rose-400",
+	},
+	warning: { icon: "alert-triangle", className: "text-amber-500" },
+	success: { icon: "check-circle", className: "text-emerald-500" },
+	info: {
+		icon: "info-outline",
+		className: "text-text-soft-400 dark:text-white/40",
+	},
+};
+
+/** Which record a reason is about, from its id prefix (e.g. "dmarc-p-none"). */
+function reasonTag(id: string): string | null {
+	const prefix = id.split("-")[0];
+	switch (prefix) {
+		case "dmarc":
+		case "subdomain":
+			return "DMARC";
+		case "spf":
+			return "SPF";
+		case "dkim":
+			return "DKIM";
+		case "mx":
+			return "MX";
+		default:
+			return null;
+	}
+}
+
+/** A titled card with a one-line explanation, so every block says what it is. */
+function Section({
+	title,
+	hint,
+	action,
+	children,
+}: {
+	title: ReactNode;
+	hint: ReactNode;
+	action?: ReactNode;
+	children: ReactNode;
+}) {
+	return (
+		<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.02]">
+			<div className="flex items-start justify-between gap-3 px-3.5 py-2.5 sm:px-4">
+				<div className="min-w-0">
+					<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
+						{title}
+					</p>
+					<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
+						{hint}
+					</p>
+				</div>
+				{action}
+			</div>
+			<div className="p-2 pt-0 sm:p-2.5 sm:pt-0">
+				<div className="rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-white/10 dark:bg-[#070707]">
+					{children}
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function ResultView({
+	result,
+	shouldReduceMotion,
+}: {
+	result: SpoofCheckResult;
+	shouldReduceMotion: boolean | null;
+}) {
+	const verdict = VERDICT[result.verdict];
+	const outcome = OUTCOME[result.inboxOutcome];
+	const [showRaw, setShowRaw] = useState(false);
+	// The subdomain note usually repeats a "subdomain-*" reason; show it once.
+	const showSubdomainNote =
+		Boolean(result.subdomainNote) &&
+		!result.reasons.some((r) => r.id.startsWith("subdomain"));
+
+	return (
+		<div className="flex flex-col gap-3 text-left">
+			{/* The answer */}
+			<div className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 px-3.5 py-3 sm:px-4 dark:border-white/10 dark:bg-white/[0.02]">
+				<div className="flex items-start gap-2">
+					<Icon
+						name={verdict.icon}
+						className={cn("mt-0.5 size-4 shrink-0", verdict.iconClass)}
+					/>
+					<p className="font-semibold text-sm text-text-strong-950 leading-relaxed dark:text-white">
+						{result.headline}
+					</p>
+				</div>
+				<p className="mt-1 pl-6 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/55">
+					{result.summary}
+				</p>
+			</div>
+
+			{/* What a fake would do */}
+			<Section title="If someone sent a fake email as you" hint={outcome.hint}>
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+					<div className="flex min-w-0 items-start gap-3">
+						<span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-bg-weak-50 font-semibold text-[12px] text-text-sub-600 dark:bg-white/[0.06] dark:text-white/60">
+							CEO
+						</span>
+						<div className="min-w-0">
+							<p className="truncate text-[13px]">
+								<span className="font-semibold text-text-strong-950 dark:text-white">
+									CEO
+								</span>{" "}
+								<span className="font-mono text-[11.5px] text-text-sub-600 dark:text-white/50">
+									&lt;ceo@{result.domain}&gt;
+								</span>
+							</p>
+							<p className="truncate font-medium text-[13px] text-text-strong-950 dark:text-white/90">
+								Urgent: please wire $40,000 to vendor account today
+							</p>
+							<p className="truncate text-[12px] text-text-sub-600 dark:text-white/45">
+								Hi team, please process this payment before end of day.
+							</p>
+						</div>
+					</div>
+					<span
+						className={cn(
+							"inline-flex shrink-0 items-center gap-1.5 self-start rounded-md border px-2 py-1 font-medium text-[12px] sm:self-center",
+							outcome.className,
+						)}
+					>
+						<Icon name={outcome.icon} className="size-3.5" />
+						{outcome.label}
+					</span>
+				</div>
+			</Section>
+
+			{/* Why */}
+			<Section
+				title="Why"
+				hint="What your public DMARC, SPF and DKIM records tell inboxes to do."
+				action={
+					<button
+						type="button"
+						onClick={() => setShowRaw((prev) => !prev)}
+						aria-expanded={showRaw}
+						aria-controls="spoof-raw-records"
+						className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+					>
+						<span>Raw records</span>
+						<Icon
+							name="chevron-down"
+							className={cn(
+								"size-3 transition-transform duration-200",
+								showRaw && "rotate-180",
+							)}
+						/>
+					</button>
+				}
+			>
+				<AnimatePresence initial={false}>
+					{showRaw ? (
+						<motion.div
+							id="spoof-raw-records"
+							key="raw-records"
+							initial={
+								shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }
+							}
+							animate={
+								shouldReduceMotion
+									? { opacity: 1 }
+									: { opacity: 1, height: "auto" }
+							}
+							exit={
+								shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }
+							}
+							transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+							className="overflow-hidden"
+						>
+							<div className="mb-3 space-y-2 rounded-lg bg-bg-weak-50 p-3 font-mono text-[11.5px] leading-relaxed dark:bg-white/[0.03]">
+								<p className="break-all text-text-strong-950 dark:text-white/85">
+									<span className="text-text-sub-600 dark:text-white/40">
+										_dmarc.{result.domain} TXT{" "}
+									</span>
+									{result.dmarc.rawRecord ?? "No record found"}
+								</p>
+								<p className="break-all text-text-strong-950 dark:text-white/85">
+									<span className="text-text-sub-600 dark:text-white/40">
+										{result.domain} TXT{" "}
+									</span>
+									{result.spf.rawRecord ?? "No SPF record found"}
+								</p>
+							</div>
+						</motion.div>
+					) : null}
+				</AnimatePresence>
+				<ul className="-my-3 divide-y divide-stroke-soft-100/50 dark:divide-white/5">
+					{result.reasons.map((reason) => {
+						const severity = SEVERITY[reason.severity];
+						const tag = reasonTag(reason.id);
+						return (
+							<li key={reason.id} className="flex items-start gap-2.5 py-3">
+								<Icon
+									name={severity.icon}
+									className={cn("mt-0.5 size-4 shrink-0", severity.className)}
+								/>
+								<div className="min-w-0">
+									<div className="flex flex-wrap items-center gap-1.5">
+										<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+											{reason.title}
+										</span>
+										{tag ? (
+											<span className="rounded-md border border-stroke-soft-100 bg-bg-weak-50 px-1.5 py-px font-medium font-mono text-[10.5px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60">
+												{tag}
+											</span>
+										) : null}
+									</div>
+									<p className="mt-0.5 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
+										{reason.detail}
+									</p>
+								</div>
+							</li>
+						);
+					})}
+				</ul>
+			</Section>
+
+			{showSubdomainNote && result.subdomainNote ? (
+				<div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3.5 text-xs">
+					<Icon
+						name="alert-triangle"
+						className="mt-px size-4 shrink-0 text-amber-500"
+					/>
+					<p className="text-amber-700 leading-relaxed dark:text-amber-400">
+						{result.subdomainNote.replace(/^Note:\s*/, "")}
+					</p>
+				</div>
+			) : null}
+
+			<a
+				href={result.nextStep.href}
+				className="group flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-3 transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.06]"
+			>
+				<span className="min-w-0">
+					<span className="block font-mono text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+						Recommendation
+					</span>
+					<span className="mt-1 block font-medium text-[13px] text-text-strong-950 dark:text-white">
+						{result.nextStep.title}
+					</span>
+					<span className="mt-0.5 block text-[12px] text-text-sub-600 leading-relaxed dark:text-white/55">
+						{result.nextStep.body}
+					</span>
+				</span>
+				<Icon
+					name="arrow-right"
+					className="size-3.5 shrink-0 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/50"
+				/>
+			</a>
+		</div>
+	);
+}
 
 export function CheckerPanel() {
-	const [domain, setDomain] = useState("stripe.com");
+	const [domain, setDomain] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [result, setResult] = useState<SpoofCheckResult | null>(null);
 	const [copied, setCopied] = useState(false);
-	const [showRawRecords, setShowRawRecords] = useState(false);
-
+	const [copiedLink, setCopiedLink] = useState(false);
+	const field = useFieldError();
+	const shouldReduceMotion = useReducedMotion();
+	const hasFieldError = field.hasError;
 	const abortRef = useRef<AbortController | null>(null);
 
-	const executeCheck = async (targetDomain: string) => {
-		const target = targetDomain.trim();
-		if (!target) return;
-
+	const executeCheck = async (raw: string) => {
+		const clean = normalizeDomainInput(raw);
+		if (!validateInput(clean).ok) {
+			setResult(null);
+			setError(null);
+			field.show(FIELD_ERROR_MESSAGE);
+			return;
+		}
+		field.clear();
+		// Shareable URL from the moment a check starts, so reload or a
+		// shared link re-runs the same check even if it errors.
+		syncDomainParam(clean);
 		abortRef.current?.abort();
 		const controller = new AbortController();
 		abortRef.current = controller;
-
 		setIsLoading(true);
 		setError(null);
-
 		try {
-			const res = await runSpoofCheck(target, controller.signal);
+			const res = await runSpoofCheck(clean, controller.signal);
+			if (controller.signal.aborted) return;
 			setResult(res);
 		} catch (err) {
 			if (err instanceof DOMException && err.name === "AbortError") return;
 			setResult(null);
 			setError(
-				(err as Error).message ||
-					"Failed to check domain spoofability. Please verify the domain name.",
+				(err as Error).message || "Something went wrong running that check.",
 			);
 		} finally {
 			if (!controller.signal.aborted) setIsLoading(false);
 		}
 	};
 
-	useEffect(() => {
-		return () => {
+	useEffect(
+		() => () => {
 			abortRef.current?.abort();
-		};
+		},
+		[],
+	);
+
+	// Deep-link support: ?domain= pre-fills and auto-runs. The timeout defers
+	// past StrictMode's remount simulation (whose cleanup aborts in-flight
+	// fetches); the cleanup clears the first timer so the check runs once.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: run once on mount
+	useEffect(() => {
+		const preset = getDomainParam();
+		if (!preset) return;
+		setDomain(normalizeDomainInput(preset) || preset);
+		const t = setTimeout(() => {
+			void executeCheck(preset);
+		}, 0);
+		return () => clearTimeout(t);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		executeCheck(domain);
+		if (result || error) return;
+		void executeCheck(domain);
 	};
 
-	const handleCopyReport = () => {
-		if (!result) return;
-		const report = `[Reloop Domain Spoofing Check]
-Domain: ${result.domain}
-Verdict: ${result.verdict.toUpperCase()}
-Headline: ${result.headline}
-Inbox Outcome: ${result.inboxOutcome.toUpperCase()}
-Summary: ${result.summary}
-DMARC Policy: ${result.dmarc.policy || "none"}
-SPF: ${result.spf.rawRecord || "none"}
-https://reloop.sh/tools/spoof-checker`;
+	const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+		if (isLoading) return;
+		const pasted = e.clipboardData.getData("text").trim();
+		if (!pasted) return;
+		const norm = normalizeDomainInput(pasted);
+		if (validateInput(norm).ok) {
+			e.preventDefault();
+			setDomain(norm);
+			if (hasFieldError) field.clear();
+			setResult(null);
+			setError(null);
+			void executeCheck(norm);
+		}
+	};
 
-		navigator.clipboard.writeText(report).then(() => {
+	const handleReset = () => {
+		abortRef.current?.abort();
+		setIsLoading(false);
+		setResult(null);
+		setError(null);
+		field.clear();
+		setDomain("");
+		syncDomainParam(null);
+		setTimeout(() => field.inputRef.current?.focus(), 50);
+	};
+
+	const handleCopyReport = async () => {
+		if (!result) return;
+		const report = `[Reloop Email Spoofing Check]
+Domain: ${result.domain}
+Verdict: ${VERDICT[result.verdict].label}
+${result.headline}
+A fake email from this domain: ${OUTCOME[result.inboxOutcome].label}
+DMARC: ${result.dmarc.rawRecord || "Not published"}
+SPF: ${result.spf.rawRecord || "Not published"}
+https://reloop.sh${toolPath}?domain=${encodeURIComponent(result.domain)}`;
+		try {
+			await navigator.clipboard.writeText(report);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
-		});
+		} catch {
+			// Clipboard may be unavailable outside a secure context.
+		}
 	};
 
+	const handleCopyLink = async () => {
+		if (!result) return;
+		try {
+			await navigator.clipboard.writeText(buildShareUrl(result.domain));
+			setCopiedLink(true);
+			setTimeout(() => setCopiedLink(false), 2000);
+		} catch {
+			// Clipboard may be unavailable outside a secure context.
+		}
+	};
+
+	const hasChecked = Boolean(result || error);
+
 	return (
-		<div className="mx-auto max-w-4xl">
-			{/* Preset Bar */}
-			<div className="mb-4 flex flex-wrap items-center gap-2">
-				<span className="font-mono text-[11px] text-text-soft-400 uppercase tracking-[0.14em] dark:text-white/35">
-					Try Presets:
-				</span>
-				{PRESETS.map((preset) => (
-					<button
-						key={preset.label}
-						type="button"
-						onClick={() => {
-							setDomain(preset.value);
-							executeCheck(preset.value);
-						}}
-						className={cn(
-							"rounded-lg px-2.5 py-1 font-mono text-[11.5px] transition-colors",
-							domain === preset.value
-								? "bg-text-strong-950 font-medium text-white shadow-xs dark:bg-white dark:text-black"
-								: "border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-text-strong-950 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/5 dark:text-white/60 dark:hover:border-white dark:hover:text-white",
-						)}
-					>
-						{preset.label}
-					</button>
-				))}
-			</div>
-
-			{/* Search Input Box */}
-			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs sm:p-5 dark:border-white/10 dark:bg-[#0b0b0b]">
-				<form
-					onSubmit={handleSubmit}
-					className="flex flex-col gap-2.5 sm:flex-row sm:items-center"
-				>
-					<Input.Root size="small" className="flex-1">
-						<Input.Wrapper>
-							<Input.Input
-								value={domain}
-								onChange={(e) => setDomain(e.target.value)}
-								placeholder="Enter domain or URL (e.g. acme.com, https://acme.com)"
-								disabled={isLoading}
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-
-					<Button.Root
-						type="submit"
-						variant="primary"
-						mode="filled"
-						size="small"
-						disabled={isLoading || !domain.trim()}
-						className="shrink-0"
-					>
-						{isLoading ? (
-							<>
-								<Spinner size={14} />
-								<span>Testing Spoofability...</span>
-							</>
-						) : (
-							<>
-								<Button.Icon as={Icon} name="search" className="size-3.5" />
-								<span>Check My Domain</span>
-							</>
-						)}
-					</Button.Root>
-				</form>
-				<p className="mt-2.5 font-mono text-[11px] text-text-sub-600 dark:text-white/40">
-					We do not send test emails. We only query public DNS records across
-					global root resolvers.
-				</p>
-			</div>
-
-			{/* Error State */}
-			{error && (
-				<Alert.Root
-					variant="lighter"
-					status="error"
-					size="large"
-					className="mt-6"
-				>
-					<Alert.Icon as={Icon} name="alert-triangle" />
-					<div>
-						<div className="font-medium text-label-sm">Lookup error</div>
-						<p className="mt-0.5 text-paragraph-sm">{error}</p>
-					</div>
-				</Alert.Root>
-			)}
-
-			{/* Results View */}
-			{result && (
-				<div className="mt-6 space-y-6">
-					{/* Big Answer Verdict Card */}
-					<div
-						className={cn(
-							"rounded-2xl border p-6 shadow-xs transition-colors sm:p-7",
-							result.verdict === "spoofable" &&
-								"border-rose-500/30 bg-rose-500/[0.04] dark:border-rose-500/40 dark:bg-rose-500/[0.07]",
-							result.verdict === "partially_protected" &&
-								"border-amber-500/30 bg-amber-500/[0.04] dark:border-amber-500/40 dark:bg-amber-500/[0.07]",
-							result.verdict === "protected" &&
-								"border-emerald-500/30 bg-emerald-500/[0.04] dark:border-emerald-500/40 dark:bg-emerald-500/[0.07]",
-						)}
-					>
-						<div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-							<div>
-								{/* Capsule Badge */}
-								{result.verdict === "spoofable" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full bg-error-lighter px-3 py-1 font-medium text-[12.5px] text-error-base dark:bg-rose-500/15 dark:text-rose-400">
-										<Icon name="minus-circle" className="size-4 shrink-0" />
-										<span>Vulnerable to Spoofing</span>
-									</div>
+		<div className="mx-auto w-full max-w-2xl text-left font-sans">
+			<form onSubmit={handleSubmit} noValidate className="space-y-2.5">
+				<div className="mx-auto w-full max-w-xl">
+					<FieldError field={field} messageClassName="text-xs leading-relaxed">
+						<div className="relative w-full">
+							<Input.Root
+								size="medium"
+								hasError={hasFieldError}
+								className={cn(
+									"relative z-10 w-full rounded-xl bg-bg-white-0 shadow-xs transition-shadow sm:rounded-2xl dark:bg-[#0c0c0c]",
+									hasFieldError
+										? "has-[input:focus]:!shadow-button-error-focus has-[input:focus]:before:!ring-error-base"
+										: "has-[input:focus]:before:!ring-primary-base has-[input:focus]:!shadow-button-primary-focus",
 								)}
-								{result.verdict === "partially_protected" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full bg-warning-lighter px-3 py-1 font-medium text-[12.5px] text-warning-base dark:bg-amber-500/15 dark:text-amber-400">
-										<Icon name="alert-triangle" className="size-4 shrink-0" />
-										<span>Partially Protected</span>
-									</div>
-								)}
-								{result.verdict === "protected" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full bg-success-lighter px-3 py-1 font-medium text-[12.5px] text-success-base dark:bg-emerald-500/15 dark:text-emerald-400">
-										<Icon name="shield-check" className="size-4 shrink-0" />
-										<span>Protected: Receivers Reject Fakes</span>
-									</div>
-								)}
-
-								<h2 className="mt-3 font-semibold text-[22px] text-text-strong-950 tracking-tight sm:text-[26px] dark:text-white">
-									{result.headline}
-								</h2>
-								<p className="mt-2 max-w-2xl text-[14.5px] text-text-sub-600 leading-relaxed dark:text-white/70">
-									{result.summary}
-								</p>
-
-								{result.subdomainNote && (
-									<p className="mt-2 font-medium text-[13px] text-amber-600 dark:text-amber-400">
-										⚠️ {result.subdomainNote}
-									</p>
-								)}
-							</div>
-
-							<div className="flex shrink-0 items-center gap-2">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="small"
-									onClick={handleCopyReport}
-								>
-									<Button.Icon
-										as={Icon}
-										name={copied ? "check" : "copy"}
-										className={copied ? "text-emerald-500" : ""}
-									/>
-									<span>{copied ? "Copied" : "Copy summary"}</span>
-								</Button.Root>
-							</div>
-						</div>
-					</div>
-
-					{/* 📧 Fake Inbox Mock (CEO Fraud Simulation) */}
-					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-5 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="mb-3 flex items-center justify-between border-stroke-soft-200 border-b pb-3 dark:border-white/10">
-							<span className="font-mono text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
-								Simulated Inbox Outcome (Gmail / Outlook)
-							</span>
-							<span className="font-mono text-[11px] text-text-sub-600 dark:text-white/45">
-								CEO Fraud Simulation
-							</span>
-						</div>
-
-						{/* Mock Inbox Row */}
-						<div className="flex flex-col gap-3 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10 dark:bg-white/[0.02]">
-							<div className="flex items-start gap-3.5">
-								<div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 font-semibold text-[13px] text-white">
-									CEO
-								</div>
-								<div className="min-w-0">
-									<div className="flex flex-wrap items-baseline gap-2">
-										<strong className="text-[13.5px] text-text-strong-950 dark:text-white">
-											CEO
-										</strong>
-										<span className="font-mono text-[12px] text-text-sub-600 dark:text-white/50">
-											&lt;ceo@{result.domain}&gt;
-										</span>
-									</div>
-									<p className="mt-0.5 truncate font-medium text-[13px] text-text-strong-950 dark:text-white">
-										Urgent: please wire $40,000 to vendor account today
-									</p>
-									<p className="truncate text-[12px] text-text-sub-600 dark:text-white/45">
-										Hi team, please process this payment before end of day. Wire
-										details attached...
-									</p>
-								</div>
-							</div>
-
-							{/* Inbox Status Outcome Badge */}
-							<div className="shrink-0">
-								{result.inboxOutcome === "delivered" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/20 bg-rose-500/10 px-3 py-1 font-medium text-[12px] text-rose-600 dark:bg-rose-500/15 dark:text-rose-400">
-										<Icon name="alert-triangle" className="size-3.5 shrink-0" />
-										<span>Would be delivered to Primary Inbox</span>
-									</div>
-								)}
-								{result.inboxOutcome === "spam" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 font-medium text-[12px] text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
-										<Icon name="alert-triangle" className="size-3.5 shrink-0" />
-										<span>Would be routed to Spam / Junk folder</span>
-									</div>
-								)}
-								{result.inboxOutcome === "rejected" && (
-									<div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 font-medium text-[12px] text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
-										<Icon name="shield-check" className="size-3.5 shrink-0" />
-										<span>Would be blocked &amp; rejected at gateway</span>
-									</div>
-								)}
-							</div>
-						</div>
-					</div>
-
-					{/* 🚦 Three Protocol Lights (SPF, DKIM, DMARC) */}
-					<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-						{/* DMARC Light */}
-						<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between">
-								<span className="font-semibold text-[13.5px] text-text-strong-950 dark:text-white">
-									DMARC (The Lock)
-								</span>
-								{result.dmarc.policy === "reject" ? (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-emerald-600 dark:text-emerald-400">
-										<Icon name="shield-check" className="size-3.5" /> p=reject
-									</span>
-								) : result.dmarc.policy === "quarantine" ? (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-amber-600 dark:text-amber-400">
-										<Icon name="alert-triangle" className="size-3.5" />{" "}
-										p=quarantine
-									</span>
-								) : result.dmarc.policy === "none" ? (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-rose-500">
-										<Icon name="minus-circle" className="size-3.5" /> p=none
-										(monitor)
-									</span>
-								) : (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-rose-500">
-										<Icon name="minus-circle" className="size-3.5" /> Missing
-									</span>
-								)}
-							</div>
-							<p className="mt-1.5 text-[12px] text-text-sub-600 dark:text-white/50">
-								{result.dmarc.policy === "reject"
-									? "Instructs receivers to discard unauthenticated mail."
-									: result.dmarc.policy === "quarantine"
-										? "Instructs receivers to route unauthenticated mail to spam."
-										: "No instruction to block fakes. Open to spoofers."}
-							</p>
-						</div>
-
-						{/* SPF Light */}
-						<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between">
-								<span className="font-semibold text-[13.5px] text-text-strong-950 dark:text-white">
-									SPF (Authorized IPs)
-								</span>
-								{result.spf.published && result.spf.qualifier !== "+all" ? (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-emerald-600 dark:text-emerald-400">
-										<Icon name="check" className="size-3.5" />{" "}
-										{result.spf.qualifier || "Valid"}
-									</span>
-								) : result.spf.qualifier === "+all" ? (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-rose-500">
-										<Icon name="minus-circle" className="size-3.5" /> +all
-										(open)
-									</span>
-								) : (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-amber-600 dark:text-amber-400">
-										<Icon name="alert-triangle" className="size-3.5" /> Missing
-									</span>
-								)}
-							</div>
-							<p className="mt-1.5 text-[12px] text-text-sub-600 dark:text-white/50">
-								{result.spf.published
-									? `${result.spf.lookupCount}/10 DNS lookups configured.`
-									: "No list of authorized mail servers published."}
-							</p>
-						</div>
-
-						{/* DKIM Light */}
-						<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-							<div className="flex items-center justify-between">
-								<span className="font-semibold text-[13.5px] text-text-strong-950 dark:text-white">
-									DKIM (Signatures)
-								</span>
-								{result.dkim.published ? (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-emerald-600 dark:text-emerald-400">
-										<Icon name="check" className="size-3.5" />{" "}
-										{result.dkim.selector}
-									</span>
-								) : (
-									<span className="inline-flex items-center gap-1 font-mono text-[11.5px] text-text-sub-600 dark:text-white/45">
-										<Icon name="info-outline" className="size-3.5" /> Custom
-									</span>
-								)}
-							</div>
-							<p className="mt-1.5 text-[12px] text-text-sub-600 dark:text-white/50">
-								{result.dkim.published
-									? `Found ${result.dkim.keyLength ? `${result.dkim.keyLength}-bit ` : ""}public key.`
-									: "Tested common selectors (ESP may use custom key)."}
-							</p>
-						</div>
-					</div>
-
-					{/* 📋 Diagnostic Breakdown */}
-					<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-xs dark:border-white/10 dark:bg-[#0b0b0b]">
-						<div className="border-stroke-soft-200 border-b px-4 py-3 sm:px-5 dark:border-white/10">
-							<h3 className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
-								Technical Verdict Breakdown ({result.reasons.length})
-							</h3>
-						</div>
-
-						<div className="divide-y divide-stroke-soft-200 dark:divide-white/5">
-							{result.reasons.map((r) => (
-								<div
-									key={r.id}
-									className="flex items-start justify-between gap-4 px-4 py-3.5 sm:px-5"
-								>
-									<div className="flex items-start gap-3">
-										<div className="mt-0.5">
-											{r.severity === "critical" && (
-												<Icon
-													name="minus-circle"
-													className="size-4 text-rose-500"
-												/>
-											)}
-											{r.severity === "warning" && (
-												<Icon
-													name="alert-triangle"
-													className="size-4 text-amber-500"
-												/>
-											)}
-											{r.severity === "success" && (
-												<Icon
-													name="shield-check"
-													className="size-4 text-emerald-500"
-												/>
-											)}
-											{r.severity === "info" && (
-												<Icon
-													name="info-outline"
-													className="size-4 text-blue-500"
-												/>
-											)}
-										</div>
-										<div>
-											<p className="font-medium text-[13.5px] text-text-strong-950 dark:text-white">
-												{r.title}
-											</p>
-											<p className="text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
-												{r.detail}
-											</p>
-										</div>
-									</div>
-								</div>
-							))}
-						</div>
-					</div>
-
-					{/* 🚀 Next Steps & Reloop CTA */}
-					<div className="flex flex-col justify-between gap-4 rounded-2xl border border-blue-500/20 bg-blue-500/[0.04] p-5 sm:flex-row sm:items-center dark:border-blue-500/30 dark:bg-blue-500/[0.08]">
-						<div className="space-y-1">
-							<span className="font-mono font-semibold text-[10.5px] text-blue-600 uppercase tracking-wider dark:text-blue-400">
-								Recommended Action
-							</span>
-							<h3 className="font-semibold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
-								{result.nextStep.title}
-							</h3>
-							<p className="max-w-xl text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
-								{result.nextStep.body}
-							</p>
-						</div>
-
-						<div className="flex shrink-0 flex-wrap items-center gap-2">
-							<Button.Root asChild variant="primary" mode="filled" size="small">
-								<a href={result.nextStep.href}>
-									<span>Take Action</span>
-									<Button.Icon as={Icon} name="arrow-right" />
-								</a>
-							</Button.Root>
-
-							<Link
-								href={`/tools/auth-checker?domain=${encodeURIComponent(result.domain)}`}
 							>
-								<Button.Root variant="neutral" mode="stroke" size="small">
-									<Button.Icon as={Icon} name="lock" />
-									<span>Full Protocol Audit</span>
-								</Button.Root>
-							</Link>
+								<Input.Wrapper className="h-12 pr-2 pl-4 dark:bg-[#0c0c0c]">
+									<Input.Input
+										id="checker-input"
+										aria-label="Domain"
+										{...field.controlProps}
+										type="text"
+										inputMode="url"
+										autoComplete="off"
+										autoCapitalize="none"
+										spellCheck={false}
+										value={domain}
+										onPaste={handlePaste}
+										onChange={(e) => {
+											setDomain(e.target.value);
+											if (hasFieldError) field.clear();
+											if (result) setResult(null);
+											if (error) setError(null);
+										}}
+										placeholder="stripe.com or https://stripe.com"
+										className="font-medium text-[15px]"
+									/>
+									{hasChecked ? (
+										<button
+											type="button"
+											onClick={handleReset}
+											className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/45 dark:hover:bg-white/10 dark:hover:text-white"
+											aria-label="Clear check"
+										>
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2.5"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												className="size-3.5"
+												aria-hidden="true"
+											>
+												<path d="M18 6L6 18M6 6l12 12" />
+											</svg>
+										</button>
+									) : (
+										<FancyButton.Root
+											type="submit"
+											variant="primary"
+											size="xsmall"
+											className="!p-0 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg dark:text-black"
+											aria-label="Check if this domain can be spoofed"
+										>
+											{isLoading ? (
+												<LoadingDot
+													size={13}
+													dotSize={2}
+													className="text-white dark:text-black"
+												/>
+											) : (
+												<FancyButton.Icon className="mx-0 size-3.5 dark:text-black">
+													<Icon
+														name="arrow-right"
+														className="size-3.5 text-white dark:text-black"
+													/>
+												</FancyButton.Icon>
+											)}
+										</FancyButton.Root>
+									)}
+								</Input.Wrapper>
+							</Input.Root>
 						</div>
-					</div>
-
-					{/* Collapsible Raw DNS Records */}
-					<div className="pt-2">
-						<button
-							type="button"
-							onClick={() => setShowRawRecords((prev) => !prev)}
-							className="font-mono text-[12px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
-						>
-							{showRawRecords
-								? "▲ Hide raw DNS records"
-								: "▼ View raw DNS records for proof"}
-						</button>
-
-						{showRawRecords && (
-							<div className="mt-3 space-y-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-4 font-mono text-[11.5px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.02] dark:text-white">
-								<div>
-									<span className="text-text-sub-600 dark:text-white/40">
-										DMARC (_dmarc.{result.domain}):
-									</span>
-									<p className="mt-0.5 break-all">
-										{result.dmarc.rawRecord || "No record found"}
-									</p>
-								</div>
-								<div className="border-stroke-soft-200 border-t pt-2 dark:border-white/10">
-									<span className="text-text-sub-600 dark:text-white/40">
-										SPF ({result.domain}):
-									</span>
-									<p className="mt-0.5 break-all">
-										{result.spf.rawRecord || "No record found"}
-									</p>
-								</div>
-							</div>
-						)}
-					</div>
+					</FieldError>
 				</div>
-			)}
+
+				<MorphSlot
+					activeKey={error ? "error" : result ? "result" : null}
+					reduceMotion={shouldReduceMotion}
+				>
+					{error ? (
+						<div className="mx-auto flex max-w-xl items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3.5 text-xs">
+							<Icon
+								name="alert-triangle"
+								className="mt-0.5 size-4 shrink-0 text-rose-500"
+							/>
+							<p className="text-rose-600 leading-relaxed dark:text-rose-400">
+								{error}
+							</p>
+						</div>
+					) : result ? (
+						<div className="space-y-2 pt-1">
+							<ResultView
+								result={result}
+								shouldReduceMotion={shouldReduceMotion}
+							/>
+							<div className="-mx-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+								<div className="flex items-center gap-0.5 sm:gap-1.5">
+									<button
+										type="button"
+										onClick={handleCopyLink}
+										className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+									>
+										<Icon
+											name={copiedLink ? "check" : "link"}
+											className="size-3.5"
+										/>
+										{copiedLink ? "Link copied" : "Copy link"}
+									</button>
+									<button
+										type="button"
+										onClick={handleCopyReport}
+										className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white"
+									>
+										<Icon
+											name={copied ? "check" : "copy"}
+											className="size-3.5"
+										/>
+										{copied ? "Copied" : "Copy summary"}
+									</button>
+								</div>
+								<button
+									type="button"
+									onClick={handleReset}
+									className="cursor-pointer rounded-lg px-2 py-1.5 font-medium text-primary-base text-xs hover:underline"
+								>
+									Clear result
+								</button>
+							</div>
+						</div>
+					) : null}
+				</MorphSlot>
+			</form>
 		</div>
 	);
 }

@@ -199,67 +199,29 @@ const STATUS_LABEL: Record<CheckStatus, string> = {
 	fail: "Fail",
 };
 
-function CheckItem({
-	label,
-	status,
-	detail,
-	record,
-	fix,
-}: {
-	label: string;
-	status: CheckStatus;
-	detail: string;
-	record?: string;
-	fix?: string;
-}) {
-	const dotColor =
-		status === "fail"
-			? "bg-rose-500"
-			: status === "warn"
-				? "bg-amber-500"
-				: "bg-emerald-500";
-
-	const badgeStyles =
-		status === "fail"
-			? "border-rose-500/20 bg-rose-500/[0.08] text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400"
-			: status === "warn"
-				? "border-amber-500/20 bg-amber-500/[0.08] text-amber-600 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400"
-				: "border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400";
-
-	return (
-		<div className="py-3 last:pb-0">
-			<div className="flex items-center justify-between gap-3">
-				<div className="flex items-center gap-2.5">
-					<span className={cn("size-2 rounded-full", dotColor)} />
-					<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
-						{label}
-					</span>
-				</div>
-				<code
-					className={cn(
-						"rounded-md border px-2 py-0.5 font-medium font-mono text-[11px] tracking-tight",
-						badgeStyles,
-					)}
-				>
-					{STATUS_LABEL[status]}
-				</code>
-			</div>
-			<p className="mt-1.5 pl-[18px] text-text-sub-600 text-xs leading-relaxed dark:text-white/55">
-				{detail}
-			</p>
-			{record && (
-				<code className="mt-2 ml-[18px] block overflow-x-auto rounded-lg bg-bg-weak-50 p-2 font-mono text-[11px] leading-relaxed dark:bg-black">
-					{record}
-				</code>
-			)}
-			{fix && status !== "pass" && (
-				<p className="mt-1.5 pl-[18px] text-text-strong-950 text-xs leading-relaxed dark:text-white/80">
-					<span className="font-semibold">How to fix:</span> {fix}
-				</p>
-			)}
-		</div>
-	);
-}
+const STATUS_STYLE: Record<
+	CheckStatus,
+	{ icon: IconName; iconClass: string; chip: string; tint: string }
+> = {
+	pass: {
+		icon: "check-circle",
+		iconClass: "text-emerald-500",
+		chip: "border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400",
+		tint: "border-emerald-500/20 bg-emerald-500/[0.05] text-emerald-800 dark:border-emerald-500/25 dark:bg-emerald-500/[0.08] dark:text-emerald-300",
+	},
+	warn: {
+		icon: "alert-triangle",
+		iconClass: "text-amber-500",
+		chip: "border-amber-500/20 bg-amber-500/[0.08] text-amber-600 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400",
+		tint: "border-amber-500/20 bg-amber-500/[0.05] text-amber-800 dark:border-amber-500/25 dark:bg-amber-500/[0.08] dark:text-amber-300",
+	},
+	fail: {
+		icon: "cross-circle",
+		iconClass: "text-rose-500 dark:text-rose-400",
+		chip: "border-rose-500/20 bg-rose-500/[0.08] text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400",
+		tint: "border-rose-500/20 bg-rose-500/[0.05] text-rose-800 dark:border-rose-500/25 dark:bg-rose-500/[0.08] dark:text-rose-300",
+	},
+};
 
 function isPreviewableLogoUrl(url: string | null): url is string {
 	if (!url) return false;
@@ -276,123 +238,209 @@ function senderName(domain: string): string {
 	return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-const OTHER_SENDERS = [
-	{ name: "Alex Rivera", subject: "Re: Q3 planning", time: "9:12 AM" },
-	{ name: "Team Updates", subject: "Weekly digest", time: "Yesterday" },
-];
+/** The brand logo, falling back to the sender's initial if it won't load. */
+function BrandLogo({
+	url,
+	name,
+	className,
+	fallbackClassName,
+}: {
+	url: string | null;
+	name: string;
+	className?: string;
+	fallbackClassName?: string;
+}) {
+	const [failed, setFailed] = useState(false);
+	if (!isPreviewableLogoUrl(url) || failed) {
+		return (
+			<span
+				className={cn(
+					"flex items-center justify-center bg-bg-weak-50 font-semibold text-text-sub-600 dark:bg-white/[0.06] dark:text-white/60",
+					className,
+					fallbackClassName,
+				)}
+			>
+				{name.charAt(0)}
+			</span>
+		);
+	}
+	return (
+		<img
+			src={url}
+			alt={`${name} logo`}
+			className={cn("bg-white object-cover", className)}
+			referrerPolicy="no-referrer"
+			onError={() => setFailed(true)}
+		/>
+	);
+}
+
+function SkeletonBar({ className }: { className?: string }) {
+	return (
+		<span
+			aria-hidden
+			className={cn(
+				"block h-2 rounded-full bg-stroke-soft-100 dark:bg-white/10",
+				className,
+			)}
+		/>
+	);
+}
+
+const INBOX_FOLDERS = ["Inbox", "Starred", "Snoozed", "Sent", "Drafts"];
 
 /**
- * A mock inbox showing the logo where it lands: a round sender avatar.
- * Neighbouring rows use plain initials so the difference is obvious.
+ * A small mail client with the brand's emails in it, so the logo is seen
+ * where it actually appears: the round avatar next to the sender.
  */
-function InboxPreview({
+function InboxMock({
 	logoUrl,
 	domain,
 	verified,
 }: {
-	logoUrl: string;
+	logoUrl: string | null;
 	domain: string;
 	verified: boolean;
 }) {
-	const [failed, setFailed] = useState(false);
 	const name = senderName(domain);
+	const brandRows = [
+		{
+			subject: isPreviewableLogoUrl(logoUrl)
+				? "Your emails now show our logo"
+				: "Your account update",
+			time: "1:12 PM",
+		},
+		{ subject: `What's new at ${name} this month`, time: "1:08 PM" },
+	];
 	return (
-		<div className="overflow-hidden rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-[#070707]">
-			<div className="flex items-center justify-between gap-3 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-white/10">
-				<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
-					How it looks in the inbox
-				</p>
-				<span className="text-[11px] text-text-soft-400 dark:text-white/40">
-					Preview
+		<div
+			aria-label={`Preview of ${name} emails in an inbox`}
+			role="img"
+			className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-white/10 dark:bg-[#0b0b0b]"
+		>
+			<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-3 py-2 dark:border-white/10">
+				<span className="flex shrink-0 items-center gap-1">
+					<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+					<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+					<span className="size-2 rounded-full bg-stroke-soft-200 dark:bg-white/15" />
+				</span>
+				<span className="flex h-6 flex-1 items-center rounded-md bg-bg-weak-50 px-2.5 text-[11px] text-text-soft-400 dark:bg-white/[0.05] dark:text-white/35">
+					Search mail
 				</span>
 			</div>
-			<ul className="divide-y divide-stroke-soft-100/60 dark:divide-white/5">
-				<li className="flex items-center gap-3 bg-bg-weak-50/60 px-4 py-3 dark:bg-white/[0.03]">
-					<span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-stroke-soft-200 bg-white dark:border-white/10">
-						{failed ? (
-							<span className="font-semibold text-[13px] text-text-sub-600">
-								{name.charAt(0)}
-							</span>
-						) : (
-							<img
-								src={logoUrl}
-								alt={`${name} logo`}
-								className="size-full object-cover"
-								referrerPolicy="no-referrer"
-								onError={() => setFailed(true)}
-							/>
-						)}
+			<div className="grid grid-cols-1 sm:grid-cols-[112px_minmax(0,1fr)]">
+				<div className="hidden flex-col gap-0.5 border-stroke-soft-100 border-r p-2 sm:flex dark:border-white/10">
+					<span className="mb-2 flex h-7 items-center rounded-lg border border-stroke-soft-100 px-2.5 font-medium text-[11px] text-text-strong-950 dark:border-white/10 dark:text-white">
+						Compose
 					</span>
-					<div className="min-w-0 flex-1">
-						<div className="flex items-center justify-between gap-2">
-							<span className="flex min-w-0 items-center gap-1">
-								<span className="truncate font-semibold text-[13px] text-text-strong-950 dark:text-white">
-									{name}
-								</span>
-								{verified ? (
-									<VerifiedBadge className="size-3.5 shrink-0" />
-								) : null}
-							</span>
-							<span className="shrink-0 font-semibold text-[11px] text-text-strong-950 dark:text-white">
-								10:24 AM
-							</span>
-						</div>
-						<p className="truncate text-[12px] text-text-sub-600 dark:text-white/60">
-							<span className="font-medium text-text-strong-950 dark:text-white/90">
-								Your account update
-							</span>{" "}
-							· Here's what's new from {name} this week
-						</p>
-					</div>
-				</li>
-				{OTHER_SENDERS.map((row) => (
-					<li key={row.name} className="flex items-center gap-3 px-4 py-3">
-						<span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-bg-weak-50 font-semibold text-[13px] text-text-soft-400 dark:bg-white/[0.06] dark:text-white/40">
-							{row.name.charAt(0)}
+					{INBOX_FOLDERS.map((folder, i) => (
+						<span
+							key={folder}
+							className={cn(
+								"flex items-center justify-between rounded-md px-2 py-1 text-[11px]",
+								i === 0
+									? "bg-bg-weak-50 font-semibold text-text-strong-950 dark:bg-white/[0.06] dark:text-white"
+									: "text-text-sub-600 dark:text-white/50",
+							)}
+						>
+							{folder}
+							{i === 0 ? <span className="text-[10px]">2</span> : null}
 						</span>
-						<div className="min-w-0 flex-1">
-							<div className="flex items-center justify-between gap-2">
-								<span className="truncate text-[13px] text-text-sub-600 dark:text-white/60">
-									{row.name}
+					))}
+				</div>
+				<div className="min-w-0">
+					<div className="flex border-stroke-soft-100 border-b px-2 text-[11px] dark:border-white/10">
+						{["Primary", "Social", "Promotions"].map((tab, i) => (
+							<span
+								key={tab}
+								className={cn(
+									"px-2.5 py-2",
+									i === 0
+										? "border-text-strong-950 border-b-2 font-semibold text-text-strong-950 dark:border-white dark:text-white"
+										: "text-text-soft-400 dark:text-white/40",
+								)}
+							>
+								{tab}
+							</span>
+						))}
+					</div>
+					<ul className="divide-y divide-stroke-soft-100/70 dark:divide-white/5">
+						{brandRows.map((row) => (
+							<li
+								key={row.subject}
+								className="flex items-center gap-2.5 px-3 py-2.5"
+							>
+								<BrandLogo
+									url={logoUrl}
+									name={name}
+									className="size-7 shrink-0 rounded-full border border-stroke-soft-100 dark:border-white/10"
+									fallbackClassName="text-[11px]"
+								/>
+								<span className="flex w-24 shrink-0 items-center gap-1">
+									<span className="truncate font-semibold text-[12px] text-text-strong-950 dark:text-white">
+										{name}
+									</span>
+									{verified ? (
+										<VerifiedBadge className="size-3 shrink-0" />
+									) : null}
 								</span>
-								<span className="shrink-0 text-[11px] text-text-soft-400 dark:text-white/40">
+								<span className="min-w-0 flex-1 truncate font-medium text-[12px] text-text-strong-950 dark:text-white/90">
+									{row.subject}
+								</span>
+								<span className="shrink-0 font-semibold text-[10.5px] text-text-strong-950 dark:text-white/80">
 									{row.time}
 								</span>
-							</div>
-							<p className="truncate text-[12px] text-text-soft-400 dark:text-white/40">
-								{row.subject}
-							</p>
-						</div>
-					</li>
-				))}
-			</ul>
-		</div>
-	);
-}
-
-function LogoPreview({ url, domain }: { url: string; domain: string }) {
-	const [failed, setFailed] = useState(false);
-
-	return (
-		<div className="shrink-0 text-center">
-			<div className="flex size-14 items-center justify-center overflow-hidden rounded-xl border border-stroke-soft-200 bg-white p-1.5 dark:border-white/10">
-				{failed ? (
-					<p className="px-1 font-mono text-[9px] text-text-sub-600 leading-snug dark:text-black/55">
-						No preview
-					</p>
-				) : (
-					<img
-						src={url}
-						alt={`BIMI logo for ${domain}`}
-						className="size-full object-contain"
-						referrerPolicy="no-referrer"
-						onError={() => setFailed(true)}
-					/>
-				)}
+							</li>
+						))}
+						{["w-16", "w-20", "w-14", "w-[4.5rem]"].map((width) => (
+							<li key={width} className="flex items-center gap-2.5 px-3 py-3">
+								<span className="size-7 shrink-0 rounded-full bg-bg-weak-50 dark:bg-white/[0.06]" />
+								<span className="w-24 shrink-0">
+									<SkeletonBar className={width} />
+								</span>
+								<SkeletonBar className="flex-1" />
+								<SkeletonBar className="w-8 shrink-0" />
+							</li>
+						))}
+					</ul>
+				</div>
 			</div>
 		</div>
 	);
 }
+
+/** Parses "v=BIMI1; l=…; a=…" into a tag map. */
+function parseBimiTags(record: string | null): Record<string, string> {
+	const tags: Record<string, string> = {};
+	if (!record) return tags;
+	for (const part of record.split(";")) {
+		const eq = part.indexOf("=");
+		if (eq === -1) continue;
+		const key = part.slice(0, eq).trim().toLowerCase();
+		if (key) tags[key] = part.slice(eq + 1).trim();
+	}
+	return tags;
+}
+
+const TAG_ROWS = [
+	{
+		tag: "v",
+		name: "Version",
+		meaning: "Marks this as a BIMI record. Must be BIMI1 and come first.",
+	},
+	{
+		tag: "l",
+		name: "Logo location",
+		meaning:
+			"HTTPS link to the square SVG logo inboxes show next to your mail.",
+	},
+	{
+		tag: "a",
+		name: "Certificate",
+		meaning:
+			"HTTPS link to a VMC or CMC certificate. Optional for most inboxes; Gmail and Apple Mail need it.",
+	},
+];
 
 function ResultCardDetailed({
 	result,
@@ -402,6 +450,8 @@ function ResultCardDetailed({
 	onReset: () => void;
 }) {
 	const status = VERDICT_STATUS_CONFIG[result.verdict];
+	const style = STATUS_STYLE[result.verdict];
+	const tags = parseBimiTags(result.bimiRecord);
 	// Most recommendations repeat a check's own "How to fix"; only list new ones.
 	const shownFixes = new Set(
 		result.checks.filter((c) => c.status !== "pass").map((c) => c.fix),
@@ -411,6 +461,7 @@ function ResultCardDetailed({
 		result.verdict === "pass"
 			? []
 			: result.recommendations.filter((rec) => !shownFixes.has(rec));
+	const name = senderName(result.domain);
 	const [copiedLink, setCopiedLink] = useState(false);
 	const [copiedJson, setCopiedJson] = useState(false);
 
@@ -435,13 +486,10 @@ function ResultCardDetailed({
 	};
 
 	return (
-		<div className="space-y-2 text-left text-xs">
+		<div className="space-y-3 text-left text-xs">
 			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.02]">
 				{/* Verdict */}
-				<div className="flex items-start gap-3 px-3.5 py-3 sm:px-4">
-					{isPreviewableLogoUrl(result.logoUrl) ? (
-						<LogoPreview url={result.logoUrl} domain={result.domain} />
-					) : null}
+				<div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1 px-4 py-3">
 					<div className="min-w-0">
 						<div className="flex items-center gap-1.5">
 							{result.verdict === "pass" ? (
@@ -459,57 +507,151 @@ function ResultCardDetailed({
 						<p className="mt-1 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/60">
 							{status.hint}
 						</p>
-						<p className="mt-1 truncate font-mono text-[11px] text-text-soft-400 dark:text-white/40">
-							{result.queryName}
-						</p>
 					</div>
+					<p className="truncate pt-0.5 font-mono text-[11px] text-text-soft-400 dark:text-white/40">
+						{result.queryName}
+					</p>
 				</div>
 
-				{/* Checks */}
-				<div className="p-2 pt-0 sm:p-2.5 sm:pt-0">
-					{isPreviewableLogoUrl(result.logoUrl) ? (
-						<div className="mb-2">
-							<InboxPreview
-								logoUrl={result.logoUrl}
-								domain={result.domain}
-								verified={Boolean(result.authorityUrl)}
+				{/* Logo + where it shows */}
+				<div className="grid gap-2 p-2 pt-0 sm:p-2.5 sm:pt-0 md:grid-cols-[280px_minmax(0,1fr)]">
+					<div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-white/10 dark:bg-[#0b0b0b]">
+						<BrandLogo
+							url={result.logoUrl}
+							name={name}
+							className="size-44 rounded-3xl border border-stroke-soft-100 dark:border-white/10"
+							fallbackClassName="text-4xl"
+						/>
+						<div className="flex items-center gap-2.5">
+							<BrandLogo
+								url={result.logoUrl}
+								name={name}
+								className="size-9 shrink-0 rounded-full border border-stroke-soft-100 dark:border-white/10"
+								fallbackClassName="text-[13px]"
 							/>
-						</div>
-					) : null}
-					<div className="rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-white/10 dark:bg-[#070707]">
-						<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
-							What we checked
-						</p>
-						<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
-							Inboxes only show your logo when every check below passes.
-						</p>
-						<div className="mt-2 divide-y divide-stroke-soft-100/50 border-stroke-soft-100/50 border-t dark:divide-white/5 dark:border-white/5">
-							{result.checks.map((check) => (
-								<CheckItem
-									key={check.id}
-									label={check.label}
-									status={check.status}
-									detail={check.detail}
-									record={check.record}
-									fix={check.fix}
-								/>
-							))}
+							<p className="text-[11.5px] text-text-sub-600 leading-snug dark:text-white/50">
+								{isPreviewableLogoUrl(result.logoUrl)
+									? "Inboxes crop it to a circle."
+									: "No logo yet. Inboxes show your initial."}
+							</p>
 						</div>
 					</div>
-					{extraRecommendations.length > 0 && (
-						<div className="mt-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-white/10 dark:bg-[#070707]">
-							<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
-								What to fix next
-							</p>
-							<ul className="mt-1.5 list-disc space-y-1 pl-4 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
-								{extraRecommendations.map((rec) => (
-									<li key={rec}>{rec}</li>
-								))}
-							</ul>
-						</div>
-					)}
+					<InboxMock
+						logoUrl={result.logoUrl}
+						domain={result.domain}
+						verified={Boolean(result.authorityUrl)}
+					/>
 				</div>
 			</div>
+
+			{/* The record */}
+			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-white/10">
+				<div
+					className={cn(
+						"break-all border-b px-4 py-3 font-mono text-[12px]",
+						result.bimiRecord ? style.tint : STATUS_STYLE.fail.tint,
+					)}
+				>
+					{result.bimiRecord ?? `No BIMI record at ${result.queryName}`}
+				</div>
+				<table className="w-full text-left text-[12.5px]">
+					<thead className="bg-bg-weak-50 text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:bg-white/[0.03] dark:text-white/40">
+						<tr>
+							<th className="w-12 px-4 py-2 font-medium">Tag</th>
+							<th className="px-2 py-2 font-medium">Value</th>
+							<th className="hidden px-2 py-2 font-medium sm:table-cell">
+								What it means
+							</th>
+						</tr>
+					</thead>
+					<tbody className="divide-y divide-stroke-soft-100 bg-bg-white-0 dark:divide-white/5 dark:bg-transparent">
+						{TAG_ROWS.map((row) => (
+							<tr key={row.tag} className="align-top">
+								<td className="px-4 py-2.5 font-mono font-semibold text-text-strong-950 dark:text-white">
+									{row.tag}
+								</td>
+								<td className="px-2 py-2.5">
+									<span className="font-medium text-text-strong-950 dark:text-white">
+										{row.name}
+									</span>
+									<span className="mt-0.5 block break-all font-mono text-[11.5px] text-text-sub-600 dark:text-white/55">
+										{tags[row.tag] || "(empty)"}
+									</span>
+									<span className="mt-1 block text-[12px] text-text-sub-600 leading-relaxed sm:hidden dark:text-white/50">
+										{row.meaning}
+									</span>
+								</td>
+								<td className="hidden px-2 py-2.5 pr-4 text-text-sub-600 leading-relaxed sm:table-cell dark:text-white/55">
+									{row.meaning}
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+
+			{/* Tests */}
+			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-white/10">
+				<div className="flex items-baseline justify-between gap-3 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2 text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:border-white/10 dark:bg-white/[0.03] dark:text-white/40">
+					<span>Test</span>
+					<span>Result</span>
+				</div>
+				<ul className="divide-y divide-stroke-soft-100 bg-bg-white-0 dark:divide-white/5 dark:bg-transparent">
+					{result.checks.map((check) => {
+						const s = STATUS_STYLE[check.status];
+						return (
+							<li key={check.id} className="flex items-start gap-3 px-4 py-2.5">
+								<Icon
+									name={s.icon}
+									className={cn("mt-0.5 size-4 shrink-0", s.iconClass)}
+								/>
+								<div className="min-w-0 flex-1">
+									<div className="flex items-start justify-between gap-3">
+										<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
+											{check.label}
+										</span>
+										<span
+											className={cn(
+												"shrink-0 rounded-md border px-1.5 py-px font-medium text-[11px]",
+												s.chip,
+											)}
+										>
+											{STATUS_LABEL[check.status]}
+										</span>
+									</div>
+									<p className="mt-0.5 break-words text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
+										{check.detail}
+									</p>
+									{check.record && check.id !== "bimi-present" ? (
+										<code className="mt-1.5 block break-all rounded-md bg-bg-weak-50 px-2 py-1.5 font-mono text-[11px] text-text-strong-950 dark:bg-white/[0.04] dark:text-white/80">
+											{check.record}
+										</code>
+									) : null}
+									{check.fix && check.status !== "pass" ? (
+										<p className="mt-1 text-[12.5px] text-text-strong-950 leading-relaxed dark:text-white/80">
+											<span className="font-semibold">How to fix:</span>{" "}
+											{check.fix}
+										</p>
+									) : null}
+								</div>
+							</li>
+						);
+					})}
+				</ul>
+			</div>
+
+			{extraRecommendations.length > 0 && (
+				<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-white/10 dark:bg-transparent">
+					<p className="font-semibold text-sm text-text-strong-950 dark:text-white">
+						What to fix next
+					</p>
+					<ul className="mt-1.5 list-disc space-y-1 pl-4 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
+						{extraRecommendations.map((rec) => (
+							<li key={rec}>{rec}</li>
+						))}
+					</ul>
+				</div>
+			)}
 
 			{/* Actions Footer */}
 			<div className="-mx-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
@@ -653,10 +795,10 @@ export function CheckerPanel() {
 	}, []);
 
 	return (
-		<div className="mx-auto w-full max-w-2xl text-left font-sans">
+		<div className="w-full text-left font-sans">
 			{/* Input Check Zone */}
 			<form onSubmit={onSubmit} noValidate className="space-y-2.5">
-				<div className="mx-auto w-full max-w-xl">
+				<div className="w-full max-w-xl">
 					<FieldError field={field} messageClassName="text-xs leading-relaxed">
 						<div className="relative w-full">
 							<Input.Root

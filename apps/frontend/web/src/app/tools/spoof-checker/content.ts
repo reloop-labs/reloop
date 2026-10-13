@@ -1,8 +1,10 @@
+import { productionSiteUrl } from "@reloop/web/lib/site";
+
 export const toolPath = "/tools/spoof-checker";
 export const toolTitle = "Can Anyone Spoof My Domain? Email Spoofing Checker";
 export const metaTitle = "Free Email Spoofing Test: Can My Domain Be Spoofed?";
 export const toolDescription =
-	"Find out in plain English if someone can send emails pretending to be you. Check whether Gmail, Yahoo, and Outlook will deliver unauthorized fake emails using your domain.";
+	"Find out if someone can send email pretending to be you. We read your public SPF, DKIM and DMARC records and show whether Gmail, Yahoo and Outlook would deliver a fake. Free, no sign-up.";
 export const metaDescription =
 	"Free email spoofing vulnerability checker. Test whether attackers can forge email from your domain without permission based on your public SPF, DKIM, and DMARC enforcement records.";
 
@@ -17,39 +19,6 @@ export const toolKeywords = [
 	"email spoofing vulnerability",
 	"domain impersonation test",
 	"DMARC enforcement checker",
-];
-
-export interface DiagnosticReason {
-	title: string;
-	description: string;
-	icon: string;
-}
-
-export const reasons: DiagnosticReason[] = [
-	{
-		title: "Stop Invoice & CEO Fraud",
-		description:
-			"Attackers forge 'ceo@yourcompany.com' or 'finance@yourcompany.com' to trick employees into wiring money or changing bank accounts.",
-		icon: "shield-check",
-	},
-	{
-		title: "The DMARC 'p=none' Blindspot",
-		description:
-			"Publishing DMARC with 'p=none' collects monitoring reports, but explicitly tells Gmail and Outlook to deliver fake emails anyway.",
-		icon: "alert-triangle",
-	},
-	{
-		title: "Protect Brand & Customer Trust",
-		description:
-			"When your domain is strictly locked, phishing attempts using your exact From address are discarded before reaching your customers.",
-		icon: "lock",
-	},
-	{
-		title: "2024+ Inbox Enforcement",
-		description:
-			"Major mailbox providers reject unaligned sending domains to combat phishing. Secure domains enjoy higher deliverability.",
-		icon: "check-circle",
-	},
 ];
 
 export interface FaqItem {
@@ -112,6 +81,184 @@ export const faqGroups: FaqGroup[] = [
 
 export const faqs: FaqItem[] = faqGroups.flatMap((group) => group.items);
 
+export const apiEndpoint = `${productionSiteUrl}/api/tools/v1/spoof-checker`;
+
+export type ApiSnippet = {
+	id: string;
+	label: string;
+	code: string;
+};
+
+/** Non-empty by construction so the page can always fall back to the first tab. */
+export const apiSnippets: [ApiSnippet, ...ApiSnippet[]] = [
+	{
+		id: "curl",
+		label: "cURL",
+		code: `curl -X POST ${apiEndpoint} \\
+  -H "Content-Type: application/json" \\
+  -d '{"domain": "stripe.com"}'`,
+	},
+	{
+		id: "javascript",
+		label: "JavaScript",
+		code: `// No SDK, no API key: it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = await res.json();`,
+	},
+	{
+		id: "typescript",
+		label: "TypeScript",
+		code: `// No SDK, no API key: it is a plain POST.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = (await res.json()) as CheckResult;`,
+	},
+	{
+		id: "node",
+		label: "Node.js",
+		code: `// Node 18+ has a global fetch, so no dependencies.
+const res = await fetch(
+  "${apiEndpoint}",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ domain: "stripe.com" }),
+  },
+);
+
+const result = await res.json();`,
+	},
+	{
+		id: "axios",
+		label: "Axios",
+		code: `import axios from "axios";
+
+const { data } = await axios.post(
+  "${apiEndpoint}",
+  { domain: "stripe.com" },
+);`,
+	},
+	{
+		id: "python",
+		label: "Python",
+		code: `# pip install requests
+import requests
+
+result = requests.post(
+    "${apiEndpoint}",
+    json={"domain": "stripe.com"},
+).json()`,
+	},
+	{
+		id: "go",
+		label: "Go",
+		code: `body, _ := json.Marshal(map[string]string{
+    "domain": "stripe.com",
+})
+
+res, err := http.Post(
+    "${apiEndpoint}",
+    "application/json",
+    bytes.NewReader(body),
+)`,
+	},
+	{
+		id: "java",
+		label: "Java",
+		code: `HttpClient client = HttpClient.newHttpClient();
+String body = "{\\"domain\\": \\"stripe.com\\"}";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("${apiEndpoint}"))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(body))
+    .build();
+
+HttpResponse<String> response = client.send(
+    request, HttpResponse.BodyHandlers.ofString());`,
+	},
+	{
+		id: "csharp",
+		label: "C#",
+		code: `using var client = new HttpClient();
+
+var response = await client.PostAsJsonAsync(
+    "${apiEndpoint}",
+    new { domain = "stripe.com" });`,
+	},
+	{
+		id: "php",
+		label: "PHP",
+		code: `$ch = curl_init("${apiEndpoint}");
+
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => ["Content-Type: application/json"],
+    CURLOPT_POSTFIELDS => json_encode(["domain" => "stripe.com"]),
+    CURLOPT_RETURNTRANSFER => true,
+]);
+
+$result = curl_exec($ch);`,
+	},
+	{
+		id: "ruby",
+		label: "Ruby",
+		code: `require "net/http"
+require "json"
+
+uri = URI("${apiEndpoint}")
+
+result = Net::HTTP.post(
+  uri,
+  { domain: "stripe.com" }.to_json,
+  "Content-Type" => "application/json"
+)`,
+	},
+	{
+		id: "rust",
+		label: "Rust",
+		code: `let result: serde_json::Value = reqwest::Client::new()
+    .post("${apiEndpoint}")
+    .json(&serde_json::json!({ "domain": "stripe.com" }))
+    .send()
+    .await?
+    .json()
+    .await?;`,
+	},
+];
+
+export type ApiBodyArg = {
+	name: string;
+	type: string;
+	required: boolean;
+	description: string;
+};
+
+export const apiBodyArgs: ApiBodyArg[] = [
+	{
+		name: "domain",
+		type: "string",
+		required: true,
+		description:
+			"Domain or URL to check (e.g. stripe.com). We read its public SPF, DKIM and DMARC records; no email is sent.",
+	},
+];
+
 export const apiResponseSample = `{
   "domain": "stripe.com",
   "resolvedAt": "2026-08-31T12:00:00.000Z",
@@ -164,3 +311,53 @@ export const apiResponseSample = `{
   },
   "subdomainNote": null
 }`;
+
+export type ApiStatusCode = "200" | "400" | "429";
+
+export const apiStatusCodes: ApiStatusCode[] = ["200", "400", "429"];
+
+export const apiResponseSamples: Record<ApiStatusCode, string> = {
+	"200": apiResponseSample,
+	"400": `{
+  "message": "Domain parameter is required.",
+  "why": "Checking spoofability requires a valid domain name (e.g. stripe.com).",
+  "fix": "Provide a root domain or URL to analyze.",
+  "link": "https://reloop.sh/tools/spoof-checker"
+}`,
+	"429": `{
+  "message": "Rate limited",
+  "why": "Too many checks from this IP.",
+  "fix": "Wait a moment and try again."
+}`,
+};
+
+export const apiResponseSchemas: Record<ApiStatusCode, string> = {
+	"200": `{
+  "domain": "string",
+  "resolvedAt": "string (ISO date)",
+  "responseTimeMs": "number",
+  "spoofable": "boolean",
+  "verdict": "spoofable | partially_protected | protected",
+  "headline": "string",
+  "summary": "string",
+  "inboxOutcome": "delivered | spam | rejected",
+  "dmarc": "{ published: boolean, policy: string | null, subdomainPolicy: string | null, percentage: number | null, rawRecord: string | null }",
+  "spf": "{ published: boolean, qualifier: string | null, lookupCount: number, rawRecord: string | null }",
+  "dkim": "{ published: boolean, selector: string | null, keyLength: number | null }",
+  "mx": "{ published: boolean, provider: string | null }",
+  "reasons": "{ id: string, severity: critical | warning | info | success, title: string, detail: string }[]",
+  "nextStep": "{ title: string, body: string, href: string }",
+  "subdomainNote": "string | null"
+}`,
+	"400": `{
+  "message": "string",
+  "why": "string",
+  "fix": "string",
+  "link": "string"
+}`,
+	"429": `{
+  "message": "string",
+  "why": "string",
+  "fix": "string"
+}`,
+};
