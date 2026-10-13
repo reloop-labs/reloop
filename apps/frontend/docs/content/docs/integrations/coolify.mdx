@@ -1,35 +1,53 @@
 ---
-title: Coolify Integration
+title: Coolify
 sidebarTitle: Coolify
 icon: "siCoolify"
-description: Configure services deployed on Coolify to route emails using Reloop SMTP.
+description: Send Coolify's own mail, and mail from apps on Coolify, through Reloop.
 ---
 
-[Coolify](https://coolify.io) is an open-source, self-hostable alternative to Heroku and Netlify. You can easily integrate Reloop into your Coolify applications or use Reloop SMTP as the global system transactional mail provider.
+Point Coolify at Reloop SMTP. The same API key sends Coolify's password resets and alerts, and mail from the apps you deploy there.
 
----
+Create the key in the [Reloop dashboard](https://reloop.sh/dashboard/api-keys). The address you send from has to be on a [verified domain](https://reloop.sh/dashboard/domain).
 
-## Step 1: Set Reloop SMTP as System SMTP
+## Coolify's own email
 
-To send system alerts and registration emails from Coolify itself via Reloop:
+<Steps>
+  <Step title="Open email settings">
+    In Coolify, go to **Settings → Email**.
 
-1. Open your **Coolify Dashboard**.
-2. Navigate to **Settings** → **Transactional Email**.
-3. Enable transactional emails and enter the following settings:
-   - **SMTP Server**: `smtp.reloop.sh`
-   - **SMTP Port**: `587`
-   - **SMTP User**: `reloop`
-   - **SMTP Password**: `rl_your_api_key`
-   - **From Address**: `noreply@yourdomain.com`
-4. Click **Save**.
+    ![Coolify email settings](/docs/images/docs/integrations/coolify-email.png)
+  </Step>
+  <Step title="Enter the Reloop server">
+    Turn SMTP on and use these values. The username and the password are both your API key.
 
----
+    | Field | Value |
+    | :--- | :--- |
+    | **Host** | `smtp.reloop.sh` |
+    | **Port** | `587` |
+    | **Encryption** | `StartTLS` |
+    | **SMTP username** | Your API key (`rl_...`) |
+    | **SMTP password** | The same API key |
+    | **From address** | `hello@yourdomain.com` |
+    | **From name** | `Coolify` |
+  </Step>
+  <Step title="Save and send a test">
+    Click **Save**, then send the test from the same page. The message shows up in your [Reloop logs](https://reloop.sh/dashboard).
+  </Step>
+</Steps>
 
-## Step 2: Configure Application Environment Variables
+## Apps you deploy on Coolify
 
-For apps hosted on Coolify:
+<Steps>
+  <Step title="Add the API key">
+    Open the application, go to **Environment Variables**, and add the key as a secret.
 
-1. Select your **Application** in Coolify.
-2. Go to **Environment Variables**.
-3. Add `RELOOP_API_KEY` as a secret variable.
-4. Save and redeploy.
+    ```bash
+    RELOOP_API_KEY=rl_your_api_key
+    ```
+  </Step>
+  <Step title="Redeploy">
+    Save and redeploy so the app picks up the key. Send with the [SMTP relay](/docs/examples/smtp/introduction) or an [SDK](/docs).
+  </Step>
+</Steps>
+
+To run Reloop itself on Coolify, follow [Deploy on Coolify](/docs/self-host/coolify).
