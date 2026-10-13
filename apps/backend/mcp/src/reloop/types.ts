@@ -709,3 +709,27 @@ export type DomainAgeReport = {
 	};
 	warnings: string[];
 };
+
+export type BimiCheckStatus = "pass" | "warn" | "fail";
+
+export type BimiCheckReport = {
+	domain: string;
+	queryName: string;
+	verdict: BimiCheckStatus;
+	bimiRecord: string | null;
+	logoUrl: string | null;
+	authorityUrl: string | null;
+	dmarcRecord: string | null;
+	dmarcPolicy: string | null;
+	dmarcPct: number | null;
+	dmarcEnforced: boolean;
+	checks: {
+		id: string;
+		label: string;
+		status: BimiCheckStatus;
+		detail: string;
+		record?: string;
+		fix?: string;
+	}[];
+	recommendations: string[];
+};

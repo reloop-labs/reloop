@@ -90,6 +90,7 @@ describe("mcp server over streamable http", () => {
 			"check_temp_email",
 			"check_domain_reputation",
 			"check_domain_age",
+			"check_bimi",
 		]);
 		for (const tool of listed.tools) {
 			expect(tool.inputSchema).toBeDefined();

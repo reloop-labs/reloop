@@ -870,6 +870,18 @@ Read-only: yes · Destructive: no · Idempotent: yes · Open world: yes
 
 Returns: `domain`, `registrableDomain`, `verdict`, `headline`, `summary`, `createdAt`, `ageDays`, `expiresAt`, `updatedAt`, `registrar`, `registryStatus`, `nameserverProvider`, `nameserverKind`, `emailSetup`, `warnings`
 
+### `check_bimi`
+
+Check whether a domain's logo can show next to its email in the inbox (BIMI). Looks up the TXT record at default._bimi.<domain>, validates v=BIMI1, the l= logo URL and the a= certificate (VMC/CMC) URL, confirms DMARC is at enforcement (p=quarantine or p=reject with pct=100), and fetches the SVG logo to flag scripts, animation, external references or a non-square canvas. The `verdict` is `pass` (ready), `warn` (works in some inboxes; Gmail and Apple Mail need the a= certificate) or `fail` (no logo anywhere). Each entry in `checks` has a `fix` when it is not passing. Nothing is sent and nothing is stored. Use this when setting up or debugging a brand logo in the inbox.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `domain` | string | yes | Domain or URL, for example reloop.sh or https://reloop.sh |
+
+Returns: `domain`, `queryName`, `verdict`, `bimiRecord`, `logoUrl`, `authorityUrl`, `dmarcPolicy`, `dmarcEnforced`, `checks`, `recommendations`
+
 ## Errors
 
 Every failed call returns `isError: true` and no `structuredContent`; the text content is a JSON document with an `error` object (structured content must match the tool's output schema, so errors travel in the text block):

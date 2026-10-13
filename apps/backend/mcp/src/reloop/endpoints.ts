@@ -93,6 +93,10 @@ export const domainAgeEndpoints = {
 	check: "/api/tools/v1/domain-age",
 } as const;
 
+export const bimiEndpoints = {
+	check: "/api/tools/v1/bimi-check",
+} as const;
+
 export const domainReputationEndpoints = {
 	check: "/api/tools/v1/domain-reputation",
 } as const;

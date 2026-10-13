@@ -3,6 +3,7 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { SimilarTools } from "../components/similar-tools";
+import { McpSection } from "../domain-age/components/mcp-section";
 import { ApiIntegration } from "./components/api-integration";
 import { BimiCta } from "./components/bimi-cta";
 import { BimiDnsRecords } from "./components/bimi-dns-records";
@@ -123,6 +124,15 @@ export default function BimiCheckerPage() {
 				<div
 					aria-hidden
 					className="h-24 border-stroke-soft-100 border-b dark:border-white/10"
+				/>
+				<McpSection
+					title={["Check BIMI", "from your AI agent"]}
+					description="Connect Claude, Cursor, or any MCP client to Reloop and let your agent check a domain's inbox logo on its own."
+					mcpDescription="Let Claude, Cursor, or Codex check a domain's BIMI record and tell you what to fix."
+				/>
+				<div
+					aria-hidden
+					className="h-24 border-stroke-soft-100 border-y dark:border-white/10"
 				/>
 				<SimilarTools currentPath={toolPath} />
 				<div aria-hidden className="h-12 sm:h-16" />

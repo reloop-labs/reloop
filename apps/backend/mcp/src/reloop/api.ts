@@ -1,4 +1,5 @@
 import { ApiKeysApi } from "./api-keys";
+import { BimiApi } from "./bimi";
 import { ChannelsApi } from "./channels";
 import { ReloopClient, type ReloopClientOptions } from "./client";
 import { ContactsApi } from "./contacts";
@@ -27,6 +28,7 @@ export type ReloopApi = {
 	tempEmail: TempEmailApi;
 	domainReputation: DomainReputationApi;
 	domainAge: DomainAgeApi;
+	bimi: BimiApi;
 };
 
 export function createReloopApi(options: ReloopClientOptions): ReloopApi {
@@ -45,5 +47,6 @@ export function createReloopApi(options: ReloopClientOptions): ReloopApi {
 		tempEmail: new TempEmailApi(client),
 		domainReputation: new DomainReputationApi(client),
 		domainAge: new DomainAgeApi(client),
+		bimi: new BimiApi(client),
 	};
 }

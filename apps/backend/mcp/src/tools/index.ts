@@ -6,6 +6,7 @@ import { getApiKey } from "./api-keys/get";
 import { listApiKeys } from "./api-keys/list";
 import { rotateApiKey } from "./api-keys/rotate";
 import { updateApiKey } from "./api-keys/update";
+import { checkBimi } from "./bimi/check";
 import { createChannel } from "./channels/create";
 import { deleteChannel } from "./channels/delete";
 import { getChannel } from "./channels/get";
@@ -107,4 +108,5 @@ export const tools: readonly AnyToolDefinition[] = [
 	checkTempEmail,
 	checkDomainReputation,
 	checkDomainAge,
+	checkBimi,
 ];
