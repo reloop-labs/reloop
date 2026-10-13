@@ -13,25 +13,42 @@ import {
 
 type BillingMode = "monthly" | "credits";
 
-const billingTabs: Array<{ id: BillingMode; label: string }> = [
-	{ id: "credits", label: "Credits" },
-	{ id: "monthly", label: "Monthly" },
+const billingTabs: Array<{
+	id: BillingMode;
+	label: string;
+	description: [string, string];
+}> = [
+	{
+		id: "monthly",
+		label: "Monthly",
+		description: [
+			"A plan that renews every month.",
+			"Best for steady, ongoing sending.",
+		],
+	},
+	{
+		id: "credits",
+		label: "Credits",
+		description: [
+			"Pay once, no subscription.",
+			"Credits last 6 months, use them as you need.",
+		],
+	},
 ];
 
 export function PricingExplorer() {
 	const [monthlyVolume, setMonthlyVolume] = useState(50000);
 	const [creditsVolume, setCreditsVolume] = useState(10000);
-	const [mode, setMode] = useState<BillingMode>("credits");
+	const [mode, setMode] = useState<BillingMode>("monthly");
 
 	return (
 		<>
-			<div className="flex w-full justify-center border-stroke-soft-100 border-t px-6 pt-10 sm:px-8 sm:pt-12 dark:border-white/10">
+			<div className="flex w-full flex-col items-center gap-4 px-6 sm:px-8">
 				<div
 					role="tablist"
 					aria-label="Billing mode"
 					className="inline-flex rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-1 dark:border-white/10 dark:bg-white/[0.04]"
 				>
-					{" "}
 					{billingTabs.map((tab) => {
 						const active = mode === tab.id;
 						return (
@@ -53,6 +70,15 @@ export function PricingExplorer() {
 						);
 					})}
 				</div>
+				<p className="text-center text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
+					{billingTabs
+						.find((tab) => tab.id === mode)
+						?.description.map((line) => (
+							<span key={line} className="block">
+								{line}
+							</span>
+						))}
+				</p>
 			</div>
 			{mode === "monthly" ? (
 				<>
