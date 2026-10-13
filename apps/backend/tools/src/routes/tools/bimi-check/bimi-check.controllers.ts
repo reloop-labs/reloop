@@ -311,7 +311,7 @@ export async function checkBimiController(
 			for (const issue of logo.issues) {
 				checks.push({
 					id: `logo-${checks.length}`,
-					label: "SVG Tiny PS",
+					label: "Logo file",
 					status: issue.status,
 					detail: issue.detail,
 					fix: issue.fix,

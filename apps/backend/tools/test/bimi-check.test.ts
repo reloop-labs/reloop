@@ -95,13 +95,19 @@ describe("inspectSvgTinyPs", () => {
 		expect(result.issues.some((i) => i.status === "fail")).toBe(false);
 	});
 
-	test("fails scripts and warns on missing tiny-ps profile", () => {
+	test("fails scripts and warns on a non-square logo", () => {
 		const svg = `<svg viewBox="0 0 100 50"><script>alert(1)</script></svg>`;
 		const result = inspectSvgTinyPs(svg);
 		expect(result.ok).toBe(false);
 		expect(result.issues.some((i) => i.code === "script")).toBe(true);
-		expect(result.issues.some((i) => i.code === "baseProfile")).toBe(true);
 		expect(result.issues.some((i) => i.code === "not-square")).toBe(true);
+	});
+
+	test("does not flag a missing version or baseProfile", () => {
+		const svg = `<svg version="1.0" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><rect width="128" height="128"/></svg>`;
+		const result = inspectSvgTinyPs(svg);
+		expect(result.ok).toBe(true);
+		expect(result.issues.every((i) => i.status === "pass")).toBe(true);
 	});
 
 	test("rejects protocol-relative hrefs", () => {

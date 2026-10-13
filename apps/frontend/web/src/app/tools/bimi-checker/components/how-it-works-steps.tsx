@@ -12,9 +12,9 @@ type FeatureItem = {
 const FEATURES: FeatureItem[] = [
 	{
 		icon: Eye,
-		title: "Stand out in the inbox",
+		title: "Up to 2.5x more opens",
 		description:
-			"Your logo appears next to every authenticated message, so recipients recognize you before they even open the email.",
+			"Your logo appears next to every authenticated message, so recipients recognize you instantly and open rates can increase by up to 2.5x.",
 	},
 	{
 		icon: ShieldCheck,

@@ -47,7 +47,8 @@ function extractAttr(svg: string, name: string): string | null {
 
 /**
  * Heuristic SVG Tiny Portable/Secure checks for BIMI logos.
- * Not a full SVG Tiny 1.2 parser — flags the issues mailbox providers reject.
+ * Not a full SVG Tiny 1.2 parser — flags only the issues that stop a logo
+ * from showing, not cosmetic header attributes.
  */
 export function inspectSvgTinyPs(svg: string): SvgTinyPsResult {
 	const issues: SvgTinyPsIssue[] = [];
@@ -63,30 +64,9 @@ export function inspectSvgTinyPs(svg: string): SvgTinyPsResult {
 		return { ok: false, issues };
 	}
 
-	const version = extractAttr(trimmed, "version");
-	if (version !== "1.2") {
-		issues.push({
-			status: "warn",
-			code: "version",
-			detail: version
-				? `SVG version is "${version}"; BIMI requires SVG 1.2 Tiny PS.`
-				: 'SVG is missing version="1.2".',
-			fix: 'Set version="1.2" and baseProfile="tiny-ps" on the root <svg>.',
-		});
-	}
-
-	const baseProfile = extractAttr(trimmed, "baseProfile");
-	if ((baseProfile || "").toLowerCase() !== "tiny-ps") {
-		issues.push({
-			status: "warn",
-			code: "baseProfile",
-			detail: baseProfile
-				? `baseProfile is "${baseProfile}"; BIMI requires tiny-ps.`
-				: 'SVG is missing baseProfile="tiny-ps".',
-			fix: 'Set baseProfile="tiny-ps" on the root <svg>.',
-		});
-	}
-
+	// version="1.2" / baseProfile="tiny-ps" are not checked: inboxes render
+	// logos without them (e.g. cnn.com), so flagging them is noise. We only
+	// flag what actually stops a logo from showing.
 	for (const rule of DISALLOWED) {
 		if (rule.pattern.test(trimmed)) {
 			issues.push({
@@ -144,7 +124,7 @@ export function inspectSvgTinyPs(svg: string): SvgTinyPsResult {
 			status: "pass",
 			code: "tiny-ps",
 			detail:
-				"SVG looks like BIMI Tiny PS (version 1.2, baseProfile tiny-ps, no scripts).",
+				"SVG is square with no scripts, animation, or external references.",
 		});
 	}
 
