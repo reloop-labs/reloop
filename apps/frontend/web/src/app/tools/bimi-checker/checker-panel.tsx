@@ -199,30 +199,6 @@ const STATUS_LABEL: Record<CheckStatus, string> = {
 	fail: "Fail",
 };
 
-const STATUS_STYLE: Record<
-	CheckStatus,
-	{ icon: IconName; iconClass: string; chip: string; tint: string }
-> = {
-	pass: {
-		icon: "check-circle",
-		iconClass: "text-emerald-500",
-		chip: "border-emerald-500/20 bg-emerald-500/[0.08] text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-400",
-		tint: "border-emerald-500/20 bg-emerald-500/[0.05] text-emerald-800 dark:border-emerald-500/25 dark:bg-emerald-500/[0.08] dark:text-emerald-300",
-	},
-	warn: {
-		icon: "alert-triangle",
-		iconClass: "text-amber-500",
-		chip: "border-amber-500/20 bg-amber-500/[0.08] text-amber-600 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-400",
-		tint: "border-amber-500/20 bg-amber-500/[0.05] text-amber-800 dark:border-amber-500/25 dark:bg-amber-500/[0.08] dark:text-amber-300",
-	},
-	fail: {
-		icon: "cross-circle",
-		iconClass: "text-rose-500 dark:text-rose-400",
-		chip: "border-rose-500/20 bg-rose-500/[0.08] text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/15 dark:text-rose-400",
-		tint: "border-rose-500/20 bg-rose-500/[0.05] text-rose-800 dark:border-rose-500/25 dark:bg-rose-500/[0.08] dark:text-rose-300",
-	},
-};
-
 function isPreviewableLogoUrl(url: string | null): url is string {
 	if (!url) return false;
 	try {
@@ -442,6 +418,138 @@ const TAG_ROWS = [
 	},
 ];
 
+/** Copy-on-click value cell, matching the dashboard's DNS record table. */
+function CopyValue({ value, mono = false }: { value: string; mono?: boolean }) {
+	const [copied, setCopied] = useState(false);
+	const copy = async () => {
+		try {
+			await navigator.clipboard.writeText(value);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 1500);
+		} catch {
+			// Clipboard may be unavailable outside a secure context.
+		}
+	};
+	return (
+		<button
+			type="button"
+			onClick={copy}
+			title={value}
+			aria-label={copied ? "Copied" : `Copy ${value}`}
+			className={cn(
+				"group relative flex h-8 w-full min-w-0 cursor-pointer items-center justify-between gap-1.5 overflow-hidden rounded-lg bg-bg-white-0 px-2.5 text-left transition duration-200 ease-out",
+				"before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:ring-1 before:ring-stroke-soft-100 before:ring-inset dark:before:ring-stroke-soft-100/40",
+				"hover:bg-bg-weak-50 dark:bg-bg-weak-50/30 dark:hover:bg-bg-weak-50/50",
+				copied && "bg-success-lighter/10 before:ring-success-base",
+			)}
+		>
+			<span
+				className={cn(
+					"min-w-0 flex-1 truncate text-xs",
+					mono ? "font-mono" : "font-medium",
+					copied
+						? "text-success-dark"
+						: mono
+							? "text-text-sub-600"
+							: "text-text-strong-950",
+				)}
+			>
+				{value}
+			</span>
+			<Icon
+				name={copied ? "check" : "copy"}
+				className={cn(
+					"size-3.5 shrink-0",
+					copied
+						? "text-success-base"
+						: "text-text-sub-600/50 group-hover:text-text-strong-950",
+				)}
+			/>
+		</button>
+	);
+}
+
+function Pill({ children }: { children: ReactNode }) {
+	return (
+		<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
+			{children}
+		</span>
+	);
+}
+
+const STATUS_TEXT: Record<CheckStatus, { icon: IconName; className: string }> =
+	{
+		pass: { icon: "shield-check", className: "text-success-base" },
+		warn: { icon: "alert-triangle", className: "text-warning-base" },
+		fail: { icon: "cross-circle", className: "text-error-base" },
+	};
+
+function StatusText({ status }: { status: CheckStatus }) {
+	const s = STATUS_TEXT[status];
+	return (
+		<span
+			className={cn(
+				"inline-flex items-center gap-1.5 font-medium text-[13px]",
+				s.className,
+			)}
+		>
+			<Icon name={s.icon} className="size-3.5" />
+			{STATUS_LABEL[status]}
+		</span>
+	);
+}
+
+/**
+ * The dashboard's table: a soft header strip tucked under a bordered body.
+ * `cols` is a full Tailwind grid class so it survives purging.
+ */
+function DashTable({
+	title,
+	description,
+	cols,
+	headers,
+	children,
+}: {
+	title: string;
+	description: string;
+	cols: string;
+	headers: string[];
+	children: ReactNode;
+}) {
+	return (
+		<div>
+			<div className="mb-3">
+				<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
+					{title}
+				</h3>
+				<p className="mt-0.5 text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
+					{description}
+				</p>
+			</div>
+			<div className="w-full text-paragraph-sm">
+				<div
+					className={cn(
+						"hidden items-center gap-x-3 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 sm:grid dark:border-[#101010] dark:bg-bg-weak-50/40",
+						cols,
+					)}
+				>
+					{headers.map((header) => (
+						<span key={header} className="text-xs">
+							{header}
+						</span>
+					))}
+				</div>
+				<div className="sm:-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50 dark:bg-[#0b0b0b]">
+					{children}
+				</div>
+			</div>
+		</div>
+	);
+}
+
+const ROW =
+	"flex flex-col gap-2 px-4 py-3 transition-colors hover:bg-bg-weak-50/50 sm:grid sm:items-center sm:gap-x-3 sm:gap-y-0 sm:py-2.5";
+
 function ResultCardDetailed({
 	result,
 	onReset,
@@ -450,7 +558,6 @@ function ResultCardDetailed({
 	onReset: () => void;
 }) {
 	const status = VERDICT_STATUS_CONFIG[result.verdict];
-	const style = STATUS_STYLE[result.verdict];
 	const tags = parseBimiTags(result.bimiRecord);
 	// Most recommendations repeat a check's own "How to fix"; only list new ones.
 	const shownFixes = new Set(
@@ -486,7 +593,7 @@ function ResultCardDetailed({
 	};
 
 	return (
-		<div className="space-y-3 text-left text-xs">
+		<div className="space-y-8 text-left text-xs">
 			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/10 dark:bg-white/[0.02]">
 				{/* Verdict */}
 				<div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1 px-4 py-3">
@@ -544,101 +651,115 @@ function ResultCardDetailed({
 				</div>
 			</div>
 
-			{/* The record */}
-			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-white/10">
+			<DashTable
+				title="Your BIMI record"
+				description="The TXT record inboxes look up. Click a value to copy it."
+				cols="sm:grid-cols-[64px_minmax(0,1fr)_minmax(0,1.6fr)_110px]"
+				headers={["Type", "Name", "Value", "Status"]}
+			>
 				<div
 					className={cn(
-						"break-all border-b px-4 py-3 font-mono text-[12px]",
-						result.bimiRecord ? style.tint : STATUS_STYLE.fail.tint,
+						ROW,
+						"sm:grid-cols-[64px_minmax(0,1fr)_minmax(0,1.6fr)_110px]",
 					)}
 				>
-					{result.bimiRecord ?? `No BIMI record at ${result.queryName}`}
+					<div>
+						<Pill>TXT</Pill>
+					</div>
+					<CopyValue value={result.queryName} />
+					{result.bimiRecord ? (
+						<CopyValue value={result.bimiRecord} mono />
+					) : (
+						<span className="text-[13px] text-text-sub-600 dark:text-white/55">
+							No record published
+						</span>
+					)}
+					<div>
+						<StatusText status={result.bimiRecord ? "pass" : "fail"} />
+					</div>
 				</div>
-				<table className="w-full text-left text-[12.5px]">
-					<thead className="bg-bg-weak-50 text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:bg-white/[0.03] dark:text-white/40">
-						<tr>
-							<th className="w-12 px-4 py-2 font-medium">Tag</th>
-							<th className="px-2 py-2 font-medium">Value</th>
-							<th className="hidden px-2 py-2 font-medium sm:table-cell">
-								What it means
-							</th>
-						</tr>
-					</thead>
-					<tbody className="divide-y divide-stroke-soft-100 bg-bg-white-0 dark:divide-white/5 dark:bg-transparent">
-						{TAG_ROWS.map((row) => (
-							<tr key={row.tag} className="align-top">
-								<td className="px-4 py-2.5 font-mono font-semibold text-text-strong-950 dark:text-white">
-									{row.tag}
-								</td>
-								<td className="px-2 py-2.5">
-									<span className="font-medium text-text-strong-950 dark:text-white">
-										{row.name}
-									</span>
-									<span className="mt-0.5 block break-all font-mono text-[11.5px] text-text-sub-600 dark:text-white/55">
-										{tags[row.tag] || "(empty)"}
-									</span>
-									<span className="mt-1 block text-[12px] text-text-sub-600 leading-relaxed sm:hidden dark:text-white/50">
-										{row.meaning}
-									</span>
-								</td>
-								<td className="hidden px-2 py-2.5 pr-4 text-text-sub-600 leading-relaxed sm:table-cell dark:text-white/55">
-									{row.meaning}
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
+			</DashTable>
 
-			{/* Tests */}
-			<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-white/10">
-				<div className="flex items-baseline justify-between gap-3 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2 text-[10.5px] text-text-sub-600 uppercase tracking-wider dark:border-white/10 dark:bg-white/[0.03] dark:text-white/40">
-					<span>Test</span>
-					<span>Result</span>
-				</div>
-				<ul className="divide-y divide-stroke-soft-100 bg-bg-white-0 dark:divide-white/5 dark:bg-transparent">
-					{result.checks.map((check) => {
-						const s = STATUS_STYLE[check.status];
-						return (
-							<li key={check.id} className="flex items-start gap-3 px-4 py-2.5">
-								<Icon
-									name={s.icon}
-									className={cn("mt-0.5 size-4 shrink-0", s.iconClass)}
-								/>
-								<div className="min-w-0 flex-1">
-									<div className="flex items-start justify-between gap-3">
-										<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
-											{check.label}
-										</span>
-										<span
-											className={cn(
-												"shrink-0 rounded-md border px-1.5 py-px font-medium text-[11px]",
-												s.chip,
-											)}
-										>
-											{STATUS_LABEL[check.status]}
-										</span>
-									</div>
-									<p className="mt-0.5 break-words text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
-										{check.detail}
-									</p>
-									{check.record && check.id !== "bimi-present" ? (
-										<code className="mt-1.5 block break-all rounded-md bg-bg-weak-50 px-2 py-1.5 font-mono text-[11px] text-text-strong-950 dark:bg-white/[0.04] dark:text-white/80">
-											{check.record}
-										</code>
-									) : null}
-									{check.fix && check.status !== "pass" ? (
-										<p className="mt-1 text-[12.5px] text-text-strong-950 leading-relaxed dark:text-white/80">
-											<span className="font-semibold">How to fix:</span>{" "}
-											{check.fix}
-										</p>
-									) : null}
+			<DashTable
+				title="What each tag means"
+				description="The record is a list of tags. Here is what each one does."
+				cols="sm:grid-cols-[64px_minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1.6fr)]"
+				headers={["Tag", "Name", "Value", "What it means"]}
+			>
+				{TAG_ROWS.map((row) => (
+					<div
+						key={row.tag}
+						className={cn(
+							ROW,
+							"sm:grid-cols-[64px_minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1.6fr)]",
+						)}
+					>
+						<div className="flex items-center gap-2">
+							<Pill>{row.tag}</Pill>
+							<span className="font-medium text-[13px] text-text-strong-950 sm:hidden dark:text-white">
+								{row.name}
+							</span>
+						</div>
+						<span className="hidden font-medium text-[13px] text-text-strong-950 sm:block dark:text-white">
+							{row.name}
+						</span>
+						{tags[row.tag] ? (
+							<CopyValue value={tags[row.tag] ?? ""} mono />
+						) : (
+							<span className="text-[13px] text-text-soft-400 dark:text-white/40">
+								Not set
+							</span>
+						)}
+						<p className="text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
+							{row.meaning}
+						</p>
+					</div>
+				))}
+			</DashTable>
+
+			<DashTable
+				title="What we checked"
+				description="Inboxes only show your logo when every check passes."
+				cols="sm:grid-cols-[minmax(0,0.9fr)_minmax(0,2fr)_110px]"
+				headers={["Test", "Result", "Status"]}
+			>
+				{result.checks.map((check) => (
+					<div
+						key={check.id}
+						className={cn(
+							ROW,
+							"sm:grid-cols-[minmax(0,0.9fr)_minmax(0,2fr)_110px] sm:items-start",
+						)}
+					>
+						<div className="flex items-center justify-between gap-3">
+							<span className="font-medium text-[13px] text-text-strong-950 dark:text-white">
+								{check.label}
+							</span>
+							<span className="sm:hidden">
+								<StatusText status={check.status} />
+							</span>
+						</div>
+						<div className="min-w-0">
+							<p className="break-words text-[12.5px] text-text-sub-600 leading-relaxed dark:text-white/55">
+								{check.detail}
+							</p>
+							{check.record && check.id !== "bimi-present" ? (
+								<div className="mt-1.5">
+									<CopyValue value={check.record} mono />
 								</div>
-							</li>
-						);
-					})}
-				</ul>
-			</div>
+							) : null}
+							{check.fix && check.status !== "pass" ? (
+								<p className="mt-1 text-[12.5px] text-text-strong-950 leading-relaxed dark:text-white/80">
+									<span className="font-semibold">How to fix:</span> {check.fix}
+								</p>
+							) : null}
+						</div>
+						<div className="hidden sm:block">
+							<StatusText status={check.status} />
+						</div>
+					</div>
+				))}
+			</DashTable>
 
 			{extraRecommendations.length > 0 && (
 				<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-3 dark:border-white/10 dark:bg-transparent">
