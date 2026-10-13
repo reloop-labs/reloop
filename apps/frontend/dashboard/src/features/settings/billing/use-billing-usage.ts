@@ -72,6 +72,26 @@ export interface BillingPeriod {
 	emailsOverage: number;
 }
 
+/**
+ * Monthly email usage. Both sent and received email count toward the plan:
+ * `creditsUsed` holds send credits (one per recipient, kept live by usage
+ * updates) and `creditsReceived` the non-spam inbound emails this period.
+ */
+export function emailUsage(
+	subscription: BillingUsage["subscription"],
+	monthlyIncluded: number,
+): { sent: number; received: number; used: number; remaining: number } {
+	const sent = Math.max(0, subscription.creditsUsed);
+	const received = Math.max(0, subscription.creditsReceived ?? 0);
+	const used = sent + received;
+	return {
+		sent,
+		received,
+		used,
+		remaining: Math.max(0, monthlyIncluded - used),
+	};
+}
+
 export interface UsageLiveUpdate {
 	organizationId: string;
 	creditsUsed: number;

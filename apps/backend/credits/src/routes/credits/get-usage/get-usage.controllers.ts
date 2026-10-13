@@ -40,8 +40,9 @@ export const getUsageController = async ({
 			dailyRows,
 			conversionRows,
 		] = await Promise.all([
+			// Credits, not rows: one email_send row is charged per recipient.
 			db
-				.select({ value: count() })
+				.select({ value: sum(emailSend.creditsConsumed) })
 				.from(emailSend)
 				.where(
 					and(
@@ -161,7 +162,7 @@ export const getUsageController = async ({
 				cancelAtPeriodEnd: billing.subscription.cancelAtPeriodEnd,
 				creditsUsed: billing.credits.creditsUsed,
 				creditsRemaining: billing.credits.creditsRemaining,
-				creditsSent: sentRows[0]?.value ?? 0,
+				creditsSent: Number(sentRows[0]?.value ?? 0),
 				creditsReceived: receivedRows[0]?.value ?? 0,
 				currentPeriodStart: billing.credits.currentPeriodStart.toISOString(),
 				currentPeriodEnd: billing.credits.currentPeriodEnd.toISOString(),

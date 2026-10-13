@@ -22,7 +22,11 @@ import {
 	useBillingCheckout,
 	useBillingPortal,
 } from "./use-billing-actions";
-import { useBillingPeriods, useBillingUsage } from "./use-billing-usage";
+import {
+	emailUsage,
+	useBillingPeriods,
+	useBillingUsage,
+} from "./use-billing-usage";
 
 const CARD =
 	"rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]";
@@ -79,11 +83,13 @@ export function BillingPage() {
 	});
 	const currentPlan = getPlanById(currentPlanId) ?? defaultPlan;
 	const nextPlan = getNextPlan(currentPlanId);
-	const remaining = usageData?.subscription.creditsRemaining ?? 0;
 	const monthlyIncluded =
 		usageData?.plan.entitlements?.monthlyEmails ??
 		usageData?.plan.monthlyCredits ??
 		0;
+	const remaining = usageData
+		? emailUsage(usageData.subscription, monthlyIncluded).remaining
+		: 0;
 
 	const nextPlanPriceLabel = nextPlan
 		? nextPlan.monthlyPrice === null

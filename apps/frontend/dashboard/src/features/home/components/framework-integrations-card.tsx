@@ -93,7 +93,7 @@ export function FrameworkIntegrationsCard() {
 				{/* Tab Selector */}
 				<div className="flex shrink-0 overflow-x-auto overflow-y-hidden border-stroke-soft-100/50 border-b px-4 [-ms-overflow-style:none] [scrollbar-width:none] dark:border-white/5 [&::-webkit-scrollbar]:hidden">
 					<TabMenuHorizontal.Root value={activeTab} className="w-full">
-						<TabMenuHorizontal.List className="[&>div:last-child]:-bottom-px relative h-12 w-full justify-start gap-0 overflow-x-auto overflow-y-hidden border-b-0 py-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>div:last-child]:h-0.5">
+						<TabMenuHorizontal.List className="relative h-12 w-full justify-start gap-0 overflow-x-auto overflow-y-hidden border-b-0 py-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>div:last-child]:-bottom-px [&>div:last-child]:h-0.5">
 							{languages.map(({ id, title, icon }, index) => {
 								const isHovered = hoveredIdx === index;
 								const isActive =
@@ -116,7 +116,7 @@ export function FrameworkIntegrationsCard() {
 										{(isHovered || isActive) && (
 											<motion.div
 												layoutId="framework-active-pill"
-												className="-z-10 absolute inset-x-1.5 top-2.5 bottom-2.5 rounded-lg bg-neutral-alpha-10 dark:bg-white/10"
+												className="absolute inset-x-1.5 top-2.5 bottom-2.5 -z-10 rounded-lg bg-neutral-alpha-10 dark:bg-white/10"
 												transition={{
 													type: "spring",
 													stiffness: 380,

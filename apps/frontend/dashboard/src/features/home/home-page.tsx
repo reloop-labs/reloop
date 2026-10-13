@@ -4,7 +4,10 @@ import { useEffect, useMemo } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
-import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
+import {
+	emailUsage,
+	useBillingUsage,
+} from "#/features/settings/billing/use-billing-usage";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { navigatePostAuth } from "#/utils/navigate-post-auth";
 import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destination";
@@ -84,7 +87,7 @@ export function HomePage() {
 		if (!canManageBilling || billing.data?.selfHosted !== false) return null;
 		const monthly = billing.data.plan.monthlyCredits;
 		if (!monthly || monthly <= 0) return null;
-		return billing.data.subscription.creditsUsed / monthly;
+		return emailUsage(billing.data.subscription, monthly).used / monthly;
 	}, [billing.data, canManageBilling]);
 
 	const attentionItems = useMemo(

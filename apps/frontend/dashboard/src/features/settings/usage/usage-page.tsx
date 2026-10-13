@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import { resolvePlanId } from "#/features/settings/billing/plan-id";
 import { SwitchPlanModal } from "#/features/settings/billing/switch-plan-modal";
-import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
+import {
+	emailUsage,
+	useBillingUsage,
+} from "#/features/settings/billing/use-billing-usage";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { UsageSection } from "./usage-section";
 
@@ -43,7 +46,7 @@ export function UsagePage() {
 					</h1>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
 						{data
-							? `${data.subscription.creditsRemaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period.`
+							? `${emailUsage(data.subscription, data.plan.monthlyCredits).remaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period.`
 							: "Track your plan limits and resource usage for this billing period."}
 					</p>
 				</div>

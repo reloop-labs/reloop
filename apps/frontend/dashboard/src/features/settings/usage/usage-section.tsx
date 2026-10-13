@@ -4,7 +4,10 @@ import { cn } from "@reloop/ui/cn";
 import Link from "next/link";
 import { Circle } from "rc-progress";
 import { GrantedPlanBanner } from "#/features/settings/billing/granted-plan-banner";
-import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
+import {
+	emailUsage,
+	useBillingUsage,
+} from "#/features/settings/billing/use-billing-usage";
 
 type UsageStatus = "healthy" | "warning" | "critical" | "unlimited";
 
@@ -220,8 +223,7 @@ export function UsageSection() {
 	const unlimited = data.selfHosted;
 	const entitlements = plan.entitlements;
 	const total = Math.max(0, entitlements?.monthlyEmails ?? plan.monthlyCredits);
-	const used = Math.max(0, subscription.creditsUsed);
-	const remaining = Math.max(0, subscription.creditsRemaining);
+	const { sent, received, used, remaining } = emailUsage(subscription, total);
 	const ratio = total > 0 ? used / total : 0;
 	const percent = Math.min(100, Math.round(ratio * 100));
 	const overageEnabled =
@@ -258,7 +260,7 @@ export function UsageSection() {
 
 			<CategoryCard
 				title="Emails"
-				description="Transactional & campaign emails sent through Reloop."
+				description="Emails sent and received through Reloop. Both count toward your plan."
 			>
 				<div className="border-stroke-soft-100 border-b py-3.5 dark:border-stroke-soft-100/40">
 					<div className="mb-2 flex items-center justify-between">
@@ -289,8 +291,6 @@ export function UsageSection() {
 					</div>
 
 					{(() => {
-						const sent = subscription.creditsSent ?? used;
-						const received = subscription.creditsReceived ?? 0;
 						const sentPct = total > 0 ? Math.min(100, (sent / total) * 100) : 0;
 						const recvPct =
 							total > 0 ? Math.min(100 - sentPct, (received / total) * 100) : 0;
