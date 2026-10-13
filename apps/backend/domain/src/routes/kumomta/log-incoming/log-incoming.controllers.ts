@@ -285,6 +285,9 @@ export async function logIncomingController({
 		recipientCount,
 	});
 	if (!decision.ok) {
+		if (decision.reason === "payment") {
+			throw KumoMtaErrors.paymentOverdue();
+		}
 		if (decision.reason === "daily" && decision.dailyLimit != null) {
 			throw KumoMtaErrors.dailyQuotaExceeded({
 				used: decision.dailyUsed,

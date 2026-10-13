@@ -1,4 +1,6 @@
+import { addMonthsUtc } from "@reloop/db/billing-period";
 import { db } from "@reloop/db/client";
+import { syncInboxesToPlanCap } from "@reloop/db/inbox-plan-cap";
 import {
 	adminAuditLog,
 	creditLedger,
@@ -127,13 +129,19 @@ export async function convertOrganizationPlanController(args: {
 			});
 		}
 
+		// Suspend inboxes over a lower cap / restore them on a higher one
+		await syncInboxesToPlanCap({
+			organizationId,
+			maxAgentInboxes: nextLimits.maxAgentInboxes,
+			tx,
+		});
+
 		// Ensure credits row exists
 		let credits = await tx.query.organizationCredits.findFirst({
 			where: eq(organizationCredits.organizationId, organizationId),
 		});
 		if (!credits) {
-			const periodEnd = new Date(now);
-			periodEnd.setMonth(periodEnd.getMonth() + 1);
+			const periodEnd = addMonthsUtc(now, 1);
 			const [created] = await tx
 				.insert(organizationCredits)
 				.values({
@@ -218,8 +226,7 @@ export async function convertOrganizationPlanController(args: {
 				})
 				.where(eq(organizationSubscription.id, sub.id));
 		} else {
-			const periodEnd = new Date(now);
-			periodEnd.setMonth(periodEnd.getMonth() + 1);
+			const periodEnd = addMonthsUtc(now, 1);
 			await tx.insert(organizationSubscription).values({
 				organizationId,
 				planId: targetPlanId,

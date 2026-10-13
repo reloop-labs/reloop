@@ -1,4 +1,7 @@
+import { addMonthsUtc, advancePeriod } from "@reloop/db/billing-period";
 import { type DatabaseInstance, db } from "@reloop/db/client";
+import { syncInboxesToPlanCap } from "@reloop/db/inbox-plan-cap";
+import { utcDayStart } from "@reloop/db/reserve-send-credits";
 import {
 	billingPeriod,
 	creditLedger,
@@ -27,9 +30,7 @@ export type OrgBillingRow = {
 };
 
 function nextMonth(from: Date): Date {
-	const end = new Date(from);
-	end.setMonth(end.getMonth() + 1);
-	return end;
+	return addMonthsUtc(from, 1);
 }
 
 function limitsFromRow(row: typeof organizationPlan.$inferSelect): PlanLimits {
@@ -105,6 +106,13 @@ export async function applyLimitsToOrgPlan(
 			.where(eq(organizationPlan.id, existing.id))
 			.returning();
 		if (!updated) throw new Error("Failed to update organization plan");
+		if (updated.maxAgentInboxes !== existing.maxAgentInboxes) {
+			await syncInboxesToPlanCap({
+				organizationId: orgId,
+				maxAgentInboxes: updated.maxAgentInboxes,
+				tx,
+			});
+		}
 		return updated;
 	}
 
@@ -289,6 +297,8 @@ export async function getOrProvisionOrgBilling(
 				creditsUsed: 0,
 				creditsRemaining: plan.monthlyEmails,
 				monthlyCredits: plan.monthlyEmails,
+				dailyEmailsUsed: 0,
+				dailyWindowStart: utcDayStart(now),
 				currentPeriodStart: now,
 				currentPeriodEnd: periodEnd,
 				status: "active",
@@ -353,8 +363,12 @@ export async function getOrProvisionOrgBilling(
 			emailsUsed: credits.creditsUsed,
 			tx: client,
 		});
-		const periodStart = now;
-		const periodEnd = nextMonth(now);
+		// Advance from the period's anchor (same rule as the send path).
+		const { periodStart, periodEnd } = advancePeriod({
+			periodStart: credits.currentPeriodStart,
+			periodEnd: credits.currentPeriodEnd,
+			now,
+		});
 		credits = await refillCreditsFromPlan({
 			creditsId: credits.id,
 			organizationId: orgId,

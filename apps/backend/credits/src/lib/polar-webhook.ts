@@ -17,7 +17,11 @@ import {
 	organizationCredits,
 	organizationSubscription,
 } from "@reloop/db/schema";
-import { mapPolarSubscriptionStatus, type PlanId } from "@reloop/pricing";
+import {
+	mapPolarSubscriptionStatus,
+	type PlanId,
+	polarStatusMap,
+} from "@reloop/pricing";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 
@@ -150,7 +154,22 @@ async function applySubscription(data: Record<string, unknown>) {
 		},
 		livePolarBilling.enabled ? livePolarBilling : undefined,
 	);
-	const status = mapPolarSubscriptionStatus(str(data.status) ?? "active");
+	// An unknown Polar status must not grant (or revoke) access: keep ours.
+	const rawStatus = str(data.status) ?? "active";
+	const knownStatus = Object.hasOwn(polarStatusMap, rawStatus);
+	if (!knownStatus) {
+		log.warn({
+			message: "Unknown Polar subscription status; keeping current status",
+			organizationId: orgId,
+			polarStatus: rawStatus,
+		});
+	}
+	const status = knownStatus
+		? mapPolarSubscriptionStatus(rawStatus)
+		: billing.subscription.status;
+	const now = new Date();
+	const pastDueSince =
+		status === "past_due" ? (billing.subscription.pastDueSince ?? now) : null;
 	const periodStart =
 		date(field(data, "currentPeriodStart", "current_period_start")) ??
 		billing.subscription.currentPeriodStart;
@@ -197,6 +216,7 @@ async function applySubscription(data: Record<string, unknown>) {
 					cancelAtPeriodEnd,
 					canceledAt:
 						canceledAt ?? billing.subscription.canceledAt ?? new Date(),
+					pastDueSince: null,
 					updatedAt: new Date(),
 				})
 				.where(eq(organizationSubscription.id, billing.subscription.id));
@@ -210,6 +230,25 @@ async function applySubscription(data: Record<string, unknown>) {
 			}
 		});
 
+		return { ok: true as const, organizationId: orgId };
+	}
+
+	// Polar retries can deliver an older event after a newer one. For the same
+	// subscription, never move the period backwards (it would reset usage).
+	const sameSubscription =
+		polarSubscriptionId != null &&
+		polarSubscriptionId === billing.subscription.polarSubscriptionId;
+	if (
+		sameSubscription &&
+		periodStart.getTime() < billing.subscription.currentPeriodStart.getTime()
+	) {
+		log.info({
+			message: "Ignoring out-of-order Polar subscription event",
+			organizationId: orgId,
+			polarSubscriptionId,
+			eventPeriodStart: periodStart.toISOString(),
+			currentPeriodStart: billing.subscription.currentPeriodStart.toISOString(),
+		});
 		return { ok: true as const, organizationId: orgId };
 	}
 
@@ -249,10 +288,16 @@ async function applySubscription(data: Record<string, unknown>) {
 				tx,
 			});
 		} else if (incomingPlanId && incomingPlanId !== billing.plan.planId) {
+			// Mid-period plan change: the new limit applies to this period, minus
+			// what was already sent (upgrade adds room, downgrade caps it).
 			await tx
 				.update(organizationCredits)
 				.set({
 					monthlyCredits: monthlyEmails,
+					creditsRemaining: Math.max(
+						0,
+						monthlyEmails - billing.credits.creditsUsed,
+					),
 					updatedAt: new Date(),
 				})
 				.where(eq(organizationCredits.id, billing.credits.id));
@@ -271,6 +316,7 @@ async function applySubscription(data: Record<string, unknown>) {
 				currentPeriodEnd: periodEnd,
 				cancelAtPeriodEnd,
 				canceledAt,
+				pastDueSince,
 				updatedAt: new Date(),
 			})
 			.where(eq(organizationSubscription.id, billing.subscription.id));

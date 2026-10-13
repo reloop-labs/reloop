@@ -26,6 +26,8 @@ const createInboundAttachmentId = () => `inbatt_${createId()}`;
 export const mailboxStatusEnum = pgEnum("mailbox_status", [
 	"active",
 	"disabled",
+	/** Over the plan's inbox cap after a downgrade; re-enabled on upgrade. */
+	"suspended",
 ]);
 
 export const inboundEmailStatusEnum = pgEnum("inbound_email_status", [

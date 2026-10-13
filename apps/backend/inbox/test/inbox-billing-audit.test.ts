@@ -4,8 +4,12 @@
  *     bun test test/inbox-billing-audit.test.ts
  */
 import { afterAll, describe, expect, it } from "bun:test";
-import { assertInboxQuota } from "@reloop/be-inbox/lib/inbox-quota";
+import {
+	assertCanActivateInbox,
+	assertInboxQuota,
+} from "@reloop/be-inbox/lib/inbox-quota";
 import { db } from "@reloop/db/client";
+import { syncInboxesToPlanCap } from "@reloop/db/inbox-plan-cap";
 import {
 	domain,
 	mailbox,
@@ -101,18 +105,80 @@ describe.skipIf(!enabled)("Agent inbox limits", () => {
 		expect(await inboxCount(orgId)).toBe(1);
 	});
 
-	it("I4 after downgrading Pro → free, inboxes above the free cap are disabled", async () => {
+	async function downgradeTo(orgId: string, maxAgentInboxes: number) {
+		// same as applyLimitsToOrgPlan / admin convert-plan: plan row + sync in one tx
+		await db.transaction(async (tx) => {
+			await tx
+				.update(organizationPlan)
+				.set({ maxAgentInboxes })
+				.where(eq(organizationPlan.organizationId, orgId));
+			await syncInboxesToPlanCap({
+				organizationId: orgId,
+				maxAgentInboxes,
+				tx,
+			});
+		});
+	}
+
+	async function statuses(orgId: string) {
+		const rows = await db.query.mailbox.findMany({
+			where: eq(mailbox.organizationId, orgId),
+			orderBy: (m, { asc }) => [asc(m.createdAt), asc(m.id)],
+		});
+		return rows.map((m) => m.status);
+	}
+
+	it("I4 after downgrading Pro → free, inboxes above the free cap are suspended", async () => {
 		const { orgId, domainId } = await setup(5);
 		for (let i = 0; i < 5; i++) await createInbox(orgId, domainId, i);
-		await db
-			.update(organizationPlan)
-			.set({ maxAgentInboxes: 1 })
-			.where(eq(organizationPlan.organizationId, orgId));
-		const active = (
+		await downgradeTo(orgId, 1);
+		const s = await statuses(orgId);
+		expect(s.filter((x) => x === "active").length).toBe(1);
+		expect(s.filter((x) => x === "suspended").length).toBe(4);
+		expect(s[0]).toBe("active"); // the oldest inbox keeps working
+	});
+
+	it("I5 upgrading again re-activates suspended inboxes", async () => {
+		const { orgId, domainId } = await setup(5);
+		for (let i = 0; i < 5; i++) await createInbox(orgId, domainId, i);
+		await downgradeTo(orgId, 1);
+		await downgradeTo(orgId, 5);
+		expect((await statuses(orgId)).every((x) => x === "active")).toBe(true);
+	});
+
+	it("I6 a suspended inbox can't be re-enabled past the cap", async () => {
+		const { orgId, domainId } = await setup(5);
+		for (let i = 0; i < 5; i++) await createInbox(orgId, domainId, i);
+		await downgradeTo(orgId, 1);
+		const suspended = (
 			await db.query.mailbox.findMany({
 				where: eq(mailbox.organizationId, orgId),
 			})
-		).filter((m) => m.status === "active");
-		expect(active.length).toBeLessThanOrEqual(1);
+		).find((m) => m.status === "suspended");
+		if (!suspended) throw new Error("expected a suspended inbox");
+		expect(
+			db.transaction((tx) => assertCanActivateInbox(orgId, suspended.id, tx)),
+		).rejects.toThrow();
+	});
+
+	it("I7 user-disabled inboxes are left alone and don't take a slot", async () => {
+		const { orgId, domainId } = await setup(5);
+		for (let i = 0; i < 3; i++) await createInbox(orgId, domainId, i);
+		const oldest = (
+			await db.query.mailbox.findMany({
+				where: eq(mailbox.organizationId, orgId),
+				orderBy: (m, { asc }) => [asc(m.createdAt), asc(m.id)],
+			})
+		)[0];
+		if (!oldest) throw new Error("no inbox");
+		await db
+			.update(mailbox)
+			.set({ status: "disabled" })
+			.where(eq(mailbox.id, oldest.id));
+		await downgradeTo(orgId, 1);
+		const s = await statuses(orgId);
+		expect(s[0]).toBe("disabled");
+		expect(s.filter((x) => x === "active").length).toBe(1);
+		expect(s.filter((x) => x === "suspended").length).toBe(1);
 	});
 });

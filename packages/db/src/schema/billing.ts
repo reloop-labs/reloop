@@ -117,6 +117,8 @@ export const organizationSubscription = pgTable(
 		currentPeriodEnd: timestamp("current_period_end").notNull(),
 		cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
 		canceledAt: timestamp("canceled_at"),
+		/** When the subscription first went past_due; cleared once it is paid. */
+		pastDueSince: timestamp("past_due_since"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at").notNull().defaultNow(),
 	},

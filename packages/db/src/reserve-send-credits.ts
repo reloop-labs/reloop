@@ -1,14 +1,37 @@
-import { and, eq, lte } from "drizzle-orm";
+import { and, eq, isNull, lte } from "drizzle-orm";
+import { addMonthsUtc, advancePeriod, periodOverage } from "./billing-period";
 import { type DatabaseInstance, db } from "./client";
 import {
+	billingPeriod,
 	creditLedger,
 	organizationCredits,
 	organizationPlan,
+	organizationSubscription,
 } from "./schema/billing";
 import { isSelfHosted } from "./self-hosted";
 
 const DEFAULT_MONTHLY_CREDITS = 3000;
 const DEFAULT_DAILY_EMAIL_LIMIT = 100;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Days a past_due org may keep sending while Polar retries the payment. */
+export function pastDueGraceDays(): number {
+	const raw = Number(process.env.PAST_DUE_GRACE_DAYS);
+	return Number.isFinite(raw) && raw >= 0 ? raw : 7;
+}
+
+/** True once a past_due subscription has used up its grace period. */
+export function isPastDueBeyondGrace(args: {
+	status: string;
+	pastDueSince: Date | null;
+	now: Date;
+	graceDays?: number;
+}): boolean {
+	if (args.status !== "past_due") return false;
+	const since = args.pastDueSince ?? args.now;
+	const graceDays = args.graceDays ?? pastDueGraceDays();
+	return args.now.getTime() - since.getTime() > graceDays * DAY_MS;
+}
 
 export function utcDayStart(now: Date): Date {
 	return new Date(
@@ -27,7 +50,7 @@ export type CreditSnapshot = {
 
 export type ReserveDenied = {
 	ok: false;
-	reason: "monthly" | "daily";
+	reason: "monthly" | "daily" | "payment";
 	remaining: number;
 	monthlyCredits: number;
 	dailyUsed: number;
@@ -150,8 +173,7 @@ async function ensureActiveCredits(
 	});
 
 	if (!activeCredits) {
-		const periodEnd = new Date(now);
-		periodEnd.setMonth(periodEnd.getMonth() + 1);
+		const periodEnd = addMonthsUtc(now, 1);
 
 		const [newCredits] = await client
 			.insert(organizationCredits)
@@ -198,16 +220,20 @@ async function ensureActiveCredits(
 	}
 
 	if (now >= activeCredits.currentPeriodEnd) {
-		const periodEnd = new Date(now);
-		periodEnd.setMonth(periodEnd.getMonth() + 1);
+		// Advance from the period's own anchor (no drift), in UTC.
+		const next = advancePeriod({
+			periodStart: activeCredits.currentPeriodStart,
+			periodEnd: activeCredits.currentPeriodEnd,
+			now,
+		});
 
 		const [updatedCredits] = await client
 			.update(organizationCredits)
 			.set({
 				creditsUsed: 0,
 				creditsRemaining: activeCredits.monthlyCredits,
-				currentPeriodStart: now,
-				currentPeriodEnd: periodEnd,
+				currentPeriodStart: next.periodStart,
+				currentPeriodEnd: next.periodEnd,
 				updatedAt: now,
 			})
 			.where(
@@ -231,6 +257,44 @@ async function ensureActiveCredits(
 			}
 			return refreshed;
 		}
+
+		// Record the closed period before its usage is gone (same as the
+		// billing-path reset); unique on (org, period_start) so it's idempotent.
+		const plan = await client.query.organizationPlan.findFirst({
+			where: eq(organizationPlan.organizationId, organizationId),
+			columns: { planId: true },
+		});
+		await client
+			.insert(billingPeriod)
+			.values({
+				organizationId,
+				planId: plan?.planId ?? "free",
+				periodStart: activeCredits.currentPeriodStart,
+				periodEnd: activeCredits.currentPeriodEnd,
+				includedEmails: activeCredits.monthlyCredits,
+				emailsUsed: activeCredits.creditsUsed,
+				emailsOverage: periodOverage(
+					activeCredits.monthlyCredits,
+					activeCredits.creditsUsed,
+				),
+			})
+			.onConflictDoNothing();
+
+		// Free (non-Polar) orgs: keep the subscription row's period in step.
+		// Polar-backed periods are owned by the subscription webhooks.
+		await client
+			.update(organizationSubscription)
+			.set({
+				currentPeriodStart: next.periodStart,
+				currentPeriodEnd: next.periodEnd,
+				updatedAt: now,
+			})
+			.where(
+				and(
+					eq(organizationSubscription.organizationId, organizationId),
+					isNull(organizationSubscription.polarSubscriptionId),
+				),
+			);
 
 		await client.insert(creditLedger).values({
 			organizationId,
@@ -259,6 +323,38 @@ async function loadPlanDailyEmailLimit(
 		return DEFAULT_DAILY_EMAIL_LIMIT;
 	}
 	return plan.dailyEmailLimit;
+}
+
+/** Deny sends once a past_due subscription is beyond its grace period. */
+async function paymentDenial(
+	organizationId: string,
+	client: DatabaseInstance,
+	now: Date,
+	credits: typeof organizationCredits.$inferSelect,
+	dailyLimit: number | null,
+): Promise<ReserveDenied | null> {
+	const subscription = await client.query.organizationSubscription.findFirst({
+		where: eq(organizationSubscription.organizationId, organizationId),
+		columns: { status: true, pastDueSince: true },
+	});
+	if (
+		!subscription ||
+		!isPastDueBeyondGrace({
+			status: subscription.status,
+			pastDueSince: subscription.pastDueSince,
+			now,
+		})
+	) {
+		return null;
+	}
+	return {
+		ok: false,
+		reason: "payment",
+		remaining: credits.creditsRemaining,
+		monthlyCredits: credits.monthlyCredits,
+		dailyUsed: credits.dailyEmailsUsed,
+		dailyLimit,
+	};
 }
 
 function snapshotFromRow(
@@ -291,6 +387,16 @@ export async function peekSendCredits(args: {
 	const dailyEmailLimit = unlimited
 		? null
 		: await loadPlanDailyEmailLimit(args.organizationId, client);
+	if (!unlimited) {
+		const denied = await paymentDenial(
+			args.organizationId,
+			client,
+			now,
+			credits,
+			dailyEmailLimit,
+		);
+		if (denied) return denied;
+	}
 	return applyCreditReservation({
 		credits: snapshotFromRow(credits),
 		dailyEmailLimit,
@@ -360,6 +466,16 @@ export async function reserveSendCredits(args: {
 		const dailyEmailLimit = unlimited
 			? null
 			: await loadPlanDailyEmailLimit(organizationId, tx);
+		if (!unlimited) {
+			const denied = await paymentDenial(
+				organizationId,
+				tx,
+				now,
+				locked,
+				dailyEmailLimit,
+			);
+			if (denied) return denied;
+		}
 		const decision = applyCreditReservation({
 			credits: snapshotFromRow(locked),
 			dailyEmailLimit,
@@ -424,7 +540,9 @@ export async function refundSendCredits(args: {
 
 		if (!row) return;
 
-		const sameDay = row.dailyWindowStart.getTime() === today.getTime();
+		// Compare by UTC day: a provisioned window may start mid-day.
+		const sameDay =
+			utcDayStart(row.dailyWindowStart).getTime() === today.getTime();
 		await tx
 			.update(organizationCredits)
 			.set({

@@ -170,6 +170,13 @@ export const KumoMtaErrors = {
 			why: "The system was unable to save the email log database entry.",
 			fix: "Please try again later or verify database status.",
 		}),
+	paymentOverdue: () =>
+		createError({
+			status: 402,
+			message: "Payment overdue",
+			why: "Your subscription payment failed and the grace period has ended, so sending is paused",
+			fix: "Update your payment method in Billing; sending resumes as soon as the payment succeeds",
+		}),
 	quotaExceeded: ({
 		remaining,
 		required,

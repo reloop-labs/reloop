@@ -11,10 +11,13 @@ import { db } from "@reloop/db/client";
 import { reserveSendCredits } from "@reloop/db/reserve-send-credits";
 import {
 	billingPeriod,
+	domain,
+	mailbox,
 	organization,
 	organizationCredits,
 	organizationPlan,
 	organizationSubscription,
+	user,
 } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -198,6 +201,43 @@ describe.skipIf(!enabled)("Subscription cancellation", () => {
 		const s = await state(org);
 		expect(s.plan?.planId).toBe("startup");
 		expect(s.subscription?.status).toBe("active");
+	});
+
+	it("revoking Pro suspends inboxes over the free cap (oldest stays active)", async () => {
+		const { org, start, end } = await paidOrg("inboxes");
+		await db
+			.insert(user)
+			.values({ id: org, name: org, email: `${org}@example.test` });
+		const [d] = await db
+			.insert(domain)
+			.values({ domain: `${org}.test`, organizationId: org, userId: org })
+			.returning();
+		if (!d) throw new Error("domain insert failed");
+		for (let i = 0; i < 5; i++) {
+			await db.insert(mailbox).values({
+				email: `agent${i}@${org}.test`,
+				password: "x",
+				organizationId: org,
+				domainId: d.id,
+			});
+		}
+
+		await handlePolarWebhookEvent(
+			subEvent(org, {
+				type: "subscription.revoked",
+				status: "revoked",
+				plan: "individual",
+				periodStart: start,
+				periodEnd: end,
+			}),
+		);
+
+		const boxes = await db.query.mailbox.findMany({
+			where: eq(mailbox.organizationId, org),
+		});
+		expect(boxes.filter((m) => m.status === "active").length).toBe(1);
+		expect(boxes.filter((m) => m.status === "suspended").length).toBe(4);
+		await db.delete(user).where(eq(user.id, org));
 	});
 
 	it("resubscribing after a downgrade restores the paid plan", async () => {

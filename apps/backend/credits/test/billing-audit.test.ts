@@ -388,8 +388,53 @@ suite("PAID plans (Polar webhooks)", () => {
 		expect(p?.planId).toBe("free");
 	});
 
-	it("P11 past_due subscription is restricted (cannot keep using paid quota indefinitely)", async () => {
+	it("P11 past_due: sends allowed during the 7-day grace, blocked after it, restored once paid", async () => {
 		const { org, start, end } = await paidOrg("p11");
+		const pastDue = subEvent(org, {
+			status: "past_due",
+			plan: "individual",
+			periodStart: start,
+			periodEnd: end,
+		});
+		await handlePolarWebhookEvent(pastDue);
+		const sub = await db.query.organizationSubscription.findFirst({
+			where: eq(organizationSubscription.organizationId, org),
+		});
+		expect(sub?.status).toBe("past_due");
+		expect(sub?.pastDueSince).toBeInstanceOf(Date);
+
+		// within grace
+		expect((await send(org, 1)).ok).toBe(true);
+
+		// a repeated past_due webhook must not restart the grace clock
+		const eightDaysAgo = new Date(Date.now() - 8 * day);
+		await db
+			.update(organizationSubscription)
+			.set({ pastDueSince: eightDaysAgo })
+			.where(eq(organizationSubscription.organizationId, org));
+		await handlePolarWebhookEvent(pastDue);
+		const blocked = await send(org, 1);
+		expect(blocked.ok).toBe(false);
+		if (!blocked.ok) expect(blocked.reason).toBe("payment");
+
+		// payment succeeds → active, clock cleared, sending works again
+		await handlePolarWebhookEvent(
+			subEvent(org, {
+				status: "active",
+				plan: "individual",
+				periodStart: start,
+				periodEnd: end,
+			}),
+		);
+		const paid = await db.query.organizationSubscription.findFirst({
+			where: eq(organizationSubscription.organizationId, org),
+		});
+		expect(paid?.pastDueSince).toBeNull();
+		expect((await send(org, 1)).ok).toBe(true);
+	});
+
+	it("P12 an unknown Polar status keeps the current status and plan", async () => {
+		const { org, start, end } = await paidOrg("p12");
 		await handlePolarWebhookEvent(
 			subEvent(org, {
 				status: "past_due",
@@ -398,17 +443,6 @@ suite("PAID plans (Polar webhooks)", () => {
 				periodEnd: end,
 			}),
 		);
-		const sub = await db.query.organizationSubscription.findFirst({
-			where: eq(organizationSubscription.organizationId, org),
-		});
-		expect(sub?.status).toBe("past_due");
-		// business rule check: does anything stop a past_due org from sending?
-		const r = await send(org, 1);
-		expect(r.ok).toBe(false);
-	});
-
-	it("P12 an unknown Polar status is not treated as active", async () => {
-		const { org, start, end } = await paidOrg("p12");
 		await handlePolarWebhookEvent(
 			subEvent(org, {
 				status: "some_new_status",
@@ -420,7 +454,9 @@ suite("PAID plans (Polar webhooks)", () => {
 		const sub = await db.query.organizationSubscription.findFirst({
 			where: eq(organizationSubscription.organizationId, org),
 		});
-		expect(sub?.status).not.toBe("active");
+		// not silently upgraded to `active`
+		expect(sub?.status).toBe("past_due");
+		expect((await plan(org))?.planId).toBe("individual");
 	});
 });
 
