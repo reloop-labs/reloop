@@ -766,3 +766,171 @@ export type BimiCheckReport = {
 	}[];
 	recommendations: string[];
 };
+
+// --- Inbox (received mail, threads, mailbox sends) ---
+
+export type InboxAttachment = {
+	id: string;
+	filename: string;
+	contentType: string;
+	size: number;
+	contentDisposition?: string | null;
+	contentId?: string | null;
+};
+
+export type Mailbox = {
+	id: string;
+	email: string;
+	quota: string;
+	status: string;
+	displayName: string | null;
+	domainId?: string;
+	createdAt: string;
+	updatedAt?: string;
+};
+
+export type InboxMessage = {
+	id: string;
+	mailboxId: string;
+	fromEmail: string;
+	fromName: string | null;
+	toEmails: string[];
+	ccEmails?: string[] | null;
+	bccEmails?: string[] | null;
+	replyTo: string | null;
+	subject: string | null;
+	textBody: string | null;
+	htmlBody: string | null;
+	snippet: string | null;
+	size: number;
+	status: string;
+	isRead: boolean;
+	isStarred: boolean;
+	isSpam: boolean;
+	spamScore: number | null;
+	threadId: string | null;
+	date: string | null;
+	createdAt: string;
+	attachments?: InboxAttachment[];
+};
+
+export type MailboxSentMessage = {
+	id: string;
+	messageId: string;
+	fromEmail: string;
+	fromName: string | null;
+	toEmails: string[];
+	ccEmails?: string[] | null;
+	bccEmails?: string[] | null;
+	subject: string;
+	textBody: string | null;
+	htmlBody: string | null;
+	status: string;
+	errorMessage?: string | null;
+	createdAt: string;
+	threadId?: string | null;
+	isStarred?: boolean;
+	attachments?: InboxAttachment[];
+};
+
+export type InboxThreadStatus = "active" | "archived" | "closed" | "trash";
+
+export type InboxThread = {
+	id: string;
+	mailboxId: string | null;
+	subject: string | null;
+	lastMessagePreview: string | null;
+	lastMessageAt: string;
+	status: string;
+	messageCount: number;
+	participants: string[];
+	isRead: boolean;
+	isStarred: boolean;
+	isImportant?: boolean;
+	isPinned?: boolean;
+	labels?: { id: string; name: string; color: string }[];
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type InboxThreadMessage = {
+	id: string;
+	direction: string;
+	inboundEmailId?: string | null;
+	emailLogId?: string | null;
+	fromEmail: string;
+	fromName?: string | null;
+	subject?: string | null;
+	preview?: string | null;
+	messageAt: string;
+	errorMessage?: string | null;
+	email: {
+		id: string;
+		toEmails: string[];
+		ccEmails?: string[] | null;
+		textBody: string | null;
+		htmlBody: string | null;
+		status?: string;
+		isRead?: boolean;
+		attachments?: InboxAttachment[];
+	} | null;
+};
+
+export type InboxThreadDetail = InboxThread & {
+	messages: InboxThreadMessage[];
+};
+
+export type InboxActionResponse = {
+	success: boolean;
+	id?: string;
+	message?: string;
+	status?: string;
+};
+
+export type InboxAttachmentInput = {
+	filename?: string;
+	content?: string;
+	path?: string;
+	content_type?: string;
+	content_id?: string;
+};
+
+export type MailboxSendInput = {
+	mailboxId: string;
+	to: string | string[];
+	subject: string;
+	text?: string;
+	html?: string;
+	cc?: string | string[];
+	bcc?: string | string[];
+	attachments?: InboxAttachmentInput[];
+	scheduledAt?: string;
+	undoWindowSeconds?: number;
+};
+
+export type InboxReplyInput = {
+	text?: string;
+	html?: string;
+	to?: string | string[];
+	cc?: string | string[];
+	bcc?: string | string[];
+	attachments?: InboxAttachmentInput[];
+};
+
+export type InboxForwardInput = InboxReplyInput & { to: string | string[] };
+
+export type InboxSendResponse =
+	| {
+			success: boolean;
+			messageId: string;
+			status: string;
+			timestamp: string;
+			id: string;
+	  }
+	| {
+			success: boolean;
+			pending: true;
+			id: string;
+			sendAt: string;
+			messageId: string;
+	  };

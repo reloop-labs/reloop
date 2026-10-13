@@ -139,7 +139,7 @@ resource metadata. Keys and tokens never appear in logs or tool output, except t
 
 ### `get_reloop_status`
 
-Check that Reloop is connected and introduce what it can do. Reloop is open-source email infrastructure: a transactional email API, SMTP relay, contacts, templates and deliverability tools. Call this first when the user asks whether Reloop is connected or working, what Reloop is, or what you can do with Reloop. It makes one authenticated read, so a successful result proves the credentials work, and it reports how many sending domains are ready.
+Check that Reloop is connected and introduce what it can do. Reloop is open-source email infrastructure: a transactional email API, SMTP relay, inbox mailboxes for received email, contacts, templates and deliverability tools. Call this first when the user asks whether Reloop is connected or working, what Reloop is, or what you can do with Reloop. It makes one authenticated read, so a successful result proves the credentials work, and it reports how many sending domains are ready.
 
 Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
 
@@ -911,6 +911,236 @@ Read-only: yes · Destructive: no · Idempotent: yes · Open world: yes
 | `domain` | string | yes | Domain or URL, for example reloop.sh or https://reloop.sh |
 
 Returns: `domain`, `queryName`, `verdict`, `bimiRecord`, `logoUrl`, `authorityUrl`, `dmarcPolicy`, `dmarcEnforced`, `checks`, `recommendations`
+
+### `list_mailboxes`
+
+List the inbox mailboxes of the authenticated Reloop organization: the addresses that receive email in Reloop and can send replies. Call this first when the user asks about received email, their inbox, or which addresses they have, then pass a mailbox `id` to list_inbox_messages, list_inbox_threads, or send_mailbox_email.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+Returns: `mailboxes`
+
+### `get_mailbox`
+
+Get one inbox mailbox by ID: its address, display name, status, and storage quota.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Mailbox ID as returned by list_mailboxes |
+
+Returns: `id`, `email`, `displayName`, `status`, `quota`, `createdAt`, `domainId`
+
+### `list_inbox_threads`
+
+List inbox conversations (threads of received and sent messages), most recent activity first. This is the inbox view: use `folder` for inbox, archive, or trash, `filter` for primary, alerts (important), person, or tag (labelled), and `search` over subject and preview. Call get_inbox_thread for the messages in one conversation.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `mailboxId` | string | no | Only this mailbox; omit for all |
+| `folder` | inbox \| archive \| trash | no | Folder to list; omit for every folder |
+| `filter` | primary \| alerts \| person \| tag | no | Category: primary, alerts (important), person, or tag (has labels) |
+| `pinned` | boolean | no | Only pinned (true) or unpinned (false) |
+| `search` | string | no |  |
+| `limit` | integer | no | Items per page, 1 to 200 |
+| `offset` | integer | no | Items to skip, for pagination |
+
+Returns: `threads`, `pagination`
+
+### `get_inbox_thread`
+
+Get a whole inbox conversation: every received and sent message in order, with bodies and attachments. Use a received message's `messageId` from here with reply_to_inbox_message to answer it.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Thread ID as returned by list_inbox_threads or a message's threadId |
+
+Returns: `id`, `mailboxId`, `subject`, `preview`, `participants`, `messageCount`, `status`, `isRead`, `isStarred`, `isImportant`, `isPinned`, `labels`, `lastMessageAt`, `messages`
+
+### `update_inbox_thread`
+
+Mark a whole conversation read or unread, star, flag as important, pin, or close it. Only the fields you pass change. To archive, trash, or restore it, use move_inbox_thread.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Thread ID as returned by list_inbox_threads or a message's threadId |
+| `read` | boolean | no |  |
+| `starred` | boolean | no |  |
+| `important` | boolean | no |  |
+| `pinned` | boolean | no |  |
+| `closed` | boolean | no | true to close the conversation, false to reopen it |
+
+Returns: `updated`, `id`
+
+### `move_inbox_thread`
+
+Move a conversation out of or back into the inbox: `archive` hides it from the inbox, `trash` moves it to trash, and `restore` brings an archived or trashed conversation back. Nothing is deleted; use delete_inbox_thread to remove it permanently.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Thread ID as returned by list_inbox_threads or a message's threadId |
+| `action` | archive \| trash \| restore | yes |  |
+
+Returns: `id`, `action`, `done`
+
+### `delete_inbox_thread`
+
+Permanently delete a conversation and every message in it. This cannot be undone; prefer move_inbox_thread with `trash` unless the user explicitly asks to delete it forever. Confirm with the user before calling.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Thread ID as returned by list_inbox_threads or a message's threadId |
+
+Returns: `deleted`, `id`
+
+### `list_inbox_messages`
+
+List emails RECEIVED in the organization's Reloop inbox mailboxes, newest first, with a preview of each. Use this when the user asks what email they got, whether something arrived, or to find a message from a sender. Filter by `mailboxId` (from list_mailboxes), `search` over subject, preview, and sender, or `spam`. Bodies are omitted; call get_inbox_message for the full email. For email the organization SENT through the API, use list_emails instead.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `mailboxId` | string | no | Only this mailbox; omit for all mailboxes |
+| `search` | string | no | Case-insensitive search over subject, preview, and sender |
+| `spam` | boolean | no | true for only spam, false to exclude spam; omit for both |
+| `limit` | integer | no | Items per page, 1 to 200 |
+| `offset` | integer | no | Items to skip, for pagination |
+
+Returns: `messages`, `pagination`
+
+### `get_inbox_message`
+
+Get one received email with its full body, recipients, spam score, and attachment list. The plain-text body is returned when present, otherwise the HTML; either is cut at 50000 characters. Reading it does not mark it as read; use update_inbox_message for that. Use the message's threadId with get_inbox_thread to see the whole conversation.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Received message ID as returned by list_inbox_messages |
+
+Returns: `id`, `mailboxId`, `threadId`, `from`, `fromName`, `to`, `subject`, `snippet`, `isRead`, `isStarred`, `isSpam`, `attachmentCount`, `receivedAt`, `cc`, `replyTo`, `text`, `html`, `bodyTruncated`, `spamScore`, `attachments`
+
+### `update_inbox_message`
+
+Mark a received email as read or unread, star or unstar it, or flag it as spam or not spam. Only the fields you pass change. To act on a whole conversation, use update_inbox_thread.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Received message ID as returned by list_inbox_messages |
+| `read` | boolean | no | true to mark read, false for unread |
+| `starred` | boolean | no |  |
+| `spam` | boolean | no | true to move to spam, false to restore |
+
+Returns: `updated`, `id`
+
+### `delete_inbox_message`
+
+Permanently delete one received email and its attachments. This cannot be undone. To keep it but hide it from the inbox, prefer move_inbox_thread with `archive` or `trash` on its thread. Confirm with the user before calling.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Received message ID as returned by list_inbox_messages |
+
+Returns: `deleted`, `id`
+
+### `reply_to_inbox_message`
+
+Reply to a received email from the mailbox that received it, keeping the subject and conversation thread. By default it replies to the sender only; set `replyAll` to include everyone on the original To and Cc. This sends real email immediately and cannot be recalled, so show the user the reply text and recipients before calling.
+
+Read-only: no · Destructive: yes · Idempotent: no · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Received message to reply to |
+| `text` | string | no | Plain-text body |
+| `html` | string | no | HTML body |
+| `replyAll` | boolean | no | Also reply to the original To and Cc recipients |
+| `to` | string or array of string | no | Override who the reply goes to |
+| `cc` | string or array of string | no |  |
+| `bcc` | string or array of string | no |  |
+| `attachments` | array of object | no | Files to attach |
+
+Returns: `id`, `messageId`, `status`, `sendAt`
+
+### `forward_inbox_message`
+
+Forward a received email, with its original content and attachments, to new recipients from the mailbox that received it. `text`/`html` is an optional note placed above the forwarded message. This sends real email immediately; confirm the recipients with the user first.
+
+Read-only: no · Destructive: yes · Idempotent: no · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Received message to forward |
+| `to` | string or array of string | yes | Who to forward it to |
+| `text` | string | no | Optional plain-text note above the forwarded email |
+| `html` | string | no | Optional HTML note above the forwarded email |
+| `cc` | string or array of string | no |  |
+| `bcc` | string or array of string | no |  |
+| `attachments` | array of object | no | Files to attach |
+
+Returns: `id`, `messageId`, `status`, `sendAt`
+
+### `send_mailbox_email`
+
+Send a new email FROM one of the organization's inbox mailboxes, so replies come back to that inbox. This delivers real email and cannot be recalled unless `undoWindowSeconds` or `scheduledAt` is set; confirm recipients, subject, and body with the user first. Get the mailbox ID from list_mailboxes. To answer a received email, use reply_to_inbox_message instead so it stays in the same thread.
+
+Read-only: no · Destructive: yes · Idempotent: no · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `mailboxId` | string | yes | Mailbox to send from |
+| `to` | string or array of string | yes | Recipient address or up to 50 addresses |
+| `subject` | string | yes | Subject line |
+| `text` | string | no | Plain-text body |
+| `html` | string | no | HTML body |
+| `cc` | string or array of string | no |  |
+| `bcc` | string or array of string | no |  |
+| `attachments` | array of object | no | Files to attach |
+| `scheduledAt` | string | no | ISO 8601 time to send later instead of now |
+| `undoWindowSeconds` | integer | no | Hold the email this many seconds so it can still be cancelled |
+
+Returns: `id`, `messageId`, `status`, `sendAt`
+
+### `cancel_pending_mailbox_send`
+
+Cancel a send_mailbox_email that is still pending because it was scheduled or has an undo window. Pass the `id` that send_mailbox_email returned with status `pending`. Fails once the email has gone out.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Pending send ID from send_mailbox_email |
+
+Returns: `cancelled`, `id`
+
+### `list_mailbox_sent_messages`
+
+List emails sent FROM inbox mailboxes (replies, forwards, and send_mailbox_email), newest first, with delivery status. Filter by `mailboxId` or `search` over subject, body, and recipients. For transactional email sent through the API, use list_emails instead.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `mailboxId` | string | no | Mailbox ID as returned by list_mailboxes |
+| `search` | string | no |  |
+
+Returns: `messages`
 
 ## Errors
 

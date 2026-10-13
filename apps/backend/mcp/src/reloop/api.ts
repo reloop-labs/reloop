@@ -8,6 +8,7 @@ import { DomainReputationApi } from "./domain-reputation";
 import { DomainsApi } from "./domains";
 import { EmailLogsApi } from "./email-logs";
 import { GroupsApi } from "./groups";
+import { InboxApi } from "./inbox";
 import { MailApi } from "./mail";
 import { PropertiesApi } from "./properties";
 import { SmtpProvidersApi } from "./smtp-providers";
@@ -29,6 +30,7 @@ export type ReloopApi = {
 	domainReputation: DomainReputationApi;
 	domainAge: DomainAgeApi;
 	bimi: BimiApi;
+	inbox: InboxApi;
 };
 
 export function createReloopApi(options: ReloopClientOptions): ReloopApi {
@@ -48,5 +50,6 @@ export function createReloopApi(options: ReloopClientOptions): ReloopApi {
 		domainReputation: new DomainReputationApi(client),
 		domainAge: new DomainAgeApi(client),
 		bimi: new BimiApi(client),
+		inbox: new InboxApi(client),
 	};
 }

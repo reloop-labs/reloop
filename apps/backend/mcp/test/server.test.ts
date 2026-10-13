@@ -93,6 +93,22 @@ describe("mcp server over streamable http", () => {
 			"check_domain_reputation",
 			"check_domain_age",
 			"check_bimi",
+			"list_mailboxes",
+			"get_mailbox",
+			"list_inbox_threads",
+			"get_inbox_thread",
+			"update_inbox_thread",
+			"move_inbox_thread",
+			"delete_inbox_thread",
+			"list_inbox_messages",
+			"get_inbox_message",
+			"update_inbox_message",
+			"delete_inbox_message",
+			"reply_to_inbox_message",
+			"forward_inbox_message",
+			"send_mailbox_email",
+			"cancel_pending_mailbox_send",
+			"list_mailbox_sent_messages",
 		]);
 		for (const tool of listed.tools) {
 			expect(tool.inputSchema).toBeDefined();

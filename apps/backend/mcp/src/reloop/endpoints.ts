@@ -102,3 +102,25 @@ export const bimiEndpoints = {
 export const domainReputationEndpoints = {
 	check: "/api/tools/v1/domain-reputation",
 } as const;
+
+const INBOX = "/api/inbox/v1";
+
+export const inboxEndpoints = {
+	mailboxes: `${INBOX}/mailboxes/list`,
+	mailbox: (id: string) => `${INBOX}/mailboxes/${encodeURIComponent(id)}`,
+	messages: `${INBOX}/messages`,
+	sentMessages: `${INBOX}/messages/sent`,
+	send: `${INBOX}/messages/send`,
+	message: (id: string) => `${INBOX}/messages/${encodeURIComponent(id)}`,
+	reply: (id: string) => `${INBOX}/messages/${encodeURIComponent(id)}/reply`,
+	replyAll: (id: string) =>
+		`${INBOX}/messages/${encodeURIComponent(id)}/reply-all`,
+	forward: (id: string) =>
+		`${INBOX}/messages/${encodeURIComponent(id)}/forward`,
+	cancelPending: (id: string) =>
+		`${INBOX}/messages/pending/${encodeURIComponent(id)}/cancel`,
+	threads: `${INBOX}/threads`,
+	thread: (id: string) => `${INBOX}/threads/${encodeURIComponent(id)}`,
+	threadAction: (id: string, action: "archive" | "trash" | "restore") =>
+		`${INBOX}/threads/${encodeURIComponent(id)}/${action}`,
+} as const;

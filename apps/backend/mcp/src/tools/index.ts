@@ -40,6 +40,22 @@ import { listGroups } from "./groups/list";
 import { listGroupContacts } from "./groups/list-contacts";
 import { removeContactFromGroup } from "./groups/remove-contact";
 import { updateGroup } from "./groups/update";
+import { cancelPendingMailboxSend } from "./inbox/cancel-pending";
+import { deleteInboxMessage } from "./inbox/delete-message";
+import { deleteInboxThread } from "./inbox/delete-thread";
+import { forwardInboxMessage } from "./inbox/forward";
+import { getMailbox } from "./inbox/get-mailbox";
+import { getInboxMessage } from "./inbox/get-message";
+import { getInboxThread } from "./inbox/get-thread";
+import { listMailboxes } from "./inbox/list-mailboxes";
+import { listInboxMessages } from "./inbox/list-messages";
+import { listMailboxSentMessages } from "./inbox/list-sent";
+import { listInboxThreads } from "./inbox/list-threads";
+import { moveInboxThread } from "./inbox/move-thread";
+import { replyToInboxMessage } from "./inbox/reply";
+import { sendMailboxEmail } from "./inbox/send";
+import { updateInboxMessage } from "./inbox/update-message";
+import { updateInboxThread } from "./inbox/update-thread";
 import { createProperty } from "./properties/create";
 import { deleteProperty } from "./properties/delete";
 import { listProperties } from "./properties/list";
@@ -113,4 +129,20 @@ export const tools: readonly AnyToolDefinition[] = [
 	checkDomainReputation,
 	checkDomainAge,
 	checkBimi,
+	listMailboxes,
+	getMailbox,
+	listInboxThreads,
+	getInboxThread,
+	updateInboxThread,
+	moveInboxThread,
+	deleteInboxThread,
+	listInboxMessages,
+	getInboxMessage,
+	updateInboxMessage,
+	deleteInboxMessage,
+	replyToInboxMessage,
+	forwardInboxMessage,
+	sendMailboxEmail,
+	cancelPendingMailboxSend,
+	listMailboxSentMessages,
 ];
