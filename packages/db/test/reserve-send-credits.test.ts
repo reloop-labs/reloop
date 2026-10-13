@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	applyCreditReservation,
+	applyReceiveCharge,
 	type CreditSnapshot,
 	utcDayStart,
 } from "../src/reserve-send-credits";
@@ -133,5 +134,49 @@ describe("applyCreditReservation", () => {
 		});
 		expect(decision.ok).toBe(false);
 		if (!decision.ok) expect(decision.reason).toBe("monthly");
+	});
+});
+
+describe("applyReceiveCharge", () => {
+	test("a received email uses one credit from the shared monthly pool", () => {
+		expect(
+			applyReceiveCharge({ creditsUsed: 10, creditsRemaining: 2990 }),
+		).toEqual({ creditsUsed: 11, creditsRemaining: 2989, delta: -1 });
+	});
+
+	test("receiving never goes below zero but still counts toward overage", () => {
+		expect(
+			applyReceiveCharge({ creditsUsed: 3000, creditsRemaining: 0 }),
+		).toEqual({ creditsUsed: 3001, creditsRemaining: 0, delta: 0 });
+	});
+
+	test("self-hosted tracks usage without drawing down the balance", () => {
+		expect(
+			applyReceiveCharge({
+				creditsUsed: 5,
+				creditsRemaining: 100,
+				unlimited: true,
+			}),
+		).toEqual({ creditsUsed: 6, creditsRemaining: 100, delta: 0 });
+	});
+
+	test("received mail that drains the pool blocks the next send", () => {
+		const now = new Date("2026-09-16T10:00:00.000Z");
+		const afterReceive = applyReceiveCharge({
+			creditsUsed: 2999,
+			creditsRemaining: 1,
+		});
+		const decision = applyCreditReservation({
+			credits: snapshot({
+				creditsUsed: afterReceive.creditsUsed,
+				creditsRemaining: afterReceive.creditsRemaining,
+			}),
+			dailyEmailLimit: null,
+			recipientCount: 1,
+			now,
+		});
+		expect(decision.ok).toBe(false);
+		if (decision.ok) return;
+		expect(decision.reason).toBe("monthly");
 	});
 });

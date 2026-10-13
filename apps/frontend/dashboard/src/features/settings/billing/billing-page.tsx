@@ -88,7 +88,7 @@ export function BillingPage() {
 		usageData?.plan.monthlyCredits ??
 		0;
 	const remaining = usageData
-		? emailUsage(usageData.subscription, monthlyIncluded).remaining
+		? emailUsage(usageData.subscription).remaining
 		: 0;
 
 	const nextPlanPriceLabel = nextPlan

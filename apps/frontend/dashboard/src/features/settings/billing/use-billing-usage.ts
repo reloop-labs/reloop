@@ -73,22 +73,25 @@ export interface BillingPeriod {
 }
 
 /**
- * Monthly email usage. Both sent and received email count toward the plan:
- * `creditsUsed` holds send credits (one per recipient, kept live by usage
- * updates) and `creditsReceived` the non-spam inbound emails this period.
+ * Monthly email usage. Sent and received (non-spam) email both draw from the
+ * plan's credits, so `creditsUsed`/`creditsRemaining` already cover both and
+ * stay live through usage updates. `creditsSent`/`creditsReceived` only split
+ * that total for display.
  */
-export function emailUsage(
-	subscription: BillingUsage["subscription"],
-	monthlyIncluded: number,
-): { sent: number; received: number; used: number; remaining: number } {
-	const sent = Math.max(0, subscription.creditsUsed);
+export function emailUsage(subscription: BillingUsage["subscription"]): {
+	sent: number;
+	received: number;
+	used: number;
+	remaining: number;
+} {
+	const used = Math.max(0, subscription.creditsUsed);
 	const received = Math.max(0, subscription.creditsReceived ?? 0);
-	const used = sent + received;
+	const sent = Math.max(0, subscription.creditsSent ?? used - received);
 	return {
 		sent,
 		received,
 		used,
-		remaining: Math.max(0, monthlyIncluded - used),
+		remaining: Math.max(0, subscription.creditsRemaining),
 	};
 }
 

@@ -46,7 +46,7 @@ export function UsagePage() {
 					</h1>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
 						{data
-							? `${emailUsage(data.subscription, data.plan.monthlyCredits).remaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period.`
+							? `${emailUsage(data.subscription).remaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period.`
 							: "Track your plan limits and resource usage for this billing period."}
 					</p>
 				</div>

@@ -223,7 +223,7 @@ export function UsageSection() {
 	const unlimited = data.selfHosted;
 	const entitlements = plan.entitlements;
 	const total = Math.max(0, entitlements?.monthlyEmails ?? plan.monthlyCredits);
-	const { sent, received, used, remaining } = emailUsage(subscription, total);
+	const { sent, received, used, remaining } = emailUsage(subscription);
 	const ratio = total > 0 ? used / total : 0;
 	const percent = Math.min(100, Math.round(ratio * 100));
 	const overageEnabled =

@@ -66,9 +66,12 @@ export {
 } from "./reputation";
 export {
 	applyCreditReservation,
+	applyReceiveCharge,
 	type CreditReservation,
 	type CreditSnapshot,
+	chargeReceiveCredits,
 	peekSendCredits,
+	type ReceiveChargeResult,
 	type ReserveDecision,
 	refundSendCredits,
 	reserveSendCredits,

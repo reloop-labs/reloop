@@ -440,3 +440,106 @@ export async function refundSendCredits(args: {
 			.where(eq(organizationCredits.id, reservation.organizationCreditsId));
 	});
 }
+
+/**
+ * One received email against the monthly pool. Never refused: the balance
+ * floors at zero (later sends are what get blocked) while `creditsUsed` keeps
+ * counting so overage covers it. Unlimited (self-hosted) only tracks usage.
+ */
+export function applyReceiveCharge(args: {
+	creditsUsed: number;
+	creditsRemaining: number;
+	unlimited?: boolean;
+}): { creditsUsed: number; creditsRemaining: number; delta: number } {
+	const creditsRemaining =
+		args.unlimited === true
+			? args.creditsRemaining
+			: Math.max(0, args.creditsRemaining - 1);
+	return {
+		creditsUsed: args.creditsUsed + 1,
+		creditsRemaining,
+		delta: creditsRemaining - args.creditsRemaining,
+	};
+}
+
+export type ReceiveChargeResult =
+	| { charged: true; remaining: number; creditsUsed: number }
+	| { charged: false; reason: "already_charged" };
+
+/**
+ * Count one received (non-spam) email against the org's monthly credits, the
+ * same pool sends draw from, so the monthly limit and overage cover both
+ * directions. Mail is never refused for lack of credits: the balance floors at
+ * zero and later sends are what get blocked. Idempotent per inbound email via
+ * the ledger's reference ID. Not counted against the daily *sending* cap.
+ */
+export async function chargeReceiveCredits(args: {
+	organizationId: string;
+	inboundEmailId: string;
+	now?: Date;
+	client?: DatabaseInstance;
+}): Promise<ReceiveChargeResult> {
+	const outer = args.client ?? db;
+	const now = args.now ?? new Date();
+	const { organizationId, inboundEmailId } = args;
+
+	if (!organizationId) {
+		throw new Error("organizationId is required for credit checks");
+	}
+
+	return outer.transaction(async (tx) => {
+		await ensureActiveCredits(organizationId, tx, now);
+
+		const [locked] = await tx
+			.select()
+			.from(organizationCredits)
+			.where(
+				and(
+					eq(organizationCredits.organizationId, organizationId),
+					eq(organizationCredits.status, "active"),
+				),
+			)
+			.for("update");
+
+		if (!locked) {
+			throw new Error("Failed to lock organization credits for receive charge");
+		}
+
+		const existing = await tx.query.creditLedger.findFirst({
+			where: (l, { and: both, eq: equals }) =>
+				both(
+					equals(l.organizationId, organizationId),
+					equals(l.entryType, "email_received"),
+					equals(l.referenceId, inboundEmailId),
+				),
+			columns: { id: true },
+		});
+		if (existing) {
+			return { charged: false, reason: "already_charged" } as const;
+		}
+
+		const next = applyReceiveCharge({
+			creditsUsed: locked.creditsUsed,
+			creditsRemaining: locked.creditsRemaining,
+			unlimited: isSelfHosted(),
+		});
+		const { creditsUsed, creditsRemaining: remaining } = next;
+
+		await tx
+			.update(organizationCredits)
+			.set({ creditsUsed, creditsRemaining: remaining, updatedAt: now })
+			.where(eq(organizationCredits.id, locked.id));
+
+		await tx.insert(creditLedger).values({
+			organizationId,
+			organizationCreditsId: locked.id,
+			entryType: "email_received",
+			delta: next.delta,
+			balanceAfter: remaining,
+			reason: "Inbound email received",
+			referenceId: inboundEmailId,
+		});
+
+		return { charged: true, remaining, creditsUsed } as const;
+	});
+}

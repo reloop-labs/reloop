@@ -87,7 +87,7 @@ export function HomePage() {
 		if (!canManageBilling || billing.data?.selfHosted !== false) return null;
 		const monthly = billing.data.plan.monthlyCredits;
 		if (!monthly || monthly <= 0) return null;
-		return emailUsage(billing.data.subscription, monthly).used / monthly;
+		return emailUsage(billing.data.subscription).used / monthly;
 	}, [billing.data, canManageBilling]);
 
 	const attentionItems = useMemo(

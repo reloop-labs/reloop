@@ -28,6 +28,7 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
 export const ledgerEntryTypeEnum = pgEnum("ledger_entry_type", [
 	"credit_purchased",
 	"email_sent",
+	"email_received",
 	"rollover_applied",
 	"manual_adjustment",
 	"refund",
@@ -203,7 +204,7 @@ export const creditLedger = pgTable(
 		delta: integer("delta").notNull(),
 		balanceAfter: integer("balance_after").notNull(),
 		reason: text("reason"),
-		referenceId: text("reference_id"), // points to email_send.id
+		referenceId: text("reference_id"), // email_send.id, or inbound_email.id for email_received
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 	},
 	(t) => [
