@@ -156,6 +156,7 @@ export function ConsentPage() {
 				<ConnectionHero
 					clientName={clientName}
 					logoUri={client?.logo_uri}
+					clientUris={[client?.client_uri, oauthRequest.redirectUri]}
 					loading={clientLoading}
 				/>
 				<ConsentHeading

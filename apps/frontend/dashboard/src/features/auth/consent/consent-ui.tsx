@@ -11,6 +11,7 @@ import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { AuthCard, AuthCardHeader } from "#/features/auth/auth-card";
 import { AuthShell } from "#/features/auth/auth-shell";
+import { isKnownApp, KnownAppGlyph } from "#/features/auth/known-app-mark";
 import type { OrganizationWithPlan } from "#/features/auth/organizations-query";
 import { useOrganizationsQuery } from "#/features/auth/organizations-query";
 import { useSessionQuery } from "#/features/auth/session-query";
@@ -77,11 +78,14 @@ function LogoTile({ children }: { children: React.ReactNode }) {
 export function ConnectionHero({
 	clientName,
 	logoUri,
+	clientUris = [],
 	icon,
 	loading = false,
 }: {
 	clientName: string;
 	logoUri?: string;
+	/** Client and redirect URIs; their host helps recognise well-known apps. */
+	clientUris?: (string | null | undefined)[];
 	/** Icon name shown instead of an app logo (e.g. a device). */
 	icon?: string;
 	loading?: boolean;
@@ -93,6 +97,12 @@ export function ConnectionHero({
 					<span className="size-8 animate-pulse rounded-lg bg-bg-soft-200" />
 				) : icon ? (
 					<Icon name={icon} className="size-7 text-text-strong-950" />
+				) : isKnownApp(clientName, clientUris) ? (
+					<KnownAppGlyph
+						name={clientName}
+						uris={clientUris}
+						className="size-8"
+					/>
 				) : logoUri ? (
 					// Remote logos are display-only; the metadata transport never
 					// fetches them server-side.

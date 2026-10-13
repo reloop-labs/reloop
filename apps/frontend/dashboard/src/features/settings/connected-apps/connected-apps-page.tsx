@@ -7,23 +7,20 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { type ComponentType, useState } from "react";
-import * as SimpleIcons from "simple-icons";
+import { useState } from "react";
 import { toast } from "sonner";
 import {
 	describeCapabilities,
 	summarizeAccess,
 } from "#/features/auth/consent/consent-request";
 import { Initial } from "#/features/auth/consent/consent-ui";
+import { isKnownApp, KnownAppGlyph } from "#/features/auth/known-app-mark";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { CodexIcon, VsCodeIcon } from "#/features/integrations/ai/client-icons";
 import { formatTimeAgo } from "#/features/settings/security/security-utils";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { queryKeys } from "#/lib/query-keys";
 
 type RowStatus = "idle" | "confirming" | "revoking";
-
-type SimpleIcon = { path: string; hex: string };
 
 function grantKey(app: ConnectedApp): string {
 	return `${app.user.id}:${app.clientId}`;
@@ -47,67 +44,15 @@ function formatDate(iso: string | null): string | null {
 	});
 }
 
-type KnownAppMark =
-	| { src: string }
-	| { customIcon: ComponentType<{ className?: string }> }
-	| { simpleIconKey: string };
-
-/**
- * Bundled logos for well-known clients, matched on the registered name and
- * client URI host. They win over a client-supplied `logo_uri`, which is
- * self-reported by whoever registered the client. First match wins, so keep
- * more specific patterns above broader ones.
- */
-const KNOWN_APP_MARKS: { pattern: RegExp; mark: KnownAppMark }[] = [
-	{ pattern: /antigravity/i, mark: { src: "/dashboard/apps/antigravity.svg" } },
-	{ pattern: /claude|anthropic/i, mark: { simpleIconKey: "siClaude" } },
-	{ pattern: /\bcodex\b/i, mark: { customIcon: CodexIcon } },
-	{ pattern: /cursor/i, mark: { simpleIconKey: "siCursor" } },
-	{ pattern: /windsurf|codeium/i, mark: { simpleIconKey: "siWindsurf" } },
-	{ pattern: /copilot/i, mark: { simpleIconKey: "siGithubcopilot" } },
-	{ pattern: /vs ?code|visual studio code/i, mark: { customIcon: VsCodeIcon } },
-	{ pattern: /gemini/i, mark: { simpleIconKey: "siGooglegemini" } },
-	{ pattern: /\bzed\b/i, mark: { simpleIconKey: "siZedindustries" } },
-	{ pattern: /\bcline\b/i, mark: { simpleIconKey: "siCline" } },
-	{ pattern: /raycast/i, mark: { simpleIconKey: "siRaycast" } },
-	{ pattern: /\bwarp\b/i, mark: { simpleIconKey: "siWarp" } },
-	{
-		pattern: /jetbrains|intellij|junie/i,
-		mark: { simpleIconKey: "siJetbrains" },
-	},
-	{ pattern: /perplexity/i, mark: { simpleIconKey: "siPerplexity" } },
-	{ pattern: /mistral|le chat/i, mark: { simpleIconKey: "siMistralai" } },
-	{ pattern: /\bn8n\b/i, mark: { simpleIconKey: "siN8n" } },
-	{ pattern: /zapier/i, mark: { simpleIconKey: "siZapier" } },
-	{ pattern: /postman/i, mark: { simpleIconKey: "siPostman" } },
-	{ pattern: /replit/i, mark: { simpleIconKey: "siReplit" } },
-	{ pattern: /\bv0\b|vercel/i, mark: { simpleIconKey: "siVercel" } },
-	{ pattern: /ollama/i, mark: { simpleIconKey: "siOllama" } },
-	{
-		pattern: /model ?context ?protocol|mcp inspector/i,
-		mark: { simpleIconKey: "siModelcontextprotocol" },
-	},
-];
-
-function knownAppMark(app: ConnectedApp, name: string): KnownAppMark | null {
-	const haystack = [name, hostOf(app.uri)].filter(Boolean).join(" ");
-	return (
-		KNOWN_APP_MARKS.find((entry) => entry.pattern.test(haystack))?.mark ?? null
-	);
-}
-
 function AppLogo({ app }: { app: ConnectedApp }) {
 	const name = app.name ?? app.clientId;
-	const mark = knownAppMark(app, name);
-	const src = mark && "src" in mark ? mark.src : mark ? null : app.icon;
+	const known = isKnownApp(name, [app.uri]);
 	return (
 		<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
-			{mark && "customIcon" in mark ? (
-				<mark.customIcon className="h-5 w-5 text-text-strong-950" />
-			) : mark && "simpleIconKey" in mark ? (
-				<SimpleIconGlyph iconKey={mark.simpleIconKey} />
-			) : src ? (
-				<img src={src} alt="" className="h-5 w-5 object-contain" />
+			{known ? (
+				<KnownAppGlyph name={name} uris={[app.uri]} className="h-5 w-5" />
+			) : app.icon ? (
+				<img src={app.icon} alt="" className="h-5 w-5 object-contain" />
 			) : app.applicationType === "native" ? (
 				<Icon name="terminal" className="h-4 w-4 text-text-sub-600" />
 			) : (
@@ -115,28 +60,6 @@ function AppLogo({ app }: { app: ConnectedApp }) {
 			)}
 		</div>
 	);
-}
-
-function SimpleIconGlyph({ iconKey }: { iconKey: string }) {
-	const icon = (SimpleIcons as Record<string, SimpleIcon | undefined>)[iconKey];
-	if (!icon) return null;
-	return (
-		<svg
-			role="img"
-			viewBox="0 0 24 24"
-			className="h-5 w-5 fill-text-strong-950"
-			// Near-black marks follow the theme text color so they stay visible in dark mode.
-			style={isNearBlack(icon.hex) ? undefined : { fill: `#${icon.hex}` }}
-			aria-hidden
-		>
-			<path d={icon.path} />
-		</svg>
-	);
-}
-
-function isNearBlack(hex: string): boolean {
-	const channel = (i: number) => Number.parseInt(hex.slice(i, i + 2), 16);
-	return 0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4) < 40;
 }
 
 function MemberLabel({ app }: { app: ConnectedApp }) {
