@@ -53,8 +53,10 @@ const TEMPLATES = "/api/template/v1";
 
 export const templateEndpoints = {
 	list: `${TEMPLATES}/list`,
+	create: `${TEMPLATES}/create`,
 	byId: (id: string) => `${TEMPLATES}/${encodeURIComponent(id)}`,
 	test: (id: string) => `${TEMPLATES}/${encodeURIComponent(id)}/test`,
+	versions: (id: string) => `${TEMPLATES}/${encodeURIComponent(id)}/versions`,
 } as const;
 
 const API_KEYS = "/api/api-key/v1";

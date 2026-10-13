@@ -67,6 +67,7 @@ describe("mcp server over streamable http", () => {
 			"resend_email",
 			"list_templates",
 			"get_template",
+			"create_template",
 			"send_test_email",
 			"list_api_keys",
 			"get_api_key",

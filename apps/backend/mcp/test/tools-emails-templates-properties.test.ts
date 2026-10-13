@@ -362,6 +362,91 @@ describe("templates", () => {
 		).toEqual([]);
 	});
 
+	test("create_template creates, publishes, and detects placeholders", async () => {
+		const html =
+			'<html><body><p>Hi {{{first_name}}}</p><a href="{{{ order_url }}}">View</a></body></html>';
+		const { calls, result } = await call(
+			[
+				{
+					method: "POST",
+					path: "/api/template/v1/create",
+					body: templateFixture({ status: "draft" }),
+				},
+				{
+					method: "POST",
+					path: "/api/template/v1/tpl_1/versions",
+					body: { id: "ver_1", templateId: "tpl_1", version: 1, isMajor: true },
+				},
+				{
+					method: "GET",
+					path: "/api/template/v1/tpl_1",
+					body: templateFixture(),
+				},
+			],
+			"create_template",
+			{
+				name: "Order confirmation",
+				subject: "Order {{{order_number}}} confirmed",
+				html,
+				variables: [{ name: "first_name", defaultValue: "there" }],
+			},
+		);
+		expect(calls.map((c) => `${c.method} ${new URL(c.url).pathname}`)).toEqual([
+			"POST /api/template/v1/create",
+			"POST /api/template/v1/tpl_1/versions",
+			"GET /api/template/v1/tpl_1",
+		]);
+
+		const create = calls[0]?.body;
+		expect(readProperty(create, "name")).toBe("Order confirmation");
+		const content = readProperty(create, "content");
+		if (!Array.isArray(content)) {
+			throw new Error("expected content");
+		}
+		expect(readProperty(content[0], "type")).toBe("html");
+		expect(readProperty(content[0], "html")).toBe(html);
+
+		const version = calls[1]?.body;
+		expect(readProperty(version, "isMajor")).toBe(true);
+		expect(readProperty(version, "renderedHtml")).toBe(html);
+		expect(readProperty(version, "variables")).toEqual([
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "order_number", type: "string", defaultValue: null },
+			{ name: "order_url", type: "string", defaultValue: null },
+		]);
+		expect(readProperty(structuredContent(result), "published")).toBe(true);
+	});
+
+	test("create_template saves a draft when publish is false", async () => {
+		const { calls } = await call(
+			[
+				{
+					method: "POST",
+					path: "/api/template/v1/create",
+					body: templateFixture({ status: "draft" }),
+				},
+				{
+					method: "POST",
+					path: "/api/template/v1/tpl_1/versions",
+					body: {
+						id: "ver_1",
+						templateId: "tpl_1",
+						version: 1,
+						isMajor: false,
+					},
+				},
+				{
+					method: "GET",
+					path: "/api/template/v1/tpl_1",
+					body: templateFixture({ status: "draft" }),
+				},
+			],
+			"create_template",
+			{ name: "Draft", subject: "Hello", html: "<p>Hi</p>", publish: false },
+		);
+		expect(readProperty(calls[1]?.body, "isMajor")).toBe(false);
+	});
+
 	test("send_test_email posts the recipient and variables", async () => {
 		const { calls, result } = await call(
 			[

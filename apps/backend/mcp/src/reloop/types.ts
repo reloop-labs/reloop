@@ -506,6 +506,39 @@ export type TemplateListResponse = {
 	limit: number;
 };
 
+export type CreateTemplateInput = {
+	name: string;
+	description?: string;
+	subject?: string;
+	fromEmail?: string;
+	replyTo?: string;
+	content: TemplateBlock[];
+};
+
+export type TemplateBlock = {
+	id: string;
+	type: string;
+	props: Record<string, unknown>;
+	html?: string;
+};
+
+export type CreateTemplateVersionInput = {
+	name?: string;
+	content: TemplateBlock[];
+	renderedHtml: string;
+	subject?: string;
+	previewText?: string;
+	variables?: TemplateVariable[];
+	isMajor: boolean;
+};
+
+export type TemplateVersion = {
+	id: string;
+	templateId: string;
+	version: number;
+	isMajor: boolean;
+};
+
 export type TestTemplateInput = {
 	to: string;
 	fromEmail?: string;

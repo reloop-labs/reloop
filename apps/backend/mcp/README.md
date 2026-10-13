@@ -1,6 +1,6 @@
 # Reloop MCP
 
-The official [Model Context Protocol](https://modelcontextprotocol.io) server for [Reloop](https://reloop.sh), open-source email infrastructure. It lets MCP clients and coding agents operate a Reloop organization through typed tools: read and manage contacts, contact properties, groups, and subscription channels, send transactional email and inspect what was sent, look up templates, and manage API keys and sending domains. The npm package is `reloop-mcp` and the binary is `reloop-mcp`; the source lives at [github.com/reloop-labs/reloop-mcp](https://github.com/reloop-labs/reloop-mcp). It implements MCP revision 2026-07-28 with the official TypeScript SDK v2 over stateless Streamable HTTP, and still serves 2025-era clients through the SDK's legacy compatibility layer.
+The official [Model Context Protocol](https://modelcontextprotocol.io) server for [Reloop](https://reloop.sh), open-source email infrastructure. It lets MCP clients and coding agents operate a Reloop organization through typed tools: read and manage contacts, contact properties, groups, and subscription channels, send transactional email and inspect what was sent, look up and create templates, and manage API keys and sending domains. The npm package is `reloop-mcp` and the binary is `reloop-mcp`; the source lives at [github.com/reloop-labs/reloop-mcp](https://github.com/reloop-labs/reloop-mcp). It implements MCP revision 2026-07-28 with the official TypeScript SDK v2 over stateless Streamable HTTP, and still serves 2025-era clients through the SDK's legacy compatibility layer.
 
 ## Transports
 
@@ -562,6 +562,26 @@ Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
 | `id` | string | yes | Template ID as returned by list_templates |
 
 Returns: `template`
+
+### `create_template`
+
+Save a complete HTML email as a reusable Reloop template, so it can be sent by ID with send_email's `template` and edited later in the Reloop editor. Write the full email yourself as email-safe HTML (tables and inline styles, no scripts, 600px wide) and put per-recipient values in triple braces, for example {{{first_name}}} or {{{order_url}}}. Double braces are not substituted. Placeholders found in the HTML become template variables; pass `variables` to give them defaults. By default the template is published and ready to send; set `publish` to false to save it as a draft for review. Returns the template with its ID and variables.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Template name shown in the dashboard, e.g. Order confirmation |
+| `subject` | string | yes | Subject line; may contain {{{variables}}} |
+| `html` | string | yes | The full email as an HTML document |
+| `previewText` | string | no | Inbox preview text shown after the subject |
+| `description` | string | no | What the template is for, shown in the dashboard |
+| `fromEmail` | string | no | Default sender on a verified domain |
+| `replyTo` | string | no | Default reply-to address |
+| `variables` | array of object | no | Defaults for placeholders in the HTML. Placeholders not listed here are added with no default. |
+| `publish` | boolean | no | Publish so send_email can use the template now; false saves a draft |
+
+Returns: `template`, `published`
 
 ### `send_test_email`
 

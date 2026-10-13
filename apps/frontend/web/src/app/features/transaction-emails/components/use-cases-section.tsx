@@ -144,7 +144,13 @@ const previewTemplates = new Map<string, EmailTemplateExample>([
 	),
 ]);
 
-export function UseCasesSection() {
+export function UseCasesSection({
+	title = "Ready for every use case",
+	description = "Whether you need to send welcome emails or notify users of important events, start from a ready-made template.",
+}: {
+	title?: string;
+	description?: string;
+} = {}) {
 	return (
 		<section
 			id="use-cases"
@@ -160,11 +166,10 @@ export function UseCasesSection() {
 					id="use-cases-heading"
 					className="mt-3 text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.6rem] dark:text-white"
 				>
-					Ready for every use case
+					{title}
 				</h2>
 				<p className="mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
-					Whether you need to send welcome emails or notify users of important
-					events, start from a ready-made template.
+					{description}
 				</p>
 			</div>
 

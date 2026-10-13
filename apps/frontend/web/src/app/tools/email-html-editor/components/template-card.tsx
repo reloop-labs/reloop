@@ -44,9 +44,11 @@ export function withSampleValues(
 export function EmailPreview({
 	template,
 	previewCss,
+	className,
 }: {
 	template: EmailTemplateExample;
 	previewCss?: string;
+	className?: string;
 }) {
 	const frameRef = useRef<HTMLDivElement>(null);
 	const [scale, setScale] = useState(0);
@@ -71,7 +73,7 @@ export function EmailPreview({
 	}, []);
 
 	return (
-		<div ref={frameRef} className={previewFrameClassName}>
+		<div ref={frameRef} className={cn(previewFrameClassName, className)}>
 			{srcDoc && scale > 0 ? (
 				<iframe
 					title={`Preview of ${template.name}`}
