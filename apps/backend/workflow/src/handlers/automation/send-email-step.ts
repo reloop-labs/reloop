@@ -35,27 +35,25 @@ export async function sendAutomationEmail(params: {
 		);
 	}
 
-	const html =
-		params.nodeData.html?.trim() ||
-		`<p>${escapeHtml(subject)}</p><p>Hi ${escapeHtml(params.contact.firstName || "there")},</p>`;
-	const text =
-		params.nodeData.text?.trim() ||
-		`${subject}\n\nHi ${params.contact.firstName || "there"},`;
-
 	const body: Record<string, unknown> = {
 		from,
 		to,
 		subject,
-		html,
-		text,
 		tags: params.tags,
 	};
 
-	if (params.nodeData.templateId?.trim()) {
-		body.template = {
-			id: params.nodeData.templateId.trim(),
-			variables: {},
-		};
+	const templateId = params.nodeData.templateId?.trim();
+	if (templateId) {
+		// The template is the body. HTML older steps kept on the step would
+		// only end up in the email log, so it isn't sent.
+		body.template = { id: templateId, variables: {} };
+	} else {
+		body.html =
+			params.nodeData.html?.trim() ||
+			`<p>${escapeHtml(subject)}</p><p>Hi ${escapeHtml(params.contact.firstName || "there")},</p>`;
+		body.text =
+			params.nodeData.text?.trim() ||
+			`${subject}\n\nHi ${params.contact.firstName || "there"},`;
 	}
 
 	const url = `${workflowConfig.BASE_URL.replace(/\/$/, "")}/api/mail/v1/send`;

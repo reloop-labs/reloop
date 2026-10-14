@@ -25,7 +25,11 @@ import {
 	pickerTargetKey,
 	useNodeEditor,
 } from "../node-editor-context";
-import { RunStepDetails, RunStepStatus } from "../runs/run-step-card";
+import {
+	RunStepDetails,
+	RunStepStatus,
+	runStepTone,
+} from "../runs/run-step-card";
 import { StepIcon } from "../step-icon";
 
 /** The value from the previous render (the current value on first render). */
@@ -183,6 +187,7 @@ export const NodePill = ({
 				run && nodeId ? <RunStepDetails run={run} nodeId={nodeId} /> : belowCard
 			}
 			invalid={invalid}
+			tone={run && nodeId ? runStepTone(run, nodeId) : undefined}
 		>
 			<span
 				className={cn(

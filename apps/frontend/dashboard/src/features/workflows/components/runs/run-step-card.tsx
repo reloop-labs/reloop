@@ -9,6 +9,7 @@ import { useNow } from "../../hooks/use-automation-runs";
 import type { StepEmail, StepRun } from "../../hooks/use-automations-api";
 import { formatCountdown, formatMoment } from "../../run-format";
 import { TRIGGER_NODE_ID } from "../../workflow-types";
+import type { FrameTone } from "../editors/editor-shell";
 import type { RunOverlay } from "../node-editor-context";
 import { RUN_STATUS, RunBadge, STEP_STATUS } from "./run-status-badge";
 
@@ -20,6 +21,29 @@ const Field = ({ label, children }: { label: string; children: ReactNode }) => (
 		</div>
 	</div>
 );
+
+/** Frame tint for a step: green done, red failed, blue still going. */
+export function runStepTone(
+	run: RunOverlay,
+	nodeId: string,
+): FrameTone | undefined {
+	const status =
+		nodeId === TRIGGER_NODE_ID
+			? run.enrollment.status
+			: run.steps[nodeId]?.status;
+	switch (status) {
+		case "completed":
+			return "success";
+		case "failed":
+			return "error";
+		case "active":
+		case "pending":
+		case "running":
+			return "progress";
+		default:
+			return undefined;
+	}
+}
 
 /** "◌ 4m 32s left", counting down every second while a step waits. */
 const CountdownBadge = ({ at }: { at: string }) => {

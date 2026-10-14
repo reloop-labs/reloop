@@ -125,7 +125,11 @@ async function stepEmails(params: {
 				subject: log.subject,
 				templateId: resolved.templateId,
 				templateName: resolved.templateName,
-				html: log.htmlBody ?? resolved.html,
+				// The mail log keeps the request's HTML, not the template it
+				// rendered, so a template step shows the template.
+				html: resolved.templateId
+					? (resolved.html ?? log.htmlBody)
+					: log.htmlBody,
 				sent: true,
 				emailId,
 				deliveryStatus: log.status,

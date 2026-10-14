@@ -77,6 +77,17 @@ export const ACTIONS_WRAP = "mr-2 flex shrink-0 items-center gap-0.5";
 export const TRAILING_CELL =
 	"flex h-full w-[52px] shrink-0 items-center justify-center border-stroke-soft-200 border-l dark:border-stroke-soft-100/50";
 
+export type FrameTone = "success" | "error" | "progress";
+
+const FRAME_TONE: Record<FrameTone, string> = {
+	success:
+		"border-success-base/25 bg-success-lighter dark:border-success-base/30 dark:bg-success-base/10",
+	error:
+		"border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
+	progress:
+		"border-information-base/25 bg-information-lighter dark:border-information-base/30 dark:bg-information-base/10",
+};
+
 /**
  * Tab + double frame shared by a step at rest and while it's being edited,
  * so switching between the two never shifts the layout.
@@ -93,8 +104,11 @@ export const NodeFrame = ({
 	cardContent,
 	belowCard,
 	invalid = false,
+	tone,
 	children,
 }: {
+	/** Runs view: tints the frame by how the step went. */
+	tone?: FrameTone;
 	title: string;
 	icon: string;
 	/** Needs setup and Start was pressed: red outline, like an input error. */
@@ -318,7 +332,8 @@ export const NodeFrame = ({
 			<div
 				ref={frameRef}
 				className={cn(
-					"rounded-[15px] border border-stroke-soft-200 bg-bg-weak-50 p-[3px] dark:border-stroke-soft-100/50 dark:bg-[#101014]",
+					"rounded-[15px] border border-stroke-soft-200 bg-bg-weak-50 p-[3px] transition-colors duration-300 dark:border-stroke-soft-100/50 dark:bg-[#101014]",
+					tone && FRAME_TONE[tone],
 					expanded &&
 						"rounded-b-none border-b-transparent dark:border-b-transparent",
 				)}
