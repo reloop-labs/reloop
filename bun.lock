@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -769,6 +768,7 @@
         "@reloop/analytics": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/code-samples": "workspace:*",
+        "@reloop/email-templates": "workspace:*",
         "@reloop/pricing": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
@@ -932,6 +932,7 @@
         "@reloop/analytics": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/code-samples": "workspace:*",
+        "@reloop/email-templates": "workspace:*",
         "@reloop/pricing": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
@@ -1097,6 +1098,14 @@
       "devDependencies": {
         "@reloop/tsconfig": "workspace:*",
         "@types/node": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/email-templates": {
+      "name": "@reloop/email-templates",
+      "version": "0.0.1",
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
         "typescript": "catalog:",
       },
     },
@@ -2329,6 +2338,8 @@
     "@reloop/db": ["@reloop/db@workspace:packages/db"],
 
     "@reloop/dns": ["@reloop/dns@workspace:packages/dns"],
+
+    "@reloop/email-templates": ["@reloop/email-templates@workspace:packages/email-templates"],
 
     "@reloop/email-validation": ["@reloop/email-validation@workspace:packages/email-validation"],
 

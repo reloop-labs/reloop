@@ -1,7 +1,12 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
-import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
+import {
+	parseAsArrayOf,
+	parseAsString,
+	parseAsStringLiteral,
+	useQueryState,
+} from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
@@ -12,8 +17,12 @@ import {
 } from "#/features/templates/hooks/use-templates-query";
 import { TemplatesListHeader } from "../templates-list-header";
 import { EmptyState } from "./empty-state";
+import { ExploreGallery } from "./explore-gallery";
 import { TemplateGrid } from "./template-grid";
 import { TemplateListToolbar } from "./template-list-toolbar";
+import { type TemplatesTab, TemplatesTabs } from "./templates-tabs";
+
+const TAB_VALUES = ["yours", "explore"] as const;
 
 const DOCS_URL = "https://reloop.sh/docs/learn/templates";
 
@@ -24,6 +33,10 @@ export function TemplateList() {
 	const [statusFilter] = useQueryState(
 		"status",
 		parseAsArrayOf(parseAsString).withDefault([]),
+	);
+	const [tabParam, setTabParam] = useQueryState(
+		"tab",
+		parseAsStringLiteral(TAB_VALUES),
 	);
 	const [deletedName, setDeletedName] = useState<string | null>(null);
 
@@ -77,6 +90,7 @@ export function TemplateList() {
 	}, [data?.templates, searchQuery, statusFilter]);
 
 	const hasAnyTemplates = (data?.templates?.length ?? 0) > 0;
+	const tab: TemplatesTab = tabParam ?? "yours";
 
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
@@ -110,7 +124,18 @@ export function TemplateList() {
 				)}
 			</AnimatePresence>
 
-			{error ? (
+			<TemplatesTabs
+				value={tab}
+				onChange={(next) => void setTabParam(next)}
+				yoursCount={data?.templates?.length}
+			/>
+
+			{tab === "explore" ? (
+				<div className="space-y-6 pb-8">
+					<TemplateListToolbar searchOnly />
+					<ExploreGallery />
+				</div>
+			) : error ? (
 				<div className="flex flex-col items-center justify-center gap-2 p-4">
 					<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
 					<p className="text-center text-sm text-text-sub-600">
@@ -129,7 +154,7 @@ export function TemplateList() {
 				</div>
 			) : !isLoading && !hasAnyTemplates ? (
 				<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
-					<EmptyState />
+					<EmptyState onBrowseExamples={() => void setTabParam("explore")} />
 				</div>
 			) : (
 				<div className="pb-8">

@@ -15,7 +15,12 @@ import { TemplateStatusFilterChip } from "./status-filter-chip";
 
 const SEARCH_INPUT_ID = "template-list-search";
 
-export function TemplateListToolbar() {
+/** Explore shows only search: status and refresh apply to your templates. */
+export function TemplateListToolbar({
+	searchOnly = false,
+}: {
+	searchOnly?: boolean;
+}) {
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"q",
 		parseAsString.withDefault(""),
@@ -47,6 +52,7 @@ export function TemplateListToolbar() {
 			refresh();
 		},
 		{
+			enabled: !searchOnly,
 			enableOnFormTags: false,
 			preventDefault: true,
 		},
@@ -104,15 +110,22 @@ export function TemplateListToolbar() {
 					</Input.Wrapper>
 				</Input.Root>
 
-				<TemplateStatusFilterChip
-					value={statusFilter}
-					onChange={(status) => {
-						void setStatusFilter(status);
-					}}
-				/>
+				{searchOnly ? null : (
+					<TemplateStatusFilterChip
+						value={statusFilter}
+						onChange={(status) => {
+							void setStatusFilter(status);
+						}}
+					/>
+				)}
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2">
+			<div
+				className={cn(
+					"flex shrink-0 items-center gap-2",
+					searchOnly && "hidden",
+				)}
+			>
 				<Tooltip.Provider delayDuration={200}>
 					<Tooltip.Root>
 						<Tooltip.Trigger asChild>

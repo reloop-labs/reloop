@@ -1,8 +1,8 @@
 "use client";
 
+import { getEmailTemplateExample } from "@reloop/email-templates";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { getEmailTemplateExample } from "../templates";
 
 const EmailHtmlEditorPage = dynamic(
 	() =>

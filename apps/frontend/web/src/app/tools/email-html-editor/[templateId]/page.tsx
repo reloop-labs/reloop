@@ -1,8 +1,11 @@
+import {
+	editorTemplateExamples,
+	getEmailTemplateExample,
+} from "@reloop/email-templates";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { toolPath, toolTitle } from "../content";
-import { editorTemplateExamples, getEmailTemplateExample } from "../templates";
 import { TemplateEditor } from "./template-editor";
 
 type PageProps = {

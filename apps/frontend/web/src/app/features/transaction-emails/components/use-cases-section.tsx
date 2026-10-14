@@ -1,5 +1,9 @@
 "use client";
 
+import {
+	acmeTemplateExamples,
+	type EmailTemplateExample,
+} from "@reloop/email-templates";
 import { Icon } from "@reloop/ui/icon";
 import {
 	CARD_ONLY_PREVIEW_CSS,
@@ -9,10 +13,6 @@ import {
 	withSampleValues,
 } from "../../../tools/email-html-editor/components/template-card";
 import { toolPath } from "../../../tools/email-html-editor/content";
-import {
-	acmeTemplateExamples,
-	type EmailTemplateExample,
-} from "../../../tools/email-html-editor/templates";
 
 /** One brand (Acme) and one theme across every transactional email. */
 const USE_CASES: { id: string; title: string }[] = [

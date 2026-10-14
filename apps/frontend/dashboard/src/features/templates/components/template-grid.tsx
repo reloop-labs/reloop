@@ -155,7 +155,7 @@ const previewPaperStyle = {
 	paddingLeft: `${PAPER_INSET}px`,
 } as const;
 
-const previewCardClassName =
+export const previewCardClassName =
 	"relative aspect-[5/4] w-full overflow-hidden rounded-[28px] border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]";
 
 /** Email-shaped bars that stay visible on the dark card (bg-weak-50 is near-black). */
@@ -170,7 +170,7 @@ const EmailPaperSkeleton = () => (
 	</div>
 );
 
-const TemplatePreviewPaper = ({ children }: { children: ReactNode }) => (
+export const TemplatePreviewPaper = ({ children }: { children: ReactNode }) => (
 	<div
 		className="pointer-events-none absolute inset-0 select-none overflow-hidden"
 		style={previewPaperStyle}

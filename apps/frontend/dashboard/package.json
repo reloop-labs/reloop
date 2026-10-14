@@ -37,6 +37,7 @@
 		"@reloop/analytics": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/code-samples": "workspace:*",
+		"@reloop/email-templates": "workspace:*",
 		"@reloop/pricing": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",

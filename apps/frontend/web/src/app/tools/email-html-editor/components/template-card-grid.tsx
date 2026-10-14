@@ -1,7 +1,10 @@
 "use client";
 
+import {
+	blankTemplateExample,
+	galleryTemplateExamples,
+} from "@reloop/email-templates";
 import { toolPath } from "../content";
-import { blankTemplateExample, galleryTemplateExamples } from "../templates";
 import {
 	BlankPreview,
 	EmailPreview,

@@ -3,13 +3,19 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
+import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useCreateTemplate } from "#/features/templates/hooks/use-templates-query";
 
 const actionKbdOnSolidClassName =
 	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
 
-export const EmptyState = () => {
+/** `onBrowseExamples` adds a link to the Explore tab on the no-templates state. */
+export const EmptyState = ({
+	onBrowseExamples,
+}: {
+	onBrowseExamples?: () => void;
+} = {}) => {
 	const { isCreating, create } = useCreateTemplate();
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"q",
@@ -21,6 +27,19 @@ export const EmptyState = () => {
 	);
 
 	const isFiltered = statusFilter.length > 0 || searchQuery.trim() !== "";
+
+	useHotkeys(
+		"b",
+		(e) => {
+			e.preventDefault();
+			onBrowseExamples?.();
+		},
+		{
+			enabled: !!onBrowseExamples && !isFiltered,
+			enableOnFormTags: false,
+			preventDefault: true,
+		},
+	);
 
 	const handleClearFilters = () => {
 		void setSearchQuery("");
@@ -56,28 +75,44 @@ export const EmptyState = () => {
 					Clear filters
 				</Button.Root>
 			) : (
-				<FancyButton.Root
-					type="button"
-					variant="blue"
-					size="small"
-					onClick={() => void create()}
-					disabled={isCreating}
-					className="gap-1.5 rounded-xl"
-					aria-keyshortcuts="c"
-				>
-					{isCreating ? (
-						<>
-							<Spinner size={14} color="currentColor" />
-							Creating...
-						</>
-					) : (
-						<>
-							<Icon name="plus" className="h-4 w-4" />
-							Create template
-							<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
-						</>
-					)}
-				</FancyButton.Root>
+				<div className="flex items-center gap-2">
+					<FancyButton.Root
+						type="button"
+						variant="neutral"
+						size="small"
+						onClick={() => void create()}
+						disabled={isCreating}
+						className="gap-1.5 rounded-xl"
+						aria-keyshortcuts="c"
+					>
+						{isCreating ? (
+							<>
+								<Spinner size={14} color="currentColor" />
+								Creating...
+							</>
+						) : (
+							<>
+								<Icon name="plus" className="h-4 w-4" />
+								Create template
+								<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
+							</>
+						)}
+					</FancyButton.Root>
+					{onBrowseExamples ? (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="small"
+							onClick={onBrowseExamples}
+							className="gap-1.5 rounded-xl"
+							aria-keyshortcuts="b"
+						>
+							Browse templates
+							<ActionKbd>B</ActionKbd>
+						</Button.Root>
+					) : null}
+				</div>
 			)}
 		</div>
 	);

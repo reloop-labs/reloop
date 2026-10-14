@@ -1,5 +1,6 @@
 "use client";
 
+import { acmeTemplateExamples } from "@reloop/email-templates";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +9,6 @@ import {
 	EmailPreview,
 	withSampleValues,
 } from "../../../tools/email-html-editor/components/template-card";
-import { acmeTemplateExamples } from "../../../tools/email-html-editor/templates";
 
 const PROMPT =
 	"Order confirmation for Acme. Match the style of this screenshot, keep it minimal, and add a button to view the order.";

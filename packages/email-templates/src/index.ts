@@ -1,4 +1,9 @@
-import type { ToolVariable } from "@reloop/web/lib/email-html-editor/hooks/use-editor-store";
+export interface TemplateVariable {
+	name: string;
+	type: "string" | "number";
+	defaultValue: string | null;
+}
+
 import { acmeAccountDeletedHtml } from "./acme/account-deleted";
 import { acmeApiKeyCreatedHtml } from "./acme/api-key-created";
 import { acmeDataExportHtml } from "./acme/data-export";
@@ -51,7 +56,7 @@ export interface EmailTemplateExample {
 	slug: string;
 	description: string;
 	html: (origin: string) => string;
-	variables: ToolVariable[];
+	variables: TemplateVariable[];
 }
 
 /** Empty canvas; the gallery shows it as the first card. */

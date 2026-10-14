@@ -66,7 +66,7 @@ export function TemplatesListHeader() {
 				</Button.Root>
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={() => void create()}
 					disabled={isCreating}

@@ -1,11 +1,11 @@
 "use client";
 
+import type { EmailTemplateExample } from "@reloop/email-templates";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import type { EmailTemplateExample } from "../templates";
 
 /** Width the email is laid out at before it is scaled into the card. */
 const EMAIL_RENDER_WIDTH = 600;

@@ -1,8 +1,8 @@
 "use client";
 
+import { acmeTemplateExamples } from "@reloop/email-templates";
 import { SectionHeading } from "../../components/section-heading";
 import { toolPath } from "../content";
-import { acmeTemplateExamples } from "../templates";
 import {
 	CARD_ONLY_PREVIEW_CSS,
 	EmailPreview,

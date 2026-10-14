@@ -1,0 +1,16 @@
+{
+	"name": "@reloop/email-templates",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"typescript": "catalog:"
+	}
+}
