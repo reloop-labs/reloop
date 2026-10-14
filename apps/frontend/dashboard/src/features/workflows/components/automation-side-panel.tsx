@@ -19,17 +19,14 @@ export const SIDE_PANEL_TRANSITION = {
 export function AutomationSidePanel({
 	open,
 	children,
-	onSettled,
 }: {
 	open: boolean;
 	children: ReactNode;
-	/** After opening or closing finishes (to re-center the canvas). */
-	onSettled?: () => void;
 }) {
 	const reduceMotion = useReducedMotion();
 	const transition = reduceMotion ? { duration: 0 } : SIDE_PANEL_TRANSITION;
 	return (
-		<AnimatePresence initial={false} onExitComplete={onSettled}>
+		<AnimatePresence initial={false}>
 			{open ? (
 				<motion.aside
 					key="automation-side-panel"
@@ -37,16 +34,6 @@ export function AutomationSidePanel({
 					animate={{ width: SIDE_PANEL_WIDTH, opacity: 1 }}
 					exit={{ width: 0, opacity: 0 }}
 					transition={transition}
-					onAnimationComplete={(definition) => {
-						if (
-							typeof definition === "object" &&
-							definition !== null &&
-							"width" in definition &&
-							definition.width === SIDE_PANEL_WIDTH
-						) {
-							onSettled?.();
-						}
-					}}
 					className="relative z-10 shrink-0 overflow-hidden border-stroke-soft-200 border-r bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black"
 				>
 					<div

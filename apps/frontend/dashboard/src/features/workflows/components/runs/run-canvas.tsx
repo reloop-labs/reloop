@@ -55,7 +55,7 @@ const ReadOnlyFlowInner = ({
 	run: RunOverlay;
 }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
-	const { getNode, setViewport } = useReactFlow();
+	const { getNode, getViewport, setViewport } = useReactFlow();
 
 	const marked = useMemo(() => {
 		const clean = stripPlaceholderNodes(graph.nodes, graph.edges);
@@ -85,34 +85,40 @@ const ReadOnlyFlowInner = ({
 		[],
 	);
 
-	// Open with the trigger centered at the top, where the run starts, and keep
-	// it there while the side panel opening or closing changes the width.
+	// Open with the trigger centered at the top, where the run starts.
 	const nodesInitialized = useNodesInitialized();
-	const place = useCallback(() => {
+	const placedRef = useRef(false);
+	useEffect(() => {
+		if (!nodesInitialized || placedRef.current) return;
 		const trigger = getNode(TRIGGER_NODE_ID);
 		const width = containerRef.current?.clientWidth;
 		if (!trigger || !width) return;
+		placedRef.current = true;
 		const nodeWidth = trigger.measured?.width ?? 400;
 		void setViewport({
 			x: width / 2 - (trigger.position.x + nodeWidth / 2),
 			y: TOP_GAP - trigger.position.y,
 			zoom: 1,
 		});
-	}, [getNode, setViewport]);
+	}, [nodesInitialized, getNode, setViewport]);
+
+	// The side panel animating changes the width: keep the flow's center put
+	// (and any panning the user did) by shifting half of each change.
 	useEffect(() => {
-		if (!nodesInitialized) return;
-		requestAnimationFrame(place);
 		const container = containerRef.current;
 		if (!container) return;
 		let lastWidth = container.clientWidth;
 		const observer = new ResizeObserver(() => {
-			if (container.clientWidth === lastWidth) return;
-			lastWidth = container.clientWidth;
-			place();
+			const width = container.clientWidth;
+			const delta = width - lastWidth;
+			lastWidth = width;
+			if (!delta || !placedRef.current) return;
+			const viewport = getViewport();
+			void setViewport({ ...viewport, x: viewport.x + delta / 2 });
 		});
 		observer.observe(container);
 		return () => observer.disconnect();
-	}, [nodesInitialized, place]);
+	}, [getViewport, setViewport]);
 
 	return (
 		<NodeEditorProvider

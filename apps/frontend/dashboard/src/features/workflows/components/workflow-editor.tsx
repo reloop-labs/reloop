@@ -35,7 +35,10 @@ import {
 	type WorkflowStatus,
 } from "../workflow-types";
 import { getNodeIssue } from "../workflow-validation";
-import { AutomationSidePanel } from "./automation-side-panel";
+import {
+	AutomationSidePanel,
+	SIDE_PANEL_TRANSITION,
+} from "./automation-side-panel";
 import { useAutomationView } from "./automation-view-tabs";
 import { defaultEdgeOptions, edgeTypes, nodeTypes } from "./flow-types";
 import { LiveAutomationBanner } from "./live-automation-banner";
@@ -296,20 +299,47 @@ const WorkflowEditorInner = ({
 	const nodesInitialized = useNodesInitialized();
 	const centeredForRef = useRef<string | null>(null);
 	// Runs swaps the canvas out, so it remounts on the way back: center it again.
+	const backFromRunsRef = useRef(false);
 	useEffect(() => {
-		if (view === "runs") centeredForRef.current = null;
+		if (view === "runs") {
+			centeredForRef.current = null;
+			backFromRunsRef.current = true;
+		}
 	}, [view]);
-	// The side panel opened or closed, so the canvas changed width.
-	const recenterAfterPanel = () => {
-		if (view !== "runs" && centeredForRef.current) revealGraph();
-	};
+	// The side panel pushes the canvas narrower or wider as it animates: keep
+	// the flow's center where it is on every frame, so it glides with the
+	// panel instead of being covered and then jumping back.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: re-observe when the canvas remounts (back from Runs)
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		let lastWidth = canvas.clientWidth;
+		const observer = new ResizeObserver(() => {
+			const width = canvas.clientWidth;
+			const delta = width - lastWidth;
+			lastWidth = width;
+			if (!delta) return;
+			const viewport = getViewport();
+			void setViewport({ ...viewport, x: viewport.x + delta / 2 });
+		});
+		observer.observe(canvas);
+		return () => observer.disconnect();
+	}, [view === "runs", getViewport, setViewport]);
 	// Keep showing the last panel while it closes back to the editor.
 	const lastPanelRef = useRef<"runs" | "metrics">("metrics");
 	if (view !== "editor") lastPanelRef.current = view;
 	useEffect(() => {
 		if (!nodesInitialized || centeredForRef.current === workflow.id) return;
-		centeredForRef.current = workflow.id;
-		revealGraph();
+		// Back from Runs, the panel is still closing: center once it's done.
+		const delay = backFromRunsRef.current
+			? SIDE_PANEL_TRANSITION.duration * 1000
+			: 0;
+		const timer = setTimeout(() => {
+			centeredForRef.current = workflow.id;
+			backFromRunsRef.current = false;
+			revealGraph();
+		}, delay);
+		return () => clearTimeout(timer);
 	}, [nodesInitialized, workflow.id, revealGraph]);
 
 	const selectNode = useCallback((nodeId: string | null) => {
@@ -616,10 +646,7 @@ const WorkflowEditorInner = ({
 					onInvalidStart={flagIssues}
 				/>
 				<div className="relative flex min-h-0 flex-1 overflow-hidden">
-					<AutomationSidePanel
-						open={view !== "editor"}
-						onSettled={recenterAfterPanel}
-					>
+					<AutomationSidePanel open={view !== "editor"}>
 						{lastPanelRef.current === "runs" ? (
 							<RunsList workflow={{ ...workflow, nodes, edges }} />
 						) : (
