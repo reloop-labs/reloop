@@ -1,6 +1,7 @@
 import { CustomEventErrors } from "@be/workflow/error/custom-event.error-response";
 import { enrollContactInMatchingAutomations } from "@be/workflow/handlers/automation/enroll";
 import { resolveOrCreateContact } from "@be/workflow/lib/automation/resolve-contact";
+import { ensureTriggerPrefix } from "@be/workflow/lib/custom-event/key";
 import { validateTrackProperties } from "@be/workflow/lib/custom-event/validate-properties";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -21,7 +22,7 @@ export async function trackCustomEventController(params: {
 	lastName?: string;
 	properties?: Record<string, unknown>;
 }) {
-	const key = params.eventKey.trim().toLowerCase();
+	const key = ensureTriggerPrefix(params.eventKey);
 
 	const eventDef = await db.query.customEvent.findFirst({
 		where: and(

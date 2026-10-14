@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { CustomEventModel } from "@be/workflow/routes/custom-event/custom-event.model";
+import { createEventXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia } from "elysia";
 import { createCustomEventController } from "./create-custom-event.controllers";
 
@@ -22,16 +23,17 @@ export const createCustomEventRoute = new Elysia().use(authMiddleware).post(
 		body: CustomEventModel.createBody,
 		response: {
 			201: CustomEventModel.eventResponse,
-			400: CustomEventModel.evlogError,
-			409: CustomEventModel.evlogError,
-			401: CustomEventModel.evlogError,
-			500: CustomEventModel.evlogError,
+			400: CustomEventModel.errors.invalidKey,
+			409: CustomEventModel.errors.keyExists,
+			401: CustomEventModel.errors.unauthorized,
+			500: CustomEventModel.errors.internal,
 		},
 		detail: {
 			tags: ["Events"],
-			summary: "Create workflow event",
+			summary: "Create event",
 			description:
 				"Creates an org-defined workflow event with optional property schema. Used only as automation triggers — not webhooks.",
+			"x-codeSamples": createEventXCodeSamples,
 		},
 	},
 );

@@ -14,6 +14,7 @@
 		"api-key",
 		"webhook",
 		"contacts",
+		"workflow",
 		"logs",
 		"upload",
 		"template",

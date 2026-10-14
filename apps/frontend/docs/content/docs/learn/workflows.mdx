@@ -1,14 +1,183 @@
 ---
 title: Workflows
-description: Build automated visual campaign flows and event-based auto-responders.
+description: Send emails automatically when something happens in your app, with delays and branches, from the dashboard or the SDK.
 icon: workflow
+faq:
+  - question: What starts an automation?
+    answer: A trigger, which is a custom event your app tracks (for example user.signed_up). Track it with the SDK or API and every active automation that uses it starts for that contact. You can also enroll one contact directly.
+  - question: Can a contact go through the same automation twice?
+    answer: No. A contact is enrolled in each automation once. Tracking the event again for the same contact does not start it again, and enrolling them directly returns 409.
+  - question: What happens to contacts in progress when I pause an automation?
+    answer: Pausing stops new enrollments, and contacts already in it are cancelled when their next step comes due. Activating again does not resume them.
+  - question: Do my edits apply to an active automation right away?
+    answer: No. Saving steps on an active automation keeps them as a draft. Activate it again (Publish changes in the dashboard) to publish them. Contacts already enrolled finish on the version they started with.
+  - question: Is a custom event the same as a webhook event?
+    answer: No. Custom events only start automations. Tracking one does not send webhooks, and webhook events do not start automations.
 ---
 
-Design complex, multi-step customer journeys with Reloop **Workflows**. Connect inbound triggers, branch logic, delays, and customized email dispatches using a clean drag-and-drop interface.
+An **automation** sends emails for you when something happens in your app. You track a **trigger** (a custom event like `user.signed_up`) for a contact, and Reloop runs the automation's steps for them: send an email, wait, check a condition, and branch.
 
-## Key capabilities
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ## Create a trigger
 
-* **Triggers**: Start workflows automatically based on events (e.g. contact added, webhook received, email link clicked).
-* **Time delays**: Pause workflows for a specified number of minutes, hours, or days before executing the next action.
-* **Conditional branching**: Split customer paths based on user traits, email engagement, or geographic regions.
-* **Auto-responders**: Automatically reply to inbound inquiries with dynamic, personalized templates.
+    1. Go to [Automation → Triggers](https://reloop.sh/dashboard/automation/triggers)
+    2. Click **Create Trigger**
+    3. Name it (for example `User signed up`) and add the properties your app will send, such as `plan`
+    4. Save, then copy its key from the row menu (**Copy key**)
+
+    ## Build an automation
+
+    1. Go to [Automation](https://reloop.sh/dashboard/automation)
+    2. Click **Create Automation**
+    3. Pick the trigger that starts it
+    4. Add steps after it: **Send email**, **Delay** and **Condition**. A condition has a **Yes** and a **No** path
+    5. Click **Publish** to start it
+
+    After you edit an active automation, click **Publish changes** so new contacts get the new steps.
+
+    ## Track the trigger from your app
+
+    The trigger's code drawer shows a ready-to-paste snippet with its key. You can also use the **Code** tab on this page.
+
+    ## Pause an automation
+
+    Open the automation and click **Pause automation**. It stops starting for new events, and contacts in progress are cancelled at their next step.
+  </Tab>
+  <Tab title="Code" icon="code">
+    ## Create a trigger
+
+    Define the event and the properties it carries. The key is what your app sends when tracking it.
+
+    <WorkflowCodeSamples id="events.create" />
+
+    <Info>
+    Keys always start with `trigger.`, so `user.signed_up` is stored as `trigger.user.signed_up`. You can leave the prefix off anywhere you pass a key.
+    </Info>
+
+    ## Create an automation
+
+    An automation is a list of **steps** and the **connections** between them. Each step has a `key` you choose, which connections use to link steps. Pass `status: "active"` to start it right away, or leave it as a draft.
+
+    <WorkflowCodeSamples id="automations.create" />
+
+    If something is wrong with the steps, the error's `why` lists every problem at once.
+
+    ## Track the event
+
+    Track the event when it happens in your app. Every active automation it triggers starts for that contact. Pass `email` and the contact is created if it doesn't exist yet.
+
+    <WorkflowCodeSamples id="events.track" />
+
+    The response tells you how many automations started (`enrollments`). Properties marked `required` must be sent, and missing ones fall back to their `defaultValue`.
+
+    ## Enroll a contact directly
+
+    Start one active automation for a contact without tracking an event, for example to backfill existing users.
+
+    <WorkflowCodeSamples id="automations.enroll" />
+
+    ## Activate, edit and pause
+
+    <WorkflowCodeSamples id="automations.activate" />
+
+    Changing the steps of an active automation saves them as a draft. Activate it again, or pass `status: "active"` in the same update, to publish them.
+
+    <WorkflowCodeSamples id="automations.update" />
+
+    <WorkflowCodeSamples id="automations.pause" />
+
+    ## See who went through it
+
+    List the contacts enrolled in an automation, then open one to see what happened at each step, including the email a send step sent.
+
+    <WorkflowCodeSamples id="automations.enrollments.list" />
+
+    <WorkflowCodeSamples id="automations.enrollments.get" />
+  </Tab>
+</Tabs>
+
+## Steps
+
+| Type | Config | What it does |
+|---|---|---|
+| `trigger` | `{ eventName }` | Starts the automation. Every automation has exactly one. |
+| `send_email` | `{ template: { id }, from?, subject? }` | Sends a [template](/docs/learn/templates) to the contact. `from` and `subject` override the template's. |
+| `delay` | `{ amount, unit }` | Waits before the next step. `unit` is `minutes`, `hours` or `days`. |
+| `condition` | a rule or a group | Checks the contact or the event and takes the Yes or No path. |
+
+Connections link steps by key: `{ from, to, type }`. `type` is `default` between steps. A condition has one `condition_met` (Yes) and one `condition_not_met` (No) connection.
+
+## Conditions
+
+A rule checks one field:
+
+```json
+{ "type": "rule", "field": "trigger.plan", "operator": "eq", "value": "pro" }
+```
+
+A group combines rules. With `and` every rule must match, and with `or` any rule can:
+
+```json
+{
+  "type": "and",
+  "rules": [
+    { "type": "rule", "field": "trigger.plan", "operator": "eq", "value": "pro" },
+    { "type": "rule", "field": "contact.company", "operator": "exists" }
+  ]
+}
+```
+
+| Field | Reads |
+|---|---|
+| `trigger.<name>` | A property sent with the event, e.g. `trigger.plan` |
+| `contact.email`, `contact.firstName`, `contact.lastName`, `contact.status` | The contact |
+| `contact.<name>` | A [contact property](/docs/learn/contacts/properties), e.g. `contact.company` |
+
+| Operator | Matches when the field |
+|---|---|
+| `eq` / `neq` | equals / does not equal `value` |
+| `contains`, `starts_with`, `ends_with` | contains, starts with, or ends with `value` |
+| `gt`, `gte`, `lt`, `lte` | is a number greater than, at least, less than, or at most `value` |
+| `exists` / `not_exists` | is set / is not set |
+| `is_empty` | is not set or is blank (no `value` needed) |
+
+Text comparisons ignore case. To compare against another field instead of a fixed value, pass `{ "var": "trigger.expected_plan" }` as `value`.
+
+## How a contact moves through it
+
+- **Once per automation.** A contact is enrolled in each automation once. Tracking the event again does not restart it.
+- **Only subscribed contacts.** If the contact unsubscribes or is blocked, they leave the automation at their next step.
+- **Pinned to a version.** Each enrollment finishes on the steps that were published when it started, even if you publish changes later.
+- **Enrollment status.** `active` while it runs, then `completed`, `cancelled` (paused, deleted or unsubscribed) or `failed`.
+
+## API reference
+
+- [Track event](/docs/api/workflow/events/post-api-workflow-v1events-track)
+- [Events](/docs/api/workflow/events/post-api-workflow-v1events)
+- [Automations](/docs/api/workflow/automations/post-api-workflow-v1automations)
+- [Enrollments](/docs/api/workflow/automations/get-api-workflow-v1automations-by-automation_id-enrollments)
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What starts an automation?">
+    A trigger, which is a custom event your app tracks (for example `user.signed_up`). [Track it](#track-the-event) and every active automation that uses it starts for that contact. You can also [enroll one contact directly](#enroll-a-contact-directly).
+  </Accordion>
+
+  <Accordion title="Can a contact go through the same automation twice?">
+    No. A contact is enrolled in each automation once. Tracking the event again for the same contact does not start it again, and enrolling them directly returns `409`.
+  </Accordion>
+
+  <Accordion title="What happens to contacts in progress when I pause an automation?">
+    Pausing stops new enrollments, and contacts already in it are cancelled when their next step comes due. Activating again does not resume them.
+  </Accordion>
+
+  <Accordion title="Do my edits apply to an active automation right away?">
+    No. Saving steps on an active automation keeps them as a draft. Activate it again (**Publish changes** in the dashboard) to publish them. Contacts already enrolled finish on the version they started with.
+  </Accordion>
+
+  <Accordion title="Is a custom event the same as a webhook event?">
+    No. Custom events only start automations. Tracking one does not send webhooks, and webhook events do not start automations.
+  </Accordion>
+</AccordionGroup>

@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { AutomationModel } from "@be/workflow/routes/automation/automation.model";
+import { updateAutomationXCodeSamples } from "@reloop/code-samples/workflow";
 import type { AutomationGraph } from "@reloop/db/schema";
 import { Elysia, t } from "elysia";
 import { updateAutomationController } from "./update-automation.controllers";
@@ -27,15 +28,16 @@ export const updateAutomationRoute = new Elysia().use(authMiddleware).patch(
 		body: AutomationModel.updateBody,
 		response: {
 			200: AutomationModel.automationResponse,
-			400: AutomationModel.evlogError,
-			404: AutomationModel.evlogError,
-			401: AutomationModel.evlogError,
-			500: AutomationModel.evlogError,
+			400: AutomationModel.errors.invalidGraph,
+			404: AutomationModel.errors.notFound,
+			401: AutomationModel.errors.unauthorized,
+			500: AutomationModel.errors.internal,
 		},
 		detail: {
 			tags: ["Automations"],
 			summary: "Update automation",
 			description: "Updates automation name, description, or draft graph",
+			"x-codeSamples": updateAutomationXCodeSamples,
 		},
 	},
 );

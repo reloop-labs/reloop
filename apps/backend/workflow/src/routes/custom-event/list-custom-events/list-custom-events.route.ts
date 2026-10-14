@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { CustomEventModel } from "@be/workflow/routes/custom-event/custom-event.model";
+import { listEventsXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia } from "elysia";
 import { listCustomEventsController } from "./list-custom-events.controllers";
 
@@ -17,12 +18,13 @@ export const listCustomEventsRoute = new Elysia().use(authMiddleware).get(
 		query: CustomEventModel.listQuery,
 		response: {
 			200: CustomEventModel.eventListResponse,
-			401: CustomEventModel.evlogError,
+			401: CustomEventModel.errors.unauthorized,
 		},
 		detail: {
 			tags: ["Events"],
-			summary: "List custom events",
+			summary: "List events",
 			description: "Lists org-defined events and their property schemas",
+			"x-codeSamples": listEventsXCodeSamples,
 		},
 	},
 );

@@ -1,0 +1,11 @@
+{
+	"title": "Events",
+	"pages": [
+		"post-api-workflow-v1events-track",
+		"post-api-workflow-v1events",
+		"get-api-workflow-v1events-by-event_id",
+		"get-api-workflow-v1events",
+		"patch-api-workflow-v1events-by-event_id",
+		"delete-api-workflow-v1events-by-event_id"
+	]
+}

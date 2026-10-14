@@ -91,7 +91,10 @@ function normalizeRouteKey(pathValue: string, method: string): string {
 		.replace(/\/msg_[^/\s?]+/g, "/{id}")
 		.replace(/\/thr_[^/\s?]+/g, "/{id}")
 		.replace(/\/pnd_[^/\s?]+/g, "/{id}")
-		.replace(/\/att_[^/\s?]+/g, "/{attachmentId}");
+		.replace(/\/att_[^/\s?]+/g, "/{attachmentId}")
+		.replace(/\/auto_[^/\s?]+/g, "/{automation_id}")
+		.replace(/\/enr_[^/\s?]+/g, "/{enrollment_id}")
+		.replace(/\/evt_[^/\s?]+/g, "/{event_id}");
 	const normalized = templated.replace(/\/+$/, "") || "/";
 	let routeKey = `${method}:${normalized}`;
 	if (normalized.startsWith("/api/webhook/")) {
@@ -236,6 +239,7 @@ const services = [
 	{ name: "webhook", dir: path.join(CODE_SAMPLES_ROOT, "webhook") },
 	{ name: "inbox", dir: path.join(CODE_SAMPLES_ROOT, "inbox") },
 	{ name: "logs", dir: path.join(CODE_SAMPLES_ROOT, "logs") },
+	{ name: "workflow", dir: path.join(CODE_SAMPLES_ROOT, "workflow") },
 ];
 
 const sampleIndex = new Map<string, SampleSource>();

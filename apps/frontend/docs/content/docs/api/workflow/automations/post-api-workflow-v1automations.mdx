@@ -1,0 +1,136 @@
+---
+title: "Create automation"
+full: true
+_openapi:
+  method: POST
+  toc: []
+  structuredData:
+    headings: []
+    contents:
+      - content: "Creates an automation from `steps` and the `connections` between them. It starts as a draft unless `status` is \"active\", which validates it and starts it right away."
+_apiData:
+  document: "https://reloop.sh/api/workflow/openapi/json"
+  operationData: [{"path":"/api/workflow/v1/automations/","method":"post"}]
+  parameterList: [{"name":"name","type":"string","required":true,"description":"Automation name","location":"body","minLength":1,"maxLength":255},{"name":"description","type":"string","required":false,"description":"Optional description","location":"body","maxLength":2000},{"name":"status","type":"\"draft\" | \"active\"","required":false,"description":"","location":"body","enumValues":["draft","active"]},{"name":"steps","type":"object[]","required":false,"description":"The steps, with exactly one trigger. Can be left out to create an empty draft.","location":"body","properties":[{"name":"key","type":"string","required":true,"description":"Unique key for this step, used by connections (1-64 letters, numbers, _ or -).","location":"body"},{"name":"type","type":"string","required":true,"description":"\"trigger\", \"send_email\", \"delay\" or \"condition\".","location":"body"},{"name":"config","type":"object","required":false,"description":"trigger: { eventName }. send_email: { template: { id }, from?, subject? }. delay: { amount, unit }. condition: { type: \"rule\", field, operator, value } or { type: \"and\" | \"or\", rules }.","location":"body"}]},{"name":"connections","type":"object[]","required":false,"description":"How the steps link together, by step key.","location":"body","properties":[{"name":"from","type":"string","required":true,"description":"Key of the step this connection leaves.","location":"body"},{"name":"to","type":"string","required":true,"description":"Key of the step it leads to.","location":"body"},{"name":"type","type":"string","required":false,"description":"\"default\" (the default), or \"condition_met\" / \"condition_not_met\" from a condition step.","location":"body"}]}]
+  responseMap: {"201":{"description":"Response for status 201","schema":{"id":"auto_123456789","organizationId":"org_123456789","name":"Welcome","description":"Greets new sign-ups","status":"active","triggerEvent":"trigger.user.signed_up","steps":[{"key":"start","type":"trigger","config":{"eventName":"trigger.user.signed_up"}},{"key":"is_pro","type":"condition","config":{"type":"rule","field":"trigger.plan","operator":"eq","value":"pro"}},{"key":"welcome_pro","type":"send_email","config":{"template":{"id":"tmpl_123456789"}}},{"key":"wait","type":"delay","config":{"amount":1,"unit":"days"}},{"key":"welcome_free","type":"send_email","config":{"template":{"id":"tmpl_987654321"}}}],"connections":[{"from":"start","to":"is_pro","type":"default"},{"from":"is_pro","to":"welcome_pro","type":"condition_met"},{"from":"is_pro","to":"wait","type":"condition_not_met"},{"from":"wait","to":"welcome_free","type":"default"}],"graph":{"nodes":[],"edges":[]},"activeVersionId":"autov_123456789","createdAt":"2026-03-23T10:00:00.000Z","updatedAt":"2026-03-23T10:00:00.000Z"}},"400":{"description":"Response for status 400","schema":{"message":"Invalid workflow graph","why":"Step \"is_pro\": config.operator is required. Step \"welcome_pro\": config.template.id is required.","fix":"Fix the validation issues and try again."}},"401":{"description":"Response for status 401","schema":{"message":"Authentication required"}},"500":{"description":"Response for status 500","schema":{"message":"Failed to update automation","why":"An unexpected error occurred while updating automation \"auto_123456789\".","fix":"Please try again later or contact support."}}}
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { automation, automationError } = await reloop.automations.create({
+          name: "Welcome",
+          status: "active",
+          steps: [
+            { key: "start", type: "trigger", config: { eventName: "user.signed_up" } },
+            { key: "is_pro", type: "condition", config: { type: "rule", field: "trigger.plan", operator: "eq", value: "pro" } },
+            { key: "welcome_pro", type: "send_email", config: { template: { id: "tmpl_123456789" } } },
+            { key: "wait", type: "delay", config: { amount: 1, unit: "days" } },
+            { key: "welcome_free", type: "send_email", config: { template: { id: "tmpl_987654321" } } },
+          ],
+          connections: [
+            { from: "start", to: "is_pro" },
+            { from: "is_pro", to: "welcome_pro", type: "condition_met" },
+            { from: "is_pro", to: "wait", type: "condition_not_met" },
+            { from: "wait", to: "welcome_free" },
+          ],
+        });
+        if (automationError) throw automationError;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl -X POST https://reloop.sh/api/workflow/v1/automations \
+          -H "x-api-key: rl_123456789" \
+          -H "Content-Type: application/json" \
+          -d '{"name":"Welcome","status":"active","steps":[{"key":"start","type":"trigger","config":{"eventName":"user.signed_up"}},{"key":"is_pro","type":"condition","config":{"type":"rule","field":"trigger.plan","operator":"eq","value":"pro"}},{"key":"welcome_pro","type":"send_email","config":{"template":{"id":"tmpl_123456789"}}},{"key":"wait","type":"delay","config":{"amount":1,"unit":"days"}},{"key":"welcome_free","type":"send_email","config":{"template":{"id":"tmpl_987654321"}}}],"connections":[{"from":"start","to":"is_pro"},{"from":"is_pro","to":"welcome_pro","type":"condition_met"},{"from":"is_pro","to":"wait","type":"condition_not_met"},{"from":"wait","to":"welcome_free"}]}'
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        import requests
+        
+        res = requests.post(
+            "https://reloop.sh/api/workflow/v1/automations",
+            headers={"x-api-key": "rl_123456789"},
+            json={
+                "name": "Welcome",
+                "status": "active",
+                "steps": [
+                    {
+                        "key": "start",
+                        "type": "trigger",
+                        "config": {
+                            "eventName": "user.signed_up"
+                        }
+                    },
+                    {
+                        "key": "is_pro",
+                        "type": "condition",
+                        "config": {
+                            "type": "rule",
+                            "field": "trigger.plan",
+                            "operator": "eq",
+                            "value": "pro"
+                        }
+                    },
+                    {
+                        "key": "welcome_pro",
+                        "type": "send_email",
+                        "config": {
+                            "template": {
+                                "id": "tmpl_123456789"
+                            }
+                        }
+                    },
+                    {
+                        "key": "wait",
+                        "type": "delay",
+                        "config": {
+                            "amount": 1,
+                            "unit": "days"
+                        }
+                    },
+                    {
+                        "key": "welcome_free",
+                        "type": "send_email",
+                        "config": {
+                            "template": {
+                                "id": "tmpl_987654321"
+                            }
+                        }
+                    }
+                ],
+                "connections": [
+                    {
+                        "from": "start",
+                        "to": "is_pro"
+                    },
+                    {
+                        "from": "is_pro",
+                        "to": "welcome_pro",
+                        "type": "condition_met"
+                    },
+                    {
+                        "from": "is_pro",
+                        "to": "wait",
+                        "type": "condition_not_met"
+                    },
+                    {
+                        "from": "wait",
+                        "to": "welcome_free"
+                    }
+                ]
+            },
+        )
+        res.raise_for_status()
+        print(res.json())
+---
+
+{/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}
+
+<APIPage />

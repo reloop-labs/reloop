@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { CustomEventModel } from "@be/workflow/routes/custom-event/custom-event.model";
+import { updateEventXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia, t } from "elysia";
 import { updateCustomEventController } from "./update-custom-event.controllers";
 
@@ -22,16 +23,17 @@ export const updateCustomEventRoute = new Elysia().use(authMiddleware).patch(
 		body: CustomEventModel.updateBody,
 		response: {
 			200: CustomEventModel.eventResponse,
-			400: CustomEventModel.evlogError,
-			404: CustomEventModel.evlogError,
-			401: CustomEventModel.evlogError,
-			500: CustomEventModel.evlogError,
+			400: CustomEventModel.errors.invalidProperties,
+			404: CustomEventModel.errors.notFound,
+			401: CustomEventModel.errors.unauthorized,
+			500: CustomEventModel.errors.internal,
 		},
 		detail: {
 			tags: ["Events"],
-			summary: "Update custom event",
+			summary: "Update event",
 			description:
 				"Updates name/description and optionally replaces the property schema",
+			"x-codeSamples": updateEventXCodeSamples,
 		},
 	},
 );

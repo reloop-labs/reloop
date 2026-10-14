@@ -1,0 +1,36 @@
+import type { CodeSample } from "../../../types";
+
+/** GET /api/workflow/v1/automations */
+export const listAutomationsXCodeSamples: CodeSample[] = [
+	{
+		id: "node",
+		lang: "javascript",
+		label: "Node.js",
+		source: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { automations, automationError } = await reloop.automations.list({ page: 1, limit: 20 });
+if (automationError) throw automationError;`,
+	},
+	{
+		id: "curl",
+		lang: "bash",
+		label: "cURL",
+		source: `curl -X GET "https://reloop.sh/api/workflow/v1/automations?page=1&limit=20" \\
+  -H "x-api-key: rl_123456789"`,
+	},
+	{
+		id: "python",
+		lang: "python",
+		label: "Python",
+		source: `import requests
+
+res = requests.get(
+    "https://reloop.sh/api/workflow/v1/automations?page=1&limit=20",
+    headers={"x-api-key": "rl_123456789"},
+)
+res.raise_for_status()
+print(res.json())`,
+	},
+];

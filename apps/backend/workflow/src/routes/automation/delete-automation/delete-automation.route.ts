@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { AutomationModel } from "@be/workflow/routes/automation/automation.model";
+import { deleteAutomationXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia, t } from "elysia";
 import { deleteAutomationController } from "./delete-automation.controllers";
 
@@ -18,14 +19,15 @@ export const deleteAutomationRoute = new Elysia().use(authMiddleware).delete(
 		}),
 		response: {
 			200: AutomationModel.deleteResponse,
-			404: AutomationModel.evlogError,
-			401: AutomationModel.evlogError,
-			500: AutomationModel.evlogError,
+			404: AutomationModel.errors.notFound,
+			401: AutomationModel.errors.unauthorized,
+			500: AutomationModel.errors.internal,
 		},
 		detail: {
 			tags: ["Automations"],
 			summary: "Delete automation",
 			description: "Soft-deletes an automation workflow",
+			"x-codeSamples": deleteAutomationXCodeSamples,
 		},
 	},
 );

@@ -10,3 +10,4 @@ export * from "./template";
 export * from "./tools";
 export type { CodeSample, CodeSampleId } from "./types";
 export * from "./webhook";
+export * from "./workflow";

@@ -36,10 +36,11 @@ describe("stepsToGraph", () => {
 		if (!result.ok) throw new Error(result.errors.join("\n"));
 		const { nodes, edges } = result.graph;
 
-		// The trigger always lives under the fixed "trigger" id.
+		// The trigger always lives under the fixed "trigger" id, and event keys
+		// get the "trigger." prefix every stored key has.
 		expect(nodes.find((n) => n.type === "trigger")).toMatchObject({
 			id: "trigger",
-			data: { eventKey: "user.created", key: "start" },
+			data: { eventKey: "trigger.user.created", key: "start" },
 		});
 		// A single rule is stored flat, like the dashboard writes it.
 		expect(nodes.find((n) => n.id === "check_plan")?.data).toEqual({
@@ -107,7 +108,7 @@ describe("stepsToGraph", () => {
 			[{ from: "start", to: "big" }],
 		);
 		if (!result.ok) throw new Error(result.errors.join("\n"));
-		expect(result.graph.nodes[0]?.data.eventKey).toBe("order.paid");
+		expect(result.graph.nodes[0]?.data.eventKey).toBe("trigger.order.paid");
 		expect(result.graph.nodes[1]?.data).toMatchObject({ type: "or" });
 	});
 

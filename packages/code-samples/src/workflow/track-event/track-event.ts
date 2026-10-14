@@ -4,7 +4,8 @@ import type { CodeSample } from "../../types";
  * POST /api/workflow/v1/events/track — fires a workflow custom event and
  * enrolls the contact in automations triggered by it.
  *
- * The SDKs don't wrap this endpoint yet, so every sample is a plain HTTP call.
+ * Node uses the SDK; the other SDKs don't wrap this endpoint yet, so their
+ * samples are plain HTTP calls.
  * `user.signed_up` is the placeholder event key; the dashboard swaps in the
  * real key of the automation's trigger.
  */
@@ -15,19 +16,16 @@ export const trackEventXCodeSamples: CodeSample[] = [
 		id: "node",
 		lang: "javascript",
 		label: "Node.js",
-		source: `const res = await fetch("https://reloop.sh/api/workflow/v1/events/track", {
-  method: "POST",
-  headers: {
-    "x-api-key": "rl_123456789",
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    event: "user.signed_up",
-    email: "john.doe@example.com",
-    properties: { plan: "pro" },
-  }),
+		source: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { event, eventError } = await reloop.events.track({
+  event: "user.signed_up",
+  email: "john.doe@example.com",
+  properties: { plan: "pro" },
 });
-const { enrollments } = await res.json();`,
+if (eventError) throw eventError;`,
 	},
 	{
 		id: "python",

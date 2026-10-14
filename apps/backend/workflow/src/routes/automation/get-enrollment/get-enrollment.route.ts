@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { AutomationModel } from "@be/workflow/routes/automation/automation.model";
+import { getEnrollmentXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia, t } from "elysia";
 import { getEnrollmentController } from "./get-enrollment.controllers";
 
@@ -20,13 +21,14 @@ export const getEnrollmentRoute = new Elysia().use(authMiddleware).get(
 		}),
 		response: {
 			200: AutomationModel.enrollmentDetailResponse,
-			401: AutomationModel.evlogError,
-			404: AutomationModel.evlogError,
+			401: AutomationModel.errors.unauthorized,
+			404: AutomationModel.errors.enrollmentNotFound,
 		},
 		detail: {
 			tags: ["Automations"],
 			summary: "Get enrollment",
 			description: "Retrieves an enrollment and its step runs",
+			"x-codeSamples": getEnrollmentXCodeSamples,
 		},
 	},
 );

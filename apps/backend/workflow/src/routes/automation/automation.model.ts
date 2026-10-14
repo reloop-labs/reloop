@@ -1,5 +1,85 @@
 import { t } from "elysia";
 
+// Examples shown in the API reference.
+const exampleSteps = [
+	{
+		key: "start",
+		type: "trigger",
+		config: { eventName: "trigger.user.signed_up" },
+	},
+	{
+		key: "is_pro",
+		type: "condition",
+		config: {
+			type: "rule",
+			field: "trigger.plan",
+			operator: "eq",
+			value: "pro",
+		},
+	},
+	{
+		key: "welcome_pro",
+		type: "send_email",
+		config: { template: { id: "tmpl_123456789" } },
+	},
+	{ key: "wait", type: "delay", config: { amount: 1, unit: "days" } },
+	{
+		key: "welcome_free",
+		type: "send_email",
+		config: { template: { id: "tmpl_987654321" } },
+	},
+];
+
+const exampleConnections = [
+	{ from: "start", to: "is_pro", type: "default" },
+	{ from: "is_pro", to: "welcome_pro", type: "condition_met" },
+	{ from: "is_pro", to: "wait", type: "condition_not_met" },
+	{ from: "wait", to: "welcome_free", type: "default" },
+];
+
+const exampleAutomation = {
+	id: "auto_123456789",
+	organizationId: "org_123456789",
+	name: "Welcome",
+	description: "Greets new sign-ups",
+	status: "active",
+	triggerEvent: "trigger.user.signed_up",
+	steps: exampleSteps,
+	connections: exampleConnections,
+	graph: { nodes: [], edges: [] },
+	activeVersionId: "autov_123456789",
+	createdAt: "2026-03-23T10:00:00.000Z",
+	updatedAt: "2026-03-23T10:00:00.000Z",
+};
+
+const exampleEnrollment = {
+	id: "enr_123456789",
+	automationId: "auto_123456789",
+	contactId: "con_123456789",
+	contactEmail: "john.doe@example.com",
+	contactFirstName: "John",
+	contactLastName: "Doe",
+	status: "active",
+	currentNodeId: "wait",
+	enrolledAt: "2026-03-23T10:00:00.000Z",
+	completedAt: null,
+	cancelledAt: null,
+};
+
+const errorFields = {
+	message: t.String(),
+	why: t.Optional(t.String()),
+	fix: t.Optional(t.String()),
+	link: t.Optional(t.String()),
+};
+
+const errorExample = (message: string, why?: string, fix?: string) =>
+	t.Object(errorFields, {
+		examples: [why ? { message, why, fix } : { message }],
+	});
+
+export const workflowErrorExample = errorExample;
+
 const graphNode = t.Object({
 	id: t.String(),
 	type: t.String(),
@@ -73,7 +153,7 @@ const connectionResponse = t.Object({
 export namespace AutomationModel {
 	export const automationIdParam = t.String({
 		minLength: 1,
-		description: "Automation ID",
+		description: "Automation ID (auto_...)",
 	});
 
 	export const createBody = t.Object({
@@ -94,8 +174,19 @@ export namespace AutomationModel {
 					'"draft" (default) or "active" to validate and start it right away.',
 			}),
 		),
-		steps: t.Optional(t.Array(stepInput, { maxItems: 200 })),
-		connections: t.Optional(t.Array(connectionInput, { maxItems: 400 })),
+		steps: t.Optional(
+			t.Array(stepInput, {
+				maxItems: 200,
+				description:
+					"The steps, with exactly one trigger. Can be left out to create an empty draft.",
+			}),
+		),
+		connections: t.Optional(
+			t.Array(connectionInput, {
+				maxItems: 400,
+				description: "How the steps link together, by step key.",
+			}),
+		),
 	});
 
 	export const updateBody = t.Object({
@@ -103,18 +194,33 @@ export namespace AutomationModel {
 			t.String({
 				minLength: 1,
 				maxLength: 255,
+				description: "Automation name",
 			}),
 		),
-		description: t.Optional(t.Union([t.String({ maxLength: 2000 }), t.Null()])),
+		description: t.Optional(
+			t.Union([t.String({ maxLength: 2000 }), t.Null()], {
+				description: "Description, or null to clear it",
+			}),
+		),
 		/** Dashboard canvas graph. API clients send `steps` + `connections`. */
-		graph: t.Optional(automationGraphSchema),
+		graph: t.Optional(
+			t.Object(automationGraphSchema.properties, {
+				description:
+					"Used by the dashboard editor. Send steps and connections instead.",
+			}),
+		),
 		steps: t.Optional(
 			t.Array(stepInput, {
 				maxItems: 200,
 				description: "Replaces all steps (send `connections` with it).",
 			}),
 		),
-		connections: t.Optional(t.Array(connectionInput, { maxItems: 400 })),
+		connections: t.Optional(
+			t.Array(connectionInput, {
+				maxItems: 400,
+				description: "Replaces all connections (send `steps` with it).",
+			}),
+		),
 		status: t.Optional(
 			t.Union([t.Literal("active"), t.Literal("paused")], {
 				description: '"active" validates and starts it; "paused" stops it.',
@@ -123,35 +229,54 @@ export namespace AutomationModel {
 	});
 
 	export const listQuery = t.Object({
-		page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
-		limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, default: 50 })),
+		page: t.Optional(
+			t.Numeric({ minimum: 1, default: 1, description: "Page number" }),
+		),
+		limit: t.Optional(
+			t.Numeric({
+				minimum: 1,
+				maximum: 100,
+				default: 50,
+				description: "Automations per page",
+			}),
+		),
 	});
 
-	export const automationResponse = t.Object({
-		id: t.String(),
-		organizationId: t.String(),
-		name: t.String(),
-		description: t.Nullable(t.String()),
-		status: t.Union([
-			t.Literal("draft"),
-			t.Literal("active"),
-			t.Literal("paused"),
-		]),
-		triggerEvent: t.Nullable(t.String()),
-		steps: t.Array(stepResponse),
-		connections: t.Array(connectionResponse),
-		graph: automationGraphSchema,
-		activeVersionId: t.Nullable(t.String()),
-		createdAt: t.String(),
-		updatedAt: t.String(),
-	});
+	export const automationResponse = t.Object(
+		{
+			id: t.String(),
+			organizationId: t.String(),
+			name: t.String(),
+			description: t.Nullable(t.String()),
+			status: t.Union([
+				t.Literal("draft"),
+				t.Literal("active"),
+				t.Literal("paused"),
+			]),
+			triggerEvent: t.Nullable(t.String()),
+			steps: t.Array(stepResponse),
+			connections: t.Array(connectionResponse),
+			graph: automationGraphSchema,
+			activeVersionId: t.Nullable(t.String()),
+			createdAt: t.String(),
+			updatedAt: t.String(),
+		},
+		{ examples: [exampleAutomation] },
+	);
 
-	export const automationListResponse = t.Object({
-		automations: t.Array(automationResponse),
-		total: t.Number(),
-		page: t.Number(),
-		limit: t.Number(),
-	});
+	export const automationListResponse = t.Object(
+		{
+			automations: t.Array(automationResponse),
+			total: t.Number(),
+			page: t.Number(),
+			limit: t.Number(),
+		},
+		{
+			examples: [
+				{ automations: [exampleAutomation], total: 1, page: 1, limit: 50 },
+			],
+		},
+	);
 
 	export const evlogError = t.Object({
 		message: t.String(),
@@ -160,16 +285,81 @@ export namespace AutomationModel {
 		link: t.Optional(t.String()),
 	});
 
-	export const deleteResponse = t.Object({
-		success: t.Boolean(),
-		id: t.String(),
-	});
+	export const deleteResponse = t.Object(
+		{
+			success: t.Boolean(),
+			id: t.String(),
+		},
+		{ examples: [{ success: true, id: "auto_123456789" }] },
+	);
+
+	export const errors = {
+		unauthorized: errorExample("Authentication required"),
+		notFound: errorExample(
+			"Automation not found",
+			'No automation with ID "auto_123456789" exists for your organization.',
+			"Verify the ID and ensure it belongs to your active organization.",
+		),
+		invalidGraph: errorExample(
+			"Invalid workflow graph",
+			'Step "is_pro": config.operator is required. Step "welcome_pro": config.template.id is required.',
+			"Fix the validation issues and try again.",
+		),
+		cannotActivate: errorExample(
+			"Cannot activate automation",
+			'Custom event "trigger.user.signed_up" was not found. Create it under Events first.',
+			"Complete the workflow configuration before activating.",
+		),
+		cannotEnroll: errorExample(
+			"Automation is not active",
+			"Only an active automation can enroll contacts.",
+			"Activate the workflow, then enroll the contact.",
+		),
+		contactNotFound: errorExample(
+			"Contact not found",
+			"No matching contact was found for this organization.",
+			"Create the contact first or pass a valid contactId/email.",
+		),
+		alreadyEnrolled: errorExample(
+			"Contact already enrolled",
+			"This contact is already enrolled (enr_123456789). Automations enroll a contact once.",
+			"Pick a different contact, or inspect the existing enrollment.",
+		),
+		enrollmentNotFound: errorExample(
+			"Enrollment not found",
+			'No enrollment with ID "enr_123456789" exists for this automation.',
+			"Verify the enrollment ID.",
+		),
+		internal: errorExample(
+			"Failed to update automation",
+			'An unexpected error occurred while updating automation "auto_123456789".',
+			"Please try again later or contact support.",
+		),
+	};
 
 	export const enrollBody = t.Object({
-		contactId: t.Optional(t.String()),
-		email: t.Optional(t.String({ format: "email" })),
-		firstName: t.Optional(t.String({ maxLength: 255 })),
-		lastName: t.Optional(t.String({ maxLength: 255 })),
+		contactId: t.Optional(
+			t.String({ description: "Contact to enroll. Pass this or email." }),
+		),
+		email: t.Optional(
+			t.String({
+				format: "email",
+				description:
+					"Contact email. Creates the contact if it does not exist yet.",
+			}),
+		),
+		firstName: t.Optional(
+			t.String({
+				maxLength: 255,
+				description: "Used when the contact is created from email",
+			}),
+		),
+		lastName: t.Optional(
+			t.String({
+				maxLength: 255,
+				description: "Used when the contact is created from email",
+			}),
+		),
 	});
 
 	export const enrollmentStatus = t.Union([
@@ -201,24 +391,55 @@ export namespace AutomationModel {
 		cancelledAt: t.Nullable(t.String()),
 	});
 
-	export const enrollResponse = t.Object({
-		enrollment: enrollmentResponse,
-		contactCreated: t.Boolean(),
-		delayMs: t.Number(),
-	});
+	export const enrollResponse = t.Object(
+		{
+			enrollment: enrollmentResponse,
+			contactCreated: t.Boolean(),
+			delayMs: t.Number(),
+		},
+		{
+			examples: [
+				{
+					enrollment: { ...exampleEnrollment, currentNodeId: "start" },
+					contactCreated: false,
+					delayMs: 0,
+				},
+			],
+		},
+	);
 
 	export const enrollmentListQuery = t.Object({
-		page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
-		limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, default: 50 })),
-		status: t.Optional(enrollmentStatus),
+		page: t.Optional(
+			t.Numeric({ minimum: 1, default: 1, description: "Page number" }),
+		),
+		limit: t.Optional(
+			t.Numeric({
+				minimum: 1,
+				maximum: 100,
+				default: 50,
+				description: "Enrollments per page",
+			}),
+		),
+		status: t.Optional(
+			t.Union(enrollmentStatus.anyOf, {
+				description: "Only enrollments with this status",
+			}),
+		),
 	});
 
-	export const enrollmentListResponse = t.Object({
-		enrollments: t.Array(enrollmentResponse),
-		total: t.Number(),
-		page: t.Number(),
-		limit: t.Number(),
-	});
+	export const enrollmentListResponse = t.Object(
+		{
+			enrollments: t.Array(enrollmentResponse),
+			total: t.Number(),
+			page: t.Number(),
+			limit: t.Number(),
+		},
+		{
+			examples: [
+				{ enrollments: [exampleEnrollment], total: 1, page: 1, limit: 50 },
+			],
+		},
+	);
 
 	export const stepRunResponse = t.Object({
 		id: t.String(),
@@ -232,8 +453,41 @@ export namespace AutomationModel {
 		error: t.Nullable(t.String()),
 	});
 
-	export const enrollmentDetailResponse = t.Object({
-		enrollment: enrollmentResponse,
-		steps: t.Array(stepRunResponse),
-	});
+	export const enrollmentDetailResponse = t.Object(
+		{
+			enrollment: enrollmentResponse,
+			steps: t.Array(stepRunResponse),
+		},
+		{
+			examples: [
+				{
+					enrollment: exampleEnrollment,
+					steps: [
+						{
+							id: "astep_123456789",
+							nodeId: "is_pro",
+							nodeType: "condition",
+							status: "completed",
+							scheduledFor: "2026-03-23T10:00:00.000Z",
+							startedAt: "2026-03-23T10:00:00.000Z",
+							finishedAt: "2026-03-23T10:00:00.000Z",
+							emailLogId: null,
+							error: null,
+						},
+						{
+							id: "astep_987654321",
+							nodeId: "wait",
+							nodeType: "delay",
+							status: "pending",
+							scheduledFor: "2026-03-24T10:00:00.000Z",
+							startedAt: null,
+							finishedAt: null,
+							emailLogId: null,
+							error: null,
+						},
+					],
+				},
+			],
+		},
+	);
 }

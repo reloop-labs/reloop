@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { CustomEventModel } from "@be/workflow/routes/custom-event/custom-event.model";
+import { getEventXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia, t } from "elysia";
 import { getCustomEventController } from "./get-custom-event.controllers";
 
@@ -18,13 +19,14 @@ export const getCustomEventRoute = new Elysia().use(authMiddleware).get(
 		}),
 		response: {
 			200: CustomEventModel.eventResponse,
-			404: CustomEventModel.evlogError,
-			401: CustomEventModel.evlogError,
+			404: CustomEventModel.errors.notFound,
+			401: CustomEventModel.errors.unauthorized,
 		},
 		detail: {
 			tags: ["Events"],
-			summary: "Get custom event",
+			summary: "Get event",
 			description: "Retrieves an event by ID or key, including properties",
+			"x-codeSamples": getEventXCodeSamples,
 		},
 	},
 );

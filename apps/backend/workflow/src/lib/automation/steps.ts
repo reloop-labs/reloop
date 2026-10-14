@@ -7,6 +7,7 @@ import {
 	findTriggerNode,
 	TRIGGER_NODE_ID,
 } from "@be/workflow/lib/automation/graph";
+import { ensureTriggerPrefix } from "@be/workflow/lib/custom-event/key";
 import type { AutomationGraph } from "@reloop/db/schema";
 
 /**
@@ -90,7 +91,7 @@ function configToData(
 			// `event_name` too, for clients that send snake_case.
 			const eventName = str(config.eventName) ?? str(config.event_name);
 			if (!eventName) errors.push(`${at}: config.eventName is required.`);
-			return eventName ? { eventKey: eventName } : {};
+			return eventName ? { eventKey: ensureTriggerPrefix(eventName) } : {};
 		}
 		case "send_email": {
 			const template = config.template as { id?: unknown } | undefined;

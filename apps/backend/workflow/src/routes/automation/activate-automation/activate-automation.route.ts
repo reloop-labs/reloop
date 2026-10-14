@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { AutomationModel } from "@be/workflow/routes/automation/automation.model";
+import { activateAutomationXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia, t } from "elysia";
 import { activateAutomationController } from "./activate-automation.controllers";
 
@@ -19,16 +20,17 @@ export const activateAutomationRoute = new Elysia().use(authMiddleware).post(
 		}),
 		response: {
 			200: AutomationModel.automationResponse,
-			400: AutomationModel.evlogError,
-			404: AutomationModel.evlogError,
-			401: AutomationModel.evlogError,
-			500: AutomationModel.evlogError,
+			400: AutomationModel.errors.cannotActivate,
+			404: AutomationModel.errors.notFound,
+			401: AutomationModel.errors.unauthorized,
+			500: AutomationModel.errors.internal,
 		},
 		detail: {
 			tags: ["Automations"],
 			summary: "Activate automation",
 			description:
 				"Publishes an immutable version snapshot and starts enrolling contacts on the trigger",
+			"x-codeSamples": activateAutomationXCodeSamples,
 		},
 	},
 );

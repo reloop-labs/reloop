@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { CustomEventModel } from "@be/workflow/routes/custom-event/custom-event.model";
+import { trackEventXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia } from "elysia";
 import { trackCustomEventController } from "./track-custom-event.controllers";
 
@@ -22,15 +23,16 @@ export const trackCustomEventRoute = new Elysia().use(authMiddleware).post(
 		body: CustomEventModel.trackBody,
 		response: {
 			200: CustomEventModel.trackResponse,
-			400: CustomEventModel.evlogError,
-			404: CustomEventModel.evlogError,
-			401: CustomEventModel.evlogError,
+			400: CustomEventModel.errors.invalidProperties,
+			404: CustomEventModel.errors.notFound,
+			401: CustomEventModel.errors.unauthorized,
 		},
 		detail: {
 			tags: ["Events"],
-			summary: "Track workflow event",
+			summary: "Track event",
 			description:
 				"Fires a workflow-only custom event: validates properties and enrolls matching automations. Pass email to create the contact if it does not exist. Not related to outbound webhooks.",
+			"x-codeSamples": trackEventXCodeSamples,
 		},
 	},
 );

@@ -1,0 +1,15 @@
+{
+	"title": "Automations",
+	"pages": [
+		"post-api-workflow-v1automations",
+		"get-api-workflow-v1automations-by-automation_id",
+		"get-api-workflow-v1automations",
+		"patch-api-workflow-v1automations-by-automation_id",
+		"delete-api-workflow-v1automations-by-automation_id",
+		"post-api-workflow-v1automations-by-automation_id-activate",
+		"post-api-workflow-v1automations-by-automation_id-pause",
+		"post-api-workflow-v1automations-by-automation_id-enroll",
+		"get-api-workflow-v1automations-by-automation_id-enrollments",
+		"get-api-workflow-v1automations-by-automation_id-enrollments-by-enrollment_id"
+	]
+}

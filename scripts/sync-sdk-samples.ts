@@ -4,7 +4,7 @@
  *
  * 1. Canonical: packages/code-samples (@reloop/code-samples)
  * 2. Dashboard: generate api-keys-code-examples.ts
- * 3. Docs: sync MDX codeSamples from the package (api-key + contacts + domain + mail + inbox)
+ * 3. Docs: sync MDX codeSamples from the package (api-key + contacts + domain + mail + inbox + workflow)
  *
  * From monorepo root:
  *   bun run sync:sdk-samples
@@ -43,7 +43,7 @@ console.log(CHECK ? "Checking SDK samples…" : "Syncing SDK samples…");
 run(path.join(SCRIPTS, "sync-dashboard-api-key-samples.ts"));
 run(
 	path.join(DOCS_SCRIPTS, "sync-code-samples-from-source.ts"),
-	["api-key", "contacts", "domain", "mail", "inbox"],
+	["api-key", "contacts", "domain", "mail", "inbox", "workflow"],
 	path.join(REPO_ROOT, "apps/frontend/docs"),
 );
 console.log(CHECK ? "All SDK sample checks passed." : "SDK samples synced.");

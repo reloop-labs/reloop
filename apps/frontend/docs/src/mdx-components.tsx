@@ -31,6 +31,7 @@ import { Side, SideBySide } from "@reloop/fe-docs/components/mdx/SideBySide";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import { ApiKeyCodeSamples } from "@reloop/fe-docs/lib/api-key-code-samples";
 import { ContactsCodeSamples } from "@reloop/fe-docs/lib/contacts-code-samples";
+import { WorkflowCodeSamples } from "@reloop/fe-docs/lib/workflow-code-samples";
 import { DomainCodeSamples } from "@reloop/fe-docs/lib/domain-code-samples";
 import { RELOOP_ICON_NAMES } from "@reloop/fe-docs/lib/reloop-icon-names";
 import { Icon as ReloopIcon } from "@reloop/ui/icon";
@@ -151,6 +152,7 @@ export function getMDXComponents(
 		CodeBlock,
 		CodeGroup,
 		ContactsCodeSamples,
+		WorkflowCodeSamples,
 		DomainCodeSamples,
 		Steps,
 		Step,

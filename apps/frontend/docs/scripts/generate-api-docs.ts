@@ -7,7 +7,8 @@
  * and code samples sourced directly from the backend OpenAPI spec.
  *
  * Usage:
- *   bun run generate:api-docs
+ *   bun run generate:api-docs            # every service
+ *   bun run generate:api-docs workflow   # only the named services
  */
 
 import fs from "node:fs";
@@ -102,6 +103,13 @@ const SERVICES: ServiceConfig[] = [
 		port: 8014,
 		specUrl: "http://localhost:8014/api/contacts/openapi/json",
 		prodUrl: "https://reloop.sh/api/contacts/openapi/json",
+	},
+	{
+		name: "workflow",
+		prefix: "/api/workflow",
+		port: 8017,
+		specUrl: "http://localhost:8017/api/workflow/openapi/json",
+		prodUrl: "https://reloop.sh/api/workflow/openapi/json",
 	},
 	{
 		name: "logs",
@@ -993,7 +1001,9 @@ async function main() {
 
 	const allGenerated: Record<string, GeneratedPage[]> = {};
 
+	const only = process.argv.slice(2);
 	for (const service of SERVICES) {
+		if (only.length > 0 && !only.includes(service.name)) continue;
 		const generated = await generateForService(service);
 		if (generated.length > 0) allGenerated[service.name] = generated;
 	}

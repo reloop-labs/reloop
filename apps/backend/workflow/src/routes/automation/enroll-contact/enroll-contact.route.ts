@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { AutomationModel } from "@be/workflow/routes/automation/automation.model";
+import { enrollContactXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia, t } from "elysia";
 import { enrollContactController } from "./enroll-contact.controllers";
 
@@ -24,17 +25,18 @@ export const enrollContactRoute = new Elysia().use(authMiddleware).post(
 		body: AutomationModel.enrollBody,
 		response: {
 			200: AutomationModel.enrollResponse,
-			400: AutomationModel.evlogError,
-			401: AutomationModel.evlogError,
-			404: AutomationModel.evlogError,
-			409: AutomationModel.evlogError,
-			500: AutomationModel.evlogError,
+			400: AutomationModel.errors.cannotEnroll,
+			401: AutomationModel.errors.unauthorized,
+			404: AutomationModel.errors.contactNotFound,
+			409: AutomationModel.errors.alreadyEnrolled,
+			500: AutomationModel.errors.internal,
 		},
 		detail: {
 			tags: ["Automations"],
 			summary: "Enroll a contact",
 			description:
 				"Starts this active automation for a contact. Pass contactId or email (email creates the contact if needed).",
+			"x-codeSamples": enrollContactXCodeSamples,
 		},
 	},
 );

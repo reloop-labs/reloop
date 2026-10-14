@@ -1,5 +1,6 @@
 import { authMiddleware } from "@be/workflow/middleware/auth";
 import { AutomationModel } from "@be/workflow/routes/automation/automation.model";
+import { listEnrollmentsXCodeSamples } from "@reloop/code-samples/workflow";
 import { Elysia, t } from "elysia";
 import { listEnrollmentsController } from "./list-enrollments.controllers";
 
@@ -22,13 +23,14 @@ export const listEnrollmentsRoute = new Elysia().use(authMiddleware).get(
 		query: AutomationModel.enrollmentListQuery,
 		response: {
 			200: AutomationModel.enrollmentListResponse,
-			401: AutomationModel.evlogError,
-			404: AutomationModel.evlogError,
+			401: AutomationModel.errors.unauthorized,
+			404: AutomationModel.errors.notFound,
 		},
 		detail: {
 			tags: ["Automations"],
 			summary: "List enrollments",
 			description: "Lists contacts enrolled in this automation",
+			"x-codeSamples": listEnrollmentsXCodeSamples,
 		},
 	},
 );

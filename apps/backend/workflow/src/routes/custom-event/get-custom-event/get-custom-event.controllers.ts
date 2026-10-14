@@ -1,4 +1,5 @@
 import { CustomEventErrors } from "@be/workflow/error/custom-event.error-response";
+import { ensureTriggerPrefix } from "@be/workflow/lib/custom-event/key";
 import { mapCustomEvent } from "@be/workflow/routes/custom-event/custom-event.mappers";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -15,7 +16,7 @@ export async function getCustomEventController(params: {
 			isNull(schema.customEvent.deletedAt),
 			or(
 				eq(schema.customEvent.id, params.eventIdOrKey),
-				eq(schema.customEvent.key, params.eventIdOrKey),
+				eq(schema.customEvent.key, ensureTriggerPrefix(params.eventIdOrKey)),
 			),
 		),
 	});
