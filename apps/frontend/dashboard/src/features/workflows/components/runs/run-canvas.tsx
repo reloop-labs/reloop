@@ -44,23 +44,23 @@ function prepare(nodes: WorkflowNode[], edges: WorkflowEdge[]) {
 	};
 }
 
-const RunCanvasInner = ({ detail }: { detail: EnrollmentDetail }) => {
+/**
+ * The steps drawn read-only, each showing how one run went at it.
+ */
+const ReadOnlyFlowInner = ({
+	graph,
+	run,
+}: {
+	graph: { nodes: WorkflowNode[]; edges: WorkflowEdge[] };
+	run: RunOverlay;
+}) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { getNode, setViewport } = useReactFlow();
 
-	const run: RunOverlay = useMemo(
-		() => ({
-			steps: latestByNode(detail.steps),
-			trigger: detail.trigger,
-			enrollment: detail.enrollment,
-			emails: detail.emails,
-		}),
-		[detail],
-	);
 	const marked = useMemo(() => {
-		const clean = stripPlaceholderNodes(detail.graph.nodes, detail.graph.edges);
+		const clean = stripPlaceholderNodes(graph.nodes, graph.edges);
 		return prepare(clean.nodes, clean.edges);
-	}, [detail.graph]);
+	}, [graph]);
 
 	const [nodes, setNodes] = useState<WorkflowNode[]>(() =>
 		layoutWorkflow(marked.nodes, marked.edges),
@@ -160,8 +160,23 @@ const RunCanvasInner = ({ detail }: { detail: EnrollmentDetail }) => {
 };
 
 /** One run drawn on the steps it followed, with how each step went. */
-export const RunCanvas = ({ detail }: { detail: EnrollmentDetail }) => (
-	<ReactFlowProvider>
-		<RunCanvasInner key={detail.enrollment.id} detail={detail} />
-	</ReactFlowProvider>
-);
+export const RunCanvas = ({ detail }: { detail: EnrollmentDetail }) => {
+	const run: RunOverlay = useMemo(
+		() => ({
+			steps: latestByNode(detail.steps),
+			trigger: detail.trigger,
+			enrollment: detail.enrollment,
+			emails: detail.emails,
+		}),
+		[detail],
+	);
+	return (
+		<ReactFlowProvider>
+			<ReadOnlyFlowInner
+				key={detail.enrollment.id}
+				graph={detail.graph}
+				run={run}
+			/>
+		</ReactFlowProvider>
+	);
+};

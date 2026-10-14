@@ -38,7 +38,7 @@ import { getNodeIssue } from "../workflow-validation";
 import { useAutomationView } from "./automation-view-tabs";
 import { defaultEdgeOptions, edgeTypes, nodeTypes } from "./flow-types";
 import { LiveAutomationBanner } from "./live-automation-banner";
-import { MetricsView } from "./metrics/metrics-view";
+import { MetricsPanel } from "./metrics/metrics-view";
 import {
 	type MorphFrom,
 	NodeEditorProvider,
@@ -294,10 +294,12 @@ const WorkflowEditorInner = ({
 	// Re-center once real node sizes are measured and the layout has settled.
 	const nodesInitialized = useNodesInitialized();
 	const centeredForRef = useRef<string | null>(null);
-	// The canvas remounts when coming back from Runs or Metrics: center it again.
+	// Runs replaces the canvas, so it remounts on the way back: center it again.
+	// Metrics only narrows it: re-center in place.
 	useEffect(() => {
-		if (view !== "editor") centeredForRef.current = null;
-	}, [view]);
+		if (view === "runs") centeredForRef.current = null;
+		else if (centeredForRef.current) revealGraph();
+	}, [view, revealGraph]);
 	useEffect(() => {
 		if (!nodesInitialized || centeredForRef.current === workflow.id) return;
 		centeredForRef.current = workflow.id;
@@ -609,10 +611,9 @@ const WorkflowEditorInner = ({
 				/>
 				{view === "runs" ? (
 					<RunsView workflow={{ ...workflow, nodes, edges }} />
-				) : view === "metrics" ? (
-					<MetricsView workflow={{ ...workflow, nodes, edges }} />
 				) : (
 					<div className="relative flex min-h-0 flex-1 overflow-hidden">
+						{view === "metrics" ? <MetricsPanel workflow={workflow} /> : null}
 						<div ref={canvasRef} className="relative min-w-0 flex-1">
 							<ReactFlow
 								nodes={nodes}
