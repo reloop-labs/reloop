@@ -127,10 +127,78 @@ export function fallback(href: string): string {
 	});
 }
 
-export function footer(): string {
+/**
+ * Marketing emails (sequence, offers) pass `unsubscribe` for a link to the
+ * built-in `unsubscribe_url`, which the editor recognizes as its unsubscribe
+ * link.
+ */
+export function footer({ unsubscribe = false } = {}): string {
+	const unsubscribeLink = unsubscribe
+		? ` &nbsp;·&nbsp; <a href="{{{unsubscribe_url}}}" data-unsubscribe-link="true" target="_blank" style="color:${acme.muted};text-decoration:underline">Unsubscribe</a>`
+		: "";
 	return `<hr style="width:100%;border:none;border-top:1px solid ${acme.line};margin:0 0 28px 0" />
 <p style="margin:0 0 6px 0;font-size:13px;line-height:20px;color:${acme.muted};font-family:${font}">Sent by Acme</p>
-<p style="margin:0;font-size:13px;line-height:20px;color:${acme.muted};font-family:${font}">${acme.domain} &nbsp;·&nbsp; <a href="#" target="_blank" style="color:${acme.muted};text-decoration:underline">Privacy policy</a></p>`;
+<p style="margin:0;font-size:13px;line-height:20px;color:${acme.muted};font-family:${font}">${acme.domain} &nbsp;·&nbsp; <a href="#" target="_blank" style="color:${acme.muted};text-decoration:underline">Privacy policy</a>${unsubscribeLink}</p>`;
+}
+
+/** Small gray label above the heading, e.g. "Getting started · 2 of 4". */
+export function eyebrow(label: string): string {
+	return `<p style="margin:0 0 12px 0;font-size:13px;line-height:20px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:${acme.muted};font-family:${font}">${label}</p>`;
+}
+
+const mono =
+	"ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono',monospace";
+
+function escapeCode(line: string): string {
+	return line
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/ {2}/g, "&nbsp;&nbsp;");
+}
+
+/** Tinted monospace block for terminal commands and config snippets. */
+export function code(lines: string[], marginBottom = 28): string {
+	return block(
+		`<p style="margin:0;font-size:13px;line-height:22px;color:${acme.ink};font-family:${mono}">${lines.map(escapeCode).join("<br />")}</p>`,
+		`padding:16px 18px;background-color:${acme.tint};border-radius:8px`,
+		`margin:0 0 ${marginBottom}px 0`,
+	);
+}
+
+/**
+ * Offer panel: big amount, what it's off, a dashed coupon code, and when it
+ * ends. Pass `code` as HTML so a `{{{coupon_code}}}` variable span works.
+ */
+export function offer({
+	amount,
+	label,
+	code: couponCode,
+	expires,
+}: {
+	amount: string;
+	label: string;
+	code?: string;
+	expires?: string;
+}): string {
+	const coupon = couponCode
+		? `\n<table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:20px auto 0 auto">
+<tbody>
+<tr>
+<td style="padding:10px 18px;border:1px dashed ${acme.ink};border-radius:6px;background-color:#ffffff"><p style="margin:0;font-size:16px;line-height:22px;font-weight:600;letter-spacing:0.08em;color:${acme.ink};font-family:${mono}">${couponCode}</p></td>
+</tr>
+</tbody>
+</table>`
+		: "";
+	const expiry = expires
+		? `\n<p style="margin:16px 0 0 0;font-size:13px;line-height:20px;color:${acme.muted};text-align:center;font-family:${font}">${expires}</p>`
+		: "";
+	return block(
+		`<p style="margin:0;font-size:52px;line-height:56px;font-weight:600;letter-spacing:-0.03em;color:${acme.ink};text-align:center;font-family:${font}">${amount}</p>
+<p style="margin:6px 0 0 0;font-size:16px;line-height:24px;color:${acme.body};text-align:center;font-family:${font}">${label}</p>${coupon}${expiry}`,
+		`padding:32px 24px;background-color:${acme.tint};border-radius:12px`,
+		"margin:0 0 32px 0",
+	);
 }
 
 /** Page shell: preheader, warm gray page, and the flat white card. */

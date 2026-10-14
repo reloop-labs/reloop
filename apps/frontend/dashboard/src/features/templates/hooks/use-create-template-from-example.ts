@@ -63,10 +63,7 @@ export function useCreateTemplateFromExample() {
 			if (pendingId) return;
 			setPendingId(example.id);
 			try {
-				const template =
-					example.id === "blank"
-						? await createTemplate()
-						: await createTemplateFromExample(example);
+				const template = await createTemplateFromExample(example);
 				await invalidate();
 				router.push(`/templates/${template.id}`);
 			} catch (error) {
