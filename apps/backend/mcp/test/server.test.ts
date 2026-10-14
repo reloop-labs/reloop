@@ -109,6 +109,22 @@ describe("mcp server over streamable http", () => {
 			"send_mailbox_email",
 			"cancel_pending_mailbox_send",
 			"list_mailbox_sent_messages",
+			"list_events",
+			"get_event",
+			"create_event",
+			"update_event",
+			"delete_event",
+			"track_event",
+			"list_automations",
+			"get_automation",
+			"create_automation",
+			"update_automation",
+			"activate_automation",
+			"pause_automation",
+			"delete_automation",
+			"enroll_contact",
+			"list_enrollments",
+			"get_enrollment",
 		]);
 		for (const tool of listed.tools) {
 			expect(tool.inputSchema).toBeDefined();

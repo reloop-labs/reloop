@@ -1,4 +1,5 @@
 import { ApiKeysApi } from "./api-keys";
+import { AutomationsApi } from "./automations";
 import { BimiApi } from "./bimi";
 import { ChannelsApi } from "./channels";
 import { ReloopClient, type ReloopClientOptions } from "./client";
@@ -14,6 +15,7 @@ import { PropertiesApi } from "./properties";
 import { SmtpProvidersApi } from "./smtp-providers";
 import { TempEmailApi } from "./temp-email";
 import { TemplatesApi } from "./templates";
+import { WorkflowEventsApi } from "./workflow-events";
 
 export type ReloopApi = {
 	contacts: ContactsApi;
@@ -31,6 +33,8 @@ export type ReloopApi = {
 	domainAge: DomainAgeApi;
 	bimi: BimiApi;
 	inbox: InboxApi;
+	automations: AutomationsApi;
+	workflowEvents: WorkflowEventsApi;
 };
 
 export function createReloopApi(options: ReloopClientOptions): ReloopApi {
@@ -51,5 +55,7 @@ export function createReloopApi(options: ReloopClientOptions): ReloopApi {
 		domainAge: new DomainAgeApi(client),
 		bimi: new BimiApi(client),
 		inbox: new InboxApi(client),
+		automations: new AutomationsApi(client),
+		workflowEvents: new WorkflowEventsApi(client),
 	};
 }

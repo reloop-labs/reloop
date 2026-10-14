@@ -6,6 +6,16 @@ import { getApiKey } from "./api-keys/get";
 import { listApiKeys } from "./api-keys/list";
 import { rotateApiKey } from "./api-keys/rotate";
 import { updateApiKey } from "./api-keys/update";
+import { activateAutomation } from "./automations/activate";
+import { createAutomation } from "./automations/create";
+import { deleteAutomation } from "./automations/delete";
+import { enrollContact } from "./automations/enroll";
+import { getAutomation } from "./automations/get";
+import { getEnrollment } from "./automations/get-enrollment";
+import { listAutomations } from "./automations/list";
+import { listEnrollments } from "./automations/list-enrollments";
+import { pauseAutomation } from "./automations/pause";
+import { updateAutomation } from "./automations/update";
 import { checkBimi } from "./bimi/check";
 import { createChannel } from "./channels/create";
 import { deleteChannel } from "./channels/delete";
@@ -32,6 +42,12 @@ import { listEmails } from "./email/list";
 import { resendEmail } from "./email/resend";
 import { sendEmail } from "./email/send";
 import { getEmailStats } from "./email/stats";
+import { createEvent } from "./events/create";
+import { deleteEvent } from "./events/delete";
+import { getEvent } from "./events/get";
+import { listEvents } from "./events/list";
+import { trackEvent } from "./events/track";
+import { updateEvent } from "./events/update";
 import { addContactToGroup } from "./groups/add-contact";
 import { createGroup } from "./groups/create";
 import { deleteGroup } from "./groups/delete";
@@ -145,4 +161,20 @@ export const tools: readonly AnyToolDefinition[] = [
 	sendMailboxEmail,
 	cancelPendingMailboxSend,
 	listMailboxSentMessages,
+	listEvents,
+	getEvent,
+	createEvent,
+	updateEvent,
+	deleteEvent,
+	trackEvent,
+	listAutomations,
+	getAutomation,
+	createAutomation,
+	updateAutomation,
+	activateAutomation,
+	pauseAutomation,
+	deleteAutomation,
+	enrollContact,
+	listEnrollments,
+	getEnrollment,
 ];

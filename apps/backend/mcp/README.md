@@ -139,7 +139,7 @@ resource metadata. Keys and tokens never appear in logs or tool output, except t
 
 ### `get_reloop_status`
 
-Check that Reloop is connected and introduce what it can do. Reloop is open-source email infrastructure: a transactional email API, SMTP relay, inbox mailboxes for received email, contacts, templates and deliverability tools. Call this first when the user asks whether Reloop is connected or working, what Reloop is, or what you can do with Reloop. It makes one authenticated read, so a successful result proves the credentials work, and it reports how many sending domains are ready.
+Check that Reloop is connected and introduce what it can do. Reloop is open-source email infrastructure: a transactional email API, SMTP relay, inbox mailboxes for received email, contacts, templates, automations and deliverability tools. Call this first when the user asks whether Reloop is connected or working, what Reloop is, or what you can do with Reloop. It makes one authenticated read, so a successful result proves the credentials work, and it reports how many sending domains are ready.
 
 Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
 
@@ -1141,6 +1141,226 @@ Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
 | `search` | string | no |  |
 
 Returns: `messages`
+
+### `list_events`
+
+List the organization's custom events (shown as Triggers in the dashboard) with their keys and properties. A custom event is something the app reports, such as a sign-up or an order, that starts automations. These are not webhook events. Use this to find the key for an automation's trigger step or for track_event.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Events per page, 1 to 100 |
+
+Returns: `events`, `pagination`
+
+### `get_event`
+
+Get one custom event by its ID or its key (for example user.signed_up), with the properties it accepts.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `idOrKey` | string | yes | Event ID (evt_...) or key (user.signed_up) |
+
+Returns: `event`
+
+### `create_event`
+
+Create a custom event that the app can track to start automations, with the properties it carries (for example a plan on a sign-up). The key is made from the name when left out and always starts with trigger.; use the returned `key` in an automation's trigger step. Fails with `event_already_exists` when the key is taken; check list_events first.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Display name, for example User signed up |
+| `key` | string | no | Event key, for example user.signed_up. Keys are stored as trigger.<key>; the trigger. prefix is optional. |
+| `description` | string | no |  |
+| `properties` | array of object | no |  |
+
+Returns: `event`
+
+### `update_event`
+
+Rename a custom event, change its description, or replace its properties. `properties` replaces the whole list: read the current ones with get_event and pass the full updated list. The key cannot change.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Event ID as returned by Reloop, for example evt_123456789 |
+| `name` | string | no |  |
+| `description` | string or null | no | New description, or null to clear it |
+| `properties` | array of object | no | Replaces every property |
+
+Returns: `event`
+
+### `delete_event`
+
+Delete a custom event by ID. Tracking it fails from then on, and automations it triggers can no longer be activated. Use get_event to confirm the right event, and confirm with the user before calling.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Event ID as returned by Reloop, for example evt_123456789 |
+
+Returns: `deleted`, `id`
+
+### `track_event`
+
+Report that a custom event happened to a contact, which starts every active automation it triggers for them and can send real email right away; confirm with the user first. Pass contactId, or email to create the contact if needed. Required properties must be included (see get_event). The result's `enrollments` is how many automations started; 0 usually means none are active for this event or the contact already went through them.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `event` | string | yes | Event key, for example user.signed_up. Keys are stored as trigger.<key>; the trigger. prefix is optional. |
+| `contactId` | string | no | Contact ID, for example con_123456789. Pass this or email. |
+| `email` | string | no | Contact email. Creates the contact if it does not exist yet. |
+| `firstName` | string | no | Used only when the contact is created from email |
+| `lastName` | string | no | Used only when the contact is created from email |
+| `properties` | object | no | Values for the event's properties, for example { plan: 'pro' } |
+
+Returns: `eventKey`, `contactId`, `contactCreated`, `enrollments`, `properties`
+
+### `list_automations`
+
+List the organization's automations, most recently updated first, with their status, trigger event, steps and connections. An automation sends emails to a contact when the app tracks its trigger event (a custom event such as trigger.user.signed_up). Use this to find an automation ID before get_automation, update_automation or list_enrollments.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Automations per page, 1 to 100 |
+
+Returns: `automations`, `pagination`
+
+### `get_automation`
+
+Get one automation by ID with its status, trigger event, steps and connections. Steps are trigger, send_email (a template), delay and condition (a yes/no branch).
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Automation ID as returned by Reloop, for example auto_123456789 |
+
+Returns: `automation`
+
+### `create_automation`
+
+Create an automation as a draft from steps and the connections between them. It does not run until activate_automation is called. Build it as: one trigger step whose eventName is a custom event key (find or create one with list_events / create_event), then send_email steps (template IDs from list_templates), delay steps and condition steps. Connect steps by key; a condition needs one condition_met and one condition_not_met connection. When the steps are invalid the error's `why` lists every problem at once.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Automation name |
+| `description` | string | no |  |
+| `steps` | array of object | yes | The steps, with exactly one trigger. Each step has a unique key; link them with connections. |
+| `connections` | array of object | no | How the steps link together, by step key |
+
+Returns: `automation`
+
+### `update_automation`
+
+Rename an automation, change its description, or replace its steps and connections. `steps` replaces every step, so read the current ones with get_automation and pass the full updated list with its connections. Changing the steps of an active automation saves them as a draft: call activate_automation afterwards to publish them. To start or stop it, use activate_automation or pause_automation.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Automation ID as returned by Reloop, for example auto_123456789 |
+| `name` | string | no |  |
+| `description` | string or null | no | New description, or null to clear it |
+| `steps` | array of object | no | The steps, with exactly one trigger. Each step has a unique key; link them with connections. Replaces every step. |
+| `connections` | array of object | no | Replaces every connection; pass it together with steps |
+
+Returns: `automation`
+
+### `activate_automation`
+
+Publish an automation's current steps and start running it: from now on, every time its trigger event is tracked for a contact, that contact gets its emails. This makes the automation send real email; confirm with the user first. Also call this after editing an active automation to publish the changes. Contacts already enrolled finish on the version they started with. Fails with `invalid_automation` when the steps are incomplete or the trigger event does not exist.
+
+Read-only: no · Destructive: no · Idempotent: yes · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Automation ID as returned by Reloop, for example auto_123456789 |
+
+Returns: `automation`
+
+### `pause_automation`
+
+Stop an automation from starting for new events. Contacts already in it are cancelled when their next step comes due, and activating it again does not resume them. Confirm with the user first when list_enrollments shows active enrollments.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Automation ID as returned by Reloop, for example auto_123456789 |
+
+Returns: `automation`
+
+### `delete_automation`
+
+Delete an automation by ID. It stops running and contacts in progress are cancelled. This cannot be undone; prefer pause_automation when it may be needed again. Use get_automation to confirm the right automation, and confirm with the user before calling.
+
+Read-only: no · Destructive: yes · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `id` | string | yes | Automation ID as returned by Reloop, for example auto_123456789 |
+
+Returns: `deleted`, `id`
+
+### `enroll_contact`
+
+Start an active automation for one contact without tracking its event, for example to backfill an existing user. Its first emails can go out right away, so confirm with the user first. A contact is enrolled in each automation once: fails with `already_enrolled` when they already went through it, and with `cannot_enroll` when the automation is not active or the contact is unsubscribed.
+
+Read-only: no · Destructive: no · Idempotent: no · Open world: yes
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `automationId` | string | yes | Automation ID as returned by Reloop, for example auto_123456789 |
+| `contactId` | string | no | Contact ID, for example con_123456789. Pass this or email. |
+| `email` | string | no | Contact email. Creates the contact if it does not exist yet. |
+| `firstName` | string | no | Used only when the contact is created from email |
+| `lastName` | string | no | Used only when the contact is created from email |
+
+Returns: `enrollment`, `contactCreated`, `firstStepInSeconds`
+
+### `list_enrollments`
+
+List the contacts that went through an automation, newest first, with where each one is (`currentStep`) and whether it is active, completed, cancelled or failed. Use get_enrollment to see what happened at each step, for example to find out why someone did not get an email.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `automationId` | string | yes | Automation ID as returned by Reloop, for example auto_123456789 |
+| `status` | active \| completed \| cancelled \| failed | no | Only enrollments with this status |
+| `page` | integer | no | 1-based page number |
+| `limit` | integer | no | Enrollments per page, 1 to 100 |
+
+Returns: `enrollments`, `pagination`
+
+### `get_enrollment`
+
+Get one contact's run through an automation with what happened at each step: when it ran, whether it completed, was skipped or failed (with the reason in `error`), and the email a send_email step sent (look it up with get_email). Use this to explain why a contact did or did not get an email.
+
+Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
+
+| Input | Type | Required | Description |
+|---|---|---|---|
+| `automationId` | string | yes | Automation ID as returned by Reloop, for example auto_123456789 |
+| `enrollmentId` | string | yes | Enrollment ID as returned by Reloop, for example enr_123456789 |
+
+Returns: `enrollment`, `steps`
 
 ## Errors
 

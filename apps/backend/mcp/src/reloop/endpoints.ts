@@ -124,3 +124,25 @@ export const inboxEndpoints = {
 	threadAction: (id: string, action: "archive" | "trash" | "restore") =>
 		`${INBOX}/threads/${encodeURIComponent(id)}/${action}`,
 } as const;
+
+const AUTOMATIONS = "/api/workflow/v1/automations";
+
+export const automationEndpoints = {
+	collection: AUTOMATIONS,
+	byId: (id: string) => `${AUTOMATIONS}/${encodeURIComponent(id)}`,
+	action: (id: string, action: "activate" | "pause" | "enroll") =>
+		`${AUTOMATIONS}/${encodeURIComponent(id)}/${action}`,
+	enrollments: (id: string) =>
+		`${AUTOMATIONS}/${encodeURIComponent(id)}/enrollments`,
+	enrollment: (id: string, enrollmentId: string) =>
+		`${AUTOMATIONS}/${encodeURIComponent(id)}/enrollments/${encodeURIComponent(enrollmentId)}`,
+} as const;
+
+const WORKFLOW_EVENTS = "/api/workflow/v1/events";
+
+export const workflowEventEndpoints = {
+	collection: WORKFLOW_EVENTS,
+	track: `${WORKFLOW_EVENTS}/track`,
+	byId: (idOrKey: string) =>
+		`${WORKFLOW_EVENTS}/${encodeURIComponent(idOrKey)}`,
+} as const;

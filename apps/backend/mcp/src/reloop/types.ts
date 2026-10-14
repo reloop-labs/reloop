@@ -934,3 +934,189 @@ export type InboxSendResponse =
 			sendAt: string;
 			messageId: string;
 	  };
+
+export type AutomationStatus = "draft" | "active" | "paused";
+
+export type AutomationStep = {
+	key: string;
+	type: string;
+	config: Record<string, unknown>;
+};
+
+export type AutomationConnection = {
+	from: string;
+	to: string;
+	type: "default" | "condition_met" | "condition_not_met";
+};
+
+export type Automation = {
+	id: string;
+	organizationId: string;
+	name: string;
+	description: string | null;
+	status: AutomationStatus;
+	triggerEvent: string | null;
+	steps: AutomationStep[];
+	connections: AutomationConnection[];
+	activeVersionId: string | null;
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type AutomationListResponse = {
+	automations: Automation[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
+export type CreateAutomationBody = {
+	name: string;
+	description?: string;
+	status?: "draft" | "active";
+	steps?: AutomationStep[];
+	connections?: Partial<AutomationConnection>[];
+};
+
+export type UpdateAutomationBody = {
+	name?: string;
+	description?: string | null;
+	steps?: AutomationStep[];
+	connections?: Partial<AutomationConnection>[];
+	status?: "active" | "paused";
+};
+
+export type EnrollmentStatus = "active" | "completed" | "cancelled" | "failed";
+
+export type Enrollment = {
+	id: string;
+	automationId: string;
+	contactId: string;
+	contactEmail: string | null;
+	contactFirstName: string | null;
+	contactLastName: string | null;
+	status: EnrollmentStatus;
+	currentNodeId: string | null;
+	enrolledAt: string;
+	completedAt: string | null;
+	cancelledAt: string | null;
+};
+
+export type EnrollContactBody = {
+	contactId?: string;
+	email?: string;
+	firstName?: string;
+	lastName?: string;
+};
+
+export type EnrollContactResponse = {
+	enrollment: Enrollment;
+	contactCreated: boolean;
+	delayMs: number;
+};
+
+export type ListEnrollmentsQuery = {
+	page?: number;
+	limit?: number;
+	status?: EnrollmentStatus;
+};
+
+export type EnrollmentListResponse = {
+	enrollments: Enrollment[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
+export type StepRun = {
+	id: string;
+	nodeId: string;
+	nodeType: string;
+	status: "pending" | "running" | "completed" | "skipped" | "failed";
+	scheduledFor: string;
+	startedAt: string | null;
+	finishedAt: string | null;
+	emailLogId: string | null;
+	error: string | null;
+};
+
+export type EnrollmentDetail = {
+	enrollment: Enrollment;
+	steps: StepRun[];
+};
+
+export type WorkflowEventPropertyType = "string" | "number" | "boolean";
+
+export type WorkflowEventProperty = {
+	id: string;
+	name: string;
+	propertyType: WorkflowEventPropertyType;
+	required: boolean;
+	defaultValue: string | null;
+	description: string | null;
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type WorkflowEvent = {
+	id: string;
+	organizationId: string;
+	name: string;
+	key: string;
+	description: string | null;
+	properties: WorkflowEventProperty[];
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type WorkflowEventListResponse = {
+	events: WorkflowEvent[];
+	total: number;
+	page: number;
+	limit: number;
+};
+
+export type WorkflowEventPropertyInput = {
+	name: string;
+	propertyType?: WorkflowEventPropertyType;
+	required?: boolean;
+	defaultValue?: string | null;
+	description?: string | null;
+};
+
+export type CreateWorkflowEventBody = {
+	name: string;
+	key?: string;
+	description?: string;
+	properties?: WorkflowEventPropertyInput[];
+};
+
+export type UpdateWorkflowEventBody = {
+	name?: string;
+	description?: string | null;
+	properties?: WorkflowEventPropertyInput[];
+};
+
+export type TrackWorkflowEventBody = {
+	event: string;
+	contactId?: string;
+	email?: string;
+	firstName?: string;
+	lastName?: string;
+	properties?: Record<string, unknown>;
+};
+
+export type TrackWorkflowEventResponse = {
+	success: boolean;
+	eventId: string;
+	eventKey: string;
+	contactId: string;
+	contactCreated: boolean;
+	enrollments: number;
+	properties: Record<string, unknown>;
+};
+
+export type WorkflowDeleteResponse = {
+	success: boolean;
+	id: string;
+};

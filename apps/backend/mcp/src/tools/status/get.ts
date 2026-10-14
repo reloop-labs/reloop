@@ -8,6 +8,7 @@ const CAPABILITIES = [
 	"Manage sending domains and their DNS records (list_domains, create_domain, verify_domain)",
 	"Manage contacts, groups, channels and custom properties",
 	"Create email templates and send test emails",
+	"Build automations that email contacts when the app tracks an event, with delays and conditions, and see who went through them (create_automation, track_event, list_enrollments)",
 	"Manage API keys and bring-your-own SMTP providers",
 	"Check deliverability: domain reputation, domain age, BIMI and disposable addresses",
 ];
@@ -16,7 +17,7 @@ export const getReloopStatus = defineTool({
 	name: "get_reloop_status",
 	title: "Check Reloop connection",
 	description:
-		"Check that Reloop is connected and introduce what it can do. Reloop is open-source email infrastructure: a transactional email API, SMTP relay, inbox mailboxes for received email, contacts, templates and deliverability tools. Call this first when the user asks whether Reloop is connected or working, what Reloop is, or what you can do with Reloop. It makes one authenticated read, so a successful result proves the credentials work, and it reports how many sending domains are ready.",
+		"Check that Reloop is connected and introduce what it can do. Reloop is open-source email infrastructure: a transactional email API, SMTP relay, inbox mailboxes for received email, contacts, templates, automations and deliverability tools. Call this first when the user asks whether Reloop is connected or working, what Reloop is, or what you can do with Reloop. It makes one authenticated read, so a successful result proves the credentials work, and it reports how many sending domains are ready.",
 	annotations: {
 		readOnlyHint: true,
 		destructiveHint: false,
