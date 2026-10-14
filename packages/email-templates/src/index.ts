@@ -54,6 +54,28 @@ import { blankHtml } from "./blank";
 import type { TemplateCategoryId } from "./categories";
 import { eventTicketHtml } from "./event-ticket";
 import { fileDeliveryHtml } from "./file-delivery";
+import { accountTemplates } from "./library/account";
+import { authTemplates } from "./library/auth";
+import { billingTemplates } from "./library/billing";
+import { bookingsTemplates } from "./library/bookings";
+import { cartRecoveryTemplates } from "./library/cart-recovery";
+import { dataTemplates } from "./library/data";
+import { developerTemplates } from "./library/developer";
+import { eventsTemplates } from "./library/events";
+import { legalTemplates } from "./library/legal";
+import { newslettersTemplates } from "./library/newsletters";
+import { notificationsTemplates } from "./library/notifications";
+import { offersTemplates } from "./library/offers";
+import { onboardingTemplates } from "./library/onboarding";
+import { ordersTemplates } from "./library/orders";
+import { receiptsTemplates } from "./library/receipts";
+import { reviewsTemplates } from "./library/reviews";
+import { statusTemplates } from "./library/status";
+import { supportTemplates } from "./library/support";
+import { surveysTemplates } from "./library/surveys";
+import { teamTemplates } from "./library/team";
+import { usageTemplates } from "./library/usage";
+import { winBackTemplates } from "./library/win-back";
 import { orderShippedHtml } from "./order-shipped";
 import { paymentFailedHtml } from "./payment-failed";
 import { refundConfirmationHtml } from "./refund-confirmation";
@@ -787,13 +809,30 @@ export const galleryTemplateExamples: EmailTemplateExample[] = [
 	...emailTemplateExamples,
 ];
 
-/** Every template that opens at /tools/email-html-editor/[id]. */
-export const editorTemplateExamples: EmailTemplateExample[] = [
-	blankTemplateExample,
-	...emailTemplateExamples,
-	...acmeTemplateExamples,
-	...acmeWelcomeSequenceExamples,
-	...acmeOfferExamples,
+/** The Acme library, one file per Explore folder under `library/`. */
+export const libraryTemplateExamples: EmailTemplateExample[] = [
+	...accountTemplates,
+	...authTemplates,
+	...billingTemplates,
+	...bookingsTemplates,
+	...cartRecoveryTemplates,
+	...dataTemplates,
+	...developerTemplates,
+	...eventsTemplates,
+	...legalTemplates,
+	...newslettersTemplates,
+	...notificationsTemplates,
+	...offersTemplates,
+	...onboardingTemplates,
+	...ordersTemplates,
+	...receiptsTemplates,
+	...reviewsTemplates,
+	...statusTemplates,
+	...supportTemplates,
+	...surveysTemplates,
+	...teamTemplates,
+	...usageTemplates,
+	...winBackTemplates,
 ];
 
 /** Every designed template (no blank canvas), filed into Explore folders. */
@@ -802,6 +841,13 @@ export const categorizedTemplateExamples: EmailTemplateExample[] = [
 	...acmeTemplateExamples,
 	...acmeWelcomeSequenceExamples,
 	...acmeOfferExamples,
+	...libraryTemplateExamples,
+];
+
+/** Every template that opens at /tools/email-html-editor/[id]. */
+export const editorTemplateExamples: EmailTemplateExample[] = [
+	blankTemplateExample,
+	...categorizedTemplateExamples,
 ];
 
 export function getEmailTemplateExample(

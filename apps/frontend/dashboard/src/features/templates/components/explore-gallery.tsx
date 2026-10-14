@@ -1,7 +1,4 @@
 import {
-	acmeOfferExamples,
-	acmeTemplateExamples,
-	acmeWelcomeSequenceExamples,
 	categorizedTemplateExamples,
 	type EmailTemplateExample,
 	type TemplateCategory,
@@ -175,17 +172,9 @@ function ExampleCard({
 	);
 }
 
-/** The Acme family drops its gray page so only the white card shows. */
-const cardOnlyIds = new Set(
-	[
-		...acmeTemplateExamples,
-		...acmeWelcomeSequenceExamples,
-		...acmeOfferExamples,
-	].map((template) => template.id),
-);
-
+/** The Acme family (`acme-` ids) drops its gray page so only the white card shows. */
 function previewCssFor(template: EmailTemplateExample) {
-	return cardOnlyIds.has(template.id) ? CARD_ONLY_PREVIEW_CSS : undefined;
+	return template.id.startsWith("acme-") ? CARD_ONLY_PREVIEW_CSS : undefined;
 }
 
 type Folder = TemplateCategory & { templates: EmailTemplateExample[] };
