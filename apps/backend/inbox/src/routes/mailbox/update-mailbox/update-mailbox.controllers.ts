@@ -1,3 +1,4 @@
+import { assertCanActivateInbox } from "@reloop/be-inbox/lib/inbox-quota";
 import { db } from "@reloop/db/client";
 import { mailbox } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -39,7 +40,13 @@ export async function updateMailboxController(
 		return { success: true, id, message: "No changes" };
 	}
 
-	await db.update(mailbox).set(updateData).where(eq(mailbox.id, id));
+	await db.transaction(async (tx) => {
+		// Re-enabling (incl. a plan-suspended inbox) must fit the plan cap
+		if (updates.status === "active" && mbx.status !== "active") {
+			await assertCanActivateInbox(organizationId, id, tx);
+		}
+		await tx.update(mailbox).set(updateData).where(eq(mailbox.id, id));
+	});
 
 	log.info(`[MAILBOX] Updated mailbox ${id}: ${JSON.stringify(updateData)}`);
 	return { success: true, id, ...updateData };

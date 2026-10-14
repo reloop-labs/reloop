@@ -2,7 +2,7 @@ import { InboxErrors } from "@reloop/be-inbox/lib/errors";
 import { type DatabaseInstance, db } from "@reloop/db/client";
 import { mailbox, organizationPlan } from "@reloop/db/schema";
 import { isSelfHosted } from "@reloop/db/self-hosted";
-import { count, eq, sql } from "drizzle-orm";
+import { and, count, eq, ne, sql } from "drizzle-orm";
 
 const DEFAULT_MAX_AGENT_INBOXES = 1;
 
@@ -22,6 +22,48 @@ export function decideInboxSlot(args: {
 		return { ok: false, used: args.used, limit: args.limit };
 	}
 	return { ok: true };
+}
+
+/**
+ * Lock the org and throw if turning one more mailbox `active` would exceed
+ * the plan cap (e.g. re-enabling an inbox suspended after a downgrade).
+ * Must run in the same transaction as the status update.
+ */
+export async function assertCanActivateInbox(
+	organizationId: string,
+	mailboxId: string,
+	tx: DatabaseInstance = db,
+): Promise<void> {
+	if (isSelfHosted()) return;
+
+	await tx.execute(
+		sql`select pg_advisory_xact_lock(hashtext(${`${organizationId}:inbox`}))`,
+	);
+
+	const plan = await tx.query.organizationPlan.findFirst({
+		where: eq(organizationPlan.organizationId, organizationId),
+		columns: { maxAgentInboxes: true },
+	});
+	const limit = plan?.maxAgentInboxes ?? DEFAULT_MAX_AGENT_INBOXES;
+
+	const [row] = await tx
+		.select({ total: count() })
+		.from(mailbox)
+		.where(
+			and(
+				eq(mailbox.organizationId, organizationId),
+				eq(mailbox.status, "active"),
+				ne(mailbox.id, mailboxId),
+			),
+		);
+
+	const decision = decideInboxSlot({ used: Number(row?.total ?? 0), limit });
+	if (!decision.ok) {
+		throw InboxErrors.inboxLimitReached({
+			used: decision.used,
+			limit: decision.limit,
+		});
+	}
 }
 
 /**

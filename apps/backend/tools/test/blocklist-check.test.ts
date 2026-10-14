@@ -89,6 +89,26 @@ describe("evaluateListingStatus", () => {
 		expect(result.status).toBe("error");
 		expect(result.validCodes).toEqual([]);
 	});
+
+	it("treats a list-specific refused code (URIBL/SURBL 127.0.0.1) as an error, not clean", () => {
+		const result = evaluateListingStatus(["127.0.0.1"], ["127.0.0.1"]);
+		expect(result.status).toBe("error");
+		expect(result.error).toContain("refused");
+	});
+
+	it("still reports real listings on lists with refused codes", () => {
+		expect(evaluateListingStatus(["127.0.0.14"], ["127.0.0.1"])).toEqual({
+			status: "listed",
+			validCodes: ["127.0.0.14"],
+		});
+	});
+
+	it("marks URIBL and SURBL with their 127.0.0.1 refusal code", () => {
+		for (const id of ["uribl-multi", "surbl-multi"]) {
+			const provider = DOMAIN_DNSBL_PROVIDERS.find((p) => p.id === id);
+			expect(provider?.refusedCodes).toEqual(["127.0.0.1"]);
+		}
+	});
 });
 
 describe("aggregateVerdict", () => {

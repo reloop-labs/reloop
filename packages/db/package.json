@@ -7,6 +7,8 @@
 		"./schema": "./src/schema/index.ts",
 		"./index": "./src/index.ts",
 		"./reserve-send-credits": "./src/reserve-send-credits.ts",
+		"./billing-period": "./src/billing-period.ts",
+		"./inbox-plan-cap": "./src/inbox-plan-cap.ts",
 		"./self-hosted": "./src/self-hosted.ts",
 		"./domain-age-cap": "./src/domain-age-cap.ts",
 		"./smtp-recipients": "./src/smtp-recipients.ts",

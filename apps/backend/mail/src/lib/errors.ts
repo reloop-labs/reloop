@@ -268,6 +268,13 @@ export const MailErrors = {
 			why: `This send needs ${required} credit${required === 1 ? "" : "s"}, but only ${remaining} remain of ${monthlyCredits} this period`,
 			fix: "Upgrade your plan, wait for the monthly reset, or reduce recipients for this send",
 		}),
+	paymentOverdue: () =>
+		createError({
+			status: 402,
+			message: "Payment overdue",
+			why: "Your subscription payment failed and the grace period has ended, so sending is paused",
+			fix: "Update your payment method in Billing; sending resumes as soon as the payment succeeds",
+		}),
 	dailyQuotaExceeded: ({
 		used,
 		limit,

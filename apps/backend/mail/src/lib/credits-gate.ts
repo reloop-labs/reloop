@@ -15,6 +15,9 @@ function throwQuotaError(
 	if (decision.ok) {
 		throw new Error("throwQuotaError called on an accepted reservation");
 	}
+	if (decision.reason === "payment") {
+		throw MailErrors.paymentOverdue();
+	}
 	if (decision.reason === "daily" && decision.dailyLimit != null) {
 		throw MailErrors.dailyQuotaExceeded({
 			used: decision.dailyUsed,

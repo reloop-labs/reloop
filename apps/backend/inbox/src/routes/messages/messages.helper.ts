@@ -61,6 +61,22 @@ export async function proxySendToMailService(
 		});
 	}
 
+	if (mbx.status !== "active") {
+		throw createError({
+			status: 403,
+			message:
+				mbx.status === "suspended" ? "Inbox suspended" : "Inbox disabled",
+			why:
+				mbx.status === "suspended"
+					? `Mailbox ${mbx.email} is over your plan's inbox limit and was suspended`
+					: `Mailbox ${mbx.email} is disabled`,
+			fix:
+				mbx.status === "suspended"
+					? "Upgrade your plan or remove another inbox to re-enable it"
+					: "Enable the inbox before sending from it",
+		});
+	}
+
 	const fromAddress = mbx.displayName
 		? `${mbx.displayName} <${mbx.email}>`
 		: mbx.email;

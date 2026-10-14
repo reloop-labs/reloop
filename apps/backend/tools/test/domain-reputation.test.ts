@@ -57,6 +57,24 @@ describe("Domain Reputation Service", () => {
 		it("throws an error for invalid domains", async () => {
 			expect(checkDomainReputation("not-a-domain")).rejects.toThrow();
 		});
+
+		it("grades a Spamhaus DBL listing as F regardless of DNS hygiene", async () => {
+			// dbltest.com is Spamhaus' permanent DBL test point
+			const report = await checkDomainReputation("dbltest.com");
+			expect(report.details.blocklist.listedCount).toBeGreaterThanOrEqual(1);
+			expect(report.breakdown.blocklist.status).toBe("fail");
+			expect(report.grade).toBe("F");
+			expect(report.verdictLabel).toContain("Spamhaus DBL");
+		}, 15000);
+
+		it("does not count a null MX (RFC 7505) as a mail server", async () => {
+			// example.com publishes "MX 0 ." and accepts no email
+			const report = await checkDomainReputation("example.com");
+			const mx = report.checks.find((c) => c.id === "dns_mx");
+			expect(report.details.dnsHealth.mxRecords).toEqual([]);
+			expect(mx?.status).toBe("info");
+			expect(report.verdictLabel).toContain("null MX");
+		}, 15000);
 	});
 
 	describe("checkDomainReputationController", () => {

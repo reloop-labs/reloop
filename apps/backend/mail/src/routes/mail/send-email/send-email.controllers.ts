@@ -327,8 +327,8 @@ export async function sendEmailController({
 			registeredAt: currentDomain.registeredAt,
 			dailyCapOverride:
 				"dailyCapOverride" in currentDomain
-					? (currentDomain as { dailyCapOverride?: number | null })
-							.dailyCapOverride ?? null
+					? ((currentDomain as { dailyCapOverride?: number | null })
+							.dailyCapOverride ?? null)
 					: null,
 		},
 		recipientCount,
@@ -373,9 +373,11 @@ export async function sendEmailController({
 		// Lost the concurrent same-key race: the winner already sent.
 		// Reservation is refunded below (nothing injected), then return
 		// the winner's response instead of surfacing an error.
+		let refunded = false;
 		if (error instanceof IdempotentReplayError) {
 			if (!injected) {
 				await refundCreditsForFailedSend(reservation);
+				refunded = true;
 			}
 			const replay =
 				idempotencyKey &&
@@ -393,7 +395,8 @@ export async function sendEmailController({
 			}
 		}
 		if (!injected) {
-			await refundCreditsForFailedSend(reservation);
+			// Already refunded in the replay branch when the winner wasn't found
+			if (!refunded) await refundCreditsForFailedSend(reservation);
 		} else {
 			log.error({
 				message:
