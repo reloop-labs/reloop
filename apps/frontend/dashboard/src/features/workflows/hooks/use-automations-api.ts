@@ -148,6 +148,8 @@ export type AutomationEnrollment = {
 	enrolledAt: string;
 	completedAt: string | null;
 	cancelledAt: string | null;
+	/** When it completed, was cancelled or failed. */
+	endedAt: string | null;
 };
 
 export type EnrollContactResponse = {
@@ -186,11 +188,100 @@ export async function enrollContact(
 
 export async function listEnrollments(
 	automationId: string,
-	limit = 50,
+	options: {
+		limit?: number;
+		page?: number;
+		status?: EnrollmentStatus;
+		/** Only runs that started at or after this time. */
+		since?: Date;
+	} = {},
 ): Promise<EnrollmentListResponse> {
+	const params = new URLSearchParams({
+		limit: String(options.limit ?? 50),
+		page: String(options.page ?? 1),
+	});
+	if (options.status) params.set("status", options.status);
+	if (options.since) params.set("since", options.since.toISOString());
 	const res = await fetch(
-		`/api/workflow/v1/automations/${automationId}/enrollments?limit=${limit}`,
+		`/api/workflow/v1/automations/${automationId}/enrollments?${params}`,
 		{ credentials: "include" },
 	);
 	return parseJson<EnrollmentListResponse>(res);
+}
+
+export type StepRunStatus =
+	| "pending"
+	| "running"
+	| "completed"
+	| "skipped"
+	| "failed";
+
+export type StepRun = {
+	id: string;
+	nodeId: string;
+	nodeType: string;
+	status: StepRunStatus;
+	scheduledFor: string;
+	startedAt: string | null;
+	finishedAt: string | null;
+	emailLogId: string | null;
+	error: string | null;
+};
+
+export type EnrollmentDetail = {
+	enrollment: AutomationEnrollment;
+	/** The event that started it; `eventKey` is null when enrolled directly. */
+	trigger: { eventKey: string | null; properties: Record<string, unknown> };
+	/** The published version of the steps this run follows. */
+	graph: { nodes: WorkflowNode[]; edges: WorkflowEdge[] };
+	steps: StepRun[];
+};
+
+export async function getEnrollment(
+	automationId: string,
+	enrollmentId: string,
+): Promise<EnrollmentDetail> {
+	const res = await fetch(
+		`/api/workflow/v1/automations/${automationId}/enrollments/${enrollmentId}`,
+		{ credentials: "include" },
+	);
+	return parseJson<EnrollmentDetail>(res);
+}
+
+type RunCounts = {
+	total: number;
+	active: number;
+	completed: number;
+	cancelled: number;
+	failed: number;
+};
+
+export type EmailCounts = {
+	sent: number;
+	delivered: number;
+	opened: number;
+	clicked: number;
+	bounced: number;
+};
+
+export type AutomationMetrics = {
+	runs: RunCounts & { averageDurationMs: number | null };
+	emails: EmailCounts;
+	steps: (Record<StepRunStatus, number> & {
+		nodeId: string;
+		nodeType: string;
+		emails: EmailCounts;
+	})[];
+	daily: (RunCounts & { date: string })[];
+};
+
+export async function getAutomationMetrics(
+	automationId: string,
+	days: number,
+): Promise<AutomationMetrics> {
+	const res = await fetch(
+		`/api/workflow/v1/automations/${automationId}/metrics?days=${days}`,
+		{ credentials: "include" },
+	);
+	return parseJson<AutomationMetrics>(res);
 }

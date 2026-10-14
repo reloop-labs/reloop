@@ -158,8 +158,12 @@ export const queryKeys = {
 		detail: (id: string) => [...queryKeys.workflows.all, "detail", id] as const,
 		events: () => [...queryKeys.workflows.all, "events"] as const,
 		event: (id: string) => [...queryKeys.workflows.all, "event", id] as const,
-		enrollments: (id: string) =>
-			[...queryKeys.workflows.all, "enrollments", id] as const,
+		runs: (id: string, status?: string) =>
+			[...queryKeys.workflows.all, "runs", id, status ?? "all"] as const,
+		run: (id: string, enrollmentId: string) =>
+			[...queryKeys.workflows.all, "run", id, enrollmentId] as const,
+		metrics: (id: string, days: number) =>
+			[...queryKeys.workflows.all, "metrics", id, days] as const,
 	},
 	campaigns: {
 		all: ["campaigns"] as const,

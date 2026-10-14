@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
+import type { EnrollmentDetail, StepRun } from "../hooks/use-automations-api";
 
 export type StepKind = "send_email" | "condition" | "delay";
 
@@ -32,6 +33,14 @@ export interface MorphFrom {
 	tabGhost?: HTMLElement;
 }
 
+/** One run shown on a read-only canvas: what happened at each step. */
+export interface RunOverlay {
+	/** Latest step run per node ID. */
+	steps: Record<string, StepRun>;
+	trigger: EnrollmentDetail["trigger"];
+	enrollment: EnrollmentDetail["enrollment"];
+}
+
 interface NodeEditorContextValue {
 	updateNode: (nodeId: string, data: Record<string, unknown>) => void;
 	deleteNode: (nodeId: string) => void;
@@ -54,6 +63,8 @@ interface NodeEditorContextValue {
 	readOnly: boolean;
 	/** Start was pressed with steps still needing setup: outline them in red. */
 	showIssues?: boolean;
+	/** Set on the Runs view: each step shows how it went for this run. */
+	run?: RunOverlay;
 }
 
 const NodeEditorContext = createContext<NodeEditorContextValue | null>(null);

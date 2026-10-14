@@ -64,6 +64,7 @@ const exampleEnrollment = {
 	enrolledAt: "2026-03-23T10:00:00.000Z",
 	completedAt: null,
 	cancelledAt: null,
+	endedAt: null,
 };
 
 const errorFields = {
@@ -389,6 +390,11 @@ export namespace AutomationModel {
 		enrolledAt: t.String(),
 		completedAt: t.Nullable(t.String()),
 		cancelledAt: t.Nullable(t.String()),
+		endedAt: t.Nullable(
+			t.String({
+				description: "When it completed, was cancelled or failed",
+			}),
+		),
 	});
 
 	export const enrollResponse = t.Object(
@@ -425,6 +431,12 @@ export namespace AutomationModel {
 				description: "Only enrollments with this status",
 			}),
 		),
+		since: t.Optional(
+			t.String({
+				format: "date-time",
+				description: "Only enrollments that started at or after this time",
+			}),
+		),
 	});
 
 	export const enrollmentListResponse = t.Object(
@@ -456,12 +468,30 @@ export namespace AutomationModel {
 	export const enrollmentDetailResponse = t.Object(
 		{
 			enrollment: enrollmentResponse,
+			trigger: t.Object(
+				{
+					eventKey: t.Nullable(t.String()),
+					properties: t.Record(t.String(), t.Unknown()),
+				},
+				{
+					description:
+						"The event that started it; eventKey is null when the contact was enrolled directly",
+				},
+			),
+			graph: t.Object(automationGraphSchema.properties, {
+				description: "The published version of the steps this run follows",
+			}),
 			steps: t.Array(stepRunResponse),
 		},
 		{
 			examples: [
 				{
 					enrollment: exampleEnrollment,
+					trigger: {
+						eventKey: "trigger.user.signed_up",
+						properties: { plan: "pro" },
+					},
+					graph: { nodes: [], edges: [] },
 					steps: [
 						{
 							id: "astep_123456789",
@@ -484,6 +514,114 @@ export namespace AutomationModel {
 							finishedAt: null,
 							emailLogId: null,
 							error: null,
+						},
+					],
+				},
+			],
+		},
+	);
+
+	export const metricsQuery = t.Object({
+		days: t.Optional(
+			t.Numeric({
+				minimum: 1,
+				maximum: 90,
+				default: 30,
+				description: "How many days the daily breakdown covers",
+			}),
+		),
+	});
+
+	const runCounts = {
+		total: t.Number(),
+		active: t.Number(),
+		completed: t.Number(),
+		cancelled: t.Number(),
+		failed: t.Number(),
+	};
+
+	export const metricsResponse = t.Object(
+		{
+			runs: t.Object({
+				...runCounts,
+				averageDurationMs: t.Nullable(
+					t.Number({ description: "Average time to complete a run" }),
+				),
+			}),
+			emails: t.Object({
+				sent: t.Number(),
+				delivered: t.Number(),
+				opened: t.Number(),
+				clicked: t.Number(),
+				bounced: t.Number(),
+			}),
+			steps: t.Array(
+				t.Object({
+					nodeId: t.String(),
+					nodeType: t.String(),
+					pending: t.Number(),
+					running: t.Number(),
+					completed: t.Number(),
+					skipped: t.Number(),
+					failed: t.Number(),
+					emails: t.Object({
+						sent: t.Number(),
+						delivered: t.Number(),
+						opened: t.Number(),
+						clicked: t.Number(),
+						bounced: t.Number(),
+					}),
+				}),
+				{ description: "What happened at each step, across every run" },
+			),
+			daily: t.Array(t.Object({ date: t.String(), ...runCounts }), {
+				description: "Runs started each day, by their current status",
+			}),
+		},
+		{
+			examples: [
+				{
+					runs: {
+						total: 120,
+						active: 14,
+						completed: 98,
+						cancelled: 5,
+						failed: 3,
+						averageDurationMs: 86400000,
+					},
+					emails: {
+						sent: 196,
+						delivered: 190,
+						opened: 121,
+						clicked: 37,
+						bounced: 2,
+					},
+					steps: [
+						{
+							nodeId: "welcome_pro",
+							nodeType: "send_email",
+							pending: 0,
+							running: 0,
+							completed: 40,
+							skipped: 1,
+							failed: 0,
+							emails: {
+								sent: 40,
+								delivered: 39,
+								opened: 28,
+								clicked: 11,
+								bounced: 0,
+							},
+						},
+					],
+					daily: [
+						{
+							date: "2026-03-23",
+							total: 6,
+							active: 1,
+							completed: 5,
+							cancelled: 0,
+							failed: 0,
 						},
 					],
 				},

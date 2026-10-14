@@ -19,6 +19,7 @@ import {
 	type WorkflowStatus,
 } from "../workflow-types";
 import { validateWorkflow } from "../workflow-validation";
+import { AutomationViewTabs, useAutomationView } from "./automation-view-tabs";
 import { DeleteWorkflowModal } from "./delete-workflow-modal";
 import { EnrollContactModal } from "./enroll-contact-modal";
 import { useWorkflows } from "./workflows-provider";
@@ -176,6 +177,9 @@ export const WorkflowEditorToolbar = ({
 	const router = useRouter();
 	const { createWorkflow, updateWorkflow } = useWorkflows();
 	const [, setDeleteId] = useQueryState("delete");
+	const [, setView] = useAutomationView();
+	const [, setRunsFilter] = useQueryState("runs");
+	const [, setSelectedRun] = useQueryState("run");
 	const [busy, setBusy] = useState(false);
 	const [testOpen, setTestOpen] = useState(false);
 	const [stopOpen, setStopOpen] = useState(false);
@@ -269,9 +273,10 @@ export const WorkflowEditorToolbar = ({
 
 	return (
 		<div className="relative flex shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-white-0 px-4 py-2.5 dark:border-stroke-soft-100/40 dark:bg-black">
-			{/* Left: Toggle */}
-			<div className="flex min-w-0 flex-1 items-center gap-2">
+			{/* Left: Toggle + Editor / Runs / Metrics */}
+			<div className="relative z-10 flex min-w-0 flex-1 items-center gap-2">
 				<SidebarToggleButton />
+				<AutomationViewTabs automationId={workflow.id} />
 			</div>
 
 			{/* Center: Title / Breadcrumb */}
@@ -422,6 +427,12 @@ export const WorkflowEditorToolbar = ({
 				canEnroll={isActive}
 				open={testOpen}
 				onOpenChange={setTestOpen}
+				onEnrolled={(enrollmentId) => {
+					// Show the run that just started, whatever filter was on.
+					void setRunsFilter(null);
+					void setSelectedRun(enrollmentId);
+					void setView("runs");
+				}}
 			/>
 			<DeleteWorkflowModal workflows={[workflow]} />
 		</div>

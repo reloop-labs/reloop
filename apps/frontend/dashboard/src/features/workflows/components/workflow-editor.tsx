@@ -4,7 +4,6 @@ import {
 	applyNodeChanges,
 	Background,
 	BackgroundVariant,
-	type DefaultEdgeOptions,
 	type FitViewOptions,
 	type NodeChange,
 	ReactFlow,
@@ -36,7 +35,10 @@ import {
 	type WorkflowStatus,
 } from "../workflow-types";
 import { getNodeIssue } from "../workflow-validation";
+import { useAutomationView } from "./automation-view-tabs";
+import { defaultEdgeOptions, edgeTypes, nodeTypes } from "./flow-types";
 import { LiveAutomationBanner } from "./live-automation-banner";
+import { MetricsView } from "./metrics/metrics-view";
 import {
 	type MorphFrom,
 	NodeEditorProvider,
@@ -44,33 +46,9 @@ import {
 	pickerTargetKey,
 	type StepKind,
 } from "./node-editor-context";
-import { ConditionNode } from "./nodes/condition-node";
-import { DelayNode } from "./nodes/delay-node";
-import { FlowEdge } from "./nodes/flow-edge";
-import { GroupNode } from "./nodes/group-node";
-import { PickerNode } from "./nodes/picker-node";
-import { SendEmailNode } from "./nodes/send-email-node";
-import { TriggerNode } from "./nodes/trigger-node";
+import { RunsView } from "./runs/runs-view";
 import { StepPicker } from "./step-picker";
 import { WorkflowEditorToolbar } from "./workflow-editor-toolbar";
-
-const nodeTypes = {
-	trigger: TriggerNode,
-	send_email: SendEmailNode,
-	delay: DelayNode,
-	condition: ConditionNode,
-	group: GroupNode,
-	add_step: PickerNode,
-};
-
-const edgeTypes = {
-	flow: FlowEdge,
-};
-
-const defaultEdgeOptions: DefaultEdgeOptions = {
-	type: "flow",
-	data: { tone: "default" },
-};
 
 const prefersReducedMotion = () =>
 	typeof window !== "undefined" &&
@@ -136,6 +114,7 @@ const WorkflowEditorInner = ({
 		() => prepareGraph(workflow.nodes, workflow.edges),
 		[workflow.id],
 	);
+	const [view] = useAutomationView();
 	const [nodes, setNodes] = useState<WorkflowNode[]>(initial.nodes);
 	const [edges, setEdges] = useState<WorkflowEdge[]>(initial.edges);
 	const edgesRef = useRef(edges);
@@ -315,6 +294,10 @@ const WorkflowEditorInner = ({
 	// Re-center once real node sizes are measured and the layout has settled.
 	const nodesInitialized = useNodesInitialized();
 	const centeredForRef = useRef<string | null>(null);
+	// The canvas remounts when coming back from Runs or Metrics: center it again.
+	useEffect(() => {
+		if (view !== "editor") centeredForRef.current = null;
+	}, [view]);
 	useEffect(() => {
 		if (!nodesInitialized || centeredForRef.current === workflow.id) return;
 		centeredForRef.current = workflow.id;
@@ -624,74 +607,80 @@ const WorkflowEditorInner = ({
 					onSoftStopChange={handleSoftStopChange}
 					onInvalidStart={flagIssues}
 				/>
-				<div className="relative flex min-h-0 flex-1 overflow-hidden">
-					<div ref={canvasRef} className="relative min-w-0 flex-1">
-						<ReactFlow
-							nodes={nodes}
-							edges={edges}
-							onNodesChange={handleNodesChange}
-							onNodeClick={(_, node) => {
-								setPicker(null);
-								if (node.type !== "add_step") dropPlaceholders();
-							}}
-							nodesDraggable={false}
-							nodesConnectable={false}
-							nodesFocusable
-							elementsSelectable={!isReadOnly}
-							connectOnClick={false}
-							nodeTypes={nodeTypes}
-							edgeTypes={edgeTypes}
-							defaultEdgeOptions={defaultEdgeOptions}
-							fitView
-							fitViewOptions={{
-								minZoom: 1,
-								maxZoom: 1,
-								padding: { x: "64px", y: "80px" },
-							}}
-							proOptions={{ hideAttribution: true }}
-							onPaneClick={clearSelection}
-							deleteKeyCode={null}
-							zoomOnScroll={false}
-							zoomOnPinch={false}
-							zoomOnDoubleClick={false}
-							zoomActivationKeyCode={null}
-							panOnScroll
-							panOnDrag
-							minZoom={1}
-							maxZoom={1}
-							className="workflow-canvas bg-bg-weak-50 dark:bg-black"
-						>
-							<Background
-								variant={BackgroundVariant.Dots}
-								gap={22}
-								size={1.2}
-								color="var(--color-stroke-soft-200)"
-							/>
-							<ViewportPortal>
-								{/* `custom`: when a step was picked the menu hands off to the new step instead of fading out. */}
-								<AnimatePresence custom={morph !== null}>
-									{picker ? (
-										<StepPicker
-											key={pickerTargetKey(picker.target)}
-											anchor={picker.anchor}
-											onPick={(kind, from) =>
-												addStep(picker.target, kind, from)
-											}
-											onClose={closePicker}
-											connector={picker.target.type !== "replace"}
-										/>
-									) : null}
-								</AnimatePresence>
-							</ViewportPortal>
-						</ReactFlow>
-						{isReadOnly ? (
-							<LiveAutomationBanner
-								key={workflow.id}
-								workflow={{ ...workflow, nodes, edges }}
-							/>
-						) : null}
+				{view === "runs" ? (
+					<RunsView workflow={{ ...workflow, nodes, edges }} />
+				) : view === "metrics" ? (
+					<MetricsView workflow={{ ...workflow, nodes, edges }} />
+				) : (
+					<div className="relative flex min-h-0 flex-1 overflow-hidden">
+						<div ref={canvasRef} className="relative min-w-0 flex-1">
+							<ReactFlow
+								nodes={nodes}
+								edges={edges}
+								onNodesChange={handleNodesChange}
+								onNodeClick={(_, node) => {
+									setPicker(null);
+									if (node.type !== "add_step") dropPlaceholders();
+								}}
+								nodesDraggable={false}
+								nodesConnectable={false}
+								nodesFocusable
+								elementsSelectable={!isReadOnly}
+								connectOnClick={false}
+								nodeTypes={nodeTypes}
+								edgeTypes={edgeTypes}
+								defaultEdgeOptions={defaultEdgeOptions}
+								fitView
+								fitViewOptions={{
+									minZoom: 1,
+									maxZoom: 1,
+									padding: { x: "64px", y: "80px" },
+								}}
+								proOptions={{ hideAttribution: true }}
+								onPaneClick={clearSelection}
+								deleteKeyCode={null}
+								zoomOnScroll={false}
+								zoomOnPinch={false}
+								zoomOnDoubleClick={false}
+								zoomActivationKeyCode={null}
+								panOnScroll
+								panOnDrag
+								minZoom={1}
+								maxZoom={1}
+								className="workflow-canvas bg-bg-weak-50 dark:bg-black"
+							>
+								<Background
+									variant={BackgroundVariant.Dots}
+									gap={22}
+									size={1.2}
+									color="var(--color-stroke-soft-200)"
+								/>
+								<ViewportPortal>
+									{/* `custom`: when a step was picked the menu hands off to the new step instead of fading out. */}
+									<AnimatePresence custom={morph !== null}>
+										{picker ? (
+											<StepPicker
+												key={pickerTargetKey(picker.target)}
+												anchor={picker.anchor}
+												onPick={(kind, from) =>
+													addStep(picker.target, kind, from)
+												}
+												onClose={closePicker}
+												connector={picker.target.type !== "replace"}
+											/>
+										) : null}
+									</AnimatePresence>
+								</ViewportPortal>
+							</ReactFlow>
+							{isReadOnly ? (
+								<LiveAutomationBanner
+									key={workflow.id}
+									workflow={{ ...workflow, nodes, edges }}
+								/>
+							) : null}
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
 		</NodeEditorProvider>
 	);

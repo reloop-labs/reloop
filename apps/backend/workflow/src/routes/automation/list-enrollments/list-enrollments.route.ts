@@ -13,6 +13,7 @@ export const listEnrollmentsRoute = new Elysia().use(authMiddleware).get(
 			page: Number(query.page ?? 1),
 			limit: Number(query.limit ?? 50),
 			status: query.status,
+			since: query.since,
 		});
 	},
 	{

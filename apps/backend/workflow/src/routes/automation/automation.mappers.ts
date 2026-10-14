@@ -27,6 +27,12 @@ export function mapEnrollment(params: {
 		enrolledAt: row.enrolledAt.toISOString(),
 		completedAt: iso(row.completedAt),
 		cancelledAt: iso(row.cancelledAt),
+		// Failed runs have no timestamp of their own; their last update is when.
+		endedAt: iso(
+			row.completedAt ??
+				row.cancelledAt ??
+				(row.status === "failed" ? row.updatedAt : null),
+		),
 	};
 }
 

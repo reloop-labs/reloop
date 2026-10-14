@@ -4,6 +4,7 @@ import { deleteAutomationRoute } from "@be/workflow/routes/automation/delete-aut
 import { enrollContactRoute } from "@be/workflow/routes/automation/enroll-contact/enroll-contact.route";
 import { getAutomationRoute } from "@be/workflow/routes/automation/get-automation/get-automation.route";
 import { getEnrollmentRoute } from "@be/workflow/routes/automation/get-enrollment/get-enrollment.route";
+import { getMetricsRoute } from "@be/workflow/routes/automation/get-metrics/get-metrics.route";
 import { listAutomationsRoute } from "@be/workflow/routes/automation/list-automations/list-automations.route";
 import { listEnrollmentsRoute } from "@be/workflow/routes/automation/list-enrollments/list-enrollments.route";
 import { pauseAutomationRoute } from "@be/workflow/routes/automation/pause-automation/pause-automation.route";
@@ -21,6 +22,7 @@ export const automationRoutes = new Elysia({
 	.use(enrollContactRoute)
 	.use(listEnrollmentsRoute)
 	.use(getEnrollmentRoute)
+	.use(getMetricsRoute)
 	.use(getAutomationRoute)
 	.use(updateAutomationRoute)
 	.use(deleteAutomationRoute);

@@ -2,7 +2,7 @@ import { AutomationErrors } from "@be/workflow/error/automation.error-response";
 import { mapEnrollment } from "@be/workflow/routes/automation/automation.mappers";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { and, count, desc, eq, isNull } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNull } from "drizzle-orm";
 
 export async function listEnrollmentsController(params: {
 	organizationId: string;
@@ -10,6 +10,7 @@ export async function listEnrollmentsController(params: {
 	page: number;
 	limit: number;
 	status?: "active" | "completed" | "cancelled" | "failed";
+	since?: string;
 }) {
 	const automation = await db.query.automation.findFirst({
 		where: and(
@@ -28,6 +29,11 @@ export async function listEnrollmentsController(params: {
 	];
 	if (params.status) {
 		filters.push(eq(schema.automationEnrollment.status, params.status));
+	}
+	if (params.since) {
+		filters.push(
+			gte(schema.automationEnrollment.enrolledAt, new Date(params.since)),
+		);
 	}
 	const where = and(...filters);
 

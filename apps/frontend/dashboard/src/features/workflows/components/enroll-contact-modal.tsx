@@ -3,18 +3,12 @@
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import * as StatusBadge from "@reloop/ui/status-badge";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
-import { formatRelativeTime } from "#/utils/format-relative-time";
-import {
-	type AutomationEnrollment,
-	enrollContact,
-	listEnrollments,
-} from "../hooks/use-automations-api";
+import { enrollContact } from "../hooks/use-automations-api";
 import {
 	AutomationModalFrame,
 	type AutomationModalStatus,
@@ -26,17 +20,9 @@ interface EnrollContactModalProps {
 	canEnroll?: boolean;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	/** The run started: the parent shows it on the Runs tab. */
+	onEnrolled?: (enrollmentId: string) => void;
 }
-
-const enrollmentBadge: Record<
-	AutomationEnrollment["status"],
-	"completed" | "pending" | "failed" | "disabled"
-> = {
-	active: "pending",
-	completed: "completed",
-	cancelled: "disabled",
-	failed: "failed",
-};
 
 export const EnrollContactModal = ({
 	automationId,
@@ -44,6 +30,7 @@ export const EnrollContactModal = ({
 	canEnroll = true,
 	open,
 	onOpenChange,
+	onEnrolled,
 }: EnrollContactModalProps) => {
 	const queryClient = useQueryClient();
 	const [email, setEmail] = useState("");
@@ -52,12 +39,6 @@ export const EnrollContactModal = ({
 	const [status, setStatus] = useState<AutomationModalStatus>("idle");
 	const emailField = useFieldError();
 	const clearEmailError = emailField.clear;
-
-	const enrollmentsQuery = useQuery({
-		queryKey: queryKeys.workflows.enrollments(automationId),
-		queryFn: () => listEnrollments(automationId, 20),
-		enabled: open,
-	});
 
 	const enrollMutation = useMutation({
 		mutationFn: () =>
@@ -89,20 +70,25 @@ export const EnrollContactModal = ({
 		setStatus("busy");
 		try {
 			const result = await enrollMutation.mutateAsync();
-			await queryClient.invalidateQueries({
-				queryKey: queryKeys.workflows.enrollments(automationId),
-			});
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: [...queryKeys.workflows.all, "runs", automationId],
+				}),
+				queryClient.invalidateQueries({
+					queryKey: [...queryKeys.workflows.all, "metrics", automationId],
+				}),
+			]);
 			setStatus("success");
 			toast.success(
 				result.contactCreated
 					? "Contact created and enrolled"
 					: "Contact enrolled",
 			);
+			// Let "Enrolled" show for a moment, then close on the new run.
 			setTimeout(() => {
-				setEmail("");
-				setFirstName("");
-				setLastName("");
 				setStatus("idle");
+				onOpenChange(false);
+				onEnrolled?.(result.enrollment.id);
 			}, 450);
 		} catch (err) {
 			setStatus("idle");
@@ -143,8 +129,6 @@ export const EnrollContactModal = ({
 			return () => clearTimeout(timer);
 		}
 	}, [open, clearEmailError]);
-
-	const enrollments = enrollmentsQuery.data?.enrollments ?? [];
 
 	return (
 		<AutomationModalFrame
@@ -254,48 +238,6 @@ export const EnrollContactModal = ({
 							</Input.Wrapper>
 						</Input.Root>
 					</div>
-				</div>
-
-				<div>
-					<p className="mb-2 font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
-						Recent enrollments
-						{typeof enrollmentsQuery.data?.total === "number"
-							? ` · ${enrollmentsQuery.data.total}`
-							: ""}
-					</p>
-					{enrollmentsQuery.isLoading ? (
-						<div className="h-16 animate-pulse rounded-xl bg-bg-weak-50" />
-					) : enrollments.length === 0 ? (
-						<p className="text-sm text-text-soft-400">
-							No one is in this automation yet.
-						</p>
-					) : (
-						<ul className="max-h-48 space-y-0.5 overflow-y-auto">
-							{enrollments.map((row) => (
-								<li
-									key={row.id}
-									className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5"
-								>
-									<div className="min-w-0">
-										<p className="truncate text-sm text-text-strong-950">
-											{row.contactEmail ?? row.contactId}
-										</p>
-										<p className="text-text-sub-600 text-xs">
-											{formatRelativeTime(row.enrolledAt)}
-										</p>
-									</div>
-									<StatusBadge.Root
-										variant="light"
-										status={enrollmentBadge[row.status]}
-										className="capitalize"
-									>
-										<StatusBadge.Dot />
-										{row.status}
-									</StatusBadge.Root>
-								</li>
-							))}
-						</ul>
-					)}
 				</div>
 			</div>
 		</AutomationModalFrame>

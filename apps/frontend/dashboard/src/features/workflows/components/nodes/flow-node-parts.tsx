@@ -25,6 +25,7 @@ import {
 	pickerTargetKey,
 	useNodeEditor,
 } from "../node-editor-context";
+import { RunStepCard } from "../runs/run-step-card";
 import { StepIcon } from "../step-icon";
 
 /** The value from the previous render (the current value on first render). */
@@ -119,9 +120,12 @@ export const NodePill = ({
 	belowCard,
 }: NodePillProps) => {
 	const nodeId = useNodeId();
-	const { readOnly, editNode, deleteNode, showIssues } = useNodeEditor();
+	const { readOnly, editNode, deleteNode, showIssues, run } = useNodeEditor();
 	const reduceMotion = useReducedMotion();
 	const invalid = Boolean(showIssues) && !ready && !readOnly;
+	// On the Runs view every step is compact, with how this run went below it.
+	const runCard =
+		run && nodeId ? <RunStepCard run={run} nodeId={nodeId} /> : null;
 	// Plain icon buttons (no divider lines) on the right of the box.
 	const actions =
 		readOnly || !nodeId ? null : (
@@ -172,8 +176,8 @@ export const NodePill = ({
 			showTitle={false}
 			titleExiting={titleExiting}
 			trailing={actions}
-			cardContent={cardContent}
-			belowCard={belowCard}
+			cardContent={runCard ? undefined : cardContent}
+			belowCard={runCard ?? belowCard}
 			invalid={invalid}
 		>
 			<span
@@ -185,7 +189,7 @@ export const NodePill = ({
 			>
 				{label || placeholder}
 			</span>
-			{ready ? null : (
+			{ready || run ? null : (
 				<span className="mr-3 flex shrink-0">
 					<StatusDot ready={false} />
 				</span>

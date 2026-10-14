@@ -4,6 +4,7 @@ import {
 	mapStepRun,
 } from "@be/workflow/routes/automation/automation.mappers";
 import { db } from "@reloop/db/client";
+import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 
@@ -37,6 +38,7 @@ export async function getEnrollmentController(params: {
 				},
 			},
 			stepRuns: true,
+			version: { columns: { graph: true } },
 		},
 	});
 	if (!enrollment)
@@ -51,6 +53,14 @@ export async function getEnrollmentController(params: {
 			row: enrollment,
 			contact: enrollment.contact,
 		}),
+		trigger: {
+			eventKey: enrollment.context.eventKey ?? null,
+			properties: enrollment.context.properties ?? {},
+		},
+		graph: (enrollment.version?.graph ?? {
+			nodes: [],
+			edges: [],
+		}) as AutomationGraph,
 		steps: steps.map(mapStepRun),
 	};
 }

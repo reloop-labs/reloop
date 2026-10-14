@@ -87,7 +87,7 @@ export const TriggerNode = ({
 	selected,
 	type,
 }: NodeProps<TriggerFlowNode>) => {
-	const { readOnly } = useNodeEditor();
+	const { readOnly, run } = useNodeEditor();
 	const issue = getNodeIssue({ type, data });
 	const eventKey =
 		(typeof data.eventKey === "string" && data.eventKey) ||
@@ -97,7 +97,7 @@ export const TriggerNode = ({
 
 	return (
 		<div className="relative">
-			<CodeEntry eventKey={eventKey || undefined} />
+			{run ? null : <CodeEntry eventKey={eventKey || undefined} />}
 			<EditSwap
 				editing={editing}
 				editor={<TriggerEditor nodeId={id} data={data} />}
