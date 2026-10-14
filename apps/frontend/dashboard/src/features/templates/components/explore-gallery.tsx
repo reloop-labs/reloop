@@ -201,6 +201,13 @@ function pluralTemplates(count: number) {
 	return `${count} ${count === 1 ? "template" : "templates"}`;
 }
 
+/** Resting offsets so a few different emails peek out of the folder. */
+const paperRestPoses = [
+	"-translate-x-[7%] -translate-y-[7%] -rotate-[4deg]",
+	"-translate-y-[2%]",
+	"translate-x-[6%] translate-y-[1%] rotate-[3deg]",
+];
+
 /**
  * At rest the emails sit straight in the folder with only an edge showing;
  * on hover they rise and fan out.
@@ -261,6 +268,7 @@ function FolderCard({
 						className={cn(
 							"absolute top-[26%] left-[17%] aspect-[16/10] w-[66%] origin-bottom overflow-hidden rounded-[8px] bg-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] ring-1 ring-black/5",
 							"transition-transform duration-300 ease-out motion-reduce:transition-none",
+							papers.length > 1 && paperRestPoses[index],
 							paperPoses[papers.length === 1 ? 1 : index],
 						)}
 					>
