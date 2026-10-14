@@ -128,11 +128,11 @@ export function TemplateList() {
 				value={tab}
 				onChange={(next) => void setTabParam(next)}
 				yoursCount={data?.templates?.length}
+				end={tab === "explore" ? <TemplateListToolbar searchOnly /> : null}
 			/>
 
 			{tab === "explore" ? (
-				<div className="space-y-6 pb-8">
-					<TemplateListToolbar searchOnly />
+				<div className="pb-8">
 					<ExploreGallery />
 				</div>
 			) : error ? (

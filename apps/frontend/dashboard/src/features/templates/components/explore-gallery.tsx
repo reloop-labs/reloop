@@ -1,15 +1,18 @@
 import {
+	acmeOfferExamples,
 	acmeTemplateExamples,
+	acmeWelcomeSequenceExamples,
+	categorizedTemplateExamples,
 	type EmailTemplateExample,
-	galleryTemplateExamples,
+	type TemplateCategory,
+	templateCategories,
 } from "@reloop/email-templates";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { parseAsString, useQueryState } from "nuqs";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useCreateTemplateFromExample } from "#/features/templates/hooks/use-create-template-from-example";
-import { previewCardClassName, TemplatePreviewPaper } from "./template-grid";
 
 /** Width the email is laid out at before it is scaled into the card. */
 const EMAIL_RENDER_WIDTH = 600;
@@ -97,17 +100,6 @@ function ExamplePreview({
 	);
 }
 
-function BlankPreview() {
-	return (
-		<div className="flex h-full flex-col items-center justify-center gap-3">
-			<span className="flex size-10 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors duration-200 group-hover/card:text-text-strong-950 dark:border-stroke-soft-100/40">
-				<Icon name="plus" className="size-5" />
-			</span>
-			<span className="text-[13px] text-text-sub-600">Start from scratch</span>
-		</div>
-	);
-}
-
 function ExampleCard({
 	template,
 	previewCss,
@@ -121,79 +113,94 @@ function ExampleCard({
 	disabled: boolean;
 	onUse: () => void;
 }) {
-	const isBlank = template.id === "blank";
-
 	return (
-		<div className="group/card relative flex flex-col gap-3.5">
-			<div
-				className={cn(
-					previewCardClassName,
-					"transition-colors duration-200",
-					"hover:border-stroke-sub-300 dark:hover:border-stroke-soft-100/70",
-				)}
-			>
-				<TemplatePreviewPaper>
-					{isBlank ? (
-						<BlankPreview />
-					) : (
-						<ExamplePreview template={template} previewCss={previewCss} />
+		<div
+			className={cn(
+				"group/card relative flex flex-col gap-2 rounded-t-[24px] rounded-b-[20px] p-1.5",
+				"transition-colors duration-200 ease-out motion-reduce:transition-none",
+				"hover:bg-bg-weak-50 dark:hover:bg-white/[0.05]",
+				isPending && "bg-bg-weak-50 dark:bg-white/[0.05]",
+			)}
+		>
+			<div className="pointer-events-none relative aspect-[5/4] w-full select-none overflow-hidden rounded-[18px] bg-white ring-1 ring-stroke-soft-100 dark:ring-white/10">
+				<ExamplePreview template={template} previewCss={previewCss} />
+
+				<div
+					className={cn(
+						"absolute inset-x-0 bottom-4 z-10 flex justify-center transition-opacity duration-200",
+						isPending
+							? "opacity-100"
+							: "opacity-0 group-hover/card:opacity-100",
 					)}
-				</TemplatePreviewPaper>
-
-				{isBlank ? null : (
-					<div
-						className={cn(
-							"pointer-events-none absolute inset-x-0 bottom-4 z-10 flex justify-center transition-opacity duration-200",
-							isPending
-								? "opacity-100"
-								: "opacity-0 group-hover/card:opacity-100",
+				>
+					<span className="flex items-center gap-1.5 rounded-full bg-bg-strong-950 px-3.5 py-2 font-medium text-text-white-0 text-xs shadow-sm">
+						{isPending ? (
+							<>
+								<Spinner size={12} color="currentColor" />
+								Creating...
+							</>
+						) : (
+							<>
+								<Icon name="plus" className="h-3.5 w-3.5" />
+								Use template
+							</>
 						)}
-					>
-						<span className="flex items-center gap-1.5 rounded-full bg-bg-strong-950 px-3.5 py-2 font-medium text-text-white-0 text-xs shadow-sm">
-							{isPending ? (
-								<>
-									<Spinner size={12} color="currentColor" />
-									Creating...
-								</>
-							) : (
-								<>
-									<Icon name="plus" className="h-3.5 w-3.5" />
-									Use template
-								</>
-							)}
-						</span>
-					</div>
-				)}
-
-				<button
-					type="button"
-					className="absolute inset-0 z-0 cursor-pointer disabled:cursor-wait"
-					aria-label={`Use the ${template.name} template`}
-					disabled={disabled}
-					onClick={onUse}
-				/>
+					</span>
+				</div>
 			</div>
 
-			<div className="flex min-w-0 flex-col gap-0.5 px-1">
-				<span
-					className="ml-2 truncate font-semibold text-label-sm text-text-strong-950"
+			<div className="flex min-w-0 flex-col gap-0.5 px-3 pt-1 pb-2.5">
+				<h3
+					className="truncate font-medium text-[16px] text-text-strong-950"
 					title={template.name}
 				>
 					{template.name}
-				</span>
+				</h3>
 				<span
-					className="ml-2 truncate text-paragraph-xs text-text-sub-600"
+					className="truncate text-paragraph-xs text-text-sub-600"
 					title={template.description}
 				>
 					{template.slug}
 				</span>
 			</div>
+
+			<button
+				type="button"
+				className="absolute inset-0 cursor-pointer rounded-t-[24px] rounded-b-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-sub-300 disabled:cursor-wait"
+				aria-label={`Use the ${template.name} template`}
+				disabled={disabled}
+				onClick={onUse}
+			/>
 		</div>
 	);
 }
 
+/** The Acme family drops its gray page so only the white card shows. */
+const cardOnlyIds = new Set(
+	[
+		...acmeTemplateExamples,
+		...acmeWelcomeSequenceExamples,
+		...acmeOfferExamples,
+	].map((template) => template.id),
+);
+
+function previewCssFor(template: EmailTemplateExample) {
+	return cardOnlyIds.has(template.id) ? CARD_ONLY_PREVIEW_CSS : undefined;
+}
+
+type Folder = TemplateCategory & { templates: EmailTemplateExample[] };
+
+/** Folders in display order; empty ones are hidden until they're filled. */
+const folders: Folder[] = templateCategories
+	.map((category) => ({
+		...category,
+		templates: categorizedTemplateExamples.filter(
+			(template) => template.category === category.id,
+		),
+	}))
+	.filter((folder) => folder.templates.length > 0);
+
 function matches(template: EmailTemplateExample, q: string): boolean {
-	if (!q) return true;
 	return (
 		template.name.toLowerCase().includes(q) ||
 		template.slug.toLowerCase().includes(q) ||
@@ -201,90 +208,257 @@ function matches(template: EmailTemplateExample, q: string): boolean {
 	);
 }
 
-const sections = [
-	{
-		id: "designs",
-		title: "Designs",
-		description: "Standalone designs, each with its own look.",
-		templates: galleryTemplateExamples,
-		previewCss: undefined,
-	},
-	{
-		id: "acme",
-		title: "Transactional set",
-		description:
-			"One consistent brand across every lifecycle email. Swap the logo and colors to make it yours.",
-		templates: acmeTemplateExamples,
-		previewCss: CARD_ONLY_PREVIEW_CSS,
-	},
+function pluralTemplates(count: number) {
+	return `${count} ${count === 1 ? "template" : "templates"}`;
+}
+
+/**
+ * At rest the emails sit straight in the folder with only an edge showing;
+ * on hover they rise and fan out.
+ */
+const paperPoses = [
+	"group-hover/folder:-translate-x-[9%] group-hover/folder:-translate-y-[30%] group-hover/folder:-rotate-[9deg]",
+	"group-hover/folder:-translate-y-[38%] group-hover/folder:-rotate-[1deg]",
+	"group-hover/folder:translate-x-[9%] group-hover/folder:-translate-y-[30%] group-hover/folder:rotate-[8deg]",
 ];
 
-/** Ready-made templates from the public email editor, copied on use. */
+/**
+ * Glass folder: a tabbed back panel, the folder's first emails tucked inside,
+ * and a frosted front pocket over them.
+ */
+function FolderCard({
+	folder,
+	onOpen,
+}: {
+	folder: Folder;
+	onOpen: () => void;
+}) {
+	const gradientId = useId();
+	const papers = folder.templates.slice(0, 3);
+	const count = pluralTemplates(folder.templates.length);
+
+	return (
+		<div className="group/folder relative flex flex-col gap-2 p-1.5">
+			<div className="pointer-events-none relative aspect-[5/4] w-full select-none">
+				{/* Back panel with the folder tab */}
+				<svg
+					viewBox="0 0 100 80"
+					preserveAspectRatio="none"
+					className="absolute inset-0 h-full w-full"
+					aria-hidden
+				>
+					<defs>
+						<linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+							<stop
+								offset="0"
+								className="[stop-color:#e6e6e6] dark:[stop-color:#2e2e2e]"
+							/>
+							<stop
+								offset="1"
+								className="[stop-color:#d4d4d4] dark:[stop-color:#141414]"
+							/>
+						</linearGradient>
+					</defs>
+					<path
+						d="M8 14 Q8 6 16 6 H37 Q41 6 43.5 9 L46 12 Q48.5 15 52.5 15 H84 Q92 15 92 23 V62 Q92 70 84 70 H16 Q8 70 8 62 Z"
+						fill={`url(#${CSS.escape(gradientId)})`}
+						className="stroke-[0.4] stroke-black/[0.06] dark:stroke-white/10"
+					/>
+				</svg>
+
+				{papers.map((template, index) => (
+					<div
+						key={template.id}
+						className={cn(
+							"absolute top-[26%] left-[17%] aspect-[16/10] w-[66%] origin-bottom overflow-hidden rounded-[8px] bg-white shadow-[0_4px_14px_rgba(0,0,0,0.12)] ring-1 ring-black/5",
+							"transition-transform duration-300 ease-out motion-reduce:transition-none",
+							paperPoses[papers.length === 1 ? 1 : index],
+						)}
+					>
+						<ExamplePreview
+							template={template}
+							previewCss={previewCssFor(template)}
+						/>
+					</div>
+				))}
+
+				{/* Soft glow under the pocket, dark mode only */}
+				<div className="absolute inset-x-[16%] bottom-[2%] hidden h-[12%] rounded-[50%] bg-white/10 blur-xl dark:block" />
+
+				{/* Frosted front pocket */}
+				<div
+					className={cn(
+						"absolute inset-x-[8%] top-[34%] bottom-[10%] overflow-hidden rounded-[20px] backdrop-blur-xl",
+						"bg-gradient-to-b from-white/75 to-[#ececec]/75 ring-1 ring-black/[0.06]",
+						"shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]",
+						"dark:from-[#5c5c5c]/75 dark:to-[#2a2a2a]/85 dark:ring-white/15",
+						"dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_16px_40px_-10px_rgba(0,0,0,0.8)]",
+					)}
+				>
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,255,255,0.55),transparent_65%)] opacity-70 transition-opacity duration-300 group-hover/folder:opacity-100 dark:bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,255,255,0.16),transparent_65%)]" />
+				</div>
+			</div>
+
+			<div className="flex min-w-0 flex-col gap-0.5 px-3 pt-1 pb-2.5">
+				<h3
+					className="truncate font-medium text-[16px] text-text-strong-950"
+					title={folder.description}
+				>
+					{folder.name}
+				</h3>
+				<span className="truncate text-paragraph-xs text-text-sub-600">
+					{count}
+				</span>
+			</div>
+
+			<button
+				type="button"
+				className="absolute inset-0 cursor-pointer rounded-[24px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-sub-300"
+				aria-label={`Open ${folder.name}, ${count}`}
+				onClick={onOpen}
+			/>
+		</div>
+	);
+}
+
+const gridClassName =
+	"grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-10";
+
+/** Ready-made templates from the public email editor, filed into folders. */
 export function ExploreGallery() {
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"q",
 		parseAsString.withDefault(""),
 	);
+	const [folderId, setFolderId] = useQueryState(
+		"folder",
+		parseAsString.withOptions({ history: "push" }),
+	);
 	const { pendingId, createFromExample } = useCreateTemplateFromExample();
+	const rootRef = useRef<HTMLDivElement>(null);
+
+	const openFolder = (id: string | null) => {
+		void setFolderId(id);
+		rootRef.current?.scrollIntoView({ block: "nearest" });
+	};
+
+	const renderCard = (template: EmailTemplateExample) => (
+		<ExampleCard
+			key={template.id}
+			template={template}
+			previewCss={previewCssFor(template)}
+			isPending={pendingId === template.id}
+			disabled={pendingId !== null}
+			onUse={() => void createFromExample(template)}
+		/>
+	);
 
 	const q = searchQuery.trim().toLowerCase();
-	const visibleSections = sections
-		.map((section) => ({
-			...section,
-			templates: section.templates.filter((t) => matches(t, q)),
-		}))
-		.filter((section) => section.templates.length > 0);
+	const openFolderData = folders.find((folder) => folder.id === folderId);
 
-	if (visibleSections.length === 0) {
+	// Search spans every folder; a folder whose name matches shows in full.
+	if (q) {
+		const results = folders
+			.map((folder) => ({
+				...folder,
+				templates: folder.name.toLowerCase().includes(q)
+					? folder.templates
+					: folder.templates.filter((template) => matches(template, q)),
+			}))
+			.filter((folder) => folder.templates.length > 0);
+
+		if (results.length === 0) {
+			return (
+				<div className="flex flex-col items-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-6 py-12 text-center dark:border-stroke-soft-100/40">
+					<Icon name="search" className="mb-4 h-8 w-8 text-text-sub-600" />
+					<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
+						No templates found
+					</h3>
+					<p className="mb-6 text-[12px] text-text-sub-600">
+						Try a different search.
+					</p>
+					<button
+						type="button"
+						onClick={() => void setSearchQuery("")}
+						className="font-medium text-sm text-text-strong-950 underline underline-offset-4"
+					>
+						Clear search
+					</button>
+				</div>
+			);
+		}
+
 		return (
-			<div className="flex flex-col items-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-6 py-12 text-center dark:border-stroke-soft-100/40">
-				<Icon name="search" className="mb-4 h-8 w-8 text-text-sub-600" />
-				<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-					No templates found
-				</h3>
-				<p className="mb-6 text-[12px] text-text-sub-600">
-					Try a different search.
-				</p>
-				<button
-					type="button"
-					onClick={() => void setSearchQuery("")}
-					className="font-medium text-sm text-text-strong-950 underline underline-offset-4"
-				>
-					Clear search
-				</button>
+			<div ref={rootRef} className="space-y-12">
+				{results.map((folder) => (
+					<section key={folder.id} aria-labelledby={`explore-${folder.id}`}>
+						<div className="mb-5 flex items-baseline gap-2">
+							<h2
+								id={`explore-${folder.id}`}
+								className="font-semibold text-label-md text-text-strong-950"
+							>
+								{folder.name}
+							</h2>
+							<span className="text-paragraph-sm text-text-sub-600">
+								{folder.templates.length}
+							</span>
+						</div>
+						<div className={gridClassName}>
+							{folder.templates.map(renderCard)}
+						</div>
+					</section>
+				))}
 			</div>
 		);
 	}
 
+	if (openFolderData) {
+		return (
+			<section
+				ref={rootRef}
+				aria-labelledby={`explore-${openFolderData.id}`}
+				className="scroll-mt-6"
+			>
+				<nav aria-label="Breadcrumb" className="mb-3">
+					<button
+						type="button"
+						onClick={() => openFolder(null)}
+						className="-ml-1 flex cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-sub-300"
+					>
+						<Icon name="chevron-left" className="size-4" />
+						All folders
+					</button>
+				</nav>
+				<div className="mb-6">
+					<h2
+						id={`explore-${openFolderData.id}`}
+						className="font-semibold text-label-lg text-text-strong-950"
+					>
+						{openFolderData.name}
+					</h2>
+					<p className="mt-0.5 text-paragraph-sm text-text-sub-600">
+						{openFolderData.description} ·{" "}
+						{pluralTemplates(openFolderData.templates.length)}
+					</p>
+				</div>
+				<div className={gridClassName}>
+					{openFolderData.templates.map(renderCard)}
+				</div>
+			</section>
+		);
+	}
+
 	return (
-		<div className="space-y-12">
-			{visibleSections.map((section) => (
-				<section key={section.id} aria-labelledby={`explore-${section.id}`}>
-					<div className="mb-5">
-						<h2
-							id={`explore-${section.id}`}
-							className="font-semibold text-label-md text-text-strong-950"
-						>
-							{section.title}
-						</h2>
-						<p className="mt-0.5 text-paragraph-sm text-text-sub-600">
-							{section.description}
-						</p>
-					</div>
-					<div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-10">
-						{section.templates.map((template) => (
-							<ExampleCard
-								key={template.id}
-								template={template}
-								previewCss={section.previewCss}
-								isPending={pendingId === template.id}
-								disabled={pendingId !== null}
-								onUse={() => void createFromExample(template)}
-							/>
-						))}
-					</div>
-				</section>
-			))}
+		<div ref={rootRef} className="scroll-mt-6">
+			<div className={gridClassName}>
+				{folders.map((folder) => (
+					<FolderCard
+						key={folder.id}
+						folder={folder}
+						onOpen={() => openFolder(folder.id)}
+					/>
+				))}
+			</div>
 		</div>
 	);
 }

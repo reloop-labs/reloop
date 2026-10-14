@@ -1,3 +1,9 @@
+export {
+	type TemplateCategory,
+	type TemplateCategoryId,
+	templateCategories,
+} from "./categories";
+
 export interface TemplateVariable {
 	name: string;
 	type: "string" | "number";
@@ -11,6 +17,11 @@ import { acmeDomainVerifiedHtml } from "./acme/domain-verified";
 import { acmeEmailChangedHtml } from "./acme/email-changed";
 import { acmeInvitationAcceptedHtml } from "./acme/invitation-accepted";
 import { acmeMentionHtml } from "./acme/mention";
+import { acmeOfferAnnualHtml } from "./acme/offer-annual";
+import { acmeOfferSaleHtml } from "./acme/offer-sale";
+import { acmeOfferTrialExtensionHtml } from "./acme/offer-trial-extension";
+import { acmeOfferUpgradeHtml } from "./acme/offer-upgrade";
+import { acmeOfferWinBackHtml } from "./acme/offer-win-back";
 import { acmeOrderConfirmationHtml } from "./acme/order-confirmation";
 import { acmeOrderDeliveredHtml } from "./acme/order-delivered";
 import { acmeOrderShippedHtml } from "./acme/order-shipped";
@@ -21,6 +32,10 @@ import { acmePlanChangedHtml } from "./acme/plan-changed";
 import { acmeReceiptHtml } from "./acme/receipt";
 import { acmeRefundHtml } from "./acme/refund";
 import { acmeSecurityAlertHtml } from "./acme/security-alert";
+import { acmeSequenceAiHtml } from "./acme/sequence-ai";
+import { acmeSequenceCliHtml } from "./acme/sequence-cli";
+import { acmeSequenceMcpHtml } from "./acme/sequence-mcp";
+import { acmeSequenceWelcomeHtml } from "./acme/sequence-welcome";
 import { acmeSignInCodeHtml } from "./acme/sign-in-code";
 import { acmeSubscriptionCanceledHtml } from "./acme/subscription-canceled";
 import { acmeSubscriptionRenewalHtml } from "./acme/subscription-renewal";
@@ -36,11 +51,10 @@ import { acmeWeeklyReportHtml } from "./acme/weekly-report";
 import { acmeWelcomeHtml } from "./acme/welcome";
 import { appointmentReminderHtml } from "./appointment-reminder";
 import { blankHtml } from "./blank";
+import type { TemplateCategoryId } from "./categories";
 import { eventTicketHtml } from "./event-ticket";
 import { fileDeliveryHtml } from "./file-delivery";
-import { orderReceiptHtml } from "./order-receipt";
 import { orderShippedHtml } from "./order-shipped";
-import { passwordResetHtml } from "./password-reset";
 import { paymentFailedHtml } from "./payment-failed";
 import { refundConfirmationHtml } from "./refund-confirmation";
 import { securityAlertHtml } from "./security-alert";
@@ -54,6 +68,8 @@ export interface EmailTemplateExample {
 	name: string;
 	/** Card subtitle, kebab-case like the dashboard template grid. */
 	slug: string;
+	/** Explore folder; the blank canvas has none. */
+	category?: TemplateCategoryId;
 	description: string;
 	html: (origin: string) => string;
 	variables: TemplateVariable[];
@@ -71,32 +87,8 @@ export const blankTemplateExample: EmailTemplateExample = {
 
 export const emailTemplateExamples: EmailTemplateExample[] = [
 	{
-		id: "password-reset",
-		name: "Password reset",
-		slug: "password-reset",
-		description:
-			"Minimal password reset email with a single button, expiry note, and fallback link.",
-		html: passwordResetHtml,
-		variables: [
-			{ name: "first_name", type: "string", defaultValue: "there" },
-			{ name: "reset_url", type: "string", defaultValue: null },
-		],
-	},
-	{
-		id: "order-receipt",
-		name: "Order receipt",
-		slug: "order-receipt",
-		description:
-			"Clean order receipt with line items, totals, and a view-invoice button.",
-		html: orderReceiptHtml,
-		variables: [
-			{ name: "first_name", type: "string", defaultValue: "there" },
-			{ name: "order_number", type: "string", defaultValue: "1042" },
-			{ name: "invoice_url", type: "string", defaultValue: null },
-		],
-	},
-	{
 		id: "sign-in-code",
+		category: "auth",
 		name: "Sign-in code",
 		slug: "sign-in-code",
 		description:
@@ -110,6 +102,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "order-shipped",
+		category: "orders",
 		name: "Order shipped",
 		slug: "order-shipped",
 		description:
@@ -123,6 +116,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "event-ticket",
+		category: "events",
 		name: "Event ticket",
 		slug: "booking-confirmed",
 		description:
@@ -136,6 +130,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "payment-failed",
+		category: "billing",
 		name: "Payment failed",
 		slug: "payment-failed",
 		description:
@@ -149,6 +144,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "team-invite",
+		category: "team",
 		name: "Team invite",
 		slug: "team-invite",
 		description:
@@ -167,6 +163,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "security-alert",
+		category: "auth",
 		name: "Security alert",
 		slug: "new-sign-in",
 		description:
@@ -179,6 +176,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "appointment-reminder",
+		category: "bookings",
 		name: "Appointment reminder",
 		slug: "appointment-reminder",
 		description:
@@ -191,6 +189,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "refund-confirmation",
+		category: "receipts",
 		name: "Refund confirmation",
 		slug: "refund-issued",
 		description:
@@ -205,6 +204,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "subscription-renewal",
+		category: "billing",
 		name: "Subscription renewal",
 		slug: "membership-renewal",
 		description:
@@ -223,6 +223,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "file-delivery",
+		category: "data",
 		name: "File delivery",
 		slug: "export-ready",
 		description:
@@ -248,6 +249,7 @@ export const emailTemplateExamples: EmailTemplateExample[] = [
 export const acmeTemplateExamples: EmailTemplateExample[] = [
 	{
 		id: "acme-welcome",
+		category: "onboarding",
 		name: "Welcome",
 		slug: "acme-welcome",
 		description:
@@ -260,6 +262,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-password-reset",
+		category: "auth",
 		name: "Password reset",
 		slug: "acme-password-reset",
 		description:
@@ -272,6 +275,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-sign-in-code",
+		category: "auth",
 		name: "Sign-in code",
 		slug: "acme-sign-in-code",
 		description: "Acme one-time sign-in code with a magic link fallback.",
@@ -283,6 +287,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-usage-alert",
+		category: "usage",
 		name: "Usage alert",
 		slug: "acme-usage-alert",
 		description:
@@ -295,6 +300,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-receipt",
+		category: "receipts",
 		name: "Receipt",
 		slug: "acme-receipt",
 		description:
@@ -308,6 +314,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-team-invite",
+		category: "team",
 		name: "Team invite",
 		slug: "acme-team-invite",
 		description:
@@ -321,6 +328,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-security-alert",
+		category: "auth",
 		name: "Security alert",
 		slug: "acme-security-alert",
 		description:
@@ -333,6 +341,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-payment-failed",
+		category: "billing",
 		name: "Payment failed",
 		slug: "acme-payment-failed",
 		description:
@@ -346,6 +355,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-subscription-renewal",
+		category: "billing",
 		name: "Renewal",
 		slug: "acme-subscription-renewal",
 		description: "Acme renewal reminder with plan, date, and amount.",
@@ -359,6 +369,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-order-shipped",
+		category: "orders",
 		name: "Order shipped",
 		slug: "acme-order-shipped",
 		description:
@@ -372,6 +383,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-refund",
+		category: "receipts",
 		name: "Refund",
 		slug: "acme-refund",
 		description: "Acme refund confirmation with amount, card, and timing.",
@@ -385,6 +397,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-verify-email",
+		category: "auth",
 		name: "Email verification",
 		slug: "acme-verify-email",
 		description:
@@ -397,6 +410,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-password-changed",
+		category: "auth",
 		name: "Password changed",
 		slug: "acme-password-changed",
 		description: "Acme confirmation that an account password was changed.",
@@ -408,6 +422,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-email-changed",
+		category: "account",
 		name: "Email changed",
 		slug: "acme-email-changed",
 		description:
@@ -421,6 +436,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-two-factor-enabled",
+		category: "auth",
 		name: "Two-factor enabled",
 		slug: "acme-two-factor-enabled",
 		description:
@@ -433,6 +449,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-usage-limit-reached",
+		category: "usage",
 		name: "Usage limit reached",
 		slug: "acme-usage-limit-reached",
 		description:
@@ -445,6 +462,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-trial-ending",
+		category: "billing",
 		name: "Trial ending",
 		slug: "acme-trial-ending",
 		description: "Acme reminder that a free trial is about to end.",
@@ -457,6 +475,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-subscription-canceled",
+		category: "billing",
 		name: "Subscription canceled",
 		slug: "acme-subscription-canceled",
 		description: "Acme confirmation that a subscription was canceled.",
@@ -469,6 +488,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-plan-changed",
+		category: "billing",
 		name: "Plan changed",
 		slug: "acme-plan-changed",
 		description:
@@ -481,6 +501,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-upcoming-invoice",
+		category: "billing",
 		name: "Upcoming invoice",
 		slug: "acme-upcoming-invoice",
 		description: "Acme preview of the next invoice before it's charged.",
@@ -493,6 +514,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-order-confirmation",
+		category: "orders",
 		name: "Order confirmation",
 		slug: "acme-order-confirmation",
 		description: "Acme order confirmation with items, shipping, and total.",
@@ -505,6 +527,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-order-delivered",
+		category: "orders",
 		name: "Order delivered",
 		slug: "acme-order-delivered",
 		description:
@@ -517,6 +540,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-data-export",
+		category: "data",
 		name: "Data export",
 		slug: "acme-data-export",
 		description:
@@ -529,6 +553,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-account-deleted",
+		category: "account",
 		name: "Account deleted",
 		slug: "acme-account-deleted",
 		description:
@@ -541,6 +566,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-invitation-accepted",
+		category: "team",
 		name: "Invitation accepted",
 		slug: "acme-invitation-accepted",
 		description:
@@ -554,6 +580,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-api-key-created",
+		category: "developer",
 		name: "API key created",
 		slug: "acme-api-key-created",
 		description: "Acme security notice when a new API key is created.",
@@ -566,6 +593,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-domain-verified",
+		category: "developer",
 		name: "Domain verified",
 		slug: "acme-domain-verified",
 		description: "Acme confirmation that a domain passed DNS verification.",
@@ -577,6 +605,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-support-ticket",
+		category: "support",
 		name: "Support request",
 		slug: "acme-support-ticket",
 		description: "Acme acknowledgment that a support request was received.",
@@ -589,6 +618,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-weekly-report",
+		category: "notifications",
 		name: "Weekly report",
 		slug: "acme-weekly-report",
 		description:
@@ -601,6 +631,7 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 	},
 	{
 		id: "acme-mention",
+		category: "notifications",
 		name: "Mention",
 		slug: "acme-mention",
 		description: "Acme notification when someone mentions you in a comment.",
@@ -609,6 +640,143 @@ export const acmeTemplateExamples: EmailTemplateExample[] = [
 			{ name: "commenter_name", type: "string", defaultValue: "Maya" },
 			{ name: "first_name", type: "string", defaultValue: "Alex" },
 			{ name: "comment_url", type: "string", defaultValue: null },
+		],
+	},
+];
+
+/**
+ * Acme onboarding drip: a welcome, then one email each for the MCP server,
+ * the CLI, and setting up with a coding agent.
+ */
+export const acmeWelcomeSequenceExamples: EmailTemplateExample[] = [
+	{
+		id: "acme-sequence-welcome",
+		category: "onboarding",
+		name: "Welcome (1 of 4)",
+		slug: "acme-sequence-welcome",
+		description:
+			"Acme sequence opener introducing the three ways in: AI assistant, terminal, and dashboard.",
+		html: acmeSequenceWelcomeHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "dashboard_url", type: "string", defaultValue: null },
+		],
+	},
+	{
+		id: "acme-sequence-mcp",
+		category: "onboarding",
+		name: "Connect MCP (2 of 4)",
+		slug: "acme-sequence-mcp",
+		description:
+			"Acme guide to adding the MCP server to Claude, Cursor, or ChatGPT, with config and prompts to try.",
+		html: acmeSequenceMcpHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "api_keys_url", type: "string", defaultValue: null },
+		],
+	},
+	{
+		id: "acme-sequence-cli",
+		category: "onboarding",
+		name: "Install the CLI (3 of 4)",
+		slug: "acme-sequence-cli",
+		description:
+			"Acme CLI install and first commands for sites, events, and reports.",
+		html: acmeSequenceCliHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "docs_url", type: "string", defaultValue: null },
+		],
+	},
+	{
+		id: "acme-sequence-ai",
+		category: "onboarding",
+		name: "Build with AI (4 of 4)",
+		slug: "acme-sequence-ai",
+		description:
+			"Acme guide to letting a coding agent install tracking, with llms.txt and a ready-to-paste prompt.",
+		html: acmeSequenceAiHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "dashboard_url", type: "string", defaultValue: null },
+		],
+	},
+];
+
+/** Acme promotional emails: discounts, upgrades, extensions, and win-backs. */
+export const acmeOfferExamples: EmailTemplateExample[] = [
+	{
+		id: "acme-offer-annual",
+		category: "offers",
+		name: "Annual discount",
+		slug: "acme-offer-annual",
+		description:
+			"Acme offer to switch to yearly billing with a coupon code and price comparison.",
+		html: acmeOfferAnnualHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "coupon_code", type: "string", defaultValue: "YEARLY20" },
+			{ name: "offer_expiry", type: "string", defaultValue: "Oct 31, 2026" },
+			{ name: "offer_url", type: "string", defaultValue: null },
+		],
+	},
+	{
+		id: "acme-offer-upgrade",
+		category: "offers",
+		name: "Upgrade offer",
+		slug: "acme-offer-upgrade",
+		description:
+			"Acme half-price upgrade offer for a Free workspace, listing what Pro includes.",
+		html: acmeOfferUpgradeHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "workspace_name", type: "string", defaultValue: "Acme Studio" },
+			{ name: "coupon_code", type: "string", defaultValue: "PRO50" },
+			{ name: "offer_expiry", type: "string", defaultValue: "Oct 31, 2026" },
+			{ name: "upgrade_url", type: "string", defaultValue: null },
+		],
+	},
+	{
+		id: "acme-offer-trial-extension",
+		category: "offers",
+		name: "Trial extension",
+		slug: "acme-offer-trial-extension",
+		description: "Acme offer to extend a trial by a week, no card required.",
+		html: acmeOfferTrialExtensionHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "trial_end_date", type: "string", defaultValue: "Oct 18, 2026" },
+			{ name: "extend_url", type: "string", defaultValue: null },
+		],
+	},
+	{
+		id: "acme-offer-win-back",
+		category: "win-back",
+		name: "Win-back",
+		slug: "acme-offer-win-back",
+		description:
+			"Acme win-back email with what's new since a customer left and a comeback discount.",
+		html: acmeOfferWinBackHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "coupon_code", type: "string", defaultValue: "COMEBACK30" },
+			{ name: "offer_expiry", type: "string", defaultValue: "Oct 31, 2026" },
+			{ name: "reactivate_url", type: "string", defaultValue: null },
+		],
+	},
+	{
+		id: "acme-offer-sale",
+		category: "offers",
+		name: "Limited-time sale",
+		slug: "acme-offer-sale",
+		description:
+			"Acme seasonal sale with a coupon, deadline, and before-and-after plan prices.",
+		html: acmeOfferSaleHtml,
+		variables: [
+			{ name: "first_name", type: "string", defaultValue: "there" },
+			{ name: "coupon_code", type: "string", defaultValue: "SALE40" },
+			{ name: "offer_expiry", type: "string", defaultValue: "Nov 30, 2026" },
+			{ name: "offer_url", type: "string", defaultValue: null },
 		],
 	},
 ];
@@ -624,6 +792,16 @@ export const editorTemplateExamples: EmailTemplateExample[] = [
 	blankTemplateExample,
 	...emailTemplateExamples,
 	...acmeTemplateExamples,
+	...acmeWelcomeSequenceExamples,
+	...acmeOfferExamples,
+];
+
+/** Every designed template (no blank canvas), filed into Explore folders. */
+export const categorizedTemplateExamples: EmailTemplateExample[] = [
+	...emailTemplateExamples,
+	...acmeTemplateExamples,
+	...acmeWelcomeSequenceExamples,
+	...acmeOfferExamples,
 ];
 
 export function getEmailTemplateExample(
