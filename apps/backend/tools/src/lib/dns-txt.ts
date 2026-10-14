@@ -29,6 +29,53 @@ export async function lookupTxt(
 	}
 }
 
+export type TxtResult = { records: string[]; failed: boolean };
+
+export type TxtResultLookup = (name: string) => Promise<TxtResult>;
+
+// NXDOMAIN and NODATA are real answers ("nothing here"). Anything else — a
+// timeout, SERVFAIL, a refused connection — means we don't know.
+const NO_ANSWER_CODES = new Set(["ENOTFOUND", "ENODATA"]);
+
+function isNoAnswer(error: unknown): boolean {
+	const code = (error as NodeJS.ErrnoException | undefined)?.code;
+	return Boolean(code && NO_ANSWER_CODES.has(code));
+}
+
+export async function lookupTxtResult(
+	name: string,
+	timeoutMs = DEFAULT_TIMEOUT_MS,
+	resolver: dns.Resolver = publicResolver,
+): Promise<TxtResult> {
+	try {
+		const records = await withDeadline(
+			resolver.resolveTxt(name),
+			timeoutMs,
+			`TXT ${name}`,
+		);
+		return { records: flattenTxt(records), failed: false };
+	} catch (error) {
+		return { records: [], failed: !isNoAnswer(error) };
+	}
+}
+
+/** true/false when DNS answered, null when the lookup itself failed. */
+export async function domainExists(
+	domain: string,
+	timeoutMs = DEFAULT_TIMEOUT_MS,
+	resolver: dns.Resolver = publicResolver,
+): Promise<boolean | null> {
+	try {
+		await withDeadline(resolver.resolveSoa(domain), timeoutMs, `SOA ${domain}`);
+		return true;
+	} catch (error) {
+		const code = (error as NodeJS.ErrnoException | undefined)?.code;
+		if (code === "ENODATA") return true;
+		if (code === "ENOTFOUND") return false;
+		return null;
+	}
+}
+
 export function findRecordsByPrefix(
 	records: string[],
 	prefix: string,

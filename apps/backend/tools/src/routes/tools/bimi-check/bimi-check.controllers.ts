@@ -1,12 +1,15 @@
 import { ToolsErrors } from "@be/tools/error/tools.error-response";
 import {
+	domainExists,
 	findRecordsByPrefix,
-	lookupTxt,
-	type TxtLookup,
+	lookupTxtResult,
+	type TxtResult,
+	type TxtResultLookup,
 } from "@be/tools/lib/dns-txt";
 import { isPlausibleDomain, normalizeDomain } from "@be/tools/lib/domain";
 import { fetchHttpsText } from "@be/tools/lib/fetch-https";
 import { inspectSvgTinyPs } from "@be/tools/lib/svg-tiny-ps";
+import { getDomain } from "tldts";
 import {
 	type BimiCheckItem,
 	type CheckStatus,
@@ -40,12 +43,14 @@ export interface BimiCheckResult {
 }
 
 export type BimiCheckDeps = {
-	lookupTxt: TxtLookup;
+	lookupTxt: TxtResultLookup;
+	domainExists: (domain: string) => Promise<boolean | null>;
 	fetchLogo: boolean;
 };
 
 const defaultDeps: BimiCheckDeps = {
-	lookupTxt,
+	lookupTxt: (name) => lookupTxtResult(name),
+	domainExists: (domain) => domainExists(domain),
 	fetchLogo: true,
 };
 
@@ -57,26 +62,69 @@ function parentDomain(domain: string): string | null {
 	return labels.slice(1).join(".");
 }
 
+// One retry: a single dropped UDP packet shouldn't turn into "no record".
+async function lookupWithRetry(
+	name: string,
+	lookup: TxtResultLookup,
+): Promise<TxtResult> {
+	const first = await lookup(name);
+	return first.failed ? lookup(name) : first;
+}
+
 export async function discoverDmarc(
 	domain: string,
-	lookup: TxtLookup,
-): Promise<{ records: string[]; at: string; inherited: boolean }> {
+	lookup: TxtResultLookup,
+): Promise<{
+	records: string[];
+	at: string;
+	inherited: boolean;
+	failed: boolean;
+}> {
 	let current: string | null = domain;
+	let failed = false;
 	for (let hop = 0; hop < MAX_DMARC_WALK && current; hop++) {
-		const matches = findRecordsByPrefix(
-			await lookup(`_dmarc.${current}`),
-			"v=dmarc1",
-		);
+		const result = await lookupWithRetry(`_dmarc.${current}`, lookup);
+		failed ||= result.failed;
+		const matches = findRecordsByPrefix(result.records, "v=dmarc1");
 		if (matches.length > 0) {
 			return {
 				records: matches,
 				at: current,
 				inherited: current !== domain,
+				failed: false,
 			};
 		}
 		current = parentDomain(current);
 	}
-	return { records: [], at: domain, inherited: false };
+	return { records: [], at: domain, inherited: false, failed };
+}
+
+// BIMI discovery: look at default._bimi.<domain>, and if that holds no BIMI
+// record, fall back to the organizational domain (draft-brand-indicators-for-
+// message-identification, "Assertion Record Discovery").
+export async function discoverBimi(
+	domain: string,
+	lookup: TxtResultLookup,
+): Promise<{ records: string[]; queryName: string; inherited: boolean }> {
+	const queryName = `default._bimi.${domain}`;
+	const own = await lookupWithRetry(queryName, lookup);
+	if (own.failed) throw ToolsErrors.bimiLookupFailed();
+
+	const ownMatches = findRecordsByPrefix(own.records, "v=bimi1");
+	const orgDomain = getDomain(domain);
+	if (ownMatches.length > 0 || !orgDomain || orgDomain === domain) {
+		return { records: ownMatches, queryName, inherited: false };
+	}
+
+	const orgQueryName = `default._bimi.${orgDomain}`;
+	const org = await lookupWithRetry(orgQueryName, lookup);
+	if (org.failed) throw ToolsErrors.bimiLookupFailed();
+
+	const orgMatches = findRecordsByPrefix(org.records, "v=bimi1");
+	if (orgMatches.length === 0) {
+		return { records: [], queryName, inherited: false };
+	}
+	return { records: orgMatches, queryName: orgQueryName, inherited: true };
 }
 
 function recommendationsFrom(checks: BimiCheckItem[]): string[] {
@@ -152,19 +200,30 @@ export async function checkBimiController(
 	rawDomain: string,
 	deps: Partial<BimiCheckDeps> = {},
 ): Promise<BimiCheckResult> {
-	const { lookupTxt: resolveTxt, fetchLogo } = { ...defaultDeps, ...deps };
+	const {
+		lookupTxt: resolveTxt,
+		domainExists: checkDomainExists,
+		fetchLogo,
+	} = { ...defaultDeps, ...deps };
 	const domain = normalizeDomain(rawDomain);
 
 	if (!domain) throw ToolsErrors.bimiEmptyInput();
 	if (!isPlausibleDomain(domain)) throw ToolsErrors.bimiInvalidDomain();
 
-	const queryName = `default._bimi.${domain}`;
-	const [bimiTxts, dmarcDiscovery] = await Promise.all([
-		resolveTxt(queryName),
+	const [bimiDiscovery, dmarcDiscovery] = await Promise.all([
+		discoverBimi(domain, resolveTxt),
 		discoverDmarc(domain, resolveTxt),
 	]);
+	const { queryName, records: bimiMatches } = bimiDiscovery;
 
-	const bimiMatches = findRecordsByPrefix(bimiTxts, "v=bimi1");
+	// No record anywhere could mean the domain itself is a typo. Only ask then,
+	// so a working domain doesn't pay for the extra lookup.
+	if (bimiMatches.length === 0 && dmarcDiscovery.records.length === 0) {
+		if ((await checkDomainExists(domain)) === false) {
+			throw ToolsErrors.bimiDomainNotFound(domain);
+		}
+	}
+
 	const dmarcMatches = dmarcDiscovery.records;
 	const bimiRaw = bimiMatches[0] ?? null;
 	const dmarcRaw = dmarcMatches.length === 1 ? (dmarcMatches[0] ?? null) : null;
@@ -189,11 +248,15 @@ export async function checkBimiController(
 	const authorityUrl: string | null = parsed?.authorityUrl || null;
 
 	if (!parsed) {
+		const orgDomain = getDomain(domain);
+		const checkedOrg = orgDomain && orgDomain !== domain;
 		checks.push({
 			id: "bimi-present",
 			label: "BIMI TXT",
 			status: "fail",
-			detail: `No BIMI record at ${queryName}.`,
+			detail: checkedOrg
+				? `No BIMI record at ${queryName} or default._bimi.${orgDomain}.`
+				: `No BIMI record at ${queryName}.`,
 			fix: `Publish a TXT record at ${queryName} with v=BIMI1; l=https://…/logo.svg`,
 		});
 	} else {
@@ -201,7 +264,9 @@ export async function checkBimiController(
 			id: "bimi-present",
 			label: "BIMI TXT",
 			status: "pass",
-			detail: `Found BIMI record at ${queryName}.`,
+			detail: bimiDiscovery.inherited
+				? `No record at default._bimi.${domain}, so inboxes use the one at ${queryName}.`
+				: `Found BIMI record at ${queryName}.`,
 			record: parsed.raw,
 		});
 
@@ -267,6 +332,14 @@ export async function checkBimiController(
 			status: "fail",
 			detail: `Found ${dmarcMatches.length} DMARC TXT records at _dmarc.${dmarcDiscovery.at}. Multiple DMARC records must be discarded.`,
 			fix: "Keep a single v=DMARC1 TXT record at that name.",
+		});
+	} else if (!dmarc.present && dmarcDiscovery.failed) {
+		checks.push({
+			id: "dmarc",
+			label: "DMARC enforcement",
+			status: "warn",
+			detail: `The DNS lookup for _dmarc.${domain} did not answer, so DMARC could not be checked.`,
+			fix: "Run the check again in a moment.",
 		});
 	} else if (!dmarc.present) {
 		checks.push({

@@ -81,6 +81,10 @@ export function parseDmarcPct(raw: string | undefined): number | null {
 	return Number(raw);
 }
 
+function capitalize(text: string): string {
+	return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 export function httpsUrlIssue(
 	url: string | null,
 	label: string,
@@ -99,7 +103,7 @@ export function httpsUrlIssue(
 	} catch {
 		return {
 			ok: false,
-			detail: `${label} URL is not a valid URL.`,
+			detail: `${capitalize(label)} URL is not a valid URL.`,
 			fix: "Publish an absolute HTTPS URL.",
 		};
 	}
@@ -107,12 +111,12 @@ export function httpsUrlIssue(
 	if (parsed.protocol !== "https:") {
 		return {
 			ok: false,
-			detail: `${label} URL must use HTTPS (got ${parsed.protocol}).`,
+			detail: `${capitalize(label)} URL must use HTTPS (got ${parsed.protocol}).`,
 			fix: "Serve the file over HTTPS with a valid certificate.",
 		};
 	}
 
-	return { ok: true, detail: `${label} URL is HTTPS.` };
+	return { ok: true, detail: `${capitalize(label)} URL is HTTPS.` };
 }
 
 export function overallVerdict(items: BimiCheckItem[]): CheckStatus {

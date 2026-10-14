@@ -118,10 +118,15 @@ describe("inspectSvgTinyPs", () => {
 	});
 });
 
+function answers(fn: (name: string) => string[]) {
+	return async (name: string) => ({ records: fn(name), failed: false });
+}
+
 describe("checkBimiController", () => {
 	test("fails when BIMI and DMARC are missing", async () => {
 		const result = await checkBimiController("example.com", {
-			lookupTxt: async () => [],
+			lookupTxt: answers(() => []),
+			domainExists: async () => true,
 			fetchLogo: false,
 		});
 		expect(result.domain).toBe("example.com");
@@ -135,7 +140,7 @@ describe("checkBimiController", () => {
 
 	test("passes a complete BIMI + enforced DMARC record without fetching the logo", async () => {
 		const result = await checkBimiController("brand.example", {
-			lookupTxt: async (name) => {
+			lookupTxt: answers((name) => {
 				if (name.startsWith("default._bimi.")) {
 					return [
 						"v=BIMI1; l=https://cdn.brand.example/bimi.svg; a=https://cdn.brand.example/vmc.pem",
@@ -147,7 +152,7 @@ describe("checkBimiController", () => {
 					];
 				}
 				return [];
-			},
+			}),
 			fetchLogo: false,
 		});
 		expect(result.verdict).toBe("pass");
@@ -158,7 +163,7 @@ describe("checkBimiController", () => {
 
 	test("warns when BIMI is present but DMARC is p=none and there is no VMC", async () => {
 		const result = await checkBimiController("monitor.example", {
-			lookupTxt: async (name) => {
+			lookupTxt: answers((name) => {
 				if (name.startsWith("default._bimi.")) {
 					return ["v=BIMI1; l=https://cdn.monitor.example/logo.svg"];
 				}
@@ -166,7 +171,7 @@ describe("checkBimiController", () => {
 					return ["v=DMARC1; p=none"];
 				}
 				return [];
-			},
+			}),
 			fetchLogo: false,
 		});
 		expect(result.verdict).toBe("fail");
@@ -177,14 +182,14 @@ describe("checkBimiController", () => {
 	});
 
 	test("rejects an invalid domain", async () => {
-		expect(checkBimiController("nodot", { fetchLogo: false })).rejects.toThrow(
-			"Invalid domain",
-		);
+		await expect(
+			checkBimiController("nodot", { fetchLogo: false }),
+		).rejects.toThrow("Invalid domain");
 	});
 
 	test("inherits an enforcing parent DMARC policy for a subdomain", async () => {
 		const result = await checkBimiController("mail.brand.example", {
-			lookupTxt: async (name) => {
+			lookupTxt: answers((name) => {
 				if (name.startsWith("default._bimi.")) {
 					return [
 						"v=BIMI1; l=https://cdn.brand.example/bimi.svg; a=https://cdn.brand.example/vmc.pem",
@@ -194,7 +199,7 @@ describe("checkBimiController", () => {
 					return ["v=DMARC1; p=reject; sp=quarantine"];
 				}
 				return [];
-			},
+			}),
 			fetchLogo: false,
 		});
 		expect(result.dmarcEnforced).toBe(true);
@@ -204,7 +209,7 @@ describe("checkBimiController", () => {
 
 	test("fails when a lookup name publishes multiple DMARC records", async () => {
 		const result = await checkBimiController("brand.example", {
-			lookupTxt: async (name) => {
+			lookupTxt: answers((name) => {
 				if (name.startsWith("default._bimi.")) {
 					return ["v=BIMI1; l=https://cdn.brand.example/bimi.svg"];
 				}
@@ -212,10 +217,112 @@ describe("checkBimiController", () => {
 					return ["v=DMARC1; p=reject", "v=DMARC1; p=none"];
 				}
 				return [];
-			},
+			}),
 			fetchLogo: false,
 		});
 		expect(result.dmarcEnforced).toBe(false);
 		expect(result.checks.find((c) => c.id === "dmarc")?.status).toBe("fail");
+	});
+
+	test("falls back to the organizational domain's BIMI record for a subdomain", async () => {
+		const result = await checkBimiController("mail.brand.com", {
+			lookupTxt: answers((name) => {
+				if (name === "default._bimi.brand.com") {
+					return [
+						"v=BIMI1; l=https://cdn.brand.com/bimi.svg; a=https://cdn.brand.com/vmc.pem",
+					];
+				}
+				if (name === "_dmarc.brand.com") return ["v=DMARC1; p=reject"];
+				return [];
+			}),
+			fetchLogo: false,
+		});
+		expect(result.verdict).toBe("pass");
+		expect(result.queryName).toBe("default._bimi.brand.com");
+		expect(
+			result.checks.find((c) => c.id === "bimi-present")?.detail,
+		).toContain("default._bimi.mail.brand.com");
+	});
+
+	test("prefers the subdomain's own BIMI record over the organizational domain", async () => {
+		const result = await checkBimiController("mail.brand.com", {
+			lookupTxt: answers((name) => {
+				if (name === "default._bimi.mail.brand.com") {
+					return ["v=BIMI1; l=https://cdn.brand.com/mail.svg"];
+				}
+				if (name === "default._bimi.brand.com") {
+					return ["v=BIMI1; l=https://cdn.brand.com/bimi.svg"];
+				}
+				return [];
+			}),
+			fetchLogo: false,
+		});
+		expect(result.queryName).toBe("default._bimi.mail.brand.com");
+		expect(result.logoUrl).toBe("https://cdn.brand.com/mail.svg");
+	});
+
+	test("names both lookups when neither the subdomain nor its parent has BIMI", async () => {
+		const result = await checkBimiController("mail.brand.com", {
+			lookupTxt: answers(() => []),
+			domainExists: async () => true,
+			fetchLogo: false,
+		});
+		expect(result.queryName).toBe("default._bimi.mail.brand.com");
+		expect(result.checks.find((c) => c.id === "bimi-present")?.detail).toBe(
+			"No BIMI record at default._bimi.mail.brand.com or default._bimi.brand.com.",
+		);
+	});
+
+	test("rejects a domain that does not exist instead of reporting a missing record", async () => {
+		await expect(
+			checkBimiController("typo-brand.com", {
+				lookupTxt: answers(() => []),
+				domainExists: async () => false,
+				fetchLogo: false,
+			}),
+		).rejects.toThrow("Domain not found");
+	});
+
+	test("retries a failed BIMI lookup once before trusting the answer", async () => {
+		let bimiCalls = 0;
+		const result = await checkBimiController("brand.com", {
+			lookupTxt: async (name) => {
+				if (name === "default._bimi.brand.com") {
+					bimiCalls++;
+					if (bimiCalls === 1) return { records: [], failed: true };
+					return {
+						records: ["v=BIMI1; l=https://cdn.brand.com/bimi.svg"],
+						failed: false,
+					};
+				}
+				return { records: ["v=DMARC1; p=reject"], failed: false };
+			},
+			fetchLogo: false,
+		});
+		expect(bimiCalls).toBe(2);
+		expect(result.bimiRecord).toBe("v=BIMI1; l=https://cdn.brand.com/bimi.svg");
+	});
+
+	test("errors instead of reporting no record when the BIMI lookup keeps failing", async () => {
+		await expect(
+			checkBimiController("brand.com", {
+				lookupTxt: async () => ({ records: [], failed: true }),
+				fetchLogo: false,
+			}),
+		).rejects.toThrow("DNS lookup failed");
+	});
+
+	test("warns instead of failing DMARC when its lookup fails", async () => {
+		const result = await checkBimiController("brand.com", {
+			lookupTxt: async (name) =>
+				name.startsWith("_dmarc.")
+					? { records: [], failed: true }
+					: {
+							records: ["v=BIMI1; l=https://cdn.brand.com/bimi.svg"],
+							failed: false,
+						},
+			fetchLogo: false,
+		});
+		expect(result.checks.find((c) => c.id === "dmarc")?.status).toBe("warn");
 	});
 });

@@ -31,7 +31,9 @@ export const bimiCheckRoute = new Elysia()
 		response: {
 			200: ToolsModel.bimiCheckResponse,
 			400: ToolsModel.errorResponse,
+			404: ToolsModel.errorResponse,
 			429: ToolsModel.errorResponse,
+			503: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
 		detail,
@@ -41,7 +43,9 @@ export const bimiCheckRoute = new Elysia()
 		response: {
 			200: ToolsModel.bimiCheckResponse,
 			400: ToolsModel.errorResponse,
+			404: ToolsModel.errorResponse,
 			429: ToolsModel.errorResponse,
+			503: ToolsModel.errorResponse,
 		},
 		rateLimit: true,
 		detail: { ...detail, hide: true },

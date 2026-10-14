@@ -44,6 +44,20 @@ export const ToolsErrors = {
 			why: "The value was not a domain name with a dot.",
 			fix: "Enter a host like example.com — not an IP address or a URL path.",
 		}),
+	bimiDomainNotFound: (domain: string) =>
+		createError({
+			status: 404,
+			message: "Domain not found",
+			why: `${domain} does not exist in DNS, so it has no BIMI or DMARC records.`,
+			fix: "Check the spelling, or enter the domain you send mail from.",
+		}),
+	bimiLookupFailed: () =>
+		createError({
+			status: 503,
+			message: "DNS lookup failed",
+			why: "The DNS servers did not answer the BIMI lookup in time, so we can't say whether a record exists.",
+			fix: "Try again in a moment.",
+		}),
 	domainReputationEmptyInput: () =>
 		createError({
 			status: 400,
