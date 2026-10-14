@@ -11,6 +11,9 @@ export const createAutomationRoute = new Elysia().use(authMiddleware).post(
 			userId,
 			name: body.name,
 			description: body.description,
+			status: body.status,
+			steps: body.steps,
+			connections: body.connections,
 		});
 		set.status = 201;
 		return result;
@@ -27,7 +30,8 @@ export const createAutomationRoute = new Elysia().use(authMiddleware).post(
 		detail: {
 			tags: ["Automations"],
 			summary: "Create automation",
-			description: "Creates a draft automation workflow for the organization",
+			description:
+				'Creates an automation from `steps` and the `connections` between them. It starts as a draft unless `status` is "active", which validates it and starts it right away.',
 		},
 	},
 );

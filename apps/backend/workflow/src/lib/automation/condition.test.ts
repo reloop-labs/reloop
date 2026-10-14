@@ -19,6 +19,7 @@ describe("parseConditionData", () => {
 		expect(
 			parseConditionData({ field: "firstName", operator: "exists" }),
 		).toEqual({
+			type: "rule",
 			field: "firstName",
 			operator: "exists",
 			value: "",
@@ -102,5 +103,113 @@ describe("getBranchTarget", () => {
 	test("resolves yes/no from handle or edge data", () => {
 		expect(getBranchTarget(graph, "cond", "yes")).toBe("send-yes");
 		expect(getBranchTarget(graph, "cond", "no")).toBe("send-no");
+	});
+});
+
+describe("rules, groups and references", () => {
+	const vars = {
+		"event.plan": "pro",
+		"event.amount": "120",
+		"event.order_id": "ord_1",
+		"wait.order_id": "ord_1",
+		"contact.email": "ada@example.com",
+	};
+
+	test("parses and/or groups with nested rules", () => {
+		expect(
+			parseConditionData({
+				type: "and",
+				rules: [
+					{ type: "rule", field: "event.plan", operator: "eq", value: "pro" },
+					{ type: "rule", field: "event.amount", operator: "gte", value: 100 },
+				],
+			}),
+		).toEqual({
+			type: "and",
+			rules: [
+				{ type: "rule", field: "event.plan", operator: "eq", value: "pro" },
+				{ type: "rule", field: "event.amount", operator: "gte", value: 100 },
+			],
+		});
+		expect(() => parseConditionData({ type: "or", rules: [] })).toThrow(
+			"at least one rule",
+		);
+	});
+
+	test("and needs every rule, or needs one", () => {
+		const pro = {
+			type: "rule",
+			field: "event.plan",
+			operator: "eq",
+			value: "pro",
+		} as const;
+		const big = {
+			type: "rule",
+			field: "event.amount",
+			operator: "gte",
+			value: 500,
+		} as const;
+		expect(evaluateCondition({ type: "and", rules: [pro, big] }, vars)).toBe(
+			false,
+		);
+		expect(evaluateCondition({ type: "or", rules: [pro, big] }, vars)).toBe(
+			true,
+		);
+	});
+
+	test("gte / lte / starts_with / ends_with / is_empty", () => {
+		const rule = (operator: string, value?: string | number) =>
+			parseConditionData({ field: "event.amount", operator, value });
+		expect(evaluateCondition(rule("gte", 120), vars)).toBe(true);
+		expect(evaluateCondition(rule("lte", 119), vars)).toBe(false);
+		expect(
+			evaluateCondition(
+				parseConditionData({
+					field: "contact.email",
+					operator: "ends_with",
+					value: "@EXAMPLE.com",
+				}),
+				vars,
+			),
+		).toBe(true);
+		expect(
+			evaluateCondition(
+				parseConditionData({
+					field: "contact.email",
+					operator: "starts_with",
+					value: "bob",
+				}),
+				vars,
+			),
+		).toBe(false);
+		expect(
+			evaluateCondition(
+				parseConditionData({ field: "event.coupon", operator: "is_empty" }),
+				vars,
+			),
+		).toBe(true);
+	});
+
+	test("{ var } compares against another field; missing data never matches", () => {
+		expect(
+			evaluateCondition(
+				parseConditionData({
+					field: "wait.order_id",
+					operator: "eq",
+					value: { var: "event.order_id" },
+				}),
+				vars,
+			),
+		).toBe(true);
+		expect(
+			evaluateCondition(
+				parseConditionData({
+					field: "wait.order_id",
+					operator: "neq",
+					value: { var: "event.missing" },
+				}),
+				vars,
+			),
+		).toBe(false);
 	});
 });

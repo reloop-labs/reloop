@@ -3,6 +3,7 @@
 import * as Alert from "@reloop/ui/alert";
 import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -498,7 +499,7 @@ export function EmailValidatorPageView() {
 												<FancyButton.Icon as={Icon} name="shield-check" />
 												<span>Check Health</span>
 												<KbdKey className={actionKbdOnFilledClassName}>
-													↵
+													<EnterIcon />
 												</KbdKey>
 											</>
 										)}
@@ -1080,7 +1081,9 @@ export function EmailValidatorPageView() {
 										<>
 											<FancyButton.Icon as={Icon} name="shield-check" />
 											<span>Start Batch Health Check</span>
-											<KbdKey className={actionKbdOnFilledClassName}>↵</KbdKey>
+											<KbdKey className={actionKbdOnFilledClassName}>
+												<EnterIcon />
+											</KbdKey>
 										</>
 									)}
 								</FancyButton.Root>

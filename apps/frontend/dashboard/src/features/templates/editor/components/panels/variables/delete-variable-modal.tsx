@@ -1,6 +1,7 @@
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
@@ -336,7 +337,7 @@ export const DeleteTemplateVariableModal = ({
 									<>
 										<span>Delete</span>
 										<ActionKbd className={actionKbdOnDestructiveClassName}>
-											↵
+											<EnterIcon />
 										</ActionKbd>
 									</>
 								)}

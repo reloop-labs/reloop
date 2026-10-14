@@ -10,16 +10,25 @@ export type WorkflowNodeType =
 	| "delay"
 	| "condition"
 	| "group"
+	/** Unsaved placeholder holding the step menu while inserting (never persisted). */
 	| "add_step";
 
 export type ConditionOperator =
 	| "eq"
 	| "neq"
 	| "contains"
+	| "starts_with"
+	| "ends_with"
 	| "exists"
 	| "not_exists"
+	| "is_empty"
 	| "gt"
-	| "lt";
+	| "gte"
+	| "lt"
+	| "lte";
+
+/** A fixed value, or another field to compare with (set through the API). */
+export type ConditionValue = string | number | boolean | null | { var: string };
 
 export type DelayUnit = "minutes" | "hours" | "days";
 
@@ -56,16 +65,20 @@ export interface SendEmailNodeData extends NodeCardMeta {
 }
 
 export interface DelayNodeData extends NodeCardMeta {
-	amount: number;
-	unit: DelayUnit;
+	/** Unset on a brand-new Delay step: the user always picks the wait. */
+	amount?: number;
+	unit?: DelayUnit;
 	[key: string]: unknown;
 }
 
 export interface ConditionNodeData extends NodeCardMeta {
-	/** `email` / `firstName` / `status` / `event.plan` / `property.plan` */
+	/** `contact.email` / `contact.plan` / `trigger.plan` (legacy: `email` / `property.plan` / `event.plan`) */
 	field: string;
 	operator: ConditionOperator;
-	value?: string;
+	value?: ConditionValue;
+	/** `and` / `or` group of `rules` (only created through the API). */
+	type?: "rule" | "and" | "or";
+	rules?: Record<string, unknown>[];
 	[key: string]: unknown;
 }
 

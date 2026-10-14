@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
@@ -413,7 +414,9 @@ export function ContactExportModal({
 								>
 									<Icon name="file-download" className="h-4 w-4" />
 									<span>Export {selectedCount.toLocaleString()}</span>
-									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+									<ActionKbd className={actionKbdOnBlueClassName}>
+										<EnterIcon />
+									</ActionKbd>
 								</FancyButton.Root>
 							</>
 						) : step === "exporting" ? (
@@ -474,7 +477,9 @@ export function ContactExportModal({
 									className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
 								>
 									Done
-									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+									<ActionKbd className={actionKbdOnBlueClassName}>
+										<EnterIcon />
+									</ActionKbd>
 								</FancyButton.Root>
 							</>
 						) : (
@@ -499,7 +504,9 @@ export function ContactExportModal({
 									)}
 								>
 									Retry
-									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+									<ActionKbd className={actionKbdOnBlueClassName}>
+										<EnterIcon />
+									</ActionKbd>
 								</FancyButton.Root>
 							</>
 						)}

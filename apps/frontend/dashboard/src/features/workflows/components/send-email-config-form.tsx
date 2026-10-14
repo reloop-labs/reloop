@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
@@ -66,6 +67,10 @@ const TemplateThumb = ({ template }: { template: Template }) => {
 	);
 };
 
+/** Edge to edge: it sits inside a step's card, which provides the border. */
+/** Preview images that have finished loading at least once this session. */
+const loadedPreviewSrcs = new Set<string>();
+
 const TemplateDetailPreview = ({
 	templateId,
 	templateName,
@@ -77,35 +82,39 @@ const TemplateDetailPreview = ({
 	detail?: Template | null;
 	isLoading: boolean;
 }) => {
-	const [failed, setFailed] = useState(false);
-	const [imageLoaded, setImageLoaded] = useState(false);
 	const src = templateThumbnailSrc({
 		id: templateId,
 		updatedAt: detail?.updatedAt ?? "",
 		thumbnailUrl: detail?.thumbnailUrl ?? null,
 	} as Template);
+	// A preview already shown once (e.g. at rest, before opening the editor)
+	// renders straight away: no skeleton, no fade, so nothing flickers when
+	// the step switches between resting and editing.
+	const seenBefore = loadedPreviewSrcs.has(src);
+	const [failed, setFailed] = useState(false);
+	const [imageLoaded, setImageLoaded] = useState(seenBefore);
 
 	useEffect(() => {
 		setFailed(false);
-		setImageLoaded(false);
+		setImageLoaded(loadedPreviewSrcs.has(src));
 	}, [src]);
 
 	if (isLoading) {
 		return (
-			<Skeleton className="nodrag nopan nowheel h-72 w-full rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40" />
+			<Skeleton className="nodrag nopan nowheel h-72 w-full rounded-none" />
 		);
 	}
 
 	if (failed) {
 		return (
-			<div className="nodrag nopan nowheel flex h-72 w-full cursor-default select-none items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 text-text-soft-400 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
+			<div className="nodrag nopan nowheel flex h-72 w-full cursor-default select-none items-center justify-center bg-bg-white-0 text-text-soft-400 dark:bg-[#141419]">
 				<Icon name="image-upload" className="pointer-events-none h-6 w-6" />
 			</div>
 		);
 	}
 
 	return (
-		<div className="nodrag nopan nowheel relative h-72 w-full cursor-default select-none overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#141419]">
+		<div className="nodrag nopan nowheel relative h-72 w-full cursor-default select-none overflow-hidden bg-bg-white-0 dark:bg-[#141419]">
 			{!imageLoaded && (
 				<Skeleton className="absolute inset-0 h-full w-full rounded-none" />
 			)}
@@ -113,29 +122,40 @@ const TemplateDetailPreview = ({
 				src={src}
 				alt={`Preview of ${templateName}`}
 				className={cn(
-					"pointer-events-none h-full w-full select-none object-cover object-top transition-opacity duration-200",
+					"pointer-events-none h-full w-full select-none object-cover object-top",
+					!seenBefore && "transition-opacity duration-200",
 					imageLoaded ? "opacity-100" : "opacity-0",
 				)}
-				loading="lazy"
-				decoding="async"
+				loading={seenBefore ? "eager" : "lazy"}
+				decoding={seenBefore ? "sync" : "async"}
 				draggable={false}
-				onLoad={() => setImageLoaded(true)}
+				onLoad={() => {
+					loadedPreviewSrcs.add(src);
+					setImageLoaded(true);
+				}}
 				onError={() => setFailed(true)}
 			/>
 		</div>
 	);
 };
 
-const TemplatePicker = ({
+export const TemplatePicker = ({
 	value,
 	onChange,
+	search: externalSearch,
+	onSelect,
 }: {
 	value: SendEmailNodeData;
 	onChange: (data: SendEmailNodeData) => void;
+	/** When set, filters by this (e.g. the step's input) and hides the grid's own search box. */
+	search?: string;
+	/** When set, picking a template calls this instead of toggling `templateId`. */
+	onSelect?: (template: Template) => void;
 }) => {
 	const queryClient = useQueryClient();
 	const router = useRouter();
-	const [search, setSearch] = useState("");
+	const [ownSearch, setSearch] = useState("");
+	const search = externalSearch ?? ownSearch;
 	const [creating, setCreating] = useState(false);
 	const templatesQuery = useTemplatesQuery();
 	const templates = templatesQuery.data?.templates ?? [];
@@ -151,6 +171,10 @@ const TemplatePicker = ({
 	}, [templates, search]);
 
 	const selectTemplate = (template: Template) => {
+		if (onSelect) {
+			onSelect(template);
+			return;
+		}
 		if (template.id === value.templateId) {
 			onChange({ ...value, templateId: "" });
 			return;
@@ -175,21 +199,23 @@ const TemplatePicker = ({
 
 	return (
 		<div className="space-y-2">
-			<div className="relative">
-				<Icon
-					name="search"
-					className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-text-soft-400"
-				/>
-				<input
-					type="text"
-					placeholder="Search templates..."
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
-					onKeyDown={(e) => e.stopPropagation()}
-					aria-label="Search templates"
-					className="w-full rounded-xl border border-stroke-soft-100 bg-bg-white-0 py-2 pr-3 pl-9 text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus:border-blue-500"
-				/>
-			</div>
+			{externalSearch === undefined ? (
+				<div className="relative">
+					<Icon
+						name="search"
+						className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-soft-400"
+					/>
+					<input
+						type="text"
+						placeholder="Search templates..."
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						onKeyDown={(e) => e.stopPropagation()}
+						aria-label="Search templates"
+						className="w-full rounded-xl border border-stroke-soft-100 bg-bg-white-0 py-2 pr-3 pl-9 text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus:border-blue-500"
+					/>
+				</div>
+			) : null}
 			{templatesQuery.isLoading ? (
 				<p className="px-1 py-4 text-center text-text-sub-600 text-xs">
 					Loading templates…
@@ -203,7 +229,7 @@ const TemplatePicker = ({
 					No templates match “{search.trim()}”.
 				</p>
 			) : null}
-			<div className="nowheel scrollbar-thin grid max-h-64 grid-cols-2 gap-2 overflow-y-auto overflow-x-hidden overscroll-contain p-0.5">
+			<div className="grid grid-cols-2 gap-2 p-0.5">
 				{filtered.map((template) => {
 					const isSelected = value.templateId === template.id;
 					return (
@@ -872,7 +898,7 @@ const WorkflowSenderSection = ({
 								animate={{ opacity: 1, y: 0, scale: 1 }}
 								exit={{ opacity: 0, y: -4, scale: 0.98 }}
 								transition={{ duration: 0.15, ease: "easeOut" }}
-								className="nodrag absolute top-full left-0 z-50 mt-1.5 w-full min-w-[280px] max-w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+								className="nodrag absolute top-full left-0 z-50 mt-1.5 w-full min-w-[280px] max-w-full overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg dark:border-stroke-soft-100"
 								onMouseDown={(e) => e.stopPropagation()}
 							>
 								{isLoadingDomains && suggestions.length === 0 ? (
@@ -904,7 +930,7 @@ const WorkflowSenderSection = ({
 										</Link>
 									</div>
 								) : (
-									<div className="max-h-56 overflow-y-auto">
+									<div>
 										{suggestions.map((item, idx) => {
 											const isSelected = idx === highlightIndex;
 											return (
@@ -921,8 +947,8 @@ const WorkflowSenderSection = ({
 													className={cn(
 														"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors",
 														isSelected
-															? "bg-bg-weak-50 text-text-strong-950 dark:bg-bg-sub-300/40"
-															: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
+															? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/[0.07]"
+															: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.04]",
 													)}
 												>
 													<div className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">
@@ -1070,6 +1096,7 @@ const WorkflowSenderSection = ({
 							id="workflow-send-details-preview-text"
 							label="Preview"
 							className="py-2.5"
+							hideBorder
 						>
 							<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
 								<input
@@ -1108,16 +1135,31 @@ const WorkflowSenderSection = ({
 	);
 };
 
-const SelectedTemplateView = ({
+/** Width of the "‹" plus its gap before the template name. */
+const CHEVRON_SPACE = 18;
+
+export const SelectedTemplateView = ({
 	templateId,
 	templateName,
 	initialStatus,
 	onBack,
+	previewSlot,
+	readOnly = false,
+	justClosed = false,
 }: {
 	templateId: string;
 	templateName: string;
 	initialStatus?: Template["status"];
-	onBack: () => void;
+	onBack?: () => void;
+	/** Render the email preview (+ Publish) into this element instead of inline. */
+	previewSlot?: HTMLElement | null;
+	/**
+	 * The step at rest: identical layout, frozen (inert, so nothing can be
+	 * clicked, typed into or tabbed to), no "‹" and no Publish bar.
+	 */
+	readOnly?: boolean;
+	/** At rest right after editing: slide the title back left as the "‹" leaves. */
+	justClosed?: boolean;
 }) => {
 	const queryClient = useQueryClient();
 	const [publishing, setPublishing] = useState(false);
@@ -1138,16 +1180,32 @@ const SelectedTemplateView = ({
 		[versionsQuery.data],
 	);
 	const latest = versions[0];
+	/** What's live: the newest published (major) version. */
+	const published = versions.find((v) => v.isMajor);
 	const status = detail?.status ?? initialStatus ?? "draft";
 	const isDraft = status !== "published";
 
+	// Unsaved typing first, then the template's saved values (what the sender
+	// fields edit), then the latest version. Saved edits live on the template,
+	// so they must win over the version or they'd look like they reverted.
 	const resolvedFrom =
-		fromDraft ?? latest?.fromEmail ?? detail?.fromEmail ?? "";
-	const resolvedReply = replyDraft ?? latest?.replyTo ?? detail?.replyTo ?? "";
+		fromDraft ?? detail?.fromEmail ?? latest?.fromEmail ?? "";
+	const resolvedReply = replyDraft ?? detail?.replyTo ?? latest?.replyTo ?? "";
 	const resolvedSubject =
-		subjectDraft ?? latest?.subject ?? detail?.subject ?? "";
+		subjectDraft ?? detail?.subject ?? latest?.subject ?? "";
 	const resolvedPreviewText =
-		previewTextDraft ?? latest?.previewText ?? detail?.previewText ?? "";
+		previewTextDraft ?? detail?.previewText ?? latest?.previewText ?? "";
+
+	// Changes not yet in the live version (typed or saved) need publishing.
+	const differs = (a?: string | null, b?: string | null) =>
+		(a ?? "").trim() !== (b ?? "").trim();
+	const hasUnpublishedChanges =
+		!isDraft &&
+		!!published &&
+		(differs(resolvedFrom, published.fromEmail) ||
+			differs(resolvedReply, published.replyTo) ||
+			differs(resolvedSubject, published.subject) ||
+			differs(resolvedPreviewText, published.previewText));
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: reset draft on templateId switch
 	useEffect(() => {
@@ -1216,6 +1274,21 @@ const SelectedTemplateView = ({
 		}
 		setPublishing(true);
 		try {
+			// Save the sender fields onto the template first: publishing a
+			// version doesn't copy them back, and the template is what these
+			// fields edit (so they'd otherwise show as unpublished again).
+			const saved = await fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify({
+					fromEmail: resolvedFrom,
+					replyTo: resolvedReply,
+					subject: resolvedSubject,
+					previewText: resolvedPreviewText,
+				}),
+			});
+			if (!saved.ok) throw new Error(`Save failed (${saved.status})`);
 			const res = await fetch(`/api/template/v1/${templateId}/versions`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -1240,8 +1313,12 @@ const SelectedTemplateView = ({
 				}),
 			});
 			if (!res.ok) throw new Error(`Publish failed (${res.status})`);
+			setFromDraft(null);
+			setReplyDraft(null);
+			setSubjectDraft(null);
+			setPreviewTextDraft(null);
 			await invalidateTemplate();
-			toast.success("Template published");
+			toast.success(isDraft ? "Template published" : "Changes published");
 		} catch {
 			toast.error("Failed to publish template");
 		} finally {
@@ -1249,14 +1326,93 @@ const SelectedTemplateView = ({
 		}
 	};
 
-	return (
-		<div className="flex flex-col gap-3">
+	const preview = (
+		<div className="relative">
+			<TemplateDetailPreview
+				key={`${templateId}-${detail?.updatedAt ?? ""}`}
+				templateId={templateId}
+				templateName={templateName}
+				detail={detail}
+				isLoading={detailQuery.isLoading}
+			/>
+			{/*
+			 * Opens the template editor in a new tab so unsaved automation
+			 * changes survive. Shown at rest too (same look either way); it
+			 * stops the click so a resting step doesn't also open its editor.
+			 */}
+			<button
+				type="button"
+				onPointerDown={(e) => e.stopPropagation()}
+				onClick={(e) => {
+					e.stopPropagation();
+					window.open(
+						`/dashboard/templates/${templateId}`,
+						"_blank",
+						"noopener",
+					);
+				}}
+				className="nodrag nopan absolute top-2.5 right-2.5 z-10 flex h-8 items-center gap-1.5 rounded-lg border border-stroke-soft-200/80 bg-bg-white-0/90 px-2.5 font-medium text-text-sub-600 text-xs backdrop-blur-md transition-colors hover:text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-[#18181f]/90"
+			>
+				<Icon name="edit" className="h-3.5 w-3.5" />
+				Edit template
+			</button>
+			{!readOnly && (isDraft || hasUnpublishedChanges) ? (
+				<div className="absolute inset-x-2.5 bottom-2.5 z-10 flex items-center justify-between gap-2 rounded-xl border border-stroke-soft-200/80 bg-bg-white-0/90 py-1.5 pr-1.5 pl-3 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#18181f]/90">
+					<p className="min-w-0 flex-1 truncate text-text-sub-600 text-xs">
+						{isDraft
+							? "Draft template. Publish before use"
+							: "Unpublished changes to this template"}
+					</p>
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							void handlePublish();
+						}}
+						disabled={publishing || detailQuery.isLoading}
+						className="shrink-0 cursor-pointer rounded-full bg-black px-4 py-1.5 font-medium text-sm text-white transition-opacity disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-black"
+					>
+						{publishing
+							? "Publishing…"
+							: isDraft
+								? "Publish"
+								: "Publish changes"}
+					</button>
+				</div>
+			) : null}
+		</div>
+	);
+
+	const details = (
+		<div className="flex flex-col gap-3" inert={readOnly}>
 			<button
 				type="button"
 				onClick={onBack}
-				className="inline-flex w-fit cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
+				className="inline-flex w-fit cursor-pointer items-center rounded-md px-1 py-0.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
 			>
-				<Icon name="chevron-left" className="h-3.5 w-3.5" />
+				{/*
+				 * At rest the title sits flush left. Opening the editor slides the
+				 * "‹" in, pushing the title right; closing slides it back left.
+				 */}
+				<motion.span
+					aria-hidden
+					className="flex shrink-0 items-center overflow-hidden"
+					initial={
+						readOnly
+							? justClosed
+								? { width: CHEVRON_SPACE, opacity: 1 }
+								: false
+							: { width: 0, opacity: 0 }
+					}
+					animate={
+						readOnly
+							? { width: 0, opacity: 0 }
+							: { width: CHEVRON_SPACE, opacity: 1 }
+					}
+					transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
+				>
+					<Icon name="chevron-left" className="h-3.5 w-3.5 shrink-0" />
+				</motion.span>
 				<span className="max-w-[260px] truncate">{templateName}</span>
 			</button>
 
@@ -1275,36 +1431,54 @@ const SelectedTemplateView = ({
 						setPreviewTextDraft(draft.previewText);
 				}}
 			/>
-
-			<div className="relative">
-				<TemplateDetailPreview
-					key={`${templateId}-${detail?.updatedAt ?? ""}`}
-					templateId={templateId}
-					templateName={templateName}
-					detail={detail}
-					isLoading={detailQuery.isLoading}
-				/>
-				{isDraft ? (
-					<div className="absolute inset-x-2.5 bottom-2.5 z-10 flex items-center justify-between gap-2 rounded-xl border border-stroke-soft-200/80 bg-bg-white-0/90 py-1.5 pr-1.5 pl-3 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#18181f]/90">
-						<p className="min-w-0 flex-1 truncate text-text-sub-600 text-xs">
-							Draft template. Publish before use
-						</p>
-						<button
-							type="button"
-							onClick={(e) => {
-								e.stopPropagation();
-								void handlePublish();
-							}}
-							disabled={publishing || detailQuery.isLoading}
-							className="shrink-0 cursor-pointer rounded-full bg-black px-4 py-1.5 font-medium text-sm text-white transition-opacity disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-black"
-						>
-							{publishing ? "Publishing…" : "Publish"}
-						</button>
-					</div>
-				) : null}
-			</div>
 		</div>
 	);
+
+	return (
+		<>
+			{details}
+			{previewSlot ? createPortal(preview, previewSlot) : preview}
+		</>
+	);
+};
+
+/**
+ * The two cards of a Send email step with a template: details on top, email
+ * preview below (in the same gray frame). Used both at rest (`readOnly`) and
+ * while editing, so switching between them changes nothing on screen.
+ */
+export const useTemplateStepCards = ({
+	templateId,
+	templateName,
+	initialStatus,
+	onBack,
+	readOnly,
+	justClosed,
+}: {
+	templateId: string;
+	templateName: string;
+	initialStatus?: Template["status"];
+	onBack?: () => void;
+	readOnly?: boolean;
+	justClosed?: boolean;
+}) => {
+	const [previewSlot, setPreviewSlot] = useState<HTMLDivElement | null>(null);
+	return {
+		cardContent: (
+			<div className="px-3 pt-2.5 pb-1">
+				<SelectedTemplateView
+					templateId={templateId}
+					templateName={templateName}
+					initialStatus={initialStatus}
+					onBack={onBack}
+					previewSlot={previewSlot}
+					readOnly={readOnly}
+					justClosed={justClosed}
+				/>
+			</div>
+		),
+		belowCard: <div ref={setPreviewSlot} />,
+	};
 };
 
 export const SendEmailConfigForm = ({

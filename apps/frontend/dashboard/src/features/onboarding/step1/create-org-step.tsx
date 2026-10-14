@@ -1,3 +1,4 @@
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
@@ -112,12 +113,16 @@ export function CreateOrgStep() {
 							) : orgId ? (
 								<>
 									<span>Continue</span>
-									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+									<ActionKbd className={actionKbdOnBlueClassName}>
+										<EnterIcon />
+									</ActionKbd>
 								</>
 							) : (
 								<>
 									<span>Create organization</span>
-									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+									<ActionKbd className={actionKbdOnBlueClassName}>
+										<EnterIcon />
+									</ActionKbd>
 								</>
 							)}
 						</motion.span>

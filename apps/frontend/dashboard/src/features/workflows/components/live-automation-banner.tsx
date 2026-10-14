@@ -40,7 +40,7 @@ export const LiveAutomationBanner = ({ workflow }: { workflow: Workflow }) => {
 	};
 
 	return (
-		<div className="absolute right-6 bottom-6 z-20 w-[380px] max-w-[calc(100%-3rem)] rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-[#17171c] dark:text-white">
+		<div className="absolute bottom-6 left-6 z-20 w-[380px] max-w-[calc(100%-3rem)] rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-[#17171c] dark:text-white">
 			<button
 				type="button"
 				onClick={() => setDismissed(true)}
@@ -65,7 +65,7 @@ export const LiveAutomationBanner = ({ workflow }: { workflow: Workflow }) => {
 						this version.
 					</p>
 					<FancyButton.Root
-						variant="blue"
+						variant="neutral"
 						size="xsmall"
 						onClick={() => void handleDuplicate()}
 						disabled={duplicating}

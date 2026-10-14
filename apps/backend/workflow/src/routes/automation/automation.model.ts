@@ -25,6 +25,51 @@ export const automationGraphSchema = t.Object({
 	edges: t.Array(graphEdge),
 });
 
+// Public steps + connections shape (see lib/automation/steps.ts). Configs are
+// checked there so every problem comes back in one readable error.
+const stepInput = t.Object({
+	key: t.String({
+		description:
+			"Unique key for this step, used by connections (1-64 letters, numbers, _ or -).",
+	}),
+	type: t.String({
+		description: '"trigger", "send_email", "delay" or "condition".',
+	}),
+	config: t.Optional(
+		t.Record(t.String(), t.Unknown(), {
+			description:
+				'trigger: { eventName }. send_email: { template: { id }, from?, subject? }. delay: { amount, unit }. condition: { type: "rule", field, operator, value } or { type: "and" | "or", rules }.',
+		}),
+	),
+});
+
+const connectionInput = t.Object({
+	from: t.String({ description: "Key of the step this connection leaves." }),
+	to: t.String({ description: "Key of the step it leads to." }),
+	type: t.Optional(
+		t.String({
+			description:
+				'"default" (the default), or "condition_met" / "condition_not_met" from a condition step.',
+		}),
+	),
+});
+
+const stepResponse = t.Object({
+	key: t.String(),
+	type: t.String(),
+	config: t.Record(t.String(), t.Unknown()),
+});
+
+const connectionResponse = t.Object({
+	from: t.String(),
+	to: t.String(),
+	type: t.Union([
+		t.Literal("default"),
+		t.Literal("condition_met"),
+		t.Literal("condition_not_met"),
+	]),
+});
+
 export namespace AutomationModel {
 	export const automationIdParam = t.String({
 		minLength: 1,
@@ -43,6 +88,14 @@ export namespace AutomationModel {
 				description: "Optional description",
 			}),
 		),
+		status: t.Optional(
+			t.Union([t.Literal("draft"), t.Literal("active")], {
+				description:
+					'"draft" (default) or "active" to validate and start it right away.',
+			}),
+		),
+		steps: t.Optional(t.Array(stepInput, { maxItems: 200 })),
+		connections: t.Optional(t.Array(connectionInput, { maxItems: 400 })),
 	});
 
 	export const updateBody = t.Object({
@@ -53,7 +106,20 @@ export namespace AutomationModel {
 			}),
 		),
 		description: t.Optional(t.Union([t.String({ maxLength: 2000 }), t.Null()])),
+		/** Dashboard canvas graph. API clients send `steps` + `connections`. */
 		graph: t.Optional(automationGraphSchema),
+		steps: t.Optional(
+			t.Array(stepInput, {
+				maxItems: 200,
+				description: "Replaces all steps (send `connections` with it).",
+			}),
+		),
+		connections: t.Optional(t.Array(connectionInput, { maxItems: 400 })),
+		status: t.Optional(
+			t.Union([t.Literal("active"), t.Literal("paused")], {
+				description: '"active" validates and starts it; "paused" stops it.',
+			}),
+		),
 	});
 
 	export const listQuery = t.Object({
@@ -72,6 +138,8 @@ export namespace AutomationModel {
 			t.Literal("paused"),
 		]),
 		triggerEvent: t.Nullable(t.String()),
+		steps: t.Array(stepResponse),
+		connections: t.Array(connectionResponse),
 		graph: automationGraphSchema,
 		activeVersionId: t.Nullable(t.String()),
 		createdAt: t.String(),

@@ -14,6 +14,10 @@ interface FlowStepCardProps {
 	status?: WorkflowStatus;
 }
 
+/**
+ * A step drawn like the editor canvas: a tab naming the step type, then a gray
+ * frame around a white card.
+ */
 function FlowStepCard({
 	icon,
 	badge,
@@ -23,46 +27,72 @@ function FlowStepCard({
 	status,
 }: FlowStepCardProps) {
 	return (
-		<div className="w-full text-paragraph-sm">
-			{/* Table-style header tab */}
-			<div className="flex items-center justify-between rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-3.5 pt-2 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40">
-				<div className="flex items-center gap-1.5">
-					<Icon name={icon} className="h-3 w-3 text-text-sub-600" />
-					<span className="text-xs">{badge}</span>
-				</div>
-				{detail ? (
-					<span className="font-mono text-[11px] text-text-sub-600">
-						{detail}
-					</span>
-				) : null}
-			</div>
-
-			{/* Table-style overlapping card body */}
-			<div className="-mt-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3.5 py-2.5 shadow-2xs transition-colors hover:bg-bg-weak-50/40 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-				<div className="flex items-center justify-between gap-2">
+		<div className="flex w-full flex-col">
+			<p className="relative z-10 -mb-px ml-4 flex h-8 w-fit items-center gap-1.5 rounded-t-xl border border-stroke-soft-200 border-b-0 bg-bg-weak-50 px-3 font-medium text-[13px] text-text-sub-600 dark:border-stroke-soft-100/50 dark:bg-[#101014]">
+				<Icon name={icon} className="h-3.5 w-3.5 shrink-0" />
+				{badge}
+			</p>
+			<div className="rounded-[15px] border border-stroke-soft-200 bg-bg-weak-50 p-[3px] dark:border-stroke-soft-100/50 dark:bg-[#101014]">
+				<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] dark:border-stroke-soft-100/50 dark:bg-[#141419]">
 					<div className="min-w-0 flex-1">
-						<p className="truncate font-semibold text-label-sm text-text-strong-950">
+						<p className="truncate font-medium text-[14px] text-text-strong-950">
 							{title}
 						</p>
 						{subtitle ? (
-							<p className="mt-0.5 truncate font-mono text-text-sub-600 text-xs">
+							<p className="mt-0.5 truncate font-mono text-[12px] text-text-sub-600">
 								{subtitle}
 							</p>
 						) : null}
 					</div>
-					{status ? <WorkflowStatusBadge status={status} /> : null}
+					{status ? (
+						<WorkflowStatusBadge status={status} />
+					) : detail ? (
+						<span className="shrink-0 font-mono text-[11px] text-text-soft-400">
+							{detail}
+						</span>
+					) : null}
 				</div>
 			</div>
 		</div>
 	);
 }
 
+/** Gap between one step's frame and the next step's tab. */
+const GAP = 16;
+/** Tab height minus the 1px it overlaps the frame. */
+const TAB = 31;
+/** The arrow runs past the next step's tab (off to the left) into its frame. */
+const CONNECTOR = GAP + TAB;
+const STROKE = "var(--color-stroke-sub-300)";
+
+/** Same soft arrow as the connectors on the editor canvas. */
 function StepConnector() {
 	return (
-		<div className="my-1.5 flex flex-col items-center">
-			<div className="h-3 w-px bg-stroke-soft-200 dark:bg-stroke-soft-100/60" />
-			<div className="h-1 w-1 rounded-full bg-stroke-sub-300 dark:bg-stroke-sub-300" />
-			<div className="h-3 w-px bg-stroke-soft-200 dark:bg-stroke-soft-100/60" />
+		<div
+			className="relative flex justify-center"
+			style={{ marginBottom: -TAB }}
+		>
+			<svg
+				aria-hidden
+				width={12}
+				height={CONNECTOR}
+				viewBox={`0 0 12 ${CONNECTOR}`}
+				className="overflow-visible"
+			>
+				<path
+					d={`M 6 1 V ${CONNECTOR - 4}`}
+					stroke={STROKE}
+					strokeWidth={2}
+					strokeLinecap="round"
+				/>
+				<path
+					d={`M 2 ${CONNECTOR - 8} L 6 ${CONNECTOR - 1.75} L 10 ${CONNECTOR - 8} Z`}
+					fill={STROKE}
+					stroke={STROKE}
+					strokeWidth={3}
+					strokeLinejoin="round"
+				/>
+			</svg>
 		</div>
 	);
 }
@@ -101,7 +131,7 @@ export function AutomationFlowPreview({
 			{/* 3. SEND EMAIL */}
 			<FlowStepCard
 				icon="mail-single"
-				badge="Send Email"
+				badge="Send email"
 				title="Welcome to Reloop"
 				subtitle="Template: Welcome onboard 👋"
 				detail="Instant"

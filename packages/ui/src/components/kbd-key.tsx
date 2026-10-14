@@ -1,8 +1,10 @@
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import type * as React from "react";
 
 export function KbdKey({
 	className,
+	children,
 	...rest
 }: React.HTMLAttributes<HTMLSpanElement>) {
 	return (
@@ -12,6 +14,9 @@ export function KbdKey({
 				className,
 			)}
 			{...rest}
-		/>
+		>
+			{/* A "↵" keycap draws the Enter icon instead of the text glyph. */}
+			{children === "↵" ? <EnterIcon /> : children}
+		</span>
 	);
 }

@@ -1,11 +1,19 @@
 "use client";
 
 import type { NodeProps } from "@xyflow/react";
+import { formatDelayAmount } from "../../delay-format";
 import type { DelayNodeData, WorkflowNode } from "../../workflow-types";
 import { getNodeIssue } from "../../workflow-validation";
-import { DelayConfigForm } from "../delay-config-form";
+import { DelayEditor } from "../editors/delay-editor";
 import { useNodeEditor } from "../node-editor-context";
-import { SectionNodeCard } from "./section-node-card";
+import {
+	DanglingStub,
+	EditSwap,
+	NodePill,
+	SourceHandle,
+	TargetHandle,
+	usePrevious,
+} from "./flow-node-parts";
 
 type DelayFlowNode = WorkflowNode & {
 	type: "delay";
@@ -18,25 +26,32 @@ export const DelayNode = ({
 	selected,
 	type,
 }: NodeProps<DelayFlowNode>) => {
-	const { updateNode, deleteNode } = useNodeEditor();
+	const { readOnly } = useNodeEditor();
 	const issue = getNodeIssue({ type, data });
+	const amount = formatDelayAmount(Number(data.amount), data.unit);
+	const editing = selected && !readOnly;
+	const wasEditing = usePrevious(editing);
 
 	return (
-		<SectionNodeCard
-			nodeId={id}
-			tone="delay"
-			badge={issue ? "Setup" : null}
-			badgeTone="warning"
-			selected={selected}
-			hasTarget
-			hasSource
-			onDelete={() => deleteNode(id)}
-		>
-			<DelayConfigForm
-				value={data}
-				idPrefix={`${id}-`}
-				onChange={(next) => updateNode(id, next)}
+		<div className="relative">
+			<TargetHandle />
+			<EditSwap
+				editing={editing}
+				editor={<DelayEditor nodeId={id} data={data} />}
+				rest={
+					<NodePill
+						removable
+						titleExiting={wasEditing}
+						title="Delay"
+						icon="clock"
+						label={amount || null}
+						placeholder="Set a wait time"
+						ready={!issue}
+					/>
+				}
 			/>
-		</SectionNodeCard>
+			<SourceHandle hidden={editing} />
+			{editing ? null : <DanglingStub nodeId={id} />}
+		</div>
 	);
 };

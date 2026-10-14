@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -392,7 +393,7 @@ export const EmailPillsInput = ({
 										</div>
 										{selected ? (
 											<span className="shrink-0 rounded-md bg-mail-foreground/10 px-1.5 py-0.5 font-medium text-[10px] text-mail-muted">
-												↵
+												<EnterIcon />
 											</span>
 										) : null}
 									</div>
@@ -406,7 +407,9 @@ export const EmailPillsInput = ({
 							</span>
 							<span className="text-mail-border">·</span>
 							<span className="inline-flex items-center gap-1">
-								<ActionKbd className="w-auto min-w-4 px-1">↵</ActionKbd>
+								<ActionKbd className="w-auto min-w-4 px-1">
+									<EnterIcon />
+								</ActionKbd>
 								select
 							</span>
 							<span className="text-mail-border">·</span>

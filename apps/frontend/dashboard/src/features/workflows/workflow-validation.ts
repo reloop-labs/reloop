@@ -12,6 +12,39 @@ import {
 	type WorkflowNode,
 } from "./workflow-types";
 
+/** Operators that only check the field, never a value. */
+export const VALUELESS_OPERATORS = new Set<string>([
+	"exists",
+	"not_exists",
+	"is_empty",
+]);
+
+const hasConditionValue = (value: unknown) =>
+	value !== undefined &&
+	value !== null &&
+	(typeof value !== "string" || value.trim() !== "");
+
+/** A single rule, or every rule of an `and`/`or` group, is filled in. */
+export const isConditionComplete = (data: Record<string, unknown>): boolean => {
+	if (data.type === "and" || data.type === "or") {
+		const rules = data.rules;
+		return (
+			Array.isArray(rules) &&
+			rules.length > 0 &&
+			rules.every(
+				(rule) =>
+					typeof rule === "object" &&
+					rule !== null &&
+					isConditionComplete(rule as Record<string, unknown>),
+			)
+		);
+	}
+	const field = typeof data.field === "string" ? data.field.trim() : "";
+	const operator = typeof data.operator === "string" ? data.operator : "";
+	if (!field || !operator) return false;
+	return VALUELESS_OPERATORS.has(operator) || hasConditionValue(data.value);
+};
+
 export interface WorkflowValidationResult {
 	isValid: boolean;
 	warnings: string[];
@@ -103,13 +136,9 @@ export const validateWorkflow = (
 	}
 
 	const conditionNodes = workflow.nodes.filter(isConditionNode);
-	const unconfiguredCondition = conditionNodes.filter((n) => {
-		const field = n.data.field?.trim();
-		const operator = n.data.operator;
-		if (!field || !operator) return true;
-		if (operator === "exists" || operator === "not_exists") return false;
-		return !n.data.value?.trim();
-	});
+	const unconfiguredCondition = conditionNodes.filter(
+		(n) => !isConditionComplete(n.data),
+	);
 	if (unconfiguredCondition.length > 0) {
 		warnings.push("Complete field, operator, and value for each Condition");
 	}
@@ -165,13 +194,10 @@ export const getNodeIssue = (
 
 	if (node.type === "condition") {
 		const data = node.data as ConditionNodeData;
-		const field = data.field?.trim();
-		const operator = data.operator;
-		if (!field || !operator) return "Set a condition";
-		if (operator !== "exists" && operator !== "not_exists") {
-			if (!data.value?.trim()) return "Set a value";
-		}
-		return null;
+		if (isConditionComplete(data)) return null;
+		if (data.type === "and" || data.type === "or") return "Complete every rule";
+		if (!data.field?.trim() || !data.operator) return "Set a condition";
+		return "Set a value";
 	}
 
 	return null;

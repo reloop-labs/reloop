@@ -16,7 +16,8 @@
 		"./logs": "./src/logs/index.ts",
 		"./template": "./src/template/index.ts",
 		"./inbox": "./src/inbox/index.ts",
-		"./tools": "./src/tools/index.ts"
+		"./tools": "./src/tools/index.ts",
+		"./workflow": "./src/workflow/index.ts"
 	},
 	"scripts": {
 		"typecheck": "tsc --noEmit",

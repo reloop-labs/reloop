@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
@@ -81,7 +82,9 @@ export function RotateWebhookSecretModal({
 						) : (
 							<>
 								Rotate secret
-								<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+								<ActionKbd className={actionKbdOnBlueClassName}>
+									<EnterIcon />
+								</ActionKbd>
 							</>
 						)}
 					</FancyButton.Root>

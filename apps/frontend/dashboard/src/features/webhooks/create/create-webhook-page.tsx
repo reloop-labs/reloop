@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
@@ -81,7 +82,7 @@ export function CreateWebhookPage() {
 										<span>Create webhook</span>
 										<span className="inline-flex items-center gap-1">
 											<ActionKbd className={actionKbdOnBlueClassName}>
-												↵
+												<EnterIcon />
 											</ActionKbd>
 										</span>
 									</>

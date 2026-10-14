@@ -1,6 +1,7 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import { Icon } from "@reloop/ui/icon";
@@ -693,7 +694,7 @@ function CreateCampaignPageContent() {
 										>
 											Continue
 											<ActionKbd className={actionKbdOnBlueClassName}>
-												↵
+												<EnterIcon />
 											</ActionKbd>
 										</FancyButton.Root>
 									</div>
@@ -1334,7 +1335,7 @@ function CreateCampaignPageContent() {
 												>
 													Continue
 													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
+														<EnterIcon />
 													</ActionKbd>
 												</FancyButton.Root>
 											</div>
@@ -1574,7 +1575,7 @@ function CreateCampaignPageContent() {
 									>
 										Continue
 										<ActionKbd className={actionKbdOnBlueClassName}>
-											↵
+											<EnterIcon />
 										</ActionKbd>
 									</FancyButton.Root>
 								</div>
@@ -1739,7 +1740,9 @@ function CreateCampaignPageContent() {
 									className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
 								>
 									Continue
-									<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+									<ActionKbd className={actionKbdOnBlueClassName}>
+										<EnterIcon />
+									</ActionKbd>
 								</FancyButton.Root>
 							</div>
 						</motion.div>
@@ -1890,7 +1893,7 @@ function CreateCampaignPageContent() {
 													⌘
 												</ActionKbd>
 												<ActionKbd className={actionKbdOnBlueClassName}>
-													↵
+													<EnterIcon />
 												</ActionKbd>
 											</span>
 										</>

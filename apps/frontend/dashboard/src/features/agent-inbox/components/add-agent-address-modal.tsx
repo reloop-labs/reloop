@@ -1,6 +1,7 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
@@ -398,7 +399,7 @@ export const AddAgentAddressModal = ({
 											<>
 												Add address
 												<ActionKbd className={actionKbdOnBlueClassName}>
-													↵
+													<EnterIcon />
 												</ActionKbd>
 											</>
 										)}

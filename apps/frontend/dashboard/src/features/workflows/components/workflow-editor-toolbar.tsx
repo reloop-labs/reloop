@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import {
 	isTriggerNode,
 	type Workflow,
@@ -31,7 +32,22 @@ interface WorkflowEditorToolbarProps {
 	/** True after "Stop new automations": running continues, editing stays locked. */
 	softStopped?: boolean;
 	onSoftStopChange?: (soft: boolean) => void;
+	/** Start was pressed while steps still need setup: point them out. */
+	onInvalidStart?: () => void;
 }
+
+type MoreItem = {
+	id: "test" | "duplicate" | "delete";
+	label: string;
+	icon: string;
+	isDanger?: boolean;
+};
+
+const MORE_ITEMS: MoreItem[] = [
+	{ id: "test", label: "Test automation", icon: "play" },
+	{ id: "duplicate", label: "Duplicate", icon: "copy" },
+	{ id: "delete", label: "Delete", icon: "trash", isDanger: true },
+];
 
 function SidebarToggleButton() {
 	const { isCollapsed, toggle } = useSidebarCollapse();
@@ -153,6 +169,7 @@ export const WorkflowEditorToolbar = ({
 	onSave,
 	softStopped = false,
 	onSoftStopChange,
+	onInvalidStart,
 }: WorkflowEditorToolbarProps) => {
 	const validation = validateWorkflow(workflow);
 	const isActive = workflow.status === "active";
@@ -164,6 +181,11 @@ export const WorkflowEditorToolbar = ({
 	const [stopOpen, setStopOpen] = useState(false);
 	const [moreOpen, setMoreOpen] = useState(false);
 	const [duplicating, setDuplicating] = useState(false);
+	// Sliding hover pill for the "…" menu (same as the other row menus).
+	const [moreHoverIdx, setMoreHoverIdx] = useState<number | undefined>();
+	const moreItemRefs = useRef<HTMLElement[]>([]);
+	const moreHoverEl = moreItemRefs.current[moreHoverIdx ?? -1];
+	const moreHoverRect = moreHoverEl?.getBoundingClientRect();
 	const triggerNode = workflow.nodes.find(isTriggerNode);
 	const triggerEvent =
 		workflow.triggerEvent ||
@@ -175,6 +197,7 @@ export const WorkflowEditorToolbar = ({
 		if (busy || isActive) return;
 		if (!validation.isValid) {
 			toast.error(validation.warnings[0] ?? "Complete the workflow first");
+			onInvalidStart?.();
 			return;
 		}
 
@@ -265,7 +288,13 @@ export const WorkflowEditorToolbar = ({
 
 			{/* Right: Actions */}
 			<div className="flex flex-1 items-center justify-end gap-2">
-				<Dropdown.Root open={moreOpen} onOpenChange={setMoreOpen}>
+				<Dropdown.Root
+					open={moreOpen}
+					onOpenChange={(open) => {
+						setMoreOpen(open);
+						if (!open) setMoreHoverIdx(undefined);
+					}}
+				>
 					<Dropdown.Trigger asChild>
 						<FancyButton.Root
 							variant="basic"
@@ -276,37 +305,48 @@ export const WorkflowEditorToolbar = ({
 							<Icon name="more-horizontal" className="h-4 w-4" />
 						</FancyButton.Root>
 					</Dropdown.Trigger>
-					<Dropdown.Content align="end" sideOffset={6} className="w-48 p-1.5">
-						<Dropdown.Item
-							onSelect={() => {
-								setMoreOpen(false);
-								setTestOpen(true);
-							}}
-							className="cursor-pointer"
-						>
-							<Icon name="play" className="size-3.5 text-text-sub-600" />
-							<span className="flex-1 font-medium text-xs">
-								Test automation
-							</span>
-						</Dropdown.Item>
-						<Dropdown.Item
-							onSelect={() => void handleDuplicate()}
-							className="cursor-pointer"
-						>
-							<Icon name="copy" className="size-3.5 text-text-sub-600" />
-							<span className="flex-1 font-medium text-xs">Duplicate</span>
-						</Dropdown.Item>
-						<Dropdown.Separator className="mx-2 my-1 h-px bg-stroke-soft-200 dark:bg-white/10" />
-						<Dropdown.Item
-							onSelect={() => {
-								setMoreOpen(false);
-								void setDeleteId(workflow.id);
-							}}
-							className="cursor-pointer text-error-base data-[highlighted]:text-error-base"
-						>
-							<Icon name="trash" className="size-3.5" />
-							<span className="flex-1 font-medium text-xs">Delete</span>
-						</Dropdown.Item>
+					<Dropdown.Content
+						align="end"
+						sideOffset={6}
+						className="w-48 overflow-hidden rounded-2xl p-1.5"
+					>
+						<div className="relative">
+							{MORE_ITEMS.map((item, idx) => (
+								<Dropdown.Item
+									key={item.id}
+									ref={(el) => {
+										if (el) moreItemRefs.current[idx] = el;
+									}}
+									onPointerEnter={() => setMoreHoverIdx(idx)}
+									onPointerLeave={() => setMoreHoverIdx(undefined)}
+									onFocus={() => setMoreHoverIdx(idx)}
+									onSelect={() => {
+										setMoreOpen(false);
+										if (item.id === "test") setTestOpen(true);
+										else if (item.id === "duplicate") void handleDuplicate();
+										else void setDeleteId(workflow.id);
+									}}
+									className={cn(
+										// The sliding pill is the only highlight.
+										"relative z-10 flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 font-medium text-xs outline-none data-[highlighted]:bg-transparent",
+										item.isDanger
+											? "text-error-base data-[highlighted]:text-error-base"
+											: "text-text-sub-600 hover:text-text-strong-950",
+										!moreHoverRect &&
+											moreHoverIdx === idx &&
+											"bg-neutral-alpha-10",
+									)}
+								>
+									<Icon name={item.icon} className="size-3.5" />
+									<span className="flex-1">{item.label}</span>
+								</Dropdown.Item>
+							))}
+							<AnimatedHoverBackground
+								rect={moreHoverRect}
+								tabElement={moreHoverEl}
+								isDanger={MORE_ITEMS[moreHoverIdx ?? -1]?.isDanger ?? false}
+							/>
+						</div>
 					</Dropdown.Content>
 				</Dropdown.Root>
 				{isActive ? (
@@ -356,22 +396,21 @@ export const WorkflowEditorToolbar = ({
 							Started
 						</FancyButton.Root>
 						<FancyButton.Root
-							variant="blue"
+							variant="neutral"
 							size="xsmall"
 							onClick={() => void handleStopNow()}
 							disabled={busy}
-							className="dark:text-black dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.4),0_0_0_1px_#ffffff] dark:[--zero-blue-hover:#e6edf3] dark:[--zero-blue:#ffffff]"
 						>
 							{busy ? "Stopping…" : "Stop now"}
 						</FancyButton.Root>
 					</>
 				) : (
 					<FancyButton.Root
-						variant="blue"
+						variant="neutral"
 						size="xsmall"
 						onClick={() => void handleStart()}
-						disabled={busy || !validation.isValid}
-						className="dark:text-black dark:shadow-[0_1px_2px_0_rgba(0,0,0,0.4),0_0_0_1px_#ffffff] dark:[--zero-blue-hover:#e6edf3] dark:[--zero-blue:#ffffff]"
+						// Not disabled while steps need setup: pressing it says what's missing.
+						disabled={busy}
 					>
 						{busy ? "Starting…" : "Start"}
 					</FancyButton.Root>

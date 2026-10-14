@@ -2,23 +2,58 @@
 
 import { createContext, useContext } from "react";
 
-export type InsertStepKind = "send_email" | "condition" | "delay" | "add_step";
+export type StepKind = "send_email" | "condition" | "delay";
+
+/** Where a step chosen in the picker goes: after a node's handle, or into an edge. */
+export type PickerTarget =
+	| { type: "append"; nodeId: string; handle?: string }
+	| { type: "insert"; edgeId: string }
+	/** Change an existing step to a different type (the tab's back button). */
+	| { type: "replace"; nodeId: string };
+
+export const pickerTargetKey = (target: PickerTarget) =>
+	target.type === "append"
+		? `append:${target.nodeId}:${target.handle ?? ""}`
+		: target.type === "insert"
+			? `insert:${target.edgeId}`
+			: `replace:${target.nodeId}`;
+
+/** Where the step menu was when a step was picked, so the new step can grow out of it. */
+export interface MorphFrom {
+	/** Screen y of the menu's top (its tab). */
+	top: number;
+	frameHeight: number;
+	cardHeight: number;
+	/** Screen rect of the picked row's icon; it flies into the input's icon. */
+	icon?: { left: number; top: number; width: number; height: number };
+	/** Snapshot of the menu's rows, shown collapsing inside the new step. */
+	ghost?: HTMLElement;
+	/** Snapshot of the menu's tab, which fades out as the step's tab arrives. */
+	tabGhost?: HTMLElement;
+}
 
 interface NodeEditorContextValue {
 	updateNode: (nodeId: string, data: Record<string, unknown>) => void;
 	deleteNode: (nodeId: string) => void;
-	insertStep: (edgeId: string, kind: InsertStepKind) => void;
-	appendStep: (kind: InsertStepKind) => void;
-	addStepBelow: (
-		sourceNodeId: string,
-		sourceHandle: string | undefined,
-		kind: InsertStepKind,
-	) => void;
-	replaceStep: (
-		nodeId: string,
-		kind: "send_email" | "condition" | "delay",
-	) => void;
+	/** Leaves in-place editing (deselects the step). */
+	closeEditor: () => void;
+	/** Opens a step's editor (the pencil on a resting step). */
+	editNode: (nodeId: string) => void;
+	/** Opens the step picker next to `anchor` (the clicked "+" button). */
+	openPicker: (target: PickerTarget, anchor: HTMLElement) => void;
+	closePicker: () => void;
+	/** `pickerTargetKey` of the open picker, if any. */
+	activePickerKey: string | null;
+	/** A step that was just picked from the menu and should morph out of it. */
+	morph: (MorphFrom & { nodeId: string }) | null;
+	/** Adds/replaces a step from the menu (used by the in-flow placeholder). */
+	pickStep: (target: PickerTarget, kind: StepKind, from?: MorphFrom) => void;
+	/** Drops the insert placeholder and closes the gap it opened. */
+	removePlaceholder: () => void;
+	clearMorph: () => void;
 	readOnly: boolean;
+	/** Start was pressed with steps still needing setup: outline them in red. */
+	showIssues?: boolean;
 }
 
 const NodeEditorContext = createContext<NodeEditorContextValue | null>(null);
