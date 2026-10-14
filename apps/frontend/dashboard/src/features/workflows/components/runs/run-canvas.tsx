@@ -85,22 +85,35 @@ const ReadOnlyFlowInner = ({
 		[],
 	);
 
-	// Open with the trigger centered at the top, where the run starts.
+	// Open with the trigger centered at the top, where the run starts. The
+	// trigger or the canvas width may not be ready on the first try (the side
+	// panel can still be opening), so keep trying until it lands.
 	const nodesInitialized = useNodesInitialized();
 	const placedRef = useRef(false);
-	useEffect(() => {
-		if (!nodesInitialized || placedRef.current) return;
+	const place = useCallback(() => {
 		const trigger = getNode(TRIGGER_NODE_ID);
 		const width = containerRef.current?.clientWidth;
-		if (!trigger || !width) return;
-		placedRef.current = true;
+		if (!trigger || !width) return false;
 		const nodeWidth = trigger.measured?.width ?? 400;
 		void setViewport({
 			x: width / 2 - (trigger.position.x + nodeWidth / 2),
 			y: TOP_GAP - trigger.position.y,
 			zoom: 1,
 		});
-	}, [nodesInitialized, getNode, setViewport]);
+		placedRef.current = true;
+		return true;
+	}, [getNode, setViewport]);
+	useEffect(() => {
+		if (!nodesInitialized || placedRef.current) return;
+		let frame = 0;
+		let tries = 0;
+		const attempt = () => {
+			if (place() || ++tries > 30) return;
+			frame = requestAnimationFrame(attempt);
+		};
+		frame = requestAnimationFrame(attempt);
+		return () => cancelAnimationFrame(frame);
+	}, [nodesInitialized, place]);
 
 	// The side panel animating changes the width: keep the flow's center put
 	// (and any panning the user did) by shifting half of each change.
@@ -112,13 +125,17 @@ const ReadOnlyFlowInner = ({
 			const width = container.clientWidth;
 			const delta = width - lastWidth;
 			lastWidth = width;
-			if (!delta || !placedRef.current) return;
+			if (!placedRef.current) {
+				place();
+				return;
+			}
+			if (!delta) return;
 			const viewport = getViewport();
 			void setViewport({ ...viewport, x: viewport.x + delta / 2 });
 		});
 		observer.observe(container);
 		return () => observer.disconnect();
-	}, [getViewport, setViewport]);
+	}, [getViewport, setViewport, place]);
 
 	return (
 		<NodeEditorProvider
