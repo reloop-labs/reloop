@@ -272,7 +272,7 @@ function FolderCard({
 				))}
 
 				{/* Soft glow under the pocket, dark mode only */}
-				<div className="absolute inset-x-[16%] bottom-[2%] hidden h-[12%] rounded-[50%] bg-white/10 blur-xl dark:block" />
+				<div className="absolute inset-x-[16%] bottom-[7%] hidden h-[10%] rounded-[50%] bg-white/10 blur-xl dark:block" />
 
 				{/* Frosted front pocket */}
 				<div
@@ -288,7 +288,7 @@ function FolderCard({
 				</div>
 			</div>
 
-			<div className="flex min-w-0 flex-col gap-0.5 px-3 pt-1 pb-2.5">
+			<div className="-mt-[6%] flex min-w-0 flex-col gap-0.5 px-[8%] pb-2.5">
 				<h3
 					className="truncate font-medium text-[16px] text-text-strong-950"
 					title={folder.description}
