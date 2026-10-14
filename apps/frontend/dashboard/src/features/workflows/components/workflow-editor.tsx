@@ -35,6 +35,7 @@ import {
 	type WorkflowStatus,
 } from "../workflow-types";
 import { getNodeIssue } from "../workflow-validation";
+import { AutomationSidePanel } from "./automation-side-panel";
 import { useAutomationView } from "./automation-view-tabs";
 import { defaultEdgeOptions, edgeTypes, nodeTypes } from "./flow-types";
 import { LiveAutomationBanner } from "./live-automation-banner";
@@ -46,7 +47,7 @@ import {
 	pickerTargetKey,
 	type StepKind,
 } from "./node-editor-context";
-import { RunsView } from "./runs/runs-view";
+import { RunsCanvasArea, RunsList } from "./runs/runs-view";
 import { StepPicker } from "./step-picker";
 import { WorkflowEditorToolbar } from "./workflow-editor-toolbar";
 
@@ -294,12 +295,17 @@ const WorkflowEditorInner = ({
 	// Re-center once real node sizes are measured and the layout has settled.
 	const nodesInitialized = useNodesInitialized();
 	const centeredForRef = useRef<string | null>(null);
-	// Runs replaces the canvas, so it remounts on the way back: center it again.
-	// Metrics only narrows it: re-center in place.
+	// Runs swaps the canvas out, so it remounts on the way back: center it again.
 	useEffect(() => {
 		if (view === "runs") centeredForRef.current = null;
-		else if (centeredForRef.current) revealGraph();
-	}, [view, revealGraph]);
+	}, [view]);
+	// The side panel opened or closed, so the canvas changed width.
+	const recenterAfterPanel = () => {
+		if (view !== "runs" && centeredForRef.current) revealGraph();
+	};
+	// Keep showing the last panel while it closes back to the editor.
+	const lastPanelRef = useRef<"runs" | "metrics">("metrics");
+	if (view !== "editor") lastPanelRef.current = view;
 	useEffect(() => {
 		if (!nodesInitialized || centeredForRef.current === workflow.id) return;
 		centeredForRef.current = workflow.id;
@@ -609,11 +615,20 @@ const WorkflowEditorInner = ({
 					onSoftStopChange={handleSoftStopChange}
 					onInvalidStart={flagIssues}
 				/>
-				{view === "runs" ? (
-					<RunsView workflow={{ ...workflow, nodes, edges }} />
-				) : (
-					<div className="relative flex min-h-0 flex-1 overflow-hidden">
-						{view === "metrics" ? <MetricsPanel workflow={workflow} /> : null}
+				<div className="relative flex min-h-0 flex-1 overflow-hidden">
+					<AutomationSidePanel
+						open={view !== "editor"}
+						onSettled={recenterAfterPanel}
+					>
+						{lastPanelRef.current === "runs" ? (
+							<RunsList workflow={{ ...workflow, nodes, edges }} />
+						) : (
+							<MetricsPanel workflow={workflow} />
+						)}
+					</AutomationSidePanel>
+					{view === "runs" ? (
+						<RunsCanvasArea workflow={{ ...workflow, nodes, edges }} />
+					) : (
 						<div ref={canvasRef} className="relative min-w-0 flex-1">
 							<ReactFlow
 								nodes={nodes}
@@ -680,8 +695,8 @@ const WorkflowEditorInner = ({
 								/>
 							) : null}
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 			</div>
 		</NodeEditorProvider>
 	);

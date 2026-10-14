@@ -85,25 +85,34 @@ const ReadOnlyFlowInner = ({
 		[],
 	);
 
-	// Open with the trigger centered at the top, where the run starts.
+	// Open with the trigger centered at the top, where the run starts, and keep
+	// it there while the side panel opening or closing changes the width.
 	const nodesInitialized = useNodesInitialized();
-	const placedRef = useRef(false);
-	useEffect(() => {
-		if (!nodesInitialized || placedRef.current) return;
+	const place = useCallback(() => {
 		const trigger = getNode(TRIGGER_NODE_ID);
 		const width = containerRef.current?.clientWidth;
 		if (!trigger || !width) return;
-		placedRef.current = true;
-		requestAnimationFrame(() => {
-			const placed = getNode(TRIGGER_NODE_ID) ?? trigger;
-			const nodeWidth = placed.measured?.width ?? 400;
-			void setViewport({
-				x: width / 2 - (placed.position.x + nodeWidth / 2),
-				y: TOP_GAP - placed.position.y,
-				zoom: 1,
-			});
+		const nodeWidth = trigger.measured?.width ?? 400;
+		void setViewport({
+			x: width / 2 - (trigger.position.x + nodeWidth / 2),
+			y: TOP_GAP - trigger.position.y,
+			zoom: 1,
 		});
-	}, [nodesInitialized, getNode, setViewport]);
+	}, [getNode, setViewport]);
+	useEffect(() => {
+		if (!nodesInitialized) return;
+		requestAnimationFrame(place);
+		const container = containerRef.current;
+		if (!container) return;
+		let lastWidth = container.clientWidth;
+		const observer = new ResizeObserver(() => {
+			if (container.clientWidth === lastWidth) return;
+			lastWidth = container.clientWidth;
+			place();
+		});
+		observer.observe(container);
+		return () => observer.disconnect();
+	}, [nodesInitialized, place]);
 
 	return (
 		<NodeEditorProvider

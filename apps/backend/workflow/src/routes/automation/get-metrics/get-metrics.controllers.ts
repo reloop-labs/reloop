@@ -62,58 +62,95 @@ export async function getMetricsController(params: {
 	const since = new Date(today.getTime() - (params.days - 1) * DAY_MS);
 	const day = sql<string>`to_char(date_trunc('day', ${enrollment.enrolledAt}), 'YYYY-MM-DD')`;
 
-	const [byStatus, duration, bySteps, emailsByStep, sentByStep, byDay] =
-		await Promise.all([
-			db
-				.select({ status: enrollment.status, total: count() })
-				.from(enrollment)
-				.where(ofAutomation)
-				.groupBy(enrollment.status),
-			db
-				.select({
-					ms: sql<
-						string | null
-					>`avg(extract(epoch from (${enrollment.completedAt} - ${enrollment.enrolledAt})) * 1000)`,
-				})
-				.from(enrollment)
-				.where(and(ofAutomation, eq(enrollment.status, "completed"))),
-			db
-				.select({
-					nodeId: stepRun.nodeId,
-					nodeType: stepRun.nodeType,
-					status: stepRun.status,
-					total: count(),
-				})
-				.from(stepRun)
-				.innerJoin(enrollment, eq(stepRun.enrollmentId, enrollment.id))
-				.where(ofAutomation)
-				.groupBy(stepRun.nodeId, stepRun.nodeType, stepRun.status),
-			db
-				.select({
-					nodeId: stepRun.nodeId,
-					type: schema.emailEvent.type,
-					total: sql<number>`count(distinct ${schema.emailEvent.emailLogId})`,
-				})
-				.from(stepRun)
-				.innerJoin(enrollment, eq(stepRun.enrollmentId, enrollment.id))
-				.innerJoin(
-					schema.emailEvent,
-					eq(schema.emailEvent.emailLogId, stepRun.emailLogId),
-				)
-				.where(ofAutomation)
-				.groupBy(stepRun.nodeId, schema.emailEvent.type),
-			db
-				.select({ nodeId: stepRun.nodeId, total: count() })
-				.from(stepRun)
-				.innerJoin(enrollment, eq(stepRun.enrollmentId, enrollment.id))
-				.where(and(ofAutomation, isNotNull(stepRun.emailLogId)))
-				.groupBy(stepRun.nodeId),
-			db
-				.select({ date: day, status: enrollment.status, total: count() })
-				.from(enrollment)
-				.where(and(ofAutomation, gte(enrollment.enrolledAt, since)))
-				.groupBy(day, enrollment.status),
-		]);
+	const sentDay = sql<string>`to_char(date_trunc('day', ${stepRun.finishedAt}), 'YYYY-MM-DD')`;
+	const eventDay = sql<string>`to_char(date_trunc('day', ${schema.emailEvent.createdAt}), 'YYYY-MM-DD')`;
+
+	const [
+		byStatus,
+		duration,
+		bySteps,
+		emailsByStep,
+		sentByStep,
+		byDay,
+		sentByDay,
+		eventsByDay,
+	] = await Promise.all([
+		db
+			.select({ status: enrollment.status, total: count() })
+			.from(enrollment)
+			.where(ofAutomation)
+			.groupBy(enrollment.status),
+		db
+			.select({
+				ms: sql<
+					string | null
+				>`avg(extract(epoch from (${enrollment.completedAt} - ${enrollment.enrolledAt})) * 1000)`,
+			})
+			.from(enrollment)
+			.where(and(ofAutomation, eq(enrollment.status, "completed"))),
+		db
+			.select({
+				nodeId: stepRun.nodeId,
+				nodeType: stepRun.nodeType,
+				status: stepRun.status,
+				total: count(),
+			})
+			.from(stepRun)
+			.innerJoin(enrollment, eq(stepRun.enrollmentId, enrollment.id))
+			.where(ofAutomation)
+			.groupBy(stepRun.nodeId, stepRun.nodeType, stepRun.status),
+		db
+			.select({
+				nodeId: stepRun.nodeId,
+				type: schema.emailEvent.type,
+				total: sql<number>`count(distinct ${schema.emailEvent.emailLogId})`,
+			})
+			.from(stepRun)
+			.innerJoin(enrollment, eq(stepRun.enrollmentId, enrollment.id))
+			.innerJoin(
+				schema.emailEvent,
+				eq(schema.emailEvent.emailLogId, stepRun.emailLogId),
+			)
+			.where(ofAutomation)
+			.groupBy(stepRun.nodeId, schema.emailEvent.type),
+		db
+			.select({ nodeId: stepRun.nodeId, total: count() })
+			.from(stepRun)
+			.innerJoin(enrollment, eq(stepRun.enrollmentId, enrollment.id))
+			.where(and(ofAutomation, isNotNull(stepRun.emailLogId)))
+			.groupBy(stepRun.nodeId),
+		db
+			.select({ date: day, status: enrollment.status, total: count() })
+			.from(enrollment)
+			.where(and(ofAutomation, gte(enrollment.enrolledAt, since)))
+			.groupBy(day, enrollment.status),
+		db
+			.select({ date: sentDay, total: count() })
+			.from(stepRun)
+			.innerJoin(enrollment, eq(stepRun.enrollmentId, enrollment.id))
+			.where(
+				and(
+					ofAutomation,
+					isNotNull(stepRun.emailLogId),
+					gte(stepRun.finishedAt, since),
+				),
+			)
+			.groupBy(sentDay),
+		db
+			.select({
+				date: eventDay,
+				type: schema.emailEvent.type,
+				total: sql<number>`count(distinct ${schema.emailEvent.emailLogId})`,
+			})
+			.from(stepRun)
+			.innerJoin(enrollment, eq(stepRun.enrollmentId, enrollment.id))
+			.innerJoin(
+				schema.emailEvent,
+				eq(schema.emailEvent.emailLogId, stepRun.emailLogId),
+			)
+			.where(and(ofAutomation, gte(schema.emailEvent.createdAt, since)))
+			.groupBy(eventDay, schema.emailEvent.type),
+	]);
 
 	const runs = emptyRuns();
 	for (const row of byStatus) {
@@ -165,18 +202,32 @@ export async function getMetricsController(params: {
 	}
 
 	// Every day in the range, including days with no runs.
-	const daily = new Map<string, ReturnType<typeof emptyRuns>>();
+	const daily = new Map<
+		string,
+		ReturnType<typeof emptyRuns> & { emails: EmailCounts }
+	>();
 	for (let i = 0; i < params.days; i++) {
 		const date = new Date(since.getTime() + i * DAY_MS)
 			.toISOString()
 			.slice(0, 10);
-		daily.set(date, emptyRuns());
+		daily.set(date, { ...emptyRuns(), emails: emptyEmails() });
 	}
 	for (const row of byDay) {
 		const entry = daily.get(row.date);
 		if (!entry) continue;
 		entry[row.status as RunStatus] = Number(row.total);
 		entry.total += Number(row.total);
+	}
+	for (const row of sentByDay) {
+		const entry = daily.get(row.date);
+		if (entry) entry.emails.sent = Number(row.total);
+	}
+	for (const row of eventsByDay) {
+		const type = row.type as (typeof EMAIL_EVENTS)[number];
+		const entry = daily.get(row.date);
+		if (entry && EMAIL_EVENTS.includes(type)) {
+			entry.emails[type] = Number(row.total);
+		}
 	}
 
 	const averageMs = duration[0]?.ms;

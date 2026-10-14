@@ -567,6 +567,14 @@ export namespace AutomationModel {
 		failed: t.Number(),
 	};
 
+	const emailCounts = {
+		sent: t.Number(),
+		delivered: t.Number(),
+		opened: t.Number(),
+		clicked: t.Number(),
+		bounced: t.Number(),
+	};
+
 	export const metricsResponse = t.Object(
 		{
 			runs: t.Object({
@@ -601,9 +609,17 @@ export namespace AutomationModel {
 				}),
 				{ description: "What happened at each step, across every run" },
 			),
-			daily: t.Array(t.Object({ date: t.String(), ...runCounts }), {
-				description: "Runs started each day, by their current status",
-			}),
+			daily: t.Array(
+				t.Object({
+					date: t.String(),
+					...runCounts,
+					emails: t.Object(emailCounts),
+				}),
+				{
+					description:
+						"Per day: runs started (by their current status) and what happened to this automation's emails",
+				},
+			),
 		},
 		{
 			examples: [
@@ -649,6 +665,13 @@ export namespace AutomationModel {
 							completed: 5,
 							cancelled: 0,
 							failed: 0,
+							emails: {
+								sent: 5,
+								delivered: 5,
+								opened: 3,
+								clicked: 1,
+								bounced: 0,
+							},
 						},
 					],
 				},

@@ -3,11 +3,12 @@
 import { cn } from "@reloop/ui/cn";
 import { motion } from "motion/react";
 import { parseAsNumberLiteral, useQueryState } from "nuqs";
-import type { ReactNode } from "react";
 import {
 	Bar,
 	BarChart,
 	CartesianGrid,
+	Line,
+	LineChart,
 	ResponsiveContainer,
 	Tooltip,
 	XAxis,
@@ -15,8 +16,10 @@ import {
 } from "recharts";
 import { CustomTooltip } from "#/features/metrics/components/custom-tooltip";
 import { useAutomationMetrics } from "../../hooks/use-automation-runs";
-import type { AutomationMetrics } from "../../hooks/use-automations-api";
-import { formatDuration } from "../../run-format";
+import type {
+	AutomationMetrics,
+	EmailCounts,
+} from "../../hooks/use-automations-api";
 import type { Workflow } from "../../workflow-types";
 
 const RANGES = [7, 30, 90] as const;
@@ -36,28 +39,124 @@ const SERIES = [
 const CARD =
 	"rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]";
 
-const percent = (part: number, whole: number) =>
-	whole > 0 ? `${Math.round((part / whole) * 100)}%` : "—";
+/**
+ * Delivery funnel lines. Validated (CVD + normal vision, all pairs, light and
+ * dark); Sent is ink, Bounced stays status red in the legend only.
+ */
+const DELIVERY = [
+	{ key: "sent", label: "Sent", color: "var(--delivery-sent)" },
+	{ key: "delivered", label: "Delivered", color: "var(--delivery-delivered)" },
+	{ key: "opened", label: "Opened", color: "var(--delivery-opened)" },
+	{ key: "clicked", label: "Clicked", color: "var(--delivery-clicked)" },
+] as const;
 
-const Tile = ({
-	label,
-	value,
-	detail,
+const DELIVERY_COLORS =
+	"[--delivery-sent:var(--color-text-strong-950)] [--delivery-delivered:#1baf7a] [--delivery-opened:#2a78d6] [--delivery-clicked:#eb6834] dark:[--delivery-delivered:#199e70] dark:[--delivery-opened:#3987e5] dark:[--delivery-clicked:#d95926]";
+
+const DeliveryChart = ({
+	daily,
+	days,
 }: {
-	label: string;
-	value: ReactNode;
-	detail?: ReactNode;
-}) => (
-	<section className={cn(CARD, "flex flex-col px-5 py-4")}>
-		<h3 className="font-medium text-[11px] text-text-soft-400 uppercase tracking-[0.08em]">
-			{label}
-		</h3>
-		<p className="mt-2 font-semibold text-[26px] text-text-strong-950 tabular-nums tracking-tight">
-			{value}
-		</p>
-		<p className="mt-0.5 min-h-4 text-text-sub-600 text-xs">{detail}</p>
-	</section>
-);
+	daily: AutomationMetrics["daily"];
+	days: number;
+}) => {
+	const totals: EmailCounts = {
+		sent: sum(daily, (day) => day.emails.sent),
+		delivered: sum(daily, (day) => day.emails.delivered),
+		opened: sum(daily, (day) => day.emails.opened),
+		clicked: sum(daily, (day) => day.emails.clicked),
+		bounced: sum(daily, (day) => day.emails.bounced),
+	};
+	const data = daily.map((day) => ({
+		...day.emails,
+		label: new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, {
+			month: "short",
+			day: "numeric",
+		}),
+	}));
+	const rate = (n: number) =>
+		totals.sent > 0 ? ` · ${Math.round((n / totals.sent) * 100)}%` : "";
+	return (
+		<section className={cn(CARD, DELIVERY_COLORS, "px-5 pt-4 pb-3")}>
+			<h3 className="font-medium text-sm text-text-strong-950">
+				Emails delivered, last {days} days
+			</h3>
+			{/* Legend doubles as the totals, so every line is labeled in text. */}
+			<ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+				{DELIVERY.map((series) => (
+					<li
+						key={series.key}
+						className="flex items-center gap-1.5 text-text-sub-600 text-xs"
+					>
+						<span
+							aria-hidden
+							className="h-0.5 w-3 rounded-full"
+							style={{ backgroundColor: series.color }}
+						/>
+						{series.label}
+						<span className="font-medium text-text-strong-950 tabular-nums">
+							{totals[series.key].toLocaleString()}
+							{series.key === "sent" ? "" : rate(totals[series.key])}
+						</span>
+					</li>
+				))}
+				<li className="flex items-center gap-1.5 text-text-sub-600 text-xs">
+					Bounced
+					<span className="font-medium text-text-strong-950 tabular-nums">
+						{totals.bounced.toLocaleString()}
+					</span>
+				</li>
+			</ul>
+			<div className="mt-4 h-[180px] text-text-soft-400">
+				<ResponsiveContainer width="100%" height="100%">
+					<LineChart data={data}>
+						<CartesianGrid
+							vertical={false}
+							stroke="currentColor"
+							strokeOpacity={0.15}
+						/>
+						<XAxis
+							dataKey="label"
+							tickLine={false}
+							axisLine={false}
+							tick={{ fontSize: 11, fill: "currentColor" }}
+							interval="preserveStartEnd"
+							minTickGap={24}
+						/>
+						<YAxis
+							allowDecimals={false}
+							tickLine={false}
+							axisLine={false}
+							width={32}
+							tick={{ fontSize: 11, fill: "currentColor" }}
+						/>
+						<Tooltip
+							cursor={{ stroke: "currentColor", strokeOpacity: 0.3 }}
+							content={<CustomTooltip />}
+						/>
+						{DELIVERY.map((series) => (
+							<Line
+								key={series.key}
+								type="monotone"
+								dataKey={series.key}
+								name={series.label}
+								stroke={series.color}
+								strokeWidth={2}
+								dot={false}
+								activeDot={{
+									r: 4,
+									strokeWidth: 2,
+									stroke: "var(--color-bg-white-0)",
+								}}
+								isAnimationActive={false}
+							/>
+						))}
+					</LineChart>
+				</ResponsiveContainer>
+			</div>
+		</section>
+	);
+};
 
 const RangeTabs = ({
 	value,
@@ -92,6 +191,9 @@ const RangeTabs = ({
 	</div>
 );
 
+const sum = <T,>(items: T[], pick: (item: T) => number) =>
+	items.reduce((total, item) => total + pick(item), 0);
+
 const RunsChart = ({
 	daily,
 	days,
@@ -108,26 +210,33 @@ const RunsChart = ({
 	}));
 	return (
 		<section className={cn(CARD, "px-5 pt-4 pb-3")}>
-			<div className="flex flex-wrap items-center justify-between gap-3">
+			<div className="flex items-baseline justify-between gap-3">
 				<h3 className="font-medium text-sm text-text-strong-950">
 					Runs started, last {days} days
 				</h3>
-				<ul className="flex flex-wrap items-center gap-4">
-					{SERIES.map((series) => (
-						<li
-							key={series.key}
-							className="flex items-center gap-1.5 text-text-sub-600 text-xs"
-						>
-							<span
-								aria-hidden
-								className="size-2 rounded-full"
-								style={{ backgroundColor: series.color }}
-							/>
-							{series.label}
-						</li>
-					))}
-				</ul>
+				<span className="font-medium text-sm text-text-strong-950 tabular-nums">
+					{sum(daily, (day) => day.total).toLocaleString()}
+				</span>
 			</div>
+			{/* Legend doubles as the counts for the range. */}
+			<ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+				{SERIES.map((series) => (
+					<li
+						key={series.key}
+						className="flex items-center gap-1.5 text-text-sub-600 text-xs"
+					>
+						<span
+							aria-hidden
+							className="size-2 rounded-full"
+							style={{ backgroundColor: series.color }}
+						/>
+						{series.label}
+						<span className="font-medium text-text-strong-950 tabular-nums">
+							{sum(daily, (day) => day[series.key]).toLocaleString()}
+						</span>
+					</li>
+				))}
+			</ul>
 			<div className="mt-4 h-[180px] text-text-soft-400">
 				<ResponsiveContainer width="100%" height="100%">
 					<BarChart data={data} barCategoryGap="28%">
@@ -178,12 +287,8 @@ const RunsChart = ({
 
 const MetricsSkeleton = () => (
 	<div className="flex flex-col gap-3">
-		<div className="grid grid-cols-2 gap-3">
-			{Array.from({ length: 8 }, (_, i) => (
-				<div key={i} className={cn(CARD, "h-[98px] animate-pulse")} />
-			))}
-		</div>
-		<div className={cn(CARD, "h-[240px] animate-pulse")} />
+		<div className={cn(CARD, "h-[268px] animate-pulse")} />
+		<div className={cn(CARD, "h-[268px] animate-pulse")} />
 	</div>
 );
 
@@ -193,10 +298,10 @@ export function MetricsPanel({ workflow }: { workflow: Workflow }) {
 	const query = useAutomationMetrics(workflow.id, days);
 	const metrics = query.data;
 	return (
-		<aside className="flex w-[480px] shrink-0 flex-col overflow-y-auto border-stroke-soft-200 border-r bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
+		<div className="min-h-0 flex-1 overflow-y-auto">
 			<div className="flex flex-col gap-3 p-3">
 				<div className="flex items-center justify-between gap-3">
-					<p className="text-text-sub-600 text-xs">Totals cover every run.</p>
+					<h2 className="font-medium text-sm text-text-strong-950">Metrics</h2>
 					<RangeTabs
 						value={days}
 						onChange={(value) => void setDays(value === 30 ? null : value)}
@@ -210,58 +315,11 @@ export function MetricsPanel({ workflow }: { workflow: Workflow }) {
 					<MetricsSkeleton />
 				) : (
 					<>
-						<div className="grid grid-cols-2 gap-3">
-							<Tile
-								label="Runs"
-								value={metrics.runs.total.toLocaleString()}
-								detail={`${metrics.runs.active.toLocaleString()} running now`}
-							/>
-							<Tile
-								label="Completed"
-								value={metrics.runs.completed.toLocaleString()}
-								detail={`${percent(metrics.runs.completed, metrics.runs.total)} of runs`}
-							/>
-							<Tile
-								label="Failed or cancelled"
-								value={(
-									metrics.runs.failed + metrics.runs.cancelled
-								).toLocaleString()}
-								detail={`${metrics.runs.failed.toLocaleString()} failed · ${metrics.runs.cancelled.toLocaleString()} cancelled`}
-							/>
-							<Tile
-								label="Time to complete"
-								value={
-									metrics.runs.averageDurationMs === null
-										? "—"
-										: formatDuration(metrics.runs.averageDurationMs)
-								}
-								detail="Average for completed runs"
-							/>
-							<Tile
-								label="Emails sent"
-								value={metrics.emails.sent.toLocaleString()}
-								detail={`${metrics.emails.bounced.toLocaleString()} bounced`}
-							/>
-							<Tile
-								label="Delivered"
-								value={percent(metrics.emails.delivered, metrics.emails.sent)}
-								detail={`${metrics.emails.delivered.toLocaleString()} emails`}
-							/>
-							<Tile
-								label="Opened"
-								value={percent(metrics.emails.opened, metrics.emails.sent)}
-								detail={`${metrics.emails.opened.toLocaleString()} emails`}
-							/>
-							<Tile
-								label="Clicked"
-								value={percent(metrics.emails.clicked, metrics.emails.sent)}
-								detail={`${metrics.emails.clicked.toLocaleString()} emails`}
-							/>
-						</div>
 						<RunsChart daily={metrics.daily} days={days} />
+						<DeliveryChart daily={metrics.daily} days={days} />
 					</>
 				)}
 			</div>
-		</aside>
+		</div>
 	);
 }

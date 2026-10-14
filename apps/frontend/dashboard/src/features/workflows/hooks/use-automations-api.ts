@@ -291,7 +291,8 @@ export type AutomationMetrics = {
 		nodeType: string;
 		emails: EmailCounts;
 	})[];
-	daily: (RunCounts & { date: string })[];
+	/** Per day: runs started, and what happened to the emails. */
+	daily: (RunCounts & { date: string; emails: EmailCounts })[];
 };
 
 export async function getAutomationMetrics(

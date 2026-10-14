@@ -240,16 +240,18 @@ const EmptyRuns = ({
 	);
 };
 
-export function RunsView({ workflow }: { workflow: Workflow }) {
+/**
+ * The run list and the open run, kept in the URL so the panel (list) and the
+ * canvas (open run) read the same state.
+ */
+function useRuns(workflow: Workflow) {
 	const [filter, setFilter] = useQueryState("runs", filterParser);
 	const [selectedId, setSelectedId] = useQueryState("run");
+	const [range, setRange] = useQueryState("range", rangeParser);
 	const status: EnrollmentStatus | undefined =
 		filter === "all" ? undefined : filter;
-	const [range, setRange] = useQueryState("range", rangeParser);
 	const runsQuery = useAutomationRuns(workflow.id, status, range);
 	const runs = runsQuery.data?.pages.flatMap((page) => page.enrollments) ?? [];
-	const total = runsQuery.data?.pages[0]?.total ?? 0;
-	const now = useNow();
 
 	// Show the newest run until one is picked (or the picked one is filtered out).
 	const firstId = runs[0]?.id ?? null;
@@ -257,107 +259,146 @@ export function RunsView({ workflow }: { workflow: Workflow }) {
 	// A run that just started may not be in the list until it refreshes.
 	const keepSelected = selectedInList || (runsQuery.isFetching && !!selectedId);
 	const activeId = keepSelected ? selectedId : firstId;
+	const runQuery = useAutomationRun(workflow.id, activeId);
+
+	return {
+		filter,
+		setFilter,
+		range,
+		setRange,
+		runsQuery,
+		runs,
+		total: runsQuery.data?.pages[0]?.total ?? 0,
+		firstId,
+		keepSelected,
+		activeId,
+		setSelectedId,
+		runQuery,
+	};
+}
+
+/** Runs panel: filters and the list of runs. */
+export function RunsList({ workflow }: { workflow: Workflow }) {
+	const {
+		filter,
+		setFilter,
+		range,
+		setRange,
+		runsQuery,
+		runs,
+		total,
+		firstId,
+		keepSelected,
+		activeId,
+		setSelectedId,
+		runQuery,
+	} = useRuns(workflow);
+	const now = useNow();
+
 	useEffect(() => {
 		if (!runsQuery.isSuccess || keepSelected) return;
 		void setSelectedId(firstId, { history: "replace" });
 	}, [runsQuery.isSuccess, keepSelected, firstId, setSelectedId]);
 
-	const runQuery = useAutomationRun(workflow.id, activeId);
-
 	return (
-		<div className="flex min-h-0 flex-1">
-			<aside className="flex w-[480px] shrink-0 flex-col border-stroke-soft-200 border-r bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-black">
-				<div className="px-3 pt-3">
-					<Filters
-						range={range}
-						onRangeChange={(value) =>
-							void setRange(value === "all" ? null : value)
-						}
-						status={filter}
-						onStatusChange={(value) =>
-							void setFilter(value === "all" ? null : value)
-						}
-						refreshing={runsQuery.isFetching && !runsQuery.isPending}
-						onRefresh={() => {
-							void runsQuery.refetch();
-							if (activeId) void runQuery.refetch();
-						}}
-					/>
-				</div>
-				<div className="min-h-0 flex-1 overflow-y-auto px-3 pt-3 pb-3">
-					<div className="w-full text-paragraph-sm">
-						<div
-							className={cn(
-								COLUMNS,
-								"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40",
-							)}
-						>
-							<ColumnTitle icon="contacts" label="Contact" />
-							<ColumnTitle icon="history" label="Started" />
-							<ColumnTitle
-								icon="clock"
-								label="Duration"
-								className="justify-end"
-							/>
-						</div>
-						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
-							{runsQuery.isPending ? (
-								<ListSkeleton />
-							) : runsQuery.isError ? (
-								<p className="px-4 py-3 text-sm text-text-sub-600">
-									Couldn’t load runs. {runsQuery.error.message}
-								</p>
-							) : runs.length === 0 ? (
-								<p className="px-4 py-6 text-center text-sm text-text-sub-600">
-									No runs to show.
-								</p>
-							) : (
-								runs.map((run) => (
-									<RunRow
-										key={run.id}
-										run={run}
-										now={now}
-										selected={run.id === activeId}
-										onSelect={() => void setSelectedId(run.id)}
-									/>
-								))
-							)}
-							{runs.length > 0 ? (
-								<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
-									<span className="tabular-nums">
-										{runs.length.toLocaleString()} of {total.toLocaleString()}{" "}
-										{total === 1 ? "run" : "runs"}
-									</span>
-									{runsQuery.hasNextPage ? (
-										<button
-											type="button"
-											onClick={() => void runsQuery.fetchNextPage()}
-											disabled={runsQuery.isFetchingNextPage}
-											className="rounded-lg px-2 py-1 font-medium transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-60 dark:hover:bg-white/5"
-										>
-											{runsQuery.isFetchingNextPage ? "Loading…" : "Load more"}
-										</button>
-									) : null}
-								</div>
-							) : null}
-						</div>
+		<>
+			<div className="px-3 pt-3">
+				<Filters
+					range={range}
+					onRangeChange={(value) =>
+						void setRange(value === "all" ? null : value)
+					}
+					status={filter}
+					onStatusChange={(value) =>
+						void setFilter(value === "all" ? null : value)
+					}
+					refreshing={runsQuery.isFetching && !runsQuery.isPending}
+					onRefresh={() => {
+						void runsQuery.refetch();
+						if (activeId) void runQuery.refetch();
+					}}
+				/>
+			</div>
+			<div className="min-h-0 flex-1 overflow-y-auto px-3 pt-3 pb-3">
+				<div className="w-full text-paragraph-sm">
+					<div
+						className={cn(
+							COLUMNS,
+							"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40",
+						)}
+					>
+						<ColumnTitle icon="contacts" label="Contact" />
+						<ColumnTitle icon="history" label="Started" />
+						<ColumnTitle
+							icon="clock"
+							label="Duration"
+							className="justify-end"
+						/>
+					</div>
+					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
+						{runsQuery.isPending ? (
+							<ListSkeleton />
+						) : runsQuery.isError ? (
+							<p className="px-4 py-3 text-sm text-text-sub-600">
+								Couldn’t load runs. {runsQuery.error.message}
+							</p>
+						) : runs.length === 0 ? (
+							<p className="px-4 py-6 text-center text-sm text-text-sub-600">
+								No runs to show.
+							</p>
+						) : (
+							runs.map((run) => (
+								<RunRow
+									key={run.id}
+									run={run}
+									now={now}
+									selected={run.id === activeId}
+									onSelect={() => void setSelectedId(run.id)}
+								/>
+							))
+						)}
+						{runs.length > 0 ? (
+							<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
+								<span className="tabular-nums">
+									{runs.length.toLocaleString()} of {total.toLocaleString()}{" "}
+									{total === 1 ? "run" : "runs"}
+								</span>
+								{runsQuery.hasNextPage ? (
+									<button
+										type="button"
+										onClick={() => void runsQuery.fetchNextPage()}
+										disabled={runsQuery.isFetchingNextPage}
+										className="rounded-lg px-2 py-1 font-medium transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-60 dark:hover:bg-white/5"
+									>
+										{runsQuery.isFetchingNextPage ? "Loading…" : "Load more"}
+									</button>
+								) : null}
+							</div>
+						) : null}
 					</div>
 				</div>
-			</aside>
-			<section className="relative flex min-w-0 flex-1 bg-bg-weak-50 dark:bg-black">
-				{runsQuery.isSuccess && runs.length === 0 ? (
-					<EmptyRuns
-						workflow={workflow}
-						filtered={filter !== "all" || range !== "all"}
-					/>
-				) : runQuery.data ? (
-					<RunCanvas detail={runQuery.data} />
-				) : runQuery.isError ? (
-					<p className="m-auto text-text-sub-600 text-xs">
-						Couldn’t load this run. {runQuery.error.message}
-					</p>
-				) : null}
-			</section>
-		</div>
+			</div>
+		</>
+	);
+}
+
+/** The open run drawn on its steps (or why there's nothing to show). */
+export function RunsCanvasArea({ workflow }: { workflow: Workflow }) {
+	const { filter, range, runsQuery, runs, runQuery } = useRuns(workflow);
+	return (
+		<section className="relative flex min-w-0 flex-1 bg-bg-weak-50 dark:bg-black">
+			{runsQuery.isSuccess && runs.length === 0 ? (
+				<EmptyRuns
+					workflow={workflow}
+					filtered={filter !== "all" || range !== "all"}
+				/>
+			) : runQuery.data ? (
+				<RunCanvas detail={runQuery.data} />
+			) : runQuery.isError ? (
+				<p className="m-auto text-text-sub-600 text-xs">
+					Couldn’t load this run. {runQuery.error.message}
+				</p>
+			) : null}
+		</section>
 	);
 }
