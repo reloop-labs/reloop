@@ -463,6 +463,26 @@ export namespace AutomationModel {
 		finishedAt: t.Nullable(t.String()),
 		emailLogId: t.Nullable(t.String()),
 		error: t.Nullable(t.String()),
+		createdAt: t.String({
+			description: "When the step was scheduled (a delay starts waiting here)",
+		}),
+	});
+
+	export const stepEmailResponse = t.Object({
+		from: t.Nullable(t.String()),
+		to: t.String(),
+		subject: t.String(),
+		templateId: t.Nullable(t.String()),
+		templateName: t.Nullable(t.String()),
+		html: t.Nullable(t.String()),
+		sent: t.Boolean({
+			description: "True once it went out; the fields are then what was sent",
+		}),
+		emailId: t.Nullable(t.String()),
+		deliveryStatus: t.Nullable(t.String()),
+		problem: t.Nullable(
+			t.String({ description: "Why it can't be sent as configured" }),
+		),
 	});
 
 	export const enrollmentDetailResponse = t.Object(
@@ -481,6 +501,10 @@ export namespace AutomationModel {
 			graph: t.Object(automationGraphSchema.properties, {
 				description: "The published version of the steps this run follows",
 			}),
+			emails: t.Record(t.String(), stepEmailResponse, {
+				description:
+					"For each send_email step (by step ID): the email it sends this contact, or sent",
+			}),
 			steps: t.Array(stepRunResponse),
 		},
 		{
@@ -492,6 +516,7 @@ export namespace AutomationModel {
 						properties: { plan: "pro" },
 					},
 					graph: { nodes: [], edges: [] },
+					emails: {},
 					steps: [
 						{
 							id: "astep_123456789",
@@ -503,6 +528,7 @@ export namespace AutomationModel {
 							finishedAt: "2026-03-23T10:00:00.000Z",
 							emailLogId: null,
 							error: null,
+							createdAt: "2026-03-23T10:00:00.000Z",
 						},
 						{
 							id: "astep_987654321",
@@ -514,6 +540,7 @@ export namespace AutomationModel {
 							finishedAt: null,
 							emailLogId: null,
 							error: null,
+							createdAt: "2026-03-23T10:00:00.000Z",
 						},
 					],
 				},

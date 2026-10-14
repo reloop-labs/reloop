@@ -15,7 +15,10 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { isLocal } from "@reloop/dns/is-local";
 import { resolver } from "@reloop/dns/resolver";
-import { countSpfRecords, duplicateSpfReason } from "@reloop/dns/verify-records";
+import {
+	countSpfRecords,
+	duplicateSpfReason,
+} from "@reloop/dns/verify-records";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 

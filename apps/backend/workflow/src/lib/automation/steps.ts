@@ -27,9 +27,9 @@ export type StepType = (typeof STEP_TYPES)[number];
 export type TriggerStepConfig = { eventName: string };
 export type SendEmailStepConfig = {
 	template: { id: string };
-	/** Overrides the template's From. */
+	/** Used when the template has no From. */
 	from?: string;
-	/** Overrides the template's subject. */
+	/** Used when the template has no subject. */
 	subject?: string;
 };
 export type DelayStepConfig = { amount: number; unit: DelayUnit };

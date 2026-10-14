@@ -38,3 +38,16 @@ export function formatMoment(iso: string): string {
 		? `${at.format("MMM D")} at ${time}`
 		: `${at.format("MMM D, YYYY")} at ${time}`;
 }
+
+/** Live countdown: "45s", "4m 32s", "3h 12m", "2d 4h". */
+export function formatCountdown(ms: number): string {
+	const total = Math.max(0, Math.ceil(ms / SECOND));
+	const d = Math.floor(total / 86400);
+	const h = Math.floor((total % 86400) / 3600);
+	const m = Math.floor((total % 3600) / 60);
+	const s = total % 60;
+	if (d) return h ? `${d}d ${h}h` : `${d}d`;
+	if (h) return m ? `${h}h ${m}m` : `${h}h`;
+	if (m) return `${m}m ${s}s`;
+	return `${s}s`;
+}

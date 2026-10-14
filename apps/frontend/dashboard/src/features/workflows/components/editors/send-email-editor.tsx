@@ -58,7 +58,16 @@ export const SendEmailEditor = ({
 	}, [templates, search]);
 
 	const choose = (template: Template) => {
-		updateNode(nodeId, { ...data, templateId: template.id });
+		// The template is the source of From, Subject and body: drop values
+		// older steps kept on the step itself, which would override it unseen.
+		updateNode(nodeId, {
+			templateId: template.id,
+			from: undefined,
+			subject: undefined,
+			html: undefined,
+			text: undefined,
+			to: undefined,
+		});
 		// Stay open on the template's details so the user can check them.
 		setQuery(null);
 		setPicking(false);

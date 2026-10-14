@@ -46,8 +46,6 @@ export const FlowEdge = ({
 
 	const branch =
 		data?.branch === "yes" || data?.branch === "no" ? data.branch : undefined;
-	// On the Runs view, a path this run did not take.
-	const dimmed = data?.dimmed === true;
 	const target = { type: "insert", edgeId: id } as const;
 	const active = activePickerKey === pickerTargetKey(target);
 
@@ -63,12 +61,7 @@ export const FlowEdge = ({
 		<>
 			<BaseEdge
 				path={path}
-				style={{
-					stroke: STROKE,
-					strokeWidth: 2,
-					strokeLinecap: "round",
-					opacity: dimmed ? 0.4 : 1,
-				}}
+				style={{ stroke: STROKE, strokeWidth: 2, strokeLinecap: "round" }}
 			/>
 			{/*
 			 * Short, chunky arrowhead with a thick round-joined stroke, so every
@@ -81,7 +74,6 @@ export const FlowEdge = ({
 				stroke={STROKE}
 				strokeWidth={3}
 				strokeLinejoin="round"
-				opacity={dimmed ? 0.4 : 1}
 			/>
 			{/* No "+" next to the open insert placeholder: it's already the menu. */}
 			{(readOnly && !branch) ||
@@ -93,7 +85,6 @@ export const FlowEdge = ({
 						style={{
 							transform: `translate(-50%, -50%) translate(${chipX}px, ${chipY}px)`,
 							pointerEvents: readOnly ? "none" : "all",
-							opacity: dimmed ? 0.4 : 1,
 						}}
 					>
 						<button

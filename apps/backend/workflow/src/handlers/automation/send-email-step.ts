@@ -1,22 +1,13 @@
 import type { SendEmailNodeData } from "@be/workflow/lib/automation/graph";
+import { resolveStepEmail } from "@be/workflow/lib/automation/resolve-email";
+import { StepError } from "@be/workflow/lib/automation/step-error";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import {
 	INTERNAL_ORG_ID_HEADER,
 	INTERNAL_SECRET_HEADER,
 	INTERNAL_USER_ID_HEADER,
 } from "@reloop/auth/middleware/types";
-import { db } from "@reloop/db/client";
 import { log } from "evlog";
-
-function interpolate(
-	template: string,
-	vars: Record<string, string | null | undefined>,
-): string {
-	return template.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (_, key: string) => {
-		const value = vars[key];
-		return value == null ? "" : String(value);
-	});
-}
 
 export async function sendAutomationEmail(params: {
 	organizationId: string;
@@ -29,49 +20,19 @@ export async function sendAutomationEmail(params: {
 	nodeData: SendEmailNodeData;
 	tags: { name: string; value: string }[];
 }): Promise<{ emailLogId?: string; messageId?: string }> {
-	const vars: Record<string, string | null | undefined> = {
-		"contact.email": params.contact.email,
-		"contact.firstName": params.contact.firstName ?? "",
-		"contact.lastName": params.contact.lastName ?? "",
-		email: params.contact.email,
-		firstName: params.contact.firstName ?? "",
-		lastName: params.contact.lastName ?? "",
-	};
-
-	const to = interpolate(params.nodeData.to || "{{contact.email}}", vars);
-	const templateId = params.nodeData.templateId?.trim();
-	let subject = interpolate(params.nodeData.subject ?? "", vars);
-	let from = params.nodeData.from?.trim();
-
-	// Template-only nodes: resolve Subject/From from the template itself.
-	if ((!from || !subject) && templateId) {
-		const templateRecord = await db.query.template.findFirst({
-			where: (t, { and: dbAnd, eq: dbEq, isNull: dbIsNull }) =>
-				dbAnd(
-					dbEq(t.id, templateId),
-					dbEq(t.organizationId, params.organizationId),
-					dbIsNull(t.deletedAt),
-				),
-		});
-		if (!subject) {
-			subject = templateRecord?.subject ?? "";
-		}
-		if (!from) {
-			const latestPublished = templateRecord
-				? await db.query.templateVersion.findFirst({
-						where: (tv, { and: dbAnd, eq: dbEq }) =>
-							dbAnd(
-								dbEq(tv.templateId, templateRecord.id),
-								dbEq(tv.isMajor, true),
-							),
-						orderBy: (tv, { desc: dbDesc }) => [dbDesc(tv.version)],
-					})
-				: undefined;
-			from = latestPublished?.fromEmail?.trim() || undefined;
-		}
-	}
+	const resolved = await resolveStepEmail({
+		organizationId: params.organizationId,
+		nodeData: params.nodeData,
+		contact: params.contact,
+	});
+	const { to, subject, from } = resolved;
 	if (!from) {
-		throw new Error("Send email step is missing a From address");
+		throw new StepError(
+			"This step has no From address. Pick one in the editor.",
+			{
+				retryable: false,
+			},
+		);
 	}
 
 	const html =
@@ -110,6 +71,11 @@ export async function sendAutomationEmail(params: {
 			[INTERNAL_ORG_ID_HEADER]: params.organizationId,
 		},
 		body: JSON.stringify(body),
+	}).catch((cause: unknown) => {
+		throw new StepError("Couldn’t reach the mail service.", {
+			retryable: true,
+			cause,
+		});
 	});
 
 	const payload = (await res.json().catch(() => ({}))) as {
@@ -126,10 +92,26 @@ export async function sendAutomationEmail(params: {
 			message: "Automation send email failed",
 			status: res.status,
 			detail,
+			why: payload.why,
 			to,
 			subject,
 		});
-		throw new Error(detail);
+		// 4xx explains what to fix (e.g. an unverified domain), so show it.
+		// 5xx is our problem: never show its internals.
+		if (res.status >= 500) {
+			throw new StepError(
+				"The email couldn’t be sent because of a problem on our side.",
+				{
+					retryable: true,
+				},
+			);
+		}
+		const reason = [payload.message?.replace(/\.$/, ""), payload.why]
+			.filter(Boolean)
+			.join(". ");
+		throw new StepError(reason || "The mail service rejected this email.", {
+			retryable: res.status === 429,
+		});
 	}
 
 	return {

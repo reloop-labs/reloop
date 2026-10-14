@@ -39,6 +39,7 @@ export interface RunOverlay {
 	steps: Record<string, StepRun>;
 	trigger: EnrollmentDetail["trigger"];
 	enrollment: EnrollmentDetail["enrollment"];
+	emails: EnrollmentDetail["emails"];
 }
 
 interface NodeEditorContextValue {

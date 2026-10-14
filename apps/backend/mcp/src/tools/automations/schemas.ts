@@ -100,12 +100,14 @@ export const stepSchema = z.discriminatedUnion("type", [
 				.string()
 				.max(320)
 				.optional()
-				.describe("Overrides the template's From; must be on an active domain"),
+				.describe(
+					"Used only when the template has no From; must be on one of your domains",
+				),
 			subject: z
 				.string()
 				.max(998)
 				.optional()
-				.describe("Overrides the template's subject"),
+				.describe("Used only when the template has no subject"),
 		}),
 	}),
 	z.object({

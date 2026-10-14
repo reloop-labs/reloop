@@ -32,6 +32,7 @@ export function startAutomationWorker(): Worker {
 				enrollmentId,
 				stepRunId,
 				organizationId,
+				finalAttempt: job.attemptsMade + 1 >= (job.opts.attempts ?? 1),
 			});
 		},
 		{

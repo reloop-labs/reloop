@@ -25,7 +25,7 @@ import {
 	pickerTargetKey,
 	useNodeEditor,
 } from "../node-editor-context";
-import { RunStepCard } from "../runs/run-step-card";
+import { RunStepDetails, RunStepStatus } from "../runs/run-step-card";
 import { StepIcon } from "../step-icon";
 
 /** The value from the previous render (the current value on first render). */
@@ -123,12 +123,14 @@ export const NodePill = ({
 	const { readOnly, editNode, deleteNode, showIssues, run } = useNodeEditor();
 	const reduceMotion = useReducedMotion();
 	const invalid = Boolean(showIssues) && !ready && !readOnly;
-	// On the Runs view every step is compact, with how this run went below it.
-	const runCard =
-		run && nodeId ? <RunStepCard run={run} nodeId={nodeId} /> : null;
+	// On the Runs view every step is compact: its status at the top right and,
+	// once it has run (or while it waits), the details below.
+	const onRun = Boolean(run && nodeId);
 	// Plain icon buttons (no divider lines) on the right of the box.
 	const actions =
-		readOnly || !nodeId ? null : (
+		run && nodeId ? (
+			<RunStepStatus run={run} nodeId={nodeId} />
+		) : readOnly || !nodeId ? null : (
 			<span className={ACTIONS_WRAP}>
 				<button
 					type="button"
@@ -172,12 +174,14 @@ export const NodePill = ({
 		<NodeFrame
 			title={title}
 			icon={icon}
-			hoverable
+			hoverable={!onRun}
 			showTitle={false}
 			titleExiting={titleExiting}
 			trailing={actions}
-			cardContent={runCard ? undefined : cardContent}
-			belowCard={runCard ?? belowCard}
+			cardContent={onRun ? undefined : cardContent}
+			belowCard={
+				run && nodeId ? <RunStepDetails run={run} nodeId={nodeId} /> : belowCard
+			}
 			invalid={invalid}
 		>
 			<span

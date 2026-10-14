@@ -3,6 +3,7 @@ import {
 	extractTriggerEvent,
 	validateAutomationGraph,
 } from "@be/workflow/lib/automation/graph";
+import { sendStepProblems } from "@be/workflow/lib/automation/resolve-email";
 import { mapAutomation } from "@be/workflow/routes/automation/automation.mappers";
 import { db } from "@reloop/db/client";
 import type { AutomationGraph } from "@reloop/db/schema";
@@ -53,6 +54,12 @@ export async function activateAutomationController(params: {
 		throw AutomationErrors.cannotActivate(
 			`Custom event "${triggerEvent}" was not found. Create it under Events first.`,
 		);
+	}
+
+	// A From on a domain the org doesn't have would fail every send.
+	const sendProblems = await sendStepProblems(params.organizationId, graph);
+	if (sendProblems.length > 0) {
+		throw AutomationErrors.cannotActivate(sendProblems.join(" "));
 	}
 
 	try {

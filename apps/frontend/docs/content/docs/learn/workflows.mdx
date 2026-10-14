@@ -102,7 +102,7 @@ An **automation** sends emails for you when something happens in your app. You t
 | Type | Config | What it does |
 |---|---|---|
 | `trigger` | `{ eventName }` | Starts the automation. Every automation has exactly one. |
-| `send_email` | `{ template: { id }, from?, subject? }` | Sends a [template](/docs/learn/templates) to the contact. `from` and `subject` override the template's. |
+| `send_email` | `{ template: { id }, from?, subject? }` | Sends a [template](/docs/learn/templates) to the contact. Its From and subject come from the template; `from` and `subject` are used only when the template has none. |
 | `delay` | `{ amount, unit }` | Waits before the next step. `unit` is `minutes`, `hours` or `days`. |
 | `condition` | a rule or a group | Checks the contact or the event and takes the Yes or No path. |
 

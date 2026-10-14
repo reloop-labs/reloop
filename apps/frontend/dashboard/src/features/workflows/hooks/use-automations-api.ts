@@ -226,6 +226,23 @@ export type StepRun = {
 	finishedAt: string | null;
 	emailLogId: string | null;
 	error: string | null;
+	/** When it was scheduled; a delay starts waiting here. */
+	createdAt: string;
+};
+
+/** The email a send step sends this contact (or sent, once `sent`). */
+export type StepEmail = {
+	from: string | null;
+	to: string;
+	subject: string;
+	templateId: string | null;
+	templateName: string | null;
+	html: string | null;
+	sent: boolean;
+	emailId: string | null;
+	deliveryStatus: string | null;
+	/** Why it can't be sent as configured. */
+	problem: string | null;
 };
 
 export type EnrollmentDetail = {
@@ -234,6 +251,8 @@ export type EnrollmentDetail = {
 	trigger: { eventKey: string | null; properties: Record<string, unknown> };
 	/** The published version of the steps this run follows. */
 	graph: { nodes: WorkflowNode[]; edges: WorkflowEdge[] };
+	/** Per send_email step ID. */
+	emails: Record<string, StepEmail>;
 	steps: StepRun[];
 };
 

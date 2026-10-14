@@ -47,6 +47,7 @@ export function mapStepRun(row: typeof schema.automationStepRun.$inferSelect) {
 		finishedAt: iso(row.finishedAt),
 		emailLogId: row.emailLogId ?? null,
 		error: row.error ?? null,
+		createdAt: row.createdAt.toISOString(),
 	};
 }
 

@@ -11,6 +11,10 @@ import {
 	parseDelayData,
 	type SendEmailNodeData,
 } from "@be/workflow/lib/automation/graph";
+import {
+	GENERIC_STEP_ERROR,
+	StepError,
+} from "@be/workflow/lib/automation/step-error";
 import { enqueueAutomationStep } from "@be/workflow/queues/automation.queue";
 import { db } from "@reloop/db/client";
 import type { AutomationGraph } from "@reloop/db/schema";
@@ -22,6 +26,8 @@ export async function executeAutomationStep(params: {
 	enrollmentId: string;
 	stepRunId: string;
 	organizationId: string;
+	/** No retries left: a failure now fails the step and the run. */
+	finalAttempt?: boolean;
 }): Promise<void> {
 	const { enrollmentId, stepRunId, organizationId } = params;
 
@@ -178,10 +184,30 @@ export async function executeAutomationStep(params: {
 			});
 		}
 	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error);
+		// The run shows `message`; the raw error only goes to the logs.
+		const message =
+			error instanceof StepError ? error.message : GENERIC_STEP_ERROR;
+		const retryable = error instanceof StepError ? error.retryable : true;
+		log.error({
+			message: "Automation step failed",
+			enrollmentId,
+			stepRunId,
+			nodeType: node.type,
+			retryable,
+			finalAttempt: params.finalAttempt ?? false,
+			error: error instanceof Error ? error.message : String(error),
+		});
+		if (retryable && !params.finalAttempt) {
+			// Back to pending so the retry runs it again (a failed step is skipped).
+			await markStep(stepRunId, {
+				status: "pending",
+				error: `${message} Trying again shortly.`,
+			});
+			throw error;
+		}
 		await markStep(stepRunId, { status: "failed", error: message });
-		// Throw so BullMQ retries transient failures
-		throw error;
+		await completeEnrollment(enrollmentId, "failed");
+		return;
 	}
 
 	// Advance to next node
@@ -240,7 +266,8 @@ export async function executeAutomationStep(params: {
 async function markStep(
 	stepRunId: string,
 	patch: {
-		status: "completed" | "skipped" | "failed";
+		/** `pending`: it failed but will be retried. */
+		status: "completed" | "skipped" | "failed" | "pending";
 		error?: string;
 		emailLogId?: string;
 	},
@@ -249,9 +276,10 @@ async function markStep(
 		.update(schema.automationStepRun)
 		.set({
 			status: patch.status,
-			error: patch.error,
+			// Clears an earlier attempt's error once a retry succeeds.
+			error: patch.error ?? null,
 			emailLogId: patch.emailLogId,
-			finishedAt: new Date(),
+			finishedAt: patch.status === "pending" ? null : new Date(),
 			updatedAt: new Date(),
 		})
 		.where(eq(schema.automationStepRun.id, stepRunId));

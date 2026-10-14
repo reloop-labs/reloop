@@ -36,23 +36,11 @@ function latestByNode(steps: StepRun[]): Record<string, StepRun> {
 	return byNode;
 }
 
-/** Steps this run never reached are faded, with the path into them. */
-function markReached(
-	nodes: WorkflowNode[],
-	edges: WorkflowEdge[],
-	reached: Set<string>,
-) {
+/** Every step at full strength; the run's state shows on each step instead. */
+function prepare(nodes: WorkflowNode[], edges: WorkflowEdge[]) {
 	return {
-		nodes: nodes.map((node) => ({
-			...node,
-			selected: false,
-			className: reached.has(node.id) ? undefined : "opacity-50",
-		})),
-		edges: edges.map((edge) => ({
-			...edge,
-			type: "flow",
-			data: { ...edge.data, dimmed: !reached.has(edge.target) },
-		})),
+		nodes: nodes.map((node) => ({ ...node, selected: false })),
+		edges: edges.map((edge) => ({ ...edge, type: "flow" })),
 	};
 }
 
@@ -65,37 +53,20 @@ const RunCanvasInner = ({ detail }: { detail: EnrollmentDetail }) => {
 			steps: latestByNode(detail.steps),
 			trigger: detail.trigger,
 			enrollment: detail.enrollment,
+			emails: detail.emails,
 		}),
 		[detail],
 	);
-	const reached = useMemo(
-		() => new Set([TRIGGER_NODE_ID, ...Object.keys(run.steps)]),
-		[run],
-	);
-
 	const marked = useMemo(() => {
 		const clean = stripPlaceholderNodes(detail.graph.nodes, detail.graph.edges);
-		return markReached(clean.nodes, clean.edges, reached);
-	}, [detail.graph, reached]);
+		return prepare(clean.nodes, clean.edges);
+	}, [detail.graph]);
 
 	const [nodes, setNodes] = useState<WorkflowNode[]>(() =>
 		layoutWorkflow(marked.nodes, marked.edges),
 	);
 	const edgesRef = useRef(marked.edges);
 	edgesRef.current = marked.edges;
-
-	// A live run moved on: re-fade, keeping the measured sizes.
-	useEffect(() => {
-		setNodes((current) =>
-			layoutWorkflow(
-				current.map((node) => ({
-					...node,
-					className: reached.has(node.id) ? undefined : "opacity-50",
-				})),
-				edgesRef.current,
-			),
-		);
-	}, [reached]);
 
 	// Status cards change a step's height: lay out again once measured.
 	const handleNodesChange = useCallback(
