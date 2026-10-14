@@ -1,14 +1,16 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { FieldError, useFieldError } from "@reloop/ui/field-error";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { queryKeys } from "#/lib/query-keys";
 import {
 	type CustomEvent,
@@ -19,6 +21,7 @@ import {
 	AutomationModalFrame,
 	type AutomationModalStatus,
 } from "./automation-modal-frame";
+import { StepIcon } from "./step-icon";
 
 const EMPTY_TRIGGER_ERROR = "Please enter a trigger key.";
 
@@ -26,6 +29,37 @@ type PropertyDraft = {
 	id: string;
 	name: string;
 	propertyType: "string" | "number" | "boolean";
+	/** Used when a tracked event leaves this property out. Empty = no default. */
+	defaultValue: string;
+	// Not editable here, but kept so saving doesn't wipe them.
+	required?: boolean;
+	description?: string | null;
+};
+
+const newPropertyDraft = (name = ""): PropertyDraft => ({
+	id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+	name,
+	propertyType: "string",
+	defaultValue: "",
+});
+
+/** Why a default can't be stored for this type, if it can't. */
+const defaultValueError = (p: PropertyDraft) => {
+	const value = p.defaultValue.trim();
+	if (!value) return null;
+	if (p.propertyType === "number" && !Number.isFinite(Number(value))) {
+		return `Default for "${p.name.trim()}" must be a number`;
+	}
+	if (p.propertyType === "boolean" && value !== "true" && value !== "false") {
+		return `Default for "${p.name.trim()}" must be true or false`;
+	}
+	return null;
+};
+
+const DEFAULT_PLACEHOLDER: Record<PropertyDraft["propertyType"], string> = {
+	string: "Default",
+	number: "0",
+	boolean: "true / false",
 };
 
 const TRIGGER_PREFIX = "trigger.";
@@ -49,11 +83,84 @@ const slugifySuffix = (value: string) =>
 const isValidPropertyName = (name: string) =>
 	/^[a-zA-Z][a-zA-Z0-9_]*$/.test(name);
 
+/** String / Number / Boolean picker, styled like the other menus (sliding hover pill). */
+function PropertyTypeSelect({
+	value,
+	disabled,
+	onChange,
+}: {
+	value: PropertyDraft["propertyType"];
+	disabled?: boolean;
+	onChange: (value: PropertyDraft["propertyType"]) => void;
+}) {
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>();
+	const itemRefs = useRef<HTMLElement[]>([]);
+	const currentTab = itemRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+	const label =
+		PROPERTY_TYPE_OPTIONS.find((opt) => opt.value === value)?.label ?? "String";
+
+	return (
+		<Dropdown.Root onOpenChange={(open) => !open && setHoverIdx(undefined)}>
+			<Dropdown.Trigger asChild>
+				<button
+					type="button"
+					disabled={disabled}
+					className="group/type inline-flex h-7 shrink-0 items-center gap-1 rounded-lg border border-stroke-soft-200/70 bg-bg-weak-50 pr-1.5 pl-2.5 font-medium text-text-sub-600 text-xs outline-none transition-colors duration-150 hover:bg-bg-soft-200/60 hover:text-text-strong-950 focus-visible:border-text-strong-950 disabled:opacity-50 data-[state=open]:text-text-strong-950 dark:border-white/[0.06] dark:bg-white/[0.04] dark:data-[state=open]:bg-white/[0.08] dark:hover:bg-white/[0.08]"
+				>
+					{label}
+					<Icon
+						name="chevron-down"
+						className="h-3 w-3 text-text-soft-400 transition-transform duration-200 group-data-[state=open]/type:rotate-180"
+					/>
+				</button>
+			</Dropdown.Trigger>
+			<Dropdown.Content
+				align="end"
+				sideOffset={4}
+				className="w-32 overflow-hidden rounded-2xl p-1.5"
+			>
+				<div className="relative">
+					{PROPERTY_TYPE_OPTIONS.map((opt, idx) => (
+						<Dropdown.Item
+							key={opt.value}
+							ref={(el) => {
+								if (el) itemRefs.current[idx] = el;
+							}}
+							onPointerEnter={() => setHoverIdx(idx)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							// Arrow keys move the same pill as the pointer.
+							onFocus={() => setHoverIdx(idx)}
+							onSelect={() => onChange(opt.value)}
+							className={cn(
+								// The sliding pill is the only highlight: drop the item's own one.
+								"relative z-10 flex cursor-pointer items-center justify-between gap-2 rounded-xl px-2.5 py-1.5 font-medium text-xs outline-none data-[highlighted]:bg-transparent",
+								opt.value === value
+									? "text-text-strong-950"
+									: "text-text-sub-600 hover:text-text-strong-950",
+								!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
+							)}
+						>
+							{opt.label}
+							{opt.value === value ? (
+								<StepIcon name="check" className="size-3.5" />
+							) : null}
+						</Dropdown.Item>
+					))}
+					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
+				</div>
+			</Dropdown.Content>
+		</Dropdown.Root>
+	);
+}
+
 interface CreateEventModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	event?: CustomEvent | null;
 	initialKey?: string;
+	/** Editing: start with this property added (unless the event already has it). */
+	initialProperty?: string;
 	onCreated?: (event: CustomEvent) => void;
 	onUpdated?: (event: CustomEvent) => void;
 }
@@ -66,6 +173,7 @@ export function CreateEventModal({
 	onOpenChange,
 	event,
 	initialKey,
+	initialProperty,
 	onCreated,
 	onUpdated,
 }: CreateEventModalProps) {
@@ -82,14 +190,7 @@ export function CreateEventModal({
 	};
 
 	const handleAddProperty = () => {
-		setProperties((prev) => [
-			...prev,
-			{
-				id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-				name: "",
-				propertyType: "string",
-			},
-		]);
+		setProperties((prev) => [...prev, newPropertyDraft()]);
 	};
 
 	const handleUpdateProperty = (id: string, patch: Partial<PropertyDraft>) => {
@@ -144,6 +245,11 @@ export function CreateEventModal({
 				return;
 			}
 			seen.add(n);
+			const defaultError = defaultValueError(p);
+			if (defaultError) {
+				toast.error(defaultError);
+				return;
+			}
 		}
 
 		triggerField.clear();
@@ -152,6 +258,9 @@ export function CreateEventModal({
 			const normalizedProps = properties.map((p) => ({
 				name: p.name.trim(),
 				propertyType: p.propertyType,
+				defaultValue: p.defaultValue.trim() || null,
+				required: p.required,
+				description: p.description,
 			}));
 
 			if (event) {
@@ -228,12 +337,19 @@ export function CreateEventModal({
 		if (open) {
 			if (event) {
 				setKeySuffix(suffixFromKey(event.key));
+				const existing = event.properties.map((p) => ({
+					id: p.id,
+					name: p.name,
+					propertyType: p.propertyType,
+					defaultValue: p.defaultValue ?? "",
+					required: p.required,
+					description: p.description,
+				}));
+				const extra = initialProperty?.trim();
 				setProperties(
-					event.properties.map((p) => ({
-						id: p.id,
-						name: p.name,
-						propertyType: p.propertyType,
-					})),
+					extra && !existing.some((p) => p.name === extra)
+						? [...existing, newPropertyDraft(extra)]
+						: existing,
 				);
 			} else if (initialKey?.trim()) {
 				setKeySuffix(suffixFromKey(initialKey.trim()));
@@ -247,7 +363,7 @@ export function CreateEventModal({
 			setStatus("idle");
 		}, 300);
 		return () => clearTimeout(timer);
-	}, [open, event, initialKey, clearTriggerError]);
+	}, [open, event, initialKey, initialProperty, clearTriggerError]);
 
 	return (
 		<AutomationModalFrame
@@ -297,16 +413,17 @@ export function CreateEventModal({
 					{properties.length === 0 ? (
 						<p className="rounded-lg border border-stroke-soft-200 border-dashed bg-bg-weak-50/30 px-3 py-3 text-center text-text-sub-600 text-xs dark:border-stroke-soft-100/40">
 							No properties yet. Add dynamic properties like contact properties.
-							Each has a name and a type (no default values).
+							Each has a name, a type and an optional default value.
 						</p>
 					) : (
 						<div className="space-y-2">
 							{properties.map((p) => (
 								<div
 									key={p.id}
-									className="flex items-center gap-2 rounded-xl bg-bg-weak-50 p-0.5 dark:bg-bg-weak-50/40"
+									// The delete button gets its own fixed column and sits centered in it.
+									className="grid grid-cols-[minmax(0,1fr)_2.75rem] items-center rounded-xl bg-bg-weak-50 p-0.5 dark:bg-bg-weak-50/40"
 								>
-									<div className="flex flex-1 items-center gap-2 rounded-[10px] border border-stroke-soft-200/80 bg-bg-white-0 py-1 pr-1.5 pl-3 transition-colors focus-within:border-primary-base focus-within:ring-4 focus-within:ring-primary-base/10 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+									<div className="flex min-w-0 items-center gap-2 rounded-[10px] border border-stroke-soft-200/80 bg-bg-white-0 py-1 pr-1.5 pl-3 transition-colors focus-within:border-text-strong-950 focus-within:ring-4 focus-within:ring-text-strong-950/10 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 										<input
 											placeholder="plan"
 											value={p.name}
@@ -318,55 +435,38 @@ export function CreateEventModal({
 											disabled={status !== "idle"}
 											className="h-7 min-w-0 flex-1 bg-transparent font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 disabled:opacity-50"
 										/>
-										<Dropdown.Root>
-											<Dropdown.Trigger asChild>
-												<button
-													type="button"
-													disabled={status !== "idle"}
-													className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border border-stroke-soft-200/70 bg-bg-weak-50 px-2 font-medium text-text-strong-950 text-xs transition-colors hover:bg-bg-soft-200 focus:outline-none dark:border-stroke-soft-100/40 dark:bg-white/10 dark:hover:bg-white/15"
-												>
-													<span>
-														{PROPERTY_TYPE_OPTIONS.find(
-															(opt) => opt.value === p.propertyType,
-														)?.label ?? "String"}
-													</span>
-													<Icon
-														name="chevron-down"
-														className="h-3 w-3 text-text-sub-600"
-													/>
-												</button>
-											</Dropdown.Trigger>
-											<Dropdown.Content
-												align="end"
-												className="w-32 rounded-xl p-1 shadow-regular-md"
-											>
-												{PROPERTY_TYPE_OPTIONS.map((opt) => (
-													<Dropdown.Item
-														key={opt.value}
-														onClick={() =>
-															handleUpdateProperty(p.id, {
-																propertyType: opt.value,
-															})
-														}
-														className="flex items-center justify-between py-1.5 text-xs"
-													>
-														<span>{opt.label}</span>
-														{p.propertyType === opt.value ? (
-															<Icon
-																name="check"
-																className="h-3.5 w-3.5 text-text-strong-950"
-															/>
-														) : null}
-													</Dropdown.Item>
-												))}
-											</Dropdown.Content>
-										</Dropdown.Root>
+										<span
+											aria-hidden
+											className="h-4 w-px shrink-0 bg-stroke-soft-200 dark:bg-stroke-soft-100/40"
+										/>
+										<input
+											aria-label={`Default value for ${p.name || "property"}`}
+											placeholder={DEFAULT_PLACEHOLDER[p.propertyType]}
+											value={p.defaultValue}
+											inputMode={
+												p.propertyType === "number" ? "decimal" : undefined
+											}
+											onChange={(e) =>
+												handleUpdateProperty(p.id, {
+													defaultValue: e.target.value,
+												})
+											}
+											disabled={status !== "idle"}
+											className="h-7 w-24 min-w-0 shrink-0 bg-transparent font-mono text-text-strong-950 text-xs outline-none placeholder:text-text-soft-400 disabled:opacity-50"
+										/>
+										<PropertyTypeSelect
+											value={p.propertyType}
+											disabled={status !== "idle"}
+											onChange={(propertyType) =>
+												handleUpdateProperty(p.id, { propertyType })
+											}
+										/>
 									</div>
 									<button
 										type="button"
 										onClick={() => handleRemoveProperty(p.id)}
 										disabled={status !== "idle"}
-										className="flex size-8 shrink-0 items-center justify-center rounded-[10px] text-text-sub-600 transition-colors hover:bg-error-lighter hover:text-error-base disabled:opacity-50 dark:hover:bg-error-base/10 dark:hover:text-error-base"
+										className="flex size-8 items-center justify-center justify-self-center rounded-[10px] text-text-sub-600 transition-colors hover:bg-error-lighter hover:text-error-base disabled:opacity-50 dark:hover:bg-error-base/10 dark:hover:text-error-base"
 										aria-label="Remove property"
 										title="Remove property"
 									>

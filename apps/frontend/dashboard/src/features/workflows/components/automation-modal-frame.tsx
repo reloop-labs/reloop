@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
@@ -11,8 +12,14 @@ import { X } from "lucide-react";
 import type { FormEvent, ReactNode } from "react";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
-export const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+/**
+ * Keycap on the black (theme-inverting) submit button: follows the button's
+ * text color. The `dark:` repeats override ActionKbd's own dark styles.
+ */
+const actionKbdOnNeutralClassName = cn(
+	"border-text-white-0/20 bg-text-white-0/10 text-text-white-0 shadow-[0_1.5px_0_0_color-mix(in_srgb,var(--color-text-white-0)_25%,transparent)]",
+	"dark:border-text-white-0/20 dark:bg-text-white-0/10 dark:text-text-white-0 dark:shadow-[0_1.5px_0_0_color-mix(in_srgb,var(--color-text-white-0)_25%,transparent)]",
+);
 
 export type AutomationModalStatus = "idle" | "busy" | "success";
 
@@ -102,7 +109,7 @@ export function AutomationModalFrame({
 
 						<FancyButton.Root
 							type="submit"
-							variant={status === "success" ? "success" : "blue"}
+							variant={status === "success" ? "success" : "neutral"}
 							size="small"
 							disabled={!idle || submitDisabled}
 							className={cn(
@@ -137,8 +144,8 @@ export function AutomationModalFrame({
 									) : (
 										<>
 											{submitLabel}
-											<ActionKbd className={actionKbdOnBlueClassName}>
-												↵
+											<ActionKbd className={actionKbdOnNeutralClassName}>
+												<EnterIcon />
 											</ActionKbd>
 										</>
 									)}

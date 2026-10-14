@@ -4,6 +4,7 @@ import * as Alert from "@reloop/ui/alert";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdKey } from "@reloop/ui/kbd-key";
@@ -524,7 +525,9 @@ export function TesterPanel() {
 												className="size-3.5"
 											/>
 											<span>Check Health</span>
-											<KbdKey className={actionKbdOnFilledClassName}>↵</KbdKey>
+											<KbdKey className={actionKbdOnFilledClassName}>
+												<EnterIcon />
+											</KbdKey>
 										</>
 									)}
 								</Button.Root>
@@ -1119,7 +1122,9 @@ export function TesterPanel() {
 											className="size-3.5"
 										/>
 										<span>Start Batch Health Check</span>
-										<KbdKey className={actionKbdOnFilledClassName}>↵</KbdKey>
+										<KbdKey className={actionKbdOnFilledClassName}>
+											<EnterIcon />
+										</KbdKey>
 									</>
 								)}
 							</Button.Root>

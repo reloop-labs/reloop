@@ -57,7 +57,7 @@ export const WorkflowEmptyState = ({
 			) : (
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={onCreate}
 					className="gap-1.5 rounded-xl"
@@ -65,7 +65,7 @@ export const WorkflowEmptyState = ({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					{createLabel}
-					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+					<ActionKbd className="border-text-white-0/20 bg-text-white-0/10 text-text-white-0 shadow-[0_1.5px_0_0_color-mix(in_srgb,var(--color-text-white-0)_25%,transparent)] dark:border-text-white-0/20 dark:bg-text-white-0/10 dark:text-text-white-0 dark:shadow-[0_1.5px_0_0_color-mix(in_srgb,var(--color-text-white-0)_25%,transparent)]">
 						C
 					</ActionKbd>
 				</FancyButton.Root>

@@ -6,13 +6,17 @@ import { updateAutomationController } from "./update-automation.controllers";
 
 export const updateAutomationRoute = new Elysia().use(authMiddleware).patch(
 	"/:automation_id",
-	async ({ params: { automation_id }, body, organizationId }) => {
+	async ({ params: { automation_id }, body, organizationId, userId }) => {
 		return await updateAutomationController({
 			organizationId,
+			userId,
 			automationId: automation_id,
 			name: body.name,
 			description: body.description,
 			graph: body.graph as AutomationGraph | undefined,
+			steps: body.steps,
+			connections: body.connections,
+			status: body.status,
 		});
 	},
 	{

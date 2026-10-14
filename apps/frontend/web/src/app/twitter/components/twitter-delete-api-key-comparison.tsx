@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -115,7 +116,9 @@ function DeleteApiKeyOld() {
 					className="min-w-[134px] justify-center"
 				>
 					Delete API key
-					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>
+						<EnterIcon />
+					</Kbd>
 				</FancyButton.Root>
 			</div>
 		</div>
@@ -207,7 +210,9 @@ function DeleteApiKeyNew() {
 					className="min-w-[134px] justify-center"
 				>
 					Delete API key
-					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>
+						<EnterIcon />
+					</Kbd>
 				</FancyButton.Root>
 			</div>
 		</div>
@@ -324,7 +329,9 @@ function CreateApiKeyOld() {
 					className="min-w-[158px] justify-center"
 				>
 					Create API key{" "}
-					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>
+						<EnterIcon />
+					</Kbd>
 				</FancyButton.Root>
 			</div>
 		</div>
@@ -388,7 +395,9 @@ function CreateApiKeyNew() {
 					className="min-w-[158px] justify-center"
 				>
 					Create API key{" "}
-					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>
+						<EnterIcon />
+					</Kbd>
 				</FancyButton.Root>
 			</div>
 		</div>
@@ -448,7 +457,9 @@ function ApiKeyDisplayOld() {
 					className="min-w-[158px] justify-center"
 				>
 					Copy API key{" "}
-					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>
+						<EnterIcon />
+					</Kbd>
 				</FancyButton.Root>
 			</div>
 		</div>
@@ -498,7 +509,9 @@ function ApiKeyDisplayNew() {
 					className="min-w-[158px] justify-center"
 				>
 					Copy API key{" "}
-					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>
+						<EnterIcon />
+					</Kbd>
 				</FancyButton.Root>
 			</div>
 		</div>
@@ -577,7 +590,9 @@ function RotateApiKeyOld() {
 					className="min-w-[158px] justify-center"
 				>
 					Rotate API key{" "}
-					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>
+						<EnterIcon />
+					</Kbd>
 				</FancyButton.Root>
 			</div>
 		</div>
@@ -655,7 +670,9 @@ function RotateApiKeyNew() {
 					className="min-w-[158px] justify-center"
 				>
 					Rotate API key{" "}
-					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>↵</Kbd>
+					<Kbd className={cn(actionKbdOnBlueClassName, "ml-1")}>
+						<EnterIcon />
+					</Kbd>
 				</FancyButton.Root>
 			</div>
 		</div>

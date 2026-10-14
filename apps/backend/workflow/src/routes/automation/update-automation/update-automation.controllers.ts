@@ -3,7 +3,14 @@ import {
 	extractTriggerEvent,
 	validateAutomationGraph,
 } from "@be/workflow/lib/automation/graph";
+import {
+	type ConnectionInput,
+	type StepInput,
+	stepsToGraph,
+} from "@be/workflow/lib/automation/steps";
+import { activateAutomationController } from "@be/workflow/routes/automation/activate-automation/activate-automation.controllers";
 import { mapAutomation } from "@be/workflow/routes/automation/automation.mappers";
+import { pauseAutomationController } from "@be/workflow/routes/automation/pause-automation/pause-automation.controllers";
 import { db } from "@reloop/db/client";
 import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
@@ -12,11 +19,32 @@ import { log } from "evlog";
 
 export async function updateAutomationController(params: {
 	organizationId: string;
+	userId: string;
 	automationId: string;
 	name?: string;
 	description?: string | null;
 	graph?: AutomationGraph;
+	steps?: StepInput[];
+	connections?: ConnectionInput[];
+	status?: "active" | "paused";
 }) {
+	if (params.steps && params.graph) {
+		throw AutomationErrors.invalidGraph([
+			"Send either `steps` + `connections` or `graph`, not both.",
+		]);
+	}
+	if (params.connections && !params.steps) {
+		throw AutomationErrors.invalidGraph([
+			"Send `steps` together with `connections` (they replace the whole flow).",
+		]);
+	}
+	let graphInput = params.graph;
+	if (params.steps) {
+		const built = stepsToGraph(params.steps, params.connections);
+		if (!built.ok) throw AutomationErrors.invalidGraph(built.errors);
+		graphInput = built.graph;
+	}
+
 	const existing = await db.query.automation.findFirst({
 		where: and(
 			eq(schema.automation.id, params.automationId),
@@ -37,9 +65,9 @@ export async function updateAutomationController(params: {
 		patch.description =
 			params.description === null ? null : params.description.trim() || null;
 	}
-	if (params.graph !== undefined) {
+	if (graphInput !== undefined) {
 		// Soft-validate structure; full validation required only on activate
-		const graph = params.graph;
+		const graph = graphInput;
 		if (!Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) {
 			throw AutomationErrors.invalidGraph([
 				"Graph must include nodes and edges.",
@@ -61,6 +89,7 @@ export async function updateAutomationController(params: {
 		}
 	}
 
+	let updated: ReturnType<typeof mapAutomation>;
 	try {
 		const [row] = await db
 			.update(schema.automation)
@@ -68,7 +97,7 @@ export async function updateAutomationController(params: {
 			.where(eq(schema.automation.id, params.automationId))
 			.returning();
 		if (!row) throw AutomationErrors.updateFailed(params.automationId);
-		return mapAutomation(row);
+		updated = mapAutomation(row);
 	} catch (error) {
 		log.error({
 			message: "Error updating automation",
@@ -77,4 +106,19 @@ export async function updateAutomationController(params: {
 		if (error && typeof error === "object" && "status" in error) throw error;
 		throw AutomationErrors.updateFailed(params.automationId);
 	}
+
+	if (params.status === "active") {
+		return activateAutomationController({
+			organizationId: params.organizationId,
+			userId: params.userId,
+			automationId: params.automationId,
+		});
+	}
+	if (params.status === "paused" && updated.status !== "paused") {
+		return pauseAutomationController({
+			organizationId: params.organizationId,
+			automationId: params.automationId,
+		});
+	}
+	return updated;
 }

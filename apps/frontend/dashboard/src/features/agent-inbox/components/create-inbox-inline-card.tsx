@@ -2,6 +2,7 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
@@ -343,7 +344,7 @@ export function CreateInboxInlineCard({
 											<>
 												<span>Create inbox</span>
 												<ActionKbd className={actionKbdOnBlueClassName}>
-													↵
+													<EnterIcon />
 												</ActionKbd>
 											</>
 										)}

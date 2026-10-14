@@ -1,6 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { FileText, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -268,7 +269,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 																	</div>
 																</div>
 																<div className="flex h-5 w-5 items-center justify-center rounded border border-stroke-soft-200 bg-bg-weak-50 font-medium text-[10px] text-text-sub-600 opacity-0 transition-opacity group-hover:opacity-100 dark:border-stroke-soft-100/40 dark:bg-white/5">
-																	↵
+																	<EnterIcon />
 																</div>
 															</button>
 														))}
@@ -285,7 +286,10 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 												<kbd className="font-sans">↑↓</kbd> Navigate
 											</span>
 											<span className="flex items-center gap-1">
-												<kbd className="font-sans">↵</kbd> Select
+												<kbd className="font-sans">
+													<EnterIcon />
+												</kbd>{" "}
+												Select
 											</span>
 										</div>
 										<div className="flex items-center gap-1">

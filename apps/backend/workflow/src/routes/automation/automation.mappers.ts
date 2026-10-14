@@ -1,3 +1,4 @@
+import { graphToSteps } from "@be/workflow/lib/automation/steps";
 import type * as schema from "@reloop/db/schema";
 import type { AutomationGraph } from "@reloop/db/schema";
 
@@ -52,6 +53,7 @@ export function mapAutomation(row: typeof schema.automation.$inferSelect) {
 		description: row.description ?? null,
 		status: row.status,
 		triggerEvent: row.triggerEvent ?? null,
+		...graphToSteps(graph),
 		graph: {
 			nodes: graph.nodes ?? [],
 			edges: graph.edges ?? [],

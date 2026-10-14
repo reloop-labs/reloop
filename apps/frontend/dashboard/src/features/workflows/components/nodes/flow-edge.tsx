@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon } from "@reloop/ui/icon";
+import { cn } from "@reloop/ui/cn";
 import {
 	BaseEdge,
 	EdgeLabelRenderer,
@@ -8,88 +8,123 @@ import {
 	getSmoothStepPath,
 	Position,
 } from "@xyflow/react";
-import { useNodeEditor } from "../node-editor-context";
+import { BRANCH_SPLIT_DROP } from "../../layout";
+import { pickerTargetKey, useNodeEditor } from "../node-editor-context";
+import { RotatingPlus } from "./flow-node-parts";
 
 export type EdgeTone = "accent" | "default";
 
-const TONE_COLOR: Record<EdgeTone, string> = {
-	accent: "var(--color-green-600)",
-	default: "var(--color-stroke-sub-300)",
-};
+const STROKE = "var(--color-stroke-sub-300)";
 
 export const FlowEdge = ({
 	id,
+	source,
+	target: targetId,
 	sourceX,
 	sourceY,
 	targetX,
 	targetY,
 	sourcePosition,
 	targetPosition,
-	markerEnd,
 	data,
 }: EdgeProps) => {
-	const tone: EdgeTone = data?.tone === "accent" ? "accent" : "default";
-	const color = TONE_COLOR[tone];
-	const isStub = data?.stub === true;
+	const { openPicker, closePicker, activePickerKey, readOnly } =
+		useNodeEditor();
 
-	const [path, labelX, labelY] = getSmoothStepPath({
+	const [path] = getSmoothStepPath({
 		sourceX,
 		sourceY,
 		sourcePosition: sourcePosition ?? Position.Bottom,
 		targetX,
 		targetY,
 		targetPosition: targetPosition ?? Position.Top,
-		borderRadius: 12,
+		borderRadius: 10,
+		offset: 0,
+		// Branches fork just under the condition, matching the dangling stubs.
+		centerY: sourceY + BRANCH_SPLIT_DROP,
 	});
 
 	const branch =
 		data?.branch === "yes" || data?.branch === "no" ? data.branch : undefined;
+	const target = { type: "insert", edgeId: id } as const;
+	const active = activePickerKey === pickerTargetKey(target);
 
-	const { insertStep, readOnly } = useNodeEditor();
+	// Every edge ends in a vertical run into the target's top, so the chip
+	// sits in the middle of that run.
+	const chipX = targetX;
+	const chipY =
+		targetX === sourceX
+			? (sourceY + targetY) / 2
+			: (sourceY + BRANCH_SPLIT_DROP + targetY) / 2;
 
 	return (
 		<>
-			{isStub ? null : (
-				<BaseEdge
-					path={path}
-					markerEnd={markerEnd}
-					style={{ stroke: color, strokeWidth: 1.5 }}
-				/>
-			)}
-			{isStub || readOnly ? null : (
+			<BaseEdge
+				path={path}
+				style={{ stroke: STROKE, strokeWidth: 2, strokeLinecap: "round" }}
+			/>
+			{/*
+			 * Short, chunky arrowhead with a thick round-joined stroke, so every
+			 * corner is rounded off (like Cloudflare's connectors). The tip is
+			 * pulled back by half the stroke so it just touches the step.
+			 */}
+			<path
+				d={`M ${targetX - 4} ${targetY - 8} L ${targetX} ${targetY - 1.75} L ${targetX + 4} ${targetY - 8} Z`}
+				fill={STROKE}
+				stroke={STROKE}
+				strokeWidth={3}
+				strokeLinejoin="round"
+			/>
+			{/* No "+" next to the open insert placeholder: it's already the menu. */}
+			{(readOnly && !branch) ||
+			source.startsWith("add_step_") ||
+			targetId.startsWith("add_step_") ? null : (
 				<EdgeLabelRenderer>
 					<div
-						className="nodrag nopan absolute z-30"
+						className="nodrag nopan absolute"
 						style={{
-							transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-							pointerEvents: "all",
+							transform: `translate(-50%, -50%) translate(${chipX}px, ${chipY}px)`,
+							pointerEvents: readOnly ? "none" : "all",
 						}}
 					>
 						<button
 							type="button"
-							aria-label="Insert step here"
+							aria-label={
+								branch
+									? `Insert step on ${branch === "yes" ? "Yes" : "No"} path`
+									: "Insert step here"
+							}
 							onClick={(e) => {
 								e.stopPropagation();
-								insertStep(id, "add_step");
+								if (active) closePicker();
+								else openPicker(target, e.currentTarget);
 							}}
-							className="group flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-[#3d444d] text-white shadow-[0_2px_10px_rgba(0,0,0,0.25)] transition-all duration-150 hover:scale-110 hover:bg-[#4d555e] active:scale-95"
+							className={cn(
+								"group flex h-6 items-center justify-center gap-1 rounded-[7px] border transition-colors duration-150",
+								branch ? "px-1.5" : "w-6",
+								active
+									? "border-transparent bg-bg-strong-950 text-text-white-0"
+									: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-stroke-sub-300 hover:text-text-strong-950 dark:border-stroke-soft-100/50 dark:bg-[#141419]",
+							)}
 						>
-							<Icon
-								name="plus"
-								className="h-4 w-4 transition-transform duration-150 group-hover:rotate-90"
-							/>
+							{branch ? (
+								<span className="font-mono text-[10px] uppercase tracking-wide">
+									{branch === "yes" ? "Yes" : "No"}
+								</span>
+							) : null}
+							{readOnly ? null : (
+								<RotatingPlus
+									open={active}
+									className={cn(
+										"h-3 w-3",
+										branch &&
+											!active &&
+											"hidden group-hover:block group-focus-visible:block",
+									)}
+								/>
+							)}
 						</button>
 					</div>
-					{branch ? (
-						<div
-							className="nodrag nopan pointer-events-none absolute rounded-full border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-mono text-[10px] text-text-sub-600 dark:border-stroke-soft-100/50"
-							style={{
-								transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY - 30}px)`,
-							}}
-						>
-							{branch === "yes" ? "Yes" : "No"}
-						</div>
-					) : null}
 				</EdgeLabelRenderer>
 			)}
 		</>

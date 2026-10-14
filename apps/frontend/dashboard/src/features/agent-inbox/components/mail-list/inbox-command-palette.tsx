@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import dayjs from "dayjs";
@@ -663,7 +664,9 @@ export const InboxCommandPalette = ({
 				<div className="ml-auto flex items-center gap-2.5">
 					<span className="inline-flex items-center gap-1.5">
 						<span>Open</span>
-						<ActionKbd className="w-auto min-w-4 px-1">↵</ActionKbd>
+						<ActionKbd className="w-auto min-w-4 px-1">
+							<EnterIcon />
+						</ActionKbd>
 					</span>
 					<span aria-hidden className="h-3 w-px bg-black/10 dark:bg-white/15" />
 					<span className="inline-flex items-center gap-1.5">

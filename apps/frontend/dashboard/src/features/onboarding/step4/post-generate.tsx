@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
@@ -287,7 +288,7 @@ export function PostGenerate({
 											<Icon name="confetti" className="h-3.5 w-3.5 shrink-0" />
 											<span>Send email</span>
 											<ActionKbd className={actionKbdOnBlueClassName}>
-												↵
+												<EnterIcon />
 											</ActionKbd>
 										</span>
 									)}
@@ -339,7 +340,7 @@ export function PostGenerate({
 													/>
 													<span>Go to Dashboard</span>
 													<ActionKbd className={actionKbdOnBlueClassName}>
-														↵
+														<EnterIcon />
 													</ActionKbd>
 												</>
 											)}

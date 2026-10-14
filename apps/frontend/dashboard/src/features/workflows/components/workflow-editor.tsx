@@ -5,19 +5,22 @@ import {
 	Background,
 	BackgroundVariant,
 	type DefaultEdgeOptions,
+	type FitViewOptions,
 	type NodeChange,
-	type NodePositionChange,
 	ReactFlow,
 	ReactFlowProvider,
-	useEdgesState,
+	useNodesInitialized,
 	useOnSelectionChange,
 	useReactFlow,
+	ViewportPortal,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { AnimatePresence } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
+import { layoutWorkflow, stripPlaceholderNodes } from "../layout";
 import {
-	createAddStepNode,
 	createConditionNode,
 	createDelayNode,
 	createSendEmailNode,
@@ -32,15 +35,23 @@ import {
 	type WorkflowNode,
 	type WorkflowStatus,
 } from "../workflow-types";
+import { getNodeIssue } from "../workflow-validation";
 import { LiveAutomationBanner } from "./live-automation-banner";
-import { type InsertStepKind, NodeEditorProvider } from "./node-editor-context";
-import { AddStepNode } from "./nodes/add-step-node";
+import {
+	type MorphFrom,
+	NodeEditorProvider,
+	type PickerTarget,
+	pickerTargetKey,
+	type StepKind,
+} from "./node-editor-context";
 import { ConditionNode } from "./nodes/condition-node";
 import { DelayNode } from "./nodes/delay-node";
 import { FlowEdge } from "./nodes/flow-edge";
 import { GroupNode } from "./nodes/group-node";
+import { PickerNode } from "./nodes/picker-node";
 import { SendEmailNode } from "./nodes/send-email-node";
 import { TriggerNode } from "./nodes/trigger-node";
+import { StepPicker } from "./step-picker";
 import { WorkflowEditorToolbar } from "./workflow-editor-toolbar";
 
 const nodeTypes = {
@@ -49,7 +60,7 @@ const nodeTypes = {
 	delay: DelayNode,
 	condition: ConditionNode,
 	group: GroupNode,
-	add_step: AddStepNode,
+	add_step: PickerNode,
 };
 
 const edgeTypes = {
@@ -61,129 +72,46 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 	data: { tone: "default" },
 };
 
-/** Horizontal center of the vertical node column (cards are 420px wide). */
-const COLUMN_X = 220;
+const prefersReducedMotion = () =>
+	typeof window !== "undefined" &&
+	window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** Estimated card heights by type for initial layout before DOM measurement */
-export const getNodeEstimatedHeight = (type?: string): number => {
-	switch (type) {
-		case "trigger":
-			return 108;
-		case "delay":
-			return 128;
-		case "condition":
-			return 320;
-		case "send_email":
-			return 260;
-		case "add_step":
-			return 230;
-		default:
-			return 140;
-	}
+const prepareGraph = (nodes: WorkflowNode[], edges: WorkflowEdge[]) => {
+	const clean = stripPlaceholderNodes(nodes, edges);
+	return {
+		nodes: layoutWorkflow(clean.nodes, clean.edges),
+		edges: clean.edges,
+	};
 };
 
-/** Actual measured height from React Flow if rendered, otherwise calibrated estimated height */
-export const getNodeHeight = (node?: WorkflowNode): number => {
-	if (!node) return 140;
-	if (node.measured?.height && node.measured.height > 20) {
-		return node.measured.height;
+const createStepNode = (kind: StepKind, nodes: WorkflowNode[]) => {
+	if (kind === "send_email") {
+		return createSendEmailNode(nodes.filter(isSendEmailNode).length);
 	}
-	return getNodeEstimatedHeight(node.type);
+	if (kind === "delay")
+		return createDelayNode(nodes.filter(isDelayNode).length);
+	return createConditionNode(nodes.filter(isConditionNode).length);
 };
 
-/** Clear vertical gap between the bottom of one node and the top of the next (line height) */
-export const CLEAR_NODE_GAP = 60;
+const branchOf = (handle?: string | null) =>
+	handle === "yes" || handle === "no" ? handle : undefined;
 
-/** Ensures every sequential node on the canvas has the exact same uniform vertical spacing and stays in a straight line */
-function sanitizeNodePositions(
-	nodes: WorkflowNode[],
-	edges: WorkflowEdge[],
-): WorkflowNode[] {
-	if (nodes.length === 0) return nodes;
-	let modified = false;
-	const result = nodes.map((n) => ({ ...n, position: { ...n.position } }));
-
-	// Find the root node (Trigger or node without incoming edges)
-	const rootNode =
-		result.find((n) => n.id === TRIGGER_NODE_ID) ??
-		result.find((n) => !edges.some((e) => e.target === n.id)) ??
-		result[0];
-
-	const rootX = rootNode ? rootNode.position.x : COLUMN_X;
-
-	// Traverse the graph from the root downwards (BFS)
-	const visited = new Set<string>();
-	const queue: WorkflowNode[] = [];
-
-	if (rootNode) {
-		if (rootNode.position.x !== rootX) {
-			rootNode.position.x = rootX;
-			modified = true;
-		}
-		queue.push(rootNode);
-		visited.add(rootNode.id);
-	}
-
-	while (queue.length > 0) {
-		const current = queue.shift();
-		if (!current) break;
-		const currentHeight = getNodeHeight(current);
-		const expectedChildY = current.position.y + currentHeight + CLEAR_NODE_GAP;
-
-		const outgoingEdges = edges.filter((e) => e.source === current.id);
-		for (const edge of outgoingEdges) {
-			const target = result.find((n) => n.id === edge.target);
-			if (!target) continue;
-
-			let expectedChildX = current.position.x;
-			if (edge.sourceHandle === "yes") {
-				expectedChildX = current.position.x - 240;
-			} else if (edge.sourceHandle === "no") {
-				expectedChildX = current.position.x + 240;
-			}
-
-			if (target.position.x !== expectedChildX) {
-				target.position.x = expectedChildX;
-				modified = true;
-			}
-
-			if (target.position.y !== expectedChildY) {
-				target.position.y = expectedChildY;
-				modified = true;
-			}
-
-			if (!visited.has(target.id)) {
-				visited.add(target.id);
-				queue.push(target);
-			}
-		}
-	}
-
-	// Any unvisited nodes (disconnected) get aligned below the lowest visited node
-	const unvisited = result.filter((n) => !visited.has(n.id));
-	if (unvisited.length > 0) {
-		const visitedNodes = result.filter((n) => visited.has(n.id));
-		let maxY =
-			visitedNodes.length > 0
-				? Math.max(...visitedNodes.map((n) => n.position.y + getNodeHeight(n)))
-				: 60;
-
-		for (const node of unvisited) {
-			const expectedY = maxY + CLEAR_NODE_GAP;
-			if (node.position.y !== expectedY) {
-				node.position.y = expectedY;
-				modified = true;
-			}
-			if (node.position.x !== rootX) {
-				node.position.x = rootX;
-				modified = true;
-			}
-			maxY = expectedY + getNodeHeight(node);
-		}
-	}
-
-	return modified ? result : nodes;
-}
+const makeEdge = (
+	source: WorkflowNode | string,
+	target: string,
+	sourceHandle?: string | null,
+): WorkflowEdge => {
+	const sourceId = typeof source === "string" ? source : source.id;
+	const branch = branchOf(sourceHandle);
+	return {
+		id: `e_${sourceId}_${target}_${Date.now()}`,
+		source: sourceId,
+		target,
+		...(sourceHandle ? { sourceHandle } : {}),
+		type: "flow",
+		data: { tone: branch === "yes" ? "accent" : "default", branch },
+	};
+};
 
 interface WorkflowEditorProps {
 	workflow: Workflow;
@@ -203,64 +131,78 @@ const WorkflowEditorInner = ({
 	onStatusChange,
 	onSave,
 }: WorkflowEditorProps) => {
-	const sanitizedInitialNodes = useMemo(
-		() => sanitizeNodePositions(workflow.nodes, workflow.edges),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only lay out once per workflow; later updates flow through state
+	const initial = useMemo(
+		() => prepareGraph(workflow.nodes, workflow.edges),
 		[workflow.id],
 	);
-	const [nodes, setNodes] = useState<WorkflowNode[]>(sanitizedInitialNodes);
-
-	const [edges, setEdges, onEdgesChange] = useEdgesState<WorkflowEdge>(
-		workflow.edges,
-	);
+	const [nodes, setNodes] = useState<WorkflowNode[]>(initial.nodes);
+	const [edges, setEdges] = useState<WorkflowEdge[]>(initial.edges);
 	const edgesRef = useRef(edges);
 	edgesRef.current = edges;
 
-	const handleNodesChange = useCallback(
-		(changes: NodeChange<WorkflowNode>[]) => {
-			setNodes((currentNodes) => {
-				const posChange = changes.find(
-					(c): c is NodePositionChange => c.type === "position" && !!c.position,
-				);
-
-				if (posChange?.position) {
-					const draggedNode = currentNodes.find((n) => n.id === posChange.id);
-					if (draggedNode) {
-						const dx = posChange.position.x - draggedNode.position.x;
-						const dy = posChange.position.y - draggedNode.position.y;
-
-						if (dx !== 0 || dy !== 0) {
-							// Move the entire tree together so individual nodes cannot be detached
-							const movedNodes = currentNodes.map((node) => ({
-								...node,
-								position: {
-									x: node.position.x + dx,
-									y: node.position.y + dy,
-								},
-							}));
-
-							const otherChanges = changes.filter((c) => c.type !== "position");
-							return otherChanges.length > 0
-								? applyNodeChanges(otherChanges, movedNodes)
-								: movedNodes;
-						}
-					}
-				}
-
-				const updated = applyNodeChanges(changes, currentNodes);
-				const hasDimChange = changes.some((c) => c.type === "dimensions");
-				if (hasDimChange) {
-					return sanitizeNodePositions(updated, edgesRef.current);
-				}
-				return updated;
-			});
-		},
-		[setNodes],
-	);
 	const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+	const [picker, setPicker] = useState<{
+		target: PickerTarget;
+		anchor: { x: number; y: number };
+	} | null>(null);
 	const workflowIdRef = useRef(workflow.id);
 	const skipPersistRef = useRef(false);
-	const { fitView } = useReactFlow();
+	const { fitView, screenToFlowPosition, getViewport, setViewport } =
+		useReactFlow();
+	const canvasRef = useRef<HTMLDivElement>(null);
+
+	/**
+	 * Pans the canvas up or down just enough that `el` (a step being edited or
+	 * the step menu) is fully in view. If it's taller than the canvas, its top
+	 * stays in view.
+	 */
+	const revealElement = useCallback(
+		(el: Element | null | undefined) => {
+			const canvas = canvasRef.current;
+			if (!el || !canvas) return;
+			const PAD = 32;
+			const view = canvas.getBoundingClientRect();
+			const box = el.getBoundingClientRect();
+			let dy = 0;
+			if (box.top < view.top + PAD) {
+				dy = view.top + PAD - box.top;
+			} else if (box.bottom > view.bottom - PAD) {
+				dy = Math.max(view.bottom - PAD - box.bottom, view.top + PAD - box.top);
+			}
+			if (Math.abs(dy) < 1) return;
+			const viewport = getViewport();
+			void setViewport(
+				{ ...viewport, y: viewport.y + dy },
+				{ duration: prefersReducedMotion() ? 0 : 240 },
+			);
+		},
+		[getViewport, setViewport],
+	);
+
+	/** Reveals what `find` returns once it has rendered, and again after it grows. */
+	const scheduleReveal = useCallback(
+		(find: () => Element | null, delays: number[] = [0, 320]) => {
+			for (const delay of delays) {
+				if (delay === 0) {
+					requestAnimationFrame(() =>
+						requestAnimationFrame(() => revealElement(find())),
+					);
+				} else {
+					window.setTimeout(() => revealElement(find()), delay);
+				}
+			}
+		},
+		[revealElement],
+	);
+	const findNodeEl = useCallback(
+		(nodeId: string) => () =>
+			canvasRef.current?.querySelector(
+				`.react-flow__node[data-id="${CSS.escape(nodeId)}"]`,
+			) ?? null,
+		[],
+	);
+
 	const softStopKey = `automation-soft-stop:${workflow.id}`;
 	const [softStopFlag, setSoftStopFlag] = useState(() => {
 		try {
@@ -308,12 +250,13 @@ const WorkflowEditorInner = ({
 		if (workflowIdRef.current !== workflow.id) {
 			workflowIdRef.current = workflow.id;
 			skipPersistRef.current = true;
-			const cleanNodes = sanitizeNodePositions(workflow.nodes, workflow.edges);
-			setNodes(cleanNodes);
-			setEdges(workflow.edges);
+			const next = prepareGraph(workflow.nodes, workflow.edges);
+			setNodes(next.nodes);
+			setEdges(next.edges);
 			setSelectedNodeId(null);
+			setPicker(null);
 		}
-	}, [workflow.id, workflow.nodes, workflow.edges, setNodes, setEdges]);
+	}, [workflow.id, workflow.nodes, workflow.edges]);
 
 	// Debounced local notify (parent may persist on save only or auto-save)
 	useEffect(() => {
@@ -322,16 +265,80 @@ const WorkflowEditorInner = ({
 			return;
 		}
 		const timer = setTimeout(() => {
-			onGraphChange(nodes, edges);
+			// The insert placeholder is UI-only; never hand it to the parent.
+			const clean = stripPlaceholderNodes(nodes, edges);
+			onGraphChange(clean.nodes, clean.edges);
 		}, 400);
 		return () => clearTimeout(timer);
 	}, [nodes, edges, onGraphChange]);
+
+	const handleNodesChange = useCallback(
+		(changes: NodeChange<WorkflowNode>[]) => {
+			setNodes((current) => {
+				// Positions come from the layout, never from dragging.
+				const relevant = changes.filter((c) => c.type !== "position");
+				if (relevant.length === 0) return current;
+				const updated = applyNodeChanges(relevant, current);
+				return relevant.some((c) => c.type === "dimensions")
+					? layoutWorkflow(updated, edgesRef.current)
+					: updated;
+			});
+		},
+		[],
+	);
 
 	useOnSelectionChange({
 		onChange: ({ nodes: selected }) => {
 			setSelectedNodeId(selected[0]?.id ?? null);
 		},
 	});
+
+	const revealGraph = useCallback(() => {
+		const duration = prefersReducedMotion() ? 0 : 220;
+		const options: FitViewOptions = {
+			minZoom: 1,
+			maxZoom: 1,
+			duration,
+			padding: {
+				top: "80px",
+				bottom: "80px",
+				left: "64px",
+				right: "64px",
+			},
+		};
+		// Wait a frame so freshly added nodes are measured and laid out.
+		requestAnimationFrame(() =>
+			requestAnimationFrame(() => void fitView(options)),
+		);
+	}, [fitView]);
+
+	// Re-center once real node sizes are measured and the layout has settled.
+	const nodesInitialized = useNodesInitialized();
+	const centeredForRef = useRef<string | null>(null);
+	useEffect(() => {
+		if (!nodesInitialized || centeredForRef.current === workflow.id) return;
+		centeredForRef.current = workflow.id;
+		revealGraph();
+	}, [nodesInitialized, workflow.id, revealGraph]);
+
+	const selectNode = useCallback((nodeId: string | null) => {
+		setSelectedNodeId(nodeId);
+		setNodes((nds) =>
+			nds.map((n) =>
+				n.selected === (n.id === nodeId)
+					? n
+					: { ...n, selected: n.id === nodeId },
+			),
+		);
+	}, []);
+
+	const commitGraph = useCallback(
+		(nextNodes: WorkflowNode[], nextEdges: WorkflowEdge[]) => {
+			setEdges(nextEdges);
+			setNodes(layoutWorkflow(nextNodes, nextEdges));
+		},
+		[],
+	);
 
 	const updateNodeData = useCallback(
 		(nodeId: string, data: Record<string, unknown>) => {
@@ -342,60 +349,174 @@ const WorkflowEditorInner = ({
 				),
 			);
 		},
-		[setNodes, isReadOnly],
+		[isReadOnly],
 	);
 
-	const appendNode = useCallback(
-		(newNode: WorkflowNode) => {
+	const openPicker = useCallback(
+		(target: PickerTarget, anchorEl: HTMLElement) => {
 			if (isReadOnly) return;
-			if (nodes.length === 0) {
-				newNode.position = { x: COLUMN_X, y: 60 };
-			} else {
-				const deepestNode = [...nodes].sort(
-					(a, b) => b.position.y - a.position.y,
-				)[0]!;
-				const deepestHeight = getNodeHeight(deepestNode);
-				newNode.position = {
-					x: deepestNode.position.x,
-					y: deepestNode.position.y + deepestHeight + CLEAR_NODE_GAP,
+			// Only one menu at a time: close any open insert placeholder first.
+			const base = stripPlaceholderNodes(nodes, edges);
+			if (target.type === "insert") {
+				// Between two steps the menu becomes a real step-sized box in the
+				// flow (pushing later steps down) instead of covering them.
+				const edge = base.edges.find((e) => e.id === target.edgeId);
+				if (!edge) return;
+				const placeholder: WorkflowNode = {
+					id: `add_step_${Date.now()}`,
+					type: "add_step",
+					position: { x: 0, y: 0 },
+					// Closing restores this exact connector.
+					data: { fromEdge: edge.id },
 				};
-			}
-			newNode.selected = true;
-			setNodes((nds) => {
-				const next: WorkflowNode[] = nds.map((n) =>
-					n.selected ? { ...n, selected: false } : n,
+				commitGraph(
+					[
+						...base.nodes.map((n) =>
+							n.selected ? { ...n, selected: false } : n,
+						),
+						placeholder,
+					],
+					[
+						...base.edges.filter((e) => e.id !== edge.id),
+						makeEdge(edge.source, placeholder.id, edge.sourceHandle),
+						makeEdge(placeholder, edge.target),
+					],
 				);
-				next.push(newNode);
-				return next;
+				setSelectedNodeId(null);
+				setPicker(null);
+				scheduleReveal(findNodeEl(placeholder.id));
+				return;
+			}
+			if (base.nodes !== nodes) commitGraph(base.nodes, base.edges);
+			// "+" buttons: the menu hangs below them. Changing a step's type: the
+			// menu sits exactly over that step (the picker adds 8px above).
+			const nodeEl =
+				target.type === "replace"
+					? anchorEl.closest<HTMLElement>(".react-flow__node")
+					: null;
+			const rect = (nodeEl ?? anchorEl).getBoundingClientRect();
+			const anchor = screenToFlowPosition({
+				x: rect.left + rect.width / 2,
+				y: nodeEl ? rect.top - 8 : rect.bottom,
 			});
-			setSelectedNodeId(newNode.id);
-			const reduceMotion =
-				typeof window !== "undefined" &&
-				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-			requestAnimationFrame(() => {
-				void fitView({
-					padding: 0.3,
-					duration: reduceMotion ? 0 : 220,
-				});
-			});
+			setPicker({ target, anchor });
+			scheduleReveal(
+				() => canvasRef.current?.querySelector("[data-step-picker]") ?? null,
+			);
 		},
-		[nodes, setNodes, fitView, isReadOnly],
+		[
+			isReadOnly,
+			screenToFlowPosition,
+			nodes,
+			edges,
+			commitGraph,
+			scheduleReveal,
+			findNodeEl,
+		],
 	);
 
-	const handleAddSendEmail = useCallback(() => {
-		const sendCount = nodes.filter(isSendEmailNode).length;
-		appendNode(createSendEmailNode(sendCount, 0));
-	}, [nodes, appendNode]);
+	const dropPlaceholders = useCallback(() => {
+		const base = stripPlaceholderNodes(nodes, edges);
+		if (base.nodes !== nodes) commitGraph(base.nodes, base.edges);
+	}, [nodes, edges, commitGraph]);
 
-	const handleAddDelay = useCallback(() => {
-		const delayCount = nodes.filter(isDelayNode).length;
-		appendNode(createDelayNode(delayCount, 0));
-	}, [nodes, appendNode]);
+	const closePicker = useCallback(() => setPicker(null), []);
 
-	const handleAddCondition = useCallback(() => {
-		const conditionCount = nodes.filter(isConditionNode).length;
-		appendNode(createConditionNode(conditionCount, 0));
-	}, [nodes, appendNode]);
+	const [morph, setMorph] = useState<(MorphFrom & { nodeId: string }) | null>(
+		null,
+	);
+	const clearMorph = useCallback(() => setMorph(null), []);
+	// Start pressed while steps need setup: outline them until they're done.
+	const [showIssues, setShowIssues] = useState(false);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset per workflow
+	useEffect(() => setShowIssues(false), [workflow.id]);
+	const flagIssues = useCallback(() => {
+		setShowIssues(true);
+		// Bring the first step that needs setup into view.
+		const first = nodes.find((n) => getNodeIssue(n));
+		if (first) scheduleReveal(findNodeEl(first.id), [0]);
+	}, [nodes, scheduleReveal, findNodeEl]);
+
+	const morphRef = useRef(morph);
+	morphRef.current = morph;
+
+	// A step's editor opens taller than the step: keep it in view. A step that
+	// grows out of the menu is revealed once that animation is done.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only when the selection changes
+	useEffect(() => {
+		if (!selectedNodeId || isReadOnly) return;
+		scheduleReveal(
+			findNodeEl(selectedNodeId),
+			morphRef.current?.nodeId === selectedNodeId ? [560] : [0, 320],
+		);
+	}, [selectedNodeId]);
+
+	const addStep = useCallback(
+		(target: PickerTarget, kind: StepKind, from?: MorphFrom) => {
+			if (isReadOnly) return;
+			const newNode = createStepNode(kind, nodes);
+			newNode.selected = true;
+			// A condition hands the rest of the flow to its Yes path.
+			const newNodeHandle = kind === "condition" ? "yes" : undefined;
+
+			let nextEdges: WorkflowEdge[];
+			let nextNodes: WorkflowNode[];
+			const unselected = nodes.map((n) =>
+				n.selected ? { ...n, selected: false } : n,
+			);
+
+			if (target.type === "replace") {
+				const old = nodes.find((n) => n.id === target.nodeId);
+				if (!old) return;
+				const outgoing = edges.filter((e) => e.source === old.id);
+				if (old.type === kind) {
+					// Same type picked: just reopen it.
+					setPicker(null);
+					selectNode(old.id);
+					return;
+				}
+				if (old.type === "condition" && outgoing.length > 1) {
+					toast.error(
+						"Remove the steps on one branch before changing this condition",
+					);
+					setPicker(null);
+					return;
+				}
+				// Keep its place in the flow: rewire both sides to the new step.
+				nextEdges = edges.map((e) => {
+					if (e.target === old.id) return { ...e, target: newNode.id };
+					if (e.source === old.id) {
+						return makeEdge(newNode, e.target, newNodeHandle);
+					}
+					return e;
+				});
+				nextNodes = unselected.map((n) => (n.id === old.id ? newNode : n));
+			} else {
+				if (target.type === "append") {
+					nextEdges = [
+						...edges,
+						makeEdge(target.nodeId, newNode.id, target.handle),
+					];
+				} else {
+					const edge = edges.find((e) => e.id === target.edgeId);
+					if (!edge) return;
+					nextEdges = [
+						...edges.filter((e) => e.id !== edge.id),
+						makeEdge(edge.source, newNode.id, edge.sourceHandle),
+						makeEdge(newNode, edge.target, newNodeHandle),
+					];
+				}
+				nextNodes = [...unselected, newNode];
+			}
+
+			commitGraph(nextNodes, nextEdges);
+			setSelectedNodeId(newNode.id);
+			// The new step grows out of the menu in place, so don't pan here.
+			setMorph(from ? { ...from, nodeId: newNode.id } : null);
+			setPicker(null);
+		},
+		[nodes, edges, isReadOnly, commitGraph, selectNode],
+	);
 
 	const handleDeleteNode = useCallback(
 		(nodeId: string) => {
@@ -408,383 +529,88 @@ const WorkflowEditorInner = ({
 			const incomingEdges = edges.filter((e) => e.target === nodeId);
 			const outgoingEdges = edges.filter((e) => e.source === nodeId);
 
+			if (nodeToDelete.type === "condition" && outgoingEdges.length > 1) {
+				toast.error(
+					"Remove the steps on one branch before deleting this condition",
+				);
+				return;
+			}
+
 			const remainingEdges = edges.filter(
 				(e) => e.source !== nodeId && e.target !== nodeId,
 			);
-
-			// Reconnect upstream nodes to downstream nodes
-			const stamp = Date.now();
 			const bridgeEdges: WorkflowEdge[] = [];
-
 			for (const inEdge of incomingEdges) {
 				for (const outEdge of outgoingEdges) {
 					if (inEdge.source === outEdge.target) continue;
-
-					const alreadyExists =
-						remainingEdges.some(
-							(e) => e.source === inEdge.source && e.target === outEdge.target,
-						) ||
-						bridgeEdges.some(
-							(e) => e.source === inEdge.source && e.target === outEdge.target,
-						);
-					if (alreadyExists) continue;
-
-					// Only inherit sourceHandle from inEdge (the upstream parent's handle)
-					const branch =
-						inEdge.sourceHandle === "yes" || inEdge.sourceHandle === "no"
-							? inEdge.sourceHandle
-							: undefined;
-					const tone = branch === "yes" ? "accent" : "default";
-
-					bridgeEdges.push({
-						id: `e_${inEdge.source}_${outEdge.target}_${stamp}`,
-						source: inEdge.source,
-						target: outEdge.target,
-						...(inEdge.sourceHandle
-							? { sourceHandle: inEdge.sourceHandle }
-							: {}),
-						...(outEdge.targetHandle
-							? { targetHandle: outEdge.targetHandle }
-							: {}),
-						type: "flow",
-						data: {
-							tone,
-							branch,
-						},
-					});
+					bridgeEdges.push(
+						makeEdge(inEdge.source, outEdge.target, inEdge.sourceHandle),
+					);
 				}
 			}
 
-			const nextEdges = [...remainingEdges, ...bridgeEdges];
-			const nextNodes = nodes.filter((n) => n.id !== nodeId);
-
-			// Ensure layout constraints (60px gap) across entire remaining graph
-			const sanitized = sanitizeNodePositions(nextNodes, nextEdges);
-
-			setNodes(sanitized);
-			setEdges(nextEdges);
+			commitGraph(
+				nodes.filter((n) => n.id !== nodeId),
+				[...remainingEdges, ...bridgeEdges],
+			);
 			if (selectedNodeId === nodeId) setSelectedNodeId(null);
-
-			const reduceMotion =
-				typeof window !== "undefined" &&
-				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-			requestAnimationFrame(() => {
-				void fitView({
-					padding: 0.35,
-					duration: reduceMotion ? 0 : 200,
-				});
-			});
+			setPicker(null);
+			revealGraph();
 		},
-		[nodes, edges, selectedNodeId, setNodes, setEdges, fitView, isReadOnly],
+		[nodes, edges, selectedNodeId, isReadOnly, commitGraph, revealGraph],
 	);
 
-	/** Append a step directly below a specific node/handle and connect it with an edge. */
-	const addStepBelow = useCallback(
-		(
-			sourceNodeId: string,
-			sourceHandle: string | undefined,
-			kind: InsertStepKind,
-		) => {
-			if (isReadOnly) return;
-			const existingAddStep = nodes.find((n) => n.type === "add_step");
-			if (existingAddStep && existingAddStep.id !== sourceNodeId) {
-				handleDeleteNode(existingAddStep.id);
-			}
-
-			const sourceNode = nodes.find((n) => n.id === sourceNodeId);
-			if (!sourceNode) return;
-
-			let newNode: WorkflowNode;
-			if (kind === "send_email") {
-				newNode = createSendEmailNode(nodes.filter(isSendEmailNode).length, 0);
-			} else if (kind === "delay") {
-				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
-			} else if (kind === "condition") {
-				newNode = createConditionNode(nodes.filter(isConditionNode).length, 0);
-			} else {
-				newNode = createAddStepNode(sourceHandle);
-			}
-
-			const sourceHeight = getNodeHeight(sourceNode);
-			const targetY = sourceNode.position.y + sourceHeight + CLEAR_NODE_GAP;
-
-			let targetX = sourceNode.position.x;
-			if (sourceHandle === "yes") {
-				targetX = sourceNode.position.x - 240;
-			} else if (sourceHandle === "no") {
-				targetX = sourceNode.position.x + 240;
-			}
-
-			newNode.position = { x: targetX, y: targetY };
-			newNode.selected = true;
-
-			const branch =
-				sourceHandle === "yes" || sourceHandle === "no"
-					? sourceHandle
-					: undefined;
-			const stamp = Date.now();
-			const newEdge: WorkflowEdge = {
-				id: `e_${sourceNodeId}_${newNode.id}_${stamp}`,
-				source: sourceNodeId,
-				target: newNode.id,
-				type: "flow",
-				data: {
-					tone: branch === "yes" ? "accent" : "default",
-					branch,
-				},
-			};
-			if (sourceHandle) {
-				newEdge.sourceHandle = sourceHandle;
-			}
-
-			const nextEdges = [...edges, newEdge];
-			setEdges(nextEdges);
-
-			setNodes((nds) => {
-				const unselected = nds.map((n) =>
-					n.selected ? { ...n, selected: false } : n,
-				);
-				return sanitizeNodePositions([...unselected, newNode], nextEdges);
-			});
-			setSelectedNodeId(newNode.id);
-
-			const reduceMotion =
-				typeof window !== "undefined" &&
-				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-			requestAnimationFrame(() => {
-				void fitView({
-					padding: 0.35,
-					duration: reduceMotion ? 0 : 220,
-				});
-			});
-		},
-		[nodes, edges, setNodes, setEdges, fitView, isReadOnly, handleDeleteNode],
-	);
-
-	/** Append a step at the end of the flow (fallback / palette). */
-	const appendStep = useCallback(
-		(kind: InsertStepKind) => {
-			if (isReadOnly) return;
-			const byY = [...nodes].sort((a, b) => b.position.y - a.position.y);
-			const target = byY.find((n) => n.type !== "group");
-			if (target) {
-				addStepBelow(target.id, undefined, kind);
-			} else {
-				if (kind === "send_email") handleAddSendEmail();
-				else if (kind === "delay") handleAddDelay();
-				else handleAddCondition();
-			}
-		},
-		[
-			nodes,
-			addStepBelow,
-			handleAddSendEmail,
-			handleAddDelay,
-			handleAddCondition,
-			isReadOnly,
-		],
-	);
-
-	/** Insert a new step between the two nodes of an edge (plus button on edges). */
-	const insertStep = useCallback(
-		(edgeId: string, kind: InsertStepKind) => {
-			if (isReadOnly) return;
-			const existingAddStep = nodes.find((n) => n.type === "add_step");
-			if (existingAddStep) {
-				handleDeleteNode(existingAddStep.id);
-			}
-
-			const edge = edges.find((e) => e.id === edgeId);
-			if (!edge) return;
-			const source = nodes.find((n) => n.id === edge.source);
-			const target = nodes.find((n) => n.id === edge.target);
-			if (!source || !target) return;
-
-			let newNode: WorkflowNode;
-			if (kind === "send_email") {
-				newNode = createSendEmailNode(nodes.filter(isSendEmailNode).length, 0);
-			} else if (kind === "delay") {
-				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
-			} else if (kind === "condition") {
-				newNode = createConditionNode(nodes.filter(isConditionNode).length, 0);
-			} else {
-				newNode = createAddStepNode(edge.sourceHandle ?? undefined);
-			}
-
-			const insertX = target.position.x;
-			const insertY = target.position.y;
-			newNode.position = { x: insertX, y: insertY };
-			newNode.selected = true;
-
-			const branch =
-				edge.sourceHandle === "yes" || edge.sourceHandle === "no"
-					? edge.sourceHandle
-					: undefined;
-			const stamp = Date.now();
-			const rest = edges.filter((e) => e.id !== edgeId);
-			const first: WorkflowEdge = {
-				id: `e_${edge.source}_${newNode.id}_${stamp}`,
-				source: edge.source,
-				target: newNode.id,
-				type: "flow",
-				data: {
-					tone: branch === "yes" ? "accent" : "default",
-					branch,
-				},
-			};
-			if (edge.sourceHandle) first.sourceHandle = edge.sourceHandle;
-			const second: WorkflowEdge = {
-				id: `e_${newNode.id}_${edge.target}_${stamp}`,
-				source: newNode.id,
-				target: edge.target,
-				type: "flow",
-				data: { tone: "default" },
-			};
-			if (edge.targetHandle) second.targetHandle = edge.targetHandle;
-			const nextEdges = [...rest, first, second];
-
-			setEdges(nextEdges);
-
-			setNodes((nds) => {
-				const unselected = nds.map((n) =>
-					n.selected ? { ...n, selected: false } : n,
-				);
-				return sanitizeNodePositions([...unselected, newNode], nextEdges);
-			});
-			setSelectedNodeId(newNode.id);
-
-			const reduceMotion =
-				typeof window !== "undefined" &&
-				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-			requestAnimationFrame(() => {
-				void fitView({
-					padding: 0.3,
-					duration: reduceMotion ? 0 : 220,
-				});
-			});
-		},
-		[edges, nodes, setNodes, setEdges, fitView, isReadOnly, handleDeleteNode],
-	);
-
-	useHotkeys("backspace", () => {
+	useHotkeys("backspace, delete", () => {
 		if (isReadOnly) return;
 		if (!selectedNodeId || selectedNodeId === TRIGGER_NODE_ID) return;
 		const active = document.activeElement;
 		if (
 			active instanceof HTMLInputElement ||
-			active instanceof HTMLTextAreaElement
+			active instanceof HTMLTextAreaElement ||
+			(active instanceof HTMLElement && active.isContentEditable)
 		) {
 			return;
 		}
 		handleDeleteNode(selectedNodeId);
 	}, [selectedNodeId, handleDeleteNode, isReadOnly]);
 
+	useHotkeys("escape", () => {
+		if (picker) setPicker(null);
+		else if (nodes.some((n) => n.type === "add_step")) dropPlaceholders();
+		else if (selectedNodeId) selectNode(null);
+	}, [picker, selectedNodeId, selectNode, nodes, dropPlaceholders]);
+
 	const handleSave = () => {
 		if (isReadOnly) return;
-		const addStepNode = nodes.find((n) => n.type === "add_step");
-		if (addStepNode) {
-			const inEdge = edges.find((e) => e.target === addStepNode.id);
-			const outEdge = edges.find((e) => e.source === addStepNode.id);
-			const cleanNodes = nodes.filter((n) => n.id !== addStepNode.id);
-			const remainingEdges = edges.filter(
-				(e) => e.source !== addStepNode.id && e.target !== addStepNode.id,
-			);
-			if (inEdge && outEdge && inEdge.source !== outEdge.target) {
-				remainingEdges.push({
-					id: `e_${inEdge.source}_${outEdge.target}_${Date.now()}`,
-					source: inEdge.source,
-					target: outEdge.target,
-					...(inEdge.sourceHandle ? { sourceHandle: inEdge.sourceHandle } : {}),
-					...(outEdge.targetHandle
-						? { targetHandle: outEdge.targetHandle }
-						: {}),
-					type: "flow",
-					data: {
-						tone: inEdge.data?.tone ?? "default",
-						branch: inEdge.data?.branch,
-					},
-				});
-			}
-			return onSave(cleanNodes, remainingEdges);
-		}
-		return onSave(nodes, edges);
+		const clean = stripPlaceholderNodes(nodes, edges);
+		return onSave(clean.nodes, clean.edges);
 	};
 
 	const clearSelection = useCallback(() => {
-		setSelectedNodeId(null);
-		setNodes((nds) =>
-			nds.map((n) => (n.selected ? { ...n, selected: false } : n)),
-		);
-	}, [setNodes]);
-
-	const handleNodeDragStop = useCallback(() => {
-		if (isReadOnly) return;
-		setNodes((nds) => sanitizeNodePositions(nds, edges));
-	}, [edges, setNodes, isReadOnly]);
-
-	const replaceStep = useCallback(
-		(nodeId: string, kind: "send_email" | "condition" | "delay") => {
-			if (isReadOnly) return;
-			const targetNode = nodes.find((n) => n.id === nodeId);
-			if (!targetNode) return;
-
-			let newNode: WorkflowNode;
-			if (kind === "send_email") {
-				newNode = createSendEmailNode(nodes.filter(isSendEmailNode).length, 0);
-			} else if (kind === "delay") {
-				newNode = createDelayNode(nodes.filter(isDelayNode).length, 0);
-			} else {
-				newNode = createConditionNode(nodes.filter(isConditionNode).length, 0);
-			}
-
-			newNode.position = { ...targetNode.position };
-			newNode.selected = true;
-
-			const nextEdges = edges.map((e) => {
-				let updated = e;
-				if (e.target === nodeId) {
-					updated = { ...updated, target: newNode.id };
-				}
-				if (e.source === nodeId) {
-					updated = {
-						...updated,
-						source: newNode.id,
-						sourceHandle: kind === "condition" ? "yes" : undefined,
-					};
-				}
-				return updated;
-			});
-
-			const nextNodes = nodes.map((n) => (n.id === nodeId ? newNode : n));
-			const sanitized = sanitizeNodePositions(nextNodes, nextEdges);
-
-			setNodes(sanitized);
-			setEdges(nextEdges);
-			setSelectedNodeId(newNode.id);
-
-			const reduceMotion =
-				typeof window !== "undefined" &&
-				window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-			requestAnimationFrame(() => {
-				void fitView({
-					padding: 0.35,
-					duration: reduceMotion ? 0 : 220,
-				});
-			});
-		},
-		[nodes, edges, setNodes, setEdges, fitView, isReadOnly],
-	);
+		setPicker(null);
+		dropPlaceholders();
+		selectNode(null);
+	}, [selectNode, dropPlaceholders]);
 
 	return (
 		<NodeEditorProvider
 			value={{
 				updateNode: updateNodeData,
 				deleteNode: handleDeleteNode,
-				insertStep,
-				appendStep,
-				addStepBelow,
-				replaceStep,
+				closeEditor: clearSelection,
+				editNode: (nodeId: string) => {
+					setPicker(null);
+					selectNode(nodeId);
+				},
+				openPicker,
+				closePicker,
+				activePickerKey: picker ? pickerTargetKey(picker.target) : null,
+				morph,
+				clearMorph,
+				pickStep: addStep,
+				removePlaceholder: dropPlaceholders,
 				readOnly: isReadOnly,
+				showIssues,
 			}}
 		>
 			<div className="flex h-full min-h-0 flex-col">
@@ -796,41 +622,44 @@ const WorkflowEditorInner = ({
 					onSave={handleSave}
 					softStopped={softStopped}
 					onSoftStopChange={handleSoftStopChange}
+					onInvalidStart={flagIssues}
 				/>
 				<div className="relative flex min-h-0 flex-1 overflow-hidden">
-					<div className="relative min-w-0 flex-1">
+					<div ref={canvasRef} className="relative min-w-0 flex-1">
 						<ReactFlow
 							nodes={nodes}
 							edges={edges}
-							onNodesChange={isReadOnly ? undefined : handleNodesChange}
-							onEdgesChange={isReadOnly ? undefined : onEdgesChange}
-							onNodeDragStop={handleNodeDragStop}
-							nodesDraggable={!isReadOnly}
+							onNodesChange={handleNodesChange}
+							onNodeClick={(_, node) => {
+								setPicker(null);
+								if (node.type !== "add_step") dropPlaceholders();
+							}}
+							nodesDraggable={false}
 							nodesConnectable={false}
-							nodesFocusable={!isReadOnly}
+							nodesFocusable
 							elementsSelectable={!isReadOnly}
 							connectOnClick={false}
 							nodeTypes={nodeTypes}
 							edgeTypes={edgeTypes}
 							defaultEdgeOptions={defaultEdgeOptions}
 							fitView
-							fitViewOptions={{ padding: 0.35, minZoom: 1, maxZoom: 1 }}
+							fitViewOptions={{
+								minZoom: 1,
+								maxZoom: 1,
+								padding: { x: "64px", y: "80px" },
+							}}
 							proOptions={{ hideAttribution: true }}
 							onPaneClick={clearSelection}
 							deleteKeyCode={null}
 							zoomOnScroll={false}
 							zoomOnPinch={false}
 							zoomOnDoubleClick={false}
+							zoomActivationKeyCode={null}
 							panOnScroll
 							panOnDrag
 							minZoom={1}
 							maxZoom={1}
-							defaultViewport={{ x: 0, y: 0, zoom: 1 }}
 							className="workflow-canvas bg-bg-weak-50 dark:bg-black"
-							connectionLineStyle={{
-								stroke: "#3b82f6",
-								strokeWidth: 2,
-							}}
 						>
 							<Background
 								variant={BackgroundVariant.Dots}
@@ -838,6 +667,22 @@ const WorkflowEditorInner = ({
 								size={1.2}
 								color="var(--color-stroke-soft-200)"
 							/>
+							<ViewportPortal>
+								{/* `custom`: when a step was picked the menu hands off to the new step instead of fading out. */}
+								<AnimatePresence custom={morph !== null}>
+									{picker ? (
+										<StepPicker
+											key={pickerTargetKey(picker.target)}
+											anchor={picker.anchor}
+											onPick={(kind, from) =>
+												addStep(picker.target, kind, from)
+											}
+											onClose={closePicker}
+											connector={picker.target.type !== "replace"}
+										/>
+									) : null}
+								</AnimatePresence>
+							</ViewportPortal>
 						</ReactFlow>
 						{isReadOnly ? (
 							<LiveAutomationBanner

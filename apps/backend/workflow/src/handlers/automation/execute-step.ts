@@ -293,6 +293,8 @@ async function buildConditionVars(params: {
 	const properties = context.properties ?? {};
 	for (const [key, value] of Object.entries(properties)) {
 		if (value == null) continue;
+		// `trigger.plan` is what the editor offers; `event.plan` is the legacy name.
+		vars[`trigger.${key}`] = String(value);
 		vars[`event.${key}`] = String(value);
 	}
 
@@ -310,7 +312,10 @@ async function buildConditionVars(params: {
 	for (const row of values) {
 		const name = row.property?.propertyName;
 		if (!name) continue;
+		// `contact.plan` is what the editor offers; `property.plan` is the legacy
+		// name. Built-in contact fields win over a same-named custom property.
 		vars[`property.${name}`] = row.value;
+		if (!(`contact.${name}` in vars)) vars[`contact.${name}`] = row.value;
 	}
 
 	return vars;

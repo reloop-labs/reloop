@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -960,7 +961,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 											{modKey}
 										</ActionKbd>
 										<ActionKbd className={actionKbdOnBlueClassName}>
-											↵
+											<EnterIcon />
 										</ActionKbd>
 									</div>
 								)}

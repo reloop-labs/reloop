@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -7,7 +8,6 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
-
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
@@ -379,7 +379,7 @@ export const DeleteWebhookModal = ({
 									<>
 										<span>Delete webhook</span>
 										<ActionKbd className={actionKbdOnBlueClassName}>
-											↵
+											<EnterIcon />
 										</ActionKbd>
 									</>
 								)}

@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
@@ -58,7 +59,9 @@ export const ModalFooter = ({
 								? `${selectedCount.toLocaleString()} contact${selectedCount === 1 ? "" : "s"}`
 								: "contacts"}
 						</span>
-						<ActionKbd className={actionKbdOnSolidClassName}>↵</ActionKbd>
+						<ActionKbd className={actionKbdOnSolidClassName}>
+							<EnterIcon />
+						</ActionKbd>
 					</>
 				)}
 			</FancyButton.Root>

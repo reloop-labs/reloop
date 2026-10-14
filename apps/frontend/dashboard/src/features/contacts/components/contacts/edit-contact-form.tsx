@@ -1,6 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -640,7 +641,7 @@ export function EditContactForm({
 											<>
 												<span>Update</span>
 												<ActionKbd className={actionKbdOnBlueClassName}>
-													↵
+													<EnterIcon />
 												</ActionKbd>
 											</>
 										)}
@@ -915,7 +916,7 @@ export function EditContactForm({
 									<>
 										<span>Update</span>
 										<ActionKbd className={actionKbdOnBlueClassName}>
-											↵
+											<EnterIcon />
 										</ActionKbd>
 									</>
 								)}

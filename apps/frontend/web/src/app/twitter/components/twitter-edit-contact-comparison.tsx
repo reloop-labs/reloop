@@ -4,6 +4,7 @@ import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -410,7 +411,9 @@ export function EditContactOld() {
 						>
 							<span className="flex items-center justify-center gap-1.5 font-medium">
 								<span>Update</span>
-								<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+								<ActionKbd className={actionKbdOnBlueClassName}>
+									<EnterIcon />
+								</ActionKbd>
 							</span>
 						</FancyButton.Root>
 					</div>
@@ -783,7 +786,9 @@ export function EditContactNew() {
 						>
 							<span className="flex items-center justify-center gap-1.5 font-medium">
 								<span>Update</span>
-								<ActionKbd className={actionKbdOnBlueClassName}>↵</ActionKbd>
+								<ActionKbd className={actionKbdOnBlueClassName}>
+									<EnterIcon />
+								</ActionKbd>
 							</span>
 						</FancyButton.Root>
 					</div>

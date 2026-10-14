@@ -549,7 +549,7 @@ export const TemplateFromField = () => {
 								animate={{ opacity: 1, y: 0, scale: 1 }}
 								exit={{ opacity: 0, y: -4, scale: 0.98 }}
 								transition={{ duration: 0.15, ease: "easeOut" }}
-								className="absolute top-full left-0 z-50 mt-2.5 w-full min-w-[320px] max-w-[420px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+								className="absolute top-full left-0 z-50 mt-2.5 w-full min-w-[320px] max-w-[420px] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-regular-md dark:border-stroke-soft-100"
 							>
 								{isLoadingDomains && suggestions.length === 0 ? (
 									<div className="flex items-center justify-center gap-2.5 py-6 text-paragraph-xs text-text-sub-600">
@@ -591,8 +591,8 @@ export const TemplateFromField = () => {
 													className={cn(
 														"flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left",
 														isSelected
-															? "bg-bg-weak-50 text-text-strong-950 dark:bg-bg-sub-300/40"
-															: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-bg-sub-300/20",
+															? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/[0.07]"
+															: "text-text-sub-600 hover:bg-bg-weak-50/70 dark:hover:bg-white/[0.04]",
 													)}
 												>
 													<div className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-label-xs">

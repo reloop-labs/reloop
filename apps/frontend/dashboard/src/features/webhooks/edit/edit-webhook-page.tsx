@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
@@ -156,7 +157,7 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 									<>
 										<span>Save changes</span>
 										<ActionKbd className={actionKbdOnBlueClassName}>
-											↵
+											<EnterIcon />
 										</ActionKbd>
 									</>
 								)}

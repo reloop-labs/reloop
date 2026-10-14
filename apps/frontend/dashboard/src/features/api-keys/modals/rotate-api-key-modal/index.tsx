@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
@@ -280,7 +281,7 @@ export function RotateApiKeyModal({
 											<>
 												Rotate API key
 												<ActionKbd className={actionKbdOnDarkFillClassName}>
-													↵
+													<EnterIcon />
 												</ActionKbd>
 											</>
 										)}
@@ -310,7 +311,7 @@ export function RotateApiKeyModal({
 											<>
 												Copy API key
 												<ActionKbd className={actionKbdOnDarkFillClassName}>
-													↵
+													<EnterIcon />
 												</ActionKbd>
 											</>
 										)}

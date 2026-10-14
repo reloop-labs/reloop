@@ -52,6 +52,7 @@
 		"./kbd-esc": "./src/components/kbd-esc.tsx",
 		"./kbd-key-outline": "./src/components/kbd-key-outline.tsx",
 		"./kbd-enter": "./src/components/kbd-enter.tsx",
+		"./enter-icon": "./src/components/enter-icon.tsx",
 		"./kbd-command": "./src/components/kbd-command.tsx",
 		"./kbd-key": "./src/components/kbd-key.tsx",
 		"./form": "./src/components/form.tsx",

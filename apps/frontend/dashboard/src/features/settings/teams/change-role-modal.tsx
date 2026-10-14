@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
@@ -330,7 +331,7 @@ export const ChangeRoleModal = ({
 													⌘
 												</ActionKbd>
 												<ActionKbd className={actionKbdOnNeutralClassName}>
-													↵
+													<EnterIcon />
 												</ActionKbd>
 											</span>
 										</>

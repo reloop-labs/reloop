@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { EnterIcon } from "@reloop/ui/enter-icon";
 import { Icon } from "@reloop/ui/icon";
 import { MCP_PAGE_PATH } from "@reloop/web/lib/landing/ai-tools/mcp";
 import Link from "next/link";
@@ -214,8 +215,8 @@ function AiMock() {
 						>
 							<span className="truncate">{idea}</span>
 							{index === 0 && (
-								<kbd className="rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0.5 font-sans text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60">
-									↵ Enter
+								<kbd className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0.5 font-sans text-[11px] text-text-sub-600 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60">
+									<EnterIcon /> Enter
 								</kbd>
 							)}
 						</li>
