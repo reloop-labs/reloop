@@ -181,7 +181,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						className={cn(
 							"flex size-4 items-center justify-center rounded border",
 							isBulkSelected
-								? "border-zero-blue bg-zero-blue text-white"
+								? "border-primary-base bg-primary-base text-primary-foreground"
 								: "border-stroke-soft-200 bg-transparent hover:border-stroke-sub-300 dark:border-stroke-soft-100/60",
 						)}
 					>

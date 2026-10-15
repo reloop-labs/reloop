@@ -78,7 +78,7 @@ export function CreateOrgStep() {
 
 				<FancyButton.Root
 					type="submit"
-					variant="blue"
+					variant="neutral"
 					size="medium"
 					className="mt-6 h-10 w-full overflow-hidden rounded-xl font-medium text-sm"
 					disabled={!canSubmit}

@@ -819,7 +819,7 @@ function getEmailColumns(
 				<div className="flex min-w-0 items-center gap-1.5 pr-4">
 					<Link
 						href={`/emails/${row.original.id}`}
-						className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+						className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 					>
 						{row.original.subject || "(No Subject)"}
 					</Link>
@@ -873,7 +873,7 @@ function getEmailColumns(
 							name={via.icon}
 							className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
 						/>
-						<span className="truncate font-medium text-[13px] text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400">
+						<span className="truncate font-medium text-[13px] text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600">
 							{via.label}
 						</span>
 					</button>

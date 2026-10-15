@@ -268,7 +268,7 @@ export function PostGenerate({
 								className="min-w-0 flex-1 sm:ml-auto sm:flex-none"
 							>
 								<FancyButton.Root
-									variant="blue"
+									variant="neutral"
 									size="medium"
 									className={cn(
 										"h-10 w-full justify-center overflow-visible whitespace-nowrap rounded-xl font-medium text-sm sm:w-auto sm:min-w-[190px]",
@@ -304,7 +304,7 @@ export function PostGenerate({
 								className="w-full sm:ml-auto sm:w-auto"
 							>
 								<FancyButton.Root
-									variant="blue"
+									variant="neutral"
 									size="medium"
 									className={cn(
 										"h-10 w-full justify-center overflow-visible whitespace-nowrap rounded-xl font-medium text-sm transition-all duration-200 sm:w-auto sm:min-w-[170px]",

@@ -564,7 +564,7 @@ export const TriggerWebhookTester = ({
 						</Button.Root>
 						<FancyButton.Root
 							type="button"
-							variant="blue"
+							variant="neutral"
 							size="xsmall"
 							disabled={!canSend}
 							onClick={() => void handleTrigger()}

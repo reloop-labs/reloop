@@ -67,7 +67,7 @@ export function StepOneSkeleton() {
 
 						<FancyButton.Root
 							type="button"
-							variant="blue"
+							variant="neutral"
 							size="medium"
 							className="mt-6 h-10 w-full rounded-xl font-medium text-sm"
 							disabled

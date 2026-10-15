@@ -170,7 +170,7 @@ export function InvitePage() {
 					</div>
 					<div className="space-y-3">
 						<FancyButton.Root
-							variant="blue"
+							variant="neutral"
 							size="small"
 							className="w-full justify-center overflow-hidden transition-all duration-200"
 							onClick={() => router.push(session ? "/onboarding" : "/login")}
@@ -232,7 +232,7 @@ export function InvitePage() {
 						</div>
 						<div className="space-y-4">
 							<FancyButton.Root
-								variant="blue"
+								variant="neutral"
 								size="small"
 								className={cn(
 									"w-full justify-center overflow-hidden transition-all duration-200",

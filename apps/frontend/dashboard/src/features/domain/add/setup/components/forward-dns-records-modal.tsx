@@ -285,7 +285,7 @@ export const ForwardDNSRecordsModal = ({
 											</Button.Root>
 											<FancyButton.Root
 												type="button"
-												variant="blue"
+												variant="neutral"
 												size="small"
 												disabled={isSending}
 												onPointerDown={startHold}

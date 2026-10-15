@@ -549,7 +549,7 @@ export const AgentInboxContent = ({
 							className={cn(
 								"flex size-4 items-center justify-center rounded border transition-colors disabled:opacity-40",
 								allVisibleSelected || mail.bulkSelected.length > 0
-									? "border-zero-blue bg-zero-blue text-white"
+									? "border-primary-base bg-primary-base text-primary-foreground"
 									: "border-stroke-soft-200 bg-transparent hover:border-stroke-sub-300",
 							)}
 						>
@@ -572,7 +572,7 @@ export const AgentInboxContent = ({
 					{mail.bulkSelected.length === 0 ? (
 						<div className="flex items-center gap-1 text-text-sub-600">
 							{activeFilterCount > 0 && (
-								<span className="mr-1 rounded-full bg-zero-blue/15 px-1.5 py-0.5 font-medium text-[11px] text-zero-blue tabular-nums">
+								<span className="mr-1 rounded-full bg-primary-base/15 px-1.5 py-0.5 font-medium text-[11px] text-primary-base tabular-nums">
 									{activeFilterCount}
 								</span>
 							)}

@@ -274,7 +274,7 @@ export function WebhookHeader({
 								<ActionKbd className="w-auto min-w-4 px-1">E</ActionKbd>
 							</Button.Root>
 							<FancyButton.Root
-								variant="blue"
+								variant="neutral"
 								size="xsmall"
 								onClick={() => onTriggerTest?.()}
 								className="gap-1.5"

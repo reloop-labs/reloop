@@ -107,7 +107,7 @@ function AutoPopulateBanner({
 
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={onAutoPopulate}
 					className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4 transition-all duration-200"

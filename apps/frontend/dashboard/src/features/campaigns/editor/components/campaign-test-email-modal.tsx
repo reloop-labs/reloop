@@ -500,7 +500,7 @@ export function CampaignTestEmailModal({
 
 							<FancyButton.Root
 								type="submit"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								disabled={status !== "idle" || !hasFrom}
 								title={hasFrom ? undefined : "Add a From address first"}

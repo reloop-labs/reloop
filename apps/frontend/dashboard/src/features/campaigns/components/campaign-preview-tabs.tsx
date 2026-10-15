@@ -272,7 +272,7 @@ export function CampaignPreviewTabs({
 												{effectiveAudienceInfo.href ? (
 													<Link
 														href={effectiveAudienceInfo.href}
-														className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+														className="underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 													>
 														{effectiveAudienceInfo.name}
 													</Link>

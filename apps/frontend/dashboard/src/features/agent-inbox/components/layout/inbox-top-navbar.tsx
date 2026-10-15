@@ -73,7 +73,7 @@ export function InboxTopNavbar({
 					"ring-1 ring-stroke-soft-100",
 					"transition-colors hover:bg-bg-soft-200/70 hover:ring-stroke-soft-200",
 					"dark:bg-white/[0.06] dark:ring-white/10 dark:hover:bg-white/[0.1]",
-					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zero-blue/35",
+					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base/35",
 				)}
 			>
 				<Search

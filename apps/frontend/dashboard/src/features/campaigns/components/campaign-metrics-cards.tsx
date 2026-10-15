@@ -44,7 +44,7 @@ function BreakdownRow({
 						"truncate text-paragraph-sm",
 						muted ? "text-text-sub-600" : "text-text-strong-950",
 						onClick &&
-							"underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400",
+							"underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600",
 					)}
 				>
 					{name}

@@ -312,7 +312,7 @@ export const EditTemplateVariableModal = ({
 												className={cn(
 													"group relative flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.98]",
 													isSelected
-														? "border-primary-base bg-bg-white-0 shadow-[0_0_0_1px_#0055FF] dark:border-primary-base dark:bg-white/[0.04] dark:shadow-[0_0_0_1px_#0055FF]"
+														? "border-primary-base bg-bg-white-0 shadow-[0_0_0_1px_var(--primary-base)] dark:border-primary-base dark:bg-white/[0.04] dark:shadow-[0_0_0_1px_var(--primary-base)]"
 														: "border-stroke-soft-200 bg-bg-white-0 hover:border-stroke-sub-300 hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10 dark:hover:bg-white/[0.02]",
 												)}
 											>
@@ -322,7 +322,7 @@ export const EditTemplateVariableModal = ({
 													</p>
 													{isSelected ? (
 														<div className="flex size-4.5 items-center justify-center rounded-full bg-primary-base">
-															<div className="size-1.5 rounded-full bg-white" />
+															<div className="size-1.5 rounded-full bg-primary-foreground" />
 														</div>
 													) : (
 														<div className="size-4.5 rounded-full border-2 border-stroke-soft-200 transition-colors group-hover:border-stroke-sub-300 dark:border-stroke-soft-100/60" />
@@ -400,7 +400,7 @@ export const EditTemplateVariableModal = ({
 
 						<FancyButton.Root
 							type="submit"
-							variant={status === "success" ? "success" : "blue"}
+							variant={status === "success" ? "success" : "neutral"}
 							size="small"
 							disabled={status !== "idle"}
 							className={cn(

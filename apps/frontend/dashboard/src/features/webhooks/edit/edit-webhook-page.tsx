@@ -121,7 +121,7 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 					</Button.Root>
 					<FancyButton.Root
 						type="submit"
-						variant="blue"
+						variant="neutral"
 						size="small"
 						disabled={isLoading}
 						className="min-w-[140px] gap-1.5 overflow-hidden rounded-xl"

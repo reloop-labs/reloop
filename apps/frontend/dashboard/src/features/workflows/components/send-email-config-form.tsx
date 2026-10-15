@@ -212,7 +212,7 @@ export const TemplatePicker = ({
 						onChange={(e) => setSearch(e.target.value)}
 						onKeyDown={(e) => e.stopPropagation()}
 						aria-label="Search templates"
-						className="w-full rounded-xl border border-stroke-soft-100 bg-bg-white-0 py-2 pr-3 pl-9 text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus:border-blue-500"
+						className="w-full rounded-xl border border-stroke-soft-100 bg-bg-white-0 py-2 pr-3 pl-9 text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400 focus:border-stroke-strong-950"
 					/>
 				</div>
 			) : null}
@@ -245,12 +245,12 @@ export const TemplatePicker = ({
 								className={cn(
 									"relative block w-full overflow-hidden rounded-lg transition-all",
 									isSelected &&
-										"ring-2 ring-blue-500 ring-offset-1 ring-offset-bg-weak-50/50 dark:ring-offset-black/50",
+										"ring-2 ring-stroke-strong-950 ring-offset-1 ring-offset-bg-weak-50/50 dark:ring-offset-black/50",
 								)}
 							>
 								<TemplateThumb template={template} />
 								{isSelected ? (
-									<span className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-white shadow-xs">
+									<span className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-bg-strong-950 text-text-white-0 shadow-xs">
 										<Icon name="check" className="h-3 w-3" />
 									</span>
 								) : null}
@@ -267,7 +267,7 @@ export const TemplatePicker = ({
 					disabled={creating}
 					className="group flex min-w-0 flex-col gap-1.5 rounded-xl p-1.5 text-left transition-colors hover:bg-bg-weak-50 disabled:cursor-wait disabled:opacity-60 dark:hover:bg-white/[0.06]"
 				>
-					<span className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 border-dashed bg-bg-white-0 text-text-sub-600 transition-colors group-hover:border-blue-500 group-hover:text-text-strong-950 dark:border-stroke-soft-100/60 dark:bg-[#141419] dark:group-hover:border-blue-400 dark:group-hover:text-white">
+					<span className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 border-dashed bg-bg-white-0 text-text-sub-600 transition-colors group-hover:border-stroke-strong-950 group-hover:text-text-strong-950 dark:border-stroke-soft-100/60 dark:bg-[#141419] dark:group-hover:text-white">
 						<Icon name="plus" className="h-5 w-5" />
 						<span className="font-medium text-xs">
 							{creating ? "Creating…" : "New template"}

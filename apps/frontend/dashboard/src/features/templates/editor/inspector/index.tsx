@@ -488,7 +488,10 @@ function TemplateVariableInspectorCard({
 													}}
 													className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary-base"
 												>
-													<Icon name="check" className="h-2 w-2 text-white" />
+													<Icon
+														name="check"
+														className="h-2 w-2 text-primary-foreground"
+													/>
 												</motion.div>
 											)}
 										</AnimatePresence>

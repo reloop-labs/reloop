@@ -249,7 +249,7 @@ export function DevicePage() {
 					) : null}
 					<FancyButton.Root
 						type="submit"
-						variant="blue"
+						variant="neutral"
 						size="medium"
 						disabled={checking}
 						className="h-12 w-full justify-center gap-2 rounded-2xl font-medium text-sm"

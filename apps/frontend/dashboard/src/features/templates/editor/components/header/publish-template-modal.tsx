@@ -213,10 +213,10 @@ export function SlideToPublish({
 				whileHover={!disabled && !isPublishing ? { scale: 1.04 } : undefined}
 				whileTap={!disabled && !isPublishing ? { scale: 0.96 } : undefined}
 				className={cn(
-					"relative z-10 flex h-9 w-14 cursor-grab items-center justify-center rounded-full text-white active:cursor-grabbing",
+					"relative z-10 flex h-9 w-14 cursor-grab items-center justify-center rounded-full active:cursor-grabbing",
 					isSuccess
-						? "bg-emerald-600"
-						: "bg-zero-blue shadow-[0_1px_2px_0_rgba(14,18,27,0.24),0_0_0_1px_#006ffe] before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/[.12] before:to-transparent before:p-px after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-to-b after:from-white after:to-transparent after:opacity-[.16] hover:after:opacity-[.24] before:[mask-clip:content-box,border-box] before:[mask-composite:exclude] before:[mask-image:linear-gradient(#fff_0_0),linear-gradient(#fff_0_0)]",
+						? "bg-emerald-600 text-white"
+						: "bg-bg-strong-950 text-text-white-0 shadow-fancy-buttons-neutral before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/[.12] before:to-transparent before:p-px after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-gradient-to-b after:from-white after:to-transparent after:opacity-[.16] hover:after:opacity-[.24] before:[mask-clip:content-box,border-box] before:[mask-composite:exclude] before:[mask-image:linear-gradient(#fff_0_0),linear-gradient(#fff_0_0)]",
 				)}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>

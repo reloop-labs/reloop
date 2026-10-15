@@ -67,7 +67,7 @@ function Calendar({
 					// hover
 					"hover:bg-bg-weak-50 hover:text-text-strong-950",
 					// selected
-					"aria-[selected]:bg-primary-base aria-[selected]:text-static-white",
+					"aria-[selected]:bg-primary-base aria-[selected]:text-primary-foreground",
 					// focus visible
 					"focus:outline-none focus-visible:bg-bg-weak-50 focus-visible:text-text-strong-950",
 				),

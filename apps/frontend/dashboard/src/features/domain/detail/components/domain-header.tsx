@@ -74,7 +74,7 @@ export function DomainHeader({
 										<ForwardDNSRecordsButton domainId={domainRecordId} />
 									)}
 									<FancyButton.Root
-										variant="blue"
+										variant="neutral"
 										size="xsmall"
 										onClick={() => void handleVerifyDNS()}
 										disabled={isVerifying || status === "verifying"}

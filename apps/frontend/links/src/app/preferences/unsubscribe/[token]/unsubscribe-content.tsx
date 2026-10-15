@@ -67,7 +67,7 @@ export function UnsubscribeContent({
 				<FancyButton.Root
 					type="button"
 					onClick={() => void unsubscribe()}
-					variant="blue"
+					variant="neutral"
 					size="medium"
 					className="w-full justify-center py-3 font-semibold"
 				>

@@ -193,7 +193,7 @@ export function CreateInboxInlineCard({
 						<div>
 							<FancyButton.Root
 								asChild
-								variant="blue"
+								variant="neutral"
 								size="small"
 								className="gap-1.5 rounded-xl"
 							>
@@ -313,7 +313,7 @@ export function CreateInboxInlineCard({
 						<div className="flex items-center justify-end px-6 pt-3 pb-3.5">
 							<FancyButton.Root
 								type="button"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								onClick={() => {
 									if (!isSubmitting && canCreate) {

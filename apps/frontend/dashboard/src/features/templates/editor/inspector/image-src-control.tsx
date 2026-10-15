@@ -91,7 +91,7 @@ export function ImageSrcControl({
 						className="absolute top-2 right-2 flex h-7 items-center gap-1.5 rounded-lg bg-black/75 px-2 font-medium text-[11px] text-white shadow-md backdrop-blur-sm transition-all hover:bg-black active:scale-95 disabled:opacity-50"
 					>
 						{isUploading ? (
-							<Loader2 className="h-3.5 w-3.5 animate-spin text-blue-400" />
+							<Loader2 className="h-3.5 w-3.5 animate-spin text-text-sub-600" />
 						) : (
 							<RefreshCw className="h-3.5 w-3.5" />
 						)}
@@ -110,7 +110,7 @@ export function ImageSrcControl({
 						type="button"
 						disabled={isUploading}
 						onClick={() => fileInputRef.current?.click()}
-						className="flex items-center gap-1 font-medium text-[11px] text-blue-500 transition-colors hover:text-blue-600 disabled:opacity-50"
+						className="flex items-center gap-1 font-medium text-[11px] text-text-strong-950 transition-colors hover:text-text-sub-600 disabled:opacity-50"
 					>
 						{isUploading ? (
 							<Loader2 className="h-3 w-3 animate-spin" />

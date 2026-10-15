@@ -517,7 +517,7 @@ export function CampaignRecipientIssuesCard({
 													<Icon name="link" className="h-3.5 w-3.5" />
 												</div>
 												<div className="min-w-0">
-													<span className="block truncate font-medium text-paragraph-sm text-text-strong-950 underline decoration-dotted underline-offset-2 group-hover:text-[#1868DF] dark:group-hover:text-blue-400">
+													<span className="block truncate font-medium text-paragraph-sm text-text-strong-950 underline decoration-dotted underline-offset-2 group-hover:text-text-sub-600">
 														{link.url}
 													</span>
 												</div>

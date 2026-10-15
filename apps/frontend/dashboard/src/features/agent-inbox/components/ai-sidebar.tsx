@@ -205,7 +205,7 @@ export const AiSidebar = ({
 						<button
 							type="submit"
 							disabled={!draft.trim()}
-							className="grid size-6 place-items-center rounded-lg bg-blue-600 text-white transition-opacity hover:bg-blue-700 disabled:opacity-30"
+							className="grid size-6 place-items-center rounded-lg bg-bg-strong-950 text-text-white-0 transition-opacity hover:bg-bg-strong-950/90 disabled:opacity-30"
 							aria-label="Send"
 						>
 							<Send className="size-3" />
@@ -238,7 +238,7 @@ export const AiSidebarToggle = ({
 		onClick={onClick}
 		className={cn(
 			"inline-flex h-7 items-center justify-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-2 text-xs transition-colors hover:bg-bg-soft-200 dark:border-stroke-soft-100/40 dark:bg-white/[0.06]",
-			active && "ring-1 ring-blue-500",
+			active && "ring-1 ring-stroke-strong-950",
 		)}
 	>
 		<Icon name="agent" className="size-3.5 text-text-strong-950" />

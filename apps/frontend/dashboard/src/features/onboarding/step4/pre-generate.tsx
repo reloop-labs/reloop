@@ -45,7 +45,7 @@ export function PreGenerate({
 			</p>
 			<div className="flex items-center gap-3">
 				<FancyButton.Root
-					variant="blue"
+					variant="neutral"
 					size="small"
 					className={cn(
 						"min-w-[140px] justify-center overflow-hidden rounded-xl transition-all duration-200",

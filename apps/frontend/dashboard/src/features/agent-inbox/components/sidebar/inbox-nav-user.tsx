@@ -126,7 +126,7 @@ export const InboxNavUser = ({
 						"grid shrink-0 place-items-center rounded-full font-medium text-white",
 						compact ? "size-5 text-[10px]" : "size-5 text-[11px]",
 						getAvatarGradient(mailbox.email || displayName),
-						compact && switcherOpen && "ring-zero-blue/40",
+						compact && switcherOpen && "ring-primary-base/40",
 					)}
 				>
 					{initial}
@@ -227,7 +227,7 @@ export const InboxNavUser = ({
 												!currentRect &&
 													hoverIdx === idx &&
 													"bg-neutral-alpha-10",
-												"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zero-blue/30",
+												"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base/30",
 											)}
 										>
 											<span className="relative shrink-0">
@@ -282,10 +282,10 @@ export const InboxNavUser = ({
 												!currentRect &&
 													hoverIdx === addIdx &&
 													"bg-neutral-alpha-10",
-												"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zero-blue/30",
+												"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base/30",
 											)}
 										>
-											<span className="grid size-9 shrink-0 place-items-center rounded-full bg-zero-blue/15 text-zero-blue">
+											<span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary-base/15 text-primary-base">
 												<Plus className="size-4" strokeWidth={2.25} />
 											</span>
 											<span className="font-medium text-[13px] text-mail-foreground">

@@ -349,7 +349,7 @@ function EmailSentVia({
 		<button
 			type="button"
 			onClick={() => router.push(href)}
-			className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+			className="underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 		>
 			{via.label}
 		</button>
@@ -651,7 +651,7 @@ export const EmailDetail = ({
 										{idx > 0 && ", "}
 										<Link
 											href={`/contacts/detail/${encodeURIComponent(toEmail)}`}
-											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 										>
 											{toEmail}
 										</Link>
@@ -671,7 +671,7 @@ export const EmailDetail = ({
 										{idx > 0 && ", "}
 										<Link
 											href={`/contacts/detail/${encodeURIComponent(ccEmail)}`}
-											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+											className="underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 										>
 											{ccEmail}
 										</Link>

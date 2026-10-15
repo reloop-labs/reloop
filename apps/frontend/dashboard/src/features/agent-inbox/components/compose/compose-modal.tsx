@@ -1387,7 +1387,7 @@ export const ComposeModal = ({
 							</Button.Root>
 							<FancyButton.Root
 								type="submit"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								disabled={isSending || attachments.some((a) => a.isUploading)}
 								className="gap-1.5"

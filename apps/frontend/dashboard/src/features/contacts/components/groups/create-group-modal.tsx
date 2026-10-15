@@ -171,7 +171,7 @@ export const CreateGroupModal = ({
 
 								<FancyButton.Root
 									type="submit"
-									variant={status === "success" ? "success" : "blue"}
+									variant={status === "success" ? "success" : "neutral"}
 									size="small"
 									disabled={
 										status === "creating" || (status === "idle" && !name.trim())

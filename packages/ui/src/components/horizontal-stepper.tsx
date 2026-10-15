@@ -68,7 +68,7 @@ const horizontalStepperItemVariants = tv({
 			},
 			active: {
 				root: "text-text-strong-950",
-				indicator: "bg-primary-base text-static-white",
+				indicator: "bg-primary-base text-primary-foreground",
 			},
 			default: {
 				root: "text-text-sub-600",

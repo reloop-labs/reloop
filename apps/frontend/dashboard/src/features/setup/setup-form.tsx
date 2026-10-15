@@ -463,7 +463,7 @@ export function SetupForm({
 				) : null}
 				<FancyButton.Root
 					type="submit"
-					variant={isSuccess ? "success" : "blue"}
+					variant={isSuccess ? "success" : "neutral"}
 					size="medium"
 					disabled={!canContinue}
 					className={`h-11 min-w-0 flex-1 justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm transition-colors duration-200 ${

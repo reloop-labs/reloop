@@ -1,5 +1,31 @@
 @import "@reloop/tailwind/style.css";
 
+/* Brand accent is neutral: primary renders black in light mode, white in dark. */
+:root {
+	--primary-base: var(--neutral-950);
+	--primary-dark: var(--neutral-800);
+	--primary-darker: var(--neutral-800);
+	--primary-link: var(--neutral-950);
+	--primary-alpha-24: rgb(23 23 23 / 0.24);
+	--primary-alpha-16: rgb(23 23 23 / 0.16);
+	--primary-alpha-10: rgb(23 23 23 / 0.1);
+	--zero-blue: var(--neutral-950);
+	--zero-blue-hover: var(--neutral-800);
+}
+
+.dark {
+	--primary-base: var(--neutral-0);
+	--primary-dark: var(--neutral-200);
+	--primary-darker: var(--neutral-200);
+	--primary-link: var(--neutral-0);
+	--primary-alpha-24: rgb(255 255 255 / 0.24);
+	--primary-alpha-16: rgb(255 255 255 / 0.16);
+	--primary-alpha-10: rgb(255 255 255 / 0.1);
+	--primary-foreground: var(--neutral-950);
+	--zero-blue: var(--neutral-0);
+	--zero-blue-hover: var(--neutral-200);
+}
+
 :root {
 	--font-sans: var(--font-open-runde) !important;
 

@@ -282,7 +282,7 @@ export function CreateChannelPreview({
 				<FancyButton.Root
 					type="button"
 					onClick={handleUpdate}
-					variant={saved ? "success" : "blue"}
+					variant={saved ? "success" : "neutral"}
 					size="medium"
 					className="w-full justify-center"
 				>

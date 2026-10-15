@@ -48,7 +48,7 @@ const DomainSparkline = ({ domainId }: { domainId: string }) => {
 
 	return (
 		<svg
-			className="h-5 w-24 text-blue-500 dark:text-blue-400"
+			className="h-5 w-24 text-text-strong-950"
 			viewBox="0 0 100 24"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
@@ -56,8 +56,8 @@ const DomainSparkline = ({ domainId }: { domainId: string }) => {
 		>
 			<defs>
 				<linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-					<stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
-					<stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+					<stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
+					<stop offset="100%" stopColor="currentColor" stopOpacity="0" />
 				</linearGradient>
 			</defs>
 			<path

@@ -177,7 +177,7 @@ export function SignupPage() {
 					<FancyButton.Root
 						type={isOtpStep ? "button" : "submit"}
 						form={isOtpStep ? undefined : SIGNUP_EMAIL_FORM_ID}
-						variant={ctaSuccess ? "success" : "blue"}
+						variant={ctaSuccess ? "success" : "neutral"}
 						size="medium"
 						disabled={ctaDisabled}
 						className={`h-11 w-full justify-center gap-2 overflow-hidden rounded-xl font-medium text-sm transition-colors duration-200 ${

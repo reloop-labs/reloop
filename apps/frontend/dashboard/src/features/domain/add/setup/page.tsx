@@ -194,7 +194,7 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 					) : null}
 					<FancyButton.Root
 						type="button"
-						variant="blue"
+						variant="neutral"
 						size="small"
 						onClick={() => void handleVerifyAndNavigate()}
 						disabled={isVerifying || showLoading}

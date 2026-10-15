@@ -499,7 +499,7 @@ export function TestEmailModal({
 
 							<FancyButton.Root
 								type="submit"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								disabled={status !== "idle"}
 								className={cn(

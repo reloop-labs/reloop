@@ -93,6 +93,8 @@ const Switch = React.forwardRef<
 							!disabled && [
 								// before
 								"before:-translate-x-1/2 before:absolute before:inset-y-0 before:left-1/2 before:w-3 before:rounded-full before:bg-static-white",
+								!checkedColor &&
+									"data-[state=checked]:before:bg-primary-foreground",
 								"before:[mask:--mask]",
 								// after
 								"after:-translate-x-1/2 after:absolute after:inset-y-0 after:left-1/2 after:w-3 after:rounded-full after:shadow-switch-thumb",

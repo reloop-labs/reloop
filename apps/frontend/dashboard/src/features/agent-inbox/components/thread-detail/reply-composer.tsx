@@ -946,7 +946,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							</button>
 							<FancyButton.Root
 								type="button"
-								variant="blue"
+								variant="neutral"
 								size="xsmall"
 								disabled={!canSend}
 								onClick={() => void send()}

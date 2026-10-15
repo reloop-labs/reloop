@@ -59,7 +59,7 @@ export function CampaignsListHeader() {
 				</Button.Root>
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={openCreate}
 					className="gap-1.5 rounded-xl"

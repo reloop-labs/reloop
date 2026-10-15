@@ -95,7 +95,7 @@ export function IntegrationLanguagePills({
 					<FancyButton.Root
 						key={pill.id}
 						type="button"
-						variant="blue"
+						variant="neutral"
 						size="xsmall"
 						onClick={() => onChange(pill.id)}
 						aria-keyshortcuts={pill.shortcut.toLowerCase()}

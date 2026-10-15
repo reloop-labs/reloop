@@ -213,7 +213,7 @@ export function PreferencesContent({
 							? "success"
 							: saveState === "error"
 								? "destructive"
-								: "blue"
+								: "neutral"
 					}
 					size="medium"
 					className="w-full justify-center py-3 font-semibold"

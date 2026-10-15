@@ -147,11 +147,11 @@ function findFirstUnreadMessageId(
 function UnreadMessagesBanner() {
 	return (
 		<div className="flex items-center gap-3 py-2">
-			<div className="h-px flex-1 bg-blue-400/50" />
-			<span className="shrink-0 rounded-full bg-blue-500/15 px-2.5 py-0.5 font-semibold text-[10px] text-blue-700 uppercase tracking-wide dark:text-blue-300">
+			<div className="h-px flex-1 bg-stroke-soft-200" />
+			<span className="shrink-0 rounded-full bg-bg-weak-50 px-2.5 py-0.5 font-semibold text-[10px] text-text-sub-600 uppercase tracking-wide">
 				New from Reloop
 			</span>
-			<div className="h-px flex-1 bg-blue-400/50" />
+			<div className="h-px flex-1 bg-stroke-soft-200" />
 		</div>
 	);
 }
@@ -188,7 +188,7 @@ function SupportPersonAvatar({
 				<Avatar.Image asChild>
 					<div
 						className={cn(
-							"flex h-full w-full items-center justify-center rounded-full bg-blue-600 text-white",
+							"flex h-full w-full items-center justify-center rounded-full bg-bg-strong-950 text-text-white-0",
 							size === "24" ? "text-[10px]" : "text-[11px]",
 						)}
 					>
@@ -216,7 +216,7 @@ function FounderAvatar() {
 	const [failed, setFailed] = useState(false);
 	if (failed) {
 		return (
-			<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-blue-600 font-semibold text-[11px] text-white">
+			<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-strong-950 font-semibold text-[11px] text-text-white-0">
 				P
 			</div>
 		);
@@ -226,7 +226,7 @@ function FounderAvatar() {
 			src="/team/pranav-patel.png"
 			alt="Pranav Patel, Reloop founder"
 			onError={() => setFailed(true)}
-			className="size-8 shrink-0 rounded-full bg-blue-600 object-cover"
+			className="size-8 shrink-0 rounded-full bg-bg-strong-950 object-cover"
 		/>
 	);
 }
@@ -690,8 +690,8 @@ export function SupportChatPanel() {
 					{!hasMessages ? (
 						<div className="flex h-full min-h-[280px] flex-col px-4 py-6">
 							<div className="flex flex-1 flex-col items-center justify-center text-center">
-								<div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/15 to-violet-500/10 ring-1 ring-blue-500/10">
-									<LifeBuoy className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+								<div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-bg-weak-50 ring-1 ring-stroke-soft-200">
+									<LifeBuoy className="h-6 w-6 text-text-strong-950" />
 								</div>
 								<p className="font-semibold text-[17px] text-text-strong-950 dark:text-white">
 									{greetingForHour()}, {firstName}
@@ -715,9 +715,9 @@ export function SupportChatPanel() {
 													key={topic.id}
 													type="button"
 													onClick={() => applyTopic(topic.message)}
-													className="group flex items-center gap-2.5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/80 px-3 py-2.5 text-left transition-all hover:border-blue-500/30 hover:bg-white dark:border-white/8 dark:bg-white/[0.03] dark:hover:border-blue-500/25 dark:hover:bg-white/[0.05]"
+													className="group flex items-center gap-2.5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/80 px-3 py-2.5 text-left transition-all hover:border-stroke-sub-300 hover:bg-white dark:border-white/8 dark:bg-white/[0.03] dark:hover:bg-white/[0.05]"
 												>
-													<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-text-sub-600 ring-1 ring-stroke-soft-100 transition-colors group-hover:text-blue-600 dark:bg-white/5 dark:ring-white/10 dark:group-hover:text-blue-400">
+													<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-text-sub-600 ring-1 ring-stroke-soft-100 transition-colors group-hover:text-text-strong-950 dark:bg-white/5 dark:ring-white/10">
 														<Icon className="h-3.5 w-3.5" />
 													</span>
 													<span className="min-w-0 font-medium text-[12px] text-text-strong-950 dark:text-white">

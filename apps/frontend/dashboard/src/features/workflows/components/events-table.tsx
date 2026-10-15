@@ -137,7 +137,7 @@ export function EventsTable({
 										<button
 											type="button"
 											onClick={() => handleEdit(event.id)}
-											className="truncate text-left font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+											className="truncate text-left font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 										>
 											{event.name}
 										</button>

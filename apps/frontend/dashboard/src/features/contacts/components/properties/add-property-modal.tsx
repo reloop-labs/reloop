@@ -380,7 +380,7 @@ export const AddPropertyModal = ({
 
 						<FancyButton.Root
 							type="submit"
-							variant={status === "success" ? "success" : "blue"}
+							variant={status === "success" ? "success" : "neutral"}
 							size="small"
 							disabled={status !== "idle"}
 							className={cn(

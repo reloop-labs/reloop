@@ -688,7 +688,7 @@ function CreateCampaignPageContent() {
 									<div className="flex items-center justify-end px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
 										<FancyButton.Root
 											type="submit"
-											variant="blue"
+											variant="neutral"
 											size="small"
 											className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm"
 										>
@@ -838,7 +838,7 @@ function CreateCampaignPageContent() {
 														<div className="relative flex h-10 w-10 shrink-0 items-center justify-center text-text-strong-950">
 															<Icon
 																name="notification-indicator"
-																className="h-6 w-6 text-blue-600 dark:text-blue-400"
+																className="h-6 w-6 text-text-strong-950"
 															/>
 														</div>
 														<div>
@@ -1036,7 +1036,7 @@ function CreateCampaignPageContent() {
 																				<div
 																					className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
 																						isGrpSelected
-																							? "border-primary-base bg-primary-base text-white"
+																							? "border-primary-base bg-primary-base text-primary-foreground"
 																							: "border-stroke-soft-300"
 																					}`}
 																				>
@@ -1111,7 +1111,7 @@ function CreateCampaignPageContent() {
 																				<div
 																					className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
 																						isChnSelected
-																							? "border-primary-base bg-primary-base text-white"
+																							? "border-primary-base bg-primary-base text-primary-foreground"
 																							: "border-stroke-soft-300"
 																					}`}
 																				>
@@ -1328,7 +1328,7 @@ function CreateCampaignPageContent() {
 												</Button.Root>
 												<FancyButton.Root
 													type="button"
-													variant="blue"
+													variant="neutral"
 													size="small"
 													onClick={handleContinue}
 													className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm"
@@ -1569,7 +1569,7 @@ function CreateCampaignPageContent() {
 									</Button.Root>
 									<FancyButton.Root
 										type="submit"
-										variant="blue"
+										variant="neutral"
 										size="small"
 										className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
 									>
@@ -1734,7 +1734,7 @@ function CreateCampaignPageContent() {
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
-									variant="blue"
+									variant="neutral"
 									size="small"
 									onClick={handleContinue}
 									className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
@@ -1868,7 +1868,7 @@ function CreateCampaignPageContent() {
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
-									variant="blue"
+									variant="neutral"
 									size="small"
 									onClick={handleBroadcastNow}
 									disabled={

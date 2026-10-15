@@ -294,7 +294,7 @@ export function CampaignSendModal({
 									<div className="flex items-start gap-2.5 px-6 pt-5">
 										<Icon
 											name="mega-phone"
-											className="mt-0.5 h-6 w-6 shrink-0 text-[#1868DF] dark:text-blue-400"
+											className="mt-0.5 h-6 w-6 shrink-0 text-text-strong-950"
 										/>
 										<div className="min-w-0 flex-1">
 											<Modal.Title className="font-medium text-text-strong-950 text-xl tracking-tight dark:text-white">
@@ -405,7 +405,7 @@ export function CampaignSendModal({
 													{breakdown.isLoading ? (
 														<Skeleton className="h-5 w-14 rounded" />
 													) : (
-														<span className="font-semibold text-[#1868DF] text-base tabular-nums dark:text-blue-400">
+														<span className="font-semibold text-text-strong-950 text-base tabular-nums">
 															{(breakdown.sendable ?? 0).toLocaleString()}
 														</span>
 													)}

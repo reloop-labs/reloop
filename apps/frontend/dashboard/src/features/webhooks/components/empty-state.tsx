@@ -44,7 +44,7 @@ export const EmptyState = ({
 			) : (
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={() => router.push("/webhooks/create")}
 					className="gap-1.5 rounded-xl"

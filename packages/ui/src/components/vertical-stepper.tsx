@@ -64,7 +64,7 @@ const verticalStepperItemVariants = tv({
 			},
 			active: {
 				root: "bg-bg-white-0 text-text-strong-950 shadow-regular-xs",
-				indicator: "bg-primary-base text-static-white",
+				indicator: "bg-primary-base text-primary-foreground",
 			},
 			default: {
 				root: "bg-bg-weak-50 text-text-sub-600",

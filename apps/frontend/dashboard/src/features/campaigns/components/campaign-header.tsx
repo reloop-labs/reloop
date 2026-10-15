@@ -164,7 +164,7 @@ export function CampaignHeader({
 									</Button.Root>
 
 									<FancyButton.Root
-										variant="blue"
+										variant="neutral"
 										size="xsmall"
 										className="gap-1.5"
 										onClick={onSend}

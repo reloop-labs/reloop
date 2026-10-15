@@ -189,7 +189,7 @@ export function AddDomainPage() {
 						<div className="mt-5 flex items-center gap-3">
 							<FancyButton.Root
 								type="submit"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								disabled={status === "loading"}
 								className={cn(

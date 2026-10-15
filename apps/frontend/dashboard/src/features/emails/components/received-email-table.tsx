@@ -632,7 +632,7 @@ const receivedColumns: ColumnDef<ReceivedEmailData>[] = [
 			<div className="flex min-w-0 flex-col pr-4">
 				<Link
 					href="/inbox"
-					className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+					className="truncate font-medium text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 				>
 					{row.original.subject || "(No Subject)"}
 				</Link>

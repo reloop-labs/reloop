@@ -245,7 +245,7 @@ export const AddAgentAddressModal = ({
 							</p>
 							<FancyButton.Root
 								asChild
-								variant="blue"
+								variant="neutral"
 								size="small"
 								className="gap-1.5 rounded-xl"
 							>
@@ -368,7 +368,7 @@ export const AddAgentAddressModal = ({
 							</Button.Root>
 							<FancyButton.Root
 								type="button"
-								variant="blue"
+								variant="neutral"
 								size="small"
 								onClick={() => {
 									if (!isSubmitting && canCreate) {

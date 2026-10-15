@@ -172,6 +172,7 @@ const Checkbox = React.forwardRef<
 						// path
 						"[&>path]:[stroke-dasharray:var(--total-length)] [&>path]:[stroke-dashoffset:var(--total-length)]",
 						"group-data-[state=indeterminate]/checkbox:invisible",
+						variant === "primary" && "[&>path]:stroke-primary-foreground",
 					)}
 					style={{
 						["--total-length" as string]: TOTAL_LENGTH_CHECK,
@@ -186,6 +187,7 @@ const Checkbox = React.forwardRef<
 						// path
 						"[&>path]:[stroke-dasharray:var(--total-length)] [&>path]:[stroke-dashoffset:var(--total-length)]",
 						"invisible group-data-[state=indeterminate]/checkbox:visible",
+						variant === "primary" && "[&>path]:stroke-primary-foreground",
 					)}
 					style={{
 						["--total-length" as string]: TOTAL_LENGTH_INDETERMINATE,

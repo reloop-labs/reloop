@@ -451,34 +451,34 @@ export function EmailImageSelectionOverlay({
 			}}
 		>
 			{/* Blue selection border */}
-			<div className="pointer-events-none absolute inset-0 border-2 border-[#3b82f6]" />
+			<div className="pointer-events-none absolute inset-0 border-2 border-neutral-950" />
 
 			{/* 4 Capsule / Pill Resize Handles */}
 			{/* Top handle */}
 			<div
 				title="Resize image top"
-				className="-top-1 -translate-x-1/2 -translate-y-1/2 pointer-events-auto absolute left-1/2 h-2 w-8 cursor-ns-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
+				className="-top-1 -translate-x-1/2 -translate-y-1/2 pointer-events-auto absolute left-1/2 h-2 w-8 cursor-ns-resize rounded-full border-[1.5px] border-white bg-neutral-950 shadow-sm transition-transform hover:scale-110 active:scale-110"
 				onPointerDown={(e) => handlePointerDown(e, "top")}
 			/>
 
 			{/* Bottom handle */}
 			<div
 				title="Resize image bottom"
-				className="-bottom-1 -translate-x-1/2 pointer-events-auto absolute left-1/2 h-2 w-8 translate-y-1/2 cursor-ns-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
+				className="-bottom-1 -translate-x-1/2 pointer-events-auto absolute left-1/2 h-2 w-8 translate-y-1/2 cursor-ns-resize rounded-full border-[1.5px] border-white bg-neutral-950 shadow-sm transition-transform hover:scale-110 active:scale-110"
 				onPointerDown={(e) => handlePointerDown(e, "bottom")}
 			/>
 
 			{/* Left handle */}
 			<div
 				title="Resize image left"
-				className="-left-1 -translate-x-1/2 -translate-y-1/2 pointer-events-auto absolute top-1/2 h-8 w-2 cursor-ew-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
+				className="-left-1 -translate-x-1/2 -translate-y-1/2 pointer-events-auto absolute top-1/2 h-8 w-2 cursor-ew-resize rounded-full border-[1.5px] border-white bg-neutral-950 shadow-sm transition-transform hover:scale-110 active:scale-110"
 				onPointerDown={(e) => handlePointerDown(e, "left")}
 			/>
 
 			{/* Right handle */}
 			<div
 				title="Resize image right"
-				className="-right-1 -translate-y-1/2 pointer-events-auto absolute top-1/2 h-8 w-2 translate-x-1/2 cursor-ew-resize rounded-full border-[1.5px] border-white bg-[#3b82f6] shadow-sm transition-transform hover:scale-110 active:scale-110"
+				className="-right-1 -translate-y-1/2 pointer-events-auto absolute top-1/2 h-8 w-2 translate-x-1/2 cursor-ew-resize rounded-full border-[1.5px] border-white bg-neutral-950 shadow-sm transition-transform hover:scale-110 active:scale-110"
 				onPointerDown={(e) => handlePointerDown(e, "right")}
 			/>
 
@@ -515,7 +515,7 @@ export function EmailImageSelectionOverlay({
 					className="flex h-7 w-7 items-center justify-center rounded-full text-zinc-300 transition-colors hover:bg-white/15 hover:text-white disabled:opacity-50"
 				>
 					{isUploading ? (
-						<Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+						<Loader2 className="h-4 w-4 animate-spin text-white/70" />
 					) : (
 						<RefreshCw className="h-3.5 w-3.5" />
 					)}
@@ -533,7 +533,7 @@ export function EmailImageSelectionOverlay({
 					onClick={() => setIsLinkOpen((v) => !v)}
 					className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
 						selectedImage.href
-							? "bg-blue-600/30 text-blue-400 hover:bg-blue-600/50 hover:text-white"
+							? "bg-white/20 text-white hover:bg-white/30"
 							: "text-zinc-300 hover:bg-white/15 hover:text-white"
 					} ${isLinkOpen ? "bg-white/20 text-white" : ""}`}
 				>
@@ -562,14 +562,14 @@ export function EmailImageSelectionOverlay({
 							}
 						}}
 						placeholder="https://example.com"
-						className="flex-1 rounded-lg bg-white/10 px-2.5 py-1 text-white text-xs placeholder-zinc-400 outline-none focus:bg-white/15 focus:ring-1 focus:ring-blue-500"
+						className="flex-1 rounded-lg bg-white/10 px-2.5 py-1 text-white text-xs placeholder-zinc-400 outline-none focus:bg-white/15 focus:ring-1 focus:ring-white/40"
 					/>
 					<button
 						type="button"
 						title="Apply link"
 						aria-label="Apply link"
 						onClick={handleApplyLink}
-						className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-white transition-colors hover:bg-blue-500"
+						className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-neutral-950 transition-colors hover:bg-white/90"
 					>
 						<Check className="h-3.5 w-3.5" />
 					</button>

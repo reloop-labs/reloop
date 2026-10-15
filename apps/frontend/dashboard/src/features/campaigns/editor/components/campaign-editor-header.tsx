@@ -214,7 +214,7 @@ export function CampaignEditorHeader() {
 				{/* Right: Test email and Review / Details */}
 				<div className="flex flex-1 items-center justify-end gap-2">
 					{isReadOnly ? (
-						<FancyButton.Root variant="blue" size="xsmall" asChild>
+						<FancyButton.Root variant="neutral" size="xsmall" asChild>
 							<Link href={`/campaigns/${campaignId}`}>Details</Link>
 						</FancyButton.Root>
 					) : (
@@ -228,7 +228,7 @@ export function CampaignEditorHeader() {
 							</FancyButton.Root>
 
 							<FancyButton.Root
-								variant="blue"
+								variant="neutral"
 								size="xsmall"
 								onClick={() => setIsSendModalOpen(true)}
 							>

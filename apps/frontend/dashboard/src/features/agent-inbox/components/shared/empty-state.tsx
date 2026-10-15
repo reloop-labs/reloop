@@ -24,7 +24,7 @@ export const AgentInboxEmptyState = ({
 			</p>
 			<FancyButton.Root
 				type="button"
-				variant="blue"
+				variant="neutral"
 				size="small"
 				onClick={onAddClick}
 				className="gap-1.5 rounded-xl"

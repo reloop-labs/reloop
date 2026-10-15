@@ -234,6 +234,7 @@
 	--color-primary-alpha-24: var(--primary-alpha-24);
 	--color-primary-alpha-16: var(--primary-alpha-16);
 	--color-primary-alpha-10: var(--primary-alpha-10);
+	--color-primary-foreground: var(--primary-foreground);
 
 	--color-static-black: var(--static-black);
 	--color-static-white: var(--static-white);
@@ -943,6 +944,8 @@
 	--primary-alpha-24: #006ffe3d;
 	--primary-alpha-16: #006ffe29;
 	--primary-alpha-10: #006ffe1a;
+	/* Text/icons drawn on a solid primary fill. */
+	--primary-foreground: var(--static-white);
 
 	--static-black: var(--neutral-950);
 	--static-white: var(--neutral-0);

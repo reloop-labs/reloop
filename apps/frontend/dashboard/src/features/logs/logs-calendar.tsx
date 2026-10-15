@@ -278,10 +278,10 @@ function LogsDayButton({
 				// focus
 				"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base/50",
 				// range styling
-				"data-[range-start=true]:rounded-l-md data-[range-start=true]:bg-primary-base data-[range-start=true]:text-white",
-				"data-[range-end=true]:rounded-r-md data-[range-end=true]:bg-primary-base data-[range-end=true]:text-white",
+				"data-[range-start=true]:rounded-l-md data-[range-start=true]:bg-primary-base data-[range-start=true]:text-primary-foreground",
+				"data-[range-end=true]:rounded-r-md data-[range-end=true]:bg-primary-base data-[range-end=true]:text-primary-foreground",
 				"data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-primary-alpha-10 data-[range-middle=true]:text-text-strong-950",
-				"data-[selected-single=true]:bg-primary-base data-[selected-single=true]:text-white",
+				"data-[selected-single=true]:bg-primary-base data-[selected-single=true]:text-primary-foreground",
 				className,
 			)}
 			{...props}

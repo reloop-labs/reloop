@@ -71,7 +71,7 @@ export const buttonVariants = tv({
 			class: {
 				root: [
 					// base
-					"bg-primary-base text-static-white",
+					"bg-primary-base text-primary-foreground",
 					// hover
 					"hover:bg-primary-darker",
 					// focus

@@ -67,7 +67,7 @@ export function SendFirstEmailButton({
 	return (
 		<FancyButton.Root
 			type="button"
-			variant="blue"
+			variant="neutral"
 			size={size}
 			className={className ?? "gap-1.5 rounded-xl"}
 			disabled={pending}

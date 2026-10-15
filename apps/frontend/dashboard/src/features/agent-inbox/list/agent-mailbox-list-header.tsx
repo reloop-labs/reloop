@@ -76,7 +76,7 @@ export function AgentMailboxListHeader() {
 				</Button.Root>
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={openAdd}
 					className="gap-1.5 rounded-xl"

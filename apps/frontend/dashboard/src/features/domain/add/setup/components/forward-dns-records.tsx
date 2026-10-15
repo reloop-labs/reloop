@@ -345,7 +345,7 @@ export const ForwardDNSRecordsButton = ({
 											</Button.Root>
 											<FancyButton.Root
 												type="button"
-												variant="blue"
+												variant="neutral"
 												size="xsmall"
 												disabled={isSending}
 												onPointerDown={startHold}

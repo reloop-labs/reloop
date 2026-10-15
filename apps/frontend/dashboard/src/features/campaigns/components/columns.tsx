@@ -31,7 +31,7 @@ export const campaignColumns: ColumnDef<Campaign>[] = [
 								? `/campaigns/${campaign.id}/edit`
 								: `/campaigns/${campaign.id}`
 						}
-						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 					>
 						{campaign.name}
 					</Link>

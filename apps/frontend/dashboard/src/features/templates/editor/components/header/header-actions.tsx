@@ -261,7 +261,7 @@ export const HeaderActions = ({
 
 			{/* Publish Button */}
 			<FancyButton.Root
-				variant="blue"
+				variant="neutral"
 				size="xsmall"
 				onClick={() => setIsPublishModalOpen(true)}
 				disabled={isPublishing}

@@ -85,8 +85,8 @@ export function SupportChatMarkdown({
 							className={cn(
 								"font-medium underline underline-offset-2 transition-colors",
 								mine
-									? "text-blue-700 decoration-blue-700/50 hover:decoration-blue-700 dark:text-blue-400 dark:decoration-blue-400/50 dark:hover:decoration-blue-400"
-									: "text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
+									? "text-text-strong-950 decoration-text-strong-950/40 hover:decoration-text-strong-950"
+									: "text-text-strong-950 underline hover:text-text-sub-600",
 							)}
 						>
 							{children}
