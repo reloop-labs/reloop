@@ -135,17 +135,9 @@ const DEFAULT_BRANDS = [
 	"irs",
 	"hmrc",
 	"gov.uk",
-	// Generic impersonation anchors
-	"support",
-	"security",
-	"helpdesk",
-	"alert",
-	"verify",
-	"verification",
-	"account",
-	"billing",
-	"invoice",
-	"confirm",
+	// Generic words like "support", "billing" or "security" are deliberately
+	// NOT here: senders legitimately use "Support <support@theirdomain.com>".
+	// Spoofs such as "PayPal Support" are still caught by the brand itself.
 ];
 
 const extraBrands = (process.env.BRAND_BLOCKLIST ?? "")
@@ -168,8 +160,14 @@ function escapeRegExp(s: string): string {
 export function assertDisplayNameNotSpoofed(from: string): void {
 	const displayName = extractDisplayName(from);
 	if (!displayName) return; // bare address — nothing to check
+	// A brand sending from its own (verified) domain is not a spoof.
+	// Compare whole domain labels so "startups.io" doesn't whitelist "ups".
+	const senderLabels = new Set(
+		extractDomain(from).split(/[.-]/).filter(Boolean),
+	);
 
 	for (const brand of BRAND_BLOCKLIST) {
+		if (senderLabels.has(brand.replace(/[^a-z0-9]/g, ""))) continue;
 		// Word-boundary match: "PayPal Support" is blocked, but
 		// "pranavkp.me via Reloop" must NOT match brand "vk",
 		// and "Pineapple Inc" must NOT match brand "apple".

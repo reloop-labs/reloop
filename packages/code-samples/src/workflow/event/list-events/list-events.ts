@@ -10,8 +10,8 @@ export const listEventsXCodeSamples: CodeSample[] = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { events, eventError } = await reloop.events.list({ page: 1, limit: 20 });
-if (eventError) throw eventError;`,
+const { triggers, triggerError } = await reloop.automations.triggers.list({ page: 1, limit: 20 });
+if (triggerError) throw triggerError;`,
 	},
 	{
 		id: "curl",

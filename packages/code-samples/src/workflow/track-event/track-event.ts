@@ -20,12 +20,12 @@ export const trackEventXCodeSamples: CodeSample[] = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { event, eventError } = await reloop.events.track({
+const { automation, automationError } = await reloop.automations.start({
   event: "user.signed_up",
   email: "john.doe@example.com",
   properties: { plan: "pro" },
 });
-if (eventError) throw eventError;`,
+if (automationError) throw automationError;`,
 	},
 	{
 		id: "python",

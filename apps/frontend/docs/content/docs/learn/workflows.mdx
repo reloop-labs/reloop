@@ -36,7 +36,7 @@ An **automation** sends emails for you when something happens in your app. You t
 
     After you edit an active automation, click **Publish changes** so new contacts get the new steps.
 
-    ## Track the trigger from your app
+    ## Start it from your app
 
     The trigger's code drawer shows a ready-to-paste snippet with its key. You can also use the **Code** tab on this page.
 
@@ -47,7 +47,7 @@ An **automation** sends emails for you when something happens in your app. You t
   <Tab title="Code" icon="code">
     ## Create a trigger
 
-    Define the event and the properties it carries. The key is what your app sends when tracking it.
+    Define the event and the properties it carries. The key is what your app sends as `event` when starting automations.
 
     <WorkflowCodeSamples id="events.create" />
 
@@ -63,9 +63,9 @@ An **automation** sends emails for you when something happens in your app. You t
 
     If something is wrong with the steps, the error's `why` lists every problem at once.
 
-    ## Track the event
+    ## Start the automation
 
-    Track the event when it happens in your app. Every active automation it triggers starts for that contact. Pass `email` and the contact is created if it doesn't exist yet.
+    Call `automations.start` when the event happens in your app. Every active automation listening for it starts for that contact. Pass `email` and the contact is created if it doesn't exist yet.
 
     <WorkflowCodeSamples id="events.track" />
 
@@ -73,7 +73,7 @@ An **automation** sends emails for you when something happens in your app. You t
 
     ## Enroll a contact directly
 
-    Start one active automation for a contact without tracking an event, for example to backfill existing users.
+    Start one active automation for a contact without a trigger, for example to backfill existing users.
 
     <WorkflowCodeSamples id="automations.enroll" />
 
@@ -162,7 +162,7 @@ Text comparisons ignore case. To compare against another field instead of a fixe
 
 <AccordionGroup>
   <Accordion title="What starts an automation?">
-    A trigger, which is a custom event your app tracks (for example `user.signed_up`). [Track it](#track-the-event) and every active automation that uses it starts for that contact. You can also [enroll one contact directly](#enroll-a-contact-directly).
+    A trigger, which is a custom event your app tracks (for example `user.signed_up`). [Start it](#start-the-automation) and every active automation that uses it starts for that contact. You can also [enroll one contact directly](#enroll-a-contact-directly).
   </Accordion>
 
   <Accordion title="Can a contact go through the same automation twice?">

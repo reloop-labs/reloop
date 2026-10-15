@@ -10,12 +10,12 @@ export const createEventXCodeSamples: CodeSample[] = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { event, eventError } = await reloop.events.create({
+const { trigger, triggerError } = await reloop.automations.triggers.create({
   name: "User signed up",
   key: "user.signed_up",
   properties: [{ name: "plan", propertyType: "string", required: true }],
 });
-if (eventError) throw eventError;`,
+if (triggerError) throw triggerError;`,
 	},
 	{
 		id: "curl",

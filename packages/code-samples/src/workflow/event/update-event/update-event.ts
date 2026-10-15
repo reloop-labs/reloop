@@ -10,11 +10,11 @@ export const updateEventXCodeSamples: CodeSample[] = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { event, eventError } = await reloop.events.update("evt_123456789", {
+const { trigger, triggerError } = await reloop.automations.triggers.update("evt_123456789", {
   description: "Fired when an account is created",
   properties: [{ name: "plan", propertyType: "string", required: true }],
 });
-if (eventError) throw eventError;`,
+if (triggerError) throw triggerError;`,
 	},
 	{
 		id: "curl",

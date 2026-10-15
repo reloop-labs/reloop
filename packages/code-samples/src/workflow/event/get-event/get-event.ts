@@ -10,8 +10,8 @@ export const getEventXCodeSamples: CodeSample[] = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { event, eventError } = await reloop.events.get("evt_123456789");
-if (eventError) throw eventError;`,
+const { trigger, triggerError } = await reloop.automations.triggers.get("evt_123456789");
+if (triggerError) throw triggerError;`,
 	},
 	{
 		id: "curl",
