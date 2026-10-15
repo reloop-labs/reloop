@@ -9,7 +9,7 @@ import {
 } from "../../../(home)/components/platform-tabs-data";
 import { toolDescription, toolPath } from "../content";
 
-const editorHref = `${toolPath}/password-reset`;
+const editorHref = `${toolPath}/blank`;
 
 export function EmailHtmlEditorHero() {
 	return (
