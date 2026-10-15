@@ -22,12 +22,16 @@ export function SubscriptionActivityChart({
 	data: SubscriptionActivityPoint[];
 }) {
 	return (
-		<ResponsiveContainer width="100%" height="100%">
+		<ResponsiveContainer
+			width="100%"
+			height="100%"
+			className="text-text-strong-950"
+		>
 			<AreaChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
 				<defs>
 					<linearGradient id="subscribedGradient" x1="0" y1="0" x2="0" y2="1">
-						<stop offset="5%" stopColor="#1868DF" stopOpacity={0.28} />
-						<stop offset="95%" stopColor="#1868DF" stopOpacity={0} />
+						<stop offset="5%" stopColor="currentColor" stopOpacity={0.28} />
+						<stop offset="95%" stopColor="currentColor" stopOpacity={0} />
 					</linearGradient>
 					<linearGradient id="unsubscribedGradient" x1="0" y1="0" x2="0" y2="1">
 						<stop offset="5%" stopColor="#A1A1AA" stopOpacity={0.22} />
@@ -51,7 +55,7 @@ export function SubscriptionActivityChart({
 					type="monotone"
 					dataKey="subscribed"
 					name="Subscribed"
-					stroke="#1868DF"
+					stroke="currentColor"
 					strokeWidth={2}
 					fillOpacity={1}
 					fill="url(#subscribedGradient)"

@@ -112,10 +112,10 @@ function ChannelToggleBadge({
 			transition={SPRING}
 			className={cn(
 				"relative flex items-center overflow-hidden rounded-full px-2.5 py-1",
-				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-base/40",
+				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950/30",
 				"disabled:cursor-not-allowed",
 				active
-					? "bg-primary-base/10 text-primary-base hover:bg-primary-base/15"
+					? "bg-bg-strong-950 text-text-white-0 hover:bg-bg-strong-950/90"
 					: "bg-bg-weak-50 text-text-sub-600 hover:bg-bg-weak-50/80 dark:bg-white/5 dark:hover:bg-white/10",
 			)}
 		>

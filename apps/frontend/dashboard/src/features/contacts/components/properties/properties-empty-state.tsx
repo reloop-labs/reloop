@@ -77,7 +77,7 @@ export function PropertiesEmptyState({
 			) : (
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={onAddProperty}
 					className="gap-1.5 rounded-xl"

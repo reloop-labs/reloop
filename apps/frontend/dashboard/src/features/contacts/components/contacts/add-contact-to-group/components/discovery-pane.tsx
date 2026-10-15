@@ -133,7 +133,7 @@ export const DiscoveryPane = ({
 						className={cn(
 							"flex h-4 w-4 items-center justify-center rounded border transition-colors",
 							isAllVisibleSelected && pickableCount > 0
-								? "border-primary-base bg-primary-base text-white"
+								? "border-stroke-strong-950 bg-bg-strong-950 text-text-white-0"
 								: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40",
 						)}
 					>

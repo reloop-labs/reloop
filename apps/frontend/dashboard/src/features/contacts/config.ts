@@ -106,7 +106,7 @@ export const getTypeBadgeStyles = (type: string): string => {
 		return "border border-stroke-soft-200 text-text-sub-600 bg-neutral-alpha-10";
 	switch (type.toLowerCase()) {
 		case "string":
-			return "border border-primary-base text-primary-base bg-primary-light/20";
+			return "border border-stroke-strong-950 text-text-strong-950 bg-neutral-alpha-10";
 		case "number":
 			return "border border-violet-500 text-violet-600 bg-violet-100/20";
 		default:

@@ -32,7 +32,7 @@ function Checkbox({
 				checked
 					? isDarkMode
 						? "bg-white"
-						: "bg-primary-base"
+						: "bg-bg-strong-950"
 					: cn(
 							"border bg-transparent",
 							isDarkMode ? "border-white/25" : "border-black/15",

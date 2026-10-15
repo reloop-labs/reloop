@@ -233,7 +233,7 @@ export function CreatePropertyForm({
 								className={cn(
 									"inline-flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs transition-colors disabled:opacity-50",
 									selected
-										? "border-primary-base bg-primary-light/10 font-medium text-text-strong-950"
+										? "border-stroke-strong-950 bg-bg-weak-50 font-medium text-text-strong-950"
 										: "border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 hover:border-stroke-soft-300",
 								)}
 							>

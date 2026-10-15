@@ -168,7 +168,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 									</ActionKbd>
 								</Button.Root>
 								<FancyButton.Root
-									variant="blue"
+									variant="neutral"
 									size="xsmall"
 									onClick={() => void setModal("add-contact-to-group")}
 									className="gap-1.5"

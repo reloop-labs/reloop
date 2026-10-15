@@ -691,7 +691,7 @@ function EmailTimelineCard({
 				<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
 					<Link
 						href={`/emails/${entry.id}`}
-						className="truncate font-medium text-paragraph-sm text-text-strong-950 hover:text-primary-base hover:underline"
+						className="truncate font-medium text-paragraph-sm text-text-strong-950 hover:text-text-sub-600 hover:underline"
 					>
 						{subject}
 					</Link>
@@ -759,7 +759,7 @@ function GroupTimelineCard({
 					name="modules"
 					className={cn(
 						"size-3.5",
-						isRemoved ? "text-error-base" : "text-blue-600 dark:text-blue-400",
+						isRemoved ? "text-error-base" : "text-text-strong-950",
 					)}
 				/>
 			}
@@ -775,7 +775,7 @@ function GroupTimelineCard({
 						{groupId ? (
 							<Link
 								href={`/contacts/groups/${groupId}`}
-								className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-strong-950 hover:text-primary-base"
+								className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-strong-950 hover:text-text-sub-600"
 							>
 								<Icon name="modules" className="size-3 text-text-sub-600" />
 								<span className="underline decoration-dotted underline-offset-2">
@@ -841,7 +841,7 @@ function ChannelTimelineCard({
 						{channelId ? (
 							<Link
 								href={`/contacts?channelId=${channelId}`}
-								className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-strong-950 hover:text-primary-base"
+								className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-strong-950 hover:text-text-sub-600"
 							>
 								<Icon
 									name="notification-indicator"

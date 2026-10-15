@@ -431,7 +431,7 @@ export const ContactHeader = ({
 
 	if (!contact && !isLoading) {
 		return (
-			<div className="mx-auto max-w-3xl px-4 pb-8 sm:px-8">
+			<div className="mx-auto max-w-6xl px-6 pb-8 lg:px-8">
 				<div className="flex items-center justify-between pt-10 pb-8">
 					<AnimatedBackButton fallbackHref="/contacts" />
 				</div>
@@ -466,7 +466,7 @@ export const ContactHeader = ({
 
 	return (
 		<>
-			<div className="mx-auto max-w-3xl px-4 pb-16 sm:px-8">
+			<div className="mx-auto max-w-6xl px-6 pb-16 lg:px-8">
 				<div className="flex items-center justify-between pt-10 pb-8">
 					<AnimatedBackButton fallbackHref="/contacts" />
 				</div>
@@ -721,7 +721,7 @@ export const ContactHeader = ({
 												<Link
 													href={`/contacts/groups/${group.id}`}
 													key={group.id}
-													className="underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
+													className="underline decoration-dashed underline-offset-4 transition-colors hover:text-text-sub-600"
 												>
 													{group.name}
 												</Link>
@@ -740,7 +740,7 @@ export const ContactHeader = ({
 												<Link
 													href={`/contacts?channelId=${channel.id}`}
 													key={channel.id}
-													className="underline decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
+													className="underline decoration-dashed underline-offset-4 transition-colors hover:text-text-sub-600"
 												>
 													{channel.name}
 												</Link>

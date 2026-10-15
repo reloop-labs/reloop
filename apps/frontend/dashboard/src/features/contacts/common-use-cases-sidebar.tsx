@@ -150,7 +150,7 @@ export function ContactsCommonUseCasesSidebar() {
 						)}
 					>
 						<div className="flex items-start justify-between gap-3">
-							<span className="font-semibold text-sm text-text-strong-950 transition-colors group-hover:text-[#1868DF] dark:group-hover:text-blue-400">
+							<span className="font-semibold text-sm text-text-strong-950 transition-colors group-hover:text-text-sub-600">
 								Browse samples
 							</span>
 							<Icon
@@ -195,7 +195,7 @@ export function ContactsCommonUseCasesSidebar() {
 					className={cardClassName}
 				>
 					<div className="flex items-start justify-between gap-3">
-						<h3 className="font-semibold text-sm text-text-strong-950 transition-colors group-hover:text-[#1868DF] dark:group-hover:text-blue-400">
+						<h3 className="font-semibold text-sm text-text-strong-950 transition-colors group-hover:text-text-sub-600">
 							{item.title}
 						</h3>
 						<Icon

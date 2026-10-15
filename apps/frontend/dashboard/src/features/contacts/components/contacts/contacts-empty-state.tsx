@@ -106,7 +106,7 @@ export function ContactsEmptyState({
 			) : (
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={handleAddContact}
 					className="gap-1.5 rounded-xl"

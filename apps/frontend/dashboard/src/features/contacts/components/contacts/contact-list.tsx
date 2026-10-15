@@ -253,7 +253,7 @@ export function ContactList() {
 							</p>
 							<div className="flex shrink-0 items-center gap-3">
 								<div className="flex items-center gap-1.5">
-									<span className="h-1.5 w-1.5 rounded-full bg-[#1868DF]" />
+									<span className="h-1.5 w-1.5 rounded-full bg-text-strong-950" />
 									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
 										{activityPending ? "-" : weekSubscribed.toLocaleString()}{" "}
 										subscribed

@@ -54,7 +54,7 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 		const is404 =
 			contactError instanceof Error && contactError.message.includes("404");
 		return (
-			<div className="mx-auto max-w-3xl px-4 sm:px-8">
+			<div className="mx-auto max-w-6xl px-6 lg:px-8">
 				<div className="flex items-center justify-between pt-10 pb-8">
 					<AnimatedBackButton fallbackHref="/contacts" />
 				</div>
@@ -74,7 +74,7 @@ export function ContactDetailContent({ contactId }: { contactId: string }) {
 
 	if (!contactData && !isLoading) {
 		return (
-			<div className="mx-auto max-w-3xl px-4 sm:px-8">
+			<div className="mx-auto max-w-6xl px-6 lg:px-8">
 				<div className="flex items-center justify-between pt-10 pb-8">
 					<AnimatedBackButton fallbackHref="/contacts" />
 				</div>

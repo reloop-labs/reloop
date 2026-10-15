@@ -27,7 +27,7 @@ export const ContactRow = ({
 			className={cn(
 				"group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors",
 				!isLocked && "hover:bg-bg-weak-50 dark:hover:bg-bg-weak-50/30",
-				selected && !inGroup && "bg-primary-alpha-10 dark:bg-primary-base/10",
+				selected && !inGroup && "bg-bg-weak-50 dark:bg-white/5",
 				inGroup && "opacity-60",
 				isLocked && "cursor-default",
 			)}
@@ -38,7 +38,7 @@ export const ContactRow = ({
 					inGroup
 						? "border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40"
 						: selected
-							? "border-primary-base bg-primary-base text-white"
+							? "border-stroke-strong-950 bg-bg-strong-950 text-text-white-0"
 							: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0",
 				)}
 				aria-hidden

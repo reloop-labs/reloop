@@ -53,31 +53,31 @@ const SOLID_STATUS_CONFIGS: Record<string, StatusStyleConfig> = {
 };
 
 const LIGHT_DEFAULT_CONFIG: StatusStyleConfig = {
-	shell: "bg-[#fca5a5] dark:bg-[#7f1d1d]",
-	face: "bg-[#fee2e2] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#450a0a]/85 dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.12)]",
-	text: "text-[#b91c1c] dark:text-[#f87171]",
+	shell: "bg-[#dc2626]/[0.15] dark:bg-[#ef4444]/[0.16]",
+	face: "bg-[#fdecec] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#ef4444]/[0.08] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.05)]",
+	text: "text-[#b91c1c] dark:text-[#fca5a5]",
 	icon: "cross",
 	iconClass: "stroke-[2.5]",
 };
 
 const LIGHT_STATUS_CONFIGS: Record<string, StatusStyleConfig> = {
 	subscribed: {
-		shell: "bg-[#86efac] dark:bg-[#065f46]",
-		face: "bg-[#dcfce7] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#064e3b]/85 dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.12)]",
-		text: "text-[#15803d] dark:text-[#4ade80]",
+		shell: "bg-[#16a34a]/[0.17] dark:bg-[#22c55e]/[0.16]",
+		face: "bg-[#e7f7ec] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#22c55e]/[0.08] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.05)]",
+		text: "text-[#15803d] dark:text-[#86efac]",
 		icon: "check",
 	},
 	unsubscribed: LIGHT_DEFAULT_CONFIG,
 	suppressed: {
-		shell: "bg-[#fca5a5] dark:bg-[#7f1d1d]",
-		face: "bg-[#fee2e2] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#450a0a]/85 dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.12)]",
-		text: "text-[#b91c1c] dark:text-[#f87171]",
+		shell: "bg-[#dc2626]/[0.15] dark:bg-[#ef4444]/[0.16]",
+		face: "bg-[#fdecec] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#ef4444]/[0.08] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.05)]",
+		text: "text-[#b91c1c] dark:text-[#fca5a5]",
 		icon: "slash",
 	},
 	blocked: {
-		shell: "bg-[#fcd34d] dark:bg-[#78350f]",
-		face: "bg-[#fef3c7] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#451a03]/85 dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.12)]",
-		text: "text-[#b45309] dark:text-[#fbbf24]",
+		shell: "bg-[#d97706]/[0.17] dark:bg-[#f59e0b]/[0.16]",
+		face: "bg-[#fdf3e1] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.9)] dark:bg-[#f59e0b]/[0.08] dark:shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.05)]",
+		text: "text-[#b45309] dark:text-[#fcd34d]",
 		icon: "slash",
 	},
 };

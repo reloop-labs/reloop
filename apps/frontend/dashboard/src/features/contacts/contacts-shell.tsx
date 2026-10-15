@@ -233,7 +233,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 										<Dropdown.Trigger asChild>
 											<FancyButton.Root
 												type="button"
-												variant="blue"
+												variant="neutral"
 												size="small"
 												className="cursor-pointer gap-1.5 rounded-xl"
 												aria-keyshortcuts="c"
@@ -300,7 +300,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 								) : (
 									<FancyButton.Root
 										type="button"
-										variant="blue"
+										variant="neutral"
 										size="small"
 										onClick={handleAction}
 										className="gap-1.5 rounded-xl"

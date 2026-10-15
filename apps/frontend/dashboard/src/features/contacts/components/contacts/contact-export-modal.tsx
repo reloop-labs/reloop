@@ -406,7 +406,7 @@ export function ContactExportModal({
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
-									variant="blue"
+									variant="neutral"
 									size="small"
 									disabled={selectedCount === 0}
 									onClick={() => void handleExport()}
@@ -433,7 +433,7 @@ export function ContactExportModal({
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
-									variant="blue"
+									variant="neutral"
 									size="small"
 									disabled
 									className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
@@ -471,7 +471,7 @@ export function ContactExportModal({
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
-									variant="blue"
+									variant="neutral"
 									size="small"
 									onClick={() => onOpenChange(false)}
 									className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
@@ -496,7 +496,7 @@ export function ContactExportModal({
 								</Button.Root>
 								<FancyButton.Root
 									type="button"
-									variant="blue"
+									variant="neutral"
 									size="small"
 									onClick={() => void handleExport()}
 									className={cn(

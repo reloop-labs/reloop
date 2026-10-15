@@ -50,7 +50,7 @@ const getSubscriptionBadgeStyle = (
 
 const getVisibilityBadgeStyle = (visibility?: "private" | "public") => {
 	if (visibility === "public") {
-		return "text-primary-base border-primary-base/30 bg-primary-base/5";
+		return "text-text-strong-950 border-stroke-sub-300 bg-bg-weak-50";
 	}
 	return "text-text-sub-600 border-stroke-soft-200 bg-bg-white-0";
 };
@@ -148,7 +148,7 @@ export const ChannelTable = ({
 								onClick={() => handleRowClick(channel.id)}
 								className={cn(
 									"group/row grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_48px] items-center px-4 py-2 text-left transition-colors",
-									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base focus-visible:outline-offset-[-1px]",
+									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-strong-950 focus-visible:outline-offset-[-1px]",
 									isRowActive && "bg-bg-weak-50/50",
 								)}
 							>
@@ -158,7 +158,7 @@ export const ChannelTable = ({
 										name="notification-indicator"
 										className="h-4 w-4 shrink-0 text-text-sub-600"
 									/>
-									<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors group-hover/row:text-[#1868DF] dark:group-hover/row:text-blue-400">
+									<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors group-hover/row:text-text-sub-600">
 										{channel.name}
 									</span>
 								</div>

@@ -199,7 +199,7 @@ export const CreateChannelModal = ({
 			>
 				<div className="rounded-2xl border border-stroke-soft-100">
 					<Modal.Header className="before:border-stroke-soft-100 dark:border-stroke-soft-100/40">
-						<div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-base/10 text-primary-base dark:bg-white/10 dark:text-white">
+						<div className="flex h-8 w-8 items-center justify-center rounded-xl bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white">
 							<Icon name="notification-indicator" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
@@ -220,7 +220,7 @@ export const CreateChannelModal = ({
 									<div className="relative flex flex-col gap-1.5">
 										<Label.Root htmlFor="channel-name">
 											Channel Name
-											<span className="text-primary-base">*</span>
+											<span className="text-text-soft-400">*</span>
 										</Label.Root>
 										<Input.Root size="medium">
 											<Input.Wrapper>
@@ -283,7 +283,7 @@ export const CreateChannelModal = ({
 										className={cn(
 											"flex w-full cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all duration-200",
 											defaultSubscription === "opt_in"
-												? "border-primary-base/40 bg-primary-base/[0.03] dark:border-white/20 dark:bg-white/[0.03]"
+												? "border-stroke-strong-950/40 bg-bg-weak-50 dark:border-white/20 dark:bg-white/[0.03]"
 												: "border-stroke-soft-100 hover:border-stroke-sub-300 dark:border-stroke-soft-100/40 dark:hover:border-stroke-soft-100/80",
 										)}
 									>
@@ -313,7 +313,7 @@ export const CreateChannelModal = ({
 										className={cn(
 											"flex w-full cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all duration-200",
 											visibility === "public"
-												? "border-primary-base/40 bg-primary-base/[0.03] dark:border-white/20 dark:bg-white/[0.03]"
+												? "border-stroke-strong-950/40 bg-bg-weak-50 dark:border-white/20 dark:bg-white/[0.03]"
 												: "border-stroke-soft-100 hover:border-stroke-sub-300 dark:border-stroke-soft-100/40 dark:hover:border-stroke-soft-100/80",
 										)}
 									>

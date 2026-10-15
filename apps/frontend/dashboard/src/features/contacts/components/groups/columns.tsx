@@ -88,7 +88,7 @@ export const groupColumns: ColumnDef<Group>[] = [
 					<Icon name="modules" className="h-4 w-4 shrink-0 text-text-sub-600" />
 					<Link
 						href={`/contacts/groups/${group.id}`}
-						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"
 						onClick={(e) => {
 							if (isEditing) e.preventDefault();
 						}}

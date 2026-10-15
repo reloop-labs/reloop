@@ -40,7 +40,7 @@ export const ModalFooter = ({
 			</Button.Root>
 			<FancyButton.Root
 				type="button"
-				variant="blue"
+				variant="neutral"
 				size="small"
 				onClick={onSubmit}
 				disabled={isSubmitting || selectedCount === 0}

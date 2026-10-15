@@ -58,7 +58,7 @@ export function EmptyState({
 			) : (
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={onCreateClick}
 					className="gap-1.5 rounded-xl"

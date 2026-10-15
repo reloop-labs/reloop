@@ -418,7 +418,7 @@ export function CreateContactModal({
 
 						<FancyButton.Root
 							type="submit"
-							variant="blue"
+							variant="neutral"
 							size="small"
 							disabled={isSubmitting}
 							className="gap-1.5"

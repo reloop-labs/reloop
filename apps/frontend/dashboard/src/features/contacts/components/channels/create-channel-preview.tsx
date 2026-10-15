@@ -37,7 +37,7 @@ function Checkbox({
 				checked
 					? isDarkMode
 						? "bg-white"
-						: "bg-primary-base"
+						: "bg-bg-strong-950"
 					: cn(
 							"border bg-transparent",
 							isDarkMode ? "border-white/25" : "border-black/15",
@@ -190,7 +190,7 @@ export function CreateChannelPreview({
 								className={cn(
 									"rounded-2xl border transition-all duration-200",
 									isCurrent
-										? "border-primary-base"
+										? "border-stroke-strong-950"
 										: "border-transparent hover:bg-bg-weak-50 dark:hover:bg-white/5",
 								)}
 							>
@@ -225,7 +225,7 @@ export function CreateChannelPreview({
 												/>
 											)}
 											{isCurrent && (
-												<span className="flex-shrink-0 rounded-full bg-primary-base px-2 py-0.5 font-semibold text-[10px] text-white">
+												<span className="flex-shrink-0 rounded-full bg-bg-strong-950 px-2 py-0.5 font-semibold text-[10px] text-text-white-0">
 													{badgeLabel}
 												</span>
 											)}
@@ -260,7 +260,7 @@ export function CreateChannelPreview({
 											transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
 											className="overflow-hidden"
 										>
-											<div className="flex gap-2 rounded-b-[15px] bg-primary-base px-4 py-2">
+											<div className="flex gap-2 rounded-b-[15px] bg-bg-strong-950 px-4 py-2">
 												<Icon
 													name="lock"
 													className="h-3.5 w-3.5 text-white/90"

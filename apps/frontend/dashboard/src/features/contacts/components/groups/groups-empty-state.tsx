@@ -63,7 +63,7 @@ export function GroupsEmptyState({
 			) : (
 				<FancyButton.Root
 					type="button"
-					variant="blue"
+					variant="neutral"
 					size="small"
 					onClick={onAddGroup}
 					className="gap-1.5 rounded-xl"
