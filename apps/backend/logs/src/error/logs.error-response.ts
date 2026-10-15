@@ -34,6 +34,13 @@ export const LogsErrors = {
 			why: `No email log with ID "${emailLogId}" exists for your organization.`,
 			fix: "Verify the email log ID and ensure it belongs to your active organization.",
 		}),
+	upgradeRequired: () =>
+		createError({
+			status: 426,
+			message: "Upgrade required",
+			why: "This endpoint only accepts WebSocket connections, but the request had no `Upgrade: websocket` header.",
+			fix: "Connect with a WebSocket client, and make sure any proxy in front of the logs service forwards the Upgrade and Connection headers.",
+		}),
 	badRequest: (why: string, fix?: string) =>
 		createError({
 			status: 400,

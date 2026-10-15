@@ -1,4 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
+import { LogsErrors } from "@reloop/logs/error/logs.error-response";
 import { authMiddleware } from "@reloop/logs/middleware/auth";
 import {
 	joinOrgRoom,
@@ -47,6 +48,16 @@ function getOrCreateClient(ws: {
 
 export const logsWsRoute = new Elysia({ prefix: "/v1" })
 	.use(authMiddleware)
+	// Elysia only dispatches to the WS handler when `upgrade: websocket` is
+	// present; otherwise the request falls through to GET /v1/:log_id and
+	// surfaces as a misleading "Log not found" for id "ws".
+	.get(
+		"/ws",
+		() => {
+			throw LogsErrors.upgradeRequired();
+		},
+		{ detail: { hide: true } },
+	)
 	.ws("/ws", {
 		auth: true,
 		body: t.Unknown(),

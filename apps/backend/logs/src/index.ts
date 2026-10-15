@@ -51,6 +51,9 @@ const port = logsConfig.port;
 const logsService = new Elysia({
 	prefix: "/api/logs",
 	name: "Logs Service",
+	// Bun's native router would match GET /v1/:log_id for /v1/ws before
+	// Elysia sees the websocket upgrade, so the socket could never connect.
+	systemRouter: false,
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(requireUserAgentPlugin())
