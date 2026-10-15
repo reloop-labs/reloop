@@ -225,7 +225,7 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 	return (
 		<div className="flex h-full flex-col">
 			{/* ── Panel Header: METHOD /path ── */}
-			<div className="flex items-center justify-between gap-3 h-12 shrink-0 border-stroke-soft-100 border-b px-5 dark:border-stroke-soft-100/40">
+			<div className="flex h-12 shrink-0 items-center justify-between gap-3 border-stroke-soft-100 border-b px-5 dark:border-stroke-soft-100/40">
 				<div className="min-w-0 flex-1">
 					{isLoading ? (
 						<div className="flex h-5 items-center gap-1.5">
@@ -272,7 +272,9 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 			{/* ── Body ── */}
 			<div className="flex-1 overflow-y-auto px-5 pb-5">
 				{/* Diagnostic card, only once we know it's an error */}
-				{!isLoading && log && <DiagnosticCard log={log} />}
+				{!isLoading && log && (
+					<DiagnosticCard log={log} className="mt-4 mb-2" />
+				)}
 
 				{/* Property table: Stripe-style key/value list */}
 				<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">

@@ -1,56 +1,87 @@
-import * as Badge from "@reloop/ui/badge";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useRouter } from "next/navigation";
 
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import {
+	AMBER_KEYCAP,
+	GREEN_KEYCAP,
+	KeycapBadge,
+	type KeycapStyle,
+	NEUTRAL_KEYCAP,
+	RED_KEYCAP,
+} from "#/features/emails/detail/email-status-badge";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { DiagnosticCard } from "./diagnostic-card";
 import { formatDisplayEndpoint } from "./format-endpoint";
 import { useLogDetailQuery } from "./hooks/use-logs-query";
 
-const getMethodColorClass = (method: string) => {
-	switch (method?.toUpperCase()) {
-		case "GET":
-			return "text-emerald-700 dark:text-emerald-400";
-		case "POST":
-			return "text-blue-700 dark:text-blue-400";
-		case "PUT":
-		case "PATCH":
-			return "text-amber-700 dark:text-amber-400";
-		case "DELETE":
-			return "text-rose-700 dark:text-rose-400";
-		case "SMTP":
-			return "text-purple-700 dark:text-purple-400";
-		default:
-			return "text-text-sub-600";
-	}
+type StatusTone = "success" | "warning" | "error" | "neutral";
+
+const getStatusTone = (statusCode: number | null | undefined): StatusTone => {
+	if (!statusCode) return "neutral";
+	if (statusCode >= 500) return "error";
+	if (statusCode >= 400) return "warning";
+	if (statusCode >= 200 && statusCode < 300) return "success";
+	return "neutral";
 };
 
-const getStatusProps = (statusCode: number | null | undefined) => {
-	if (!statusCode) return null;
-	let label = `${statusCode}`;
-	let color = "gray";
-	if (statusCode >= 200 && statusCode < 300) {
-		label = `${statusCode} OK`;
-		color = "gray";
-	} else if (statusCode >= 300 && statusCode < 400) {
-		label = `${statusCode} REDIR`;
-		color = "blue";
-	} else if (statusCode >= 400 && statusCode < 500) {
-		label = `${statusCode} ERR`;
-		color = "orange";
-	} else if (statusCode >= 500) {
-		label = `${statusCode} ERR`;
-		color = "red";
-	}
-	return { label, color };
+const getStatusLabel = (statusCode: number) => {
+	if (statusCode >= 200 && statusCode < 300) return `${statusCode} OK`;
+	if (statusCode >= 300 && statusCode < 400) return `${statusCode} Redirect`;
+	return `${statusCode} Error`;
 };
+
+const STATUS_KEYCAP: Record<StatusTone, KeycapStyle> = {
+	success: GREEN_KEYCAP,
+	warning: AMBER_KEYCAP,
+	error: RED_KEYCAP,
+	neutral: NEUTRAL_KEYCAP,
+};
+
+/** Same two-layer tile as `CampaignAvatar`, tinted by response status. */
+const AVATAR_TONE: Record<StatusTone, { outer: string; icon: string }> = {
+	success: {
+		outer:
+			"border-success-base/25 bg-success-lighter dark:border-success-base/30 dark:bg-success-base/10",
+		icon: "text-success-base",
+	},
+	warning: {
+		outer:
+			"border-warning-base/25 bg-warning-lighter dark:border-warning-base/30 dark:bg-warning-base/10",
+		icon: "text-warning-base",
+	},
+	error: {
+		outer:
+			"border-error-base/25 bg-error-lighter dark:border-error-base/30 dark:bg-error-base/10",
+		icon: "text-error-base",
+	},
+	neutral: {
+		outer:
+			"border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]",
+		icon: "text-text-sub-600 dark:text-white/80",
+	},
+};
+
+function LogAvatar({ tone }: { tone: StatusTone }) {
+	return (
+		<div
+			className={cn(
+				"flex size-12 shrink-0 items-center justify-center rounded-[14px] border p-0.5",
+				AVATAR_TONE[tone].outer,
+			)}
+		>
+			<div className="flex h-full w-full items-center justify-center rounded-[11px] bg-bg-white-0 shadow-xs dark:bg-[#0c0c0c]">
+				<Icon name="logs" className={cn("size-5", AVATAR_TONE[tone].icon)} />
+			</div>
+		</div>
+	);
+}
 
 function CopyButton({ value, label }: { value: string; label?: string }) {
 	const [copied, setCopied] = useState(false);
@@ -74,13 +105,14 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 		>
 			<Icon
 				name={copied ? "check" : "copy"}
-				className={cn("h-3 w-3", copied && "text-success-base")}
+				className={cn("h-3.5 w-3.5", copied && "text-success-base")}
 			/>
 		</button>
 	);
 }
 
-function PropertyRow({
+/** Label/value row, same rhythm as the email detail header fields. */
+function FieldRow({
 	label,
 	children,
 }: {
@@ -88,31 +120,44 @@ function PropertyRow({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="grid grid-cols-[120px_1fr] items-start gap-4 py-2.5">
-			<span className="text-text-sub-600 text-xs">{label}</span>
-			<div className="flex min-w-0 flex-1 items-center gap-1.5 text-left">
-				{children}
-			</div>
+		<div className="flex items-start gap-4">
+			<span className="w-24 shrink-0 font-medium text-paragraph-sm text-text-sub-600">
+				{label}
+			</span>
+			<div className="flex min-w-0 flex-1 items-center gap-1.5">{children}</div>
 		</div>
 	);
 }
 
-function PropertyValue({
+function FieldValue({
 	value,
 	mono,
 	copyable,
+	copyLabel,
 	maxLength,
 }: {
 	value: string | null | undefined;
 	mono?: boolean;
 	copyable?: boolean;
+	copyLabel?: string;
 	maxLength?: number;
 }) {
-	if (!value) return <span className="text-text-soft-400 text-xs">-</span>;
+	if (!value) {
+		return (
+			<span className="font-medium text-paragraph-sm text-text-soft-400">
+				-
+			</span>
+		);
+	}
 	const isTruncated = maxLength && value.length > maxLength;
 	const display = isTruncated ? `${value.slice(0, maxLength)}…` : value;
 	const content = (
-		<span className={cn("text-text-strong-950 text-xs", mono && "font-mono")}>
+		<span
+			className={cn(
+				"truncate font-medium text-paragraph-sm text-text-strong-950",
+				mono && "font-mono text-[13px]",
+			)}
+		>
 			{display}
 		</span>
 	);
@@ -134,222 +179,240 @@ function PropertyValue({
 			) : (
 				content
 			)}
-			{copyable && <CopyButton value={value} label={mono ? "ID" : undefined} />}
+			{copyable && <CopyButton value={value} label={copyLabel} />}
+		</>
+	);
+}
+
+function LogDetailSkeleton() {
+	return (
+		<>
+			<div className="mb-8 flex items-center gap-4">
+				<Skeleton className="size-12 shrink-0 rounded-[14px]" />
+				<div className="flex min-w-0 flex-1 flex-col gap-1.5">
+					<Skeleton className="h-4 w-20 rounded-full" />
+					<Skeleton className="h-6 w-72 rounded-lg" />
+				</div>
+				<Skeleton className="h-9 w-36 rounded-xl" />
+			</div>
+			<div className="space-y-3.5">
+				{Array.from({ length: 6 }).map((_, i) => (
+					<div key={i} className="flex gap-4">
+						<Skeleton className="h-4 w-24 rounded-md" />
+						<Skeleton className="h-4 w-56 rounded-md" />
+					</div>
+				))}
+			</div>
+			<Skeleton className="mt-8 h-40 rounded-xl" />
 		</>
 	);
 }
 
 export function LogDetailPage({ logId }: { logId: string }) {
-	const router = useRouter();
 	const { data: logData, error, isPending } = useLogDetailQuery(logId);
 
-	if (isPending) {
-		return (
-			<div className="mx-auto max-w-3xl px-6 pb-12 sm:px-8">
-				<div className="pt-10 pb-4">
-					<AnimatedBackButton onClick={() => router.push("/logs")} />
-				</div>
-				<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
-					<div className="flex flex-col gap-4 p-5">
-						<div className="border-stroke-soft-100 border-b pb-4 dark:border-stroke-soft-100/40">
-							<Skeleton className="h-5 w-56 rounded" />
-							<Skeleton className="mt-2 h-3.5 w-36 rounded" />
-						</div>
-						<div className="space-y-3">
-							{Array.from({ length: 6 }).map((_, i) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
-								<div key={i} className="grid grid-cols-[120px_1fr] gap-4">
-									<Skeleton className="h-3.5 w-20 rounded" />
-									<Skeleton className="h-3.5 w-32 rounded" />
-								</div>
-							))}
-						</div>
-						<Skeleton className="mt-4 h-40 rounded-xl" />
-					</div>
-				</div>
+	return (
+		<div className="mx-auto max-w-6xl p-6 lg:p-8">
+			<div className="pb-8">
+				<AnimatedBackButton fallbackHref="/logs" />
 			</div>
-		);
-	}
+			{isPending ? (
+				<LogDetailSkeleton />
+			) : error || !logData ? (
+				<LogNotFound />
+			) : (
+				<LogDetailContent log={logData} />
+			)}
+		</div>
+	);
+}
 
-	if (error || !logData) {
-		return (
-			<div className="mx-auto max-w-3xl px-6 sm:px-8">
-				<div className="pt-10 pb-4">
-					<AnimatedBackButton onClick={() => router.push("/logs")} />
-				</div>
-				<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-12 text-center dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
-					<p className="text-sm text-text-sub-600">Log not found</p>
-				</div>
+function LogNotFound() {
+	return (
+		<div>
+			<div className="flex items-center gap-1.5 text-error-base">
+				<Icon name="alert-circle" className="h-3.5 w-3.5" />
+				<p className="font-medium text-paragraph-xs">Not found</p>
 			</div>
-		);
-	}
+			<h1 className="mt-1 font-medium text-title-h6 leading-8">
+				Log not found
+			</h1>
+			<p className="mt-1 text-paragraph-sm text-text-sub-600">
+				This log doesn't exist or is no longer retained.
+			</p>
+		</div>
+	);
+}
 
-	const method = logData.requestDetails?.method as string | undefined;
-	const endpoint = logData.requestDetails?.endpoint as string | undefined;
+function LogDetailContent({
+	log,
+}: {
+	log: NonNullable<ReturnType<typeof useLogDetailQuery>["data"]>;
+}) {
+	const [idCopied, setIdCopied] = useState(false);
+
+	const method = log.requestDetails?.method as string | undefined;
+	const endpoint = log.requestDetails?.endpoint as string | undefined;
 	const displayEndpoint = endpoint
 		? formatDisplayEndpoint(endpoint)
 		: undefined;
-	const statusProps = getStatusProps(logData.status_code);
-	const metadataEntries = logData.metadata
-		? Object.entries(logData.metadata)
-		: [];
+	const tone = getStatusTone(log.status_code);
 	const hasRequestDetails =
-		logData.requestDetails && Object.keys(logData.requestDetails).length > 0;
+		log.requestDetails && Object.keys(log.requestDetails).length > 0;
+	const metadataEntries = log.metadata ? Object.entries(log.metadata) : [];
+
+	let origin: string | undefined;
+	if (endpoint) {
+		try {
+			origin = new URL(endpoint).origin;
+		} catch {
+			origin = undefined;
+		}
+	}
+
+	const handleCopyId = async () => {
+		try {
+			await navigator.clipboard.writeText(log.uuid);
+			setIdCopied(true);
+			toast.success("Request ID copied");
+			setTimeout(() => setIdCopied(false), 2000);
+		} catch {
+			toast.error("Failed to copy");
+		}
+	};
 
 	return (
-		<div className="mx-auto max-w-3xl px-6 pb-12 sm:px-8">
-			<div className="pt-10 pb-4">
-				<AnimatedBackButton onClick={() => router.push("/logs")} />
-			</div>
-
-			<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
-				<div className="flex flex-col">
-					<div className="flex items-start justify-between gap-3 px-5 pt-4">
-						<div className="min-w-0 flex-1">
-							<h2 className="truncate font-semibold text-sm text-text-strong-950">
-								{method && displayEndpoint ? (
-									<>
-										<span
-											className={cn(
-												"mr-1.5 font-bold uppercase",
-												getMethodColorClass(method),
-											)}
-										>
-											{method}
-										</span>
-										<span>{displayEndpoint}</span>
-									</>
-								) : (
-									logData.event
-								)}
-							</h2>
-							<div className="mt-1 flex items-center gap-2 text-text-sub-600 text-xs">
-								<span>{new Date(logData.created_at).toLocaleString()}</span>
-								<span className="text-text-disabled-300">·</span>
-								<span>{formatRelativeTime(logData.created_at)}</span>
-							</div>
-						</div>
-					</div>
-
-					<div className="flex-1 space-y-4 p-5">
-						<DiagnosticCard log={logData} />
-
-						<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-							<div className="divide-y divide-stroke-soft-100 px-4 dark:divide-stroke-soft-100/40">
-								<PropertyRow label="Status">
-									{statusProps ? (
-										<Badge.Root
-											variant="lighter"
-											// biome-ignore lint/suspicious/noExplicitAny: badge color union
-											color={statusProps.color as any}
-											className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
-										>
-											{statusProps.label}
-										</Badge.Root>
-									) : (
-										<span className="text-text-soft-400 text-xs">-</span>
-									)}
-								</PropertyRow>
-
-								<PropertyRow label="Request ID">
-									<PropertyValue
-										value={logData.uuid}
-										mono
-										copyable
-										maxLength={26}
-									/>
-								</PropertyRow>
-
-								<PropertyRow label="Time">
-									<PropertyValue
-										value={new Date(logData.created_at).toLocaleString()}
-									/>
-								</PropertyRow>
-
-								{hasRequestDetails && logData.requestDetails.ipAddress && (
-									<PropertyRow label="IP address">
-										<PropertyValue
-											value={logData.requestDetails.ipAddress as string}
-											mono
-											copyable
-										/>
-									</PropertyRow>
-								)}
-
-								{logData.trace_id && (
-									<PropertyRow label="Trace ID">
-										<PropertyValue
-											value={logData.trace_id}
-											mono
-											copyable
-											maxLength={26}
-										/>
-									</PropertyRow>
-								)}
-
-								{hasRequestDetails && logData.requestDetails.userAgent && (
-									<PropertyRow label="Source">
-										<PropertyValue
-											value={logData.requestDetails.userAgent as string}
-											maxLength={55}
-										/>
-									</PropertyRow>
-								)}
-
-								{hasRequestDetails &&
-									logData.requestDetails.endpoint &&
-									(() => {
-										try {
-											const origin = new URL(
-												logData.requestDetails.endpoint as string,
-											).origin;
-											return (
-												<PropertyRow label="Origin">
-													<PropertyValue value={origin} mono maxLength={50} />
-												</PropertyRow>
-											);
-										} catch {
-											return null;
-										}
-									})()}
-							</div>
-						</div>
-
-						{logData.request_body &&
-							Object.keys(logData.request_body).length > 0 && (
-								<div>
-									<CopyCodeBlock
-										code={JSON.stringify(logData.request_body, null, 2)}
-										lang="json"
-										label="Request body"
-									/>
-								</div>
-							)}
-
-						{metadataEntries.length > 0 ? (
-							<div>
-								<CopyCodeBlock
-									code={JSON.stringify(logData.metadata, null, 2)}
-									lang="json"
-									label="Response body"
-								/>
-							</div>
-						) : (
-							<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-								<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
-									<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
-									<span className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-										Response body
-									</span>
-								</div>
-								<div className="py-4 text-center text-text-soft-400 text-xs">
-									No response body
-								</div>
-							</div>
-						)}
+		<>
+			{/* Avatar + endpoint + status + actions row (mirrors campaign/email headers) */}
+			<div className="mb-8 flex items-center gap-4">
+				<LogAvatar tone={tone} />
+				<div className="min-w-0 flex-1">
+					<p className="font-medium text-paragraph-xs text-text-sub-600">
+						{method ? `${method.toUpperCase()} request` : "Log"}
+					</p>
+					<div className="flex min-w-0 items-center gap-2.5">
+						<h1 className="min-w-0 truncate font-semibold text-title-h6 leading-7">
+							{displayEndpoint ?? log.event}
+						</h1>
+						{log.status_code ? (
+							<KeycapBadge
+								style={STATUS_KEYCAP[tone]}
+								label={getStatusLabel(log.status_code)}
+							/>
+						) : null}
 					</div>
 				</div>
+				<Button.Root
+					type="button"
+					variant="neutral"
+					mode="stroke"
+					size="small"
+					className="shrink-0 gap-1.5"
+					onClick={() => void handleCopyId()}
+				>
+					<Icon name={idCopied ? "check" : "copy"} className="h-4 w-4" />
+					<span>Copy request ID</span>
+				</Button.Root>
 			</div>
-		</div>
+
+			<div className="space-y-8">
+				<section className="flex flex-col gap-3.5">
+					{method && (
+						<FieldRow label="Method">
+							<FieldValue value={method.toUpperCase()} mono />
+						</FieldRow>
+					)}
+					{displayEndpoint && (
+						<FieldRow label="Endpoint">
+							<FieldValue value={displayEndpoint} mono maxLength={80} />
+						</FieldRow>
+					)}
+					<FieldRow label="Request ID">
+						<FieldValue value={log.uuid} mono copyable copyLabel="Request ID" />
+					</FieldRow>
+					<FieldRow label="Time">
+						<span className="font-medium text-paragraph-sm text-text-strong-950">
+							{new Date(log.created_at).toLocaleString(undefined, {
+								weekday: "long",
+								year: "numeric",
+								month: "long",
+								day: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+							})}
+						</span>
+						<span className="text-paragraph-sm text-text-soft-400">
+							· {formatRelativeTime(log.created_at)}
+						</span>
+					</FieldRow>
+					{hasRequestDetails && log.requestDetails.ipAddress ? (
+						<FieldRow label="IP address">
+							<FieldValue
+								value={log.requestDetails.ipAddress as string}
+								mono
+								copyable
+								copyLabel="IP address"
+							/>
+						</FieldRow>
+					) : null}
+					{log.trace_id && (
+						<FieldRow label="Trace ID">
+							<FieldValue
+								value={log.trace_id}
+								mono
+								copyable
+								copyLabel="Trace ID"
+							/>
+						</FieldRow>
+					)}
+					{hasRequestDetails && log.requestDetails.userAgent ? (
+						<FieldRow label="Source">
+							<FieldValue
+								value={log.requestDetails.userAgent as string}
+								maxLength={80}
+							/>
+						</FieldRow>
+					) : null}
+					{origin && (
+						<FieldRow label="Origin">
+							<FieldValue value={origin} mono />
+						</FieldRow>
+					)}
+				</section>
+
+				<DiagnosticCard log={log} />
+
+				{log.request_body && Object.keys(log.request_body).length > 0 && (
+					<CopyCodeBlock
+						code={JSON.stringify(log.request_body, null, 2)}
+						lang="json"
+						label="Request body"
+						collapsedHeight={240}
+					/>
+				)}
+
+				{metadataEntries.length > 0 ? (
+					<CopyCodeBlock
+						code={JSON.stringify(log.metadata, null, 2)}
+						lang="json"
+						label="Response body"
+						collapsedHeight={240}
+					/>
+				) : (
+					<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+						<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
+							<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
+							<span className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
+								Response body
+							</span>
+						</div>
+						<div className="py-4 text-center text-text-soft-400 text-xs">
+							No response body
+						</div>
+					</div>
+				)}
+			</div>
+		</>
 	);
 }

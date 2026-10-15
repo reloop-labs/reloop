@@ -4,8 +4,15 @@
  */
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	useReducedMotion,
+	useTransform,
+} from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BrightCode } from "./bright-code";
 
 export type CopyCodeBlockIcon = {
@@ -90,6 +97,7 @@ export function CopyCodeBlock({
 	icon,
 	loading = false,
 	emptyMessage,
+	collapsedHeight,
 }: {
 	code: string;
 	lang: string;
@@ -113,6 +121,8 @@ export function CopyCodeBlock({
 	loading?: boolean;
 	/** Shown inside the code surface when not loading and code is empty */
 	emptyMessage?: string;
+	/** Clamp long code to this many px with a "Show all" toggle */
+	collapsedHeight?: number;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
@@ -487,6 +497,16 @@ export function CopyCodeBlock({
 					>
 						{emptyMessage}
 					</div>
+				) : collapsedHeight ? (
+					<CollapsibleCode collapsedHeight={collapsedHeight} code={code}>
+						<BrightCode
+							code={code}
+							lang={lang}
+							lineNumbers={!hideLineNumbers}
+							noScroll
+							codeExtraPadding={codeExtraPadding}
+						/>
+					</CollapsibleCode>
 				) : (
 					<BrightCode
 						code={code}
@@ -498,6 +518,102 @@ export function CopyCodeBlock({
 					/>
 				)}
 			</div>
+		</div>
+	);
+}
+
+const SNAPPY_EASE = [0.32, 0.72, 0, 1] as const;
+
+/**
+ * Clamps code to `collapsedHeight` with a fade + "Show all" toggle.
+ * Height and fade share one motion value so they move in lockstep;
+ * collapsing plays the same curve in reverse.
+ */
+function CollapsibleCode({
+	collapsedHeight,
+	code,
+	children,
+}: {
+	collapsedHeight: number;
+	code: string;
+	children: React.ReactNode;
+}) {
+	const contentRef = useRef<HTMLDivElement>(null);
+	const [fullHeight, setFullHeight] = useState<number | null>(null);
+	const [expanded, setExpanded] = useState(false);
+	const reduceMotion = useReducedMotion();
+	const height = useMotionValue(collapsedHeight);
+	const fadeOpacity = useTransform(
+		height,
+		[collapsedHeight, Math.max(fullHeight ?? 0, collapsedHeight + 1)],
+		[1, 0],
+	);
+
+	useLayoutEffect(() => {
+		const el = contentRef.current;
+		if (!el) return;
+		const update = () => setFullHeight(el.scrollHeight);
+		update();
+		const ro = new ResizeObserver(update);
+		ro.observe(el);
+		return () => ro.disconnect();
+	}, []);
+
+	// Small overflow isn't worth a toggle: just show everything.
+	const canCollapse = fullHeight !== null && fullHeight > collapsedHeight + 48;
+
+	useEffect(() => {
+		if (!canCollapse || fullHeight === null) return;
+		const controls = animate(height, expanded ? fullHeight : collapsedHeight, {
+			duration: reduceMotion ? 0 : 0.4,
+			ease: SNAPPY_EASE,
+		});
+		return () => controls.stop();
+	}, [
+		expanded,
+		fullHeight,
+		canCollapse,
+		collapsedHeight,
+		height,
+		reduceMotion,
+	]);
+
+	const lineCount = code.split("\n").length;
+
+	return (
+		<div>
+			<motion.div
+				className="relative overflow-hidden"
+				style={canCollapse ? { height } : undefined}
+			>
+				<div ref={contentRef}>{children}</div>
+				{canCollapse && (
+					<motion.div
+						aria-hidden
+						style={{ opacity: fadeOpacity }}
+						className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent dark:from-zinc-950"
+					/>
+				)}
+			</motion.div>
+			{canCollapse && (
+				<div className="flex justify-center py-1.5">
+					<button
+						type="button"
+						onClick={() => setExpanded((v) => !v)}
+						aria-expanded={expanded}
+						className="flex items-center gap-1 rounded-md px-2 py-1 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+					>
+						{expanded ? "Show less" : `Show all ${lineCount} lines`}
+						<Icon
+							name="chevron-down"
+							className={cn(
+								"h-3.5 w-3.5 transition-transform duration-300",
+								expanded && "rotate-180",
+							)}
+						/>
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }

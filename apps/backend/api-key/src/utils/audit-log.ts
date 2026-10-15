@@ -79,14 +79,23 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 		} else {
 			level = "error";
 			event = `api_key.${action}_failed`;
-			const errResponse = response as { message?: string } | null | undefined;
+			const errResponse = response as
+				| { message?: string; why?: unknown; fix?: unknown; link?: unknown }
+				| null
+				| undefined;
+			const errObj =
+				errResponse && typeof errResponse === "object" ? errResponse : null;
+			// Keep the API's own why/fix so the dashboard can explain the failure.
 			metadata = {
 				error:
-					errResponse &&
-					typeof errResponse === "object" &&
-					"message" in errResponse
-						? errResponse.message
-						: String(response),
+					errObj && "message" in errObj
+						? errObj.message
+						: response == null
+							? undefined
+							: String(response),
+				...(typeof errObj?.why === "string" ? { why: errObj.why } : {}),
+				...(typeof errObj?.fix === "string" ? { fix: errObj.fix } : {}),
+				...(typeof errObj?.link === "string" ? { link: errObj.link } : {}),
 			};
 		}
 
