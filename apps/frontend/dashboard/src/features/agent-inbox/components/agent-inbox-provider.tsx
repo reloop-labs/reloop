@@ -11,7 +11,7 @@ import {
 	useState,
 } from "react";
 import { toast } from "sonner";
-import { apiFetch } from "#/features/agent-inbox/lib/api-fetch";
+import { apiFetch, responseError } from "#/features/agent-inbox/lib/api-fetch";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import {
@@ -867,8 +867,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to update mailbox name");
+				throw await responseError(res, "Failed to update mailbox name");
 			}
 
 			await mutateMailboxes(
@@ -966,9 +965,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			if (!res.ok) {
 				// Revalidate to roll back optimistic state
 				await Promise.all([mutateMessages(), mutateThreads()]);
-				const body = await res.text();
-				throw new Error(
-					body || `Failed to mark message as ${isRead ? "read" : "unread"}`,
+				throw await responseError(
+					res,
+					`Failed to mark message as ${isRead ? "read" : "unread"}`,
 				);
 			}
 
@@ -984,8 +983,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to delete message");
+				throw await responseError(res, "Failed to delete message");
 			}
 
 			await Promise.all([mutateMessages(), mutateThreads()]);
@@ -1002,8 +1000,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to update spam status");
+				throw await responseError(res, "Failed to update spam status");
 			}
 
 			await Promise.all([mutateMessages(), mutateThreads()]);
@@ -1020,8 +1017,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to update star status");
+				throw await responseError(res, "Failed to update star status");
 			}
 
 			await Promise.all([
@@ -1113,8 +1109,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				);
 
 				if (!res.ok) {
-					const body = await res.text();
-					throw new Error(body || "Failed to archive thread");
+					throw await responseError(res, "Failed to archive thread");
 				}
 
 				await Promise.all([
@@ -1146,8 +1141,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				});
 
 				if (!res.ok) {
-					const body = await res.text();
-					throw new Error(body || "Failed to unarchive thread");
+					throw await responseError(res, "Failed to unarchive thread");
 				}
 
 				await Promise.all([
@@ -1177,8 +1171,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				});
 
 				if (!res.ok) {
-					const body = await res.text();
-					throw new Error(body || "Failed to trash thread");
+					throw await responseError(res, "Failed to trash thread");
 				}
 
 				await Promise.all([
@@ -1211,8 +1204,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				);
 
 				if (!res.ok) {
-					const body = await res.text();
-					throw new Error(body || "Failed to restore thread");
+					throw await responseError(res, "Failed to restore thread");
 				}
 
 				await Promise.all([
@@ -1242,8 +1234,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to update important status");
+				throw await responseError(res, "Failed to update important status");
 			}
 
 			await Promise.all([mutateMessages(), mutateThreads()]);
@@ -1260,8 +1251,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to update pinned status");
+				throw await responseError(res, "Failed to update pinned status");
 			}
 
 			await Promise.all([mutateMessages(), mutateThreads()]);
@@ -1287,8 +1277,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				});
 
 				if (!res.ok) {
-					const body = await res.text();
-					throw new Error(body || "Failed to batch update threads");
+					throw await responseError(res, "Failed to batch update threads");
 				}
 
 				await Promise.all([
@@ -1339,8 +1328,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to send reply");
+				throw await responseError(res, "Failed to send reply");
 			}
 
 			await Promise.all([
@@ -1382,8 +1370,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to send reply all");
+				throw await responseError(res, "Failed to send reply all");
 			}
 
 			await Promise.all([
@@ -1418,8 +1405,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to forward message");
+				throw await responseError(res, "Failed to forward message");
 			}
 
 			await Promise.all([mutateMessages(), mutateSentMessages()]);
@@ -1451,8 +1437,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			});
 
 			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to send message");
+				throw await responseError(res, "Failed to send message");
 			}
 
 			const data = (await res.json()) as {

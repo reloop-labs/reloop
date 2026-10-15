@@ -182,7 +182,7 @@ export async function sendEmailController({
 		{ redisGet: (key: string) => redis.get(key) },
 		{ organizationId },
 	);
-	await assertNotDuplicateBurst(redis, {
+	const duplicateGuard = await assertNotDuplicateBurst(redis, {
 		organizationId,
 		from: rawBody.from,
 		to: rawBody.to,
@@ -191,220 +191,240 @@ export async function sendEmailController({
 		subject: rawBody.subject,
 		html: rawBody.html,
 		text: rawBody.text,
-	});
-
-	// ── Plan size gate ──────────────────────────────────────────────────
-	// Fail fast on per-plan attachment limits (free 1 MB, paid 5 MB) before
-	// credits are reserved, logs created, or KumoMTA is hit. Without this,
-	// oversized sends die deep in the pipeline as KumoMTA 413s surfaced as
-	// generic 500s.
-	const { maxAttachmentBytes, planId } =
-		await getOrgAttachmentLimit(organizationId);
-	assertAttachmentsWithinPlan(rawBody.attachments, maxAttachmentBytes, planId);
-
-	// Fail closed before DNS/log/Kumo work when the monthly meter is empty.
-	await assertHasCredits({ organizationId, body: rawBody });
-
-	// ── Outbound content security ─────────────────────────────────────────
-	// Runs before any log or KumoMTA work so phishing/spam payloads are
-	// rejected at the API boundary and never touch the mail queue.
-	const { sanitizedHeaders } = runOutboundGuard({
-		from: rawBody.from,
-		to: rawBody.to,
-		cc: rawBody.cc,
-		bcc: rawBody.bcc,
-		subject: rawBody.subject,
-		html: rawBody.html,
-		text: rawBody.text,
-		headers: rawBody.headers,
-		replyTo: rawBody.reply_to,
+		template: rawBody.template,
 		attachments: rawBody.attachments,
-	});
-	// Swap in the sanitized headers (CRLF-clean, reserved names stripped)
-	let body: MailModel.SendEmailBody = { ...rawBody, headers: sanitizedHeaders };
-	log.info({
-		message: "Outbound guard passed",
-		from: body.from,
-		subject: body.subject,
+		threadId: rawBody.thread_id,
+		scheduledAt: rawBody.scheduled_at,
+		idempotencyKey,
 	});
 
-	const { domainName } = parseFromAddress_step1(body.from);
-
-	const { currentDomain } = await verifyDomainAuth_step2({
-		organizationId,
-		domainName,
-	});
-
-	// ── GAP 8: Global suppression list check ──────────────────────────────
-	// Runs after auth (org confirmed) but before log creation so suppressed
-	// sends are never logged or billed.
-	// Platform-global: an email suppressed in ANY org is blocked here too,
-	// protecting shared IP reputation across all tenants.
-	const { body: cleanBody, suppressed } = await checkSuppressions_step2b({
-		body,
-	});
-	if (suppressed.length > 0) {
-		log.warn({
-			message: `Removed ${suppressed.length} suppressed recipient(s) before send`,
-			suppressed: suppressed.map((s) => s.email),
-			organizationId,
-		});
-	}
-	body = cleanBody;
-
-	const abuse = scoreOutboundAbuse({
-		from: body.from,
-		to: body.to,
-		cc: body.cc,
-		bcc: body.bcc,
-		subject: body.subject,
-		text: body.text,
-		html: body.html,
-	});
-	if (abuse.severity !== "none") {
-		try {
-			await bus.publish(BusEvent.ABUSE_SUSPECTED, {
-				organizationId,
-				fromEmail: body.from,
-				subject: body.subject,
-				recipientCount: countEmailRecipients(body),
-				severity: abuse.severity,
-				reasons: abuse.reasons,
-				action: abuse.severity === "high" ? "blocked" : "allowed",
-				timestamp: new Date().toISOString(),
-			});
-		} catch (error) {
-			log.warn({
-				message: "Failed to publish abuse.suspected event",
-				organizationId,
-				error: error instanceof Error ? error.message : String(error),
-			});
-		}
-	}
-	if (abuse.severity === "high") {
-		throw MailErrors.abuseBlocked(abuse.reasons);
-	}
-
-	const dnsHealthCheck = await checkDnsHealth_step3({
-		domainId: currentDomain.id,
-		organizationId,
-	});
-
-	if (!dnsHealthCheck.ok) {
-		if (dnsHealthCheck.code === "not_found") {
-			throw MailErrors.domainNotFound(domainName);
-		}
-		if (dnsHealthCheck.code === "suspended") {
-			throw MailErrors.domainSuspended(domainName);
-		}
-		if (dnsHealthCheck.code === "sending_disabled") {
-			throw MailErrors.sendingDisabled(domainName);
-		}
-		if (dnsHealthCheck.code === "lookup_failed") {
-			throw MailErrors.dnsLookupFailed(domainName);
-		}
-		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.reason);
-	}
-
-	// The live check just confirmed the records. The row loaded in step 2
-	// may still say unverified if DNS was fixed after the last stored check.
-	currentDomain.systemVerified = true;
-	currentDomain.status = "active";
-	currentDomain.isTrackingDomain = Boolean(
-		currentDomain.isClickTrackingEnabled || currentDomain.isOpenTrackingEnabled,
-	);
-
-	// ── Domain-age initial daily cap (all packages) ───────────────────────
-	// Prefers registrar age captured at domain creation (stored); falls back
-	// to live RDAP, then Reloop added date.
-	// 0–1d:20, 2–3d:50, 4–7d:100, 8–14d:250, 15–30d:500, 30+d:dynamic
-	const recipientCount = countEmailRecipients(body);
-	const ageCheck = await checkDomainAgeDailyCap({
-		domain: {
-			id: currentDomain.id,
-			domain: currentDomain.domain,
-			createdAt: currentDomain.createdAt,
-			registeredAt: currentDomain.registeredAt,
-			dailyCapOverride:
-				"dailyCapOverride" in currentDomain
-					? ((currentDomain as { dailyCapOverride?: number | null })
-							.dailyCapOverride ?? null)
-					: null,
-		},
-		recipientCount,
-	});
-	if (!ageCheck.allowed && ageCheck.cap !== null) {
-		throw MailErrors.domainAgeDailyCapExceeded({
-			domainName,
-			ageDays: ageCheck.ageDays,
-			cap: ageCheck.cap,
-			sentToday: ageCheck.sentToday,
-			required: recipientCount,
-		});
-	}
-
-	// Reserve monthly + daily quota under a row lock so concurrent API/SMTP
-	// senders cannot all pass a stale remaining-balance check.
-	const reservation = await reserveCreditsForSend({
-		organizationId,
-		body,
-	});
-
+	// If anything below fails before KumoMTA accepts the message, forget the
+	// fingerprint so the user's retry isn't rejected as a "duplicate".
 	let injected = false;
 	try {
-		return await sendReservedEmail({
-			organizationId,
-			body,
-			currentDomain,
-			apiKey,
-			apiKeyId,
-			userId,
-			cookie,
-			requestApiKey,
-			useInternalInject,
+		// ── Plan size gate ──────────────────────────────────────────────────
+		// Fail fast on per-plan attachment limits (free 1 MB, paid 5 MB) before
+		// credits are reserved, logs created, or KumoMTA is hit. Without this,
+		// oversized sends die deep in the pipeline as KumoMTA 413s surfaced as
+		// generic 500s.
+		const { maxAttachmentBytes, planId } =
+			await getOrgAttachmentLimit(organizationId);
+		assertAttachmentsWithinPlan(
+			rawBody.attachments,
 			maxAttachmentBytes,
 			planId,
-			idempotencyKey,
-			onInjected: () => {
-				injected = true;
-			},
+		);
+
+		// Fail closed before DNS/log/Kumo work when the monthly meter is empty.
+		await assertHasCredits({ organizationId, body: rawBody });
+
+		// ── Outbound content security ─────────────────────────────────────────
+		// Runs before any log or KumoMTA work so phishing/spam payloads are
+		// rejected at the API boundary and never touch the mail queue.
+		const { sanitizedHeaders } = runOutboundGuard({
+			from: rawBody.from,
+			to: rawBody.to,
+			cc: rawBody.cc,
+			bcc: rawBody.bcc,
+			subject: rawBody.subject,
+			html: rawBody.html,
+			text: rawBody.text,
+			headers: rawBody.headers,
+			replyTo: rawBody.reply_to,
+			attachments: rawBody.attachments,
 		});
-	} catch (error) {
-		// Lost the concurrent same-key race: the winner already sent.
-		// Reservation is refunded below (nothing injected), then return
-		// the winner's response instead of surfacing an error.
-		let refunded = false;
-		if (error instanceof IdempotentReplayError) {
-			if (!injected) {
-				await refundCreditsForFailedSend(reservation);
-				refunded = true;
-			}
-			const replay =
-				idempotencyKey &&
-				(await findIdempotentSend({
-					organizationId,
-					idempotencyKey,
-				}));
-			if (replay) {
-				log.info({
-					message: "Idempotent race lost — returning winner send",
-					organizationId,
-					emailLogId: replay.id,
-				});
-				return replay;
-			}
-		}
-		if (!injected) {
-			// Already refunded in the replay branch when the winner wasn't found
-			if (!refunded) await refundCreditsForFailedSend(reservation);
-		} else {
-			log.error({
-				message:
-					"Kumo accepted the message but post-inject work failed; credits kept",
+		// Swap in the sanitized headers (CRLF-clean, reserved names stripped)
+		let body: MailModel.SendEmailBody = {
+			...rawBody,
+			headers: sanitizedHeaders,
+		};
+		log.info({
+			message: "Outbound guard passed",
+			from: body.from,
+			subject: body.subject,
+		});
+
+		const { domainName } = parseFromAddress_step1(body.from);
+
+		const { currentDomain } = await verifyDomainAuth_step2({
+			organizationId,
+			domainName,
+		});
+
+		// ── GAP 8: Global suppression list check ──────────────────────────────
+		// Runs after auth (org confirmed) but before log creation so suppressed
+		// sends are never logged or billed.
+		// Platform-global: an email suppressed in ANY org is blocked here too,
+		// protecting shared IP reputation across all tenants.
+		const { body: cleanBody, suppressed } = await checkSuppressions_step2b({
+			body,
+		});
+		if (suppressed.length > 0) {
+			log.warn({
+				message: `Removed ${suppressed.length} suppressed recipient(s) before send`,
+				suppressed: suppressed.map((s) => s.email),
 				organizationId,
-				error: error instanceof Error ? error.message : String(error),
 			});
 		}
+		body = cleanBody;
+
+		const abuse = scoreOutboundAbuse({
+			from: body.from,
+			to: body.to,
+			cc: body.cc,
+			bcc: body.bcc,
+			subject: body.subject,
+			text: body.text,
+			html: body.html,
+		});
+		if (abuse.severity !== "none") {
+			try {
+				await bus.publish(BusEvent.ABUSE_SUSPECTED, {
+					organizationId,
+					fromEmail: body.from,
+					subject: body.subject,
+					recipientCount: countEmailRecipients(body),
+					severity: abuse.severity,
+					reasons: abuse.reasons,
+					action: abuse.severity === "high" ? "blocked" : "allowed",
+					timestamp: new Date().toISOString(),
+				});
+			} catch (error) {
+				log.warn({
+					message: "Failed to publish abuse.suspected event",
+					organizationId,
+					error: error instanceof Error ? error.message : String(error),
+				});
+			}
+		}
+		if (abuse.severity === "high") {
+			throw MailErrors.abuseBlocked(abuse.reasons);
+		}
+
+		const dnsHealthCheck = await checkDnsHealth_step3({
+			domainId: currentDomain.id,
+			organizationId,
+		});
+
+		if (!dnsHealthCheck.ok) {
+			if (dnsHealthCheck.code === "not_found") {
+				throw MailErrors.domainNotFound(domainName);
+			}
+			if (dnsHealthCheck.code === "suspended") {
+				throw MailErrors.domainSuspended(domainName);
+			}
+			if (dnsHealthCheck.code === "sending_disabled") {
+				throw MailErrors.sendingDisabled(domainName);
+			}
+			if (dnsHealthCheck.code === "lookup_failed") {
+				throw MailErrors.dnsLookupFailed(domainName);
+			}
+			throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.reason);
+		}
+
+		// The live check just confirmed the records. The row loaded in step 2
+		// may still say unverified if DNS was fixed after the last stored check.
+		currentDomain.systemVerified = true;
+		currentDomain.status = "active";
+		currentDomain.isTrackingDomain = Boolean(
+			currentDomain.isClickTrackingEnabled ||
+				currentDomain.isOpenTrackingEnabled,
+		);
+
+		// ── Domain-age initial daily cap (all packages) ───────────────────────
+		// Prefers registrar age captured at domain creation (stored); falls back
+		// to live RDAP, then Reloop added date.
+		// 0–1d:20, 2–3d:50, 4–7d:100, 8–14d:250, 15–30d:500, 30+d:dynamic
+		const recipientCount = countEmailRecipients(body);
+		const ageCheck = await checkDomainAgeDailyCap({
+			domain: {
+				id: currentDomain.id,
+				domain: currentDomain.domain,
+				createdAt: currentDomain.createdAt,
+				registeredAt: currentDomain.registeredAt,
+				dailyCapOverride:
+					"dailyCapOverride" in currentDomain
+						? ((currentDomain as { dailyCapOverride?: number | null })
+								.dailyCapOverride ?? null)
+						: null,
+			},
+			recipientCount,
+		});
+		if (!ageCheck.allowed && ageCheck.cap !== null) {
+			throw MailErrors.domainAgeDailyCapExceeded({
+				domainName,
+				ageDays: ageCheck.ageDays,
+				cap: ageCheck.cap,
+				sentToday: ageCheck.sentToday,
+				required: recipientCount,
+			});
+		}
+
+		// Reserve monthly + daily quota under a row lock so concurrent API/SMTP
+		// senders cannot all pass a stale remaining-balance check.
+		const reservation = await reserveCreditsForSend({
+			organizationId,
+			body,
+		});
+
+		try {
+			return await sendReservedEmail({
+				organizationId,
+				body,
+				currentDomain,
+				apiKey,
+				apiKeyId,
+				userId,
+				cookie,
+				requestApiKey,
+				useInternalInject,
+				maxAttachmentBytes,
+				planId,
+				idempotencyKey,
+				onInjected: () => {
+					injected = true;
+				},
+			});
+		} catch (error) {
+			// Lost the concurrent same-key race: the winner already sent.
+			// Reservation is refunded below (nothing injected), then return
+			// the winner's response instead of surfacing an error.
+			let refunded = false;
+			if (error instanceof IdempotentReplayError) {
+				if (!injected) {
+					await refundCreditsForFailedSend(reservation);
+					refunded = true;
+				}
+				const replay =
+					idempotencyKey &&
+					(await findIdempotentSend({
+						organizationId,
+						idempotencyKey,
+					}));
+				if (replay) {
+					log.info({
+						message: "Idempotent race lost — returning winner send",
+						organizationId,
+						emailLogId: replay.id,
+					});
+					return replay;
+				}
+			}
+			if (!injected) {
+				// Already refunded in the replay branch when the winner wasn't found
+				if (!refunded) await refundCreditsForFailedSend(reservation);
+			} else {
+				log.error({
+					message:
+						"Kumo accepted the message but post-inject work failed; credits kept",
+					organizationId,
+					error: error instanceof Error ? error.message : String(error),
+				});
+			}
+			throw error;
+		}
+	} catch (error) {
+		if (!injected) await duplicateGuard.release();
 		throw error;
 	}
 }

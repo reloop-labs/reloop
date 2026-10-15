@@ -13,7 +13,9 @@ function memoryRedis() {
 			counts.set(key, next);
 			return next;
 		},
-		async expire(_key: string, _seconds: number) {
+		async expire(key: string, seconds: number) {
+			// Mirrors Redis: a non-positive TTL deletes the key.
+			if (seconds <= 0) counts.delete(key);
 			return 1;
 		},
 	};
@@ -92,5 +94,58 @@ describe("assertNotDuplicateBurst", () => {
 
 	test("skips empty-To sends without throwing", async () => {
 		await assertNotDuplicateBurst(redis, { ...base, to: [] as string[] });
+	});
+});
+
+describe("duplicate guard false positives", () => {
+	test("template sends with different variables are not identical", () => {
+		const a = buildDuplicateFingerprint({
+			...base,
+			html: undefined,
+			text: undefined,
+			template: { id: "tpl_1", variables: { name: "Ana" } },
+		});
+		const b = buildDuplicateFingerprint({
+			...base,
+			html: undefined,
+			text: undefined,
+			template: { id: "tpl_1", variables: { name: "Ben" } },
+		});
+		expect(a).not.toBe(b);
+	});
+
+	test("different attachments are not identical", () => {
+		const a = buildDuplicateFingerprint({
+			...base,
+			attachments: [{ filename: "a.pdf", path: "u/a.pdf" }],
+		});
+		const b = buildDuplicateFingerprint({
+			...base,
+			attachments: [{ filename: "b.pdf", path: "u/b.pdf" }],
+		});
+		expect(a).not.toBe(b);
+	});
+
+	test("a unique Idempotency-Key skips the identical-content check", async () => {
+		const redis = memoryRedis();
+		await assertNotDuplicateBurst(redis, { ...base, idempotencyKey: "k1" });
+		await expect(
+			assertNotDuplicateBurst(redis, { ...base, idempotencyKey: "k2" }),
+		).resolves.toBeDefined();
+	});
+
+	test("releasing after a failed send lets the retry through", async () => {
+		const redis = memoryRedis();
+		const first = await assertNotDuplicateBurst(redis, base);
+		await first.release();
+		await expect(assertNotDuplicateBurst(redis, base)).resolves.toBeDefined();
+	});
+
+	test("without release, an identical resend is still blocked", async () => {
+		const redis = memoryRedis();
+		await assertNotDuplicateBurst(redis, base);
+		await expect(assertNotDuplicateBurst(redis, base)).rejects.toMatchObject({
+			status: 429,
+		});
 	});
 });

@@ -132,21 +132,27 @@ export async function proxySendToMailService(
 	if (!response.ok) {
 		const errorBody = await response.text();
 		log.error(`[INBOX] Mail service error: ${response.status} ${errorBody}`);
-		let why = `Mail service returned ${response.status}`;
+		let message = `Mail service returned ${response.status}`;
+		let why = message;
+		let fix = "Try again in a moment. If it keeps failing, contact support.";
 		try {
 			const parsed = JSON.parse(errorBody) as {
 				message?: string;
 				why?: string;
+				fix?: string;
 			};
+			message = parsed.message || parsed.why || message;
 			why = parsed.why || parsed.message || why;
+			fix = parsed.fix || fix;
 		} catch {
-			if (errorBody) why = errorBody.slice(0, 500);
+			if (errorBody) why = message = errorBody.slice(0, 500);
 		}
+		// Pass the mail service's own explanation through unchanged.
 		throw createError({
 			status: response.status as 500,
-			message: why,
+			message,
 			why,
-			fix: "Check mail service logs for details",
+			fix,
 		});
 	}
 
