@@ -43,6 +43,7 @@
 		"@reloop/webhook-delivery": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
 		"nodemailer": "catalog:backend",
+		"html-to-text": "catalog:backend",
 		"@types/nodemailer": "catalog:backend",
 		"@reloop/code-samples": "workspace:*"
 	},
@@ -51,6 +52,7 @@
 		"tsdown": "catalog:backend",
 		"typescript": "catalog:",
 		"@types/bun": "catalog:backend",
+		"@types/html-to-text": "catalog:backend",
 		"drizzle-kit": "catalog:db",
 		"@types/pg": "catalog:db",
 		"@better-auth/cli": "catalog:backend"

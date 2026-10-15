@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -449,6 +450,7 @@
         "drizzle-typebox": "catalog:db",
         "elysia": "catalog:backend",
         "evlog": "catalog:backend",
+        "html-to-text": "catalog:backend",
         "nodemailer": "catalog:backend",
         "pg": "catalog:db",
         "redis": "catalog:db",
@@ -458,6 +460,7 @@
         "@better-auth/cli": "catalog:backend",
         "@reloop/tsconfig": "workspace:*",
         "@types/bun": "catalog:backend",
+        "@types/html-to-text": "catalog:backend",
         "@types/pg": "catalog:db",
         "drizzle-kit": "catalog:db",
         "tsdown": "catalog:backend",
@@ -1267,6 +1270,7 @@
       "@opentelemetry/semantic-conventions": "1.36.0",
       "@paralleldrive/cuid2": "2.2.2",
       "@types/bun": "1.2.6",
+      "@types/html-to-text": "9.0.4",
       "@types/mailparser": "^3.4.6",
       "@types/nodemailer": "6.4.14",
       "@types/ua-parser-js": "0.7.39",
@@ -1278,6 +1282,7 @@
       "dotenv": "16.4.7",
       "elysia": "1.4.15",
       "evlog": "2.10.0",
+      "html-to-text": "9.0.5",
       "lib0": "^0.2.117",
       "mailparser": "^3.9.8",
       "nodemailer": "6.9.7",
@@ -2739,6 +2744,8 @@
     "@types/estree-jsx": ["@types/estree-jsx@1.0.5", "", { "dependencies": { "@types/estree": "*" } }, "sha512-52CcUVNFyfb1A2ALocQw/Dd1BQFNmSdkuC3BkZ6iqhdMfQz7JWOFRuJFloOzjk+6WijU56m9oKXFAXc7o3Towg=="],
 
     "@types/hast": ["@types/hast@3.0.4", "", { "dependencies": { "@types/unist": "*" } }, "sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ=="],
+
+    "@types/html-to-text": ["@types/html-to-text@9.0.4", "", {}, "sha512-pUY3cKH/Nm2yYrEmDlPR1mR7yszjGx4DrwPjQ702C4/D5CwHuZTgZdIdwPkRbcuhs7BAh2L5rg3CL5cbRiGTCQ=="],
 
     "@types/js-yaml": ["@types/js-yaml@4.0.9", "", {}, "sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg=="],
 

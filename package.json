@@ -151,6 +151,8 @@
 			},
 			"backend": {
 				"dotenv": "16.4.7",
+				"html-to-text": "9.0.5",
+				"@types/html-to-text": "9.0.4",
 				"tsdown": "0.12.9",
 				"@elysiajs/static": "1.4.7",
 				"elysia": "1.4.15",

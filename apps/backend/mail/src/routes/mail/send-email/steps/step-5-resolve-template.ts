@@ -1,4 +1,5 @@
 import { MailErrors } from "@reloop/be-mail/lib/errors";
+import { htmlToText } from "@reloop/be-mail/lib/html-to-text";
 import { db } from "@reloop/db/client";
 
 export async function resolveTemplate_step5({
@@ -76,6 +77,14 @@ export async function resolveTemplate_step5({
 
 	if (!finalHtml && !finalText) {
 		throw MailErrors.missingEmailBody();
+	}
+
+	// HTML-only send: derive the text/plain part so the message goes out as
+	// multipart/alternative. Done after template substitution so the text
+	// matches the rendered HTML, and before tracking injection so it carries
+	// the real link targets rather than redirect URLs.
+	if (finalHtml && !finalText?.trim()) {
+		finalText = htmlToText(finalHtml) || undefined;
 	}
 
 	return { finalSubject, finalHtml, finalText };
