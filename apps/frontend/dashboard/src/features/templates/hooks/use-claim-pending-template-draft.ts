@@ -9,6 +9,7 @@ import {
 	readPendingTemplateDraft,
 	restorePendingTemplateDraft,
 } from "#/features/templates/lib/pending-template-draft";
+import { templateHref } from "#/features/templates/lib/template-href";
 import { queryKeys } from "#/lib/query-keys";
 import type { Template } from "./use-templates-query";
 
@@ -122,7 +123,7 @@ export function useClaimPendingTemplateDraft(enabled: boolean) {
 					queryKey: queryKeys.templates.all,
 				});
 				toast.success("Your template is saved to Templates.", { id: toastId });
-				router.push(`/templates/${template.id}`);
+				router.push(templateHref(template));
 			} catch (error) {
 				console.error("Failed to save template from the editor:", error);
 				// Put it back so the next dashboard load can retry.

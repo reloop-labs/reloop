@@ -2,6 +2,7 @@ import type { EmailTemplateExample } from "@reloop/email-templates";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { templateHref } from "#/features/templates/lib/template-href";
 import {
 	createTemplate,
 	type Template,
@@ -65,7 +66,7 @@ export function useCreateTemplateFromExample() {
 			try {
 				const template = await createTemplateFromExample(example);
 				await invalidate();
-				router.push(`/templates/${template.id}`);
+				router.push(templateHref(template));
 			} catch (error) {
 				console.error("Failed to create template from example:", error);
 				toast.error("Failed to use this template. Please try again.");

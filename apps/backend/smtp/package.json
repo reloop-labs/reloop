@@ -6,6 +6,7 @@
 		"test": "bun test test/"
 	},
 	"devDependencies": {
+		"@reloop/db": "workspace:*",
 		"@types/mailparser": "catalog:backend",
 		"mailparser": "catalog:backend"
 	}

@@ -232,6 +232,7 @@ local function apply_reloop_logic(msg, api_key, source)
         toEmails = to_emails,
         subject = subject,
         size = size,
+        generatePlainText = utils.needs_plain_text(data),
         textBody = text_body,
         htmlBody = html_body,
         rawMessage = data
@@ -264,6 +265,16 @@ local function apply_reloop_logic(msg, api_key, source)
       if body and body.id then
         msg:set_meta('X-Email-Log-ID', body.id)
         print("[LOG-INCOMING] [" .. msg_id .. "] stored log ID: " .. body.id)
+
+        -- HTML-only submission: add the text/plain part the backend
+        -- converted, before tracking rewrites the links.
+        if body.plainText and body.plainText ~= "" then
+          local with_text = utils.add_plain_text(msg:get_data(), body.plainText, "reloop-alt-" .. msg_id)
+          if with_text ~= msg:get_data() then
+            msg:set_data(with_text)
+            print("[PLAIN-TEXT] [" .. msg_id .. "] added text/plain alternative")
+          end
+        end
 
         -- Apply tracking injection
         local new_data = utils.inject_tracking(

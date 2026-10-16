@@ -3,6 +3,7 @@ import { extractRecipientDomain, findUndeliverableRecipient } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { ensureSendingDomainVerified } from "@reloop/db/ensure-sending-domain-verified";
+import { htmlToText } from "@reloop/db/html-to-text";
 import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import {
 	type CreditReservation,
@@ -32,6 +33,8 @@ export type LogIncomingParams = {
 	htmlBody?: string;
 	rawMessage?: string;
 	size: number;
+	/** Set by the SMTP policy when the message has HTML but no text/plain part. */
+	generatePlainText?: boolean;
 };
 
 export async function logIncomingController({
@@ -50,6 +53,7 @@ export async function logIncomingController({
 	clickTracking: boolean;
 	openTracking: boolean;
 	tls: "opportunistic" | "enforced";
+	plainText?: string;
 }> {
 	const log = useLogger();
 	let textBody = body.textBody || "";
@@ -74,6 +78,14 @@ export async function logIncomingController({
 			);
 		}
 	}
+
+	// HTML-only SMTP submission: hand back the text/plain part for the policy
+	// to add, from the same converter API sends use. Converted before
+	// tracking injection, so links keep their real targets.
+	const plainText =
+		body.generatePlainText && htmlBody
+			? htmlToText(htmlBody) || undefined
+			: undefined;
 
 	const domainQuery = and(
 		eq(domain.domain, body.domainName),
@@ -175,6 +187,7 @@ export async function logIncomingController({
 				clickTracking: domainRecord.isClickTrackingEnabled,
 				openTracking: domainRecord.isOpenTrackingEnabled,
 				tls: domainRecord.tls ?? "opportunistic",
+				plainText,
 			};
 		}
 	}
@@ -370,5 +383,6 @@ export async function logIncomingController({
 		clickTracking: domainRecord.isClickTrackingEnabled,
 		openTracking: domainRecord.isOpenTrackingEnabled,
 		tls: domainRecord.tls ?? "opportunistic",
+		plainText,
 	};
 }

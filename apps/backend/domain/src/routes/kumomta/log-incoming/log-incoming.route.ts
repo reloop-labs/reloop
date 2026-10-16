@@ -29,6 +29,7 @@ export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 				clickTracking: t.Boolean(),
 				openTracking: t.Boolean(),
 				tls: t.Union([t.Literal("opportunistic"), t.Literal("enforced")]),
+				plainText: t.Optional(t.String()),
 			}),
 			400: ErrorResponseSchema,
 			401: ErrorResponseSchema,
@@ -50,6 +51,7 @@ export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 			htmlBody: t.Optional(t.String()),
 			rawMessage: t.Optional(t.String()),
 			size: t.Number(),
+			generatePlainText: t.Optional(t.Boolean()),
 		}),
 		detail: {
 			summary: "Log Incoming Email",

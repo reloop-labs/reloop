@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { pageMetadata } from "#/app/_lib/page-metadata";
-import { TemplateEditorPage } from "./client";
+import { TemplateRoute } from "./client";
 
 export const metadata = pageMetadata(
 	"Template Editor · Reloop",
@@ -15,7 +15,7 @@ export default async function TemplateEditorRoute({
 	const { templateId } = await params;
 	return (
 		<Suspense fallback={null}>
-			<TemplateEditorPage templateId={templateId} />
+			<TemplateRoute param={decodeURIComponent(templateId)} />
 		</Suspense>
 	);
 }

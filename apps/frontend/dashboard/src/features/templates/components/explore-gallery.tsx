@@ -6,6 +6,7 @@ import {
 } from "@reloop/email-templates";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
@@ -321,6 +322,77 @@ function FolderCard({
 const gridClassName =
 	"grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-10";
 
+/** A folder's templates, over the folder grid so the page keeps its place. */
+function FolderModal({
+	folder,
+	onClose,
+	renderCard,
+}: {
+	folder: Folder | undefined;
+	onClose: () => void;
+	renderCard: (template: EmailTemplateExample) => React.ReactNode;
+}) {
+	// Keep the last folder while the close animation plays.
+	const [shown, setShown] = useState(folder);
+	useEffect(() => {
+		if (folder) setShown(folder);
+	}, [folder]);
+
+	return (
+		<Modal.Root open={!!folder} onOpenChange={(open) => !open && onClose()}>
+			{/* Two layers: a soft outer shell holds the title, and an inset white
+			    panel holds the templates and scrolls on its own. */}
+			<Modal.Content
+				showClose={false}
+				className="flex max-h-[calc(100dvh-2rem)] max-w-[1080px] flex-col overflow-hidden rounded-[24px] bg-bg-weak-50 p-1.5 ring-1 ring-stroke-soft-100 dark:bg-[#111113] dark:ring-white/10"
+			>
+				{shown ? (
+					<>
+						<div className="flex shrink-0 items-start justify-between gap-4 px-4 pt-3 pb-3.5">
+							<div className="min-w-0">
+								<Modal.Title className="font-semibold text-label-md text-text-strong-950">
+									{shown.name}
+								</Modal.Title>
+								<Modal.Description className="mt-0.5 text-paragraph-sm text-text-sub-600">
+									{shown.description} ·{" "}
+									{pluralTemplates(shown.templates.length)}
+								</Modal.Description>
+							</div>
+							<Modal.Close asChild>
+								<button
+									type="button"
+									className="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-black/[0.05] hover:text-text-strong-950 dark:hover:bg-white/[0.08]"
+									aria-label="Close"
+								>
+									{/* Inline so it can be heavier than the sprite's fixed 1.5 stroke */}
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										className="size-4"
+										aria-hidden
+									>
+										<path
+											d="M6 18L18 6M6 6l12 12"
+											stroke="currentColor"
+											strokeWidth="2.25"
+											strokeLinecap="round"
+										/>
+									</svg>
+								</button>
+							</Modal.Close>
+						</div>
+						<div className="min-h-0 flex-1 overflow-y-auto rounded-[18px] bg-bg-white-0 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-stroke-soft-100 sm:p-5 dark:bg-black dark:ring-white/10">
+							<div className={gridClassName}>
+								{shown.templates.map(renderCard)}
+							</div>
+						</div>
+					</>
+				) : null}
+			</Modal.Content>
+		</Modal.Root>
+	);
+}
+
 /** Ready-made templates from the public email editor, filed into folders. */
 export function ExploreGallery() {
 	const [searchQuery, setSearchQuery] = useQueryState(
@@ -332,11 +404,22 @@ export function ExploreGallery() {
 		parseAsString.withOptions({ history: "push" }),
 	);
 	const { pendingId, createFromExample } = useCreateTemplateFromExample();
-	const rootRef = useRef<HTMLDivElement>(null);
+	// Opened by a click here (a history entry was pushed) vs. a shared
+	// `?folder=` link: closing should step back only in the first case.
+	const openedHere = useRef(false);
 
-	const openFolder = (id: string | null) => {
+	const openFolder = (id: string) => {
+		openedHere.current = true;
 		void setFolderId(id);
-		rootRef.current?.scrollIntoView({ block: "nearest" });
+	};
+
+	const closeFolder = () => {
+		if (openedHere.current) {
+			openedHere.current = false;
+			window.history.back();
+		} else {
+			void setFolderId(null, { history: "replace" });
+		}
 	};
 
 	const renderCard = (template: EmailTemplateExample) => (
@@ -386,7 +469,7 @@ export function ExploreGallery() {
 		}
 
 		return (
-			<div ref={rootRef} className="space-y-12">
+			<div className="space-y-12">
 				{results.map((folder) => (
 					<section key={folder.id} aria-labelledby={`explore-${folder.id}`}>
 						<div className="mb-5 flex items-baseline gap-2">
@@ -409,44 +492,8 @@ export function ExploreGallery() {
 		);
 	}
 
-	if (openFolderData) {
-		return (
-			<section
-				ref={rootRef}
-				aria-labelledby={`explore-${openFolderData.id}`}
-				className="scroll-mt-6"
-			>
-				<nav aria-label="Breadcrumb" className="mb-3">
-					<button
-						type="button"
-						onClick={() => openFolder(null)}
-						className="-ml-1 flex cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-sub-300"
-					>
-						<Icon name="chevron-left" className="size-4" />
-						All folders
-					</button>
-				</nav>
-				<div className="mb-6">
-					<h2
-						id={`explore-${openFolderData.id}`}
-						className="font-semibold text-label-lg text-text-strong-950"
-					>
-						{openFolderData.name}
-					</h2>
-					<p className="mt-0.5 text-paragraph-sm text-text-sub-600">
-						{openFolderData.description} ·{" "}
-						{pluralTemplates(openFolderData.templates.length)}
-					</p>
-				</div>
-				<div className={gridClassName}>
-					{openFolderData.templates.map(renderCard)}
-				</div>
-			</section>
-		);
-	}
-
 	return (
-		<div ref={rootRef} className="scroll-mt-6">
+		<>
 			<div className={gridClassName}>
 				{folders.map((folder) => (
 					<FolderCard
@@ -456,6 +503,11 @@ export function ExploreGallery() {
 					/>
 				))}
 			</div>
-		</div>
+			<FolderModal
+				folder={openFolderData}
+				onClose={closeFolder}
+				renderCard={renderCard}
+			/>
+		</>
 	);
 }

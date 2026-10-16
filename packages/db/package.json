@@ -12,6 +12,7 @@
 		"./self-hosted": "./src/self-hosted.ts",
 		"./domain-age-cap": "./src/domain-age-cap.ts",
 		"./smtp-recipients": "./src/smtp-recipients.ts",
+		"./html-to-text": "./src/html-to-text.ts",
 		"./outbound-abuse": "./src/outbound-abuse.ts",
 		"./reputation": "./src/reputation.ts",
 		"./ensure-sending-domain-verified": "./src/ensure-sending-domain-verified.ts",
@@ -41,6 +42,7 @@
 		"@reloop/webhook-events": "workspace:*",
 		"drizzle-orm": "catalog:db",
 		"drizzle-typebox": "catalog:db",
+		"html-to-text": "catalog:backend",
 		"pg": "catalog:db",
 		"redis": "catalog:db",
 		"@paralleldrive/cuid2": "catalog:backend",
@@ -48,6 +50,7 @@
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
+		"@types/html-to-text": "catalog:backend",
 		"@types/node": "catalog:",
 		"@types/pg": "catalog:db",
 		"dotenv-cli": "catalog:db",

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { templateHref } from "#/features/templates/lib/template-href";
 import { queryKeys } from "#/lib/query-keys";
 
 export type Template = {
@@ -103,7 +104,7 @@ export function useCreateTemplate() {
 			try {
 				const template = await createTemplate(input);
 				await invalidate();
-				router.push(`/templates/${template.id}`);
+				router.push(templateHref(template));
 			} catch (error) {
 				console.error("Failed to create template:", error);
 				toast.error("Failed to create template. Please try again.");

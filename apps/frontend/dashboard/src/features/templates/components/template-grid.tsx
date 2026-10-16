@@ -8,6 +8,7 @@ import { type ReactNode, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { Template } from "#/features/templates/hooks/use-templates-query";
+import { templateHref } from "#/features/templates/lib/template-href";
 import { DeleteTemplateModal } from "./delete-template-modal";
 
 interface TemplateGridProps {
@@ -24,17 +25,6 @@ interface TemplateDropdownProps {
 	onDuplicate: (id: string) => Promise<void>;
 	onDelete: (id: string, name: string) => void;
 	onOpenChange?: (open: boolean) => void;
-}
-
-/** Kebab-case slug for the card subtitle (mockup: order-confirmation). */
-function templateSlug(name: string, description: string | null): string {
-	const fromDescription = description?.trim();
-	if (fromDescription) return fromDescription;
-	return name
-		.toLowerCase()
-		.trim()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "");
 }
 
 const TemplateDropdown = ({
@@ -322,8 +312,8 @@ export const TemplateGrid = ({
 		setIsDeleteModalOpen(true);
 	};
 
-	const openEditor = (id: string) => {
-		router.push(`/templates/${id}`);
+	const openEditor = (template: { id: string; slug?: string }) => {
+		router.push(templateHref(template));
 	};
 
 	return (
@@ -335,7 +325,7 @@ export const TemplateGrid = ({
 						))
 					: templates.map((template) => {
 							const isCardActive = activeDropdownId === template.id;
-							const slug = templateSlug(template.name, template.description);
+							const slug = template.slug;
 
 							return (
 								<div
@@ -378,7 +368,7 @@ export const TemplateGrid = ({
 											type="button"
 											className="absolute inset-0 z-0"
 											aria-label={`Edit ${template.name}`}
-											onClick={() => openEditor(template.id)}
+											onClick={() => openEditor(template)}
 										/>
 									</div>
 

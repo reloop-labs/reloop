@@ -22,6 +22,7 @@ import {
 	useTemplateDetailQuery,
 	useTemplatesQuery,
 } from "#/features/templates/hooks/use-templates-query";
+import { templateHref } from "#/features/templates/lib/template-href";
 import { queryKeys } from "#/lib/query-keys";
 import type { SendEmailNodeData } from "../workflow-types";
 
@@ -190,7 +191,7 @@ export const TemplatePicker = ({
 			await queryClient.invalidateQueries({
 				queryKey: queryKeys.templates.all,
 			});
-			router.push(`/templates/${template.id}`);
+			router.push(templateHref(template));
 		} catch {
 			toast.error("Failed to create template");
 			setCreating(false);
@@ -203,7 +204,7 @@ export const TemplatePicker = ({
 				<div className="relative">
 					<Icon
 						name="search"
-						className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-soft-400"
+						className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-text-soft-400"
 					/>
 					<input
 						type="text"

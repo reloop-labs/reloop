@@ -173,6 +173,54 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
   return tostring(root)
 end
 
+--- True when the message has an HTML body but no text/plain alternative.
+--- multipart/related (HTML with inline images) is left alone: the text part
+--- belongs outside the related group, which can't be restructured in place.
+function utils.needs_plain_text(data)
+  if not data:find("text/html", 1, true) then
+    return false
+  end
+  if data:lower():find("multipart/related", 1, true) then
+    return false
+  end
+  local parsed, root = pcall(_kumo.mimepart.parse, data)
+  if not parsed then
+    return false
+  end
+  local structure = root:get_simple_structure()
+  return structure.html_part ~= nil and structure.text_part == nil
+end
+
+--- Turn the HTML part into multipart/alternative { text/plain, text/html }
+--- in place, so every other header and part is untouched. Must run before
+--- inject_tracking and DKIM signing.
+function utils.add_plain_text(data, text, boundary)
+  if not text or text == "" then
+    return data
+  end
+  local parsed, root = pcall(_kumo.mimepart.parse, data)
+  if not parsed then
+    return data
+  end
+  local structure = root:get_simple_structure()
+  local html_part = structure.html_part
+  if not html_part or structure.text_part then
+    return data
+  end
+
+  local ok = pcall(function()
+    local html = html_part.body
+    html_part.headers:remove_all_named('Content-Transfer-Encoding')
+    html_part.headers:set_content_type('multipart/alternative; boundary="' .. boundary .. '"')
+    html_part:append_part(_kumo.mimepart.new_text_plain(text))
+    html_part:append_part(_kumo.mimepart.new_html(html))
+  end)
+  if not ok then
+    return data
+  end
+  return tostring(root)
+end
+
 function utils.normalize_tls_mode(mode)
   return tls.normalize_tls_mode(mode)
 end
