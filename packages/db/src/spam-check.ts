@@ -60,10 +60,18 @@ const DEFAULT_RSPAMD_URL = "http://reloop-spam:11333/checkv2";
 const DEFAULT_TIMEOUT_MS = 1500;
 const MAX_SYMBOLS = 10;
 
-/** Outbound scanning is on unless RSPAMD_OUTBOUND_DISABLED=true. */
+/**
+ * Outbound scanning is on unless RSPAMD_OUTBOUND_DISABLED=true. Reuses the
+ * inbound KUMOMTA_RSPAMD_URL that every install (Coolify, CapRover, compose)
+ * already sets for backends, so no new env is needed to turn it on.
+ */
 export function outboundRspamdUrl(): string | null {
 	if (process.env.RSPAMD_OUTBOUND_DISABLED === "true") return null;
-	return process.env.RSPAMD_URL || DEFAULT_RSPAMD_URL;
+	return (
+		process.env.RSPAMD_URL ||
+		process.env.KUMOMTA_RSPAMD_URL ||
+		DEFAULT_RSPAMD_URL
+	);
 }
 
 function asList(value: string | string[] | undefined): string[] {
