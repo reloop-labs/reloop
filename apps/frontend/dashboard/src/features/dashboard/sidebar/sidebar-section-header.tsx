@@ -24,7 +24,7 @@ export function SidebarSectionHeader({
 			<span
 				aria-hidden={isCollapsed || undefined}
 				className={cn(
-					"block text-text-soft-400 transition-opacity duration-200 ease-in-out",
+					"block text-text-soft-400 transition-opacity duration-150 ease-out",
 					isCollapsed && "opacity-0",
 				)}
 			>
@@ -34,7 +34,7 @@ export function SidebarSectionHeader({
 				<span
 					aria-hidden
 					className={cn(
-						"absolute top-1/2 left-1 h-px w-6 bg-stroke-soft-200 transition-opacity duration-200 ease-in-out",
+						"absolute top-1/2 left-1 h-px w-6 bg-stroke-soft-200 transition-opacity duration-150 ease-out",
 						isCollapsed ? "opacity-100" : "opacity-0",
 					)}
 				/>

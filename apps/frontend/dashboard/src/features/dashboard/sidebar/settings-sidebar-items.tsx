@@ -94,7 +94,7 @@ export function SettingsSidebarItems({
 				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
 				onClick={() => onCloseSettings?.()}
 				className={cn(
-					"relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all duration-200 ease-in-out",
+					"relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all duration-150 ease-out",
 					isCollapsed
 						? "h-8 w-8 justify-start overflow-hidden px-2"
 						: "w-full justify-start gap-2.5 px-2.5",
@@ -109,7 +109,7 @@ export function SettingsSidebarItems({
 					<span
 						aria-hidden={isCollapsed || undefined}
 						className={cn(
-							"whitespace-nowrap font-medium text-[13px] text-text-sub-600 transition-[color,opacity] duration-200 ease-in-out group-hover:text-text-strong-950",
+							"whitespace-nowrap font-medium text-[13px] text-text-sub-600 transition-[color,opacity] duration-150 ease-out group-hover:text-text-strong-950",
 							isCollapsed && "opacity-0",
 						)}
 					>
@@ -150,7 +150,7 @@ export function SettingsSidebarItems({
 									setHoveredEl(itemRefs.current[currentIdx])
 								}
 								className={cn(
-									"relative z-10 flex h-8 items-center rounded-lg transition-all duration-200 ease-in-out",
+									"relative z-10 flex h-8 items-center rounded-lg transition-all duration-150 ease-out",
 									isCollapsed
 										? "h-8 w-8 justify-start overflow-hidden px-2"
 										: "w-full justify-start gap-2.5 px-2.5",
@@ -179,7 +179,7 @@ export function SettingsSidebarItems({
 										<span
 											aria-hidden={isCollapsed || undefined}
 											className={cn(
-												"truncate font-medium text-[13px] transition-[color,opacity] duration-200 ease-in-out",
+												"truncate font-medium text-[13px] transition-[color,opacity] duration-150 ease-out",
 												isCollapsed && "opacity-0",
 												isItemActive
 													? "text-text-strong-950"

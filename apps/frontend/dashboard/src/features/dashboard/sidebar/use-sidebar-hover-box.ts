@@ -3,8 +3,8 @@
 import { useLayoutEffect, useState } from "react";
 import type { HoverBox } from "#/features/onboarding/animated-hover-background";
 
-/** Sidebar width transition is 200ms, so also remeasure after it settles. */
-const COLLAPSE_SETTLE_MS = 220;
+/** Sidebar width transition is 150ms, so also remeasure after it settles. */
+const COLLAPSE_SETTLE_MS = 170;
 
 /**
  * Tracks the hover/active pill box relative to a sidebar container.

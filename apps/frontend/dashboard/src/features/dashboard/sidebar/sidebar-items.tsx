@@ -143,7 +143,7 @@ export function SidebarItems({
 								path === "/settings" ? () => onOpenSettings?.() : undefined
 							}
 							className={cn(
-								"relative z-10 flex h-8 items-center rounded-lg transition-all duration-200 ease-in-out",
+								"relative z-10 flex h-8 items-center rounded-lg transition-all duration-150 ease-out",
 								isCollapsed
 									? "h-8 w-8 justify-start overflow-hidden px-2"
 									: cn(
@@ -176,7 +176,7 @@ export function SidebarItems({
 									<span
 										aria-hidden={isCollapsed || undefined}
 										className={cn(
-											"truncate font-medium text-[13px] transition-[color,opacity] duration-200 ease-in-out",
+											"truncate font-medium text-[13px] transition-[color,opacity] duration-150 ease-out",
 											isCollapsed && "opacity-0",
 											isSpecial
 												? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
