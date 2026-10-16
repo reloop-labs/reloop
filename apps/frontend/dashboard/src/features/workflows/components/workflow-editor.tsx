@@ -34,7 +34,6 @@ import {
 	type WorkflowNode,
 	type WorkflowStatus,
 } from "../workflow-types";
-import { getNodeIssue } from "../workflow-validation";
 import {
 	AutomationSidePanel,
 	SIDE_PANEL_TRANSITION,
@@ -57,6 +56,11 @@ import { WorkflowEditorToolbar } from "./workflow-editor-toolbar";
 const prefersReducedMotion = () =>
 	typeof window !== "undefined" &&
 	window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** Quiet time after the last resize before a reveal pans (editor opening). */
+const REVEAL_SETTLE_MS = 80;
+/** Pan anyway after this long, even if the element keeps resizing. */
+const REVEAL_MAX_WAIT_MS = 700;
 
 const prepareGraph = (nodes: WorkflowNode[], edges: WorkflowEdge[]) => {
 	const clean = stripPlaceholderNodes(nodes, edges);
@@ -136,9 +140,10 @@ const WorkflowEditorInner = ({
 	const canvasRef = useRef<HTMLDivElement>(null);
 
 	/**
-	 * Pans the canvas up or down just enough that `el` (a step being edited or
-	 * the step menu) is fully in view. If it's taller than the canvas, its top
-	 * stays in view.
+	 * Pans the canvas so `el` (a step being added or edited, or the step menu)
+	 * sits in the center, so nobody has to scroll to it. Anything larger than
+	 * the canvas keeps its top/left edge in view instead. Only runs on those
+	 * actions; panning afterwards is left alone.
 	 */
 	const revealElement = useCallback(
 		(el: Element | null | undefined) => {
@@ -147,37 +152,78 @@ const WorkflowEditorInner = ({
 			const PAD = 32;
 			const view = canvas.getBoundingClientRect();
 			const box = el.getBoundingClientRect();
-			let dy = 0;
-			if (box.top < view.top + PAD) {
-				dy = view.top + PAD - box.top;
-			} else if (box.bottom > view.bottom - PAD) {
-				dy = Math.max(view.bottom - PAD - box.bottom, view.top + PAD - box.top);
-			}
-			if (Math.abs(dy) < 1) return;
+			const centerOffset = (
+				viewStart: number,
+				viewSize: number,
+				boxStart: number,
+				boxSize: number,
+			) =>
+				boxSize > viewSize - PAD * 2
+					? viewStart + PAD - boxStart
+					: viewStart + viewSize / 2 - (boxStart + boxSize / 2);
+			const dx = centerOffset(view.left, view.width, box.left, box.width);
+			const dy = centerOffset(view.top, view.height, box.top, box.height);
+			if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
 			const viewport = getViewport();
 			void setViewport(
-				{ ...viewport, y: viewport.y + dy },
+				{ ...viewport, x: viewport.x + dx, y: viewport.y + dy },
 				{ duration: prefersReducedMotion() ? 0 : 240 },
 			);
 		},
 		[getViewport, setViewport],
 	);
 
-	/** Reveals what `find` returns once it has rendered, and again after it grows. */
+	/**
+	 * Centers what `find` returns exactly once per action: waits until it has
+	 * rendered and stopped resizing (an editor opening, the menu growing), then
+	 * pans a single time. A newer reveal or the user panning cancels it.
+	 */
+	const revealCleanupRef = useRef<(() => void) | null>(null);
+	const cancelReveal = useCallback(() => {
+		revealCleanupRef.current?.();
+		revealCleanupRef.current = null;
+	}, []);
 	const scheduleReveal = useCallback(
-		(find: () => Element | null, delays: number[] = [0, 320]) => {
-			for (const delay of delays) {
-				if (delay === 0) {
-					requestAnimationFrame(() =>
-						requestAnimationFrame(() => revealElement(find())),
-					);
-				} else {
-					window.setTimeout(() => revealElement(find()), delay);
-				}
-			}
+		(find: () => Element | null, startDelay = 0) => {
+			cancelReveal();
+			let cancelled = false;
+			let settleTimer: number | undefined;
+			let maxTimer: number | undefined;
+			let observer: ResizeObserver | undefined;
+			const cleanup = () => {
+				cancelled = true;
+				window.clearTimeout(startTimer);
+				window.clearTimeout(settleTimer);
+				window.clearTimeout(maxTimer);
+				observer?.disconnect();
+			};
+			const start = () => {
+				const el = find();
+				if (cancelled || !el) return;
+				const finish = () => {
+					if (cancelled) return;
+					cleanup();
+					revealCleanupRef.current = null;
+					revealElement(el);
+				};
+				// ResizeObserver fires once on observe, then on every size change.
+				observer = new ResizeObserver(() => {
+					window.clearTimeout(settleTimer);
+					settleTimer = window.setTimeout(finish, REVEAL_SETTLE_MS);
+				});
+				observer.observe(el);
+				maxTimer = window.setTimeout(finish, REVEAL_MAX_WAIT_MS);
+			};
+			// Two frames so freshly added nodes are measured and laid out.
+			const startTimer = window.setTimeout(
+				() => requestAnimationFrame(() => requestAnimationFrame(start)),
+				startDelay,
+			);
+			revealCleanupRef.current = cleanup;
 		},
-		[revealElement],
+		[revealElement, cancelReveal],
 	);
+	useEffect(() => cancelReveal, [cancelReveal]);
 	const findNodeEl = useCallback(
 		(nodeId: string) => () =>
 			canvasRef.current?.querySelector(
@@ -421,9 +467,12 @@ const WorkflowEditorInner = ({
 				y: nodeEl ? rect.top - 8 : rect.bottom,
 			});
 			setPicker({ target, anchor });
-			scheduleReveal(
-				() => canvasRef.current?.querySelector("[data-step-picker]") ?? null,
-			);
+			// Only "+" buttons center the canvas; changing a step's type doesn't.
+			if (target.type !== "replace") {
+				scheduleReveal(
+					() => canvasRef.current?.querySelector("[data-step-picker]") ?? null,
+				);
+			}
 		},
 		[
 			isReadOnly,
@@ -453,24 +502,7 @@ const WorkflowEditorInner = ({
 	useEffect(() => setShowIssues(false), [workflow.id]);
 	const flagIssues = useCallback(() => {
 		setShowIssues(true);
-		// Bring the first step that needs setup into view.
-		const first = nodes.find((n) => getNodeIssue(n));
-		if (first) scheduleReveal(findNodeEl(first.id), [0]);
-	}, [nodes, scheduleReveal, findNodeEl]);
-
-	const morphRef = useRef(morph);
-	morphRef.current = morph;
-
-	// A step's editor opens taller than the step: keep it in view. A step that
-	// grows out of the menu is revealed once that animation is done.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: only when the selection changes
-	useEffect(() => {
-		if (!selectedNodeId || isReadOnly) return;
-		scheduleReveal(
-			findNodeEl(selectedNodeId),
-			morphRef.current?.nodeId === selectedNodeId ? [560] : [0, 320],
-		);
-	}, [selectedNodeId]);
+	}, []);
 
 	const addStep = useCallback(
 		(target: PickerTarget, kind: StepKind, from?: MorphFrom) => {
@@ -686,6 +718,10 @@ const WorkflowEditorInner = ({
 								zoomOnPinch={false}
 								zoomOnDoubleClick={false}
 								zoomActivationKeyCode={null}
+								// Only programmatic moves have no event: a user pan wins.
+								onMoveStart={(event) => {
+									if (event) cancelReveal();
+								}}
 								panOnScroll
 								panOnDrag
 								minZoom={1}
