@@ -4,7 +4,6 @@ import { db } from "@reloop/db/client";
 import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { ensureSendingDomainVerified } from "@reloop/db/ensure-sending-domain-verified";
 import { htmlToText } from "@reloop/db/html-to-text";
-import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import {
 	type CreditReservation,
 	refundSendCredits,
@@ -15,7 +14,9 @@ import {
 	isSelfHosted,
 	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
 } from "@reloop/db/self-hosted";
+import { findSenderBlock } from "@reloop/db/sender-gate";
 import { uniqueBareEmails } from "@reloop/db/smtp-recipients";
+import { checkOutboundSpam } from "@reloop/db/spam-check";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
 import { createError } from "evlog";
@@ -239,12 +240,24 @@ export async function logIncomingController({
 		});
 	}
 
-	const abuse = scoreOutboundAbuse({
+	// ── Sender gate: admin suspension or reputation pause ───────────────
+	// The mail API checks these itself; SMTP submissions only pass here.
+	const senderBlock = await findSenderBlock(finalOrgId);
+	if (senderBlock?.kind === "organization_status") {
+		throw KumoMtaErrors.organizationSuspended(senderBlock.status);
+	}
+	if (senderBlock?.kind === "sending_block") {
+		throw KumoMtaErrors.sendingPaused(senderBlock);
+	}
+
+	const abuse = await checkOutboundSpam({
+		organizationId: finalOrgId,
 		from: body.fromEmail,
 		to: toEmails,
 		subject,
 		text: textBody,
 		html: htmlBody,
+		rawMessage: body.rawMessage,
 	});
 	if (abuse.severity !== "none") {
 		try {

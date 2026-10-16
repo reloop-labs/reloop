@@ -24,6 +24,7 @@
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
+        "@reloop/email-validation": "workspace:*",
         "@reloop/pricing": "workspace:*",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",

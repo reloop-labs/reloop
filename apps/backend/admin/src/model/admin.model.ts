@@ -941,4 +941,122 @@ export namespace AdminModel {
 		items: t.Array(adminUserItem),
 		total: t.Number(),
 	});
+
+	// ── Spam risk ──────────────────────────────────────────────────────────
+	export const riskLevel = t.Union([
+		t.Literal("low"),
+		t.Literal("medium"),
+		t.Literal("high"),
+		t.Literal("critical"),
+	]);
+
+	export const riskSignal = t.Object({
+		id: t.String(),
+		points: t.Number(),
+		detail: t.String(),
+		domain: t.Optional(t.String()),
+	});
+
+	export const spamRiskReport = t.Object({
+		organizationId: t.String(),
+		name: t.String(),
+		slug: t.String(),
+		status: t.String(),
+		isSuspect: t.Boolean(),
+		createdAt: t.Date(),
+		score: t.Number(),
+		level: riskLevel,
+		signals: t.Array(riskSignal),
+		stats: t.Object({
+			sent7d: t.Number(),
+			bounced7d: t.Number(),
+			complaints7d: t.Number(),
+			sent24h: t.Number(),
+			bounceRate: t.Number(),
+			complaintRate: t.Number(),
+			activeSendingBlock: t.Boolean(),
+			pastSendingBlocks: t.Number(),
+		}),
+		domains: t.Array(
+			t.Object({
+				domain: t.String(),
+				status: t.String(),
+				registeredAt: t.Union([t.Date(), t.Null()]),
+				signals: t.Array(
+					t.Object({ id: t.String(), points: t.Number(), detail: t.String() }),
+				),
+			}),
+		),
+	});
+
+	export const spamRiskListResponse = t.Object({
+		items: t.Array(spamRiskReport),
+		total: t.Number(),
+		scanned: t.Number(),
+	});
+
+	const recipients = t.Union([t.String(), t.Array(t.String())]);
+
+	export const spamCheckBody = t.Object({
+		organizationId: t.Optional(t.String()),
+		from: t.String(),
+		to: recipients,
+		cc: t.Optional(recipients),
+		bcc: t.Optional(recipients),
+		subject: t.String(),
+		text: t.Optional(t.String()),
+		html: t.Optional(t.String()),
+	});
+
+	export const spamCheckResponse = t.Object({
+		verdict: t.Union([
+			t.Literal("allow"),
+			t.Literal("flag"),
+			t.Literal("block"),
+		]),
+		severity: t.Union([
+			t.Literal("none"),
+			t.Literal("medium"),
+			t.Literal("high"),
+		]),
+		reasons: t.Array(t.String()),
+		internal: t.Object({
+			severity: t.String(),
+			reasons: t.Array(t.String()),
+			phishingTokenCount: t.Number(),
+		}),
+		rspamd: t.Union([
+			t.Object({
+				score: t.Number(),
+				action: t.String(),
+				symbols: t.Array(t.Object({ name: t.String(), score: t.Number() })),
+			}),
+			t.Null(),
+		]),
+	});
+
+	export const spamBlockBody = t.Object({
+		reason: t.String({ minLength: 1, maxLength: 500 }),
+		banUsers: t.Optional(t.Boolean()),
+	});
+
+	export const spamBlockResponse = t.Object({
+		success: t.Boolean(),
+		status: t.Literal("suspended"),
+		riskScore: t.Number(),
+		riskLevel: riskLevel,
+		bannedUserCount: t.Number(),
+	});
+
+	export const spamUnblockBody = t.Object({
+		reason: t.String({ minLength: 1, maxLength: 500 }),
+		unbanUsers: t.Optional(t.Boolean()),
+	});
+
+	export const spamUnblockResponse = t.Object({
+		success: t.Boolean(),
+		status: t.Literal("active"),
+		releasedSendingBlocks: t.Number(),
+		unbannedUserCount: t.Number(),
+	});
 }

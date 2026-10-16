@@ -211,8 +211,28 @@ export const KumoMtaErrors = {
 		createError({
 			status: 403,
 			message: "Message rejected",
-			why: `This send matches outbound abuse patterns (${reasons.join(", ")}) and was not accepted`,
-			fix: "Remove phishing content and carrier SMS/MMS gateway recipients, then contact support if this is legitimate mail",
+			why: `This send matches outbound spam/abuse patterns (${reasons.join(", ")}) and was not accepted`,
+			fix: "Remove phishing or spam content and carrier SMS/MMS gateway recipients, then contact support if this is legitimate mail",
+		}),
+	organizationSuspended: (status: "suspended" | "deleted") =>
+		createError({
+			status: 403,
+			message: "Organization suspended",
+			why: `This organization is ${status} and cannot send email`,
+			fix: "Contact support to review the suspension",
+		}),
+	sendingPaused: ({
+		reason,
+		retryAfterSeconds,
+	}: {
+		reason: string;
+		retryAfterSeconds: number;
+	}) =>
+		createError({
+			status: 403,
+			message: "Sending temporarily paused",
+			why: `Sending is paused for this organization (${reason}): bounce/complaint rate is above the delivery threshold`,
+			fix: `Wait ${retryAfterSeconds}s for the cooldown to expire, clean your recipient list, then retry. Contact support if you need an early review`,
 		}),
 	domainAgeDailyCapExceeded: ({
 		domainName,

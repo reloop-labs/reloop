@@ -16,8 +16,9 @@ import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
-import { scoreOutboundAbuse } from "@reloop/db/outbound-abuse";
 import { emailLog, emailThread, threadMessage } from "@reloop/db/schema";
+import { findSenderBlock } from "@reloop/db/sender-gate";
+import { checkOutboundSpam } from "@reloop/db/spam-check";
 import { and, eq, sql } from "drizzle-orm";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -172,12 +173,17 @@ export async function sendEmailController({
 		await releaseFailedIdempotencyKey({ organizationId, idempotencyKey });
 	}
 
-	// ── Reputation + duplicate burst guards ─────────────────────────────
-	// Reputation first (org is paused → 403 with cooldown, no quota burned).
+	// ── Suspension, reputation + duplicate burst guards ─────────────────
+	// Suspended org (admin spam block) → 403. Reputation next (org is
+	// paused → 403 with cooldown, no quota burned).
 	// Duplicate second (identical re-send within 10 min, or >3/min to the
 	// same address → 429). Both run before credits/log/KumoMTA so abusive
 	// bursts never consume quota or damage shared IP reputation.
 	const { redis } = await import("@reloop/be-mail/utils/loader");
+	const senderBlock = await findSenderBlock(organizationId);
+	if (senderBlock?.kind === "organization_status") {
+		throw MailErrors.organizationSuspended(senderBlock.status);
+	}
 	await assertReputationAllowed(
 		{ redisGet: (key: string) => redis.get(key) },
 		{ organizationId },
@@ -268,7 +274,8 @@ export async function sendEmailController({
 		}
 		body = cleanBody;
 
-		const abuse = scoreOutboundAbuse({
+		const abuse = await checkOutboundSpam({
+			organizationId,
 			from: body.from,
 			to: body.to,
 			cc: body.cc,

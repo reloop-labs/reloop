@@ -308,8 +308,15 @@ export const MailErrors = {
 		createError({
 			status: 403,
 			message: "Message rejected",
-			why: `This send matches outbound abuse patterns (${reasons.join(", ")}) and was not accepted`,
-			fix: "Remove phishing content and carrier SMS/MMS gateway recipients, then contact support if this is legitimate mail",
+			why: `This send matches outbound spam/abuse patterns (${reasons.join(", ")}) and was not accepted`,
+			fix: "Remove phishing or spam content and carrier SMS/MMS gateway recipients, then contact support if this is legitimate mail",
+		}),
+	organizationSuspended: (status: "suspended" | "deleted") =>
+		createError({
+			status: 403,
+			message: "Organization suspended",
+			why: `This organization is ${status} and cannot send email`,
+			fix: "Contact support to review the suspension",
 		}),
 	domainAgeDailyCapExceeded: ({
 		domainName,
