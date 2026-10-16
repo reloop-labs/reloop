@@ -1,10 +1,13 @@
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { ForwardDNSRecordsButton } from "../../add/setup/components/forward-dns-records";
 import { DeleteDomainModal } from "../../components/delete-domain";
 import { DomainAvatar } from "../../components/domain-avatar";
 import type { Domain } from "../../types";
+import { useClipboard } from "../hooks/use-clipboard";
 import { useDomainActions } from "../hooks/use-domain-actions";
 import { DomainHeaderActions } from "./domain-header-actions";
 
@@ -21,6 +24,8 @@ export function DomainHeader({
 	const domainRecordId = domain?.id || domainId || "";
 	const status = domain?.status || "pending";
 
+	const { copiedItems, copyToClipboard } = useClipboard();
+	const isCopied = copiedItems.has("domain-name");
 	const { handleVerifyDNS, isVerifying } = useDomainActions(
 		domainRecordId,
 		domain as never,
@@ -53,9 +58,30 @@ export function DomainHeader({
 								<p className="font-medium text-paragraph-xs text-text-sub-600">
 									Domain
 								</p>
-								<h1 className="mb-0.5 font-semibold text-title-h6 leading-5">
-									{domainName}
-								</h1>
+								<div className="flex min-w-0 items-center gap-1">
+									<h1 className="mb-0.5 truncate font-semibold text-title-h6 leading-5">
+										{domainName}
+									</h1>
+									{domain?.domain && (
+										<button
+											type="button"
+											onClick={() =>
+												void copyToClipboard(domain.domain, "domain-name")
+											}
+											className="flex size-6 shrink-0 items-center justify-center rounded-md text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+											title="Copy domain"
+											aria-label="Copy domain"
+										>
+											<Icon
+												name={isCopied ? "check" : "copy"}
+												className={cn(
+													"h-3.5 w-3.5",
+													isCopied && "text-success-base",
+												)}
+											/>
+										</button>
+									)}
+								</div>
 							</div>
 						</div>
 					)}

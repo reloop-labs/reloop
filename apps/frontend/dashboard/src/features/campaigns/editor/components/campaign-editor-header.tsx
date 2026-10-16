@@ -4,6 +4,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Tooltip from "@reloop/ui/tooltip";
 import Link from "next/link";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
@@ -29,24 +30,38 @@ function SidebarToggleButton() {
 	} = usePlayAnimationOnHover(500);
 
 	return (
-		<button
-			type="button"
-			onClick={toggle}
-			title="Toggle Sidebar (⌘B)"
-			data-animating={isAnimating || undefined}
-			onPointerEnter={onPointerEnter}
-			onPointerLeave={onPointerLeave}
-			onAnimationStart={onAnimationStart}
-			onAnimationEnd={onAnimationEnd}
-			className={cn(
-				"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
-				"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
-			)}
-		>
-			<AnimatedSidebarToggleIcon
-				className={cn("h-4 w-4", isCollapsed && "rotate-180")}
-			/>
-		</button>
+		<Tooltip.Root delayDuration={300}>
+			<Tooltip.Trigger asChild>
+				<button
+					aria-label="Toggle sidebar"
+					type="button"
+					onClick={toggle}
+					data-animating={isAnimating || undefined}
+					onPointerEnter={onPointerEnter}
+					onPointerLeave={onPointerLeave}
+					onAnimationStart={onAnimationStart}
+					onAnimationEnd={onAnimationEnd}
+					className={cn(
+						"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
+						"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
+					)}
+				>
+					<AnimatedSidebarToggleIcon
+						className={cn("h-4 w-4", isCollapsed && "rotate-180")}
+					/>
+				</button>
+			</Tooltip.Trigger>
+			<Tooltip.Content
+				side="bottom"
+				align="start"
+				variant="light"
+				size="small"
+				showArrow={false}
+				shortcut={["mod", "B"]}
+			>
+				Toggle sidebar
+			</Tooltip.Content>
+		</Tooltip.Root>
 	);
 }
 

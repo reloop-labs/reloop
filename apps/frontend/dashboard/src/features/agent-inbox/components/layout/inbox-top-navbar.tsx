@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { Search, Trash2 } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -50,19 +51,33 @@ export function InboxTopNavbar({
 
 	return (
 		<header className="flex h-11 shrink-0 items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-3 dark:border-stroke-soft-100/40 dark:bg-black">
-			<button
-				type="button"
-				onClick={toggleSidebar}
-				title="Toggle sidebar (⌘B)"
-				className={cn(
-					"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
-					"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
-				)}
-			>
-				<AnimatedSidebarToggleIcon
-					className={cn("h-4 w-4", collapsed && "rotate-180")}
-				/>
-			</button>
+			<Tooltip.Root delayDuration={300}>
+				<Tooltip.Trigger asChild>
+					<button
+						aria-label="Toggle sidebar"
+						type="button"
+						onClick={toggleSidebar}
+						className={cn(
+							"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
+							"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
+						)}
+					>
+						<AnimatedSidebarToggleIcon
+							className={cn("h-4 w-4", collapsed && "rotate-180")}
+						/>
+					</button>
+				</Tooltip.Trigger>
+				<Tooltip.Content
+					side="bottom"
+					align="start"
+					variant="light"
+					size="small"
+					showArrow={false}
+					shortcut={["mod", "B"]}
+				>
+					Toggle sidebar
+				</Tooltip.Content>
+			</Tooltip.Root>
 
 			<button
 				type="button"

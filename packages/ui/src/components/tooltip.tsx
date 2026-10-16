@@ -3,8 +3,10 @@
 "use client";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { cn } from "@reloop/ui/cn";
 import * as React from "react";
 import { tv, type VariantProps } from "../utils/tv";
+import { KbdKey } from "./kbd-key";
 
 const TooltipProvider = TooltipPrimitive.Provider;
 const TooltipRoot = TooltipPrimitive.Root;
@@ -18,6 +20,8 @@ export const tooltipVariants = tv({
 		],
 		arrow:
 			"-translate-y-1/2 -rotate-45 border [clip-path:polygon(0_100%,0_0,100%_100%)]",
+		shortcut: "flex shrink-0 items-center gap-0.5",
+		kbd: "h-4 min-w-4 w-auto rounded-[5px] px-1 text-[10px] leading-none normal-case",
 	},
 	variants: {
 		size: {
@@ -38,11 +42,17 @@ export const tooltipVariants = tv({
 			dark: {
 				content: "bg-bg-strong-950 text-text-white-0",
 				arrow: "border-stroke-strong-950 bg-bg-strong-950",
+				kbd: "border border-white/15 bg-white/10 text-text-white-0",
 			},
 			light: {
 				content:
 					"bg-bg-white-0 text-text-strong-950 ring-1 ring-stroke-soft-200",
 				arrow: "border-stroke-soft-200 bg-bg-white-0",
+				kbd: [
+					"border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
+					"shadow-[0_1.5px_0_0_var(--color-stroke-soft-200)]",
+					"dark:border-white/[0.14] dark:bg-white/[0.07] dark:text-white",
+				],
 			},
 		},
 	},
@@ -82,12 +92,23 @@ export const tooltipVariants = tv({
 	},
 });
 
+/** `mod` renders as ⌘ on Apple platforms and Ctrl elsewhere. */
+function formatShortcutKey(key: string): string {
+	if (key.toLowerCase() !== "mod") return key;
+	return typeof navigator !== "undefined" &&
+		/Mac|iPhone|iPad|iPod/.test(navigator.platform)
+		? "⌘"
+		: "Ctrl";
+}
+
 const TooltipContent = React.forwardRef<
 	React.ComponentRef<typeof TooltipPrimitive.Content>,
 	React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> &
 		VariantProps<typeof tooltipVariants> & {
 			/** Set false to hide the pointer arrow. Defaults to true. */
 			showArrow?: boolean;
+			/** Keyboard shortcut drawn as keycaps after the label, e.g. `["mod", "B"]`. */
+			shortcut?: string[];
 		}
 >(
 	(
@@ -95,6 +116,7 @@ const TooltipContent = React.forwardRef<
 			size,
 			variant,
 			showArrow = true,
+			shortcut,
 			className,
 			children,
 			sideOffset = 4,
@@ -102,7 +124,12 @@ const TooltipContent = React.forwardRef<
 		},
 		forwardedRef,
 	) => {
-		const { content, arrow } = tooltipVariants({
+		const {
+			content,
+			arrow,
+			shortcut: shortcutSlot,
+			kbd,
+		} = tooltipVariants({
 			size,
 			variant,
 		});
@@ -112,10 +139,21 @@ const TooltipContent = React.forwardRef<
 				<TooltipPrimitive.Content
 					ref={forwardedRef}
 					sideOffset={sideOffset}
-					className={content({ class: className })}
+					className={content({
+						class: cn(shortcut?.length && "flex items-center gap-2", className),
+					})}
 					{...rest}
 				>
 					{children}
+					{shortcut?.length ? (
+						<span className={shortcutSlot()}>
+							{shortcut.map((key, i) => (
+								<KbdKey key={`${key}-${i}`} className={kbd()}>
+									{formatShortcutKey(key)}
+								</KbdKey>
+							))}
+						</span>
+					) : null}
 					{showArrow ? (
 						<TooltipPrimitive.Arrow asChild>
 							<div className={arrow()} />

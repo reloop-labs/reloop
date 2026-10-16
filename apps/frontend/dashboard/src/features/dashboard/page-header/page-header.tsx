@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { LifeBuoy } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -88,26 +89,40 @@ function SidebarToggleButton({
 			>
 				<HamburgerIcon open={isMobileNavOpen} />
 			</button>
-			<button
-				type="button"
-				onClick={toggle}
-				title="Toggle Sidebar (⌘B)"
-				data-animating={isAnimating || undefined}
-				onPointerEnter={onPointerEnter}
-				onPointerLeave={onPointerLeave}
-				onAnimationStart={onAnimationStart}
-				onAnimationEnd={onAnimationEnd}
-				className={cn(btnClass, "hidden lg:flex")}
-			>
-				<AnimatedSidebarToggleIcon
-					className={cn(
-						"h-4 w-4",
-						collapsedFromDom
-							? "sidebar-collapsed:rotate-180"
-							: isCollapsed && "rotate-180",
-					)}
-				/>
-			</button>
+			<Tooltip.Root delayDuration={300}>
+				<Tooltip.Trigger asChild>
+					<button
+						aria-label="Toggle sidebar"
+						type="button"
+						onClick={toggle}
+						data-animating={isAnimating || undefined}
+						onPointerEnter={onPointerEnter}
+						onPointerLeave={onPointerLeave}
+						onAnimationStart={onAnimationStart}
+						onAnimationEnd={onAnimationEnd}
+						className={cn(btnClass, "hidden lg:flex")}
+					>
+						<AnimatedSidebarToggleIcon
+							className={cn(
+								"h-4 w-4",
+								collapsedFromDom
+									? "sidebar-collapsed:rotate-180"
+									: isCollapsed && "rotate-180",
+							)}
+						/>
+					</button>
+				</Tooltip.Trigger>
+				<Tooltip.Content
+					side="bottom"
+					align="start"
+					variant="light"
+					size="small"
+					showArrow={false}
+					shortcut={["mod", "B"]}
+				>
+					Toggle sidebar
+				</Tooltip.Content>
+			</Tooltip.Root>
 		</>
 	);
 }
@@ -145,7 +160,7 @@ function HelpLink({ unreadCount = 0 }: { unreadCount?: number }) {
 				{hasUnread ? (
 					<span
 						aria-hidden
-						className="-top-0.5 -right-0.5 absolute flex h-2 w-2"
+						className="absolute -top-0.5 -right-0.5 flex h-2 w-2"
 					>
 						<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-error-base opacity-75" />
 						<span className="relative inline-flex h-2 w-2 rounded-full bg-error-base ring-2 ring-bg-white-0 dark:ring-black" />
