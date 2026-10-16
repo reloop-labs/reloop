@@ -51,7 +51,7 @@ export function InboxTopNavbar({
 
 	return (
 		<header className="flex h-11 shrink-0 items-center gap-2 border-stroke-soft-100 border-b bg-bg-white-0 px-3 dark:border-stroke-soft-100/40 dark:bg-black">
-			<Tooltip.Root delayDuration={300}>
+			<Tooltip.Root delayDuration={300} disableHoverableContent>
 				<Tooltip.Trigger asChild>
 					<button
 						aria-label="Toggle sidebar"

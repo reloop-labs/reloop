@@ -30,7 +30,7 @@ function SidebarToggleButton() {
 	} = usePlayAnimationOnHover(500);
 
 	return (
-		<Tooltip.Root delayDuration={300}>
+		<Tooltip.Root delayDuration={300} disableHoverableContent>
 			<Tooltip.Trigger asChild>
 				<button
 					aria-label="Toggle sidebar"

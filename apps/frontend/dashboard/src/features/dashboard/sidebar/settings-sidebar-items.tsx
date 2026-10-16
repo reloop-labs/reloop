@@ -12,6 +12,7 @@ import {
 } from "./settings-nav-cache";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavButton, SidebarNavLink } from "./sidebar-nav-link";
+import { SidebarSectionHeader } from "./sidebar-section-header";
 import { useSidebarHoverBox } from "./use-sidebar-hover-box";
 
 export function SettingsSidebarItems({
@@ -83,7 +84,7 @@ export function SettingsSidebarItems({
 			ref={setContainerEl}
 			className={cn(
 				"relative flex w-full flex-col",
-				isCollapsed && "items-center",
+				isCollapsed && "items-start",
 			)}
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
@@ -93,28 +94,27 @@ export function SettingsSidebarItems({
 				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
 				onClick={() => onCloseSettings?.()}
 				className={cn(
-					"relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
+					"relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all duration-200 ease-in-out",
 					isCollapsed
-						? "h-8 w-8 justify-center px-0"
+						? "h-8 w-8 justify-start overflow-hidden px-2"
 						: "w-full justify-start gap-2.5 px-2.5",
 				)}
 				title={isCollapsed ? "Back to app" : undefined}
 			>
-				<span
-					className={cn(
-						"flex min-w-0 items-center",
-						isCollapsed ? "" : "gap-2.5",
-					)}
-				>
+				<span className="flex min-w-0 items-center gap-2.5">
 					<Icon
 						name="arrow-left"
 						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:-translate-x-0.5 group-hover:text-text-strong-950 group-hover:opacity-100"
 					/>
-					{!isCollapsed && (
-						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950">
-							Back to app
-						</span>
-					)}
+					<span
+						aria-hidden={isCollapsed || undefined}
+						className={cn(
+							"whitespace-nowrap font-medium text-[13px] text-text-sub-600 transition-[color,opacity] duration-200 ease-in-out group-hover:text-text-strong-950",
+							isCollapsed && "opacity-0",
+						)}
+					>
+						Back to app
+					</span>
 				</span>
 			</SidebarNavButton>
 
@@ -123,23 +123,14 @@ export function SettingsSidebarItems({
 					key={section.section}
 					className={cn(
 						"flex flex-col",
-						isCollapsed ? "items-center" : "w-full",
+						isCollapsed ? "items-start" : "w-full",
 					)}
 				>
-					{isCollapsed ? (
-						sectionIdx > 0 && (
-							<div className="my-2 h-[1px] w-6 self-center bg-stroke-soft-200" />
-						)
-					) : (
-						<div
-							className={cn(
-								"px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]",
-								sectionIdx === 0 && "pt-1.5",
-							)}
-						>
-							{section.section}
-						</div>
-					)}
+					<SidebarSectionHeader
+						label={section.section}
+						isCollapsed={isCollapsed}
+						isFirst={sectionIdx === 0}
+					/>
 
 					{section.items.map((item) => {
 						const currentIdx = globalIndex++;
@@ -159,9 +150,9 @@ export function SettingsSidebarItems({
 									setHoveredEl(itemRefs.current[currentIdx])
 								}
 								className={cn(
-									"relative z-10 flex h-8 items-center rounded-lg transition-all",
+									"relative z-10 flex h-8 items-center rounded-lg transition-all duration-200 ease-in-out",
 									isCollapsed
-										? "h-8 w-8 justify-center px-0"
+										? "h-8 w-8 justify-start overflow-hidden px-2"
 										: "w-full justify-start gap-2.5 px-2.5",
 								)}
 								title={
@@ -180,28 +171,23 @@ export function SettingsSidebarItems({
 											: "flex-1 justify-between gap-2.5",
 									)}
 								>
-									<span
-										className={cn(
-											"flex min-w-0 items-center",
-											!isCollapsed && "gap-2.5",
-										)}
-									>
+									<span className="flex min-w-0 items-center gap-2.5">
 										<SidebarNavIcon
 											name={item.iconName}
 											isActive={isItemActive}
 										/>
-										{!isCollapsed && (
-											<span
-												className={cn(
-													"truncate font-medium text-[13px] transition-colors",
-													isItemActive
-														? "text-text-strong-950"
-														: "text-text-sub-600 group-hover:text-text-strong-950",
-												)}
-											>
-												{item.label}
-											</span>
-										)}
+										<span
+											aria-hidden={isCollapsed || undefined}
+											className={cn(
+												"truncate font-medium text-[13px] transition-[color,opacity] duration-200 ease-in-out",
+												isCollapsed && "opacity-0",
+												isItemActive
+													? "text-text-strong-950"
+													: "text-text-sub-600 group-hover:text-text-strong-950",
+											)}
+										>
+											{item.label}
+										</span>
 									</span>
 									{!isCollapsed && item.shortcut && (
 										<ShortcutHint>{item.shortcut.label}</ShortcutHint>

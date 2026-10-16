@@ -10,7 +10,27 @@ import { KbdKey } from "./kbd-key";
 
 const TooltipProvider = TooltipPrimitive.Provider;
 const TooltipRoot = TooltipPrimitive.Root;
-const TooltipTrigger = TooltipPrimitive.Trigger;
+/**
+ * Only keyboard focus (`:focus-visible`) opens the tooltip. Radix also opens
+ * on programmatic focus, e.g. when the window regains focus with a clicked
+ * button still focused, which leaves the tooltip stuck open with no
+ * pointerleave to close it.
+ */
+const TooltipTrigger = React.forwardRef<
+	React.ComponentRef<typeof TooltipPrimitive.Trigger>,
+	React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Trigger>
+>(({ onFocus, ...rest }, forwardedRef) => (
+	<TooltipPrimitive.Trigger
+		ref={forwardedRef}
+		onFocus={(event) => {
+			onFocus?.(event);
+			if (!event.currentTarget.matches(":focus-visible"))
+				event.preventDefault();
+		}}
+		{...rest}
+	/>
+));
+TooltipTrigger.displayName = TooltipPrimitive.Trigger.displayName;
 
 export const tooltipVariants = tv({
 	slots: {

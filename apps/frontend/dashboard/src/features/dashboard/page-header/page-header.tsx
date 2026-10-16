@@ -1,5 +1,4 @@
 import { cn } from "@reloop/ui/cn";
-import * as Tooltip from "@reloop/ui/tooltip";
 import { LifeBuoy } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -89,40 +88,26 @@ function SidebarToggleButton({
 			>
 				<HamburgerIcon open={isMobileNavOpen} />
 			</button>
-			<Tooltip.Root delayDuration={300}>
-				<Tooltip.Trigger asChild>
-					<button
-						aria-label="Toggle sidebar"
-						type="button"
-						onClick={toggle}
-						data-animating={isAnimating || undefined}
-						onPointerEnter={onPointerEnter}
-						onPointerLeave={onPointerLeave}
-						onAnimationStart={onAnimationStart}
-						onAnimationEnd={onAnimationEnd}
-						className={cn(btnClass, "hidden lg:flex")}
-					>
-						<AnimatedSidebarToggleIcon
-							className={cn(
-								"h-4 w-4",
-								collapsedFromDom
-									? "sidebar-collapsed:rotate-180"
-									: isCollapsed && "rotate-180",
-							)}
-						/>
-					</button>
-				</Tooltip.Trigger>
-				<Tooltip.Content
-					side="bottom"
-					align="start"
-					variant="light"
-					size="small"
-					showArrow={false}
-					shortcut={["mod", "B"]}
-				>
-					Toggle sidebar
-				</Tooltip.Content>
-			</Tooltip.Root>
+			<button
+				aria-label="Toggle sidebar"
+				type="button"
+				onClick={toggle}
+				data-animating={isAnimating || undefined}
+				onPointerEnter={onPointerEnter}
+				onPointerLeave={onPointerLeave}
+				onAnimationStart={onAnimationStart}
+				onAnimationEnd={onAnimationEnd}
+				className={cn(btnClass, "hidden lg:flex")}
+			>
+				<AnimatedSidebarToggleIcon
+					className={cn(
+						"h-4 w-4",
+						collapsedFromDom
+							? "sidebar-collapsed:rotate-180"
+							: isCollapsed && "rotate-180",
+					)}
+				/>
+			</button>
 		</>
 	);
 }

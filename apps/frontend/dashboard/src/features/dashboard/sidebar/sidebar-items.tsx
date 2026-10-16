@@ -15,6 +15,7 @@ import {
 } from "../navigation";
 import { SidebarNavIcon } from "./sidebar-nav-icon";
 import { SidebarNavLink } from "./sidebar-nav-link";
+import { SidebarSectionHeader } from "./sidebar-section-header";
 import { useSidebarHoverBox } from "./use-sidebar-hover-box";
 
 export function SidebarItems({
@@ -102,7 +103,7 @@ export function SidebarItems({
 			ref={setContainerEl}
 			className={cn(
 				"relative flex w-full flex-col",
-				isCollapsed && "items-center",
+				isCollapsed && "items-start",
 			)}
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
@@ -122,24 +123,16 @@ export function SidebarItems({
 						key={path + index}
 						className={cn(
 							"flex flex-col",
-							isCollapsed ? "items-center" : "w-full",
+							isCollapsed ? "items-start" : "w-full",
 						)}
 					>
-						{showSectionHeader &&
-							(isCollapsed ? (
-								index > 0 && (
-									<div className="my-2 h-[1px] w-6 self-center bg-stroke-soft-200" />
-								)
-							) : (
-								<div
-									className={cn(
-										"px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]",
-										index === 0 && "pt-1.5",
-									)}
-								>
-									{section}
-								</div>
-							))}
+						{showSectionHeader && (
+							<SidebarSectionHeader
+								label={section}
+								isCollapsed={isCollapsed}
+								isFirst={index === 0}
+							/>
+						)}
 						<SidebarNavLink
 							href={path === "/settings" ? settingsHref : path}
 							ref={(el) => {
@@ -150,9 +143,9 @@ export function SidebarItems({
 								path === "/settings" ? () => onOpenSettings?.() : undefined
 							}
 							className={cn(
-								"relative z-10 flex h-8 items-center rounded-lg transition-all",
+								"relative z-10 flex h-8 items-center rounded-lg transition-all duration-200 ease-in-out",
 								isCollapsed
-									? "h-8 w-8 justify-center px-0"
+									? "h-8 w-8 justify-start overflow-hidden px-2"
 									: cn(
 											"w-full gap-2.5 px-2.5",
 											hasSubNav ? "justify-between" : "justify-start",
@@ -174,31 +167,26 @@ export function SidebarItems({
 										: "flex-1 justify-between gap-2.5",
 								)}
 							>
-								<span
-									className={cn(
-										"flex min-w-0 items-center",
-										!isCollapsed && "gap-2.5",
-									)}
-								>
+								<span className="flex min-w-0 items-center gap-2.5">
 									<SidebarNavIcon
 										name={iconName}
 										isSpecial={isSpecial}
 										isActive={activeMainIndex === index}
 									/>
-									{!isCollapsed && (
-										<span
-											className={cn(
-												"truncate font-medium text-[13px] transition-colors",
-												isSpecial
-													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
-													: activeMainIndex === index
-														? "text-text-strong-950"
-														: "text-text-sub-600 group-hover:text-text-strong-950",
-											)}
-										>
-											{label}
-										</span>
-									)}
+									<span
+										aria-hidden={isCollapsed || undefined}
+										className={cn(
+											"truncate font-medium text-[13px] transition-[color,opacity] duration-200 ease-in-out",
+											isCollapsed && "opacity-0",
+											isSpecial
+												? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
+												: activeMainIndex === index
+													? "text-text-strong-950"
+													: "text-text-sub-600 group-hover:text-text-strong-950",
+										)}
+									>
+										{label}
+									</span>
 								</span>
 								{!isCollapsed && shortcut && (
 									<ShortcutHint>{shortcut.label}</ShortcutHint>

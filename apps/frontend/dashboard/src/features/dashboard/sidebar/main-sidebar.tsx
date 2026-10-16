@@ -43,6 +43,13 @@ export function MainSidebar() {
 		}
 	}, [isSettingsRoute]);
 	const shouldReduceMotion = useReducedMotion();
+	// Collapsed: 12px gutter centers the 32px nav items in the 56px rail.
+	// Animated in step with the rail width so icons never jump sideways.
+	const railPadding = !isTemplateEditor && isCollapsed ? 12 : 8;
+	const railPaddingTransition = {
+		duration: shouldReduceMotion ? 0 : 0.2,
+		ease: "easeInOut",
+	} as const;
 
 	useHotkeys("meta+b", (e) => {
 		e.preventDefault();
@@ -231,8 +238,15 @@ export function MainSidebar() {
 											? "translateX(0%)"
 											: "translateX(20%)",
 										opacity: 0,
+										paddingLeft: railPadding,
+										paddingRight: railPadding,
 									}}
-									animate={{ transform: "translateX(0%)", opacity: 1 }}
+									animate={{
+										transform: "translateX(0%)",
+										opacity: 1,
+										paddingLeft: railPadding,
+										paddingRight: railPadding,
+									}}
 									exit={{
 										transform: shouldReduceMotion
 											? "translateX(0%)"
@@ -242,11 +256,10 @@ export function MainSidebar() {
 									transition={{
 										duration: 0.28,
 										ease: [0.32, 0.72, 0, 1],
+										paddingLeft: railPaddingTransition,
+										paddingRight: railPaddingTransition,
 									}}
 									className="absolute inset-0 overflow-y-auto overflow-x-hidden py-2"
-									style={{
-										paddingInline: !isTemplateEditor && isCollapsed ? 0 : 8,
-									}}
 								>
 									<SettingsSidebarItems
 										isCollapsed={!isTemplateEditor && isCollapsed}
@@ -261,8 +274,15 @@ export function MainSidebar() {
 											? "translateX(0%)"
 											: "translateX(-20%)",
 										opacity: 0,
+										paddingLeft: railPadding,
+										paddingRight: railPadding,
 									}}
-									animate={{ transform: "translateX(0%)", opacity: 1 }}
+									animate={{
+										transform: "translateX(0%)",
+										opacity: 1,
+										paddingLeft: railPadding,
+										paddingRight: railPadding,
+									}}
 									exit={{
 										transform: shouldReduceMotion
 											? "translateX(0%)"
@@ -272,11 +292,10 @@ export function MainSidebar() {
 									transition={{
 										duration: 0.28,
 										ease: [0.32, 0.72, 0, 1],
+										paddingLeft: railPaddingTransition,
+										paddingRight: railPaddingTransition,
 									}}
 									className="absolute inset-0 overflow-y-auto overflow-x-hidden py-2"
-									style={{
-										paddingInline: !isTemplateEditor && isCollapsed ? 0 : 8,
-									}}
 								>
 									<SidebarItems
 										isCollapsed={!isTemplateEditor && isCollapsed}
