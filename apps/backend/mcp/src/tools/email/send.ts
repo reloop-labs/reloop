@@ -68,6 +68,13 @@ export const sendEmail = defineTool({
 				value.html !== undefined ||
 				value.template !== undefined,
 			{ message: "Provide text, html, or a template" },
+		)
+		.refine(
+			(value) =>
+				value.template === undefined ||
+				value.template.id !== undefined ||
+				value.template.slug !== undefined,
+			{ message: "Provide template.id or template.slug" },
 		),
 	output: z.object({
 		id: z.string().describe("Reloop email log ID"),

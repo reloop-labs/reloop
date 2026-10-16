@@ -1,9 +1,11 @@
 import { useEmailContainerWidth } from "#/features/templates/editor/hooks/use-email-container-width";
 import { TemplateFromField } from "./template-from-field";
+import { TemplateSlugField } from "./template-slug-field";
 import { TemplateSubjectField } from "./template-subject-field";
 
 export { TemplateFieldRow } from "./template-field-row";
 export { TemplateFromField } from "./template-from-field";
+export { TemplateSlugField } from "./template-slug-field";
 export { TemplateSubjectField } from "./template-subject-field";
 
 export const SendDetails = () => {
@@ -16,6 +18,7 @@ export const SendDetails = () => {
 		>
 			<TemplateFromField />
 			<TemplateSubjectField />
+			<TemplateSlugField />
 		</div>
 	);
 };

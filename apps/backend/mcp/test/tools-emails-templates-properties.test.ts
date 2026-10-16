@@ -61,6 +61,7 @@ function templateFixture(over: Partial<Template> = {}): Template {
 	return {
 		id: "tpl_1",
 		name: "Welcome",
+		slug: "welcome",
 		description: null,
 		subject: "Welcome {{FIRST_NAME}}",
 		fromEmail: "hi@send.example.com",

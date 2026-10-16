@@ -45,7 +45,11 @@ export interface SendEmailOptions {
 		content_id?: string;
 	}>;
 	tags?: Array<{ name: string; value: string }>;
-	template?: { id: string; variables?: Record<string, string | number> };
+	template?: {
+		id?: string;
+		slug?: string;
+		variables?: Record<string, string | number>;
+	};
 }
 
 // KumoMTA /api/inject/v1 response shape (per official API schema)

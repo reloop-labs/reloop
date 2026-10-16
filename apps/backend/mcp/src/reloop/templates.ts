@@ -40,6 +40,15 @@ export class TemplatesApi {
 		});
 	}
 
+	retrieveBySlug(slug: string): Promise<Template> {
+		return this.#client.request<Template>({
+			method: "GET",
+			path: templateEndpoints.bySlug(slug),
+			codes: TEMPLATE_CODES,
+			idempotent: true,
+		});
+	}
+
 	create(input: CreateTemplateInput): Promise<Template> {
 		return this.#client.request<Template>({
 			method: "POST",

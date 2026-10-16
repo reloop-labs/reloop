@@ -113,7 +113,14 @@ export namespace MailModel {
 		template: t.Optional(
 			t.Object(
 				{
-					id: t.String({ description: "Template ID" }),
+					id: t.Optional(t.String({ description: "Template ID" })),
+					slug: t.Optional(
+						t.String({
+							maxLength: 128,
+							description:
+								"Template slug, e.g. welcome-email. Use instead of id.",
+						}),
+					),
 					variables: t.Optional(
 						t.Record(
 							t.String({
@@ -144,7 +151,7 @@ export namespace MailModel {
 						),
 					),
 				},
-				{ description: "Email template to use" },
+				{ description: "Email template to use, by id or slug" },
 			),
 		),
 		thread_id: t.Optional(

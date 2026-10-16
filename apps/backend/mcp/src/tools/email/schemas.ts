@@ -88,7 +88,14 @@ export const VARIABLE_KEY_PATTERN =
 	/^(?!FIRST_NAME$|LAST_NAME$|EMAIL$|UNSUBSCRIBE_URL$)[A-Za-z0-9_]{1,50}$/;
 
 export const templateSchema = z.object({
-	id: resourceIdSchema.describe("Template ID"),
+	id: resourceIdSchema.describe("Template ID").optional(),
+	slug: z
+		.string()
+		.trim()
+		.min(1)
+		.max(128)
+		.describe("Template slug, e.g. welcome-email; use instead of id")
+		.optional(),
 	variables: z
 		.record(
 			z.string().regex(VARIABLE_KEY_PATTERN),

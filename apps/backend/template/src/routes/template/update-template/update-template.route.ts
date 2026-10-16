@@ -2,6 +2,10 @@ import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
 import { templateResponseSchema } from "@be/template/model/template.model";
 import { auditLogHook } from "@be/template/utils/audit-log";
+import {
+	TEMPLATE_SLUG_MAX_LENGTH,
+	TEMPLATE_SLUG_PATTERN,
+} from "@be/template/utils/slug";
 import { updateTemplateXCodeSamples } from "@reloop/code-samples/template";
 import { Elysia, t } from "elysia";
 import { updateTemplate } from "./update-template.controllers";
@@ -26,6 +30,14 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 		}),
 		body: t.Object({
 			name: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
+			slug: t.Optional(
+				t.String({
+					maxLength: TEMPLATE_SLUG_MAX_LENGTH,
+					pattern: TEMPLATE_SLUG_PATTERN,
+					description:
+						"Org-unique handle for sending by slug. Changing it breaks API calls that use the old slug.",
+				}),
+			),
 			description: t.Optional(t.String()),
 			subject: t.Optional(t.String({ maxLength: 500 })),
 			fromEmail: t.Optional(t.String({ maxLength: 255 })),
@@ -55,6 +67,7 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 			401: ErrorResponseSchema,
 			403: ErrorResponseSchema,
 			404: ErrorResponseSchema,
+			409: ErrorResponseSchema,
 			500: ErrorResponseSchema,
 		},
 		detail: {

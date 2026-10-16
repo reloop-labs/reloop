@@ -1,7 +1,11 @@
 import * as z from "zod";
 import { emailSchema } from "../contacts/schemas";
 import { defineTool } from "../define";
-import { templateSchema, toTemplateOutput } from "./schemas";
+import {
+	templateSchema,
+	templateSlugSchema,
+	toTemplateOutput,
+} from "./schemas";
 
 const VARIABLE_NAME = /^[A-Za-z0-9_]{1,50}$/;
 const PLACEHOLDER = /\{\{\{\s*([A-Za-z0-9_]{1,50})\s*\}\}\}/g;
@@ -16,7 +20,7 @@ export const createTemplate = defineTool({
 	name: "create_template",
 	title: "Create template",
 	description:
-		"Save a complete HTML email as a reusable Reloop template, so it can be sent by ID with send_email's `template` and edited later in the Reloop editor. Write the full email yourself as email-safe HTML (tables and inline styles, no scripts, 600px wide) and put per-recipient values in triple braces, for example {{{first_name}}} or {{{order_url}}}. Double braces are not substituted. Placeholders found in the HTML become template variables; pass `variables` to give them defaults. By default the template is published and ready to send; set `publish` to false to save it as a draft for review. Returns the template with its ID and variables.",
+		"Save a complete HTML email as a reusable Reloop template, so it can be sent by ID or slug with send_email's `template` and edited later in the Reloop editor. Write the full email yourself as email-safe HTML (tables and inline styles, no scripts, 600px wide) and put per-recipient values in triple braces, for example {{{first_name}}} or {{{order_url}}}. Double braces are not substituted. Placeholders found in the HTML become template variables; pass `variables` to give them defaults. By default the template is published and ready to send; set `publish` to false to save it as a draft for review. Returns the template with its ID and variables.",
 	annotations: {
 		readOnlyHint: false,
 		destructiveHint: false,
@@ -31,6 +35,11 @@ export const createTemplate = defineTool({
 			.max(255)
 			.describe(
 				"Template name shown in the dashboard, e.g. Order confirmation",
+			),
+		slug: templateSlugSchema
+			.optional()
+			.describe(
+				"Org-unique handle for send_email's template.slug, e.g. order-confirmation. Generated from the name when omitted.",
 			),
 		subject: z
 			.string()
@@ -107,6 +116,7 @@ export const createTemplate = defineTool({
 
 		const created = await api.templates.create({
 			name: args.name,
+			slug: args.slug,
 			description: args.description,
 			subject: args.subject,
 			fromEmail: args.fromEmail,

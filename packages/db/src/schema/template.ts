@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
 	boolean,
 	index,
@@ -9,6 +9,7 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uniqueIndex,
 	varchar,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
@@ -63,6 +64,8 @@ export const template = pgTable(
 			.$defaultFn(() => createTemplateId())
 			.primaryKey(),
 		name: varchar("name", { length: 255 }).notNull(),
+		// Stable, org-unique handle for sending by name, e.g. `welcome-email`
+		slug: varchar("slug", { length: 128 }).notNull(),
 		description: text("description"),
 		subject: varchar("subject", { length: 500 }),
 		fromEmail: varchar("from_email", { length: 255 }),
@@ -99,6 +102,10 @@ export const template = pgTable(
 		index("template_idx_name").on(table.name),
 		index("template_idx_org_status").on(table.organizationId, table.status),
 		index("template_idx_deleted_at").on(table.deletedAt),
+		// Soft-deleted templates release their slug
+		uniqueIndex("template_unique_org_slug")
+			.on(table.organizationId, table.slug)
+			.where(sql`${table.deletedAt} is null`),
 	],
 );
 

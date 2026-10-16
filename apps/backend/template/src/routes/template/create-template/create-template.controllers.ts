@@ -4,6 +4,7 @@ import {
 	extractVariablesFromContent,
 	normalizeVariableName,
 } from "@be/template/utils/extract-variables";
+import { isValidTemplateSlug } from "@be/template/utils/slug";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
 
@@ -11,6 +12,7 @@ export async function createTemplate(params: {
 	organizationId: string;
 	userId: string;
 	name: string;
+	slug?: string;
 	description?: string;
 	subject?: string;
 	fromEmail?: string;
@@ -21,6 +23,7 @@ export async function createTemplate(params: {
 		organizationId,
 		userId,
 		name,
+		slug,
 		description,
 		subject,
 		fromEmail,
@@ -31,6 +34,11 @@ export async function createTemplate(params: {
 	try {
 		if (!name || name.trim().length === 0) {
 			throw TemplateErrors.nameRequired();
+		}
+
+		const explicitSlug = slug?.trim() || undefined;
+		if (explicitSlug && !isValidTemplateSlug(explicitSlug)) {
+			throw TemplateErrors.invalidSlug(explicitSlug);
 		}
 
 		// Auto-extract variables from initial content if provided
@@ -45,6 +53,7 @@ export async function createTemplate(params: {
 
 		const result = await templateModel.create({
 			name: name.trim(),
+			slug: explicitSlug,
 			description,
 			subject,
 			fromEmail,

@@ -145,6 +145,20 @@ export const MailErrors = {
 			why: `The address '${from}' is not a valid email format`,
 			fix: "Provide a valid email address in the 'from' field (e.g., user@example.com)",
 		}),
+	templateSlugNotFound: (slug: string) =>
+		createError({
+			status: 404,
+			message: "Template not found",
+			why: `No template with slug "${slug}" exists in your organization`,
+			fix: "Verify the template slug; it is shown under the template name in the dashboard",
+		}),
+	templateRefRequired: () =>
+		createError({
+			status: 400,
+			message: "Template id or slug is required",
+			why: "The 'template' object has neither 'id' nor 'slug'",
+			fix: "Pass template.id or template.slug",
+		}),
 	templateNotFound: (templateId: string) =>
 		createError({
 			status: 404,

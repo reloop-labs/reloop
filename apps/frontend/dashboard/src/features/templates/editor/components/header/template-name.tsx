@@ -61,7 +61,8 @@ export const TemplateName = () => {
 				credentials: "include",
 			});
 			if (response.ok) {
-				mutate({ ...data, name: newName }, false);
+				// Server response carries the slug, which follows renames on drafts
+				mutate(await response.json(), false);
 			}
 		} catch (error) {
 			console.error("Failed to update template name:", error);

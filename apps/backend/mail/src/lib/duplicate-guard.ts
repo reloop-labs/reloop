@@ -83,7 +83,11 @@ export interface DuplicateFingerprintInput {
 	subject: string;
 	html?: string;
 	text?: string;
-	template?: { id: string; variables?: Record<string, unknown> };
+	template?: {
+		id?: string;
+		slug?: string;
+		variables?: Record<string, unknown>;
+	};
 	attachments?: FingerprintAttachment[];
 	threadId?: string;
 	scheduledAt?: string;

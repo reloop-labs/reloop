@@ -563,25 +563,27 @@ Returns: `templates`, `pagination`
 
 ### `get_template`
 
-Get one email template by ID: its subject, sender, status, and the variables it expects. The visual editor content is not returned; use send_test_email to see the rendered result. Returns a `template_not_found` error when no template matches.
+Get one email template by ID or slug: its subject, sender, status, and the variables it expects. The visual editor content is not returned; use send_test_email to see the rendered result. Returns a `template_not_found` error when no template matches.
 
 Read-only: yes · Destructive: no · Idempotent: yes · Open world: no
 
 | Input | Type | Required | Description |
 |---|---|---|---|
-| `id` | string | yes | Template ID as returned by list_templates |
+| `id` | string | no | Template ID as returned by list_templates |
+| `slug` | string | no | Template slug, e.g. welcome-email, as returned by list_templates |
 
 Returns: `template`
 
 ### `create_template`
 
-Save a complete HTML email as a reusable Reloop template, so it can be sent by ID with send_email's `template` and edited later in the Reloop editor. Write the full email yourself as email-safe HTML (tables and inline styles, no scripts, 600px wide) and put per-recipient values in triple braces, for example {{{first_name}}} or {{{order_url}}}. Double braces are not substituted. Placeholders found in the HTML become template variables; pass `variables` to give them defaults. By default the template is published and ready to send; set `publish` to false to save it as a draft for review. Returns the template with its ID and variables.
+Save a complete HTML email as a reusable Reloop template, so it can be sent by ID or slug with send_email's `template` and edited later in the Reloop editor. Write the full email yourself as email-safe HTML (tables and inline styles, no scripts, 600px wide) and put per-recipient values in triple braces, for example {{{first_name}}} or {{{order_url}}}. Double braces are not substituted. Placeholders found in the HTML become template variables; pass `variables` to give them defaults. By default the template is published and ready to send; set `publish` to false to save it as a draft for review. Returns the template with its ID and variables.
 
 Read-only: no · Destructive: no · Idempotent: no · Open world: no
 
 | Input | Type | Required | Description |
 |---|---|---|---|
 | `name` | string | yes | Template name shown in the dashboard, e.g. Order confirmation |
+| `slug` | string | no | Org-unique handle for send_email's template.slug, e.g. order-confirmation. Generated from the name when omitted. |
 | `subject` | string | yes | Subject line; may contain {{{variables}}} |
 | `html` | string | yes | The full email as an HTML document |
 | `previewText` | string | no | Inbox preview text shown after the subject |

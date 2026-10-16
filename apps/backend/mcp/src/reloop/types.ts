@@ -94,7 +94,11 @@ export type SendEmailInput = {
 	scheduled_at?: string;
 	headers?: Record<string, string>;
 	tags?: { name: string; value: string }[];
-	template?: { id: string; variables?: Record<string, string | number> };
+	template?: {
+		id?: string;
+		slug?: string;
+		variables?: Record<string, string | number>;
+	};
 	channel_id?: string;
 };
 
@@ -486,6 +490,7 @@ export type TemplateVariable = {
 export type Template = {
 	id: string;
 	name: string;
+	slug: string;
 	description: string | null;
 	subject: string | null;
 	fromEmail: string | null;
@@ -508,6 +513,7 @@ export type TemplateListResponse = {
 
 export type CreateTemplateInput = {
 	name: string;
+	slug?: string;
 	description?: string;
 	subject?: string;
 	fromEmail?: string;

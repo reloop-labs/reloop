@@ -10,7 +10,11 @@ export async function resolveTemplate_step5({
 	text,
 }: {
 	organizationId: string;
-	template?: { id: string; variables?: Record<string, string | number> };
+	template?: {
+		id?: string;
+		slug?: string;
+		variables?: Record<string, string | number>;
+	};
 	subject: string;
 	html?: string;
 	text?: string;
@@ -19,18 +23,25 @@ export async function resolveTemplate_step5({
 	let finalHtml = html;
 	let finalText = text;
 
-	if (template?.id) {
+	if (template && !template.id && !template.slug) {
+		throw MailErrors.templateRefRequired();
+	}
+
+	if (template?.id || template?.slug) {
+		const { id, slug } = template;
 		const templateRecord = await db.query.template.findFirst({
 			where: (t, { and: dbAnd, eq: dbEq, isNull: dbIsNull }) =>
 				dbAnd(
-					dbEq(t.id, template.id),
+					id ? dbEq(t.id, id) : dbEq(t.slug, slug as string),
 					dbEq(t.organizationId, organizationId),
 					dbIsNull(t.deletedAt),
 				),
 		});
 
 		if (!templateRecord) {
-			throw MailErrors.templateNotFound(template.id);
+			throw id
+				? MailErrors.templateNotFound(id)
+				: MailErrors.templateSlugNotFound(slug as string);
 		}
 
 		const latestPublished = await db.query.templateVersion.findFirst({

@@ -1,10 +1,45 @@
+import { TemplateErrors } from "@be/template/error/template.error";
+import {
+	isTemplateSlugConflict,
+	uniqueTemplateSlug,
+} from "@be/template/utils/slug";
 import { db } from "@reloop/db/client";
 import type { TemplateBlock } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
 import { and, desc, eq, isNull } from "drizzle-orm";
 
+const SLUG_RETRIES = 5;
+
+/**
+ * Insert with an org-unique slug. An explicit slug that's taken is a 409; a
+ * generated one is regenerated when a concurrent insert grabbed it first.
+ */
+async function insertWithSlug(
+	values: Omit<typeof schema.template.$inferInsert, "slug">,
+	explicitSlug?: string,
+) {
+	for (let attempt = 0; ; attempt++) {
+		const slug =
+			explicitSlug ??
+			(await uniqueTemplateSlug(values.organizationId, values.name));
+		try {
+			const [result] = await db
+				.insert(schema.template)
+				.values({ ...values, slug })
+				.returning();
+			return result;
+		} catch (error) {
+			if (!isTemplateSlugConflict(error)) throw error;
+			if (explicitSlug) throw TemplateErrors.slugTaken(explicitSlug);
+			if (attempt >= SLUG_RETRIES) throw error;
+		}
+	}
+}
+
 export interface CreateTemplateInput {
 	name: string;
+	/** Omit to derive from the name */
+	slug?: string;
 	description?: string;
 	subject?: string;
 	fromEmail?: string;
@@ -19,6 +54,7 @@ export interface CreateTemplateInput {
 export interface UpdateTemplateInput {
 	id: string;
 	name?: string;
+	slug?: string;
 	description?: string;
 	subject?: string;
 	fromEmail?: string;
@@ -33,9 +69,8 @@ export interface UpdateTemplateInput {
 
 export const templateModel = {
 	async create(input: CreateTemplateInput) {
-		const [result] = await db
-			.insert(schema.template)
-			.values({
+		return insertWithSlug(
+			{
 				name: input.name,
 				description: input.description,
 				subject: input.subject,
@@ -46,9 +81,9 @@ export const templateModel = {
 				createdByUserId: input.createdByUserId,
 				content: input.content || [],
 				variables: input.variables || [],
-			})
-			.returning();
-		return result;
+			},
+			input.slug,
+		);
 	},
 
 	async findById(id: string) {
@@ -73,6 +108,34 @@ export const templateModel = {
 				),
 			);
 		return result;
+	},
+
+	async findBySlugAndOrg(slug: string, organizationId: string) {
+		const [result] = await db
+			.select()
+			.from(schema.template)
+			.where(
+				and(
+					eq(schema.template.slug, slug),
+					eq(schema.template.organizationId, organizationId),
+					isNull(schema.template.deletedAt),
+				),
+			);
+		return result;
+	},
+
+	async hasPublishedVersion(templateId: string) {
+		const [row] = await db
+			.select({ id: schema.templateVersion.id })
+			.from(schema.templateVersion)
+			.where(
+				and(
+					eq(schema.templateVersion.templateId, templateId),
+					eq(schema.templateVersion.isMajor, true),
+				),
+			)
+			.limit(1);
+		return !!row;
 	},
 
 	async list(organizationId: string, page = 1, limit = 10) {
@@ -103,6 +166,7 @@ export const templateModel = {
 		const updateData: Partial<typeof schema.template.$inferInsert> = {};
 
 		if (input.name !== undefined) updateData.name = input.name;
+		if (input.slug !== undefined) updateData.slug = input.slug;
 		if (input.description !== undefined)
 			updateData.description = input.description;
 		if (input.subject !== undefined) updateData.subject = input.subject;
@@ -118,13 +182,20 @@ export const templateModel = {
 		if (input.thumbnailUrl !== undefined)
 			updateData.thumbnailUrl = input.thumbnailUrl;
 
-		const [result] = await db
-			.update(schema.template)
-			.set(updateData)
-			.where(eq(schema.template.id, input.id))
-			.returning();
+		try {
+			const [result] = await db
+				.update(schema.template)
+				.set(updateData)
+				.where(eq(schema.template.id, input.id))
+				.returning();
 
-		return result;
+			return result;
+		} catch (error) {
+			if (input.slug !== undefined && isTemplateSlugConflict(error)) {
+				throw TemplateErrors.slugTaken(input.slug);
+			}
+			throw error;
+		}
 	},
 
 	async softDelete(id: string) {
@@ -140,22 +211,17 @@ export const templateModel = {
 		const original = await this.findByIdAndOrg(id, organizationId);
 		if (!original) return null;
 
-		const [result] = await db
-			.insert(schema.template)
-			.values({
-				name: `${original.name} (Copy)`,
-				description: original.description,
-				subject: original.subject,
-				organizationId,
-				createdByUserId: userId,
-				content: original.content,
-				variables: original.variables,
-				thumbnailUrl: original.thumbnailUrl,
-				status: "draft",
-			})
-			.returning();
-
-		return result;
+		return insertWithSlug({
+			name: `${original.name} (Copy)`,
+			description: original.description,
+			subject: original.subject,
+			organizationId,
+			createdByUserId: userId,
+			content: original.content,
+			variables: original.variables,
+			thumbnailUrl: original.thumbnailUrl,
+			status: "draft",
+		});
 	},
 };
 
@@ -164,6 +230,7 @@ import { t } from "elysia";
 export const templateResponseSchema = t.Object({
 	id: t.String(),
 	name: t.String(),
+	slug: t.String(),
 	description: t.Union([t.String(), t.Null()]),
 	subject: t.Union([t.String(), t.Null()]),
 	fromEmail: t.Union([t.String(), t.Null()]),

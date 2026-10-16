@@ -8,6 +8,7 @@ import { queryKeys } from "#/lib/query-keys";
 export type Template = {
 	id: string;
 	name: string;
+	slug: string;
 	description: string | null;
 	subject: string | null;
 	fromEmail?: string | null;

@@ -40,6 +40,27 @@ export const TemplateErrors = {
 			why: `Template with id "${id}" not found`,
 			fix: "Verify the template ID and ensure it exists and has not been deleted.",
 		}),
+	slugNotFound: (slug: string) =>
+		createError({
+			status: 404,
+			message: "Template not found",
+			why: `No template with slug "${slug}" exists in this organization.`,
+			fix: "Verify the slug; it is shown under the template name in the dashboard.",
+		}),
+	slugTaken: (slug: string) =>
+		createError({
+			status: 409,
+			message: "Template slug already in use",
+			why: `Another template in this organization already uses the slug "${slug}".`,
+			fix: "Choose a different slug, or omit it to have one generated from the name.",
+		}),
+	invalidSlug: (slug: string) =>
+		createError({
+			status: 400,
+			message: "Invalid template slug",
+			why: `"${slug}" is not a valid slug.`,
+			fix: "Use lowercase letters, numbers, and single dashes (e.g. welcome-email), up to 128 characters.",
+		}),
 	nameRequired: () =>
 		createError({
 			status: 400,
