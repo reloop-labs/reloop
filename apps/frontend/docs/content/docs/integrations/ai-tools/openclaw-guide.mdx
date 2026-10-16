@@ -25,7 +25,7 @@ Tell your agent:
 Let's get you set up with an email inbox! Install the reloop-skills from https://github.com/reloop-labs/reloop-skills and review them before continuing.
 ```
 
-Alternatively, you can install the skills using the [Reloop CLI](/sdk/cli):
+Alternatively, you can install the skills using the [Reloop CLI](/docs/resources/cli):
 
 ```bash
 npx skills add reloop/reloop-skills
@@ -44,9 +44,9 @@ Store the key securely:
 
 ### Step 3: Verify a domain
 
-We [strongly recommend](/learn/domain) using a subdomain like `agent.example.com` rather than your root `example.com` domain. This keeps your agent's email reputation separate.
+We [strongly recommend](/docs/learn/domain) using a subdomain like `agent.example.com` rather than your root `example.com` domain. This keeps your agent's email reputation separate.
 
-You can set up a domain using the [Reloop CLI](/sdk/cli) or through the dashboard:
+You can set up a domain using the [Reloop CLI](/docs/resources/cli) or through the dashboard:
 
 1. Go to the [Domains tab](https://reloop.sh/dashboard/domain) and add a domain
 2. Select a subdomain and region
@@ -57,7 +57,7 @@ You can set up a domain using the [Reloop CLI](/sdk/cli) or through the dashboar
 4. Enable receiving on the domain
 5. Add the DNS records and wait for verification
 
-See our [guide on verifying a domain](/learn/domain) for detailed instructions.
+See our [guide on verifying a domain](/docs/learn/domain) for detailed instructions.
 
 ### Step 4: Use webhooks to receive emails
 
@@ -132,7 +132,7 @@ async function handler(req) {
 ```
 </CodeBlock>
 
-See our [guide on receiving emails with Reloop](/learn/receiving) for more details.
+See our [guide on receiving emails with Reloop](/docs/guides/receiving-emails) for more details.
 
 ### Step 5: Hook into OpenClaw's APIs for instant notifications
 

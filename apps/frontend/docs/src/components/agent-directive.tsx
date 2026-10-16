@@ -41,7 +41,7 @@ export function AgentDirective({
 					<> by appending .md to the URL</>
 				)}
 				. Product capabilities: <a href="/skill.md">skill.md</a>. Docs MCP:{" "}
-				<a href="/docs/mcp">/docs/mcp</a>. Site MCP: <a href="/mcp">/mcp</a>.
+				<a href="/docs/mcp">/docs/mcp</a>. Site MCP: <code>https://reloop.sh/mcp</code>.
 			</p>
 		</div>
 	);

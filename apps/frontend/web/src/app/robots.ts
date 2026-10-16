@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
 			userAgent: "*",
 			allow: "/",
 			// /home is noindex; it must stay crawlable so Google can see that.
-			disallow: ["/preferences/", "/redirect/", "/twitter"],
+			disallow: ["/preferences/", "/redirect/", "/twitter", "/mcp"],
 		},
 		sitemap: [
 			`${siteUrl}/sitemap.xml`,

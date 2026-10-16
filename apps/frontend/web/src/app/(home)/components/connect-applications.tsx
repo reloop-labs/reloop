@@ -21,7 +21,7 @@ export function ConnectApplications() {
 								to connect and synchronize data from multiple sources with ease.
 							</p>
 							<Link
-								href="/integrations"
+								href="/docs/integrations"
 								className="inline-flex h-8 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-card px-3 font-medium text-foreground text-xs shadow-black/15 shadow-sm ring-1 ring-foreground/10 duration-200 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 dark:ring-foreground/15 dark:hover:bg-muted/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
 							>
 								See all integrations

@@ -94,7 +94,7 @@ export function DataVisualization() {
 					</Card>
 					<Card icon="zap" title="Automated IP warmup">
 						Volume ramps that protect your{" "}
-						<Term href="/glossary/email-warmup">warmup</Term>.
+						<Term href="/glossary/ip-warming">warmup</Term>.
 					</Card>
 				</div>
 			</div>
