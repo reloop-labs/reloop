@@ -359,8 +359,12 @@ local function apply_reloop_logic(msg, api_key, source)
   end
 
   local current_mid = msg:get_first_named_header_value('Message-ID')
-  if not current_mid or not current_mid:find("^<.+@.+>$") then
+  if current_mid then current_mid = current_mid:match("^%s*(.-)%s*$") end
+  if not current_mid or not current_mid:find("^<[^<>]+@[^<>]+>$") then
     local new_mid = string.format("<%s@%s>", msg_id, domain)
+    -- Replace, never append: a second Message-ID makes Gmail reject with
+    -- 550 "multiple Message-ID headers" (RFC 5322 allows exactly one).
+    msg:remove_all_named_headers('Message-ID')
     msg:append_header('Message-ID', new_mid)
     print("[HEADERS] [" .. msg_id .. "] Injected/Fixed Message-ID: " .. new_mid)
   end
