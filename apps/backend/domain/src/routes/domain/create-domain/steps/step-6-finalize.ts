@@ -60,6 +60,8 @@ export async function finalizeDomainCreation_step6({
 		isSendingEmailEnabled: domainWithDnsRecords.isSendingEmailEnabled,
 		isReceivingEmailEnabled: domainWithDnsRecords.isReceivingEmailEnabled,
 		verificationFailedReason: domainWithDnsRecords.verificationFailedReason,
+		sendingBlockedAt: domainWithDnsRecords.sendingBlockedAt,
+		sendingBlockedMessage: domainWithDnsRecords.sendingBlockedMessage,
 		lastVerifiedAt: domainWithDnsRecords.lastVerifiedAt,
 		createdAt: domainWithDnsRecords.createdAt,
 		updatedAt: domainWithDnsRecords.updatedAt,

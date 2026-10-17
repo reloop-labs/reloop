@@ -115,6 +115,8 @@ export const domain = pgTable(
 		 */
 		sendingBlockedAt: timestamp("sending_blocked_at"),
 		sendingBlockedMessage: text("sending_blocked_message"),
+		/** "admin" or "spamhaus". Only Spamhaus blocks lift automatically. */
+		sendingBlockedSource: text("sending_blocked_source"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
 			.notNull()

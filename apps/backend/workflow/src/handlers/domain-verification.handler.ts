@@ -13,6 +13,7 @@ import {
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import { applySpamhausDblCheck } from "@reloop/db/spamhaus-dbl";
 import { isLocal } from "@reloop/dns/is-local";
 import { resolver } from "@reloop/dns/resolver";
 import {
@@ -104,6 +105,18 @@ export async function processDomainVerification({
 
 	const domainName = domainWithRecords.domain;
 	const records = domainWithRecords.dnsRecords;
+
+	const dbl = await applySpamhausDblCheck({ domainId, domainName });
+	if (dbl.outcome !== "unchanged") {
+		log.info({
+			message: "Spamhaus DBL check changed sending block",
+			domainId,
+			domainName,
+			outcome: dbl.outcome,
+			lookup: dbl.lookup,
+		});
+		await logJob(job, `Spamhaus DBL: ${dbl.outcome}`);
+	}
 	// Capture verification state before any updates so we only emit transition events
 	// (e.g. pending/failed → verified), never verified → verified on re-checks.
 	const wasAlreadyVerified = domainWithRecords.systemVerified;

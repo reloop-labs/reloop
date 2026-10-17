@@ -36,6 +36,7 @@ export async function listDomainsController({
 			systemVerified: domain.systemVerified,
 			sendingBlockedAt: domain.sendingBlockedAt,
 			sendingBlockedMessage: domain.sendingBlockedMessage,
+			sendingBlockedSource: domain.sendingBlockedSource,
 			createdAt: domain.createdAt,
 		})
 		.from(domain)
@@ -131,6 +132,7 @@ export async function setDomainSendingBlockController({
 		.set({
 			sendingBlockedAt: trimmed ? new Date() : null,
 			sendingBlockedMessage: trimmed,
+			sendingBlockedSource: trimmed ? "admin" : null,
 			updatedAt: new Date(),
 		})
 		.where(eq(domain.id, domainId));

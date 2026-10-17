@@ -26,6 +26,7 @@ type DomainItem = {
 	systemVerified: boolean;
 	sendingBlockedAt: string | null;
 	sendingBlockedMessage: string | null;
+	sendingBlockedSource: string | null;
 	createdAt: string;
 };
 
@@ -194,7 +195,10 @@ export default function DomainsPage() {
 										className="mt-0.5 max-w-xs truncate text-[12px] text-red-700 dark:text-red-400"
 										title={d.sendingBlockedMessage ?? undefined}
 									>
-										Sending blocked · {d.sendingBlockedMessage}
+										{d.sendingBlockedSource === "spamhaus"
+											? "Blocked by Spamhaus DBL"
+											: "Sending blocked"}{" "}
+										· {d.sendingBlockedMessage}
 									</p>
 								) : null}
 							</td>

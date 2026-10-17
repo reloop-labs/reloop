@@ -5,6 +5,7 @@ import {
 	summarizeDnsChecks,
 } from "@reloop/db/ensure-sending-domain-verified";
 import * as schema from "@reloop/db/schema";
+import { applySpamhausDblCheck } from "@reloop/db/spamhaus-dbl";
 import { ensureReceivingMxRecord } from "@reloop/domain/utils/ensure-receiving-mx";
 import { ensureTrackingCnameRecord } from "@reloop/domain/utils/ensure-tracking-cname";
 import { DOMAIN_VERIFY_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -71,6 +72,13 @@ export async function verifyDNSRecordController({
 			domainId,
 			domain: domainWithRecords,
 		});
+
+		// Block (or lift a stale Spamhaus block) before the domain can go live.
+		const dbl = await applySpamhausDblCheck({
+			domainId,
+			domainName: domainWithRecords.domain,
+		});
+		log.set({ spamhausDbl: dbl.outcome });
 
 		// Fast path: DNS is usually already propagated when the user clicks
 		// verify. Check synchronously so a correct setup returns `active`

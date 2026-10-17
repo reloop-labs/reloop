@@ -1,3 +1,4 @@
+import { applySpamhausDblCheck } from "@reloop/db/spamhaus-dbl";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
@@ -72,6 +73,10 @@ export async function createDomainController({
 		});
 
 		if (undeletedResponse) {
+			await applySpamhausDblCheck({
+				domainId: undeletedResponse.id,
+				domainName: undeletedResponse.domain,
+			});
 			return undeletedResponse;
 		}
 
@@ -106,6 +111,8 @@ export async function createDomainController({
 			receivingMxRecord,
 			trackingRecord,
 		});
+
+		await applySpamhausDblCheck({ domainId, domainName: domain });
 
 		// Step 6: Finalize creation and return response
 		return await finalizeDomainCreation_step6({

@@ -1,6 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
 import type { DatabaseInstance } from "@reloop/db/client";
 import { domainDnsRecord, domain as domainTable } from "@reloop/db/schema";
+import { applySpamhausDblCheck } from "@reloop/db/spamhaus-dbl";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull, sql } from "drizzle-orm";
@@ -155,6 +156,11 @@ export async function publishRelayDomainEvent(
 	organizationId: string,
 	result: RelayDomainResult,
 ): Promise<void> {
+	// Relay domains are live without verification, so check them here.
+	await applySpamhausDblCheck({
+		domainId: result.domainId,
+		domainName: result.domain,
+	});
 	const payload = {
 		domainId: result.domainId,
 		domain: result.domain,
