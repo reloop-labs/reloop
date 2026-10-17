@@ -40,6 +40,9 @@ export type Domain = {
 	isSendingEmailEnabled: boolean;
 	isReceivingEmailEnabled: boolean;
 	verificationFailedReason: string | null;
+	/** Set while Reloop has blocked sending; the message explains why. */
+	sendingBlockedAt?: string | null;
+	sendingBlockedMessage?: string | null;
 	dnsRecords: DNSRecord[];
 	deletedAt: string | null;
 	lastVerifiedAt: string | null;

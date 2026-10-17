@@ -1,3 +1,4 @@
+import { blockedDetail } from "@reloop/db/ensure-sending-domain-verified";
 import { t } from "elysia";
 import { createError } from "evlog";
 
@@ -105,6 +106,15 @@ export const CampaignErrors = {
 			why: `No verified sending domain matched "${domain}".`,
 			fix: "Verify the domain in Reloop before sending from it.",
 		}),
+	domainBlocked: (domain: string, message: string | null) => {
+		const detail = blockedDetail(domain, message);
+		return createError({
+			status: 403,
+			message: detail,
+			why: detail,
+			fix: "Contact support to review the block on this domain.",
+		});
+	},
 	testFailed: (why: string) =>
 		createError({
 			status: 400,

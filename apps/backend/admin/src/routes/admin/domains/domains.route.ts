@@ -4,6 +4,7 @@ import { Elysia, t } from "elysia";
 import {
 	listDomainsController,
 	reverifyDomainController,
+	setDomainSendingBlockController,
 	updateDomainCapController,
 	updateDomainStatusController,
 } from "./domains.controllers";
@@ -65,6 +66,49 @@ export const domainsRoute = new Elysia()
 			detail: {
 				tags: ["Admin"],
 				summary: "Update domain status",
+			},
+		},
+	)
+	.post(
+		"/domains/:domainId/block",
+		async ({ params, body, userId }) =>
+			setDomainSendingBlockController({
+				domainId: params.domainId,
+				message: body.message,
+				actorUserId: userId,
+			}),
+		{
+			authAdmin: true,
+			params: t.Object({ domainId: t.String() }),
+			body: AdminModel.blockDomainBody,
+			response: {
+				200: AdminModel.successResponse,
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Admin"],
+				summary: "Block a domain from sending, with a customer-facing message",
+			},
+		},
+	)
+	.post(
+		"/domains/:domainId/unblock",
+		async ({ params, userId }) =>
+			setDomainSendingBlockController({
+				domainId: params.domainId,
+				message: null,
+				actorUserId: userId,
+			}),
+		{
+			authAdmin: true,
+			params: t.Object({ domainId: t.String() }),
+			response: {
+				200: AdminModel.successResponse,
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Admin"],
+				summary: "Lift a domain sending block",
 			},
 		},
 	)

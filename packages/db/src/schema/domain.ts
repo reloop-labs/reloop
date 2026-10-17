@@ -108,6 +108,13 @@ export const domain = pgTable(
 		 * Raised via admin console "Increase limit" with audit log.
 		 */
 		dailyCapOverride: integer("daily_cap_override"),
+		/**
+		 * Admin sending block. Kept apart from `status`, which DNS
+		 * verification rewrites, so a re-verify can never lift it.
+		 * The message is shown to the customer on every rejected send.
+		 */
+		sendingBlockedAt: timestamp("sending_blocked_at"),
+		sendingBlockedMessage: text("sending_blocked_message"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
 			.notNull()

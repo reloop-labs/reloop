@@ -202,6 +202,7 @@ export type SendingDomainDnsResult =
 	| { ok: true }
 	| { ok: false; code: "not_found" }
 	| { ok: false; code: "suspended" }
+	| { ok: false; code: "blocked"; message: string | null }
 	| { ok: false; code: "sending_disabled" }
 	| {
 			ok: false;
@@ -216,6 +217,15 @@ export type SendingDomainDnsResult =
 			missing: string[];
 			transient: true;
 	  };
+
+/** Customer-facing rejection text for an admin-blocked domain. */
+export function blockedDetail(
+	domainName: string,
+	message: string | null,
+): string {
+	const base = `Email was not sent. Sending from ${domainName} has been blocked.`;
+	return message?.trim() ? `${base} ${message.trim()}` : base;
+}
 
 /**
  * When SPF fails, check whether the cause is duplicate v=spf1 records so the
@@ -244,7 +254,8 @@ async function duplicateSpfDetail(
  *
  * A definitive mismatch marks the domain unverified. A resolver timeout
  * blocks this send and leaves the stored status alone.
- * Suspended domains stay suspended.
+ * Suspended domains stay suspended. Admin-blocked domains are rejected
+ * before any DNS lookup.
  */
 export async function ensureSendingDomainVerified(
 	{
@@ -271,6 +282,8 @@ export async function ensureSendingDomainVerified(
 			isClickTrackingEnabled: true,
 			isOpenTrackingEnabled: true,
 			smtpProviderId: true,
+			sendingBlockedAt: true,
+			sendingBlockedMessage: true,
 		},
 		with: {
 			dnsRecords: {
@@ -289,6 +302,9 @@ export async function ensureSendingDomainVerified(
 	});
 
 	if (!row) return { ok: false, code: "not_found" };
+	if (row.sendingBlockedAt) {
+		return { ok: false, code: "blocked", message: row.sendingBlockedMessage };
+	}
 	if (row.status === "suspended") return { ok: false, code: "suspended" };
 	if (!row.isSendingEmailEnabled) {
 		return { ok: false, code: "sending_disabled" };

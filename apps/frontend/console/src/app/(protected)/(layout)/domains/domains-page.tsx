@@ -24,6 +24,8 @@ type DomainItem = {
 	organizationId: string;
 	organizationName: string;
 	systemVerified: boolean;
+	sendingBlockedAt: string | null;
+	sendingBlockedMessage: string | null;
 	createdAt: string;
 };
 
@@ -38,6 +40,8 @@ export default function DomainsPage() {
 	const [draftQ, setDraftQ] = useState(q);
 	const [suspendTarget, setSuspendTarget] = useState<DomainItem | null>(null);
 	const [verifyingId, setVerifyingId] = useState<string | null>(null);
+	const [blockTarget, setBlockTarget] = useState<DomainItem | null>(null);
+	const [blockMessage, setBlockMessage] = useState("");
 
 	useEffect(() => {
 		setDraftQ(q);
@@ -123,6 +127,47 @@ export default function DomainsPage() {
 				/>
 			) : null}
 
+			{blockTarget ? (
+				<InlineActionPanel
+					title={`Block sending from ${blockTarget.domain}?`}
+					description="Every send from this domain (API, SMTP, campaigns, automations) is rejected with your message until you unblock it. DNS re-verification does not lift the block."
+					confirmLabel="Block sending"
+					destructive
+					onCancel={() => {
+						setBlockTarget(null);
+						setBlockMessage("");
+					}}
+					onConfirm={async () => {
+						const message = blockMessage.trim();
+						if (!message) {
+							toast.error("Add a message for the customer");
+							return;
+						}
+						try {
+							await adminPost(`/domains/${blockTarget.id}/block`, { message });
+							toast.success(`Sending blocked for ${blockTarget.domain}`);
+							setBlockTarget(null);
+							setBlockMessage("");
+							mutate();
+						} catch {
+							toast.error("Failed to block domain");
+						}
+					}}
+				>
+					<textarea
+						rows={3}
+						maxLength={500}
+						value={blockMessage}
+						onChange={(e) => setBlockMessage(e.target.value)}
+						placeholder="Shown to the customer, e.g. Sending is paused while we review a phishing report. Contact support to appeal."
+						className="block w-full resize-none rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3 text-[13px] text-text-strong-950 outline-none transition placeholder:text-text-soft-400 focus:border-text-strong-950 focus:ring-1 focus:ring-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-white/[0.02] dark:focus:border-white"
+					/>
+					<p className="text-[11px] text-text-soft-400 tabular-nums">
+						{blockMessage.length}/500
+					</p>
+				</InlineActionPanel>
+			) : null}
+
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 				<DataTable
 					headers={[
@@ -142,7 +187,17 @@ export default function DomainsPage() {
 							key={d.id}
 							className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40"
 						>
-							<td className="px-4 py-3 font-medium">{d.domain}</td>
+							<td className="px-4 py-3">
+								<p className="font-medium">{d.domain}</p>
+								{d.sendingBlockedAt ? (
+									<p
+										className="mt-0.5 max-w-xs truncate text-[12px] text-red-700 dark:text-red-400"
+										title={d.sendingBlockedMessage ?? undefined}
+									>
+										Sending blocked · {d.sendingBlockedMessage}
+									</p>
+								) : null}
+							</td>
 							<td className="px-4 py-3">
 								<Link
 									href={`/organizations/${d.organizationId}`}
@@ -181,9 +236,7 @@ export default function DomainsPage() {
 											try {
 												setVerifyingId(d.id);
 												await adminPost(`/domains/${d.id}/verify`);
-												toast.success(
-													`Reverification started for ${d.domain}`,
-												);
+												toast.success(`Reverification started for ${d.domain}`);
 												mutate();
 											} catch {
 												toast.error("Failed to start reverification");
@@ -194,6 +247,36 @@ export default function DomainsPage() {
 									>
 										{verifyingId === d.id ? "Verifying..." : "Reverify"}
 									</Button.Root>
+									{d.sendingBlockedAt ? (
+										<Button.Root
+											size="xsmall"
+											variant="neutral"
+											mode="ghost"
+											onClick={async () => {
+												try {
+													await adminPost(`/domains/${d.id}/unblock`);
+													toast.success(`Sending unblocked for ${d.domain}`);
+													mutate();
+												} catch {
+													toast.error("Failed to unblock domain");
+												}
+											}}
+										>
+											Unblock sending
+										</Button.Root>
+									) : (
+										<Button.Root
+											size="xsmall"
+											variant="error"
+											mode="ghost"
+											onClick={() => {
+												setBlockMessage("");
+												setBlockTarget(d);
+											}}
+										>
+											Block sending
+										</Button.Root>
+									)}
 									{d.status === "suspended" ? (
 										<Button.Root
 											size="xsmall"

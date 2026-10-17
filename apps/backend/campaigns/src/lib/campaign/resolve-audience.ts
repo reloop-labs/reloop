@@ -205,8 +205,16 @@ export async function assertVerifiedFromDomain(
 			eq(schema.domain.organizationId, organizationId),
 			eq(schema.domain.domain, domainName),
 		),
-		columns: { id: true, status: true },
+		columns: {
+			id: true,
+			status: true,
+			sendingBlockedAt: true,
+			sendingBlockedMessage: true,
+		},
 	});
+	if (row?.sendingBlockedAt) {
+		throw CampaignErrors.domainBlocked(domainName, row.sendingBlockedMessage);
+	}
 	if (!row || row.status === "suspended" || row.status === "failed") {
 		throw CampaignErrors.unverifiedDomain(domainName);
 	}

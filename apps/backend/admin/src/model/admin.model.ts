@@ -453,6 +453,8 @@ export namespace AdminModel {
 		organizationId: t.String(),
 		organizationName: t.String(),
 		systemVerified: t.Boolean(),
+		sendingBlockedAt: t.Union([t.Date(), t.Null()]),
+		sendingBlockedMessage: t.Union([t.String(), t.Null()]),
 		createdAt: t.Date(),
 	});
 
@@ -470,6 +472,10 @@ export namespace AdminModel {
 			t.Literal("failed"),
 		]),
 		reason: t.Optional(t.String()),
+	});
+
+	export const blockDomainBody = t.Object({
+		message: t.String({ minLength: 1, maxLength: 500 }),
 	});
 
 	export const updateDomainCapBody = t.Object({

@@ -138,6 +138,9 @@ export async function logIncomingController({
 		if (dns.code === "not_found") {
 			throw KumoMtaErrors.domainNotFound(body.domainName);
 		}
+		if (dns.code === "blocked") {
+			throw KumoMtaErrors.domainBlocked(body.domainName, dns.message);
+		}
 		if (dns.code === "lookup_failed") {
 			const detail = `Email was not sent. DNS for ${body.domainName} could not be checked just now, so the message was not accepted.`;
 			throw createError({

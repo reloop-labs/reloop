@@ -1,3 +1,4 @@
+import { blockedDetail } from "@reloop/db/ensure-sending-domain-verified";
 import { t } from "elysia";
 import { createError } from "evlog";
 
@@ -140,6 +141,17 @@ export const KumoMtaErrors = {
 			why: `The domain ${domainName} is found but is not active or verified.`,
 			fix: "Verify the domain's DNS records and ensure its status is active.",
 		}),
+	// 422 so the SMTP policy relays the message to the client as 5.7.1;
+	// a 403 there is masked as a generic rejection.
+	domainBlocked: (domainName: string, message: string | null) => {
+		const detail = blockedDetail(domainName, message);
+		return createError({
+			status: 422,
+			message: detail,
+			why: detail,
+			fix: "Contact support to review the block on this domain.",
+		});
+	},
 	domainDnsNotVerified: (domainName: string, reason: string) => {
 		const detail = `Email was not sent. ${domainName} failed DNS verification. ${reason}. The domain status is now failed.`;
 		return createError({

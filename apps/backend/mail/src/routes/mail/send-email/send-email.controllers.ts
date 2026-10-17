@@ -317,6 +317,9 @@ export async function sendEmailController({
 			if (dnsHealthCheck.code === "not_found") {
 				throw MailErrors.domainNotFound(domainName);
 			}
+			if (dnsHealthCheck.code === "blocked") {
+				throw MailErrors.domainBlocked(domainName, dnsHealthCheck.message);
+			}
 			if (dnsHealthCheck.code === "suspended") {
 				throw MailErrors.domainSuspended(domainName);
 			}

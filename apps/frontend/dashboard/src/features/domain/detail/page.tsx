@@ -22,6 +22,7 @@ import { DomainConfigurationSection } from "./components/domain-configuration-se
 import { DomainEvents } from "./components/domain-events";
 import { DomainHeader } from "./components/domain-header";
 import { DomainStats } from "./components/domain-stats";
+import { SendingBlockedBanner } from "./components/sending-blocked-banner";
 import { useDomainActions } from "./hooks/use-domain-actions";
 
 export function DomainDetailPage({
@@ -247,6 +248,7 @@ export function DomainDetailPage({
 				domainId={domainId ?? undefined}
 				isLoading={showLoading}
 			/>
+			<SendingBlockedBanner domain={domainData} />
 			<DomainStats domain={domainData} isLoading={showLoading} />
 			<DomainEvents domain={domainData} isLoading={showLoading} />
 			<TabMenu.Root

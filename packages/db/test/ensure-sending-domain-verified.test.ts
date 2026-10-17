@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	blockedDetail,
 	planDomainDnsChecks,
 	summarizeDnsChecks,
 } from "@reloop/db/ensure-sending-domain-verified";
@@ -117,5 +118,24 @@ describe("summarizeDnsChecks", () => {
 			missing: ["SPF"],
 			transient: true,
 		});
+	});
+});
+
+describe("blockedDetail", () => {
+	test("appends the admin message for the customer", () => {
+		expect(
+			blockedDetail("example.com", "  Phishing report under review.  "),
+		).toBe(
+			"Email was not sent. Sending from example.com has been blocked. Phishing report under review.",
+		);
+	});
+
+	test("falls back to the base sentence without a message", () => {
+		expect(blockedDetail("example.com", null)).toBe(
+			"Email was not sent. Sending from example.com has been blocked.",
+		);
+		expect(blockedDetail("example.com", "   ")).toBe(
+			"Email was not sent. Sending from example.com has been blocked.",
+		);
 	});
 });

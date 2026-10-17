@@ -188,6 +188,17 @@ export namespace DomainModel {
 			verificationFailedReason: t.Union([t.String(), t.Null()], {
 				description: "Reason for verification failure",
 			}),
+			sendingBlockedAt: t.Optional(
+				t.Union([t.Date(), t.Null()], {
+					description:
+						"When Reloop blocked sending from this domain (null = not blocked)",
+				}),
+			),
+			sendingBlockedMessage: t.Optional(
+				t.Union([t.String(), t.Null()], {
+					description: "Why Reloop blocked sending from this domain",
+				}),
+			),
 			sentCount: t.Optional(
 				t.Number({
 					description: "Number of emails sent using this domain",

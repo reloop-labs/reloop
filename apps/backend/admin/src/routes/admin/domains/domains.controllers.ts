@@ -34,6 +34,8 @@ export async function listDomainsController({
 			organizationId: domain.organizationId,
 			organizationName: organization.name,
 			systemVerified: domain.systemVerified,
+			sendingBlockedAt: domain.sendingBlockedAt,
+			sendingBlockedMessage: domain.sendingBlockedMessage,
 			createdAt: domain.createdAt,
 		})
 		.from(domain)
@@ -87,6 +89,62 @@ export async function updateDomainStatusController({
 			previousStatus: existing.status,
 			domain: existing.domain,
 			reason,
+		},
+	});
+
+	return { success: true };
+}
+
+export async function setDomainSendingBlockController({
+	domainId,
+	message,
+	actorUserId,
+}: {
+	domainId: string;
+	/** Customer-facing message. Null lifts the block. */
+	message: string | null;
+	actorUserId: string;
+}) {
+	const existing = await db.query.domain.findFirst({
+		where: and(eq(domain.id, domainId), isNull(domain.deletedAt)),
+	});
+	if (!existing) {
+		throw createError({
+			status: 404,
+			message: "Domain not found",
+			why: `No domain with id ${domainId}`,
+			fix: "Check the domain id and try again",
+		});
+	}
+	const trimmed = message?.trim() || null;
+	if (message !== null && !trimmed) {
+		throw createError({
+			status: 400,
+			message: "Block message is required",
+			why: "The message was empty",
+			fix: "Tell the customer why sending is blocked",
+		});
+	}
+
+	await db
+		.update(domain)
+		.set({
+			sendingBlockedAt: trimmed ? new Date() : null,
+			sendingBlockedMessage: trimmed,
+			updatedAt: new Date(),
+		})
+		.where(eq(domain.id, domainId));
+
+	await writeAdminAudit({
+		actorUserId,
+		action: trimmed ? "domain.sending_blocked" : "domain.sending_unblocked",
+		resourceType: "domain",
+		resourceId: domainId,
+		organizationId: existing.organizationId,
+		metadata: {
+			domain: existing.domain,
+			message: trimmed,
+			previousMessage: existing.sendingBlockedMessage,
 		},
 	});
 

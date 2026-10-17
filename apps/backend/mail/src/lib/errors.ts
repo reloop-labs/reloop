@@ -1,3 +1,4 @@
+import { blockedDetail } from "@reloop/db/ensure-sending-domain-verified";
 import { createError } from "evlog";
 
 export class MailError extends Error {
@@ -136,6 +137,15 @@ export const MailErrors = {
 			message: detail,
 			why: detail,
 			fix: "Contact support if this domain should be allowed to send.",
+		});
+	},
+	domainBlocked: (domainName: string, message: string | null) => {
+		const detail = blockedDetail(domainName, message);
+		return createError({
+			status: 403,
+			message: detail,
+			why: detail,
+			fix: "Contact support to review the block on this domain.",
 		});
 	},
 	invalidFromAddress: (from: string) =>
