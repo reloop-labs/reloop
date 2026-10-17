@@ -9,6 +9,7 @@
 		"event-types",
 		"retries-and-replays",
 		"verify-webhooks-requests",
+		"testing-webhooks",
 		"ingester",
 		"---Emails---",
 		"emails/bounced",

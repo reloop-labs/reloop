@@ -148,6 +148,7 @@ export function WebhookTestPage({ webhookId }: { webhookId: string }) {
 			) : webhook ? (
 				<TriggerWebhookTester
 					webhookId={webhook.id}
+					webhookUrl={webhook.url}
 					webhookEvents={webhook.events}
 					webhookStatus={webhook.status}
 					onCancel={goBack}

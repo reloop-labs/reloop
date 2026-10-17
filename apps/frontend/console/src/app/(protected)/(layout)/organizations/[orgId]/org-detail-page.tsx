@@ -1,6 +1,7 @@
 "use client";
 
 import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
+import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
 import { AttachmentChips } from "@fe/console/components/ui/attachment-chips";
 import { EntityTabs } from "@fe/console/components/ui/entity-tabs";
 import { MetricGrid } from "@fe/console/components/ui/metric-grid";
@@ -21,7 +22,6 @@ import {
 	formatRelativeTime,
 	truncateId,
 } from "@fe/console/lib/format";
-import { SuspectionDrawer } from "@fe/console/components/suspection-drawer";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -118,6 +118,9 @@ type OrgDetail = {
 		sentToday: number;
 		remaining: number | null;
 		source: string;
+		sendingBlockedAt?: string | null;
+		sendingBlockedMessage?: string | null;
+		sendingBlockedSource?: string | null;
 	}>;
 	apiKeys: Array<{
 		id: string;
@@ -235,6 +238,14 @@ export default function OrganizationDetailPage() {
 		reason: string;
 	} | null>(null);
 	const [savingCap, setSavingCap] = useState(false);
+	const [blockTarget, setBlockTarget] = useState<{
+		id: string;
+		domain: string;
+	} | null>(null);
+	const [blockMessage, setBlockMessage] = useState("");
+	const [unblockingDomainId, setUnblockingDomainId] = useState<string | null>(
+		null,
+	);
 
 	const { data, isLoading, error, mutate } = useSWR<OrgDetail>(
 		orgId ? `/organizations/${orgId}` : null,
@@ -414,10 +425,11 @@ export default function OrganizationDetailPage() {
 			{data.isSuspect ? (
 				<div className="flex items-start justify-between gap-3 rounded-2xl border border-red-500/30 bg-red-500/[0.06] p-4 text-[13px] dark:border-red-500/40 dark:bg-red-500/10">
 					<div className="flex items-start gap-3">
-						<ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+						<ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
 						<div>
 							<p className="font-semibold text-red-700 dark:text-red-300">
-								Organization Flagged as Suspect ({data.suspectCategory || "Spam"}) ·{" "}
+								Organization Flagged as Suspect (
+								{data.suspectCategory || "Spam"}) ·{" "}
 								{data.suspectSeverity?.toUpperCase() || "HIGH"} RISK
 							</p>
 							<p className="mt-0.5 text-red-600 dark:text-red-400">
@@ -588,7 +600,9 @@ export default function OrganizationDetailPage() {
 								dailyCapOverride: amount,
 								reason: capTarget.reason || "Limit raised by admin",
 							});
-							toast.success(`Daily cap for ${capTarget.domain} set to ${amount}`);
+							toast.success(
+								`Daily cap for ${capTarget.domain} set to ${amount}`,
+							);
 							setCapTarget(null);
 							mutate();
 						} finally {
@@ -646,6 +660,48 @@ export default function OrganizationDetailPage() {
 					>
 						Restore automatic cap instead
 					</button>
+				</InlineActionPanel>
+			) : null}
+
+			{blockTarget ? (
+				<InlineActionPanel
+					title={`Disable sending from ${blockTarget.domain}?`}
+					description="Every send from this domain (API, SMTP, campaigns, automations) is rejected with your reason until you re-enable it. DNS re-verification does not lift the block. Audit-logged."
+					confirmLabel="Disable domain"
+					destructive
+					onCancel={() => {
+						setBlockTarget(null);
+						setBlockMessage("");
+					}}
+					onConfirm={async () => {
+						const message = blockMessage.trim();
+						if (!message) {
+							toast.error("Add a reason for the customer");
+							throw new Error("missing reason");
+						}
+						try {
+							await adminPost(`/domains/${blockTarget.id}/block`, { message });
+							toast.success(`Sending disabled for ${blockTarget.domain}`);
+							setBlockTarget(null);
+							setBlockMessage("");
+							mutate();
+						} catch (err) {
+							toast.error("Failed to disable domain");
+							throw err;
+						}
+					}}
+				>
+					<textarea
+						rows={3}
+						maxLength={500}
+						value={blockMessage}
+						onChange={(e) => setBlockMessage(e.target.value)}
+						placeholder="Reason shown to the customer, e.g. Sending is paused while we review a phishing report. Contact support to appeal."
+						className="block w-full resize-none rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3 text-[13px] text-text-strong-950 outline-none transition placeholder:text-text-soft-400 focus:border-text-strong-950 focus:ring-1 focus:ring-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-white/[0.02] dark:focus:border-white"
+					/>
+					<p className="text-[11px] text-text-soft-400 tabular-nums">
+						{blockMessage.length}/500
+					</p>
 				</InlineActionPanel>
 			) : null}
 
@@ -798,7 +854,7 @@ export default function OrganizationDetailPage() {
 														{d.domain}
 														{d.dailyCapOverride != null ? (
 															<span
-																className="ml-1.5 rounded-full bg-blue-500/10 px-1.5 py-0.5 font-sans font-medium text-[10px] text-blue-700 ring-1 ring-blue-500/20 dark:text-blue-300"
+																className="ml-1.5 rounded-full bg-blue-500/10 px-1.5 py-0.5 font-medium font-sans text-[10px] text-blue-700 ring-1 ring-blue-500/20 dark:text-blue-300"
 																title={`Admin override (automatic would be ${d.ageCap ?? "dynamic"})`}
 															>
 																raised
@@ -1271,6 +1327,19 @@ export default function OrganizationDetailPage() {
 								>
 									<td className="px-4 py-3 font-medium">
 										<div>{d.domain}</div>
+										{d.sendingBlockedAt ? (
+											<p
+												className="max-w-xs truncate text-[11px] text-red-700 dark:text-red-400"
+												title={d.sendingBlockedMessage ?? undefined}
+											>
+												{d.sendingBlockedSource === "spamhaus"
+													? "Blocked by Spamhaus DBL"
+													: "Disabled"}
+												{d.sendingBlockedMessage
+													? ` · ${d.sendingBlockedMessage}`
+													: null}
+											</p>
+										) : null}
 										{isWarming ? (
 											<span className="text-[11px] text-orange-600 dark:text-orange-400">
 												Warming up
@@ -1315,7 +1384,7 @@ export default function OrganizationDetailPage() {
 												{d.dailyCap}
 												{d.dailyCapOverride != null ? (
 													<span
-														className="ml-1 text-[10px] font-medium text-blue-600"
+														className="ml-1 font-medium text-[10px] text-blue-600"
 														title={`Admin override (automatic would be ${d.ageCap ?? "dynamic"})`}
 													>
 														· raised
@@ -1390,6 +1459,44 @@ export default function OrganizationDetailPage() {
 											>
 												Increase
 											</Button.Root>
+											{d.sendingBlockedAt ? (
+												<Button.Root
+													size="xsmall"
+													variant="neutral"
+													mode="ghost"
+													disabled={unblockingDomainId === d.id}
+													onClick={async () => {
+														try {
+															setUnblockingDomainId(d.id);
+															await adminPost(`/domains/${d.id}/unblock`);
+															toast.success(
+																`Sending re-enabled for ${d.domain}`,
+															);
+															mutate();
+														} catch {
+															toast.error("Failed to re-enable domain");
+														} finally {
+															setUnblockingDomainId(null);
+														}
+													}}
+												>
+													{unblockingDomainId === d.id
+														? "Enabling..."
+														: "Enable"}
+												</Button.Root>
+											) : (
+												<Button.Root
+													size="xsmall"
+													variant="error"
+													mode="ghost"
+													onClick={() => {
+														setBlockMessage("");
+														setBlockTarget({ id: d.id, domain: d.domain });
+													}}
+												>
+													Disable
+												</Button.Root>
+											)}
 										</div>
 									</td>
 								</tr>

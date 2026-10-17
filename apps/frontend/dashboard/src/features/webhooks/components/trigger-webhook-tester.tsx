@@ -22,22 +22,16 @@ import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { useWebhookListenersQuery } from "#/features/webhooks/hooks/use-webhooks-query";
 
 const actionKbdOnBlueClassName =
 	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
-
-const FORBIDDEN_BROWSER_HEADERS = new Set([
-	"user-agent",
-	"host",
-	"content-length",
-	"connection",
-	"accept-encoding",
-]);
 
 type WebhookStatus = "active" | "paused" | "disabled" | "failed";
 
 interface TriggerWebhookTesterProps {
 	webhookId: string;
+	webhookUrl?: string;
 	webhookEvents?: string[];
 	webhookStatus?: WebhookStatus;
 	onCancel?: () => void;
@@ -46,7 +40,7 @@ interface TriggerWebhookTesterProps {
 }
 
 interface DirectTriggerResult {
-	phase: "completed" | "sign_error";
+	phase: "completed" | "request_error";
 	eventType: string;
 	triggeredAt: string;
 	durationMs: number | null;
@@ -58,6 +52,24 @@ interface DirectTriggerResult {
 	requestBodySent?: Record<string, unknown>;
 	ok: boolean;
 }
+
+interface SendTestEventResponse {
+	target: "endpoint" | "listener";
+	url: string;
+	ok: boolean;
+	responseStatus: number | null;
+	responseBody: string | null;
+	durationMs: number | null;
+	error: string | null;
+	headers: Record<string, string>;
+	body: Record<string, unknown>;
+}
+
+/** "endpoint" = the webhook URL; anything else is a listener session ID. */
+type TestTarget = "endpoint" | (string & {});
+
+const LISTEN_COMMAND =
+	"reloop webhooks listen --forward-to localhost:3000/webhooks";
 
 const CATEGORY_META: Record<string, { label: string; icon: string }> = {
 	email: { label: "Email", icon: "mail-send" },
@@ -220,8 +232,72 @@ function inactiveCopy(status: WebhookStatus): {
 	}
 }
 
+function TargetOption({
+	selected,
+	disabled,
+	onSelect,
+	title,
+	detail,
+	badge,
+}: {
+	selected: boolean;
+	disabled: boolean;
+	onSelect: () => void;
+	title: string;
+	detail?: string;
+	badge?: string;
+}) {
+	return (
+		<button
+			type="button"
+			aria-pressed={selected}
+			disabled={disabled}
+			onClick={onSelect}
+			className={cn(
+				"flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-[border-color,background-color,box-shadow] duration-150 ease-out",
+				disabled && "cursor-not-allowed opacity-60",
+				selected
+					? "border-stroke-soft-200 bg-bg-weak-50 shadow-regular-xs dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40"
+					: "border-transparent hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:hover:border-stroke-soft-100/40",
+			)}
+		>
+			<span
+				className={cn(
+					"flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ease-out",
+					selected
+						? "border-text-strong-950 bg-text-strong-950 dark:border-white dark:bg-white"
+						: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50",
+				)}
+				aria-hidden
+			>
+				{selected ? (
+					<span className="h-1.5 w-1.5 rounded-full bg-white dark:bg-black" />
+				) : null}
+			</span>
+			<div className="min-w-0 flex-1">
+				<div className="flex items-center gap-2">
+					<span className="font-medium text-[13px] text-text-strong-950">
+						{title}
+					</span>
+					{badge ? (
+						<span className="rounded-md bg-bg-soft-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 dark:bg-bg-weak-50/50">
+							{badge}
+						</span>
+					) : null}
+				</div>
+				{detail ? (
+					<p className="truncate font-mono text-[11px] text-text-sub-600">
+						{detail}
+					</p>
+				) : null}
+			</div>
+		</button>
+	);
+}
+
 export const TriggerWebhookTester = ({
 	webhookId,
+	webhookUrl,
 	webhookEvents,
 	webhookStatus = "active",
 	onCancel,
@@ -255,6 +331,14 @@ export const TriggerWebhookTester = ({
 	);
 	const [isSending, setIsSending] = useState(false);
 	const [result, setResult] = useState<DirectTriggerResult | null>(null);
+	const [selectedTarget, setSelectedTarget] = useState<TestTarget>("endpoint");
+	const { data: listeners = [] } = useWebhookListenersQuery();
+	// Fall back to the webhook URL when the chosen listener goes offline.
+	const target: TestTarget =
+		selectedTarget === "endpoint" ||
+		listeners.some((l) => l.sessionId === selectedTarget)
+			? selectedTarget
+			: "endpoint";
 
 	const selectedEvent = useMemo(
 		() => filteredEvents.find((e) => e.id === selectedEventId),
@@ -279,7 +363,8 @@ export const TriggerWebhookTester = ({
 		Boolean(selectedEventId) &&
 		!isSending &&
 		!isReenabling &&
-		isDeliverable &&
+		// Paused webhooks get no real deliveries, but a local listener can still be tested.
+		(isDeliverable || target !== "endpoint") &&
 		filteredEvents.length > 0;
 
 	useHotkeys(
@@ -314,34 +399,50 @@ export const TriggerWebhookTester = ({
 	};
 
 	const handleTrigger = async () => {
-		if (!selectedEventId || !isDeliverable || isSending) return;
+		if (!selectedEventId || !canSend) return;
 
 		setIsSending(true);
 		setResult(null);
 		const triggeredAt = new Date().toISOString();
 
-		let signedData: {
-			url: string;
-			headers: Record<string, string>;
-			body: Record<string, unknown>;
-			rawBody: string;
-		};
-
-		// 1. Get backend signature & headers without storing any event actions/DB logs
+		// Signed and delivered by Reloop's servers, so the endpoint needs no CORS.
 		try {
-			const res = await axios.post(
-				"/api/webhook/v1/sign-test-event",
-				{ webhookId, event: selectedEventId, payload },
+			const res = await axios.post<SendTestEventResponse>(
+				"/api/webhook/v1/send-test-event",
+				{
+					webhookId,
+					event: selectedEventId,
+					payload,
+					...(target === "endpoint" ? {} : { listenerSessionId: target }),
+				},
 				{ withCredentials: true },
 			);
-			signedData = res.data;
+			const data = res.data;
+			setResult({
+				phase: "completed",
+				eventType: selectedEventId,
+				triggeredAt,
+				durationMs: data.durationMs,
+				url: data.url,
+				responseStatus: data.responseStatus,
+				responseBody: data.responseBody,
+				errorMessage: data.error,
+				headersSent: data.headers,
+				requestBodySent: data.body,
+				ok: data.ok,
+			});
+			if (data.ok) {
+				toast.success(`Endpoint returned HTTP ${data.responseStatus}`);
+			} else {
+				toast.error(data.error ?? "Delivery failed");
+			}
 		} catch (err: unknown) {
 			const msg =
 				axios.isAxiosError(err) && err.response?.data?.message
 					? err.response.data.message
-					: "Failed to sign test event";
+					: "Failed to send test event";
 			setResult({
-				phase: "sign_error",
+				phase: "request_error",
 				eventType: selectedEventId,
 				triggeredAt,
 				durationMs: null,
@@ -349,76 +450,6 @@ export const TriggerWebhookTester = ({
 				ok: false,
 			});
 			toast.error(msg);
-			setIsSending(false);
-			return;
-		}
-
-		// Prepare headers for browser fetch (filter out restricted browser headers)
-		const browserHeaders: Record<string, string> = {};
-		for (const [k, v] of Object.entries(signedData.headers)) {
-			if (FORBIDDEN_BROWSER_HEADERS.has(k.toLowerCase())) continue;
-			browserHeaders[k] = v;
-		}
-
-		// 2. Direct client call from browser to target webhook URL
-		const startTime = performance.now();
-		try {
-			const response = await fetch(signedData.url, {
-				method: "POST",
-				headers: browserHeaders,
-				body: signedData.rawBody,
-			});
-
-			const durationMs = Math.round(performance.now() - startTime);
-			const status = response.status;
-			const isOk = response.ok;
-			let responseBodyText: string | null = null;
-			try {
-				responseBodyText = await response.text();
-			} catch {
-				responseBodyText = null;
-			}
-
-			setResult({
-				phase: "completed",
-				eventType: selectedEventId,
-				triggeredAt,
-				durationMs,
-				url: signedData.url,
-				responseStatus: status,
-				responseBody: responseBodyText,
-				errorMessage: isOk ? null : `Endpoint returned HTTP ${status}`,
-				headersSent: browserHeaders,
-				requestBodySent: signedData.body,
-				ok: isOk,
-			});
-
-			if (isOk) {
-				toast.success(`Endpoint returned HTTP ${status}`);
-			} else {
-				toast.error(`Endpoint returned HTTP ${status}`);
-			}
-		} catch (err: unknown) {
-			const durationMs = Math.round(performance.now() - startTime);
-			const errorMsg =
-				err instanceof Error
-					? err.message
-					: "Failed to send request directly from browser (Network or CORS error)";
-
-			setResult({
-				phase: "completed",
-				eventType: selectedEventId,
-				triggeredAt,
-				durationMs,
-				url: signedData.url,
-				responseStatus: null,
-				responseBody: null,
-				errorMessage: `${errorMsg}. Ensure target endpoint allows cross-origin requests or is reachable from your browser.`,
-				headersSent: browserHeaders,
-				requestBodySent: signedData.body,
-				ok: false,
-			});
-			toast.error("Failed to reach target endpoint directly from browser");
 		} finally {
 			setIsSending(false);
 		}
@@ -472,6 +503,61 @@ export const TriggerWebhookTester = ({
 			<div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
 				{/* ── Left: Event picker ── */}
 				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+					<div className="space-y-2 border-stroke-soft-200 border-b px-4 pt-4 pb-3 dark:border-stroke-soft-100/40">
+						<div>
+							<Label.Root>Send to</Label.Root>
+							<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+								Reloop sends the request from its servers, so your endpoint
+								doesn&apos;t need CORS.
+							</p>
+						</div>
+						<div className="space-y-1">
+							<TargetOption
+								selected={target === "endpoint"}
+								disabled={isSending}
+								onSelect={() => setSelectedTarget("endpoint")}
+								title="Webhook URL"
+								detail={webhookUrl}
+							/>
+							{listeners.map((listener) => (
+								<TargetOption
+									key={listener.sessionId}
+									selected={target === listener.sessionId}
+									disabled={isSending}
+									onSelect={() => setSelectedTarget(listener.sessionId)}
+									title="Local listener"
+									detail={listener.forwardTo ?? listener.sessionId}
+									badge="CLI"
+								/>
+							))}
+						</div>
+						{listeners.length === 0 ? (
+							<div className="flex items-center gap-2 rounded-xl bg-bg-weak-50 px-3 py-2 dark:bg-bg-weak-50/50">
+								<p className="min-w-0 flex-1 text-[12px] text-text-sub-600 leading-relaxed">
+									Testing on localhost? Run{" "}
+									<code className="font-mono text-[11px] text-text-strong-950">
+										{LISTEN_COMMAND}
+									</code>{" "}
+									and it shows up here.
+								</p>
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="ghost"
+									size="xsmall"
+									className="shrink-0 rounded-lg"
+									onClick={() => {
+										void navigator.clipboard.writeText(LISTEN_COMMAND);
+										toast.success("Command copied");
+									}}
+								>
+									<Icon name="copy" className="h-3.5 w-3.5" />
+									<span className="sr-only">Copy command</span>
+								</Button.Root>
+							</div>
+						) : null}
+					</div>
+
 					<div className="space-y-3 px-4 pt-4 pb-3">
 						<div>
 							<Label.Root>
@@ -578,7 +664,7 @@ export const TriggerWebhookTester = ({
 							{isSending ? (
 								<>
 									<Spinner size={14} color="currentColor" />
-									Sending from browser…
+									Sending…
 								</>
 							) : (
 								<>
@@ -604,11 +690,12 @@ export const TriggerWebhookTester = ({
 							<div className="flex flex-col items-center justify-center gap-2 px-4 py-14 text-center">
 								<Spinner size={20} color="currentColor" />
 								<p className="font-medium text-sm text-text-strong-950">
-									Sending test event from client browser…
+									Sending test event…
 								</p>
 								<p className="max-w-[260px] text-[12px] text-text-sub-600 leading-relaxed">
-									Signing payload on backend and invoking endpoint directly from
-									your browser.
+									{target === "endpoint"
+										? "Reloop is signing the payload and POSTing it to your endpoint."
+										: "Reloop is relaying the signed payload to your local listener."}
 								</p>
 							</div>
 						</div>
@@ -640,8 +727,8 @@ export const TriggerWebhookTester = ({
 										<p className="font-semibold text-sm text-text-strong-950">
 											{result.ok
 												? "Endpoint responded successfully"
-												: result.phase === "sign_error"
-													? "Signing failed"
+												: result.phase === "request_error"
+													? "Could not send test event"
 													: "Delivery failed"}
 										</p>
 										<p className="mt-0.5 text-[12px] text-text-sub-600">
@@ -690,7 +777,7 @@ export const TriggerWebhookTester = ({
 								Object.keys(result.headersSent).length > 0 ? (
 									<div className="space-y-1.5">
 										<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wide">
-											Headers sent from client
+											Signed headers sent
 										</p>
 										<pre className="max-h-[min(180px,25vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
 											{JSON.stringify(result.headersSent, null, 2)}
@@ -735,7 +822,7 @@ export const TriggerWebhookTester = ({
 										</p>
 										<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
 											{selectedEvent
-												? "Signed JSON envelope POSTed directly from browser to your endpoint."
+												? "Signed JSON envelope Reloop POSTs to your endpoint."
 												: "Select an event to preview the sample payload."}
 										</p>
 									</div>

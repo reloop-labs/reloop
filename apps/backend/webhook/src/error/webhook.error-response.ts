@@ -60,6 +60,13 @@ export const WebhookErrors = {
 			why: `An unexpected error occurred while deleting the webhook "${webhookId}".`,
 			fix: "Please try again later or contact support if the issue persists.",
 		}),
+	listenerOffline: (sessionId: string) =>
+		createError({
+			status: 404,
+			message: "Listener is not connected",
+			why: `No active \`reloop webhooks listen\` session with ID "${sessionId}" exists for your organization.`,
+			fix: "Start `reloop webhooks listen --forward-to <url>` and pick the listener again.",
+		}),
 	databaseError: (message: string) =>
 		createError({
 			status: 500,

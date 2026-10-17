@@ -32,7 +32,7 @@ export default (req, res) => {
 };
 ```
 
-You can use tools like [ngrok](https://ngrok.com) or [VS Code Port Forwarding](https://code.visualstudio.com/docs/debugtest/port-forwarding) to expose your local server to the internet.
+To test it while it runs on localhost, use [`reloop webhooks listen`](/docs/webhooks/testing-webhooks#test-on-localhost-with-the-cli). It forwards test events to your machine without exposing it to the internet.
 
 ### 2. Add a webhook in Reloop.
 
@@ -41,6 +41,8 @@ Go to the [Webhooks page](https://reloop.sh/dashboard/webhooks) in your dashboar
 2. Select all events you want to observe.
 
 ### 3. Test your local endpoint.
+
+Open the webhook's **Test** page and send a test event to your URL or to a local listener. See [Test Webhooks](/docs/webhooks/testing-webhooks).
 
 When you send an email or trigger an event, Reloop will send a payload like this to your endpoint:
 

@@ -51,7 +51,8 @@ export async function listOrganizationsController({
 	isSuspect?: boolean;
 }) {
 	const conditions = [];
-	if (isSuspect !== undefined) conditions.push(eq(organization.isSuspect, isSuspect));
+	if (isSuspect !== undefined)
+		conditions.push(eq(organization.isSuspect, isSuspect));
 	if (status) conditions.push(eq(organization.status, status));
 	if (q) {
 		conditions.push(
@@ -279,6 +280,9 @@ export async function getOrganizationController(organizationId: string) {
 				createdAt: domain.createdAt,
 				registeredAt: domain.registeredAt,
 				dailyCapOverride: domain.dailyCapOverride,
+				sendingBlockedAt: domain.sendingBlockedAt,
+				sendingBlockedMessage: domain.sendingBlockedMessage,
+				sendingBlockedSource: domain.sendingBlockedSource,
 			})
 			.from(domain)
 			.where(
@@ -790,4 +794,3 @@ export async function updateOrganizationSuspectController({
 		affectedUserCount,
 	};
 }
-

@@ -349,6 +349,9 @@ export namespace AdminModel {
 				sentToday: t.Number(),
 				remaining: t.Union([t.Number(), t.Null()]),
 				source: t.String(),
+				sendingBlockedAt: t.Union([t.Date(), t.Null()]),
+				sendingBlockedMessage: t.Union([t.String(), t.Null()]),
+				sendingBlockedSource: t.Union([t.String(), t.Null()]),
 			}),
 		),
 		apiKeys: t.Array(

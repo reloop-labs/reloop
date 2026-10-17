@@ -79,4 +79,6 @@ export namespace WebhookTypes {
 	export type SignTestEventBody = typeof WebhookModel.signTestEventBody.static;
 	export type SignTestEventResponse =
 		typeof WebhookModel.signTestEventResponse.static;
+	export type SendTestEventResponse =
+		typeof WebhookModel.sendTestEventResponse.static;
 }

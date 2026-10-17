@@ -3,6 +3,8 @@ import { deleteWebhookRoute } from "@reloop/webhook/routes/webhook/delete-webhoo
 import { getWebhookRoute } from "@reloop/webhook/routes/webhook/get-webhook/get-webhook.route";
 import { listWebhookDeliveriesRoute } from "@reloop/webhook/routes/webhook/list-webhook-deliveries/list-webhook-deliveries.route";
 import { listWebhooksRoute } from "@reloop/webhook/routes/webhook/list-webhooks/list-webhooks.route";
+import { listenRoute } from "@reloop/webhook/routes/webhook/listen/listen.route";
+import { sendTestEventRoute } from "@reloop/webhook/routes/webhook/send-test-event/send-test-event.route";
 import { signTestEventRoute } from "@reloop/webhook/routes/webhook/sign-test-event/sign-test-event.route";
 import { triggerWebhookRoute } from "@reloop/webhook/routes/webhook/trigger-webhook/trigger-webhook.route";
 import { updateWebhookRoute } from "@reloop/webhook/routes/webhook/update-webhook/update-webhook.route";
@@ -19,4 +21,6 @@ export const webhookRoutes = new Elysia({
 	.use(deleteWebhookRoute)
 	.use(triggerWebhookRoute)
 	.use(signTestEventRoute)
+	.use(sendTestEventRoute)
+	.use(listenRoute)
 	.use(listWebhookDeliveriesRoute);

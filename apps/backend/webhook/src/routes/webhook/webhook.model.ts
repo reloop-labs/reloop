@@ -415,6 +415,68 @@ export namespace WebhookModel {
 
 	export type SignTestEventResponse = typeof signTestEventResponse.static;
 
+	export const sendTestEventBody = t.Object({
+		webhookId: t.String({
+			description: "Webhook ID to send the test event for",
+		}),
+		event: t.String({
+			pattern: knownEventRegex.source,
+			error: "Invalid event ID provided",
+		}),
+		payload: t.Record(t.String(), t.Any(), {
+			description: "Event payload (becomes envelope.data)",
+		}),
+		listenerSessionId: t.Optional(
+			t.String({
+				description:
+					"Send to a `reloop webhooks listen` session instead of the webhook URL",
+			}),
+		),
+	});
+
+	export type SendTestEventBody = typeof sendTestEventBody.static;
+
+	export const sendTestEventResponse = t.Object({
+		target: t.Union([t.Literal("endpoint"), t.Literal("listener")]),
+		url: t.String({ description: "Where the request was delivered" }),
+		ok: t.Boolean(),
+		responseStatus: t.Union([t.Number(), t.Null()]),
+		responseBody: t.Union([t.String(), t.Null()]),
+		durationMs: t.Union([t.Number(), t.Null()]),
+		error: t.Union([t.String(), t.Null()]),
+		headers: t.Record(t.String(), t.String(), {
+			description: "Signed headers that were sent",
+		}),
+		body: t.Record(t.String(), t.Any(), {
+			description: "Webhook envelope that was sent",
+		}),
+	});
+
+	export type SendTestEventResponse = typeof sendTestEventResponse.static;
+
+	export const listenStreamQuery = t.Object({
+		forwardTo: t.Optional(t.String({ maxLength: 2048 })),
+	});
+
+	export const listenResultBody = t.Object({
+		deliveryId: t.String(),
+		status: t.Union([t.Number(), t.Null()]),
+		body: t.Union([t.String(), t.Null()]),
+		durationMs: t.Number(),
+		error: t.Union([t.String(), t.Null()]),
+	});
+
+	export const listenSessionResponse = t.Object({
+		sessionId: t.String(),
+		forwardTo: t.Union([t.String(), t.Null()]),
+		client: t.Union([t.String(), t.Null()]),
+		connectedAt: t.String(),
+	});
+
+	export const listenSessionListResponse = t.Object({
+		sessions: t.Array(listenSessionResponse),
+	});
+
 	export const webhookDeliveryAttemptResponse = t.Object({
 		id: t.String({ description: "Attempt identifier" }),
 		attemptNumber: t.Number(),

@@ -1,0 +1,120 @@
+---
+title: Test Webhooks
+description: Send test events to your endpoint, or to a server on localhost with the Reloop CLI.
+---
+
+You can test a webhook before any real email goes out. There are two ways to do it:
+
+- **Send a test event to your webhook URL** from the dashboard. Use this when your endpoint is already deployed.
+- **Forward test events to localhost** with `reloop webhooks listen`. Use this while you build your handler on your own machine. You don't need ngrok or a public URL.
+
+Either way, Reloop signs the request and sends it **from its own servers**, exactly like a real delivery. Your endpoint doesn't need CORS headers, and your [signature check](/docs/webhooks/verify-webhooks-requests) runs unchanged.
+
+Test events are not stored. They don't show up in delivery logs, and they don't count toward retries or auto-disable.
+
+## Send a test event to your webhook URL
+
+<Steps>
+<Step title="Open the Test page">
+Go to [Webhooks](https://reloop.sh/dashboard/webhooks), open your webhook, and choose **Test**.
+</Step>
+<Step title="Pick the target and event">
+Under **Send to**, keep **Webhook URL** selected. Pick one of the webhook's subscribed events. The right-hand panel shows the exact envelope that will be sent.
+</Step>
+<Step title="Send">
+Click **Send test event** (or press <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Enter</kbd>). The result shows the HTTP status, how long the request took, your endpoint's response body, and the signed headers that were sent.
+</Step>
+</Steps>
+
+Paused or disabled webhooks can't receive tests at their URL. Resume the webhook first, or send to a local listener instead.
+
+## Test on localhost with the CLI
+
+`reloop webhooks listen` opens a connection from your machine to Reloop. When you send a test event to the listener, Reloop pushes it down that connection, and the CLI POSTs it to your local server. Your server's response then travels back to the dashboard.
+
+```
+Dashboard ──► Reloop ══ connection opened by the CLI ══► reloop CLI ──► localhost:3000
+                ▲                                                         │
+                └────────────── status · response body · timing ◄─────────┘
+```
+
+The connection starts on your machine, so this works behind NAT, firewalls, and corporate networks.
+
+<Steps>
+<Step title="Install the CLI and sign in">
+
+```bash
+npm install -g reloop-cli
+reloop login
+```
+
+In CI or a container, set `RELOOP_API_KEY` instead of running `reloop login`.
+</Step>
+<Step title="Start your local server">
+Run the app that handles webhooks, for example on `http://localhost:3000/webhooks`.
+</Step>
+<Step title="Start the listener">
+
+```bash
+reloop webhooks listen --forward-to localhost:3000/webhooks
+```
+
+```
+Ready. Forwarding webhook events to http://localhost:3000/webhooks
+Listener wls_o3g9g7vk7k82ule1s4d4at8x. Pick it as the target on a webhook's Test page. Ctrl-C to stop.
+```
+</Step>
+<Step title="Send a test event to the listener">
+On the webhook's **Test** page, a **Local listener** option appears under **Send to** within a few seconds. Select it, pick an event, and click **Send test event**.
+
+The CLI prints one line per event:
+
+```
+14:02:11  email.sent  →  POST http://localhost:3000/webhooks  [200]  12ms
+```
+
+The dashboard shows the same status and your server's response body.
+</Step>
+</Steps>
+
+Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop. The listener disappears from the dashboard straight away.
+
+### Signatures
+
+Requests forwarded to a listener are signed with the secret of **the webhook whose Test page you sent from**. Configure your local server with that webhook's signing secret (`whsec_…`) and verify requests as usual. See [Verify Webhooks Requests](/docs/webhooks/verify-webhooks-requests).
+
+### Options
+
+| Flag | Description |
+| --- | --- |
+| `--forward-to`, `-f` | Local URL to POST events to. Accepts a full URL, `localhost:3000/webhooks`, or just a port (`3000` means `http://localhost:3000/`). |
+| `--json` | Print one JSON object per event, for scripts and agents. |
+| `--endpoint` | Use a self-hosted Reloop instead of Reloop Cloud. |
+| `--debug` | Log the connection to the relay. |
+
+```bash
+# Forward to a port on localhost
+reloop webhooks listen -f 8080
+
+# Pipe results into jq
+reloop webhooks listen -f localhost:3000/webhooks --json | jq '{type: .eventType, status}'
+```
+
+If the connection drops, for example when your laptop sleeps, the CLI reconnects with backoff and prints a warning. Its listener ID changes, so select the new listener in the dashboard.
+
+## Troubleshooting
+
+**The listener doesn't appear in the dashboard.**
+Check that the CLI printed `Ready.` and is signed in to the same organization you're viewing (`reloop auth status`). The list refreshes every few seconds.
+
+**`Could not reach http://localhost:3000/webhooks`**
+The CLI is connected, but nothing is listening at `--forward-to`. Check that your server is running, and check the port and path.
+
+**`Local endpoint returned HTTP 4xx/5xx`**
+Your server received the request and rejected it. The response body is shown in the dashboard and the CLI. A `401` or `400` is usually a signature check that uses the wrong secret, or that re-serializes the JSON before verifying.
+
+**`The listener did not report a result within 15s`**
+Your server took longer than 10 seconds to respond. Return `2xx` quickly, and do slow work after responding.
+
+**`Outbound request to private/local IP address … is blocked`**
+You sent a test to a webhook URL that points at a private or local address. Reloop's servers can't reach your machine. Use a local listener instead.

@@ -92,6 +92,33 @@ class MessageBus {
 		return sub;
 	}
 
+	/** Publish JSON on an ad-hoc subject (not a typed BusEvent), e.g. per-session relay subjects. */
+	publishSubject(subject: string, payload: unknown) {
+		if (!this.nc) throw new Error("Bus not connected. Call connect() first.");
+		this.nc.publish(subject, this.encoder.encode(JSON.stringify(payload)));
+	}
+
+	/** Subscribe to an ad-hoc subject. The caller owns the returned subscription. */
+	subscribeSubject<T>(
+		subject: string,
+		callback: (payload: T) => void | Promise<void>,
+		options?: { max?: number },
+	): Subscription {
+		if (!this.nc) throw new Error("Bus not connected. Call connect() first.");
+
+		const sub = this.nc.subscribe(subject, { max: options?.max });
+		(async () => {
+			for await (const m of sub) {
+				try {
+					await callback(m.json<T>());
+				} catch (err) {
+					console.error(`Error processing subject ${subject}:`, err);
+				}
+			}
+		})();
+		return sub;
+	}
+
 	async ensureStream(name: string, subjects: string[]) {
 		if (!this.nc) throw new Error("Bus not connected. Call connect() first.");
 		const jsm = await jetstreamManager(this.nc);

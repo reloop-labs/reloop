@@ -88,6 +88,32 @@ export function useWebhookDetailQuery(webhookId: string | null | undefined) {
 	});
 }
 
+export type WebhookListener = {
+	sessionId: string;
+	forwardTo: string | null;
+	client: string | null;
+	connectedAt: string;
+};
+
+/** Online `reloop webhooks listen` sessions for the active organization. */
+export function useWebhookListenersQuery() {
+	const { activeOrganization } = useActiveOrganization();
+	return useQuery({
+		queryKey: queryKeys.webhooks.listeners(activeOrganization?.id ?? ""),
+		queryFn: async () => {
+			const res = await fetch("/api/webhook/v1/listen/sessions", {
+				credentials: "include",
+			});
+			if (!res.ok) throw new Error(`Failed to load listeners (${res.status})`);
+			const data = (await res.json()) as { sessions: WebhookListener[] };
+			return data.sessions;
+		},
+		enabled: !!activeOrganization?.id,
+		// Listeners come and go as the CLI starts and stops.
+		refetchInterval: 5000,
+	});
+}
+
 export function useInvalidateWebhooks() {
 	const queryClient = useQueryClient();
 	return () =>
