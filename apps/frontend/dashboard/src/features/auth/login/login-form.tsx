@@ -12,6 +12,8 @@ import {
 	showRateLimitCountdownToast,
 	toastApiError,
 } from "#/lib/rate-limit-toast";
+import { normalizeEmail } from "@/features/auth/normalize-email";
+import { lowercaseInput } from "@/utils/lowercase-input";
 
 /**
  * Extract a displayable message from a Better Auth client error, which is a
@@ -95,7 +97,7 @@ export function LoginForm({
 		try {
 			clearErrors("email");
 			changeStatus("loading");
-			const email = data.email;
+			const email = normalizeEmail(data.email);
 			const { error } = await authClient.emailOtp.sendVerificationOtp({
 				email,
 				type: "sign-in",
@@ -145,11 +147,18 @@ export function LoginForm({
 						<Input.Input
 							className="h-11 font-medium text-base"
 							id="email"
-							type="email"
+							// text, not email: email inputs can't restore the caret
+							// after lowercasing (see lowercaseInput).
+							type="text"
+							inputMode="email"
+							autoComplete="email"
+							autoCapitalize="none"
+							spellCheck={false}
 							placeholder="steve@apple.com"
 							disabled={isBusy}
 							{...emailField}
 							onChange={(e) => {
+								lowercaseInput(e.target);
 								void emailField.onChange(e);
 								if (errors.email) clearErrors("email");
 							}}

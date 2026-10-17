@@ -5,6 +5,34 @@ import {
 } from "@reloop/web/app/(home)/components/agent-cards";
 import { siModelcontextprotocol } from "simple-icons";
 
+// The SVG terminal scales its text down to ~7px on phones; render real text there instead.
+function MobileCliTerminal() {
+	return (
+		<div className="w-full overflow-hidden rounded-lg border border-stroke-soft-100 bg-zinc-50 sm:hidden dark:border-white/10 dark:bg-zinc-950">
+			<div className="flex items-center gap-1.5 border-stroke-soft-100 border-b px-3 py-2 dark:border-white/10">
+				<span className="size-2 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+				<span className="size-2 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+				<span className="size-2 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+				<span className="ml-2 font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
+					developer@mac ~ reloop
+				</span>
+			</div>
+			<pre className="overflow-x-auto px-3 py-3 font-mono text-[12.5px] text-zinc-600 leading-6 dark:text-zinc-400">
+				<code>
+					<span className="block text-zinc-950 dark:text-white">
+						$ reloop emails send \
+					</span>
+					<span className="block">{"    "}--to user@example.com \</span>
+					<span className="block">{"    "}--subject "Welcome to Reloop"</span>
+					<span className="block text-zinc-950 dark:text-white">
+						✓ queued → sent → delivered (78ms)
+					</span>
+				</code>
+			</pre>
+		</div>
+	);
+}
+
 export function LandingAgentCards() {
 	return (
 		<section
@@ -35,7 +63,7 @@ export function LandingAgentCards() {
 								description="Let Claude, Cursor, or Codex send and manage email."
 							/>
 						</div>
-						<div className="flex min-h-[280px] flex-1 flex-col border-stroke-soft-100 border-t p-4 sm:p-5 md:px-5 md:py-5 dark:border-white/10">
+						<div className="flex min-h-[240px] flex-1 flex-col border-stroke-soft-100 border-t px-0 py-4 sm:min-h-[280px] sm:p-5 md:px-5 md:py-5 dark:border-white/10">
 							<div className="flex min-h-0 flex-1 items-center justify-center [&>svg]:max-h-[240px] [&>svg]:w-full">
 								<McpDiagram />
 							</div>
@@ -68,9 +96,10 @@ export function LandingAgentCards() {
 							/>
 						</div>
 						<div className="flex min-h-[280px] flex-1 flex-col border-stroke-soft-100 border-t p-4 sm:p-5 md:px-5 md:py-5 dark:border-white/10">
-							<div className="flex min-h-0 flex-1 items-center justify-center [&>svg]:max-h-[220px] [&>svg]:w-full">
+							<div className="hidden min-h-0 flex-1 items-center justify-center sm:flex [&>svg]:max-h-[220px] [&>svg]:w-full">
 								<CliDiagram />
 							</div>
+							<MobileCliTerminal />
 						</div>
 					</div>
 				</div>

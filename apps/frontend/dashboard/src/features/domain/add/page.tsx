@@ -61,7 +61,7 @@ export function AddDomainPage() {
 			const { data } = await axios.post<DomainResponse>(
 				"/api/domain/v1/create",
 				{
-					domain,
+					domain: domain.trim().toLowerCase(),
 					click_tracking: clickTracking,
 					open_tracking: openTracking,
 					// Receiving + tracking on by default for new domains.

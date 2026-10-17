@@ -4,6 +4,7 @@ import * as Label from "@reloop/ui/label";
 import * as React from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import { HoverPopover } from "#/features/agent-inbox/components/thread-detail/hover-popover";
+import { lowercaseInput } from "@/utils/lowercase-input";
 import type { DomainFormValues } from "../schema";
 
 interface DomainInputFieldProps {
@@ -50,6 +51,8 @@ export const DomainInputField = ({
 		return domainParts.slice(-2).join(".");
 	}, [domainParts]);
 
+	const domainField = register("domain");
+
 	const showWarningTriangle = !criteria.isSubdomain && domainParts.length > 0;
 	const warningTooltip = !criteria.isValid
 		? "Enter a valid domain name (e.g. send.example.com)."
@@ -76,7 +79,14 @@ export const DomainInputField = ({
 						<Input.Input
 							id="domain"
 							placeholder="send.example.com"
-							{...register("domain")}
+							autoCapitalize="none"
+							autoCorrect="off"
+							spellCheck={false}
+							{...domainField}
+							onChange={(e) => {
+								lowercaseInput(e.target);
+								void domainField.onChange(e);
+							}}
 							disabled={isLoading}
 						/>
 
