@@ -19,6 +19,14 @@ import {
 } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
+type ContactStatus = "subscribed" | "unsubscribed" | "blocked";
+
+/** Parse "subscribed,blocked" into a de-duplicated list (the route validates values). */
+export function parseStatusFilter(raw: string | undefined): ContactStatus[] {
+	if (!raw) return [];
+	return [...new Set(raw.split(",").filter(Boolean))] as ContactStatus[];
+}
+
 export async function listContactsController({
 	organizationId,
 	query,
@@ -43,8 +51,9 @@ export async function listContactsController({
 		];
 
 		const matchFilters: Array<SQL<unknown>> = [];
-		if (query.status) {
-			const condition = eq(schema.contact.status, query.status);
+		const statuses = parseStatusFilter(query.status);
+		if (statuses.length > 0) {
+			const condition = inArray(schema.contact.status, statuses);
 			whereConditions.push(condition);
 			matchFilters.push(condition);
 		}

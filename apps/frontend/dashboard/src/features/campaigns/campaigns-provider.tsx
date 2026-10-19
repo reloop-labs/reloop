@@ -1,6 +1,10 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	type QueryClient,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import {
 	createContext,
 	type ReactNode,
@@ -17,6 +21,8 @@ import type {
 	UpdateCampaignInput,
 } from "./campaign-types";
 import {
+	type CampaignListParams,
+	type CampaignListResponse,
 	createCampaignRequest,
 	deleteCampaignRequest,
 	duplicateCampaignRequest,
@@ -29,11 +35,6 @@ import {
 } from "./campaigns-api";
 
 interface CampaignsContextValue {
-	campaigns: Campaign[];
-	isLoading: boolean;
-	isHydrated: boolean;
-	isError: boolean;
-	getCampaign: (id: string) => Campaign | undefined;
 	createCampaign: (
 		input: CreateCampaignInput,
 		recipientCount: number,
@@ -52,24 +53,11 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 	const orgId = activeOrganization?.id ?? "default_org";
 	const queryClient = useQueryClient();
 
-	const listQuery = useQuery({
-		queryKey: queryKeys.campaigns.list(orgId),
-		queryFn: listCampaigns,
-		enabled: Boolean(activeOrganization?.id),
-	});
-
-	const campaigns = listQuery.data ?? [];
-
 	const invalidate = useCallback(async () => {
 		await queryClient.invalidateQueries({
-			queryKey: queryKeys.campaigns.list(orgId),
+			queryKey: queryKeys.campaigns.lists(orgId),
 		});
 	}, [orgId, queryClient]);
-
-	const getCampaign = useCallback(
-		(id: string) => campaigns.find((c) => c.id === id),
-		[campaigns],
-	);
 
 	const createCampaign = useCallback(
 		async (input: CreateCampaignInput, _recipientCount: number) => {
@@ -94,7 +82,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 
 	const sendCampaign = useCallback(
 		async (id: string) => {
-			const existing = campaigns.find((c) => c.id === id);
+			const existing = findCachedCampaign(queryClient, orgId, id);
 			await sendCampaignRequest(id);
 			await invalidate();
 			toast.success(
@@ -103,7 +91,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 					: "Campaign is sending",
 			);
 		},
-		[campaigns, invalidate],
+		[invalidate, orgId, queryClient],
 	);
 
 	const scheduleCampaign = useCallback(
@@ -119,7 +107,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 
 	const duplicateCampaign = useCallback(
 		async (id: string) => {
-			const existing = campaigns.find((c) => c.id === id);
+			const existing = findCachedCampaign(queryClient, orgId, id);
 			const cloned = await duplicateCampaignRequest(id);
 			await invalidate();
 			toast.success(
@@ -127,28 +115,23 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			);
 			return cloned;
 		},
-		[campaigns, invalidate],
+		[invalidate, orgId, queryClient],
 	);
 
 	const deleteCampaign = useCallback(
 		async (id: string) => {
-			const existing = campaigns.find((c) => c.id === id);
+			const existing = findCachedCampaign(queryClient, orgId, id);
 			await deleteCampaignRequest(id);
 			await invalidate();
 			toast.success(
 				existing ? `Deleted "${existing.name}"` : "Campaign deleted",
 			);
 		},
-		[campaigns, invalidate],
+		[invalidate, orgId, queryClient],
 	);
 
 	const value = useMemo<CampaignsContextValue>(
 		() => ({
-			campaigns,
-			isLoading: listQuery.isLoading,
-			isHydrated: listQuery.isFetched || listQuery.isError,
-			isError: listQuery.isError,
-			getCampaign,
 			createCampaign,
 			updateCampaign,
 			sendCampaign,
@@ -157,11 +140,6 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			deleteCampaign,
 		}),
 		[
-			campaigns,
-			listQuery.isLoading,
-			listQuery.isFetched,
-			listQuery.isError,
-			getCampaign,
 			createCampaign,
 			updateCampaign,
 			sendCampaign,
@@ -176,6 +154,38 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			{children}
 		</CampaignsContext.Provider>
 	);
+}
+
+/** Look up a campaign in any cached list page or detail query (for toast names). */
+function findCachedCampaign(
+	queryClient: QueryClient,
+	orgId: string,
+	id: string,
+): Campaign | undefined {
+	const detail = queryClient.getQueryData<Campaign>(
+		queryKeys.campaigns.detail(id),
+	);
+	if (detail) return detail;
+	const lists = queryClient.getQueriesData<CampaignListResponse>({
+		queryKey: queryKeys.campaigns.lists(orgId),
+	});
+	for (const [, data] of lists) {
+		const found = data?.campaigns.find((c) => c.id === id);
+		if (found) return found;
+	}
+	return undefined;
+}
+
+/** One server-side page of campaigns for the current search/status/page. */
+export function useCampaignsListQuery(params: CampaignListParams) {
+	const { activeOrganization } = useActiveOrganization();
+	const orgId = activeOrganization?.id ?? "default_org";
+	return useQuery({
+		queryKey: queryKeys.campaigns.list(orgId, params),
+		queryFn: () => listCampaigns(params),
+		enabled: Boolean(activeOrganization?.id),
+		placeholderData: (prev) => prev,
+	});
 }
 
 export function useCampaigns() {
@@ -200,13 +210,8 @@ export function useCampaignQuery(id: string | undefined) {
 		queryKey: queryKeys.campaigns.detail(id ?? ""),
 		queryFn: () => getCampaignById(id as string),
 		enabled: Boolean(id && activeOrganization?.id),
-		placeholderData: () => {
-			if (!id) return undefined;
-			const listed = queryClient.getQueryData<Campaign[]>(
-				queryKeys.campaigns.list(orgId),
-			);
-			return listed?.find((campaign) => campaign.id === id);
-		},
+		placeholderData: () =>
+			id ? findCachedCampaign(queryClient, orgId, id) : undefined,
 	});
 }
 

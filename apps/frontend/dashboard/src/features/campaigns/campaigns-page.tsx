@@ -10,7 +10,7 @@ import { useEffect, useMemo } from "react";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { CampaignsListHeader } from "./campaigns-list-header";
-import { CampaignsProvider, useCampaigns } from "./campaigns-provider";
+import { CampaignsProvider, useCampaignsListQuery } from "./campaigns-provider";
 import { CampaignErrorState } from "./components/campaign-error-state";
 import { CampaignListToolbar } from "./components/campaign-list-toolbar";
 import { CampaignTable } from "./components/campaign-table";
@@ -18,7 +18,6 @@ import { CreateCampaignModal } from "./components/create-campaign-modal";
 import { useCampaignColumnVisibility } from "./hooks/use-campaign-column-visibility";
 
 function CampaignsPageContent() {
-	const { campaigns, isLoading, isHydrated, isError } = useCampaigns();
 	const [statusFilters] = useQueryState(
 		"status",
 		parseAsArrayOf(parseAsString).withDefault([]),
@@ -32,35 +31,34 @@ function CampaignsPageContent() {
 	const [modal, setModal] = useQueryState("modal");
 	const { columnVisibility, setColumnVisible } = useCampaignColumnVisibility();
 
-	const filtered = useMemo(() => {
-		let list = campaigns;
-		if (statusFilters.length > 0) {
-			const allowed = new Set(statusFilters);
-			list = list.filter((campaign) => allowed.has(campaign.status));
-		}
-		const q = searchQuery.toLowerCase().trim();
-		if (!q) return list;
-		return list.filter(
-			(campaign) =>
-				campaign.name.toLowerCase().includes(q) ||
-				campaign.subject.toLowerCase().includes(q) ||
-				(campaign.audienceTargetName?.toLowerCase().includes(q) ?? false),
-		);
-	}, [campaigns, statusFilters, searchQuery]);
-
 	const limit = pageSize ?? 10;
 	const page = currentPage ?? 1;
-	const paged = useMemo(() => {
-		const start = (page - 1) * limit;
-		return filtered.slice(start, start + limit);
-	}, [filtered, page, limit]);
+	// Sorted so the same selection in a different order shares a cache entry.
+	const statuses = useMemo(() => [...statusFilters].sort(), [statusFilters]);
+	const listQuery = useCampaignsListQuery({
+		page,
+		limit,
+		search: searchQuery,
+		statuses,
+	});
+	const campaigns = listQuery.data?.campaigns ?? [];
+	const total = listQuery.data?.total ?? 0;
 
+	// Clamp to the last page when the result set shrinks (e.g. after a delete).
 	useEffect(() => {
-		const totalPages = Math.max(1, Math.ceil(filtered.length / limit));
+		if (!listQuery.data || listQuery.isPlaceholderData) return;
+		const totalPages = Math.max(1, Math.ceil(total / limit));
 		if (page > totalPages) {
 			void setCurrentPage(totalPages);
 		}
-	}, [filtered.length, limit, page, setCurrentPage]);
+	}, [
+		listQuery.data,
+		listQuery.isPlaceholderData,
+		total,
+		limit,
+		page,
+		setCurrentPage,
+	]);
 
 	const actions = useMemo<CommandAction[]>(
 		() => [
@@ -85,13 +83,13 @@ function CampaignsPageContent() {
 
 	useRegisterCommandActions("campaigns", "Campaigns", actions);
 
-	const showLoading = !isHydrated || isLoading;
+	const showLoading = listQuery.isPending;
 
 	return (
 		<div className="mx-auto max-w-5xl space-y-6 p-6 lg:p-8">
 			<CampaignsListHeader />
 
-			{isError ? (
+			{listQuery.isError ? (
 				<CampaignErrorState />
 			) : (
 				<div className="space-y-4">
@@ -100,8 +98,8 @@ function CampaignsPageContent() {
 						onColumnVisibleChange={setColumnVisible}
 					/>
 					<CampaignTable
-						campaigns={paged}
-						total={filtered.length}
+						campaigns={campaigns}
+						total={total}
 						columnVisibility={columnVisibility}
 						isLoading={showLoading}
 					/>

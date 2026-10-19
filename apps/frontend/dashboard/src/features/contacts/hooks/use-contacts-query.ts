@@ -38,6 +38,7 @@ export type ContactsListParams = {
 	page: number;
 	limit: number;
 	search: string;
+	/** Comma-separated statuses; empty means no status filter. */
 	status: string;
 	channelId?: string;
 	enabled?: boolean;
@@ -144,7 +145,7 @@ export function useUpdateContactStatusInCache() {
 
 			// Query key shape: ["contacts", "list", { page, limit, search, status }]
 			const params = queryKey[2] as { status?: string } | undefined;
-			const statusFilter = params?.status ?? "";
+			const statusFilter = (params?.status ?? "").split(",").filter(Boolean);
 
 			let subscribedDelta = 0;
 			let unsubscribedDelta = 0;
@@ -154,7 +155,7 @@ export function useUpdateContactStatusInCache() {
 			if (newStatus === "unsubscribed") unsubscribedDelta += 1;
 
 			const noLongerMatchesFilter =
-				!!statusFilter && statusFilter !== newStatus;
+				statusFilter.length > 0 && !statusFilter.includes(newStatus);
 
 			if (noLongerMatchesFilter) {
 				queryClient.setQueryData<ContactListResponse>(queryKey, {

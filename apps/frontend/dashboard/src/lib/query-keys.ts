@@ -169,8 +169,17 @@ export const queryKeys = {
 	},
 	campaigns: {
 		all: ["campaigns"] as const,
-		list: (orgId: string) =>
+		lists: (orgId: string) =>
 			[...queryKeys.campaigns.all, "list", orgId] as const,
+		list: (
+			orgId: string,
+			params: {
+				page: number;
+				limit: number;
+				search: string;
+				statuses: string[];
+			},
+		) => [...queryKeys.campaigns.lists(orgId), params] as const,
 		detail: (id: string) => [...queryKeys.campaigns.all, "detail", id] as const,
 		recipients: (id: string) =>
 			[...queryKeys.campaigns.all, "recipients", id] as const,

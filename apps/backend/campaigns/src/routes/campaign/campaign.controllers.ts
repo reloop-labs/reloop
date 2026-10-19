@@ -13,6 +13,7 @@ import { assertVerifiedFromDomain } from "@be/campaigns/lib/campaign/resolve-aud
 import { sendCampaignMail } from "@be/campaigns/lib/campaign/send-mail";
 import { snapshotAudience } from "@be/campaigns/lib/campaign/snapshot";
 import {
+	type CampaignStatus,
 	canCancel,
 	canDelete,
 	canEdit,
@@ -171,7 +172,8 @@ export async function listCampaignsController(params: {
 	page?: number;
 	limit?: number;
 	search?: string;
-	status?: "draft" | "scheduled" | "sending" | "sent" | "cancelled";
+	/** One status or a comma-separated list. */
+	status?: string;
 }) {
 	const page = Math.max(1, params.page ?? 1);
 	const limit = Math.min(
@@ -183,10 +185,20 @@ export async function listCampaignsController(params: {
 		eq(schema.campaign.organizationId, params.organizationId),
 		isNull(schema.campaign.deletedAt),
 	];
-	if (params.status) filters.push(eq(schema.campaign.status, params.status));
+	const statuses = [
+		...new Set(params.status?.split(",").filter(Boolean) ?? []),
+	] as CampaignStatus[];
+	if (statuses.length > 0) {
+		filters.push(inArray(schema.campaign.status, statuses));
+	}
 	if (params.search?.trim()) {
 		const q = `%${params.search.trim().replace(/[%_\\]/g, "\\$&")}%`;
-		filters.push(ilike(schema.campaign.name, q));
+		const searchMatch = or(
+			ilike(schema.campaign.name, q),
+			ilike(schema.campaign.subject, q),
+			ilike(schema.campaign.audienceTargetName, q),
+		);
+		if (searchMatch) filters.push(searchMatch);
 	}
 
 	const where = and(...filters);
@@ -195,7 +207,7 @@ export async function listCampaignsController(params: {
 			.select()
 			.from(schema.campaign)
 			.where(where)
-			.orderBy(desc(schema.campaign.createdAt))
+			.orderBy(desc(schema.campaign.createdAt), desc(schema.campaign.id))
 			.limit(limit)
 			.offset(offset),
 		db

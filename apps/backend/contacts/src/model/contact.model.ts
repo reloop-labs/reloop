@@ -371,16 +371,12 @@ export namespace ContactModel {
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 100 })),
 		search: t.Optional(t.String({ description: "Search by email" })),
 		status: t.Optional(
-			t.Union(
-				[
-					t.Literal("subscribed"),
-					t.Literal("unsubscribed"),
-					t.Literal("blocked"),
-				],
-				{
-					description: "Filter by status",
-				},
-			),
+			t.String({
+				pattern:
+					"^(subscribed|unsubscribed|blocked)(,(subscribed|unsubscribed|blocked))*$",
+				description:
+					"Filter by status. Pass one status, or several comma-separated (e.g. subscribed,blocked) to match any of them.",
+			}),
 		),
 		channelId: t.Optional(
 			t.String({

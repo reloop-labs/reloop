@@ -15,11 +15,34 @@ async function parseError(res: Response): Promise<string> {
 	}
 }
 
-export async function listCampaigns(): Promise<Campaign[]> {
-	const res = await fetch(`${BASE}/list?limit=100`, { credentials: "include" });
+export interface CampaignListParams {
+	page: number;
+	limit: number;
+	search: string;
+	/** Selected statuses; empty means all. */
+	statuses: string[];
+}
+
+export interface CampaignListResponse {
+	campaigns: Campaign[];
+	total: number;
+	page: number;
+	limit: number;
+}
+
+export async function listCampaigns(
+	params: CampaignListParams,
+): Promise<CampaignListResponse> {
+	const sp = new URLSearchParams();
+	sp.set("page", String(params.page));
+	sp.set("limit", String(params.limit));
+	if (params.search.trim()) sp.set("search", params.search.trim());
+	if (params.statuses.length > 0) sp.set("status", params.statuses.join(","));
+	const res = await fetch(`${BASE}/list?${sp.toString()}`, {
+		credentials: "include",
+	});
 	if (!res.ok) throw new Error(await parseError(res));
-	const body = (await res.json()) as { campaigns: Campaign[] };
-	return body.campaigns ?? [];
+	return (await res.json()) as CampaignListResponse;
 }
 
 export async function getCampaignById(id: string): Promise<Campaign> {

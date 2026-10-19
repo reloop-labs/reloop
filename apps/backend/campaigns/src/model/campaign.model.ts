@@ -85,7 +85,13 @@ export const campaignListQuery = t.Object({
 	page: t.Optional(t.Number()),
 	limit: t.Optional(t.Number()),
 	search: t.Optional(t.String()),
-	status: t.Optional(campaignStatusSchema),
+	/** One status or several comma-separated, e.g. "draft,scheduled". */
+	status: t.Optional(
+		t.String({
+			pattern:
+				"^(draft|scheduled|sending|sent|cancelled)(,(draft|scheduled|sending|sent|cancelled))*$",
+		}),
+	),
 });
 
 export const scheduleBody = t.Object({

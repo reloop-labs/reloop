@@ -87,8 +87,10 @@ export function ContactList() {
 	const { columnVisibility, setColumnVisible } = useContactColumnVisibility();
 	const [exportOpen, setExportOpen] = useState(false);
 
-	/** Exactly one status applies a filter (same pattern as API keys). */
-	const statusParam = statusFilter.length === 1 ? (statusFilter[0] ?? "") : "";
+	/** All selected statuses, comma-separated; the API matches any of them. */
+	const statusParam = [...statusFilter].sort().join(",");
+	/** The export modal can only preselect a single status. */
+	const singleStatus = statusFilter.length === 1 ? statusFilter[0] : undefined;
 	const channelFilter = channelId?.trim() || undefined;
 
 	const { data: channelsData } = useChannelsQuery(!!channelFilter);
@@ -333,10 +335,10 @@ export function ContactList() {
 					unsubscribed: data?.unsubscribedContacts ?? 0,
 				}}
 				defaultStatus={
-					statusParam === "subscribed" ||
-					statusParam === "unsubscribed" ||
-					statusParam === "blocked"
-						? statusParam
+					singleStatus === "subscribed" ||
+					singleStatus === "unsubscribed" ||
+					singleStatus === "blocked"
+						? singleStatus
 						: "all"
 				}
 			/>

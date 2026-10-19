@@ -76,7 +76,8 @@ export namespace ContactTypes {
 		page?: number;
 		limit?: number;
 		search?: string;
-		status?: "subscribed" | "unsubscribed" | "blocked";
+		/** One status or a comma-separated list, e.g. "subscribed,blocked". */
+		status?: string;
 		channelId?: string;
 		organizationId?: string;
 	}

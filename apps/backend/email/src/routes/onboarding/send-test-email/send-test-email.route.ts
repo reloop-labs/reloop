@@ -8,11 +8,11 @@ import { db } from "@reloop/db/client";
 import { member } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import { ONBOARDING_TEST_LOCAL_PART } from "@reloop/email/routes/onboarding/onboarding.constants";
-import { buildOnboardingTestEmail } from "@reloop/email/routes/onboarding/onboarding-test-email";
 import {
 	onboardingSessionOpts,
 	onboardingSessionRedis,
 } from "@reloop/email/routes/onboarding/onboarding.session";
+import { buildOnboardingTestEmail } from "@reloop/email/routes/onboarding/onboarding-test-email";
 import { saveOnboardingCustomerEmailLog } from "@reloop/email/routes/onboarding/send-test-email/customer-email-log";
 import { sendEmail } from "@reloop/email/utils/email";
 import { and, eq } from "drizzle-orm";
