@@ -1,4 +1,14 @@
 import DOMPurify from "dompurify";
+import {
+	DARK_PANEL,
+	darkenBackground,
+	extractColorToken,
+	lightenText,
+	luminance,
+	parseColor,
+	type Rgb,
+	toCss,
+} from "./email-dark-colors";
 
 export type EmailTheme = "light" | "dark";
 
@@ -138,6 +148,68 @@ const themeStyles = (theme: EmailTheme): string => {
 </style>`;
 };
 
+const toHex = ({ r, g, b }: Rgb) =>
+	`#${[r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+
+/**
+ * Most emails are designed for a white canvas and hard-code dark inline text
+ * colors, which become unreadable on the dark panel. Rewrite inline/attribute
+ * colors: light neutral backgrounds go dark (or transparent), and text that
+ * lacks contrast against its adapted background gets lightened. Emails that
+ * are already dark, and saturated brand colors, are left alone.
+ */
+const adaptColorsForDarkMode = (doc: Document) => {
+	const effectiveBg = new Map<Element, Rgb>();
+
+	for (const el of Array.from(doc.body.querySelectorAll<HTMLElement>("*"))) {
+		const parentBg =
+			(el.parentElement && effectiveBg.get(el.parentElement)) ?? DARK_PANEL;
+		let bg = parentBg;
+		let hasOwnLightBg = false;
+
+		const styleBg = parseColor(
+			extractColorToken(el.style.getPropertyValue("background-color")),
+		);
+		const attrBg = parseColor(el.getAttribute("bgcolor"));
+		if (attrBg) {
+			const mapped = darkenBackground(attrBg);
+			if (mapped) el.setAttribute("bgcolor", toHex(mapped));
+			else el.removeAttribute("bgcolor");
+			if (!styleBg) bg = mapped ?? parentBg;
+		}
+		if (styleBg) {
+			const mapped = darkenBackground(styleBg);
+			el.style.setProperty(
+				"background-color",
+				mapped ? toCss(mapped) : "transparent",
+				el.style.getPropertyPriority("background-color"),
+			);
+			bg = mapped ?? parentBg;
+		}
+		if (bg !== parentBg && luminance(bg) > 0.4) hasOwnLightBg = true;
+		effectiveBg.set(el, bg);
+
+		const styleColor = parseColor(el.style.getPropertyValue("color"));
+		const attrColor =
+			el.tagName === "FONT" ? parseColor(el.getAttribute("color")) : null;
+		if (styleColor) {
+			el.style.setProperty(
+				"color",
+				toCss(lightenText(styleColor, bg)),
+				el.style.getPropertyPriority("color"),
+			);
+		}
+		if (attrColor) {
+			el.setAttribute("color", toHex(lightenText(attrColor, bg)));
+		}
+		// A kept light background (e.g. a yellow button) would otherwise inherit
+		// the panel's light text color.
+		if (!styleColor && !attrColor && hasOwnLightBg) {
+			el.style.setProperty("color", "#111111");
+		}
+	}
+};
+
 /**
  * Apply image preferences + theme styles for Shadow DOM injection.
  */
@@ -166,6 +238,8 @@ export const processEmailHtmlForDisplay = ({
 			}
 		}
 	}
+
+	if (theme === "dark") adaptColorsForDarkMode(doc);
 
 	return {
 		processedHtml: `${themeStyles(theme)}${doc.body.innerHTML}`,
