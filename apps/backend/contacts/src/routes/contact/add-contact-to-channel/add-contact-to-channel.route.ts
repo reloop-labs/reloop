@@ -1,5 +1,4 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ChannelSubscriptionModel } from "@be/contacts/model/channel-subscription.model";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
@@ -9,9 +8,6 @@ import { addContactToChannelController } from "./add-contact-to-channel.controll
 
 export const addContactToChannelRoute = new Elysia()
 	.use(authMiddleware)
-	.use(
-		rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "add-channel" }),
-	)
 	.post(
 		"/channel/:channel_id",
 		async ({ body, params, organizationId }) => {
@@ -25,7 +21,6 @@ export const addContactToChannelRoute = new Elysia()
 		},
 		{
 			auth: true,
-			rateLimit: true,
 			params: t.Object({
 				channel_id: t.String({
 					description: "Channel ID",

@@ -1,5 +1,4 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { removeContactFromGroupXCodeSamples } from "@reloop/code-samples/contacts";
@@ -8,9 +7,6 @@ import { removeContactFromGroupController } from "./remove-contact-from-group.co
 
 export const removeContactFromGroupRoute = new Elysia()
 	.use(authMiddleware)
-	.use(
-		rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "remove-group" }),
-	)
 	.delete(
 		"/group/:group_id",
 		async ({ body, params, organizationId }) => {
@@ -23,7 +19,6 @@ export const removeContactFromGroupRoute = new Elysia()
 		},
 		{
 			auth: true,
-			rateLimit: true,
 			params: t.Object({
 				group_id: t.String({
 					description: "Group ID",

@@ -1,5 +1,4 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { deleteContactXCodeSamples } from "@reloop/code-samples/contacts";
@@ -8,13 +7,6 @@ import { deleteContactController } from "./delete-contact.controllers";
 
 export const deleteContactRoute = new Elysia()
 	.use(authMiddleware)
-	.use(
-		rateLimitPlugin({
-			max: 30,
-			windowSeconds: 60,
-			namespace: "delete-contact",
-		}),
-	)
 	.delete(
 		"/:contact_id",
 		async ({ params, organizationId }) => {
@@ -25,7 +17,6 @@ export const deleteContactRoute = new Elysia()
 		},
 		{
 			auth: true,
-			rateLimit: true,
 			params: t.Object({
 				contact_id: t.String({
 					description: "Unique contact identifier",

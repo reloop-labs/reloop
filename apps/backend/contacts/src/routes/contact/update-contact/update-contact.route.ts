@@ -1,5 +1,4 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { updateContactXCodeSamples } from "@reloop/code-samples/contacts";
@@ -8,13 +7,6 @@ import { updateContactController } from "./update-contact.controllers";
 
 export const updateContactRoute = new Elysia()
 	.use(authMiddleware)
-	.use(
-		rateLimitPlugin({
-			max: 30,
-			windowSeconds: 60,
-			namespace: "contact-update",
-		}),
-	)
 	.patch(
 		"/:contact_id",
 		async ({ params, body, organizationId }) => {
@@ -30,7 +22,6 @@ export const updateContactRoute = new Elysia()
 		},
 		{
 			auth: true,
-			rateLimit: true,
 			params: t.Object({
 				contact_id: t.String({
 					description: "Unique contact identifier",

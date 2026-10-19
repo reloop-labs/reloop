@@ -1,5 +1,4 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { auditLogHook } from "@be/contacts/utils/audit-log";
 import { addContactToGroupXCodeSamples } from "@reloop/code-samples/contacts";
@@ -8,7 +7,6 @@ import { addContactToGroupController } from "./add-contact-to-group.controllers"
 
 export const addContactToGroupRoute = new Elysia()
 	.use(authMiddleware)
-	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "add-group" }))
 	.post(
 		"/group/:group_id",
 		async ({ body, params, organizationId }) => {
@@ -21,7 +19,6 @@ export const addContactToGroupRoute = new Elysia()
 		},
 		{
 			auth: true,
-			rateLimit: true,
 			params: t.Object({
 				group_id: t.String({
 					description: "Group ID",

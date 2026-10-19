@@ -1,5 +1,4 @@
 import { authMiddleware } from "@be/contacts/middleware/auth";
-import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { getContactXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia, t } from "elysia";
@@ -7,9 +6,6 @@ import { getContactController } from "./get-contact.controllers";
 
 export const getContactRoute = new Elysia()
 	.use(authMiddleware)
-	.use(
-		rateLimitPlugin({ max: 60, windowSeconds: 60, namespace: "get-contact" }),
-	)
 	.get(
 		"/retrieve/:contact_id",
 		async ({ params, organizationId }) => {
@@ -20,7 +16,6 @@ export const getContactRoute = new Elysia()
 		},
 		{
 			auth: true,
-			rateLimit: true,
 			params: t.Object({
 				contact_id: t.String({
 					description: "Unique contact identifier",
