@@ -19,6 +19,7 @@ export default function DebugFlowPage() {
 		nodes: [createTriggerNode()],
 		edges: [],
 		activeVersionId: null,
+		reentry: "once",
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
 	}));

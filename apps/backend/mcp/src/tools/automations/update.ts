@@ -4,6 +4,8 @@ import {
 	automationIdSchema,
 	automationSchema,
 	connectionSchema,
+	reentryDescription,
+	reentrySchema,
 	stepSchema,
 	stepsDescription,
 	toAutomationOutput,
@@ -13,7 +15,7 @@ export const updateAutomation = defineTool({
 	name: "update_automation",
 	title: "Update automation",
 	description:
-		"Rename an automation, change its description, or replace its steps and connections. `steps` replaces every step, so read the current ones with get_automation and pass the full updated list with its connections. Changing the steps of an active automation saves them as a draft: call activate_automation afterwards to publish them. To start or stop it, use activate_automation or pause_automation.",
+		"Rename an automation, change its description, change re-entry, or replace its steps and connections. Re-entry changes take effect right away, without activate_automation. `steps` replaces every step, so read the current ones with get_automation and pass the full updated list with its connections. Changing the steps of an active automation saves them as a draft: call activate_automation afterwards to publish them. To start or stop it, use activate_automation or pause_automation.",
 	annotations: {
 		readOnlyHint: false,
 		destructiveHint: false,
@@ -41,13 +43,17 @@ export const updateAutomation = defineTool({
 				.max(400)
 				.optional()
 				.describe("Replaces every connection; pass it together with steps"),
+			reentry: reentrySchema.optional().describe(reentryDescription),
 		})
 		.refine(
 			(value) =>
 				value.name !== undefined ||
 				value.description !== undefined ||
-				value.steps !== undefined,
-			{ message: "Pass at least one of name, description or steps" },
+				value.steps !== undefined ||
+				value.reentry !== undefined,
+			{
+				message: "Pass at least one of name, description, steps or reentry",
+			},
 		)
 		.refine(
 			(value) => value.connections === undefined || value.steps !== undefined,
@@ -63,6 +69,7 @@ export const updateAutomation = defineTool({
 			steps: args.steps,
 			connections:
 				args.steps === undefined ? undefined : (args.connections ?? []),
+			reentry: args.reentry,
 		});
 		return { automation: toAutomationOutput(automation) };
 	},

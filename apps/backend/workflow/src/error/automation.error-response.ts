@@ -75,8 +75,8 @@ export const AutomationErrors = {
 		createError({
 			status: 409,
 			message: "Contact already enrolled",
-			why: `This contact is already enrolled (${enrollmentId}). Automations enroll a contact once.`,
-			fix: "Pick a different contact, or inspect the existing enrollment.",
+			why: `This contact already went through this automation (${enrollmentId}). Re-entry is off, so each contact goes through it once.`,
+			fix: 'Set reentry to "restart" or "parallel" to let contacts start it again, or pick a different contact.',
 		}),
 	cannotEnroll: (why: string) =>
 		createError({

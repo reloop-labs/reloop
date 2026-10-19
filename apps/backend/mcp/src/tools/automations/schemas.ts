@@ -136,6 +136,11 @@ export const connectionSchema = z.object({
 		),
 });
 
+export const reentrySchema = z.enum(["once", "restart", "parallel"]);
+
+export const reentryDescription =
+	"What tracking the trigger again does for a contact who already went through it. once (the default): nothing, each contact goes through it once. restart: starts it again and cancels a run still in progress, e.g. an abandoned-checkout reminder that should start over. parallel: starts it again alongside any run in progress, e.g. one sequence per order. Only change it when the user wants repeats; it takes effect right away, without activate_automation.";
+
 export const stepsDescription =
 	"The steps, with exactly one trigger. Each step has a unique key; link them with connections.";
 
@@ -168,6 +173,9 @@ export const automationSchema = z.object({
 		.describe(
 			"Published version new enrollments use; null until first activated",
 		),
+	reentry: reentrySchema.describe(
+		"once: each contact goes through it once. restart: the trigger starts it again, cancelling a run in progress. parallel: the trigger starts it again alongside runs in progress",
+	),
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });
@@ -184,6 +192,7 @@ export function toAutomationOutput(
 		steps: automation.steps,
 		connections: automation.connections,
 		activeVersionId: automation.activeVersionId,
+		reentry: automation.reentry,
 		createdAt: automation.createdAt,
 		updatedAt: automation.updatedAt,
 	};
@@ -211,6 +220,10 @@ export const enrollmentSchema = z.object({
 	enrolledAt: z.string(),
 	completedAt: z.string().nullable(),
 	cancelledAt: z.string().nullable(),
+	replacedByEnrollmentId: z
+		.string()
+		.nullable()
+		.describe("The newer run that cancelled this one (re-entry restart)"),
 });
 
 export function toEnrollmentOutput(
@@ -228,6 +241,7 @@ export function toEnrollmentOutput(
 		enrolledAt: enrollment.enrolledAt,
 		completedAt: enrollment.completedAt,
 		cancelledAt: enrollment.cancelledAt,
+		replacedByEnrollmentId: enrollment.replacedByEnrollmentId,
 	};
 }
 

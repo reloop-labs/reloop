@@ -8,10 +8,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import type { WorkflowReentry } from "../workflow-types";
 import {
 	AutomationModalFrame,
 	type AutomationModalStatus,
 } from "./automation-modal-frame";
+import { ReentrySetting } from "./reentry-setting";
 import { useWorkflows } from "./workflows-provider";
 
 const EMPTY_NAME_ERROR = "Please enter an automation name.";
@@ -29,6 +31,7 @@ export const CreateWorkflowModal = ({
 	const { createWorkflow } = useWorkflows();
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
+	const [reentry, setReentry] = useState<WorkflowReentry>("once");
 	const [status, setStatus] = useState<AutomationModalStatus>("idle");
 	const nameField = useFieldError();
 	const clearNameError = nameField.clear;
@@ -52,12 +55,14 @@ export const CreateWorkflowModal = ({
 			const workflow = await createWorkflow({
 				name: trimmed,
 				description: description.trim() || undefined,
+				reentry,
 			});
 			setStatus("success");
 			setTimeout(() => {
 				onOpenChange(false);
 				setName("");
 				setDescription("");
+				setReentry("once");
 				nameField.clear();
 				setStatus("idle");
 				router.push(`/automation/${workflow.id}`);
@@ -74,11 +79,13 @@ export const CreateWorkflowModal = ({
 	useHotkeys(
 		"enter",
 		(e) => {
+			// Enter on a switch row toggles it instead of submitting.
+			if ((e.target as HTMLElement | null)?.closest('[role="switch"]')) return;
 			e.preventDefault();
 			if (open && status === "idle") void handleSubmit();
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, status, name, description],
+		[open, status, name, description, reentry],
 	);
 
 	useHotkeys(
@@ -95,6 +102,7 @@ export const CreateWorkflowModal = ({
 			const timer = setTimeout(() => {
 				setName("");
 				setDescription("");
+				setReentry("once");
 				clearNameError();
 				setStatus("idle");
 			}, 300);
@@ -162,6 +170,13 @@ export const CreateWorkflowModal = ({
 						rows={3}
 						disabled={status !== "idle"}
 						className="min-h-[76px] resize-none text-text-strong-950 text-xs"
+					/>
+				</div>
+				<div className="rounded-2xl border border-stroke-soft-200 p-1 dark:border-stroke-soft-100/50">
+					<ReentrySetting
+						value={reentry}
+						onChange={setReentry}
+						disabled={status !== "idle"}
 					/>
 				</div>
 			</div>

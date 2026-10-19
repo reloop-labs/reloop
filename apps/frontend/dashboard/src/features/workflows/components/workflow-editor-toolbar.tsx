@@ -23,6 +23,7 @@ import { validateWorkflow } from "../workflow-validation";
 import { AutomationViewTabs, useAutomationView } from "./automation-view-tabs";
 import { DeleteWorkflowModal } from "./delete-workflow-modal";
 import { EnrollContactModal } from "./enroll-contact-modal";
+import { ReentrySetting, useReentry } from "./reentry-setting";
 import { useWorkflows } from "./workflows-provider";
 
 interface WorkflowEditorToolbarProps {
@@ -200,6 +201,7 @@ export const WorkflowEditorToolbar = ({
 	const [stopOpen, setStopOpen] = useState(false);
 	const [moreOpen, setMoreOpen] = useState(false);
 	const [duplicating, setDuplicating] = useState(false);
+	const reentry = useReentry(workflow);
 	// Sliding hover pill for the "…" menu (same as the other row menus).
 	const [moreHoverIdx, setMoreHoverIdx] = useState<number | undefined>();
 	const moreItemRefs = useRef<HTMLElement[]>([]);
@@ -270,6 +272,7 @@ export const WorkflowEditorToolbar = ({
 			const created = await createWorkflow({
 				name: `${workflow.name} (Copy)`,
 				description: workflow.description ?? undefined,
+				reentry: workflow.reentry,
 			});
 			if (workflow.nodes?.length || workflow.edges?.length) {
 				await updateWorkflow(created.id, {
@@ -328,8 +331,14 @@ export const WorkflowEditorToolbar = ({
 					<Dropdown.Content
 						align="end"
 						sideOffset={6}
-						className="w-48 overflow-hidden rounded-2xl p-1.5"
+						className="w-64 overflow-hidden rounded-2xl p-1.5"
 					>
+						<ReentrySetting
+							value={reentry.value}
+							pending={reentry.pending}
+							onChange={(next) => void reentry.set(next)}
+						/>
+						<div className="-mx-1.5 my-1.5 h-px bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
 						<div className="relative">
 							{MORE_ITEMS.map((item, idx) => (
 								<Dropdown.Item

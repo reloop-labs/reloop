@@ -13,7 +13,7 @@ export const enrollContact = defineTool({
 	name: "enroll_contact",
 	title: "Enroll contact in automation",
 	description:
-		"Start an active automation for one contact without tracking its event, for example to backfill an existing user. Its first emails can go out right away, so confirm with the user first. A contact is enrolled in each automation once: fails with `already_enrolled` when they already went through it, and with `cannot_enroll` when the automation is not active or the contact is unsubscribed.",
+		"Start an active automation for one contact without tracking its event, for example to backfill an existing user. Its first emails can go out right away, so confirm with the user first. How a contact who already went through it is handled depends on the automation's `reentry`: once fails with `already_enrolled`, restart cancels their run in progress and starts fresh, parallel starts another run alongside it. Fails with `cannot_enroll` when the automation is not active or the contact is unsubscribed.",
 	annotations: {
 		readOnlyHint: false,
 		destructiveHint: false,

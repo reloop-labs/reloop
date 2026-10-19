@@ -281,6 +281,13 @@
       "when": 1792300000000,
       "tag": "0039_domain_sending_block_source",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1792400000000,
+      "tag": "0040_automation_reentry",
+      "breakpoints": true
     }
   ]
 }

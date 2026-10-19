@@ -98,6 +98,12 @@ export interface WorkflowEdgeData extends Record<string, unknown> {
 
 export type WorkflowEdge = Edge<WorkflowEdgeData>;
 
+/**
+ * once: each contact goes through it once. restart: the trigger starts it
+ * again, cancelling a run in progress. parallel: runs overlap.
+ */
+export type WorkflowReentry = "once" | "restart" | "parallel";
+
 export interface Workflow {
 	id: string;
 	organizationId: string;
@@ -108,6 +114,8 @@ export interface Workflow {
 	nodes: WorkflowNode[];
 	edges: WorkflowEdge[];
 	activeVersionId?: string | null;
+	/** What the trigger does for a contact who already went through it. */
+	reentry: WorkflowReentry;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -116,6 +124,7 @@ export interface CreateWorkflowInput {
 	name: string;
 	description?: string;
 	organizationId: string;
+	reentry?: WorkflowReentry;
 }
 
 export const TRIGGER_NODE_ID = "trigger";

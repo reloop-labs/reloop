@@ -6,7 +6,7 @@ faq:
   - question: What starts an automation?
     answer: A trigger, which is a custom event your app tracks (for example user.signed_up). Track it with the SDK or API and every active automation that uses it starts for that contact. You can also enroll one contact directly.
   - question: Can a contact go through the same automation twice?
-    answer: No. A contact is enrolled in each automation once. Tracking the event again for the same contact does not start it again, and enrolling them directly returns 409.
+    answer: Only if you turn on re-entry for that automation. By default a contact goes through each automation once; tracking the event again does nothing and enrolling them directly returns 409. With re-entry on, every new event starts it again. You choose whether a run still in progress is cancelled (restart) or keeps going alongside the new one (parallel).
   - question: What happens to contacts in progress when I pause an automation?
     answer: Pausing stops new enrollments, and contacts already in it are cancelled when their next step comes due. Activating again does not resume them.
   - question: Do my edits apply to an active automation right away?
@@ -146,10 +146,10 @@ Text comparisons ignore case. To compare against another field instead of a fixe
 
 ## How a contact moves through it
 
-- **Once per automation.** A contact is enrolled in each automation once. Tracking the event again does not restart it.
+- **Once per automation, unless re-entry is on.** By default a contact goes through each automation once, and tracking the event again does nothing. For flows that can happen more than once, turn on **Allow re-entry** when you create the automation or from the **…** menu in the editor. Each new event then starts it again. **Cancel the run in progress** decides what happens if the contact is still in an earlier run: on, that run is cancelled and the fresh one takes over (good for an abandoned checkout that should start over); off, both runs keep going (good for one sequence per order). In the API this is `reentry`: `"once"` (default), `"restart"` or `"parallel"`. Changes apply right away, without publishing.
 - **Only subscribed contacts.** If the contact unsubscribes or is blocked, they leave the automation at their next step.
 - **Pinned to a version.** Each enrollment finishes on the steps that were published when it started, even if you publish changes later.
-- **Enrollment status.** `active` while it runs, then `completed`, `cancelled` (paused, deleted or unsubscribed) or `failed`.
+- **Enrollment status.** `active` while it runs, then `completed`, `cancelled` (paused, deleted, unsubscribed, or replaced by a newer run; `replacedByEnrollmentId` points to it) or `failed`.
 
 ## API reference
 
@@ -166,7 +166,7 @@ Text comparisons ignore case. To compare against another field instead of a fixe
   </Accordion>
 
   <Accordion title="Can a contact go through the same automation twice?">
-    No. A contact is enrolled in each automation once. Tracking the event again for the same contact does not start it again, and enrolling them directly returns `409`.
+    Only if you turn on [re-entry](#how-a-contact-moves-through-it) for that automation. By default a contact goes through each automation once; tracking the event again does nothing and enrolling them directly returns `409`. With re-entry on, every new event starts it again. You choose whether a run still in progress is cancelled (`restart`) or keeps going alongside the new one (`parallel`).
   </Accordion>
 
   <Accordion title="What happens to contacts in progress when I pause an automation?">

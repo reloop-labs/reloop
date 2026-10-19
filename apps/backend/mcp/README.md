@@ -1213,7 +1213,7 @@ Returns: `deleted`, `id`
 
 ### `track_event`
 
-Report that a custom event happened to a contact, which starts every active automation it triggers for them and can send real email right away; confirm with the user first. Pass contactId, or email to create the contact if needed. Required properties must be included (see get_event). The result's `enrollments` is how many automations started; 0 usually means none are active for this event or the contact already went through them.
+Report that a custom event happened to a contact, which starts every active automation it triggers for them and can send real email right away; confirm with the user first. Pass contactId, or email to create the contact if needed. Required properties must be included (see get_event). The result's `enrollments` is how many automations started; 0 usually means none are active for this event or the contact already went through them (automations whose reentry is restart or parallel start again).
 
 Read-only: no · Destructive: no · Idempotent: no · Open world: yes
 
@@ -1265,12 +1265,13 @@ Read-only: no · Destructive: no · Idempotent: no · Open world: no
 | `description` | string | no |  |
 | `steps` | array of object | yes | The steps, with exactly one trigger. Each step has a unique key; link them with connections. |
 | `connections` | array of object | no | How the steps link together, by step key |
+| `reentry` | once \| restart \| parallel | no | What tracking the trigger again does for a contact who already went through it. once (the default): nothing, each contact goes through it once. restart: starts it again and cancels a run still in progress, e.g. an abandoned-checkout reminder that should start over. parallel: starts it again alongside any run in progress, e.g. one sequence per order. Only change it when the user wants repeats; it takes effect right away, without activate_automation. |
 
 Returns: `automation`
 
 ### `update_automation`
 
-Rename an automation, change its description, or replace its steps and connections. `steps` replaces every step, so read the current ones with get_automation and pass the full updated list with its connections. Changing the steps of an active automation saves them as a draft: call activate_automation afterwards to publish them. To start or stop it, use activate_automation or pause_automation.
+Rename an automation, change its description, change re-entry, or replace its steps and connections. Re-entry changes take effect right away, without activate_automation. `steps` replaces every step, so read the current ones with get_automation and pass the full updated list with its connections. Changing the steps of an active automation saves them as a draft: call activate_automation afterwards to publish them. To start or stop it, use activate_automation or pause_automation.
 
 Read-only: no · Destructive: no · Idempotent: yes · Open world: no
 
@@ -1281,6 +1282,7 @@ Read-only: no · Destructive: no · Idempotent: yes · Open world: no
 | `description` | string or null | no | New description, or null to clear it |
 | `steps` | array of object | no | The steps, with exactly one trigger. Each step has a unique key; link them with connections. Replaces every step. |
 | `connections` | array of object | no | Replaces every connection; pass it together with steps |
+| `reentry` | once \| restart \| parallel | no | What tracking the trigger again does for a contact who already went through it. once (the default): nothing, each contact goes through it once. restart: starts it again and cancels a run still in progress, e.g. an abandoned-checkout reminder that should start over. parallel: starts it again alongside any run in progress, e.g. one sequence per order. Only change it when the user wants repeats; it takes effect right away, without activate_automation. |
 
 Returns: `automation`
 
@@ -1322,7 +1324,7 @@ Returns: `deleted`, `id`
 
 ### `enroll_contact`
 
-Start an active automation for one contact without tracking its event, for example to backfill an existing user. Its first emails can go out right away, so confirm with the user first. A contact is enrolled in each automation once: fails with `already_enrolled` when they already went through it, and with `cannot_enroll` when the automation is not active or the contact is unsubscribed.
+Start an active automation for one contact without tracking its event, for example to backfill an existing user. Its first emails can go out right away, so confirm with the user first. How a contact who already went through it is handled depends on the automation's `reentry`: once fails with `already_enrolled`, restart cancels their run in progress and starts fresh, parallel starts another run alongside it. Fails with `cannot_enroll` when the automation is not active or the contact is unsubscribed.
 
 Read-only: no · Destructive: no · Idempotent: no · Open world: yes
 

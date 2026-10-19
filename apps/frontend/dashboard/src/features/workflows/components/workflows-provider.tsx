@@ -38,7 +38,9 @@ interface WorkflowsContextValue {
 	) => Promise<Workflow>;
 	updateWorkflow: (
 		id: string,
-		patch: Partial<Pick<Workflow, "name" | "description" | "nodes" | "edges">>,
+		patch: Partial<
+			Pick<Workflow, "name" | "description" | "nodes" | "edges" | "reentry">
+		>,
 	) => Promise<void>;
 	setWorkflowGraph: (
 		id: string,
@@ -102,6 +104,7 @@ export const WorkflowsProvider = ({ children }: { children: ReactNode }) => {
 			const row = await createMutation.mutateAsync({
 				name: input.name,
 				description: input.description,
+				reentry: input.reentry,
 			});
 			return mapAutomationToWorkflow(row);
 		},
@@ -112,12 +115,13 @@ export const WorkflowsProvider = ({ children }: { children: ReactNode }) => {
 		async (
 			id: string,
 			patch: Partial<
-				Pick<Workflow, "name" | "description" | "nodes" | "edges">
+				Pick<Workflow, "name" | "description" | "nodes" | "edges" | "reentry">
 			>,
 		) => {
 			const body: Parameters<typeof updateAutomation>[1] = {};
 			if (patch.name !== undefined) body.name = patch.name;
 			if (patch.description !== undefined) body.description = patch.description;
+			if (patch.reentry !== undefined) body.reentry = patch.reentry;
 			if (patch.nodes !== undefined || patch.edges !== undefined) {
 				const current = workflows.find((w) => w.id === id);
 				body.graph = {

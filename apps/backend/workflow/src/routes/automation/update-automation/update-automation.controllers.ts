@@ -27,6 +27,7 @@ export async function updateAutomationController(params: {
 	steps?: StepInput[];
 	connections?: ConnectionInput[];
 	status?: "active" | "paused";
+	reentry?: "once" | "restart" | "parallel";
 }) {
 	if (params.steps && params.graph) {
 		throw AutomationErrors.invalidGraph([
@@ -64,6 +65,9 @@ export async function updateAutomationController(params: {
 	if (params.description !== undefined) {
 		patch.description =
 			params.description === null ? null : params.description.trim() || null;
+	}
+	if (params.reentry !== undefined) {
+		patch.reentry = params.reentry;
 	}
 	if (graphInput !== undefined) {
 		// Soft-validate structure; full validation required only on activate

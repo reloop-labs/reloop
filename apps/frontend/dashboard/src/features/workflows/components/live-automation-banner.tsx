@@ -23,6 +23,7 @@ export const LiveAutomationBanner = ({ workflow }: { workflow: Workflow }) => {
 			const created = await createWorkflow({
 				name: `${workflow.name} (Copy)`,
 				description: workflow.description ?? undefined,
+				reentry: workflow.reentry,
 			});
 			if (workflow.nodes?.length || workflow.edges?.length) {
 				await updateWorkflow(created.id, {

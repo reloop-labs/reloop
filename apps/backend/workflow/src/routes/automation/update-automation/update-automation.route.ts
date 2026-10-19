@@ -18,6 +18,7 @@ export const updateAutomationRoute = new Elysia().use(authMiddleware).patch(
 			steps: body.steps,
 			connections: body.connections,
 			status: body.status,
+			reentry: body.reentry,
 		});
 	},
 	{
@@ -36,7 +37,8 @@ export const updateAutomationRoute = new Elysia().use(authMiddleware).patch(
 		detail: {
 			tags: ["Automations"],
 			summary: "Update automation",
-			description: "Updates automation name, description, or draft graph",
+			description:
+				"Updates automation name, description, re-entry, or draft graph",
 			"x-codeSamples": updateAutomationXCodeSamples,
 		},
 	},

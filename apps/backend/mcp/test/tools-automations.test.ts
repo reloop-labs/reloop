@@ -55,6 +55,7 @@ function automationFixture(over: Partial<Automation> = {}): Automation {
 			{ from: "is_pro", to: "wait", type: "condition_not_met" },
 		],
 		activeVersionId: null,
+		reentry: "once",
 		createdAt: "2026-01-01T00:00:00.000Z",
 		updatedAt: "2026-01-02T00:00:00.000Z",
 		...over,
@@ -74,6 +75,7 @@ function enrollmentFixture(over: Partial<Enrollment> = {}): Enrollment {
 		enrolledAt: "2026-01-01T00:00:00.000Z",
 		completedAt: null,
 		cancelledAt: null,
+		replacedByEnrollmentId: null,
 		...over,
 	};
 }

@@ -48,6 +48,7 @@ const exampleAutomation = {
 	connections: exampleConnections,
 	graph: { nodes: [], edges: [] },
 	activeVersionId: "autov_123456789",
+	reentry: "once",
 	createdAt: "2026-03-23T10:00:00.000Z",
 	updatedAt: "2026-03-23T10:00:00.000Z",
 };
@@ -64,6 +65,7 @@ const exampleEnrollment = {
 	enrolledAt: "2026-03-23T10:00:00.000Z",
 	completedAt: null,
 	cancelledAt: null,
+	replacedByEnrollmentId: null,
 	endedAt: null,
 };
 
@@ -151,6 +153,14 @@ const connectionResponse = t.Object({
 	]),
 });
 
+const reentrySchema = t.Union(
+	[t.Literal("once"), t.Literal("restart"), t.Literal("parallel")],
+	{
+		description:
+			'What tracking the trigger again does for a contact who already went through it. "once" (the default): nothing, each contact goes through it once. "restart": starts it again and cancels a run still in progress. "parallel": starts it again alongside any run in progress. Takes effect right away, without re-activating.',
+	},
+);
+
 export namespace AutomationModel {
 	export const automationIdParam = t.String({
 		minLength: 1,
@@ -188,6 +198,7 @@ export namespace AutomationModel {
 				description: "How the steps link together, by step key.",
 			}),
 		),
+		reentry: t.Optional(reentrySchema),
 	});
 
 	export const updateBody = t.Object({
@@ -227,6 +238,7 @@ export namespace AutomationModel {
 				description: '"active" validates and starts it; "paused" stops it.',
 			}),
 		),
+		reentry: t.Optional(reentrySchema),
 	});
 
 	export const listQuery = t.Object({
@@ -259,6 +271,11 @@ export namespace AutomationModel {
 			connections: t.Array(connectionResponse),
 			graph: automationGraphSchema,
 			activeVersionId: t.Nullable(t.String()),
+			reentry: t.Union([
+				t.Literal("once"),
+				t.Literal("restart"),
+				t.Literal("parallel"),
+			]),
 			createdAt: t.String(),
 			updatedAt: t.String(),
 		},
@@ -323,8 +340,8 @@ export namespace AutomationModel {
 		),
 		alreadyEnrolled: errorExample(
 			"Contact already enrolled",
-			"This contact is already enrolled (enr_123456789). Automations enroll a contact once.",
-			"Pick a different contact, or inspect the existing enrollment.",
+			"This contact already went through this automation (enr_123456789). Re-entry is off, so each contact goes through it once.",
+			'Set reentry to "restart" or "parallel" to let contacts start it again, or pick a different contact.',
 		),
 		enrollmentNotFound: errorExample(
 			"Enrollment not found",
@@ -390,6 +407,12 @@ export namespace AutomationModel {
 		enrolledAt: t.String(),
 		completedAt: t.Nullable(t.String()),
 		cancelledAt: t.Nullable(t.String()),
+		replacedByEnrollmentId: t.Nullable(
+			t.String({
+				description:
+					'The newer run that cancelled this one (re-entry "restart"), or null.',
+			}),
+		),
 		endedAt: t.Nullable(
 			t.String({
 				description: "When it completed, was cancelled or failed",

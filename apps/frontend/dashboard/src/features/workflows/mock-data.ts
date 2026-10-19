@@ -53,6 +53,7 @@ export const createEmptyWorkflow = (input: CreateWorkflowInput): Workflow => {
 		status: "draft",
 		nodes: [createTriggerNode()],
 		edges: [],
+		reentry: "once",
 		createdAt: timestamp,
 		updatedAt: timestamp,
 	};

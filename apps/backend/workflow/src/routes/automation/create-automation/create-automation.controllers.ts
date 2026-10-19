@@ -23,6 +23,7 @@ export async function createAutomationController(params: {
 	status?: "draft" | "active";
 	steps?: StepInput[];
 	connections?: ConnectionInput[];
+	reentry?: "once" | "restart" | "parallel";
 }) {
 	if (params.connections && !params.steps) {
 		throw AutomationErrors.invalidGraph([
@@ -48,6 +49,7 @@ export async function createAutomationController(params: {
 				status: "draft",
 				graph,
 				triggerEvent: extractTriggerEvent(graph) ?? null,
+				reentry: params.reentry ?? "once",
 			})
 			.returning();
 

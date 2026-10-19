@@ -15,6 +15,7 @@ export const createAutomationRoute = new Elysia().use(authMiddleware).post(
 			status: body.status,
 			steps: body.steps,
 			connections: body.connections,
+			reentry: body.reentry,
 		});
 		set.status = 201;
 		return result;

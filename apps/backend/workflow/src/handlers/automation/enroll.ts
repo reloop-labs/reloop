@@ -8,7 +8,7 @@ import { enqueueAutomationStep } from "@be/workflow/queues/automation.queue";
 import { db } from "@reloop/db/client";
 import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, ne, sql } from "drizzle-orm";
 import { log } from "evlog";
 
 export type EnrollOutcome =
@@ -93,24 +93,10 @@ export async function enrollContactInAutomation(params: {
 		return { status: "skipped", reason: "missing_version" };
 	}
 
-	const existing = await db.query.automationEnrollment.findFirst({
-		where: and(
-			eq(schema.automationEnrollment.automationId, auto.id),
-			eq(schema.automationEnrollment.contactId, contactId),
-		),
-		columns: { id: true },
-	});
-	if (existing) {
-		log.info({
-			message: "Contact already enrolled — skip",
-			automationId: auto.id,
-			contactId,
-		});
-		return {
-			status: "skipped",
-			reason: "already_enrolled",
-			existingEnrollmentId: existing.id,
-		};
+	// Fast path; checked again under the lock below.
+	if (auto.reentry === "once") {
+		const existing = await findEnrollment(auto.id, contactId);
+		if (existing) return alreadyEnrolled(auto.id, contactId, existing.id);
 	}
 
 	const version = await db.query.automationVersion.findFirst({
@@ -160,9 +146,25 @@ export async function enrollContactInAutomation(params: {
 		scheduledFor = new Date(now.getTime() + delayMs);
 	}
 
-	let enrollment: typeof schema.automationEnrollment.$inferSelect;
-	try {
-		const [row] = await db
+	const result = await db.transaction(async (tx) => {
+		// One enroll at a time per automation+contact, so two events arriving
+		// together can't both pass the checks below. Released on commit.
+		await tx.execute(
+			sql`select pg_advisory_xact_lock(hashtext(${`${auto.id}:${contactId}`}))`,
+		);
+
+		if (auto.reentry === "once") {
+			const existing = await tx.query.automationEnrollment.findFirst({
+				where: and(
+					eq(schema.automationEnrollment.automationId, auto.id),
+					eq(schema.automationEnrollment.contactId, contactId),
+				),
+				columns: { id: true },
+			});
+			if (existing) return { existingEnrollmentId: existing.id };
+		}
+
+		const [row] = await tx
 			.insert(schema.automationEnrollment)
 			.values({
 				organizationId,
@@ -175,27 +177,46 @@ export async function enrollContactInAutomation(params: {
 				enrolledAt: now,
 			})
 			.returning();
-
 		if (!row) {
 			throw new Error("Failed to create enrollment");
 		}
-		enrollment = row;
-	} catch (error) {
-		if (isUniqueViolation(error)) {
-			const raced = await db.query.automationEnrollment.findFirst({
-				where: and(
-					eq(schema.automationEnrollment.automationId, auto.id),
-					eq(schema.automationEnrollment.contactId, contactId),
-				),
-				columns: { id: true },
-			});
-			return {
-				status: "skipped",
-				reason: "already_enrolled",
-				existingEnrollmentId: raced?.id,
-			};
+
+		if (auto.reentry === "restart") {
+			// The run in progress ends here; its queued steps skip themselves
+			// once they see it is cancelled.
+			const replaced = await tx
+				.update(schema.automationEnrollment)
+				.set({
+					status: "cancelled",
+					cancelledAt: now,
+					replacedByEnrollmentId: row.id,
+					updatedAt: now,
+				})
+				.where(
+					and(
+						eq(schema.automationEnrollment.automationId, auto.id),
+						eq(schema.automationEnrollment.contactId, contactId),
+						eq(schema.automationEnrollment.status, "active"),
+						ne(schema.automationEnrollment.id, row.id),
+					),
+				)
+				.returning({ id: schema.automationEnrollment.id });
+			if (replaced.length > 0) {
+				log.info({
+					message: "Re-entry cancelled the run in progress",
+					automationId: auto.id,
+					contactId,
+					enrollmentId: row.id,
+					replacedEnrollmentIds: replaced.map((r) => r.id),
+				});
+			}
 		}
-		throw error;
+		return { enrollment: row };
+	});
+
+	const { enrollment } = result;
+	if (!enrollment) {
+		return alreadyEnrolled(auto.id, contactId, result.existingEnrollmentId);
 	}
 
 	const [stepRun] = await db
@@ -270,11 +291,29 @@ export async function cancelEnrollmentsForContact(params: {
 	}
 }
 
-function isUniqueViolation(error: unknown): boolean {
-	return (
-		typeof error === "object" &&
-		error !== null &&
-		"code" in error &&
-		(error as { code: string }).code === "23505"
-	);
+function findEnrollment(automationId: string, contactId: string) {
+	return db.query.automationEnrollment.findFirst({
+		where: and(
+			eq(schema.automationEnrollment.automationId, automationId),
+			eq(schema.automationEnrollment.contactId, contactId),
+		),
+		columns: { id: true },
+	});
+}
+
+function alreadyEnrolled(
+	automationId: string,
+	contactId: string,
+	existingEnrollmentId: string,
+): EnrollOutcome {
+	log.info({
+		message: "Contact already enrolled — skip",
+		automationId,
+		contactId,
+	});
+	return {
+		status: "skipped",
+		reason: "already_enrolled",
+		existingEnrollmentId,
+	};
 }

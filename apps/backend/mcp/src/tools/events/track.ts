@@ -11,7 +11,7 @@ export const trackEvent = defineTool({
 	name: "track_event",
 	title: "Track event",
 	description:
-		"Report that a custom event happened to a contact, which starts every active automation it triggers for them and can send real email right away; confirm with the user first. Pass contactId, or email to create the contact if needed. Required properties must be included (see get_event). The result's `enrollments` is how many automations started; 0 usually means none are active for this event or the contact already went through them.",
+		"Report that a custom event happened to a contact, which starts every active automation it triggers for them and can send real email right away; confirm with the user first. Pass contactId, or email to create the contact if needed. Required properties must be included (see get_event). The result's `enrollments` is how many automations started; 0 usually means none are active for this event or the contact already went through them (automations whose reentry is restart or parallel start again).",
 	annotations: {
 		readOnlyHint: false,
 		destructiveHint: false,

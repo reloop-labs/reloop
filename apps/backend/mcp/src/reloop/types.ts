@@ -955,6 +955,8 @@ export type AutomationConnection = {
 	type: "default" | "condition_met" | "condition_not_met";
 };
 
+export type AutomationReentry = "once" | "restart" | "parallel";
+
 export type Automation = {
 	id: string;
 	organizationId: string;
@@ -965,6 +967,7 @@ export type Automation = {
 	steps: AutomationStep[];
 	connections: AutomationConnection[];
 	activeVersionId: string | null;
+	reentry: AutomationReentry;
 	createdAt: string;
 	updatedAt: string;
 };
@@ -982,6 +985,7 @@ export type CreateAutomationBody = {
 	status?: "draft" | "active";
 	steps?: AutomationStep[];
 	connections?: Partial<AutomationConnection>[];
+	reentry?: AutomationReentry;
 };
 
 export type UpdateAutomationBody = {
@@ -990,6 +994,7 @@ export type UpdateAutomationBody = {
 	steps?: AutomationStep[];
 	connections?: Partial<AutomationConnection>[];
 	status?: "active" | "paused";
+	reentry?: AutomationReentry;
 };
 
 export type EnrollmentStatus = "active" | "completed" | "cancelled" | "failed";
@@ -1006,6 +1011,7 @@ export type Enrollment = {
 	enrolledAt: string;
 	completedAt: string | null;
 	cancelledAt: string | null;
+	replacedByEnrollmentId: string | null;
 };
 
 export type EnrollContactBody = {

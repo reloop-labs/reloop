@@ -27,6 +27,7 @@ export function mapEnrollment(params: {
 		enrolledAt: row.enrolledAt.toISOString(),
 		completedAt: iso(row.completedAt),
 		cancelledAt: iso(row.cancelledAt),
+		replacedByEnrollmentId: row.replacedByEnrollmentId ?? null,
 		// Failed runs have no timestamp of their own; their last update is when.
 		endedAt: iso(
 			row.completedAt ??
@@ -66,6 +67,7 @@ export function mapAutomation(row: typeof schema.automation.$inferSelect) {
 			edges: graph.edges ?? [],
 		},
 		activeVersionId: row.activeVersionId ?? null,
+		reentry: row.reentry,
 		createdAt: row.createdAt.toISOString(),
 		updatedAt: row.updatedAt.toISOString(),
 	};

@@ -26,6 +26,18 @@ export const automationStatusEnum = pgEnum("automation_status", [
 	"paused",
 ]);
 
+/**
+ * What the trigger does for a contact who already went through the automation.
+ * once: nothing, each contact goes through it once.
+ * restart: starts it again; a run still in progress is cancelled first.
+ * parallel: starts it again alongside any run in progress.
+ */
+export const automationReentryEnum = pgEnum("automation_reentry", [
+	"once",
+	"restart",
+	"parallel",
+]);
+
 export const automationEnrollmentStatusEnum = pgEnum(
 	"automation_enrollment_status",
 	["active", "completed", "cancelled", "failed"],
@@ -81,6 +93,8 @@ export const automation = pgTable(
 			.notNull()
 			.default({ edges: [], nodes: [] }),
 		activeVersionId: text("active_version_id"),
+		/** Applies to new enrollments right away; not part of the published version. */
+		reentry: automationReentryEnum("reentry").notNull().default("once"),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
@@ -156,6 +170,8 @@ export const automationEnrollment = pgTable(
 		enrolledAt: timestamp("enrolled_at").notNull().defaultNow(),
 		completedAt: timestamp("completed_at"),
 		cancelledAt: timestamp("cancelled_at"),
+		/** Set when re-entry (`restart`) cancelled this run for a newer one. */
+		replacedByEnrollmentId: text("replaced_by_enrollment_id"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
 			.notNull()
@@ -167,8 +183,9 @@ export const automationEnrollment = pgTable(
 		index("automation_enrollment_idx_automation").on(table.automationId),
 		index("automation_enrollment_idx_contact").on(table.contactId),
 		index("automation_enrollment_idx_status").on(table.status),
-		// One enrollment per automation+contact (no re-enroll in v1)
-		unique("automation_enrollment_unique").on(
+		// How many runs a contact may have depends on `automation.reentry`, so
+		// the enroll handler serializes per automation+contact instead.
+		index("automation_enrollment_idx_automation_contact").on(
 			table.automationId,
 			table.contactId,
 		),

@@ -2,6 +2,7 @@ import type {
 	Workflow,
 	WorkflowEdge,
 	WorkflowNode,
+	WorkflowReentry,
 	WorkflowStatus,
 } from "../workflow-types";
 
@@ -17,6 +18,7 @@ export type AutomationApiResponse = {
 		edges: WorkflowEdge[];
 	};
 	activeVersionId: string | null;
+	reentry: WorkflowReentry;
 	createdAt: string;
 	updatedAt: string;
 };
@@ -39,6 +41,7 @@ export function mapAutomationToWorkflow(row: AutomationApiResponse): Workflow {
 		nodes: (row.graph?.nodes ?? []) as WorkflowNode[],
 		edges: (row.graph?.edges ?? []) as WorkflowEdge[],
 		activeVersionId: row.activeVersionId,
+		reentry: row.reentry,
 		createdAt: row.createdAt,
 		updatedAt: row.updatedAt,
 	};
@@ -77,6 +80,7 @@ export async function getAutomation(
 export async function createAutomation(input: {
 	name: string;
 	description?: string;
+	reentry?: WorkflowReentry;
 }): Promise<AutomationApiResponse> {
 	const res = await fetch("/api/workflow/v1/automations", {
 		method: "POST",
@@ -93,6 +97,7 @@ export async function updateAutomation(
 		name?: string;
 		description?: string | null;
 		graph?: { nodes: WorkflowNode[]; edges: WorkflowEdge[] };
+		reentry?: WorkflowReentry;
 	},
 ): Promise<AutomationApiResponse> {
 	const res = await fetch(`/api/workflow/v1/automations/${id}`, {
@@ -148,6 +153,8 @@ export type AutomationEnrollment = {
 	enrolledAt: string;
 	completedAt: string | null;
 	cancelledAt: string | null;
+	/** The newer run that cancelled this one (re-entry "restart"). */
+	replacedByEnrollmentId: string | null;
 	/** When it completed, was cancelled or failed. */
 	endedAt: string | null;
 };

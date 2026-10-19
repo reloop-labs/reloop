@@ -24,6 +24,7 @@ import type {
 } from "../../hooks/use-automations-api";
 import { formatAgo, formatDuration } from "../../run-format";
 import type { Workflow } from "../../workflow-types";
+import { ReplacedRunNotice } from "./replaced-run-notice";
 import { RunCanvas } from "./run-canvas";
 import { RUN_STATUS, RunStatusIcon } from "./run-status-badge";
 
@@ -384,7 +385,9 @@ export function RunsList({ workflow }: { workflow: Workflow }) {
 
 /** The open run drawn on its steps (or why there's nothing to show). */
 export function RunsCanvasArea({ workflow }: { workflow: Workflow }) {
-	const { filter, range, runsQuery, runs, runQuery } = useRuns(workflow);
+	const { filter, setFilter, range, runsQuery, runs, runQuery, setSelectedId } =
+		useRuns(workflow);
+	const replacedBy = runQuery.data?.enrollment.replacedByEnrollmentId;
 	return (
 		<section className="relative flex min-w-0 flex-1 bg-bg-weak-50 dark:bg-black">
 			{runsQuery.isSuccess && runs.length === 0 ? (
@@ -393,7 +396,21 @@ export function RunsCanvasArea({ workflow }: { workflow: Workflow }) {
 					filtered={filter !== "all" || range !== "all"}
 				/>
 			) : runQuery.data ? (
-				<RunCanvas detail={runQuery.data} />
+				<>
+					<RunCanvas detail={runQuery.data} />
+					{replacedBy ? (
+						<ReplacedRunNotice
+							key={runQuery.data.enrollment.id}
+							workflow={workflow}
+							replacedBy={replacedBy}
+							onViewReplacement={(id) => {
+								// It may be outside the current filters; show every run.
+								void setFilter(null);
+								void setSelectedId(id);
+							}}
+						/>
+					) : null}
+				</>
 			) : runQuery.isError ? (
 				<p className="m-auto text-text-sub-600 text-xs">
 					Couldn’t load this run. {runQuery.error.message}

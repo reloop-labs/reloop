@@ -3,6 +3,8 @@ import { defineTool } from "../define";
 import {
 	automationSchema,
 	connectionSchema,
+	reentryDescription,
+	reentrySchema,
 	stepSchema,
 	stepsDescription,
 	toAutomationOutput,
@@ -28,6 +30,7 @@ export const createAutomation = defineTool({
 			.max(400)
 			.default([])
 			.describe("How the steps link together, by step key"),
+		reentry: reentrySchema.optional().describe(reentryDescription),
 	}),
 	output: z.object({ automation: automationSchema }),
 	async run(args, api) {
@@ -37,6 +40,7 @@ export const createAutomation = defineTool({
 			status: "draft",
 			steps: args.steps,
 			connections: args.connections,
+			reentry: args.reentry,
 		});
 		return { automation: toAutomationOutput(automation) };
 	},
