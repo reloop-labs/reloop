@@ -95,6 +95,10 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
   if click_tracking == nil then click_tracking = true end
   if open_tracking == nil then open_tracking = true end
 
+  if not click_tracking and not open_tracking then
+    return data
+  end
+
   if not data:find("text/html", 1, true) then
     return data
   end
@@ -133,41 +137,44 @@ function utils.inject_tracking(data, email_log_id, tracking_domain, click_tracki
     end
   end
 
-  -- 2. Rewrite links (always, using click_tracking flag)
-  html = html:gsub('(href=["\']?)(https?://[^"\'%s >]+)(["\']?)', function(prefix, url, suffix)
-    -- Clean &amp; entity before encoding
-    local clean_url = url:gsub("&[aA][mM][pP];", "&")
+  -- 2. Rewrite links only when click tracking is on. With it off, links keep
+  -- their original destination instead of hopping through the shared link host.
+  if click_tracking then
+    html = html:gsub('(href=["\']?)(https?://[^"\'%s >]+)(["\']?)', function(prefix, url, suffix)
+      -- Clean &amp; entity before encoding
+      local clean_url = url:gsub("&[aA][mM][pP];", "&")
 
-    -- Check if it is already a redirect URL
-    local existing_token = clean_url:match("/redirect/([%w%-_]+)")
-    if existing_token then
-      local decoded = utils.decode_tracking_token(existing_token)
-      if decoded and decoded.url then
-        clean_url = decoded.url
-      else
-        -- Fallback: decode without signature verification
-        local status, json_str = pcall(function()
-          return _kumo.encode.base64url_nopad_decode(existing_token)
-        end)
-        if status and json_str then
-          local parse_status, obj = pcall(function()
-            return _kumo.serde.json_parse(json_str)
+      -- Check if it is already a redirect URL
+      local existing_token = clean_url:match("/redirect/([%w%-_]+)")
+      if existing_token then
+        local decoded = utils.decode_tracking_token(existing_token)
+        if decoded and decoded.url then
+          clean_url = decoded.url
+        else
+          -- Fallback: decode without signature verification
+          local status, json_str = pcall(function()
+            return _kumo.encode.base64url_nopad_decode(existing_token)
           end)
-          if parse_status and obj and obj.url then
-            clean_url = obj.url
+          if status and json_str then
+            local parse_status, obj = pcall(function()
+              return _kumo.serde.json_parse(json_str)
+            end)
+            if parse_status and obj and obj.url then
+              clean_url = obj.url
+            else
+              return nil
+            end
           else
             return nil
           end
-        else
-          return nil
         end
       end
-    end
 
-    local click_token = utils.encode_tracking_token(email_log_id, clean_url, click_tracking)
-    local tracked_url = string.format("%s/redirect/%s", tracking_base_url, click_token)
-    return prefix .. tracked_url .. suffix
-  end)
+      local click_token = utils.encode_tracking_token(email_log_id, clean_url, true)
+      local tracked_url = string.format("%s/redirect/%s", tracking_base_url, click_token)
+      return prefix .. tracked_url .. suffix
+    end)
+  end
 
   html_part.body = html
   return tostring(root)

@@ -36,8 +36,12 @@ export function injectCustomTracking_step5c({
 	const baseUrl = `${protocol}${trackingDomain}`;
 	let result = html;
 
-	// Always rewrite links to use /redirect/, passing clickTracking flag to helper
-	result = rewriteLinks(result, emailLogId, baseUrl, clickTracking);
+	// With click tracking off, links keep their original destination. Wrapping
+	// them through the shared link host would only add a redirect hop that
+	// mailbox providers score against the sender.
+	if (clickTracking) {
+		result = rewriteLinks(result, emailLogId, baseUrl);
+	}
 
 	if (openTracking) {
 		result = injectOpenPixel(result, emailLogId, baseUrl);
@@ -52,7 +56,6 @@ function rewriteLinks(
 	html: string,
 	emailLogId: string,
 	baseUrl: string,
-	clickTracking: boolean,
 ): string {
 	return html.replace(
 		/(<a\s[^>]*href=)(["'])([^"']+)\2/gi,
@@ -95,9 +98,7 @@ function rewriteLinks(
 			}
 
 			const token = encodeTrackingToken(
-				clickTracking
-					? { id: emailLogId, url: cleanUrl }
-					: { id: emailLogId, url: cleanUrl, nt: 1 },
+				{ id: emailLogId, url: cleanUrl },
 				mailConfig.TRACKING_SECRET,
 			);
 			const trackingUrl = `${baseUrl}/redirect/${token}`;

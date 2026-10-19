@@ -335,4 +335,18 @@ describe("inject_tracking in KumoMTA", () => {
 	test("messages without an html part pass through unchanged", () => {
 		expect(results.plainOnly).toBe(fixtures.plainOnly as string);
 	});
+
+	test("links keep their destination when click tracking is off", async () => {
+		const html = String((await simpleParser(results.openOnly as string)).html);
+		expect(hrefs(html).map((link) => link.url.replace(/&amp;/g, "&"))).toEqual([
+			PRICING_URL,
+			QUOTED_URL,
+		]);
+		expect(html).not.toContain("/redirect/");
+		expect(openTokens(html)).toHaveLength(1);
+	});
+
+	test("messages pass through unchanged when all tracking is off", () => {
+		expect(results.noTracking).toBe(fixtures.pythonBoundary as string);
+	});
 });

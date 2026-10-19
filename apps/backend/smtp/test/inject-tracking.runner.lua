@@ -11,6 +11,8 @@ kumo.on('init', function()
   for name, raw in pairs(fixtures) do
     results[name] = utils.inject_tracking(raw, 'log_test_1', '', true, true)
   end
+  results.openOnly = utils.inject_tracking(fixtures.pythonBoundary, 'log_test_1', '', false, true)
+  results.noTracking = utils.inject_tracking(fixtures.pythonBoundary, 'log_test_1', '', false, false)
 
   print('TOKEN_PARITY ' .. kumo.serde.json_encode({
     tracked = utils.encode_tracking_token('log_test_1', 'https://example.com/a', true),

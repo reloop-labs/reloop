@@ -331,7 +331,7 @@ export function InboxEmailAddressInput({
 						animate={{ opacity: 1, y: 0, scale: 1 }}
 						exit={{ opacity: 0, y: -4, scale: 0.98 }}
 						transition={{ duration: 0.15, ease: "easeOut" }}
-						className="absolute top-full right-0 left-0 z-50 mt-2 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-lg dark:border-stroke-soft-100/40 dark:bg-bg-soft-200"
+						className="absolute top-full right-0 left-0 z-50 mt-2 overflow-hidden rounded-xl bg-bg-white-0 p-1 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset"
 					>
 						{isLoadingDomains && suggestions.length === 0 ? (
 							<div className="flex items-center justify-center gap-2.5 py-6 text-paragraph-xs text-text-sub-600">
