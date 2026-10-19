@@ -24,9 +24,17 @@ import {
 } from "react";
 import { uploadComposeFile } from "./compose-attachments";
 import { ComposeToolbar } from "./compose-toolbar";
+import { isPlainTextDocument, plainTextFromDocument } from "./plain-text-email";
+
+/**
+ * `plainText` is true when the body has no formatting. Callers that send
+ * should then omit `html` (`text` is already the clean plain-text body);
+ * `html` is still returned for drafts / undo restore.
+ */
+export type ComposedEmail = { html: string; text: string; plainText: boolean };
 
 export type ComposeBodyEditorHandle = {
-	getEmail: () => Promise<{ html: string; text: string }>;
+	getEmail: () => Promise<ComposedEmail>;
 	getEmailHTML: () => Promise<string>;
 	getEmailText: () => Promise<string>;
 	getJSON: () => JSONContent;
@@ -67,8 +75,13 @@ const composeTheme = extendTheme("basic", {
 function buildHandle(editor: Editor | null): ComposeBodyEditorHandle {
 	return {
 		getEmail: async () => {
-			if (!editor) return { html: "", text: "" };
-			return composeReactEmail({ editor });
+			if (!editor) return { html: "", text: "", plainText: false };
+			const { html, text } = await composeReactEmail({ editor });
+			const json = editor.getJSON();
+			if (isPlainTextDocument(json)) {
+				return { html, text: plainTextFromDocument(json), plainText: true };
+			}
+			return { html, text, plainText: false };
 		},
 		getEmailHTML: async () => {
 			if (!editor) return "";
@@ -160,7 +173,11 @@ export const ComposeBodyEditor = forwardRef<
 		ref,
 		() => ({
 			getEmail: async () =>
-				(await handleRef.current?.getEmail()) ?? { html: "", text: "" },
+				(await handleRef.current?.getEmail()) ?? {
+					html: "",
+					text: "",
+					plainText: false,
+				},
 			getEmailHTML: async () => (await handleRef.current?.getEmailHTML()) ?? "",
 			getEmailText: async () => (await handleRef.current?.getEmailText()) ?? "",
 			getJSON: () =>
@@ -200,7 +217,7 @@ export const ComposeBodyEditor = forwardRef<
 	return (
 		<div
 			key={editorKey}
-			className="compose-email-editor flex min-h-0 flex-1 flex-col"
+			className="compose-email-editor flex min-h-0 flex-1 flex-col text-mail-foreground"
 		>
 			<style>{COMPOSE_EDITOR_CSS}</style>
 			<EditorProvider
@@ -270,6 +287,18 @@ body > div:has([data-re-link-selector-form]),
   font-size: 14px;
   line-height: 1.55;
   color: inherit;
+}
+
+/* The email theme paints a white canvas with black text for the recipient.
+   In dark mode, show the draft on the panel instead (export is unchanged). */
+.dark .compose-email-editor .tiptap.ProseMirror,
+.dark .compose-email-editor .ProseMirror .node-container {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.dark .compose-email-editor .ProseMirror a {
+  color: #60a5fa !important;
 }
 
 .compose-email-editor .node-container {

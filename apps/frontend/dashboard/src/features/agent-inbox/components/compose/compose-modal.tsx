@@ -563,6 +563,7 @@ export const ComposeModal = ({
 		const exported = (await editorRef.current?.getEmail()) ?? {
 			html: htmlBody,
 			text: textBody,
+			plainText: false,
 		};
 
 		setIsSending(true);
@@ -573,7 +574,7 @@ export const ComposeModal = ({
 				to: data.to,
 				subject: data.subject || "(No Subject)",
 				text: exported.text || textBody,
-				html: exported.html || htmlBody,
+				html: exported.plainText ? undefined : exported.html || htmlBody,
 				cc: data.cc.length > 0 ? data.cc : undefined,
 				bcc: data.bcc.length > 0 ? data.bcc : undefined,
 				attachments: toSendAttachments(attachments),

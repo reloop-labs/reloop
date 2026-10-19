@@ -236,9 +236,11 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 				toast.error("Please wait for attachments to finish uploading.");
 				return;
 			}
+			// Always HTML: the forward embeds the original message's HTML.
 			const exported = (await editorRef.current?.getEmail()) ?? {
 				html: htmlBody,
 				text: textBody,
+				plainText: false,
 			};
 			onSend({
 				to: data.to,

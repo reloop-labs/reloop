@@ -327,10 +327,12 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 				const exported = (await editorRef.current?.getEmail()) ?? {
 					html: htmlRef.current,
 					text: textRef.current,
+					plainText: false,
 				};
 				onSend({
 					text: (exported.text || textRef.current).trim(),
-					html: exported.html || htmlRef.current,
+					// Unformatted replies go out as text/plain only.
+					html: exported.plainText ? "" : exported.html || htmlRef.current,
 					attachments: toSendAttachments(attachments),
 					to: toEmails,
 					cc: ccEmails,

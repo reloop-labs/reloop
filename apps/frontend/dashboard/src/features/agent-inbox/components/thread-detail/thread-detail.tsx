@@ -790,7 +790,7 @@ export const ThreadDetail = ({
 				? sendReplyAll(
 						sendId,
 						body,
-						payload.html,
+						payload.html || undefined,
 						payload.attachments,
 						recipients,
 						conversationId,
@@ -798,7 +798,7 @@ export const ThreadDetail = ({
 				: sendReply(
 						sendId,
 						body,
-						payload.html,
+						payload.html || undefined,
 						payload.attachments,
 						recipients,
 						conversationId,
