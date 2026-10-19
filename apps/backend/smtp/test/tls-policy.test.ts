@@ -170,7 +170,7 @@ describe("policy sources stay wired", () => {
 		expect(logIncoming).toContain("creditsReserved: true");
 		expect(logIncoming).toContain("uniqueBareEmails(body.toEmails)");
 		expect(logIncoming).toContain("No envelope recipients");
-		expect(logIncoming).toContain("scoreOutboundAbuse");
+		expect(logIncoming).toContain("checkOutboundSpam");
 	});
 
 	test("smtp.lua validates AUTH PLAIN against /v1/smtp-auth", () => {
@@ -214,6 +214,6 @@ describe("policy sources stay wired", () => {
 		expect(sendController).toContain("if (!injected)");
 		expect(sendController).toContain("refundCreditsForFailedSend(reservation)");
 		expect(sendController).toContain("credits kept");
-		expect(sendController).toContain("scoreOutboundAbuse");
+		expect(sendController).toContain("checkOutboundSpam");
 	});
 });
