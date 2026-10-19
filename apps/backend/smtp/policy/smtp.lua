@@ -182,6 +182,9 @@ local function apply_reloop_logic(msg, api_key, source)
 
   local existing_log_id = msg:get_first_named_header_value('X-Email-Log-ID')
   local org_id = msg:get_first_named_header_value('X-Org-ID') or ""
+  -- Internal routing headers from the mail service: read above, never sent on.
+  msg:remove_all_named_headers('X-Org-ID')
+  msg:remove_all_named_headers('X-Domain-ID')
   local is_internal = (api_key ~= "" and api_key == constants.internal_secret)
   -- Mail HTTP inject already inserted email_log (API key or internal secret).
   -- Customer SMTP must not skip quota by stamping a fake X-Email-Log-ID.

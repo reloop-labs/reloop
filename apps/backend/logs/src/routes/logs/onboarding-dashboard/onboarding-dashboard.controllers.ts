@@ -5,12 +5,14 @@ import { db } from "@reloop/db/client";
 import { activityLog, domain, emailLog, member, user } from "@reloop/db/schema";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { insertAuditLog } from "@reloop/logs/utils/insert-audit-log";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
-/** Matches onboarding send-test-email subject. */
-const ONBOARDING_TEST_SUBJECT = "Hello World!";
-const ONBOARDING_TEST_TEXT = "Congrats on sending your first email!";
+/** Matches the email service's onboarding.constants.ts. */
+const ONBOARDING_TEST_SUBJECT = `Your ${appName} account is ready to send`;
+/** Current subject plus the one older onboarding sends were logged under. */
+const ONBOARDING_TEST_SUBJECTS = [ONBOARDING_TEST_SUBJECT, "Hello World!"];
+const ONBOARDING_TEST_TEXT = `This email confirms your ${appName} account can send.`;
 const ONBOARDING_TEST_LOCAL_PART = "onboarding";
 
 function parseFromEmail(from: string): string {
@@ -248,11 +250,12 @@ export async function onboardingDashboardController({
 				organizationId: emailLog.organizationId,
 				apikeyId: emailLog.apikeyId,
 				fromEmail: emailLog.fromEmail,
+				subject: emailLog.subject,
 			})
 			.from(emailLog)
 			.where(
 				and(
-					eq(emailLog.subject, ONBOARDING_TEST_SUBJECT),
+					inArray(emailLog.subject, ONBOARDING_TEST_SUBJECTS),
 					sql`EXISTS (
 						SELECT 1
 						FROM jsonb_array_elements_text(${emailLog.toEmails}) AS addr(email)
@@ -303,7 +306,7 @@ export async function onboardingDashboardController({
 				apikeyId: keyAuth.apiKeyId,
 				to,
 				from: match.fromEmail || parseFromEmail(from),
-				subject: ONBOARDING_TEST_SUBJECT,
+				subject: match.subject,
 			});
 			attributedIds.push(match.id);
 		}

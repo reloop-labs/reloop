@@ -7,12 +7,12 @@ import { db } from "@reloop/db/client";
 import { emailLog, member } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import { attributeOnboardingActivityLog } from "@reloop/email/routes/onboarding/attribute-activity-log";
-import { ONBOARDING_TEST_SUBJECT } from "@reloop/email/routes/onboarding/onboarding.constants";
+import { ONBOARDING_TEST_SUBJECTS } from "@reloop/email/routes/onboarding/onboarding.constants";
 import {
 	onboardingSessionOpts,
 	onboardingSessionRedis,
 } from "@reloop/email/routes/onboarding/onboarding.session";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { log } from "evlog";
 
@@ -116,11 +116,14 @@ export const dashboardRoute = new Elysia({
 						organizationId: emailLog.organizationId,
 						apikeyId: emailLog.apikeyId,
 						fromEmail: emailLog.fromEmail,
+						subject: emailLog.subject,
+						textBody: emailLog.textBody,
+						htmlBody: emailLog.htmlBody,
 					})
 					.from(emailLog)
 					.where(
 						and(
-							eq(emailLog.subject, ONBOARDING_TEST_SUBJECT),
+							inArray(emailLog.subject, ONBOARDING_TEST_SUBJECTS),
 							sql`EXISTS (
 								SELECT 1
 								FROM jsonb_array_elements_text(${emailLog.toEmails}) AS addr(email)
@@ -174,7 +177,9 @@ export const dashboardRoute = new Elysia({
 						apikeyId: keyAuth.apiKeyId,
 						to,
 						from: match.fromEmail,
-						subject: ONBOARDING_TEST_SUBJECT,
+						subject: match.subject,
+						text: match.textBody ?? undefined,
+						html: match.htmlBody ?? undefined,
 					});
 
 					ids.push(match.id);

@@ -7,11 +7,8 @@ import { appName } from "@reloop/brand";
 import { db } from "@reloop/db/client";
 import { member } from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
-import {
-	ONBOARDING_TEST_LOCAL_PART,
-	ONBOARDING_TEST_SUBJECT,
-	ONBOARDING_TEST_TEXT,
-} from "@reloop/email/routes/onboarding/onboarding.constants";
+import { ONBOARDING_TEST_LOCAL_PART } from "@reloop/email/routes/onboarding/onboarding.constants";
+import { buildOnboardingTestEmail } from "@reloop/email/routes/onboarding/onboarding-test-email";
 import {
 	onboardingSessionOpts,
 	onboardingSessionRedis,
@@ -123,15 +120,15 @@ export const sendTestEmailRoute = new Elysia({
 
 			// Display name + address — matches product expectation:
 			// Reloop <onboarding@{ONBOARDING_TEST_DOMAIN}>
-			const from = `${appName} <${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}>`;
+			const fromAddress = `${ONBOARDING_TEST_LOCAL_PART}@${onboardingTestDomain}`;
+			const from = `${appName} <${fromAddress}>`;
+			const content = buildOnboardingTestEmail({
+				to,
+				from: fromAddress,
+				name: session.userName,
+			});
 			try {
-				const result = await sendEmail({
-					from,
-					to,
-					subject: ONBOARDING_TEST_SUBJECT,
-					text: ONBOARDING_TEST_TEXT,
-					html: ONBOARDING_TEST_TEXT,
-				});
+				const result = await sendEmail({ from, to, ...content });
 
 				const resultObj =
 					result && typeof result === "object"
@@ -155,6 +152,7 @@ export const sendTestEmailRoute = new Elysia({
 						to,
 						onboardingDomainName: onboardingTestDomain,
 						providerMessageId,
+						content,
 					});
 				}
 

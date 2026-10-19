@@ -45,8 +45,8 @@ const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
 const { response, emailError } = await reloop.mail.send({
   from: "Reloop <onboarding@reloop.email>",
   to: "${to}",
-  subject: "Hello World!",
-  text: "Congrats on sending your first email!",
+  subject: "Your Reloop account is ready to send",
+  text: "This email confirms your Reloop account can send to ${to}.",
 });
 
 if (emailError) throw emailError;
@@ -62,8 +62,8 @@ reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 result = reloop.mail.send({
     "from": "Reloop <onboarding@reloop.email>",
     "to": "${to}",
-    "subject": "Hello World!",
-    "text": "Congrats on sending your first email!",
+    "subject": "Your Reloop account is ready to send",
+    "text": "This email confirms your Reloop account can send to ${to}.",
 })
 
 if result.email_error:
@@ -93,8 +93,8 @@ func main() {
   result, err := client.Mail.Send(reloop.SendMailParams{
     From:    "Reloop <onboarding@reloop.email>",
     To:      "${to}",
-    Subject: "Hello World!",
-    Text:    reloop.String("Congrats on sending your first email!"),
+    Subject: "Your Reloop account is ready to send",
+    Text:    reloop.String("This email confirms your Reloop account can send to ${to}."),
   })
   if err != nil {
     fmt.Println("Error:", err)
@@ -110,8 +110,8 @@ func main() {
 $result = $reloop->mail->send([
   'from' => 'Reloop <onboarding@reloop.email>',
   'to' => '${to}',
-  'subject' => 'Hello World!',
-  'text' => 'Congrats on sending your first email!',
+  'subject' => 'Your Reloop account is ready to send',
+  'text' => 'This email confirms your Reloop account can send to ${to}.',
 ]);
 
 echo $result->message_id, $result->id;`,
@@ -130,7 +130,7 @@ My API key: ${apiKey}
 Requirements:
 1. Detect this project's language/framework and install the correct Reloop SDK
 2. Add RELOOP_API_KEY=${apiKey} to my .env file
-3. Send a transactional email from Reloop <onboarding@reloop.email> to ${to} with subject "Hello World!" and plain-text body "Congrats on sending your first email!"
+3. Send a transactional email from Reloop <onboarding@reloop.email> to ${to} with subject "Your Reloop account is ready to send" and plain-text body "This email confirms your Reloop account can send to ${to}."
 4. Follow this project's existing conventions and handle errors properly
 
 Supported SDKs:

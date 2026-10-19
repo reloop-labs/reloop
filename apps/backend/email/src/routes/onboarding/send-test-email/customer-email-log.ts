@@ -1,11 +1,9 @@
 import { db } from "@reloop/db/client";
 import { domain, emailLog, member } from "@reloop/db/schema";
 import { attributeOnboardingActivityLog } from "@reloop/email/routes/onboarding/attribute-activity-log";
-import {
-	ONBOARDING_TEST_SUBJECT,
-	ONBOARDING_TEST_TEXT,
-} from "@reloop/email/routes/onboarding/onboarding.constants";
-import { and, desc, eq, gte, or, sql } from "drizzle-orm";
+import { ONBOARDING_TEST_SUBJECTS } from "@reloop/email/routes/onboarding/onboarding.constants";
+import type { OnboardingTestEmail } from "@reloop/email/routes/onboarding/onboarding-test-email";
+import { and, desc, eq, gte, inArray, or, sql } from "drizzle-orm";
 import { log } from "evlog";
 
 function parseFromEmail(from: string): string {
@@ -35,6 +33,7 @@ export async function saveOnboardingCustomerEmailLog({
 	to,
 	onboardingDomainName,
 	providerMessageId,
+	content,
 }: {
 	organizationId: string;
 	userId: string;
@@ -43,6 +42,7 @@ export async function saveOnboardingCustomerEmailLog({
 	to: string;
 	onboardingDomainName: string;
 	providerMessageId?: string;
+	content: OnboardingTestEmail;
 }): Promise<string | null> {
 	try {
 		// Prefer the platform row for this send (message id or very recent).
@@ -62,7 +62,7 @@ export async function saveOnboardingCustomerEmailLog({
 				.from(emailLog)
 				.where(
 					and(
-						eq(emailLog.subject, ONBOARDING_TEST_SUBJECT),
+						inArray(emailLog.subject, ONBOARDING_TEST_SUBJECTS),
 						recipientMatch,
 						or(
 							eq(emailLog.messageId, providerMessageId.trim()),
@@ -87,7 +87,7 @@ export async function saveOnboardingCustomerEmailLog({
 				.from(emailLog)
 				.where(
 					and(
-						eq(emailLog.subject, ONBOARDING_TEST_SUBJECT),
+						inArray(emailLog.subject, ONBOARDING_TEST_SUBJECTS),
 						recipientMatch,
 						gte(emailLog.createdAt, recentCutoff),
 					),
@@ -166,13 +166,13 @@ export async function saveOnboardingCustomerEmailLog({
 					fromEmail: parseFromEmail(from),
 					fromName: parseFromName(from) ?? "Reloop",
 					toEmails: [to],
-					subject: ONBOARDING_TEST_SUBJECT,
-					textBody: ONBOARDING_TEST_TEXT,
-					htmlBody: ONBOARDING_TEST_TEXT,
+					subject: content.subject,
+					textBody: content.text,
+					htmlBody: content.html,
 					status: "sent",
 					provider: "kumomta",
 					providerMessageId: providerMessageId?.trim() || undefined,
-					size: ONBOARDING_TEST_TEXT.length * 2,
+					size: (content.text.length + content.html.length) * 2,
 					sentAt: new Date(),
 				})
 				.returning({ id: emailLog.id });
@@ -189,7 +189,9 @@ export async function saveOnboardingCustomerEmailLog({
 				apikeyId,
 				to,
 				from: parseFromEmail(from),
-				subject: ONBOARDING_TEST_SUBJECT,
+				subject: content.subject,
+				text: content.text,
+				html: content.html,
 			});
 		}
 
