@@ -14,12 +14,15 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
 import type { Domain } from "../types";
 
 /** Light keycap so it reads on the red/destructive FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -428,7 +431,7 @@ export function DeleteDomainModal({
 										{isBulk
 											? `Delete ${bulkDomainsToDelete.length || ""} domain${bulkDomainsToDelete.length === 1 ? "" : "s"}`
 											: "Delete domain"}
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>

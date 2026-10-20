@@ -9,10 +9,13 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 /** Pricing-style primary button: blue in light mode, white in dark mode. */
 const primaryDarkWhiteClassName =
@@ -144,7 +147,7 @@ export function InboxTopNavbar({
 					>
 						<Icon name="plus" className="h-4 w-4" />
 						Create new inbox
-						<ActionKbd className={actionKbdOnBlueClassName}>N</ActionKbd>
+						<ActionKbd className={actionKbdOnButtonClassName}>N</ActionKbd>
 					</FancyButton.Root>
 				</>
 			)}

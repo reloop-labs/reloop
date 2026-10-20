@@ -13,12 +13,15 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Campaign } from "../campaign-types";
 import { deleteCampaignRequest } from "../campaigns-api";
 import { useInvalidateCampaigns } from "../campaigns-provider";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -408,7 +411,7 @@ export function DeleteCampaignModal({
 										{isBulk
 											? `Delete ${bulkCampaignsToDelete.length || ""} campaign${bulkCampaignsToDelete.length === 1 ? "" : "s"}`
 											: "Delete campaign"}
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>

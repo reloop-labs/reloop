@@ -17,7 +17,10 @@ import { useInboxFolderStats } from "#/features/agent-inbox/hooks/use-inbox-fold
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 import { SidebarNavIcon } from "#/features/dashboard/sidebar/sidebar-nav-icon";
 import { SidebarNavLink } from "#/features/dashboard/sidebar/sidebar-nav-link";
@@ -25,7 +28,7 @@ import { useSidebarHoverBox } from "#/features/dashboard/sidebar/use-sidebar-hov
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 /** Light keycap for blue FancyButton fill */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 /** Pricing-style primary button: blue in light mode, white in dark mode. */
 const primaryDarkWhiteClassName =
@@ -290,7 +293,7 @@ export const InboxSidebar = ({
 							)}
 						</div>
 						{!collapsed && (
-							<ActionKbd className={actionKbdOnBlueClassName}>C</ActionKbd>
+							<ActionKbd className={actionKbdOnButtonClassName}>C</ActionKbd>
 						)}
 					</FancyButton.Root>
 				</div>

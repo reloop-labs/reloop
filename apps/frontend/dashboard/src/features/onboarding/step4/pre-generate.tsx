@@ -5,10 +5,13 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 export function PreGenerate({
 	loading,
@@ -86,7 +89,7 @@ export function PreGenerate({
 									<span>
 										{mustRegenerate ? "Generate new key" : "Create API key"}
 									</span>
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</>

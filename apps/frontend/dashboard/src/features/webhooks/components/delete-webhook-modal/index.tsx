@@ -15,11 +15,14 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import type { DeleteWebhookModalProps, WebhookData } from "./types";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -377,7 +380,7 @@ export const DeleteWebhookModal = ({
 								) : (
 									<>
 										<span>Delete webhook</span>
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>

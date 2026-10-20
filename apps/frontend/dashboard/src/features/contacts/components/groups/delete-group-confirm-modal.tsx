@@ -14,13 +14,16 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	type Group,
 	useInvalidateContacts,
 } from "../../hooks/use-contacts-query";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -349,7 +352,7 @@ export function DeleteGroupConfirmModal({
 								) : (
 									<>
 										<span>Delete</span>
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>

@@ -14,10 +14,13 @@ import {
 	type Group,
 	useInvalidateContacts,
 } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 /** Light keycap so it reads on the destructive FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 interface DeleteGroupModalProps {
 	open: boolean;
@@ -254,7 +257,7 @@ export const DeleteGroupModal = ({
 									) : (
 										<>
 											<span>Delete</span>
-											<ActionKbd className={actionKbdOnBlueClassName}>
+											<ActionKbd className={actionKbdOnButtonClassName}>
 												<EnterIcon />
 											</ActionKbd>
 										</>

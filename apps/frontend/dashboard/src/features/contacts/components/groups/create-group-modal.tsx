@@ -11,10 +11,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 interface CreateGroupModalProps {
 	open: boolean;
@@ -207,7 +210,7 @@ export const CreateGroupModal = ({
 											) : (
 												<>
 													Create group
-													<ActionKbd className={actionKbdOnBlueClassName}>
+													<ActionKbd className={actionKbdOnButtonClassName}>
 														<EnterIcon />
 													</ActionKbd>
 												</>

@@ -10,7 +10,10 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainNotFound } from "../../components/domain-not-found";
 import { DNSAutoConnectBanner } from "../../detail/components/dns-auto-connect-banner";
@@ -22,7 +25,7 @@ import {
 import { ForwardDNSRecordsButton } from "./components/forward-dns-records";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 function BackspaceIcon({ className }: { className?: string }) {
 	return (
@@ -232,7 +235,7 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 								) : (
 									<>
 										<span>Verify & finish</span>
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>

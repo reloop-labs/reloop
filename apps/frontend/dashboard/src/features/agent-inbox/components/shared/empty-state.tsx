@@ -1,8 +1,11 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 export const AgentInboxEmptyState = ({
 	onAddClick,
@@ -31,7 +34,7 @@ export const AgentInboxEmptyState = ({
 			>
 				<Icon name="plus" className="h-4 w-4" />
 				Add address
-				<ActionKbd className={actionKbdOnBlueClassName}>A</ActionKbd>
+				<ActionKbd className={actionKbdOnButtonClassName}>A</ActionKbd>
 			</FancyButton.Root>
 		</div>
 	);

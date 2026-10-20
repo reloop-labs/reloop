@@ -23,11 +23,14 @@ import {
 	type Property,
 	useAllPropertiesQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { testCampaignRequest } from "../../campaigns-api";
 import { useCampaignEditorStore } from "../campaign-editor-store";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 interface VariableInputFieldProps {
 	property: Property;
@@ -531,10 +534,10 @@ export function CampaignTestEmailModal({
 											<>
 												Send
 												<span className="inline-flex items-center gap-0.5">
-													<ActionKbd className={actionKbdOnBlueClassName}>
+													<ActionKbd className={actionKbdOnButtonClassName}>
 														⌘
 													</ActionKbd>
-													<ActionKbd className={actionKbdOnBlueClassName}>
+													<ActionKbd className={actionKbdOnButtonClassName}>
 														<EnterIcon />
 													</ActionKbd>
 												</span>

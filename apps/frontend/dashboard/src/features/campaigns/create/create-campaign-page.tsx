@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
-"use client";
+
+("use client");
 
 import * as Button from "@reloop/ui/button";
 import { EnterIcon } from "@reloop/ui/enter-icon";
@@ -20,7 +21,10 @@ import {
 	useContactsQuery,
 	useGroupsQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import type { AudienceTargetType } from "../campaign-types";
@@ -30,7 +34,10 @@ import {
 	useCampaigns,
 } from "../campaigns-provider";
 
-const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnButtonClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 type Step = "setup" | "audience" | "sender" | "content" | "review";
 
@@ -693,7 +700,7 @@ function CreateCampaignPageContent() {
 											className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm"
 										>
 											Continue
-											<ActionKbd className={actionKbdOnBlueClassName}>
+											<ActionKbd className={actionKbdOnButtonClassName}>
 												<EnterIcon />
 											</ActionKbd>
 										</FancyButton.Root>
@@ -1334,7 +1341,7 @@ function CreateCampaignPageContent() {
 													className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm"
 												>
 													Continue
-													<ActionKbd className={actionKbdOnBlueClassName}>
+													<ActionKbd className={actionKbdOnButtonClassName}>
 														<EnterIcon />
 													</ActionKbd>
 												</FancyButton.Root>
@@ -1574,7 +1581,7 @@ function CreateCampaignPageContent() {
 										className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
 									>
 										Continue
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</FancyButton.Root>
@@ -1740,7 +1747,7 @@ function CreateCampaignPageContent() {
 									className="min-w-[134px] justify-center gap-1.5 overflow-hidden rounded-xl"
 								>
 									Continue
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</FancyButton.Root>
@@ -1889,10 +1896,10 @@ function CreateCampaignPageContent() {
 												{effectiveRecipientCount.toLocaleString()})
 											</span>
 											<span className="inline-flex items-center gap-0.5">
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnButtonClassName}>
 													⌘
 												</ActionKbd>
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnButtonClassName}>
 													<EnterIcon />
 												</ActionKbd>
 											</span>

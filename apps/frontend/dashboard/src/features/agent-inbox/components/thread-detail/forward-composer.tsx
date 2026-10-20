@@ -15,7 +15,10 @@ import {
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import type { ComposeDraftKind } from "../../types";
 import {
@@ -78,7 +81,10 @@ const modKey =
 		? "⌘"
 		: "Ctrl";
 
-const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnButtonClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
@@ -582,10 +588,10 @@ export const ForwardComposer = forwardRef<HTMLDivElement, ForwardComposerProps>(
 								</span>
 								{!isSending && (
 									<div className="flex items-center gap-0.5 opacity-90">
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											{modKey}
 										</ActionKbd>
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</div>

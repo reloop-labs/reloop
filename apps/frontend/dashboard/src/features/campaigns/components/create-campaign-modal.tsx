@@ -16,12 +16,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useCampaigns } from "../campaigns-provider";
 
 const EMPTY_NAME_ERROR = "Please enter a campaign name.";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 interface CreateCampaignModalProps {
 	open: boolean;
@@ -248,7 +251,7 @@ export function CreateCampaignModal({
 									) : (
 										<>
 											Create campaign
-											<ActionKbd className={actionKbdOnBlueClassName}>
+											<ActionKbd className={actionKbdOnButtonClassName}>
 												<EnterIcon />
 											</ActionKbd>
 										</>

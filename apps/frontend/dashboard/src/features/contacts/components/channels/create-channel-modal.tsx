@@ -16,11 +16,14 @@ import { useCallback, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { CreateChannelPreview } from "./create-channel-preview";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 interface Channel {
 	id: string;
@@ -398,7 +401,7 @@ export const CreateChannelModal = ({
 											) : (
 												<>
 													<span>Create Channel</span>
-													<ActionKbd className={actionKbdOnBlueClassName}>
+													<ActionKbd className={actionKbdOnButtonClassName}>
 														<EnterIcon />
 													</ActionKbd>
 												</>

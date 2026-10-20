@@ -15,11 +15,14 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Workflow } from "../workflow-types";
 import { useWorkflows } from "./workflows-provider";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -403,7 +406,7 @@ export function DeleteWorkflowModal({
 										{isBulk
 											? `Delete ${bulkWorkflowsToDelete.length || ""} automation${bulkWorkflowsToDelete.length === 1 ? "" : "s"}`
 											: "Delete automation"}
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>

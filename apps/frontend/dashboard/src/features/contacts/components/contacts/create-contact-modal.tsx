@@ -22,9 +22,12 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { GroupSelect } from "#/features/contacts/components/groups/group-select";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 const BATCH_SIZE = 5;
 
@@ -432,7 +435,7 @@ export function CreateContactModal({
 									{totalValidNow > 1
 										? `Add ${totalValidNow} contacts`
 										: "Add contact"}
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</>

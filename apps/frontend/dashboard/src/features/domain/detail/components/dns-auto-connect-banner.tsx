@@ -6,7 +6,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import * as simpleIcons from "simple-icons";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { DomainResponse } from "#/features/domain/types";
 import {
 	DNS_SETUP_HUB_URL,
@@ -17,7 +20,7 @@ import { useDomainConnect } from "../hooks/use-domain-connect";
 import { inferDnsProvider } from "../utils";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;
@@ -143,7 +146,9 @@ function AutoPopulateBanner({
 							) : (
 								<>
 									<span>Auto populate</span>
-									<ActionKbd className={actionKbdOnBlueClassName}>A</ActionKbd>
+									<ActionKbd className={actionKbdOnButtonClassName}>
+										A
+									</ActionKbd>
 								</>
 							)}
 						</motion.span>

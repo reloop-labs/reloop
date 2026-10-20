@@ -21,10 +21,16 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useWebhookListenersQuery } from "#/features/webhooks/hooks/use-webhooks-query";
 
-const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnButtonClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 type WebhookStatus = "active" | "paused" | "disabled" | "failed";
 
@@ -669,10 +675,10 @@ export const TriggerWebhookTester = ({
 								<>
 									Send test event
 									<span className="inline-flex items-center gap-0.5">
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											{modKey}
 										</ActionKbd>
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</span>

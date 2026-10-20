@@ -14,7 +14,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	type ContactsExportFilters,
 	useContactsExport,
@@ -29,7 +32,7 @@ export type ExportStatusChoice =
 	| "blocked";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 const HEADER_CONTENT: Record<ExportStep, { title: string; icon: string }> = {
 	configure: { title: "Export contacts", icon: "file-download" },
@@ -413,7 +416,7 @@ export function ContactExportModal({
 								>
 									<Icon name="file-download" className="h-4 w-4" />
 									<span>Export {selectedCount.toLocaleString()}</span>
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</FancyButton.Root>
@@ -476,7 +479,7 @@ export function ContactExportModal({
 									className="min-w-[158px] justify-center overflow-hidden transition-all duration-200"
 								>
 									Done
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</FancyButton.Root>
@@ -503,7 +506,7 @@ export function ContactExportModal({
 									)}
 								>
 									Retry
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</FancyButton.Root>

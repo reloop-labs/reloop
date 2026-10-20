@@ -21,7 +21,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
@@ -32,7 +35,7 @@ import {
 } from "#/features/templates/editor/utils/get-rendered-email-html";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
@@ -623,10 +626,10 @@ export function TestEmailModal({
 											<>
 												Send
 												<span className="inline-flex items-center gap-0.5">
-													<ActionKbd className={actionKbdOnBlueClassName}>
+													<ActionKbd className={actionKbdOnButtonClassName}>
 														⌘
 													</ActionKbd>
-													<ActionKbd className={actionKbdOnBlueClassName}>
+													<ActionKbd className={actionKbdOnButtonClassName}>
 														<EnterIcon />
 													</ActionKbd>
 												</span>

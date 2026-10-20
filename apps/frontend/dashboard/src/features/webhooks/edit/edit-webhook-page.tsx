@@ -1,5 +1,5 @@
-import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -7,12 +7,18 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
 import { EditWebhookFormFields } from "./components/edit-webhook-form-fields";
 import { useEditWebhookForm } from "./components/use-edit-webhook-form";
 
-const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnButtonClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 interface EditWebhookPageProps {
 	webhookId: string;
@@ -156,7 +162,7 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 								) : (
 									<>
 										<span>Save changes</span>
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>

@@ -16,11 +16,14 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import type { AudienceStatus } from "#/features/contacts/audience";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { ChannelsField, GroupsField } from "./membership-fields";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 export interface EditContactFormContact {
 	id: string;
@@ -639,7 +642,7 @@ export function EditContactForm({
 										) : (
 											<>
 												<span>Update</span>
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnButtonClassName}>
 													<EnterIcon />
 												</ActionKbd>
 											</>
@@ -914,7 +917,7 @@ export function EditContactForm({
 								) : (
 									<>
 										<span>Update</span>
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>

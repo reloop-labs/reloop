@@ -1,5 +1,5 @@
-import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -8,7 +8,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
 import {
 	useInvalidateWebhooks,
@@ -19,7 +22,10 @@ import {
 	type WebhookHeaderMenuAction,
 } from "./webhook-header-menu";
 
-const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnButtonClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 interface WebhookHeaderProps {
 	webhook: WebhookDetailData | null | undefined;
@@ -286,7 +292,7 @@ export function WebhookHeader({
 									className="ml-0.5 h-3.5 w-3.5"
 								/>
 								Send test event
-								<ActionKbd className={actionKbdOnBlueClassName}>T</ActionKbd>
+								<ActionKbd className={actionKbdOnButtonClassName}>T</ActionKbd>
 							</FancyButton.Root>
 							<WebhookHeaderMenu
 								status={webhook.status}

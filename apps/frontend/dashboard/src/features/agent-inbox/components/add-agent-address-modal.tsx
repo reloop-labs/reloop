@@ -17,7 +17,10 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Domain, DomainListResponse } from "#/features/domain/types";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { AgentMailbox } from "../types";
@@ -27,7 +30,10 @@ import {
 	InboxEmailAddressInput,
 } from "./email-address-input";
 
-const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnButtonClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 /** RFC 5321/5322 unquoted local-part (dot-atom), max 64 chars */
 const EMAIL_LOCAL_PART_REGEX =
@@ -397,7 +403,7 @@ export const AddAgentAddressModal = ({
 										) : (
 											<>
 												Add address
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnButtonClassName}>
 													<EnterIcon />
 												</ActionKbd>
 											</>

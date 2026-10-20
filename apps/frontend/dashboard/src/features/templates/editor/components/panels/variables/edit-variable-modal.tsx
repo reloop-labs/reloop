@@ -13,10 +13,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type PropertyType = "string" | "number";
 
@@ -434,7 +437,7 @@ export const EditTemplateVariableModal = ({
 									) : (
 										<>
 											{submitLabel}
-											<ActionKbd className={actionKbdOnBlueClassName}>
+											<ActionKbd className={actionKbdOnButtonClassName}>
 												<EnterIcon />
 											</ActionKbd>
 										</>

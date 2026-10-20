@@ -3,7 +3,10 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { type FormEvent, useCallback } from "react";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { CompanyNameField } from "./company-name-field";
 import { LogoUpload } from "./logo-upload";
 import { ReferralField } from "./referral-field";
@@ -11,7 +14,7 @@ import { useCreateOrg } from "./use-create-org";
 import { useLogoUpload } from "./use-logo-upload";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 export function CreateOrgStep() {
 	const {
@@ -112,14 +115,14 @@ export function CreateOrgStep() {
 							) : orgId ? (
 								<>
 									<span>Continue</span>
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</>
 							) : (
 								<>
 									<span>Create organization</span>
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</>

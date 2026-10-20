@@ -11,9 +11,15 @@ import {
 	LABEL_COLORS,
 	resolveLabelColor,
 } from "#/features/agent-inbox/lib/label-colors";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
-const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnButtonClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 export const InboxLabelDialog = ({
 	open,
@@ -201,7 +207,7 @@ export const InboxLabelDialog = ({
 							{isSubmitting ? "Creating…" : "Create label"}
 							{!isSubmitting && (
 								<span className="inline-flex items-center gap-0.5">
-									<ActionKbd className={actionKbdOnBlueClassName}>
+									<ActionKbd className={actionKbdOnButtonClassName}>
 										<EnterIcon />
 									</ActionKbd>
 								</span>

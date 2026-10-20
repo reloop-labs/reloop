@@ -18,7 +18,10 @@ import { toast } from "sonner";
 import * as v from "valibot";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Domain, DomainListResponse } from "#/features/domain/types";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { useAgentInbox } from "./agent-inbox-provider";
@@ -27,7 +30,10 @@ import {
 	InboxEmailAddressInput,
 } from "./email-address-input";
 
-const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
+const actionKbdOnButtonClassName = cn(
+	actionKbdOnSolidClassName,
+	"w-auto min-w-4 px-1",
+);
 
 const EMAIL_LOCAL_PART_REGEX =
 	/^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*$/;
@@ -342,7 +348,7 @@ export function CreateInboxInlineCard({
 										) : (
 											<>
 												<span>Create inbox</span>
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnButtonClassName}>
 													<EnterIcon />
 												</ActionKbd>
 											</>

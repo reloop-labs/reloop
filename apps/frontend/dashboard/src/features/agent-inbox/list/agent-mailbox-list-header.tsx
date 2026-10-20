@@ -3,11 +3,14 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/agent-inbox";
 
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 export function AgentMailboxListHeader() {
 	const [, setModal] = useQueryState("modal");
@@ -83,7 +86,7 @@ export function AgentMailboxListHeader() {
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Add address
-					<ActionKbd className={actionKbdOnBlueClassName}>A</ActionKbd>
+					<ActionKbd className={actionKbdOnButtonClassName}>A</ActionKbd>
 				</FancyButton.Root>
 			</div>
 		</div>

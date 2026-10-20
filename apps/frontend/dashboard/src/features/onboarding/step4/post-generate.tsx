@@ -6,14 +6,17 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { CopyCodeBlock } from "./copy-code-block";
 import { DeveloperPlayground } from "./developer-playground";
 import type { LanguageCode } from "./types";
 import type { PlatformTestStatus } from "./use-generate-api-key";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 function inboxProvider(email: string | null): {
 	label: string;
@@ -286,7 +289,7 @@ export function PostGenerate({
 										<span className="flex items-center justify-center gap-1.5">
 											<Icon name="confetti" className="h-3.5 w-3.5 shrink-0" />
 											<span>Send email</span>
-											<ActionKbd className={actionKbdOnBlueClassName}>
+											<ActionKbd className={actionKbdOnButtonClassName}>
 												<EnterIcon />
 											</ActionKbd>
 										</span>
@@ -338,7 +341,7 @@ export function PostGenerate({
 														className="h-3.5 w-3.5 shrink-0"
 													/>
 													<span>Go to Dashboard</span>
-													<ActionKbd className={actionKbdOnBlueClassName}>
+													<ActionKbd className={actionKbdOnButtonClassName}>
 														<EnterIcon />
 													</ActionKbd>
 												</>

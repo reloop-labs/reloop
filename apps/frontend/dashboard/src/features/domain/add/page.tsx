@@ -14,7 +14,10 @@ import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
 import type { DomainListResponse, DomainResponse } from "../types";
 import { AddDomainHeader } from "./components/add-domain-header";
@@ -25,7 +28,7 @@ import type { DomainFormValues } from "./schema";
 import { domainSchema } from "./schema";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 export function AddDomainPage() {
 	const router = useRouter();
@@ -226,7 +229,7 @@ export function AddDomainPage() {
 										) : (
 											<>
 												<span>Add Domain</span>
-												<ActionKbd className={actionKbdOnBlueClassName}>
+												<ActionKbd className={actionKbdOnButtonClassName}>
 													<EnterIcon />
 												</ActionKbd>
 											</>

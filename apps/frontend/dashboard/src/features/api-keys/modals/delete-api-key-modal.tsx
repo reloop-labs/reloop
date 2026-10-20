@@ -14,12 +14,15 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../types";
 
 /** Light keycap so it reads on the red/destructive FancyButton fill. */
-const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
+const actionKbdOnButtonClassName = actionKbdOnSolidClassName;
 
 type DeleteState = "idle" | "deleting" | "success";
 
@@ -426,7 +429,7 @@ export function DeleteApiKeyModal({
 										{isBulk
 											? `Delete ${bulkKeysToDelete.length || ""} API key${bulkKeysToDelete.length === 1 ? "" : "s"}`
 											: "Delete API key"}
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnButtonClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</>
