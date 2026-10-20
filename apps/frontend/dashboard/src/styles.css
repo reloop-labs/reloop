@@ -501,3 +501,78 @@ body {
 		transition: opacity 150ms ease;
 	}
 }
+
+/*
+ * User menu opens like a punch-hole island: the panel is clipped to the
+ * avatar circle (28px slot, 4px from the top-right) and grows out of it.
+ * Close plays the same keyframes in reverse so it mirrors the open.
+ */
+@keyframes user-menu-island-open {
+	from {
+		clip-path: inset(4px 4px calc(100% - 32px) calc(100% - 32px) round 14px);
+	}
+	to {
+		clip-path: inset(-64px round 18px);
+	}
+}
+
+@keyframes user-menu-island-close {
+	from {
+		clip-path: inset(4px 4px calc(100% - 32px) calc(100% - 32px) round 14px);
+	}
+	to {
+		clip-path: inset(-64px round 18px);
+	}
+}
+
+@keyframes user-menu-island-body-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes user-menu-island-body-out {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.user-menu-island[data-state="open"] {
+	animation: user-menu-island-open 380ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.user-menu-island[data-state="closed"] {
+	animation: user-menu-island-close 260ms cubic-bezier(0.32, 0.72, 0, 1)
+		reverse both;
+}
+
+.user-menu-island[data-state="open"] .user-menu-island-body {
+	animation: user-menu-island-body-in 380ms cubic-bezier(0.32, 0.72, 0, 1)
+		both;
+}
+
+.user-menu-island[data-state="closed"] .user-menu-island-body {
+	animation: user-menu-island-body-out 260ms cubic-bezier(0.32, 0.72, 0, 1)
+		reverse both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.user-menu-island[data-state="open"],
+	.user-menu-island[data-state="closed"] {
+		animation-duration: 1ms;
+	}
+
+	.user-menu-island[data-state] .user-menu-island-body {
+		animation-duration: 1ms;
+	}
+}

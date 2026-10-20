@@ -59,6 +59,10 @@ const UserDropdownItem = forwardRef<HTMLDivElement, UserDropdownItemProps>(
 	},
 );
 
+/** Trigger is a 28px circle; the panel is inset 4px on every side, avatar included. Only the avatar corner stays fully round. */
+const TRIGGER_SIZE = 28;
+const ISLAND_INSET = 4;
+
 /** Same 28px circle as the avatar trigger. */
 export function UserDropdownSkeleton() {
 	return <div className="h-7 w-7 animate-pulse rounded-full bg-bg-weak-50" />;
@@ -148,178 +152,174 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content
-				sideOffset={8}
-				className="w-[275px] rounded-[22px] border border-stroke-soft-200 bg-bg-white-0 p-2 shadow-[0_12px_36px_rgba(0,0,0,0.12)] ring-0 dark:border-white/10 dark:bg-[#141415] dark:shadow-[0_12px_36px_rgba(0,0,0,0.4)]"
+				// Island: the panel's avatar slot lands exactly on the trigger, so
+				// the menu reads as growing out of the avatar (see styles.css).
 				side="bottom"
 				align="end"
+				sideOffset={-(TRIGGER_SIZE + ISLAND_INSET)}
+				alignOffset={-ISLAND_INSET}
+				avoidCollisions={false}
+				// Only the avatar corner hugs the circle (14px + 4px inset).
+				style={{ borderRadius: "12px 18px 12px 12px" }}
+				className="user-menu-island w-[264px] gap-0 bg-bg-white-0 p-1 shadow-regular-md ring-1 ring-stroke-soft-200 ring-inset"
 			>
-				{/* Top user header card */}
-				<div className="flex items-center justify-between rounded-[18px] border border-stroke-soft-200/80 bg-bg-weak-50/70 p-3 dark:border-white/[0.08] dark:bg-white/[0.04]">
-					<div className="min-w-0 flex-1 pr-2">
-						<p className="truncate font-semibold text-[14.5px] text-text-strong-950 leading-tight dark:text-white">
+				{/* Identity: text uses the same 14px inset as rows; avatar sits where the trigger was */}
+				<div className="relative">
+					<div className="user-menu-island-body min-w-0 px-2.5 pt-2.5 pr-10">
+						<p className="truncate font-medium text-[13px] text-text-strong-950 leading-4">
 							{user.name || "User"}
 						</p>
-						<p className="mt-0.5 truncate font-normal text-[12.5px] text-text-sub-600 dark:text-white/55">
+						<p className="mt-0.5 truncate text-[12px] text-text-soft-400 leading-4">
 							{user.email}
 						</p>
 					</div>
-					<div className="relative shrink-0 rounded-full bg-gradient-to-tr from-[#f43f5e] via-[#c084fc] to-[#38bdf8] p-[2.5px] shadow-sm">
-						<div className="rounded-full bg-bg-white-0 p-0.5 dark:bg-[#141415]">
-							<UserAvatar
-								name={user.name}
-								email={user.email}
-								image={user.image}
-								size="32"
-								className="size-9 rounded-full"
-								initialsClassName="text-[12px]"
-							/>
-						</div>
-					</div>
+					<button
+						type="button"
+						aria-label="Close menu"
+						onClick={() => setIsOpen(false)}
+						className="absolute top-0 right-0 flex size-7 cursor-pointer items-center justify-center rounded-full outline-none"
+					>
+						<UserAvatar
+							name={user.name}
+							email={user.email}
+							image={user.image}
+							size="24"
+							initialsClassName="text-[10px]"
+						/>
+					</button>
 				</div>
 
-				<div
-					className="relative mt-2 flex flex-col gap-0.5"
-					onPointerLeave={() => setHoverIdx(undefined)}
-				>
-					{workspaceItems.length > 0 ? (
-						<>
-							<Dropdown.Label className="px-2.5 pt-1.5 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
-								Organization
-							</Dropdown.Label>
-							<Dropdown.Group className="gap-0.5">
-								{workspaceItems.map((item, index) => {
-									const isTeams = item.path === "/settings/teams";
-									return (
-										<UserDropdownItem
-											key={item.path}
-											ref={(el) => {
-												if (el) itemRefs.current[index] = el;
-											}}
-											onHoverEnter={() => setHoverIdx(index)}
-											onHoverLeave={() => setHoverIdx(undefined)}
-											className="relative z-10 gap-2.5 rounded-xl px-2.5 py-2 font-medium text-[13.5px] text-text-sub-600 outline-none transition-colors hover:text-text-strong-950 data-[highlighted]:bg-transparent! dark:text-white/70 dark:hover:text-white"
-											onClick={() => goToSettings(item.path)}
-										>
-											<SidebarNavIcon
-												name={item.iconName}
-												className="h-4 w-4 shrink-0 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/70 dark:group-hover:text-white"
-											/>
-											<span className="flex-1 truncate">
-												{isTeams ? "Invite user" : item.label}
-											</span>
-										</UserDropdownItem>
-									);
-								})}
-							</Dropdown.Group>
-							<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-white/10" />
-						</>
-					) : null}
+				<div className="user-menu-island-body">
+					<div className="mx-2.5 mt-3 mb-1.5 h-px bg-stroke-soft-200" />
 
-					<Dropdown.Label className="px-2.5 pt-1.5 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
-						Account
-					</Dropdown.Label>
-					<Dropdown.Group className="gap-0.5">
-						{accountItems.map((item, index) => {
-							const idx = workspaceItems.length + index;
-							const isProfile = item.path === "/settings/profile";
-							return (
-								<UserDropdownItem
-									key={item.path}
-									ref={(el) => {
-										if (el) itemRefs.current[idx] = el;
-									}}
-									onHoverEnter={() => setHoverIdx(idx)}
-									onHoverLeave={() => setHoverIdx(undefined)}
-									className="relative z-10 gap-2.5 rounded-xl px-2.5 py-2 font-medium text-[13.5px] text-text-sub-600 outline-none transition-colors hover:text-text-strong-950 data-[highlighted]:bg-transparent! dark:text-white/70 dark:hover:text-white"
-									onClick={() => goToSettings(item.path)}
-								>
-									{isProfile ? (
-										<UserAvatar
-											name={user.name}
-											email={user.email}
-											image={user.image}
-											size="20"
-											className="shrink-0"
-											initialsClassName="text-[8px]"
-										/>
-									) : (
-										<SidebarNavIcon
-											name={item.iconName}
-											className="h-4 w-4 shrink-0 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/70 dark:group-hover:text-white"
-										/>
-									)}
-									<span className="flex-1 truncate">
-										{isProfile ? "My profile" : item.label}
+					<div
+						className="relative flex flex-col"
+						onPointerLeave={() => setHoverIdx(undefined)}
+					>
+						{workspaceItems.length > 0 ? (
+							<>
+								<Dropdown.Label className="px-2.5 pt-1.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]">
+									Organization
+								</Dropdown.Label>
+								<Dropdown.Group className="gap-0">
+									{workspaceItems.map((item, index) => {
+										const isTeams = item.path === "/settings/teams";
+										return (
+											<UserDropdownItem
+												key={item.path}
+												ref={(el) => {
+													if (el) itemRefs.current[index] = el;
+												}}
+												onHoverEnter={() => setHoverIdx(index)}
+												onHoverLeave={() => setHoverIdx(undefined)}
+												className="relative z-10 h-8 gap-2.5 rounded-lg px-2.5 py-0 font-medium text-[13px] text-text-sub-600 outline-none transition-colors duration-150 ease-out hover:text-text-strong-950 data-[highlighted]:bg-transparent!"
+												onClick={() => goToSettings(item.path)}
+											>
+												<SidebarNavIcon name={item.iconName} />
+												<span className="flex-1 truncate">
+													{isTeams ? "Invite user" : item.label}
+												</span>
+											</UserDropdownItem>
+										);
+									})}
+								</Dropdown.Group>
+							</>
+						) : null}
+
+						<Dropdown.Label
+							className={cn(
+								"px-2.5 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]",
+								workspaceItems.length > 0 ? "pt-4" : "pt-1.5",
+							)}
+						>
+							Account
+						</Dropdown.Label>
+						<Dropdown.Group className="gap-0">
+							{accountItems.map((item, index) => {
+								const idx = workspaceItems.length + index;
+								const isProfile = item.path === "/settings/profile";
+								return (
+									<UserDropdownItem
+										key={item.path}
+										ref={(el) => {
+											if (el) itemRefs.current[idx] = el;
+										}}
+										onHoverEnter={() => setHoverIdx(idx)}
+										onHoverLeave={() => setHoverIdx(undefined)}
+										className="relative z-10 h-8 gap-2.5 rounded-lg px-2.5 py-0 font-medium text-[13px] text-text-sub-600 outline-none transition-colors duration-150 ease-out hover:text-text-strong-950 data-[highlighted]:bg-transparent!"
+										onClick={() => goToSettings(item.path)}
+									>
+										<SidebarNavIcon name={item.iconName} />
+										<span className="flex-1 truncate">
+											{isProfile ? "My profile" : item.label}
+										</span>
+									</UserDropdownItem>
+								);
+							})}
+
+							<UserDropdownItem
+								ref={(el) => {
+									if (el) itemRefs.current[homeHoverIdx] = el;
+								}}
+								onHoverEnter={() => setHoverIdx(homeHoverIdx)}
+								onHoverLeave={() => setHoverIdx(undefined)}
+								className="relative z-10 h-8 gap-2.5 rounded-lg px-2.5 py-0 font-medium text-[13px] text-text-sub-600 outline-none transition-colors duration-150 ease-out hover:text-text-strong-950 data-[highlighted]:bg-transparent!"
+								onClick={() => {
+									setIsOpen(false);
+									window.location.href = "/home";
+								}}
+							>
+								<SidebarNavIcon name="home" />
+								<span className="flex-1 truncate">Home</span>
+							</UserDropdownItem>
+
+							<div className="flex h-8 items-center justify-between rounded-lg pr-0.5 pl-2.5">
+								<div className="flex items-center gap-2.5">
+									<Icon
+										name={
+											theme === "system"
+												? "laptop"
+												: theme === "dark"
+													? "moon"
+													: "sun"
+										}
+										className="size-4 shrink-0 text-text-sub-600 opacity-70"
+									/>
+									<span className="font-medium text-[13px] text-text-sub-600">
+										Theme
 									</span>
-								</UserDropdownItem>
-							);
-						})}
-
-						<UserDropdownItem
-							ref={(el) => {
-								if (el) itemRefs.current[homeHoverIdx] = el;
-							}}
-							onHoverEnter={() => setHoverIdx(homeHoverIdx)}
-							onHoverLeave={() => setHoverIdx(undefined)}
-							className="relative z-10 gap-2.5 rounded-xl px-2.5 py-2 font-medium text-[13.5px] text-text-sub-600 outline-none transition-colors hover:text-text-strong-950 data-[highlighted]:bg-transparent! dark:text-white/70 dark:hover:text-white"
-							onClick={() => {
-								setIsOpen(false);
-								window.location.href = "/home";
-							}}
-						>
-							<SidebarNavIcon
-								name="home"
-								className="h-4 w-4 shrink-0 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/70 dark:group-hover:text-white"
-							/>
-							<span className="flex-1 truncate">Home</span>
-						</UserDropdownItem>
-
-						<div className="flex items-center justify-between rounded-xl px-2.5 py-2">
-							<div className="flex items-center gap-2.5">
-								<Icon
-									name={
-										theme === "system"
-											? "laptop"
-											: theme === "dark"
-												? "moon"
-												: "sun"
-									}
-									className="h-4 w-4 text-text-sub-600 dark:text-white/70"
-								/>
-								<span className="font-medium text-[13.5px] text-text-sub-600 dark:text-white/70">
-									Theme
-								</span>
+								</div>
+								<ThemeToggle subtle />
 							</div>
-							<ThemeToggle />
-						</div>
-					</Dropdown.Group>
+						</Dropdown.Group>
 
-					<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-white/10" />
+						<div className="mx-2.5 my-1.5 h-px bg-stroke-soft-200" />
 
-					<Dropdown.Group className="gap-0">
-						<UserDropdownItem
-							ref={(el) => {
-								if (el) itemRefs.current[logoutHoverIdx] = el;
-							}}
-							onHoverEnter={() => setHoverIdx(logoutHoverIdx)}
-							onHoverLeave={() => setHoverIdx(undefined)}
-							className="relative z-10 gap-2.5 rounded-xl px-2.5 py-2 font-medium text-[13.5px] text-red-500 outline-none transition-colors hover:text-red-600 data-[highlighted]:bg-transparent! dark:hover:text-red-400"
-							onClick={() => void handleSignOut()}
-						>
-							<Icon
-								name="arrow-right-rec"
-								className="h-3.5 w-3.5 text-red-500 transition-transform duration-200 group-hover:translate-x-0.5"
-							/>
-							<span className="flex-1 truncate">Log out</span>
-						</UserDropdownItem>
-					</Dropdown.Group>
+						<Dropdown.Group className="gap-0">
+							<UserDropdownItem
+								ref={(el) => {
+									if (el) itemRefs.current[logoutHoverIdx] = el;
+								}}
+								onHoverEnter={() => setHoverIdx(logoutHoverIdx)}
+								onHoverLeave={() => setHoverIdx(undefined)}
+								className="relative z-10 h-8 gap-2.5 rounded-lg px-2.5 py-0 font-medium text-[13px] text-red-500 outline-none transition-colors hover:text-red-600 data-[highlighted]:bg-transparent! dark:text-red-400 dark:hover:text-red-300"
+								onClick={() => void handleSignOut()}
+							>
+								<Icon
+									name="arrow-right-rec"
+									className="size-4 text-red-500 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-red-400"
+								/>
+								<span className="flex-1 truncate">Log out</span>
+							</UserDropdownItem>
+						</Dropdown.Group>
 
-					<AnimatedHoverBackground
-						rect={currentRect}
-						tabElement={currentTab}
-						isDanger={hoverIdx === logoutHoverIdx}
-						className="rounded-xl"
-					/>
+						<AnimatedHoverBackground
+							rect={currentRect}
+							tabElement={currentTab}
+							isDanger={hoverIdx === logoutHoverIdx}
+							className="rounded-lg"
+						/>
+					</div>
 				</div>
 			</Dropdown.Content>
 		</Dropdown.Root>
