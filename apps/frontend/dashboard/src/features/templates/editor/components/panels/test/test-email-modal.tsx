@@ -15,12 +15,14 @@ import * as Textarea from "@reloop/ui/textarea";
 import { useCurrentEditor } from "@tiptap/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import Link from "next/link";
 import type React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
@@ -122,8 +124,29 @@ export function TestEmailModal({
 }) {
 	const templateId = useTemplateId();
 	const { editor } = useCurrentEditor();
-	const { subject, fromEmail, previewText } = useEditorStore();
+	const { subject, fromEmail, previewText, setFromEmail } = useEditorStore();
 	const { data: session } = useSessionQuery();
+
+	// Template has no From yet: collect it here instead of sending the user
+	// back to Send details, and save it to the template after a successful send.
+	const needsFrom = !fromEmail;
+	const domainsQuery = useDomainsQuery({
+		page: 1,
+		limit: 100,
+		q: "",
+		status: [],
+	});
+	const verifiedDomain = useMemo(() => {
+		const list = domainsQuery.data?.domains || [];
+		return list.find(
+			(d) =>
+				(d.status === "active" || d.systemVerified || d.userVerifiedDomain) &&
+				d.isSendingEmailEnabled !== false,
+		)?.domain;
+	}, [domainsQuery.data?.domains]);
+	const [fromInput, setFromInput] = useState("");
+	const fromField = useFieldError<HTMLInputElement>();
+	const clearFromError = fromField.clear;
 
 	const [email, setEmail] = useState("");
 	const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
@@ -162,6 +185,9 @@ export function TestEmailModal({
 	useEffect(() => {
 		if (isOpen) {
 			setEmail(session?.user?.email ?? "");
+			setFromInput(
+				(prev) => prev || (verifiedDomain ? `hello@${verifiedDomain}` : ""),
+			);
 			if (detectedVars.length > 0) {
 				setVariableValues((prev) => {
 					const next: Record<string, string> = {};
@@ -174,6 +200,7 @@ export function TestEmailModal({
 		} else {
 			const timer = setTimeout(() => {
 				clearEmailError();
+				clearFromError();
 				for (const ctrl of Object.values(varFieldRefs.current)) {
 					ctrl?.clear();
 				}
@@ -183,7 +210,14 @@ export function TestEmailModal({
 			}, 300);
 			return () => clearTimeout(timer);
 		}
-	}, [isOpen, clearEmailError, session?.user?.email, templateData]);
+	}, [
+		isOpen,
+		clearEmailError,
+		clearFromError,
+		session?.user?.email,
+		templateData,
+		verifiedDomain,
+	]);
 
 	const handleClose = () => {
 		if (status === "sending") return;
@@ -219,11 +253,22 @@ export function TestEmailModal({
 			return;
 		}
 
-		if (!fromEmail) {
-			emailField.show(
-				"From address is required. Please set a From email in send details first.",
-			);
-			hasError = true;
+		const effectiveFrom = needsFrom ? fromInput.trim() : fromEmail;
+		if (needsFrom) {
+			const address = (effectiveFrom.match(/<([^>]+)>/)?.[1] ?? effectiveFrom)
+				.trim()
+				.toLowerCase();
+			if (!verifiedDomain && !address) {
+				// From input isn't rendered without a verified domain.
+				toast.error("Verify a domain first to send emails.");
+				hasError = true;
+			} else if (!address) {
+				fromField.show(`Add a From address, e.g. hello@${verifiedDomain}`);
+				hasError = true;
+			} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) {
+				fromField.show(`"${address}" is not a valid email address.`);
+				hasError = true;
+			}
 		}
 
 		for (const v of detectedVars) {
@@ -240,6 +285,7 @@ export function TestEmailModal({
 		}
 
 		emailField.clear();
+		fromField.clear();
 		for (const ctrl of Object.values(varFieldRefs.current)) {
 			ctrl?.clear();
 		}
@@ -263,7 +309,7 @@ export function TestEmailModal({
 					credentials: "include",
 					body: JSON.stringify({
 						to: addr,
-						fromEmail: fromEmail || undefined,
+						fromEmail: effectiveFrom || undefined,
 						subject: subject || undefined,
 						html,
 						variables: variableValues,
@@ -282,6 +328,7 @@ export function TestEmailModal({
 				emailList.length === 1
 					? (emailList[0] ?? "")
 					: `${emailList[0]} and ${emailList.length - 1} other${emailList.length > 2 ? "s" : ""}`;
+			if (needsFrom) setFromEmail(effectiveFrom);
 			setSentRecipientsSummary(summary);
 			setStatus("success");
 
@@ -308,7 +355,7 @@ export function TestEmailModal({
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: isOpen },
-		[isOpen, status, email, variableValues, detectedVars],
+		[isOpen, status, email, fromInput, variableValues, detectedVars],
 	);
 
 	useHotkeys(
@@ -320,7 +367,7 @@ export function TestEmailModal({
 			}
 		},
 		{ enableOnFormTags: ["INPUT", "TEXTAREA"], enabled: isOpen },
-		[isOpen, status, email, variableValues, detectedVars],
+		[isOpen, status, email, fromInput, variableValues, detectedVars],
 	);
 
 	useHotkeys(
@@ -412,6 +459,53 @@ export function TestEmailModal({
 
 									{/* Content */}
 									<div className="space-y-4 px-6 pb-6">
+										{needsFrom && (
+											<div className="space-y-1.5">
+												<Label.Root
+													htmlFor="test-from-email"
+													className="font-medium text-text-strong-950 text-xs"
+												>
+													From
+													<Label.Asterisk />
+												</Label.Root>
+												{!verifiedDomain && !domainsQuery.isLoading ? (
+													<p className="text-text-sub-600 text-xs leading-relaxed">
+														You need a verified domain to send emails.{" "}
+														<Link
+															href="/domain"
+															className="font-medium text-primary-base hover:underline"
+														>
+															Add a domain
+														</Link>
+													</p>
+												) : (
+													<FieldError
+														field={fromField}
+														hint={`Use an address on your verified domain${verifiedDomain ? ` (@${verifiedDomain})` : ""}. We'll save it to this template.`}
+													>
+														<Input.Root
+															size="medium"
+															hasError={fromField.hasError}
+															className="rounded-xl"
+														>
+															<Input.Wrapper>
+																<Input.Input
+																	id="test-from-email"
+																	{...fromField.controlProps}
+																	placeholder={`Acme <hello@${verifiedDomain ?? "yourdomain.com"}>`}
+																	value={fromInput}
+																	onChange={(e) => {
+																		setFromInput(e.target.value);
+																		if (fromField.hasError) fromField.clear();
+																	}}
+																	disabled={status !== "idle"}
+																/>
+															</Input.Wrapper>
+														</Input.Root>
+													</FieldError>
+												)}
+											</div>
+										)}
 										<div className="space-y-1.5">
 											<Label.Root
 												htmlFor="test-recipient-email"
