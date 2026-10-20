@@ -1,20 +1,76 @@
+import { classifyMailboxProvider, resolveOrgEgress } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import { domain, domainDnsRecord } from "@reloop/db/schema";
 import { KumoMtaErrors } from "@reloop/domain/error/domain.error-response";
 import { and, eq, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
+export type EgressResult = {
+	pool: "dedicated" | "shared";
+	address: string | null;
+	hostname: string | null;
+};
+
+const SHARED_EGRESS: EgressResult = {
+	pool: "shared",
+	address: null,
+	hostname: null,
+};
+
+/**
+ * Pick the sending IP for one accepted message and reserve its warmup budget.
+ * Never fails the send: any error routes the message through the shared pool.
+ */
+async function resolveEgress(
+	organizationId: string,
+	recipients: string[],
+): Promise<EgressResult> {
+	const log = useLogger();
+	if (recipients.length === 0) return SHARED_EGRESS;
+	try {
+		const egress = await resolveOrgEgress(organizationId, {
+			// One message, one source IP: the first recipient decides which
+			// provider's warmup budget the whole message draws from.
+			provider: classifyMailboxProvider(recipients[0] ?? ""),
+			recipientCount: recipients.length,
+		});
+		if (egress.reason !== "no_assignment") {
+			log.info(
+				`[EGRESS] org=${organizationId} pool=${egress.pool} reason=${egress.reason} provider=${egress.provider} day=${egress.day} sent=${egress.sentToday}/${egress.dailyCap ?? "-"}`,
+			);
+		}
+		if (egress.pool === "dedicated" && egress.address && egress.hostname) {
+			return {
+				pool: "dedicated",
+				address: egress.address,
+				hostname: egress.hostname,
+			};
+		}
+		// "defer" overflow has no MTA-side hold yet; it sends from the shared
+		// pool like the default "shared" overflow.
+		return SHARED_EGRESS;
+	} catch (error) {
+		log.error(
+			`[EGRESS] resolve failed for org=${organizationId}, using shared pool: ${error instanceof Error ? error.message : String(error)}`,
+		);
+		return SHARED_EGRESS;
+	}
+}
+
 export async function getDkimKeyController({
 	domainName,
 	organizationId,
+	recipients = [],
 }: {
 	domainName: string;
 	organizationId: string;
+	recipients?: string[];
 }): Promise<{
 	/** Null only for relay domains without a verified Reloop DKIM record. */
 	selector: string | null;
 	privateKey: string | null;
 	smtpProviderId: string | null;
+	egress: EgressResult;
 }> {
 	const log = useLogger();
 	const domainQuery = and(
@@ -66,7 +122,13 @@ export async function getDkimKeyController({
 	// Relay domains may have no Reloop DNS at all; only sign with our key when
 	// the customer actually published it, otherwise the signature would fail.
 	if (smtpProviderId && dkimRecord?.status !== "active") {
-		return { selector: null, privateKey: null, smtpProviderId };
+		// Relay domains leave from the customer's server, never our IPs.
+		return {
+			selector: null,
+			privateKey: null,
+			smtpProviderId,
+			egress: SHARED_EGRESS,
+		};
 	}
 
 	if (!dkimRecord || !dkimRecord.privateKey) {
@@ -79,5 +141,8 @@ export async function getDkimKeyController({
 		selector,
 		privateKey: dkimRecord.privateKey,
 		smtpProviderId,
+		egress: smtpProviderId
+			? SHARED_EGRESS
+			: await resolveEgress(organizationId, recipients),
 	};
 }

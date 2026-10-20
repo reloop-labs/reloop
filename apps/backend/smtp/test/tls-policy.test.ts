@@ -94,8 +94,8 @@ describe("policy sources stay wired", () => {
 	test("queue.lua selects egress pool and enable_tls from tls.lua", () => {
 		const queueLua = readFileSync(join(policyDir, "queue.lua"), "utf8");
 		expect(queueLua).toContain("require 'policy.tls'");
-		expect(queueLua).toContain("tls.egress_pool(tenant)");
-		expect(queueLua).toContain("tls.enable_tls(constants.env, egress_source)");
+		expect(queueLua).toContain("tls.egress_pool(tls_mode)");
+		expect(queueLua).toContain("tls.enable_tls(constants.env, tls_pool)");
 	});
 
 	test("smtp.lua stamps tenant from log-incoming or X-Reloop-TLS-Mode", () => {

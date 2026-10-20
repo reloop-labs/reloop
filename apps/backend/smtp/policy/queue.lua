@@ -2,6 +2,9 @@ local kumo = require 'kumo'
 local constants = require 'policy.constants'
 local tls = require 'policy.tls'
 local byo = require 'policy.byo'
+local egress = require 'policy.egress'
+
+local egress_source_map = egress.parse_source_map(constants.egress_source_map)
 
 -- Fetch a customer relay (host, vetted IP, credentials) from the domain
 -- service. Cached briefly so queue/egress hooks don't hit the API per message.
@@ -43,8 +46,10 @@ kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
     }
   end
 
+  -- Tenant = TLS mode, plus the dedicated IP for orgs that have one.
+  local tls_mode, address, hostname = egress.split(tenant)
   local queue = {
-    egress_pool = tls.egress_pool(tenant),
+    egress_pool = egress.pool_name(tls.egress_pool(tls_mode), address, hostname),
   }
 
   -- Bring-your-own SMTP: relay to the customer's server as a smart host.
@@ -99,16 +104,22 @@ kumo.on('get_egress_path_config', function(routing_domain, egress_source, site_n
     return make(path)
   end
 
+  local tls_pool, _, hostname = egress.split(egress_source)
   return make {
-    enable_tls = tls.enable_tls(constants.env, egress_source),
-    ehlo_domain = constants.hostname,
+    enable_tls = tls.enable_tls(constants.env, tls_pool),
+    ehlo_domain = hostname or constants.hostname,
   }
 end)
 
 kumo.on('get_egress_source', function(source_name)
   local make = kumo.make_egress_source or function(t) return t end
-  return make {
-    name = source_name,
-    ehlo_domain = constants.hostname,
-  }
+  -- Dedicated IPs bind their mapped local address and EHLO as the IP's own
+  -- hostname (must match its PTR). An IP dropped from EGRESS_SOURCE_MAP while
+  -- mail was queued falls back to the host default address.
+  local source = egress.source(source_name, egress_source_map, constants.hostname)
+  if not source then
+    print("[EGRESS] source " .. source_name .. " not bindable, using host default address")
+    source = { name = source_name, ehlo_domain = constants.hostname }
+  end
+  return make(source)
 end)

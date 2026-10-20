@@ -96,6 +96,7 @@ services:
       - KUMOMTA_MIN_FREE_INODES=${KUMOMTA_MIN_FREE_INODES:-0}
       - TRACKING_SECRET=${TRACKING_SECRET:-reloop_tracking_secret_default_123}
       - RELOOP_INTERNAL_SECRET=${RELOOP_INTERNAL_SECRET:-reloop_internal_secret_default_123}
+      - EGRESS_SOURCE_MAP=${EGRESS_SOURCE_MAP:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

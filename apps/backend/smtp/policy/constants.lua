@@ -38,6 +38,9 @@ constants.kumomta_url = os.getenv("KUMOMTA_WEBHOOK_URL") or default_webhook_url
 
 
 
+-- Public sending IP -> local bind address (see policy/egress.lua).
+constants.egress_source_map = os.getenv("EGRESS_SOURCE_MAP") or ""
+
 -- 3. NATS connection URL
 constants.nats_url = os.getenv("NATS_URL") or "reloop-nats:4222"
 
@@ -46,5 +49,6 @@ print("[DEBUG] constants.hostname = " .. constants.hostname)
 print("[DEBUG] constants.base_url = " .. constants.base_url)
 print("[DEBUG] constants.kumomta_url = " .. constants.kumomta_url)
 print("[DEBUG] constants.nats_url = " .. constants.nats_url)
+print("[DEBUG] constants.egress_source_map = " .. constants.egress_source_map)
 
 return constants

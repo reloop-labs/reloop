@@ -1,5 +1,6 @@
 local constants = require 'policy.constants'
 local tls = require 'policy.tls'
+local egress = require 'policy.egress'
 
 local utils = {}
 
@@ -240,6 +241,23 @@ function utils.apply_tls_mode(msg, mode)
   msg:set_meta('tenant', tls_mode)
   print("[TLS] [" .. msg:id() .. "] mode=" .. tls_mode)
   return tls_mode
+end
+
+--- Move the message onto an organization's dedicated IP, keeping its TLS
+--- mode. Only for IPs this node can bind (EGRESS_SOURCE_MAP); anything else
+--- stays on the shared pool rather than failing every delivery attempt.
+function utils.apply_egress(msg, address, hostname, source_map)
+  if type(address) ~= 'string' or type(hostname) ~= 'string' then
+    return false
+  end
+  if not source_map[address] then
+    print("[EGRESS] [" .. msg:id() .. "] " .. address .. " not in EGRESS_SOURCE_MAP, using shared pool")
+    return false
+  end
+  local tls_mode = msg:get_meta('tls_mode') or 'opportunistic'
+  msg:set_meta('tenant', egress.tenant(tls_mode, address, hostname))
+  print("[EGRESS] [" .. msg:id() .. "] dedicated ip=" .. address .. " ehlo=" .. hostname)
+  return true
 end
 
 return utils

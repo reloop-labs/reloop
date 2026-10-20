@@ -260,6 +260,8 @@ services:
       - .env
     environment:
       HOSTNAME: ${RELOOP_DOMAIN}
+      # Dedicated sending IPs: "public=bind" pairs, see apps/backend/smtp/policy/egress.lua
+      EGRESS_SOURCE_MAP: ${EGRESS_SOURCE_MAP:-}
       KUMOMTA_MIN_FREE_SPACE: ${KUMOMTA_MIN_FREE_SPACE:-5%}
       KUMOMTA_MIN_FREE_INODES: ${KUMOMTA_MIN_FREE_INODES:-0}
     ports:

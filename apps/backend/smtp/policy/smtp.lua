@@ -2,7 +2,9 @@ local kumo = require 'kumo'
 local constants = require 'policy.constants'
 local utils = require 'policy.utils'
 local byo = require 'policy.byo'
+local egress = require 'policy.egress'
 utils.init(kumo)
+local egress_source_map = egress.parse_source_map(constants.egress_source_map)
 
 
 
@@ -391,7 +393,7 @@ local function apply_reloop_logic(msg, api_key, source)
       req = req:header("x-api-key", api_key)
     end
     return req
-      :body(kumo.serde.json_encode({ domainName = domain }))
+      :body(kumo.serde.json_encode({ domainName = domain, recipients = to_emails }))
       :send()
   end)
 
@@ -407,6 +409,13 @@ local function apply_reloop_logic(msg, api_key, source)
       if relay_domain then
         msg:set_meta('routing_domain', relay_domain)
         print("[BYO-SMTP] [" .. msg_id .. "] relaying via " .. tostring(dkim_data.smtpProviderId))
+      end
+
+      -- Dedicated sending IP, also from the org-scoped lookup: a sender can
+      -- never pick an IP with a header.
+      local egress_data = dkim_data.egress
+      if not relay_domain and type(egress_data) == 'table' and egress_data.pool == 'dedicated' then
+        utils.apply_egress(msg, egress_data.address, egress_data.hostname, egress_source_map)
       end
 
       -- JSON null decodes to a truthy sentinel, so check for real strings.
