@@ -334,11 +334,11 @@ export const EmailPillsInput = ({
 						}}
 						className={cn(
 							// Portaled to body; Radix Dialog sets pointer-events: none on body.
-							"pointer-events-auto overflow-hidden rounded-xl border border-mail-border/60 bg-panel-light shadow-[0_12px_40px_rgba(0,0,0,0.12)]",
-							"dark:border-mail-border/50 dark:bg-panel-dark dark:shadow-[0_12px_40px_rgba(0,0,0,0.45)]",
+							"pointer-events-auto overflow-hidden rounded-xl bg-bg-white-0 shadow-[0_12px_40px_rgba(0,0,0,0.12)] ring-1 ring-stroke-soft-200 ring-inset",
+							"dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)]",
 						)}
 					>
-						<div className="border-mail-border/40 border-b px-3 py-2">
+						<div className="border-stroke-soft-200 border-b px-3 py-2">
 							<p className="font-medium text-[11px] text-mail-muted uppercase tracking-wide">
 								Suggestions
 							</p>
@@ -359,8 +359,8 @@ export const EmailPillsInput = ({
 										className={cn(
 											"flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors duration-100 ease-out",
 											selected
-												? "bg-mail-foreground/[0.07] ring-1 ring-mail-border/50 dark:bg-white/[0.08]"
-												: "hover:bg-(--inbox-hover)",
+												? "bg-bg-weak-50"
+												: "hover:bg-bg-weak-50/60",
 										)}
 										onMouseEnter={() => setHighlight(i)}
 										onPointerDown={(e) => {
@@ -392,7 +392,7 @@ export const EmailPillsInput = ({
 											)}
 										</div>
 										{selected ? (
-											<span className="shrink-0 rounded-md bg-mail-foreground/10 px-1.5 py-0.5 font-medium text-[10px] text-mail-muted">
+											<span className="shrink-0 rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[10px] text-mail-muted">
 												<EnterIcon />
 											</span>
 										) : null}
@@ -400,7 +400,7 @@ export const EmailPillsInput = ({
 								);
 							})}
 						</div>
-						<div className="flex items-center gap-2 border-mail-border/40 border-t px-3 py-1.5 text-[10px] text-mail-muted">
+						<div className="flex items-center gap-2 border-stroke-soft-200 border-t px-3 py-1.5 text-[10px] text-mail-muted">
 							<span className="inline-flex items-center gap-1">
 								<ActionKbd className="w-auto min-w-4 px-1">↑↓</ActionKbd>
 								navigate

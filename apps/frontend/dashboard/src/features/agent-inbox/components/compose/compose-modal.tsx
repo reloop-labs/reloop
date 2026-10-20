@@ -60,8 +60,8 @@ import { showEmailSentToast } from "./email-sent-toast";
 import { ScheduleSendPicker } from "./schedule-send-picker";
 import { showUndoSendToast } from "./undo-send-toast";
 
-const actionKbdOnBlueClassName =
-	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnNeutralClassName =
+	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/15 dark:bg-black/[0.06] dark:text-black/70 dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.12)]";
 
 /** Portaled compose UI (recipient suggestions + React Email menus). */
 const isComposeFloatingUi = (target: EventTarget | null) =>
@@ -1396,10 +1396,10 @@ export const ComposeModal = ({
 								{isSending ? "Sending…" : scheduleAt ? "Schedule" : "Send"}
 								{!isSending && (
 									<span className="inline-flex items-center gap-0.5">
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnNeutralClassName}>
 											{modKey}
 										</ActionKbd>
-										<ActionKbd className={actionKbdOnBlueClassName}>
+										<ActionKbd className={actionKbdOnNeutralClassName}>
 											<EnterIcon />
 										</ActionKbd>
 									</span>
