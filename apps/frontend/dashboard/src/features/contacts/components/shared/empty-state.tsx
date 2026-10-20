@@ -2,9 +2,10 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-
-const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 interface EmptyStateProps {
 	onCreateClick?: () => void;

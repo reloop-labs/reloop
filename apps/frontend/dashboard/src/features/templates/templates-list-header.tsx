@@ -3,12 +3,13 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useCreateTemplate } from "#/features/templates/hooks/use-templates-query";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/templates";
-
-const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
 
 export function TemplatesListHeader() {
 	const { isCreating, create } = useCreateTemplate();

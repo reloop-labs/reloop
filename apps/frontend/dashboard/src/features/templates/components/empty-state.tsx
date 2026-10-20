@@ -4,10 +4,11 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useCreateTemplate } from "#/features/templates/hooks/use-templates-query";
-
-const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
 
 /** `onBrowseExamples` adds a link to the Explore tab on the no-templates state. */
 export const EmptyState = ({

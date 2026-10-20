@@ -15,14 +15,15 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import type { GroupDetail } from "#/features/contacts/hooks/use-contacts-query";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { DeleteGroupModal } from "../components/groups/delete-group";
 import { EditGroupModal } from "../components/groups/edit-group-modal";
 
 /** Light keycap so it reads on filled primary buttons. */
-const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
-
 interface GroupHeaderProps {
 	group: GroupDetail | undefined;
 	isLoading: boolean;

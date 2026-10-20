@@ -10,9 +10,10 @@ import {
 } from "#/features/contacts/components/contacts/contact-filter-dropdown";
 import { ContactTable } from "#/features/contacts/components/contacts/contact-table";
 import { useGroupContactsQuery } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-
-const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 export const GroupContactList = ({ groupId }: { groupId: string }) => {
 	const [currentPage, setCurrentPage] = useQueryState(

@@ -9,9 +9,10 @@ import {
 	useQueryState,
 } from "nuqs";
 import type { ReactNode } from "react";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-
-const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 interface ContactsEmptyStateProps {
 	onAddContact?: () => void;

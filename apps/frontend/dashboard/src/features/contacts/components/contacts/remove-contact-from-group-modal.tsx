@@ -11,15 +11,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	type Contact,
 	useInvalidateContacts,
 } from "../../hooks/use-contacts-query";
 
 /** Light keycap so it reads on the destructive FancyButton fill. */
-const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
-
 type RemoveState = "idle" | "removing" | "success";
 
 interface RemoveContactFromGroupModalProps {

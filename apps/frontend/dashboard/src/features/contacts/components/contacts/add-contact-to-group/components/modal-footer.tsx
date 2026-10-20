@@ -3,9 +3,10 @@ import { cn } from "@reloop/ui/cn";
 import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
-
-const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 interface ModalFooterProps {
 	isSubmitting: boolean;
