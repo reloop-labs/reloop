@@ -1,6 +1,7 @@
 "use client";
 
 import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
+import { NotifyIpOwnerButton } from "@fe/console/components/notify-ip-owner-button";
 import {
 	DataTable,
 	PageFrame,
@@ -406,14 +407,17 @@ export default function SendingIpsPage() {
 						<td className="px-4 py-3 text-right">
 							{ip.kind === "dedicated" && ip.status === "active" ? (
 								ip.assignment ? (
-									<Button.Root
-										size="xsmall"
-										variant="neutral"
-										mode="stroke"
-										onClick={() => setUnassignTarget(ip)}
-									>
-										Unassign
-									</Button.Root>
+									<div className="inline-flex items-center gap-2">
+										<NotifyIpOwnerButton sendingIpId={ip.id} />
+										<Button.Root
+											size="xsmall"
+											variant="neutral"
+											mode="stroke"
+											onClick={() => setUnassignTarget(ip)}
+										>
+											Unassign
+										</Button.Root>
+									</div>
 								) : (
 									<Button.Root
 										size="xsmall"

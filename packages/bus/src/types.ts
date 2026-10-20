@@ -406,6 +406,23 @@ export interface StartupApplicationApprovedPayload {
 	company: string;
 }
 
+export interface DedicatedIpOwnerNotifiedPayload {
+	assignmentId: string;
+	organizationId: string;
+	organizationName: string;
+	ownerEmail: string;
+	ownerName: string | null;
+	address: string;
+	hostname: string;
+	/** Null when the IP was assigned without a warmup. */
+	warmup: {
+		day: number;
+		totalDays: number;
+		/** "shared": over-cap volume uses the shared pool; "defer": it waits. */
+		overflow: "shared" | "defer";
+	} | null;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -461,4 +478,5 @@ export interface EventPayloads {
 	[BusEvent.MAILBOX_CREATED]: MailboxCreatedPayload;
 	[BusEvent.MAILBOX_DELETED]: MailboxDeletedPayload;
 	[BusEvent.STARTUP_APPLICATION_APPROVED]: StartupApplicationApprovedPayload;
+	[BusEvent.DEDICATED_IP_OWNER_NOTIFIED]: DedicatedIpOwnerNotifiedPayload;
 }

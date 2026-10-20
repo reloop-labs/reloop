@@ -77,4 +77,7 @@ export enum BusEvent {
 
 	// Startup Program Events
 	STARTUP_APPLICATION_APPROVED = "startup.application.approved",
+
+	// Sending IP Events
+	DEDICATED_IP_OWNER_NOTIFIED = "sending_ip.dedicated.owner_notified",
 }

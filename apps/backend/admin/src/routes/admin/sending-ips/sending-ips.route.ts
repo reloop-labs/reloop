@@ -7,6 +7,7 @@ import {
 	getSendingIpController,
 	listOrganizationSendingIpsController,
 	listSendingIpsController,
+	notifyDedicatedIpOwnerController,
 	unassignSendingIpController,
 	updateSendingIpController,
 	warmupSendingIpController,
@@ -110,6 +111,32 @@ export const sendingIpsRoute = new Elysia()
 			detail: {
 				tags: ["Admin"],
 				summary: "Update a sending IP",
+			},
+		},
+	)
+	.post(
+		"/sending-ips/:sendingIpId/notify-owner",
+		async ({ params, userId }) =>
+			notifyDedicatedIpOwnerController({
+				sendingIpId: params.sendingIpId,
+				actorUserId: userId,
+			}),
+		{
+			authAdmin: true,
+			params: t.Object({ sendingIpId: t.String() }),
+			response: {
+				200: t.Object({
+					ownerEmail: t.String(),
+					conversationId: t.String(),
+					supportMessageSent: t.Boolean(),
+					emailQueued: t.Boolean(),
+				}),
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Admin"],
+				summary:
+					"Email the org owner about their dedicated IP and post it in their support chat",
 			},
 		},
 	)

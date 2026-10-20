@@ -1,4 +1,11 @@
+import {
+	createMessageController,
+	getMyConversationController,
+	getOrCreateMyConversationController,
+} from "@reloop/admin/routes/admin/support/support.controllers";
+import { broadcastConversationUpdate } from "@reloop/admin/routes/admin/support/support.rooms";
 import { writeAdminAudit } from "@reloop/admin/utils/audit";
+import { BusEvent, bus } from "@reloop/bus";
 import {
 	assignDedicatedIp,
 	createSendingIp,
@@ -11,12 +18,16 @@ import {
 	type WarmupAction,
 	warmupProgressView,
 } from "@reloop/db";
-import type {
-	ipWarmup,
-	organizationSendingIp,
-	sendingIp,
+import { db } from "@reloop/db/client";
+import {
+	type ipWarmup,
+	member,
+	type organizationSendingIp,
+	type sendingIp,
+	user,
 } from "@reloop/db/schema";
-import { createError } from "evlog";
+import { and, eq } from "drizzle-orm";
+import { createError, log } from "evlog";
 
 type SendingIpRow = {
 	ip: typeof sendingIp.$inferSelect;
@@ -363,5 +374,166 @@ export async function listOrganizationSendingIpsController(
 		dedicatedIpCount: result.dedicatedIpCount,
 		assignedCount: result.assignedCount,
 		items: result.items.map((row) => toSendingIpItem(row, now)),
+	};
+}
+
+type DedicatedIpNotice = {
+	ownerName: string | null;
+	organizationName: string;
+	address: string;
+	hostname: string;
+	warmup: {
+		day: number;
+		totalDays: number;
+		overflow: "shared" | "defer";
+	} | null;
+};
+
+function dedicatedIpSupportMessage(notice: DedicatedIpNotice) {
+	const firstName = notice.ownerName?.split(" ").at(0) || "there";
+	const lines = [
+		`Hi ${firstName}, ${notice.organizationName} now has its own dedicated sending IP: ${notice.address} (${notice.hostname}).`,
+		`From now on, all email from ${notice.organizationName} is sent through this IP, so your sender reputation is yours alone.`,
+	];
+	if (notice.warmup) {
+		lines.push(
+			`We're warming it up over ${notice.warmup.totalDays} days (today is day ${Math.max(notice.warmup.day, 1)}) so inbox providers learn to trust it. ${
+				notice.warmup.overflow === "shared"
+					? "Anything above the day's limit goes through our shared pool, so nothing is delayed."
+					: "Anything above the day's limit is queued and sent as capacity frees up."
+			}`,
+		);
+	}
+	lines.push(
+		"There's nothing you need to do. Reply here if you have any questions.",
+	);
+	return lines.join("\n\n");
+}
+
+/**
+ * One click from the console: tells the org owner about their dedicated IP
+ * by email (via the email service) and with a message in their support chat.
+ */
+export async function notifyDedicatedIpOwnerController(args: {
+	sendingIpId: string;
+	actorUserId: string;
+}) {
+	const row = await getSendingIp(args.sendingIpId);
+	if (!row) throw assignError("ip_not_found", args.sendingIpId);
+	const assignment = row.assignment;
+	if (!assignment?.id) {
+		throw assignError("not_assigned", args.sendingIpId);
+	}
+
+	const [owner] = await db
+		.select({ id: user.id, name: user.name, email: user.email })
+		.from(member)
+		.innerJoin(user, eq(member.userId, user.id))
+		.where(
+			and(
+				eq(member.organizationId, assignment.organizationId),
+				eq(member.role, "owner"),
+			),
+		)
+		.limit(1);
+	if (!owner) {
+		throw createError({
+			status: 404,
+			message: "Organization has no owner",
+			why: `No member with role owner in ${assignment.organizationId}`,
+			fix: "Assign an owner to the organization first",
+		});
+	}
+
+	const warmupView = row.warmup
+		? warmupProgressView(row.warmup, new Date())
+		: null;
+	const notice: DedicatedIpNotice = {
+		ownerName: owner.name,
+		organizationName: row.organizationName ?? "Your organization",
+		address: row.ip.address,
+		hostname: row.ip.hostname,
+		warmup:
+			row.warmup && warmupView && row.warmup.status !== "completed"
+				? {
+						day: warmupView.day,
+						totalDays: Math.max(
+							...row.warmup.schedule.map((phase) => phase.endDay),
+						),
+						overflow: row.warmup.overflow,
+					}
+				: null,
+	};
+
+	// Support message first: it's synchronous, so a failure here aborts
+	// before any email is queued.
+	let conversationId: string;
+	try {
+		const created = await getOrCreateMyConversationController({
+			userId: owner.id,
+			organizationId: assignment.organizationId,
+		});
+		conversationId = created.conversation.id;
+	} catch (error) {
+		// Lost a race creating the thread; use the one that won.
+		const fallback = await getMyConversationController({ userId: owner.id });
+		if (!fallback.conversation) throw error;
+		conversationId = fallback.conversation.id;
+	}
+
+	const result = await createMessageController({
+		conversationId,
+		senderUserId: args.actorUserId,
+		senderRole: "admin",
+		body: dedicatedIpSupportMessage(notice),
+		isPlatformAdmin: true,
+	});
+	broadcastConversationUpdate({
+		conversationId,
+		conversationForAdmin: result.conversationForAdmin,
+		conversationForUser: result.conversationForUser,
+		message: result.message,
+	});
+
+	let emailQueued = true;
+	try {
+		await bus.publish(BusEvent.DEDICATED_IP_OWNER_NOTIFIED, {
+			assignmentId: assignment.id,
+			organizationId: assignment.organizationId,
+			organizationName: notice.organizationName,
+			ownerEmail: owner.email,
+			ownerName: owner.name,
+			address: notice.address,
+			hostname: notice.hostname,
+			warmup: notice.warmup,
+		});
+	} catch (error) {
+		emailQueued = false;
+		log.error({
+			error: error instanceof Error ? error.message : String(error),
+			sendingIpId: args.sendingIpId,
+			message:
+				"Failed to publish DEDICATED_IP_OWNER_NOTIFIED; support message sent but email not queued",
+		});
+	}
+
+	await writeAdminAudit({
+		actorUserId: args.actorUserId,
+		action: "sending_ip.notify_owner",
+		resourceType: "sending_ip",
+		resourceId: row.ip.id,
+		organizationId: assignment.organizationId,
+		metadata: {
+			ownerUserId: owner.id,
+			conversationId,
+			emailQueued,
+		},
+	});
+
+	return {
+		ownerEmail: owner.email,
+		conversationId,
+		supportMessageSent: true,
+		emailQueued,
 	};
 }

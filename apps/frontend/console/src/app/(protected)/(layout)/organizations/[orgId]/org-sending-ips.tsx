@@ -1,6 +1,7 @@
 "use client";
 
 import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
+import { NotifyIpOwnerButton } from "@fe/console/components/notify-ip-owner-button";
 import { DataTable } from "@fe/console/components/ui/page-frame";
 import { SectionCard } from "@fe/console/components/ui/section-card";
 import { StatusPill } from "@fe/console/components/ui/status-pill";
@@ -214,14 +215,17 @@ export function OrgSendingIps({
 							{formatRelativeTime(ip.assignment?.assignedAt ?? null)}
 						</td>
 						<td className="px-4 py-3 text-right">
-							<Button.Root
-								size="xsmall"
-								variant="neutral"
-								mode="stroke"
-								onClick={() => setUnassignId(ip.id)}
-							>
-								Unassign
-							</Button.Root>
+							<div className="inline-flex items-center gap-2">
+								<NotifyIpOwnerButton sendingIpId={ip.id} />
+								<Button.Root
+									size="xsmall"
+									variant="neutral"
+									mode="stroke"
+									onClick={() => setUnassignId(ip.id)}
+								>
+									Unassign
+								</Button.Root>
+							</div>
 						</td>
 					</tr>
 				))}
