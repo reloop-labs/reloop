@@ -17,15 +17,16 @@ import { emailLog } from "./schema/email";
 export type DomainAgeCap = number | null; // null = dynamic (no age cap, defer to plan)
 
 /**
- * Resolve the effective daily cap: admin override wins over the age band.
- * Null override = automatic. Set override = effective cap (even when the
- * age band itself is dynamic).
+ * Resolve the effective daily cap: the higher of the admin override and the
+ * age band. An override only ever raises the cap — the domain still climbs
+ * the age bands, and once the band is dynamic (null) there is no cap.
  */
 export function resolveEffectiveDailyCap(
 	ageCap: DomainAgeCap,
 	override: number | null | undefined,
 ): DomainAgeCap {
-	if (override != null) return override;
+	if (ageCap === null) return null;
+	if (override != null) return Math.max(override, ageCap);
 	return ageCap;
 }
 export function getDomainAgeDays(
@@ -317,8 +318,9 @@ export async function checkDomainAgeDailyCap(args: {
 		ageDays = getDomainAgeDays(stored, now);
 		source = "stored";
 	} else {
-		const registrarCreatedAt =
-			await getRegistrarCreationDate(args.domain.domain);
+		const registrarCreatedAt = await getRegistrarCreationDate(
+			args.domain.domain,
+		);
 		if (registrarCreatedAt) {
 			ageDays = getDomainAgeDays(new Date(registrarCreatedAt), now);
 			source = "rdap";

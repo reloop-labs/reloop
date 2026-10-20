@@ -841,7 +841,14 @@ export default function OrganizationDetailPage() {
 											d.dailyCap === null
 												? null
 												: Math.max(0, d.dailyCap - d.sentToday);
-										const next = nextCapFor(d.ageDays);
+										const band = nextCapFor(d.ageDays);
+										// An override above the next band means no change on that day.
+										const next =
+											band?.cap != null &&
+											d.dailyCap !== null &&
+											band.cap <= d.dailyCap
+												? null
+												: band;
 										const isAt =
 											d.dailyCap !== null && d.sentToday >= d.dailyCap;
 										return (
@@ -908,7 +915,7 @@ export default function OrganizationDetailPage() {
 															? " · send only to highly engaged / verified contacts"
 															: ""}
 													</span>
-													{next && (
+													{next && d.dailyCapOverride == null && (
 														<span className="text-text-sub-600 dark:text-white/50">
 															Next: {next.cap ?? next.label} in {next.in}{" "}
 															{d.dailyCap !== null && next.cap
@@ -917,6 +924,106 @@ export default function OrganizationDetailPage() {
 														</span>
 													)}
 												</div>
+												{d.dailyCapOverride != null
+													? (() => {
+															const override = d.dailyCapOverride;
+															const ageCap = d.ageCap ?? null;
+															// Age bands move at the registration anniversary time, not UTC midnight.
+															const anchor = new Date(
+																d.registrarCreatedAt ?? d.createdAt,
+															).getTime();
+															const fmt = (ms: number) =>
+																new Date(ms).toLocaleString("en-GB", {
+																	day: "numeric",
+																	month: "short",
+																	year: "numeric",
+																	hour: "2-digit",
+																	minute: "2-digit",
+																	timeZone: "UTC",
+																}) + " UTC";
+															const today = new Date().toLocaleDateString(
+																"en-GB",
+																{
+																	day: "numeric",
+																	month: "short",
+																	year: "numeric",
+																	timeZone: "UTC",
+																},
+															);
+															const bands = [
+																{ fromDay: 2, cap: 50 },
+																{ fromDay: 4, cap: 100 },
+																{ fromDay: 8, cap: 250 },
+																{ fromDay: 15, cap: 500 },
+																{ fromDay: 31, cap: null },
+															].filter((b) => b.fromDay > d.ageDays);
+															const adminWinsToday =
+																ageCap !== null && override >= ageCap;
+															return (
+																<div className="mt-2 rounded-md border border-blue-500/20 bg-blue-500/5 px-2.5 py-2 text-[11px] text-text-sub-600 leading-relaxed dark:text-white/70">
+																	<p className="font-medium text-blue-700 dark:text-blue-300">
+																		Admin raised this domain's limit to{" "}
+																		{override.toLocaleString()}/day
+																	</p>
+																	<p className="mt-1">
+																		By age alone ({d.ageDays} day
+																		{d.ageDays === 1 ? "" : "s"} old), the daily
+																		cap would be{" "}
+																		<span className="font-medium text-text-strong-950 dark:text-white">
+																			{ageCap === null
+																				? "dynamic (no age cap)"
+																				: ageCap.toLocaleString()}
+																		</span>
+																		. The higher of the admin limit and the age
+																		cap always applies, so the admin limit never
+																		lowers the automatic increases.
+																	</p>
+																	<p className="mt-1">
+																		<span className="font-medium text-text-strong-950 dark:text-white">
+																			Today ({today}):{" "}
+																			{d.dailyCap === null
+																				? "no cap"
+																				: `${d.dailyCap.toLocaleString()} emails`}
+																		</span>{" "}
+																		{ageCap === null
+																			? "· domain is past warm-up, the admin limit no longer applies"
+																			: adminWinsToday
+																				? `· admin limit in use (age cap is ${ageCap.toLocaleString()})`
+																				: `· age cap in use (higher than admin limit ${override.toLocaleString()})`}
+																	</p>
+																	{bands.length > 0 ? (
+																		<ul className="mt-1.5 space-y-0.5">
+																			{bands.map((b) => {
+																				const effective =
+																					b.cap === null
+																						? null
+																						: Math.max(override, b.cap);
+																				return (
+																					<li key={b.fromDay}>
+																						<span className="font-medium text-text-strong-950 dark:text-white">
+																							From{" "}
+																							{fmt(
+																								anchor + b.fromDay * 86_400_000,
+																							)}
+																							:{" "}
+																							{effective === null
+																								? "no cap"
+																								: `${effective.toLocaleString()}/day`}
+																						</span>{" "}
+																						{b.cap === null
+																							? "· warm-up ends (30+ days), dynamic reputation-based sending"
+																							: override >= b.cap
+																								? `· admin limit still higher than age cap ${b.cap.toLocaleString()}, no change`
+																								: `· age cap ${b.cap.toLocaleString()} takes over (higher than admin limit)`}
+																					</li>
+																				);
+																			})}
+																		</ul>
+																	) : null}
+																</div>
+															);
+														})()
+													: null}
 											</div>
 										);
 									})}

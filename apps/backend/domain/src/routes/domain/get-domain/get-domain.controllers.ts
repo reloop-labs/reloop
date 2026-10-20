@@ -3,6 +3,7 @@ import {
 	getDomainAgeDays,
 	getDomainInitialDailyCap,
 	getRegistrarCreationDate,
+	resolveEffectiveDailyCap,
 } from "@reloop/db/domain-age-cap";
 import { utcDayStart } from "@reloop/db/reserve-send-credits";
 import * as schema from "@reloop/db/schema";
@@ -82,9 +83,9 @@ export async function getDomainController({
 			? getDomainAgeDays(new Date(registrarCreatedAtStr), new Date())
 			: getDomainAgeDays(new Date(result.createdAt), new Date());
 		const ageCap = getDomainInitialDailyCap(ageDays);
-		const override = (result as { dailyCapOverride?: number | null })
-			.dailyCapOverride ?? null;
-		const dailyCap = override ?? ageCap;
+		const override =
+			(result as { dailyCapOverride?: number | null }).dailyCapOverride ?? null;
+		const dailyCap = resolveEffectiveDailyCap(ageCap, override);
 		const dayStart = utcDayStart(new Date());
 		const [sentRow] = await db
 			.select({ value: count() })
@@ -109,7 +110,12 @@ export async function getDomainController({
 			dailyCapOverride: override,
 			sentToday,
 			remaining,
-			source: override != null ? "override" : registrarCreatedAtStr ? "rdap" : "reloop",
+			source:
+				override != null
+					? "override"
+					: registrarCreatedAtStr
+						? "rdap"
+						: "reloop",
 			event: DOMAIN_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {

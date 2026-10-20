@@ -59,6 +59,7 @@ export async function resendEmailController({
 		text: emailLogEntry.textBody ?? undefined,
 		html: emailLogEntry.htmlBody ?? undefined,
 		headers: emailLogEntry.headers ?? undefined,
+		tags: emailLogEntry.tags.length > 0 ? emailLogEntry.tags : undefined,
 	};
 
 	return await sendEmailController({

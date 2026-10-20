@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { trackRoute } from "../track/track.route";
+import { adminResendEmailRoute } from "./send-email/admin-resend-email.route";
 import { resendEmailRoute } from "./send-email/resend-email.route";
 import { sendEmailRoute } from "./send-email/send-email.route";
 
@@ -9,4 +10,5 @@ export const mailRoutes = new Elysia({
 })
 	.use(trackRoute)
 	.use(sendEmailRoute)
-	.use(resendEmailRoute);
+	.use(resendEmailRoute)
+	.use(adminResendEmailRoute);

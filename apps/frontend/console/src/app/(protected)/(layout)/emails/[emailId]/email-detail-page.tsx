@@ -1,6 +1,7 @@
 "use client";
 
-import { adminGet } from "@fe/console/lib/admin-api";
+import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
+import { adminErrorMessage, adminGet } from "@fe/console/lib/admin-api";
 import {
 	formatBytes,
 	formatDateTime,
@@ -11,6 +12,8 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
+import * as Tooltip from "@reloop/ui/tooltip";
+import axios from "axios";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -239,6 +242,48 @@ function CopyIconButton({ value, label }: { value: string; label: string }) {
 				className={cn("h-3 w-3", copied && "text-success-base")}
 			/>
 		</button>
+	);
+}
+
+function ResendButton({
+	hasAttachments,
+	onClick,
+}: {
+	hasAttachments: boolean;
+	onClick: () => void;
+}) {
+	const button = (
+		<Button.Root
+			variant="neutral"
+			mode="stroke"
+			size="small"
+			disabled={hasAttachments}
+			onClick={onClick}
+			className="h-8 gap-1.5 rounded-lg px-3 font-medium text-xs"
+		>
+			<Icon name="rotate-cw" className="h-3.5 w-3.5" />
+			Resend
+		</Button.Root>
+	);
+	if (!hasAttachments) return button;
+
+	// Disabled buttons don't fire pointer events, so the wrapper is the trigger.
+	return (
+		<Tooltip.Root delayDuration={0}>
+			<Tooltip.Trigger asChild>
+				<span className="inline-flex cursor-not-allowed">
+					{button}
+				</span>
+			</Tooltip.Trigger>
+			<Tooltip.Content
+				side="bottom"
+				variant="light"
+				className="max-w-[240px] text-xs"
+			>
+				This email has attachments. Resending would send it without them, so ask
+				the sender to send it again instead.
+			</Tooltip.Content>
+		</Tooltip.Root>
 	);
 }
 
@@ -501,6 +546,8 @@ export default function EmailDetailPage() {
 	const emailId = params.emailId;
 	const [activeTab, setActiveTab] = useState("preview");
 	const [previewTheme, setPreviewTheme] = useState<"light" | "dark">("light");
+	const [resendOpen, setResendOpen] = useState(false);
+	const router = useRouter();
 
 	const {
 		data: email,
@@ -509,6 +556,26 @@ export default function EmailDetailPage() {
 	} = useSWR<EmailDetailData>(emailId ? `/emails/${emailId}` : null, () =>
 		adminGet<EmailDetailData>(`/emails/${emailId}`),
 	);
+
+	const resendEmail = async () => {
+		try {
+			const { data } = await axios.post<{ id: string }>(
+				`/api/mail/v1/admin/resend/${emailId}`,
+				undefined,
+				{ withCredentials: true },
+			);
+			setResendOpen(false);
+			toast.success("Email resent", {
+				action: {
+					label: "View",
+					onClick: () => router.push(`/emails/${data.id}`),
+				},
+			});
+		} catch (error) {
+			toast.error(adminErrorMessage(error));
+			throw error;
+		}
+	};
 
 	const copyToClipboard = (text: string, label: string) => {
 		navigator.clipboard.writeText(text);
@@ -700,6 +767,12 @@ export default function EmailDetailPage() {
 				<BackButton fallbackHref="/emails" />
 				{email ? (
 					<div className="flex flex-wrap items-center justify-end gap-2">
+						{email.status === "failed" ? (
+							<ResendButton
+								hasAttachments={(email.attachments?.length ?? 0) > 0}
+								onClick={() => setResendOpen(true)}
+							/>
+						) : null}
 						<Button.Root
 							variant="neutral"
 							mode="stroke"
@@ -724,6 +797,17 @@ export default function EmailDetailPage() {
 					</div>
 				) : null}
 			</div>
+
+			{resendOpen && email ? (
+				<InlineActionPanel
+					className="mb-6"
+					title="Resend this email?"
+					description={`Sends a new copy to ${formatRecipients(email.toEmails)} as ${email.organizationName ?? "the organization"}. This failed log stays as it is.`}
+					confirmLabel="Resend"
+					onCancel={() => setResendOpen(false)}
+					onConfirm={resendEmail}
+				/>
+			) : null}
 
 			<div className="space-y-6 pb-16">
 				{/* Metadata: dashboard-style key/value rows */}
