@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useInvalidateApiKeys } from "../../hooks/use-api-keys-query";
 import type { ApiKeyWithSecret } from "../../types";
@@ -23,8 +23,7 @@ import { type ApiKeyFormValues, FormStep } from "./form-step";
 import { SuccessStep } from "./success-step";
 
 /** Light keycap so it reads on the dark FancyButton fill. */
-const actionKbdOnDarkFillClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]";
+const actionKbdOnDarkFillClassName = actionKbdOnSolidClassName;
 
 const apiKeySchema = v.object({
 	name: v.pipe(v.string(), v.minLength(1, "Name must be at least 1 character")),

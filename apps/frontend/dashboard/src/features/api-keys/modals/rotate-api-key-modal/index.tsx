@@ -12,15 +12,14 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateApiKeys } from "../../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../../types";
 import { ConfirmStep } from "./confirm-step";
 import { SuccessStep } from "./success-step";
 
 /** Light keycap so it reads on the dark FancyButton fill. */
-const actionKbdOnDarkFillClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]";
+const actionKbdOnDarkFillClassName = actionKbdOnSolidClassName;
 
 type RotatedKey = {
 	id: string;

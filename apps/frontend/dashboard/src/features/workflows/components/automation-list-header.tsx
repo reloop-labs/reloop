@@ -4,7 +4,7 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/workflows";
 
@@ -67,7 +67,7 @@ export function AutomationListHeader({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					{createLabel}
-					<ActionKbd className="border-text-white-0/20 bg-text-white-0/10 text-text-white-0 shadow-[0_1.5px_0_0_color-mix(in_srgb,var(--color-text-white-0)_25%,transparent)] dark:border-text-white-0/20 dark:bg-text-white-0/10 dark:text-text-white-0 dark:shadow-[0_1.5px_0_0_color-mix(in_srgb,var(--color-text-white-0)_25%,transparent)]">
+					<ActionKbd className={actionKbdOnSolidClassName}>
 						C
 					</ActionKbd>
 				</FancyButton.Root>

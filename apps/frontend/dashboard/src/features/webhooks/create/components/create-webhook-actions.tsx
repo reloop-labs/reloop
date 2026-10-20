@@ -1,14 +1,14 @@
+import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
 import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { useCreateWebhookForm } from "./use-create-webhook-form";
 
-const actionKbdOnBlueClassName =
-	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
 
 type CreateWebhookActionsProps = Pick<
 	ReturnType<typeof useCreateWebhookForm>,

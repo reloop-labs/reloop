@@ -21,8 +21,7 @@ import { DeleteGroupModal } from "../components/groups/delete-group";
 import { EditGroupModal } from "../components/groups/edit-group-modal";
 
 /** Light keycap so it reads on filled primary buttons. */
-const actionKbdOnSolidClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
 
 interface GroupHeaderProps {
 	group: GroupDetail | undefined;

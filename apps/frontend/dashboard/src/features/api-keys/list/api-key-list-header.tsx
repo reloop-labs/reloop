@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ApiKeysApiDetails } from "#/components/api-details/api-keys";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/api-keys";
 
@@ -84,7 +84,7 @@ export function ApiKeyListHeader() {
 					<Icon name="plus" className="h-4 w-4" />
 					Create API key
 					{/* Light keycap so it reads on the dark fill */}
-					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]">
+					<ActionKbd className={actionKbdOnSolidClassName}>
 						C
 					</ActionKbd>
 				</FancyButton.Root>

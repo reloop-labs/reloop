@@ -15,7 +15,7 @@ import {
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import type { ComposeDraftKind } from "../../types";
 import {
@@ -78,8 +78,7 @@ const modKey =
 		? "⌘"
 		: "Ctrl";
 
-const actionKbdOnBlueClassName =
-	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 

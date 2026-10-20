@@ -198,6 +198,16 @@ const shortcutKbdClassName = cn(
 );
 
 /**
+ * Keycap sitting on a filled button (Send, Create, Delete, …). Tinted from
+ * the button's own text color, so it reads on any fill in either theme:
+ * white keys on a black button, dark keys on the white dark-mode button.
+ */
+export const actionKbdOnSolidClassName = cn(
+	"border-current/20 bg-current/10 text-current shadow-[0_1.5px_0_0_color-mix(in_srgb,currentColor_18%,transparent)]",
+	"dark:border-current/20 dark:bg-current/10 dark:text-current dark:shadow-[0_1.5px_0_0_color-mix(in_srgb,currentColor_18%,transparent)]",
+);
+
+/**
  * Always-visible keycap for action buttons (Create, Docs, Refresh, …).
  * Same physical key style as `ShortcutHint`, without the Space-reveal gate.
  */

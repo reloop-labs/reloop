@@ -9,11 +9,10 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/15 dark:bg-black/[0.08] dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.15)]";
+const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
 
 /** Pricing-style primary button: blue in light mode, white in dark mode. */
 const primaryDarkWhiteClassName =

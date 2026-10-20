@@ -7,8 +7,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useCreateTemplate } from "#/features/templates/hooks/use-templates-query";
 
-const actionKbdOnSolidClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnSolidClassName = actionKbdOnSolidClassName;
 
 /** `onBrowseExamples` adds a link to the Explore tab on the no-templates state. */
 export const EmptyState = ({

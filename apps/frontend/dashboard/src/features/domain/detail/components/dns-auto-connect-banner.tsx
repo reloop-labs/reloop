@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import * as simpleIcons from "simple-icons";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { DomainResponse } from "#/features/domain/types";
 import {
 	DNS_SETUP_HUB_URL,
@@ -17,8 +17,7 @@ import { useDomainConnect } from "../hooks/use-domain-connect";
 import { inferDnsProvider } from "../utils";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
 
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;

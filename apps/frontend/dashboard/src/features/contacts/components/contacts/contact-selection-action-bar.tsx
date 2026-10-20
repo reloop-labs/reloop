@@ -14,7 +14,7 @@ import {
 	ActionBarSelection,
 	ActionBarSeparator,
 } from "#/components/data-table/action-bar";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { AudienceStatus } from "../../audience";
 import {
 	type Contact,
@@ -153,7 +153,7 @@ export function ContactSelectionActionBar({
 				>
 					<FancyButton.Icon as={Icon} name="trash" className="size-3.5" />
 					Delete {selectedCount} contact{selectedCount === 1 ? "" : "s"}
-					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+					<ActionKbd className={actionKbdOnSolidClassName}>
 						<svg
 							viewBox="0 -0.5 25 25"
 							fill="none"

@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -5,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useHotkeys } from "react-hotkeys-hook";
 import { WebhooksApiDetails } from "#/components/api-details/webhooks";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/webhooks";
 
@@ -96,7 +97,7 @@ export function WebhooksListHeader() {
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create webhook
-					<ActionKbd className="w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+					<ActionKbd className={cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1")}>
 						C
 					</ActionKbd>
 				</FancyButton.Root>

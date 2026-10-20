@@ -17,7 +17,7 @@ import { useInboxFolderStats } from "#/features/agent-inbox/hooks/use-inbox-fold
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 import { SidebarNavIcon } from "#/features/dashboard/sidebar/sidebar-nav-icon";
 import { SidebarNavLink } from "#/features/dashboard/sidebar/sidebar-nav-link";
@@ -25,8 +25,7 @@ import { useSidebarHoverBox } from "#/features/dashboard/sidebar/use-sidebar-hov
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 /** Light keycap for blue FancyButton fill */
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/15 dark:bg-black/[0.08] dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.15)]";
+const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
 
 /** Pricing-style primary button: blue in light mode, white in dark mode. */
 const primaryDarkWhiteClassName =

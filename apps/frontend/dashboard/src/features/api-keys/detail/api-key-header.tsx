@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -7,7 +8,7 @@ import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ApiKeyAvatar } from "#/features/api-keys/components/api-key-avatar";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyDetail } from "../types";
@@ -185,7 +186,7 @@ export function ApiKeyHeader({
 							>
 								<Icon name="rotate-cw" className="h-3.5 w-3.5" />
 								<span>Rotate key</span>
-								<ActionKbd className="ml-0.5 w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-black/25 dark:bg-black/10 dark:text-black dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]">
+								<ActionKbd className={cn(actionKbdOnSolidClassName, "ml-0.5 w-auto min-w-4 px-1")}>
 									C
 								</ActionKbd>
 							</FancyButton.Root>

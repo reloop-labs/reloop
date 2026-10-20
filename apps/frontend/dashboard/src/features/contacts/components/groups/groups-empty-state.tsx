@@ -2,7 +2,7 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 interface GroupsEmptyStateProps {
 	onAddGroup?: () => void;
@@ -70,7 +70,7 @@ export function GroupsEmptyState({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create group
-					<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+					<ActionKbd className={actionKbdOnSolidClassName}>
 						C
 					</ActionKbd>
 				</FancyButton.Root>

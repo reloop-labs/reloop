@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -5,7 +6,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Campaign } from "../campaign-types";
 import { CampaignAvatar } from "./campaign-avatar";
 import {
@@ -172,7 +173,7 @@ export function CampaignHeader({
 									>
 										<Icon name="mail-send" className="h-3.5 w-3.5" />
 										<span>Send to all</span>
-										<ActionKbd className="ml-0.5 w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+										<ActionKbd className={cn(actionKbdOnSolidClassName, "ml-0.5 w-auto min-w-4 px-1")}>
 											S
 										</ActionKbd>
 									</FancyButton.Root>

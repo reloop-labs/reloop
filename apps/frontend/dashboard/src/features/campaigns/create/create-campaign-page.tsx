@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 "use client";
 
 import * as Button from "@reloop/ui/button";
@@ -19,7 +20,7 @@ import {
 	useContactsQuery,
 	useGroupsQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useDomainsQuery } from "#/features/domain/hooks/use-domains-query";
 import type { AudienceTargetType } from "../campaign-types";
@@ -29,8 +30,7 @@ import {
 	useCampaigns,
 } from "../campaigns-provider";
 
-const actionKbdOnBlueClassName =
-	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
 
 type Step = "setup" | "audience" | "sender" | "content" | "review";
 

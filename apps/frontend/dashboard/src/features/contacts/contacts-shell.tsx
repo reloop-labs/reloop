@@ -13,7 +13,7 @@ import { ChannelsApiDetails } from "#/components/api-details/channels";
 import { ContactsApiDetails } from "#/components/api-details/contacts";
 import { GroupsApiDetails } from "#/components/api-details/groups";
 import { PropertiesApiDetails } from "#/components/api-details/properties";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { ContactsTabs } from "./components/contacts/contacts-tabs";
 import { ContactsModals } from "./contacts-modals";
 
@@ -246,7 +246,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 														isAddDropdownOpen && "rotate-180",
 													)}
 												/>
-												<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+												<ActionKbd className={actionKbdOnSolidClassName}>
 													C
 												</ActionKbd>
 											</FancyButton.Root>
@@ -308,7 +308,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									>
 										<Icon name="plus" className="h-4 w-4" />
 										{actionLabel}
-										<ActionKbd className="border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]">
+										<ActionKbd className={actionKbdOnSolidClassName}>
 											C
 										</ActionKbd>
 									</FancyButton.Root>

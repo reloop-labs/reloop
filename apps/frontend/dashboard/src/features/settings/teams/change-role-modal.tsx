@@ -8,11 +8,10 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
 
-const actionKbdOnNeutralClassName =
-	"border-text-white-0/25 bg-text-white-0/15 text-text-white-0 shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)]";
+const actionKbdOnNeutralClassName = actionKbdOnSolidClassName;
 
 export type AssignableRole = "admin" | "member";
 

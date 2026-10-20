@@ -17,7 +17,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Domain, DomainListResponse } from "#/features/domain/types";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { AgentMailbox } from "../types";
@@ -27,8 +27,7 @@ import {
 	InboxEmailAddressInput,
 } from "./email-address-input";
 
-const actionKbdOnBlueClassName =
-	"w-auto min-w-4 border-white/25 bg-white/15 px-1 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnBlueClassName = cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1");
 
 /** RFC 5321/5322 unquoted local-part (dot-atom), max 64 chars */
 const EMAIL_LOCAL_PART_REGEX =

@@ -14,7 +14,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	type ContactsExportFilters,
 	useContactsExport,
@@ -29,8 +29,7 @@ export type ExportStatusChoice =
 	| "blocked";
 
 /** Light keycap so it reads on the blue FancyButton fill. */
-const actionKbdOnBlueClassName =
-	"border-white/25 bg-white/15 text-white shadow-[0_1.5px_0_0_rgba(0,0,0,0.2)] dark:border-white/25 dark:bg-white/15 dark:text-white dark:shadow-[0_1.5px_0_0_rgba(0,0,0,0.35)]";
+const actionKbdOnBlueClassName = actionKbdOnSolidClassName;
 
 const HEADER_CONTENT: Record<ExportStep, { title: string; icon: string }> = {
 	configure: { title: "Export contacts", icon: "file-download" },
