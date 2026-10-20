@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import * as Switch from "@reloop/ui/switch";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import type * as React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Workflow, WorkflowReentry } from "../workflow-types";
@@ -33,6 +33,67 @@ export function useReentry(workflow: Workflow) {
 	return { value: pending ?? workflow.reentry, pending: pending !== null, set };
 }
 
+/**
+ * Looks like `@reloop/ui/switch` but is plain markup: the row is the control.
+ * Nesting the Radix switch (a button with ref state) inside the row's button
+ * sent React into an update loop.
+ */
+const SwitchLook = ({
+	checked,
+	pending,
+	disabled,
+}: {
+	checked: boolean;
+	pending?: boolean;
+	disabled?: boolean;
+}) => {
+	const state = checked ? "checked" : "unchecked";
+	return (
+		<span
+			aria-hidden
+			data-state={state}
+			className="pointer-events-none mt-0.5 block h-5 w-8 shrink-0 p-0.5"
+		>
+			<span
+				data-state={state}
+				className={cn(
+					"block h-4 w-7 rounded-full bg-bg-soft-200 p-0.5 transition duration-200 ease-out",
+					!disabled && [
+						"group-hover/row:bg-bg-sub-300",
+						"data-[state=checked]:bg-primary-base group-hover/row:data-[state=checked]:bg-primary-darker",
+					],
+					disabled &&
+						"bg-bg-white-0 p-[3px] ring-1 ring-stroke-soft-200 ring-inset",
+				)}
+			>
+				<span
+					data-state={state}
+					className={cn(
+						"relative block size-3",
+						"transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+						"data-[state=checked]:translate-x-3",
+						pending && "scale-95 animate-pulse opacity-75",
+						!disabled && [
+							"before:-translate-x-1/2 before:absolute before:inset-y-0 before:left-1/2 before:w-3 before:rounded-full before:bg-static-white",
+							"data-[state=checked]:before:bg-primary-foreground",
+							"before:[mask:--mask]",
+							"after:-translate-x-1/2 after:absolute after:inset-y-0 after:left-1/2 after:w-3 after:rounded-full after:shadow-switch-thumb",
+							"group-active/row:scale-[.833]",
+						],
+						disabled && "size-2.5 rounded-full bg-bg-soft-200 shadow-none",
+					)}
+					style={
+						{
+							"--mask":
+								"radial-gradient(circle farthest-side at 50% 50%, #0000 1.95px, #000 2.05px 100%) 50% 50%/100% 100% no-repeat",
+						} as React.CSSProperties
+					}
+				/>
+			</span>
+		</span>
+	);
+};
+
 /** One labelled switch; the whole row toggles it. */
 export const SettingSwitchRow = ({
 	label,
@@ -58,7 +119,7 @@ export const SettingSwitchRow = ({
 		disabled={disabled}
 		onClick={() => onCheckedChange(!checked)}
 		className={cn(
-			"flex w-full items-start gap-3 rounded-xl px-2.5 py-2 text-left outline-none transition-colors",
+			"group/row flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left outline-none transition-colors",
 			"hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 disabled:cursor-not-allowed disabled:opacity-60 dark:focus-visible:bg-white/5 dark:hover:bg-white/5",
 			className,
 		)}
@@ -69,14 +130,7 @@ export const SettingSwitchRow = ({
 				{description}
 			</span>
 		</span>
-		<Switch.Root
-			checked={checked}
-			isPending={pending}
-			tabIndex={-1}
-			aria-hidden
-			// Display only: the row is the control.
-			className="pointer-events-none mt-0.5"
-		/>
+		<SwitchLook checked={checked} pending={pending} disabled={disabled} />
 	</button>
 );
 
