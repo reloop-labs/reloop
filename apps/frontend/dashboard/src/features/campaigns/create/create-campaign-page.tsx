@@ -1,7 +1,6 @@
+"use client";
+
 import { cn } from "@reloop/ui/cn";
-
-("use client");
-
 import * as Button from "@reloop/ui/button";
 import { EnterIcon } from "@reloop/ui/enter-icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
