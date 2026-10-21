@@ -10,6 +10,7 @@ import {
 	isValidTemplateSlug,
 	uniqueTemplateSlug,
 } from "@be/template/utils/slug";
+import { scheduleDraftThumbnail } from "@be/template/utils/template-thumbnail";
 import type { TemplateBlock, TemplateVariable } from "@reloop/db/schema";
 import { log } from "evlog";
 
@@ -26,8 +27,10 @@ export async function updateTemplate(params: {
 	content?: TemplateBlock[];
 	variables?: TemplateVariable[];
 	status?: "draft" | "published" | "archived";
+	/** Composed draft HTML; only used for the thumbnail, never stored */
+	renderedHtml?: string;
 }) {
-	const { id, organizationId, ...updateData } = params;
+	const { id, organizationId, renderedHtml, ...updateData } = params;
 
 	try {
 		const existing = await templateModel.findByIdAndOrg(id, organizationId);
@@ -121,6 +124,19 @@ export async function updateTemplate(params: {
 
 		if (!result) {
 			throw TemplateErrors.updateFailed(id);
+		}
+
+		// Without a published version the list thumbnail has nothing to
+		// render, so draft edits drive it until the first publish.
+		if (
+			renderedHtml?.trim() &&
+			!(await templateModel.hasPublishedVersion(id))
+		) {
+			scheduleDraftThumbnail({
+				templateId: id,
+				organizationId,
+				html: renderedHtml,
+			});
 		}
 
 		return result;

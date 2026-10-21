@@ -44,6 +44,12 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 			replyTo: t.Optional(t.String({ maxLength: 255 })),
 			previewText: t.Optional(t.String()),
 			content: t.Optional(t.Array(t.Any())),
+			renderedHtml: t.Optional(
+				t.String({
+					description:
+						"Composed HTML of the draft content. Refreshes the list thumbnail until the template is first published; not stored.",
+				}),
+			),
 			variables: t.Optional(
 				t.Array(
 					t.Object({

@@ -1,5 +1,6 @@
 import { useCurrentEditor } from "@tiptap/react";
 import { useCallback, useEffect, useRef } from "react";
+import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rendered-email-html";
 import { useEditorStore } from "./use-editor-store";
 import { useTemplateId } from "./use-template-id";
 
@@ -31,6 +32,11 @@ export function useAutoSaveDraft() {
 		state.setIsSavingDraft(true);
 		try {
 			const content = editor.getJSON().content ?? [];
+			// Lets the list thumbnail show the draft before the first publish.
+			const renderedHtml = await getRenderedEmailHtml(
+				editor,
+				state.previewText,
+			).catch(() => undefined);
 			const response = await fetch(`/api/template/v1/${templateId}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
@@ -41,6 +47,7 @@ export function useAutoSaveDraft() {
 					fromEmail: state.fromEmail,
 					replyTo: state.replyTo,
 					previewText: state.previewText,
+					renderedHtml,
 				}),
 			});
 			if (response.ok) {

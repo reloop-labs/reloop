@@ -65,6 +65,37 @@ export async function refreshTemplateThumbnail(params: {
 	return job;
 }
 
+const DRAFT_THUMBNAIL_DEBOUNCE_MS = 5000;
+const draftTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+/**
+ * Refresh the thumbnail from autosaved draft HTML. Autosave fires every few
+ * seconds while typing, so renders are debounced per template and only the
+ * latest HTML is captured.
+ */
+export function scheduleDraftThumbnail(params: {
+	templateId: string;
+	organizationId: string;
+	html: string;
+}) {
+	const pending = draftTimers.get(params.templateId);
+	if (pending) clearTimeout(pending);
+
+	draftTimers.set(
+		params.templateId,
+		setTimeout(() => {
+			draftTimers.delete(params.templateId);
+			refreshTemplateThumbnail(params).catch((error) => {
+				log.warn({
+					message: "Draft template thumbnail refresh failed",
+					templateId: params.templateId,
+					error: error instanceof Error ? error.message : String(error),
+				});
+			});
+		}, DRAFT_THUMBNAIL_DEBOUNCE_MS),
+	);
+}
+
 export async function resolveTemplateThumbnail(params: {
 	templateId: string;
 	organizationId: string;
