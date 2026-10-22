@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import {
@@ -12,9 +13,14 @@ import { useMailboxesQuery } from "#/features/emails/hooks/use-emails-query";
 interface MailboxSelectorProps {
 	value: string;
 	onChange: (value: string) => void;
+	className?: string;
 }
 
-export const MailboxSelector = ({ value, onChange }: MailboxSelectorProps) => {
+export const MailboxSelector = ({
+	value,
+	onChange,
+	className,
+}: MailboxSelectorProps) => {
 	const { data: mailboxesData, isPending: isLoading } = useMailboxesQuery();
 
 	const selectedMailbox = mailboxesData?.find((m) => m.id === value);
@@ -27,7 +33,7 @@ export const MailboxSelector = ({ value, onChange }: MailboxSelectorProps) => {
 			value={value === "" ? "all" : value}
 			onValueChange={(val) => onChange(!val || val === "all" ? "" : val)}
 		>
-			<SelectTrigger className="w-48">
+			<SelectTrigger className={cn("w-48", className)}>
 				<SelectValue placeholder="All Mailboxes">
 					<Icon name="inbox" className="h-4 w-4 shrink-0 text-text-sub-600" />
 					<span className="min-w-0 truncate">{displayLabel}</span>

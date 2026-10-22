@@ -19,6 +19,7 @@ export type InboundEmailStatus =
 interface InboundStatusSelectorProps {
 	value: string;
 	onChange: (value: string) => void;
+	className?: string;
 }
 
 const statusOptions: {
@@ -69,6 +70,7 @@ const statusOptions: {
 export const InboundStatusSelector = ({
 	value,
 	onChange,
+	className,
 }: InboundStatusSelectorProps) => {
 	const selectedOption =
 		statusOptions.find((o) => o.id === (value || null)) || statusOptions[0];
@@ -78,7 +80,7 @@ export const InboundStatusSelector = ({
 			value={value === "" ? "all" : value}
 			onValueChange={(val) => onChange(!val || val === "all" ? "" : val)}
 		>
-			<SelectTrigger className="w-40">
+			<SelectTrigger className={cn("w-40", className)}>
 				<SelectValue placeholder="All Status">
 					{selectedOption?.icon ? (
 						<Icon

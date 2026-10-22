@@ -12,6 +12,7 @@ import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useReceivedEmailsQuery } from "#/features/emails/hooks/use-emails-query";
 import { queryKeys } from "#/lib/query-keys";
+import { RefreshButton } from "./email-refresh-button";
 import { InboundStatusSelector } from "./inbound-status-selector";
 import { MailboxSelector } from "./mailbox-selector";
 import { ReceivedEmailTable } from "./received-email-table";
@@ -134,9 +135,11 @@ export function ReceivedEmailList() {
 	return (
 		<div>
 			<div className="space-y-2">
-				{/* Filters first, free space for full-width search below */}
-				<div className="flex flex-wrap items-center gap-2">
+				{/* Filters first, free space for full-width search below.
+				    Phones stack them full width so labels never truncate. */}
+				<div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
 					<InboundStatusSelector
+						className="w-full sm:w-40"
 						value={selectedStatus ?? ""}
 						onChange={(val) => {
 							void setSelectedStatus(val);
@@ -144,6 +147,7 @@ export function ReceivedEmailList() {
 						}}
 					/>
 					<MailboxSelector
+						className="w-full sm:w-48"
 						value={selectedMailbox ?? ""}
 						onChange={(val) => {
 							void setSelectedMailbox(val);
@@ -162,124 +166,70 @@ export function ReceivedEmailList() {
 							Clear filters
 						</Button.Root>
 					)}
-					<div className="ml-auto flex items-center gap-2">
-						<Tooltip.Provider delayDuration={200}>
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
-									<button
-										type="button"
-										onClick={handleRefresh}
-										disabled={isFetching}
-										className={cn(
-											dataTableToolbarControlClassName,
-											"gap-2 px-1.5",
-											isFetching ? "pointer-events-none" : "cursor-pointer",
-										)}
-										aria-label="Refresh received emails"
-										aria-keyshortcuts="r"
-										aria-busy={isFetching}
-									>
-										<Icon
-											name="rotate-cw"
-											className={cn(
-												"h-3.5 w-3.5 shrink-0",
-												isFetching && "animate-spin",
-											)}
-										/>
-										<ActionKbd>R</ActionKbd>
-									</button>
-								</Tooltip.Trigger>
-								<Tooltip.Content
-									side="top"
-									sideOffset={-1}
-									size="medium"
-									variant="light"
-									className="max-w-63 p-2.5"
-								>
-									<div className="flex items-start gap-2.5">
-										<div
-											className={cn(
-												"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
-												"bg-bg-weak-50 ring-1 ring-stroke-soft-200",
-											)}
-											aria-hidden
-										>
-											<Icon
-												name="rotate-cw"
-												className={cn(
-													"h-3.5 w-3.5 text-text-sub-600",
-													isFetching && "animate-spin",
-												)}
-											/>
-										</div>
-										<div className="min-w-0 flex-1">
-											<div className="flex items-center justify-between gap-3">
-												<p className="font-medium text-label-sm text-text-strong-950">
-													{isFetching ? "Refreshing…" : "Refresh"}
-												</p>
-												<ActionKbd>R</ActionKbd>
-											</div>
-											<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-												{isFetching
-													? "Fetching received emails."
-													: "Reload received emails from the server."}
-											</p>
-										</div>
-									</div>
-								</Tooltip.Content>
-							</Tooltip.Root>
-						</Tooltip.Provider>
-					</div>
+					<RefreshButton
+						isFetching={isFetching}
+						onRefresh={handleRefresh}
+						subject="received emails"
+						className="ml-auto hidden sm:flex"
+					/>
 				</div>
 
-				{/* Full-width search */}
-				<Input.Root size="small" className="w-full rounded-xl">
-					<Input.Wrapper>
-						<Input.Icon as={Icon} name="search" size="small" />
-						<Input.Input
-							id={SEARCH_INPUT_ID}
-							ref={searchInputRef}
-							placeholder="Search sender or subject..."
-							value={searchQuery}
-							aria-keyshortcuts="/"
-							onChange={(e) => {
-								setSearchQuery(e.target.value);
-								void setCurrentPage(1);
-							}}
-							onKeyDown={(e) => {
-								if (e.key === "Escape") {
-									e.currentTarget.blur();
-								}
-							}}
-						/>
-						{searchQuery ? (
-							<button
-								type="button"
-								onMouseDown={(e) => e.preventDefault()}
-								onClick={() => {
-									setSearchQuery("");
+				{/* Full-width search; refresh sits beside it on phones */}
+				<div className="flex items-center gap-2">
+					<Input.Root size="small" className="w-full rounded-xl">
+						<Input.Wrapper>
+							<Input.Icon as={Icon} name="search" size="small" />
+							<Input.Input
+								id={SEARCH_INPUT_ID}
+								ref={searchInputRef}
+								placeholder="Search sender or subject..."
+								value={searchQuery}
+								aria-keyshortcuts="/"
+								onChange={(e) => {
+									setSearchQuery(e.target.value);
 									void setCurrentPage(1);
 								}}
-								className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
-							>
-								<Icon name="cross" className="h-3 w-3" />
-							</button>
-						) : (
-							<button
-								type="button"
-								tabIndex={-1}
-								aria-label="Focus search"
-								onMouseDown={(e) => {
-									e.preventDefault();
-									focusSearch();
+								onKeyDown={(e) => {
+									if (e.key === "Escape") {
+										e.currentTarget.blur();
+									}
 								}}
-								className="shrink-0 cursor-pointer rounded-[5px] outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950"
-							>
-								<ActionKbd>/</ActionKbd>
-							</button>
-						)}
-					</Input.Wrapper>
-				</Input.Root>
+							/>
+							{searchQuery ? (
+								<button
+									type="button"
+									onMouseDown={(e) => e.preventDefault()}
+									onClick={() => {
+										setSearchQuery("");
+										void setCurrentPage(1);
+									}}
+									className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
+								>
+									<Icon name="cross" className="h-3 w-3" />
+								</button>
+							) : (
+								<button
+									type="button"
+									tabIndex={-1}
+									aria-label="Focus search"
+									onMouseDown={(e) => {
+										e.preventDefault();
+										focusSearch();
+									}}
+									className="shrink-0 cursor-pointer rounded-[5px] outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950"
+								>
+									<ActionKbd>/</ActionKbd>
+								</button>
+							)}
+						</Input.Wrapper>
+					</Input.Root>
+					<RefreshButton
+						isFetching={isFetching}
+						onRefresh={handleRefresh}
+						subject="received emails"
+						className="size-9 justify-center sm:hidden"
+					/>
+				</div>
 			</div>
 
 			<div className="mt-4">

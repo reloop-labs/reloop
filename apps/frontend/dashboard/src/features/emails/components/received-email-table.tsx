@@ -791,85 +791,98 @@ export const ReceivedEmailTable = ({
 
 	return (
 		<>
-			<div className="w-full text-paragraph-sm">
-				{/* Table Header */}
-				<div
-					style={receivedGridStyle}
-					className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-				>
-					{headerGroup?.headers.map((header) => (
-						<div key={header.id} className="flex items-center gap-1">
-							{header.isPlaceholder
-								? null
-								: flexRender(
-										header.column.columnDef.header,
-										header.getContext(),
-									)}
-						</div>
-					))}
-					<div />
-				</div>
+			{/* Phones scroll the table sideways instead of crushing the columns;
+			    the scroller bleeds past the shell's p-6 so rows scroll to the screen edge */}
+			<div className="@container w-full overflow-x-auto text-paragraph-sm max-md:-mx-6 max-md:w-auto">
+				{/* The 24px inset lives inside the scroller: at rest the table lines up
+				    with the filters, and the right inset appears once scrolled to the end */}
+				<div className="min-w-[748px] max-md:px-6 md:min-w-0">
+					{/* Table Header */}
+					<div
+						style={receivedGridStyle}
+						className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
+					>
+						{headerGroup?.headers.map((header) => (
+							<div key={header.id} className="flex items-center gap-1">
+								{header.isPlaceholder
+									? null
+									: flexRender(
+											header.column.columnDef.header,
+											header.getContext(),
+										)}
+							</div>
+						))}
+						<div />
+					</div>
 
-				{/* Table Body */}
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-					{isLoading && logs.length === 0 ? (
-						Array.from({ length: loadingRows }).map((_, index) => (
-							<EmailSkeleton key={`skeleton-${index}`} />
-						))
-					) : rows.length === 0 ? (
-						<EmailsEmptyState
-							isFiltered={hasFilters}
-							onClearFilters={onClearFilters}
-							variant="received"
-						/>
-					) : (
-						rows.map((row) => {
-							const log = row.original;
-							const isRowActive = activeDropdownId === log.id;
-							return (
-								<div key={row.id}>
-									<ReceivedRowContextMenu log={log} handlers={actionsHandlers}>
-										<div
-											style={receivedGridStyle}
-											data-state={row.getIsSelected() ? "selected" : undefined}
-											className={cn(
-												"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left",
-												"hover:bg-bg-weak-50",
-												(isRowActive || row.getIsSelected()) &&
-													"bg-bg-weak-50/50",
-											)}
-											onClick={handleRowClick}
+					{/* Table Body */}
+					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+						{isLoading && logs.length === 0 ? (
+							Array.from({ length: loadingRows }).map((_, index) => (
+								<EmailSkeleton key={`skeleton-${index}`} />
+							))
+						) : rows.length === 0 ? (
+							<EmailsEmptyState
+								isFiltered={hasFilters}
+								onClearFilters={onClearFilters}
+								variant="received"
+							/>
+						) : (
+							rows.map((row) => {
+								const log = row.original;
+								const isRowActive = activeDropdownId === log.id;
+								return (
+									<div key={row.id}>
+										<ReceivedRowContextMenu
+											log={log}
+											handlers={actionsHandlers}
 										>
-											{row.getVisibleCells().map((cell) => (
-												<div key={cell.id}>
-													{flexRender(
-														cell.column.columnDef.cell,
-														cell.getContext(),
-													)}
-												</div>
-											))}
 											<div
-												onClick={(e) => e.stopPropagation()}
-												onKeyDown={(e) => e.stopPropagation()}
+												style={receivedGridStyle}
+												data-state={
+													row.getIsSelected() ? "selected" : undefined
+												}
+												className={cn(
+													"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left",
+													"hover:bg-bg-weak-50",
+													(isRowActive || row.getIsSelected()) &&
+														"bg-bg-weak-50/50",
+												)}
+												onClick={handleRowClick}
 											>
-												<ReceivedActionsMenu
-													log={log}
-													handlers={actionsHandlers}
-												/>
+												{row.getVisibleCells().map((cell) => (
+													<div key={cell.id}>
+														{flexRender(
+															cell.column.columnDef.cell,
+															cell.getContext(),
+														)}
+													</div>
+												))}
+												<div
+													onClick={(e) => e.stopPropagation()}
+													onKeyDown={(e) => e.stopPropagation()}
+												>
+													<ReceivedActionsMenu
+														log={log}
+														handlers={actionsHandlers}
+													/>
+												</div>
 											</div>
-										</div>
-									</ReceivedRowContextMenu>
-								</div>
-							);
-						})
-					)}
+										</ReceivedRowContextMenu>
+									</div>
+								);
+							})
+						)}
 
-					<TableFooter
-						total={totalLogs}
-						selectedCount={selectedCount}
-						pageRowCount={rows.length}
-						isLoading={isLoading}
-					/>
+						<TableFooter
+							total={totalLogs}
+							selectedCount={selectedCount}
+							pageRowCount={rows.length}
+							isLoading={isLoading}
+							// Pin pagination inside the visible card (24px inset + 1px border per side) while rows scroll
+							className="max-md:sticky max-md:left-[25px] max-md:w-[calc(100cqw-50px)]"
+						/>
+					</div>
 				</div>
 			</div>
 			<ReceivedEmailSelectionActionBar

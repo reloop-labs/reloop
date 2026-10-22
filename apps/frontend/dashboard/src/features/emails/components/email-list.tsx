@@ -15,90 +15,11 @@ import { DateRangeFilter } from "#/features/logs/date-range-filter";
 import { queryKeys } from "#/lib/query-keys";
 import { ApiKeySelector } from "./api-key-selector";
 import { DomainSelector } from "./domain-selector";
+import { RefreshButton } from "./email-refresh-button";
 import { EmailTable } from "./email-table";
 import { StatusSelector } from "./status-selector";
 
 const SEARCH_INPUT_ID = "sent-emails-search-input";
-
-function RefreshButton({
-	isFetching,
-	onRefresh,
-	className,
-}: {
-	isFetching: boolean;
-	onRefresh: () => void;
-	className?: string;
-}) {
-	return (
-		<Tooltip.Provider delayDuration={200}>
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild>
-					<button
-						type="button"
-						onClick={onRefresh}
-						disabled={isFetching}
-						className={cn(
-							dataTableToolbarControlClassName,
-							"gap-2 px-1.5",
-							isFetching ? "pointer-events-none" : "cursor-pointer",
-							className,
-						)}
-						aria-label="Refresh sent emails"
-						aria-keyshortcuts="r"
-						aria-busy={isFetching}
-					>
-						<Icon
-							name="rotate-cw"
-							className={cn(
-								"h-3.5 w-3.5 shrink-0",
-								isFetching && "animate-spin",
-							)}
-						/>
-						<ActionKbd>R</ActionKbd>
-					</button>
-				</Tooltip.Trigger>
-				<Tooltip.Content
-					side="top"
-					sideOffset={-1}
-					size="medium"
-					variant="light"
-					className="max-w-63 p-2.5"
-				>
-					<div className="flex items-start gap-2.5">
-						<div
-							className={cn(
-								"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
-								"bg-bg-weak-50 ring-1 ring-stroke-soft-200",
-							)}
-							aria-hidden
-						>
-							<Icon
-								name="rotate-cw"
-								className={cn(
-									"h-3.5 w-3.5 text-text-sub-600",
-									isFetching && "animate-spin",
-								)}
-							/>
-						</div>
-						<div className="min-w-0 flex-1">
-							<div className="flex items-center justify-between gap-3">
-								<p className="font-medium text-label-sm text-text-strong-950">
-									{isFetching ? "Refreshing…" : "Refresh"}
-								</p>
-								<ActionKbd>R</ActionKbd>
-							</div>
-							<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-								{isFetching
-									? "Fetching sent emails."
-									: "Reload sent emails from the server."}
-							</p>
-						</div>
-					</div>
-				</Tooltip.Content>
-			</Tooltip.Root>
-		</Tooltip.Provider>
-	);
-}
 
 export function EmailList() {
 	const { activeOrganization } = useActiveOrganization();
@@ -285,6 +206,7 @@ export function EmailList() {
 					<RefreshButton
 						isFetching={isFetching}
 						onRefresh={handleRefresh}
+						subject="sent emails"
 						className="ml-auto hidden sm:flex"
 					/>
 				</div>
@@ -341,6 +263,7 @@ export function EmailList() {
 					<RefreshButton
 						isFetching={isFetching}
 						onRefresh={handleRefresh}
+						subject="sent emails"
 						className="size-9 justify-center sm:hidden"
 					/>
 				</div>

@@ -41,13 +41,16 @@ const formatRole = (role: string) =>
  */
 export function OrgMembersFlyout({
 	orgId,
-	top,
+	top = 0,
+	inline = false,
 	onNavigate,
 	onPointerEnter,
 }: {
 	orgId: string;
 	/** Offset from the top of the switcher panel, aligned to the hovered row. */
-	top: number;
+	top?: number;
+	/** Touch: render in place of the org list instead of beside it. */
+	inline?: boolean;
 	/** Switches to this org first when it isn't active, then navigates. */
 	onNavigate: (path: string) => void;
 	onPointerEnter?: () => void;
@@ -94,6 +97,93 @@ export function OrgMembersFlyout({
 		return () => observer.disconnect();
 	}, []);
 
+	const body = (
+		<div ref={contentRef} className={inline ? undefined : "p-1"}>
+			<div className="flex items-center justify-between px-2.5 pt-1.5 pb-1.5">
+				<span className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]">
+					Members
+				</span>
+				{!isPending ? (
+					<span className="font-medium text-[11px] text-text-soft-400 tabular-nums">
+						{members.length}
+					</span>
+				) : null}
+			</div>
+
+			{isPending
+				? Array.from({ length: 3 }, (_, i) => (
+						<div key={i} className="flex h-11 items-center gap-2.5 px-2.5">
+							<div className="size-6 shrink-0 animate-pulse rounded-full bg-bg-weak-50" />
+							<div className="flex flex-1 flex-col gap-1">
+								<div className="h-2.5 w-24 animate-pulse rounded bg-bg-weak-50" />
+								<div className="h-2 w-32 animate-pulse rounded bg-bg-weak-50" />
+							</div>
+						</div>
+					))
+				: preview.map((member) => (
+						<div
+							key={member.id}
+							className="flex h-11 items-center gap-2.5 px-2.5"
+						>
+							<UserAvatar
+								name={member.user.name}
+								email={member.user.email}
+								image={member.user.image}
+								size="24"
+								className="shrink-0"
+								initialsClassName="text-[10px]"
+							/>
+							<div className="min-w-0 flex-1">
+								<p className="truncate font-medium text-[13px] text-text-strong-950 leading-4">
+									{member.user.name || member.user.email}
+								</p>
+								{member.user.name ? (
+									<p className="truncate text-[12px] text-text-soft-400 leading-4">
+										{member.user.email}
+									</p>
+								) : null}
+							</div>
+							<span className="shrink-0 text-[11px] text-text-soft-400">
+								{formatRole(member.role)}
+							</span>
+						</div>
+					))}
+
+			{hiddenCount > 0 ? (
+				<p className="px-2.5 pt-0.5 pb-1.5 text-[12px] text-text-soft-400">
+					+{hiddenCount} more
+				</p>
+			) : null}
+
+			{hasActions ? (
+				<div className="mx-2.5 my-1 h-px bg-stroke-soft-200" />
+			) : null}
+
+			{canInvite ? (
+				<button
+					type="button"
+					className={ROW_CLASS}
+					onClick={() => onNavigate("/settings/teams?modal=invite")}
+				>
+					<Icon name="plus" className="size-4 shrink-0 opacity-70" />
+					Invite member
+				</button>
+			) : null}
+			{canManageTeam ? (
+				<button
+					type="button"
+					className={ROW_CLASS}
+					onClick={() => onNavigate("/settings/teams")}
+				>
+					<SidebarNavIcon name="users" />
+					View all members
+				</button>
+			) : null}
+		</div>
+	);
+
+	if (inline) return body;
+
 	return (
 		<motion.div
 			className="absolute left-[calc(100%+8px)] z-10 w-[280px] overflow-hidden rounded-xl bg-bg-white-0 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset"
@@ -103,88 +193,7 @@ export function OrgMembersFlyout({
 			transition={SPRING}
 			onPointerEnter={onPointerEnter}
 		>
-			<div ref={contentRef} className="p-1">
-				<div className="flex items-center justify-between px-2.5 pt-1.5 pb-1.5">
-					<span className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]">
-						Members
-					</span>
-					{!isPending ? (
-						<span className="font-medium text-[11px] text-text-soft-400 tabular-nums">
-							{members.length}
-						</span>
-					) : null}
-				</div>
-
-				{isPending
-					? Array.from({ length: 3 }, (_, i) => (
-							<div key={i} className="flex h-11 items-center gap-2.5 px-2.5">
-								<div className="size-6 shrink-0 animate-pulse rounded-full bg-bg-weak-50" />
-								<div className="flex flex-1 flex-col gap-1">
-									<div className="h-2.5 w-24 animate-pulse rounded bg-bg-weak-50" />
-									<div className="h-2 w-32 animate-pulse rounded bg-bg-weak-50" />
-								</div>
-							</div>
-						))
-					: preview.map((member) => (
-							<div
-								key={member.id}
-								className="flex h-11 items-center gap-2.5 px-2.5"
-							>
-								<UserAvatar
-									name={member.user.name}
-									email={member.user.email}
-									image={member.user.image}
-									size="24"
-									className="shrink-0"
-									initialsClassName="text-[10px]"
-								/>
-								<div className="min-w-0 flex-1">
-									<p className="truncate font-medium text-[13px] text-text-strong-950 leading-4">
-										{member.user.name || member.user.email}
-									</p>
-									{member.user.name ? (
-										<p className="truncate text-[12px] text-text-soft-400 leading-4">
-											{member.user.email}
-										</p>
-									) : null}
-								</div>
-								<span className="shrink-0 text-[11px] text-text-soft-400">
-									{formatRole(member.role)}
-								</span>
-							</div>
-						))}
-
-				{hiddenCount > 0 ? (
-					<p className="px-2.5 pt-0.5 pb-1.5 text-[12px] text-text-soft-400">
-						+{hiddenCount} more
-					</p>
-				) : null}
-
-				{hasActions ? (
-					<div className="mx-2.5 my-1 h-px bg-stroke-soft-200" />
-				) : null}
-
-				{canInvite ? (
-					<button
-						type="button"
-						className={ROW_CLASS}
-						onClick={() => onNavigate("/settings/teams?modal=invite")}
-					>
-						<Icon name="plus" className="size-4 shrink-0 opacity-70" />
-						Invite member
-					</button>
-				) : null}
-				{canManageTeam ? (
-					<button
-						type="button"
-						className={ROW_CLASS}
-						onClick={() => onNavigate("/settings/teams")}
-					>
-						<SidebarNavIcon name="users" />
-						View all members
-					</button>
-				) : null}
-			</div>
+			{body}
 		</motion.div>
 	);
 }

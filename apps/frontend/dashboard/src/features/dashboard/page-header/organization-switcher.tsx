@@ -46,6 +46,8 @@ export function OrganizationSwitcher({
 		null,
 	);
 	const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	// Touch / narrow screens: members open in place of the list (no hover, no room beside it).
+	const [membersIdx, setMembersIdx] = useState<number | null>(null);
 	const router = useRouter();
 	const { billingEnabled: showPlans, isLoading: isBillingLoading } =
 		useBillingUsage();
@@ -105,6 +107,7 @@ export function OrganizationSwitcher({
 		if (isOpen) return;
 		if (closeTimer.current) clearTimeout(closeTimer.current);
 		setFlyout(null);
+		setMembersIdx(null);
 	}, [isOpen]);
 
 	useEffect(
@@ -115,6 +118,20 @@ export function OrganizationSwitcher({
 	);
 
 	const flyoutOrg = flyout ? organizations?.[flyout.idx] : undefined;
+	const membersOrg =
+		membersIdx !== null ? organizations?.[membersIdx] : undefined;
+
+	// The chevron opens members: beside the menu with a mouse, in place on touch.
+	const openMembers = (idx: number) => {
+		const canFlyout = window.matchMedia(
+			"(hover: hover) and (pointer: fine) and (min-width: 640px)",
+		).matches;
+		if (canFlyout) {
+			showFlyout(idx);
+		} else {
+			setMembersIdx(idx);
+		}
+	};
 
 	const handleSelectOrganization = (organization: Organization) => {
 		onOrganizationChange(organization);
@@ -159,112 +176,140 @@ export function OrganizationSwitcher({
 				ref={contentRef}
 				sideOffset={2}
 				// Visible overflow so the members panel can sit beside the menu.
-				className="w-[380px] overflow-visible p-0"
+				className="w-[380px] max-w-[calc(100vw-24px)] overflow-visible p-0"
 				onPointerEnter={cancelFlyoutClose}
 				onPointerLeave={scheduleFlyoutClose}
 				side={side}
 				align="start"
 			>
-				<div className="relative flex flex-col p-1.5">
-					<div className="px-2 pt-1 pb-1.5">
-						<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider">
-							Organizations
-						</span>
-					</div>
-					<div
-						ref={scrollContainerRef}
-						className="relative max-h-[300px] min-h-[190px] space-y-0.5 overflow-y-auto"
-					>
-						{(organizations ?? []).map((organization, idx) => {
-							const isActive = organization.id === activeOrganization.id;
-							const rowContent = (
-								<>
-									<div className="flex min-w-0 flex-1 items-center gap-2.5">
-										<OrgAvatar org={organization} size={24} />
-										<p className="min-w-0 truncate text-left font-medium text-sm text-text-strong-950">
-											{organization.name}
-										</p>
-										{showPlans ? (
-											<PlanBadge planId={organization.planId} />
-										) : null}
-									</div>
-									<div className="flex shrink-0 items-center gap-1.5">
-										{isActive && (
-											<Icon
-												name="check"
-												className="h-4 w-4 flex-shrink-0 text-text-strong-950"
-											/>
-										)}
-										<Icon
-											name="chevron-right"
-											className="h-3.5 w-3.5 flex-shrink-0 text-text-soft-400"
-										/>
-									</div>
-								</>
-							);
-							const rowClassName = cn(
-								"flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 font-normal",
-								!currentRect && currentIdx === idx && "bg-neutral-alpha-10",
-							);
-							const setRef = (el: HTMLElement | null) => {
-								if (el) buttonRefs.current[idx] = el;
-							};
-
-							return (
-								<button
-									type="button"
-									ref={setRef}
-									key={organization.id}
-									onPointerEnter={() => {
-										setHoverIdx(idx);
-										showFlyout(idx);
-									}}
-									onPointerLeave={() => setHoverIdx(undefined)}
-									className={rowClassName}
-									onClick={() => {
-										if (!isActive) handleSelectOrganization(organization);
-									}}
-								>
-									{rowContent}
-								</button>
-							);
-						})}
-						{(!organizations || organizations.length === 0) && (
-							<div className="flex min-h-[170px] flex-col items-center justify-center gap-1 px-3 py-4 text-center">
-								<p className="font-medium text-sm text-text-sub-600">
-									No organizations
-								</p>
-								<p className="text-text-soft-400 text-xs">
-									Create one below to get started
-								</p>
-							</div>
-						)}
-						<AnimatedHoverBackground
-							rect={currentRect}
-							tabElement={currentTab}
-							containerElement={scrollContainerRef.current}
-							className="rounded-lg"
+				{membersOrg ? (
+					<div className="flex flex-col p-1.5">
+						<div className="flex items-center gap-1.5 pb-1">
+							<button
+								type="button"
+								onClick={() => setMembersIdx(null)}
+								aria-label="Back to organizations"
+								className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
+							>
+								<Icon name="chevron-left" className="h-4 w-4" />
+							</button>
+							<OrgAvatar org={membersOrg} size={20} />
+							<p className="min-w-0 truncate font-medium text-sm text-text-strong-950">
+								{membersOrg.name}
+							</p>
+						</div>
+						<OrgMembersFlyout
+							inline
+							orgId={membersOrg.id}
+							onNavigate={(path) => void handleNavigate(membersOrg, path)}
 						/>
 					</div>
-
-					<div className="mx-1 my-1 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
-
-					<button
-						key="create-organization"
-						type="button"
-						className="flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-2.5 py-2 font-normal transition-colors hover:bg-neutral-alpha-10"
-						onClick={handleCreateOrganization}
-					>
-						<div className="flex h-6 w-6 items-center justify-center rounded-[6px] border border-stroke-soft-200 border-dashed bg-bg-weak-50 dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/50">
-							<Icon name="plus" className="h-3.5 w-3.5 text-text-sub-600" />
+				) : (
+					<div className="relative flex flex-col p-1.5">
+						<div className="px-2 pt-1 pb-1.5">
+							<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider">
+								Organizations
+							</span>
 						</div>
-						<span className="font-medium text-sm text-text-strong-950">
-							{hasFreeOrg
-								? "Upgrade to add organization"
-								: "Create organization"}
-						</span>
-					</button>
-				</div>
+						<div
+							ref={scrollContainerRef}
+							className="relative max-h-[300px] min-h-[190px] space-y-0.5 overflow-y-auto"
+						>
+							{(organizations ?? []).map((organization, idx) => {
+								const isActive = organization.id === activeOrganization.id;
+								const rowClassName = cn(
+									"flex w-full items-center rounded-lg font-normal",
+									!currentRect && currentIdx === idx && "bg-neutral-alpha-10",
+								);
+								const setRef = (el: HTMLElement | null) => {
+									if (el) buttonRefs.current[idx] = el;
+								};
+
+								return (
+									<div
+										ref={setRef}
+										key={organization.id}
+										// Hover preview is mouse-only; touch uses the chevron button.
+										onPointerEnter={(e) => {
+											if (e.pointerType !== "mouse") return;
+											setHoverIdx(idx);
+											showFlyout(idx);
+										}}
+										onPointerLeave={() => setHoverIdx(undefined)}
+										className={rowClassName}
+									>
+										<button
+											type="button"
+											className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 py-2 pl-2.5"
+											onClick={() => {
+												if (!isActive) handleSelectOrganization(organization);
+											}}
+										>
+											<OrgAvatar org={organization} size={24} />
+											<p className="min-w-0 truncate text-left font-medium text-sm text-text-strong-950">
+												{organization.name}
+											</p>
+											{showPlans ? (
+												<PlanBadge planId={organization.planId} />
+											) : null}
+											{isActive && (
+												<Icon
+													name="check"
+													className="ml-auto h-4 w-4 flex-shrink-0 text-text-strong-950"
+												/>
+											)}
+										</button>
+										<button
+											type="button"
+											onClick={() => openMembers(idx)}
+											aria-label={`View ${organization.name} members`}
+											className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center"
+										>
+											<Icon
+												name="chevron-right"
+												className="h-3.5 w-3.5 flex-shrink-0 text-text-soft-400"
+											/>
+										</button>
+									</div>
+								);
+							})}
+							{(!organizations || organizations.length === 0) && (
+								<div className="flex min-h-[170px] flex-col items-center justify-center gap-1 px-3 py-4 text-center">
+									<p className="font-medium text-sm text-text-sub-600">
+										No organizations
+									</p>
+									<p className="text-text-soft-400 text-xs">
+										Create one below to get started
+									</p>
+								</div>
+							)}
+							<AnimatedHoverBackground
+								rect={currentRect}
+								tabElement={currentTab}
+								containerElement={scrollContainerRef.current}
+								className="rounded-lg"
+							/>
+						</div>
+
+						<div className="mx-1 my-1 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
+
+						<button
+							key="create-organization"
+							type="button"
+							className="flex w-full cursor-pointer items-center justify-start gap-2.5 rounded-lg px-2.5 py-2 font-normal transition-colors hover:bg-neutral-alpha-10"
+							onClick={handleCreateOrganization}
+						>
+							<div className="flex h-6 w-6 items-center justify-center rounded-[6px] border border-stroke-soft-200 border-dashed bg-bg-weak-50 dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/50">
+								<Icon name="plus" className="h-3.5 w-3.5 text-text-sub-600" />
+							</div>
+							<span className="font-medium text-sm text-text-strong-950">
+								{hasFreeOrg
+									? "Upgrade to add organization"
+									: "Create organization"}
+							</span>
+						</button>
+					</div>
+				)}
 
 				<AnimatePresence>
 					{flyout && flyoutOrg ? (
