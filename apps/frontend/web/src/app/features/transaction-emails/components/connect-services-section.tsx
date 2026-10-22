@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AutoScrollRow } from "@reloop/web/components/landing/auto-scroll-row";
+import type { ReactNode } from "react";
 import type { SimpleIcon } from "simple-icons";
 import {
 	siCloudflare,
@@ -18,7 +19,7 @@ import {
 } from "simple-icons";
 import { isDarkBrandColor } from "../../../sdk/components/language-icon";
 
-type Service = { label: string; href: string; icon: SimpleIcon };
+export type Service = { label: string; href: string; icon: SimpleIcon };
 
 const SERVICES: Service[] = [
 	{
@@ -77,7 +78,21 @@ function ServiceTile({ service }: { service: Service }) {
 	);
 }
 
-export function ConnectServicesSection() {
+export function ConnectServicesSection({
+	services = SERVICES,
+	title = (
+		<>
+			Connect easily
+			<br />
+			with any service
+		</>
+	),
+	description = "Add Reloop to your existing stack, with the tools you already know and love.",
+}: {
+	services?: Service[];
+	title?: ReactNode;
+	description?: string;
+} = {}) {
 	return (
 		<section
 			id="connect-services"
@@ -93,18 +108,15 @@ export function ConnectServicesSection() {
 					id="connect-services-heading"
 					className="mt-3 text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.6rem] dark:text-white"
 				>
-					Connect easily
-					<br />
-					with any service
+					{title}
 				</h2>
 				<p className="mt-3 max-w-md text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
-					Add Reloop to your existing stack, with the tools you already know and
-					love.
+					{description}
 				</p>
 			</div>
 
 			<AutoScrollRow label="Services that work with Reloop">
-				{SERVICES.map((service) => (
+				{services.map((service) => (
 					<div
 						key={service.label}
 						className="size-36 shrink-0 border-stroke-soft-100 border-r sm:size-44 dark:border-white/10"

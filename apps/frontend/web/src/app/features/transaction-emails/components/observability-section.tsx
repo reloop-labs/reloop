@@ -42,7 +42,13 @@ const TABS: Tab[] = [
 	},
 ];
 
-export function ObservabilitySection() {
+export function ObservabilitySection({
+	title = "Complete visibility of every send",
+	description = "Every email generates events like opens, clicks, and bounces. See them in the dashboard or store them in your own database with webhooks.",
+}: {
+	title?: string;
+	description?: string;
+} = {}) {
 	const [active, setActive] = useState(0);
 	const [failed, setFailed] = useState<Record<string, boolean>>({});
 	const tablistRef = useRef<HTMLDivElement>(null);
@@ -74,11 +80,10 @@ export function ObservabilitySection() {
 					id="observability-heading"
 					className="mt-3 text-balance font-semibold text-[2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.6rem] dark:text-white"
 				>
-					Complete visibility of every send
+					{title}
 				</h2>
 				<p className="mt-3 max-w-2xl text-balance text-[15px] text-text-sub-600 leading-relaxed sm:mx-auto sm:text-base dark:text-white/60">
-					Every email generates events like opens, clicks, and bounces. See them
-					in the dashboard or store them in your own database with webhooks.
+					{description}
 				</p>
 			</div>
 
