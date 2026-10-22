@@ -37,7 +37,8 @@ export function EmailsListHeader() {
 					{title}
 				</h1>
 			</div>
-			<div className="flex shrink-0 items-center gap-2">
+			{/* Developer actions; nobody wires up the SDK from a phone */}
+			<div className="hidden shrink-0 items-center gap-2 sm:flex">
 				<EmailsApiDetails
 					isReceived={isReceived}
 					renderTrigger={({ open }: { open: () => void }) => (

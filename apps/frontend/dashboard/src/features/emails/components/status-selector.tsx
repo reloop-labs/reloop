@@ -21,6 +21,7 @@ export type EmailStatus =
 interface StatusSelectorProps {
 	value: string;
 	onChange: (value: string) => void;
+	className?: string;
 }
 
 const statusOptions: {
@@ -80,7 +81,11 @@ const statusOptions: {
 	},
 ];
 
-export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
+export const StatusSelector = ({
+	value,
+	onChange,
+	className,
+}: StatusSelectorProps) => {
 	const selectedOption =
 		statusOptions.find((o) => o.id === (value || null)) || statusOptions[0];
 
@@ -89,7 +94,7 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 			value={value === "" ? "all" : value}
 			onValueChange={(val) => onChange(!val || val === "all" ? "" : val)}
 		>
-			<SelectTrigger className="w-40">
+			<SelectTrigger className={cn("w-40", className)}>
 				<SelectValue placeholder="All Status">
 					{selectedOption?.icon ? (
 						<Icon

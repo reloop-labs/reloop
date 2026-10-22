@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PageSizeDropdown } from "./page-size-dropdown";
 import { PaginationControls } from "./pagination-controls";
@@ -7,11 +8,13 @@ export function TableFooter({
 	selectedCount = 0,
 	pageRowCount = 0,
 	isLoading,
+	className,
 }: {
 	total: number;
 	selectedCount?: number;
 	pageRowCount?: number;
 	isLoading?: boolean;
+	className?: string;
 }) {
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -27,9 +30,14 @@ export function TableFooter({
 	if (total <= 0) return null;
 
 	return (
-		<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
-			<div className="flex items-center gap-3">
-				<span>
+		<div
+			className={cn(
+				"flex items-center justify-between gap-3 px-4 py-2 text-label-xs text-text-sub-600",
+				className,
+			)}
+		>
+			<div className="flex min-w-0 items-center gap-3">
+				<span className="hidden truncate sm:inline">
 					{selectedCount} of {pageRowCount} row(s) selected.
 				</span>
 				<PageSizeDropdown

@@ -87,7 +87,23 @@ interface DateRangeFilterProps {
 	/** Cap selectable range length (and presets) in days. */
 	maxDays?: number;
 	align?: "start" | "end";
+	className?: string;
 }
+
+// Phones can't fit the presets column beside two months.
+const useIsNarrowViewport = () => {
+	const [isNarrow, setIsNarrow] = useState(false);
+
+	useEffect(() => {
+		const media = window.matchMedia("(max-width: 639px)");
+		setIsNarrow(media.matches);
+		const listener = () => setIsNarrow(media.matches);
+		media.addEventListener("change", listener);
+		return () => media.removeEventListener("change", listener);
+	}, []);
+
+	return isNarrow;
+};
 
 export const DateRangeFilter = ({
 	startDate,
@@ -97,7 +113,9 @@ export const DateRangeFilter = ({
 	numberOfMonths = 2,
 	maxDays,
 	align = "start",
+	className,
 }: DateRangeFilterProps) => {
+	const isNarrow = useIsNarrowViewport();
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -233,12 +251,15 @@ export const DateRangeFilter = ({
 						"h-9 gap-1.5 whitespace-nowrap rounded-xl",
 						hasActiveFilter &&
 							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
+						className,
 					)}
 				>
 					<Button.Icon>
 						<Icon name="calendar" className="h-4 w-4" />
 					</Button.Icon>
-					{formatDisplayLabel()}
+					<span className="min-w-0 flex-1 truncate text-left">
+						{formatDisplayLabel()}
+					</span>
 					<Button.Icon>
 						<Icon name="chevron-down" className="h-3.5 w-3.5" />
 					</Button.Icon>
@@ -246,10 +267,10 @@ export const DateRangeFilter = ({
 			</Popover.Trigger>
 
 			<Popover.Content align={align} showArrow={false} className="w-auto p-0">
-				<div className="flex divide-x divide-stroke-soft-200">
+				<div className="flex flex-col divide-y divide-stroke-soft-200 sm:flex-row sm:divide-x sm:divide-y-0">
 					{/* Left: Presets */}
-					<div className="w-44 px-2">
-						<div className="relative py-2">
+					<div className="px-2 sm:w-44">
+						<div className="relative grid grid-cols-2 py-2 sm:block">
 							{filteredPresets.map((preset, idx) => {
 								const isActive = activePreset === preset.value;
 								return (
@@ -294,7 +315,7 @@ export const DateRangeFilter = ({
 							mode="range"
 							selected={calendarRange}
 							onSelect={handleCalendarSelect}
-							numberOfMonths={numberOfMonths}
+							numberOfMonths={isNarrow ? 1 : numberOfMonths}
 							disabled={getDisabledDays()}
 						/>
 						<div className="flex justify-end gap-2 border-stroke-soft-100 border-t pt-2">

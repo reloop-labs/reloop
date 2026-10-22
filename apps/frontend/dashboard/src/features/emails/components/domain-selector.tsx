@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
@@ -16,9 +17,14 @@ interface DomainSelectorProps {
 	value: string;
 	onChange: (value: string) => void;
 	align?: "start" | "end";
+	className?: string;
 }
 
-export const DomainSelector = ({ value, onChange }: DomainSelectorProps) => {
+export const DomainSelector = ({
+	value,
+	onChange,
+	className,
+}: DomainSelectorProps) => {
 	const { activeOrganization } = useActiveOrganization();
 
 	const { data, isPending: isLoading } = useQuery({
@@ -42,7 +48,7 @@ export const DomainSelector = ({ value, onChange }: DomainSelectorProps) => {
 			value={value === "" ? "all" : value}
 			onValueChange={(val) => onChange(!val || val === "all" ? "" : val)}
 		>
-			<SelectTrigger className="w-44">
+			<SelectTrigger className={cn("w-44", className)}>
 				<SelectValue placeholder="All Domains">
 					<Icon name="globe" className="h-4 w-4 shrink-0 text-text-sub-600" />
 					<span className="min-w-0 truncate">{displayLabel}</span>
