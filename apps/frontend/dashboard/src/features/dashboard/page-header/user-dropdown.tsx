@@ -73,6 +73,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const itemRefs = useRef<(HTMLElement | null)[]>([]);
+	const closePressRef = useRef(false);
 	const router = useRouter();
 	const signOut = useSignOut();
 	const pathname = usePathname();
@@ -130,7 +131,13 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const logoutHoverIdx = workspaceItems.length + accountItems.length + 1;
 
 	return (
-		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+		<Dropdown.Root
+			open={isOpen}
+			onOpenChange={(open) => {
+				closePressRef.current = false;
+				setIsOpen(open);
+			}}
+		>
 			<Dropdown.Trigger asChild>
 				<Button.Root
 					variant="neutral"
@@ -176,7 +183,17 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 					<button
 						type="button"
 						aria-label="Close menu"
-						onClick={() => setIsOpen(false)}
+						// This button sits exactly over the trigger. On touch the menu opens on
+						// pointerdown and the tap's click lands here, closing it instantly, so
+						// only close when the press also started on this button.
+						onPointerDown={() => {
+							closePressRef.current = true;
+						}}
+						onClick={(e) => {
+							const startedHere = closePressRef.current || e.detail === 0;
+							closePressRef.current = false;
+							if (startedHere) setIsOpen(false);
+						}}
 						className="absolute top-0 right-0 flex size-7 cursor-pointer items-center justify-center rounded-full outline-none"
 					>
 						<UserAvatar
