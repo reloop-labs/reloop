@@ -13,7 +13,10 @@ import { ChannelsApiDetails } from "#/components/api-details/channels";
 import { ContactsApiDetails } from "#/components/api-details/contacts";
 import { GroupsApiDetails } from "#/components/api-details/groups";
 import { PropertiesApiDetails } from "#/components/api-details/properties";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { ContactsTabs } from "./components/contacts/contacts-tabs";
 import { ContactsModals } from "./contacts-modals";
 
@@ -41,6 +44,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isChannelsPage = pathname.includes("/contacts/channels");
 	const isGroupsPage = pathname.includes("/contacts/groups");
+	const isSuppressionPage = pathname.includes("/contacts/suppression");
 	const isBulkImportPage = pathname.includes("/bulk-import");
 	const isDetailPage =
 		isContactDetailPage ||
@@ -51,6 +55,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		!isPropertiesPage &&
 		!isChannelsPage &&
 		!isGroupsPage &&
+		!isSuppressionPage &&
 		!isBulkImportPage &&
 		!isDetailPage;
 
@@ -73,7 +78,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		{
 			enableOnFormTags: false,
 			preventDefault: true,
-			enabled: !isBulkImportPage && !isDetailPage,
+			enabled: !isBulkImportPage && !isDetailPage && !isSuppressionPage,
 		},
 	);
 
@@ -105,9 +110,11 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 			? "Channels"
 			: isGroupsPage
 				? "Groups"
-				: isBulkImportPage
-					? "Bulk Import"
-					: "Contacts";
+				: isSuppressionPage
+					? "Suppression"
+					: isBulkImportPage
+						? "Bulk Import"
+						: "Contacts";
 
 	const subtitle = isPropertiesPage
 		? "Manage custom attributes and metadata for your contact audience."
@@ -115,9 +122,11 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 			? "Configure communication channels for sending messages."
 			: isGroupsPage
 				? "Organize contacts into custom groups and segments for targeting."
-				: isBulkImportPage
-					? "Bulk import contacts and custom attributes from a CSV file."
-					: "Manage contacts, audiences, and properties for targeted email campaigns.";
+				: isSuppressionPage
+					? "Addresses Reloop won't send to after a hard bounce, full mailbox, or spam complaint."
+					: isBulkImportPage
+						? "Bulk import contacts and custom attributes from a CSV file."
+						: "Manage contacts, audiences, and properties for targeted email campaigns.";
 
 	const headerIcon = isPropertiesPage
 		? "tag"
@@ -125,9 +134,11 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 			? "notification-indicator"
 			: isGroupsPage
 				? "modules"
-				: isBulkImportPage
-					? "upload"
-					: "contacts";
+				: isSuppressionPage
+					? "slash"
+					: isBulkImportPage
+						? "upload"
+						: "contacts";
 
 	const actionLabel = isPropertiesPage
 		? "Add property"
@@ -225,7 +236,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									Documentation
 									<ActionKbd>D</ActionKbd>
 								</Button.Root>
-								{isContactsPage ? (
+								{isSuppressionPage ? null : isContactsPage ? (
 									<Dropdown.Root
 										open={isAddDropdownOpen}
 										onOpenChange={setIsAddDropdownOpen}

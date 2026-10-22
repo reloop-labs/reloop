@@ -5,6 +5,7 @@ import { initDedicatedIpSubscribers } from "@reloop/email/subscribers/dedicated-
 import { initDomainSubscribers } from "@reloop/email/subscribers/domain.subscriber";
 import { initExportSubscribers } from "@reloop/email/subscribers/export.subscriber";
 import { initOrgSubscribers } from "@reloop/email/subscribers/organization.subscriber";
+import { initReputationSubscribers } from "@reloop/email/subscribers/reputation.subscriber";
 import { initStartupSubscribers } from "@reloop/email/subscribers/startup.subscriber";
 import { initTestEmailSubscribers } from "@reloop/email/subscribers/test-email.subscriber";
 import { log } from "evlog";
@@ -21,6 +22,7 @@ export async function initSubscribers() {
 			initExportSubscribers(),
 			initStartupSubscribers(),
 			initDedicatedIpSubscribers(),
+			initReputationSubscribers(),
 		]);
 
 		log.info("server", "All email subscribers initialized");

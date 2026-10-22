@@ -23,7 +23,7 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
-import { and, eq, gt, inArray } from "drizzle-orm";
+import { and, eq, gt, inArray, isNotNull, or } from "drizzle-orm";
 import { log } from "evlog";
 import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
 import { OAUTH_ORG_CLAIM } from "../middleware/keys";
@@ -188,6 +188,48 @@ async function assertUserNotSuspended(email: string): Promise<void> {
 		log.error({
 			...{ data: error },
 			message: "Failed to check suspended status before sending OTP",
+		});
+	}
+}
+
+/** Shown inline on the login page when the address is on the suppression list. */
+export const SUPPRESSED_EMAIL_MESSAGE =
+	"We can't send a code to this address because earlier emails to it bounced or were reported as spam. Please contact support to have it removed from the suppression list, or use a different email.";
+
+/**
+ * Mirrors the mail service's platform-wide suppression check
+ * (step-2b-check-suppressions). Without this the OTP send is rejected later in
+ * the email worker and the user just never gets a code. Throwing here surfaces
+ * the reason inline on the login form instead.
+ */
+async function assertEmailNotSuppressed(email: string): Promise<void> {
+	const normalized = email.trim().toLowerCase();
+	if (!normalized) return;
+	try {
+		const [found] = await db
+			.select({ id: schema.contact.id })
+			.from(schema.contact)
+			.where(
+				and(
+					eq(schema.contact.email, normalized),
+					or(
+						eq(schema.contact.status, "blocked"),
+						isNotNull(schema.contact.suppressionReason),
+					),
+				),
+			)
+			.limit(1);
+		if (found) {
+			throw new APIError("FORBIDDEN", {
+				message: SUPPRESSED_EMAIL_MESSAGE,
+			});
+		}
+	} catch (error) {
+		// Infra failures fail open so login itself doesn't break.
+		if (error instanceof APIError) throw error;
+		log.error({
+			...{ data: error },
+			message: "Failed to check suppression status before sending OTP",
 		});
 	}
 }
@@ -589,6 +631,7 @@ export const auth = betterAuth({
 				log.info("server", `Sending OTP (${type}) to: ${email}`);
 				// Suspended users get an inline login-page error — no email sent.
 				await assertUserNotSuspended(email);
+				await assertEmailNotSuppressed(email);
 				if (
 					authServerConfig.DEFAULT_OTP &&
 					authServerConfig.NODE_ENV !== "development"

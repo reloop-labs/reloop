@@ -79,6 +79,8 @@ export namespace ContactTypes {
 		/** One status or a comma-separated list, e.g. "subscribed,blocked". */
 		status?: string;
 		channelId?: string;
+		/** Only contacts on the suppression list. */
+		suppressed?: boolean;
 		organizationId?: string;
 	}
 }

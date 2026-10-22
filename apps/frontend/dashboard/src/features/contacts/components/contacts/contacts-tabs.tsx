@@ -36,6 +36,13 @@ const items = [
 		path: "/contacts/channels",
 		shortcut: "4",
 	},
+	{
+		title: "Suppression",
+		value: "suppression",
+		iconName: "slash",
+		path: "/contacts/suppression",
+		shortcut: "5",
+	},
 ] as const;
 
 export function ContactsTabs() {
@@ -79,13 +86,24 @@ export function ContactsTabs() {
 		{ enableOnFormTags: false, preventDefault: true },
 	);
 
+	useHotkeys(
+		"5",
+		(e) => {
+			e.preventDefault();
+			router.push("/contacts/suppression");
+		},
+		{ enableOnFormTags: false, preventDefault: true },
+	);
+
 	const effectiveTabValue = pathname.includes("/contacts/properties")
 		? "properties"
 		: pathname.includes("/contacts/channels")
 			? "channels"
 			: pathname.includes("/contacts/groups")
 				? "groups"
-				: "contacts";
+				: pathname.includes("/contacts/suppression")
+					? "suppression"
+					: "contacts";
 
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const activeIndex = items.findIndex(

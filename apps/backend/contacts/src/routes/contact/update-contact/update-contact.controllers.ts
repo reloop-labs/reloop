@@ -116,6 +116,14 @@ export async function updateContactController({
 					if (contactStatus === "subscribed") {
 						updateData.suppressionReason = null;
 						updateData.suppressedAt = null;
+						// Org-level override of other orgs' suppression for this address
+						// (see step-2b-check-suppressions in the mail service).
+						if (
+							existingContact.status === "blocked" ||
+							existingContact.suppressionReason
+						) {
+							updateData.unsuppressedAt = new Date();
+						}
 					}
 				}
 

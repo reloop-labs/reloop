@@ -384,6 +384,12 @@ export namespace ContactModel {
 					"Filter to contacts enrolled in this channel (status = enrolled)",
 			}),
 		),
+		suppressed: t.Optional(
+			t.Boolean({
+				description:
+					"Only contacts on the suppression list (blocked, or suppressed after a hard bounce, full mailbox or spam complaint). Sorted by most recently suppressed.",
+			}),
+		),
 	});
 
 	export type ContactQuery = typeof contactQuery.static;

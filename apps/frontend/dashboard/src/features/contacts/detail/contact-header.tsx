@@ -16,6 +16,7 @@ import { formatRelativeTime } from "#/utils/format-relative-time";
 import { ContactStatusBadge } from "../components/contacts/contact-status-badge";
 import { DeleteContactModal } from "../components/contacts/delete-contact-modal";
 import { EditContactModal } from "../components/contacts/edit-contact-modal";
+import { RemoveSuppressionModal } from "../components/suppression/remove-suppression-modal";
 import type { ActivityFilter } from "./contact-email-history";
 import { ContactEmailHistory } from "./contact-email-history";
 
@@ -390,6 +391,7 @@ export const ContactHeader = ({
 	const [copied, setCopied] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [isUnsuppressOpen, setIsUnsuppressOpen] = useState(false);
 	const [activityTab, setActivityTab] = useState<ActivityFilter>("all");
 
 	const {
@@ -541,7 +543,7 @@ export const ContactHeader = ({
 							name="alert-octagon"
 							className="mt-0.5 h-5 w-5 flex-shrink-0 text-error-base"
 						/>
-						<div className="flex flex-col gap-0.5">
+						<div className="flex flex-1 flex-col gap-0.5">
 							<h3 className="font-medium text-error-base text-sm">
 								Contact Suppressed
 								{contact?.suppressedAt && (
@@ -553,8 +555,22 @@ export const ContactHeader = ({
 							</h3>
 							<p className="text-error-base/80 text-sm">{suppressionCopy}</p>
 						</div>
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							className="shrink-0"
+							onClick={() => setIsUnsuppressOpen(true)}
+						>
+							Remove suppression
+						</Button.Root>
 					</div>
 				)}
+				<RemoveSuppressionModal
+					contact={isUnsuppressOpen && contact ? contact : null}
+					onOpenChange={setIsUnsuppressOpen}
+				/>
 
 				{/* Content */}
 				<div className="mt-8 flex flex-col gap-10">

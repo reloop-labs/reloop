@@ -263,7 +263,10 @@ export async function sendEmailController({
 		// Platform-global: an email suppressed in ANY org is blocked here too,
 		// protecting shared IP reputation across all tenants.
 		const { body: cleanBody, suppressed } = await checkSuppressions_step2b({
+			organizationId,
 			body,
+			userId,
+			apiKeyId,
 		});
 		if (suppressed.length > 0) {
 			log.warn({

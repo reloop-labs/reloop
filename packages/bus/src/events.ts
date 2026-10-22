@@ -80,4 +80,7 @@ export enum BusEvent {
 
 	// Sending IP Events
 	DEDICATED_IP_OWNER_NOTIFIED = "sending_ip.dedicated.owner_notified",
+
+	// Reputation Events
+	REPUTATION_NOTICE = "reputation.notice",
 }

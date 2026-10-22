@@ -7,11 +7,14 @@ export function ContactTableFooter({
 	selectedCount = 0,
 	pageRowCount = 0,
 	isLoading,
+	showSelection = true,
 }: {
 	total: number;
 	selectedCount?: number;
 	pageRowCount?: number;
 	isLoading?: boolean;
+	/** Hide the "x of y selected" label on tables without row selection. */
+	showSelection?: boolean;
 }) {
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -29,9 +32,11 @@ export function ContactTableFooter({
 	return (
 		<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
 			<div className="flex items-center gap-3">
-				<span>
-					{selectedCount} of {pageRowCount} row(s) selected.
-				</span>
+				{showSelection && (
+					<span>
+						{selectedCount} of {pageRowCount} row(s) selected.
+					</span>
+				)}
 				<PageSizeDropdown
 					value={pageSize ?? 10}
 					onValueChange={(value) => {

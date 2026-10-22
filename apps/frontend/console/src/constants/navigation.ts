@@ -49,6 +49,12 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
 				description: "Inbound mail across orgs",
 			},
 			{
+				href: "/suppressions",
+				label: "Suppressions",
+				iconName: "slash",
+				description: "Suppressed addresses across orgs",
+			},
+			{
 				href: "/audit",
 				label: "Audit",
 				iconName: "logs",

@@ -671,6 +671,27 @@ export namespace AdminModel {
 		success: t.Boolean(),
 	});
 
+	export const suppressionItem = t.Object({
+		id: t.String(),
+		email: t.String(),
+		status: t.String(),
+		suppressionReason: t.Union([t.String(), t.Null()]),
+		suppressedAt: t.Union([t.Date(), t.Null()]),
+		updatedAt: t.Date(),
+		organizationId: t.String(),
+		organizationName: t.String(),
+	});
+
+	export const suppressionsResponse = t.Object({
+		items: t.Array(suppressionItem),
+		total: t.Number(),
+	});
+
+	export const removeSuppressionResponse = t.Object({
+		success: t.Boolean(),
+		cleared: t.Number(),
+	});
+
 	export const supportMessage = t.Object({
 		id: t.String(),
 		conversationId: t.String(),

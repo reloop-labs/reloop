@@ -58,10 +58,13 @@ export {
 export {
 	blockTtlSeconds,
 	evaluateReputation,
+	REPUTATION_NOTICE_REPEAT_SECONDS,
 	REPUTATION_THRESHOLDS,
 	type ReputationCounts,
+	type ReputationNoticeLevel,
 	type ReputationReason,
 	type ReputationVerdict,
+	reputationNoticeLevel,
 	reputationRates,
 } from "./reputation";
 export {

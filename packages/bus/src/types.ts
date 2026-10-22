@@ -423,6 +423,29 @@ export interface DedicatedIpOwnerNotifiedPayload {
 	} | null;
 }
 
+/**
+ * Bounce / complaint rate is climbing (level 1–3) or sending was paused
+ * (level 4). Emailed to the org's owners and admins.
+ */
+export interface ReputationNoticePayload {
+	noticeId: string;
+	organizationId: string;
+	level: 1 | 2 | 3 | 4;
+	reason: "bounce_rate" | "complaint_rate" | "duplicate_burst";
+	window: "24h";
+	sent: number;
+	bounced: number;
+	complaint: number;
+	bounceRate: number;
+	complaintRate: number;
+	bounceBlockRate: number;
+	complaintBlockRate: number;
+	/** Sending domains with the most bounces in the window, worst first. */
+	topBouncingDomains: { domain: string; sent: number; bounced: number }[];
+	/** Level 4 only: when the pause lifts. */
+	pausedUntil: string | null;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -479,4 +502,5 @@ export interface EventPayloads {
 	[BusEvent.MAILBOX_DELETED]: MailboxDeletedPayload;
 	[BusEvent.STARTUP_APPLICATION_APPROVED]: StartupApplicationApprovedPayload;
 	[BusEvent.DEDICATED_IP_OWNER_NOTIFIED]: DedicatedIpOwnerNotifiedPayload;
+	[BusEvent.REPUTATION_NOTICE]: ReputationNoticePayload;
 }

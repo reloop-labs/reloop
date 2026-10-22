@@ -13,7 +13,9 @@ import {
 	exists,
 	ilike,
 	inArray,
+	isNotNull,
 	isNull,
+	or,
 	type SQL,
 	sql,
 } from "drizzle-orm";
@@ -54,6 +56,16 @@ export async function listContactsController({
 		const statuses = parseStatusFilter(query.status);
 		if (statuses.length > 0) {
 			const condition = inArray(schema.contact.status, statuses);
+			whereConditions.push(condition);
+			matchFilters.push(condition);
+		}
+		if (query.suppressed) {
+			// Same definition the mail service enforces at send time
+			// (step-2b-check-suppressions): blocked or carrying a suppression reason.
+			const condition = or(
+				eq(schema.contact.status, "blocked"),
+				isNotNull(schema.contact.suppressionReason),
+			) as SQL<unknown>;
 			whereConditions.push(condition);
 			matchFilters.push(condition);
 		}
@@ -109,6 +121,14 @@ export async function listContactsController({
 				: undefined,
 		);
 
+		const orderBy = query.suppressed
+			? [
+					sql`${schema.contact.suppressedAt} desc nulls last`,
+					desc(schema.contact.updatedAt),
+					desc(schema.contact.id),
+				]
+			: [desc(schema.contact.createdAt), desc(schema.contact.id)];
+
 		const [countsResult, contacts] = await Promise.all([
 			db
 				.select({
@@ -121,7 +141,7 @@ export async function listContactsController({
 				.where(countsWhere),
 			db.query.contact.findMany({
 				where: and(...whereConditions),
-				orderBy: [desc(schema.contact.createdAt), desc(schema.contact.id)],
+				orderBy,
 				limit,
 				offset,
 			}),

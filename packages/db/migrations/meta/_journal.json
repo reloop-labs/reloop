@@ -288,6 +288,20 @@
       "when": 1792400000000,
       "tag": "0040_automation_reentry",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1792500000000,
+      "tag": "0041_reputation_notice",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1792600000000,
+      "tag": "0042_contact_unsuppressed_at",
+      "breakpoints": true
     }
   ]
 }

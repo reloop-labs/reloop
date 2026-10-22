@@ -106,3 +106,49 @@ export function blockTtlSeconds(priorBlocks: number): number {
 	if (priorBlocks === 1) return 86400;
 	return 7 * 86400;
 }
+
+/**
+ * Escalating heads-up before an auto-pause. The band between the warn and
+ * block rates is split into thirds so a climbing sender is emailed up to
+ * three times (heads-up → warning → final warning) before sending pauses.
+ *
+ *   bounce:    3% → 3.67% → 4.33% → pause at 5%
+ *   complaint: 0.1% → 0.17% → 0.23% → pause at 0.3%
+ */
+export type ReputationNoticeLevel = 1 | 2 | 3;
+
+/** Each level is emailed at most once per window; a higher level always goes out. */
+export const REPUTATION_NOTICE_REPEAT_SECONDS = 24 * 3600;
+
+function levelForRate(
+	rate: number,
+	warn: number,
+	block: number,
+): 0 | ReputationNoticeLevel {
+	if (rate < warn) return 0;
+	const step = (block - warn) / 3;
+	if (rate >= warn + 2 * step) return 3;
+	if (rate >= warn + step) return 2;
+	return 1;
+}
+
+/** 0 when no notice is due (below volume floor, under warn, or already blocked). */
+export function reputationNoticeLevel(
+	counts: ReputationCounts,
+	thresholds = REPUTATION_THRESHOLDS,
+): 0 | ReputationNoticeLevel {
+	const verdict = evaluateReputation(counts, thresholds);
+	if (!verdict.warned || verdict.blocked) return 0;
+	return Math.max(
+		levelForRate(
+			verdict.bounceRate,
+			thresholds.bounceWarnRate,
+			thresholds.bounceBlockRate,
+		),
+		levelForRate(
+			verdict.complaintRate,
+			thresholds.complaintWarnRate,
+			thresholds.complaintBlockRate,
+		),
+	) as 0 | ReputationNoticeLevel;
+}

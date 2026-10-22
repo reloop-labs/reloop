@@ -49,6 +49,12 @@ export const contact = pgTable(
 		lastName: varchar("last_name", { length: 255 }),
 		suppressionReason: suppressionReasonEnum("suppression_reason"),
 		suppressedAt: timestamp("suppressed_at"),
+		/**
+		 * Set when the org removes a suppression. The send-time check lets this
+		 * org send even while another org still has the address suppressed,
+		 * unless that suppression is newer than this timestamp.
+		 */
+		unsuppressedAt: timestamp("unsuppressed_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
 			.notNull()

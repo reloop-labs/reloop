@@ -13,6 +13,9 @@ export type AttentionItem = {
 	cta: string;
 };
 
+const BOUNCE_WARN_PERCENT = 3;
+const BOUNCE_PAUSE_PERCENT = 5;
+
 export function buildAttentionItems({
 	domains,
 	bounceRate,
@@ -66,15 +69,18 @@ export function buildAttentionItems({
 		}
 	}
 
-	if (bounceRate != null && bounceRate >= 4) {
+	// Mirrors REPUTATION_THRESHOLDS in @reloop/db/reputation (warn 3%, pause 5%).
+	if (bounceRate != null && bounceRate >= BOUNCE_WARN_PERCENT) {
+		const atLimit = bounceRate >= BOUNCE_PAUSE_PERCENT;
 		items.push({
 			id: "bounce-rate",
-			status: bounceRate >= 8 ? "error" : "warning",
+			status: atLimit ? "error" : "warning",
 			title: `Bounce rate is ${bounceRate.toFixed(1)}%`,
-			description:
-				"A high bounce rate hurts deliverability. Check recent failures and suppress invalid addresses.",
-			href: "/metrics",
-			cta: "View metrics",
+			description: atLimit
+				? `Sending pauses automatically when bounces pass ${BOUNCE_PAUSE_PERCENT}%. Remove invalid and stale addresses before your next send.`
+				: `Sending pauses automatically at ${BOUNCE_PAUSE_PERCENT}%. Remove invalid and stale addresses to bring it down.`,
+			href: "/emails?status=bounced",
+			cta: "Review bounces",
 		});
 	}
 

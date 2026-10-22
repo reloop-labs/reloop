@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	blockTtlSeconds,
 	evaluateReputation,
+	reputationNoticeLevel,
 	reputationRates,
 } from "../src/reputation";
 
@@ -77,5 +78,34 @@ describe("blockTtlSeconds", () => {
 		expect(blockTtlSeconds(1)).toBe(86400);
 		expect(blockTtlSeconds(2)).toBe(7 * 86400);
 		expect(blockTtlSeconds(5)).toBe(7 * 86400);
+	});
+});
+
+describe("reputationNoticeLevel", () => {
+	const at = (bounced: number, complaint = 0) =>
+		reputationNoticeLevel({ sent: 1000, bounced, complaint });
+
+	test("no notice below the warn rate or the volume floor", () => {
+		expect(at(29)).toBe(0);
+		expect(reputationNoticeLevel({ sent: 50, bounced: 20, complaint: 0 })).toBe(
+			0,
+		);
+	});
+
+	test("escalates through three levels between warn and block", () => {
+		expect(at(30)).toBe(1);
+		expect(at(36)).toBe(1);
+		expect(at(37)).toBe(2);
+		expect(at(43)).toBe(2);
+		expect(at(44)).toBe(3);
+		expect(at(49)).toBe(3);
+	});
+
+	test("no notice once blocked — the pause email covers it", () => {
+		expect(at(50)).toBe(0);
+	});
+
+	test("takes the worse of bounce and complaint", () => {
+		expect(at(30, 2)).toBe(2);
 	});
 });

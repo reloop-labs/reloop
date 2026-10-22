@@ -13,15 +13,20 @@ export type Contact = {
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: string | null;
+	suppressionReason?: SuppressionReason | null;
+	suppressedAt?: string | null;
 };
+
+export type SuppressionReason =
+	| "hard_bounce"
+	| "spam_complaint"
+	| "mailbox_full";
 
 /** Full contact payload from `/api/contacts/retrieve/:id`. */
 export type ContactDetail = Contact & {
 	properties?: Record<string, string | number>;
 	groups?: { id: string; name: string }[];
 	channels?: { id: string; name: string; subscription: "opt_in" | "opt_out" }[];
-	suppressionReason?: "hard_bounce" | "spam_complaint" | "mailbox_full" | null;
-	suppressedAt?: string | null;
 };
 
 export type ContactListResponse = {
@@ -41,6 +46,8 @@ export type ContactsListParams = {
 	/** Comma-separated statuses; empty means no status filter. */
 	status: string;
 	channelId?: string;
+	/** Only contacts on the suppression list. */
+	suppressed?: boolean;
 	enabled?: boolean;
 };
 
@@ -53,6 +60,7 @@ async function fetchContacts(
 	if (params.search) search.set("search", params.search);
 	if (params.status) search.set("status", params.status);
 	if (params.channelId) search.set("channelId", params.channelId);
+	if (params.suppressed) search.set("suppressed", "true");
 	const res = await fetch(`/api/contacts/list?${search.toString()}`, {
 		credentials: "include",
 	});
