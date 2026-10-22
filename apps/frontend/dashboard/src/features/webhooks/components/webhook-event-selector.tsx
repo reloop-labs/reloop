@@ -184,7 +184,7 @@ export const WebhookEventSelector = ({
 			</Dropdown.Trigger>
 			<Dropdown.Content
 				align="start"
-				className="max-h-85 w-(--radix-dropdown-menu-trigger-width) overflow-y-auto rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-0 shadow-regular-md dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5"
+				className="max-h-85 w-(--radix-dropdown-menu-trigger-width) overflow-y-auto rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-0 shadow-regular-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50"
 			>
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-3 py-2 dark:border-stroke-soft-100/40">
 					<Icon name="search" className="h-4 w-4 shrink-0 text-text-soft-400" />

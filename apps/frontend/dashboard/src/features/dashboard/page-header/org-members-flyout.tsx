@@ -186,7 +186,7 @@ export function OrgMembersFlyout({
 
 	return (
 		<motion.div
-			className="absolute left-[calc(100%+8px)] z-10 w-[280px] overflow-hidden rounded-xl bg-bg-white-0 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset"
+			className="absolute left-[calc(100%+8px)] z-10 w-[280px] overflow-hidden rounded-xl bg-bg-white-0 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:bg-bg-weak-50"
 			initial={{ opacity: 0, top, height, x: -4 }}
 			animate={{ opacity: 1, top, height, x: 0 }}
 			exit={{ opacity: 0, x: -4 }}

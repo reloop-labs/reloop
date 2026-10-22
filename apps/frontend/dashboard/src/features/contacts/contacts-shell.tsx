@@ -265,7 +265,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 										<Dropdown.Content
 											align="end"
 											sideOffset={6}
-											className="w-60 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]"
+											className="w-60 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50"
 										>
 											<Dropdown.Item
 												onClick={() => {
