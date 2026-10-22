@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { addContactToChannelRoute } from "./add-contact-to-channel/add-contact-to-channel.route";
 import { addContactToGroupRoute } from "./add-contact-to-group/add-contact-to-group.route";
+import { addSuppressionRoute } from "./add-suppression/add-suppression.route";
 import { createContactRoute } from "./create-contact/create-contact.route";
 import { deleteContactRoute } from "./delete-contact/delete-contact.route";
 import { exportContactsRoute } from "./export-contacts/export-contacts.route";
@@ -24,6 +25,7 @@ export const contactRoutes = new Elysia({ name: "ContactRoutes" })
 	.use(subscriptionActivityRoute)
 	.use(updateContactRoute)
 	.use(deleteContactRoute)
+	.use(addSuppressionRoute)
 
 	.use(addContactToChannelRoute)
 

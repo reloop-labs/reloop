@@ -13,6 +13,7 @@ import { EditGroupModal } from "./components/groups/edit-group-modal";
 import { AddPropertyModal } from "./components/properties/add-property-modal";
 import { DeletePropertyModal } from "./components/properties/delete-property-modal";
 import { EditPropertyModal } from "./components/properties/edit-property-modal";
+import { AddSuppressionModal } from "./components/suppression/add-suppression-modal";
 import {
 	type Channel,
 	type Contact,
@@ -149,6 +150,10 @@ export function ContactsModals({
 			/>
 			<CreateContactModal
 				open={modal === "add-contact"}
+				onOpenChange={handleOpenChange}
+			/>
+			<AddSuppressionModal
+				open={modal === "add-suppression"}
 				onOpenChange={handleOpenChange}
 			/>
 			<AddContactToGroupModal

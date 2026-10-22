@@ -8,6 +8,7 @@ import {
 	attachAuditChanges,
 	computeContactFieldChanges,
 } from "@be/contacts/utils/contact-field-changes";
+import { getSuppressionSource } from "@be/contacts/utils/suppression";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -116,6 +117,7 @@ export async function updateContactController({
 					if (contactStatus === "subscribed") {
 						updateData.suppressionReason = null;
 						updateData.suppressedAt = null;
+						updateData.suppressionNote = null;
 						// Org-level override of other orgs' suppression for this address
 						// (see step-2b-check-suppressions in the mail service).
 						if (
@@ -204,6 +206,8 @@ export async function updateContactController({
 					channels: (updatedContact as ContactTypes.ContactData).channels ?? [],
 					suppressionReason: updatedContact.suppressionReason ?? null,
 					suppressedAt: updatedContact.suppressedAt ?? null,
+					suppressionSource: getSuppressionSource(updatedContact),
+					suppressionNote: updatedContact.suppressionNote ?? null,
 					createdAt: updatedContact.createdAt,
 					updatedAt: updatedContact.updatedAt,
 					event: CONTACT_UPDATE_WEBHOOK_EVENT.id,

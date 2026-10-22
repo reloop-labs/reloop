@@ -41,6 +41,13 @@ export const ContactErrors = {
 			why: "A contact with this email is already registered in your organization.",
 			fix: "Try updating the existing contact or use a different email address.",
 		}),
+	alreadySuppressed: (_email: string) =>
+		createError({
+			status: 409,
+			message: "Already suppressed",
+			why: "This address is already on your suppression list.",
+			fix: "Remove it from the suppression list first if you want to change the reason.",
+		}),
 	contactNotFound: (_contactId: string) =>
 		createError({
 			status: 404,

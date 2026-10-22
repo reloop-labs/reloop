@@ -3,6 +3,7 @@ import {
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
+import { getSuppressionSource } from "@be/contacts/utils/suppression";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -265,6 +266,8 @@ export async function listContactsController({
 
 			suppressionReason: contact.suppressionReason ?? null,
 			suppressedAt: contact.suppressedAt ?? null,
+			suppressionSource: getSuppressionSource(contact),
+			suppressionNote: contact.suppressionNote ?? null,
 			createdAt: contact.createdAt,
 			updatedAt: contact.updatedAt,
 		}));

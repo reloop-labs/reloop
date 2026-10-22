@@ -3,6 +3,7 @@ import {
 	isAppError,
 } from "@be/contacts/error/contacts.error-response";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
+import { getSuppressionSource } from "@be/contacts/utils/suppression";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull, or } from "drizzle-orm";
@@ -108,6 +109,8 @@ export async function getContactController({
 			channels: channels ?? [],
 			suppressionReason,
 			suppressedAt,
+			suppressionSource: getSuppressionSource(contact),
+			suppressionNote: contact.suppressionNote ?? null,
 			createdAt: contact.createdAt,
 			updatedAt: contact.updatedAt,
 		};

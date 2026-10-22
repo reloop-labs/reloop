@@ -15,12 +15,18 @@ export type Contact = {
 	deletedAt: string | null;
 	suppressionReason?: SuppressionReason | null;
 	suppressedAt?: string | null;
+	suppressionSource?: SuppressionSource | null;
+	/** Reason a person gave when suppressing the address by hand. */
+	suppressionNote?: string | null;
 };
 
 export type SuppressionReason =
 	| "hard_bounce"
 	| "spam_complaint"
 	| "mailbox_full";
+
+/** `system`: bounce, full mailbox or spam complaint. `manual`: added by a person. */
+export type SuppressionSource = "system" | "manual";
 
 /** Full contact payload from `/api/contacts/retrieve/:id`. */
 export type ContactDetail = Contact & {

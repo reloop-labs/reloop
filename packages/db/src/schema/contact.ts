@@ -50,6 +50,12 @@ export const contact = pgTable(
 		suppressionReason: suppressionReasonEnum("suppression_reason"),
 		suppressedAt: timestamp("suppressed_at"),
 		/**
+		 * Why a person added this address to the suppression list by hand.
+		 * Manual suppressions have no suppressionReason; that field is only
+		 * set by the system (bounces, full mailboxes, spam complaints).
+		 */
+		suppressionNote: text("suppression_note"),
+		/**
 		 * Set when the org removes a suppression. The send-time check lets this
 		 * org send even while another org still has the address suppressed,
 		 * unless that suppression is newer than this timestamp.

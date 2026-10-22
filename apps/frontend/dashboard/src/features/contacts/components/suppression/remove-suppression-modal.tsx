@@ -17,7 +17,11 @@ import {
 	type Contact,
 	useInvalidateContacts,
 } from "../../hooks/use-contacts-query";
-import { SUPPRESSION_REASON_LABEL } from "./reason-labels";
+import {
+	getSuppressionReasonText,
+	getSuppressionSource,
+} from "./reason-labels";
+import { SuppressionSourceBadge } from "./suppression-source-badge";
 
 export function RemoveSuppressionModal({
 	contact,
@@ -79,9 +83,7 @@ export function RemoveSuppressionModal({
 		[contact, isRemoving],
 	);
 
-	const reason = shown?.suppressionReason
-		? SUPPRESSION_REASON_LABEL[shown.suppressionReason]
-		: "Blocked";
+	const reason = shown ? getSuppressionReasonText(shown) : "";
 
 	return (
 		<Modal.Root open={open} onOpenChange={(o) => !o && handleClose()}>
@@ -105,8 +107,14 @@ export function RemoveSuppressionModal({
 					<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
 						{shown?.email}
 					</p>
+					<p className="mt-2 font-normal text-text-sub-600 text-xs">Source</p>
+					<div className="mt-1">
+						<SuppressionSourceBadge
+							source={shown ? getSuppressionSource(shown) : "manual"}
+						/>
+					</div>
 					<p className="mt-2 font-normal text-text-sub-600 text-xs">Reason</p>
-					<p className="mt-0.5 font-medium text-sm text-text-strong-950">
+					<p className="mt-0.5 whitespace-pre-wrap break-words font-medium text-sm text-text-strong-950">
 						{reason}
 					</p>
 				</div>

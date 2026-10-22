@@ -63,6 +63,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		if (isPropertiesPage) void setModal("add-property");
 		else if (isChannelsPage) void setModal("create-channel");
 		else if (isGroupsPage) void setModal("create-group");
+		else if (isSuppressionPage) void setModal("add-suppression");
 		else setIsAddDropdownOpen((prev) => !prev);
 	};
 
@@ -78,7 +79,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		{
 			enableOnFormTags: false,
 			preventDefault: true,
-			enabled: !isBulkImportPage && !isDetailPage && !isSuppressionPage,
+			enabled: !isBulkImportPage && !isDetailPage,
 		},
 	);
 
@@ -123,7 +124,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 			: isGroupsPage
 				? "Organize contacts into custom groups and segments for targeting."
 				: isSuppressionPage
-					? "Addresses Reloop won't send to after a hard bounce, full mailbox, or spam complaint."
+					? "Addresses Reloop won't send to, suppressed automatically or added by your team."
 					: isBulkImportPage
 						? "Bulk import contacts and custom attributes from a CSV file."
 						: "Manage contacts, audiences, and properties for targeted email campaigns.";
@@ -146,7 +147,9 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 			? "Create channel"
 			: isGroupsPage
 				? "Create group"
-				: "Add contact";
+				: isSuppressionPage
+					? "Add suppression"
+					: "Add contact";
 
 	const ApiDetailsComponent = isPropertiesPage
 		? PropertiesApiDetails
@@ -236,7 +239,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									Documentation
 									<ActionKbd>D</ActionKbd>
 								</Button.Root>
-								{isSuppressionPage ? null : isContactsPage ? (
+								{isContactsPage ? (
 									<Dropdown.Root
 										open={isAddDropdownOpen}
 										onOpenChange={setIsAddDropdownOpen}

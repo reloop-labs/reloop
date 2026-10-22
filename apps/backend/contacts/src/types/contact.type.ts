@@ -25,6 +25,9 @@ export namespace ContactTypes {
 	export type Unauthorized = typeof ContactModel.unauthorized.static;
 	export type ValidationError = typeof ContactModel.validationError.static;
 
+	/** `system`: bounce, full mailbox or spam complaint. `manual`: added by a person. */
+	export type SuppressionSource = "system" | "manual";
+
 	// Internal Data Types
 	export interface ContactData {
 		id: string;
@@ -45,6 +48,8 @@ export namespace ContactTypes {
 		}[];
 		suppressionReason: "hard_bounce" | "spam_complaint" | "mailbox_full" | null;
 		suppressedAt: Date | null;
+		suppressionSource?: SuppressionSource | null;
+		suppressionNote?: string | null;
 	}
 
 	export interface CreateContactRequest {

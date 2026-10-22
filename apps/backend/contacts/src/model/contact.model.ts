@@ -213,6 +213,17 @@ export namespace ContactModel {
 				description: "When the contact was suppressed, or null",
 				default: null,
 			}),
+			suppressionSource: t.Optional(
+				t.Union([t.Literal("system"), t.Literal("manual"), t.Null()], {
+					description:
+						"Who suppressed the contact: `system` (bounce, full mailbox or spam complaint) or `manual` (added by a person). Null if not suppressed.",
+				}),
+			),
+			suppressionNote: t.Optional(
+				t.Union([t.String(), t.Null()], {
+					description: "Reason given when the contact was suppressed manually",
+				}),
+			),
 			createdAt: t.Date(),
 			updatedAt: t.Date(),
 		},
@@ -488,6 +499,39 @@ export namespace ContactModel {
 		fix: t.String(),
 	});
 	export type ContactNotFound = typeof contactNotFound.static;
+
+	export const addSuppressionBody = t.Object({
+		email: t.String({
+			pattern: emailPattern.source,
+			maxLength: 255,
+			description: "Email address to stop sending to",
+			examples: ["john.doe@example.com"],
+		}),
+		reason: t.String({
+			maxLength: 500,
+			// Must contain a non-whitespace character
+			pattern: "\\S",
+			description: "Why this address is being suppressed",
+			examples: ["Asked to never be contacted again"],
+		}),
+	});
+	export type AddSuppressionBody = typeof addSuppressionBody.static;
+
+	export const suppressionResponse = t.Object({
+		object: t.Literal("suppression"),
+		contactId: t.String({ description: "Contact that holds the suppression" }),
+		email: t.String(),
+		suppressionSource: t.Literal("manual"),
+		suppressionNote: t.String(),
+		suppressedAt: t.Date(),
+	});
+	export type SuppressionResponse = typeof suppressionResponse.static;
+
+	export const alreadySuppressed = t.Object({
+		message: t.Literal("Already suppressed"),
+		why: t.String(),
+		fix: t.String(),
+	});
 
 	export const contactAlreadyExists = t.Object({
 		message: t.Literal("Contact already exists"),

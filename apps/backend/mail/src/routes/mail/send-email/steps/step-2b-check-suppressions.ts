@@ -202,6 +202,12 @@ export async function checkSuppressions_step2b({
 	>();
 	for (const row of rows) {
 		if (row.status !== "blocked" && !row.suppressionReason) continue;
+		// Only system suppressions (bounce, full mailbox, spam complaint) apply
+		// across orgs. A blocked row without a reason was suppressed by a person
+		// in that org and must not stop other orgs from sending.
+		if (row.organizationId !== organizationId && !row.suppressionReason) {
+			continue;
+		}
 		const key = row.email.toLowerCase();
 		const override = overrideByEmail.get(key);
 		const suppressedAt = row.suppressedAt ?? row.updatedAt;
