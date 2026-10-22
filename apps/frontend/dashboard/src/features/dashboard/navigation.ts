@@ -52,6 +52,12 @@ export const mainNavigation: MainNavigationItem[] = [
 				iconName: "notification-indicator",
 				shortcut: { label: "G H", keys: ["g h", "g+h"] },
 			},
+			{
+				label: "Suppression",
+				path: "/contacts/suppression",
+				iconName: "slash",
+				shortcut: { label: "G X", keys: ["g x", "g+x"] },
+			},
 		],
 	},
 	{
