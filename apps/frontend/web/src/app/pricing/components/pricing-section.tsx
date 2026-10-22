@@ -313,6 +313,13 @@ const FEATURE_TOOLTIPS: Record<
 		badge: "AUTO",
 		status: "USAGE",
 	},
+	creditValidity: {
+		description:
+			"How long purchased credits stay usable. Unused credits expire 6 months after purchase.",
+		version: "v1.0",
+		badge: "CREDITS",
+		status: "6 MONTHS",
+	},
 	contacts: {
 		description:
 			"Store as many contacts as you need. You pay for emails sent, never for the size of your list.",
@@ -565,6 +572,35 @@ function FeatureTooltipContent({
 				{info.description}
 			</p>
 		</div>
+	);
+}
+
+export function ComparisonRowLabel({
+	label,
+	rowKey,
+}: {
+	label: string;
+	rowKey: string;
+}) {
+	return (
+		<HoverCard.Root openDelay={100} closeDelay={150}>
+			<HoverCard.Trigger asChild>
+				<span className="relative cursor-pointer text-body-default text-text-strong-950 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-text-strong-950 dark:text-white dark:hover:decoration-white">
+					{label}
+				</span>
+			</HoverCard.Trigger>
+			<HoverCard.Portal>
+				<HoverCard.Content
+					side="top"
+					align="start"
+					sideOffset={10}
+					collisionPadding={16}
+					className="fade-in-0 zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 animate-in outline-none duration-150 data-[state=closed]:animate-out"
+				>
+					<FeatureTooltipContent label={label} rowKey={rowKey} />
+				</HoverCard.Content>
+			</HoverCard.Portal>
+		</HoverCard.Root>
 	);
 }
 
@@ -1007,27 +1043,7 @@ function ComparisonTable({
 										"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
 									)}
 								>
-									<HoverCard.Root openDelay={100} closeDelay={150}>
-										<HoverCard.Trigger asChild>
-											<span className="relative cursor-pointer text-body-default text-text-strong-950 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-text-strong-950 dark:text-white dark:hover:decoration-white">
-												{row.label}
-											</span>
-										</HoverCard.Trigger>
-										<HoverCard.Portal>
-											<HoverCard.Content
-												side="top"
-												align="start"
-												sideOffset={10}
-												collisionPadding={16}
-												className="fade-in-0 zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 animate-in outline-none duration-150 data-[state=closed]:animate-out"
-											>
-												<FeatureTooltipContent
-													label={row.label}
-													rowKey={row.key}
-												/>
-											</HoverCard.Content>
-										</HoverCard.Portal>
-									</HoverCard.Root>
+									<ComparisonRowLabel label={row.label} rowKey={row.key} />
 								</div>
 								{pricingPlans.map((plan) => {
 									const value = plan.comparison[row.key];

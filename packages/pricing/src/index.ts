@@ -382,6 +382,7 @@ export const comparisonSections: ComparisonSection[] = [
 			{ label: "Agent inboxes", key: "agentInbox", type: "text" },
 			{ label: "Webhooks", key: "webhooks", type: "text" },
 			{ label: "Custom domains", key: "customDomains", type: "text" },
+			{ label: "Bring your own SMTP", key: "ownSmtp", type: "text" },
 			{ label: "Max attachment size", key: "attachmentSize", type: "text" },
 			{ label: "Data retention", key: "dataRetention", type: "text" },
 		],
@@ -415,7 +416,6 @@ export const comparisonSections: ComparisonSection[] = [
 				type: "boolean",
 			},
 			{ label: "Dedicated IP", key: "dedicatedIp", type: "text" },
-			{ label: "Bring your own SMTP", key: "ownSmtp", type: "text" },
 			{ label: "Spam testing", key: "spamTesting", type: "boolean" },
 			{
 				label: "Reputation monitoring",

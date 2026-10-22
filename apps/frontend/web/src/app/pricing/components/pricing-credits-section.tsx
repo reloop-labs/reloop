@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { formatCreditsCost } from "./pricing-credits-slider";
-import { PlanFeature } from "./pricing-section";
+import { ComparisonRowLabel, PlanFeature } from "./pricing-section";
 
 type CreditColumn = {
 	name: string;
@@ -523,9 +523,7 @@ export function CreditsComparisonTable() {
 											"group-hover/row:bg-bg-weak-50/70 dark:group-hover/row:bg-white/[0.03]",
 										)}
 									>
-										<span className="text-[14px] text-text-strong-950 dark:text-white">
-											{row.label}
-										</span>
+										<ComparisonRowLabel label={row.label} rowKey={row.key} />
 									</div>
 									{([0, 1, 2] as const).map((planIndex) => (
 										<div
