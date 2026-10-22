@@ -51,6 +51,11 @@ function HamburgerIcon({ open }: { open: boolean }) {
 	);
 }
 
+const headerButtonClass = cn(
+	"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
+	"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
+);
+
 /**
  * `collapsedFromDom`: take the arrow direction from `<html data-sidebar-collapsed>`
  * instead of store state, so SSR'd loading chrome hydrates without a mismatch.
@@ -61,8 +66,6 @@ function SidebarToggleButton({
 	collapsedFromDom?: boolean;
 }) {
 	const { isCollapsed, toggle } = useSidebarCollapse();
-	const isMobileNavOpen = useUIStore((s) => s.isMobileNavOpen);
-	const toggleMobileNav = useUIStore((s) => s.toggleMobileNav);
 	const {
 		isAnimating,
 		onPointerEnter,
@@ -71,44 +74,46 @@ function SidebarToggleButton({
 		onAnimationEnd,
 	} = usePlayAnimationOnHover(500);
 
-	const btnClass = cn(
-		"group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
-		"hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5",
+	return (
+		<button
+			aria-label="Toggle sidebar"
+			type="button"
+			onClick={toggle}
+			data-animating={isAnimating || undefined}
+			onPointerEnter={onPointerEnter}
+			onPointerLeave={onPointerLeave}
+			onAnimationStart={onAnimationStart}
+			onAnimationEnd={onAnimationEnd}
+			className={cn(headerButtonClass, "hidden lg:flex")}
+		>
+			<AnimatedSidebarToggleIcon
+				className={cn(
+					"h-4 w-4",
+					collapsedFromDom
+						? "sidebar-collapsed:rotate-180"
+						: isCollapsed && "rotate-180",
+				)}
+			/>
+		</button>
 	);
+}
+
+/** Mobile only: sits at the right edge, next to the drawer it opens. */
+function MobileMenuButton() {
+	const isMobileNavOpen = useUIStore((s) => s.isMobileNavOpen);
+	const toggleMobileNav = useUIStore((s) => s.toggleMobileNav);
 
 	return (
-		<>
-			<button
-				type="button"
-				onClick={toggleMobileNav}
-				title="Open menu"
-				aria-label={isMobileNavOpen ? "Close menu" : "Open menu"}
-				aria-expanded={isMobileNavOpen}
-				className={cn(btnClass, "lg:hidden")}
-			>
-				<HamburgerIcon open={isMobileNavOpen} />
-			</button>
-			<button
-				aria-label="Toggle sidebar"
-				type="button"
-				onClick={toggle}
-				data-animating={isAnimating || undefined}
-				onPointerEnter={onPointerEnter}
-				onPointerLeave={onPointerLeave}
-				onAnimationStart={onAnimationStart}
-				onAnimationEnd={onAnimationEnd}
-				className={cn(btnClass, "hidden lg:flex")}
-			>
-				<AnimatedSidebarToggleIcon
-					className={cn(
-						"h-4 w-4",
-						collapsedFromDom
-							? "sidebar-collapsed:rotate-180"
-							: isCollapsed && "rotate-180",
-					)}
-				/>
-			</button>
-		</>
+		<button
+			type="button"
+			onClick={toggleMobileNav}
+			title="Open menu"
+			aria-label={isMobileNavOpen ? "Close menu" : "Open menu"}
+			aria-expanded={isMobileNavOpen}
+			className={cn(headerButtonClass, "h-8 w-8 lg:hidden")}
+		>
+			<HamburgerIcon open={isMobileNavOpen} />
+		</button>
 	);
 }
 
@@ -182,6 +187,7 @@ export function PageHeaderSkeleton() {
 			<div className="flex items-center gap-1.5">
 				<HelpLink />
 				<UserDropdownSkeleton />
+				<MobileMenuButton />
 			</div>
 		</div>
 	);
@@ -221,6 +227,7 @@ export function PageHeader() {
 							: null
 					}
 				/>
+				<MobileMenuButton />
 			</div>
 		</div>
 	);

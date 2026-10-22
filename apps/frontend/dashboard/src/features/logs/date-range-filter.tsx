@@ -266,7 +266,12 @@ export const DateRangeFilter = ({
 				</Button.Root>
 			</Popover.Trigger>
 
-			<Popover.Content align={align} showArrow={false} className="w-auto p-0">
+			<Popover.Content
+				align={align}
+				showArrow={false}
+				// Phones: at least as wide as the trigger, so a full-width trigger gets a full-width picker
+				className="w-auto p-0 max-sm:min-w-(--radix-popover-trigger-width)"
+			>
 				<div className="flex flex-col divide-y divide-stroke-soft-200 sm:flex-row sm:divide-x sm:divide-y-0">
 					{/* Left: Presets */}
 					<div className="px-2 sm:w-44">
