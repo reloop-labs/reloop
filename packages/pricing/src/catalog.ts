@@ -28,7 +28,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 		maxAttachmentBytes: 1 * MB,
 		dataRetentionDays: 45,
 		dedicatedIpCount: 0,
-		maxSmtpProviders: 0,
+		maxSmtpProviders: 1,
 	},
 	individual: {
 		planId: "individual",
@@ -41,7 +41,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 		maxAttachmentBytes: 5 * MB,
 		dataRetentionDays: 45,
 		dedicatedIpCount: 0,
-		maxSmtpProviders: 1,
+		maxSmtpProviders: 2,
 	},
 	startup: {
 		planId: "startup",

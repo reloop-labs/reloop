@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { formatCreditsCost } from "./pricing-credits-slider";
-import { getFeatureIcon } from "./pricing-section";
+import { PlanFeature } from "./pricing-section";
 
 type CreditColumn = {
 	name: string;
@@ -41,9 +41,12 @@ const creditColumns: CreditColumn[] = [
 		features: [
 			"3,000 emails / month",
 			"100 emails / day",
+			"Unlimited contacts",
+			"Unlimited team members",
 			"1 agent inbox",
 			"1 webhook",
 			"3 custom domains",
+			"1 own SMTP server",
 			"1 MB attachments",
 			"Data retention (45 days)",
 			"Community support",
@@ -68,9 +71,12 @@ const creditColumns: CreditColumn[] = [
 			(volume: number) =>
 				`${new Intl.NumberFormat("en-US").format(volume)} emails / 6 months`,
 			"No daily limit",
+			"Unlimited contacts",
+			"Unlimited team members",
 			"5 agent inboxes",
 			"5 webhooks",
 			"5 custom domains",
+			"2 own SMTP servers",
 			"5 MB attachments",
 			"Data retention (45 days)",
 			"Dedicated support",
@@ -87,9 +93,12 @@ const creditColumns: CreditColumn[] = [
 		features: [
 			"Custom email volume",
 			"No daily limit",
+			"Unlimited contacts",
+			"Unlimited team members",
 			"Custom agent inboxes",
 			"Custom webhooks",
 			"Custom domains",
+			"Custom SMTP servers",
 			"Custom attachments",
 			"Data retention (45 days)",
 			"Dedicated support & SLA",
@@ -215,17 +224,7 @@ function CreditColumnCard({
 				{column.features.map((feature) => {
 					const label =
 						typeof feature === "function" ? feature(volume) : feature;
-					return (
-						<li
-							key={label}
-							className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug"
-						>
-							{getFeatureIcon(label)}
-							<span className="text-text-sub-600 dark:text-white/60">
-								{label}
-							</span>
-						</li>
-					);
+					return <PlanFeature key={label} feature={label} />;
 				})}
 			</ul>
 		</div>
@@ -427,7 +426,7 @@ export function CreditsComparisonTable() {
 				>
 					<div className="flex flex-col gap-3 border-stroke-soft-100 border-b px-5 py-7 sm:px-7 lg:px-9 dark:border-white/10">
 						<p className="font-medium text-[12px] text-text-strong-950 uppercase tracking-[0.12em] dark:text-white/55">
-							Credits
+							Pay as you go
 						</p>
 						<h3 className="font-medium text-text-strong-950 leading-none dark:text-white">
 							Compare credit plans

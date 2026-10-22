@@ -80,7 +80,7 @@ const PricingPage = () => {
 						</h1>
 
 						<p className="mt-5 max-w-[46rem] text-balance text-center text-[16.5px] text-text-sub-600 leading-relaxed sm:mt-6 sm:text-[18.5px] lg:text-[20px] dark:text-white/60">
-							Start for free, then scale as you grow.
+							Subscribe monthly, or pay once with no subscription.
 						</p>
 					</div>
 				</header>

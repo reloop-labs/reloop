@@ -44,6 +44,8 @@ export interface PricingPlan {
 		dailyLimit: string;
 		overage: string;
 		// Resources
+		contacts: string;
+		teamMembers: string;
 		agentInbox: string;
 		webhooks: string;
 		customDomains: string;
@@ -97,9 +99,12 @@ export const pricingPlans: PricingPlan[] = [
 		features: [
 			"3,000 emails / month",
 			"100 emails / day",
+			"Unlimited contacts",
+			"Unlimited team members",
 			"1 agent inbox",
 			"1 webhook",
 			"3 custom domains",
+			"1 own SMTP server",
 			"1 MB attachments",
 			"Data retention (45 days)",
 			"Community support",
@@ -108,6 +113,8 @@ export const pricingPlans: PricingPlan[] = [
 			monthlyEmails: "3,000",
 			dailyLimit: "100",
 			overage: "-",
+			contacts: "Unlimited",
+			teamMembers: "Unlimited",
 			agentInbox: "1 inbox",
 			webhooks: "1 webhook",
 			customDomains: "3 domains",
@@ -124,7 +131,7 @@ export const pricingPlans: PricingPlan[] = [
 			emailAuth: true,
 			pristineSharedIps: true,
 			dedicatedIp: "-",
-			ownSmtp: "-",
+			ownSmtp: "1 server",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -154,10 +161,12 @@ export const pricingPlans: PricingPlan[] = [
 		features: [
 			"50,000 emails / month",
 			"No daily limit",
+			"Unlimited contacts",
+			"Unlimited team members",
 			"5 agent inboxes",
 			"5 webhooks",
 			"5 custom domains",
-			"Bring your own SMTP",
+			"2 own SMTP servers",
 			"5 MB attachments",
 			"Data retention (45 days)",
 			"Dedicated support",
@@ -166,6 +175,8 @@ export const pricingPlans: PricingPlan[] = [
 			monthlyEmails: "50,000",
 			dailyLimit: "No limit",
 			overage: "$0.50 / 1k",
+			contacts: "Unlimited",
+			teamMembers: "Unlimited",
 			agentInbox: "5 inboxes",
 			webhooks: "5 webhooks",
 			customDomains: "5 domains",
@@ -182,7 +193,7 @@ export const pricingPlans: PricingPlan[] = [
 			emailAuth: true,
 			pristineSharedIps: true,
 			dedicatedIp: "-",
-			ownSmtp: "1 server",
+			ownSmtp: "2 servers",
 			spamTesting: true,
 			reputationMonitoring: true,
 			deliveryAnalytics: true,
@@ -214,19 +225,23 @@ export const pricingPlans: PricingPlan[] = [
 		features: [
 			"100,000 emails / month",
 			"No daily limit",
-			"1 dedicated IP",
-			"Bring your own SMTP (3 servers)",
+			"Unlimited contacts",
+			"Unlimited team members",
 			"10 agent inboxes",
 			"10 webhooks",
 			"10 custom domains",
+			"3 own SMTP servers",
 			"5 MB attachments",
 			"Data retention (45 days)",
 			"Dedicated support",
+			"1 dedicated IP",
 		],
 		comparison: {
 			monthlyEmails: "100,000",
 			dailyLimit: "No limit",
 			overage: "$0.50 / 1k",
+			contacts: "Unlimited",
+			teamMembers: "Unlimited",
 			agentInbox: "10 inboxes",
 			webhooks: "10 webhooks",
 			customDomains: "10 domains",
@@ -272,17 +287,23 @@ export const pricingPlans: PricingPlan[] = [
 		features: [
 			"Custom email volume",
 			"No daily limit",
+			"Unlimited contacts",
+			"Unlimited team members",
 			"Custom agent inboxes",
 			"Custom webhooks",
 			"Custom domains",
+			"Custom SMTP servers",
 			"Custom attachments",
 			"Data retention (45 days)",
 			"Dedicated support & SLA",
+			"Custom dedicated IPs",
 		],
 		comparison: {
 			monthlyEmails: "Custom",
 			dailyLimit: "No limit",
 			overage: "Custom",
+			contacts: "Unlimited",
+			teamMembers: "Unlimited",
 			agentInbox: "Custom",
 			webhooks: "Custom",
 			customDomains: "Custom",
@@ -356,6 +377,8 @@ export const comparisonSections: ComparisonSection[] = [
 	{
 		title: "Resources",
 		rows: [
+			{ label: "Contacts", key: "contacts", type: "text" },
+			{ label: "Team members", key: "teamMembers", type: "text" },
 			{ label: "Agent inboxes", key: "agentInbox", type: "text" },
 			{ label: "Webhooks", key: "webhooks", type: "text" },
 			{ label: "Custom domains", key: "customDomains", type: "text" },

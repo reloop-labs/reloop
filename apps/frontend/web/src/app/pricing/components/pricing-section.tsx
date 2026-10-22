@@ -87,6 +87,12 @@ export function getFeatureIcon(feature: string, customClassName?: string) {
 		customClassName ??
 		"mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40";
 
+	if (key.includes("contacts")) {
+		return <Icon name="contacts" className={className} />;
+	}
+	if (key.includes("team member")) {
+		return <Icon name="users" className={className} />;
+	}
 	if (key.includes("all ") && key.includes("features")) {
 		return (
 			<Icon
@@ -306,6 +312,20 @@ const FEATURE_TOOLTIPS: Record<
 		version: "v1.0",
 		badge: "AUTO",
 		status: "USAGE",
+	},
+	contacts: {
+		description:
+			"Store as many contacts as you need. You pay for emails sent, never for the size of your list.",
+		version: "v1.0",
+		badge: "NO CAP",
+		status: "AUDIENCE",
+	},
+	teamMembers: {
+		description:
+			"Invite your whole team to the workspace at no extra cost, with no per-seat pricing.",
+		version: "v1.0",
+		badge: "NO CAP",
+		status: "SEATS",
 	},
 	agentInbox: {
 		description:
@@ -684,18 +704,62 @@ function PlanColumn({
 
 			<ul className="flex-1 space-y-1.5 pt-6">
 				{plan.features.map((feature) => (
-					<li
-						key={feature}
-						className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug"
-					>
-						{getFeatureIcon(feature)}
-						<span className="text-text-sub-600 dark:text-white/60">
-							{feature}
-						</span>
-					</li>
+					<PlanFeature key={feature} feature={feature} />
 				))}
 			</ul>
 		</div>
+	);
+}
+
+const featureHintKeys: Array<{
+	match: string;
+	rowKey: keyof (typeof pricingPlans)[number]["comparison"];
+}> = [
+	{ match: "smtp", rowKey: "ownSmtp" },
+	{ match: "contacts", rowKey: "contacts" },
+	{ match: "team member", rowKey: "teamMembers" },
+	{ match: "dedicated ip", rowKey: "dedicatedIp" },
+	{ match: "agent inbox", rowKey: "agentInbox" },
+];
+
+const comparisonRowLabels = new Map<string, string>(
+	comparisonSections.flatMap((section) =>
+		section.rows.map((row) => [row.key, row.label] as const),
+	),
+);
+
+export function PlanFeature({ feature }: { feature: string }) {
+	const key = feature.toLowerCase();
+	const rowKey = featureHintKeys.find((h) => key.includes(h.match))?.rowKey;
+	return (
+		<li className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug">
+			{getFeatureIcon(feature)}
+			{rowKey ? (
+				<HoverCard.Root openDelay={100} closeDelay={150}>
+					<HoverCard.Trigger asChild>
+						<span className="cursor-pointer text-text-sub-600 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:text-text-strong-950 hover:decoration-text-strong-950 dark:text-white/60 dark:hover:text-white dark:hover:decoration-white">
+							{feature}
+						</span>
+					</HoverCard.Trigger>
+					<HoverCard.Portal>
+						<HoverCard.Content
+							side="top"
+							align="start"
+							sideOffset={10}
+							collisionPadding={16}
+							className="fade-in-0 zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 animate-in outline-none duration-150 data-[state=closed]:animate-out"
+						>
+							<FeatureTooltipContent
+								label={comparisonRowLabels.get(rowKey) ?? feature}
+								rowKey={rowKey}
+							/>
+						</HoverCard.Content>
+					</HoverCard.Portal>
+				</HoverCard.Root>
+			) : (
+				<span className="text-text-sub-600 dark:text-white/60">{feature}</span>
+			)}
+		</li>
 	);
 }
 

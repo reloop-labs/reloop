@@ -16,23 +16,17 @@ type BillingMode = "monthly" | "credits";
 const billingTabs: Array<{
 	id: BillingMode;
 	label: string;
-	description: [string, string];
+	description: string;
 }> = [
 	{
 		id: "monthly",
-		label: "Monthly",
-		description: [
-			"A plan that renews every month.",
-			"Best for steady, ongoing sending.",
-		],
+		label: "Monthly plan",
+		description: "Renews monthly. Best for steady sending.",
 	},
 	{
 		id: "credits",
-		label: "Credits",
-		description: [
-			"Pay once, no subscription.",
-			"Credits last 6 months, use them as you need.",
-		],
+		label: "Pay as you go",
+		description: "Pay once, no subscription. Credits last 6 months.",
 	},
 ];
 
@@ -43,11 +37,11 @@ export function PricingExplorer() {
 
 	return (
 		<>
-			<div className="flex w-full flex-col items-center gap-4 px-6 sm:px-8">
+			<div className="w-full border-stroke-soft-100 border-y dark:border-white/10">
 				<div
 					role="tablist"
 					aria-label="Billing mode"
-					className="inline-flex rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-1 dark:border-white/10 dark:bg-white/[0.04]"
+					className="mx-auto grid w-full grid-cols-2 divide-x divide-stroke-soft-100 border-stroke-soft-100 lg:w-1/2 lg:border-x dark:divide-white/10 dark:border-white/10"
 				>
 					{billingTabs.map((tab) => {
 						const active = mode === tab.id;
@@ -59,26 +53,40 @@ export function PricingExplorer() {
 								aria-selected={active}
 								onClick={() => setMode(tab.id)}
 								className={cn(
-									"h-9 rounded-full px-6 font-medium text-[13.5px] transition-all duration-200",
+									"flex items-start gap-3 px-5 py-5 text-left transition-colors duration-200 sm:px-7 sm:py-6",
 									active
-										? "bg-bg-strong-950 text-text-white-0 shadow-fancy-buttons-neutral"
-										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
+										? "bg-bg-weak-50 dark:bg-white/[0.04]"
+										: "hover:bg-bg-weak-50/60 dark:hover:bg-white/[0.02]",
 								)}
 							>
-								{tab.label}
+								<span
+									aria-hidden
+									className={cn(
+										"mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors duration-200",
+										active
+											? "border-stroke-strong-950 dark:border-white"
+											: "border-stroke-soft-300 dark:border-white/25",
+									)}
+								>
+									<span
+										className={cn(
+											"size-2 rounded-full bg-bg-strong-950 transition-transform duration-200 dark:bg-white",
+											active ? "scale-100" : "scale-0",
+										)}
+									/>
+								</span>
+								<span className="flex flex-col gap-1">
+									<span className="font-medium text-[14.5px] text-text-strong-950 leading-tight dark:text-white">
+										{tab.label}
+									</span>
+									<span className="text-[13px] text-text-sub-600 leading-snug dark:text-white/55">
+										{tab.description}
+									</span>
+								</span>
 							</button>
 						);
 					})}
 				</div>
-				<p className="text-center text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
-					{billingTabs
-						.find((tab) => tab.id === mode)
-						?.description.map((line) => (
-							<span key={line} className="block">
-								{line}
-							</span>
-						))}
-				</p>
 			</div>
 			{mode === "monthly" ? (
 				<>

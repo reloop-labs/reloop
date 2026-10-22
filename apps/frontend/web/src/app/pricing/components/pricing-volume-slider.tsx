@@ -18,7 +18,6 @@ const TICKS = [
 	{ value: 100000, label: "100k", plan: "Growth" },
 	{ value: 250000, label: "250k", plan: "Growth" },
 	{ value: 500000, label: "500k", plan: "Enterprise" },
-	{ value: 1000000, label: "1M", plan: "Enterprise" },
 ];
 
 const SEGMENTS = TICKS.length - 1;
@@ -112,10 +111,10 @@ export function PricingVolumeSlider({
 	return (
 		<section
 			aria-label="Select your monthly email volume"
-			className="w-full px-6 pt-8 pb-12 sm:px-8 sm:pt-10 sm:pb-14 lg:px-12"
+			className="w-full px-6 py-14 sm:px-8 sm:py-16 lg:px-12 lg:py-20"
 		>
 			<div className="mx-auto w-full max-w-3xl">
-				<div className="mt-2 px-1">
+				<div className="px-1">
 					<Slider.Root
 						min={0}
 						max={100}
@@ -127,7 +126,7 @@ export function PricingVolumeSlider({
 						<Slider.Thumb aria-label="Monthly email volume" />
 					</Slider.Root>
 
-					<div className="relative mt-1 h-16">
+					<div className="relative mt-1 h-[30px] sm:h-[46px]">
 						{TICKS.flatMap((_tick, index) => {
 							const nodes = [];
 							if (index < TICKS.length - 1) {

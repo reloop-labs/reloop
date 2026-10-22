@@ -88,7 +88,7 @@ export function CreditsVolumeSlider({
 	return (
 		<section
 			aria-label="Estimate your credit cost"
-			className="w-full px-6 pt-8 pb-12 sm:px-8 sm:pt-10 sm:pb-14 lg:px-12"
+			className="w-full px-6 py-14 sm:px-8 sm:py-16 lg:px-12 lg:py-20"
 		>
 			<div className="mx-auto w-full max-w-3xl text-center">
 				<div className="px-1">
@@ -103,7 +103,7 @@ export function CreditsVolumeSlider({
 						<Slider.Thumb aria-label="Email volume in credits" />
 					</Slider.Root>
 
-					<div className="relative mt-1 h-16">
+					<div className="relative mt-1 h-[30px] sm:h-[46px]">
 						{CREDIT_TICKS.flatMap((_tick, index) => {
 							const nodes = [];
 							if (index < CREDIT_TICKS.length - 1) {
