@@ -138,7 +138,7 @@ export function EmailTimeline({
 	});
 
 	return (
-		<div className="relative flex w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-all hover:border-stroke-soft-200 sm:h-[176px] sm:px-8 sm:pt-6 sm:pb-5 dark:bg-bg-white-0/5">
+		<div className="relative flex w-full items-center justify-start transition-all sm:h-[176px] sm:rounded-3xl sm:border sm:border-stroke-soft-100 sm:bg-bg-white-0 sm:px-8 sm:pt-6 sm:pb-5 sm:hover:border-stroke-soft-200 sm:dark:bg-bg-white-0/5">
 			{/* Mobile: vertical list — icon, label, timestamp per row */}
 			<ol className="flex w-full flex-col sm:hidden">
 				{rows.map((row, index) => {
