@@ -1,5 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
 	parseAsArrayOf,
@@ -7,15 +8,7 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
-import {
-	lazy,
-	Suspense,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from "react";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -51,9 +44,9 @@ function StatItem({
 				{label}
 			</p>
 			{isLoading ? (
-				<Skeleton className="mt-1 h-5 w-16 rounded-lg" />
+				<Skeleton className="mt-1 h-6 w-16 rounded-lg" />
 			) : (
-				<p className="mt-1 truncate font-medium text-sm text-text-strong-950 tabular-nums">
+				<p className="mt-1 truncate font-medium text-base text-text-strong-950 tabular-nums">
 					{value}
 				</p>
 			)}
@@ -110,13 +103,14 @@ export function ContactList() {
 	const isLoading = isPending || (isFetching && !data);
 
 	const { data: activityData, isPending: activityPending } =
-		useSubscriptionActivityQuery(7, !!activeOrganization?.id);
+		useSubscriptionActivityQuery(30, !!activeOrganization?.id);
 
-	const chartContainerRef = useRef<HTMLDivElement>(null);
 	const [hasChartSize, setHasChartSize] = useState(false);
-
-	useEffect(() => {
-		const el = chartContainerRef.current;
+	// Callback ref so the observer re-attaches whenever the sparkline box remounts
+	const chartObserverRef = useRef<ResizeObserver | null>(null);
+	const chartContainerRef = useCallback((el: HTMLDivElement | null) => {
+		chartObserverRef.current?.disconnect();
+		chartObserverRef.current = null;
 		if (!el) return;
 		const observer = new ResizeObserver((entries) => {
 			for (const entry of entries) {
@@ -125,26 +119,21 @@ export function ContactList() {
 			}
 		});
 		observer.observe(el);
-		return () => observer.disconnect();
+		chartObserverRef.current = observer;
 	}, []);
 
+	// Running totals over the last 30 days (the metrics page default range), so
+	// the sparkline shows growth instead of mostly-flat daily counts
 	const chartData = useMemo(() => {
 		if (!activityData?.dates?.length) return [];
-		return activityData.dates.map((date, i) => ({
-			date: formatChartDayLabel(date),
-			subscribed: activityData.subscribed[i] ?? 0,
-			unsubscribed: activityData.unsubscribed[i] ?? 0,
-		}));
+		let subscribed = 0;
+		let unsubscribed = 0;
+		return activityData.dates.map((date, i) => {
+			subscribed += activityData.subscribed[i] ?? 0;
+			unsubscribed += activityData.unsubscribed[i] ?? 0;
+			return { date: formatChartDayLabel(date), subscribed, unsubscribed };
+		});
 	}, [activityData]);
-
-	const weekSubscribed = useMemo(
-		() => chartData.reduce((sum, d) => sum + d.subscribed, 0),
-		[chartData],
-	);
-	const weekUnsubscribed = useMemo(
-		() => chartData.reduce((sum, d) => sum + d.unsubscribed, 0),
-		[chartData],
-	);
 
 	const openExportModal = useCallback(() => {
 		setExportOpen(true);
@@ -213,66 +202,42 @@ export function ContactList() {
 
 	return (
 		<div>
-			{/* Audience snapshot + 7-day trend, matches API key detail two-box layout */}
-			<div className="mb-4 grid items-stretch gap-4 lg:grid-cols-2">
-				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-					<div className="flex h-full flex-col justify-between gap-3 p-4">
-						<p className="font-medium text-sm text-text-strong-950">Audience</p>
-						<div className="grid grid-cols-3 gap-4">
-							<StatItem
-								label="Total"
-								value={(data?.totalContacts ?? 0).toLocaleString()}
-								isLoading={isLoading}
-							/>
-							<StatItem
-								label="Subscribed"
-								value={(data?.subscribedContacts ?? 0).toLocaleString()}
-								isLoading={isLoading}
-							/>
-							<StatItem
-								label="Unsubscribed"
-								value={(data?.unsubscribedContacts ?? 0).toLocaleString()}
-								isLoading={isLoading}
-							/>
-						</div>
+			{/* Audience snapshot; the trend sparkline opens the full metrics page */}
+			<div className="mb-8 grid grid-cols-2 gap-x-6 gap-y-4 pt-4 sm:grid-cols-4 lg:w-3/4">
+				<StatItem
+					label="Total"
+					value={(data?.totalContacts ?? 0).toLocaleString()}
+					isLoading={isLoading}
+				/>
+				<StatItem
+					label="Subscribed"
+					value={(data?.subscribedContacts ?? 0).toLocaleString()}
+					isLoading={isLoading}
+				/>
+				<StatItem
+					label="Unsubscribed"
+					value={(data?.unsubscribedContacts ?? 0).toLocaleString()}
+					isLoading={isLoading}
+				/>
+				<Link
+					href="/contacts/metrics"
+					aria-label="Open audience metrics"
+					className="block min-w-0 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950"
+				>
+					<p className="truncate font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
+						Metrics
+					</p>
+					{/* Same height as the stat values so the row lines up */}
+					<div ref={chartContainerRef} className="mt-1 h-6 w-28">
+						{activityPending ? (
+							<Skeleton className="h-full w-full rounded-lg" />
+						) : hasChartSize && chartData.length > 0 ? (
+							<Suspense fallback={null}>
+								<SubscriptionActivityChart data={chartData} />
+							</Suspense>
+						) : null}
 					</div>
-				</div>
-
-				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-					<div className="flex h-full flex-col justify-between gap-2 p-4">
-						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-							<p className="shrink-0 font-medium text-sm text-text-strong-950">
-								Last 7 days
-							</p>
-							<div className="flex shrink-0 items-center gap-3">
-								<div className="flex items-center gap-1.5">
-									<span className="h-1.5 w-1.5 rounded-full bg-text-strong-950" />
-									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-										{activityPending ? "-" : weekSubscribed.toLocaleString()}{" "}
-										subscribed
-									</span>
-								</div>
-								<div className="flex items-center gap-1.5">
-									<span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
-									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-										{activityPending ? "-" : weekUnsubscribed.toLocaleString()}{" "}
-										unsubscribed
-									</span>
-								</div>
-							</div>
-						</div>
-
-						<div ref={chartContainerRef} className="h-[52px] w-full">
-							{activityPending ? (
-								<Skeleton className="h-full w-full rounded-xl" />
-							) : hasChartSize && chartData.length > 0 ? (
-								<Suspense fallback={null}>
-									<SubscriptionActivityChart data={chartData} />
-								</Suspense>
-							) : null}
-						</div>
-					</div>
-				</div>
+				</Link>
 			</div>
 
 			<ContactListToolbar

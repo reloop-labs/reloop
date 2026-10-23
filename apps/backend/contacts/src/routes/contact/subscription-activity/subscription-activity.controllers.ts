@@ -41,7 +41,7 @@ export async function subscriptionActivityController({
 	event: string;
 }> {
 	const log = useLogger();
-	const rangeDays = Math.min(Math.max(days, 1), 30);
+	const rangeDays = Math.min(Math.max(days, 1), 365);
 	const dayKeys = buildDayKeys(rangeDays);
 
 	const start = new Date(`${dayKeys[0]}T00:00:00.000Z`);

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-	Area,
-	AreaChart,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
-} from "recharts";
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 export type SubscriptionActivityPoint = {
 	date: string;
@@ -25,50 +18,42 @@ export function SubscriptionActivityChart({
 		<ResponsiveContainer
 			width="100%"
 			height="100%"
-			className="text-text-strong-950"
+			className="pointer-events-none text-text-strong-950"
 		>
-			<AreaChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+			<AreaChart data={data} margin={{ top: 1, right: 1, left: 1, bottom: 1 }}>
 				<defs>
 					<linearGradient id="subscribedGradient" x1="0" y1="0" x2="0" y2="1">
-						<stop offset="5%" stopColor="currentColor" stopOpacity={0.28} />
-						<stop offset="95%" stopColor="currentColor" stopOpacity={0} />
+						<stop offset="5%" stopColor="#10B981" stopOpacity={0.35} />
+						<stop offset="95%" stopColor="#10B981" stopOpacity={0} />
 					</linearGradient>
 					<linearGradient id="unsubscribedGradient" x1="0" y1="0" x2="0" y2="1">
-						<stop offset="5%" stopColor="#A1A1AA" stopOpacity={0.22} />
-						<stop offset="95%" stopColor="#A1A1AA" stopOpacity={0} />
+						<stop offset="5%" stopColor="#EF4444" stopOpacity={0.3} />
+						<stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
 					</linearGradient>
 				</defs>
-				{/* Compact sparkline: axes hidden; details via tooltip */}
+				{/* Static sparkline: no axes, tooltip or hover state; the card links to the metrics page */}
 				<XAxis dataKey="date" hide />
 				<YAxis hide domain={[0, "auto"]} />
-				<Tooltip
-					contentStyle={{
-						background: "#18181b",
-						borderColor: "#27272a",
-						borderRadius: "8px",
-						color: "#ffffff",
-						fontSize: "12px",
-					}}
-					labelStyle={{ color: "#a1a1aa", marginBottom: 4 }}
-				/>
 				<Area
 					type="monotone"
 					dataKey="subscribed"
 					name="Subscribed"
-					stroke="currentColor"
-					strokeWidth={2}
+					stroke="#10B981"
+					strokeWidth={1}
 					fillOpacity={1}
 					fill="url(#subscribedGradient)"
+					activeDot={false}
 					isAnimationActive
 				/>
 				<Area
 					type="monotone"
 					dataKey="unsubscribed"
 					name="Unsubscribed"
-					stroke="#A1A1AA"
-					strokeWidth={2}
+					stroke="#EF4444"
+					strokeWidth={1}
 					fillOpacity={1}
 					fill="url(#unsubscribedGradient)"
+					activeDot={false}
 					isAnimationActive
 				/>
 			</AreaChart>

@@ -19,9 +19,9 @@ export const subscriptionActivityRoute = new Elysia()
 				days: t.Optional(
 					t.Numeric({
 						minimum: 1,
-						maximum: 30,
+						maximum: 365,
 						default: 7,
-						description: "Number of UTC days to include (1–30)",
+						description: "Number of UTC days to include (1–365)",
 					}),
 				),
 			}),

@@ -41,6 +41,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		pathname.match(/\/contacts\/groups\/[^/]+$/),
 	);
 	const isCreatePage = pathname.includes("/contacts/create");
+	const isMetricsPage = pathname.endsWith("/contacts/metrics");
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isChannelsPage = pathname.includes("/contacts/channels");
 	const isGroupsPage = pathname.includes("/contacts/groups");
@@ -48,6 +49,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 	const isBulkImportPage = pathname.includes("/bulk-import");
 	const isDetailPage =
 		isContactDetailPage ||
+		isMetricsPage ||
 		Boolean(pathname.match(/\/contacts\/groups\/[^/]+$/)) ||
 		Boolean(pathname.match(/\/contacts\/channels\/[^/]+$/));
 
@@ -159,7 +161,12 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 				? GroupsApiDetails
 				: ContactsApiDetails;
 
-	if (isContactDetailPage || isGroupDetailPage || isCreatePage) {
+	if (
+		isContactDetailPage ||
+		isGroupDetailPage ||
+		isCreatePage ||
+		isMetricsPage
+	) {
 		return (
 			<>
 				{children}
