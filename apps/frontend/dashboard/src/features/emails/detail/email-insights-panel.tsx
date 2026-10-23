@@ -339,36 +339,40 @@ export function EmailInsightsPanel({ email }: { email: EmailInsightsData }) {
 	}, [email]);
 
 	return (
-		<div className="space-y-6 pt-2 pb-6">
-			{/* Possible Improvements - Always shown */}
-			<div className="space-y-2">
-				<h4 className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-neutral-400">
-					POSSIBLE IMPROVEMENTS
-				</h4>
-				<div className="border-stroke-soft-100/60 border-t dark:border-stroke-soft-100">
-					{improvements.length > 0 ? (
-						improvements.map((item) => (
+		<div className="space-y-6 pb-6">
+			{improvements.length > 0 ? (
+				<div className="space-y-2 pt-2">
+					<h4 className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-neutral-400">
+						POSSIBLE IMPROVEMENTS
+					</h4>
+					<div className="border-stroke-soft-100/60 border-t dark:border-stroke-soft-100">
+						{improvements.map((item) => (
 							<InsightAccordionItem
 								key={item.id}
 								item={item}
 								isOpen={Boolean(expandedItems[item.id])}
 								onToggle={() => toggleItem(item.id)}
 							/>
-						))
-					) : (
-						<div className="flex items-start gap-3 py-4 text-paragraph-sm text-text-sub-600 dark:text-neutral-400">
-							<Icon
-								name="check-circle"
-								className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500"
-							/>
-							<span>
-								No improvements needed. Your email meets all deliverability best
-								practices.
-							</span>
-						</div>
-					)}
+						))}
+					</div>
 				</div>
-			</div>
+			) : (
+				<div className="flex items-start gap-3 rounded-2xl border border-success-base/20 bg-success-base/10 p-4">
+					<Icon
+						name="check-circle"
+						className="h-5 w-5 shrink-0 text-success-base"
+					/>
+					<div className="min-w-0 space-y-0.5">
+						<p className="font-medium text-paragraph-sm text-text-strong-950">
+							Everything looks good
+						</p>
+						<p className="text-paragraph-sm text-text-sub-600 dark:text-neutral-400">
+							No improvements needed. Your email meets all deliverability best
+							practices.
+						</p>
+					</div>
+				</div>
+			)}
 
 			{doingGreat.length > 0 && (
 				<div className="space-y-2">

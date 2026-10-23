@@ -1,5 +1,8 @@
 "use client";
 
+import * as Button from "@reloop/ui/button";
+import * as Dropdown from "@reloop/ui/dropdown";
+import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useCallback, useMemo } from "react";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
@@ -121,12 +124,19 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 										<EmailStatusBadge status={data.status} />
 									</span>
 								)}
+								<EmailActionsMenu
+									isFailed={isFailed}
+									isResending={isResending}
+									isSavingTemplate={isSavingTemplate}
+									onResend={handleResend}
+									onSaveAsTemplate={handleSaveAsTemplate}
+								/>
 							</div>
 						)}
 					</div>
 				</div>
 
-				<div className="flex shrink-0 items-center gap-2">
+				<div className="flex shrink-0 items-center gap-2 max-sm:hidden">
 					{isLoading ? (
 						<Skeleton className="h-9 w-40 rounded-xl" />
 					) : (
@@ -158,6 +168,54 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 				isResending={isResending}
 			/>
 		</div>
+	);
+}
+
+/** Phones: the header actions collapse into a menu so they don't take a row of their own. */
+function EmailActionsMenu({
+	isFailed,
+	isResending,
+	isSavingTemplate,
+	onResend,
+	onSaveAsTemplate,
+}: {
+	isFailed: boolean;
+	isResending: boolean;
+	isSavingTemplate: boolean;
+	onResend: () => void;
+	onSaveAsTemplate: () => void;
+}) {
+	return (
+		<Dropdown.Root>
+			<Dropdown.Trigger asChild>
+				<Button.Root
+					type="button"
+					variant="neutral"
+					mode="ghost"
+					size="xxsmall"
+					className="aspect-square h-8 w-8 shrink-0 rounded-lg p-0 sm:hidden"
+					aria-label="Email actions"
+				>
+					<Icon name="more-horizontal" className="h-4 w-4 text-text-sub-600" />
+				</Button.Root>
+			</Dropdown.Trigger>
+			<Dropdown.Content
+				align="end"
+				sideOffset={6}
+				className="w-48 gap-0 rounded-xl p-1.5"
+			>
+				{isFailed && (
+					<Dropdown.Item disabled={isResending} onSelect={onResend}>
+						<Icon name="send-2" className="h-4 w-4 text-text-sub-600" />
+						{isResending ? "Resending…" : "Resend email"}
+					</Dropdown.Item>
+				)}
+				<Dropdown.Item disabled={isSavingTemplate} onSelect={onSaveAsTemplate}>
+					<Icon name="layout" className="h-4 w-4 text-text-sub-600" />
+					{isSavingTemplate ? "Creating template…" : "Save as template"}
+				</Dropdown.Item>
+			</Dropdown.Content>
+		</Dropdown.Root>
 	);
 }
 
