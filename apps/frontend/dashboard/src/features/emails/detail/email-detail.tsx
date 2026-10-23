@@ -628,7 +628,7 @@ export const EmailDetail = ({
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							From
 						</span>
-						<span className="font-medium text-paragraph-sm text-text-strong-950">
+						<span className="min-w-0 break-words font-medium text-paragraph-sm text-text-strong-950">
 							{isLoading ? (
 								<Skeleton className="h-4 w-64 rounded-md" />
 							) : email?.fromName ? (
@@ -642,7 +642,7 @@ export const EmailDetail = ({
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							To
 						</span>
-						<span className="font-medium text-paragraph-sm text-text-strong-950">
+						<span className="min-w-0 break-words font-medium text-paragraph-sm text-text-strong-950">
 							{isLoading ? (
 								<Skeleton className="h-4 w-48 rounded-md" />
 							) : (
@@ -665,7 +665,7 @@ export const EmailDetail = ({
 							<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 								Cc
 							</span>
-							<span className="font-medium text-paragraph-sm text-text-strong-950">
+							<span className="min-w-0 break-words font-medium text-paragraph-sm text-text-strong-950">
 								{email.ccEmails.map((ccEmail, idx) => (
 									<span key={ccEmail}>
 										{idx > 0 && ", "}
@@ -684,7 +684,7 @@ export const EmailDetail = ({
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							Subject
 						</span>
-						<span className="font-medium text-paragraph-sm text-text-strong-950">
+						<span className="min-w-0 break-words font-medium text-paragraph-sm text-text-strong-950">
 							{isLoading ? (
 								<Skeleton className="h-4 w-80 rounded-md" />
 							) : (
@@ -696,7 +696,7 @@ export const EmailDetail = ({
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							Date
 						</span>
-						<span className="font-medium text-paragraph-sm text-text-strong-950">
+						<span className="min-w-0 break-words font-medium text-paragraph-sm text-text-strong-950">
 							{isLoading ? (
 								<Skeleton className="h-4 w-40 rounded-md" />
 							) : (
@@ -719,7 +719,7 @@ export const EmailDetail = ({
 						<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 							Via
 						</span>
-						<span className="font-medium text-paragraph-sm text-text-strong-950">
+						<span className="min-w-0 break-words font-medium text-paragraph-sm text-text-strong-950">
 							{isLoading ? (
 								<Skeleton className="h-4 w-28 rounded-md" />
 							) : (
@@ -790,7 +790,10 @@ export const EmailDetail = ({
 			{/* Content Preview Tabs */}
 			<section>
 				<TabMenu.Root value={activeTab} onValueChange={setActiveTab}>
-					<TabMenu.List className="relative mb-6 h-11 gap-0 border-b! py-0 dark:border-stroke-soft-100">
+					<TabMenu.List
+						wrapperClassName="mb-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+						className="relative h-11 w-max min-w-full gap-0 border-b! py-0 dark:border-stroke-soft-100"
+					>
 						{tabItems.map((item, index) => (
 							<TabMenu.Trigger
 								key={item.value}
@@ -801,7 +804,7 @@ export const EmailDetail = ({
 								onPointerEnter={() => setHoveredIdx(index)}
 								onPointerLeave={() => setHoveredIdx(undefined)}
 								className={cn(
-									"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
+									"flex shrink-0 cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
 									hoveredIdx === undefined &&
 										activeIndex === index &&
 										"text-text-strong-950",
@@ -964,7 +967,7 @@ function SentViaRow({ providerId }: { providerId: string }) {
 			<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 				Sent via
 			</span>
-			<span className="font-medium text-paragraph-sm text-text-strong-950">
+			<span className="min-w-0 break-words font-medium text-paragraph-sm text-text-strong-950">
 				{name ? `Your SMTP (${name})` : "Your SMTP server"}
 			</span>
 		</div>

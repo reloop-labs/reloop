@@ -128,99 +128,133 @@ export function EmailTimeline({
 		];
 	}, [isFailed, onDeliveredClick]);
 
+	const rows = steps.map((step) => {
+		const event = allEvents.find((e) => e.type === step.stepType);
+		return {
+			...step,
+			isCompleted: !!event,
+			formattedTime: formatTimelineDate(event?.createdAt),
+		};
+	});
+
 	return (
-		<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 px-8 pt-6 pb-5 transition-all hover:border-stroke-soft-200 dark:bg-bg-white-0/5">
+		<div className="relative flex w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-all hover:border-stroke-soft-200 sm:h-[176px] sm:px-8 sm:pt-6 sm:pb-5 dark:bg-bg-white-0/5">
+			{/* Mobile: vertical list — icon, label, timestamp per row */}
+			<ol className="flex w-full flex-col sm:hidden">
+				{rows.map((row, index) => {
+					const rowBody = (
+						<>
+							<div
+								className={cn(
+									"flex size-9 shrink-0 items-center justify-center rounded-[10px] border transition-all duration-300",
+									getIconStyles(
+										row.stepType,
+										row.isCompleted,
+										row.isInteractive,
+									),
+								)}
+							>
+								<Icon name={row.icon} className="size-[18px]" />
+							</div>
+							<span
+								className={cn(
+									"flex min-w-0 flex-1 items-center gap-1 font-medium text-paragraph-sm",
+									row.isCompleted
+										? "text-text-strong-950"
+										: "text-text-soft-400",
+								)}
+							>
+								{row.label}
+								{row.isInteractive && (
+									<Icon
+										name="chevron-right"
+										className="size-4 text-text-soft-400"
+									/>
+								)}
+							</span>
+							{isLoading ? (
+								<Skeleton className="h-3 w-20 rounded-md" />
+							) : (
+								<span className="whitespace-nowrap font-medium text-paragraph-xs text-text-soft-400">
+									{row.isCompleted && row.formattedTime
+										? row.formattedTime
+										: "—"}
+								</span>
+							)}
+						</>
+					);
+
+					return (
+						<li key={row.id}>
+							{row.isInteractive && row.onClick ? (
+								<button
+									type="button"
+									onClick={row.onClick}
+									className="group flex w-full items-center gap-3 rounded-xl text-left outline-none focus-visible:ring-2 focus-visible:ring-success-base/40"
+									aria-label={`View ${row.label} details`}
+								>
+									{rowBody}
+								</button>
+							) : (
+								<div className="group flex w-full items-center gap-3">
+									{rowBody}
+								</div>
+							)}
+							{index < rows.length - 1 && (
+								<div
+									className="ml-[17px] h-3 border-stroke-soft-100 border-l-[1.5px] border-dashed dark:border-neutral-800"
+									aria-hidden="true"
+								/>
+							)}
+						</li>
+					);
+				})}
+			</ol>
+
+			{/* Desktop: horizontal flow */}
 			<div
 				className={cn(
-					"flex items-start",
+					"hidden items-start sm:flex",
 					isFailed
 						? "w-64 justify-between"
 						: "w-full max-w-2xl justify-between",
 				)}
 			>
-				{steps.map((step, index) => {
-					const event = allEvents.find((e) => e.type === step.stepType);
-					const isCompleted = !!event;
-					const timestamp = event?.createdAt;
-					const formattedTime = formatTimelineDate(timestamp);
-
-					const getIconStyles = () => {
-						if (!isCompleted) {
-							return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400";
-						}
-						switch (step.stepType) {
-							case "sent":
-								return "border-information-base/20 bg-information-lighter/50 text-information-base";
-							case "failed":
-							case "bounced":
-							case "complaint":
-								return "border-error-light bg-error-lighter text-error-base";
-							case "delivered":
-								return cn(
-									"border-success-base/20 bg-success-lighter/50 text-success-base",
-									step.isInteractive &&
-										"group-hover:border-success-base/40 group-hover:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]",
-								);
-							case "opened":
-								return "border-orange-500/20 bg-orange-50/50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400";
-							case "clicked":
-								return "border-purple-500/20 bg-purple-50/50 text-purple-600 dark:bg-purple-950/30 dark:text-purple-400";
-							default:
-								return "border-information-base/20 bg-information-lighter/50 text-information-base";
-						}
-					};
-
-					const getBadgeStyles = () => {
-						if (!isCompleted) {
-							return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900 dark:text-neutral-400";
-						}
-						switch (step.stepType) {
-							case "sent":
-								return "bg-information-lighter text-information-base";
-							case "failed":
-							case "bounced":
-							case "complaint":
-								return "bg-error-lighter text-error-base";
-							case "delivered":
-								return cn(
-									"bg-success-lighter text-success-base",
-									step.isInteractive && "group-hover:underline",
-								);
-							case "opened":
-								return "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400";
-							case "clicked":
-								return "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400";
-							default:
-								return "bg-information-lighter text-information-base";
-						}
-					};
-
+				{rows.map((row, index) => {
 					const nodeBody = (
 						<div className="flex flex-col items-center gap-2">
 							<div
 								className={cn(
 									"flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border transition-all duration-300",
-									getIconStyles(),
+									getIconStyles(
+										row.stepType,
+										row.isCompleted,
+										row.isInteractive,
+									),
 								)}
 							>
-								<Icon name={step.icon} className="h-5 w-5" />
+								<Icon name={row.icon} className="h-5 w-5" />
 							</div>
 
 							<div className="flex flex-col items-center gap-1 text-center">
 								<span
 									className={cn(
 										"rounded-md px-2 py-1 font-semibold text-xs transition-colors duration-300",
-										getBadgeStyles(),
+										getBadgeStyles(
+											row.stepType,
+											row.isCompleted,
+											row.isInteractive,
+										),
 									)}
 								>
-									{step.label}
+									{row.label}
 								</span>
 								<div className="flex h-4 items-center justify-center">
 									{isLoading ? (
 										<Skeleton className="h-3 w-16 rounded-md" />
-									) : isCompleted && formattedTime ? (
+									) : row.isCompleted && row.formattedTime ? (
 										<span className="whitespace-nowrap font-medium text-text-soft-400 text-xs">
-											{formattedTime}
+											{row.formattedTime}
 										</span>
 									) : (
 										<span className="h-4 w-16 opacity-0" aria-hidden="true" />
@@ -231,14 +265,14 @@ export function EmailTimeline({
 					);
 
 					return (
-						<Fragment key={step.id}>
+						<Fragment key={row.id}>
 							<div className="flex min-w-[90px] flex-col items-center">
-								{step.isInteractive && step.onClick ? (
+								{row.isInteractive && row.onClick ? (
 									<button
 										type="button"
-										onClick={step.onClick}
+										onClick={row.onClick}
 										className="group flex flex-col items-center rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-success-base/40"
-										aria-label={`View ${step.label} details`}
+										aria-label={`View ${row.label} details`}
 									>
 										{nodeBody}
 									</button>
@@ -248,7 +282,7 @@ export function EmailTimeline({
 									</div>
 								)}
 							</div>
-							{index < steps.length - 1 && (
+							{index < rows.length - 1 && (
 								<div className="mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
 							)}
 						</Fragment>
@@ -257,4 +291,63 @@ export function EmailTimeline({
 			</div>
 		</div>
 	);
+}
+
+function getIconStyles(
+	stepType: string,
+	isCompleted: boolean,
+	isInteractive?: boolean,
+) {
+	if (!isCompleted) {
+		return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400";
+	}
+	switch (stepType) {
+		case "sent":
+			return "border-information-base/20 bg-information-lighter/50 text-information-base";
+		case "failed":
+		case "bounced":
+		case "complaint":
+			return "border-error-light bg-error-lighter text-error-base";
+		case "delivered":
+			return cn(
+				"border-success-base/20 bg-success-lighter/50 text-success-base",
+				isInteractive &&
+					"group-hover:border-success-base/40 group-hover:shadow-[0_0_0_3px_rgba(34,197,94,0.12)]",
+			);
+		case "opened":
+			return "border-orange-500/20 bg-orange-50/50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400";
+		case "clicked":
+			return "border-purple-500/20 bg-purple-50/50 text-purple-600 dark:bg-purple-950/30 dark:text-purple-400";
+		default:
+			return "border-information-base/20 bg-information-lighter/50 text-information-base";
+	}
+}
+
+function getBadgeStyles(
+	stepType: string,
+	isCompleted: boolean,
+	isInteractive?: boolean,
+) {
+	if (!isCompleted) {
+		return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900 dark:text-neutral-400";
+	}
+	switch (stepType) {
+		case "sent":
+			return "bg-information-lighter text-information-base";
+		case "failed":
+		case "bounced":
+		case "complaint":
+			return "bg-error-lighter text-error-base";
+		case "delivered":
+			return cn(
+				"bg-success-lighter text-success-base",
+				isInteractive && "group-hover:underline",
+			);
+		case "opened":
+			return "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400";
+		case "clicked":
+			return "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400";
+		default:
+			return "bg-information-lighter text-information-base";
+	}
 }

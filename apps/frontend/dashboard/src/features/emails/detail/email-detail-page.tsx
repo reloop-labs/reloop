@@ -90,34 +90,40 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 				<AnimatedBackButton fallbackHref="/" />
 			</div>
 			{/* Avatar + recipient + status + actions row (mirrors contact header) */}
-			<div className="mb-8 flex h-10 items-center gap-4">
-				{isLoading ? (
-					<Skeleton className="size-10 shrink-0 rounded-full" />
-				) : (
-					<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-base text-white uppercase tracking-wide shadow-sm">
-						{(primaryRecipient.charAt(0) || "?").toUpperCase()}
-					</div>
-				)}
-
-				<div className="min-w-0 flex-1">
+			<div className="mb-8 flex flex-col gap-4 sm:h-10 sm:flex-row sm:items-center">
+				<div className="flex min-w-0 flex-1 items-center gap-4">
 					{isLoading ? (
-						<div className="flex items-center gap-2.5">
-							<Skeleton className="h-7 w-64 rounded-lg" />
-							<Skeleton className="h-6 w-20 rounded-md" />
-						</div>
+						<Skeleton className="size-10 shrink-0 rounded-full" />
 					) : (
-						<div className="flex min-w-0 items-center gap-2.5">
-							<h1 className="min-w-0 truncate pb-0.5 font-medium text-[22px] text-text-strong-950 leading-none tracking-tight">
-								{primaryRecipient}
-								{extraRecipients > 0 && (
-									<span className="ml-1.5 font-normal text-text-sub-600">
-										+{extraRecipients}
-									</span>
-								)}
-							</h1>
-							{data?.status && <EmailStatusBadge status={data.status} />}
+						<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-base text-white uppercase tracking-wide shadow-sm">
+							{(primaryRecipient.charAt(0) || "?").toUpperCase()}
 						</div>
 					)}
+
+					<div className="min-w-0 flex-1">
+						{isLoading ? (
+							<div className="flex items-center gap-3 sm:gap-2.5">
+								<Skeleton className="h-7 w-64 min-w-0 rounded-lg" />
+								<Skeleton className="h-6 w-20 shrink-0 rounded-md max-sm:ml-auto" />
+							</div>
+						) : (
+							<div className="flex min-w-0 items-center gap-3 sm:gap-2.5">
+								<h1 className="min-w-0 truncate pb-0.5 font-medium text-[22px] text-text-strong-950 leading-none tracking-tight">
+									{primaryRecipient}
+									{extraRecipients > 0 && (
+										<span className="ml-1.5 font-normal text-text-sub-600">
+											+{extraRecipients}
+										</span>
+									)}
+								</h1>
+								{data?.status && (
+									<span className="shrink-0 max-sm:ml-auto">
+										<EmailStatusBadge status={data.status} />
+									</span>
+								)}
+							</div>
+						)}
+					</div>
 				</div>
 
 				<div className="flex shrink-0 items-center gap-2">
