@@ -791,8 +791,8 @@ export const EmailDetail = ({
 			<section>
 				<TabMenu.Root value={activeTab} onValueChange={setActiveTab}>
 					<TabMenu.List
-						wrapperClassName="mb-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-						className="relative h-11 w-max min-w-full gap-0 border-b! py-0 dark:border-stroke-soft-100"
+						wrapperClassName="mb-6 max-sm:-mx-4 sm:max-md:-mx-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+						className="relative h-11 w-max min-w-full gap-0 border-b! py-0 max-md:px-3 dark:border-stroke-soft-100"
 					>
 						{tabItems.map((item, index) => (
 							<TabMenu.Trigger

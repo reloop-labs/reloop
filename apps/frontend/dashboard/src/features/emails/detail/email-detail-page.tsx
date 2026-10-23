@@ -70,7 +70,7 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 
 	if (error && !data) {
 		return (
-			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-6xl flex-col items-center justify-center p-6 lg:p-8">
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-6xl flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
 				<EmailNotFound />
 			</div>
 		);
@@ -78,15 +78,15 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 
 	if (!data && !isLoading) {
 		return (
-			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-6xl flex-col items-center justify-center p-6 lg:p-8">
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-6xl flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
 				<EmailNotFound />
 			</div>
 		);
 	}
 
 	return (
-		<div className="mx-auto max-w-6xl p-6 lg:p-8">
-			<div className="pb-8">
+		<div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
+			<div className="pb-8 max-md:hidden">
 				<AnimatedBackButton fallbackHref="/" />
 			</div>
 			{/* Avatar + recipient + status + actions row (mirrors contact header) */}

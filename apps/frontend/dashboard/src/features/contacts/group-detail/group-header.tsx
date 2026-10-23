@@ -85,7 +85,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	if (!group && !isLoading) {
 		return (
 			<div>
-				<div className="flex items-center justify-between pt-10 pb-8">
+				<div className="flex items-center justify-between pt-10 pb-8 max-md:hidden">
 					<AnimatedBackButton fallbackHref="/contacts/groups" />
 				</div>
 				<div className="flex items-center justify-between">
@@ -113,7 +113,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 
 	return (
 		<>
-			<div className="flex items-center justify-between pt-10 pb-8">
+			<div className="flex items-center justify-between pt-10 pb-8 max-md:hidden">
 				<AnimatedBackButton fallbackHref="/contacts/groups" />
 			</div>
 			<div className="pb-2">

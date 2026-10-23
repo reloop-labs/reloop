@@ -154,8 +154,10 @@ function CampaignDetailContent() {
 
 	if (campaignQuery.isError) {
 		return (
-			<div className="mx-auto max-w-5xl px-6 pt-10 pb-12 sm:px-8">
-				<AnimatedBackButton fallbackHref="/campaigns" />
+			<div className="mx-auto max-w-5xl px-4 pt-4 pb-12 sm:px-8 md:pt-10">
+				<div className="max-md:hidden">
+					<AnimatedBackButton fallbackHref="/campaigns" />
+				</div>
 				<div className="py-12 text-center">
 					<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
 						Failed to load campaign
@@ -179,7 +181,7 @@ function CampaignDetailContent() {
 
 	if (isLoading) {
 		return (
-			<div className="mx-auto max-w-5xl space-y-8 px-6 pt-10 pb-12 sm:px-8">
+			<div className="mx-auto max-w-5xl space-y-8 px-4 pt-4 pb-12 sm:px-8 md:pt-10">
 				<CampaignHeader campaign={undefined} isLoading={true} />
 				<div className="space-y-4">
 					<div className="h-32 animate-pulse rounded-xl bg-bg-weak-50" />
@@ -191,8 +193,10 @@ function CampaignDetailContent() {
 
 	if (!campaign) {
 		return (
-			<div className="mx-auto max-w-5xl px-6 pt-10 pb-12 sm:px-8">
-				<AnimatedBackButton fallbackHref="/campaigns" />
+			<div className="mx-auto max-w-5xl px-4 pt-4 pb-12 sm:px-8 md:pt-10">
+				<div className="max-md:hidden">
+					<AnimatedBackButton fallbackHref="/campaigns" />
+				</div>
 				<div className="py-12 text-center">
 					<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
 						Campaign not found
@@ -208,7 +212,7 @@ function CampaignDetailContent() {
 
 	return (
 		<>
-			<div className="mx-auto max-w-5xl space-y-8 px-6 pt-10 pb-12 sm:px-8">
+			<div className="mx-auto max-w-5xl space-y-8 px-4 pt-4 pb-12 sm:px-8 md:pt-10">
 				<CampaignHeader
 					campaign={campaign}
 					isLoading={campaignQuery.isLoading}

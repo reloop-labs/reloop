@@ -57,7 +57,7 @@ export function LogsPage() {
 	);
 
 	return (
-		<div className="mx-auto max-w-6xl space-y-5 p-6 lg:p-8">
+		<div className="mx-auto max-w-6xl space-y-5 p-4 sm:p-6 lg:p-8">
 			<LogsListHeader />
 			<LogList />
 		</div>

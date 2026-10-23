@@ -33,7 +33,7 @@ export function DomainHeader({
 
 	return (
 		<div>
-			<div className="pb-6">
+			<div className="pb-6 max-md:hidden">
 				<AnimatedBackButton fallbackHref="/domain" />
 			</div>
 			<div className="flex items-center justify-between">

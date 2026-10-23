@@ -106,7 +106,7 @@ export function SmtpPage({
 	useRegisterCommandActions("smtp", "SMTP", actions);
 
 	return (
-		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+		<div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
 			<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">

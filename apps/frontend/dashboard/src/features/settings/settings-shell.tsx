@@ -18,7 +18,7 @@ export function SettingsShell({ children }: { children: ReactNode }) {
 	}
 
 	return (
-		<div className="mx-auto max-w-3xl p-6 lg:p-8">
+		<div className="mx-auto max-w-3xl p-4 sm:p-6 lg:p-8">
 			<div className="w-full flex-1 pb-10">{children}</div>
 		</div>
 	);

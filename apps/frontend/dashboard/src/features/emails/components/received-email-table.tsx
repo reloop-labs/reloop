@@ -793,7 +793,7 @@ export const ReceivedEmailTable = ({
 		<>
 			{/* Phones scroll the table sideways instead of crushing the columns;
 			    the scroller bleeds past the shell's p-6 so rows scroll to the screen edge */}
-			<div className="@container w-full overflow-x-auto text-paragraph-sm max-md:-mx-6 max-md:w-auto">
+			<div className="@container w-full overflow-x-auto text-paragraph-sm max-sm:-mx-4 sm:max-md:-mx-6 max-md:w-auto">
 				{/* The 24px inset lives inside the scroller: at rest the table lines up
 				    with the filters, and the right inset appears once scrolled to the end */}
 				<div className="min-w-[748px] max-md:px-6 md:min-w-0">

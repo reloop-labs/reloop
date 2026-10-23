@@ -178,7 +178,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 
 	return (
 		<>
-			<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+			<div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
 				{!isDetailPage && (
 					<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
 						<div>

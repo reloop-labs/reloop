@@ -70,7 +70,7 @@ export function CampaignHeader({
 	if (!campaign && !isLoading) {
 		return (
 			<div>
-				<div className="pb-8">
+				<div className="pb-8 max-md:hidden">
 					<AnimatedBackButton fallbackHref="/campaigns" />
 				</div>
 				<div className="flex items-center justify-between">
@@ -92,7 +92,7 @@ export function CampaignHeader({
 
 	return (
 		<div>
-			<div className="pb-8">
+			<div className="pb-8 max-md:hidden">
 				<AnimatedBackButton fallbackHref="/campaigns" />
 			</div>
 			<div className="flex items-center justify-between">

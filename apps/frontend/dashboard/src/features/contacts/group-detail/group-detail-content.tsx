@@ -16,8 +16,8 @@ export function GroupDetailContent({ groupId }: { groupId: string }) {
 
 	if (groupError && !groupData) {
 		return (
-			<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
-				<div className="flex items-center justify-between pt-10 pb-8">
+			<div className="mx-auto max-w-5xl px-4 pt-4 pb-6 sm:px-6 md:pt-0 lg:px-8 lg:pb-8">
+				<div className="flex items-center justify-between pt-10 pb-8 max-md:hidden">
 					<AnimatedBackButton fallbackHref="/contacts/groups" />
 				</div>
 				<div className="py-12 text-center">
@@ -29,8 +29,8 @@ export function GroupDetailContent({ groupId }: { groupId: string }) {
 
 	if (!groupData && !isLoading) {
 		return (
-			<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
-				<div className="flex items-center justify-between pt-10 pb-8">
+			<div className="mx-auto max-w-5xl px-4 pt-4 pb-6 sm:px-6 md:pt-0 lg:px-8 lg:pb-8">
+				<div className="flex items-center justify-between pt-10 pb-8 max-md:hidden">
 					<AnimatedBackButton fallbackHref="/contacts/groups" />
 				</div>
 				<div className="py-12 text-center">
@@ -47,7 +47,7 @@ export function GroupDetailContent({ groupId }: { groupId: string }) {
 	}
 
 	return (
-		<div className="mx-auto max-w-5xl px-6 pb-6 lg:px-8 lg:pb-8">
+		<div className="mx-auto max-w-5xl px-4 pt-4 pb-6 sm:px-6 md:pt-0 lg:px-8 lg:pb-8">
 			<GroupHeader group={groupData} isLoading={isLoading} />
 			<GroupSummary group={groupData} isLoading={isLoading} />
 			<GroupContactList groupId={groupId} />

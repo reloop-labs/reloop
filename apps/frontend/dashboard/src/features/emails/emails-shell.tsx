@@ -11,7 +11,7 @@ import { useEmailsLive } from "./hooks/use-emails-live";
 export function EmailsShell({ children }: { children: React.ReactNode }) {
 	useEmailsLive();
 	return (
-		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+		<div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
 			<EmailsListHeader />
 			<div>
 				<EmailsTabs />
