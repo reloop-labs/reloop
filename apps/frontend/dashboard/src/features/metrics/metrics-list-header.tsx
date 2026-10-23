@@ -5,7 +5,7 @@ const DOCS_URL = "https://reloop.sh/docs/learn/metrics";
 
 export function MetricsListHeader() {
 	return (
-		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+		<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-2 pb-4 sm:flex-nowrap sm:items-start">
 			<div>
 				<div className="flex items-center gap-2.5">
 					<Icon
@@ -18,14 +18,14 @@ export function MetricsListHeader() {
 				</div>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2">
+			<div className="ml-auto flex shrink-0 items-center gap-2">
 				<Button.Root
 					type="button"
 					variant="neutral"
 					mode="stroke"
 					size="small"
 					onClick={() => window.open(DOCS_URL, "_blank")}
-					className="rounded-xl"
+					className="rounded-xl max-sm:hidden"
 				>
 					Documentation
 				</Button.Root>

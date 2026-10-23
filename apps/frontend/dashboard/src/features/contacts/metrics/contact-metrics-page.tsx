@@ -178,9 +178,6 @@ export function ContactMetricsPage() {
 						Audience metrics
 					</h1>
 				</div>
-				<p className="text-sm text-text-sub-600">
-					How your audience grows, when people leave, and which days stand out.
-				</p>
 			</div>
 
 			{/* Toolbar */}

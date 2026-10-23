@@ -49,11 +49,6 @@ export function AutomationShell({ children }: { children: ReactNode }) {
 				onCreate={handleCreate}
 				createLabel={isTriggersPage ? "Create trigger" : "Create automation"}
 				title={isTriggersPage ? "Triggers" : "Automation"}
-				description={
-					isTriggersPage
-						? "Custom triggers that start automations. Separate from webhooks."
-						: "Trigger emails from events: delays, conditions, and sends."
-				}
 				icon={isTriggersPage ? "zap" : "workflow"}
 			/>
 

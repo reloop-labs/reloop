@@ -54,9 +54,6 @@ export function TeamsPage() {
 				<h1 className="font-semibold text-text-strong-950 text-title-h5 dark:text-white">
 					Teams
 				</h1>
-				<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
-					Manage organization members, set access levels, and invite new users.
-				</p>
 			</div>
 
 			<div className="flex items-center gap-2">

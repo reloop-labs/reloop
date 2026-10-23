@@ -119,18 +119,6 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 						? "Bulk Import"
 						: "Contacts";
 
-	const subtitle = isPropertiesPage
-		? "Manage custom attributes and metadata for your contact audience."
-		: isChannelsPage
-			? "Configure communication channels for sending messages."
-			: isGroupsPage
-				? "Organize contacts into custom groups and segments for targeting."
-				: isSuppressionPage
-					? "Addresses Reloop won't send to, suppressed automatically or added by your team."
-					: isBulkImportPage
-						? "Bulk import contacts and custom attributes from a CSV file."
-						: "Manage contacts, audiences, and properties for targeted email campaigns.";
-
 	const headerIcon = isPropertiesPage
 		? "tag"
 		: isChannelsPage
@@ -187,7 +175,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		<>
 			<div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
 				{!isDetailPage && (
-					<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+					<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-2 pb-4 sm:flex-nowrap sm:items-start">
 						<div>
 							{isBulkImportPage && (
 								<Button.Root
@@ -195,7 +183,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									variant="neutral"
 									mode="stroke"
 									size="xxsmall"
-									className="mb-2 w-fit"
+									className="mb-2 w-fit max-sm:hidden"
 								>
 									<Button.Icon>
 										<Icon name="chevron-left" className="h-4 w-4" />
@@ -212,12 +200,11 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									{title}
 								</h1>
 							</div>
-							<p className="mt-1 text-sm text-text-sub-600">{subtitle}</p>
 						</div>
 
 						{!isBulkImportPage && (
 							// Developer actions hide on phones; nobody wires up the SDK from a phone
-							<div className="flex shrink-0 items-center gap-2">
+							<div className="ml-auto flex shrink-0 items-center gap-2">
 								<ApiDetailsComponent
 									renderTrigger={({ open }) => (
 										<Button.Root

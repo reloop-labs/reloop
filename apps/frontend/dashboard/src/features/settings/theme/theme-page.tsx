@@ -8,9 +8,6 @@ export function ThemePage() {
 					<h1 className="font-semibold text-text-strong-950 text-title-h5 dark:text-white">
 						Theme
 					</h1>
-					<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
-						Select a base theme for your interface.
-					</p>
 				</div>
 				<ThemeToggleAppearance />
 			</div>

@@ -154,11 +154,6 @@ export function ConnectedAppsPage() {
 				<h1 className="font-semibold text-text-strong-950 text-title-h5 dark:text-white">
 					Connected Apps
 				</h1>
-				<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
-					{isOrgAdmin
-						? "Apps, AI assistants, and CLIs that members have allowed to access this organization."
-						: "Apps, AI assistants, and CLIs you've allowed to access this organization."}
-				</p>
 			</div>
 
 			<div className="divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:divide-[#101010] dark:border-stroke-soft-100/40">

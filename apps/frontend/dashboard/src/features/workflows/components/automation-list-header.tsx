@@ -4,7 +4,10 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/workflows";
 
@@ -12,13 +15,11 @@ export function AutomationListHeader({
 	onCreate,
 	createLabel = "Create automation",
 	title = "Automation",
-	description = "Trigger emails from events: delays, conditions, and sends.",
 	icon = "workflow",
 }: {
 	onCreate: () => void;
 	createLabel?: string;
 	title?: string;
-	description?: string;
 	icon?: string;
 }) {
 	const openDocs = () => window.open(DOCS_URL, "_blank");
@@ -33,7 +34,7 @@ export function AutomationListHeader({
 	);
 
 	return (
-		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+		<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-2 pb-4 sm:flex-nowrap sm:items-start">
 			<div>
 				<div className="flex items-center gap-2.5">
 					<Icon name={icon} className="h-6 w-6 shrink-0 text-text-strong-950" />
@@ -41,17 +42,16 @@ export function AutomationListHeader({
 						{title}
 					</h1>
 				</div>
-				<p className="mt-1 text-sm text-text-sub-600">{description}</p>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2">
+			<div className="ml-auto flex shrink-0 items-center gap-2">
 				<Button.Root
 					type="button"
 					variant="neutral"
 					mode="stroke"
 					size="small"
 					onClick={openDocs}
-					className="gap-1.5 rounded-xl"
+					className="gap-1.5 rounded-xl max-sm:hidden"
 					aria-keyshortcuts="d"
 				>
 					Documentation
@@ -67,9 +67,7 @@ export function AutomationListHeader({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					{createLabel}
-					<ActionKbd className={actionKbdOnSolidClassName}>
-						C
-					</ActionKbd>
+					<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 				</FancyButton.Root>
 			</div>
 		</div>

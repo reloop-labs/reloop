@@ -1,12 +1,15 @@
-import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 
 import { useHotkeys } from "react-hotkeys-hook";
 import { WebhooksApiDetails } from "#/components/api-details/webhooks";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/webhooks";
 
@@ -42,7 +45,7 @@ export function WebhooksListHeader() {
 	// S is handled by WebhooksApiDetails trigger (opens SDK samples).
 
 	return (
-		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+		<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-2 pb-4 sm:flex-nowrap sm:items-start">
 			<div>
 				<div className="flex items-center gap-2.5">
 					<Icon
@@ -53,12 +56,9 @@ export function WebhooksListHeader() {
 						Webhooks
 					</h1>
 				</div>
-				<p className="mt-1 text-sm text-text-sub-600">
-					Manage endpoints, delivery logs, and signed event payloads.
-				</p>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2">
+			<div className="ml-auto flex shrink-0 items-center gap-2">
 				<WebhooksApiDetails
 					renderTrigger={({ open }: { open: () => void }) => (
 						<Button.Root
@@ -67,7 +67,7 @@ export function WebhooksListHeader() {
 							mode="stroke"
 							size="small"
 							onClick={open}
-							className="gap-1.5 rounded-xl"
+							className="gap-1.5 rounded-xl max-sm:hidden"
 							aria-keyshortcuts="s"
 						>
 							SDK samples
@@ -81,7 +81,7 @@ export function WebhooksListHeader() {
 					mode="stroke"
 					size="small"
 					onClick={openDocs}
-					className="gap-1.5 rounded-xl"
+					className="gap-1.5 rounded-xl max-sm:hidden"
 					aria-keyshortcuts="d"
 				>
 					Documentation
@@ -97,7 +97,9 @@ export function WebhooksListHeader() {
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create webhook
-					<ActionKbd className={cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1")}>
+					<ActionKbd
+						className={cn(actionKbdOnSolidClassName, "w-auto min-w-4 px-1")}
+					>
 						C
 					</ActionKbd>
 				</FancyButton.Root>

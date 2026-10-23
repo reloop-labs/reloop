@@ -288,11 +288,6 @@ export function DedicatedIpPage() {
 				<h1 className="font-semibold text-text-strong-950 text-title-h5">
 					Dedicated IP
 				</h1>
-				<p className="mt-1 text-paragraph-sm text-text-sub-600">
-					{entitled
-						? "Sending addresses reserved for this organization, with warmup by mailbox provider."
-						: "Dedicated IPs isolate your traffic and warm up per provider: Gmail, Microsoft, Yahoo, and Apple."}
-				</p>
 			</div>
 
 			{sendingIps.error ? (

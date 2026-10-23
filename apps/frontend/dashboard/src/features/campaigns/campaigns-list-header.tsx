@@ -5,7 +5,10 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/emails";
 
@@ -33,7 +36,7 @@ export function CampaignsListHeader() {
 	);
 
 	return (
-		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+		<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-2 pb-4 sm:flex-nowrap sm:items-start">
 			<div className="flex items-center gap-2.5">
 				<Icon
 					name="mega-phone"
@@ -44,14 +47,14 @@ export function CampaignsListHeader() {
 				</h1>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2">
+			<div className="ml-auto flex shrink-0 items-center gap-2">
 				<Button.Root
 					type="button"
 					variant="neutral"
 					mode="stroke"
 					size="small"
 					onClick={openDocs}
-					className="gap-1.5 rounded-xl"
+					className="gap-1.5 rounded-xl max-sm:hidden"
 					aria-keyshortcuts="d"
 				>
 					Documentation
@@ -67,9 +70,7 @@ export function CampaignsListHeader() {
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create campaign
-					<ActionKbd className={actionKbdOnSolidClassName}>
-						C
-					</ActionKbd>
+					<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 				</FancyButton.Root>
 			</div>
 		</div>

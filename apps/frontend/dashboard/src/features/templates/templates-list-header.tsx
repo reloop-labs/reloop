@@ -35,7 +35,7 @@ export function TemplatesListHeader() {
 	);
 
 	return (
-		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+		<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-2 pb-4 sm:flex-nowrap sm:items-start">
 			<div>
 				<div className="flex items-center gap-2.5">
 					<Icon
@@ -46,19 +46,16 @@ export function TemplatesListHeader() {
 						Templates
 					</h1>
 				</div>
-				<p className="mt-1 text-sm text-text-sub-600">
-					Design and manage reusable email templates for your product.
-				</p>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2">
+			<div className="ml-auto flex shrink-0 items-center gap-2">
 				<Button.Root
 					type="button"
 					variant="neutral"
 					mode="stroke"
 					size="small"
 					onClick={openDocs}
-					className="gap-1.5 rounded-xl"
+					className="gap-1.5 rounded-xl max-sm:hidden"
 					aria-keyshortcuts="d"
 				>
 					Documentation

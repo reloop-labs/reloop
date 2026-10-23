@@ -107,17 +107,14 @@ export function SmtpPage({
 
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
-			<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+			<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-2 pb-4 sm:flex-nowrap sm:items-start">
 				<div>
 					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						SMTP
 					</h1>
-					<p className="mt-1 text-sm text-text-sub-600">
-						Send with Reloop's SMTP relay, or connect your own server.
-					</p>
 				</div>
 
-				<div className="flex shrink-0 items-center gap-2">
+				<div className="ml-auto flex shrink-0 items-center gap-2">
 					<SmtpCodeDrawer
 						smtpHost={smtpHost}
 						renderTrigger={({ open }) => (
@@ -127,7 +124,7 @@ export function SmtpPage({
 								mode="stroke"
 								size="small"
 								onClick={open}
-								className="gap-1.5 rounded-xl"
+								className="gap-1.5 rounded-xl max-sm:hidden"
 								aria-keyshortcuts="s"
 							>
 								<Icon name="code" className="h-4 w-4 text-text-sub-600" />
@@ -142,7 +139,7 @@ export function SmtpPage({
 						mode="stroke"
 						size="small"
 						onClick={openDocs}
-						className="gap-1.5 rounded-xl"
+						className="gap-1.5 rounded-xl max-sm:hidden"
 						aria-keyshortcuts="d"
 					>
 						Documentation

@@ -27,7 +27,7 @@ export function EmailsListHeader() {
 	);
 
 	return (
-		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+		<div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-2 pb-4 sm:flex-nowrap sm:items-start">
 			<div className="flex items-center gap-2.5">
 				<Icon
 					name={iconName}

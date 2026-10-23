@@ -318,9 +318,6 @@ export function ShortcutsPage() {
 				<h1 className="font-semibold text-text-strong-950 text-title-h5 dark:text-white">
 					Keyboard Shortcuts
 				</h1>
-				<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
-					Hotkeys and sequences to navigate Reloop without leaving the keyboard.
-				</p>
 			</div>
 
 			{/* Tip */}
