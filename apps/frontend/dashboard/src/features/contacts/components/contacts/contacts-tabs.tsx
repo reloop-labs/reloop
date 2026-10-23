@@ -115,7 +115,11 @@ export function ContactsTabs() {
 
 	return (
 		<TabMenuHorizontal.Root value={effectiveTabValue}>
-			<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
+			{/* Phones: the tab strip bleeds to the screen edges and scrolls sideways */}
+			<TabMenuHorizontal.List
+				wrapperClassName="max-sm:-mx-4 sm:max-md:-mx-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+				className="relative h-11 w-max min-w-full gap-0 border-b! py-0 max-md:px-3"
+			>
 				{items.map(({ value, title, iconName, path, shortcut }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {
@@ -124,7 +128,7 @@ export function ContactsTabs() {
 						onPointerEnter={() => setHoveredIdx(index)}
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
-							"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
+							"flex shrink-0 cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
 							hoveredIdx === undefined &&
 								activeIndex === index &&
 								"text-text-strong-950",

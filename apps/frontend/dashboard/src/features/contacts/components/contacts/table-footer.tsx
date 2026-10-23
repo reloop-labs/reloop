@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
 import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
@@ -8,6 +9,7 @@ export function ContactTableFooter({
 	pageRowCount = 0,
 	isLoading,
 	showSelection = true,
+	className,
 }: {
 	total: number;
 	selectedCount?: number;
@@ -15,6 +17,7 @@ export function ContactTableFooter({
 	isLoading?: boolean;
 	/** Hide the "x of y selected" label on tables without row selection. */
 	showSelection?: boolean;
+	className?: string;
 }) {
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -30,10 +33,15 @@ export function ContactTableFooter({
 	if (total <= 0) return null;
 
 	return (
-		<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
-			<div className="flex items-center gap-3">
+		<div
+			className={cn(
+				"flex items-center justify-between gap-3 px-4 py-2 text-label-xs text-text-sub-600",
+				className,
+			)}
+		>
+			<div className="flex min-w-0 items-center gap-3">
 				{showSelection && (
-					<span>
+					<span className="hidden truncate sm:inline">
 						{selectedCount} of {pageRowCount} row(s) selected.
 					</span>
 				)}

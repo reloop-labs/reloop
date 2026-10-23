@@ -792,11 +792,11 @@ export const ReceivedEmailTable = ({
 	return (
 		<>
 			{/* Phones scroll the table sideways instead of crushing the columns;
-			    the scroller bleeds past the shell's p-6 so rows scroll to the screen edge */}
+			    the scroller bleeds past the shell padding so rows scroll to the screen edge */}
 			<div className="@container w-full overflow-x-auto text-paragraph-sm max-sm:-mx-4 sm:max-md:-mx-6 max-md:w-auto">
-				{/* The 24px inset lives inside the scroller: at rest the table lines up
+				{/* The page inset (16px phones, 24px tablets) lives inside the scroller: at rest the table lines up
 				    with the filters, and the right inset appears once scrolled to the end */}
-				<div className="min-w-[748px] max-md:px-6 md:min-w-0">
+				<div className="min-w-[748px] max-sm:px-4 sm:max-md:px-6 md:min-w-0">
 					{/* Table Header */}
 					<div
 						style={receivedGridStyle}
@@ -879,8 +879,8 @@ export const ReceivedEmailTable = ({
 							selectedCount={selectedCount}
 							pageRowCount={rows.length}
 							isLoading={isLoading}
-							// Pin pagination inside the visible card (24px inset + 1px border per side) while rows scroll
-							className="max-md:sticky max-md:left-[25px] max-md:w-[calc(100cqw-50px)]"
+							// Pin pagination inside the visible card (page inset + 1px border per side) while rows scroll
+							className="max-md:sticky max-sm:left-[17px] max-sm:w-[calc(100cqw-34px)] sm:max-md:left-[25px] sm:max-md:w-[calc(100cqw-50px)]"
 						/>
 					</div>
 				</div>

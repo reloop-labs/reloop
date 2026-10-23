@@ -47,7 +47,7 @@ function StatItem({
 }) {
 	return (
 		<div className="min-w-0">
-			<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
+			<p className="truncate font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
 				{label}
 			</p>
 			{isLoading ? (
@@ -217,16 +217,7 @@ export function ContactList() {
 			<div className="mb-4 grid items-stretch gap-4 lg:grid-cols-2">
 				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 					<div className="flex h-full flex-col justify-between gap-3 p-4">
-						<div>
-							<p className="font-medium text-sm text-text-strong-950">
-								Audience
-							</p>
-							<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
-								{channelFilter
-									? `Contacts enrolled in ${channelName ?? "this channel"}.`
-									: "Contact volume and subscription status across your organization."}
-							</p>
-						</div>
+						<p className="font-medium text-sm text-text-strong-950">Audience</p>
 						<div className="grid grid-cols-3 gap-4">
 							<StatItem
 								label="Total"
@@ -249,7 +240,7 @@ export function ContactList() {
 
 				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 					<div className="flex h-full flex-col justify-between gap-2 p-4">
-						<div className="flex items-center justify-between gap-3">
+						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
 							<p className="shrink-0 font-medium text-sm text-text-strong-950">
 								Last 7 days
 							</p>

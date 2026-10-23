@@ -209,6 +209,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 						</div>
 
 						{!isBulkImportPage && (
+							// Developer actions hide on phones; nobody wires up the SDK from a phone
 							<div className="flex shrink-0 items-center gap-2">
 								<ApiDetailsComponent
 									renderTrigger={({ open }) => (
@@ -218,7 +219,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 											mode="stroke"
 											size="small"
 											onClick={open}
-											className="gap-1.5 rounded-xl"
+											className="gap-1.5 rounded-xl max-sm:hidden"
 											aria-keyshortcuts="s"
 										>
 											<Icon name="code" className="h-4 w-4 text-text-sub-600" />
@@ -233,7 +234,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									mode="stroke"
 									size="small"
 									onClick={openDocs}
-									className="gap-1.5 rounded-xl"
+									className="gap-1.5 rounded-xl max-sm:hidden"
 									aria-keyshortcuts="d"
 								>
 									Documentation
