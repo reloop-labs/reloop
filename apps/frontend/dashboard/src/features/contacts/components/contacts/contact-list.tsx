@@ -203,7 +203,7 @@ export function ContactList() {
 	return (
 		<div>
 			{/* Audience snapshot; the trend sparkline opens the full metrics page */}
-			<div className="mb-8 grid grid-cols-2 gap-x-6 gap-y-4 pt-4 sm:grid-cols-4 lg:w-3/4">
+			<div className="mb-8 grid grid-cols-2 gap-x-6 gap-y-4 pt-4 sm:grid-cols-4">
 				<StatItem
 					label="Total"
 					value={(data?.totalContacts ?? 0).toLocaleString()}
@@ -222,13 +222,13 @@ export function ContactList() {
 				<Link
 					href="/contacts/metrics"
 					aria-label="Open audience metrics"
-					className="block min-w-0 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950"
+					className="block min-w-0 justify-self-end rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950"
 				>
 					<p className="truncate font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
 						Metrics
 					</p>
 					{/* Same height as the stat values so the row lines up */}
-					<div ref={chartContainerRef} className="mt-1 h-6 w-28">
+					<div ref={chartContainerRef} className="mt-1 h-6 w-44">
 						{activityPending ? (
 							<Skeleton className="h-full w-full rounded-lg" />
 						) : hasChartSize && chartData.length > 0 ? (
