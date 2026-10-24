@@ -16,10 +16,11 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import * as Slider from "@reloop/ui/slider";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { Check } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
-
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	contactEnterprise,
 	useBillingCheckout,
@@ -213,6 +214,80 @@ function CreditPackSlider({
 	);
 }
 
+/** Same tab strip as the Contacts page: underline plus a hover pill. */
+function BillingModeTabs({
+	value,
+	onChange,
+}: {
+	value: BillingMode;
+	onChange: (mode: BillingMode) => void;
+}) {
+	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const activeIndex = BILLING_MODES.findIndex((option) => option.id === value);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
+	const tab = buttonRefs.current[currentIdx];
+	const rect = tab?.getBoundingClientRect();
+	const parentRect = tab?.offsetParent?.getBoundingClientRect();
+
+	return (
+		<TabMenuHorizontal.Root
+			value={value}
+			onValueChange={(next) => onChange(next as BillingMode)}
+		>
+			<TabMenuHorizontal.List
+				aria-label="Billing mode"
+				className="relative h-11 w-full gap-0 border-b! px-2 py-0"
+			>
+				{BILLING_MODES.map((option, index) => (
+					<TabMenuHorizontal.Trigger
+						key={option.id}
+						value={option.id}
+						ref={(el) => {
+							if (el) buttonRefs.current[index] = el;
+						}}
+						onPointerEnter={() => setHoveredIdx(index)}
+						onPointerLeave={() => setHoveredIdx(undefined)}
+						className={cn(
+							"flex shrink-0 cursor-pointer items-center px-3 py-0! font-medium text-sm",
+							hoveredIdx === undefined &&
+								activeIndex === index &&
+								"text-text-strong-950",
+						)}
+					>
+						{option.label}
+					</TabMenuHorizontal.Trigger>
+				))}
+				<AnimatePresence>
+					{rect && activeIndex !== -1 ? (
+						<motion.div
+							className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
+							initial={{
+								pointerEvents: "none",
+								width: rect.width,
+								height: rect.height - 14,
+								left: rect.left - (parentRect?.left || 0),
+								top: rect.top - (parentRect?.top || 0) + 7,
+								opacity: 0,
+							}}
+							animate={{
+								pointerEvents: "none",
+								width: rect.width,
+								height: rect.height - 14,
+								left: rect.left - (parentRect?.left || 0),
+								top: rect.top - (parentRect?.top || 0) + 7,
+								opacity: 1,
+							}}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.14 }}
+						/>
+					) : null}
+				</AnimatePresence>
+			</TabMenuHorizontal.List>
+		</TabMenuHorizontal.Root>
+	);
+}
+
 function FeatureItem({ children }: { children: React.ReactNode }) {
 	return (
 		<li className="flex items-start gap-2.5">
@@ -350,187 +425,143 @@ export function SwitchPlanModal({
 					</div>
 				</div>
 
-				<div className="px-5">
-					<div
-						role="tablist"
-						aria-label="Billing mode"
-						className="grid grid-cols-1 gap-2 sm:grid-cols-2"
-					>
-						{BILLING_MODES.map((option) => {
-							const active = mode === option.id;
-							return (
-								<button
-									key={option.id}
-									type="button"
-									role="tab"
-									aria-selected={active}
-									onClick={() => setMode(option.id)}
-									className={cn(
-										OPTION_BASE,
-										"flex items-start gap-3 p-4",
-										active ? OPTION_SELECTED : OPTION_IDLE,
-									)}
-								>
-									<span
-										aria-hidden
-										className={cn(
-											"mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors duration-200",
-											active
-												? "border-stroke-strong-950 dark:border-white"
-												: "border-stroke-soft-300 dark:border-white/25",
-										)}
-									>
-										<span
+				<BillingModeTabs value={mode} onChange={setMode} />
+
+				<div className="p-5">
+					<p className="text-paragraph-sm text-text-sub-600">
+						{BILLING_MODES.find((option) => option.id === mode)?.description}
+					</p>
+					<div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-[300px_1fr]">
+						{isCredits ? (
+							<div role="tabpanel" aria-label="Credit pack">
+								<CreditPackSlider emails={emails} onChange={setEmails} />
+							</div>
+						) : (
+							<div role="tabpanel" className="flex flex-col gap-2">
+								{pricingPlans.map((plan) => {
+									const isSelected = plan.id === selectedId;
+									const isCurrent = plan.id === currentPlanId;
+									return (
+										<button
+											key={plan.id}
+											type="button"
+											onClick={() => setSelectedId(plan.id)}
+											aria-pressed={isSelected}
 											className={cn(
-												"size-2 rounded-full bg-bg-strong-950 transition-transform duration-200 dark:bg-white",
-												active ? "scale-100" : "scale-0",
+												OPTION_BASE,
+												"flex items-center justify-between gap-3 p-4",
+												isSelected ? OPTION_SELECTED : OPTION_IDLE,
 											)}
-										/>
-									</span>
-									<span className="flex min-w-0 flex-col gap-0.5">
-										<span className="font-medium text-label-sm text-text-strong-950">
-											{option.label}
-										</span>
-										<span className="text-[12px] text-text-sub-600">
-											{option.description}
-										</span>
-									</span>
-								</button>
-							);
-						})}
-					</div>
-				</div>
-
-				<div className="grid grid-cols-1 gap-6 p-5 sm:grid-cols-[300px_1fr]">
-					{isCredits ? (
-						<div role="tabpanel" aria-label="Credit pack">
-							<CreditPackSlider emails={emails} onChange={setEmails} />
-						</div>
-					) : (
-						<div role="tabpanel" className="flex flex-col gap-2">
-							{pricingPlans.map((plan) => {
-								const isSelected = plan.id === selectedId;
-								const isCurrent = plan.id === currentPlanId;
-								return (
-									<button
-										key={plan.id}
-										type="button"
-										onClick={() => setSelectedId(plan.id)}
-										aria-pressed={isSelected}
-										className={cn(
-											OPTION_BASE,
-											"flex items-center justify-between gap-3 p-4",
-											isSelected ? OPTION_SELECTED : OPTION_IDLE,
-										)}
-									>
-										<div className="min-w-0">
-											<div className="flex items-center gap-2">
-												<span className="font-medium text-label-sm text-text-strong-950">
-													{plan.name}
-												</span>
-												{isCurrent && (
-													<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
-														Current plan
+										>
+											<div className="min-w-0">
+												<div className="flex items-center gap-2">
+													<span className="font-medium text-label-sm text-text-strong-950">
+														{plan.name}
 													</span>
-												)}
+													{isCurrent && (
+														<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
+															Current plan
+														</span>
+													)}
+												</div>
+												<p className="text-[12px] text-text-sub-600">
+													{renderPlanPrice(plan)}
+												</p>
 											</div>
-											<p className="text-[12px] text-text-sub-600">
-												{renderPlanPrice(plan)}
-											</p>
-										</div>
-										{isSelected ? <SelectedCheck /> : null}
-									</button>
-								);
-							})}
-						</div>
-					)}
+											{isSelected ? <SelectedCheck /> : null}
+										</button>
+									);
+								})}
+							</div>
+						)}
 
-					<div>
-						<p className="text-paragraph-sm text-text-sub-600">
-							Included features
-						</p>
-						<ul className="mt-4 min-h-[380px] space-y-3.5">
-							{isCredits ? (
-								<>
-									<FeatureItem>
-										<NumberFlow
-											value={emails}
-											className="font-medium tabular-nums"
-											transformTiming={{ duration: 500, easing: "ease-out" }}
-										/>
-										emails, valid until {formatDate(validUntil)}
-									</FeatureItem>
-									<FeatureItem>
-										<span className="font-medium tabular-nums">
-											{payg.monthlyEmails.toLocaleString()}
-										</span>
-										free emails per month on top
-									</FeatureItem>
-									<FeatureItem>No daily sending limit</FeatureItem>
-									<FeatureItem>
-										<span className="font-medium tabular-nums">
-											{payg.maxAgentInboxes}
-										</span>
-										inboxes
-									</FeatureItem>
-									<FeatureItem>
-										<span className="font-medium tabular-nums">
-											{payg.maxWebhooks}
-										</span>
-										webhooks
-									</FeatureItem>
-									<FeatureItem>
-										<span className="font-medium tabular-nums">
-											{payg.maxCustomDomains}
-										</span>
-										custom domains
-									</FeatureItem>
-									<FeatureItem>
-										<span className="font-medium tabular-nums">
-											{Math.round(payg.maxAttachmentBytes / (1024 * 1024))}
-										</span>
-										MB attachments
-									</FeatureItem>
-									<FeatureItem>
-										{formatUsd(creditPackPriceCents(1000))} per 1,000 emails, no
-										subscription
-									</FeatureItem>
-								</>
-							) : isEnterprise ? (
-								selectedPlan.features.map((feature) => (
-									<FeatureItem key={feature}>{feature}</FeatureItem>
-								))
-							) : (
-								<>
-									{NUMERIC_FEATURES.map((row) => (
-										<FeatureItem key={row.id}>
+						<div>
+							<p className="text-paragraph-sm text-text-sub-600">
+								Included features
+							</p>
+							<ul className="mt-4 min-h-[380px] space-y-3.5">
+								{isCredits ? (
+									<>
+										<FeatureItem>
 											<NumberFlow
-												value={toNumber(selectedPlan.comparison[row.key])}
+												value={emails}
 												className="font-medium tabular-nums"
-												transformTiming={{
-													duration: 500,
-													easing: "ease-out",
-												}}
+												transformTiming={{ duration: 500, easing: "ease-out" }}
 											/>
-											{row.suffix}
+											emails, valid until {formatDate(validUntil)}
 										</FeatureItem>
-									))}
-									<FeatureItem>
-										{selectedPlan.comparison.support} support
-									</FeatureItem>
-								</>
-							)}
-							<li>
-								<button
-									type="button"
-									onClick={goToPlans}
-									className="inline-flex items-center gap-2 text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
-								>
-									<Icon name="arrow-up-right" className="h-4 w-4 shrink-0" />
-									Full feature list
-								</button>
-							</li>
-						</ul>
+										<FeatureItem>
+											<span className="font-medium tabular-nums">
+												{payg.monthlyEmails.toLocaleString()}
+											</span>
+											free emails per month on top
+										</FeatureItem>
+										<FeatureItem>No daily sending limit</FeatureItem>
+										<FeatureItem>
+											<span className="font-medium tabular-nums">
+												{payg.maxAgentInboxes}
+											</span>
+											inboxes
+										</FeatureItem>
+										<FeatureItem>
+											<span className="font-medium tabular-nums">
+												{payg.maxWebhooks}
+											</span>
+											webhooks
+										</FeatureItem>
+										<FeatureItem>
+											<span className="font-medium tabular-nums">
+												{payg.maxCustomDomains}
+											</span>
+											custom domains
+										</FeatureItem>
+										<FeatureItem>
+											<span className="font-medium tabular-nums">
+												{Math.round(payg.maxAttachmentBytes / (1024 * 1024))}
+											</span>
+											MB attachments
+										</FeatureItem>
+										<FeatureItem>
+											{formatUsd(creditPackPriceCents(1000))} per 1,000 emails,
+											no subscription
+										</FeatureItem>
+									</>
+								) : isEnterprise ? (
+									selectedPlan.features.map((feature) => (
+										<FeatureItem key={feature}>{feature}</FeatureItem>
+									))
+								) : (
+									<>
+										{NUMERIC_FEATURES.map((row) => (
+											<FeatureItem key={row.id}>
+												<NumberFlow
+													value={toNumber(selectedPlan.comparison[row.key])}
+													className="font-medium tabular-nums"
+													transformTiming={{
+														duration: 500,
+														easing: "ease-out",
+													}}
+												/>
+												{row.suffix}
+											</FeatureItem>
+										))}
+										<FeatureItem>
+											{selectedPlan.comparison.support} support
+										</FeatureItem>
+									</>
+								)}
+								<li>
+									<button
+										type="button"
+										onClick={goToPlans}
+										className="inline-flex items-center gap-2 text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
+									>
+										<Icon name="arrow-up-right" className="h-4 w-4 shrink-0" />
+										Full feature list
+									</button>
+								</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 
