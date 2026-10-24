@@ -153,9 +153,22 @@ kumo.on('smtp_server_message_received', function(msg)
 
   -- 2. Publish raw message to NATS for inbox service processing
   local nc = get_nats_client()
+  -- Envelope recipients (RCPT TO), so consumers file BCC'd mail correctly
+  -- instead of guessing from the To header.
+  local recipients = {}
+  local ok_list, list = pcall(function() return msg:recipient_list() end)
+  if not (ok_list and type(list) == "table") then
+    local ok_one, one = pcall(function() return msg:recipient() end)
+    list = (ok_one and one) and { one } or {}
+  end
+  for _, recip in ipairs(list) do
+    table.insert(recipients, tostring(recip.email or recip))
+  end
+
   local ok, err = pcall(function()
     local payload = {
-      rawMessage = msg:get_data()
+      rawMessage = msg:get_data(),
+      recipients = recipients,
     }
     nc:publish {
       subject = 'kumomta.inbound_received',

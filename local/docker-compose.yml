@@ -137,6 +137,25 @@ services:
         condition: service_started
     restart: unless-stopped
 
+  imap:
+    build:
+      context: ../apps/backend/imap
+      dockerfile: Dockerfile
+    container_name: reloop-imap
+    ports:
+      - "1143:143"   # IMAP (plain auth allowed locally only)
+      - "8029:8029"  # HTTP health check
+    environment:
+      - PG_URL=postgresql://reloop:reloop123@reloop-postgres:5432/reloop
+      - NATS_URL=nats://reloop-nats:4222
+      - IMAP_ALLOW_INSECURE_AUTH=true
+    depends_on:
+      reloop-postgres:
+        condition: service_healthy
+      reloop-nats:
+        condition: service_started
+    restart: unless-stopped
+
   reloop-minio:
     image: pgsty/silo:RELEASE.2026-09-16T00-00-00Z
     container_name: reloop-minio

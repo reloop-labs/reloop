@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
-import { mailbox } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { mailAccount, mailbox } from "@reloop/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { createError, log as evlog } from "evlog";
 import { useLogger } from "evlog/elysia";
 
@@ -14,6 +14,23 @@ function getLogger() {
 			warn: (msg: string) => evlog.warn("domain", msg),
 		};
 	}
+}
+
+/** IMAP mail accounts (apps/backend/imap), with the same plus-address fallback. */
+async function isActiveMailAccount(email: string): Promise<boolean> {
+	const [localPart, domainPart] = email.split("@");
+	const candidates = [email];
+	if (localPart?.includes("+") && domainPart) {
+		candidates.push(`${localPart.split("+")[0]}@${domainPart}`);
+	}
+	const account = await db.query.mailAccount.findFirst({
+		where: and(
+			inArray(mailAccount.email, candidates),
+			eq(mailAccount.status, "active"),
+		),
+		columns: { id: true },
+	});
+	return !!account;
 }
 
 export async function checkRecipientController(
@@ -49,7 +66,8 @@ export async function checkRecipientController(
 			}
 		}
 
-		const allowed = !!mailboxRecord;
+		const allowed =
+			!!mailboxRecord || (await isActiveMailAccount(normalizedEmail));
 		log.info(
 			`[CHECK-RECIPIENT] Recipient check result: ${email} -> allowed=${allowed}`,
 		);

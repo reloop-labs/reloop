@@ -12,6 +12,7 @@ export * from "./custom-event";
 export * from "./domain";
 export * from "./email";
 export * from "./group";
+export * from "./imap";
 export * from "./inbox";
 export * from "./reputation";
 export * from "./sending-ip";
