@@ -170,7 +170,7 @@ export const InboxNavUser = ({
 							aria-label="Close"
 							className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-control)] hover:text-mail-foreground"
 						>
-							<X className="size-3.5" strokeWidth={2} />
+							<X className="size-3.5" strokeWidth={2.25} />
 						</button>
 
 						<div className="relative mt-1">

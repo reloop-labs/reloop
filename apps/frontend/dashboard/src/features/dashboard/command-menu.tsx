@@ -391,7 +391,7 @@ export function CommandMenuGlobal() {
 						onClick={() => setSearch("")}
 						className="flex size-5 shrink-0 items-center justify-center rounded text-text-soft-400 transition-colors hover:text-text-sub-600"
 					>
-						<X className="size-3.5" />
+						<X className="size-3.5" strokeWidth={2.25} />
 					</button>
 				) : null}
 			</div>
