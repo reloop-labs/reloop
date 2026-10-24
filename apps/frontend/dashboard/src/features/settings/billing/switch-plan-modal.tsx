@@ -42,7 +42,7 @@ export const BILLING_MODES: Array<{
 	{
 		id: "credits",
 		label: "Pay as you go",
-		description: `Pay once, no subscription. Credits last ${creditPack.validityMonths} months.`,
+		description: `One-time payment. Credits last ${creditPack.validityMonths} months.`,
 	},
 ];
 

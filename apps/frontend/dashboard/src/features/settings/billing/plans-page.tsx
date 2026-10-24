@@ -294,7 +294,7 @@ export function PlansPage() {
 				/>
 			</div>
 
-			<div className="mb-8">
+			<div>
 				<h1 className="font-semibold text-text-strong-950 text-title-h5">
 					Plans
 				</h1>
@@ -323,83 +323,91 @@ export function PlansPage() {
 				</p>
 			</div>
 
-			<fieldset className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2">
-				<legend className="sr-only">Billing mode</legend>
-				{BILLING_MODES.map((option) => {
-					const active = mode === option.id;
-					return (
-						<label
-							key={option.id}
-							className={cn(
-								"flex cursor-pointer items-start gap-2.5 rounded-2xl border p-3.5 transition-[border-color,box-shadow,background-color] duration-150",
-								"has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-text-strong-950/20",
-								active
-									? "border-transparent bg-bg-white-0 shadow-xs ring-[1.5px] ring-text-strong-950 dark:bg-white/[0.04] dark:ring-white"
-									: "border-stroke-soft-100 bg-bg-weak-50/30 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.02] dark:hover:bg-white/[0.04]",
-							)}
-						>
-							<input
-								type="radio"
-								name="billing-mode"
-								value={option.id}
-								checked={active}
-								onChange={() => setMode(option.id)}
-								className="sr-only"
-							/>
-							<span
-								aria-hidden
-								className={cn(
-									"mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors duration-200",
-									active
-										? "border-stroke-strong-950 dark:border-white"
-										: "border-stroke-soft-300 dark:border-white/25",
-								)}
-							>
-								<span
+			{/* One gap between every block (title, radios, slider, table) so the
+			    vertical rhythm stays even. */}
+			<div className="mt-16 flex flex-col gap-16">
+				<div className="mx-auto w-full max-w-2xl">
+					<fieldset className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+						<legend className="sr-only">Billing mode</legend>
+						{BILLING_MODES.map((option) => {
+							const active = mode === option.id;
+							return (
+								<label
+									key={option.id}
 									className={cn(
-										"size-2 rounded-full bg-bg-strong-950 transition-transform duration-200 dark:bg-white",
-										active ? "scale-100" : "scale-0",
+										"flex cursor-pointer items-start gap-2.5 rounded-2xl border p-4 transition-[border-color,box-shadow,background-color] duration-150",
+										"has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-text-strong-950/20",
+										active
+											? "border-transparent bg-bg-white-0 shadow-xs ring-[1.5px] ring-text-strong-950 ring-inset dark:bg-white/[0.04] dark:ring-white"
+											: "border-stroke-soft-100 bg-bg-weak-50/30 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-white/[0.02] dark:hover:bg-white/[0.04]",
 									)}
-								/>
-							</span>
-							<span className="flex min-w-0 flex-col gap-0.5">
-								<span className="font-medium text-label-sm text-text-strong-950">
-									{option.label}
-								</span>
-								<span className="text-paragraph-xs text-text-sub-600">
-									{option.description}
-								</span>
-							</span>
-						</label>
-					);
-				})}
-			</fieldset>
+								>
+									<input
+										type="radio"
+										name="billing-mode"
+										value={option.id}
+										checked={active}
+										onChange={() => setMode(option.id)}
+										className="sr-only"
+									/>
+									<span
+										aria-hidden
+										className={cn(
+											"mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors duration-200",
+											active
+												? "border-stroke-strong-950 dark:border-white"
+												: "border-stroke-soft-300 dark:border-white/25",
+										)}
+									>
+										<span
+											className={cn(
+												"size-2 rounded-full bg-bg-strong-950 transition-transform duration-200 dark:bg-white",
+												active ? "scale-100" : "scale-0",
+											)}
+										/>
+									</span>
+									<span className="flex min-w-0 flex-col gap-0.5">
+										<span className="font-medium text-label-sm text-text-strong-950">
+											{option.label}
+										</span>
+										<span className="text-paragraph-xs text-text-sub-600">
+											{option.description}
+										</span>
+									</span>
+								</label>
+							);
+						})}
+					</fieldset>
+				</div>
 
-			<div className="mx-auto w-full max-w-3xl py-20">
-				{isCredits ? (
-					<StepSlider
-						steps={creditPackSizes}
-						value={emails}
-						onChange={setEmails}
-						ariaLabel="Number of emails"
+				<div className="mx-auto w-full max-w-2xl">
+					{isCredits ? (
+						<StepSlider
+							steps={creditPackSizes}
+							value={emails}
+							onChange={setEmails}
+							ariaLabel="Number of emails"
+						/>
+					) : (
+						<StepSlider
+							steps={MONTHLY_VOLUMES}
+							value={volume}
+							onChange={setVolume}
+							ariaLabel="Emails per month"
+						/>
+					)}
+				</div>
+
+				<div>
+					<h2 className="font-medium text-label-md text-text-strong-950">
+						Compare plans
+					</h2>
+					<ComparisonTable
+						columns={isCredits ? creditColumns : monthlyColumns}
+						sections={isCredits ? creditSections : comparisonSections}
 					/>
-				) : (
-					<StepSlider
-						steps={MONTHLY_VOLUMES}
-						value={volume}
-						onChange={setVolume}
-						ariaLabel="Emails per month"
-					/>
-				)}
+				</div>
 			</div>
-
-			<h2 className="font-medium text-label-md text-text-strong-950">
-				Compare plans
-			</h2>
-			<ComparisonTable
-				columns={isCredits ? creditColumns : monthlyColumns}
-				sections={isCredits ? creditSections : comparisonSections}
-			/>
 		</div>
 	);
 }
@@ -424,11 +432,11 @@ function ComparisonTable({
 	return (
 		<div className="mb-12 overflow-x-auto pb-4 lg:overflow-visible">
 			<div className={cn("grid", GRID_COLS[columns.length])}>
-				<div className="sticky top-0 z-20 border-stroke-soft-100 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]/95" />
+				<div className="sticky top-0 z-20 border-stroke-soft-100 border-b bg-bg-white-0 dark:border-stroke-soft-100/40" />
 				{columns.map((column) => (
 					<div
 						key={column.id}
-						className="sticky top-0 z-20 border-stroke-soft-100 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]/95"
+						className="sticky top-0 z-20 border-stroke-soft-100 border-b bg-bg-white-0 dark:border-stroke-soft-100/40"
 					>
 						<div
 							className={cn(
