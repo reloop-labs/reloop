@@ -5,6 +5,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@reloop/ui/cn";
 import * as React from "react";
+import { focusDialogOnOpen } from "../utils/dialog-auto-focus";
 import * as CompactButton from "./compact-button";
 import { Icon } from "./icon";
 
@@ -43,33 +44,39 @@ DrawerOverlay.displayName = "DrawerOverlay";
 const DrawerContent = React.forwardRef<
 	React.ComponentRef<typeof DialogPrimitive.Content>,
 	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...rest }, forwardedRef) => {
-	return (
-		<DrawerPortal>
-			<DrawerOverlay>
-				<DialogPrimitive.Content
-					ref={forwardedRef}
-					className={cn(
-						// base
-						"size-full max-w-[400px] overflow-y-auto",
-						"border-stroke-soft-200 border-l bg-bg-white-0",
-						// animation
-						"data-[state=open]:animate-in data-[state=open]:duration-200 data-[state=open]:ease-out",
-						"data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=closed]:ease-in",
-						"data-[state=open]:slide-in-from-right-full",
-						"data-[state=closed]:slide-out-to-right-full",
-						className,
-					)}
-					{...rest}
-				>
-					<div className="relative flex min-h-full w-full flex-col">
-						{children}
-					</div>
-				</DialogPrimitive.Content>
-			</DrawerOverlay>
-		</DrawerPortal>
-	);
-});
+>(
+	(
+		{ className, children, onOpenAutoFocus = focusDialogOnOpen, ...rest },
+		forwardedRef,
+	) => {
+		return (
+			<DrawerPortal>
+				<DrawerOverlay>
+					<DialogPrimitive.Content
+						ref={forwardedRef}
+						className={cn(
+							// base
+							"size-full max-w-[400px] overflow-y-auto",
+							"border-stroke-soft-200 border-l bg-bg-white-0",
+							// animation
+							"data-[state=open]:animate-in data-[state=open]:duration-200 data-[state=open]:ease-out",
+							"data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=closed]:ease-in",
+							"data-[state=open]:slide-in-from-right-full",
+							"data-[state=closed]:slide-out-to-right-full",
+							className,
+						)}
+						onOpenAutoFocus={onOpenAutoFocus}
+						{...rest}
+					>
+						<div className="relative flex min-h-full w-full flex-col">
+							{children}
+						</div>
+					</DialogPrimitive.Content>
+				</DrawerOverlay>
+			</DrawerPortal>
+		);
+	},
+);
 DrawerContent.displayName = "DrawerContent";
 
 function DrawerHeader({

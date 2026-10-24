@@ -3,6 +3,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@reloop/ui/cn";
 import * as React from "react";
+import { focusDialogOnOpen } from "../utils/dialog-auto-focus";
 import { Icon } from "./icon";
 
 const ModalRoot = DialogPrimitive.Root;
@@ -38,7 +39,14 @@ const ModalContent = React.forwardRef<
 	}
 >(
 	(
-		{ className, overlayClassName, children, showClose = true, ...rest },
+		{
+			className,
+			overlayClassName,
+			children,
+			showClose = true,
+			onOpenAutoFocus = focusDialogOnOpen,
+			...rest
+		},
 		forwardedRef,
 	) => {
 		return (
@@ -58,6 +66,7 @@ const ModalContent = React.forwardRef<
 							"data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
 							className,
 						)}
+						onOpenAutoFocus={onOpenAutoFocus}
 						{...rest}
 					>
 						{children}
