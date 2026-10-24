@@ -330,6 +330,10 @@
         "typescript": "catalog:",
       },
     },
+    "apps/backend/imap": {
+      "name": "be-imap",
+      "version": "1.0.0",
+    },
     "apps/backend/inbound": {
       "name": "be-inbound",
       "version": "1.0.0",
@@ -2909,6 +2913,8 @@
     "be-domain": ["be-domain@workspace:apps/backend/domain"],
 
     "be-email": ["be-email@workspace:apps/backend/email"],
+
+    "be-imap": ["be-imap@workspace:apps/backend/imap"],
 
     "be-inbound": ["be-inbound@workspace:apps/backend/inbound"],
 

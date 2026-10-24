@@ -129,7 +129,7 @@ func serve(ctx context.Context, s *store.Store) error {
 	slog.Info("imaps listening", "addr", tlsAddr, "certificate", certManager.Source())
 	go func() { errc <- server.Serve(tln) }()
 
-	healthAddr := env("HEALTH_ADDR", ":8029")
+	healthAddr := env("HEALTH_ADDR", ":8031")
 	go func() {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

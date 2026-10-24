@@ -1,0 +1,12 @@
+{
+	"name": "be-imap",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "sh scripts/dev.sh",
+		"build": "go build -o dist/imap .",
+		"start": "./dist/imap serve",
+		"test": "go test ./...",
+		"check-types": "go vet ./..."
+	}
+}

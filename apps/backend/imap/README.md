@@ -29,7 +29,7 @@ As in the other services: `.env.dev` holds local values and `.env.prod` lists wh
 | `NATS_URL` | `nats://127.0.0.1:4222` | |
 | `IMAP_HOSTNAME` | `imap.reloop.sh` | Public host customers enter; the certificate is looked up for this name |
 | `IMAP_ADDR` / `IMAP_TLS_ADDR` | `:143` / `:993` | STARTTLS and implicit-TLS listeners |
-| `HEALTH_ADDR` | `:8029` | `GET /health` |
+| `HEALTH_ADDR` | `:8031` | `GET /health` |
 | `IMAP_ALLOW_INSECURE_AUTH` | | `true` allows login without TLS. **Local development only.** |
 
 ### TLS certificate (automatic, like the SMTP service)
@@ -45,7 +45,7 @@ As in the other services: `.env.dev` holds local values and `.env.prod` lists wh
 Sources 1–4 are re-read every 5 minutes, so renewals by Traefik, Caddy or certbot apply without a restart. The container runs as root so it can read Traefik's root-only `acme.json`.
 
 **On Coolify:**
-- Attach `imap.reloop.sh` as a domain on this service, pointing at port 8029, so Traefik issues and renews its certificate.
+- Attach `imap.reloop.sh` as a domain on this service, pointing at port 8031, so Traefik issues and renews its certificate.
 - Mount `/data/coolify/proxy:/data/coolify/proxy:ro`.
 - Publish port 993.
 
@@ -57,7 +57,14 @@ imap create-account <email> <organizationId> <domainId>  # also creates default 
 imap app-password <email> [label]                        # prints xxxx-xxxx-xxxx-xxxx once
 ```
 
-Locally: `docker compose -f local/docker-compose.yml up -d imap`, then run the commands with `docker exec reloop-imap imap ...`.
+## Running locally
+
+`bun dev` and `bun run backend:dev` start it with the other services. To start it alone, run `bun run be:imap:dev`. It creates `.env` from `.env.dev` on the first run.
+- **Ports:** IMAP on `localhost:1143` (plain login allowed), IMAPS on `localhost:1993` (self-signed certificate), health at `localhost:8031/health`.
+- **Go missing or older than `go.mod` requires:** it prints a warning and skips IMAP instead of stopping the other services.
+- **Without Go at all:** `docker compose -f local/docker-compose.yml --profile imap up -d imap`.
+
+Run the commands with `go run . <command>`, or with `docker exec reloop-imap imap <command>` for the container.
 
 ## Developing
 

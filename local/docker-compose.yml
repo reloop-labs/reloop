@@ -137,7 +137,10 @@ services:
         condition: service_started
     restart: unless-stopped
 
+  # Runs natively with `bun dev` (be-imap). Use this container only without
+  # Go installed: docker compose -f local/docker-compose.yml --profile imap up -d imap
   imap:
+    profiles: ["imap"]
     build:
       context: ../apps/backend/imap
       dockerfile: Dockerfile
@@ -145,7 +148,7 @@ services:
     ports:
       - "1143:143"   # IMAP (plain auth allowed locally only)
       - "1993:993"   # IMAPS (self-signed locally)
-      - "8029:8029"  # HTTP health check
+      - "8031:8031"  # HTTP health check
     environment:
       - PG_URL=postgresql://reloop:reloop123@reloop-postgres:5432/reloop
       - NATS_URL=nats://reloop-nats:4222
