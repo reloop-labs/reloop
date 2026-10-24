@@ -16,8 +16,8 @@ import { useState } from "react";
 
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { openHelpWithMessage } from "#/features/help/open-help";
-import { BuyCreditsModal } from "./buy-credits-modal";
 import { resolvePlanId } from "./plan-id";
+import { SwitchPlanModal } from "./switch-plan-modal";
 import {
 	contactEnterprise,
 	useBillingCheckout,
@@ -290,11 +290,12 @@ export function PlansPage() {
 				</div>
 			</div>
 
-			<BuyCreditsModal
+			<SwitchPlanModal
 				open={creditsOpen}
 				onOpenChange={setCreditsOpen}
+				initialMode="credits"
 				currentPlanId={currentPlanId}
-				currentExpiresAt={usageData?.prepaid?.expiresAt}
+				creditsExpireAt={usageData?.prepaid?.expiresAt}
 			/>
 		</div>
 	);

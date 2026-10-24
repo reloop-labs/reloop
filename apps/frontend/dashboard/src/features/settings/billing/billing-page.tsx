@@ -16,10 +16,9 @@ import { AnimatedForwardButton } from "#/features/dashboard/animated-forward-but
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import { openHelpWithMessage } from "#/features/help/open-help";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
-import { BuyCreditsModal } from "./buy-credits-modal";
 import { GrantedPlanBanner } from "./granted-plan-banner";
 import { resolvePlanId } from "./plan-id";
-import { SwitchPlanModal } from "./switch-plan-modal";
+import { type BillingMode, SwitchPlanModal } from "./switch-plan-modal";
 import {
 	contactEnterprise,
 	useBillingCheckout,
@@ -52,8 +51,7 @@ function formatExpiryDate(value: string): string {
 
 export function BillingPage() {
 	const router = useRouter();
-	const [switchOpen, setSwitchOpen] = useState(false);
-	const [creditsOpen, setCreditsOpen] = useState(false);
+	const [planModal, setPlanModal] = useState<BillingMode | null>(null);
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const {
 		data: usageData,
@@ -150,7 +148,7 @@ export function BillingPage() {
 
 	const handleManage = () => {
 		void portal.mutateAsync().catch(() => {
-			setSwitchOpen(true);
+			setPlanModal("monthly");
 		});
 	};
 
@@ -282,7 +280,7 @@ export function BillingPage() {
 							variant={hasCredits || isPayg ? "neutral" : "basic"}
 							size="xsmall"
 							className="shrink-0 rounded-full font-medium"
-							onClick={() => setCreditsOpen(true)}
+							onClick={() => setPlanModal("credits")}
 						>
 							{hasCredits ? "Buy more" : "Buy credits"}
 						</FancyButton.Root>
@@ -392,17 +390,14 @@ export function BillingPage() {
 				)}
 			</div>
 
-			<BuyCreditsModal
-				open={creditsOpen}
-				onOpenChange={setCreditsOpen}
-				currentPlanId={currentPlanId}
-				currentExpiresAt={prepaidExpiresAt}
-			/>
-
 			<SwitchPlanModal
-				open={switchOpen}
-				onOpenChange={setSwitchOpen}
+				open={planModal != null}
+				onOpenChange={(open) => {
+					if (!open) setPlanModal(null);
+				}}
+				initialMode={planModal ?? undefined}
 				currentPlanId={currentPlanId}
+				creditsExpireAt={prepaidExpiresAt}
 			/>
 		</div>
 	);

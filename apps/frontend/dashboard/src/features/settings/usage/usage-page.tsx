@@ -34,8 +34,12 @@ export function UsagePage() {
 		id: data?.plan.id ?? data?.subscription.planId,
 		name: data?.plan.name,
 	});
+	// Pay as you go can still move to a monthly plan or buy more credits.
 	const canUpgrade =
-		data != null && !data.selfHosted && getNextPlan(currentPlanId) != null;
+		data != null &&
+		!data.selfHosted &&
+		(currentPlanId === "payg" || getNextPlan(currentPlanId) != null);
+	const prepaidBalance = data?.prepaid?.balance ?? 0;
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -46,7 +50,11 @@ export function UsagePage() {
 					</h1>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
 						{data
-							? `${emailUsage(data.subscription).remaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period.`
+							? `${emailUsage(data.subscription).remaining.toLocaleString()} of ${data.plan.monthlyCredits.toLocaleString()} emails remaining this period${
+									prepaidBalance > 0
+										? `, plus ${prepaidBalance.toLocaleString()} credits`
+										: ""
+								}.`
 							: "Track your plan limits and resource usage for this billing period."}
 					</p>
 				</div>
@@ -81,6 +89,7 @@ export function UsagePage() {
 				open={switchOpen}
 				onOpenChange={setSwitchOpen}
 				currentPlanId={currentPlanId}
+				creditsExpireAt={data?.prepaid?.expiresAt}
 			/>
 		</div>
 	);
