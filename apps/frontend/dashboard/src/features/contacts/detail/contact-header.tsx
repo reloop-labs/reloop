@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
@@ -394,9 +395,18 @@ export const ContactHeader = ({
 }: ContactHeaderProps) => {
 	const router = useRouter();
 	const [copied, setCopied] = useState(false);
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [isUnsuppressOpen, setIsUnsuppressOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	// Distinct from the shell's "edit-contact"/"delete-contact" (ContactsModals
+	// is mounted on this page too); the contact id comes from the route.
+	const isEditModalOpen = modal === "edit-contact-detail";
+	const isDeleteModalOpen = modal === "delete-contact-detail";
+	const isUnsuppressOpen = modal === "remove-suppression";
+	const setIsEditModalOpen = (open: boolean) =>
+		void setModal(open ? "edit-contact-detail" : null);
+	const setIsDeleteModalOpen = (open: boolean) =>
+		void setModal(open ? "delete-contact-detail" : null);
+	const setIsUnsuppressOpen = (open: boolean) =>
+		void setModal(open ? "remove-suppression" : null);
 	const [activityTab, setActivityTab] = useState<ActivityFilter>("all");
 
 	const {

@@ -8,6 +8,7 @@ import { toast } from "@reloop/ui/toast";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { type FormEvent, useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSessionQuery } from "#/features/auth/session-query";
@@ -42,7 +43,9 @@ export function SmtpTestStepPage({ providerId }: { providerId: string }) {
 	const [to, setTo] = useState("");
 	const [from, setFrom] = useState("");
 	const [test, setTest] = useState<TestState>({ kind: "idle" });
-	const [editOpen, setEditOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	// Wait for the provider so a reload never opens the form in "create" mode.
+	const editOpen = modal === "edit-provider" && !!provider;
 
 	useEffect(() => {
 		const email = session?.user?.email;
@@ -188,7 +191,7 @@ export function SmtpTestStepPage({ providerId }: { providerId: string }) {
 						</span>
 						<button
 							type="button"
-							onClick={() => setEditOpen(true)}
+							onClick={() => void setModal("edit-provider")}
 							className="shrink-0 font-medium text-text-sub-600 text-xs underline-offset-2 hover:text-text-strong-950 hover:underline"
 						>
 							Edit server
@@ -301,7 +304,7 @@ export function SmtpTestStepPage({ providerId }: { providerId: string }) {
 				provider={provider}
 				selfHosted={usage?.selfHosted === true}
 				onClose={() => {
-					setEditOpen(false);
+					void setModal(null);
 					setTest({ kind: "idle" });
 				}}
 			/>

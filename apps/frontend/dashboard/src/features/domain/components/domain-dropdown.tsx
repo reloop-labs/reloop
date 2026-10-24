@@ -5,6 +5,7 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { type ReactNode, useCallback, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { ForwardDNSRecordsModal } from "../add/setup/components/forward-dns-records-modal";
@@ -29,7 +30,17 @@ function useDomainActionsMenu(domain: Domain, handlers: DomainActionsHandlers) {
 	const [open, setOpen] = useState(false);
 	const [contextMenuKey, setContextMenuKey] = useState(0);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const [forwardOpen, setForwardOpen] = useState(false);
+	// ?modal=forward-dns&id=<domainId> — only the matching row's modal opens.
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [modalId, setModalId] = useQueryState("id", { history: "replace" });
+	const forwardOpen = modal === "forward-dns" && modalId === domain.id;
+	const setForwardOpen = useCallback(
+		(next: boolean) => {
+			void setModal(next ? "forward-dns" : null);
+			void setModalId(next ? domain.id : null);
+		},
+		[domain.id, setModal, setModalId],
+	);
 	const [copiedItem, setCopiedItem] = useState<"name" | "id" | null>(null);
 	const buttonRefs = useRef<HTMLElement[]>([]);
 	const keepOpenRef = useRef(false);
@@ -377,25 +388,20 @@ export function DomainRowContextMenu({
 }) {
 	const menu = useDomainActionsMenu(domain, handlers);
 
+	// The row's DomainDropdown renders the Forward Records modal (driven by
+	// ?modal=forward-dns&id=), so it isn't mounted twice for the same row.
 	return (
-		<>
-			<ContextMenu.Root
-				key={menu.contextMenuKey}
-				onOpenChange={menu.handleOpenChange}
+		<ContextMenu.Root
+			key={menu.contextMenuKey}
+			onOpenChange={menu.handleOpenChange}
+		>
+			<ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
+			<ContextMenu.Content
+				className={menuContentClassName}
+				onCloseAutoFocus={(e) => e.preventDefault()}
 			>
-				<ContextMenu.Trigger asChild>{children}</ContextMenu.Trigger>
-				<ContextMenu.Content
-					className={menuContentClassName}
-					onCloseAutoFocus={(e) => e.preventDefault()}
-				>
-					<DomainActionsMenuItems menu={menu} variant="context" />
-				</ContextMenu.Content>
-			</ContextMenu.Root>
-			<ForwardModal
-				domainId={domain.id}
-				open={menu.forwardOpen}
-				onOpenChange={menu.setForwardOpen}
-			/>
-		</>
+				<DomainActionsMenuItems menu={menu} variant="context" />
+			</ContextMenu.Content>
+		</ContextMenu.Root>
 	);
 }

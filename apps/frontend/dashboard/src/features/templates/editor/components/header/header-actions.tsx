@@ -1,6 +1,7 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { useCurrentEditor } from "@tiptap/react";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DeleteTemplateModal } from "#/features/templates/components/delete-template-modal";
@@ -55,10 +56,8 @@ export const HeaderActions = ({
 	useAutoSaveDraft();
 
 	// Dialog States
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-	const [isTestModalOpen, setIsTestModalOpen] = useState(false);
-	const [isDiscardModalOpen, setIsDiscardModalOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const closeModal = () => void setModal(null);
 
 	// SWR hook to fetch versions cache for Diff comparison
 	const { data: versions, mutate } = useSWR<any[]>(
@@ -244,7 +243,7 @@ export const HeaderActions = ({
 				<FancyButton.Root
 					variant="basic"
 					size="xsmall"
-					onClick={() => setIsDiscardModalOpen(true)}
+					onClick={() => void setModal("discard-draft")}
 					disabled={isPublishing}
 				>
 					Discard changes
@@ -254,7 +253,7 @@ export const HeaderActions = ({
 			<FancyButton.Root
 				variant="basic"
 				size="xsmall"
-				onClick={() => setIsTestModalOpen(true)}
+				onClick={() => void setModal("test-template")}
 			>
 				Test email
 			</FancyButton.Root>
@@ -263,29 +262,27 @@ export const HeaderActions = ({
 			<FancyButton.Root
 				variant="neutral"
 				size="xsmall"
-				onClick={() => setIsPublishModalOpen(true)}
+				onClick={() => void setModal("publish-template")}
 				disabled={isPublishing}
 			>
 				{isPublishing ? "Publishing..." : "Publish"}
 			</FancyButton.Root>
 
-			<TestEmailModal
-				isOpen={isTestModalOpen}
-				onClose={() => setIsTestModalOpen(false)}
-			/>
+			<TestEmailModal isOpen={modal === "test-template"} onClose={closeModal} />
 
 			{/* Delete Confirmation Modal */}
 			<DeleteTemplateModal
-				isOpen={isDeleteModalOpen}
-				onClose={() => setIsDeleteModalOpen(false)}
+				isOpen={modal === "delete-template"}
+				onClose={closeModal}
 				onConfirm={handleDelete}
 				templateName={template?.name || "Untitled"}
 				onDeleted={() => router.push("/templates")}
 			/>
 
+			{/* Discarding needs the published snapshot, so wait for it after a reload. */}
 			<DiscardDraftModal
-				isOpen={isDiscardModalOpen}
-				onClose={() => setIsDiscardModalOpen(false)}
+				isOpen={modal === "discard-draft" && !!latestPublished}
+				onClose={closeModal}
 				onConfirm={handleDiscardDraft}
 				publishedLabel={
 					latestPublished?.name ||
@@ -295,8 +292,8 @@ export const HeaderActions = ({
 
 			{/* Publish Confirmation Modal */}
 			<PublishTemplateModal
-				isOpen={isPublishModalOpen}
-				onClose={() => setIsPublishModalOpen(false)}
+				isOpen={modal === "publish-template"}
+				onClose={closeModal}
 				onConfirm={handlePublish}
 				isPublishing={isPublishing}
 				latestPublished={latestPublished}

@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { AgentInboxContent } from "#/features/agent-inbox/components/mail-list/agent-inbox-content";
 import { MailListSkeleton } from "#/features/agent-inbox/components/mail-list/mail-list-skeleton";
-import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import { useComposeDrafts } from "#/features/agent-inbox/hooks/use-compose-drafts";
 import { useLabelThreadIds } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import { useFolderMailbox } from "#/features/agent-inbox/lib/use-folder-mailbox";
@@ -267,7 +266,6 @@ export function DraftsFolderPage() {
 	const router = useRouter();
 	const { mailbox, mailboxId } = useFolderMailbox();
 	const { deleteDraft } = useAgentInbox();
-	const { openCompose } = useInboxSidebar();
 	const { drafts, isLoading, refresh } = useComposeDrafts(mailboxId);
 
 	if (!mailbox) return null;
@@ -285,10 +283,10 @@ export function DraftsFolderPage() {
 			router.push(`/inbox?${qs.toString()}`);
 			return;
 		}
+		// ?modal=compose opens the sidebar's ComposeModal, which hydrates ?draftId=.
 		router.push(
-			`/inbox?mailboxId=${encodeURIComponent(mailboxId)}&draftId=${encodeURIComponent(d.id)}`,
+			`/inbox?mailboxId=${encodeURIComponent(mailboxId)}&draftId=${encodeURIComponent(d.id)}&modal=compose`,
 		);
-		openCompose();
 	};
 
 	return (

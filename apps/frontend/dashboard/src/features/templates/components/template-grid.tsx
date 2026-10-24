@@ -4,6 +4,7 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { type ReactNode, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
@@ -270,11 +271,27 @@ export const TemplateGrid = ({
 }: TemplateGridProps) => {
 	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [templateToDelete, setTemplateToDelete] = useState<{
-		id: string;
-		name: string;
-	} | null>(null);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [modalId, setModalId] = useQueryState("id", { history: "replace" });
+
+	// Derive the target from loaded data; cache it so the close animation stays
+	// clean after the template disappears from the list post-delete.
+	const templateToDeleteRef = useRef<{ id: string; name: string } | null>(null);
+	const currentTemplateToDelete =
+		modal === "delete-template" && modalId
+			? templates.find((template) => template.id === modalId)
+			: undefined;
+	if (currentTemplateToDelete) {
+		templateToDeleteRef.current = {
+			id: currentTemplateToDelete.id,
+			name: currentTemplateToDelete.name,
+		};
+	}
+	const templateToDelete = templateToDeleteRef.current;
+	const isDeleteModalOpen =
+		modal === "delete-template" &&
+		!!modalId &&
+		templateToDelete?.id === modalId;
 
 	const handleDuplicate = async (id: string) => {
 		try {
@@ -308,8 +325,9 @@ export const TemplateGrid = ({
 	};
 
 	const handleDeleteClick = (id: string, name: string) => {
-		setTemplateToDelete({ id, name });
-		setIsDeleteModalOpen(true);
+		templateToDeleteRef.current = { id, name };
+		void setModal("delete-template");
+		void setModalId(id);
 	};
 
 	const openEditor = (template: { id: string; slug?: string }) => {
@@ -401,8 +419,8 @@ export const TemplateGrid = ({
 			<DeleteTemplateModal
 				isOpen={isDeleteModalOpen}
 				onClose={() => {
-					setIsDeleteModalOpen(false);
-					setTemplateToDelete(null);
+					void setModal(null);
+					void setModalId(null);
 				}}
 				onConfirm={handleDeleteConfirm}
 				templateName={templateToDelete?.name || "Template"}

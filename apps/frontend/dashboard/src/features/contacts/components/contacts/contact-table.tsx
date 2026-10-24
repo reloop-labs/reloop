@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import type { Contact } from "../../hooks/use-contacts-query";
 import { type ContactTableMeta, contactColumns } from "./columns";
@@ -62,7 +62,8 @@ export const ContactTable = ({
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [editingContactId, setEditingContactId] = useState<string | null>(null);
-	const [contactToRemove, setContactToRemove] = useState<Contact | null>(null);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [modalId, setModalId] = useQueryState("id", { history: "replace" });
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
 	const totalPages = Math.max(1, Math.ceil(total / (pageSize ?? 10)));
@@ -78,9 +79,28 @@ export const ContactTable = ({
 		[setDeleteId],
 	);
 
-	const handleRemoveFromGroup = useCallback((contact: Contact) => {
-		setContactToRemove(contact);
-	}, []);
+	// Resolved from the loaded rows by id; the last match is cached so the
+	// modal stays open through its success state after the row is removed.
+	const isRemoveModal = modal === "remove-from-group" && !!modalId;
+	const lastContactToRemoveRef = useRef<Contact | null>(null);
+	const currentContactToRemove = isRemoveModal
+		? contacts.find((c) => c.id === modalId)
+		: undefined;
+	if (currentContactToRemove) {
+		lastContactToRemoveRef.current = currentContactToRemove;
+	}
+	const contactToRemove =
+		isRemoveModal && lastContactToRemoveRef.current?.id === modalId
+			? lastContactToRemoveRef.current
+			: null;
+
+	const handleRemoveFromGroup = useCallback(
+		(contact: Contact) => {
+			void setModal("remove-from-group");
+			void setModalId(contact.id);
+		},
+		[setModal, setModalId],
+	);
 
 	const handleOpenChange = useCallback((open: boolean, id: string) => {
 		setActiveDropdownId(open ? id : null);
@@ -285,7 +305,10 @@ export const ContactTable = ({
 				<RemoveContactFromGroupModal
 					open={!!contactToRemove}
 					onOpenChange={(open) => {
-						if (!open) setContactToRemove(null);
+						if (!open) {
+							void setModal(null);
+							void setModalId(null);
+						}
 					}}
 					contact={contactToRemove}
 					groupId={groupId}

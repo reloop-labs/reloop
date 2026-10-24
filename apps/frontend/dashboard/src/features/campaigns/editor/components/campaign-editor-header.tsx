@@ -7,7 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import Link from "next/link";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
@@ -170,10 +170,32 @@ export function CampaignEditorHeader() {
 	const status = useCampaignEditorStore((s) => s.status);
 	const fromEmail = useCampaignEditorStore((s) => s.fromEmail);
 	const subject = useCampaignEditorStore((s) => s.subject);
-	const [isTestModalOpen, setIsTestModalOpen] = useState(false);
-	const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-	const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 	const isReadOnly = status !== "draft";
+	// Wait for the campaign to load (the store starts with an empty id) so a
+	// reload reopens the modal against the right campaign.
+	const isLoaded = campaignId !== "";
+	const isTestModalOpen = isLoaded && modal === "test-email";
+	const isScheduleModalOpen = isLoaded && modal === "schedule";
+	const isSendModalOpen = isLoaded && modal === "send";
+	const modalOpenChange =
+		(name: "test-email" | "schedule" | "send") => (open: boolean) =>
+			void setModal(open ? name : null);
+
+	// Test/send/schedule only apply to drafts: drop a stale ?modal= when a
+	// non-draft campaign loads. Checked once per campaign so a send that flips
+	// the status doesn't cut the success state short.
+	const checkedCampaignRef = useRef<string | null>(null);
+	useEffect(() => {
+		if (!campaignId || checkedCampaignRef.current === campaignId) return;
+		checkedCampaignRef.current = campaignId;
+		if (
+			isReadOnly &&
+			(modal === "test-email" || modal === "schedule" || modal === "send")
+		) {
+			void setModal(null);
+		}
+	}, [campaignId, isReadOnly, modal, setModal]);
 
 	const focusField = (id: string) => {
 		const el = document.getElementById(id);
@@ -207,7 +229,7 @@ export function CampaignEditorHeader() {
 			return;
 		}
 
-		setIsTestModalOpen(true);
+		void setModal("test-email");
 	};
 
 	return (
@@ -245,7 +267,7 @@ export function CampaignEditorHeader() {
 							<FancyButton.Root
 								variant="neutral"
 								size="xsmall"
-								onClick={() => setIsSendModalOpen(true)}
+								onClick={() => void setModal("send")}
 							>
 								Review
 							</FancyButton.Root>
@@ -257,17 +279,17 @@ export function CampaignEditorHeader() {
 			{/* Modals */}
 			<CampaignTestEmailModal
 				open={isTestModalOpen}
-				onOpenChange={setIsTestModalOpen}
+				onOpenChange={modalOpenChange("test-email")}
 				campaignId={campaignId}
 			/>
 			<CampaignScheduleModal
 				open={isScheduleModalOpen}
-				onOpenChange={setIsScheduleModalOpen}
+				onOpenChange={modalOpenChange("schedule")}
 				campaignId={campaignId}
 			/>
 			<CampaignSendModal
 				open={isSendModalOpen}
-				onOpenChange={setIsSendModalOpen}
+				onOpenChange={modalOpenChange("send")}
 				campaignId={campaignId}
 			/>
 		</>

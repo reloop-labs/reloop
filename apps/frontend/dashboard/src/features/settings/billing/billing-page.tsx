@@ -11,14 +11,14 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatedForwardButton } from "#/features/dashboard/animated-forward-button";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import { openHelpWithMessage } from "#/features/help/open-help";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { GrantedPlanBanner } from "./granted-plan-banner";
 import { resolvePlanId } from "./plan-id";
-import { type BillingMode, SwitchPlanModal } from "./switch-plan-modal";
+import { SwitchPlanModal, useOpenSwitchPlanModal } from "./switch-plan-modal";
 import {
 	contactEnterprise,
 	useBillingCheckout,
@@ -51,7 +51,7 @@ function formatExpiryDate(value: string): string {
 
 export function BillingPage() {
 	const router = useRouter();
-	const [planModal, setPlanModal] = useState<BillingMode | null>(null);
+	const setPlanModal = useOpenSwitchPlanModal();
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const {
 		data: usageData,
@@ -385,11 +385,6 @@ export function BillingPage() {
 			</div>
 
 			<SwitchPlanModal
-				open={planModal != null}
-				onOpenChange={(open) => {
-					if (!open) setPlanModal(null);
-				}}
-				initialMode={planModal ?? undefined}
 				currentPlanId={currentPlanId}
 				creditsExpireAt={prepaidExpiresAt}
 			/>

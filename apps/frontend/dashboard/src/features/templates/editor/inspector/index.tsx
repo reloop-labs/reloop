@@ -8,6 +8,7 @@ import * as Input from "@reloop/ui/input";
 import { getMarkRange } from "@tiptap/core";
 import { useCurrentEditor, useEditorState } from "@tiptap/react";
 import { AnimatePresence, motion } from "motion/react";
+import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -321,7 +322,23 @@ function TemplateVariableInspectorCard({
 	const [localDefaultValue, setLocalDefaultValue] = useState(defaultValue);
 
 	const [isSaving, setIsSaving] = useState(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	// URL-backed so a reload reopens it; `id` scopes it to this selected variable.
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [modalVarName, setModalVarName] = useQueryState("id", {
+		history: "replace",
+	});
+	const isDeleteModalOpen =
+		modal === "delete-selected-variable" &&
+		!!modalVarName &&
+		normalizeTemplateVariableName(modalVarName) === normalizedTarget;
+	const openDeleteModal = () => {
+		void setModal("delete-selected-variable");
+		void setModalVarName(name);
+	};
+	const closeDeleteModal = () => {
+		void setModal(null);
+		void setModalVarName(null);
+	};
 	const [isDeleting, setIsDeleting] = useState(false);
 
 	// Synchronize local state when selection changes
@@ -416,6 +433,9 @@ function TemplateVariableInspectorCard({
 
 			toast.success(`Deleted variable ${name}`);
 			mutate();
+
+			// Removing the node unmounts this card before the modal can close itself.
+			closeDeleteModal();
 
 			// Delete the active variable node in the editor
 			if (editor) {
@@ -559,7 +579,7 @@ function TemplateVariableInspectorCard({
 						variant="error"
 						mode="lighter"
 						size="small"
-						onClick={() => setIsDeleteModalOpen(true)}
+						onClick={openDeleteModal}
 						disabled={isSaving || isDeleting}
 						className="justify-center rounded-xl py-2"
 					>
@@ -585,7 +605,7 @@ function TemplateVariableInspectorCard({
 
 			<DeleteTemplateVariableModal
 				isOpen={isDeleteModalOpen}
-				onClose={() => setIsDeleteModalOpen(false)}
+				onClose={closeDeleteModal}
 				variableName={name}
 				variableType={varType}
 				defaultValue={defaultValue}

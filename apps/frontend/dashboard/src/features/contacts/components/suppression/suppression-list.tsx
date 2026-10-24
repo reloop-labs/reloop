@@ -5,7 +5,6 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useState } from "react";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { type Contact, useContactsQuery } from "../../hooks/use-contacts-query";
 import { ContactTableFooter } from "../contacts/table-footer";
@@ -27,7 +26,8 @@ export function SuppressionList() {
 	);
 	const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [limit] = useQueryState("limit", parseAsInteger.withDefault(10));
-	const [target, setTarget] = useState<Contact | null>(null);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [modalId, setModalId] = useQueryState("id", { history: "replace" });
 
 	const { data, isLoading, isError } = useContactsQuery({
 		page,
@@ -40,6 +40,17 @@ export function SuppressionList() {
 	const contacts = data?.contacts ?? [];
 	const total = data?.total ?? 0;
 	const isFiltered = search.trim() !== "";
+
+	// Derived from the loaded page; stays closed until the row is available.
+	// Once removed, the row drops out of the list and the modal closes itself.
+	const target =
+		modal === "remove-suppression" && modalId
+			? (contacts.find((c) => c.id === modalId) ?? null)
+			: null;
+	const setTarget = (contact: Contact | null) => {
+		void setModal(contact ? "remove-suppression" : null);
+		void setModalId(contact ? contact.id : null);
+	};
 
 	return (
 		<div className="space-y-4">

@@ -30,8 +30,6 @@ interface EditorState {
 	setIsPublishing: (publishing: boolean) => void;
 
 	// Global Variable creation state
-	isCreatingVar: boolean;
-	setIsCreatingVar: (open: boolean) => void;
 
 	// HTML currently shown in the code editor / HTML preview iframe
 	codeHtml: string;
@@ -88,8 +86,6 @@ export const useEditorStore = create<EditorState>((set) => ({
 		set((s) => (s.isPublishing === isPublishing ? s : { isPublishing })),
 
 	// Global Variable creation
-	isCreatingVar: false,
-	setIsCreatingVar: (isCreatingVar) => set({ isCreatingVar }),
 
 	codeHtml: "",
 	setCodeHtml: (codeHtml) =>

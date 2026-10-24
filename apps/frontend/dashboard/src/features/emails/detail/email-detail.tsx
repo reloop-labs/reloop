@@ -6,6 +6,7 @@ import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -318,6 +319,9 @@ function buildSmtpRows(
 		.filter(Boolean) as SmtpDetailRow[];
 }
 
+/** Synthetic row id used when an email is delivered but has no SMTP event. */
+const DELIVERED_SUMMARY_ROW_ID = "delivered-summary";
+
 /** Prefer Delivery/delivered rows for the timeline Delivered step. */
 function pickDeliveredSmtpRow(rows: SmtpDetailRow[]): SmtpDetailRow | null {
 	const byKumo = rows.find((r) => r.kumoType.toLowerCase() === "delivery");
@@ -468,33 +472,57 @@ export const EmailDetail = ({
 	const [activeTab, setActiveTab] = useState<string>("preview");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const [smtpDetail, setSmtpDetail] = useState<SmtpDetailRow | null>(null);
-	const [smtpDrawerOpen, setSmtpDrawerOpen] = useState(false);
+	// ?modal=smtp-response&id=<event id | delivered-summary>
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [smtpRowId, setSmtpRowId] = useQueryState("id", { history: "replace" });
 
 	const smtpRows = useMemo(() => buildSmtpRows(email?.events), [email?.events]);
 
-	const openSmtpDetail = useCallback((row: SmtpDetailRow) => {
-		setSmtpDetail(row);
-		setSmtpDrawerOpen(true);
-	}, []);
+	const deliveredSummaryRow = useMemo<SmtpDetailRow | null>(
+		() =>
+			email?.deliveredAt
+				? {
+						id: DELIVERED_SUMMARY_ROW_ID,
+						type: "delivered",
+						kumoType: "Delivery",
+						content: null,
+						code: 250,
+						createdAt: email.deliveredAt,
+					}
+				: null,
+		[email?.deliveredAt],
+	);
+
+	const activeSmtpRow =
+		modal === "smtp-response" && smtpRowId
+			? (smtpRows.find((r) => r.id === smtpRowId) ??
+				(smtpRowId === DELIVERED_SUMMARY_ROW_ID ? deliveredSummaryRow : null))
+			: null;
+	// Keep the last row so the drawer content stays put while it animates closed.
+	const lastSmtpRowRef = useRef<SmtpDetailRow | null>(null);
+	if (activeSmtpRow) lastSmtpRowRef.current = activeSmtpRow;
+	const smtpDetail = activeSmtpRow ?? lastSmtpRowRef.current;
+	const smtpDrawerOpen = !!activeSmtpRow;
+
+	const openSmtpDetail = useCallback(
+		(row: SmtpDetailRow) => {
+			void setModal("smtp-response");
+			void setSmtpRowId(row.id);
+		},
+		[setModal, setSmtpRowId],
+	);
+
+	const handleSmtpDrawerOpenChange = (open: boolean) => {
+		if (!open) {
+			void setModal(null);
+			void setSmtpRowId(null);
+		}
+	};
 
 	const openDeliveredDetail = useCallback(() => {
-		const row = pickDeliveredSmtpRow(smtpRows);
-		if (row) {
-			openSmtpDetail(row);
-			return;
-		}
-		if (email?.deliveredAt) {
-			openSmtpDetail({
-				id: "delivered-summary",
-				type: "delivered",
-				kumoType: "Delivery",
-				content: null,
-				code: 250,
-				createdAt: email.deliveredAt,
-			});
-		}
-	}, [email?.deliveredAt, openSmtpDetail, smtpRows]);
+		const row = pickDeliveredSmtpRow(smtpRows) ?? deliveredSummaryRow;
+		if (row) openSmtpDetail(row);
+	}, [deliveredSummaryRow, openSmtpDetail, smtpRows]);
 
 	useEffect(() => {
 		if (email) {
@@ -784,7 +812,7 @@ export const EmailDetail = ({
 			<SmtpResponseDrawer
 				row={smtpDetail}
 				open={smtpDrawerOpen}
-				onOpenChange={setSmtpDrawerOpen}
+				onOpenChange={handleSmtpDrawerOpenChange}
 			/>
 
 			{/* Content Preview Tabs */}

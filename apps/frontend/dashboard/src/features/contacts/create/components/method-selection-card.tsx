@@ -5,12 +5,11 @@ import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import { Code2, FileText } from "lucide-react";
-import { useState } from "react";
+import { useQueryState } from "nuqs";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { ContactsApiDetails } from "#/components/api-details/contacts";
 import type { CreateContactStep } from "../types";
-import { ManualContactsModal } from "./manual-contacts-modal";
 
 interface MethodSelectionCardProps {
 	onSelectMethod: (method: CreateContactStep) => void;
@@ -24,7 +23,8 @@ export function MethodSelectionCard({
 	onSelectMethod,
 	onFileSelect,
 }: MethodSelectionCardProps) {
-	const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+	// The create-contact modal is mounted by ContactsModals in the shell
+	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		accept: {
 			"text/csv": [".csv"],
@@ -155,7 +155,7 @@ export function MethodSelectionCard({
 					{/* Option 1: Add manually or copy paste */}
 					<button
 						type="button"
-						onClick={() => setIsManualModalOpen(true)}
+						onClick={() => void setModal("add-contact")}
 						className="group flex w-full cursor-pointer items-center gap-3 rounded-lg py-2 text-left font-medium text-text-strong-950 text-xs transition-colors hover:text-black sm:text-sm dark:hover:text-white"
 					>
 						<FileText className="h-4 w-4 text-text-sub-600 transition-colors group-hover:text-text-strong-950" />
@@ -177,11 +177,6 @@ export function MethodSelectionCard({
 					/>
 				</div>
 			</div>
-
-			<ManualContactsModal
-				open={isManualModalOpen}
-				onOpenChange={setIsManualModalOpen}
-			/>
 		</div>
 	);
 }

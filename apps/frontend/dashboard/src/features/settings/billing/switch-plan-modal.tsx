@@ -19,7 +19,13 @@ import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { Check } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import {
+	parseAsInteger,
+	parseAsStringLiteral,
+	useQueryState,
+	useQueryStates,
+} from "nuqs";
+import { useCallback, useRef, useState } from "react";
 import { StepSlider } from "./step-slider";
 import {
 	contactEnterprise,
@@ -267,36 +273,58 @@ function renderPlanPrice(plan: PricingPlan) {
 	);
 }
 
+const BILLING_MODE_IDS = ["monthly", "credits"] as const;
+const PLAN_IDS = pricingPlans.map((plan) => plan.id);
+
+/**
+ * Modal state lives in the URL (`?switchPlan=credits&plan=…&emails=…`) so a
+ * reload reopens it on the same tab, plan and pack instead of losing it.
+ */
+const switchPlanParsers = {
+	switchPlan: parseAsStringLiteral(BILLING_MODE_IDS),
+	plan: parseAsStringLiteral(PLAN_IDS),
+	emails: parseAsInteger,
+};
+
+/** Tab the modal opens on: Pay as you go for credit users, Monthly otherwise. */
+export function defaultBillingMode(currentPlanId: PlanId): BillingMode {
+	return currentPlanId === "payg" ? "credits" : "monthly";
+}
+
+/** Opens the Switch plan modal (rendered elsewhere on the page) on a tab. */
+export function useOpenSwitchPlanModal() {
+	const [, setMode] = useQueryState("switchPlan", switchPlanParsers.switchPlan);
+	return useCallback((mode: BillingMode) => void setMode(mode), [setMode]);
+}
+
 interface SwitchPlanModalProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
 	currentPlanId: PlanId;
-	/** Tab shown on open. Defaults to Pay as you go for credit users. */
-	initialMode?: BillingMode;
 	/** Expiry of credits the org already holds, if any. */
 	creditsExpireAt?: string | null;
 }
 
 export function SwitchPlanModal({
-	open,
-	onOpenChange,
 	currentPlanId,
-	initialMode,
 	creditsExpireAt,
 }: SwitchPlanModalProps) {
 	const router = useRouter();
-	const openMode: BillingMode =
-		initialMode ?? (currentPlanId === "payg" ? "credits" : "monthly");
-	const [mode, setMode] = useState<BillingMode>(openMode);
-	const [selectedId, setSelectedId] = useState<PlanId>(currentPlanId);
-	const [emails, setEmails] = useState<number>(DEFAULT_PACK);
+	const [query, setQuery] = useQueryStates(switchPlanParsers);
+	const open = query.switchPlan !== null;
+	const mode: BillingMode =
+		query.switchPlan ?? defaultBillingMode(currentPlanId);
+	const selectedId: PlanId = query.plan ?? currentPlanId;
+	const emails =
+		query.emails !== null &&
+		(creditPackSizes as readonly number[]).includes(query.emails)
+			? query.emails
+			: DEFAULT_PACK;
 
-	useEffect(() => {
-		if (!open) return;
-		setMode(openMode);
-		setSelectedId(currentPlanId);
-		setEmails(DEFAULT_PACK);
-	}, [open, openMode, currentPlanId]);
+	const setMode = (next: BillingMode) => void setQuery({ switchPlan: next });
+	const setSelectedId = (next: PlanId) => void setQuery({ plan: next });
+	const setEmails = (next: number) => void setQuery({ emails: next });
+	const onOpenChange = (next: boolean) => {
+		if (!next) void setQuery({ switchPlan: null, plan: null, emails: null });
+	};
 
 	const checkout = useBillingCheckout();
 	const creditsCheckout = useCreditsCheckout();
@@ -357,7 +385,7 @@ export function SwitchPlanModal({
 								className="flex size-6 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
 								aria-label="Close"
 							>
-								<Icon name="plus" className="h-4 w-4 rotate-45" />
+								<Icon name="cross" className="h-4 w-4" />
 							</button>
 						</Modal.Close>
 					</div>

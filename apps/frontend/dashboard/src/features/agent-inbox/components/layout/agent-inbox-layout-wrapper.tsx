@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useQueryState } from "nuqs";
 import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
@@ -22,7 +22,9 @@ export const AgentInboxLayoutWrapper = ({
 	children: React.ReactNode;
 }) => {
 	const router = useRouter();
-	const [isAddOpen, setIsAddOpen] = useState(false);
+	// Same ?modal=create-agent-mailbox key the mailbox list header uses.
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const isAddOpen = modal === "create-agent-mailbox";
 	const { data: billing } = useBillingUsage();
 	const { mailboxes, refresh } = useAgentInbox();
 	const inboxUsed = billing?.resources?.agentInboxes.used ?? 0;
@@ -35,7 +37,7 @@ export const AgentInboxLayoutWrapper = ({
 			router.push("/settings/billing");
 			return;
 		}
-		setIsAddOpen(true);
+		void setModal("create-agent-mailbox");
 	};
 
 	return (
@@ -60,7 +62,7 @@ export const AgentInboxLayoutWrapper = ({
 
 			<AddAgentAddressModal
 				isOpen={isAddOpen}
-				onClose={() => setIsAddOpen(false)}
+				onClose={() => void setModal(null)}
 				onCreated={(created) => {
 					toast.success("Mailbox added");
 					router.push(`/inbox?mailboxId=${encodeURIComponent(created.id)}`);

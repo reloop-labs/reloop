@@ -21,10 +21,12 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 		parseAsInteger.withDefault(1),
 	);
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
-	const [, setModal] = useQueryState("modal", { history: "replace" });
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 	const [statusFilter, setStatusFilter] = useState<ContactFilterOption>(null);
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [exportOpen, setExportOpen] = useState(false);
+	const exportOpen = modal === "export-contacts";
+	const setExportOpen = (open: boolean) =>
+		void setModal(open ? "export-contacts" : null);
 
 	const {
 		data,

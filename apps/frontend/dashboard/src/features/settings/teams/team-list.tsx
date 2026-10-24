@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
@@ -142,16 +142,9 @@ export function TeamList({
 	const [inviteId, setInviteId] = useQueryState("inviteId", {
 		history: "replace",
 	});
-	const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false);
-	const [memberToRemove, setMemberToRemove] = useState<{
-		id: string;
-		name: string | null;
-		email: string;
-	} | null>(null);
-	const [changeRoleModalOpen, setChangeRoleModalOpen] = useState(false);
-	const [memberToChangeRole, setMemberToChangeRole] = useState<Member | null>(
-		null,
-	);
+	const [memberId, setMemberId] = useQueryState("memberId", {
+		history: "replace",
+	});
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const orgId = activeOrganization?.id;
@@ -188,6 +181,26 @@ export function TeamList({
 		queryClient.invalidateQueries({
 			queryKey: queryKeys.organization.invitations(orgId ?? ""),
 		});
+
+	// Derive the targeted member from the URL. Keep the last match in a ref so
+	// the remove modal can finish its success state after the member disappears
+	// from the refetched list.
+	const lastMemberRef = useRef<Member | null>(null);
+	const matchedMember =
+		membersData?.members?.find((m) => m.id === memberId) ?? null;
+	if (matchedMember) lastMemberRef.current = matchedMember;
+	const targetMember =
+		matchedMember ??
+		(memberId && lastMemberRef.current?.id === memberId
+			? lastMemberRef.current
+			: null);
+	const memberToRemove = modal === "remove-member" ? targetMember : null;
+	const memberToChangeRole = modal === "change-role" ? targetMember : null;
+
+	const closeMemberModal = () => {
+		setModal(null);
+		setMemberId(null);
+	};
 
 	const { data: session } = useSessionQuery();
 	const currentUserId = session?.user?.id;
@@ -251,12 +264,8 @@ export function TeamList({
 	};
 
 	const handleRemoveMemberClick = (member: Member) => {
-		setMemberToRemove({
-			id: member.id,
-			name: member.user.name,
-			email: member.user.email,
-		});
-		setRemoveMemberModalOpen(true);
+		setModal("remove-member");
+		setMemberId(member.id);
 	};
 
 	const handleConfirmRemoveMember = async () => {
@@ -283,8 +292,8 @@ export function TeamList({
 	const handleChangeRoleClick = (memberId: string) => {
 		const member = membersData?.members?.find((m) => m.id === memberId);
 		if (!member) return;
-		setMemberToChangeRole(member);
-		setChangeRoleModalOpen(true);
+		setModal("change-role");
+		setMemberId(member.id);
 	};
 
 	const handleRemoveMemberById = (memberId: string) => {
@@ -667,18 +676,19 @@ export function TeamList({
 				}
 			/>
 			<RemoveMemberModal
-				open={removeMemberModalOpen}
-				onOpenChange={setRemoveMemberModalOpen}
+				open={modal === "remove-member" && !!memberToRemove}
+				onOpenChange={(open) => {
+					if (!open) closeMemberModal();
+				}}
 				onConfirm={handleConfirmRemoveMember}
 				isRemoving={removingMember === memberToRemove?.id}
-				memberName={memberToRemove?.name ?? ""}
-				memberEmail={memberToRemove?.email ?? ""}
+				memberName={memberToRemove?.user.name ?? ""}
+				memberEmail={memberToRemove?.user.email ?? ""}
 			/>
 			<ChangeRoleModal
-				open={changeRoleModalOpen}
+				open={modal === "change-role" && !!memberToChangeRole}
 				onOpenChange={(open) => {
-					setChangeRoleModalOpen(open);
-					if (!open) setMemberToChangeRole(null);
+					if (!open) closeMemberModal();
 				}}
 				onConfirm={handleConfirmChangeRole}
 				isUpdating={updatingRole}

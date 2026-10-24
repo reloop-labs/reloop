@@ -42,7 +42,15 @@ export const DomainHeaderActions = ({
 }: DomainHeaderActionsProps) => {
 	const [, setDeleteId] = useQueryState("delete");
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const [forwardOpen, setForwardOpen] = useState(false);
+	// ?modal=forward-dns — domain comes from the route.
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const forwardOpen = modal === "forward-dns";
+	const setForwardOpen = useCallback(
+		(open: boolean) => {
+			void setModal(open ? "forward-dns" : null);
+		},
+		[setModal],
+	);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const openedBySequenceRef = useRef(false);
 	const { handleVerifyDNS } = useDomainActions(domainRecordId);
@@ -115,7 +123,14 @@ export const DomainHeaderActions = ({
 				void setDeleteId(domainRecordId);
 			}
 		},
-		[domain?.domain, domainRecordId, handleVerifyDNS, onVerifyDNS, setDeleteId],
+		[
+			domain?.domain,
+			domainRecordId,
+			handleVerifyDNS,
+			onVerifyDNS,
+			setDeleteId,
+			setForwardOpen,
+		],
 	);
 
 	useHotkeys(
@@ -187,7 +202,7 @@ export const DomainHeaderActions = ({
 		window.addEventListener("domain:open-forward-records", onOpenForward);
 		return () =>
 			window.removeEventListener("domain:open-forward-records", onOpenForward);
-	}, []);
+	}, [setForwardOpen]);
 
 	return (
 		<>

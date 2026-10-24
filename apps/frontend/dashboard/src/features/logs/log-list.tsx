@@ -101,15 +101,9 @@ export function LogList({
 	const tabEl = buttonRefs.current[currentIdx];
 	const rect = tabEl?.getBoundingClientRect();
 
-	// Mobile drawer state (for narrow viewports)
-	const [drawerOpen, setDrawerOpen] = useState(false);
+	// Mobile drawer (narrow viewports) — open state derived from ?log=
 	const isMobile = useMediaQuery("(max-width: 1023px)");
-
-	useEffect(() => {
-		if (isMobile && selectedLogId) {
-			setDrawerOpen(true);
-		}
-	}, [isMobile, selectedLogId]);
+	const drawerOpen = isMobile && !!selectedLogId;
 
 	const listParams = {
 		page: currentPage ?? 1,
@@ -444,7 +438,6 @@ export function LogList({
 						selectedLogId={selectedLogId}
 						onRowClick={(logId) => {
 							void setSelectedLogId(logId);
-							setDrawerOpen(true);
 						}}
 						hasFilters={!!hasAnyFilter}
 						onClearFilters={handleClearAll}
@@ -521,7 +514,6 @@ export function LogList({
 				logId={drawerOpen ? selectedLogId : null}
 				isOpen={drawerOpen}
 				onOpenChange={(open) => {
-					setDrawerOpen(open);
 					if (!open) void setSelectedLogId(null);
 				}}
 			/>

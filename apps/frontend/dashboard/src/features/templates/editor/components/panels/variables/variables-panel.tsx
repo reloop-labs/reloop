@@ -4,9 +4,10 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useCurrentEditor } from "@tiptap/react";
+import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { useAddVariableModal } from "#/features/templates/editor/hooks/use-add-variable-modal";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import {
@@ -81,10 +82,48 @@ export function VariablesPanel({}: PanelProps = {}) {
 	const { editor } = useCurrentEditor();
 
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
-	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
+	const [, setIsCreatingVar] = useAddVariableModal();
 	const [isSavingConfig, setIsSavingConfig] = useState(false);
-	const [editingVar, setEditingVar] = useState<MappedVariable | null>(null);
-	const [deletingVar, setDeletingVar] = useState<MappedVariable | null>(null);
+
+	// Edit/delete modals live in the URL (variable name in `id`) so a reload reopens them.
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [modalVarName, setModalVarName] = useQueryState("id", {
+		history: "replace",
+	});
+	const openVarModal = (
+		name: "edit-variable" | "delete-variable",
+		variable: MappedVariable,
+	) => {
+		void setModal(name);
+		void setModalVarName(variable.name);
+	};
+	const closeVarModal = () => {
+		void setModal(null);
+		void setModalVarName(null);
+	};
+
+	// Keep the last matched variable (with a stable identity) so the modal keeps its
+	// details through rename/delete refetches and the close animation.
+	const targetVarRef = useRef<MappedVariable | null>(null);
+	const isVarModal = modal === "edit-variable" || modal === "delete-variable";
+	const matchedVar =
+		isVarModal && modalVarName
+			? detectedVars.find((v) => v.name === modalVarName)
+			: undefined;
+	if (
+		matchedVar &&
+		(targetVarRef.current?.name !== matchedVar.name ||
+			targetVarRef.current.type !== matchedVar.type ||
+			targetVarRef.current.defaultValue !== matchedVar.defaultValue)
+	) {
+		targetVarRef.current = matchedVar;
+	}
+	const targetVar =
+		isVarModal && targetVarRef.current?.name === modalVarName
+			? targetVarRef.current
+			: null;
+	const editingVar = modal === "edit-variable" ? targetVar : null;
+	const deletingVar = modal === "delete-variable" ? targetVar : null;
 
 	const handleCopy = (key: string, e: React.MouseEvent) => {
 		e.stopPropagation();
@@ -284,7 +323,7 @@ export function VariablesPanel({}: PanelProps = {}) {
 												size="xxsmall"
 												onClick={(e) => {
 													e.stopPropagation();
-													setEditingVar(v);
+													openVarModal("edit-variable", v);
 												}}
 												title="Configure variable"
 												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:hover:bg-bg-soft-200"
@@ -298,7 +337,7 @@ export function VariablesPanel({}: PanelProps = {}) {
 												size="xxsmall"
 												onClick={(e) => {
 													e.stopPropagation();
-													setDeletingVar(v);
+													openVarModal("delete-variable", v);
 												}}
 												title="Delete variable"
 												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-error-lighter hover:text-error-base dark:hover:bg-error-base/10 dark:hover:text-error-base"
@@ -336,19 +375,18 @@ export function VariablesPanel({}: PanelProps = {}) {
 				variable={editingVar}
 				open={!!editingVar}
 				onOpenChange={(isOpen) => {
-					if (!isOpen) setEditingVar(null);
+					if (!isOpen) closeVarModal();
 				}}
 				onSave={handleSaveVariableConfig}
 				onDelete={async (_name) => {
-					setDeletingVar(editingVar);
-					setEditingVar(null);
+					if (editingVar) openVarModal("delete-variable", editingVar);
 				}}
 				isSubmitting={isSavingConfig}
 			/>
 
 			<DeleteTemplateVariableModal
 				isOpen={!!deletingVar}
-				onClose={() => setDeletingVar(null)}
+				onClose={closeVarModal}
 				variableName={deletingVar?.name ?? ""}
 				variableType={deletingVar?.type ?? "string"}
 				defaultValue={deletingVar?.defaultValue ?? null}

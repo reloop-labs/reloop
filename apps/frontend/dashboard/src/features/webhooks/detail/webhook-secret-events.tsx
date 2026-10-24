@@ -4,6 +4,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { StripeSecret } from "#/features/webhooks/components/blurred-secret";
@@ -95,7 +96,11 @@ export function WebhookSecretEvents({
 	const [copiedSecret, setCopiedSecret] = useState(false);
 	const [isSecretVisible, setIsSecretVisible] = useState(false);
 	const [isRotatingSecret, setIsRotatingSecret] = useState(false);
-	const [isRotateModalOpen, setIsRotateModalOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const isRotateModalOpen = modal === "rotate-webhook-secret";
+	const setIsRotateModalOpen = (open: boolean) => {
+		void setModal(open ? "rotate-webhook-secret" : null);
+	};
 
 	const handleCopySecret = async () => {
 		if (!webhook?.secret) return;

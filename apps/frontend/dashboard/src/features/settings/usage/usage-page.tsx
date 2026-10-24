@@ -1,10 +1,14 @@
 import { getNextPlan } from "@reloop/pricing";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import { resolvePlanId } from "#/features/settings/billing/plan-id";
-import { SwitchPlanModal } from "#/features/settings/billing/switch-plan-modal";
+import {
+	defaultBillingMode,
+	SwitchPlanModal,
+	useOpenSwitchPlanModal,
+} from "#/features/settings/billing/switch-plan-modal";
 import {
 	emailUsage,
 	useBillingUsage,
@@ -16,7 +20,7 @@ export function UsagePage() {
 	const router = useRouter();
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const { data, error: usageError, refetch: refetchUsage } = useBillingUsage();
-	const [switchOpen, setSwitchOpen] = useState(false);
+	const openSwitchPlan = useOpenSwitchPlanModal();
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
@@ -63,7 +67,7 @@ export function UsagePage() {
 						variant="neutral"
 						size="xsmall"
 						className="shrink-0 rounded-full font-medium"
-						onClick={() => setSwitchOpen(true)}
+						onClick={() => openSwitchPlan(defaultBillingMode(currentPlanId))}
 					>
 						Upgrade plan
 					</FancyButton.Root>
@@ -86,8 +90,6 @@ export function UsagePage() {
 			<UsageSection />
 
 			<SwitchPlanModal
-				open={switchOpen}
-				onOpenChange={setSwitchOpen}
 				currentPlanId={currentPlanId}
 				creditsExpireAt={data?.prepaid?.expiresAt}
 			/>

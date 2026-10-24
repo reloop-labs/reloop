@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
-import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
+import { useAddVariableModal } from "#/features/templates/editor/hooks/use-add-variable-modal";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/hooks/use-template-id";
 import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
@@ -21,6 +21,7 @@ const fetcher = (url: string) =>
 export const VariablesDropdown = forwardRef(
 	(props: VariablesDropdownProps, ref) => {
 		const templateId = useTemplateId();
+		const [, setIsCreatingVar] = useAddVariableModal();
 
 		const { data: templateData } = useSWR(
 			templateId ? `/api/template/v1/${templateId}` : null,
@@ -82,7 +83,7 @@ export const VariablesDropdown = forwardRef(
 
 				// Defer so TipTap suggestion onExit finishes before Radix modal opens
 				window.setTimeout(() => {
-					useEditorStore.getState().setIsCreatingVar(true);
+					setIsCreatingVar(true);
 				}, 0);
 			}
 		};

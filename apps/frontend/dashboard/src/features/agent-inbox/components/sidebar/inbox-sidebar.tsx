@@ -90,8 +90,17 @@ export const InboxSidebar = ({
 	const countsLoading = !mailboxReady || isLoadingMailboxes || isLoadingThreads;
 	const labelsLoading = !mailboxReady || isLoadingLabels;
 
-	const [isComposeOpen, setIsComposeOpen] = useState(false);
-	const [isLabelDialogOpen, setIsLabelDialogOpen] = useState(false);
+	// ?modal=compose / ?modal=create-label — shared `modal` key with the layout
+	// wrapper (?modal=create-agent-mailbox). Compose drafts restore via ?draftId=.
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const isComposeOpen = mailboxReady && modal === "compose";
+	const isLabelDialogOpen = mailboxReady && modal === "create-label";
+	const setIsComposeOpen = (open: boolean) => {
+		void setModal(open ? "compose" : null);
+	};
+	const setIsLabelDialogOpen = (open: boolean) => {
+		void setModal(open ? "create-label" : null);
+	};
 	const [emailCopied, setEmailCopied] = useState(false);
 	const [, setDeleteId] = useQueryState("delete", parseAsString);
 
@@ -125,8 +134,8 @@ export const InboxSidebar = ({
 	);
 
 	useEffect(() => {
-		registerOpenCompose(() => setIsComposeOpen(true));
-	}, [registerOpenCompose]);
+		registerOpenCompose(() => void setModal("compose"));
+	}, [registerOpenCompose, setModal]);
 
 	useHotkeys(
 		"c",
@@ -148,7 +157,9 @@ export const InboxSidebar = ({
 
 	useHotkeys("alt+l", (e) => {
 		e.preventDefault();
-		setIsLabelDialogOpen(true);
+		if (mailboxReady) {
+			setIsLabelDialogOpen(true);
+		}
 	});
 
 	useHotkeys("meta+k, ctrl+k", (e) => {

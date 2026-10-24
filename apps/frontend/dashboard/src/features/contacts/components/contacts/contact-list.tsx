@@ -78,7 +78,12 @@ export function ContactList() {
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const { columnVisibility, setColumnVisible } = useContactColumnVisibility();
-	const [exportOpen, setExportOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const exportOpen = modal === "export-contacts";
+	const setExportOpen = useCallback(
+		(open: boolean) => void setModal(open ? "export-contacts" : null),
+		[setModal],
+	);
 
 	/** All selected statuses, comma-separated; the API matches any of them. */
 	const statusParam = [...statusFilter].sort().join(",");
@@ -137,7 +142,7 @@ export function ContactList() {
 
 	const openExportModal = useCallback(() => {
 		setExportOpen(true);
-	}, []);
+	}, [setExportOpen]);
 
 	const actions = useMemo<CommandAction[]>(
 		() => [

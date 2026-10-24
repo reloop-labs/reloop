@@ -40,9 +40,15 @@ const headerMenuItems = [
 
 export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	const router = useRouter();
-	const [, setModal] = useQueryState("modal", { history: "replace" });
-	const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	// Distinct from the shell's "edit-group"/"delete-group" (ContactsModals is
+	// mounted on this page too), so only these route-scoped modals open.
+	const isRenameModalOpen = modal === "edit-group-detail";
+	const isDeleteModalOpen = modal === "delete-group-detail";
+	const setIsRenameModalOpen = (open: boolean) =>
+		void setModal(open ? "edit-group-detail" : null);
+	const setIsDeleteModalOpen = (open: boolean) =>
+		void setModal(open ? "delete-group-detail" : null);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 

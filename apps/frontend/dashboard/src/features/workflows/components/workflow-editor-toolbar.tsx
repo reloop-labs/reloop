@@ -197,7 +197,8 @@ export const WorkflowEditorToolbar = ({
 	const [, setRunsFilter] = useQueryState("runs");
 	const [, setSelectedRun] = useQueryState("run");
 	const [busy, setBusy] = useState(false);
-	const [testOpen, setTestOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const testOpen = modal === "enroll-contact";
 	const [stopOpen, setStopOpen] = useState(false);
 	const [moreOpen, setMoreOpen] = useState(false);
 	const [duplicating, setDuplicating] = useState(false);
@@ -351,7 +352,7 @@ export const WorkflowEditorToolbar = ({
 									onFocus={() => setMoreHoverIdx(idx)}
 									onSelect={() => {
 										setMoreOpen(false);
-										if (item.id === "test") setTestOpen(true);
+										if (item.id === "test") void setModal("enroll-contact");
 										else if (item.id === "duplicate") void handleDuplicate();
 										else void setDeleteId(workflow.id);
 									}}
@@ -450,7 +451,7 @@ export const WorkflowEditorToolbar = ({
 				triggerEvent={triggerEvent}
 				canEnroll={isActive}
 				open={testOpen}
-				onOpenChange={setTestOpen}
+				onOpenChange={(open) => void setModal(open ? "enroll-contact" : null)}
 				onEnrolled={(enrollmentId) => {
 					// Show the run that just started, whatever filter was on.
 					void setRunsFilter(null);

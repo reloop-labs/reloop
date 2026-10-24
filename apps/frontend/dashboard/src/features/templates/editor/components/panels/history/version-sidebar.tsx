@@ -354,20 +354,22 @@ export function VersionSidebar() {
 		parseAsStringLiteral(viewModes).withDefault("visual"),
 	);
 
-	// Modals & Triggers
-	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-	const [selectedPreviewVersion, setSelectedPreviewVersion] =
-		useState<TemplateVersion | null>(null);
-
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [versionToDelete, setVersionToDelete] = useState<{
-		id: string;
-		label: string;
-	} | null>(null);
-
-	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-	const [versionToPublish, setVersionToPublish] =
-		useState<TemplateVersion | null>(null);
+	// Modals & Triggers (URL-backed so a reload reopens them; version id in `id`)
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [modalVersionId, setModalVersionId] = useQueryState("id", {
+		history: "replace",
+	});
+	const openVersionModal = (
+		name: "preview-version" | "delete-version" | "publish-version",
+		versionId: string,
+	) => {
+		void setModal(name);
+		void setModalVersionId(versionId);
+	};
+	const closeVersionModal = () => {
+		void setModal(null);
+		void setModalVersionId(null);
+	};
 	const [isPublishing, setIsPublishing] = useState(false);
 
 	const [restoringId, setRestoringId] = useState<string | null>(null);
@@ -391,6 +393,31 @@ export function VersionSidebar() {
 		templateId ? `/api/template/v1/${templateId}` : null,
 		fetcher,
 	);
+
+	// Derive the modal's version from loaded data; keep the last match so the
+	// modal keeps its details after a delete refetch and through the close animation.
+	const modalVersionRef = useRef<TemplateVersion | null>(null);
+	const isVersionModal =
+		modal === "preview-version" ||
+		modal === "delete-version" ||
+		modal === "publish-version";
+	const matchedModalVersion =
+		isVersionModal && modalVersionId && Array.isArray(versions)
+			? versions.find((v) => v.id === modalVersionId)
+			: undefined;
+	if (matchedModalVersion) {
+		modalVersionRef.current = matchedModalVersion;
+	}
+	const modalVersion =
+		isVersionModal && modalVersionRef.current?.id === modalVersionId
+			? modalVersionRef.current
+			: null;
+
+	const isPreviewOpen = modal === "preview-version" && !!modalVersion;
+	const selectedPreviewVersion = isPreviewOpen ? modalVersion : null;
+	const isDeleteModalOpen = modal === "delete-version" && !!modalVersion;
+	const isPublishModalOpen = modal === "publish-version" && !!modalVersion;
+	const versionToPublish = isPublishModalOpen ? modalVersion : null;
 
 	const handleRestore = async (version: TemplateVersion) => {
 		if (!editor) return;
@@ -558,6 +585,16 @@ export function VersionSidebar() {
 		return majorVersions.length - index;
 	};
 
+	const versionToDelete =
+		isDeleteModalOpen && modalVersion
+			? {
+					id: modalVersion.id,
+					label: modalVersion.isMajor
+						? `v${getMajorVersionNumber(modalVersion.id)}.0`
+						: "Draft version",
+				}
+			: null;
+
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 font-sans dark:bg-black">
 			{/* ── Header ── */}
@@ -614,7 +651,7 @@ export function VersionSidebar() {
 										{currentList.length > 1 && (
 											<div
 												className={cn(
-													"-translate-x-1/2 absolute left-1/2 w-[1px] bg-stroke-soft-200",
+													"absolute left-1/2 w-[1px] -translate-x-1/2 bg-stroke-soft-200",
 													index === 0
 														? "top-[26px] bottom-0"
 														: index === currentList.length - 1
@@ -759,7 +796,7 @@ export function VersionSidebar() {
 									</div>
 
 									{/* Interactive Actions (shown on hover, no backgrounds/borders) */}
-									<div className="-translate-y-1/2 absolute top-[26px] right-4 flex translate-x-2 items-center gap-1 opacity-0 transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100">
+									<div className="absolute top-[26px] right-4 flex translate-x-2 -translate-y-1/2 items-center gap-1 opacity-0 transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100">
 										{/* Publish action */}
 										<Tooltip.Root>
 											<Tooltip.Trigger asChild>
@@ -769,8 +806,7 @@ export function VersionSidebar() {
 													size="xxsmall"
 													onClick={(e) => {
 														e.stopPropagation();
-														setVersionToPublish(version);
-														setIsPublishModalOpen(true);
+														openVersionModal("publish-version", version.id);
 													}}
 													className="size-6 rounded-md p-1 text-text-sub-600 transition-all duration-150 ease-out hover:bg-bg-weak-50 active:scale-95"
 												>
@@ -793,8 +829,7 @@ export function VersionSidebar() {
 													size="xxsmall"
 													onClick={(e) => {
 														e.stopPropagation();
-														setSelectedPreviewVersion(version);
-														setIsPreviewOpen(true);
+														openVersionModal("preview-version", version.id);
 													}}
 													className="size-6 rounded-md p-1 text-text-sub-600 transition-all duration-150 ease-out hover:bg-bg-weak-50 active:scale-95"
 												>
@@ -815,13 +850,7 @@ export function VersionSidebar() {
 													size="xxsmall"
 													onClick={(e) => {
 														e.stopPropagation();
-														setVersionToDelete({
-															id: version.id,
-															label: version.isMajor
-																? displayLabel
-																: "Draft version",
-														});
-														setIsDeleteModalOpen(true);
+														openVersionModal("delete-version", version.id);
 													}}
 													disabled={isDeleting}
 													className="size-6 rounded-md p-1 text-text-sub-600 transition-all duration-150 ease-out hover:bg-error-lighter hover:text-error-base active:scale-95 disabled:opacity-50"
@@ -853,10 +882,7 @@ export function VersionSidebar() {
 			{isPreviewOpen && selectedPreviewVersion && (
 				<PreviewModal
 					isOpen={isPreviewOpen}
-					onClose={() => {
-						setIsPreviewOpen(false);
-						setSelectedPreviewVersion(null);
-					}}
+					onClose={closeVersionModal}
 					version={selectedPreviewVersion}
 					currentHtml={editor?.getHTML() || ""}
 					currentSubject={subject || ""}
@@ -867,10 +893,7 @@ export function VersionSidebar() {
 
 			<DeleteVersionModal
 				isOpen={isDeleteModalOpen}
-				onClose={() => {
-					setIsDeleteModalOpen(false);
-					setVersionToDelete(null);
-				}}
+				onClose={closeVersionModal}
 				onConfirm={() => {
 					if (versionToDelete) {
 						handleDeleteVersion(versionToDelete.id, versionToDelete.label);
@@ -881,10 +904,7 @@ export function VersionSidebar() {
 
 			<PublishVersionModal
 				isOpen={isPublishModalOpen}
-				onClose={() => {
-					setIsPublishModalOpen(false);
-					setVersionToPublish(null);
-				}}
+				onClose={closeVersionModal}
 				onConfirm={handlePublishVersion}
 				isPublishing={isPublishing}
 				versionLabel={

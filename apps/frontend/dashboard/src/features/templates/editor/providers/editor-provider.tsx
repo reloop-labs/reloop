@@ -3,6 +3,7 @@ import { EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useAddVariableModal } from "#/features/templates/editor/hooks/use-add-variable-modal";
 import { useEditorHook } from "#/features/templates/editor/hooks/use-editor-hooks";
 import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-store";
 import { useSWR } from "#/features/templates/editor/hooks/use-swr-compat";
@@ -130,8 +131,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	const setHtmlLocked = useEditorStore((s) => s.setHtmlLocked);
 	const setImportedEmailCss = useEditorStore((s) => s.setImportedEmailCss);
 
-	const isCreatingVar = useEditorStore((s) => s.isCreatingVar);
-	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
+	const [isCreatingVar, setIsCreatingVar] = useAddVariableModal();
 	const [isSavingConfig, setIsSavingConfig] = useState(false);
 
 	useEffect(() => {

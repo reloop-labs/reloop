@@ -2,7 +2,8 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useQueryState } from "nuqs";
+import { useCallback, useMemo, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
@@ -38,10 +39,38 @@ export function SmtpPage({
 	const { isOrgAdmin } = useOrgPermissions();
 	const { data: usage } = useBillingUsage();
 	const providersQuery = useSmtpProviders();
-	const [editing, setEditing] = useState<SmtpProvider | null>(null);
-	const [deleting, setDeleting] = useState<SmtpProvider | null>(null);
+	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const [providerId, setProviderId] = useQueryState("id", {
+		history: "replace",
+	});
 
 	const providers = providersQuery.data?.items ?? [];
+
+	// Derive the targeted provider from the URL so a reload reopens the modal.
+	// Keep the last match so the delete modal stays populated if the provider
+	// drops out of the list before the modal finishes closing.
+	const lastProviderRef = useRef<SmtpProvider | null>(null);
+	const matchedProvider = providers.find((p) => p.id === providerId) ?? null;
+	if (matchedProvider) lastProviderRef.current = matchedProvider;
+	const targetProvider =
+		matchedProvider ??
+		(providerId && lastProviderRef.current?.id === providerId
+			? lastProviderRef.current
+			: null);
+	const editing = modal === "edit-provider" ? targetProvider : null;
+	const deleting = modal === "delete-provider" ? targetProvider : null;
+
+	const openProviderModal = useCallback(
+		(name: "edit-provider" | "delete-provider", provider: SmtpProvider) => {
+			void setModal(name);
+			void setProviderId(provider.id);
+		},
+		[setModal, setProviderId],
+	);
+	const closeProviderModal = useCallback(() => {
+		void setModal(null);
+		void setProviderId(null);
+	}, [setModal, setProviderId]);
 	const limit = providersQuery.data?.limit;
 	const entitled = limit === null || (limit ?? 0) > 0;
 	const atLimit = typeof limit === "number" && providers.length >= limit;
@@ -203,8 +232,10 @@ export function SmtpPage({
 					entitled={entitled}
 					canManage={Boolean(isOrgAdmin)}
 					onAdd={openAdd}
-					onEdit={setEditing}
-					onDelete={setDeleting}
+					onEdit={(provider) => openProviderModal("edit-provider", provider)}
+					onDelete={(provider) =>
+						openProviderModal("delete-provider", provider)
+					}
 				/>
 
 				{providers.length > 0 ? (
@@ -220,12 +251,9 @@ export function SmtpPage({
 				open={!!editing}
 				provider={editing}
 				selfHosted={usage?.selfHosted === true}
-				onClose={() => setEditing(null)}
+				onClose={closeProviderModal}
 			/>
-			<DeleteProviderModal
-				provider={deleting}
-				onClose={() => setDeleting(null)}
-			/>
+			<DeleteProviderModal provider={deleting} onClose={closeProviderModal} />
 		</div>
 	);
 }
