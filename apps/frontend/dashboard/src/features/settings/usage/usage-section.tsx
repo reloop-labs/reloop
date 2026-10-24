@@ -417,11 +417,11 @@ export function UsageSection() {
 			</CategoryCard>
 
 			<CategoryCard
-				title="Inbox"
-				description="Inboxes to receive and route email."
+				title="Agent Inbox"
+				description="Inboxes your agents use to receive and reply to email."
 			>
 				<UsageRow
-					label="Inboxes"
+					label="Agent inboxes"
 					used={inboxUsed}
 					total={inboxLimit}
 					isUnlimited={unlimited}
