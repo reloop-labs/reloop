@@ -519,3 +519,29 @@ export function getNextPlan(id: PlanId) {
 	const i = pricingPlans.findIndex((p) => p.id === id);
 	return i >= 0 && i < pricingPlans.length - 1 ? pricingPlans[i + 1] : null;
 }
+
+/**
+ * How close (in USD) Pro's overage-inflated total may get to
+ * Growth's base price before Growth becomes the recommendation.
+ * E.g. Pro at $18+ overage loses to Growth at $20 base.
+ */
+const UPSELL_THRESHOLD_USD = 2;
+
+export function recommendPlanIdForVolume(volume: number): PlanId {
+	if (volume > 250000) return "enterprise";
+	if (volume <= 3000) return "free";
+	const pro = getPlanById("individual");
+	const growth = getPlanById("startup");
+	const proBase = pro?.monthlyPrice ?? 10;
+	const growthBase = growth?.monthlyPrice ?? 20;
+	const proIncluded =
+		Number(pro?.comparison.monthlyEmails.replace(/,/g, "")) || 50000;
+	const proTotal =
+		proBase +
+		(Math.max(0, volume - proIncluded) / 1000) * paidOverageUsdPerThousand;
+	// Once overage pushes Pro within threshold of Growth's base,
+	// the next tier is the better deal, so recommend it instead of
+	// inflating Pro up to (or past) Growth's price.
+	if (proTotal >= growthBase - UPSELL_THRESHOLD_USD) return "startup";
+	return "individual";
+}

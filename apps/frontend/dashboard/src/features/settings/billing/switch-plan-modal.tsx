@@ -15,12 +15,12 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
-import * as Slider from "@reloop/ui/slider";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { Check } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { StepSlider } from "./step-slider";
 import {
 	contactEnterprise,
 	useBillingCheckout,
@@ -29,7 +29,7 @@ import {
 
 export type BillingMode = "monthly" | "credits";
 
-const BILLING_MODES: Array<{
+export const BILLING_MODES: Array<{
 	id: BillingMode;
 	label: string;
 	description: string;
@@ -101,26 +101,17 @@ const OPTION_SELECTED =
 const OPTION_IDLE =
 	"border-stroke-soft-100 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04]";
 
-// Thumb is 16px: radix insets it 8px at each end, so ticks follow it.
-const THUMB_HALF = 8;
-const LABELLED_PACKS = new Set([3_000, 10_000, 30_000, 50_000, 100_000]);
-const PACK_STEPS = creditPackSizes.length - 1;
+const LABELLED_PACKS = new Set<number>([
+	3_000, 10_000, 30_000, 50_000, 100_000,
+]);
 
-function tickLeft(index: number): string {
-	const percent = (index / PACK_STEPS) * 100;
-	const offset = THUMB_HALF - (percent * THUMB_HALF * 2) / 100;
-	return `calc(${percent}% + ${offset}px)`;
-}
-
-function CreditPackSlider({
+export function CreditPackSlider({
 	emails,
 	onChange,
 }: {
 	emails: number;
 	onChange: (emails: number) => void;
 }) {
-	const found = creditPackSizes.findIndex((size) => size === emails);
-	const index = found < 0 ? 0 : found;
 	const priceCents = creditPackPriceCents(emails);
 
 	return (
@@ -149,66 +140,13 @@ function CreditPackSlider({
 			</p>
 
 			<div className="mt-8">
-				<Slider.Root
-					min={0}
-					max={PACK_STEPS}
-					step={1}
-					value={[index]}
-					onValueChange={(value) => {
-						const next = creditPackSizes[value[0] ?? 0];
-						if (next) onChange(next);
-					}}
-					aria-label="Number of emails"
-				>
-					<Slider.Thumb aria-label="Number of emails" />
-				</Slider.Root>
-
-				<div className="relative mt-1.5 h-9">
-					{creditPackSizes.map((size, i) => {
-						const active = i === index;
-						const labelled = LABELLED_PACKS.has(size);
-						return (
-							<button
-								key={size}
-								type="button"
-								tabIndex={-1}
-								aria-label={`${size.toLocaleString("en-US")} emails`}
-								onClick={() => onChange(size)}
-								style={{ left: tickLeft(i) }}
-								className={cn(
-									"absolute top-0 flex flex-col gap-1 px-0.5",
-									i === 0
-										? "items-start"
-										: i === PACK_STEPS
-											? "-translate-x-full items-end"
-											: "-translate-x-1/2 items-center",
-								)}
-							>
-								<span
-									aria-hidden
-									className={cn(
-										"h-1.5 w-px",
-										active
-											? "bg-text-strong-950"
-											: "bg-stroke-soft-200 dark:bg-white/15",
-									)}
-								/>
-								{labelled ? (
-									<span
-										className={cn(
-											"text-[12px] tabular-nums",
-											active
-												? "font-semibold text-text-strong-950"
-												: "text-text-soft-400",
-										)}
-									>
-										{size / 1000}k
-									</span>
-								) : null}
-							</button>
-						);
-					})}
-				</div>
+				<StepSlider
+					steps={creditPackSizes}
+					value={emails}
+					onChange={onChange}
+					ariaLabel="Number of emails"
+					labelled={(size) => LABELLED_PACKS.has(size)}
+				/>
 			</div>
 		</div>
 	);
