@@ -144,10 +144,12 @@ services:
     container_name: reloop-imap
     ports:
       - "1143:143"   # IMAP (plain auth allowed locally only)
+      - "1993:993"   # IMAPS (self-signed locally)
       - "8029:8029"  # HTTP health check
     environment:
       - PG_URL=postgresql://reloop:reloop123@reloop-postgres:5432/reloop
       - NATS_URL=nats://reloop-nats:4222
+      - IMAP_HOSTNAME=local.reloop.sh
       - IMAP_ALLOW_INSECURE_AUTH=true
     depends_on:
       reloop-postgres:

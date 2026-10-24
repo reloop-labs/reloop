@@ -89,7 +89,7 @@ jobs:
 
       - name: Start IMAP server
         run: |
-          IMAP_ADDR=127.0.0.1:1143 IMAP_ALLOW_INSECURE_AUTH=true ./imap serve > imap.log 2>&1 &
+          IMAP_ADDR=127.0.0.1:1143 IMAP_TLS_ADDR=127.0.0.1:1993 IMAP_ALLOW_INSECURE_AUTH=true ./imap serve > imap.log 2>&1 &
           for i in $(seq 1 30); do
             curl -sf localhost:8029/health && exit 0
             sleep 1

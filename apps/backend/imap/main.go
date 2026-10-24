@@ -18,6 +18,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapserver"
@@ -25,6 +26,7 @@ import (
 	"github.com/nats-io/nats.go"
 	"golang.org/x/crypto/bcrypt"
 
+	"reloop/imap/internal/certs"
 	"reloop/imap/internal/ingest"
 	"reloop/imap/internal/mailstore"
 	"reloop/imap/internal/store"
@@ -75,14 +77,17 @@ func serve(ctx context.Context, s *store.Store) error {
 		return err
 	}
 
-	tlsConfig, err := loadTLS()
+	// Finds a certificate the same way the SMTP service does (explicit files,
+	// Coolify/Traefik acme.json, Caddy, Let's Encrypt), else self-signed.
+	certManager, err := certs.New(certs.ConfigFromEnv())
 	if err != nil {
 		return err
 	}
+	stopWatch := make(chan struct{})
+	defer close(stopWatch)
+	go certManager.Watch(5*time.Minute, stopWatch)
+	tlsConfig := certManager.TLSConfig()
 	insecureAuth := env("IMAP_ALLOW_INSECURE_AUTH", "") == "true"
-	if tlsConfig == nil && !insecureAuth {
-		return fmt.Errorf("set IMAP_TLS_CERT/IMAP_TLS_KEY, or IMAP_ALLOW_INSECURE_AUTH=true for local development")
-	}
 
 	server := imapserver.New(&imapserver.Options{
 		NewSession: backend.NewSession,
@@ -113,18 +118,16 @@ func serve(ctx context.Context, s *store.Store) error {
 	if err != nil {
 		return err
 	}
-	slog.Info("imap listening", "addr", plainAddr, "starttls", tlsConfig != nil)
+	slog.Info("imap listening", "addr", plainAddr, "starttls", true, "insecureAuth", insecureAuth)
 	go func() { errc <- server.Serve(ln) }()
 
-	if tlsConfig != nil {
-		tlsAddr := env("IMAP_TLS_ADDR", ":993")
-		tln, err := tls.Listen("tcp", tlsAddr, tlsConfig)
-		if err != nil {
-			return err
-		}
-		slog.Info("imaps listening", "addr", tlsAddr)
-		go func() { errc <- server.Serve(tln) }()
+	tlsAddr := env("IMAP_TLS_ADDR", ":993")
+	tln, err := tls.Listen("tcp", tlsAddr, tlsConfig)
+	if err != nil {
+		return err
 	}
+	slog.Info("imaps listening", "addr", tlsAddr, "certificate", certManager.Source())
+	go func() { errc <- server.Serve(tln) }()
 
 	healthAddr := env("HEALTH_ADDR", ":8029")
 	go func() {
@@ -146,18 +149,6 @@ func serve(ctx context.Context, s *store.Store) error {
 	case err := <-errc:
 		return err
 	}
-}
-
-func loadTLS() (*tls.Config, error) {
-	certFile, keyFile := env("IMAP_TLS_CERT", ""), env("IMAP_TLS_KEY", "")
-	if certFile == "" || keyFile == "" {
-		return nil, nil
-	}
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-	if err != nil {
-		return nil, fmt.Errorf("load tls: %w", err)
-	}
-	return &tls.Config{Certificates: []tls.Certificate{cert}, MinVersion: tls.VersionTLS12}, nil
 }
 
 func createAccount(ctx context.Context, s *store.Store, args []string) error {

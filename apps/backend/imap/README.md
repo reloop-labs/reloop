@@ -27,10 +27,27 @@ As in the other services: `.env.dev` holds local values and `.env.prod` lists wh
 |---|---|---|
 | `PG_URL` | (required) | Postgres connection string |
 | `NATS_URL` | `nats://127.0.0.1:4222` | |
-| `IMAP_TLS_CERT` / `IMAP_TLS_KEY` | | PEM paths. When set, serves 993 (implicit TLS) and STARTTLS on 143, and refuses plaintext logins. |
-| `IMAP_ADDR` / `IMAP_TLS_ADDR` | `:143` / `:993` | |
-| `IMAP_ALLOW_INSECURE_AUTH` | | `true` allows login without TLS. **Local development only.** |
+| `IMAP_HOSTNAME` | `imap.reloop.sh` | Public host customers enter; the certificate is looked up for this name |
+| `IMAP_ADDR` / `IMAP_TLS_ADDR` | `:143` / `:993` | STARTTLS and implicit-TLS listeners |
 | `HEALTH_ADDR` | `:8029` | `GET /health` |
+| `IMAP_ALLOW_INSECURE_AUTH` | | `true` allows login without TLS. **Local development only.** |
+
+### TLS certificate (automatic, like the SMTP service)
+
+`internal/certs` takes the first certificate it finds:
+1. `IMAP_TLS_CERT` + `IMAP_TLS_KEY` (paths), or `IMAP_TLS_CERT_DATA` + `IMAP_TLS_KEY_DATA` (PEM)
+2. `/certs/fullchain.pem` + `/certs/privkey.pem`, or `/etc/letsencrypt/live/<IMAP_HOSTNAME>/`
+3. Coolify/Traefik `acme.json`, checked at `IMAP_TLS_ACME_JSON` first, then `/data/coolify/proxy/acme.json`, `/traefik/acme.json` and the usual variants. It uses a certificate whose main name or SANs match the hostname exactly or by wildcard, and if several match it picks the one that expires last.
+4. Caddy's certificate store
+5. `AUTO_LETSENCRYPT=true`: Let's Encrypt over HTTP-01. Port 80 must be free; set `LETSENCRYPT_EMAIL` and `LETSENCRYPT_CACHE_DIR` (default `/var/lib/imap/autocert`).
+6. Otherwise a self-signed certificate, with a warning in the log.
+
+Sources 1–4 are re-read every 5 minutes, so renewals by Traefik, Caddy or certbot apply without a restart. The container runs as root so it can read Traefik's root-only `acme.json`.
+
+**On Coolify:**
+- Attach `imap.reloop.sh` as a domain on this service, pointing at port 8029, so Traefik issues and renews its certificate.
+- Mount `/data/coolify/proxy:/data/coolify/proxy:ro`.
+- Publish port 993.
 
 ## Commands
 
