@@ -5,17 +5,24 @@ import { db } from "@reloop/db/client";
 import { usablePrepaidCredits } from "@reloop/db/reserve-send-credits";
 import {
 	adminAuditLog,
+	contact,
 	domain,
 	emailSend,
 	inboundEmail,
 	mailbox,
+	member,
+	smtpProvider,
 	webhook,
 } from "@reloop/db/schema";
 import {
 	isSelfHosted,
 	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
 } from "@reloop/db/self-hosted";
-import { getPlanById, planDisplayName } from "@reloop/pricing";
+import {
+	getPlanById,
+	getPlanLimits,
+	planDisplayName,
+} from "@reloop/pricing";
 import { and, count, desc, eq, gte, isNull, like, ne, sum } from "drizzle-orm";
 
 export const getUsageController = async ({
@@ -40,6 +47,9 @@ export const getUsageController = async ({
 			domainRows,
 			dailyRows,
 			conversionRows,
+			smtpRows,
+			contactRows,
+			memberRows,
 		] = await Promise.all([
 			// Credits, not rows: one email_send row is charged per recipient.
 			db
@@ -107,6 +117,23 @@ export const getUsageController = async ({
 				)
 				.orderBy(desc(adminAuditLog.createdAt))
 				.limit(1),
+			db
+				.select({ value: count() })
+				.from(smtpProvider)
+				.where(eq(smtpProvider.organizationId, organizationId)),
+			db
+				.select({ value: count() })
+				.from(contact)
+				.where(
+					and(
+						eq(contact.organizationId, organizationId),
+						isNull(contact.deletedAt),
+					),
+				),
+			db
+				.select({ value: count() })
+				.from(member)
+				.where(eq(member.organizationId, organizationId)),
 		]);
 
 		// Plan granted by a Reloop admin (convert-plan action) that is still the
@@ -186,6 +213,20 @@ export const getUsageController = async ({
 					used: domainRows[0]?.value ?? 0,
 					limit: selfHosted ? null : entitlements.maxCustomDomains,
 				},
+				smtpProviders: {
+					used: smtpRows[0]?.value ?? 0,
+					// Same cap the SMTP service enforces: rows created before the
+					// column existed hold 0, so fall back to the catalog value.
+					limit: selfHosted
+						? null
+						: Math.max(
+								entitlements.maxSmtpProviders,
+								getPlanLimits(billing.plan.planId).maxSmtpProviders,
+							),
+				},
+				// Unlimited on every plan; counted so the page can show usage.
+				contacts: { used: contactRows[0]?.value ?? 0, limit: null },
+				teamMembers: { used: memberRows[0]?.value ?? 0, limit: null },
 			},
 			daily: {
 				sent: Number(dailyRows[0]?.value ?? 0),

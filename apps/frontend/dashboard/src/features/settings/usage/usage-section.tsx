@@ -1,5 +1,9 @@
 import NumberFlow from "@number-flow/react";
-import { paidOverageUsdPerThousand } from "@reloop/pricing";
+import {
+	getPlanById,
+	isPlanId,
+	paidOverageUsdPerThousand,
+} from "@reloop/pricing";
 import { cn } from "@reloop/ui/cn";
 import Link from "next/link";
 import { Circle } from "rc-progress";
@@ -46,6 +50,7 @@ function UsageRow({
 	total,
 	unit,
 	isUnlimited,
+	noLimit,
 	isLast,
 }: {
 	label: string;
@@ -53,6 +58,8 @@ function UsageRow({
 	total: number;
 	unit?: string;
 	isUnlimited?: boolean;
+	/** No cap on this plan: show the count, then "Unlimited". */
+	noLimit?: boolean;
 	isLast?: boolean;
 }) {
 	const ratio = isUnlimited || total === 0 ? 0 : used / total;
@@ -77,7 +84,14 @@ function UsageRow({
 						isUnlimited ? "text-text-soft-400" : "text-text-strong-950",
 					)}
 				>
-					{isUnlimited ? (
+					{noLimit ? (
+						<>
+							<NumberFlow value={used} className="tabular-nums" />
+							<span className="font-normal text-text-soft-400">
+								{" / "}Unlimited
+							</span>
+						</>
+					) : isUnlimited ? (
 						"Unlimited"
 					) : (
 						<>
@@ -250,6 +264,17 @@ export function UsageSection() {
 	const domainUsed = resources?.customDomains.used ?? 0;
 	const domainLimit =
 		resources?.customDomains.limit ?? entitlements?.maxCustomDomains ?? 0;
+	const smtpUsed = resources?.smtpProviders?.used ?? 0;
+	const smtpLimit =
+		resources?.smtpProviders?.limit ?? entitlements?.maxSmtpProviders ?? 0;
+	const contactsUsed = resources?.contacts?.used ?? 0;
+	const membersUsed = resources?.teamMembers?.used ?? 0;
+	// Pay as you go carries Pro's limits, support included.
+	const planId = plan.id === "payg" ? "individual" : plan.id;
+	const supportLevel =
+		planId && isPlanId(planId)
+			? getPlanById(planId)?.comparison.support
+			: undefined;
 
 	return (
 		<div className="space-y-4">
@@ -405,8 +430,28 @@ export function UsageSection() {
 			</CategoryCard>
 
 			<CategoryCard
+				title="Contacts & team"
+				description="People you email and people who work in Reloop."
+			>
+				<UsageRow
+					label="Contacts"
+					used={contactsUsed}
+					total={0}
+					noLimit
+					isLast={false}
+				/>
+				<UsageRow
+					label="Team members"
+					used={membersUsed}
+					total={0}
+					noLimit
+					isLast={true}
+				/>
+			</CategoryCard>
+
+			<CategoryCard
 				title="Other Limits"
-				description="Webhooks, domains, and dedicated IPs on this organization."
+				description="Webhooks, domains, SMTP servers, dedicated IPs and support on this organization."
 			>
 				<UsageRow
 					label="Webhooks"
@@ -419,6 +464,13 @@ export function UsageSection() {
 					label="Custom domains"
 					used={domainUsed}
 					total={domainLimit}
+					isUnlimited={unlimited}
+					isLast={false}
+				/>
+				<UsageRow
+					label="Own SMTP servers"
+					used={smtpUsed}
+					total={smtpLimit}
 					isUnlimited={unlimited}
 					isLast={unlimited}
 				/>
@@ -437,8 +489,11 @@ export function UsageSection() {
 						<SpecRow
 							label="Data retention"
 							value={`${entitlements?.dataRetentionDays ?? 45} days`}
-							isLast={true}
+							isLast={!supportLevel}
 						/>
+						{supportLevel ? (
+							<SpecRow label="Support" value={supportLevel} isLast={true} />
+						) : null}
 					</>
 				)}
 			</CategoryCard>

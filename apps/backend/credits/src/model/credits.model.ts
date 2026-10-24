@@ -66,6 +66,9 @@ export namespace CreditsModel {
 				agentInboxes: resourceUsage,
 				webhooks: resourceUsage,
 				customDomains: resourceUsage,
+				smtpProviders: t.Optional(resourceUsage),
+				contacts: t.Optional(resourceUsage),
+				teamMembers: t.Optional(resourceUsage),
 			}),
 		),
 		daily: t.Optional(

@@ -46,13 +46,27 @@ function formatDate(iso: string | null): string | null {
 
 function AppLogo({ app }: { app: ConnectedApp }) {
 	const name = app.name ?? app.clientId;
-	const known = isKnownApp(name, [app.uri]);
+	// Logos that fail to load fall through to the next option instead of
+	// rendering the browser's broken-image glyph.
+	const [knownFailed, setKnownFailed] = useState(false);
+	const [iconFailed, setIconFailed] = useState(false);
+	const known = !knownFailed && isKnownApp(name, [app.uri]);
 	return (
 		<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
 			{known ? (
-				<KnownAppGlyph name={name} uris={[app.uri]} className="h-5 w-5" />
-			) : app.icon ? (
-				<img src={app.icon} alt="" className="h-5 w-5 object-contain" />
+				<KnownAppGlyph
+					name={name}
+					uris={[app.uri]}
+					className="h-5 w-5"
+					onError={() => setKnownFailed(true)}
+				/>
+			) : app.icon && !iconFailed ? (
+				<img
+					src={app.icon}
+					alt=""
+					className="h-5 w-5 object-contain"
+					onError={() => setIconFailed(true)}
+				/>
 			) : app.applicationType === "native" ? (
 				<Icon name="terminal" className="h-4 w-4 text-text-sub-600" />
 			) : (

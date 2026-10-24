@@ -60,6 +60,9 @@ export interface BillingUsage {
 		agentInboxes: ResourceUsage;
 		webhooks: ResourceUsage;
 		customDomains: ResourceUsage;
+		smtpProviders?: ResourceUsage;
+		contacts?: ResourceUsage;
+		teamMembers?: ResourceUsage;
 	};
 	daily?: {
 		sent: number;

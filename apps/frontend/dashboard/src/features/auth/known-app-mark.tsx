@@ -79,17 +79,25 @@ export function KnownAppGlyph({
 	name,
 	uris = [],
 	className,
+	onError,
 }: {
 	name: string;
 	/** Client URI, redirect URI, … whose host also identifies the app. */
 	uris?: (string | null | undefined)[];
 	className?: string;
+	/** Called when a bundled image logo fails to load. */
+	onError?: () => void;
 }) {
 	const mark = findMark(name, uris);
 	if (mark === null) return null;
 	if ("src" in mark) {
 		return (
-			<img src={mark.src} alt="" className={cn("object-contain", className)} />
+			<img
+				src={mark.src}
+				alt=""
+				className={cn("object-contain", className)}
+				onError={onError}
+			/>
 		);
 	}
 	if ("customIcon" in mark) {
