@@ -1,7 +1,10 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { publishUsageAfterCharge } from "@reloop/credits/lib/usage-events";
 import { db } from "@reloop/db/client";
-import { chargeReceiveCredits } from "@reloop/db/reserve-send-credits";
+import {
+	chargeReceiveCredits,
+	usablePrepaidCredits,
+} from "@reloop/db/reserve-send-credits";
 import { organizationPlan } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
@@ -38,7 +41,7 @@ export async function initInboundSubscriber() {
 
 				await publishUsageAfterCharge({
 					organizationId: payload.organizationId,
-					charged: 1,
+					charged: 1 - result.fromPrepaid,
 					snapshot: {
 						creditsUsed: result.creditsUsed,
 						creditsRemaining: result.remaining,
@@ -46,6 +49,7 @@ export async function initInboundSubscriber() {
 						periodStart: credits.currentPeriodStart,
 						periodEnd: credits.currentPeriodEnd,
 						overageEnabled: plan?.overageEnabled ?? false,
+						prepaidRemaining: usablePrepaidCredits(credits, new Date()),
 					},
 				});
 			} catch (error) {

@@ -5,6 +5,7 @@ import {
 } from "@reloop/credits/lib/usage-events";
 import { getOrProvisionCredits } from "@reloop/credits/utils/credits";
 import { db } from "@reloop/db/client";
+import { usablePrepaidCredits } from "@reloop/db/reserve-send-credits";
 import {
 	creditLedger,
 	emailSend,
@@ -115,6 +116,7 @@ export async function initEmailSubscriber() {
 						periodStart: activeCredits.currentPeriodStart,
 						periodEnd: activeCredits.currentPeriodEnd,
 						overageEnabled: plan?.overageEnabled ?? false,
+						prepaidRemaining: usablePrepaidCredits(activeCredits, new Date()),
 					};
 				});
 
@@ -122,7 +124,10 @@ export async function initEmailSubscriber() {
 
 				await publishUsageAfterCharge({
 					organizationId: payload.organizationId,
-					charged: payload.recipientCount,
+					charged: Math.max(
+						0,
+						payload.recipientCount - (payload.prepaidCharged ?? 0),
+					),
 					snapshot: usageSnapshot,
 				});
 

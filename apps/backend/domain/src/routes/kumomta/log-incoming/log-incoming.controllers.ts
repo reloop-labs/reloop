@@ -377,6 +377,7 @@ export async function logIncomingController({
 		emailLogId: insertedId,
 		recipientCount: toEmails.length,
 		creditsReserved: true,
+		prepaidCharged: reservation?.fromPrepaid ?? 0,
 		timestamp: new Date().toISOString(),
 	});
 

@@ -109,6 +109,20 @@ export const CreditErrors = {
 			why: "Polar could not charge the remaining balance on the card on file.",
 			fix: "Open Manage billing, update the payment method, then try the upgrade again.",
 		}),
+	invalidCreditPack: (emails: number) =>
+		createError({
+			status: 400,
+			message: "Invalid credit pack size",
+			why: `${emails} is not a credit pack size we sell.`,
+			fix: "Choose between 3,000 and 100,000 emails, in steps of 1,000.",
+		}),
+	creditsProductNotConfigured: () =>
+		createError({
+			status: 503,
+			message: "Polar credits product was not found",
+			why: "No one-time Polar product is set up for email credits.",
+			fix: "In Polar, create a one-time product with metadata reloop_kind=credits, or set POLAR_CREDITS_PRODUCT_ID.",
+		}),
 	webhookInvalid: () =>
 		createError({
 			status: 403,

@@ -228,6 +228,8 @@ export function UsageSection() {
 	const percent = Math.min(100, Math.round(ratio * 100));
 	const overageEnabled =
 		entitlements?.overageEnabled ?? plan.overageLimit !== 0;
+	const prepaidBalance = data.prepaid?.balance ?? 0;
+	const prepaidExpiresAt = data.prepaid?.expiresAt ?? null;
 
 	const resetDays = daysUntil(subscription.currentPeriodEnd);
 	const periodRange = `${formatDate(subscription.currentPeriodStart)} – ${formatDate(
@@ -357,13 +359,27 @@ export function UsageSection() {
 					/>
 				) : null}
 
+				{!unlimited && (prepaidBalance > 0 || prepaidExpiresAt) ? (
+					<SpecRow
+						label="Email credits"
+						value={`${prepaidBalance.toLocaleString()} left${
+							prepaidExpiresAt
+								? ` · valid until ${formatDate(prepaidExpiresAt)}`
+								: ""
+						}`}
+						isLast={false}
+					/>
+				) : null}
+
 				{unlimited ? null : (
 					<SpecRow
 						label="Overage"
 						value={
-							overageEnabled
-								? `$${paidOverageUsdPerThousand.toFixed(2)} / 1,000 emails`
-								: "Sending pauses at the limit"
+							prepaidBalance > 0
+								? "Credits are used after the monthly limit"
+								: overageEnabled
+									? `$${paidOverageUsdPerThousand.toFixed(2)} / 1,000 emails`
+									: "Sending pauses at the limit"
 						}
 						isLast={false}
 					/>

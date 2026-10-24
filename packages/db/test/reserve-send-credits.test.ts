@@ -3,6 +3,7 @@ import {
 	applyCreditReservation,
 	applyReceiveCharge,
 	type CreditSnapshot,
+	usablePrepaidCredits,
 	utcDayStart,
 } from "../src/reserve-send-credits";
 
@@ -141,13 +142,23 @@ describe("applyReceiveCharge", () => {
 	test("a received email uses one credit from the shared monthly pool", () => {
 		expect(
 			applyReceiveCharge({ creditsUsed: 10, creditsRemaining: 2990 }),
-		).toEqual({ creditsUsed: 11, creditsRemaining: 2989, delta: -1 });
+		).toEqual({
+			creditsUsed: 11,
+			creditsRemaining: 2989,
+			delta: -1,
+			fromPrepaid: 0,
+		});
 	});
 
 	test("receiving never goes below zero but still counts toward overage", () => {
 		expect(
 			applyReceiveCharge({ creditsUsed: 3000, creditsRemaining: 0 }),
-		).toEqual({ creditsUsed: 3001, creditsRemaining: 0, delta: 0 });
+		).toEqual({
+			creditsUsed: 3001,
+			creditsRemaining: 0,
+			delta: 0,
+			fromPrepaid: 0,
+		});
 	});
 
 	test("self-hosted tracks usage without drawing down the balance", () => {
@@ -157,7 +168,12 @@ describe("applyReceiveCharge", () => {
 				creditsRemaining: 100,
 				unlimited: true,
 			}),
-		).toEqual({ creditsUsed: 6, creditsRemaining: 100, delta: 0 });
+		).toEqual({
+			creditsUsed: 6,
+			creditsRemaining: 100,
+			delta: 0,
+			fromPrepaid: 0,
+		});
 	});
 
 	test("received mail that drains the pool blocks the next send", () => {
@@ -178,5 +194,100 @@ describe("applyReceiveCharge", () => {
 		expect(decision.ok).toBe(false);
 		if (decision.ok) return;
 		expect(decision.reason).toBe("monthly");
+	});
+});
+
+describe("prepaid credits", () => {
+	const now = new Date("2026-09-16T10:00:00.000Z");
+
+	test("monthly emails are spent first, then prepaid credits", () => {
+		const decision = applyCreditReservation({
+			credits: snapshot({ creditsRemaining: 10, prepaidRemaining: 1000 }),
+			dailyEmailLimit: null,
+			recipientCount: 25,
+			now,
+		});
+		expect(decision.ok).toBe(true);
+		if (!decision.ok) return;
+		expect(decision.fromPrepaid).toBe(15);
+		expect(decision.next.creditsRemaining).toBe(0);
+		expect(decision.next.prepaidRemaining).toBe(985);
+		expect(decision.remaining).toBe(985);
+	});
+
+	test("prepaid credits let a send through once the monthly pool is empty", () => {
+		const decision = applyCreditReservation({
+			credits: snapshot({
+				creditsRemaining: 0,
+				creditsUsed: 3000,
+				prepaidRemaining: 5,
+			}),
+			dailyEmailLimit: null,
+			recipientCount: 5,
+			now,
+		});
+		expect(decision.ok).toBe(true);
+		if (!decision.ok) return;
+		expect(decision.fromPrepaid).toBe(5);
+		expect(decision.next.prepaidRemaining).toBe(0);
+	});
+
+	test("a send larger than monthly plus prepaid is denied", () => {
+		const decision = applyCreditReservation({
+			credits: snapshot({ creditsRemaining: 2, prepaidRemaining: 3 }),
+			dailyEmailLimit: null,
+			recipientCount: 6,
+			now,
+		});
+		expect(decision.ok).toBe(false);
+		if (decision.ok) return;
+		expect(decision.reason).toBe("monthly");
+		expect(decision.remaining).toBe(5);
+	});
+
+	test("without prepaid credits nothing is drawn from them", () => {
+		const decision = applyCreditReservation({
+			credits: snapshot(),
+			dailyEmailLimit: null,
+			recipientCount: 3,
+			now,
+		});
+		expect(decision.ok).toBe(true);
+		if (decision.ok) expect(decision.fromPrepaid).toBe(0);
+	});
+
+	test("expired or missing expiry means no usable prepaid credits", () => {
+		const later = new Date("2026-10-01T00:00:00.000Z");
+		const earlier = new Date("2026-09-01T00:00:00.000Z");
+		expect(
+			usablePrepaidCredits(
+				{ prepaidCredits: 50, prepaidExpiresAt: later },
+				now,
+			),
+		).toBe(50);
+		expect(
+			usablePrepaidCredits(
+				{ prepaidCredits: 50, prepaidExpiresAt: earlier },
+				now,
+			),
+		).toBe(0);
+		expect(
+			usablePrepaidCredits({ prepaidCredits: 50, prepaidExpiresAt: null }, now),
+		).toBe(0);
+	});
+
+	test("received mail draws from prepaid once the monthly pool is empty", () => {
+		expect(
+			applyReceiveCharge({
+				creditsUsed: 3000,
+				creditsRemaining: 0,
+				prepaidRemaining: 10,
+			}),
+		).toEqual({
+			creditsUsed: 3001,
+			creditsRemaining: 0,
+			delta: -1,
+			fromPrepaid: 1,
+		});
 	});
 });

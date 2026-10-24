@@ -2,6 +2,7 @@ import { creditsConfig } from "@reloop/credits/credits.config";
 import { CreditErrors } from "@reloop/credits/error/credits.error-response";
 import { getOrProvisionOrgBilling } from "@reloop/credits/lib/org-billing";
 import { db } from "@reloop/db/client";
+import { usablePrepaidCredits } from "@reloop/db/reserve-send-credits";
 import {
 	adminAuditLog,
 	domain,
@@ -14,7 +15,7 @@ import {
 	isSelfHosted,
 	SELF_HOSTED_MAX_ATTACHMENT_BYTES,
 } from "@reloop/db/self-hosted";
-import { getPlanById } from "@reloop/pricing";
+import { getPlanById, planDisplayName } from "@reloop/pricing";
 import { and, count, desc, eq, gte, isNull, like, ne, sum } from "drizzle-orm";
 
 export const getUsageController = async ({
@@ -117,7 +118,7 @@ export const getUsageController = async ({
 			!billing.subscription.polarSubscriptionId
 				? {
 						planId: billing.plan.planId,
-						name: catalog?.name ?? billing.plan.planId,
+						name: planDisplayName(billing.plan.planId),
 						grantedAt: conversion.createdAt.toISOString(),
 					}
 				: null;
@@ -144,7 +145,7 @@ export const getUsageController = async ({
 			selfHosted,
 			plan: {
 				id: billing.plan.planId,
-				name: catalog?.name ?? "Free",
+				name: planDisplayName(billing.plan.planId),
 				monthlyCredits: billing.plan.monthlyEmails,
 				basePriceUsd:
 					monthlyPrice === null ? "custom" : monthlyPrice.toFixed(2),
@@ -166,6 +167,10 @@ export const getUsageController = async ({
 				creditsReceived: receivedRows[0]?.value ?? 0,
 				currentPeriodStart: billing.credits.currentPeriodStart.toISOString(),
 				currentPeriodEnd: billing.credits.currentPeriodEnd.toISOString(),
+			},
+			prepaid: {
+				balance: usablePrepaidCredits(billing.credits, new Date()),
+				expiresAt: billing.credits.prepaidExpiresAt?.toISOString() ?? null,
 			},
 			grantedPlan,
 			resources: {

@@ -1,18 +1,22 @@
 import {
 	comparisonSections,
+	creditPack,
 	formatPrice,
 	isCheckoutPlanId,
 	type PlanId,
 	type PricingPlan,
+	planDisplayName,
 	pricingPlans,
 } from "@reloop/pricing";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { openHelpWithMessage } from "#/features/help/open-help";
+import { BuyCreditsModal } from "./buy-credits-modal";
 import { resolvePlanId } from "./plan-id";
 import {
 	contactEnterprise,
@@ -32,12 +36,15 @@ export function PlansPage() {
 	const { data: usageData } = useBillingUsage();
 	const checkout = useBillingCheckout();
 	const portal = useBillingPortal();
+	const [creditsOpen, setCreditsOpen] = useState(false);
 
 	const currentPlanId = resolvePlanId({
 		id: usageData?.plan.id ?? usageData?.subscription.planId,
 		name: usageData?.plan.name,
 	});
-	const currentIndex = planIndex(currentPlanId);
+	const isPayg = currentPlanId === "payg";
+	// Pay as you go is Free plus credits: compare upgrades from Free's column.
+	const currentIndex = isPayg ? planIndex("free") : planIndex(currentPlanId);
 	const nextIndex = currentIndex + 1;
 
 	const isHighlight = (plan: PricingPlan) => planIndex(plan.id) === nextIndex;
@@ -62,6 +69,19 @@ export function PlansPage() {
 
 	function renderCta(plan: PricingPlan) {
 		const index = planIndex(plan.id);
+
+		if (isPayg && plan.id === "free") {
+			return (
+				<FancyButton.Root
+					variant="basic"
+					size="small"
+					className="w-full rounded-full font-semibold opacity-60"
+					disabled
+				>
+					Included
+				</FancyButton.Root>
+			);
+		}
 
 		if (index === currentIndex) {
 			return (
@@ -137,7 +157,9 @@ export function PlansPage() {
 				<p className="mt-1 text-paragraph-sm text-text-sub-600">
 					You are on the{" "}
 					<span className="font-medium text-text-strong-950">
-						{pricingPlans[currentIndex]?.name ?? "Free"} plan
+						{isPayg
+							? planDisplayName(currentPlanId)
+							: `${pricingPlans[currentIndex]?.name ?? "Free"} plan`}
 					</span>
 					. If you have any questions or would like further support with your
 					plan,{" "}
@@ -156,6 +178,30 @@ export function PlansPage() {
 					</button>
 				</p>
 			</div>
+
+			{currentPlanId !== "enterprise" ? (
+				<div className="mb-8 flex flex-col gap-4 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+					<div>
+						<h2 className="font-medium text-label-md text-text-strong-950">
+							Prefer to pay as you go?
+						</h2>
+						<p className="mt-1 text-paragraph-sm text-text-sub-600">
+							Buy email credits once, no subscription. $
+							{creditPack.usdPerThousand.toFixed(2)} per 1,000 emails, valid for{" "}
+							{creditPack.validityMonths} months, with Pro limits while they
+							last.
+						</p>
+					</div>
+					<FancyButton.Root
+						variant="basic"
+						size="small"
+						className="shrink-0 rounded-full font-semibold"
+						onClick={() => setCreditsOpen(true)}
+					>
+						Buy credits
+					</FancyButton.Root>
+				</div>
+			) : null}
 
 			<div className="mb-12 overflow-x-auto pb-4 lg:overflow-visible">
 				<div className={cn("grid min-w-[900px]", GRID_COLS)}>
@@ -243,6 +289,13 @@ export function PlansPage() {
 					))}
 				</div>
 			</div>
+
+			<BuyCreditsModal
+				open={creditsOpen}
+				onOpenChange={setCreditsOpen}
+				currentPlanId={currentPlanId}
+				currentExpiresAt={usageData?.prepaid?.expiresAt}
+			/>
 		</div>
 	);
 }

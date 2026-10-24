@@ -32,6 +32,19 @@ async function startCheckout(planId: CheckoutPlanId): Promise<{ url: string }> {
 	return res.json() as Promise<{ url: string }>;
 }
 
+async function startCreditsCheckout(emails: number): Promise<{ url: string }> {
+	const res = await fetch("/api/credits/v1/billing/credits/checkout", {
+		method: "POST",
+		credentials: "include",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ emails }),
+	});
+	if (!res.ok) {
+		throw new Error(await readError(res));
+	}
+	return res.json() as Promise<{ url: string }>;
+}
+
 async function startPortal(): Promise<{ url: string }> {
 	const res = await fetch("/api/credits/v1/billing/portal", {
 		method: "POST",
@@ -46,6 +59,20 @@ async function startPortal(): Promise<{ url: string }> {
 export function useBillingCheckout() {
 	return useMutation({
 		mutationFn: startCheckout,
+		onSuccess: (data) => {
+			window.location.assign(data.url);
+		},
+		onError: (error: Error) => {
+			toast.error("Could not start checkout", {
+				description: error.message,
+			});
+		},
+	});
+}
+
+export function useCreditsCheckout() {
+	return useMutation({
+		mutationFn: startCreditsCheckout,
 		onSuccess: (data) => {
 			window.location.assign(data.url);
 		},

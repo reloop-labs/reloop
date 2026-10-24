@@ -19,11 +19,13 @@ export async function finalizeEmail_step7({
 	result,
 	organizationId,
 	body,
+	prepaidCharged = 0,
 }: {
 	emailLogId: string;
 	result: { id: string; messageId: string };
 	organizationId: string;
 	body: MailModel.SendEmailBody;
+	prepaidCharged?: number;
 }) {
 	await db
 		.update(emailLog)
@@ -53,6 +55,7 @@ export async function finalizeEmail_step7({
 			emailLogId,
 			recipientCount: totalRecipients,
 			creditsReserved: true,
+			prepaidCharged,
 			timestamp,
 		});
 	}

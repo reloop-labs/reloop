@@ -67,6 +67,36 @@ export function buildPolarPlanCatalog(
 
 export function invalidatePolarPlanCatalog(): void {
 	cache = null;
+	creditsProductCache = null;
+}
+
+let creditsProductCache: { fetchedAt: number; id: string | null } | null = null;
+
+/** True for the one-time Polar product that sells email credit packs. */
+export function isCreditsProduct(product: {
+	metadata?: Record<string, unknown> | null;
+}): boolean {
+	const kind =
+		metaString(product.metadata ?? undefined, "reloop_kind") ??
+		metaString(product.metadata ?? undefined, "kind");
+	return kind?.trim().toLowerCase() === "credits";
+}
+
+export async function polarCreditsProductId(
+	polar: PolarBillingPort,
+	configuredId?: string,
+): Promise<string | null> {
+	if (configuredId) return configuredId;
+	if (
+		creditsProductCache &&
+		Date.now() - creditsProductCache.fetchedAt < CACHE_TTL_MS
+	) {
+		return creditsProductCache.id;
+	}
+	const products = await polar.listOneTimeProducts();
+	const id = products.find(isCreditsProduct)?.id ?? null;
+	creditsProductCache = { fetchedAt: Date.now(), id };
+	return id;
 }
 
 export async function getPolarPlanCatalog(

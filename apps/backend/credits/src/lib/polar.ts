@@ -10,6 +10,7 @@ import {
 	isPolarMissingCustomerError,
 	isPolarMissingSubscriptionError,
 	isPolarPaymentFailedError,
+	listPolarOneTimeProducts,
 	listPolarProducts,
 	updatePolarSubscription,
 } from "./polar-http";
@@ -38,6 +39,7 @@ export type PolarProductRef = {
 export type PolarBillingPort = {
 	enabled: boolean;
 	listProducts(): Promise<PolarProductRef[]>;
+	listOneTimeProducts(): Promise<PolarProductRef[]>;
 	createOrGetCustomer(input: {
 		externalId: string;
 		email: string;
@@ -51,6 +53,7 @@ export type PolarBillingPort = {
 		successUrl: string;
 		returnUrl?: string;
 		metadata: Record<string, string>;
+		priceCents?: number;
 	}): Promise<PolarCheckout>;
 	createCustomerPortal(input: { customerId: string }): Promise<PolarPortal>;
 	updateSubscription(input: {
@@ -68,6 +71,7 @@ export const livePolarBilling: PolarBillingPort = {
 		creditsConfig.BILLING_ENABLED && Boolean(creditsConfig.POLAR_ACCESS_TOKEN),
 
 	listProducts: listPolarProducts,
+	listOneTimeProducts: listPolarOneTimeProducts,
 
 	createOrGetCustomer: createOrGetPolarCustomer,
 

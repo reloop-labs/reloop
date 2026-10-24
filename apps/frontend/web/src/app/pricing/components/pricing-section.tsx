@@ -558,7 +558,7 @@ function FeatureTooltipContent({
 	};
 
 	return (
-		<div className="w-[280px] rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#121212] dark:shadow-[0_20px_50px_rgba(0,0,0,0.45)]">
+		<div className="w-[280px] rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-white/10 dark:bg-[#121212]">
 			<div className="flex items-center gap-2">
 				{getFeatureIcon(
 					label,

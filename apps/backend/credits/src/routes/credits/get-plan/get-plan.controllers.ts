@@ -1,6 +1,6 @@
 import { CreditErrors } from "@reloop/credits/error/credits.error-response";
 import { getOrProvisionOrgBilling } from "@reloop/credits/lib/org-billing";
-import { getPlanById } from "@reloop/pricing";
+import { getPlanById, planDisplayName } from "@reloop/pricing";
 
 export const getPlanController = async ({
 	organizationId,
@@ -15,7 +15,7 @@ export const getPlanController = async ({
 		return {
 			plan: {
 				id: billing.plan.planId,
-				name: catalog?.name ?? "Free",
+				name: planDisplayName(billing.plan.planId),
 				monthlyCredits: billing.plan.monthlyEmails,
 				basePriceUsd:
 					monthlyPrice === null ? "custom" : monthlyPrice.toFixed(2),

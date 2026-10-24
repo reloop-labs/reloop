@@ -1,4 +1,4 @@
-export type PlanId = "free" | "individual" | "startup" | "enterprise";
+export type PlanId = "free" | "individual" | "startup" | "enterprise" | "payg";
 
 export type PlanLimits = {
 	planId: PlanId;
@@ -56,6 +56,21 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 		dedicatedIpCount: 1,
 		maxSmtpProviders: 3,
 	},
+	// Pay as you go: Free's monthly allowance plus Pro limits while prepaid
+	// credits are valid. Sending past the allowance spends the credits.
+	payg: {
+		planId: "payg",
+		monthlyEmails: 3_000,
+		dailyEmailLimit: null,
+		overageEnabled: false,
+		maxAgentInboxes: 5,
+		maxWebhooks: 5,
+		maxCustomDomains: 5,
+		maxAttachmentBytes: 5 * MB,
+		dataRetentionDays: 45,
+		dedicatedIpCount: 0,
+		maxSmtpProviders: 2,
+	},
 	enterprise: {
 		planId: "enterprise",
 		monthlyEmails: 100_000,
@@ -78,7 +93,13 @@ export function isCheckoutPlanId(id: string): id is CheckoutPlanId {
 	return (checkoutPlanIds as readonly string[]).includes(id);
 }
 
-const PLAN_IDS: PlanId[] = ["free", "individual", "startup", "enterprise"];
+const PLAN_IDS: PlanId[] = [
+	"free",
+	"individual",
+	"startup",
+	"enterprise",
+	"payg",
+];
 
 export function isPlanId(id: string): id is PlanId {
 	return (PLAN_IDS as readonly string[]).includes(id);
@@ -151,6 +172,36 @@ export function applyPlanChange(args: {
 	}
 
 	return result;
+}
+
+/** One-time email credits (pay as you go). */
+export const creditPack = {
+	usdPerThousand: 0.5,
+	validityMonths: 6,
+	minEmails: 3_000,
+	maxEmails: 100_000,
+	stepEmails: 1_000,
+} as const;
+
+/** Pack sizes offered in the dashboard, matching the pricing page slider. */
+export const creditPackSizes = [
+	3_000, 5_000, 10_000, 15_000, 20_000, 30_000, 40_000, 50_000, 75_000, 100_000,
+] as const;
+
+export function isValidCreditPackSize(emails: number): boolean {
+	return (
+		Number.isInteger(emails) &&
+		emails >= creditPack.minEmails &&
+		emails <= creditPack.maxEmails &&
+		emails % creditPack.stepEmails === 0
+	);
+}
+
+/** Price of a credit pack in US cents. */
+export function creditPackPriceCents(emails: number): number {
+	return Math.round(
+		(emails / creditPack.stepEmails) * creditPack.usdPerThousand * 100,
+	);
 }
 
 export function closePeriodSnapshot(args: {

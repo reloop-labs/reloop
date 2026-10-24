@@ -34,6 +34,7 @@ export const ledgerEntryTypeEnum = pgEnum("ledger_entry_type", [
 	"refund",
 	"plan_change",
 	"period_reset",
+	"credit_expired",
 ]);
 export const emailSendStatusEnum = pgEnum("email_send_status", [
 	"queued",
@@ -62,6 +63,7 @@ export const planIdEnum = pgEnum("plan_id", [
 	"individual",
 	"startup",
 	"enterprise",
+	"payg",
 ]);
 
 const createOrganizationPlanId = () => `opl_${createId()}`;
@@ -174,6 +176,10 @@ export const organizationCredits = pgTable(
 		creditsRemaining: integer("credits_remaining").notNull().default(3000),
 		monthlyCredits: integer("monthly_credits").notNull().default(3000),
 		dailyEmailsUsed: integer("daily_emails_used").notNull().default(0),
+		/** Pay-as-you-go balance, spent after the monthly pool runs out. */
+		prepaidCredits: integer("prepaid_credits").notNull().default(0),
+		/** Every purchase pushes this out; the balance is void after it. */
+		prepaidExpiresAt: timestamp("prepaid_expires_at"),
 		dailyWindowStart: timestamp("daily_window_start").notNull().defaultNow(),
 		currentPeriodStart: timestamp("current_period_start")
 			.notNull()

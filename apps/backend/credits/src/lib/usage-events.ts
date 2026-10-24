@@ -12,6 +12,8 @@ export type UsageSnapshot = {
 	periodStart: Date;
 	periodEnd: Date;
 	overageEnabled: boolean;
+	/** Unexpired pay-as-you-go balance left after this charge. */
+	prepaidRemaining?: number;
 };
 
 /**
@@ -20,7 +22,8 @@ export type UsageSnapshot = {
  */
 export async function publishUsageAfterCharge(args: {
 	organizationId: string;
-	/** Credits just charged, metered to Polar on overage plans. */
+	/** Credits just charged from the plan, metered to Polar on overage plans.
+	 * Prepaid credits are already paid for, so callers leave them out. */
 	charged: number;
 	snapshot: UsageSnapshot;
 }): Promise<void> {
@@ -62,8 +65,10 @@ export async function publishUsageAfterCharge(args: {
 		}
 	}
 
+	// Prepaid credits keep sending going once the monthly pool is empty.
+	const prepaid = Math.max(0, snap.prepaidRemaining ?? 0);
 	const usageRatio = snap.creditsUsed / snap.monthlyCredits;
-	if (snap.creditsRemaining <= 0) {
+	if (snap.creditsRemaining + prepaid <= 0) {
 		await bus.publish(BusEvent.QUOTA_EXCEEDED, {
 			organizationId,
 			creditsUsed: snap.creditsUsed,
@@ -73,7 +78,7 @@ export async function publishUsageAfterCharge(args: {
 			...{ organizationId },
 			message: "Quota exceeded — published QUOTA_EXCEEDED",
 		});
-	} else if (usageRatio >= 0.8) {
+	} else if (prepaid === 0 && usageRatio >= 0.8) {
 		// Fire QUOTA_WARNING at 80% and again at 90%
 		await bus.publish(BusEvent.QUOTA_WARNING, {
 			email: "", // email service enriches this from org lookup if needed

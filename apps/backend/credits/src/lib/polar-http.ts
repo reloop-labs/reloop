@@ -199,12 +199,22 @@ export async function polarJsonOrNotFound(
 }
 
 export async function listPolarProducts(): Promise<PolarProductRef[]> {
+	return listPolarProductsByKind({ recurring: true });
+}
+
+export async function listPolarOneTimeProducts(): Promise<PolarProductRef[]> {
+	return listPolarProductsByKind({ recurring: false });
+}
+
+async function listPolarProductsByKind(args: {
+	recurring: boolean;
+}): Promise<PolarProductRef[]> {
 	const products: PolarProductRef[] = [];
 	let page = 1;
 	while (true) {
 		const query = new URLSearchParams({
 			is_archived: "false",
-			is_recurring: "true",
+			is_recurring: String(args.recurring),
 			limit: "100",
 			page: String(page),
 		});
@@ -282,12 +292,25 @@ export async function createPolarCheckout(input: {
 	successUrl: string;
 	returnUrl?: string;
 	metadata: Record<string, string>;
+	/** Fixed ad-hoc price in US cents, replacing the product's catalog price. */
+	priceCents?: number;
 }): Promise<PolarCheckout> {
 	const body: Record<string, unknown> = {
 		products: [input.productId],
 		success_url: input.successUrl,
 		metadata: input.metadata,
 	};
+	if (input.priceCents != null) {
+		body.prices = {
+			[input.productId]: [
+				{
+					amount_type: "fixed",
+					price_amount: input.priceCents,
+					price_currency: "usd",
+				},
+			],
+		};
+	}
 	if (input.returnUrl) body.return_url = input.returnUrl;
 	if (input.customerId) {
 		body.customer_id = input.customerId;

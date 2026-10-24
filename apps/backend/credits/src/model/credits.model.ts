@@ -45,6 +45,12 @@ export namespace CreditsModel {
 			cancelAtPeriodEnd: t.Optional(t.Boolean()),
 			planId: t.Optional(t.String()),
 		}),
+		prepaid: t.Optional(
+			t.Object({
+				balance: t.Number(),
+				expiresAt: t.Union([t.String(), t.Null()]),
+			}),
+		),
 		grantedPlan: t.Optional(
 			t.Union([
 				t.Object({
@@ -94,6 +100,10 @@ export namespace CreditsModel {
 
 	export const checkoutBody = t.Object({
 		planId: t.Union([t.Literal("individual"), t.Literal("startup")]),
+	});
+
+	export const creditsCheckoutBody = t.Object({
+		emails: t.Integer({ minimum: 1 }),
 	});
 
 	export const checkoutResponse = t.Object({

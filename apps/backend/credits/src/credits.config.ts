@@ -15,6 +15,8 @@ export const creditsConfig = {
 	BILLING_ENABLED: envFlag(process.env.BILLING_ENABLED),
 	POLAR_ACCESS_TOKEN: process.env.POLAR_ACCESS_TOKEN || "",
 	POLAR_WEBHOOK_SECRET: (process.env.POLAR_WEBHOOK_SECRET || "").trim(),
+	/** One-time Polar product for credit packs; else found by metadata. */
+	POLAR_CREDITS_PRODUCT_ID: (process.env.POLAR_CREDITS_PRODUCT_ID || "").trim(),
 	POLAR_SERVER:
 		process.env.POLAR_SERVER === "production" ? "production" : "sandbox",
 	BILLING_SUCCESS_URL:

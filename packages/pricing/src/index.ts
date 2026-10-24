@@ -10,9 +10,13 @@ export {
 	applyPlanChange,
 	checkoutPlanIds,
 	closePeriodSnapshot,
+	creditPack,
+	creditPackPriceCents,
+	creditPackSizes,
 	getPlanLimits,
 	isCheckoutPlanId,
 	isPlanId,
+	isValidCreditPackSize,
 	mapPolarSubscriptionStatus,
 	planLimits,
 	polarStatusMap,
@@ -503,6 +507,12 @@ export const defaultPlan = pricingPlans[0] as PricingPlan;
 
 export function getPlanById(id: PlanId) {
 	return pricingPlans.find((p) => p.id === id);
+}
+
+/** Display name for any plan, including Pay as you go (not a pricing tier). */
+export function planDisplayName(id: PlanId): string {
+	if (id === "payg") return "Pay as you go";
+	return getPlanById(id)?.name ?? "Free";
 }
 
 export function getNextPlan(id: PlanId) {

@@ -55,6 +55,8 @@ export interface EmailSentPayload {
 	recipientCount: number;
 	/** True when the send path already reserved monthly/daily credits. */
 	creditsReserved?: boolean;
+	/** Recipients paid from prepaid (pay-as-you-go) credits; never metered. */
+	prepaidCharged?: number;
 	timestamp: string;
 }
 

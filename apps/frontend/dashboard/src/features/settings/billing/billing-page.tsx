@@ -1,19 +1,22 @@
 import {
+	creditPack,
 	defaultPlan,
 	formatPrice,
 	getNextPlan,
 	getPlanById,
 	isCheckoutPlanId,
+	planDisplayName,
 } from "@reloop/pricing";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatedForwardButton } from "#/features/dashboard/animated-forward-button";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import { openHelpWithMessage } from "#/features/help/open-help";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import { BuyCreditsModal } from "./buy-credits-modal";
 import { GrantedPlanBanner } from "./granted-plan-banner";
 import { resolvePlanId } from "./plan-id";
 import { SwitchPlanModal } from "./switch-plan-modal";
@@ -37,9 +40,20 @@ function formatPeriodDate(value: string): string {
 	return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
+function formatExpiryDate(value: string): string {
+	const d = new Date(value);
+	if (Number.isNaN(d.getTime())) return "";
+	return d.toLocaleDateString(undefined, {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+	});
+}
+
 export function BillingPage() {
 	const router = useRouter();
 	const [switchOpen, setSwitchOpen] = useState(false);
+	const [creditsOpen, setCreditsOpen] = useState(false);
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const {
 		data: usageData,
@@ -55,6 +69,21 @@ export function BillingPage() {
 			router.push(SETTINGS_MEMBER_HOME);
 		}
 	}, [canManageBilling, rolePending, router]);
+
+	// Back from Polar checkout: the payment webhook can land a moment later,
+	// so refetch a few times until the new plan or credits show up.
+	const refetchUsageRef = useRef(refetchUsage);
+	refetchUsageRef.current = refetchUsage;
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		if (params.get("checkout") !== "success") return;
+		const timers = [2_000, 5_000, 10_000].map((ms) =>
+			window.setTimeout(() => void refetchUsageRef.current(), ms),
+		);
+		return () => {
+			for (const t of timers) window.clearTimeout(t);
+		};
+	}, []);
 
 	if (rolePending || !canManageBilling) {
 		return null;
@@ -81,8 +110,13 @@ export function BillingPage() {
 		id: usageData?.plan.id ?? usageData?.subscription.planId,
 		name: usageData?.plan.name,
 	});
+	const isPayg = currentPlanId === "payg";
 	const currentPlan = getPlanById(currentPlanId) ?? defaultPlan;
-	const nextPlan = getNextPlan(currentPlanId);
+	const planName = planDisplayName(currentPlanId);
+	// Pay as you go sits between Free and Pro, so Pro is the next step up.
+	const nextPlan = isPayg
+		? getPlanById("individual")
+		: getNextPlan(currentPlanId);
 	const monthlyIncluded =
 		usageData?.plan.entitlements?.monthlyEmails ??
 		usageData?.plan.monthlyCredits ??
@@ -90,6 +124,10 @@ export function BillingPage() {
 	const remaining = usageData
 		? emailUsage(usageData.subscription).remaining
 		: 0;
+	const prepaidBalance = usageData?.prepaid?.balance ?? 0;
+	const prepaidExpiresAt = usageData?.prepaid?.expiresAt ?? null;
+	const hasCredits = prepaidBalance > 0 || prepaidExpiresAt != null;
+	const canBuyCredits = currentPlanId !== "enterprise";
 
 	const nextPlanPriceLabel = nextPlan
 		? nextPlan.monthlyPrice === null
@@ -117,9 +155,10 @@ export function BillingPage() {
 	};
 
 	const periods = periodsQuery.data ?? [];
-	// Nothing to manage in the billing portal on Free or an admin-granted plan.
+	// Nothing to manage in the billing portal on Free, Pay as you go (no
+	// subscription) or an admin-granted plan.
 	const canManageSubscription =
-		currentPlanId !== "free" && !usageData?.grantedPlan;
+		currentPlanId !== "free" && !isPayg && !usageData?.grantedPlan;
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -130,7 +169,11 @@ export function BillingPage() {
 					</h1>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
 						{usageData
-							? `${remaining.toLocaleString()} of ${monthlyIncluded.toLocaleString()} emails remaining this period.`
+							? `${remaining.toLocaleString()} of ${monthlyIncluded.toLocaleString()} emails remaining this period${
+									prepaidBalance > 0
+										? `, plus ${prepaidBalance.toLocaleString()} credits`
+										: ""
+								}.`
 							: "Plan, usage, and invoices for this organization."}{" "}
 						For questions,{" "}
 						<button
@@ -178,7 +221,7 @@ export function BillingPage() {
 					<div>
 						<div className="flex items-center gap-2">
 							<h2 className="font-medium text-label-md text-text-strong-950">
-								{currentPlan.name} plan
+								{isPayg ? planName : `${planName} plan`}
 							</h2>
 							<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
 								{usageData?.subscription.status === "past_due"
@@ -192,11 +235,13 @@ export function BillingPage() {
 							) : null}
 						</div>
 						<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
-							{currentPlan.monthlyPrice === null
-								? currentPlan.priceSubline
-								: currentPlan.monthlyPrice === 0
-									? "Free for everyone"
-									: `${formatPrice(currentPlan.monthlyPrice)} / month`}
+							{isPayg
+								? "No subscription"
+								: currentPlan.monthlyPrice === null
+									? currentPlan.priceSubline
+									: currentPlan.monthlyPrice === 0
+										? "Free for everyone"
+										: `${formatPrice(currentPlan.monthlyPrice)} / month`}
 							{monthlyIncluded > 0
 								? ` · ${monthlyIncluded.toLocaleString()} emails included`
 								: null}
@@ -215,6 +260,35 @@ export function BillingPage() {
 					) : null}
 				</div>
 			</div>
+
+			{canBuyCredits ? (
+				<div className={CARD}>
+					<div className="flex items-center justify-between gap-4">
+						<div>
+							<h2 className="font-medium text-label-md text-text-strong-950">
+								Email credits
+							</h2>
+							<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
+								{hasCredits
+									? `${prepaidBalance.toLocaleString()} credits left${
+											prepaidExpiresAt
+												? ` · Valid until ${formatExpiryDate(prepaidExpiresAt)}`
+												: ""
+										}`
+									: `Pay once, no subscription. $${creditPack.usdPerThousand.toFixed(2)} per 1,000 emails, valid for ${creditPack.validityMonths} months.`}
+							</p>
+						</div>
+						<FancyButton.Root
+							variant={hasCredits || isPayg ? "neutral" : "basic"}
+							size="xsmall"
+							className="shrink-0 rounded-full font-medium"
+							onClick={() => setCreditsOpen(true)}
+						>
+							{hasCredits ? "Buy more" : "Buy credits"}
+						</FancyButton.Root>
+					</div>
+				</div>
+			) : null}
 
 			{nextPlan ? (
 				<div className={CARD}>
@@ -317,6 +391,13 @@ export function BillingPage() {
 					</div>
 				)}
 			</div>
+
+			<BuyCreditsModal
+				open={creditsOpen}
+				onOpenChange={setCreditsOpen}
+				currentPlanId={currentPlanId}
+				currentExpiresAt={prepaidExpiresAt}
+			/>
 
 			<SwitchPlanModal
 				open={switchOpen}

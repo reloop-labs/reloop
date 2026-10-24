@@ -45,6 +45,11 @@ export interface BillingUsage {
 		cancelAtPeriodEnd?: boolean;
 		planId?: string;
 	};
+	/** Pay-as-you-go credits, spent after the monthly emails run out. */
+	prepaid?: {
+		balance: number;
+		expiresAt: string | null;
+	};
 	/** Set when a Reloop admin granted the current plan (not paid via checkout). */
 	grantedPlan?: {
 		planId: string;

@@ -15,6 +15,8 @@ import { createError } from "evlog";
 
 const planRank: Record<PlanId, number> = {
 	free: 0,
+	// Pay as you go: Free plus prepaid credits, below any subscription.
+	payg: 0.5,
 	individual: 1,
 	startup: 2,
 	enterprise: 3,

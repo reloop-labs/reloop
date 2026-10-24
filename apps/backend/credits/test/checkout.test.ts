@@ -30,6 +30,7 @@ describe("createCheckoutController", () => {
 				polar: {
 					enabled: false,
 					listProducts: async () => [],
+					listOneTimeProducts: async () => [],
 					createOrGetCustomer: async () => {
 						throw new Error("unused");
 					},
@@ -57,6 +58,7 @@ describe("createCheckoutController", () => {
 				polar: {
 					enabled: true,
 					listProducts: async () => [],
+					listOneTimeProducts: async () => [],
 					createOrGetCustomer: async () => {
 						throw new Error("unused");
 					},

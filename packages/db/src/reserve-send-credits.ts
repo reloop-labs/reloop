@@ -46,7 +46,19 @@ export type CreditSnapshot = {
 	currentPeriodEnd: Date;
 	dailyEmailsUsed: number;
 	dailyWindowStart: Date;
+	/** Unexpired pay-as-you-go balance, spent once the monthly pool is empty. */
+	prepaidRemaining?: number;
 };
+
+/** Pay-as-you-go balance that can still be spent at `now` (0 once expired). */
+export function usablePrepaidCredits(
+	row: { prepaidCredits: number; prepaidExpiresAt: Date | null },
+	now: Date,
+): number {
+	if (row.prepaidCredits <= 0) return 0;
+	if (!row.prepaidExpiresAt || row.prepaidExpiresAt <= now) return 0;
+	return row.prepaidCredits;
+}
 
 export type ReserveDenied = {
 	ok: false;
@@ -59,7 +71,10 @@ export type ReserveDenied = {
 
 export type ReserveAccepted = {
 	ok: true;
+	/** Monthly plus prepaid credits left after this send. */
 	remaining: number;
+	/** Part of this send paid from the prepaid balance. */
+	fromPrepaid: number;
 	monthlyCredits: number;
 	dailyUsed: number;
 	dailyLimit: number | null;
@@ -71,7 +86,8 @@ export type ReserveDecision = ReserveAccepted | ReserveDenied;
 
 /**
  * Decide whether a send of `recipientCount` emails fits monthly remaining
- * and the plan daily cap. Pure: callers persist `next` under a row lock.
+ * (plus any prepaid credits) and the plan daily cap. The monthly pool is
+ * spent first, then prepaid. Pure: callers persist `next` under a row lock.
  */
 export function applyCreditReservation(args: {
 	credits: CreditSnapshot;
@@ -88,11 +104,14 @@ export function applyCreditReservation(args: {
 	const dailyUsedAfter = dailyUsedBefore + n;
 	const dailyWindowStart = rollsDaily ? today : args.credits.dailyWindowStart;
 	const dailyLimit = args.dailyEmailLimit;
+	const prepaid = Math.max(0, args.credits.prepaidRemaining ?? 0);
+	const available = Math.max(0, args.credits.creditsRemaining) + prepaid;
 
 	if (n <= 0) {
 		return {
 			ok: true,
-			remaining: args.credits.creditsRemaining,
+			remaining: available,
+			fromPrepaid: 0,
 			monthlyCredits: args.credits.monthlyCredits,
 			dailyUsed: dailyUsedBefore,
 			dailyLimit,
@@ -105,11 +124,11 @@ export function applyCreditReservation(args: {
 		};
 	}
 
-	if (!unlimited && args.credits.creditsRemaining < n) {
+	if (!unlimited && available < n) {
 		return {
 			ok: false,
 			reason: "monthly",
-			remaining: args.credits.creditsRemaining,
+			remaining: available,
 			monthlyCredits: args.credits.monthlyCredits,
 			dailyUsed: dailyUsedBefore,
 			dailyLimit,
@@ -120,30 +139,35 @@ export function applyCreditReservation(args: {
 		return {
 			ok: false,
 			reason: "daily",
-			remaining: args.credits.creditsRemaining,
+			remaining: available,
 			monthlyCredits: args.credits.monthlyCredits,
 			dailyUsed: dailyUsedBefore,
 			dailyLimit,
 		};
 	}
 
-	const remaining = unlimited
-		? args.credits.creditsRemaining
-		: args.credits.creditsRemaining - n;
+	const fromMonthly = unlimited
+		? 0
+		: Math.min(n, Math.max(0, args.credits.creditsRemaining));
+	const fromPrepaid = unlimited ? 0 : n - fromMonthly;
+	const monthlyRemaining = args.credits.creditsRemaining - fromMonthly;
+	const prepaidRemaining = prepaid - fromPrepaid;
 	return {
 		ok: true,
-		remaining,
+		remaining: Math.max(0, monthlyRemaining) + prepaidRemaining,
+		fromPrepaid,
 		monthlyCredits: args.credits.monthlyCredits,
 		dailyUsed: dailyUsedAfter,
 		dailyLimit,
 		dailyWindowStart,
 		next: {
-			creditsRemaining: remaining,
+			creditsRemaining: monthlyRemaining,
 			creditsUsed: args.credits.creditsUsed + n,
 			monthlyCredits: args.credits.monthlyCredits,
 			currentPeriodEnd: args.credits.currentPeriodEnd,
 			dailyEmailsUsed: dailyUsedAfter,
 			dailyWindowStart,
+			prepaidRemaining,
 		},
 	};
 }
@@ -152,6 +176,8 @@ export type CreditReservation = {
 	organizationId: string;
 	organizationCreditsId: string;
 	recipientCount: number;
+	/** Part of the reservation taken from prepaid credits (refunded there). */
+	fromPrepaid: number;
 	dailyWindowStart: Date;
 	remaining: number;
 	monthlyCredits: number;
@@ -359,6 +385,7 @@ async function paymentDenial(
 
 function snapshotFromRow(
 	row: typeof organizationCredits.$inferSelect,
+	now: Date,
 ): CreditSnapshot {
 	return {
 		creditsRemaining: row.creditsRemaining,
@@ -367,6 +394,7 @@ function snapshotFromRow(
 		currentPeriodEnd: row.currentPeriodEnd,
 		dailyEmailsUsed: row.dailyEmailsUsed,
 		dailyWindowStart: row.dailyWindowStart,
+		prepaidRemaining: usablePrepaidCredits(row, now),
 	};
 }
 
@@ -398,7 +426,7 @@ export async function peekSendCredits(args: {
 		if (denied) return denied;
 	}
 	return applyCreditReservation({
-		credits: snapshotFromRow(credits),
+		credits: snapshotFromRow(credits, now),
 		dailyEmailLimit,
 		recipientCount: args.recipientCount,
 		now,
@@ -429,6 +457,7 @@ export async function reserveSendCredits(args: {
 		return {
 			ok: true,
 			remaining: 0,
+			fromPrepaid: 0,
 			monthlyCredits: DEFAULT_MONTHLY_CREDITS,
 			dailyUsed: 0,
 			dailyLimit: null,
@@ -477,7 +506,7 @@ export async function reserveSendCredits(args: {
 			if (denied) return denied;
 		}
 		const decision = applyCreditReservation({
-			credits: snapshotFromRow(locked),
+			credits: snapshotFromRow(locked, now),
 			dailyEmailLimit,
 			recipientCount,
 			now,
@@ -494,6 +523,9 @@ export async function reserveSendCredits(args: {
 				.set({
 					creditsUsed: decision.next.creditsUsed,
 					creditsRemaining: decision.next.creditsRemaining,
+					...(decision.fromPrepaid > 0
+						? { prepaidCredits: locked.prepaidCredits - decision.fromPrepaid }
+						: {}),
 					dailyEmailsUsed: decision.next.dailyEmailsUsed,
 					dailyWindowStart: decision.next.dailyWindowStart,
 					updatedAt: now,
@@ -507,6 +539,7 @@ export async function reserveSendCredits(args: {
 				organizationId,
 				organizationCreditsId: locked.id,
 				recipientCount,
+				fromPrepaid: decision.fromPrepaid,
 				dailyWindowStart: decision.dailyWindowStart,
 				remaining: decision.remaining,
 				monthlyCredits: decision.monthlyCredits,
@@ -543,13 +576,15 @@ export async function refundSendCredits(args: {
 		// Compare by UTC day: a provisioned window may start mid-day.
 		const sameDay =
 			utcDayStart(row.dailyWindowStart).getTime() === today.getTime();
+		const toPrepaid = Math.min(n, Math.max(0, reservation.fromPrepaid ?? 0));
 		await tx
 			.update(organizationCredits)
 			.set({
 				creditsUsed: Math.max(0, row.creditsUsed - n),
 				creditsRemaining: !isSelfHosted()
-					? row.creditsRemaining + n
+					? row.creditsRemaining + (n - toPrepaid)
 					: row.creditsRemaining,
+				prepaidCredits: row.prepaidCredits + toPrepaid,
 				dailyEmailsUsed: sameDay
 					? Math.max(0, row.dailyEmailsUsed - n)
 					: row.dailyEmailsUsed,
@@ -567,8 +602,24 @@ export async function refundSendCredits(args: {
 export function applyReceiveCharge(args: {
 	creditsUsed: number;
 	creditsRemaining: number;
+	/** Unexpired prepaid balance; used once the monthly pool is empty. */
+	prepaidRemaining?: number;
 	unlimited?: boolean;
-}): { creditsUsed: number; creditsRemaining: number; delta: number } {
+}): {
+	creditsUsed: number;
+	creditsRemaining: number;
+	delta: number;
+	fromPrepaid: number;
+} {
+	const prepaid = Math.max(0, args.prepaidRemaining ?? 0);
+	if (args.unlimited !== true && args.creditsRemaining <= 0 && prepaid > 0) {
+		return {
+			creditsUsed: args.creditsUsed + 1,
+			creditsRemaining: args.creditsRemaining,
+			delta: -1,
+			fromPrepaid: 1,
+		};
+	}
 	const creditsRemaining =
 		args.unlimited === true
 			? args.creditsRemaining
@@ -577,11 +628,17 @@ export function applyReceiveCharge(args: {
 		creditsUsed: args.creditsUsed + 1,
 		creditsRemaining,
 		delta: creditsRemaining - args.creditsRemaining,
+		fromPrepaid: 0,
 	};
 }
 
 export type ReceiveChargeResult =
-	| { charged: true; remaining: number; creditsUsed: number }
+	| {
+			charged: true;
+			remaining: number;
+			creditsUsed: number;
+			fromPrepaid: number;
+	  }
 	| { charged: false; reason: "already_charged" };
 
 /**
@@ -639,13 +696,21 @@ export async function chargeReceiveCredits(args: {
 		const next = applyReceiveCharge({
 			creditsUsed: locked.creditsUsed,
 			creditsRemaining: locked.creditsRemaining,
+			prepaidRemaining: usablePrepaidCredits(locked, now),
 			unlimited: isSelfHosted(),
 		});
 		const { creditsUsed, creditsRemaining: remaining } = next;
 
 		await tx
 			.update(organizationCredits)
-			.set({ creditsUsed, creditsRemaining: remaining, updatedAt: now })
+			.set({
+				creditsUsed,
+				creditsRemaining: remaining,
+				...(next.fromPrepaid > 0
+					? { prepaidCredits: locked.prepaidCredits - next.fromPrepaid }
+					: {}),
+				updatedAt: now,
+			})
 			.where(eq(organizationCredits.id, locked.id));
 
 		await tx.insert(creditLedger).values({
@@ -658,6 +723,11 @@ export async function chargeReceiveCredits(args: {
 			referenceId: inboundEmailId,
 		});
 
-		return { charged: true, remaining, creditsUsed } as const;
+		return {
+			charged: true,
+			remaining,
+			creditsUsed,
+			fromPrepaid: next.fromPrepaid,
+		} as const;
 	});
 }

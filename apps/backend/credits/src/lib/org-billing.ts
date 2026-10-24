@@ -1,7 +1,10 @@
 import { addMonthsUtc, advancePeriod } from "@reloop/db/billing-period";
 import { type DatabaseInstance, db } from "@reloop/db/client";
 import { syncInboxesToPlanCap } from "@reloop/db/inbox-plan-cap";
-import { utcDayStart } from "@reloop/db/reserve-send-credits";
+import {
+	usablePrepaidCredits,
+	utcDayStart,
+} from "@reloop/db/reserve-send-credits";
 import {
 	billingPeriod,
 	creditLedger,
@@ -15,11 +18,12 @@ import {
 import {
 	applyPlanChange,
 	closePeriodSnapshot,
+	creditPack,
 	getPlanLimits,
 	type PlanId,
 	type PlanLimits,
 } from "@reloop/pricing";
-import { and, eq } from "drizzle-orm";
+import { and, eq, lte } from "drizzle-orm";
 import { log } from "evlog";
 import type { PolarBillingPort } from "./polar";
 
@@ -208,22 +212,40 @@ export async function refillCreditsFromPlan(args: {
 	return updated;
 }
 
+/** True while the org holds pay-as-you-go credits that have not expired. */
+export function hasActivePrepaid(
+	credits: typeof organizationCredits.$inferSelect,
+	now: Date,
+): boolean {
+	return credits.prepaidExpiresAt != null && credits.prepaidExpiresAt > now;
+}
+
 /**
  * Subscription ended (revoked / canceled at period end): record the paid
- * period, move the org to the free plan and start a fresh free period.
- * No-op on the plan when the org is already free (duplicate webhooks).
+ * period, move the org to the free plan (Pay as you go while it still holds
+ * prepaid credits) and start a fresh period. No-op on the plan when the org
+ * is already there (duplicate webhooks).
  */
 export async function downgradeOrgToFree(args: {
 	billing: OrgBillingRow;
 	tx: DatabaseInstance;
 	now?: Date;
-}): Promise<{ downgraded: boolean; periodStart: Date; periodEnd: Date }> {
+}): Promise<{
+	downgraded: boolean;
+	planId: PlanId;
+	periodStart: Date;
+	periodEnd: Date;
+}> {
 	const { billing, tx } = args;
 	const now = args.now ?? new Date();
+	const fallbackPlanId: PlanId = hasActivePrepaid(billing.credits, now)
+		? "payg"
+		: "free";
 
-	if (billing.plan.planId === "free") {
+	if (billing.plan.planId === fallbackPlanId) {
 		return {
 			downgraded: false,
+			planId: fallbackPlanId,
 			periodStart: billing.credits.currentPeriodStart,
 			periodEnd: billing.credits.currentPeriodEnd,
 		};
@@ -245,7 +267,7 @@ export async function downgradeOrgToFree(args: {
 
 	const free = await changeOrgPlan({
 		organizationId: billing.plan.organizationId,
-		nextPlanId: "free",
+		nextPlanId: fallbackPlanId,
 		tx,
 	});
 
@@ -260,7 +282,147 @@ export async function downgradeOrgToFree(args: {
 		tx,
 	});
 
-	return { downgraded: true, periodStart, periodEnd };
+	return { downgraded: true, planId: fallbackPlanId, periodStart, periodEnd };
+}
+
+/**
+ * Void prepaid credits once they pass their expiry, and move a Pay as you go
+ * org back to Free. Safe to call repeatedly: only the caller that clears
+ * `prepaidExpiresAt` does the work.
+ */
+async function expirePrepaidCredits(args: {
+	plan: typeof organizationPlan.$inferSelect;
+	credits: typeof organizationCredits.$inferSelect;
+	tx: DatabaseInstance;
+	now: Date;
+}): Promise<{
+	plan: typeof organizationPlan.$inferSelect;
+	credits: typeof organizationCredits.$inferSelect;
+}> {
+	const { tx, now } = args;
+	const expiresAt = args.credits.prepaidExpiresAt;
+	if (!expiresAt || expiresAt > now) {
+		return { plan: args.plan, credits: args.credits };
+	}
+
+	const [credits] = await tx
+		.update(organizationCredits)
+		.set({ prepaidCredits: 0, prepaidExpiresAt: null, updatedAt: now })
+		.where(
+			and(
+				eq(organizationCredits.id, args.credits.id),
+				lte(organizationCredits.prepaidExpiresAt, now),
+			),
+		)
+		.returning();
+	if (!credits) return { plan: args.plan, credits: args.credits };
+
+	if (args.credits.prepaidCredits > 0) {
+		await tx.insert(creditLedger).values({
+			organizationId: credits.organizationId,
+			organizationCreditsId: credits.id,
+			entryType: "credit_expired",
+			delta: -args.credits.prepaidCredits,
+			balanceAfter: 0,
+			reason: `Unused email credits expired after ${creditPack.validityMonths} months`,
+		});
+	}
+
+	let plan = args.plan;
+	if (plan.planId === "payg") {
+		await changeOrgPlan({
+			organizationId: plan.organizationId,
+			nextPlanId: "free",
+			tx,
+		});
+		await tx
+			.update(organizationSubscription)
+			.set({ planId: "free", updatedAt: now })
+			.where(eq(organizationSubscription.organizationId, plan.organizationId));
+		const refreshed = await tx.query.organizationPlan.findFirst({
+			where: eq(organizationPlan.organizationId, plan.organizationId),
+		});
+		if (refreshed) plan = refreshed;
+	}
+
+	return { plan, credits };
+}
+
+/**
+ * Add a paid credit pack. Credits are spent after the monthly allowance and
+ * last `creditPack.validityMonths` from this purchase; buying again extends
+ * the whole balance. A Free org moves to Pay as you go (Pro limits).
+ * Idempotent per Polar order.
+ */
+export async function grantPrepaidCredits(args: {
+	organizationId: string;
+	emails: number;
+	orderId: string;
+	tx: DatabaseInstance;
+	now?: Date;
+}): Promise<{ granted: boolean; balance: number; expiresAt: Date | null }> {
+	const { tx, organizationId, emails, orderId } = args;
+	const now = args.now ?? new Date();
+	const billing = await getOrProvisionOrgBilling(organizationId, tx);
+
+	const [locked] = await tx
+		.select()
+		.from(organizationCredits)
+		.where(eq(organizationCredits.id, billing.credits.id))
+		.for("update");
+	if (!locked) throw new Error("Failed to lock organization credits");
+
+	const existing = await tx.query.creditLedger.findFirst({
+		where: and(
+			eq(creditLedger.organizationId, organizationId),
+			eq(creditLedger.entryType, "credit_purchased"),
+			eq(creditLedger.referenceId, orderId),
+		),
+		columns: { id: true },
+	});
+	if (existing) {
+		return {
+			granted: false,
+			balance: locked.prepaidCredits,
+			expiresAt: locked.prepaidExpiresAt,
+		};
+	}
+
+	const fresh = addMonthsUtc(now, creditPack.validityMonths);
+	const expiresAt =
+		locked.prepaidExpiresAt && locked.prepaidExpiresAt > fresh
+			? locked.prepaidExpiresAt
+			: fresh;
+	const balance = usablePrepaidCredits(locked, now) + emails;
+
+	await tx
+		.update(organizationCredits)
+		.set({
+			prepaidCredits: balance,
+			prepaidExpiresAt: expiresAt,
+			updatedAt: now,
+		})
+		.where(eq(organizationCredits.id, locked.id));
+
+	await tx.insert(creditLedger).values({
+		organizationId,
+		organizationCreditsId: locked.id,
+		entryType: "credit_purchased",
+		delta: emails,
+		balanceAfter: balance,
+		reason: `Bought ${emails.toLocaleString("en-US")} email credits`,
+		referenceId: orderId,
+	});
+
+	if (billing.plan.planId === "free") {
+		await changeOrgPlan({ organizationId, nextPlanId: "payg", tx });
+		await tx
+			.update(organizationSubscription)
+			.set({ planId: "payg", updatedAt: now })
+			.where(eq(organizationSubscription.organizationId, organizationId));
+	}
+
+	return { granted: true, balance, expiresAt };
 }
 
 export async function getOrProvisionOrgBilling(
@@ -288,6 +450,14 @@ export async function getOrProvisionOrgBilling(
 			eq(organizationCredits.status, "active"),
 		),
 	});
+	if (credits) {
+		({ plan, credits } = await expirePrepaidCredits({
+			plan,
+			credits,
+			tx: client,
+			now,
+		}));
+	}
 	if (!credits) {
 		const periodEnd = nextMonth(now);
 		const [created] = await client

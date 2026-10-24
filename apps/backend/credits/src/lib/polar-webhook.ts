@@ -3,6 +3,7 @@ import {
 	closeBillingPeriod,
 	downgradeOrgToFree,
 	getOrProvisionOrgBilling,
+	grantPrepaidCredits,
 	linkPolarCustomerToOrg,
 	refillCreditsFromPlan,
 } from "@reloop/credits/lib/org-billing";
@@ -18,6 +19,9 @@ import {
 	organizationSubscription,
 } from "@reloop/db/schema";
 import {
+	creditPack,
+	creditPackPriceCents,
+	isValidCreditPackSize,
 	mapPolarSubscriptionStatus,
 	type PlanId,
 	polarStatusMap,
@@ -32,6 +36,15 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 
 function str(value: unknown): string | undefined {
 	return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function num(value: unknown): number | undefined {
+	if (typeof value === "number" && Number.isFinite(value)) return value;
+	if (typeof value === "string" && value.trim() !== "") {
+		const parsed = Number(value);
+		if (Number.isFinite(parsed)) return parsed;
+	}
+	return undefined;
 }
 
 function bool(value: unknown): boolean | undefined {
@@ -110,11 +123,85 @@ export async function handlePolarWebhookEvent(event: {
 		return applySubscription(event.data);
 	}
 
+	if (event.type === "order.paid") {
+		const metadata = asRecord(field(event.data, "metadata", "metadata"));
+		if (str(metadata?.kind) === "credits") {
+			return applyCreditPurchase(event.data);
+		}
+	}
+
 	if (event.type.startsWith("customer.") || event.type.startsWith("order.")) {
 		return applyCustomerLink(event.data);
 	}
 
 	return { ok: true };
+}
+
+/**
+ * Emails a paid credit order covers: what checkout asked for, capped by what
+ * was actually charged before discounts (never more than was paid for).
+ */
+export function creditPackEmailsForOrder(args: {
+	requestedEmails: number | undefined;
+	subtotalCents: number | undefined;
+}): number {
+	const requested = args.requestedEmails ?? 0;
+	if (!isValidCreditPackSize(requested)) return 0;
+	if (args.subtotalCents == null) return 0;
+	if (args.subtotalCents >= creditPackPriceCents(requested)) return requested;
+	const centsPerStep = creditPackPriceCents(creditPack.stepEmails);
+	return Math.floor(args.subtotalCents / centsPerStep) * creditPack.stepEmails;
+}
+
+async function applyCreditPurchase(data: Record<string, unknown>) {
+	const orgId = await resolveOrganizationId(data);
+	const orderId = str(data.id);
+	if (!orgId || !orderId) {
+		log.warn({
+			message: "Polar credit order missing organization or order id",
+			polarOrderId: orderId,
+		});
+		return { ok: false as const, reason: "organization_not_found" };
+	}
+
+	const metadata = asRecord(field(data, "metadata", "metadata"));
+	const requestedEmails = num(metadata?.emails);
+	const subtotalCents =
+		num(field(data, "subtotalAmount", "subtotal_amount")) ?? num(data.amount);
+	const emails = creditPackEmailsForOrder({ requestedEmails, subtotalCents });
+	if (emails !== requestedEmails) {
+		log.warn({
+			message: "Polar credit order amount does not match the pack",
+			organizationId: orgId,
+			polarOrderId: orderId,
+			requestedEmails,
+			subtotalCents,
+			grantedEmails: emails,
+		});
+	}
+	if (emails <= 0) return { ok: true as const, organizationId: orgId };
+
+	const result = await db.transaction((tx) =>
+		grantPrepaidCredits({ organizationId: orgId, emails, orderId, tx }),
+	);
+	log.info({
+		message: result.granted
+			? "Granted prepaid email credits"
+			: "Credit order already granted",
+		organizationId: orgId,
+		polarOrderId: orderId,
+		emails,
+		balance: result.balance,
+	});
+
+	const polarCustomerId =
+		str(field(data, "customerId", "customer_id")) ??
+		str(asRecord(data.customer)?.id);
+	if (polarCustomerId) {
+		await linkPolarCustomerToOrg({ organizationId: orgId, polarCustomerId });
+	}
+
+	return { ok: true as const, organizationId: orgId };
 }
 
 async function applyCustomerLink(data: Record<string, unknown>) {
@@ -205,7 +292,7 @@ async function applySubscription(data: Record<string, unknown>) {
 			await tx
 				.update(organizationSubscription)
 				.set({
-					planId: "free",
+					planId: period.planId,
 					status,
 					polarSubscriptionId:
 						polarSubscriptionId ?? billing.subscription.polarSubscriptionId,

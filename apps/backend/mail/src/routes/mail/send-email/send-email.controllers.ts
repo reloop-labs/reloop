@@ -394,6 +394,7 @@ export async function sendEmailController({
 				maxAttachmentBytes,
 				planId,
 				idempotencyKey,
+				prepaidCharged: reservation?.fromPrepaid ?? 0,
 				onInjected: () => {
 					injected = true;
 				},
@@ -455,6 +456,7 @@ async function sendReservedEmail({
 	maxAttachmentBytes,
 	planId,
 	idempotencyKey,
+	prepaidCharged,
 	onInjected,
 }: {
 	organizationId: string;
@@ -471,6 +473,7 @@ async function sendReservedEmail({
 	maxAttachmentBytes?: number;
 	planId?: string;
 	idempotencyKey?: string;
+	prepaidCharged: number;
 	onInjected?: () => void;
 }): Promise<MailModel.SendEmailResponse> {
 	// ── Resolve In-Reply-To header if replying to a thread ────────
@@ -565,6 +568,7 @@ async function sendReservedEmail({
 		result,
 		organizationId,
 		body,
+		prepaidCharged,
 	});
 
 	// ── Thread linking ────────────────────────────────────────────
