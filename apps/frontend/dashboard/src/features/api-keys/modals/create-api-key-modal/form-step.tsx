@@ -15,13 +15,11 @@ export function FormStep({
 	isLoading,
 	access,
 	onAccessChange,
-	showAccessError,
 }: {
 	form: UseFormReturn<ApiKeyFormValues>;
 	isLoading: boolean;
 	access: ApiKeyAccessValue;
 	onAccessChange: (value: ApiKeyAccessValue) => void;
-	showAccessError: boolean;
 }) {
 	const {
 		register,
@@ -61,7 +59,6 @@ export function FormStep({
 				value={access}
 				onChange={onAccessChange}
 				disabled={isLoading}
-				showError={showAccessError}
 			/>
 		</div>
 	);

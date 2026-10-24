@@ -12,11 +12,9 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../types";
-import { describeScope } from "./api-key-access-badge";
 import {
 	ApiKeyAccessField,
 	type ApiKeyAccessValue,
-	accessError,
 	accessToScope,
 	scopeToAccess,
 } from "./api-key-access-field";
@@ -30,19 +28,19 @@ export function ApiKeyAccessSection({
 	isLoading: boolean;
 }) {
 	const [, setAccessId] = useQueryState("access");
-	const lines = describeScope(apiKey?.scope);
+	const scope = apiKey?.scope ?? [];
 
 	return (
 		<section className="flex flex-col gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-stroke-soft-100/40">
-			<div className="flex items-start justify-between gap-3">
+			<div className="flex items-center justify-between gap-3">
 				<div className="min-w-0">
 					<h2 className="font-medium text-label-md text-text-strong-950 dark:text-white">
 						Access
 					</h2>
 					<p className="text-paragraph-sm text-text-sub-600">
-						{lines.length === 0
-							? "Full access: any domain, any mailbox, and API key management."
-							: "Restricted: can only send from, and sign in to mailboxes on, these."}
+						{scope.length === 0
+							? "Full access to every domain and mailbox."
+							: "Can only send from and sign in to:"}
 					</p>
 				</div>
 				<Button.Root
@@ -53,20 +51,23 @@ export function ApiKeyAccessSection({
 					disabled={!apiKey}
 					onClick={() => apiKey && void setAccessId(apiKey.id)}
 				>
-					<Button.Icon as={Icon} name="shield" />
-					Edit access
+					Edit
 				</Button.Root>
 			</div>
 			{isLoading ? (
-				<Skeleton className="h-5 w-48" />
-			) : lines.length > 0 ? (
+				<Skeleton className="h-6 w-48 rounded-full" />
+			) : scope.length > 0 ? (
 				<ul className="flex flex-wrap gap-1.5">
-					{lines.map((line) => (
+					{scope.map((entry) => (
 						<li
-							key={line}
-							className="inline-flex h-6 items-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 px-2.5 font-medium text-paragraph-sm text-text-strong-950 dark:border-stroke-soft-100/40"
+							key={`${entry.domainId}:${entry.email ?? "*"}`}
+							className="inline-flex h-6 items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 px-2 font-medium text-paragraph-sm text-text-strong-950 dark:border-stroke-soft-100/40"
 						>
-							{line}
+							<Icon
+								name={entry.email ? "mail" : "globe"}
+								className="size-3.5 text-text-sub-600"
+							/>
+							{entry.email ?? entry.domain}
 						</li>
 					))}
 				</ul>
@@ -87,14 +88,12 @@ export function EditApiKeyAccessModal({
 	const [value, setValue] = useState<ApiKeyAccessValue>(() =>
 		scopeToAccess(apiKey?.scope),
 	);
-	const [showError, setShowError] = useState(false);
 	const [saving, setSaving] = useState(false);
 
 	// Start from the saved restrictions each time the modal opens.
 	useEffect(() => {
 		if (open) {
 			setValue(scopeToAccess(apiKey?.scope));
-			setShowError(false);
 		}
 	}, [open, apiKey?.scope]);
 
@@ -102,10 +101,6 @@ export function EditApiKeyAccessModal({
 
 	const save = async () => {
 		if (!apiKey || saving) return;
-		if (accessError(value)) {
-			setShowError(true);
-			return;
-		}
 		try {
 			setSaving(true);
 			await axios.patch(
@@ -139,15 +134,13 @@ export function EditApiKeyAccessModal({
 							Edit access
 						</Modal.Title>
 						<Modal.Description className="mt-1 text-paragraph-sm text-text-sub-600">
-							Changes apply within a minute, including to mail apps already
-							signed in with this key.
+							Changes reach apps already using this key within a minute.
 						</Modal.Description>
 					</div>
 					<ApiKeyAccessField
 						value={value}
 						onChange={setValue}
 						disabled={saving}
-						showError={showError}
 					/>
 					<div className="flex items-center justify-end gap-3">
 						<Button.Root

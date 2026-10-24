@@ -22,7 +22,6 @@ import {
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import {
 	type ApiKeyAccessValue,
-	accessError,
 	accessToScope,
 	FULL_ACCESS,
 } from "../../access/api-key-access-field";
@@ -62,7 +61,6 @@ export function CreateApiKeyModal({
 	);
 	const [copied, setCopied] = useState(false);
 	const [access, setAccess] = useState<ApiKeyAccessValue>(FULL_ACCESS);
-	const [showAccessError, setShowAccessError] = useState(false);
 
 	const form = useForm<ApiKeyFormValues>({
 		resolver: valibotResolver(apiKeySchema) as Resolver<ApiKeyFormValues>,
@@ -98,10 +96,6 @@ export function CreateApiKeyModal({
 
 	const onSubmit = async (data: ApiKeyFormValues) => {
 		if (!activeOrganization?.id || isLoading) return;
-		if (accessError(access)) {
-			setShowAccessError(true);
-			return;
-		}
 		try {
 			setIsLoading(true);
 			const response = await axios.post<ApiKeyWithSecret>(
@@ -113,7 +107,6 @@ export function CreateApiKeyModal({
 			setCreatedApiKey(response.data);
 			form.reset();
 			setAccess(FULL_ACCESS);
-			setShowAccessError(false);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to create API key"
@@ -131,7 +124,6 @@ export function CreateApiKeyModal({
 				setCopied(false);
 				form.reset();
 				setAccess(FULL_ACCESS);
-				setShowAccessError(false);
 			}, 300);
 			return () => clearTimeout(timer);
 		}
@@ -204,7 +196,6 @@ export function CreateApiKeyModal({
 												isLoading={isLoading}
 												access={access}
 												onAccessChange={setAccess}
-												showAccessError={showAccessError}
 											/>
 										</form>
 									</motion.div>

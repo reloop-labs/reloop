@@ -28,11 +28,10 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { bunIcon } from "#/features/onboarding/step4/bun-icon";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import {
-	type ApiKeyAccessValue,
 	ApiKeyAccessField,
-	FULL_ACCESS,
-	accessError,
+	type ApiKeyAccessValue,
 	accessToScope,
+	FULL_ACCESS,
 } from "../access/api-key-access-field";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyWithSecret } from "../types";
@@ -118,7 +117,6 @@ export function CreateApiKeyPage() {
 	const [selectedLang, setSelectedLang] = useState<LanguageId>("nodejs");
 	const [selectedPkg, setSelectedPkg] = useState<string>("npm");
 	const [access, setAccess] = useState<ApiKeyAccessValue>(FULL_ACCESS);
-	const [showAccessError, setShowAccessError] = useState(false);
 
 	const {
 		register,
@@ -140,7 +138,6 @@ export function CreateApiKeyPage() {
 		setSelectedLang("nodejs");
 		setSelectedPkg("npm");
 		setAccess(FULL_ACCESS);
-		setShowAccessError(false);
 		reset({ name: "" });
 
 		return () => {
@@ -181,10 +178,6 @@ export function CreateApiKeyPage() {
 
 	const onSubmit = async (data: CreateApiKeyFormValues) => {
 		if (!activeOrganization?.id) return;
-		if (accessError(access)) {
-			setShowAccessError(true);
-			return;
-		}
 		try {
 			setIsLoading(true);
 			const response = await axios.post<ApiKeyWithSecret>(
@@ -343,7 +336,6 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 							value={access}
 							onChange={setAccess}
 							disabled={isLoading}
-							showError={showAccessError}
 						/>
 					</div>
 
