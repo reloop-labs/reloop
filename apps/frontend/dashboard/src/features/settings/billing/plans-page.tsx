@@ -323,7 +323,7 @@ export function PlansPage() {
 				</p>
 			</div>
 
-			<fieldset className="mx-auto mb-8 grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+			<fieldset className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2">
 				<legend className="sr-only">Billing mode</legend>
 				{BILLING_MODES.map((option) => {
 					const active = mode === option.id;
@@ -331,7 +331,7 @@ export function PlansPage() {
 						<label
 							key={option.id}
 							className={cn(
-								"flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-[border-color,box-shadow,background-color] duration-150",
+								"flex cursor-pointer items-start gap-2.5 rounded-2xl border p-3.5 transition-[border-color,box-shadow,background-color] duration-150",
 								"has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-text-strong-950/20",
 								active
 									? "border-transparent bg-bg-white-0 shadow-xs ring-[1.5px] ring-text-strong-950 dark:bg-white/[0.04] dark:ring-white"
@@ -363,10 +363,10 @@ export function PlansPage() {
 								/>
 							</span>
 							<span className="flex min-w-0 flex-col gap-0.5">
-								<span className="font-medium text-label-md text-text-strong-950">
+								<span className="font-medium text-label-sm text-text-strong-950">
 									{option.label}
 								</span>
-								<span className="text-paragraph-sm text-text-sub-600">
+								<span className="text-paragraph-xs text-text-sub-600">
 									{option.description}
 								</span>
 							</span>
@@ -375,7 +375,7 @@ export function PlansPage() {
 				})}
 			</fieldset>
 
-			<div className="mx-auto mb-10 w-full max-w-2xl">
+			<div className="mx-auto w-full max-w-3xl py-20">
 				{isCredits ? (
 					<StepSlider
 						steps={creditPackSizes}
@@ -393,7 +393,7 @@ export function PlansPage() {
 				)}
 			</div>
 
-			<h2 className="mb-2 font-semibold text-paragraph-lg text-text-strong-950">
+			<h2 className="font-medium text-label-md text-text-strong-950">
 				Compare plans
 			</h2>
 			<ComparisonTable

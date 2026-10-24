@@ -51,7 +51,7 @@ export function StepSlider({
 				<Slider.Thumb aria-label={ariaLabel} />
 			</Slider.Root>
 
-			<div className="relative mt-1.5 h-9">
+			<div className="relative mt-1.5 h-[26px]">
 				{steps.map((step, i) => {
 					const active = i === index;
 					return (
