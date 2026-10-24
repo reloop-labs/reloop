@@ -21,6 +21,7 @@ import (
 
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapserver"
+	"github.com/joho/godotenv"
 	"github.com/nats-io/nats.go"
 	"golang.org/x/crypto/bcrypt"
 
@@ -31,6 +32,8 @@ import (
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	// Local development reads .env (copy .env.dev); real env vars win.
+	_ = godotenv.Load()
 
 	cmd := "serve"
 	if len(os.Args) > 1 {

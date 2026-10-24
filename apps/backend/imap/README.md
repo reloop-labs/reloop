@@ -21,6 +21,8 @@ Sequence numbers and IDLE push need an ordered in-memory view of each folder, so
 
 ## Environment
 
+As in the other services: `.env.dev` holds local values and `.env.prod` lists what production needs. For local runs, `cp .env.dev .env && go run .`; the service loads `.env` on start, and real environment variables override it.
+
 | Variable | Default | |
 |---|---|---|
 | `PG_URL` | (required) | Postgres connection string |

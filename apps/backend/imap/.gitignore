@@ -1,0 +1,8 @@
+# env
+.env*
+!.env.prod
+!.env.dev
+
+# build output
+/imap
+*.log
