@@ -1,17 +1,18 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { PageSection } from "@reloop/web/components/page-shell";
 import { useState } from "react";
 import { PricingCreditsSection } from "./pricing-credits-section";
 import { CreditsVolumeSlider } from "./pricing-credits-slider";
+import { usePricingUi } from "./pricing-cta";
 import { PricingSection } from "./pricing-section";
 import {
 	PricingVolumeSlider,
 	recommendPlanIdForVolume,
 } from "./pricing-volume-slider";
 
-type BillingMode = "monthly" | "credits";
+export type PricingBillingMode = "monthly" | "credits";
+type BillingMode = PricingBillingMode;
 
 const billingTabs: Array<{
 	id: BillingMode;
@@ -30,10 +31,15 @@ const billingTabs: Array<{
 	},
 ];
 
-export function PricingExplorer() {
+export function PricingExplorer({
+	initialMode = "monthly",
+}: {
+	initialMode?: BillingMode;
+} = {}) {
+	const { Section } = usePricingUi();
 	const [monthlyVolume, setMonthlyVolume] = useState(50000);
 	const [creditsVolume, setCreditsVolume] = useState(10000);
-	const [mode, setMode] = useState<BillingMode>("monthly");
+	const [mode, setMode] = useState<BillingMode>(initialMode);
 
 	return (
 		<>
@@ -94,12 +100,12 @@ export function PricingExplorer() {
 						volume={monthlyVolume}
 						onVolumeChange={setMonthlyVolume}
 					/>
-					<PageSection flushTop flushBottom>
+					<Section>
 						<PricingSection
 							recommendedPlanId={recommendPlanIdForVolume(monthlyVolume)}
 							volume={monthlyVolume}
 						/>
-					</PageSection>
+					</Section>
 				</>
 			) : (
 				<>
@@ -107,9 +113,9 @@ export function PricingExplorer() {
 						volume={creditsVolume}
 						onVolumeChange={setCreditsVolume}
 					/>
-					<PageSection flushTop flushBottom>
+					<Section>
 						<PricingCreditsSection volume={creditsVolume} />
-					</PageSection>
+					</Section>
 				</>
 			)}
 		</>

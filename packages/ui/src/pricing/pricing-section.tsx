@@ -1,19 +1,20 @@
 "use client";
 
-import * as HoverCard from "@radix-ui/react-hover-card";
-import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
-import type { PlanId } from "@reloop/web/lib/pricing";
+import type { PlanId } from "@reloop/pricing";
 import {
 	comparisonSections,
 	formatPrice,
 	getPlanPrice,
 	paidOverageUsdPerThousand,
 	pricingPlans,
-} from "@reloop/web/lib/pricing";
+} from "@reloop/pricing";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
+import { HoverCard } from "radix-ui";
 import { Fragment } from "react";
+import { PricingCta, usePricingUi } from "./pricing-cta";
 
 function PlanCtaLink({
 	href,
@@ -718,11 +719,14 @@ function PlanColumn({
 					plan.secondaryCta && "sm:flex-row sm:items-center",
 				)}
 			>
-				<PlanCtaLink
+				<PricingCta
+					target={plan.id}
+					placement="card"
 					href={plan.ctaHref}
 					label={plan.ctaLabel}
 					external={plan.ctaExternal}
-					variant={recommended ? "primary" : "default"}
+					primary={recommended}
+					volume={selectedVolume}
 				/>
 				{plan.secondaryCta && (
 					<PlanCtaLink
@@ -890,42 +894,15 @@ function ComparePlanCta({
 	plan: (typeof pricingPlans)[number];
 	active?: boolean;
 }) {
-	const content = (
-		<span className="truncate font-medium text-[14px] tracking-[-0.01em]">
-			{plan.ctaLabel}
-		</span>
-	);
-
-	if (plan.ctaExternal) {
-		return (
-			<FancyButton.Root
-				asChild
-				variant={active ? "primary" : "basic"}
-				size="medium"
-				className={cn(
-					"h-10! w-full! rounded-full! px-5!",
-					active && "dark:text-black",
-				)}
-			>
-				<a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
-					{content}
-				</a>
-			</FancyButton.Root>
-		);
-	}
-
 	return (
-		<FancyButton.Root
-			asChild
-			variant={active ? "primary" : "basic"}
-			size="medium"
-			className={cn(
-				"h-10! w-full! rounded-full! px-5!",
-				active && "dark:text-black",
-			)}
-		>
-			<Link href={plan.ctaHref}>{content}</Link>
-		</FancyButton.Root>
+		<PricingCta
+			target={plan.id}
+			placement="compare"
+			href={plan.ctaHref}
+			label={plan.ctaLabel}
+			external={plan.ctaExternal}
+			primary={!!active}
+		/>
 	);
 }
 
@@ -937,6 +914,7 @@ function ComparisonTable({
 }: {
 	recommendedPlanId?: PlanId;
 }) {
+	const { stickyTopClassName } = usePricingUi();
 	const isRecommended = (plan: (typeof pricingPlans)[number]) =>
 		recommendedPlanId ? plan.id === recommendedPlanId : !!plan.highlighted;
 
@@ -949,7 +927,12 @@ function ComparisonTable({
 				)}
 			>
 				{/* Header row: matches reference: eyebrow + title left, plan + pill CTA right */}
-				<div className="sticky top-16 z-30 flex flex-col gap-3 border-stroke-soft-100 border-b bg-bg-white-0/95 px-5 py-7 backdrop-blur-md sm:px-7 lg:px-9 dark:border-white/10 dark:bg-black/95">
+				<div
+					className={cn(
+						"sticky z-30 flex flex-col gap-3 border-stroke-soft-100 border-b bg-bg-white-0/95 px-5 py-7 backdrop-blur-md sm:px-7 lg:px-9 dark:border-white/10 dark:bg-black/95",
+						stickyTopClassName,
+					)}
+				>
 					<p className="font-medium text-[12px] text-primary-base uppercase">
 						Features
 					</p>
@@ -963,7 +946,8 @@ function ComparisonTable({
 						<div
 							key={plan.id}
 							className={cn(
-								"sticky top-16 z-30 flex flex-col justify-center gap-7 border-stroke-soft-100 border-b border-l px-5 py-7 backdrop-blur-md sm:px-6 dark:border-white/10",
+								"sticky z-30 flex flex-col justify-center gap-7 border-stroke-soft-100 border-b border-l px-5 py-7 backdrop-blur-md sm:px-6 dark:border-white/10",
+								stickyTopClassName,
 								active
 									? "bg-bg-weak-50/95 dark:bg-white/[0.05]"
 									: "bg-bg-white-0/95 dark:bg-black/95",

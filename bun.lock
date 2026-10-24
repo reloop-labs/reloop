@@ -1170,6 +1170,7 @@
         "@radix-ui/react-tabs": "catalog:ui",
         "@radix-ui/react-toast": "catalog:ui",
         "@radix-ui/react-tooltip": "catalog:ui",
+        "@reloop/pricing": "workspace:*",
         "class-variance-authority": "catalog:ui",
         "cmdk": "catalog:ui",
         "input-otp": "catalog:ui",

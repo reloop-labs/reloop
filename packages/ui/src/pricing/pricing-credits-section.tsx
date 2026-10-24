@@ -1,19 +1,15 @@
 "use client";
 
+import { comparisonSections, type PlanId, pricingPlans } from "@reloop/pricing";
 import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import {
-	comparisonSections,
-	type PlanId,
-	pricingPlans,
-} from "@reloop/web/lib/pricing";
-import Link from "next/link";
 import { Fragment } from "react";
 import { formatCreditsCost } from "./pricing-credits-slider";
+import { PricingCta, type PricingCtaTarget } from "./pricing-cta";
 import { ComparisonRowLabel, PlanFeature } from "./pricing-section";
 
 type CreditColumn = {
+	target: PricingCtaTarget;
 	name: string;
 	badge?: string;
 	price: string;
@@ -35,6 +31,7 @@ type CreditColumn = {
 
 const creditColumns: CreditColumn[] = [
 	{
+		target: "free",
 		name: "Free",
 		price: "$0",
 		middlePrimary: "Free for everyone",
@@ -55,6 +52,7 @@ const creditColumns: CreditColumn[] = [
 		ctaHref: "/dashboard/signup",
 	},
 	{
+		target: "credits",
 		name: "Credit",
 		price: "$5",
 		priceSubline: "/ 10,000 emails one-time",
@@ -85,6 +83,7 @@ const creditColumns: CreditColumn[] = [
 		ctaHref: "/dashboard/signup",
 	},
 	{
+		target: "business",
 		name: "Business",
 		badge: "High volume",
 		price: "Custom",
@@ -194,25 +193,15 @@ function CreditColumnCard({
 			/>
 
 			<div className="flex flex-col gap-3 py-6">
-				<FancyButton.Root
-					asChild
-					variant={column.primary ? "primary" : "basic"}
-					size="medium"
-					className={cn(
-						"h-11! w-full! rounded-full! px-6!",
-						column.primary && "dark:text-black",
-					)}
-				>
-					{column.ctaExternal ? (
-						<a href={column.ctaHref} target="_blank" rel="noopener noreferrer">
-							<span className="font-medium text-[14px]">{column.ctaLabel}</span>
-						</a>
-					) : (
-						<Link href={column.ctaHref}>
-							<span className="font-medium text-[14px]">{column.ctaLabel}</span>
-						</Link>
-					)}
-				</FancyButton.Root>
+				<PricingCta
+					target={column.target}
+					placement="card"
+					href={column.ctaHref}
+					label={column.ctaLabel}
+					external={column.ctaExternal}
+					primary={!!column.primary}
+					volume={volume}
+				/>
 			</div>
 
 			<div
@@ -247,16 +236,13 @@ function DedicatedIpStrip() {
 						</span>
 					</p>
 				</div>
-				<FancyButton.Root
-					asChild
-					variant="basic"
-					size="medium"
-					className="h-10! shrink-0 rounded-full! px-5!"
-				>
-					<Link href="/contact">
-						<span className="font-medium text-[14px]">Contact sales</span>
-					</Link>
-				</FancyButton.Root>
+				<PricingCta
+					target="dedicated-ip"
+					placement="strip"
+					href="/contact"
+					label="Contact sales"
+					primary={false}
+				/>
 			</div>
 		</div>
 	);
@@ -340,6 +326,7 @@ function CreditCompareCell({
 const creditComparePlans = [
 	{
 		id: "free",
+		target: "free",
 		name: "Free",
 		cta: "Get started",
 		href: "/dashboard/signup",
@@ -348,6 +335,7 @@ const creditComparePlans = [
 	},
 	{
 		id: "starter",
+		target: "credits",
 		name: "Credit",
 		cta: "Get started",
 		href: "/dashboard/signup",
@@ -356,6 +344,7 @@ const creditComparePlans = [
 	},
 	{
 		id: "business",
+		target: "business",
 		name: "Business",
 		cta: "Book a call",
 		href: "https://cal.com/pranavp/30",
@@ -414,7 +403,7 @@ function creditSectionIcon(title: string) {
 	return creditSectionIcons[title] ?? "magic-wand";
 }
 
-export function CreditsComparisonTable() {
+export function CreditsComparisonTable({ volume }: { volume?: number }) {
 	return (
 		<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-100 border-b dark:border-white/[0.07]">
 			<div className="overflow-x-auto">
@@ -440,29 +429,15 @@ export function CreditsComparisonTable() {
 							<span className="font-medium text-[15px] text-text-strong-950 leading-none dark:text-white">
 								{plan.name}
 							</span>
-							<FancyButton.Root
-								asChild
-								variant={plan.primary ? "primary" : "basic"}
-								size="medium"
-								className={cn(
-									"h-10! w-full! rounded-full! px-5!",
-									plan.primary && "dark:text-black",
-								)}
-							>
-								{plan.external ? (
-									<a href={plan.href} target="_blank" rel="noopener noreferrer">
-										<span className="truncate font-medium text-[14px] tracking-[-0.01em]">
-											{plan.cta}
-										</span>
-									</a>
-								) : (
-									<Link href={plan.href}>
-										<span className="truncate font-medium text-[14px] tracking-[-0.01em]">
-											{plan.cta}
-										</span>
-									</Link>
-								)}
-							</FancyButton.Root>
+							<PricingCta
+								target={plan.target}
+								placement="compare"
+								href={plan.href}
+								label={plan.cta}
+								external={plan.external}
+								primary={plan.primary}
+								volume={volume}
+							/>
 						</div>
 					))}
 
@@ -575,7 +550,7 @@ export function PricingCreditsSection({ volume }: { volume: number }) {
 			</div>
 			<DedicatedIpStrip />
 			<div className="mt-24">
-				<CreditsComparisonTable />
+				<CreditsComparisonTable volume={volume} />
 			</div>
 		</>
 	);

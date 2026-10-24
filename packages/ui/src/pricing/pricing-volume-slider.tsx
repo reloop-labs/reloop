@@ -1,12 +1,12 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
-import * as Slider from "@reloop/ui/slider";
 import {
 	getPlanById,
 	type PlanId,
 	paidOverageUsdPerThousand,
-} from "@reloop/web/lib/pricing";
+} from "@reloop/pricing";
+import { cn } from "@reloop/ui/cn";
+import * as Slider from "@reloop/ui/slider";
 
 const TICKS = [
 	{ value: 3000, label: "3k", plan: "Free" },

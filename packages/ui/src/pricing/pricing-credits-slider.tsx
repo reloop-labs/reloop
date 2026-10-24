@@ -1,8 +1,8 @@
 "use client";
 
+import { paidOverageUsdPerThousand } from "@reloop/pricing";
 import { cn } from "@reloop/ui/cn";
 import * as Slider from "@reloop/ui/slider";
-import { paidOverageUsdPerThousand } from "@reloop/web/lib/pricing";
 
 export const CREDIT_MAX_VOLUME = 100000;
 
