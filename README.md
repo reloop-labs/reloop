@@ -99,6 +99,10 @@ curl -fsSL https://reloop.sh/install.sh | sudo bash
 
 The installer runs preflight checks, installs Docker, prompts for your domain, generates production secrets, deploys every service, verifies health, and prints the DNS records to add. See the **[VPS guide →](https://reloop.sh/docs/self-host/vps)**
 
+[![Deploy to DigitalOcean](https://img.shields.io/badge/Deploy_to-DigitalOcean-0080FF?logo=digitalocean&logoColor=white)](install/digitalocean/README.md)
+
+Create an evaluation Droplet from a GitHub Actions workflow. DigitalOcean blocks SMTP ports, so direct mail delivery is unavailable. See the [setup and deployment steps](install/digitalocean/README.md).
+
 ---
 
 ## Hosted Service
