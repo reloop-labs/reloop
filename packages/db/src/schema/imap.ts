@@ -17,10 +17,9 @@ import { domain } from "./domain";
 
 // IMAP mail store. Owned by apps/backend/imap (Go): it is the only writer of
 // mail_folder / mail_message, because it keeps per-folder UID state in memory.
-// Other services may create accounts and app passwords directly.
+// Other services may create accounts directly.
 
 const createMailAccountId = () => `macc_${createId()}`;
-const createMailAppPasswordId = () => `mapw_${createId()}`;
 const createMailFolderId = () => `mfld_${createId()}`;
 const createMailMessageId = () => `mmsg_${createId()}`;
 
@@ -43,7 +42,7 @@ export const mailAccount = pgTable(
 		id: text("id")
 			.$defaultFn(() => createMailAccountId())
 			.primaryKey(),
-		/** Lowercased full address; also the IMAP/SMTP login username. */
+		/** Lowercased full address; also the IMAP login username (password: an API key). */
 		email: varchar("email", { length: 255 }).notNull(),
 		displayName: varchar("display_name", { length: 255 }),
 		status: mailAccountStatusEnum("status").notNull().default("active"),
@@ -69,28 +68,6 @@ export const mailAccount = pgTable(
 	],
 );
 
-// ─── mail_app_password ───────────────────────────────────────────────
-
-export const mailAppPassword = pgTable(
-	"mail_app_password",
-	{
-		id: text("id")
-			.$defaultFn(() => createMailAppPasswordId())
-			.primaryKey(),
-		accountId: text("account_id")
-			.notNull()
-			.references(() => mailAccount.id, { onDelete: "cascade" }),
-		/** User-facing name, e.g. "Pranav's iPhone". */
-		label: varchar("label", { length: 255 }).notNull(),
-		/** bcrypt hash; the plain password is shown once at creation. */
-		passwordHash: text("password_hash").notNull(),
-		lastUsedAt: timestamp("last_used_at"),
-		revokedAt: timestamp("revoked_at"),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-	},
-	(table) => [index("mail_app_password_idx_account_id").on(table.accountId)],
-);
-
 // ─── mail_folder ─────────────────────────────────────────────────────
 
 export const mailFolder = pgTable(
@@ -111,7 +88,9 @@ export const mailFolder = pgTable(
 		uidNext: bigint("uid_next", { mode: "number" }).notNull().default(1),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 	},
-	(table) => [unique("mail_folder_unique_name").on(table.accountId, table.name)],
+	(table) => [
+		unique("mail_folder_unique_name").on(table.accountId, table.name),
+	],
 );
 
 // ─── mail_message ────────────────────────────────────────────────────
@@ -130,10 +109,7 @@ export const mailMessage = pgTable(
 			.references(() => mailFolder.id, { onDelete: "cascade" }),
 		uid: bigint("uid", { mode: "number" }).notNull(),
 		/** IMAP flags and keywords, e.g. {"\\Seen","\\Flagged","$Agent"}. */
-		flags: text("flags")
-			.array()
-			.notNull()
-			.default(sql`'{}'::text[]`),
+		flags: text("flags").array().notNull().default(sql`'{}'::text[]`),
 		/** IMAP INTERNALDATE: when the message entered this mailbox. */
 		internalDate: timestamp("internal_date", { withTimezone: true })
 			.notNull()
@@ -166,19 +142,8 @@ export const mailAccountRelations = relations(mailAccount, ({ one, many }) => ({
 		fields: [mailAccount.domainId],
 		references: [domain.id],
 	}),
-	appPasswords: many(mailAppPassword),
 	folders: many(mailFolder),
 }));
-
-export const mailAppPasswordRelations = relations(
-	mailAppPassword,
-	({ one }) => ({
-		account: one(mailAccount, {
-			fields: [mailAppPassword.accountId],
-			references: [mailAccount.id],
-		}),
-	}),
-);
 
 export const mailFolderRelations = relations(mailFolder, ({ one, many }) => ({
 	account: one(mailAccount, {

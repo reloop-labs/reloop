@@ -91,38 +91,6 @@ func (s *Store) CreateAccount(ctx context.Context, email, organizationID, domain
 	return a, err
 }
 
-type AppPassword struct {
-	ID   string
-	Hash string
-}
-
-func (s *Store) ActiveAppPasswords(ctx context.Context, accountID string) ([]AppPassword, error) {
-	rows, err := s.pool.Query(ctx, `
-		SELECT id, password_hash FROM mail_app_password
-		WHERE account_id = $1 AND revoked_at IS NULL`, accountID)
-	if err != nil {
-		return nil, err
-	}
-	return pgx.CollectRows(rows, func(row pgx.CollectableRow) (AppPassword, error) {
-		var p AppPassword
-		err := row.Scan(&p.ID, &p.Hash)
-		return p, err
-	})
-}
-
-func (s *Store) CreateAppPassword(ctx context.Context, accountID, label, hash string) error {
-	_, err := s.pool.Exec(ctx, `
-		INSERT INTO mail_app_password (id, account_id, label, password_hash)
-		VALUES ($1, $2, $3, $4)`,
-		newID("mapw_"), accountID, label, hash)
-	return err
-}
-
-func (s *Store) TouchAppPassword(ctx context.Context, id string) error {
-	_, err := s.pool.Exec(ctx, `UPDATE mail_app_password SET last_used_at = now() WHERE id = $1`, id)
-	return err
-}
-
 // ─── folders ─────────────────────────────────────────────────────────
 
 type Folder struct {

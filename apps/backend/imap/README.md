@@ -11,13 +11,13 @@ inbound KumoMTA (25) ──NATS kumomta.inbound_received──► imap ──►
 ```
 
 - **Delivery:** subscribes to `kumomta.inbound_received` (queue group `imap-ingest`) and files each message into the INBOX of every `mail_account` among the envelope recipients. `user+tag@` falls back to `user@`. Messages flagged `X-Spam-Flag: YES` by Rspamd go to Junk.
-- **Login:** username is the full address; the password is one of the account's app passwords (`mail_app_password`, bcrypt). Passwords are compared case-insensitively, with dashes and spaces ignored, so `ABCD-efgh-ijkl-mnop` equals `abcdefghijklmnop`.
+- **Login:** the username is the mailbox address and the password is a Reloop **API key**, the same credential the SMTP relay takes. The domain service checks it via `/v1/smtp-auth`, so IMAP and SMTP follow one rule. The key must belong to the mailbox's organization, and if it has address restrictions (`api_key_scope`), they must include the mailbox. Successful checks are remembered for 1 minute, so a revoked key stops working within a minute. If the domain service is down, clients get `NO [UNAVAILABLE]` and retry instead of prompting for a new password.
 - **Folders:** every account gets INBOX, Sent, Drafts, Archive, Junk and Trash, advertised with SPECIAL-USE attributes so clients map them automatically.
 - **Extensions:** IMAP4rev1 + IMAP4rev2, IDLE, MOVE, UIDPLUS, SPECIAL-USE, NAMESPACE, ESEARCH, SEARCHRES, LIST-EXTENDED, LIST-STATUS, STATUS=SIZE, BINARY, LITERAL+, APPENDLIMIT (50 MB). There is no CONDSTORE/QRESYNC yet, because go-imap v2 does not support them.
 
 ## Single writer
 
-Sequence numbers and IDLE push need an ordered in-memory view of each folder, so **this process must be the only writer of `mail_folder` and `mail_message`, and only one instance may run**. Other services may create accounts and app passwords directly. Changes to messages (for example from the agent API) must go through this service.
+Sequence numbers and IDLE push need an ordered in-memory view of each folder, so **this process must be the only writer of `mail_folder` and `mail_message`, and only one instance may run**. Other services may create accounts directly. Changes to messages (for example from the agent API) must go through this service.
 
 ## Environment
 
@@ -26,6 +26,7 @@ As in the other services: `.env.dev` holds local values and `.env.prod` lists wh
 | Variable | Default | |
 |---|---|---|
 | `PG_URL` | (required) | Postgres connection string |
+| `DOMAIN_SERVICE_URL` | (required) | Domain service base URL, e.g. `http://domain:8011/api/domain`; used to check API-key logins |
 | `NATS_URL` | `nats://127.0.0.1:4222` | |
 | `IMAP_HOSTNAME` | `imap.reloop.sh` | Public host customers enter; the certificate is looked up for this name |
 | `IMAP_ADDR` / `IMAP_TLS_ADDR` | `:143` / `:993` | STARTTLS and implicit-TLS listeners |
@@ -54,7 +55,6 @@ Sources 1–4 are re-read every 5 minutes, so renewals by Traefik, Caddy or cert
 ```sh
 imap serve                                               # default
 imap create-account <email> <organizationId> <domainId>  # also creates default folders
-imap app-password <email> [label]                        # prints xxxx-xxxx-xxxx-xxxx once
 ```
 
 ## Running locally
@@ -72,7 +72,7 @@ Needs Go 1.25+ (or use Docker: `docker run --rm -v $PWD:/w -w /w golang:1.26-alp
 
 ```sh
 go vet ./... && go build ./...
-IMAP_TEST_USER=you@domain IMAP_TEST_PASSWORD=xxxx-xxxx-xxxx-xxxx python3 test/smoke.py
+IMAP_TEST_USER=you@domain IMAP_TEST_PASSWORD=<api key> python3 test/smoke.py
 ```
 
 `test/smoke.py` runs 49 end-to-end checks:

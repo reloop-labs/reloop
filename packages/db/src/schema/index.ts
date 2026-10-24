@@ -1,6 +1,7 @@
 export * from "./activity-log";
 export * from "./admin";
 export * from "./api-key";
+export * from "./api-key-scope";
 export * from "./auth";
 export * from "./automation";
 export * from "./billing";

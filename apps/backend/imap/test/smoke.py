@@ -1,6 +1,6 @@
 """End-to-end smoke test against a running IMAP server (plain IMAP, dev mode).
 
-    IMAP_TEST_USER=you@domain IMAP_TEST_PASSWORD=xxxx-xxxx-xxxx-xxxx python3 test/smoke.py
+    IMAP_TEST_USER=you@domain IMAP_TEST_PASSWORD=<api key> python3 test/smoke.py
 
 Needs NATS on localhost:4222 for the delivery/IDLE checks. Uses the account's
 real mailbox, so point it at a throwaway account.
@@ -39,8 +39,8 @@ try:
 except imaplib.IMAP4.error:
     check("rejects wrong password", True)
 m = imaplib.IMAP4(HOST, PORT)
-typ, _ = m.login(USER.upper(), PW.replace("-", "").upper())
-check("login: case-insensitive user, password without dashes", typ == "OK")
+typ, _ = m.login(USER.upper(), PW)
+check("login: API key, case-insensitive username", typ == "OK")
 
 typ, caps = m.capability()
 caps = caps[0].decode()

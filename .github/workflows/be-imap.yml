@@ -6,13 +6,11 @@ on:
     tags: [ 'v*' ]
     paths:
       - 'apps/backend/imap/**'
-      - 'packages/db/migrations/0045_imap_mail_store.sql'
       - '.github/workflows/be-imap.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'apps/backend/imap/**'
-      - 'packages/db/migrations/0045_imap_mail_store.sql'
       - '.github/workflows/be-imap.yml'
   workflow_dispatch:
 
@@ -88,7 +86,14 @@ jobs:
           psql "$PG_URL" -v ON_ERROR_STOP=1 -f ../../../packages/db/migrations/0045_imap_mail_store.sql
 
       - name: Start IMAP server
+        env:
+          # The domain service is stood in by test/fake_auth.py (see the smoke step).
+          DOMAIN_SERVICE_URL: http://127.0.0.1:8011/api/domain
+          FAKE_AUTH_KEY: rl_ci_imap_smoke_key_0000000000
+          FAKE_AUTH_ORG: org_ci
+          FAKE_AUTH_EMAIL: ci@ci.reloop.sh
         run: |
+          python3 test/fake_auth.py &
           IMAP_ADDR=127.0.0.1:1143 IMAP_TLS_ADDR=127.0.0.1:1993 IMAP_ALLOW_INSECURE_AUTH=true ./imap serve > imap.log 2>&1 &
           for i in $(seq 1 30); do
             curl -sf localhost:8031/health && exit 0
@@ -100,9 +105,7 @@ jobs:
       - name: End-to-end smoke test
         run: |
           ./imap create-account ci@ci.reloop.sh org_ci domain_ci
-          export IMAP_TEST_USER=ci@ci.reloop.sh
-          export IMAP_TEST_PASSWORD="$(./imap app-password ci@ci.reloop.sh CI)"
-          python3 test/smoke.py
+          IMAP_TEST_USER=ci@ci.reloop.sh IMAP_TEST_PASSWORD=rl_ci_imap_smoke_key_0000000000 python3 test/smoke.py
 
       - name: Server log
         if: always()

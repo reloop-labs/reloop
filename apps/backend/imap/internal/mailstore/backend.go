@@ -20,6 +20,7 @@ import (
 	"github.com/emersion/go-imap/v2/imapserver"
 	"github.com/emersion/go-message/mail"
 
+	"reloop/imap/internal/auth"
 	"reloop/imap/internal/store"
 )
 
@@ -37,13 +38,14 @@ var defaultFolders = []struct{ name, specialUse string }{
 
 type Backend struct {
 	Store *store.Store
+	Auth  *auth.Verifier
 
 	mu      sync.Mutex
 	folders map[string]*folderState // by folder id
 }
 
-func NewBackend(s *store.Store) *Backend {
-	return &Backend{Store: s, folders: make(map[string]*folderState)}
+func NewBackend(s *store.Store, verifier *auth.Verifier) *Backend {
+	return &Backend{Store: s, Auth: verifier, folders: make(map[string]*folderState)}
 }
 
 // folderState is the in-memory, ordered view of one folder.

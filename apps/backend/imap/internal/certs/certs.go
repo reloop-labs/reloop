@@ -22,6 +22,9 @@ import (
 	"crypto/x509/pkix"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io/fs"
 	"log/slog"
 	"math/big"
 	"net/http"
@@ -77,6 +80,7 @@ func ConfigFromEnv() Config {
 		CaddyRoots: []string{
 			"/traefik/caddy/certificates/acme-v02.api.letsencrypt.org-directory",
 			"/data/coolify/proxy/caddy/certificates/acme-v02.api.letsencrypt.org-directory",
+			"/data/coolify/proxy/caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory",
 		},
 		AutoLetsEncrypt: os.Getenv("AUTO_LETSENCRYPT") == "true",
 		Email:           firstNonEmpty(os.Getenv("LETSENCRYPT_EMAIL"), "admin@"+host),
@@ -97,10 +101,12 @@ type Manager struct {
 // New finds a certificate (falling back to self-signed) and returns a Manager.
 func New(cfg Config) (*Manager, error) {
 	m := &Manager{cfg: cfg}
-	if cert, source := m.discover(); cert != nil {
+	cert, source, notes := m.discover()
+	if cert != nil {
 		m.set(cert, source)
 		return m, nil
 	}
+	slog.Warn("tls: no certificate for hostname in any source", "host", cfg.Hostname, "checked", notes)
 
 	if cfg.AutoLetsEncrypt && cfg.Hostname != "localhost" && cfg.Hostname != "local.reloop.sh" {
 		m.auto = &autocert.Manager{
@@ -178,7 +184,7 @@ func (m *Manager) Refresh() {
 	if m.Source() == "letsencrypt" {
 		return // autocert renews on its own
 	}
-	cert, source := m.discover()
+	cert, source, _ := m.discover()
 	if cert == nil {
 		return
 	}
@@ -200,45 +206,54 @@ func (m *Manager) set(cert *tls.Certificate, source string) {
 	}
 }
 
-// discover walks sources 1–4 and returns the first usable certificate.
-func (m *Manager) discover() (*tls.Certificate, string) {
+// discover walks sources 1–4 and returns the first usable certificate. notes
+// says what was found at each location, for the startup log when nothing fits.
+func (m *Manager) discover() (cert *tls.Certificate, source string, notes []string) {
 	cfg := m.cfg
 	if cfg.CertFile != "" && cfg.KeyFile != "" {
 		if c, err := loadPair(cfg.CertFile, cfg.KeyFile); err == nil {
-			return c, cfg.CertFile
+			return c, cfg.CertFile, nil
 		} else {
 			slog.Error("tls: IMAP_TLS_CERT/IMAP_TLS_KEY unusable", "err", err)
 		}
 	}
 	if cfg.CertPEM != "" && cfg.KeyPEM != "" {
 		if c, err := parsePair([]byte(cfg.CertPEM), []byte(cfg.KeyPEM)); err == nil {
-			return c, "IMAP_TLS_CERT_DATA"
+			return c, "IMAP_TLS_CERT_DATA", nil
 		} else {
 			slog.Error("tls: IMAP_TLS_CERT_DATA/IMAP_TLS_KEY_DATA unusable", "err", err)
 		}
 	}
 	for _, p := range cfg.FilePairs {
 		if fileExists(p[0]) && fileExists(p[1]) {
-			if c, err := loadPair(p[0], p[1]); err == nil && covers(c, cfg.Hostname) {
-				return c, p[0]
+			c, err := loadPair(p[0], p[1])
+			switch {
+			case err != nil:
+				notes = append(notes, p[0]+": unusable: "+err.Error())
+			case !covers(c, cfg.Hostname):
+				notes = append(notes, fmt.Sprintf("%s: for %v, not %s", p[0], c.Leaf.DNSNames, cfg.Hostname))
+			default:
+				return c, p[0], nil
 			}
 		}
 	}
 	for _, f := range cfg.AcmeFiles {
-		if c := fromAcmeJSON(f, cfg.Hostname); c != nil {
-			return c, f
+		c, note := fromAcmeJSON(f, cfg.Hostname)
+		if c != nil {
+			return c, f, nil
 		}
+		notes = append(notes, note)
 	}
 	for _, root := range cfg.CaddyRoots {
 		dir := filepath.Join(root, cfg.Hostname)
 		crt, key := filepath.Join(dir, cfg.Hostname+".crt"), filepath.Join(dir, cfg.Hostname+".key")
 		if fileExists(crt) && fileExists(key) {
 			if c, err := loadPair(crt, key); err == nil {
-				return c, crt
+				return c, crt, nil
 			}
 		}
 	}
-	return nil, ""
+	return nil, "", notes
 }
 
 // acmeFile is Traefik's storage: {"<resolver>": {"Certificates": [...]}}.
@@ -253,18 +268,22 @@ type acmeResolver struct {
 	} `json:"Certificates"`
 }
 
-// fromAcmeJSON returns the longest-lived certificate in path covering host.
-func fromAcmeJSON(path, host string) *tls.Certificate {
+// fromAcmeJSON returns the longest-lived certificate in path covering host,
+// or a note saying why there is none (missing file, other domains only, ...).
+func fromAcmeJSON(path, host string) (*tls.Certificate, string) {
 	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil, path + ": not found"
+	} else if err != nil {
+		return nil, path + ": " + err.Error()
 	}
 	var resolvers map[string]json.RawMessage
 	if err := json.Unmarshal(data, &resolvers); err != nil {
-		slog.Error("tls: unreadable acme.json", "path", path, "err", err)
-		return nil
+		return nil, path + ": not valid JSON: " + err.Error()
 	}
 	var best *tls.Certificate
+	var domains []string
+	var problems []string
 	for _, raw := range resolvers {
 		var r acmeResolver
 		if json.Unmarshal(raw, &r) != nil {
@@ -272,16 +291,23 @@ func fromAcmeJSON(path, host string) *tls.Certificate {
 		}
 		for _, c := range r.Certificates {
 			names := append([]string{c.Domain.Main}, c.Domain.SANs...)
+			domains = append(domains, names...)
 			if !matchesAny(names, host) {
 				continue
 			}
 			certPEM, err1 := base64.StdEncoding.DecodeString(c.Certificate)
 			keyPEM, err2 := base64.StdEncoding.DecodeString(c.Key)
 			if err1 != nil || err2 != nil {
+				problems = append(problems, "bad base64")
 				continue
 			}
 			cert, err := parsePair(certPEM, keyPEM)
-			if err != nil || time.Now().After(cert.Leaf.NotAfter) {
+			if err != nil {
+				problems = append(problems, err.Error())
+				continue
+			}
+			if time.Now().After(cert.Leaf.NotAfter) {
+				problems = append(problems, "expired "+cert.Leaf.NotAfter.Format(time.DateOnly))
 				continue
 			}
 			if best == nil || cert.Leaf.NotAfter.After(best.Leaf.NotAfter) {
@@ -289,7 +315,16 @@ func fromAcmeJSON(path, host string) *tls.Certificate {
 			}
 		}
 	}
-	return best
+	if best != nil {
+		return best, ""
+	}
+	if len(problems) > 0 {
+		return nil, fmt.Sprintf("%s: certificate for %s unusable: %s", path, host, strings.Join(problems, "; "))
+	}
+	if len(domains) > 30 {
+		domains = append(domains[:30], "…")
+	}
+	return nil, fmt.Sprintf("%s: %d certificates, none for %s (has: %s)", path, len(domains), host, strings.Join(domains, ", "))
 }
 
 func loadPair(certFile, keyFile string) (*tls.Certificate, error) {

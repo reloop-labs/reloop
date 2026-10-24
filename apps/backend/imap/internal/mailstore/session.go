@@ -12,8 +12,8 @@ import (
 
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapserver"
-	"golang.org/x/crypto/bcrypt"
 
+	"reloop/imap/internal/auth"
 	"reloop/imap/internal/store"
 )
 
@@ -67,33 +67,33 @@ func (s *Session) closeSelection() {
 
 // ─── not authenticated ───────────────────────────────────────────────
 
-// NormalizeAppPassword makes "ABCD-efgh ijkl-mnop" and "abcdefghijklmnop"
-// equivalent. Hashes are always computed over the normalised form.
-func NormalizeAppPassword(p string) string {
-	return strings.ToLower(strings.NewReplacer("-", "", " ", "").Replace(p))
-}
-
+// Login accepts the mailbox address as username and a Reloop API key as
+// password. The key must belong to the mailbox's organization, and its address
+// scope (api_key_scope) must allow this mailbox.
 func (s *Session) Login(username, password string) error {
 	account, err := s.b.Store.AccountByEmail(s.ctx, username)
 	if err != nil {
 		return err
 	}
 	if account != nil && account.Active {
-		passwords, err := s.b.Store.ActiveAppPasswords(s.ctx, account.ID)
-		if err != nil {
+		orgID, ok, err := s.b.Auth.Verify(s.ctx, password, account.Email)
+		if errors.Is(err, auth.ErrUnavailable) {
+			slog.Error("imap login: cannot verify api key", "err", err)
+			return &imap.Error{
+				Type: imap.StatusResponseTypeNo,
+				Code: imap.ResponseCodeUnavailable,
+				Text: "Temporary authentication failure, try again shortly",
+			}
+		} else if err != nil {
 			return err
 		}
-		candidate := []byte(NormalizeAppPassword(password))
-		for _, p := range passwords {
-			if bcrypt.CompareHashAndPassword([]byte(p.Hash), candidate) == nil {
-				if err := s.b.EnsureDefaultFolders(s.ctx, account.ID); err != nil {
-					return err
-				}
-				_ = s.b.Store.TouchAppPassword(s.ctx, p.ID)
-				s.account = account
-				slog.Info("imap login", "account", account.Email, "remote", s.remote)
-				return nil
+		if ok && orgID == account.OrganizationID {
+			if err := s.b.EnsureDefaultFolders(s.ctx, account.ID); err != nil {
+				return err
 			}
+			s.account = account
+			slog.Info("imap login", "account", account.Email, "remote", s.remote)
+			return nil
 		}
 	}
 	slog.Warn("imap login failed", "username", username, "remote", s.remote)
