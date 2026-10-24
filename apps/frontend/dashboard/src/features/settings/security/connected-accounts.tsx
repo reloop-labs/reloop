@@ -6,7 +6,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { queryKeys } from "#/lib/query-keys";
 
 interface Account {
@@ -85,20 +85,51 @@ const getProviderInfo = (providerId: string) => {
 	}
 };
 
-const AccountSkeleton = () => (
-	<div className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40">
-		<div className="flex items-center justify-between">
-			<div className="flex items-center gap-3 p-0.5">
-				<Skeleton className="h-8 w-8 rounded-lg" />
-				<div className="space-y-1.5">
-					<Skeleton className="h-4 w-24" />
-					<Skeleton className="h-3 w-32" />
+type ProviderInfo = ReturnType<typeof getProviderInfo>;
+
+const SOCIAL_PROVIDER_IDS: string[] = AVAILABLE_PROVIDERS.map((p) => p.id);
+
+/** Icon tile, name and description shared by every account row. */
+function AccountRow({
+	provider,
+	description,
+	action,
+}: {
+	provider: ProviderInfo;
+	description: string;
+	action: ReactNode;
+}) {
+	return (
+		<div className="rounded-[15px] border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40">
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-3">
+					<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+						{provider.useCustomIcon ? (
+							<GoogleIcon className="h-4 w-4" />
+						) : (
+							<Icon
+								name={provider.icon}
+								className="h-4 w-4 text-text-sub-600"
+							/>
+						)}
+					</div>
+					<div>
+						<p className="font-medium text-label-sm text-text-strong-950">
+							{provider.name}
+						</p>
+						<p className="text-paragraph-xs text-text-sub-600">{description}</p>
+					</div>
 				</div>
+				{action}
 			</div>
-			<Skeleton className="h-5 w-20 rounded-full" />
 		</div>
-	</div>
-);
+	);
+}
+
+const ROW_BUTTON =
+	"min-w-[110px] justify-center overflow-hidden font-medium transition-all duration-200";
+
+const SWAP_TRANSITION = { type: "spring", duration: 0.25, bounce: 0 } as const;
 
 export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 	const queryClient = useQueryClient();
@@ -157,6 +188,115 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 		}
 	};
 
+	// Google and GitHub always render so the list never jumps; any other
+	// linked account (e.g. email and password) is added once accounts load.
+	const providerIds = [
+		...SOCIAL_PROVIDER_IDS,
+		...(accounts ?? [])
+			.map((a) => a.providerId)
+			.filter((id) => !SOCIAL_PROVIDER_IDS.includes(id)),
+	];
+
+	const renderAction = (providerId: string, account?: Account) => {
+		if (isLoading) {
+			return <Skeleton className="h-7 w-[110px] rounded-lg" />;
+		}
+
+		if (account && providerId === "credential") {
+			return (
+				<span className="rounded-full bg-success-base px-1.5 py-0.5 font-semibold text-[10px] text-white">
+					Connected
+				</span>
+			);
+		}
+
+		if (account) {
+			const itemStatus = statusMap[providerId] ?? "idle";
+			return (
+				<FancyButton.Root
+					variant={itemStatus === "success" ? "success" : "basic"}
+					size="xsmall"
+					disabled={itemStatus !== "idle"}
+					onClick={() => handleDisconnect(account)}
+					className={cn(
+						ROW_BUTTON,
+						itemStatus === "disconnecting" && "opacity-90",
+					)}
+				>
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key={itemStatus}
+							transition={SWAP_TRANSITION}
+							initial={{ opacity: 0, y: -14 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 14 }}
+							className="flex items-center justify-center gap-1.5 font-medium"
+						>
+							{itemStatus === "disconnecting" ? (
+								<>
+									<Spinner size={14} color="var(--text-strong-950)" />
+									<span>Disconnecting...</span>
+								</>
+							) : itemStatus === "success" ? (
+								<>
+									<Icon name="check-circle" className="h-4 w-4" />
+									<span>Disconnected</span>
+								</>
+							) : (
+								<>
+									<FancyButton.Icon
+										as={Icon}
+										name="check-circle"
+										className="mr-0.5 h-4 w-4 shrink-0"
+									/>
+									<span>Disconnect</span>
+								</>
+							)}
+						</motion.span>
+					</AnimatePresence>
+				</FancyButton.Root>
+			);
+		}
+
+		const isConnecting = connecting === providerId;
+		return (
+			<FancyButton.Root
+				variant="basic"
+				size="xsmall"
+				disabled={isConnecting}
+				onClick={() => handleConnect(providerId)}
+				className={cn(ROW_BUTTON, isConnecting && "opacity-90")}
+			>
+				<AnimatePresence mode="popLayout" initial={false}>
+					<motion.span
+						key={isConnecting ? "connecting" : "idle"}
+						transition={SWAP_TRANSITION}
+						initial={{ opacity: 0, y: -14 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: 14 }}
+						className="flex items-center justify-center gap-1.5 font-medium"
+					>
+						{isConnecting ? (
+							<>
+								<Spinner size={14} color="var(--text-strong-950)" />
+								<span>Connecting...</span>
+							</>
+						) : (
+							<>
+								<FancyButton.Icon
+									as={Icon}
+									name="plus-circle"
+									className="mr-0.5 h-4 w-4 shrink-0"
+								/>
+								<span>Connect</span>
+							</>
+						)}
+					</motion.span>
+				</AnimatePresence>
+			</FancyButton.Root>
+		);
+	};
+
 	return (
 		<div className={cn("space-y-4", className)}>
 			<div>
@@ -169,196 +309,22 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 			</div>
 
 			<div className="space-y-3">
-				{isLoading ? (
-					<>
-						<AccountSkeleton />
-						<AccountSkeleton />
-						<AccountSkeleton />
-					</>
-				) : (
-					<>
-						{accounts?.map((account) => {
-							const provider = getProviderInfo(account.providerId);
-							return (
-								<div
-									key={account.id}
-									className={cn(
-										"rounded-[15px] border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40",
-									)}
-								>
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-3">
-											<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
-												{provider.useCustomIcon &&
-												account.providerId.toLowerCase() === "google" ? (
-													<GoogleIcon className="h-4 w-4" />
-												) : (
-													<Icon
-														name={provider.icon}
-														className="h-4 w-4 text-text-sub-600"
-													/>
-												)}
-											</div>
-											<div>
-												<p className="font-medium text-label-sm text-text-strong-950">
-													{provider.name}
-												</p>
-												<p className="text-paragraph-xs text-text-sub-600">
-													{provider.description}
-												</p>
-											</div>
-										</div>
-										{account.providerId !== "credential" ? (
-											(() => {
-												const itemStatus =
-													statusMap[account.providerId] ?? "idle";
-												return (
-													<FancyButton.Root
-														variant={
-															itemStatus === "success" ? "success" : "basic"
-														}
-														size="xsmall"
-														disabled={itemStatus !== "idle"}
-														onClick={() => handleDisconnect(account)}
-														className={cn(
-															"min-w-[110px] justify-center overflow-hidden font-medium transition-all duration-200",
-															itemStatus === "disconnecting" && "opacity-90",
-														)}
-													>
-														<AnimatePresence mode="popLayout" initial={false}>
-															<motion.span
-																key={itemStatus}
-																transition={{
-																	type: "spring",
-																	duration: 0.25,
-																	bounce: 0,
-																}}
-																initial={{ opacity: 0, y: -14 }}
-																animate={{ opacity: 1, y: 0 }}
-																exit={{ opacity: 0, y: 14 }}
-																className="flex items-center justify-center gap-1.5 font-medium"
-															>
-																{itemStatus === "disconnecting" ? (
-																	<>
-																		<Spinner
-																			size={14}
-																			color="var(--text-strong-950)"
-																		/>
-																		<span>Disconnecting...</span>
-																	</>
-																) : itemStatus === "success" ? (
-																	<>
-																		<Icon
-																			name="check-circle"
-																			className="h-4 w-4"
-																		/>
-																		<span>Disconnected</span>
-																	</>
-																) : (
-																	<>
-																		<FancyButton.Icon
-																			as={Icon}
-																			name="check-circle"
-																			className="mr-0.5 h-4 w-4 shrink-0"
-																		/>
-																		<span>Disconnect</span>
-																	</>
-																)}
-															</motion.span>
-														</AnimatePresence>
-													</FancyButton.Root>
-												);
-											})()
-										) : (
-											<span className="rounded-full bg-success-base px-1.5 py-0.5 font-semibold text-[10px] text-white">
-												Connected
-											</span>
-										)}
-									</div>
-								</div>
-							);
-						})}
-
-						{AVAILABLE_PROVIDERS.filter(
-							(p) => !accounts?.some((a) => a.providerId === p.id),
-						).map((provider) => {
-							const isConnecting = connecting === provider.id;
-							return (
-								<div
-									key={provider.id}
-									className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40"
-								>
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-3">
-											<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
-												{provider.useCustomIcon && provider.id === "google" ? (
-													<GoogleIcon className="h-4 w-4" />
-												) : (
-													<Icon
-														name={provider.icon}
-														className="h-4 w-4 text-text-sub-600"
-													/>
-												)}
-											</div>
-											<div>
-												<p className="font-medium text-label-sm text-text-strong-950">
-													{provider.name}
-												</p>
-												<p className="text-paragraph-xs text-text-sub-600">
-													Connect your {provider.name} account
-												</p>
-											</div>
-										</div>
-										<FancyButton.Root
-											variant="basic"
-											size="xsmall"
-											disabled={isConnecting}
-											onClick={() => handleConnect(provider.id)}
-											className={cn(
-												"min-w-[110px] justify-center overflow-hidden font-medium transition-all duration-200",
-												isConnecting && "opacity-90",
-											)}
-										>
-											<AnimatePresence mode="popLayout" initial={false}>
-												<motion.span
-													key={isConnecting ? "connecting" : "idle"}
-													transition={{
-														type: "spring",
-														duration: 0.25,
-														bounce: 0,
-													}}
-													initial={{ opacity: 0, y: -14 }}
-													animate={{ opacity: 1, y: 0 }}
-													exit={{ opacity: 0, y: 14 }}
-													className="flex items-center justify-center gap-1.5 font-medium"
-												>
-													{isConnecting ? (
-														<>
-															<Spinner
-																size={14}
-																color="var(--text-strong-950)"
-															/>
-															<span>Connecting...</span>
-														</>
-													) : (
-														<>
-															<FancyButton.Icon
-																as={Icon}
-																name="plus-circle"
-																className="mr-0.5 h-4 w-4 shrink-0"
-															/>
-															<span>Connect</span>
-														</>
-													)}
-												</motion.span>
-											</AnimatePresence>
-										</FancyButton.Root>
-									</div>
-								</div>
-							);
-						})}
-					</>
-				)}
+				{providerIds.map((providerId) => {
+					const provider = getProviderInfo(providerId);
+					const account = accounts?.find((a) => a.providerId === providerId);
+					return (
+						<AccountRow
+							key={providerId}
+							provider={provider}
+							description={
+								account
+									? provider.description
+									: `Connect your ${provider.name} account`
+							}
+							action={renderAction(providerId, account)}
+						/>
+					);
+				})}
 			</div>
 		</div>
 	);
