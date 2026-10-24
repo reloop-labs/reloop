@@ -1,5 +1,6 @@
 import { authClient } from "@reloop/auth/client";
 import type { ConnectedApp } from "@reloop/auth/server/connected-apps";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -17,6 +18,7 @@ import { Initial } from "#/features/auth/consent/consent-ui";
 import { isKnownApp, KnownAppGlyph } from "#/features/auth/known-app-mark";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { formatTimeAgo } from "#/features/settings/security/security-utils";
+import { TableEmptyState } from "#/features/settings/security/table-empty-state";
 import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { queryKeys } from "#/lib/query-keys";
 
@@ -99,16 +101,32 @@ function MemberLabel({ app }: { app: ConnectedApp }) {
 	);
 }
 
-const AppSkeleton = () => (
-	<div className="flex items-center justify-between px-4 py-3">
+const BASE_COLS = "minmax(0,1fr) 120px 120px 180px";
+const MEMBER_COLS = "minmax(0,1fr) 160px 120px 120px 180px";
+
+const AppSkeleton = ({ cols }: { cols: string }) => (
+	<div style={{ gridTemplateColumns: cols }} className="grid px-4 py-2">
 		<div className="flex items-center gap-3">
 			<Skeleton className="h-8 w-8 rounded-lg" />
-			<div className="space-y-1.5">
+			<div className="flex-1 space-y-1">
 				<Skeleton className="h-4 w-28" />
 				<Skeleton className="h-3 w-48" />
 			</div>
 		</div>
-		<Skeleton className="h-7 w-24 rounded-lg" />
+		{cols === MEMBER_COLS && (
+			<div className="flex items-center">
+				<Skeleton className="h-4 w-20" />
+			</div>
+		)}
+		<div className="flex items-center">
+			<Skeleton className="h-4 w-20" />
+		</div>
+		<div className="flex items-center">
+			<Skeleton className="h-4 w-16" />
+		</div>
+		<div className="flex items-center justify-end">
+			<Skeleton className="h-7 w-24 rounded-lg" />
+		</div>
 	</div>
 );
 
@@ -123,7 +141,13 @@ export function ConnectedAppsPage() {
 			?.activeOrganizationId ?? null;
 	const queryKey = queryKeys.auth.connectedApps(organizationId);
 
-	const { data: apps = [], isPending: loading } = useQuery({
+	const {
+		data: apps = [],
+		isPending: loading,
+		isError,
+		refetch,
+		isRefetching,
+	} = useQuery({
 		queryKey,
 		queryFn: async (): Promise<ConnectedApp[]> => {
 			const { data, error } = await authClient.connectedApps.list();
@@ -132,7 +156,7 @@ export function ConnectedAppsPage() {
 			return data ?? [];
 		},
 		enabled: organizationId !== null,
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: true,
 	});
 
 	const showMembers = apps.some((app) => !app.isOwn);
@@ -162,20 +186,89 @@ export function ConnectedAppsPage() {
 		}
 	};
 
+	const cols = showMembers ? MEMBER_COLS : BASE_COLS;
+
 	return (
-		<div className="w-full space-y-6 pt-5">
+		<div className="space-y-4">
 			<div>
-				<h1 className="font-semibold text-text-strong-950 text-title-h5 dark:text-white">
+				<p className="font-medium text-label-md text-text-strong-950">
 					Connected Apps
-				</h1>
+				</p>
+				<p className="text-paragraph-sm text-text-sub-600">
+					Apps, AI assistants, and CLIs with access to this organization.
+				</p>
 			</div>
 
-			<div className="divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:divide-[#101010] dark:border-stroke-soft-100/40">
-				{loading && organizationId !== null
-					? Array.from({ length: 3 }).map((_, i) => (
-							<AppSkeleton key={`skeleton-${i.toString()}`} />
+			<div className="w-full overflow-x-auto text-paragraph-sm">
+				<div
+					style={{ gridTemplateColumns: cols }}
+					className="grid min-w-[720px] items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
+				>
+					<div className="flex items-center gap-1">
+						<Icon name="plug-custom" className="h-3 w-3" />
+						<span className="text-xs">App</span>
+					</div>
+					{showMembers && (
+						<div className="flex items-center gap-1">
+							<Icon name="user" className="h-3 w-3" />
+							<span className="text-xs">Member</span>
+						</div>
+					)}
+					<div className="flex items-center gap-1">
+						<Icon name="calendar" className="h-3 w-3" />
+						<span className="text-xs">Connected</span>
+					</div>
+					<div className="flex items-center gap-1">
+						<Icon name="clock" className="h-3 w-3" />
+						<span className="text-xs">Last Active</span>
+					</div>
+					<div />
+				</div>
+
+				<div className="-mt-2.5 min-w-[720px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
+					{organizationId === null ? (
+						<TableEmptyState
+							icon="workspace-custom"
+							title="No organization selected"
+							description="Select an organization to see its connected apps."
+						/>
+					) : loading ? (
+						Array.from({ length: 3 }).map((_, i) => (
+							<AppSkeleton key={`skeleton-${i.toString()}`} cols={cols} />
 						))
-					: apps.map((app) => {
+					) : apps.length === 0 ? (
+						<TableEmptyState
+							icon={isError ? "shield-cross" : "plug-custom"}
+							title={
+								isError ? "Couldn't load connected apps" : "No connected apps"
+							}
+							description={
+								isError
+									? "Something went wrong while fetching connected apps."
+									: "Apps authorized for this organization, like MCP clients or the Reloop CLI, will appear here."
+							}
+							action={
+								isError ? (
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="stroke"
+										size="small"
+										onClick={() => void refetch()}
+										disabled={isRefetching}
+										className="gap-1.5 rounded-xl"
+									>
+										<Icon
+											name="refresh-cw"
+											className="h-4 w-4 text-text-sub-600"
+										/>
+										Try again
+									</Button.Root>
+								) : null
+							}
+						/>
+					) : (
+						apps.map((app) => {
 							const key = grantKey(app);
 							const status = statusMap[key] ?? "idle";
 							const name = app.name ?? "Unnamed app";
@@ -186,16 +279,16 @@ export function ConnectedAppsPage() {
 									resources: app.resources,
 								}),
 							);
-							const connected = formatDate(app.connectedAt);
 							return (
 								<div
 									key={key}
-									className="flex flex-col gap-3 px-4 py-3 transition-colors hover:bg-bg-weak-50/50 sm:flex-row sm:items-center sm:justify-between"
+									style={{ gridTemplateColumns: cols }}
+									className="group/row grid w-full items-center px-4 py-2 text-left hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]"
 								>
 									<div className="flex min-w-0 items-center gap-3">
 										<AppLogo app={app} />
-										<div className="min-w-0 space-y-0.5">
-											<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+										<div className="min-w-0 flex-1">
+											<div className="flex min-w-0 items-center gap-2">
 												<span className="truncate font-medium text-label-xs text-text-strong-950">
 													{name}
 												</span>
@@ -205,114 +298,101 @@ export function ConnectedAppsPage() {
 													</span>
 												)}
 												{!app.hasActiveSession && (
-													<span className="rounded-full border border-stroke-soft-100 px-1.5 text-[10px] text-text-sub-600 dark:border-stroke-soft-100/40">
+													<span className="shrink-0 rounded-full border border-stroke-soft-100 px-1.5 text-[10px] text-text-sub-600 dark:border-stroke-soft-100/40">
 														Idle
 													</span>
 												)}
 											</div>
-											<p className="truncate text-[11px] text-text-sub-600">
+											<p
+												className="truncate text-[11px] text-text-sub-600"
+												title={access}
+											>
 												{access}
 											</p>
-											<div className="flex flex-wrap items-center gap-x-2 text-[11px] text-text-soft-400">
-												{showMembers && <MemberLabel app={app} />}
-												<span>
-													{[
-														connected ? `Connected ${connected}` : null,
-														app.lastActiveAt
-															? `Last active ${formatTimeAgo(new Date(app.lastActiveAt))}`
-															: null,
-													]
-														.filter(Boolean)
-														.join(" · ")}
-												</span>
-											</div>
 										</div>
 									</div>
 
-									{canDisconnect(app) && (
-										<div className="flex flex-shrink-0 items-center gap-2">
-											{status === "confirming" && (
-												<button
-													type="button"
-													className="h-7 rounded-lg px-2 font-medium text-text-sub-600 text-xs hover:text-text-strong-950"
-													onClick={() => setStatus(key, "idle")}
-												>
-													Cancel
-												</button>
-											)}
-											<FancyButton.Root
-												variant="destructive"
-												size="xsmall"
-												className={cn(
-													"min-w-[96px] justify-center overflow-hidden font-medium",
-													status === "revoking" && "opacity-90",
-												)}
-												disabled={status === "revoking"}
-												onClick={() =>
-													status === "confirming"
-														? handleDisconnect(app)
-														: setStatus(key, "confirming")
-												}
-											>
-												<AnimatePresence mode="popLayout" initial={false}>
-													<motion.span
-														key={status}
-														transition={{
-															type: "spring",
-															duration: 0.25,
-															bounce: 0,
-														}}
-														initial={{ opacity: 0, y: -14 }}
-														animate={{ opacity: 1, y: 0 }}
-														exit={{ opacity: 0, y: 14 }}
-														className="flex items-center justify-center gap-1.5"
+									{showMembers && <MemberLabel app={app} />}
+
+									<span className="text-label-xs text-text-sub-600">
+										{formatDate(app.connectedAt) ?? "-"}
+									</span>
+									<span className="text-label-xs text-text-sub-600">
+										{app.lastActiveAt
+											? formatTimeAgo(new Date(app.lastActiveAt))
+											: "-"}
+									</span>
+
+									<div className="flex items-center justify-end gap-2">
+										{canDisconnect(app) && (
+											<>
+												{status === "confirming" && (
+													<button
+														type="button"
+														className="h-7 rounded-lg px-2 font-medium text-text-sub-600 text-xs hover:text-text-strong-950"
+														onClick={() => setStatus(key, "idle")}
 													>
-														{status === "revoking" ? (
-															<>
-																<Spinner
-																	size={12}
-																	color="var(--static-white)"
-																/>
-																<span>Disconnecting...</span>
-															</>
-														) : status === "confirming" ? (
-															"Confirm"
-														) : (
-															"Disconnect"
-														)}
-													</motion.span>
-												</AnimatePresence>
-											</FancyButton.Root>
-										</div>
-									)}
+														Cancel
+													</button>
+												)}
+												<FancyButton.Root
+													variant="destructive"
+													size="xsmall"
+													className={cn(
+														"min-w-[96px] justify-center overflow-hidden font-medium",
+														status === "revoking" && "opacity-90",
+													)}
+													disabled={status === "revoking"}
+													onClick={() =>
+														status === "confirming"
+															? handleDisconnect(app)
+															: setStatus(key, "confirming")
+													}
+												>
+													<AnimatePresence mode="popLayout" initial={false}>
+														<motion.span
+															key={status}
+															transition={{
+																type: "spring",
+																duration: 0.25,
+																bounce: 0,
+															}}
+															initial={{ opacity: 0, y: -14 }}
+															animate={{ opacity: 1, y: 0 }}
+															exit={{ opacity: 0, y: 14 }}
+															className="flex items-center justify-center gap-1.5"
+														>
+															{status === "revoking" ? (
+																<>
+																	<Spinner
+																		size={12}
+																		color="var(--static-white)"
+																	/>
+																	<span>Disconnecting...</span>
+																</>
+															) : status === "confirming" ? (
+																"Confirm"
+															) : (
+																"Disconnect"
+															)}
+														</motion.span>
+													</AnimatePresence>
+												</FancyButton.Root>
+											</>
+										)}
+									</div>
 								</div>
 							);
-						})}
-				{!loading && apps.length === 0 && (
-					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<Icon
-							name="plug-custom"
-							className="mb-3 h-8 w-8 text-text-sub-600"
-						/>
-						<p className="font-medium text-text-strong-950">
-							No connected apps
-						</p>
-						<p className="text-sm text-text-sub-600">
-							Apps authorized for this organization, like MCP clients or the
-							Reloop CLI, will appear here.
-						</p>
-					</div>
-				)}
-				{organizationId === null && (
-					<div className="flex flex-col items-center justify-center py-12 text-center">
-						<p className="font-medium text-text-strong-950">
-							No organization selected
-						</p>
-						<p className="text-sm text-text-sub-600">
-							Select an organization to see its connected apps.
-						</p>
-					</div>
-				)}
+						})
+					)}
+					{!loading && apps.length > 0 && (
+						<div className="flex items-center justify-between px-4 py-2">
+							<p className="text-label-xs text-text-sub-600">
+								{apps.length} connected app{apps.length > 1 ? "s" : ""}
+							</p>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

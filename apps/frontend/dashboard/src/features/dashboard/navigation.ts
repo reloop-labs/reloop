@@ -220,7 +220,23 @@ export type SettingsNavigationItem = {
 	/** Owner/admin only (team management). */
 	requiresTeamAdmin?: boolean;
 	requiresBilling?: boolean;
+	/** Nested pages shown under the item, like Contacts in the main sidebar. */
+	items?: SettingsNavigationSubItem[];
 };
+
+export type SettingsNavigationSubItem = {
+	label: string;
+	path: string;
+	iconName: string;
+	shortcut?: { label: string; keys: string[] };
+};
+
+/** Settings items plus their nested sub items, in sidebar order. */
+export function flattenSettingsItems(
+	items: SettingsNavigationItem[],
+): (SettingsNavigationItem | SettingsNavigationSubItem)[] {
+	return items.flatMap((item) => [item, ...(item.items ?? [])]);
+}
 
 export type SettingsNavigationSection = {
 	section: string;
@@ -272,12 +288,6 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 				requiresOrgAdmin: true,
 				shortcut: { label: "G Shift+W", keys: ["g shift+w", "g+shift+w"] },
 			},
-			{
-				label: "Connected Apps",
-				path: "/settings/connected-apps",
-				iconName: "plug-custom",
-				shortcut: { label: "G Shift+A", keys: ["g shift+a", "g+shift+a"] },
-			},
 		],
 	},
 	{
@@ -294,6 +304,17 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 				path: "/settings/security",
 				iconName: "shield-check",
 				shortcut: { label: "G Shift+S", keys: ["g shift+s", "g+shift+s"] },
+				items: [
+					{
+						label: "Connected Apps",
+						path: "/settings/security/connected-apps",
+						iconName: "plug-custom",
+						shortcut: {
+							label: "G Shift+A",
+							keys: ["g shift+a", "g+shift+a"],
+						},
+					},
+				],
 			},
 			{
 				label: "Shortcuts",

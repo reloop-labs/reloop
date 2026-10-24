@@ -6,6 +6,7 @@ import * as Input from "@reloop/ui/input";
 import { useMemo, useState } from "react";
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
+	flattenSettingsItems,
 	mainNavigation,
 	settingsNavigation,
 } from "#/features/dashboard/navigation";
@@ -248,7 +249,7 @@ export function ShortcutsPage() {
 			});
 		}
 		for (const section of settingsNavigation) {
-			for (const item of section.items) {
+			for (const item of flattenSettingsItems(section.items)) {
 				if (!item.shortcut) continue;
 				list.push({
 					name: item.label,

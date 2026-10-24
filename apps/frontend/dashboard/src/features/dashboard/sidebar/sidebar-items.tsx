@@ -243,7 +243,7 @@ export function SidebarItems({
 										transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 										style={{ overflow: "hidden" }}
 									>
-										<div className="my-0.5 ml-[14px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-2">
+										<div className="my-0.5 ml-[17.5px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-[9.5px]">
 											{items.map((subItem, subIndex) => {
 												const {
 													label: subLabel,

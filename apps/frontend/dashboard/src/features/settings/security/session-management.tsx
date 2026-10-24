@@ -1,4 +1,5 @@
 import { authClient } from "@reloop/auth/client";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -17,13 +18,13 @@ import {
 	parseUserAgent,
 	type Session,
 } from "./security-utils";
+import { TableEmptyState } from "./table-empty-state";
 
 interface SessionManagementProps {
 	className?: string;
 }
 
 const GRID_COLS = "grid-cols-[1fr_140px_140px_120px_80px]";
-const DIVIDER = "divide-stroke-soft-100 dark:divide-[#101010]";
 const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/40";
 
 export function SessionManagement({ className }: SessionManagementProps) {
@@ -36,14 +37,21 @@ export function SessionManagement({ className }: SessionManagementProps) {
 	);
 	const { data: currentSession } = useSessionQuery();
 
-	const { data: sessions = [], isPending: loading } = useQuery({
+	const {
+		data: sessions = [],
+		isPending: loading,
+		isError,
+		refetch,
+		isRefetching,
+	} = useQuery({
 		queryKey: queryKeys.auth.sessions(),
 		queryFn: async (): Promise<Session[]> => {
 			const { data, error } = await authClient.listSessions();
 			if (error) throw new Error(error.message || "Failed to fetch sessions");
 			return (data as Session[]) || [];
 		},
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: true,
+		refetchInterval: 60_000,
 	});
 
 	const setSessionsCache = (next: Session[]) => {
@@ -144,7 +152,7 @@ export function SessionManagement({ className }: SessionManagementProps) {
 
 			<div className="w-full overflow-x-auto text-paragraph-sm">
 				<div
-					className={`grid min-w-[640px] ${GRID_COLS} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40`}
+					className={`grid min-w-[640px] ${GRID_COLS} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40`}
 				>
 					<div className="flex items-center gap-1">
 						<Icon name="monitor" className="h-3 w-3" />
@@ -165,12 +173,7 @@ export function SessionManagement({ className }: SessionManagementProps) {
 					<div />
 				</div>
 
-				<div
-					className={cn(
-						"-mt-2.5 min-w-[640px] divide-y overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
-						DIVIDER,
-					)}
-				>
+				<div className="-mt-2.5 min-w-[640px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
 					{loading
 						? Array.from({ length: 3 }).map((_, i) => (
 								<div
@@ -211,7 +214,8 @@ export function SessionManagement({ className }: SessionManagementProps) {
 											session.id ? `session-${session.id}` : `session-idx-${i}`
 										}
 										className={cn(
-											`group/row grid ${GRID_COLS} items-center px-4 py-2 transition-colors hover:bg-bg-weak-50/50`,
+											`group/row grid ${GRID_COLS} w-full items-center px-4 py-2 text-left`,
+											"hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]",
 										)}
 									>
 										<div className="flex items-center gap-3">
@@ -326,22 +330,41 @@ export function SessionManagement({ className }: SessionManagementProps) {
 								);
 							})}
 					{!loading && sessions.length > 0 && (
-						<div className="flex items-center justify-between px-4 py-2.5">
+						<div className="flex items-center justify-between px-4 py-2">
 							<p className="text-label-xs text-text-sub-600">
 								{sessions.length} active session{sessions.length > 1 ? "s" : ""}
 							</p>
 						</div>
 					)}
 					{!loading && sessions.length === 0 && (
-						<div className="flex flex-col items-center justify-center py-12 text-center">
-							<Icon name="shield" className="mb-3 h-8 w-8 text-text-sub-600" />
-							<p className="font-medium text-text-strong-950">
-								No active sessions
-							</p>
-							<p className="text-sm text-text-sub-600">
-								Your sessions will appear here.
-							</p>
-						</div>
+						<TableEmptyState
+							icon={isError ? "shield-cross" : "shield"}
+							title={isError ? "Couldn't load sessions" : "No active sessions"}
+							description={
+								isError
+									? "Something went wrong while fetching your sessions."
+									: "Your sessions will appear here."
+							}
+							action={
+								isError ? (
+									<Button.Root
+										type="button"
+										variant="neutral"
+										mode="stroke"
+										size="small"
+										onClick={() => void refetch()}
+										disabled={isRefetching}
+										className="gap-1.5 rounded-xl"
+									>
+										<Icon
+											name="refresh-cw"
+											className="h-4 w-4 text-text-sub-600"
+										/>
+										Try again
+									</Button.Root>
+								) : null
+							}
+						/>
 					)}
 				</div>
 			</div>

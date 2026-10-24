@@ -1,0 +1,118 @@
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import { AnimatePresence, motion } from "motion/react";
+import { usePathname, useRouter } from "next/navigation";
+import { type ReactNode, useRef, useState } from "react";
+
+const items = [
+	{
+		title: "Sign-in",
+		value: "sign-in",
+		iconName: "lock" as const,
+		path: "/settings/security",
+	},
+	{
+		title: "Connected Apps",
+		value: "connected-apps",
+		iconName: "plug-custom" as const,
+		path: "/settings/security/connected-apps",
+	},
+] as const;
+
+function SecurityTabs() {
+	const router = useRouter();
+	const pathname = usePathname();
+	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+
+	const effectiveTabValue = pathname.startsWith(
+		"/settings/security/connected-apps",
+	)
+		? "connected-apps"
+		: "sign-in";
+
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const activeIndex = items.findIndex(
+		(item) => item.value === effectiveTabValue,
+	);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
+	const tab = buttonRefs.current[currentIdx];
+	const rect = tab?.getBoundingClientRect();
+
+	return (
+		<TabMenuHorizontal.Root value={effectiveTabValue}>
+			<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
+				{items.map(({ value, title, iconName, path }, index) => (
+					<TabMenuHorizontal.Trigger
+						ref={(el) => {
+							if (el) buttonRefs.current[index] = el;
+						}}
+						onPointerEnter={() => setHoveredIdx(index)}
+						onPointerLeave={() => setHoveredIdx(undefined)}
+						className={cn(
+							"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
+							hoveredIdx === undefined &&
+								activeIndex === index &&
+								"text-text-strong-950",
+						)}
+						key={value}
+						value={value}
+						onClick={() => router.push(path)}
+					>
+						<Icon name={iconName} className="h-4 w-4" />
+						{title}
+					</TabMenuHorizontal.Trigger>
+				))}
+				<AnimatePresence>
+					{rect && activeIndex !== -1 ? (
+						<motion.div
+							className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
+							initial={{
+								pointerEvents: "none",
+								width: rect.width,
+								height: rect.height - 14,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+									7,
+								opacity: 0,
+							}}
+							animate={{
+								pointerEvents: "none",
+								width: rect.width,
+								height: rect.height - 14,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+									7,
+								opacity: 1,
+							}}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.14 }}
+						/>
+					) : null}
+				</AnimatePresence>
+			</TabMenuHorizontal.List>
+		</TabMenuHorizontal.Root>
+	);
+}
+
+export function SecurityShell({ children }: { children: ReactNode }) {
+	return (
+		<div className="w-full space-y-6 pt-5">
+			<div className="space-y-4">
+				<h1 className="font-semibold text-text-strong-950 text-title-h5 dark:text-white">
+					Security
+				</h1>
+				<SecurityTabs />
+			</div>
+			{children}
+		</div>
+	);
+}

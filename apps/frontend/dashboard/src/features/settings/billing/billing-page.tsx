@@ -215,8 +215,8 @@ export function BillingPage() {
 			) : null}
 
 			<div className={CARD}>
-				<div className="flex items-center justify-between">
-					<div>
+				<div className="flex items-center justify-between gap-4">
+					<div className="min-w-0">
 						<div className="flex items-center gap-2">
 							<h2 className="font-medium text-label-md text-text-strong-950">
 								{isPayg ? planName : `${planName} plan`}
@@ -244,49 +244,43 @@ export function BillingPage() {
 								? ` · ${monthlyIncluded.toLocaleString()} emails included`
 								: null}
 						</p>
-					</div>
-					{canManageSubscription ? (
-						<FancyButton.Root
-							variant="basic"
-							size="xsmall"
-							className="rounded-full font-medium"
-							disabled={portal.isPending}
-							onClick={handleManage}
-						>
-							{portal.isPending ? "Opening…" : "Manage"}
-						</FancyButton.Root>
-					) : null}
-				</div>
-			</div>
-
-			{canBuyCredits ? (
-				<div className={CARD}>
-					<div className="flex items-center justify-between gap-4">
-						<div>
-							<h2 className="font-medium text-label-md text-text-strong-950">
-								Email credits
-							</h2>
-							<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
+						{canBuyCredits ? (
+							<p className="mt-1 font-medium text-paragraph-xs text-text-soft-400">
 								{hasCredits
 									? `${prepaidBalance.toLocaleString()} credits left${
 											prepaidExpiresAt
 												? ` · Valid until ${formatExpiryDate(prepaidExpiresAt)}`
 												: ""
 										}`
-									: `Pay once, no subscription. $${creditPack.usdPerThousand.toFixed(2)} per 1,000 emails, valid for ${creditPack.validityMonths} months.`}
+									: `Need more? Buy credits once: $${creditPack.usdPerThousand.toFixed(2)} per 1,000 emails, valid for ${creditPack.validityMonths} months.`}
 							</p>
-						</div>
-						<FancyButton.Root
-							variant={hasCredits || isPayg ? "neutral" : "basic"}
-							size="xsmall"
-							className="shrink-0 rounded-full font-medium"
-							onClick={() => setPlanModal("credits")}
-						>
-							{hasCredits ? "Buy more" : "Buy credits"}
-						</FancyButton.Root>
+						) : null}
+					</div>
+					<div className="flex shrink-0 items-center gap-2">
+						{canBuyCredits ? (
+							<FancyButton.Root
+								variant={hasCredits || isPayg ? "neutral" : "basic"}
+								size="xsmall"
+								className="shrink-0 rounded-full font-medium"
+								onClick={() => setPlanModal("credits")}
+							>
+								{hasCredits ? "Buy more" : "Buy credits"}
+							</FancyButton.Root>
+						) : null}
+						{canManageSubscription ? (
+							<FancyButton.Root
+								variant="basic"
+								size="xsmall"
+								className="rounded-full font-medium"
+								disabled={portal.isPending}
+								onClick={handleManage}
+							>
+								{portal.isPending ? "Opening…" : "Manage"}
+							</FancyButton.Root>
+						) : null}
 					</div>
 				</div>
-			) : null}
+			</div>
 
 			{nextPlan ? (
 				<div className={CARD}>

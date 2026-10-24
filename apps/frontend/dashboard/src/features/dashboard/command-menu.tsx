@@ -20,6 +20,7 @@ import { useCommandMenuActions } from "#/features/dashboard/command-menu-context
 import { ActionKbd } from "#/features/dashboard/keyboard-shortcuts-reveal";
 import {
 	filterSettingsNavigation,
+	flattenSettingsItems,
 	mainNavigation,
 	settingsNavigation,
 } from "#/features/dashboard/navigation";
@@ -38,7 +39,7 @@ mainNavigation.forEach((item) => {
 	});
 });
 settingsNavigation.forEach((section) => {
-	section.items.forEach((item) => {
+	flattenSettingsItems(section.items).forEach((item) => {
 		if (item.shortcut) {
 			PAGE_SHORTCUTS[item.path] = item.shortcut;
 		}
@@ -94,7 +95,7 @@ function useNavigationShortcuts(router: ReturnType<typeof useRouter>) {
 			I: "/settings/dedicated-ip",
 			W: "/settings/organization",
 			O: "/settings/organization",
-			A: "/settings/connected-apps",
+			A: "/settings/security/connected-apps",
 			P: "/settings/profile",
 			S: "/settings/security",
 			K: "/settings/shortcuts",
@@ -219,7 +220,7 @@ export function CommandMenuGlobal() {
 				isOrgAdmin,
 				canManageTeam,
 				canManageBilling,
-			}).flatMap((section) => section.items),
+			}).flatMap((section) => flattenSettingsItems(section.items)),
 		[isOrgAdmin, canManageTeam, canManageBilling],
 	);
 	useHotkeys("mod+k", (e) => {

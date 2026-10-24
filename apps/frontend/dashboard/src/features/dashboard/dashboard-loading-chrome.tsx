@@ -114,7 +114,7 @@ function LoadingSidebarNav() {
 						{item.items && expanded[item.path] ? (
 							<div
 								className={cn(
-									"my-0.5 ml-[14px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-2",
+									"my-0.5 ml-[17.5px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-[9.5px]",
 									EXPANDED_ONLY,
 								)}
 							>
@@ -203,11 +203,16 @@ function LoadingSettingsNav({ pathWithoutSlug }: { pathWithoutSlug: string }) {
 						/>
 					) : null}
 					{section.items.map((item) => {
-						const isActive =
+						const subItems = item.items ?? [];
+						const inSection =
 							item.path === "/settings"
 								? pathWithoutSlug === "/settings"
 								: pathWithoutSlug.startsWith(item.path);
-						return (
+						const activeSub = subItems.find((sub) =>
+							pathWithoutSlug.startsWith(sub.path),
+						);
+						const isActive = inSection && !activeSub;
+						const row = (
 							<div
 								key={item.path}
 								className={cn(
@@ -227,6 +232,40 @@ function LoadingSettingsNav({ pathWithoutSlug }: { pathWithoutSlug: string }) {
 								>
 									{item.label}
 								</span>
+							</div>
+						);
+						if (!inSection || subItems.length === 0) return row;
+						return (
+							<div key={item.path} className="flex flex-col">
+								{row}
+								<div
+									className={cn(
+										"my-0.5 ml-[17.5px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-[9.5px]",
+										EXPANDED_ONLY,
+									)}
+								>
+									{subItems.map((sub) => {
+										const isSubActive = sub === activeSub;
+										return (
+											<div
+												key={sub.path}
+												className={cn(
+													"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px]",
+													isSubActive
+														? "bg-neutral-alpha-10 text-text-strong-950"
+														: "text-text-sub-600",
+												)}
+											>
+												<SidebarNavIcon
+													name={sub.iconName}
+													isActive={isSubActive}
+													className="h-3.5 w-3.5"
+												/>
+												{sub.label}
+											</div>
+										);
+									})}
+								</div>
 							</div>
 						);
 					})}
