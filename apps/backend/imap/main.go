@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -62,7 +63,9 @@ func main() {
 
 func serve(ctx context.Context, s *store.Store) error {
 	// IMAP passwords are API keys, checked by the domain service like SMTP AUTH.
-	backend := mailstore.NewBackend(s, auth.NewVerifier(mustEnv("DOMAIN_SERVICE_URL")))
+	domainURL := domainServiceURL()
+	slog.Info("api key checks via domain service", "url", domainURL)
+	backend := mailstore.NewBackend(s, auth.NewVerifier(domainURL, os.Getenv("RELOOP_INTERNAL_SECRET")))
 
 	nc, err := nats.Connect(env("NATS_URL", nats.DefaultURL), nats.Name("reloop-imap"), nats.MaxReconnects(-1))
 	if err != nil {
@@ -160,6 +163,21 @@ func createAccount(ctx context.Context, s *store.Store, args []string) error {
 	}
 	fmt.Printf("created %s (%s)\n", a.Email, a.ID)
 	return nil
+}
+
+// domainServiceURL resolves the domain service base URL the same way the SMTP
+// service does (apps/backend/smtp/policy/constants.lua): an explicit URL, else
+// BASE_URL + /api/domain, else the local dev server.
+func domainServiceURL() string {
+	for _, key := range []string{"DOMAIN_SERVICE_URL", "KUMOMTA_WEBHOOK_URL"} {
+		if v := os.Getenv(key); v != "" {
+			return v
+		}
+	}
+	if base := os.Getenv("BASE_URL"); base != "" {
+		return strings.TrimRight(base, "/") + "/api/domain"
+	}
+	return "http://localhost:8011/api/domain"
 }
 
 func env(key, fallback string) string {

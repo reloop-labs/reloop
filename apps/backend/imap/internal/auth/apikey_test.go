@@ -22,6 +22,9 @@ func fakeDomain(t *testing.T, calls *atomic.Int32) *httptest.Server {
 		}
 		var body struct{ Email string }
 		_ = json.NewDecoder(r.Body).Decode(&body)
+		if s := r.Header.Get("x-internal-secret"); s != "" && s != "secret_1" {
+			t.Errorf("unexpected internal secret %q", s)
+		}
 		if r.Header.Get("x-api-key") != goodKey || body.Email != "support@acme.com" {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -34,7 +37,7 @@ func TestVerify(t *testing.T) {
 	var calls atomic.Int32
 	srv := fakeDomain(t, &calls)
 	defer srv.Close()
-	v := NewVerifier(srv.URL + "/api/domain/")
+	v := NewVerifier(srv.URL+"/api/domain/", "secret_1")
 	ctx := context.Background()
 
 	org, ok, err := v.Verify(ctx, goodKey, " Support@ACME.com ")
@@ -63,7 +66,7 @@ func TestVerifyRejectsWithoutCalling(t *testing.T) {
 	var calls atomic.Int32
 	srv := fakeDomain(t, &calls)
 	defer srv.Close()
-	v := NewVerifier(srv.URL + "/api/domain")
+	v := NewVerifier(srv.URL+"/api/domain", "")
 
 	long := make([]byte, maxKeyLength+1)
 	for i := range long {
@@ -83,7 +86,7 @@ func TestVerifyUnavailable(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadGateway)
 	}))
-	v := NewVerifier(srv.URL)
+	v := NewVerifier(srv.URL, "")
 	if _, ok, err := v.Verify(context.Background(), goodKey, "support@acme.com"); ok || !errors.Is(err, ErrUnavailable) {
 		t.Fatalf("5xx must be ErrUnavailable: ok=%v err=%v", ok, err)
 	}

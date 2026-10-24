@@ -25,9 +25,10 @@ const maxKeyLength = 128
 var ErrUnavailable = errors.New("auth service unavailable")
 
 type Verifier struct {
-	url    string
-	client *http.Client
-	ttl    time.Duration
+	url            string
+	internalSecret string
+	client         *http.Client
+	ttl            time.Duration
 
 	mu    sync.Mutex
 	cache map[string]cacheEntry
@@ -38,11 +39,13 @@ type cacheEntry struct {
 	expires        time.Time
 }
 
-// NewVerifier takes the domain service base URL, e.g. http://domain:8011/api/domain.
-func NewVerifier(domainServiceURL string) *Verifier {
+// NewVerifier takes the domain service base URL (e.g. https://app.reloop.sh/api/domain)
+// and the shared internal secret, sent as x-internal-secret like the SMTP service does.
+func NewVerifier(domainServiceURL, internalSecret string) *Verifier {
 	return &Verifier{
-		url:    strings.TrimRight(domainServiceURL, "/") + "/v1/smtp-auth",
-		client: &http.Client{Timeout: 10 * time.Second},
+		url:            strings.TrimRight(domainServiceURL, "/") + "/v1/smtp-auth",
+		internalSecret: internalSecret,
+		client:         &http.Client{Timeout: 10 * time.Second},
 		// Short, so a revoked or re-scoped key stops working within a minute.
 		ttl:   time.Minute,
 		cache: make(map[string]cacheEntry),
@@ -75,6 +78,9 @@ func (v *Verifier) Verify(ctx context.Context, apiKey, email string) (organizati
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-api-key", apiKey)
 	req.Header.Set("User-Agent", "ReloopImap/1.0")
+	if v.internalSecret != "" {
+		req.Header.Set("x-internal-secret", v.internalSecret)
+	}
 
 	resp, err := v.client.Do(req)
 	if err != nil {

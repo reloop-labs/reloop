@@ -26,7 +26,8 @@ As in the other services: `.env.dev` holds local values and `.env.prod` lists wh
 | Variable | Default | |
 |---|---|---|
 | `PG_URL` | (required) | Postgres connection string |
-| `DOMAIN_SERVICE_URL` | (required) | Domain service base URL, e.g. `http://domain:8011/api/domain`; used to check API-key logins |
+| `BASE_URL` / `KUMOMTA_WEBHOOK_URL` / `DOMAIN_SERVICE_URL` | | Where API-key logins are checked, resolved like the SMTP service: `DOMAIN_SERVICE_URL`, else `KUMOMTA_WEBHOOK_URL`, else `BASE_URL` + `/api/domain`, else `http://localhost:8011/api/domain` |
+| `RELOOP_INTERNAL_SECRET` | | Sent as `x-internal-secret`, like the SMTP service |
 | `NATS_URL` | `nats://127.0.0.1:4222` | |
 | `IMAP_HOSTNAME` | `imap.reloop.sh` | Public host customers enter; the certificate is looked up for this name |
 | `IMAP_ADDR` / `IMAP_TLS_ADDR` | `:143` / `:993` | STARTTLS and implicit-TLS listeners |
