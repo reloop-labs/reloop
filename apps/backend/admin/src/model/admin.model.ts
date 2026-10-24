@@ -285,6 +285,16 @@ export namespace AdminModel {
 		suspectSeverity: t.Union([t.String(), t.Null()]),
 		suspectCategory: t.Union([t.String(), t.Null()]),
 		suspectUpdatedAt: t.Union([t.Date(), t.Null()]),
+		sendingBlock: t.Union([
+			t.Object({
+				reason: t.String(),
+				bounceRate: t.Number(),
+				complaintRate: t.Number(),
+				expiresAt: t.Date(),
+				createdAt: t.Date(),
+			}),
+			t.Null(),
+		]),
 		counts: t.Object({
 			members: t.Number(),
 			domains: t.Number(),

@@ -17,6 +17,7 @@ import {
 	organization,
 	organizationCredits,
 	organizationPlan,
+	orgSendingBlock,
 	supportConversation,
 	template,
 	user,
@@ -27,9 +28,11 @@ import {
 	count,
 	desc,
 	eq,
+	gt,
 	gte,
 	ilike,
 	inArray,
+	isNull,
 	or,
 	sql,
 } from "drizzle-orm";
@@ -207,6 +210,26 @@ export async function getOrganizationController(organizationId: string) {
 			fix: "Check the organization id and try again",
 		});
 	}
+
+	// Active reputation pause (bounce/complaint cooldown), if any.
+	const [sendingBlock] = await db
+		.select({
+			reason: orgSendingBlock.reason,
+			bounceRate: orgSendingBlock.bounceRate,
+			complaintRate: orgSendingBlock.complaintRate,
+			expiresAt: orgSendingBlock.expiresAt,
+			createdAt: orgSendingBlock.createdAt,
+		})
+		.from(orgSendingBlock)
+		.where(
+			and(
+				eq(orgSendingBlock.organizationId, organizationId),
+				isNull(orgSendingBlock.releasedAt),
+				gt(orgSendingBlock.expiresAt, new Date()),
+			),
+		)
+		.orderBy(desc(orgSendingBlock.expiresAt))
+		.limit(1);
 
 	const startOfDay = new Date();
 	startOfDay.setHours(0, 0, 0, 0);
@@ -533,6 +556,7 @@ export async function getOrganizationController(organizationId: string) {
 		suspectSeverity: org.suspectSeverity ?? null,
 		suspectCategory: org.suspectCategory ?? null,
 		suspectUpdatedAt: org.suspectUpdatedAt ?? null,
+		sendingBlock: sendingBlock ?? null,
 		counts: {
 			members: members.length,
 			domains: domains.length,

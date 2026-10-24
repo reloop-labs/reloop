@@ -59,6 +59,13 @@ type OrgDetail = {
 	suspectSeverity?: "low" | "medium" | "high" | "critical" | null;
 	suspectCategory?: "spam" | "phishing" | "fraud" | "abuse" | "other" | null;
 	suspectUpdatedAt?: string | null;
+	sendingBlock?: {
+		reason: string;
+		bounceRate: number;
+		complaintRate: number;
+		expiresAt: string;
+		createdAt: string;
+	} | null;
 	counts: {
 		members: number;
 		domains: number;
@@ -221,6 +228,7 @@ export default function OrganizationDetailPage() {
 	const [tab, setTab] = useState<TabId>("overview");
 	const [suspendOpen, setSuspendOpen] = useState(false);
 	const [suspectOpen, setSuspectOpen] = useState(false);
+	const [unblockOpen, setUnblockOpen] = useState(false);
 	const [topupOpen, setTopupOpen] = useState(false);
 	const [topupAmount, setTopupAmount] = useState("1000");
 	const [topupReason, setTopupReason] = useState("");
@@ -314,6 +322,9 @@ export default function OrganizationDetailPage() {
 								status={`Suspect (${data.suspectCategory || "abuse"})`}
 								tone="red"
 							/>
+						) : null}
+						{data.sendingBlock ? (
+							<StatusPill status="Sending paused" tone="orange" />
 						) : null}
 						<StatusPill
 							status={planLabel(data.plan?.planId)}
@@ -409,6 +420,16 @@ export default function OrganizationDetailPage() {
 								Suspend
 							</Button.Root>
 						)}
+						{data.sendingBlock ? (
+							<Button.Root
+								variant="neutral"
+								mode="stroke"
+								size="small"
+								onClick={() => setUnblockOpen(true)}
+							>
+								Unblock sending
+							</Button.Root>
+						) : null}
 						<Button.Root
 							variant={data.isSuspect ? "error" : "neutral"}
 							mode={data.isSuspect ? "filled" : "stroke"}
@@ -453,6 +474,50 @@ export default function OrganizationDetailPage() {
 						Edit Suspection
 					</Button.Root>
 				</div>
+			) : null}
+
+			{data.sendingBlock ? (
+				<div className="flex items-start justify-between gap-3 rounded-2xl border border-orange-500/30 bg-orange-500/[0.06] p-4 text-[13px] dark:border-orange-500/40 dark:bg-orange-500/10">
+					<div>
+						<p className="font-semibold text-orange-700 dark:text-orange-300">
+							Sending paused · {data.sendingBlock.reason.replaceAll("_", " ")}
+						</p>
+						<p className="mt-0.5 text-orange-600 dark:text-orange-400">
+							Bounce {(data.sendingBlock.bounceRate * 100).toFixed(2)}% ·
+							Complaint {(data.sendingBlock.complaintRate * 100).toFixed(2)}%
+							over 24h. API sends are rejected until the cooldown ends.
+						</p>
+						<p className="mt-1 text-[11px] text-orange-500/80">
+							Paused {formatRelativeTime(data.sendingBlock.createdAt)} · expires{" "}
+							{formatDateTime(data.sendingBlock.expiresAt)}
+						</p>
+					</div>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="small"
+						onClick={() => setUnblockOpen(true)}
+					>
+						Unblock sending
+					</Button.Root>
+				</div>
+			) : null}
+
+			{unblockOpen ? (
+				<InlineActionPanel
+					title={`Unblock sending for ${data.name}?`}
+					description="Releases the reputation pause, sets the organization to active and clears its suspect flag. Members are not changed. This action is audit-logged."
+					confirmLabel="Unblock sending"
+					onCancel={() => setUnblockOpen(false)}
+					onConfirm={async () => {
+						await adminPost(`/spam/organizations/${data.id}/unblock`, {
+							reason: "Sending pause released by platform admin",
+						});
+						toast.success("Sending unblocked");
+						setUnblockOpen(false);
+						mutate();
+					}}
+				/>
 			) : null}
 
 			{suspendOpen ? (
