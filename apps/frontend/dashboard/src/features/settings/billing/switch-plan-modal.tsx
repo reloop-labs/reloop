@@ -16,7 +16,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import {
@@ -385,7 +385,7 @@ export function SwitchPlanModal({
 								className="flex size-6 items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
 								aria-label="Close"
 							>
-								<Icon name="cross" className="h-4 w-4" />
+								<X className="h-4 w-4" strokeWidth={2.25} />
 							</button>
 						</Modal.Close>
 					</div>
