@@ -15,8 +15,17 @@ import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import {
+	type ApiKeyAccessValue,
+	accessError,
+	accessToScope,
+	FULL_ACCESS,
+} from "../../access/api-key-access-field";
 import { useInvalidateApiKeys } from "../../hooks/use-api-keys-query";
 import type { ApiKeyWithSecret } from "../../types";
 import { type ApiKeyFormValues, FormStep } from "./form-step";
@@ -52,6 +61,8 @@ export function CreateApiKeyModal({
 		null,
 	);
 	const [copied, setCopied] = useState(false);
+	const [access, setAccess] = useState<ApiKeyAccessValue>(FULL_ACCESS);
+	const [showAccessError, setShowAccessError] = useState(false);
 
 	const form = useForm<ApiKeyFormValues>({
 		resolver: valibotResolver(apiKeySchema) as Resolver<ApiKeyFormValues>,
@@ -87,16 +98,22 @@ export function CreateApiKeyModal({
 
 	const onSubmit = async (data: ApiKeyFormValues) => {
 		if (!activeOrganization?.id || isLoading) return;
+		if (accessError(access)) {
+			setShowAccessError(true);
+			return;
+		}
 		try {
 			setIsLoading(true);
 			const response = await axios.post<ApiKeyWithSecret>(
 				"/api/api-key/v1/",
-				{ name: data.name },
+				{ name: data.name, scope: accessToScope(access) },
 				{ withCredentials: true },
 			);
 			await invalidate();
 			setCreatedApiKey(response.data);
 			form.reset();
+			setAccess(FULL_ACCESS);
+			setShowAccessError(false);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to create API key"
@@ -113,6 +130,8 @@ export function CreateApiKeyModal({
 				setCreatedApiKey(null);
 				setCopied(false);
 				form.reset();
+				setAccess(FULL_ACCESS);
+				setShowAccessError(false);
 			}, 300);
 			return () => clearTimeout(timer);
 		}
@@ -180,7 +199,13 @@ export function CreateApiKeyModal({
 												if (!isLoading) void form.handleSubmit(onSubmit)();
 											}}
 										>
-											<FormStep form={form} isLoading={isLoading} />
+											<FormStep
+												form={form}
+												isLoading={isLoading}
+												access={access}
+												onAccessChange={setAccess}
+												showAccessError={showAccessError}
+											/>
 										</form>
 									</motion.div>
 								) : (

@@ -15,7 +15,10 @@ import {
 	ActionBarSelection,
 	ActionBarSeparator,
 } from "#/components/data-table/action-bar";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../types";
 

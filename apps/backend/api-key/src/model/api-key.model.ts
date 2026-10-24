@@ -5,6 +5,36 @@ export namespace ApiKeyModel {
 		description: "API Key identifier",
 	});
 
+	export const apiKeyScopeInput = t.Array(
+		t.Object({
+			domainId: t.String({
+				description: "Domain the key may send from / open mailboxes on",
+			}),
+			email: t.Optional(
+				t.Union([t.String({ maxLength: 255 }), t.Null()], {
+					description:
+						"One exact address on that domain; omit or null to allow every address on it",
+				}),
+			),
+		}),
+		{
+			maxItems: 100,
+			description:
+				"Restrict the key to these domains or addresses (sending and IMAP). Empty or omitted means full access.",
+		},
+	);
+
+	export const apiKeyScopeResponse = t.Array(
+		t.Object({
+			domainId: t.String(),
+			domain: t.String({ description: "Domain name" }),
+			email: t.Union([t.String(), t.Null()], {
+				description: "Exact address, or null for every address on the domain",
+			}),
+		}),
+		{ description: "Access restrictions; empty means full access" },
+	);
+
 	export const createApiKeyBody = t.Object(
 		{
 			name: t.String({
@@ -12,6 +42,7 @@ export namespace ApiKeyModel {
 				maxLength: 255,
 				description: "Name for the API key",
 			}),
+			scope: t.Optional(apiKeyScopeInput),
 		},
 		{
 			examples: [
@@ -26,11 +57,14 @@ export namespace ApiKeyModel {
 
 	export const updateApiKeyBody = t.Object(
 		{
-			name: t.String({
-				minLength: 1,
-				maxLength: 255,
-				description: "Name for the API key",
-			}),
+			name: t.Optional(
+				t.String({
+					minLength: 1,
+					maxLength: 255,
+					description: "Name for the API key",
+				}),
+			),
+			scope: t.Optional(apiKeyScopeInput),
 		},
 		{
 			examples: [
@@ -91,6 +125,7 @@ export namespace ApiKeyModel {
 			permissions: t.Union([t.String(), t.Null()], {
 				description: "Comma-separated permissions",
 			}),
+			scope: apiKeyScopeResponse,
 			metadata: t.Union([t.String(), t.Null()], {
 				description: "JSON metadata string",
 			}),
@@ -144,6 +179,7 @@ export namespace ApiKeyModel {
 			permissions: t.Union([t.String(), t.Null()], {
 				description: "Comma-separated permissions",
 			}),
+			scope: apiKeyScopeResponse,
 			object: t.Literal("api_key"),
 			event: t.String({ description: "Event ID for the operation" }),
 		},

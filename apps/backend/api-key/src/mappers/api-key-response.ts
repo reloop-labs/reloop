@@ -1,4 +1,5 @@
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import type { ApiKeyScopeView } from "@reloop/api-key/utils/api-key-scope";
 
 /** Row shape needed to build the public API Key DTO (optional creator relation). */
 export type ApiKeyResponseSource = {
@@ -33,6 +34,7 @@ export type ApiKeyResponseSource = {
 export function toApiKeyResponse(
 	row: ApiKeyResponseSource,
 	eventId: string,
+	scope: ApiKeyScopeView[],
 ): ApiKeyTypes.ApiKeyResponse {
 	return {
 		id: row.id,
@@ -54,6 +56,7 @@ export function toApiKeyResponse(
 		updatedAt: row.updatedAt.toISOString(),
 		permissions: row.permissions,
 		metadata: row.metadata,
+		scope,
 		createdBy: row.user
 			? {
 					id: row.user.id,
@@ -75,6 +78,7 @@ export function toApiKeyWithKeyResponse(
 	>,
 	plaintextKey: string,
 	eventId: string,
+	scope: ApiKeyScopeView[],
 ): ApiKeyTypes.ApiKeyWithKeyResponse {
 	return {
 		id: row.id,
@@ -84,6 +88,7 @@ export function toApiKeyWithKeyResponse(
 		createdAt: row.createdAt.toISOString(),
 		updatedAt: row.updatedAt.toISOString(),
 		permissions: row.permissions,
+		scope,
 		object: "api_key" as const,
 		event: eventId,
 	};

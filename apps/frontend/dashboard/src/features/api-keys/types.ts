@@ -1,3 +1,11 @@
+/** One access restriction; a key with none has full access. */
+export type ApiKeyScopeEntry = {
+	domainId: string;
+	domain: string;
+	/** Exact address, or null for every address on the domain. */
+	email: string | null;
+};
+
 export type ApiKeyData = {
 	id: string;
 	name: string | null;
@@ -9,6 +17,8 @@ export type ApiKeyData = {
 	expiresAt: string | null;
 	createdAt: string;
 	lastRequest: string | null;
+	/** Empty (or missing on older responses) means full access. */
+	scope?: ApiKeyScopeEntry[];
 	createdBy?: {
 		id: string;
 		name: string | null;
@@ -35,6 +45,7 @@ export type ApiKeyWithSecret = {
 	id: string;
 	name: string | null;
 	key: string;
+	scope?: ApiKeyScopeEntry[];
 };
 
 /** Full key payload from GET /api/api-key/v1/:id */

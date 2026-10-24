@@ -1,5 +1,6 @@
 import { toApiKeyResponse } from "@reloop/api-key/mappers/api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import { loadScopeViews } from "@reloop/api-key/utils/api-key-scope";
 import {
 	parseApiKeySort,
 	toApiKeyOrderBy,
@@ -55,10 +56,15 @@ export async function listApiKeysController({
 	]);
 	const total = totalResult[0]?.count || 0;
 	log.info("API keys retrieved");
+	const scopes = await loadScopeViews(result.map((apiKey) => apiKey.id));
 
 	return {
 		apiKeys: result.map((apiKey) =>
-			toApiKeyResponse(apiKey, API_KEY_LIST_WEBHOOK_EVENT.id),
+			toApiKeyResponse(
+				apiKey,
+				API_KEY_LIST_WEBHOOK_EVENT.id,
+				scopes.get(apiKey.id) ?? [],
+			),
 		),
 		total,
 		page,

@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
+import { assertCanManageApiKeys } from "@reloop/api-key/utils/api-key-scope";
 import { auditLogHook } from "@reloop/api-key/utils/audit-log";
 import { createApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 import { Elysia } from "elysia";
@@ -11,12 +12,21 @@ export const createApiKeyRoute = new Elysia()
 	.use(rateLimitPlugin({ max: 10, windowSeconds: 60, namespace: "create" }))
 	.post(
 		"/",
-		async ({ body: { name }, organizationId, userId, set }) => {
+		async ({
+			body: { name, scope },
+			organizationId,
+			userId,
+			authType,
+			apiKeyId,
+			set,
+		}) => {
+			await assertCanManageApiKeys({ authType, apiKeyId });
 			set.status = 201;
 			return await createApiKeyController({
 				organizationId,
 				userId,
 				name,
+				scope,
 			});
 		},
 		{

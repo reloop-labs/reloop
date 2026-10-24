@@ -8,6 +8,7 @@ import * as React from "react";
 import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import { ApiKeyAccessBadge } from "../access/api-key-access-badge";
 import type { ApiKeyData } from "../types";
 
 export type ApiKeyTableMeta = {
@@ -146,6 +147,7 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 					>
 						{displayName}
 					</Link>
+					<ApiKeyAccessBadge scope={apiKey.scope} />
 					{isEditing && (
 						<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
 							Editing

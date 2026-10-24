@@ -1,6 +1,7 @@
 import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
 import { toApiKeyResponse } from "@reloop/api-key/mappers/api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import { loadScopeView } from "@reloop/api-key/utils/api-key-scope";
 import { controllerLog } from "@reloop/api-key/utils/controller-log";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -32,5 +33,9 @@ export async function getApiKeyController({
 	}
 
 	log.info("API key retrieved successfully");
-	return toApiKeyResponse(result, API_KEY_GET_WEBHOOK_EVENT.id);
+	return toApiKeyResponse(
+		result,
+		API_KEY_GET_WEBHOOK_EVENT.id,
+		await loadScopeView(result.id),
+	);
 }

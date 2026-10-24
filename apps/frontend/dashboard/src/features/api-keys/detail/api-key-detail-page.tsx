@@ -7,6 +7,10 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
+import {
+	ApiKeyAccessSection,
+	EditApiKeyAccessModal,
+} from "../access/api-key-access-section";
 import { useApiKeyDetailQuery } from "../hooks/use-api-key-detail-query";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
@@ -287,6 +291,8 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 
 				<ApiKeySummary apiKey={data} isLoading={isLoading} />
 
+				<ApiKeyAccessSection apiKey={data} isLoading={isLoading} />
+
 				<section>
 					<ActivitySection actorId={data?.id} />
 				</section>
@@ -300,6 +306,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 			/>
 			<RotateApiKeyModal apiKeys={apiKeysForModal} />
 			<EditApiKeyModal apiKeys={apiKeysForModal} />
+			<EditApiKeyAccessModal apiKey={data} />
 		</>
 	);
 }

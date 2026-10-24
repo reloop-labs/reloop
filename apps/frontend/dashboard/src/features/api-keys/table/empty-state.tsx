@@ -7,7 +7,10 @@ import {
 	parseAsString,
 	useQueryState,
 } from "nuqs";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 export function EmptyState({ onCreateApiKey }: { onCreateApiKey: () => void }) {
 	const [statusFilter, setStatusFilter] = useQueryState(
@@ -77,9 +80,7 @@ export function EmptyState({ onCreateApiKey }: { onCreateApiKey: () => void }) {
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create API key
-					<ActionKbd className={actionKbdOnSolidClassName}>
-						C
-					</ActionKbd>
+					<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 				</FancyButton.Root>
 			)}
 		</div>

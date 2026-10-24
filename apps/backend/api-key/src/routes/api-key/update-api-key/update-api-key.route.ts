@@ -1,6 +1,7 @@
 import { authMiddleware } from "@reloop/api-key/middleware/auth";
 import { rateLimitPlugin } from "@reloop/api-key/middleware/rate-limit";
 import { ApiKeyModel } from "@reloop/api-key/model/api-key.model";
+import { assertCanManageApiKeys } from "@reloop/api-key/utils/api-key-scope";
 import { auditLogHook } from "@reloop/api-key/utils/audit-log";
 import { updateApiKeyXCodeSamples } from "@reloop/code-samples/api-key";
 import { Elysia, t } from "elysia";
@@ -11,11 +12,19 @@ export const updateApiKeyRoute = new Elysia()
 	.use(rateLimitPlugin({ max: 30, windowSeconds: 60, namespace: "update" }))
 	.patch(
 		"/:api_key_id",
-		async ({ params: { api_key_id }, body: { name }, organizationId }) => {
+		async ({
+			params: { api_key_id },
+			body: { name, scope },
+			organizationId,
+			authType,
+			apiKeyId,
+		}) => {
+			await assertCanManageApiKeys({ authType, apiKeyId });
 			return await updateApiKeyController({
 				apiKeyId: api_key_id,
 				organizationId,
 				name,
+				scope,
 			});
 		},
 		{

@@ -8,7 +8,10 @@ import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ApiKeyAvatar } from "#/features/api-keys/components/api-key-avatar";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyDetail } from "../types";
@@ -186,7 +189,12 @@ export function ApiKeyHeader({
 							>
 								<Icon name="rotate-cw" className="h-3.5 w-3.5" />
 								<span>Rotate key</span>
-								<ActionKbd className={cn(actionKbdOnSolidClassName, "ml-0.5 w-auto min-w-4 px-1")}>
+								<ActionKbd
+									className={cn(
+										actionKbdOnSolidClassName,
+										"ml-0.5 w-auto min-w-4 px-1",
+									)}
+								>
 									C
 								</ActionKbd>
 							</FancyButton.Root>

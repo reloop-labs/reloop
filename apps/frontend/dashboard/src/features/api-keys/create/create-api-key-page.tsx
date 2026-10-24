@@ -27,6 +27,13 @@ import * as v from "valibot";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { bunIcon } from "#/features/onboarding/step4/bun-icon";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
+import {
+	type ApiKeyAccessValue,
+	ApiKeyAccessField,
+	FULL_ACCESS,
+	accessError,
+	accessToScope,
+} from "../access/api-key-access-field";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyWithSecret } from "../types";
 
@@ -110,6 +117,8 @@ export function CreateApiKeyPage() {
 	// Environment selection state
 	const [selectedLang, setSelectedLang] = useState<LanguageId>("nodejs");
 	const [selectedPkg, setSelectedPkg] = useState<string>("npm");
+	const [access, setAccess] = useState<ApiKeyAccessValue>(FULL_ACCESS);
+	const [showAccessError, setShowAccessError] = useState(false);
 
 	const {
 		register,
@@ -130,6 +139,8 @@ export function CreateApiKeyPage() {
 		setIsLoading(false);
 		setSelectedLang("nodejs");
 		setSelectedPkg("npm");
+		setAccess(FULL_ACCESS);
+		setShowAccessError(false);
 		reset({ name: "" });
 
 		return () => {
@@ -170,11 +181,15 @@ export function CreateApiKeyPage() {
 
 	const onSubmit = async (data: CreateApiKeyFormValues) => {
 		if (!activeOrganization?.id) return;
+		if (accessError(access)) {
+			setShowAccessError(true);
+			return;
+		}
 		try {
 			setIsLoading(true);
 			const response = await axios.post<ApiKeyWithSecret>(
 				"/api/api-key/v1/",
-				{ name: data.name },
+				{ name: data.name, scope: accessToScope(access) },
 				{ withCredentials: true },
 			);
 			await invalidate();
@@ -321,6 +336,15 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 								{errors.name.message}
 							</p>
 						)}
+					</div>
+
+					<div className="pt-5">
+						<ApiKeyAccessField
+							value={access}
+							onChange={setAccess}
+							disabled={isLoading}
+							showError={showAccessError}
+						/>
 					</div>
 
 					{/* Action Buttons */}
