@@ -45,6 +45,7 @@ export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 			messageId: t.String(),
 			providerMessageId: t.Optional(t.String()),
 			fromEmail: t.String(),
+			headerFromEmail: t.Optional(t.String()),
 			toEmails: t.Array(t.String()),
 			subject: t.String(),
 			textBody: t.Optional(t.String()),

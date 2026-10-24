@@ -155,6 +155,13 @@ export const MailErrors = {
 			why: `The address '${from}' is not a valid email format`,
 			fix: "Provide a valid email address in the 'from' field (e.g., user@example.com)",
 		}),
+	apiKeyAddressNotAllowed: (address: string) =>
+		createError({
+			status: 403,
+			message: "API key is not allowed to send from this address",
+			why: `This API key is restricted to specific domains or addresses, and ${address} is not one of them`,
+			fix: "Send from an address the key allows, or use a key with access to this domain or address",
+		}),
 	templateSlugNotFound: (slug: string) =>
 		createError({
 			status: 404,

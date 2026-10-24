@@ -219,6 +219,13 @@ export const KumoMtaErrors = {
 			why: `This send needs ${required} email${required === 1 ? "" : "s"}, but you have already sent ${used} of ${limit} today`,
 			fix: "Wait until the daily limit resets, or upgrade your plan to remove the daily cap",
 		}),
+	apiKeyAddressNotAllowed: (address: string) =>
+		createError({
+			status: 403,
+			message: `API key is not allowed to send from ${address}`,
+			why: `This API key is restricted to specific domains or addresses, and ${address} is not one of them`,
+			fix: "Send from an address the key allows, or use a key with access to this domain or address",
+		}),
 	abuseBlocked: (reasons: string[]) =>
 		createError({
 			status: 403,

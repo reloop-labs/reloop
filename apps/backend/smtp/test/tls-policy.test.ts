@@ -114,10 +114,21 @@ describe("policy sources stay wired", () => {
 		);
 	});
 
-	test("smtp.lua maps 403 abuse rejections from log-incoming", () => {
+	test("smtp.lua maps 403 rejections from log-incoming to a permanent 550 with the reason", () => {
 		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
-		expect(smtpLua).toContain("code == 403");
-		expect(smtpLua).toContain("5.7.1 Message rejected");
+		const block = smtpLua.slice(
+			smtpLua.indexOf("code == 403"),
+			smtpLua.indexOf("code == 404"),
+		);
+		// Abuse, suspended org, or an API key not allowed to use the sender.
+		expect(block).toContain('local reason = "Message rejected"');
+		expect(block).toContain("parsed.message");
+		expect(block).toContain('kumo.reject(550, "5.7.1 " .. reason)');
+	});
+
+	test("smtp.lua sends the From header address to log-incoming for API key scope checks", () => {
+		const smtpLua = readFileSync(join(policyDir, "smtp.lua"), "utf8");
+		expect(smtpLua).toContain("headerFromEmail = header_from");
 	});
 
 	test("smtp.lua permanently rejects quota exceeded from log-incoming", () => {

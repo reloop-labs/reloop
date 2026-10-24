@@ -1,5 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { extractRecipientDomain, findUndeliverableRecipient } from "@reloop/db";
+import { apiKeyAllowsAddress } from "@reloop/db/api-key-scope";
 import { db } from "@reloop/db/client";
 import { checkDomainAgeDailyCap } from "@reloop/db/domain-age-cap";
 import { ensureSendingDomainVerified } from "@reloop/db/ensure-sending-domain-verified";
@@ -28,6 +29,8 @@ export type LogIncomingParams = {
 	messageId: string;
 	providerMessageId?: string;
 	fromEmail: string;
+	/** Address in the From header; may differ from the envelope sender on the same domain. */
+	headerFromEmail?: string;
 	toEmails: string[];
 	subject: string;
 	textBody?: string;
@@ -60,6 +63,7 @@ export async function logIncomingController({
 	let textBody = body.textBody || "";
 	let htmlBody = body.htmlBody || "";
 	let subject = body.subject || "No Subject";
+	let parsedFromEmail: string | undefined;
 
 	if (body.rawMessage) {
 		log.info(
@@ -73,10 +77,29 @@ export async function logIncomingController({
 			textBody = parsed.text || "";
 			htmlBody = (parsed.html as string) || "";
 			subject = parsed.subject || subject;
+			parsedFromEmail = parsed.from?.value[0]?.address;
 		} catch (parseError) {
 			log.error(
 				`[LOG-INCOMING] mailparser error: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
 			);
+		}
+	}
+
+	// A key restricted to certain domains/addresses (api_key_scope) may only
+	// send from those. Check the envelope sender and the From header: the SMTP
+	// policy only requires them to share a domain, not an address. Runs before
+	// any side effects (log row, credits).
+	if (apikeyId) {
+		const senders = new Set(
+			[body.fromEmail, body.headerFromEmail ?? parsedFromEmail]
+				.map((address) => bareAddress(address))
+				.filter((address): address is string => !!address),
+		);
+		for (const address of senders) {
+			if (!(await apiKeyAllowsAddress(apikeyId, address))) {
+				log.warn(`[LOG-INCOMING] API key scope refused sender ${address}`);
+				throw KumoMtaErrors.apiKeyAddressNotAllowed(address);
+			}
 		}
 	}
 
@@ -402,4 +425,12 @@ export async function logIncomingController({
 		tls: domainRecord.tls ?? "opportunistic",
 		plainText,
 	};
+}
+
+/** Bare lowercase address from "<a@b.com>", "Name <a@b.com>" or "a@b.com". */
+function bareAddress(value: string | undefined): string | undefined {
+	if (!value) return undefined;
+	const angle = value.match(/<([^>]+)>/);
+	const address = (angle?.[1] ?? value).trim().toLowerCase();
+	return address.includes("@") ? address : undefined;
 }

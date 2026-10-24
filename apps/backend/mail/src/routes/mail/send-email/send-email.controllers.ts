@@ -23,6 +23,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import {
+	checkApiKeyScope_step1b,
 	checkDnsHealth_step3,
 	checkSuppressions_step2b,
 	createEmailLog_step4,
@@ -145,6 +146,15 @@ export async function sendEmailController({
 		to: rawBody.to,
 	});
 	log.info("server", "Initiating email send process");
+
+	// ── API key scope ─────────────────────────────────────────────────────
+	// A key restricted to certain domains/addresses (api_key_scope) may only
+	// send from those; checked before replays, guards or credits. Only the
+	// caller's own key counts: session/internal sends, and resends that merely
+	// inherit the original key id, are not scoped.
+	if (!useInternalInject && apiKeyId) {
+		await checkApiKeyScope_step1b({ apiKeyId, from: rawBody.from });
+	}
 
 	// ── Idempotency ───────────────────────────────────────────────────────
 	// Header Idempotency-Key wins, body idempotency_key is the fallback.

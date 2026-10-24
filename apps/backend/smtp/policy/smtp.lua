@@ -234,6 +234,7 @@ local function apply_reloop_logic(msg, api_key, source)
         messageId = message_id,
         providerMessageId = msg_id,
         fromEmail = from_email,
+        headerFromEmail = header_from,
         toEmails = to_emails,
         subject = subject,
         size = size,
@@ -320,8 +321,14 @@ local function apply_reloop_logic(msg, api_key, source)
       kumo.reject(552, "5.3.4 Message too large for your plan; reduce attachments or upgrade")
       return
     elseif code == 403 then
-      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Abuse policy")
-      kumo.reject(550, "5.7.1 Message rejected")
+      -- Abuse policy, suspended org, or an API key not allowed to use this sender.
+      local reason = "Message rejected"
+      local parsed_ok, parsed = pcall(kumo.serde.json_parse, body_text)
+      if parsed_ok and type(parsed) == "table" and parsed.message and tostring(parsed.message) ~= "" then
+        reason = tostring(parsed.message)
+      end
+      print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED (403): " .. reason)
+      kumo.reject(550, "5.7.1 " .. reason)
       return
     elseif code == 404 then
       print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Domain " .. domain .. " not found")
