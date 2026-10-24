@@ -11,6 +11,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ContactDetail } from "#/features/contacts/hooks/use-contacts-query";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { OverflowActionsMenu } from "#/features/dashboard/overflow-actions-menu";
 import { queryKeys } from "#/lib/query-keys";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { ContactStatusBadge } from "../components/contacts/contact-status-badge";
@@ -202,7 +203,7 @@ function ContactStatsRow({ email }: { email: string }) {
 			<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
 				Statistics
 			</h3>
-			<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+			<div className="grid grid-cols-3 gap-x-4 gap-y-6 sm:gap-x-8 sm:gap-y-8">
 				{rows.map((row) => (
 					<DetailItem key={row.label} icon={row.icon} label={row.label}>
 						{statsQuery.isPending ? (
@@ -250,7 +251,11 @@ function ContactActivityTabs({
 
 	return (
 		<TabMenuHorizontal.Root value={value}>
-			<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
+			{/* Phones: the tab strip bleeds to the screen edges */}
+			<TabMenuHorizontal.List
+				wrapperClassName="max-sm:-mx-4 sm:max-md:-mx-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+				className="relative h-11 w-max min-w-full gap-0 border-b! py-0 max-md:px-3"
+			>
 				{activityTabItems.map(
 					({ value: itemValue, title, iconName }, index) => (
 						<TabMenuHorizontal.Trigger
@@ -500,7 +505,29 @@ export const ContactHeader = ({
 						)}
 					</div>
 
-					<div className="flex shrink-0 items-center gap-2">
+					{!isLoading && contact ? (
+						// Phones: Edit / Delete collapse into a menu so the name keeps its width
+						<OverflowActionsMenu
+							label="Contact actions"
+							className="sm:hidden"
+							actions={[
+								{
+									id: "edit",
+									label: "Edit contact",
+									icon: "pencil",
+									onSelect: () => setIsEditModalOpen(true),
+								},
+								{
+									id: "delete",
+									label: "Delete contact",
+									icon: "trash",
+									isDanger: true,
+									onSelect: () => setIsDeleteModalOpen(true),
+								},
+							]}
+						/>
+					) : null}
+					<div className="flex shrink-0 items-center gap-2 max-sm:hidden">
 						{isLoading ? (
 							<>
 								<Skeleton className="h-9 w-28 rounded-lg" />
@@ -538,12 +565,12 @@ export const ContactHeader = ({
 				</div>
 
 				{!isLoading && isSuppressed && (
-					<div className="mt-6 flex items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3">
+					<div className="mt-6 flex flex-wrap items-start gap-3 rounded-2xl border border-error-base/30 bg-error-base/10 px-4 py-3 sm:flex-nowrap">
 						<Icon
 							name="alert-octagon"
 							className="mt-0.5 h-5 w-5 flex-shrink-0 text-error-base"
 						/>
-						<div className="flex flex-1 flex-col gap-0.5">
+						<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 							<h3 className="font-medium text-error-base text-sm">
 								Contact Suppressed
 								{contact?.suppressedAt && (
@@ -560,7 +587,7 @@ export const ContactHeader = ({
 							variant="neutral"
 							mode="stroke"
 							size="xsmall"
-							className="shrink-0"
+							className="shrink-0 max-sm:ml-8"
 							onClick={() => setIsUnsuppressOpen(true)}
 						>
 							Remove suppression
@@ -579,7 +606,7 @@ export const ContactHeader = ({
 							Properties
 						</h3>
 						{isLoading ? (
-							<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+							<div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-8">
 								{[0, 1, 2, 3, 4, 5].map((i) => (
 									<div
 										key={`property-skeleton-${i}`}
@@ -591,7 +618,7 @@ export const ContactHeader = ({
 								))}
 							</div>
 						) : (
-							<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+							<div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-8">
 								<PropertyField label="First name">
 									{!isEmptyPropertyValue(contact?.firstName) ? (
 										contact?.firstName
@@ -623,7 +650,7 @@ export const ContactHeader = ({
 					</section>
 
 					{isLoading ? (
-						<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+						<div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-8">
 							{[0, 1, 2, 3, 4].map((i) => (
 								<div
 									key={`detail-skeleton-${i}`}
@@ -636,7 +663,7 @@ export const ContactHeader = ({
 						</div>
 					) : (
 						contact && (
-							<div className="grid grid-cols-3 gap-x-8 gap-y-8">
+							<div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-8">
 								<DetailItem icon="calendar" label="Created">
 									{contact.createdAt ? (
 										<span className="font-medium text-paragraph-sm text-text-strong-950">
@@ -648,7 +675,7 @@ export const ContactHeader = ({
 								</DetailItem>
 								<DetailItem icon="hash" label="ID">
 									<button
-										className="group/copy w-[150px] cursor-pointer text-left"
+										className="group/copy w-full max-w-[150px] cursor-pointer text-left"
 										type="button"
 										onClick={handleCopyId}
 										title="Copy contact ID"
