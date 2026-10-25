@@ -15,6 +15,11 @@ import {
 	MAX_EXPORT_ROWS,
 	toCsvLine,
 } from "@be/contacts/routes/contact/export-contacts/export-query";
+import {
+	exportStatusPath,
+	updateExportRecord,
+	writeExportRecord,
+} from "@be/contacts/routes/contact/export-contacts/export-record";
 import { signExportDownloadToken } from "@be/contacts/routes/contact/export-contacts/export-token.utils";
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { redis } from "@be/contacts/utils/loader";
@@ -28,15 +33,8 @@ import { useLogger } from "evlog/elysia";
 
 /** How long an emailed-export generation may hold the per-org lock. */
 const EMAIL_EXPORT_LOCK_TTL_SECONDS = 1800;
-/** Redis record TTL for the export job (matches 7-day link validity). */
-const EXPORT_RECORD_TTL_SECONDS = 7 * 24 * 60 * 60;
-
 function emailLockKey(organizationId: string): string {
 	return `export:email:${organizationId}`;
-}
-
-function exportRecordKey(exportId: string): string {
-	return `export:email:record:${exportId}`;
 }
 
 async function resolveRecipientEmail(userId: string): Promise<string> {
@@ -66,9 +64,9 @@ async function processExportEmail(args: {
 }): Promise<void> {
 	const { exportId, organizationId, recipient, query, total } = args;
 	const lockKey = emailLockKey(organizationId);
-	const recordKey = exportRecordKey(exportId);
 
 	try {
+		await updateExportRecord(exportId, { status: "processing" });
 		const baseConditions = buildExportConditions(organizationId, query);
 		const parts: string[] = [EXPORT_CSV_HEADER];
 
@@ -126,11 +124,11 @@ async function processExportEmail(args: {
 			expiresAt: new Date(expiresAt).toISOString(),
 		});
 
-		await redis.set(
-			recordKey,
-			{ status: "ready", totalRows: exported, recipient },
-			EXPORT_RECORD_TTL_SECONDS,
-		);
+		await updateExportRecord(exportId, {
+			status: "ready",
+			totalRows: exported,
+			completedAt: new Date().toISOString(),
+		});
 		log.info({
 			message: "Contact export emailed",
 			exportId,
@@ -144,15 +142,10 @@ async function processExportEmail(args: {
 			exportId,
 			organizationId,
 		});
-		try {
-			await redis.set(
-				recordKey,
-				{ status: "failed" },
-				EXPORT_RECORD_TTL_SECONDS,
-			);
-		} catch {
-			// best-effort
-		}
+		await updateExportRecord(exportId, {
+			status: "failed",
+			completedAt: new Date().toISOString(),
+		});
 	} finally {
 		try {
 			await redis.delete(lockKey);
@@ -170,7 +163,7 @@ export async function requestExportEmailController({
 	organizationId: string;
 	userId: string;
 	query: ContactTypes.ContactExportQuery;
-}): Promise<{ exportId: string; totalRows: number; recipient: string }> {
+}): Promise<ContactTypes.ContactExportEmailResponse> {
 	const requestLog = useLogger();
 	requestLog.info("Export email requested", {
 		...query,
@@ -217,11 +210,13 @@ export async function requestExportEmailController({
 		await redis.set(lockKey, Date.now(), EMAIL_EXPORT_LOCK_TTL_SECONDS);
 
 		const exportId = `exp_${createId()}`;
-		await redis.set(
-			exportRecordKey(exportId),
-			{ status: "queued", totalRows: total, recipient },
-			EXPORT_RECORD_TTL_SECONDS,
-		);
+		await writeExportRecord(exportId, {
+			organizationId,
+			status: "queued",
+			totalRows: total,
+			recipient,
+			createdAt: new Date().toISOString(),
+		});
 
 		// Fire-and-forget: the request returns 202 while CSV generation,
 		// S3 upload, and the email send happen in the background.
@@ -239,7 +234,13 @@ export async function requestExportEmailController({
 			});
 		});
 
-		return { exportId, totalRows: total, recipient };
+		return {
+			exportId,
+			status: "queued",
+			statusUrl: exportStatusPath(exportId),
+			totalRows: total,
+			recipient,
+		};
 	} catch (error) {
 		if (isAppError(error)) {
 			throw error;

@@ -7,6 +7,7 @@ import { deleteContactRoute } from "./delete-contact/delete-contact.route";
 import { exportContactsRoute } from "./export-contacts/export-contacts.route";
 import { exportDownloadRoute } from "./export-contacts/export-download.route";
 import { exportEmailRoute } from "./export-contacts/export-email.route";
+import { exportStatusRoute } from "./export-contacts/export-status.route";
 import { getContactRoute } from "./get-contact/get-contact.route";
 import { listContactsRoute } from "./list-contacts/list-contacts.route";
 import { removeContactFromGroupRoute } from "./remove-contact-from-group/remove-contact-from-group.route";
@@ -28,6 +29,7 @@ function withContactRoutes<const Prefix extends string>(app: Elysia<Prefix>) {
 		.use(exportContactsRoute)
 		.use(exportEmailRoute)
 		.use(exportDownloadRoute)
+		.use(exportStatusRoute)
 		.use(subscriptionActivityRoute)
 		.use(updateContactRoute)
 		.use(deleteContactRoute)

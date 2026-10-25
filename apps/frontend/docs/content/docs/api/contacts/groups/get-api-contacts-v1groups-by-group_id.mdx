@@ -13,7 +13,114 @@ _apiData:
   operationData: [{"path":"/api/contacts/v1/groups/{group_id}","method":"get"}]
   parameterList: [{"name":"group_id","type":"string","required":true,"description":"","location":"path"}]
   responseMap: {"200":{"description":"Response for status 200","schema":{"object":"contact_group","id":"grp_123456789","name":"Beta Testers","createdAt":"2026-03-27T10:00:00Z","updatedAt":"2026-03-27T10:00:00Z","createdBy":{"id":"usr_123","name":"Jane Doe","email":"jane@example.com","image":null}}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}},"404":{"description":"Response for status 404","schema":{"message":"Group not found","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}}}
-  codeSamples: [{"id":"node","lang":"javascript","label":"Node.js","source":"import { Reloop } from \"reloop-email\";\n\nconst reloop = new Reloop({ apiKey: \"rl_123456789\" });\n\nconst { group, groupError } = await reloop.contacts.groups.get(\"grp_123456789\");\n\nif (groupError) throw groupError;\n\nconsole.log(group.id, group.name);"},{"id":"curl","lang":"bash","label":"cURL","source":"curl \"https://reloop.sh/api/contacts/v1/groups/grp_123456789\" \\\n  -H \"x-api-key: rl_123456789\""},{"id":"python","lang":"python","label":"Python","source":"from reloop_email import Reloop\n\nreloop = Reloop(api_key=\"rl_123456789\")\n\nresult = reloop.contacts.groups.get(\"grp_123456789\")\n\nif result.group_error:\n    raise result.group_error\n\nprint(result.group[\"id\"], result.group[\"name\"])"},{"id":"php","lang":"php","label":"PHP","source":"<?php\n\nrequire 'vendor/autoload.php';\n\nuse Reloop\\Reloop;\n\n$reloop = Reloop::client('rl_123456789');\n\n$group = $reloop->contacts->groups->get('grp_123456789');\necho $group['id'] . ' ' . $group['name'] . PHP_EOL;"},{"id":"java","lang":"java","label":"Java","source":"import sh.reloop.ReloopClient;\n\nReloopClient reloop = new ReloopClient(\"rl_123456789\");\n\nvar group = reloop.contacts.groups.get(\"grp_123456789\");\nSystem.out.println(group.id + \" \" + group.name);"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using Reloop;\nusing Reloop.Models;\n\nvar reloop = new ReloopClient(\"rl_123456789\");\n\nawait reloop.Contacts.GetGroupAsync(\"grp_123456789\");"},{"id":"go","lang":"go","label":"Go","source":"import reloop \"github.com/reloop-labs/reloop-go\"\n\nclient, _ := reloop.NewClient(reloop.ClientOptions{\n    APIKey: \"rl_123456789\",\n})\n\ngroup, _ := client.Contacts.GetGroup(\"grp_123456789\")"},{"id":"rust","lang":"rust","label":"Rust","source":"use reloop::ReloopClient;\n#[tokio::main]\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let reloop = ReloopClient::new(\"rl_123456789\".to_string(), None);\n\n    reloop.contacts().get_group(\"grp_123456789\").await?;\n\n    Ok(())\n}"},{"id":"ruby","lang":"ruby","label":"Ruby","source":"require \"reloop\"\n\nreloop = Reloop::Client.new(api_key: \"rl_123456789\")\n\ngroup = reloop.contacts.get_group(\"grp_123456789\")"},{"id":"elixir","lang":"elixir","label":"Elixir","source":"client = Reloop.client(\"rl_123456789\")\n\n{:ok, group} = Reloop.Services.Contacts.get_group(client, \"grp_123456789\")"}]
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { group, groupError } = await reloop.contacts.groups.get("grp_123456789");
+        
+        if (groupError) throw groupError;
+        
+        console.log(group.id, group.name);
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl "https://reloop.sh/api/contacts/v1/groups/grp_123456789" \
+          -H "x-api-key: rl_123456789"
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        from reloop_email import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        result = reloop.contacts.groups.get("grp_123456789")
+        
+        if result.group_error:
+            raise result.group_error
+        
+        print(result.group["id"], result.group["name"])
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        <?php
+        
+        require 'vendor/autoload.php';
+        
+        use Reloop\Reloop;
+        
+        $reloop = Reloop::client('rl_123456789');
+        
+        $group = $reloop->contacts->groups->get('grp_123456789');
+        echo $group['id'] . ' ' . $group['name'] . PHP_EOL;
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import sh.reloop.ReloopClient;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        var group = reloop.contacts.groups.get("grp_123456789");
+        System.out.println(group.id + " " + group.name);
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using Reloop;
+        using Reloop.Models;
+        
+        var reloop = new ReloopClient("rl_123456789");
+        
+        await reloop.Contacts.GetGroupAsync("grp_123456789");
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        import reloop "github.com/reloop-labs/reloop-go"
+        
+        client, _ := reloop.NewClient(reloop.ClientOptions{
+            APIKey: "rl_123456789",
+        })
+        
+        group, _ := client.Contacts.GetGroup("grp_123456789")
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reloop::ReloopClient;
+        #[tokio::main]
+        async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+        
+            reloop.contacts().get_group("grp_123456789").await?;
+        
+            Ok(())
+        }
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require "reloop"
+        
+        reloop = Reloop::Client.new(api_key: "rl_123456789")
+        
+        group = reloop.contacts.get_group("grp_123456789")
+    - id: elixir
+      lang: elixir
+      label: Elixir
+      source: |-
+        client = Reloop.client("rl_123456789")
+        
+        {:ok, group} = Reloop.Services.Contacts.get_group(client, "grp_123456789")
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

@@ -3,6 +3,7 @@ import { rateLimitPlugin } from "@be/contacts/middleware/rate-limit";
 import { ContactModel } from "@be/contacts/model/contact.model";
 import { Elysia } from "elysia";
 import { requestExportEmailController } from "./export-email.controllers";
+import { EXPORT_POLL_INTERVAL_SECONDS } from "./export-record";
 
 export const exportEmailRoute = new Elysia()
 	.use(authMiddleware)
@@ -15,12 +16,14 @@ export const exportEmailRoute = new Elysia()
 	)
 	.post(
 		"/export/email",
-		async ({ body, organizationId, userId, status }) => {
+		async ({ body, organizationId, userId, status, set }) => {
 			const result = await requestExportEmailController({
 				organizationId: organizationId as string,
 				userId: userId as string,
 				query: body,
 			});
+			set.headers.location = result.statusUrl;
+			set.headers["retry-after"] = String(EXPORT_POLL_INTERVAL_SECONDS);
 			return status(202, result);
 		},
 		{
@@ -34,7 +37,7 @@ export const exportEmailRoute = new Elysia()
 				tags: ["Contact"],
 				summary: "Email Contacts Export",
 				description:
-					"Queues a CSV export of the filtered contacts and emails a 7-day signed download link to the requesting user's account email. Returns 202 immediately; generation, S3 upload, and delivery happen in the background. Rate-limited to 3 per hour per organization.",
+					"Queues a CSV export of the filtered contacts and emails a 7-day signed download link to the requesting user's account email. Returns 202 immediately with a `Location` header; generation, S3 upload, and delivery happen in the background. Poll `GET /api/contacts/v1/exports/{export_id}` (the `Location` URL) until `status` is `ready` or `failed`, waiting `Retry-After` seconds between polls. Rate-limited to 3 per hour per organization.",
 			},
 		},
 	);

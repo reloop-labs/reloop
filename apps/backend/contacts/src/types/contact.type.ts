@@ -16,6 +16,10 @@ export namespace ContactTypes {
 	export type ContactQuery = typeof ContactModel.contactQuery.static;
 	export type ContactExportQuery =
 		typeof ContactModel.contactExportQuery.static;
+	export type ContactExportEmailResponse =
+		typeof ContactModel.contactExportEmailResponse.static;
+	export type ContactExportJobResponse =
+		typeof ContactModel.contactExportJobResponse.static;
 
 	// Error Types
 	export type ContactNotFound = typeof ContactModel.contactNotFound.static;

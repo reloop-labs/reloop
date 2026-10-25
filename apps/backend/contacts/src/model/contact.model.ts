@@ -463,13 +463,68 @@ export namespace ContactModel {
 
 	export type ContactExportEmailBody = typeof contactExportEmailBody.static;
 
+	const exportJobStatus = t.Union(
+		[
+			t.Literal("queued"),
+			t.Literal("processing"),
+			t.Literal("ready"),
+			t.Literal("failed"),
+		],
+		{
+			description:
+				"`queued` and `processing` are in progress; `ready` means the download link was emailed; `failed` means it was not.",
+		},
+	);
+
 	export const contactExportEmailResponse = t.Object({
 		exportId: t.String({ description: "Background export job identifier" }),
+		status: exportJobStatus,
+		statusUrl: t.String({
+			description:
+				"Poll this URL (also sent as the `Location` header) for the job's status.",
+		}),
 		totalRows: t.Number({ description: "Contacts matched for the export" }),
 		recipient: t.String({
 			description: "Account email the download link will be sent to",
 		}),
 	});
+
+	export const contactExportJobParams = t.Object({
+		export_id: t.String({
+			description: "Export job ID returned by Email Contacts Export",
+		}),
+	});
+
+	export const contactExportJobResponse = t.Object(
+		{
+			object: t.Literal("contact_export", { default: "contact_export" }),
+			id: t.String({ description: "Export job ID" }),
+			status: exportJobStatus,
+			totalRows: t.Number({
+				description: "Contacts matched (or exported, once ready)",
+			}),
+			recipient: t.String({
+				description: "Account email the download link is sent to",
+			}),
+			createdAt: t.String({ format: "date-time" }),
+			completedAt: t.Union([t.String({ format: "date-time" }), t.Null()], {
+				description: "When the job finished; null while it runs",
+			}),
+		},
+		{
+			examples: [
+				{
+					object: "contact_export",
+					id: "exp_abc123",
+					status: "ready",
+					totalRows: 1520,
+					recipient: "owner@example.com",
+					createdAt: "2026-10-25T10:00:00.000Z",
+					completedAt: "2026-10-25T10:00:12.000Z",
+				},
+			],
+		},
+	);
 
 	export type ContactExportEmailResponse =
 		typeof contactExportEmailResponse.static;
