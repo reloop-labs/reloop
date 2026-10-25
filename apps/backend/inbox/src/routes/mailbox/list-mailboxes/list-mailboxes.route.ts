@@ -1,3 +1,7 @@
+import {
+	listMailboxFilter,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { listMailboxesXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,8 +10,9 @@ import { getMailboxesController } from "./list-mailboxes.controllers";
 
 export const listMailboxesRoute = new Elysia().use(authMiddleware).get(
 	"/list",
-	async ({ organizationId }) => {
-		return getMailboxesController(organizationId);
+	async ({ organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		return getMailboxesController(organizationId, listMailboxFilter(scope));
 	},
 	{
 		auth: true,

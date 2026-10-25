@@ -1,3 +1,7 @@
+import {
+	assertMessageAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { getMessageAttachmentXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +10,9 @@ import { getMessageAttachmentController } from "./get-message-attachment.control
 
 export const getMessageAttachmentRoute = new Elysia().use(authMiddleware).get(
 	"/:id/attachments/:attachmentId",
-	async ({ params: { id, attachmentId }, organizationId }) => {
+	async ({ params: { id, attachmentId }, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		await assertMessageAllowed(scope, organizationId, id);
 		return getMessageAttachmentController(id, attachmentId, organizationId);
 	},
 	{

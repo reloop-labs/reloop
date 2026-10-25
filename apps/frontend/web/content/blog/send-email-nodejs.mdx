@@ -1,0 +1,387 @@
+---
+title: "How to Send Email in Node.js: Nodemailer vs API (2026)"
+description: "Send email from Node.js with Nodemailer over SMTP or with an email API. Complete TypeScript examples for HTML email, attachments, React Email templates, retries with idempotency keys and error handling."
+keywords:
+  - send email Node.js
+  - Node.js send email
+  - Nodemailer tutorial
+  - Nodemailer vs email API
+  - send email TypeScript
+  - Node.js email API
+  - send HTML email Node.js
+  - Node.js email attachments
+  - React Email Node.js
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [nodejs, typescript, nodemailer, smtp, sdk, react-email]
+readTime: 12 min read
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - password-reset-email-best-practices
+  - send-email-python
+  - send-email-nextjs-app-router
+  - smtp-ports-explained
+  - transactional-email-best-practices
+  - send-email-cloudflare-workers
+  - spf-dkim-dmarc-setup-guide
+---
+
+**There are two ways to send email from Node.js: over SMTP with [Nodemailer](https://nodemailer.com), or over HTTPS with an email API SDK.** Use Nodemailer when you need to stay provider-neutral or the target only speaks SMTP. Use an API when you control the code and want structured errors, safe retries and no MIME handling.
+
+This guide covers both with TypeScript examples you can copy, then goes through the parts that break in production: errors, retries, attachments and templates.
+
+---
+
+## Which approach should you use?
+
+| | Nodemailer (SMTP) | Email API (HTTPS) |
+|---|-------------------|-------------------|
+| **Transport** | SMTP on port 587 (STARTTLS) | HTTPS on port 443 |
+| **Blocked by firewalls or serverless?** | Sometimes | Almost never |
+| **Errors** | SMTP reply codes as strings | JSON with status, message and fix |
+| **Safe retries** | No, a retry can send twice | Yes, with an idempotency key |
+| **Edge runtimes and Workers** | No raw TCP sockets | Works anywhere `fetch` works |
+| **Switch providers** | Change host and password | Change the SDK |
+| **Templates, scheduling, tags** | Build them yourself | Built in |
+
+**Short version:** if you write the code, use the API. If you are configuring software that only accepts SMTP credentials, use Nodemailer or the software's SMTP settings.
+
+---
+
+## Prerequisites
+
+1. **Node.js 18 or later** (for native `fetch`)
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide). Sending from an unverified domain is the most common reason mail lands in spam.
+3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`.
+
+```env
+RELOOP_API_KEY=rl_your_api_key
+```
+
+Never commit this file. Load it with `node --env-file=.env` (Node 20.6+) or your framework's env loader.
+
+---
+
+## Method 1: Send email with an API (recommended)
+
+### Install
+
+```bash
+npm install reloop-email
+```
+
+### Create one shared client
+
+```typescript
+// lib/reloop.ts
+import { Reloop } from "reloop-email";
+
+if (!process.env.RELOOP_API_KEY) {
+  throw new Error("Missing RELOOP_API_KEY");
+}
+
+export const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+```
+
+### Send your first email
+
+```typescript
+// send.ts
+import { reloop } from "./lib/reloop";
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome to Acme",
+  html: "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+  text: "Welcome! Thanks for signing up.",
+});
+
+if (emailError) {
+  console.error(emailError.status, emailError.body.message, emailError.body.fix);
+  process.exit(1);
+}
+
+console.log("Sent", response.id);
+```
+
+Run it:
+
+```bash
+npx tsx --env-file=.env send.ts
+```
+
+The SDK **does not throw** on API or network errors. It returns either `response` or `emailError`, so you cannot forget a `try/catch`. Network failures come back with `status: 0`.
+
+### Send from an Express route
+
+```typescript
+import express from "express";
+import { reloop } from "./lib/reloop";
+
+const app = express();
+app.use(express.json());
+
+app.post("/api/contact", async (req, res) => {
+  const { email, message } = req.body as { email?: string; message?: string };
+
+  if (!email?.includes("@") || !message) {
+    return res.status(400).json({ error: "Email and message are required" });
+  }
+
+  const { response, emailError } = await reloop.mail.send({
+    from: "Acme Website <contact@mail.acme.com>",
+    to: "support@acme.com",
+    reply_to: email,
+    subject: `New message from ${email}`,
+    text: message,
+  });
+
+  if (emailError) {
+    return res.status(502).json({ error: "Could not send message" });
+  }
+
+  res.json({ id: response.id });
+});
+
+app.listen(3000);
+```
+
+Note the `reply_to`. Put the visitor's address there, **not** in `from`. You can only send from domains you have verified, and spoofing a visitor's domain fails [DMARC](/blog/gmail-yahoo-bulk-sender-requirements).
+
+---
+
+## Method 2: Send email with Nodemailer (SMTP)
+
+### Install
+
+```bash
+npm install nodemailer
+npm install -D @types/nodemailer
+```
+
+### Create a transporter and send
+
+```typescript
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.reloop.sh",
+  port: 587,
+  secure: false, // STARTTLS; use port 2587 if 587 is blocked
+  auth: {
+    user: "reloop",
+    pass: process.env.RELOOP_API_KEY,
+  },
+});
+
+const info = await transporter.sendMail({
+  from: '"Acme" <hello@mail.acme.com>',
+  to: "user@example.com",
+  subject: "Welcome to Acme",
+  html: "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+  text: "Welcome! Thanks for signing up.",
+});
+
+console.log("Sent", info.messageId);
+```
+
+Create the transporter **once** and reuse it. Creating one per request opens a new TCP and TLS connection every time.
+
+### Verify the connection at startup
+
+```typescript
+await transporter.verify(); // throws if host, port or credentials are wrong
+```
+
+If `verify()` hangs or times out, the port is blocked or `secure` does not match the port. The [SMTP ports guide](/blog/smtp-ports-explained) covers every error.
+
+### Can I use Gmail with Nodemailer?
+
+You can, with an [App Password](https://support.google.com/accounts/answer/185833), but not for a product. Personal Gmail accounts are limited to about 500 recipients a day, every message comes from `@gmail.com`, and bulk sending from a personal account gets it suspended. Use a provider with your own domain.
+
+---
+
+## Send HTML email with React Email
+
+Writing email HTML by hand means nested tables and inline styles. [React Email](https://react.email) lets you write components instead.
+
+```bash
+npm install @react-email/components @react-email/render react react-dom
+```
+
+```tsx
+// emails/welcome.tsx
+import { Body, Button, Container, Html, Text } from "@react-email/components";
+
+export function WelcomeEmail({ name }: { name: string }) {
+  return (
+    <Html>
+      <Body style={{ fontFamily: "sans-serif" }}>
+        <Container>
+          <Text>Hi {name}, welcome to Acme.</Text>
+          <Button href="https://acme.com/start">Get started</Button>
+        </Container>
+      </Body>
+    </Html>
+  );
+}
+```
+
+Pass the component as `react`. The Reloop SDK renders it to HTML for you:
+
+```tsx
+import { WelcomeEmail } from "./emails/welcome";
+
+await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome to Acme",
+  react: <WelcomeEmail name="Ada" />,
+});
+```
+
+With Nodemailer, render it yourself: `html: await render(<WelcomeEmail name="Ada" />)` from `@react-email/render`.
+
+If your team edits copy without deploying code, store templates in Reloop instead and send them by ID with `template: { id, variables }`. See [templates](/docs/learn/templates).
+
+---
+
+## Attachments
+
+Both methods accept base64 content.
+
+```typescript
+import { readFile } from "node:fs/promises";
+
+const pdf = await readFile("./invoice-1042.pdf");
+
+await reloop.mail.send({
+  from: "Acme Billing <billing@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your invoice #1042",
+  text: "Your invoice is attached.",
+  attachments: [
+    {
+      filename: "invoice-1042.pdf",
+      content: pdf.toString("base64"),
+      content_type: "application/pdf",
+    },
+  ],
+});
+```
+
+Keep attachments small. Large files hurt deliverability and many inboxes reject messages over 25 MB. For anything big, send a signed download link instead.
+
+---
+
+## Retries without duplicate emails
+
+A request times out. Did the email go out? With SMTP you cannot know, and retrying might send it twice. The API solves this with an [`Idempotency-Key` header](/docs/api/idempotency): retry with the same key and Reloop returns the original result instead of sending again.
+
+```typescript
+async function sendReceipt(orderId: string, to: string): Promise<void> {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const res = await fetch("https://reloop.sh/api/mail/v1/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.RELOOP_API_KEY ?? "",
+        "Idempotency-Key": `receipt-${orderId}`,
+      },
+      body: JSON.stringify({
+        from: "Acme <orders@mail.acme.com>",
+        to,
+        subject: `Receipt for order ${orderId}`,
+        text: "Thanks for your order.",
+      }),
+    }).catch(() => null);
+
+    if (res?.ok) return;
+    if (res && res.status < 500 && res.status !== 409 && res.status !== 429) {
+      throw new Error(`Send failed: ${res.status} ${await res.text()}`);
+    }
+    await new Promise((r) => setTimeout(r, 2 ** attempt * 250));
+  }
+  throw new Error(`Send failed after retries for order ${orderId}`);
+}
+```
+
+Base the key on the business event (`receipt-${orderId}`), not a random UUID per attempt. That way, even a retry from a different worker cannot double-send.
+
+**Retry** on network errors, `409` (same key still in flight), `429` (rate limited) and `5xx`. **Do not retry** other `4xx` errors. An invalid address or unverified domain will fail the same way every time.
+
+---
+
+## Do not send email inside the request
+
+Sending inline adds 100 to 500 ms to every signup and fails the request if the provider is slow. For anything beyond a contact form:
+
+1. Write the job to a queue (BullMQ, pg-boss, SQS) in the same transaction as the business change.
+2. Return the HTTP response.
+3. Send from a worker with the retry logic above.
+
+This is the same pattern Reloop uses internally. See [how we built our delivery queue with BullMQ](/blog/how-we-built-email-delivery-queue-bullmq).
+
+---
+
+## Production checklist
+
+- [ ] API key in an environment variable, never in client bundles or git
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `from` on your verified domain; user addresses go in `reply_to`
+- [ ] Both `html` and `text` bodies
+- [ ] One shared client or transporter, not one per request
+- [ ] Idempotency keys on anything retried
+- [ ] Sends happen in a background job, not the request path
+- [ ] [Webhooks](/features/webhooks) for bounces and complaints so you stop mailing bad addresses
+- [ ] Disposable addresses blocked at signup ([how](/blog/block-disposable-emails-at-signup))
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can Node.js send email without a library?">
+    Yes. Node has no built-in SMTP client, but you can call any email API with
+    the native fetch available since Node 18. Writing your own SMTP client on
+    top of net and tls is possible but not worth it.
+  </Accordion>
+
+  <Accordion title="Is Nodemailer free?">
+    Nodemailer is free and open source. It is only a client: you still need an
+    SMTP server to send through, such as an email provider, your own Postfix or
+    a Gmail account for personal use.
+  </Accordion>
+
+  <Accordion title="Why are my Node.js emails going to spam?">
+    Usually because the sending domain is not authenticated, or the From
+    domain does not match the domain that signed the message. Set up SPF, DKIM
+    and DMARC, send from your own domain, and include a plain-text body.
+  </Accordion>
+
+  <Accordion title="Can I send email from serverless functions or edge runtimes?">
+    Use the HTTP API. Edge runtimes and Cloudflare Workers do not allow raw SMTP
+    sockets, and some serverless platforms block outbound SMTP ports. See the
+    Cloudflare Workers guide for a fetch-only example.
+  </Accordion>
+
+  <Accordion title="How do I send to many recipients?">
+    Pass up to 50 addresses in to, cc or bcc for a single message. For
+    personalised bulk mail, send one message per recipient from a queue, or use
+    campaigns, which handle unsubscribe headers and throttling for you.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send your first email from Node.js"
+  description="TypeScript SDK, SMTP relay, React Email support and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

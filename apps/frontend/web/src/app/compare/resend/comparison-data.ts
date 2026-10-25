@@ -47,7 +47,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				label: "100,000 emails / mo plan",
 				icon: "mega-phone",
 				reloop: "$20 / mo",
-				competitor: "$90 / mo",
+				competitor: "$35 / mo",
 			},
 			{
 				label: "Overage rate (per 1k emails)",

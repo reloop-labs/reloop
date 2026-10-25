@@ -1,3 +1,7 @@
+import {
+	assertMailboxAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { getMailboxXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +10,9 @@ import { getMailboxController } from "./get-mailbox.controllers";
 
 export const getMailboxRoute = new Elysia().use(authMiddleware).get(
 	"/:id",
-	async ({ params: { id }, organizationId }) => {
+	async ({ params: { id }, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		assertMailboxAllowed(scope, id);
 		return getMailboxController(id, organizationId);
 	},
 	{

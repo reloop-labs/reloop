@@ -1,10 +1,17 @@
 import { db } from "@reloop/db/client";
 import { mailbox } from "@reloop/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
-export async function getMailboxesController(organizationId: string) {
+export async function getMailboxesController(
+	organizationId: string,
+	mailboxIds?: string[],
+) {
+	if (mailboxIds && mailboxIds.length === 0) return [];
 	const mailboxes = await db.query.mailbox.findMany({
-		where: eq(mailbox.organizationId, organizationId),
+		where: and(
+			eq(mailbox.organizationId, organizationId),
+			mailboxIds ? inArray(mailbox.id, mailboxIds) : undefined,
+		),
 		orderBy: (m, { desc }) => [desc(m.createdAt)],
 	});
 

@@ -1,3 +1,10 @@
+import {
+	assertLabelAllowed,
+	assertMailboxAllowed,
+	assertThreadAllowed,
+	resolveMailboxScope,
+	scopeAllowsMailbox,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
@@ -19,8 +26,14 @@ export const labelsRoutes = new Elysia({
 	.use(authMiddleware)
 	.get(
 		"/",
-		async ({ query, organizationId }) => {
-			return listLabelsController(organizationId, query.mailboxId);
+		async ({ query, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			if (query.mailboxId) assertMailboxAllowed(scope, query.mailboxId);
+			const labels = await listLabelsController(
+				organizationId,
+				query.mailboxId,
+			);
+			return labels.filter((l) => scopeAllowsMailbox(scope, l.mailboxId));
 		},
 		{
 			auth: true,
@@ -42,7 +55,9 @@ export const labelsRoutes = new Elysia({
 	)
 	.post(
 		"/",
-		async ({ body, organizationId }) => {
+		async ({ body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			assertMailboxAllowed(scope, body.mailboxId);
 			return createLabelController(organizationId, body);
 		},
 		{
@@ -67,7 +82,9 @@ export const labelsRoutes = new Elysia({
 	)
 	.patch(
 		"/:id",
-		async ({ params: { id }, body, organizationId }) => {
+		async ({ params: { id }, body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertLabelAllowed(scope, organizationId, id);
 			return updateLabelController(id, organizationId, body);
 		},
 		{
@@ -92,7 +109,9 @@ export const labelsRoutes = new Elysia({
 	)
 	.delete(
 		"/:id",
-		async ({ params: { id }, organizationId }) => {
+		async ({ params: { id }, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertLabelAllowed(scope, organizationId, id);
 			return deleteLabelController(id, organizationId);
 		},
 		{
@@ -113,7 +132,9 @@ export const labelsRoutes = new Elysia({
 	)
 	.get(
 		"/:id/threads",
-		async ({ params: { id }, organizationId }) => {
+		async ({ params: { id }, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertLabelAllowed(scope, organizationId, id);
 			return listLabelThreadIdsController(organizationId, id);
 		},
 		{
@@ -134,7 +155,9 @@ export const labelsRoutes = new Elysia({
 	)
 	.get(
 		"/threads/:threadId",
-		async ({ params: { threadId }, organizationId }) => {
+		async ({ params: { threadId }, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertThreadAllowed(scope, organizationId, threadId);
 			return listThreadLabelsController(organizationId, threadId);
 		},
 		{
@@ -155,7 +178,10 @@ export const labelsRoutes = new Elysia({
 	)
 	.post(
 		"/threads/:threadId/assign",
-		async ({ params: { threadId }, body, organizationId }) => {
+		async ({ params: { threadId }, body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertThreadAllowed(scope, organizationId, threadId);
+			await assertLabelAllowed(scope, organizationId, body.labelId);
 			return assignLabelController(organizationId, threadId, body.labelId);
 		},
 		{
@@ -177,7 +203,9 @@ export const labelsRoutes = new Elysia({
 	)
 	.post(
 		"/threads/:threadId/unassign",
-		async ({ params: { threadId }, body, organizationId }) => {
+		async ({ params: { threadId }, body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertThreadAllowed(scope, organizationId, threadId);
 			return unassignLabelController(organizationId, threadId, body.labelId);
 		},
 		{

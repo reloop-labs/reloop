@@ -11,10 +11,10 @@ To connect to the Reloop SMTP server, use the following configuration settings:
 | Setting | Value |
 | :--- | :--- |
 | **Host** | `smtp.reloop.sh` |
-| **Port** | `587` (TLS) or `2525` / `25` |
-| **Username** | Your Reloop API Key |
+| **Port** | `587`, or `2587` / `2025` if 587 is blocked |
+| **Username** | Any string, for example `reloop` |
 | **Password** | Your Reloop API Key |
-| **Encryption** | SSL/TLS (`465`) or STARTTLS (`587`) |
+| **Encryption** | STARTTLS on every port. Implicit TLS (port `465`) is not offered. |
 
 ## Code Examples
 

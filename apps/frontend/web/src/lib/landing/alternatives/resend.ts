@@ -17,7 +17,7 @@ export const config: AlternativeDefinition = {
 		"Resend competitor",
 		"Reloop vs Resend",
 	],
-	updatedAt: "September 17, 2026",
+	updatedAt: "October 26, 2026",
 	primaryCta: {
 		label: "Get started free",
 		href: "/dashboard/signup",
@@ -83,7 +83,7 @@ export const config: AlternativeDefinition = {
 		{
 			question: "How much can we save switching from Resend to Reloop?",
 			answer:
-				"At 50,000 emails/month: $10 on Reloop Pro vs $20 on Resend. At 100,000/month: $20 on Reloop Growth vs roughly $90 on Resend. Overage is $0.50 vs $0.90 per 1,000. Prices are public list prices as of September 17, 2026.",
+				"At 50,000 emails/month: $10 on Reloop Pro vs $20 on Resend. At 100,000/month: $20 on Reloop Growth vs $35 on Resend Pro. Overage is $0.50 vs $0.90 per 1,000. Prices are public list prices as of October 26, 2026.",
 		},
 		{
 			question: "Is Reloop a drop-in Resend replacement?",

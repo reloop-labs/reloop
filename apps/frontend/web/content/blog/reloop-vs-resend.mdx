@@ -24,7 +24,7 @@ relatedSlugs:
   - self-hosted-email-infrastructure
 ---
 
-**Reloop and Resend feel almost the same to code against.** Both give you a clean REST API, a small SDK, React Email support, webhooks and SMTP. The differences are underneath: **Reloop costs about half as much at 50k emails and under a quarter as much at 100k, receives mail into real inboxes your agents can reply from, and is open source, so you can run it yourself.** Resend is the more established hosted product with a larger ecosystem.
+**Reloop and Resend feel almost the same to code against.** Both give you a clean REST API, a small SDK, React Email support, webhooks and SMTP. The differences are underneath: **Reloop costs about half as much at 50k emails and about 40% less at 100k (far less if you need a dedicated IP), receives mail into real inboxes your agents can reply from, and is open source, so you can run it yourself.** Resend is the more established hosted product with a larger ecosystem.
 
 We build Reloop, so weigh this accordingly. Every price below is from the public pricing pages, and where Resend is the better pick, we say so.
 
@@ -36,9 +36,9 @@ We build Reloop, so weigh this accordingly. Every price below is from the public
 |---|---|---|
 | Free tier | 6,000 / mo, 200 / day | 3,000 / mo, 100 / day |
 | 50,000 emails / mo | **$10** | $20 |
-| 100,000 emails / mo | **$20** | $90 |
+| 100,000 emails / mo | **$20** | $35 |
 | Overage per 1,000 | **$0.50** | $0.90 |
-| Dedicated IP | Included on Growth ($20) | Scale plan and up |
+| Dedicated IP | Included on Growth ($20) | $30/mo add-on on Scale ($90+), from 3,000 emails a day |
 | Open source | Yes (Apache 2.0) | No |
 | Self-host | Yes | No |
 | Sending path | Own MTA (KumoMTA) | Amazon SES |
@@ -61,13 +61,14 @@ Reloop's free tier is double Resend's: 6,000 emails a month capped at 200 a day,
 |---|---|---|---|
 | 3,000 | $0 | $0 | $0 |
 | 50,000 | $10 | $20 | $120 |
-| 100,000 | $20 | $90 | **$840** |
-| 150,000 | $20 + $25 overage = $45 | $90 + $45 overage = $135 | $1,080 |
+| 100,000 | $20 | $35 | **$180** |
+| 150,000 | $20 + $25 overage = $45 | $35 + $45 overage = $80 | $420 |
+| 100,000 with a dedicated IP | $20 | $90 Scale + $30 add-on = $120 | **$1,200** |
 
 Two things drive the difference:
 
 - **Reloop has a $10 tier.** Resend's first paid plan is $20 for 50k.
-- **Reloop's 100k plan is $20, Resend's is $90.** Above that, extra mail costs $0.50 per 1,000 on Reloop vs $0.90 on Resend.
+- **Reloop's 100k plan is $20, Resend's is $35.** A dedicated IP is included on Reloop Growth; on Resend it needs the $90 Scale plan plus a $30/mo add-on. Above that, extra mail costs $0.50 per 1,000 on Reloop vs $0.90 on Resend.
 
 And if you self-host Reloop, there's no per-email fee at all. You pay for the server. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really involves.
 
@@ -181,7 +182,7 @@ Deliverability mostly comes down to your own domain setup and list hygiene. Both
 The differences:
 
 - **Sending path.** Resend sends through Amazon SES. Reloop runs its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation).
-- **Dedicated IPs.** Reloop includes one on Growth ($20/mo). On Resend, dedicated IPs start on the Scale plan.
+- **Dedicated IPs.** Reloop includes one on Growth ($20/mo). On Resend, a dedicated IP is a $30/mo add-on on the Scale plan (from $90), available once you send more than 3,000 emails a day.
 - **Tools.** Reloop ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers you can run before you send.
 
 ---
@@ -249,7 +250,7 @@ Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same st
   <Accordion title="Is Reloop's free tier the same as Resend's?">
     No, it's double: Reloop gives 6,000 emails a month with a 200-a-day cap,
     Resend gives 3,000 with a 100-a-day cap. Paid plans differ too: $10 vs
-    $20 for 50k, and $20 vs $90 for 100k.
+    $20 for 50k, and $20 vs $35 for 100k.
   </Accordion>
 
   <Accordion title="Does Resend support self-hosting?">
@@ -266,7 +267,7 @@ Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same st
 
 <Cta
   title="Try Reloop free"
-  description="6,000 emails a month on the free tier. Same API shape as Resend, at a fraction of the price as you grow."
+  description="6,000 emails a month on the free tier. Same API shape as Resend, for less as you grow."
   href="/dashboard/signup"
   label="Get started"
 />

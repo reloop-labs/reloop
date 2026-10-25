@@ -1,3 +1,7 @@
+import {
+	assertThreadAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { deleteThreadXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +10,9 @@ import { deleteThreadController } from "./delete-thread.controllers";
 
 export const deleteThreadRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
-	async ({ params: { id }, organizationId }) => {
+	async ({ params: { id }, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		await assertThreadAllowed(scope, organizationId, id);
 		return deleteThreadController(id, organizationId);
 	},
 	{

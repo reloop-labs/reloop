@@ -1,3 +1,4 @@
+import type { ApiKeyScope } from "@reloop/db/api-key-scope";
 import { db } from "@reloop/db/client";
 import {
 	emailLog,
@@ -5,7 +6,7 @@ import {
 	mailbox,
 	threadMessage,
 } from "@reloop/db/schema";
-import { and, eq, inArray, or, sql } from "drizzle-orm";
+import { and, eq, inArray, or, type SQL, sql } from "drizzle-orm";
 import { mapEmailLogAttachments } from "../../../lib/outbound-attachments";
 
 function bareEmail(value: string): string {
@@ -13,12 +14,48 @@ function bareEmail(value: string): string {
 	return (match?.[1] ?? value).trim().toLowerCase();
 }
 
+function escapeLike(value: string): string {
+	return value.replace(/[\\%_]/g, (c) => `\\${c}`);
+}
+
+/**
+ * SQL matching sender addresses a restricted API key may see, or null when
+ * the key allows nothing. fromEmail is stored bare or as "Name <address>".
+ */
+export function senderScopeCondition(keyScope: ApiKeyScope): SQL | null {
+	const parts: SQL[] = [];
+	for (const entry of keyScope.entries) {
+		if (entry.domainDeleted) continue;
+		if (entry.email) {
+			parts.push(
+				sql`lower(${emailLog.fromEmail}) = ${entry.email}`,
+				sql`lower(${emailLog.fromEmail}) like ${`%<${escapeLike(entry.email)}>%`}`,
+			);
+		} else {
+			const domain = escapeLike(entry.domain);
+			parts.push(
+				sql`lower(${emailLog.fromEmail}) like ${`%@${domain}`}`,
+				sql`lower(${emailLog.fromEmail}) like ${`%@${domain}>%`}`,
+			);
+		}
+	}
+	return parts.length > 0 ? (or(...parts) ?? null) : null;
+}
+
 export async function getSentMessagesController(
 	organizationId: string,
 	mailboxId?: string,
 	q?: string,
+	/** Set for restricted API keys: only senders the key allows. */
+	senderScope?: ApiKeyScope,
 ) {
 	const conditions = [eq(emailLog.organizationId, organizationId)];
+
+	if (senderScope) {
+		const allowed = senderScopeCondition(senderScope);
+		if (!allowed) return [];
+		conditions.push(allowed);
+	}
 
 	if (mailboxId) {
 		const mbx = await db.query.mailbox.findFirst({

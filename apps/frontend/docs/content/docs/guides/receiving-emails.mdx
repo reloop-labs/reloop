@@ -1,41 +1,74 @@
 ---
 title: "Receiving Emails"
-description: "How to receive inbound emails with Reloop."
+description: "Receive inbound email on your own domain with Reloop: add the MX record, create a mailbox, and read messages in the dashboard, over the API, with webhooks, over MCP or over IMAP."
 ---
 
-How to receive inbound emails with Reloop.
+Reloop receives email for any domain you have added, stores it in a mailbox, threads it by conversation and gives every message a spam verdict. You can then read and reply from the dashboard, your code, an AI agent or a normal mail client.
 
-## Overview
-
-Understanding this topic is important for maintaining good email deliverability with Reloop.
-
-## Key Points
-
-- Follow email sending best practices to maintain a strong sender reputation
-- Monitor your delivery rates in the [Reloop dashboard](https://reloop.sh/dashboard)
-- Keep your email lists clean and up-to-date
-
-## Best Practices
+## Set up receiving
 
 <Steps>
-  <Step title="Monitor your metrics">
-    Regularly check your delivery, bounce, and complaint rates in the Reloop dashboard.
+  <Step title="Pick the hostname">
+    Use a subdomain such as `inbox.yourdomain.com` or `agents.yourdomain.com`. If your root domain already receives mail through Google Workspace or Microsoft 365, pointing its MX at Reloop would split or divert that mail. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving) and [MX conflicts](/docs/guides/avoid-mx-conflicts).
   </Step>
-  <Step title="Follow authentication standards">
-    Ensure SPF, DKIM, and DMARC are properly configured for your domain.
+  <Step title="Turn on Email Receiving">
+    Add the domain in the [dashboard](https://reloop.sh/dashboard) or open an existing one. **Email Receiving** is on by default for new domains. You can toggle it on the domain detail page.
   </Step>
-  <Step title="Respect recipient preferences">
-    Always include an unsubscribe mechanism in marketing emails and honor opt-out requests promptly.
+  <Step title="Add the MX record">
+    At your DNS host, add the MX record Reloop shows for the domain:
+
+    | Type | Name | Value | Priority |
+    | --- | --- | --- | --- |
+    | `MX` | your subdomain, for example `inbox` | `inbound.reloop.sh` | `10` |
+
+    [Auto-populate](/docs/guides/connect-domain/auto-populate) adds it for you on supported DNS hosts.
+  </Step>
+  <Step title="Create a mailbox">
+    Create a mailbox for the address, for example `support@inbox.yourdomain.com`, from the domain page or with the API. Mail sent to that address now lands in the mailbox.
+  </Step>
+  <Step title="Send a test">
+    Send a message to the address from any personal account. It should appear in the mailbox within a few seconds.
   </Step>
 </Steps>
 
-<Tip>
-For detailed guidance on email deliverability, see our [Email Best Practices](/docs/integrations/agent-skills/email-best-practices) skill documentation.
-</Tip>
+## Read and reply
 
-## Learn More
+Choose how your app, agent or team works with received mail:
 
-- [Emails Going to Spam](/docs/guides/emails-going-to-spam)
-- [Warm-up Guide](/docs/guides/warmup-guide)
-- [Audience Hygiene](/docs/guides/audience-hygiene)
-- [Domains Guide](/docs/learn/domain)
+| Method | Best for | Docs |
+| --- | --- | --- |
+| **Dashboard** | People reading and replying by hand | [Agent inbox](/docs/learn/agent-inbox) |
+| **Webhooks** | Reacting to each new message in your code | [`email.received`](/docs/webhooks/emails/received) |
+| **API and SDKs** | Listing threads, fetching messages, replying in a thread | [API reference](/docs/api) |
+| **MCP** | Letting Claude, Cursor or another AI client read and answer mail | [MCP server](/docs/integrations/ai-tools/mcp-server) |
+| **IMAP** | Apple Mail, Outlook, Thunderbird or any IMAP client | See below |
+
+### Webhooks
+
+Subscribe a webhook to `email.received`. Each event includes the mailbox, sender, subject, `thread_id`, `is_spam` and the `email_id` you use to fetch the full message or reply. Always [verify the signature](/docs/webhooks/verify-webhooks-requests) before trusting the payload.
+
+To forward received mail to another address, see [Forward emails](/docs/guides/inbound-forward-emails).
+
+### IMAP
+
+| Setting | Value |
+| --- | --- |
+| Host | `imap.reloop.sh` |
+| Port | `993` (TLS) |
+| Username | The mailbox address, for example `support@inbox.yourdomain.com` |
+| Password | A Reloop API key with access to that mailbox |
+
+Changes sync both ways: messages you read, move or archive in your mail client show the same way in the dashboard and the API.
+
+## Troubleshooting
+
+- **Nothing arrives.** Check the MX record with `dig MX inbox.yourdomain.com +short`. It should return `10 inbound.reloop.sh.` DNS changes can take up to an hour to propagate.
+- **Mail arrives somewhere else.** Another MX record on the same hostname has a lower priority number. Remove it or use a different subdomain.
+- **Mail is marked as spam.** Every message gets a spam verdict. Messages with `is_spam: true` are still stored in the mailbox, so check for flagged messages before assuming mail was lost.
+
+## Learn more
+
+- [Agent inbox](/docs/learn/agent-inbox)
+- [Domains](/docs/learn/domain)
+- [Webhook event types](/docs/webhooks/event-types)
+- [Give an AI agent its own email address](/blog/give-ai-agent-email-address)

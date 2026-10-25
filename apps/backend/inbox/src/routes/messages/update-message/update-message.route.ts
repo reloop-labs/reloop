@@ -1,3 +1,7 @@
+import {
+	assertMessageAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { updateMessageXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +10,9 @@ import { updateMessageController } from "./update-message.controllers";
 
 export const updateMessageRoute = new Elysia().use(authMiddleware).patch(
 	"/:id",
-	async ({ params: { id }, body, organizationId }) => {
+	async ({ params: { id }, body, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		await assertMessageAllowed(scope, organizationId, id);
 		return updateMessageController(id, organizationId, body);
 	},
 	{

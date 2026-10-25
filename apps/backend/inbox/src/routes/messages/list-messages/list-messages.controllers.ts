@@ -1,6 +1,6 @@
 import { db } from "@reloop/db/client";
 import { inboundEmail, threadMessage } from "@reloop/db/schema";
-import { and, desc, eq, ilike, or } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or } from "drizzle-orm";
 
 export async function getMessagesController(
 	organizationId: string,
@@ -9,11 +9,18 @@ export async function getMessagesController(
 	offset = 0,
 	q?: string,
 	isSpam?: boolean,
+	/** Restricts to these mailboxes (API key scope). undefined = no restriction. */
+	mailboxIds?: string[],
 ) {
+	if (mailboxIds && mailboxIds.length === 0) return [];
+
 	const conditions = [eq(inboundEmail.organizationId, organizationId)];
 
 	if (mailboxId) {
 		conditions.push(eq(inboundEmail.mailboxId, mailboxId));
+	}
+	if (mailboxIds) {
+		conditions.push(inArray(inboundEmail.mailboxId, mailboxIds));
 	}
 
 	if (isSpam !== undefined) {

@@ -13,11 +13,18 @@ export async function getThreadsController(
 	q?: string,
 	isPinned?: boolean,
 	filter?: ThreadListFilter,
+	/** Restricts to these mailboxes (API key scope). undefined = no restriction. */
+	mailboxIds?: string[],
 ) {
+	if (mailboxIds && mailboxIds.length === 0) return [];
+
 	const conditions = [eq(emailThread.organizationId, organizationId)];
 
 	if (mailboxId) {
 		conditions.push(eq(emailThread.mailboxId, mailboxId));
+	}
+	if (mailboxIds) {
+		conditions.push(inArray(emailThread.mailboxId, mailboxIds));
 	}
 
 	switch (folder) {

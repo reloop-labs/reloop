@@ -1,0 +1,262 @@
+---
+title: "SMTP Ports Explained: 25 vs 465 vs 587 vs 2525"
+description: "What each SMTP port is for, which one to use for sending email from your app, why port 25 is blocked on most clouds, and how to fix connection timeouts on 587 and 465."
+keywords:
+  - SMTP ports
+  - SMTP port 587
+  - SMTP port 465
+  - port 25 vs 587
+  - 465 vs 587
+  - SMTP port 2525
+  - which SMTP port to use
+  - STARTTLS vs SSL/TLS
+  - port 25 blocked
+publishedAt: 2026-10-26
+category: Deliverability
+tags: [smtp, ports, tls, starttls, networking]
+readTime: 9 min read
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - spf-dkim-dmarc-setup-guide
+  - gmail-yahoo-bulk-sender-requirements
+  - self-hosted-email-infrastructure
+  - transactional-email-best-practices
+---
+
+**Use port 587 with STARTTLS to send email from an application.** Use port 465 if your client prefers implicit TLS. Use an alternate port such as 2525 or 2587 only when your network blocks 587. Do not use port 25 for sending from an app: it is for server-to-server delivery, and most cloud providers block it.
+
+That is the short answer. The rest of this guide explains why, and how to fix the timeouts and TLS errors that come with picking the wrong port.
+
+---
+
+## SMTP ports at a glance
+
+| Port | Purpose | Encryption | Use it for |
+|------|---------|------------|------------|
+| **25** | Relay between mail servers (MTA to MTA) | Optional STARTTLS | Receiving mail on your MX. Not for app sending. |
+| **587** | Message submission (client to server) | STARTTLS, required | **Default choice** for apps and email clients |
+| **465** | Message submission over implicit TLS | TLS from the first byte | Clients that prefer implicit TLS |
+| **2525** | Unofficial alternate for 587 | STARTTLS | Networks that block 587 |
+| **2587 / 2025** | Provider-specific alternates | STARTTLS, like 587 | Networks that block standard ports |
+
+---
+
+## Port 25: server to server only
+
+Port 25 is the original SMTP port from 1982 ([RFC 821](https://datatracker.ietf.org/doc/html/rfc821)). Today it has one job: **mail servers delivering to other mail servers.** When Reloop delivers your message to Gmail, it connects to Gmail's MX on port 25.
+
+You should not send from your app on port 25:
+
+- **AWS, Google Cloud, Azure, DigitalOcean, Hetzner and most residential ISPs block outbound port 25** by default to stop spam from compromised machines. Some unblock it on request, and many never do.
+- Port 25 usually does not require authentication, so providers do not accept submissions there.
+- Many networks allow it without TLS, so credentials and content can travel in plain text.
+
+If you are self-hosting and need port 25 for **inbound** mail, that is fine. The [self-hosted email infrastructure guide](/blog/self-hosted-email-infrastructure) covers what to open.
+
+---
+
+## Port 587: the default for sending
+
+Port 587 is the **message submission** port, defined in [RFC 6409](https://datatracker.ietf.org/doc/html/rfc6409). It exists so that mail clients and applications can hand mail to a provider with authentication, separate from server-to-server traffic.
+
+The connection starts in plain text, then upgrades with the `STARTTLS` command before any credentials are sent:
+
+```
+S: 220 smtp.reloop.sh ESMTP
+C: EHLO app.example.com
+S: 250-smtp.reloop.sh
+S: 250 STARTTLS
+C: STARTTLS
+S: 220 Ready to start TLS
+   ... TLS handshake ...
+C: EHLO app.example.com
+S: 250 AUTH PLAIN LOGIN
+C: AUTH PLAIN ...
+```
+
+A correctly configured provider refuses `AUTH` before `STARTTLS`, so your password is never sent unencrypted.
+
+**Use 587 unless you have a reason not to.** Every SMTP library supports it, and almost no network blocks it.
+
+---
+
+## Port 465: implicit TLS
+
+Port 465 has a messy history. It was registered for SMTPS in 1997, revoked a year later, and then **brought back for submission over implicit TLS** in [RFC 8314](https://datatracker.ietf.org/doc/html/rfc8314) in 2018.
+
+With implicit TLS, the TLS handshake happens **as soon as the TCP connection opens**. There is no plain-text phase and no `STARTTLS` command. RFC 8314 actually recommends implicit TLS over STARTTLS because it removes the window for downgrade attacks.
+
+### 465 vs 587
+
+| | 587 | 465 |
+|---|-----|-----|
+| TLS starts | After `STARTTLS` command | Immediately |
+| Downgrade risk | Low if the server requires STARTTLS | None |
+| Library setting | `secure: false` (Nodemailer), `starttls()` (Python) | `secure: true` (Nodemailer), `SMTP_SSL` (Python) |
+| Support | Universal | Universal in modern libraries |
+
+Both are secure when configured correctly. The most common mistake is **mixing up the setting with the port**:
+
+- `secure: true` on port 587 hangs, because the client waits for a TLS handshake the server never starts.
+- `secure: false` on port 465 fails with `wrong version number` or `ECONNRESET`, because the server speaks TLS immediately.
+
+---
+
+## Port 2525: the fallback
+
+Port 2525 is **not** an official SMTP port. Providers listen on it because some hosting companies and corporate firewalls block 587 and 465. It behaves like 587 (STARTTLS).
+
+Some providers use other alternates. Reloop accepts submissions on **587**, **2587** and **2025**, all with STARTTLS. It does not offer implicit TLS on 465, so use 587 with `secure: false` (Nodemailer) or `starttls()` (Python). Check your provider's docs for the exact list.
+
+---
+
+## Which port should you use?
+
+```
+Sending from an app or script?
+├── Yes → 587 (STARTTLS)
+│         └── Blocked or timing out? → your provider's alternate (2525, 2587) or 465 if offered
+└── No, I run a mail server receiving mail → 25 inbound
+```
+
+Or skip SMTP entirely. If you control the code, an **HTTP email API** avoids port blocking altogether because it runs on 443. It also gives you structured errors, idempotency and attachments without MIME encoding. See [how to send email in Node.js](/blog/send-email-nodejs) for both approaches side by side.
+
+---
+
+## Configuration examples
+
+All examples use Reloop's SMTP relay. The username can be any string, and the password is your API key ([full SMTP docs](/docs/examples/smtp/introduction)).
+
+### Nodemailer (Node.js)
+
+```javascript
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.reloop.sh",
+  port: 587,
+  secure: false, // STARTTLS. Reloop does not offer port 465
+  auth: {
+    user: "reloop",
+    pass: process.env.RELOOP_API_KEY,
+  },
+});
+```
+
+### Python smtplib
+
+```python
+import os
+import smtplib
+from email.message import EmailMessage
+
+msg = EmailMessage()
+msg["From"] = "Acme <hello@mail.acme.com>"
+msg["To"] = "user@example.com"
+msg["Subject"] = "Hello"
+msg.set_content("Sent over port 587 with STARTTLS.")
+
+with smtplib.SMTP("smtp.reloop.sh", 587) as server:
+    server.starttls()
+    server.login("reloop", os.environ["RELOOP_API_KEY"])
+    server.send_message(msg)
+```
+
+For a provider that offers port 465, replace `smtplib.SMTP(...)` and `starttls()` with `smtplib.SMTP_SSL(host, 465)`. With Reloop, stay on 587 and use 2587 if 587 is blocked.
+
+### Environment variables (most frameworks)
+
+```env
+SMTP_HOST=smtp.reloop.sh
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=reloop
+SMTP_PASSWORD=rl_your_api_key
+```
+
+Laravel, Django, Rails, Ghost, Supabase Auth and most CMSs accept these values directly.
+
+---
+
+## Troubleshooting SMTP connections
+
+### Test whether a port is open
+
+```bash
+# STARTTLS ports (587, 2525, 2587)
+openssl s_client -starttls smtp -connect smtp.reloop.sh:587 -crlf
+
+# Implicit TLS (465), for providers that offer it
+openssl s_client -connect smtp.example.com:465 -crlf
+
+# Plain TCP reachability
+nc -vz smtp.reloop.sh 587
+```
+
+If `nc` times out, the port is blocked between you and the server. Try the next port.
+
+### Common errors
+
+| Error | Likely cause | Fix |
+|-------|-------------|-----|
+| `ETIMEDOUT` / `Connection timed out` | Port blocked by your host or firewall | Switch to your provider's alternate port (2587 on Reloop) |
+| `wrong version number` / `ECONNRESET` | `secure: false` on port 465 | Set `secure: true` or use 587 |
+| Hangs on connect, no error | `secure: true` on port 587 | Set `secure: false` |
+| `530 5.7.0 Must issue a STARTTLS command first` | Tried to `AUTH` before TLS | Call `starttls()` or enable `requireTLS` |
+| `535 5.7.8 Authentication failed` | Wrong API key or password | Check the key and that it has sending access |
+| `554 5.7.1 Relay access denied` | Not authenticated, or `From` domain not verified | Authenticate and [verify the domain](/docs/learn/domain) |
+| `self signed certificate` | Connecting to a local or misconfigured server | Fix the certificate. Do not disable verification in production. |
+
+Once mail is flowing, make sure it lands in the inbox: set up [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide) and check the [Gmail and Yahoo sender requirements](/blog/gmail-yahoo-bulk-sender-requirements).
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is port 587 or 465 more secure?">
+    Both encrypt the whole session when configured correctly. Port 465 starts
+    TLS immediately, so there is no plain-text phase at all. RFC 8314 prefers
+    implicit TLS for that reason. Port 587 is equally safe when the server
+    refuses authentication before STARTTLS, which every reputable provider
+    does.
+  </Accordion>
+
+  <Accordion title="Why is port 25 blocked on my server?">
+    Cloud and residential providers block outbound port 25 to stop
+    compromised machines from sending spam directly to mail servers. Use 587
+    or 465 to send through a provider instead. If you need port 25 to deliver
+    mail yourself, ask your host to unblock it, but expect a review.
+  </Accordion>
+
+  <Accordion title="What SMTP port does Gmail use?">
+    For sending through Gmail's own SMTP server (smtp.gmail.com), use 587
+    with STARTTLS or 465 with implicit TLS. Gmail receives mail from other
+    servers on port 25.
+  </Accordion>
+
+  <Accordion title="Is port 2525 an official SMTP port?">
+    No. It is a convention some providers adopted as a fallback when 587 is
+    blocked. It is not registered with IANA, so check that your provider
+    actually listens on it.
+  </Accordion>
+
+  <Accordion title="Should I use SMTP or an HTTP API?">
+    Use SMTP when the software only speaks SMTP, such as a CMS, Supabase Auth
+    or a legacy app. Use the HTTP API when you write the code: it runs on port
+    443, returns structured errors and avoids MIME encoding.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="An SMTP relay that just works"
+  description="STARTTLS on 587 with alternate ports, API key auth and DKIM with your own domain. Free for 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

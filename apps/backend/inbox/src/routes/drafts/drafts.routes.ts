@@ -1,3 +1,10 @@
+import {
+	assertDraftAllowed,
+	assertMailboxAllowed,
+	assertThreadAllowed,
+	resolveMailboxScope,
+	scopeAllowsMailbox,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
@@ -45,12 +52,18 @@ export const draftsRoutes = new Elysia({
 	.use(authMiddleware)
 	.get(
 		"/",
-		async ({ query, organizationId }) => {
-			return listDraftsController(organizationId, {
+		async ({ query, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			if (query.mailboxId) assertMailboxAllowed(scope, query.mailboxId);
+			if (query.threadId) {
+				await assertThreadAllowed(scope, organizationId, query.threadId);
+			}
+			const drafts = await listDraftsController(organizationId, {
 				mailboxId: query.mailboxId,
 				threadId: query.threadId,
 				kind: query.kind,
 			});
+			return drafts.filter((d) => scopeAllowsMailbox(scope, d.mailboxId));
 		},
 		{
 			auth: true,
@@ -74,7 +87,9 @@ export const draftsRoutes = new Elysia({
 	)
 	.get(
 		"/:id",
-		async ({ params: { id }, organizationId }) => {
+		async ({ params: { id }, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertDraftAllowed(scope, organizationId, id);
 			return getDraftController(id, organizationId);
 		},
 		{
@@ -95,7 +110,9 @@ export const draftsRoutes = new Elysia({
 	)
 	.post(
 		"/",
-		async ({ body, organizationId }) => {
+		async ({ body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			assertMailboxAllowed(scope, body.mailboxId);
 			return createDraftController(organizationId, body);
 		},
 		{
@@ -119,7 +136,10 @@ export const draftsRoutes = new Elysia({
 	)
 	.patch(
 		"/:id",
-		async ({ params: { id }, body, organizationId }) => {
+		async ({ params: { id }, body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertDraftAllowed(scope, organizationId, id);
+			if (body.mailboxId) assertMailboxAllowed(scope, body.mailboxId);
 			return updateDraftController(id, organizationId, body);
 		},
 		{
@@ -144,7 +164,9 @@ export const draftsRoutes = new Elysia({
 	)
 	.delete(
 		"/:id",
-		async ({ params: { id }, organizationId }) => {
+		async ({ params: { id }, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertDraftAllowed(scope, organizationId, id);
 			return deleteDraftController(id, organizationId);
 		},
 		{

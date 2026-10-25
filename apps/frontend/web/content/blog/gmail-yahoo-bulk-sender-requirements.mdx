@@ -1,0 +1,268 @@
+---
+title: "Gmail & Yahoo Bulk Sender Requirements: 2026 Checklist"
+description: "Every rule Gmail, Yahoo and Microsoft Outlook enforce on email senders: SPF, DKIM, DMARC alignment, one-click unsubscribe, spam rate limits and PTR records, with a checklist you can run today."
+keywords:
+  - Gmail bulk sender requirements
+  - Yahoo sender requirements
+  - Gmail sender guidelines 2026
+  - Outlook bulk sender requirements
+  - Google Yahoo email authentication requirements
+  - one-click unsubscribe requirement
+  - 5000 emails per day Gmail
+  - DMARC requirement Gmail
+publishedAt: 2026-10-25
+category: Deliverability
+tags: [gmail, yahoo, outlook, dmarc, deliverability, unsubscribe, compliance]
+readTime: 11 min read
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - spf-dkim-dmarc-setup-guide
+  - why-emails-land-in-spam-fix
+  - ip-warming-guide
+  - email-bounce-processing-automation
+  - transactional-email-best-practices
+---
+
+**Gmail, Yahoo and Outlook now reject or junk mail that is not authenticated.** If you send more than 5,000 messages a day to any of them, you need SPF, DKIM, an aligned DMARC record, one-click unsubscribe on marketing mail, and a spam complaint rate under 0.3%. Smaller senders still need SPF or DKIM, valid reverse DNS and TLS.
+
+Google and Yahoo announced these rules together in October 2023 and started enforcing them in February 2024. Microsoft followed for Outlook.com, Hotmail and Live addresses in May 2025. Enforcement has only tightened since: what began as temporary errors is now outright rejection.
+
+This guide lists every requirement, who it applies to, and how to check each one. The checklist at the end works for any provider, including [Reloop](/features/transaction-emails).
+
+---
+
+## Who counts as a bulk sender?
+
+| Mailbox provider | Bulk threshold | What counts |
+|------------------|----------------|-------------|
+| **Gmail** | ~5,000 messages in a 24-hour period | Mail to personal `@gmail.com` and `@googlemail.com` addresses from the same primary domain |
+| **Yahoo** | No fixed number published | Yahoo applies the rules to "bulk senders" by volume and pattern |
+| **Outlook / Hotmail / Live** | More than 5,000 messages a day | Mail to Microsoft consumer addresses |
+
+Three details catch people out:
+
+1. **Gmail counts by primary domain.** Mail from `mail.acme.com` and `news.acme.com` adds up under `acme.com`.
+2. **Once Gmail classifies you as bulk, you stay bulk.** One busy day with a product launch is enough. Dropping back under 5,000 does not undo it.
+3. **Transactional and marketing mail share the count.** Password resets and receipts count toward the 5,000 threshold even though they are exempt from the unsubscribe rule.
+
+The safe move is to meet the bulk sender rules from day one. None of them are hard to set up, and all of them improve inbox placement even at low volume.
+
+---
+
+## Requirements for every sender
+
+These apply even if you send ten emails a day.
+
+### 1. SPF or DKIM on your sending domain
+
+At least one of them must pass. In practice, set up both: DKIM survives forwarding, SPF does not. Our [SPF, DKIM and DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide) walks through the exact records.
+
+### 2. Valid forward and reverse DNS (PTR)
+
+The IP address that connects to Gmail must have a PTR record, and that hostname must resolve back to the same IP. If you use an email API, your provider handles this. If you run your own MTA, check it:
+
+```bash
+dig -x 203.0.113.10 +short
+# mta1.mail.example.com.
+dig mta1.mail.example.com +short
+# 203.0.113.10
+```
+
+### 3. TLS for the connection
+
+Gmail requires TLS when it receives your mail. Every modern provider supports this. A self-hosted Postfix with an expired certificate is the usual way to fail it.
+
+### 4. Spam complaint rate below 0.3%
+
+Google measures the share of your delivered mail that users mark as spam, as reported in [Google Postmaster Tools](https://postmaster.google.com). Aim for **under 0.1%**. At 0.3% and above, Gmail stops giving you mitigation help and starts filtering hard.
+
+### 5. RFC 5322 compliant messages
+
+That means one `From` header, a valid `Message-ID` and a `Date` header, among others. Hand-built MIME strings are where this breaks. Use a library or an API.
+
+### 6. Do not impersonate Gmail
+
+Never put a `@gmail.com` address in the `From` header when sending through a third party. Gmail's own DMARC policy is `p=quarantine`, so those messages get filtered.
+
+---
+
+## Extra requirements for bulk senders
+
+### 7. SPF **and** DKIM, both passing
+
+Bulk senders need both, not one or the other.
+
+### 8. A DMARC record, at least `p=none`
+
+Publish a TXT record at `_dmarc.yourdomain.com`:
+
+```
+v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com
+```
+
+`p=none` meets the requirement. It only asks for reports and does not change delivery. Move to `p=quarantine` and then `p=reject` once the reports show only your own services sending.
+
+### 9. DMARC alignment
+
+This is the requirement most teams miss. The domain in your visible `From` address must **match** the domain that passed SPF or DKIM.
+
+| From address | DKIM signing domain (`d=`) | Aligned? |
+|--------------|---------------------------|----------|
+| `hello@acme.com` | `acme.com` | Yes |
+| `hello@acme.com` | `mail.acme.com` | Yes (relaxed alignment, same organizational domain) |
+| `hello@acme.com` | `sendgrid.net` | **No** |
+| `hello@acme.com` | `amazonses.com` | **No** |
+
+If your provider signs with its own domain, your mail passes DKIM but fails alignment. Use a provider that signs with **your** domain. Reloop does this by default when you [verify a domain](/docs/learn/domain).
+
+### 10. One-click unsubscribe for marketing mail
+
+Marketing and subscribed messages need two headers defined in [RFC 8058](https://datatracker.ietf.org/doc/html/rfc8058):
+
+```
+List-Unsubscribe: <https://acme.com/unsubscribe?token=abc123>, <mailto:unsubscribe@acme.com?subject=unsubscribe>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+```
+
+Gmail and Yahoo then show their own "Unsubscribe" button next to the sender name. When a user clicks it, the provider sends a `POST` request to your HTTPS URL. Your endpoint must unsubscribe the user **without** a login, confirmation page or second click.
+
+Two more rules apply:
+
+- **Honor the request within two days.**
+- **Keep a visible unsubscribe link in the body too.** The header does not replace it.
+
+Both headers must also be covered by your DKIM signature, or Gmail ignores them. Reloop's MTA includes `List-Unsubscribe` and `List-Unsubscribe-Post` in the signed header set, and [campaigns](/features/email-marketing) add both headers automatically for each recipient.
+
+<Callout type="info">
+  Transactional mail such as password resets, receipts and security alerts is **exempt** from the one-click unsubscribe rule. Do not add an unsubscribe header to a login code: users will click it and stop receiving mail they need.
+</Callout>
+
+---
+
+## What Outlook added in 2025
+
+Microsoft's rules for Outlook.com, Hotmail.com and Live.com took effect on **May 5, 2025**, for domains sending more than 5,000 messages a day:
+
+- SPF must pass for the sending domain
+- DKIM must pass
+- DMARC must exist with at least `p=none` and align with SPF or DKIM
+
+Non-compliant mail first went to Junk. It is now rejected with:
+
+```
+550 5.7.515 Access denied, sending domain [example.com] does not meet the required authentication level.
+```
+
+Microsoft also asks, but does not yet enforce, a working unsubscribe link, valid `From` and `Reply-To` addresses, and list hygiene. See our guide on [avoiding the Outlook spam folder](/docs/guides/avoid-outlook-spam).
+
+---
+
+## What happens when you fail
+
+Gmail and Outlook return SMTP errors that tell you exactly which rule you broke. These are the ones you will see in your [bounce logs](/blog/email-bounce-processing-automation):
+
+| Error | Meaning |
+|-------|---------|
+| `550 5.7.26` | Unauthenticated: the message failed DMARC or had no SPF/DKIM pass |
+| `421 4.7.27` / `550 5.7.27` | SPF did not pass |
+| `550 5.7.30` | DKIM did not pass (bulk senders) |
+| `421 4.7.32` / `550 5.7.32` | `From` domain not aligned with SPF or DKIM |
+| `421 4.7.28` | Rate limited: unusual volume or a high spam rate |
+| `550 5.7.515` | Outlook: domain does not meet authentication requirements |
+
+A `4xx` code is temporary and the message will be retried. A `5xx` code is a permanent failure. If `5xx` codes for authentication pile up, stop sending and fix DNS before you retry. Repeated failures damage your [domain reputation](/tools/domain-reputation-checker).
+
+---
+
+## The checklist
+
+Work through this list once per sending domain.
+
+- [ ] **SPF** record published and passing ([check with the auth checker](/tools/auth-checker))
+- [ ] **DKIM** signing with **your** domain, 2048-bit key
+- [ ] **DMARC** record at `_dmarc.yourdomain.com`, at least `p=none`, with a `rua` address
+- [ ] `From` domain **aligned** with the DKIM `d=` domain
+- [ ] **PTR record** valid for every sending IP
+- [ ] **TLS** on all outbound connections
+- [ ] **One-click unsubscribe** headers on marketing and newsletter mail, covered by DKIM
+- [ ] **Visible unsubscribe link** in the body of marketing mail
+- [ ] Unsubscribes processed **within 48 hours**
+- [ ] **Spam rate under 0.1%**, monitored in Google Postmaster Tools
+- [ ] Domain **not on any blocklist** ([blocklist checker](/tools/blocklist-checker))
+- [ ] Transactional and marketing mail on **separate subdomains** so one cannot sink the other ([subdomain vs root](/docs/guides/subdomain-vs-root))
+
+Then send a real message to the [deliverability tester](/tools/deliverability-tester). It shows the SPF, DKIM and DMARC results and the headers the receiving server actually saw.
+
+---
+
+## How to keep your spam rate low
+
+Authentication gets you through the door. The spam complaint rate decides whether you stay in the inbox.
+
+1. **Only send to people who asked.** Double opt-in for newsletters. Never buy lists.
+2. **Block throwaway addresses at signup.** Disposable inboxes inflate bounces and never engage. See [how to block disposable emails](/blog/block-disposable-emails-at-signup).
+3. **Suppress hard bounces and complainers immediately.** Reloop keeps a [suppression list](/docs/guides/suppression-list) per organization automatically.
+4. **Make unsubscribing easier than complaining.** If the unsubscribe link is hidden, users press "Report spam" instead, and that counts against you.
+5. **Warm up new domains and IPs.** Jumping from zero to 50,000 a day looks like a compromised account. Follow the [IP warming guide](/blog/ip-warming-guide).
+6. **Sunset inactive contacts.** Stop mailing people who have not opened in 6 to 12 months.
+
+For a full diagnosis when mail is already landing in spam, read [why emails land in spam and how to fix it](/blog/why-emails-land-in-spam-fix).
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do the Gmail requirements apply if I send fewer than 5,000 emails a day?">
+    The basic rules do: SPF or DKIM, valid reverse DNS, TLS, a spam rate under
+    0.3% and RFC 5322 compliant messages. DMARC, alignment and one-click
+    unsubscribe are only required above 5,000 a day, but you should set them up
+    anyway. Gmail filters unauthenticated mail more aggressively at any volume.
+  </Accordion>
+
+  <Accordion title="Does one-click unsubscribe apply to transactional email?">
+    No. Google and Yahoo exempt transactional messages such as password resets,
+    receipts, order updates and security alerts. The rule covers marketing and
+    subscribed mail like newsletters and promotions.
+  </Accordion>
+
+  <Accordion title="Is DMARC p=none enough?">
+    It meets the Gmail, Yahoo and Outlook requirement. It does not protect your
+    domain from spoofing, because receivers still deliver failing mail. Use
+    p=none to collect reports, then move to p=quarantine and p=reject once only
+    your own services appear in them.
+  </Accordion>
+
+  <Accordion title="How do I check my spam complaint rate?">
+    Add and verify your domain in Google Postmaster Tools. It shows the user
+    reported spam rate for mail delivered to Gmail. Yahoo offers a Complaint
+    Feedback Loop, and Microsoft offers SNDS and JMRP for Outlook.
+  </Accordion>
+
+  <Accordion title="What does error 550 5.7.26 mean?">
+    Gmail rejected the message because it was not authenticated. Either DMARC
+    failed, or neither SPF nor DKIM passed for your domain. Check that your DKIM
+    record is published and that your From domain aligns with the signing
+    domain.
+  </Accordion>
+
+  <Accordion title="Does Reloop handle these requirements for me?">
+    Reloop signs mail with DKIM using your own domain, gives you the SPF and
+    DMARC records to publish, sends over TLS from IPs with valid PTR records,
+    and adds one-click unsubscribe headers to campaign mail. You still publish
+    the DNS records and keep your list clean.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send compliant email from day one"
+  description="DKIM with your own domain, one-click unsubscribe on campaigns and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

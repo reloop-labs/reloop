@@ -1,3 +1,7 @@
+import {
+	assertMessagesAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { batchGetMessagesXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +10,9 @@ import { batchGetMessagesController } from "./batch-get-messages.controllers";
 
 export const batchGetMessagesRoute = new Elysia().use(authMiddleware).post(
 	"/batch",
-	async ({ body, organizationId }) => {
+	async ({ body, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		await assertMessagesAllowed(scope, organizationId, body.ids);
 		return batchGetMessagesController(organizationId, body.ids);
 	},
 	{

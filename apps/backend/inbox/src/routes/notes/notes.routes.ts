@@ -1,3 +1,8 @@
+import {
+	assertNoteAllowed,
+	assertThreadAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
@@ -16,7 +21,9 @@ export const notesRoutes = new Elysia({
 	.use(authMiddleware)
 	.get(
 		"/",
-		async ({ query, organizationId }) => {
+		async ({ query, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertThreadAllowed(scope, organizationId, query.threadId);
 			return listNotesController(organizationId, query.threadId);
 		},
 		{
@@ -39,7 +46,9 @@ export const notesRoutes = new Elysia({
 	)
 	.post(
 		"/",
-		async ({ body, organizationId }) => {
+		async ({ body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertThreadAllowed(scope, organizationId, body.threadId);
 			return createNoteController(organizationId, body);
 		},
 		{
@@ -65,7 +74,9 @@ export const notesRoutes = new Elysia({
 	)
 	.patch(
 		"/:id",
-		async ({ params: { id }, body, organizationId }) => {
+		async ({ params: { id }, body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertNoteAllowed(scope, organizationId, id);
 			return updateNoteController(id, organizationId, body);
 		},
 		{
@@ -92,7 +103,9 @@ export const notesRoutes = new Elysia({
 	)
 	.delete(
 		"/:id",
-		async ({ params: { id }, organizationId }) => {
+		async ({ params: { id }, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertNoteAllowed(scope, organizationId, id);
 			return deleteNoteController(id, organizationId);
 		},
 		{
@@ -113,7 +126,9 @@ export const notesRoutes = new Elysia({
 	)
 	.post(
 		"/reorder",
-		async ({ body, organizationId }) => {
+		async ({ body, organizationId, apiKeyId }) => {
+			const scope = await resolveMailboxScope(organizationId, apiKeyId);
+			await assertThreadAllowed(scope, organizationId, body.threadId);
 			return reorderNotesController(
 				organizationId,
 				body.threadId,

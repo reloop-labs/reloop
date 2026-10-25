@@ -102,7 +102,7 @@ Reloop is open-source email infrastructure: an SMTP relay and REST API, plus inb
 
 **Weaknesses**
 
-- **One port.** Reloop's relay listens on 587 with STARTTLS. Devices on networks that block 587 can't fall back to 2525 or 80 the way they can on SMTP2GO.
+- **Fewer ports.** Reloop's relay uses STARTTLS on 587, with 2587 and 2025 as fallbacks. It has no 2525, port 80 or implicit TLS on 465, so devices on very locked-down networks have fewer options than on SMTP2GO.
 - **A 200-a-day cap on Free.** SMTP2GO's free 1,000 a month has no daily cap, which suits occasional bursts better.
 - No SMS and no phone support.
 

@@ -9,6 +9,6 @@ Create and maintain beautiful email templates within Reloop. Use our interactive
 ## Key capabilities
 
 * **Lexical editor**: An intuitive visual drag-and-drop builder for creating complex responsive email layouts without writing HTML.
-* **Variable interpolation**: Embed variables (`{{ contact.first_name }}`) to personalize emails dynamically during execution.
+* **Variable interpolation**: Embed variables in triple braces (`{{{first_name}}}`) and pass their values in `template.variables` when you send through the API. Campaigns and workflows can also read contact fields directly (`{{contact.first_name}}`).
 * **Layout inheritance**: Design universal headers/footers and extend them for newsletter, marketing, or transactional templates.
 * **Developer previews**: Instantly test how templates render in dark mode, light mode, or mobile screens.

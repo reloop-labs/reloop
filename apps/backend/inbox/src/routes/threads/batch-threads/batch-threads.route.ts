@@ -1,3 +1,7 @@
+import {
+	assertThreadsAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { batchThreadsXCodeSamples } from "@reloop/code-samples/inbox";
@@ -23,7 +27,9 @@ const batchAction = t.Union([
 
 export const batchThreadsRoute = new Elysia().use(authMiddleware).post(
 	"/batch",
-	async ({ body, organizationId }) => {
+	async ({ body, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		await assertThreadsAllowed(scope, organizationId, body.ids);
 		return batchThreadsController(organizationId, body.ids, body.action);
 	},
 	{

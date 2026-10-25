@@ -29,10 +29,10 @@ relatedSlugs:
 
 Resend set the bar for a modern email API, and plenty of teams are happy on it. The reasons people look elsewhere are usually the same few:
 
-- **Price at volume.** The free tier is generous (3,000 a month), but the next steps are $20 for 50k and $90 for 100k, with $0.90 per extra 1,000.
+- **Price at volume.** The free tier is generous (3,000 a month), but the next steps are $20 for 50k and $35 for 100k, with $0.90 per extra 1,000.
 - **Hosted only.** There's no way to run Resend yourself, for data residency, security review or cost.
 - **Inbound is a webhook.** Resend can receive mail and post each message to your webhook, but storage, threading and replies are yours to build.
-- **Dedicated IPs** start on the Scale plan.
+- **Dedicated IPs** need the $90 Scale plan plus a $30/mo add-on.
 
 We build Reloop, so weigh this accordingly. Every price below comes from our researched head-to-head posts and each provider's public pricing page, and each section says where that alternative beats us.
 
@@ -59,7 +59,7 @@ We build Reloop, so weigh this accordingly. Every price below comes from our res
 |---|---|---|---|---|---|---|---|---|
 | **Free tier** | 3,000 / mo (100 / day) | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | 100 / mo | $200 credits, 6 months | 60-day trial, 100 / day | 100 / day, trial | 500 / mo |
 | **~50,000 / mo** | $20 | **$10** | $20 | $87 | ~$5 | $19.95 | $35 | $35 |
-| **~100,000 / mo** | $90 | **$20** | $40 | $177 | ~$10 | $34.95 | ~$100 | $68 |
+| **~100,000 / mo** | $35 | **$20** | $40 | $177 | ~$10 | $34.95 | ~$100 | $68 |
 | **Inbound** | Webhook | Mailboxes, API, MCP, IMAP | Roadmap | Webhook | Receipt rules | Parse webhook | Routes | Forwarding |
 | **Campaigns** | Broadcasts | Yes + automations | Yes | Broadcast streams | No | Separate plans | Limited | Via MailerLite |
 | **Open source** | No | Yes (Apache 2.0) | Yes (AGPL) | No | No | No | No | No |
@@ -90,11 +90,11 @@ const { response, emailError } = await reloop.mail.send({
 
 **Strengths**
 
-- **Half Resend's price at 50k and under a quarter at 100k.** Over a year at 100k a month, that's $840 saved.
+- **Half Resend's price at 50k and about 40% less at 100k.** Over a year at 100k a month, that's $180 saved, or $1,200 if you need a dedicated IP.
 - **Inbound mail into real inboxes.** Messages are stored, threaded, spam-scored and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, so AI agents and support teams can reply in-thread.
 - **Transactional, campaigns and event automations** in one product with one suppression list.
 - **Open source (Apache 2.0)** and self-hostable with a [one-command installer](/self-host). Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers.
-- **Dedicated IP on the $20 plan**, where Resend needs Scale.
+- **Dedicated IP on the $20 plan**, where Resend needs the $90 Scale plan plus a $30/mo add-on.
 - **Errors that explain themselves**, with `why` and `fix` fields.
 
 **Weaknesses**
@@ -249,7 +249,7 @@ Most of the work is DNS, not code.
 
   <Accordion title="What is the cheapest Resend alternative?">
     For raw sending, Amazon SES at $0.10 per 1,000. For a full platform,
-    Reloop at $10 for 50,000 and $20 for 100,000, compared with $20 and $90 on
+    Reloop at $10 for 50,000 and $20 for 100,000, compared with $20 and $35 on
     Resend.
   </Accordion>
 

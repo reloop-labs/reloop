@@ -32,8 +32,8 @@ try {
     $mail->SMTPAuth   = true;
     $mail->Username   = 'reloop';
     $mail->Password   = getenv('RELOOP_API_KEY');
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-    $mail->Port       = 465;
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 587;
 
     // Recipients
     $mail->setFrom('onboarding@reloop.sh', 'Onboarding');

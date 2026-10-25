@@ -68,7 +68,7 @@ None of that matters if you have a platform team and send millions of emails a m
 |---|---|---|---|---|---|---|---|---|
 | **Free** | $200 AWS credits, 6 months | 6,000 / mo (200 / day) | Own verified addresses only | First credit (10k emails) | 100 / mo | 3,000 / mo (100 / day) | 100 / day, trial | 100 / day, 60-day trial |
 | **~50k / mo** | ~$5 | **$10** | about $21 | about $12.50 | $87 | $20 | $35 | $19.95 |
-| **~100k / mo** | ~$10 | **$20** | about $39 | about $25 | $177 | $90 | about $100 | $34.95 |
+| **~100k / mo** | ~$10 | **$20** | about $39 | about $25 | $177 | $35 | about $100 | $34.95 |
 | **Delivery events** | SNS / EventBridge, you wire it up | Signed HTTP webhooks | Cloudflare Queues | Webhooks | Webhooks | Webhooks | Webhooks | Webhooks |
 | **Inbound** | Receipt rules to S3 / SNS / Lambda | Mailboxes, API, MCP, IMAP | Email Routing | Not offered | Webhook (Pro and up) | Webhook | Inbound routes | Inbound Parse |
 | **Marketing** | No | Campaigns + automations | No | Not allowed | Broadcast streams | Broadcasts | Limited | Separate plans |
@@ -176,11 +176,11 @@ Postmark has built its reputation on fast, transactional-first delivery, with se
 
 Resend set the bar for a modern email API and created React Email. Worth knowing for SES refugees: **Resend sends through Amazon SES** under the hood, with its own product layer on top.
 
-**Pricing:** free for 3,000 a month (100 a day), $20 for 50,000, $90 for 100,000, overage $0.90 per 1,000.
+**Pricing:** free for 3,000 a month (100 a day), $20 for 50,000, $35 for 100,000, overage $0.90 per 1,000.
 
 **Strengths:** clean API and SDKs, React Email, a large ecosystem of examples, broadcasts for simple marketing.
 
-**Weaknesses:** a big jump to $90 at 100k; dedicated IPs on the Scale plan and up; inbound is a webhook per message; hosted-only.
+**Weaknesses:** $35 at 100k vs about $10 on SES; a dedicated IP needs the $90 Scale plan plus a $30/mo add-on; inbound is a webhook per message; hosted-only.
 
 **Best for:** teams that want the most polished hosted API and stay under 50k emails a month. Full comparison: [Reloop vs Resend](/blog/reloop-vs-resend).
 

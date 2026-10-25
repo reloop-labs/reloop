@@ -185,7 +185,7 @@ export const comparePages: ComparePageContent[] = [
 			{
 				question: "How does Reloop pricing compare to Resend?",
 				answer:
-					"Reloop Free includes 6,000 emails per month with a 200/day cap, double Resend Free (3,000 per month, 100/day). Reloop Pro is $10/month for 50,000 emails and Growth is $20/month for 100,000 emails; Resend Pro is $20/month for 50,000 emails and roughly $90/month at 100,000 emails. Reloop overage is $0.50 per 1,000 vs Resend $0.90 per 1,000. Self-hosted Reloop has no Reloop license fee — you pay your own infrastructure. Prices are public list prices as of September 17, 2026; see reloop.sh/pricing and resend.com/pricing.",
+					"Reloop Free includes 6,000 emails per month with a 200/day cap, double Resend Free (3,000 per month, 100/day). Reloop Pro is $10/month for 50,000 emails and Growth is $20/month for 100,000 emails; Resend Pro is $20/month for 50,000 emails and $35/month for 100,000 emails. Reloop overage is $0.50 per 1,000 vs Resend $0.90 per 1,000. Self-hosted Reloop has no Reloop license fee — you pay your own infrastructure. Prices are public list prices as of October 26, 2026; see reloop.sh/pricing and resend.com/pricing.",
 			},
 			{
 				question: "Is Reloop open source?",

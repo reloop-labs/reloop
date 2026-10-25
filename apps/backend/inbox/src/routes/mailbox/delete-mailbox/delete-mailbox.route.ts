@@ -1,3 +1,7 @@
+import {
+	assertMailboxAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { deleteMailboxXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +10,9 @@ import { deleteMailboxController } from "./delete-mailbox.controllers";
 
 export const deleteMailboxRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
-	async ({ params: { id }, organizationId }) => {
+	async ({ params: { id }, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		assertMailboxAllowed(scope, id);
 		return deleteMailboxController(id, organizationId);
 	},
 	{

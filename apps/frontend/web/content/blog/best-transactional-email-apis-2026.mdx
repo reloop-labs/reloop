@@ -52,14 +52,14 @@ We build Reloop, so factor that in. Every price below comes from each provider's
 |---|---|---|---|---|---|---|
 | **Free tier** | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | 100 / mo | $200 AWS credits, 6 months | 60-day trial, 100 / day | 100 / day |
 | **~50,000 / mo** | **$10** | $20 | $15 base (10k) + overage | ~$5 | $19.95 | $35 |
-| **~100,000 / mo** | **$20** | $90 | $15 base + overage | ~$10 | $34.95 | $35 + overage |
+| **~100,000 / mo** | **$20** | $35 | $15 base + overage | ~$10 | $34.95 | $35 + overage |
 | **Overage per 1k** | **$0.50** | $0.90 | $1.80 (Basic), $1.30 (Pro) | $0.10 | Plan upgrade | From $1.30 |
 | **Open source** | Yes | No | No | No | No | No |
 | **Self-host** | Yes | No | No | No | No | No |
 | **Inbound** | Mailboxes + threads | Webhook | Webhook (Pro and up) | Receipt rules to S3 / Lambda / SNS | Inbound Parse webhook | Routes |
 | **Marketing / campaigns** | Yes + automations | Broadcasts | Broadcast streams | No | Separate plan | Separate product |
 | **SMTP relay** | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Dedicated IP** | 1 included on $20 Growth | Scale plan and up | $50 / mo, from 300k / mo | $24.95 / mo | Pro plan and up | Paid add-on |
+| **Dedicated IP** | 1 included on $20 Growth | $30/mo add-on on Scale ($90+) | $50 / mo, from 300k / mo | $24.95 / mo | Pro plan and up | Paid add-on |
 
 Sources: [resend.com/pricing](https://resend.com/pricing), [postmarkapp.com/pricing](https://postmarkapp.com/pricing), [aws.amazon.com/ses/pricing](https://aws.amazon.com/ses/pricing/), [sendgrid.com/pricing](https://sendgrid.com/pricing/), [mailgun.com/pricing](https://www.mailgun.com/pricing/), [reloop.sh/pricing](/pricing). SES figures are à la carte sending only, before data transfer. Postmark prices volume in tiers, so use its calculator for an exact 50k or 100k figure.
 
@@ -109,7 +109,7 @@ Reloop is open-source email infrastructure: a transactional API, SMTP relay, inb
 
 Resend made "an email API that feels like Stripe" the norm, and its React Email project made writing templates in JSX mainstream.
 
-**Pricing:** Free is 3,000 a month (100 a day). Pro is $20 for 50,000. 100,000 costs $90 a month. Overage is $0.90 per 1,000.
+**Pricing:** Free is 3,000 a month (100 a day). Pro is $20 for 50,000. 100,000 costs $35 a month. Overage is $0.90 per 1,000.
 
 **Strengths**
 
@@ -120,10 +120,10 @@ Resend made "an email API that feels like Stripe" the norm, and its React Email 
 
 **Weaknesses**
 
-- Prices climb fast past 50k: $90 at 100k vs $20 on Reloop.
+- $35 at 100k vs $20 on Reloop, and a dedicated IP needs the $90 Scale plan plus a $30/mo add-on.
 - Hosted only. No self-hosting, no source.
 - Inbound arrives as a webhook per message, not a mailbox you can thread and reply from.
-- Dedicated IPs start on the Scale plan.
+- A dedicated IP needs the $90 Scale plan plus a $30/mo add-on.
 
 **Best for:** small teams that want a polished hosted API and expect to stay under 50k emails a month.
 

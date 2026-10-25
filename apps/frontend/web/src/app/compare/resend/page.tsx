@@ -63,7 +63,7 @@ const ResendComparisonPage = () => {
 				pagePath={pagePath}
 				titleLines={["Reloop vs Resend"]}
 				description="The open-source Resend alternative for 2026: same developer ergonomics with self-hosting, lower send-based pricing, its own MTA, and an agent inbox. By Reloop Labs — the team behind Reloop."
-				updatedAt="September 17, 2026"
+				updatedAt="October 26, 2026"
 				primaryCta={{
 					label: "Get Started ",
 					href: "/dashboard/signup",
@@ -113,13 +113,13 @@ const ResendComparisonPage = () => {
 							</p>
 							<p className="mt-2 text-[14px] leading-relaxed">
 								At 50,000 emails/month Reloop Pro is $10 vs Resend $20; at
-								100,000/month Reloop Growth is $20 vs roughly $90 on Resend,
-								with overage at $0.50 vs $0.90 per 1,000. Add self-hosting, an
-								agent inbox, and an MTA you control, and Reloop is the better
-								default for teams that outgrow a DX wrapper. Stay on Resend if
-								Audiences plus a hosted-only workflow already fits and you have
-								no need for source access or inbound agent workflows. Pricing as
-								of September 17, 2026 — verify on{" "}
+								100,000/month Reloop Growth is $20 vs $35 on Resend Pro, with
+								overage at $0.50 vs $0.90 per 1,000. Add self-hosting, an agent
+								inbox, and an MTA you control, and Reloop is the better default
+								for teams that outgrow a DX wrapper. Stay on Resend if Audiences
+								plus a hosted-only workflow already fits and you have no need
+								for source access or inbound agent workflows. Pricing as of
+								October 26, 2026 — verify on{" "}
 								<a
 									href="https://resend.com/pricing"
 									target="_blank"
@@ -167,7 +167,7 @@ const ResendComparisonPage = () => {
 				{/* Migration: Dub-style 3-step cards */}
 				<CompareSection maxWidth="2xl">
 					<p className="font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/40">
-						Pricing deep-dive · as of September 17, 2026
+						Pricing deep-dive · as of October 26, 2026
 					</p>
 					<h2 className="mt-3 font-semibold text-text-strong-950 text-xl tracking-tight sm:text-2xl dark:text-white">
 						Pricing: where the gap opens up past 50k emails
@@ -178,7 +178,7 @@ const ResendComparisonPage = () => {
 							Resend Free (3,000/month, 100/day). The gap widens at the first
 							paid tier: Reloop Pro bundles 50,000 emails for $10/month while
 							Resend charges $20 for the same 50,000. At 100,000 emails/month
-							Reloop Growth stays at $20; Resend scales to roughly $90.
+							Reloop Growth stays at $20; Resend Pro is $35.
 						</p>
 						<p>
 							Overage tells the same story: $0.50 per 1,000 on Reloop vs $0.90

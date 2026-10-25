@@ -1,3 +1,7 @@
+import {
+	listMailboxFilter,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { listThreadsXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +10,9 @@ import { getThreadsController } from "./list-threads.controllers";
 
 export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 	"/",
-	async ({ query, organizationId }) => {
+	async ({ query, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		const mailboxIds = listMailboxFilter(scope, query.mailboxId);
 		return getThreadsController(
 			organizationId,
 			query.mailboxId,
@@ -16,6 +22,7 @@ export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 			query.q,
 			query.isPinned,
 			query.filter,
+			mailboxIds,
 		);
 	},
 	{

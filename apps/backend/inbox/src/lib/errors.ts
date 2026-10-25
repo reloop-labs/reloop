@@ -57,4 +57,12 @@ export const InboxErrors = {
 			why: `Your plan allows ${limit} agent inbox${limit === 1 ? "" : "es"} and you already have ${used}.`,
 			fix: "Delete an existing inbox or upgrade your plan to add more.",
 		}),
+	apiKeyMailboxNotAllowed: (target: string) =>
+		createError({
+			status: 403,
+			message: "API key is not allowed to access this mailbox",
+			why: `This API key is restricted to specific domains or addresses, and ${target} is not one of them`,
+			fix: "Use a mailbox the key allows, or use a key with access to this domain or address",
+			link: "https://reloop.sh/docs/learn/api-keys",
+		}),
 };

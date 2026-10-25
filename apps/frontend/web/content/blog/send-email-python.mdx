@@ -1,0 +1,500 @@
+---
+title: "How to Send Email in Python: smtplib, Django and API"
+description: "Send email from Python with smtplib, Django, FastAPI or Flask, or with an email API. Copy-paste examples for HTML email, attachments, background sending and retries without duplicates."
+keywords:
+  - send email Python
+  - Python send email
+  - Python smtplib example
+  - send HTML email Python
+  - Django send email
+  - FastAPI send email
+  - Flask send email
+  - Python email attachment
+  - Python email API
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [python, smtplib, django, fastapi, flask, smtp, sdk]
+readTime: 12 min read
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - send-email-nodejs
+  - smtp-ports-explained
+  - transactional-email-best-practices
+  - spf-dkim-dmarc-setup-guide
+  - gmail-yahoo-bulk-sender-requirements
+---
+
+**Python can send email with the built-in `smtplib` module, no install needed.** For anything in production, send through a provider: either over SMTP with `smtplib` or your framework's mail settings, or over HTTPS with an email API SDK.
+
+This guide covers plain `smtplib`, the Reloop Python SDK, Django, FastAPI and Flask, then the production details: attachments, background sending and safe retries.
+
+---
+
+## Which approach should you use?
+
+| | `smtplib` / framework SMTP | Email API SDK |
+|---|---------------------------|---------------|
+| **Install** | Nothing, it is in the standard library | `pip install reloop-email` |
+| **Transport** | SMTP on port 587 (STARTTLS) | HTTPS on port 443 |
+| **Building the message** | `EmailMessage`, MIME parts | A dict with `html`, `text`, `attachments` |
+| **Errors** | `SMTPException` subclasses | Result object with status and message |
+| **Safe retries** | No, a retry can send twice | Yes, with an idempotency key |
+| **Works with Django's `send_mail`** | Yes, natively | Through SMTP settings |
+
+If you are wiring up Django's built-in auth emails or a third-party package, use SMTP settings. If you are writing the send call yourself, use the API.
+
+---
+
+## Prerequisites
+
+1. **Python 3.9 or later**
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
+3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`, and the same key works for the API and SMTP.
+
+```bash
+export RELOOP_API_KEY=rl_your_api_key
+```
+
+Keep the key in the environment or a secrets manager, never in your code or git.
+
+---
+
+## Method 1: Send email with smtplib
+
+Use `EmailMessage` from the standard library. It handles encoding, headers and multipart bodies for you, so you do not need the older `MIMEMultipart` and `MIMEText` classes.
+
+```python
+import os
+import smtplib
+from email.message import EmailMessage
+
+msg = EmailMessage()
+msg["From"] = "Acme <hello@mail.acme.com>"
+msg["To"] = "user@example.com"
+msg["Subject"] = "Welcome to Acme"
+
+# Plain-text body first, then the HTML alternative
+msg.set_content("Welcome! Thanks for signing up.")
+msg.add_alternative(
+    "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+    subtype="html",
+)
+
+with smtplib.SMTP("smtp.reloop.sh", 587, timeout=30) as server:
+    server.starttls()
+    server.login("reloop", os.environ["RELOOP_API_KEY"])
+    server.send_message(msg)
+```
+
+The username can be any string. The password is your API key.
+
+### When port 587 is blocked
+
+Some hosts block outbound 587. Reloop also accepts STARTTLS on port **2587** (and 2025), so only the port number changes:
+
+```python
+with smtplib.SMTP("smtp.reloop.sh", 2587, timeout=30) as server:
+    server.starttls()
+    server.login("reloop", os.environ["RELOOP_API_KEY"])
+    server.send_message(msg)
+```
+
+Reloop does not offer implicit TLS on port 465, so do not use `smtplib.SMTP_SSL` with it. If the connection hangs or times out, see [SMTP ports explained](/blog/smtp-ports-explained).
+
+### Handle SMTP errors
+
+```python
+try:
+    with smtplib.SMTP("smtp.reloop.sh", 587, timeout=30) as server:
+        server.starttls()
+        server.login("reloop", os.environ["RELOOP_API_KEY"])
+        server.send_message(msg)
+except smtplib.SMTPAuthenticationError:
+    print("Wrong API key")
+except smtplib.SMTPRecipientsRefused as e:
+    print("Rejected recipients:", e.recipients)
+except (smtplib.SMTPException, OSError) as e:
+    print("Send failed:", e)
+```
+
+### Can I send with Gmail from Python?
+
+For a personal script, yes: use `smtp.gmail.com` on port 587 with an [App Password](https://support.google.com/accounts/answer/185833). For an app, no. Gmail limits personal accounts to about 500 recipients a day, every message comes from your `@gmail.com` address, and bulk sending gets the account suspended.
+
+---
+
+## Method 2: Send email with the Python SDK
+
+### Install
+
+```bash
+pip install reloop-email
+```
+
+### Send an email
+
+```python
+import os
+from reloop_email import Reloop
+
+reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
+
+result = reloop.mail.send({
+    "from": "Acme <hello@mail.acme.com>",
+    "to": "user@example.com",
+    "subject": "Welcome to Acme",
+    "html": "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+    "text": "Welcome! Thanks for signing up.",
+})
+
+if result.email_error:
+    print("Failed:", result.email_error.status, result.email_error)
+else:
+    print("Sent:", result.response["id"])
+```
+
+The SDK **returns** errors instead of raising them. Every call gives you a result with either `response` or `email_error`. Network failures come back with status `0`. If you prefer exceptions, `raise result.email_error`: it is an `Exception` subclass.
+
+Create the client **once** at startup and reuse it. It keeps an HTTP connection pool open. Call `reloop.close()` on shutdown, or use it as a context manager in scripts:
+
+```python
+with Reloop(api_key=os.environ["RELOOP_API_KEY"]) as reloop:
+    reloop.mail.send({...})
+```
+
+### Send to several recipients
+
+```python
+reloop.mail.send({
+    "from": "Acme <hello@mail.acme.com>",
+    "to": ["ada@example.com", "grace@example.com"],
+    "cc": "team@acme.com",
+    "reply_to": "support@acme.com",
+    "subject": "Your weekly report",
+    "text": "Here is your report.",
+    "tags": [{"name": "type", "value": "weekly_report"}],
+})
+```
+
+Every address in `to` sees the others. For personalised mail, send one message per recipient.
+
+### Send a stored template
+
+Keep copy out of your code so non-developers can edit it. Create the template in Reloop, then send it by ID with variables:
+
+```python
+reloop.mail.send({
+    "from": "Acme <hello@mail.acme.com>",
+    "to": "user@example.com",
+    "subject": "Welcome to Acme",
+    "template": {
+        "id": "tmpl_welcome",
+        "variables": {"first_name": "Ada", "plan": "Pro"},
+    },
+})
+```
+
+See [templates](/docs/learn/templates) for variables and defaults.
+
+---
+
+## Django
+
+Django's mail functions work with any SMTP provider. Add these settings and `send_mail`, password reset emails and admin error emails all go through Reloop:
+
+```python
+# settings.py
+import os
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.reloop.sh"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "reloop"
+EMAIL_HOST_PASSWORD = os.environ["RELOOP_API_KEY"]
+DEFAULT_FROM_EMAIL = "Acme <hello@mail.acme.com>"
+SERVER_EMAIL = "errors@mail.acme.com"
+```
+
+Keep `EMAIL_USE_SSL` off: Reloop uses STARTTLS, not implicit TLS. If 587 is blocked, set `EMAIL_PORT = 2587`.
+
+```python
+from django.core.mail import EmailMultiAlternatives
+
+message = EmailMultiAlternatives(
+    subject="Welcome to Acme",
+    body="Welcome! Thanks for signing up.",
+    to=["user@example.com"],
+)
+message.attach_alternative("<h1>Welcome!</h1>", "text/html")
+message.send()
+```
+
+In development, set `EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"` to print emails to the terminal instead of sending them. Full example: [Django guide](/docs/examples/python/django).
+
+---
+
+## FastAPI
+
+The SDK is synchronous. Declare the route with `def`, not `async def`, and FastAPI runs it in a thread pool so it does not block the event loop:
+
+```python
+import os
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, EmailStr
+from reloop_email import Reloop
+
+app = FastAPI()
+reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
+
+class Contact(BaseModel):
+    email: EmailStr
+    message: str
+
+@app.post("/contact")
+def contact(body: Contact):
+    result = reloop.mail.send({
+        "from": "Acme Website <contact@mail.acme.com>",
+        "to": "support@acme.com",
+        "reply_to": body.email,
+        "subject": f"New message from {body.email}",
+        "text": body.message,
+    })
+    if result.email_error:
+        raise HTTPException(status_code=502, detail="Could not send message")
+    return {"id": result.response["id"]}
+```
+
+The visitor's address goes in `reply_to`, never in `from`. You can only send from your verified domain, and putting someone else's domain in `from` fails [DMARC](/blog/gmail-yahoo-bulk-sender-requirements).
+
+To return before the email is sent, use `BackgroundTasks`:
+
+```python
+from fastapi import BackgroundTasks
+
+@app.post("/signup")
+def signup(email: EmailStr, tasks: BackgroundTasks):
+    # ... create the user ...
+    tasks.add_task(reloop.mail.send, {
+        "from": "Acme <hello@mail.acme.com>",
+        "to": email,
+        "subject": "Welcome to Acme",
+        "text": "Thanks for signing up.",
+    })
+    return {"ok": True}
+```
+
+`BackgroundTasks` is lost if the process restarts. For emails that must arrive, use a real queue (see below). Full example: [FastAPI guide](/docs/examples/python/fastapi).
+
+---
+
+## Flask
+
+```python
+import os
+from flask import Flask, request, jsonify
+from reloop_email import Reloop
+
+app = Flask(__name__)
+reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
+
+@app.post("/contact")
+def contact():
+    data = request.get_json()
+    result = reloop.mail.send({
+        "from": "Acme Website <contact@mail.acme.com>",
+        "to": "support@acme.com",
+        "reply_to": data["email"],
+        "subject": "New contact form message",
+        "text": data["message"],
+    })
+    if result.email_error:
+        return jsonify(error="Could not send message"), 502
+    return jsonify(id=result.response["id"])
+```
+
+Prefer SMTP with Flask-Mail? Use the same host, port and credentials as the Django settings above. Full example: [Flask guide](/docs/examples/python/flask).
+
+---
+
+## Attachments
+
+With the SDK, pass base64 content:
+
+```python
+import base64
+from pathlib import Path
+
+pdf = Path("invoice-1042.pdf").read_bytes()
+
+reloop.mail.send({
+    "from": "Acme Billing <billing@mail.acme.com>",
+    "to": "user@example.com",
+    "subject": "Your invoice #1042",
+    "text": "Your invoice is attached.",
+    "attachments": [{
+        "filename": "invoice-1042.pdf",
+        "content": base64.b64encode(pdf).decode(),
+        "content_type": "application/pdf",
+    }],
+})
+```
+
+With `smtplib`, use `add_attachment`:
+
+```python
+msg.add_attachment(
+    pdf,
+    maintype="application",
+    subtype="pdf",
+    filename="invoice-1042.pdf",
+)
+```
+
+Keep attachments small. Many inboxes reject messages over 25 MB, and large files hurt deliverability. For big files, send a signed download link.
+
+---
+
+## Send in the background with Celery
+
+Sending inside a web request adds latency and fails the request when the provider is slow. Move it to a worker and let the queue handle retries:
+
+```python
+# tasks.py
+import os
+from celery import Celery
+from reloop_email import Reloop
+
+app = Celery("tasks", broker=os.environ["REDIS_URL"])
+reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
+
+class RetryableSendError(Exception):
+    pass
+
+@app.task(
+    autoretry_for=(RetryableSendError,),
+    retry_backoff=True,
+    max_retries=5,
+)
+def send_welcome(email: str) -> str:
+    result = reloop.mail.send({
+        "from": "Acme <hello@mail.acme.com>",
+        "to": email,
+        "subject": "Welcome to Acme",
+        "text": "Thanks for signing up.",
+    })
+    if result.email_error:
+        status = result.email_error.status
+        if status == 0 or status == 429 or status >= 500:
+            raise RetryableSendError(str(result.email_error))
+        raise result.email_error  # 4xx: do not retry
+    return result.response["id"]
+```
+
+**Retry** network errors (status `0`), `429` and `5xx`. **Do not retry** other `4xx` errors: an invalid address or unverified domain fails the same way every time.
+
+---
+
+## Retries without duplicate emails
+
+A request times out and your task retries. If the first attempt actually went through, the user gets two emails. The API prevents this with an [`Idempotency-Key` header](/docs/api/idempotency): repeat a request with the same key and Reloop returns the original result instead of sending again.
+
+The SDK does not set this header yet, so call the endpoint with `httpx` (already installed with the SDK):
+
+```python
+import os
+import httpx
+
+def send_receipt(order_id: str, to: str) -> dict:
+    res = httpx.post(
+        "https://reloop.sh/api/mail/v1/send",
+        headers={
+            "x-api-key": os.environ["RELOOP_API_KEY"],
+            "Idempotency-Key": f"receipt-{order_id}",
+        },
+        json={
+            "from": "Acme <orders@mail.acme.com>",
+            "to": to,
+            "subject": f"Receipt for order {order_id}",
+            "text": "Thanks for your order.",
+        },
+        timeout=30,
+    )
+    res.raise_for_status()
+    return res.json()
+```
+
+Base the key on the business event (`receipt-{order_id}`), not a new UUID per attempt, so retries from any worker are safe.
+
+---
+
+## Testing without sending real email
+
+- **Django:** the test runner swaps in the `locmem` backend automatically. Assert on `django.core.mail.outbox`.
+- **Anything else:** mock the client in unit tests, and send to [test addresses](/docs/guides/testing-email-addresses) in staging so you do not hurt your sender reputation with bounces.
+- **Local SMTP:** run [Mailpit](https://mailpit.axllent.org) with `docker run -p 1025:1025 -p 8025:8025 axllent/mailpit` and point `smtplib.SMTP("localhost", 1025)` at it, without `starttls()` or `login()`. Open `http://localhost:8025` to see the messages.
+
+---
+
+## Production checklist
+
+- [ ] API key in an environment variable or secrets manager
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `from` on your verified domain; user addresses in `reply_to`
+- [ ] Both HTML and plain-text bodies
+- [ ] One shared client, created at startup
+- [ ] Sending in a worker (Celery, RQ, Dramatiq), not the request
+- [ ] Retries only on network errors, `429` and `5xx`
+- [ ] Idempotency keys on anything that retries
+- [ ] [Webhooks](/features/webhooks) for bounces and complaints
+- [ ] Disposable addresses blocked at signup ([how](/blog/block-disposable-emails-at-signup))
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I send an HTML email in Python?">
+    Build an EmailMessage, call set_content with the plain-text version, then
+    add_alternative with your HTML and subtype="html". With the Reloop SDK,
+    pass html and text keys in the send dict.
+  </Accordion>
+
+  <Accordion title="What is the difference between smtplib.SMTP and SMTP_SSL?">
+    SMTP connects in plain text and you call starttls() to upgrade, which is
+    what port 587 expects. SMTP_SSL starts TLS immediately, which is what port
+    465 expects. Using the wrong one for the port makes the connection hang or
+    fail with an SSL error.
+  </Accordion>
+
+  <Accordion title="Is there an async Python SDK?">
+    The Reloop Python SDK is synchronous. In FastAPI, declare routes with def
+    so they run in the thread pool, or call the HTTP API directly with
+    httpx.AsyncClient from async code.
+  </Accordion>
+
+  <Accordion title="Why do my Python emails go to spam?">
+    Usually the sending domain is not authenticated, or the From domain does
+    not match the domain that signed the message. Set up SPF, DKIM and DMARC,
+    send from your own domain, and always include a plain-text body.
+  </Accordion>
+
+  <Accordion title="Can I use Reloop with Django's password reset emails?">
+    Yes. Set the SMTP settings shown above and every email Django sends,
+    including password resets and admin error reports, goes through Reloop with
+    no code changes.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send your first email from Python"
+  description="Python SDK, SMTP relay for Django and Flask, and a free tier of 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

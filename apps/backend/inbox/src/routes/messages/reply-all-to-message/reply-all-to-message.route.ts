@@ -1,3 +1,8 @@
+import {
+	assertMessageAllowed,
+	assertThreadAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { replyAllToMessageXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +11,12 @@ import { replyAllToMessageController } from "./reply-all-to-message.controllers"
 
 export const replyAllToMessageRoute = new Elysia().use(authMiddleware).post(
 	"/:id/reply-all",
-	async ({ params: { id }, body, organizationId, request }) => {
+	async ({ params: { id }, body, organizationId, request, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		await assertMessageAllowed(scope, organizationId, id);
+		if (body.threadId) {
+			await assertThreadAllowed(scope, organizationId, body.threadId);
+		}
 		return replyAllToMessageController(
 			id,
 			organizationId,

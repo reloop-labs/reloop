@@ -1,3 +1,7 @@
+import {
+	assertThreadAllowed,
+	resolveMailboxScope,
+} from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { getThreadAttachmentXCodeSamples } from "@reloop/code-samples/inbox";
@@ -6,7 +10,9 @@ import { getThreadAttachmentController } from "./get-thread-attachment.controlle
 
 export const getThreadAttachmentRoute = new Elysia().use(authMiddleware).get(
 	"/:id/attachments/:attachmentId",
-	async ({ params: { id, attachmentId }, organizationId }) => {
+	async ({ params: { id, attachmentId }, organizationId, apiKeyId }) => {
+		const scope = await resolveMailboxScope(organizationId, apiKeyId);
+		await assertThreadAllowed(scope, organizationId, id);
 		return getThreadAttachmentController(id, attachmentId, organizationId);
 	},
 	{

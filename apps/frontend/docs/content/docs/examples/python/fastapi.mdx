@@ -1,7 +1,7 @@
 ---
 title: Send Email with FastAPI
 sidebarTitle: FastAPI
-description: Send transactional email from FastAPI with the Reloop Python SDK. Includes env setup and a complete async send-mail endpoint example.
+description: Send transactional email from FastAPI with the Reloop Python SDK. Includes env setup and a complete send-mail endpoint example.
 icon: siFastapi
 ---
 
@@ -18,7 +18,7 @@ pip install reloop-email
 Add your API key to your environment:
 
 ```bash
-export RELOOP_API_KEY="re_your_api_key_here"
+export RELOOP_API_KEY="rl_your_api_key_here"
 ```
 
 ## Sending an Email
@@ -33,8 +33,10 @@ from reloop_email import Reloop
 app = FastAPI()
 reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
 
+# The SDK is synchronous. Use `def`, not `async def`, so FastAPI runs the
+# route in its thread pool instead of blocking the event loop.
 @app.post("/send-email")
-async def send_email():
+def send_email():
     try:
         result = reloop.mail.send({
             "from": "onboarding@reloop.sh",

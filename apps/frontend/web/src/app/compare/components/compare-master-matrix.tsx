@@ -122,7 +122,7 @@ const MASTER_CATEGORIES: MatrixCategory[] = [
 				feature: "Cost per 100,000 Emails",
 				detail: "Hosted Reloop Growth ($20, 100k included)",
 				reloop: "$20",
-				resend: "$90.00",
+				resend: "$35.00",
 				sendgrid: "$89.95",
 				postmark: "$115.00",
 				awsSes: "$10.00 + Data",

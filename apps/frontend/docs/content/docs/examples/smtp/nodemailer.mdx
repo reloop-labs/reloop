@@ -22,7 +22,7 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   host: 'smtp.reloop.sh',
   port: 587,
-  secure: false, // true for port 465, false for other ports
+  secure: false, // Reloop uses STARTTLS; keep false on every port
   auth: {
     user: 'reloop',
     pass: process.env.RELOOP_API_KEY,
