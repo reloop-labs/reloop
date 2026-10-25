@@ -9,10 +9,11 @@ require 'policy.bounce_rewrite'
 local constants = require 'policy.constants'
 
 -- Submission ports (outbound relay). Inbound MX is handled by the inbound service on :25.
--- 587 / 2025 / 2587 — STARTTLS (explicit TLS)
--- 465 / 2465 — same listeners; for true SMTPS (implicit TLS) terminate TLS upstream
---              (Coolify/Traefik/HAProxy) and forward cleartext to these ports.
+-- 587 / 2025 / 2465 / 2587 — STARTTLS (explicit TLS)
+-- 465 — implicit TLS (SMTPS, RFC 8314) when kumod supports `tls_mode`; older
+--       builds reject the option, so 465 falls back to STARTTLS (see below).
 local SUBMISSION_PORTS = { 465, 587, 2025, 2465, 2587 }
+local IMPLICIT_TLS_PORTS = { [465] = true }
 
 -- KumoMTA min_free_space is a percentage string ("10%") or a byte count (number).
 -- Env values like "10MB" must be converted; passing them through crashes kumod.
@@ -127,7 +128,29 @@ kumo.on('init', function()
       listener_config.tls_certificate = tls_cert_path
       listener_config.tls_private_key = tls_key_path
     end
-    kumo.start_esmtp_listener(listener_config)
+
+    local started = false
+    if IMPLICIT_TLS_PORTS[port] then
+      -- `tls_mode` only exists in newer kumod builds, which reject unknown
+      -- listener fields. Try implicit TLS first and keep the old STARTTLS
+      -- listener if this build does not know the option yet.
+      local implicit_config = {}
+      for key, value in pairs(listener_config) do
+        implicit_config[key] = value
+      end
+      implicit_config.tls_mode = 'ImplicitTls'
+      local ok, err = pcall(kumo.start_esmtp_listener, implicit_config)
+      if ok then
+        started = true
+        print('[SMTP] Port ' .. port .. ': implicit TLS')
+      else
+        print('[SMTP] Port ' .. port .. ': implicit TLS unsupported by this kumod, using STARTTLS: ' .. tostring(err))
+      end
+    end
+
+    if not started then
+      kumo.start_esmtp_listener(listener_config)
+    end
   end
 
   kumo.start_http_listener {
