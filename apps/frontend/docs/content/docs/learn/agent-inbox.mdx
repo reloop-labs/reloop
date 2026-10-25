@@ -1,21 +1,102 @@
 ---
 title: Agent Inbox
-description: Handle inbound emails dynamically using AI-powered classification and routing.
+description: Give people and AI agents real mailboxes on your own domain that receive, thread, send and reply, over the dashboard, API, webhooks, MCP and IMAP.
 icon: inbox
 ---
 
-The Reloop **Agent Inbox** turns static inbound email addresses into active, programmable endpoints. Instead of simply forwarding raw emails, Reloop routes inbound messages through our AI processing engine to extract structured data, classify intent, and trigger downstream handlers.
-
-## Key capabilities
-
-* **AI classification**: Automatically categorize inbound messages (e.g. Support, Billing, Sales, Spam) and extract sentiment.
-* **Structured data extraction**: Parse variables out of the email body (like invoice numbers, customer names, or tracking codes) using JSON schemas.
-* **Automated routing**: Forward parsed payloads directly to custom webhooks or enqueue them in NATS messaging topics.
-* **Inline conversational replies**: Send automated AI-drafted replies or route them to human agents in the dashboard.
+An **agent inbox** is a mailbox on a domain you own, such as `support@inbox.yourdomain.com`. Reloop receives mail for it, groups messages into threads, flags spam, and lets you send and reply from the same address. The same mailbox works for a person in the dashboard, for your code through the API, and for an AI agent through MCP.
 
 ## How it works
 
-1. **Inbound gateway**: Email is received via your verified sending domain (e.g. `support@yourdomain.com`).
-2. **Parsing & normalization**: The HTML content, attachments, headers, and metadata are parsed.
-3. **AI evaluation**: The inbox's custom prompt evaluates the content against defined rules.
-4. **Action dispatch**: Webhooks are fired, database state is updated, or an automated reply is queued.
+1. **Mail arrives.** Your domain's MX record points to `inbound.reloop.sh`. Reloop accepts mail for every mailbox on that domain.
+2. **It is stored and threaded.** Each message lands in its mailbox and is attached to a thread with the earlier messages in the conversation.
+3. **It gets a spam verdict.** Every inbound message is scored. Messages scored as spam are still stored, with `is_spam: true`.
+4. **You are notified.** An `email.received` webhook fires with the mailbox, sender, subject, thread and message IDs.
+5. **You reply in the thread.** Replies are sent from the mailbox address and stay in the same conversation for the recipient.
+
+## Set up a mailbox
+
+<Steps>
+  <Step title="Add the domain and MX record">
+    Add a domain with **Email Receiving** turned on, and publish the MX record `inbound.reloop.sh`. Use a subdomain if your root domain already receives mail elsewhere. See [Receiving emails](/docs/guides/receiving-emails).
+  </Step>
+  <Step title="Create the mailbox">
+    Create it from the domain page in the [dashboard](https://reloop.sh/dashboard), with the [Mailboxes API](/docs/api/inbox/mailboxes), or with the Node.js SDK:
+
+    ```typescript
+    const { mailbox, mailboxError } = await reloop.inbox.mailboxes.create({
+      domainId: "dom_...",
+      email: "support@inbox.yourdomain.com",
+      displayName: "Acme Support",
+    });
+    ```
+  </Step>
+  <Step title="Send it a test">
+    Email the address from any personal account. The message appears in the mailbox within a few seconds.
+  </Step>
+</Steps>
+
+## Threads and messages
+
+| Concept | What it is |
+| --- | --- |
+| **Mailbox** | One address, such as `support@inbox.yourdomain.com`, with its own display name |
+| **Thread** | A conversation. Status is `active`, `archived`, `closed` or `trash`, and threads can be starred, labelled and marked read |
+| **Message** | One inbound or outbound email in a thread, with attachments and the raw source available |
+| **Draft** and **note** | Unsent replies, and internal notes your team leaves on a thread |
+
+Load the whole thread before replying, so a person or model sees every earlier message, inbound and outbound.
+
+## Send and reply
+
+- **Reply** or **reply all** to a message to keep the conversation in one thread. Reloop sets the threading headers for you.
+- **Forward** a message to another address.
+- **Send** a new message from the mailbox.
+- **Delay a send** with `scheduledAt`, or give it an undo window with `undoWindowSeconds`. A pending send can be cancelled until it goes out.
+
+The [Messages API](/docs/api/inbox/messages) and the SDK (`reloop.inbox.messages.reply`, `replyAll`, `forward`, `send`, `cancelPending`) cover all of these.
+
+## Ways to work with an inbox
+
+| Method | Best for |
+| --- | --- |
+| **Dashboard** | People reading, replying, labelling and leaving notes |
+| **Webhooks** | Reacting to each new message in your code. Subscribe to [`email.received`](/docs/webhooks/emails/received) and [verify the signature](/docs/webhooks/verify-webhooks-requests). |
+| **API and SDKs** | Listing threads, fetching messages, replying and sending ([Threads](/docs/api/inbox/threads), [Messages](/docs/api/inbox/messages)) |
+| **MCP** | Letting Claude, Cursor or another AI client read and answer mail. See [MCP server](/docs/integrations/ai-tools/mcp-server). |
+| **IMAP** | Apple Mail, Outlook, Thunderbird or any IMAP client |
+
+### IMAP settings
+
+| Setting | Value |
+| --- | --- |
+| Host | `imap.reloop.sh` |
+| Port | `993` (TLS) or `143` (STARTTLS) |
+| Username | The mailbox address |
+| Password | A Reloop API key from the mailbox's organization that is allowed to use that address |
+
+## Restrict what an agent can reach
+
+Give each agent an API key restricted to its own address or domain. A restricted key can only list, read, change and send from the mailboxes its scope allows. This applies to the whole inbox API, to sending, to SMTP and to IMAP login. Requests for any other mailbox return `403`.
+
+Treat inbound email as untrusted input. An email can contain instructions written to manipulate an AI agent, so do not let a model follow instructions found in a message, and require human approval before an agent sends anything consequential.
+
+## Limits
+
+Each plan includes a number of agent inboxes:
+
+| Plan | Agent inboxes |
+| --- | --- |
+| Free | 3 |
+| Pro | 5 |
+| Growth | 10 |
+| Enterprise | Custom |
+
+Creating or re-activating a mailbox beyond your plan's limit fails. Each mailbox has a 5 GB storage quota by default. Self-hosted Reloop has no inbox limit.
+
+## Learn more
+
+- [Receiving emails](/docs/guides/receiving-emails)
+- [Webhook event types](/docs/webhooks/event-types)
+- [MCP server](/docs/integrations/ai-tools/mcp-server)
+- [Domains](/docs/learn/domain)
