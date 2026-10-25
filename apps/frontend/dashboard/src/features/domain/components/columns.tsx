@@ -7,6 +7,42 @@ import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { Domain } from "../types";
 import { getStatusColorClass, getStatusIcon, getStatusLabel } from "../utils";
 
+/** On/off state of a per-domain feature (sending, receiving, tracking). */
+function FeatureCell({ enabled }: { enabled: boolean }) {
+	return (
+		<div
+			className={cn(
+				"flex items-center gap-1 font-medium text-[13px]",
+				enabled ? "text-success-base" : "text-text-soft-400",
+			)}
+		>
+			<Icon
+				name={enabled ? "check-circle" : "minus-circle"}
+				className="h-3 w-3 shrink-0"
+			/>
+			{enabled ? "On" : "Off"}
+		</div>
+	);
+}
+
+function featureColumn(
+	id: string,
+	label: string,
+	icon: string,
+	pick: (domain: Domain) => boolean,
+): ColumnDef<Domain> {
+	return {
+		id,
+		header: () => (
+			<div className="flex items-center gap-1">
+				<Icon name={icon} className="h-3 w-3" />
+				<span className="whitespace-nowrap text-xs">{label}</span>
+			</div>
+		),
+		cell: ({ row }) => <FeatureCell enabled={pick(row.original)} />,
+	};
+}
+
 export const domainColumns: ColumnDef<Domain>[] = [
 	{
 		id: "select",
@@ -98,6 +134,30 @@ export const domainColumns: ColumnDef<Domain>[] = [
 			</div>
 		),
 	},
+	featureColumn(
+		"sending",
+		"Sending",
+		"mail-send",
+		(d) => d.isSendingEmailEnabled,
+	),
+	featureColumn(
+		"receiving",
+		"Receiving",
+		"mail-receive",
+		(d) => d.isReceivingEmailEnabled,
+	),
+	featureColumn(
+		"clickTracking",
+		"Click tracking",
+		"cursor-click",
+		(d) => d.isClickTrackingEnabled,
+	),
+	featureColumn(
+		"openTracking",
+		"Open tracking",
+		"eye-outline",
+		(d) => d.isOpenTrackingEnabled,
+	),
 	{
 		id: "createdAt",
 		header: () => (

@@ -6,6 +6,10 @@ const STORAGE_KEY = "reloop:domains:column-visibility";
 export const DOMAIN_VIEW_COLUMNS = [
 	{ id: "domain", label: "Domain" },
 	{ id: "status", label: "Status" },
+	{ id: "sending", label: "Sending" },
+	{ id: "receiving", label: "Receiving" },
+	{ id: "clickTracking", label: "Click tracking" },
+	{ id: "openTracking", label: "Open tracking" },
 	{ id: "createdAt", label: "Created At" },
 ] as const;
 
@@ -14,6 +18,10 @@ export type DomainViewColumnId = (typeof DOMAIN_VIEW_COLUMNS)[number]["id"];
 const DEFAULT_VISIBILITY: VisibilityState = {
 	domain: true,
 	status: true,
+	sending: true,
+	receiving: true,
+	clickTracking: true,
+	openTracking: true,
 	createdAt: true,
 };
 

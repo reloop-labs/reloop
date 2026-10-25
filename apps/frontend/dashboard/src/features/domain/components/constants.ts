@@ -4,7 +4,11 @@ import type { CSSProperties } from "react";
 const COLUMN_TRACKS: Record<string, string> = {
 	domain: "minmax(0,1fr)",
 	status: "120px",
-	createdAt: "140px",
+	sending: "100px",
+	receiving: "100px",
+	clickTracking: "120px",
+	openTracking: "120px",
+	createdAt: "120px",
 };
 
 export function getDomainTableGridStyle(

@@ -11,7 +11,6 @@ import type { CommandAction } from "#/features/dashboard/command-menu";
 import { useRegisterCommandActions } from "#/features/dashboard/command-menu-context";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
-import { DomainCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { DomainErrorState } from "./components/domain-error-state";
 import { DomainListHeader } from "./components/domain-list-header";
 import { DomainListToolbar } from "./components/domain-list-toolbar";
@@ -108,30 +107,22 @@ export function DomainPage() {
 		<div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
 			<DomainListHeader />
 
-			<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-				<div className="lg:col-span-9 xl:col-span-9">
-					{error ? (
-						<DomainErrorState />
-					) : (
-						<div className="space-y-4">
-							<DomainListToolbar
-								columnVisibility={columnVisibility}
-								onColumnVisibleChange={setColumnVisible}
-							/>
-							<DomainTable
-								domains={data?.domains || []}
-								total={data?.total || 0}
-								columnVisibility={columnVisibility}
-								isLoading={showLoading}
-							/>
-						</div>
-					)}
+			{error ? (
+				<DomainErrorState />
+			) : (
+				<div className="space-y-4">
+					<DomainListToolbar
+						columnVisibility={columnVisibility}
+						onColumnVisibleChange={setColumnVisible}
+					/>
+					<DomainTable
+						domains={data?.domains || []}
+						total={data?.total || 0}
+						columnVisibility={columnVisibility}
+						isLoading={showLoading}
+					/>
 				</div>
-
-				<div className="lg:col-span-3 xl:col-span-3">
-					<DomainCommonUseCasesSidebar />
-				</div>
-			</div>
+			)}
 		</div>
 	);
 }
