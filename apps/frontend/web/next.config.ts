@@ -76,18 +76,30 @@ const nextConfig: NextConfig = {
 		];
 	},
 	async rewrites() {
-		return [
-			// ARD v0.91 moved the catalog to ard.json; keep the legacy path for older readers
-			{
-				source: "/.well-known/ai-catalog.json",
-				destination: "/.well-known/ard.json",
-			},
-			// Markdown twins (App Router skill.md / pricing.md win over afterFiles rewrite)
-			{
-				source: "/:path*.md",
-				destination: "/api/markdown/:path*",
-			},
-		];
+		return {
+			beforeFiles: [],
+			afterFiles: [
+				// ARD v0.91 moved the catalog to ard.json; keep the legacy path for older readers
+				{
+					source: "/.well-known/ai-catalog.json",
+					destination: "/.well-known/ard.json",
+				},
+				// Markdown twins (App Router skill.md / pricing.md win over afterFiles rewrite)
+				{
+					source: "/:path*.md",
+					destination: "/api/markdown/:path*",
+				},
+			],
+			// Runs only after every page and dynamic route failed to match, so
+			// agents asking for Markdown get a Markdown 404 instead of the HTML page.
+			fallback: [
+				{
+					source: "/:path*",
+					has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
+					destination: "/api/markdown-not-found/:path*",
+				},
+			],
+		};
 	},
 };
 

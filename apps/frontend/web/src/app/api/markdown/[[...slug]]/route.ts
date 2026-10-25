@@ -5,6 +5,7 @@ import {
 	AGENT_LINK_HEADER,
 	canonicalLinkHeader,
 } from "@reloop/web/lib/agent-headers";
+import { markdownNotFound } from "@reloop/web/lib/markdown-not-found";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -34,7 +35,7 @@ export async function GET(
 
 	const content = resolveMarketingMarkdown(path);
 	if (!content) {
-		return new NextResponse(`Markdown not found for ${path}`, { status: 404 });
+		return markdownNotFound(`${path}.md`);
 	}
 
 	return new NextResponse(content, {
