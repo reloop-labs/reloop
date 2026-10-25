@@ -42,25 +42,17 @@ const CONTACT_ITEMS = [
 export function HelpPage() {
 	return (
 		<div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-			<div className="pt-5">
-				<div>
-					<h1 className="font-semibold text-text-strong-950 text-title-h5">
-						Help
-					</h1>
-				</div>
-			</div>
-
-			<div className="mt-6 grid items-start gap-6 lg:grid-cols-2">
-				{/* Left: live chat */}
+			<div className="grid items-start gap-6 lg:grid-cols-2">
+				{/* Left: live chat, fills the viewport below the sticky header (h-11) and page padding (3rem) */}
 				<section
 					aria-label="Support chat"
-					className="flex h-[560px] flex-col overflow-hidden rounded-[20px] border border-stroke-soft-100 bg-white lg:sticky lg:top-16 lg:h-[720px] dark:border-stroke-soft-100/70 dark:bg-black"
+					className="flex h-[calc(100dvh-5.75rem)] min-h-[480px] flex-col overflow-hidden rounded-[20px] border border-stroke-soft-100 bg-white dark:border-stroke-soft-100/70 dark:bg-black"
 				>
 					<SupportChatPanel />
 				</section>
 
 				{/* Right: contact details */}
-				<div className="w-full">
+				<div className="w-full lg:sticky lg:top-[4.25rem]">
 					<div className="max-w-sm space-y-5 md:mx-auto">
 						{CONTACT_ITEMS.map((item) => (
 							<a

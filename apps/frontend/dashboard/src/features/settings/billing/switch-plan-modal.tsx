@@ -339,8 +339,10 @@ export function SwitchPlanModal({
 	const validUntil = existing && existing > fresh ? existing : fresh;
 	const payg = planLimits.payg;
 
+	// No onOpenChange(false) here: nuqs flushes its query update after the push
+	// and would replace the URL back to this page. The plans URL has no
+	// switchPlan param, so the modal is closed on arrival anyway.
 	const goToPlans = () => {
-		onOpenChange(false);
 		router.push("/settings/billing/plans");
 	};
 
