@@ -12,7 +12,7 @@ export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
 	return (
 		<Link
 			href={`/blog/${post.slug}`}
-			className="group flex flex-col outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-2 focus-visible:ring-offset-bg-white-0 dark:focus-visible:ring-offset-black"
+			className="group flex flex-col outline-none focus-visible:ring-2 focus-visible:ring-text-strong-950 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-white-0 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black"
 		>
 			<BlogPostCoverImage
 				slug={post.slug}
@@ -30,7 +30,7 @@ export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
 				</span>
 			</div>
 
-			<h2 className="mt-3 font-semibold text-[18px] text-text-strong-950 leading-snug tracking-tight group-hover:text-primary-base sm:text-[19px] dark:text-white">
+			<h2 className="mt-3 font-semibold text-[18px] text-text-strong-950 leading-snug tracking-tight group-hover:text-text-sub-600 sm:text-[19px] dark:text-white dark:group-hover:text-white/70">
 				{post.title}
 			</h2>
 

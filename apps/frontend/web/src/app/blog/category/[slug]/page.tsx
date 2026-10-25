@@ -51,7 +51,10 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 			activeCategorySlug={slug}
 			breadcrumb={
 				<nav className="mb-4 text-[13px] text-text-sub-600 dark:text-white/55">
-					<Link href="/blog" className="hover:text-primary-base">
+					<Link
+						href="/blog"
+						className="hover:text-text-strong-950 dark:hover:text-white"
+					>
 						Blog
 					</Link>
 					<span className="mx-2">/</span>

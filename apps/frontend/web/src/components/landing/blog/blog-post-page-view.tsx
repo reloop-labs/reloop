@@ -5,7 +5,10 @@ import { Icon } from "@reloop/ui/icon";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
-import { BlogTableOfContents } from "@reloop/web/components/landing/blog/blog-table-of-contents";
+import {
+	BlogTableOfContents,
+	BlogTocRail,
+} from "@reloop/web/components/landing/blog/blog-table-of-contents";
 import {
 	formatBlogDate,
 	formatBlogDateUpper,
@@ -16,7 +19,6 @@ import type {
 	BlogPostDefinition,
 	BlogTocItem,
 } from "@reloop/web/lib/landing/types";
-import { hostedSignupHref } from "@reloop/web/lib/site";
 import Image from "next/image";
 import Link from "next/link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -98,51 +100,8 @@ function CheckIcon({ className }: { className?: string }) {
 	);
 }
 
-function StackMark({ className }: { className?: string }) {
-	return (
-		<svg
-			className={className}
-			viewBox="0 0 24 24"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			aria-hidden="true"
-		>
-			<g transform="rotate(90, 12, 12)">
-				<path
-					d="M22 10V6.5L12 11.5V15L22 10Z"
-					fill="currentColor"
-					fillOpacity={0.25}
-				/>
-				<path
-					d="M22 17.5V14L12 19V22.5L22 17.5Z"
-					fill="currentColor"
-					fillOpacity={0.25}
-				/>
-				<path d="M12 19V22.3213" stroke="currentColor" />
-				<path
-					d="M2 14L11.3292 18.6646C11.7515 18.8757 12.2485 18.8757 12.6708 18.6646L22 14"
-					stroke="currentColor"
-				/>
-				<path
-					d="M6 12L2.55279 13.7236C2.214 13.893 2 14.2393 2 14.618V16.882C2 17.2607 2.214 17.607 2.55279 17.7764L11.3292 22.1646C11.7515 22.3757 12.2485 22.3757 12.6708 22.1646L21.4472 17.7764C21.786 17.607 22 17.2607 22 16.882V14.618C22 14.2393 21.786 13.893 21.4472 13.7236L18 12"
-					stroke="currentColor"
-				/>
-				<path d="M12 11.5V14.8229" stroke="currentColor" />
-				<path
-					d="M2 6.5L11.3292 11.1646C11.7515 11.3757 12.2485 11.3757 12.6708 11.1646L22 6.5"
-					stroke="currentColor"
-				/>
-				<path
-					d="M11.3292 14.6646L2.55279 10.2764C2.214 10.107 2 9.76074 2 9.38197V7.11803C2 6.73926 2.214 6.393 2.55279 6.22361L11.3292 1.83541C11.7515 1.62426 12.2485 1.62426 12.6708 1.83541L21.4472 6.22361C21.786 6.393 22 6.73926 22 7.11803V9.38197C22 9.76074 21.786 10.107 21.4472 10.2764L12.6708 14.6646C12.2485 14.8757 11.7515 14.8757 11.3292 14.6646Z"
-					stroke="currentColor"
-				/>
-			</g>
-		</svg>
-	);
-}
-
 const floatingCardClassName =
-	"w-full rounded-2xl border border-stroke-soft-200 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_-16px_rgba(0,0,0,0.14)] dark:border-white/10 dark:bg-bg-weak-50 dark:shadow-none";
+	"w-full rounded-2xl border border-stroke-soft-200 bg-white p-5 dark:border-white/10 dark:bg-bg-weak-50";
 
 const shareButtonClassName =
 	"flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white";
@@ -252,92 +211,6 @@ function TocCard({
 	);
 }
 
-function GetStartedCard() {
-	return (
-		<div className={floatingCardClassName}>
-			<div className="relative flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-xl border border-stroke-soft-200/70 bg-bg-weak-50/60 text-text-strong-950 dark:border-white/[0.06] dark:bg-black/40 dark:text-white">
-				<div
-					className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.06]"
-					style={{
-						backgroundImage:
-							"repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 10px)",
-					}}
-				/>
-				<svg
-					className="pointer-events-none absolute inset-0 size-full text-text-strong-950/[0.06] dark:text-white/[0.07]"
-					viewBox="0 0 200 112"
-					fill="none"
-					aria-hidden="true"
-				>
-					<circle
-						cx="100"
-						cy="56"
-						r="26"
-						stroke="currentColor"
-						strokeDasharray="3 3"
-					/>
-					<circle
-						cx="100"
-						cy="56"
-						r="50"
-						stroke="currentColor"
-						strokeWidth="0.75"
-					/>
-					<circle
-						cx="100"
-						cy="56"
-						r="78"
-						stroke="currentColor"
-						strokeDasharray="4 4"
-					/>
-				</svg>
-				<StackMark className="relative size-16" />
-			</div>
-
-			<p className="mt-5 font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-widest dark:text-white/45">
-				Get started
-			</p>
-			<h3 className="mt-1.5 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
-				Ready to send?
-			</h3>
-			<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
-				Email API, SMTP relay and agent inboxes.{" "}
-				<span className="font-medium text-text-strong-950 dark:text-white">
-					Open source, self-host or cloud.
-				</span>
-			</p>
-
-			<div className="mt-5 flex flex-col gap-2">
-				<a
-					href={hostedSignupHref}
-					className="inline-flex h-9 items-center justify-center rounded-xl bg-text-strong-950 font-medium text-sm text-white transition-colors hover:bg-text-strong-950/85 active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90"
-				>
-					Start for free
-				</a>
-				<a
-					href="/docs"
-					className="inline-flex h-9 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 font-medium text-sm text-text-strong-950 transition-colors hover:border-stroke-soft-300 active:scale-[0.98] dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:border-white/20"
-				>
-					Read the docs
-				</a>
-			</div>
-
-			<a
-				href="/llms.txt"
-				className="group mt-4 flex items-center justify-center gap-1 text-text-soft-400 text-xs transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
-			>
-				<span>AI agent? Read llms.txt</span>
-				<span
-					aria-hidden="true"
-					className="transition-transform duration-200 group-hover:translate-x-0.5"
-				>
-					→
-				</span>
-			</a>
-		</div>
-	);
-}
-
 export function BlogPostPageView({
 	post,
 	body,
@@ -371,10 +244,17 @@ export function BlogPostPageView({
 			<div className="w-full border-stroke-soft-200 border-b dark:border-white/10">
 				<div className="mx-auto w-full max-w-7xl border-stroke-soft-100 border-x px-4 pt-32 pb-12 sm:px-6 lg:px-8 dark:border-white/10">
 					<header className="mx-auto flex w-full max-w-[720px] flex-col gap-4">
+						<Link
+							href="/blog"
+							className="mb-2 hidden items-center gap-1.5 self-start font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 xl:inline-flex dark:text-white/60 dark:hover:text-white"
+						>
+							<ArrowLeftIcon className="size-3.5 shrink-0 select-none" />
+							<span>All articles</span>
+						</Link>
 						<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
 							<Link
 								href={getCategoryPath(post.category)}
-								className="text-primary-base transition-opacity hover:opacity-80"
+								className="text-text-strong-950 transition-opacity hover:opacity-70 dark:text-white"
 							>
 								{post.category}
 							</Link>
@@ -423,26 +303,18 @@ export function BlogPostPageView({
 				</div>
 			</div>
 
-			{/* Article with floating side cards */}
+			{/* Article with the table of contents rail on the right edge */}
 			<div className="mx-auto w-full max-w-7xl border-stroke-soft-100 border-x px-4 sm:px-6 lg:px-8 dark:border-white/10">
-				<aside
-					aria-label="Table of contents"
-					className={cn(
-						"-translate-y-1/2 fixed top-1/2 left-4 z-30 hidden w-[260px] transition-opacity duration-300 xl:block",
-						railsVisible ? "opacity-100" : "pointer-events-none opacity-0",
-					)}
-				>
-					<TocCard toc={toc} className="max-h-[calc(100dvh-8rem)]" />
-				</aside>
-				<aside
-					aria-label="Get started"
-					className={cn(
-						"-translate-y-1/2 fixed top-1/2 right-4 z-30 hidden w-[260px] transition-opacity duration-300 xl:block",
-						railsVisible ? "opacity-100" : "pointer-events-none opacity-0",
-					)}
-				>
-					<GetStartedCard />
-				</aside>
+				{toc.length > 0 ? (
+					<div
+						className={cn(
+							"-translate-y-1/2 fixed top-1/2 right-4 z-30 hidden transition-opacity duration-300 xl:block",
+							railsVisible ? "opacity-100" : "pointer-events-none opacity-0",
+						)}
+					>
+						<BlogTocRail items={toc} />
+					</div>
+				) : null}
 
 				<main
 					ref={mainRef}
@@ -464,7 +336,7 @@ export function BlogPostPageView({
 
 					{post.description ? (
 						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 p-6 dark:border-white/10 dark:bg-white/[0.03]">
-							<div className="mb-3 flex items-center gap-1.5 font-mono font-semibold text-[11px] text-primary-base uppercase tracking-widest">
+							<div className="mb-3 flex items-center gap-1.5 font-mono font-semibold text-[11px] text-text-strong-950 uppercase tracking-widest dark:text-white">
 								<SparklesIcon className="size-3" />
 								<span>Summary</span>
 							</div>

@@ -30,15 +30,9 @@ function handleScrollTo(
 	setActiveId(id);
 }
 
-export function BlogTableOfContents({
-	items,
-	className,
-	showHeader = true,
-}: {
-	items: BlogTocItem[];
-	className?: string;
-	showHeader?: boolean;
-}) {
+function useActiveHeading(
+	items: BlogTocItem[],
+): [string, (id: string) => void] {
 	const [activeId, setActiveId] = useState("");
 
 	useEffect(() => {
@@ -51,33 +45,52 @@ export function BlogTableOfContents({
 
 		if (elements.length === 0) return;
 
-		const observer = new IntersectionObserver(
-			(entries) => {
-				const visible = entries
-					.filter((entry) => entry.isIntersecting)
-					.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
-				if (visible[0]) {
-					setActiveId(visible[0].target.id);
-				}
-			},
-			{
-				rootMargin: "-20% 0px -60% 0px",
-				threshold: 0,
-			},
-		);
-
-		for (const element of elements) {
-			observer.observe(element);
-		}
+		// The active heading is the last one scrolled above 30% of the viewport,
+		// so it stays correct after jumps that skip headings entirely.
+		let frame = 0;
+		const update = () => {
+			frame = 0;
+			const line = window.innerHeight * 0.3;
+			let current = elements[0]?.id ?? "";
+			for (const element of elements) {
+				if (element.getBoundingClientRect().top > line) break;
+				current = element.id;
+			}
+			setActiveId(current);
+		};
+		const onScroll = () => {
+			if (!frame) frame = requestAnimationFrame(update);
+		};
 
 		const hash = window.location.hash.replace("#", "");
 		if (hash && ids.includes(hash)) {
 			setActiveId(hash);
+		} else {
+			update();
 		}
 
-		return () => observer.disconnect();
+		window.addEventListener("scroll", onScroll, { passive: true });
+		window.addEventListener("resize", onScroll);
+		return () => {
+			window.removeEventListener("scroll", onScroll);
+			window.removeEventListener("resize", onScroll);
+			cancelAnimationFrame(frame);
+		};
 	}, [items]);
+
+	return [activeId, setActiveId];
+}
+
+export function BlogTableOfContents({
+	items,
+	className,
+	showHeader = true,
+}: {
+	items: BlogTocItem[];
+	className?: string;
+	showHeader?: boolean;
+}) {
+	const [activeId, setActiveId] = useActiveHeading(items);
 
 	if (items.length === 0) return null;
 
@@ -112,6 +125,87 @@ export function BlogTableOfContents({
 					);
 				})}
 			</ul>
+		</nav>
+	);
+}
+
+/**
+ * Compact table of contents for the page edge: one short line per heading,
+ * expanding into a titled list on hover or keyboard focus.
+ */
+export function BlogTocRail({
+	items,
+	className,
+}: {
+	items: BlogTocItem[];
+	className?: string;
+}) {
+	const [activeId, setActiveId] = useActiveHeading(items);
+
+	if (items.length === 0) return null;
+
+	return (
+		<nav
+			aria-label="Table of contents"
+			className={cn("group/toc relative flex justify-end", className)}
+		>
+			<ul
+				aria-hidden="true"
+				className="m-0 flex list-none flex-col items-end gap-[14px] p-3 transition-opacity duration-200 group-focus-within/toc:opacity-0 group-hover/toc:opacity-0"
+			>
+				{items.map((item) => {
+					const id = getHeadingId(item.url);
+					const isActive = activeId === id;
+
+					return (
+						<li
+							key={id}
+							className={cn(
+								"h-[2px] rounded-full transition-all duration-300",
+								isActive
+									? "w-5 bg-text-strong-950 dark:bg-white"
+									: "w-4 bg-text-soft-400/50 dark:bg-white/25",
+							)}
+						/>
+					);
+				})}
+			</ul>
+
+			<div className="-translate-y-1/2 pointer-events-none invisible absolute top-1/2 right-0 w-[280px] origin-right scale-95 opacity-0 transition-[opacity,transform,visibility] duration-200 ease-out group-focus-within/toc:pointer-events-auto group-focus-within/toc:visible group-focus-within/toc:scale-100 group-focus-within/toc:opacity-100 group-hover/toc:pointer-events-auto group-hover/toc:visible group-hover/toc:scale-100 group-hover/toc:opacity-100">
+				<ul className="m-0 flex max-h-[calc(100dvh-10rem)] list-none flex-col overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-white p-2 dark:border-white/10 dark:bg-bg-weak-50">
+					{items.map((item) => {
+						const id = getHeadingId(item.url);
+						const isActive = activeId === id;
+
+						return (
+							<li key={id}>
+								<a
+									href={item.url}
+									onClick={(e) => handleScrollTo(e, id, setActiveId)}
+									title={item.title}
+									className={cn(
+										"flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] leading-snug transition-colors hover:bg-bg-weak-50 dark:hover:bg-white/[0.05]",
+										isActive
+											? "font-medium text-text-strong-950 dark:text-white"
+											: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
+									)}
+								>
+									<span
+										aria-hidden="true"
+										className={cn(
+											"size-1 shrink-0 rounded-full",
+											isActive
+												? "bg-text-strong-950 dark:bg-white"
+												: "bg-transparent",
+										)}
+									/>
+									<span className="truncate">{item.title}</span>
+								</a>
+							</li>
+						);
+					})}
+				</ul>
+			</div>
 		</nav>
 	);
 }
