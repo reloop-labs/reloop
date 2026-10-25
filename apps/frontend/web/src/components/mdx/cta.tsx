@@ -41,7 +41,10 @@ export function Cta({
 		);
 
 	return (
-		<aside className="my-8 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 dark:border-white/10 dark:bg-white/[0.03]">
+		<aside
+			data-prose-reset
+			className="my-8 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 dark:border-white/10 dark:bg-white/[0.03]"
+		>
 			<h3 className="font-semibold text-[18px] text-text-strong-950 dark:text-white">
 				{title}
 			</h3>

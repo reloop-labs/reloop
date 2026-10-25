@@ -46,7 +46,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 	const { body: renderBody, ...metadata } = post;
 	const [postData, relatedPosts] = await Promise.all([
 		withBlurPlaceholder(metadata),
-		withBlurPlaceholders(getRelatedPosts(slug, 4)),
+		withBlurPlaceholders(getRelatedPosts(slug, 3)),
 	]);
 
 	return (

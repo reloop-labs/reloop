@@ -4,13 +4,13 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
+import { BlogPostGrid } from "@reloop/web/components/landing/blog/blog-post-card";
 import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
 import {
 	BlogTableOfContents,
 	BlogTocRail,
 } from "@reloop/web/components/landing/blog/blog-table-of-contents";
 import {
-	formatBlogDate,
 	formatBlogDateUpper,
 	formatReadTime,
 	getCategoryPath,
@@ -348,48 +348,19 @@ export function BlogPostPageView({
 					) : null}
 
 					<BlogBody>{body}</BlogBody>
-
-					{relatedPosts.length > 0 ? (
-						<div className="border-stroke-soft-200 border-t pt-8 dark:border-white/10">
-							<h2 className="mb-6 font-semibold text-text-strong-950 tracking-tight dark:text-white">
-								Read more
-							</h2>
-							<div className="flex flex-col gap-6 sm:gap-7">
-								{relatedPosts.map((relatedPost) => (
-									<Link
-										key={relatedPost.slug}
-										href={`/blog/${relatedPost.slug}`}
-										className="group flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5"
-									>
-										<div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl bg-bg-weak-50/50 sm:w-44 md:w-48 dark:bg-white/[0.04]">
-											<BlogPostCoverImage
-												slug={relatedPost.slug}
-												image={relatedPost.image}
-												blurDataURL={relatedPost.imageBlurDataURL}
-												alt={relatedPost.title}
-											/>
-										</div>
-										<div className="flex flex-col justify-center space-y-1">
-											<h3 className="font-semibold text-base text-text-strong-950 decoration-text-strong-950/40 underline-offset-4 transition-colors group-hover:underline dark:text-white dark:group-hover:decoration-white/40">
-												{relatedPost.title}
-											</h3>
-											<p className="line-clamp-2 text-text-sub-600 text-xs leading-relaxed sm:text-sm dark:text-white/70">
-												{relatedPost.description}
-											</p>
-											<time
-												dateTime={relatedPost.publishedAt}
-												className="text-text-sub-600 text-xs dark:text-white/50"
-											>
-												{formatBlogDate(relatedPost.publishedAt)}
-											</time>
-										</div>
-									</Link>
-								))}
-							</div>
-						</div>
-					) : null}
 				</main>
 			</div>
+
+			{relatedPosts.length > 0 ? (
+				<section className="border-stroke-soft-100 border-t dark:border-white/10">
+					<div className="mx-auto w-full max-w-7xl border-stroke-soft-100 border-x dark:border-white/10">
+						<h2 className="border-stroke-soft-100 border-b px-4 py-8 font-medium text-[1.5rem] text-text-strong-950 tracking-[-0.02em] sm:px-8 lg:px-12 dark:border-white/10 dark:text-white">
+							You may also like
+						</h2>
+						<BlogPostGrid posts={relatedPosts} />
+					</div>
+				</section>
+			) : null}
 
 			<BlogCta
 				category={post.category}

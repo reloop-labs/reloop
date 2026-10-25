@@ -262,6 +262,12 @@ body.dark,
 	margin-bottom: 0.75rem !important;
 }
 
+/* Components rendered inside an article (e.g. the MDX <Cta>) style themselves
+   with utilities; drop the article typography so it doesn't override them. */
+.blog-prose [data-prose-reset] :is(h3, p, a) {
+	all: revert-layer;
+}
+
 @keyframes infinite-scroll {
 	from {
 		transform: translateX(0);

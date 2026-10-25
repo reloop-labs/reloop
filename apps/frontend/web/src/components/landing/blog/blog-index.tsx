@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { BlogPostCard } from "@reloop/web/components/landing/blog/blog-post-card";
+import { BlogPostGrid } from "@reloop/web/components/landing/blog/blog-post-card";
 import { BlogPostFeaturedCard } from "@reloop/web/components/landing/blog/blog-post-featured-card";
 import {
 	filterBlogPosts,
@@ -307,16 +307,7 @@ export function BlogIndex({
 						</p>
 					</div>
 				) : (
-					<ul className="grid sm:grid-cols-2 lg:grid-cols-3">
-						{gridPosts.map((post) => (
-							<li
-								key={post.slug}
-								className="border-stroke-soft-100 border-b sm:border-r dark:border-white/10 sm:max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(3n)]:border-r-0"
-							>
-								<BlogPostCard post={post} />
-							</li>
-						))}
-					</ul>
+					<BlogPostGrid posts={gridPosts} />
 				)}
 			</div>
 

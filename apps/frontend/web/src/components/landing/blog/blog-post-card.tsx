@@ -97,3 +97,19 @@ export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
 		</Link>
 	);
 }
+
+/** Posts in bordered cells; the lines meet the page frame like a table. */
+export function BlogPostGrid({ posts }: { posts: BlogPostDefinition[] }) {
+	return (
+		<ul className="grid sm:grid-cols-2 lg:grid-cols-3">
+			{posts.map((post) => (
+				<li
+					key={post.slug}
+					className="border-stroke-soft-100 border-b sm:border-r dark:border-white/10 sm:max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(3n)]:border-r-0"
+				>
+					<BlogPostCard post={post} />
+				</li>
+			))}
+		</ul>
+	);
+}
