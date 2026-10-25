@@ -6,10 +6,9 @@ import {
 	generateCategoryStaticParams,
 	getCategories,
 	getCategoryBySlug,
-	getPostsByCategory,
+	getPublishedPosts,
 } from "@reloop/web/lib/landing/blog/source";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export const instant = false;
@@ -41,27 +40,13 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 		notFound();
 	}
 
-	const posts = await withBlurPlaceholders(getPostsByCategory(slug));
+	const posts = await withBlurPlaceholders(getPublishedPosts());
 
 	return (
 		<BlogIndex
 			posts={posts}
 			categories={getCategories()}
-			title={category.name}
-			description={category.description}
 			activeCategorySlug={slug}
-			breadcrumb={
-				<nav className="mb-4 text-[13px] text-text-sub-600 dark:text-white/55">
-					<Link
-						href="/blog"
-						className="hover:text-text-strong-950 dark:hover:text-white"
-					>
-						Blog
-					</Link>
-					<span className="mx-2">/</span>
-					<span>{category.name}</span>
-				</nav>
-			}
 		>
 			<BlogCta category={category.name} />
 		</BlogIndex>

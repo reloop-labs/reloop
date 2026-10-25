@@ -4,7 +4,10 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { BlogPostCard } from "@reloop/web/components/landing/blog/blog-post-card";
 import { BlogPostFeaturedCard } from "@reloop/web/components/landing/blog/blog-post-featured-card";
-import { filterBlogPosts } from "@reloop/web/lib/landing/blog/utils";
+import {
+	filterBlogPosts,
+	sortBlogPosts,
+} from "@reloop/web/lib/landing/blog/utils";
 import type {
 	BlogCategoryDefinition,
 	BlogPostDefinition,
@@ -43,16 +46,27 @@ const inset = "px-4 sm:px-8 lg:px-14";
 function CategoryPill({
 	href,
 	active,
+	onSelect,
 	children,
 }: {
 	href: string;
 	active: boolean;
+	onSelect: () => void;
 	children: ReactNode;
 }) {
 	return (
 		<Link
 			href={href}
+			scroll={false}
 			aria-current={active ? "page" : undefined}
+			onClick={(event) => {
+				// Let modified clicks open a new tab; plain clicks filter in place.
+				if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+					return;
+				}
+				event.preventDefault();
+				onSelect();
+			}}
 			className={cn(
 				"shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[14px] transition-colors",
 				active
@@ -73,9 +87,11 @@ function CategoryPill({
 function CategoryNav({
 	categories,
 	activeCategorySlug,
+	onSelect,
 }: {
 	categories: BlogCategoryDefinition[];
 	activeCategorySlug?: string;
+	onSelect: (slug: string | undefined) => void;
 }) {
 	const scrollerRef = useRef<HTMLElement>(null);
 	const [edges, setEdges] = useState({ start: false, end: false });
@@ -87,14 +103,18 @@ function CategoryNav({
 		setEdges({ start: el.scrollLeft > 1, end: el.scrollLeft < max - 1 });
 	}, []);
 
+	// Keep the active pill visible, including after back/forward navigation.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: re-run when the active pill changes
+	useEffect(() => {
+		scrollerRef.current
+			?.querySelector<HTMLElement>('[aria-current="page"]')
+			?.scrollIntoView({ block: "nearest", inline: "nearest" });
+	}, [activeCategorySlug]);
+
 	useEffect(() => {
 		const el = scrollerRef.current;
 		if (!el) return;
 
-		el.querySelector<HTMLElement>('[aria-current="page"]')?.scrollIntoView({
-			block: "nearest",
-			inline: "nearest",
-		});
 		updateEdges();
 
 		const observer = new ResizeObserver(updateEdges);
@@ -113,7 +133,11 @@ function CategoryNav({
 				onScroll={updateEdges}
 				className="flex gap-1 overflow-x-auto px-4 [scrollbar-width:none] sm:px-0 [&::-webkit-scrollbar]:hidden"
 			>
-				<CategoryPill href="/blog" active={!activeCategorySlug}>
+				<CategoryPill
+					href="/blog"
+					active={!activeCategorySlug}
+					onSelect={() => onSelect(undefined)}
+				>
 					All articles
 				</CategoryPill>
 				{categories.map((category) => (
@@ -121,6 +145,7 @@ function CategoryNav({
 						key={category.slug}
 						href={`/blog/category/${category.slug}`}
 						active={category.slug === activeCategorySlug}
+						onSelect={() => onSelect(category.slug)}
 					>
 						{category.name}
 					</CategoryPill>
@@ -146,58 +171,75 @@ function CategoryNav({
 	);
 }
 
+function categorySlugFromPath(pathname: string): string | undefined {
+	return pathname.match(/^\/blog\/category\/([^/]+)/)?.[1];
+}
+
+/**
+ * Blog listing shared by /blog and /blog/category/[slug]. Category pills
+ * filter in place and update the URL with history, so the hero and scroll
+ * position never move. Each category URL still renders server-side for SEO.
+ */
 export function BlogIndex({
 	posts,
 	categories,
 	title = "Blog",
-	description,
-	activeCategorySlug,
-	breadcrumb,
+	activeCategorySlug: initialCategorySlug,
 	children,
 }: {
+	/** Every published post; category filtering happens here. */
 	posts: BlogPostDefinition[];
 	categories: BlogCategoryDefinition[];
 	title?: string;
-	description?: string;
 	activeCategorySlug?: string;
-	breadcrumb?: ReactNode;
 	children?: ReactNode;
 }) {
 	const [query, setQuery] = useState("");
+	const [activeCategorySlug, setActiveCategorySlug] =
+		useState(initialCategorySlug);
 
-	const filteredPosts = useMemo(
-		() => filterBlogPosts(posts, { query }),
-		[posts, query],
+	useEffect(() => {
+		const onPopState = () =>
+			setActiveCategorySlug(categorySlugFromPath(window.location.pathname));
+		window.addEventListener("popstate", onPopState);
+		return () => window.removeEventListener("popstate", onPopState);
+	}, []);
+
+	const selectCategory = useCallback((slug: string | undefined) => {
+		setActiveCategorySlug(slug);
+		window.history.pushState(
+			null,
+			"",
+			slug ? `/blog/category/${slug}` : "/blog",
+		);
+	}, []);
+
+	const activeCategory = categories.find(
+		(category) => category.slug === activeCategorySlug,
 	);
 
-	// The main blog leads with the newest post; category pages lead with the
-	// category title instead. Searching shows every match in the grid.
-	const featured =
-		!activeCategorySlug && !query.trim() ? filteredPosts[0] : undefined;
-	const gridPosts = featured ? filteredPosts.slice(1) : filteredPosts;
+	// The hero is always the newest post, whatever the filter, so the top of
+	// the page never changes while browsing categories or searching.
+	const featured = useMemo(() => sortBlogPosts(posts)[0], [posts]);
+
+	const gridPosts = useMemo(
+		() =>
+			filterBlogPosts(posts, { query }).filter(
+				(post) =>
+					post.slug !== featured?.slug &&
+					(!activeCategory || post.category === activeCategory.name),
+			),
+		[posts, query, featured, activeCategory],
+	);
 
 	return (
 		<div className="min-h-dvh bg-bg-white-0 dark:bg-black">
-			{/* Lead: featured post on /blog, title on category pages */}
+			{/* Lead: the newest post, identical on every listing URL */}
 			<section className={cn(frame, inset, "pt-28 pb-16 sm:pt-36 sm:pb-24")}>
-				{featured ? (
-					<>
-						<h1 className="sr-only">{title}</h1>
-						<BlogPostFeaturedCard post={featured} />
-					</>
-				) : (
-					<div>
-						{breadcrumb}
-						<h1 className="font-medium text-[2rem] text-text-strong-950 leading-[1.1] tracking-[-0.02em] sm:text-[2.5rem] dark:text-white">
-							{title}
-						</h1>
-						{description ? (
-							<p className="mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
-								{description}
-							</p>
-						) : null}
-					</div>
-				)}
+				<h1 className="sr-only">
+					{activeCategory ? `${activeCategory.name} articles` : title}
+				</h1>
+				{featured ? <BlogPostFeaturedCard post={featured} /> : null}
 			</section>
 
 			{/* Recent posts header, filters and search */}
@@ -210,13 +252,14 @@ export function BlogIndex({
 					)}
 				>
 					<h2 className="shrink-0 font-medium text-[1.5rem] text-text-strong-950 tracking-[-0.02em] dark:text-white">
-						Recent posts
+						{activeCategory?.name ?? "Recent posts"}
 					</h2>
 
 					<div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center">
 						<CategoryNav
 							categories={categories}
 							activeCategorySlug={activeCategorySlug}
+							onSelect={selectCategory}
 						/>
 
 						<span

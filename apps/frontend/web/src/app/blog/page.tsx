@@ -3,7 +3,6 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { BlogIndex } from "@reloop/web/components/landing/blog/blog-index";
 import { withBlurPlaceholders } from "@reloop/web/lib/landing/blog/blur";
 import {
-	blogIndexDescription,
 	buildBlogIndexJsonLd,
 	createBlogIndexMetadata,
 } from "@reloop/web/lib/landing/blog/seo";
@@ -22,11 +21,7 @@ const BlogPage = async () => {
 	return (
 		<>
 			<JsonLd data={buildBlogIndexJsonLd(posts)} />
-			<BlogIndex
-				posts={posts}
-				categories={getCategories()}
-				description={blogIndexDescription}
-			>
+			<BlogIndex posts={posts} categories={getCategories()}>
 				<BlogCta />
 			</BlogIndex>
 		</>
