@@ -1,0 +1,289 @@
+---
+title: "Reloop vs MailPace (2026): Pricing, Privacy and Which to Choose"
+description: "Reloop vs MailPace compared honestly: pricing by volume, EU hosting and the DPA, MailPace's no-tracking stance, the send API, inbound email and agent inboxes, campaigns, self-hosting, and how to switch."
+keywords:
+  - Reloop vs MailPace
+  - MailPace alternative
+  - MailPace pricing
+  - MailPace vs Reloop
+  - EU transactional email API
+  - privacy-focused email API
+publishedAt: 2026-10-25
+category: Comparison
+tags: [mailpace, comparison, pricing, gdpr, eu]
+readTime: 11 min read
+image: /blog/images/reloop-vs-mailpace.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - eu-email-api-providers-2026
+  - reloop-vs-lettermint
+  - reloop-vs-sweego
+---
+
+**MailPace is a small, opinionated transactional email API: EU-hosted, run by a UK company, and built around one rule, that it never tracks opens or clicks.** Reloop is a broader platform. **It sends transactional mail and campaigns, runs event-triggered automations, receives mail into inboxes your AI agents can reply from, and it's open source, so you can host it yourself.** MailPace is the cleaner answer if you want a hosted EU provider with no tracking at all. Reloop is cheaper per email once you pass 10,000 a month, and does more.
+
+We build Reloop, so weigh this accordingly. MailPace facts below come from its own [pricing page](https://mailpace.com/pricing), [documentation](https://docs.mailpace.com/), [DPA](https://mailpace.com/dpa), [privacy policy](https://mailpace.com/privacy) and [terms](https://mailpace.com/terms). Where MailPace is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **MailPace** |
+|---|---|---|
+| What it is | Email infrastructure: API, SMTP, campaigns, automations, inboxes | Transactional email API and SMTP |
+| Company | Reloop Labs | OhMySMTP Ltd, England and Wales |
+| Hosted data location | Hetzner, with EU data centers (or self-host to choose) | France (per its DPA) |
+| Free tier | 3,000 / mo, 100 / day | Up to 100 / mo, on request |
+| 10,000 emails / mo | $10 (Pro) | $10 |
+| 50,000 emails / mo | **$10** | $50 |
+| 100,000 emails / mo | **$20** | $100 |
+| Open / click tracking | Per domain, can be turned off | **Never** |
+| Marketing / campaigns | Yes | Prohibited |
+| Automations | Every plan | No |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | JSON webhook per message |
+| Dedicated IP | Included on Growth ($20) | No, shared IPs only |
+| Idempotent sends | Yes | Yes |
+| Open source | Yes (Apache 2.0) | No (SDKs and templates are MIT) |
+| Self-host | Yes | No |
+
+Prices change. Check [MailPace's pricing page](https://mailpace.com/pricing) and [ours](/pricing) before you commit.
+
+---
+
+## Pricing at real volumes
+
+MailPace has one plan. It's $10 a month for the first 10,000 emails, and its pricing calculator adds $1 for every 1,000 after that. Every feature is on that plan. Two details matter:
+
+- **It counts mail you send and receive.** The pricing page asks "How many emails do you send and receive each month?", so inbound volume is billed too.
+- **The free plan is unadvertised.** The pricing FAQ calls it a "secret free plan" of up to 100 emails a month, which you request by email.
+
+Reloop has Free (3,000 a month, 100 a day), Pro at $10 for 50,000, and Growth at $20 for 100,000 with a dedicated IP. Above your plan, it's $0.50 per 1,000.
+
+| Monthly volume | Reloop | MailPace |
+|---|---|---|
+| 3,000 | $0 | $10 (free only up to 100) |
+| 10,000 | $10 | $10 |
+| 50,000 | $10 | $50 |
+| 100,000 | $20 | $100 |
+| 250,000 | $20 + $75 overage = $95 | $250 |
+
+MailPace prices are in US dollars from its calculator; it shows local currencies too, so your exact figure depends on where you are billed.
+
+At 10,000 emails the two cost the same. Past that, MailPace grows at $1 per 1,000 and Reloop at $0.50 per 1,000 beyond a much larger included volume.
+
+If you self-host Reloop, there's no per-email fee at all. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really takes.
+
+<Callout type="tip">
+  If you receive a lot of mail through MailPace's inbound webhooks, add that volume to your estimate. MailPace bills sent and received mail together.
+</Callout>
+
+---
+
+## Privacy, hosting and jurisdiction
+
+This is why most people look at MailPace, and it's well documented.
+
+**Who runs it.** MailPace's terms and privacy policy name the company as OhMySMTP Ltd, incorporated in England and Wales (company number 13200428). The service was called OhMySMTP until January 2022. Its terms are governed by UK law.
+
+**Where data lives.** The homepage says MailPace is "100% European Union hosted". The [DPA](https://mailpace.com/dpa) is more specific: stored data is "encrypted and hosted in France", and it "never leaves the EU and EU-owned cloud infrastructure, except for actually sending each email, which is sent via SMTP servers based in the UK". Its [sub-processor list](https://mailpace.com/privacy) names Clever Cloud for EU-hosted servers and databases, Freethought (a UK hosting company) for infrastructure hosting, and Hetzner for off-site backups in Germany. If your review needs every hop inside the EU, ask MailPace about the UK sending servers.
+
+**How long it keeps mail.** Emails are visible in the dashboard for 30 days and removed from backups 7 days later, so 37 days at most, per the DPA.
+
+**Tracking.** MailPace says: "We never track email opens or clicks." It only reports whether the receiving server accepted the message. If you want an open pixel anyway, its FAQ says you can add one yourself, with user opt-in.
+
+**Reloop's side.** Reloop Cloud runs on Hetzner, the German hosting company, with EU data centers. It comes with a [Data Processing Addendum](/dpa) based on the EU Standard Contractual Clauses and a public [sub-processor list](/dpa/subprocessors). If you want to decide both location and jurisdiction yourself, [self-host Reloop](/self-host) on your own EU server. Open and click tracking in Reloop are per-domain settings. New domains start with them on, and you can switch either off on the domain's Configuration tab.
+
+<Callout type="info">
+  For a hosted service with no tracking pixels anywhere, MailPace is the more direct answer. Reloop can match it only if you turn tracking off on each domain, or self-host.
+</Callout>
+
+---
+
+## Developer experience
+
+Both APIs are small and easy to call. MailPace authenticates with a per-domain token in a `MailPace-Server-Token` header.
+
+**MailPace**
+
+```typescript
+await fetch("https://app.mailpace.com/api/v1/send", {
+  method: "POST",
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    "MailPace-Server-Token": process.env.MAILPACE_TOKEN!,
+  },
+  body: JSON.stringify({
+    from: "hello@acme.com",
+    to: "user@example.com",
+    subject: "Welcome",
+    htmlbody: "<p>Thanks for signing up.</p>",
+  }),
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+| | Reloop | MailPace |
+|---|---|---|
+| Send endpoint | `POST /api/mail/v1/send` | `POST /api/v1/send` |
+| Auth | Account API key (`x-api-key`) | One token per domain (`MailPace-Server-Token`) |
+| Body fields | `from`, `to`, `html`, `text` | `from`, `to`, `htmlbody`, `textbody` |
+| Recipients per send | Up to 50 in `to` | Up to 50 in `to` |
+| Idempotency | `Idempotency-Key` header | `Idempotency-Key` header |
+| Stored templates | Yes, with variables | No; send rendered HTML |
+| Attachments | Up to 1 MB (Free) or 5 MB (paid) | Allow-listed file extensions only |
+| Webhook signing | HMAC-SHA256 (`Reloop-Signature`) | Ed25519 (`X-MailPace-Signature`) |
+| SMTP | `smtp.reloop.sh` | `smtp.mailpace.com` |
+
+A few things worth knowing:
+
+- **Idempotency is a tie.** MailPace highlights it as a differentiator, and it's a good feature. Reloop supports the same `Idempotency-Key` header on sends.
+- **Libraries.** MailPace's docs cover Rails, JavaScript, PHP, Erlang, Go and Rust. Reloop has [official SDKs](/docs/resources/sdks) for Node, Python, Go, PHP, Ruby, Rust, Java, .NET and Elixir.
+- **Errors.** Reloop's errors include `message`, `why` and `fix`, so the response tells you what to change. MailPace returns a short `error` string or per-field `errors`.
+- **MCP.** MailPace publishes an MIT-licensed [MCP server](https://github.com/mailpace/mailpace-mcp) with one tool, `send-email`. Reloop's [MCP server](/docs/integrations/ai-tools/mcp-server) covers sending plus inboxes, contacts, templates, automations and domains.
+
+---
+
+## Receiving email and agent inboxes
+
+**MailPace** catches all mail sent to a subdomain you choose (for example `*@inbound.acme.com`) once you add a CNAME to `inbound.mailpace.com`. Each message is POSTed to your HTTPS endpoint as JSON, with the raw message, parsed fields and attachments. It retries five times, then marks the message failed and bounces it to the sender. Storing, threading and replying is up to you.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. Replying in-thread is one call, and an `email.received` webhook is there if you also want push.
+
+| | Reloop | MailPace |
+|---|---|---|
+| Receive on your domain | Yes | Yes, on a subdomain |
+| Webhook per message | Yes (`email.received`) | Yes |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | Build it yourself |
+| MCP access for agents | Yes | No |
+| IMAP access | Yes | No |
+
+If you're building an AI agent or a support inbox that has to read a thread and answer it, Reloop saves you the storage and threading work. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Campaigns, contacts and automations
+
+MailPace doesn't do this, on purpose. Its terms allow "sending transactional email only", and its docs say marketing emails and newsletters are "strictly prohibited". There are no contact lists, campaigns or automations.
+
+Reloop has contacts with custom properties, groups, subscription channels, scheduled broadcast campaigns, and **event-triggered automations** that start when your app tracks an event like `user.signed_up`. Automations are on every plan, including Free.
+
+If you only send password resets, receipts and alerts, MailPace's focus is a feature: a provider that only carries transactional mail keeps its shared IPs clean of newsletter traffic. If you also send onboarding sequences or product updates, you'd need a second provider next to MailPace, and Reloop covers both.
+
+---
+
+## Deliverability
+
+Both handle the basics: DKIM signing, bounce handling and a block list of addresses that bounced.
+
+- **IPs.** MailPace's docs say "Static IP addresses are not available"; every customer shares its IPs. Reloop includes a dedicated IP on Growth at $20 a month, and shared IPs on the other plans.
+- **Spam filtering.** MailPace runs an internal spam filter on outgoing mail and refuses to send what it flags. Reloop runs its own MTA (KumoMTA) with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+- **Signals.** Without opens and clicks, MailPace tells you whether mail was accepted, deferred or bounced. Reloop reports the same delivery events, plus opens and clicks if you leave tracking on.
+- **Free tools.** Reloop ships a [domain reputation checker](/tools/domain-reputation-checker), [blocklist checker](/tools/blocklist-checker) and [temp email checker](/tools/temp-email-checker).
+
+---
+
+## Self-hosting and lock-in
+
+MailPace is hosted only. It publishes its client libraries, an [HTML email template set](https://github.com/mailpace/templates) and its MCP server under MIT, but not the service itself.
+
+Reloop is Apache 2.0. You can:
+
+1. Start on Reloop Cloud.
+2. Move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup).
+3. Keep the same API. Point the SDK's `baseUrl` at your instance and nothing else in your code changes.
+
+Self-hosting isn't free in effort: you own IP reputation, warm-up, backups and uptime. The [requirements](/docs/self-host/requirements) start at 2 vCPUs and 4 GB of RAM.
+
+---
+
+## Where MailPace is the better choice
+
+- **You want a hosted EU provider and no tracking, full stop.** MailPace stores data in France and never adds open or click tracking. Reloop Cloud is EU-hosted too, but it offers tracking (on by default for new domains).
+- **You send only transactional mail** and like a provider that refuses marketing traffic on its IPs.
+- **You send around 10,000 emails a month** and value a tiny, focused product. At that volume the price is the same.
+
+## Where Reloop is the better choice
+
+- **You send more than 10,000 emails a month.** $10 vs $50 at 50k and $20 vs $100 at 100k.
+- **You also send campaigns or onboarding sequences**, and want one provider and one suppression list for both.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You need a dedicated IP**, or open source and self-hosting for compliance or control.
+
+---
+
+## Switching from MailPace to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Decide on tracking.** If you chose MailPace for its no-tracking stance, turn click and open tracking off on the domain before you send.
+3. **Swap the client.** Replace the `/api/v1/send` call with `reloop.mail.send`, and map `htmlbody`/`textbody`/`replyto` to `html`/`text`/`reply_to`. Keep sending your `Idempotency-Key`.
+4. **Or swap SMTP settings.** Point your app at `smtp.reloop.sh` on port 587 with STARTTLS, using your Reloop API key as username and password.
+5. **Carry over your block list.** Copy the bounced addresses from your domain's Block List page in MailPace and suppress them in Reloop, so you don't mail them again.
+6. **Point webhooks** at a new handler. `email.delivered` and `email.bounced` keep their names; MailPace's `email.deferred` becomes `email.delivery_delayed`. Verify Reloop's HMAC-SHA256 `Reloop-Signature` instead of the Ed25519 signature.
+7. **Move inbound.** Add a receiving address in Reloop and change the subdomain's DNS once you're ready, then read mail from the mailbox or the `email.received` webhook.
+8. **Ramp traffic** over a week or two, then remove MailPace's DNS records and delete your MailPace account, which deletes its stored emails.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) walks through the same steps in more detail, including a traffic-split flag and a suppression import script.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop cheaper than MailPace?">
+    Above 10,000 emails a month, yes. At 50,000 Reloop is $10 and MailPace
+    is $50; at 100,000 it's $20 vs $100. At exactly 10,000 both are $10.
+    Below 3,000 a month, Reloop's free tier costs nothing, while MailPace's
+    free plan covers up to 100 emails on request.
+  </Accordion>
+
+  <Accordion title="Where does MailPace host data?">
+    Its DPA says stored data is hosted in France and stays in the EU, except
+    that outgoing mail is sent through SMTP servers in the UK. MailPace
+    itself is a UK company, OhMySMTP Ltd.
+  </Accordion>
+
+  <Accordion title="Can I send marketing email with MailPace?">
+    No. MailPace's terms allow transactional email only, and its docs say
+    newsletters and other marketing mail are strictly prohibited. Reloop
+    sends both transactional mail and campaigns.
+  </Accordion>
+
+  <Accordion title="Does Reloop track opens and clicks?">
+    Only if the domain has tracking turned on. Open and click tracking are
+    per-domain settings; new domains start with them on, and you can turn
+    either off. MailPace never tracks them.
+  </Accordion>
+
+  <Accordion title="Can I self-host MailPace?">
+    No. MailPace is a hosted service, though its SDKs, templates and MCP
+    server are MIT-licensed. Reloop is open source under Apache 2.0 and runs
+    on your own server with the same API.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, campaigns and automations on every plan, and $10 for 50k when you grow."
+  href="/dashboard/signup"
+  label="Get started"
+/>

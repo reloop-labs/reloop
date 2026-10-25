@@ -1,0 +1,312 @@
+---
+title: "Reloop vs Lettermint (2026): Pricing, EU Hosting and Which to Choose"
+description: "Reloop vs Lettermint compared honestly: pricing at real volumes, EU hosting and jurisdiction, the send API, broadcasts, inbound mail and agent inboxes, deliverability, self-hosting, and how to switch."
+keywords:
+  - Reloop vs Lettermint
+  - Lettermint alternative
+  - Lettermint pricing
+  - Lettermint vs Reloop
+  - EU transactional email API
+  - open source Lettermint alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [lettermint, comparison, pricing, eu, open-source]
+readTime: 11 min read
+image: /blog/images/reloop-vs-lettermint.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - eu-email-api-providers-2026
+  - reloop-vs-sweego
+  - reloop-vs-mailpace
+---
+
+**Lettermint is a Dutch email API that keeps your email data in the EU, run by an EU company.** Reloop is open-source email infrastructure you can use hosted or run yourself. The differences: **Reloop costs $10 for 50k emails where Lettermint's cheapest 50k plan is €40, it receives mail into real inboxes your agents can reply from, it has contacts, campaigns and automations built in, and you can self-host it.** Lettermint has the cleaner answer if you need EU hosting without running servers, plus ISO 27001 certification and compliance features Reloop Cloud doesn't publish.
+
+We build Reloop, so weigh this accordingly. Every Lettermint fact below comes from its own site: [pricing](https://lettermint.co/pricing), [docs](https://lettermint.co/docs/introduction), [sub-processors](https://lettermint.co/subprocessors), [privacy policy](https://lettermint.co/privacy-policy), [DPA](https://lettermint.co/dpa) and [GitHub](https://github.com/lettermint). Where Lettermint is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Lettermint** |
+|---|---|---|
+| Company | Reloop Labs | Lettermint B.V. (Netherlands) |
+| Where email data lives | Self-host: your server. Cloud: Hetzner, with EU data centers | EU (UpCloud in the Netherlands, backups on OVHcloud in Germany) |
+| Free tier | 3,000 / mo, 100 / day | 300 / mo, no daily limit |
+| 50,000 emails / mo | **$10** | €40 (Starter) / €45 (Growth) / €55 (Pro) |
+| Overage | $0.50 per 1,000 | €1.10 to €1.50 per 1,000 at the 10k–50k tiers |
+| Dedicated IP | Included on Growth ($20) | €50 / mo add-on, Pro at 300k+ |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Parsed and posted to a signed webhook (Starter and up) |
+| Contacts, campaigns, automations | Yes, every plan | Broadcast sending route; no contacts or automations in its docs |
+| Open source | Yes (Apache 2.0) | SDKs only; the platform is proprietary |
+| Self-host | Yes | No |
+| ISO 27001 | Not published | ISO/IEC 27001:2022 certified |
+| SMTP relay | Yes | Yes |
+
+Lettermint prices in euros and Reloop in dollars. Both change prices from time to time, so check [Lettermint's pricing page](https://lettermint.co/pricing) and [ours](/pricing) before you commit.
+
+---
+
+## EU hosting and jurisdiction
+
+This is the main reason people look at Lettermint, so it comes first.
+
+**Lettermint** is Lettermint B.V., registered with the Dutch Chamber of Commerce and based in Zwolle. Its [privacy policy](https://lettermint.co/privacy-policy) says email data "hosted, stored, routed, or processed as part of Lettermint's core European email delivery infrastructure remains within the European Union". Its [sub-processor list](https://lettermint.co/subprocessors) is specific: the private cloud runs on UpCloud (a Finnish company) in the Netherlands, encrypted backups sit on OVHcloud in Germany, and deliverability monitoring is done by Postmastery in the Netherlands. Business tools like Stripe and Slack process billing and internal data in the US, which the privacy policy discloses.
+
+The [DPA](https://lettermint.co/dpa) applies automatically to every customer, is governed by Dutch law, and Lettermint countersigns it on request. Lettermint is also ISO/IEC 27001:2022 certified, with the certificate in its [Trust Center](https://trust.lettermint.co/).
+
+**Reloop Cloud** runs on Hetzner, the German hosting company, with EU data centers. We publish a [Data Processing Addendum](/dpa) based on the EU Standard Contractual Clauses and a [sub-processor list](/dpa/subprocessors). The systems that touch your mail (PostgreSQL, KumoMTA, Rspamd and so on) are deployments we run ourselves, not third-party SaaS.
+
+If you'd rather control the servers and the jurisdiction yourself, **self-host Reloop** on an EU server:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh | sudo bash
+```
+
+Then you choose both the location and the company that runs it. The trade-off is that you run it.
+
+<Callout type="tip">
+  If your security review needs "EU-hosted, EU-owned, certified" and you don't want to operate servers, Lettermint is the simpler answer today. Our [EU email API roundup](/blog/eu-email-api-providers-2026) covers the other options.
+</Callout>
+
+---
+
+## Pricing at real volumes
+
+Lettermint has Free, Starter, Growth and Pro plans, each priced by monthly volume. Reloop has Free, Pro ($10) and Growth ($20), with overage above that.
+
+| Monthly volume | Reloop | Lettermint Starter | Lettermint Growth | Lettermint Pro |
+|---|---|---|---|---|
+| 300 | $0 | €0 (Free) | €0 (Free) | €0 (Free) |
+| 3,000 | $0 | €10 (10k tier) | €13 | €15 |
+| 10,000 | $10 | €10 | €13 | €15 |
+| 50,000 | $10 | €40 | €45 | €55 |
+| 100,000 | $20 | €85 (125k tier) | €100 | €110 |
+| 300,000 | $20 + $100 overage = $120 | €175 | €200 | €215 |
+| 1,000,000 | $20 + $450 overage = $470 | €500 | €600 | €620 |
+
+What stands out:
+
+- **Reloop's free tier is ten times bigger.** 3,000 a month vs 300, though Lettermint has no daily cap and Reloop's free plan allows 100 a day.
+- **The gap is widest between 10k and 300k.** At 50k you'd pay €40 or more on Lettermint and $10 on Reloop.
+- **At a million emails it gets close.** Reloop's flat $0.50 per 1,000 overage adds up, and Lettermint's per-email price falls with volume. At very high volume, compare a real quote, not just list prices.
+- **Lettermint counts inbound mail in your volume.** Its pricing page says the monthly allowance is "Transactional, Broadcast and Inbound emails combined".
+- **Some Lettermint features depend on the plan.** Inbound mail, open and click tracking, and sandbox mode start on Starter; email scheduling on Growth; custom tracking domains, spam insights and dedicated IPs on Pro. On Reloop, every plan gets the same features; plans differ by volume, limits on inboxes, webhooks and domains, and a dedicated IP on Growth.
+
+Lettermint also has **spend limits** that pause sending at a monthly cap instead of billing overage, which is a nice touch if you worry about runaway costs.
+
+If you self-host Reloop, there's no per-email fee at all. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really takes.
+
+---
+
+## Developer experience
+
+Both are developer-first APIs, and the send calls look almost the same.
+
+**Lettermint**
+
+```typescript
+import { Lettermint } from "lettermint";
+
+const lettermint = new Lettermint({
+  sendingToken: process.env.LETTERMINT_PROJECT_TOKEN,
+});
+
+const result = await lettermint.emails.send({
+  from: "Acme <hello@acme.com>",
+  to: ["user@example.com"],
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+The Lettermint SDK throws typed errors (`ValidationError`, `RateLimitError` and so on), so you wrap calls in `try`/`catch`. Reloop returns errors as values. Lettermint's SDK is well built: it runs on Node, Bun, Deno and edge runtimes with no dependencies, and supports batch sends with per-email idempotency keys.
+
+| | Reloop | Lettermint |
+|---|---|---|
+| Auth | One API key (`x-api-key`) | Project sending token (`x-lettermint-token`), separate team token for management |
+| Organizing mail | Domains | Projects and routes (transactional, broadcast, inbound) |
+| Idempotency | Yes | Yes |
+| Error format | `message`, `why` and `fix` | `code`, `message` and field errors |
+| MCP server | Yes | Yes |
+| Official SDKs | Node, Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | Node, Python, Go, PHP, Java, .NET, Elixir, Rust, plus Laravel, Symfony and Nuxt packages |
+
+Lettermint also ships a CLI and a Terraform provider. Its SMTP relay is `smtp.lettermint.co`, with the username `lettermint` and your project token as the password. Reloop's is `smtp.reloop.sh` on port 587, with your API key as username and password.
+
+Reloop's errors tell you **why** a send failed and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Receiving email and agent inboxes
+
+**Lettermint** handles inbound with [inbound routes](https://lettermint.co/docs/platform/inbound-mail/introduction), on Starter and up. Each route gets a catch-all address domain (`<route-id>.lettermint.app`), or you point your own domain's MX at it. Lettermint parses each message and sends a signed `message.inbound` webhook to your endpoint. Messages above the route's spam threshold are quarantined for review. Storing, threading and replying are up to you.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. Replying in-thread is one call, and an `email.received` webhook is there if you also want push. Inbound is on every plan, including Free (one inbox).
+
+| | Reloop | Lettermint |
+|---|---|---|
+| Receive on your domain | Yes | Yes (Starter and up) |
+| Stored mailboxes with threads | Yes | No, webhook delivery |
+| Reply in thread via API | Yes | Build it yourself |
+| MCP access to inboxes | Yes | No |
+| IMAP access | Yes | No |
+
+That matters if you're building [AI agents that read and reply to email](/blog/build-ai-agent-sends-emails), support inboxes, or reply handling for transactional mail. If you only need "parse this email and hit my webhook", Lettermint's approach is simpler.
+
+---
+
+## Broadcasts, contacts and automations
+
+**Lettermint** supports broadcast email as its own sending route. Its [broadcast changelog](https://lettermint.co/changelog/marketing-campaigns-newsletters-lettermint-broadcast) says broadcasts go through "a segregated infrastructure", so a big newsletter doesn't slow your password resets, and its [broadcast page](https://lettermint.co/features/broadcast-emails) says every broadcast gets mandatory unsubscribe links and headers. We didn't find contact lists, a campaign editor or automations in its docs: you build the list and the email in your own app or tool, then send through the broadcast route.
+
+**Reloop** has the marketing layer built in: contacts with custom properties, groups, subscription channels, scheduled broadcast campaigns, and **event-triggered automations** with delays, conditions and email steps. Your app reports an event, and every automation listening for it starts for that contact:
+
+```typescript
+const { automationError } = await reloop.automations.start({
+  event: "user.signed_up",
+  email: user.email,
+  firstName: user.name,
+  properties: { plan: user.plan },
+});
+```
+
+If you already manage lists and campaigns somewhere else, Lettermint's broadcast route is enough. If you want onboarding sequences and newsletters on the same API and suppression list as your transactional mail, Reloop does that without a second tool. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert) for a worked example.
+
+---
+
+## Deliverability
+
+Both cover the basics: SPF, DKIM and DMARC, bounce and complaint handling, a suppression list, and per-domain or per-route open and click tracking. The defaults differ: Lettermint's tracking is off until you turn it on per route, while Reloop turns it on for new domains and lets you switch it off per domain.
+
+The differences:
+
+- **Dedicated IPs.** Lettermint sells one for €50 a month on Pro at 300,000 emails and up, and offers bring-your-own-IP for enterprise Pro customers. Reloop includes one on Growth at $20 a month.
+- **Sending path.** Reloop runs its own MTA (KumoMTA) with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation). Lettermint separates broadcast and transactional infrastructure, and works with Postmastery on deliverability monitoring.
+- **Tracking quality.** Lettermint filters bot opens and clicks (security scanners, link previews) out of its engagement data, which makes open rates more honest.
+- **Managed DKIM.** Lettermint hosts the DKIM key behind CNAME records and rotates it every six months.
+- **Tools.** Reloop ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers.
+
+---
+
+## Self-hosting and lock-in
+
+Lettermint is hosted only. Its SDKs are open source on [GitHub](https://github.com/lettermint) (MIT, with the Rust SDK under Apache 2.0), but the platform isn't.
+
+Reloop is Apache 2.0. You can:
+
+1. Start on Reloop Cloud.
+2. Move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup).
+3. Keep the same API. Point the SDK's `baseUrl` at your instance and nothing else in your code changes.
+
+That helps with data residency, with security reviews that want to read the code handling your users' mail, and as insurance against price changes.
+
+Self-hosting isn't free in effort: you own IP reputation, warm-up, backups and uptime. The [VPS guide](/docs/self-host/vps) lists a minimum of 2 vCPUs and 4 GB of RAM.
+
+---
+
+## Where Lettermint is the better choice
+
+- **You need an EU company as well as EU hosting, without running servers.** Lettermint answers both "where" and "who" in one line: a Dutch company on EU infrastructure. Reloop Cloud covers the "where" with Hetzner's EU data centers.
+- **Your buyers ask for ISO 27001.** Lettermint is certified; that shortens vendor questionnaires.
+- **You want enterprise controls on a small plan.** SSO with SCIM from Starter, an API token IP allowlist, enforced TLS, sandbox mode and spend limits.
+- **You send around a million emails a month** and its volume pricing comes out close to or below Reloop's overage.
+
+## Where Reloop is the better choice
+
+- **You send between 3,000 and a few hundred thousand emails a month.** $10 vs €40 at 50k and $20 vs €85 at 100k–125k adds up.
+- **You need inbound mail as real inboxes**, especially for AI agents, and on the free plan.
+- **You want contacts, campaigns and automations** in the same product as your transactional mail.
+- **You need open source or self-hosting**, including EU hosting on servers you control.
+
+---
+
+## Switching from Lettermint to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Swap the client.** Replace `lettermint.emails.send` with `reloop.mail.send`. The fields map closely: `from`, `to`, `subject`, `html`, `text`, `reply_to` and `scheduled_at`.
+3. **Move tracking settings.** Lettermint sets open and click tracking per route; in Reloop it's per domain.
+4. **Import suppressions.** Export unsubscribed, bounced and complained addresses from Lettermint and import them, so you never mail someone who opted out.
+5. **Move broadcasts.** Import your list as Reloop contacts and send newsletters as campaigns, or keep sending them from your own tool through Reloop's API or SMTP.
+6. **Move inbound.** Create a mailbox in Reloop and point the domain's MX record at Reloop instead of Lettermint. Replace your `message.inbound` handler with Reloop's `email.received` webhook, or read the mailbox over the API.
+7. **Point webhooks** at a new handler. Reloop events are named `email.delivered`, `email.bounced`, `email.complained` and so on, and are signed with HMAC-SHA256 in the `Reloop-Signature` header.
+8. **Ramp traffic** from 10% to 100% over a week or two, then remove Lettermint's DNS records.
+
+If you want the servers under your own control, do step 1 on a self-hosted Reloop instead of Reloop Cloud. Our [SendGrid migration guide](/blog/migrating-from-sendgrid) walks through the same steps in more detail.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop cheaper than Lettermint?">
+    For most volumes, yes. At 50,000 emails a month Reloop is $10 and
+    Lettermint is €40 on Starter. Reloop's free tier is also bigger: 3,000 a
+    month vs 300. Around a million emails a month the two get close, so price
+    your real volume.
+  </Accordion>
+
+  <Accordion title="Where does Lettermint store data?">
+    In the EU. Its sub-processor list names UpCloud in the Netherlands for
+    hosting and OVHcloud in Germany for encrypted backups. Lettermint B.V. is a
+    Dutch company, and its DPA is governed by Dutch law.
+  </Accordion>
+
+  <Accordion title="Does Reloop have an EU region?">
+    Yes. Reloop Cloud runs on Hetzner, with EU data centers. It comes with a
+    DPA based on the EU Standard Contractual Clauses and a public sub-processor
+    list. If you want full control over where data lives, you can also
+    self-host Reloop on your own EU server; it's the same open-source code.
+  </Accordion>
+
+  <Accordion title="Does Lettermint support inbound email?">
+    Yes, on Starter and up. It parses incoming mail and posts it to your
+    endpoint as a signed webhook. Reloop stores incoming mail in threaded
+    mailboxes you can read and reply to over the API, MCP or IMAP.
+  </Accordion>
+
+  <Accordion title="Can Lettermint send newsletters?">
+    Yes, through a separate broadcast route with its own sending
+    infrastructure and automatic unsubscribe handling. You manage the list and
+    content yourself. Reloop also has contacts, campaigns and automations.
+  </Accordion>
+
+  <Accordion title="Can I self-host Lettermint?">
+    No. Lettermint is a hosted service; only its SDKs are open source. Reloop
+    is open source under Apache 2.0 and runs on your own server with the same
+    API.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, inbound mailboxes and automations on every plan, and $10 for 50k when you grow."
+  href="/dashboard/signup"
+  label="Get started"
+/>

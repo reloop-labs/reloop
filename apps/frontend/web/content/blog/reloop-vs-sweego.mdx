@@ -1,0 +1,300 @@
+---
+title: "Reloop vs Sweego (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Sweego compared honestly: pricing by volume, French hosting and data residency, the send API, SMS, inbound email and agent inboxes, webhooks, marketing sends, self-hosting, and how to switch."
+keywords:
+  - Reloop vs Sweego
+  - Sweego alternative
+  - Sweego pricing
+  - Sweego vs Reloop
+  - French email API
+  - EU transactional email
+  - open source Sweego alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [sweego, comparison, pricing, eu, open-source]
+readTime: 11 min read
+image: /blog/images/reloop-vs-sweego.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - eu-email-api-providers-2026
+  - reloop-vs-lettermint
+  - reloop-vs-mailpace
+---
+
+**Sweego is a French transactional email and SMS API, run by a French company on French data centers.** Reloop is open-source email infrastructure: an email API and SMTP relay, plus campaigns, event-triggered automations and inboxes your AI agents can read and reply from. The short version: **if you need SMS, or hosted email that provably stays in France, Sweego is the better pick. If you want more of the email stack in one product, lower prices at volume, or the option to self-host, Reloop fits better.**
+
+We build Reloop, so weigh this accordingly. Every Sweego fact below comes from [sweego.io](https://www.sweego.io/), its [pricing page](https://www.sweego.io/pricing), its [documentation](https://learn.sweego.io/) and its [legal notice](https://www.sweego.io/legal-notice). Where Sweego is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Sweego** |
+|---|---|---|
+| Company | Reloop Labs | Mindbaz SAS (Lille, France) |
+| Hosting | Reloop Cloud (Hetzner, with EU data centers) or your own server | France (OVHcloud and Scaleway) |
+| Free tier | 3,000 / mo, 100 / day | 100 / day |
+| Entry paid plan | **$10** for 50,000 emails | From €10 (Individual, 20k to 50k) |
+| ~100,000 emails / mo | **$20** | From €79 (Startup, 100k to 200k) |
+| Dedicated IP | Included on Growth ($20) | Available on Startup, included on Scaleup |
+| SMS | No | Yes, prepaid credits |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Webhook per message, paid plans |
+| Campaigns and automations | Yes, on every plan | Bulk send API, no lists or automations |
+| Log retention | 45 days | 7 to 90 days, by plan |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+| SMTP relay | Yes | Yes |
+
+Prices change. Check [Sweego's pricing page](https://www.sweego.io/pricing) and [ours](/pricing) before you commit.
+
+---
+
+## What each one is
+
+**Sweego** launched in [March 2024](https://www.sweego.io/corporate/sweego-launch) from Mindbaz, a French email sending company whose expertise dates back to 2009. Its pitch is sovereignty: its [cloud sovereignty page](https://www.sweego.io/corporate/understanding-the-cloud-sovereignty-framework-and-sweegos-position-within-this-new-european-benchmark) says it hosts on OVHcloud (Gravelines) and Scaleway (DC5), both French, and that Mindbaz is "100% French-owned". Its docs say "Your data is never sent outside the European Union." You get a REST API and SMTP for email, an SMS API, a drag-and-drop template builder, inbound routing and signed webhooks.
+
+**Reloop** is email infrastructure you can use hosted or run yourself. The same codebase covers transactional sending, an SMTP relay, contacts, broadcast campaigns, automations, webhooks and inbound mailboxes. It runs its own MTA (KumoMTA) and spam scoring (Rspamd), and it's Apache 2.0.
+
+So the overlap is transactional email. Sweego adds SMS; Reloop adds the marketing and inbox side.
+
+---
+
+## Pricing at real volumes
+
+Sweego prices email in bands, and you pick a volume within each plan:
+
+| Monthly volume | Reloop | Sweego |
+|---|---|---|
+| ~3,000 | $0 (Free) | €0 (Free, 100 / day) |
+| 20,000 | $10 | From €10 (Individual) |
+| 50,000 | $10 | Individual, top of its range |
+| 100,000 | $20 | From €79 (Startup) |
+| 500,000 | $20 + $200 overage = $220 | From €270 (Scaleup) |
+| 1M+ | $20 + $0.50 per 1,000 above 100k | Unicorn (custom) |
+
+Reloop's overage is $0.50 per 1,000 emails above your plan. Sweego takes 20% off for annual billing and allows bursts of up to 30% above your plan's volume.
+
+What stands out:
+
+- **The free tiers are about the same.** Sweego's 100 a day and Reloop's 3,000 a month (100 a day) land in the same place. Sweego's free plan has no inbound routing and keeps logs for 7 days.
+- **Entry plans are close; the gap opens at 100k.** At 100,000 a month Reloop Growth is $20 with a dedicated IP, while Sweego Startup starts at €79.
+- **Sweego includes more with the plan in some places.** Log retention grows with the plan (30, 60 and 90 days on Individual, Startup and Scaleup), and Startup and up get unlimited templates. Reloop keeps 45 days of data on every plan.
+- **Dedicated IPs.** Reloop includes one on Growth. Sweego makes one available on Startup and includes one on Scaleup, with extra IPs at €30 a month.
+
+If you self-host Reloop, there's no per-email fee at all, only your server.
+
+<Callout type="tip">
+  Prices are in different currencies: Sweego bills in euros, Reloop in US dollars. Compare at today's exchange rate.
+</Callout>
+
+---
+
+## Data residency and jurisdiction
+
+This is where Sweego is strongest, and it's probably why you're reading this.
+
+**Sweego** answers both questions a security review asks. *Where is the data?* In France, on OVHcloud and Scaleway. *Who runs it?* A French company with French capital. Its sovereignty page also lists its sub-processors, which are European too: CM.com (Netherlands) for SMS, Mollie (Netherlands) for payments, Hyperline (France) for billing and Chamaileon (Hungary) for the template builder. One honest note from that same page: Sweego says it is "GDPR compliant, no formal security certification yet."
+
+**Reloop Cloud** runs on Hetzner, the German hosting company, with EU data centers. We publish a [Data Processing Addendum](/dpa) that relies on the EU Standard Contractual Clauses for transfers outside the EEA, and a [sub-processor list](/dpa/subprocessors).
+
+If you want to control exactly where everything lives, Reloop also offers **self-hosting**: run the same code on an EU server (Hetzner, OVHcloud, Scaleway or your own hardware) and you decide where everything lives. That's more control than any hosted provider gives you, but it's also more work. If you specifically want French hosting by a French-owned company, pick Sweego. Our [EU email API roundup](/blog/eu-email-api-providers-2026) covers this choice in more depth.
+
+---
+
+## Developer experience
+
+Sweego doesn't publish an official Node SDK; its docs show plain HTTP calls. You send to `/send` with an `Api-Key` header:
+
+**Sweego**
+
+```typescript
+await fetch("https://api.sweego.io/send", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Api-Key": process.env.SWEEGO_API_KEY!,
+  },
+  body: JSON.stringify({
+    channel: "email",
+    provider: "sweego",
+    recipients: [{ email: "user@example.com" }],
+    from: { name: "Acme", email: "hello@mail.acme.com" },
+    subject: "Welcome",
+    "message-html": "<p>Thanks for signing up.</p>",
+  }),
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+| | Reloop | Sweego |
+|---|---|---|
+| Auth | API key (`x-api-key`) | API key (`Api-Key`) or OAuth2 bearer |
+| Field style | `from`, `to`, `html` | `recipients`, `from`, `message-html`, plus `channel` and `provider` |
+| Template variables | `{{{first_name}}}` | `{{ name }}` with `template-id` and `variables` |
+| Many recipients | Up to 50 per send; campaigns for audiences | `/send/bulk/email`, up to 500 per request with per-recipient variables |
+| Official SDKs | Node, Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | Symfony Mailer and Notifier; community packages for Convex, Payload, Odoo, Gleam, Terraform and WordPress |
+| AI tooling | [MCP server](/docs/integrations/ai-tools/mcp-server) that sends, reads inboxes and manages resources | Docs-only MCP server (read-only, cannot send) |
+
+A few Sweego details we like: a `dry-run` flag that runs a send without actually delivering it, an expiration-date header so old messages can be deleted, and daily log exports over SFTP.
+
+Reloop's errors tell you **why** a send failed and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## SMS
+
+Sweego sends SMS from the same account and API as email. You buy prepaid credits, from €20 (about 500 SMS at €0.040 each in its example), valid for 12 months, with prices that vary by country. It supports custom sender IDs, SMS templates, SMS webhooks and, for the US and Canada, toll-free numbers.
+
+**Reloop does not send SMS.** It's email only. If you need SMS alongside email from one European provider, that's a clear point for Sweego. You can also mix them: send email through Reloop and keep Sweego for SMS.
+
+---
+
+## Receiving email and agent inboxes
+
+**Sweego** offers inbound routing on paid plans. You point a subdomain's MX at Sweego, and each incoming message is posted to your webhook as JSON. Attachments arrive as metadata, and you fetch their content from the API. Failed deliveries are retried every 5 minutes, up to 20 times. To match replies to the email you sent, [Sweego's docs](https://learn.sweego.io/docs/inbound/conversational_flow) recommend a unique Reply-To address per message. Storing, threading and replying is up to you.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the MCP server or IMAP. Replying in-thread is one call, and an `email.received` webhook is there if you also want push.
+
+| | Reloop | Sweego |
+|---|---|---|
+| Receive on your domain | Yes, every plan | Yes, paid plans |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | Build it yourself |
+| MCP access for agents | Yes | No |
+| IMAP access | Yes | No |
+
+If you're building an AI agent that handles email, or a support inbox where humans and agents work the same threads, this is the biggest difference. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Webhooks and deliverability
+
+Both sign webhooks with HMAC-SHA256. Sweego sends `webhook-id`, `webhook-timestamp` and `webhook-signature` headers; Reloop sends `Reloop-Signature`. Sweego's email events cover sent, delivered, soft and hard bounces, list-unsubscribe, spam complaints, opens (split into proxy and human opens) and clicks. Tracking events can arrive up to 10 minutes late. Multiple webhooks need Startup or above; Reloop allows 1, 5 or 10 depending on plan.
+
+On suppression, Sweego automatically blocks an address for 90 days after a "user unknown" hard bounce. Its docs say viewing the suppression list from the dashboard or API is "not yet available". Reloop handles bounces, complaints and suppression in its MTA, with one list across transactional mail, campaigns and automations. See [how bounce processing works](/blog/email-bounce-processing-automation).
+
+Both handle SPF, DKIM and DMARC setup. Reloop also ships free [domain reputation](/tools/domain-reputation-checker) and [blocklist](/tools/blocklist-checker) checkers.
+
+---
+
+## Marketing, contacts and automations
+
+Sweego is built for transactional mail and SMS, but it does accept marketing sends: set `campaign-type` to `newsletter` or `market` and Sweego adds a `List-Unsubscribe` header and collects the unsubscribes for you. What we didn't find in its docs is the rest of a marketing tool: no contact lists, no campaign scheduler, no automations. You'd manage audiences in your own app and loop through the bulk endpoint.
+
+Reloop covers that layer: contacts with custom properties, groups, subscription channels, scheduled broadcast campaigns, and **event-triggered automations** that start when your app tracks an event like `user.signed_up`. Automations are on every plan, including Free.
+
+---
+
+## Self-hosting and lock-in
+
+Sweego is hosted only. Reloop is Apache 2.0, so you can:
+
+1. Start on Reloop Cloud.
+2. Move to your own server later with the [one-command installer](/self-host).
+3. Keep the same API. Point the SDK's `baseUrl` at your instance and nothing else changes.
+
+Self-hosting isn't free in effort: you own IP reputation, warm-up, backups and uptime. The [requirements](/docs/self-host/requirements) start at 2 vCPUs and 4 GB of RAM.
+
+---
+
+## Where Sweego is the better choice
+
+- **You need hosted email that stays in France**, run by a French company on French infrastructure, without running servers yourself.
+- **You need SMS** next to email in one account and one API.
+- **You want longer log retention** on higher plans (60 or 90 days) or daily log exports over SFTP.
+- **You work in Symfony**, where Sweego has official Mailer and Notifier components.
+
+## Where Reloop is the better choice
+
+- **You send 100k or more a month.** $20 with a dedicated IP vs from €79.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You want campaigns and automations** in the same product as your transactional mail.
+- **You need open source or self-hosting**, including running it on your own EU server.
+
+---
+
+## Switching from Sweego to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Swap the client.** Replace calls to `/send` with `reloop.mail.send`, and map `recipients`/`from`/`subject`/`message-html`/`message-txt` to `to`/`from`/`subject`/`html`/`text`. If you use SMTP, change the host and credentials.
+3. **Move templates.** Export the HTML and change placeholders to triple braces: `{{ name }}` becomes `{{{name}}}`.
+4. **Carry over suppressions.** Export hard bounces and unsubscribes from your Sweego logs or webhook history and import them, so you never mail someone who opted out.
+5. **Point webhooks** at a new handler. Reloop events are named `email.delivered`, `email.bounced`, `email.complained` and so on.
+6. **Move inbound.** Point the inbound subdomain's MX at Reloop and read replies from the mailbox instead of a webhook.
+7. **Ramp traffic** from 10% to 100% over a week or two, then remove Sweego's DNS records. Keep your Sweego account if you still send SMS.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) walks through the same steps in more detail.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop cheaper than Sweego?">
+    At low volume they're close: both are free up to about 100 emails a day,
+    and both entry plans are around 10 (dollars for Reloop, euros for Sweego).
+    At 100,000 emails a month Reloop is $20 with a dedicated IP, while Sweego
+    Startup starts at €79.
+  </Accordion>
+
+  <Accordion title="Does Reloop send SMS?">
+    No. Reloop is email only. If you need SMS, Sweego sends both from one
+    account, and you can use Sweego for SMS alongside Reloop for email.
+  </Accordion>
+
+  <Accordion title="Where does Sweego host data?">
+    In France. Sweego says it runs on OVHcloud (Gravelines) and Scaleway (DC5),
+    and that data is never sent outside the European Union. It is operated by
+    Mindbaz, a French company based in Lille.
+  </Accordion>
+
+  <Accordion title="Does Reloop Cloud have an EU region?">
+    Yes. Reloop Cloud runs on Hetzner, with EU data centers, and comes with a
+    DPA based on the EU Standard Contractual Clauses. If you want full control
+    over location, you can also self-host Reloop on your own EU server.
+  </Accordion>
+
+  <Accordion title="Can Sweego receive email?">
+    Yes, on paid plans. Sweego posts each incoming message to your webhook as
+    JSON. Reloop stores incoming mail in threaded mailboxes you can read and
+    reply to over the API, MCP or IMAP.
+  </Accordion>
+
+  <Accordion title="Can I self-host Sweego?">
+    No. Sweego is a hosted service. Reloop is open source under Apache 2.0 and
+    runs on your own server with the same API.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, automations and inboxes on every plan, and $20 for 100k with a dedicated IP when you grow."
+  href="/dashboard/signup"
+  label="Get started"
+/>
