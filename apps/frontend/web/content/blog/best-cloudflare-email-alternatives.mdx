@@ -68,14 +68,14 @@ Full breakdown: [Reloop vs Cloudflare Email Service](/blog/reloop-vs-cloudflare-
 |---|---|---|---|---|---|---|---|---|
 | **Free** | Own verified addresses only | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | $200 AWS credits, 6 months | First credit (10k emails) | 100 / mo | 500 / mo | 100 / day, trial |
 | **~50k / mo** | about $21 | **$10** | $20 | ~$5 | about $12.50 | $87 | $35 | $35 |
-| **~100k / mo** | about $39 | **$20** | $35 | ~$10 | about $25 | $177 | $68 | about $100 |
+| **~100k / mo** | about $39 | **$20** | $35 | ~$10 | about $25 | $177 | $68 | $90 |
 | **DNS provider** | Cloudflare only | Any | Any | Any | Any | Any | Any | Any |
 | **Marketing mail** | No | Campaigns + automations | Broadcasts | No | Not allowed | Broadcast streams | Via MailerLite | Limited |
 | **Inbound** | Email Routing | Mailboxes, API, MCP, IMAP | Webhook | Receipt rules to S3 / SNS / Lambda | Not offered | Webhook (Pro and up) | Parsed and forwarded | Inbound routes |
 | **Dedicated IP** | Not documented | Included on Growth ($20) | $30/mo add-on on Scale ($90+) | Add-on | Paid add-on | $50 / mo, from 300k | Add-on on Professional | Paid add-on |
 | **Open source / self-host** | No | Yes (Apache 2.0) | No | No | No | No | No | No |
 
-Cloudflare figures include the $5 Workers Paid minimum and are our math from its $0.35 per 1,000 rate after 3,000 included. ZeptoMail figures use the widely listed $2.50 per 10k credit, which varies by region. Postmark and Mailgun at these volumes are list price plus overage. SES is send-only, before data transfer.
+Cloudflare figures include the $5 Workers Paid minimum and are our math from its $0.35 per 1,000 rate after 3,000 included. ZeptoMail figures use the widely listed $2.50 per 10k credit, which varies by region. Postmark at these volumes is list price plus overage; Mailgun at 100k is its $90 Scale plan. SES is send-only, before data transfer.
 
 ---
 
