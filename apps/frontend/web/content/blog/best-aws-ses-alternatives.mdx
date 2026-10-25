@@ -1,0 +1,295 @@
+---
+title: "Best Amazon SES Alternatives in 2026: Skip the Glue Code, Keep the Low Price"
+description: "The best Amazon SES alternatives of 2026 compared: Reloop, Cloudflare Email Service, ZeptoMail, Postmark, Resend, Mailgun, SendGrid and Postal on price at 50k and 100k emails, setup effort, inbound, logs and self-hosting."
+keywords:
+  - Amazon SES alternatives
+  - AWS SES alternative
+  - Amazon SES alternative
+  - Amazon SES competitors
+  - open source Amazon SES alternative
+  - SES alternative with dashboard
+publishedAt: 2026-10-25
+category: Comparison
+tags: [aws-ses, alternatives, comparison, pricing]
+readTime: 11 min read
+image: /blog/images/best-aws-ses-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-aws-ses
+  - best-transactional-email-apis-2026
+  - self-hosted-email-infrastructure
+---
+
+**Amazon SES is the cheapest way to send email from a server, and that's exactly why teams outgrow it.** At $0.10 per 1,000 emails nothing hosted beats it on the line item. But SES is a sending pipe, not a product. Before your first password reset reaches a real user, you request production access out of the sandbox, wire bounce and complaint events through SNS or EventBridge, build a suppression store, and find somewhere to keep delivery logs that support can actually search.
+
+**The short version:** if you want SES-like prices with the product already built, **Reloop** is the closest swap ($10 for 50k, $20 for 100k, open source). If your app lives on Cloudflare Workers, **Cloudflare Email Service** is the native choice. If you only send transactional mail and want prepaid credits, look at **ZeptoMail**. If deliverability is your only metric, **Postmark**.
+
+We build Reloop, so weigh our entry accordingly. Every other provider's facts come from our researched head-to-head posts, linked in each section, and each section says where that provider beats us.
+
+---
+
+## Why teams look for an Amazon SES alternative
+
+SES is a great piece of infrastructure. The reasons people leave are almost always about what's missing around it:
+
+- **The sandbox.** New accounts can only send to verified addresses until AWS approves production access, and requests are sometimes denied or need a second round.
+- **Glue code.** Bounces, complaints and deliveries arrive through a configuration set and SNS, EventBridge or Firehose. You build the consumer, the storage and the suppression logic yourself.
+- **No logs or dashboard.** "Did the reset email arrive?" means digging through CloudWatch or an internal tool you had to write.
+- **Templates for engineers only.** Templates are API-managed, so non-engineers can't edit copy without a deploy.
+- **No marketing, no real inbound.** Newsletters need another tool, and inbound mail lands in S3, SNS or Lambda as raw messages.
+- **Account risk.** AWS reviews accounts whose bounce or complaint rates stay high and can pause sending, so you need your own monitoring.
+
+None of that matters if you have a platform team and send millions of emails a month. For everyone else, the engineering time costs more than the per-email savings. Full breakdown: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses).
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall SES alternative** | Reloop | Full platform at $10 for 50k, open source, self-hostable |
+| **Best for Cloudflare Workers apps** | Cloudflare Email Service | Native binding, $0.35 per 1k after 3k included |
+| **Best prepaid, transactional-only** | ZeptoMail | Credits with no monthly fee |
+| **Best for deliverability focus** | Postmark | Transactional-only track record, message streams |
+| **Best developer experience** | Resend | Clean API and React Email |
+| **Best for email validation and routing** | Mailgun | Inbound routes, validation add-on |
+| **Best for enterprise procurement** | SendGrid | Twilio contracts, subusers, IP pools |
+| **Best self-hosted MTA** | Postal | MIT-licensed mail server you run yourself |
+
+---
+
+## The comparison table
+
+| | Amazon SES | Reloop | Cloudflare | ZeptoMail | Postmark | Resend | Mailgun | SendGrid |
+|---|---|---|---|---|---|---|---|---|
+| **Free** | $200 AWS credits, 6 months | 6,000 / mo (200 / day) | Own verified addresses only | First credit (10k emails) | 100 / mo | 3,000 / mo (100 / day) | 100 / day, trial | 100 / day, 60-day trial |
+| **~50k / mo** | ~$5 | **$10** | about $21 | about $12.50 | $87 | $20 | $35 | $19.95 |
+| **~100k / mo** | ~$10 | **$20** | about $39 | about $25 | $177 | $90 | about $100 | $34.95 |
+| **Delivery events** | SNS / EventBridge, you wire it up | Signed HTTP webhooks | Cloudflare Queues | Webhooks | Webhooks | Webhooks | Webhooks | Webhooks |
+| **Inbound** | Receipt rules to S3 / SNS / Lambda | Mailboxes, API, MCP, IMAP | Email Routing | Not offered | Webhook (Pro and up) | Webhook | Inbound routes | Inbound Parse |
+| **Marketing** | No | Campaigns + automations | No | Not allowed | Broadcast streams | Broadcasts | Limited | Separate plans |
+| **Open source / self-host** | No | Yes (Apache 2.0) | No | No | No | No | No | No |
+
+Prices are taken from each provider's pricing page as covered in our head-to-head posts. The Cloudflare figures include the $5 Workers Paid minimum; the ZeptoMail figures use the widely listed $2.50 per 10k credit, which varies by region. Postmark and Mailgun at these volumes are list price plus overage. SES figures are send-only, before $0.12 per GB of outbound data.
+
+---
+
+## 1. Reloop: best overall Amazon SES alternative
+
+[Reloop](/) is open-source email infrastructure: a transactional API, SMTP relay, templates, logs, signed webhooks, inbound mailboxes, contacts, campaigns and event automations in one product. It runs its own MTA (KumoMTA) rather than reselling SES, and **Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers**.
+
+**Pricing:** Free for 6,000 emails a month (200 a day). Pro is $10 for 50,000, Growth is $20 for 100,000 with a dedicated IP included, and extra mail is $0.50 per 1,000. Or prepay credits at $0.50 per 1,000, valid for 6 months. Self-hosting under Apache 2.0 has no per-email fee at all.
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+**Strengths**
+
+- **Everything you'd build around SES is already there**: suppression, searchable logs, webhooks signed with `Reloop-Signature`, and templates with `{{{variables}}}`.
+- No sandbox. Verify your domain and send.
+- Inbound mail lands in real mailboxes with threads, readable over the API, the MCP server or IMAP (3, 5 and 10 hosted inboxes on Free, Pro and Growth).
+- Campaigns and event automations share one suppression list with transactional mail.
+- Open source, so you can move to your own servers and keep the same API.
+
+**Weaknesses**
+
+- **SES is cheaper per email at high volume.** At a million emails a month SES is about $100 sending-only; Reloop is $470 hosted. Self-hosting closes that gap, but then you run it.
+- No IAM integration. You authenticate with an API key, not AWS roles.
+
+**Best for:** teams that picked SES for the price and are tired of maintaining the glue. Full comparison: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses), or see our [Amazon SES alternative](/alternatives/aws-ses) and [SES comparison](/compare/aws-ses) pages.
+
+---
+
+## 2. Cloudflare Email Service: best for Workers apps
+
+Cloudflare added outbound sending to its Email Service in a public beta in April 2026. From a Worker it's one binding and one `send()` call, with no API key to store.
+
+**Pricing:** sending to any recipient requires Workers Paid ($5 a month minimum), which includes 3,000 emails, then $0.35 per 1,000. The free plan only sends to addresses you've verified in your own account.
+
+**Strengths**
+
+- Native Workers binding; errors come back with clear codes such as `E_SENDER_NOT_VERIFIED`.
+- Cheaper than Reloop above roughly 200k emails a month.
+- Inbound via Email Routing, which is generally available.
+
+**Weaknesses**
+
+- Sending is still in public beta.
+- Your domain must use Cloudflare DNS.
+- Transactional only; templates and dedicated IPs aren't documented. Events go to Cloudflare Queues, not HTTP webhooks.
+
+**Best for:** apps that already live on Workers and only send transactional mail. Full comparison: [Reloop vs Cloudflare Email Service](/blog/reloop-vs-cloudflare-email).
+
+---
+
+## 3. ZeptoMail: best prepaid, transactional-only option
+
+ZeptoMail from Zoho, now part of Zoho CPaaS, sells email on prepaid credits: one credit sends 10,000 emails, the first one is free, and credits last 6 months.
+
+**Pricing:** about $2.50 per credit (varies by region), so roughly $12.50 for 50,000 and $25 for 100,000 emails.
+
+**Strengths**
+
+- No monthly fee, and cheaper than Reloop above roughly 150,000 emails a month.
+- Mail Agents keep products or environments apart, each with its own tokens, domains and stats.
+- SMTP relay and REST API, plus SMS, WhatsApp and voice in the wider Zoho CPaaS.
+
+**Weaknesses**
+
+- Marketing mail isn't allowed; accounts that keep sending it get blocked.
+- No inbound mailboxes.
+- Credits expire after 6 months.
+
+**Best for:** price-sensitive teams sending only transactional mail. Full comparison: [Reloop vs ZeptoMail](/blog/reloop-vs-zeptomail).
+
+---
+
+## 4. Postmark: best for deliverability focus
+
+Postmark has built its reputation on fast, transactional-first delivery, with separate message streams to keep transactional and broadcast traffic apart.
+
+**Pricing:** free for 100 emails a month. Basic starts at $15 for 10,000, with overage at $1.80 per 1,000 ($1.30 on Pro). That's about $87 at 50,000 and $177 at 100,000 on Basic list price; use Postmark's calculator for an exact tier.
+
+**Strengths:** long transactional-only track record, message streams, excellent docs and support.
+
+**Weaknesses:** far more expensive than SES or Reloop at volume; dedicated IPs are $50 a month from 300k emails; inbound is a webhook on Pro and up; no self-hosting.
+
+**Best for:** teams where every millisecond of reset-email delivery matters and budget doesn't. Full comparison: [Reloop vs Postmark](/blog/reloop-vs-postmark).
+
+---
+
+## 5. Resend: best developer experience
+
+Resend set the bar for a modern email API and created React Email. Worth knowing for SES refugees: **Resend sends through Amazon SES** under the hood, with its own product layer on top.
+
+**Pricing:** free for 3,000 a month (100 a day), $20 for 50,000, $90 for 100,000, overage $0.90 per 1,000.
+
+**Strengths:** clean API and SDKs, React Email, a large ecosystem of examples, broadcasts for simple marketing.
+
+**Weaknesses:** a big jump to $90 at 100k; dedicated IPs on the Scale plan and up; inbound is a webhook per message; hosted-only.
+
+**Best for:** teams that want the most polished hosted API and stay under 50k emails a month. Full comparison: [Reloop vs Resend](/blog/reloop-vs-resend).
+
+---
+
+## 6. Mailgun: best for email validation and routing
+
+Mailgun is a long-standing developer email API with inbound routes (match by pattern, then forward or post to a webhook) and email validation as a paid add-on.
+
+**Pricing:** 100 a day on a trial. Basic is $15 for 10,000; Foundation is $35 for 50,000; 100,000 is about $100 with overage from $1.30 per 1,000.
+
+**Strengths:** mature API, inbound routes, Handlebars templates, validation.
+
+**Weaknesses:** expensive at 100k compared with SES or Reloop; dedicated IPs and validation cost extra; marketing is a separate Sinch product.
+
+**Best for:** teams that need validation and inbound routing from one vendor. Full comparison: [Reloop vs Mailgun](/blog/reloop-vs-mailgun).
+
+---
+
+## 7. SendGrid: best for enterprise procurement
+
+SendGrid, part of Twilio, is the default enterprise choice, with subusers, IP pools and a mature compliance program.
+
+**Pricing:** a 60-day trial at 100 a day. Essentials is $19.95 for 50,000 and $34.95 for 100,000. Dedicated IPs, subusers and SSO start on Pro at $89.95.
+
+**Strengths:** full Handlebars templates, enterprise contracts, Marketing Campaigns as an add-on.
+
+**Weaknesses:** marketing is priced separately; no permanent free tier; the features most SES users want (dedicated IP) need Pro.
+
+**Best for:** companies that need a Twilio contract. Full comparison: [Reloop vs SendGrid](/blog/reloop-vs-sendgrid).
+
+---
+
+## 8. Postal: best self-hosted mail server
+
+If you're leaving SES because you'd rather own the sending path entirely, [Postal](https://github.com/postalserver/postal) is a mature, MIT-licensed mail server with an HTTP API, SMTP, webhooks and IP pools with routing rules. There's no hosted version.
+
+**Pricing:** free; you pay for the server. Its minimum is 2 CPU cores, 4 GB RAM and 25 GB disk, with MariaDB 10.6 or newer.
+
+**Strengths:** lightweight, proven MTA; multiple IP pools; no per-email fees.
+
+**Weaknesses:** no stored templates, contacts, campaigns or inbound mailboxes; you own IP reputation, warm-up and uptime.
+
+**Best for:** teams that want a pure, self-run MTA. Reloop is also self-hostable if you want the full platform on your own servers. Full comparison: [Reloop vs Postal](/blog/reloop-vs-postal).
+
+---
+
+## How to choose
+
+- **"We chose SES for the price but spend too much time on glue code."** Reloop. Same idea of cheap sending, with logs, suppression and webhooks built in.
+- **"We send millions of emails a month and have a platform team."** Stay on SES, or self-host Reloop to keep zero per-email fees with a product on top.
+- **"Our whole app runs on Cloudflare Workers."** Cloudflare Email Service.
+- **"We only send transactional mail and want the lowest bill."** ZeptoMail, or Reloop below about 150k a month.
+- **"Deliverability is the only thing that matters."** Postmark.
+- **"We need inbound mail as real inboxes, for support or AI agents."** Reloop.
+- **"We want to run our own mail server."** Postal for a pure MTA, Reloop for the full platform.
+
+---
+
+## Migrating off Amazon SES
+
+The steps are the same whichever provider you pick:
+
+1. **Verify your domain** with the new provider. Add its DKIM record and merge its include into your existing SPF record; never publish a second SPF record. Keep DMARC in place. Our [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide) covers it.
+2. **Export your suppression list** from SES's account-level list and your own store, and import it so you don't email addresses that bounced or complained.
+3. **Swap the send call.** Replace `SendEmailCommand` with the new SDK. On Reloop, change `{{variable}}` placeholders to `{{{variable}}}`.
+4. **Replace the SNS or EventBridge consumer** with a webhook handler. On Reloop, verify the `Reloop-Signature` header.
+5. **Ramp traffic** from 10% to 100% over one to two weeks, watching bounce and complaint rates.
+6. **Tear down** the configuration sets, SNS topics and Lambda functions you no longer need.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the cheapest Amazon SES alternative?">
+    Per email, nothing hosted beats SES's $0.10 per 1,000. Among full
+    platforms, Reloop is the cheapest at $10 for 50,000 and $20 for 100,000.
+    ZeptoMail and Cloudflare get cheaper than Reloop above roughly 150,000
+    and 200,000 emails a month. Self-hosting Reloop or Postal removes the
+    per-email fee entirely.
+  </Accordion>
+
+  <Accordion title="Is there an open-source alternative to Amazon SES?">
+    Yes. Reloop is open source under Apache 2.0 and includes the API,
+    dashboard, inbound mailboxes and campaigns. Postal is an MIT-licensed
+    mail server focused on sending. Both can run on your own servers.
+  </Accordion>
+
+  <Accordion title="Does Resend use Amazon SES?">
+    Yes. Resend sends through Amazon SES and adds its own API, dashboard and
+    features on top. Reloop runs its own MTA (KumoMTA) instead.
+  </Accordion>
+
+  <Accordion title="Do I have to leave the SES sandbox to use these alternatives?">
+    No. The sandbox is an AWS process. On Reloop you verify your domain and
+    can send to real users right away, within the free tier's 200-a-day cap.
+  </Accordion>
+
+  <Accordion title="Can I keep using SMTP?">
+    Yes. Every provider here except Cloudflare's Workers binding offers SMTP;
+    Cloudflare offers SMTP in beta. Reloop's relay is `smtp.reloop.sh`, with
+    your API key as both username and password.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Get SES-level pricing without the glue code"
+  description="6,000 emails a month free, then $10 for 50,000. Logs, webhooks, suppression and inboxes included, and open source if you want to run it yourself."
+  href="/dashboard/signup"
+  label="Get started"
+/>

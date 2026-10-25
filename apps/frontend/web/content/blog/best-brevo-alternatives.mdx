@@ -1,0 +1,318 @@
+---
+title: "Best Brevo Alternatives in 2026: Cheaper, Developer-Friendly and Open-Source Options"
+description: "The best Brevo (Sendinblue) alternatives of 2026 compared: Reloop, Mailchimp, Mailjet, Loops, Customer.io, Elastic Email and Listmonk on pricing, free tiers, automations, deliverability, inbound and self-hosting."
+keywords:
+  - Brevo alternatives
+  - Brevo alternative
+  - Brevo competitors
+  - Sendinblue alternative
+  - open source Brevo alternative
+  - cheaper Brevo alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [brevo, alternatives, comparison, pricing, open-source]
+readTime: 11 min read
+image: /blog/images/best-brevo-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-brevo
+  - reloop-vs-mailjet
+  - best-mailchimp-alternatives
+---
+
+**The short version:** if developers own your email and you send real volume, **Reloop** is the best Brevo alternative: $10 for 50,000 emails where Brevo's entry plan is $9 for 5,000, automations on every plan, a dedicated IP at $20, and open source. If you want to stay with a marketer-first suite, **Mailjet** has a 6,000-a-month free tier and a strong editor. If you only need newsletters and can host them, **Listmonk** is free.
+
+We build Reloop, so factor that in. Every competitor fact below comes from our researched head-to-head posts, which link each provider's own pricing page, and each section says where that tool beats us.
+
+---
+
+## Why teams leave Brevo
+
+Brevo (formerly Sendinblue) is a capable all-in-one marketing suite. People usually look elsewhere for one of these reasons:
+
+1. **The price climbs with volume.** Starter begins at $9 for 5,000 emails, and larger volumes are set on a slider. Professional starts at $499 a month for 150,000 emails.
+2. **Automations need a higher plan.** Automations, A/B testing and advanced stats start on Standard, from $18.
+3. **Dedicated IPs sit on the higher tiers**, and Brevo's shared IPs carry a lot of marketing mail alongside your password resets.
+4. **It's built for marketers, not developers.** Inbound mail arrives as a webhook, not a mailbox, and there's no self-hosted option.
+
+If your team needs SMS, WhatsApp, live chat and a CRM in one bill, Brevo is still a good fit. We say when to stay at the end.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall for developer-led teams** | Reloop | $10 for 50k, automations on every plan, open source |
+| **Best for marketers on a free plan** | Mailjet | 6,000 emails a month free, strong editor |
+| **Best for marketers with small lists** | Mailchimp | Huge template library and integrations |
+| **Best lifecycle tool for SaaS** | Loops | Focused, polished onboarding flows |
+| **Best multi-channel engagement** | Customer.io | Journeys across email, push, in-app and SMS |
+| **Best budget no-code newsletters** | Elastic Email | Paid newsletters and checkouts built in |
+| **Best free self-hosted newsletter tool** | Listmonk | Single Go binary, bring your own SMTP |
+
+---
+
+## The comparison table
+
+| | Reloop | Mailjet | Mailchimp | Loops | Customer.io | Elastic Email (Marketing) | Listmonk |
+|---|---|---|---|---|---|---|---|
+| **Pricing basis** | Emails sent | Emails sent | Contacts stored | Contacts stored | Profiles stored | Contacts + emails | Free software + your SMTP |
+| **Free tier** | 6,000 / mo (200 / day) | 6,000 / mo (200 / day) | 250 contacts, 500 sends | 1,000 contacts, 4,000 sends | No free plan listed | 1,000 contacts, 3,000 emails | Free (self-host) |
+| **Entry paid plan** | **$10 for 50,000 emails** | Starter $9 | $13 for 500 contacts | $49 / mo | $100 / mo (5,000 profiles) | $29 (2,500 contacts, 37,500 emails) | Server + SMTP cost |
+| **Automations** | Every plan | Premium plan | Yes | Yes (core focus) | Yes (Journeys) | Starter and Pro | No drip sequences |
+| **SMS** | No | No | No | No | Yes (priced separately) | No | No |
+| **Transactional API** | Yes | Yes | Mandrill add-on | Limited | Yes | Separate Email API product | Yes (`/api/tx`) |
+| **Inbound email** | Mailboxes, API, MCP, IMAP | Parse API | Via Mandrill routes | No | No | On the Email API Pro plan | No |
+| **Dedicated IP** | Included on Growth ($20) | Premium, on request | Mandrill add-on | No | Not listed | Email API add-on | Your SMTP provider's |
+| **Open source / self-host** | Yes (Apache 2.0) | No | No | No | No | No | Yes (AGPLv3) |
+
+Reloop's prices are on [reloop.sh/pricing](/pricing). Competitor prices come from each provider's pricing page, linked in our head-to-head posts. They all change; check before you commit.
+
+---
+
+## 1. Reloop: best overall for developer-led teams
+
+Reloop is open-source email infrastructure: a transactional API, SMTP relay, contacts, broadcast campaigns, event-triggered automations and inbound mailboxes in one product. Like Brevo, it charges for emails sent, not contacts stored, but each dollar goes much further.
+
+**Pricing:** Free is 6,000 emails a month (200 a day). Pro is $10 for 50,000. Growth is $20 for 100,000 and includes a dedicated IP. Extra mail costs $0.50 per 1,000, and pay-as-you-go credits cost the same $0.50 per 1,000 and stay valid for 6 months. Self-hosting is free under Apache 2.0.
+
+**Strengths**
+
+- **$10 buys 50,000 emails**, where $9 buys 5,000 on Brevo's Starter.
+- **Automations on every plan**, driven by events from your app:
+
+```typescript
+const { automationError } = await reloop.automations.start({
+  event: "user.signed_up",
+  email: user.email,
+  firstName: user.name,
+  properties: { plan: user.plan },
+});
+```
+
+- A dedicated IP included at $20 a month, so product mail doesn't share a pool with other senders' newsletters.
+- **Inbound mail as real mailboxes** with threads, readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, which suits support inboxes and AI agents.
+- Errors return `message`, `why` and `fix`, and there are SDKs in nine languages.
+- Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers, which matters to many Brevo customers. Or [self-host](/self-host) it.
+
+**Weaknesses**
+
+- No SMS, WhatsApp, live chat, landing pages or sales CRM.
+- Brevo's visual builder and templates are more mature for marketers.
+- The free tier is smaller per day (200 vs 300).
+
+**Best for:** product teams that send from code and want lower prices, automations without a plan upgrade, and the option to self-host.
+
+Full breakdown: [Reloop vs Brevo](/blog/reloop-vs-brevo)
+
+---
+
+## 2. Mailjet: best for marketers on a free plan
+
+[Mailjet](https://www.mailjet.com/) is the closest like-for-like swap for Brevo: a French-born platform, now owned by Sinch, doing marketing and transactional mail with a strong drag-and-drop editor.
+
+**Pricing:** free for 6,000 emails a month (200 a day). Starter is $9. Essential is $19 for 15,000 and $40 for 50,000; Premium is $29 for 15,000, $59 for 50,000, $112 for 100,000 and $265 for 250,000.
+
+**Strengths**
+
+- A 6,000-a-month free tier, the same as Reloop's, with a marketer-friendly editor.
+- A polished editor, brand kit, forms and landing pages.
+- Subaccounts for agencies and multi-brand teams.
+
+**Weaknesses**
+
+- Automations, team management and dedicated IPs need Premium.
+- No SMS or WhatsApp, unlike Brevo.
+- Inbound arrives through the Parse API as a webhook.
+
+**Best for:** marketers who want a Brevo-style editor with a larger free allowance.
+
+Full breakdown: [Reloop vs Mailjet](/blog/reloop-vs-mailjet)
+
+---
+
+## 3. Mailchimp: best for marketers with small lists
+
+[Mailchimp](https://mailchimp.com/) is the best-known marketing platform, with a mature builder, a huge template library and integrations with most small-business tools.
+
+**Pricing:** free for 250 contacts and 500 sends a month. Essentials starts at $13 a month for 500 contacts, with monthly sends capped at 10× your contacts. Transactional email (Mandrill) is an add-on to Standard or Premium, billed in blocks of 25,000 emails.
+
+**Strengths**
+
+- The most extensive templates, landing pages, forms and integrations here.
+- Easy for non-technical teams.
+
+**Weaknesses**
+
+- Priced by contacts, so a large, quiet list gets expensive. Brevo's per-email model is often cheaper.
+- Transactional mail needs a separate add-on on a higher plan.
+- Hosted only.
+
+**Best for:** marketing teams with small lists who value integrations over price.
+
+Full breakdown: [Reloop vs Mailchimp](/blog/reloop-vs-mailchimp) · [Best Mailchimp alternatives](/blog/best-mailchimp-alternatives)
+
+---
+
+## 4. Loops: best lifecycle tool for SaaS
+
+[Loops](https://loops.so/) is a focused tool for SaaS lifecycle email: onboarding flows, announcements and newsletters.
+
+**Pricing:** free for 1,000 contacts and 4,000 sends a month. Paid plans start at $49 a month, and 100,000 contacts costs $399 a month.
+
+**Strengths**
+
+- Lifecycle email is its whole product, and it shows.
+- Built around SaaS use cases rather than generic small business.
+
+**Weaknesses**
+
+- Priced by contacts.
+- Limited transactional API, no SMTP relay, no inbound email.
+- Hosted only.
+
+**Best for:** SaaS marketers with transactional mail already handled elsewhere.
+
+Full breakdown: [Reloop vs Loops](/blog/reloop-vs-loops)
+
+---
+
+## 5. Customer.io: best multi-channel engagement
+
+[Customer.io](https://customer.io/) runs journeys across email, push, in-app messages and SMS, with deep segmentation. If you use Brevo for its multi-channel reach, this is the more powerful (and pricier) step up.
+
+**Pricing:** Essentials starts at $100 a month for 5,000 profiles and 1 million emails, then $0.009 per extra profile. Premium starts at $1,000 a month, billed annually. No free plan is listed.
+
+**Strengths**
+
+- Cross-channel journeys and deep segmentation.
+- A visual builder and Liquid templates that lifecycle teams can run alone.
+
+**Weaknesses**
+
+- Priced by profiles, and much more expensive than Brevo for large lists.
+- No SMTP relay and no inboxes for replies.
+
+**Best for:** growth teams with complex, multi-channel programs and the budget for them.
+
+Full breakdown: [Reloop vs Customer.io](/blog/reloop-vs-customer-io)
+
+---
+
+## 6. Elastic Email: best budget no-code newsletters
+
+[Elastic Email](https://elasticemail.com/) sells an Email API and a separate Email Marketing app.
+
+**Pricing (Email Marketing):** free for up to 1,000 contacts and 3,000 emails a month. Starter is $29 for up to 2,500 contacts and 37,500 emails, with automations, paid newsletters and checkouts. Pro is $49 with unlimited automations, webhooks and sub-accounts.
+
+**Strengths**
+
+- A drag-and-drop designer and template gallery for non-technical users.
+- Paid newsletters and checkouts.
+
+**Weaknesses**
+
+- Marketing and transactional are separate products with separate plans.
+- Hosted only.
+
+**Best for:** creators and small businesses who want cheap newsletters, maybe paid ones.
+
+Full breakdown: [Reloop vs Elastic Email](/blog/reloop-vs-elastic-email)
+
+---
+
+## 7. Listmonk: best free self-hosted newsletter tool
+
+[Listmonk](https://listmonk.app/) is an open-source newsletter manager (AGPLv3), a single Go binary plus Postgres that sends through an SMTP server you configure.
+
+**Pricing:** free software. You pay for a small server and your SMTP provider.
+
+**Strengths**
+
+- Very light, with SQL segmentation and several editors.
+- No per-contact or per-email software fees.
+
+**Weaknesses**
+
+- Needs an external SMTP provider for delivery.
+- No drip sequences, no inbound email, and you maintain it.
+
+**Best for:** technical teams that want free newsletters. Pair it with Reloop's SMTP relay for delivery.
+
+Full breakdown: [Reloop vs Listmonk](/blog/reloop-vs-listmonk)
+
+---
+
+## How to choose
+
+1. **Do developers own your email, and do you send more than a few thousand a month?** → Reloop.
+2. **Do you need SMS or push in the same journey, with deep segmentation?** → Customer.io (or stay on Brevo for SMS and WhatsApp on a smaller budget).
+3. **Do you want a Brevo-style marketer suite with a bigger free tier?** → Mailjet.
+4. **Is your list small and do you rely on integrations?** → Mailchimp.
+5. **Do you want a focused SaaS lifecycle tool?** → Loops.
+6. **Do you want cheap no-code newsletters with paid subscriptions?** → Elastic Email.
+7. **Do you want free, self-hosted newsletters?** → Listmonk.
+
+### When to stay on Brevo
+
+- You need email, SMS, WhatsApp, live chat and a CRM in one bill.
+- Your marketing team runs everything visually without engineers.
+- You send a few hundred emails a day and the free plan's 300 a day covers you.
+
+---
+
+## Switching from Brevo
+
+1. **Export contacts and suppressions**, including unsubscribed and blocklisted addresses, and import them as suppressed.
+2. **Verify your domain** with the new provider. Merge its include into your existing SPF record rather than adding a second one. See our [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide).
+3. **Move templates.** Brevo uses `{{ params.first_name }}`. In Reloop, placeholders use triple braces: `{{{first_name}}}`.
+4. **Recreate automations**, ideally triggered by events from your app.
+5. **Ramp traffic** over one to two weeks and watch bounce and complaint rates.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Brevo the same as Sendinblue?">
+    Yes. Sendinblue rebranded to Brevo in 2023. Everything in this post
+    applies to both names.
+  </Accordion>
+
+  <Accordion title="What is the cheapest Brevo alternative?">
+    At real volume, Reloop: $10 for 50,000 emails and $20 for 100,000 with a
+    dedicated IP. Self-hosted Reloop or Listmonk cost only the server (plus
+    an SMTP provider for Listmonk).
+  </Accordion>
+
+  <Accordion title="Is there an open-source Brevo alternative?">
+    Yes. Reloop (Apache 2.0) covers transactional mail, campaigns,
+    automations and inbound mailboxes, hosted or self-hosted. Listmonk
+    (AGPLv3) is a self-hosted newsletter manager.
+  </Accordion>
+
+  <Accordion title="Which Brevo alternative has SMS?">
+    Customer.io supports SMS alongside email, push and in-app messages, with
+    SMS priced separately. Reloop, Mailjet, Mailchimp, Loops, Elastic Email
+    and Listmonk in this list are email-only.
+  </Accordion>
+
+  <Accordion title="Is there an EU-hosted Brevo alternative?">
+    Yes. Reloop Cloud runs on Hetzner, a German hosting company, with EU
+    data centers, and you can also self-host it on any EU server. Mailjet
+    stores data in EU data centers too. See
+    [best EU-hosted email APIs](/blog/eu-email-api-providers-2026).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="6,000 emails a month free, and 50,000 for $10 when you grow. Automations on every plan."
+  href="/dashboard/signup"
+  label="Get started"
+/>

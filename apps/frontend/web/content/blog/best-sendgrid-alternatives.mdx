@@ -1,0 +1,289 @@
+---
+title: "Best SendGrid Alternatives in 2026: Cheaper, Simpler and Open Source"
+description: "The best SendGrid alternatives in 2026 compared: Reloop, Resend, Postmark, Amazon SES, Mailgun, MailerSend, Brevo and Mailjet on price at 50k and 100k emails, free tiers, inbound, marketing and how to migrate."
+keywords:
+  - SendGrid alternatives
+  - SendGrid alternative
+  - SendGrid competitors
+  - open source SendGrid alternative
+  - cheaper than SendGrid
+  - SendGrid replacement
+publishedAt: 2026-10-25
+category: Comparison
+tags: [sendgrid, alternatives, comparison, pricing]
+readTime: 12 min read
+image: /blog/images/best-sendgrid-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-sendgrid
+  - migrating-from-sendgrid
+  - best-transactional-email-apis-2026
+---
+
+**The short version:** if you're leaving SendGrid to pay less and get a simpler API, **Reloop** is the strongest all-round replacement: $10 for 50,000 emails, a permanent free tier, inbound mailboxes, campaigns on the same plan, and open source. If you only care about transactional deliverability, look at **Postmark**. If you're on AWS and want the cheapest raw pipe, **Amazon SES**.
+
+We build Reloop, so weigh that. Every price below comes from the providers' public pricing pages, linked in our head-to-head posts, and each section says where that provider beats us.
+
+---
+
+## Why teams leave SendGrid
+
+SendGrid, now part of Twilio, is proven at enormous volume. The reasons people look elsewhere are consistent:
+
+- **No permanent free plan.** New accounts get 100 emails a day for a 60-day trial, then you pay.
+- **The features growing teams want sit on Pro.** A dedicated IP, subusers and SSO start at $89.95 a month.
+- **Two products, two plans.** The Email API and Marketing Campaigns are billed separately.
+- **An older API.** The v3 payload nests recipients inside a `personalizations` array that most developers look up every time.
+- **Hosted only.** No source, no self-hosting, no way to run it yourself if pricing or policy changes.
+
+If none of that bothers you and you need Twilio's enterprise contracts, SendGrid may still be the right call. Otherwise, here are the alternatives.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall SendGrid alternative** | Reloop | $10 for 50k, free tier, inbound mailboxes, campaigns, open source |
+| **Best hosted developer experience** | Resend | Clean API, React Email, big ecosystem |
+| **Best for transactional deliverability** | Postmark | Transactional-first, message streams |
+| **Cheapest raw sending** | Amazon SES | $0.10 per 1,000, if you build the rest |
+| **Best for inbound routing and logs** | Mailgun | Inbound routes, detailed event logs |
+| **Best for a visual builder** | MailerSend | Drag-and-drop editor, SMS add-on |
+| **Best for marketing-led teams** | Brevo | Email, SMS, WhatsApp and CRM in one |
+| **Best EU-based ESP** | Mailjet | Strong editor, generous free tier |
+
+---
+
+## The comparison table
+
+| | SendGrid | Reloop | Resend | Postmark | Amazon SES | Mailgun | MailerSend |
+|---|---|---|---|---|---|---|---|
+| **Free tier** | 60-day trial, 100 / day | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | 100 / mo | $200 AWS credits, 6 months | 100 / day trial | 500 / mo |
+| **~50,000 / mo** | $19.95 | **$10** | $20 | $87 (Basic + overage) | ~$5 | $35 | $35 |
+| **~100,000 / mo** | $34.95 | **$20** | $90 | $177 (Basic + overage) | ~$10 | About $100 | $68 |
+| **Dedicated IP** | Pro, from $89.95 | Included on Growth ($20) | Scale plan and up | $50 / mo, from 300k / mo | $24.95 / mo | Paid add-on | Add-on on Professional |
+| **Inbound** | Inbound Parse webhook | Mailboxes + threads, API, MCP, IMAP | Webhook | Webhook (Pro and up) | Receipt rules to S3 / Lambda / SNS | Inbound routes | Forward to webhook or address |
+| **Marketing** | Separate plan | Yes + automations | Broadcasts | Broadcast streams | No | Separate Sinch product | Bulk sending; MailerLite for marketing |
+| **Open source / self-host** | No | Yes | No | No | No | No | No |
+
+Brevo and Mailjet are covered in their own sections below. Postmark's 50k and 100k figures are Basic list price plus overage; Pro and Platform plans lower the overage, so check [their calculator](https://postmarkapp.com/pricing). SES figures are sending only, before data transfer.
+
+---
+
+## 1. Reloop: best overall SendGrid alternative
+
+Reloop is open-source email infrastructure: a transactional API, SMTP relay, inbound mailboxes, contacts, campaigns, automations and webhooks in one product. Use it hosted, or run the same code on your own server.
+
+**Pricing:** Free is 6,000 emails a month (200 a day) with no end date. Pro is $10 for 50,000. Growth is $20 for 100,000 and includes a dedicated IP. Extra mail costs $0.50 per 1,000. Self-hosting is free under Apache 2.0. Pay-as-you-go credits are also available at $0.50 per 1,000, valid for 6 months.
+
+**Why it fits SendGrid users**
+
+- **Roughly half the price.** $10 vs $19.95 at 50k, $20 vs $34.95 at 100k. With a dedicated IP, it's $20 on Reloop against $89.95 on SendGrid Pro.
+- **One product.** Transactional email, campaigns and event-triggered automations share one API key and one suppression list. No second Marketing Campaigns plan.
+- **A flat API.** One request, one message, no `personalizations` array. Errors return `message`, `why` and `fix`.
+- **Inbound as real mailboxes.** Where SendGrid's Inbound Parse POSTs each message to your URL, Reloop stores and threads mail, scores spam, and lets you read and reply over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP.
+- **Open source and self-hostable**, so you're never locked in. Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers.
+
+**Where SendGrid is still ahead**
+
+- **Template logic.** SendGrid's dynamic templates run full Handlebars (`#if`, `#each`). Reloop templates substitute variables like `{{{first_name}}}` with defaults; loops and conditions happen in your code.
+- **Enterprise procurement.** Subusers, IP pools and a mature Twilio compliance programme.
+- **Track record.** Reloop is younger, with fewer years of community answers.
+
+**Best for:** startups and product teams that want SendGrid's sending without its pricing, especially if they also need inbound mail or might self-host.
+
+Full breakdown: [Reloop vs SendGrid](/blog/reloop-vs-sendgrid) · [SendGrid alternative overview](/alternatives/sendgrid) · [Feature comparison](/compare/sendgrid)
+
+---
+
+## 2. Resend: best hosted developer experience
+
+Resend set the bar for a modern email API and created React Email.
+
+**Pricing:** Free is 3,000 a month (100 a day). Pro is $20 for 50,000. 100,000 costs $90. Overage is $0.90 per 1,000.
+
+**Strengths:** excellent docs and onboarding, first-class React Email, a large ecosystem of examples, and Broadcasts for simple marketing sends.
+
+**Weaknesses:** gets expensive past 50k ($90 at 100k, more than SendGrid Essentials), dedicated IPs start on the Scale plan, inbound is a webhook per message, and it's hosted only.
+
+**Best for:** small teams that want a polished API and will stay under 50k emails a month.
+
+Full breakdown: [Reloop vs Resend](/blog/reloop-vs-resend)
+
+---
+
+## 3. Postmark: best for transactional deliverability
+
+Postmark has been transactional-first for over a decade. **Message streams** keep transactional and broadcast traffic apart, so a newsletter can't hurt your password resets.
+
+**Pricing:** a free developer plan of 100 emails a month. Basic is $15 for 10,000, with overage at $1.80 per 1,000; Pro and Platform lower that to $1.30 and $1.20. Inbound needs Pro or above. Dedicated IPs are $50 a month per IP for senders above 300,000 a month.
+
+**Strengths:** strong transactional reputation, clear bounce handling, excellent support.
+
+**Weaknesses:** the most expensive per email here once you pass 10,000, a tiny free tier, and hosted only.
+
+**Best for:** teams where a delayed receipt or reset costs real money and budget is secondary.
+
+Full breakdown: [Reloop vs Postmark](/blog/reloop-vs-postmark)
+
+---
+
+## 4. Amazon SES: cheapest raw sending
+
+SES is AWS's sending pipe. It's the cheapest per email by a wide margin, and it's a building block, not a product.
+
+**Pricing:** $0.10 per 1,000 emails plus $0.12 per GB of outbound data. Dedicated IPs are $24.95 a month. New AWS accounts get up to $200 in Free Tier credits for six months.
+
+**Strengths:** lowest list price, deep AWS integration (IAM, SNS, EventBridge, Lambda), scales to huge volume.
+
+**Weaknesses:** new accounts start in a sandbox, and you build bounce handling, logs, templates and any dashboard yourself.
+
+**Best for:** AWS-heavy teams with engineering time to build the tooling SendGrid gave them.
+
+<Callout type="tip">
+  You can combine the two: Reloop can route outbound mail through SES (or any SMTP provider) while you keep Reloop's API, logs, templates and suppression list.
+</Callout>
+
+Full breakdown: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses)
+
+---
+
+## 5. Mailgun: best for inbound routing and logs
+
+Mailgun, now part of Sinch, is a long-standing developer API with strong log search and inbound routes.
+
+**Pricing:** a 100-a-day free trial. Basic is $15 for 10,000. Foundation is $35 for 50,000, with overage from $1.30 per 1,000.
+
+**Strengths:** inbound routes that match patterns and forward or POST messages, detailed event logs, Handlebars templates, and email validation as an add-on.
+
+**Weaknesses:** more expensive than SendGrid Essentials at 50k, dedicated IPs are an add-on, campaigns are a separate Sinch product, and it's hosted only.
+
+**Best for:** teams that need routing and log search more than a low price.
+
+Full breakdown: [Reloop vs Mailgun](/blog/reloop-vs-mailgun)
+
+---
+
+## 6. MailerSend: best for a visual builder
+
+MailerSend comes from the team behind MailerLite and is built for teams where non-developers edit emails.
+
+**Pricing:** free for 500 emails a month. Hobby is $7 for 5,000. Starter is $35 for 50,000 and $68 for 100,000, with $1.30 per 1,000 overage at those tiers. Professional, which unlocks the dedicated IP add-on, is $110 for 50k.
+
+**Strengths:** a drag-and-drop template builder, SMS in the US and Canada, and a clean dashboard.
+
+**Weaknesses:** a small free tier, marketing lives in a separate product (MailerLite), and inbound is forwarded rather than stored.
+
+**Best for:** teams where designers or marketers own transactional templates.
+
+Full breakdown: [Reloop vs MailerSend](/blog/reloop-vs-mailersend)
+
+---
+
+## 7. Brevo: best for marketing-led teams
+
+Brevo (formerly Sendinblue) is an all-in-one marketing suite from Paris with a transactional API.
+
+**Pricing:** free for 300 emails a day. Starter begins at $9 for 5,000 emails, and Standard, with automations, starts at $18. Larger volumes are priced on a slider.
+
+**Strengths:** email, SMS, WhatsApp, CRM and live chat in one product, with an editor marketers can use alone.
+
+**Weaknesses:** costs rise quickly with volume compared with developer APIs, dedicated IPs are on higher tiers, and inbound is a webhook.
+
+**Best for:** teams that left SendGrid mainly for Marketing Campaigns and want a broader marketing suite.
+
+Full breakdown: [Reloop vs Brevo](/blog/reloop-vs-brevo)
+
+---
+
+## 8. Mailjet: best EU-based ESP
+
+Mailjet, now owned by Sinch, combines transactional and marketing email with a strong drag-and-drop editor.
+
+**Pricing:** free for 6,000 emails a month (200 a day). At 50,000 it's $40 on Essential or $59 on Premium; 100,000 on Premium is $112.
+
+**Strengths:** tied with Reloop for the most generous free tier here, a good visual editor, and long GDPR experience.
+
+**Weaknesses:** automations and the dedicated IP need Premium, and above the free tier it's several times Reloop's price.
+
+**Best for:** small senders under 6,000 a month, or teams that want a visual editor with EU hosting.
+
+Full breakdown: [Reloop vs Mailjet](/blog/reloop-vs-mailjet)
+
+---
+
+## How to choose
+
+- **"We want SendGrid's features for less."** Reloop. It's $10 at 50k, and the dedicated IP is $20 instead of $89.95.
+- **"Our templates depend on Handlebars logic."** Stay on SendGrid, or move the logic into your code and use Reloop or Resend.
+- **"Only transactional deliverability matters."** Postmark.
+- **"We're all-in on AWS and have engineers to spare."** Amazon SES, or SES behind Reloop.
+- **"Marketers edit the emails."** MailerSend, Brevo or Mailjet.
+- **"We receive mail too, or run AI agents that read and reply."** Reloop, the only option here with stored, threaded mailboxes.
+- **"We need to self-host or read the source."** Reloop, the only open-source option here.
+
+---
+
+## Migrating off SendGrid
+
+The steps are the same whichever provider you pick:
+
+1. **Verify your domain** with the new provider. For Reloop, publish the `reloop._domainkey` DKIM record and merge `include:reloop.sh` into your existing SPF record. Never publish a second SPF record.
+2. **Export your suppressions** (bounces, blocks, spam reports, unsubscribes) from SendGrid and import them, so you don't email people who already said no.
+3. **Swap the client.** Replace `sgMail.send` and flatten the `personalizations` array into one request per message.
+4. **Move templates.** In Reloop, placeholders use triple braces, like `{{{first_name}}}`, and Handlebars logic moves into your code.
+5. **Point webhooks** at a new handler. Reloop events are named `email.delivered`, `email.bounced` and so on, and are signed in the `Reloop-Signature` header.
+6. **Ramp traffic** from 10% to 100% over one to two weeks, watching bounce and complaint rates.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) walks through each step with code, including a traffic-split flag and a suppression import script.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the cheapest SendGrid alternative?">
+    For raw sending, Amazon SES at $0.10 per 1,000 emails, if you build the
+    tooling around it. For a complete platform, Reloop: $10 for 50,000 emails
+    and $20 for 100,000 with a dedicated IP, against $19.95 and $34.95 on
+    SendGrid Essentials.
+  </Accordion>
+
+  <Accordion title="Is there a free SendGrid alternative?">
+    Yes. Reloop gives 6,000 emails a month (200 a day) with no end date,
+    Mailjet gives 6,000 a month, and Resend gives 3,000 (100 a day). SendGrid itself now offers a
+    60-day trial instead of a permanent free plan. Self-hosted Reloop has no
+    per-email fee at all.
+  </Accordion>
+
+  <Accordion title="Is there an open-source SendGrid alternative?">
+    Reloop is open source under Apache 2.0. You can use the hosted service or
+    run the same code on your own server, and point the SDK's `baseUrl` at it
+    without changing the rest of your code.
+  </Accordion>
+
+  <Accordion title="Can I keep my SendGrid templates?">
+    The HTML moves over as is. Placeholders change to Reloop's triple-brace
+    syntax, and any `#if` or `#each` logic moves into your application code,
+    since Reloop templates substitute variables but don't run logic.
+  </Accordion>
+
+  <Accordion title="Will switching hurt my deliverability?">
+    Not if you migrate carefully: authenticate the new domain with SPF, DKIM and
+    DMARC, import your suppression list, and ramp traffic over a week or two.
+    Our [authentication guide](/blog/spf-dkim-dmarc-setup-guide) covers the DNS
+    side.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Switch from SendGrid in an afternoon"
+  description="6,000 emails a month free, then $10 for 50,000. Inbound mailboxes, campaigns and automations included."
+  href="/dashboard/signup"
+  label="Get started"
+/>

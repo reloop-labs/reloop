@@ -195,7 +195,7 @@ If you're building an AI agent that handles email, or a support inbox where huma
 
 ## Webhooks and deliverability
 
-Both sign webhooks with HMAC-SHA256. Sweego sends `webhook-id`, `webhook-timestamp` and `webhook-signature` headers; Reloop sends `Reloop-Signature`. Sweego's email events cover sent, delivered, soft and hard bounces, list-unsubscribe, spam complaints, opens (split into proxy and human opens) and clicks. Tracking events can arrive up to 10 minutes late. Multiple webhooks need Startup or above; Reloop allows 1, 5 or 10 depending on plan.
+Both sign webhooks with HMAC-SHA256. Sweego sends `webhook-id`, `webhook-timestamp` and `webhook-signature` headers; Reloop sends `Reloop-Signature`. Sweego's email events cover sent, delivered, soft and hard bounces, list-unsubscribe, spam complaints, opens (split into proxy and human opens) and clicks. Tracking events can arrive up to 10 minutes late. Multiple webhooks need Startup or above; Reloop allows 3, 5 or 10 depending on plan.
 
 On suppression, Sweego automatically blocks an address for 90 days after a "user unknown" hard bounce. Its docs say viewing the suppression list from the dashboard or API is "not yet available". Reloop handles bounces, complaints and suppression in its MTA, with one list across transactional mail, campaigns and automations. See [how bounce processing works](/blog/email-bounce-processing-automation).
 

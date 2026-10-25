@@ -228,7 +228,7 @@ Mandrill is hosted only, and tied to your Mailchimp account. Reloop is Apache 2.
    | `{{#if}}`, `{{#each}}` | Resolve in code, pass the result as a variable |
    | `global_merge_vars` / `merge_vars` | `template.variables`, one send per recipient |
 
-4. **Switch SMTP** if you use it: host `smtp.reloop.sh`, port 587 or 465, API key as username and password.
+4. **Switch SMTP** if you use it: host `smtp.reloop.sh`, port 587 with STARTTLS, API key as username and password.
 5. **Import suppressions.** Export your Mandrill rejection list and import it into Reloop so you don't re-mail bounced or complaining addresses.
 6. **Rewrite webhook handlers** for single JSON events signed with `Reloop-Signature`.
 7. **Move inbound** if you use it: create a Reloop mailbox and point the inbound subdomain's MX records at Reloop.
@@ -265,7 +265,7 @@ Our [SendGrid migration guide](/blog/migrating-from-sendgrid) shows a traffic-sp
   </Accordion>
 
   <Accordion title="Does Reloop support SMTP like Mandrill?">
-    Yes. Use `smtp.reloop.sh` on port 587 or 465, with your API key as both
+    Yes. Use `smtp.reloop.sh` on port 587 with STARTTLS, with your API key as both
     the username and password.
   </Accordion>
 </AccordionGroup>

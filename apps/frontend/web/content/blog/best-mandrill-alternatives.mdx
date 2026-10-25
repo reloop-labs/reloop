@@ -1,0 +1,268 @@
+---
+title: "Best Mandrill Alternatives in 2026: Transactional Email Without a Mailchimp Plan"
+description: "The best Mandrill (Mailchimp Transactional) alternatives of 2026 compared: Reloop, Postmark, Resend, SendGrid, Mailgun, Amazon SES and MailerSend on price at 50k and 100k, templates, inbound, dedicated IPs and self-hosting."
+keywords:
+  - Mandrill alternatives
+  - Mandrill alternative
+  - Mailchimp Transactional alternative
+  - Mandrill competitors
+  - open source Mandrill alternative
+  - Mandrill pricing
+publishedAt: 2026-10-25
+category: Comparison
+tags: [mandrill, mailchimp, alternatives, comparison, transactional]
+readTime: 12 min read
+image: /blog/images/best-mandrill-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-mandrill
+  - reloop-vs-mailchimp
+  - best-transactional-email-apis-2026
+---
+
+**The short version:** Mandrill, now sold as Mailchimp Transactional, can't be bought on its own. It's an add-on to a paid Mailchimp Standard or Premium plan, billed in blocks of 25,000 emails. If you only need transactional email, **Reloop** is a standalone API with a free tier and $10 for 50,000 emails (Mandrill is $40 in blocks, plus the Mailchimp plan). **Postmark** is the closest match on transactional focus, and **Amazon SES** is the cheapest raw pipe.
+
+We build Reloop, so weigh our pick accordingly. Every competitor price below comes from the provider's public pricing page, linked in each section, and each section says where that provider beats us.
+
+---
+
+## Why developers look for a Mandrill alternative
+
+Mandrill is a solid sending API. It supports Mailchimp merge tags and Handlebars, inbound routes and dedicated IPs. Developers leave for reasons that are mostly about packaging:
+
+- **It requires a Mailchimp marketing plan.** Transactional is "available as an add-on to Standard and Premium plans", and Essentials isn't eligible. If you never send newsletters, you're paying for a plan you don't use.
+- **Blocks, not usage.** You buy whole blocks of 25,000 emails at $20 each (cheaper only past 500k a month). A month with 26,000 emails needs two blocks.
+- **No real free tier.** Up to 500 trial sends, then you pay.
+- **Dedicated IPs are an extra $29.95 a month.**
+- **Inbound is a webhook.** Routes post each message to your endpoint; storage, threading and replies are yours to build.
+- **Hosted only, tied to your Mailchimp account.**
+
+If you already pay for Mailchimp Standard and send millions of emails a month, Mandrill's per-block price gets competitive. Otherwise, here are the options.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Mandrill alternative** | Reloop | Standalone, $10 for 50k, inbound mailboxes, open source |
+| **Best transactional reputation** | Postmark | Message streams, transactional-first for a decade |
+| **Closest modern developer experience** | Resend | Clean API, React Email |
+| **Best Handlebars templating** | SendGrid | Full Handlebars logic, enterprise program |
+| **Best for inbound routing** | Mailgun | Mature API and pattern-based routes |
+| **Cheapest raw sending** | Amazon SES | $0.10 per 1,000, build the rest yourself |
+| **Best with a visual builder** | MailerSend | Drag-and-drop editor, SMS, verification |
+| **Best open source / self-hosted** | Reloop | Apache 2.0, one-command install |
+
+---
+
+## The comparison table
+
+| | Mandrill | Reloop | Postmark | Resend | SendGrid | Mailgun | Amazon SES | MailerSend |
+|---|---|---|---|---|---|---|---|---|
+| **Needs another plan** | Mailchimp Standard or Premium | No | No | No | No | No | AWS account | No |
+| **Free tier** | Up to 500 trial sends | 6,000 / mo (200 / day) | 100 / mo | 3,000 / mo (100 / day) | 60-day trial, 100 / day | 100 / day, trial | $200 AWS credits | 500 / mo |
+| **~50k / mo** | $40 (2 blocks) + Mailchimp plan | **$10** | ~$87 (Basic + overage) | $20 | $19.95 | $35 | ~$5 | $35 |
+| **~100k / mo** | $80 (4 blocks) + Mailchimp plan | **$20** | ~$177 (Basic + overage) | $90 | $34.95 | ~$100 | ~$10 | $68 |
+| **Dedicated IP** | $29.95 / mo | Included on Growth ($20) | $50 / mo, 300k+ | Scale plan and up | Pro, from $89.95 | Paid add-on | $24.95 / mo | Professional add-on |
+| **Template logic** | Handlebars or merge tags | Variables (`{{{var}}}`) | Mustachio | React Email | Handlebars | Handlebars | SES templates | Visual builder |
+| **Inbound** | Routes to webhook | Mailboxes + threads, API, MCP, IMAP | Webhook (Pro and up) | Webhook | Inbound Parse | Routes | Receipt rules | Forward to webhook |
+| **Open source / self-host** | No | **Yes** | No | No | No | No | No | No |
+
+Sources: [Mailchimp transactional pricing](https://mailchimp.com/pricing/transactional-email/), [postmarkapp.com/pricing](https://postmarkapp.com/pricing), [resend.com/pricing](https://resend.com/pricing), [sendgrid.com/pricing](https://sendgrid.com/pricing/), [mailgun.com/pricing](https://www.mailgun.com/pricing/), [aws.amazon.com/ses/pricing](https://aws.amazon.com/ses/pricing/), [mailersend.com/pricing](https://www.mailersend.com/pricing), [reloop.sh/pricing](/pricing). Mandrill figures are blocks only; the Mailchimp plan is priced by marketing contacts and comes on top. Postmark's figures are Basic list price plus $1.80 overage. Mailgun's 100k figure is $35 plus 50k overage at $1.30. SES is send-only, before data transfer.
+
+---
+
+## 1. Reloop: best overall Mandrill alternative
+
+Reloop is open-source email infrastructure: a transactional API, SMTP relay, inbound mailboxes, contacts, campaigns, automations and webhooks in one product. Use it hosted (Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers) or run the same code on your own server.
+
+**Pricing:** Free is 6,000 emails a month (200 a day). Pro is $10 for 50,000. Growth is $20 for 100,000 and includes a dedicated IP. Extra mail is $0.50 per 1,000, so you pay for what you send, not whole blocks. Self-hosting is free under Apache 2.0.
+
+**Strengths**
+
+- **Standalone.** No marketing plan required, and a free tier you can actually run on.
+- **$10 vs $40 in blocks at 50k**, before Mandrill's Mailchimp plan; $20 vs $80 at 100k.
+- **A dedicated IP included at $20**, instead of $29.95 a month extra.
+- **Inbound as real mailboxes.** Mail is stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, with one-call replies. Hosted plans include 3, 5 or 10 inboxes on Free, Pro and Growth.
+- If you do want marketing mail later, campaigns and event-triggered automations are in the same account, with one suppression list.
+
+**Weaknesses**
+
+- **No template logic.** Reloop substitutes `{{{variable}}}` placeholders but doesn't run `{{#if}}` or `{{#each}}`. Resolve those in code and pass the result as a variable. Mandrill's Handlebars is more powerful here.
+- At millions of emails a month, Mandrill's lowest block price ($10 per 25,000, or $0.40 per 1,000) can undercut Reloop's overage if you already pay for Mailchimp.
+- Open and click tracking are on for new domains; switch them off per domain if you don't want them.
+
+**Best for:** developers who only need transactional email and don't want to pay for a Mailchimp plan to get it.
+
+Full comparison: [Reloop vs Mandrill](/blog/reloop-vs-mandrill).
+
+---
+
+## 2. Postmark: best transactional reputation
+
+Postmark has been transactional-first for over a decade. Its **message streams** keep bulk mail from hurting your transactional reputation.
+
+**Pricing:** 100 emails a month free. Basic is $15 for 10,000, then $1.80 per extra 1,000: about $87 at 50k and $177 at 100k. Dedicated IPs are $50 a month for senders above 300,000 a month.
+
+**Strengths:** strong reputation for inbox placement, message streams, excellent docs, and no marketing plan required.
+
+**Weaknesses:** more than Mandrill's blocks at 50k and above. Inbound needs Pro. Templates use Mustachio, so Handlebars templates need rewriting. Hosted only.
+
+**Best for:** low-volume senders who value reputation and docs over price.
+
+Full comparison: [Reloop vs Postmark](/blog/reloop-vs-postmark) · [Best Postmark alternatives](/blog/best-postmark-alternatives)
+
+---
+
+## 3. Resend: closest modern developer experience
+
+Resend made the clean, Stripe-style email API the norm, and its React Email project made JSX templates mainstream.
+
+**Pricing:** Free is 3,000 a month (100 a day). Pro is $20 for 50,000; 100,000 is $90. Overage is $0.90 per 1,000.
+
+**Strengths:** excellent docs, first-class React Email, a large ecosystem of examples.
+
+**Weaknesses:** $90 at 100k. Inbound is a webhook per message. Dedicated IPs start on the Scale plan. Hosted only.
+
+**Best for:** teams rewriting their email layer anyway who want to build templates in React.
+
+Full comparison: [Reloop vs Resend](/blog/reloop-vs-resend).
+
+---
+
+## 4. SendGrid: best Handlebars templating
+
+SendGrid (Twilio) supports full Handlebars logic (`#if`, `#each`) in dynamic templates, which makes it the easiest landing spot if your Mandrill templates rely on it.
+
+**Pricing:** a 60-day trial at 100 emails a day. Essentials is $19.95 for 50,000 and $34.95 for 100,000. Dedicated IPs, subusers and SSO start on Pro from $89.95.
+
+**Strengths:** Handlebars templates move over with the least rewriting, a mature enterprise program, subusers and IP pools.
+
+**Weaknesses:** no permanent free plan, marketing is on separate plans, inbound is the Inbound Parse webhook. Hosted only.
+
+**Best for:** teams with logic-heavy Handlebars templates and enterprise procurement needs.
+
+Full comparison: [Reloop vs SendGrid](/blog/reloop-vs-sendgrid) · [SendGrid alternative page](/alternatives/sendgrid)
+
+---
+
+## 5. Mailgun: best for inbound routing
+
+Mailgun is one of the original developer email APIs. Its **inbound routes** match incoming mail by pattern and forward it, much like Mandrill's routes.
+
+**Pricing:** a trial at 100 emails a day. Basic is $15 for 10,000; Foundation is $35 for 50,000. Overage starts at $1.30 per 1,000. Dedicated IPs are a paid add-on.
+
+**Strengths:** Handlebars templates, flexible inbound routing that maps closely to Mandrill's, built-in email validation.
+
+**Weaknesses:** around $100 at 100k with overage. Marketing is a separate Sinch product. Hosted only.
+
+**Best for:** teams that rely on Mandrill's inbound routes and want the most similar model.
+
+Full comparison: [Reloop vs Mailgun](/blog/reloop-vs-mailgun).
+
+---
+
+## 6. Amazon SES: cheapest raw sending
+
+SES is the lowest list price in email: $0.10 per 1,000. It's a sending pipe, not a product.
+
+**Pricing:** $0.10 per 1,000 emails plus $0.12 per GB of outbound data. New AWS accounts get $200 in Free Tier credits for the first 6 months.
+
+**Strengths:** cheapest per email at any volume, deep AWS integration.
+
+**Weaknesses:** you build bounce and complaint handling, suppression, logs and dashboards yourself. You also need to leave the SES sandbox before you can email real users.
+
+**Best for:** AWS-native teams with engineers to own the glue, or senders at millions of emails a month.
+
+Full comparison: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses).
+
+---
+
+## 7. MailerSend: best with a visual builder
+
+MailerSend is a transactional API from the team behind MailerLite, with a drag-and-drop builder, SMS and email verification.
+
+**Pricing:** Free is 500 emails a month. Hobby is $7 for 5,000. Starter is $35 for 50,000 and $68 for 100,000, with overage at $1.30 per 1,000.
+
+**Strengths:** non-developers can edit templates without touching code; SMS and verification from the same vendor.
+
+**Weaknesses:** inbound is forwarded, not stored, and each forward counts against your quota. Hosted only.
+
+**Best for:** teams where marketers or support staff own the transactional templates.
+
+Full comparison: [Reloop vs MailerSend](/blog/reloop-vs-mailersend).
+
+---
+
+## How to choose
+
+- **"We don't use Mailchimp for marketing."** Any standalone API here removes the plan cost. Reloop is $10 at 50k.
+- **"Our templates are full of Handlebars logic."** SendGrid or Mailgun keep Handlebars. With Reloop, move the logic into code.
+- **"We rely on inbound routes."** Mailgun is the closest model; Reloop goes further with stored, threaded mailboxes.
+- **"We send millions a month and already pay for Mailchimp."** Run the numbers; Mandrill's lowest blocks, SES or ZeptoMail may win on raw cost.
+- **"Legal wants source code or self-hosting."** Reloop is the only option here that's open source.
+
+<Callout type="tip">
+  Mandrill blocks are bought in whole units of 25,000. Before you compare, check your real monthly volume over the last six months. If it swings between 20k and 60k, per-1,000 overage pricing will usually save more than the headline numbers suggest.
+</Callout>
+
+---
+
+## Switching from Mandrill
+
+1. **Add your sending domain** in the new provider and publish its DKIM record. Merge the new SPF include into your existing record; never publish a second SPF record.
+2. **Swap the client.** On Reloop, replace `messages.send({ message })` with `reloop.mail.send`. `from_email` becomes `from`, and the `to` array of `{ email, type }` becomes addresses, with `cc` and `bcc` as separate fields.
+3. **Map template placeholders.** On Reloop, `*|FNAME|*` and `{{fname}}` both become `{{{fname}}}`; resolve `{{#if}}` and `{{#each}}` in code.
+4. **Switch SMTP** if you use it: on Reloop, host `smtp.reloop.sh`, port 587 with STARTTLS, API key as username and password.
+5. **Import suppressions.** Export your Mandrill rejection list and import it, so you don't re-mail bounced or complaining addresses.
+6. **Rewrite webhook handlers.** Mandrill batches events in `mandrill_events` signed with `X-Mandrill-Signature`; Reloop sends single JSON events signed in `Reloop-Signature`.
+7. **Ramp traffic** from 10% to 100% over a week or two, then cancel the Mandrill add-on.
+
+The [Reloop vs Mandrill](/blog/reloop-vs-mandrill) post has the full mapping, and the [SendGrid migration guide](/blog/migrating-from-sendgrid) shows a traffic-split flag you can reuse.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I use Mandrill without a Mailchimp plan?">
+    No. Mailchimp Transactional is an add-on to Mailchimp's Standard or
+    Premium plans (or the legacy Monthly Plan). The Essentials plan isn't
+    eligible.
+  </Accordion>
+
+  <Accordion title="What is the cheapest Mandrill alternative?">
+    Amazon SES has the lowest list price at $0.10 per 1,000, but it's a raw
+    pipe. Among full platforms, Reloop is $10 for 50,000 and $20 for 100,000,
+    with no marketing plan required.
+  </Accordion>
+
+  <Accordion title="Which alternative keeps Handlebars templates?">
+    SendGrid and Mailgun both support Handlebars. Reloop uses simple
+    `{{{variable}}}` placeholders, so conditionals and loops move into your
+    code.
+  </Accordion>
+
+  <Accordion title="Is there an open-source alternative to Mandrill?">
+    Yes. Reloop is open source under Apache 2.0. You can use the hosted
+    version or run it on your own server with a one-command installer.
+  </Accordion>
+
+  <Accordion title="Which Mandrill alternative handles inbound email best?">
+    Reloop stores inbound mail in threaded mailboxes you can read and reply to
+    over the API, MCP or IMAP. Mailgun's routes are the closest match to
+    Mandrill's webhook model.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="Transactional email without a marketing plan: 6,000 emails a month free, $10 for 50,000 when you grow."
+  href="/dashboard/signup"
+  label="Get started"
+/>

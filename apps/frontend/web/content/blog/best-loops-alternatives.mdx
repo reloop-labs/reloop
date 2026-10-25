@@ -1,0 +1,314 @@
+---
+title: "Best Loops Alternatives in 2026: Cheaper Lifecycle Email for SaaS"
+description: "The best Loops alternatives of 2026 compared: Reloop, Customer.io, Brevo, Mailchimp, Resend, Plunk and Mailjet on pricing, lifecycle automations, transactional email, SMTP and self-hosting."
+keywords:
+  - Loops alternatives
+  - Loops alternative
+  - Loops competitors
+  - open source Loops alternative
+  - Loops.so alternative
+  - lifecycle email for SaaS
+publishedAt: 2026-10-25
+category: Comparison
+tags: [loops, alternatives, comparison, lifecycle, pricing]
+readTime: 11 min read
+image: /blog/images/best-loops-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-loops
+  - welcome-email-sequences-that-convert
+  - reloop-vs-customer-io
+---
+
+**The short version:** if you're leaving Loops because the bill grows with every signup, **Reloop** is the closest swap: lifecycle automations and broadcasts, plus transactional email and SMTP, priced by emails sent instead of contacts stored. **Customer.io** is the step up if you need push, in-app and SMS in the same journeys. **Brevo** and **Mailchimp** suit teams where marketers run email without engineers.
+
+We build Reloop, so factor that in. Every price below comes from each provider's public pricing page, and each section says plainly where that provider beats us.
+
+---
+
+## Why teams look for a Loops alternative
+
+Loops is a polished, focused tool for SaaS lifecycle email, and plenty of teams are happy on it. The reasons people move are usually these:
+
+1. **Pricing by contacts.** Loops bills for every contact you store. At 100,000 contacts that's **$399 a month**, whether you email them weekly or once a quarter. A launch that brings in a wave of signups raises the bill even if most of those people never get an email.
+2. **Two vendors for one job.** Loops' transactional support is limited and it has no SMTP relay, so many teams add Resend or Postmark for password resets and receipts. That's two bills, two DNS setups and two suppression lists.
+3. **No inbound email.** Replies to your onboarding emails, support threads and AI-agent inboxes need another tool.
+4. **Closed SaaS.** You can export contacts as CSV, but you can't run it yourself.
+
+If none of those apply to you, Loops may well be the right tool to stay on. If one does, read on.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Loops alternative** | Reloop | Lifecycle + transactional + SMTP, $20 for 100k emails, open source |
+| **Best for multi-channel lifecycle** | Customer.io | Email, push, in-app and SMS in one journey |
+| **Best for marketer-run email with SMS and CRM** | Brevo | Visual builder, SMS, WhatsApp, CRM |
+| **Best for small newsletters and integrations** | Mailchimp | Huge template library and integration ecosystem |
+| **Best developer API with broadcasts** | Resend | Clean API, React Email, broadcasts |
+| **Best open-source, pay-per-email** | Plunk | $1 per 1,000 emails, no base fee, AGPL |
+| **Best large free tier with a visual editor** | Mailjet | 6,000 emails a month free |
+
+---
+
+## The comparison table
+
+| | Reloop | Loops | Customer.io | Brevo | Mailchimp | Resend | Plunk | Mailjet |
+|---|---|---|---|---|---|---|---|---|
+| **Priced by** | Emails | Contacts | Profiles | Emails | Contacts | Emails | Emails | Emails |
+| **Free tier** | 6,000 / mo (200 / day) | 1,000 contacts, 4,000 sends | None listed | 300 / day | 250 contacts, 500 sends | 3,000 / mo (100 / day) | 1,000 / mo, branded | 6,000 / mo (200 / day) |
+| **Entry paid plan** | **$10** (50k emails) | $49 | $100 (5k profiles) | From $9 (5k emails) | $13 (500 contacts) | $20 (50k emails) | $0.001 per email | From $9 |
+| **100k emails / mo** | **$20** | $399 at 100k contacts | Profile-based | Slider | Depends on list size | $90 | About $100 | $112 (Premium) |
+| **Lifecycle automations** | Yes, event-triggered | Yes (core) | Yes (Journeys) | Standard and up | Customer journeys | Limited | Workflows | Premium plan |
+| **Transactional API** | Yes | Limited | Yes | Yes | Separate product (Mandrill) | Yes | Yes | Yes |
+| **SMTP relay** | Yes | No | No | Yes | Limited | Yes | Yes | Yes |
+| **Inbound email** | Mailboxes, API, MCP, IMAP | No | No | Webhook | No | Webhook | Routing rules | Parse API |
+| **Open source** | Yes (Apache 2.0) | No | No | No | No | No | Yes (AGPL-3.0) | No |
+
+Sources: [loops.so/pricing](https://loops.so/pricing), [customer.io/pricing](https://customer.io/pricing), [brevo.com/pricing](https://www.brevo.com/pricing/), [mailchimp.com/pricing](https://mailchimp.com/pricing/), [resend.com/pricing](https://resend.com/pricing), [useplunk.com/pricing](https://www.useplunk.com/pricing), [mailjet.com/pricing](https://www.mailjet.com/pricing/), [reloop.sh/pricing](/pricing). "Slider" means the provider prices that volume interactively. Plunk's figures are our math from its per-email rate.
+
+---
+
+## 1. Reloop: best overall Loops alternative
+
+Reloop is open-source email infrastructure: a transactional API, SMTP relay, contacts, broadcast campaigns, event-triggered automations and inbound mailboxes in one product. Use it hosted (Reloop Cloud runs on Hetzner with EU data centers) or run the same code on your own server.
+
+**Pricing:** Free is 6,000 emails a month (200 a day) with no limit on contacts. Pro is $10 for 50,000 emails. Growth is $20 for 100,000 and includes a dedicated IP. Extra mail costs $0.50 per 1,000. Or skip the plan and buy prepaid credits at $0.50 per 1,000, valid for 6 months. Self-hosting is free under Apache 2.0.
+
+Here's what that means next to Loops for a product with **100,000 contacts**:
+
+| Emails per contact per month | Emails sent | Reloop | Loops |
+|---|---|---|---|
+| 1 (monthly newsletter) | 100,000 | $20 | $399 |
+| 2 | 200,000 | $70 | $399 |
+| 4 (weekly) | 400,000 | $170 | $399 |
+
+Lifecycle emails are driven from your app. Track an event and every automation listening for it starts for that contact:
+
+```typescript
+const { automationError } = await reloop.automations.start({
+  event: "user.signed_up",
+  email: user.email,
+  firstName: user.name,
+  properties: { plan: user.plan },
+});
+```
+
+**Strengths**
+
+- **Priced by sends, not contacts**: $20 vs $399 at 100,000 contacts emailed monthly.
+- Transactional email, SMTP relay, broadcasts and automations share one API key, one domain setup and one suppression list.
+- **Inbound as real mailboxes** with threads, readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, for replies, support or AI agents.
+- Open source and self-hostable with a [one-command installer](/self-host).
+
+**Weaknesses**
+
+- Built for product teams. Loops' editor is more marketer-friendly.
+- No A/B testing for campaigns yet.
+- Hosted inbox limits are 3, 5 and 10 on Free, Pro and Growth.
+
+**Best for:** SaaS teams with a large or fast-growing list who want lifecycle and transactional email in one product. Full comparison: [Reloop vs Loops](/blog/reloop-vs-loops). Also see [Reloop as a Loops alternative](/alternatives/loops) and [the feature comparison](/compare/loops).
+
+---
+
+## 2. Customer.io: best for multi-channel lifecycle
+
+[Customer.io](https://customer.io/) is a customer engagement platform built around **Journeys**: a visual, cross-channel workflow builder where one campaign can send an email, wait, branch on an attribute and push a mobile notification.
+
+**Pricing:** Essentials starts at $100 a month for 5,000 profiles and 1 million emails, with $0.009 per extra profile and $0.12 per 1,000 extra emails. Premium starts at $1,000 a month billed annually. There's no free plan on its pricing page.
+
+**Strengths**
+
+- Email, push, in-app and SMS in the same journey.
+- Much deeper segmentation than Loops, across people, accounts and event history.
+- A transactional API with Liquid templates.
+
+**Weaknesses**
+
+- Like Loops, it's priced per profile, so it gets expensive as your list grows: about $505 a month at 50,000 profiles by our math from list price.
+- No SMTP relay, no inbound mailboxes, and no self-hosting.
+
+**Best for:** lifecycle teams messaging users across mobile and web, with budget to match. Full comparison: [Reloop vs Customer.io](/blog/reloop-vs-customer-io).
+
+---
+
+## 3. Brevo: best for marketer-run email with SMS and CRM
+
+[Brevo](https://www.brevo.com/) (formerly Sendinblue) is a marketing suite from Paris: email, SMS, WhatsApp, a CRM and live chat.
+
+**Pricing:** free for 300 emails a day. Starter begins at $9 for 5,000 emails, and Standard, which adds automations, starts at $18. Larger volumes are priced on a slider.
+
+**Strengths**
+
+- Priced by emails, not contacts, like Reloop.
+- A mature visual builder, forms and landing pages for non-technical teams.
+- SMS and WhatsApp in the same tool.
+
+**Weaknesses**
+
+- Automations need Standard or above.
+- Inbound mail is a parsing webhook, not a mailbox. No self-hosting.
+
+**Best for:** marketing-led teams that want email plus SMS and a CRM in one bill. Full comparison: [Reloop vs Brevo](/blog/reloop-vs-brevo).
+
+---
+
+## 4. Mailchimp: best for small newsletters and integrations
+
+[Mailchimp](https://mailchimp.com/) is the best-known email marketing platform, with a polished drag-and-drop editor, a large template library, landing pages, sign-up forms, customer journeys and integrations with most e-commerce and CRM tools.
+
+**Pricing:** free for 250 contacts and 500 sends a month. Essentials starts at $13 a month for 500 contacts, with sends capped at 10× your contacts.
+
+**Strengths**
+
+- The most approachable tooling for non-technical marketers.
+- An integration ecosystem that's hard to match.
+
+**Weaknesses**
+
+- Priced by contacts, the same problem many teams leave Loops over.
+- Transactional email is a separate product (Mailchimp Transactional, formerly Mandrill).
+
+**Best for:** small businesses and marketers sending newsletters to a modest list. Full comparisons: [Reloop vs Mailchimp](/blog/reloop-vs-mailchimp) and [Reloop vs Mandrill](/blog/reloop-vs-mandrill).
+
+---
+
+## 5. Resend: best developer API with broadcasts
+
+[Resend](https://resend.com/) is a modern hosted email API from the team behind React Email. It added audiences and broadcasts, so some teams use it for both transactional mail and simple marketing sends.
+
+**Pricing:** free for 3,000 emails a month (100 a day). $20 for 50,000 and $90 for 100,000, then $0.90 per 1,000.
+
+**Strengths**
+
+- Excellent developer experience and documentation.
+- Transactional and broadcasts in one account, with SMTP.
+
+**Weaknesses**
+
+- Lifecycle automations are limited compared with Loops, so it isn't a full replacement for drip sequences.
+- Inbound is a webhook per message. Hosted only.
+
+**Best for:** developer teams that mainly send transactional mail and occasional broadcasts. Full comparison: [Reloop vs Resend](/blog/reloop-vs-resend).
+
+---
+
+## 6. Plunk: best open-source, pay-per-email option
+
+[Plunk](https://www.useplunk.com/) is an open-source email platform (AGPL-3.0) with transactional sending, campaigns and workflows with triggers, delays and conditions.
+
+**Pricing:** free for 1,000 emails a month with Plunk branding, then $0.001 per email ($1 per 1,000) with no base fee and a monthly spend cap. That's about $50 at 50,000 emails and $100 at 100,000.
+
+**Strengths**
+
+- Simple usage pricing with no contact charges.
+- Workflows cover the core of what Loops does.
+- Self-hostable.
+
+**Weaknesses**
+
+- Gets expensive above about 10,000 emails a month compared with flat plans.
+- Self-hosting needs an AWS SES account, since Plunk sends through SES.
+
+**Best for:** low or unpredictable volume, and teams that want open source with AGPL. Full comparison: [Reloop vs Plunk](/blog/reloop-vs-plunk).
+
+---
+
+## 7. Mailjet: best large free tier with a visual editor
+
+[Mailjet](https://www.mailjet.com/), now owned by Sinch, combines a strong drag-and-drop editor with transactional sending.
+
+**Pricing:** free for 6,000 emails a month (200 a day). At 50,000 a month it's $40 on Essential or $59 on Premium; 100,000 on Premium is $112.
+
+**Strengths**
+
+- Tied with Reloop for the largest free tier in this list.
+- A strong visual editor and transactional email in one account.
+
+**Weaknesses**
+
+- Automations are on the Premium plan only.
+- Inbound is the Parse API, which posts each message to your webhook.
+
+**Best for:** teams that want a visual editor and a generous free tier. Full comparison: [Reloop vs Mailjet](/blog/reloop-vs-mailjet).
+
+---
+
+## How to choose
+
+Answer these in order and stop at the first "yes":
+
+1. **Do you message users on push, in-app or SMS as well as email?** → Customer.io (or Brevo for SMS on a smaller budget).
+2. **Do marketers, not engineers, run your email program?** → Brevo or Mailchimp.
+3. **Is your contact list large or growing fast?** → Reloop. Per-email pricing is far cheaper than per-contact.
+4. **Do you want lifecycle and transactional email in one product?** → Reloop.
+5. **Do you need inbound mail, reply handling or inboxes for AI agents?** → Reloop.
+6. **Is your volume tiny and unpredictable, and you want open source?** → Plunk.
+7. **Do you mostly send transactional mail with the odd broadcast?** → Resend or Reloop.
+
+<Callout type="tip">
+  Model next year's list size, not today's. Per-contact pricing grows with signups; per-email pricing grows with sends. For most SaaS products the list grows much faster than the number of emails each person gets.
+</Callout>
+
+---
+
+## Switching from Loops
+
+The steps are similar whichever tool you pick:
+
+1. **Verify your sending domain** with the new provider. Merge its include into your existing SPF record rather than adding a second one.
+2. **Export contacts** from Loops as CSV and import them. Keep unsubscribed contacts unsubscribed.
+3. **Rebuild templates** and map placeholders to the new syntax (Reloop uses `{{{first_name}}}`).
+4. **Recreate each loop** as an automation with the same trigger, delays and conditions.
+5. **Swap the tracking calls** in your app. On Reloop that's `reloop.automations.start`.
+6. **Run both in parallel** for a week or two, then remove Loops' DNS records.
+
+The [Reloop vs Loops](/blog/reloop-vs-loops) post walks through this in more detail.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the cheapest Loops alternative?">
+    For most SaaS lists, a tool priced by emails sent rather than contacts
+    stored. Reloop is $10 for 50,000 emails and $20 for 100,000 with no
+    contact limit, compared with $399 a month on Loops at 100,000 contacts.
+  </Accordion>
+
+  <Accordion title="Is there an open-source alternative to Loops?">
+    Yes. Reloop is open source under Apache 2.0 and Plunk under AGPL-3.0.
+    Both have event-triggered automations and can be self-hosted. Reloop
+    sends through its own MTA; Plunk sends through Amazon SES.
+  </Accordion>
+
+  <Accordion title="Can one tool replace Loops and my transactional email provider?">
+    Yes. Reloop, Brevo, Mailjet and Plunk all handle transactional and
+    marketing email in one account. Reloop also includes an SMTP relay and
+    inbound mailboxes, so one suppression list covers everything you send.
+  </Accordion>
+
+  <Accordion title="Which Loops alternative is best for mobile apps?">
+    Customer.io, because its journeys combine email with push and in-app
+    messages. If you only need email, it's an expensive way to get it.
+  </Accordion>
+
+  <Accordion title="Will switching hurt my deliverability?">
+    Not if you set up SPF, DKIM and DMARC on the new provider, import your
+    suppression list and ramp traffic over a week or two. Follow our
+    [authentication guide](/blog/spf-dkim-dmarc-setup-guide) first.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="6,000 emails a month free, no contact limits. Lifecycle automations, transactional email and SMTP in one product."
+  href="/dashboard/signup"
+  label="Get started"
+/>

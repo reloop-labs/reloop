@@ -1,0 +1,270 @@
+---
+title: "Best Cloudflare Email Service Alternatives in 2026: Send From Workers Without the Limits"
+description: "The best Cloudflare Email Service alternatives of 2026 compared: Reloop, Resend, Amazon SES, Postmark, ZeptoMail, MailerSend and Mailgun on price, DNS requirements, templates, webhooks, inbound and marketing mail."
+keywords:
+  - Cloudflare Email Service alternatives
+  - Cloudflare Email Service alternative
+  - Cloudflare email alternative
+  - Cloudflare Email Service competitors
+  - open source Cloudflare Email Service alternative
+  - send email from Cloudflare Workers
+publishedAt: 2026-10-25
+category: Comparison
+tags: [cloudflare, workers, alternatives, comparison, pricing]
+readTime: 10 min read
+image: /blog/images/best-cloudflare-email-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-cloudflare-email
+  - send-email-cloudflare-workers
+  - best-transactional-email-apis-2026
+---
+
+**Cloudflare Email Service is the most convenient way to send email from a Worker**: one binding, one `send()` call, no API key. It's also new, narrow by design, and tied to Cloudflare. Sending entered public beta in April 2026, your domain has to use Cloudflare DNS, and it only allows transactional mail.
+
+**The short version:** if you want the same easy sending from Workers plus templates, webhooks, campaigns and real inboxes, **Reloop** is the closest alternative, and it's cheaper than Cloudflare below about 200k emails a month. If you want the most polished hosted API, **Resend**. If raw price per email is everything, **Amazon SES**. For prepaid, transactional-only sending, **ZeptoMail**.
+
+We build Reloop, so weigh our entry accordingly. Facts about each provider come from our researched head-to-head posts, linked in each section, and each section says where that provider wins.
+
+---
+
+## Why teams look for a Cloudflare Email Service alternative
+
+Cloudflare's email sending is a strong option for Workers-only apps. The reasons people look elsewhere are specific:
+
+- **It's in beta.** Sending is still labeled public beta, which matters if you need a vendor SLA for password resets.
+- **Cloudflare DNS is required.** Cloudflare's own guide says you must use Cloudflare DNS to use Email Service. If your domain lives at Route 53 or your registrar, that's a migration.
+- **Transactional only.** No newsletters, product announcements or lifecycle campaigns.
+- **No real free tier for users.** The free plan only sends to addresses you've verified in your own account. Sending to customers needs Workers Paid.
+- **Events go to Queues, not webhooks.** Delivery events land in Cloudflare Queues, so you consume them inside Cloudflare.
+- **Missing pieces.** Stored templates, idempotency keys, dedicated IPs and open and click tracking aren't documented.
+- **Limits.** 50 recipients and 5 MiB per email, and new accounts start on a conservative daily quota.
+
+Full breakdown: [Reloop vs Cloudflare Email Service](/blog/reloop-vs-cloudflare-email).
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Cloudflare alternative** | Reloop | Works from Workers, any DNS, campaigns and inboxes, open source |
+| **Best hosted developer experience** | Resend | Clean API, React Email |
+| **Cheapest per email** | Amazon SES | $0.10 per 1,000 |
+| **Best prepaid, transactional-only** | ZeptoMail | Credits with no monthly fee |
+| **Best for deliverability focus** | Postmark | Transactional-first, message streams |
+| **Best with a visual builder** | MailerSend | Drag-and-drop templates, SMS in US and Canada |
+| **Best for inbound routing and validation** | Mailgun | Inbound routes, validation add-on |
+
+---
+
+## The comparison table
+
+| | Cloudflare | Reloop | Resend | Amazon SES | ZeptoMail | Postmark | MailerSend | Mailgun |
+|---|---|---|---|---|---|---|---|---|
+| **Free** | Own verified addresses only | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | $200 AWS credits, 6 months | First credit (10k emails) | 100 / mo | 500 / mo | 100 / day, trial |
+| **~50k / mo** | about $21 | **$10** | $20 | ~$5 | about $12.50 | $87 | $35 | $35 |
+| **~100k / mo** | about $39 | **$20** | $90 | ~$10 | about $25 | $177 | $68 | about $100 |
+| **DNS provider** | Cloudflare only | Any | Any | Any | Any | Any | Any | Any |
+| **Marketing mail** | No | Campaigns + automations | Broadcasts | No | Not allowed | Broadcast streams | Via MailerLite | Limited |
+| **Inbound** | Email Routing | Mailboxes, API, MCP, IMAP | Webhook | Receipt rules to S3 / SNS / Lambda | Not offered | Webhook (Pro and up) | Parsed and forwarded | Inbound routes |
+| **Dedicated IP** | Not documented | Included on Growth ($20) | Scale plan and up | Add-on | Paid add-on | $50 / mo, from 300k | Add-on on Professional | Paid add-on |
+| **Open source / self-host** | No | Yes (Apache 2.0) | No | No | No | No | No | No |
+
+Cloudflare figures include the $5 Workers Paid minimum and are our math from its $0.35 per 1,000 rate after 3,000 included. ZeptoMail figures use the widely listed $2.50 per 10k credit, which varies by region. Postmark and Mailgun at these volumes are list price plus overage. SES is send-only, before data transfer.
+
+---
+
+## 1. Reloop: best overall Cloudflare Email Service alternative
+
+[Reloop](/) is open-source email infrastructure: a transactional API, SMTP relay, templates, signed webhooks, inbound mailboxes, contacts, campaigns and event automations. It runs its own MTA (KumoMTA), and **Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers**.
+
+From a Worker, it's the SDK with the `nodejs_compat` flag, or one `fetch` call. Our [Cloudflare Workers guide](/blog/send-email-cloudflare-workers) covers both:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+export default {
+  async fetch(request: Request, env: { RELOOP_API_KEY: string }) {
+    const reloop = new Reloop({ apiKey: env.RELOOP_API_KEY });
+
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <welcome@mail.acme.com>",
+      to: "user@example.com",
+      subject: "Welcome",
+      html: "<p>Thanks for signing up.</p>",
+    });
+
+    return Response.json(emailError ?? response);
+  },
+};
+```
+
+**Pricing:** Free for 6,000 emails a month (200 a day). Pro is $10 for 50,000, Growth is $20 for 100,000 with a dedicated IP, and extra mail is $0.50 per 1,000. Or skip the plan and buy prepaid credits at $0.50 per 1,000, valid for 6 months. Self-hosting under Apache 2.0 has no per-email fee.
+
+**Strengths**
+
+- **Any DNS provider.** Keep your domain where it is.
+- A real free tier you can use with customers.
+- Stored templates with `{{{variables}}}`, `Idempotency-Key` retries, and errors returned as values with `message`, `why` and `fix`.
+- Signed HTTP webhooks (`Reloop-Signature`) that you can consume from a Worker or anywhere else.
+- Inbound mailboxes with threads, readable over the API, the MCP server or IMAP (3, 5 and 10 hosted inboxes on Free, Pro and Growth).
+- Campaigns and event automations on the same suppression list.
+- The same code runs on Workers, Vercel, Fly.io or a Node server.
+
+**Weaknesses**
+
+- **You store one secret** (`wrangler secret put RELOOP_API_KEY`) instead of using a binding.
+- **Above roughly 200k emails a month, Cloudflare's $0.35 rate is cheaper** than our $0.50 overage.
+
+**Best for:** Workers apps that need more than transactional sending, or a domain that isn't on Cloudflare DNS. Full comparison: [Reloop vs Cloudflare Email Service](/blog/reloop-vs-cloudflare-email).
+
+---
+
+## 2. Resend: best hosted developer experience
+
+Resend set the bar for a modern email API and created React Email. It sends through Amazon SES under the hood.
+
+**Pricing:** free for 3,000 a month (100 a day), $20 for 50,000, $90 for 100,000, overage $0.90 per 1,000.
+
+**Strengths:** clean API and SDKs, React Email, a big ecosystem of examples, broadcasts and contacts.
+
+**Weaknesses:** the jump to $90 at 100k; dedicated IPs on the Scale plan and up; inbound is a webhook per message; hosted-only.
+
+**Best for:** teams under 50k emails a month that want the most polished hosted API. Full comparison: [Reloop vs Resend](/blog/reloop-vs-resend), or our [Resend alternative](/alternatives/resend) page.
+
+---
+
+## 3. Amazon SES: cheapest per email
+
+If Cloudflare's appeal for you was price, SES is cheaper still: $0.10 per 1,000 emails, plus $0.12 per GB of outbound data.
+
+**Strengths:** the lowest per-email price of any hosted option; deep AWS integration.
+
+**Weaknesses:** a sandbox you must request to leave; bounce and complaint handling through SNS or EventBridge that you build; no dashboard beyond CloudWatch; no marketing. Calling it from a Worker means signing AWS requests.
+
+**Best for:** AWS-native teams sending at very high volume. Full comparison: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses).
+
+---
+
+## 4. ZeptoMail: best prepaid, transactional-only option
+
+ZeptoMail from Zoho, now part of Zoho CPaaS, sells email on prepaid credits: one credit sends 10,000 emails, the first is free, and credits last 6 months.
+
+**Pricing:** about $2.50 per credit (varies by region): roughly $12.50 for 50,000 and $25 for 100,000.
+
+**Strengths:** no monthly fee; cheaper than Reloop above about 150,000 a month; Mail Agents separate products and environments; any DNS provider.
+
+**Weaknesses:** like Cloudflare, marketing mail isn't allowed. No inbound mailboxes, and credits expire.
+
+**Best for:** teams leaving Cloudflare only because of the DNS requirement or beta status, and that still send only transactional mail. Full comparison: [Reloop vs ZeptoMail](/blog/reloop-vs-zeptomail).
+
+---
+
+## 5. Postmark: best for deliverability focus
+
+Postmark is transactional-first, with separate message streams for transactional and broadcast mail.
+
+**Pricing:** free for 100 a month. Basic starts at $15 for 10,000, with overage at $1.80 per 1,000 ($1.30 on Pro): about $87 at 50,000 and $177 at 100,000 on Basic list price.
+
+**Strengths:** long track record, message streams, excellent docs.
+
+**Weaknesses:** expensive at volume; dedicated IPs are $50 a month from 300k; inbound is a webhook on Pro and up.
+
+**Best for:** teams that put delivery speed above cost. Full comparison: [Reloop vs Postmark](/blog/reloop-vs-postmark).
+
+---
+
+## 6. MailerSend: best with a visual builder
+
+MailerSend, from the team behind MailerLite, pairs a transactional API with a drag-and-drop template builder.
+
+**Pricing:** free for 500 a month. Starter is $35 for 50,000 and $68 for 100,000, with overage at $1.30 per 1,000 (monthly billing; annual takes 10% off).
+
+**Strengths:** visual template builder, SMS in the US and Canada, inbound parsing to a webhook or address.
+
+**Weaknesses:** a small free tier; marketing lives in the separate MailerLite product; dedicated IPs are an add-on on Professional.
+
+**Best for:** teams where non-developers design transactional templates. Full comparison: [Reloop vs MailerSend](/blog/reloop-vs-mailersend).
+
+---
+
+## 7. Mailgun: best for inbound routing and validation
+
+Mailgun is a long-standing developer API with inbound routes and email validation as a paid add-on.
+
+**Pricing:** 100 a day on a trial. Basic is $15 for 10,000, Foundation is $35 for 50,000, and 100,000 is about $100 with overage from $1.30 per 1,000.
+
+**Strengths:** mature API, Handlebars templates, inbound routes, validation.
+
+**Weaknesses:** expensive at 100k; dedicated IPs and validation cost extra; marketing is a separate Sinch product.
+
+**Best for:** teams that need validation and inbound routing from one vendor. Full comparison: [Reloop vs Mailgun](/blog/reloop-vs-mailgun).
+
+---
+
+## How to choose
+
+- **"Our app is all-in on Workers and only sends receipts and resets."** Stay on Cloudflare Email Service. It's a good fit.
+- **"Our domain isn't on Cloudflare DNS."** Reloop, Resend or ZeptoMail.
+- **"We need onboarding emails, newsletters or automations too."** Reloop.
+- **"We need to receive and reply to email, for support or AI agents."** Reloop's mailboxes, readable over API, MCP or IMAP.
+- **"We need a GA product with an SLA today."** Any of the established providers here instead of a beta.
+- **"We want the lowest price at millions of emails."** Amazon SES, or self-hosted Reloop.
+
+---
+
+## Switching from Cloudflare Email Service
+
+1. **Verify your domain** with the new provider. Cloudflare's onboarding added records on a `cf-bounce` subdomain; leave them until you've fully switched, then remove them. Merge the new provider's include into your existing SPF record rather than adding a second one.
+2. **Store an API key** as a Worker secret, for example `wrangler secret put RELOOP_API_KEY`.
+3. **Replace `env.EMAIL.send(...)`** with the new SDK call. On Reloop that's `reloop.mail.send(...)`; rename `replyTo` to `reply_to`, and check `emailError` instead of catching exceptions.
+4. **Move event handling** from your Queues consumer to an HTTP webhook handler. On Reloop, verify the `Reloop-Signature` header.
+5. **Import suppressions** so you don't email addresses that bounced or complained.
+6. **Ramp traffic** over one to two weeks and watch bounce and complaint rates.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I send email from Cloudflare Workers without Cloudflare Email Service?">
+    Yes. Any provider with an HTTP API works from a Worker with `fetch`.
+    Reloop's SDK also runs on Workers with the `nodejs_compat` flag. See our
+    [Cloudflare Workers guide](/blog/send-email-cloudflare-workers).
+  </Accordion>
+
+  <Accordion title="Is Cloudflare Email Service cheaper than Reloop?">
+    Below about 200,000 emails a month, Reloop is cheaper: $10 for 50,000
+    and $20 for 100,000, against about $21 and $39 on Cloudflare including
+    the $5 Workers Paid minimum. Above that, Cloudflare's $0.35 per 1,000
+    beats Reloop's $0.50 overage.
+  </Accordion>
+
+  <Accordion title="Do I need Cloudflare DNS for these alternatives?">
+    No. Cloudflare Email Service requires Cloudflare DNS; every alternative
+    here works with any DNS provider.
+  </Accordion>
+
+  <Accordion title="Which alternative can send marketing email?">
+    Reloop (campaigns and automations), Resend (broadcasts), Postmark
+    (broadcast streams) and Mailgun (limited). ZeptoMail, like Cloudflare,
+    doesn't allow marketing mail, and SES has no campaign features.
+  </Accordion>
+
+  <Accordion title="Is there an open-source alternative?">
+    Reloop is open source under Apache 2.0. You can use Reloop Cloud or run
+    the same code on your own server.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Send from Workers, with everything else included"
+  description="Any DNS provider, templates, signed webhooks, campaigns and inboxes. 6,000 emails a month free, then $10 for 50,000."
+  href="/dashboard/signup"
+  label="Get started"
+/>

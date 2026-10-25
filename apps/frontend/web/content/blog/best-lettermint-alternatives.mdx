@@ -1,0 +1,219 @@
+---
+title: "Best Lettermint Alternatives in 2026: EU-Friendly Email APIs Compared"
+description: "The best Lettermint alternatives of 2026 compared: Reloop, Sweego, MailPace, Brevo and Mailjet, plus Postmark and Resend, on EU hosting, pricing at 50k and 100k emails, inbound mail, campaigns and self-hosting."
+keywords:
+  - Lettermint alternatives
+  - Lettermint alternative
+  - Lettermint competitors
+  - EU Lettermint alternative
+  - EU email API
+  - GDPR email API
+publishedAt: 2026-10-25
+category: Comparison
+tags: [lettermint, alternatives, comparison, eu, pricing]
+readTime: 9 min read
+image: /blog/images/best-lettermint-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-lettermint
+  - eu-email-api-providers-2026
+  - best-transactional-email-apis-2026
+---
+
+**The short version:** **Reloop** is the strongest Lettermint alternative for most teams: it's hosted on Hetzner with EU data centers, costs $10 for 50,000 emails instead of €40, and adds real inboxes, campaigns and automations, with the option to self-host. **Sweego** is the pick if you need a French company and SMS. **MailPace** fits if you want no tracking at all. **Brevo** and **Mailjet** are the established EU marketing suites.
+
+Lettermint is a good product. It's a Dutch company on EU infrastructure, ISO 27001 certified, with a clean API. People look elsewhere for a few honest reasons:
+
+- **Price at volume.** 50,000 emails is €40 on Starter and 100,000 lands in the €85 tier.
+- **Inbound is a webhook, not a mailbox.** If you want stored threads you can reply from, or agents that read mail, you build that yourself.
+- **No contacts or automations** in its docs, only a broadcast sending route.
+- **Hosted only.** You can't run it on your own servers.
+
+We build Reloop, so weigh our entry accordingly. Every competitor fact below comes from our head-to-head posts, each of which links the provider's own pricing and docs.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall** | Reloop | EU-hosted on Hetzner, $10 for 50k, inboxes and automations, open source |
+| **Best French option with SMS** | Sweego | French company on French data centers, email and SMS |
+| **Best privacy-first** | MailPace | Never tracks opens or clicks, EU-hosted |
+| **Best EU marketing suite** | Brevo | Email, SMS, WhatsApp and CRM from Paris |
+| **Best established EU ESP** | Mailjet | EU data centers, mature visual editor |
+| **Best non-EU for deliverability** | Postmark | Long transactional track record (US company) |
+| **Best non-EU developer experience** | Resend | Polished API and docs (US company) |
+
+---
+
+## The comparison table
+
+| | Lettermint | Reloop | Sweego | MailPace | Brevo | Mailjet |
+|---|---|---|---|---|---|---|
+| **Company** | Netherlands | Reloop Labs | France | UK | France | France, owned by Sinch |
+| **Hosting** | EU (UpCloud NL, OVHcloud DE backups) | Hetzner, EU data centers; or self-host | France (OVHcloud, Scaleway) | EU (France, per its DPA) | EU (OVH, Google Cloud) | EU (Google Cloud) |
+| **Free tier** | 300 / mo | 6,000 / mo (200 / day) | 100 / day | Up to 100 / mo, on request | 300 / day | 6,000 / mo (200 / day) |
+| **~50k / mo** | €40 | **$10** | From €10 (20k–50k) | $50 | Slider | $40 / $59 |
+| **~100k / mo** | €85 (125k tier) | **$20** | From €79 | $100 | Slider | $112 (Premium) |
+| **Inbound** | Webhook | Mailboxes, API, MCP, IMAP | Webhook, paid plans | JSON webhook | Webhook | Parse API |
+| **Campaigns / automations** | Broadcasts only | Yes / Yes | No / No | No / No | Yes / Yes | Yes / Premium |
+| **Dedicated IP** | €50 / mo, Pro at 300k+ | Included on Growth ($20) | Startup and up | No | Higher tiers | Premium, on request |
+| **Self-host** | No | Yes (Apache 2.0) | No | No | No | No |
+
+Lettermint and Sweego price in euros; the others in dollars. Prices change, so check each provider's pricing page before you commit.
+
+---
+
+## 1. Reloop: best overall Lettermint alternative
+
+[Reloop](/) is open-source email infrastructure: a transactional API and SMTP relay, inbound mailboxes, contacts, campaigns, event-triggered automations and signed webhooks. **Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers**, and comes with a [DPA](/dpa) based on the EU Standard Contractual Clauses. If you'd rather hold the servers yourself, the same Apache 2.0 code [self-hosts](/self-host) on any EU machine.
+
+**Pricing:** free for 6,000 emails a month (200 a day). Pro is $10 for 50,000, Growth is $20 for 100,000 with a dedicated IP, and overage is $0.50 per 1,000. Or prepay credits at $0.50 per 1,000, valid for 6 months.
+
+**Strengths**
+
+- **About a quarter of Lettermint's price** at 50k ($10 vs €40) and 100k ($20 vs €85).
+- **Inbound mail as real mailboxes** with threads, readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, so an AI agent or a human can reply in-thread. Hosted plans include 3, 5 or 10 inboxes on Free, Pro and Growth.
+- **Contacts, campaigns and automations** on every plan, with one suppression list across transactional and marketing mail.
+- **Open source and self-hostable.**
+
+**Weaknesses**
+
+- **No published ISO 27001 certificate.** If your vendor review requires one, Lettermint has it.
+- Lettermint offers enterprise controls like SSO with SCIM from its Starter plan.
+- Open and click tracking is on for new domains; switch it off per domain if you don't want it.
+
+**Best for:** EU teams that want EU hosting at a lower price, plus inboxes and automations. Full comparison: [Reloop vs Lettermint](/blog/reloop-vs-lettermint).
+
+---
+
+## 2. Sweego: best French option with SMS
+
+[Sweego](https://www.sweego.io/) is a French email and SMS API from Mindbaz SAS in Lille, running on OVHcloud and Scaleway data centers in France.
+
+**Pricing:** free for 100 emails a day. Individual starts at €10 for 20,000 to 50,000 emails, Startup at €79 for 100,000 to 200,000 with a dedicated IP available, and Scaleup includes one. See [sweego.io/pricing](https://www.sweego.io/pricing).
+
+**Strengths:** French company and French hosting, SMS in the same account, log retention that grows to 90 days on higher plans.
+
+**Weaknesses:** no lists, campaigns or automations; inbound is a webhook on paid plans; hosted only.
+
+**Best for:** French and EU teams that need transactional email and SMS from one provider. Full comparison: [Reloop vs Sweego](/blog/reloop-vs-sweego).
+
+---
+
+## 3. MailPace: best privacy-first alternative
+
+[MailPace](https://mailpace.com/) is a UK company whose service is EU-hosted (its DPA names France). Its defining rule: **it never tracks opens or clicks.**
+
+**Pricing:** from $10 for 10,000 emails, $50 at 50,000 and $100 at 100,000. A free plan of up to 100 emails a month is available on request. See [mailpace.com/pricing](https://mailpace.com/pricing).
+
+**Strengths:** no tracking pixels at all, idempotent sends, inbound mail as JSON webhooks, a small focused product.
+
+**Weaknesses:** transactional only (marketing is prohibited), shared IPs only, and no open or click data if your product team wants it.
+
+**Best for:** privacy-focused products sending only transactional mail. Full comparison: [Reloop vs MailPace](/blog/reloop-vs-mailpace).
+
+---
+
+## 4. Brevo: best EU marketing suite
+
+[Brevo](https://www.brevo.com/) (formerly Sendinblue) runs from Paris, with servers in the EU on OVH and Google Cloud.
+
+**Pricing:** free for 300 emails a day. Starter begins at $9 for 5,000 emails and Standard, which adds automations, at $18. Larger volumes are priced on a slider at [brevo.com/pricing](https://www.brevo.com/pricing/).
+
+**Strengths:** email, SMS, WhatsApp, CRM and live chat in one product, with a drag-and-drop editor for marketers.
+
+**Weaknesses:** gets expensive at higher volumes compared with developer-focused APIs, inbound is a webhook, and part of its hosting is on Google Cloud.
+
+**Best for:** marketing-led EU teams. Full comparison: [Reloop vs Brevo](/blog/reloop-vs-brevo).
+
+---
+
+## 5. Mailjet: best established EU ESP
+
+[Mailjet](https://www.mailjet.com/) started in France and is now owned by Sinch. It stores customer data in Google Cloud data centers in Frankfurt and Saint-Ghislain.
+
+**Pricing:** free for 6,000 emails a month (200 a day). At 50,000 it's $40 on Essential or $59 on Premium; 100,000 on Premium is $112. See [mailjet.com/pricing](https://www.mailjet.com/pricing/).
+
+**Strengths:** long GDPR track record, a strong visual editor, transactional and marketing in one account.
+
+**Weaknesses:** automations need Premium, dedicated IPs are on request at higher volumes, and the hosting runs on Google Cloud.
+
+**Best for:** teams that want a mature EU-hosted ESP. Full comparison: [Reloop vs Mailjet](/blog/reloop-vs-mailjet).
+
+---
+
+## Non-EU options worth knowing
+
+If EU hosting isn't a hard requirement, two US providers often come up:
+
+- **[Postmark](/blog/reloop-vs-postmark):** a US company with a strong transactional deliverability reputation and separate message streams. $15 for 10,000 on Basic, then $1.80 per 1,000, so about $87 at 50k.
+- **[Resend](/blog/reloop-vs-resend):** a US company with an excellent developer experience. Free for 3,000 a month; $20 for 50k and $90 for 100k. It sends through Amazon SES.
+
+Both need a DPA and a transfer mechanism (such as SCCs) for EU personal data. Our [EU email API guide](/blog/eu-email-api-providers-2026) explains what that involves.
+
+---
+
+## How to choose
+
+- **"We want EU hosting at the lowest price."** Reloop.
+- **"We need an EU-registered company and ISO 27001."** Stay on Lettermint, or look at Sweego for a French company.
+- **"We need SMS too."** Sweego or Brevo.
+- **"We can't use tracking pixels."** MailPace, or Reloop with tracking switched off per domain.
+- **"We need inbound mail as real inboxes, for support or AI agents."** Reloop.
+- **"Marketers will run the campaigns."** Brevo or Mailjet.
+- **"We want to run it on our own servers."** Reloop, self-hosted.
+
+---
+
+## Switching from Lettermint
+
+1. **Sign the new provider's DPA** and update your records of processing.
+2. **Verify your sending domain.** Add the new DKIM record and merge the provider's include into your existing SPF record; never publish a second SPF record. Our [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide) covers it.
+3. **Export your suppressions** from Lettermint and import them, so you don't email people who bounced or complained.
+4. **Swap the client and webhooks.** On Reloop, the API key goes in `x-api-key`, templates use `{{{variable}}}`, and webhooks are signed in the `Reloop-Signature` header.
+5. **Ramp traffic** over one to two weeks while watching bounce and complaint rates, then remove Lettermint's DNS records.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the cheapest Lettermint alternative?">
+    For hosted plans, Reloop: $10 for 50,000 emails and $20 for 100,000 with a
+    dedicated IP, against €40 and €85 on Lettermint Starter. Self-hosted
+    Reloop has no per-email fee, only the server cost.
+  </Accordion>
+
+  <Accordion title="Is there an EU-hosted alternative to Lettermint?">
+    Yes. Reloop Cloud runs on Hetzner with EU data centers, Sweego hosts in
+    France, MailPace is EU-hosted, and Brevo and Mailjet store data in the EU.
+  </Accordion>
+
+  <Accordion title="Is there an open-source Lettermint alternative?">
+    Reloop is open source under Apache 2.0. You can use it hosted or run the
+    same code on your own server.
+  </Accordion>
+
+  <Accordion title="Which alternative handles inbound email best?">
+    Reloop stores inbound mail in mailboxes with threads, readable over the
+    API, MCP or IMAP, and lets you reply in-thread. The others post each
+    message to a webhook.
+  </Accordion>
+
+  <Accordion title="Which Lettermint alternative supports SMS?">
+    Sweego and Brevo both send SMS alongside email. Reloop is email only.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="EU-hosted on Hetzner, 6,000 emails a month free, and $10 for 50,000. Inboxes, campaigns and automations included."
+  href="/dashboard/signup"
+  label="Get started"
+/>

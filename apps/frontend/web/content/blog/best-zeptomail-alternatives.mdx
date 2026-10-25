@@ -1,0 +1,275 @@
+---
+title: "Best ZeptoMail Alternatives in 2026: Cheap Transactional Email, Plus What ZeptoMail Won't Do"
+description: "The best ZeptoMail alternatives of 2026 compared: Reloop, Amazon SES, Elastic Email, SMTP2GO, Cloudflare Email Service, Postmark, MailerSend and Mailgun on price at 50k and 100k emails, marketing rules, inbound and self-hosting."
+keywords:
+  - ZeptoMail alternatives
+  - ZeptoMail alternative
+  - Zoho ZeptoMail alternative
+  - ZeptoMail competitors
+  - open source ZeptoMail alternative
+  - Zoho CPaaS email alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [zeptomail, zoho, alternatives, comparison, pricing]
+readTime: 10 min read
+image: /blog/images/best-zeptomail-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-zeptomail
+  - reloop-vs-aws-ses
+  - best-transactional-email-apis-2026
+---
+
+**ZeptoMail is one of the cheapest ways to send transactional email, and it's deliberately narrow.** Zoho sells it on prepaid credits, allows only transactional mail, and has folded it into **Zoho CPaaS** alongside SMS, WhatsApp and voice. That's ideal if receipts and OTPs are all you'll ever send. Teams look for alternatives when they need marketing mail, inbound inboxes, predictable monthly pricing, or the option to self-host.
+
+**The short version:** **Reloop** is the closest all-round alternative: cheaper than ZeptoMail below about 150k emails a month, with campaigns, automations and inboxes included, and open source. For the lowest raw price, **Amazon SES**. For a simple SMTP relay, **SMTP2GO**. For a budget API with an optional marketing product, **Elastic Email**.
+
+We build Reloop, so weigh our entry accordingly. Facts about each provider come from our researched head-to-head posts, linked in each section, and each section says where that provider wins.
+
+---
+
+## Why teams look for a ZeptoMail alternative
+
+- **Marketing mail isn't allowed.** ZeptoMail's terms prohibit marketing, promotional mail and newsletters, and accounts that keep sending them get blocked. Onboarding sequences and product announcements need a second tool.
+- **No inbound mailboxes.** You can't receive and store replies, which rules out support inboxes and AI agents that answer email.
+- **Credits expire.** Each credit is valid for 6 months, so buying in bulk can waste money if volume drops.
+- **The free credit is one-off.** 10,000 emails to start, not a monthly allowance.
+- **Prices vary by region.** The per-credit price is widely listed at $2.50 but differs by region, which makes budgeting less predictable.
+- **The product is changing.** ZeptoMail is now Zoho CPaaS, with the API at `cpaas.zoho.com`. Useful if you want SMS or WhatsApp, a distraction if you only want email.
+
+Full breakdown: [Reloop vs ZeptoMail](/blog/reloop-vs-zeptomail).
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall ZeptoMail alternative** | Reloop | Transactional + campaigns + inboxes, $10 for 50k, open source |
+| **Cheapest per email** | Amazon SES | $0.10 per 1,000 |
+| **Best budget API with a marketing option** | Elastic Email | 3k free a month, separate marketing plans |
+| **Best simple SMTP relay** | SMTP2GO | Many ports, dedicated IP on Professional |
+| **Best for Cloudflare Workers apps** | Cloudflare Email Service | Native binding, $0.35 per 1k |
+| **Best for deliverability focus** | Postmark | Transactional-first, message streams |
+| **Best with a visual builder** | MailerSend | Drag-and-drop templates |
+| **Best for inbound routing and validation** | Mailgun | Inbound routes, validation add-on |
+
+---
+
+## The comparison table
+
+| | ZeptoMail | Reloop | Amazon SES | Elastic Email | SMTP2GO | Cloudflare | Postmark | MailerSend |
+|---|---|---|---|---|---|---|---|---|
+| **Pricing model** | Prepaid credits | Monthly plans or prepaid credits | Pay per use | Monthly plans | Monthly plans | Workers Paid + usage | Monthly plans | Monthly plans |
+| **Free** | First credit (10k emails) | 6,000 / mo (200 / day) | $200 AWS credits, 6 months | 3,000 / mo (100 / day) | 1,000 / mo | Own verified addresses only | 100 / mo | 500 / mo |
+| **~50k / mo** | about $12.50 | **$10** | ~$5 | $19 (Starter) | Overage-based | about $21 | $87 | $35 |
+| **~100k / mo** | about $25 | **$20** | ~$10 | Volume slider | $75 | about $39 | $177 | $68 |
+| **Marketing mail** | Not allowed | Campaigns + automations | No | Separate plans | No | No | Broadcast streams | Via MailerLite |
+| **Inbound** | Not offered | Mailboxes, API, MCP, IMAP | Receipt rules to S3 / SNS / Lambda | Pro plan | Not a focus | Email Routing | Webhook (Pro and up) | Parsed and forwarded |
+| **Dedicated IP** | Paid add-on | Included on Growth ($20) | Add-on | $40–50 / mo add-on | Included on Professional ($75) | Not documented | $50 / mo, from 300k | Add-on on Professional |
+| **Open source / self-host** | No | Yes (Apache 2.0) | No | No | No | No | No | No |
+
+ZeptoMail figures use the widely listed $2.50 per 10k credit, which varies by region. Cloudflare figures include the $5 Workers Paid minimum. Postmark is Basic list price plus overage. SES is send-only, before data transfer. SMTP2GO's Starter plan is $10 for 10,000 with $1 per extra 1,000, so check its calculator for 50k.
+
+---
+
+## 1. Reloop: best overall ZeptoMail alternative
+
+[Reloop](/) is open-source email infrastructure: a transactional API, SMTP relay, templates, signed webhooks, inbound mailboxes, contacts, campaigns and event automations in one product. It runs its own MTA (KumoMTA), and **Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers**.
+
+**Pricing:** Free for 6,000 emails a month (200 a day), every month. Pro is $10 for 50,000, Growth is $20 for 100,000 with a dedicated IP, and extra mail is $0.50 per 1,000. If you prefer ZeptoMail-style prepaid credits, Reloop sells those too: $0.50 per 1,000, valid for 6 months. Self-hosting under Apache 2.0 has no per-email fee.
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your code is 481920",
+  html: "<p>Your sign-in code is <strong>481920</strong>.</p>",
+});
+```
+
+**Strengths**
+
+- **Transactional and marketing in one place**, kept apart by domain while sharing one suppression list. Campaigns and event automations (`reloop.automations.start`) cover onboarding and dunning.
+- Inbound mail lands in real mailboxes with threads, readable over the API, the MCP server or IMAP (3, 5 and 10 hosted inboxes on Free, Pro and Growth).
+- A monthly free tier and flat plans, plus optional prepaid credits.
+- Errors return a `message`, a `why` and a `fix`; webhooks are signed with `Reloop-Signature`.
+- Open source, so you can move to your own servers later with the same API.
+
+**Weaknesses**
+
+- **Above roughly 150,000 emails a month, ZeptoMail is cheaper per email.** At a million emails, ZeptoMail is about $250 and Reloop is $470 hosted.
+- No SMS or WhatsApp. If you want OTPs over several channels from one vendor, Zoho CPaaS covers that.
+
+**Best for:** teams that need more than transactional sending without adding a second tool. Full comparison: [Reloop vs ZeptoMail](/blog/reloop-vs-zeptomail).
+
+---
+
+## 2. Amazon SES: cheapest per email
+
+SES is the lowest-cost hosted sending pipe: $0.10 per 1,000 emails, plus $0.12 per GB of outbound data.
+
+**Strengths:** cheaper than ZeptoMail at every paid volume; deep AWS integration; inbound via receipt rules to S3, SNS or Lambda.
+
+**Weaknesses:** a sandbox you must request to leave; bounce and complaint handling through SNS or EventBridge that you build; no dashboard beyond CloudWatch; no campaigns.
+
+**Best for:** AWS-native teams with engineers to build the pieces around it. Full comparison: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses), or our [Amazon SES alternatives](/blog/best-aws-ses-alternatives) roundup.
+
+---
+
+## 3. Elastic Email: best budget API with a marketing option
+
+Elastic Email sells an Email API and a separate Email Marketing product.
+
+**Pricing:** the Email API's free plan is 3,000 a month (100 a day). Starter is $19 and Pro is $49 for 50,000; larger volumes are priced on a slider. Dedicated IPs are a $40 add-on on Starter and $50 on Pro.
+
+**Strengths:** a generous free tier; a marketing product from the same vendor; inbound processing on Pro.
+
+**Weaknesses:** webhooks and inbound are Pro-only; logs are kept 3 days on Free and Starter and 7 on Pro; marketing is a separate subscription.
+
+**Best for:** small teams that want low prices and may add marketing later. Full comparison: [Reloop vs Elastic Email](/blog/reloop-vs-elastic-email).
+
+---
+
+## 4. SMTP2GO: best simple SMTP relay
+
+SMTP2GO is a long-standing SMTP relay with an HTTP API, popular with WordPress sites, agencies and devices.
+
+**Pricing:** free for 1,000 a month. Starter is $10 for 10,000 ($1 per extra 1,000). Professional is $75 for 100,000 ($0.85 per extra 1,000), with a dedicated IP included.
+
+**Strengths:** many SMTP ports, including 2525, 8025 and 80 for restrictive networks; SMS; phone and chat support on every plan.
+
+**Weaknesses:** a small free tier; no campaigns; inbound isn't a focus.
+
+**Best for:** plugging a reliable relay into apps and devices. Full comparison: [Reloop vs SMTP2GO](/blog/reloop-vs-smtp2go).
+
+---
+
+## 5. Cloudflare Email Service: best for Workers apps
+
+Cloudflare's sending entered public beta in April 2026. From a Worker it's one binding and one `send()` call.
+
+**Pricing:** Workers Paid ($5 a month minimum) includes 3,000 emails, then $0.35 per 1,000.
+
+**Strengths:** native Workers binding, no API key; Email Routing for inbound.
+
+**Weaknesses:** still in beta; requires Cloudflare DNS; transactional only, like ZeptoMail; events go to Cloudflare Queues.
+
+**Best for:** apps already on Workers. Full comparison: [Reloop vs Cloudflare Email Service](/blog/reloop-vs-cloudflare-email).
+
+---
+
+## 6. Postmark: best for deliverability focus
+
+Postmark is transactional-first, with separate message streams for transactional and broadcast mail.
+
+**Pricing:** free for 100 a month. Basic starts at $15 for 10,000, with overage at $1.80 per 1,000 ($1.30 on Pro): about $87 at 50,000 and $177 at 100,000 on Basic list price.
+
+**Strengths:** strong transactional reputation, message streams, excellent docs.
+
+**Weaknesses:** several times ZeptoMail's price at volume; dedicated IPs are $50 a month from 300k.
+
+**Best for:** teams that care more about delivery speed than cost. Full comparison: [Reloop vs Postmark](/blog/reloop-vs-postmark).
+
+---
+
+## 7. MailerSend: best with a visual builder
+
+MailerSend pairs a transactional API with a drag-and-drop template builder.
+
+**Pricing:** free for 500 a month. Starter is $35 for 50,000 and $68 for 100,000, with overage at $1.30 per 1,000 (monthly billing).
+
+**Strengths:** visual builder, SMS in the US and Canada, inbound parsing.
+
+**Weaknesses:** small free tier; marketing lives in the separate MailerLite product.
+
+**Best for:** teams where non-developers design templates. Full comparison: [Reloop vs MailerSend](/blog/reloop-vs-mailersend).
+
+---
+
+## 8. Mailgun: best for inbound routing and validation
+
+Mailgun offers inbound routes and email validation as a paid add-on.
+
+**Pricing:** 100 a day on a trial. Basic is $15 for 10,000, Foundation is $35 for 50,000, and 100,000 is about $100 with overage from $1.30 per 1,000.
+
+**Strengths:** mature API, Handlebars templates, inbound routes, validation.
+
+**Weaknesses:** expensive compared with ZeptoMail; validation and dedicated IPs cost extra.
+
+**Best for:** teams that need validation and routing from one vendor. Full comparison: [Reloop vs Mailgun](/blog/reloop-vs-mailgun).
+
+---
+
+## How to choose
+
+- **"We only send receipts and OTPs, at high volume."** Stay on ZeptoMail, or move to Amazon SES for an even lower price.
+- **"We want onboarding emails and newsletters from the same provider."** Reloop.
+- **"We need to receive replies, for support or AI agents."** Reloop.
+- **"We want a predictable monthly bill instead of credits."** Reloop, Elastic Email or SMTP2GO.
+- **"We need an SMTP relay for WordPress or devices."** SMTP2GO or Reloop (`smtp.reloop.sh`).
+- **"We want to self-host."** Reloop, under Apache 2.0.
+
+---
+
+## Switching from ZeptoMail
+
+1. **Verify your domain** with the new provider. Add its DKIM record and merge its include into your existing SPF record; never publish a second SPF record.
+2. **Export your suppression list** from ZeptoMail and import it, so you don't email addresses that bounced or complained.
+3. **Swap the client.** ZeptoMail's recipients look like `[{ email_address: { address, name } }]`; most alternatives take plain strings. On Reloop, use `reloop.mail.send(...)`.
+4. **Move templates.** ZeptoMail sends templates by `template_key` with `merge_info`. On Reloop, store the template and use `{{{variables}}}`.
+5. **Update SMTP settings** if you use the relay: ZeptoMail's `smtp.zeptomail.com` with user `emailapikey` becomes, for Reloop, `smtp.reloop.sh` with your API key as both username and password.
+6. **Ramp traffic** over one to two weeks, then let your remaining credits run out rather than buying more.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the cheapest ZeptoMail alternative?">
+    Amazon SES, at $0.10 per 1,000 emails, if you're willing to build bounce
+    handling and logs yourself. Among complete platforms, Reloop is cheaper
+    than ZeptoMail below about 150,000 emails a month ($10 for 50,000 and $20
+    for 100,000).
+  </Accordion>
+
+  <Accordion title="Which ZeptoMail alternative allows marketing email?">
+    Reloop includes campaigns and automations in the same product. Elastic
+    Email and MailerSend offer marketing through separate products, and
+    Postmark has broadcast streams. ZeptoMail, Cloudflare Email Service and
+    SES don't offer campaigns.
+  </Accordion>
+
+  <Accordion title="Is there an open-source alternative to ZeptoMail?">
+    Yes. Reloop is open source under Apache 2.0. You can use Reloop Cloud or
+    run the same code on your own server with no per-email fee.
+  </Accordion>
+
+  <Accordion title="Is ZeptoMail the same as Zoho CPaaS?">
+    Zoho now presents ZeptoMail as part of Zoho CPaaS, built on the same
+    email infrastructure and adding SMS, WhatsApp and voice. The email API
+    and SMTP relay work the same way.
+  </Accordion>
+
+  <Accordion title="Can I receive email with a ZeptoMail alternative?">
+    Yes. Reloop receives mail into mailboxes with threads that you can read
+    over the API, the MCP server or IMAP. SES, Mailgun, Postmark (Pro and
+    up), MailerSend and Elastic Email (Pro) forward inbound mail to your
+    code instead.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Transactional email, plus everything ZeptoMail leaves out"
+  description="Campaigns, automations and inboxes on one plan. 6,000 emails a month free, then $10 for 50,000."
+  href="/dashboard/signup"
+  label="Get started"
+/>

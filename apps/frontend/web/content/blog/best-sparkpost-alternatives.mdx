@@ -1,0 +1,270 @@
+---
+title: "Best SparkPost Alternatives in 2026: Where to Go Now SparkPost Is Bird"
+description: "SparkPost is now Bird Email, so a migration is coming either way. The best SparkPost alternatives in 2026 compared: Reloop, Amazon SES, SendGrid, Mailgun, Postmark, Elastic Email and ZeptoMail on price, volume, inbound and migration."
+keywords:
+  - SparkPost alternatives
+  - SparkPost alternative
+  - SparkPost competitors
+  - open source SparkPost alternative
+  - SparkPost replacement
+  - Bird Email alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [sparkpost, bird, alternatives, comparison, pricing]
+readTime: 12 min read
+image: /blog/images/best-sparkpost-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-sparkpost
+  - reloop-vs-aws-ses
+  - best-transactional-email-apis-2026
+---
+
+**The short version:** SparkPost is now sold as **Bird Email**, and Bird says SparkPost requests may not work unchanged, so you're planning a migration whichever way you go. Under about 300,000 emails a month, **Reloop** is the cheapest complete platform: $10 for 50,000, a permanent free tier, inbound mailboxes and open source. At millions a month, **Amazon SES** (or Bird itself) wins on price per email.
+
+We build Reloop, so weigh that. Every price below comes from the providers' public pricing pages, linked in our head-to-head posts, and each section says where that provider beats us.
+
+---
+
+## What happened to SparkPost
+
+- MessageBird [agreed to acquire SparkPost](https://bird.com/blog/sparkpost-joins-bird) and later rebranded as Bird.
+- [sparkpost.com](https://www.sparkpost.com) now redirects to Bird's email product, and the old pricing page redirects to [Bird's email pricing](https://bird.com/pricing/email).
+- Bird's own [SparkPost page](https://bird.com/email-api/features/sparkpost) says Bird Email "has its own API and SDKs" and advises reviewing sending, templates, domains and webhooks "rather than assuming that a SparkPost request can be sent unchanged."
+
+Bird Email is a real option, and we include it below. But since your sending layer needs work anyway, it's the right moment to compare.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall SparkPost alternative** | Reloop | $10 for 50k, inbound mailboxes, campaigns, open source |
+| **Cheapest at millions per month** | Amazon SES | $0.10 per 1,000, if you build the rest |
+| **Staying in the SparkPost family** | Bird Email | Same engine, $0.20–$0.45 per 1,000 |
+| **Best for enterprise contracts** | SendGrid | Twilio procurement, subusers, IP pools |
+| **Best for logs and inbound routing** | Mailgun | Detailed event logs, inbound routes |
+| **Best for transactional deliverability** | Postmark | Transactional-first, message streams |
+| **Best low-cost bulk API** | Elastic Email | Volume slider up to 10M a month |
+| **Cheapest prepaid credits** | ZeptoMail | Pay per credit, transactional only |
+
+---
+
+## The comparison table
+
+| | Bird Email (SparkPost) | Reloop | Amazon SES | SendGrid | Mailgun | Postmark | ZeptoMail |
+|---|---|---|---|---|---|---|---|
+| **Free tier** | 1,000 / mo (50 / day) | 6,000 / mo (200 / day) | $200 AWS credits, 6 months | 60-day trial, 100 / day | 100 / day trial | 100 / mo | First credit free (10,000 emails) |
+| **~50,000 / mo** | ~$20 (Startup) | **$10** | ~$5 | $19.95 | $35 | $87 (Basic + overage) | ~$12.50 in credits |
+| **~100,000 / mo** | ~$40 (Startup) | **$20** | ~$10 | $34.95 | About $100 | $177 (Basic + overage) | ~$25 in credits |
+| **High-volume rate per 1k** | $0.20–$0.45 | $0.50 overage | **$0.10** | Plan upgrade | From $1.30 | $1.20–$1.80 | Credit-based |
+| **Dedicated IP** | Add-on, Growth ($250 deposit) and up | Included on Growth ($20) | $24.95 / mo | Pro, from $89.95 | Paid add-on | $50 / mo, from 300k / mo | Paid add-on |
+| **Inbound** | Included, with mailboxes | Mailboxes + threads, API, MCP, IMAP | Receipt rules | Inbound Parse webhook | Routes | Webhook (Pro and up) | Not offered |
+| **Open source / self-host** | No | Yes | No | No | No | No | No |
+
+Bird's figures are usage at its Startup rate ($0.40 per 1,000) on a $15 monthly deposit. ZeptoMail's are based on its widely listed $2.50 per credit, which varies by region. Mailgun's 100k figure is worked out from its overage rate. SES figures are sending only.
+
+---
+
+## 1. Reloop: best overall SparkPost alternative
+
+Reloop is open-source email infrastructure: a transactional API, SMTP relay, inbound mailboxes, contacts, campaigns, automations and webhooks in one product, hosted or on your own server.
+
+**Pricing:** Free is 6,000 emails a month (200 a day). Pro is $10 for 50,000. Growth is $20 for 100,000 and includes a dedicated IP. Extra mail costs $0.50 per 1,000, and pay-as-you-go credits cost the same $0.50 per 1,000 and stay valid for 6 months. Self-hosting is free under Apache 2.0.
+
+**Why it fits SparkPost users**
+
+- **Cheaper below about 300,000 a month.** $10 vs about $20 on Bird at 50k, $20 vs about $40 at 100k. The two meet around 300k, and Bird gets cheaper above that.
+- **A dedicated IP for $20.** On Bird it's a paid add-on from the Growth plan ($250 deposit).
+- **A simple send model.** SparkPost's transmissions wrap content and a recipients list; Reloop is one flat request per message, with errors that return `message`, `why` and `fix`.
+- **Inbound as real mailboxes** you can read and reply to over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP.
+- **No more forced migrations.** It's open source, so if the vendor ever changes, you can run the same code yourself. Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers.
+
+**Where SparkPost (Bird) is still ahead**
+
+- **Price at high volume.** Above 300k a month, Bird's $0.20–$0.45 per 1,000 beats Reloop's $0.50 overage.
+- **Analytics heritage** and 30 days of message retention on every plan.
+- **SMS and WhatsApp** in the same account. Reloop is email only.
+
+**Best for:** SparkPost users sending under a few hundred thousand emails a month who want one platform for transactional, marketing and inbound mail.
+
+Full breakdown: [Reloop vs SparkPost](/blog/reloop-vs-sparkpost)
+
+---
+
+## 2. Amazon SES: cheapest at millions per month
+
+**Pricing:** $0.10 per 1,000 emails plus $0.12 per GB of outbound data. Receiving costs $0.10 per 1,000. Dedicated IPs are $24.95 a month.
+
+**Strengths:** the lowest list price by far, deep AWS integration, and huge scale. At 1,000,000 emails a month SES is about $100, against $470 on Reloop.
+
+**Weaknesses:** no logs dashboard, template editor, bounce processing or campaigns. You build those with SNS, Lambda and storage, and new accounts start in a sandbox.
+
+**Best for:** very high-volume senders, often former SparkPost customers, with engineers to build the tooling SparkPost gave them.
+
+<Callout type="tip">
+  Reloop can route outbound mail through SES (or any SMTP provider), so you can keep SES pricing while using Reloop's API, logs, templates and suppression list.
+</Callout>
+
+Full breakdown: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses)
+
+---
+
+## 3. Bird Email: staying in the SparkPost family
+
+If you'd rather stay, Bird Email is built on what Bird calls "the SparkPost engine, now one API."
+
+**Pricing:** each paid plan adds a monthly deposit to a prepaid balance, charged per email. Free covers 1,000 emails a month (50 a day). Startup is a $15 deposit at $0.40 per 1,000, Growth a $250 deposit at $0.45, and Scale plans run from $0.35 down to $0.20 per 1,000.
+
+**Strengths:** the SparkPost engine and analytics, 30-day retention on every plan, inbound included, and SMS and WhatsApp from the same vendor.
+
+**Weaknesses:** a small free tier, a new API to migrate to anyway, and dedicated IPs only from Growth.
+
+**Best for:** high-volume senders who want to keep the SparkPost engine and also need other channels.
+
+---
+
+## 4. SendGrid: best for enterprise contracts
+
+**Pricing:** a 60-day trial at 100 emails a day. Essentials is $19.95 for 50,000 and $34.95 for 100,000. Pro, with a dedicated IP, subusers and SSO, starts at $89.95.
+
+**Strengths:** proven at enormous volume, subusers and IP pools, Twilio procurement, and Handlebars logic in templates.
+
+**Weaknesses:** no permanent free plan, marketing on a separate plan, an older API, and hosted only.
+
+**Best for:** enterprises that want a large, established vendor with contracts to match.
+
+Full breakdown: [Reloop vs SendGrid](/blog/reloop-vs-sendgrid)
+
+---
+
+## 5. Mailgun: best for logs and inbound routing
+
+**Pricing:** a 100-a-day free trial. Basic is $15 for 10,000. Foundation is $35 for 50,000, with overage from $1.30 per 1,000.
+
+**Strengths:** detailed event logs and search, inbound routes that match and forward, and email validation as an add-on.
+
+**Weaknesses:** expensive per email above the plan, dedicated IPs are extra, and campaigns are a separate Sinch product.
+
+**Best for:** teams that relied on SparkPost's event data and want strong log search.
+
+Full breakdown: [Reloop vs Mailgun](/blog/reloop-vs-mailgun)
+
+---
+
+## 6. Postmark: best for transactional deliverability
+
+**Pricing:** a free developer plan of 100 emails a month. Basic is $15 for 10,000 with $1.80 per 1,000 overage; Pro and Platform lower that to $1.30 and $1.20. Dedicated IPs are $50 a month per IP above 300,000 a month.
+
+**Strengths:** a strong transactional reputation and message streams that separate transactional from broadcast mail.
+
+**Weaknesses:** the most expensive per email here at volume, and hosted only.
+
+**Best for:** teams sending modest volumes where every receipt has to land fast.
+
+Full breakdown: [Reloop vs Postmark](/blog/reloop-vs-postmark)
+
+---
+
+## 7. Elastic Email: best low-cost bulk API
+
+**Pricing:** the Email API's free plan is 3,000 emails a month (100 a day). Starter is $19 and Pro is $49, both for 50,000, and a volume slider runs up to 10 million a month. Dedicated IPs are a $40 or $50 add-on.
+
+**Strengths:** may be cheap per email in the millions, and has a free plan of 3,000 emails a month.
+
+**Weaknesses:** inbound and webhooks need Pro, logs are kept for 3 to 7 days, and marketing is a separate plan.
+
+**Best for:** high-volume senders who want a hosted API without building on SES.
+
+Full breakdown: [Reloop vs Elastic Email](/blog/reloop-vs-elastic-email)
+
+---
+
+## 8. ZeptoMail: cheapest prepaid credits
+
+ZeptoMail, now part of Zoho CPaaS, sells transactional email as prepaid credits.
+
+**Pricing:** one credit sends 10,000 emails, the first credit is free, and credits expire after 6 months. The price per credit is widely listed at $2.50 and varies by region.
+
+**Strengths:** no monthly fee, cheap at mid-to-high volume (about $25 for 100,000), and WhatsApp and SMS from the same vendor.
+
+**Weaknesses:** marketing email isn't allowed, there's no inbound mailbox, and credits expire.
+
+**Best for:** strictly transactional senders who want pay-as-you-go pricing.
+
+Full breakdown: [Reloop vs ZeptoMail](/blog/reloop-vs-zeptomail)
+
+---
+
+## How to choose
+
+- **"We send under 300,000 a month and want one platform."** Reloop.
+- **"We send millions a month and have engineers."** Amazon SES, or SES behind Reloop.
+- **"We want the SparkPost engine and other channels."** Bird Email.
+- **"Enterprise procurement decides."** SendGrid.
+- **"We only send transactional mail and want pay-as-you-go."** ZeptoMail.
+- **"We never want a forced migration again."** Reloop, the only open-source option here.
+
+---
+
+## Migrating off SparkPost
+
+1. **Verify your domain** with the new provider. For Reloop, publish the `reloop._domainkey` DKIM record and merge `include:reloop.sh` into your existing SPF record. Never publish a second SPF record.
+2. **Export your suppression list** from SparkPost and import it before your first send.
+3. **Rewrite the sending layer.** Replace `transmissions.send` calls with the new provider's client. In Reloop that's one `reloop.mail.send` per message.
+4. **Move templates.** SparkPost uses double-brace placeholders like `{{first_name}}`; in Reloop they become `{{{first_name}}}`.
+5. **Point webhooks** at a new handler. Reloop events like `email.delivered` and `email.bounced` are signed in the `Reloop-Signature` header.
+6. **Ramp traffic** from 10% to 100% over one to two weeks. If you send at high volume, warm a new dedicated IP gradually.
+
+The [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same steps in detail, including a traffic-split flag and a suppression import script.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is SparkPost shutting down?">
+    SparkPost has become Bird Email. sparkpost.com redirects to Bird, and Bird
+    says its email product has its own API and SDKs, so existing SparkPost code
+    may need changes. Check Bird's pages for timelines that apply to your
+    account.
+  </Accordion>
+
+  <Accordion title="What is the cheapest SparkPost alternative?">
+    It depends on volume. Under about 300,000 emails a month, Reloop is the
+    cheapest complete platform ($10 for 50k, $20 for 100k). At millions a
+    month, Amazon SES at $0.10 per 1,000 is cheapest if you build the tooling,
+    and Bird's Scale plans go down to $0.20 per 1,000.
+  </Accordion>
+
+  <Accordion title="Is there an open-source SparkPost alternative?">
+    Reloop is open source under Apache 2.0 and runs its own MTA (KumoMTA). Use
+    the hosted service or run the same code on your own servers.
+  </Accordion>
+
+  <Accordion title="Which alternative handles inbound email best?">
+    Reloop receives mail into stored, threaded mailboxes you can read and reply
+    to over the API, MCP or IMAP. Bird includes inbound with mailboxes too.
+    SendGrid, Mailgun and Postmark post inbound mail to your webhook, and SES
+    uses receipt rules.
+  </Accordion>
+
+  <Accordion title="Will I lose deliverability when I move?">
+    Not if you migrate carefully: authenticate the new domain, import your
+    suppressions, and ramp traffic gradually. Our
+    [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide) covers the
+    DNS side.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Migrate once, and never be forced to again"
+  description="Open-source email infrastructure: $10 for 50,000 emails, inbound mailboxes, campaigns and automations. 6,000 emails a month free."
+  href="/dashboard/signup"
+  label="Get started"
+/>

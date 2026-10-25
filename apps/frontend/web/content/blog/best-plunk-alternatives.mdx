@@ -1,0 +1,232 @@
+---
+title: "Best Plunk Alternatives in 2026: Open-Source and Hosted Email Platforms Compared"
+description: "The best Plunk alternatives in 2026 compared: Reloop, useSend, Loops, Resend, Listmonk and Amazon SES on pricing at steady volume, automations, inbound email, licensing and self-hosting without AWS."
+keywords:
+  - Plunk alternatives
+  - Plunk alternative
+  - Plunk competitors
+  - open source Plunk alternative
+  - useplunk alternative
+  - self-hosted email platform
+publishedAt: 2026-10-25
+category: Comparison
+tags: [plunk, alternatives, comparison, open-source, automations]
+readTime: 10 min read
+image: /blog/images/best-plunk-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-plunk
+  - reloop-vs-usesend
+  - reloop-vs-loops
+---
+
+**The short version:** Plunk is an open-source platform for transactional mail, campaigns and automations. If you want the same scope for less at steady volume, inbound mail in real inboxes, or self-hosting without AWS, **Reloop** is the closest alternative. **useSend** is the other open-source option on SES, **Loops** is the polished hosted tool for lifecycle email, and **Listmonk** covers self-hosted newsletters.
+
+Plunk does a lot right: simple pricing, automations, inbound routing and an open codebase. Teams usually look elsewhere because of:
+
+- **Per-email pricing at steady volume.** $1 per 1,000 emails is simple, but it's about $50 at 50k and $100 at 100k.
+- **A branded free tier.** The free 1,000 emails a month carry Plunk branding.
+- **Self-hosting needs Amazon SES.** You need an AWS account out of the SES sandbox, an IAM user and an SNS topic for events.
+- **The AGPL license**, which some companies' legal teams avoid.
+
+We build Reloop, so weigh this accordingly. Prices and facts come from our researched head-to-head posts and each provider's own site, and each section says where that alternative beats us.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Plunk alternative** | Reloop | Same scope, $10 for 50k, inboxes, Apache 2.0 |
+| **Best open source on SES** | useSend | Resend-style API, $0.40 per 1,000 transactional |
+| **Best hosted lifecycle email** | Loops | Polished automations for SaaS, priced by contacts |
+| **Best hosted developer API** | Resend | Clean API, React Email |
+| **Best self-hosted newsletters** | Listmonk | Fast, light, bring any SMTP |
+| **Cheapest raw pipe** | Amazon SES | $0.10 per 1,000, build the rest |
+
+---
+
+## The comparison table
+
+| | Plunk | Reloop | useSend | Loops | Resend | Listmonk |
+|---|---|---|---|---|---|---|
+| **License** | AGPL-3.0 | Apache 2.0 | AGPL-3.0 | Closed | Closed | AGPLv3 |
+| **Pricing basis** | Per email | Plans by email volume | Per email ($10 minimum) | Contacts stored | Plans by email volume | Self-host only |
+| **Free tier** | 1,000 / mo, branded | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | 1,000 contacts, 4,000 sends | 3,000 / mo (100 / day) | N/A |
+| **~50,000 emails / mo** | about $50 | **$10** | $20 | From $49 (by contacts) | $20 | Server + SMTP |
+| **~100,000 emails / mo** | about $100 | **$20** | $40 | $399 at 100k contacts | $90 | Server + SMTP |
+| **Automations** | Yes | Yes | Not listed | Yes, core focus | Limited | No drip sequences |
+| **Inbound email** | Routing rules | Mailboxes, API, MCP, IMAP | Roadmap | No | Webhook | No |
+| **SMTP relay** | Yes | Yes | Yes | No | Yes | Needs one |
+| **Self-host without AWS** | No (SES) | Yes | No (SES) | No | No | Yes (any SMTP) |
+
+Plunk and useSend figures are our math from their per-email rates. Loops prices by contacts, not emails, so its column depends on list size.
+
+---
+
+## 1. Reloop: best overall Plunk alternative
+
+[Reloop](/) covers the same ground as Plunk: a transactional API, SMTP, contacts, campaigns, event-triggered automations and inbound email. It's open source under Apache 2.0 and runs its own mail server.
+
+Starting an automation looks almost identical to Plunk's `/v1/track` call:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { automationError } = await reloop.automations.start({
+  event: "user.signed_up",
+  email: user.email,
+});
+```
+
+**Pricing:** free for 6,000 emails a month (200 a day) with no branding. Pro is $10 for 50,000, Growth is $20 for 100,000 with a dedicated IP, then $0.50 per 1,000. Pay-as-you-go credits are also $0.50 per 1,000, valid for 6 months. Self-hosting has no per-email fee.
+
+**Strengths**
+
+- **Cheaper at steady volume.** From about 10,000 emails a month on, a flat plan costs less than $1 per 1,000.
+- **No AWS when self-hosting.** KumoMTA sends from your own server, so there's no SES sandbox, IAM or SNS setup, and mail never passes through a third party. Install with [one command](/self-host).
+- **Inbound into real inboxes**, threaded and spam-scored, readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, so agents and humans can reply in-thread.
+- **Subscription channels**, so a contact can opt out of product updates while still getting billing mail.
+- **Apache 2.0**, with no copyleft obligations. Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers.
+
+**Weaknesses**
+
+- **You own IP reputation when self-hosting.** With Plunk, SES handles warm-up.
+- No browser-safe public tracking key like Plunk's `pk_` keys; track events from your server.
+
+**Best for:** teams with steady volume, anyone who needs inbound mail as inboxes, and self-hosters who want to avoid AWS. Full comparison: [Reloop vs Plunk](/blog/reloop-vs-plunk).
+
+---
+
+## 2. useSend: best open source on SES
+
+[useSend](https://usesend.com) (formerly Unsend) is an open-source Resend alternative under AGPL-3.0, sending through Amazon SES, with contacts, campaigns and a hosted cloud.
+
+**Pricing:** free for 3,000 a month (100 a day). Paid is usage-based with a $10 monthly minimum: $0.0004 per transactional email and $0.001 per marketing email.
+
+**Strengths:** cheaper than Plunk for transactional mail, a Resend-style API, and SES handles reputation when self-hosted.
+
+**Weaknesses:** still beta, inbound is on the roadmap, automations aren't listed, and self-hosting needs the same AWS setup as Plunk.
+
+**Best for:** high-volume transactional senders on SES. Full comparison: [Reloop vs useSend](/blog/reloop-vs-usesend).
+
+---
+
+## 3. Loops: best hosted lifecycle email
+
+[Loops](https://loops.so) is a polished, hosted tool for SaaS lifecycle email: onboarding sequences, product announcements and broadcasts.
+
+**Pricing:** free for 1,000 contacts and 4,000 sends a month, then from $49 a month. It bills by contacts stored: 100,000 contacts is $399 a month, however much you send.
+
+**Strengths:** a focused, well-designed automation builder that non-developers enjoy using.
+
+**Weaknesses:** closed source and hosted only, limited transactional API, no SMTP relay, no inbound, and contact-based pricing grows with your list, not your sending.
+
+**Best for:** marketing-led SaaS teams that want a polished lifecycle tool and will pair it with a separate transactional provider. Full comparison: [Reloop vs Loops](/blog/reloop-vs-loops). See also [Loops alternative](/alternatives/loops).
+
+---
+
+## 4. Resend: best hosted developer API
+
+[Resend](https://resend.com) is a hosted email API with a clean SDK, React Email and Broadcasts for audiences.
+
+**Pricing:** free for 3,000 a month (100 a day), $20 for 50k, $90 for 100k, then $0.90 per 1,000.
+
+**Strengths:** excellent developer experience and docs, a large ecosystem.
+
+**Weaknesses:** closed source and hosted only, limited automations, inbound is a webhook per message.
+
+**Best for:** developer teams that want a polished hosted API and don't need open source. Full comparison: [Reloop vs Resend](/blog/reloop-vs-resend). See also [Resend alternative](/alternatives/resend).
+
+---
+
+## 5. Listmonk: best self-hosted newsletters
+
+[Listmonk](https://listmonk.app) is a newsletter and mailing list manager under AGPLv3: a single Go binary plus Postgres that sends through any SMTP server you provide.
+
+**Pricing:** free and self-hosted only; you pay for the server and your SMTP provider.
+
+**Strengths:** very fast and light, SQL segmentation, a mature campaign UI, and no AWS requirement.
+
+**Weaknesses:** doesn't send mail itself, no drip sequences or inbound.
+
+**Best for:** self-hosted newsletters. Pair it with an SMTP backend such as Reloop. Full comparison: [Reloop vs Listmonk](/blog/reloop-vs-listmonk).
+
+---
+
+## 6. Amazon SES: cheapest raw pipe
+
+[Amazon SES](https://aws.amazon.com/ses/) is what Plunk sends through. Using it directly removes the platform layer and its fee.
+
+**Pricing:** $200 in AWS credits for the first 6 months, then $0.10 per 1,000 plus $0.12 per GB outbound.
+
+**Strengths:** the lowest per-email price, and Amazon manages reputation.
+
+**Weaknesses:** no contacts, campaigns, automations or inbox UI. You build the product Plunk gave you.
+
+**Best for:** AWS teams with engineers to spare. Full comparison: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses). See also [Amazon SES alternative](/alternatives/aws-ses).
+
+---
+
+## How to choose
+
+- **"Plunk's bill grows with our volume."** Reloop. $10 for 50k and $20 for 100k.
+- **"We want to self-host without AWS."** Reloop, or Listmonk for newsletters only.
+- **"We need agents or support to reply to inbound mail."** Reloop, with stored mailboxes, MCP and IMAP.
+- **"We send millions of transactional emails on SES."** useSend.
+- **"Marketing wants a polished hosted automation tool."** Loops, with a separate transactional provider.
+- **"Our lawyers avoid AGPL."** Reloop (Apache 2.0), or the hosted options.
+
+---
+
+## Switching from Plunk
+
+1. **Add your domain** in the new provider and publish its DKIM record. Merge its SPF include into your existing record rather than adding a second one.
+2. **Swap the send call.** Plunk's `POST /v1/send` maps to Reloop's `reloop.mail.send`.
+3. **Swap event tracking.** Plunk's `POST /v1/track` with `event` and `email` becomes `reloop.automations.start({ event, email })`, called from your server.
+4. **Rebuild automations** in Reloop with the same triggers, delays and conditions.
+5. **Move templates.** Plunk's `{{ firstName }}` becomes `{{{firstName}}}` in Reloop.
+6. **Export contacts and suppressions** and import them, so you don't email anyone who bounced or unsubscribed.
+7. **Ramp traffic** over one to two weeks, then remove the old DNS records.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What's the best open-source alternative to Plunk?">
+    Reloop covers the same scope (transactional, campaigns, automations and
+    inbound) under Apache 2.0 and runs its own mail server, so self-hosting
+    needs no AWS. useSend is another open-source option, also built on SES.
+  </Accordion>
+
+  <Accordion title="Is Reloop cheaper than Plunk?">
+    At steady volume, yes. Plunk is $1 per 1,000 emails, about $50 at 50k and
+    $100 at 100k. Reloop is $10 and $20. At very low or spiky volume, Plunk's
+    pay-per-email model with a spend cap can cost less.
+  </Accordion>
+
+  <Accordion title="Can I self-host a Plunk alternative without AWS SES?">
+    Yes. Reloop sends through its own MTA (KumoMTA), and Listmonk can use any
+    SMTP server. useSend, like Plunk, requires Amazon SES.
+  </Accordion>
+
+  <Accordion title="Which Plunk alternative handles inbound email best?">
+    Reloop stores inbound mail in threaded mailboxes you can read and reply
+    to over the API, MCP or IMAP. Plunk routes inbound mail with rules; the
+    other options here either forward it as a webhook or don't receive mail.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Open source email that scales without the per-email bill"
+  description="6,000 emails a month free without branding, $10 for 50,000. Transactional, campaigns, automations and inboxes in one Apache 2.0 platform."
+  href="/dashboard/signup"
+  label="Get started"
+/>

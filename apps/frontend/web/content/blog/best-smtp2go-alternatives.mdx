@@ -1,0 +1,287 @@
+---
+title: "Best SMTP2GO Alternatives in 2026: SMTP Relays Compared"
+description: "The best SMTP2GO alternatives of 2026 compared: Reloop, Mailgun, Postmark, SendGrid, Amazon SES, ZeptoMail and Elastic Email as SMTP relays for WordPress, apps and devices, on price, ports, dedicated IPs and inbound."
+keywords:
+  - SMTP2GO alternatives
+  - SMTP2GO alternative
+  - SMTP2GO competitors
+  - open source SMTP2GO alternative
+  - best SMTP relay service
+  - WordPress SMTP relay
+publishedAt: 2026-10-25
+category: Comparison
+tags: [smtp2go, smtp, alternatives, comparison, pricing]
+readTime: 10 min read
+image: /blog/images/best-smtp2go-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-smtp2go
+  - reloop-vs-mailgun
+  - reloop-vs-sendgrid
+---
+
+**The short version:** every provider here works as an SMTP relay for WordPress, a CRM, a NAS or a legacy app. The differences are price and what comes with the relay. **Reloop** is $20 for 100,000 emails with a dedicated IP, against $75 on SMTP2GO, and adds an API, inboxes and campaigns. **Amazon SES** and **ZeptoMail** are cheaper per email if you only need the relay. **Postmark** is the pick when transactional deliverability is all that matters.
+
+We build Reloop, so weigh our entry accordingly. Every price below comes from the provider's own pricing page, and each section says where that provider beats us.
+
+---
+
+## Why teams look for an SMTP2GO alternative
+
+SMTP2GO is a focused, well-run relay with phone support and a long list of fallback ports. Teams usually move for one of these reasons:
+
+- **Price at volume.** Starter is $10 for 10,000 with $1 per extra 1,000; Professional is $75 for 100,000 ([SMTP2GO pricing](https://www.smtp2go.com/pricing/)).
+- **A small free tier.** 1,000 emails a month.
+- **Relay only.** Inbound mail isn't a focus, and there are no campaigns or automations.
+- **Hosted only.** You can't run it yourself.
+
+If your devices sit on networks that block port 587, SMTP2GO's alternate ports (2525, 8025, 80, 443) are a real reason to stay. Check that first.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall** | Reloop | $20 for 100k with a dedicated IP, plus API, inboxes and campaigns |
+| **Cheapest relay** | Amazon SES | $0.10 per 1,000, if you're comfortable with AWS |
+| **Cheapest hosted relay** | ZeptoMail | Prepaid credits, transactional only |
+| **Best deliverability focus** | Postmark | Transactional-first, separate message streams |
+| **Best developer veteran** | Mailgun | Mature SMTP and API, inbound routes |
+| **Best for enterprise** | SendGrid | Subusers, IP pools, Twilio contracts |
+| **Best budget with marketing tools** | Elastic Email | 3,000 free a month, newsletter designer |
+
+---
+
+## The comparison table
+
+| | SMTP2GO | Reloop | Amazon SES | ZeptoMail | Postmark | Mailgun | SendGrid | Elastic Email |
+|---|---|---|---|---|---|---|---|---|
+| **Free tier** | 1,000 / mo | 6,000 / mo (200 / day) | $200 AWS credits | First credit (10,000) | 100 / mo | 100 / day, trial | 60-day trial, 100 / day | 3,000 / mo (100 / day) |
+| **~50k / mo** | $50 (Starter + overage) | **$10** | ~$5 | ~$12.50 | $15 base + overage | $35 | $19.95 | $19 / $49 |
+| **~100k / mo** | $75 | **$20** | ~$10 | ~$25 | $15 base + overage | About $100 | $34.95 | Slider |
+| **Dedicated IP** | Professional ($75) | Included on Growth ($20) | $24.95 / mo | Paid add-on | $50 / mo, 300k+ | Paid add-on | Pro ($89.95) | $40–50 add-on |
+| **Inbound** | Not a focus | Mailboxes, API, MCP, IMAP | Receipt rules | No | Pro and up | Routes | Inbound Parse | Pro plan |
+| **Campaigns** | No | Yes + automations | No | Not allowed | Broadcast streams | Limited | Separate plan | Separate plans |
+| **Open source** | No | Yes (Apache 2.0) | No | No | No | No | No | No |
+
+Sources: [smtp2go.com/pricing](https://www.smtp2go.com/pricing/), [reloop.sh/pricing](/pricing), [aws.amazon.com/ses/pricing](https://aws.amazon.com/ses/pricing/), [zoho.com/zeptomail/pricing](https://www.zoho.com/zeptomail/pricing.html), [postmarkapp.com/pricing](https://postmarkapp.com/pricing), [mailgun.com/pricing](https://www.mailgun.com/pricing/), [sendgrid.com/pricing](https://sendgrid.com/pricing/), [elasticemail.com/email-api-pricing](https://elasticemail.com/email-api-pricing). SMTP2GO's 50k and Mailgun's 100k figures are worked out from published overage rates. ZeptoMail uses the widely listed $2.50 per credit, which varies by region.
+
+---
+
+## SMTP settings at a glance
+
+| | Host | Port | Username | Password |
+|---|---|---|---|---|
+| **SMTP2GO** | `mail.smtp2go.com` | 2525 (recommended), 25, 587, 8025, 80; SSL on 465, 8465, 443 | An SMTP user you create | That user's password |
+| **Reloop** | `smtp.reloop.sh` | 587 with STARTTLS | Your API key | The same API key |
+| **SendGrid** | `smtp.sendgrid.net` | 587 | `apikey` | Your API key |
+| **ZeptoMail** | `smtp.zeptomail.com` | See Zoho docs | `emailapikey` | Your send-mail token |
+
+For the others, the SMTP host and credentials are in each provider's dashboard. Amazon SES uses separate SMTP credentials generated in the SES console, not your AWS access keys.
+
+---
+
+## 1. Reloop: best overall SMTP2GO alternative
+
+Reloop is open-source email infrastructure: an SMTP relay and REST API, plus inbound mailboxes, contacts, campaigns, automations and signed webhooks.
+
+**Pricing:** Free is 6,000 emails a month (200 a day). Pro is $10 for 50,000. Growth is $20 for 100,000 and includes a dedicated IP. Extra mail costs $0.50 per 1,000. Or prepay credits at $0.50 per 1,000, valid for 6 months. Self-hosting is free under Apache 2.0.
+
+**Strengths**
+
+- **$20 vs $75 at 100,000 emails**, both with a dedicated IP.
+- **One credential for everything.** The same API key works for SMTP and the REST API.
+- **More than a relay.** Inbound mailboxes readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, plus campaigns and automations.
+- Webhooks signed with HMAC in the `Reloop-Signature` header.
+- Runs on Hetzner with EU data centers, or on your own server.
+
+**Weaknesses**
+
+- **One port.** Reloop's relay listens on 587 with STARTTLS. Devices on networks that block 587 can't fall back to 2525 or 80 the way they can on SMTP2GO.
+- **A 200-a-day cap on Free.** SMTP2GO's free 1,000 a month has no daily cap, which suits occasional bursts better.
+- No SMS and no phone support.
+
+**Best for:** apps and WordPress sites sending more than a few thousand emails a month, especially if you also want an API or inbound mail.
+
+Full breakdown: [Reloop vs SMTP2GO](/blog/reloop-vs-smtp2go).
+
+---
+
+## 2. Amazon SES: cheapest relay
+
+[Amazon SES](https://aws.amazon.com/ses/) offers an SMTP interface alongside its API.
+
+**Pricing:** $0.10 per 1,000 emails, plus $0.12 per GB of attachments. Dedicated IPs are $24.95 a month.
+
+**Strengths**
+
+- Lowest price per email here.
+- Scales to very high volume.
+
+**Weaknesses**
+
+- New accounts start in a sandbox and need production access approval.
+- No friendly dashboard; bounce and complaint handling is yours to wire up.
+
+**Best for:** AWS-comfortable teams sending at volume. Full comparison: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses) or our [SES alternatives page](/alternatives/aws-ses).
+
+---
+
+## 3. ZeptoMail: cheapest hosted relay
+
+[ZeptoMail](https://www.zoho.com/zeptomail/), now part of Zoho CPaaS, sells transactional email on prepaid credits with an SMTP relay at `smtp.zeptomail.com`.
+
+**Pricing:** one credit sends 10,000 emails, the first is free, and credits expire after 6 months. At the widely listed $2.50 per credit, that's about $12.50 for 50,000.
+
+**Strengths**
+
+- Very cheap, no monthly fee.
+- Webhooks, suppression list, SMTP and API.
+
+**Weaknesses**
+
+- Transactional only; newsletters aren't allowed.
+- No inbound mail. Credits expire.
+
+**Best for:** low-cost transactional relaying. Full comparison: [Reloop vs ZeptoMail](/blog/reloop-vs-zeptomail).
+
+---
+
+## 4. Postmark: best deliverability focus
+
+[Postmark](https://postmarkapp.com/) has been transactional-first for over a decade and separates traffic into message streams.
+
+**Pricing:** a free developer plan of 100 emails a month. Basic starts at $15 for 10,000 with $1.80 per extra 1,000. Inbound needs Pro or above. Dedicated IPs are $50 a month for senders above 300,000 a month.
+
+**Strengths**
+
+- Strong transactional reputation and excellent support.
+- Message streams keep bulk and transactional traffic apart.
+
+**Weaknesses**
+
+- The most expensive per email in this list once you pass the base tier.
+- Tiny free tier.
+
+**Best for:** teams where a late password reset costs real money. Full comparison: [Reloop vs Postmark](/blog/reloop-vs-postmark) or our [Postmark alternatives page](/alternatives/postmark).
+
+---
+
+## 5. Mailgun: best developer veteran
+
+[Mailgun](https://www.mailgun.com/) offers SMTP and a REST API with stored templates, inbound routes and email validation.
+
+**Pricing:** a 100-a-day trial. Basic is $15 for 10,000; Foundation is $35 for 50,000, with overage from $1.30 per 1,000. Dedicated IPs are a paid add-on.
+
+**Strengths**
+
+- Mature sending, webhooks and inbound routes.
+- Email validation as an add-on.
+
+**Weaknesses**
+
+- No permanent free tier.
+- About $100 at 100,000 emails.
+
+**Best for:** developer teams that want routing and validation. Full comparison: [Reloop vs Mailgun](/blog/reloop-vs-mailgun) or our [Mailgun alternatives page](/alternatives/mailgun).
+
+---
+
+## 6. SendGrid: best for enterprise
+
+[SendGrid](https://sendgrid.com/), part of Twilio, relays through `smtp.sendgrid.net` with the username `apikey`.
+
+**Pricing:** a 60-day trial at 100 a day. Essentials is $19.95 for 50,000 and $34.95 for 100,000. Pro, with a dedicated IP, subusers and SSO, starts at $89.95.
+
+**Strengths**
+
+- Proven at very high volume, with IP pools and subusers.
+- Enterprise procurement through Twilio.
+
+**Weaknesses**
+
+- No permanent free plan.
+- The dedicated IP needs Pro at $89.95.
+
+**Best for:** large organisations with procurement requirements. Full comparison: [Reloop vs SendGrid](/blog/reloop-vs-sendgrid) or our [SendGrid alternatives page](/alternatives/sendgrid).
+
+---
+
+## 7. Elastic Email: best budget with marketing tools
+
+[Elastic Email](https://elasticemail.com/) sells an Email API with SMTP and a separate Email Marketing app.
+
+**Pricing:** free for 3,000 emails a month (100 a day). Starter is $19 and Pro is $49 for 50,000. A dedicated IP is a $40 or $50 add-on.
+
+**Strengths**
+
+- Generous free tier.
+- A drag-and-drop newsletter designer on its marketing plans.
+
+**Weaknesses**
+
+- Webhooks and inbound need Pro.
+- Logs kept for 3 to 7 days.
+
+**Best for:** budget senders who also want newsletters. Full comparison: [Reloop vs Elastic Email](/blog/reloop-vs-elastic-email).
+
+---
+
+## How to choose
+
+- **"Our devices can't reach port 587."** Stay on SMTP2GO; its alternate ports matter.
+- **"We send 50k+ a month and want a dedicated IP."** Reloop: $20 for 100,000 with the IP included.
+- **"We want the lowest price and only relay transactional mail."** ZeptoMail or Amazon SES.
+- **"Every password reset must land fast."** Postmark.
+- **"We want to receive and reply to mail too."** Reloop's mailboxes.
+
+---
+
+## Switching from SMTP2GO
+
+1. **Verify your domain** with the new provider. Merge its SPF include into your existing record (never publish two SPF records) and add its DKIM record. See our [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide).
+2. **Export bounces and unsubscribes** and import them, so you keep suppressing the same addresses.
+3. **Change the SMTP settings** in WordPress, your app or your device. On Reloop: host `smtp.reloop.sh`, port 587, TLS or STARTTLS (not "SSL"), and your API key as both username and password.
+4. **Send a test** from each system that relays mail; it's easy to forget a printer or a cron job.
+5. **Move webhooks** and remove SMTP2GO's DNS records once traffic has moved.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the cheapest SMTP2GO alternative?">
+    Amazon SES at $0.10 per 1,000 emails, if you're comfortable with AWS.
+    For a hosted relay with a dashboard, ZeptoMail at about $2.50 per 10,000,
+    or Reloop at $20 for 100,000 with a dedicated IP.
+  </Accordion>
+
+  <Accordion title="Is there an open-source SMTP2GO alternative?">
+    Yes. Reloop is open source under Apache 2.0, with an SMTP relay, API and
+    inbound mailboxes. Use it hosted or run it on your own server.
+  </Accordion>
+
+  <Accordion title="Which SMTP relay works best with WordPress?">
+    All of them work with plugins like WP Mail SMTP, FluentSMTP and Post SMTP.
+    Pick on price and deliverability. On Reloop, use `smtp.reloop.sh`, port
+    587 with TLS, and your API key as username and password.
+  </Accordion>
+
+  <Accordion title="Which alternative supports port 2525?">
+    SMTP2GO is the one known for alternate ports like 2525, 8025 and 80.
+    Reloop's relay uses port 587 with STARTTLS. If your network blocks 587,
+    check each provider's docs for supported ports before you switch.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="An SMTP relay and email API in one. $20 for 100,000 emails with a dedicated IP, open source, and hosted on European infrastructure."
+  href="/dashboard/signup"
+  label="Get started"
+/>

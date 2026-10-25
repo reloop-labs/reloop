@@ -1,0 +1,253 @@
+---
+title: "Best Listmonk Alternatives in 2026: Self-Hosted and Hosted Newsletter Tools"
+description: "The best Listmonk alternatives of 2026 compared: Reloop, Mautic, Keila, Sendy, Plunk, Mailchimp and Brevo on licensing, self-hosting, sending, automations, pricing and what each needs to run."
+keywords:
+  - Listmonk alternatives
+  - Listmonk alternative
+  - Listmonk competitors
+  - open source Listmonk alternative
+  - self-hosted newsletter
+  - open source newsletter tool
+publishedAt: 2026-10-25
+category: Comparison
+tags: [listmonk, alternatives, comparison, open-source, self-hosting]
+readTime: 11 min read
+image: /blog/images/best-listmonk-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-listmonk
+  - best-mailchimp-alternatives
+  - self-hosted-email-infrastructure
+---
+
+**The short version:** Listmonk is an excellent open-source newsletter manager, but it only manages lists and campaigns. It needs an SMTP provider to deliver mail, and it doesn't ship automations. **Reloop** is the open-source alternative that includes the sending infrastructure, event-triggered automations, transactional email and inboxes. **Mautic** is the pick for full marketing automation on your own servers, and **Keila** is a lighter open-source newsletter tool with a hosted EU option.
+
+We build Reloop, so weigh our pick accordingly. Every competitor fact below comes from the project's own site or repository, linked in each section, and each section says where that tool beats us.
+
+---
+
+## Why teams look for a Listmonk alternative
+
+Listmonk does its job very well: a single Go binary plus Postgres, lists with double opt-in, SQL segmentation, a visual editor, and campaigns to millions of subscribers in tens of megabytes of RAM. Teams look elsewhere when they need more than newsletters:
+
+- **It doesn't send mail itself.** Every message goes to an SMTP server you provide, such as Amazon SES or Postmark, so you run and pay for two systems.
+- **No automations.** No drip sequences or event-triggered workflows; teams glue its API to tools like n8n.
+- **Not a transactional platform.** It has a transactional API, but no inbound mail, inboxes or reply handling.
+- **No hosted version.** You always run it yourself.
+- **AGPLv3.** Fine for most uses, but some legal teams prefer permissive licenses.
+
+If you only need newsletters and already have a sending provider, Listmonk is hard to beat. Otherwise, here are the options.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Listmonk alternative** | Reloop | Includes the MTA, automations, transactional and inboxes; Apache 2.0 |
+| **Best open-source marketing automation** | Mautic | Campaigns, segments, forms and landing pages |
+| **Best lightweight open-source newsletter** | Keila | Simple editor, hosted EU option |
+| **Best one-time-fee self-hosted** | Sendy | $69 license, sends through Amazon SES |
+| **Best pay-per-email open source** | Plunk | Hosted at $0.001 per email, or self-host |
+| **Best for marketer-run newsletters** | Mailchimp | Polished editor and integrations |
+| **Best all-in-one marketing suite** | Brevo | Email, SMS, WhatsApp and CRM |
+
+---
+
+## The comparison table
+
+| | Listmonk | Reloop | Mautic | Keila | Sendy | Plunk | Mailchimp | Brevo |
+|---|---|---|---|---|---|---|---|---|
+| **License** | AGPLv3 | Apache 2.0 | GPL-3.0 | AGPL-3.0 | Commercial | AGPL-3.0 | Proprietary | Proprietary |
+| **Hosted option** | No | Yes | No | Yes (EU) | No | Yes | Yes | Yes |
+| **Sends mail itself** | No, needs SMTP | **Yes (own MTA)** | No, needs SMTP | Yes, or bring your own | Via Amazon SES | Via Amazon SES | Yes | Yes |
+| **Automations** | No | Yes, event-triggered | Yes | No | Autoresponders | Workflows | Customer journeys | Standard plan and up |
+| **Transactional API** | Yes | Yes | No | No | No | Yes | Separate product | Yes |
+| **Inbound email** | No | Mailboxes, API, MCP, IMAP | No | No | No | Routing rules | No | Webhook |
+| **Price** | Free + SMTP + server | Free 6k / mo; $10 for 50k; or free self-hosted | Free + SMTP + server | From €8 / mo hosted | $69 one-time + SES | $0.001 / email | Free 250 contacts; from $13 | Free 300 / day; from $9 |
+
+Sources: [github.com/knadh/listmonk](https://github.com/knadh/listmonk), [github.com/mautic/mautic](https://github.com/mautic/mautic), [github.com/pentacent/keila](https://github.com/pentacent/keila), [keila.io/pricing](https://www.keila.io/pricing), [sendy.co](https://sendy.co/), [useplunk.com](https://www.useplunk.com/), [mailchimp.com/pricing](https://mailchimp.com/pricing/), [brevo.com/pricing](https://www.brevo.com/pricing/), [reloop.sh/pricing](/pricing).
+
+---
+
+## 1. Reloop: best overall Listmonk alternative
+
+Reloop is open-source email infrastructure: a transactional API, SMTP relay, inbound mailboxes, contacts, campaigns, automations and webhooks in one product. Self-host it, or use Reloop Cloud, which runs on Hetzner, a German hosting company, with EU data centers.
+
+**Pricing:** self-hosting is free under Apache 2.0; you pay for the server (the [VPS guide](/docs/self-host/vps) lists a minimum of 2 vCPUs and 4 GB of RAM). Reloop Cloud is Free for 6,000 emails a month (200 a day), Pro $10 for 50,000, and Growth $20 for 100,000 with a dedicated IP.
+
+**Strengths**
+
+- **No separate SMTP provider.** Reloop runs its own MTA (KumoMTA) with per-domain throttling and automatic pauses when bounce or complaint rates spike, and handles bounces and suppression internally.
+- **Event-triggered automations built in.** Track `user.signed_up` from your app with `reloop.automations.start` and run delays, conditions and email steps.
+- **Campaigns plus transactional mail** with one suppression list: contacts with custom properties, groups, subscription channels and scheduled broadcasts.
+- **Inbound mailboxes** readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP.
+- Permissive Apache 2.0 license, and a hosted option if you stop wanting to run servers.
+
+**Weaknesses**
+
+- Heavier than Listmonk. A single Go binary and Postgres will always be smaller than a full mail platform.
+- Segmentation uses properties and groups, not raw SQL. If your team thinks in SQL, Listmonk's approach is more flexible.
+- Self-hosting means you own IP reputation, warm-up and uptime.
+
+**Best for:** teams that want newsletters, product email and automations from one open-source stack, without a separate sending provider.
+
+Full comparison: [Reloop vs Listmonk](/blog/reloop-vs-listmonk). You can also keep Listmonk and send through Reloop: add `smtp.reloop.sh` on port 587 (STARTTLS) as an SMTP server, with your API key as username and password.
+
+---
+
+## 2. Mautic: best open-source marketing automation
+
+[Mautic](https://github.com/mautic/mautic) is an open-source marketing automation platform written in PHP and licensed under GPL-3.0. It covers campaign automation, segmentation, forms and landing pages.
+
+**Pricing:** free to self-host. You pay for the server and for an SMTP provider, because Mautic needs an external SMTP server or relay (such as Amazon SES, Mailgun or Reloop) to send mail.
+
+**Strengths:** the closest open-source match to a full marketing automation platform, with no per-contact fees.
+
+**Weaknesses:** you run and maintain a PHP application plus a separate sending provider. No transactional API or inbound mailboxes. Much heavier than Listmonk.
+
+**Best for:** marketing teams that want automation, forms and landing pages on their own servers and have ops time to run it.
+
+---
+
+## 3. Keila: best lightweight open-source newsletter
+
+[Keila](https://github.com/pentacent/keila) describes itself as "an open source alternative to newsletter tools like Mailchimp or Sendinblue". It's AGPL-3.0, written in Elixir, and ships as a Docker image.
+
+**Pricing:** free to self-host. Keila Cloud has no free plan: €8 a month for 2,000 emails, €64 for 50,000 and €128 for 100,000, with unlimited contacts. The company says it's "Made in Germany. Hosted in the EU."
+
+**Strengths:** a WYSIWYG campaign editor and sign-up forms, plus a hosted option, which Listmonk doesn't have. Senders include SMTP, Amazon SES, SendGrid, Mailgun and Postmark.
+
+**Weaknesses:** newsletter-only, like Listmonk: no automations, transactional API or inbound. The hosted plans cost more per email than Reloop Cloud.
+
+**Best for:** small teams that want Listmonk's simplicity with the option of a hosted EU service.
+
+---
+
+## 4. Sendy: best one-time-fee self-hosted
+
+[Sendy](https://sendy.co/) is a self-hosted newsletter app that sends through Amazon SES. It runs on standard PHP and MySQL or MariaDB hosting.
+
+**Pricing:** a $69 one-time license, with an optional $79 installation service. Updates are free until the next major version. Sending is billed by Amazon SES at its normal rates.
+
+**Strengths:** pay once and send at SES prices; autoresponders for drip sequences, which Listmonk doesn't have; runs on cheap shared hosting.
+
+**Weaknesses:** not open source. Tied to Amazon SES, so you also manage the SES sandbox, bounces and complaints. No transactional API or inbound.
+
+**Best for:** cost-focused senders comfortable with AWS who want autoresponders.
+
+---
+
+## 5. Plunk: best pay-per-email open source
+
+[Plunk](https://www.useplunk.com/) is an open-source email platform (AGPL-3.0) with a transactional API, campaigns, workflows, segments and inbound routing rules.
+
+**Pricing:** hosted, 1,000 emails a month free (with Plunk branding), then $0.001 per email with no base fee. Self-hosting needs Docker, PostgreSQL, Redis and an AWS SES account.
+
+**Strengths:** workflows and a transactional API on top of campaigns; simple per-email pricing.
+
+**Weaknesses:** sends through Amazon SES, so self-hosting means managing an AWS account and leaving the SES sandbox. About $50 at 50k emails on the hosted plan, vs $10 on Reloop.
+
+**Best for:** small SaaS teams that want open source with simple usage-based hosting.
+
+Full comparison: [Reloop vs Plunk](/blog/reloop-vs-plunk).
+
+---
+
+## 6. Mailchimp: best for marketer-run newsletters
+
+[Mailchimp](https://mailchimp.com/) offers a polished drag-and-drop editor, a large template library, landing pages, sign-up forms, customer journeys and a long list of integrations.
+
+**Pricing:** free for 250 contacts and 500 sends a month. Essentials starts at $13 a month for 500 contacts, with sends capped at 10× your contacts.
+
+**Strengths:** very approachable for non-technical marketers, with a large integration ecosystem.
+
+**Weaknesses:** priced by contacts, so large lists get expensive fast, which is often why people move to Listmonk in the first place. Transactional email is a separate product. Hosted only.
+
+**Best for:** marketing teams who'd rather not run servers at all.
+
+Full comparison: [Reloop vs Mailchimp](/blog/reloop-vs-mailchimp) · [Mailchimp alternative page](/alternatives/mailchimp)
+
+---
+
+## 7. Brevo: best all-in-one marketing suite
+
+[Brevo](https://www.brevo.com/) (formerly Sendinblue) is a marketing suite from Paris: email, SMS, WhatsApp, live chat and a sales CRM in one account. It charges for emails sent rather than contacts stored.
+
+**Pricing:** free for 300 emails a day. Starter begins at $9 for 5,000 emails. Standard, which adds automations, starts at $18.
+
+**Strengths:** more channels than any other tool here, with a mature editor and A/B testing.
+
+**Weaknesses:** automations need Standard; gets expensive at higher volumes; hosted only.
+
+**Best for:** marketing-led teams that want one bill for email, SMS and CRM.
+
+Full comparison: [Reloop vs Brevo](/blog/reloop-vs-brevo).
+
+---
+
+## How to choose
+
+- **"We want to stay open source and self-hosted, but need automations."** Reloop for automations plus sending in one stack, Mautic for heavy marketing automation.
+- **"We want to stop running a separate SMTP provider."** Reloop includes its own MTA.
+- **"We just want a simpler newsletter tool with hosting."** Keila.
+- **"We want to pay once and send at SES prices."** Sendy.
+- **"We never want to run servers again."** Reloop Cloud, Mailchimp or Brevo.
+- **"Listmonk is fine, but our SMTP provider isn't."** Keep Listmonk and point it at Reloop's SMTP relay.
+
+<Callout type="tip">
+  Moving off Listmonk doesn't have to be all or nothing. Many teams keep Listmonk for the newsletter and move only the sending layer, or keep both tools and send product email and automations from Reloop while marketing stays in Listmonk.
+</Callout>
+
+---
+
+## Switching from Listmonk
+
+1. **Export subscribers** from Listmonk, including their status, so unsubscribed and blocklisted addresses stay that way.
+2. **Import contacts** into the new tool and map lists to groups or subscription channels.
+3. **Rebuild templates.** Listmonk uses Go templates; on Reloop, change placeholders to triple braces like `{{{first_name}}}`.
+4. **Verify your sending domain.** Publish the new DKIM record and merge the SPF include into your existing record; never publish a second SPF record.
+5. **Recreate automations** that you'd glued together externally, using event-triggered automations.
+6. **Send a small campaign first**, watch bounce and complaint rates, then move the full list.
+
+The [Reloop vs Listmonk](/blog/reloop-vs-listmonk) post covers running the two side by side.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the best open-source alternative to Listmonk?">
+    It depends on what's missing. Reloop adds sending, automations,
+    transactional email and inboxes under Apache 2.0. Mautic adds full
+    marketing automation. Keila is a similarly simple newsletter tool with a
+    hosted option.
+  </Accordion>
+
+  <Accordion title="Does any Listmonk alternative send mail without a separate SMTP provider?">
+    Yes. Reloop runs its own MTA, so it delivers mail itself whether you
+    self-host or use Reloop Cloud. Keila Cloud can also send for you on its
+    hosted plans.
+  </Accordion>
+
+  <Accordion title="Can I keep Listmonk and use Reloop for sending?">
+    Yes. Add `smtp.reloop.sh` on port 587 with STARTTLS as an SMTP server in
+    Listmonk, using your Reloop API key as both username and password.
+  </Accordion>
+
+  <Accordion title="Is there a hosted version of Listmonk?">
+    Listmonk itself has no official hosted service. If you want hosting,
+    Keila Cloud, Plunk, Reloop Cloud, Mailchimp and Brevo all offer one.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="Open source under Apache 2.0, with its own MTA, automations and inboxes. Self-host it, or start free on Reloop Cloud."
+  href="/dashboard/signup"
+  label="Get started"
+/>

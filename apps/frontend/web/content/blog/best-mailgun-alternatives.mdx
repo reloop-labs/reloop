@@ -1,0 +1,269 @@
+---
+title: "Best Mailgun Alternatives in 2026: Lower Prices and a Real Free Tier"
+description: "The best Mailgun alternatives in 2026 compared: Reloop, Resend, Postmark, Amazon SES, SendGrid, MailerSend, SMTP2GO and Elastic Email on price at 50k and 100k emails, free tiers, inbound routing, overage and migration."
+keywords:
+  - Mailgun alternatives
+  - Mailgun alternative
+  - Mailgun competitors
+  - open source Mailgun alternative
+  - cheaper than Mailgun
+  - Mailgun replacement
+publishedAt: 2026-10-25
+category: Comparison
+tags: [mailgun, alternatives, comparison, pricing]
+readTime: 12 min read
+image: /blog/images/best-mailgun-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-mailgun
+  - best-transactional-email-apis-2026
+  - email-provider-comparison-2026
+---
+
+**The short version:** if you're leaving Mailgun because of price, **Reloop** is the closest like-for-like replacement: the same REST and SMTP sending, stored templates, webhooks and inbound mail, for **$10 at 50,000 emails instead of $35**, with a permanent free tier and open source. **Postmark** is the pick for pure transactional deliverability, and **Amazon SES** is the cheapest pipe if you'll build the tooling yourself.
+
+We build Reloop, so weigh that. Every price below comes from the providers' public pricing pages, linked in our head-to-head posts, and each section says where that provider beats us.
+
+---
+
+## Why teams leave Mailgun
+
+Mailgun, now part of Sinch, still does the basics well. People usually leave for the same handful of reasons:
+
+- **No real free tier.** The free option is a trial at 100 emails a day.
+- **Small entry plan.** Basic is $15 for only 10,000 emails. 50,000 needs Foundation at $35.
+- **Expensive overage.** Extra mail costs from $1.30 per 1,000 ($1.80 on Basic), so 100,000 a month lands around $100.
+- **Paid extras.** Dedicated IPs and email validation are add-ons.
+- **Marketing lives elsewhere.** Campaigns are a separate Sinch product.
+- **Hosted only.** No source and no self-hosting.
+
+If Mailgun's routes, log search and validation are central to your stack, it may still be worth the price. Otherwise, here are the alternatives.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Mailgun alternative** | Reloop | $10 for 50k, inbound mailboxes, campaigns, open source |
+| **Best hosted developer experience** | Resend | Clean JSON API, React Email |
+| **Best for transactional deliverability** | Postmark | Transactional-first, message streams |
+| **Cheapest raw sending** | Amazon SES | $0.10 per 1,000, if you build the rest |
+| **Best for enterprise contracts** | SendGrid | Twilio procurement, subusers, IP pools |
+| **Best for a visual builder** | MailerSend | Drag-and-drop editor |
+| **Best SMTP relay** | SMTP2GO | Many fallback ports, simple setup |
+| **Best for low-cost bulk** | Elastic Email | 3,000 free a month, volume slider for millions |
+
+---
+
+## The comparison table
+
+| | Mailgun | Reloop | Resend | Postmark | Amazon SES | SendGrid | SMTP2GO |
+|---|---|---|---|---|---|---|---|
+| **Free tier** | 100 / day trial | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | 100 / mo | $200 AWS credits, 6 months | 60-day trial, 100 / day | 1,000 / mo |
+| **~50,000 / mo** | $35 | **$10** | $20 | $87 (Basic + overage) | ~$5 | $19.95 | $50 (Starter + overage) |
+| **~100,000 / mo** | About $100 | **$20** | $90 | $177 (Basic + overage) | ~$10 | $34.95 | $75 |
+| **Overage per 1k** | From $1.30 | **$0.50** | $0.90 | $1.80 (Basic), $1.30 (Pro) | $0.10 | Plan upgrade | $1 / $0.85 |
+| **Dedicated IP** | Paid add-on | Included on Growth ($20) | Scale plan and up | $50 / mo, from 300k / mo | $24.95 / mo | Pro, from $89.95 | Included on Professional ($75) |
+| **Inbound** | Routes (match and forward) | Mailboxes + threads, API, MCP, IMAP | Webhook | Webhook (Pro and up) | Receipt rules | Inbound Parse webhook | Not a focus |
+| **Open source / self-host** | No | Yes | No | No | No | No | No |
+
+MailerSend and Elastic Email are covered in their own sections. Mailgun's 100k figure is $35 plus 50,000 overage at $1.30 per 1,000; SMTP2GO's 50k figure is Starter plus overage at $1 per 1,000. Both are worked out from published rates, not listed tiers.
+
+---
+
+## 1. Reloop: best overall Mailgun alternative
+
+Reloop is open-source email infrastructure: a transactional API, SMTP relay, inbound mailboxes, contacts, campaigns, automations and webhooks in one product, hosted or on your own server.
+
+**Pricing:** Free is 6,000 emails a month (200 a day) with no end date. Pro is $10 for 50,000. Growth is $20 for 100,000 and includes a dedicated IP. Extra mail costs $0.50 per 1,000. Or prepay credits at $0.50 per 1,000, valid for 6 months. Self-hosting is free under Apache 2.0.
+
+**Why it fits Mailgun users**
+
+- **A fraction of the price.** $10 vs $35 at 50k, and $20 vs about $100 at 100k. Overage is $0.50 per 1,000 instead of $1.30 or more.
+- **Inbound that goes further than routes.** Mailgun matches and forwards messages. Reloop stores them in threaded mailboxes, scores spam, and lets you read and reply over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, with an `email.received` webhook when you want push.
+- **A JSON API with readable errors.** No `multipart/form-data` and no domain argument: Reloop reads the domain from `from`, returns errors as values with `message`, `why` and `fix`, and supports `Idempotency-Key` for safe retries.
+- **Campaigns and automations on the same plan**, sharing one suppression list with your transactional mail.
+- **Open source and self-hostable.** Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers.
+
+**Where Mailgun is still ahead**
+
+- **Template logic.** Mailgun templates use Handlebars. Reloop substitutes variables like `{{{first_name}}}`; logic stays in your code.
+- **Years of history.** More Stack Overflow answers, client libraries and edge cases already solved.
+
+**Best for:** teams that want Mailgun's sending surface at a much lower price, plus real inboxes.
+
+Full breakdown: [Reloop vs Mailgun](/blog/reloop-vs-mailgun) · [Mailgun alternative overview](/alternatives/mailgun) · [Feature comparison](/compare/mailgun)
+
+---
+
+## 2. Resend: best hosted developer experience
+
+**Pricing:** Free is 3,000 a month (100 a day). Pro is $20 for 50,000. 100,000 costs $90. Overage is $0.90 per 1,000.
+
+**Strengths:** excellent docs, a JSON API with a small SDK, first-class React Email, and Broadcasts for simple marketing.
+
+**Weaknesses:** at 100k it costs about as much as Mailgun, dedicated IPs start on the Scale plan, inbound is a webhook per message, and it's hosted only.
+
+**Best for:** small teams that want the most polished API and will stay under 50k emails a month.
+
+Full breakdown: [Reloop vs Resend](/blog/reloop-vs-resend)
+
+---
+
+## 3. Postmark: best for transactional deliverability
+
+**Pricing:** a free developer plan of 100 emails a month. Basic is $15 for 10,000 with $1.80 per 1,000 overage; Pro and Platform lower that to $1.30 and $1.20. Inbound needs Pro or above. Dedicated IPs are $50 a month per IP above 300,000 emails a month.
+
+**Strengths:** a long transactional-only track record, message streams that keep bulk mail away from password resets, and excellent support.
+
+**Weaknesses:** priced like Mailgun or higher once you pass 10,000, a tiny free tier, and hosted only.
+
+**Best for:** teams leaving Mailgun for reliability, not price.
+
+Full breakdown: [Reloop vs Postmark](/blog/reloop-vs-postmark)
+
+---
+
+## 4. Amazon SES: cheapest raw sending
+
+**Pricing:** $0.10 per 1,000 emails plus $0.12 per GB of outbound data. Receiving costs $0.10 per 1,000. Dedicated IPs are $24.95 a month. New AWS accounts get up to $200 in Free Tier credits for six months.
+
+**Strengths:** the lowest list price by far, deep AWS integration, and huge scale.
+
+**Weaknesses:** a sandbox to escape, and no logs dashboard, templates editor, bounce processing or inbound mailboxes unless you build them. Inbound is receipt rules into S3 or Lambda, a step down from Mailgun's routes.
+
+**Best for:** AWS-native teams with engineering time.
+
+<Callout type="tip">
+  Reloop can route outbound mail through SES (or any SMTP provider) while you keep Reloop's API, logs, templates and suppression list.
+</Callout>
+
+Full breakdown: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses)
+
+---
+
+## 5. SendGrid: best for enterprise contracts
+
+**Pricing:** a 60-day trial at 100 emails a day. Essentials is $19.95 for 50,000 and $34.95 for 100,000. Pro, with a dedicated IP, subusers and SSO, starts at $89.95. Marketing Campaigns is a separate plan.
+
+**Strengths:** proven at huge volume, Twilio procurement, subusers and IP pools, and Handlebars logic in templates.
+
+**Weaknesses:** no permanent free plan, separate plans for marketing, an older API, and hosted only.
+
+**Best for:** larger companies that need enterprise paperwork more than a low price.
+
+Full breakdown: [Reloop vs SendGrid](/blog/reloop-vs-sendgrid)
+
+---
+
+## 6. MailerSend: best for a visual builder
+
+**Pricing:** free for 500 emails a month. Hobby is $7 for 5,000. Starter is $35 for 50,000 and $68 for 100,000, with $1.30 per 1,000 overage. Professional, which unlocks the dedicated IP add-on, is $110 for 50k.
+
+**Strengths:** a drag-and-drop builder, SMS in the US and Canada, and inbound forwarding.
+
+**Weaknesses:** the same $35 at 50k as Mailgun, a small free tier, and marketing in a separate product (MailerLite).
+
+**Best for:** teams where non-developers edit the templates.
+
+Full breakdown: [Reloop vs MailerSend](/blog/reloop-vs-mailersend)
+
+---
+
+## 7. SMTP2GO: best SMTP relay
+
+**Pricing:** free for 1,000 emails a month. Starter is $10 for 10,000 ($1 per extra 1,000). Professional is $75 for 100,000 ($0.85 per extra 1,000) and includes a dedicated IP.
+
+**Strengths:** a long list of fallback ports (2525, 8025, 80 and more) that get devices sending through restrictive networks, simple setup, and SMS.
+
+**Weaknesses:** inbound isn't a focus, there are no campaigns or automations, and it's hosted only.
+
+**Best for:** teams that mostly use Mailgun as an SMTP relay for apps, WordPress or devices.
+
+Full breakdown: [Reloop vs SMTP2GO](/blog/reloop-vs-smtp2go)
+
+---
+
+## 8. Elastic Email: best for low-cost bulk
+
+**Pricing:** the Email API's free plan is 3,000 emails a month (100 a day). Starter is $19 and Pro is $49, both for 50,000. Above that, a volume slider runs up to 10 million a month. Dedicated IPs are a $40 or $50 add-on.
+
+**Strengths:** a permanent 3,000-a-month free tier, and a slider that may come out cheap per email in the millions.
+
+**Weaknesses:** inbound and webhooks are on Pro only, logs are kept for 3 to 7 days, and marketing is a separate plan.
+
+**Best for:** high-volume senders who only need to send.
+
+Full breakdown: [Reloop vs Elastic Email](/blog/reloop-vs-elastic-email)
+
+---
+
+## How to choose
+
+- **"We want the same features for much less."** Reloop: $10 at 50k and $0.50 per 1,000 overage.
+- **"We rely on inbound routes."** Reloop if you want stored, threaded mailboxes; stay on Mailgun if pattern-based forwarding is all you need.
+- **"Deliverability is everything."** Postmark.
+- **"We're on AWS and price per email is all that matters."** Amazon SES, or SES behind Reloop.
+- **"We just need a dependable SMTP relay."** SMTP2GO or Reloop.
+- **"We need to self-host or audit the code."** Reloop, the only open-source option here.
+
+---
+
+## Migrating off Mailgun
+
+1. **Verify your domain** with the new provider. For Reloop, publish the `reloop._domainkey` DKIM record and merge `include:reloop.sh` into your existing SPF record. Never publish a second SPF record.
+2. **Export suppressions** (bounces, unsubscribes, complaints) from Mailgun and import them.
+3. **Swap the client.** Replace `mg.messages.create(domain, {...})` with a JSON send. In Reloop that's `reloop.mail.send`, with the domain taken from `from`.
+4. **Move templates.** Handlebars `{{first_name}}` becomes `{{{first_name}}}` in Reloop, and values are passed as template variables instead of `h:X-Mailgun-Variables`.
+5. **Replace routes.** If you forward inbound mail, point MX records at the new provider and read from its mailboxes or inbound webhook.
+6. **Point webhooks** at a new handler. Reloop events like `email.delivered` and `email.bounced` are signed in the `Reloop-Signature` header.
+7. **Ramp traffic** from 10% to 100% over one to two weeks.
+
+The [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same steps in detail, including a traffic-split flag and a suppression import script that work just as well from Mailgun.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the cheapest Mailgun alternative?">
+    For a complete platform, Reloop: $10 for 50,000 emails against Mailgun's
+    $35, and $20 for 100,000 against about $100. For raw sending only, Amazon
+    SES at $0.10 per 1,000, if you build the tooling yourself.
+  </Accordion>
+
+  <Accordion title="Is there a free Mailgun alternative?">
+    Reloop gives 6,000 emails a month (200 a day) with no end date. Resend and
+    Elastic Email each give 3,000 a month (100 a day), and SMTP2GO gives 1,000
+    a month. Mailgun's own free option
+    is a trial. Self-hosted Reloop has no per-email fee.
+  </Accordion>
+
+  <Accordion title="Is there an open-source Mailgun alternative?">
+    Reloop is open source under Apache 2.0, with its own MTA (KumoMTA). Use the
+    hosted service or run the same code on your own server.
+  </Accordion>
+
+  <Accordion title="Which alternative replaces Mailgun's inbound routes?">
+    Reloop receives mail into stored, threaded mailboxes you can read and reply
+    to over the API, MCP or IMAP, and also sends an `email.received` webhook.
+    Resend, Postmark (Pro and up) and SendGrid post inbound mail to a webhook.
+  </Accordion>
+
+  <Accordion title="Do I lose email validation if I leave Mailgun?">
+    Mailgun's validation is a paid add-on. Reloop includes email validation, so
+    you can keep checking addresses before you send.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Pay $10 for 50,000 emails, not $35"
+  description="Same REST and SMTP sending, plus inbound mailboxes, campaigns and automations. 6,000 emails a month free."
+  href="/dashboard/signup"
+  label="Get started"
+/>

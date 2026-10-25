@@ -1,0 +1,286 @@
+---
+title: "Best Customer.io Alternatives in 2026: Lifecycle Email Without the Profile Bill"
+description: "The best Customer.io alternatives of 2026 compared: Reloop, Loops, Brevo, Mailchimp, Mautic, Plunk and Mailjet on pricing, journeys and automations, transactional email, channels and self-hosting."
+keywords:
+  - Customer.io alternatives
+  - Customer.io alternative
+  - Customer.io competitors
+  - open source Customer.io alternative
+  - cheaper Customer.io alternative
+  - lifecycle email automation
+publishedAt: 2026-10-25
+category: Comparison
+tags: [customer-io, alternatives, comparison, lifecycle, automation]
+readTime: 11 min read
+image: /blog/images/best-customer-io-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-customer-io
+  - best-loops-alternatives
+  - email-reduce-churn-sequences
+---
+
+**The short version:** if you use Customer.io mostly for email, **Reloop** gives you event-triggered automations, transactional email, SMTP and inbound mailboxes at $20 for 100,000 emails, with no charge per profile. **Loops** is the focused, marketer-friendly option for SaaS lifecycle email. **Brevo** keeps SMS in the mix on a much smaller budget. **Mautic** is the open-source pick if you want a full marketing automation suite you run yourself.
+
+We build Reloop, so factor that in. Every price below comes from each provider's public pricing page or repository, and each section says plainly where that provider beats us.
+
+---
+
+## Why teams look for a Customer.io alternative
+
+Customer.io is a strong product. Its Journeys builder, cross-channel messaging and segmentation are hard to match, and if you use all of that, stay. Teams usually leave for one of these reasons:
+
+1. **Price.** Essentials starts at **$100 a month** for 5,000 profiles, then $0.009 per extra profile. By our math from list price that's about $505 a month at 50,000 profiles, and Premium starts at $1,000 a month billed annually.
+2. **You only use email.** Push, in-app and SMS are what you pay for. If your journeys are all email steps, most of the platform sits unused.
+3. **No free plan.** There isn't one on the pricing page, which makes it a big first step for an early-stage product.
+4. **No SMTP relay or inbound mailboxes**, and no way to self-host.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Customer.io alternative for email** | Reloop | Automations + transactional + SMTP + inboxes, $20 for 100k, open source |
+| **Best focused SaaS lifecycle tool** | Loops | Marketer-friendly lifecycle email, simple product |
+| **Best with SMS on a smaller budget** | Brevo | Email, SMS, WhatsApp and CRM, priced by emails |
+| **Best open-source marketing automation suite** | Mautic | Campaigns, segments, forms and landing pages, GPL-3.0 |
+| **Best for marketer-run newsletters** | Mailchimp | Editor, templates and integrations |
+| **Best pay-per-email open source** | Plunk | Workflows, $1 per 1,000 emails, AGPL |
+| **Best large free tier** | Mailjet | 6,000 emails a month free |
+
+---
+
+## The comparison table
+
+| | Reloop | Customer.io | Loops | Brevo | Mautic | Mailchimp | Plunk | Mailjet |
+|---|---|---|---|---|---|---|---|---|
+| **Priced by** | Emails | Profiles | Contacts | Emails | Free (self-hosted) | Contacts | Emails | Emails |
+| **Free tier** | 6,000 / mo (200 / day) | None listed | 1,000 contacts, 4,000 sends | 300 / day | Self-host free | 250 contacts, 500 sends | 1,000 / mo, branded | 6,000 / mo (200 / day) |
+| **Entry paid plan** | **$10** (50k emails) | $100 (5k profiles) | $49 | From $9 (5k emails) | Your server + SMTP | $13 (500 contacts) | $0.001 per email | From $9 |
+| **Automations** | Event-triggered | Journeys | Loops | Standard and up | Campaigns | Customer journeys | Workflows | Premium plan |
+| **Channels** | Email | Email, push, in-app, SMS | Email | Email, SMS, WhatsApp | Multi-channel | Email | Email | Email |
+| **Transactional API** | Yes | Yes | Limited | Yes | No | Separate product | Yes | Yes |
+| **SMTP relay** | Yes | No | No | Yes | Needs external SMTP | Limited | Yes | Yes |
+| **Inbound email** | Mailboxes, API, MCP, IMAP | No | No | Webhook | No | No | Routing rules | Parse API |
+| **Open source** | Yes (Apache 2.0) | No | No | No | Yes (GPL-3.0) | No | Yes (AGPL-3.0) | No |
+
+Sources: [customer.io/pricing](https://customer.io/pricing), [loops.so/pricing](https://loops.so/pricing), [brevo.com/pricing](https://www.brevo.com/pricing/), [github.com/mautic/mautic](https://github.com/mautic/mautic), [mailchimp.com/pricing](https://mailchimp.com/pricing/), [useplunk.com/pricing](https://www.useplunk.com/pricing), [mailjet.com/pricing](https://www.mailjet.com/pricing/), [reloop.sh/pricing](/pricing).
+
+---
+
+## 1. Reloop: best Customer.io alternative for email
+
+Reloop is open-source email infrastructure: event-triggered automations, broadcast campaigns, contacts, a transactional API, SMTP relay and inbound mailboxes in one product. Use it hosted (Reloop Cloud runs on Hetzner with EU data centers) or run the same code on your own server.
+
+**Pricing:** Free is 6,000 emails a month (200 a day), with no charge for contacts. Pro is $10 for 50,000 emails. Growth is $20 for 100,000 and includes a dedicated IP. Extra mail costs $0.50 per 1,000. Or skip the subscription and buy pay-as-you-go credits at $0.50 per 1,000, valid for 6 months. Self-hosting is free under Apache 2.0.
+
+Automations work the way Customer.io's event-triggered campaigns do. Your app reports an event, and every automation listening for it starts for that contact, with delays, conditions and email steps:
+
+```typescript
+const { automationError } = await reloop.automations.start({
+  event: "trial.ending",
+  email: user.email,
+  properties: { plan: user.plan, daysLeft: 3 },
+});
+```
+
+**Strengths**
+
+- **No per-profile pricing**: $20 for 100,000 emails vs about $505 a month at 50,000 profiles on Customer.io Essentials.
+- Transactional email, SMTP, campaigns and automations on one domain setup and one suppression list.
+- **Inbound as real mailboxes**, readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP.
+- Open source and self-hostable with a [one-command installer](/self-host).
+
+**Weaknesses**
+
+- **Email only.** No push, in-app or SMS steps.
+- Segmentation uses groups and contact properties, which is simpler than Customer.io's segments across people, objects and events.
+- No A/B testing for campaigns yet.
+
+**Best for:** product teams whose lifecycle program is email, who want transactional and lifecycle mail in one place at a fraction of the price. Full comparison: [Reloop vs Customer.io](/blog/reloop-vs-customer-io).
+
+---
+
+## 2. Loops: best focused SaaS lifecycle tool
+
+[Loops](https://loops.so/) is a polished lifecycle email tool for SaaS companies, built around a visual, marketing-first workflow.
+
+**Pricing:** free for 1,000 contacts and 4,000 sends a month. Paid plans start at $49 a month and scale with contacts; 100,000 contacts is $399 a month.
+
+**Strengths**
+
+- Simple and pleasant for marketers, with much less setup than Customer.io.
+- Far cheaper than Customer.io at small and mid-sized lists.
+
+**Weaknesses**
+
+- Still priced by contacts, so large lists get expensive.
+- Limited transactional support, no SMTP relay and no inbound email.
+
+**Best for:** SaaS teams who want lifecycle email without Customer.io's complexity. Full comparison: [Reloop vs Loops](/blog/reloop-vs-loops), and our roundup of [Loops alternatives](/blog/best-loops-alternatives).
+
+---
+
+## 3. Brevo: best with SMS on a smaller budget
+
+[Brevo](https://www.brevo.com/) is a marketing suite from Paris with email, SMS, WhatsApp, a CRM and live chat.
+
+**Pricing:** free for 300 emails a day. Starter begins at $9 for 5,000 emails, and Standard, which adds automations, starts at $18. Larger volumes are priced on a slider.
+
+**Strengths**
+
+- Keeps SMS and WhatsApp in your lifecycle program for much less than Customer.io.
+- Priced by emails, not profiles.
+- A mature visual builder for non-technical teams.
+
+**Weaknesses**
+
+- Segmentation and journey depth are below Customer.io's.
+- Automations need Standard or above. No self-hosting.
+
+**Best for:** teams that still need SMS but not Customer.io's price. Full comparison: [Reloop vs Brevo](/blog/reloop-vs-brevo).
+
+---
+
+## 4. Mautic: best open-source marketing automation suite
+
+[Mautic](https://github.com/mautic/mautic) is an open-source marketing automation platform written in PHP and licensed under GPL-3.0. It covers campaign automation, segmentation, forms and landing pages, and you can download and self-host it for free.
+
+**Pricing:** free to self-host. You pay for the server and for an SMTP provider, because Mautic needs an external SMTP server or relay (such as Amazon SES, Mailgun or Reloop) to send mail.
+
+**Strengths**
+
+- The closest open-source match to a full marketing automation platform: campaigns, segments, forms and landing pages.
+- No per-profile fees at any list size.
+
+**Weaknesses**
+
+- You run and maintain a PHP application, plus a separate sending provider.
+- No transactional API or inbound mailboxes of its own.
+
+**Best for:** teams that want Customer.io-style marketing automation on their own servers and have the ops time to run it. Pair it with Reloop's [SMTP relay](/docs) if you want the sending side handled.
+
+---
+
+## 5. Mailchimp: best for marketer-run newsletters
+
+[Mailchimp](https://mailchimp.com/) offers a polished drag-and-drop editor, a large template library, landing pages, sign-up forms, customer journeys and a long list of integrations.
+
+**Pricing:** free for 250 contacts and 500 sends a month. Essentials starts at $13 a month for 500 contacts, with sends capped at 10× your contacts.
+
+**Strengths**
+
+- Very approachable for non-technical marketers.
+- A large integration ecosystem for e-commerce and CRMs.
+
+**Weaknesses**
+
+- Priced by contacts, like Customer.io.
+- Transactional email is a separate product (Mailchimp Transactional, formerly Mandrill).
+
+**Best for:** marketing teams sending newsletters to a modest list. Full comparison: [Reloop vs Mailchimp](/blog/reloop-vs-mailchimp).
+
+---
+
+## 6. Plunk: best pay-per-email open source
+
+[Plunk](https://www.useplunk.com/) is an open-source email platform (AGPL-3.0) with transactional sending, campaigns and workflows with triggers, delays and conditions.
+
+**Pricing:** free for 1,000 emails a month with Plunk branding, then $0.001 per email with no base fee and a monthly spend cap. That's about $50 at 50,000 emails by our math.
+
+**Strengths**
+
+- Event-driven workflows without contact or profile fees.
+- Self-hostable.
+
+**Weaknesses**
+
+- Costs more than flat plans above about 10,000 emails a month.
+- Self-hosting needs an AWS SES account.
+
+**Best for:** early products with low or unpredictable volume. Full comparison: [Reloop vs Plunk](/blog/reloop-vs-plunk).
+
+---
+
+## 7. Mailjet: best large free tier
+
+[Mailjet](https://www.mailjet.com/), owned by Sinch, combines a strong visual editor with transactional sending.
+
+**Pricing:** free for 6,000 emails a month (200 a day). At 50,000 a month it's $40 on Essential or $59 on Premium; 100,000 on Premium is $112.
+
+**Strengths:** a large free tier (tied with Reloop's), and a strong drag-and-drop editor.
+
+**Weaknesses:** automations are on Premium only, and inbound is a parse webhook.
+
+**Best for:** teams that want a visual editor and room to grow on the free plan. Full comparison: [Reloop vs Mailjet](/blog/reloop-vs-mailjet).
+
+---
+
+## How to choose
+
+Answer these in order and stop at the first "yes":
+
+1. **Do your journeys rely on push, in-app or deep cross-object segmentation?** → Stay on Customer.io.
+2. **Do you need SMS but want to spend less?** → Brevo.
+3. **Do you want a full marketing automation suite on your own servers?** → Mautic, with an SMTP provider behind it.
+4. **Is your lifecycle program email-only, and do you also send transactional mail?** → Reloop.
+5. **Do you need inbound mail, reply handling or AI-agent inboxes?** → Reloop.
+6. **Do marketers run email and want a simpler tool?** → Loops or Mailchimp.
+
+<Callout type="tip">
+  Before you migrate, list the journeys you actually run and the channels each one uses. If every step is an email, you're paying Customer.io for channels you don't use.
+</Callout>
+
+---
+
+## Switching from Customer.io
+
+1. **Inventory your journeys**: triggers, delays, branches and the attributes they read.
+2. **Verify your sending domain** with the new provider and merge its include into your existing SPF record.
+3. **Export people and unsubscribes**, then import them. Keep unsubscribed people unsubscribed.
+4. **Convert templates** from Liquid to the new syntax. On Reloop, variables use triple braces: `{{{first_name}}}`.
+5. **Rebuild each journey** as an automation with the same events, delays and conditions. On Reloop, replace `track` calls with `reloop.automations.start`.
+6. **Run both in parallel** for a week or two, then turn Customer.io's journeys off.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the cheapest Customer.io alternative?">
+    For email-only lifecycle programs, a tool priced by emails sent. Reloop
+    is $10 for 50,000 emails and $20 for 100,000 with no profile charges.
+    Self-hosted Mautic has no license fee at all, but you pay for a server
+    and a sending provider.
+  </Accordion>
+
+  <Accordion title="Is there an open-source alternative to Customer.io?">
+    Yes. Mautic is an open-source marketing automation suite (GPL-3.0).
+    Reloop (Apache 2.0) and Plunk (AGPL-3.0) are open-source email
+    platforms with event-triggered automations and transactional sending.
+  </Accordion>
+
+  <Accordion title="Which alternative supports push and SMS like Customer.io?">
+    Brevo covers SMS and WhatsApp. None of the other options here match
+    Customer.io's push and in-app messaging, so if you rely on those, it may
+    be worth staying.
+  </Accordion>
+
+  <Accordion title="Can I keep my event tracking when I switch?">
+    Mostly. Your app keeps sending the same events; you change where they
+    go. On Reloop, each event name becomes an automation trigger, and event
+    properties can drive conditions in the automation.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="Event-triggered automations, transactional email and inbound mailboxes. 6,000 emails a month free, no per-profile pricing."
+  href="/dashboard/signup"
+  label="Get started"
+/>

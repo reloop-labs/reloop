@@ -1,0 +1,280 @@
+---
+title: "Best Resend Alternatives in 2026: Cheaper, Open-Source and Self-Hosted Options"
+description: "The best Resend alternatives in 2026 compared: Reloop, useSend, Postmark, Amazon SES, SendGrid, Mailgun, MailerSend and Cloudflare Email Service on price at 50k and 100k emails, inbound, self-hosting and developer experience."
+keywords:
+  - Resend alternatives
+  - Resend alternative
+  - Resend competitors
+  - open source Resend alternative
+  - self-hosted Resend alternative
+  - cheaper Resend alternative
+  - Resend pricing
+publishedAt: 2026-10-25
+category: Comparison
+tags: [resend, alternatives, comparison, pricing, open-source]
+readTime: 11 min read
+image: /blog/images/best-resend-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-resend
+  - reloop-vs-usesend
+  - best-transactional-email-apis-2026
+---
+
+**The short version:** if you like Resend's API but want it cheaper, with real inboxes and the option to self-host, **Reloop** is the closest match: same API shape, $10 for 50k emails instead of $20, and open source. If you want open source on top of Amazon SES, look at **useSend**. If transactional deliverability is all you care about, **Postmark**. If you want the cheapest raw pipe and you're on AWS, **Amazon SES**.
+
+Resend set the bar for a modern email API, and plenty of teams are happy on it. The reasons people look elsewhere are usually the same few:
+
+- **Price at volume.** The free tier is generous (3,000 a month), but the next steps are $20 for 50k and $90 for 100k, with $0.90 per extra 1,000.
+- **Hosted only.** There's no way to run Resend yourself, for data residency, security review or cost.
+- **Inbound is a webhook.** Resend can receive mail and post each message to your webhook, but storage, threading and replies are yours to build.
+- **Dedicated IPs** start on the Scale plan.
+
+We build Reloop, so weigh this accordingly. Every price below comes from our researched head-to-head posts and each provider's public pricing page, and each section says where that alternative beats us.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Resend alternative** | Reloop | Same API shape, $10 for 50k, inboxes, open source |
+| **Best open source on Amazon SES** | useSend | Resend-style API, AGPL, per-email pricing |
+| **Best for transactional deliverability** | Postmark | A decade of transactional-only focus |
+| **Cheapest raw sending pipe** | Amazon SES | $0.10 per 1,000, if you build the rest |
+| **Best for enterprise procurement** | SendGrid | Twilio contracts, subusers, mature compliance |
+| **Best for routing and validation** | Mailgun | Inbound routes, email validation |
+| **Best no-code builder** | MailerSend | Drag-and-drop editor, SMS, split testing |
+| **Best for apps on Workers** | Cloudflare Email Service | One binding, $0.35 per 1,000 |
+
+---
+
+## The comparison table
+
+| | Resend | Reloop | useSend | Postmark | Amazon SES | SendGrid | Mailgun | MailerSend |
+|---|---|---|---|---|---|---|---|---|
+| **Free tier** | 3,000 / mo (100 / day) | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | 100 / mo | $200 credits, 6 months | 60-day trial, 100 / day | 100 / day, trial | 500 / mo |
+| **~50,000 / mo** | $20 | **$10** | $20 | $87 | ~$5 | $19.95 | $35 | $35 |
+| **~100,000 / mo** | $90 | **$20** | $40 | $177 | ~$10 | $34.95 | ~$100 | $68 |
+| **Inbound** | Webhook | Mailboxes, API, MCP, IMAP | Roadmap | Webhook | Receipt rules | Parse webhook | Routes | Forwarding |
+| **Campaigns** | Broadcasts | Yes + automations | Yes | Broadcast streams | No | Separate plans | Limited | Via MailerLite |
+| **Open source** | No | Yes (Apache 2.0) | Yes (AGPL) | No | No | No | No | No |
+| **Self-host** | No | Yes | Yes (needs SES) | No | No | No | No | No |
+
+Postmark figures are Basic list price plus overage; Mailgun at 100k is $35 plus overage at $1.30; useSend is our math from its per-email rates. Cloudflare Email Service is covered in its own section, since it bills through Workers Paid.
+
+---
+
+## 1. Reloop: best overall Resend alternative
+
+[Reloop](/) is open-source email infrastructure: a transactional API, SMTP relay, inbound mailboxes, contacts, campaigns, automations and webhooks. Its API follows the same shape as Resend's on purpose, so switching is mostly a client swap.
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+**Pricing:** Free for 6,000 emails a month (200 a day), double Resend's free tier. Pro is $10 for 50,000, Growth is $20 for 100,000 with a dedicated IP, and extra mail is $0.50 per 1,000. Or skip the subscription and buy pay-as-you-go credits at $0.50 per 1,000, valid for 6 months. Self-hosting has no per-email fee.
+
+**Strengths**
+
+- **Half Resend's price at 50k and under a quarter at 100k.** Over a year at 100k a month, that's $840 saved.
+- **Inbound mail into real inboxes.** Messages are stored, threaded, spam-scored and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, so AI agents and support teams can reply in-thread.
+- **Transactional, campaigns and event automations** in one product with one suppression list.
+- **Open source (Apache 2.0)** and self-hostable with a [one-command installer](/self-host). Reloop Cloud runs on Hetzner, a German hosting company, with EU data centers.
+- **Dedicated IP on the $20 plan**, where Resend needs Scale.
+- **Errors that explain themselves**, with `why` and `fix` fields.
+
+**Weaknesses**
+
+- Smaller ecosystem of community examples than Resend.
+- Hosted inboxes are capped by plan (3 on Free, 5 on Pro, 10 on Growth); self-hosted is unlimited.
+
+**Best for:** teams past 50k emails a month, anyone building AI agents that handle email, and teams that want open source or self-hosting. Full comparison: [Reloop vs Resend](/blog/reloop-vs-resend). See also [Resend alternative](/alternatives/resend) and [compare Reloop and Resend](/compare/resend).
+
+---
+
+## 2. useSend: best open source on Amazon SES
+
+[useSend](https://usesend.com) (formerly Unsend) is an open-source Resend alternative under AGPL-3.0. It wraps Amazon SES with a clean API, dashboard, contacts and campaigns, and offers a hosted cloud.
+
+**Pricing:** Free for 3,000 a month (100 a day). Paid is usage-based with a $10 monthly minimum: $0.0004 per transactional email and $0.001 per marketing email.
+
+**Strengths**
+
+- Resend-style API and SDK, open source.
+- At millions of transactional emails a month, $0.40 per 1,000 is hard to beat on a hosted plan.
+- Self-hosting lets Amazon handle IP reputation.
+
+**Weaknesses**
+
+- Inbound email is on the roadmap, not shipped.
+- Self-hosting needs an AWS account, SES sandbox approval, SNS callbacks and GitHub OAuth.
+- Still marked beta.
+
+**Best for:** teams already on AWS that want an open-source, SES-backed Resend. Full comparison: [Reloop vs useSend](/blog/reloop-vs-usesend).
+
+---
+
+## 3. Postmark: best for transactional deliverability
+
+[Postmark](https://postmarkapp.com) has focused on transactional email for over a decade, with separate message streams so marketing mail never affects password resets.
+
+**Pricing:** a developer plan with 100 emails a month. Basic is $15 for 10,000, then $1.80 per 1,000 ($87 at 50k, $177 at 100k at list price). Pro and Platform lower overage to $1.30 and $1.20.
+
+**Strengths:** strong deliverability reputation, message streams, excellent docs and support.
+
+**Weaknesses:** the most expensive option here per email, a tiny free tier, no contacts or automations, and hosted only.
+
+**Best for:** teams where transactional inbox placement is the only priority and budget isn't. Full comparison: [Reloop vs Postmark](/blog/reloop-vs-postmark).
+
+---
+
+## 4. Amazon SES: cheapest raw sending pipe
+
+[Amazon SES](https://aws.amazon.com/ses/) is a sending pipe at $0.10 per 1,000 emails. Resend itself sends through SES.
+
+**Pricing:** $200 in AWS Free Tier credits for the first 6 months, then $0.10 per 1,000 plus $0.12 per GB of outbound data. About $10 for 100k.
+
+**Strengths:** the lowest per-email price, IAM, SNS and Lambda integration.
+
+**Weaknesses:** you build the product around it: sandbox exit, bounce and complaint handling through SNS, suppression, templates, logs and inbound.
+
+**Best for:** AWS-native teams with engineering time to build what Resend gave them. Full comparison: [Reloop vs Amazon SES](/blog/reloop-vs-aws-ses).
+
+---
+
+## 5. SendGrid: best for enterprise procurement
+
+[SendGrid](https://sendgrid.com), part of Twilio, is the incumbent for large organizations.
+
+**Pricing:** a 60-day trial at 100 a day. Essentials is $19.95 for 50k and $34.95 for 100k; Pro, with dedicated IPs, subusers and SSO, starts at $89.95.
+
+**Strengths:** enterprise compliance, subuser management, full Handlebars logic in templates.
+
+**Weaknesses:** no lasting free tier, marketing on separate plans, inbound is a parse webhook.
+
+**Best for:** companies already inside Twilio that need procurement checkboxes. Full comparison: [Reloop vs SendGrid](/blog/reloop-vs-sendgrid).
+
+---
+
+## 6. Mailgun: best for routing and validation
+
+[Mailgun](https://www.mailgun.com) is one of the original developer email APIs, with inbound routes, webhooks and email validation.
+
+**Pricing:** a trial at 100 a day. Basic is $15 for 10,000; Foundation is $35 for 50,000, with overage from $1.30 per 1,000.
+
+**Strengths:** regex inbound routes, detailed logs, validation built in.
+
+**Weaknesses:** no real free tier, validation is an add-on, marketing sits in a separate product.
+
+**Best for:** teams that need inbound routing rules and validation from one vendor. Full comparison: [Reloop vs Mailgun](/blog/reloop-vs-mailgun).
+
+---
+
+## 7. MailerSend: best no-code builder
+
+[MailerSend](https://www.mailersend.com) is a developer API with the most complete no-code side here.
+
+**Pricing:** free for 500 emails a month. Hobby is $7 for 5,000; Starter is $35 for 50k and $68 for 100k.
+
+**Strengths:** drag-and-drop builder, SMS, email verification and split testing.
+
+**Weaknesses:** small free tier, inbound is forwarded rather than stored, and each forward counts toward your quota.
+
+**Best for:** teams where non-developers edit emails. Full comparison: [Reloop vs MailerSend](/blog/reloop-vs-mailersend).
+
+---
+
+## 8. Cloudflare Email Service: best for apps on Workers
+
+[Cloudflare Email Service](https://developers.cloudflare.com/email-service/) adds sending to Cloudflare's Email Routing. From a Worker it's one binding and one `send()` call.
+
+**Pricing:** sending to any recipient needs Workers Paid ($5 a month minimum), which includes 3,000 emails, then $0.35 per 1,000. About $21 at 50k and $39 at 100k.
+
+**Strengths:** cheap at high volume, one `send()` call from a Worker, and unlimited inbound through Email Routing.
+
+**Weaknesses:** sending is in public beta, your domain must use Cloudflare DNS, and it's transactional only with no templates, contacts or campaigns.
+
+**Best for:** apps that live entirely on Workers and send only transactional mail. Full comparison: [Reloop vs Cloudflare Email Service](/blog/reloop-vs-cloudflare-email).
+
+---
+
+## How to choose
+
+- **"We like Resend's API but the bill is growing."** Reloop. Same shape, $10 at 50k and $20 at 100k.
+- **"We need open source."** Reloop (Apache 2.0, its own MTA) or useSend (AGPL, on SES).
+- **"We need agents or humans to read and reply to inbound mail."** Reloop, the only option here with stored mailboxes, MCP and IMAP.
+- **"Deliverability for receipts is everything."** Postmark.
+- **"We're on AWS and have engineers to spare."** Amazon SES.
+- **"Procurement needs a big vendor."** SendGrid.
+- **"Our app runs on Cloudflare Workers."** Cloudflare Email Service.
+
+---
+
+## Switching from Resend
+
+Most of the work is DNS, not code.
+
+1. **Add your domain** in the new provider and publish its DKIM record. Merge its SPF include into your existing SPF record; never publish a second one.
+2. **Swap the client.** For Reloop, replace `resend.emails.send` with `reloop.mail.send` and rename `replyTo` to `reply_to` and `scheduledAt` to `scheduled_at`.
+3. **Move templates.** React Email components keep working. Stored templates in Reloop use triple braces: `{{{first_name}}}`.
+4. **Import suppressions** so you don't email addresses that bounced or unsubscribed.
+5. **Point webhooks** at a new handler. Reloop's events (`email.delivered`, `email.bounced` and so on) are signed with HMAC-SHA256 in the `Reloop-Signature` header.
+6. **Ramp traffic** from 10% to 100% over one to two weeks, then remove Resend's DNS records.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the best open-source alternative to Resend?">
+    Reloop and useSend are both open source. Reloop is Apache 2.0 and runs its
+    own mail server, so self-hosting needs no AWS account, and it receives
+    mail into inboxes. useSend is AGPL and sends through Amazon SES, which
+    handles IP reputation for you but needs an AWS account and sandbox exit.
+  </Accordion>
+
+  <Accordion title="What is the cheapest Resend alternative?">
+    For raw sending, Amazon SES at $0.10 per 1,000. For a full platform,
+    Reloop at $10 for 50,000 and $20 for 100,000, compared with $20 and $90 on
+    Resend.
+  </Accordion>
+
+  <Accordion title="Can I self-host a Resend alternative?">
+    Yes. Reloop installs with one command on your own server and keeps the
+    same API, so you can start on Reloop Cloud and move later by changing the
+    SDK's `baseUrl`. useSend can also be self-hosted on top of Amazon SES.
+  </Accordion>
+
+  <Accordion title="Do React Email templates work with these alternatives?">
+    Any provider that accepts HTML works with React Email, since you can render
+    components to HTML. Reloop's SDK also accepts the component directly in a
+    `react` field.
+  </Accordion>
+
+  <Accordion title="Which Resend alternative is best for AI agents?">
+    Reloop. Agents get their own mailboxes, can read threads and reply over
+    the API, the MCP server or IMAP. See
+    [email infrastructure for AI agents](/blog/email-infrastructure-for-ai-agents).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try the Resend alternative built to grow with you"
+  description="6,000 emails a month free. $10 for 50,000. Same API shape as Resend, open source, with real inboxes."
+  href="/dashboard/signup"
+  label="Get started"
+/>

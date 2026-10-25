@@ -1,0 +1,289 @@
+---
+title: "Best Postal Alternatives in 2026: Self-Hosted Mail Servers and Email Platforms Compared"
+description: "The best Postal alternatives for self-hosted email: Reloop, KumoMTA, Haraka, Plunk, useSend, Listmonk and mailcow, compared on what each one actually does, licenses, requirements, inbound mail and whether you still need Amazon SES."
+keywords:
+  - Postal alternatives
+  - Postal alternative
+  - Postal competitors
+  - open source Postal alternative
+  - Postal mail server alternative
+  - self-hosted email server
+  - self-hosted SendGrid alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [postal, comparison, self-hosting, open-source, mta]
+readTime: 11 min read
+image: /blog/images/best-postal-alternatives.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-postal
+  - self-hosted-email-infrastructure
+  - self-host-email-5-dollars
+---
+
+**The short version:** if you want what Postal does (self-hosted sending with an HTTP API, SMTP and webhooks) **plus** templates, contacts, campaigns and real inboxes, pick **Reloop**. If you want a raw, high-volume MTA to build your own platform on, look at **KumoMTA** or **Haraka**. If you're happy for Amazon SES to do the actual sending, **Plunk** and **useSend** are lighter open-source platforms. **Listmonk** is the pick for newsletters only, and **mailcow** is for hosting people's mailboxes, not app email.
+
+We build Reloop, so factor that in. Each section says plainly where another option is the better choice.
+
+---
+
+## Why teams look for a Postal alternative
+
+[Postal](https://github.com/postalserver/postal) is a mature, MIT-licensed mail delivery platform with around 17k GitHub stars. It does sending well, and its IP pools with routing rules are excellent for isolating senders. Teams usually look elsewhere for one of these reasons (facts from [Postal's docs](https://docs.postalserver.io/)):
+
+- **It's only the delivery layer.** There are no stored templates, contacts, campaigns or automations, so you still bolt those on.
+- **Inbound mail is forwarded, not kept.** Postal sends incoming messages to an HTTP endpoint, an SMTP server or an address. There's no mailbox to thread, search or reply from.
+- **There's no hosted option.** If you want to start hosted and self-host later, or fall back to a managed service, Postal can't do that.
+- **The stack.** It's written in Ruby and requires MariaDB 10.6 or newer (MySQL isn't supported), which some teams would rather not operate.
+
+---
+
+## Top picks at a glance
+
+| Category | Pick | Why |
+|---|---|---|
+| **Best overall Postal alternative** | Reloop | Sending, templates, campaigns, automations and inboxes; hosted or self-hosted |
+| **Best raw high-volume MTA** | KumoMTA | Rust MTA built for high-volume sending, scripted in Lua |
+| **Best programmable SMTP server** | Haraka | Node.js SMTP server with a plugin for every stage |
+| **Best open-source platform on top of SES** | Plunk | Transactional, campaigns, workflows; SES does delivery |
+| **Best open-source Resend-style API on SES** | useSend | Developer API with a hosted tier; still in beta |
+| **Best for newsletters only** | Listmonk | Single Go binary, very light, needs an SMTP server |
+| **Best for hosting people's mailboxes** | mailcow | Full mail server and groupware suite |
+
+---
+
+## Three different kinds of "Postal alternative"
+
+Search results mix up tools that solve different problems. It helps to sort them first:
+
+1. **Email platforms** replace Postal and the tools around it: Reloop, Plunk, useSend.
+2. **MTAs and SMTP servers** replace Postal's delivery engine and leave the rest to you: KumoMTA, Haraka.
+3. **Adjacent tools** people consider by mistake: Listmonk (newsletters, needs an SMTP server like Postal or Reloop behind it) and mailcow (mailboxes for humans, not app email).
+
+---
+
+## The comparison table
+
+| | Reloop | Postal | KumoMTA | Haraka | Plunk | useSend | Listmonk | mailcow |
+|---|---|---|---|---|---|---|---|---|
+| **What it is** | Email platform | Mail delivery platform | MTA | SMTP server | Email platform | Email API | Newsletter manager | Mail server suite |
+| **License** | Apache 2.0 | MIT | Apache 2.0 | MIT | AGPL-3.0 | AGPL-3.0 | AGPLv3 | GPL-3.0 |
+| **Language** | TypeScript (Bun) | Ruby | Rust | Node.js | TypeScript | TypeScript | Go | Mixed (Postfix, Dovecot) |
+| **Sends mail itself** | Yes (KumoMTA) | Yes | Yes | Yes | No (Amazon SES) | No (Amazon SES) | No (external SMTP) | Yes (Postfix) |
+| **HTTP send API** | Yes | Yes | Injection API | No (plugins) | Yes | Yes | Template-based tx API | No |
+| **Hosted option** | Yes | No | No | No | Yes | Yes | No | No |
+| **Templates, contacts, campaigns** | Yes | No | No | No | Yes | Contacts and campaigns | Campaigns | No |
+| **Automations** | Event-triggered | No | No | No | Workflows | Not listed | No | No |
+| **Inbound** | Mailboxes, API, MCP, IMAP | Forward to HTTP, SMTP or address | Build it | Plugins | Routing rules | On the roadmap | No | Mailboxes (IMAP, webmail) |
+
+Sources: [Postal](https://github.com/postalserver/postal), [KumoMTA](https://github.com/KumoCorp/kumomta), [Haraka](https://github.com/haraka/Haraka), [Plunk](https://www.useplunk.com/pricing), [useSend](https://usesend.com), [Listmonk](https://listmonk.app/), [mailcow](https://github.com/mailcow/mailcow-dockerized), [Reloop](/pricing).
+
+---
+
+## 1. Reloop: best overall Postal alternative
+
+[Reloop](/self-host) is open-source email infrastructure under Apache 2.0. Like Postal it sends over an HTTP API and SMTP, signs mail with DKIM, fires signed webhooks and keeps a suppression list. On top of that it has stored templates (`{{{variables}}}`), contacts, campaigns, event-triggered automations, and inbound **mailboxes** your app, your agents or a person over IMAP can read and reply from. It delivers mail with KumoMTA, so there's no dependency on Amazon SES.
+
+```bash
+curl -fsSL https://reloop.sh/install.sh | sudo bash
+```
+
+**Pricing:** self-hosting is free, with no limits on emails, inboxes or domains. The [VPS guide](/docs/self-host/vps) lists a minimum of 2 vCPUs and 4 GB of RAM. If you'd rather not run servers, Reloop Cloud is Free (6,000 a month), Pro $10 for 50,000, and Growth $20 for 100,000 with a dedicated IP, hosted on Hetzner with EU data centers.
+
+**Strengths**
+
+- Replaces Postal **and** the template, contact, campaign and inbox tools you'd otherwise add.
+- Real inbound mailboxes with threads, an MCP server and IMAP, not just forwarding.
+- Same API hosted or self-hosted, so you can start on Reloop Cloud and move later by changing the SDK's `baseUrl`.
+- PostgreSQL instead of MariaDB.
+- Webhooks signed with HMAC-SHA256 in the `Reloop-Signature` header.
+
+**Weaknesses**
+
+- Postal's IP pools with per-sender routing rules are more flexible than Reloop's dedicated IPs, which matters if you run mail for many separate clients.
+- Reloop runs more services (API services, dashboard, KumoMTA, PostgreSQL, Redis, NATS), so it's heavier than Postal.
+- Self-hosting either one means owning IP reputation, warm-up and uptime.
+
+**Best for:** teams that want Postal's self-hosted sending plus everything they'd otherwise build around it. Full breakdown: [Reloop vs Postal](/blog/reloop-vs-postal).
+
+---
+
+## 2. KumoMTA: best raw high-volume MTA
+
+[KumoMTA](https://github.com/KumoCorp/kumomta) describes itself as "the first Open-Source high-performance MTA developed from the ground-up for high-volume email sending environments". It's written in Rust, licensed Apache 2.0, configured with Lua policy scripts, and accepts mail over SMTP or an HTTP injection API. It's also the MTA Reloop uses for delivery.
+
+**Strengths**
+
+- Built for very high volume, with fine-grained traffic shaping per destination.
+- Policy as code in Lua.
+- Apache 2.0.
+
+**Weaknesses**
+
+- It's only an MTA. No dashboard, no templates, no contacts, no inbound mailboxes, no suppression UI.
+- You write the policy and the tooling around it.
+
+**Best for:** email service providers and high-volume senders building their own platform. If you want KumoMTA with a product around it, that's what Reloop is.
+
+---
+
+## 3. Haraka: best programmable SMTP server
+
+[Haraka](https://github.com/haraka/Haraka) is "a fast, highly extensible, and event driven SMTP server" written in Node.js and licensed MIT. Every stage of an SMTP transaction (connect, helo, mail, rcpt, data) is a hook you can extend with a JavaScript plugin, and it works as both an inbound filter and an outbound delivery engine.
+
+**Strengths**
+
+- Extremely flexible: write a plugin for any routing, filtering or logging rule.
+- Lightweight, with a large plugin ecosystem.
+- MIT license.
+
+**Weaknesses**
+
+- No built-in web interface or HTTP send API.
+- Everything Postal gives you out of the box (credentials, webhooks, a dashboard) is yours to build.
+
+**Best for:** teams that need custom SMTP behavior, such as an inbound gateway or a filtering relay, and are comfortable writing Node.js plugins.
+
+---
+
+## 4. Plunk: best open-source platform on top of SES
+
+[Plunk](https://www.useplunk.com/) is an AGPL-3.0 email platform with a transactional API, SMTP, contacts, segments, campaigns, workflows and inbound routing rules. Self-hosted, it runs with Docker and sends through **your Amazon SES account**, so SES owns deliverability.
+
+**Pricing:** hosted, a free tier of 1,000 emails a month with Plunk branding, then $0.001 per email with no base fee. Self-hosting is free, but you pay AWS for SES sending.
+
+**Strengths**
+
+- Full platform: transactional, campaigns and workflows.
+- No IP warm-up when self-hosting, because SES does the sending.
+
+**Weaknesses**
+
+- Requires an AWS account, the SES sandbox review and SNS wiring.
+- Mail passes through SES even when the app is on your server.
+- AGPL-3.0.
+
+**Best for:** teams that want a self-hosted platform without running their own MTA. Full breakdown: [Reloop vs Plunk](/blog/reloop-vs-plunk).
+
+---
+
+## 5. useSend: best open-source Resend-style API on SES
+
+[useSend](https://usesend.com) (formerly Unsend) is an AGPL-3.0 Resend alternative with a developer-friendly API, SMTP, signed webhooks, contacts and campaigns. Like Plunk, it sends through Amazon SES.
+
+**Pricing:** hosted free tier of 3,000 a month (100 a day), then $0.40 per 1,000 transactional and $1.00 per 1,000 marketing emails, with a $10 monthly minimum.
+
+**Strengths**
+
+- Clean API in the style of Resend.
+- Hosted tier if you don't want to run it.
+
+**Weaknesses**
+
+- Still in beta, per its README.
+- Self-hosting needs AWS SES and SNS.
+- Inbound email is on the roadmap, not shipped.
+
+**Best for:** developers who want a lightweight open-source sending API and are fine with SES. Full breakdown: [Reloop vs useSend](/blog/reloop-vs-usesend).
+
+---
+
+## 6. Listmonk: best for newsletters only
+
+[Listmonk](https://listmonk.app/) is a self-hosted newsletter and mailing list manager: a single Go binary plus PostgreSQL, licensed AGPLv3. Its homepage cites a 7+ million email campaign with a peak RAM use of 57 MB. It doesn't send mail itself; it delivers over SMTP to a server you configure, which can be Postal or Reloop.
+
+**Strengths**
+
+- Very light and fast.
+- Mature campaign UI with SQL-based segmentation.
+
+**Weaknesses**
+
+- Not a Postal replacement on its own: it needs an SMTP server behind it.
+- No drip sequences or inbound mail.
+
+**Best for:** teams that only need newsletters. Pair it with Reloop's SMTP relay if you want a sender behind it. Full breakdown: [Reloop vs Listmonk](/blog/reloop-vs-listmonk).
+
+---
+
+## 7. mailcow: best for hosting people's mailboxes
+
+[mailcow: dockerized](https://github.com/mailcow/mailcow-dockerized) is a GPL-3.0 mail server and groupware suite that bundles Postfix, Dovecot, Rspamd, SOGo webmail and ClamAV in Docker.
+
+**Strengths**
+
+- Complete mail hosting for a team or organization: mailboxes, webmail, calendars and spam filtering.
+- Large community.
+
+**Weaknesses**
+
+- Built for people's mailboxes, not app email. There's no HTTP send API, templates, webhooks or campaign tooling.
+
+**Best for:** replacing Google Workspace or Microsoft 365 mailboxes, not replacing Postal. If you need both, run them on separate domains or subdomains.
+
+---
+
+## How to choose
+
+- **"We want Postal's sending plus templates, campaigns and inboxes."** Reloop.
+- **"We need per-client IP pools with routing rules."** Stay on Postal, or build on KumoMTA.
+- **"We're building our own ESP and need a raw MTA."** KumoMTA or Haraka.
+- **"We don't want to warm IPs or run an MTA."** Plunk or useSend on SES, or Reloop Cloud.
+- **"We only send newsletters."** Listmonk with an SMTP server behind it.
+- **"We need mailboxes for our staff."** mailcow.
+
+---
+
+## Switching from Postal
+
+1. **Stand up the new system** on a fresh server, or sign up for the hosted option.
+2. **Verify your sending domains.** Publish the new DKIM key and merge the new SPF include into your existing record (never publish a second SPF record).
+3. **Swap the client.** Postal's `POST /api/v1/messages/message` with the `X-Server-API-Key` header becomes the new provider's send call. On Reloop, that's `reloop.mail.send`. SMTP users only change host and credentials.
+4. **Move webhooks** to the new event names and verify signatures.
+5. **Import your suppression list** so you don't email addresses that bounced or complained.
+6. **Ramp traffic** over one to two weeks while watching bounce and complaint rates, then retire Postal.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What is the best open-source Postal alternative?">
+    For most teams, Reloop: it's Apache 2.0, sends with its own MTA like
+    Postal does, and adds templates, contacts, campaigns, automations and
+    inbound mailboxes. For a raw MTA, KumoMTA.
+  </Accordion>
+
+  <Accordion title="Is there a hosted version of Postal?">
+    No. Postal is self-host only. Reloop, Plunk and useSend each offer both a
+    hosted service and a self-hosted edition.
+  </Accordion>
+
+  <Accordion title="Do I need Amazon SES to self-host?">
+    Not with Reloop, Postal, KumoMTA or Haraka, which deliver mail
+    themselves. Plunk and useSend send through SES, so you need an AWS
+    account and production SES access.
+  </Accordion>
+
+  <Accordion title="Is mailcow a Postal alternative?">
+    Not really. mailcow hosts mailboxes for people (IMAP, webmail,
+    calendars). Postal and Reloop send email from applications.
+  </Accordion>
+
+  <Accordion title="How much server do I need?">
+    Postal's docs list 2 CPU cores, 4 GB of RAM and 25 GB of disk. Reloop's
+    docs list a minimum of 2 vCPUs and 4 GB of RAM. Listmonk is far lighter,
+    but it needs an SMTP server behind it.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Self-host Reloop in one command"
+  description="Open source under Apache 2.0: sending, templates, campaigns, automations and inboxes on your own server. Or start free on Reloop Cloud."
+  href="/dashboard/signup"
+  label="Get started"
+/>

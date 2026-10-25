@@ -21,6 +21,8 @@ import type {
 } from "@reloop/web/lib/landing/types";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type React from "react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { siYcombinator } from "simple-icons";
 
@@ -28,26 +30,15 @@ function ArrowLeftIcon({ className }: { className?: string }) {
 	return (
 		<svg
 			className={className}
-			viewBox="0 0 15 15"
+			viewBox="0 0 16 16"
 			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
+			stroke="currentColor"
+			strokeWidth="1.5"
+			strokeLinecap="round"
+			strokeLinejoin="round"
 			aria-hidden="true"
 		>
-			<g
-				stroke="currentColor"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				strokeWidth="1.5"
-				clipPath="url(#blog-back-arrow-clip)"
-			>
-				<path d="M1.5 5.056h8.667a3.333 3.333 0 0 1 0 6.666H6.833" />
-				<path d="M4.611 8.167 1.5 5.056l3.111-3.112" />
-			</g>
-			<defs>
-				<clipPath id="blog-back-arrow-clip">
-					<path fill="#fff" d="M0 0h15v15H0z" />
-				</clipPath>
-			</defs>
+			<path d="M12.5 8h-9M7.5 4l-4 4 4 4" />
 		</svg>
 	);
 }
@@ -186,28 +177,76 @@ function TocCard({
 }) {
 	return (
 		<div className={cn(floatingCardClassName, "flex flex-col", className)}>
-			{toc.length > 0 ? (
-				<>
-					<h2 className="mb-3 font-medium text-sm text-text-strong-950 dark:text-white">
-						On this page
-					</h2>
-					<div className="-mr-2 min-h-0 overflow-y-auto pr-2">
-						<BlogTableOfContents items={toc} showHeader={false} />
-					</div>
-				</>
-			) : null}
-			<Link
-				href="/blog"
-				className={cn(
-					"inline-flex items-center gap-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
-					toc.length > 0 &&
-						"-mx-5 mt-4 border-stroke-soft-200 border-t px-5 pt-4 dark:border-white/10",
-				)}
-			>
-				<ArrowLeftIcon className="size-3.5 shrink-0 select-none" />
-				<span>All articles</span>
-			</Link>
+			<h2 className="mb-3 font-medium text-sm text-text-strong-950 dark:text-white">
+				On this page
+			</h2>
+			<div className="-mr-2 min-h-0 overflow-y-auto pr-2">
+				<BlogTableOfContents items={toc} showHeader={false} />
+			</div>
 		</div>
+	);
+}
+
+/** Whether the previous history entry is a blog page on this site. */
+function previousPageIsBlog(): boolean {
+	try {
+		// The Navigation API sees client-side (soft) navigations; the referrer
+		// only covers full page loads, so it is the fallback.
+		const navigation = (
+			window as Window & {
+				navigation?: {
+					canGoBack: boolean;
+					currentEntry: { index: number } | null;
+					entries: () => { url: string | null }[];
+				};
+			}
+		).navigation;
+		let previousUrl: string | null = null;
+		if (navigation?.currentEntry) {
+			if (!navigation.canGoBack) return false;
+			previousUrl =
+				navigation.entries()[navigation.currentEntry.index - 1]?.url ?? null;
+		} else if (window.history.length > 1) {
+			previousUrl = document.referrer || null;
+		}
+		if (!previousUrl) return false;
+		const previous = new URL(previousUrl);
+		return (
+			previous.origin === window.location.origin &&
+			previous.pathname.startsWith("/blog")
+		);
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Returns to the previous page when the reader came from elsewhere on the
+ * blog, so they land back at their spot in the list. Otherwise it is a plain
+ * link to the blog index (also what middle-click and new-tab use).
+ */
+function BackToBlogButton() {
+	const router = useRouter();
+
+	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+		if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+			return;
+		}
+		if (previousPageIsBlog()) {
+			e.preventDefault();
+			router.back();
+		}
+	};
+
+	return (
+		<Link
+			href="/blog"
+			onClick={handleClick}
+			className="group inline-flex h-8 items-center gap-1.5 self-start rounded-full border border-stroke-soft-200 bg-white pr-3.5 pl-2.5 font-medium text-[13px] text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70 dark:hover:border-white/20 dark:hover:bg-white/[0.06] dark:hover:text-white"
+		>
+			<ArrowLeftIcon className="group-hover:-translate-x-0.5 size-4 shrink-0 transition-transform duration-200" />
+			<span>All articles</span>
+		</Link>
 	);
 }
 
@@ -244,13 +283,9 @@ export function BlogPostPageView({
 			<div className="w-full border-stroke-soft-100 border-b dark:border-white/10">
 				<div className="mx-auto w-full max-w-7xl border-stroke-soft-100 border-x px-4 pt-32 pb-12 sm:px-6 lg:px-8 dark:border-white/10">
 					<header className="mx-auto flex w-full max-w-[720px] flex-col gap-4">
-						<Link
-							href="/blog"
-							className="mb-2 hidden items-center gap-1.5 self-start font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 xl:inline-flex dark:text-white/60 dark:hover:text-white"
-						>
-							<ArrowLeftIcon className="size-3.5 shrink-0 select-none" />
-							<span>All articles</span>
-						</Link>
+						<div className="mb-2">
+							<BackToBlogButton />
+						</div>
 						<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
 							<Link
 								href={getCategoryPath(post.category)}
@@ -320,7 +355,7 @@ export function BlogPostPageView({
 					ref={mainRef}
 					className="mx-auto w-full min-w-0 max-w-[720px] space-y-8 pt-10 pb-16"
 				>
-					<TocCard toc={toc} className="xl:hidden" />
+					{toc.length > 0 ? <TocCard toc={toc} className="xl:hidden" /> : null}
 
 					{post.image ? (
 						<div className="overflow-hidden rounded-2xl">
