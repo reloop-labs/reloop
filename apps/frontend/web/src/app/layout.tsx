@@ -62,10 +62,6 @@ export const metadata: Metadata = {
 	},
 };
 
-/** Chrome origin-trial token that enables WebMCP (`document.modelContext`). */
-const webMcpOriginTrialToken =
-	process.env.NEXT_PUBLIC_WEBMCP_ORIGIN_TRIAL_TOKEN;
-
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -82,9 +78,6 @@ export default function RootLayout({
 					id="manifest-loader"
 					strategy="afterInteractive"
 				>{`var l=document.createElement('link');l.rel='manifest';l.href='/manifest.json';document.head.appendChild(l)`}</Script>
-				{webMcpOriginTrialToken ? (
-					<meta httpEquiv="origin-trial" content={webMcpOriginTrialToken} />
-				) : null}
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-[#fff] antialiased dark:bg-black`}
