@@ -105,12 +105,12 @@ export function DomainListToolbar({
 		<div
 			role="toolbar"
 			aria-orientation="horizontal"
-			className="flex w-full items-start justify-between gap-2"
+			className="flex w-full items-start justify-between gap-2 max-sm:flex-wrap max-sm:items-center"
 		>
-			<div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+			<div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 max-sm:contents">
 				<Input.Root
 					size="small"
-					className="w-40 rounded-xl shadow-none! lg:w-56"
+					className="w-full rounded-xl shadow-none! sm:w-40 lg:w-56"
 				>
 					<Input.Wrapper>
 						<Input.Icon as={Icon} name="search" size="small" />
@@ -150,7 +150,7 @@ export function DomainListToolbar({
 				/>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2">
+			<div className="flex shrink-0 items-center gap-2 max-sm:ml-auto">
 				<DomainViewPopover
 					columnVisibility={columnVisibility}
 					onColumnVisibleChange={onColumnVisibleChange}
