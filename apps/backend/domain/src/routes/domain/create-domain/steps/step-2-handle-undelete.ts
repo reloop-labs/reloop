@@ -3,6 +3,7 @@ import { db } from "@reloop/db/client";
 import { getRegistrarCreationDate } from "@reloop/db/domain-age-cap";
 import * as schema from "@reloop/db/schema";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
+import { ensureOwnershipRecord } from "@reloop/domain/lib/domain-ownership";
 import { assertCustomDomainQuota } from "@reloop/domain/lib/domain-quota";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_UNDELETE_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -80,6 +81,14 @@ export async function handleUndelete_step2({
 					updatedAt: now,
 				})
 				.where(eq(schema.domainDnsRecord.domainId, domainId));
+		});
+
+		// Held by another org since it was deleted here: prove ownership again.
+		await ensureOwnershipRecord({
+			domainId,
+			organizationId,
+			userId: deletedDomain.userId,
+			domain: deletedDomain.domain,
 		});
 
 		const undeletedDomain = await db.query.domain.findFirst({

@@ -83,8 +83,12 @@ export namespace DomainModel {
 					t.Literal("DKIM"),
 					t.Literal("DMARC"),
 					t.Literal("CNAME"),
+					t.Literal("OWNERSHIP"),
 				],
-				{ description: "DNS record type name" },
+				{
+					description:
+						"DNS record type name. OWNERSHIP is a TXT record proving you control the domain; it appears when the domain is already added in another organization, and verifying it moves the domain to yours.",
+				},
 			),
 			domain: t.String({ description: "Domain name" }),
 			name: t.String({ description: "DNS record name" }),

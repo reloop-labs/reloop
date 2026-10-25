@@ -4,6 +4,8 @@ import { domainDnsRecord, domain as domainTable } from "@reloop/db/schema";
 import { applySpamhausDblCheck } from "@reloop/db/spamhaus-dbl";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
+import { ensureOwnershipRecord } from "@reloop/domain/lib/domain-ownership";
+import { isReservedDomain } from "@reloop/domain/lib/reserved-domains";
 import { and, eq, isNull, sql } from "drizzle-orm";
 
 export function normalizeRelayDomain(input: string): string {
@@ -14,13 +16,7 @@ export function normalizeRelayDomain(input: string): string {
 			"Domains starting with 'www.' are not supported. Use the domain you send from, e.g. example.com.",
 		);
 	}
-	const reserved = [
-		domainConfig.ONBOARDING_TEST_DOMAIN,
-		domainConfig.RELOOP_SENDER_DOMAIN,
-	]
-		.map((d) => d.toLowerCase().trim())
-		.filter(Boolean);
-	if (reserved.includes(name)) {
+	if (isReservedDomain(name)) {
 		throw DomainErrors.invalidDomain(
 			input,
 			`"${input}" is reserved for Reloop platform mail.`,
@@ -29,12 +25,51 @@ export function normalizeRelayDomain(input: string): string {
 	return name;
 }
 
+/** A relay domain held by another org must prove ownership before it goes live. */
+const CONTESTED_RELAY = {
+	status: "pending" as const,
+	systemVerified: false,
+	userVerifiedDomain: false,
+	verificationFailedReason: null,
+	isSendingEmailEnabled: true,
+	isReceivingEmailEnabled: false,
+	isClickTrackingEnabled: false,
+	isOpenTrackingEnabled: false,
+	isTrackingDomain: false,
+};
+
 /**
  * Settings to apply when an existing domain switches to a relay. Sending is
  * usable at once; receiving and tracking stay on only if their DNS record is
  * already verified — otherwise the live send check would fail the domain.
+ * If another org holds the domain and this row isn't verified yet, it stays
+ * pending until the ownership TXT verifies.
  */
 export async function relayActivation(tx: DatabaseInstance, domainId: string) {
+	const row = await tx.query.domain.findFirst({
+		where: eq(domainTable.id, domainId),
+		columns: {
+			organizationId: true,
+			userId: true,
+			domain: true,
+			status: true,
+			systemVerified: true,
+		},
+	});
+	const alreadyVerified = row?.status === "active" && row.systemVerified;
+	if (row && !alreadyVerified) {
+		const contested = await ensureOwnershipRecord(
+			{
+				domainId,
+				organizationId: row.organizationId,
+				userId: row.userId,
+				domain: row.domain,
+			},
+			tx,
+		);
+		if (contested) return CONTESTED_RELAY;
+	}
+
 	const records = await tx
 		.select({
 			recordType: domainDnsRecord.recordType,
@@ -78,8 +113,10 @@ export type RelayDomainResult = {
 /**
  * Make `domainName` send through the given relay with zero setup: reuse the
  * org's domain if it exists, revive a soft-deleted one, or create it. Relay
- * domains need no Reloop DNS, so they are active immediately. Runs inside the
- * caller's transaction; call `publishRelayDomainEvent` after commit.
+ * domains need no Reloop DNS, so they are active immediately — unless another
+ * org already holds the name, in which case the domain stays pending until
+ * its ownership TXT verifies. Runs inside the caller's transaction; call
+ * `publishRelayDomainEvent` after commit.
  */
 export async function attachRelayDomain(
 	tx: DatabaseInstance,
@@ -134,6 +171,7 @@ export async function attachRelayDomain(
 			.update(domainTable)
 			.set({ ...relayDefaults, deletedAt: null })
 			.where(eq(domainTable.id, deleted.id));
+		await holdIfContested(tx, deleted.id, args);
 		return { domainId: deleted.id, domain: deleted.domain, event: "undeleted" };
 	}
 
@@ -149,7 +187,30 @@ export async function attachRelayDomain(
 		})
 		.returning({ id: domainTable.id, domain: domainTable.domain });
 	if (!created) throw DomainErrors.databaseError("Failed to create domain");
+	await holdIfContested(tx, created.id, args);
 	return { domainId: created.id, domain: created.domain, event: "created" };
+}
+
+/** Another org holds this name: add the ownership TXT and keep it pending. */
+async function holdIfContested(
+	tx: DatabaseInstance,
+	domainId: string,
+	args: { organizationId: string; userId: string; domainName: string },
+): Promise<void> {
+	const contested = await ensureOwnershipRecord(
+		{
+			domainId,
+			organizationId: args.organizationId,
+			userId: args.userId,
+			domain: normalizeRelayDomain(args.domainName),
+		},
+		tx,
+	);
+	if (!contested) return;
+	await tx
+		.update(domainTable)
+		.set({ ...CONTESTED_RELAY, lastVerifiedAt: null })
+		.where(eq(domainTable.id, domainId));
 }
 
 export async function publishRelayDomainEvent(

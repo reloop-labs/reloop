@@ -12,6 +12,10 @@ import {
 } from "@be/workflow/utils/verify-dns-records";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import {
+	isOwnershipRecordValue,
+	transferDomainOwnership,
+} from "@reloop/db/domain-ownership";
 import * as schema from "@reloop/db/schema";
 import { applySpamhausDblCheck } from "@reloop/db/spamhaus-dbl";
 import { isLocal } from "@reloop/dns/is-local";
@@ -19,6 +23,7 @@ import { resolver } from "@reloop/dns/resolver";
 import {
 	countSpfRecords,
 	duplicateSpfReason,
+	verifyOwnershipRecord,
 } from "@reloop/dns/verify-records";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
@@ -233,8 +238,21 @@ export async function processDomainVerification({
 		return;
 	}
 
+	// Domain held by another org: its ownership TXT must verify too.
+	const ownershipRecord = records.find(
+		(r) => r.recordType === "TXT" && isOwnershipRecordValue(r.value),
+	);
+
 	// Compile active verifications dynamically
 	const activeResults: { record: any; verifyFn: () => Promise<boolean> }[] = [];
+
+	if (ownershipRecord) {
+		activeResults.push({
+			record: ownershipRecord,
+			verifyFn: () =>
+				verifyOwnershipRecord(ownershipRecord.fqdn, ownershipRecord.value),
+		});
+	}
 
 	if (dkimRecord) {
 		activeResults.push({
@@ -282,6 +300,9 @@ export async function processDomainVerification({
 		ok: verificationResults[index],
 	}));
 
+	const ownershipOk = ownershipRecord
+		? (results.find((r) => r.record.id === ownershipRecord.id)?.ok ?? false)
+		: true;
 	const dkimOk = dkimRecord
 		? (results.find((r) => r.record.id === dkimRecord.id)?.ok ?? false)
 		: true;
@@ -303,6 +324,7 @@ export async function processDomainVerification({
 		message: "DNS verification results",
 		domainId,
 		domainName,
+		ownershipOk,
 		dkimOk,
 		spfOk,
 		dmarcOk,
@@ -311,7 +333,7 @@ export async function processDomainVerification({
 	});
 	await logJob(
 		job,
-		`DNS results: DKIM=${dkimOk} SPF=${spfOk} DMARC=${dmarcOk} MX=${mxOk} CNAME=${cnameOk}`,
+		`DNS results: OWNERSHIP=${ownershipOk} DKIM=${dkimOk} SPF=${spfOk} DMARC=${dmarcOk} MX=${mxOk} CNAME=${cnameOk}`,
 	);
 
 	const activeRecordIds = new Set(activeResults.map((item) => item.record.id));
@@ -335,8 +357,10 @@ export async function processDomainVerification({
 		),
 	]);
 
-	const allPassed = dkimOk && spfOk && dmarcOk && mxOk && cnameOk;
+	const allPassed =
+		ownershipOk && dkimOk && spfOk && dmarcOk && mxOk && cnameOk;
 	let failureReason = buildFailureReason({
+		"ownership TXT": ownershipOk,
 		DKIM: dkimOk,
 		SPF: spfOk,
 		DMARC: dmarcOk,
@@ -359,6 +383,29 @@ export async function processDomainVerification({
 	}
 
 	if (allPassed) {
+		// Proven DNS control (per-row DKIM key or ownership token, not the
+		// shared SPF/MX values): the domain now belongs to this org only.
+		if (ownershipRecord || dkimRecord) {
+			const transferred = await transferDomainOwnership({
+				domainId,
+				organizationId,
+				domainName,
+			});
+			for (const row of transferred) {
+				await bus.publish(BusEvent.DOMAIN_DELETED, {
+					domainId: row.domainId,
+					domain: row.domain,
+					organizationId: row.organizationId,
+				});
+			}
+			if (transferred.length > 0) {
+				await logJob(
+					job,
+					`Ownership proven: removed ${domainName} from ${transferred.length} other organization(s)`,
+				);
+			}
+		}
+
 		await db
 			.update(schema.domain)
 			.set({

@@ -31,6 +31,7 @@ export const DNSRecordsSection = ({
 		receivingRecords,
 		trackingRecords,
 		dmarcRecords,
+		ownershipRecords,
 	} = groupDomainDnsRecords(domain?.dnsRecords);
 
 	const { handleUpdateDomain } = useDomainActions(domain?.id, domain);
@@ -117,6 +118,29 @@ export const DNSRecordsSection = ({
 				<DNSAutoConnectBanner domain={domain} />
 			)}
 
+			{/* Ownership: the domain is already added in another organization */}
+			{ownershipRecords.length > 0 && (
+				<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
+					<div className="mb-2 flex items-center gap-2 text-base text-text-strong-950">
+						<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
+						<h3 className="font-semibold">Prove you own this domain</h3>
+					</div>
+					<p className="mb-4 max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
+						This domain is already added to another Reloop organization. Add
+						this TXT record at your DNS provider and verify. Once it verifies,
+						the domain moves to your organization and is removed from the other
+						one.
+					</p>
+					<DNSRecordSectionGroup
+						title="Ownership TXT"
+						docsUrl={DNS_RECORD_DOCS.hub}
+						records={ownershipRecords}
+						isLoading={!!isLoading}
+						tableId="ownership-"
+					/>
+				</div>
+			)}
+
 			{/* Domain Verification Group */}
 			{isRelay ? (
 				<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
@@ -125,9 +149,9 @@ export const DNSRecordsSection = ({
 						<h3 className="font-semibold">Sending through your SMTP</h3>
 					</div>
 					<p className="max-w-2xl text-paragraph-xs text-text-sub-600 leading-relaxed">
-						This domain relays through your own SMTP server, so no DKIM, SPF,
-						or DMARC records are needed in Reloop. Your provider's existing
-						setup keeps working. Receiving and tracking below still need their
+						This domain relays through your own SMTP server, so no DKIM, SPF, or
+						DMARC records are needed in Reloop. Your provider's existing setup
+						keeps working. Receiving and tracking below still need their
 						records.
 					</p>
 				</div>

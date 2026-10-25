@@ -65,13 +65,12 @@ export function DomainTable({
 		[handleDelete, handleOpenChange],
 	);
 
-	const groupRootById = useMemo(() => {
-		const map = new Map<string, string>();
+	const groupParentIds = useMemo(() => {
+		const ids = new Set<string>();
 		for (const group of groupByRootDomain(domains, (d) => d.domain)) {
-			if (group.kind !== "group") continue;
-			for (const child of group.children) map.set(child.id, group.root);
+			if (group.kind === "group" && group.parent) ids.add(group.parent.id);
 		}
-		return map;
+		return ids;
 	}, [domains]);
 
 	const table = useReactTable({
@@ -85,7 +84,7 @@ export function DomainTable({
 		getRowId: (row) => row.id,
 		manualPagination: true,
 		pageCount: totalPages,
-		meta: { groupRootById } satisfies DomainTableMeta,
+		meta: { groupParentIds } satisfies DomainTableMeta,
 	});
 
 	useHotkeys(

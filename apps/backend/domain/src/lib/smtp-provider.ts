@@ -7,6 +7,7 @@ import {
 } from "@reloop/db/schema";
 import { isSelfHosted } from "@reloop/db/self-hosted";
 import { SmtpProviderErrors } from "@reloop/domain/error/domain.error-response";
+import { isReservedDomain } from "@reloop/domain/lib/reserved-domains";
 import { getPlanLimits } from "@reloop/pricing";
 import {
 	resolvePublicTarget,
@@ -126,8 +127,13 @@ export async function assertSmtpProviderQuota(
 /**
  * Resolve the host and refuse private/reserved targets so customers can't
  * point the relay at internal infrastructure. Self-hosted may relay to LAN.
+ * Reloop's own hosts (e.g. smtp.reloop.sh) are refused too: relaying back
+ * into Reloop would bypass sender checks and can loop.
  */
 export async function resolveSmtpHost(host: string) {
+	if (isReservedDomain(host)) {
+		throw SmtpProviderErrors.hostBlocked(host);
+	}
 	try {
 		return await resolvePublicTarget(host, { allowPrivate: isSelfHosted() });
 	} catch (error) {

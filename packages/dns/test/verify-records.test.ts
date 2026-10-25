@@ -9,6 +9,7 @@ import {
 	duplicateSpfReason,
 	mxRecordMatches,
 	normalizeMxLookupName,
+	ownershipRecordMatches,
 	spfRecordMatches,
 } from "@reloop/dns/verify-records";
 
@@ -149,5 +150,27 @@ describe("live check outcomes", () => {
 	test("classifies NXDOMAIN separately from a timeout", () => {
 		expect(classifyDnsError({ code: "ENODATA" })).toBe("mismatch");
 		expect(classifyDnsError({ code: "ETIMEOUT" })).toBe("lookup_failed");
+	});
+});
+
+describe("ownershipRecordMatches", () => {
+	const token = "reloop-verification=abc123";
+
+	test("matches the exact token among other TXT values", () => {
+		expect(
+			ownershipRecordMatches([["google-site-verification=x"], [token]], token),
+		).toBe(true);
+	});
+
+	test("joins TXT chunks before comparing", () => {
+		expect(
+			ownershipRecordMatches([["reloop-verification=", "abc123"]], token),
+		).toBe(true);
+	});
+
+	test("rejects another org's token", () => {
+		expect(
+			ownershipRecordMatches([["reloop-verification=zzz999"]], token),
+		).toBe(false);
 	});
 });

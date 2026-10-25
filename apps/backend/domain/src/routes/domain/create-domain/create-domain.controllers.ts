@@ -1,6 +1,8 @@
 import { applySpamhausDblCheck } from "@reloop/db/spamhaus-dbl";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
+import { ensureOwnershipRecord } from "@reloop/domain/lib/domain-ownership";
+import { isReservedDomain } from "@reloop/domain/lib/reserved-domains";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { useLogger } from "evlog/elysia";
 import {
@@ -38,14 +40,7 @@ export async function createDomainController({
 			);
 		}
 
-		const reservedDomains = [
-			domainConfig.ONBOARDING_TEST_DOMAIN,
-			domainConfig.RELOOP_SENDER_DOMAIN,
-		]
-			.map((d) => d.toLowerCase().trim())
-			.filter(Boolean);
-		const requested = domain.toLowerCase().trim();
-		if (reservedDomains.includes(requested)) {
+		if (isReservedDomain(domain)) {
 			throw DomainErrors.invalidDomain(
 				domain,
 				`"${domain}" is reserved for Reloop platform mail and cannot be added as a customer domain.`,
@@ -111,6 +106,10 @@ export async function createDomainController({
 			receivingMxRecord,
 			trackingRecord,
 		});
+
+		// Already added in another org: anyone may add it, but only an org that
+		// publishes this ownership TXT can verify it (and take it over).
+		await ensureOwnershipRecord({ domainId, organizationId, userId, domain });
 
 		await applySpamhausDblCheck({ domainId, domainName: domain });
 

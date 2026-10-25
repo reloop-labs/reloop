@@ -5,6 +5,7 @@ import {
 	checkDkimRecord,
 	checkDmarcRecord,
 	checkMxRecord,
+	checkOwnershipRecord,
 	checkSpfRecord,
 	countSpfRecords,
 	type DnsCheckOutcome,
@@ -12,6 +13,10 @@ import {
 } from "@reloop/dns/verify-records";
 import { and, eq, isNull } from "drizzle-orm";
 import { type DatabaseInstance, db as defaultDb } from "./client";
+import {
+	isOwnershipRecordValue,
+	transferDomainOwnership,
+} from "./domain-ownership";
 import { domain, domainDnsRecord } from "./schema/domain";
 
 export type StoredDnsRecord = {
@@ -38,12 +43,14 @@ export type DomainCheckFlags = {
 
 export type PlannedDnsCheck = {
 	id: string;
-	label: "DKIM" | "SPF" | "DMARC" | "MX" | "CNAME";
+	label: "OWNERSHIP" | "DKIM" | "SPF" | "DMARC" | "MX" | "CNAME";
 	run: () => Promise<DnsCheckOutcome>;
 };
 
 /**
  * Records the domain must still publish for its enabled features.
+ * An ownership TXT (added when the domain already existed in another org)
+ * is always required, relay or not.
  * Sending always requires DKIM, SPF, and DMARC — except through a customer's
  * own SMTP relay, which needs none of them.
  * Receiving adds MX.
@@ -55,6 +62,18 @@ export function planDomainDnsChecks(
 ): { missingConfig: string[]; checks: PlannedDnsCheck[] } {
 	const missingConfig: string[] = [];
 	const checks: PlannedDnsCheck[] = [];
+
+	const ownership = records.find(
+		(record) =>
+			record.recordType === "TXT" && isOwnershipRecordValue(record.value),
+	);
+	if (ownership) {
+		checks.push({
+			id: ownership.id,
+			label: "OWNERSHIP",
+			run: () => checkOwnershipRecord(ownership.fqdn, ownership.value),
+		});
+	}
 
 	const dkim = records.find(
 		(record) =>
@@ -136,6 +155,22 @@ export function planDomainDnsChecks(
 	}
 
 	return { missingConfig, checks };
+}
+
+/**
+ * Whether these results prove the org controls the domain's DNS. Only DKIM
+ * (a per-row key) and the ownership TXT (a per-row token) count: SPF, DMARC,
+ * MX and CNAME values are identical for every org, so another org's records
+ * would pass them too.
+ */
+export function provesDnsControl(
+	results: { label: string; outcome: DnsCheckOutcome }[],
+): boolean {
+	return results.some(
+		(result) =>
+			(result.label === "DKIM" || result.label === "OWNERSHIP") &&
+			result.outcome === "match",
+	);
 }
 
 export function dnsFailureReason(failed: string[]): string {
@@ -275,6 +310,7 @@ export async function ensureSendingDomainVerified(
 		),
 		columns: {
 			id: true,
+			domain: true,
 			status: true,
 			systemVerified: true,
 			isSendingEmailEnabled: true,
@@ -341,6 +377,13 @@ export async function ensureSendingDomainVerified(
 			row.systemVerified &&
 			outcomes.every((result) => storedActive.get(result.id) === "active");
 		if (!alreadyVerified) {
+			// Proven DNS control: the domain now belongs to this org only.
+			if (provesDnsControl(outcomes)) {
+				await transferDomainOwnership(
+					{ domainId, organizationId, domainName: row.domain },
+					database,
+				);
+			}
 			await Promise.all([
 				database
 					.update(domain)

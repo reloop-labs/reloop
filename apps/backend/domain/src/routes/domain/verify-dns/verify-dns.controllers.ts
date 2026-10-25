@@ -1,11 +1,14 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
+import { transferDomainOwnership } from "@reloop/db/domain-ownership";
 import {
 	planDomainDnsChecks,
+	provesDnsControl,
 	summarizeDnsChecks,
 } from "@reloop/db/ensure-sending-domain-verified";
 import * as schema from "@reloop/db/schema";
 import { applySpamhausDblCheck } from "@reloop/db/spamhaus-dbl";
+import { publishDomainTransfers } from "@reloop/domain/lib/domain-ownership";
 import { ensureReceivingMxRecord } from "@reloop/domain/utils/ensure-receiving-mx";
 import { ensureTrackingCnameRecord } from "@reloop/domain/utils/ensure-tracking-cname";
 import { DOMAIN_VERIFY_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -235,6 +238,16 @@ async function tryFastVerify({
 				const wasAlreadyVerified = Boolean(
 					(domain as { systemVerified?: boolean }).systemVerified,
 				);
+
+				// Proven DNS control: the domain now belongs to this org only.
+				if (provesDnsControl(outcomes)) {
+					const transferred = await transferDomainOwnership({
+						domainId,
+						organizationId,
+						domainName: domain.domain,
+					});
+					await publishDomainTransfers(transferred);
+				}
 
 				await Promise.all([
 					db

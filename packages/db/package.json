@@ -19,6 +19,7 @@
 		"./sender-gate": "./src/sender-gate.ts",
 		"./domain-risk": "./src/domain-risk.ts",
 		"./ensure-sending-domain-verified": "./src/ensure-sending-domain-verified.ts",
+		"./domain-ownership": "./src/domain-ownership.ts",
 		"./spamhaus-dbl": "./src/spamhaus-dbl.ts",
 		"./webhook-events": "./src/webhook-events.ts",
 		"./api-key-scope": "./src/api-key-scope.ts",

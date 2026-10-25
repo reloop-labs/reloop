@@ -10,6 +10,9 @@ const isMxRecord = (record: DNSRecord) => record.recordTypeName === "MX";
 
 const isTrackingRecord = (record: DNSRecord) => record.purpose === "tracking";
 
+const isOwnershipRecord = (record: DNSRecord) =>
+	record.recordTypeName === "OWNERSHIP";
+
 export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 	const allRecords = records ?? [];
 
@@ -19,5 +22,6 @@ export const groupDomainDnsRecords = (records: DNSRecord[] | undefined) => {
 		dkimRecords: allRecords.filter(isDkimRecord),
 		dmarcRecords: allRecords.filter(isDmarcRecord),
 		trackingRecords: allRecords.filter(isTrackingRecord),
+		ownershipRecords: allRecords.filter(isOwnershipRecord),
 	};
 };

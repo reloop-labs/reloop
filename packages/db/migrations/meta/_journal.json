@@ -330,6 +330,13 @@
       "when": 1793000000000,
       "tag": "0046_api_key_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1793100000000,
+      "tag": "0047_domain_ownership",
+      "breakpoints": true
     }
   ]
 }

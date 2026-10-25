@@ -38,6 +38,8 @@ export const dnsRecordTypeNameEnum = pgEnum("dns_record_type_name", [
 	"DKIM",
 	"DMARC",
 	"CNAME",
+	/** TXT proving DNS control when the domain already exists in another org. */
+	"OWNERSHIP",
 ]);
 
 export const dnsRecordPurposeEnum = pgEnum("dns_record_purpose", [

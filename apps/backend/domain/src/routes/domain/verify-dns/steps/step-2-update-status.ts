@@ -1,4 +1,5 @@
 import { db } from "@reloop/db/client";
+import { isOwnershipRecordValue } from "@reloop/db/domain-ownership";
 import * as schema from "@reloop/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 
@@ -25,6 +26,14 @@ export async function updateStatusToVerifying_step2({
 	);
 
 	const activeRecordIds = new Set<string>();
+
+	// Ownership TXT (domain held by another org) is always checked.
+	const ownershipRecord = domain.dnsRecords.find(
+		(r) => r.recordType === "TXT" && isOwnershipRecordValue(r.value),
+	);
+	if (ownershipRecord) {
+		activeRecordIds.add(ownershipRecord.id);
+	}
 
 	// Find mandatory DKIM verification record
 	const dkimRecord = domain.dnsRecords.find(

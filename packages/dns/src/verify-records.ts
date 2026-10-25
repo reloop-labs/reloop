@@ -72,7 +72,7 @@ export function countSpfRecords(flattenedRecords: string[]): number {
 export function duplicateSpfReason(count: number): string {
 	return (
 		`Your domain publishes ${count} SPF records, but only one SPF record is allowed. ` +
-		`Merge them into a single TXT record at your DNS provider, wait for propagation, then retry verification.`
+		"Merge them into a single TXT record at your DNS provider, wait for propagation, then retry verification."
 	);
 }
 
@@ -290,6 +290,37 @@ export async function checkCnameRecord(
 
 	if (directFailedLookup && addressLookupFailed) return "lookup_failed";
 	return "mismatch";
+}
+
+/** Ownership TXT matches when any TXT value at the name equals the token exactly. */
+export function ownershipRecordMatches(
+	records: string[][],
+	expectedValue: string,
+): boolean {
+	const expected = expectedValue.trim();
+	return records.some((chunks) => chunks.join("").trim() === expected);
+}
+
+export async function checkOwnershipRecord(
+	name: string,
+	value: string,
+	resolveTxt: TxtLookup = defaultTxt,
+): Promise<DnsCheckOutcome> {
+	if (isLocal(name)) return "match";
+	try {
+		const records = await resolveTxt(name);
+		return ownershipRecordMatches(records, value) ? "match" : "mismatch";
+	} catch (error) {
+		console.error(`Error verifying ownership record for ${name}:`, error);
+		return classifyDnsError(error);
+	}
+}
+
+export async function verifyOwnershipRecord(
+	name: string,
+	value: string,
+): Promise<boolean> {
+	return (await checkOwnershipRecord(name, value)) === "match";
 }
 
 export async function verifySpfRecord(

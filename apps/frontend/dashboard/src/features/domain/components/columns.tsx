@@ -21,11 +21,11 @@ import {
 	getStatusPillClass,
 } from "../utils";
 import { DomainFavicon } from "./domain-favicon";
-import { rootDomainOf } from "./domain-groups";
+import { groupLabelOf, rootDomainOf } from "./domain-groups";
 
 export type DomainTableMeta = {
-	/** Grouped child domain id → its group root, for the shortened label. */
-	groupRootById?: ReadonlyMap<string, string>;
+	/** Ids of root domains heading a group of subdomains, labelled by name only. */
+	groupParentIds?: ReadonlySet<string>;
 };
 
 /** Domain status pill; `null` for a group whose domains differ ("Mixed"). */
@@ -260,12 +260,11 @@ export const domainColumns: ColumnDef<Domain>[] = [
 		cell: ({ row, table }) => {
 			const domain = row.original;
 			const meta = table.options.meta as DomainTableMeta | undefined;
-			// Inside a group, show only what differs: mc.reloop.sh → mc.
-			const groupRoot = meta?.groupRootById?.get(domain.id);
-			const label =
-				groupRoot && domain.domain.endsWith(`.${groupRoot}`)
-					? domain.domain.slice(0, -(groupRoot.length + 1))
-					: domain.domain;
+			// A group's root reads as its name (reloop.sh → reloop); subdomains
+			// under it keep their full hostname.
+			const label = meta?.groupParentIds?.has(domain.id)
+				? groupLabelOf(domain.domain)
+				: domain.domain;
 			return (
 				<div className="flex min-w-0 items-center gap-1">
 					<DomainFavicon
