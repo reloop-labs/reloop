@@ -1,0 +1,271 @@
+---
+title: "Reloop vs Elastic Email (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Elastic Email compared: Email API and Email Marketing plans, pricing at 3k to 250k emails a month, developer experience, inbound mail, dedicated IPs, self-hosting, and how to switch."
+keywords:
+  - Reloop vs Elastic Email
+  - Elastic Email alternative
+  - Elastic Email pricing
+  - Elastic Email API
+  - open source Elastic Email alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [elastic-email, comparison, pricing, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-elastic-email.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-brevo
+  - reloop-vs-zeptomail
+  - best-transactional-email-apis-2026
+---
+
+**Elastic Email is one of the longest-running budget email providers, and it sells two separate products: an Email API for developers and an Email Marketing app for newsletters.** Reloop puts transactional email, campaigns, automations and inboxes in one product. **It costs about half as much at 50k emails, includes a dedicated IP on its $20 plan, receives mail into real inboxes, and is open source, so you can run it yourself.** Elastic Email has the more mature drag-and-drop marketing tools.
+
+We build Reloop, so weigh this accordingly. Elastic Email's prices below are from its [Email API pricing](https://elasticemail.com/email-api-pricing) and [Email Marketing pricing](https://elasticemail.com/pricing) pages, and where Elastic Email is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Elastic Email (Email API)** |
+|---|---|---|
+| Free tier | 3,000 / mo, 100 / day | 3,000 / mo, 100 / day |
+| 50,000 emails / mo | **$10** | $19 (Starter) or $49 (Pro) |
+| 100,000 emails / mo | **$20** | Set by a volume slider |
+| Dedicated IP | Included on Growth ($20) | Add-on: $40/mo on Starter, $50/mo on Pro |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Inbound processing on Pro |
+| Webhooks | All plans | Pro |
+| Log retention | Plan-based | 3 days (Free, Starter), 7 days (Pro) |
+| Marketing and automations | Included in the same product | Separate Email Marketing plans |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+| SMTP relay | Yes | Yes |
+
+Both pricing pages change; check them before you commit.
+
+---
+
+## Pricing at real volumes
+
+Both free tiers are the same size: 3,000 emails a month with a 100-a-day cap. Elastic Email's free API plan keeps logs for 3 days and has no dedicated IP or inbound processing.
+
+At 50,000 emails a month:
+
+| | Reloop | Elastic Email |
+|---|---|---|
+| Plan | Pro, $10 | Starter, $19 |
+| With inbound and webhooks | $10 | Pro, $49 |
+| With a dedicated IP | Growth, $20 (100k emails) | Starter $19 + $40 = $59, or Pro $49 + $50 = $99 |
+
+Above 50,000 emails, Elastic Email prices both API plans with a volume slider that runs up to 10 million emails a month. The exact numbers depend on where you set it, so check the [calculator](https://elasticemail.com/email-api-pricing) for your volume. Reloop's 100k plan is $20, and every extra 1,000 emails costs $0.50, so 250,000 emails is $20 + $75 = **$95**.
+
+Two things drive the difference at low and mid volume:
+
+- **Webhooks and inbound sit on Elastic Email's $49 Pro plan.** On Reloop they're on every plan, including Free.
+- **A dedicated IP is an add-on on Elastic Email** ($40 or $50 a month). Reloop includes one on Growth at $20.
+
+At very high volume, Elastic Email's slider may come out cheaper per email than Reloop's $0.50 per 1,000 overage. If you send millions of emails a month and only need sending, price both at your real volume. If you self-host Reloop, there's no per-email fee at all; you pay for the server.
+
+<Callout type="tip">
+  Price the features you'll need in a year, not just the volume. Webhooks, inbound mail and a dedicated IP move Elastic Email from $19 to $49 or more, while Reloop includes them.
+</Callout>
+
+---
+
+## Developer experience
+
+Elastic Email's v4 REST API lives at `https://api.elasticemail.com/v4` and authenticates with an `X-ElasticEmail-ApiKey` header. Transactional mail goes to `POST /emails/transactional`.
+
+**Elastic Email**
+
+```typescript
+const res = await fetch("https://api.elasticemail.com/v4/emails/transactional", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-ElasticEmail-ApiKey": process.env.ELASTIC_EMAIL_API_KEY!,
+  },
+  body: JSON.stringify({
+    Recipients: { To: ["user@example.com"] },
+    Content: {
+      From: "Acme <hello@acme.com>",
+      Subject: "Welcome",
+      Body: [{ ContentType: "HTML", Content: "<p>Thanks for signing up.</p>" }],
+    },
+  }),
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+The differences worth knowing:
+
+| | Reloop | Elastic Email |
+|---|---|---|
+| Field style | snake_case (`reply_to`) | PascalCase (`Recipients`, `Content`, `ReplyTo`) |
+| Body | `html` and `text` fields | `Body` array of `{ ContentType, Content }` |
+| Template variables | `{{{first_name}}}` | `{firstname}` merge fields, values passed in `Merge` |
+| Stored templates | Sent by ID | Sent by `TemplateName` |
+| Error format | `message`, `why` and `fix` | JSON error response |
+| Official SDK | `reloop-email` and SDKs for Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | Generated clients on [GitHub](https://github.com/ElasticEmail) |
+
+Reloop's errors tell you **why** a send failed and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Receiving email and agent inboxes
+
+Elastic Email includes **inbound email processing on its Pro plan**: mail sent to your domain is parsed and forwarded to your app.
+
+Reloop receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call, and the `email.received` webhook notifies your app.
+
+| | Reloop | Elastic Email |
+|---|---|---|
+| Receive on your domain | All plans | Pro ($49) |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | Build it yourself |
+| MCP access for AI agents | Yes | No |
+| IMAP access | Yes | No |
+
+If you're building support inboxes or [an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails), this is the biggest functional gap.
+
+---
+
+## Marketing, contacts and automations
+
+This is where Elastic Email is strongest. Its **Email Marketing** product is a separate set of plans:
+
+- **Free:** up to 1,000 contacts and 3,000 emails a month, with 1 automation.
+- **Starter ($29/mo):** up to 2,500 contacts and 37,500 emails a month, with automations, paid newsletters and checkouts.
+- **Pro ($49/mo):** the same visible contact tier, plus unlimited automations, unlimited custom fields, webhooks and sub-accounts.
+
+It comes with a drag-and-drop designer and a gallery of pre-designed templates, aimed at marketers who don't write code.
+
+Reloop keeps marketing and transactional mail in **one product with one suppression list**: contacts with custom properties, groups, subscription channels, scheduled broadcast campaigns, and event-triggered automations with delays and conditions. You start them from your app:
+
+```typescript
+await reloop.automations.start({
+  event: "user.signed_up",
+  email: user.email,
+});
+```
+
+See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert) for a worked example. If your marketing team wants a visual newsletter builder with paid-newsletter checkouts, Elastic Email's marketing app has more to offer today.
+
+---
+
+## Deliverability
+
+Deliverability mostly comes down to your own domain setup and list hygiene. Both providers handle SPF and DKIM, bounces, complaints, open and click tracking, and suppression.
+
+- **Sending path.** Reloop runs its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates spike. See [how bounce processing works](/blog/email-bounce-processing-automation).
+- **Dedicated IPs.** Included on Reloop's Growth plan; a $40 to $50 monthly add-on on Elastic Email.
+- **Logs.** Elastic Email's API plans keep logs for 3 days (Free, Starter) or 7 days (Pro). Short retention makes it harder to debug a delivery complaint from last week.
+- **Tools.** Reloop ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers.
+
+---
+
+## Self-hosting and lock-in
+
+Elastic Email is hosted-only. Reloop is Apache 2.0:
+
+1. Start on Reloop Cloud.
+2. Move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup).
+3. Keep the same API by pointing the SDK's `baseUrl` at your instance.
+
+Self-hosting means you own IP reputation, warm-up and uptime. Most teams should start hosted and keep self-hosting as an option. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what it involves.
+
+---
+
+## Where Elastic Email is the better choice
+
+- **You send millions of emails a month and only need sending.** Its volume slider goes to 10 million emails, and at that scale it may cost less per email than Reloop's hosted overage. Price both.
+- **Your marketing team wants a no-code newsletter tool** with a drag-and-drop designer, template gallery, paid newsletters and checkouts.
+- **You need sub-accounts** to separate clients, which Elastic Email lists on Pro.
+
+## Where Reloop is the better choice
+
+- **You're at 50k to a few hundred thousand emails a month** and want the lower price.
+- **You need webhooks, inbound mail or a dedicated IP** without moving to a $49 plan or paying an add-on.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You want transactional mail, campaigns and automations in one product** instead of two subscriptions.
+- **You need open source or self-hosting.**
+
+---
+
+## Switching from Elastic Email to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Swap the client.** Replace the `/v4/emails/transactional` call with `reloop.mail.send`, and map `Recipients.To` → `to`, `Content.From` → `from`, `Content.Subject` → `subject`, and the HTML `Body` entry → `html`.
+3. **Move templates.** Change merge fields to triple braces: `{firstname}` becomes `{{{first_name}}}`, and pass values as template variables instead of `Merge`.
+4. **Move contacts and suppressions.** Export your contacts and any unsubscribed or bounced addresses from Elastic Email and import them into Reloop so nobody who opted out is emailed again.
+5. **Point webhooks** at a new handler. Reloop events are named `email.delivered`, `email.bounced`, `email.complained` and so on, signed with HMAC-SHA256 in the `Reloop-Signature` header.
+6. **Ramp traffic** from 10% to 100% over a week or two, then remove Elastic Email's DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same steps in more detail, including a traffic-split flag and a suppression import script.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop cheaper than Elastic Email?">
+    At 50,000 emails a month, yes: $10 on Reloop vs $19 on Elastic Email's
+    Starter API plan, or $49 if you need webhooks and inbound. At millions of
+    emails a month, Elastic Email's volume pricing may be lower, so compare
+    at your real volume.
+  </Accordion>
+
+  <Accordion title="Do both have a free plan?">
+    Yes, and they're the same size: 3,000 emails a month, capped at 100 a
+    day. Elastic Email's free API plan keeps logs for 3 days.
+  </Accordion>
+
+  <Accordion title="Does Elastic Email support inbound email?">
+    Yes, inbound email processing is part of its Pro API plan ($49/mo).
+    Reloop receives mail on every plan into stored, threaded mailboxes you can
+    read over the API, MCP or IMAP.
+  </Accordion>
+
+  <Accordion title="Can I use Reloop over SMTP like Elastic Email?">
+    Yes. Use `smtp.reloop.sh` on port 587 with STARTTLS, and your API key as
+    both the username and the password.
+  </Accordion>
+
+  <Accordion title="Is Elastic Email open source?">
+    No. Elastic Email is a hosted service. Reloop is open source under Apache
+    2.0 and can run on your own server.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, with webhooks, inbound mailboxes and automations included."
+  href="/dashboard/signup"
+  label="Get started"
+/>

@@ -1,0 +1,275 @@
+---
+title: "Reloop vs Cloudflare Email Service (2026): Which to Use for Sending"
+description: "Reloop vs Cloudflare Email Service compared: pricing at 3k to 250k emails a month, the Workers binding vs an HTTP API, DNS requirements, events, inbound email, marketing mail and lock-in."
+keywords:
+  - Reloop vs Cloudflare Email
+  - Cloudflare Email Service
+  - Cloudflare Email Sending
+  - Cloudflare Workers send email
+  - Cloudflare Email Service pricing
+  - Cloudflare email alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [cloudflare, workers, comparison, pricing]
+readTime: 9 min read
+image: /blog/images/reloop-vs-cloudflare-email.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - send-email-cloudflare-workers
+  - reloop-vs-resend
+  - reloop-vs-aws-ses
+---
+
+**Cloudflare now sends email.** Its Email Service adds outbound sending to the Email Routing product many teams already use for inbound, and from a Worker it's one binding and one `send()` call. **If your app lives entirely on Workers and only sends transactional mail, it's a strong, cheap option.** Reloop is the better fit when you need marketing mail, templates, contacts and automations, real inboxes, a domain that isn't on Cloudflare DNS, or the option to self-host.
+
+We build Reloop, so weigh this accordingly. Every Cloudflare fact below links to Cloudflare's own docs, checked in October 2026. Where Cloudflare wins, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Cloudflare Email Service** |
+|---|---|---|
+| Status | Generally available | Sending in public beta, Routing GA |
+| Free tier | 3,000 / mo, 100 / day | Sending to your own verified addresses only |
+| Paid entry point | $10 / mo for 50k | Workers Paid ($5 / mo minimum), 3,000 emails included |
+| Price per extra 1,000 | $0.50 | $0.35 |
+| Domain DNS | Any DNS provider | Must use Cloudflare DNS |
+| Marketing email | Yes (campaigns) | No, transactional only |
+| Templates | Yes, `{{{variables}}}` | Not documented |
+| Contacts, campaigns, automations | Yes | No |
+| Events | Signed HTTP webhooks | Cloudflare Queues |
+| Inbound email | Stored mailboxes, API, MCP, IMAP | Email Routing to addresses or Workers |
+| Dedicated IP | Included on Growth ($20) | Not documented |
+| Open source / self-host | Yes (Apache 2.0) | No |
+
+Sources: Cloudflare's [pricing](https://developers.cloudflare.com/email-service/platform/pricing/), [overview](https://developers.cloudflare.com/email-service/), [FAQ](https://developers.cloudflare.com/email-service/reference/faq/) and [getting started](https://developers.cloudflare.com/email-service/get-started/send-emails/) pages. Reloop's prices are on [reloop.sh/pricing](/pricing).
+
+---
+
+## Where Cloudflare Email Service stands today
+
+Cloudflare's [changelog](https://developers.cloudflare.com/email-service/platform/changelog/) tells the story:
+
+- **April 16, 2026:** Email Sending enters public beta, through a Workers binding and a REST API.
+- **June 8, 2026:** authenticated SMTP submission (beta) on `smtp.mx.cloudflare.net:465`.
+- **July 15, 2026:** sending lifecycle events published to Cloudflare Queues.
+- **September 25, 2026:** suppressions can be scoped to a single sending domain.
+
+Email Routing, the inbound side, has been generally available for years. Sending is still labeled beta on the [overview page](https://developers.cloudflare.com/email-service/). That's worth knowing if you need a vendor SLA for your password resets today.
+
+---
+
+## Pricing at real volumes
+
+Cloudflare's model is simple: sending to arbitrary recipients **requires the Workers Paid plan** (a $5 a month account minimum, which also covers Workers, KV, Durable Objects and more). That plan includes **3,000 emails a month, then $0.35 per 1,000**. Bounced emails count toward the quota; sends rejected by the API don't. ([pricing](https://developers.cloudflare.com/email-service/platform/pricing/))
+
+| Monthly volume | Reloop | Cloudflare (incl. $5 Workers Paid) |
+|---|---|---|
+| 3,000 | $0 | $5 |
+| 50,000 | **$10** | about $21 |
+| 100,000 | **$20** | about $39 |
+| 250,000 | $20 + $75 overage = $95 | **about $91** |
+
+The Cloudflare figures are our math from the published rate: `$5 + (volume − 3,000) × $0.35 / 1,000`.
+
+What this means:
+
+- **Below about 200k emails a month, Reloop is cheaper**, mostly because our Growth plan includes 100k for $20.
+- **Above about 200k, Cloudflare's $0.35 rate wins** over our $0.50 overage. If you already pay for Workers, the $5 isn't extra and the crossover comes a little earlier.
+- **Reloop has a real free tier.** Cloudflare's free plan only lets you send to destination addresses you've verified in your own account, which is fine for alerts to yourself but not for users.
+
+If you self-host Reloop, there's no per-email fee at all. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure).
+
+---
+
+## Developer experience on Workers
+
+This is Cloudflare's best argument. Add a binding to `wrangler.jsonc`:
+
+```jsonc
+{
+  "send_email": [{ "name": "EMAIL" }]
+}
+```
+
+Then send from any handler:
+
+```typescript
+// Cloudflare Email Service
+const { messageId } = await env.EMAIL.send({
+  from: "welcome@acme.com",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+  text: "Thanks for signing up.",
+});
+```
+
+No API key to store, no package to install. Errors are thrown with a `code` such as `E_SENDER_NOT_VERIFIED` or `E_RATE_LIMIT_EXCEEDED`. ([Workers API](https://developers.cloudflare.com/email-service/api/send-emails/workers-api/))
+
+Reloop from a Worker is one `fetch` call, or the SDK with the `nodejs_compat` flag. Our [Cloudflare Workers guide](/blog/send-email-cloudflare-workers) covers both:
+
+```typescript
+// Reloop
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: env.RELOOP_API_KEY });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <welcome@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+You do store one secret (`wrangler secret put RELOOP_API_KEY`). In return, the same code runs unchanged on Vercel, Fly.io, a Node server or a cron job, and errors come back as values with `message`, `why` and `fix` instead of exceptions.
+
+Outside Workers, both have options. Cloudflare offers a [REST API](https://developers.cloudflare.com/email-service/api/send-emails/rest-api/) (`POST /client/v4/accounts/{account_id}/email/sending/send` with a Cloudflare API token) and SMTP. Reloop offers the REST API, SDKs for Node, Python, Go, PHP, Ruby, Rust, Java, .NET and Elixir, and an SMTP relay at `smtp.reloop.sh`.
+
+| | Reloop | Cloudflare |
+|---|---|---|
+| Workers integration | `fetch` or SDK + secret | Native binding, no secret |
+| REST API | Yes | Yes |
+| SMTP | Yes | Yes (beta, port 465) |
+| Official SDKs | 9 languages | Workers binding |
+| Errors | Returned as values (`message`, `why`, `fix`) | Thrown, with `code` |
+| Idempotent retries | `Idempotency-Key` header | Not documented |
+| Stored templates | Yes | Not documented |
+
+Cloudflare caps each email at 50 recipients across to, cc and bcc, and at 5 MiB including attachments ([limits](https://developers.cloudflare.com/email-service/platform/limits/)). New Cloudflare accounts also start on a "conservative daily quota" that grows over time, and higher limits go through a request form.
+
+---
+
+## The DNS requirement
+
+Cloudflare's getting-started guide is explicit: **"You must be using Cloudflare DNS to use Email Service."** ([source](https://developers.cloudflare.com/email-service/get-started/send-emails/)) Onboarding a domain adds bounce MX records, SPF, DKIM (selector `cf-bounce._domainkey`) and DMARC on a `cf-bounce` subdomain. ([domains](https://developers.cloudflare.com/email-service/configuration/domains/))
+
+If your DNS is already on Cloudflare, that's a non-issue and setup takes minutes. If it's on Route 53, Google Cloud DNS, Vercel or your registrar, you'd have to move the whole zone just to send email.
+
+Reloop works with any DNS provider: publish one DKIM record (`reloop._domainkey`) and merge `include:reloop.sh` into your SPF record.
+
+---
+
+## Events and webhooks
+
+Cloudflare publishes six sending events (`message.delivered`, `message.deferred`, `message.bounced`, `message.failed`, `message.rejected`, `message.complained`) **to a Cloudflare Queue**, which you consume with a Worker or an HTTP pull consumer. ([event subscriptions](https://developers.cloudflare.com/email-service/reference/event-subscriptions/)) That's elegant if you're on Workers; from anywhere else you're polling.
+
+Reloop pushes signed HTTP webhooks (`email.delivered`, `email.bounced`, `email.complained`, `email.opened`, `email.clicked`, `email.received` and more) to any URL, signed with HMAC-SHA256 in the `Reloop-Signature` header and retried on failure. See [building a webhook delivery system](/blog/building-webhook-delivery-system) for how that works.
+
+Both maintain a suppression list for bounces and complaints. Cloudflare's can be scoped per sending domain; Reloop's is shared across transactional mail and campaigns, so one bounce protects both.
+
+---
+
+## Inbound email
+
+Cloudflare's [Email Routing](https://developers.cloudflare.com/email-service/get-started/route-emails/) is excellent and free: unlimited inbound mail, forwarded to verified addresses or handed to a Worker's `email()` handler, which can reply in-thread. What you do with the message after that (store it, thread it, search it) is your code.
+
+Reloop receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. Reply in-thread with one call. Hosted plans include 1 inbox on Free, 5 on Pro and 10 on Growth; self-hosted is unlimited.
+
+| | Reloop | Cloudflare |
+|---|---|---|
+| Receive on your domain | Yes | Yes |
+| Price | Included per plan | Free, unlimited |
+| Stored mailboxes with threads | Yes | Build it (for example, Workers + R2) |
+| Reply in thread | API call | `message.reply()` in a Worker |
+| MCP and IMAP access | Yes | No |
+
+If you're building [AI agents that read and answer email](/blog/build-ai-agent-sends-emails), Reloop gives you the inbox; with Cloudflare you build one.
+
+---
+
+## Marketing, contacts and automations
+
+Cloudflare's FAQ is clear: **"Email Service supports transactional email only."** No newsletters, product announcements or drip campaigns.
+
+Reloop covers both sides with one suppression list: contacts with custom properties, groups and subscription channels, scheduled broadcast campaigns, and event-triggered automations (`reloop.automations.start`) for onboarding and dunning sequences. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert).
+
+---
+
+## Lock-in
+
+Cloudflare Email Service ties sending to Cloudflare DNS, Workers Paid and, for events, Cloudflare Queues. That's a fine trade if you're committed to the platform.
+
+Reloop is Apache 2.0. Start on Reloop Cloud, move to your own server with the [one-command installer](/self-host), and point the SDK's `baseUrl` at your instance. Nothing else in your code changes.
+
+---
+
+## Where Cloudflare is the better choice
+
+- **You're all-in on Workers** and your DNS is already on Cloudflare. The binding is the least code you'll ever write to send email.
+- **You send high transactional volume.** Above roughly 200k emails a month, $0.35 per 1,000 beats our overage rate.
+- **You only need inbound forwarding.** Email Routing is free and unlimited.
+- **You want one vendor and one bill** for compute, storage and email.
+
+## Where Reloop is the better choice
+
+- **Your DNS isn't on Cloudflare**, or your app runs on more than Workers.
+- **You send under ~200k a month** and want the lower bill and a real free tier.
+- **You need marketing mail, templates, contacts or automations** alongside transactional.
+- **You want inboxes**, for support or AI agents, with MCP and IMAP.
+- **You want signed HTTP webhooks** instead of a queue consumer.
+- **You need open source or self-hosting.**
+- **You need a generally available product today** rather than a beta.
+
+---
+
+## Using both, or switching
+
+You don't have to choose all at once. A common setup: keep **Email Routing** for forwarding `hello@` to your team, and send through Reloop from your Workers.
+
+To move transactional sending from Cloudflare to Reloop:
+
+1. **Add your domain in Reloop**, publish the `reloop._domainkey` DKIM record and merge `include:reloop.sh` into your SPF record. Don't create a second SPF record.
+2. **Store the key** with `wrangler secret put RELOOP_API_KEY`.
+3. **Replace `env.EMAIL.send(...)`** with `reloop.mail.send(...)` or the `fetch` helper from our [Workers guide](/blog/send-email-cloudflare-workers). Rename `replyTo` to `reply_to`, and check `emailError` instead of catching exceptions.
+4. **Swap the Queue consumer** for a webhook endpoint that verifies `Reloop-Signature`.
+5. **Import suppressions** from Cloudflare so you don't email addresses that already bounced or complained.
+6. **Ramp traffic** over a few days, then remove the `send_email` binding.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Cloudflare Email Service free?">
+    Inbound Email Routing is free and unlimited. Sending to arbitrary
+    recipients requires the Workers Paid plan ($5 a month minimum), which
+    includes 3,000 emails a month, then $0.35 per 1,000. On the free plan you
+    can only send to destination addresses verified in your account.
+  </Accordion>
+
+  <Accordion title="Can I use Cloudflare Email Service without Cloudflare DNS?">
+    No. Cloudflare's docs say you must be using Cloudflare DNS to use Email
+    Service. Reloop works with any DNS provider.
+  </Accordion>
+
+  <Accordion title="Can I send newsletters with Cloudflare Email Service?">
+    No. Cloudflare says Email Service supports transactional email only.
+    Reloop supports both transactional email and marketing campaigns.
+  </Accordion>
+
+  <Accordion title="Can I use Reloop from Cloudflare Workers?">
+    Yes. Call the HTTP API with `fetch`, or use the `reloop-email` SDK with
+    the `nodejs_compat` flag. Our [Workers guide](/blog/send-email-cloudflare-workers)
+    covers secrets, `waitUntil`, retries and Queues.
+  </Accordion>
+
+  <Accordion title="Which is cheaper?">
+    Reloop below roughly 200,000 emails a month ($10 for 50k, $20 for 100k).
+    Cloudflare above that, because $0.35 per 1,000 is lower than our $0.50
+    overage. Self-hosted Reloop has no per-email cost.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, any DNS provider, and it runs on Workers with one fetch call."
+  href="/dashboard/signup"
+  label="Get started"
+/>

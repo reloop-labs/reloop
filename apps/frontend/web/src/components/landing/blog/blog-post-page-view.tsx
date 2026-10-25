@@ -241,7 +241,7 @@ export function BlogPostPageView({
 	return (
 		<div className="min-h-dvh bg-white dark:bg-black">
 			{/* Header */}
-			<div className="w-full border-stroke-soft-200 border-b dark:border-white/10">
+			<div className="w-full border-stroke-soft-100 border-b dark:border-white/10">
 				<div className="mx-auto w-full max-w-7xl border-stroke-soft-100 border-x px-4 pt-32 pb-12 sm:px-6 lg:px-8 dark:border-white/10">
 					<header className="mx-auto flex w-full max-w-[720px] flex-col gap-4">
 						<Link
@@ -364,6 +364,8 @@ export function BlogPostPageView({
 
 			<BlogCta
 				category={post.category}
+				// The related grid already ends with a rule; a second one would double up.
+				showTopRule={relatedPosts.length === 0}
 				headlineLine1="Ship your first email with Reloop"
 				headlineLine2="in minutes."
 				sub="Open-source, deliverability-focused, and yours to self-host or run on Reloop Cloud. No lock-in, no rewrite later."
