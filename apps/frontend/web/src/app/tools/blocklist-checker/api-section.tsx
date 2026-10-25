@@ -93,7 +93,7 @@ console.log(\`Verdict: \${report.verdict} (Listed: \${report.listedCount}/\${rep
 		installCommand: "pip install reloop-email",
 		fileName: "check_blocklist.py",
 		checkCode: `import os
-from reloop import Reloop
+from reloop_email import Reloop
 
 client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
@@ -109,7 +109,7 @@ print(f"Clean: {report.clean_count}, Errors: {report.error_count}")`,
 				name: "Python",
 				icon: siPython,
 				code: `import os
-from reloop import Reloop
+from reloop_email import Reloop
 
 client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
@@ -221,7 +221,7 @@ echo "Verdict: {$report->verdict} (Listed: {$report->listedCount}/{$report->tota
 		name: "Ruby",
 		packageName: "reloop-email",
 		icon: siRuby,
-		installCommand: "gem install reloop-email",
+		installCommand: "gem install reloop",
 		fileName: "check_blocklist.rb",
 		checkCode: `require 'reloop'
 
@@ -278,7 +278,7 @@ public class App {
 		name: ".NET",
 		packageName: "Reloop.Email",
 		icon: siDotnet,
-		installCommand: "dotnet add package Reloop.Email",
+		installCommand: "dotnet add package Reloop",
 		fileName: "CheckBlocklist.cs",
 		checkCode: `using Reloop;
 

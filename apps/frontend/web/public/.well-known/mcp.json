@@ -4,18 +4,20 @@
   "url": "https://reloop.sh/mcp",
   "servers": [
     {
-      "name": "site",
+      "name": "reloop",
       "url": "https://reloop.sh/mcp",
       "transport": "http",
-      "authentication": "none",
-      "description": "Search Reloop marketing site content"
+      "authentication": "oauth2",
+      "description": "Act on a Reloop account: send email, manage domains, contacts, templates, automations and inboxes",
+      "card": "https://reloop.sh/.well-known/mcp-server-cards/reloop.json"
     },
     {
       "name": "docs",
       "url": "https://reloop.sh/docs/mcp",
       "transport": "http",
       "authentication": "none",
-      "description": "Search and retrieve Reloop documentation as markdown"
+      "description": "Search and retrieve Reloop documentation as markdown",
+      "card": "https://reloop.sh/.well-known/mcp-server-cards/docs.json"
     }
   ]
 }

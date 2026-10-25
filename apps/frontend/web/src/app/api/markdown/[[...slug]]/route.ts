@@ -7,6 +7,7 @@ import {
 } from "@reloop/web/lib/agent-headers";
 import { markdownNotFound } from "@reloop/web/lib/markdown-not-found";
 import { getSiteUrl } from "@reloop/web/lib/site";
+import { getAllSitemapRoutes } from "@reloop/web/lib/sitemap-routes";
 import { type NextRequest, NextResponse } from "next/server";
 
 const RESERVED = new Set([
@@ -16,6 +17,13 @@ const RESERVED = new Set([
 	"sitemap",
 	"pricing", // dedicated route
 ]);
+
+let knownPages: Set<string> | null = null;
+
+function isKnownPage(path: string): boolean {
+	knownPages ??= new Set(getAllSitemapRoutes());
+	return knownPages.has(path);
+}
 
 export async function GET(
 	_request: NextRequest,
@@ -33,7 +41,7 @@ export async function GET(
 			? "/"
 			: `/${slug.join("/")}`;
 
-	const content = resolveMarketingMarkdown(path);
+	const content = resolveMarketingMarkdown(path, isKnownPage);
 	if (!content) {
 		return markdownNotFound(`${path}.md`);
 	}

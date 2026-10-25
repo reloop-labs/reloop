@@ -82,12 +82,12 @@ console.log(\`Batch token: \${batch.token}\`);`,
 	{
 		slug: "python",
 		name: "Python",
-		packageName: "reloop",
+		packageName: "reloop-email",
 		icon: siPython,
-		installCommand: "pip install reloop",
+		installCommand: "pip install reloop-email",
 		fileName: "verify_email.py",
 		checkCode: `import os
-from reloop import Reloop
+from reloop_email import Reloop
 
 client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 

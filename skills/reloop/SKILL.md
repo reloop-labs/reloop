@@ -1,0 +1,1 @@
+../../apps/frontend/web/public/skill.md

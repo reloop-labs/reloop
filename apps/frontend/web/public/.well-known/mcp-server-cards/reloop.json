@@ -1,0 +1,44 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  "name": "sh.reloop/mcp",
+  "title": "Reloop",
+  "description": "Send email and manage domains, contacts, templates, automations and inboxes on Reloop.",
+  "version": "0.2.0",
+  "websiteUrl": "https://reloop.sh/features/mcp",
+  "icons": [
+    {
+      "src": "https://reloop.sh/web-app-manifest-512x512.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    },
+    {
+      "src": "https://reloop.sh/icon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/reloop-labs/reloop",
+    "source": "github",
+    "subfolder": "apps/backend/mcp"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://reloop.sh/mcp"
+    }
+  ],
+  "_meta": {
+    "sh.reloop/auth": {
+      "type": "oauth2",
+      "protectedResourceMetadata": "https://reloop.sh/.well-known/oauth-protected-resource/mcp",
+      "alternatives": [
+        "Reloop API key as `Authorization: Bearer rl_...`"
+      ]
+    }
+  }
+}

@@ -109,8 +109,8 @@ print(f"Email sent: {result.response['id']}")`,
 		name: "Go",
 		shortDescription:
 			"Use the Go SDK for high-throughput services with context-aware requests and minimal dependencies.",
-		installCommand: "go get github.com/reloop-labs/reloop-email",
-		packageName: "reloop-email",
+		installCommand: "go get github.com/reloop-labs/reloop-go/v2",
+		packageName: "reloop-go",
 		typeSafety: "Static / Strong",
 		concurrency: "Goroutines & Channels",
 		primaryFramework: "Gin, Fiber, Echo",
@@ -124,7 +124,7 @@ import (
 	"fmt"
 	"os"
 
-	reloopemail "github.com/reloop-labs/reloop-email"
+	reloopemail "github.com/reloop-labs/reloop-go/v2"
 )
 
 func main() {
@@ -206,8 +206,8 @@ $reloop->emails->send([
 		name: "Ruby",
 		shortDescription:
 			"Ship email from Rails, Sinatra, or any Ruby app with a gem that follows familiar conventions.",
-		installCommand: "gem install reloop-email",
-		packageName: "reloop-email",
+		installCommand: "gem install reloop",
+		packageName: "reloop",
 		typeSafety: "Typed Interface (RBS)",
 		concurrency: "Fibers / Threads",
 		primaryFramework: "Rails, Sinatra, Hanami",
@@ -291,8 +291,8 @@ public class Main {
 		name: ".NET",
 		shortDescription:
 			"Send email from C# and .NET 6+ with a NuGet package designed for modern async applications.",
-		installCommand: "dotnet add package Reloop.Email",
-		packageName: "Reloop.Email",
+		installCommand: "dotnet add package Reloop",
+		packageName: "Reloop",
 		typeSafety: "Strong Static C# 10+",
 		concurrency: "Async / Await Tasks",
 		primaryFramework: "ASP.NET Core, Worker Services",

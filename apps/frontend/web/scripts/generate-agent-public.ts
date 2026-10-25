@@ -2,6 +2,7 @@
  * Write agent discovery files into public/ (static serving).
  * Run: bun apps/frontend/web/scripts/generate-agent-public.ts
  */
+import { createHash } from "node:crypto";
 import {
 	copyFileSync,
 	existsSync,
@@ -66,16 +67,21 @@ for (const page of pages) {
 write("llms-full.txt", fullChunks.join("\n"));
 
 // --- pricing.md ---
-write("pricing.md", injectMarkdownAgentDirective(buildPricingMarkdown()));
+write(
+	"pricing.md",
+	injectMarkdownAgentDirective(buildPricingMarkdown(), {
+		canonical: `${origin}/pricing`,
+	}),
+);
 
 // --- agent page mirrors ---
 const agentDir = join(root, "content/agent");
-const mirrors: Array<[string, string]> = [
-	["home.md", "index.md"],
-	["about.md", "about.md"],
-	["developers.md", "developers.md"],
+const mirrors: Array<[string, string, string]> = [
+	["home.md", "index.md", ""],
+	["about.md", "about.md", "/about"],
+	["developers.md", "developers.md", "/developers"],
 ];
-for (const [src, dest] of mirrors) {
+for (const [src, dest, page] of mirrors) {
 	const from = join(agentDir, src);
 	if (existsSync(from)) {
 		const body = injectMarkdownAgentDirective(
@@ -83,6 +89,7 @@ for (const [src, dest] of mirrors) {
 				/\*\*\d+ \/ day\*\*/g,
 				`**${freeDailyEmails} / day**`,
 			),
+			{ canonical: `${origin}${page}` },
 		);
 		write(dest, body);
 	}
@@ -115,64 +122,103 @@ for (const name of ["skill.md", "llms-docs.txt"] as const) {
 }
 
 // --- .well-known discovery ---
-const siteMcp = `${origin}/mcp`;
+const productMcp = `${origin}/mcp`;
 const docsMcp = `${origin}/docs/mcp`;
+const productMcpVersion = (
+	JSON.parse(
+		readFileSync(join(root, "../../backend/mcp/package.json"), "utf-8"),
+	) as { version: string }
+).version;
+const productCard = `${origin}/.well-known/mcp-server-cards/reloop.json`;
+const docsCard = `${origin}/.well-known/mcp-server-cards/docs.json`;
+const icons = [
+	{
+		src: `${origin}/web-app-manifest-512x512.png`,
+		mimeType: "image/png",
+		sizes: ["512x512"],
+	},
+	{ src: `${origin}/icon.svg`, mimeType: "image/svg+xml", sizes: ["any"] },
+];
+const repository = {
+	url: "https://github.com/reloop-labs/reloop",
+	source: "github",
+};
 
+// Server cards (draft MCP server-card extension); no tools[]: agents trust the live tools/list.
+const serverCardSchema =
+	"https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json";
 write(
-	".well-known/mcp.json",
+	".well-known/mcp-server-cards/reloop.json",
 	`${JSON.stringify(
 		{
+			$schema: serverCardSchema,
+			name: "sh.reloop/mcp",
+			title: "Reloop",
+			description:
+				"Send email and manage domains, contacts, templates, automations and inboxes on Reloop.",
+			version: productMcpVersion,
+			websiteUrl: `${origin}/features/mcp`,
+			icons,
+			repository: { ...repository, subfolder: "apps/backend/mcp" },
+			remotes: [{ type: "streamable-http", url: productMcp }],
+			// Auth isn't a server-card field; vendor data belongs under _meta
+			_meta: {
+				"sh.reloop/auth": {
+					type: "oauth2",
+					protectedResourceMetadata: `${origin}/.well-known/oauth-protected-resource/mcp`,
+					alternatives: ["Reloop API key as `Authorization: Bearer rl_...`"],
+				},
+			},
+		},
+		null,
+		2,
+	)}\n`,
+);
+write(
+	".well-known/mcp-server-cards/docs.json",
+	`${JSON.stringify(
+		{
+			$schema: serverCardSchema,
+			name: "sh.reloop/docs-mcp",
+			title: "Reloop Docs",
+			description: "Search and read the Reloop documentation as markdown.",
 			version: "1.0.0",
-			transport: "http",
-			url: siteMcp,
-			servers: [
-				{
-					name: "site",
-					url: siteMcp,
-					transport: "http",
-					authentication: "none",
-					description: "Search Reloop marketing site content",
-				},
-				{
-					name: "docs",
-					url: docsMcp,
-					transport: "http",
-					authentication: "none",
-					description: "Search and retrieve Reloop documentation as markdown",
-				},
-			],
+			websiteUrl: `${origin}/docs/integrations/ai-tools/mcp-server`,
+			icons,
+			repository: { ...repository, subfolder: "apps/frontend/docs" },
+			remotes: [{ type: "streamable-http", url: docsMcp }],
 		},
 		null,
 		2,
 	)}\n`,
 );
 
-write(
-	".well-known/mcp",
-	`${JSON.stringify(
-		{
-			version: "1.0.0",
-			transport: "http",
-			url: siteMcp,
-			servers: [
-				{
-					name: "site",
-					url: siteMcp,
-					transport: "http",
-					authentication: "none",
-				},
-				{
-					name: "docs",
-					url: docsMcp,
-					transport: "http",
-					authentication: "none",
-				},
-			],
-		},
-		null,
-		2,
-	)}\n`,
-);
+const mcpServers = [
+	{
+		name: "reloop",
+		url: productMcp,
+		transport: "http",
+		authentication: "oauth2",
+		description:
+			"Act on a Reloop account: send email, manage domains, contacts, templates, automations and inboxes",
+		card: productCard,
+	},
+	{
+		name: "docs",
+		url: docsMcp,
+		transport: "http",
+		authentication: "none",
+		description: "Search and retrieve Reloop documentation as markdown",
+		card: docsCard,
+	},
+];
+const mcpManifest = `${JSON.stringify(
+	{ version: "1.0.0", transport: "http", url: productMcp, servers: mcpServers },
+	null,
+	2,
+)}\n`;
+write(".well-known/mcp.json", mcpManifest);
+write(".well-known/mcp", mcpManifest);
 
 write(
 	".well-known/skills/index.json",
@@ -205,6 +251,10 @@ write(
 					description:
 						"Use Reloop email infrastructure: API keys, send mail, domains, contacts, webhooks, and templates.",
 					url: `${origin}/skill.md`,
+					// Hash of the served bytes so agents can verify what they fetched
+					digest: `sha256:${createHash("sha256")
+						.update(readFileSync(join(pub, "skill.md")))
+						.digest("hex")}`,
 				},
 			],
 		},

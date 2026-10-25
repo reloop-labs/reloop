@@ -1,6 +1,11 @@
-> For the site documentation index, see [llms.txt](/llms.txt). Docs index: [llms-docs.txt](/llms-docs.txt). Marketing corpus: [llms-full.txt](/llms-full.txt). Docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
+---
+title: "About Reloop"
+canonical: "https://reloop.sh/about"
+---
 
 # About Reloop
+
+> For the site documentation index, see [llms.txt](/llms.txt). Docs index: [llms-docs.txt](/llms-docs.txt). Marketing corpus: [llms-full.txt](/llms-full.txt). Docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
 
 Reloop Labs builds open-source email infrastructure for developers and AI agents. Reloop **is** the email platform (ESP + MTA). It is **not** a multi-ESP connector.
 

@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
-
-const agentLink =
-	'</llms.txt>; rel="llms-txt", </llms-docs.txt>; rel="docs-llms-txt", </llms-full.txt>; rel="llms-full-txt", </llms-full-docs.txt>; rel="docs-llms-full-txt", </sitemap.md>; rel="sitemap", </skill.md>; rel="skill-md", </.well-known/ard.json>; rel="ard", </.well-known/ard.json>; rel="ai-catalog"';
-const agentCache = "public, max-age=300, s-maxage=3600, must-revalidate";
+import {
+	AGENT_CACHE_CONTROL as agentCache,
+	AGENT_LINK_HEADER as agentLink,
+} from "./src/lib/agent-headers";
 
 const nextConfig: NextConfig = {
 	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],

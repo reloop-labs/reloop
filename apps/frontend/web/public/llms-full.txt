@@ -33,9 +33,12 @@ Markdown: https://reloop.sh/pricing.md
 - Features:
   - 3,000 emails / month
   - 100 emails / day
+  - Unlimited contacts
+  - Unlimited team members
   - 1 agent inbox
   - 1 webhook
   - 3 custom domains
+  - 1 own SMTP server
   - 1 MB attachments
   - Data retention (45 days)
   - Community support
@@ -51,10 +54,12 @@ Markdown: https://reloop.sh/pricing.md
 - Features:
   - 50,000 emails / month
   - No daily limit
+  - Unlimited contacts
+  - Unlimited team members
   - 5 agent inboxes
   - 5 webhooks
   - 5 custom domains
-  - Bring your own SMTP
+  - 2 own SMTP servers
   - 5 MB attachments
   - Data retention (45 days)
   - Dedicated support
@@ -70,14 +75,16 @@ Markdown: https://reloop.sh/pricing.md
 - Features:
   - 100,000 emails / month
   - No daily limit
-  - 1 dedicated IP
-  - Bring your own SMTP (3 servers)
+  - Unlimited contacts
+  - Unlimited team members
   - 10 agent inboxes
   - 10 webhooks
   - 10 custom domains
+  - 3 own SMTP servers
   - 5 MB attachments
   - Data retention (45 days)
   - Dedicated support
+  - 1 dedicated IP
 
 ### Enterprise
 
@@ -89,12 +96,16 @@ Markdown: https://reloop.sh/pricing.md
 - Features:
   - Custom email volume
   - No daily limit
+  - Unlimited contacts
+  - Unlimited team members
   - Custom agent inboxes
   - Custom webhooks
   - Custom domains
+  - Custom SMTP servers
   - Custom attachments
   - Data retention (45 days)
   - Dedicated support & SLA
+  - Custom dedicated IPs
 
 ## Community (self-hosted)
 
@@ -1825,7 +1836,7 @@ This is the quiet deal-breaker. Proprietary APIs, opaque logs, and "you can't le
 
 Linux, Postgres, Redis, Nginx: the boring foundations of the internet are open. Email sits in that category. If it fails, users can't log in, can't reset passwords, and can't get receipts.
 
-Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a [pricing page](/pricing). Full rationale: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and our [product beliefs](/our-product-beliefs).
+Open source is how we make the five things above credible. You can read how delivery works. You can leave without rewriting your notification stack. The roadmap gets shaped by people shipping real mail, not only by a [pricing page](/pricing). Full rationale: [why we open-sourced email infrastructure](/blog/why-we-open-sourced-email-infrastructure) and our [product beliefs](/about).
 
 We're not open-sourcing a demo. Reloop Cloud and Reloop open source are the same product, with the same APIs whether you use [hosted](/pricing) or [self-host](/self-host).
 
@@ -3780,7 +3791,7 @@ By releasing Reloop under the **[Apache 2.0 license](/license)**, we guarantee:
 2. **Auditability & Security**: Security teams can inspect every line of delivery logic and keep sensitive communication strictly within their own VPC boundary.
 3. **No Ransom Pricing**: If your business grows 100x, your outbound communication channel doesn't become your most expensive utility. You can choose managed [Reloop Cloud pricing](/pricing) for zero ops, or [self-host](/self-host) with complete independence.
 
-For a deeper dive into our architectural philosophy, read our [product beliefs](/our-product-beliefs) and [why open source matters](/why-open-source).
+For a deeper dive into our architectural philosophy, read our [product beliefs](/about) and [why open source matters](/why-open-source).
 
 ---
 

@@ -1,6 +1,12 @@
-> For the site documentation index, see [llms.txt](/llms.txt). Docs index: [llms-docs.txt](/llms-docs.txt). Marketing corpus: [llms-full.txt](/llms-full.txt). Docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
+---
+title: "Reloop"
+description: "High-performance, open-source email infrastructure: the same service as proprietary platforms. Use Reloop hosted or deploy it yourself."
+canonical: "https://reloop.sh"
+---
 
 # Reloop
+
+> For the site documentation index, see [llms.txt](/llms.txt). Docs index: [llms-docs.txt](/llms-docs.txt). Marketing corpus: [llms-full.txt](/llms-full.txt). Docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
 
 > High-performance, open-source email infrastructure: the same service as proprietary platforms. Use Reloop hosted or deploy it yourself.
 

@@ -5,7 +5,8 @@
       "name": "reloop",
       "type": "skill-md",
       "description": "Use Reloop email infrastructure: API keys, send mail, domains, contacts, webhooks, and templates.",
-      "url": "https://reloop.sh/skill.md"
+      "url": "https://reloop.sh/skill.md",
+      "digest": "sha256:e544d8c88c61d2128dcd5a10ebc50199646bd0513bafa7ddf60e88c72667ec79"
     }
   ]
 }

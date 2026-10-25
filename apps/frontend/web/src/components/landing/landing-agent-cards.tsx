@@ -9,9 +9,12 @@ export function LandingAgentCards() {
 	return (
 		<section
 			id="integrations"
-			aria-label="Four ways to use Reloop"
+			aria-labelledby="landing-agent-cards-heading"
 			className="overflow-hidden bg-white text-zinc-950 dark:bg-black dark:text-zinc-50"
 		>
+			<h2 id="landing-agent-cards-heading" className="sr-only">
+				Use Reloop from your AI agent or terminal
+			</h2>
 			<div className="relative mx-auto w-full max-w-5xl border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 				<div className="grid w-full md:grid-cols-2">
 					{/* MCP Server */}

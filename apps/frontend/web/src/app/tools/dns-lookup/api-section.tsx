@@ -95,7 +95,7 @@ console.log(\`Provider: \${result.provider?.name}\`);`,
 		installCommand: "pip install reloop-email",
 		fileName: "lookup_dns.py",
 		checkCode: `import os
-from reloop import Reloop
+from reloop_email import Reloop
 
 client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
@@ -112,7 +112,7 @@ print(f"DMARC Policy: {report.summary.dmarc_policy}")`,
 				name: "Python",
 				icon: siPython,
 				code: `import os
-from reloop import Reloop
+from reloop_email import Reloop
 
 client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
@@ -227,7 +227,7 @@ echo "Records found: " . count($report->records) . "\\n";`,
 		name: "Ruby",
 		packageName: "reloop-email",
 		icon: siRuby,
-		installCommand: "gem install reloop-email",
+		installCommand: "gem install reloop",
 		fileName: "lookup_dns.rb",
 		checkCode: `require 'reloop'
 
@@ -287,7 +287,7 @@ public class App {
 		name: ".NET",
 		packageName: "Reloop.Email",
 		icon: siDotnet,
-		installCommand: "dotnet add package Reloop.Email",
+		installCommand: "dotnet add package Reloop",
 		fileName: "LookupDns.cs",
 		checkCode: `using Reloop;
 

@@ -14,55 +14,7 @@ import { JsonLd } from "@reloop/web/components/json-ld";
 import { LandingAgentCards } from "@reloop/web/components/landing/landing-agent-cards";
 import { LandingDeveloperProof } from "@reloop/web/components/landing/landing-developer-proof";
 import { LandingHero } from "@reloop/web/components/landing/landing-hero";
-import { homeFaqItems } from "@reloop/web/lib/home-faq";
-import {
-	faqPageJsonLd,
-	pricingSoftwareApplicationJsonLd,
-} from "@reloop/web/lib/schema";
-import {
-	defaultOgImage,
-	getSiteUrl,
-	siteDescription,
-	siteName,
-	socialProfiles,
-} from "@reloop/web/lib/site";
-
-const siteUrl = getSiteUrl();
-const organizationId = `${siteUrl}/#organization`;
-
-export const homeSchema = [
-	{
-		"@context": "https://schema.org" as const,
-		"@type": "WebSite" as const,
-		"@id": `${siteUrl}/#website`,
-		name: siteName,
-		url: siteUrl,
-		description: siteDescription,
-		publisher: { "@id": organizationId },
-	},
-	{
-		"@context": "https://schema.org" as const,
-		"@type": "Organization" as const,
-		"@id": organizationId,
-		name: "Reloop Labs",
-		alternateName: siteName,
-		url: siteUrl,
-		logo: `${siteUrl}${defaultOgImage}`,
-		sameAs: [
-			socialProfiles.github,
-			socialProfiles.x,
-			socialProfiles.discord,
-			socialProfiles.linkedin,
-		],
-	},
-	{
-		...pricingSoftwareApplicationJsonLd(siteUrl),
-		"@id": `${siteUrl}/#software`,
-		url: siteUrl,
-		publisher: { "@id": organizationId },
-	},
-	faqPageJsonLd(homeFaqItems),
-];
+import { homeSchema } from "@reloop/web/lib/home-schema";
 
 export function LandingPageView() {
 	return (

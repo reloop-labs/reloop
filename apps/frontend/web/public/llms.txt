@@ -69,9 +69,28 @@ Prefer `.md` twins. Reloop Free has a monthly and a daily cap (see the pricing s
 - [Product skill](https://reloop.sh/skill.md): Capabilities, auth, constraints
 - [Pricing (markdown)](https://reloop.sh/pricing.md): Structured plan and price data
 - [Sitemap (markdown)](https://reloop.sh/sitemap.md): All public marketing URLs
-- [Site MCP](https://reloop.sh/mcp): Search marketing content
-- [Docs MCP](https://reloop.sh/docs/mcp): Search product documentation (runtime API on docs app)
+- [Docs section index](https://reloop.sh/docs/llms.txt): llms.txt scoped to /docs
+- [Blog section index](https://reloop.sh/blog/llms.txt): Every published post with its markdown URL
+- [Product MCP](https://reloop.sh/mcp): Act on a Reloop account (OAuth or API key); [server card](https://reloop.sh/.well-known/mcp-server-cards/reloop.json)
+- [Docs MCP](https://reloop.sh/docs/mcp): Search product documentation, no auth; [server card](https://reloop.sh/.well-known/mcp-server-cards/docs.json)
 - [MCP discovery](https://reloop.sh/.well-known/mcp.json): Machine-readable MCP location
+- [OpenAPI spec](https://reloop.sh/openapi.json): The whole public REST API; per-service specs in the [API catalog](https://reloop.sh/.well-known/api-catalog)
+- [Agent auth](https://reloop.sh/auth.md): How agents get credentials (OAuth discovery, API keys)
+- [NLWeb ask](https://reloop.sh/ask): `POST {"query":{"text":"..."}}` natural-language search over site and docs
+- [Agentic Resource Discovery](https://reloop.sh/.well-known/ard.json): ARD catalog of the above
+
+## Official SDKs
+
+- Node.js: `npm install reloop-email` ([npm](https://www.npmjs.com/package/reloop-email), [source](https://github.com/reloop-labs/reloop-node))
+- Python: `pip install reloop-email`, `from reloop_email import Reloop` ([PyPI](https://pypi.org/project/reloop-email/), [source](https://github.com/reloop-labs/reloop-python))
+- Go: `go get github.com/reloop-labs/reloop-go/v2` ([pkg.go.dev](https://pkg.go.dev/github.com/reloop-labs/reloop-go/v2))
+- Ruby: `gem install reloop` ([RubyGems](https://rubygems.org/gems/reloop), [source](https://github.com/reloop-labs/reloop-ruby))
+- PHP: `composer require reloop/reloop-email` ([Packagist](https://packagist.org/packages/reloop/reloop-email))
+- Rust: `cargo add reloop` ([crates.io](https://crates.io/crates/reloop))
+- .NET: `dotnet add package Reloop` ([NuGet](https://www.nuget.org/packages/Reloop))
+- Elixir: `{:reloop, "~> 0.1.3"}` ([Hex](https://hex.pm/packages/reloop))
+- Java: [source](https://github.com/reloop-labs/reloop-java)
+- Remote MCP server: `https://reloop.sh/mcp` (OAuth or API key; see [auth.md](https://reloop.sh/auth.md))
 
 ## Marketing
 

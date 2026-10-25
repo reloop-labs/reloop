@@ -94,42 +94,52 @@ function listBlogPosts(): BlogMeta[] {
 		.filter((p) => includeDrafts || !p.draft);
 }
 
-/** Resolve markdown body for a marketing path like `/pricing` or `/blog/foo`. */
-export function resolveMarketingMarkdown(path: string): string | null {
+/**
+ * Resolve markdown body for a marketing path like `/pricing` or `/blog/foo`.
+ * Pages without a markdown source get a stub, but only when `isKnownPage`
+ * confirms the page exists, so unknown paths stay 404s.
+ */
+export function resolveMarketingMarkdown(
+	path: string,
+	isKnownPage: (path: string) => boolean = () => true,
+): string | null {
 	const normalized = path.replace(/\.md$/i, "").replace(/\/+$/, "") || "/";
 	const origin = getSiteUrl();
+	const canonical = `${origin}${normalized === "/" ? "" : normalized.replace(/^\/?/, "/")}`;
+	const finalize = (markdown: string, lastUpdated?: string) =>
+		injectMarkdownAgentDirective(markdown, { canonical, lastUpdated });
 
 	if (normalized === "/pricing" || normalized === "pricing") {
-		return injectMarkdownAgentDirective(buildPricingMarkdown());
+		return finalize(buildPricingMarkdown());
 	}
 
 	if (normalized === "/compare" || normalized === "compare") {
-		return injectMarkdownAgentDirective(buildCompareIndexMarkdown());
+		return finalize(buildCompareIndexMarkdown());
 	}
 
 	const compareMatch = normalized.match(/^\/?compare\/([^/]+)$/);
 	if (compareMatch?.[1]) {
 		const md = buildCompareMarkdown(compareMatch[1]);
-		if (md) return injectMarkdownAgentDirective(md);
+		if (md) return finalize(md);
 	}
 
 	if (normalized === "/" || normalized === "" || normalized === "/index") {
 		const home = readAgentPage("home.md");
-		if (home) return injectMarkdownAgentDirective(home);
-		return injectMarkdownAgentDirective(buildHomeMarkdown());
+		if (home) return finalize(home);
+		return finalize(buildHomeMarkdown());
 	}
 
 	// MCP server and CLI feature pages
 	const aiToolsMarkdown = resolveAiToolsMarkdown(normalized);
 	if (aiToolsMarkdown) {
-		return injectMarkdownAgentDirective(aiToolsMarkdown);
+		return finalize(aiToolsMarkdown);
 	}
 
 	// Static agent pages: content/agent/<slug>.md
 	const agentSlug = normalized.replace(/^\//, "").replace(/\//g, "-");
 	const agentPage = readAgentPage(`${agentSlug}.md`);
 	if (agentPage) {
-		return injectMarkdownAgentDirective(agentPage);
+		return finalize(agentPage);
 	}
 
 	// Blog posts
@@ -167,10 +177,11 @@ export function resolveMarketingMarkdown(path: string): string | null {
 		]
 			.filter((l) => l !== "")
 			.join("\n");
-		return injectMarkdownAgentDirective(header);
+		return finalize(header, published);
 	}
 
 	// Lightweight stub for other public paths (avoid importing full sitemap graph)
+	if (!isKnownPage(normalized)) return null;
 	const title =
 		normalized
 			.split("/")
@@ -178,7 +189,7 @@ export function resolveMarketingMarkdown(path: string): string | null {
 			.map((p) => p.charAt(0).toUpperCase() + p.slice(1))
 			.join(" ") || siteName;
 
-	return injectMarkdownAgentDirective(
+	return finalize(
 		[
 			`# ${title}`,
 			"",

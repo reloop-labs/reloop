@@ -18,6 +18,8 @@ export function GET() {
 		`Sitemap: ${siteUrl}/glossary/sitemap.xml`,
 		`Sitemap: ${siteUrl}/docs/sitemap.xml`,
 		"",
+		`Schemamap: ${siteUrl}/schemamap.xml`,
+		"",
 		`Agentmap: ${siteUrl}/.well-known/ard.json`,
 		"",
 	].join("\n");

@@ -35,7 +35,7 @@ const events = await reloop.events.list({
 			label: "Python",
 			file: "analytics.py",
 			code: `import os
-from reloop import Reloop
+from reloop_email import Reloop
 
 reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 

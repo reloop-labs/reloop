@@ -6,8 +6,34 @@ import { type DocsTextFile, loadAllDocsText } from "../../lib/docs-content-fs";
 const ORIGIN = getSiteUrl();
 const SERVER_INFO = {
 	name: "reloop-docs",
+	title: "Reloop Docs",
 	version: "1.0.0",
 };
+
+const INSTRUCTIONS = `Read-only access to the Reloop documentation (open-source email infrastructure: email API, SMTP relay, domains, contacts, templates, automations, webhooks, agent inboxes).
+Use search_docs to find pages by keyword, then get_doc_page with a returned path to read the page as markdown.
+Resources expose the product skill (reloop://skill.md) and the curated docs index (reloop://llms.txt).
+This server cannot act on a Reloop account; for that, connect the product MCP server at ${ORIGIN}/mcp (OAuth or API key).`;
+
+/** MCP resources, served from the marketing app's public agent files. */
+const RESOURCES = [
+	{
+		uri: "reloop://skill.md",
+		name: "skill.md",
+		title: "Reloop product skill",
+		description: "Reloop product skill for agents",
+		mimeType: "text/markdown",
+		source: `${ORIGIN}/skill.md`,
+	},
+	{
+		uri: "reloop://llms.txt",
+		name: "llms.txt",
+		title: "Reloop llms.txt",
+		description: "Curated documentation index",
+		mimeType: "text/plain",
+		source: `${ORIGIN}/llms.txt`,
+	},
+];
 
 const TOOLS = [
 	{
@@ -173,6 +199,7 @@ async function handleRpc(body: {
 				resources: {},
 			},
 			serverInfo: SERVER_INFO,
+			instructions: INSTRUCTIONS,
 		});
 	}
 
@@ -186,21 +213,33 @@ async function handleRpc(body: {
 
 	if (method === "resources/list") {
 		return jsonRpcResult(id, {
-			resources: [
-				{
-					uri: "reloop://skill.md",
-					name: "skill.md",
-					description: "Reloop product skill for agents",
-					mimeType: "text/markdown",
-				},
-				{
-					uri: "reloop://llms.txt",
-					name: "llms.txt",
-					description: "Curated documentation index",
-					mimeType: "text/plain",
-				},
-			],
+			resources: RESOURCES.map(({ source: _source, ...resource }) => resource),
 		});
+	}
+
+	if (method === "resources/read") {
+		const uri = String(params.uri ?? "");
+		const resource = RESOURCES.find((r) => r.uri === uri);
+		if (!resource) {
+			return jsonRpcError(id, -32002, `Resource not found: ${uri}`);
+		}
+		try {
+			const res = await fetch(resource.source, {
+				signal: AbortSignal.timeout(5000),
+			});
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			return jsonRpcResult(id, {
+				contents: [
+					{ uri, mimeType: resource.mimeType, text: await res.text() },
+				],
+			});
+		} catch (error) {
+			return jsonRpcError(
+				id,
+				-32603,
+				`Could not load ${uri}: ${error instanceof Error ? error.message : "unknown error"}`,
+			);
+		}
 	}
 
 	if (method === "tools/call") {

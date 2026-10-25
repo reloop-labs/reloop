@@ -207,7 +207,7 @@ console.log("Detected Issues:", analysis.issues);`,
 	{
 		id: "python",
 		label: "Python",
-		code: `from reloop import Reloop
+		code: `from reloop_email import Reloop
 
 client = Reloop(api_key="rl_live_your_api_key")
 

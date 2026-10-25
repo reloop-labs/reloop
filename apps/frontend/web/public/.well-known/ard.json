@@ -8,21 +8,23 @@
   "entries": [
     {
       "@context": "https://agenticresourcediscovery.org/context/v1",
-      "identifier": "urn:air:reloop.sh:mcp:site",
-      "displayName": "Reloop Site MCP Server",
-      "description": "Search Reloop marketing site content: pricing, comparisons, blog, and product pages.",
+      "identifier": "urn:air:reloop.sh:mcp:product",
+      "displayName": "Reloop MCP Server",
+      "description": "Act on a Reloop account: send email, manage domains, contacts, templates, automations and agent inboxes.",
       "mediaType": "application/json",
       "type": "application/json",
-      "url": "https://reloop.sh/.well-known/mcp.json",
+      "url": "https://reloop.sh/.well-known/mcp-server-cards/reloop.json",
       "metadata": {
         "resourceType": "mcp-server",
         "endpoint": "https://reloop.sh/mcp",
         "transport": "streamable-http",
-        "authentication": "none"
+        "authentication": "oauth2",
+        "protectedResourceMetadata": "https://reloop.sh/.well-known/oauth-protected-resource/mcp",
+        "authDocs": "https://reloop.sh/auth.md"
       },
       "representativeQueries": [
-        "how much does Reloop cost for 100k emails a month",
-        "compare Reloop with Resend"
+        "send a test email from my Reloop domain",
+        "list my Reloop domains and their DNS status"
       ]
     },
     {
@@ -32,7 +34,7 @@
       "description": "Search and retrieve Reloop documentation as markdown.",
       "mediaType": "application/json",
       "type": "application/json",
-      "url": "https://reloop.sh/.well-known/mcp.json",
+      "url": "https://reloop.sh/.well-known/mcp-server-cards/docs.json",
       "metadata": {
         "resourceType": "mcp-server",
         "endpoint": "https://reloop.sh/docs/mcp",
@@ -75,6 +77,60 @@
       "representativeQueries": [
         "what is Reloop",
         "is Reloop open source"
+      ]
+    },
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:reloop.sh:api:rest",
+      "displayName": "Reloop REST API",
+      "description": "OpenAPI 3 description of the public Reloop API: email, domains, contacts, templates, webhooks, automations, inboxes.",
+      "mediaType": "application/json",
+      "type": "application/json",
+      "url": "https://reloop.sh/openapi.json",
+      "metadata": {
+        "resourceType": "openapi",
+        "baseUrl": "https://reloop.sh",
+        "authentication": "apiKey",
+        "catalog": "https://reloop.sh/.well-known/api-catalog",
+        "authDocs": "https://reloop.sh/auth.md"
+      },
+      "representativeQueries": [
+        "what endpoint sends an email",
+        "how do I list contacts via the API"
+      ]
+    },
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:reloop.sh:nlweb:ask",
+      "displayName": "Reloop NLWeb ask",
+      "description": "NLWeb v0.55 natural-language search over the Reloop site and documentation, with SSE streaming.",
+      "mediaType": "application/json",
+      "type": "application/json",
+      "url": "https://reloop.sh/ask",
+      "metadata": {
+        "resourceType": "nlweb",
+        "method": "POST",
+        "version": "0.55",
+        "authentication": "none"
+      },
+      "representativeQueries": [
+        "does Reloop support inbound email",
+        "Reloop vs Postmark"
+      ]
+    },
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:reloop.sh:docs:auth-md",
+      "displayName": "Reloop auth.md",
+      "description": "How agents obtain credentials for the Reloop MCP server and REST API.",
+      "mediaType": "text/markdown",
+      "type": "text/markdown",
+      "url": "https://reloop.sh/auth.md",
+      "metadata": {
+        "resourceType": "documentation"
+      },
+      "representativeQueries": [
+        "how does an agent authenticate with Reloop"
       ]
     }
   ]

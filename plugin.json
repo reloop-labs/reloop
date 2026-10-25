@@ -1,0 +1,14 @@
+{
+	"$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+	"name": "reloop",
+	"version": "0.1.0",
+	"description": "Reloop email infrastructure for agents: the Reloop MCP server, the docs MCP server, and the Reloop skill.",
+	"author": {
+		"name": "Reloop Labs",
+		"email": "reloop.sh@gmail.com",
+		"url": "https://reloop.sh"
+	},
+	"homepage": "https://reloop.sh/docs/integrations/ai-tools/mcp-server",
+	"repository": "https://github.com/reloop-labs/reloop",
+	"keywords": ["email", "smtp", "transactional-email", "mcp", "email-api"]
+}

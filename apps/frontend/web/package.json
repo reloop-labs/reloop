@@ -8,7 +8,8 @@
 		"start": "next start",
 		"test": "bun test",
 		"lint": "next lint",
-		"generate:agent-public": "bun run scripts/generate-agent-public.ts && bun run scripts/generate-docs-llms-full.ts",
+		"generate:agent-public": "bun run scripts/generate-agent-public.ts && bun run scripts/generate-docs-llms-full.ts && bun run scripts/generate-lastmod.ts",
+		"generate:lastmod": "bun run scripts/generate-lastmod.ts",
 		"generate:llms-full": "bun run scripts/generate-agent-public.ts",
 		"generate:docs-llms-full": "bun run scripts/generate-docs-llms-full.ts"
 	},

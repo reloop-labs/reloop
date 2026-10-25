@@ -410,8 +410,8 @@ class MailController
 			"Ship password resets and receipts from Rails controllers and Active Job with the Ruby gem.",
 		languageSlug: "ruby",
 		languageName: "Ruby",
-		installCommand: "gem install reloop-email",
-		packageName: "reloop-email",
+		installCommand: "gem install reloop",
+		packageName: "reloop",
 		docsPath: "/docs/quickstart/ruby",
 		icon: siRubyonrails,
 		runtimeHint: "Controllers · Active Job",
@@ -477,8 +477,8 @@ public class MailController {
 			"Send email from ASP.NET Core minimal APIs and controllers with the .NET SDK.",
 		languageSlug: "dotnet",
 		languageName: ".NET",
-		installCommand: "dotnet add package Reloop.Email",
-		packageName: "Reloop.Email",
+		installCommand: "dotnet add package Reloop",
+		packageName: "Reloop",
 		docsPath: "/docs/quickstart/dotnet",
 		icon: siDotnet,
 		runtimeHint: "Minimal APIs · Controllers",
@@ -546,8 +546,8 @@ end`,
 			"High-throughput Gin handlers that send email via the Go SDK with context-aware requests.",
 		languageSlug: "go",
 		languageName: "Go",
-		installCommand: "go get github.com/reloop-labs/reloop-email",
-		packageName: "reloop-email",
+		installCommand: "go get github.com/reloop-labs/reloop-go/v2",
+		packageName: "reloop-go",
 		docsPath: "/docs/quickstart/go",
 		icon: siGin,
 		runtimeHint: "Handlers · Middleware",
@@ -559,7 +559,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	reloopemail "github.com/reloop-labs/reloop-email"
+	reloopemail "github.com/reloop-labs/reloop-go/v2"
 )
 
 func main() {

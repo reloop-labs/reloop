@@ -3,7 +3,8 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"build": "next build",
+		"build": "bun run generate:lastmod && next build",
+		"generate:lastmod": "bun run scripts/generate-lastmod.ts",
 		"dev": "next dev --turbo --port=3003",
 		"start": "next start",
 		"generate:api-docs": "bun run scripts/generate-api-docs.ts",

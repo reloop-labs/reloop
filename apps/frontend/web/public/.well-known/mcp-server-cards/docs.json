@@ -1,0 +1,35 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  "name": "sh.reloop/docs-mcp",
+  "title": "Reloop Docs",
+  "description": "Search and read the Reloop documentation as markdown.",
+  "version": "1.0.0",
+  "websiteUrl": "https://reloop.sh/docs/integrations/ai-tools/mcp-server",
+  "icons": [
+    {
+      "src": "https://reloop.sh/web-app-manifest-512x512.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    },
+    {
+      "src": "https://reloop.sh/icon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/reloop-labs/reloop",
+    "source": "github",
+    "subfolder": "apps/frontend/docs"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://reloop.sh/docs/mcp"
+    }
+  ]
+}

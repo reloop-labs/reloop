@@ -1,6 +1,12 @@
-> For the site documentation index, see [llms.txt](/llms.txt). Docs index: [llms-docs.txt](/llms-docs.txt). Marketing corpus: [llms-full.txt](/llms-full.txt). Docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
+---
+title: "Pricing | Reloop"
+description: "Scale your email. Control your costs. Hosted Reloop or self-host."
+canonical: "https://reloop.sh/pricing"
+---
 
 # Pricing | Reloop
+
+> For the site documentation index, see [llms.txt](/llms.txt). Docs index: [llms-docs.txt](/llms-docs.txt). Marketing corpus: [llms-full.txt](/llms-full.txt). Docs corpus: [llms-full-docs.txt](/llms-full-docs.txt). Product skill: [skill.md](/skill.md). Prefer markdown URLs (append `.md`) when available.
 
 > Scale your email. Control your costs. Hosted Reloop or self-host.
 > HTML page: https://reloop.sh/pricing
@@ -17,9 +23,12 @@
 - Features:
   - 3,000 emails / month
   - 100 emails / day
+  - Unlimited contacts
+  - Unlimited team members
   - 1 agent inbox
   - 1 webhook
   - 3 custom domains
+  - 1 own SMTP server
   - 1 MB attachments
   - Data retention (45 days)
   - Community support
@@ -35,10 +44,12 @@
 - Features:
   - 50,000 emails / month
   - No daily limit
+  - Unlimited contacts
+  - Unlimited team members
   - 5 agent inboxes
   - 5 webhooks
   - 5 custom domains
-  - Bring your own SMTP
+  - 2 own SMTP servers
   - 5 MB attachments
   - Data retention (45 days)
   - Dedicated support
@@ -54,14 +65,16 @@
 - Features:
   - 100,000 emails / month
   - No daily limit
-  - 1 dedicated IP
-  - Bring your own SMTP (3 servers)
+  - Unlimited contacts
+  - Unlimited team members
   - 10 agent inboxes
   - 10 webhooks
   - 10 custom domains
+  - 3 own SMTP servers
   - 5 MB attachments
   - Data retention (45 days)
   - Dedicated support
+  - 1 dedicated IP
 
 ### Enterprise
 
@@ -73,12 +86,16 @@
 - Features:
   - Custom email volume
   - No daily limit
+  - Unlimited contacts
+  - Unlimited team members
   - Custom agent inboxes
   - Custom webhooks
   - Custom domains
+  - Custom SMTP servers
   - Custom attachments
   - Data retention (45 days)
   - Dedicated support & SLA
+  - Custom dedicated IPs
 
 ## Community (self-hosted)
 
