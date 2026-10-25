@@ -7,12 +7,12 @@ _openapi:
   structuredData:
     headings: []
     contents:
-      - content: "Queues a CSV export of the filtered contacts and emails a 7-day signed download link to the requesting user's account email. Returns 202 immediately; generation, S3 upload, and delivery happen in the background. Rate-limited to 3 per hour per organization."
+      - content: "Queues a CSV export of the filtered contacts and emails a 7-day signed download link to the requesting user's account email. Returns 202 immediately with a `Location` header; generation, S3 upload, and delivery happen in the background. Poll `GET /api/contacts/v1/exports/{export_id}` (the `Location` URL) until `status` is `ready` or `failed`, waiting `Retry-After` seconds between polls. Rate-limited to 3 per hour per organization."
 _apiData:
   document: "https://reloop.sh/api/contacts/openapi/json"
   operationData: [{"path":"/api/contacts/v1/export/email","method":"post"}]
   parameterList: [{"name":"search","type":"string","required":false,"description":"Search by email","location":"body"},{"name":"status","type":"\"subscribed\" | \"unsubscribed\" | \"blocked\"","required":false,"description":"","location":"body","enumValues":["subscribed","unsubscribed","blocked"]},{"name":"channelId","type":"string","required":false,"description":"Filter to contacts enrolled in this channel (status = enrolled)","location":"body"},{"name":"groupId","type":"string","required":false,"description":"Filter to contacts in this group","location":"body"}]
-  responseMap: {"202":{"description":"Response for status 202","schema":{"exportId":"example_exportId","totalRows":0,"recipient":"example_recipient"}}}
+  responseMap: {"202":{"description":"Response for status 202","schema":{"exportId":"example_exportId","status":"queued","statusUrl":"example_statusUrl","totalRows":0,"recipient":"example_recipient"}}}
   codeSamples: []
 ---
 

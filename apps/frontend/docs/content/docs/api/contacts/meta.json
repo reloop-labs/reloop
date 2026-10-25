@@ -7,6 +7,7 @@
 		"get-api-contacts-v1export",
 		"post-api-contacts-v1export-email",
 		"get-api-contacts-v1export-download",
+		"get-api-contacts-v1exports-by-export_id",
 		"get-api-contacts-v1stats-subscription-activity",
 		"patch-api-contacts-v1by-contact_id",
 		"delete-api-contacts-v1by-contact_id",

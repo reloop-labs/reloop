@@ -42,6 +42,7 @@ The API uses standard HTTP status codes to indicate the outcome of a request:
 |------|---------|-------------------|
 | `200` | OK | Request succeeded. |
 | `201` | Created | A new resource was created successfully. |
+| `202` | Accepted | A background job was started. Poll the URL in the `Location` header (see [Long-running operations](#long-running-operations)). |
 | `400` | Bad Request | Missing or invalid parameters. Check the `why` field for details. |
 | `401` | Unauthorized | The `x-api-key` header is missing, invalid, or the key has been revoked. |
 | `403` | Forbidden | The API key doesn't have permission to access the requested resource. |
@@ -50,6 +51,29 @@ The API uses standard HTTP status codes to indicate the outcome of a request:
 | `422` | Unprocessable Content | The request did not match the endpoint's schema (`errors` lists each field), or an [Idempotency-Key](/docs/api/idempotency) was reused with a different request. |
 | `429` | Too Many Requests | You've exceeded a [rate limit](/docs/api/usage-limits). Retry after the `Retry-After` header value. |
 | `500` | Internal Server Error | Something went wrong on our end. If the issue persists, contact [support](mailto:support@reloop.sh). |
+
+## Long-running operations
+
+Operations that take longer than a request, such as emailing a contacts export, return `202 Accepted` right away and run in the background. The response includes:
+
+- A `Location` header with the URL of the job's status resource (also in the body as `statusUrl`).
+- A `Retry-After` header with the seconds to wait before polling.
+
+```bash
+curl -X POST "https://reloop.sh/api/contacts/v1/export/email" \
+  -H "x-api-key: rl_prod_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "subscribed"}'
+# HTTP/1.1 202 Accepted
+# Location: /api/contacts/v1/exports/exp_abc123
+# Retry-After: 5
+
+curl "https://reloop.sh/api/contacts/v1/exports/exp_abc123" \
+  -H "x-api-key: rl_prod_YOUR_API_KEY"
+# { "object": "contact_export", "id": "exp_abc123", "status": "processing", ... }
+```
+
+Poll the `Location` URL with `GET` until `status` is final (`ready` or `failed`), waiting `Retry-After` seconds between requests. Job status is kept for 7 days.
 
 ## Errors
 

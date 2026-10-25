@@ -169,6 +169,41 @@ export function addErrorModel(paths: Record<string, unknown>): void {
 	}
 }
 
+const asyncJobComponents = {
+	headers: {
+		JobLocation: {
+			description:
+				"URL of the job's status resource. Poll it with GET until the job finishes.",
+			schema: {
+				type: "string",
+				example: "/api/contacts/v1/exports/exp_abc123",
+			},
+		},
+		RetryAfter: {
+			description: "Seconds to wait before polling again.",
+			schema: { type: "integer", example: 5 },
+		},
+	},
+};
+
+/**
+ * Every 202 starts a background job whose status lives at `Location`
+ * (e.g. the contacts export in apps/backend/contacts). Documents the headers.
+ */
+export function addAsyncJobHeaders(paths: Record<string, unknown>): void {
+	for (const item of Object.values(paths)) {
+		for (const op of Object.values(item as Record<string, Operation>)) {
+			const accepted = op?.responses?.["202"];
+			if (!accepted || "$ref" in accepted) continue;
+			accepted.headers = {
+				...(accepted.headers as Record<string, unknown> | undefined),
+				Location: { $ref: "#/components/headers/JobLocation" },
+				"Retry-After": { $ref: "#/components/headers/RetryAfter" },
+			};
+		}
+	}
+}
+
 const VERSIONING_POLICY_URL = "https://reloop.sh/docs/api/versioning";
 
 const deprecationComponents = {
@@ -326,7 +361,9 @@ export async function buildMergedOpenApi() {
 	addErrorModel(paths);
 	addIdempotency(paths);
 	addDeprecationHeaders(paths);
+	addAsyncJobHeaders(paths);
 	for (const extra of [
+		asyncJobComponents,
 		errorComponents,
 		idempotencyComponents,
 		deprecationComponents,

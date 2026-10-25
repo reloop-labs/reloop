@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	addAsyncJobHeaders,
 	addDeprecationHeaders,
 	addErrorModel,
 	supportsIdempotencyKey,
@@ -89,5 +90,23 @@ describe("addDeprecationHeaders", () => {
 		};
 		expect(Object.keys(old.headers ?? {})).toEqual(["Deprecation", "Sunset"]);
 		expect(current.headers).toBeUndefined();
+	});
+});
+
+describe("addAsyncJobHeaders", () => {
+	test("documents Location and Retry-After on 202 responses only", () => {
+		const paths = {
+			"/job": { post: { responses: { "202": {}, "400": {} } } },
+		};
+		addAsyncJobHeaders(paths);
+		const responses = paths["/job"].post.responses as Record<
+			string,
+			{ headers?: Record<string, unknown> }
+		>;
+		expect(Object.keys(responses["202"]?.headers ?? {})).toEqual([
+			"Location",
+			"Retry-After",
+		]);
+		expect(responses["400"]?.headers).toBeUndefined();
 	});
 });
