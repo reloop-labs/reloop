@@ -1,0 +1,81 @@
+{
+  "specVersion": "0.91",
+  "host": {
+    "name": "Reloop",
+    "domain": "reloop.sh",
+    "url": "https://reloop.sh"
+  },
+  "entries": [
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:reloop.sh:mcp:site",
+      "displayName": "Reloop Site MCP Server",
+      "description": "Search Reloop marketing site content: pricing, comparisons, blog, and product pages.",
+      "mediaType": "application/json",
+      "type": "application/json",
+      "url": "https://reloop.sh/.well-known/mcp.json",
+      "metadata": {
+        "resourceType": "mcp-server",
+        "endpoint": "https://reloop.sh/mcp",
+        "transport": "streamable-http",
+        "authentication": "none"
+      },
+      "representativeQueries": [
+        "how much does Reloop cost for 100k emails a month",
+        "compare Reloop with Resend"
+      ]
+    },
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:reloop.sh:mcp:docs",
+      "displayName": "Reloop Docs MCP Server",
+      "description": "Search and retrieve Reloop documentation as markdown.",
+      "mediaType": "application/json",
+      "type": "application/json",
+      "url": "https://reloop.sh/.well-known/mcp.json",
+      "metadata": {
+        "resourceType": "mcp-server",
+        "endpoint": "https://reloop.sh/docs/mcp",
+        "transport": "streamable-http",
+        "authentication": "none"
+      },
+      "representativeQueries": [
+        "how do I send an email with the Reloop API",
+        "how do I verify a domain with SPF and DKIM on Reloop"
+      ]
+    },
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:reloop.sh:skill:reloop",
+      "displayName": "Reloop Agent Skill",
+      "description": "Use Reloop email infrastructure: API keys, send mail, domains, contacts, webhooks, and templates.",
+      "mediaType": "text/markdown",
+      "type": "text/markdown",
+      "url": "https://reloop.sh/skill.md",
+      "metadata": {
+        "resourceType": "agent-skill",
+        "index": "https://reloop.sh/.well-known/agent-skills/index.json"
+      },
+      "representativeQueries": [
+        "send a transactional email with Reloop",
+        "set up a sending domain on Reloop"
+      ]
+    },
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:reloop.sh:docs:llms-txt",
+      "displayName": "Reloop llms.txt",
+      "description": "Machine-readable overview of Reloop with links to markdown docs, pricing, and comparisons.",
+      "mediaType": "text/plain",
+      "type": "text/plain",
+      "url": "https://reloop.sh/llms.txt",
+      "metadata": {
+        "resourceType": "documentation"
+      },
+      "representativeQueries": [
+        "what is Reloop",
+        "is Reloop open source"
+      ]
+    }
+  ]
+}

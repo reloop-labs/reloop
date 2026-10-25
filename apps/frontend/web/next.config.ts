@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const agentLink =
-	'</llms.txt>; rel="llms-txt", </llms-docs.txt>; rel="docs-llms-txt", </llms-full.txt>; rel="llms-full-txt", </llms-full-docs.txt>; rel="docs-llms-full-txt", </sitemap.md>; rel="sitemap", </skill.md>; rel="skill-md"';
+	'</llms.txt>; rel="llms-txt", </llms-docs.txt>; rel="docs-llms-txt", </llms-full.txt>; rel="llms-full-txt", </llms-full-docs.txt>; rel="docs-llms-full-txt", </sitemap.md>; rel="sitemap", </skill.md>; rel="skill-md", </.well-known/ard.json>; rel="ard", </.well-known/ard.json>; rel="ai-catalog"';
 const agentCache = "public, max-age=300, s-maxage=3600, must-revalidate";
 
 const nextConfig: NextConfig = {
@@ -77,6 +77,11 @@ const nextConfig: NextConfig = {
 	},
 	async rewrites() {
 		return [
+			// ARD v0.91 moved the catalog to ard.json; keep the legacy path for older readers
+			{
+				source: "/.well-known/ai-catalog.json",
+				destination: "/.well-known/ard.json",
+			},
 			// Markdown twins (App Router skill.md / pricing.md win over afterFiles rewrite)
 			{
 				source: "/:path*.md",

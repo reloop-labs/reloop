@@ -74,6 +74,12 @@ export default function RootLayout({
 			className={`${inter.variable} overscroll-y-none scroll-auto`}
 		>
 			<head>
+				<link rel="ard" href="/.well-known/ard.json" type="application/json" />
+				<link
+					rel="ai-catalog"
+					href="/.well-known/ard.json"
+					type="application/json"
+				/>
 				<Script
 					id="manifest-loader"
 					strategy="afterInteractive"
