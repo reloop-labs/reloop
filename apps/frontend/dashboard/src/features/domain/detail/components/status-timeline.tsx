@@ -111,8 +111,8 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 	};
 
 	return (
-		<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 py-6 pr-8 pb-5 pl-6 transition-all hover:border-stroke-soft-200 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
-			<div className="flex w-full max-w-2xl items-start justify-start">
+		<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 py-6 pr-4 pb-5 pl-4 transition-all hover:border-stroke-soft-200 sm:pr-8 sm:pl-6 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+			<div className="flex w-full max-w-2xl items-start justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 				{steps.map((step, index) => {
 					const state = getStepState(step.number);
 					const timeLabel = formatShort(step.rawDate);
@@ -164,7 +164,7 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 								</div>
 							</div>
 							{index < steps.length - 1 && (
-								<div className="mt-5 h-0 w-24 flex-none border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+								<div className="mt-5 h-0 w-10 flex-none border-stroke-soft-100 border-t-[1.5px] border-dashed sm:w-24 dark:border-neutral-800" />
 							)}
 						</Fragment>
 					);
@@ -175,8 +175,8 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 };
 
 export const StatusTimelineSkeleton = () => (
-	<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 py-6 pr-8 pb-5 pl-6 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
-		<div className="flex w-full max-w-2xl items-start justify-start">
+	<div className="relative flex h-[176px] w-full items-center justify-start rounded-3xl border border-stroke-soft-100 bg-bg-white-0 py-6 pr-4 pb-5 pl-4 sm:pr-8 sm:pl-6 dark:border-stroke-soft-100/50 dark:bg-bg-white-0/5">
+		<div className="flex w-full max-w-2xl items-start justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 			{[1, 2, 3].map((step, index) => (
 				<Fragment key={step}>
 					<div className="flex min-w-[90px] flex-col items-center">
@@ -189,7 +189,7 @@ export const StatusTimelineSkeleton = () => (
 						</div>
 					</div>
 					{index < 2 && (
-						<div className="mt-5 h-0 w-24 flex-none border-stroke-soft-100 border-t-[1.5px] border-dashed dark:border-neutral-800" />
+						<div className="mt-5 h-0 w-10 flex-none border-stroke-soft-100 border-t-[1.5px] border-dashed sm:w-24 dark:border-neutral-800" />
 					)}
 				</Fragment>
 			))}

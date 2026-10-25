@@ -31,7 +31,7 @@ interface DNSAutoConnectBannerProps {
 
 const DNSAutoConnectBannerSkeleton = () => (
 	<div className="mb-8 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
-		<div className="flex items-center justify-between gap-6">
+		<div className="flex items-center justify-between gap-6 max-sm:flex-col max-sm:items-stretch max-sm:gap-4">
 			<div className="flex items-center gap-4">
 				<Skeleton className="h-12 w-12 rounded-xl" />
 				<div className="space-y-2">
@@ -93,10 +93,10 @@ function AutoPopulateBanner({
 
 	return (
 		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
-			<div className="flex items-center justify-between gap-6">
+			<div className="flex items-center justify-between gap-6 max-sm:flex-col max-sm:items-stretch max-sm:gap-4">
 				<div className="flex gap-4">
 					<ProviderIcon provider={provider} />
-					<div className="space-y-1">
+					<div className="min-w-0 space-y-1">
 						<h3 className="font-semibold text-paragraph-base text-text-strong-950">
 							{provider.label}
 						</h3>
@@ -112,7 +112,7 @@ function AutoPopulateBanner({
 					variant="neutral"
 					size="small"
 					onClick={onAutoPopulate}
-					className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4 transition-all duration-200"
+					className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4 transition-all duration-200 max-sm:w-full"
 					disabled={isConnecting}
 					aria-keyshortcuts="a"
 				>
@@ -213,10 +213,10 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 		const manualHref = provider.url || provider.docsUrl;
 		return (
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40">
-				<div className="flex items-center justify-between gap-6">
+				<div className="flex items-center justify-between gap-6 max-sm:flex-col max-sm:items-stretch max-sm:gap-4">
 					<div className="flex items-center gap-4">
 						<ProviderIcon provider={provider} />
-						<div className="space-y-1">
+						<div className="min-w-0 space-y-1">
 							<h3 className="font-semibold text-paragraph-base text-text-strong-950">
 								{provider.label}
 							</h3>
@@ -231,7 +231,7 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 						type="button"
 						variant="basic"
 						size="small"
-						className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4"
+						className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4 max-sm:w-full"
 						onClick={() =>
 							window.open(manualHref, "_blank", "noopener,noreferrer")
 						}
@@ -252,7 +252,7 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 						<Icon name="server" className="h-6 w-6 text-text-soft-400" />
 						<div className="absolute top-2 right-2 size-2 rounded-full border border-bg-white-0 bg-error-base dark:border-stroke-soft-100/40" />
 					</div>
-					<div className="space-y-1">
+					<div className="min-w-0 space-y-1">
 						<h3 className="font-semibold text-paragraph-base text-text-strong-950">
 							We couldn't detect a supported DNS provider
 						</h3>

@@ -22,7 +22,7 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 	isLoading,
 }) => {
 	return (
-		<div className="mt-7 grid grid-cols-4 gap-x-12 gap-y-6">
+		<div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4 sm:gap-x-12 sm:gap-y-6">
 			{/* Created */}
 			<div className="flex flex-col gap-1.5">
 				<div className="flex items-center gap-1.5">

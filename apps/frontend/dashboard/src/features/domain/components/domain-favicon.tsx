@@ -7,6 +7,18 @@ import { useState } from "react";
 // Remembers domains without a favicon so they don't re-request on every render.
 const missing = new Set<string>();
 
+export function faviconUrl(host: string): string {
+	return `https://icons.duckduckgo.com/ip3/${encodeURIComponent(host)}.ico`;
+}
+
+export function isFaviconMissing(host: string): boolean {
+	return missing.has(host);
+}
+
+export function markFaviconMissing(host: string): void {
+	missing.add(host);
+}
+
 /**
  * The site's favicon at icon size; the globe when the domain has none.
  * DuckDuckGo's endpoint 404s for sites without one, which is what triggers
@@ -35,7 +47,7 @@ export function DomainFavicon({
 	}
 	return (
 		<img
-			src={`https://icons.duckduckgo.com/ip3/${encodeURIComponent(host)}.ico`}
+			src={faviconUrl(host)}
 			alt=""
 			aria-hidden
 			loading="lazy"

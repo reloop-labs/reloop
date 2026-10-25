@@ -36,8 +36,8 @@ export function DomainHeader({
 			<div className="pb-6 max-md:hidden">
 				<AnimatedBackButton fallbackHref="/domain" />
 			</div>
-			<div className="flex items-center justify-between">
-				<div>
+			<div className="flex flex-wrap items-center justify-between gap-3">
+				<div className="min-w-0 max-sm:w-full">
 					{isLoading ? (
 						<div className="flex items-center gap-3">
 							<Skeleton className="h-12 w-12 shrink-0 rounded-[14px]" />
@@ -52,6 +52,7 @@ export function DomainHeader({
 								seed={domainRecordId || domainName}
 								size="lg"
 								status={status}
+								domain={domain?.domain}
 								alt={`${domainName} avatar`}
 							/>
 							<div className="min-w-0">
@@ -59,7 +60,7 @@ export function DomainHeader({
 									Domain
 								</p>
 								<div className="flex min-w-0 items-center gap-1">
-									<h1 className="mb-0.5 truncate font-semibold text-title-h6 leading-5">
+									<h1 className="truncate font-semibold text-title-h6 leading-7">
 										{domainName}
 									</h1>
 									{domain?.domain && (
@@ -87,7 +88,8 @@ export function DomainHeader({
 					)}
 				</div>
 
-				<div className="flex items-center gap-2">
+				{/* Phones: the buttons fill the row (⋯ menu, always last, keeps its size) */}
+				<div className="flex flex-wrap items-center gap-2 max-sm:w-full max-sm:*:flex-1 max-sm:[&>*:last-child]:flex-none">
 					{isLoading ? (
 						<Skeleton className="h-9 w-32 rounded-lg" />
 					) : (

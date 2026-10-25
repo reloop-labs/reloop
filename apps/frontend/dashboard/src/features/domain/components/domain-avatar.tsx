@@ -1,9 +1,16 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { useState } from "react";
 import { AnimatedGlobeIcon } from "#/features/dashboard/sidebar/animated-globe-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import type { DomainStatus } from "../types";
+import {
+	faviconUrl,
+	isFaviconMissing,
+	markFaviconMissing,
+} from "./domain-favicon";
+import { rootDomainOf } from "./domain-groups";
 
 type DomainAvatarSize = "sm" | "md" | "lg" | "xl";
 
@@ -72,9 +79,12 @@ const STATUS_TONE: Record<DomainStatus, { outer: string; icon: string }> = {
 export function DomainAvatar({
 	size = "lg",
 	status = "pending",
+	domain,
 	className,
 }: {
 	seed?: string;
+	/** Shows this domain's root favicon instead of the globe when it has one. */
+	domain?: string;
 	size?: DomainAvatarSize;
 	status?: DomainStatus;
 	className?: string;
@@ -83,6 +93,10 @@ export function DomainAvatar({
 	const sizeConfig = SIZE_CLASS[size];
 	const tone = STATUS_TONE[status] ?? STATUS_TONE.pending;
 	const { groupProps } = usePlayAnimationOnHover();
+	const faviconHost = domain ? rootDomainOf(domain) : "";
+	const [faviconFailed, setFaviconFailed] = useState(
+		() => !faviconHost || isFaviconMissing(faviconHost),
+	);
 
 	return (
 		<div
@@ -101,7 +115,22 @@ export function DomainAvatar({
 					sizeConfig.inner,
 				)}
 			>
-				<AnimatedGlobeIcon className={cn(tone.icon, sizeConfig.icon)} />
+				{faviconFailed ? (
+					<AnimatedGlobeIcon className={cn(tone.icon, sizeConfig.icon)} />
+				) : (
+					<img
+						src={faviconUrl(faviconHost)}
+						alt=""
+						aria-hidden
+						decoding="async"
+						referrerPolicy="no-referrer"
+						onError={() => {
+							markFaviconMissing(faviconHost);
+							setFaviconFailed(true);
+						}}
+						className={cn("rounded-[4px] object-contain", sizeConfig.icon)}
+					/>
+				)}
 			</div>
 		</div>
 	);
