@@ -51,7 +51,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
 	return (
 		<>
-			<JsonLd data={buildBlogPostJsonLd(postData)} />
+			<JsonLd data={buildBlogPostJsonLd(postData, post.faq)} />
 			<BlogPostPageView
 				post={postData}
 				body={renderBody()}

@@ -1,4 +1,7 @@
-import type { BlogPostDefinition } from "@reloop/web/lib/landing/types";
+import type {
+	BlogFaqItem,
+	BlogPostDefinition,
+} from "@reloop/web/lib/landing/types";
 import { getSiteUrl, siteName, socialImage } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 
@@ -168,7 +171,10 @@ export function createBlogCategoryMetadata(category: {
 	};
 }
 
-export function buildBlogPostJsonLd(post: BlogPostDefinition) {
+export function buildBlogPostJsonLd(
+	post: BlogPostDefinition,
+	faq: BlogFaqItem[] = [],
+) {
 	const origin = siteUrl();
 	const pageUrl = blogPostUrl(post.slug);
 	const coverUrl = blogCoverAbsoluteUrl(post.image);
@@ -236,6 +242,22 @@ export function buildBlogPostJsonLd(post: BlogPostDefinition) {
 					},
 				],
 			},
+			...(faq.length > 0
+				? [
+						{
+							"@type": "FAQPage",
+							"@id": `${pageUrl}#faq`,
+							mainEntity: faq.map((item) => ({
+								"@type": "Question",
+								name: item.question,
+								acceptedAnswer: {
+									"@type": "Answer",
+									text: item.answer,
+								},
+							})),
+						},
+					]
+				: []),
 		],
 	};
 }

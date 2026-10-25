@@ -90,6 +90,11 @@ export type BlogPostDefinition = {
 	relatedSlugs?: string[];
 };
 
+export type BlogFaqItem = {
+	question: string;
+	answer: string;
+};
+
 export type BlogTocItem = {
 	title: string;
 	url: string;

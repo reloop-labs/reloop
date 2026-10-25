@@ -10,10 +10,12 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import type {
 	BlogCategoryDefinition,
+	BlogFaqItem,
 	BlogPostAuthor,
 	BlogPostDefinition,
 	BlogTocItem,
 } from "../types";
+import { extractFaq } from "./faq";
 import { timestamp } from "./watcher-trigger";
 
 if (process.env.NODE_ENV === "development") {
@@ -23,6 +25,7 @@ if (process.env.NODE_ENV === "development") {
 export type BlogPostPage = BlogPostDefinition & {
 	body: (props?: { components?: MDXComponents }) => React.ReactNode;
 	toc: BlogTocItem[];
+	faq: BlogFaqItem[];
 };
 
 const blogDir = path.join(process.cwd(), "content", "blog");
@@ -185,6 +188,7 @@ function readPostFile(slug: string) {
 		post,
 		content,
 		toc: extractToc(content),
+		faq: extractFaq(content),
 		body: (props?: { components?: MDXComponents }) => (
 			<MDXRemote
 				source={content}
@@ -298,6 +302,7 @@ export function getPost(slug: string): BlogPostPage | null {
 		...file.post,
 		body: file.body,
 		toc: file.toc,
+		faq: file.faq,
 	};
 }
 
