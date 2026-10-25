@@ -5,42 +5,40 @@ import { addContactToGroupXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia, t } from "elysia";
 import { addContactToGroupController } from "./add-contact-to-group.controllers";
 
-export const addContactToGroupRoute = new Elysia()
-	.use(authMiddleware)
-	.post(
-		"/group/:group_id",
-		async ({ body, params, organizationId }) => {
-			return await addContactToGroupController({
-				organizationId,
-				groupId: params.group_id,
-				contact_id: body.contact_id,
-				email: body.email,
-			});
-		},
-		{
-			auth: true,
-			params: t.Object({
-				group_id: t.String({
-					description: "Group ID",
-					examples: ["grp_123456789"],
-				}),
+export const addContactToGroupRoute = new Elysia().use(authMiddleware).post(
+	"/group/:group_id",
+	async ({ body, params, organizationId }) => {
+		return await addContactToGroupController({
+			organizationId,
+			groupId: params.group_id,
+			contact_id: body.contact_id,
+			email: body.email,
+		});
+	},
+	{
+		auth: true,
+		params: t.Object({
+			group_id: t.String({
+				description: "Group ID",
+				examples: ["grp_123456789"],
 			}),
-			body: ContactModel.addContactToGroupBody,
-			response: {
-				200: ContactModel.addContactToGroupResponse,
-				400: t.Object({ message: t.String() }),
-				404: t.Object({ message: t.String() }),
-			},
-			detail: {
-				tags: ["Contact"],
-				summary: "Add Contact Group",
-				description: "Adds a contact to a group by ID or email",
-				"x-codeSamples": addContactToGroupXCodeSamples,
-			},
-			afterResponse: auditLogHook({
-				resourceType: "contact",
-				action: "added_to_group",
-				successStatus: 200,
-			}),
+		}),
+		body: ContactModel.addContactToGroupBody,
+		response: {
+			200: ContactModel.addContactToGroupResponse,
+			400: t.Object({ message: t.String() }),
+			404: t.Object({ message: t.String() }),
 		},
-	);
+		detail: {
+			tags: ["Contact"],
+			summary: "Add Contact Group",
+			description: "Adds a contact to a group by ID or email",
+			"x-codeSamples": addContactToGroupXCodeSamples,
+		},
+		afterResponse: auditLogHook({
+			resourceType: "contact",
+			action: "added_to_group",
+			successStatus: 200,
+		}),
+	},
+);

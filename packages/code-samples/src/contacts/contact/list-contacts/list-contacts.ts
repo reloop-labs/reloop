@@ -20,7 +20,7 @@ if (contactError) throw contactError;`,
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl "https://reloop.sh/api/contacts/list?page=1&limit=10&status=subscribed" \\
+		source: `curl "https://reloop.sh/api/contacts/v1/list?page=1&limit=10&status=subscribed" \\
   -H "x-api-key: rl_123456789"`,
 	},
 	{

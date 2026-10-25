@@ -52,9 +52,9 @@ cli.ts
 
 - The base URL is a bare origin (default `https://reloop.sh`); services mount at `/api/<service>`.
 - Auth header is `x-api-key` for API keys and `Authorization: Bearer` for Better Auth OAuth tokens. A non-empty `User-Agent` is required or Reloop answers 400.
-- Error bodies are `{ message, why, fix, link? }`. 429 adds a `retryAfter` body field and a `retry-after` header; rate-limit headers are `ratelimit-limit`, `ratelimit-remaining`, `ratelimit-reset`.
+- Error bodies are `{ code, message, why?, fix?, link }`, plus `errors: [{ path, message }]` on `validation_error` (422). `code` is stable (`unauthorized`, `not_found`, `conflict`, `rate_limited`, ...). Every response carries `ratelimit-limit`, `ratelimit-remaining` and `ratelimit-reset`; 429 adds `retry-after`, and some endpoints add a `retryAfter` body field.
 - Pagination is offset based: `page` (1-based) and `limit` (max 100).
-- Contacts: `properties` on update **replaces** the whole property set, so read before writing. There is no bulk route; `get_contact` by email is a `search` on `/api/contacts/list` plus an exact match.
+- Contacts: the contact routes are served both unversioned (`/api/contacts/list`) and under `/api/contacts/v1/`. This server uses the unversioned paths so it keeps working against self-hosted instances that predate the `/v1` aliases. `properties` on update **replaces** the whole property set, so read before writing. There is no bulk route; `get_contact` by email is a `search` on `/api/contacts/list` plus an exact match.
 - Email logs: `GET /api/logs/v1/emails` (filters `recipient`, `status`, `domain`, `search` on subject or sender, `start_date`, `end_date`), `/emails/:id`, `/emails/stats` (parallel arrays per date). Resend is `POST /api/mail/v1/resend/:id` and returns the send response.
 - Templates: `/api/template/v1/list`, `/:id`, `POST /:id/test`, `POST /create`, `POST /:id/versions`. Responses carry editor `content` blocks that tools drop. Sends use the latest version with `isMajor: true`, so a template is only sendable after a published version with `renderedHtml` exists. A single `{ type: "html", html }` content block is what the editor imports on first open. Send-time substitution only matches `{{{name}}}`.
 - Properties: `/api/contacts/v1/properties/{list,create,:id}`. `PATCH` only accepts `fallbackValue`; name and type are immutable.
@@ -62,7 +62,7 @@ cli.ts
 - API keys: routes live under `/api/api-key/v1`; the collection is `/api/api-key/v1/` with a trailing slash, and state changes are `POST /rotate|enable|disable/:id`. Only create and rotate return the plaintext `key`.
 - Domains: routes live under `/api/domain/v1` (`/list`, `/create`, `/:id`, `POST /verify/:id`). Verify returns `active` synchronously when DNS already resolves, otherwise `verifying` while a background job retries.
 - SMTP providers (bring your own SMTP): routes live under `/api/domain/v1/smtp-providers` (`GET`/`POST`, `PATCH`/`DELETE /:id`, `POST /:id/test`). Create takes a sending `domain` and adds it automatically with no DNS; passwords are write-only.
-- Mail: `POST /api/mail/v1/send` has **no idempotency key**. A timeout or network failure may still have delivered the email, which is why writes are never marked `retryable`.
+- Mail: `POST /api/mail/v1/send` accepts an `Idempotency-Key` header, but this server does not send one. A timeout or network failure may still have delivered the email, which is why writes are never marked `retryable`.
 
 ## Tool conventions
 

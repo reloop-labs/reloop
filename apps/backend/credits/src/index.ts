@@ -86,13 +86,13 @@ const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 		}),
 	)
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
+	.use(apiErrorsPlugin())
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)
 	.use(creditsRoutes)
 	.use(billingRoutes)
 	.use(polarWebhookRoute)
-	.use(apiErrorsPlugin())
 	.onStart(async () => {
 		await loader();
 	})

@@ -6,46 +6,44 @@ import { addContactToChannelXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia, t } from "elysia";
 import { addContactToChannelController } from "./add-contact-to-channel.controllers";
 
-export const addContactToChannelRoute = new Elysia()
-	.use(authMiddleware)
-	.post(
-		"/channel/:channel_id",
-		async ({ body, params, organizationId }) => {
-			return await addContactToChannelController({
-				organizationId,
-				channelId: params.channel_id,
-				subscription: body.subscription,
-				contact_id: body.contact_id,
-				email: body.email,
-			});
-		},
-		{
-			auth: true,
-			params: t.Object({
-				channel_id: t.String({
-					description: "Channel ID",
-					examples: ["channel_123456789"],
-				}),
+export const addContactToChannelRoute = new Elysia().use(authMiddleware).post(
+	"/channel/:channel_id",
+	async ({ body, params, organizationId }) => {
+		return await addContactToChannelController({
+			organizationId,
+			channelId: params.channel_id,
+			subscription: body.subscription,
+			contact_id: body.contact_id,
+			email: body.email,
+		});
+	},
+	{
+		auth: true,
+		params: t.Object({
+			channel_id: t.String({
+				description: "Channel ID",
+				examples: ["channel_123456789"],
 			}),
-			body: ContactModel.addContactToChannelBody,
-			response: {
-				201: ContactModel.addContactToChannelResponse,
-				404: ChannelSubscriptionModel.notFound,
-				409: ChannelSubscriptionModel.subscriptionAlreadyExists,
-				400: ContactModel.invalidEmail,
-				403: ContactModel.unauthorized,
-			},
-			detail: {
-				tags: ["Contact"],
-				summary: "Add Contact Channel",
-				description:
-					"Creates a contact (if not exists) and enrolls them in a channel in one operation",
-				"x-codeSamples": addContactToChannelXCodeSamples,
-			},
-			afterResponse: auditLogHook({
-				resourceType: "contact",
-				action: "added_to_channel",
-				successStatus: 201,
-			}),
+		}),
+		body: ContactModel.addContactToChannelBody,
+		response: {
+			201: ContactModel.addContactToChannelResponse,
+			404: ChannelSubscriptionModel.notFound,
+			409: ChannelSubscriptionModel.subscriptionAlreadyExists,
+			400: ContactModel.invalidEmail,
+			403: ContactModel.unauthorized,
 		},
-	);
+		detail: {
+			tags: ["Contact"],
+			summary: "Add Contact Channel",
+			description:
+				"Creates a contact (if not exists) and enrolls them in a channel in one operation",
+			"x-codeSamples": addContactToChannelXCodeSamples,
+		},
+		afterResponse: auditLogHook({
+			resourceType: "contact",
+			action: "added_to_channel",
+			successStatus: 201,
+		}),
+	},
+);

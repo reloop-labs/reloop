@@ -1,7 +1,11 @@
 import "dotenv/config";
 import { contactsConfig } from "@be/contacts/contacts.config";
 import { channelRoutes } from "@be/contacts/routes/channel/channel.routes";
-import { contactRoutes } from "@be/contacts/routes/contact/contact.routes";
+import {
+	contactRoutes,
+	contactRoutesV1,
+	legacyContactPaths,
+} from "@be/contacts/routes/contact/contact.routes";
 import { groupRoutes } from "@be/contacts/routes/group/group.routes";
 import { agentCardRoute } from "@be/contacts/routes/landing/agent-card.route";
 import { healthRoute } from "@be/contacts/routes/landing/health.route";
@@ -77,6 +81,7 @@ const contactsService = new Elysia({
 	.use(opentelemetry())
 	.use(
 		openapi({
+			exclude: { paths: legacyContactPaths },
 			documentation: {
 				info: {
 					title: "Contacts Service",
@@ -96,15 +101,16 @@ const contactsService = new Elysia({
 	)
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(serverTiming())
+	.use(apiErrorsPlugin())
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)
 	.use(contactRoutes)
+	.use(contactRoutesV1)
 	.use(propertyRoutes)
 	.use(channelRoutes)
 	.use(groupRoutes)
 	.use(preferencesRoutes)
-	.use(apiErrorsPlugin())
 	.onStart(async () => {
 		await loader();
 	})

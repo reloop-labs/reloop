@@ -22,7 +22,7 @@ console.log(channel.status, channel.success);`,
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X PATCH https://reloop.sh/api/contacts/channel/chn_123456789 \\
+		source: `curl -X PATCH https://reloop.sh/api/contacts/v1/channel/chn_123456789 \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
   -d '{"email": "john.doe@example.com","subscription": "opt_out"}'`,

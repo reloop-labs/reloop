@@ -24,7 +24,7 @@ if (contactError) throw contactError;`,
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X POST https://reloop.sh/api/contacts/create \\
+		source: `curl -X POST https://reloop.sh/api/contacts/v1/create \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
   -d '{"email": "john.doe@example.com","firstName": "John","lastName": "Doe","status": "subscribed","properties": {"company": "Reloop","role": "Developer"},"groupIds": ["grp_123456789"],"channels": [{"channelId": "chn_123456789","subscription": "opt_in"}]}'`,

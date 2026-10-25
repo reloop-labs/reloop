@@ -5,51 +5,49 @@ import { createContactXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia } from "elysia";
 import { createContactController } from "./create-contact.controllers";
 
-export const createContactRoute = new Elysia()
-	.use(authMiddleware)
-	.post(
-		"/create",
-		async ({ body, organizationId, userId }) => {
-			const {
-				email,
-				firstName,
-				lastName,
-				status,
-				properties,
-				groupIds,
-				channels,
-			} = body;
-			return await createContactController({
-				organizationId,
-				userId,
-				email,
-				firstName,
-				lastName,
-				status,
-				properties,
-				groupIds,
-				channels,
-			});
+export const createContactRoute = new Elysia().use(authMiddleware).post(
+	"/create",
+	async ({ body, organizationId, userId }) => {
+		const {
+			email,
+			firstName,
+			lastName,
+			status,
+			properties,
+			groupIds,
+			channels,
+		} = body;
+		return await createContactController({
+			organizationId,
+			userId,
+			email,
+			firstName,
+			lastName,
+			status,
+			properties,
+			groupIds,
+			channels,
+		});
+	},
+	{
+		auth: true,
+		body: ContactModel.createContactBody,
+		response: {
+			201: ContactModel.contactResponse,
+			409: ContactModel.contactAlreadyExists,
+			400: ContactModel.invalidEmail,
+			403: ContactModel.unauthorized,
 		},
-		{
-			auth: true,
-			body: ContactModel.createContactBody,
-			response: {
-				201: ContactModel.contactResponse,
-				409: ContactModel.contactAlreadyExists,
-				400: ContactModel.invalidEmail,
-				403: ContactModel.unauthorized,
-			},
-			detail: {
-				tags: ["Contact"],
-				summary: "Create Contact",
-				description: "Creates contact",
-				"x-codeSamples": createContactXCodeSamples,
-			},
-			afterResponse: auditLogHook({
-				resourceType: "contact",
-				action: "created",
-				successStatus: 201,
-			}),
+		detail: {
+			tags: ["Contact"],
+			summary: "Create Contact",
+			description: "Creates contact",
+			"x-codeSamples": createContactXCodeSamples,
 		},
-	);
+		afterResponse: auditLogHook({
+			resourceType: "contact",
+			action: "created",
+			successStatus: 201,
+		}),
+	},
+);

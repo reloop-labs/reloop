@@ -24,6 +24,52 @@ const config = {
 	},
 	async redirects() {
 		return [
+			// Contacts reference moved to the /v1 paths (old unversioned paths still work)
+			{
+				source: "/api/contacts/post-api-contacts-create",
+				destination: "/api/contacts/post-api-contacts-v1create",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts/get-api-contacts-list",
+				destination: "/api/contacts/get-api-contacts-v1list",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts/get-api-contacts-retrieve-by-contact_id",
+				destination: "/api/contacts/get-api-contacts-v1retrieve-by-contact_id",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts/patch-api-contacts-by-contact_id",
+				destination: "/api/contacts/patch-api-contacts-v1by-contact_id",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts/delete-api-contacts-by-contact_id",
+				destination: "/api/contacts/delete-api-contacts-v1by-contact_id",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts/post-api-contacts-channel-by-channel_id",
+				destination: "/api/contacts/post-api-contacts-v1channel-by-channel_id",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts/patch-api-contacts-channel-by-channel_id",
+				destination: "/api/contacts/patch-api-contacts-v1channel-by-channel_id",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts/post-api-contacts-group-by-group_id",
+				destination: "/api/contacts/post-api-contacts-v1group-by-group_id",
+				permanent: true,
+			},
+			{
+				source: "/api/contacts/delete-api-contacts-group-by-group_id",
+				destination: "/api/contacts/delete-api-contacts-v1group-by-group_id",
+				permanent: true,
+			},
 			// Collapsed multi-page API Keys learn section into a single page
 			{
 				source: "/learn/api-keys/managing-api-keys",

@@ -96,16 +96,16 @@ Prefer these markdown guides for coding agents. They contain SDK samples for eve
 - [Trigger Test Webhook](https://reloop.sh/docs/api/webhook/post-api-webhook-v1trigger): POST /api/webhook/v1/trigger
 
 ### Contacts API
-- [Create Contact](https://reloop.sh/docs/api/contacts/post-api-contacts-create): POST /api/contacts/create
-- [List Contacts](https://reloop.sh/docs/api/contacts/get-api-contacts-list): GET /api/contacts/list
-- [Get Contact](https://reloop.sh/docs/api/contacts/get-api-contacts-retrieve-by-contact_id): GET /api/contacts/retrieve/:contact_id
-- [Update Contact](https://reloop.sh/docs/api/contacts/patch-api-contacts-by-contact_id): PATCH /api/contacts/:contact_id
-- [Delete Contact](https://reloop.sh/docs/api/contacts/delete-api-contacts-by-contact_id): DELETE /api/contacts/:contact_id
+- [Create Contact](https://reloop.sh/docs/api/contacts/post-api-contacts-v1create): POST /api/contacts/v1/create
+- [List Contacts](https://reloop.sh/docs/api/contacts/get-api-contacts-v1list): GET /api/contacts/v1/list
+- [Get Contact](https://reloop.sh/docs/api/contacts/get-api-contacts-v1retrieve-by-contact_id): GET /api/contacts/v1/retrieve/:contact_id
+- [Update Contact](https://reloop.sh/docs/api/contacts/patch-api-contacts-v1by-contact_id): PATCH /api/contacts/v1/:contact_id
+- [Delete Contact](https://reloop.sh/docs/api/contacts/delete-api-contacts-v1by-contact_id): DELETE /api/contacts/v1/:contact_id
 - [Create Contact Group](https://reloop.sh/docs/api/contacts/post-api-contacts-v1groups-create): POST /api/contacts/v1/groups/create
 - [List Contact Groups](https://reloop.sh/docs/api/contacts/get-api-contacts-v1groups-list): GET /api/contacts/v1/groups/list
 - [Get Contact Group](https://reloop.sh/docs/api/contacts/get-api-contacts-v1groups-by-group_id): GET /api/contacts/v1/groups/:group_id
 - [Update Contact Group](https://reloop.sh/docs/api/contacts/patch-api-contacts-v1groups-by-group_id): PATCH /api/contacts/v1/groups/:group_id
-- [Delete Contact Group](https://reloop.sh/docs/api/contacts/delete-api-contacts-group-by-group_id): DELETE /api/contacts/group/:group_id
+- [Delete Contact Group](https://reloop.sh/docs/api/contacts/delete-api-contacts-v1groups-by-group_id): DELETE /api/contacts/v1/groups/:group_id
 - [List Contacts in Group](https://reloop.sh/docs/api/contacts/get-api-contacts-v1groups-by-group_id-contacts): GET /api/contacts/v1/groups/:group_id/contacts
 - [Create Contact Property](https://reloop.sh/docs/api/contacts/post-api-contacts-v1properties-create): POST /api/contacts/v1/properties/create
 - [List Contact Properties](https://reloop.sh/docs/api/contacts/get-api-contacts-v1properties-list): GET /api/contacts/v1/properties/list

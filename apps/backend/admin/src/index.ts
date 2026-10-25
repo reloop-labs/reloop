@@ -68,12 +68,12 @@ const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
 	)
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(serverTiming())
+	.use(apiErrorsPlugin())
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)
 	.use(startupApplicationPublicRoute)
 	.use(adminRoutes)
-	.use(apiErrorsPlugin())
 	.onStart(async () => {
 		await loader();
 	})

@@ -14,22 +14,42 @@ import { subscriptionActivityRoute } from "./subscription-activity/subscription-
 import { updateContactRoute } from "./update-contact/update-contact.route";
 import { updateContactChannelRoute } from "./update-contact-channel/update-contact-channel.route";
 
-export const contactRoutes = new Elysia({ name: "ContactRoutes" })
+/**
+ * Contact routes, served at both `/api/contacts/<route>` (the original,
+ * unversioned paths SDKs and integrations use) and `/api/contacts/v1/<route>`,
+ * so contacts match every other service's URL versioning. The route modules
+ * are unnamed, so Elysia registers them under both prefixes.
+ */
+function withContactRoutes<const Prefix extends string>(app: Elysia<Prefix>) {
+	return app
+		.use(createContactRoute)
+		.use(getContactRoute)
+		.use(listContactsRoute)
+		.use(exportContactsRoute)
+		.use(exportEmailRoute)
+		.use(exportDownloadRoute)
+		.use(subscriptionActivityRoute)
+		.use(updateContactRoute)
+		.use(deleteContactRoute)
+		.use(addSuppressionRoute)
+		.use(addContactToChannelRoute)
+		.use(addContactToGroupRoute)
+		.use(removeContactFromGroupRoute)
+		.use(updateContactChannelRoute);
+}
 
-	.use(createContactRoute)
-	.use(getContactRoute)
-	.use(listContactsRoute)
-	.use(exportContactsRoute)
-	.use(exportEmailRoute)
-	.use(exportDownloadRoute)
-	.use(subscriptionActivityRoute)
-	.use(updateContactRoute)
-	.use(deleteContactRoute)
-	.use(addSuppressionRoute)
+export const contactRoutes = withContactRoutes(
+	new Elysia({ name: "ContactRoutes" }),
+);
 
-	.use(addContactToChannelRoute)
+export const contactRoutesV1 = withContactRoutes(
+	new Elysia({ name: "ContactRoutesV1", prefix: "/v1" }),
+);
 
-	.use(addContactToGroupRoute)
-	.use(removeContactFromGroupRoute)
-
-	.use(updateContactChannelRoute);
+/**
+ * Unversioned contact paths, hidden from OpenAPI so the reference documents
+ * only the /v1 paths. They keep working for existing integrations.
+ */
+export const legacyContactPaths = [
+	...new Set(contactRoutes.routes.map((route) => `/api/contacts${route.path}`)),
+];

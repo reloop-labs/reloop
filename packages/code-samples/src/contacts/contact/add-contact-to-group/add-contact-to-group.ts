@@ -22,7 +22,7 @@ console.log(group.id, group.success);`,
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X POST https://reloop.sh/api/contacts/group/grp_123456789 \\
+		source: `curl -X POST https://reloop.sh/api/contacts/v1/group/grp_123456789 \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
   -d '{"email": "john.doe@example.com"}'`,

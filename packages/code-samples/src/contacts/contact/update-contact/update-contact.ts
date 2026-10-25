@@ -16,7 +16,7 @@ if (contactError) throw contactError;`,
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X PATCH https://reloop.sh/api/contacts/con_123456789 \\
+		source: `curl -X PATCH https://reloop.sh/api/contacts/v1/con_123456789 \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
   -d '{"firstName": "Jane"}'`,

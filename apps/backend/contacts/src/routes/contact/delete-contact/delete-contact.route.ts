@@ -5,39 +5,37 @@ import { deleteContactXCodeSamples } from "@reloop/code-samples/contacts";
 import { Elysia, t } from "elysia";
 import { deleteContactController } from "./delete-contact.controllers";
 
-export const deleteContactRoute = new Elysia()
-	.use(authMiddleware)
-	.delete(
-		"/:contact_id",
-		async ({ params, organizationId }) => {
-			return await deleteContactController({
-				contactId: params.contact_id,
-				organizationId,
-			});
-		},
-		{
-			auth: true,
-			params: t.Object({
-				contact_id: t.String({
-					description: "Unique contact identifier",
-					examples: ["cont_123456789"],
-				}),
+export const deleteContactRoute = new Elysia().use(authMiddleware).delete(
+	"/:contact_id",
+	async ({ params, organizationId }) => {
+		return await deleteContactController({
+			contactId: params.contact_id,
+			organizationId,
+		});
+	},
+	{
+		auth: true,
+		params: t.Object({
+			contact_id: t.String({
+				description: "Unique contact identifier",
+				examples: ["cont_123456789"],
 			}),
-			response: {
-				200: ContactModel.deleteResponse,
-				404: ContactModel.contactNotFound,
-				403: ContactModel.unauthorized,
-			},
-			detail: {
-				tags: ["Contact"],
-				summary: "Delete Contact",
-				description: "Removes a contact from the organization",
-				"x-codeSamples": deleteContactXCodeSamples,
-			},
-			afterResponse: auditLogHook({
-				resourceType: "contact",
-				action: "deleted",
-				successStatus: 200,
-			}),
+		}),
+		response: {
+			200: ContactModel.deleteResponse,
+			404: ContactModel.contactNotFound,
+			403: ContactModel.unauthorized,
 		},
-	);
+		detail: {
+			tags: ["Contact"],
+			summary: "Delete Contact",
+			description: "Removes a contact from the organization",
+			"x-codeSamples": deleteContactXCodeSamples,
+		},
+		afterResponse: auditLogHook({
+			resourceType: "contact",
+			action: "deleted",
+			successStatus: 200,
+		}),
+	},
+);
