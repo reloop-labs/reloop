@@ -1,15 +1,19 @@
 ---
 title: "BIMI: Show Your Logo in the Gmail Inbox"
-description: BIMI (Brand Indicators for Message Identification) lets verified senders display their logo next to emails in Gmail and Apple Mail. Here's how to set it up.
+description: "A complete BIMI setup guide: DMARC enforcement, the SVG Tiny PS logo, VMC vs CMC certificates, the default._bimi DNS record, which inboxes show logos, and how to debug a logo that won't appear."
 keywords:
   - BIMI email setup
   - show logo in gmail
   - brand indicators for message identification
   - BIMI DNS record
+  - VMC vs CMC
+  - SVG Tiny PS logo
+  - Gmail blue checkmark
 publishedAt: 2026-08-25
 category: Deliverability
 tags: [deliverability, bimi, dmarc, branding, dns]
-readTime: 7 min read
+readTime: 10 min read
+image: /blog/images/bimi-email-setup-guide.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -18,54 +22,239 @@ draft: false
 relatedSlugs:
   - spf-dkim-dmarc-setup-guide
   - why-emails-land-in-spam-fix
+  - ip-warming-guide
 ---
 
-## What is BIMI?
+**BIMI shows your logo next to your emails in Gmail, Apple Mail, Yahoo and a few other inboxes.** To get it you need three things: DMARC at enforcement (`p=quarantine` or `p=reject` with `pct=100`), your logo as an SVG Tiny PS file, and for Gmail and Apple Mail a mark certificate (VMC or CMC). Then you publish one TXT record at `default._bimi.yourdomain.com`.
 
-BIMI (Brand Indicators for Message Identification) is an email standard that displays your brand logo next to your email in the recipient's inbox. It's supported by Gmail, Apple Mail, Yahoo, and Fastmail. Beyond branding, it signals to recipients (and ISPs) that you're a verified, trustworthy sender.
+The DNS part takes five minutes. The certificate is what takes time, so start there if you want the logo in Gmail. This guide covers every step and the reasons logos don't show up.
 
-## Prerequisites
+---
 
-BIMI has strict requirements. You need all of these before starting:
+## What BIMI is (and isn't)
 
-- ✅ SPF record configured
-- ✅ DKIM configured
-- ✅ DMARC policy set to `p=quarantine` or `p=reject` (not `p=none`)
-- ✅ A Verified Mark Certificate (VMC): required for Gmail (optional for others)
-- ✅ An SVG logo in the specific BIMI format
+BIMI stands for Brand Indicators for Message Identification. It's a DNS record that tells mailbox providers where to find your logo, and optionally a certificate proving you're allowed to use it.
 
-## Step 1: Prepare your SVG logo
+It is **not** a deliverability shortcut. A BIMI record won't move you from spam to inbox. What it does:
 
-BIMI requires a specific SVG profile (Tiny PS). Your regular SVG will likely not work. Requirements:
-- Square aspect ratio
-- SVG 1.2 Tiny PS format
-- No external resources
-- Validated at [bimigroup.org/svg-validator](https://bimigroup.org/svg-validator/)
+- Puts your logo in the inbox list instead of a grey letter avatar
+- Makes phishing that imitates your brand easier to spot
+- Adds a blue verified checkmark in Gmail if you have a VMC
 
-## Step 2: Host your logo
+The real benefit is the prerequisite. BIMI requires DMARC enforcement, and getting there means you've authenticated every service that sends as your domain. That alone improves deliverability and blocks spoofing.
 
-Upload your BIMI-compliant SVG to a publicly accessible HTTPS URL. It must be served over HTTPS. HTTP won't work.
+---
 
+## Which inboxes show BIMI logos
+
+| Mailbox provider | Shows BIMI logos | Certificate needed |
+|---|---|---|
+| Gmail | Yes | VMC or CMC. A VMC adds the blue checkmark |
+| Apple Mail (iCloud, iOS, macOS) | Yes | VMC |
+| Yahoo Mail / AOL | Yes | Not required; a self-asserted logo can show |
+| Fastmail | Yes | Check their current policy |
+| La Poste, Zone, AU (KDDI) | Yes | Varies |
+| Microsoft Outlook / Outlook.com | No | - |
+
+Sources: the [BIMI Group's provider list](https://bimigroup.org/where-is-my-bimi-logo-displayed/) and [Google Workspace's BIMI setup page](https://knowledge.workspace.google.com/admin/security/set-up-bimi). Providers can always decline to show a logo if they don't trust the sender's reputation, even with everything configured correctly.
+
+---
+
+## Step 1: Get DMARC to enforcement
+
+This is the requirement most domains fail. Your DMARC record must use `p=quarantine` or `p=reject`, and must apply to 100% of mail.
+
+```text
+_dmarc.yourdomain.com  TXT  "v=DMARC1; p=quarantine; pct=100; rua=mailto:dmarc@yourdomain.com"
 ```
-https://yourdomain.com/.well-known/bimi-logo.svg
+
+| Policy | BIMI eligible |
+|---|---|
+| `p=none` | No |
+| `p=quarantine; pct=50` | No |
+| `p=quarantine` (pct defaults to 100) | Yes |
+| `p=reject` | Yes |
+
+Don't jump straight to `reject`. Moving to enforcement before every sender is authenticated means your own invoices, CRM emails or support replies start landing in spam. The safe path:
+
+1. Publish `p=none` with a `rua` reporting address.
+2. Read the aggregate reports for two to four weeks. Find every service sending as your domain.
+3. Add SPF and DKIM for each one: your email API, Google Workspace or Microsoft 365, your CRM, your helpdesk.
+4. Move to `p=quarantine`, watch reports for another week or two, then optionally `p=reject`.
+
+The [SPF, DKIM and DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide) walks through each step. If you send with Reloop, your domain page shows the exact SPF and DKIM records and whether they verify.
+
+<Callout type="warning">
+  If your organizational domain has `sp=none` (subdomain policy), subdomains you send from may not qualify. Check both the subdomain you send from and the root domain's policy.
+</Callout>
+
+---
+
+## Step 2: Make an SVG Tiny PS logo
+
+BIMI logos must be in **SVG Tiny Portable/Secure (SVG Tiny PS)**, a restricted SVG profile. A normal SVG exported from Figma or Illustrator will not work as-is.
+
+Gmail's requirements:
+
+- SVG Tiny PS: `version="1.2"` and `baseProfile="tiny-ps"` on the root `<svg>`
+- A `<title>` element with your company name
+- Square aspect ratio, with the logo centered on a **solid** background
+- Minimum 96 × 96 pixels, in absolute units
+- Under 32 KB
+- No scripts, external links, raster images, animations or `x=`/`y=` on the root element
+
+A minimal valid structure:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps"
+     viewBox="0 0 96 96" width="96" height="96">
+  <title>Acme</title>
+  <rect width="96" height="96" fill="#000000"/>
+  <!-- your logo paths, centered -->
+</svg>
 ```
 
-## Step 3: Add the BIMI DNS record
+Design for a circle. Most inboxes crop the logo into a circle, so keep the mark inside the middle ~70% of the square.
 
+Converting an existing logo:
+
+1. Export a clean SVG (paths only, text converted to outlines).
+2. Remove any embedded bitmaps, gradients that reference external resources, and `<script>` or `<style>` blocks that pull in fonts.
+3. Edit the root element to add `version="1.2"` and `baseProfile="tiny-ps"`, remove `x` and `y`, and add a `<title>`.
+4. Host it at a stable HTTPS URL, for example `https://yourdomain.com/bimi/logo.svg`.
+
+If you're getting a VMC or CMC, the certificate authority will usually check or prepare the SVG for you, since the logo is embedded in the certificate.
+
+---
+
+## Step 3: Get a VMC or CMC (for Gmail and Apple Mail)
+
+A mark certificate proves you're entitled to use the logo. Two types exist:
+
+| | VMC (Verified Mark Certificate) | CMC (Common Mark Certificate) |
+|---|---|---|
+| Proof required | A **registered trademark** for the logo | Evidence the logo has been publicly used for at least a year |
+| Gmail | Logo + blue checkmark | Logo, no checkmark |
+| Apple Mail | Logo | Not supported |
+| Time to get | Weeks once you hold the trademark. Registering the trademark itself often takes 6–12 months | Usually days to weeks |
+| Typical issuers | DigiCert, Sectigo, GlobalSign, Entrust | DigiCert, Sectigo, GlobalSign, Entrust |
+
+Pick based on what you have:
+
+- **You already have a registered trademark for the logo:** get a VMC. You get Gmail, Apple Mail and the checkmark.
+- **No trademark:** get a CMC for Gmail now, and file a trademark if you want the checkmark and Apple Mail later.
+- **You only care about Yahoo:** you can skip the certificate entirely.
+
+Certificates are annual purchases. The issuer gives you a PEM file. Host it at an HTTPS URL next to your logo, for example `https://yourdomain.com/bimi/certificate.pem`.
+
+---
+
+## Step 4: Publish the BIMI record
+
+Add a TXT record at `default._bimi` on the domain in your From address.
+
+**With a certificate:**
+
+```text
+default._bimi.yourdomain.com  TXT  "v=BIMI1; l=https://yourdomain.com/bimi/logo.svg; a=https://yourdomain.com/bimi/certificate.pem"
 ```
-v=BIMI1; l=https://yourdomain.com/.well-known/bimi-logo.svg; a=https://yourdomain.com/.well-known/vmc.pem
+
+**Without a certificate (Yahoo and others that accept self-asserted logos):**
+
+```text
+default._bimi.yourdomain.com  TXT  "v=BIMI1; l=https://yourdomain.com/bimi/logo.svg; a="
 ```
 
-The `a=` parameter points to your VMC. For non-Gmail clients, you can omit `a=` and the logo will still appear.
+| Tag | Meaning |
+|---|---|
+| `v=BIMI1` | Version, required, must come first |
+| `l=` | HTTPS URL of the SVG Tiny PS logo |
+| `a=` | HTTPS URL of the VMC or CMC PEM file. Empty if you have none |
 
-## Step 4: Obtain a VMC (for Gmail)
+When the logo is embedded in the certificate, Gmail uses the certificate's copy. Keep the `l=` file identical to it anyway.
 
-A Verified Mark Certificate is issued by authorized CAs (DigiCert, Entrust). It verifies that you own the trademarked logo. Cost is ~$1,200–$1,500/year. For most early-stage startups, the non-Gmail BIMI (without VMC) is a reasonable starting point.
+If you send from a subdomain like `mail.yourdomain.com`, publish the record on that subdomain (`default._bimi.mail.yourdomain.com`) or rely on the organizational domain's record, which providers fall back to.
 
-## Verifying your setup
+---
 
-Check your BIMI record with [BIMI Inspector](https://bimigroup.org/bimi-generator/) and then send a test email to a Gmail address to confirm the logo appears.
+## Step 5: Check it
 
-## Is BIMI worth it?
+Use the free [Reloop BIMI checker](/tools/bimi-checker). It looks up `default._bimi` for your domain, validates the `v=`, `l=` and `a=` tags, checks that DMARC is at enforcement with `pct=100`, and fetches the logo to run SVG Tiny PS checks.
 
-Yes, but only after SPF, DKIM, and DMARC are solid. The brand visibility boost is real, and the DMARC requirement means you're forced into a good security posture to qualify.
+Then send a real email to a Gmail and a Yahoo address. Logos can take up to 48 hours to appear after everything is in place, and providers cache them, so changes aren't instant.
+
+---
+
+## Why your BIMI logo isn't showing
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Nothing anywhere | DMARC is `p=none` or `pct` is under 100 | Move to `p=quarantine` with `pct=100` |
+| Shows in Yahoo, not Gmail | No VMC or CMC | Get a certificate and add it as `a=` |
+| Shows in Gmail, not Apple Mail | You have a CMC | Apple Mail needs a VMC |
+| Checker says logo invalid | Not SVG Tiny PS, has `x`/`y` on root, or over 32 KB | Re-export and fix the root element |
+| Some emails show it, others don't | A different service sends some mail and fails DMARC alignment | Authenticate that service's SPF/DKIM for your domain |
+| Logo shows with wrong crop | Logo not centered for a circle | Shrink the mark to the middle ~70% |
+| Recently fixed, still missing | Provider cache | Wait up to 48 hours |
+
+Also remember that mailbox providers can choose not to show logos for senders with poor reputation, high complaint rates, or very low volume. BIMI rewards senders who are already doing the basics right.
+
+---
+
+## BIMI and Reloop
+
+Reloop doesn't need anything special for BIMI. The logo is tied to the domain in your From address, not to the sending service. As long as the mail you send through Reloop passes DMARC (which it does once the SPF and DKIM records from your domain page are verified), BIMI works for it automatically.
+
+A quick pre-flight for a Reloop sending domain:
+
+1. Domain verified in Reloop, DKIM passing.
+2. DMARC at `p=quarantine` or `p=reject`, `pct=100`.
+3. `default._bimi` record published, logo and certificate on HTTPS.
+4. [BIMI checker](/tools/bimi-checker) passes.
+
+The free [auth checker](/tools/auth-checker) will confirm SPF, DKIM and DMARC for the domain first, if you're not sure where you stand.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I need a trademark for BIMI?">
+    Only for a VMC, which gives you the Gmail checkmark and Apple Mail
+    support. A CMC needs proof that the logo has been in public use for at
+    least a year instead, and works in Gmail without a checkmark. Yahoo
+    doesn't require a certificate at all.
+  </Accordion>
+
+  <Accordion title="Does BIMI improve deliverability?">
+    Not directly. BIMI requires DMARC enforcement, and enforcement does help
+    by blocking spoofing and pushing you to authenticate every sender. The
+    logo itself may improve recognition and opens, but it won't fix spam
+    placement.
+  </Accordion>
+
+  <Accordion title="Does Outlook support BIMI?">
+    Not at the time of writing. Outlook shows its own sender images for some
+    brands, but it doesn't read BIMI records.
+  </Accordion>
+
+  <Accordion title="How much does a VMC cost?">
+    VMCs and CMCs are sold as annual certificates by the certificate
+    authorities listed above. Prices change and vary by issuer, so compare
+    current quotes. Budget for the trademark separately if you don't have one.
+  </Accordion>
+
+  <Accordion title="Can I use BIMI on a subdomain?">
+    Yes. Publish `default._bimi` on the subdomain you send from, or let it
+    fall back to the organizational domain's record. DMARC enforcement has to
+    apply to the subdomain either way.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Check your BIMI setup"
+  description="Validate your BIMI record, logo and DMARC policy in seconds with the free checker."
+  href="/tools/bimi-checker"
+  label="Run the BIMI checker"
+/>

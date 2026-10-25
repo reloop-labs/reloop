@@ -1,15 +1,18 @@
 ---
 title: "Send Email from Cloudflare Workers"
-description: Send transactional email from Cloudflare Workers using Reloop's HTTP API, with no Node.js SDK required. Works on the edge runtime.
+description: "Send transactional email from Cloudflare Workers with Reloop: a plain fetch call or the SDK with nodejs_compat, secrets with Wrangler, waitUntil, retries with Idempotency-Key, Queues and Cron Triggers."
 keywords:
   - cloudflare workers email
   - send email cloudflare workers
+  - cloudflare workers smtp
   - edge runtime email
   - cloudflare workers transactional email
+  - wrangler send email
 publishedAt: 2026-09-05
 category: Tutorials
 tags: [cloudflare, edge, workers, http-api, tutorial]
-readTime: 5 min read
+readTime: 9 min read
+image: /blog/images/send-email-cloudflare-workers.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -18,75 +21,435 @@ draft: false
 relatedSlugs:
   - send-email-nextjs-app-router
   - send-email-sveltekit
+  - transactional-email-best-practices
 ---
 
-## Why the SDK doesn't work on Cloudflare Workers
+**To send email from a Cloudflare Worker, call Reloop's HTTP API with `fetch`.** Workers can't hold a normal SMTP connection, but they're very good at HTTP. One `POST` to `https://reloop.sh/api/mail/v1/send` with your API key in an `x-api-key` header sends the email. No SDK is required, and if you'd like one, the `reloop-email` package works too with the `nodejs_compat` flag.
 
-Cloudflare Workers run in a V8 isolate, not a Node.js environment. Node.js built-ins like `net`, `tls`, and `http` are unavailable. The Reloop Node.js SDK uses these for SMTP, so on Workers, you call the HTTP REST API directly instead.
+This guide covers both options, plus the parts that matter in production: secrets, sending without slowing down the response, safe retries, Queues and scheduled sends.
 
-## The good news: the HTTP API is simple
+---
 
-Everything the SDK does, the HTTP API does too. And `fetch` is available natively in Workers.
+## Why HTTP and not SMTP
 
-## Setting up your Worker
+Most email libraries for Node (Nodemailer, for example) open a TCP connection to an SMTP server. That doesn't fit the Workers runtime:
 
-```typescript
-// src/index.ts
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    if (request.method === "POST" && new URL(request.url).pathname === "/send") {
-      return sendEmail(env);
-    }
-    return new Response("Not found", { status: 404 });
-  },
-};
-```
+- Workers run on V8 isolates, not a full Node.js process, so many Node networking APIs aren't available.
+- Every request should finish fast. An SMTP handshake with STARTTLS adds several round trips.
+- An HTTP API gives you a single request, a JSON response with an email ID, and structured errors.
 
-## Sending an email via the HTTP API
+So the pattern on Workers is simple: **HTTP out, Reloop does the SMTP.**
 
-```typescript
-async function sendEmail(env: Env): Promise<Response> {
-  const response = await fetch("https://api.reloop.sh/v1/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.RELOOP_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "hello@yourdomain.com",
-      to: "user@example.com",
-      subject: "Hello from the edge",
-      html: "<p>Sent from a Cloudflare Worker.</p>",
-    }),
-  });
+| Option | Dependencies | Best for |
+|---|---|---|
+| `fetch` to the REST API | None | Smallest bundle, full control |
+| `reloop-email` SDK | One package + `nodejs_compat` | Typed params, React Email rendering, shared code with Node services |
 
-  const data = await response.json();
-  return Response.json(data);
-}
-```
+---
 
-## Storing your API key securely
+## Prerequisites
 
-Never hardcode the API key. Add it as a Cloudflare secret:
+1. A Cloudflare account and [Wrangler](https://developers.cloudflare.com/workers/wrangler/) (`npm create cloudflare@latest` sets up a project).
+2. A Reloop API key from the [dashboard](https://reloop.sh/dashboard/api-keys). Keys start with `rl_`.
+3. A verified sending domain. See [connect a domain](/docs/guides/connect-domain) and the [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide).
+
+---
+
+## 1. Store the API key as a secret
+
+Never put the key in `wrangler.jsonc` or in your source. Use a Worker secret:
 
 ```bash
-wrangler secret put RELOOP_API_KEY
+npx wrangler secret put RELOOP_API_KEY
 ```
 
-Access it as `env.RELOOP_API_KEY` in your Worker.
+Paste the key when prompted. For local development with `wrangler dev`, put it in `.dev.vars` (and add that file to `.gitignore`):
 
-## Defining the Env type
+```env
+RELOOP_API_KEY=rl_your_api_key_here
+```
+
+Secrets show up on the `env` object passed to your handler, so type them once:
 
 ```typescript
-interface Env {
+// src/env.ts
+export interface Env {
   RELOOP_API_KEY: string;
 }
 ```
 
-## Deploying
+---
 
-```bash
-wrangler deploy
+## 2. Option A: plain `fetch` (no dependencies)
+
+This is the whole integration:
+
+```typescript
+// src/reloop.ts
+import type { Env } from "./env";
+
+export type SendEmailInput = {
+  from: string;
+  to: string | string[];
+  subject: string;
+  html?: string;
+  text?: string;
+  reply_to?: string;
+  tags?: { name: string; value: string }[];
+};
+
+export type SendEmailResult =
+  | { ok: true; id: string; messageId: string }
+  | { ok: false; status: number; code?: string; message: string };
+
+export async function sendEmail(
+  env: Env,
+  input: SendEmailInput,
+  idempotencyKey?: string,
+): Promise<SendEmailResult> {
+  const headers: Record<string, string> = {
+    "x-api-key": env.RELOOP_API_KEY,
+    "Content-Type": "application/json",
+  };
+  if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;
+
+  const res = await fetch("https://reloop.sh/api/mail/v1/send", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(input),
+  });
+
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as {
+      code?: string;
+      message?: string;
+    };
+    return {
+      ok: false,
+      status: res.status,
+      code: body.code,
+      message: body.message ?? res.statusText,
+    };
+  }
+
+  const data = (await res.json()) as { id: string; messageId: string };
+  return { ok: true, id: data.id, messageId: data.messageId };
+}
 ```
 
-Your Worker is now live globally on Cloudflare's edge network with email sending built in.
+And a Worker that uses it:
+
+```typescript
+// src/index.ts
+import type { Env } from "./env";
+import { sendEmail } from "./reloop";
+
+export default {
+  async fetch(request, env): Promise<Response> {
+    if (request.method !== "POST") {
+      return new Response("Method not allowed", { status: 405 });
+    }
+
+    const { email } = (await request.json()) as { email?: string };
+    if (!email || !email.includes("@")) {
+      return Response.json({ error: "Invalid email" }, { status: 400 });
+    }
+
+    const result = await sendEmail(env, {
+      from: "Acme <hello@mail.acme.com>",
+      to: email,
+      subject: "Welcome to Acme",
+      html: "<p>Thanks for signing up.</p>",
+      text: "Thanks for signing up.",
+      tags: [{ name: "type", value: "welcome" }],
+    });
+
+    if (!result.ok) {
+      console.error("Reloop send failed", result);
+      return Response.json({ error: "Could not send email" }, { status: 502 });
+    }
+
+    return Response.json({ ok: true, id: result.id });
+  },
+} satisfies ExportedHandler<Env>;
+```
+
+Reloop also accepts `Authorization: Bearer rl_…` if you prefer that header style. Both work.
+
+### What the response looks like
+
+A successful send returns the email's ID and the SMTP message ID:
+
+```json
+{
+  "success": true,
+  "id": "em_…",
+  "messageId": "<…@mail.acme.com>",
+  "status": "sent",
+  "timestamp": "2026-09-05T10:00:00.000Z"
+}
+```
+
+Errors are JSON with a stable `code` you can branch on, plus `message`, `why`, `fix` and a docs `link`:
+
+```json
+{
+  "code": "not_found",
+  "message": "Domain not found",
+  "why": "The domain acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard",
+  "link": "https://reloop.sh/docs/api/errors"
+}
+```
+
+The full list of codes is in the [errors reference](/docs/api/errors).
+
+---
+
+## 3. Option B: the `reloop-email` SDK
+
+The Node SDK uses the global `fetch`, so it runs on Workers. It also bundles webhook signature helpers that import Node's `crypto` module, which means you need Cloudflare's Node.js compatibility flag.
+
+<InstallSdkCode />
+
+Enable the flag in `wrangler.jsonc`:
+
+```jsonc
+{
+  "name": "acme-mailer",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"]
+}
+```
+
+Then create the client inside the handler, because secrets only exist on `env`:
+
+```typescript
+// src/index.ts
+import { Reloop } from "reloop-email";
+import type { Env } from "./env";
+
+export default {
+  async fetch(request, env): Promise<Response> {
+    const reloop = new Reloop({ apiKey: env.RELOOP_API_KEY });
+
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <hello@mail.acme.com>",
+      to: "user@example.com",
+      subject: "Your receipt",
+      html: "<p>Thanks for your order.</p>",
+      text: "Thanks for your order.",
+    });
+
+    if (emailError) {
+      console.error(emailError.status, emailError.message);
+      return Response.json({ error: "Could not send email" }, { status: 502 });
+    }
+
+    return Response.json({ ok: true, id: response.id });
+  },
+} satisfies ExportedHandler<Env>;
+```
+
+The SDK never throws for API errors. It returns `{ response, emailError }`, and `emailError` carries the HTTP `status`, `message` and the full error `body`.
+
+---
+
+## 4. Don't make the user wait: `ctx.waitUntil`
+
+Sending a welcome email shouldn't add latency to a signup request. Workers let you finish background work after the response is sent with `ctx.waitUntil`:
+
+```typescript
+export default {
+  async fetch(request, env, ctx): Promise<Response> {
+    const { email } = (await request.json()) as { email: string };
+
+    const user = await createUser(env, email);
+
+    ctx.waitUntil(
+      sendEmail(env, {
+        from: "Acme <hello@mail.acme.com>",
+        to: user.email,
+        subject: "Welcome to Acme",
+        html: "<p>You're in.</p>",
+      }).then((r) => {
+        if (!r.ok) console.error("welcome email failed", r);
+      }),
+    );
+
+    return Response.json({ ok: true });
+  },
+} satisfies ExportedHandler<Env>;
+```
+
+`waitUntil` keeps the Worker alive until the promise settles, but it doesn't retry. For anything you can't afford to lose, use a Queue (next section).
+
+---
+
+## 5. Retry safely with `Idempotency-Key`
+
+Networks fail. If a `fetch` times out you don't know whether Reloop received it. Retrying blindly could send the same password reset twice.
+
+Send an `Idempotency-Key` header and retries become safe. Reloop stores a successful response for 24 hours, and a repeat request with the same key and body returns the original result instead of sending again.
+
+```typescript
+const key = `password-reset:${user.id}:${resetToken}`;
+
+for (let attempt = 0; attempt < 3; attempt++) {
+  const result = await sendEmail(env, message, key);
+  if (result.ok) break;
+  if (result.status < 500 && result.status !== 429) break; // don't retry 4xx
+  await new Promise((r) => setTimeout(r, 2 ** attempt * 500));
+}
+```
+
+| Rule | Detail |
+|---|---|
+| Lifetime | Successful responses replay for 24 hours |
+| Length | Up to 500 characters for sending email |
+| Same request only | Same key with a different body returns `422` |
+| Failures | Non-2xx responses release the key, so you can retry |
+
+More in the [idempotency docs](/docs/api/idempotency).
+
+---
+
+## 6. Durable sends with Cloudflare Queues
+
+For high-volume or must-deliver email, put the message on a [Cloudflare Queue](https://developers.cloudflare.com/queues/) and send it from a consumer. Queues retry failed messages for you.
+
+```jsonc
+// wrangler.jsonc
+{
+  "queues": {
+    "producers": [{ "binding": "EMAIL_QUEUE", "queue": "emails" }],
+    "consumers": [{ "queue": "emails", "max_retries": 5 }]
+  }
+}
+```
+
+```typescript
+import type { SendEmailInput } from "./reloop";
+import { sendEmail } from "./reloop";
+
+interface Env {
+  RELOOP_API_KEY: string;
+  EMAIL_QUEUE: Queue<{ key: string; message: SendEmailInput }>;
+}
+
+export default {
+  async fetch(request, env): Promise<Response> {
+    const { email } = (await request.json()) as { email: string };
+
+    await env.EMAIL_QUEUE.send({
+      key: crypto.randomUUID(),
+      message: {
+        from: "Acme <hello@mail.acme.com>",
+        to: email,
+        subject: "Your invoice is ready",
+        html: "<p>Download it from your dashboard.</p>",
+      },
+    });
+
+    return Response.json({ queued: true });
+  },
+
+  async queue(batch, env): Promise<void> {
+    for (const msg of batch.messages) {
+      const result = await sendEmail(env, msg.body.message, msg.body.key);
+      if (result.ok || (result.status < 500 && result.status !== 429)) {
+        msg.ack();
+      } else {
+        msg.retry();
+      }
+    }
+  },
+} satisfies ExportedHandler<Env, { key: string; message: SendEmailInput }>;
+```
+
+The idempotency key travels with the message, so a retried queue message never turns into a duplicate email.
+
+---
+
+## 7. Scheduled email with Cron Triggers
+
+Daily digests and reminders fit [Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/):
+
+```jsonc
+// wrangler.jsonc
+{
+  "triggers": { "crons": ["0 9 * * 1"] }
+}
+```
+
+```typescript
+export default {
+  async scheduled(controller, env, ctx): Promise<void> {
+    const users = await getUsersWantingDigest(env);
+
+    for (const user of users) {
+      ctx.waitUntil(
+        sendEmail(
+          env,
+          {
+            from: "Acme <digest@mail.acme.com>",
+            to: user.email,
+            subject: "Your weekly summary",
+            html: renderDigest(user),
+          },
+          `digest:${user.id}:${controller.scheduledTime}`,
+        ),
+      );
+    }
+  },
+} satisfies ExportedHandler<Env>;
+```
+
+If you only need to send one email at a specific time, you don't need a cron at all: pass `scheduled_at` (an ISO 8601 timestamp) in the send request and Reloop holds it until then.
+
+---
+
+## Production checklist
+
+- [ ] `RELOOP_API_KEY` set with `wrangler secret put`, never in config or code
+- [ ] `from` uses a domain verified in Reloop
+- [ ] Endpoint that triggers sends is authenticated or rate-limited (an open send endpoint is an open relay)
+- [ ] User-facing sends use `ctx.waitUntil` or a Queue
+- [ ] Retries send an `Idempotency-Key`
+- [ ] 4xx errors are logged and not retried; 5xx and 429 are retried with backoff
+- [ ] Plain-text `text` included alongside `html`
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I use Nodemailer or SMTP from a Worker?">
+    Not reliably. Workers are built for HTTP, and SMTP needs a long-lived TCP
+    session with STARTTLS. Use the HTTP API from Workers, and keep SMTP for
+    servers and tools that only speak SMTP.
+  </Accordion>
+
+  <Accordion title="Do I need nodejs_compat?">
+    Only for the SDK. The plain `fetch` approach has no dependencies and runs
+    without any compatibility flags.
+  </Accordion>
+
+  <Accordion title="Does this work on Cloudflare Pages Functions?">
+    Yes. Pages Functions run on the same runtime. Read the key from
+    `context.env.RELOOP_API_KEY` and call the same `sendEmail` helper.
+  </Accordion>
+
+  <Accordion title="Can I point the Worker at a self-hosted Reloop?">
+    Yes. Replace `https://reloop.sh` with your instance's URL, or pass
+    `baseUrl` to the SDK. See [self-hosting Reloop](/blog/self-hosted-email-infrastructure).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Send your first email from the edge"
+  description="Free tier includes 3,000 emails a month. One fetch call, no SMTP."
+  href="/dashboard/signup"
+  label="Get started"
+/>

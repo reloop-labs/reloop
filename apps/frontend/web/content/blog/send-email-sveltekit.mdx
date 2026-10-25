@@ -1,15 +1,18 @@
 ---
-title: "Email with SvelteKit: A Developer's Guide"
-description: Send transactional email from SvelteKit server endpoints and form actions using Reloop's Node.js SDK, with full TypeScript support.
+title: "How to Send Email with SvelteKit (2026)"
+description: "Send transactional email from SvelteKit 2 and Svelte 5 with Reloop: a server-only client, form actions with progressive enhancement, +server.ts API routes, error handling, templates and deployment."
 keywords:
   - send email sveltekit
   - sveltekit email tutorial
+  - sveltekit form actions email
   - sveltekit transactional email
-  - sveltekit server actions email
+  - sveltekit contact form email
+  - svelte 5 send email
 publishedAt: 2026-09-01
 category: Tutorials
-tags: [sveltekit, nodejs, sdk, tutorial]
-readTime: 6 min read
+tags: [sveltekit, svelte, nodejs, sdk, form-actions]
+readTime: 10 min read
+image: /blog/images/send-email-sveltekit.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -18,82 +21,354 @@ draft: false
 relatedSlugs:
   - send-email-nextjs-app-router
   - send-email-remix
+  - send-email-cloudflare-workers
+  - transactional-email-best-practices
 ---
 
-## SvelteKit's server-side model
+**To send email from SvelteKit, call Reloop only from server code:** a form action in `+page.server.ts` or an endpoint in `+server.ts`. Keep the client in `src/lib/server/` and read the API key from `$env/static/private`, and SvelteKit will refuse to bundle either into the browser.
 
-SvelteKit form actions and `+server.ts` endpoints run exclusively on the server, perfect for API key usage. You never have to worry about the Reloop key leaking to the client.
+This guide builds both patterns end to end on SvelteKit 2 and Svelte 5: install, a shared client, a contact form with progressive enhancement, a JSON endpoint for webhooks and cron, error handling, templates and deploys.
 
-## Installation
+---
 
-```bash
-npm install reloop-email
-```
+## What you'll build
 
-Add to `.env`:
+| Pattern | File | Best for |
+|---|---|---|
+| **Form action** | `src/routes/contact/+page.server.ts` | Contact forms, signup, password reset, anything triggered from your own UI |
+| **API endpoint** | `src/routes/api/send/+server.ts` | Webhooks, cron jobs, mobile apps, other services |
+
+Both run only on the server and both use the same Reloop call. Use form actions for your UI. Use `+server.ts` when something outside your app needs a URL to POST to.
+
+---
+
+## Prerequisites
+
+1. A SvelteKit 2 project (`npx sv create my-app` if you're starting fresh)
+2. A Reloop account and an API key from the [dashboard](https://reloop.sh/dashboard). Keys start with `rl_`.
+3. A verified sending domain. See [connect a domain](/docs/guides/connect-domain) and the [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide).
+
+---
+
+## 1. Install the SDK
+
+<InstallSdkCode />
+
+The package is [`reloop-email`](https://www.npmjs.com/package/reloop-email). It's written in TypeScript, so you get types for every field without extra packages.
+
+---
+
+## 2. Add the API key
+
+Create `.env` in the project root:
 
 ```env
-RELOOP_API_KEY=re_your_api_key_here
+RELOOP_API_KEY=rl_your_api_key_here
 ```
 
-## Sending from a form action
+SvelteKit splits environment variables into public and private:
 
-The cleanest pattern for contact forms, signup flows, or any user-triggered email:
+| Module | Visible in the browser? | Use for the Reloop key? |
+|---|---|---|
+| `$env/static/private` | No | **Yes** |
+| `$env/dynamic/private` | No | Yes, if the value is only known at runtime |
+| `$env/static/public` | Yes (needs `PUBLIC_` prefix) | **Never** |
+| `$env/dynamic/public` | Yes | **Never** |
+
+If you import a private module from client-side code, the build fails. That's the guardrail you want.
+
+<Callout type="warning">
+  Never prefix the key with `PUBLIC_`. Anything public ends up in the JavaScript bundle. If a key ever leaks, rotate it in the dashboard and redeploy.
+</Callout>
+
+---
+
+## 3. Create a server-only client
+
+Put the client in `src/lib/server/`. SvelteKit won't let any file under that folder be imported into code that runs in the browser.
+
+```typescript
+// src/lib/server/reloop.ts
+import { RELOOP_API_KEY } from "$env/static/private";
+import { Reloop } from "reloop-email";
+
+export const reloop = new Reloop({ apiKey: RELOOP_API_KEY });
+```
+
+The constructor takes an options object: `{ apiKey }`, plus an optional `baseUrl` if you [self-host Reloop](/blog/self-hosted-email-infrastructure).
+
+---
+
+## 4. Send from a form action
+
+Form actions are the most natural fit. They work without JavaScript, and `use:enhance` upgrades them to a smooth in-page submit when JavaScript is available.
+
+### The action
 
 ```typescript
 // src/routes/contact/+page.server.ts
-import { Reloop } from "reloop-email";
+import { fail } from "@sveltejs/kit";
+import { reloop } from "$lib/server/reloop";
 import type { Actions } from "./$types";
 
-const reloop = new Reloop(import.meta.env.RELOOP_API_KEY);
-
-export const actions: Actions = {
+export const actions = {
   default: async ({ request }) => {
     const data = await request.formData();
-    const email = data.get("email") as string;
+    const email = String(data.get("email") ?? "").trim().toLowerCase();
+    const message = String(data.get("message") ?? "").trim();
 
-    await reloop.emails.send({
-      from: "hello@yourdomain.com",
+    if (!email.includes("@")) {
+      return fail(400, { email, message, error: "Enter a valid email." });
+    }
+    if (message.length < 10) {
+      return fail(400, { email, message, error: "Tell us a bit more." });
+    }
+
+    const { response, emailError } = await reloop.mail.send({
+      from: "Acme <hello@mail.acme.com>",
       to: email,
-      subject: "Thanks for reaching out",
-      html: "<p>We'll be in touch soon.</p>",
+      reply_to: "support@acme.com",
+      subject: "We got your message",
+      html: `<p>Thanks for reaching out. We'll reply within one business day.</p>`,
+      text: "Thanks for reaching out. We'll reply within one business day.",
+      tags: [{ name: "type", value: "contact_confirmation" }],
     });
 
-    return { success: true };
+    if (emailError) {
+      console.error("Reloop send failed", emailError.status, emailError.body);
+      return fail(502, { email, message, error: "Couldn't send. Try again." });
+    }
+
+    return { success: true, id: response.messageId };
   },
-};
+} satisfies Actions;
 ```
 
-## Sending from a server endpoint
+A few things worth noting:
 
-For API-style sends (webhooks, cron jobs, programmatic triggers):
+- `reloop.mail.send` doesn't throw on API errors. It returns `{ response, emailError }`, so failures are a normal branch in your code.
+- `emailError.body` carries Reloop's structured error: a `message`, `why`, `fix` and docs `link`. Log it on the server. Don't send it to the user.
+- `fail()` returns the submitted values, so the form can be re-filled after a validation error.
+- `from` must be on a domain you've verified in Reloop.
+
+### The page
+
+```svelte
+<!-- src/routes/contact/+page.svelte -->
+<script lang="ts">
+  import { enhance } from "$app/forms";
+  import type { PageProps } from "./$types";
+
+  let { form }: PageProps = $props();
+  let sending = $state(false);
+</script>
+
+{#if form?.success}
+  <p>Thanks! Check your inbox for a confirmation.</p>
+{:else}
+  <form
+    method="POST"
+    use:enhance={() => {
+      sending = true;
+      return async ({ update }) => {
+        await update();
+        sending = false;
+      };
+    }}
+  >
+    <input name="email" type="email" value={form?.email ?? ""} required />
+    <textarea name="message" required>{form?.message ?? ""}</textarea>
+
+    {#if form?.error}<p class="error">{form.error}</p>{/if}
+
+    <button disabled={sending}>{sending ? "Sending…" : "Send"}</button>
+  </form>
+{/if}
+```
+
+This uses Svelte 5 runes: `$props()` for the action result and `$state()` for the pending flag. Without JavaScript, the form still posts and the page re-renders with `form` filled in.
+
+---
+
+## 5. Send from a `+server.ts` endpoint
+
+Use an endpoint when the caller isn't your own UI: a Stripe webhook, a cron job, a mobile app, an AI agent.
 
 ```typescript
-// src/routes/api/send-welcome/+server.ts
-import { json } from "@sveltejs/kit";
-import { Reloop } from "reloop-email";
+// src/routes/api/send/+server.ts
+import { error, json } from "@sveltejs/kit";
+import { INTERNAL_SEND_SECRET } from "$env/static/private";
+import { reloop } from "$lib/server/reloop";
 import type { RequestHandler } from "./$types";
 
-const reloop = new Reloop(import.meta.env.RELOOP_API_KEY);
+type Body = { to?: string; name?: string };
 
 export const POST: RequestHandler = async ({ request }) => {
-  const { email, name } = await request.json();
+  if (request.headers.get("x-internal-secret") !== INTERNAL_SEND_SECRET) {
+    error(401, "Unauthorized");
+  }
 
-  await reloop.emails.send({
-    from: "onboarding@yourdomain.com",
-    to: email,
-    subject: `Welcome, ${name}!`,
-    html: `<p>Your account is ready.</p>`,
+  const body = (await request.json().catch(() => ({}))) as Body;
+  const to = body.to?.trim().toLowerCase();
+  if (!to?.includes("@")) error(400, "Field `to` must be an email");
+
+  const { response, emailError } = await reloop.mail.send({
+    from: "Acme <onboarding@mail.acme.com>",
+    to,
+    subject: body.name ? `Welcome, ${body.name}` : "Welcome to Acme",
+    html: "<p>Your account is ready.</p>",
+    text: "Your account is ready.",
   });
 
-  return json({ sent: true });
+  if (emailError) {
+    console.error("Reloop send failed", emailError.status, emailError.body);
+    error(502, "Failed to send email");
+  }
+
+  return json({ ok: true, messageId: response.messageId });
 };
 ```
 
-## Environment variable note
+Test it locally:
 
-SvelteKit uses `import.meta.env` for environment variables. Private variables (not exposed to the client) should be prefixed with nothing or `SECRET_`. Never use `PUBLIC_` for API keys.
+```bash
+curl -X POST http://localhost:5173/api/send \
+  -H "Content-Type: application/json" \
+  -H "x-internal-secret: $INTERNAL_SEND_SECRET" \
+  -d '{"to":"you@example.com","name":"Ada"}'
+```
 
-## Deploying
+<Callout type="warning">
+  A public endpoint that sends email to any address is an open relay. Always gate it with a session check, a shared secret, or a verified webhook signature, and rate-limit it.
+</Callout>
 
-SvelteKit works on Node.js, Vercel, Netlify, Cloudflare Workers, and more. The Reloop SDK is compatible with all Node.js-based adapters. For the Cloudflare adapter, see our [Cloudflare Workers guide](/blog/send-email-cloudflare-workers).
+In SvelteKit 2, `error()` throws for you, so there's no `throw` keyword in front of it.
+
+---
+
+## 6. Form action or endpoint?
+
+| Question | Form action | `+server.ts` |
+|---|---|---|
+| Triggered by a form in this app? | Yes | No |
+| Needs to work without JavaScript? | Yes | No |
+| Called by webhooks, cron or other services? | No | Yes |
+| Needs a stable public URL? | No | Yes |
+| Same Reloop call? | Yes | Yes |
+
+Most apps end up using both: actions for product UI, endpoints for integrations.
+
+---
+
+## 7. Use a template instead of inline HTML
+
+Inline HTML is fine for a contact form. For anything you'll iterate on (welcome emails, receipts, password resets), keep the design in a Reloop template and send variables from code.
+
+```typescript
+await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: user.email,
+  subject: "Reset your password",
+  template: {
+    id: "tmpl_password_reset",
+    variables: { name: user.name, reset_url: resetUrl },
+  },
+});
+```
+
+Templates use `{{variable}}` placeholders. Designers can edit them in the dashboard without a deploy.
+
+---
+
+## 8. Fields you'll use most
+
+```typescript
+await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>", // required, verified domain
+  to: ["a@example.com", "b@example.com"], // string or array, up to 50
+  subject: "Order shipped", // required
+  html: "<p>Your order is on its way.</p>",
+  text: "Your order is on its way.", // plain-text fallback
+  reply_to: "support@acme.com",
+  cc: "ops@acme.com",
+  bcc: "archive@acme.com",
+  scheduled_at: "2026-09-02T09:00:00Z", // send later (ISO 8601)
+  tags: [{ name: "type", value: "shipping" }],
+  attachments: [{ filename: "invoice.pdf", content: base64Pdf }],
+});
+```
+
+The full list is in the [send email API reference](/docs/api/mail/post-api-mail-v1send).
+
+---
+
+## 9. Deploying
+
+The SDK sends over `fetch`, so it runs on any SvelteKit adapter: `adapter-node`, Vercel, Netlify and Cloudflare.
+
+| Adapter | Where to set `RELOOP_API_KEY` | Notes |
+|---|---|---|
+| `adapter-node` | Server environment or `.env` | Read at build with `static`, at runtime with `dynamic` |
+| Vercel | Project → Settings → Environment Variables | Redeploy after adding |
+| Netlify | Site configuration → Environment variables | Redeploy after adding |
+| Cloudflare | `wrangler secret put RELOOP_API_KEY` | Use `$env/dynamic/private` for runtime secrets |
+
+`$env/static/private` inlines the value at build time. If your platform only exposes secrets at runtime, import from `$env/dynamic/private` instead:
+
+```typescript
+// src/lib/server/reloop.ts
+import { env } from "$env/dynamic/private";
+import { Reloop } from "reloop-email";
+
+export const reloop = new Reloop({ apiKey: env.RELOOP_API_KEY! });
+```
+
+For Cloudflare specifics, see [sending email from Cloudflare Workers](/blog/send-email-cloudflare-workers).
+
+---
+
+## Production checklist
+
+- [ ] API key only in private env, never `PUBLIC_`
+- [ ] Client lives in `src/lib/server/`
+- [ ] Sending domain verified with SPF, DKIM and DMARC
+- [ ] `emailError` handled and logged server-side
+- [ ] Public endpoints gated and rate-limited
+- [ ] Plain-text version included alongside HTML
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I send email from a +page.ts or a component?">
+    No. `+page.ts` and components can run in the browser. Send only from
+    `+page.server.ts`, `+layout.server.ts`, `+server.ts` or `hooks.server.ts`.
+    The browser calls those, never Reloop directly.
+  </Accordion>
+
+  <Accordion title="Can I use SMTP with Nodemailer instead of the SDK?">
+    Yes. Point Nodemailer at `smtp.reloop.sh` on port 587 with your API key as
+    both username and password. See the [SMTP docs](/docs/examples/smtp/introduction).
+    The SDK is simpler on serverless platforms because it's a single HTTPS
+    request.
+  </Accordion>
+
+  <Accordion title="How do I send a welcome email right after signup?">
+    Call `reloop.mail.send` inside the form action or endpoint that creates the
+    user, after the database write succeeds. For multi-step onboarding, start a
+    Reloop automation from that same spot instead.
+  </Accordion>
+
+  <Accordion title="How do I test without emailing real people?">
+    Send to your own address while developing, and use tags like
+    `{ name: "env", value: "dev" }` so you can filter test sends in the logs.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Send your first email from SvelteKit"
+  description="3,000 emails a month on the free tier. Open source and self-hostable."
+  href="/dashboard/signup"
+  label="Get started"
+/>

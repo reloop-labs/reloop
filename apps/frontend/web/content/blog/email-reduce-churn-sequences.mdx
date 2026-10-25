@@ -1,56 +1,284 @@
 ---
 title: "How to Use Email to Reduce Churn: Sequences That Work"
-description: A practical breakdown of the email sequences that reduce SaaS churn, from early warning signals to win-back campaigns.
+description: "The four email sequences that reduce SaaS churn: inactivity check-ins, failed payment recovery, pre-renewal reminders and cancellation win-backs. Timing, subject lines, and how to build each one as an automation in Reloop."
 keywords:
   - email churn reduction
   - reduce SaaS churn email
   - churn prevention email sequence
-  - SaaS retention email
+  - failed payment email sequence
+  - dunning emails
+  - win-back email sequence
 publishedAt: 2026-08-05
 category: Growth
-tags: [growth, churn, retention, sequences, saas]
-readTime: 9 min read
+tags: [growth, churn, retention, sequences, saas, automations]
+readTime: 10 min read
+image: /blog/images/email-reduce-churn-sequences.png
 author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
-  - transactional-email-as-growth-channel
   - welcome-email-sequences-that-convert
+  - transactional-email-as-growth-channel
+  - transactional-email-best-practices
 ---
 
-## Churn is usually predictable, if you're watching
+**Email reduces churn when it reacts to a signal, not a calendar.** The four sequences worth building are: an inactivity check-in when usage drops, failed payment recovery when a card declines, a reminder before an annual renewal, and a short win-back after someone cancels. Each one starts from an event in your app, checks whether the problem is already fixed before every follow-up, and stops as soon as it is.
 
-Most churn doesn't happen suddenly. It follows a pattern: decreased logins → fewer API calls → silence → cancellation. Email sequences, triggered by these behavioral signals, can interrupt that pattern before the user is mentally gone.
+This guide walks through each sequence with timing, example subject lines and what each email is for, then shows how to build them as automations in Reloop.
 
-## The three churn windows
+---
 
-### 1. Day 1–14: Activation churn
-Users who never activate are the most likely to churn. Identify your activation event (first email sent, first domain verified, first API call) and build a sequence around it.
+## Two kinds of churn, two kinds of email
 
-- **Day 2**: "One thing to try today": single CTA to the activation step
-- **Day 5**: "Here's how [similar company] got started": social proof
-- **Day 10**: "Need help?": personal outreach from a founder
+| | Voluntary churn | Involuntary churn |
+|---|---|---|
+| What happens | The customer decides to leave | The card fails and nobody notices |
+| Early signal | Usage drops, key feature unused | `invoice.payment_failed` from your billing provider |
+| Right email | Helpful, personal, from a person | Clear, transactional, one link to update the card |
+| Who should send it | Customer success or a founder | Billing, automatically |
 
-### 2. Day 30–90: Engagement churn
-Users who activated but stopped engaging. These are often users who got distracted or didn't see enough value.
+Involuntary churn is the easiest win. The customer still wants your product; their card expired. A short, clear sequence recovers a meaningful share of these with almost no effort, and it's often the first churn email worth building.
 
-- Trigger: No login in 14 days
-- Email: Surface a specific piece of value they haven't discovered yet
-- Follow-up: Offer a 1:1 call or product walkthrough
+---
 
-### 3. Day 90+: Win-back
-Users who've fully disengaged. Low-probability but still worth a single, honest outreach.
+## Sequence 1: inactivity check-in
 
-- Don't oversell. Acknowledge the silence.
-- Offer something concrete: a feature they requested, a pricing adjustment, a migration path.
-- One email. If no response, let them go.
+**Trigger:** an active user hasn't done your core action in a set number of days. Pick the number from your own data: if healthy users act weekly, 14 days of silence is a real signal.
 
-## What to measure
+| # | When | Goal | Example subject |
+|---|---|---|---|
+| 1 | When inactivity is detected | Ask, don't sell | Quick question about your Acme setup |
+| 2 | +4 days, if still inactive | Remove a blocker or show what's new | Three things that changed since you last logged in |
+| 3 | +10 days, if still inactive | Offer a human | Want me to take a look? |
 
-Track churn rate segmented by whether a user received the at-risk sequence vs. didn't. This lets you A/B test the sequences themselves over time.
+Rules for this sequence:
 
-## Building this with Reloop
+- **Plain text from a person.** "I noticed you haven't run a report in a couple of weeks, did something break?" gets honest replies.
+- **Never guilt-trip.** No "We miss you!" with a sad illustration.
+- **Stop the moment they come back.** Check before every follow-up.
 
-Use Reloop's webhook events (login events, API call events from your backend) to trigger sequences. When you detect the inactivity signal, enqueue the appropriate email sequence via the Reloop API.
+The replies are the real value here. They tell you why people drift away, which is input for the product, not just for the email.
+
+---
+
+## Sequence 2: failed payment recovery (dunning)
+
+**Trigger:** your billing provider reports a failed charge, for example Stripe's `invoice.payment_failed` webhook.
+
+| # | When | Goal | Example subject |
+|---|---|---|---|
+| 1 | Immediately | Tell them, one link to fix it | Your payment for Acme didn't go through |
+| 2 | +3 days, if still unpaid | Remind, mention what they'll lose | Action needed: update your card to keep your workspace |
+| 3 | +7 days, if still unpaid | Final notice with a date | Your Acme account will be paused on March 14 |
+| 4 | When paid | Confirm and thank | You're all set: payment received |
+
+Rules for this sequence:
+
+- **Transactional tone.** Facts, the amount, the date, one button to the billing page. No marketing.
+- **Link straight to the card form.** Not to the login page, not to the dashboard home.
+- **Say exactly what happens and when.** "Paused on March 14" is clearer than "soon."
+- **Check before each reminder.** Nobody should get "update your card" after they already did.
+
+Most billing providers also retry the card on their own schedule. Line your emails up with those retries so the reminder lands just before the next attempt.
+
+<Callout type="tip">
+  Send dunning from your transactional subdomain, not your marketing one. These emails must reach the inbox even if a newsletter has been marked as spam.
+</Callout>
+
+---
+
+## Sequence 3: pre-renewal reminder
+
+**Trigger:** an annual plan renews in 30 days.
+
+| # | When | Goal | Example subject |
+|---|---|---|---|
+| 1 | 30 days before renewal | Remind, show the value they got | Your Acme plan renews on June 1 |
+| 2 | 7 days before renewal | Last reminder with the amount | Reminder: $1,200 renewal on June 1 |
+
+This one feels counter-intuitive: why remind people they're about to pay? Because a surprise annual charge is how you get angry cancellations, refund requests and chargebacks. A clear reminder with a short summary of what they used this year turns renewal into a non-event. In some places, renewal reminders for subscriptions are also a legal requirement, so check the rules where your customers are.
+
+---
+
+## Sequence 4: cancellation and win-back
+
+**Trigger:** the customer cancels.
+
+| # | When | Goal | Example subject |
+|---|---|---|---|
+| 1 | Immediately | Confirm, explain what happens to their data | Your Acme subscription is cancelled |
+| 2 | +1 day | Ask why, one question | One question before you go |
+| 3 | +30 days | Show what changed, if anything did | We fixed the thing you mentioned |
+| 4 | +60 days | Open door, no pressure | Your Acme data is still here |
+
+Rules for this sequence:
+
+- **Make email 1 purely transactional.** Confirm the cancellation, the end date, and how to export data. No "are you sure?" upsell.
+- **Ask one question in email 2.** A single reply or a one-click reason gets far more answers than a survey.
+- **Only send email 3 if you have something real to say.** If they left over a missing feature and you shipped it, that's worth an email. A generic discount usually isn't.
+- **Stop after two win-back attempts.** Then leave them alone.
+
+---
+
+## The pattern behind all four
+
+Every sequence above has the same shape:
+
+1. **An event** from your app or billing provider starts it.
+2. **A first email** goes out immediately.
+3. **A wait**, then **a check**: is the problem still there?
+4. **A follow-up only if it is.**
+5. **A hard stop** after a few attempts.
+
+The check is what makes these sequences work. Without it you're spamming people who already fixed the problem, which is the fastest way to turn a retention email into an unsubscribe.
+
+---
+
+## Build them in Reloop
+
+Reloop runs these as **automations**: a trigger event, then send, delay and condition steps. Conditions read the contact's current data when the step runs, so your app only has to keep one property up to date for each check.
+
+### 1. Keep a health property on the contact
+
+Create [contact properties](/docs/learn/contacts/properties) for the states you check, for example `billing_status` and `engagement`. Update them from your app whenever they change:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+// e.g. from your Stripe webhook handler
+await reloop.contacts.update(contactId, {
+  properties: { billing_status: "past_due" },
+});
+
+// later, when invoice.paid arrives
+await reloop.contacts.update(contactId, {
+  properties: { billing_status: "active" },
+});
+```
+
+### 2. Track the event that starts the sequence
+
+Create a trigger (for example `billing.payment_failed`) under **Automation → Triggers**, then send it from your billing webhook:
+
+```typescript
+const { automationError } = await reloop.automations.start({
+  event: "billing.payment_failed",
+  email: customer.email,
+  properties: { amount: "$49.00", plan: "Pro" },
+});
+if (automationError) console.error(automationError);
+```
+
+### 3. Build the dunning automation
+
+Payment can fail more than once in a customer's lifetime, so turn on re-entry with `restart`: a new failure cancels any run still in progress and starts fresh.
+
+```typescript
+const stillPastDue = {
+  type: "rule",
+  field: "contact.billing_status",
+  operator: "eq",
+  value: "past_due",
+} as const;
+
+await reloop.automations.create({
+  name: "Failed payment recovery",
+  status: "active",
+  reentry: "restart",
+  steps: [
+    { key: "start", type: "trigger", config: { eventName: "billing.payment_failed" } },
+    { key: "notice", type: "send_email", config: { template: { id: "tmpl_payment_failed" } } },
+
+    { key: "wait_1", type: "delay", config: { amount: 3, unit: "days" } },
+    { key: "check_1", type: "condition", config: stillPastDue },
+    { key: "reminder", type: "send_email", config: { template: { id: "tmpl_update_card" } } },
+
+    { key: "wait_2", type: "delay", config: { amount: 4, unit: "days" } },
+    { key: "check_2", type: "condition", config: stillPastDue },
+    { key: "final", type: "send_email", config: { template: { id: "tmpl_final_notice" } } },
+  ],
+  connections: [
+    { from: "start", to: "notice" },
+    { from: "notice", to: "wait_1" },
+    { from: "wait_1", to: "check_1" },
+    { from: "check_1", to: "reminder", type: "condition_met" },
+    { from: "reminder", to: "wait_2" },
+    { from: "wait_2", to: "check_2" },
+    { from: "check_2", to: "final", type: "condition_met" },
+  ],
+});
+```
+
+If the customer pays, your webhook sets `billing_status` to `active`, the next condition doesn't match, and the sequence ends on its own.
+
+The "payment received" confirmation is a single transactional email, so send it straight from your `invoice.paid` handler with `reloop.mail.send` rather than through the automation.
+
+### 4. Reuse the shape for the others
+
+| Sequence | Trigger event | Condition before follow-ups | Re-entry |
+|---|---|---|---|
+| Inactivity check-in | `user.went_inactive` | `contact.engagement` `eq` `inactive` | `restart` |
+| Failed payment | `billing.payment_failed` | `contact.billing_status` `eq` `past_due` | `restart` |
+| Pre-renewal | `billing.renewal_upcoming` | none (always send) | `parallel` (one per renewal) |
+| Cancellation win-back | `subscription.canceled` | `contact.billing_status` `eq` `canceled` | `once` |
+
+Detecting inactivity is your app's job: a nightly job that finds users with no core action in N days, sets `engagement` to `inactive` and tracks `user.went_inactive`. When they come back, set it to `active` and the check-in sequence stops.
+
+<Callout type="info">
+  Automation steps send each template with its default variable values. Write these emails so they read well without per-user data. For an email that needs specifics, like the exact amount and card ending, send it from your webhook handler with `reloop.mail.send` and `template.variables`.
+</Callout>
+
+Unsubscribed contacts leave automations at their next step. Make sure purely transactional notices (payment failed, cancellation confirmed) still reach people who opted out of marketing by sending those directly from your app.
+
+---
+
+## How to tell if it's working
+
+| Sequence | Measure |
+|---|---|
+| Inactivity check-in | Share of contacts whose `engagement` returns to `active` within 30 days |
+| Failed payment | Recovered revenue ÷ revenue at risk |
+| Pre-renewal | Refund and chargeback rate on renewals |
+| Win-back | Reactivations within 90 days of cancelling |
+
+Compare against a period before the sequence existed. Each automation's enrollment history shows which step every contact reached, which tells you where people respond and where they drop off.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Which churn sequence should I build first?">
+    Failed payment recovery. It's the simplest, it needs no copywriting
+    finesse, and it recovers customers who never meant to leave.
+  </Accordion>
+
+  <Accordion title="Should churn emails offer a discount?">
+    Usually not as the first move. A discount in the first email teaches
+    customers to cancel to get one. Ask what's wrong first. If price really
+    is the reason, a targeted offer later in the sequence is reasonable.
+  </Accordion>
+
+  <Accordion title="How do I stop a sequence when the user fixes the problem?">
+    Put a condition before every follow-up that checks a contact property
+    your app keeps current, such as `billing_status`. When the property
+    changes, the condition fails and the contact finishes the automation.
+  </Accordion>
+
+  <Accordion title="Are dunning emails transactional?">
+    Yes. They're about an account the customer already has and a payment
+    they owe, so treat them as transactional: plain, factual, and sent from
+    your transactional subdomain.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Build your retention automations"
+  description="Triggers, delays and conditions that stop the moment the problem is fixed."
+  href="/docs/learn/workflows"
+  label="Read the automations guide"
+/>

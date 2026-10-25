@@ -69,3 +69,9 @@ export function slugifyCategory(category: string): string {
 export function getCategoryPath(category: string): string {
 	return `/blog/category/${slugifyCategory(category)}`;
 }
+
+export function formatReadTime(readTime?: string): string {
+	if (!readTime) return "5 min read";
+	const minutes = readTime.match(/\d+/)?.[0];
+	return minutes ? `${minutes} min read` : readTime;
+}

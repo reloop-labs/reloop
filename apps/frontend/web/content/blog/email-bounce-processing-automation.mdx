@@ -1,67 +1,264 @@
 ---
 title: "How We Handle Email Bounce Processing Automatically"
-description: "Inside Reloop's bounce processing pipeline: classifying hard vs soft bounces, updating suppression lists, and protecting sender reputation automatically."
+description: "Inside Reloop's bounce pipeline: how KumoMTA delivery records become log events, hard vs soft bounce handling, over-quota rewrites, platform-wide suppression, and automatic sending pauses at 5% bounces or 0.3% complaints."
 keywords:
   - email bounce processing
   - email bounce handling automation
   - hard bounce soft bounce
+  - email suppression list
+  - bounce rate threshold
   - sender reputation protection
 publishedAt: 2026-07-20
 category: Engineering
-tags: [bounces, deliverability, automation, architecture]
-readTime: 7 min read
+tags: [bounces, deliverability, suppression, kumomta, architecture]
+readTime: 11 min read
+image: /blog/images/email-bounce-processing-automation.png
 author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
-  - spf-dkim-dmarc-setup-guide
+  - how-we-built-email-delivery-queue-bullmq
   - why-emails-land-in-spam-fix
+  - ip-warming-guide
+  - building-webhook-delivery-system
 ---
 
-## Why bounce handling matters more than you think
+**Every bounce is a signal, and ignoring it is how good senders end up in spam.** In Reloop, bounce handling is automatic: KumoMTA publishes one record per delivery attempt, three independent services consume it, and within seconds the email log is updated, the address is suppressed so you can't mail it again, your webhook fires, and your organization's bounce rate is recalculated. If that rate crosses 5% (or complaints cross 0.3%), sending pauses before it damages anyone's reputation.
 
-Every hard bounce you re-send to damages your sender reputation. ISPs track your bounce rate, and crossing the 2% threshold can get your domain or IP blacklisted. Proper automated bounce handling isn't optional. It's infrastructure.
+This post walks through that pipeline with code from the [Reloop repo](https://github.com/reloop-labs/reloop).
 
-Prevention matters too: validate addresses at signup and [clean email lists](/tools/email-validator) before campaigns so invalid and disposable addresses never enter your send path. Reloop's free [email validator](/tools/email-validator) checks syntax, ~210k disposable domains, and live MX records without SMTP mailbox probing.
+---
 
-## Bounce types we classify
+## Why bounce processing matters
 
-- **Hard bounce**: permanent failure (invalid address, domain doesn't exist). Added to suppression list immediately.
-- **Soft bounce**: temporary failure (mailbox full, server busy). Retried with backoff; suppressed after 3 consecutive soft bounces.
-- **Complaint**: recipient marked as spam. Suppressed immediately, never re-sent.
+Mailbox providers watch how you treat bad addresses. Keep sending to addresses that don't exist, and Gmail and Outlook conclude you don't maintain your list, and start filtering *all* your mail, including the password resets.
 
-## How we receive bounce data
+Bounces come in a few flavors, and each needs a different response:
 
-Bounces arrive via two channels:
+| Type | Example SMTP reply | What it means | Right response |
+|---|---|---|---|
+| **Hard bounce** | `550 5.1.1 User unknown` | Address doesn't exist | Stop mailing it forever |
+| **Soft bounce** | `421 4.7.0 Try again later` | Temporary: greylisting, throttling, server busy | Retry with backoff |
+| **Mailbox full** | `452 4.2.2 OverQuotaTemp` | Technically temporary, usually abandoned | Stop mailing it |
+| **Expiration** | Retries ran out | Never got through | Count as failed |
+| **Complaint** | Feedback loop report | Recipient clicked "spam" | Stop mailing it, immediately |
 
-1. **SMTP DSN (Delivery Status Notifications)**: Reloop's inbound SMTP listener captures these and pushes them to a processing queue.
-2. **Provider webhooks**: When routing through a third-party SMTP relay, bounce events arrive as webhook payloads we normalize into our internal format.
+Getting this wrong in either direction hurts. Treat soft bounces as hard and you suppress real customers during a provider hiccup. Treat hard bounces as soft and you keep hitting dead addresses for days.
 
-## The processing pipeline
+---
+
+## The pipeline
+
+```text
+KumoMTA attempts delivery
+   │  Delivery / Bounce / TransientFailure / Expiration / Feedback / …
+   ▼
+log hook → NATS "kumomta.event"   (one record per recipient per attempt)
+   │
+   ├── logs-kumomta-worker      → email_log.status + email_event row
+   ├── contacts-kumomta-worker  → upsert contact, suppress on bounce/complaint
+   ├── logs-reputation-worker   → 24 h bounce/complaint rate → warn or pause
+   └── webhook-dispatcher       → email.bounced / email.complained webhooks
+```
+
+Each consumer runs in its own NATS queue group, so all four see every event, and each event is handled once per service. Every outbound message carries an `X-Email-Log-ID` header stamped when it was accepted by the API, which is how a delivery record finds its way back to the right email, organization and API key.
+
+---
+
+## Step 1: classify at the MTA
+
+KumoMTA, the open-source MTA we use for delivery, already separates permanent failures (5xx, logged as `Bounce`) from temporary ones (4xx, logged as `TransientFailure` and retried with backoff). It also gives each bounce a `bounce_classification`, which we store with the event so you can see *why* in the dashboard.
+
+We add one rule on top. Gmail and other providers return a **4xx** for full mailboxes, so by default the MTA keeps retrying them for days. In practice, a mailbox that's full now is usually abandoned. So we rewrite those replies to a permanent `552`:
+
+```lua
+-- apps/backend/smtp/policy/bounce_rewrite.lua (simplified)
+local OVER_QUOTA_PATTERNS = {
+  'overquotatemp', 'over quota', 'out of storage',
+  'quota exceeded', 'mailbox.*full', ...
+}
+
+kumo.on('smtp_client_rewrite_delivery_status', function(response, ...)
+  if is_over_quota(response) then
+    return 552 -- bounce now, leave the spool, suppress the address
+  end
+  return nil   -- greylisting, throttling, DNS errors keep retrying
+end)
+```
+
+The pattern list is deliberately tight. Anything that isn't clearly a full mailbox stays a soft bounce and keeps retrying, so greylisting and rate limiting never cause a suppression.
+
+---
+
+## Step 2: update the log
+
+The logs service maps each KumoMTA record type to an email status and an event:
+
+| KumoMTA record | `email_log.status` | `email_event` | Webhook |
+|---|---|---|---|
+| `Reception` | `sent` | `sent` | none (`email.sent` fires when the API accepts the send) |
+| `Delivery` | `delivered` | `delivered` | `email.delivered` |
+| `Bounce`, `AdminBounce`, `OOB` | `bounced` | `bounced` | `email.bounced` |
+| `TransientFailure` | unchanged | `deferred` | `email.delivery_delayed` |
+| `Expiration` | `failed` | `bounced` | `email.failed` |
+| `Feedback` | `spam` | `complaint` | `email.complained` |
+
+A soft bounce doesn't change the email's status. It adds a `deferred` event with the remote server's reply, so you can see "Gmail said try again at 10:02" without the email looking failed.
+
+Every event stores the full SMTP response: code, enhanced code, text, classification, remote site and queue. When a customer asks "why did this bounce?", the answer is one click away instead of a support ticket.
+
+---
+
+## Step 3: suppress the address
+
+The contacts service turns bounces and complaints into suppressions:
 
 ```typescript
-async function processBounce(event: BounceEvent) {
-  const { email, type, reason } = event;
+// apps/backend/contacts/src/subscribers/kumomta.subscriber.ts (simplified)
+const EVENT_ACTION_MAP = {
+  Delivery:    { deliverability: "delivered" },
+  Bounce:      { deliverability: "bounced", suppressionReason: "hard_bounce" },
+  AdminBounce: { deliverability: "bounced", suppressionReason: "hard_bounce" },
+  Feedback:    { deliverability: "spam",    suppressionReason: "spam_complaint" },
+};
 
-  if (type === "hard" || type === "complaint") {
-    await suppressionList.add(email, { reason, suppressedAt: new Date() });
-    return;
-  }
-
-  // Soft bounce: increment counter
-  const count = await bounceCounter.increment(email);
-  if (count >= 3) {
-    await suppressionList.add(email, { reason: "repeated_soft_bounce" });
-  }
+// Over-quota → its own reason, on the first signal
+if ((type === "Bounce" || type === "TransientFailure") && isOverQuota(event)) {
+  action = { deliverability: "bounced", suppressionReason: "mailbox_full" };
 }
 ```
 
-## Surfacing data to customers
+Suppressing means setting the contact to `blocked` with a reason (`hard_bounce`, `spam_complaint` or `mailbox_full`) and a timestamp. A few rules keep this safe:
 
-Suppressed addresses appear in the Reloop dashboard. Customers can review them, export for CRM hygiene, or manually remove addresses if they believe the suppression was erroneous.
+- **One event per recipient.** KumoMTA reports per recipient, so if one of three addresses bounces, only that one is suppressed.
+- **Manual choices win.** A contact you already unsubscribed or blocked by hand is never overwritten. The update only applies to contacts that are still `subscribed`.
+- **Idempotent.** Processing the same event twice produces the same result.
+- **Org checks.** The organization from the message header must match the email log, and the user who owns the contact must be a member of that organization. A mismatch is logged and skipped.
 
-## What's next
+### Suppression is enforced platform-wide
 
-We're working on enriched bounce classification using the SMTP enhanced status codes (e.g., 5.1.1 vs 5.7.1) to give customers more actionable feedback rather than just "hard bounce."
+This is the part most providers don't do. When you call the send API, Reloop checks every recipient (To, CC and BCC) against suppressions **across all organizations** on the platform:
+
+- If every recipient is suppressed, the API returns a `400` explaining why.
+- If only some are, they're dropped and the rest are sent.
+
+The reasoning: if `ghost@example.com` hard-bounced for another sender yesterday, mailing it from your account today damages the same shared IPs. When that happens, Reloop copies the suppression into your organization so it appears on your Suppression tab and you can remove it. If you do remove it, your organization can send to that address again, unless another organization suppresses it *after* your removal.
+
+<Callout type="tip">
+  Remove a suppression only when you know the address is good again, for example the customer fixed a typo in their mailbox. Removing hard bounces in bulk to "re-try" them is the fastest way to trigger the reputation guard below.
+</Callout>
+
+---
+
+## Step 4: protect reputation with automatic pauses
+
+Suppression stops individual bad addresses. It doesn't stop a sender who just imported a stale list of 50,000 addresses. For that, the reputation worker recalculates rates on every bounce or complaint.
+
+```typescript
+// packages/db/src/reputation.ts
+export const REPUTATION_THRESHOLDS = {
+  minSent: 100,               // ignore tiny volumes
+  bounceWarnRate: 0.03,       // 3%
+  bounceBlockRate: 0.05,      // 5%
+  complaintWarnRate: 0.001,   // 0.1%
+  complaintBlockRate: 0.003,  // 0.3%
+};
+```
+
+The rates are computed over the organization's last 24 hours of sends, straight from the email log. The complaint thresholds match Gmail and Yahoo's sender requirements. Each value can be changed with an environment variable on self-hosted installs.
+
+| Signal | Warn at | Pause at |
+|---|---|---|
+| Hard bounce rate | 3% | 5% |
+| Spam complaint rate | 0.1% | 0.3% |
+| Minimum volume before either applies | 100 sends in 24 h | |
+
+Below 100 sends nothing is evaluated, so a brand-new sender whose first two emails include one typo (a 50% bounce rate) doesn't get blocked.
+
+### Warnings before the pause
+
+Between the warn and pause thresholds, owners and admins get up to three emails as the rate climbs: a heads-up, a warning and a final warning. For bounces those land at 3%, about 3.67% and about 4.33%. Each level is sent at most once per 24 hours.
+
+### The pause
+
+When a threshold is crossed, the worker writes a block row, sets a Redis key, emails the organization and alerts our team. The mail API checks that key before doing anything else and answers with a clear error:
+
+```json
+{
+  "message": "Sending temporarily paused",
+  "why": "Sending is paused for this organization (bounce_rate: bounce 5.40%, complaint 0.02%)...",
+  "fix": "Wait 3600s for the cooldown to expire, clean your recipient list..."
+}
+```
+
+Pauses get longer if they repeat:
+
+| Pause | Cooldown |
+|---|---|
+| First | 1 hour |
+| Second | 24 hours |
+| Third and later | 7 days |
+
+Both the guard and the rate limiter fail open. If Redis or the database is unavailable, mail keeps flowing. A reputation check should never be the reason password resets stop.
+
+---
+
+## What you see as a customer
+
+All of this happens without any code on your side:
+
+- The **email log** shows `bounced` with the remote server's exact reply.
+- The **contact** is marked blocked with the reason.
+- The **Suppression tab** lists it, and you can remove it if you need to.
+- Your **webhook** receives `email.bounced` or `email.complained` with the SMTP code and message.
+- If your rates climb, you get **emails before** sending pauses.
+
+If you also keep your own database of users, listen for `email.bounced` and flag the address so your app can ask the user to update it:
+
+```typescript
+if (event.type === "email.bounced") {
+  await db.user.update({
+    where: { email: event.data.to[0] },
+    data: { emailStatus: "bouncing" },
+  });
+}
+```
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Does a soft bounce suppress an address?">
+    No. Temporary failures are retried by the MTA and recorded as
+    `deferred` events. The only temporary reply we treat as permanent is a
+    full mailbox, which is suppressed as `mailbox_full`.
+  </Accordion>
+
+  <Accordion title="Why was my email to a valid address suppressed?">
+    It hard-bounced or was reported as spam at some point, possibly from
+    another organization on the platform. Check the reason on the
+    Suppression tab. If you're sure the address works now, remove it.
+  </Accordion>
+
+  <Accordion title="Can I add addresses to the suppression list myself?">
+    Yes, from the dashboard or with `POST /api/contacts/v1/suppressions`,
+    which takes an `email` and a `reason`. Sends to that address are
+    rejected until you remove it.
+  </Accordion>
+
+  <Accordion title="Do the reputation thresholds apply to self-hosted Reloop?">
+    The same logic runs, and each threshold can be changed with environment
+    variables like `REPUTATION_BOUNCE_BLOCK` and
+    `REPUTATION_COMPLAINT_BLOCK`.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Let Reloop handle your bounces"
+  description="Automatic suppression, bounce webhooks and reputation guards on every plan, including free."
+  href="/dashboard/signup"
+  label="Get started"
+/>

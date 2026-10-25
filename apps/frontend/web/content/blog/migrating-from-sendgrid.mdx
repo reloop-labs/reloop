@@ -37,7 +37,7 @@ This guide walks through the whole thing in the order we'd do it.
 | 1. Verify your domain | Add Reloop's DKIM and SPF next to SendGrid's | 15 min + DNS propagation |
 | 2. Export suppressions | Bounces, spam reports, unsubscribes into Reloop | 30 min |
 | 3. Swap the send code | v3 Mail Send → `reloop.mail.send` (or SMTP settings) | 1–3 hours |
-| 4. Move templates | Dynamic templates → Reloop templates (Handlebars still works) | Depends on count |
+| 4. Move templates | Dynamic templates → Reloop templates (`{{x}}` → `{{{x}}}`) | Depends on count |
 | 5. Rewire webhooks | Event Webhook → Reloop webhooks | 1 hour |
 | 6. Ramp traffic | 10% → 50% → 100% over 1–2 weeks | Calendar time |
 | 7. Clean up | Remove SendGrid DNS records and keys | 15 min |
@@ -215,11 +215,20 @@ Two differences worth knowing:
 
 ## 4. Move your templates
 
-SendGrid dynamic templates use Handlebars. Reloop templates use the same `{{variable}}` syntax, so most templates move over with a copy and paste.
+SendGrid dynamic templates use Handlebars, with placeholders like `{{first_name}}`. Reloop placeholders use **triple braces**: `{{{first_name}}}`. The HTML itself carries over unchanged, so the move is a copy, paste and placeholder rename.
 
 1. In SendGrid, open each dynamic template and copy its HTML from the code editor.
-2. In Reloop, create a template and paste the HTML. Or design it in the visual editor.
-3. Replace the template ID in your code.
+2. Convert the placeholders: `{{first_name}}` becomes `{{{first_name}}}`, in the subject as well as the body.
+3. In Reloop, create a template and paste the HTML. Or design it in the visual editor.
+4. Replace the template ID in your code.
+
+A one-line conversion for simple placeholders:
+
+```bash
+sed -E 's/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/{{{\1}}}/g' sendgrid-template.html > reloop-template.html
+```
+
+Handlebars logic such as `{{#if}}` and `{{#each}}` has no Reloop equivalent. Resolve those in your code before sending and pass the result in as a plain variable.
 
 ```typescript
 await reloop.mail.send({

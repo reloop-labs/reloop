@@ -1,15 +1,18 @@
 ---
-title: "Send Transactional Email from Remix"
-description: Add reliable transactional email to your Remix app using Reloop's Node.js SDK, from loader/action setup to environment variable handling.
+title: "Send Transactional Email from Remix (React Router v7)"
+description: "Send transactional email from Remix and React Router v7 with Reloop: a server-only client, route actions, Form and useFetcher, React Email templates, error handling, webhooks and deployment."
 keywords:
   - send email remix
   - remix transactional email
+  - react router v7 send email
+  - remix action send email
   - remix email tutorial
-  - remix nodejs email
+  - react email remix
 publishedAt: 2026-08-28
 category: Tutorials
-tags: [remix, nodejs, sdk, tutorial]
-readTime: 6 min read
+tags: [remix, react-router, nodejs, sdk, tutorial]
+readTime: 10 min read
+image: /blog/images/send-email-remix.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -18,81 +21,351 @@ draft: false
 relatedSlugs:
   - send-email-nextjs-app-router
   - send-email-sveltekit
+  - send-email-cloudflare-workers
+  - transactional-email-best-practices
 ---
 
-## Why Remix is different
+**In Remix, send email from a route `action`.** Actions run only on the server, so your API key never reaches the browser. Create one Reloop client in a `.server.ts` module, call `reloop.mail.send()` inside the action, and return a small result the page can show. That's the whole pattern.
 
-Remix runs loaders and actions on the server by default, which means you can safely call the Reloop SDK without ever exposing your API key to the browser. No API routes, no extra setup. Just call it in the action.
+A note on names: Remix v2 and React Router v7 are now the same framework. React Router v7's "framework mode" is what Remix v3 would have been, and the Remix team recommends it for new apps. This guide uses React Router v7 code, and points out the one or two places where Remix v2 differs.
 
-## Installation
+---
 
-```bash
-npm install reloop-email
-```
+## What you'll build
 
-Add your API key to `.env`:
+| Piece | File | Runs on |
+|---|---|---|
+| Reloop client | `app/lib/reloop.server.ts` | Server only |
+| Signup route with an action | `app/routes/signup.tsx` | Server (action) + browser (form) |
+| Resource route for webhooks | `app/routes/api.reloop-webhook.ts` | Server only |
+| React Email template | `app/emails/welcome.tsx` | Server only |
+
+---
+
+## Prerequisites
+
+1. A React Router v7 app (`npx create-react-router@latest`) or a Remix v2 app.
+2. A Reloop API key from the [dashboard](https://reloop.sh/dashboard/api-keys). Keys start with `rl_`.
+3. A verified sending domain. See [connect a domain](/docs/guides/connect-domain).
+
+---
+
+## 1. Install the SDK
+
+<InstallSdkCode />
+
+The package is [`reloop-email`](https://www.npmjs.com/package/reloop-email). It has no runtime dependencies besides `fetch`, which every supported Node version has.
+
+---
+
+## 2. Add your API key
+
+In `.env` at the project root:
 
 ```env
-RELOOP_API_KEY=re_your_api_key_here
+RELOOP_API_KEY=rl_your_api_key_here
 ```
 
-## Sending from an action
+Don't rely on the framework to load `.env` into `process.env` for you. Load it explicitly in development, either with `dotenv` (`import "dotenv/config"` at the top of your server entry) or Node's built-in `--env-file=.env` flag. In production, set `RELOOP_API_KEY` in your host's environment settings (Fly, Render, Railway, a VPS's systemd unit, and so on).
 
-The most common pattern: trigger an email when a form is submitted:
+<Callout type="warning">
+  Don't prefix the variable with `VITE_`. Vite exposes `VITE_` variables to client code, which would put your API key in the browser bundle.
+</Callout>
+
+---
+
+## 3. Create a server-only client
+
+The `.server.ts` suffix tells the bundler this module must never end up in client code. If you import it from a component by mistake, the build fails instead of leaking your key.
 
 ```typescript
-// app/routes/contact.tsx
-import { ActionFunctionArgs } from "@remix-run/node";
+// app/lib/reloop.server.ts
 import { Reloop } from "reloop-email";
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+const apiKey = process.env.RELOOP_API_KEY;
 
-export async function action({ request }: ActionFunctionArgs) {
+if (!apiKey) {
+  throw new Error("Missing RELOOP_API_KEY");
+}
+
+export const reloop = new Reloop({ apiKey });
+```
+
+If you self-host Reloop, pass `baseUrl: "https://reloop.example.com"` as well.
+
+---
+
+## 4. Send from a route action
+
+Here's a signup route. The action validates the email, creates the user, and sends a welcome email.
+
+```tsx
+// app/routes/signup.tsx
+import { data, Form, useActionData, useNavigation } from "react-router";
+import { reloop } from "~/lib/reloop.server";
+import type { Route } from "./+types/signup";
+
+export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
-  const email = formData.get("email") as string;
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const name = String(formData.get("name") ?? "").trim();
 
-  await reloop.emails.send({
-    from: "hello@yourdomain.com",
-    to: email,
-    subject: "Thanks for reaching out",
-    html: "<p>We'll get back to you within 24 hours.</p>",
+  if (!email.includes("@")) {
+    return data({ ok: false, error: "Enter a valid email address." }, { status: 400 });
+  }
+
+  const user = await createUser({ email, name });
+
+  const { response, emailError } = await reloop.mail.send({
+    from: "Acme <hello@mail.acme.com>",
+    to: user.email,
+    subject: name ? `Welcome to Acme, ${name}` : "Welcome to Acme",
+    html: `<p>Hi ${name || "there"},</p><p>Your account is ready.</p>`,
+    text: `Hi ${name || "there"}, your account is ready.`,
+    reply_to: "support@acme.com",
+    tags: [{ name: "type", value: "welcome" }],
   });
 
-  return { success: true };
+  if (emailError) {
+    // The account exists; don't fail signup because of email.
+    console.error("Welcome email failed", emailError.status, emailError.message);
+  }
+
+  return { ok: true, emailId: response?.id ?? null };
+}
+
+export default function Signup() {
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const submitting = navigation.state === "submitting";
+
+  return (
+    <Form method="post" className="space-y-3">
+      <input name="name" placeholder="Name" />
+      <input name="email" type="email" required placeholder="you@company.com" />
+      <button type="submit" disabled={submitting}>
+        {submitting ? "Creating account…" : "Create account"}
+      </button>
+      {actionData && !actionData.ok ? <p>{actionData.error}</p> : null}
+      {actionData?.ok ? <p>Check your inbox.</p> : null}
+    </Form>
+  );
 }
 ```
 
-## Sending from a resource route
+A few things worth noticing:
 
-For webhook-triggered emails or programmatic sends, use a resource route:
+- **The SDK doesn't throw on API errors.** It returns `{ response, emailError }`. `emailError` has the HTTP `status`, a `message`, and the full error `body` with Reloop's `code`, `why` and `fix` fields.
+- **`data()` sets the status code** while still returning JSON. In Remix v2, use `json()` from `@remix-run/node` instead.
+- **The form works without JavaScript.** `<Form method="post">` posts to the action; React Router upgrades it to a fetch when JS is loaded.
+- **Types come for free.** `Route.ActionArgs` is generated by React Router's type generation. In Remix v2, use `ActionFunctionArgs` from `@remix-run/node`.
+
+---
+
+## 5. Send without navigating: `useFetcher`
+
+For things like "resend verification email" buttons, you don't want a page transition. `useFetcher` calls the action in the background:
+
+```tsx
+// app/routes/settings.tsx
+import { useFetcher } from "react-router";
+import { reloop } from "~/lib/reloop.server";
+import type { Route } from "./+types/settings";
+
+export async function action({ request }: Route.ActionArgs) {
+  const user = await requireUser(request);
+
+  const { emailError } = await reloop.mail.send({
+    from: "Acme <hello@mail.acme.com>",
+    to: user.email,
+    subject: "Verify your email",
+    html: `<p><a href="${verifyUrl(user)}">Verify your email</a></p>`,
+    text: `Verify your email: ${verifyUrl(user)}`,
+  });
+
+  return { sent: !emailError };
+}
+
+export default function Settings() {
+  const fetcher = useFetcher<typeof action>();
+
+  return (
+    <fetcher.Form method="post">
+      <button type="submit" disabled={fetcher.state !== "idle"}>
+        {fetcher.state !== "idle" ? "Sending…" : "Resend verification email"}
+      </button>
+      {fetcher.data?.sent ? <span>Sent. Check your inbox.</span> : null}
+    </fetcher.Form>
+  );
+}
+```
+
+Always authenticate inside the action (`requireUser` here). An action is a public HTTP endpoint, and an unauthenticated send endpoint can be abused to spam people from your domain.
+
+---
+
+## 6. Use React Email templates
+
+Inline HTML strings get messy fast. The Reloop SDK accepts a `react` field and renders it to HTML for you, using `@react-email/render` if it's installed or `react-dom/server` otherwise.
+
+```bash
+npm install @react-email/components @react-email/render
+```
+
+```tsx
+// app/emails/welcome.tsx
+import { Body, Button, Container, Heading, Html, Text } from "@react-email/components";
+
+export function WelcomeEmail({ name, url }: { name: string; url: string }) {
+  return (
+    <Html>
+      <Body style={{ fontFamily: "Inter, Arial, sans-serif" }}>
+        <Container>
+          <Heading>Welcome, {name}</Heading>
+          <Text>Your account is ready. Start with your first project.</Text>
+          <Button href={url}>Open dashboard</Button>
+        </Container>
+      </Body>
+    </Html>
+  );
+}
+```
+
+```tsx
+import { WelcomeEmail } from "~/emails/welcome";
+
+await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: user.email,
+  subject: "Welcome to Acme",
+  react: <WelcomeEmail name={user.name} url="https://app.acme.com" />,
+});
+```
+
+Keep email components in a server-only folder and import them only from actions or `.server.ts` files.
+
+Prefer to edit templates without a deploy? Create the template in the Reloop dashboard and send it by ID with variables:
 
 ```typescript
-// app/routes/api.send-welcome.ts
-import { json } from "@remix-run/node";
-import { Reloop } from "reloop-email";
+await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: user.email,
+  subject: "Reset your password",
+  template: {
+    id: "tmpl_password_reset",
+    variables: { name: user.name, reset_url: resetUrl },
+  },
+});
+```
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+---
 
-export async function action({ request }: { request: Request }) {
-  const { email, name } = await request.json();
+## 7. Receive delivery events with a resource route
 
-  await reloop.emails.send({
-    from: "onboarding@yourdomain.com",
-    to: email,
-    subject: `Welcome, ${name}!`,
-    html: `<p>Your account is ready. Let's get started.</p>`,
-  });
+A route with an `action` and no default export is a resource route: a plain HTTP endpoint. That's the right place for Reloop webhooks (bounces, complaints, deliveries).
 
-  return json({ sent: true });
+```typescript
+// app/routes/api.reloop-webhook.ts
+import { createHmac, timingSafeEqual } from "node:crypto";
+import type { Route } from "./+types/api.reloop-webhook";
+
+function verify(rawBody: string, header: string, secret: string) {
+  const parts = Object.fromEntries(
+    header.split(",").map((p) => p.trim().split("=") as [string, string]),
+  );
+  const timestamp = Number(parts.t);
+  if (!parts.v1 || Math.abs(Date.now() / 1000 - timestamp) > 300) return false;
+
+  const expected = createHmac("sha256", secret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest("hex");
+  const a = Buffer.from(expected, "hex");
+  const b = Buffer.from(parts.v1, "hex");
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const rawBody = await request.text();
+  const signature = request.headers.get("Reloop-Signature") ?? "";
+
+  if (!verify(rawBody, signature, process.env.RELOOP_WEBHOOK_SECRET!)) {
+    return new Response("Invalid signature", { status: 401 });
+  }
+
+  const event = JSON.parse(rawBody) as {
+    type: string;
+    data: { email_id: string; to: string[] };
+  };
+
+  if (event.type === "email.bounced" || event.type === "email.complained") {
+    await markEmailUndeliverable(event.data.to[0]);
+  }
+
+  return new Response("ok");
 }
 ```
 
-## Error handling
+Read the body with `request.text()` before parsing: the signature is computed over the raw bytes. The full algorithm and the list of event types are in the docs on [verifying webhooks](/docs/webhooks/verify-webhooks-requests) and [event types](/docs/webhooks/event-types).
 
-Wrap sends in try/catch and return structured errors to the client. Never let email failures crash your action. Degrade gracefully.
+---
 
-## Next steps
+## 8. Handle errors and retries
 
-- Add [React Email](https://react.email) for beautiful HTML templates
-- Use Reloop's webhook events to track opens and clicks
-- See the [Reloop SDK docs](/docs/examples/nodejs) for the full API reference
+| Situation | What to do |
+|---|---|
+| `emailError.status` is 4xx | Bad input or config (unverified domain, invalid address). Log it, don't retry. |
+| `emailError.status` is 429 | You hit a [rate limit](/docs/api/usage-limits). Retry with backoff. |
+| `emailError.status` is 5xx or 0 | Network or server issue. Retry with backoff. |
+| Email must not be sent twice | Use the HTTP API with an [`Idempotency-Key`](/docs/api/idempotency) header, or a job queue that tracks sends. |
+
+For high-value sends like receipts, don't send inside the request at all. Put a job on a queue (BullMQ, pg-boss, your host's queue) and send from a worker, so a slow or failed send never affects the user's request.
+
+---
+
+## 9. Deploy
+
+React Router v7 apps run anywhere Node runs, and on edge platforms with the right adapter.
+
+| Host | Where to set `RELOOP_API_KEY` |
+|---|---|
+| Node server (VPS, Docker) | Process environment, for example a `.env` loaded by your process manager |
+| Fly.io | `fly secrets set RELOOP_API_KEY=rl_…` |
+| Vercel | Project → Settings → Environment Variables |
+| Cloudflare Workers | `wrangler secret put RELOOP_API_KEY`, then read it from the request `context` |
+
+On Cloudflare, the SDK needs the `nodejs_compat` flag. See [sending email from Cloudflare Workers](/blog/send-email-cloudflare-workers) for the details and a dependency-free `fetch` version.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I send email from a loader?">
+    You can, but you shouldn't. Loaders run on GET requests, which can be
+    prefetched, retried and cached. Sending email is a side effect, so it
+    belongs in an action.
+  </Accordion>
+
+  <Accordion title="Remix v2 or React Router v7?">
+    The Reloop code is identical. The differences are imports: Remix v2 uses
+    `@remix-run/node` for `json` and `ActionFunctionArgs`, React Router v7
+    uses `data` from `react-router` and generated `Route` types.
+  </Accordion>
+
+  <Accordion title="Can I use SMTP instead of the SDK?">
+    Yes. Point Nodemailer at `smtp.reloop.sh` on port 587 with your API key
+    as both username and password. See the [SMTP docs](/docs/examples/smtp/introduction).
+  </Accordion>
+
+  <Accordion title="How do I test emails locally?">
+    Send to your own address from a verified domain, then inspect the
+    message, its headers and delivery status in the Reloop dashboard logs.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Add email to your Remix app"
+  description="Free tier includes 3,000 emails a month. One server-only client, one action."
+  href="/dashboard/signup"
+  label="Get started"
+/>

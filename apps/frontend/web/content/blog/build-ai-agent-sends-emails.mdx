@@ -1,69 +1,367 @@
 ---
-title: "Build an AI Agent That Sends Emails on Your Behalf"
-description: Learn how to build an autonomous AI agent that composes and sends emails using tool calling, with Reloop handling delivery.
+title: "Build an AI Agent That Reads and Replies to Email"
+description: "Give an AI agent its own mailbox: receive mail with Reloop's email.received webhook, read the thread, draft a reply with Claude, require human approval, and send from the same thread. Or connect Claude to Reloop's MCP server with one command."
 keywords:
-  - AI agent email automation
-  - LLM email sending
-  - AI agent tool calling email
-  - build AI email agent nodejs
+  - AI agent email
+  - AI email agent
+  - build AI agent that sends emails
+  - AI agent inbox
+  - LLM reply to email
+  - email MCP server
+  - agent email automation
 publishedAt: 2026-07-22
 category: AI & Automation
-tags: [ai, agents, llm, openai, automation]
-readTime: 9 min read
+tags: [ai, agents, inbox, mcp, claude, automation]
+readTime: 12 min read
+image: /blog/images/build-ai-agent-sends-emails.png
 author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
-  - ai-generate-transactional-email-templates
+  - email-infrastructure-for-ai-agents
   - vercel-ai-sdk-reloop-notifications
+  - ai-generate-transactional-email-templates
 ---
 
-## What an email-capable agent looks like
+**A useful email agent doesn't just send. It has its own address, reads what arrives, replies in the same thread, and asks a human before anything risky goes out.** With Reloop, the agent gets a real mailbox, an `email.received` webhook when mail lands, and API calls to read the thread and reply. The model only decides what to say.
 
-Modern LLMs support tool calling: you define a function, describe it in natural language, and the model decides when and how to call it. Wiring `send_email` as a tool turns any LLM into an agent that can compose, address, and dispatch email without a human in the loop.
+There are two ways to build this. If you want an assistant like Claude or Claude Code to work your inbox for you, connect [Reloop's MCP server](#the-fast-path-connect-claude-with-mcp) with one command. If you're building the agent into your own product, follow the [build it yourself](#build-it-yourself-the-architecture) sections below.
 
-## Defining the send_email tool
+---
 
-```typescript
-const tools = {
-  send_email: {
-    description: "Send an email to one or more recipients.",
-    parameters: z.object({
-      to: z.string().email(),
-      subject: z.string(),
-      body: z.string(),
-    }),
-    execute: async ({ to, subject, body }) => {
-      await reloop.emails.send({
-        from: "agent@yourdomain.com",
-        to,
-        subject,
-        html: `<p>${body}</p>`,
-      });
-      return { sent: true };
-    },
-  },
-};
+## What the agent needs
+
+Sending email from an LLM is one tool call. A working email agent needs much more:
+
+| Capability | Why it matters | Reloop piece |
+|---|---|---|
+| Its own address | Replies come back to the agent, not a no-reply void | Mailbox on your domain |
+| A trigger when mail arrives | The agent reacts instead of polling | `email.received` webhook |
+| Full conversation context | The model needs the thread, not one message | `inbox.threads.get` |
+| Replying in-thread | Recipients see one conversation, not scattered emails | `inbox.messages.reply` |
+| An undo window | A human can stop a bad send | `undoWindowSeconds` + `cancelPending` |
+| Spam signal | Don't let spammers drive your agent | `is_spam` on every inbound message |
+| An audit trail | Know what the agent sent and why | Inbox sent folder and email logs |
+
+---
+
+## The fast path: connect Claude with MCP
+
+Reloop runs a hosted [MCP server](/docs/integrations/ai-tools/mcp-server) at `https://reloop.sh/mcp`. Any MCP client can use it, and you sign in with your Reloop account instead of pasting an API key.
+
+In Claude Code:
+
+```bash
+claude mcp add --transport http reloop https://reloop.sh/mcp
 ```
 
-## Building the agent loop
+Then run `/mcp`, choose **reloop**, and authenticate. In Claude on the web or desktop, add a custom connector under **Settings → Connectors** with the same URL.
 
-The agent loop runs until the model stops requesting tool calls. Each iteration feeds previous tool results back as context so the model can reason about whether the task is complete.
+The inbox tools the agent gets include:
 
-## Guardrails you need
+| Tool | What it does |
+|---|---|
+| `list_mailboxes` | Find the mailboxes in your organization |
+| `list_inbox_threads` | Conversations, newest first, with folder and search filters |
+| `get_inbox_thread` | Every message in one conversation |
+| `get_inbox_message` | One message with its body and attachments |
+| `reply_to_inbox_message` | Reply in-thread, to the sender or everyone |
+| `send_mailbox_email` | Start a new conversation from a mailbox |
+| `cancel_pending_mailbox_send` | Cancel a scheduled send or one still in its undo window |
+| `move_inbox_thread` | Archive, trash or restore a conversation |
 
-- **Allowlist recipients**: never let the agent send to arbitrary addresses without approval.
-- **Rate limiting**: cap the number of emails per agent session.
-- **Human-in-the-loop for bulk**: any send to more than one recipient should require confirmation.
+Now you can ask: *"Go through unread threads in support@, draft replies to anything about billing, and show me each one before you send."*
 
-## Real-world use cases
+<Callout type="warning">
+  Sending email is real and can't be undone. MCP clients ask you to approve each tool call. Read the recipients and the text before you approve a reply.
+</Callout>
 
-- Customer support agent that drafts and sends resolution emails
-- Scheduling assistant that confirms meetings via email
-- Onboarding bot that triggers personalized welcome sequences
+That's enough for a personal assistant. For an agent that runs inside your product, unattended, you'll want the architecture below.
 
-## What's next
+---
 
-Combine this with Reloop's webhook events. When an email is opened or clicked, feed that signal back to the agent as context to trigger a follow-up action.
+## Build it yourself: the architecture
+
+```text
+ customer ──email──▶ support@mail.acme.com  (Reloop mailbox)
+                            │
+                  email.received webhook
+                            ▼
+                    your /api/agent route
+                            │
+          inbox.threads.get ── full conversation
+                            │
+                    Claude drafts a reply
+                            │
+            ┌───────────────┴────────────────┐
+     safe + confident                  anything else
+            │                                 │
+  inbox.messages.reply             save draft → human approves
+                                              │
+                                    inbox.messages.reply
+```
+
+Four steps: create a mailbox, subscribe to inbound mail, let the model draft, and decide when a human must approve.
+
+---
+
+## 1. Create a mailbox for the agent
+
+In the dashboard, open your verified domain and create a mailbox such as `support@mail.acme.com`. Or do it from code:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { mailbox, mailboxError } = await reloop.inbox.mailboxes.create({
+  domainId: "dom_…",
+  email: "support@mail.acme.com",
+  displayName: "Acme Support",
+});
+if (mailboxError) throw mailboxError;
+```
+
+Receiving must be on for the domain, which adds an MX record pointing at Reloop. The free plan includes one agent inbox. Pro includes five and Growth includes ten.
+
+---
+
+## 2. Get notified when mail arrives
+
+Create a webhook in the dashboard that subscribes to `email.received`. Every inbound message triggers a POST like this:
+
+```json
+{
+  "id": "whev_…",
+  "type": "email.received",
+  "created_at": "2026-07-22T12:00:00.000Z",
+  "data": {
+    "email_id": "in_…",
+    "mailbox_id": "mb_…",
+    "from": "customer@example.com",
+    "from_name": "Dana",
+    "to": ["support@mail.acme.com"],
+    "subject": "Can't download my invoice",
+    "thread_id": "thr_…",
+    "has_attachments": false,
+    "is_spam": false,
+    "status": "received"
+  }
+}
+```
+
+Verify the `Reloop-Signature` header before you trust the payload. The [webhook verification guide](/docs/webhooks/verify-webhooks-requests) has a copy-paste helper.
+
+---
+
+## 3. Read the thread and draft a reply
+
+The handler loads the conversation, gives it to the model, and asks for a structured decision rather than free text.
+
+```typescript
+// app/api/agent/route.ts
+import { anthropic } from "@ai-sdk/anthropic";
+import { generateText, Output } from "ai";
+import { z } from "zod";
+import { reloop } from "@/lib/reloop";
+import { verifyReloopWebhook } from "@/lib/verify-reloop-webhook";
+
+const Decision = z.object({
+  action: z.enum(["reply", "escalate", "ignore"]),
+  category: z.enum(["billing", "how_to", "bug", "sales", "other"]),
+  confidence: z.number().min(0).max(1),
+  reply: z.string().max(3000).optional(),
+});
+
+export async function POST(req: Request) {
+  const raw = await req.text();
+  const valid = verifyReloopWebhook({
+    secret: process.env.RELOOP_WEBHOOK_SECRET!,
+    rawBody: raw,
+    signatureHeader: req.headers.get("Reloop-Signature") ?? "",
+  });
+  if (!valid) return new Response("Bad signature", { status: 401 });
+
+  const event = JSON.parse(raw);
+  if (event.type !== "email.received" || event.data.is_spam) {
+    return new Response("skipped");
+  }
+
+  const { message, messageError } = await reloop.inbox.messages.get(
+    event.data.email_id,
+  );
+  if (messageError) throw messageError;
+
+  // Never answer automated mail: it's how agents end up in reply loops.
+  const auto = Object.entries(message.headers ?? {}).find(
+    ([key]) => key.toLowerCase() === "auto-submitted",
+  )?.[1];
+  if (auto && auto.toLowerCase() !== "no") {
+    return new Response("auto-reply ignored");
+  }
+
+  const { thread, threadError } = await reloop.inbox.threads.get(
+    event.data.thread_id,
+  );
+  if (threadError) throw threadError;
+
+  const history = thread.messages
+    .map((m) => `[${m.direction}] ${m.fromEmail}: ${m.preview ?? ""}`)
+    .join("\n");
+
+  const { output: decision } = await generateText({
+    model: anthropic("claude-sonnet-5-5"),
+    output: Output.object({ schema: Decision }),
+    system:
+      "You are Acme's support agent. Reply only with facts from the help " +
+      "center below. If unsure, or if money, refunds or account access are " +
+      "involved, choose escalate. Never promise anything.\n\n" +
+      HELP_CENTER,
+    prompt:
+      `Conversation so far:\n${history}\n\n` +
+      `Latest message from ${message.fromEmail}:\n${message.textBody ?? ""}`,
+  });
+
+  await handleDecision(message.id, decision);
+  return new Response("ok");
+}
+```
+
+Notes on this design:
+
+- **The model returns a decision, not an action.** Your code decides what happens next. That keeps the model away from the send button.
+- **Spam and auto-replies are filtered before the model runs.** That saves tokens and stops out-of-office loops.
+- **The system prompt limits the agent to known facts.** An email agent that makes up refund policies is worse than no agent.
+
+---
+
+## 4. Human in the loop
+
+Not every reply should go out on its own. A simple policy:
+
+```typescript
+const AUTO_SEND = new Set(["how_to"]);
+
+async function handleDecision(messageId: string, d: z.infer<typeof Decision>) {
+  if (d.action === "ignore") return;
+
+  const safe =
+    d.action === "reply" &&
+    d.reply &&
+    AUTO_SEND.has(d.category) &&
+    d.confidence >= 0.85;
+
+  if (safe) {
+    const { message, messageError } = await reloop.inbox.messages.reply(messageId, {
+      text: d.reply!,
+    });
+    if (messageError) throw messageError;
+    return;
+  }
+
+  // Everything else waits for a person.
+  await db.drafts.insert({
+    messageId,
+    category: d.category,
+    reply: d.reply ?? null,
+    status: "needs_review",
+  });
+}
+```
+
+When a teammate approves a draft in your review screen, call the same `reloop.inbox.messages.reply(messageId, { text })`. The reply lands in the original thread with the right `In-Reply-To` headers, so the customer sees one conversation.
+
+| Category | Auto-send? | Why |
+|---|---|---|
+| How-to questions | Yes, if confident | Low risk, answer is in the docs |
+| Bug reports | Draft only | Needs a human to confirm and log it |
+| Billing and refunds | Never | Money and policy decisions |
+| Sales inquiries | Draft only | Tone and pricing matter |
+| Anything uncertain | Escalate | The default when in doubt |
+
+### Add an undo window to new emails
+
+When the agent starts a *new* conversation (a follow-up, a reminder), send it from the mailbox with an undo window:
+
+```typescript
+const { message, messageError } = await reloop.inbox.messages.send({
+  mailboxId: "mb_…",
+  to: "customer@example.com",
+  subject: "Following up on your download issue",
+  text: followUp,
+  undoWindowSeconds: 300,
+});
+if (messageError) throw messageError;
+
+// Within 5 minutes, a reviewer can still stop it:
+await reloop.inbox.messages.cancelPending(message.id);
+```
+
+The email stays pending for five minutes. Show it in your review queue, and cancel it if anything looks wrong.
+
+---
+
+## Guardrails that matter
+
+| Guardrail | How |
+|---|---|
+| Skip spam | Check `is_spam` on the webhook before calling the model |
+| Prevent reply loops | Ignore messages with an `Auto-Submitted` header; cap replies per thread |
+| Rate limits | Cap agent sends per hour and per recipient |
+| No invented facts | Ground the prompt in your docs; escalate when the answer isn't there |
+| No money decisions | Billing, refunds and account access always go to a human |
+| Prompt injection | Treat email bodies as untrusted data; the model can't pick recipients or call arbitrary tools |
+| Audit trail | Every agent reply is in the mailbox's sent folder and Reloop's logs |
+
+<Callout type="tip">
+  Start in draft-only mode for a week. Review every draft, then turn on auto-send for the one category where the agent was right almost every time.
+</Callout>
+
+---
+
+## What to build next
+
+- **Learn from outcomes.** Subscribe to `email.opened`, `email.clicked` and replies on the thread, and feed them back into the agent's context.
+- **Label and route.** Use `inbox.threads.update` to mark threads important, or archive resolved ones with `inbox.threads.archive`.
+- **Give humans the same inbox.** People can work the same mailbox in the Reloop dashboard, so the agent and your team share one queue.
+
+For the infrastructure side (MX records, threading, storage, IMAP), read [how the infrastructure for an email agent works](/blog/email-infrastructure-for-ai-agents).
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Should I use MCP or build my own agent?">
+    MCP is the fastest way for you, personally, to work your inbox with
+    Claude or Claude Code, with approval on every call. Build your own when
+    the agent runs unattended inside your product and you need fixed rules
+    for what it can send.
+  </Accordion>
+
+  <Accordion title="Can the agent use my existing support address?">
+    Yes, if the domain's MX points to Reloop. Many teams start with a
+    subdomain like `support.acme.com` so their main mailbox provider is
+    untouched.
+  </Accordion>
+
+  <Accordion title="Which model should I use?">
+    Any model the AI SDK supports. We use Claude for support-style replies
+    because it follows grounding instructions well. Keep the structured
+    decision step whichever model you pick.
+  </Accordion>
+
+  <Accordion title="How do I stop the agent replying to other bots?">
+    Ignore messages that carry an `Auto-Submitted` header other than `no`,
+    skip `is_spam` messages, and cap the number of agent replies per thread.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Give your agent a mailbox"
+  description="Inbound, outbound and threads in one API, plus a hosted MCP server. Free plan includes one agent inbox."
+  href="/dashboard/signup"
+  label="Get started"
+/>

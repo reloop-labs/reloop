@@ -1,82 +1,276 @@
 ---
-title: "Reloop on Fly.io: Full Deployment Guide"
-description: Deploy Reloop on Fly.io, from fly launch to a production-ready email infrastructure with persistent volumes and custom domains.
+title: "Send Email from Fly.io Apps with Reloop"
+description: "How to send transactional email from apps on Fly.io: why direct SMTP from Fly machines lands in spam, setting RELOOP_API_KEY with fly secrets, the HTTP API and SMTP relay, background workers, and where to self-host Reloop instead."
 keywords:
-  - deploy email server fly.io
-  - reloop fly.io deployment
-  - self host email flyio
-  - flyio email infrastructure
+  - fly.io send email
+  - fly.io smtp
+  - fly.io transactional email
+  - fly.io port 25
+  - deploy email fly.io
+  - reloop fly.io
 publishedAt: 2026-08-15
 category: Self-Hosting
-tags: [self-host, flyio, deployment, docker]
-readTime: 8 min read
+tags: [flyio, deployment, smtp, http-api]
+readTime: 9 min read
+image: /blog/images/reloop-flyio-deployment.png
 author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
-  - self-host-email-5-dollars
+  - self-hosted-email-infrastructure
   - reloop-coolify-setup
+  - send-email-remix
 ---
 
-## Why Fly.io?
+**Run your app on Fly.io, and send its email through Reloop.** Fly is a great place for web apps and workers, but it's a poor place to run a mail server: you can't set reverse DNS (PTR) on Fly IPs, and most large mailbox providers penalize or reject mail from IPs without it. So set `RELOOP_API_KEY` with `fly secrets`, send over HTTPS or Reloop's SMTP relay, and let Reloop handle delivery. If you want to self-host Reloop itself, put it on a VPS next to your Fly apps.
 
-Fly.io is a developer-first platform with global edge locations, built-in Postgres, and a generous free tier. It's an excellent choice for self-hosting Reloop if you want managed infrastructure without giving up control over your data.
+This guide covers why, how to wire it up in a few minutes, and how to keep email off your request path with a Fly worker process.
 
-## Prerequisites
+---
 
-- Fly.io account (free tier works for getting started)
-- Fly CLI installed: `curl -L https://fly.io/install.sh | sh`
-- Docker installed locally for building
+## Why not send directly from a Fly machine?
 
-## Step 1: Clone and configure
+It's tempting to run Postfix, or point Nodemailer straight at recipients' MX servers. Here's what Fly's own staff say about that on the [Fly community forum](https://community.fly.io/t/outbound-port-25-direct-to-mx-smtp-blocked-by-default-on-new-accounts/28537):
 
-```bash
-git clone https://github.com/reloop-labs/reloop
-cd reloop
-cp .env.example .env
-```
+- There's no per-account block on outbound port 25.
+- But direct-to-MX delivery needs reverse DNS on the sending IP, and Fly doesn't offer customer-configurable PTR records.
+- A dedicated egress IP (`fly ips allocate-egress`) gives you a stable address, but still no PTR, which "most large receivers will penalize or outright reject."
+- Their recommendation: relay outbound mail through a transactional email service.
 
-Fill in your environment variables. At minimum: `DATABASE_URL`, `SMTP_HOST`, and `RELOOP_API_SECRET`.
+Shared egress IPs make it worse. Anyone else's bad mail from the same IP range affects you, and users regularly report connections to Gmail and other providers timing out or being dropped.
 
-## Step 2: Initialize the Fly app
+| Approach | Reverse DNS | Reputation | Result |
+|---|---|---|---|
+| Direct SMTP from a Fly machine | Not configurable | Shared or brand new | Spam folder or rejected |
+| Dedicated Fly egress IP | Not configurable | Yours, but cold | Still penalized by large providers |
+| Relay through Reloop | Handled | Warm, monitored | Inbox |
 
-```bash
-fly launch --name my-reloop --region iad --no-deploy
-```
+---
 
-This creates your `fly.toml`. Review it and set `auto_stop_machines = false` for the email worker. You don't want it sleeping mid-delivery.
+## What you need
 
-## Step 3: Set up Fly Postgres
+1. An app running on Fly.io (`fly launch` in any project).
+2. A Reloop API key from the [dashboard](https://reloop.sh/dashboard/api-keys). Keys start with `rl_`.
+3. A verified sending domain in Reloop. See [connect a domain](/docs/guides/connect-domain). DNS for your domain lives wherever it does today; it doesn't need to move to Fly.
 
-```bash
-fly postgres create --name my-reloop-db --region iad
-fly postgres attach my-reloop-db
-```
+---
 
-This automatically sets `DATABASE_URL` in your app's secrets.
-
-## Step 4: Add a persistent volume for email storage
+## 1. Store the API key as a Fly secret
 
 ```bash
-fly volumes create reloop_data --size 10 --region iad
+fly secrets set RELOOP_API_KEY=rl_your_api_key_here
 ```
 
-Mount it in `fly.toml` under `[mounts]` so email logs and attachments survive restarts.
+Fly encrypts the value and injects it as an environment variable into every machine in the app. Setting a secret triggers a rolling restart, so the new value is live as soon as the command finishes.
 
-## Step 5: Deploy
+Never put the key in `fly.toml` under `[env]`. That section is plain text, committed to your repo.
+
+---
+
+## 2. Send over HTTPS (recommended)
+
+The HTTP API is the simplest and most reliable option from a container: one HTTPS request on port 443, a JSON response with the email ID, and structured errors.
+
+### Node.js
+
+<InstallSdkCode />
+
+```typescript
+// src/lib/reloop.ts
+import { Reloop } from "reloop-email";
+
+export const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+```
+
+```typescript
+// anywhere on the server
+import { reloop } from "./lib/reloop";
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your login link",
+  html: '<p><a href="https://app.acme.com/login?token=…">Sign in</a></p>',
+  text: "Sign in: https://app.acme.com/login?token=…",
+  tags: [{ name: "type", value: "magic-link" }],
+});
+
+if (emailError) {
+  console.error(emailError.status, emailError.message);
+}
+```
+
+The SDK returns `{ response, emailError }` instead of throwing, so a failed send never crashes a request handler.
+
+### Any language
+
+It's one `POST`, so it works from Elixir, Go, Python, Rails or anything else you deploy on Fly:
 
 ```bash
-fly deploy
+curl -X POST https://reloop.sh/api/mail/v1/send \
+  -H "x-api-key: $RELOOP_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "Acme <hello@mail.acme.com>",
+    "to": "user@example.com",
+    "subject": "Hello from Fly.io",
+    "text": "Sent from a Fly machine through Reloop."
+  }'
 ```
 
-Watch the logs with `fly logs` to confirm the SMTP server and API are both healthy.
+There are official SDKs for [Python, Go, Ruby, PHP, Rust, Elixir and Java](/sdk) as well.
 
-## Step 6: Configure your domain
+---
 
-Point your domain's MX records to your Fly app's hostname, then add SPF, DKIM, and DMARC records as prompted by the Reloop dashboard.
+## 3. Or use the SMTP relay
 
-## Scaling considerations
+If your framework already sends through SMTP (Rails Action Mailer, Phoenix Swoosh, Django, Laravel), you don't need to change any code. Just change the settings:
 
-Fly.io makes it easy to scale horizontally. Email delivery workers should run on dedicated machines to isolate queue processing from API traffic.
+| Setting | Value |
+|---|---|
+| Host | `smtp.reloop.sh` |
+| Port | `587` (STARTTLS) or `465` (TLS) |
+| Username | Your Reloop API key |
+| Password | Your Reloop API key |
+
+Store them as secrets too:
+
+```bash
+fly secrets set SMTP_HOST=smtp.reloop.sh SMTP_PORT=587 \
+  SMTP_USERNAME=rl_your_api_key_here SMTP_PASSWORD=rl_your_api_key_here
+```
+
+For example, in Rails:
+
+```ruby
+# config/environments/production.rb
+config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = {
+  address: ENV.fetch("SMTP_HOST"),
+  port: ENV.fetch("SMTP_PORT").to_i,
+  user_name: ENV.fetch("SMTP_USERNAME"),
+  password: ENV.fetch("SMTP_PASSWORD"),
+  authentication: :plain,
+  enable_starttls_auto: true,
+}
+```
+
+You're connecting to a relay on 587 with authentication, not delivering to recipients' MX on port 25, so the PTR problem above doesn't apply. Examples for other languages are in the [SMTP docs](/docs/examples/smtp/introduction).
+
+---
+
+## 4. Keep email off the request path with a worker process
+
+Fly apps can run several process groups from one image. Use one for your web server and one for background jobs, and send email from the worker. A slow send never slows a page, and failed sends can be retried.
+
+```toml
+# fly.toml
+app = "acme"
+
+[processes]
+  web = "node dist/server.js"
+  worker = "node dist/worker.js"
+
+[http_service]
+  internal_port = 3000
+  processes = ["web"]
+```
+
+```typescript
+// src/worker.ts (sketch using any queue you already run, e.g. BullMQ on Redis)
+import { Worker } from "bullmq";
+import { reloop } from "./lib/reloop";
+
+new Worker(
+  "emails",
+  async (job) => {
+    const { emailError } = await reloop.mail.send(job.data);
+    if (emailError && (emailError.status >= 500 || emailError.status === 429)) {
+      throw emailError; // let the queue retry
+    }
+  },
+  { connection: { url: process.env.REDIS_URL! } },
+);
+```
+
+Then scale each group on its own:
+
+```bash
+fly scale count web=2 worker=1
+```
+
+If you can't use a queue but want retries to be safe, call the HTTP API with an [`Idempotency-Key`](/docs/api/idempotency) header. Reloop replays the original response for 24 hours instead of sending twice.
+
+---
+
+## 5. Receiving email
+
+Fly apps can't receive mail on port 25 for the same reasons they can't send it well. Use Reloop's inbound instead:
+
+1. Turn on receiving for your domain in Reloop and add the MX record it shows.
+2. Create a webhook for the `email.received` event pointing at your Fly app, for example `https://acme.fly.dev/webhooks/reloop`.
+3. Verify the `Reloop-Signature` header on each request. See [verifying webhooks](/docs/webhooks/verify-webhooks-requests).
+
+Your Fly app gets a signed JSON event with the sender, subject, thread ID and more. The full message, including attachments, is available through the inbox API.
+
+---
+
+## Should I self-host Reloop on Fly.io?
+
+We don't recommend it, and we don't ship a Fly configuration for it. Reloop's MTA needs to deliver directly to recipients on port 25 and receive on port 25, which runs straight into the PTR limitation. The stack is also a multi-service Docker Compose deployment (around 20 containers and about 22 GB of images), which doesn't map neatly onto Fly Machines.
+
+If you want to run Reloop yourself, use a VPS from a provider that lets you set reverse DNS and open port 25:
+
+| Option | Guide |
+|---|---|
+| One command on Ubuntu or Debian | [Deploy on VPS](/docs/self-host/vps) |
+| Coolify | [Reloop on Coolify](/blog/reloop-coolify-setup) |
+| Overview and trade-offs | [Self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) |
+
+Your apps can stay on Fly and point at your instance by setting the SDK's `baseUrl`, or `SMTP_HOST`, to your Reloop server.
+
+---
+
+## Checklist
+
+- [ ] `RELOOP_API_KEY` set with `fly secrets set`, not in `fly.toml`
+- [ ] Sending domain verified in Reloop (SPF, DKIM, DMARC)
+- [ ] App sends through the HTTP API or `smtp.reloop.sh:587`, never direct-to-MX
+- [ ] User-facing sends happen in a worker process or queue
+- [ ] Inbound handled by Reloop with a signed `email.received` webhook
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Does Fly.io block port 25?">
+    Fly staff say there's no per-account block on outbound port 25. The
+    problem is deliverability: Fly IPs have no customer-configurable reverse
+    DNS, so large mailbox providers penalize or reject direct mail from them.
+  </Accordion>
+
+  <Accordion title="Is port 587 to smtp.reloop.sh fine from Fly?">
+    Yes. That's an authenticated connection to a relay, not direct delivery.
+    If a network ever blocks SMTP ports, the HTTP API on 443 always works.
+  </Accordion>
+
+  <Accordion title="Which region should my Fly app run in?">
+    Wherever your users are. Sending is a single HTTPS request, so region
+    has little effect on email; Reloop queues and delivers it from there.
+  </Accordion>
+
+  <Accordion title="Can I use the free tier while testing?">
+    Yes. Reloop's free tier includes 3,000 emails a month with up to 100 a
+    day, which is plenty for staging apps on Fly.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Send email from your Fly apps"
+  description="One secret, one API call. Free tier includes 3,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

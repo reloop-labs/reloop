@@ -1,15 +1,18 @@
 ---
-title: "How We Built a Multi-Tenant Email Delivery Queue with BullMQ"
-description: "A deep dive into the job queue architecture powering Reloop's multi-tenant email delivery: rate limiting, priority lanes, and failure recovery."
+title: "Inside Reloop's Email Delivery Pipeline: KumoMTA, NATS and BullMQ"
+description: "How Reloop queues and delivers email for many tenants: an API that rejects bad sends early, KumoMTA's spool for SMTP delivery, NATS for delivery events, and BullMQ for campaigns, automations and webhooks."
 keywords:
   - bullmq email queue
   - multi-tenant email delivery
-  - job queue nodejs email
+  - kumomta architecture
+  - email delivery pipeline
+  - nats event bus email
   - email infrastructure architecture
 publishedAt: 2026-07-10
 category: Engineering
-tags: [bullmq, redis, queue, architecture, nodejs]
-readTime: 10 min read
+tags: [bullmq, kumomta, nats, redis, queue, architecture]
+readTime: 11 min read
+image: /blog/images/how-we-built-email-delivery-queue-bullmq.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -18,46 +21,280 @@ draft: false
 relatedSlugs:
   - building-webhook-delivery-system
   - email-bounce-processing-automation
+  - self-hosted-email-infrastructure
 ---
 
-## Why a queue, not direct SMTP calls
+**Reloop doesn't push every email through one big job queue.** It uses three systems, each for the job it's best at. The mail API runs every check synchronously and hands the message straight to **KumoMTA**, whose on-disk spool handles per-domain queueing, retries and SMTP delivery. KumoMTA publishes every delivery outcome to **NATS**, where independent consumers update logs, contacts, reputation and webhooks. **BullMQ** on Redis runs everything that needs scheduling or step-by-step pacing: campaigns, automations, webhook delivery and domain verification.
 
-Sending email synchronously inside a request handler is the fastest way to have unreliable delivery. A dedicated queue decouples the trigger from the send, giving you retries, back-pressure control, and observability for free. Here's how we designed ours.
+This post walks through why we split it that way and what each piece actually does, with code from the [Reloop repo](https://github.com/reloop-labs/reloop).
 
-## Choosing BullMQ over alternatives
+---
 
-We evaluated several options (SQS, RabbitMQ, and Inngest) before settling on BullMQ backed by Redis. The key deciding factors were local dev simplicity (one Redis container), mature TypeScript types, and built-in rate limiting primitives that map directly to SMTP provider limits.
+## The shape of the pipeline
 
-## Queue topology
+```text
+POST /api/mail/v1/send
+   │  rate limits → scope → domain → suppressions → DNS → log row
+   │  → template → tracking → reputation / quota guards
+   ▼
+KumoMTA  (HTTP inject → spool → per-domain queues → SMTP)
+   │  log hook: one record per Reception / Delivery / Bounce / …
+   ▼
+NATS  subject "kumomta.event"
+   ├── logs        → email_log status + email_event rows
+   ├── contacts    → auto-create contacts, suppress bounces/complaints
+   ├── reputation  → bounce/complaint rates, auto-pause bad senders
+   └── workflow    → customer webhooks (via BullMQ)
 
-We operate three priority lanes per tenant:
+BullMQ (Redis)
+   ├── campaign-send          batched campaign sends
+   ├── automation-queue       automation steps and delays
+   ├── workflow-queue         domain DNS verification, other jobs
+   └── webhook-delivery-queue signed HTTP delivery with retries
+```
 
-- **Critical**: password resets, 2FA codes. Zero delay, max concurrency.
-- **Standard**: transactional receipts, notifications. Slight delay allowed.
-- **Bulk**: marketing campaigns. Throttled to provider limits.
+| Layer | Technology | What it owns |
+|---|---|---|
+| Admission | Elysia mail service + Redis counters | Validation, rate limits, suppression, quotas |
+| Delivery | KumoMTA spool | Per-destination queues, SMTP retries, TLS, DKIM, IP selection |
+| Events | NATS | Fan-out of delivery outcomes to every interested service |
+| Background work | BullMQ on Redis | Campaign pacing, automations, webhooks, DNS checks |
 
-## Per-tenant rate limiting
+---
 
-Each tenant gets a sliding-window rate limiter keyed by `tenantId:providerId`. We use BullMQ's `RateLimiter` to cap sends per second and per day, respecting each provider's API limits without cross-tenant interference.
+## Why not one BullMQ queue for everything?
+
+The obvious design is "API enqueues a job, worker sends it over SMTP." We didn't build that, for three reasons.
+
+1. **An MTA is already a queue.** SMTP delivery needs per-destination queues, connection limits, retry schedules for 4xx responses, TLS policy and spooling to disk so nothing is lost on restart. KumoMTA does all of that. Rebuilding it on top of Redis would mean writing a worse MTA.
+2. **Errors should be synchronous.** If the sending domain isn't verified or every recipient is suppressed, the caller should get a `400` with a reason right away, not a `202` followed by a failed job they never look at.
+3. **Different work has different shapes.** A password reset should leave in milliseconds. A 50,000-recipient campaign should trickle out under rate limits for an hour. A webhook needs to retry for half a day. One queue with one retry policy fits none of them well.
+
+---
+
+## Stage 1: admission in the mail service
+
+Every API send goes through a fixed sequence of steps in `apps/backend/mail`. Each one can reject the send with a structured error (`message`, `why`, `fix`, `link`).
+
+| Step | What it checks |
+|---|---|
+| Rate limit | Per-IP, per-user, per-org (per minute and per day) and global windows in Redis |
+| Parse `from` | Valid address, display name |
+| API key scope | The key is allowed to send from this domain |
+| Verify domain | The sending domain is verified for this organization |
+| Suppressions | Drops suppressed recipients, rejects if none are left |
+| DNS health | Live check that the required DNS records are still published |
+| Create log | Inserts the `email_log` row that every later event attaches to |
+| Template | Resolves `template.id` and variables |
+| Tracking | Rewrites links and adds the open pixel when enabled |
+| Send | Composes MIME and injects into KumoMTA |
+| Finalize | Publishes `email.sent` or `email.scheduled` |
+
+The rate limiter is a fixed-window counter per layer. Default limits from `mail.config.ts`, all overridable with environment variables:
+
+| Layer | Default |
+|---|---|
+| Per IP | 20 / 60 s |
+| Per user | 50 / 60 s |
+| Per organization | 100 / 60 s |
+| Per organization, daily | 5,000 / day |
+| Global | 500 / 60 s |
 
 ```typescript
-const queue = new Queue("email-delivery", {
-  connection: redis,
-  defaultJobOptions: {
-    attempts: 4,
-    backoff: { type: "exponential", delay: 2000 },
-  },
+// apps/backend/mail/src/middleware/rate-limiter.ts (simplified)
+const count = await redis.increment(layer.key); // e.g. rl:send:org:<id>
+if (count === 1) {
+  await redis.expire(layer.key, layer.windowSeconds);
+}
+if (count > layer.max) {
+  const ttl = await redis.ttl(layer.key);
+  // 429 with Retry-After = remaining window
+}
+```
+
+Idempotency is handled here too. If a request carries an `Idempotency-Key` that matches an earlier send, the API returns the original result instead of sending again. The one exception is a send whose status is `failed`: that only happens when nothing was delivered, so a retry with the same key is treated as a fresh send.
+
+<Callout type="info">
+  Suppression is checked **platform-wide**, not just inside your organization. If an address hard-bounced for another sender, delivering to it still hurts shared IP reputation. You can see and remove those suppressions in your own dashboard.
+</Callout>
+
+---
+
+## Stage 2: KumoMTA does the actual delivery
+
+Once a message passes admission, the mail service composes the MIME message and posts it to KumoMTA's HTTP inject API:
+
+```typescript
+// apps/backend/mail/src/lib/kumomta-client.ts (simplified)
+const payload: InjectRequest = {
+  envelope_sender: toBareEmail(options.from),
+  recipients: [...recipientSet].map((email) => ({ email })),
+  content: rfc822Message,
+};
+
+await fetch(`${baseUrl}/api/inject/v1`, {
+  method: "POST",
+  body: JSON.stringify(payload),
+  signal: AbortSignal.timeout(30_000),
 });
 ```
 
-## Failure recovery and dead-letter handling
+Recipients across To, CC and BCC are deduplicated first, so one address never receives the same message twice.
 
-Jobs that exhaust their retry budget move to a dead-letter queue. A nightly process reviews these, attempts to categorize failures (bounce vs. rate limit vs. provider outage), and re-queues or surfaces them in the dashboard.
+From there, KumoMTA writes the message to its spool on disk (`/var/spool/kumomta`) and places it in a queue per destination domain. Its Lua policy, in `apps/backend/smtp/policy`, decides how each queue behaves.
 
-## Observability
+### Tenants map to IPs
 
-Every job emits lifecycle events (`active`, `completed`, `failed`) to our metrics pipeline. This drives the real-time delivery dashboard inside Reloop and powers the webhook events we send to customers.
+KumoMTA's *tenant* field carries the TLS mode and, for organizations with a dedicated IP, the IP address and its hostname:
 
-## What we'd do differently
+```lua
+-- apps/backend/smtp/policy/egress.lua
+--   'opportunistic'                          shared pool (host default IP)
+--   'enforced|65.109.252.254|smtp.reloop.sh' dedicated IP
+```
 
-Running BullMQ workers in the same Node process as the API works fine at small scale. As volume grows, we plan to extract workers into dedicated containers with independent autoscaling.
+`get_queue_config` turns that tenant into an egress pool, and `get_egress_source` binds the right local address and EHLO hostname, which must match the IP's PTR record. Shared-pool senders and dedicated-IP senders never share a connection.
+
+### Bring-your-own SMTP
+
+If an organization routes through its own SMTP provider, the queue config swaps the MX lookup for a smart host fetched from the domain service (cached for 60 seconds) and caps connections to that relay at 5:
+
+```lua
+-- apps/backend/smtp/policy/queue.lua (simplified)
+if provider_id then
+  local relay = get_relay(provider_id)
+  queue.protocol = { smtp = { mx_list = { byo.mx_entry(relay) } } }
+end
+```
+
+### Over-quota mailboxes stop retrying
+
+By default an MTA treats a `452 4.2.2 OverQuotaTemp` from Gmail as temporary and retries for days. We rewrite those to a permanent `552` so the message leaves the spool and the address is suppressed:
+
+```lua
+-- apps/backend/smtp/policy/bounce_rewrite.lua
+kumo.on('smtp_client_rewrite_delivery_status', function(response, ...)
+  if is_over_quota(response) then
+    return 552
+  end
+  return nil -- keep default handling (greylisting, throttling still retry)
+end)
+```
+
+More on that in [how we handle bounce processing](/blog/email-bounce-processing-automation).
+
+---
+
+## Stage 3: NATS carries every outcome
+
+KumoMTA's log hook publishes each delivery record (Reception, Delivery, Bounce, TransientFailure, Expiration, Feedback, and so on) to the NATS subject `kumomta.event`. Pre-queue rejections are dropped at the source because they never got an email log ID.
+
+```lua
+-- apps/backend/smtp/policy/webhooks.lua (simplified)
+nc:publish { subject = 'kumomta.event', payload = message:get_data() }
+```
+
+Four services subscribe, each in its **own queue group**, so every service gets every event, and each event is handled by only one replica of that service:
+
+| Consumer | Queue group | What it does |
+|---|---|---|
+| `logs` | `logs-kumomta-worker` | Updates `email_log.status`, writes `email_event` rows, pushes live updates to the dashboard |
+| `contacts` | `contacts-kumomta-worker` | Creates contacts on delivery, suppresses hard bounces and complaints |
+| `logs` reputation | `logs-reputation-worker` | Recomputes 24-hour bounce and complaint rates, pauses senders over the limit |
+| `workflow` | `webhook-dispatcher` | Maps the event to `email.delivered`, `email.bounced` and friends, then fans out to customer webhooks |
+
+Every message carries an `X-Email-Log-ID` header stamped at admission. That's how a KumoMTA record finds its way back to the right row, organization and API key without guessing.
+
+Adding a new reaction to delivery events means adding a subscriber. Nothing in the send path changes.
+
+---
+
+## Stage 4: BullMQ for work that needs time
+
+Everything that has to wait, pace itself or retry over hours lives in BullMQ.
+
+| Queue | Default attempts | Backoff | Worker concurrency |
+|---|---|---|---|
+| `campaign-send` | 5 | Exponential, 2 s base | 3 |
+| `automation-queue` | 5 | Exponential, 2 s base | 10 |
+| `workflow-queue` | 3 | Exponential, 1 s base (custom for DNS checks) | 5 |
+| `webhook-delivery-queue` | 7 | Fixed schedule up to 10 h | 10 |
+
+### Campaigns are a sequence, not a fan-out
+
+The tempting way to send a campaign is to enqueue one job per recipient. That races the per-user and per-org rate limits and produces a wall of `429`s. Instead, a campaign is a chain of batch jobs:
+
+```typescript
+// apps/backend/campaigns/src/lib/campaign/batch.ts
+export const CAMPAIGN_BATCH_SIZE = 40;
+export const CAMPAIGN_BATCH_DELAY_MS = 60_000;
+```
+
+Each batch loads the next 40 pending recipients, sends them through the same mail API as everything else, then schedules the next batch one window later. If the API answers `429`, the next batch waits for the `Retry-After` value (never less than 60 seconds). Each campaign only ever has one active batch, so one large campaign can't crowd out another organization's sends.
+
+Batch job IDs are deterministic (`campaign-send-<campaignId>-<batchIndex>`), and a batch reclaims any recipients a crashed worker left in `sending`. Restarting a worker mid-campaign doesn't double-send or lose recipients.
+
+### Domain verification on a schedule
+
+When you add a domain, a job checks its DNS records seven times at roughly 10 s, 30 s, 1 min, 2.5 min, 5.5 min, 11.5 min and 21.5 min after you start verification. Most DNS changes are picked up within the first few minutes, and nobody has to click "verify" again.
+
+### Webhooks with a fixed retry schedule
+
+Webhook delivery is its own queue with a custom backoff: 5 s, 5 min, 30 min, 2 h, 5 h and 10 h between attempts. The details are in [building a webhook delivery system that actually retries](/blog/building-webhook-delivery-system).
+
+---
+
+## What multi-tenancy means here
+
+"Multi-tenant" in this pipeline comes down to four concrete mechanisms:
+
+1. **Admission limits per org and per user** in Redis, so one customer's spike gets `429`s instead of slowing everyone down.
+2. **Tenant-scoped egress** in KumoMTA, so dedicated-IP customers send only from their own IP.
+3. **One active batch per campaign**, so bulk sends trickle instead of flooding.
+4. **Reputation guards per org**: if an organization's bounce or complaint rate crosses the threshold, its sending is paused before it damages the shared pool.
+
+---
+
+## Lessons
+
+- **Use the MTA as the delivery queue.** It already solved retries, spooling and per-domain throttling.
+- **Reject early, synchronously.** Most "email didn't arrive" tickets disappear when the API says why at send time.
+- **Publish outcomes, don't call services.** NATS queue groups let us add consumers without touching the send path.
+- **Pace bulk work explicitly.** A chain of delayed batch jobs is easier to reason about than thousands of jobs racing a rate limiter.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Does Reloop use BullMQ to send every email?">
+    No. Transactional sends go from the mail API straight into KumoMTA, which
+    queues and delivers them. BullMQ is used for campaigns, automations,
+    webhook delivery and domain verification.
+  </Accordion>
+
+  <Accordion title="What happens if KumoMTA restarts with mail in the queue?">
+    Messages are spooled to disk before KumoMTA accepts them, so they are
+    delivered after the restart. Delivery events are published as each
+    attempt completes.
+  </Accordion>
+
+  <Accordion title="Can I change the rate limits on a self-hosted instance?">
+    Yes. The per-IP, per-user, per-org and global limits are read from
+    environment variables like `RATE_LIMIT_ORG_MAX` and
+    `RATE_LIMIT_USER_MAX` in the mail service.
+  </Accordion>
+
+  <Accordion title="Why NATS and not Redis pub/sub?">
+    NATS queue groups give each service its own copy of every event while
+    load-balancing within a service. That's exactly the fan-out pattern
+    delivery events need.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Read the code"
+  description="The whole pipeline is open source under Apache 2.0. Run it yourself or use the hosted version."
+  href="https://github.com/reloop-labs/reloop"
+  label="View on GitHub"
+/>

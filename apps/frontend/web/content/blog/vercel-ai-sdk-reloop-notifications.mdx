@@ -1,15 +1,18 @@
 ---
-title: "Vercel AI SDK + Reloop: Send Smart Notifications from Your AI App"
-description: Combine the Vercel AI SDK's tool calling with Reloop to trigger intelligent, context-aware email notifications from any AI-powered Next.js application.
+title: "Vercel AI SDK + Reloop: Send Email Notifications from Your AI App"
+description: "Give an AI SDK model a safe email tool: define it with tool() and Zod, lock the recipient on the server, send with Reloop, require approval for risky sends, and track every email the model triggers."
 keywords:
   - vercel ai sdk email
-  - vercel ai sdk tool calling
+  - ai sdk tool calling email
   - send email from AI app
+  - ai sdk send email tool
   - nextjs ai email notifications
+  - claude tool calling email
 publishedAt: 2026-07-28
 category: AI & Automation
-tags: [vercel-ai-sdk, nextjs, ai, notifications, tools]
-readTime: 6 min read
+tags: [vercel-ai-sdk, nextjs, ai, notifications, tools, claude]
+readTime: 10 min read
+image: /blog/images/vercel-ai-sdk-reloop-notifications.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -18,61 +21,308 @@ draft: false
 relatedSlugs:
   - build-ai-agent-sends-emails
   - send-email-nextjs-app-router
+  - email-infrastructure-for-ai-agents
+  - ai-generate-transactional-email-templates
 ---
 
-## Why combine Vercel AI SDK with Reloop
+**To let an AI SDK model send email, give it a tool whose `execute` function calls Reloop, and keep every risky decision on the server.** The model chooses *when* to notify and *what* to say. Your code decides *who* receives it, which address it comes from, and how often it can fire.
 
-The Vercel AI SDK makes it trivially easy to add tool calling to any Next.js app. Reloop gives you reliable, observable email delivery. Together, they let your AI decide *when* to send an email and *what* to say, while Reloop handles the infrastructure.
+This guide builds that tool with the current AI SDK (`tool()` with `inputSchema`, `stopWhen`), wires it into a Next.js route, and covers the guardrails that stop a confused model from emailing the wrong person.
 
-## Setting up the tool
+---
 
-Define a `notifyUser` tool using the AI SDK's `tool()` helper and the Zod schema it expects:
+## What we're building
 
-```typescript
-import { tool } from "ai";
-import { z } from "zod";
-import { Reloop } from "reloop-email";
+A chat assistant inside your app that can email the signed-in user. For example:
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+- "Email me a summary of this conversation."
+- "Let me know when the export finishes."
+- "Send me tomorrow's checklist at 9am."
 
-export const notifyUser = tool({
-  description: "Send an email notification to the user about a task or event.",
-  parameters: z.object({
-    email: z.string().email(),
-    subject: z.string(),
-    message: z.string(),
-  }),
-  execute: async ({ email, subject, message }) => {
-    await reloop.emails.send({
-      from: "notifications@yourdomain.com",
-      to: email,
-      subject,
-      html: `<p>${message}</p>`,
-    });
-    return { delivered: true };
-  },
-});
+| Piece | Responsibility |
+|---|---|
+| **AI SDK** | Runs the model, decides whether to call the tool, streams the reply |
+| **Your tool** | Validates input, fixes the recipient, renders a safe email |
+| **Reloop** | Delivers it, retries, records it in the logs, fires webhooks |
+
+---
+
+## 1. Install
+
+```bash
+npm install ai @ai-sdk/anthropic zod reloop-email
 ```
 
-## Wiring it into a Server Action
+Add the keys to `.env.local`:
+
+```env
+ANTHROPIC_API_KEY=sk-ant-...
+RELOOP_API_KEY=rl_your_api_key_here
+```
+
+Neither key gets a `NEXT_PUBLIC_` prefix. Both are used only on the server.
+
+Create a shared Reloop client:
 
 ```typescript
-import { streamText } from "ai";
-import { openai } from "@ai-sdk/openai";
+// lib/reloop.ts
+import { Reloop } from "reloop-email";
 
-export async function runAgent(prompt: string, userEmail: string) {
-  return streamText({
-    model: openai("gpt-4o"),
-    prompt,
-    tools: { notifyUser },
+export const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+```
+
+---
+
+## 2. Define the email tool
+
+The most important design decision: **the model never chooses the recipient.** You create the tool per request, with the signed-in user's address baked in.
+
+```typescript
+// lib/tools/email-user.ts
+import { tool } from "ai";
+import { z } from "zod";
+import { reloop } from "@/lib/reloop";
+
+const escapeHtml = (s: string) =>
+  s.replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
+  );
+
+export function emailUserTool(user: { id: string; email: string }) {
+  let sent = 0;
+
+  return tool({
+    description:
+      "Email the current user. Use only when they ask to be emailed or notified. " +
+      "Write a short subject and a plain-language body.",
+    inputSchema: z.object({
+      subject: z.string().min(3).max(120),
+      body: z.string().min(10).max(4000),
+      sendAt: z
+        .string()
+        .datetime()
+        .optional()
+        .describe("ISO 8601 time to send later, e.g. a reminder"),
+    }),
+    execute: async ({ subject, body, sendAt }) => {
+      if (sent >= 2) {
+        return { ok: false, reason: "Email limit for this conversation reached." };
+      }
+
+      const paragraphs = body
+        .split(/\n{2,}/)
+        .map((p) => `<p>${escapeHtml(p)}</p>`)
+        .join("");
+
+      const { response, emailError } = await reloop.mail.send({
+        from: "Acme Assistant <assistant@mail.acme.com>",
+        to: user.email,
+        subject,
+        html: paragraphs,
+        text: body,
+        scheduled_at: sendAt,
+        tags: [
+          { name: "source", value: "ai_assistant" },
+          { name: "user_id", value: user.id },
+        ],
+      });
+
+      if (emailError) {
+        console.error("Reloop send failed", emailError.status, emailError.body);
+        return { ok: false, reason: "The email could not be sent." };
+      }
+
+      sent++;
+      return { ok: true, messageId: response.messageId, scheduled: Boolean(sendAt) };
+    },
   });
 }
 ```
 
-## Example: a task completion agent
+Why it's built this way:
 
-When a long-running background task finishes, the model can decide to notify the user by email rather than just returning a response. This keeps the user in the loop without polling.
+| Choice | Why |
+|---|---|
+| Recipient comes from the session, not `inputSchema` | A prompt injection can't redirect mail to an attacker |
+| Fixed `from` address | The model can't impersonate another sender |
+| `escapeHtml` on the body | Model output is untrusted; never inject it as raw HTML |
+| Per-conversation cap | A looping model can't flood an inbox |
+| `tags` with `source` and `user_id` | Every AI-triggered email is filterable in Reloop logs |
+| Errors returned, not thrown | The model sees the failure and can tell the user |
 
-## Observability
+<Callout type="warning">
+  Treat everything the model writes as untrusted input, including tool arguments. That's why the recipient and sender are not tool parameters at all.
+</Callout>
 
-Every email triggered by the AI agent appears in Reloop's logs with full metadata: subject, recipient, timestamp, delivery status. You can see exactly what your agent sent and when.
+---
+
+## 3. Wire it into a Next.js route
+
+```typescript
+// app/api/chat/route.ts
+import { anthropic } from "@ai-sdk/anthropic";
+import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from "ai";
+import { getSession } from "@/lib/auth";
+import { emailUserTool } from "@/lib/tools/email-user";
+
+export async function POST(req: Request) {
+  const session = await getSession(req);
+  if (!session) return new Response("Unauthorized", { status: 401 });
+
+  const { messages }: { messages: UIMessage[] } = await req.json();
+
+  const result = streamText({
+    model: anthropic("claude-sonnet-5-5"),
+    system:
+      "You are Acme's in-app assistant. Only send email when the user asks " +
+      "for it. Confirm what you sent in one sentence.",
+    messages: await convertToModelMessages(messages),
+    tools: { emailUser: emailUserTool(session.user) },
+    stopWhen: stepCountIs(5),
+  });
+
+  return result.toUIMessageStreamResponse();
+}
+```
+
+`stopWhen: stepCountIs(5)` lets the model call the tool, read the result, and write a final reply, while capping how many round trips one request can take.
+
+On the client, use `useChat` from `@ai-sdk/react` as usual. Nothing about email leaks into the browser: it only sees the assistant's text and the tool result.
+
+---
+
+## 4. Require approval for sends
+
+For a "remind me tomorrow" feature, auto-sending is fine. For anything that goes to someone other than the current user, or anything irreversible, make a human approve it first.
+
+The AI SDK supports this on the tool itself:
+
+```typescript
+return tool({
+  description: "Email the current user.",
+  inputSchema: z.object({ subject: z.string(), body: z.string() }),
+  needsApproval: true,
+  execute: async ({ subject, body }) => {
+    /* same as above */
+  },
+});
+```
+
+With `needsApproval`, the SDK pauses before `execute` and surfaces an approval request in the chat UI. The email is sent only after the user approves it. You can also pass a function to `needsApproval` to require approval conditionally, for example only when `sendAt` is set.
+
+---
+
+## 5. Background jobs: notify when work finishes
+
+Chat is one trigger. The more useful one is often a background job: an export, a report, a long-running agent task. Run the model when the job completes and let it write the notification.
+
+```typescript
+// jobs/export-complete.ts
+import { anthropic } from "@ai-sdk/anthropic";
+import { generateText, stepCountIs } from "ai";
+import { emailUserTool } from "@/lib/tools/email-user";
+
+export async function onExportComplete(job: ExportJob) {
+  await generateText({
+    model: anthropic("claude-sonnet-5-5"),
+    system: "Write a short, specific notification. No marketing language.",
+    prompt:
+      `The user's export "${job.name}" finished with ${job.rows} rows ` +
+      `and ${job.warnings.length} warnings: ${job.warnings.join("; ")}. ` +
+      `Download link: ${job.url}. Email them about it.`,
+    tools: { emailUser: emailUserTool(job.user) },
+    stopWhen: stepCountIs(3),
+  });
+}
+```
+
+The model turns raw job data into a useful message: it mentions the warnings that matter and skips the ones that don't. Reloop handles the delivery.
+
+<Callout type="tip">
+  If the email always has the same structure, skip the model and send a [Reloop template](/docs/learn/templates) with variables. Use the model when the content genuinely changes from case to case.
+</Callout>
+
+---
+
+## 6. Templates for consistent design
+
+Letting the model write the words doesn't mean letting it write the layout. Keep your brand, header and footer in a Reloop template, and pass the model's text in as a variable:
+
+```typescript
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme Assistant <assistant@mail.acme.com>",
+  to: user.email,
+  subject,
+  template: {
+    id: "tmpl_assistant_message",
+    variables: { name: user.name, summary: body },
+  },
+  tags: [{ name: "source", value: "ai_assistant" }],
+});
+```
+
+Your design team owns the template. The model only fills in `summary`.
+
+---
+
+## 7. Observability
+
+Every send the model triggers shows up in Reloop like any other email: recipient, subject, status and delivery events. Because of the tags, you can answer questions like "how many emails did the assistant send yesterday?" by filtering on `source = ai_assistant`.
+
+To react to what happens next, subscribe a webhook to the [email events](/docs/webhooks/event-types) you care about:
+
+| Event | Useful for |
+|---|---|
+| `email.delivered` | Confirm the notification arrived |
+| `email.bounced` | Stop emailing that user; ask them to update their address |
+| `email.complained` | Turn the assistant's email feature off for that user |
+| `email.opened` / `email.clicked` | Feed engagement back into the assistant's context |
+
+---
+
+## Guardrail checklist
+
+- [ ] Recipient comes from the session or job, never from the model
+- [ ] Fixed `from` address on a verified domain
+- [ ] Model output HTML-escaped, or passed into a template variable
+- [ ] Per-conversation or per-user send cap
+- [ ] `needsApproval` for anything beyond self-notifications
+- [ ] `source` tag on every AI-triggered email
+- [ ] `stopWhen` set so a request can't loop forever
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Does this work with models other than Claude?">
+    Yes. The tool is plain AI SDK, so swap `anthropic(...)` for any provider
+    the AI SDK supports. Nothing in the Reloop code changes.
+  </Accordion>
+
+  <Accordion title="Can the model email people other than the user?">
+    It can if you build that tool, but don't make it the default. Use an
+    allowlist (for example, the user's teammates), require approval with
+    `needsApproval`, and log who approved each send.
+  </Accordion>
+
+  <Accordion title="Should I use the Reloop MCP server instead?">
+    MCP is great for assistants like Claude, Cursor or Claude Code acting on
+    your own Reloop account. Inside your product, a narrow tool like the one
+    above is safer, because you control exactly what the model can do. See
+    the [MCP server docs](/docs/integrations/ai-tools/mcp-server).
+  </Accordion>
+
+  <Accordion title="How do I stop duplicate emails when a request retries?">
+    Send through the REST API with an `Idempotency-Key` header derived from
+    the job or message ID. Retries with the same key won't send twice. See
+    [idempotency](/docs/api/idempotency).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Give your AI app an email tool"
+  description="Reliable delivery, logs and webhooks for every email your model sends. Free for 3,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

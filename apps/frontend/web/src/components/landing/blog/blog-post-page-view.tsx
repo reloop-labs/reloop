@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
@@ -8,16 +9,17 @@ import { BlogTableOfContents } from "@reloop/web/components/landing/blog/blog-ta
 import {
 	formatBlogDate,
 	formatBlogDateUpper,
-	formatReadTimeUpper,
+	formatReadTime,
 	getCategoryPath,
 } from "@reloop/web/lib/landing/blog/utils";
 import type {
 	BlogPostDefinition,
 	BlogTocItem,
 } from "@reloop/web/lib/landing/types";
+import { hostedSignupHref } from "@reloop/web/lib/site";
 import Image from "next/image";
 import Link from "next/link";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { siYcombinator } from "simple-icons";
 
 function ArrowLeftIcon({ className }: { className?: string }) {
@@ -96,6 +98,246 @@ function CheckIcon({ className }: { className?: string }) {
 	);
 }
 
+function StackMark({ className }: { className?: string }) {
+	return (
+		<svg
+			className={className}
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			aria-hidden="true"
+		>
+			<g transform="rotate(90, 12, 12)">
+				<path
+					d="M22 10V6.5L12 11.5V15L22 10Z"
+					fill="currentColor"
+					fillOpacity={0.25}
+				/>
+				<path
+					d="M22 17.5V14L12 19V22.5L22 17.5Z"
+					fill="currentColor"
+					fillOpacity={0.25}
+				/>
+				<path d="M12 19V22.3213" stroke="currentColor" />
+				<path
+					d="M2 14L11.3292 18.6646C11.7515 18.8757 12.2485 18.8757 12.6708 18.6646L22 14"
+					stroke="currentColor"
+				/>
+				<path
+					d="M6 12L2.55279 13.7236C2.214 13.893 2 14.2393 2 14.618V16.882C2 17.2607 2.214 17.607 2.55279 17.7764L11.3292 22.1646C11.7515 22.3757 12.2485 22.3757 12.6708 22.1646L21.4472 17.7764C21.786 17.607 22 17.2607 22 16.882V14.618C22 14.2393 21.786 13.893 21.4472 13.7236L18 12"
+					stroke="currentColor"
+				/>
+				<path d="M12 11.5V14.8229" stroke="currentColor" />
+				<path
+					d="M2 6.5L11.3292 11.1646C11.7515 11.3757 12.2485 11.3757 12.6708 11.1646L22 6.5"
+					stroke="currentColor"
+				/>
+				<path
+					d="M11.3292 14.6646L2.55279 10.2764C2.214 10.107 2 9.76074 2 9.38197V7.11803C2 6.73926 2.214 6.393 2.55279 6.22361L11.3292 1.83541C11.7515 1.62426 12.2485 1.62426 12.6708 1.83541L21.4472 6.22361C21.786 6.393 22 6.73926 22 7.11803V9.38197C22 9.76074 21.786 10.107 21.4472 10.2764L12.6708 14.6646C12.2485 14.8757 11.7515 14.8757 11.3292 14.6646Z"
+					stroke="currentColor"
+				/>
+			</g>
+		</svg>
+	);
+}
+
+const floatingCardClassName =
+	"w-full rounded-2xl border border-stroke-soft-200 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_32px_-16px_rgba(0,0,0,0.14)] dark:border-white/10 dark:bg-bg-weak-50 dark:shadow-none";
+
+const shareButtonClassName =
+	"flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white";
+
+function ShareButtons({ title }: { title: string }) {
+	const [copied, setCopied] = useState(false);
+
+	const handleCopyLink = () => {
+		if (typeof window !== "undefined") {
+			navigator.clipboard.writeText(window.location.href);
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		}
+	};
+
+	const shareTitle = encodeURIComponent(title);
+	const [shareUrl, setShareUrl] = useState("");
+
+	useEffect(() => {
+		setShareUrl(encodeURIComponent(window.location.href));
+	}, []);
+
+	return (
+		<div className="flex items-center gap-2">
+			<a
+				href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
+				target="_blank"
+				rel="noopener noreferrer"
+				className={shareButtonClassName}
+				aria-label="Share on LinkedIn"
+			>
+				<Icon name="linkedin" className="size-3.5" />
+			</a>
+			<a
+				href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
+				target="_blank"
+				rel="noopener noreferrer"
+				className={shareButtonClassName}
+				aria-label="Share on X"
+			>
+				<Icon name="twitter" className="size-3.5" />
+			</a>
+			<a
+				href={`https://news.ycombinator.com/submitlink?u=${shareUrl}&t=${shareTitle}`}
+				target="_blank"
+				rel="noopener noreferrer"
+				className={shareButtonClassName}
+				aria-label="Share on Hacker News"
+			>
+				<svg
+					className="size-3.5 fill-current"
+					viewBox="0 0 24 24"
+					aria-hidden="true"
+				>
+					<path d={siYcombinator.path} />
+				</svg>
+				<span className="sr-only">Share on Hacker News</span>
+			</a>
+			<button
+				type="button"
+				onClick={handleCopyLink}
+				className={shareButtonClassName}
+				aria-label="Copy link"
+				title={copied ? "Copied!" : "Copy link"}
+			>
+				{copied ? (
+					<CheckIcon className="size-3.5 text-text-strong-950 dark:text-white" />
+				) : (
+					<LinkIcon className="size-3.5" />
+				)}
+			</button>
+		</div>
+	);
+}
+
+function TocCard({
+	toc,
+	className,
+}: {
+	toc: BlogTocItem[];
+	className?: string;
+}) {
+	return (
+		<div className={cn(floatingCardClassName, "flex flex-col", className)}>
+			{toc.length > 0 ? (
+				<>
+					<h2 className="mb-3 font-medium text-sm text-text-strong-950 dark:text-white">
+						On this page
+					</h2>
+					<div className="-mr-2 min-h-0 overflow-y-auto pr-2">
+						<BlogTableOfContents items={toc} showHeader={false} />
+					</div>
+				</>
+			) : null}
+			<Link
+				href="/blog"
+				className={cn(
+					"inline-flex items-center gap-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
+					toc.length > 0 &&
+						"-mx-5 mt-4 border-stroke-soft-200 border-t px-5 pt-4 dark:border-white/10",
+				)}
+			>
+				<ArrowLeftIcon className="size-3.5 shrink-0 select-none" />
+				<span>All articles</span>
+			</Link>
+		</div>
+	);
+}
+
+function GetStartedCard() {
+	return (
+		<div className={floatingCardClassName}>
+			<div className="relative flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-xl border border-stroke-soft-200/70 bg-bg-weak-50/60 text-text-strong-950 dark:border-white/[0.06] dark:bg-black/40 dark:text-white">
+				<div
+					className="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.06]"
+					style={{
+						backgroundImage:
+							"repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 10px)",
+					}}
+				/>
+				<svg
+					className="pointer-events-none absolute inset-0 size-full text-text-strong-950/[0.06] dark:text-white/[0.07]"
+					viewBox="0 0 200 112"
+					fill="none"
+					aria-hidden="true"
+				>
+					<circle
+						cx="100"
+						cy="56"
+						r="26"
+						stroke="currentColor"
+						strokeDasharray="3 3"
+					/>
+					<circle
+						cx="100"
+						cy="56"
+						r="50"
+						stroke="currentColor"
+						strokeWidth="0.75"
+					/>
+					<circle
+						cx="100"
+						cy="56"
+						r="78"
+						stroke="currentColor"
+						strokeDasharray="4 4"
+					/>
+				</svg>
+				<StackMark className="relative size-16" />
+			</div>
+
+			<p className="mt-5 font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-widest dark:text-white/45">
+				Get started
+			</p>
+			<h3 className="mt-1.5 font-semibold text-text-strong-950 text-xl tracking-tight dark:text-white">
+				Ready to send?
+			</h3>
+			<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed dark:text-white/60">
+				Email API, SMTP relay and agent inboxes.{" "}
+				<span className="font-medium text-text-strong-950 dark:text-white">
+					Open source, self-host or cloud.
+				</span>
+			</p>
+
+			<div className="mt-5 flex flex-col gap-2">
+				<a
+					href={hostedSignupHref}
+					className="inline-flex h-9 items-center justify-center rounded-xl bg-text-strong-950 font-medium text-sm text-white transition-colors hover:bg-text-strong-950/85 active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-white/90"
+				>
+					Start for free
+				</a>
+				<a
+					href="/docs"
+					className="inline-flex h-9 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-weak-50 font-medium text-sm text-text-strong-950 transition-colors hover:border-stroke-soft-300 active:scale-[0.98] dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:border-white/20"
+				>
+					Read the docs
+				</a>
+			</div>
+
+			<a
+				href="/llms.txt"
+				className="group mt-4 flex items-center justify-center gap-1 text-text-soft-400 text-xs transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
+			>
+				<span>AI agent? Read llms.txt</span>
+				<span
+					aria-hidden="true"
+					className="transition-transform duration-200 group-hover:translate-x-0.5"
+				>
+					→
+				</span>
+			</a>
+		</div>
+	);
+}
+
 export function BlogPostPageView({
 	post,
 	body,
@@ -107,361 +349,174 @@ export function BlogPostPageView({
 	toc: BlogTocItem[];
 	relatedPosts?: BlogPostDefinition[];
 }) {
-	const [copied, setCopied] = useState(false);
+	const mainRef = useRef<HTMLElement>(null);
+	const [railsVisible, setRailsVisible] = useState(false);
 
-	const handleCopyLink = () => {
-		if (typeof window !== "undefined") {
-			navigator.clipboard.writeText(window.location.href);
-			setCopied(true);
-			setTimeout(() => setCopied(false), 2000);
-		}
-	};
-
-	const shareTitle = encodeURIComponent(post.title);
-	const shareUrl =
-		typeof window !== "undefined"
-			? encodeURIComponent(window.location.href)
-			: "";
+	// Show the side cards only while the article crosses the middle of the viewport,
+	// so they never sit on top of the header or the CTA below.
+	useEffect(() => {
+		const main = mainRef.current;
+		if (!main) return;
+		const observer = new IntersectionObserver(
+			([entry]) => setRailsVisible(entry?.isIntersecting ?? false),
+			{ rootMargin: "-50% 0px -50% 0px" },
+		);
+		observer.observe(main);
+		return () => observer.disconnect();
+	}, []);
 
 	return (
 		<div className="min-h-dvh bg-white dark:bg-black">
-			{/* Top Header Section with Full-Width Horizontal Border */}
+			{/* Header */}
 			<div className="w-full border-stroke-soft-200 border-b dark:border-white/10">
-				<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 pt-32 pb-14 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
-					<header className="text-left">
-						<div className="flex w-full max-w-[680px] flex-col gap-4">
-							<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
-								<Link
-									href={getCategoryPath(post.category)}
-									className="text-primary-base transition-opacity hover:opacity-80"
-								>
-									{post.category}
-								</Link>
-								<span className="text-text-soft-400 dark:text-white/30">/</span>
-								<time
-									dateTime={post.publishedAt}
-									className="text-text-sub-600 dark:text-white/60"
-								>
-									{formatBlogDateUpper(post.publishedAt)}
-								</time>
+				<div className="mx-auto w-full max-w-7xl border-stroke-soft-100 border-x px-4 pt-32 pb-12 sm:px-6 lg:px-8 dark:border-white/10">
+					<header className="mx-auto flex w-full max-w-[720px] flex-col gap-4">
+						<div className="flex flex-wrap items-center gap-2 font-medium font-mono text-xs/[150%] uppercase tracking-[0.6px]">
+							<Link
+								href={getCategoryPath(post.category)}
+								className="text-primary-base transition-opacity hover:opacity-80"
+							>
+								{post.category}
+							</Link>
+							<span className="text-text-soft-400 dark:text-white/30">/</span>
+							<time
+								dateTime={post.publishedAt}
+								className="text-text-sub-600 dark:text-white/60"
+							>
+								{formatBlogDateUpper(post.publishedAt)}
+							</time>
+						</div>
+						<h1 className="text-balance font-semibold text-2xl text-text-strong-950 leading-tight tracking-tight sm:text-3xl lg:text-[2.125rem] dark:text-white">
+							{post.title}
+						</h1>
+						<div className="mt-2 flex flex-wrap items-center justify-between gap-4">
+							<div className="flex items-center gap-3">
+								{post.author.avatar ? (
+									<Image
+										src={post.author.avatar}
+										alt={post.author.name}
+										width={36}
+										height={36}
+										className="size-9 shrink-0 rounded-full border border-stroke-soft-200 object-cover dark:border-white/10"
+									/>
+								) : (
+									<div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-neutral-900 font-medium text-sm text-white dark:bg-white/10 dark:text-white">
+										{post.author.name.charAt(0)}
+									</div>
+								)}
+								<div>
+									<p className="font-semibold text-sm text-text-strong-950 leading-snug dark:text-white">
+										{post.author.name}
+									</p>
+									<p className="text-text-sub-600 text-xs dark:text-white/50">
+										{post.author.role || "Engineering"}
+										<span className="mx-1.5 text-text-soft-400 dark:text-white/30">
+											·
+										</span>
+										{formatReadTime(post.readTime)}
+									</p>
+								</div>
 							</div>
-							<h1 className="font-semibold text-text-strong-950 text-xl leading-snug tracking-tight sm:text-2xl lg:text-[1.65rem] dark:text-white">
-								{post.title}
-							</h1>
-							<p className="font-medium font-mono text-text-sub-600 text-xs/[150%] uppercase tracking-[0.6px] dark:text-white/60">
-								{formatReadTimeUpper(post.readTime)}
-							</p>
+							<ShareButtons title={post.title} />
 						</div>
 					</header>
 				</div>
 			</div>
 
-			{/* Main Article Container */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
-				{/* 3-Column Content Grid */}
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr_240px] lg:gap-0">
-					{/* Left Column: Table of Contents */}
-					<aside className="lg:border-stroke-soft-200 lg:border-r lg:pt-10 lg:pr-6 lg:pb-16 dark:lg:border-white/10">
-						<div className="space-y-5 lg:sticky lg:top-28">
-							<Link
-								href="/blog"
-								className="inline-flex items-center gap-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
-							>
-								<ArrowLeftIcon className="size-3.5 shrink-0 select-none" />
-								<span>All articles</span>
-							</Link>
-							{toc.length > 0 ? <BlogTableOfContents items={toc} /> : null}
+			{/* Article with floating side cards */}
+			<div className="mx-auto w-full max-w-7xl border-stroke-soft-100 border-x px-4 sm:px-6 lg:px-8 dark:border-white/10">
+				<aside
+					aria-label="Table of contents"
+					className={cn(
+						"-translate-y-1/2 fixed top-1/2 left-4 z-30 hidden w-[260px] transition-opacity duration-300 xl:block",
+						railsVisible ? "opacity-100" : "pointer-events-none opacity-0",
+					)}
+				>
+					<TocCard toc={toc} className="max-h-[calc(100dvh-8rem)]" />
+				</aside>
+				<aside
+					aria-label="Get started"
+					className={cn(
+						"-translate-y-1/2 fixed top-1/2 right-4 z-30 hidden w-[260px] transition-opacity duration-300 xl:block",
+						railsVisible ? "opacity-100" : "pointer-events-none opacity-0",
+					)}
+				>
+					<GetStartedCard />
+				</aside>
+
+				<main
+					ref={mainRef}
+					className="mx-auto w-full min-w-0 max-w-[720px] space-y-8 pt-10 pb-16"
+				>
+					<TocCard toc={toc} className="xl:hidden" />
+
+					{post.image ? (
+						<div className="overflow-hidden rounded-2xl">
+							<BlogPostCoverImage
+								slug={post.slug}
+								image={post.image}
+								alt={post.title}
+								priority
+								variant="hero"
+							/>
 						</div>
-					</aside>
+					) : null}
 
-					{/* Center Column: Main Content */}
-					<main className="min-w-0 space-y-8 lg:px-8 lg:pt-10 lg:pb-16 xl:px-10">
-						{/* Cover / Benchmark Image */}
-						{post.image ? (
-							<div className="overflow-hidden rounded-2xl">
-								<BlogPostCoverImage
-									slug={post.slug}
-									image={post.image}
-									alt={post.title}
-									priority
-									variant="hero"
-								/>
+					{post.description ? (
+						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 p-6 dark:border-white/10 dark:bg-white/[0.03]">
+							<div className="mb-3 flex items-center gap-1.5 font-mono font-semibold text-[11px] text-primary-base uppercase tracking-widest">
+								<SparklesIcon className="size-3" />
+								<span>Summary</span>
 							</div>
-						) : null}
+							<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
+								{post.description}
+							</p>
+						</div>
+					) : null}
 
-						{/* Summary Box */}
-						{post.description ? (
-							<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/70 p-6 dark:border-white/10 dark:bg-white/[0.03]">
-								<div className="mb-3 flex items-center gap-1.5 font-mono font-semibold text-[11px] text-primary-base uppercase tracking-widest">
-									<SparklesIcon className="size-3" />
-									<span>Summary</span>
-								</div>
-								<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[14.5px] dark:text-white/60">
-									{post.description}
-								</p>
-							</div>
-						) : null}
+					<BlogBody>{body}</BlogBody>
 
-						{/* Blog Article Body */}
-						<BlogBody>{body}</BlogBody>
-
-						{/* Read More Section */}
-						{relatedPosts.length > 0 ? (
-							<div className="-mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-10 border-stroke-soft-200 border-t px-4 pt-5 sm:px-6 lg:px-8 xl:px-10 dark:border-white/10">
-								<h2 className="mb-6 font-semibold text-text-strong-950 tracking-tight dark:text-white">
-									Read more
-								</h2>
-								<div className="flex flex-col gap-6 sm:gap-7">
-									{relatedPosts.map((relatedPost) => (
-										<Link
-											key={relatedPost.slug}
-											href={`/blog/${relatedPost.slug}`}
-											className="group flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5"
-										>
-											<div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl bg-bg-weak-50/50 sm:w-44 md:w-48 dark:bg-white/[0.04]">
-												<BlogPostCoverImage
-													slug={relatedPost.slug}
-													image={relatedPost.image}
-													alt={relatedPost.title}
-												/>
-											</div>
-											<div className="flex flex-col justify-center space-y-1">
-												<h3 className="font-semibold text-base text-text-strong-950 decoration-text-strong-950/40 underline-offset-4 transition-colors group-hover:underline dark:text-white dark:group-hover:decoration-white/40">
-													{relatedPost.title}
-												</h3>
-												<p className="line-clamp-2 text-text-sub-600 text-xs leading-relaxed sm:text-sm dark:text-white/70">
-													{relatedPost.description}
-												</p>
-												<time
-													dateTime={relatedPost.publishedAt}
-													className="text-text-sub-600 text-xs dark:text-white/50"
-												>
-													{formatBlogDate(relatedPost.publishedAt)}
-												</time>
-											</div>
-										</Link>
-									))}
-								</div>
-							</div>
-						) : null}
-					</main>
-
-					{/* Right Column: Author Info, Share & Conversion Card */}
-					<aside className="lg:border-stroke-soft-200 lg:border-l lg:pt-10 lg:pb-16 lg:pl-6 dark:lg:border-white/10">
-						<div className="space-y-8 lg:sticky lg:top-28">
-							{/* Author Card */}
-							<div>
-								<h3 className="mb-3 font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-widest dark:text-white/45">
-									Written by
-								</h3>
-								<div className="flex items-center gap-3">
-									{post.author.avatar ? (
-										<Image
-											src={post.author.avatar}
-											alt={post.author.name}
-											width={40}
-											height={40}
-											className="size-10 shrink-0 rounded-full border border-stroke-soft-200 object-cover dark:border-white/10"
-										/>
-									) : (
-										<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-900 font-medium text-sm text-white dark:bg-white/10 dark:text-white">
-											{post.author.name.charAt(0)}
-										</div>
-									)}
-									<div>
-										<p className="font-semibold text-sm text-text-strong-950 leading-snug dark:text-white">
-											{post.author.name}
-										</p>
-										<p className="text-text-sub-600 text-xs dark:text-white/50">
-											{post.author.role || "Engineering"}
-										</p>
-									</div>
-								</div>
-							</div>
-
-							{/* Share Article Section */}
-							<div>
-								<h3 className="mb-3 font-medium font-mono text-[11px] text-text-sub-600 uppercase tracking-widest dark:text-white/45">
-									Share this article
-								</h3>
-								<div className="flex items-center gap-2">
-									<a
-										href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
-										aria-label="Share on LinkedIn"
+					{relatedPosts.length > 0 ? (
+						<div className="border-stroke-soft-200 border-t pt-8 dark:border-white/10">
+							<h2 className="mb-6 font-semibold text-text-strong-950 tracking-tight dark:text-white">
+								Read more
+							</h2>
+							<div className="flex flex-col gap-6 sm:gap-7">
+								{relatedPosts.map((relatedPost) => (
+									<Link
+										key={relatedPost.slug}
+										href={`/blog/${relatedPost.slug}`}
+										className="group flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5"
 									>
-										<Icon name="linkedin" className="size-3.5" />
-									</a>
-									<a
-										href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
-										aria-label="Share on X"
-									>
-										<Icon name="twitter" className="size-3.5" />
-									</a>
-									{/** biome-ignore lint/a11y/useAnchorContent: <explanation> */}
-									<a
-										href={`https://news.ycombinator.com/submitlink?u=${shareUrl}&t=${shareTitle}`}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
-										aria-label="Share on Hacker News"
-									>
-										<svg
-											className="size-3.5 fill-current"
-											viewBox="0 0 24 24"
-											aria-hidden="true"
-										>
-											<path d={siYcombinator.path} />
-										</svg>
-									</a>
-									<button
-										type="button"
-										onClick={handleCopyLink}
-										className="flex size-8 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/20 dark:hover:text-white"
-										aria-label="Copy link"
-										title={copied ? "Copied!" : "Copy link"}
-									>
-										{copied ? (
-											<CheckIcon className="size-3.5 text-primary-base" />
-										) : (
-											<LinkIcon className="size-3.5" />
-										)}
-									</button>
-								</div>
-							</div>
-
-							{/* Dub-style Product CTA Card */}
-							<a
-								href="/dashboard/signup"
-								className="group relative block overflow-hidden rounded-2xl border border-stroke-soft-200/80 bg-white p-3.5 transition-all duration-200 hover:border-stroke-soft-300 hover:shadow-black/5 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20 dark:hover:shadow-black/40"
-							>
-								{/* Top Product Preview SVG */}
-								<div className="relative mb-3.5 flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-xl bg-bg-weak-50/40 p-3.5 text-text-strong-950 transition-colors duration-200 dark:bg-neutral-900/30 dark:text-white">
-									{/* Top Right Circular Arrow Badge (visible on hover, stationary, no shadow) */}
-									<div className="pointer-events-none absolute top-1 right-1 z-20 flex size-8 items-center justify-center rounded-full border border-stroke-soft-200/80 bg-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 dark:border-white/15 dark:bg-neutral-900">
-										<svg
-											className="size-4 shrink-0 text-text-strong-950 dark:text-white"
-											viewBox="0 0 16 16"
-											fill="none"
-											xmlns="http://www.w3.org/2000/svg"
-											aria-hidden="true"
-										>
-											<path
-												d="M4.5 11.5L11.5 4.5M11.5 4.5H5.5M11.5 4.5V10.5"
-												stroke="currentColor"
-												strokeWidth="1.5"
-												strokeLinecap="round"
-												strokeLinejoin="round"
+										<div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-xl bg-bg-weak-50/50 sm:w-44 md:w-48 dark:bg-white/[0.04]">
+											<BlogPostCoverImage
+												slug={relatedPost.slug}
+												image={relatedPost.image}
+												alt={relatedPost.title}
 											/>
-										</svg>
-									</div>
-
-									{/* Subtle grey diagonal hatch pattern */}
-									<div
-										className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
-										style={{
-											backgroundImage:
-												"repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 10px)",
-										}}
-									/>
-
-									{/* Subtle grey concentric orbital & dotted rings */}
-									<svg
-										className="pointer-events-none absolute inset-0 size-full text-text-strong-950/[0.05] dark:text-white/[0.06]"
-										viewBox="0 0 200 120"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-										aria-hidden="true"
-									>
-										<circle
-											cx="100"
-											cy="60"
-											r="28"
-											stroke="currentColor"
-											strokeDasharray="3 3"
-										/>
-										<circle
-											cx="100"
-											cy="60"
-											r="54"
-											stroke="currentColor"
-											strokeWidth="0.75"
-										/>
-										<circle
-											cx="100"
-											cy="60"
-											r="82"
-											stroke="currentColor"
-											strokeDasharray="4 4"
-										/>
-									</svg>
-
-									{/* Ultra subtle blue glow */}
-									<div className="pointer-events-none absolute size-32 rounded-full bg-gradient-to-tr from-blue-500/[0.06] via-sky-400/[0.04] to-indigo-500/[0.04] blur-2xl transition-transform duration-500 group-hover:scale-125 dark:from-blue-500/[0.08] dark:via-sky-400/[0.06] dark:to-indigo-500/[0.06]" />
-
-									<svg
-										className="relative z-10 size-24 text-text-strong-950 transition-transform duration-200 ease-out group-hover:scale-105 dark:text-white"
-										viewBox="0 0 24 24"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-										aria-hidden="true"
-									>
-										<g transform="rotate(90, 12, 12)">
-											<g fill="none">
-												<path
-													d="M22 10V6.5L12 11.5V15L22 10Z"
-													fill="currentColor"
-													fillOpacity={0.25}
-												/>
-												<path
-													d="M22 17.5V14L12 19V22.5L22 17.5Z"
-													fill="currentColor"
-													fillOpacity={0.25}
-												/>
-												<path d="M12 19V22.3213" stroke="currentColor" />
-												<path
-													d="M2 14L11.3292 18.6646C11.7515 18.8757 12.2485 18.8757 12.6708 18.6646L22 14"
-													stroke="currentColor"
-												/>
-												<path
-													d="M6 12L2.55279 13.7236C2.214 13.893 2 14.2393 2 14.618V16.882C2 17.2607 2.214 17.607 2.55279 17.7764L11.3292 22.1646C11.7515 22.3757 12.2485 22.3757 12.6708 22.1646L21.4472 17.7764C21.786 17.607 22 17.2607 22 16.882V14.618C22 14.2393 21.786 13.893 21.4472 13.7236L18 12"
-													stroke="currentColor"
-												/>
-												<path d="M12 11.5V14.8229" stroke="currentColor" />
-												<path
-													d="M2 6.5L11.3292 11.1646C11.7515 11.3757 12.2485 11.3757 12.6708 11.1646L22 6.5"
-													stroke="currentColor"
-												/>
-												<path
-													d="M11.3292 14.6646L2.55279 10.2764C2.214 10.107 2 9.76074 2 9.38197V7.11803C2 6.73926 2.214 6.393 2.55279 6.22361L11.3292 1.83541C11.7515 1.62426 12.2485 1.62426 12.6708 1.83541L21.4472 6.22361C21.786 6.393 22 6.73926 22 7.11803V9.38197C22 9.76074 21.786 10.107 21.4472 10.2764L12.6708 14.6646C12.2485 14.8757 11.7515 14.8757 11.3292 14.6646Z"
-													stroke="currentColor"
-												/>
-											</g>
-										</g>
-									</svg>
-								</div>
-
-								{/* Text content below preview */}
-								<div className="space-y-1.5 px-0.5">
-									<h4 className="font-bold text-base text-text-strong-950 tracking-tight dark:text-white">
-										Get started
-									</h4>
-									<p className="font-medium text-[13.5px] text-text-sub-600 leading-snug transition-colors duration-200 group-hover:text-text-strong-950 group-hover:underline group-hover:decoration-text-soft-400 group-hover:underline-offset-4 dark:text-white/60 dark:group-hover:text-white/90 dark:group-hover:decoration-white/30">
-										Email API for developers. With agent inboxes built in.
-									</p>
-								</div>
-							</a>
+										</div>
+										<div className="flex flex-col justify-center space-y-1">
+											<h3 className="font-semibold text-base text-text-strong-950 decoration-text-strong-950/40 underline-offset-4 transition-colors group-hover:underline dark:text-white dark:group-hover:decoration-white/40">
+												{relatedPost.title}
+											</h3>
+											<p className="line-clamp-2 text-text-sub-600 text-xs leading-relaxed sm:text-sm dark:text-white/70">
+												{relatedPost.description}
+											</p>
+											<time
+												dateTime={relatedPost.publishedAt}
+												className="text-text-sub-600 text-xs dark:text-white/50"
+											>
+												{formatBlogDate(relatedPost.publishedAt)}
+											</time>
+										</div>
+									</Link>
+								))}
+							</div>
 						</div>
-					</aside>
-				</div>
+					) : null}
+				</main>
 			</div>
 
-			{/* CTA Section */}
 			<BlogCta
 				category={post.category}
 				headlineLine1="Ship your first email with Reloop"

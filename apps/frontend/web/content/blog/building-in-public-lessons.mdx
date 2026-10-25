@@ -1,15 +1,17 @@
 ---
 title: "Building in Public: Lessons From Growing Reloop"
-description: What we've learned building Reloop in public, from the first commit to shipping real features, growing the community, and staying focused.
+description: "What we've learned building Reloop, an open-source email platform, in public since July 2025: shipping order, rewriting early, public changelogs, docs as product, writing for AI agents, and what open source changes."
 keywords:
   - building in public
-  - open source saas lessons
-  - building open source project
-  - indie hacker email tool
+  - open source startup lessons
+  - build in public developer tools
+  - open source email infrastructure
+  - public changelog
 publishedAt: 2026-09-15
 category: Open Source
-tags: [open-source, building-in-public, company, growth]
-readTime: 7 min read
+tags: [open-source, building-in-public, company, lessons]
+readTime: 8 min read
+image: /blog/images/building-in-public-lessons.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -17,33 +19,169 @@ author:
 draft: false
 relatedSlugs:
   - why-we-open-sourced-email-infrastructure
+  - introducing-reloop
   - self-hosted-email-infrastructure
 ---
 
-## Why we build in public
+**Building in public is mostly a discipline, not a marketing tactic.** For us it has meant an open repository, a public changelog for everything we ship, docs written before people ask, and saying plainly what Reloop doesn't do yet. Those habits have shaped the product more than any launch.
 
-Building in public forces clarity. When you have to explain what you're working on and why, you can't hide behind vague roadmap items. It also builds an audience before you have a product, and creates accountability that solo or small-team projects often lack.
+Reloop's first commit landed on July 31, 2025. Since then the repository has grown to more than 5,900 commits, 21 backend services, 66 public changelog entries and over 370 documentation pages. Here's what we've learned along the way. Every number in this post comes from the repo, so you can check it.
 
-## Lesson 1: Ship something embarrassingly early
+---
 
-The first version of Reloop was a Docker Compose file and a basic SMTP relay. No dashboard, no API, no analytics. We shared it anyway. The feedback shaped every subsequent decision more than any internal planning session.
+## What "in public" means for us
 
-## Lesson 2: Documentation is marketing
+"Building in public" gets used loosely, so here's what we actually do:
 
-Every time we wrote a "how to deploy on Coolify" or "how to configure DKIM" guide, we got inbound traffic from people who needed exactly that. Documentation compounds. It's the gift that keeps giving without ongoing effort.
+| Practice | Where you can see it |
+|---|---|
+| Source code is open (Apache 2.0) | [github.com/reloop-labs/reloop](https://github.com/reloop-labs/reloop) |
+| Every notable release gets a changelog entry | [/changelog](/changelog) |
+| Docs ship with the feature, not after | [/docs](/docs) |
+| Pricing is public, including what self-hosting costs | [/pricing](/pricing) |
+| Comparisons say where competitors are better | [/compare](/compare) |
+| The product is usable by AI agents, not just humans | [/llms.txt](/llms.txt), MCP server |
 
-## Lesson 3: GitHub stars lag real interest by weeks
+We don't publish revenue dashboards or daily metrics threads. That's a valid version of building in public, but it's not ours. Ours is: you can read the code, see what changed, and know what you're getting.
 
-When something gets shared on Hacker News or a relevant subreddit, stars spike 3–5 days later, not immediately. Don't judge the success of a post by the day-of numbers.
+---
 
-## Lesson 4: The community knows what to build next
+## Lesson 1: Ship the boring core first
 
-Our most-requested features have consistently surprised us. Things we assumed were "nice to have" turned out to be table stakes for certain users. The issues tab and Discord are better product research than any framework.
+Our first month of changelog entries, from August 2025, reads like a list of things nobody tweets about:
 
-## Lesson 5: Consistency beats intensity
+- Domain DNS verification for SPF, DKIM and DMARC
+- KumoMTA as the SMTP engine
+- DNS record status badges and quick copy
+- A "send test email" tool in the dashboard
 
-Shipping once a month consistently, with updates and changelogs, compounds over time. A two-week sprint followed by silence loses momentum and community trust.
+No campaigns, no AI, no automations. Just: can you verify a domain and get an email delivered?
 
-## What's next
+That order was deliberate. Email infrastructure lives or dies on deliverability. A beautiful campaign builder on top of mail that lands in spam is worthless. Getting authentication and the MTA right first meant everything we built later inherited a working foundation.
 
-We'll keep shipping in public. If you want to follow along, watch the [GitHub repo](https://github.com/reloop-labs/reloop), join the Discord, or subscribe to the blog. We're just getting started.
+**What we'd tell others:** find the part of your product that has to be boring and correct, and ship that before anything people will screenshot.
+
+---
+
+## Lesson 2: Rewrite early, while it's cheap
+
+In September 2025, about six weeks in, we migrated the data layer to Drizzle ORM on PostgreSQL. In November 2025 we built background jobs on Inngest. Today that event layer runs on NATS JetStream inside our own stack.
+
+Each of those was a rewrite of something that already worked. They were worth it because:
+
+- **Self-hosting changes the constraints.** A dependency that's fine for a hosted SaaS becomes a problem when every self-hoster has to run it too. Moving the event bus into the stack meant one less external service for people deploying Reloop themselves.
+- **Early rewrites are small.** Changing the ORM with a few thousand lines of code is an afternoon of pain. Changing it a year later is a quarter.
+- **Doing it in public keeps you honest.** When the changelog says "Migration to Drizzle ORM & PostgreSQL", you have to actually finish it.
+
+**What we'd tell others:** if an early architectural choice is wrong for where the product is going, change it now. The cost only goes up.
+
+---
+
+## Lesson 3: A public changelog is a forcing function
+
+We've published 66 changelog entries since August 2025. A few things happen when every release has to be written up:
+
+1. **You ship smaller.** A changelog entry needs a clear "what changed". That pushes features into shippable pieces instead of month-long branches.
+2. **You think about the user's next step.** A feature written up for strangers has to make sense on its own. That's why entries like "Webhook Retry Engine & Test Delivery Tool" pair the capability with the way to try it.
+3. **Users can see momentum.** For an infrastructure product, people need to trust it's maintained before they put password resets on it. A dated changelog is the most honest proof.
+
+The changelog isn't marketing copy. It's a record. Entries say what shipped, not what's coming.
+
+---
+
+## Lesson 4: Docs are part of the product
+
+Our docs site has more than 370 pages. A lot of them are unglamorous: DNS setup for GoDaddy, Namecheap, Cloudflare, Route 53, Hetzner, Porkbun and others; troubleshooting pages for SPF conflicts, MX conflicts and domains that won't verify.
+
+Those pages exist because domain setup is where most people get stuck with any email provider. Every guide we write is one fewer person who gives up at the DNS step.
+
+Two rules we follow:
+
+- **Write the doc when you ship the feature.** If it can't be explained clearly, the feature probably isn't done.
+- **Errors link to docs.** Every Reloop API error returns a `message`, a `why`, a `fix` and a `link` to the relevant page. The docs are where the error message sends you, so they have to be right.
+
+---
+
+## Lesson 5: Write for AI agents, not just people
+
+In mid-2026 we shipped the [Reloop MCP server](/docs/integrations/ai-tools/mcp-server), standardized `llms.txt` and `skill.md` endpoints, and copy-paste setup prompts for AI coding tools like Cursor, Claude Code and Windsurf.
+
+A growing share of developers meet a new API through their coding assistant rather than through the docs homepage. If the assistant can't find accurate information about your product, it guesses, and the guesses are usually wrong.
+
+What that looks like in practice:
+
+- An [`llms.txt`](/llms.txt) index of the docs, so agents can find the right page
+- Markdown versions of pages, which are cheaper and cleaner for models to read
+- An OpenAPI spec generated from the code, so it can't drift from the real API
+- An MCP server so an agent can send email, manage templates and read an inbox directly
+
+**What we'd tell others:** treat "can an AI assistant use our product correctly?" as a real acceptance test.
+
+---
+
+## Lesson 6: Open source changes who you're accountable to
+
+Reloop is licensed under Apache 2.0 and can be self-hosted with a single install command. That changes the relationship with users in ways we didn't fully expect.
+
+- **People read the code before they trust it.** Security reviews and "how does this actually work?" questions are answered by the source, not by a sales call.
+- **Self-hosters run it in places you don't.** Different networks, DNS resolvers and hosting providers. That's why the self-hosting docs go into detail on things like outbound DNS and port 25.
+- **You can't hide limitations.** If a feature isn't there, anyone can see it isn't there. So we say so: our [comparison pages](/compare) mark features we don't have yet, like A/B testing, as "No".
+
+We wrote more about the decision in [why we open-sourced our email infrastructure](/blog/why-we-open-sourced-email-infrastructure).
+
+---
+
+## Lesson 7: Be honest about what's not done
+
+The easiest way to lose trust in public is to overclaim. So we've adopted a few rules for everything we publish, including this blog:
+
+| We do | We don't |
+|---|---|
+| Cite pricing from public pages and link to them | Quote competitor prices from memory |
+| Say "we build Reloop" in comparison posts | Pretend to be a neutral review site |
+| Mark beta features as beta | Announce features before they ship |
+| Use numbers from the repo or the product | Invent growth metrics |
+
+This post follows the same rules. You won't find a revenue chart here, because we haven't published one.
+
+---
+
+## Follow along
+
+If you want to see what we ship next:
+
+- Watch or star the [GitHub repo](https://github.com/reloop-labs/reloop)
+- Read the [changelog](/changelog)
+- Subscribe to the [blog feed](/blog/feed.xml)
+
+And if you're building something in public yourself, our advice is short: ship the boring parts first, write it all down, and don't claim anything you can't link to.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is all of Reloop open source?">
+    The email platform is Apache 2.0 and self-hostable, including the API,
+    MTA, inboxes, campaigns, automations and dashboard. A few pieces only make
+    sense for the hosted service, like billing, and are left out of the
+    self-hosted install.
+  </Accordion>
+
+  <Accordion title="How often do you ship?">
+    Continuously. The repository has thousands of commits since July 2025,
+    and the public changelog has an entry for each notable release.
+  </Accordion>
+
+  <Accordion title="Can I contribute?">
+    Yes. Read CONTRIBUTING.md in the repository for the setup, commit
+    conventions and how pull requests are reviewed.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="See what we're building"
+  description="Open-source email infrastructure: API, SMTP, campaigns, automations and agent inboxes."
+  href="https://github.com/reloop-labs/reloop"
+  label="View on GitHub"
+/>

@@ -1,15 +1,19 @@
 ---
 title: "Building a Webhook Delivery System That Actually Retries"
-description: How Reloop built a reliable, observable webhook delivery system with exponential backoff, signature verification, and replay support.
+description: "How Reloop delivers webhooks: idempotent events, per-endpoint filters and rate limits, HMAC-SHA256 signatures, SSRF protection with DNS pinning, a 7-attempt retry schedule over 17 hours, auto-disable and manual replays."
 keywords:
   - webhook delivery system
-  - reliable webhooks nodejs
-  - webhook retry exponential backoff
+  - reliable webhooks
+  - webhook retry schedule
   - webhook signature verification
+  - hmac sha256 webhooks
+  - webhook ssrf protection
+  - bullmq webhooks
 publishedAt: 2026-07-15
 category: Engineering
-tags: [webhooks, reliability, nodejs, architecture]
-readTime: 8 min read
+tags: [webhooks, reliability, bullmq, security, architecture]
+readTime: 11 min read
+image: /blog/images/building-webhook-delivery-system.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -18,44 +22,284 @@ draft: false
 relatedSlugs:
   - how-we-built-email-delivery-queue-bullmq
   - email-bounce-processing-automation
+  - migrating-from-sendgrid
 ---
 
-## The problem with naive webhook delivery
+**A webhook system is only as good as what it does when your endpoint is down.** Reloop's webhook system delivers every event at least once: it stores the event, creates one delivery per subscribed endpoint, signs the body with HMAC-SHA256, and POSTs it from a BullMQ worker. If the endpoint fails, the delivery is retried up to 7 times over about 17 hours. Endpoints that keep failing are disabled instead of hammered, and any delivery can be replayed by hand.
 
-Most webhook implementations fire an HTTP request and forget. If your customer's server is down, or returns a 500, the event is lost forever. We've been on the receiving end of that, and it's a terrible developer experience. Here's how we avoided it.
+This post walks through how that works in the [Reloop codebase](https://github.com/reloop-labs/reloop), with the numbers taken straight from the code.
 
-## Delivery guarantees we target
+---
 
-We aim for **at-least-once delivery** with a maximum of 5 attempts over 24 hours. We intentionally avoid exactly-once delivery because it requires distributed transactions that add too much complexity for the value gained at our scale.
+## The flow
 
-## The retry schedule
+```text
+Something happens (email delivered, contact created, domain verified, …)
+   │
+   ▼  NATS event
+workflow service — dispatcher (queue group "webhook-dispatcher")
+   │  1. insert webhook_event (idempotent)
+   │  2. find active endpoints subscribed to this event type
+   │  3. per endpoint: filters → rate limit → insert webhook_delivery
+   │  4. enqueue BullMQ job (jobId = deliveryId)
+   ▼
+BullMQ "webhook-delivery-queue"  (concurrency 10)
+   │  sign → SSRF-checked, DNS-pinned HTTPS POST → record result
+   ├── 2xx            → success, reset consecutive failures
+   ├── error / non-2xx → retry on fixed schedule
+   └── last attempt    → failed, maybe auto-disable endpoint
+```
 
-Retries follow exponential backoff with jitter to avoid thundering herds:
+Three tables carry the state:
 
-- Attempt 1: immediate
-- Attempt 2: 30 seconds
-- Attempt 3: 5 minutes
-- Attempt 4: 30 minutes
-- Attempt 5: 6 hours
+| Table | One row per | Holds |
+|---|---|---|
+| `webhook_event` | Thing that happened | Type, payload, source, idempotency key |
+| `webhook_delivery` | Event × endpoint × attempt chain | Status, attempt number, response code and body, next retry time |
+| `webhook` | Customer endpoint | URL, encrypted secret, subscriptions, filters, rate limit, counters |
+
+---
+
+## 1. Events are idempotent
+
+The same real-world event can show up more than once. KumoMTA can log twice, a NATS message can be redelivered, a service can restart mid-handler. If each of those created a new webhook, customers would see duplicate `email.delivered` calls.
+
+So every dispatch carries a stable key. For delivery events it's built from the organization, event type, email ID, KumoMTA record type and record ID:
 
 ```typescript
-function nextRetryDelay(attempt: number): number {
-  const base = Math.pow(2, attempt) * 1000; // exponential
-  const jitter = Math.random() * 1000;       // ±1s jitter
-  return Math.min(base + jitter, 6 * 60 * 60 * 1000);
+// apps/backend/workflow/src/subscribers/webhook.subscriber.ts
+const sourceKey =
+  `${orgId}:${webhookType}:${email.id}:${event.type}:${event.id}`;
+```
+
+The dispatcher looks the key up before inserting, and the unique constraint on `idempotency_key` catches the race where two replicas insert at once:
+
+```typescript
+// apps/backend/workflow/src/lib/webhook-dispatcher.ts (simplified)
+const existing = await db.query.webhookEvent.findFirst({
+  where: eq(schema.webhookEvent.idempotencyKey, idempotencyKey),
+});
+if (existing) return { eventId: existing.id, deliveryCount: 0 };
+
+try {
+  await db.insert(schema.webhookEvent).values({ id: eventId, idempotencyKey, ... });
+} catch {
+  // unique violation: a concurrent insert won, reuse it
 }
 ```
 
-## Signature verification
+On top of that, the dispatcher subscribes in the NATS queue group `webhook-dispatcher`, so only one workflow replica handles each event in the first place.
 
-Every webhook payload is signed with HMAC-SHA256 using a per-endpoint secret. This lets customers verify that requests genuinely come from Reloop.
+---
 
-## The replay UI
+## 2. Fan-out with per-endpoint settings
 
-Failed deliveries are surfaced in the dashboard with full request/response details. One click re-queues the event. This turns webhook debugging from a black box into a transparent, self-service experience.
+For each active endpoint subscribed to the event type, the dispatcher applies that endpoint's settings before creating a delivery.
 
-## Lessons learned
+| Setting | Default | Effect |
+|---|---|---|
+| `maxRetries` | 7 | Total attempts including the first, clamped to 1–7 |
+| `rateLimitEnabled` | `true` | Turns the outbound rate limit on |
+| `maxRequestsPerMinute` | 60 | Outbound POSTs per endpoint per minute |
+| `filteringOptions.matchConditions` | none | Only deliver if each listed `data` field equals the value |
+| `filteringOptions.excludeFields` | none | Strip these top-level keys from `data` |
 
-- **Log everything**: store the raw outbound payload and the response body, not just the status code.
-- **Separate delivery from processing**: webhook workers should not share a process with API workers.
-- **Circuit break slow endpoints**: if an endpoint consistently times out, back off aggressively before burning through retries.
+### Rate limits delay, they don't drop
+
+The outbound limit is a fixed one-minute window in Redis. When an endpoint is over its cap, the delivery isn't discarded. Its first attempt is delayed until the window resets:
+
+```typescript
+// apps/backend/workflow/src/lib/webhook-dispatcher.ts (simplified)
+const bucket = Math.floor(Date.now() / 60_000);
+const key = `reloop:webhook-out:${hook.id}:${bucket}`;
+const count = await redis.increment(key);
+if (count === 1) await redis.expire(key, 65);
+
+if (isWebhookRateLimited(count, hook.maxRequestsPerMinute)) {
+  delayMs = rateLimitDelayMs(await redis.ttl(key)); // at least 1 s
+}
+```
+
+If Redis is unavailable, the check fails open and the delivery goes out. Losing a rate limit for a minute is better than losing events.
+
+### Filters
+
+Filtering is shallow on purpose. A customer who only wants bounces can set:
+
+```json
+{
+  "filteringOptions": {
+    "matchConditions": { "status": "bounced" },
+    "excludeFields": ["subject"]
+  }
+}
+```
+
+The excluded fields are removed from the stored delivery payload too, not just the outgoing request, so sensitive fields never sit in our delivery logs.
+
+---
+
+## 3. Signing
+
+Every POST is signed with the endpoint's secret (`whsec_…`, stored encrypted and decrypted only inside the worker). The signed string is the Unix timestamp, a dot, and the exact raw body:
+
+```typescript
+// packages/webhook-delivery/src/signer.ts
+export function signWebhookBody(secret: string, rawBody: string, ts: number) {
+  return createHmac("sha256", secret).update(`${ts}.${rawBody}`).digest("hex");
+}
+```
+
+The request carries three headers:
+
+| Header | Example |
+|---|---|
+| `Reloop-Id` | `whev_01h…` (same as the body's `id`) |
+| `Reloop-Timestamp` | `1753185600` |
+| `Reloop-Signature` | `t=1753185600,v1=5257a8…` |
+
+Two details matter here:
+
+- **The body is serialized once.** The worker builds the envelope, calls `JSON.stringify` once, signs that string and sends that same string. Re-serializing between signing and sending is the classic way to ship signatures that never verify.
+- **Customers can't override the security headers.** Endpoints can add custom headers, but names like `Reloop-Signature`, `Content-Type`, `Host` and `Authorization` are reserved and silently dropped.
+
+On the receiving side, verify against the **raw** body, use a constant-time compare, and reject timestamps older than five minutes to block replays. The full snippet is in the [webhook verification docs](/docs/webhooks/verify-webhooks-requests).
+
+---
+
+## 4. Sending without becoming an SSRF proxy
+
+A webhook URL is user input that makes our servers send HTTP requests. Without care, someone could point it at `http://169.254.169.254/` or an internal service and use us to reach it.
+
+The HTTP client in `packages/webhook-delivery` does three things:
+
+1. **HTTPS only** in production.
+2. **Resolve, then validate.** The hostname is resolved, and every address is checked against private ranges (`10/8`, `172.16/12`, `192.168/16`, loopback, IPv6 ULA) and always-blocked ranges (link-local `169.254/16`, CGNAT `100.64/10`, multicast, `0.0.0.0`).
+3. **Pin the IP.** The request connects to the exact IP that passed validation, while still sending the original hostname for TLS SNI and the `Host` header. This closes the DNS-rebinding gap where a hostname resolves to a public IP during the check and a private one during the request.
+
+```typescript
+// packages/webhook-delivery/src/http-client.ts (simplified)
+lib.request({
+  hostname: resolved.pinnedIp,
+  servername: parsed.hostname, // TLS SNI
+  headers: { ...headers, Host: parsed.host },
+  lookup: (_h, _o, cb) => cb(null, resolved.pinnedIp, resolved.family),
+  timeout: 10_000,
+});
+```
+
+Requests time out after 10 seconds, and stored response bodies are truncated at 8,192 characters.
+
+<Callout type="warning">
+  SSRF-blocked URLs are **not retried**. A private IP won't become public on attempt 5, so the delivery fails immediately with a `fix` telling the customer to use a public HTTPS URL.
+</Callout>
+
+---
+
+## 5. Retries on a fixed schedule
+
+We tried exponential backoff first. It's fine for jobs, but bad for humans debugging webhooks: "when is the next try?" shouldn't need a calculator. So retries follow a fixed, documented schedule, implemented as a custom BullMQ backoff:
+
+```typescript
+// packages/webhook-delivery/src/retry-schedule.ts
+export const WEBHOOK_RETRY_DELAYS_MS = [
+  5_000,           // before attempt 2
+  5 * 60_000,      // before attempt 3
+  30 * 60_000,     // before attempt 4
+  2 * 60 * 60_000, // before attempt 5
+  5 * 60 * 60_000, // before attempt 6
+  10 * 60 * 60_000 // before attempt 7
+] as const;
+```
+
+| Attempt | Delay after the previous failure | Time since first try (approx.) |
+|---|---|---|
+| 1 | Immediate | 0 |
+| 2 | 5 seconds | 5 s |
+| 3 | 5 minutes | 5 min |
+| 4 | 30 minutes | 35 min |
+| 5 | 2 hours | 2 h 35 min |
+| 6 | 5 hours | 7 h 35 min |
+| 7 | 10 hours | 17 h 35 min |
+
+The early retries catch blips like a deploy or a cold start. The late ones cover a real outage that someone has to wake up and fix.
+
+Any network error, timeout or non-2xx response counts as a failure. Each attempt writes the response status, a truncated body, the duration and the next retry time to `webhook_delivery`, so the dashboard can show exactly what happened.
+
+The BullMQ job ID is the delivery ID. Enqueueing the same delivery twice is a no-op, so a restart in the middle of the fan-out can't create duplicate jobs.
+
+---
+
+## 6. Auto-disable broken endpoints
+
+An endpoint that's been deleted or misconfigured will fail forever. Retrying every event 7 times against it wastes work and floods the delivery log.
+
+After each **terminal** outcome (success, or failure on the last attempt) the worker updates the endpoint's counters in one statement:
+
+```typescript
+// apps/backend/workflow/src/handlers/webhook-delivery.handler.ts (simplified)
+consecutiveFailures: succeeded
+  ? 0
+  : sql`${schema.webhook.consecutiveFailures} + 1`,
+```
+
+When `consecutiveFailures` reaches 10 (`WEBHOOK_DISABLE_AFTER_CONSECUTIVE_FAILURES`), the endpoint is marked `failed` and stops receiving new deliveries. One success in between resets the counter, so a flaky endpoint stays enabled. Re-enable it from the dashboard once it's fixed.
+
+---
+
+## 7. Replays
+
+Sometimes you want an event again: you fixed a bug in your handler, or you restored a database. Replay creates a **new** delivery row linked to the original and enqueues it with the endpoint's current `maxRetries`. The original delivery's history is never changed, which keeps the audit trail honest.
+
+Replays are refused while the endpoint is disabled, failed or paused, with a `why` explaining which.
+
+---
+
+## What we'd tell anyone building this
+
+| Lesson | Why |
+|---|---|
+| Store the event before you deliver it | Replays and debugging need the original payload |
+| Make the event idempotent at the source | Duplicates are cheaper to prevent than to explain |
+| Sign the exact bytes you send | Re-serialization breaks signatures |
+| Resolve, validate and pin IPs | Validating the hostname alone leaves a DNS-rebinding hole |
+| Use a fixed, published retry schedule | Customers can reason about it |
+| Disable after repeated terminal failures | Protects you and the customer's logs |
+| Never mutate history on replay | The delivery log is an audit trail |
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Are Reloop webhooks delivered exactly once?">
+    At least once. Events are deduplicated at the source, but a delivery can
+    still be retried after your server processed it and failed to respond in
+    time. Use the `Reloop-Id` header to make your handler idempotent.
+  </Accordion>
+
+  <Accordion title="Does a 4xx response get retried?">
+    Yes. Any non-2xx response is retried on the schedule. Only SSRF-blocked
+    or non-HTTPS URLs fail immediately. Return 2xx as soon as you've stored
+    the event, and do slow work asynchronously.
+  </Accordion>
+
+  <Accordion title="Can I lower the number of retries?">
+    Yes. Set `maxRetries` on the endpoint to anything from 1 to 7. Only the
+    first rows of the schedule apply.
+  </Accordion>
+
+  <Accordion title="Which events can I subscribe to?">
+    Email lifecycle (`email.sent`, `email.delivered`, `email.bounced`,
+    `email.complained`, `email.opened`, `email.clicked`, `email.received`
+    and more), plus domain, API key and contact events. See
+    [event types](/docs/webhooks/event-types).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Set up a webhook"
+  description="Subscribe to delivery events in a few clicks and verify signatures with a few lines of code."
+  href="/docs/webhooks"
+  label="Read the webhooks docs"
+/>

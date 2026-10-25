@@ -1,59 +1,315 @@
 ---
 title: "How to Use AI to Generate Transactional Email Templates"
-description: Use LLMs to generate, personalize, and iterate on transactional email templates, then send them reliably with Reloop.
+description: "A practical workflow for generating transactional email templates with an LLM: a prompt that produces email-safe HTML, variable naming, review checks, and saving and sending the result as a Reloop template."
 keywords:
   - AI email templates
   - LLM email generation
   - generate transactional email templates AI
-  - ChatGPT email template
+  - AI email template generator
+  - Claude email template
+  - email-safe HTML
 publishedAt: 2026-07-25
 category: AI & Automation
-tags: [ai, llm, templates, personalization]
-readTime: 7 min read
+tags: [ai, llm, templates, html-email]
+readTime: 9 min read
+image: /blog/images/ai-generate-transactional-email-templates.png
 author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
+  - transactional-email-best-practices
   - build-ai-agent-sends-emails
   - vercel-ai-sdk-reloop-notifications
 ---
 
-## The problem with hand-written templates
+**LLMs are good at writing transactional email templates if you constrain them hard.** Tell the model exactly what email clients can render (tables, inline styles, 600px wide, no scripts), name every variable up front, and treat the output as a draft that goes through the same checks as hand-written HTML. Generate the template once, save it, and send it by ID. Don't call a model on every send.
 
-Most teams have a handful of email templates written years ago. They're generic, outdated, and nobody owns them. AI gives you a practical way to generate, personalize, and continuously improve them without a designer.
+This guide walks through the workflow we use: the prompt, the review checklist, and how to store and send the result as a Reloop template.
 
-## Prompt patterns that work
+---
 
-The key is specificity. A vague prompt produces a vague template. Give the model your product context, the trigger event, the recipient's state, and the desired tone.
+## Generate once, send many times
 
-```typescript
-const prompt = `
-  Write a transactional email for a SaaS product called "${productName}".
-  Event: User just completed onboarding.
-  Recipient: ${user.name}, joined ${daysAgo} days ago, hasn't sent their first email yet.
-  Goal: Encourage them to send their first email using a code example.
-  Tone: Friendly, developer-focused, concise.
-  Format: Subject line + plain HTML body.
-`;
+There are two ways to use AI for transactional email, and only one of them is a good idea for most teams.
+
+| Approach | How it works | Use it for |
+|---|---|---|
+| **Generate the template** | An LLM writes the HTML once. You review it, save it, and send it with variables. | Receipts, password resets, welcome emails, invoices: almost everything |
+| **Generate every email** | An LLM writes a new body for each recipient at send time. | Genuinely one-off messages, like an agent replying in a support thread |
+
+Generating per send is slower, costs money on every email, and means nobody has reviewed the exact HTML a customer receives. A password reset shouldn't depend on a model being in a good mood. Generate the template, then let variables do the personalization.
+
+---
+
+## What email-safe HTML means
+
+Most bad AI email templates fail for the same reason: the model writes web HTML. Email clients are not browsers. Outlook on Windows renders with Word's engine, Gmail strips `<style>` blocks in some contexts, and nobody runs your JavaScript.
+
+| Rule | Why |
+|---|---|
+| Layout with `<table>`, not flexbox or grid | Outlook ignores modern CSS layout |
+| Inline every style (`style="…"`) | Some clients drop `<head>` styles |
+| Max width 600px, centered | Fits every desktop and mobile client |
+| No `<script>`, forms, or iframes | Stripped or flagged as suspicious |
+| Absolute `https://` URLs for images and links | Relative URLs break outside your site |
+| `alt` text on every image | Images are often blocked by default |
+| Web-safe font stack | Custom fonts don't load in most clients |
+| A bulletproof button (table cell with a link) | CSS-only buttons fall apart in Outlook |
+
+Put these rules in the prompt. Don't hope the model knows them.
+
+---
+
+## The prompt
+
+A good template prompt has four parts: context, constraints, variables, and output format.
+
+```text
+You write transactional email templates for {product}, a {one-line description}.
+
+Write the "{template name}" email. It is sent when {trigger event}.
+The reader's state: {what they just did, what they need next}.
+Tone: {plain, friendly, short}. No marketing copy, no emojis.
+
+Constraints:
+- A complete HTML document, email-safe: tables for layout, inline styles only,
+  600px max width, no <script>, no external CSS, web-safe fonts.
+- One primary call-to-action as a bulletproof table button.
+- Every image uses an absolute https URL and has alt text.
+- Include a short footer with the company name and a support email.
+
+Variables (use exactly these, in triple braces, and no others):
+- {{{first_name}}}: the recipient's first name
+- {{{reset_url}}}: the password reset link
+- {{{expires_in}}}: e.g. "30 minutes"
+
+Return only the HTML document. Then, after a line with "---", a subject line
+that may use the same variables.
 ```
 
-## Streaming the template into your editor
+Three things matter more than everything else:
 
-Use streaming responses to show the template generating in real-time in your admin UI. It feels fast and gives your team confidence they can iterate quickly.
+1. **Declare the variables.** If you don't list them, the model invents names (`{{user.name}}`, `[FIRST NAME]`) that won't be substituted.
+2. **Describe the trigger.** "Sent 1 minute after signup, before they've created a project" produces a much better welcome email than "write a welcome email".
+3. **Ask for plain copy.** Transactional email should read like a note from a person, not a landing page.
 
-## Personalization at send time
+<Callout type="info">
+  Reloop substitutes variables written in **triple braces**, like `{{{first_name}}}`. Ask the model for that exact syntax so the template works without edits.
+</Callout>
 
-Generate a base template with the LLM, then swap in per-recipient variables at send time using Reloop's template engine. You get AI quality without per-send LLM latency.
+---
 
-## Evaluating quality
+## Generating it with the Claude API
 
-Before shipping AI-generated templates, run them through:
-- A spam scorer (check subject line trigger words)
-- A readability check (Flesch-Kincaid score)
-- A preview across major email clients (Gmail, Outlook, Apple Mail)
+You can use any capable model. Here's the same prompt sent with the Anthropic TypeScript SDK:
 
-## Iterating with feedback loops
+```typescript
+import Anthropic from "@anthropic-ai/sdk";
 
-Log open rates and click rates per template variant. Feed low-performing metrics back to the LLM as context to generate improved versions. This creates a continuous improvement loop without manual A/B testing setup.
+const anthropic = new Anthropic();
+
+const message = await anthropic.messages.create({
+  model: "claude-sonnet-5-5",
+  max_tokens: 8000,
+  system: TEMPLATE_SYSTEM_PROMPT, // the constraints above
+  messages: [
+    {
+      role: "user",
+      content:
+        "Write the password reset email for Acme. Variables: " +
+        "{{{first_name}}}, {{{reset_url}}}, {{{expires_in}}}.",
+    },
+  ],
+});
+
+const output = message.content
+  .filter((block) => block.type === "text")
+  .map((block) => block.text)
+  .join("");
+
+const [html, subject] = output.split("\n---\n").map((part) => part.trim());
+```
+
+For a handful of templates, you don't need code at all. Paste the prompt into Claude, iterate in the conversation ("make the button full-width on mobile", "shorter intro"), and copy the final HTML.
+
+If you use the [Reloop MCP server](/docs/integrations/ai-tools/mcp-server) in Claude, Cursor or another MCP client, you can skip the copy-paste: ask the assistant to write the template and save it, and it calls the `create_template` tool with the HTML directly.
+
+---
+
+## Review before you save
+
+An LLM's template is a first draft. Run every one through the same checklist.
+
+| Check | How |
+|---|---|
+| Variables are exactly the ones you declared | Search the HTML for `{{{`; nothing else should appear |
+| No leftover placeholders | Search for `[`, `TODO`, `example.com`, `lorem` |
+| Links are real and absolute | Every `href` starts with `https://` or is a variable |
+| Renders in Outlook and Gmail | Send a test to real accounts in both |
+| Dark mode is readable | Open the test on a phone in dark mode |
+| Plain-text version makes sense | Read the text part, not just the HTML |
+| Under 100 KB of HTML | Gmail clips larger messages |
+| Copy is accurate | Expiry times, support address and product names are right |
+
+The last one is the one models get wrong most often. A model will happily write "this link expires in 24 hours" when your links expire in 30 minutes. Pass facts like that in as variables or state them in the prompt.
+
+<Callout type="warning">
+  Never paste customer data into a prompt to "personalize" a template. The template should contain variables, not real names, emails or order details.
+</Callout>
+
+---
+
+## Save it as a Reloop template
+
+Saved templates live in Reloop, get version history, and can be edited later in the visual editor. You send them by ID or slug and pass the variables at send time.
+
+### In the dashboard
+
+Open **Templates → New template**. The visual editor has a built-in AI assistant, so you can describe the email, generate a layout, and refine it in place. Placeholders are detected as template variables, and you can set a default for each one.
+
+If you generated the HTML somewhere else, save it with the API below or with the MCP `create_template` tool. Both store the full HTML document as-is.
+
+### With the API
+
+Create the template, then publish a version with the rendered HTML:
+
+```typescript
+const headers = {
+  "x-api-key": process.env.RELOOP_API_KEY!,
+  "Content-Type": "application/json",
+};
+
+const content = [{ id: crypto.randomUUID(), type: "html", props: {}, html }];
+
+const created = await fetch("https://reloop.sh/api/template/v1/create", {
+  method: "POST",
+  headers,
+  body: JSON.stringify({ name: "Password reset", subject, content }),
+}).then((res) => res.json());
+
+await fetch(`https://reloop.sh/api/template/v1/${created.id}/versions`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({
+    content,
+    subject,
+    renderedHtml: html,
+    isMajor: true, // publish this version
+    variables: [
+      { name: "first_name", type: "string", defaultValue: "there" },
+      { name: "reset_url", type: "string", defaultValue: null },
+      { name: "expires_in", type: "string", defaultValue: "30 minutes" },
+    ],
+  }),
+});
+```
+
+Sends always use the latest **published** version, so you can save drafts and review changes without affecting live email.
+
+### Send a test
+
+Before you wire it into your app, send a test with real-looking variables:
+
+```bash
+curl -X POST "https://reloop.sh/api/template/v1/$TEMPLATE_ID/test" \
+  -H "x-api-key: $RELOOP_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"to":"you@example.com","variables":{"first_name":"Ada","reset_url":"https://acme.com/reset/abc","expires_in":"30 minutes"}}'
+```
+
+---
+
+## Send it from your app
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { emailError } = await reloop.mail.send({
+  from: "Acme <security@mail.acme.com>",
+  to: user.email,
+  subject: "Reset your password",
+  template: {
+    id: process.env.RESET_TEMPLATE_ID!,
+    variables: {
+      first_name: user.firstName,
+      reset_url: resetUrl,
+      expires_in: "30 minutes",
+    },
+  },
+});
+```
+
+A few details worth knowing:
+
+- **Defaults fill gaps.** If you leave a variable out, Reloop uses the template's default. If there's no default, the placeholder stays as-is, so set defaults for anything optional.
+- **Plain text is automatic.** If the template has only HTML, Reloop derives the `text/plain` part from it, so the email still goes out as multipart.
+- **Subject comes from the template** when the template has one, with variables substituted there too.
+
+---
+
+## Iterating with AI
+
+Templates aren't write-once. A useful loop:
+
+1. Look at the numbers in your Reloop logs: opens, clicks, and how many people complete the action.
+2. Ask the model for a variant that targets the weak spot ("the CTA is below the fold on mobile", "the first sentence doesn't say why they got this email").
+3. Save it as a new version, test it, publish it.
+4. If it's worse, restore the previous version from the template's history.
+
+Keep the variables identical between versions so your send code never changes.
+
+---
+
+## Prompt snippets for common templates
+
+| Template | Trigger to describe | Variables |
+|---|---|---|
+| Welcome | Account created, nothing set up yet | `first_name`, `dashboard_url` |
+| Email verification | Signed up, must confirm address | `verify_url`, `expires_in` |
+| Password reset | Requested a reset | `first_name`, `reset_url`, `expires_in` |
+| Receipt | Payment succeeded | `first_name`, `amount`, `invoice_url`, `date` |
+| Payment failed | Card declined on renewal | `first_name`, `update_billing_url`, `retry_date` |
+| Team invite | Invited by a teammate | `inviter_name`, `team_name`, `accept_url` |
+
+For the content of each, see [transactional email best practices](/blog/transactional-email-best-practices).
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Which model should I use?">
+    Any current frontier model writes good email HTML when the constraints are
+    in the prompt. The constraints matter far more than the model. Pick one
+    you can call from your stack and keep the prompt in version control.
+  </Accordion>
+
+  <Accordion title="Why triple braces instead of double?">
+    Reloop substitutes `{{{variable}}}` placeholders when it renders a
+    template at send time. Using that syntax in the prompt means the
+    generated HTML works without find-and-replace.
+  </Accordion>
+
+  <Accordion title="Can I generate templates from a screenshot or design?">
+    Yes. Vision-capable models can match a reference image's layout and
+    colors. Ask for email-safe HTML that approximates the design, then review
+    it in real clients. Pixel-perfect matches aren't realistic in email.
+  </Accordion>
+
+  <Accordion title="Should an AI agent write emails on the fly instead?">
+    For replies in a conversation, yes. For system emails like receipts and
+    resets, no. See [building an AI agent that sends emails](/blog/build-ai-agent-sends-emails)
+    for where per-message generation makes sense.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Store and send templates with Reloop"
+  description="Version history, variables with defaults, a visual editor and a free tier of 3,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>
