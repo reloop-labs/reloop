@@ -7,6 +7,7 @@ import {
 	INTERNAL_SECRET_HEADER,
 	INTERNAL_USER_ID_HEADER,
 } from "@reloop/auth/middleware";
+import { fillTripleBraceVars } from "@reloop/db/template-vars";
 import { log } from "evlog";
 
 export async function sendTestEmail(params: {
@@ -97,19 +98,14 @@ export async function sendTestEmail(params: {
 		}
 	}
 
-	// 5. Substitute placeholders in the subject and HTML content
-	const substitute = (str: string) => {
-		let substituted = str;
-		for (const [key, value] of Object.entries(mergedVariables)) {
-			// Matches both {{{key}}} and {{{ key }}}
-			const regex = new RegExp(`{{{\\s*${key}\\s*}}}`, "g");
-			substituted = substituted.replace(regex, String(value));
-		}
-		return substituted;
-	};
-
-	const finalSubject = substitute(resolvedSubject);
-	const finalHtml = substitute(resolvedHtml);
+	// 5. Substitute placeholders the same way a real send does: values are
+	// HTML-escaped in the HTML body, raw in the subject.
+	const finalSubject = fillTripleBraceVars(resolvedSubject, mergedVariables, {
+		html: false,
+	});
+	const finalHtml = fillTripleBraceVars(resolvedHtml, mergedVariables, {
+		html: true,
+	});
 
 	const effectiveUserId = userId || template.createdByUserId || "";
 

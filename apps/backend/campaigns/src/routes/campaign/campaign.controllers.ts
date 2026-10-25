@@ -488,7 +488,7 @@ export async function testCampaignController(params: {
 		}),
 		...(params.variables ?? {}),
 	};
-	const html = interpolate(row.contentHtml, vars);
+	const html = interpolate(row.contentHtml, vars, { html: true });
 	const subject = interpolate(row.subject, vars);
 	const from = `${row.fromName} <${row.fromEmail}>`;
 	try {

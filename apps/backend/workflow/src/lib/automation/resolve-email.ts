@@ -2,6 +2,7 @@ import type { SendEmailNodeData } from "@be/workflow/lib/automation/graph";
 import { db } from "@reloop/db/client";
 import type { AutomationGraph } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
+import { fillTripleBraceVars } from "@reloop/db/template-vars";
 import { and, eq, isNull } from "drizzle-orm";
 
 export type StepContact = {
@@ -42,10 +43,13 @@ export function contactVars(contact: StepContact) {
 	};
 }
 
-/** `{{{ name }}}` placeholders filled with the template variables' defaults. */
+/**
+ * `{{{ name }}}` placeholders filled with the template variables' defaults,
+ * HTML-escaped the same way the mail service fills them at send time.
+ */
 function fillDefaults(html: string, variables: unknown): string {
 	if (!Array.isArray(variables)) return html;
-	let out = html;
+	const defaults: Record<string, string> = {};
 	for (const v of variables) {
 		if (!v || typeof v !== "object") continue;
 		const { name, defaultValue } = v as {
@@ -53,13 +57,9 @@ function fillDefaults(html: string, variables: unknown): string {
 			defaultValue?: unknown;
 		};
 		if (!name || defaultValue == null) continue;
-		const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-		out = out.replace(
-			new RegExp(`{{{\\s*${escaped}\\s*}}}`, "g"),
-			String(defaultValue),
-		);
+		defaults[name] = String(defaultValue);
 	}
-	return out;
+	return fillTripleBraceVars(html, defaults, { html: true });
 }
 
 /**

@@ -70,6 +70,29 @@ describe("interpolate", () => {
 			"ada@example.com",
 		);
 	});
+
+	test("escapes contact values in HTML bodies only", () => {
+		const vars = { firstName: '<a href="https://evil.example">x</a>' };
+		expect(interpolate("<p>Hi {{firstName}}</p>", vars, { html: true })).toBe(
+			"<p>Hi &lt;a href=&quot;https://evil.example&quot;&gt;x&lt;/a&gt;</p>",
+		);
+		expect(interpolate("<p>{{{firstName}}}</p>", vars, { html: true })).toBe(
+			"<p>&lt;a href=&quot;https://evil.example&quot;&gt;x&lt;/a&gt;</p>",
+		);
+		expect(interpolate("Hi {{firstName}}", { firstName: "Tom & Jerry" })).toBe(
+			"Hi Tom & Jerry",
+		);
+	});
+
+	test("escapes defaulted fallbacks in HTML bodies", () => {
+		expect(
+			interpolate(
+				'<p>{{firstName | default: "<b>friend</b>"}}</p>',
+				{ firstName: "" },
+				{ html: true },
+			),
+		).toBe("<p>&lt;b&gt;friend&lt;/b&gt;</p>");
+	});
 });
 
 describe("campaign status machine", () => {

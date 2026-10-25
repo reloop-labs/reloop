@@ -1,6 +1,7 @@
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { htmlToText } from "@reloop/be-mail/lib/html-to-text";
 import { db } from "@reloop/db/client";
+import { fillTripleBraceVars } from "@reloop/db/template-vars";
 
 export async function resolveTemplate_step5({
 	organizationId,
@@ -71,19 +72,20 @@ export async function resolveTemplate_step5({
 			}
 		}
 
-		// 3. Substitute placeholders in subject, html, and text
-		const substitute = (str: string) => {
-			let substituted = str;
-			for (const [key, value] of Object.entries(finalVariables)) {
-				const regex = new RegExp(`{{{\\s*${key}\\s*}}}`, "g");
-				substituted = substituted.replace(regex, String(value));
-			}
-			return substituted;
-		};
-
-		if (finalSubject) finalSubject = substitute(finalSubject);
-		if (finalHtml) finalHtml = substitute(finalHtml);
-		if (finalText) finalText = substitute(finalText);
+		// 3. Substitute placeholders. Values are HTML-escaped in the HTML body
+		// only; subject and text are not HTML.
+		if (finalSubject)
+			finalSubject = fillTripleBraceVars(finalSubject, finalVariables, {
+				html: false,
+			});
+		if (finalHtml)
+			finalHtml = fillTripleBraceVars(finalHtml, finalVariables, {
+				html: true,
+			});
+		if (finalText)
+			finalText = fillTripleBraceVars(finalText, finalVariables, {
+				html: false,
+			});
 	}
 
 	if (!finalHtml && !finalText) {

@@ -81,6 +81,46 @@ describe("sendTestEmail controller", () => {
 		]);
 	});
 
+	test("HTML-escapes variable values in the body but not the subject", async () => {
+		templateModel.findByIdAndOrg = mock(async () => ({
+			id: "tpl_123",
+			organizationId: "org_abc",
+			fromEmail: "team@verified.com",
+			subject: "Hi {{{COMPANY}}}",
+			createdByUserId: "usr_xyz",
+			variables: [],
+		})) as any;
+
+		templateVersionModel.getLatestVersion = mock(async () => ({
+			id: "ver_1",
+			renderedHtml: "<p>{{{COMPANY}}}</p>",
+		})) as any;
+
+		globalThis.fetch = mock(
+			async (url: string | URL | Request, init?: RequestInit) => {
+				lastFetchUrl = String(url);
+				lastFetchOptions = init;
+				return new Response(JSON.stringify({ id: "log_1" }), {
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				});
+			},
+		) as any;
+
+		await sendTestEmail({
+			templateId: "tpl_123",
+			organizationId: "org_abc",
+			to: "test@recipient.com",
+			variables: { COMPANY: '<a href="https://evil.example">Tom & Co</a>' },
+		});
+
+		const body = JSON.parse(lastFetchOptions?.body as string);
+		expect(body.html).toBe(
+			"<p>&lt;a href=&quot;https://evil.example&quot;&gt;Tom &amp; Co&lt;/a&gt;</p>",
+		);
+		expect(body.subject).toBe('Hi <a href="https://evil.example">Tom & Co</a>');
+	});
+
 	test("surfaces error when Mail service rejects (e.g. insufficient credits or unverified domain)", async () => {
 		templateModel.findByIdAndOrg = mock(async () => ({
 			id: "tpl_123",

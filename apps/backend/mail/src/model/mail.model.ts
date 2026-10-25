@@ -147,7 +147,10 @@ export namespace MailModel {
 										"Variable value must be a string (max 2,000 characters) or a number (not greater than 2^53 - 1).",
 								},
 							),
-							{ description: "Variables to replace in the template" },
+							{
+								description:
+									"Variables to replace in the template. Values are HTML-escaped in the HTML body and inserted as-is in the subject and text.",
+							},
 						),
 					),
 				},

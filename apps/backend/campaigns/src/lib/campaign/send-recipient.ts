@@ -104,7 +104,7 @@ export async function sendCampaignRecipient(
 	const htmlWithFooter = unsubscribeUrl
 		? appendUnsubscribeFooter(campaign.contentHtml, unsubscribeUrl)
 		: campaign.contentHtml;
-	const html = interpolate(htmlWithFooter, vars);
+	const html = interpolate(htmlWithFooter, vars, { html: true });
 	const text = htmlToText(html) || subject;
 	const from = campaign.fromName
 		? `${campaign.fromName} <${campaign.fromEmail}>`

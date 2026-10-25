@@ -13,6 +13,7 @@
 		"./domain-age-cap": "./src/domain-age-cap.ts",
 		"./smtp-recipients": "./src/smtp-recipients.ts",
 		"./html-to-text": "./src/html-to-text.ts",
+		"./template-vars": "./src/template-vars.ts",
 		"./outbound-abuse": "./src/outbound-abuse.ts",
 		"./reputation": "./src/reputation.ts",
 		"./spam-check": "./src/spam-check.ts",
