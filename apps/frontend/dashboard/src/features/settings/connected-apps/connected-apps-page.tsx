@@ -188,6 +188,15 @@ export function ConnectedAppsPage() {
 
 	const cols = showMembers ? MEMBER_COLS : BASE_COLS;
 
+	const showFooter = !loading && apps.length > 0;
+	const footer = (
+		<div className="flex items-center justify-between px-4 py-2">
+			<p className="text-label-xs text-text-sub-600">
+				{apps.length} connected app{apps.length > 1 ? "s" : ""}
+			</p>
+		</div>
+	);
+
 	return (
 		<div className="space-y-4">
 			<div>
@@ -199,200 +208,210 @@ export function ConnectedAppsPage() {
 				</p>
 			</div>
 
-			<div className="w-full overflow-x-auto text-paragraph-sm">
-				<div
-					style={{ gridTemplateColumns: cols }}
-					className="grid min-w-[720px] items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-				>
-					<div className="flex items-center gap-1">
-						<Icon name="plug-custom" className="h-3 w-3" />
-						<span className="text-xs">App</span>
-					</div>
-					{showMembers && (
-						<div className="flex items-center gap-1">
-							<Icon name="user" className="h-3 w-3" />
-							<span className="text-xs">Member</span>
+			{/* Phones and tablets: the card (border drawn here) holds a sideways
+			    scroller for the columns, and the footer below it stays put */}
+			<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+				<div className="w-full overflow-x-auto">
+					{/* 720px = the column minimums, so the last column never spills out */}
+					<div className="min-w-[720px]">
+						<div
+							style={{ gridTemplateColumns: cols }}
+							className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40"
+						>
+							<div className="flex items-center gap-1">
+								<Icon name="plug-custom" className="h-3 w-3" />
+								<span className="text-xs">App</span>
+							</div>
+							{showMembers && (
+								<div className="flex items-center gap-1">
+									<Icon name="user" className="h-3 w-3" />
+									<span className="text-xs">Member</span>
+								</div>
+							)}
+							<div className="flex items-center gap-1">
+								<Icon name="calendar" className="h-3 w-3" />
+								<span className="text-xs">Connected</span>
+							</div>
+							<div className="flex items-center gap-1">
+								<Icon name="clock" className="h-3 w-3" />
+								<span className="text-xs">Last Active</span>
+							</div>
+							<div />
 						</div>
-					)}
-					<div className="flex items-center gap-1">
-						<Icon name="calendar" className="h-3 w-3" />
-						<span className="text-xs">Connected</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="clock" className="h-3 w-3" />
-						<span className="text-xs">Last Active</span>
-					</div>
-					<div />
-				</div>
 
-				<div className="-mt-2.5 min-w-[720px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
-					{organizationId === null ? (
-						<TableEmptyState
-							icon="workspace-custom"
-							title="No organization selected"
-							description="Select an organization to see its connected apps."
-						/>
-					) : loading ? (
-						Array.from({ length: 3 }).map((_, i) => (
-							<AppSkeleton key={`skeleton-${i.toString()}`} cols={cols} />
-						))
-					) : apps.length === 0 ? (
-						<TableEmptyState
-							icon={isError ? "shield-cross" : "plug-custom"}
-							title={
-								isError ? "Couldn't load connected apps" : "No connected apps"
-							}
-							description={
-								isError
-									? "Something went wrong while fetching connected apps."
-									: "Apps authorized for this organization, like MCP clients or the Reloop CLI, will appear here."
-							}
-							action={
-								isError ? (
-									<Button.Root
-										type="button"
-										variant="neutral"
-										mode="stroke"
-										size="small"
-										onClick={() => void refetch()}
-										disabled={isRefetching}
-										className="gap-1.5 rounded-xl"
-									>
-										<Icon
-											name="refresh-cw"
-											className="h-4 w-4 text-text-sub-600"
-										/>
-										Try again
-									</Button.Root>
-								) : null
-							}
-						/>
-					) : (
-						apps.map((app) => {
-							const key = grantKey(app);
-							const status = statusMap[key] ?? "idle";
-							const name = app.name ?? "Unnamed app";
-							const host = hostOf(app.uri);
-							const access = summarizeAccess(
-								describeCapabilities({
-									scopes: app.scopes,
-									resources: app.resources,
-								}),
-							);
-							return (
-								<div
-									key={key}
-									style={{ gridTemplateColumns: cols }}
-									className="group/row grid w-full items-center px-4 py-2 text-left hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]"
-								>
-									<div className="flex min-w-0 items-center gap-3">
-										<AppLogo app={app} />
-										<div className="min-w-0 flex-1">
-											<div className="flex min-w-0 items-center gap-2">
-												<span className="truncate font-medium text-label-xs text-text-strong-950">
-													{name}
-												</span>
-												{host && (
-													<span className="truncate text-[11px] text-text-sub-600">
-														{host}
-													</span>
-												)}
-												{!app.hasActiveSession && (
-													<span className="shrink-0 rounded-full border border-stroke-soft-100 px-1.5 text-[10px] text-text-sub-600 dark:border-stroke-soft-100/40">
-														Idle
-													</span>
+						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
+							{organizationId === null ? (
+								<TableEmptyState
+									icon="workspace-custom"
+									title="No organization selected"
+									description="Select an organization to see its connected apps."
+								/>
+							) : loading ? (
+								Array.from({ length: 3 }).map((_, i) => (
+									<AppSkeleton key={`skeleton-${i.toString()}`} cols={cols} />
+								))
+							) : apps.length === 0 ? (
+								<TableEmptyState
+									icon={isError ? "shield-cross" : "plug-custom"}
+									title={
+										isError
+											? "Couldn't load connected apps"
+											: "No connected apps"
+									}
+									description={
+										isError
+											? "Something went wrong while fetching connected apps."
+											: "Apps authorized for this organization, like MCP clients or the Reloop CLI, will appear here."
+									}
+									action={
+										isError ? (
+											<Button.Root
+												type="button"
+												variant="neutral"
+												mode="stroke"
+												size="small"
+												onClick={() => void refetch()}
+												disabled={isRefetching}
+												className="gap-1.5 rounded-xl"
+											>
+												<Icon
+													name="refresh-cw"
+													className="h-4 w-4 text-text-sub-600"
+												/>
+												Try again
+											</Button.Root>
+										) : null
+									}
+								/>
+							) : (
+								apps.map((app) => {
+									const key = grantKey(app);
+									const status = statusMap[key] ?? "idle";
+									const name = app.name ?? "Unnamed app";
+									const host = hostOf(app.uri);
+									const access = summarizeAccess(
+										describeCapabilities({
+											scopes: app.scopes,
+											resources: app.resources,
+										}),
+									);
+									return (
+										<div
+											key={key}
+											style={{ gridTemplateColumns: cols }}
+											className="group/row grid w-full items-center px-4 py-2 text-left hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]"
+										>
+											<div className="flex min-w-0 items-center gap-3">
+												<AppLogo app={app} />
+												<div className="min-w-0 flex-1">
+													<div className="flex min-w-0 items-center gap-2">
+														<span className="truncate font-medium text-label-xs text-text-strong-950">
+															{name}
+														</span>
+														{host && (
+															<span className="truncate text-[11px] text-text-sub-600">
+																{host}
+															</span>
+														)}
+														{!app.hasActiveSession && (
+															<span className="shrink-0 rounded-full border border-stroke-soft-100 px-1.5 text-[10px] text-text-sub-600 dark:border-stroke-soft-100/40">
+																Idle
+															</span>
+														)}
+													</div>
+													<p
+														className="truncate text-[11px] text-text-sub-600"
+														title={access}
+													>
+														{access}
+													</p>
+												</div>
+											</div>
+
+											{showMembers && <MemberLabel app={app} />}
+
+											<span className="text-label-xs text-text-sub-600">
+												{formatDate(app.connectedAt) ?? "-"}
+											</span>
+											<span className="text-label-xs text-text-sub-600">
+												{app.lastActiveAt
+													? formatTimeAgo(new Date(app.lastActiveAt))
+													: "-"}
+											</span>
+
+											<div className="flex items-center justify-end gap-2">
+												{canDisconnect(app) && (
+													<>
+														{status === "confirming" && (
+															<button
+																type="button"
+																className="h-7 rounded-lg px-2 font-medium text-text-sub-600 text-xs hover:text-text-strong-950"
+																onClick={() => setStatus(key, "idle")}
+															>
+																Cancel
+															</button>
+														)}
+														<FancyButton.Root
+															variant="destructive"
+															size="xsmall"
+															className={cn(
+																"min-w-[96px] justify-center overflow-hidden font-medium",
+																status === "revoking" && "opacity-90",
+															)}
+															disabled={status === "revoking"}
+															onClick={() =>
+																status === "confirming"
+																	? handleDisconnect(app)
+																	: setStatus(key, "confirming")
+															}
+														>
+															<AnimatePresence mode="popLayout" initial={false}>
+																<motion.span
+																	key={status}
+																	transition={{
+																		type: "spring",
+																		duration: 0.25,
+																		bounce: 0,
+																	}}
+																	initial={{ opacity: 0, y: -14 }}
+																	animate={{ opacity: 1, y: 0 }}
+																	exit={{ opacity: 0, y: 14 }}
+																	className="flex items-center justify-center gap-1.5"
+																>
+																	{status === "revoking" ? (
+																		<>
+																			<Spinner
+																				size={12}
+																				color="var(--static-white)"
+																			/>
+																			<span>Disconnecting...</span>
+																		</>
+																	) : status === "confirming" ? (
+																		"Confirm"
+																	) : (
+																		"Disconnect"
+																	)}
+																</motion.span>
+															</AnimatePresence>
+														</FancyButton.Root>
+													</>
 												)}
 											</div>
-											<p
-												className="truncate text-[11px] text-text-sub-600"
-												title={access}
-											>
-												{access}
-											</p>
 										</div>
-									</div>
-
-									{showMembers && <MemberLabel app={app} />}
-
-									<span className="text-label-xs text-text-sub-600">
-										{formatDate(app.connectedAt) ?? "-"}
-									</span>
-									<span className="text-label-xs text-text-sub-600">
-										{app.lastActiveAt
-											? formatTimeAgo(new Date(app.lastActiveAt))
-											: "-"}
-									</span>
-
-									<div className="flex items-center justify-end gap-2">
-										{canDisconnect(app) && (
-											<>
-												{status === "confirming" && (
-													<button
-														type="button"
-														className="h-7 rounded-lg px-2 font-medium text-text-sub-600 text-xs hover:text-text-strong-950"
-														onClick={() => setStatus(key, "idle")}
-													>
-														Cancel
-													</button>
-												)}
-												<FancyButton.Root
-													variant="destructive"
-													size="xsmall"
-													className={cn(
-														"min-w-[96px] justify-center overflow-hidden font-medium",
-														status === "revoking" && "opacity-90",
-													)}
-													disabled={status === "revoking"}
-													onClick={() =>
-														status === "confirming"
-															? handleDisconnect(app)
-															: setStatus(key, "confirming")
-													}
-												>
-													<AnimatePresence mode="popLayout" initial={false}>
-														<motion.span
-															key={status}
-															transition={{
-																type: "spring",
-																duration: 0.25,
-																bounce: 0,
-															}}
-															initial={{ opacity: 0, y: -14 }}
-															animate={{ opacity: 1, y: 0 }}
-															exit={{ opacity: 0, y: 14 }}
-															className="flex items-center justify-center gap-1.5"
-														>
-															{status === "revoking" ? (
-																<>
-																	<Spinner
-																		size={12}
-																		color="var(--static-white)"
-																	/>
-																	<span>Disconnecting...</span>
-																</>
-															) : status === "confirming" ? (
-																"Confirm"
-															) : (
-																"Disconnect"
-															)}
-														</motion.span>
-													</AnimatePresence>
-												</FancyButton.Root>
-											</>
-										)}
-									</div>
-								</div>
-							);
-						})
-					)}
-					{!loading && apps.length > 0 && (
-						<div className="flex items-center justify-between px-4 py-2">
-							<p className="text-label-xs text-text-sub-600">
-								{apps.length} connected app{apps.length > 1 ? "s" : ""}
-							</p>
+									);
+								})
+							)}
+							{/* Desktop: footer inside the rows card, as before */}
+							{showFooter && <div className="max-md:hidden">{footer}</div>}
 						</div>
-					)}
+					</div>
 				</div>
+				{/* Phones/tablets: outside the scroller, so it never scrolls sideways. No top
+			    border: divide-y already draws one under the last row (the hidden desktop
+			    footer above is still the last child). */}
+				{showFooter && (
+					<div className="bg-bg-white-0 md:hidden dark:bg-black">{footer}</div>
+				)}
 			</div>
 		</div>
 	);

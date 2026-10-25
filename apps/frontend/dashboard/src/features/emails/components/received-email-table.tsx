@@ -68,7 +68,7 @@ interface ReceivedEmailTableProps {
 
 const receivedGridStyle = {
 	gridTemplateColumns:
-		"32px minmax(0, 1.2fr) minmax(0, 1.8fr) 110px 110px 32px",
+		"32px minmax(180px, 1.2fr) minmax(250px, 1.8fr) 110px 110px 32px",
 };
 
 const getInboundStatusColorClass = (status: string): string => {
@@ -791,98 +791,111 @@ export const ReceivedEmailTable = ({
 
 	return (
 		<>
-			{/* Phones scroll the table sideways instead of crushing the columns;
-			    the scroller bleeds past the shell padding so rows scroll to the screen edge */}
-			<div className="@container w-full overflow-x-auto text-paragraph-sm max-sm:-mx-4 sm:max-md:-mx-6 max-md:w-auto">
-				{/* The page inset (16px phones, 24px tablets) lives inside the scroller: at rest the table lines up
-				    with the filters, and the right inset appears once scrolled to the end */}
-				<div className="min-w-[748px] max-sm:px-4 sm:max-md:px-6 md:min-w-0">
-					{/* Table Header */}
-					<div
-						style={receivedGridStyle}
-						className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-					>
-						{headerGroup?.headers.map((header) => (
-							<div key={header.id} className="flex items-center gap-1">
-								{header.isPlaceholder
-									? null
-									: flexRender(
-											header.column.columnDef.header,
-											header.getContext(),
-										)}
-							</div>
-						))}
-						<div />
-					</div>
+			{/* Phones and tablets: the card (border drawn here) holds a sideways
+			    scroller for the columns, and the footer below it stays put */}
+			<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+				<div className="w-full overflow-x-auto">
+					{/* 748px = the column minimums, so the ⋯ column never spills out */}
+					<div className="min-w-[748px]">
+						{/* Table Header */}
+						<div
+							style={receivedGridStyle}
+							className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40"
+						>
+							{headerGroup?.headers.map((header) => (
+								<div key={header.id} className="flex items-center gap-1">
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+								</div>
+							))}
+							<div />
+						</div>
 
-					{/* Table Body */}
-					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-						{isLoading && logs.length === 0 ? (
-							Array.from({ length: loadingRows }).map((_, index) => (
-								<EmailSkeleton key={`skeleton-${index}`} />
-							))
-						) : rows.length === 0 ? (
-							<EmailsEmptyState
-								isFiltered={hasFilters}
-								onClearFilters={onClearFilters}
-								variant="received"
-							/>
-						) : (
-							rows.map((row) => {
-								const log = row.original;
-								const isRowActive = activeDropdownId === log.id;
-								return (
-									<div key={row.id}>
-										<ReceivedRowContextMenu
-											log={log}
-											handlers={actionsHandlers}
-										>
-											<div
-												style={receivedGridStyle}
-												data-state={
-													row.getIsSelected() ? "selected" : undefined
-												}
-												className={cn(
-													"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left",
-													"hover:bg-bg-weak-50",
-													(isRowActive || row.getIsSelected()) &&
-														"bg-bg-weak-50/50",
-												)}
-												onClick={handleRowClick}
+						{/* Table Body */}
+						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+							{isLoading && logs.length === 0 ? (
+								Array.from({ length: loadingRows }).map((_, index) => (
+									<EmailSkeleton key={`skeleton-${index}`} />
+								))
+							) : rows.length === 0 ? (
+								<EmailsEmptyState
+									isFiltered={hasFilters}
+									onClearFilters={onClearFilters}
+									variant="received"
+								/>
+							) : (
+								rows.map((row) => {
+									const log = row.original;
+									const isRowActive = activeDropdownId === log.id;
+									return (
+										<div key={row.id}>
+											<ReceivedRowContextMenu
+												log={log}
+												handlers={actionsHandlers}
 											>
-												{row.getVisibleCells().map((cell) => (
-													<div key={cell.id}>
-														{flexRender(
-															cell.column.columnDef.cell,
-															cell.getContext(),
-														)}
-													</div>
-												))}
 												<div
-													onClick={(e) => e.stopPropagation()}
-													onKeyDown={(e) => e.stopPropagation()}
+													style={receivedGridStyle}
+													data-state={
+														row.getIsSelected() ? "selected" : undefined
+													}
+													className={cn(
+														"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left",
+														"hover:bg-bg-weak-50",
+														(isRowActive || row.getIsSelected()) &&
+															"bg-bg-weak-50/50",
+													)}
+													onClick={handleRowClick}
 												>
-													<ReceivedActionsMenu
-														log={log}
-														handlers={actionsHandlers}
-													/>
+													{row.getVisibleCells().map((cell) => (
+														<div key={cell.id}>
+															{flexRender(
+																cell.column.columnDef.cell,
+																cell.getContext(),
+															)}
+														</div>
+													))}
+													<div
+														onClick={(e) => e.stopPropagation()}
+														onKeyDown={(e) => e.stopPropagation()}
+													>
+														<ReceivedActionsMenu
+															log={log}
+															handlers={actionsHandlers}
+														/>
+													</div>
 												</div>
-											</div>
-										</ReceivedRowContextMenu>
-									</div>
-								);
-							})
-						)}
+											</ReceivedRowContextMenu>
+										</div>
+									);
+								})
+							)}
 
-						<TableFooter
-							total={totalLogs}
-							selectedCount={selectedCount}
-							pageRowCount={rows.length}
-							isLoading={isLoading}
-							// Pin pagination inside the visible card (page inset + 1px border per side) while rows scroll
-							className="max-md:sticky max-sm:left-[17px] max-sm:w-[calc(100cqw-34px)] sm:max-md:left-[25px] sm:max-md:w-[calc(100cqw-50px)]"
-						/>
+							{/* Desktop: footer inside the rows card, as before */}
+							<div className="max-md:hidden">
+								<TableFooter
+									total={totalLogs}
+									selectedCount={selectedCount}
+									pageRowCount={rows.length}
+									isLoading={isLoading}
+								/>
+							</div>
+						</div>
 					</div>
+				</div>
+				{/* Phones/tablets: outside the scroller, so it never scrolls sideways. No top
+				    border: divide-y already draws one under the last row (the hidden desktop
+				    footer above is still the last child). */}
+				<div className="bg-bg-white-0 md:hidden dark:bg-black">
+					<TableFooter
+						total={totalLogs}
+						selectedCount={selectedCount}
+						pageRowCount={rows.length}
+						isLoading={isLoading}
+					/>
 				</div>
 			</div>
 			<ReceivedEmailSelectionActionBar

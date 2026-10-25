@@ -2,7 +2,7 @@ import type { VisibilityState } from "@tanstack/react-table";
 import type { CSSProperties } from "react";
 
 const COLUMN_TRACKS: Record<string, string> = {
-	name: "minmax(0,1fr)",
+	name: "minmax(160px,1fr)",
 	contacts: "100px",
 	updatedAt: "110px",
 	createdAt: "110px",

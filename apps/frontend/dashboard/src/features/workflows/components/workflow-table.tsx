@@ -195,82 +195,105 @@ export const WorkflowTable = ({
 
 	return (
 		<>
-			<div className="w-full text-paragraph-sm">
-				<div
-					style={gridStyle}
-					className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-				>
-					{headerGroup?.headers.map((header) => (
-						<div key={header.id} className="flex items-center gap-1">
-							{header.isPlaceholder
-								? null
-								: flexRender(
-										header.column.columnDef.header,
-										header.getContext(),
-									)}
+			{/* Phones and tablets: the card (border drawn here) holds a sideways
+			    scroller for the columns, and the footer below it stays put */}
+			<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/40">
+				<div className="w-full overflow-x-auto">
+					{/* 670px = the column minimums, so the ⋯ column never spills out */}
+					<div className="min-w-[670px]">
+						<div
+							style={gridStyle}
+							className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40"
+						>
+							{headerGroup?.headers.map((header) => (
+								<div key={header.id} className="flex items-center gap-1">
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+								</div>
+							))}
+							{/* spacer matches actions column */}
+							<div />
 						</div>
-					))}
-					{/* spacer matches actions column */}
-					<div />
-				</div>
 
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-					{isLoading && workflows.length === 0 ? (
-						<WorkflowTableSkeleton
-							rows={4}
-							columnVisibility={columnVisibility}
-						/>
-					) : isTotalEmpty ? (
-						<WorkflowEmptyState onCreate={onCreate} />
-					) : isFilteredEmpty || rows.length === 0 ? (
-						<WorkflowEmptyState
-							onCreate={onCreate}
-							isFiltered
-							onClearFilters={onClearFilters}
-						/>
-					) : (
-						rows.map((row) => {
-							const workflow = row.original;
-							const isRowActive = activeDropdownId === workflow.id;
-							return (
-								<WorkflowRowContextMenu
-									key={row.id}
-									workflow={workflow}
-									handlers={actionsHandlers}
-								>
-									<div
-										style={gridStyle}
-										data-state={row.getIsSelected() ? "selected" : undefined}
-										className={cn(
-											"group/row grid w-full items-center px-4 py-2 text-left",
-											"hover:bg-bg-weak-50",
-											(isRowActive || row.getIsSelected()) &&
-												"bg-bg-weak-50/50",
-										)}
-									>
-										{row.getVisibleCells().map((cell) => (
-											<div key={cell.id}>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext(),
-												)}
-											</div>
-										))}
-										<div
-											onClick={(e) => e.stopPropagation()}
-											onKeyDown={(e) => e.stopPropagation()}
+						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40 [&>*:first-child]:rounded-t-[11px] max-md:[&>*:first-child]:rounded-none">
+							{isLoading && workflows.length === 0 ? (
+								<WorkflowTableSkeleton
+									rows={4}
+									columnVisibility={columnVisibility}
+								/>
+							) : isTotalEmpty ? (
+								<WorkflowEmptyState onCreate={onCreate} />
+							) : isFilteredEmpty || rows.length === 0 ? (
+								<WorkflowEmptyState
+									onCreate={onCreate}
+									isFiltered
+									onClearFilters={onClearFilters}
+								/>
+							) : (
+								rows.map((row) => {
+									const workflow = row.original;
+									const isRowActive = activeDropdownId === workflow.id;
+									return (
+										<WorkflowRowContextMenu
+											key={row.id}
+											workflow={workflow}
+											handlers={actionsHandlers}
 										>
-											<WorkflowDropdown
-												workflow={workflow}
-												handlers={actionsHandlers}
-											/>
-										</div>
-									</div>
-								</WorkflowRowContextMenu>
-							);
-						})
-					)}
+											<div
+												style={gridStyle}
+												data-state={
+													row.getIsSelected() ? "selected" : undefined
+												}
+												className={cn(
+													"group/row grid w-full items-center px-4 py-2 text-left",
+													"hover:bg-bg-weak-50",
+													(isRowActive || row.getIsSelected()) &&
+														"bg-bg-weak-50/50",
+												)}
+											>
+												{row.getVisibleCells().map((cell) => (
+													<div key={cell.id}>
+														{flexRender(
+															cell.column.columnDef.cell,
+															cell.getContext(),
+														)}
+													</div>
+												))}
+												<div
+													onClick={(e) => e.stopPropagation()}
+													onKeyDown={(e) => e.stopPropagation()}
+												>
+													<WorkflowDropdown
+														workflow={workflow}
+														handlers={actionsHandlers}
+													/>
+												</div>
+											</div>
+										</WorkflowRowContextMenu>
+									);
+								})
+							)}
 
+							{/* Desktop: footer inside the rows card, as before */}
+							<div className="max-md:hidden">
+								<WorkflowTableFooter
+									total={workflows.length}
+									selectedCount={selectedCount}
+									pageRowCount={rows.length}
+									isLoading={isLoading}
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+				{/* Phones/tablets: outside the scroller, so it never scrolls sideways. No top
+			    border: divide-y already draws one under the last row (the hidden desktop
+			    footer above is still the last child). */}
+				<div className="bg-bg-white-0 md:hidden dark:bg-black">
 					<WorkflowTableFooter
 						total={workflows.length}
 						selectedCount={selectedCount}

@@ -9,7 +9,10 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import {
 	apiErrorMessage,
@@ -24,7 +27,7 @@ import {
 
 /** name · host · domains · status · last tested · added · actions */
 const GRID = {
-	gridTemplateColumns: "minmax(0,1fr) 210px 190px 120px 110px 100px 32px",
+	gridTemplateColumns: "minmax(140px,1fr) 210px 190px 120px 110px 100px 32px",
 } as const;
 
 function HeaderCell({ icon, label }: { icon: string; label: string }) {
@@ -292,9 +295,7 @@ function OwnSmtpPrompt({
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Connect to SMTP Server
-					<ActionKbd className={actionKbdOnSolidClassName}>
-						C
-					</ActionKbd>
+					<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 				</FancyButton.Root>
 			) : (
 				<Link
@@ -326,50 +327,55 @@ export function SmtpServersTable({
 	onEdit: (provider: SmtpProvider) => void;
 	onDelete: (provider: SmtpProvider) => void;
 }) {
+	// Phones and tablets: the card (border drawn here) holds a sideways
+	// scroller for the columns
 	return (
-		<div className="w-full overflow-x-auto text-paragraph-sm">
-			<div className="min-w-[880px]">
-				<div
-					style={GRID}
-					className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-				>
-					<HeaderCell icon="server" label="Server" />
-					<HeaderCell icon="link" label="Host" />
-					<HeaderCell icon="globe" label="Domains" />
-					<HeaderCell icon="activity" label="Status" />
-					<HeaderCell icon="history" label="Last Tested" />
-					<HeaderCell icon="calendar" label="Added" />
-					<div />
-				</div>
+		<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+			<div className="w-full overflow-x-auto">
+				{/* 936px = the column minimums, so the ⋯ column never spills out */}
+				<div className="min-w-[936px]">
+					<div
+						style={GRID}
+						className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40"
+					>
+						<HeaderCell icon="server" label="Server" />
+						<HeaderCell icon="link" label="Host" />
+						<HeaderCell icon="globe" label="Domains" />
+						<HeaderCell icon="activity" label="Status" />
+						<HeaderCell icon="history" label="Last Tested" />
+						<HeaderCell icon="calendar" label="Added" />
+						<div />
+					</div>
 
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
-					{isLoading && providers.length === 0 ? (
-						<div style={GRID} className="grid items-center px-4 py-2.5">
-							<Skeleton className="h-4 w-40" />
-							<Skeleton className="h-4 w-32" />
-							<Skeleton className="h-4 w-24" />
-							<Skeleton className="h-4 w-20" />
-							<Skeleton className="h-4 w-14" />
-							<Skeleton className="h-4 w-14" />
-							<div />
-						</div>
-					) : providers.length === 0 ? (
-						<OwnSmtpPrompt
-							entitled={entitled}
-							canManage={canManage}
-							onAdd={onAdd}
-						/>
-					) : (
-						providers.map((provider) => (
-							<ProviderRow
-								key={provider.id}
-								provider={provider}
+					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
+						{isLoading && providers.length === 0 ? (
+							<div style={GRID} className="grid items-center px-4 py-2.5">
+								<Skeleton className="h-4 w-40" />
+								<Skeleton className="h-4 w-32" />
+								<Skeleton className="h-4 w-24" />
+								<Skeleton className="h-4 w-20" />
+								<Skeleton className="h-4 w-14" />
+								<Skeleton className="h-4 w-14" />
+								<div />
+							</div>
+						) : providers.length === 0 ? (
+							<OwnSmtpPrompt
+								entitled={entitled}
 								canManage={canManage}
-								onEdit={onEdit}
-								onDelete={onDelete}
+								onAdd={onAdd}
 							/>
-						))
-					)}
+						) : (
+							providers.map((provider) => (
+								<ProviderRow
+									key={provider.id}
+									provider={provider}
+									canManage={canManage}
+									onEdit={onEdit}
+									onDelete={onDelete}
+								/>
+							))
+						)}
+					</div>
 				</div>
 			</div>
 		</div>

@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
-import { useMemo, useRef, useState } from "react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { PixelAvatarTile } from "#/features/dashboard/page-header/pixel-avatar";
@@ -77,7 +77,7 @@ const isEmailLike = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const primaryRole = (role: string) =>
 	role.split(",")[0]?.trim().toLowerCase() ?? role.toLowerCase();
 
-const GRID = "grid-cols-[minmax(0,1fr)_120px_130px_32px]";
+const GRID = "grid-cols-[minmax(160px,1fr)_120px_130px_32px]";
 
 const TeamSkeleton = () => (
 	<div className={`grid ${GRID} items-center px-4 py-2`}>
@@ -99,9 +99,21 @@ const TeamSkeleton = () => (
 	</div>
 );
 
+/**
+ * Phones and tablets: the card (border drawn here) holds a sideways scroller
+ * for the columns. 476px = the column minimums, so the ⋯ column never spills out.
+ */
+const TableCard = ({ children }: { children: ReactNode }) => (
+	<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+		<div className="w-full overflow-x-auto">
+			<div className="min-w-[476px]">{children}</div>
+		</div>
+	</div>
+);
+
 const TableHeader = () => (
 	<div
-		className={`grid ${GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40`}
+		className={`grid ${GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40`}
 	>
 		<div className="flex items-center gap-1">
 			<Icon name="user" className="h-3 w-3" />
@@ -416,15 +428,15 @@ export function TeamList({
 
 	if (isLoading) {
 		return (
-			<div className="w-full text-paragraph-sm">
+			<TableCard>
 				<TableHeader />
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
+				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
 					{Array.from({ length: 3 }).map((_, index) => (
 						// biome-ignore lint/suspicious/noArrayIndexKey: static skeleton rows
 						<TeamSkeleton key={`skeleton-${index}`} />
 					))}
 				</div>
-			</div>
+			</TableCard>
 		);
 	}
 
@@ -433,11 +445,11 @@ export function TeamList({
 
 	return (
 		<div>
-			<div className="w-full text-paragraph-sm">
+			<TableCard>
 				<TableHeader />
 
 				{/* Table body, stacked over header with rounded corners (same as domains) */}
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
+				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
 					{noResults ? (
 						<div className="flex flex-col items-center justify-center py-16">
 							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
@@ -658,7 +670,7 @@ export function TeamList({
 						</>
 					)}
 				</div>
-			</div>
+			</TableCard>
 			<RevokeInviteModal
 				open={modal === "revoke-invite"}
 				onOpenChange={(open) => {

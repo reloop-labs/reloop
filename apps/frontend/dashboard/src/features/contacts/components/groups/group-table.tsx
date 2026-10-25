@@ -110,115 +110,139 @@ export const GroupTable = ({
 
 	return (
 		<>
-			<div className="w-full text-paragraph-sm">
-				<div
-					style={gridStyle}
-					className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-				>
-					{headerGroup?.headers.map((header) => (
-						<div key={header.id} className="flex items-center gap-1">
-							{header.isPlaceholder
-								? null
-								: flexRender(
-										header.column.columnDef.header,
-										header.getContext(),
-									)}
-						</div>
-					))}
-					<div />
-				</div>
-
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-					{isLoading && groups.length === 0 ? (
-						<GroupTableSkeleton
-							rows={loadingRows}
-							columnVisibility={columnVisibility}
-						/>
-					) : rows.length === 0 ? (
-						<GroupsEmptyState
-							onAddGroup={onAddGroup}
-							searchQuery={searchQuery}
-							onClearSearch={onClearSearch}
-						/>
-					) : (
-						rows.map((row) => {
-							const group = row.original;
-							const isEditing = editingGroupId === group.id;
-							const isRowActive = activeDropdownId === group.id || isEditing;
-
-							return (
-								<div key={row.id}>
-									<GroupRowContextMenu
-										group={group}
-										onEdit={handleEdit}
-										onDelete={handleDelete}
-										onOpenChange={(open) =>
-											setActiveDropdownId(open ? group.id : null)
-										}
-									>
-										<div
-											style={gridStyle}
-											data-state={row.getIsSelected() ? "selected" : undefined}
-											className={cn(
-												"group/row grid w-full items-center px-4 py-2 text-left",
-												"hover:bg-bg-weak-50",
-												(isRowActive || row.getIsSelected()) &&
-													"bg-bg-weak-50/50",
-												isEditing && "bg-bg-weak-50/70",
+			{/* Phones and tablets: the card (border drawn here) holds a sideways
+			    scroller for the columns, and the footer below it stays put */}
+			<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+				<div className="w-full overflow-x-auto">
+					{/* 580px = the column minimums, so the ⋯ column never spills out */}
+					<div className="min-w-[580px]">
+						<div
+							style={gridStyle}
+							className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40"
+						>
+							{headerGroup?.headers.map((header) => (
+								<div key={header.id} className="flex items-center gap-1">
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
 											)}
-										>
-											{row.getVisibleCells().map((cell) => (
-												<div key={cell.id}>
-													{flexRender(
-														cell.column.columnDef.cell,
-														cell.getContext(),
-													)}
-												</div>
-											))}
-											<div
-												onClick={(e) => e.stopPropagation()}
-												onKeyDown={(e) => e.stopPropagation()}
-											>
-												<GroupDropdown
-													group={group}
-													onEdit={handleEdit}
-													onDelete={handleDelete}
-													onOpenChange={(open) =>
-														setActiveDropdownId(open ? group.id : null)
-													}
-												/>
-											</div>
-										</div>
-									</GroupRowContextMenu>
-
-									<AnimatePresence initial={false}>
-										{isEditing ? (
-											<motion.div
-												key={`edit-${group.id}`}
-												initial={{ height: 0, opacity: 0 }}
-												animate={{ height: "auto", opacity: 1 }}
-												exit={{ height: 0, opacity: 0 }}
-												transition={{
-													height: {
-														duration: 0.28,
-														ease: [0.32, 0.72, 0, 1],
-													},
-													opacity: { duration: 0.2, ease: "easeOut" },
-												}}
-												className="overflow-hidden"
-											>
-												<EditGroupRowPanel
-													group={group}
-													onClose={() => setEditingGroupId(null)}
-												/>
-											</motion.div>
-										) : null}
-									</AnimatePresence>
 								</div>
-							);
-						})
-					)}
+							))}
+							<div />
+						</div>
 
+						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40 [&>*:first-child]:rounded-t-[11px] max-md:[&>*:first-child]:rounded-none">
+							{isLoading && groups.length === 0 ? (
+								<GroupTableSkeleton
+									rows={loadingRows}
+									columnVisibility={columnVisibility}
+								/>
+							) : rows.length === 0 ? (
+								<GroupsEmptyState
+									onAddGroup={onAddGroup}
+									searchQuery={searchQuery}
+									onClearSearch={onClearSearch}
+								/>
+							) : (
+								rows.map((row) => {
+									const group = row.original;
+									const isEditing = editingGroupId === group.id;
+									const isRowActive =
+										activeDropdownId === group.id || isEditing;
+
+									return (
+										<div key={row.id}>
+											<GroupRowContextMenu
+												group={group}
+												onEdit={handleEdit}
+												onDelete={handleDelete}
+												onOpenChange={(open) =>
+													setActiveDropdownId(open ? group.id : null)
+												}
+											>
+												<div
+													style={gridStyle}
+													data-state={
+														row.getIsSelected() ? "selected" : undefined
+													}
+													className={cn(
+														"group/row grid w-full items-center px-4 py-2 text-left",
+														"hover:bg-bg-weak-50",
+														(isRowActive || row.getIsSelected()) &&
+															"bg-bg-weak-50/50",
+														isEditing && "bg-bg-weak-50/70",
+													)}
+												>
+													{row.getVisibleCells().map((cell) => (
+														<div key={cell.id}>
+															{flexRender(
+																cell.column.columnDef.cell,
+																cell.getContext(),
+															)}
+														</div>
+													))}
+													<div
+														onClick={(e) => e.stopPropagation()}
+														onKeyDown={(e) => e.stopPropagation()}
+													>
+														<GroupDropdown
+															group={group}
+															onEdit={handleEdit}
+															onDelete={handleDelete}
+															onOpenChange={(open) =>
+																setActiveDropdownId(open ? group.id : null)
+															}
+														/>
+													</div>
+												</div>
+											</GroupRowContextMenu>
+
+											<AnimatePresence initial={false}>
+												{isEditing ? (
+													<motion.div
+														key={`edit-${group.id}`}
+														initial={{ height: 0, opacity: 0 }}
+														animate={{ height: "auto", opacity: 1 }}
+														exit={{ height: 0, opacity: 0 }}
+														transition={{
+															height: {
+																duration: 0.28,
+																ease: [0.32, 0.72, 0, 1],
+															},
+															opacity: { duration: 0.2, ease: "easeOut" },
+														}}
+														className="overflow-hidden"
+													>
+														<EditGroupRowPanel
+															group={group}
+															onClose={() => setEditingGroupId(null)}
+														/>
+													</motion.div>
+												) : null}
+											</AnimatePresence>
+										</div>
+									);
+								})
+							)}
+
+							{/* Desktop: footer inside the rows card, as before */}
+							<div className="max-md:hidden">
+								<GroupTableFooter
+									total={total}
+									selectedCount={selectedCount}
+									pageRowCount={rows.length}
+									isLoading={isLoading}
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+				{/* Phones/tablets: outside the scroller, so it never scrolls sideways. No top
+				    border: divide-y already draws one under the last row (the hidden desktop
+				    footer above is still the last child). */}
+				<div className="bg-bg-white-0 md:hidden dark:bg-black">
 					<GroupTableFooter
 						total={total}
 						selectedCount={selectedCount}

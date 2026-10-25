@@ -155,144 +155,157 @@ export const ContactTable = ({
 
 	return (
 		<>
-			{/* Phones scroll the table sideways instead of crushing the columns;
-			    the scroller bleeds past the shell padding so rows scroll to the screen edge */}
-			<div className="@container w-full overflow-x-auto text-paragraph-sm max-sm:-mx-4 max-md:w-auto sm:max-md:-mx-6">
-				{/* The page inset (16px phones, 24px tablets) lives inside the scroller: at rest the table lines up
-				    with the toolbar, and the right inset appears once scrolled to the end */}
-				<div className="min-w-[780px] max-sm:px-4 sm:max-md:px-6 md:min-w-0">
-					<div
-						style={gridStyle}
-						className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-					>
-						{headerGroup?.headers.map((header) => (
-							<div key={header.id} className="flex items-center gap-1">
-								{header.isPlaceholder
-									? null
-									: flexRender(
-											header.column.columnDef.header,
-											header.getContext(),
-										)}
-							</div>
-						))}
-						{/* spacer matches actions column */}
-						<div />
-					</div>
+			{/* Phones and tablets: the card (border drawn here) holds a sideways
+			    scroller for the columns, and the footer below it stays put */}
+			<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+				<div className="w-full overflow-x-auto">
+					{/* 750px = the column minimums, so the ⋯ column never spills out */}
+					<div className="min-w-[750px]">
+						<div
+							style={gridStyle}
+							className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40"
+						>
+							{headerGroup?.headers.map((header) => (
+								<div key={header.id} className="flex items-center gap-1">
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+								</div>
+							))}
+							{/* spacer matches actions column */}
+							<div />
+						</div>
 
-					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-						{isLoading && contacts.length === 0 ? (
-							<ContactTableSkeleton
-								rows={loadingRows}
-								columnVisibility={columnVisibility}
-							/>
-						) : rows.length === 0 ? (
-							<ContactsEmptyState
-								onAddContact={onAddContact}
-								searchQuery={searchQuery}
-								onClearSearch={onClearSearch}
-								title={emptyStateTitle}
-								description={emptyStateDescription}
-								buttonText={emptyStateButtonText}
-								shortcut={emptyStateShortcut}
-							/>
-						) : (
-							rows.map((row) => {
-								const contact = row.original;
-								const isEditing = editingContactId === contact.id;
-								const isRowActive =
-									activeDropdownId === contact.id || isEditing;
-								return (
-									<div key={row.id}>
-										<ContactRowContextMenu
-											contact={contact}
-											onEdit={handleEdit}
-											onDelete={handleDelete}
-											onRemoveFromGroup={
-												groupId ? handleRemoveFromGroup : undefined
-											}
-											isDeleting={false}
-											onOpenChange={(open) =>
-												handleOpenChange(open, contact.id)
-											}
-										>
-											<div
-												style={gridStyle}
-												data-state={
-													row.getIsSelected() ? "selected" : undefined
+						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40 [&>*:first-child]:rounded-t-[11px] max-md:[&>*:first-child]:rounded-none">
+							{isLoading && contacts.length === 0 ? (
+								<ContactTableSkeleton
+									rows={loadingRows}
+									columnVisibility={columnVisibility}
+								/>
+							) : rows.length === 0 ? (
+								<ContactsEmptyState
+									onAddContact={onAddContact}
+									searchQuery={searchQuery}
+									onClearSearch={onClearSearch}
+									title={emptyStateTitle}
+									description={emptyStateDescription}
+									buttonText={emptyStateButtonText}
+									shortcut={emptyStateShortcut}
+								/>
+							) : (
+								rows.map((row) => {
+									const contact = row.original;
+									const isEditing = editingContactId === contact.id;
+									const isRowActive =
+										activeDropdownId === contact.id || isEditing;
+									return (
+										<div key={row.id}>
+											<ContactRowContextMenu
+												contact={contact}
+												onEdit={handleEdit}
+												onDelete={handleDelete}
+												onRemoveFromGroup={
+													groupId ? handleRemoveFromGroup : undefined
 												}
-												className={cn(
-													"group/row grid w-full items-center px-4 py-2 text-left",
-													"hover:bg-bg-weak-50",
-													(isRowActive || row.getIsSelected()) &&
-														"bg-bg-weak-50/50",
-													isEditing && "bg-bg-weak-50/70",
-												)}
+												isDeleting={false}
+												onOpenChange={(open) =>
+													handleOpenChange(open, contact.id)
+												}
 											>
-												{row.getVisibleCells().map((cell) => (
-													<div key={cell.id}>
-														{flexRender(
-															cell.column.columnDef.cell,
-															cell.getContext(),
-														)}
-													</div>
-												))}
 												<div
-													onClick={(e) => e.stopPropagation()}
-													onKeyDown={(e) => e.stopPropagation()}
+													style={gridStyle}
+													data-state={
+														row.getIsSelected() ? "selected" : undefined
+													}
+													className={cn(
+														"group/row grid w-full items-center px-4 py-2 text-left",
+														"hover:bg-bg-weak-50",
+														(isRowActive || row.getIsSelected()) &&
+															"bg-bg-weak-50/50",
+														isEditing && "bg-bg-weak-50/70",
+													)}
 												>
-													<ContactDropdown
-														contact={contact}
-														onEdit={handleEdit}
-														onDelete={handleDelete}
-														onRemoveFromGroup={
-															groupId ? handleRemoveFromGroup : undefined
-														}
-														isDeleting={false}
-														onOpenChange={(open) =>
-															handleOpenChange(open, contact.id)
-														}
-													/>
+													{row.getVisibleCells().map((cell) => (
+														<div key={cell.id}>
+															{flexRender(
+																cell.column.columnDef.cell,
+																cell.getContext(),
+															)}
+														</div>
+													))}
+													<div
+														onClick={(e) => e.stopPropagation()}
+														onKeyDown={(e) => e.stopPropagation()}
+													>
+														<ContactDropdown
+															contact={contact}
+															onEdit={handleEdit}
+															onDelete={handleDelete}
+															onRemoveFromGroup={
+																groupId ? handleRemoveFromGroup : undefined
+															}
+															isDeleting={false}
+															onOpenChange={(open) =>
+																handleOpenChange(open, contact.id)
+															}
+														/>
+													</div>
 												</div>
-											</div>
-										</ContactRowContextMenu>
+											</ContactRowContextMenu>
 
-										<AnimatePresence initial={false}>
-											{isEditing ? (
-												<motion.div
-													key={`edit-${contact.id}`}
-													initial={{ height: 0, opacity: 0 }}
-													animate={{ height: "auto", opacity: 1 }}
-													exit={{ height: 0, opacity: 0 }}
-													transition={{
-														height: {
-															duration: 0.28,
-															ease: [0.32, 0.72, 0, 1],
-														},
-														opacity: { duration: 0.2, ease: "easeOut" },
-													}}
-													className="overflow-hidden"
-												>
-													<EditContactRowPanel
-														contactId={contact.id}
-														onClose={() => setEditingContactId(null)}
-													/>
-												</motion.div>
-											) : null}
-										</AnimatePresence>
-									</div>
-								);
-							})
-						)}
+											<AnimatePresence initial={false}>
+												{isEditing ? (
+													<motion.div
+														key={`edit-${contact.id}`}
+														initial={{ height: 0, opacity: 0 }}
+														animate={{ height: "auto", opacity: 1 }}
+														exit={{ height: 0, opacity: 0 }}
+														transition={{
+															height: {
+																duration: 0.28,
+																ease: [0.32, 0.72, 0, 1],
+															},
+															opacity: { duration: 0.2, ease: "easeOut" },
+														}}
+														className="overflow-hidden"
+													>
+														<EditContactRowPanel
+															contactId={contact.id}
+															onClose={() => setEditingContactId(null)}
+														/>
+													</motion.div>
+												) : null}
+											</AnimatePresence>
+										</div>
+									);
+								})
+							)}
 
-						<ContactTableFooter
-							total={total}
-							selectedCount={selectedCount}
-							pageRowCount={rows.length}
-							isLoading={isLoading}
-							// Pin pagination inside the visible card (page inset + 1px border per side) while rows scroll
-							className="max-sm:left-[17px] max-sm:w-[calc(100cqw-34px)] max-md:sticky sm:max-md:left-[25px] sm:max-md:w-[calc(100cqw-50px)]"
-						/>
+							{/* Desktop: footer inside the rows card, as before */}
+							<div className="max-md:hidden">
+								<ContactTableFooter
+									total={total}
+									selectedCount={selectedCount}
+									pageRowCount={rows.length}
+									isLoading={isLoading}
+								/>
+							</div>
+						</div>
 					</div>
+				</div>
+				{/* Phones/tablets: outside the scroller, so it never scrolls sideways. No top
+				    border: divide-y already draws one under the last row (the hidden desktop
+				    footer above is still the last child). */}
+				<div className="bg-bg-white-0 md:hidden dark:bg-black">
+					<ContactTableFooter
+						total={total}
+						selectedCount={selectedCount}
+						pageRowCount={rows.length}
+						isLoading={isLoading}
+					/>
 				</div>
 			</div>
 			<ContactSelectionActionBar table={table} />

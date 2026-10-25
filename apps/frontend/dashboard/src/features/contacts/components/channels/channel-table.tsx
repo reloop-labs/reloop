@@ -105,151 +105,171 @@ export const ChannelTable = ({
 	const startIndex = (currentPage - 1) * pageSize + 1;
 	const endIndex = Math.min(currentPage * pageSize, total);
 
+	// Pagination footer: rendered inside the rows card on desktop and pinned
+	// below the sideways scroller on phones/tablets.
+	const footer = !isLoading && total > 0 && (
+		<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
+			<div className="flex items-center gap-3">
+				<span>
+					Showing {startIndex}–{endIndex} of {total} channel
+					{total !== 1 ? "s" : ""}
+				</span>
+				<PageSizeDropdown
+					value={pageSize}
+					onValueChange={(value) => onPageSizeChange?.(value)}
+				/>
+			</div>
+			<PaginationControls
+				currentPage={currentPage}
+				totalPages={totalPages}
+				onPageChange={(page) => onPageChange?.(page)}
+				isLoading={isLoading}
+			/>
+		</div>
+	);
+
 	return (
-		<div className="w-full text-paragraph-sm">
-			{/* Table Header */}
-			<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
-				<div className="flex items-center gap-1">
-					<Icon name="notification-indicator" className="h-3 w-3" />
-					<span className="text-xs">Name</span>
-				</div>
-				<div className="flex items-center gap-1">
-					<Icon name="users" className="h-3 w-3" />
-					<span className="text-xs">Subscription</span>
-				</div>
-				<div className="flex items-center gap-1">
-					<Icon name="eye-outline" className="h-3 w-3" />
-					<span className="text-xs">Visibility</span>
-				</div>
-				<div className="flex items-center gap-1">
-					<Icon name="clock" className="h-3 w-3" />
-					<span className="text-xs">Created At</span>
-				</div>
-				<div />
-			</div>
-
-			{/* Table Body */}
-			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-				{isLoading ? (
-					Array.from({ length: loadingRows }).map((_, i) => (
-						<ChannelSkeleton key={`skeleton-${i}`} />
-					))
-				) : channels.length === 0 ? (
-					<EmptyState onCreateClick={onAddChannel} />
-				) : (
-					channels.map((channel) => {
-						const isRowActive = activeDropdownId === channel.id;
-						const subscriptionValue = channel.defaultSubscription || "opt_out";
-						const visibilityValue = channel.visibility || "private";
-
-						return (
-							<div
-								key={channel.id}
-								onClick={() => handleRowClick(channel.id)}
-								className={cn(
-									"group/row grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_48px] items-center px-4 py-2 text-left transition-colors",
-									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-strong-950 focus-visible:outline-offset-[-1px]",
-									isRowActive && "bg-bg-weak-50/50",
-								)}
-							>
-								{/* Name Column */}
-								<div className="flex items-center gap-2">
-									<Icon
-										name="notification-indicator"
-										className="h-4 w-4 shrink-0 text-text-sub-600"
-									/>
-									<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors group-hover/row:text-text-sub-600">
-										{channel.name}
-									</span>
-								</div>
-
-								{/* Subscription Column */}
-								<div className="flex items-center">
-									<span
-										className={cn(
-											"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
-											getSubscriptionBadgeStyle(channel.defaultSubscription),
-										)}
-									>
-										<Icon
-											name={
-												channel.defaultSubscription === "opt_in"
-													? "user-plus"
-													: "user-minus"
-											}
-											className="h-3 w-3"
-										/>
-										{subscriptionValue}
-									</span>
-								</div>
-
-								{/* Visibility Column */}
-								<div className="flex items-center">
-									<span
-										className={cn(
-											"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
-											getVisibilityBadgeStyle(channel.visibility),
-										)}
-									>
-										<Icon
-											name={channel.visibility === "public" ? "globe" : "lock"}
-											className="h-3 w-3"
-										/>
-										{visibilityValue}
-									</span>
-								</div>
-
-								{/* Created Column */}
-								<div className="flex items-center">
-									<span className="whitespace-nowrap font-medium text-[13px]">
-										{formatRelativeTime(channel.createdAt)}
-									</span>
-								</div>
-
-								{/* Actions Column */}
-								<div
-									className="flex items-center justify-center text-text-soft-400"
-									onClick={(e) => e.stopPropagation()}
-								>
-									<ChannelDropdown
-										channelId={channel.id}
-										channelName={channel.name}
-										visibility={channel.visibility}
-										onEdit={onEdit}
-										onDelete={handleDelete}
-										onToggleVisibility={onToggleVisibility}
-										onOpenChange={(open: boolean) =>
-											setActiveDropdownId(open ? channel.id : null)
-										}
-									/>
-								</div>
-							</div>
-						);
-					})
-				)}
-
-				{/* Pagination Footer */}
-				{!isLoading && total > 0 && (
-					<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
-						<div className="flex items-center gap-3">
-							<span>
-								Showing {startIndex}–{endIndex} of {total} channel
-								{total !== 1 ? "s" : ""}
-							</span>
-							<PageSizeDropdown
-								value={pageSize}
-								onValueChange={(value) => onPageSizeChange?.(value)}
-							/>
+		// Phones and tablets: the card (border drawn here) holds a sideways
+		// scroller for the columns, and the footer below it stays put
+		<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+			<div className="w-full overflow-x-auto">
+				{/* 540px = the column minimums, so the ⋯ column never spills out */}
+				<div className="min-w-[540px]">
+					{/* Table Header */}
+					<div className="grid grid-cols-[2fr_1fr_1fr_1fr_48px] items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40">
+						<div className="flex items-center gap-1">
+							<Icon name="notification-indicator" className="h-3 w-3" />
+							<span className="text-xs">Name</span>
 						</div>
-						<PaginationControls
-							currentPage={currentPage}
-							totalPages={totalPages}
-							onPageChange={(page) => onPageChange?.(page)}
-							isLoading={isLoading}
-						/>
+						<div className="flex items-center gap-1">
+							<Icon name="users" className="h-3 w-3" />
+							<span className="text-xs">Subscription</span>
+						</div>
+						<div className="flex items-center gap-1">
+							<Icon name="eye-outline" className="h-3 w-3" />
+							<span className="text-xs">Visibility</span>
+						</div>
+						<div className="flex items-center gap-1">
+							<Icon name="clock" className="h-3 w-3" />
+							<span className="text-xs">Created At</span>
+						</div>
+						<div />
 					</div>
-				)}
+
+					{/* Table Body */}
+					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+						{isLoading ? (
+							Array.from({ length: loadingRows }).map((_, i) => (
+								<ChannelSkeleton key={`skeleton-${i}`} />
+							))
+						) : channels.length === 0 ? (
+							<EmptyState onCreateClick={onAddChannel} />
+						) : (
+							channels.map((channel) => {
+								const isRowActive = activeDropdownId === channel.id;
+								const subscriptionValue =
+									channel.defaultSubscription || "opt_out";
+								const visibilityValue = channel.visibility || "private";
+
+								return (
+									<div
+										key={channel.id}
+										onClick={() => handleRowClick(channel.id)}
+										className={cn(
+											"group/row grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_48px] items-center px-4 py-2 text-left transition-colors",
+											"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-stroke-strong-950 focus-visible:outline-offset-[-1px]",
+											isRowActive && "bg-bg-weak-50/50",
+										)}
+									>
+										{/* Name Column */}
+										<div className="flex items-center gap-2">
+											<Icon
+												name="notification-indicator"
+												className="h-4 w-4 shrink-0 text-text-sub-600"
+											/>
+											<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors group-hover/row:text-text-sub-600">
+												{channel.name}
+											</span>
+										</div>
+
+										{/* Subscription Column */}
+										<div className="flex items-center">
+											<span
+												className={cn(
+													"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
+													getSubscriptionBadgeStyle(
+														channel.defaultSubscription,
+													),
+												)}
+											>
+												<Icon
+													name={
+														channel.defaultSubscription === "opt_in"
+															? "user-plus"
+															: "user-minus"
+													}
+													className="h-3 w-3"
+												/>
+												{subscriptionValue}
+											</span>
+										</div>
+
+										{/* Visibility Column */}
+										<div className="flex items-center">
+											<span
+												className={cn(
+													"inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-medium text-[11px] capitalize",
+													getVisibilityBadgeStyle(channel.visibility),
+												)}
+											>
+												<Icon
+													name={
+														channel.visibility === "public" ? "globe" : "lock"
+													}
+													className="h-3 w-3"
+												/>
+												{visibilityValue}
+											</span>
+										</div>
+
+										{/* Created Column */}
+										<div className="flex items-center">
+											<span className="whitespace-nowrap font-medium text-[13px]">
+												{formatRelativeTime(channel.createdAt)}
+											</span>
+										</div>
+
+										{/* Actions Column */}
+										<div
+											className="flex items-center justify-center text-text-soft-400"
+											onClick={(e) => e.stopPropagation()}
+										>
+											<ChannelDropdown
+												channelId={channel.id}
+												channelName={channel.name}
+												visibility={channel.visibility}
+												onEdit={onEdit}
+												onDelete={handleDelete}
+												onToggleVisibility={onToggleVisibility}
+												onOpenChange={(open: boolean) =>
+													setActiveDropdownId(open ? channel.id : null)
+												}
+											/>
+										</div>
+									</div>
+								);
+							})
+						)}
+
+						{/* Desktop: footer inside the rows card, as before */}
+						<div className="max-md:hidden">{footer}</div>
+					</div>
+				</div>
 			</div>
+			{/* Phones/tablets: outside the scroller, so it never scrolls sideways. No top
+			    border: divide-y already draws one under the last row (the hidden desktop
+			    footer above is still the last child). */}
+			<div className="bg-bg-white-0 md:hidden dark:bg-black">{footer}</div>
 		</div>
 	);
 };

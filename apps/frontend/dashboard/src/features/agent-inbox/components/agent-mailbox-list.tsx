@@ -27,7 +27,7 @@ import { AgentInboxEmptyState } from "./shared/empty-state";
 import { LoadingDot } from "./shared/loading-dot";
 
 const TABLE_GRID =
-	"grid grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center px-4";
+	"grid grid-cols-[minmax(160px,1fr)_120px_140px_32px] items-center px-4";
 
 type MailboxStatus = AgentMailbox["status"];
 type StatusFilter = MailboxStatus | null;
@@ -359,148 +359,162 @@ export const AgentMailboxList = () => {
 		void setCurrentPage(1);
 	};
 
+	const footer = (
+		<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
+			<div className="flex items-center">
+				<span>
+					Showing {startIndex}–{endIndex} of {total} address
+					{total !== 1 ? "es" : ""}
+					{isFiltered ? " (filtered)" : ""}
+				</span>
+				<PageSizeDropdown
+					value={size}
+					onValueChange={(value) => {
+						void setPageSize(value);
+						void setCurrentPage(1);
+					}}
+				/>
+			</div>
+			<PaginationControls
+				currentPage={safePage}
+				totalPages={totalPages}
+				onPageChange={(p) => void setCurrentPage(p)}
+				isLoading={isLoadingMailboxes}
+			/>
+		</div>
+	);
+
 	return (
 		<div className="pb-8">
 			<div className="space-y-4">
 				<AgentMailboxListToolbar />
 
-				<div className="w-full text-paragraph-sm">
-					{/* Table header */}
-					<div
-						className={cn(
-							TABLE_GRID,
-							"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-white/[0.03]",
-						)}
-					>
-						<div className="flex items-center gap-1">
-							<Icon name="inbox" className="h-3 w-3" />
-							<span className="text-xs">Address</span>
-						</div>
-						<div className="flex items-center gap-1">
-							<Icon name="activity" className="h-3 w-3" />
-							<span className="text-xs">Status</span>
-						</div>
-						<div className="flex items-center gap-1">
-							<Icon name="clock" className="h-3 w-3" />
-							<span className="text-xs">Created At</span>
-						</div>
-						<div />
-					</div>
+				{/* Phones and tablets: the card (border drawn here) holds a sideways
+				    scroller for the columns, and the footer below it stays put */}
+				<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/40">
+					<div className="w-full overflow-x-auto">
+						{/* 486px = the column minimums, so the ⋯ column never spills out */}
+						<div className="min-w-[486px]">
+							{/* Table header */}
+							<div
+								className={cn(
+									TABLE_GRID,
+									"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-2.5 pb-5 font-medium text-text-sub-600 max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-white/[0.03]",
+								)}
+							>
+								<div className="flex items-center gap-1">
+									<Icon name="inbox" className="h-3 w-3" />
+									<span className="text-xs">Address</span>
+								</div>
+								<div className="flex items-center gap-1">
+									<Icon name="activity" className="h-3 w-3" />
+									<span className="text-xs">Status</span>
+								</div>
+								<div className="flex items-center gap-1">
+									<Icon name="clock" className="h-3 w-3" />
+									<span className="text-xs">Created At</span>
+								</div>
+								<div />
+							</div>
 
-					{/* Table body */}
-					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-						{isLoadingMailboxes ? (
-							Array.from({ length: 4 }).map((_, i) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
-								<AgentMailboxSkeleton key={`skeleton-${i}`} />
-							))
-						) : mailboxes.length === 0 ? (
-							<AgentInboxEmptyState onAddClick={() => setAddOpen(true)} />
-						) : filteredMailboxes.length === 0 ? (
-							<FilteredEmptyState
-								searchQuery={searchQuery ?? ""}
-								statusFilter={statusFilter}
-								onClear={clearFilters}
-							/>
-						) : (
-							pagedMailboxes.map((mailbox) => {
-								const isRowActive = activeDropdownId === mailbox.id;
-								return (
-									<div
-										key={mailbox.id}
-										onClick={() => goToMailbox(mailbox.id)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" || e.key === " ") {
-												e.preventDefault();
-												goToMailbox(mailbox.id);
-											}
-										}}
-										className={cn(
-											TABLE_GRID,
-											"group/row cursor-pointer py-2 text-left transition-colors",
-											"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
-											isRowActive && "bg-bg-weak-50/50",
-										)}
-									>
-										{/* Address */}
-										<div className="flex min-w-0 items-center gap-2 pr-4">
-											<Icon
-												name="inbox"
-												className={cn(
-													"h-4 w-4 shrink-0",
-													getStatusColorClass(mailbox.status),
-												)}
-											/>
-											<span className="truncate font-medium text-label-sm text-text-strong-950">
-												{mailbox.email}
-											</span>
-										</div>
-
-										{/* Status */}
-										<div className="flex items-center">
+							{/* Table body */}
+							<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+								{isLoadingMailboxes ? (
+									Array.from({ length: 4 }).map((_, i) => (
+										// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
+										<AgentMailboxSkeleton key={`skeleton-${i}`} />
+									))
+								) : mailboxes.length === 0 ? (
+									<AgentInboxEmptyState onAddClick={() => setAddOpen(true)} />
+								) : filteredMailboxes.length === 0 ? (
+									<FilteredEmptyState
+										searchQuery={searchQuery ?? ""}
+										statusFilter={statusFilter}
+										onClear={clearFilters}
+									/>
+								) : (
+									pagedMailboxes.map((mailbox) => {
+										const isRowActive = activeDropdownId === mailbox.id;
+										return (
 											<div
+												key={mailbox.id}
+												onClick={() => goToMailbox(mailbox.id)}
+												onKeyDown={(e) => {
+													if (e.key === "Enter" || e.key === " ") {
+														e.preventDefault();
+														goToMailbox(mailbox.id);
+													}
+												}}
 												className={cn(
-													"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-													getStatusColorClass(mailbox.status),
+													TABLE_GRID,
+													"group/row cursor-pointer py-2 text-left transition-colors",
+													"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
+													isRowActive && "bg-bg-weak-50/50",
 												)}
 											>
-												<Icon
-													name={getStatusIcon(mailbox.status)}
-													className="h-3.5 w-3.5"
-												/>
-												{getStatusLabel(mailbox.status)}
+												{/* Address */}
+												<div className="flex min-w-0 items-center gap-2 pr-4">
+													<Icon
+														name="inbox"
+														className={cn(
+															"h-4 w-4 shrink-0",
+															getStatusColorClass(mailbox.status),
+														)}
+													/>
+													<span className="truncate font-medium text-label-sm text-text-strong-950">
+														{mailbox.email}
+													</span>
+												</div>
+
+												{/* Status */}
+												<div className="flex items-center">
+													<div
+														className={cn(
+															"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+															getStatusColorClass(mailbox.status),
+														)}
+													>
+														<Icon
+															name={getStatusIcon(mailbox.status)}
+															className="h-3.5 w-3.5"
+														/>
+														{getStatusLabel(mailbox.status)}
+													</div>
+												</div>
+
+												{/* Created */}
+												<div>
+													<span className="whitespace-nowrap font-medium text-[13px]">
+														{formatRelativeTime(mailbox.createdAt)}
+													</span>
+												</div>
+
+												{/* Actions */}
+												<div className="flex items-center justify-center text-text-soft-400">
+													<AgentMailboxActionsDropdown
+														mailbox={mailbox}
+														onToggleEnabled={handleToggleEnabled}
+														onDelete={openDeleteMailbox}
+														isToggling={togglingId === mailbox.id}
+														onOpenChange={(open) =>
+															setActiveDropdownId(open ? mailbox.id : null)
+														}
+													/>
+												</div>
 											</div>
-										</div>
+										);
+									})
+								)}
 
-										{/* Created */}
-										<div>
-											<span className="whitespace-nowrap font-medium text-[13px]">
-												{formatRelativeTime(mailbox.createdAt)}
-											</span>
-										</div>
-
-										{/* Actions */}
-										<div className="flex items-center justify-center text-text-soft-400">
-											<AgentMailboxActionsDropdown
-												mailbox={mailbox}
-												onToggleEnabled={handleToggleEnabled}
-												onDelete={openDeleteMailbox}
-												isToggling={togglingId === mailbox.id}
-												onOpenChange={(open) =>
-													setActiveDropdownId(open ? mailbox.id : null)
-												}
-											/>
-										</div>
-									</div>
-								);
-							})
-						)}
-
-						{total > 0 && (
-							<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
-								<div className="flex items-center">
-									<span>
-										Showing {startIndex}–{endIndex} of {total} address
-										{total !== 1 ? "es" : ""}
-										{isFiltered ? " (filtered)" : ""}
-									</span>
-									<PageSizeDropdown
-										value={size}
-										onValueChange={(value) => {
-											void setPageSize(value);
-											void setCurrentPage(1);
-										}}
-									/>
-								</div>
-								<PaginationControls
-									currentPage={safePage}
-									totalPages={totalPages}
-									onPageChange={(p) => void setCurrentPage(p)}
-									isLoading={isLoadingMailboxes}
-								/>
+								{/* Desktop: footer inside the rows card, as before */}
+								{total > 0 && <div className="max-md:hidden">{footer}</div>}
 							</div>
-						)}
+						</div>
 					</div>
+					{/* Phones/tablets: outside the scroller, so it never scrolls sideways. No top
+					    border: divide-y already draws one under the last row (the hidden desktop
+					    footer above is still the last child). */}
+					{total > 0 && <div className="bg-bg-white-0 md:hidden">{footer}</div>}
 				</div>
 			</div>
 

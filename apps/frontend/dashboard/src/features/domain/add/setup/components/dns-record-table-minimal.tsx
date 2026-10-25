@@ -60,122 +60,132 @@ export const DNSRecordTableMinimal = ({
 		setTimeout(() => setCopiedId(null), 2000);
 	};
 
+	// Phones and tablets: the card (border drawn here) holds a sideways
+	// scroller for the columns
 	return (
-		<div className="w-full text-paragraph-sm">
-			{/* Table Header */}
-			<div
-				className={cn(
-					"grid items-center gap-x-3 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
-					gridCols,
-				)}
-			>
-				<div className="flex items-center">
-					<span className="text-xs">Type</span>
-				</div>
-				<div className="flex items-center">
-					<span className="text-xs">Name</span>
-				</div>
-				<div className="flex items-center">
-					<span className="text-xs">Value</span>
-				</div>
-				<div className="flex items-center">
-					<span className="text-xs">TTL</span>
-				</div>
-				<div className="flex items-center">
-					{showPriorityColumn && <span className="text-xs">Priority</span>}
-				</div>
-			</div>
+		<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/50">
+			<div className="w-full overflow-x-auto">
+				{/* 602px = the column minimums (120px Name, 180px Value), so the last
+			    column never spills out */}
+				<div className="min-w-[602px]">
+					{/* Table Header */}
+					<div
+						className={cn(
+							"grid items-center gap-x-3 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40",
+							gridCols,
+						)}
+					>
+						<div className="flex items-center">
+							<span className="text-xs">Type</span>
+						</div>
+						<div className="flex items-center">
+							<span className="text-xs">Name</span>
+						</div>
+						<div className="flex items-center">
+							<span className="text-xs">Value</span>
+						</div>
+						<div className="flex items-center">
+							<span className="text-xs">TTL</span>
+						</div>
+						<div className="flex items-center">
+							{showPriorityColumn && <span className="text-xs">Priority</span>}
+						</div>
+					</div>
 
-			{/* Table Body */}
-			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
-				{isLoading
-					? Array.from({ length: loadingRows }).map((_, index) => (
-							<RecordSkeleton
-								key={`skeleton-${index}`}
-								showPriority={showPriorityColumn}
-							/>
-						))
-					: records?.map((record, index) => (
-							<div
-								key={`record-${index}`}
-								className={cn(
-									"group/row grid items-center gap-x-3 px-4 py-2.5 transition-colors",
-									"hover:bg-bg-weak-50/50",
-									gridCols,
-								)}
-							>
-								{/* Type Column */}
-								<div className="flex items-center">
-									<button
-										type="button"
-										aria-label={
-											copiedId === `type-${index}`
-												? "Copied"
-												: `Copy ${record.recordType}`
-										}
-										onClick={() =>
-											handleCopy(record.recordType, `type-${index}`)
-										}
+					{/* Table Body */}
+					<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/50">
+						{isLoading
+							? Array.from({ length: loadingRows }).map((_, index) => (
+									<RecordSkeleton
+										key={`skeleton-${index}`}
+										showPriority={showPriorityColumn}
+									/>
+								))
+							: records?.map((record, index) => (
+									<div
+										key={`record-${index}`}
 										className={cn(
-											"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs ease-out",
-											copiedId === `type-${index}`
-												? "bg-success-alpha-10 text-success-dark dark:bg-success-alpha-20"
-												: "bg-neutral-alpha-10 text-text-strong-950 hover:bg-neutral-alpha-20 dark:bg-neutral-alpha-16 hover:dark:bg-neutral-alpha-24",
+											"group/row grid items-center gap-x-3 px-4 py-2.5 transition-colors",
+											"hover:bg-bg-weak-50/50",
+											gridCols,
 										)}
 									>
-										{record.recordType}
-									</button>
-								</div>
-
-								{/* Name Column */}
-								<CopyableDnsValue
-									value={record.name}
-									copied={copiedId === `name-${index}`}
-									onCopy={() => handleCopy(record.name, `name-${index}`)}
-								/>
-
-								{/* Value Column */}
-								<Tooltip.Provider delayDuration={0}>
-									<Tooltip.Root>
-										<Tooltip.Trigger asChild>
-											<CopyableDnsValue
-												value={record.value}
-												copied={copiedId === `value-${index}`}
-												mono
-												onCopy={() =>
-													handleCopy(record.value, `value-${index}`)
+										{/* Type Column */}
+										<div className="flex items-center">
+											<button
+												type="button"
+												aria-label={
+													copiedId === `type-${index}`
+														? "Copied"
+														: `Copy ${record.recordType}`
 												}
-											/>
-										</Tooltip.Trigger>
-										<Tooltip.Content
-											side="top"
-											variant="light"
-											className="max-w-sm break-all font-mono text-xs"
-										>
-											{record.value}
-										</Tooltip.Content>
-									</Tooltip.Root>
-								</Tooltip.Provider>
+												onClick={() =>
+													handleCopy(record.recordType, `type-${index}`)
+												}
+												className={cn(
+													"inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 font-semibold text-xs ease-out",
+													copiedId === `type-${index}`
+														? "bg-success-alpha-10 text-success-dark dark:bg-success-alpha-20"
+														: "bg-neutral-alpha-10 text-text-strong-950 hover:bg-neutral-alpha-20 dark:bg-neutral-alpha-16 hover:dark:bg-neutral-alpha-24",
+												)}
+											>
+												{record.recordType}
+											</button>
+										</div>
 
-								{/* TTL Column */}
-								<div className="flex items-center">
-									<span className="text-label-sm text-text-sub-600">
-										{record.ttl}
-									</span>
-								</div>
+										{/* Name Column */}
+										<CopyableDnsValue
+											value={record.name}
+											copied={copiedId === `name-${index}`}
+											onCopy={() => handleCopy(record.name, `name-${index}`)}
+										/>
 
-								{/* Priority Column - always render slot for alignment */}
-								<div className="flex items-center">
-									{record.priority ? (
-										<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
-											{record.priority}
-										</span>
-									) : showPriorityColumn ? (
-										<span className="text-label-sm text-text-sub-600">-</span>
-									) : null}
-								</div>
-							</div>
-						))}
+										{/* Value Column */}
+										<Tooltip.Provider delayDuration={0}>
+											<Tooltip.Root>
+												<Tooltip.Trigger asChild>
+													<CopyableDnsValue
+														value={record.value}
+														copied={copiedId === `value-${index}`}
+														mono
+														onCopy={() =>
+															handleCopy(record.value, `value-${index}`)
+														}
+													/>
+												</Tooltip.Trigger>
+												<Tooltip.Content
+													side="top"
+													variant="light"
+													className="max-w-sm break-all font-mono text-xs"
+												>
+													{record.value}
+												</Tooltip.Content>
+											</Tooltip.Root>
+										</Tooltip.Provider>
+
+										{/* TTL Column */}
+										<div className="flex items-center">
+											<span className="text-label-sm text-text-sub-600">
+												{record.ttl}
+											</span>
+										</div>
+
+										{/* Priority Column - always render slot for alignment */}
+										<div className="flex items-center">
+											{record.priority ? (
+												<span className="inline-flex items-center rounded-md bg-neutral-alpha-10 px-2 py-0.5 font-semibold text-text-strong-950 text-xs dark:bg-neutral-alpha-16">
+													{record.priority}
+												</span>
+											) : showPriorityColumn ? (
+												<span className="text-label-sm text-text-sub-600">
+													-
+												</span>
+											) : null}
+										</div>
+									</div>
+								))}
+					</div>
+				</div>
 			</div>
 		</div>
 	);

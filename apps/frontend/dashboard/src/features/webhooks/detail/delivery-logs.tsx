@@ -900,14 +900,15 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 						{data && data.total > 0 ? (
 							<div
 								className={cn(
-									"flex shrink-0 items-center justify-between px-4",
+									"flex shrink-0 items-center justify-between gap-3 px-4",
 									isMobile
 										? "py-3 text-paragraph-sm text-text-sub-600"
 										: "py-2 text-[11px] text-text-sub-600",
 								)}
 							>
-								<div className="flex items-center gap-3">
-									<span>
+								<div className="flex min-w-0 items-center gap-3">
+									{/* Phones: no room beside the page size + pagination */}
+									<span className="truncate max-sm:hidden">
 										Showing {startIndex}–{endIndex} of {data.total} event
 										{data.total !== 1 ? "s" : ""}
 									</span>

@@ -49,7 +49,8 @@ interface WebhookTableProps {
 	onDeleteSuccess?: (deletedName: string) => void;
 }
 
-const GRID = "grid-cols-[minmax(0,1fr)_100px_130px_120px_minmax(40px,auto)]";
+const GRID =
+	"grid-cols-[minmax(200px,1fr)_100px_130px_120px_minmax(40px,auto)]";
 
 const getStatusColorClass = (status: string) => {
 	switch (status) {
@@ -581,132 +582,139 @@ export const WebhookTable = ({
 
 	return (
 		<>
-			<div className="w-full text-paragraph-sm">
-				<div
-					className={cn(
-						`grid ${GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40`,
-					)}
-				>
-					<div className="flex items-center gap-1">
-						<Icon name="link" className="h-3 w-3" />
-						<span className="text-xs">URL</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="activity" className="h-3 w-3" />
-						<span className="text-xs">Status</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="check-circle" className="h-3 w-3" />
-						<span className="text-xs">Health</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="clock" className="h-3 w-3" />
-						<span className="text-xs">Last trigger</span>
-					</div>
-					<div />
-				</div>
+			{/* Phones and tablets: the card (border drawn here) holds a sideways
+			    scroller for the columns */}
+			<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+				<div className="w-full overflow-x-auto">
+					{/* 624px = the column minimums, so the ⋯ column never spills out */}
+					<div className="min-w-[624px]">
+						<div
+							className={cn(
+								`grid ${GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40`,
+							)}
+						>
+							<div className="flex items-center gap-1">
+								<Icon name="link" className="h-3 w-3" />
+								<span className="text-xs">URL</span>
+							</div>
+							<div className="flex items-center gap-1">
+								<Icon name="activity" className="h-3 w-3" />
+								<span className="text-xs">Status</span>
+							</div>
+							<div className="flex items-center gap-1">
+								<Icon name="check-circle" className="h-3 w-3" />
+								<span className="text-xs">Health</span>
+							</div>
+							<div className="flex items-center gap-1">
+								<Icon name="clock" className="h-3 w-3" />
+								<span className="text-xs">Last trigger</span>
+							</div>
+							<div />
+						</div>
 
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-					{isLoading ? (
-						<WebhookTableSkeleton rows={loadingRows} />
-					) : isTotalEmpty ? (
-						<EmptyState />
-					) : webhooks.length === 0 ? (
-						<EmptyState
-							isFiltered={isFiltered}
-							onClearFilters={onClearFilters}
-						/>
-					) : (
-						webhooks.map((webhook) => {
-							const isRowActive = activeDropdownId === webhook.id;
-							const isToggling = isTogglingStatus === webhook.id;
+						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+							{isLoading ? (
+								<WebhookTableSkeleton rows={loadingRows} />
+							) : isTotalEmpty ? (
+								<EmptyState />
+							) : webhooks.length === 0 ? (
+								<EmptyState
+									isFiltered={isFiltered}
+									onClearFilters={onClearFilters}
+								/>
+							) : (
+								webhooks.map((webhook) => {
+									const isRowActive = activeDropdownId === webhook.id;
+									const isToggling = isTogglingStatus === webhook.id;
 
-							return (
-								// biome-ignore lint/a11y/useSemanticElements: interactive table row
-								<div
-									key={webhook.id}
-									role="link"
-									tabIndex={0}
-									onClick={() => goToDetail(webhook.id)}
-									onKeyDown={(e) => {
-										if (e.key === "Enter" || e.key === " ") {
-											e.preventDefault();
-											goToDetail(webhook.id);
-										}
-									}}
-									className={cn(
-										`group/row grid w-full cursor-pointer ${GRID} items-center px-4 py-2.5 text-left`,
-										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:bg-bg-weak-50/50",
-										isRowActive && "bg-bg-weak-50/50",
-									)}
-								>
-									{/* URL only */}
-									<div className="min-w-0 pr-3">
-										<p className="truncate font-medium font-mono text-label-sm text-text-strong-950">
-											{webhook.url}
-										</p>
-									</div>
-
-									{/* Status */}
-									<div className="flex items-center">
+									return (
+										// biome-ignore lint/a11y/useSemanticElements: interactive table row
 										<div
+											key={webhook.id}
+											role="link"
+											tabIndex={0}
+											onClick={() => goToDetail(webhook.id)}
+											onKeyDown={(e) => {
+												if (e.key === "Enter" || e.key === " ") {
+													e.preventDefault();
+													goToDetail(webhook.id);
+												}
+											}}
 											className={cn(
-												"flex items-center gap-1.5 font-medium text-[13px] capitalize",
-												getStatusColorClass(webhook.status),
+												`group/row grid w-full cursor-pointer ${GRID} items-center px-4 py-2.5 text-left`,
+												"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:bg-bg-weak-50/50",
+												isRowActive && "bg-bg-weak-50/50",
 											)}
 										>
-											<Icon
-												name={getStatusIcon(webhook.status)}
-												className="h-3.5 w-3.5"
-											/>
-											{webhook.status}
+											{/* URL only */}
+											<div className="min-w-0 pr-3">
+												<p className="truncate font-medium font-mono text-label-sm text-text-strong-950">
+													{webhook.url}
+												</p>
+											</div>
+
+											{/* Status */}
+											<div className="flex items-center">
+												<div
+													className={cn(
+														"flex items-center gap-1.5 font-medium text-[13px] capitalize",
+														getStatusColorClass(webhook.status),
+													)}
+												>
+													<Icon
+														name={getStatusIcon(webhook.status)}
+														className="h-3.5 w-3.5"
+													/>
+													{webhook.status}
+												</div>
+											</div>
+
+											{/* Health: last 7 days success + failure lines */}
+											<div className="flex items-center">
+												<HealthCell
+													healthSeries={webhook.healthSeries}
+													healthFailureSeries={webhook.healthFailureSeries}
+													successCount7d={webhook.healthSuccessCount7d}
+													failureCount7d={webhook.healthFailureCount7d}
+												/>
+											</div>
+
+											{/* Last trigger */}
+											<div className="flex items-center">
+												<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
+													{webhook.lastTriggeredAt
+														? formatRelativeTime(webhook.lastTriggeredAt)
+														: "Never"}
+												</span>
+											</div>
+
+											{/* Actions */}
+											<div
+												className="flex items-center justify-center text-text-soft-400"
+												onClick={(e) => e.stopPropagation()}
+												onKeyDown={(e) => e.stopPropagation()}
+											>
+												<WebhookActionsDropdown
+													webhook={webhook}
+													isToggling={isToggling}
+													onViewDetails={goToDetail}
+													onTest={goToTest}
+													onEdit={goToEdit}
+													onCopyUrl={handleCopyUrl}
+													onCopyId={handleCopyId}
+													onSetStatus={handleSetStatus}
+													onDelete={(id) => void setDeleteId(id)}
+													onOpenChange={(open) =>
+														setActiveDropdownId(open ? webhook.id : null)
+													}
+												/>
+											</div>
 										</div>
-									</div>
-
-									{/* Health: last 7 days success + failure lines */}
-									<div className="flex items-center">
-										<HealthCell
-											healthSeries={webhook.healthSeries}
-											healthFailureSeries={webhook.healthFailureSeries}
-											successCount7d={webhook.healthSuccessCount7d}
-											failureCount7d={webhook.healthFailureCount7d}
-										/>
-									</div>
-
-									{/* Last trigger */}
-									<div className="flex items-center">
-										<span className="whitespace-nowrap font-medium text-[13px] text-text-sub-600">
-											{webhook.lastTriggeredAt
-												? formatRelativeTime(webhook.lastTriggeredAt)
-												: "Never"}
-										</span>
-									</div>
-
-									{/* Actions */}
-									<div
-										className="flex items-center justify-center text-text-soft-400"
-										onClick={(e) => e.stopPropagation()}
-										onKeyDown={(e) => e.stopPropagation()}
-									>
-										<WebhookActionsDropdown
-											webhook={webhook}
-											isToggling={isToggling}
-											onViewDetails={goToDetail}
-											onTest={goToTest}
-											onEdit={goToEdit}
-											onCopyUrl={handleCopyUrl}
-											onCopyId={handleCopyId}
-											onSetStatus={handleSetStatus}
-											onDelete={(id) => void setDeleteId(id)}
-											onOpenChange={(open) =>
-												setActiveDropdownId(open ? webhook.id : null)
-											}
-										/>
-									</div>
-								</div>
-							);
-						})
-					)}
+									);
+								})
+							)}
+						</div>
+					</div>
 				</div>
 			</div>
 

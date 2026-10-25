@@ -159,107 +159,132 @@ export function ApiKeyTable({
 
 	return (
 		<>
-			<div className="w-full text-paragraph-sm">
-				<div
-					style={gridStyle}
-					className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40"
-				>
-					{headerGroup?.headers.map((header) => (
-						<div key={header.id} className="flex items-center gap-1">
-							{header.isPlaceholder
-								? null
-								: flexRender(
-										header.column.columnDef.header,
-										header.getContext(),
-									)}
-						</div>
-					))}
-					{/* spacer matches actions column */}
-					<div />
-				</div>
-
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black">
-					{isLoading && apiKeys.length === 0 ? (
-						<TableSkeleton
-							rows={loadingRows}
-							columnVisibility={columnVisibility}
-						/>
-					) : rows.length === 0 ? (
-						<EmptyState
-							onCreateApiKey={() => router.push("/api-keys/create")}
-						/>
-					) : (
-						rows.map((row) => {
-							const apiKey = row.original;
-							const isEditing = editingApiKeyId === apiKey.id;
-							const isRowActive = activeDropdownId === apiKey.id || isEditing;
-							return (
-								<div key={row.id}>
-									<ApiKeyRowContextMenu
-										apiKey={apiKey}
-										handlers={actionsHandlers}
-									>
-										<div
-											style={gridStyle}
-											data-state={row.getIsSelected() ? "selected" : undefined}
-											className={cn(
-												"group/row grid w-full items-center px-4 py-2 text-left",
-												"hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]",
-												(isRowActive || row.getIsSelected()) &&
-													"bg-bg-weak-50/50 dark:bg-white/[0.06]",
-												isEditing && "bg-bg-weak-50/70 dark:bg-white/[0.08]",
+			{/* Phones and tablets: the card (border drawn here) holds a sideways
+			    scroller for the columns, and the footer below it stays put */}
+			<div className="w-full text-paragraph-sm max-md:overflow-hidden max-md:rounded-[14px] max-md:border max-md:border-stroke-soft-100 dark:max-md:border-stroke-soft-100/70">
+				<div className="w-full overflow-x-auto">
+					{/* 900px = the column minimums, so the ⋯ column never spills out */}
+					<div className="min-w-[900px]">
+						<div
+							style={gridStyle}
+							className="grid items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs max-md:rounded-none max-md:border-0 max-md:pb-2.5 dark:border-[#101010] dark:bg-bg-weak-50/40"
+						>
+							{headerGroup?.headers.map((header) => (
+								<div key={header.id} className="flex items-center gap-1">
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
 											)}
-										>
-											{row.getVisibleCells().map((cell) => (
-												<div key={cell.id}>
-													{flexRender(
-														cell.column.columnDef.cell,
-														cell.getContext(),
-													)}
-												</div>
-											))}
-											{/* Actions outside column defs so open state never remounts with columns */}
-											<div
-												onClick={(e) => e.stopPropagation()}
-												onKeyDown={(e) => e.stopPropagation()}
-											>
-												<ApiKeyActionsMenu
-													apiKey={apiKey}
-													handlers={actionsHandlers}
-												/>
-											</div>
-										</div>
-									</ApiKeyRowContextMenu>
-
-									<AnimatePresence initial={false}>
-										{isEditing ? (
-											<motion.div
-												key={`edit-${apiKey.id}`}
-												initial={{ height: 0, opacity: 0 }}
-												animate={{ height: "auto", opacity: 1 }}
-												exit={{ height: 0, opacity: 0 }}
-												transition={{
-													height: {
-														duration: 0.28,
-														ease: [0.32, 0.72, 0, 1],
-													},
-													opacity: { duration: 0.2, ease: "easeOut" },
-												}}
-												className="overflow-hidden"
-											>
-												<EditApiKeyRowPanel
-													apiKey={apiKey}
-													onClose={() => setEditingApiKeyId(null)}
-													onSuccess={onEditSuccess}
-												/>
-											</motion.div>
-										) : null}
-									</AnimatePresence>
 								</div>
-							);
-						})
-					)}
+							))}
+							{/* spacer matches actions column */}
+							<div />
+						</div>
 
+						<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 max-md:mt-0 max-md:rounded-none max-md:border-0 max-md:border-t dark:divide-stroke-soft-100 dark:border-stroke-soft-100/70 dark:bg-black [&>*:first-child]:rounded-t-[11px] max-md:[&>*:first-child]:rounded-none">
+							{isLoading && apiKeys.length === 0 ? (
+								<TableSkeleton
+									rows={loadingRows}
+									columnVisibility={columnVisibility}
+								/>
+							) : rows.length === 0 ? (
+								<EmptyState
+									onCreateApiKey={() => router.push("/api-keys/create")}
+								/>
+							) : (
+								rows.map((row) => {
+									const apiKey = row.original;
+									const isEditing = editingApiKeyId === apiKey.id;
+									const isRowActive =
+										activeDropdownId === apiKey.id || isEditing;
+									return (
+										<div key={row.id}>
+											<ApiKeyRowContextMenu
+												apiKey={apiKey}
+												handlers={actionsHandlers}
+											>
+												<div
+													style={gridStyle}
+													data-state={
+														row.getIsSelected() ? "selected" : undefined
+													}
+													className={cn(
+														"group/row grid w-full items-center px-4 py-2 text-left",
+														"hover:bg-bg-weak-50 dark:hover:bg-white/[0.04]",
+														(isRowActive || row.getIsSelected()) &&
+															"bg-bg-weak-50/50 dark:bg-white/[0.06]",
+														isEditing &&
+															"bg-bg-weak-50/70 dark:bg-white/[0.08]",
+													)}
+												>
+													{row.getVisibleCells().map((cell) => (
+														<div key={cell.id}>
+															{flexRender(
+																cell.column.columnDef.cell,
+																cell.getContext(),
+															)}
+														</div>
+													))}
+													{/* Actions outside column defs so open state never remounts with columns */}
+													<div
+														onClick={(e) => e.stopPropagation()}
+														onKeyDown={(e) => e.stopPropagation()}
+													>
+														<ApiKeyActionsMenu
+															apiKey={apiKey}
+															handlers={actionsHandlers}
+														/>
+													</div>
+												</div>
+											</ApiKeyRowContextMenu>
+
+											<AnimatePresence initial={false}>
+												{isEditing ? (
+													<motion.div
+														key={`edit-${apiKey.id}`}
+														initial={{ height: 0, opacity: 0 }}
+														animate={{ height: "auto", opacity: 1 }}
+														exit={{ height: 0, opacity: 0 }}
+														transition={{
+															height: {
+																duration: 0.28,
+																ease: [0.32, 0.72, 0, 1],
+															},
+															opacity: { duration: 0.2, ease: "easeOut" },
+														}}
+														className="overflow-hidden"
+													>
+														<EditApiKeyRowPanel
+															apiKey={apiKey}
+															onClose={() => setEditingApiKeyId(null)}
+															onSuccess={onEditSuccess}
+														/>
+													</motion.div>
+												) : null}
+											</AnimatePresence>
+										</div>
+									);
+								})
+							)}
+
+							{/* Desktop: footer inside the rows card, as before */}
+							<div className="max-md:hidden">
+								<TableFooter
+									total={total}
+									selectedCount={selectedCount}
+									pageRowCount={rows.length}
+									isLoading={isLoading}
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+				{/* Phones/tablets: outside the scroller, so it never scrolls sideways. No top
+				    border: divide-y already draws one under the last row (the hidden desktop
+				    footer above is still the last child). */}
+				<div className="bg-bg-white-0 md:hidden dark:bg-black">
 					<TableFooter
 						total={total}
 						selectedCount={selectedCount}

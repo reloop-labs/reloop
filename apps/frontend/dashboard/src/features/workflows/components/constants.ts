@@ -2,8 +2,8 @@ import type { VisibilityState } from "@tanstack/react-table";
 import type { CSSProperties } from "react";
 
 export const WORKFLOW_COLUMN_TRACKS: Record<string, string> = {
-	name: "minmax(0, 1.4fr)",
-	trigger: "minmax(0, 1.1fr)",
+	name: "minmax(140px, 1.4fr)",
+	trigger: "minmax(120px, 1.1fr)",
 	steps: "80px",
 	updatedAt: "120px",
 	status: "110px",
@@ -11,7 +11,7 @@ export const WORKFLOW_COLUMN_TRACKS: Record<string, string> = {
 
 /** Default grid when all data columns are visible (+ select + actions). */
 export const WORKFLOW_TABLE_GRID =
-	"grid-cols-[32px_minmax(0,1.4fr)_minmax(0,1.1fr)_80px_120px_110px_32px]";
+	"grid-cols-[32px_minmax(140px,1.4fr)_minmax(120px,1.1fr)_80px_120px_110px_32px]";
 
 export function getWorkflowTableGridStyle(
 	visibility: VisibilityState = {},
