@@ -58,6 +58,7 @@
 		"react-hotkeys-hook": "catalog:ui",
 		"remark-gfm": "^4.0.1",
 		"server-only": "^0.0.1",
+		"sharp": "^0.35.3",
 		"simple-icons": "catalog:ui",
 		"sonner": "catalog:ui",
 		"svg-dotted-map": "^2.1.0",

@@ -5,12 +5,14 @@ import Image from "next/image";
 export function BlogPostCoverImage({
 	slug,
 	image,
+	blurDataURL,
 	alt,
 	priority = false,
 	variant = "card",
 }: {
 	slug: string;
 	image?: string;
+	blurDataURL?: string;
 	alt: string;
 	priority?: boolean;
 	variant?: "card" | "hero" | "list";
@@ -26,6 +28,8 @@ export function BlogPostCoverImage({
 						className="object-cover"
 						sizes="(max-width: 720px) 100vw, 720px"
 						priority={priority}
+						placeholder={blurDataURL ? "blur" : "empty"}
+						blurDataURL={blurDataURL}
 					/>
 				</div>
 			);
@@ -41,6 +45,8 @@ export function BlogPostCoverImage({
 						className="object-cover"
 						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
 						priority={priority}
+						placeholder={blurDataURL ? "blur" : "empty"}
+						blurDataURL={blurDataURL}
 					/>
 				</div>
 			);
@@ -55,6 +61,8 @@ export function BlogPostCoverImage({
 					className="object-cover"
 					sizes="(max-width: 680px) 100vw, 680px"
 					priority={priority}
+					placeholder={blurDataURL ? "blur" : "empty"}
+					blurDataURL={blurDataURL}
 				/>
 			</div>
 		);

@@ -327,6 +327,7 @@ export function BlogPostPageView({
 							<BlogPostCoverImage
 								slug={post.slug}
 								image={post.image}
+								blurDataURL={post.imageBlurDataURL}
 								alt={post.title}
 								priority
 								variant="hero"
@@ -364,6 +365,7 @@ export function BlogPostPageView({
 											<BlogPostCoverImage
 												slug={relatedPost.slug}
 												image={relatedPost.image}
+												blurDataURL={relatedPost.imageBlurDataURL}
 												alt={relatedPost.title}
 											/>
 										</div>

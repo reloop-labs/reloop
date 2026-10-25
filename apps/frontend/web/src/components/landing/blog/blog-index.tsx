@@ -10,7 +10,14 @@ import type {
 	BlogPostDefinition,
 } from "@reloop/web/lib/landing/types";
 import Link from "next/link";
-import { type ReactNode, useMemo, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 
 function RssIcon({ className }: { className?: string }) {
 	return (
@@ -55,6 +62,87 @@ function CategoryPill({
 		>
 			{children}
 		</Link>
+	);
+}
+
+/**
+ * Horizontally scrolling category pills. Each edge fades only while there is
+ * more to scroll in that direction, so the first and last pill are never
+ * cut off at rest.
+ */
+function CategoryNav({
+	categories,
+	activeCategorySlug,
+}: {
+	categories: BlogCategoryDefinition[];
+	activeCategorySlug?: string;
+}) {
+	const scrollerRef = useRef<HTMLElement>(null);
+	const [edges, setEdges] = useState({ start: false, end: false });
+
+	const updateEdges = useCallback(() => {
+		const el = scrollerRef.current;
+		if (!el) return;
+		const max = el.scrollWidth - el.clientWidth;
+		setEdges({ start: el.scrollLeft > 1, end: el.scrollLeft < max - 1 });
+	}, []);
+
+	useEffect(() => {
+		const el = scrollerRef.current;
+		if (!el) return;
+
+		el.querySelector<HTMLElement>('[aria-current="page"]')?.scrollIntoView({
+			block: "nearest",
+			inline: "nearest",
+		});
+		updateEdges();
+
+		const observer = new ResizeObserver(updateEdges);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, [updateEdges]);
+
+	const fade =
+		"pointer-events-none absolute inset-y-0 w-12 from-bg-white-0 to-transparent transition-opacity duration-200 dark:from-black";
+
+	return (
+		<div className="-mx-4 relative min-w-0 sm:mx-0">
+			<nav
+				ref={scrollerRef}
+				aria-label="Blog categories"
+				onScroll={updateEdges}
+				className="flex gap-1 overflow-x-auto px-4 [scrollbar-width:none] sm:px-0 [&::-webkit-scrollbar]:hidden"
+			>
+				<CategoryPill href="/blog" active={!activeCategorySlug}>
+					All articles
+				</CategoryPill>
+				{categories.map((category) => (
+					<CategoryPill
+						key={category.slug}
+						href={`/blog/category/${category.slug}`}
+						active={category.slug === activeCategorySlug}
+					>
+						{category.name}
+					</CategoryPill>
+				))}
+			</nav>
+			<span
+				aria-hidden="true"
+				className={cn(
+					fade,
+					"left-0 bg-gradient-to-r",
+					edges.start ? "opacity-100" : "opacity-0",
+				)}
+			/>
+			<span
+				aria-hidden="true"
+				className={cn(
+					fade,
+					"right-0 bg-gradient-to-l",
+					edges.end ? "opacity-100" : "opacity-0",
+				)}
+			/>
+		</div>
 	);
 }
 
@@ -126,23 +214,10 @@ export function BlogIndex({
 					</h2>
 
 					<div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center">
-						<nav
-							aria-label="Blog categories"
-							className="-mx-4 flex min-w-0 gap-1 overflow-x-auto px-4 [mask-image:linear-gradient(to_right,#000_calc(100%-3rem),transparent)] [scrollbar-width:none] sm:mx-0 sm:px-0 sm:pr-10 [&::-webkit-scrollbar]:hidden"
-						>
-							<CategoryPill href="/blog" active={!activeCategorySlug}>
-								All articles
-							</CategoryPill>
-							{categories.map((category) => (
-								<CategoryPill
-									key={category.slug}
-									href={`/blog/category/${category.slug}`}
-									active={category.slug === activeCategorySlug}
-								>
-									{category.name}
-								</CategoryPill>
-							))}
-						</nav>
+						<CategoryNav
+							categories={categories}
+							activeCategorySlug={activeCategorySlug}
+						/>
 
 						<span
 							className="hidden h-6 w-px shrink-0 bg-stroke-soft-100 lg:block dark:bg-white/10"

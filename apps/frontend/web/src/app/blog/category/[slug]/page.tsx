@@ -1,5 +1,6 @@
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { BlogIndex } from "@reloop/web/components/landing/blog/blog-index";
+import { withBlurPlaceholders } from "@reloop/web/lib/landing/blog/blur";
 import { createBlogCategoryMetadata } from "@reloop/web/lib/landing/blog/seo";
 import {
 	generateCategoryStaticParams,
@@ -40,7 +41,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 		notFound();
 	}
 
-	const posts = getPostsByCategory(slug);
+	const posts = await withBlurPlaceholders(getPostsByCategory(slug));
 
 	return (
 		<BlogIndex

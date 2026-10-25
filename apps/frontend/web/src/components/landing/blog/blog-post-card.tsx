@@ -80,6 +80,7 @@ export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
 			<BlogPostCoverImage
 				slug={post.slug}
 				image={post.image}
+				blurDataURL={post.imageBlurDataURL}
 				alt={post.title}
 				variant="list"
 			/>

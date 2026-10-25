@@ -1,6 +1,10 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { BlogPostPageView } from "@reloop/web/components/landing/blog/blog-post-page-view";
 import {
+	withBlurPlaceholder,
+	withBlurPlaceholders,
+} from "@reloop/web/lib/landing/blog/blur";
+import {
 	buildBlogPostJsonLd,
 	createBlogPostMetadata,
 } from "@reloop/web/lib/landing/blog/seo";
@@ -39,8 +43,11 @@ export default async function BlogPostPage({ params }: PageProps) {
 		notFound();
 	}
 
-	const { body: renderBody, ...postData } = post;
-	const relatedPosts = getRelatedPosts(slug, 4);
+	const { body: renderBody, ...metadata } = post;
+	const [postData, relatedPosts] = await Promise.all([
+		withBlurPlaceholder(metadata),
+		withBlurPlaceholders(getRelatedPosts(slug, 4)),
+	]);
 
 	return (
 		<>

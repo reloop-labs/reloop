@@ -84,6 +84,8 @@ export type BlogPostDefinition = {
 	readTime: string;
 	author: BlogPostAuthor;
 	image?: string;
+	/** Tiny blurred preview of `image`, set server-side for `placeholder="blur"`. */
+	imageBlurDataURL?: string;
 	draft?: boolean;
 	relatedSlugs?: string[];
 };
