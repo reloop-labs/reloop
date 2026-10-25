@@ -1,39 +1,277 @@
 ---
 title: "Self-Hosted Email Infrastructure: When and How"
-description: Why teams self-host email, what Reloop gives you out of the box, and how to deploy with Docker Compose.
+description: "When self-hosting email infrastructure is worth it, what it really costs, and how to deploy Reloop on your own server with one command: requirements, DNS, port 25, reputation and upgrades."
 keywords:
   - self-hosted email
+  - self-hosted email infrastructure
   - self-host email server
   - open source email infrastructure
+  - self-hosted transactional email
+  - email server docker compose
 publishedAt: 2026-04-28
 category: Self-Hosting
-tags: [docker, self-host, infrastructure]
-readTime: 9 min read
+tags: [docker, self-host, infrastructure, kumomta]
+readTime: 10 min read
+image: /blog/images/self-hosted-email-infrastructure.png
 author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
+  - self-host-email-5-dollars
+  - reloop-coolify-setup
   - email-provider-comparison-2026
-  - spf-dkim-dmarc-setup-guide
+  - ip-warming-guide
+---
+
+**Self-host your email infrastructure when you have a hard reason to:** data residency, security review of the code that touches your users' mail, or volume high enough that per-email pricing hurts. If none of those apply, a hosted provider is cheaper once you count your own time.
+
+If you do have a reason, self-hosting in 2026 is far easier than it used to be. This guide covers when it's worth it, what you're signing up for, and how to run Reloop on your own server with one command.
+
 ---
 
 ## When self-hosting makes sense
 
-Data residency requirements, cost at scale, security review of source code, or simply not wanting vendor lock-in: these are the common drivers.
+Most teams should not run their own mail stack. These are the cases where it pays off.
+
+| Reason | What it looks like in practice |
+|---|---|
+| **Data residency** | Email bodies, logs and contacts must stay in the EU, in-country, or on-prem for GDPR, HIPAA or a customer contract. |
+| **Security review** | Your security team needs to audit the code that handles password resets, invoices and inbound mail. |
+| **Cost at scale** | You send millions of emails a month and per-email pricing is a real line item. |
+| **No vendor risk** | You can't afford an account suspension or a surprise price change blocking signups. |
+| **Air-gapped or private networks** | Internal tools that send to internal mailboxes and never touch the public internet. |
+
+## When it doesn't
+
+- You send fewer than a few hundred thousand emails a month. Hosted plans cost less than an hour of engineering time.
+- Nobody on the team wants to own DNS, IP reputation and on-call for a mail server.
+- You need to send from day one at high volume. A brand-new IP needs [weeks of warm-up](/blog/ip-warming-guide).
+
+A useful middle ground: **start on a hosted plan and move later.** With open-source infrastructure, the API is the same in both places, so moving is a config change, not a rewrite.
+
+---
+
+## What "email infrastructure" actually includes
+
+People underestimate this. Sending a message over SMTP is the easy part. A production email stack needs:
+
+1. **An API** your app calls, with auth, rate limits and idempotency.
+2. **A queue** so a traffic spike doesn't drop mail.
+3. **An MTA** (mail transfer agent) that talks SMTP to Gmail, Outlook and everyone else, with per-domain throttling and retries.
+4. **DKIM signing** and the DNS records to back it up.
+5. **Bounce and complaint processing**, plus a suppression list so you stop mailing dead addresses.
+6. **Inbound mail**: an MX server, spam filtering and somewhere to store what arrives.
+7. **Tracking and webhooks** for delivered, bounced, opened and clicked events.
+8. **A dashboard** to debug "why didn't this email arrive?"
+
+Building that from Postfix and cron jobs is a multi-month project. Reloop ships all of it as one open-source stack.
+
+---
 
 ## What you get with Reloop
 
-Reloop is Apache 2.0: transactional API, campaigns, SMTP, webhooks, templates, and analytics; it's the same product hosted or self-deployed.
+Reloop is Apache 2.0. The self-hosted version is the same code that runs [reloop.sh](https://reloop.sh), minus the parts that only make sense for a hosted business, like billing.
 
-## Docker Compose quickstart
+- **Transactional API and SDKs** for Node, Python, Go, PHP, Ruby and more
+- **SMTP relay** on ports 465 and 587 for apps that only speak SMTP
+- **KumoMTA** as the outbound and inbound MTA
+- **Rspamd** spam scoring for inbound mail
+- **Agent and human inboxes** with threads, readable over the API, MCP or IMAP
+- **Campaigns, contacts, groups and automations**
+- **Webhooks** with signed payloads and retries
+- **Templates**, logs and delivery metrics in a dashboard
 
-Clone the repo, configure environment variables, and `docker compose up`. See our self-hosting guide for production hardening.
+On a self-hosted install there are no plan limits. The installer sets `SELF_HOSTED=true`, which turns off sending quotas and caps on inboxes, domains and organizations. Sending isn't metered.
+
+---
+
+## Requirements
+
+| Resource | Minimum | Recommended |
+|---|---|---|
+| CPU | 2 vCPUs | 4+ vCPUs |
+| RAM | 4 GB | 8 GB |
+| Disk | 35 GB | 50 GB NVMe |
+| OS | Ubuntu 22.04 / 24.04, Debian 12 / 13 | Same |
+| Ports | 25, 465, 587, 80, 443 | Same |
+
+The disk floor is higher than you might expect because the container images total about 22 GB. The installer checks this up front and refuses to start on a smaller disk rather than failing halfway through a download.
+
+<Callout type="warning">
+  Many cloud providers (AWS, GCP, Azure, DigitalOcean on new accounts) block port 25 by default. You need it open to receive mail. Ask your provider to unblock it **before** you deploy, and ask for a PTR (reverse DNS) record pointing your server IP at your Reloop hostname.
+</Callout>
+
+Providers that are friendly to mail servers include Hetzner (after a short account review), OVH, and most dedicated-server hosts. If you can't get port 25 open for outbound mail, you can still self-host the API, dashboard and inboxes and route outbound mail through an SMTP provider such as Amazon SES.
+
+---
+
+## Deploy with one command
+
+On a fresh Ubuntu or Debian server:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh | sudo bash
+```
+
+Prefer to read it first? You should:
+
+```bash
+curl -fsSL https://reloop.sh/install.sh -o install.sh
+less install.sh
+sudo bash install.sh
+```
+
+The installer asks for a handful of things:
+
+- **Primary domain**, for example `reloop.example.com`, where the dashboard and API live
+- **TLS contact email** for Let's Encrypt
+- Whether you're **behind an existing reverse proxy** (Caddy, Nginx, Traefik)
+- Optional **S3-compatible storage** for template images and attachments
+
+Everything else is generated for you: database and Redis passwords, the auth secret, the webhook encryption key and the internal service secret. They're written to `/opt/reloop/.env` with `0600` permissions.
+
+When it finishes, you'll have 20 containers running: 14 Reloop backend services, the dashboard, the link-tracking service, PostgreSQL, Redis, NATS and Caddy. Only Caddy and the mail ports are exposed to the internet. The database and event bus stay on the internal Docker network.
+
+```text
+/opt/reloop/
+├── .env                 # configuration and secrets
+├── docker-compose.yml   # the production stack
+├── Caddyfile            # reverse proxy and TLS
+└── backups/             # automatic DB dumps before schema changes
+```
+
+---
+
+## DNS: two layers
+
+There are two sets of DNS records, and mixing them up is the most common setup mistake.
+
+### 1. Records for the Reloop server itself
+
+The installer prints these at the end:
+
+```text
+reloop.example.com            A    203.0.113.10
+link.reloop.example.com       A    203.0.113.10
+inbound.reloop.example.com    A    203.0.113.10
+reloop.example.com            TXT  "v=spf1 ip4:203.0.113.10 -all"
+```
+
+- The apex serves the dashboard and API.
+- `link.` serves click and open tracking and unsubscribe pages.
+- `inbound.` is the MX target for mail your domains receive.
+- The SPF record authorizes your server's IP to send.
+
+### 2. Records for each domain you send from
+
+Add a sending domain under **Domains** in the dashboard. Reloop generates the exact SPF, DKIM, DMARC and MX records for it. Add them at your DNS host, then click verify.
+
+If you're new to these, read the [SPF, DKIM and DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide). It's the single biggest factor in whether your mail lands in the inbox.
+
+---
+
+## Point your app at your own instance
+
+The SDK is the same one you'd use with Reloop Cloud. Set `baseUrl` to your server:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+export const reloop = new Reloop({
+  apiKey: process.env.RELOOP_API_KEY!,
+  baseUrl: "https://reloop.example.com",
+});
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your login link",
+  html: "<p>Click to sign in.</p>",
+});
+```
+
+Because the API is identical, you can develop against Reloop Cloud and deploy against your own instance, or the other way round.
+
+---
+
+## Day-two operations
+
+Running a mail server is mostly boring once it's set up. These are the things you'll actually do.
+
+```bash
+reloop status            # container health
+reloop logs mail         # follow one service's logs
+reloop restart           # apply .env changes
+reloop update            # pull the new version and redeploy
+```
+
+`reloop update` takes a database backup before applying schema changes, so a bad upgrade can be rolled back.
+
+### Protect your reputation
+
+A new IP has no reputation, and mailbox providers treat unknown senders with suspicion. In the first few weeks:
+
+- **Warm up gradually.** Start with your most engaged recipients and ramp volume over 2–4 weeks. See the [IP warming schedule](/blog/ip-warming-guide).
+- **Separate traffic.** Send transactional and marketing mail from different subdomains so a campaign complaint doesn't hurt password resets.
+- **Watch bounces and complaints.** Reloop suppresses hard bounces and spam complaints automatically. Keep complaints under 0.1%.
+- **Check blocklists.** Run your IP and domain through the free [blocklist checker](/tools/blocklist-checker) after launch.
+
+### Back up the right things
+
+PostgreSQL holds everything that matters: contacts, templates, logs and inbox messages. Back up the database and `/opt/reloop/.env` (your secrets and DKIM keys depend on it). Containers are disposable. Data isn't.
+
+---
+
+## Self-hosted vs hosted: the real cost
+
+| | Reloop Cloud | Self-hosted Reloop |
+|---|---|---|
+| Software | Free tier, then $10–$20/mo for 50k–100k | Free (Apache 2.0) |
+| Server | Included | $10–$40/mo VPS |
+| Setup time | Minutes | An hour, plus DNS propagation |
+| IP reputation | Shared pool, already warm | Yours to build |
+| Upgrades | Automatic | `reloop update` |
+| Data location | Our infrastructure | Wherever you put it |
+| Plan limits | Per plan | None |
+
+The software is free either way. What you're really choosing is who runs it.
+
+If you want the cheapest possible setup, we wrote a step-by-step guide to [self-hosting email for $5 a month](/blog/self-host-email-5-dollars). If you already run Coolify, see [Reloop on Coolify](/blog/reloop-coolify-setup).
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is self-hosted Reloop the same as Reloop Cloud?">
+    Same code, same API, same dashboard. The self-hosted install leaves out
+    billing, the public docs site and the public email tools, and it removes
+    plan limits.
+  </Accordion>
+
+  <Accordion title="Can I run it without port 25?">
+    You need inbound port 25 to receive mail. For sending, you can route
+    outbound mail through an SMTP provider like Amazon SES if your host
+    blocks outbound port 25.
+  </Accordion>
+
+  <Accordion title="Does it run on Kubernetes?">
+    The supported path is Docker Compose on a single server, plus guides for
+    Coolify, Dokploy, CapRover and Railway. Every service is a container, so
+    you can move it to Kubernetes, but you'll own that configuration.
+  </Accordion>
+
+  <Accordion title="Can I migrate from Reloop Cloud to self-hosted later?">
+    Yes. Change the SDK's `baseUrl`, move your domains, and update your DNS
+    records. Your application code doesn't change.
+  </Accordion>
+</AccordionGroup>
 
 <Cta
   title="Deploy Reloop yourself"
-  description="Follow the self-hosting guide for Docker Compose and production hardening."
+  description="One command on a fresh Ubuntu or Debian server. Open source under Apache 2.0."
   href="/self-host"
-  label="Read the guide"
+  label="Read the self-hosting guide"
 />
