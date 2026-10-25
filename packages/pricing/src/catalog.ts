@@ -19,11 +19,11 @@ const MB = 1024 * 1024;
 export const planLimits: Record<PlanId, PlanLimits> = {
 	free: {
 		planId: "free",
-		monthlyEmails: 3_000,
-		dailyEmailLimit: 100,
+		monthlyEmails: 6_000,
+		dailyEmailLimit: 200,
 		overageEnabled: false,
-		maxAgentInboxes: 1,
-		maxWebhooks: 1,
+		maxAgentInboxes: 3,
+		maxWebhooks: 3,
 		maxCustomDomains: 3,
 		maxAttachmentBytes: 1 * MB,
 		dataRetentionDays: 45,
@@ -60,7 +60,7 @@ export const planLimits: Record<PlanId, PlanLimits> = {
 	// credits are valid. Sending past the allowance spends the credits.
 	payg: {
 		planId: "payg",
-		monthlyEmails: 3_000,
+		monthlyEmails: 6_000,
 		dailyEmailLimit: null,
 		overageEnabled: false,
 		maxAgentInboxes: 5,

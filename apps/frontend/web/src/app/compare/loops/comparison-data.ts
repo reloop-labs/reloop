@@ -28,8 +28,8 @@ export const loopsComparisonCategories: ComparisonCategory[] = [
 				label: "Free monthly tier",
 				icon: "send-2",
 				reloop: {
-					value: "3,000 emails / mo",
-					note: "100 / day cap",
+					value: "6,000 emails / mo",
+					note: "200 / day cap",
 				},
 				competitor: "1,000 contacts",
 			},

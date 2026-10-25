@@ -1104,7 +1104,7 @@ export default function OrganizationDetailPage() {
 										<span className="font-mono">8–14d: 250</span> →{" "}
 										<span className="font-mono">15–30d: 500</span> →{" "}
 										<span className="font-mono">30d+: Dynamic</span>{" "}
-										(reputation-based; Free still max 100/day). Caps are
+										(reputation-based; Free still max 200/day). Caps are
 										per-domain per UTC day and reset at 00:00 UTC. If you hit
 										the cap you’ll get{" "}
 										<span className="font-mono">
@@ -1127,7 +1127,7 @@ export default function OrganizationDetailPage() {
 										"Plan",
 										data.plan
 											? `${planLabel(data.plan.planId)} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
-											: "Free · 3,000/mo",
+											: "Free · 6,000/mo",
 									],
 									["Billing email", data.billingEmail || "-"],
 									["Billing name", data.billingName || "-"],
@@ -1156,7 +1156,7 @@ export default function OrganizationDetailPage() {
 							description={
 								data.plan
 									? `${planLabel(data.plan.planId)} · ${data.plan.monthlyEmails.toLocaleString()}/mo`
-									: "Free · 3,000/mo"
+									: "Free · 6,000/mo"
 							}
 							action={
 								<button
@@ -1205,12 +1205,12 @@ export default function OrganizationDetailPage() {
 											{
 												label: "Webhooks",
 												used: data.webhooks.length,
-												limit: data.plan?.maxWebhooks ?? 1,
+												limit: data.plan?.maxWebhooks ?? 3,
 											},
 											{
 												label: "Agent inboxes",
 												used: data.counts.mailboxes,
-												limit: data.plan?.maxAgentInboxes ?? 1,
+												limit: data.plan?.maxAgentInboxes ?? 3,
 											},
 										].map((row) => {
 											const remaining = Math.max(0, row.limit - row.used);

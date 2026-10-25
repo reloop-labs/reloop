@@ -174,8 +174,8 @@ const ResendComparisonPage = () => {
 					</h2>
 					<div className="mt-5 space-y-4 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
 						<p>
-							Both start at 3,000 free emails/month with a 100/day cap — a
-							genuine tie for side projects. The divergence starts at the first
+							Reloop Free includes 6,000 emails/month with a 200/day cap, double
+							Resend Free (3,000/month, 100/day). The gap widens at the first
 							paid tier: Reloop Pro bundles 50,000 emails for $10/month while
 							Resend charges $20 for the same 50,000. At 100,000 emails/month
 							Reloop Growth stays at $20; Resend scales to roughly $90.

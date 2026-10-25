@@ -153,7 +153,7 @@ export function WasteCalculator() {
 							</p>
 							<p className="mt-1.5 text-[13px] text-white/60 leading-relaxed">
 								Reloop automatically flags risky contacts before you waste time
-								or money on them. Start with 3,000 free emails per month.{" "}
+								or money on them. Start with 6,000 free emails per month.{" "}
 								<Link
 									href="/pricing"
 									className="underline underline-offset-2 hover:text-white"

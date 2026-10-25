@@ -112,7 +112,7 @@ export default function Hero() {
 					</FancyButton.Root>
 				</div>
 				<p className="mt-4 text-center text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
-					Free tier: 3,000 tracked emails/month. Instant setup, zero lock-in.
+					Free tier: 6,000 tracked emails/month. Instant setup, zero lock-in.
 				</p>
 			</header>
 

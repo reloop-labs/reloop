@@ -103,6 +103,7 @@ const columns: FooterColumn[] = [
 			{ title: "Terms of Service", href: "/terms-and-conditions" },
 			{ title: "DPA", href: "/dpa" },
 			{ title: "Subprocessors", href: "/dpa/subprocessors" },
+			{ title: "Security", href: "/security" },
 			{ title: "License", href: "/license" },
 			{
 				title: "Status",

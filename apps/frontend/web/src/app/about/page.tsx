@@ -1,5 +1,5 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
-import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
+import { founderEmail, getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { EssayDoodles } from "./components/essay-doodles";
 
@@ -178,7 +178,7 @@ const AboutPage = () => {
 								<br />
 								Skip the warm-up spreadsheet.
 								<br />
-								Send the first 3,000 free.
+								Send the first 6,000 free.
 								<br />
 								Read the code.
 							</p>
@@ -207,6 +207,25 @@ const AboutPage = () => {
 								</p>
 								<p className="mt-1 text-text-sub-600 dark:text-neutral-500">
 									Co-Founders of Reloop
+								</p>
+								<p className="mt-6 text-text-sub-600 dark:text-neutral-500">
+									Want to talk before you switch?{" "}
+									<a
+										href="https://cal.com/pranavp/30"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-4 transition-colors hover:decoration-text-strong-950 dark:text-neutral-200 dark:decoration-neutral-600"
+									>
+										Book a call with us
+									</a>{" "}
+									or email{" "}
+									<a
+										href={`mailto:${founderEmail}`}
+										className="text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-4 transition-colors hover:decoration-text-strong-950 dark:text-neutral-200 dark:decoration-neutral-600"
+									>
+										{founderEmail}
+									</a>
+									. We read every message ourselves.
 								</p>
 							</div>
 						</div>

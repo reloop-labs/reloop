@@ -11,11 +11,11 @@ import { shouldClaimOrganizationExternalCustomerId } from "../src/lib/org-billin
 describe("plan catalog", () => {
 	test("matches hosted pricing numbers", () => {
 		expect(getPlanLimits("free")).toMatchObject({
-			monthlyEmails: 3000,
-			dailyEmailLimit: 100,
+			monthlyEmails: 6000,
+			dailyEmailLimit: 200,
 			overageEnabled: false,
-			maxAgentInboxes: 1,
-			maxWebhooks: 1,
+			maxAgentInboxes: 3,
+			maxWebhooks: 3,
 			dedicatedIpCount: 0,
 		});
 		expect(getPlanLimits("individual")).toMatchObject({
@@ -77,8 +77,8 @@ describe("applyPlanChange", () => {
 			current: getPlanLimits("individual"),
 			nextPlanId: "free",
 		});
-		expect(next.maxWebhooks).toBe(1);
-		expect(next.monthlyEmails).toBe(3000);
+		expect(next.maxWebhooks).toBe(3);
+		expect(next.monthlyEmails).toBe(6000);
 	});
 });
 

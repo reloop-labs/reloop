@@ -12,8 +12,8 @@ export const mailgunComparisonCategories: ComparisonCategory[] = [
 				label: "Free tier",
 				icon: "send-2",
 				reloop: {
-					value: "3,000 / mo",
-					note: "100 / day cap",
+					value: "6,000 / mo",
+					note: "200 / day cap",
 				},
 				competitor: {
 					value: "100 / day",

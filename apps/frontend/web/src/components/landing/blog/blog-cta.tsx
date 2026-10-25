@@ -27,7 +27,7 @@ type CategoryVariant = {
 const DEFAULT_VARIANT: CategoryVariant = {
 	headlineLine1: "Ready to scale your email?",
 	headlineLine2: "Let's talk.",
-	sub: "3,000 free emails every month. Modern email infrastructure and deliverability built for developers.",
+	sub: "6,000 free emails every month. Modern email infrastructure and deliverability built for developers.",
 	primaryLabel: "Get started free",
 	secondaryLabel: "Schedule call",
 	secondaryHref: "https://cal.com/pranavp/30",

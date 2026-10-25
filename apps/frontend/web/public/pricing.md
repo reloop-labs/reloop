@@ -18,15 +18,15 @@ canonical: "https://reloop.sh/pricing"
 - Price: $0 / month
 - Note: Free for everyone
 - Description: For side projects and getting started with Reloop.
-- Emails: 3,000 emails / month
+- Emails: 6,000 emails / month
 - CTA: Get started → /dashboard/signup
 - Features:
-  - 3,000 emails / month
-  - 100 emails / day
+  - 6,000 emails / month
+  - 200 emails / day
   - Unlimited contacts
   - Unlimited team members
-  - 1 agent inbox
-  - 1 webhook
+  - 3 agent inboxes
+  - 3 webhooks
   - 3 custom domains
   - 1 own SMTP server
   - 1 MB attachments

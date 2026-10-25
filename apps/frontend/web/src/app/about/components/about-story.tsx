@@ -34,7 +34,7 @@ const story: StoryChapter[] = [
 		period: "2026: Production readiness",
 		title: "Reloop is live worldwide. The codebase remains 100% public.",
 		paragraphs: [
-			"You can sign up on reloop.sh and send 3,000 emails per month free, or clone the repository and run Reloop inside your private VPC. No enterprise paywalls for essential features, and zero closed-source routing modules.",
+			"You can sign up on reloop.sh and send 6,000 emails per month free, or clone the repository and run Reloop inside your private VPC. No enterprise paywalls for essential features, and zero closed-source routing modules.",
 			"We are an engineer-led team shipping weekly with a public roadmap. The foundation is open, the engine is proven, and we are committed to building the permanent open-source standard for email.",
 		],
 	},

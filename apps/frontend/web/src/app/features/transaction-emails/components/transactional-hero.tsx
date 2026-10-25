@@ -40,7 +40,7 @@ export function TransactionalHero() {
 						<CopyPromptButton />
 					</div>
 					<p className="mt-3.5 text-[12.5px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
-						Free plan: 3,000 emails a month. No credit card.
+						Free plan: 6,000 emails a month. No credit card.
 					</p>
 				</div>
 

@@ -99,7 +99,7 @@ export default async function FrameworkPage({ params }: PageProps) {
 				<BlueprintCta
 					headlineLine1={`Ready to send with ${framework.name}?`}
 					headlineLine2="Let's talk."
-					subtext="3,000 free emails every month. Modern email infrastructure and deliverability built for developers."
+					subtext="6,000 free emails every month. Modern email infrastructure and deliverability built for developers."
 					primaryLabel="Get started free"
 					primaryHref="/dashboard/signup"
 					secondaryLabel="Schedule call"

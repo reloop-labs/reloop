@@ -10,8 +10,8 @@ import {
 } from "./schema/billing";
 import { isSelfHosted } from "./self-hosted";
 
-const DEFAULT_MONTHLY_CREDITS = 3000;
-const DEFAULT_DAILY_EMAIL_LIMIT = 100;
+const DEFAULT_MONTHLY_CREDITS = 6000;
+const DEFAULT_DAILY_EMAIL_LIMIT = 200;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Days a past_due org may keep sending while Polar retries the payment. */

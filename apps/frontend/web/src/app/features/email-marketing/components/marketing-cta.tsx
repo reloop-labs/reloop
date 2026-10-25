@@ -12,7 +12,7 @@ export function MarketingCta() {
 						<span className="text-orange-400">$0 / mo.</span>
 					</span>
 				}
-				sub="No credit card required. 3,000 emails for free."
+				sub="No credit card required. 6,000 emails for free."
 				primaryLabel="Get started"
 				primaryHref={hostedSignupHref}
 				secondaryLabel="View pricing"

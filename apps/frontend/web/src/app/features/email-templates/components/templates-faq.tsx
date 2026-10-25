@@ -35,7 +35,7 @@ export const templatesFaq = [
 	{
 		question: "What does it cost?",
 		answer:
-			"Templates are included on every plan, including the free plan with 3,000 emails a month and no credit card. You can also try the editor without an account.",
+			"Templates are included on every plan, including the free plan with 6,000 emails a month and no credit card. You can also try the editor without an account.",
 	},
 ];
 

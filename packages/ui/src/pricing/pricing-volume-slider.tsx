@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Slider from "@reloop/ui/slider";
 
 const TICKS = [
-	{ value: 3000, label: "3k", plan: "Free" },
+	{ value: 6000, label: "6k", plan: "Free" },
 	{ value: 10000, label: "10k", plan: "Pro" },
 	{ value: 20000, label: "20k", plan: "Pro" },
 	{ value: 30000, label: "30k", plan: "Pro" },
@@ -37,7 +37,7 @@ const clamp = (n: number, min: number, max: number) =>
 
 /** Evenly-spaced tick i sits at i * SEGMENT_WIDTH; values interpolate linearly within each segment. */
 const toPosition = (volume: number) => {
-	const first = TICKS[0]?.value ?? 3000;
+	const first = TICKS[0]?.value ?? 6000;
 	if (volume <= first) return 0;
 	for (let i = 0; i < SEGMENTS; i++) {
 		const low = TICKS[i]?.value ?? first;
@@ -56,7 +56,7 @@ const toVolume = (position: number) => {
 		SEGMENTS,
 		Math.max(0, Math.round(clamp(position, 0, 100) / SEGMENT_WIDTH)),
 	);
-	return TICKS[index]?.value ?? TICKS[0]?.value ?? 3000;
+	return TICKS[index]?.value ?? TICKS[0]?.value ?? 6000;
 };
 
 export { recommendPlanIdForVolume };

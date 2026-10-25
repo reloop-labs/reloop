@@ -103,7 +103,7 @@ export default async function McpClientPage({ params }: PageProps) {
 				<BlueprintCta
 					headlineLine1={`Connect ${client.name} to Reloop.`}
 					headlineLine2="Sign in once."
-					subtext="Your agent can do everything you can do in the Reloop dashboard. 3,000 free emails every month."
+					subtext="Your agent can do everything you can do in the Reloop dashboard. 6,000 free emails every month."
 					primaryLabel="Connect in the dashboard"
 					primaryHref={MCP_DASHBOARD_HREF}
 					secondaryLabel="MCP overview"

@@ -18,7 +18,7 @@ import { SMTP_SERVICES } from "./components/smtp-services";
 const pagePath = "/features/smtp";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 const description =
-	"Point any app, framework, or no-code tool at smtp.reloop.sh and start sending. Delivery logs, webhooks, DKIM, and bounce suppression included. 3,000 emails a month free. Open source.";
+	"Point any app, framework, or no-code tool at smtp.reloop.sh and start sending. Delivery logs, webhooks, DKIM, and bounce suppression included. 6,000 emails a month free. Open source.";
 
 export const metadata: Metadata = {
 	title: "SMTP Relay Service",

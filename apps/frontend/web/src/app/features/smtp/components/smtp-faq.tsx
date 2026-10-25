@@ -30,7 +30,7 @@ export const smtpFaq = [
 	{
 		question: "Do SMTP sends count toward my quota?",
 		answer:
-			"Yes, each recipient counts once, the same as API sends. The free plan includes 3,000 emails a month with no credit card. Because Reloop is open source, you can also self-host the entire relay.",
+			"Yes, each recipient counts once, the same as API sends. The free plan includes 6,000 emails a month with no credit card. Because Reloop is open source, you can also self-host the entire relay.",
 	},
 ];
 

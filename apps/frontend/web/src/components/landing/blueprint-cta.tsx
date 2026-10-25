@@ -384,7 +384,7 @@ export function BlueprintCta({
 	className,
 	headlineLine1 = "Ready to scale your email?",
 	headlineLine2 = "Let's talk.",
-	subtext = "3,000 free emails every month. Modern email infrastructure and deliverability built for developers.",
+	subtext = "6,000 free emails every month. Modern email infrastructure and deliverability built for developers.",
 	primaryLabel = "Get started free",
 	primaryHref = hostedSignupHref,
 	secondaryLabel = "Schedule call",

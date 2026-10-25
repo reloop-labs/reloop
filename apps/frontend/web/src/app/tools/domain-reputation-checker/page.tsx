@@ -122,7 +122,7 @@ export default function DomainReputationCheckerPage() {
 				<BlueprintCta
 					headlineLine1="Keep your reputation high."
 					headlineLine2="Send with Reloop."
-					subtext="Authenticated sending, bounce handling, and deliverability analytics built in. Start with 3,000 free emails a month."
+					subtext="Authenticated sending, bounce handling, and deliverability analytics built in. Start with 6,000 free emails a month."
 					primaryLabel="Get started free"
 					secondaryLabel="Talk to founder"
 				/>

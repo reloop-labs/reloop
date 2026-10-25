@@ -25,7 +25,7 @@ export const transactionalFaq = [
 	{
 		question: "What does it cost?",
 		answer:
-			"The free plan includes 3,000 emails a month with no credit card. Paid plans scale with volume, and because Reloop is open source you can also self-host it on your own servers.",
+			"The free plan includes 6,000 emails a month with no credit card. Paid plans scale with volume, and because Reloop is open source you can also self-host it on your own servers.",
 	},
 	{
 		question: "Do I need a developer to edit email content?",

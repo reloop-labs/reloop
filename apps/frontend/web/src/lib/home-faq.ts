@@ -25,7 +25,7 @@ export const homeFaqGroups: HomeFaqGroup[] = [
 			{
 				question: "How is Reloop different from Resend, SendGrid, or Postmark?",
 				answer:
-					"Unlike traditional closed email services, Reloop is open-source under Apache 2.0. You get full transparency into queues, delivery pipelines, and DNS checks with zero vendor lock-in. You can self-host for free on your own servers or use Reloop Cloud with 3,000 free emails every month.",
+					"Unlike traditional closed email services, Reloop is open-source under Apache 2.0. You get full transparency into queues, delivery pipelines, and DNS checks with zero vendor lock-in. You can self-host for free on your own servers or use Reloop Cloud with 6,000 free emails every month.",
 			},
 			{
 				question: "Which programming languages and frameworks are supported?",

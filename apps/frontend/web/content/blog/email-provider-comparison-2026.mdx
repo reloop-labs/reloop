@@ -34,7 +34,7 @@ We build Reloop, so read this with that in mind. We've tried to keep every claim
 
 | | **Reloop** | **Resend** | **SendGrid** |
 |---|---|---|---|
-| Free tier | 3,000 / mo (100 / day) | 3,000 / mo (100 / day) | 60-day trial, 100 / day |
+| Free tier | 6,000 / mo (200 / day) | 3,000 / mo (100 / day) | 60-day trial, 100 / day |
 | 50,000 emails / mo | **$10** | $20 | $19.95 |
 | 100,000 emails / mo | **$20** | $90 | $34.95 |
 | Overage per 1,000 | **$0.50** | $0.90 | Plan upgrade |
@@ -54,7 +54,7 @@ Every serious provider ships the basics: a REST API, SMTP, SPF/DKIM support, web
 
 The real differences show up in five places:
 
-1. **Price at your volume.** Free tiers look identical. The gap opens at 50k–500k emails a month.
+1. **Price at your volume.** Free tiers look similar. The real gap opens at 50k–500k emails a month.
 2. **Developer experience.** How long from `npm install` to a delivered email? How readable are errors?
 3. **Deliverability controls.** Dedicated IPs, suppression lists, bounce handling, warm-up.
 4. **What else it does.** Receiving mail, campaigns, automations, contact management.
@@ -251,8 +251,8 @@ Read more in [why we open-sourced our email infrastructure](/blog/why-we-open-so
 
   <Accordion title="Does SendGrid still have a free plan?">
     Not a permanent one. New SendGrid accounts get a 60-day trial with a
-    daily sending cap, then need a paid Essentials or Pro plan. Reloop and
-    Resend both keep a free tier of 3,000 emails a month.
+    daily sending cap, then need a paid Essentials or Pro plan. Reloop keeps a
+    free tier of 6,000 emails a month, and Resend one of 3,000.
   </Accordion>
 
   <Accordion title="Can I use React Email templates with Reloop?">
@@ -270,7 +270,7 @@ Read more in [why we open-sourced our email infrastructure](/blog/why-we-open-so
 
 <Cta
   title="Try Reloop free"
-  description="3,000 emails a month on the hosted free tier, or self-host the whole stack."
+  description="6,000 emails a month on the hosted free tier, or self-host the whole stack."
   href="/dashboard/signup"
   label="Get started"
 />

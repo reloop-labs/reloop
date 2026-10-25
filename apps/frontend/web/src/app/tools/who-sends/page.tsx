@@ -217,7 +217,7 @@ export default function WhoSendsPage() {
 				<BlueprintCta
 					headlineLine1="Too many senders?"
 					headlineLine2="Send it all through Reloop."
-					subtext="Replace scattered sending vendors with one SPF include and one API. Start with 3,000 free emails per month."
+					subtext="Replace scattered sending vendors with one SPF include and one API. Start with 6,000 free emails per month."
 					primaryLabel="Get started free"
 					secondaryLabel="Talk to founder"
 				/>

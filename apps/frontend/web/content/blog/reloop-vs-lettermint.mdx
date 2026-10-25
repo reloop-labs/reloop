@@ -36,7 +36,7 @@ We build Reloop, so weigh this accordingly. Every Lettermint fact below comes fr
 |---|---|---|
 | Company | Reloop Labs | Lettermint B.V. (Netherlands) |
 | Where email data lives | Self-host: your server. Cloud: Hetzner, with EU data centers | EU (UpCloud in the Netherlands, backups on OVHcloud in Germany) |
-| Free tier | 3,000 / mo, 100 / day | 300 / mo, no daily limit |
+| Free tier | 6,000 / mo, 200 / day | 300 / mo, no daily limit |
 | 50,000 emails / mo | **$10** | €40 (Starter) / €45 (Growth) / €55 (Pro) |
 | Overage | $0.50 per 1,000 | €1.10 to €1.50 per 1,000 at the 10k–50k tiers |
 | Dedicated IP | Included on Growth ($20) | €50 / mo add-on, Pro at 300k+ |
@@ -91,7 +91,7 @@ Lettermint has Free, Starter, Growth and Pro plans, each priced by monthly volum
 
 What stands out:
 
-- **Reloop's free tier is ten times bigger.** 3,000 a month vs 300, though Lettermint has no daily cap and Reloop's free plan allows 100 a day.
+- **Reloop's free tier is twenty times bigger.** 6,000 a month vs 300, though Lettermint has no daily cap and Reloop's free plan allows 200 a day.
 - **The gap is widest between 10k and 300k.** At 50k you'd pay €40 or more on Lettermint and $10 on Reloop.
 - **At a million emails it gets close.** Reloop's flat $0.50 per 1,000 overage adds up, and Lettermint's per-email price falls with volume. At very high volume, compare a real quote, not just list prices.
 - **Lettermint counts inbound mail in your volume.** Its pricing page says the monthly allowance is "Transactional, Broadcast and Inbound emails combined".
@@ -168,7 +168,7 @@ Reloop's errors tell you **why** a send failed and **how to fix it**:
 
 **Lettermint** handles inbound with [inbound routes](https://lettermint.co/docs/platform/inbound-mail/introduction), on Starter and up. Each route gets a catch-all address domain (`<route-id>.lettermint.app`), or you point your own domain's MX at it. Lettermint parses each message and sends a signed `message.inbound` webhook to your endpoint. Messages above the route's spam threshold are quarantined for review. Storing, threading and replying are up to you.
 
-**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. Replying in-thread is one call, and an `email.received` webhook is there if you also want push. Inbound is on every plan, including Free (one inbox).
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. Replying in-thread is one call, and an `email.received` webhook is there if you also want push. Inbound is on every plan, including Free (three inboxes).
 
 | | Reloop | Lettermint |
 |---|---|---|
@@ -267,7 +267,7 @@ If you want the servers under your own control, do step 1 on a self-hosted Reloo
 <AccordionGroup>
   <Accordion title="Is Reloop cheaper than Lettermint?">
     For most volumes, yes. At 50,000 emails a month Reloop is $10 and
-    Lettermint is €40 on Starter. Reloop's free tier is also bigger: 3,000 a
+    Lettermint is €40 on Starter. Reloop's free tier is also bigger: 6,000 a
     month vs 300. Around a million emails a month the two get close, so price
     your real volume.
   </Accordion>
@@ -306,7 +306,7 @@ If you want the servers under your own control, do step 1 on a self-hosted Reloo
 
 <Cta
   title="Try Reloop free"
-  description="3,000 emails a month on the free tier, inbound mailboxes and automations on every plan, and $10 for 50k when you grow."
+  description="6,000 emails a month on the free tier, inbound mailboxes and automations on every plan, and $10 for 50k when you grow."
   href="/dashboard/signup"
   label="Get started"
 />

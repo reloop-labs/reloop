@@ -36,12 +36,12 @@ const creditColumns: CreditColumn[] = [
 		price: "$0",
 		middlePrimary: "Free for everyone",
 		features: [
-			"3,000 emails / month",
-			"100 emails / day",
+			"6,000 emails / month",
+			"200 emails / day",
 			"Unlimited contacts",
 			"Unlimited team members",
-			"1 agent inbox",
-			"1 webhook",
+			"3 agent inboxes",
+			"3 webhooks",
 			"3 custom domains",
 			"1 own SMTP server",
 			"1 MB attachments",
@@ -376,7 +376,7 @@ function creditCompareValue(
 	key: ComparisonRowKey | typeof CREDIT_VALIDITY_KEY,
 ): string | boolean {
 	if (key === "monthlyEmails") {
-		return (["3,000", "Pay as you go", "Custom"] as const)[planIndex];
+		return (["6,000", "Pay as you go", "Custom"] as const)[planIndex];
 	}
 	if (key === CREDIT_VALIDITY_KEY) {
 		return (["—", "6 months", "Custom"] as const)[planIndex];

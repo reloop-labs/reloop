@@ -5,6 +5,7 @@ import {
 	organization,
 	organizationCredits,
 } from "@reloop/db/schema";
+import { getPlanLimits } from "@reloop/pricing";
 import { desc, eq, sql } from "drizzle-orm";
 import { createError } from "evlog";
 
@@ -17,6 +18,7 @@ async function getOrProvisionCredits(orgId: string, tx: DatabaseInstance = db) {
 	if (activeCredits) return activeCredits;
 
 	const now = new Date();
+	const freeMonthly = getPlanLimits("free").monthlyEmails;
 	const periodEnd = new Date(now);
 	periodEnd.setMonth(periodEnd.getMonth() + 1);
 
@@ -25,8 +27,8 @@ async function getOrProvisionCredits(orgId: string, tx: DatabaseInstance = db) {
 		.values({
 			organizationId: orgId,
 			creditsUsed: 0,
-			creditsRemaining: 3000,
-			monthlyCredits: 3000,
+			creditsRemaining: freeMonthly,
+			monthlyCredits: freeMonthly,
 			currentPeriodStart: now,
 			currentPeriodEnd: periodEnd,
 			status: "active",

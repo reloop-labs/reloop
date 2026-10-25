@@ -61,7 +61,7 @@ export function MarketingHero() {
 						</FancyButton.Root>
 					</div>
 					<p className="mt-4 text-center text-[13px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
-						Free plan: 3,000 emails a month. No credit card.
+						Free plan: 6,000 emails a month. No credit card.
 					</p>
 				</div>
 			</div>

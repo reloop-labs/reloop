@@ -38,7 +38,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 								className="size-4 shrink-0"
 								aria-hidden="true"
 							/>
-							<span>Try Reloop Cloud 3,000 emails for free</span>
+							<span>Try Reloop Cloud 6,000 emails for free</span>
 						</Link>
 						<Link
 							href="/docs/self-host"
@@ -90,7 +90,7 @@ export function Hero({ variant = "default" }: HeroProps) {
 								className="size-4 shrink-0"
 								aria-hidden="true"
 							/>
-							<span>3,000 emails for free</span>
+							<span>6,000 emails for free</span>
 						</Link>
 						<Link
 							href="/dpa"

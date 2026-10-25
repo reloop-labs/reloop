@@ -35,7 +35,7 @@ We build Reloop, so weigh this accordingly. Every Cloudflare fact below links to
 | | **Reloop** | **Cloudflare Email Service** |
 |---|---|---|
 | Status | Generally available | Sending in public beta, Routing GA |
-| Free tier | 3,000 / mo, 100 / day | Sending to your own verified addresses only |
+| Free tier | 6,000 / mo, 200 / day | Sending to your own verified addresses only |
 | Paid entry point | $10 / mo for 50k | Workers Paid ($5 / mo minimum), 3,000 emails included |
 | Price per extra 1,000 | $0.50 | $0.35 |
 | Domain DNS | Any DNS provider | Must use Cloudflare DNS |
@@ -170,7 +170,7 @@ Both maintain a suppression list for bounces and complaints. Cloudflare's can be
 
 Cloudflare's [Email Routing](https://developers.cloudflare.com/email-service/get-started/route-emails/) is excellent and free: unlimited inbound mail, forwarded to verified addresses or handed to a Worker's `email()` handler, which can reply in-thread. What you do with the message after that (store it, thread it, search it) is your code.
 
-Reloop receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. Reply in-thread with one call. Hosted plans include 1 inbox on Free, 5 on Pro and 10 on Growth; self-hosted is unlimited.
+Reloop receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. Reply in-thread with one call. Hosted plans include 3 inboxes on Free, 5 on Pro and 10 on Growth; self-hosted is unlimited.
 
 | | Reloop | Cloudflare |
 |---|---|---|
@@ -269,7 +269,7 @@ To move transactional sending from Cloudflare to Reloop:
 
 <Cta
   title="Try Reloop free"
-  description="3,000 emails a month on the free tier, any DNS provider, and it runs on Workers with one fetch call."
+  description="6,000 emails a month on the free tier, any DNS provider, and it runs on Workers with one fetch call."
   href="/dashboard/signup"
   label="Get started"
 />

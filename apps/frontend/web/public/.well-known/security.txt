@@ -1,0 +1,6 @@
+Contact: https://github.com/reloop-labs/reloop/security/advisories/new
+Contact: mailto:reloop.sh@gmail.com
+Expires: 2027-10-26T00:00:00.000Z
+Policy: https://github.com/reloop-labs/reloop/blob/main/SECURITY.md
+Preferred-Languages: en
+Canonical: https://reloop.sh/.well-known/security.txt

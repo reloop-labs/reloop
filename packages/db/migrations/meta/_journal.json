@@ -337,6 +337,13 @@
       "when": 1793100000000,
       "tag": "0047_domain_ownership",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1793200000000,
+      "tag": "0048_free_plan_limits",
+      "breakpoints": true
     }
   ]
 }

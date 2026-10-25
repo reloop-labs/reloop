@@ -80,11 +80,11 @@ export const organizationPlan = pgTable(
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),
 		planId: planIdEnum("plan_id").notNull().default("free"),
-		monthlyEmails: integer("monthly_emails").notNull().default(3000),
+		monthlyEmails: integer("monthly_emails").notNull().default(6000),
 		dailyEmailLimit: integer("daily_email_limit"),
 		overageEnabled: boolean("overage_enabled").notNull().default(false),
-		maxAgentInboxes: integer("max_agent_inboxes").notNull().default(1),
-		maxWebhooks: integer("max_webhooks").notNull().default(1),
+		maxAgentInboxes: integer("max_agent_inboxes").notNull().default(3),
+		maxWebhooks: integer("max_webhooks").notNull().default(3),
 		maxCustomDomains: integer("max_custom_domains").notNull().default(3),
 		maxAttachmentBytes: integer("max_attachment_bytes")
 			.notNull()
@@ -173,8 +173,8 @@ export const organizationCredits = pgTable(
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),
 		creditsUsed: integer("credits_used").notNull().default(0),
-		creditsRemaining: integer("credits_remaining").notNull().default(3000),
-		monthlyCredits: integer("monthly_credits").notNull().default(3000),
+		creditsRemaining: integer("credits_remaining").notNull().default(6000),
+		monthlyCredits: integer("monthly_credits").notNull().default(6000),
 		dailyEmailsUsed: integer("daily_emails_used").notNull().default(0),
 		/** Pay-as-you-go balance, spent after the monthly pool runs out. */
 		prepaidCredits: integer("prepaid_credits").notNull().default(0),

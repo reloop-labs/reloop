@@ -211,7 +211,7 @@ export default function SpoofCheckerPage() {
 				<BlueprintCta
 					headlineLine1="Lock down your domain."
 					headlineLine2="Send with Reloop."
-					subtext="Reloop sets up SPF, DKIM and DMARC for your sending domain so fakes get rejected and real mail lands. Start with 3,000 free emails per month."
+					subtext="Reloop sets up SPF, DKIM and DMARC for your sending domain so fakes get rejected and real mail lands. Start with 6,000 free emails per month."
 					primaryLabel="Get started free"
 					secondaryLabel="Talk to founder"
 				/>

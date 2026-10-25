@@ -105,13 +105,13 @@ afterAll(async () => {
 
 /* ------------------------------------------------------------------ */
 suite("FREE plan", () => {
-	it("F1 new org is provisioned with 3,000/month and 100/day", async () => {
+	it("F1 new org is provisioned with 6,000/month and 200/day", async () => {
 		const org = await newOrg("f1");
 		const billing = await getOrProvisionOrgBilling(org);
 		expect(billing.plan.planId).toBe("free");
-		expect(billing.plan.monthlyEmails).toBe(3000);
-		expect(billing.plan.dailyEmailLimit).toBe(100);
-		expect(billing.credits.creditsRemaining).toBe(3000);
+		expect(billing.plan.monthlyEmails).toBe(6000);
+		expect(billing.plan.dailyEmailLimit).toBe(200);
+		expect(billing.credits.creditsRemaining).toBe(6000);
 	});
 
 	it("F2 a send deducts one credit per recipient", async () => {
@@ -121,15 +121,15 @@ suite("FREE plan", () => {
 		expect(r.ok).toBe(true);
 		const c = await credits(org);
 		expect(c.creditsUsed).toBe(5);
-		expect(c.creditsRemaining).toBe(2995);
+		expect(c.creditsRemaining).toBe(5995);
 		expect(c.dailyEmailsUsed).toBe(5);
 	});
 
-	it("F3 the 101st email of the UTC day is blocked; next UTC day it works again", async () => {
+	it("F3 the 201st email of the UTC day is blocked; next UTC day it works again", async () => {
 		const org = await newOrg("f3");
 		await getOrProvisionOrgBilling(org);
 		const t = new Date();
-		expect((await send(org, 100, t)).ok).toBe(true);
+		expect((await send(org, 200, t)).ok).toBe(true);
 		const blocked = await send(org, 1, t);
 		expect(blocked.ok).toBe(false);
 		if (!blocked.ok) expect(blocked.reason).toBe("daily");
@@ -140,7 +140,7 @@ suite("FREE plan", () => {
 	it("F4 runs out of monthly credits exactly at zero (no partial sends)", async () => {
 		const org = await newOrg("f4");
 		await getOrProvisionOrgBilling(org);
-		await setCredits(org, { creditsRemaining: 3, creditsUsed: 2997 });
+		await setCredits(org, { creditsRemaining: 3, creditsUsed: 5997 });
 		expect((await send(org, 4)).ok).toBe(false); // 4 recipients > 3 left
 		expect((await send(org, 3)).ok).toBe(true);
 		const last = await send(org, 1);
@@ -148,13 +148,13 @@ suite("FREE plan", () => {
 		if (!last.ok) expect(last.reason).toBe("monthly");
 		const c = await credits(org);
 		expect(c.creditsRemaining).toBe(0);
-		expect(c.creditsUsed).toBe(3000);
+		expect(c.creditsUsed).toBe(6000);
 	});
 
 	it("F5 concurrent sends never overspend (50 parallel sends, 20 credits left)", async () => {
 		const org = await newOrg("f5");
 		await getOrProvisionOrgBilling(org);
-		await setCredits(org, { creditsRemaining: 20, creditsUsed: 2980 });
+		await setCredits(org, { creditsRemaining: 20, creditsUsed: 5980 });
 		const results = await Promise.all(
 			Array.from({ length: 50 }, () => send(org, 1)),
 		);
@@ -169,7 +169,7 @@ suite("FREE plan", () => {
 		if (!r.ok || !r.reservation) throw new Error("reserve failed");
 		await refundSendCredits({ reservation: r.reservation });
 		const c = await credits(org);
-		expect(c.creditsRemaining).toBe(3000);
+		expect(c.creditsRemaining).toBe(6000);
 		expect(c.creditsUsed).toBe(0);
 		expect(c.dailyEmailsUsed).toBe(0);
 	});
@@ -184,7 +184,7 @@ suite("FREE plan", () => {
 		});
 		const billing = await getOrProvisionOrgBilling(org);
 		expect(billing.credits.creditsUsed).toBe(0);
-		expect(billing.credits.creditsRemaining).toBe(3000);
+		expect(billing.credits.creditsRemaining).toBe(6000);
 		const periods = await db.query.billingPeriod.findMany({
 			where: eq(billingPeriod.organizationId, org),
 		});

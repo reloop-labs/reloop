@@ -2,6 +2,9 @@ export const siteName = "Reloop";
 
 export const contactEmail = "reloop.sh@gmail.com";
 
+/** A founder's direct inbox, for "talk to a human" links. */
+export const founderEmail = "pranav@reloop.sh";
+
 /** Reloop hosted product signup */
 export const hostedSignupHref = "/dashboard/signup";
 

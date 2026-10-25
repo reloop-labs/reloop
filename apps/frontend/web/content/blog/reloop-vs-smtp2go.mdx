@@ -34,7 +34,7 @@ We build Reloop, so weigh this accordingly. Every SMTP2GO price below is from [s
 
 | | **Reloop** | **SMTP2GO** |
 |---|---|---|
-| Free tier | 3,000 / mo, 100 / day | 1,000 / mo |
+| Free tier | 6,000 / mo, 200 / day | 1,000 / mo |
 | 10,000 emails / mo | $10 | $10 |
 | 100,000 emails / mo | **$20** | $75 |
 | Overage per 1,000 | **$0.50** | $1 (Starter), $0.85 (Professional) |
@@ -68,7 +68,7 @@ The 50k and 250k SMTP2GO figures are worked out from the published overage rates
 
 Two things to note:
 
-- **Free tiers differ in shape.** SMTP2GO gives 1,000 a month. Reloop gives 3,000 a month but caps each day at 100, so a burst of 500 password resets in one day won't fit on free.
+- **Free tiers differ in shape.** SMTP2GO gives 1,000 a month. Reloop gives 6,000 a month but caps each day at 200, so a burst of 500 password resets in one day won't fit on free.
 - **The dedicated IP costs much less.** Both include one on the 100k plan, but that plan is $20 on Reloop and $75 on SMTP2GO.
 
 If you self-host Reloop, there's no per-email fee at all. You pay for the server. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that involves.
@@ -232,7 +232,7 @@ As always, your own DNS and list quality matter more than which provider you pic
 - **Devices on restrictive networks.** If a printer, scanner or on-prem app can't reach port 587, SMTP2GO's alternate ports (2525, 8025, 80, 443) are a real advantage.
 - **You also need SMS** from the same provider and account.
 - **You want phone support.** SMTP2GO lists ticket, chat and phone support on its plans.
-- **Very low volume, no daily bursts.** If you send a few hundred emails a month but occasionally a few hundred in one day, SMTP2GO's free 1,000 with no daily cap fits better than our 100-a-day free cap.
+- **Very low volume, no daily bursts.** If you send a few hundred emails a month but occasionally a few hundred in one day, SMTP2GO's free 1,000 with no daily cap fits better than our 200-a-day free cap.
 
 ## Where Reloop is the better choice
 
@@ -275,8 +275,8 @@ Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same st
 
   <Accordion title="Is Reloop cheaper than SMTP2GO?">
     At 10,000 emails they're the same ($10). Above that Reloop is cheaper:
-    $10 vs about $50 at 50k, and $20 vs $75 at 100k. Below 3,000 a month
-    Reloop's free tier covers you if you stay under 100 a day.
+    $10 vs about $50 at 50k, and $20 vs $75 at 100k. Below 6,000 a month
+    Reloop's free tier covers you if you stay under 200 a day.
   </Accordion>
 
   <Accordion title="Does SMTP2GO offer a dedicated IP?">
@@ -293,7 +293,7 @@ Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same st
 
 <Cta
   title="Try Reloop free"
-  description="3,000 emails a month on the free tier. SMTP relay and API with the same key, and a dedicated IP from $20 a month."
+  description="6,000 emails a month on the free tier. SMTP relay and API with the same key, and a dedicated IP from $20 a month."
   href="/dashboard/signup"
   label="Get started"
 />

@@ -294,7 +294,7 @@ export default function DomainAgePage() {
 				<DomainAgeCta
 					headlineLine1="New domain? Send safely."
 					headlineLine2="Let Reloop warm it up."
-					subtext="Reloop warms up new domains for you and watches for bounce and spam signals automatically. Start with 3,000 free emails per month."
+					subtext="Reloop warms up new domains for you and watches for bounce and spam signals automatically. Start with 6,000 free emails per month."
 					primaryLabel="Get started free"
 					secondaryLabel="Talk to founder"
 				/>

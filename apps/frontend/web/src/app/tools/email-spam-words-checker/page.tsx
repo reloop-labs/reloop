@@ -3,6 +3,7 @@ import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import { SectionSeparator } from "../../(home)/components/section-separator";
+import { SimilarTools } from "../components/similar-tools";
 import { ApiSection } from "./api-section";
 import { AiAgentsSection } from "./components/ai-agents-section";
 import { SpamScoreHero } from "./components/spam-score-hero";
@@ -16,7 +17,6 @@ import {
 } from "./content";
 import { FaqGrid } from "./faq-grid";
 import { SectionIntro } from "./grid";
-import { SimilarTools } from "../components/similar-tools";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -111,7 +111,7 @@ export default function SpamScoreCheckerPage() {
 							for Developers
 						</>
 					}
-					sub="Free plan: 3,000 emails a month. No credit card."
+					sub="Free plan: 6,000 emails a month. No credit card."
 					primaryLabel="Get started free"
 					primaryHref="/dashboard/signup"
 					primaryVariant="primary"

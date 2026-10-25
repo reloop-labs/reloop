@@ -177,7 +177,7 @@ export const DomainEvents = ({
 						)}
 						{dailyCap === null && (
 							<p className="mt-1 text-[12px] text-text-sub-600 leading-relaxed dark:text-white/60">
-								Warmup complete. your plan limit now applies (Free 100/day).
+								Warmup complete. your plan limit now applies (Free 200/day).
 								Keep bounce/complaint low to stay dynamic.
 							</p>
 						)}

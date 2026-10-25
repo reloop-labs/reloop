@@ -37,6 +37,7 @@ const STATIC_TITLES: Record<string, string> = {
 	"/license": "License",
 	"/pricing": "Pricing",
 	"/privacy": "Privacy Policy",
+	"/security": "Security",
 	"/terms-and-conditions": "Terms of Service",
 	"/tools": "Tools",
 	"/use-cases": "Use cases",

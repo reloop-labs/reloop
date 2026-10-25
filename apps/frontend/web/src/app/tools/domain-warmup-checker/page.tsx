@@ -220,7 +220,7 @@ export default function DomainWarmupCheckerPage() {
 				<DomainAgeCta
 					headlineLine1="Stop warming up manually."
 					headlineLine2="Let's talk."
-					subtext="Reloop handles your domain warmup and watches for bounce and spam signals automatically. Start with 3,000 free emails per month."
+					subtext="Reloop handles your domain warmup and watches for bounce and spam signals automatically. Start with 6,000 free emails per month."
 					primaryLabel="Get started free"
 					secondaryLabel="Talk to founder"
 				/>

@@ -36,8 +36,8 @@ async function setup(maxAgentInboxes: number) {
 	await db.insert(organizationPlan).values({
 		organizationId: id,
 		planId: maxAgentInboxes === 1 ? "free" : "individual",
-		monthlyEmails: 3000,
-		dailyEmailLimit: 100,
+		monthlyEmails: 6000,
+		dailyEmailLimit: 200,
 		overageEnabled: false,
 		maxAgentInboxes,
 		maxWebhooks: 1,

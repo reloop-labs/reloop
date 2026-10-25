@@ -53,7 +53,7 @@ export default function ToolsIndexPage() {
 			<BlueprintCta
 				headlineLine1="Start sending email today"
 				headlineLine2="$0 / mo."
-				subtext="No credit card required. 3,000 emails for free."
+				subtext="No credit card required. 6,000 emails for free."
 				primaryLabel="Get started free"
 				secondaryLabel="Talk to founder"
 				className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8"

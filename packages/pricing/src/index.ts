@@ -97,16 +97,16 @@ export const pricingPlans: PricingPlan[] = [
 		description: "For side projects and getting started with Reloop.",
 		monthlyPrice: 0,
 		priceSubline: "Free for everyone",
-		emailsLabel: "3,000 emails / month",
+		emailsLabel: "6,000 emails / month",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
 		features: [
-			"3,000 emails / month",
-			"100 emails / day",
+			"6,000 emails / month",
+			"200 emails / day",
 			"Unlimited contacts",
 			"Unlimited team members",
-			"1 agent inbox",
-			"1 webhook",
+			"3 agent inboxes",
+			"3 webhooks",
 			"3 custom domains",
 			"1 own SMTP server",
 			"1 MB attachments",
@@ -114,13 +114,13 @@ export const pricingPlans: PricingPlan[] = [
 			"Community support",
 		],
 		comparison: {
-			monthlyEmails: "3,000",
-			dailyLimit: "100",
+			monthlyEmails: "6,000",
+			dailyLimit: "200",
 			overage: "-",
 			contacts: "Unlimited",
 			teamMembers: "Unlimited",
-			agentInbox: "1 inbox",
-			webhooks: "1 webhook",
+			agentInbox: "3 inboxes",
+			webhooks: "3 webhooks",
 			customDomains: "3 domains",
 			attachmentSize: "1 MB",
 			dataRetention: "45 days",
@@ -474,7 +474,7 @@ export function hostedMonthlyUsdForVolume(volume: number): number {
 	if (volume <= 0) return 0;
 	const free = pricingPlans.find((p) => p.id === "free");
 	const freeIncluded = Number(
-		(free?.comparison.monthlyEmails ?? "3000").replace(/,/g, ""),
+		(free?.comparison.monthlyEmails ?? "6000").replace(/,/g, ""),
 	);
 	if (volume <= freeIncluded) return 0;
 
@@ -529,7 +529,7 @@ const UPSELL_THRESHOLD_USD = 2;
 
 export function recommendPlanIdForVolume(volume: number): PlanId {
 	if (volume > 250000) return "enterprise";
-	if (volume <= 3000) return "free";
+	if (volume <= 6000) return "free";
 	const pro = getPlanById("individual");
 	const growth = getPlanById("startup");
 	const proBase = pro?.monthlyPrice ?? 10;

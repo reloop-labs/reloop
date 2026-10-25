@@ -7,7 +7,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata: Metadata = {
 	title: "Transactional Email API",
 	description:
-		"Transactional email that actually arrives. Delivery logs, webhooks, idempotent retries, automatic bounce suppression, and guided SPF/DKIM/DMARC. 3,000 emails a month free. Open source.",
+		"Transactional email that actually arrives. Delivery logs, webhooks, idempotent retries, automatic bounce suppression, and guided SPF/DKIM/DMARC. 6,000 emails a month free. Open source.",
 	keywords: [
 		"transactional email API",
 		"transactional email service",

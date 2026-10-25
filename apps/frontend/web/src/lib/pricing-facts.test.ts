@@ -30,7 +30,7 @@ describe("pricing facts derive from @reloop/pricing", () => {
 			planLimits.free.monthlyEmails.toLocaleString("en-US"),
 		);
 		expect(freeDailyEmails).toBe(String(planLimits.free.dailyEmailLimit));
-		expect(freePlanSummary).toBe("3,000 emails/month (100/day)");
+		expect(freePlanSummary).toBe("6,000 emails/month (200/day)");
 	});
 
 	test("the plan sentence names every plan once", () => {
@@ -39,7 +39,7 @@ describe("pricing facts derive from @reloop/pricing", () => {
 			expect(sentence.split(`${plan.name}`).length).toBe(2);
 		}
 		expect(sentence).toContain(`${freeDailyEmails}/day`);
-		expect(sentence).not.toContain("200/day");
+		expect(sentence).not.toContain("100/day");
 	});
 });
 

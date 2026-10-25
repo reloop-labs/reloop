@@ -118,11 +118,11 @@ describe.skipIf(!enabled)("Subscription cancellation", () => {
 
 		const s = await state(org);
 		expect(s.plan?.planId).toBe("free");
-		expect(s.plan?.monthlyEmails).toBe(3000);
-		expect(s.plan?.dailyEmailLimit).toBe(100);
+		expect(s.plan?.monthlyEmails).toBe(6000);
+		expect(s.plan?.dailyEmailLimit).toBe(200);
 		expect(s.plan?.overageEnabled).toBe(false);
-		expect(s.credits?.monthlyCredits).toBe(3000);
-		expect(s.credits?.creditsRemaining).toBe(3000);
+		expect(s.credits?.monthlyCredits).toBe(6000);
+		expect(s.credits?.creditsRemaining).toBe(6000);
 		expect(s.credits?.creditsUsed).toBe(0);
 		expect(s.subscription?.planId).toBe("free");
 		expect(s.subscription?.status).toBe("cancelled");

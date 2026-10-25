@@ -16,15 +16,15 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			{
 				label: "Free monthly emails",
 				icon: "send-2",
-				reloop: "3,000 / mo",
+				reloop: "6,000 / mo",
 				competitor: "3,000 / mo",
 			},
 			{
 				label: "Daily send limit (Free tier)",
 				icon: "calendar",
 				reloop: {
-					value: "100 / day",
-					note: "Free also caps at 3,000 / month",
+					value: "200 / day",
+					note: "Free also caps at 6,000 / month",
 				},
 				competitor: {
 					value: "100 / day",

@@ -2,6 +2,7 @@ import { FaqSection } from "@reloop/web/components/faq-section";
 import { JsonLd } from "@reloop/web/components/json-ld";
 import { createPageMetadata } from "@reloop/web/lib/metadata";
 import { getSiteUrl } from "@reloop/web/lib/site";
+import { SimilarTools } from "../components/similar-tools";
 import { ApiIntegration } from "./components/api-integration";
 import { HowItWorksSteps } from "./components/how-it-works-steps";
 import { McpSection } from "./components/mcp-section";
@@ -18,7 +19,6 @@ import {
 	toolPath,
 	toolTitle,
 } from "./content";
-import { SimilarTools } from "../components/similar-tools";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -135,7 +135,7 @@ export default function TempEmailCheckerPage() {
 				<div aria-hidden className="h-12 sm:h-16" />
 				<TempEmailCta
 					headlineLine1="Stop paying for throwaways emails."
-					subtext="Reloop automatically flags risky contacts before you waste time or money on them. Start with 3,000 free emails per month."
+					subtext="Reloop automatically flags risky contacts before you waste time or money on them. Start with 6,000 free emails per month."
 					primaryLabel="Get started free"
 					secondaryLabel="Talk to founder"
 				/>

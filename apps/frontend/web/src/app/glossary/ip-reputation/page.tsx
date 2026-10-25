@@ -13,7 +13,7 @@ export default function IpReputationGlossaryPage() {
 			term={term}
 			cta={defaultLandingCta(
 				"Try Reloop free",
-				"3,000 emails a month on the Free plan, no credit card. Or self-host from the docs.",
+				"6,000 emails a month on the Free plan, no credit card. Or self-host from the docs.",
 			)}
 		/>
 	);

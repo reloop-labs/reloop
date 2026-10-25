@@ -16,7 +16,7 @@ A free, instant client-side **Email Content & Spam Score Checker** that scans em
 
 ### Strategic Conversion Hook
 Users checking their email spam score are in the active phase of sending emails or troubleshooting deliverability.
-* **Conversion Bridge:** Inline callouts showing how Reloop automates SPF/DKIM verification, provides 99.8% inbox placement, and offers 3,000 free emails/month.
+* **Conversion Bridge:** Inline callouts showing how Reloop automates SPF/DKIM verification, provides 99.8% inbox placement, and offers 6,000 free emails/month.
 
 ---
 

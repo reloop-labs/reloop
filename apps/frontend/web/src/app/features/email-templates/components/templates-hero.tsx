@@ -50,7 +50,7 @@ export function TemplatesHero() {
 						</FancyButton.Root>
 					</div>
 					<p className="mt-3.5 text-[12.5px] text-text-sub-600 sm:text-[13.5px] dark:text-white/50">
-						No HTML, no design tools. Free plan: 3,000 emails a month.
+						No HTML, no design tools. Free plan: 6,000 emails a month.
 					</p>
 				</div>
 

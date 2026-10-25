@@ -87,7 +87,7 @@ export function GridHero() {
 												</FancyButton.Root>
 											</div>
 											<span className="mt-3 block text-sm text-zinc-600 leading-5 dark:text-zinc-400">
-												3,000 emails for free<span aria-hidden="true"> · </span>
+												6,000 emails for free<span aria-hidden="true"> · </span>
 												No credit card required.
 											</span>
 										</div>

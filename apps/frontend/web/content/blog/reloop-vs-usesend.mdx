@@ -35,7 +35,7 @@ We build Reloop, so weigh this accordingly. useSend (formerly Unsend) is a well-
 | | **Reloop** | **useSend** |
 |---|---|---|
 | License | Apache 2.0 | AGPL-3.0 |
-| Free tier (hosted) | 3,000 / mo, 100 / day | 3,000 / mo, 100 / day |
+| Free tier (hosted) | 6,000 / mo, 200 / day | 3,000 / mo, 100 / day |
 | Paid pricing | Plans: $10 for 50k, $20 for 100k | Usage: $0.40 per 1k transactional, $1.00 per 1k marketing, $10 minimum |
 | Sending path | Own MTA (KumoMTA) | Amazon SES |
 | Self-host needs AWS | No | Yes (SES and SNS) |
@@ -53,7 +53,7 @@ useSend's prices are from the pricing section on [usesend.com](https://usesend.c
 
 ## Pricing at real volumes
 
-The free tiers are identical: 3,000 emails a month, capped at 100 a day.
+Reloop's free tier is double useSend's: 6,000 emails a month capped at 200 a day, vs 3,000 and 100.
 
 After that, the models differ. **Reloop sells plans** with a fixed amount of email. **useSend charges per email**, with a $10 monthly minimum in usage credits, and transactional mail ($0.0004 each) costs less than marketing mail ($0.001 each).
 
@@ -274,7 +274,7 @@ If you use SMTP instead, change the host to `smtp.reloop.sh` and use your Reloop
 
 <Cta
   title="Try Reloop free"
-  description="3,000 emails a month on the free tier, or self-host it without an AWS account."
+  description="6,000 emails a month on the free tier, or self-host it without an AWS account."
   href="/dashboard/signup"
   label="Get started"
 />
