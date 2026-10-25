@@ -1,14 +1,18 @@
 ---
 title: "Email Provider Comparison: Resend vs SendGrid vs Reloop"
-description: A 2026 comparison of developer email providers on open source, self-hosting, campaigns, and pricing.
+description: "Resend vs SendGrid vs Reloop in 2026: pricing at 3k, 50k and 100k emails a month, developer experience, inbound and agent inboxes, self-hosting, and which one fits your team."
 keywords:
   - email provider comparison
   - Resend vs SendGrid
+  - Resend vs SendGrid vs Reloop
   - best email API 2026
+  - transactional email provider pricing
+  - open source email API
 publishedAt: 2026-04-15
 category: Comparison
-tags: [resend, sendgrid, pricing]
-readTime: 12 min read
+tags: [resend, sendgrid, pricing, comparison]
+readTime: 11 min read
+image: /blog/images/email-provider-comparison-2026.png
 author:
   name: Pranav Patel
   role: Co-founder
@@ -17,24 +21,256 @@ draft: false
 relatedSlugs:
   - migrating-from-sendgrid
   - self-hosted-email-infrastructure
+  - transactional-email-best-practices
 ---
 
-## What developers actually need
+**Short answer:** pick **Resend** if you want a polished hosted API and don't mind paying more per email as you grow. Pick **SendGrid** if you're already deep in the Twilio ecosystem or need its long enterprise track record. Pick **Reloop** if you want the same modern developer experience at a lower price, plus inbound mail, agent inboxes, and the option to self-host the whole stack.
 
-Transactional API, webhooks, SDKs, and deliverability are the baseline. The differentiators are self-hosting, campaigns, open source, and total cost at scale.
+We build Reloop, so read this with that in mind. We've tried to keep every claim checkable: pricing comes from each provider's public pricing page, and where a competitor is better, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Resend** | **SendGrid** |
+|---|---|---|---|
+| Free tier | 3,000 / mo (100 / day) | 3,000 / mo (100 / day) | 60-day trial, 100 / day |
+| 50,000 emails / mo | **$10** | $20 | $19.95 |
+| 100,000 emails / mo | **$20** | $90 | $34.95 |
+| Overage per 1,000 | **$0.50** | $0.90 | Plan upgrade |
+| Open source | Yes (Apache 2.0) | No | No |
+| Self-host | Yes | No | No |
+| Inbound + agent inbox | Yes | Inbound via webhooks | Inbound Parse webhook |
+| Marketing / campaigns | Yes | Broadcasts | Marketing Campaigns (separate plan) |
+| SMTP relay | Yes | Yes | Yes |
+
+Prices are list prices for hosted plans as published on [resend.com/pricing](https://resend.com/pricing), [sendgrid.com/pricing](https://sendgrid.com/pricing/) and [reloop.sh/pricing](/pricing). Check them before you sign anything; providers change tiers often.
+
+---
+
+## What actually matters when choosing an email API
+
+Every serious provider ships the basics: a REST API, SMTP, SPF/DKIM support, webhooks for delivery events, and SDKs for the usual languages. If a provider is missing any of those, skip it.
+
+The real differences show up in five places:
+
+1. **Price at your volume.** Free tiers look identical. The gap opens at 50k–500k emails a month.
+2. **Developer experience.** How long from `npm install` to a delivered email? How readable are errors?
+3. **Deliverability controls.** Dedicated IPs, suppression lists, bounce handling, warm-up.
+4. **What else it does.** Receiving mail, campaigns, automations, contact management.
+5. **Lock-in.** Can you move, or run it yourself, if pricing or policy changes?
+
+Let's go through each provider against those.
+
+---
 
 ## Resend
 
-Excellent DX for hosted transactional email. Proprietary, no self-hosting, limited marketing features.
+Resend popularised the "email API that feels like Stripe" style. The docs are clean, the Node SDK is tiny, and its React Email project made writing templates in JSX normal.
+
+**Where Resend is strong**
+
+- Excellent onboarding and docs. You'll send your first email in minutes.
+- React Email integration is first-class.
+- A focused product. It does sending very well and doesn't try to be a CRM.
+
+**Where it falls short**
+
+- **Price as you scale.** The free tier matches ours, but the first paid tier is $20 for 50k, and 100k emails costs $90 a month. Overage is $0.90 per 1,000.
+- **Hosted only.** There's no self-hosted option, so data residency and vendor risk are on their terms.
+- **Inbound is webhook-based.** You receive a POST per message rather than a mailbox your app or agent can read, thread, and reply from.
+
+**Best for:** small teams that want a great hosted sending API and expect modest volume.
+
+---
 
 ## SendGrid
 
-Mature but complex. Legacy pricing and Twilio ownership. Still widely used for high volume.
+SendGrid has been around since 2009 and is now part of Twilio. It sends a huge share of the world's transactional email and has every enterprise checkbox you can think of.
+
+**Where SendGrid is strong**
+
+- Proven at very high volume, with dedicated IP pools and sub-user management.
+- Mature compliance story (SOC 2, HIPAA-eligible configurations, SSO).
+- Marketing Campaigns, Inbound Parse and an Email Validation API exist in one account.
+
+**Where it falls short**
+
+- **The permanent free plan is gone.** New accounts get a 60-day trial, then pay.
+- **Complexity.** Two products (Email API and Marketing Campaigns) with separate plans, legacy v2/v3 APIs, and a dashboard that shows its age.
+- **Account reviews.** New accounts can be held for manual review before sending is enabled, which can delay a launch.
+- **Hosted only**, like Resend.
+
+**Best for:** larger companies already on Twilio that need enterprise procurement more than developer ergonomics.
+
+If you're leaving, we wrote a step-by-step [SendGrid migration guide](/blog/migrating-from-sendgrid).
+
+---
 
 ## Reloop
 
-Open source, self-hostable, campaigns + transactional + agent inbox. Hosted free tier or deploy yourself.
+Reloop is open-source email infrastructure: transactional API, SMTP relay, campaigns, automations, webhooks and agent inboxes in one product. You can use the hosted version at [reloop.sh](https://reloop.sh) or run the same code on your own servers.
+
+**Where Reloop is strong**
+
+- **Price.** Pro is $10 for 50k emails and Growth is $20 for 100k, with $0.50 per extra 1,000. That's 2–4× cheaper than the alternatives at the same volume.
+- **Two-way email.** Every domain can receive mail into real mailboxes with threads, so AI agents and humans can read and reply, over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server), or IMAP.
+- **Transactional and marketing together.** Contacts, groups, templates, campaigns and event-triggered automations share one API key and one suppression list.
+- **Self-hosting.** Everything is Apache 2.0. Deploy with Docker Compose on a [$5 VPS](/blog/self-host-email-5-dollars), [Coolify](/blog/reloop-coolify-setup) or [Fly.io](/blog/reloop-flyio-deployment).
+- **Bring your own SMTP.** Route sends through SES, Postmark or any SMTP provider while keeping Reloop's API, logs and templates.
+
+**Where it falls short**
+
+- **Younger product.** Reloop launched in 2025. SendGrid has fifteen years of edge cases behind it.
+- **No A/B testing yet** for campaigns.
+- **Self-hosting is real work.** You own IP reputation, warm-up and uptime. The hosted plan exists for teams that don't want that.
+
+**Best for:** startups and developer teams that want a modern API, care about cost, and want the option to own their infrastructure later.
+
+---
+
+## Pricing at real volumes
+
+Free tiers are a marketing number. Here's what the hosted plans cost at three realistic monthly volumes.
+
+| Monthly volume | Reloop | Resend | SendGrid |
+|---|---|---|---|
+| 3,000 | $0 | $0 | Trial, then paid |
+| 50,000 | $10 | $20 | $19.95 |
+| 100,000 | $20 | $90 | $34.95 |
+| 250,000 | $20 + $75 overage = **$95** | Scale tier | Pro tier |
+
+At 100k emails a month, Reloop costs **$240 a year**. The same volume on Resend is **$1,080 a year**.
+
+If you self-host Reloop, the software is free and your cost is the server plus your time. For most teams under a few million emails a month, the hosted plan is cheaper than an engineer's afternoon.
 
 <Callout type="tip">
-  Compare total cost at your projected volume, including self-hosting ops time if data residency matters.
+  Price your **projected** volume twelve months out, not today's. Switching providers mid-growth means re-verifying domains and re-warming reputation.
 </Callout>
+
+---
+
+## Developer experience, side by side
+
+All three have a Node SDK. Here's sending one email with each.
+
+**Resend**
+
+```typescript
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+await resend.emails.send({
+  from: "Acme <hello@acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+**SendGrid**
+
+```typescript
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+
+await sgMail.send({
+  from: "hello@acme.com",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+The calls are nearly identical, which is the point: switching between modern providers is mostly a find-and-replace. Reloop returns errors as values (`emailError`) instead of throwing, and every API error includes a `message`, `why`, `fix` and docs `link`, so you know what to change without opening a support ticket.
+
+---
+
+## Deliverability
+
+Deliverability is mostly about **your** domain and list, not the provider. Any of these three will land in the inbox if you:
+
+- Publish [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
+- Keep bounces and complaints low with automatic suppression
+- [Warm up](/blog/ip-warming-guide) new domains and IPs gradually
+- Separate transactional and marketing traffic
+
+Where providers differ is how much they do for you. SendGrid offers dedicated IPs on higher plans. Resend offers dedicated IPs as an add-on. Reloop includes a dedicated IP on Growth, auto-suppresses hard bounces and complaints across transactional and marketing sends, and runs a [free domain reputation checker](/tools/domain-reputation-checker) you can use before you send anything.
+
+---
+
+## Lock-in and data ownership
+
+This is the biggest structural difference.
+
+With Resend and SendGrid, your sending history, templates, suppression lists and contacts live in their database. If prices rise or your account is suspended, you export what you can and start over.
+
+With Reloop, the code is open. You can start hosted, export everything, and move to your own servers without changing your integration. Just point the SDK's `baseUrl` at your instance. That also matters for data residency: if you need email bodies to stay in the EU or on-prem, you can.
+
+Read more in [why we open-sourced our email infrastructure](/blog/why-we-open-sourced-email-infrastructure).
+
+---
+
+## Which one should you pick?
+
+- **You're a solo developer or small team sending under 3,000 emails a month:** any of them. Pick the docs you like most.
+- **You're growing past 50k emails a month and cost matters:** Reloop. Same DX, a fraction of the price.
+- **You need inbound email for an AI agent or support inbox:** Reloop. Real mailboxes, not just webhooks.
+- **You need data residency or air-gapped deploys:** Reloop self-hosted. It's the only one of the three you can run yourself.
+- **You're an enterprise on Twilio with procurement already approved:** SendGrid.
+- **You want the most established hosted API and React Email is central to your stack:** Resend. (React Email also works with Reloop.)
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop a drop-in replacement for Resend?">
+    Close to it. The send payload uses the same fields (`from`, `to`,
+    `subject`, `html`, `text`, `reply_to`, `tags`), so most migrations are a
+    client swap and an environment variable change. You'll re-verify your
+    domain's DNS records in Reloop.
+  </Accordion>
+
+  <Accordion title="Does SendGrid still have a free plan?">
+    Not a permanent one. New SendGrid accounts get a 60-day trial with a
+    daily sending cap, then need a paid Essentials or Pro plan. Reloop and
+    Resend both keep a free tier of 3,000 emails a month.
+  </Accordion>
+
+  <Accordion title="Can I use React Email templates with Reloop?">
+    Yes. Render the component to HTML with `@react-email/render` and pass it
+    as `html`. You can also store templates in Reloop and send them by ID
+    with variables.
+  </Accordion>
+
+  <Accordion title="Is self-hosting Reloop actually free?">
+    The software is free under Apache 2.0. You pay for your own server, and
+    you're responsible for IP reputation and uptime. See the
+    [self-hosting guide](/self-host).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the hosted free tier, or self-host the whole stack."
+  href="/dashboard/signup"
+  label="Get started"
+/>
