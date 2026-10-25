@@ -1,0 +1,263 @@
+---
+title: "Reloop vs SendGrid (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs SendGrid compared honestly: pricing at 50k and 100k emails, API and SMTP, inbound mail, campaigns, deliverability tooling, compliance, self-hosting, and when SendGrid is still the better pick."
+keywords:
+  - Reloop vs SendGrid
+  - SendGrid vs Reloop
+  - SendGrid alternative
+  - SendGrid pricing comparison
+  - open source SendGrid alternative
+  - SendGrid competitor 2026
+publishedAt: 2026-10-25
+category: Comparison
+tags: [sendgrid, comparison, pricing, migration]
+readTime: 10 min read
+image: /blog/images/reloop-vs-sendgrid.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - migrating-from-sendgrid
+  - email-provider-comparison-2026
+  - reloop-vs-resend
+---
+
+**Short answer:** choose **SendGrid** if you need enterprise procurement checkboxes, subuser management, or Handlebars logic in your templates, and you're already inside Twilio. Choose **Reloop** if you want a simpler API at roughly half the price, real mailboxes for inbound mail and AI agents, transactional and marketing email in one product, and the option to self-host the whole stack.
+
+We build Reloop, so weigh this accordingly. Pricing comes from [SendGrid's public pricing page](https://www.twilio.com/en-us/products/email-api/pricing) and [ours](/pricing). Where SendGrid is better, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **SendGrid** |
+|---|---|---|
+| Free | 3,000 / mo, 100 / day, no time limit | 100 / day for a 60-day trial |
+| 50,000 emails / mo | **$10** (Pro) | $19.95 (Essentials) |
+| 100,000 emails / mo | **$20** (Growth) | $34.95 (Essentials) |
+| Dedicated IP, subusers, SSO tier | Dedicated IP on Growth ($20) | Pro, from $89.95 |
+| Extra volume | $0.50 per 1,000 | Move up a tier |
+| Open source | Yes, Apache 2.0 | No |
+| Self-host | Yes | No |
+| Inbound mail | Mailboxes with threads, API, MCP, IMAP | Inbound Parse webhook |
+| Marketing | Campaigns and automations, same plan | Marketing Campaigns, separate plans |
+| Template logic | Variables only (`{{{name}}}`) | Full Handlebars (`#if`, `#each`) |
+| Enterprise compliance | DPA; self-host for data control | Mature enterprise program |
+
+---
+
+## Pricing at real volumes
+
+| Monthly volume | Reloop | SendGrid |
+|---|---|---|
+| 3,000 | $0 | Trial for 60 days, then paid |
+| 50,000 | $10 | $19.95 |
+| 100,000 | $20 | $34.95 |
+| 100,000 with a dedicated IP | $20 | from $89.95 (Pro) |
+| 250,000 | $20 + $75 overage = $95 | Higher Essentials or Pro tier |
+
+Two things stand out.
+
+**The free tier.** SendGrid no longer has a permanent free plan. New accounts get 100 emails a day for 60 days. Reloop's free tier is 3,000 emails a month with no end date, which is enough for a side project or a staging environment indefinitely.
+
+**The dedicated IP jump.** On SendGrid, the features most growing teams eventually want (a dedicated IP, subusers, SSO, 2,500 free email validations) start on Pro at $89.95 a month. Reloop's Growth plan includes a dedicated IP at $20.
+
+At 100,000 emails a month, Reloop is **$240 a year** and SendGrid Essentials is **about $420 a year**. With a dedicated IP, the gap is $240 versus roughly $1,080.
+
+<Callout type="tip">
+  List prices change. Check both pricing pages for your exact volume before deciding, and ask SendGrid sales about commit discounts if you send millions a month.
+</Callout>
+
+---
+
+## Developer experience
+
+Both have a REST API, SMTP relay, webhooks and SDKs for the major languages. The difference is shape and age.
+
+**SendGrid**
+
+```typescript
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+
+await sgMail.send({
+  from: { email: "hello@acme.com", name: "Acme" },
+  to: "user@example.com",
+  subject: "Your receipt",
+  html: "<p>Thanks for your order.</p>",
+  categories: ["receipt"],
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@acme.com>",
+  to: "user@example.com",
+  subject: "Your receipt",
+  html: "<p>Thanks for your order.</p>",
+  tags: [{ name: "category", value: "receipt" }],
+});
+```
+
+Under the SDK, SendGrid's v3 payload nests recipients and per-recipient data inside a `personalizations` array. It's powerful (one request can carry many different messages) but it's the part of SendGrid most developers have to look up every time. Reloop's payload is flat: one request, one message.
+
+Errors differ too. Reloop returns errors as values instead of throwing, and every API error has a `message`, a `why`, a `fix` and a docs `link`. Retries are safe with an `Idempotency-Key` header, so a timeout never means a duplicate email.
+
+### SMTP
+
+| | Reloop | SendGrid |
+|---|---|---|
+| Host | `smtp.reloop.sh` | `smtp.sendgrid.net` |
+| Port | 587 (STARTTLS) or 465 | 587 |
+| Username | Your API key | `apikey` |
+| Password | Your API key | Your API key |
+
+### Templates
+
+This is one place SendGrid is ahead. SendGrid dynamic templates use full Handlebars, so you can write `{{#if}}` and `{{#each}}` inside the template. Reloop templates support variable substitution with `{{{name}}}` placeholders and default values, plus a visual editor and versioning, but no logic. With Reloop, loops and conditionals happen in your code before you send.
+
+---
+
+## Sending and receiving
+
+SendGrid receives mail through **Inbound Parse**: you point MX records at SendGrid and it POSTs each message to your URL. Storage, threading and replies are up to you.
+
+Reloop treats inbound as a first-class feature. Every domain can receive mail into **mailboxes** with threads. You can:
+
+- Read and reply over the API or SDK (`inbox.messages.reply`)
+- Give an AI agent access through the [MCP server](/docs/integrations/ai-tools/mcp-server)
+- Open the same mailbox in a mail client over IMAP
+- Get an `email.received` webhook for each message, signed with the same `Reloop-Signature` HMAC as outbound events
+
+If you're building a support inbox, an AI agent that answers email, or anything conversational, this saves you from building a mail store. See [building an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Marketing and automations
+
+SendGrid's marketing product, Marketing Campaigns, is sold on separate plans from the Email API. Many teams end up with two bills and two places where contacts live.
+
+Reloop puts it in one product under one API key:
+
+- **Contacts, groups and custom properties**
+- **Campaigns** to a group, with scheduling and engagement stats
+- **Automations** triggered by events from your app, with delay and condition steps
+- **Channels** (subscription topics) so users can opt out of one kind of email without leaving everything
+- **One suppression list** shared by transactional and marketing sends
+
+What SendGrid has that Reloop doesn't yet: A/B testing in campaigns and a longer list of marketing integrations.
+
+---
+
+## Deliverability tooling
+
+Both handle the essentials: DKIM signing, bounce and complaint processing, suppression lists, and click and open tracking.
+
+**Where SendGrid is stronger:** IP pools and subuser-level IP assignment for large senders, and an Email Address Validation API included on Pro and above.
+
+**What Reloop adds:**
+
+- Automatic protection when reputation dips: sending pauses if bounce or complaint rates cross safe thresholds, instead of letting a bad list burn your domain. See [how bounce processing works](/blog/email-bounce-processing-automation).
+- Free public tools for [domain reputation](/tools/domain-reputation-checker), [blocklists](/tools/blocklist-checker), [SPF/DKIM/DMARC](/tools/auth-checker) and [temporary email detection](/tools/temp-email-checker).
+- Bring your own SMTP provider. Route sends through SES or another relay while keeping Reloop's API, templates and logs.
+
+Neither will rescue a bad list. If you're seeing spam-folder placement, start with [why emails land in spam](/blog/why-emails-land-in-spam-fix).
+
+---
+
+## Compliance and enterprise: where SendGrid wins
+
+Be clear-eyed here. SendGrid is part of Twilio, a public company with a long-established compliance program, enterprise contracts, SSO, subusers for agencies and multi-brand companies, and Premier support tiers. If your procurement team needs a specific certification report or a vendor with a decade of enterprise history, SendGrid is the safer choice today.
+
+Reloop offers a [DPA](/dpa) for the hosted service. For strict data requirements, the stronger answer is self-hosting: run Reloop on your own servers and your email data never leaves your infrastructure. No hosted vendor, SendGrid included, can offer that.
+
+---
+
+## Self-hosting and lock-in
+
+SendGrid is hosted only. Your templates, suppression lists, contacts and logs live in Twilio's systems. If pricing changes or an account review pauses sending, your options are to wait or to migrate.
+
+Reloop is open source under Apache 2.0. You can:
+
+- Start on the hosted plan
+- Move to your own server later with [one command](/blog/self-hosted-email-infrastructure) or [Coolify](/blog/reloop-coolify-setup)
+- Keep the same API: change the SDK's `baseUrl` and nothing else in your code
+
+Self-hosted installs have no plan limits and no per-email fees. You do take on IP reputation, warm-up and uptime yourself.
+
+---
+
+## Switching from SendGrid
+
+Most teams finish the code changes in an afternoon. SMTP users change four settings. API users swap the client and flatten the payload. The careful part is moving your suppression list first and ramping traffic over a week or two while both providers run.
+
+We wrote the full playbook: [Migrating from SendGrid to Reloop](/blog/migrating-from-sendgrid). It covers DNS, suppressions, field mapping, templates, webhooks and the cutover schedule.
+
+---
+
+## Which should you pick?
+
+| If you… | Pick |
+|---|---|
+| Want the lowest price at 50k–500k emails a month | Reloop |
+| Need a free tier that doesn't expire | Reloop |
+| Need inbound mailboxes, a support inbox or an AI email agent | Reloop |
+| Want transactional and marketing in one plan | Reloop |
+| Need to self-host or keep data on your own infrastructure | Reloop |
+| Rely on Handlebars logic inside templates | SendGrid |
+| Manage many brands or clients with subusers and IP pools | SendGrid |
+| Need an established enterprise compliance program for procurement | SendGrid |
+| Already run on Twilio with a negotiated commit | SendGrid |
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop cheaper than SendGrid?">
+    At list prices, yes. 50,000 emails a month is $10 on Reloop and $19.95
+    on SendGrid Essentials. 100,000 is $20 versus $34.95, and Reloop's $20
+    Growth plan includes a dedicated IP, which on SendGrid starts with Pro
+    at $89.95.
+  </Accordion>
+
+  <Accordion title="Does Reloop have a free plan like SendGrid used to?">
+    Yes. 3,000 emails a month (100 a day) with no time limit. SendGrid
+    replaced its permanent free plan with a 60-day trial.
+  </Accordion>
+
+  <Accordion title="Can I use my SendGrid templates in Reloop?">
+    The HTML carries over. Rename placeholders from `{{name}}` to
+    `{{{name}}}`, and move any `{{#if}}` or `{{#each}}` logic into your
+    code. The [migration guide](/blog/migrating-from-sendgrid) has a
+    one-line conversion script.
+  </Accordion>
+
+  <Accordion title="Will my deliverability change if I switch?">
+    Your domain reputation comes with you. IP reputation doesn't, so ramp
+    traffic gradually over one to two weeks rather than switching all at
+    once.
+  </Accordion>
+
+  <Accordion title="Is there a Reloop equivalent of SendGrid Inbound Parse?">
+    Yes, and more. Reloop stores inbound mail in mailboxes with threads
+    and sends an `email.received` webhook for each message, so you can
+    reply through the API instead of building your own mail store.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month, no expiry. Run it alongside SendGrid until you're confident."
+  href="/dashboard/signup"
+  label="Get started"
+/>

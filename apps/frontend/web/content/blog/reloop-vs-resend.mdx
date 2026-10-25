@@ -1,0 +1,271 @@
+---
+title: "Reloop vs Resend (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Resend compared honestly: pricing at 3k to 250k emails a month, developer experience, inbound and agent inboxes, deliverability, self-hosting and lock-in, plus how to switch."
+keywords:
+  - Reloop vs Resend
+  - Resend alternative
+  - Resend pricing
+  - Resend vs Reloop
+  - open source Resend alternative
+  - self-hosted Resend alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [resend, comparison, pricing, open-source]
+readTime: 10 min read
+image: /blog/images/reloop-vs-resend.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-sendgrid
+  - email-provider-comparison-2026
+  - self-hosted-email-infrastructure
+---
+
+**Reloop and Resend feel almost the same to code against.** Both give you a clean REST API, a small SDK, React Email support, webhooks and SMTP. The differences are underneath: **Reloop costs about half as much at 50k emails and under a quarter as much at 100k, receives mail into real inboxes your agents can reply from, and is open source, so you can run it yourself.** Resend is the more established hosted product with a larger ecosystem.
+
+We build Reloop, so weigh this accordingly. Every price below is from the public pricing pages, and where Resend is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Resend** |
+|---|---|---|
+| Free tier | 3,000 / mo, 100 / day | 3,000 / mo, 100 / day |
+| 50,000 emails / mo | **$10** | $20 |
+| 100,000 emails / mo | **$20** | $90 |
+| Overage per 1,000 | **$0.50** | $0.90 |
+| Dedicated IP | Included on Growth ($20) | Scale plan and up |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+| Sending path | Own MTA (KumoMTA) | Amazon SES |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Webhook per message |
+| Agent inbox | Yes | No |
+| Contacts and broadcasts | Yes | Yes |
+| Automations | Yes | Limited |
+| React Email | Yes | Yes (they created it) |
+| SMTP relay | Yes | Yes |
+
+Resend's prices are from [resend.com/pricing](https://resend.com/pricing). Reloop's are on [reloop.sh/pricing](/pricing). Both change; check before you commit.
+
+---
+
+## Pricing at real volumes
+
+Both free tiers are identical: 3,000 emails a month, capped at 100 a day. The gap opens the moment you pay.
+
+| Monthly volume | Reloop | Resend | Difference per year |
+|---|---|---|---|
+| 3,000 | $0 | $0 | $0 |
+| 50,000 | $10 | $20 | $120 |
+| 100,000 | $20 | $90 | **$840** |
+| 150,000 | $20 + $25 overage = $45 | $90 + $45 overage = $135 | $1,080 |
+
+Two things drive the difference:
+
+- **Reloop has a $10 tier.** Resend's first paid plan is $20 for 50k.
+- **Reloop's 100k plan is $20, Resend's is $90.** Above that, extra mail costs $0.50 per 1,000 on Reloop vs $0.90 on Resend.
+
+And if you self-host Reloop, there's no per-email fee at all. You pay for the server. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really involves.
+
+<Callout type="tip">
+  Price the volume you expect in a year, not today's. Moving providers later means re-verifying DNS and rebuilding reputation, so pick the one that still makes sense at 10× your current volume.
+</Callout>
+
+---
+
+## Developer experience
+
+This is where the two are closest. Resend set the bar for a modern email API, and Reloop's API follows the same shape on purpose.
+
+**Resend**
+
+```typescript
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const { data, error } = await resend.emails.send({
+  from: "Acme <hello@acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+Both return errors as values instead of throwing. A few differences worth knowing:
+
+| | Reloop | Resend |
+|---|---|---|
+| Error format | `message`, `why` and `fix` | `name` and `message` |
+| Field style | `reply_to`, `scheduled_at` (snake_case) | `replyTo`, `scheduledAt` (camelCase in Node) |
+| Idempotent retries | `Idempotency-Key` header | `Idempotency-Key` header |
+| Stored templates | Yes, sent by ID with `{{{variables}}}` | Yes |
+| React Email | Pass a component or rendered HTML | Pass a component or rendered HTML |
+| Official SDKs | Node, Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | Most major languages |
+
+Reloop's error shape is our one strong opinion here. When a send fails, the error tells you **why** it failed and **how to fix it**, so you rarely need to open the docs:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+Resend's docs and onboarding are excellent, and its ecosystem of examples and integrations is larger. That's a real advantage if your team leans heavily on copy-paste examples.
+
+---
+
+## Receiving email and agent inboxes
+
+This is the biggest functional difference.
+
+**Resend** can receive email on your domain and deliver each message to your webhook. What you do with it after that (storage, threading, replies) is up to you.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call, and there's an `email.received` webhook if you want push notifications too.
+
+That matters if you're building:
+
+- **AI agents that handle email.** Give an agent its own address, let it read the thread and reply. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+- **Support or shared inboxes** where humans and agents work the same threads.
+- **Reply handling** for transactional mail ("reply to this email to comment").
+
+| | Reloop | Resend |
+|---|---|---|
+| Receive on your domain | Yes | Yes |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | Build it yourself |
+| Inbound spam scoring | Yes (Rspamd) | Not documented |
+| MCP access for agents | Yes | Not for inboxes |
+| IMAP access | Yes | No |
+
+---
+
+## Marketing, contacts and automations
+
+Both products now go beyond transactional mail.
+
+- **Resend** has Audiences and Broadcasts for sending newsletters and announcements to a contact list.
+- **Reloop** has contacts with custom properties, groups, subscription channels, broadcast campaigns with scheduling, and **event-triggered automations**: delays, conditions and email steps that run when your app tracks an event like `user.signed_up`.
+
+If you want onboarding or dunning sequences without adding another tool, Reloop covers that. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert) for a worked example.
+
+Neither offers A/B testing on campaigns today.
+
+---
+
+## Deliverability
+
+Deliverability mostly comes down to your own domain setup and list hygiene. Both providers handle the fundamentals: SPF, DKIM, DMARC guidance, bounce and complaint events, open and click tracking, and suppression of bad addresses.
+
+The differences:
+
+- **Sending path.** Resend sends through Amazon SES. Reloop runs its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+- **Dedicated IPs.** Reloop includes one on Growth ($20/mo). On Resend, dedicated IPs start on the Scale plan.
+- **Tools.** Reloop ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers you can run before you send.
+
+---
+
+## Self-hosting and lock-in
+
+Resend is hosted-only. Your templates, logs, contacts and suppression lists live in Resend's database.
+
+Reloop is Apache 2.0. You can:
+
+1. Start on Reloop Cloud.
+2. Move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup).
+3. Keep the same API. Point the SDK's `baseUrl` at your instance and nothing else in your code changes.
+
+That's useful for data residency (EU-only, on-prem), for security reviews that need to read the code handling your users' mail, and as insurance against price changes or account suspensions.
+
+Self-hosting isn't free in effort. You own IP reputation, warm-up and uptime. Most teams should start hosted and treat self-hosting as an option, not a requirement.
+
+---
+
+## Where Resend is the better choice
+
+Being honest about it:
+
+- **You want the most established hosted API** with the largest set of community examples, and you'll stay well under 50k emails a month where the price gap is small.
+- **Your team is already on Resend** and happy. Migrating for a $10/month difference isn't worth the DNS work.
+
+## Where Reloop is the better choice
+
+- **You're past 50k emails a month** and cost matters.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You want transactional mail, campaigns and automations** in one product with one suppression list.
+- **You need open source or self-hosting** for compliance, residency or peace of mind.
+
+---
+
+## Switching from Resend to Reloop
+
+Because the APIs are so similar, most of the work is DNS.
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record. Don't add a second SPF record.
+2. **Swap the client.** Replace `resend.emails.send` with `reloop.mail.send`, and rename `replyTo` → `reply_to` and `scheduledAt` → `scheduled_at`.
+3. **Move templates.** Change placeholders to triple braces: `{{{first_name}}}`.
+4. **Point webhooks** at a new handler. Reloop events are named `email.delivered`, `email.bounced`, `email.complained` and so on, and are signed with HMAC-SHA256 in the `Reloop-Signature` header.
+5. **Ramp traffic** from 10% to 100% over a week or two, then remove Resend's DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same steps in more detail, including a traffic-split flag and a suppression import script that work just as well when coming from Resend.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop a drop-in replacement for Resend?">
+    Close. The send payload has the same fields, with snake_case names
+    (`reply_to`, `scheduled_at`). Most migrations are a client swap, a few
+    field renames, and new DNS records.
+  </Accordion>
+
+  <Accordion title="Do React Email templates work with Reloop?">
+    Yes. Pass the rendered HTML as `html`, or pass the component to the SDK's
+    `react` field. Your existing React Email components don't need to change.
+  </Accordion>
+
+  <Accordion title="Is Reloop's free tier the same as Resend's?">
+    Yes: 3,000 emails a month with a 100-a-day cap on both. The difference
+    starts with paid plans: $10 vs $20 for 50k, and $20 vs $90 for 100k.
+  </Accordion>
+
+  <Accordion title="Does Resend support self-hosting?">
+    No. Resend is a hosted service only. Reloop can run on your own server
+    under the Apache 2.0 license.
+  </Accordion>
+
+  <Accordion title="Which has better deliverability?">
+    For most senders, neither will be the deciding factor. Your SPF, DKIM
+    and DMARC setup, list quality and sending patterns matter far more. Fix
+    those first with our [authentication guide](/blog/spf-dkim-dmarc-setup-guide).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier. Same API shape as Resend, at a fraction of the price as you grow."
+  href="/dashboard/signup"
+  label="Get started"
+/>

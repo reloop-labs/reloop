@@ -8,6 +8,16 @@ export function formatBlogDate(date: string) {
 	});
 }
 
+/** "October 22, 2026". Dates are calendar days, so format in UTC to avoid an off-by-one shift. */
+export function formatBlogDateLong(date: string): string {
+	return new Date(date).toLocaleDateString("en-US", {
+		month: "long",
+		day: "numeric",
+		year: "numeric",
+		timeZone: "UTC",
+	});
+}
+
 export function formatBlogDateUpper(date: string) {
 	const d = new Date(date);
 	const month = d.toLocaleDateString("en-US", { month: "long" }).toUpperCase();

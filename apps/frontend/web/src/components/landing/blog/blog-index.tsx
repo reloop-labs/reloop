@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { BlogPostCard } from "@reloop/web/components/landing/blog/blog-post-card";
+import { BlogPostFeaturedCard } from "@reloop/web/components/landing/blog/blog-post-featured-card";
 import { filterBlogPosts } from "@reloop/web/lib/landing/blog/utils";
 import type {
 	BlogCategoryDefinition,
@@ -25,6 +26,35 @@ function RssIcon({ className }: { className?: string }) {
 			<path d="M4 4a16 16 0 0 1 16 16" />
 			<circle cx="5" cy="19" r="1.5" fill="currentColor" stroke="none" />
 		</svg>
+	);
+}
+
+const frame =
+	"mx-auto w-full max-w-7xl border-stroke-soft-100 border-x dark:border-white/10";
+const inset = "px-4 sm:px-8 lg:px-14";
+
+function CategoryPill({
+	href,
+	active,
+	children,
+}: {
+	href: string;
+	active: boolean;
+	children: ReactNode;
+}) {
+	return (
+		<Link
+			href={href}
+			aria-current={active ? "page" : undefined}
+			className={cn(
+				"shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[14px] transition-colors",
+				active
+					? "border-stroke-soft-100 bg-bg-white-0 text-text-strong-950 shadow-xs dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
+					: "border-transparent text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
+			)}
+		>
+			{children}
+		</Link>
 	);
 }
 
@@ -52,56 +82,76 @@ export function BlogIndex({
 		[posts, query],
 	);
 
+	// The main blog leads with the newest post; category pages lead with the
+	// category title instead. Searching shows every match in the grid.
+	const featured =
+		!activeCategorySlug && !query.trim() ? filteredPosts[0] : undefined;
+	const gridPosts = featured ? filteredPosts.slice(1) : filteredPosts;
+
 	return (
-		<div className="min-h-dvh bg-white dark:bg-black">
-			{/* Header & Filter Section */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 pt-32 pb-0 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
-				{breadcrumb}
-				<h1 className="font-sans font-semibold text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.2rem] lg:text-[3.6rem] dark:text-white">
-					{title}
-				</h1>
-				{description ? (
-					<p className="mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/60">
-						{description}
-					</p>
-				) : null}
+		<div className="min-h-dvh bg-bg-white-0 dark:bg-black">
+			{/* Lead: featured post on /blog, title on category pages */}
+			<section className={cn(frame, inset, "pt-28 pb-16 sm:pt-36 sm:pb-24")}>
+				{featured ? (
+					<>
+						<h1 className="sr-only">{title}</h1>
+						<BlogPostFeaturedCard post={featured} />
+					</>
+				) : (
+					<div>
+						{breadcrumb}
+						<h1 className="font-medium text-[2rem] text-text-strong-950 leading-[1.1] tracking-[-0.02em] sm:text-[2.5rem] dark:text-white">
+							{title}
+						</h1>
+						{description ? (
+							<p className="mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
+								{description}
+							</p>
+						) : null}
+					</div>
+				)}
+			</section>
 
-				<div className="-mx-4 sm:-mx-6 lg:-mx-8 mt-8 border-stroke-soft-200 border-y px-4 py-4 sm:px-6 lg:px-8 dark:border-white/10">
-					<div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-						<div className="flex flex-wrap gap-1">
-							<Link
-								href="/blog"
-								className={cn(
-									"rounded-full px-3.5 py-1.5 font-medium text-[14px] transition-colors",
-									!activeCategorySlug
-										? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
-										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
-								)}
-							>
-								All
-							</Link>
-							{categories.map((category) => {
-								const isActive = category.slug === activeCategorySlug;
+			{/* Recent posts header, filters and search */}
+			<div className="border-stroke-soft-100 border-y dark:border-white/10">
+				<div
+					className={cn(
+						frame,
+						inset,
+						"flex flex-col gap-5 py-6 lg:flex-row lg:items-center lg:justify-between",
+					)}
+				>
+					<h2 className="shrink-0 font-medium text-[1.5rem] text-text-strong-950 tracking-[-0.02em] dark:text-white">
+						Recent posts
+					</h2>
 
-								return (
-									<Link
-										key={category.slug}
-										href={`/blog/category/${category.slug}`}
-										className={cn(
-											"rounded-full px-3.5 py-1.5 font-medium text-[14px] transition-colors",
-											isActive
-												? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
-												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
-										)}
-									>
-										{category.name}
-									</Link>
-								);
-							})}
-						</div>
+					<div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center">
+						<nav
+							aria-label="Blog categories"
+							className="-mx-4 flex min-w-0 gap-1 overflow-x-auto px-4 [mask-image:linear-gradient(to_right,#000_calc(100%-3rem),transparent)] [scrollbar-width:none] sm:mx-0 sm:px-0 sm:pr-10 [&::-webkit-scrollbar]:hidden"
+						>
+							<CategoryPill href="/blog" active={!activeCategorySlug}>
+								All articles
+							</CategoryPill>
+							{categories.map((category) => (
+								<CategoryPill
+									key={category.slug}
+									href={`/blog/category/${category.slug}`}
+									active={category.slug === activeCategorySlug}
+								>
+									{category.name}
+								</CategoryPill>
+							))}
+						</nav>
 
-						<div className="flex items-center gap-2 self-start lg:self-auto">
-							<label className="relative block w-full min-w-[220px] sm:w-[260px]">
+						<span
+							className="hidden h-6 w-px shrink-0 bg-stroke-soft-100 lg:block dark:bg-white/10"
+							aria-hidden="true"
+						/>
+
+						<div className="flex shrink-0 items-center gap-2">
+							<label className="relative block w-full lg:w-[260px]">
+								<span className="sr-only">Search posts</span>
 								<Icon
 									name="search"
 									className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3.5 size-4 text-text-soft-400"
@@ -111,13 +161,13 @@ export function BlogIndex({
 									type="search"
 									value={query}
 									onChange={(event) => setQuery(event.target.value)}
-									placeholder="Search..."
-									className="h-10 w-full rounded-full border border-stroke-soft-200 bg-bg-weak-50 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-stroke-sub-300 focus:bg-bg-white-0 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:focus:border-white/20 dark:focus:bg-white/[0.06] dark:placeholder:text-white/35"
+									placeholder="Search"
+									className="h-10 w-full rounded-full border border-stroke-soft-100 bg-bg-white-0 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-stroke-sub-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:focus:border-white/20 dark:placeholder:text-white/35"
 								/>
 							</label>
 							<a
 								href="/blog/feed.xml"
-								className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 text-text-sub-600 transition-colors hover:border-stroke-soft-300 hover:text-text-strong-950 dark:border-white/10 dark:text-white/55 dark:hover:border-white/20 dark:hover:text-white"
+								className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 text-text-sub-600 transition-colors hover:text-text-strong-950 dark:border-white/10 dark:text-white/55 dark:hover:text-white"
 								aria-label="RSS feed"
 							>
 								<RssIcon className="size-4" />
@@ -127,11 +177,11 @@ export function BlogIndex({
 				</div>
 			</div>
 
-			{/* Grid Section */}
-			<div className="mx-auto w-full max-w-5xl border-stroke-soft-100 border-x px-4 pt-10 pb-20 sm:px-6 md:max-w-7xl lg:px-8 dark:border-white/10">
-				{filteredPosts.length === 0 ? (
-					<div className="rounded-2xl border border-stroke-soft-200 border-dashed px-6 py-16 text-center dark:border-white/10">
-						<p className="font-semibold text-[17px] text-text-strong-950 dark:text-white">
+			{/* Grid: every post sits in its own bordered cell */}
+			<div className={frame}>
+				{gridPosts.length === 0 ? (
+					<div className={cn(inset, "py-24 text-center")}>
+						<p className="font-medium text-[16px] text-text-strong-950 dark:text-white">
 							No posts found
 						</p>
 						<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/50">
@@ -139,11 +189,16 @@ export function BlogIndex({
 						</p>
 					</div>
 				) : (
-					<div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-						{filteredPosts.map((post) => (
-							<BlogPostCard key={post.slug} post={post} />
+					<ul className="grid sm:grid-cols-2 lg:grid-cols-3">
+						{gridPosts.map((post) => (
+							<li
+								key={post.slug}
+								className="border-stroke-soft-100 border-b sm:border-r dark:border-white/10 sm:max-lg:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(3n)]:border-r-0"
+							>
+								<BlogPostCard post={post} />
+							</li>
 						))}
-					</div>
+					</ul>
 				)}
 			</div>
 

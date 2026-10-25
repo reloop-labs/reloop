@@ -13,7 +13,7 @@ export function BlogPostCoverImage({
 	image?: string;
 	alt: string;
 	priority?: boolean;
-	variant?: "card" | "hero";
+	variant?: "card" | "hero" | "list";
 }) {
 	if (image) {
 		if (variant === "hero") {
@@ -25,6 +25,21 @@ export function BlogPostCoverImage({
 						fill
 						className="object-cover"
 						sizes="(max-width: 720px) 100vw, 720px"
+						priority={priority}
+					/>
+				</div>
+			);
+		}
+
+		if (variant === "list") {
+			return (
+				<div className="relative aspect-video overflow-hidden rounded-2xl ring-1 ring-stroke-soft-200 dark:ring-white/10">
+					<Image
+						src={image}
+						alt={alt}
+						fill
+						className="object-cover"
+						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
 						priority={priority}
 					/>
 				</div>

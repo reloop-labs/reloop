@@ -1,42 +1,98 @@
+import { cn } from "@reloop/ui/cn";
 import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
-import { formatBlogDateUpper } from "@reloop/web/lib/landing/blog/utils";
-import type { BlogPostDefinition } from "@reloop/web/lib/landing/types";
+import { formatBlogDateLong } from "@reloop/web/lib/landing/blog/utils";
+import type {
+	BlogPostAuthor,
+	BlogPostDefinition,
+} from "@reloop/web/lib/landing/types";
+import Image from "next/image";
 import Link from "next/link";
 
-export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
-	const categoryUpper = post.category
-		? post.category.toUpperCase()
-		: "OPEN SOURCE";
-	const dateUpper = formatBlogDateUpper(post.publishedAt);
+export function BlogPostMeta({
+	post,
+	className,
+}: {
+	post: BlogPostDefinition;
+	className?: string;
+}) {
+	return (
+		<p
+			className={cn(
+				"flex items-center text-[13.5px] text-text-strong-950 dark:text-white/85",
+				className,
+			)}
+		>
+			<time dateTime={post.publishedAt}>
+				{formatBlogDateLong(post.publishedAt)}
+			</time>
+			<span
+				className="mx-2 text-text-soft-400 dark:text-white/35"
+				aria-hidden="true"
+			>
+				·
+			</span>
+			<span>{post.category}</span>
+		</p>
+	);
+}
 
+export function BlogPostAuthorLine({
+	author,
+	size = "sm",
+}: {
+	author: BlogPostAuthor;
+	size?: "sm" | "md";
+}) {
+	const avatarSize = size === "md" ? 24 : 20;
+
+	return (
+		<span className="flex items-center gap-2 text-text-sub-600 dark:text-white/55">
+			{author.avatar ? (
+				<Image
+					src={author.avatar}
+					alt=""
+					width={avatarSize}
+					height={avatarSize}
+					className="rounded-full ring-1 ring-stroke-soft-200 dark:ring-white/15"
+				/>
+			) : (
+				<span
+					className="grid place-items-center rounded-full bg-bg-weak-50 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-200 dark:bg-white/10 dark:text-white/70 dark:ring-white/15"
+					style={{ width: avatarSize, height: avatarSize }}
+					aria-hidden="true"
+				>
+					{author.name.charAt(0)}
+				</span>
+			)}
+			<span className={size === "md" ? "text-[15px]" : "text-[13.5px]"}>
+				{author.name}
+			</span>
+		</span>
+	);
+}
+
+export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
 	return (
 		<Link
 			href={`/blog/${post.slug}`}
-			className="group flex flex-col outline-none focus-visible:ring-2 focus-visible:ring-text-strong-950 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-white-0 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black"
+			className="group flex h-full flex-col px-4 py-12 outline-none transition-colors duration-200 hover:bg-bg-weak-50 focus-visible:bg-bg-weak-50 sm:px-8 sm:py-14 lg:px-12 lg:py-16 dark:focus-visible:bg-white/[0.04] dark:hover:bg-white/[0.04]"
 		>
 			<BlogPostCoverImage
 				slug={post.slug}
 				image={post.image}
 				alt={post.title}
+				variant="list"
 			/>
 
-			<div className="mt-4 flex items-center font-mono text-[12px] uppercase tracking-wider">
-				<span className="font-medium text-text-sub-600 dark:text-white/60">
-					{categoryUpper}
-				</span>
-				<span className="mx-2 text-text-sub-600/60 dark:text-white/30">/</span>
-				<span className="text-text-sub-600 dark:text-white/50">
-					{dateUpper}
-				</span>
-			</div>
+			<BlogPostMeta post={post} className="mt-5" />
 
-			<h2 className="mt-3 font-semibold text-[18px] text-text-strong-950 leading-snug tracking-tight group-hover:text-text-sub-600 sm:text-[19px] dark:text-white dark:group-hover:text-white/70">
+			<h2 className="mt-2 text-[17px] text-text-strong-950 leading-[1.45] tracking-[-0.01em] transition-colors dark:text-white">
 				{post.title}
 			</h2>
 
-			<p className="mt-2 line-clamp-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-				{post.description}
-			</p>
+			<div className="mt-3">
+				<BlogPostAuthorLine author={post.author} />
+			</div>
 		</Link>
 	);
 }
