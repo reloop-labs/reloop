@@ -8,8 +8,6 @@ export const DOMAIN_VIEW_COLUMNS = [
 	{ id: "status", label: "Status" },
 	{ id: "sending", label: "Sending" },
 	{ id: "receiving", label: "Receiving" },
-	{ id: "clickTracking", label: "Click tracking" },
-	{ id: "openTracking", label: "Open tracking" },
 	{ id: "createdAt", label: "Created At" },
 ] as const;
 
@@ -20,8 +18,6 @@ const DEFAULT_VISIBILITY: VisibilityState = {
 	status: true,
 	sending: true,
 	receiving: true,
-	clickTracking: true,
-	openTracking: true,
 	createdAt: true,
 };
 

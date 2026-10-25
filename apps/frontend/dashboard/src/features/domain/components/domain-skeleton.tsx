@@ -15,8 +15,6 @@ export function DomainSkeleton({
 		status: true,
 		sending: true,
 		receiving: true,
-		clickTracking: true,
-		openTracking: true,
 		createdAt: true,
 		...columnVisibility,
 	}).filter(([, visible]) => visible !== false).length;

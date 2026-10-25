@@ -47,6 +47,21 @@ export const getStatusColorClass = (status: DomainStatus): string => {
 	}
 };
 
+/** Tinted pill (fill + border + text) for the status badge in tables. */
+export const getStatusPillClass = (status: DomainStatus | null): string => {
+	switch (status) {
+		case "active":
+			return "border-success-base/25 bg-success-base/10 text-success-base dark:bg-success-base/15";
+		case "verifying":
+			return "border-sky-500/25 bg-sky-500/10 text-sky-600 dark:text-sky-400";
+		case "failed":
+		case "suspended":
+			return "border-error-base/25 bg-error-base/10 text-error-base dark:bg-error-base/15";
+		default:
+			return "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/[0.06]";
+	}
+};
+
 export const getStatusIcon = (status: DomainStatus): string => {
 	switch (status) {
 		case "pending":

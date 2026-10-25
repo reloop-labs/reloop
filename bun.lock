@@ -833,6 +833,7 @@
         "simple-icons": "catalog:ui",
         "sonner": "catalog:ui",
         "tailwindcss": "^4.1.18",
+        "tldts": "^7.4.11",
         "usehooks-ts": "catalog:ui",
         "valibot": "catalog:db",
         "y-protocols": "^1.0.7",

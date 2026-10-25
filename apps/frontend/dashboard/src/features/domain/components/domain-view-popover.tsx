@@ -1,15 +1,7 @@
 "use client";
 
 import type { VisibilityState } from "@tanstack/react-table";
-import {
-	Activity,
-	Clock,
-	Eye,
-	Globe,
-	Inbox,
-	MousePointerClick,
-	Send,
-} from "lucide-react";
+import { Activity, Clock, Globe, Inbox, Send } from "lucide-react";
 import type * as React from "react";
 import { DataTableViewOptions } from "#/components/data-table/data-table-view-options";
 import {
@@ -22,8 +14,6 @@ const COLUMN_ICONS: Record<DomainViewColumnId, React.ReactNode> = {
 	status: <Activity className="size-3.5" />,
 	sending: <Send className="size-3.5" />,
 	receiving: <Inbox className="size-3.5" />,
-	clickTracking: <MousePointerClick className="size-3.5" />,
-	openTracking: <Eye className="size-3.5" />,
 	createdAt: <Clock className="size-3.5" />,
 };
 
