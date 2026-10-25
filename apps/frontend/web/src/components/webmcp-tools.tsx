@@ -1,35 +1,27 @@
 "use client";
 
-import { getModelContext } from "@reloop/web/lib/webmcp/model-context";
 import { publicWebMcpTools } from "@reloop/web/lib/webmcp/public-tools";
 import { useEffect } from "react";
 
+type WebMcpExecute = (typeof publicWebMcpTools)[number]["execute"];
+
+declare global {
+	interface Window {
+		__reloopWebMcpReady?: (impl: Record<string, WebMcpExecute>) => void;
+	}
+}
+
 /**
- * Registers Reloop's free tools with the browser's WebMCP model context so
- * in-browser agents can call them on any page. No-op where unsupported.
+ * Hands the tool implementations to the tools <WebMcpRegistration /> already
+ * registered in <head>. No-op where WebMCP is unsupported.
  */
 export function WebMcpTools() {
 	useEffect(() => {
-		const modelContext = getModelContext();
-		if (!modelContext) return;
-
-		const controller = new AbortController();
-		for (const tool of publicWebMcpTools) {
-			Promise.resolve(
-				modelContext.registerTool(
-					{
-						...tool,
-						// Chrome 149 calls execute(input) without a context argument.
-						execute: (input, context) =>
-							tool.execute(input, { signal: context?.signal }),
-					},
-					{ signal: controller.signal },
-				),
-			).catch(() => {
-				// Duplicate names (e.g. Fast Refresh) or an aborted registration.
-			});
-		}
-		return () => controller.abort();
+		window.__reloopWebMcpReady?.(
+			Object.fromEntries(
+				publicWebMcpTools.map((tool) => [tool.name, tool.execute]),
+			),
+		);
 	}, []);
 
 	return null;

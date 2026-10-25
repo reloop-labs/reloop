@@ -5,6 +5,7 @@ import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { AgentDirective } from "@reloop/web/components/agent-directive";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
+import { WebMcpRegistration } from "@reloop/web/components/webmcp-registration";
 import { WebMcpTools } from "@reloop/web/components/webmcp-tools";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
@@ -89,6 +90,7 @@ export default function RootLayout({
 					httpEquiv="origin-trial"
 					content="Aoq6kttLejAETbt/zdQat/n22+MCBi7IqW210U22jMnWNhNI3l0TXxxffASoX2QxpniI4EKDqSzzjliYkngPiQsAAABceyJvcmlnaW4iOiJodHRwczovL3JlbG9vcC5zaDo0NDMiLCJmZWF0dXJlIjoiV2ViTUNQIiwiZXhwaXJ5IjoxODA2MzY0ODAwLCJpc1N1YmRvbWFpbiI6dHJ1ZX0="
 				/>
+				<WebMcpRegistration />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-[#fff] antialiased dark:bg-black`}
