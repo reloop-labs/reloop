@@ -1,0 +1,284 @@
+---
+title: "Reloop vs Postal (2026): Self-Hosted Mail Servers Compared"
+description: "Reloop vs Postal compared honestly: two open-source, self-hosted email platforms. Architecture, requirements, sending API, inbound mail, webhooks, marketing features and when each one is the right pick."
+keywords:
+  - Reloop vs Postal
+  - Postal alternative
+  - Postal mail server
+  - self-hosted email server
+  - open source SendGrid alternative
+  - self-hosted Mailgun alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [postal, comparison, self-host, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-postal.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-plunk
+  - self-hosted-email-infrastructure
+  - self-host-email-5-dollars
+---
+
+**Reloop and Postal are both open-source email platforms you can run on your own server.** Both send over SMTP and an HTTP API, fire webhooks, sign mail with DKIM and keep a suppression list. The difference is scope: **Postal is a focused mail delivery server, and it's very good at that job. Reloop is a full email platform: sending, real inboxes your agents can read and reply from, contacts, campaigns and automations, and it's also available as a hosted service if you don't want to run it yourself.**
+
+We build Reloop, so weigh this accordingly. Every Postal fact below links to [Postal's own docs](https://docs.postalserver.io/) or [its GitHub repository](https://github.com/postalserver/postal), and where Postal is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Postal** |
+|---|---|---|
+| License | Apache 2.0 | MIT |
+| Language | TypeScript (Bun) | Ruby |
+| Hosted option | Yes (free tier, from $10/mo) | No, self-host only |
+| Self-host | Yes, one-command installer | Yes, Docker + CLI |
+| Sending engine | KumoMTA | Postal's own MTA |
+| Database | PostgreSQL | MariaDB 10.6+ |
+| HTTP send API | Yes | Yes |
+| SMTP submission | Yes | Yes |
+| Webhooks | Yes, HMAC-signed | Yes |
+| IP pools | Dedicated IPs | Multiple IP pools with routing rules |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Forward to HTTP endpoint, SMTP server or address |
+| Agent inbox | Yes | No |
+| Contacts, campaigns, automations | Yes | No |
+| Stored templates | Yes | No |
+| Open and click tracking | Yes | Yes |
+
+Postal's feature set is from its [feature list](https://docs.postalserver.io/welcome/feature-list). Reloop's is on [reloop.sh](/) and in [the docs](/docs).
+
+---
+
+## What each one is
+
+**Postal** describes itself as "a complete and fully featured mail delivery platform for use by websites & web servers", an open-source alternative to Sendgrid, Mailgun or Postmark that you run on your own infrastructure. It has been around for years, is written in Ruby, has around 17k GitHub stars, and is released under the MIT license. There is no official hosted version: if you use Postal, you run Postal.
+
+**Reloop** is open-source email infrastructure under Apache 2.0: an email API and SMTP relay, plus inbound mailboxes, contacts, broadcast campaigns, event-triggered automations and webhooks. You can use it hosted on [Reloop Cloud](/pricing) or run the same code yourself with the [self-host installer](/self-host).
+
+So the honest framing is: **Postal replaces the sending part of SendGrid or Mailgun. Reloop replaces the sending part and the tools you'd usually bolt on next to it.**
+
+---
+
+## Running it yourself
+
+Both run on a single Linux server with Docker. Neither is "free" in effort: you own IP reputation, warm-up, blocklist monitoring and uptime either way.
+
+| | Reloop | Postal |
+|---|---|---|
+| Minimum hardware | 2 vCPUs, 4 GB RAM, 35 GB disk | 2 CPU cores, 4 GB RAM, 25 GB disk |
+| Install | `curl -fsSL https://reloop.sh/install.sh \| sudo bash` | `postal bootstrap`, `postal initialize`, `postal make-user`, `postal start` |
+| Database | PostgreSQL (bundled) | MariaDB 10.6+ (MySQL not supported) |
+| Reverse proxy and TLS | Caddy (bundled) | Caddy (recommended in the docs) |
+| What runs | API services, dashboard, KumoMTA, PostgreSQL, Redis, NATS, Caddy | Postal web, SMTP and worker processes, MariaDB |
+
+Postal's numbers are from its [prerequisites page](https://docs.postalserver.io/getting-started/prerequisites) and [installation guide](https://docs.postalserver.io/getting-started/installation). Reloop's are from our [self-hosting guide](/blog/self-hosted-email-infrastructure).
+
+**Postal is the lighter install.** It does less, so it runs less. Reloop runs more containers because it ships more of the product: inboxes, campaigns, automations and the dashboard for all of them. If you only need an MTA with a web UI, Postal's footprint is a real advantage.
+
+Both need outbound port 25 open, which many cloud providers block by default. Check that before you pick a host.
+
+<Callout type="tip">
+  Whichever you pick, the hard part of self-hosting is reputation, not installation. Plan a 2–4 week warm-up and set up SPF, DKIM and DMARC before your first real send. Our [IP warming guide](/blog/ip-warming-guide) has a day-by-day schedule.
+</Callout>
+
+---
+
+## Sending email
+
+Both accept mail over SMTP and an HTTP API.
+
+**Postal**
+
+Postal's HTTP API authenticates with an `X-Server-API-Key` header and sends through `POST /api/v1/messages/message` ([API docs](https://docs.postalserver.io/developer/api)):
+
+```typescript
+const res = await fetch("https://postal.example.com/api/v1/messages/message", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-Server-API-Key": process.env.POSTAL_API_KEY!,
+  },
+  body: JSON.stringify({
+    from: "Acme <hello@mail.acme.com>",
+    to: ["user@example.com"],
+    subject: "Welcome",
+    html_body: "<p>Thanks for signing up.</p>",
+  }),
+});
+
+const { status, data } = await res.json();
+// status is "success" or "error"; data.messages maps each recipient to an id
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({
+  apiKey: process.env.RELOOP_API_KEY!,
+  // Self-hosted? Point it at your own instance:
+  // baseUrl: "https://mail.example.com",
+});
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+A few differences:
+
+| | Reloop | Postal |
+|---|---|---|
+| Official SDKs | Node, Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | HTTP API, plus community clients |
+| Error format | `message`, `why` and `fix` | `status: "error"` with a code and message |
+| Stored templates | Yes, sent by ID with `{{{variables}}}` | No, send the rendered body |
+| React Email | Pass a component or rendered HTML | Pass rendered HTML |
+| Same API hosted and self-hosted | Yes | Self-hosted only |
+
+That last row is the practical one. With Reloop you can start on the hosted free tier, then move to your own server by changing `baseUrl`. Nothing else in your code changes.
+
+---
+
+## Deliverability controls
+
+This is where Postal has a lot of depth for a pure MTA. Its [feature list](https://docs.postalserver.io/welcome/feature-list) includes:
+
+- **Multiple IP pools**, with rules that route specific senders or recipients to specific IPs
+- **Per-server send rate limits**
+- DKIM signing, a built-in suppression list, and automated DNS checks
+- **Development mode**, which holds messages instead of delivering them while you test
+- Click and open tracking, message tagging, and full message and queue history with search
+
+Reloop sends through KumoMTA with per-destination throttling and automatic pauses when bounce or complaint rates spike. It handles bounces and complaints, keeps one suppression list across transactional mail and campaigns, and includes a dedicated IP on the hosted Growth plan. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+
+If fine-grained IP pool routing is your main requirement, for example you run mail for many separate brands or clients and need to isolate their reputations, Postal's model is built for exactly that.
+
+---
+
+## Receiving email
+
+Both receive mail on your domain. What happens next is very different.
+
+**Postal** routes inbound mail. A message can be forwarded to an **HTTP endpoint** (as form data or JSON, raw or parsed, with replies and signatures optionally split out of the body), to another **SMTP server**, or to an **email address**. It runs spam and virus checks with SpamAssassin, rspamd and ClamAV. Storing, threading and replying is up to your application.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call, and there's an `email.received` webhook if you also want push notifications.
+
+| | Reloop | Postal |
+|---|---|---|
+| Receive on your domain | Yes | Yes |
+| Forward to your app over HTTP | Yes (`email.received` webhook) | Yes |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | Build it yourself |
+| IMAP access | Yes | No |
+| MCP access for AI agents | Yes | No |
+
+If you're building an AI agent that handles email, a support inbox, or "reply to this email" features, Reloop saves you from building the storage and threading layer. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Webhooks
+
+Both send webhooks for delivery events.
+
+- **Postal** sends events such as `MessageSent`, `MessageDelayed`, `MessageDeliveryFailed`, `MessageHeld`, `MessageBounced`, `MessageLinkClicked`, `MessageLoaded` and `DomainDNSError`, and keeps 7 days of webhook request history in the UI ([webhook docs](https://docs.postalserver.io/developer/webhooks)).
+- **Reloop** sends `email.delivered`, `email.bounced`, `email.complained`, `email.opened`, `email.clicked`, `email.received` and more, signed with HMAC-SHA256 in the `Reloop-Signature` header and retried with backoff. See [how we built webhook delivery](/blog/building-webhook-delivery-system).
+
+---
+
+## Beyond sending: contacts, campaigns and automations
+
+Postal deliberately stops at mail delivery. For newsletters, onboarding sequences or product announcements, you'd pair it with another tool and keep the two suppression lists in sync yourself.
+
+Reloop includes:
+
+- **Contacts** with custom properties, groups and subscription channels
+- **Broadcast campaigns** with scheduling
+- **Event-triggered automations**: delays, conditions and email steps that start when your app tracks an event like `user.signed_up`
+- **Stored templates** with `{{{variables}}}`
+
+All of it shares one suppression list with your transactional mail. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert) for a worked example.
+
+---
+
+## Where Postal is the better choice
+
+Being honest about it:
+
+- **You want a pure MTA and nothing more.** Postal is mature, does one job, and has a smaller footprint to run and secure.
+- **You run mail for many tenants** and need multiple IP pools with per-sender or per-recipient routing rules.
+- **You prefer MIT** over Apache 2.0, or your team already runs Ruby and MariaDB and is comfortable operating them.
+- **You already run Postal** and it's working. Migrating a stable mail server for features you don't need isn't worth the warm-up.
+
+## Where Reloop is the better choice
+
+- **You want a hosted option** today, with the freedom to self-host later on the same API.
+- **You need inbound mail as real inboxes**, especially for AI agents, with IMAP and MCP access.
+- **You want transactional mail, campaigns and automations** in one product with one suppression list.
+- **You want official SDKs** in your language instead of calling a raw HTTP API.
+
+---
+
+## Switching from Postal to Reloop
+
+1. **Install or sign up.** Run the [self-host installer](/self-host) on a new server, or create a hosted account. Keep Postal running for now.
+2. **Add your domain** and publish Reloop's DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your SPF record if you send hosted. Don't add a second SPF record.
+3. **Swap the send call.** Replace `POST /api/v1/messages/message` with `reloop.mail.send`, and rename `html_body` → `html` and `plain_body` → `text`. SMTP senders only need new host and credentials.
+4. **Move inbound routes.** For each Postal route, create a Reloop mailbox, or keep your HTTP handler and subscribe it to `email.received`.
+5. **Port webhooks.** Map `MessageSent` → `email.delivered`, `MessageBounced` and `MessageDeliveryFailed` → `email.bounced`, `MessageLinkClicked` → `email.clicked` and `MessageLoaded` → `email.opened`, and verify the `Reloop-Signature` header.
+6. **Import suppressions** so you don't re-mail addresses that bounced on Postal.
+7. **Ramp traffic** from 10% to 100% over one to two weeks while the new IP warms up, then retire Postal's DNS records and server.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) walks through the traffic split and suppression import in more detail.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Are both Reloop and Postal free and open source?">
+    Yes. Postal is MIT-licensed and Reloop is Apache 2.0. Both are free to
+    run on your own server. Reloop also has a hosted service with a free tier
+    of 3,000 emails a month and paid plans from $10 for 50k.
+  </Accordion>
+
+  <Accordion title="Does Postal have a hosted version?">
+    Postal doesn't offer an official hosted service. You run it on your own
+    infrastructure.
+  </Accordion>
+
+  <Accordion title="Which is lighter to run?">
+    Postal. It's a focused mail server and its documented minimum is 2 CPU
+    cores, 4 GB of RAM and 25 GB of disk. Reloop's minimum is similar on CPU
+    and RAM but needs about 35 GB of disk, because it ships inboxes,
+    campaigns, automations and the dashboard alongside the MTA.
+  </Accordion>
+
+  <Accordion title="Can Postal store inbound mail in mailboxes?">
+    Postal forwards inbound mail to an HTTP endpoint, an SMTP server or an
+    email address. Storing and threading it is up to your application. Reloop
+    stores inbound mail in threaded mailboxes you can read over the API, IMAP
+    or MCP.
+  </Accordion>
+
+  <Accordion title="Can I use Postal's SMTP settings with Reloop?">
+    Yes, with new credentials. Point your SMTP client at your Reloop host
+    (`smtp.reloop.sh` on hosted) and use your Reloop API key as both the
+    username and password.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="Open source like Postal, with inboxes, campaigns and automations built in. Start hosted, self-host whenever you like."
+  href="/dashboard/signup"
+  label="Get started"
+/>

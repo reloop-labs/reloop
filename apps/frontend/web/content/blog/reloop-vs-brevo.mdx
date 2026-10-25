@@ -1,0 +1,264 @@
+---
+title: "Reloop vs Brevo (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Brevo compared honestly: pricing by email volume, the transactional API, campaigns and automations, inbound and agent inboxes, deliverability, self-hosting, and how to switch."
+keywords:
+  - Reloop vs Brevo
+  - Brevo alternative
+  - Sendinblue alternative
+  - Brevo pricing
+  - Brevo transactional email
+  - open source Brevo alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [brevo, comparison, pricing, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-brevo.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-mailchimp
+  - reloop-vs-sendgrid
+  - best-transactional-email-apis-2026
+---
+
+**Brevo (formerly Sendinblue) is an all-in-one marketing suite; Reloop is email infrastructure built for developers.** Both send transactional mail and marketing campaigns, and both price by emails sent rather than contacts stored. Brevo adds SMS, WhatsApp, live chat, a CRM and a drag-and-drop builder that marketers love. **Reloop gives you a cleaner developer API, mailboxes your AI agents can read and reply from, a dedicated IP at $20 a month, and an Apache 2.0 codebase you can self-host.**
+
+We build Reloop, so weigh this accordingly. Brevo's prices below come from [brevo.com/pricing](https://www.brevo.com/pricing/), and where Brevo is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Brevo** |
+|---|---|---|
+| Free tier | 3,000 / mo, 100 / day | 300 / day |
+| Entry paid plan | **$10** for 50,000 emails | Starter from $9 for 5,000 emails |
+| Plan with automations | Every plan | Standard and up (from $18) |
+| Priced by | Emails sent | Emails sent |
+| Dedicated IP | Included on Growth ($20) | Higher tiers only |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Inbound parsing to a webhook |
+| Agent inbox | Yes | No |
+| SMS and WhatsApp | No | Yes |
+| CRM and live chat | No | Yes |
+| SMTP relay | Yes | Yes |
+
+Prices change; check [Brevo's pricing page](https://www.brevo.com/pricing/) and [ours](/pricing) before you commit.
+
+---
+
+## Pricing
+
+Both products charge for the mail you send, not the size of your list, which already makes them cheaper than contact-priced tools like [Mailchimp](/blog/reloop-vs-mailchimp) for large, quiet lists.
+
+The difference is in how far each dollar goes:
+
+| | Reloop | Brevo |
+|---|---|---|
+| Free | 3,000 emails / mo (100 / day) | 300 emails / day |
+| Cheapest paid plan | Pro: **$10 for 50,000 emails** | Starter: from $9 for 5,000 emails |
+| Automations, A/B and advanced stats | Automations on every plan | Standard: from $18 |
+| Large volume | Growth: $20 for 100,000, then $0.50 per 1,000 | Professional: from $499 (starts at 150,000 emails) |
+
+Brevo's prices rise with a volume slider, so the exact price at 50k or 100k depends on the plan builder on their pricing page. What's published is the entry point: **$9 buys 5,000 emails on Brevo, while $10 buys 50,000 on Reloop.** At 100,000 emails a month, Reloop is $20 with a dedicated IP included.
+
+Brevo's free plan is more generous day to day for small senders (300 a day vs 100), so if you send a few hundred emails a day and never more, it's worth a look.
+
+And if you self-host Reloop, there's no per-email fee at all. You pay for the server. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really involves.
+
+<Callout type="tip">
+  Price the volume you expect in a year, not today's. Moving providers later means re-verifying DNS and rebuilding reputation.
+</Callout>
+
+---
+
+## Developer experience
+
+Brevo's transactional API is solid and well documented. It's one endpoint among many in a large marketing API, and it shows in the naming.
+
+**Brevo**
+
+```typescript
+const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+  method: "POST",
+  headers: {
+    "api-key": process.env.BREVO_API_KEY!,
+    "content-type": "application/json",
+  },
+  body: JSON.stringify({
+    sender: { name: "Acme", email: "hello@acme.com" },
+    to: [{ email: "user@example.com" }],
+    subject: "Welcome",
+    htmlContent: "<p>Thanks for signing up.</p>",
+  }),
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+| | Reloop | Brevo |
+|---|---|---|
+| Send endpoint | `POST /api/mail/v1/send` | `POST /v3/smtp/email` |
+| Auth header | `x-api-key` | `api-key` |
+| Body fields | `from`, `to`, `html`, `reply_to`, `scheduled_at` | `sender`, `to[]`, `htmlContent`, `replyTo`, `scheduledAt` |
+| Template variables | `{{{first_name}}}` | `{{ params.first_name }}` |
+| Error format | `message`, `why` and `fix` | `code` and `message` |
+| React Email | Pass a component or rendered HTML | Rendered HTML |
+
+Reloop's error shape is our one strong opinion. When a send fails, the error tells you **why** it failed and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Campaigns, contacts and automations
+
+This is Brevo's home turf. It started as a marketing platform and it shows:
+
+- **Brevo** has a drag-and-drop email editor, a large template gallery, landing pages, signup forms, A/B testing, send-time optimization, a sales CRM, live chat, and SMS and WhatsApp campaigns in the same account.
+- **Reloop** has contacts with custom properties, groups, subscription channels, scheduled broadcast campaigns and **event-triggered automations** with delays, conditions and email steps.
+
+Reloop's automations are built to be driven from code. Your app reports an event and every automation listening for it starts for that contact:
+
+```typescript
+const { automationError } = await reloop.automations.start({
+  event: "user.signed_up",
+  email: user.email,
+  firstName: user.name,
+  properties: { plan: user.plan },
+});
+```
+
+If your marketing team builds journeys visually and wants SMS in the same flow, Brevo is the better fit. If your product team wants onboarding and dunning emails triggered by app events, with the same API and suppression list as your transactional mail, Reloop is. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert) for a worked example.
+
+---
+
+## Receiving email and agent inboxes
+
+**Brevo** supports inbound parsing: mail sent to your domain is posted to your webhook. Storage, threading and replies are up to you.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call, and there's an `email.received` webhook for push notifications.
+
+| | Reloop | Brevo |
+|---|---|---|
+| Receive on your domain | Yes | Yes (inbound parsing) |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | Build it yourself |
+| MCP access for agents | Yes | No |
+| IMAP access | Yes | No |
+
+That matters if you're building [AI agents that read and reply to email](/blog/build-ai-agent-sends-emails), support inboxes, or reply-to-comment flows.
+
+---
+
+## Deliverability
+
+Both handle the fundamentals: SPF and DKIM on your domain, bounce and complaint handling, unsubscribe management and suppression of bad addresses.
+
+- **Sending path.** Reloop runs its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+- **Dedicated IPs.** Reloop includes one on Growth ($20/mo). On Brevo, dedicated IPs belong to the higher tiers.
+- **Shared reputation.** Brevo's shared IPs carry a lot of marketing mail. That's fine for most senders, but if your password resets share a pool with newsletters, a dedicated IP or a provider focused on product mail can help.
+- **Tools.** Reloop ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers.
+
+---
+
+## Self-hosting and lock-in
+
+Brevo is hosted-only. Your contacts, templates, logs and suppression lists live in Brevo's database.
+
+Reloop is Apache 2.0. Start on Reloop Cloud, move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup), and point the SDK's `baseUrl` at your instance. Nothing else in your code changes.
+
+Self-hosting isn't free in effort. You own IP reputation, warm-up and uptime. Most teams should start hosted and keep self-hosting as an option.
+
+---
+
+## Where Brevo is the better choice
+
+- **Your marketing team runs email without engineers.** The visual builder, templates, forms and landing pages are mature.
+- **You need SMS, WhatsApp, chat and a CRM** in one bill.
+- **You send a few hundred emails a day** and the free plan's 300 a day covers you.
+
+## Where Reloop is the better choice
+
+- **Developers own your email.** A clean API, SDKs in nine languages, and errors that tell you how to fix them.
+- **You send real volume.** $10 for 50,000 emails and $20 for 100,000 with a dedicated IP.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You want open source or self-hosting** for compliance, data residency or peace of mind.
+
+---
+
+## Switching from Brevo to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record. Don't add a second SPF record.
+2. **Swap the send call.** Replace `POST /v3/smtp/email` with `reloop.mail.send`, and map `sender` → `from`, `htmlContent` → `html`, `replyTo` → `reply_to`, `scheduledAt` → `scheduled_at`.
+3. **Move templates.** Change `{{ params.first_name }}` to `{{{first_name}}}`.
+4. **Export contacts** from Brevo as CSV and import them into Reloop, keeping your custom attributes as contact properties. Bring your blocklisted and unsubscribed addresses across so nobody who opted out gets mail.
+5. **Rebuild automations** as Reloop automations, and replace Brevo's event tracking with `reloop.automations.start`.
+6. **Point webhooks** at a new handler. Reloop events are named `email.delivered`, `email.bounced`, `email.complained` and so on, signed with HMAC-SHA256 in the `Reloop-Signature` header.
+7. **Ramp traffic** from 10% to 100% over a week or two, then remove Brevo's DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same steps in more detail, including a traffic-split flag and a suppression import script.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Brevo the same as Sendinblue?">
+    Yes. Sendinblue rebranded to Brevo in 2023. The API moved to
+    `api.brevo.com`, but the product is the same.
+  </Accordion>
+
+  <Accordion title="Is Reloop cheaper than Brevo?">
+    For most sending volumes, yes. Brevo's Starter plan begins at $9 for
+    5,000 emails a month; Reloop's Pro plan is $10 for 50,000. Brevo's free
+    plan allows more mail per day (300 vs 100).
+  </Accordion>
+
+  <Accordion title="Can Reloop replace Brevo's marketing features?">
+    Partly. Reloop covers contacts, groups, subscription channels, broadcast
+    campaigns and event-driven automations. It does not do SMS, WhatsApp,
+    live chat, landing pages or a sales CRM.
+  </Accordion>
+
+  <Accordion title="Does Brevo support self-hosting?">
+    No. Brevo is a hosted service only. Reloop can run on your own server
+    under the Apache 2.0 license.
+  </Accordion>
+
+  <Accordion title="Which has better deliverability?">
+    For most senders, neither will be the deciding factor. Your SPF, DKIM
+    and DMARC setup and list quality matter far more. Start with our
+    [authentication guide](/blog/spf-dkim-dmarc-setup-guide).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, and 50,000 for $10 when you grow."
+  href="/dashboard/signup"
+  label="Get started"
+/>

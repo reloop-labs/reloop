@@ -1,0 +1,268 @@
+---
+title: "Reloop vs MailerSend (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs MailerSend compared: pricing from 500 to 500k emails a month, API and SDKs, inbound email, templates, dedicated IPs, self-hosting, and how to switch."
+keywords:
+  - Reloop vs MailerSend
+  - MailerSend alternative
+  - MailerSend pricing
+  - MailerSend vs Reloop
+  - open source MailerSend alternative
+  - transactional email API comparison
+publishedAt: 2026-10-25
+category: Comparison
+tags: [mailersend, comparison, pricing, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-mailersend.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-resend
+  - reloop-vs-postmark
+  - best-transactional-email-apis-2026
+---
+
+**MailerSend and Reloop are both developer-first transactional email APIs, and both send from code in a few lines.** The differences are price, scope and control: **Reloop costs $10 for 50k emails where MailerSend's Starter plan is $35, stores inbound mail in real inboxes instead of forwarding it, and is open source, so you can run it yourself.** MailerSend has the more polished no-code side: a drag-and-drop builder, SMS, email verification and split testing.
+
+We build Reloop, so read this with that in mind. MailerSend's numbers come from its public [pricing page](https://www.mailersend.com/pricing) and [API docs](https://developers.mailersend.com), checked in October 2026. Where MailerSend is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **MailerSend** |
+|---|---|---|
+| Free tier | 3,000 / mo, 100 / day | 500 / mo, 100 API requests / day |
+| 50,000 emails / mo | **$10** | $35 (Starter) |
+| 100,000 emails / mo | **$20** | $68 (Starter) |
+| Overage per 1,000 | **$0.50** | $1.30 at the 50k and 100k tiers |
+| Dedicated IP | Included on Growth ($20) | Add-on on Professional |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Parsed and forwarded to a webhook or address |
+| Agent inbox | Yes | No |
+| Contacts, campaigns, automations | Yes | Bulk sending; marketing lives in MailerLite |
+| Drag-and-drop builder | No | Yes |
+| SMS | No | Yes (US and Canada) |
+| SMTP relay | Yes | Yes |
+
+MailerSend prices above are monthly billing; annual billing takes 10% off. Reloop's prices are on [reloop.sh/pricing](/pricing). Both change, so check before you commit.
+
+---
+
+## Pricing at real volumes
+
+MailerSend's free plan is small: 500 emails a month, 1 domain, 1 template, 1 webhook and 100 API requests a day. Reloop's free tier sends 3,000 a month with a 100-a-day cap. If you're past testing, MailerSend's Hobby plan is $7 a month for 5,000 emails.
+
+From there, the gap grows with volume:
+
+| Monthly volume | Reloop | MailerSend Starter | Difference per year |
+|---|---|---|---|
+| 3,000 | $0 | $7 (Hobby) | $84 |
+| 50,000 | $10 | $35 | $300 |
+| 100,000 | $20 | $68 | **$576** |
+| 250,000 | $20 + $75 overage = $95 | $162.50 | $810 |
+| 500,000 | $20 + $200 overage = $220 | $325 | $1,260 |
+
+MailerSend's Professional plan, which adds unlimited domains, users and templates, 30-day activity retention and the dedicated IP add-on, is $110 for 50k and $140 for 100k.
+
+Two things drive the difference:
+
+- **Reloop's paid plans start lower.** $10 for 50k and $20 for 100k, with a dedicated IP included at $20.
+- **Overage is cheaper.** Extra mail on Reloop is $0.50 per 1,000. On MailerSend Starter it's $1.30 per 1,000 at the 50k and 100k tiers.
+
+If you self-host Reloop, there's no per-email fee at all. You pay for the server. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really involves.
+
+<Callout type="tip">
+  Price the volume you expect in a year, not today's. Switching providers later means new DNS records and warming reputation again, so pick one that still makes sense at 10× your current volume.
+</Callout>
+
+---
+
+## Developer experience
+
+Both APIs are clean REST with official SDKs. MailerSend uses a builder pattern; Reloop takes a plain object.
+
+**MailerSend**
+
+```typescript
+import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
+
+const mailerSend = new MailerSend({ apiKey: process.env.MAILERSEND_API_KEY! });
+
+const emailParams = new EmailParams()
+  .setFrom(new Sender("hello@acme.com", "Acme"))
+  .setTo([new Recipient("user@example.com", "User")])
+  .setSubject("Welcome")
+  .setHtml("<p>Thanks for signing up.</p>");
+
+await mailerSend.email.send(emailParams);
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+Reloop returns errors as values instead of throwing. Other differences:
+
+| | Reloop | MailerSend |
+|---|---|---|
+| Request style | Plain object | Builder (`EmailParams`, `Sender`, `Recipient`) |
+| Error format | `message`, `why` and `fix` | `message` and `errors` |
+| Template variables | `{{{first_name}}}` | `{{first_name}}` (personalization) |
+| Recipients per email | `to`, `cc`, `bcc` | Up to 50 |
+| Webhook signature | `Reloop-Signature` (HMAC-SHA256) | `Signature` (HMAC-SHA256) |
+| Event names | `email.delivered`, `email.bounced`, … | `activity.delivered`, `activity.hard_bounced`, … |
+
+Reloop's error shape is the one strong opinion here. When a send fails, the error says **why** and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+MailerSend's docs are thorough and it ships SDKs for seven languages plus an OpenAPI collection, so you won't be short of examples.
+
+---
+
+## Receiving email and agent inboxes
+
+**MailerSend** has inbound routing on its paid plans. Incoming mail is parsed and forwarded as JSON to your webhook, or forwarded to another address, with rules by recipient, domain or header. MailerSend doesn't store it as a mailbox, and each forward counts against your monthly email quota.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call, and there's an `email.received` webhook if you want push notifications too.
+
+That matters if you're building:
+
+- **AI agents that handle email.** Give an agent its own address, let it read the thread and reply. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+- **Support or shared inboxes** where humans and agents work the same threads.
+- **Reply handling** for transactional mail ("reply to this email to comment").
+
+| | Reloop | MailerSend |
+|---|---|---|
+| Receive on your domain | Yes | Yes (paid plans) |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | Build it yourself |
+| IMAP access | Yes | No |
+
+---
+
+## Templates, marketing and automations
+
+MailerSend is strong on the visual side. It has a drag-and-drop builder, a rich-text editor, an HTML editor, and split testing. Non-developers can build and edit templates without touching code.
+
+Reloop's templates are code-first: store HTML or a React Email component, send it by ID, and fill in `{{{variables}}}`. There's no drag-and-drop builder today.
+
+On marketing, MailerSend focuses on transactional mail and points marketing teams to its sister product, MailerLite. Reloop has it in one place: contacts with custom properties, groups, subscription channels, scheduled broadcast campaigns, and **event-triggered automations** with delays, conditions and email steps. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert) for a worked example.
+
+---
+
+## Deliverability
+
+Deliverability comes down mostly to your domain setup and list hygiene. Both handle SPF, DKIM and DMARC setup, bounce and complaint events, open and click tracking, and suppression lists.
+
+The differences:
+
+- **Dedicated IPs.** Reloop includes one on Growth ($20/mo). MailerSend offers a dedicated IP add-on on Professional, recommended for more than 100k emails a week.
+- **Monitoring.** MailerSend includes DMARC monitoring and blocklist monitoring on Starter and Professional. Reloop ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers.
+- **Sending path.** Reloop runs its own MTA (KumoMTA) with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+
+---
+
+## Self-hosting and lock-in
+
+MailerSend is hosted-only. Your templates, logs and suppression lists live in its database, and activity data is kept for 1 to 30 days depending on plan (longer is a paid add-on).
+
+Reloop is Apache 2.0. You can:
+
+1. Start on Reloop Cloud.
+2. Move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup).
+3. Keep the same API. Point the SDK's `baseUrl` at your instance and nothing else in your code changes.
+
+That helps with data residency, security reviews that need to read the code handling your users' mail, and insurance against price changes. Self-hosting does mean you own IP reputation, warm-up and uptime, so most teams start hosted.
+
+---
+
+## Where MailerSend is the better choice
+
+- **Non-developers edit your emails.** The drag-and-drop builder and template editors are more complete than anything Reloop offers.
+- **You need SMS** alongside email, or built-in email verification and split testing, from one vendor.
+- **You already use MailerLite** for marketing and want the sister product for transactional mail.
+
+## Where Reloop is the better choice
+
+- **Cost matters past a few thousand emails.** $10 vs $35 at 50k, $20 vs $68 at 100k.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You want transactional mail, campaigns and automations** in one product with one suppression list.
+- **You need open source or self-hosting.**
+
+---
+
+## Switching from MailerSend to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Swap the client.** Replace the `EmailParams` builder and `mailerSend.email.send` with a single `reloop.mail.send` call.
+3. **Move templates.** Change personalization placeholders to triple braces: `{{first_name}}` becomes `{{{first_name}}}`.
+4. **Export your suppression list** from MailerSend and import it into Reloop, so you never mail an address that bounced or complained.
+5. **Point webhooks** at a new handler. Map `activity.delivered` → `email.delivered`, `activity.hard_bounced` → `email.bounced`, `activity.spam_complaint` → `email.complained`, and verify the `Reloop-Signature` header instead of `Signature`.
+6. **Move inbound routes** to a Reloop mailbox, or keep using a webhook with `email.received`.
+7. **Ramp traffic** from 10% to 100% over a week or two, then remove MailerSend's DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) walks through the traffic split and suppression import in more detail; the same steps work from MailerSend.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop cheaper than MailerSend?">
+    Yes, at every paid volume we compared. 50,000 emails a month is $10 on
+    Reloop and $35 on MailerSend Starter; 100,000 is $20 vs $68. Reloop's
+    free tier is also larger: 3,000 emails a month vs 500.
+  </Accordion>
+
+  <Accordion title="Does MailerSend have a free plan?">
+    Yes. It includes 500 emails a month, 1 domain, 1 template, 1 webhook and
+    100 API requests a day. Paid plans start with Hobby at $7 a month for
+    5,000 emails.
+  </Accordion>
+
+  <Accordion title="Can I keep my MailerSend templates?">
+    The HTML moves over as-is. Change `{{variable}}` placeholders to
+    `{{{variable}}}`, save the template in Reloop, and send it by ID.
+  </Accordion>
+
+  <Accordion title="Does MailerSend support self-hosting?">
+    No. MailerSend is hosted-only. Reloop can run on your own server under
+    the Apache 2.0 license.
+  </Accordion>
+
+  <Accordion title="Which is better for receiving email?">
+    MailerSend forwards parsed inbound mail to a webhook or address and
+    counts each forward against your quota. Reloop stores it in threaded
+    mailboxes you can read and reply to over the API, MCP or IMAP, which
+    suits support inboxes and AI agents.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, and $10 for 50k when you grow."
+  href="/dashboard/signup"
+  label="Get started"
+/>

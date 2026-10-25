@@ -1,0 +1,270 @@
+---
+title: "Reloop vs Mailtrap (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Mailtrap compared honestly: sending prices at 4k to 250k emails a month, the Mailtrap testing sandbox, developer experience, inbound and agent inboxes, dedicated IPs, self-hosting and how to switch."
+keywords:
+  - Reloop vs Mailtrap
+  - Mailtrap alternative
+  - Mailtrap pricing
+  - Mailtrap Email API
+  - Mailtrap vs Reloop
+  - open source Mailtrap alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [mailtrap, comparison, pricing, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-mailtrap.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-resend
+  - reloop-vs-mailersend
+  - best-transactional-email-apis-2026
+---
+
+**Mailtrap started as the place developers send test email so it never reaches real users, and later added a production sending API.** Reloop is a production email platform from day one: sending, inboxes, campaigns and automations, open source under Apache 2.0. **For sending, Reloop costs $10 at 50k emails vs Mailtrap's $20, and includes a dedicated IP at $20 for 100k, where Mailtrap needs its $85 Business plan.** For testing, Mailtrap's sandbox is the better tool, and you can use it alongside Reloop.
+
+We build Reloop, so weigh this accordingly. Prices below are from each company's public pricing page, and where Mailtrap is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Mailtrap** |
+|---|---|---|
+| Free sending tier | 3,000 / mo, 100 / day | 4,000 / mo, 150 / day |
+| 50,000 emails / mo | **$10** | $20 (Basic) |
+| 100,000 emails / mo | **$20** | $30 (Basic) or $85 (Business) |
+| Overage per 1,000 | **$0.50** | $1.00 on Basic |
+| Dedicated IP | Included on Growth ($20) | Business plan ($85+) |
+| Testing sandbox | No | **Yes (separate product)** |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Inbound addresses with webhooks and API |
+| Agent inbox | Yes | No |
+| Marketing campaigns | Included | Separate product |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+
+Mailtrap's prices are from [mailtrap.io/pricing](https://mailtrap.io/pricing/). Reloop's are on [reloop.sh/pricing](/pricing). Both change; check before you commit.
+
+---
+
+## Pricing at real volumes
+
+Mailtrap sells three products separately: **Email API/SMTP** (sending), **Email Sandbox** (testing) and **Email Marketing** (campaigns), each with its own free tier. This table compares sending only.
+
+| Monthly volume | Reloop | Mailtrap |
+|---|---|---|
+| 3,000 | $0 | $0 |
+| 4,000 | $10 (Pro) | $0 |
+| 50,000 | **$10** | $20 |
+| 100,000 | **$20** | $30, or $85 with a dedicated IP |
+| 250,000 | **$95** ($20 + 150k overage) | $200 (Business) |
+
+What the numbers say:
+
+- **Mailtrap's free tier is a bit bigger.** 4,000 a month and 150 a day vs Reloop's 3,000 and 100. If you're tiny and only need sending, that's a real edge.
+- **From 50k up, Reloop is cheaper.** Half the price at 50k, and $10 less at 100k.
+- **Dedicated IPs are where the gap widens.** Reloop includes one at $20. On Mailtrap, a dedicated IP means the Business plan, which starts at $85 for 100k.
+
+And if you self-host Reloop, there's no per-email fee. You pay for the server. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that involves.
+
+<Callout type="tip">
+  Count the testing sandbox separately. Mailtrap's free sandbox holds 50 test emails a month; paid sandbox plans start at $14/mo billed annually. If your team relies on it, add that to Mailtrap's side of the bill, or keep using it next to whichever sender you pick.
+</Callout>
+
+---
+
+## Developer experience
+
+Both give you a REST API, SMTP, and a Node SDK.
+
+**Mailtrap**
+
+```typescript
+import { MailtrapClient } from "mailtrap";
+
+const mailtrap = new MailtrapClient({ token: process.env.MAILTRAP_API_KEY! });
+
+await mailtrap.send({
+  from: { name: "Acme", email: "hello@acme.com" },
+  to: [{ email: "user@example.com" }],
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+The differences worth knowing:
+
+| | Reloop | Mailtrap |
+|---|---|---|
+| Errors | Returned as values with `message`, `why` and `fix` | Promise rejects |
+| Address format | `"Name <email>"` strings | `{ name, email }` objects, `to` is an array |
+| Stored templates | Yes, `{{{variables}}}` | Yes, `template_uuid` + `template_variables` |
+| Webhooks | Signed with `Reloop-Signature` (HMAC-SHA256) | Opens, clicks, bounces, spam, unsubscribes |
+| Suppression list | Yes, automatic | Yes, with import |
+| SMTP relay | Yes | Yes |
+
+Reloop's error shape is our one strong opinion. When a send fails, the error says **why** and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Testing: Mailtrap's sandbox
+
+This is Mailtrap's home turf and it's genuinely good. You point staging at a sandbox inbox, every email is captured instead of delivered, and you inspect the HTML, check spam scores and preview across clients. The Node SDK switches to it with one flag:
+
+```typescript
+const mailtrap = new MailtrapClient({
+  token: process.env.MAILTRAP_API_KEY!,
+  sandbox: true,
+  testInboxId: 123456,
+});
+```
+
+Reloop doesn't have a capture-only sandbox. For staging, most teams send to a test domain or seeded addresses. If your QA process depends on catching every staging email in one place, keep Mailtrap's sandbox for that. It works with any sender, including Reloop over SMTP.
+
+---
+
+## Receiving email and agent inboxes
+
+**Mailtrap** gives you inbound addresses that forward each message to your app through webhooks and the API.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call.
+
+That matters if you're building:
+
+- **AI agents that read and answer email.** Give the agent an address and let it work the thread. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+- **Support or shared inboxes** where humans and agents handle the same conversations.
+- **Reply handling** for transactional mail.
+
+| | Reloop | Mailtrap |
+|---|---|---|
+| Receive on your domain | Yes | Yes |
+| Stored mailboxes with threads | Yes | Not as mailboxes |
+| Reply in thread via API | Yes | Build it yourself |
+| MCP access for agents | Yes | No |
+| IMAP access | Yes | No |
+
+---
+
+## Marketing and automations
+
+Mailtrap's **Email Marketing** is a separate product with its own plans, priced by contacts (the free tier allows 500 contacts and 1,500 emails a month).
+
+Reloop includes contacts with custom properties, groups, subscription channels, broadcast campaigns and **event-triggered automations** in the same account and the same price. Your app tracks an event like `user.signed_up` and the automation runs delays, conditions and email steps. One suppression list covers transactional and marketing mail. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert).
+
+---
+
+## Deliverability
+
+Both handle the basics: SPF and DKIM setup, bounce and complaint tracking, and suppression. The differences:
+
+- **Sending path.** Reloop runs its own MTA (KumoMTA) with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+- **Dedicated IPs.** $20 on Reloop vs $85+ on Mailtrap.
+- **Log retention.** Mailtrap keeps sending logs for 3 days on Free, 5 on Basic and 15 on Business. If you debug deliverability after the fact, check that window fits.
+
+Reloop also ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers.
+
+---
+
+## Self-hosting and lock-in
+
+Mailtrap is hosted only. Reloop is Apache 2.0: start on Reloop Cloud, move to your own server with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup), and point the SDK's `baseUrl` at it. Nothing else in your code changes.
+
+Self-hosting means you own IP reputation, warm-up and uptime. Most teams should start hosted and keep self-hosting as an option.
+
+---
+
+## Where Mailtrap is the better choice
+
+- **Email testing is the main job.** The sandbox is the best part of Mailtrap and Reloop has no equivalent.
+- **You send under 4,000 emails a month** and want the slightly larger free tier.
+- **You already use Mailtrap for testing** and like having sandbox and sending in one vendor.
+
+## Where Reloop is the better choice
+
+- **You send 50k+ emails a month** or want a dedicated IP without paying $85.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You want transactional, campaigns and automations** in one product with one bill and one suppression list.
+- **You need open source or self-hosting.**
+
+The two also work together: Reloop in production, Mailtrap's sandbox in staging.
+
+---
+
+## Switching from Mailtrap to Reloop
+
+1. **Add your domain in Reloop**, publish the DKIM record (`reloop._domainkey`) and merge `include:reloop.sh` into your existing SPF record. Don't create a second SPF record.
+2. **Swap the client.** Replace `mailtrap.send` with `reloop.mail.send`. Turn `{ name, email }` objects into `"Name <email>"` strings, and check `emailError` instead of catching.
+3. **Move templates.** Copy the HTML and change placeholders to triple braces: `{{{user_name}}}`. Send by template ID instead of `template_uuid`.
+4. **Import your suppression list** so you don't re-mail addresses that bounced or complained.
+5. **Point webhooks** at a new handler. Reloop events are `email.delivered`, `email.bounced`, `email.complained` and so on, signed in the `Reloop-Signature` header.
+6. **Keep the sandbox** for staging if you use it. Point staging SMTP at Mailtrap and production at `smtp.reloop.sh`.
+7. **Ramp traffic** from 10% to 100% over a week or two, then remove Mailtrap's sending DNS records.
+
+The [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same steps in more detail, including a traffic-split flag.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Mailtrap only for testing?">
+    No. Mailtrap has three separate products: Email Sandbox for testing,
+    Email API/SMTP for production sending, and Email Marketing for
+    campaigns. Each has its own plans and free tier.
+  </Accordion>
+
+  <Accordion title="Can I use Mailtrap's sandbox with Reloop?">
+    Yes. The sandbox captures whatever you send to it over SMTP or API, so
+    staging can send to Mailtrap while production sends through Reloop.
+  </Accordion>
+
+  <Accordion title="Which is cheaper?">
+    Under 4,000 emails a month, Mailtrap's free tier goes further. From 50k
+    up, Reloop is cheaper: $10 vs $20 at 50k, $20 vs $30 at 100k, and $20 vs
+    $85 if you need a dedicated IP.
+  </Accordion>
+
+  <Accordion title="Does Mailtrap support self-hosting?">
+    No. Mailtrap is a hosted service. Reloop can run on your own server under
+    the Apache 2.0 license.
+  </Accordion>
+
+  <Accordion title="Can AI agents use either one?">
+    Reloop gives agents their own mailboxes they can read and reply from over
+    the API, MCP or IMAP. Mailtrap's inbound forwards messages to your app,
+    so threading and replies are yours to build.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, a dedicated IP from $20, and inboxes your agents can reply from."
+  href="/dashboard/signup"
+  label="Get started"
+/>

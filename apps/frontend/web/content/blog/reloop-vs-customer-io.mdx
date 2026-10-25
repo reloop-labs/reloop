@@ -1,0 +1,249 @@
+---
+title: "Reloop vs Customer.io (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Customer.io compared honestly: per-email vs per-profile pricing at 10k to 100k profiles, journeys vs automations, transactional API and SMTP, inbound inboxes, self-hosting, plus how to switch."
+keywords:
+  - Reloop vs Customer.io
+  - Customer.io alternative
+  - Customer.io pricing
+  - Customer.io vs Reloop
+  - open source Customer.io alternative
+  - cheaper Customer.io alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [customer-io, comparison, pricing, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-customer-io.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-loops
+  - reloop-vs-mailchimp
+  - welcome-email-sequences-that-convert
+---
+
+**Customer.io is a customer engagement platform, and Reloop is email infrastructure.** Both can send onboarding sequences triggered by events from your app, broadcasts and transactional mail. They are built for different teams, and they charge differently. **Customer.io bills by the profiles you store, starting at $100 a month. Reloop bills by the emails you send, starting at $10.** At 50,000 profiles that's roughly $505 a month on Customer.io's entry plan versus $10 to $45 on Reloop for most sending patterns. Reloop also adds an SMTP relay, real inboxes for inbound mail, and an open-source license.
+
+Customer.io does far more than email: push, in-app messages, SMS, deep segmentation and data pipelines. If you need those, it's the stronger product. We build Reloop, so weigh this accordingly. Customer.io's prices below come from [customer.io/pricing](https://customer.io/pricing), and where Customer.io is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Customer.io** |
+|---|---|---|
+| Pricing basis | Emails sent | Profiles stored (people and objects) |
+| Free tier | 3,000 emails / mo, 100 / day | No free plan on the pricing page |
+| Entry paid plan | **$10** / mo (50,000 emails) | $100 / mo (5,000 profiles, 1M emails) |
+| Extra volume | $0.50 per 1,000 emails | $0.009 per extra profile, $0.12 per 1,000 extra emails |
+| Next plan | $20 / mo (100,000 emails, dedicated IP) | Premium, from $1,000 / mo billed annually |
+| Channels | Email | Email, push, in-app, SMS (SMS priced separately) |
+| Event-triggered automations | Yes | Yes (Journeys) |
+| Transactional API | Yes | Yes |
+| SMTP relay | Yes | No |
+| Inbound email / agent inbox | Yes | No |
+| Template language | `{{{variables}}}` | Liquid |
+| Open source / self-host | Yes (Apache 2.0) | No |
+
+Reloop's prices are on [reloop.sh/pricing](/pricing). Both change; check before you commit.
+
+---
+
+## Pricing: profiles vs emails
+
+**Customer.io charges for your audience.** The Essentials plan starts at $100 a month and includes 5,000 profiles and 1 million emails. Each profile beyond that costs $0.009, and profiles include objects (like companies or accounts) as well as people. A signup who never comes back still counts.
+
+**Reloop charges for sends.** Store as many contacts as you like. You pay for the emails that go out.
+
+Here's the Essentials list price against Reloop for a product that emails each contact about twice a month:
+
+| Profiles | Customer.io Essentials | Emails sent (2 per contact) | Reloop |
+|---|---|---|---|
+| 5,000 | $100 | 10,000 | **$10** |
+| 10,000 | $100 + $45 = $145 | 20,000 | **$10** |
+| 50,000 | $100 + $405 = $505 | 100,000 | **$20** |
+| 100,000 | $100 + $855 = $955 | 200,000 | $20 + $50 overage = **$70** |
+
+The Customer.io column is the published starting price plus $0.009 per profile over 5,000. Larger accounts usually move to Premium or negotiate, so treat it as a ceiling for Essentials, not a quote.
+
+<Callout type="tip">
+  Profile-based pricing grows with signups, not with value. A launch that adds 30,000 free users raises a Customer.io bill by $270 a month even if most of them never get past the welcome email. Model next year's list size before you choose.
+</Callout>
+
+---
+
+## Automations: Journeys vs Reloop automations
+
+Customer.io's **Journeys** are its core product. The workflow builder is visual and cross-channel. One campaign can send an email, wait, branch on an attribute, push a mobile notification and update a profile. Segmentation is deep, with segments built from attributes, events and objects.
+
+Reloop's automations cover the email side of that: an **event trigger**, then **delays**, **conditions** and **email steps**. Your app tracks an event, and the contact enters every automation that listens for it.
+
+**Customer.io**
+
+```javascript
+const { CustomerIO } = require("customerio-node");
+const cio = new CustomerIO({ apiKey: process.env.CIO_API_KEY });
+
+await cio.identify("user_123", { email: "ada@example.com" });
+await cio.track("user_123", { name: "signed_up" });
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { automationError } = await reloop.automations.start({
+  event: "user.signed_up",
+  email: "ada@example.com",
+  firstName: "Ada",
+  properties: { plan: "trial" },
+});
+if (automationError) console.error(automationError);
+```
+
+Passing `email` creates the contact if it doesn't exist yet, so there's no separate identify call. Conditions can read event properties (for example `trigger.plan`), so trial and paid users can get different emails. Our [welcome sequence guide](/blog/welcome-email-sequences-that-convert) builds a four-email onboarding flow this way.
+
+| | Reloop | Customer.io |
+|---|---|---|
+| Event-triggered flows | Yes | Yes |
+| Delays and conditions | Yes | Yes |
+| Push, in-app, SMS steps | No | Yes |
+| Segments from events and objects | Groups and contact properties | Yes, much deeper |
+| Broadcasts | Yes | Yes |
+| Subscription preferences | Channels per contact | Subscription center |
+
+If your lifecycle program spans mobile push, in-app messages and SMS, Customer.io does that and Reloop doesn't.
+
+---
+
+## Transactional email
+
+Both send password resets, receipts and magic links from your code.
+
+Customer.io's transactional API sends a template you build in its dashboard. You call `https://api.customer.io/v1/send/email` with an App API key, a `transactional_message_id`, the recipient and `message_data` for the Liquid variables:
+
+```javascript
+await cio.sendEmail({
+  to: "ada@example.com",
+  identifiers: { id: "user_123" },
+  transactional_message_id: 5,
+});
+```
+
+Reloop sends either raw HTML or a stored template:
+
+```typescript
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "ada@example.com",
+  subject: "Reset your password",
+  html: `<p><a href="${resetUrl}">Reset your password</a></p>`,
+});
+```
+
+A few differences worth knowing:
+
+- **SMTP relay.** Reloop runs one at `smtp.reloop.sh` for frameworks, CMSs and tools that only speak SMTP. Customer.io doesn't offer one.
+- **Templates.** Customer.io uses Liquid (`{{customer.first_name}}`), which supports loops and filters. Reloop substitutes `{{{first_name}}}` placeholders and also accepts React Email components or your own rendered HTML.
+- **Errors.** Reloop's errors include `message`, `why` and `fix`, so a failed send tells you what to change.
+- **Webhooks.** Reloop signs delivered, bounced and complained events with HMAC-SHA256 in the `Reloop-Signature` header.
+
+---
+
+## Receiving email and agent inboxes
+
+Customer.io is outbound. It doesn't host mailboxes for replies.
+
+Reloop receives mail into **mailboxes**. Messages are stored, threaded and spam-scored, and readable through the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call.
+
+That matters for "just reply to this email" flows, support addresses, and AI agents that need their own address to read and answer mail. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Deliverability and data ownership
+
+Reloop runs its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates spike. The Growth plan ($20/mo) includes a dedicated IP. Both products handle SPF, DKIM, bounces, complaints and suppression for you.
+
+The larger difference is where your data lives:
+
+- **Customer.io** is closed SaaS. Data warehouse sync is a Premium feature.
+- **Reloop** is Apache 2.0. Start on Reloop Cloud and later move to your own server with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup). Point the SDK's `baseUrl` at your instance and your code stays the same.
+
+Self-hosting means owning IP warm-up and uptime, so most teams should start hosted. The option is useful for data residency, security reviews and price protection.
+
+---
+
+## Where Customer.io is the better choice
+
+Being honest about it:
+
+- **You message users on more than email.** Push, in-app and SMS in the same journey is what Customer.io is built for.
+- **Your segmentation is complex.** Segments across people, accounts and event history, managed by a growth or lifecycle team, are Customer.io's strength.
+- **Marketers own the program.** The visual Journeys builder and Liquid templates let non-engineers run sophisticated campaigns without a developer.
+- **You need warehouse sync** and are already on a Premium-sized budget.
+
+## Where Reloop is the better choice
+
+- **Email is your only channel**, and paying $100+ a month for a multi-channel platform doesn't make sense.
+- **Your list is large or growing fast.** Paying per email instead of per profile is usually far cheaper: $20 vs about $505 at 50,000 profiles.
+- **You want transactional mail, SMTP and lifecycle emails in one product**, with one domain setup and one suppression list.
+- **You need inbound inboxes**, email for AI agents, or open source and self-hosting.
+
+---
+
+## Switching from Customer.io to Reloop
+
+1. **Add your sending domain** in Reloop and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Export your people** from Customer.io as CSV and import them as Reloop contacts. Map attributes to contact properties, and keep unsubscribed people unsubscribed.
+3. **Rebuild templates.** Paste in your HTML and change Liquid placeholders to triple braces: `{{customer.first_name}}` becomes `{{{first_name}}}`. Liquid loops and filters need to move into your code before the send.
+4. **Recreate email Journeys as automations.** Create an event for each trigger (for example `user.signed_up`), then add the same delays, conditions and email steps. Push, in-app and SMS steps have no Reloop equivalent.
+5. **Swap the calls.** Replace `identify` plus `track` with `reloop.automations.start`, and `sendEmail` with `reloop.mail.send`.
+6. **Run both in parallel** for a week or two, then remove Customer.io's DNS records.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why is Customer.io more expensive than Reloop?">
+    Customer.io is priced by profiles stored, starting at $100 a month for
+    5,000 profiles, plus $0.009 for each extra profile. Reloop is priced by
+    emails sent: $10 for 50,000 and $20 for 100,000, whatever the size of
+    your list.
+  </Accordion>
+
+  <Accordion title="Can Reloop replace Customer.io?">
+    For email, yes: event-triggered automations, broadcasts, transactional
+    sends and SMTP. If your journeys also use push, in-app messages or SMS,
+    Reloop doesn't cover those channels.
+  </Accordion>
+
+  <Accordion title="Does Customer.io have a free plan?">
+    No free plan is listed on its pricing page; paid plans start at $100 a
+    month. Reloop's free tier sends 3,000 emails a month with no limit on
+    contacts.
+  </Accordion>
+
+  <Accordion title="Do Liquid templates work in Reloop?">
+    Not directly. Reloop substitutes `{{{variable}}}` placeholders. Simple
+    Liquid variables convert one-to-one; loops and filters should be rendered
+    in your code, or with React Email, before you send.
+  </Accordion>
+
+  <Accordion title="Can I self-host Customer.io?">
+    No. Customer.io is a hosted service. Reloop is Apache 2.0 and can run on
+    your own server with the same API.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, with no limit on contacts. Transactional email and lifecycle automations in one place."
+  href="/dashboard/signup"
+  label="Get started"
+/>

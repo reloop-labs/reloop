@@ -1,0 +1,273 @@
+---
+title: "Reloop vs SparkPost (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs SparkPost (now Bird Email) compared honestly: pricing from 3k to 500k emails a month, what changed after the Bird move, inbound mail, analytics, self-hosting and how to switch."
+keywords:
+  - Reloop vs SparkPost
+  - SparkPost alternative
+  - SparkPost pricing
+  - Bird Email pricing
+  - SparkPost Bird migration
+  - open source SparkPost alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [sparkpost, bird, comparison, pricing, open-source]
+readTime: 10 min read
+image: /blog/images/reloop-vs-sparkpost.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-sendgrid
+  - reloop-vs-aws-ses
+  - best-transactional-email-apis-2026
+---
+
+**SparkPost isn't really SparkPost anymore.** sparkpost.com now redirects to Bird, and the product is sold as **Bird Email**, built on what Bird calls "the SparkPost engine, now one API." If you're comparing the two today, you're comparing Reloop with Bird's email product, and with a migration you'd have to plan either way.
+
+The short version: **Reloop is cheaper up to about 300k emails a month, has a real free tier, and is open source, so you can run it yourself.** Bird gets cheaper per email at very high volume and comes with the analytics and deliverability tooling SparkPost was known for.
+
+We build Reloop, so weigh this accordingly. Bird's numbers below are from [bird.com/pricing/email](https://bird.com/pricing/email) as of October 2026, and where Bird is the better pick, we say so.
+
+---
+
+## What happened to SparkPost
+
+- MessageBird [agreed to acquire SparkPost](https://bird.com/blog/sparkpost-joins-bird) and later rebranded as Bird.
+- [sparkpost.com](https://www.sparkpost.com) now redirects to Bird's email product page, and the old pricing page redirects to Bird's email pricing.
+- Bird's own [SparkPost page](https://bird.com/email-api/features/sparkpost) says Bird Email "has its own API and SDKs" and advises you to review sending, templates, domains and webhooks "rather than assuming that a SparkPost request can be sent unchanged."
+
+So if you're on SparkPost today, **you're facing a migration whichever way you go**. The real question is where to land.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **SparkPost / Bird Email** |
+|---|---|---|
+| Free tier | 3,000 / mo, 100 / day | 1,000 / mo, 50 / day |
+| Pricing model | Monthly plan + overage | Monthly deposit into a prepaid balance, billed per email |
+| 50,000 emails / mo | **$10** | About $20 (Startup, $0.40 per 1k) |
+| 100,000 emails / mo | **$20** | About $40 (Startup) |
+| Per 1,000 at high volume | $0.50 overage | **$0.20 – $0.45** depending on plan |
+| Dedicated IP | Included on Growth ($20) | Paid add-on, Growth plan ($250 deposit) and up |
+| Message retention | Plan-based logs | 30 days on every plan |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Included, with mailboxes |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+| SMS / WhatsApp in the same account | No | Yes (Bird is omnichannel) |
+
+Prices change; check [Reloop pricing](/pricing) and [Bird pricing](https://bird.com/pricing/email) before you commit.
+
+---
+
+## Pricing at real volumes
+
+Bird's model is different from a classic plan. Each paid plan adds a **monthly deposit** to your Bird balance, and every email is charged against that balance at the plan's rate. Bird is clear that "a paid deposit adds spendable balance, not a fixed number of included emails," and unused funds carry forward.
+
+| Plan | Monthly deposit | Transactional rate per 1,000 |
+|---|---|---|
+| Free | $0 | 1,000 emails / mo, 50 / day |
+| Startup | $15 | $0.40 |
+| Growth | $250 | $0.45 |
+| Scale 1,000 | $1,000 | $0.35 |
+| Scale 2,500 | $2,500 | $0.30 |
+| Scale 5,000 | $5,000 | $0.25 |
+| Scale 10,000 | $10,000 | $0.20 |
+
+Here's what that looks like next to Reloop. Bird figures are usage at the Startup rate, rounded:
+
+| Monthly volume | Reloop | Bird Email | Cheaper |
+|---|---|---|---|
+| 3,000 | $0 | $15 deposit (free plan stops at 1,000) | Reloop |
+| 50,000 | $10 | ~$20 | Reloop |
+| 100,000 | $20 | ~$40 | Reloop |
+| 300,000 | $20 + $100 overage = $120 | ~$120 | Even |
+| 500,000 | $20 + $200 overage = $220 | ~$200 | Bird |
+
+The pattern:
+
+- **Under 300k a month, Reloop costs less**, and the gap is widest for small teams. Bird's free plan is 1,000 emails, so most real apps start paying sooner.
+- **Above 300k, Bird's per-email rate wins**, and at Scale volumes ($0.20 – $0.35 per 1k) it pulls clearly ahead on list price.
+- **Dedicated IPs:** on Reloop one is included on Growth ($20/mo). On Bird they're a paid add-on, and only on Growth ($250 deposit) and up.
+
+And if you self-host Reloop, there's no per-email fee at all. You pay for the server. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really involves.
+
+<Callout type="tip">
+  Price the volume you expect in a year, not today's. If you're heading past a few hundred thousand emails a month, run both numbers at that volume, including dedicated IPs.
+</Callout>
+
+---
+
+## Developer experience
+
+SparkPost's classic API was built around **transmissions**: a content block plus a list of recipients.
+
+**SparkPost (legacy client)**
+
+```typescript
+import SparkPost from "sparkpost";
+
+const client = new SparkPost(process.env.SPARKPOST_API_KEY);
+
+await client.transmissions.send({
+  content: {
+    from: "hello@mail.acme.com",
+    subject: "Welcome",
+    html: "<p>Thanks for signing up.</p>",
+  },
+  recipients: [{ address: "user@example.com" }],
+});
+```
+
+Bird Email has its own API and SDKs, so existing SparkPost code is not guaranteed to work unchanged. Plan for a rewrite of the sending layer either way.
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+Reloop returns errors as values with a **why** and a **fix**, so a failed send tells you what to change:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+| | Reloop | Bird Email |
+|---|---|---|
+| Send shape | One message: `from`, `to`, `subject`, `html` | Bird's own API (SparkPost used transmissions) |
+| Stored templates | Yes, sent by ID with `{{{variables}}}` | Yes, including React Email |
+| SMTP relay | Yes | Yes |
+| Webhooks | Signed with HMAC-SHA256 in `Reloop-Signature` | Yes |
+| Official SDKs | Node, Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | Bird SDKs |
+
+---
+
+## Analytics and deliverability
+
+This is where SparkPost earned its reputation, and Bird keeps that focus.
+
+**Bird Email** lists real-time delivery tracking, opens, clicks and bounce reasons, IP warming, suppression lists, email validation and **Inbox Insights** for inbox placement monitoring. Bird also publishes customer results like Binance holding 99.01% inbox placement while scaling marketing email.
+
+**Reloop** covers the fundamentals: SPF, DKIM and DMARC setup, bounce and complaint events, open and click tracking, and automatic suppression. It sends through its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation). Free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers help before you send.
+
+If inbox placement testing and deep deliverability analytics are a daily job for your team, Bird has more of that built in.
+
+---
+
+## Receiving email and agent inboxes
+
+Both handle inbound. Bird includes inbound email and a number of mailboxes on every plan (5 on Free up to 100 on Scale), and routes replies and attachments into your app.
+
+**Reloop** receives mail into **mailboxes** that are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call, and the `email.received` webhook gives you push notifications too.
+
+That matters most if you're building:
+
+- **AI agents that handle email.** Give an agent its own address and let it read and reply over MCP. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+- **Support or shared inboxes** where humans (over IMAP) and agents work the same threads.
+
+---
+
+## Self-hosting and lock-in
+
+SparkPost and Bird are hosted-only, and the move to Bird is a good reminder of what that means: **when the vendor changes, your integration changes with it.**
+
+Reloop is Apache 2.0. You can:
+
+1. Start on Reloop Cloud.
+2. Move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup).
+3. Keep the same API. Point the SDK's `baseUrl` at your instance and nothing else in your code changes.
+
+Self-hosting isn't free in effort. You own IP reputation, warm-up and uptime. Most teams should start hosted and keep self-hosting as an option.
+
+---
+
+## Where SparkPost (Bird) is the better choice
+
+- **You send hundreds of thousands to millions of emails a month.** Above about 300k, Bird's per-email rate beats Reloop's overage, and at Scale it's as low as $0.20 per 1,000.
+- **Deliverability analytics are a core need.** Inbox placement monitoring and SparkPost-grade analytics are built in.
+- **You want email, SMS and WhatsApp on one balance.** Bird is an omnichannel platform; Reloop is email only.
+- **You already work with SparkPost's account team** and want their help through the migration.
+
+## Where Reloop is the better choice
+
+- **You send under 300k emails a month**, where Reloop is cheaper, often by half.
+- **You want a usable free tier**: 3,000 a month vs 1,000.
+- **You want a dedicated IP without a $250 monthly deposit.**
+- **You need inbound mail your agents can use** over MCP and IMAP.
+- **You want open source or self-hosting**, so a vendor change can't force a rewrite again.
+
+---
+
+## Switching from SparkPost to Reloop
+
+You'll need to touch the sending layer whether you move to Bird or to us, so plan it the same way.
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record. Don't add a second SPF record.
+2. **Export suppressions** from SparkPost and import them into Reloop, so you never mail an address that bounced or complained.
+3. **Swap the client.** Replace `transmissions.send` with `reloop.mail.send`. Each recipient becomes `to`, and `content.from`, `content.subject` and `content.html` move to the top level.
+4. **Move templates.** SparkPost templates use `{{variable}}`. Change placeholders to triple braces: `{{{first_name}}}`.
+5. **Point webhooks** at a new handler. Reloop events are named `email.delivered`, `email.bounced`, `email.complained` and so on, and are signed with HMAC-SHA256 in the `Reloop-Signature` header.
+6. **Ramp traffic** from 10% to 100% over a week or two, then remove the old DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers these steps in more detail, including a traffic-split flag and a suppression import script.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is SparkPost shutting down?">
+    SparkPost is now part of Bird and sold as Bird Email. sparkpost.com
+    redirects to Bird, and Bird says its email product has its own API and
+    SDKs, so existing SparkPost integrations should plan a migration rather
+    than assume requests will keep working unchanged.
+  </Accordion>
+
+  <Accordion title="How much does SparkPost cost now?">
+    Bird Email has a free plan with 1,000 emails a month, then paid plans
+    that add a monthly deposit to your balance: Startup ($15, $0.40 per
+    1,000), Growth ($250, $0.45 per 1,000) and Scale ($1,000 to $10,000,
+    $0.35 down to $0.20 per 1,000).
+  </Accordion>
+
+  <Accordion title="Is Reloop cheaper than SparkPost?">
+    Up to about 300k emails a month, yes: $10 for 50k and $20 for 100k on
+    Reloop vs roughly $20 and $40 on Bird's Startup rate. Above that, Bird's
+    per-email rate is lower.
+  </Accordion>
+
+  <Accordion title="Can I keep my SparkPost templates?">
+    The HTML carries over. Change `{{variable}}` placeholders to triple
+    braces, `{{{variable}}}`, and save them as Reloop templates or send the
+    HTML directly.
+  </Accordion>
+
+  <Accordion title="Which has better deliverability?">
+    For most senders, your SPF, DKIM and DMARC setup, list quality and
+    sending patterns matter far more than the provider. Fix those first with
+    our [authentication guide](/blog/spf-dkim-dmarc-setup-guide).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, a dedicated IP on Growth, and an open-source core you can self-host."
+  href="/dashboard/signup"
+  label="Get started"
+/>

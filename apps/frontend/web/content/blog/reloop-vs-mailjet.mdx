@@ -1,0 +1,276 @@
+---
+title: "Reloop vs Mailjet (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Mailjet compared honestly: pricing after Mailjet's September 2026 update, the send API, templates, inbound email and agent inboxes, automations, deliverability, self-hosting, and how to switch."
+keywords:
+  - Reloop vs Mailjet
+  - Mailjet alternative
+  - Mailjet pricing
+  - Mailjet vs Reloop
+  - open source Mailjet alternative
+  - Mailjet API alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [mailjet, comparison, pricing, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-mailjet.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-mailgun
+  - reloop-vs-brevo
+  - best-transactional-email-apis-2026
+---
+
+**Mailjet is a mature email platform that does both marketing and transactional mail, with a drag-and-drop editor that non-developers can use.** Reloop does the same two jobs from a developer-first angle. The differences: **Reloop costs $10 for 50k emails where Mailjet's cheapest 50k plan is $40, it receives mail into real inboxes your agents can reply from, and it's open source, so you can run it yourself.** Mailjet has a bigger free tier and a more polished visual editor.
+
+We build Reloop, so weigh this accordingly. Mailjet prices below are from [mailjet.com/pricing](https://www.mailjet.com/pricing/) and its [September 9, 2026 pricing update](https://documentation.mailjet.com/hc/en-us/articles/25750983876763-Mailjet-Subscription-Pricing-Update-September-9-2026). Where Mailjet is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Mailjet** |
+|---|---|---|
+| Free tier | 3,000 / mo, 100 / day | 6,000 / mo, 200 / day |
+| 50,000 emails / mo | **$10** | $40 (Essential) / $59 (Premium) |
+| 100,000 emails / mo | **$20** | $112 (Premium) |
+| Automations | Every plan | Premium plan |
+| Dedicated IP | Included on Growth ($20) | Premium, 100k+ plans, on request |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Parse API posts each message to your webhook |
+| Agent inbox | Yes | No |
+| Drag-and-drop editor | Templates in code or HTML | Yes, a strong one |
+| SMTP relay | Yes | Yes |
+
+Both change prices from time to time. Check the pricing pages before you commit.
+
+---
+
+## Pricing at real volumes
+
+Mailjet has five tiers: Free, Starter ($9), Essential, Premium and Custom. The September 2026 update raised Essential and Premium. Monthly prices now look like this:
+
+| Monthly volume | Reloop | Mailjet Essential | Mailjet Premium |
+|---|---|---|---|
+| 3,000 | $0 | $0 (Free) | $0 (Free) |
+| 15,000 | $10 | $19 | $29 |
+| 50,000 | $10 | $40 | $59 |
+| 100,000 | $20 | See calculator | $112 |
+| 250,000 | $20 + $75 overage = $95 | See calculator | $265 |
+
+Mailjet takes 10% off for annual billing. Reloop's overage is $0.50 per 1,000 emails above your plan.
+
+What stands out:
+
+- **Mailjet's free tier is bigger.** 6,000 emails a month and 200 a day, vs 3,000 and 100 on Reloop. If you're sending under 6,000 a month and plan to stay there, Mailjet costs nothing for longer.
+- **Above the free tier, the gap is wide.** At 50k a month you'd pay $40 or $59 on Mailjet and $10 on Reloop. At 100k, it's $112 on Premium vs $20.
+- **Features are gated by plan on Mailjet.** Segmentation starts on Essential; automations, team management and the dedicated IP are Premium. On Reloop, every plan gets the same product. Plans differ only by volume, plus a dedicated IP on Growth.
+
+If you self-host Reloop, there's no per-email fee at all. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really takes.
+
+<Callout type="tip">
+  Price the plan you'll need, not just the volume. On Mailjet, needing automations means Premium, even at 15k emails a month.
+</Callout>
+
+---
+
+## Developer experience
+
+Mailjet's v3.1 Send API takes a `Messages` array with PascalCase fields and authenticates with an API key and a secret key.
+
+**Mailjet**
+
+```typescript
+import Mailjet from "node-mailjet";
+
+const mailjet = Mailjet.apiConnect(
+  process.env.MJ_APIKEY_PUBLIC!,
+  process.env.MJ_APIKEY_PRIVATE!,
+);
+
+await mailjet.post("send", { version: "v3.1" }).request({
+  Messages: [
+    {
+      From: { Email: "hello@acme.com", Name: "Acme" },
+      To: [{ Email: "user@example.com" }],
+      Subject: "Welcome",
+      HTMLPart: "<p>Thanks for signing up.</p>",
+    },
+  ],
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+The Mailjet SDK throws on failure, so you wrap calls in `try`/`catch`. Reloop returns errors as values. A few more differences:
+
+| | Reloop | Mailjet |
+|---|---|---|
+| Auth | One API key (`x-api-key`) | API key + secret key (basic auth) |
+| Field style | `from`, `to`, `html` | `From`, `To`, `HTMLPart` |
+| Error format | `message`, `why` and `fix` | Status code plus per-message errors |
+| Template variables | `{{{first_name}}}` | `{{var:first_name}}` with `TemplateLanguage: true` |
+| React Email | Pass a component or rendered HTML | Pass rendered HTML |
+| Official SDKs | Node, Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | Node, Python, PHP, Ruby, Java, Go, C# |
+
+Reloop's errors tell you **why** a send failed and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Receiving email and agent inboxes
+
+**Mailjet** handles inbound with its Parse API: you point a domain's MX at Mailjet, and each incoming message is posted to your webhook as JSON. Storing, threading and replying is up to you.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. Replying in-thread is one call, and an `email.received` webhook is there if you also want push.
+
+That matters if you're building:
+
+- **AI agents that handle email.** Give an agent an address, let it read the thread and reply. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+- **Support or shared inboxes** where humans and agents work the same threads.
+- **Reply handling** for transactional mail.
+
+| | Reloop | Mailjet |
+|---|---|---|
+| Receive on your domain | Yes | Yes (Parse API) |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | Build it yourself |
+| MCP access for agents | Yes | No |
+| IMAP access | Yes | No |
+
+---
+
+## Marketing, contacts and automations
+
+This is Mailjet's home ground. It started as a marketing tool, and it shows:
+
+- A **drag-and-drop email editor** that marketers can use without touching HTML, plus a brand kit and form builder.
+- **Segmentation** on Essential, and **automations** and **landing pages** on Premium.
+- **Subaccounts** to separate brands or clients.
+
+Reloop covers the same ground with a developer slant: contacts with custom properties, groups, subscription channels, scheduled broadcast campaigns, and **event-triggered automations** that start when your app tracks an event like `user.signed_up`. Automations are on every plan, including Free. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert) for a worked example.
+
+If the people building your emails are marketers who want a visual editor, Mailjet is the friendlier tool. If they're developers who want templates in code and automations triggered from the app, Reloop fits better.
+
+---
+
+## Deliverability
+
+Deliverability mostly comes down to your domain setup and list hygiene. Both cover the basics: SPF and DKIM, bounce and spam-complaint events, open and click tracking, and suppression of bad addresses.
+
+The differences:
+
+- **Dedicated IPs.** Mailjet offers one on Premium plans of 100k and above, on request. Reloop includes one on Growth at $20 a month.
+- **Sending path.** Reloop runs its own MTA (KumoMTA) with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+- **Validation.** Mailjet bundles email validation credits on Essential and Premium. Reloop ships a free [temp email checker](/tools/temp-email-checker) and [domain reputation](/tools/domain-reputation-checker) and [blocklist](/tools/blocklist-checker) checkers.
+
+---
+
+## Self-hosting and lock-in
+
+Mailjet is hosted only. Your templates, contacts, logs and suppression lists live in Mailjet's account.
+
+Reloop is Apache 2.0. You can:
+
+1. Start on Reloop Cloud.
+2. Move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup).
+3. Keep the same API. Point the SDK's `baseUrl` at your instance and nothing else in your code changes.
+
+That helps with data residency, with security reviews that need to read the code handling your users' mail, and as insurance against price changes like September's.
+
+Self-hosting isn't free in effort: you own IP reputation, warm-up and uptime. Most teams should start hosted and keep self-hosting as an option.
+
+---
+
+## Where Mailjet is the better choice
+
+- **You send under 6,000 emails a month.** Mailjet's free tier is twice Reloop's.
+- **Marketers build your emails.** The drag-and-drop editor, brand kit, forms and landing pages are built for people who don't write HTML.
+- **You manage many brands or clients** and want subaccounts in one billing account.
+
+## Where Reloop is the better choice
+
+- **You send more than the free tier.** $10 vs $40 at 50k and $20 vs $112 at 100k adds up quickly.
+- **You want automations without a Premium plan.**
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You need open source or self-hosting** for compliance, residency or peace of mind.
+
+---
+
+## Switching from Mailjet to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Swap the client.** Replace `mailjet.post("send", { version: "v3.1" })` with `reloop.mail.send`, and map `From`/`To`/`Subject`/`HTMLPart`/`TextPart` to `from`/`to`/`subject`/`html`/`text`.
+3. **Move templates.** Export the HTML from Mailjet and change placeholders to triple braces: `{{var:first_name}}` becomes `{{{first_name}}}`.
+4. **Import contacts and suppressions.** Export contacts, unsubscribes and bounced addresses from Mailjet and import them, so you never mail someone who opted out.
+5. **Point webhooks** at a new handler. Reloop events are named `email.delivered`, `email.bounced`, `email.complained` and so on, and are signed with HMAC-SHA256 in the `Reloop-Signature` header.
+6. **Rebuild automations** as event-triggered automations, and call `reloop.automations.start` from your app where the trigger happens.
+7. **Ramp traffic** from 10% to 100% over a week or two, then remove Mailjet's DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) walks through the same steps in more detail, including a traffic-split flag and a suppression import script.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop cheaper than Mailjet?">
+    Above the free tier, yes. At 50,000 emails a month Reloop is $10, while
+    Mailjet is $40 on Essential or $59 on Premium. At 100,000 it's $20 vs $112
+    on Premium. Below 6,000 a month, Mailjet's free tier costs less.
+  </Accordion>
+
+  <Accordion title="Did Mailjet raise its prices in 2026?">
+    Yes. Mailjet updated Essential and Premium prices on September 9, 2026,
+    its first change in two years. Starter stayed at $9. Annual billing still
+    gets 10% off.
+  </Accordion>
+
+  <Accordion title="Can I keep my Mailjet templates?">
+    Yes. Export the HTML and change the variables from `{{var:name}}` to
+    `{{{name}}}`. If you'd rather keep templates in code, you can also send
+    React Email components through the SDK.
+  </Accordion>
+
+  <Accordion title="Does Mailjet support inbound email?">
+    Yes, through the Parse API, which posts each incoming message to your
+    webhook. Reloop stores incoming mail in threaded mailboxes you can read
+    and reply to over the API, MCP or IMAP.
+  </Accordion>
+
+  <Accordion title="Can I self-host Mailjet?">
+    No. Mailjet is a hosted service. Reloop is open source under Apache 2.0
+    and runs on your own server with the same API.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, automations on every plan, and $10 for 50k when you grow."
+  href="/dashboard/signup"
+  label="Get started"
+/>

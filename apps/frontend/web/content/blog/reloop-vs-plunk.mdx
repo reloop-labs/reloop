@@ -1,0 +1,273 @@
+---
+title: "Reloop vs Plunk (2026): Open-Source Email Platforms Compared"
+description: "Reloop vs Plunk, two open-source email platforms compared: hosted pricing, licenses, self-hosting requirements, sending infrastructure, inbound email and automations, plus how to switch."
+keywords:
+  - Reloop vs Plunk
+  - Plunk alternative
+  - Plunk pricing
+  - open source email platform
+  - self-hosted email API
+  - Plunk vs Reloop
+publishedAt: 2026-10-25
+category: Comparison
+tags: [plunk, comparison, open-source, self-hosting]
+readTime: 9 min read
+image: /blog/images/reloop-vs-plunk.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-postal
+  - reloop-vs-loops
+  - self-hosted-email-infrastructure
+---
+
+**Reloop and Plunk are both open-source email platforms that do more than send.** Each gives you a transactional API, SMTP, contacts, campaigns, automations and inbound email, on a hosted cloud or on your own server. The differences are in the details: **Plunk sends through Amazon SES and charges per email with no plan tiers; Reloop runs its own MTA, costs less once you pass a few thousand emails, and stores inbound mail in real inboxes that agents can work from.** Plunk's pricing is the simplest in the market, and its AGPL license is a deliberate choice worth understanding.
+
+We build Reloop, so weigh this accordingly. Plunk facts below come from [Plunk's pricing page](https://www.useplunk.com/pricing), [docs](https://docs.useplunk.com) and [GitHub repository](https://github.com/useplunk/plunk). Where Plunk is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Plunk** |
+|---|---|---|
+| License | Apache 2.0 | AGPL-3.0 |
+| Free tier | 3,000 / mo, 100 / day | 1,000 / mo, with Plunk branding |
+| Paid pricing | Plans: $10 for 50k, $20 for 100k | $0.001 per email, no base fee |
+| 50,000 emails / mo | **$10** | about $50 |
+| 100,000 emails / mo | **$20** | about $100 |
+| Dedicated IP | Included on Growth ($20) | Not offered on the hosted plan |
+| Sending path | Own MTA (KumoMTA) | Amazon SES |
+| Self-host needs | Your server | Your server + an AWS SES account |
+| Transactional API and SMTP | Yes | Yes |
+| Contacts, segments, campaigns | Yes | Yes |
+| Automations | Event-triggered, with delays and conditions | Workflows with triggers, delays and conditions |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Inbound with routing rules |
+| Agent inbox | Yes | No |
+
+Plunk's prices are from [useplunk.com/pricing](https://www.useplunk.com/pricing); Reloop's are on [reloop.sh/pricing](/pricing). Both change, so check before you commit.
+
+---
+
+## Pricing at real volumes
+
+The two products price in different ways. Plunk charges a flat **$0.001 per email** (that's $1 per 1,000) with no base fee and no plan tiers, plus a free tier of 1,000 emails a month that carries Plunk branding. Reloop has a free tier of 3,000 a month, then flat plans with overage.
+
+| Monthly volume | Reloop | Plunk (approx.) |
+|---|---|---|
+| 1,000 | $0 | $0 (branded) |
+| 3,000 | $0 | about $3 |
+| 50,000 | $10 | about $50 |
+| 100,000 | $20 | about $100 |
+| 200,000 | $20 + $50 overage = $70 | about $200 |
+
+Plunk figures are per-email list price, rounded; check Plunk's page for exactly how the free allowance applies once you upgrade.
+
+What this means in practice:
+
+- **At very low or spiky volume, Plunk's model is hard to beat for simplicity.** You never pay for capacity you don't use, and Plunk offers a monthly spend cap.
+- **At steady volume, Reloop is cheaper.** From about 10,000 emails a month on, a Reloop plan costs less than the same mail at $1 per 1,000.
+- **On both, self-hosting removes the platform fee.** On Plunk you still pay AWS for SES sending. On Reloop you pay for the server only.
+
+<Callout type="tip">
+  Price the volume you expect in a year, not today's. Moving providers later means re-verifying DNS and rebuilding reputation, so pick the one that still makes sense at 10× your current volume.
+</Callout>
+
+---
+
+## Open source: Apache 2.0 vs AGPL-3.0
+
+Both projects publish their full source, but the licenses behave differently.
+
+- **Plunk is AGPL-3.0.** You can self-host and modify it freely. If you modify Plunk and let others use it over a network, the AGPL requires you to share those modifications under the same license. For a company running it internally that's often fine; for one embedding it in a product, check with your legal team.
+- **Reloop is Apache 2.0.** It's a permissive license: you can modify it, embed it and run it as part of a commercial product without publishing your changes, as long as you keep the license and notices.
+
+Neither is "more open". They make different trade-offs, and AGPL is a reasonable choice for a project that wants improvements to flow back.
+
+---
+
+## Self-hosting: what you actually run
+
+This is the biggest technical difference.
+
+**Plunk is built on Amazon SES.** Its [self-hosting guide](https://docs.useplunk.com/self-hosting/introduction) lists Docker and Docker Compose, a domain with subdomains for each service, and an AWS SES account. The [environment variables](https://docs.useplunk.com/self-hosting/environment-variables) mark PostgreSQL, Redis and the SES credentials as required, and the bundled setup includes MinIO for file storage. In practice that means:
+
+1. Getting your AWS account out of the SES sandbox, which AWS reviews by hand.
+2. Creating an IAM user for sending and domain identities.
+3. Wiring an SNS topic and configuration set so bounces, complaints and deliveries flow back to Plunk.
+
+**Reloop brings its own MTA.** Reloop sends through KumoMTA running on your server, so there's no third-party sending account to apply for. You install it with the [one-command installer](/self-host) or on [Coolify](/blog/reloop-coolify-setup), point DNS at it, and send.
+
+The trade-off cuts both ways:
+
+| | Reloop self-hosted | Plunk self-hosted |
+|---|---|---|
+| Sending infrastructure | Your own IPs via KumoMTA | Amazon SES |
+| IP reputation | You own it and warm it up | SES handles it |
+| Extra cloud account | None | AWS (SES, IAM, SNS) |
+| Per-email cost | None | SES rates |
+| Data stays on your server | All of it | App data yes; mail passes through SES |
+
+If you'd rather not think about IP warm-up at all, SES doing the sending is a genuine advantage for Plunk. If you want no dependency on AWS, or mail that never leaves your infrastructure, Reloop's model fits better. Our [self-hosted email infrastructure guide](/blog/self-hosted-email-infrastructure) covers what owning IP reputation really involves.
+
+---
+
+## Developer experience
+
+Both APIs are small and easy to call.
+
+**Plunk**
+
+```typescript
+const res = await fetch("https://next-api.useplunk.com/v1/send", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.PLUNK_SECRET_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    to: "user@example.com",
+    subject: "Welcome",
+    body: "<p>Thanks for signing up.</p>",
+  }),
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+| | Reloop | Plunk |
+|---|---|---|
+| Auth | `x-api-key` header or SDK | `Authorization: Bearer` with a secret key (`sk_`) |
+| HTML field | `html` | `body` |
+| Template variables | `{{{first_name}}}` | `{{ firstName }}`, values in `data` |
+| Event tracking | `reloop.automations.start({ event, email })` | `POST /v1/track` with `event` and `email` |
+| Errors | `message`, `why` and `fix` | Error codes |
+| Webhooks | Signed with `Reloop-Signature` (HMAC-SHA256) | See Plunk docs |
+
+Plunk has a nice touch for frontend use: public keys (`pk_`) can only call `/v1/track`, so you can track events from the browser without exposing a sending key.
+
+Reloop's error shape is our one strong opinion. When a send fails, the error says **why** and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Automations, campaigns and contacts
+
+Here the two are closer than any other pair we've compared. Both cover:
+
+- **Contacts** with custom fields and activity history.
+- **Segments or groups** to target part of your list.
+- **Campaigns** for newsletters and product updates.
+- **Event-triggered automations** with delays and conditional branches.
+
+Both start an automation the same way: your app sends an event (`user.signed_up`) with the contact's email, and the contact is created if it doesn't exist. See our [welcome sequence guide](/blog/welcome-email-sequences-that-convert) for a worked example on Reloop.
+
+Reloop also has **subscription channels**, so a contact can opt out of product updates while still getting billing mail.
+
+---
+
+## Inbound email and agent inboxes
+
+Both can receive email on your domain.
+
+- **Plunk** receives inbound mail and processes it with routing rules.
+- **Reloop** receives mail into **mailboxes**: messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call.
+
+If you're building an AI agent that reads and answers email, or a shared inbox where humans and agents work the same threads, Reloop's mailboxes save you building storage and threading yourself. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Where Plunk is the better choice
+
+- **Your volume is low or unpredictable.** Paying $1 per 1,000 emails with no base fee and a spend cap is as simple as pricing gets.
+- **You want SES to own deliverability when self-hosting.** No IP warm-up, no MTA to tune; Amazon handles the sending reputation.
+- **You prefer AGPL** so that improvements to the platform stay open.
+- **You track events from the browser.** Plunk's public `pk_` keys are scoped to tracking only.
+
+## Where Reloop is the better choice
+
+- **You send more than about 10,000 emails a month.** Flat plans ($10 for 50k, $20 for 100k) cost a fraction of per-email pricing.
+- **You want a larger free tier** without branding: 3,000 a month.
+- **You want to self-host without AWS.** Reloop sends with its own MTA, so there's no SES sandbox review or SNS wiring.
+- **You need inbound mail as real inboxes**, especially for AI agents over MCP or IMAP.
+- **You need a dedicated IP** on the hosted plan.
+- **You want a permissive license** to embed the platform in your own product.
+
+---
+
+## Switching from Plunk to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Swap the send call.** Replace `POST /v1/send` with `reloop.mail.send`, and rename `body` to `html`.
+3. **Move templates.** Change `{{ firstName }}` placeholders to triple braces: `{{{first_name}}}`.
+4. **Swap event tracking.** Replace `/v1/track` calls with `reloop.automations.start({ event, email })`, and recreate your workflows as Reloop automations listening for the same event names.
+5. **Import contacts** with their custom fields, and import unsubscribes so you never mail someone who opted out.
+6. **Point webhooks** at a handler that verifies the `Reloop-Signature` header.
+7. **Ramp traffic** from 10% to 100% over a week or two, then remove the old DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same steps in more detail, including a traffic-split flag and a suppression import script.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Are Reloop and Plunk both open source?">
+    Yes. Reloop is Apache 2.0 and Plunk is AGPL-3.0. Both can be self-hosted
+    with Docker. The main practical difference is that AGPL requires you to
+    share modifications if you offer a modified version over a network.
+  </Accordion>
+
+  <Accordion title="Does self-hosted Plunk need AWS?">
+    Yes. Plunk's self-hosting guide requires an AWS SES account for sending,
+    along with PostgreSQL and Redis. Self-hosted Reloop sends through its own
+    MTA, so no AWS account is needed.
+  </Accordion>
+
+  <Accordion title="Which is cheaper on the hosted plans?">
+    It depends on volume. Plunk charges $0.001 per email with no base fee, so
+    it's cheap for tiny or irregular volumes. From around 10,000 emails a
+    month, Reloop's plans cost less: $10 for 50k and $20 for 100k.
+  </Accordion>
+
+  <Accordion title="Can both receive email?">
+    Yes. Plunk processes inbound mail with routing rules. Reloop stores it in
+    threaded mailboxes you can read over the API, MCP or IMAP, and reply to in
+    one call.
+  </Accordion>
+
+  <Accordion title="Do my Plunk templates work in Reloop?">
+    The HTML does. Change the placeholders from `{{ firstName }}` to
+    `{{{first_name}}}` and pass the values as template variables.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier. Open source, no AWS account needed to self-host."
+  href="/dashboard/signup"
+  label="Get started"
+/>
