@@ -1,4 +1,7 @@
-import { extractApiKey } from "@reloop/auth/middleware";
+import {
+	extractApiKey,
+	IDEMPOTENT_REPLAYED_HEADER,
+} from "@reloop/auth/middleware";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { authMiddleware } from "@reloop/be-mail/middleware/auth";
 import { checkRateLimit } from "@reloop/be-mail/middleware/rate-limiter";
@@ -67,6 +70,9 @@ export const sendEmailRoute = new Elysia()
 				requestApiKey,
 				useInternalInject,
 				idempotencyKey: request.headers.get("idempotency-key"),
+				onReplay: () => {
+					set.headers[IDEMPOTENT_REPLAYED_HEADER] = "true";
+				},
 			});
 		},
 		{

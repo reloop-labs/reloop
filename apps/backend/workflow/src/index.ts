@@ -12,6 +12,7 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
 	apiRateLimitPlugin,
+	idempotencyPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -61,6 +62,7 @@ const workflowApi = new Elysia({
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(apiRateLimitPlugin({ redisUrl: workflowConfig.REDIS_URL }))
+	.use(idempotencyPlugin({ redisUrl: workflowConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(
 		evlog({

@@ -4,6 +4,7 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
 	apiRateLimitPlugin,
+	idempotencyPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -53,6 +54,7 @@ const domainService = new Elysia({
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(apiRateLimitPlugin({ redisUrl: domainConfig.REDIS_URL }))
+	.use(idempotencyPlugin({ redisUrl: domainConfig.REDIS_URL }))
 	.use(
 		requireUserAgentPlugin({
 			// Caddy on-demand TLS ask must work even if the client omits UA.

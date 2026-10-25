@@ -3,6 +3,7 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
 	apiRateLimitPlugin,
+	idempotencyPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -49,6 +50,13 @@ const mailService = new Elysia({
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(apiRateLimitPlugin({ redisUrl: mailConfig.REDIS_URL }))
+	.use(
+		idempotencyPlugin({
+			redisUrl: mailConfig.REDIS_URL,
+			// send has its own DB-backed Idempotency-Key handling
+			excludePathSuffixes: ["/mail/v1/send"],
+		}),
+	)
 	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(

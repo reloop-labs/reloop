@@ -4,6 +4,7 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
 	apiRateLimitPlugin,
+	idempotencyPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -60,6 +61,13 @@ const inboxService = new Elysia({
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(apiRateLimitPlugin({ redisUrl: inboxConfig.REDIS_URL }))
+	.use(
+		idempotencyPlugin({
+			redisUrl: inboxConfig.REDIS_URL,
+			// webhook create returns its signing secret; never cache it
+			excludePathSuffixes: ["/inbox/v1/webhooks"],
+		}),
+	)
 	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(opentelemetry())

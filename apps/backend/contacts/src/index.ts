@@ -14,6 +14,7 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
 	apiRateLimitPlugin,
+	idempotencyPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -70,6 +71,7 @@ const contactsService = new Elysia({
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(apiRateLimitPlugin({ redisUrl: contactsConfig.REDIS_URL }))
+	.use(idempotencyPlugin({ redisUrl: contactsConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(opentelemetry())
 	.use(

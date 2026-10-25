@@ -128,6 +128,7 @@ export async function sendEmailController({
 	requestApiKey,
 	useInternalInject = false,
 	idempotencyKey: rawKey,
+	onReplay,
 }: {
 	organizationId: string;
 	body: MailModel.SendEmailBody;
@@ -138,6 +139,8 @@ export async function sendEmailController({
 	requestApiKey?: string | null;
 	useInternalInject?: boolean;
 	idempotencyKey?: string | null;
+	/** Called when an Idempotency-Key matched an earlier send. */
+	onReplay?: () => void;
 }): Promise<MailModel.SendEmailResponse> {
 	const logger = useLogger();
 	logger.set({
@@ -174,6 +177,7 @@ export async function sendEmailController({
 				organizationId,
 				emailLogId: replay.id,
 			});
+			onReplay?.();
 			return replay;
 		}
 		// Previous attempt with this key failed transmission — free the key

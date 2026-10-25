@@ -64,36 +64,36 @@ export async function createEmailLog_step4({
 				messageId: `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,
 				idempotencyKey: key,
 				organizationId,
-			domainId: domainId,
-			userId: resolveLogUserId(userId),
-			apikeyId,
-			fromEmail: parseFromEmail(body.from),
-			fromName: parseFromName(body.from),
-			toEmails: Array.isArray(body.to) ? body.to : [body.to],
-			ccEmails: body.cc
-				? Array.isArray(body.cc)
-					? body.cc
-					: [body.cc]
-				: undefined,
-			bccEmails: body.bcc
-				? Array.isArray(body.bcc)
-					? body.bcc
-					: [body.bcc]
-				: undefined,
-			replyTo: Array.isArray(body.reply_to)
-				? body.reply_to.join(", ")
-				: body.reply_to,
-			subject: body.subject,
-			textBody: body.text,
-			htmlBody: body.html,
-			attachments: serializeSendAttachments(body.attachments),
-			status: "pending",
-			provider: smtpProviderId ? `smtp:${smtpProviderId}` : "kumomta",
-			source: sourceFromTags(body.tags),
-			tags: body.tags ?? [],
-			size: (body.text?.length || 0) + (body.html?.length || 0),
-		})
-		.returning({ id: emailLog.id });
+				domainId: domainId,
+				userId: resolveLogUserId(userId),
+				apikeyId,
+				fromEmail: parseFromEmail(body.from),
+				fromName: parseFromName(body.from),
+				toEmails: Array.isArray(body.to) ? body.to : [body.to],
+				ccEmails: body.cc
+					? Array.isArray(body.cc)
+						? body.cc
+						: [body.cc]
+					: undefined,
+				bccEmails: body.bcc
+					? Array.isArray(body.bcc)
+						? body.bcc
+						: [body.bcc]
+					: undefined,
+				replyTo: Array.isArray(body.reply_to)
+					? body.reply_to.join(", ")
+					: body.reply_to,
+				subject: body.subject,
+				textBody: body.text,
+				htmlBody: body.html,
+				attachments: serializeSendAttachments(body.attachments),
+				status: "pending",
+				provider: smtpProviderId ? `smtp:${smtpProviderId}` : "kumomta",
+				source: sourceFromTags(body.tags),
+				tags: body.tags ?? [],
+				size: (body.text?.length || 0) + (body.html?.length || 0),
+			})
+			.returning({ id: emailLog.id });
 		return record;
 	}
 	let logRecord: { id: string } | undefined;

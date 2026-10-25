@@ -11,6 +11,15 @@ export { handleAuthLifecycleEviction } from "./eviction/handle-auth-lifecycle-ev
 export { SESSION_CACHE_REDIS_PREFIX } from "./eviction/session-cache-redis-prefix";
 export type { SessionEvictionEvent } from "./eviction/session-eviction-event";
 export {
+	IDEMPOTENCY_KEY_HEADER,
+	IDEMPOTENCY_KEY_MAX_LENGTH,
+	IDEMPOTENCY_TTL_SECONDS,
+	IDEMPOTENT_REPLAYED_HEADER,
+	type IdempotencyOptions,
+	type IdempotencyStore,
+	idempotencyPlugin,
+} from "./idempotency";
+export {
 	isInsecureDefaultInternalSecret,
 	KNOWN_INSECURE_INTERNAL_SECRETS,
 	sanitizeInternalSecret,

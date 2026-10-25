@@ -46,7 +46,8 @@ The API uses standard HTTP status codes to indicate the outcome of a request:
 | `401` | Unauthorized | The `x-api-key` header is missing, invalid, or the key has been revoked. |
 | `403` | Forbidden | The API key doesn't have permission to access the requested resource. |
 | `404` | Not Found | The resource doesn't exist, or it belongs to a different organization. |
-| `409` | Conflict | A resource with the same unique identifier already exists (e.g., duplicate domain or channel name). |
+| `409` | Conflict | A resource with the same unique identifier already exists (e.g., duplicate domain or channel name), or a request with the same [Idempotency-Key](/docs/api/idempotency) is still running. |
+| `422` | Unprocessable Content | An [Idempotency-Key](/docs/api/idempotency) was reused with a different request. |
 | `429` | Too Many Requests | You've exceeded a [rate limit](/docs/api/usage-limits). Retry after the `Retry-After` header value. |
 | `500` | Internal Server Error | Something went wrong on our end. If the issue persists, contact [support](mailto:support@reloop.sh). |
 

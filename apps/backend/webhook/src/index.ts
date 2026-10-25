@@ -3,6 +3,7 @@ import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
 	apiRateLimitPlugin,
+	idempotencyPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -53,6 +54,13 @@ const webhookService = new Elysia({
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
 	.use(apiRateLimitPlugin({ redisUrl: webhookConfig.REDIS_URL }))
+	.use(
+		idempotencyPlugin({
+			redisUrl: webhookConfig.REDIS_URL,
+			// create returns the signing secret; never cache it
+			excludePathSuffixes: ["/webhook/v1"],
+		}),
+	)
 	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(

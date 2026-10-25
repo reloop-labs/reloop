@@ -265,6 +265,34 @@ export class RedisCache {
 	}
 
 	/**
+	 * Set a value only when the key is absent (SET NX EX), honoring the
+	 * instance prefix. Returns whether this call created the key. Throws on
+	 * Redis errors so callers can choose to fail open or closed.
+	 */
+	async setIfAbsent(
+		key: string,
+		value: unknown,
+		ttlSeconds: number,
+	): Promise<boolean> {
+		try {
+			const redis = await this.getRedisClient();
+			const result = await redis.set(
+				this.getKey(key),
+				this.stringifyValue(value),
+				{ NX: true, EX: ttlSeconds },
+			);
+			return result === "OK";
+		} catch (error) {
+			console.error(
+				`Redis setIfAbsent error for ${this.prefix} cache, key "${key}":`,
+				error,
+			);
+			this.redis = null;
+			throw error;
+		}
+	}
+
+	/**
 	 * Set a TTL (expiry) on a key, in seconds.
 	 * Uses the raw key (no prefix).
 	 */

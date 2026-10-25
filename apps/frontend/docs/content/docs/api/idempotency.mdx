@@ -1,0 +1,54 @@
+---
+title: Idempotency
+description: Retry POST requests safely with the Idempotency-Key header.
+---
+
+Network failures and timeouts leave you unsure whether a request went through. Send an `Idempotency-Key` header on `POST` requests and you can retry them without sending the same email twice or creating duplicate resources.
+
+## How it works
+
+Generate a unique key for each operation, such as a UUID, and send it with the request. If you retry with the same key and the same body, Reloop returns the original response instead of running the request again.
+
+```bash
+curl -X POST "https://reloop.sh/api/contacts/create" \
+  -H "x-api-key: rl_prod_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: 5f1c2a9e-8d3b-4c7a-9f60-2b7e1d4a8c35" \
+  -d '{"email": "ada@example.com"}'
+```
+
+A replayed response has the same status code and body as the original, plus this header:
+
+```http
+Idempotent-Replayed: true
+```
+
+## Rules
+
+- **Scope.** Keys are scoped to the API key (or dashboard session) that sent them. Two different API keys can use the same key value without colliding.
+- **Lifetime.** A successful response can be replayed for 24 hours. After that the key can be reused.
+- **Length.** Keys can be up to 255 characters. Sending email accepts up to 500.
+- **Same request only.** Reusing a key with a different body or a different endpoint returns `422`.
+- **Failures are not stored.** If the request fails (any non-`2xx` response), the key is released, so you can fix the problem and retry with the same key.
+- **JSON bodies only.** File uploads do not support idempotency keys.
+
+## Error responses
+
+| Status | When | What to do |
+|--------|------|------------|
+| `400` | The key is longer than 255 characters. | Use a shorter key, such as a UUID. |
+| `409` | A request with this key is still running. The response includes `Retry-After: 1`. | Wait and retry with the same key to get the original result. |
+| `422` | The key was already used with a different body or endpoint. | Use a new key for each distinct request. |
+
+## Supported endpoints
+
+Every `POST` endpoint in these services accepts `Idempotency-Key`: send email, agent inboxes, domains, webhooks, contacts, automations, templates and campaigns. The [OpenAPI document](https://reloop.sh/openapi.json) marks each supported operation.
+
+These endpoints do not accept it because their responses contain secrets that Reloop will not store for replay:
+
+- Creating an API key, and rotating one
+- Creating a webhook, which returns its signing secret
+
+## Sending email
+
+`POST /api/mail/v1/send` stores keys with the email log rather than for 24 hours, so a retry returns the original send for as long as the log exists. If the earlier attempt failed to transmit, a retry with the same key sends the email again. You can also pass the key as `idempotency_key` in the body; the header takes precedence.
