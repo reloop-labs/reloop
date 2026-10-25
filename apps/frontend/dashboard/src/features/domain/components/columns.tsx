@@ -34,7 +34,7 @@ export function DomainStatusCell({
 		<div className="flex items-center">
 			<span
 				className={cn(
-					"inline-flex h-6 items-center gap-1 whitespace-nowrap rounded-md border px-1.5 font-medium text-[13px]",
+					"inline-flex h-5 items-center gap-1 whitespace-nowrap rounded-md border px-1 font-medium text-xs leading-none",
 					getStatusPillClass(status),
 				)}
 			>
