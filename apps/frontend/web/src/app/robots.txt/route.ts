@@ -16,6 +16,7 @@ export function GET() {
 		"",
 		`Sitemap: ${siteUrl}/sitemap.xml`,
 		`Sitemap: ${siteUrl}/glossary/sitemap.xml`,
+		`Sitemap: ${siteUrl}/blog/sitemap.xml`,
 		`Sitemap: ${siteUrl}/docs/sitemap.xml`,
 		"",
 		`Schemamap: ${siteUrl}/schemamap.xml`,

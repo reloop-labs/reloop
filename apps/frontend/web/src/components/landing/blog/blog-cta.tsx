@@ -257,7 +257,7 @@ export function BlogCta({
 			className={cn(
 				"w-full",
 				showTopRule
-					? "border-stroke-soft-200 border-t dark:border-white/10"
+					? "border-stroke-soft-100 border-t dark:border-white/10"
 					: "",
 				className,
 			)}

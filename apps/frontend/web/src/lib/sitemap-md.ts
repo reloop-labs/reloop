@@ -253,6 +253,7 @@ export function buildPublicDiscoveryMarkdown(
 		`- [\`/sitemap.md\`](${origin}/sitemap.md): markdown discovery index`,
 		`- [\`/sitemap.xml\`](${origin}/sitemap.xml): XML sitemap for crawlers`,
 		`- [\`/glossary/sitemap.xml\`](${origin}/glossary/sitemap.xml): email glossary terms only`,
+		`- [\`/blog/sitemap.xml\`](${origin}/blog/sitemap.xml): blog posts and categories only, with cover images`,
 		`- [\`/docs/sitemap.md\`](${origin}/docs/sitemap.md): full docs page tree`,
 		`- [\`/docs/mcp\`](${origin}/docs/mcp): docs search MCP (runtime)`,
 		`- [\`/blog/feed.xml\`](${origin}/blog/feed.xml): blog RSS feed`,
