@@ -1,0 +1,231 @@
+---
+title: "Reloop vs Mailchimp (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Mailchimp compared honestly: contact-based vs per-email pricing, Mailchimp Marketing vs Mandrill for developer sending, campaigns, automations, inbound, self-hosting and how to switch."
+keywords:
+  - Reloop vs Mailchimp
+  - Mailchimp alternative
+  - Mailchimp pricing
+  - Mandrill alternative
+  - Mailchimp Transactional alternative
+  - open source Mailchimp alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [mailchimp, comparison, pricing, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-mailchimp.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-loops
+  - transactional-email-as-growth-channel
+  - best-transactional-email-apis-2026
+---
+
+**Reloop and Mailchimp aren't built for the same people.** Mailchimp is a marketing platform for marketers: a polished drag-and-drop editor, hundreds of templates and integrations with almost every tool a small business uses. Reloop is email infrastructure for product teams: **one API for transactional mail, campaigns and automations, priced by the emails you send rather than the contacts you store, open source and self-hostable.**
+
+If your email is mostly newsletters written by a marketing team, Mailchimp is a strong choice. If your email starts in your code (sign-ups, receipts, alerts, onboarding sequences), read on.
+
+We build Reloop, so weigh this accordingly. Mailchimp's prices below are from [mailchimp.com/pricing](https://mailchimp.com/pricing/marketing/), checked September 17, 2026.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Mailchimp** |
+|---|---|---|
+| Pricing basis | Emails sent | Contacts stored |
+| Free tier | 3,000 emails / mo, 100 / day | 250 contacts, 500 sends / mo |
+| Entry paid plan | **$10** for 50,000 emails | $13 / mo (Essentials, 500 contacts) |
+| 100,000 emails / mo | **$20** | Depends on list size |
+| Overage | $0.50 per 1,000 | Contact and send caps (Essentials sends cap at 10× contacts) |
+| Transactional API | Yes, same product | Separate product (Mailchimp Transactional, formerly Mandrill) |
+| SMTP relay | Yes | Limited |
+| Campaigns / newsletters | Yes | Yes (its core product) |
+| Drag-and-drop editor | Yes | Yes, more advanced |
+| Agent inbox | Yes | No |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | No |
+
+---
+
+## Pricing: contacts vs sends
+
+This is the core difference, and it decides the outcome for most teams.
+
+**Mailchimp charges for your audience.** Every contact you store counts toward your plan, whether you email them weekly or never. The free tier covers 250 contacts and 500 sends a month. Essentials starts at $13 a month for 500 contacts, and your monthly send allowance is capped at 10× your contact count. Grow the list and the bill grows with it, even if most of those people are dormant.
+
+**Reloop charges for what you send.** Contacts are free to store, segment and keep for as long as you like.
+
+| | Reloop | Mailchimp |
+|---|---|---|
+| Free | 3,000 emails / mo (100 / day) | 250 contacts, 500 sends / mo |
+| First paid tier | $10 / mo, 50,000 emails | $13 / mo, 500 contacts |
+| 100,000 emails / mo | $20 (Growth, includes a dedicated IP) | Priced by contacts; see their site |
+| Above the plan | $0.50 per 1,000 emails | Move up a contact tier |
+| Self-hosted | $0 software, unlimited on your servers | Not available |
+
+The contact model works well for a newsletter with a large list and a send or two a month. It works badly for a SaaS product, where you might store 20,000 users but only email the 3,000 active this week, with receipts, alerts and a weekly digest. On Reloop you pay for those sends. On Mailchimp you pay for all 20,000 people.
+
+<Callout type="tip">
+  Count both numbers before you choose: how many contacts you'll store, and how many emails you'll actually send. If the first is much larger than the second, per-email pricing will almost always be cheaper.
+</Callout>
+
+---
+
+## Sending from code: Mailchimp Marketing vs Mandrill
+
+Mailchimp's main product is built around campaigns sent from its web app. When developers need to send email from their own code (a password reset, an order confirmation), Mailchimp points them to **Mailchimp Transactional**, the product formerly called Mandrill. It's a separate product path with its own API, its own setup and its own billing on top of a Mailchimp plan.
+
+That split shows up in day-to-day work:
+
+- **Two APIs** to learn and maintain: the Marketing API for audiences and campaigns, the Transactional API for one-off sends.
+- **Two places** to look when a user says "I never got the email."
+- **Templates and suppression** handled per product rather than shared.
+
+Reloop treats both as one product. The same API key sends a transactional email, creates a contact, starts a campaign and tracks an event that triggers an automation:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your receipt",
+  html: "<p>Thanks for your order.</p>",
+});
+```
+
+Stored templates use triple-brace variables like `{{{first_name}}}`, and failed sends return a `message`, a `why` and a `fix` so you know what to change without opening the docs. Official SDKs cover Node, Python, Go, PHP, Ruby, Rust, Java, .NET and Elixir, and there's an SMTP relay for anything that only speaks SMTP.
+
+---
+
+## Campaigns, contacts and automations
+
+This is Mailchimp's home ground, and it's genuinely good at it.
+
+**Mailchimp** has a mature visual email builder, a large template library, landing pages, sign-up forms, customer journeys and a long list of integrations with e-commerce and CRM tools. A marketer with no engineering help can build and send a polished campaign in an afternoon.
+
+**Reloop** covers the same jobs with a product-first angle:
+
+- **Contacts** with custom properties, **groups** for segments and **subscription channels** so people can opt out of one kind of email without opting out of everything.
+- **Broadcast campaigns** with scheduling, built in the campaign builder or the drag-and-drop template editor.
+- **Event-triggered automations**: your app tracks an event like `user.signed_up` and Reloop runs a sequence of delays, conditions and email steps. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert).
+
+The difference is where the data comes from. In Mailchimp, the audience usually lives in Mailchimp and gets synced from your app. In Reloop, your app sends events and contact properties through the API, so segments and automations follow what users actually do in your product.
+
+---
+
+## Receiving email and agent inboxes
+
+Mailchimp is built for sending. Replies to a campaign go to your reply-to address, and that's where Mailchimp's job ends.
+
+Reloop receives mail into **mailboxes**. Messages are stored, threaded and spam-scored, and you can read and reply to them through the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. That makes it possible to:
+
+- Give an **AI agent its own address** that reads incoming mail and replies in-thread. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+- Handle **replies to product email** ("reply to this email to comment") in code.
+- Run a **shared inbox** where people and agents work the same threads.
+
+---
+
+## Deliverability
+
+Both send from authenticated domains with SPF, DKIM and DMARC, and both handle bounces, complaints and unsubscribes.
+
+- **Sending path.** Reloop runs its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates climb. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+- **One suppression list.** Because transactional and marketing mail run through the same Reloop account, an address that hard-bounces on a campaign is suppressed for transactional sends too.
+- **Dedicated IP.** Included on Reloop Growth ($20/mo).
+- **Webhooks.** Every delivery, bounce, complaint, open and click event can be pushed to your app, signed with HMAC-SHA256 in the `Reloop-Signature` header.
+
+---
+
+## Self-hosting and lock-in
+
+Mailchimp is hosted-only. Your audience, templates and campaign history live in Mailchimp.
+
+Reloop is Apache 2.0. Start on Reloop Cloud, then move to your own server with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup) if you need data residency, a security review of the code, or simply want to stop paying per email. Point the SDK's `baseUrl` at your instance and your code stays the same.
+
+Self-hosting does mean you own IP warm-up, reputation and uptime. Most teams should start hosted.
+
+---
+
+## Where Mailchimp is the better choice
+
+Being honest about it:
+
+- **Your email is run by marketers, not engineers.** Mailchimp's drag-and-drop builder and template library are more advanced than ours, and non-technical teams get productive faster.
+- **You rely on its integrations.** If your store, CRM and forms already plug into Mailchimp, that ecosystem is hard to replace.
+- **You send newsletters to a small list.** At a few hundred contacts and a monthly send, contact-based pricing is cheap and the tooling is excellent.
+- **You want landing pages and sign-up forms** in the same tool as your newsletter.
+
+## Where Reloop is the better choice
+
+- **Your email starts in your product**: receipts, password resets, alerts and lifecycle sequences triggered by app events.
+- **You store far more contacts than you email** in a given month, so per-contact pricing overcharges you.
+- **You want one API** for transactional mail, campaigns and automations instead of Mailchimp plus Mandrill.
+- **You need inbound mail** as real inboxes, especially for AI agents.
+- **You need open source or self-hosting.**
+
+Plenty of teams run both for a while: Mailchimp for the marketing newsletter, Reloop for everything the product sends. If you do, use separate subdomains (for example `news.acme.com` and `mail.acme.com`) so each keeps its own reputation.
+
+---
+
+## Switching from Mailchimp to Reloop
+
+1. **Add your sending domain in Reloop.** Publish the DKIM record (`reloop._domainkey`) and merge `include:reloop.sh` into your existing SPF record rather than adding a second one.
+2. **Export your audience** from Mailchimp as CSV and import it into Reloop contacts. Map merge fields to contact properties and tags to groups.
+3. **Bring over unsubscribes and cleaned addresses.** Import them as unsubscribed so nobody who opted out hears from you again.
+4. **Rebuild templates.** Export the HTML or recreate them in the template editor, and change merge tags like `*|FNAME|*` to `{{{first_name}}}`.
+5. **Replace Mandrill calls** with `reloop.mail.send`, and point your event webhooks at a handler that verifies the `Reloop-Signature` header.
+6. **Turn customer journeys into automations** triggered by events your app tracks.
+7. **Ramp gradually.** Move transactional mail first, then campaigns, and watch bounce and complaint rates as you go.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the DNS cutover and traffic ramp in more detail.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop a Mailchimp alternative for non-technical teams?">
+    Partly. Reloop has a campaign builder and a drag-and-drop template editor,
+    so marketers can send campaigns without code. Mailchimp's editor is more
+    mature for pure marketing workflows, so if no one on your team writes
+    code, evaluate both with your marketing lead.
+  </Accordion>
+
+  <Accordion title="Why is Mailchimp expensive for SaaS products?">
+    Mailchimp prices by the number of contacts you store. SaaS products
+    usually store every user but email only the active ones, so they pay for
+    a large audience they rarely mail. Reloop charges per email sent, and
+    storing contacts is free.
+  </Accordion>
+
+  <Accordion title="Can Reloop replace Mandrill (Mailchimp Transactional)?">
+    Yes. Reloop's send API and SMTP relay cover transactional mail, with
+    stored templates, webhooks and idempotent retries. You swap the client,
+    update template variables to `{{{variable}}}` syntax and point webhooks
+    at a new handler.
+  </Accordion>
+
+  <Accordion title="Can I keep my Mailchimp unsubscribes when I switch?">
+    Yes. Export unsubscribed and cleaned contacts from Mailchimp and import
+    them into Reloop as unsubscribed, so they stay suppressed.
+  </Accordion>
+
+  <Accordion title="Can I self-host Mailchimp?">
+    No. Mailchimp is a hosted service only. Reloop can run on your own server
+    under the Apache 2.0 license.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier. Transactional mail, campaigns and automations in one API, priced by what you send."
+  href="/dashboard/signup"
+  label="Get started"
+/>

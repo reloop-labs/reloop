@@ -1,0 +1,269 @@
+---
+title: "Reloop vs Amazon SES (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Amazon SES compared honestly: per-email cost vs total cost, the sandbox, bounce and complaint handling, templates, logs, inbound mail, self-hosting, and how to switch."
+keywords:
+  - Reloop vs Amazon SES
+  - Reloop vs AWS SES
+  - Amazon SES alternative
+  - AWS SES pricing
+  - SES vs Reloop
+  - open source SES alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [aws-ses, comparison, pricing, open-source]
+readTime: 10 min read
+image: /blog/images/reloop-vs-aws-ses.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-resend
+  - best-transactional-email-apis-2026
+  - self-hosted-email-infrastructure
+---
+
+**Amazon SES is the cheapest way to push an email out of a server.** At $0.10 per 1,000 messages, nothing hosted beats it on the per-email line item, and we won't pretend otherwise. **Reloop is a complete email product**: API, SMTP, templates, logs, webhooks, campaigns, automations and inboxes in one place, open source, and self-hostable. The real question isn't which is cheaper per email. It's how much of the product around SES you want to build and run yourself.
+
+We build Reloop, so weigh this accordingly. SES prices below are from the [Amazon SES pricing page](https://aws.amazon.com/ses/pricing/), and where SES is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Amazon SES** |
+|---|---|---|
+| Free | 3,000 / mo, 100 / day | $200 AWS Free Tier credits (first 6 months) |
+| List price | $10 / mo for 50,000 | $0.10 per 1,000 |
+| 100,000 emails / mo | $20 | **~$10 + data transfer** |
+| Extra emails | $0.50 per 1,000 | **$0.10 per 1,000** + $0.12 / GB outbound |
+| What you get | Full platform | Sending pipe |
+| Bounce and complaint events | Signed webhooks | SNS / EventBridge, you wire it up |
+| Delivery logs and dashboard | Built in | CloudWatch / DIY |
+| Template management | Yes, with editor | Limited (API-managed) |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Receipt rules to S3, SNS or Lambda |
+| Agent inbox | Yes | No |
+| Campaigns and automations | Yes | No (DIY) |
+| Open source | Yes (Apache 2.0) | No |
+| Self-host | Yes | AWS-managed only |
+
+---
+
+## Pricing: SES wins the line item
+
+Let's get this out of the way. If you compare only the send price, SES is cheaper at every paid volume:
+
+| Monthly volume | Reloop | Amazon SES (send only) |
+|---|---|---|
+| 3,000 | $0 | ~$0.30 (or covered by credits) |
+| 50,000 | $10 | ~$5 |
+| 100,000 | $20 | ~$10 |
+| 1,000,000 | $20 + $450 overage = $470 | ~$100 |
+
+SES also charges $0.12 per GB of outbound data, which adds up with large HTML or attachments, and $0.16 per 1,000 on the Essentials tier if you want its extra features. At a million emails a month, though, SES is clearly cheaper on paper.
+
+What that table leaves out is everything you build around SES:
+
+- **Event handling.** A configuration set, an SNS topic or EventBridge rule, and a Lambda or queue consumer to process bounces, complaints and deliveries.
+- **Suppression and logs.** Somewhere to store every message's status so support can answer "did the reset email arrive?"
+- **Templates.** A way for non-engineers to edit email content without a deploy.
+- **A dashboard.** CloudWatch metrics, or an internal admin UI.
+- **Campaigns.** A separate tool for newsletters and lifecycle mail.
+
+None of that is hard on its own. Together it's weeks of engineering plus ongoing maintenance, and engineering time costs far more than the $10 difference at 100k emails. That's the trade: **SES is cheaper to send with; Reloop is cheaper to own** until you reach the volume where the per-email savings pay for a team to maintain the glue.
+
+And if you self-host Reloop, there's no per-email fee at all. You pay for the server, the same way you would around SES.
+
+<Callout type="tip">
+  Price your whole stack, not the send call. Add up the SNS, Lambda, storage and CloudWatch pieces, plus the hours to build and maintain them, before deciding SES is cheaper for you.
+</Callout>
+
+---
+
+## Getting started
+
+### The SES sandbox
+
+Every new SES account starts in the **sandbox**: you can only send to addresses and domains you've verified, with low sending limits. To email real users you request production access from AWS, describe your use case and how you handle bounces and complaints, and wait for approval. It's a sensible anti-abuse step, but it's a step, and requests are sometimes denied or need a second round.
+
+On Reloop, you verify your domain and send. The free tier's 100-a-day cap is the only limit on day one.
+
+### Sending code
+
+**Amazon SES (AWS SDK v3)**
+
+```typescript
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
+
+const ses = new SESv2Client({ region: "us-east-1" });
+
+await ses.send(
+  new SendEmailCommand({
+    FromEmailAddress: "Acme <hello@acme.com>",
+    Destination: { ToAddresses: ["user@example.com"] },
+    Content: {
+      Simple: {
+        Subject: { Data: "Welcome" },
+        Body: { Html: { Data: "<p>Thanks for signing up.</p>" } },
+      },
+    },
+    ConfigurationSetName: "transactional",
+  }),
+);
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+The SES call needs IAM credentials with `ses:SendEmail` permission and a region. Reloop needs an API key. SES throws exceptions such as `MessageRejected`; Reloop returns errors as values, with a `message`, a `why` and a `fix`:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Bounces, complaints and suppression
+
+This is where most of the SES glue code lives.
+
+**On SES**, delivery events are published through a configuration set to SNS, EventBridge, Kinesis Firehose or CloudWatch. You then:
+
+1. Create the topic or rule and subscribe a Lambda, queue or HTTPS endpoint.
+2. Parse each event and store it against the message.
+3. Decide which bounces are permanent and add those addresses to a suppression list (SES has an account-level list, but your app usually needs its own view too).
+4. Alert someone when bounce or complaint rates climb, because AWS reviews and can pause accounts that stay too high.
+
+**On Reloop**, the same events arrive as webhooks (`email.delivered`, `email.bounced`, `email.complained` and so on), signed with HMAC-SHA256 in the `Reloop-Signature` header. Hard bounces and complaints are suppressed automatically, every message has a searchable log, and sending pauses itself when bounce or complaint rates spike. See [how bounce processing works](/blog/email-bounce-processing-automation).
+
+| | Reloop | Amazon SES |
+|---|---|---|
+| Delivery events | Signed webhooks | SNS / EventBridge / Firehose |
+| Per-message log | Built in, searchable | Build it (e.g. events to S3 or a database) |
+| Automatic suppression | Yes | Account-level list; app view is DIY |
+| Dashboard | Built in | CloudWatch |
+| Templates | Editor, sent by ID with `{{{variables}}}` | API-managed templates |
+
+---
+
+## Receiving email and agent inboxes
+
+**SES** can receive mail on your domain. Receipt rules hand each message to S3, SNS or Lambda, and from there storage, threading, spam handling and replies are yours to build.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call, and there's an `email.received` webhook for push notifications.
+
+That's the difference between "a raw MIME file landed in a bucket" and "an AI agent can read the conversation and answer it." If you're building agents, support inboxes or reply-by-email features, see [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Campaigns and automations
+
+SES is a sending service. Newsletters, contact lists, unsubscribe handling and lifecycle sequences need another tool or your own code.
+
+Reloop includes contacts with custom properties, groups, subscription channels, scheduled broadcasts, and **event-triggered automations** with delays, conditions and email steps. Transactional and marketing mail share one suppression list, so an address that bounced on a receipt doesn't get your next newsletter. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert) for an example.
+
+---
+
+## Deliverability
+
+Both handle the fundamentals: SPF, DKIM, DMARC, bounce and complaint processing. Deliverability mostly depends on your domain setup and list hygiene, not the provider's logo.
+
+- **Sending path.** SES uses AWS's shared pools, with dedicated IPs as an add-on. Reloop runs its own MTA (KumoMTA) with per-domain throttling, and includes a dedicated IP on Growth ($20/mo).
+- **Reputation guardrails.** AWS watches your bounce and complaint rates and can put your account under review. Reloop pauses sending automatically when rates spike, before a mailbox provider has to.
+- **Tools.** Reloop ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers you can run before you send.
+
+---
+
+## Self-hosting and lock-in
+
+SES is AWS-managed only, and the glue you build around it (SNS topics, Lambdas, IAM policies) is AWS-specific too.
+
+Reloop is Apache 2.0. You can start on Reloop Cloud, then move to your own server, including inside your AWS account, with the [one-command installer](/self-host). Point the SDK's `baseUrl` at your instance and nothing else in your code changes. That keeps data in your VPC without assembling the product yourself. Read [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what running it really involves.
+
+---
+
+## Where Amazon SES is the better choice
+
+Being honest about it:
+
+- **You send millions of emails a month** and already have a platform team. At that scale the per-email savings can pay for the glue code.
+- **You only need a pipe.** Password resets from one service, no dashboard, no campaigns, no inbound, and an engineer who's happy to own the SNS wiring.
+- **You're all-in on AWS** and your compliance setup requires everything to be an AWS-managed service.
+
+## Where Reloop is the better choice
+
+- **You want logs, webhooks, suppression and templates on day one** instead of building them.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You want transactional mail, campaigns and automations** in one product with one suppression list.
+- **You want open source or self-hosting** without being tied to one cloud.
+
+---
+
+## Switching from SES to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record. Don't add a second SPF record.
+2. **Swap the client.** Replace `SendEmailCommand` calls with `reloop.mail.send`. If you send through SES's SMTP interface, point it at `smtp.reloop.sh` and use your Reloop API key as both username and password.
+3. **Move templates.** Change SES's `{{variable}}` placeholders to triple braces: `{{{variable}}}`.
+4. **Replace the event pipeline.** Point a webhook at a new handler, verify the `Reloop-Signature` header, and retire the SNS topics and Lambdas once traffic has moved.
+5. **Import suppressions** from SES's account-level suppression list so you don't re-mail addresses that already bounced.
+6. **Ramp traffic** from 10% to 100% over a week or two, then remove SES's DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the traffic-split flag and suppression import in more detail; the same approach works when coming from SES.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop cheaper than Amazon SES?">
+    Not per email. SES lists $0.10 per 1,000 messages, and Reloop's overage is
+    $0.50 per 1,000. Reloop competes on total cost: the logs, webhooks,
+    suppression, templates, campaigns and inboxes you'd otherwise build and
+    maintain around SES.
+  </Accordion>
+
+  <Accordion title="Does Reloop use SES to send?">
+    No. Reloop runs its own MTA (KumoMTA). Self-hosted Reloop includes outbound
+    delivery, so you don't need SES alongside it.
+  </Accordion>
+
+  <Accordion title="Can I run Reloop inside my AWS account?">
+    Yes. Reloop is Apache 2.0 and runs anywhere Docker runs, including EC2,
+    ECS or EKS, so your data stays in your VPC.
+  </Accordion>
+
+  <Accordion title="Is there a sandbox on Reloop like on SES?">
+    No production-access review. Verify your domain and you can send to any
+    recipient, within the free tier's 3,000 a month and 100 a day.
+  </Accordion>
+
+  <Accordion title="Can I migrate my SES SMTP integration without code changes?">
+    Mostly. Change the SMTP host to `smtp.reloop.sh` and use your Reloop API
+    key as the username and password. You'll still need new DNS records and a
+    webhook handler in place of SNS.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier. Logs, webhooks, templates and inboxes included, with no SNS wiring."
+  href="/dashboard/signup"
+  label="Get started"
+/>

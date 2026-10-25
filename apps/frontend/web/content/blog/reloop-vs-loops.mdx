@@ -1,0 +1,226 @@
+---
+title: "Reloop vs Loops (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs Loops compared honestly: per-email vs per-contact pricing at 1k to 100k contacts, lifecycle automations, transactional API and SMTP, inbound inboxes, self-hosting, plus how to switch."
+keywords:
+  - Reloop vs Loops
+  - Loops alternative
+  - Loops pricing
+  - Loops vs Reloop
+  - open source Loops alternative
+  - Loops.so alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [loops, comparison, pricing, open-source]
+readTime: 9 min read
+image: /blog/images/reloop-vs-loops.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-mailchimp
+  - welcome-email-sequences-that-convert
+  - best-transactional-email-apis-2026
+---
+
+**Loops and Reloop both send the emails a SaaS product needs: onboarding sequences, product announcements and account mail.** The big difference is how you pay. **Loops bills by how many contacts you store. Reloop bills by how many emails you send.** At 100,000 contacts that's $399 a month on Loops versus $20 to $70 on Reloop for most sending patterns. Reloop also covers the transactional side (REST API and SMTP), receives mail into real inboxes, and is open source.
+
+Loops is a polished, focused tool for lifecycle marketing, and for some teams that focus is exactly the point. We build Reloop, so weigh this accordingly. Loops' prices below come from [loops.so/pricing](https://loops.so/pricing), and where Loops is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Loops** |
+|---|---|---|
+| Pricing basis | Emails sent | Contacts stored |
+| Free tier | 3,000 emails / mo, 100 / day | 1,000 contacts, 4,000 sends / mo |
+| Entry paid plan | **$10** / mo (50,000 emails) | $49 / mo |
+| At 100,000 | **$20** / mo (100,000 emails) | $399 / mo (100,000 contacts) |
+| Extra volume | $0.50 per 1,000 emails | Next contact tier |
+| Transactional REST API | Yes | Limited |
+| SMTP relay | Yes | No |
+| Lifecycle automations | Yes | Yes (core focus) |
+| Broadcasts | Yes | Yes |
+| Inbound email / agent inbox | Yes | No |
+| Sending engine | Own MTA (KumoMTA) | Third-party infrastructure |
+| Open source / self-host | Yes (Apache 2.0) | No |
+
+Reloop's prices are on [reloop.sh/pricing](/pricing). Both change; check before you commit.
+
+---
+
+## Pricing: contacts vs emails
+
+This is the decision for most teams, so it's worth getting right.
+
+**Loops charges for your list.** Every contact you store counts, whether they opened an email last week or haven't logged in for a year. Your bill grows with signups, not with how much you send.
+
+**Reloop charges for sends.** Store as many contacts as you like. You pay for the emails that go out, and nothing at all for the software if you self-host.
+
+Here's what that means for a product with **100,000 contacts**, depending on how often you email them:
+
+| Emails per contact per month | Emails sent | Reloop | Loops |
+|---|---|---|---|
+| 1 (monthly newsletter) | 100,000 | $20 | $399 |
+| 2 | 200,000 | $20 + $50 overage = **$70** | $399 |
+| 4 (weekly) | 400,000 | $20 + $150 overage = **$170** | $399 |
+
+Reloop's Growth plan includes 100,000 emails for $20. Each extra 1,000 costs $0.50.
+
+At the small end, the free tiers favor different shapes. Loops gives you 1,000 contacts and 4,000 sends a month. Reloop gives you 3,000 emails a month with a 100-a-day cap and no limit on contacts. A side project with a large, quiet waitlist fits Reloop's free tier better; a tiny list you email often fits Loops'.
+
+<Callout type="tip">
+  Per-contact pricing quietly punishes growth. A launch that brings in 20,000 signups raises your Loops bill even if you never email most of them. Before you choose, model next year's list size, not today's.
+</Callout>
+
+---
+
+## Automations and lifecycle email
+
+Lifecycle email is Loops' core focus, and it shows. Building onboarding flows is pleasant and the product is designed around that one job.
+
+Reloop's automations cover the same ground: an **event trigger**, then **delays**, **conditions** and **email steps**. Your app tracks an event, and the contact enters every automation that event triggers:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { automationError } = await reloop.automations.start({
+  event: "user.signed_up",
+  email: user.email,
+  firstName: user.name,
+  properties: { plan: user.plan },
+});
+if (automationError) console.error(automationError);
+```
+
+Passing `email` creates the contact if it doesn't exist yet. Conditions can read event properties (for example `trigger.plan`), so trial and paid users can get different welcome emails. Our [welcome sequence guide](/blog/welcome-email-sequences-that-convert) builds a full four-email onboarding flow this way.
+
+Around that, Reloop has contacts with custom properties, groups, subscription channels so people can opt out of one kind of mail without losing all of it, and scheduled broadcast campaigns.
+
+| | Reloop | Loops |
+|---|---|---|
+| Event-triggered automations | Yes | Yes |
+| Delays and conditions | Yes | Yes |
+| Broadcasts / newsletters | Yes | Yes |
+| Template editing | HTML, React Email, stored templates with `{{{variables}}}` | HTML / visual editor |
+
+If your marketing team wants to build emails visually without touching code, that's a point for Loops.
+
+---
+
+## Transactional email: one tool or two
+
+Password resets, receipts, magic links and invoices need to arrive in seconds, every time. They're also where developers spend most of their integration time.
+
+Loops' transactional support is limited and it has no SMTP relay, so many teams that use Loops for lifecycle mail add a second vendor (often Resend or Postmark) for transactional sends. That means two bills, two sets of DNS records, two dashboards and two suppression lists that can disagree.
+
+Reloop handles both in one place:
+
+```typescript
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: user.email,
+  subject: "Reset your password",
+  html: `<p><a href="${resetUrl}">Reset your password</a></p>`,
+});
+```
+
+- **REST API** with SDKs for Node, Python, Go, PHP, Ruby, Rust, Java, .NET and Elixir.
+- **SMTP relay** at `smtp.reloop.sh` for frameworks, CMSs and tools that only speak SMTP.
+- **Signed webhooks** for delivered, bounced and complained events, verified with HMAC-SHA256 in the `Reloop-Signature` header.
+- **One sender reputation and one suppression list** for transactional and marketing mail. A user who hard-bounces on a receipt won't get your next newsletter.
+
+---
+
+## Receiving email and agent inboxes
+
+Loops is outbound only.
+
+Reloop receives mail into **mailboxes**. Messages are stored, threaded and spam-scored, and readable through the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call.
+
+That matters for reply handling ("just reply to this email"), support addresses, and AI agents that need their own address to read and answer mail. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Deliverability and data ownership
+
+Reloop runs its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates spike. Loops sends through third-party email infrastructure. Both verify your domain and sign webhooks.
+
+The bigger difference is where your data lives:
+
+- **Loops** is closed SaaS. You can export contacts as CSV.
+- **Reloop** is Apache 2.0. You can start on Reloop Cloud and later move to your own server with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup). Point the SDK's `baseUrl` at your instance and your code stays the same.
+
+Self-hosting means owning IP warm-up and uptime yourself, so most teams should start hosted. It's useful to have the option for data residency, security reviews and price protection.
+
+---
+
+## Where Loops is the better choice
+
+Being honest about it:
+
+- **Your list is small and you email it often.** Under 1,000 contacts, Loops' free tier allows 4,000 sends a month.
+- **Marketers own email, not engineers.** Loops is built around a visual, marketing-first workflow, and that focus makes it pleasant for non-developers.
+- **You already run transactional mail elsewhere** and only want a lifecycle tool on top.
+
+## Where Reloop is the better choice
+
+- **Your contact list is large or growing fast.** Paying per send instead of per contact is usually far cheaper: $20 vs $399 at 100,000.
+- **You want transactional and lifecycle mail in one product**, with one domain setup and one suppression list.
+- **You need SMTP**, inbound inboxes, or email for AI agents.
+- **You want open source** or the option to self-host.
+
+---
+
+## Switching from Loops to Reloop
+
+1. **Add your sending domain** in Reloop and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record rather than adding a second SPF record.
+2. **Export your contacts** from Loops as CSV and import them into Reloop. Map custom fields to contact properties and keep unsubscribed contacts unsubscribed.
+3. **Rebuild templates.** Paste in your HTML or React Email components and change placeholders to triple braces: `{{{first_name}}}`.
+4. **Recreate your loops as automations.** Create an event for each trigger (for example `user.signed_up`), then add the same delays, conditions and email steps.
+5. **Swap the tracking calls** in your app for `reloop.automations.start`, and send transactional mail with `reloop.mail.send`.
+6. **Run both in parallel** for a week or two, then remove Loops' DNS records.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why is Loops more expensive at scale?">
+    Loops prices by contacts stored, so 100,000 contacts cost $399 a month
+    however few emails you send. Reloop prices by emails sent: $20 covers
+    100,000 emails, and each extra 1,000 is $0.50.
+  </Accordion>
+
+  <Accordion title="Can Reloop replace both Loops and a transactional provider?">
+    Yes. Reloop sends transactional mail over a REST API and SMTP, and runs
+    event-triggered automations and broadcasts, all on one domain setup and
+    one suppression list.
+  </Accordion>
+
+  <Accordion title="Does Reloop have onboarding automations like Loops?">
+    Yes. Track an event like `user.signed_up` from your app and the contact
+    enters every automation it triggers, with delays, conditions and email
+    steps. See our [welcome sequence guide](/blog/welcome-email-sequences-that-convert).
+  </Accordion>
+
+  <Accordion title="Can I self-host Loops?">
+    No. Loops is a hosted service only. Reloop is Apache 2.0 and can run on
+    your own server with the same API.
+  </Accordion>
+
+  <Accordion title="Do inactive contacts cost money on Reloop?">
+    No. Reloop doesn't charge for stored contacts, only for emails sent.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, with no limit on contacts. Transactional email and lifecycle automations in one place."
+  href="/dashboard/signup"
+  label="Get started"
+/>
