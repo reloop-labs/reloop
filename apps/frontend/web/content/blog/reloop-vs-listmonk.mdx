@@ -1,0 +1,263 @@
+---
+title: "Reloop vs Listmonk (2026): Self-Hosted Newsletter and Email Platforms Compared"
+description: "Reloop vs Listmonk compared honestly: what each one is, sending infrastructure, newsletters vs transactional mail, automations, inboxes, resource use and licensing, plus how to switch or run them together."
+keywords:
+  - Reloop vs Listmonk
+  - Listmonk alternative
+  - self-hosted newsletter
+  - open source mailing list manager
+  - Listmonk SMTP
+  - self-hosted email platform
+publishedAt: 2026-10-25
+category: Comparison
+tags: [listmonk, comparison, open-source, self-hosting]
+readTime: 9 min read
+image: /blog/images/reloop-vs-listmonk.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-postal
+  - reloop-vs-mailchimp
+  - self-hosted-email-infrastructure
+---
+
+**Listmonk and Reloop are both open source and both self-hostable, but they sit at different layers.** Listmonk is a newsletter and mailing list manager: it stores subscribers, builds campaigns and hands each message to an SMTP server you provide. Reloop is the email infrastructure itself: **it runs its own MTA, sends transactional and campaign mail, runs event-triggered automations, and receives mail into inboxes.** That's why many teams don't pick one: they point Listmonk at Reloop's SMTP.
+
+We build Reloop, so weigh this accordingly. Every Listmonk fact below comes from [its GitHub repository](https://github.com/knadh/listmonk) and [documentation](https://listmonk.app/docs/), and where Listmonk is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Listmonk** |
+|---|---|---|
+| What it is | Email infrastructure: API, SMTP relay, campaigns, automations, inboxes | Newsletter and mailing list manager |
+| License | Apache 2.0 | AGPLv3 |
+| Hosted option | Yes (Reloop Cloud) | No, self-host only |
+| Sends mail itself | Yes, own MTA (KumoMTA) | No, needs an external SMTP server |
+| Stack | Bun services, Postgres, KumoMTA | Single Go binary + Postgres |
+| Transactional API | Yes | Yes (`POST /api/tx`, template-based) |
+| Campaigns / newsletters | Yes | Yes, its core strength |
+| Event-triggered automations | Yes | No drip sequences |
+| Inbound email / inboxes | Yes, with threads, API, MCP and IMAP | No |
+| Bounce handling | Built into the MTA | POP3 bounce mailbox or provider webhooks |
+| Segmentation | Groups, properties, channels | SQL expressions |
+
+---
+
+## Different layers of the stack
+
+The most useful way to understand the comparison is to look at what happens when you hit "send".
+
+**With Listmonk**, the app renders your campaign, queues it, and delivers every message over SMTP to a provider you configure: Amazon SES, Postmark, your own Postfix, or anything else. Listmonk's homepage lists "multi-SMTP e-mail queues" and "throughput and sliding window rate limiting", so you can spread sends across several relays and throttle them. But IP reputation, DKIM signing and the actual delivery to Gmail or Outlook belong to whoever runs that SMTP server.
+
+**With Reloop**, the same stack does both jobs. The API, campaigns and automations sit on top of a KumoMTA delivery pipeline with per-domain throttling and automatic pauses when bounce or complaint rates spike. If you self-host Reloop, you own that MTA. If you use Reloop Cloud, we run it.
+
+So "Reloop vs Listmonk" is partly "Reloop vs Listmonk plus SES". Keep that in mind when you compare cost and effort.
+
+---
+
+## Pricing and running costs
+
+Listmonk is free software with no hosted plan. Your costs are a small server for the app and Postgres, plus whatever your SMTP provider charges per email.
+
+Reloop is free to self-host as well, or you can use the hosted plans:
+
+| Monthly volume | Reloop Cloud |
+|---|---|
+| 3,000 (100 / day) | $0 |
+| 50,000 | $10 |
+| 100,000 | $20, includes a dedicated IP |
+| Beyond 100,000 | $0.50 per 1,000 |
+
+See [reloop.sh/pricing](/pricing) for current plans.
+
+On resources, Listmonk is famously light. Its homepage describes a "single binary application with nominal CPU and memory footprint" and cites a 7+ million email campaign with a peak RAM use of 57 MB. Reloop does more (an MTA, inbound mail, spam scoring, automations), so it needs more: the [self-hosting requirements](/docs/self-host/requirements) list 2 vCPUs and 4 GB of RAM as a minimum.
+
+---
+
+## Newsletters and campaigns
+
+This is Listmonk's home turf, and it's very good at it.
+
+- **Lists with single and double opt-in**, scaling to millions of subscribers.
+- **SQL segmentation.** You query subscribers with SQL expressions, which is extremely flexible if your team is comfortable with SQL.
+- **Editors.** A visual drag-and-drop builder, WYSIWYG, Markdown, HTML and plain text.
+- **Templates in Go's templating language**, with logic and 100+ functions.
+- **Built-in analytics** for campaign performance, bounces and top links.
+- **Media library** with S3-compatible storage, i18n, and OIDC single sign-on with roles.
+
+Reloop's campaigns cover the same ground in a different shape: contacts with custom properties, groups, subscription channels so people can opt out of one kind of mail without leaving everything, and scheduled broadcasts. Segmentation uses properties and groups rather than raw SQL.
+
+If your main job is a newsletter and you love SQL, Listmonk will feel at home.
+
+---
+
+## Transactional email
+
+Both can send one-off messages from your app, but they approach it differently.
+
+**Listmonk** has a transactional endpoint that renders a stored template for a recipient:
+
+```bash
+curl -u "api_user:token" -X POST https://listmonk.example.com/api/tx \
+  -H "Content-Type: application/json" \
+  -d '{
+    "subscriber_email": "user@example.com",
+    "template_id": 3,
+    "subscriber_mode": "fallback",
+    "data": { "order_id": "1234" }
+  }'
+```
+
+The template reads that data with `{{ .Tx.Data.order_id }}`. By default the recipient must already exist as a subscriber; `fallback` and `external` modes let you send to addresses that aren't in the database.
+
+**Reloop** treats transactional mail as the main path, with an SDK and raw HTML or stored templates:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <orders@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your order #1234",
+  html: "<p>Thanks for your order.</p>",
+});
+```
+
+On top of that you get per-message logs, delivery and bounce events, signed webhooks (`Reloop-Signature`, HMAC-SHA256), idempotency keys and scheduled sends. Stored templates use triple braces: `{{{order_id}}}`.
+
+---
+
+## Automations
+
+Listmonk is intentionally a newsletter tool and doesn't ship drip sequences or event-triggered workflows. Teams that need them usually glue Listmonk's transactional API to an external workflow tool such as n8n.
+
+Reloop has automations built in. You track an event from your app, and every active automation listening for it starts for that contact:
+
+```typescript
+const { automationError } = await reloop.automations.start({
+  event: "user.signed_up",
+  email: user.email,
+  firstName: user.name,
+  properties: { plan: user.plan },
+});
+```
+
+Automations support delays, conditions and email steps. Our [welcome sequence guide](/blog/welcome-email-sequences-that-convert) builds a four-email onboarding flow this way.
+
+---
+
+## Receiving email
+
+Listmonk is one-way. It sends mail and processes bounces, but it doesn't give you inboxes.
+
+Reloop receives mail on your domains into **mailboxes**: messages are stored, threaded, spam-scored with Rspamd, and available over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) and IMAP. You can reply in-thread with one call. That covers "reply to this email" flows, support inboxes, and [AI agents that read and answer email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Bounces and deliverability
+
+**Listmonk** processes bounces in two ways: by scanning a dedicated bounce mailbox over POP3, or by accepting webhooks. It understands webhooks from Amazon SES, Azure Communication Services, SendGrid, Postmark, Forward Email and Lettermint, plus a generic `/webhooks/bounce` endpoint. You then choose what happens at each threshold (none, blocklist or delete). Deliverability itself depends on your SMTP provider.
+
+**Reloop** handles bounces, complaints and suppression inside the MTA, so there's nothing to wire up. One suppression list covers transactional mail, campaigns and automations. Free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers help before you send.
+
+---
+
+## Licensing
+
+Listmonk is **AGPLv3**. You can self-host and modify it freely, but if you offer a modified version to users over a network, the AGPL requires you to share those changes.
+
+Reloop is **Apache 2.0**, a permissive license without that requirement. For most self-hosters neither license matters. It matters if you plan to embed or resell the software.
+
+---
+
+## Where Listmonk is the better choice
+
+- **You only need newsletters.** Listmonk does that one job extremely well, with a mature UI and editors.
+- **You want the smallest possible footprint.** A single Go binary and Postgres, running large campaigns in tens of megabytes of RAM.
+- **Your team thinks in SQL.** Segmenting with SQL expressions is hard to beat for flexibility.
+- **You already have a sending provider** you're happy with, such as SES at a contracted rate.
+
+## Where Reloop is the better choice
+
+- **You send transactional mail and campaigns from one product**, with one suppression list and one set of logs.
+- **You need automations** triggered by events in your app, without an external workflow tool.
+- **You need inbound mail**, reply handling or inboxes for AI agents.
+- **You don't want to run a separate SMTP provider.** Reloop includes the MTA, or you can use it hosted.
+
+---
+
+## Using them together
+
+You don't have to choose. Listmonk can send through Reloop like any SMTP server:
+
+1. **Verify your sending domain in Reloop.** Publish the DKIM record (`reloop._domainkey`) and merge `include:reloop.sh` into your SPF record.
+2. **Create an API key** in the Reloop dashboard (it starts with `rl_`).
+3. **In Listmonk, go to Settings → SMTP** and add a server:
+   - Host: `smtp.reloop.sh`
+   - Port: `587` with STARTTLS
+   - Username and password: your Reloop API key
+4. **Send a test campaign** to yourself and check the message in Reloop's logs.
+5. **Forward bounces.** Reloop isn't one of Listmonk's built-in bounce providers, so subscribe a small handler to Reloop's `email.bounced` and `email.complained` webhooks and post them to Listmonk's `/webhooks/bounce` endpoint.
+
+Listmonk keeps the newsletter UI your team knows, and Reloop handles delivery, transactional mail and inboxes.
+
+## Switching from Listmonk to Reloop
+
+If you'd rather run one system:
+
+1. **Export subscribers** from Listmonk with their attributes and list memberships.
+2. **Import them as contacts** in Reloop, mapping lists to groups or subscription channels and attributes to contact properties. Keep blocklisted and unsubscribed addresses suppressed.
+3. **Recreate templates.** Change Go template expressions like `{{ .Subscriber.FirstName }}` to triple-brace variables such as `{{{first_name}}}`.
+4. **Swap transactional calls** from `POST /api/tx` to `reloop.mail.send`.
+5. **Rebuild recurring flows** as Reloop automations triggered by events from your app.
+6. **Send a small campaign first**, watch bounce and complaint rates, then move the rest.
+
+Our [self-hosted email infrastructure guide](/blog/self-hosted-email-infrastructure) covers running Reloop on your own server.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Listmonk an alternative to Reloop?">
+    Partly. Listmonk replaces Reloop's newsletter and campaign features, but
+    not the sending infrastructure, automations or inboxes. It needs an
+    external SMTP server to deliver mail, which can be Reloop.
+  </Accordion>
+
+  <Accordion title="Can Listmonk send through Reloop?">
+    Yes. Add `smtp.reloop.sh` on port 587 (STARTTLS) as an SMTP server in
+    Listmonk's settings, with your Reloop API key as both username and
+    password.
+  </Accordion>
+
+  <Accordion title="Does Listmonk support drip campaigns or automations?">
+    Not built in. Listmonk focuses on lists and campaigns; teams that need
+    sequences usually connect its transactional API to an external workflow
+    tool. Reloop has event-triggered automations with delays and conditions.
+  </Accordion>
+
+  <Accordion title="Which is lighter to self-host?">
+    Listmonk. It's a single Go binary plus Postgres and runs comfortably on a
+    tiny server. Reloop includes an MTA, inbound mail and spam scoring, so its
+    documented minimum is 2 vCPUs and 4 GB of RAM.
+  </Accordion>
+
+  <Accordion title="What licenses do they use?">
+    Listmonk is AGPLv3. Reloop is Apache 2.0. Both are free to self-host.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="Send transactional mail, campaigns and automations from one open-source platform. 3,000 emails a month free, or self-host it."
+  href="/dashboard/signup"
+  label="Get started"
+/>

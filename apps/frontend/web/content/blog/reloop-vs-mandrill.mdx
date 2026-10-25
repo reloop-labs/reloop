@@ -1,0 +1,278 @@
+---
+title: "Reloop vs Mandrill (2026): A Mailchimp Transactional Alternative"
+description: "Reloop vs Mandrill (Mailchimp Transactional) for developers: block pricing and the required Mailchimp plan, API and templates, webhooks, inbound, dedicated IPs, and how to migrate."
+keywords:
+  - Reloop vs Mandrill
+  - Mandrill alternative
+  - Mailchimp Transactional alternative
+  - Mandrill pricing
+  - Mandrill replacement
+  - transactional email API
+publishedAt: 2026-10-25
+category: Comparison
+tags: [mandrill, mailchimp, comparison, pricing, transactional]
+readTime: 9 min read
+image: /blog/images/reloop-vs-mandrill.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-mailchimp
+  - reloop-vs-postmark
+  - best-transactional-email-apis-2026
+---
+
+**Mandrill, now sold as Mailchimp Transactional, is a solid sending API with one big catch: you can't buy it on its own.** It's an add-on to a paid Mailchimp Standard or Premium plan, billed in blocks of 25,000 emails. **Reloop is a standalone email API with a free tier, $10 for 50,000 emails, inboxes for replies, and open-source code you can self-host.**
+
+This post is for developers sending password resets, receipts and notifications from code. If you're comparing Mailchimp's marketing product, read [Reloop vs Mailchimp](/blog/reloop-vs-mailchimp) instead. We build Reloop, so weigh this accordingly. Mandrill's numbers below come from [Mailchimp's transactional pricing page](https://mailchimp.com/pricing/transactional-email/) and the [Mailchimp Transactional docs](https://mailchimp.com/developer/transactional/).
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **Mandrill (Mailchimp Transactional)** |
+|---|---|---|
+| Buy on its own | Yes | No: add-on to Mailchimp Standard or Premium |
+| Free tier | 3,000 / mo, 100 / day | Up to 500 trial sends to a verified domain |
+| Billing unit | Monthly plan + $0.50 per 1,000 over | Blocks of 25,000 emails |
+| 50,000 emails / mo | **$10** | $40 in blocks + Mailchimp plan |
+| 100,000 emails / mo | **$20** | $80 in blocks + Mailchimp plan |
+| Dedicated IP | Included on Growth ($20) | $29.95 / mo add-on |
+| Templates | `{{{variables}}}`, visual editor | Merge tags `*\|VAR\|*` or Handlebars |
+| Webhook signing | HMAC-SHA256, `Reloop-Signature` | HMAC-SHA1, `X-Mandrill-Signature` |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Routes posted to your webhook |
+| SMTP relay | Yes | Yes |
+| Open source / self-host | Yes (Apache 2.0) | No |
+
+---
+
+## Pricing: blocks plus a Mailchimp plan
+
+Mandrill's pricing has two parts.
+
+**1. Blocks of 25,000 emails.** From Mailchimp's pricing page:
+
+| Blocks per month | Emails | Price per block |
+|---|---|---|
+| 1–20 | Up to 500k | $20 |
+| 21–40 | 500k–1M | $18 |
+| 41–80 | 1M–2M | $16 |
+| 81–120 | 2M–3M | $14 |
+| 121–160 | 3M–4M | $12 |
+| 161+ | 4M+ | $10 |
+
+**2. A paid Mailchimp Marketing plan.** Transactional is "available as an add-on to Standard and Premium plans, or the legacy Monthly Plan". The Essentials plan isn't eligible, and there's no free entry point beyond up to 500 trial sends.
+
+Here's what that means at common volumes, before the cost of the Mailchimp plan itself:
+
+| Monthly volume | Reloop | Mandrill blocks only |
+|---|---|---|
+| 3,000 | $0 | $20 (1 block) |
+| 50,000 | $10 | $40 (2 blocks) |
+| 100,000 | $20 | $80 (4 blocks) |
+| 250,000 | $20 + $75 overage = $95 | $200 (10 blocks) |
+
+On top of the blocks you pay for a Mailchimp Standard or Premium plan, which is priced by your marketing contacts. If you only want to send transactional mail, you're paying for a marketing plan you may never use.
+
+At very high volume the gap narrows. Above 4 million emails a month, a block costs $10, or $0.40 per 1,000, and Mailchimp advertises discounts through sales. If you send millions a month and already pay for Mailchimp, the math is closer than these tables suggest.
+
+<Callout type="tip">
+  Blocks are bought in whole units of 25,000. A month with 26,000 emails needs two blocks. Reloop's overage is per 1,000, so you only pay for what you send.
+</Callout>
+
+---
+
+## Sending from code
+
+Both APIs take a JSON payload and send one message per call.
+
+**Mandrill**
+
+```typescript
+import mailchimpTx from "@mailchimp/mailchimp_transactional";
+
+const client = mailchimpTx(process.env.MANDRILL_API_KEY!);
+
+const response = await client.messages.send({
+  message: {
+    from_email: "hello@acme.com",
+    subject: "Reset your password",
+    html: "<p>Click the link to reset your password.</p>",
+    to: [{ email: "user@example.com", type: "to" }],
+  },
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Reset your password",
+  html: "<p>Click the link to reset your password.</p>",
+});
+```
+
+A few differences in shape:
+
+| | Reloop | Mandrill |
+|---|---|---|
+| Payload | Flat: `from`, `to`, `subject`, `html` | Nested under `message`, with `to` as `{ email, type }` objects |
+| Errors | Returned as a value with `message`, `why` and `fix` | Thrown by the client |
+| Stored templates | `template: { id, variables }` in the same call | Separate `messages/send-template` endpoint |
+| SMTP host | `smtp.reloop.sh` | `smtp.mandrillapp.com` |
+| SMTP password | Your API key | Your API key |
+
+---
+
+## Templates: merge tags and Handlebars
+
+Mandrill supports two merge languages, chosen in your sending defaults or per message with `merge_language`:
+
+- **Mailchimp merge tags:** `*|FNAME|*`
+- **Handlebars:** `{{fname}}` (escaped) and `{{{fname}}}` (raw HTML)
+
+Values go in `global_merge_vars` (one value for everyone) or `merge_vars` (per recipient).
+
+Reloop templates substitute `{{{variable}}}` placeholders, with default values, a visual editor and versioning. They don't run logic. **This is a real point for Mandrill:** with Handlebars you can write conditionals and loops inside the template. With Reloop, you resolve those in your code and pass the result as a variable.
+
+```typescript
+await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: user.email,
+  subject: "Reset your password",
+  template: {
+    id: "tmpl_password_reset",
+    variables: { name: user.name, reset_url: resetUrl },
+  },
+});
+```
+
+---
+
+## Webhooks
+
+Both send delivery events to your endpoint and sign them, but differently:
+
+| | Reloop | Mandrill |
+|---|---|---|
+| Signature header | `Reloop-Signature` | `X-Mandrill-Signature` |
+| Algorithm | HMAC-SHA256 | HMAC-SHA1, Base64 encoded |
+| Signed content | Request body | Webhook URL plus sorted POST parameters |
+| Payload | One JSON event per request | `mandrill_events` array, batched (up to 1,000 per request) |
+| Event names | `email.delivered`, `email.bounced`, `email.complained`, ... | `send`, `hard_bounce`, `soft_bounce`, `open`, `click`, `spam`, `unsub`, ... |
+
+Mandrill's batching is efficient at volume, but your handler must loop over the array and verify a signature built from form parameters rather than a raw JSON body.
+
+---
+
+## Receiving email
+
+**Mandrill** handles inbound on a dedicated domain or subdomain. You point its MX records at Mailchimp, add routes with wildcard patterns like `*@reply.acme.com`, and Mailchimp posts each parsed message to your webhook. Storage, threading and replies are up to you.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded and spam-scored with Rspamd, and you can read them over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, and reply in-thread with one call. That's the difference between "here's a webhook" and "here's an inbox", and it matters if you're building a support inbox or an [AI agent that answers email](/blog/build-ai-agent-sends-emails).
+
+---
+
+## Deliverability and dedicated IPs
+
+Mandrill has sent transactional mail for over a decade and handles the fundamentals well: SPF and DKIM, bounce and complaint handling, a rejection list, and open and click tracking.
+
+The differences are cost and control:
+
+- **Dedicated IP.** Mandrill charges $29.95 a month. Reloop includes one on Growth ($20/mo, 100k emails).
+- **Sending path.** Reloop runs its own MTA (KumoMTA) with per-domain throttling and automatic pauses when bounce or complaint rates spike. See [how bounce processing works](/blog/email-bounce-processing-automation).
+- **Checks before you send.** Reloop ships free [domain reputation](/tools/domain-reputation-checker), [blocklist](/tools/blocklist-checker) and [auth](/tools/auth-checker) checkers.
+
+---
+
+## Self-hosting and lock-in
+
+Mandrill is hosted only, and tied to your Mailchimp account. Reloop is Apache 2.0: start on Reloop Cloud, and if you later need data residency or full control, run it on your own server with the [one-command installer](/self-host). Point the SDK's `baseUrl` at your instance and nothing else in your code changes.
+
+---
+
+## Where Mandrill is the better choice
+
+- **Your marketing team already pays for Mailchimp Standard or Premium.** The plan cost is sunk, and keeping transactional mail in the same account is convenient.
+- **You send millions of emails a month.** Block prices fall to $10 per 25,000, and sales discounts are available.
+- **Your templates rely on Handlebars logic** and you don't want to move it into code.
+
+## Where Reloop is the better choice
+
+- **You only need transactional email** and don't want to pay for a marketing plan to get it.
+- **You send under a few hundred thousand emails a month,** where Reloop costs a fraction of Mandrill's blocks.
+- **You need replies as real inboxes,** for support or AI agents.
+- **You want transactional mail, campaigns and automations** in one product with one suppression list.
+- **You need open source or self-hosting.**
+
+---
+
+## Switching from Mandrill to Reloop
+
+1. **Add your sending domain in Reloop.** Publish the DKIM record (`reloop._domainkey`) and merge `include:reloop.sh` into your existing SPF record. Don't create a second SPF record.
+2. **Swap the client.** Replace `messages.send({ message })` with `reloop.mail.send`. Flatten the payload: `from_email` becomes `from`, and the `to` array of `{ email, type }` becomes a string or array of addresses (`cc` and `bcc` are separate fields).
+3. **Move templates.** Map the placeholders:
+
+   | Mandrill | Reloop |
+   |---|---|
+   | `*\|FNAME\|*` | `{{{fname}}}` |
+   | `{{fname}}` (Handlebars) | `{{{fname}}}` |
+   | `{{#if}}`, `{{#each}}` | Resolve in code, pass the result as a variable |
+   | `global_merge_vars` / `merge_vars` | `template.variables`, one send per recipient |
+
+4. **Switch SMTP** if you use it: host `smtp.reloop.sh`, port 587 or 465, API key as username and password.
+5. **Import suppressions.** Export your Mandrill rejection list and import it into Reloop so you don't re-mail bounced or complaining addresses.
+6. **Rewrite webhook handlers** for single JSON events signed with `Reloop-Signature`.
+7. **Move inbound** if you use it: create a Reloop mailbox and point the inbound subdomain's MX records at Reloop.
+8. **Ramp traffic** from 10% to 100% over a week or two, then cancel the Mandrill add-on.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) shows a traffic-split flag and a suppression import script you can reuse.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I use Mandrill without a paid Mailchimp plan?">
+    No. Mailchimp Transactional is an add-on to the Standard or Premium
+    Marketing plans (or the legacy Monthly Plan). The Essentials plan isn't
+    eligible. New users get up to 500 trial sends to a verified domain.
+  </Accordion>
+
+  <Accordion title="How much does Mandrill cost for 100,000 emails?">
+    Four blocks of 25,000 at $20 each, so $80 a month, plus your Mailchimp
+    Standard or Premium plan. On Reloop, 100,000 emails a month is $20 on
+    Growth, with a dedicated IP included.
+  </Accordion>
+
+  <Accordion title="Do my Mandrill Handlebars templates work in Reloop?">
+    Simple variables do, once you switch them to triple braces:
+    `{{{first_name}}}`. Conditionals and loops don't; resolve them in your
+    code and pass the result in as a variable.
+  </Accordion>
+
+  <Accordion title="Is there a free Mandrill plan?">
+    There's no ongoing free tier, only up to 500 trial sends. Reloop's free
+    tier is 3,000 emails a month with a 100-a-day cap.
+  </Accordion>
+
+  <Accordion title="Does Reloop support SMTP like Mandrill?">
+    Yes. Use `smtp.reloop.sh` on port 587 or 465, with your API key as both
+    the username and password.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Send transactional email without a marketing plan"
+  description="3,000 emails a month free, 50,000 for $10. One API for transactional mail, inboxes, campaigns and automations."
+  href="/dashboard/signup"
+  label="Get started"
+/>

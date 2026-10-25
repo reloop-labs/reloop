@@ -1,0 +1,280 @@
+---
+title: "Reloop vs useSend (2026): Open-Source Resend Alternatives Compared"
+description: "Reloop vs useSend compared honestly: license, hosted pricing at 3k to 1M emails, self-hosting with and without AWS SES, API and webhooks, inbound mail, and how to switch."
+keywords:
+  - Reloop vs useSend
+  - useSend alternative
+  - Unsend alternative
+  - open source Resend alternative
+  - self-hosted email API
+  - useSend pricing
+publishedAt: 2026-10-25
+category: Comparison
+tags: [usesend, comparison, open-source, self-hosting]
+readTime: 9 min read
+image: /blog/images/reloop-vs-usesend.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-resend
+  - reloop-vs-plunk
+  - self-hosted-email-infrastructure
+---
+
+**Reloop and useSend are both open-source alternatives to Resend.** Both give you a clean REST API, SMTP, webhooks, contacts and marketing campaigns, plus a hosted cloud if you don't want to run anything. The big difference is underneath: **useSend is a layer on top of Amazon SES, while Reloop runs its own mail server, so self-hosting Reloop needs no AWS account.** Reloop also receives mail into real inboxes your agents can reply from, which useSend lists as not yet built.
+
+We build Reloop, so weigh this accordingly. useSend (formerly Unsend) is a well-made project we respect, and where it's the better pick, we say so. Every useSend fact below comes from its [website](https://usesend.com), [docs](https://docs.usesend.com) or [GitHub repo](https://github.com/usesend/useSend).
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **useSend** |
+|---|---|---|
+| License | Apache 2.0 | AGPL-3.0 |
+| Free tier (hosted) | 3,000 / mo, 100 / day | 3,000 / mo, 100 / day |
+| Paid pricing | Plans: $10 for 50k, $20 for 100k | Usage: $0.40 per 1k transactional, $1.00 per 1k marketing, $10 minimum |
+| Sending path | Own MTA (KumoMTA) | Amazon SES |
+| Self-host needs AWS | No | Yes (SES and SNS) |
+| Dedicated IP | Included on Growth ($20) | Not listed |
+| REST API and SMTP | Yes | Yes |
+| Webhooks | Yes, HMAC signed | Yes, HMAC signed |
+| Contacts and campaigns | Yes | Yes |
+| Event-triggered automations | Yes | Not listed |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | On the roadmap |
+| Status | Generally available | Beta, per the README |
+
+useSend's prices are from the pricing section on [usesend.com](https://usesend.com). Reloop's are on [reloop.sh/pricing](/pricing). Both change; check before you commit.
+
+---
+
+## Pricing at real volumes
+
+The free tiers are identical: 3,000 emails a month, capped at 100 a day.
+
+After that, the models differ. **Reloop sells plans** with a fixed amount of email. **useSend charges per email**, with a $10 monthly minimum in usage credits, and transactional mail ($0.0004 each) costs less than marketing mail ($0.001 each).
+
+For transactional mail only:
+
+| Monthly volume | Reloop | useSend |
+|---|---|---|
+| 3,000 | $0 | $0 |
+| 25,000 | $10 | $10 |
+| 50,000 | **$10** | $20 |
+| 100,000 | **$20** | $40 |
+| 250,000 | $20 + $75 overage = $95 | $100 |
+| 1,000,000 | $20 + $450 overage = $470 | **$400** |
+
+The useSend column is our math from its published per-email rates. The shape is clear, though:
+
+- **Below about 250k a month, Reloop is cheaper.** Its plans include a lot of email for a flat fee.
+- **Around 250k, they're roughly even.**
+- **Well above that, useSend's $0.40 per 1,000 beats Reloop's $0.50 overage.** If you send millions of transactional emails, useSend's hosted pricing wins.
+
+Marketing mail flips this further in Reloop's favor: useSend charges $1.00 per 1,000 for it, while Reloop counts every email the same.
+
+<Callout type="tip">
+  Self-hosting changes the math for both. With Reloop you pay only for the server. With useSend you pay for the server plus Amazon SES, which is $0.10 per 1,000 emails.
+</Callout>
+
+---
+
+## Developer experience
+
+Both APIs are shaped after Resend's, so the code looks almost the same.
+
+**useSend**
+
+```typescript
+import { UseSend } from "usesend-js";
+
+const usesend = new UseSend(process.env.USESEND_API_KEY!);
+
+await usesend.emails.send({
+  from: "Acme <hello@acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+The details:
+
+| | Reloop | useSend |
+|---|---|---|
+| Endpoint | `POST /api/mail/v1/send` | `POST /api/v1/emails` |
+| Field style | `reply_to`, `scheduled_at` (snake_case) | `replyTo`, `scheduledAt` (camelCase) |
+| Idempotent retries | `Idempotency-Key` header | `Idempotency-Key` header |
+| Scheduling | Yes | Yes, plus update and cancel endpoints |
+| Stored templates | Yes, `{{{variables}}}` | Yes, by `templateId` with `variables` |
+| Error format | `message`, `why` and `fix` | Not documented |
+| Official SDKs | Node, Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | Node, Python, Go |
+
+useSend has two nice touches worth calling out: endpoints to **update or cancel a scheduled email**, and a visual **email editor** for campaigns, built on Tiptap and jsx-email.
+
+Reloop's strong opinion is its error shape. A failed send tells you **why** it failed and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+### Webhooks
+
+Both sign webhooks with HMAC-SHA256.
+
+- **useSend** sends `X-UseSend-Signature` and `X-UseSend-Timestamp`, retries up to six times with exponential backoff, and turns a webhook off after 30 failures in a row. Events cover emails, contacts and domains. [Docs](https://docs.usesend.com/guides/webhooks).
+- **Reloop** sends a `Reloop-Signature` header, with events like `email.delivered`, `email.bounced`, `email.complained` and `email.received`.
+
+---
+
+## Self-hosting: the real difference
+
+This is where the two projects split.
+
+**useSend is a layer on top of Amazon SES.** Its [self-hosting guide](https://docs.usesend.com/self-hosting/overview) asks you to:
+
+1. Run PostgreSQL and Redis (docker-compose does it for you).
+2. Create an AWS IAM user with SES and SNS access.
+3. Get your SES account **out of the sandbox**, which needs an AWS review.
+4. Expose a public callback URL so SNS can report delivery events back.
+5. Set up GitHub OAuth for logins.
+
+That's a good trade if you already live in AWS. SES is cheap, Amazon handles IP reputation, and you skip running a mail server.
+
+**Reloop ships its own mail server** (KumoMTA). You need a server with [2 vCPUs and 4 GB of RAM](/docs/self-host/requirements) at minimum, port 25 open, and DNS. There's no AWS account, no sandbox review, and no per-email fee to anyone. Install it with [one command](/self-host) or on [Coolify](/blog/reloop-coolify-setup).
+
+The flip side: **with Reloop you own your IP reputation.** Warming new IPs and watching blocklists is your job. Our free [blocklist checker](/tools/blocklist-checker) and [domain reputation checker](/tools/domain-reputation-checker) help, and the [self-hosting guide](/blog/self-hosted-email-infrastructure) covers what that really involves.
+
+| | Reloop | useSend |
+|---|---|---|
+| Sends through | Its own MTA | Amazon SES |
+| AWS account needed | No | Yes |
+| Approval before sending | No | SES sandbox exit |
+| Per-email cost when self-hosted | None | SES fee |
+| IP reputation | Yours to manage | Managed by AWS |
+| One-click deploy | Installer script, Coolify | Docker, Railway |
+
+---
+
+## Licensing
+
+Both are open source, under different licenses.
+
+- **useSend is AGPL-3.0.** You can self-host freely, but if you modify it and offer it to others over a network, you must publish your changes.
+- **Reloop is Apache 2.0.** It's a permissive license: you can modify it, embed it in your product, and keep your changes private.
+
+For most teams that just run it internally, both are fine. If you plan to build a product on top, Apache 2.0 gives you more room.
+
+---
+
+## Receiving email and agent inboxes
+
+**useSend** lists inbound email as a roadmap item in its README, so today it's a sending platform.
+
+**Reloop** receives mail into **mailboxes**. Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call.
+
+That matters if you're building:
+
+- **AI agents that handle email.** Give an agent its own address and let it read and reply. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+- **Support or shared inboxes** where humans and agents work the same threads.
+- **Reply handling** for transactional mail.
+
+---
+
+## Marketing and automations
+
+Both handle more than transactional mail.
+
+- **useSend** has contact books, campaigns with scheduling, double opt-in, and the visual editor. It manages unsubscribes for you.
+- **Reloop** has contacts with custom properties, groups, subscription channels, scheduled campaigns, and **event-triggered automations**. Call `reloop.automations.start` when a user signs up and a sequence of delays, conditions and emails runs. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert).
+
+---
+
+## Where useSend is the better choice
+
+- **You send millions of transactional emails a month** on the hosted plan. Its $0.40 per 1,000 beats our overage.
+- **You're already deep in AWS** and want SES's managed reputation without running a mail server.
+- **You want a visual editor** for marketing emails out of the box.
+- **You're happy with AGPL** and like how small and focused the codebase is.
+
+## Where Reloop is the better choice
+
+- **You send under about 250k emails a month.** Plans are cheaper.
+- **You want to self-host without AWS**, with no sandbox review and no per-email fee.
+- **You need inbound mail as real inboxes**, especially for AI agents.
+- **You need event-triggered automations** or a dedicated IP on a $20 plan.
+- **You want a permissive license** to build on.
+
+---
+
+## Switching from useSend to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your SPF record; don't add a second SPF record. Remove the SES records once you've fully moved.
+2. **Swap the client.** Replace `usesend.emails.send` with `reloop.mail.send`, and rename `replyTo` → `reply_to` and `scheduledAt` → `scheduled_at`.
+3. **Move templates.** Recreate them in Reloop with triple-brace placeholders: `{{{first_name}}}`.
+4. **Export contacts** and import them into Reloop, keeping unsubscribed contacts marked as unsubscribed.
+5. **Point webhooks** at a handler that verifies `Reloop-Signature`.
+6. **Ramp traffic** from 10% to 100% over a week or two.
+
+If you use SMTP instead, change the host to `smtp.reloop.sh` and use your Reloop API key as both username and password. Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the traffic split in more detail.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is useSend the same as Unsend?">
+    Yes. useSend is the current name of the project formerly called Unsend.
+    The code lives at github.com/usesend/useSend.
+  </Accordion>
+
+  <Accordion title="Do I need AWS to self-host Reloop?">
+    No. Reloop runs its own mail server, so you need a server and DNS, not an
+    AWS account. useSend's self-hosted setup requires Amazon SES and SNS.
+  </Accordion>
+
+  <Accordion title="Which is cheaper?">
+    On the hosted plans, Reloop is cheaper below about 250k emails a month and
+    useSend is cheaper well above that for transactional mail. Self-hosted,
+    Reloop has no per-email cost, while useSend passes through SES fees.
+  </Accordion>
+
+  <Accordion title="Can useSend receive email?">
+    Not yet. Inbound email is listed on its roadmap. Reloop receives mail into
+    threaded mailboxes you can read over the API, MCP or IMAP.
+  </Accordion>
+
+  <Accordion title="Which license is more permissive?">
+    Reloop's Apache 2.0. useSend's AGPL-3.0 requires you to publish changes
+    if you offer a modified version to others over a network.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, or self-host it without an AWS account."
+  href="/dashboard/signup"
+  label="Get started"
+/>

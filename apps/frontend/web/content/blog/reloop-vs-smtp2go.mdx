@@ -1,0 +1,299 @@
+---
+title: "Reloop vs SMTP2GO (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs SMTP2GO compared honestly: SMTP relay setup for WordPress, apps and devices, pricing at 3k to 250k emails a month, API, webhooks, dedicated IPs, inbound and self-hosting, plus how to switch."
+keywords:
+  - Reloop vs SMTP2GO
+  - SMTP2GO alternative
+  - SMTP2GO pricing
+  - SMTP relay service
+  - WordPress SMTP relay
+  - open source SMTP relay
+publishedAt: 2026-10-25
+category: Comparison
+tags: [smtp2go, smtp, comparison, pricing]
+readTime: 9 min read
+image: /blog/images/reloop-vs-smtp2go.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-mailgun
+  - reloop-vs-sendgrid
+  - best-transactional-email-apis-2026
+---
+
+**SMTP2GO and Reloop both get mail out of apps that can only speak SMTP.** Point WordPress, a NAS, a printer, a CRM or a legacy app at a relay host, give it credentials, and your mail lands with proper SPF and DKIM instead of in spam. The differences are in price and in what comes with the relay: **Reloop costs $20 for 100,000 emails where SMTP2GO costs $75, includes a dedicated IP at that price, and adds a modern API, inboxes, campaigns and automations. It's also open source, so you can run it yourself.** SMTP2GO is the older, more focused relay, with more ports for locked-down networks and phone support on every plan.
+
+We build Reloop, so weigh this accordingly. Every SMTP2GO price below is from [smtp2go.com/pricing](https://www.smtp2go.com/pricing/), and where SMTP2GO is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **SMTP2GO** |
+|---|---|---|
+| Free tier | 3,000 / mo, 100 / day | 1,000 / mo |
+| 10,000 emails / mo | $10 | $10 |
+| 100,000 emails / mo | **$20** | $75 |
+| Overage per 1,000 | **$0.50** | $1 (Starter), $0.85 (Professional) |
+| Dedicated IP | Included on Growth ($20) | Included on Professional ($75) |
+| SMTP relay | Yes, port 587 (STARTTLS) | Yes, many ports incl. 2525, 8025, 80, 465, 443 |
+| HTTP API | Yes, with official SDKs | Yes |
+| Webhooks | Yes, signed (HMAC) | Yes |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Not a focus |
+| Campaigns and automations | Yes | No |
+| SMS | No | Yes |
+| Open source / self-host | Yes (Apache 2.0) | No |
+
+Prices change; check both pricing pages before you commit.
+
+---
+
+## Pricing at real volumes
+
+SMTP2GO's paid plans are Starter at $10/month for 10,000 emails ($1 per extra 1,000) and Professional at $75/month for 100,000 emails ($0.85 per extra 1,000), with custom Premier plans above 3 million a month. Reloop's are Pro at $10 for 50,000 and Growth at $20 for 100,000, with $0.50 per extra 1,000.
+
+| Monthly volume | Reloop | SMTP2GO | Difference per year |
+|---|---|---|---|
+| 1,000 | $0 | $0 | $0 |
+| 3,000 | $0 | $10 (Starter) | $120 |
+| 10,000 | $10 | $10 | $0 |
+| 50,000 | $10 | $50 (Starter + 40k overage) | $480 |
+| 100,000 | $20 | $75 (Professional) | **$660** |
+| 250,000 | $20 + $75 overage = $95 | $75 + $127.50 overage = $202.50 | $1,290 |
+
+The 50k and 250k SMTP2GO figures are worked out from the published overage rates, not listed tiers. At 50k you could also jump to Professional for $75; Starter plus overage is the cheaper of the two.
+
+Two things to note:
+
+- **Free tiers differ in shape.** SMTP2GO gives 1,000 a month. Reloop gives 3,000 a month but caps each day at 100, so a burst of 500 password resets in one day won't fit on free.
+- **The dedicated IP costs much less.** Both include one on the 100k plan, but that plan is $20 on Reloop and $75 on SMTP2GO.
+
+If you self-host Reloop, there's no per-email fee at all. You pay for the server. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that involves.
+
+---
+
+## SMTP relay setup
+
+This is the main reason people pick either one, so here are the real settings side by side.
+
+| Setting | Reloop | SMTP2GO |
+|---|---|---|
+| Host | `smtp.reloop.sh` | `mail.smtp2go.com` |
+| Port | `587` with STARTTLS | 2525 (recommended), 25, 587, 8025, 80; SSL on 465, 8465, 443 |
+| Username | Your API key (`rl_...`) | An SMTP user you create |
+| Password | The same API key | That SMTP user's password |
+
+SMTP2GO's long port list is a genuine strength. Some ISPs and hotel or office networks block 25 and 587, and being able to fall back to 2525, 8025 or even 80 gets devices sending from almost anywhere ([SMTP2GO setup](https://smtp2go.com/setup)).
+
+Reloop keeps it simple: one port, STARTTLS, and the same API key you use for the REST API. Don't set "SSL" or "secure: true" (that means implicit TLS on 465); choose TLS or STARTTLS on 587.
+
+**WordPress** with any SMTP plugin (WP Mail SMTP, FluentSMTP, Post SMTP):
+
+```text
+SMTP Host:       smtp.reloop.sh
+SMTP Port:       587
+Encryption:      TLS / STARTTLS
+Authentication:  On
+Username:        rl_your_api_key
+Password:        rl_your_api_key
+From Email:      wordpress@mail.yoursite.com   (a verified Reloop domain)
+```
+
+Full walkthrough: [WordPress integration](/docs/integrations/wordpress).
+
+**Node.js with Nodemailer:**
+
+```typescript
+import nodemailer from "nodemailer";
+
+const transport = nodemailer.createTransport({
+  host: "smtp.reloop.sh",
+  port: 587,
+  secure: false, // STARTTLS is negotiated after connecting
+  auth: {
+    user: process.env.RELOOP_API_KEY,
+    pass: process.env.RELOOP_API_KEY,
+  },
+});
+
+await transport.sendMail({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Your invoice",
+  html: "<p>Thanks for your order.</p>",
+});
+```
+
+Switching an SMTP app between the two is a settings change: host, port and credentials. No code changes.
+
+---
+
+## The HTTP API
+
+Both have one. If you're writing new code, an API is usually better than SMTP: fewer round trips, clearer errors and easy idempotent retries.
+
+**SMTP2GO** ([docs](https://developers.smtp2go.com/docs/send-an-email))
+
+```bash
+curl -X POST https://api.smtp2go.com/v3/email/send \
+  -H "X-Smtp2go-Api-Key: api-xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sender": "hello@acme.com",
+    "to": ["user@example.com"],
+    "subject": "Welcome",
+    "html_body": "<p>Thanks for signing up.</p>"
+  }'
+```
+
+**Reloop**
+
+```bash
+curl -X POST https://reloop.sh/api/mail/v1/send \
+  -H "x-api-key: rl_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "Acme <hello@mail.acme.com>",
+    "to": "user@example.com",
+    "subject": "Welcome",
+    "html": "<p>Thanks for signing up.</p>"
+  }'
+```
+
+Or with the SDK:
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+| | Reloop | SMTP2GO |
+|---|---|---|
+| Auth header | `x-api-key` | `X-Smtp2go-Api-Key` |
+| Stored templates | Yes, `{{{variable}}}` | Yes, `{{ variable }}` ([docs](https://developers.smtp2go.com/docs/email-templates)) |
+| Error format | `message`, `why` and `fix` | Per-recipient `succeeded` / `failed` counts |
+| Official SDKs | Node, Python, Go, PHP, Ruby, Rust, Java, .NET, Elixir | See SMTP2GO docs |
+
+When a Reloop send fails, the error tells you why and how to fix it:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Webhooks and reporting
+
+SMTP2GO sends webhooks for `processed`, `delivered`, `bounce`, `spam`, `reject`, `open`, `click` and `unsubscribe`, as JSON or form-encoded, with custom headers you choose ([webhooks docs](https://developers.smtp2go.com/docs/webhooks-overview)). Reports are kept for 30 days on every plan.
+
+Reloop sends `email.delivered`, `email.bounced`, `email.complained`, opens, clicks and more, signed with HMAC-SHA256 in the `Reloop-Signature` header so you can verify each request really came from us. Bounces and complaints automatically add the address to your suppression list.
+
+---
+
+## Beyond the relay
+
+This is where the products diverge. SMTP2GO is a sending service, and it also does SMS. Reloop is a broader email platform.
+
+- **Inboxes.** Reloop receives mail into mailboxes, threaded and spam-scored, readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP, and you can reply in-thread with one call. Useful for support addresses, reply handling and [AI agents that read and answer email](/blog/build-ai-agent-sends-emails).
+- **Contacts, campaigns and automations.** Send broadcasts to groups and run event-triggered sequences (welcome, trial ending, dunning) from the same account and the same suppression list. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert).
+- **Self-hosting.** Reloop is Apache 2.0. Run it on your own server with the [installer](/self-host) and point the SMTP host or SDK `baseUrl` at your instance.
+
+If all you'll ever do is relay mail from a website and a few devices, none of this matters much. If you'll grow into marketing email or inbound, it saves you a second tool.
+
+---
+
+## Deliverability
+
+Both handle the fundamentals: SPF and DKIM on your domain, bounce and complaint processing, suppression of bad addresses and a dedicated IP on the 100k plan.
+
+Reloop runs its own MTA (KumoMTA), with per-domain throttling and automatic pauses when bounce or complaint rates spike. Read [how bounce processing works](/blog/email-bounce-processing-automation). Before you send, our free [auth checker](/tools/auth-checker) and [blocklist checker](/tools/blocklist-checker) catch most setup problems.
+
+As always, your own DNS and list quality matter more than which provider you pick. Start with the [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide).
+
+---
+
+## Where SMTP2GO is the better choice
+
+- **Devices on restrictive networks.** If a printer, scanner or on-prem app can't reach port 587, SMTP2GO's alternate ports (2525, 8025, 80, 443) are a real advantage.
+- **You also need SMS** from the same provider and account.
+- **You want phone support.** SMTP2GO lists ticket, chat and phone support on its plans.
+- **Very low volume, no daily bursts.** If you send a few hundred emails a month but occasionally a few hundred in one day, SMTP2GO's free 1,000 with no daily cap fits better than our 100-a-day free cap.
+
+## Where Reloop is the better choice
+
+- **You send more than 10,000 emails a month.** Above that, Reloop is cheaper at every volume, and $55 a month less at 100k.
+- **You want a dedicated IP without paying $75 a month.**
+- **You'll grow into campaigns, automations or inbound** and want one tool with one suppression list.
+- **You need open source or self-hosting** for compliance or data residency.
+
+---
+
+## Switching from SMTP2GO to Reloop
+
+1. **Add your sending domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record. Don't add a second SPF record.
+2. **Create an API key** in the dashboard.
+3. **Update SMTP settings** in each app: host `smtp.reloop.sh`, port `587`, STARTTLS, and the API key as both username and password.
+4. **Move API calls**, if any: change the endpoint, the auth header, and `sender` / `html_body` / `text_body` to `from` / `html` / `text`.
+5. **Move templates.** Change `{{ first_name }}` placeholders to triple braces: `{{{first_name}}}`.
+6. **Point webhooks** at a handler for Reloop events and verify the `Reloop-Signature` header.
+7. **Import your suppressions.** Export bounced and unsubscribed addresses from SMTP2GO and import them, so you don't re-mail people who opted out.
+8. **Watch the first week** of delivery logs, then remove SMTP2GO's DNS records.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the same steps in more detail, including a traffic-split flag for API senders.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I use Reloop as an SMTP relay for WordPress?">
+    Yes. Install any SMTP plugin and set host `smtp.reloop.sh`, port `587`,
+    TLS/STARTTLS, and your Reloop API key as both the username and password.
+    The From address must be on a domain you've verified in Reloop.
+  </Accordion>
+
+  <Accordion title="Which ports does Reloop's SMTP relay support?">
+    Port 587 with STARTTLS. Implicit TLS on 465 isn't supported, so leave
+    "SSL" or `secure: true` off. If your network blocks 587, SMTP2GO's
+    alternate ports are an advantage; with Reloop, send over the HTTPS API instead.
+  </Accordion>
+
+  <Accordion title="Is Reloop cheaper than SMTP2GO?">
+    At 10,000 emails they're the same ($10). Above that Reloop is cheaper:
+    $10 vs about $50 at 50k, and $20 vs $75 at 100k. Below 3,000 a month
+    Reloop's free tier covers you if you stay under 100 a day.
+  </Accordion>
+
+  <Accordion title="Does SMTP2GO offer a dedicated IP?">
+    Yes, on the Professional plan ($75 a month for 100,000 emails) and above.
+    Reloop includes one on Growth ($20 a month for 100,000 emails).
+  </Accordion>
+
+  <Accordion title="Can I self-host Reloop as my own SMTP relay?">
+    Yes. Reloop is Apache 2.0 and includes the SMTP relay. Run it on your own
+    server and point your apps at your own SMTP host. You'll own IP
+    reputation and warm-up, so most teams start hosted.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier. SMTP relay and API with the same key, and a dedicated IP from $20 a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>

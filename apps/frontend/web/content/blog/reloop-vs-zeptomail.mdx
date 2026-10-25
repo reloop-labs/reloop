@@ -1,0 +1,266 @@
+---
+title: "Reloop vs ZeptoMail (2026): Pricing, Features and Which to Choose"
+description: "Reloop vs ZeptoMail (now Zoho CPaaS) compared honestly: pay-as-you-go credits vs monthly plans, transactional-only rules, inbound and agent inboxes, campaigns, self-hosting, and how to switch."
+keywords:
+  - Reloop vs ZeptoMail
+  - ZeptoMail alternative
+  - ZeptoMail pricing
+  - Zoho CPaaS email
+  - Zoho ZeptoMail alternative
+  - cheap transactional email API
+publishedAt: 2026-10-25
+category: Comparison
+tags: [zeptomail, zoho, comparison, pricing]
+readTime: 9 min read
+image: /blog/images/reloop-vs-zeptomail.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - reloop-vs-aws-ses
+  - reloop-vs-postmark
+  - best-transactional-email-apis-2026
+---
+
+**ZeptoMail is one of the cheapest ways to send transactional email, and it's very good at exactly that one job.** Zoho sells it on prepaid credits with no monthly fee, it only allows transactional mail, and it recently became part of **Zoho CPaaS** alongside SMS, WhatsApp and voice. **Reloop costs a little more at high volume, but it also receives mail into real inboxes, runs campaigns and automations, and is open source, so you can host it yourself.**
+
+We build Reloop, so weigh this accordingly. Where ZeptoMail is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **ZeptoMail (Zoho CPaaS)** |
+|---|---|---|
+| Pricing model | Monthly plans | Prepaid credits, no monthly fee |
+| Free tier | 3,000 / mo, 100 / day | First credit free (10,000 emails) |
+| 50,000 emails | **$10 / mo** | About $12.50 in credits |
+| 100,000 emails | $20 / mo | About $25 in credits |
+| Credits expire | n/a | After 6 months |
+| Marketing email | Yes (campaigns) | Not allowed |
+| Inbound email | Mailboxes with threads, API, MCP, IMAP | Not offered for receiving and storing mail |
+| Automations | Yes | No |
+| Dedicated IP | Included on Growth ($20) | Paid add-on (US, EU, IN) |
+| SMTP relay | Yes | Yes |
+| Open source / self-host | Yes (Apache 2.0) | No |
+
+ZeptoMail's model is on [Zoho's pricing page](https://www.zoho.com/zeptomail/pricing.html): one credit sends 10,000 emails, the first credit is free, and credits are valid for 6 months. The per-credit price is widely listed at **$2.50** and varies by region, so check the page for yours. Reloop's prices are on [reloop.sh/pricing](/pricing).
+
+---
+
+## ZeptoMail is now Zoho CPaaS
+
+If you've looked recently, you'll have noticed the change. Zoho's site now says "ZeptoMail is now Zoho CPaaS", built on the same email infrastructure and adding **SMS** (India only, in beta), **WhatsApp** and **voice**. The email product, API and SMTP relay are unchanged, and the API now lives at `cpaas.zoho.com`.
+
+That's a plus if you also want OTPs over WhatsApp or SMS from one vendor. If you only need email, it doesn't change much.
+
+---
+
+## Pricing at real volumes
+
+ZeptoMail is pay-as-you-go: you buy credits of 10,000 emails and spend them down. At the widely listed $2.50 per credit:
+
+| Monthly volume | Reloop | ZeptoMail (approx.) | Cheaper |
+|---|---|---|---|
+| 3,000 | $0 | $0 (free credit) | Tie |
+| 50,000 | $10 | $12.50 | Reloop |
+| 100,000 | $20 | $25 | Reloop |
+| 250,000 | $20 + $75 overage = $95 | $62.50 | **ZeptoMail** |
+| 1,000,000 | $20 + $450 overage = $470 | $250 | **ZeptoMail** |
+
+Being straight about it: **above roughly 150,000 emails a month, ZeptoMail is cheaper per email.** Below that, Reloop's flat plans win, and they include things ZeptoMail doesn't sell at all (inboxes, campaigns, automations, a dedicated IP on Growth).
+
+Two details matter with credits:
+
+- **They expire after 6 months.** Buying in bulk to save time can waste money if your volume drops.
+- **The free credit is one-off.** It's 10,000 emails to get started, not a monthly allowance. Reloop's 3,000 free emails reset every month.
+
+And if you self-host Reloop, there's no per-email fee at all. See [self-hosted email infrastructure](/blog/self-hosted-email-infrastructure) for what that really involves.
+
+---
+
+## Developer experience
+
+Both give you a REST API, an SMTP relay and official SDKs.
+
+**ZeptoMail**
+
+```typescript
+import { SendMailClient } from "zeptomail";
+
+const client = new SendMailClient({
+  url: "api.zeptomail.com/",
+  token: process.env.ZEPTOMAIL_TOKEN!,
+});
+
+await client.sendMail({
+  from: { address: "hello@acme.com", name: "Acme" },
+  to: [{ email_address: { address: "user@example.com", name: "Ada" } }],
+  subject: "Welcome",
+  htmlbody: "<p>Thanks for signing up.</p>",
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@mail.acme.com>",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+| | Reloop | ZeptoMail |
+|---|---|---|
+| Recipient shape | `"user@example.com"` or an array of strings | `[{ email_address: { address, name } }]` |
+| Auth | `x-api-key` header | `Authorization: Zoho-enczapikey <token>` |
+| Templates | Sent by ID with `{{{variables}}}` | `template_key` or `template_alias` with `merge_info` |
+| Grouping sends | Domains and API keys | Mail Agents (per product, environment or team) |
+| Error format | `message`, `why` and `fix` | Error code and message |
+| SMTP | `smtp.reloop.sh`, API key as user and password | `smtp.zeptomail.com`, user `emailapikey` |
+
+ZeptoMail's **Mail Agents** are a nice touch: each one has its own tokens, domains, webhooks and stats, so you can keep staging and production, or two products, cleanly apart.
+
+Reloop's error shape is our one strong opinion. When a send fails, the error says **why** and **how to fix it**:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain mail.acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+## Transactional only vs everything in one place
+
+This is the biggest product difference.
+
+**ZeptoMail only allows transactional email.** Its terms say you must not use it for marketing, promotional mail or newsletters, and accounts that keep doing so get blocked. That's a deliberate choice that protects its deliverability, but it means you need a second tool (often Zoho Campaigns) for anything else.
+
+**Reloop covers both** while keeping them separate where it matters:
+
+- **Transactional API and SMTP** for receipts, resets and alerts.
+- **Contacts, groups and subscription channels**, with one suppression list across everything.
+- **Broadcast campaigns** with scheduling.
+- **Event-triggered automations**: call `reloop.automations.start` when a user signs up and run a sequence of delays, conditions and emails. See [welcome sequences that convert](/blog/welcome-email-sequences-that-convert).
+
+If you'll only ever send receipts and OTPs, ZeptoMail's restriction costs you nothing. If you'll want onboarding or product announcements later, it's a second vendor and a second suppression list.
+
+---
+
+## Receiving email and agent inboxes
+
+ZeptoMail is a sending service. Its webhooks report **opens, clicks and bounces**; we didn't find a feature for receiving mail on your domain and storing or threading it.
+
+**Reloop receives mail into mailboxes.** Messages are stored, threaded, spam-scored with Rspamd, and readable over the API, the [MCP server](/docs/integrations/ai-tools/mcp-server) or IMAP. You can reply in-thread with one call, and an `email.received` webhook pushes new mail to you.
+
+That matters for:
+
+- **AI agents that handle email.** Give an agent its own address and let it read and reply. See [build an AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+- **Support and reply handling** ("reply to this email to comment").
+
+| | Reloop | ZeptoMail |
+|---|---|---|
+| Receive on your domain | Yes | No |
+| Stored mailboxes with threads | Yes | No |
+| Reply in thread via API | Yes | No |
+| MCP and IMAP access | Yes | No |
+| Delivery webhooks | Yes, signed (`Reloop-Signature`) | Yes (opens, clicks, bounces) |
+
+---
+
+## Deliverability
+
+Both run their own sending infrastructure and handle SPF, DKIM, bounces, complaints and suppression.
+
+- **ZeptoMail** keeps transactional mail on infrastructure that never carries marketing, which is the whole point of its policy. Dedicated IPs are a paid add-on in the US, EU and India regions.
+- **Reloop** runs its own MTA (KumoMTA) with per-domain throttling and automatic pauses when bounce or complaint rates spike, and includes a dedicated IP on Growth. Read [how bounce processing works](/blog/email-bounce-processing-automation).
+
+Either way, your own domain setup matters more than the provider. Check yours with our free [auth checker](/tools/auth-checker) and [blocklist checker](/tools/blocklist-checker).
+
+---
+
+## Self-hosting and lock-in
+
+ZeptoMail is hosted-only, on Zoho's data centers. Reloop is Apache 2.0: start on Reloop Cloud, move to your own server later with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup), and point the SDK's `baseUrl` at your instance. Nothing else in your code changes.
+
+---
+
+## Where ZeptoMail is the better choice
+
+- **You send a lot of purely transactional mail.** Above about 150k emails a month, credits are cheaper than Reloop's plans.
+- **Your volume is spiky or seasonal.** No monthly fee means quiet months cost nothing, as long as you use credits within 6 months.
+- **You're already on Zoho** (CRM, Desk, Books) and want one vendor and one bill.
+- **You want WhatsApp, SMS or voice** from the same platform as email.
+
+## Where Reloop is the better choice
+
+- **You're under about 150k emails a month**, where Reloop's flat plans are cheaper.
+- **You need to receive email**, especially for AI agents or support.
+- **You want campaigns and automations** without a second tool.
+- **You need open source or self-hosting** for compliance or data residency.
+
+---
+
+## Switching from ZeptoMail to Reloop
+
+1. **Add your domain in Reloop** and publish the DKIM record (`reloop._domainkey`). Merge `include:reloop.sh` into your existing SPF record; don't add a second one.
+2. **Swap the client.** Replace `client.sendMail` with `reloop.mail.send`. Flatten recipients from `{ email_address: { address } }` to plain strings, and rename `htmlbody` → `html`, `textbody` → `text`.
+3. **Move templates.** Recreate them in Reloop and change placeholders to triple braces: `{{{user_name}}}`. Values you passed in `merge_info` become template variables.
+4. **Map Mail Agents.** Use separate domains or API keys where you had separate agents.
+5. **Point webhooks** at a new handler. Reloop events are `email.delivered`, `email.bounced`, `email.complained` and so on, signed with HMAC-SHA256 in the `Reloop-Signature` header.
+6. **Ramp traffic** from 10% to 100% over a week or two. Use up remaining credits first if they're close to expiring.
+
+Our [SendGrid migration guide](/blog/migrating-from-sendgrid) covers the traffic-split flag and suppression import in more detail.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is ZeptoMail cheaper than Reloop?">
+    At high volume, yes. At the widely listed $2.50 per 10,000 emails,
+    ZeptoMail is cheaper above roughly 150k emails a month. Below that,
+    Reloop's $10 (50k) and $20 (100k) plans cost less.
+  </Accordion>
+
+  <Accordion title="Can I send newsletters with ZeptoMail?">
+    No. ZeptoMail's terms only allow transactional email and accounts that
+    keep sending marketing mail get blocked. Reloop supports both
+    transactional email and campaigns.
+  </Accordion>
+
+  <Accordion title="What happened to ZeptoMail?">
+    It's now part of Zoho CPaaS, which adds SMS, WhatsApp and voice to the
+    same email infrastructure. The email API and SMTP relay still work the
+    same way.
+  </Accordion>
+
+  <Accordion title="Do ZeptoMail credits expire?">
+    Yes, 6 months after purchase. Reloop's plans are monthly, with $0.50 per
+    1,000 emails above your plan's allowance.
+  </Accordion>
+
+  <Accordion title="Can ZeptoMail receive email?">
+    Its docs describe sending, templates and delivery webhooks, not inbound
+    mailboxes. Reloop receives mail into threaded inboxes you can read over
+    the API, MCP or IMAP.
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Try Reloop free"
+  description="3,000 emails a month on the free tier, every month. Transactional email, campaigns and inboxes in one open-source platform."
+  href="/dashboard/signup"
+  label="Get started"
+/>

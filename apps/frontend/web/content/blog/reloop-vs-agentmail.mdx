@@ -1,0 +1,273 @@
+---
+title: "Reloop vs AgentMail (2026): Email Inboxes for AI Agents Compared"
+description: "Reloop vs AgentMail for AI agent inboxes: pricing, inbox limits, threads and replies, IMAP, MCP, webhooks, custom domains, self-hosting, and which one fits your agent."
+keywords:
+  - Reloop vs AgentMail
+  - AgentMail alternative
+  - AgentMail pricing
+  - email inbox for AI agents
+  - AI agent email API
+  - open source AgentMail alternative
+publishedAt: 2026-10-25
+category: Comparison
+tags: [agentmail, comparison, ai-agents, inbox]
+readTime: 10 min read
+image: /blog/images/reloop-vs-agentmail.png
+author:
+  name: Pranav Patel
+  role: Co-founder
+  avatar: /company/team/pranav-patel.jpg
+draft: false
+relatedSlugs:
+  - email-infrastructure-for-ai-agents
+  - build-ai-agent-sends-emails
+  - reloop-vs-resend
+---
+
+**AgentMail and Reloop both give your AI agent a real inbox: an address it can receive mail at, read threads from and reply in.** The difference is scope. **AgentMail is built only for agent inboxes, and it's very good at spinning up lots of them fast.** **Reloop is a full email platform (transactional API, SMTP relay, campaigns, automations) where agent inboxes are one part, and it's open source, so you can self-host it with no inbox limits.**
+
+We build Reloop, so weigh this accordingly. AgentMail facts below come from [agentmail.to/pricing](https://www.agentmail.to/pricing) and [docs.agentmail.to](https://docs.agentmail.to). Where AgentMail is the better pick, we say so.
+
+---
+
+## The 30-second comparison
+
+| | **Reloop** | **AgentMail** |
+|---|---|---|
+| Focus | Full email platform with agent inboxes | Inboxes for AI agents |
+| Free tier | 3,000 emails / mo, 100 / day, 1 inbox | 3,000 emails / mo, 100 / day, 3 inboxes |
+| First paid plan | **$10 / mo**: 50,000 emails, 5 inboxes | $20 / mo: 10,000 emails, 10 inboxes |
+| Next plan | $20 / mo: 100,000 emails, 10 inboxes, dedicated IP | $200 / mo: 150 inboxes, 15,000 emails / day |
+| Instant address without a domain | No (needs a verified domain) | Yes (`@agentmail.to`) |
+| Threads and reply in thread | Yes | Yes |
+| IMAP access | Yes | Yes |
+| Hosted MCP server | Yes | Yes |
+| Real-time events | Webhooks | Webhooks and WebSockets |
+| Transactional sending API | Yes | Sends from inboxes |
+| Campaigns and automations | Yes | No |
+| Open source | Yes (Apache 2.0) | SDKs only (MIT) |
+| Self-host | Yes, unlimited inboxes | No |
+
+Prices change; check [Reloop pricing](/pricing) and [AgentMail pricing](https://www.agentmail.to/pricing) before you commit.
+
+---
+
+## Pricing: emails vs inboxes
+
+The two products meter different things, so the right choice depends on whether your agent needs **many inboxes** or **lots of email**.
+
+**AgentMail** ([pricing](https://www.agentmail.to/pricing)):
+
+| Plan | Price | Inboxes | Emails | Custom domains |
+|---|---|---|---|---|
+| Free | $0 | 3 | 3,000 / mo, 100 / day | 0 |
+| Developer | $20 / mo | 10 | 10,000 / mo, 1,000 / day | 10 |
+| Startup | $200 / mo | 150 | 15,000 / day | 150 |
+| Enterprise | Custom | Unlimited | Custom | Custom |
+
+Add-ons are $2 / month per extra inbox, $2 / month per extra domain, and $2 / month per extra 1,000 sends. Dedicated IPs are Enterprise only.
+
+**Reloop** ([pricing](/pricing)):
+
+| Plan | Price | Inboxes | Emails | Custom domains |
+|---|---|---|---|---|
+| Free | $0 | 1 | 3,000 / mo, 100 / day | 3 |
+| Pro | $10 / mo | 5 | 50,000 / mo | 5 |
+| Growth | $20 / mo | 10 | 100,000 / mo, 1 dedicated IP | 10 |
+| Self-hosted | $0 | Unlimited | Unlimited | Unlimited |
+
+Overage on Reloop is $0.50 per 1,000 emails.
+
+What that means in practice:
+
+- **A few agents sending a lot.** Reloop is much cheaper. 50,000 emails is $10 on Reloop. On AgentMail it's the $20 Developer plan plus 40 extra blocks of 1,000 sends.
+- **Many agents sending a little.** AgentMail fits better. 150 inboxes on the Startup plan is a straightforward deal, and hosted Reloop tops out at 10 inboxes on Growth. If you need more inboxes on Reloop today, self-host it or talk to us about Enterprise.
+
+<Callout type="tip">
+  Count how many separate addresses your agents really need. Many products need one support inbox and one outbound address, not one per user. If it's one per user or per customer, AgentMail's inbox pricing or self-hosted Reloop will fit better than a hosted inbox cap.
+</Callout>
+
+---
+
+## Creating an inbox and replying
+
+Both APIs are small and feel similar.
+
+**AgentMail** (from the [quickstart](https://docs.agentmail.to/quickstart) and [messages docs](https://docs.agentmail.to/messages))
+
+```typescript
+import { AgentMailClient } from "agentmail";
+
+const client = new AgentMailClient({ apiKey: process.env.AGENTMAIL_API_KEY });
+
+// Without a domain, the inbox gets an @agentmail.to address
+const inbox = await client.inboxes.create();
+
+await client.inboxes.messages.send(inbox.inboxId, {
+  to: "user@example.com",
+  subject: "Hello from my agent",
+  text: "Hi! I'm your assistant.",
+});
+
+// Later: reply in thread
+await client.inboxes.messages.reply(inbox.inboxId, messageId, {
+  text: "Thanks, I've booked that for you.",
+});
+```
+
+**Reloop**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+// Mailboxes live on a domain you've verified in Reloop
+const { mailbox, mailboxError } = await reloop.inbox.mailboxes.create({
+  domainId: "dom_123",
+  email: "assistant@mail.acme.com",
+  displayName: "Acme Assistant",
+});
+if (mailboxError) throw mailboxError;
+
+// Read conversations
+const { threads } = await reloop.inbox.threads.list({ mailboxId: mailbox.id });
+
+// Reply in thread; Reloop keeps the In-Reply-To and References headers
+const { message, messageError } = await reloop.inbox.messages.reply("msg_123", {
+  html: "<p>Thanks, I've booked that for you.</p>",
+});
+```
+
+The practical difference: **AgentMail gives you a working address in one call, with no DNS.** Reloop mailboxes need a domain you've verified first. That's a few minutes of DNS once, and afterwards your agent sends from your own brand rather than a shared domain. AgentMail supports custom domains too, from the Developer plan up.
+
+AgentMail also has a few agent-specific extras worth knowing about:
+
+- **`extractedText` / `extractedHtml`** on incoming messages, with quoted history and signatures stripped, so your model reads only the new reply.
+- **Drafts**, for human-in-the-loop review before a send.
+- **Labels**, for tracking state on messages.
+- **Pods**, for multi-tenant setups.
+- **Allow and block lists**, to limit who an agent can email or hear from.
+
+---
+
+## Receiving: webhooks, WebSockets, IMAP and MCP
+
+Both products give an agent several ways to learn about new mail.
+
+| | Reloop | AgentMail |
+|---|---|---|
+| Webhook on new mail | `email.received` | `message.received` |
+| WebSockets | No | Yes |
+| IMAP | `imap.reloop.sh`, API key as password | `imap.agentmail.to`, API key as password |
+| SMTP | `smtp.reloop.sh` | `smtp.agentmail.to` |
+| Hosted MCP server | `https://reloop.sh/mcp` (OAuth) | `https://mcp.agentmail.to/mcp` (OAuth or API key) |
+| Spam handling | Rspamd scores inbound mail; spam goes to Junk | Spam stored but hidden from API results by default |
+
+**Webhooks.** Reloop's `email.received` event includes the mailbox, sender, subject, thread ID and an `isSpam` flag, and is signed with HMAC-SHA256 in the `Reloop-Signature` header. AgentMail has a broader set of message events, including `message.received.spam` and security-review events.
+
+**IMAP.** Both let humans open the same inbox in Apple Mail, Outlook or Thunderbird. Reloop's IMAP server supports IDLE for push, and gives each account INBOX, Sent, Drafts, Archive, Junk and Trash folders. AgentMail exposes INBOX, Sent, Trash and Spam. Either way, agents and humans can work the same threads.
+
+**MCP.** Both host an MCP server, so Claude, Cursor or ChatGPT can use the inbox directly. Reloop's inbox tools include `list_inbox_threads`, `get_inbox_thread`, `reply_to_inbox_message`, `forward_inbox_message` and `send_mailbox_email`. The same server also covers sending, contacts, templates, automations and domains. AgentMail's server has 47 tools, including calendar events and drafts.
+
+---
+
+## Beyond inboxes
+
+This is where the products diverge most.
+
+**AgentMail** is focused on agent mailboxes. It adds things around them, like calendar events and app connections, but it isn't a platform for transactional or marketing email.
+
+**Reloop** is a full email platform, and the agent inbox shares everything else with it:
+
+- **Transactional API and SMTP relay** for password resets, receipts and alerts, with templates (`{{{variables}}}`), scheduling and idempotency keys.
+- **Contacts, campaigns and event-triggered automations**, for example a welcome sequence that starts on `user.signed_up`.
+- **One suppression list** across agent mail, transactional mail and campaigns, so a bounce or complaint anywhere protects your domain everywhere.
+- **Its own sending infrastructure** (KumoMTA) with per-domain throttling and bounce handling. See [how bounce processing works](/blog/email-bounce-processing-automation).
+
+If your app already needs a transactional provider, Reloop lets your agents and your product share one account, one set of DNS records and one sender reputation.
+
+---
+
+## Self-hosting and lock-in
+
+AgentMail is a hosted service. Its SDKs and toolkit are open source under MIT, but the inbox service itself isn't something you can run yourself.
+
+Reloop is Apache 2.0. The self-hosted edition has every feature and **no limits on inboxes, emails or domains**. You can:
+
+1. Start on Reloop Cloud.
+2. Move to your own server with the [one-command installer](/self-host) or [Coolify](/blog/reloop-coolify-setup).
+3. Keep the same code. Point the SDK's `baseUrl` at your instance.
+
+That matters for agents that read sensitive mail: contracts, invoices, medical or legal correspondence. With self-hosting, the messages never leave your infrastructure, and your security team can read the code that handles them. The trade-off is that you run the server and own IP reputation and warm-up.
+
+---
+
+## Where AgentMail is the better choice
+
+- **You need many inboxes on a hosted service.** 150 inboxes for $200, or $2 per extra inbox, is hard to beat if each user or customer gets their own agent address.
+- **You want an address in seconds with no DNS.** `client.inboxes.create()` gives you a working `@agentmail.to` address immediately, which is great for prototypes and demos.
+- **You want agent-specific helpers** like extracted reply text, drafts for approval, WebSockets, pods for multi-tenancy, and calendar tools.
+
+## Where Reloop is the better choice
+
+- **Your agents send a lot of email.** 50,000 emails is $10 and 100,000 is $20, including a dedicated IP.
+- **You also need transactional mail, campaigns or automations,** and want them in the same account as your agent inboxes.
+- **You need open source or self-hosting** for data residency, security review, or unlimited inboxes without per-inbox fees.
+- **You want agents to send from your own domain** with your own deliverability, rather than a shared one.
+
+---
+
+## Switching from AgentMail to Reloop
+
+1. **Verify your domain in Reloop.** Publish the DKIM record (`reloop._domainkey`), merge `include:reloop.sh` into your SPF, then turn on receiving and add the MX record the dashboard shows.
+2. **Create a mailbox for each agent address** with `reloop.inbox.mailboxes.create`.
+3. **Swap the client calls.** `inboxes.messages.send` becomes `reloop.inbox.messages.send({ mailboxId, ... })`, and `inboxes.messages.reply` becomes `reloop.inbox.messages.reply(messageId, ...)`.
+4. **Move event handling.** Subscribe to `email.received` and verify the `Reloop-Signature` header. If you used WebSockets, switch that listener to a webhook endpoint.
+5. **Update MCP clients** to `https://reloop.sh/mcp` and sign in with your Reloop account.
+6. **Run both in parallel** until no new mail arrives at the old addresses, then retire them.
+
+If your agents use `@agentmail.to` addresses, tell your contacts about the new address, since mail to the old one won't follow you.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Reloop an open-source AgentMail alternative?">
+    Yes. Reloop is Apache 2.0 and includes agent inboxes with threads,
+    replies, IMAP and an MCP server. You can use Reloop Cloud or self-host it
+    with no inbox limits.
+  </Accordion>
+
+  <Accordion title="Can I get an inbox without owning a domain?">
+    On AgentMail, yes: inboxes default to an `@agentmail.to` address. Reloop
+    mailboxes live on a domain you've verified, so your agent sends as your
+    brand.
+  </Accordion>
+
+  <Accordion title="How many inboxes can I create?">
+    AgentMail: 3 free, 10 on Developer ($20), 150 on Startup ($200), plus $2
+    per extra inbox. Reloop Cloud: 1 free, 5 on Pro ($10), 10 on Growth ($20),
+    and unlimited when self-hosted.
+  </Accordion>
+
+  <Accordion title="Can a human and an agent share the same inbox?">
+    Yes, on both. Open the inbox over IMAP in any mail client while the agent
+    uses the API or MCP server on the same threads.
+  </Accordion>
+
+  <Accordion title="Does Reloop work with Claude, Cursor and ChatGPT?">
+    Yes. Add `https://reloop.sh/mcp` as an MCP server and sign in. See the
+    [MCP server docs](/docs/integrations/ai-tools/mcp-server), or build your
+    own agent with our guide to an
+    [AI agent that reads and replies to email](/blog/build-ai-agent-sends-emails).
+  </Accordion>
+</AccordionGroup>
+
+<Cta
+  title="Give your agent an inbox"
+  description="Start free with Reloop: an agent inbox, 3,000 emails a month, IMAP and MCP included. Self-host anytime with no inbox limits."
+  href="/dashboard/signup"
+  label="Get started"
+/>
