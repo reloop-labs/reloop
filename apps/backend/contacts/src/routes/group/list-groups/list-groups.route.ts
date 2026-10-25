@@ -13,12 +13,13 @@ export const listGroupsRoute = new Elysia()
 	.get(
 		"/list",
 		async ({ query, organizationId }) => {
-			const { page, limit, search } = query;
+			const { page, limit, search, cursor } = query;
 			return await listGroupsController({
 				organizationId: organizationId as string,
 				page,
 				limit,
 				search,
+				cursor,
 			});
 		},
 		{

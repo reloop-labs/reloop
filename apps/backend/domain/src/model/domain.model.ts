@@ -1,3 +1,4 @@
+import { cursorPageFields, cursorQuery } from "@reloop/auth/middleware";
 import { t } from "elysia";
 
 export namespace DomainModel {
@@ -362,10 +363,12 @@ export namespace DomainModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 		event: t.String({ description: "Event ID for the list request" }),
 	});
 
 	export const domainQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
 		q: t.Optional(t.String({ description: "Search query for domain name" })),

@@ -1,3 +1,4 @@
+import { cursorPageFields, cursorQuery } from "@reloop/auth/middleware";
 import { t } from "elysia";
 
 export namespace ContactModel {
@@ -271,6 +272,7 @@ export namespace ContactModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 		totalContacts: t.Number({
 			description: "Total number of contacts in organization",
 		}),
@@ -372,12 +374,14 @@ export namespace ContactModel {
 		}),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 		event: t.String({ description: "Event ID for the list request" }),
 	});
 
 	export type GroupContactListResponse = typeof groupContactListResponse.static;
 
 	export const contactQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 100 })),
 		search: t.Optional(t.String({ description: "Search by email" })),

@@ -5,9 +5,15 @@ import {
 import type { GroupModel } from "@be/contacts/model/group.model";
 import type { GroupListResponse } from "@be/contacts/types/group.type";
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
+import { and, eq, ilike, isNull, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const listGroupsController = async ({
@@ -15,16 +21,20 @@ export const listGroupsController = async ({
 	page: rawPage,
 	limit: rawLimit,
 	search,
+	cursor,
 }: {
 	organizationId: string;
 	page?: number;
 	limit?: number;
 	search?: string;
+	cursor?: string;
 }): Promise<GroupListResponse | GroupModel.Unauthorized> => {
 	const log = useLogger();
 	const page = rawPage || 1;
 	const limit = Math.min(rawLimit || 100, 100);
-	const offset = (page - 1) * limit;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = cursor ? decodeCursor(cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	log.info("Listing groups", { page, limit, search });
 
@@ -35,28 +45,43 @@ export const listGroupsController = async ({
 			search ? ilike(schema.group.name, `%${search}%`) : undefined,
 		);
 
-		const rows = await db
-			.select({
-				group: schema.group,
-				total: sql<number>`COUNT(*) OVER()`,
-			})
-			.from(schema.group)
-			.where(whereClause)
-			.orderBy(desc(schema.group.createdAt))
-			.limit(limit)
-			.offset(offset);
+		// Counted separately: COUNT(*) OVER() would only see rows after the cursor.
+		const [totalResult, rows] = await Promise.all([
+			db
+				.select({ total: sql<number>`COUNT(*)` })
+				.from(schema.group)
+				.where(whereClause),
+			db
+				.select({
+					group: schema.group,
+					createdAt: schema.group.createdAt,
+					id: schema.group.id,
+				})
+				.from(schema.group)
+				.where(
+					position
+						? and(whereClause, afterCursor(schema.group, position))
+						: whereClause,
+				)
+				.orderBy(...cursorOrderBy(schema.group))
+				.limit(limit + 1)
+				.offset(offset),
+		]);
+		const { items, hasMore, nextCursor } = toCursorPage(rows, limit);
 
 		return {
 			object: "contact_group",
-			groups: rows.map((r) => ({
+			groups: items.map((r) => ({
 				id: r.group.id,
 				name: r.group.name,
 				createdAt: r.group.createdAt,
 				updatedAt: r.group.updatedAt,
 			})),
-			total: Number(rows[0]?.total ?? 0),
+			total: Number(totalResult[0]?.total ?? 0),
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {

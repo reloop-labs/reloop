@@ -11,6 +11,7 @@ import {
 	updateCampaignBody,
 } from "@be/campaigns/model/campaign.model";
 import { auditLogHook } from "@be/campaigns/utils/audit-log";
+import { cursorPageFields, cursorQuery } from "@reloop/auth/middleware";
 import { Elysia, t } from "elysia";
 import {
 	cancelCampaignController,
@@ -74,6 +75,7 @@ export const campaignRoutes = new Elysia({
 				limit: query.limit,
 				search: query.search,
 				status: query.status,
+				cursor: query.cursor,
 			});
 		},
 		{
@@ -85,6 +87,7 @@ export const campaignRoutes = new Elysia({
 					total: t.Number(),
 					page: t.Number(),
 					limit: t.Number(),
+					...cursorPageFields,
 				}),
 				...errorResponses,
 			},
@@ -257,12 +260,14 @@ export const campaignRoutes = new Elysia({
 				status: query.status,
 				category: query.category,
 				search: query.search,
+				cursor: query.cursor,
 			});
 		},
 		{
 			auth: true,
 			params: t.Object({ id: t.String() }),
 			query: t.Object({
+				...cursorQuery,
 				page: t.Optional(t.Numeric()),
 				limit: t.Optional(t.Numeric()),
 				status: t.Optional(
@@ -293,6 +298,7 @@ export const campaignRoutes = new Elysia({
 					total: t.Number(),
 					page: t.Number(),
 					limit: t.Number(),
+					...cursorPageFields,
 					counts: t.Optional(
 						t.Object({
 							unsubscribed: t.Number(),

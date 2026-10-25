@@ -1,11 +1,16 @@
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import type { LogsTypes } from "@reloop/logs/types/logs.type";
 import { formatLogDate } from "@reloop/logs/utils/format";
 import {
 	and,
 	count,
-	desc,
 	eq,
 	gte,
 	ilike,
@@ -109,9 +114,11 @@ export async function listLogsController(
 		const whereClause = and(...conditions);
 		const limit = Math.min(Math.max(Number(query.limit || 10), 1), 100);
 		const page = Math.max(Number(query.page || 1), 1);
-		const offset = (page - 1) * limit;
+		// With a cursor, pagination is keyset-based and `page` is ignored.
+		const position = query.cursor ? decodeCursor(query.cursor) : null;
+		const offset = position ? 0 : (page - 1) * limit;
 
-		const [countRow, rows, statsRows] = await Promise.all([
+		const [countRow, fetched, statsRows] = await Promise.all([
 			db
 				.select({ total: count() })
 				.from(schema.activityLog)
@@ -120,9 +127,13 @@ export async function listLogsController(
 			db
 				.select()
 				.from(schema.activityLog)
-				.where(whereClause)
-				.orderBy(desc(schema.activityLog.createdAt))
-				.limit(limit)
+				.where(
+					position
+						? and(whereClause, afterCursor(schema.activityLog, position))
+						: whereClause,
+				)
+				.orderBy(...cursorOrderBy(schema.activityLog))
+				.limit(limit + 1)
 				.offset(offset),
 			db
 				.select({
@@ -134,6 +145,7 @@ export async function listLogsController(
 				.groupBy(schema.activityLog.level),
 		]);
 
+		const { items: rows, hasMore, nextCursor } = toCursorPage(fetched, limit);
 		const totalCount = Number(countRow?.total || 0);
 
 		const stats = {
@@ -178,6 +190,8 @@ export async function listLogsController(
 		return {
 			logs,
 			count: totalCount,
+			hasMore,
+			nextCursor,
 			stats,
 		};
 	} catch (error) {

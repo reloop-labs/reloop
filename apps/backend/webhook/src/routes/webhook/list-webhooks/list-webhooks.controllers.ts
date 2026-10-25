@@ -1,7 +1,13 @@
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import type { WebhookEventName } from "@reloop/webhook-events";
-import { and, count, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
+import { and, count, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import { log } from "evlog";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -137,8 +143,10 @@ export async function listWebhooksController({
 	query: WebhookTypes.WebhookQuery;
 	organizationId: string;
 }): Promise<WebhookTypes.WebhookListResponse> {
-	const { page = 1, limit = 10, status } = query;
-	const offset = (page - 1) * limit;
+	const { page = 1, limit = 10, status, cursor } = query;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = cursor ? decodeCursor(cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	log.info({ ...{ query, organizationId }, message: "Listing webhooks" });
 
@@ -158,10 +166,12 @@ export async function listWebhooksController({
 			.from(schema.webhook)
 			.where(whereClause);
 
-		const webhooks = await db.query.webhook.findMany({
-			where: whereClause,
-			orderBy: desc(schema.webhook.createdAt),
-			limit,
+		const rows = await db.query.webhook.findMany({
+			where: position
+				? and(whereClause, afterCursor(schema.webhook, position))
+				: whereClause,
+			orderBy: cursorOrderBy(schema.webhook),
+			limit: limit + 1,
 			offset,
 			with: {
 				subscriptions: {
@@ -170,6 +180,8 @@ export async function listWebhooksController({
 				user: true,
 			},
 		});
+
+		const { items: webhooks, hasMore, nextCursor } = toCursorPage(rows, limit);
 
 		const healthById = await loadHealthByWebhook(webhooks.map((w) => w.id));
 		const emptySeries = () => Array.from({ length: HEALTH_DAYS }, () => 0);
@@ -215,6 +227,8 @@ export async function listWebhooksController({
 			total,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 		};
 	} catch (error) {
 		log.error({

@@ -17,6 +17,7 @@ export const listChannelsRoute = new Elysia()
 				organizationId,
 				page: query.page,
 				limit: query.limit,
+				cursor: query.cursor,
 			});
 		},
 		{

@@ -1,3 +1,4 @@
+import { cursorPageFields, cursorQuery } from "@reloop/auth/middleware";
 import {
 	ACTIVE_WEBHOOK_EVENTS,
 	WEBHOOK_EVENTS,
@@ -299,11 +300,13 @@ export namespace WebhookModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 	});
 
 	export type WebhookListResponse = typeof webhookListResponse.static;
 
 	export const webhookQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, default: 10 })),
 		status: t.Optional(
@@ -551,12 +554,14 @@ export namespace WebhookModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 	});
 
 	export type WebhookDeliveryListResponse =
 		typeof webhookDeliveryListResponse.static;
 
 	export const webhookDeliveryQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, default: 10 })),
 		status: t.Optional(

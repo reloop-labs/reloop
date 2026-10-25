@@ -22,7 +22,8 @@
 		"./spamhaus-dbl": "./src/spamhaus-dbl.ts",
 		"./webhook-events": "./src/webhook-events.ts",
 		"./api-key-scope": "./src/api-key-scope.ts",
-		"./utils": "./src/utils/*"
+		"./utils": "./src/utils/*",
+		"./pagination": "./src/pagination.ts"
 	},
 	"scripts": {
 		"build": "tsc --build",

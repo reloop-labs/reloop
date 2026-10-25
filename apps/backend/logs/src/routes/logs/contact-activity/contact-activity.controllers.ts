@@ -1,8 +1,14 @@
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import { scoreContactEngagement } from "@reloop/logs/lib/contact-engagement-score";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
-import { and, count, desc, eq, type SQL, sql } from "drizzle-orm";
+import { and, count, eq, type SQL, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export async function contactActivityController({
@@ -13,8 +19,10 @@ export async function contactActivityController({
 	organizationId: string;
 }): Promise<LogsModel.ContactActivityResponse> {
 	const log = useLogger();
-	const { email, page = 1, limit = 10 } = query;
-	const offset = (page - 1) * limit;
+	const { email, page = 1, limit = 10, cursor } = query;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = cursor ? decodeCursor(cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	log.info("Fetching contact activity", { email, organizationId, page, limit });
 
@@ -36,10 +44,12 @@ export async function contactActivityController({
 		const total = totalResult[0]?.count || 0;
 
 		// Fetch email logs with their event timelines
-		const logs = await db.query.emailLog.findMany({
-			where: whereClause,
-			orderBy: desc(schema.emailLog.createdAt),
-			limit,
+		const rows = await db.query.emailLog.findMany({
+			where: position
+				? and(whereClause, afterCursor(schema.emailLog, position))
+				: whereClause,
+			orderBy: cursorOrderBy(schema.emailLog),
+			limit: limit + 1,
 			offset,
 			with: {
 				events: {
@@ -47,6 +57,7 @@ export async function contactActivityController({
 				},
 			},
 		});
+		const { items: logs, hasMore, nextCursor } = toCursorPage(rows, limit);
 
 		// Aggregate engagement stats for this recipient
 		const statsResult = await db.execute(sql`
@@ -131,6 +142,8 @@ export async function contactActivityController({
 			total,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 			stats,
 			engagement,
 		};

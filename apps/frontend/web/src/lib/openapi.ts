@@ -358,7 +358,7 @@ export async function buildMergedOpenApi() {
 		info: {
 			title: "Reloop API",
 			version: "1.0.0",
-			description: `Open-source email infrastructure: send email, manage domains, contacts, templates, webhooks, automations and agent inboxes. Every error is JSON matching the \`Error\` schema, with a stable \`code\`. The API is versioned in the URL (\`/v1\`); breaking changes ship as a new version, and deprecated endpoints send \`Deprecation\` and \`Sunset\` headers at least 180 days before removal. Policy: ${VERSIONING_POLICY_URL}`,
+			description: `Open-source email infrastructure: send email, manage domains, contacts, templates, webhooks, automations and agent inboxes. Every error is JSON matching the \`Error\` schema, with a stable \`code\`. List endpoints support cursor pagination: pass \`nextCursor\` back as \`cursor\` until \`hasMore\` is false (https://reloop.sh/docs/api/pagination). The API is versioned in the URL (\`/v1\`); breaking changes ship as a new version, and deprecated endpoints send \`Deprecation\` and \`Sunset\` headers at least 180 days before removal. Policy: ${VERSIONING_POLICY_URL}`,
 			contact: { name: "Reloop Labs", url: `${siteUrl}/contact` },
 			license: { name: "Reloop License", url: `${siteUrl}/license` },
 		},

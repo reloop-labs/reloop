@@ -1,4 +1,10 @@
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
 import { log } from "evlog";
@@ -49,8 +55,10 @@ export async function listWebhookDeliveriesController({
 	organizationId: string;
 	query: WebhookTypes.WebhookDeliveryQuery;
 }): Promise<WebhookTypes.WebhookDeliveryListResponse> {
-	const { page = 1, limit = 10, status } = query;
-	const offset = (page - 1) * limit;
+	const { page = 1, limit = 10, status, cursor } = query;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = cursor ? decodeCursor(cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	log.info({
 		...{ webhookId, organizationId, page, limit, status },
@@ -86,17 +94,25 @@ export async function listWebhookDeliveriesController({
 			.from(schema.webhookDelivery)
 			.where(rootWhere);
 
-		const deliveries = await db.query.webhookDelivery.findMany({
-			where: rootWhere,
-			limit,
+		const rows = await db.query.webhookDelivery.findMany({
+			where: position
+				? and(rootWhere, afterCursor(schema.webhookDelivery, position))
+				: rootWhere,
+			limit: limit + 1,
 			offset,
-			orderBy: [desc(schema.webhookDelivery.createdAt)],
+			orderBy: cursorOrderBy(schema.webhookDelivery),
 			with: {
 				attempts: {
 					orderBy: [desc(schema.webhookDeliveryAttempt.createdAt)],
 				},
 			},
 		});
+
+		const {
+			items: deliveries,
+			hasMore,
+			nextCursor,
+		} = toCursorPage(rows, limit);
 
 		const rootIds = deliveries.map((d) => d.id);
 
@@ -215,6 +231,8 @@ export async function listWebhookDeliveriesController({
 			total: totalResult?.value || 0,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 		};
 	} catch (error) {
 		log.error({

@@ -1,4 +1,10 @@
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import { deriveDisplayStatus } from "@reloop/logs/lib/email-log-display-status";
 import { resolveEmailSends } from "@reloop/logs/lib/email-send-origin";
@@ -6,7 +12,6 @@ import type { LogsModel } from "@reloop/logs/model/logs.model";
 import {
 	and,
 	count,
-	desc,
 	eq,
 	exists,
 	gte,
@@ -52,8 +57,11 @@ export async function listEmailLogsController({
 		start_date,
 		end_date,
 		recipient,
+		cursor,
 	} = query;
-	const offset = (page - 1) * limit;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = cursor ? decodeCursor(cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	log.info("Listing email logs", { query, organizationId });
 	try {
@@ -124,10 +132,12 @@ export async function listEmailLogsController({
 
 		const total = totalResult[0]?.count || 0;
 
-		const logs = await db.query.emailLog.findMany({
-			where: whereClause,
-			orderBy: desc(schema.emailLog.createdAt),
-			limit: limit,
+		const rows = await db.query.emailLog.findMany({
+			where: position
+				? and(whereClause, afterCursor(schema.emailLog, position))
+				: whereClause,
+			orderBy: cursorOrderBy(schema.emailLog),
+			limit: limit + 1,
 			offset: offset,
 			with: {
 				events: {
@@ -135,6 +145,7 @@ export async function listEmailLogsController({
 				},
 			},
 		});
+		const { items: logs, hasMore, nextCursor } = toCursorPage(rows, limit);
 
 		log.info("Email logs listed successfully", { count: logs.length, total });
 		const sends = await resolveEmailSends(logs);
@@ -165,6 +176,8 @@ export async function listEmailLogsController({
 			total,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 		};
 	} catch (error) {
 		log.error("Error listing email logs", {

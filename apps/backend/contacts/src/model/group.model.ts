@@ -1,3 +1,4 @@
+import { cursorPageFields, cursorQuery } from "@reloop/auth/middleware";
 import { t } from "elysia";
 
 export namespace GroupModel {
@@ -92,6 +93,7 @@ export namespace GroupModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 		event: t.String({ description: "Event ID for the list request" }),
 	});
 
@@ -99,6 +101,7 @@ export namespace GroupModel {
 
 	// Query
 	export const groupQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
 		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 100 })),
 		search: t.Optional(t.String({ description: "Search by name" })),

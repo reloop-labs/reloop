@@ -6,9 +6,15 @@ import {
 import type { ContactModel } from "@be/contacts/model/contact.model";
 import type { GroupModel } from "@be/contacts/model/group.model";
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import { GROUP_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export const listGroupContactsController = async ({
@@ -21,6 +27,7 @@ export const listGroupContactsController = async ({
 	query: {
 		page?: number;
 		limit?: number;
+		cursor?: string;
 	};
 }): Promise<
 	| ContactModel.GroupContactListResponse
@@ -30,7 +37,10 @@ export const listGroupContactsController = async ({
 	const log = useLogger();
 	const page = query.page || 1;
 	const limit = Math.min(query.limit || 100, 100);
-	const offset = (page - 1) * limit;
+	// With a cursor, pagination is keyset-based and `page` is ignored. Pages
+	// follow membership order (contact_group created_at, id), oldest first.
+	const position = query.cursor ? decodeCursor(query.cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	log.info("Listing group contacts", { group_id, page, limit });
 
@@ -81,10 +91,12 @@ export const listGroupContactsController = async ({
 
 		// Fetch paginated contacts with properties via contactGroup relation
 		const rows = await db.query.contactGroup.findMany({
-			where: memberWhere,
-			limit,
+			where: position
+				? and(memberWhere, afterCursor(schema.contactGroup, position, "asc"))
+				: memberWhere,
+			limit: limit + 1,
 			offset,
-			orderBy: asc(schema.contactGroup.createdAt),
+			orderBy: cursorOrderBy(schema.contactGroup, "asc"),
 			with: {
 				contact: {
 					with: {
@@ -97,7 +109,9 @@ export const listGroupContactsController = async ({
 			},
 		});
 
-		const contactList = rows
+		const { items, hasMore, nextCursor } = toCursorPage(rows, limit);
+
+		const contactList = items
 			.filter(({ contact }) => contact.deletedAt === null)
 			.map(({ contact }) => {
 				const properties = contact.propertyValues.reduce(
@@ -142,6 +156,8 @@ export const listGroupContactsController = async ({
 			unsubscribedContacts,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 			event: GROUP_LIST_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {

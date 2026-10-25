@@ -1,3 +1,4 @@
+import { cursorPageFields, cursorQuery } from "@reloop/auth/middleware";
 import { t } from "elysia";
 
 export namespace ApiKeyModel {
@@ -210,12 +211,14 @@ export namespace ApiKeyModel {
 		total: t.Number({ description: "Total count of API keys" }),
 		page: t.Number({ description: "Current page index" }),
 		limit: t.Number({ description: "Maximum number of keys returned" }),
+		...cursorPageFields,
 		event: t.String({ description: "Event ID for the list operation" }),
 	});
 
 	export type ApiKeyListResponse = typeof apiKeyListResponse.static;
 
 	export const apiKeyQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(
 			t.Number({
 				minimum: 1,

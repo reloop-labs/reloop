@@ -54,6 +54,15 @@ export function parseApiKeySort(sort: string | undefined): ApiKeySortRule[] {
 	return rules.length > 0 ? rules : DEFAULT_API_KEY_SORT;
 }
 
+/** True when the rules are the default createdAt:desc order (cursor-capable). */
+export function isDefaultApiKeySort(rules: ApiKeySortRule[]): boolean {
+	return (
+		rules.length === 1 &&
+		rules[0]?.field === "createdAt" &&
+		rules[0]?.order === "desc"
+	);
+}
+
 export function toApiKeyOrderBy(rules: ApiKeySortRule[]): SQL[] {
 	const sqls = rules.map((rule) => {
 		const column = COLUMN_MAP[rule.field];

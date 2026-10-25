@@ -5,6 +5,12 @@ import {
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { getSuppressionSource } from "@be/contacts/utils/suppression";
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import { CONTACT_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import {
@@ -20,6 +26,7 @@ import {
 	type SQL,
 	sql,
 } from "drizzle-orm";
+import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 
 type ContactStatus = "subscribed" | "unsubscribed" | "blocked";
@@ -46,7 +53,19 @@ export async function listContactsController({
 	try {
 		const page = query.page || 1;
 		const limit = Math.min(query.limit || 100, 100);
-		const offset = (page - 1) * limit;
+		// `suppressed` sorts by suppressedAt, which cursors cannot follow: that
+		// mode keeps offset pagination and always returns `nextCursor: null`.
+		if (query.cursor && query.suppressed) {
+			throw createError({
+				status: 400,
+				message: "cursor cannot be combined with this sort",
+				why: "Contacts filtered with suppressed=true are sorted by suppression time, which cursor pagination does not support.",
+				fix: "Remove cursor and paginate with page, or drop suppressed to page by cursor.",
+			});
+		}
+		// With a cursor, pagination is keyset-based and `page` is ignored.
+		const position = query.cursor ? decodeCursor(query.cursor) : null;
+		const offset = position ? 0 : (page - 1) * limit;
 
 		const whereConditions: Array<SQL<unknown>> = [
 			eq(schema.contact.organizationId, organizationId),
@@ -128,9 +147,12 @@ export async function listContactsController({
 					desc(schema.contact.updatedAt),
 					desc(schema.contact.id),
 				]
-			: [desc(schema.contact.createdAt), desc(schema.contact.id)];
+			: cursorOrderBy(schema.contact);
+		if (position) {
+			whereConditions.push(afterCursor(schema.contact, position));
+		}
 
-		const [countsResult, contacts] = await Promise.all([
+		const [countsResult, rows] = await Promise.all([
 			db
 				.select({
 					totalMatching: totalMatchingSql,
@@ -143,10 +165,16 @@ export async function listContactsController({
 			db.query.contact.findMany({
 				where: and(...whereConditions),
 				orderBy,
-				limit,
+				limit: limit + 1,
 				offset,
 			}),
 		]);
+		const {
+			items: contacts,
+			hasMore,
+			nextCursor: lastRowCursor,
+		} = toCursorPage(rows, limit);
+		const nextCursor = query.suppressed ? null : lastRowCursor;
 
 		const counts = countsResult[0];
 		const total = Number(counts?.totalMatching || 0);
@@ -278,6 +306,8 @@ export async function listContactsController({
 			total,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 			totalContacts,
 			subscribedContacts,
 			unsubscribedContacts,

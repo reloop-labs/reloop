@@ -55,6 +55,7 @@ export namespace ApiKeyTypes {
 	}
 
 	export interface ApiKeyListQuery {
+		cursor?: string;
 		page?: number;
 		limit?: number;
 		enabled?: boolean;

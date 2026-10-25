@@ -1,3 +1,4 @@
+import { cursorPageFields, cursorQuery } from "@reloop/auth/middleware";
 import { t } from "elysia";
 
 // Examples shown in the API reference.
@@ -438,6 +439,7 @@ export namespace AutomationModel {
 	);
 
 	export const enrollmentListQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(
 			t.Numeric({ minimum: 1, default: 1, description: "Page number" }),
 		),
@@ -468,10 +470,18 @@ export namespace AutomationModel {
 			total: t.Number(),
 			page: t.Number(),
 			limit: t.Number(),
+			...cursorPageFields,
 		},
 		{
 			examples: [
-				{ enrollments: [exampleEnrollment], total: 1, page: 1, limit: 50 },
+				{
+					enrollments: [exampleEnrollment],
+					total: 1,
+					page: 1,
+					limit: 50,
+					hasMore: false,
+					nextCursor: null,
+				},
 			],
 		},
 	);

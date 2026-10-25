@@ -1,3 +1,4 @@
+import { cursorPageFields, cursorQuery } from "@reloop/auth/middleware";
 import { t } from "elysia";
 
 export namespace LogsModel {
@@ -77,6 +78,7 @@ export namespace LogsModel {
 	export type LogDetailResponse = typeof logDetailResponse.static;
 
 	export const listLogsQuery = t.Object({
+		...cursorQuery,
 		level: t.Optional(logLevel),
 		event: t.Optional(
 			t.String({ description: "Filter by event name (partial match)" }),
@@ -174,6 +176,7 @@ export namespace LogsModel {
 	export const listLogsResponse = t.Object({
 		logs: t.Array(logEntryResponse),
 		count: t.Number(),
+		...cursorPageFields,
 		stats: t.Optional(levelStats),
 	});
 
@@ -211,6 +214,7 @@ export namespace LogsModel {
 
 	// Email Logs
 	export const listEmailLogsQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(t.Numeric({ default: 1 })),
 		limit: t.Optional(t.Numeric({ default: 10 })),
 		search: t.Optional(t.String()),
@@ -265,6 +269,7 @@ export namespace LogsModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 	});
 	export type ListEmailLogsResponse = typeof listEmailLogsResponse.static;
 
@@ -356,6 +361,7 @@ export namespace LogsModel {
 	// timelines — used to power the "Activity" section on contact detail pages.
 
 	export const contactActivityQuery = t.Object({
+		...cursorQuery,
 		/** Recipient email address to look up activity for */
 		email: t.String({
 			description: "Recipient email address",
@@ -422,6 +428,7 @@ export namespace LogsModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 		stats: contactActivityStats,
 		engagement: contactActivityEngagement,
 	});
@@ -441,6 +448,7 @@ export namespace LogsModel {
 	export type ContactHistoryParams = typeof contactHistoryParams.static;
 
 	export const contactHistoryQuery = t.Object({
+		...cursorQuery,
 		page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
 		limit: t.Optional(t.Numeric({ default: 20, minimum: 1, maximum: 50 })),
 	});
@@ -480,6 +488,7 @@ export namespace LogsModel {
 		total: t.Number(),
 		page: t.Number(),
 		limit: t.Number(),
+		...cursorPageFields,
 	});
 	export type ContactHistoryResponse = typeof contactHistoryResponse.static;
 }

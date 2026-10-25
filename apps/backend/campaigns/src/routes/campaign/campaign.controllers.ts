@@ -29,6 +29,12 @@ import {
 	toRecipientResponse,
 } from "@be/campaigns/routes/campaign/campaign.mappers";
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import {
 	and,
@@ -44,6 +50,7 @@ import {
 	type SQL,
 	sql,
 } from "drizzle-orm";
+import { createError } from "evlog";
 
 async function requireCampaign(id: string, organizationId: string) {
 	const row = await db.query.campaign.findFirst({
@@ -174,13 +181,16 @@ export async function listCampaignsController(params: {
 	search?: string;
 	/** One status or a comma-separated list. */
 	status?: string;
+	cursor?: string;
 }) {
 	const page = Math.max(1, params.page ?? 1);
 	const limit = Math.min(
 		params.limit ?? campaignsConfig.constants.defaultPageSize,
 		campaignsConfig.constants.maxPageSize,
 	);
-	const offset = (page - 1) * limit;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = params.cursor ? decodeCursor(params.cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 	const filters: SQL[] = [
 		eq(schema.campaign.organizationId, params.organizationId),
 		isNull(schema.campaign.deletedAt),
@@ -206,9 +216,11 @@ export async function listCampaignsController(params: {
 		db
 			.select()
 			.from(schema.campaign)
-			.where(where)
-			.orderBy(desc(schema.campaign.createdAt), desc(schema.campaign.id))
-			.limit(limit)
+			.where(
+				position ? and(where, afterCursor(schema.campaign, position)) : where,
+			)
+			.orderBy(...cursorOrderBy(schema.campaign))
+			.limit(limit + 1)
 			.offset(offset),
 		db
 			.select({ value: sql<number>`count(*)` })
@@ -216,11 +228,15 @@ export async function listCampaignsController(params: {
 			.where(where),
 	]);
 
+	const { items, hasMore, nextCursor } = toCursorPage(rows, limit);
+
 	return {
-		campaigns: rows.map((row) => toCampaignResponse(row)),
+		campaigns: items.map((row) => toCampaignResponse(row)),
 		total: Number(totalRow[0]?.value ?? 0),
 		page,
 		limit,
+		hasMore,
+		nextCursor,
 	};
 }
 
@@ -512,11 +528,24 @@ export async function listRecipientsController(params: {
 		| "clicked"
 		| "all";
 	search?: string;
+	cursor?: string;
 }) {
+	// The clicked tab sorts by click count, which a createdAt cursor can't page.
+	const sortsByCreatedAt = params.category !== "clicked";
+	if (params.cursor && !sortsByCreatedAt) {
+		throw createError({
+			status: 400,
+			message: "cursor cannot be combined with this sort",
+			why: "The clicked category orders recipients by click count, and cursors only page results ordered by creation time.",
+			fix: "Omit cursor and use page to paginate the clicked category, or choose another category.",
+		});
+	}
 	const campaignRow = await requireCampaign(params.id, params.organizationId);
 	const page = Math.max(1, params.page ?? 1);
 	const limit = Math.min(params.limit ?? 50, 100);
-	const offset = (page - 1) * limit;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = params.cursor ? decodeCursor(params.cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	// Condition fragments for deliverability categories
 	const unsubscribedCondition = or(
@@ -649,6 +678,8 @@ export async function listRecipientsController(params: {
 	), 0)`;
 
 	const selectFields = {
+		id: schema.campaignRecipient.id,
+		createdAt: schema.campaignRecipient.createdAt,
 		recipient: schema.campaignRecipient,
 		contactFirstName: schema.contact.firstName,
 		contactLastName: schema.contact.lastName,
@@ -699,7 +730,7 @@ export async function listRecipientsController(params: {
 
 	const where = and(...queryFilter);
 
-	const [rows, totalRow, countsRow, clickedTotalRow, linksQuery] =
+	const [pageRows, totalRow, countsRow, clickedTotalRow, linksQuery] =
 		await Promise.all([
 			db
 				.select(selectFields)
@@ -719,13 +750,17 @@ export async function listRecipientsController(params: {
 					schema.emailLog,
 					eq(schema.emailLog.id, schema.campaignRecipient.emailLogId),
 				)
-				.where(where)
-				.orderBy(
-					params.category === "clicked"
-						? desc(clickCountExpr)
-						: desc(schema.campaignRecipient.createdAt),
+				.where(
+					position
+						? and(where, afterCursor(schema.campaignRecipient, position))
+						: where,
 				)
-				.limit(limit)
+				.orderBy(
+					...(sortsByCreatedAt
+						? cursorOrderBy(schema.campaignRecipient)
+						: [desc(clickCountExpr)]),
+				)
+				.limit(limit + 1)
 				.offset(offset),
 			db
 				.select({ value: sql<number>`count(*)` })
@@ -814,6 +849,10 @@ export async function listRecipientsController(params: {
 				.groupBy(sql`${schema.emailEvent.metadata}->>'url'`)
 				.orderBy(sql`count(*) desc`),
 		]);
+	const cursorPage = toCursorPage(pageRows, limit);
+	const rows = cursorPage.items;
+	const hasMore = cursorPage.hasMore;
+	const nextCursor = sortsByCreatedAt ? cursorPage.nextCursor : null;
 
 	const recipients = rows.map(
 		({
@@ -943,6 +982,8 @@ export async function listRecipientsController(params: {
 		total: Number(totalRow[0]?.value ?? 0),
 		page,
 		limit,
+		hasMore,
+		nextCursor,
 		counts: countsRow[0]
 			? {
 					unsubscribed: Number(countsRow[0].unsubscribed ?? 0),

@@ -1,3 +1,4 @@
+import { cursorQuery } from "@reloop/auth/middleware";
 import { t } from "elysia";
 
 export const campaignStatusSchema = t.Union([
@@ -82,6 +83,7 @@ export const updateCampaignBody = t.Object({
 });
 
 export const campaignListQuery = t.Object({
+	...cursorQuery,
 	page: t.Optional(t.Number()),
 	limit: t.Optional(t.Number()),
 	search: t.Optional(t.String()),

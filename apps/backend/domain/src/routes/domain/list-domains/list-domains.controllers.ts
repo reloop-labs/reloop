@@ -1,4 +1,10 @@
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
@@ -14,8 +20,10 @@ export async function listDomainsController({
 	organizationId: string;
 }): Promise<DomainTypes.DomainListResponse> {
 	const log = useLogger();
-	const { page = 1, limit = 10, status, q } = query;
-	const offset = (page - 1) * limit;
+	const { page = 1, limit = 10, status, q, cursor } = query;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = cursor ? decodeCursor(cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	try {
 		const conditions = [
@@ -34,15 +42,18 @@ export async function listDomainsController({
 			.from(schema.domain)
 			.where(whereClause);
 		const total = totalResult[0]?.count || 0;
-		const domains = await db.query.domain.findMany({
-			where: whereClause,
-			orderBy: desc(schema.domain.createdAt),
-			limit: limit,
+		const rows = await db.query.domain.findMany({
+			where: position
+				? and(whereClause, afterCursor(schema.domain, position))
+				: whereClause,
+			orderBy: cursorOrderBy(schema.domain),
+			limit: limit + 1,
 			offset: offset,
 			with: {
 				dnsRecords: true,
 			},
 		});
+		const { items: domains, hasMore, nextCursor } = toCursorPage(rows, limit);
 
 		const domainsWithCounts = await Promise.all(
 			domains.map(async (d) => {
@@ -64,6 +75,8 @@ export async function listDomainsController({
 			total,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 			event: DOMAIN_LIST_WEBHOOK_EVENT.id,
 		};
 

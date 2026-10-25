@@ -4,9 +4,15 @@ import {
 	uniqueTemplateSlug,
 } from "@be/template/utils/slug";
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	type CursorPosition,
+	cursorOrderBy,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import type { TemplateBlock } from "@reloop/db/schema";
 import * as schema from "@reloop/db/schema";
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 const SLUG_RETRIES = 5;
 
@@ -138,27 +144,36 @@ export const templateModel = {
 		return !!row;
 	},
 
-	async list(organizationId: string, page = 1, limit = 10) {
-		const offset = (page - 1) * limit;
+	async list(
+		organizationId: string,
+		page = 1,
+		limit = 10,
+		position: CursorPosition | null = null,
+	) {
+		const offset = position ? 0 : (page - 1) * limit;
 
-		const templates = await db
+		const rows = await db
 			.select()
 			.from(schema.template)
 			.where(
 				and(
 					eq(schema.template.organizationId, organizationId),
 					isNull(schema.template.deletedAt),
+					position ? afterCursor(schema.template, position) : undefined,
 				),
 			)
-			.orderBy(desc(schema.template.createdAt))
-			.limit(limit)
+			.orderBy(...cursorOrderBy(schema.template))
+			.limit(limit + 1)
 			.offset(offset);
+		const { items: templates, hasMore, nextCursor } = toCursorPage(rows, limit);
 
 		return {
 			templates,
 			total: templates.length,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 		};
 	},
 

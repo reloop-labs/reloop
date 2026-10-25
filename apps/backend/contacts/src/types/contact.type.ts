@@ -78,6 +78,7 @@ export namespace ContactTypes {
 	}
 
 	export interface ContactListQuery {
+		cursor?: string;
 		page?: number;
 		limit?: number;
 		search?: string;

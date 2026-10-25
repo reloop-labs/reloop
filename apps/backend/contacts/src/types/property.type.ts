@@ -44,6 +44,7 @@ export namespace PropertyTypes {
 	}
 
 	export interface PropertyListQuery {
+		cursor?: string;
 		page?: number;
 		limit?: number;
 		search?: string;

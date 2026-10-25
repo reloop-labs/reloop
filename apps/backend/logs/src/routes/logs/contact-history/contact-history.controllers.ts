@@ -1,7 +1,13 @@
 import { db } from "@reloop/db/client";
+import {
+	afterCursor,
+	cursorOrderBy,
+	decodeCursor,
+	toCursorPage,
+} from "@reloop/db/pagination";
 import * as schema from "@reloop/db/schema";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
-import { and, count, desc, eq, inArray, type SQL } from "drizzle-orm";
+import { and, count, eq, inArray, type SQL } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 import {
 	resolveContactHistoryChanges,
@@ -21,7 +27,9 @@ export async function contactHistoryController({
 	const log = useLogger();
 	const page = Math.max(Number(query.page || 1), 1);
 	const limit = Math.min(Math.max(Number(query.limit || 20), 1), 50);
-	const offset = (page - 1) * limit;
+	// With a cursor, pagination is keyset-based and `page` is ignored.
+	const position = query.cursor ? decodeCursor(query.cursor) : null;
+	const offset = position ? 0 : (page - 1) * limit;
 
 	log.info("Fetching contact history", {
 		contactId,
@@ -39,7 +47,7 @@ export async function contactHistoryController({
 		];
 		const whereClause = and(...conditions);
 
-		const [totalResult, rows] = await Promise.all([
+		const [totalResult, fetched] = await Promise.all([
 			db
 				.select({ count: count() })
 				.from(schema.activityLog)
@@ -48,15 +56,17 @@ export async function contactHistoryController({
 			db
 				.select()
 				.from(schema.activityLog)
-				.where(whereClause)
-				// Tie-break equal timestamps so offset pages never skip/duplicate rows
-				.orderBy(
-					desc(schema.activityLog.createdAt),
-					desc(schema.activityLog.id),
+				.where(
+					position
+						? and(whereClause, afterCursor(schema.activityLog, position))
+						: whereClause,
 				)
-				.limit(limit)
+				// Tie-breaks equal timestamps on id, so pages never skip/duplicate rows
+				.orderBy(...cursorOrderBy(schema.activityLog))
+				.limit(limit + 1)
 				.offset(offset),
 		]);
+		const { items: rows, hasMore, nextCursor } = toCursorPage(fetched, limit);
 
 		const total = Number(totalResult?.count || 0);
 
@@ -170,6 +180,8 @@ export async function contactHistoryController({
 			total,
 			page,
 			limit,
+			hasMore,
+			nextCursor,
 		};
 	} catch (error) {
 		log.error("Error fetching contact history", {
