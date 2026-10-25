@@ -1,45 +1,404 @@
 ---
 title: Migrating from SendGrid to Reloop
-description: "Step-by-step migration: map APIs, switch SMTP, update webhooks, and validate deliverability during the cutover."
+description: "A step-by-step SendGrid to Reloop migration: map the v3 Mail Send API, switch SMTP, move templates and suppressions, rewire webhooks, update DNS, and cut over without hurting deliverability."
 keywords:
   - migrate from SendGrid
   - SendGrid migration
   - SendGrid to Reloop
+  - SendGrid alternative
+  - SendGrid API migration
+  - replace SendGrid SMTP
 publishedAt: 2026-06-01
 category: Migration
-tags: [sendgrid, smtp, api, webhooks]
-readTime: 10 min read
+tags: [sendgrid, smtp, api, webhooks, migration]
+readTime: 11 min read
+image: /blog/images/migrating-from-sendgrid.png
 author:
   name: Pranav Patel
   role: Co-founder
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
-  - spf-dkim-dmarc-setup-guide
   - email-provider-comparison-2026
+  - spf-dkim-dmarc-setup-guide
+  - ip-warming-guide
 ---
 
-## Plan the cutover
+**Migrating from SendGrid to Reloop takes most teams an afternoon of code changes and a week of careful cutover.** The code is the easy part: Reloop's send call is simpler than SendGrid's v3 payload, and if you use SMTP you only change four settings. The part that deserves care is moving your suppression list and ramping traffic so your sender reputation comes with you.
 
-Run Reloop in parallel before switching DNS or API keys. Send test traffic to seed inboxes and compare delivery rates.
+This guide walks through the whole thing in the order we'd do it.
 
-Map SendGrid endpoints to Reloop's REST API or use SMTP relay for drop-in compatibility with existing code.
+---
 
-<Callout type="info">
-  Keep SendGrid active during a parallel run period so you can roll back quickly if deliverability dips.
+## The migration at a glance
+
+| Step | What changes | Effort |
+|---|---|---|
+| 1. Verify your domain | Add Reloop's DKIM and SPF next to SendGrid's | 15 min + DNS propagation |
+| 2. Export suppressions | Bounces, spam reports, unsubscribes into Reloop | 30 min |
+| 3. Swap the send code | v3 Mail Send → `reloop.mail.send` (or SMTP settings) | 1–3 hours |
+| 4. Move templates | Dynamic templates → Reloop templates (Handlebars still works) | Depends on count |
+| 5. Rewire webhooks | Event Webhook → Reloop webhooks | 1 hour |
+| 6. Ramp traffic | 10% → 50% → 100% over 1–2 weeks | Calendar time |
+| 7. Clean up | Remove SendGrid DNS records and keys | 15 min |
+
+Keep SendGrid running until step 7. Running both in parallel is what makes this safe.
+
+---
+
+## 1. Verify your sending domain in Reloop
+
+Add your domain in the [Reloop dashboard](/dashboard) under **Domains**. Reloop shows the exact records to add. They don't conflict with SendGrid's, so you can publish both at once.
+
+| Record | SendGrid (today) | Reloop (add) |
+|---|---|---|
+| DKIM | `s1._domainkey`, `s2._domainkey` CNAMEs | `reloop._domainkey` TXT |
+| Return path / tracking | `em1234` and `url1234` CNAMEs | `link` CNAME → `link.reloop.sh` |
+| SPF | `include:sendgrid.net` | `include:reloop.sh` |
+| DMARC | Unchanged | Unchanged |
+
+Because DKIM selectors are different, both providers can sign mail for the same domain at the same time. That's what lets you ramp gradually instead of flipping a switch.
+
+<Callout type="warning">
+  You can only have **one** SPF record per host. Merge Reloop into your existing one rather than adding a second: `v=spf1 include:sendgrid.net include:reloop.sh -all`. Two SPF records is a permanent fail.
 </Callout>
 
-## Update DNS
+If you haven't set up DMARC yet, now is a good time. See the [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide).
 
-Replace SendGrid SPF includes with Reloop's. Add new DKIM selectors before removing old ones to avoid a gap in signing.
+---
 
-## Rewire webhooks
+## 2. Move your suppression list first
 
-Reloop webhook payloads differ from SendGrid's. Update your handlers for delivered, bounce, and spam complaint events.
+This is the step people skip, and it's the one that hurts. Your SendGrid suppression list holds every address that hard-bounced, marked you as spam, or unsubscribed. If you don't bring it over, your first sends from Reloop will hit those addresses again, and mailbox providers will notice.
+
+Export each list from SendGrid's API:
+
+```bash
+for list in bounces spam_reports unsubscribes invalid_emails; do
+  curl -s "https://api.sendgrid.com/v3/suppression/$list?limit=500" \
+    -H "Authorization: Bearer $SENDGRID_API_KEY" > "sg-$list.json"
+done
+```
+
+Each endpoint is paginated with `limit` and `offset`, so loop until you get an empty page if you have more than 500 entries.
+
+Then add them to Reloop's suppression list:
+
+```typescript
+import { readFileSync } from "node:fs";
+
+const lists = ["bounces", "spam_reports", "unsubscribes", "invalid_emails"];
+
+for (const list of lists) {
+  const rows = JSON.parse(readFileSync(`sg-${list}.json`, "utf8")) as {
+    email: string;
+  }[];
+
+  for (const { email } of rows) {
+    await fetch("https://reloop.sh/api/contacts/v1/suppressions", {
+      method: "POST",
+      headers: {
+        "x-api-key": process.env.RELOOP_API_KEY!,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, reason: `Imported from SendGrid: ${list}` }),
+    });
+  }
+}
+```
+
+Suppressed addresses are rejected before they're sent, for both transactional and marketing mail. From here on, Reloop adds hard bounces and complaints to the list automatically.
+
+---
+
+## 3. Swap the send code
+
+### Option A: you use SMTP
+
+If your app sends through `smtp.sendgrid.net`, this is a settings change.
+
+| Setting | SendGrid | Reloop |
+|---|---|---|
+| Host | `smtp.sendgrid.net` | `smtp.reloop.sh` |
+| Port | `587` | `587` (STARTTLS) or `465` (TLS) |
+| Username | `apikey` | Your Reloop API key |
+| Password | Your SendGrid API key | Your Reloop API key |
+
+With Nodemailer, for example:
+
+```typescript
+import nodemailer from "nodemailer";
+
+export const transport = nodemailer.createTransport({
+  host: "smtp.reloop.sh",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.RELOOP_API_KEY,
+    pass: process.env.RELOOP_API_KEY,
+  },
+});
+```
+
+That's it. Everything else in your code stays the same. More examples for PHP, Python, Go, Ruby and Rust are in the [SMTP docs](/docs/examples/smtp/introduction).
+
+### Option B: you use the v3 Mail Send API
+
+SendGrid's v3 payload nests recipients inside `personalizations`. Reloop's is flat.
+
+**Before (SendGrid):**
+
+```typescript
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+
+await sgMail.send({
+  from: { email: "hello@acme.com", name: "Acme" },
+  to: "user@example.com",
+  replyTo: "support@acme.com",
+  subject: "Your receipt",
+  html: "<p>Thanks for your order.</p>",
+  text: "Thanks for your order.",
+  categories: ["receipt"],
+});
+```
+
+**After (Reloop):**
+
+```typescript
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, emailError } = await reloop.mail.send({
+  from: "Acme <hello@acme.com>",
+  to: "user@example.com",
+  reply_to: "support@acme.com",
+  subject: "Your receipt",
+  html: "<p>Thanks for your order.</p>",
+  text: "Thanks for your order.",
+  tags: [{ name: "category", value: "receipt" }],
+});
+
+if (emailError) {
+  // emailError has message, why, fix and a docs link
+  console.error(emailError);
+}
+```
+
+Install the SDK with `npm install reloop-email`. There are official SDKs for [Python, Go, PHP, Ruby, Rust and more](/sdk) too.
+
+### Field mapping
+
+| SendGrid v3 | Reloop |
+|---|---|
+| `from: { email, name }` | `from: "Name <email>"` |
+| `personalizations[].to` | `to` (string or array, up to 50) |
+| `personalizations[].cc` / `bcc` | `cc` / `bcc` |
+| `reply_to` | `reply_to` |
+| `content[]` (`text/plain`, `text/html`) | `text`, `html` |
+| `template_id` + `dynamic_template_data` | `template: { id, variables }` |
+| `categories` | `tags: [{ name, value }]` |
+| `custom_args` | `tags` (for filtering) or `headers` |
+| `send_at` (Unix seconds) | `scheduled_at` (ISO 8601) |
+| `attachments[]` (`content`, `filename`, `type`) | `attachments[]` (`content`, `filename`, `content_type`) |
+| `headers` | `headers` |
+| `asm.group_id` | Contact channels (subscription topics) |
+
+Two differences worth knowing:
+
+- **One recipient list per call.** SendGrid lets one request contain many `personalizations`, each with different recipients and data. In Reloop, send one request per message. It's simpler to reason about and you get one email ID per recipient for tracking.
+- **Retries are safe.** Add an `Idempotency-Key` header to retry a failed request without risking a duplicate send. See [idempotency](/docs/api/idempotency).
+
+---
+
+## 4. Move your templates
+
+SendGrid dynamic templates use Handlebars. Reloop templates use the same `{{variable}}` syntax, so most templates move over with a copy and paste.
+
+1. In SendGrid, open each dynamic template and copy its HTML from the code editor.
+2. In Reloop, create a template and paste the HTML. Or design it in the visual editor.
+3. Replace the template ID in your code.
+
+```typescript
+await reloop.mail.send({
+  from: "Acme <hello@acme.com>",
+  to: user.email,
+  subject: "Reset your password",
+  template: {
+    id: "tmpl_password_reset",
+    variables: { name: user.name, reset_url: resetUrl },
+  },
+});
+```
+
+If you have dozens of templates, list them with SendGrid's `GET /v3/templates?generations=dynamic` endpoint and script the copy.
+
+---
+
+## 5. Rewire webhooks
+
+SendGrid's Event Webhook sends a JSON **array** of events in each request. Reloop sends **one event per request**, wrapped in a consistent envelope and signed with HMAC-SHA256.
+
+### Event mapping
+
+| SendGrid event | Reloop event |
+|---|---|
+| `processed` | `email.sent` |
+| `delivered` | `email.delivered` |
+| `deferred` | `email.delivery_delayed` |
+| `bounce` | `email.bounced` |
+| `dropped` | `email.failed` |
+| `spamreport` | `email.complained` |
+| `open` | `email.opened` |
+| `click` | `email.clicked` |
+| Inbound Parse | `email.received` |
+
+### Payload
+
+```json
+{
+  "id": "whev_01h…",
+  "type": "email.bounced",
+  "created_at": "2026-07-22T12:00:00.000Z",
+  "data": {
+    "email_id": "em_…",
+    "from": "hello@acme.com",
+    "to": ["user@example.com"],
+    "subject": "Your receipt",
+    "status": "bounced",
+    "error": { "code": 550, "message": "User unknown" }
+  }
+}
+```
+
+### Handler
+
+```typescript
+// app/api/webhooks/reloop/route.ts
+import { verifyReloopWebhook } from "@/lib/verify-reloop-webhook";
+
+export async function POST(request: Request) {
+  const rawBody = await request.text();
+  const ok = verifyReloopWebhook({
+    secret: process.env.RELOOP_WEBHOOK_SECRET!,
+    rawBody,
+    signatureHeader: request.headers.get("Reloop-Signature") ?? "",
+  });
+  if (!ok) return new Response("Invalid signature", { status: 401 });
+
+  const event = JSON.parse(rawBody);
+
+  switch (event.type) {
+    case "email.bounced":
+    case "email.complained":
+      await markUndeliverable(event.data.to[0]);
+      break;
+    case "email.delivered":
+      await markDelivered(event.data.email_id);
+      break;
+  }
+
+  return new Response("ok");
+}
+```
+
+The `verifyReloopWebhook` helper is a few lines of Node crypto. Copy it from [verifying webhook requests](/docs/webhooks/verify-webhooks-requests). Failed deliveries are retried with backoff, and you can replay events from the dashboard.
+
+<Callout type="tip">
+  During the parallel run, keep **both** webhook handlers live. Each provider only reports on the mail it sent.
+</Callout>
+
+---
+
+## 6. Ramp traffic gradually
+
+Don't move 100% of your volume on day one. Mailbox providers judge reputation per sending IP and domain, and a sudden jump from a new source looks suspicious.
+
+A simple flag does the job:
+
+```typescript
+const RELOOP_SHARE = Number(process.env.RELOOP_SHARE ?? "0.1");
+
+export async function sendEmail(message: Message) {
+  if (Math.random() < RELOOP_SHARE) {
+    return sendWithReloop(message);
+  }
+  return sendWithSendGrid(message);
+}
+```
+
+A schedule that works for most senders:
+
+| Days | Share on Reloop | What to watch |
+|---|---|---|
+| 1–3 | 10% | Delivery rate, bounces, any `email.failed` |
+| 4–7 | 50% | Gmail and Outlook inbox placement |
+| 8–14 | 100% | Complaint rate under 0.1% |
+
+Start with transactional mail (password resets, receipts). Those recipients expect the message and engage with it, which builds reputation quickly. Move marketing campaigns last.
+
+If you're sending high volume on a dedicated IP, follow the longer [IP warming schedule](/blog/ip-warming-guide) instead.
+
+---
+
+## 7. Clean up
+
+Once Reloop has handled 100% of traffic for a week with healthy numbers:
+
+1. Remove `include:sendgrid.net` from your SPF record.
+2. Delete the `s1._domainkey`, `s2._domainkey`, `em…` and `url…` CNAMEs.
+3. Revoke your SendGrid API keys.
+4. Delete the old webhook handler and the `RELOOP_SHARE` flag.
+5. Cancel your SendGrid plan.
+
+Keep DMARC reports on for another month. They'll show if anything is still sending through SendGrid that you missed, like a forgotten cron job or a third-party tool.
+
+---
+
+## Migration checklist
+
+- [ ] Domain verified in Reloop, SPF merged, both DKIM selectors live
+- [ ] Suppressions exported from SendGrid and imported into Reloop
+- [ ] Send code or SMTP settings switched behind a flag
+- [ ] Templates copied and template IDs updated
+- [ ] Reloop webhook endpoint live and signature verified
+- [ ] Traffic ramped 10% → 50% → 100%
+- [ ] SendGrid DNS, keys and plan removed
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Will I lose my sender reputation by switching?">
+    Your **domain** reputation comes with you because it's tied to your
+    domain, not to SendGrid. IP reputation doesn't transfer, which is why the
+    gradual ramp matters. Hosted Reloop sends from warm shared IPs by default.
+  </Accordion>
+
+  <Accordion title="Do I need to change my DMARC record?">
+    No. DMARC checks that SPF or DKIM aligns with your From domain. Once
+    Reloop's DKIM record is published, Reloop mail passes DMARC with the
+    record you already have.
+  </Accordion>
+
+  <Accordion title="Can I move SendGrid Marketing Campaigns contacts too?">
+    Yes. Export contacts as CSV from SendGrid and import them in the Reloop
+    dashboard under Contacts. Bring the suppression list across first so
+    unsubscribed contacts stay unsubscribed.
+  </Accordion>
+
+  <Accordion title="How long does the whole migration take?">
+    Code changes usually take a few hours. The traffic ramp takes one to two
+    weeks. Most of that is waiting and watching dashboards.
+  </Accordion>
+</AccordionGroup>
 
 <Cta
   title="Ready to migrate?"
-  description="Open-source email infrastructure with a free hosted tier."
+  description="Start on the free tier and run Reloop alongside SendGrid until you're confident."
   href="/dashboard/signup"
   label="Get started"
 />
