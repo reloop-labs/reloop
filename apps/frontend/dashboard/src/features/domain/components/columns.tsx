@@ -1,8 +1,12 @@
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Popover from "@reloop/ui/popover";
 import * as Switch from "@reloop/ui/switch";
 import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { useState } from "react";
 import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import {
@@ -50,36 +54,118 @@ export function DomainStatusCell({
 
 export type FeatureState = "on" | "off" | "mixed";
 
+const CONFIRM_COPY: Record<
+	DomainFeatureId,
+	{ noun: string; on: string; off: string }
+> = {
+	sending: {
+		noun: "sending",
+		on: "will be able to send email.",
+		off: "will stop sending email.",
+	},
+	receiving: {
+		noun: "receiving",
+		on: "will start receiving email.",
+		off: "will stop receiving email.",
+	},
+	clickTracking: {
+		noun: "click tracking",
+		on: "will track link clicks.",
+		off: "will stop tracking link clicks.",
+	},
+	openTracking: {
+		noun: "open tracking",
+		on: "will track email opens.",
+		off: "will stop tracking email opens.",
+	},
+};
+
 /**
- * Switch that turns a feature on/off for one domain, or for every domain in a
- * group. A mixed group shows off; switching it turns the feature on for all.
+ * Switch that turns a feature on/off for one domain (or every domain in a
+ * group). A small popover on the switch asks to confirm before anything changes.
  */
 export function FeatureSwitch({
 	domainIds,
+	domainName,
 	feature,
 	state,
 	label,
 }: {
 	domainIds: string[];
+	/** Shown in the confirmation, e.g. "mc.reloop.sh". */
+	domainName: string;
 	feature: DomainFeatureId;
 	state: FeatureState;
 	label: string;
 }) {
 	const toggle = useDomainFeatureToggle();
+	const [pending, setPending] = useState<boolean | null>(null);
+	const copy = CONFIRM_COPY[feature];
+	const next = pending ?? state !== "on";
+
 	return (
 		<div
 			className="flex items-center"
 			onClick={(e) => e.stopPropagation()}
 			onKeyDown={(e) => e.stopPropagation()}
 		>
-			<Switch.Root
-				checked={state === "on"}
-				onCheckedChange={(checked) => void toggle(domainIds, feature, checked)}
-				aria-label={label}
-				title={
-					state === "mixed" ? "On for some domains in this group" : undefined
-				}
-			/>
+			<Popover.Root
+				open={pending !== null}
+				onOpenChange={(open) => {
+					if (!open) setPending(null);
+				}}
+			>
+				<Popover.Anchor asChild>
+					<span className="inline-flex">
+						<Switch.Root
+							checked={state === "on"}
+							onCheckedChange={(checked) => setPending(checked)}
+							aria-label={label}
+							title={
+								state === "mixed"
+									? "On for some domains in this group"
+									: undefined
+							}
+						/>
+					</span>
+				</Popover.Anchor>
+				<Popover.Content
+					side="bottom"
+					align="center"
+					sideOffset={0}
+					unstyled
+					className="w-64 rounded-2xl bg-bg-white-0 p-3 ring-1 ring-stroke-soft-100 ring-inset dark:bg-bg-weak-50 dark:ring-stroke-soft-100/40"
+				>
+					<p className="font-medium text-label-sm text-text-strong-950 dark:text-white">
+						Turn {next ? "on" : "off"} {copy.noun}?
+					</p>
+					<p className="mt-1 text-paragraph-xs text-text-sub-600">
+						{domainName} {next ? copy.on : copy.off}
+					</p>
+					<div className="mt-3 flex justify-end gap-2">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							onClick={() => setPending(null)}
+						>
+							Cancel
+						</Button.Root>
+						<FancyButton.Root
+							type="button"
+							variant="neutral"
+							size="xsmall"
+							onClick={() => {
+								setPending(null);
+								void toggle(domainIds, feature, next);
+							}}
+						>
+							Turn {next ? "on" : "off"}
+						</FancyButton.Root>
+					</div>
+				</Popover.Content>
+			</Popover.Root>
 		</div>
 	);
 }
@@ -114,6 +200,7 @@ function featureColumn(
 		cell: ({ row }) => (
 			<FeatureSwitch
 				domainIds={[row.original.id]}
+				domainName={row.original.domain}
 				feature={feature.id}
 				state={feature.pick(row.original) ? "on" : "off"}
 				label={`${feature.label} for ${row.original.domain}`}

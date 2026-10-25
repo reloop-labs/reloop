@@ -17,17 +17,36 @@ export const DOMAIN_FEATURE_FIELDS = {
 
 export type DomainFeatureId = keyof typeof DOMAIN_FEATURE_FIELDS;
 
-const LABELS: Record<DomainFeatureId, string> = {
-	sending: "sending",
-	receiving: "receiving",
-	clickTracking: "click tracking",
-	openTracking: "open tracking",
+// Same wording as the domain detail page (dns-records-section.tsx).
+const MESSAGES: Record<
+	DomainFeatureId,
+	{ on: [string, string]; off: [string, string] }
+> = {
+	sending: {
+		on: ["Enabling email sending...", "Sending enabled successfully"],
+		off: ["Disabling email sending...", "Sending disabled successfully"],
+	},
+	receiving: {
+		on: ["Enabling email receiving...", "Receiving enabled successfully"],
+		off: ["Disabling email receiving...", "Receiving disabled successfully"],
+	},
+	clickTracking: {
+		on: ["Enabling click tracking...", "Click tracking enabled successfully"],
+		off: [
+			"Disabling click tracking...",
+			"Click tracking disabled successfully",
+		],
+	},
+	openTracking: {
+		on: ["Enabling open tracking...", "Open tracking enabled successfully"],
+		off: ["Disabling open tracking...", "Open tracking disabled successfully"],
+	},
 };
 
 /**
- * Turns one feature on/off for one or more domains. The list updates
- * immediately; on failure it is refetched (reverting the switch) and a toast
- * explains why.
+ * Turns one feature on/off for one or more domains, like the detail page:
+ * the list updates immediately and a loading → success/error toast tracks the
+ * save. On failure the list is refetched, reverting the switch.
  */
 export function useDomainFeatureToggle() {
 	const queryClient = useQueryClient();
@@ -37,6 +56,7 @@ export function useDomainFeatureToggle() {
 			if (domainIds.length === 0) return;
 			const { field, body } = DOMAIN_FEATURE_FIELDS[feature];
 			const ids = new Set(domainIds);
+			const [loading, success] = MESSAGES[feature][enabled ? "on" : "off"];
 
 			await queryClient.cancelQueries({ queryKey: queryKeys.domain.all });
 			queryClient.setQueriesData<DomainListResponse>(
@@ -52,7 +72,7 @@ export function useDomainFeatureToggle() {
 						: data,
 			);
 
-			const results = await Promise.allSettled(
+			const save = Promise.all(
 				domainIds.map((id) =>
 					axios.patch(
 						`/api/domain/v1/${id}`,
@@ -61,16 +81,19 @@ export function useDomainFeatureToggle() {
 					),
 				),
 			);
-			const failed = results.filter(
-				(r): r is PromiseRejectedResult => r.status === "rejected",
-			);
-			if (failed.length > 0) {
-				const reason = failed[0]?.reason;
-				toast.error(
-					axios.isAxiosError(reason) && reason.response?.data?.message
-						? reason.response.data.message
-						: `Couldn't turn ${enabled ? "on" : "off"} ${LABELS[feature]}`,
-				);
+			toast.promise(save, {
+				loading,
+				success,
+				error: (error) =>
+					axios.isAxiosError(error)
+						? error.response?.data?.message ||
+							"Failed to update domain settings"
+						: "Failed to update domain settings",
+			});
+			try {
+				await save;
+			} catch {
+				// The toast reports it; the refetch below reverts the switch.
 			}
 			await queryClient.invalidateQueries({ queryKey: queryKeys.domain.all });
 		},
