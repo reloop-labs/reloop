@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { apiError } from "@reloop/auth/middleware/api-errors";
 import { sanitizeInternalSecret } from "@reloop/auth/middleware/internal-secret";
 import { extractSessionToken } from "@reloop/auth/middleware/keys";
 import {
@@ -167,12 +168,12 @@ export function apiRateLimitPlugin(opts: ApiRateLimitOptions = {}) {
 
 			if (limited) {
 				set.status = 429;
-				return {
+				return apiError(429, {
 					message: "Too many requests",
 					why: `This client exceeded ${max} API requests per ${windowSeconds}s.`,
 					fix: `Wait ${resetSeconds} second(s) before retrying, and pace requests using the ratelimit-remaining and ratelimit-reset headers.`,
 					link: "https://reloop.sh/docs/api/usage-limits",
-				};
+				});
 			}
 		})
 		.as("global");

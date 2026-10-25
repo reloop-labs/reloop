@@ -8,6 +8,7 @@
 		"pagination",
 		"usage-limits",
 		"idempotency",
+		"versioning",
 		"errors",
 		"mail",
 		"inbox",

@@ -1,8 +1,25 @@
 export {
+	API_ERROR_CODES,
+	API_ERRORS_DOCS_URL,
+	type ApiError,
+	type ApiFieldError,
+	apiError,
+	apiErrorCode,
+	apiErrorsPlugin,
+	toApiError,
+} from "./api-errors";
+export {
 	type ApiRateLimitOptions,
 	type ApiRateLimitRedis,
 	apiRateLimitPlugin,
 } from "./api-rate-limit";
+export {
+	buildDeprecationHeaders,
+	DEPRECATION_POLICY_URL,
+	type DeprecationOptions,
+	deprecationPlugin,
+	MIN_SUNSET_NOTICE_DAYS,
+} from "./deprecation";
 export { applySessionCacheEviction } from "./eviction/apply-session-cache-eviction";
 export { evictAllSessionsForUser } from "./eviction/evict-all-sessions-for-user";
 export { evictSessionByToken } from "./eviction/evict-session-by-token";

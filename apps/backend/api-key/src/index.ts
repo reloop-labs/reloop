@@ -1,4 +1,4 @@
-import { log, parseError } from "evlog";
+import { log } from "evlog";
 import "dotenv/config";
 import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
@@ -10,6 +10,7 @@ import { healthRoute } from "@reloop/api-key/routes/landing/health.route";
 import { landingRoute } from "@reloop/api-key/routes/landing/landing.route";
 import { loader } from "@reloop/api-key/utils/loader";
 import {
+	apiErrorsPlugin,
 	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
@@ -69,39 +70,7 @@ const apiKeyService = new Elysia({
 	)
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(serverTiming())
-	.onError(({ error, set }) => {
-		const parsed = parseError(error);
-		set.status = parsed.status;
-		let message = parsed.message;
-		if (typeof message === "string" && message.trim().startsWith("{")) {
-			try {
-				const json = JSON.parse(message);
-				if (json.summary) {
-					message = json.summary;
-				} else if (
-					json.errors &&
-					Array.isArray(json.errors) &&
-					json.errors[0]?.summary
-				) {
-					message = json.errors[0].summary;
-				} else if (
-					json.message &&
-					typeof json.message === "string" &&
-					!json.message.startsWith("{")
-				) {
-					message = json.message;
-				}
-			} catch {
-				// Keep original message if not JSON
-			}
-		}
-		return {
-			message,
-			why: parsed.why,
-			fix: parsed.fix,
-			link: parsed.link,
-		};
-	})
+	.use(apiErrorsPlugin())
 	.use(landingRoute)
 	.use(agentCardRoute)
 	.use(healthRoute)

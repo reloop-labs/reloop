@@ -47,6 +47,164 @@ async function fetchSpec(name: string): Promise<Spec | null> {
 	}
 }
 
+const ERROR_REF = { $ref: "#/components/schemas/Error" };
+
+/**
+ * The error body every service returns (`apiErrorsPlugin` in
+ * packages/auth/src/middleware/api-errors.ts). Keep the two in sync.
+ */
+const errorComponents = {
+	schemas: {
+		Error: {
+			type: "object",
+			description:
+				"Error returned by every Reloop API endpoint. Branch on `code`; show `message`, `why` and `fix` to people. See https://reloop.sh/docs/api/errors.",
+			required: ["code", "message", "link"],
+			properties: {
+				code: {
+					type: "string",
+					description:
+						"Stable machine-readable error code, e.g. `validation_error`, `unauthorized`, `not_found`, `conflict`, `rate_limited`, `internal_error`.",
+					example: "validation_error",
+				},
+				message: {
+					type: "string",
+					description: "Short summary of what went wrong.",
+				},
+				why: { type: "string", description: "Why it went wrong." },
+				fix: { type: "string", description: "How to fix it." },
+				link: {
+					type: "string",
+					format: "uri",
+					description: "Documentation for this error.",
+				},
+				errors: {
+					type: "array",
+					description: "Per-field problems. Present on `validation_error`.",
+					items: { $ref: "#/components/schemas/FieldError" },
+				},
+			},
+		},
+		FieldError: {
+			type: "object",
+			required: ["path", "message"],
+			properties: {
+				path: {
+					type: "string",
+					description: "JSON Pointer to the invalid field, e.g. `/email`.",
+				},
+				message: { type: "string" },
+			},
+		},
+	},
+	responses: {
+		ValidationError: {
+			description:
+				"The request did not match the endpoint's schema (`code: validation_error`).",
+			content: { "application/json": { schema: ERROR_REF } },
+		},
+		RateLimited: {
+			description:
+				"Too many requests (`code: rate_limited`). Wait for the `Retry-After` delay. See https://reloop.sh/docs/api/usage-limits.",
+			content: { "application/json": { schema: ERROR_REF } },
+		},
+		InternalError: {
+			description: "Unexpected server error (`code: internal_error`).",
+			content: { "application/json": { schema: ERROR_REF } },
+		},
+	},
+};
+
+type JsonSchema = Record<string, unknown> & {
+	properties?: Record<string, Record<string, unknown>>;
+};
+
+/**
+ * Points an inline error schema at the shared Error. Route-specific message
+ * values (const/enum) are kept as a refinement so no detail is lost.
+ */
+function toErrorSchema(
+	schema: JsonSchema | undefined,
+): Record<string, unknown> {
+	const message = schema?.properties?.message;
+	if (message && ("const" in message || "enum" in message)) {
+		return {
+			allOf: [ERROR_REF, { type: "object", properties: { message } }],
+		};
+	}
+	return ERROR_REF;
+}
+
+/** Every 4xx/5xx uses the shared Error; adds the errors any endpoint can return. */
+export function addErrorModel(paths: Record<string, unknown>): void {
+	for (const item of Object.values(paths)) {
+		for (const [method, op] of Object.entries(
+			item as Record<string, Operation & { requestBody?: unknown }>,
+		)) {
+			if (!["get", "post", "put", "patch", "delete"].includes(method)) {
+				continue;
+			}
+			op.responses ??= {};
+			for (const [code, response] of Object.entries(op.responses)) {
+				if (!/^[45]/.test(code) || "$ref" in response) continue;
+				const content = response.content as
+					| Record<string, { schema?: JsonSchema }>
+					| undefined;
+				response.content = {
+					"application/json": {
+						schema: toErrorSchema(content?.["application/json"]?.schema),
+					},
+				};
+			}
+			if (op.requestBody || op.parameters?.length) {
+				op.responses["422"] ??= {
+					$ref: "#/components/responses/ValidationError",
+				};
+			}
+			op.responses["429"] ??= { $ref: "#/components/responses/RateLimited" };
+			op.responses["500"] ??= {
+				$ref: "#/components/responses/InternalError",
+			};
+		}
+	}
+}
+
+const VERSIONING_POLICY_URL = "https://reloop.sh/docs/api/versioning";
+
+const deprecationComponents = {
+	headers: {
+		Deprecation: {
+			description:
+				"Present when the endpoint is deprecated: when it was deprecated, as `@<unix seconds>` (RFC 9745).",
+			schema: { type: "string", example: "@1793491200" },
+		},
+		Sunset: {
+			description:
+				"Present when the endpoint is deprecated: the date after which it may be removed, as an HTTP-date (RFC 8594).",
+			schema: { type: "string", example: "Sat, 01 May 2027 00:00:00 GMT" },
+		},
+	},
+};
+
+/** Documents Deprecation/Sunset on every response of deprecated operations. */
+export function addDeprecationHeaders(paths: Record<string, unknown>): void {
+	for (const item of Object.values(paths)) {
+		for (const op of Object.values(
+			item as Record<string, Operation & { deprecated?: boolean }>,
+		)) {
+			if (!op?.deprecated || !op.responses) continue;
+			for (const response of Object.values(op.responses)) {
+				if ("$ref" in response) continue;
+				response.headers = {
+					...(response.headers as Record<string, unknown> | undefined),
+					Deprecation: { $ref: "#/components/headers/Deprecation" },
+					Sunset: { $ref: "#/components/headers/Sunset" },
+				};
+			}
+		}
+	}
+}
+
 /**
  * Services whose POST operations accept `Idempotency-Key` (backend
  * `idempotencyPlugin`, or mail send's own handling). Keep in sync with the
@@ -100,11 +258,13 @@ const idempotencyComponents = {
 	responses: {
 		IdempotencyConflict: {
 			description:
-				"A request with this Idempotency-Key is still in progress. Retry after the `Retry-After` delay.",
+				"A request with this Idempotency-Key is still in progress (`code: idempotency_in_progress`). Retry after the `Retry-After` delay.",
+			content: { "application/json": { schema: ERROR_REF } },
 		},
 		IdempotencyKeyReused: {
 			description:
-				"This Idempotency-Key was already used with a different request body or endpoint.",
+				"This Idempotency-Key was already used with a different request body or endpoint (`code: idempotency_key_reused`).",
+			content: { "application/json": { schema: ERROR_REF } },
 		},
 	},
 };
@@ -163,9 +323,17 @@ export async function buildMergedOpenApi() {
 		}
 	}
 
+	addErrorModel(paths);
 	addIdempotency(paths);
-	for (const [kind, entries] of Object.entries(idempotencyComponents)) {
-		components[kind] = { ...components[kind], ...entries };
+	addDeprecationHeaders(paths);
+	for (const extra of [
+		errorComponents,
+		idempotencyComponents,
+		deprecationComponents,
+	]) {
+		for (const [kind, entries] of Object.entries(extra)) {
+			components[kind] = { ...components[kind], ...entries };
+		}
 	}
 
 	components.securitySchemes = {
@@ -190,12 +358,17 @@ export async function buildMergedOpenApi() {
 		info: {
 			title: "Reloop API",
 			version: "1.0.0",
-			description:
-				"Open-source email infrastructure: send email, manage domains, contacts, templates, webhooks, automations and agent inboxes. Errors are JSON with a `message` field.",
+			description: `Open-source email infrastructure: send email, manage domains, contacts, templates, webhooks, automations and agent inboxes. Every error is JSON matching the \`Error\` schema, with a stable \`code\`. The API is versioned in the URL (\`/v1\`); breaking changes ship as a new version, and deprecated endpoints send \`Deprecation\` and \`Sunset\` headers at least 180 days before removal. Policy: ${VERSIONING_POLICY_URL}`,
 			contact: { name: "Reloop Labs", url: `${siteUrl}/contact` },
 			license: { name: "Reloop License", url: `${siteUrl}/license` },
 		},
 		externalDocs: { description: "Reloop docs", url: `${siteUrl}/docs/api` },
+		"x-api-lifecycle": {
+			versioning: "url",
+			currentVersion: "v1",
+			deprecationPolicy: VERSIONING_POLICY_URL,
+			minimumSunsetNoticeDays: 180,
+		},
 		servers: [{ url: siteUrl, description: "Reloop Cloud" }],
 		security: [{ apiKey: [] }, { bearer: [] }],
 		tags: [...tags.values()],

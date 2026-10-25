@@ -1,0 +1,64 @@
+---
+title: Versioning and Deprecation
+description: How the Reloop API is versioned, what counts as a breaking change, and how endpoints are deprecated and removed.
+---
+
+The Reloop API is versioned in the URL. The current version is `v1`, as in `https://reloop.sh/api/mail/v1/send`. Within a version, Reloop does not make breaking changes. When an endpoint must change in a breaking way, the new behavior ships as a new endpoint or version, and the old one is deprecated with at least **180 days** of notice before it is removed.
+
+## Non-breaking changes
+
+These can ship at any time without a new version. Build your client to tolerate them:
+
+- New endpoints.
+- New optional request fields, query parameters and headers.
+- New fields in responses, and new values in fields documented as open-ended.
+- New error `code` values. Handle an unknown `code` by its HTTP status. See [Errors](/docs/api/errors).
+- New webhook event types.
+- Changes to human-readable text such as `message`, `why` and `fix`.
+- Changes to rate limits. See [Usage Limits](/docs/api/usage-limits).
+
+## Breaking changes
+
+These only happen in a new version, after the deprecation process below:
+
+- Removing or renaming an endpoint, request field or response field.
+- Making an optional request field required.
+- Changing a field's type or format.
+- Changing authentication.
+- Changing the meaning of an existing status code or error `code`.
+
+Fixes for security issues are the one exception. When a vulnerability requires it, Reloop may change behavior with shorter notice and will explain why in the [changelog](https://reloop.sh/changelog).
+
+## Deprecation process
+
+1. **Announce.** The deprecation is published in the [changelog](https://reloop.sh/changelog) ([RSS](https://reloop.sh/changelog/feed.xml)) with the replacement and the removal date.
+2. **Signal.** From that day, every response from the deprecated endpoint carries headers you can monitor:
+
+   ```http
+   Deprecation: @1793491200
+   Sunset: Sat, 01 May 2027 00:00:00 GMT
+   Link: <https://reloop.sh/docs/api/versioning>; rel="deprecation", </api/contacts/v2/list>; rel="successor-version"
+   ```
+
+   | Header | Meaning |
+   |--------|---------|
+   | `Deprecation` | When the endpoint was deprecated, as `@` plus Unix seconds ([RFC 9745](https://www.rfc-editor.org/rfc/rfc9745)). |
+   | `Sunset` | The earliest date the endpoint may be removed, as an HTTP date ([RFC 8594](https://www.rfc-editor.org/rfc/rfc8594)). |
+   | `Link` | This policy (`rel="deprecation"`) and the replacement endpoint, if there is one (`rel="successor-version"`). |
+
+   The [OpenAPI document](https://reloop.sh/openapi.json) marks the operation `deprecated: true`, with the removal date in `x-sunset` and the replacement in `x-successor`.
+3. **Remind.** Organizations still calling the endpoint are contacted before the sunset date.
+4. **Remove.** On or after the `Sunset` date, the endpoint may be removed and return `404` (`code: not_found`).
+
+`Sunset` is always at least 180 days after `Deprecation`.
+
+## Staying ahead of changes
+
+- Log a warning whenever a response includes a `Deprecation` header.
+- Subscribe to the [changelog feed](https://reloop.sh/changelog/feed.xml).
+- Ignore unknown response fields instead of failing on them.
+- Branch on error `code`, not on `message` text.
+
+## Self-hosted deployments
+
+Self-hosted Reloop follows the same API versions. Deprecated endpoints are removed in a release after their `Sunset` date, and the release notes list them.

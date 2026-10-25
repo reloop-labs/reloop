@@ -3,6 +3,7 @@ import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiErrorsPlugin,
 	apiRateLimitPlugin,
 	idempotencyPlugin,
 	requireUserAgentPlugin,
@@ -15,7 +16,7 @@ import { healthRoute } from "@reloop/domain/routes/landing/health.route";
 import { landingRoute } from "@reloop/domain/routes/landing/landing.route";
 import { loader } from "@reloop/domain/utils/loader";
 import { Elysia } from "elysia";
-import { initLogger, log, parseError } from "evlog";
+import { initLogger, log } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
 
@@ -90,16 +91,7 @@ const domainService = new Elysia({
 	)
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(serverTiming())
-	.onError(({ error, set }) => {
-		const parsed = parseError(error);
-		set.status = parsed.status;
-		return {
-			message: parsed.message,
-			why: parsed.why,
-			fix: parsed.fix,
-			link: parsed.link,
-		};
-	})
+	.use(apiErrorsPlugin())
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)

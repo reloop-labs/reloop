@@ -1,3 +1,4 @@
+import { apiError } from "@reloop/auth/middleware/api-errors";
 import { resolveInternalBaseUrl } from "@reloop/auth/middleware/internal-base-url";
 import { sanitizeInternalSecret } from "@reloop/auth/middleware/internal-secret";
 import { resolveAuthRedis } from "@reloop/auth/middleware/redis/resolve-auth-redis";
@@ -15,7 +16,13 @@ import {
 } from "@reloop/auth/middleware/types";
 import { Elysia } from "elysia";
 
-const UNAUTH = { message: "Authentication required" };
+// Early returns from a macro resolve skip apiErrorsPlugin's stamping, so
+// these bodies are complete ApiErrors on their own.
+const UNAUTH = apiError(401, {
+	message: "Authentication required",
+	why: "The request has no valid API key, OAuth token or session.",
+	fix: "Send your API key as `x-api-key: rl_...` or `Authorization: Bearer rl_...`. Create one at https://reloop.sh/dashboard/api-keys.",
+});
 
 export function createAuthPlugin(config: AuthMiddlewareConfig) {
 	const baseUrl = resolveInternalBaseUrl(
@@ -125,11 +132,14 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolvePlatformAdmin(headers, deps);
 				if (!ctx) {
-					return status(401, {
-						message: "Unauthorized access",
-						why: "Platform admin privileges are required",
-						fix: "Sign in with a platform admin account",
-					});
+					return status(
+						401,
+						apiError(401, {
+							message: "Unauthorized access",
+							why: "Platform admin privileges are required",
+							fix: "Sign in with a platform admin account",
+						}),
+					);
 				}
 				return {
 					userId: ctx.userId,
@@ -178,11 +188,14 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveSupportSession(headers, deps);
 				if (!ctx) {
-					return status(401, {
-						message: "Unauthorized access",
-						why: "A signed-in session is required for support chat",
-						fix: "Sign in to your Reloop account and retry",
-					});
+					return status(
+						401,
+						apiError(401, {
+							message: "Unauthorized access",
+							why: "A signed-in session is required for support chat",
+							fix: "Sign in to your Reloop account and retry",
+						}),
+					);
 				}
 				return {
 					userId: ctx.userId,

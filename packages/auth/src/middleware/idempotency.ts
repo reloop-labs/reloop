@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { apiError } from "@reloop/auth/middleware/api-errors";
 import { extractSessionToken } from "@reloop/auth/middleware/keys";
 import { extractApiKey } from "@reloop/auth/middleware/resolve/extract-api-key";
 import { RedisCache } from "@reloop/cache/redis-client";
@@ -100,12 +101,13 @@ function reply(
 	return new Response(JSON.stringify(body ?? null), { status, headers });
 }
 
-const error = (message: string, why: string, fix: string) => ({
-	message,
-	why,
-	fix,
-	link: DOCS_LINK,
-});
+const error = (
+	status: number,
+	code: string,
+	message: string,
+	why: string,
+	fix: string,
+) => apiError(status, { code, message, why, fix, link: DOCS_LINK });
 
 /**
  * Stripe-style `Idempotency-Key` support for every POST on the service.
@@ -146,6 +148,8 @@ export function idempotencyPlugin(opts: IdempotencyOptions = {}) {
 					return reply(
 						400,
 						error(
+							400,
+							"invalid_idempotency_key",
 							"Invalid Idempotency-Key",
 							`Idempotency-Key must be at most ${IDEMPOTENCY_KEY_MAX_LENGTH} characters.`,
 							"Send a shorter unique key, such as a UUID.",
@@ -201,6 +205,8 @@ export function idempotencyPlugin(opts: IdempotencyOptions = {}) {
 					return reply(
 						422,
 						error(
+							422,
+							"idempotency_key_reused",
 							"Idempotency-Key reused with a different request",
 							"This key was already used for a request with a different body or endpoint.",
 							"Use a new Idempotency-Key for each distinct request; reuse a key only to retry the exact same request.",
@@ -217,6 +223,8 @@ export function idempotencyPlugin(opts: IdempotencyOptions = {}) {
 				return reply(
 					409,
 					error(
+						409,
+						"idempotency_in_progress",
 						"Request with this Idempotency-Key is still in progress",
 						"An earlier request with the same key has not finished yet.",
 						"Wait a moment and retry with the same key to get its result.",

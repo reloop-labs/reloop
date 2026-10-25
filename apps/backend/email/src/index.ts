@@ -1,4 +1,4 @@
-import { initLogger, log, parseError } from "evlog";
+import { initLogger, log } from "evlog";
 import { createOTLPDrain } from "evlog/otlp";
 import "dotenv/config";
 import cors from "@elysiajs/cors";
@@ -37,6 +37,7 @@ if (emailConfig.NODE_ENV !== "production") {
 }
 
 import {
+	apiErrorsPlugin,
 	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
@@ -65,16 +66,7 @@ const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 			},
 		}),
 	)
-	.onError(({ error, set }) => {
-		const parsed = parseError(error);
-		set.status = parsed.status;
-		return {
-			message: parsed.message,
-			why: parsed.why,
-			fix: parsed.fix,
-			link: parsed.link,
-		};
-	})
+	.use(apiErrorsPlugin())
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)

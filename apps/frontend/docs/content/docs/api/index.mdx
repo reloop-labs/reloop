@@ -47,16 +47,17 @@ The API uses standard HTTP status codes to indicate the outcome of a request:
 | `403` | Forbidden | The API key doesn't have permission to access the requested resource. |
 | `404` | Not Found | The resource doesn't exist, or it belongs to a different organization. |
 | `409` | Conflict | A resource with the same unique identifier already exists (e.g., duplicate domain or channel name), or a request with the same [Idempotency-Key](/docs/api/idempotency) is still running. |
-| `422` | Unprocessable Content | An [Idempotency-Key](/docs/api/idempotency) was reused with a different request. |
+| `422` | Unprocessable Content | The request did not match the endpoint's schema (`errors` lists each field), or an [Idempotency-Key](/docs/api/idempotency) was reused with a different request. |
 | `429` | Too Many Requests | You've exceeded a [rate limit](/docs/api/usage-limits). Retry after the `Retry-After` header value. |
 | `500` | Internal Server Error | Something went wrong on our end. If the issue persists, contact [support](mailto:support@reloop.sh). |
 
 ## Errors
 
-When a request fails, the response body always contains four fields to help you diagnose and fix the issue:
+When a request fails, the response body is a JSON object with a stable `code` plus fields that help you diagnose and fix the issue:
 
 ```json
 {
+  "code": "not_found",
   "message": "Domain not found",
   "why": "The domain acme.com was not found or is not authorized for your organization",
   "fix": "Ensure the domain is registered and verified in your dashboard",
@@ -66,6 +67,7 @@ When a request fails, the response body always contains four fields to help you 
 
 | Field | Description |
 |-------|-------------|
+| `code` | A stable, machine-readable error code such as `validation_error` or `rate_limited`. Branch on this. |
 | `message` | A short, human-readable summary of the error. |
 | `why` | A detailed explanation of what went wrong and what triggered the error. |
 | `fix` | Actionable steps you can take to resolve the issue. |

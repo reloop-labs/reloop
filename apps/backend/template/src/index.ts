@@ -15,13 +15,14 @@ import { persistencePlugin } from "@be/template/utils/persistence";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiErrorsPlugin,
 	apiRateLimitPlugin,
 	idempotencyPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
-import { initLogger, log, parseError } from "evlog";
+import { initLogger, log } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
 
@@ -82,16 +83,7 @@ const templateService = new Elysia({
 		}),
 	)
 	.use(serverTiming())
-	.onError(({ error, set }) => {
-		const parsed = parseError(error);
-		set.status = parsed.status;
-		return {
-			message: parsed.message,
-			why: parsed.why,
-			fix: parsed.fix,
-			link: parsed.link,
-		};
-	})
+	.use(apiErrorsPlugin())
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)

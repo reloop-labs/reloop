@@ -11,12 +11,13 @@ import { landingRoute } from "@reloop/admin/routes/landing/landing.route";
 import { startupApplicationPublicRoute } from "@reloop/admin/routes/landing/startup-application.route";
 import { loader } from "@reloop/admin/utils/loader";
 import {
+	apiErrorsPlugin,
 	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
-import { initLogger, log, parseError } from "evlog";
+import { initLogger, log } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
 
@@ -72,16 +73,7 @@ const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
 	.use(agentCardRoute)
 	.use(startupApplicationPublicRoute)
 	.use(adminRoutes)
-	.onError(({ error, set }) => {
-		const parsed = parseError(error);
-		set.status = parsed.status;
-		return {
-			message: parsed.message,
-			why: parsed.why,
-			fix: parsed.fix,
-			link: parsed.link,
-		};
-	})
+	.use(apiErrorsPlugin())
 	.onStart(async () => {
 		await loader();
 	})

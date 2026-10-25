@@ -64,6 +64,7 @@ Prefer these markdown guides for coding agents. They contain SDK samples for eve
 - [Pagination](https://reloop.sh/docs/api/pagination): How pagination works in the API
 - [Usage Limits](https://reloop.sh/docs/api/usage-limits): API rate limits and usage quotas
 - [Idempotency](https://reloop.sh/docs/api/idempotency): Retry POST requests safely with the Idempotency-Key header
+- [Versioning and Deprecation](https://reloop.sh/docs/api/versioning): URL versioning, breaking-change policy, Deprecation and Sunset headers
 - [Errors](https://reloop.sh/docs/api/errors): Error response format and common error codes
 
 ### Domain API

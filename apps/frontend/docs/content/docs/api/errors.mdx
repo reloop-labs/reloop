@@ -7,23 +7,47 @@ Reloop uses standard HTTP response codes to indicate the success or failure of a
 
 ## Error Response Format
 
-All error responses return a JSON object with four fields:
+Every error response is a JSON object matching the `Error` schema in the [OpenAPI document](https://reloop.sh/openapi.json):
 
 ```json
 {
-  "message": "Invalid sender address",
-  "why": "The address 'not-an-email' is not a valid email format",
-  "fix": "Provide a valid email address in the 'from' field (e.g., user@example.com)",
+  "code": "not_found",
+  "message": "Domain not found",
+  "why": "The domain acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard",
   "link": "https://reloop.sh/docs/api/errors"
 }
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `message` | `string` | A short summary of what went wrong (e.g., `"Domain not found"`). |
+| `code` | `string` | A stable, machine-readable error code. Branch on this, not on `message`. Always present. |
+| `message` | `string` | A short summary of what went wrong (e.g., `"Domain not found"`). Always present. |
 | `why` | `string` | A detailed explanation of what triggered the error, often including the offending value. |
 | `fix` | `string` | Actionable steps to resolve the issue. |
-| `link` | `string` | A URL to the relevant documentation page. |
+| `link` | `string` | A URL to the relevant documentation page. Always present. |
+| `errors` | `array` | On `validation_error` only: one `{ "path", "message" }` entry per invalid field, where `path` is a JSON Pointer such as `/email`. |
+
+## Error Codes
+
+| `code` | Status | Meaning |
+|--------|--------|---------|
+| `bad_request` | `400` | The request was invalid or its body could not be parsed. |
+| `unauthorized` | `401` | The API key or token is missing, invalid or revoked. |
+| `payment_required` | `402` | Your plan or credits do not cover this request. |
+| `forbidden` | `403` | You are authenticated but not allowed to do this. |
+| `not_found` | `404` | The resource or endpoint does not exist. |
+| `conflict` | `409` | The request conflicts with an existing resource. |
+| `payload_too_large` | `413` | The request body or an attachment is too large. |
+| `validation_error` | `422` | The request did not match the endpoint's schema. See `errors`. |
+| `rate_limited` | `429` | You exceeded a [rate limit](/docs/api/usage-limits). |
+| `internal_error` | `500` | Something went wrong on Reloop's side. |
+| `service_unavailable` | `503` | A dependency is temporarily unavailable. Retry later. |
+| `invalid_idempotency_key` | `400` | The `Idempotency-Key` header is too long. See [Idempotency](/docs/api/idempotency). |
+| `idempotency_in_progress` | `409` | A request with the same `Idempotency-Key` is still running. |
+| `idempotency_key_reused` | `422` | The `Idempotency-Key` was used before with a different request. |
+
+New codes may be added. Treat an unknown `code` by its HTTP status.
 
 ## Error Codes Reference
 
@@ -38,6 +62,7 @@ The request was invalid. This usually means a required parameter is missing, a v
 
 ```json
 {
+  "code": "bad_request",
   "message": "DNS health check failed",
   "why": "Domain acme.com is missing required DNS records: SPF, DKIM",
   "fix": "Update your DNS configuration with the required SPF, DKIM, and DMARC records"
@@ -57,6 +82,7 @@ The API key is missing, invalid, or has been revoked.
 
 ```json
 {
+  "code": "unauthorized",
   "message": "Unauthorized",
   "why": "No valid API key was provided in the x-api-key header",
   "fix": "Please provide valid credentials"
@@ -75,6 +101,7 @@ The API key is valid, but it doesn't have permission to access the requested res
 
 ```json
 {
+  "code": "forbidden",
   "message": "Forbidden",
   "why": "User is not a member of an organization",
   "fix": "Ensure your API key is associated with the correct organization"
@@ -93,6 +120,7 @@ The requested resource doesn't exist or isn't accessible to your organization.
 
 ```json
 {
+  "code": "not_found",
   "message": "Domain not found",
   "why": "The domain acme.com was not found or is not authorized for your organization",
   "fix": "Ensure the domain is registered and verified in your dashboard"
@@ -111,9 +139,29 @@ The request conflicts with an existing resource.
 
 ```json
 {
+  "code": "conflict",
   "message": "Channel already exists",
   "why": "A channel with the name 'Weekly Newsletter' already exists in your organization",
   "fix": "Use a unique channel name or update the existing channel"
+}
+```
+
+---
+
+### 422 Validation Error
+
+The request body, query or path parameters did not match the endpoint's schema. `errors` lists each invalid field.
+
+```json
+{
+  "code": "validation_error",
+  "message": "Invalid request",
+  "why": "The body did not match the schema for this endpoint.",
+  "fix": "Fix the fields listed in `errors` and retry. Schemas are in the OpenAPI document at https://reloop.sh/openapi.json.",
+  "link": "https://reloop.sh/docs/api/errors",
+  "errors": [
+    { "path": "/to", "message": "Expected string" }
+  ]
 }
 ```
 
@@ -125,6 +173,7 @@ You've exceeded a rate limit. The response includes additional fields and header
 
 ```json
 {
+  "code": "rate_limited",
   "message": "Too many requests",
   "why": "You have exceeded the limit of 10 requests per 60s window for this operation.",
   "fix": "Wait 42 second(s) before retrying.",

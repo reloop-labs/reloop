@@ -47,6 +47,7 @@
 		"zod": "catalog:ui"
 	},
 	"devDependencies": {
+		"@elysiajs/openapi": "catalog:backend",
 		"@reloop/tsconfig": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
