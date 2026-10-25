@@ -144,7 +144,7 @@ export function ApiKeyHeader({
 								<p className="font-medium text-paragraph-xs text-text-sub-600">
 									API Key
 								</p>
-								<h1 className="mb-0.5 truncate font-semibold text-title-h6 leading-5">
+								<h1 className="truncate font-semibold text-title-h6 leading-7">
 									{displayName}
 								</h1>
 							</div>

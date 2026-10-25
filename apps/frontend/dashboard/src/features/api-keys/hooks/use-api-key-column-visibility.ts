@@ -5,10 +5,10 @@ const STORAGE_KEY = "reloop:api-keys:column-visibility";
 
 export const API_KEY_VIEW_COLUMNS = [
 	{ id: "name", label: "Name" },
+	{ id: "domains", label: "Access" },
 	{ id: "prefix", label: "Prefix" },
 	{ id: "lastUsed", label: "Last Used" },
 	{ id: "status", label: "Status" },
-	{ id: "createdBy", label: "Created By" },
 	{ id: "createdAt", label: "Created At" },
 ] as const;
 
@@ -16,10 +16,10 @@ export type ApiKeyViewColumnId = (typeof API_KEY_VIEW_COLUMNS)[number]["id"];
 
 const DEFAULT_VISIBILITY: VisibilityState = {
 	name: true,
+	domains: true,
 	prefix: true,
 	lastUsed: true,
 	status: true,
-	createdBy: true,
 	createdAt: true,
 };
 

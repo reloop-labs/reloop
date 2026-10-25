@@ -3,16 +3,16 @@ import type { CSSProperties } from "react";
 
 const COLUMN_TRACKS: Record<string, string> = {
 	name: "minmax(0,1fr)",
+	domains: "180px",
 	prefix: "140px",
 	lastUsed: "110px",
 	status: "100px",
-	createdBy: "140px",
 	createdAt: "110px",
 };
 
 /** Default grid when all data columns are visible (+ select + actions). */
 export const API_KEY_TABLE_GRID =
-	"grid-cols-[32px_minmax(0,1fr)_140px_110px_100px_140px_110px_32px]";
+	"grid-cols-[32px_minmax(0,1fr)_180px_140px_110px_100px_110px_32px]";
 
 export function getApiKeyTableGridStyle(
 	visibility: VisibilityState = {},

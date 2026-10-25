@@ -12,10 +12,10 @@ export function TableSkeleton({
 	const gridStyle = getApiKeyTableGridStyle(columnVisibility);
 	const visibleCount = Object.entries({
 		name: true,
+		domains: true,
 		prefix: true,
 		lastUsed: true,
 		status: true,
-		createdBy: true,
 		createdAt: true,
 		...columnVisibility,
 	}).filter(([, visible]) => visible !== false).length;

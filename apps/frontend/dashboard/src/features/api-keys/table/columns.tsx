@@ -1,84 +1,64 @@
-import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as Tooltip from "@reloop/ui/tooltip";
 import type { ColumnDef } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import * as React from "react";
 import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { formatRelativeTime } from "#/utils/format-relative-time";
-import { ApiKeyAccessBadge } from "../access/api-key-access-badge";
 import type { ApiKeyData } from "../types";
 
 export type ApiKeyTableMeta = {
 	editingApiKeyId: string | null;
 };
 
-function CreatedByCell({ createdBy }: { createdBy: ApiKeyData["createdBy"] }) {
-	if (!createdBy) {
+/** "All domains", or the first allowed domain/address with "+N" and a full list on hover. */
+function DomainsCell({ scope }: { scope: ApiKeyData["scope"] }) {
+	const entries = scope ?? [];
+	if (entries.length === 0) {
 		return (
-			<div className="flex min-w-0 items-center gap-2">
-				<Avatar.Root size="20" color="gray" className="shrink-0">
-					<Avatar.Image asChild>
-						<div
-							className={cn(
-								"flex h-full w-full items-center justify-center rounded-full font-medium text-[8px] text-white uppercase tracking-wide",
-								getAvatarGradient("unknown@reloop.sh"),
-							)}
-						>
-							?
-						</div>
-					</Avatar.Image>
-				</Avatar.Root>
+			<div className="flex min-w-0 items-center gap-1.5">
+				<Icon name="globe" className="size-3.5 shrink-0 text-text-sub-600" />
 				<span className="truncate font-medium text-sm text-text-sub-600">
-					Unknown
+					All domains
 				</span>
 			</div>
 		);
 	}
-
-	const rawName = createdBy.name?.trim() ? createdBy.name.trim() : null;
-	const rawEmail = createdBy.email?.trim() ? createdBy.email.trim() : null;
-	const label = rawName || (rawEmail ? rawEmail.split("@")[0] : "Unknown");
-	const safeEmail = rawEmail || "unknown@reloop.sh";
-	const hasImage = Boolean(
-		createdBy.image && createdBy.image.trim().length > 0,
-	);
-	const [imgError, setImgError] = React.useState(false);
-	// Reset error state when image URL changes
-	React.useEffect(() => {
-		setImgError(false);
-	}, [createdBy.image]);
-
-	const showImage = hasImage && !imgError;
-
-	return (
-		<div className="flex min-w-0 items-center gap-2">
-			<Avatar.Root size="20" color="gray" className="shrink-0">
-				{showImage ? (
-					<Avatar.Image
-						src={createdBy.image ?? undefined}
-						alt={label}
-						onError={() => setImgError(true)}
-					/>
-				) : (
-					<Avatar.Image asChild>
-						<div
-							className={cn(
-								"flex h-full w-full items-center justify-center rounded-full font-medium text-[8px] text-white uppercase tracking-wide",
-								getAvatarGradient(safeEmail),
-							)}
-						>
-							{getAvatarInitial(rawName, safeEmail)}
-						</div>
-					</Avatar.Image>
-				)}
-			</Avatar.Root>
-			<span className="truncate font-medium text-sm text-text-sub-600">
-				{label}
+	const [first, ...rest] = entries;
+	const label = (e: (typeof entries)[number]) => e.email ?? e.domain;
+	const content = (
+		<div className="flex min-w-0 items-center gap-1.5">
+			<Icon
+				name={first?.email ? "mail" : "globe"}
+				className="size-3.5 shrink-0 text-text-sub-600"
+			/>
+			<span className="truncate font-medium text-sm text-text-strong-950 dark:text-white">
+				{first ? label(first) : ""}
 			</span>
+			{rest.length > 0 ? (
+				<span className="shrink-0 font-medium text-sm text-text-soft-400">
+					+{rest.length}
+				</span>
+			) : null}
 		</div>
+	);
+	return (
+		<Tooltip.Provider>
+			<Tooltip.Root>
+				<Tooltip.Trigger asChild>
+					<div className="min-w-0 cursor-default">{content}</div>
+				</Tooltip.Trigger>
+				<Tooltip.Content side="top" size="small" className="max-w-xs">
+					{entries.slice(0, 10).map((e) => (
+						<p key={`${e.domainId}:${e.email ?? "*"}`} className="truncate">
+							{e.email ?? `${e.domain} (all addresses)`}
+						</p>
+					))}
+					{entries.length > 10 ? <p>and {entries.length - 10} more</p> : null}
+				</Tooltip.Content>
+			</Tooltip.Root>
+		</Tooltip.Provider>
 	);
 }
 
@@ -147,7 +127,6 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 					>
 						{displayName}
 					</Link>
-					<ApiKeyAccessBadge scope={apiKey.scope} />
 					{isEditing && (
 						<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
 							Editing
@@ -156,6 +135,16 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 				</div>
 			);
 		},
+	},
+	{
+		id: "domains",
+		header: () => (
+			<div className="flex items-center gap-1">
+				<Icon name="shield" className="h-3 w-3" />
+				<span className="text-xs">Access</span>
+			</div>
+		),
+		cell: ({ row }) => <DomainsCell scope={row.original.scope} />,
 	},
 	{
 		id: "prefix",
@@ -229,16 +218,6 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 				</div>
 			);
 		},
-	},
-	{
-		id: "createdBy",
-		header: () => (
-			<div className="flex items-center gap-1">
-				<Icon name="user" className="h-3 w-3" />
-				<span className="text-xs">Created By</span>
-			</div>
-		),
-		cell: ({ row }) => <CreatedByCell createdBy={row.original.createdBy} />,
 	},
 	{
 		id: "createdAt",
