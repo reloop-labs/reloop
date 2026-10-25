@@ -26,6 +26,7 @@
 		"@reloop/pricing": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
+		"@reloop/webmcp": "workspace:*",
 		"@swc/helpers": "catalog:ui",
 		"@tailwindcss/postcss": "catalog:ui",
 		"@tiptap/core": "catalog:ui",

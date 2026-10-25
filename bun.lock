@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -783,6 +782,7 @@
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
         "@reloop/webhook-events": "workspace:*",
+        "@reloop/webmcp": "workspace:*",
         "@tanstack/react-query": "^5.101.2",
         "@tanstack/react-query-devtools": "^5.101.2",
         "@tanstack/react-table": "catalog:ui",
@@ -871,6 +871,7 @@
         "@reloop/code-samples": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
+        "@reloop/webmcp": "workspace:*",
         "ajv": "catalog:ui",
         "better-auth": "catalog:",
         "class-variance-authority": "catalog:ui",
@@ -911,6 +912,7 @@
         "@reloop/auth": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
+        "@reloop/webmcp": "workspace:*",
         "@tailwindcss/postcss": "catalog:ui",
         "babel-plugin-react-compiler": "catalog:ui",
         "better-auth": "catalog:",
@@ -947,6 +949,7 @@
         "@reloop/pricing": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
+        "@reloop/webmcp": "workspace:*",
         "@swc/helpers": "catalog:ui",
         "@tailwindcss/postcss": "catalog:ui",
         "@tiptap/core": "catalog:ui",
@@ -1222,6 +1225,20 @@
         "@reloop/tsconfig": "workspace:*",
         "@types/node": "catalog:",
         "typescript": "catalog:",
+      },
+    },
+    "packages/webmcp": {
+      "name": "@reloop/webmcp",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/bun": "catalog:backend",
+        "@types/react": "catalog:ui",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@types/react": "catalog:ui",
+        "react": "catalog:ui",
       },
     },
   },
@@ -2370,6 +2387,8 @@
     "@reloop/webhook-delivery": ["@reloop/webhook-delivery@workspace:packages/webhook-delivery"],
 
     "@reloop/webhook-events": ["@reloop/webhook-events@workspace:packages/webhook-events"],
+
+    "@reloop/webmcp": ["@reloop/webmcp@workspace:packages/webmcp"],
 
     "@rolldown/binding-android-arm64": ["@rolldown/binding-android-arm64@1.0.0", "", { "os": "android", "cpu": "arm64" }, "sha512-TWMZnRLMe63C2Lhyicviu7ZHaU4kxa6PS3rofvc9GmcvptzNN11BcfQ4Sl7MwTOsisQoa2keB/EBdNCAnUo8vA=="],
 

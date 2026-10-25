@@ -1,0 +1,9 @@
+{
+	"extends": "@reloop/tsconfig/react-library.json",
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "Bundler"
+	},
+	"include": ["src"],
+	"exclude": ["node_modules"]
+}

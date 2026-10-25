@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../styles.css";
+import {
+	WebMcpOriginTrial,
+	WebMcpRegistration,
+} from "@reloop/webmcp/registration";
+import { WebMcpTools } from "#/components/webmcp-tools";
 import { SETTINGS_NAV_PRE_PAINT_SCRIPT } from "#/features/dashboard/sidebar/settings-nav-cache";
+import { dashboardWebMcpTools } from "#/lib/webmcp/dashboard-tools";
 import { Providers } from "./providers";
 
 // TODO: Remove this opt-out after the dashboard supports Cache Components.
@@ -77,6 +83,8 @@ export default function RootLayout({
 						__html: sidebarCollapsedScript + SETTINGS_NAV_PRE_PAINT_SCRIPT,
 					}}
 				/>
+				<WebMcpOriginTrial />
+				<WebMcpRegistration tools={dashboardWebMcpTools} />
 			</head>
 			<body
 				className="bg-bg-white-0 font-sans text-text-strong-950 antialiased"
@@ -86,6 +94,7 @@ export default function RootLayout({
 				}}
 			>
 				<Providers>{children}</Providers>
+				<WebMcpTools />
 			</body>
 		</html>
 	);

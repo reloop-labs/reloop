@@ -1,4 +1,4 @@
-import type { WebMcpTool } from "@reloop/web/lib/webmcp/model-context";
+import { toWebMcpText as toText, type WebMcpTool } from "@reloop/webmcp";
 
 /**
  * Free, read-only deliverability tools exposed to in-browser agents via
@@ -16,8 +16,6 @@ const domainInput = (description: string) => ({
 	},
 	required: ["domain"],
 });
-
-const toText = (value: unknown) => JSON.stringify(value);
 
 type DomainInput = { domain: string };
 

@@ -25,6 +25,7 @@
 		"@reloop/analytics": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/ui": "workspace:*",
+		"@reloop/webmcp": "workspace:*",
 		"better-auth": "catalog:",
 		"ajv": "catalog:ui",
 		"class-variance-authority": "catalog:ui",

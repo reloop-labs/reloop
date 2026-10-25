@@ -19,3 +19,15 @@ export interface WebMcpTool<Input = Record<string, unknown>> {
 	annotations?: WebMcpToolAnnotations;
 	execute: (input: Input, context: { signal?: AbortSignal }) => Promise<string>;
 }
+
+/** Tool metadata without its implementation, safe to serialize into HTML. */
+export type WebMcpToolSpec = Omit<WebMcpTool, "execute">;
+
+export interface ModelContext {
+	registerTool: (
+		tool: WebMcpTool,
+		options?: { signal?: AbortSignal },
+	) => unknown;
+	/** Older drafts unregister by name instead of an abort signal. */
+	unregisterTool?: (name: string) => unknown;
+}

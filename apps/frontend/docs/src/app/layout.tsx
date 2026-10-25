@@ -1,8 +1,14 @@
 import "./global.css";
 import { PostHogProvider } from "@reloop/analytics";
 import { ThemeProvider } from "@reloop/fe-docs/components/theme-provider";
+import { WebMcpTools } from "@reloop/fe-docs/components/webmcp-tools";
 import { cn } from "@reloop/fe-docs/lib/cn";
+import { docsWebMcpTools } from "@reloop/fe-docs/lib/webmcp/docs-tools";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
+import {
+	WebMcpOriginTrial,
+	WebMcpRegistration,
+} from "@reloop/webmcp/registration";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
@@ -27,6 +33,10 @@ export default function Layout({ children }: { children: ReactNode }) {
 			)}
 			suppressHydrationWarning
 		>
+			<head>
+				<WebMcpOriginTrial />
+				<WebMcpRegistration tools={docsWebMcpTools} />
+			</head>
 			<body
 				className="flex min-h-screen flex-col overflow-x-hidden bg-bg-white-0 text-fd-foreground dark:bg-black"
 				suppressHydrationWarning
@@ -34,6 +44,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 				<PostHogProvider>
 					<ThemeProvider>{children}</ThemeProvider>
 					<IconsSprite />
+					<WebMcpTools />
 				</PostHogProvider>
 			</body>
 		</html>

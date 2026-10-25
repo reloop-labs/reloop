@@ -12,6 +12,7 @@
 		"@reloop/auth": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
+		"@reloop/webmcp": "workspace:*",
 		"@tailwindcss/postcss": "catalog:ui",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"better-auth": "catalog:",

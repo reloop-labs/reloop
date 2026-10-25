@@ -5,10 +5,14 @@ import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { AgentDirective } from "@reloop/web/components/agent-directive";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
-import { WebMcpRegistration } from "@reloop/web/components/webmcp-registration";
 import { WebMcpTools } from "@reloop/web/components/webmcp-tools";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/web/lib/site";
+import { publicWebMcpTools } from "@reloop/web/lib/webmcp/public-tools";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
+import {
+	WebMcpOriginTrial,
+	WebMcpRegistration,
+} from "@reloop/webmcp/registration";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 
@@ -85,12 +89,8 @@ export default function RootLayout({
 					id="manifest-loader"
 					strategy="afterInteractive"
 				>{`var l=document.createElement('link');l.rel='manifest';l.href='/manifest.json';document.head.appendChild(l)`}</Script>
-				{/* Chrome origin trial enabling WebMCP on reloop.sh + subdomains; expires 2027-03-30 */}
-				<meta
-					httpEquiv="origin-trial"
-					content="Aoq6kttLejAETbt/zdQat/n22+MCBi7IqW210U22jMnWNhNI3l0TXxxffASoX2QxpniI4EKDqSzzjliYkngPiQsAAABceyJvcmlnaW4iOiJodHRwczovL3JlbG9vcC5zaDo0NDMiLCJmZWF0dXJlIjoiV2ViTUNQIiwiZXhwaXJ5IjoxODA2MzY0ODAwLCJpc1N1YmRvbWFpbiI6dHJ1ZX0="
-				/>
-				<WebMcpRegistration />
+				<WebMcpOriginTrial />
+				<WebMcpRegistration tools={publicWebMcpTools} />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} min-h-full overscroll-y-none bg-[#fff] antialiased dark:bg-black`}

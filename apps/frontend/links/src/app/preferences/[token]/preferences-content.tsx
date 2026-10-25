@@ -5,7 +5,8 @@ import type { ChannelData } from "@reloop/links/lib/preferences-data";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePreferencesWebMcpTools } from "./use-preferences-webmcp-tools";
 
 interface Props {
 	token: string;
@@ -79,6 +80,27 @@ export function PreferencesContent({
 			]),
 		),
 	);
+
+	const savedRef = useRef(baseline);
+	useEffect(() => {
+		savedRef.current = baseline;
+	}, [baseline]);
+
+	// Keeps the user's other unsaved toggles intact.
+	const applySaved = useCallback((patch: Record<string, boolean>) => {
+		savedRef.current = { ...savedRef.current, ...patch };
+		setBaseline(savedRef.current);
+		setChecked((prev) => ({ ...prev, ...patch }));
+	}, []);
+
+	usePreferencesWebMcpTools({
+		token,
+		email: contact.email,
+		organizationName: organization.name,
+		channels,
+		savedRef,
+		onSaved: applySaved,
+	});
 
 	const [saveState, setSaveState] = useState<
 		"idle" | "saving" | "saved" | "error"

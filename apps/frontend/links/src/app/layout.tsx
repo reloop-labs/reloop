@@ -3,6 +3,7 @@ import "./globals.css";
 import { getSiteUrl, siteDescription, siteName } from "@reloop/links/lib/site";
 import { ThemeProvider } from "@reloop/links/providers/theme-provider";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
+import { WebMcpOriginTrial } from "@reloop/webmcp/registration";
 import localFont from "next/font/local";
 import { Suspense } from "react";
 
@@ -66,6 +67,10 @@ export default function RootLayout({
 			suppressHydrationWarning
 			className={`${openRunde.variable} overscroll-y-none scroll-auto`}
 		>
+			<head>
+				{/* WebMCP tools register per page (see preferences/[token]) */}
+				<WebMcpOriginTrial />
+			</head>
 			<body
 				className="min-h-full overscroll-y-none bg-bg-white-0 text-text-strong-950 antialiased"
 				style={{ fontFamily: "var(--font-open-runde)" }}
