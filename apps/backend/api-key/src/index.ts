@@ -10,6 +10,7 @@ import { healthRoute } from "@reloop/api-key/routes/landing/health.route";
 import { landingRoute } from "@reloop/api-key/routes/landing/landing.route";
 import { loader } from "@reloop/api-key/utils/loader";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -51,6 +52,7 @@ const apiKeyService = new Elysia({
 	name: "API Key Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: apiKeyConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(opentelemetry())
 	.use(

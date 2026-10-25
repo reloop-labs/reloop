@@ -2,6 +2,7 @@ import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -47,6 +48,7 @@ const mailService = new Elysia({
 	name: "Mail Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: mailConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(

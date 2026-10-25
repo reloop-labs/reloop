@@ -63,8 +63,9 @@ export function buildRateLimitHeaders(
 
 	if (input.retryAfter != null && input.retryAfter > 0) {
 		const retry = Math.max(1, Math.floor(input.retryAfter));
+		// Header names are case-insensitive; a second "Retry-After" key would be
+		// joined into "17, 17" on the wire.
 		headers[RATE_LIMIT_HEADER.retryAfter] = String(retry);
-		headers["Retry-After"] = String(retry);
 	}
 
 	return headers;

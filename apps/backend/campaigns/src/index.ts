@@ -8,6 +8,7 @@ import { loader } from "@be/campaigns/utils/loader";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -49,6 +50,7 @@ const campaignsService = new Elysia({
 	name: "Campaigns Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: campaignsConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(

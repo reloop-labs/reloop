@@ -1,3 +1,8 @@
+export {
+	type ApiRateLimitOptions,
+	type ApiRateLimitRedis,
+	apiRateLimitPlugin,
+} from "./api-rate-limit";
 export { applySessionCacheEviction } from "./eviction/apply-session-cache-eviction";
 export { evictAllSessionsForUser } from "./eviction/evict-all-sessions-for-user";
 export { evictSessionByToken } from "./eviction/evict-session-by-token";

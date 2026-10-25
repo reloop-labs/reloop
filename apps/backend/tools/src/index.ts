@@ -10,6 +10,7 @@ import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -52,6 +53,7 @@ const toolsService = new Elysia({
 	name: "Tools Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: toolsConfig.REDIS_URL }))
 	.use(
 		requireUserAgentPlugin({
 			excludePathSuffixes: [

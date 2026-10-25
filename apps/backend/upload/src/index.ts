@@ -8,6 +8,7 @@ import { loader } from "@be/upload/utils/loader";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -49,6 +50,7 @@ const uploadService = new Elysia({
 	name: "Upload Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: uploadConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(

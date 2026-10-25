@@ -3,6 +3,7 @@ import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -58,6 +59,7 @@ const inboxService = new Elysia({
 	name: "Inbox Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: inboxConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(opentelemetry())

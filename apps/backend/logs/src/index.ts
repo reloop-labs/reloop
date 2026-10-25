@@ -5,6 +5,7 @@ import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -56,6 +57,7 @@ const logsService = new Elysia({
 	systemRouter: false,
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: logsConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(opentelemetry())
 	.use(

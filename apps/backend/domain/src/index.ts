@@ -3,6 +3,7 @@ import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -51,6 +52,7 @@ const domainService = new Elysia({
 	name: "Domain Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: domainConfig.REDIS_URL }))
 	.use(
 		requireUserAgentPlugin({
 			// Caddy on-demand TLS ask must work even if the client omits UA.

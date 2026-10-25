@@ -285,7 +285,7 @@ describe("rate limit + reloop quota headers", () => {
 		expect(h[RATE_LIMIT_HEADER.remaining]).toBe("42");
 		expect(h[RATE_LIMIT_HEADER.reset]).toBe("17");
 		expect(h[RATE_LIMIT_HEADER.retryAfter]).toBe("17");
-		expect(h["Retry-After"]).toBe("17");
+		expect(h["Retry-After"]).toBeUndefined();
 	});
 
 	test("buildReloopQuotaHeaders exposes used daily/monthly counts", () => {

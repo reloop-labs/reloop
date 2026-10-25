@@ -3,9 +3,15 @@ title: Usage Limits
 description: Understand rate limits and quotas for the Reloop API.
 ---
 
-Reloop enforces rate limits on API requests to ensure stability and fair usage across all organizations. Limits are applied per **organization** and tracked using a sliding window counter backed by Redis.
+Reloop enforces rate limits on API requests to ensure stability and fair usage across all organizations. Limits are tracked with fixed-window counters backed by Redis.
 
 If a limit is exceeded, the API returns a `429 Too Many Requests` response with a `Retry-After` header indicating how many seconds to wait.
+
+## Baseline Limit
+
+Every API endpoint shares a baseline of **600 requests per 60 seconds per client**. A client is identified by its API key, then its dashboard session, then its IP address for unauthenticated requests. The budget is shared across all services, so calls to `/api/domain`, `/api/contacts` and `/api/logs` draw from the same bucket.
+
+The endpoint-specific limits below apply on top of the baseline, and the stricter one wins. Self-hosted deployments can change the baseline with the `API_RATE_LIMIT_MAX` and `API_RATE_LIMIT_WINDOW_SECONDS` environment variables.
 
 ## Management Endpoint Limits
 
@@ -106,31 +112,22 @@ When a sending request is rate limited, the error response tells you which layer
 
 ## Rate Limit Headers
 
-Every API response includes headers indicating your current rate limit status. The specific headers vary slightly between management and sending endpoints.
-
-### Management Endpoints
+Every API response, including errors such as `401` and `404`, includes rate limit headers. When an endpoint has its own stricter limit, the headers describe that limit.
 
 | Header | Description | Example |
 |--------|-------------|---------|
-| `X-RateLimit-Limit` | Maximum requests allowed in the window. | `60` |
-| `X-RateLimit-Remaining` | Requests remaining in the current window. | `48` |
-| `X-RateLimit-Window` | Window size in seconds. | `60` |
-| `Retry-After` | Seconds to wait before retrying (only on `429`). | `12` |
+| `ratelimit-limit` | Maximum requests allowed in the current window. | `600` |
+| `ratelimit-remaining` | Requests remaining in the current window. | `587` |
+| `ratelimit-reset` | Seconds until the window resets (a countdown, not a timestamp). | `42` |
+| `retry-after` | Seconds to wait before retrying (only on `429`). | `42` |
 
-### Email Sending Endpoints
-
-| Header | Description | Example |
-|--------|-------------|---------|
-| `X-RateLimit-Limit` | Maximum requests for the tightest active layer. | `100` |
-| `X-RateLimit-Remaining` | Requests remaining for the tightest active layer. | `73` |
-| `X-RateLimit-Reset` | Unix epoch timestamp (seconds) when the window resets. | `1718284800` |
-| `Retry-After` | Seconds to wait before retrying (only on `429`). | `42` |
+`X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` carry the same values for older clients. Email sending responses also include `x-reloop-daily-quota` and `x-reloop-monthly-quota` with your used send counts.
 
 ---
 
 ## Best Practices
 
-- **Monitor headers proactively.** Check `X-RateLimit-Remaining` before it reaches zero to avoid disruptions.
+- **Monitor headers proactively.** Check `ratelimit-remaining` before it reaches zero to avoid disruptions.
 - **Implement exponential backoff.** When you receive a `429`, wait for the duration specified in `Retry-After`, then retry with increasing delays if the limit is still exceeded.
 - **Batch where possible.** Use list endpoints with pagination instead of fetching resources one at a time.
 - **Separate read and write traffic.** Read operations (list, get) generally have higher limits than write operations (create, update, delete).

@@ -11,6 +11,7 @@ import { workflowConfig } from "@be/workflow/workflow.config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -59,6 +60,7 @@ const workflowApi = new Elysia({
 	name: "Workflow Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: workflowConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(
 		evlog({

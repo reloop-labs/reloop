@@ -37,6 +37,7 @@ if (emailConfig.NODE_ENV !== "production") {
 }
 
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -51,6 +52,7 @@ const port = emailConfig.PORT;
 
 const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: emailConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(cors({ origin: "*" }))
 	.use(

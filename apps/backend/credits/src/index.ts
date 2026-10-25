@@ -2,6 +2,7 @@ import "dotenv/config";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -50,6 +51,7 @@ const port = creditsConfig.PORT;
 
 const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: creditsConfig.REDIS_URL }))
 	.use(
 		requireUserAgentPlugin({
 			excludePathSuffixes: [

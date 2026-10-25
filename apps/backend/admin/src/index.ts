@@ -11,6 +11,7 @@ import { landingRoute } from "@reloop/admin/routes/landing/landing.route";
 import { startupApplicationPublicRoute } from "@reloop/admin/routes/landing/startup-application.route";
 import { loader } from "@reloop/admin/utils/loader";
 import {
+	apiRateLimitPlugin,
 	requireUserAgentPlugin,
 	secureHeadersPlugin,
 } from "@reloop/auth/middleware";
@@ -50,6 +51,7 @@ const port = adminConfig.port;
 
 const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(apiRateLimitPlugin({ redisUrl: adminConfig.REDIS_URL }))
 	.use(requireUserAgentPlugin())
 	.use(opentelemetry())
 	.use(cors({ origin: "*", credentials: true }))
