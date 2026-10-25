@@ -658,11 +658,11 @@ const receivedColumns: ColumnDef<ReceivedEmailData>[] = [
 				<div className="flex items-center">
 					<div
 						className={cn(
-							"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+							"flex items-center gap-1 rounded-lg py-0.5 font-medium text-[13px] capitalize",
 							getInboundStatusColorClass(status),
 						)}
 					>
-						<Icon name={getInboundStatusIcon(status)} className="h-3.5 w-3.5" />
+						<Icon name={getInboundStatusIcon(status)} className="h-3 w-3" />
 						{getInboundStatusLabel(status)}
 					</div>
 				</div>

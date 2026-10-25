@@ -84,8 +84,8 @@ export const groupColumns: ColumnDef<Group>[] = [
 			const meta = table.options.meta as GroupTableMeta | undefined;
 			const isEditing = meta?.editingGroupId === group.id;
 			return (
-				<div className="flex min-w-0 items-center gap-2">
-					<Icon name="modules" className="h-4 w-4 shrink-0 text-text-sub-600" />
+				<div className="flex min-w-0 items-center gap-1">
+					<Icon name="modules" className="h-3 w-3 shrink-0 text-text-sub-600" />
 					<Link
 						href={`/contacts/groups/${group.id}`}
 						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600"

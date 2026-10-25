@@ -7,6 +7,7 @@ import Link from "next/link";
 import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { ApiKeyData } from "../types";
+import { CopyCellButton } from "./copy-cell-button";
 
 export type ApiKeyTableMeta = {
 	editingApiKeyId: string | null;
@@ -17,8 +18,8 @@ function DomainsCell({ scope }: { scope: ApiKeyData["scope"] }) {
 	const entries = scope ?? [];
 	if (entries.length === 0) {
 		return (
-			<div className="flex min-w-0 items-center gap-1.5">
-				<Icon name="globe" className="size-3.5 shrink-0 text-text-sub-600" />
+			<div className="flex min-w-0 items-center gap-1">
+				<Icon name="globe" className="size-3 shrink-0 text-text-sub-600" />
 				<span className="truncate font-medium text-sm text-text-sub-600">
 					All domains
 				</span>
@@ -28,10 +29,10 @@ function DomainsCell({ scope }: { scope: ApiKeyData["scope"] }) {
 	const [first, ...rest] = entries;
 	const label = (e: (typeof entries)[number]) => e.email ?? e.domain;
 	const content = (
-		<div className="flex min-w-0 items-center gap-1.5">
+		<div className="flex min-w-0 items-center gap-1">
 			<Icon
 				name={first?.email ? "mail" : "globe"}
-				className="size-3.5 shrink-0 text-text-sub-600"
+				className="size-3 shrink-0 text-text-sub-600"
 			/>
 			<span className="truncate font-medium text-sm text-text-strong-950 dark:text-white">
 				{first ? label(first) : ""}
@@ -44,21 +45,27 @@ function DomainsCell({ scope }: { scope: ApiKeyData["scope"] }) {
 		</div>
 	);
 	return (
-		<Tooltip.Provider>
-			<Tooltip.Root>
-				<Tooltip.Trigger asChild>
-					<div className="min-w-0 cursor-default">{content}</div>
-				</Tooltip.Trigger>
-				<Tooltip.Content side="top" size="small" className="max-w-xs">
-					{entries.slice(0, 10).map((e) => (
-						<p key={`${e.domainId}:${e.email ?? "*"}`} className="truncate">
-							{e.email ?? `${e.domain} (all addresses)`}
-						</p>
-					))}
-					{entries.length > 10 ? <p>and {entries.length - 10} more</p> : null}
-				</Tooltip.Content>
-			</Tooltip.Root>
-		</Tooltip.Provider>
+		<div className="flex min-w-0 items-center gap-1">
+			<Tooltip.Provider>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<div className="min-w-0 cursor-default">{content}</div>
+					</Tooltip.Trigger>
+					<Tooltip.Content side="top" size="small" className="max-w-xs">
+						{entries.slice(0, 10).map((e) => (
+							<p key={`${e.domainId}:${e.email ?? "*"}`} className="truncate">
+								{e.email ?? `${e.domain} (all addresses)`}
+							</p>
+						))}
+						{entries.length > 10 ? <p>and {entries.length - 10} more</p> : null}
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+			<CopyCellButton
+				value={entries.map(label).join(", ")}
+				label={entries.length === 1 ? "address" : "addresses"}
+			/>
+		</div>
 	);
 }
 
@@ -116,8 +123,8 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 			const meta = table.options.meta as ApiKeyTableMeta | undefined;
 			const isEditing = meta?.editingApiKeyId === apiKey.id;
 			return (
-				<div className="flex min-w-0 items-center gap-2">
-					<Icon name="key-new" className="h-4 w-4 shrink-0 text-text-sub-600" />
+				<div className="flex min-w-0 items-center gap-1">
+					<Icon name="key-new" className="h-3 w-3 shrink-0 text-text-sub-600" />
 					<Link
 						href={`/api-keys/${apiKey.id}`}
 						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-strong-950 dark:text-white dark:hover:text-white"
@@ -155,10 +162,13 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 			</div>
 		),
 		cell: ({ row }) => (
-			<div className="flex items-center">
-				<span className="rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-semibold text-[11px] text-text-sub-600 dark:bg-bg-weak-50/20">
+			<div className="flex min-w-0 items-center gap-1">
+				<span className="truncate rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-semibold text-[11px] text-text-sub-600 dark:bg-bg-weak-50/20">
 					{row.original.start || "rl_..."}
 				</span>
+				{row.original.start ? (
+					<CopyCellButton value={row.original.start} label="prefix" />
+				) : null}
 			</div>
 		),
 	},
@@ -205,11 +215,11 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 								animate={{ y: "0%", opacity: 1 }}
 								exit={{ y: "100%", opacity: 0 }}
 								transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-								className="flex items-center gap-2"
+								className="flex items-center gap-1"
 							>
 								<Icon
 									name={enabled ? "check-circle" : "cross-circle"}
-									className="h-3.5 w-3.5 shrink-0"
+									className="h-3 w-3 shrink-0"
 								/>
 								<span>{enabled ? "Active" : "Disabled"}</span>
 							</motion.div>

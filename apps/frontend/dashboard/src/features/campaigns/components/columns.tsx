@@ -51,14 +51,14 @@ export const campaignColumns: ColumnDef<Campaign>[] = [
 			<div className="flex items-center">
 				<div
 					className={cn(
-						"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px]",
+						"flex items-center gap-1 rounded-lg py-0.5 font-medium text-[13px]",
 						getStatusColorClass(row.original.status),
 					)}
 				>
 					<Icon
 						name={getStatusIcon(row.original.status)}
 						className={cn(
-							"h-3.5 w-3.5",
+							"h-3 w-3",
 							row.original.status === "sending" && "animate-spin",
 						)}
 					/>
@@ -78,10 +78,10 @@ export const campaignColumns: ColumnDef<Campaign>[] = [
 		cell: ({ row }) => {
 			const campaign = row.original;
 			return (
-				<div className="flex min-w-0 items-center gap-1.5 pr-2">
+				<div className="flex min-w-0 items-center gap-1 pr-2">
 					<Icon
 						name={getAudienceIcon(campaign.audienceType)}
-						className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+						className="h-3 w-3 shrink-0 text-text-sub-600"
 					/>
 					<span className="truncate font-medium text-sm text-text-sub-600">
 						{campaign.audienceTargetName || "All Contacts"}

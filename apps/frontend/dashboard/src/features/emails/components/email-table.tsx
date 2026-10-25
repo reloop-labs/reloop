@@ -826,7 +826,7 @@ function getEmailColumns(
 					{row.original.hasAttachments && (
 						<Icon
 							name="paperclip"
-							className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
+							className="h-3 w-3 shrink-0 text-text-soft-400"
 						/>
 					)}
 				</div>
@@ -848,10 +848,10 @@ function getEmailColumns(
 				const href = via.href;
 				if (!href) {
 					return (
-						<div className="flex min-w-0 items-center gap-1.5 pr-4">
+						<div className="flex min-w-0 items-center gap-1 pr-4">
 							<Icon
 								name={via.icon}
-								className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+								className="h-3 w-3 shrink-0 text-text-sub-600"
 							/>
 							<span className="truncate font-medium text-[13px] text-text-sub-600">
 								{via.label}
@@ -867,11 +867,11 @@ function getEmailColumns(
 							event.stopPropagation();
 							router.push(href);
 						}}
-						className="flex min-w-0 items-center gap-1.5 pr-4 text-left"
+						className="flex min-w-0 items-center gap-1 pr-4 text-left"
 					>
 						<Icon
 							name={via.icon}
-							className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+							className="h-3 w-3 shrink-0 text-text-sub-600"
 						/>
 						<span className="truncate font-medium text-[13px] text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-text-sub-600">
 							{via.label}
@@ -894,11 +894,11 @@ function getEmailColumns(
 					<div className="flex items-center">
 						<div
 							className={cn(
-								"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+								"flex items-center gap-1 rounded-lg py-0.5 font-medium text-[13px] capitalize",
 								getEmailStatusColorClass(status),
 							)}
 						>
-							<Icon name={getEmailStatusIcon(status)} className="h-3.5 w-3.5" />
+							<Icon name={getEmailStatusIcon(status)} className="h-3 w-3" />
 							{getEmailStatusLabel(status)}
 						</div>
 					</div>

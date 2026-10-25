@@ -73,8 +73,8 @@ export const propertyColumns: ColumnDef<Property>[] = [
 			const meta = table.options.meta as PropertyTableMeta | undefined;
 			const isEditing = meta?.editingPropertyId === property.id;
 			return (
-				<div className="flex min-w-0 items-center gap-2">
-					<Icon name="tag" className="h-4 w-4 shrink-0 text-text-sub-600" />
+				<div className="flex min-w-0 items-center gap-1">
+					<Icon name="tag" className="h-3 w-3 shrink-0 text-text-sub-600" />
 					<button
 						type="button"
 						onClick={() => meta?.onEditProperty?.(property)}

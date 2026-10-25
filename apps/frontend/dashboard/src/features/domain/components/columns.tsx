@@ -58,11 +58,11 @@ export const domainColumns: ColumnDef<Domain>[] = [
 		cell: ({ row }) => {
 			const domain = row.original;
 			return (
-				<div className="flex min-w-0 items-center gap-2">
+				<div className="flex min-w-0 items-center gap-1">
 					<Icon
 						name="globe"
 						className={cn(
-							"h-4 w-4 shrink-0",
+							"h-3 w-3 shrink-0",
 							getStatusColorClass(domain.status),
 						)}
 					/>
@@ -88,14 +88,11 @@ export const domainColumns: ColumnDef<Domain>[] = [
 			<div className="flex items-center">
 				<div
 					className={cn(
-						"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+						"flex items-center gap-1 rounded-lg py-0.5 font-medium text-[13px] capitalize",
 						getStatusColorClass(row.original.status),
 					)}
 				>
-					<Icon
-						name={getStatusIcon(row.original.status)}
-						className="h-3.5 w-3.5"
-					/>
+					<Icon name={getStatusIcon(row.original.status)} className="h-3 w-3" />
 					{getStatusLabel(row.original.status)}
 				</div>
 			</div>

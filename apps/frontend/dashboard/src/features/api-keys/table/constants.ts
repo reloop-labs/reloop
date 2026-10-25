@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 const COLUMN_TRACKS: Record<string, string> = {
 	name: "minmax(0,1fr)",
 	domains: "180px",
-	prefix: "140px",
+	prefix: "160px",
 	lastUsed: "110px",
 	status: "100px",
 	createdAt: "110px",
@@ -12,7 +12,7 @@ const COLUMN_TRACKS: Record<string, string> = {
 
 /** Default grid when all data columns are visible (+ select + actions). */
 export const API_KEY_TABLE_GRID =
-	"grid-cols-[32px_minmax(0,1fr)_180px_140px_110px_100px_110px_32px]";
+	"grid-cols-[32px_minmax(0,1fr)_180px_160px_110px_100px_110px_32px]";
 
 export function getApiKeyTableGridStyle(
 	visibility: VisibilityState = {},
