@@ -19,6 +19,7 @@ export const sendMessageRoute = new Elysia().use(authMiddleware).post(
 			request.headers.get("x-api-key") ?? "",
 			request.headers.get("cookie") ?? undefined,
 			userId,
+			apiKeyId,
 		);
 	},
 	{

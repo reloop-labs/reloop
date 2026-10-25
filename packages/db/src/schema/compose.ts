@@ -114,6 +114,8 @@ export const pendingOutboundEmail = pgTable(
 				headers?: Record<string, string>;
 				/** Authenticated composer; used when the cron flushes to mail. */
 				userId?: string;
+				/** API key that queued the send; re-checked by the cron before sending. */
+				apiKeyId?: string;
 			}>()
 			.notNull(),
 		error: text("error"),

@@ -2,6 +2,7 @@ import { cron, Patterns } from "@elysiajs/cron";
 import { db } from "@reloop/db/client";
 import { pendingOutboundEmail } from "@reloop/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { checkPendingSendAuthorization } from "../lib/pending-send-authorization";
 import { ensureOutboundThreadForEmailLog } from "../lib/thread-correlation";
 import { proxySendToMailService } from "../routes/messages/messages.helper";
 
@@ -22,6 +23,7 @@ type PendingPayload = {
 	threadId?: string;
 	headers?: Record<string, string>;
 	userId?: string;
+	apiKeyId?: string;
 };
 
 type ClaimedPending = {
@@ -101,6 +103,22 @@ export const pendingOutboundCron = cron({
 
 			for (const row of due) {
 				try {
+					const blockReason = await checkPendingSendAuthorization({
+						organizationId: row.organizationId,
+						mailboxId: row.mailboxId,
+						apiKeyId: row.payload.apiKeyId,
+					});
+					if (blockReason) {
+						console.warn(
+							`[Cron] Not sending pending outbound ${row.id}: ${blockReason}`,
+						);
+						await db
+							.update(pendingOutboundEmail)
+							.set({ status: "failed", error: blockReason })
+							.where(eq(pendingOutboundEmail.id, row.id));
+						continue;
+					}
+
 					const result = (await proxySendToMailService(
 						{
 							mailboxId: row.mailboxId,

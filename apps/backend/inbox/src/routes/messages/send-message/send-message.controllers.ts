@@ -29,6 +29,7 @@ export async function sendMessageController(
 	apiKey: string,
 	cookie?: string,
 	userId?: string,
+	apiKeyId?: string,
 ) {
 	const log = useLogger();
 	log.info(`[INBOX] Sending new message from mailbox ${body.mailboxId}`);
@@ -85,6 +86,7 @@ export async function sendMessageController(
 					bcc: body.bcc,
 					attachments: body.attachments,
 					userId,
+					apiKeyId,
 				},
 			})
 			.returning();

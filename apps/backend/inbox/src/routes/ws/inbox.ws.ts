@@ -1,8 +1,10 @@
 import { createId } from "@paralleldrive/cuid2";
+import { resolveMailboxScope } from "@reloop/be-inbox/lib/api-key-mailbox-scope";
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { Elysia, t } from "elysia";
 import { log } from "evlog";
 import {
+	clientMayReceive,
 	type InboxWsClient,
 	joinOrgRoom,
 	removeClient,
@@ -89,6 +91,16 @@ export const inboxWsRoute = new Elysia({ prefix: "/v1" })
 			client.organizationId = organizationId;
 			client.readyState = ws.readyState;
 
+			// API keys can open this socket too. A restricted key only receives
+			// events for the mailboxes its scope allows, fixed at connect time.
+			const scope = await resolveMailboxScope(
+				organizationId,
+				ws.data.apiKeyId as string | undefined,
+			);
+			if (scope.restricted) {
+				client.allowedMailboxes = new Set(scope.mailboxIds);
+			}
+
 			joinOrgRoom(organizationId, client);
 
 			sendToClient(client, {
@@ -127,6 +139,14 @@ export const inboxWsRoute = new Elysia({ prefix: "/v1" })
 			}
 
 			if (parsed.type === "subscribe_mailbox") {
+				if (!clientMayReceive(client, parsed.mailboxId)) {
+					sendToClient(client, {
+						type: "error",
+						message: "This API key is not allowed to access that mailbox",
+						mailboxId: parsed.mailboxId,
+					});
+					return;
+				}
 				subscribeMailbox(client, parsed.mailboxId);
 				sendToClient(client, {
 					type: "mailbox_subscribed",

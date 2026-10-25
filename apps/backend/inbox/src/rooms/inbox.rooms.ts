@@ -10,6 +10,11 @@ export type InboxWsClient = {
 	userId?: string;
 	organizationId?: string;
 	subscribedMailboxes: Set<string>;
+	/**
+	 * Set for a socket opened with a restricted API key: the only mailboxes it
+	 * may hear about. Undefined means full access (sessions, unrestricted keys).
+	 */
+	allowedMailboxes?: Set<string>;
 };
 
 const orgRooms = new Map<string, Set<InboxWsClient>>();
@@ -67,6 +72,15 @@ export function sendToClient(client: InboxWsClient, payload: unknown) {
  * Broadcasts an event to all connected clients belonging to an organization.
  * If mailboxId is provided, sends to clients who haven't filtered or who subscribed to this mailbox.
  */
+/** Pure: may this client receive an event for this mailbox? */
+export function clientMayReceive(
+	client: InboxWsClient,
+	mailboxId: string | null | undefined,
+): boolean {
+	if (!client.allowedMailboxes) return true;
+	return Boolean(mailboxId) && client.allowedMailboxes.has(mailboxId as string);
+}
+
 export function broadcastToOrg(
 	organizationId: string,
 	payload: unknown,
@@ -76,6 +90,8 @@ export function broadcastToOrg(
 	if (!room) return;
 
 	for (const client of room) {
+		// Restricted API keys only hear about their own mailboxes.
+		if (!clientMayReceive(client, mailboxId)) continue;
 		// If client has subscribed to specific mailboxes, only send if matching
 		if (
 			mailboxId &&
