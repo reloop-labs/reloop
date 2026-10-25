@@ -36,7 +36,7 @@ export function DomainHeader({
 			<div className="pb-6 max-md:hidden">
 				<AnimatedBackButton fallbackHref="/domain" />
 			</div>
-			<div className="flex flex-wrap items-center justify-between gap-3">
+			<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-5">
 				<div className="min-w-0 max-sm:w-full">
 					{isLoading ? (
 						<div className="flex items-center gap-3">
@@ -88,8 +88,8 @@ export function DomainHeader({
 					)}
 				</div>
 
-				{/* Phones: the buttons fill the row (⋯ menu, always last, keeps its size) */}
-				<div className="flex flex-wrap items-center gap-2 max-sm:w-full max-sm:*:flex-1 max-sm:[&>*:last-child]:flex-none">
+				{/* Phones: the buttons fill the row at one height (⋯ menu, always last, is a square) */}
+				<div className="flex flex-wrap items-center gap-2 max-sm:w-full max-sm:*:h-9 max-sm:*:flex-1 max-sm:[&>*:last-child]:w-9 max-sm:[&>*:last-child]:flex-none">
 					{isLoading ? (
 						<Skeleton className="h-9 w-32 rounded-lg" />
 					) : (
