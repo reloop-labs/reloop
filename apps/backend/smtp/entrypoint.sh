@@ -8,7 +8,29 @@ DOMAIN="${SMTP_HOSTNAME:-${HOSTNAME:-smtp.reloop.sh}}"
 DOMAIN=$(echo "$DOMAIN" | sed -e 's|^[^/]*//||' -e 's|/.*$||' -e 's|:.*$||')
 EMAIL="${LETSENCRYPT_EMAIL:-admin@${DOMAIN}}"
 
-# 1. Search for Coolify/Traefik acme.json or Caddy certificates
+# Every candidate certificate is compared and the one that expires last wins.
+# acme.json can hold several entries for one domain (one per resolver, and
+# old ones are kept), so taking the first match can install an expired cert
+# even though Traefik itself serves the renewed one.
+BEST_END=0
+BEST_SOURCE=""
+CANDIDATE_DIR=$(mktemp -d)
+
+consider_cert() {
+    local cert="$1" key="$2" source="$3" end end_epoch
+    end=$(openssl x509 -noout -enddate -in "$cert" 2>/dev/null | cut -d= -f2)
+    [ -n "$end" ] || return 0
+    end_epoch=$(date -d "$end" +%s 2>/dev/null) || return 0
+    echo "[TLS] Candidate from $source expires $end"
+    if [ "$end_epoch" -gt "$BEST_END" ]; then
+        cp "$cert" "$CERT_DIR/fullchain.pem"
+        cp "$key" "$CERT_DIR/privkey.pem"
+        BEST_END=$end_epoch
+        BEST_SOURCE=$source
+    fi
+}
+
+# 1. Coolify/Traefik acme.json
 ACME_FILES=(
     "/traefik/acme.json"
     "/traefik/traefik/acme.json"
@@ -18,22 +40,19 @@ ACME_FILES=(
 )
 
 for acme_file in "${ACME_FILES[@]}"; do
-    if [ -f "$acme_file" ]; then
-        echo "[TLS] Found $acme_file, extracting certificates for $DOMAIN..."
-        if command -v jq >/dev/null 2>&1; then
-            cert_b64=$(jq -r --arg dom "$DOMAIN" '.. | objects | select(.Certificates?) | .Certificates[]? | select(.domain.main == $dom or ((.domain.sans[]? // "") == $dom)) | .certificate' "$acme_file" 2>/dev/null | head -n 1)
-            key_b64=$(jq -r --arg dom "$DOMAIN" '.. | objects | select(.Certificates?) | .Certificates[]? | select(.domain.main == $dom or ((.domain.sans[]? // "") == $dom)) | .key' "$acme_file" 2>/dev/null | head -n 1)
-            if [ -n "$cert_b64" ] && [ "$cert_b64" != "null" ] && [ -n "$key_b64" ] && [ "$key_b64" != "null" ]; then
-                echo "$cert_b64" | base64 -d > "$CERT_DIR/fullchain.pem"
-                echo "$key_b64" | base64 -d > "$CERT_DIR/privkey.pem"
-                echo "[TLS] Successfully extracted Let's Encrypt certificate for $DOMAIN from $acme_file"
-                break
-            fi
-        fi
-    fi
+    [ -f "$acme_file" ] && command -v jq >/dev/null 2>&1 || continue
+    echo "[TLS] Found $acme_file, looking for $DOMAIN certificates..."
+    n=0
+    while read -r cert_b64 key_b64; do
+        [ -n "$cert_b64" ] && [ "$cert_b64" != "null" ] && [ -n "$key_b64" ] && [ "$key_b64" != "null" ] || continue
+        n=$((n + 1))
+        echo "$cert_b64" | base64 -d > "$CANDIDATE_DIR/cert.pem"
+        echo "$key_b64" | base64 -d > "$CANDIDATE_DIR/key.pem"
+        consider_cert "$CANDIDATE_DIR/cert.pem" "$CANDIDATE_DIR/key.pem" "$acme_file #$n"
+    done < <(jq -r --arg dom "$DOMAIN" '.. | objects | select(.Certificates?) | .Certificates[]? | select(.domain.main == $dom or ((.domain.sans // []) | index($dom))) | "\(.certificate) \(.key)"' "$acme_file" 2>/dev/null)
 done
 
-# 2. Check for Caddy certificate paths (if Coolify is using Caddy proxy)
+# 2. Caddy certificate paths (if Coolify is using Caddy proxy)
 CADDY_CERT_PATHS=(
     "/traefik/caddy/certificates/acme-v02.api.letsencrypt.org-directory/$DOMAIN/$DOMAIN.crt"
     "/data/coolify/proxy/caddy/certificates/acme-v02.api.letsencrypt.org-directory/$DOMAIN/$DOMAIN.crt"
@@ -41,14 +60,20 @@ CADDY_CERT_PATHS=(
 for caddy_cert in "${CADDY_CERT_PATHS[@]}"; do
     caddy_key="${caddy_cert%.crt}.key"
     if [ -f "$caddy_cert" ] && [ -f "$caddy_key" ]; then
-        cp "$caddy_cert" "$CERT_DIR/fullchain.pem"
-        cp "$caddy_key" "$CERT_DIR/privkey.pem"
-        echo "[TLS] Successfully copied Caddy Let's Encrypt certificate for $DOMAIN"
-        break
+        consider_cert "$caddy_cert" "$caddy_key" "$caddy_cert"
     fi
 done
 
-# 2. If certificates are missing and AUTO_LETSENCRYPT=true, auto-generate via certbot
+rm -rf "$CANDIDATE_DIR"
+
+if [ "$BEST_END" -gt 0 ]; then
+    echo "[TLS] Installed $DOMAIN certificate from $BEST_SOURCE, expires $(date -u -d "@$BEST_END")"
+    if [ "$BEST_END" -le "$(date +%s)" ]; then
+        echo "[TLS] WARNING: newest certificate found for $DOMAIN is already expired; check the proxy's renewal and that the mounted acme.json is the live one"
+    fi
+fi
+
+# 3. If certificates are missing and AUTO_LETSENCRYPT=true, auto-generate via certbot
 if [ ! -s "$CERT_DIR/fullchain.pem" ] || [ ! -s "$CERT_DIR/privkey.pem" ]; then
     if [ "$AUTO_LETSENCRYPT" = "true" ] && command -v certbot >/dev/null 2>&1 && [ "$DOMAIN" != "localhost" ] && [ "$DOMAIN" != "local.reloop.sh" ]; then
         echo "[TLS] Auto-requesting Let's Encrypt certificate for $DOMAIN ($EMAIL)..."

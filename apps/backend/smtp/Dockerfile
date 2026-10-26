@@ -3,6 +3,7 @@ FROM ghcr.io/kumocorp/kumomta:latest
 RUN apt-get update && apt-get install -y --no-install-recommends \
     certbot \
     jq \
+    openssl \
     ca-certificates \
     curl \
     && rm -rf /var/lib/apt/lists/*
