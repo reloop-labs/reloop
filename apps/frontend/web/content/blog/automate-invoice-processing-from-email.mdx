@@ -1,0 +1,382 @@
+---
+title: "How to Automate Invoice Processing From Email With AI (Step by Step)"
+description: "Stop digging through inboxes for invoices. Give invoices one email address, then let AI read each PDF and pull out the vendor, amount and due date into your spreadsheet or accounting tool. Plain-English guide with the code a developer needs."
+keywords:
+  - automate invoice processing from email
+  - ai invoice processing
+  - extract data from invoice pdf
+  - invoice email automation
+  - accounts payable email inbox
+  - parse email attachments
+  - invoice data extraction ai
+  - collect invoices from email
+publishedAt: 2026-10-26
+category: AI & Automation
+tags: [ai, invoices, inbound, automation, attachments, webhooks]
+readTime: 12 min read
+author:
+  name: Twinkal Patel
+  role: Co-founder
+  avatar: /company/team/twinkal-p.jpg
+draft: false
+image: /blog/images/automate-invoice-processing-from-email.png
+relatedSlugs:
+  - receive-email-on-your-own-domain
+  - build-ai-agent-sends-emails
+  - give-ai-agent-email-address
+  - spf-dkim-dmarc-setup-guide
+---
+
+**To automate invoice processing from email, send every invoice to one dedicated address, such as `invoices@yourdomain.com`. Then have a small program read each new email, pass the PDF to an AI model, and save the vendor, amount and due date to your spreadsheet or accounting tool.** Reloop handles the inbox part: it receives the email, keeps the original with its attachments, and notifies your program the moment an invoice arrives. The AI model does the reading.
+
+The first half of this guide needs no technical skills at all and already fixes the most common problem: invoices scattered across everyone's inbox. The second half is for whoever builds the automation, explained so that anyone can follow what is happening.
+
+---
+
+## Sound familiar?
+
+If you pay bills for a business, you probably know at least one of these:
+
+- **It's the end of the month and you're searching** three inboxes for "invoice", "receipt" and "bill", hoping you didn't miss one.
+- **A supplier sent the invoice to someone who was on holiday**, and you only found out when the payment reminder arrived.
+- **You type the same five details** (vendor, invoice number, date, amount, due date) from every PDF into a spreadsheet or Xero/QuickBooks, by hand.
+- **One typo** turns $1,250.00 into $125.00, and nobody notices until the accounts don't add up.
+- **A late fee** appears because a due date was buried in an attachment nobody opened.
+- **Your accountant keeps asking** for receipts you're sure you received somewhere.
+
+None of these is really a "data entry" problem. The underlying issue is that **invoices arrive in too many places and are read too late.** So the fix comes in two parts: one place to collect them, then automatic reading.
+
+---
+
+## How it works, in plain English
+
+```
+Supplier emails an invoice
+        ↓
+invoices@yourdomain.com          ← one address for every invoice (Reloop)
+        ↓
+"New invoice arrived!"           ← Reloop instantly notifies your program
+        ↓
+AI reads the PDF                 ← pulls out vendor, amount, due date…
+        ↓
+Saved to your spreadsheet,       ← and anything unclear is flagged
+accounting tool or database        for a person to check
+```
+
+Being clear about who does what:
+
+| Step | Who does it |
+|------|-------------|
+| Receiving the email and keeping the PDF | **Reloop** |
+| Telling your program a new email arrived | **Reloop** (a webhook) |
+| Reading the PDF and pulling out the details | **An AI model** you connect, such as Claude |
+| Saving the details where you want them | **Your program** (a short script) |
+| Approving and paying the bill | **You**. Nothing in this setup pays anyone. |
+
+<Callout type="info">
+  Reloop is email infrastructure, not accounting software. It does not read invoices by itself and it does not connect to your bank. It gets every invoice email into one reliable place and hands it to your automation, which is exactly the part that is usually missing.
+</Callout>
+
+---
+
+## Part 1: One inbox for every invoice (no code)
+
+This part takes about fifteen minutes and is worth doing even if you never automate anything else.
+
+### Step 1: Create the address
+
+Follow our [step-by-step guide to receiving email on your own domain](/blog/receive-email-on-your-own-domain). In short:
+
+1. Add a domain in the [Reloop dashboard](https://reloop.sh/dashboard). If your main domain already uses Gmail or Outlook, use a subdomain such as `billing.yourdomain.com` so your existing email is untouched.
+2. Add the one MX record Reloop shows you at your DNS provider.
+3. Create a mailbox, for example `invoices@billing.yourdomain.com`.
+
+The free plan includes 3 inboxes, so this costs nothing to try.
+
+### Step 2: Get invoices sent there
+
+- **Tell your suppliers.** Send them the new address and ask them to update their billing contact. Most billing systems (Stripe, Shopify, AWS, Google, etc.) let you set a separate billing email in account settings.
+- **Forward what still lands elsewhere.** In Gmail, create a filter (for example, emails with "invoice" in the subject and an attachment) that forwards to the new address. Gmail first sends a confirmation code to the new address; you'll see it in the Reloop inbox.
+
+<Callout type="warning">
+  Many Microsoft 365 organisations block automatic forwarding to outside addresses by default. If your Outlook forwarding rule doesn't seem to work, ask your IT admin to allow forwarding to that one address, or forward invoices by hand until they do.
+</Callout>
+
+### Step 3: Read it like a normal inbox
+
+Add the mailbox to Apple Mail, Outlook or Thunderbird over IMAP (server `imap.reloop.sh`, port `993`), with a Reloop API key as the password. Invoices and their PDFs show up like any other email. Your whole finance team can watch the same inbox.
+
+**Already better:** every invoice is in one place, nothing depends on one person's inbox, and month-end means opening one folder.
+
+---
+
+## Part 2: Let AI read the invoices (for whoever builds it)
+
+This part needs someone comfortable running a small Node.js script: a developer, a technical co-founder, or a freelancer. You can hand them this page. Each step starts with what it does in plain English.
+
+### What you need
+
+- The invoice mailbox from Part 1
+- A Reloop API key and a webhook (set up in the dashboard)
+- An API key for an AI model. This example uses [Claude](https://www.anthropic.com/api), which reads PDFs directly.
+- Somewhere to run the code: any server or serverless function that can receive a web request
+
+```bash
+npm install reloop-email @anthropic-ai/sdk mailparser zod
+```
+
+### Step 1: Get notified when an invoice arrives
+
+*In plain English: instead of checking the inbox every few minutes, Reloop calls your program the moment an email arrives.*
+
+In the dashboard, create a webhook that subscribes to the `email.received` event and points to your program's URL. Each notification looks like this:
+
+```json
+{
+  "type": "email.received",
+  "data": {
+    "email_id": "in_123456789",
+    "mailbox_id": "mb_123456789",
+    "from": "billing@supplier.com",
+    "to": ["invoices@billing.yourdomain.com"],
+    "subject": "Invoice INV-2041 from Supplier Ltd",
+    "has_attachments": true,
+    "is_spam": false
+  }
+}
+```
+
+The notification tells you *that* an invoice arrived, not what is in it. Your program fetches the email itself in the next step.
+
+### Step 2: Get the PDF out of the email
+
+*In plain English: Reloop keeps an exact copy of every email exactly as it was received, attachments included. Your program downloads that copy and unpacks the PDF from it.*
+
+```typescript
+import { simpleParser } from "mailparser";
+import { reloop } from "./lib/reloop";
+
+async function getInvoiceFiles(emailId: string) {
+  const { message, messageError } = await reloop.inbox.messages.getRaw(emailId);
+  if (messageError) throw messageError;
+
+  const email = await simpleParser(message.raw);
+  const pdfs = email.attachments.filter((a) => a.contentType === "application/pdf");
+
+  return { email, pdfs };
+}
+```
+
+`reloop.inbox.messages.getRaw` returns the full original email. The open-source [mailparser](https://nodemailer.com/extras/mailparser/) library turns it into a subject, a body and a list of attachments, each with its file contents.
+
+Some invoices are not PDFs at all: many SaaS receipts are just the text of the email. The next step handles both.
+
+### Step 3: Ask the AI to read it
+
+*In plain English: you send the PDF to the AI with a short form to fill in (vendor, amount, due date…). It sends the form back completed. If something isn't on the invoice, it leaves that field empty instead of guessing.*
+
+```typescript
+import Anthropic from "@anthropic-ai/sdk";
+import { z } from "zod";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+
+const anthropic = new Anthropic();
+
+const InvoiceSchema = z.object({
+  is_invoice: z.boolean(),
+  vendor_name: z.string().nullable(),
+  invoice_number: z.string().nullable(),
+  invoice_date: z.string().nullable(), // YYYY-MM-DD
+  due_date: z.string().nullable(),     // YYYY-MM-DD
+  currency: z.string().nullable(),     // e.g. USD, EUR
+  subtotal: z.number().nullable(),
+  tax: z.number().nullable(),
+  total: z.number().nullable(),
+});
+
+type Invoice = z.infer<typeof InvoiceSchema>;
+
+async function readInvoice(pdf: Buffer | null, emailText: string): Promise<Invoice | null> {
+  const content: Anthropic.ContentBlockParam[] = [];
+  if (pdf) {
+    content.push({
+      type: "document",
+      source: { type: "base64", media_type: "application/pdf", data: pdf.toString("base64") },
+    });
+  }
+  content.push({
+    type: "text",
+    text:
+      "Extract the invoice details. Use null for anything not clearly stated; never guess. " +
+      "Set is_invoice to false if this is not an invoice or receipt.\n\n" +
+      `Email text:\n${emailText}`,
+  });
+
+  const response = await anthropic.messages.parse({
+    model: "claude-opus-5-5",
+    max_tokens: 16000,
+    messages: [{ role: "user", content }],
+    output_config: { format: zodOutputFormat(InvoiceSchema) },
+  });
+
+  if (response.stop_reason === "refusal") return null; // send to manual review
+  return response.parsed_output;
+}
+```
+
+Two details matter here:
+
+- **"Use null, never guess."** A blank field is easy to spot and fill in. A confidently wrong amount isn't.
+- **`is_invoice`.** Newsletters, "your invoice is ready" notifications without the actual invoice, and marketing emails will reach the address too. This lets your program skip them.
+
+### Step 4: Check it, then save it
+
+*In plain English: the program runs a few common-sense checks. Anything that passes goes into your spreadsheet. Anything that looks off is marked "needs review" for a person.*
+
+```typescript
+function needsReview(inv: Invoice): string[] {
+  const problems: string[] = [];
+  if (!inv.vendor_name) problems.push("missing vendor");
+  if (inv.total === null) problems.push("missing total");
+  if (!inv.due_date) problems.push("missing due date");
+  if (inv.subtotal !== null && inv.tax !== null && inv.total !== null &&
+      Math.abs(inv.subtotal + inv.tax - inv.total) > 0.01) {
+    problems.push("subtotal + tax doesn't equal total");
+  }
+  return problems;
+}
+```
+
+Then save it wherever your team already works: a row in Google Sheets, a draft bill in your accounting software through its API, or a table in your own database. Always store the `email_id` with the row so anyone can open the original email in one click.
+
+### Step 5: Put it together
+
+```typescript
+import { verify } from "./lib/verify-webhook"; // signature check
+
+export async function POST(req: Request): Promise<Response> {
+  const raw = await req.text();
+  if (!verify(raw, req.headers.get("Reloop-Signature") ?? "", process.env.RELOOP_WEBHOOK_SECRET!)) {
+    return new Response("Bad signature", { status: 401 });
+  }
+
+  const event = JSON.parse(raw);
+  if (event.type !== "email.received" || event.data.is_spam) {
+    return new Response("skipped");
+  }
+
+  // Reply straight away, do the slow work in the background
+  await queue.add("process-invoice", { emailId: event.data.email_id });
+  return new Response("ok");
+}
+
+async function processInvoice(emailId: string) {
+  if (await alreadyProcessed(emailId)) return; // the same notification can arrive twice
+
+  const { email, pdfs } = await getInvoiceFiles(emailId);
+  const files = pdfs.length > 0 ? pdfs.map((p) => p.content) : [null];
+
+  for (const file of files) {
+    const invoice = await readInvoice(file, email.text ?? "");
+    if (!invoice) {
+      await saveForReview(emailId, ["AI could not read this one"]);
+    } else if (invoice.is_invoice) {
+      await saveInvoice(emailId, invoice, needsReview(invoice));
+    }
+  }
+}
+```
+
+The signature check (`verify`) is the same function shown in our [receiving email guide](/blog/receive-email-on-your-own-domain). It proves the request really came from Reloop and not from someone pretending.
+
+---
+
+## Mistakes that cause real problems
+
+Most of these come from treating the AI as if it can't be wrong.
+
+| Mistake | What happens | Do this instead |
+|---------|--------------|-----------------|
+| Paying automatically from the extracted data | A misread amount or a fake invoice gets paid | Keep a human approval step before any payment |
+| Trusting any email that says "invoice" | Invoice fraud: a lookalike sender with new bank details | Only accept known vendors automatically. Treat changed bank details as a phone-call check, every time. |
+| Doing the AI work inside the webhook request | Slow PDFs time out and the notification is retried | Reply `ok` immediately and process in a background job |
+| Not checking for duplicates | The same invoice is recorded twice when a webhook is retried or a supplier resends | Skip an `email_id` you've already processed, and flag repeated vendor + invoice number pairs |
+| Letting the AI fill gaps | Invented dates or amounts look real | Ask for `null` when unsure and send those to review |
+| Ignoring emails with several PDFs | Only the first invoice is recorded | Loop over every PDF attachment, as in Step 5 |
+| Throwing away the original | No proof for your accountant or auditor | Store the `email_id` with every row; the original stays in the mailbox |
+
+<Callout type="warning">
+  AI extraction is very good on clear, typed invoices and less reliable on blurry phone photos of paper receipts or handwritten bills. Start with every invoice going through review, see how often corrections are needed on your own invoices, and only then decide what can skip review.
+</Callout>
+
+---
+
+## Is it worth it for you?
+
+**Probably yes if** you receive more than a handful of invoices a month, several people currently receive them, or you've paid a late fee or lost a receipt in the last year. Part 1 alone is worth doing at any size.
+
+**Probably not yet if** you get three invoices a month from the same suppliers. A shared inbox (Part 1) is enough; the automation would take longer to build than it saves.
+
+**Something to be aware of:** the AI model is billed separately by its provider, per invoice it reads. Check their pricing against your monthly invoice volume before you switch it on for everything.
+
+<Cta
+  title="Not sure where to start?"
+  description="Tell us how invoices reach your business today. The Reloop team will help you set up the inbox and work out what to automate."
+  href="/contact"
+  label="Ask the Reloop team"
+/>
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I need to know how to code?">
+    Not for Part 1. Creating the invoice inbox, pointing suppliers at it and
+    reading it in Outlook or Apple Mail needs no code. Automatic reading of
+    the invoices (Part 2) needs a short program, so you'll need a developer
+    or a technical teammate for that part.
+  </Accordion>
+
+  <Accordion title="Does Reloop read the invoices itself?">
+    No. Reloop receives the emails, keeps the originals with their
+    attachments, and notifies your program when one arrives. An AI model
+    that you connect, such as Claude, reads the invoice. Your program decides
+    where the details are saved.
+  </Accordion>
+
+  <Accordion title="Can it handle invoices that are in the email body, not a PDF?">
+    Yes. When there's no PDF attached, the example in Step 5 sends the email's
+    text to the AI instead. Many SaaS receipts work this way.
+  </Accordion>
+
+  <Accordion title="Can it connect to Xero or QuickBooks?">
+    Your program can, because both have APIs for creating draft bills.
+    Reloop doesn't have a built-in Xero or QuickBooks connection. A common
+    approach is to create the bill as a draft so someone approves it inside
+    the accounting tool.
+  </Accordion>
+
+  <Accordion title="Is it safe to send invoices to an AI model?">
+    Invoices contain business and sometimes personal data, so check the AI
+    provider's data and retention terms and your own obligations (for example,
+    GDPR) before you start. Keep the API keys for the mailbox restricted to
+    that one invoice address.
+  </Accordion>
+
+  <Accordion title="What if a supplier sends a fake or altered invoice?">
+    Automation doesn't remove that risk, and it can make it easier to miss if
+    payments happen without review. Keep a person approving payments, only
+    trust known vendors automatically, and always confirm changed bank
+    details by phone with a number you already have.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Give your invoices one home"
+  description="Create an invoices@ address on your own domain in minutes, read it in any mail app, and get a webhook for every new invoice. Free plan includes 3 inboxes."
+  href="/dashboard/signup"
+  label="Get started"
+/>
