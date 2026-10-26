@@ -18,7 +18,7 @@ export function CompareMigrateBanner({
 }) {
 	return (
 		<section className="bg-bg-weak-50/60 px-4 py-20 sm:px-8 sm:py-24 lg:px-12 dark:bg-white/[0.03]">
-			<div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+			<div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
 				<div className="max-w-xl">
 					<h2 className="text-balance font-semibold text-[1.9rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[2.3rem] dark:text-white">
 						Moving from {competitorName}?
@@ -51,28 +51,28 @@ export function CompareMigrateBanner({
 					</div>
 				</div>
 
-				{/* Centred in the right half rather than pushed to the edge. */}
+				{/* Above the copy on phones; centred in the right half rather than pushed to the edge on desktop. */}
 				<div
 					aria-hidden
-					className="flex items-center justify-center gap-6 sm:gap-8"
+					className="order-first flex items-center gap-4 sm:gap-8 lg:order-none lg:justify-center"
 				>
-					<span className="flex items-center gap-3 font-semibold text-[1.75rem] text-text-strong-950 tracking-tight sm:text-[2rem] dark:text-white">
+					<span className="flex items-center gap-2.5 font-semibold text-[1.4rem] text-text-strong-950 tracking-tight sm:gap-3 sm:text-[1.75rem] lg:text-[2rem] dark:text-white">
 						{icon ? (
 							<BrandIcon
 								icon={icon}
 								fill="currentColor"
-								className="size-8 text-text-strong-950 sm:size-9 dark:text-white"
+								className="size-6 text-text-strong-950 sm:size-9 dark:text-white"
 							/>
 						) : null}
 						{competitorName}
 					</span>
 					<Icon
 						name="arrow-right"
-						className="size-6 shrink-0 text-text-sub-600 sm:size-7 dark:text-white/40"
+						className="size-5 shrink-0 text-text-sub-600 sm:size-7 dark:text-white/40"
 					/>
-					<span className="flex items-center gap-3 font-semibold text-[1.75rem] text-text-strong-950 tracking-tight sm:text-[2rem] dark:text-white">
-						<span className="flex size-10 items-center justify-center overflow-hidden sm:size-11">
-							<Logo className="size-14 shrink-0 sm:size-16" />
+					<span className="flex items-center gap-2.5 font-semibold text-[1.4rem] text-text-strong-950 tracking-tight sm:gap-3 sm:text-[1.75rem] lg:text-[2rem] dark:text-white">
+						<span className="flex size-8 items-center justify-center overflow-hidden sm:size-11">
+							<Logo className="size-11 shrink-0 sm:size-16" />
 						</span>
 						Reloop
 					</span>
