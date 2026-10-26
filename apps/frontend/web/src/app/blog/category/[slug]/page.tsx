@@ -48,7 +48,7 @@ export default async function BlogCategoryPage({ params }: PageProps) {
 			categories={getCategories()}
 			activeCategorySlug={slug}
 		>
-			<BlogCta category={category.name} />
+			<BlogCta category={category.name} flush showTopRule={false} />
 		</BlogIndex>
 	);
 }

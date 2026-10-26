@@ -359,8 +359,8 @@ export function BlogIndex({
 				)}
 			</div>
 
-			{/* CTA Section */}
-			{children}
+			{/* CTA Section: the grid cells already close with a bottom rule */}
+			{children ? <div className={frame}>{children}</div> : null}
 		</div>
 	);
 }

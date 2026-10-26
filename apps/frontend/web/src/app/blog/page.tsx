@@ -22,7 +22,7 @@ const BlogPage = async () => {
 		<>
 			<JsonLd data={buildBlogIndexJsonLd(posts)} />
 			<BlogIndex posts={posts} categories={getCategories()}>
-				<BlogCta />
+				<BlogCta flush showTopRule={false} />
 			</BlogIndex>
 		</>
 	);
