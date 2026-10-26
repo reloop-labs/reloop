@@ -8,10 +8,10 @@ import {
 	type VisibilityState,
 } from "@tanstack/react-table";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import type { Domain } from "../types";
-import { type DomainTableMeta, domainColumns } from "./columns";
+import { domainColumns } from "./columns";
 import { getDomainTableGridStyle } from "./constants";
 import { DeleteDomainModal } from "./delete-domain";
 import {
@@ -19,8 +19,6 @@ import {
 	DomainDropdown,
 	DomainRowContextMenu,
 } from "./domain-dropdown";
-import { DomainFavicon } from "./domain-favicon";
-import { groupByRootDomain, groupLabelOf } from "./domain-groups";
 import { DomainSelectionActionBar } from "./domain-selection-action-bar";
 import { DomainSkeleton } from "./domain-skeleton";
 import { EmptyState } from "./empty-state";
@@ -65,14 +63,6 @@ export function DomainTable({
 		[handleDelete, handleOpenChange],
 	);
 
-	const groupParentIds = useMemo(() => {
-		const ids = new Set<string>();
-		for (const group of groupByRootDomain(domains, (d) => d.domain)) {
-			if (group.kind === "group" && group.parent) ids.add(group.parent.id);
-		}
-		return ids;
-	}, [domains]);
-
 	const table = useReactTable({
 		data: domains,
 		columns: domainColumns,
@@ -84,7 +74,6 @@ export function DomainTable({
 		getRowId: (row) => row.id,
 		manualPagination: true,
 		pageCount: totalPages,
-		meta: { groupParentIds } satisfies DomainTableMeta,
 	});
 
 	useHotkeys(
@@ -121,17 +110,7 @@ export function DomainTable({
 		table.resetRowSelection();
 	}, [table]);
 
-	// Subdomains are grouped under their root domain (acme.com → mail.acme.com).
-	const groups = useMemo(
-		() => groupByRootDomain(rows, (row) => row.original.domain),
-		[rows],
-	);
-	const visibleColumns = table.getVisibleLeafColumns();
-
-	const renderRow = (
-		row: Row<Domain>,
-		tree: TreeSlotProps = { kind: "none" },
-	) => {
+	const renderRow = (row: Row<Domain>) => {
 		const domain = row.original;
 		const isRowActive = activeDropdownId === domain.id;
 		return (
@@ -152,16 +131,7 @@ export function DomainTable({
 				>
 					{row.getVisibleCells().map((cell) => (
 						<div key={cell.id} className="min-w-0">
-							{cell.column.id === "domain" && tree.kind === "child" ? (
-								<div className="flex min-w-0 items-center gap-1">
-									<TreeSlot />
-									<div className="min-w-0">
-										{flexRender(cell.column.columnDef.cell, cell.getContext())}
-									</div>
-								</div>
-							) : (
-								flexRender(cell.column.columnDef.cell, cell.getContext())
-							)}
+							{flexRender(cell.column.columnDef.cell, cell.getContext())}
 						</div>
 					))}
 					<div
@@ -174,32 +144,6 @@ export function DomainTable({
 			</DomainRowContextMenu>
 		);
 	};
-
-	/** Header row for a group whose root domain was not added itself: icon + name only. */
-	const renderGroupHeader = (root: string) => (
-		<div
-			key={`group:${root}`}
-			style={gridStyle}
-			className="grid w-full items-center px-4 py-2 text-left"
-		>
-			{visibleColumns.map((column) => (
-				<div key={column.id} className="min-w-0">
-					{column.id === "domain" ? (
-						<div className="flex min-w-0 items-center gap-1" title={root}>
-							<DomainFavicon domain={root} className="text-text-sub-600" />
-							<span className="truncate font-semibold text-label-sm text-text-strong-950 dark:text-white">
-								{groupLabelOf(root)}
-							</span>
-						</div>
-					) : null}
-				</div>
-			))}
-			<div />
-		</div>
-	);
-
-	const renderChildren = (children: Row<Domain>[]) =>
-		children.map((row) => renderRow(row, { kind: "child" }));
 
 	return (
 		<>
@@ -235,18 +179,7 @@ export function DomainTable({
 							) : rows.length === 0 ? (
 								<EmptyState />
 							) : (
-								groups.map((group) =>
-									group.kind === "single" ? (
-										renderRow(group.item)
-									) : (
-										<Fragment key={`group:${group.root}`}>
-											{group.parent
-												? renderRow(group.parent)
-												: renderGroupHeader(group.root)}
-											{renderChildren(group.children)}
-										</Fragment>
-									),
-								)
+								rows.map((row) => renderRow(row))
 							)}
 
 							{/* Desktop: footer inside the rows card, as before */}
@@ -280,19 +213,5 @@ export function DomainTable({
 				onClearSelection={handleClearSelection}
 			/>
 		</>
-	);
-}
-
-type TreeSlotProps = { kind: "none" } | { kind: "child" };
-
-/**
- * Indent for a grouped child's domain cell. The guide line runs through the
- * centre of the group's 12px icon above (6px in).
- */
-function TreeSlot() {
-	return (
-		<span aria-hidden className="relative w-5 shrink-0 self-stretch">
-			<span className="-inset-y-2 -translate-x-1/2 absolute left-1.5 w-px bg-stroke-soft-200 dark:bg-stroke-soft-100/60" />
-		</span>
 	);
 }

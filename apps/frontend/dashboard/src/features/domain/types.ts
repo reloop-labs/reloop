@@ -52,6 +52,9 @@ export type Domain = {
 	ageDays?: number | null;
 	dailyCap?: number | null;
 	sentToday?: number | null;
+	/** All-time emails sent from / received by this domain. */
+	sentCount?: number;
+	receivedCount?: number;
 	remaining?: number | null;
 	source?: string | null;
 };

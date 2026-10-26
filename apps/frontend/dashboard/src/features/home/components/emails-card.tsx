@@ -1,6 +1,7 @@
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { ArrowRight, Plus } from "lucide-react";
@@ -38,42 +39,15 @@ interface BackendMessage {
 	createdAt: string | Date;
 }
 
-const getEmailIcon = (status: string) => {
-	switch (status?.toLowerCase()) {
-		case "sent":
-			return "send";
-		case "delivered":
-			return "check-circle";
-		case "opened":
-			return "mail-open";
-		case "clicked":
-			return "cursor-click";
-		case "received":
-			return "mail-receive";
-		case "spam":
-			return "alert-triangle";
-		default:
-			return "mail-send";
-	}
-};
+const getEmailIcon = (status: string) =>
+	status?.toLowerCase() === "received"
+		? "mail-receive"
+		: emailStatusTone(status).icon;
 
-const getEmailIconColorClass = (status: string) => {
-	switch (status?.toLowerCase()) {
-		case "sent":
-			return "text-blue-500 dark:text-blue-400";
-		case "delivered":
-			return "text-green-500 dark:text-green-400";
-		case "opened":
-		case "clicked":
-			return "text-text-sub-600 dark:text-white/40";
-		case "received":
-			return "text-blue-500 dark:text-blue-400";
-		case "spam":
-			return "text-error-base";
-		default:
-			return "text-text-sub-600 dark:text-white/40";
-	}
-};
+const getEmailIconColorClass = (status: string) =>
+	status?.toLowerCase() === "received"
+		? "text-information-base"
+		: emailStatusTone(status).text;
 
 const formatShortRelativeTime = (date: string | Date) => {
 	const now = new Date();

@@ -3,6 +3,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as ContextMenu from "@reloop/ui/context-menu";
 import * as Dropdown from "@reloop/ui/dropdown";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import {
 	type ColumnDef,
@@ -14,7 +15,6 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { parseAsInteger, useQueryState } from "nuqs";
 import {
 	type ReactNode,
 	useCallback,
@@ -34,8 +34,6 @@ import {
 	ActionBarSeparator,
 } from "#/components/data-table/action-bar";
 import { DataTableCheckbox } from "#/components/data-table/data-table-checkbox";
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
 import { TableFooter } from "#/features/api-keys/table/table-footer";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
@@ -79,45 +77,11 @@ const emailGridStyle = {
 		"32px minmax(160px, 1.15fr) minmax(200px, 1.5fr) minmax(120px, 0.9fr) 120px 110px 32px",
 };
 
-const getEmailStatusColorClass = (status: string): string => {
-	switch (status.toLowerCase()) {
-		case "delivered":
-		case "sent":
-			return "text-success-base";
-		case "failed":
-		case "bounced":
-		case "spam":
-			return "text-error-base";
-		case "pending":
-			return "text-warning-base";
-		case "opened":
-			return "text-information-base";
-		case "clicked":
-			return "text-feature-base";
-		default:
-			return "text-text-sub-600";
-	}
-};
+const getEmailStatusColorClass = (status: string): string =>
+	emailStatusTone(status).text;
 
-const getEmailStatusIcon = (status: string): string => {
-	switch (status.toLowerCase()) {
-		case "delivered":
-		case "sent":
-			return "check-circle";
-		case "failed":
-		case "bounced":
-		case "spam":
-			return "minus-circle";
-		case "pending":
-			return "clock";
-		case "opened":
-			return "mail-open";
-		case "clicked":
-			return "cursor-click";
-		default:
-			return "mail-single";
-	}
-};
+const getEmailStatusIcon = (status: string): string =>
+	emailStatusTone(status).icon;
 
 const getEmailStatusLabel = (status: string): string => {
 	switch (status.toLowerCase()) {
@@ -238,7 +202,7 @@ function useEmailActionsMenu(
 			}
 			handlers.onOpenChange(next, log.id);
 		},
-		[log.id, handlers.onOpenChange],
+		[log.id, handlers.onOpenChange, handlers],
 	);
 
 	const dismissMenu = useCallback(() => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import { Fragment, type ReactNode, useMemo, useState } from "react";
 import {
@@ -46,11 +47,11 @@ type ActivityEvent = EmailEvent & {
 type Kind = { label: string; icon: string; color: string };
 
 const COLOR = {
-	blue: "text-information-base",
-	green: "text-success-base",
-	orange: "text-orange-600 dark:text-orange-400",
-	purple: "text-purple-600 dark:text-purple-400",
-	red: "text-error-base",
+	blue: emailStatusTone("sent").text,
+	green: emailStatusTone("delivered").text,
+	orange: emailStatusTone("opened").text,
+	purple: emailStatusTone("clicked").text,
+	red: emailStatusTone("failed").text,
 	gray: "text-text-soft-400",
 };
 

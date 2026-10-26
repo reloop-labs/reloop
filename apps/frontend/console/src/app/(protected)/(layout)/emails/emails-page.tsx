@@ -15,6 +15,7 @@ import {
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
@@ -81,43 +82,11 @@ function getAvatarInitial(email: string): string {
 }
 
 function getEmailStatusColorClass(status: string): string {
-	switch (status.toLowerCase()) {
-		case "delivered":
-		case "sent":
-			return "text-success-base";
-		case "failed":
-		case "bounced":
-		case "spam":
-			return "text-error-base";
-		case "pending":
-			return "text-warning-base";
-		case "opened":
-			return "text-information-base";
-		case "clicked":
-			return "text-feature-base";
-		default:
-			return "text-text-sub-600";
-	}
+	return emailStatusTone(status).text;
 }
 
 function getEmailStatusIcon(status: string): string {
-	switch (status.toLowerCase()) {
-		case "delivered":
-		case "sent":
-			return "check-circle";
-		case "failed":
-		case "bounced":
-		case "spam":
-			return "minus-circle";
-		case "pending":
-			return "clock";
-		case "opened":
-			return "mail-open";
-		case "clicked":
-			return "cursor-click";
-		default:
-			return "mail-single";
-	}
+	return emailStatusTone(status).icon;
 }
 
 function getEmailStatusLabel(status: string): string {

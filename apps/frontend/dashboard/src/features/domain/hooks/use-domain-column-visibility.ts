@@ -6,8 +6,8 @@ const STORAGE_KEY = "reloop:domains:column-visibility";
 export const DOMAIN_VIEW_COLUMNS = [
 	{ id: "domain", label: "Domain" },
 	{ id: "status", label: "Status" },
-	{ id: "sending", label: "Sending" },
-	{ id: "receiving", label: "Receiving" },
+	{ id: "sending", label: "Sent" },
+	{ id: "receiving", label: "Received" },
 	{ id: "createdAt", label: "Created At" },
 ] as const;
 

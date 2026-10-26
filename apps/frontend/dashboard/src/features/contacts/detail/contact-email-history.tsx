@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon, type IconName } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -178,47 +179,11 @@ function getChannelDetails(entry: HistoryEntry): {
 	return { name, id, isOptOut };
 }
 
-const getEmailStatusColorClass = (status: string): string => {
-	switch (status.toLowerCase()) {
-		case "delivered":
-		case "sent":
-			return "text-success-base";
-		case "failed":
-		case "bounced":
-		case "spam":
-			return "text-error-base";
-		case "pending":
-		case "scheduled":
-			return "text-warning-base";
-		case "opened":
-			return "text-information-base";
-		case "clicked":
-			return "text-feature-base";
-		default:
-			return "text-text-sub-600";
-	}
-};
+const getEmailStatusColorClass = (status: string): string =>
+	emailStatusTone(status).text;
 
-const getEmailStatusIcon = (status: string): IconName => {
-	switch (status.toLowerCase()) {
-		case "delivered":
-		case "sent":
-			return "check-circle";
-		case "failed":
-		case "bounced":
-		case "spam":
-			return "minus-circle";
-		case "pending":
-		case "scheduled":
-			return "clock";
-		case "opened":
-			return "mail-open";
-		case "clicked":
-			return "cursor-click";
-		default:
-			return "mail-single";
-	}
-};
+const getEmailStatusIcon = (status: string): IconName =>
+	emailStatusTone(status).icon;
 
 const getEmailStatusLabel = (status: string): string => {
 	switch (status.toLowerCase()) {
@@ -464,7 +429,7 @@ function getEmailLifecycleBadges(entry: ActivityEntry): EmailBadgeItem[] {
 			key: "sent",
 			label: "Sent",
 			icon: "send-1",
-			className: "bg-information-lighter text-information-base",
+			className: emailStatusTone("sent").badge,
 		});
 	}
 
@@ -507,7 +472,7 @@ function getEmailLifecycleBadges(entry: ActivityEntry): EmailBadgeItem[] {
 			key: "delivered",
 			label: "Delivered",
 			icon: "check-circle",
-			className: "bg-success-lighter text-success-base",
+			className: emailStatusTone("delivered").badge,
 		});
 	}
 
@@ -520,8 +485,7 @@ function getEmailLifecycleBadges(entry: ActivityEntry): EmailBadgeItem[] {
 			key: "opened",
 			label: "Opened",
 			icon: "mail-open",
-			className:
-				"bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
+			className: emailStatusTone("opened").badge,
 		});
 	}
 
@@ -533,8 +497,7 @@ function getEmailLifecycleBadges(entry: ActivityEntry): EmailBadgeItem[] {
 			key: "clicked",
 			label: "Clicked",
 			icon: "cursor-click",
-			className:
-				"bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
+			className: emailStatusTone("clicked").badge,
 		});
 	}
 
@@ -543,7 +506,7 @@ function getEmailLifecycleBadges(entry: ActivityEntry): EmailBadgeItem[] {
 			key: "sent",
 			label: "Sent",
 			icon: "send-1",
-			className: "bg-information-lighter text-information-base",
+			className: emailStatusTone("sent").badge,
 		});
 	}
 

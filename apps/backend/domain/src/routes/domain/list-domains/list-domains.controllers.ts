@@ -8,7 +8,7 @@ import {
 import * as schema from "@reloop/db/schema";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { DOMAIN_LIST_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { and, count, desc, eq, ilike, isNull } from "drizzle-orm";
+import { and, count, eq, ilike, inArray, isNull } from "drizzle-orm";
 
 import { useLogger } from "evlog/elysia";
 
@@ -55,19 +55,39 @@ export async function listDomainsController({
 		});
 		const { items: domains, hasMore, nextCursor } = toCursorPage(rows, limit);
 
-		const domainsWithCounts = await Promise.all(
-			domains.map(async (d) => {
-				const [sentCountResult] = await db
-					.select({ count: count() })
-					.from(schema.emailLog)
-					.where(eq(schema.emailLog.domainId, d.id));
-				return {
-					...d,
-					sentCount: Number(sentCountResult?.count || 0),
-					object: "domain" as const,
-				};
-			}),
+		// One grouped query per direction instead of one query per domain.
+		const domainIds = domains.map((d) => d.id);
+		const [sentRows, receivedRows] = domainIds.length
+			? await Promise.all([
+					db
+						.select({ domainId: schema.emailLog.domainId, count: count() })
+						.from(schema.emailLog)
+						.where(inArray(schema.emailLog.domainId, domainIds))
+						.groupBy(schema.emailLog.domainId),
+					db
+						.select({ domainId: schema.mailbox.domainId, count: count() })
+						.from(schema.inboundEmail)
+						.innerJoin(
+							schema.mailbox,
+							eq(schema.inboundEmail.mailboxId, schema.mailbox.id),
+						)
+						.where(inArray(schema.mailbox.domainId, domainIds))
+						.groupBy(schema.mailbox.domainId),
+				])
+			: [[], []];
+		const sentByDomain = new Map(
+			sentRows.map((r) => [r.domainId, Number(r.count)]),
 		);
+		const receivedByDomain = new Map(
+			receivedRows.map((r) => [r.domainId, Number(r.count)]),
+		);
+
+		const domainsWithCounts = domains.map((d) => ({
+			...d,
+			sentCount: sentByDomain.get(d.id) ?? 0,
+			receivedCount: receivedByDomain.get(d.id) ?? 0,
+			object: "domain" as const,
+		}));
 
 		const finalResponse = {
 			object: "domain" as const,

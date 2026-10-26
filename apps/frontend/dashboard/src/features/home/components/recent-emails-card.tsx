@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Link from "next/link";
@@ -8,45 +9,15 @@ import { formatRelativeTime } from "#/utils/format-relative-time";
 import { HomeCardBody, HomeCardHeader, HomeCardShell } from "./home-card-shell";
 import { SendFirstEmailButton } from "./send-first-email-button";
 
-const getEmailIcon = (status: string) => {
-	switch (status?.toLowerCase()) {
-		case "sent":
-			return "send";
-		case "delivered":
-			return "check-circle";
-		case "opened":
-			return "mail-open";
-		case "clicked":
-			return "cursor-click";
-		case "bounced":
-		case "failed":
-			return "cross-circle";
-		case "spam":
-		case "complained":
-			return "alert-triangle";
-		default:
-			return "mail-send";
-	}
-};
+const getEmailIcon = (status: string) =>
+	status?.toLowerCase() === "received"
+		? "mail-receive"
+		: emailStatusTone(status).icon;
 
-const getEmailIconColorClass = (status: string) => {
-	switch (status?.toLowerCase()) {
-		case "sent":
-			return "text-information-base";
-		case "delivered":
-			return "text-success-base";
-		case "opened":
-		case "clicked":
-			return "text-text-sub-600";
-		case "bounced":
-		case "failed":
-		case "spam":
-		case "complained":
-			return "text-error-base";
-		default:
-			return "text-text-sub-600";
-	}
-};
+const getEmailIconColorClass = (status: string) =>
+	status?.toLowerCase() === "received"
+		? "text-information-base"
+		: emailStatusTone(status).text;
 
 export function RecentEmailsCard({
 	enabled,

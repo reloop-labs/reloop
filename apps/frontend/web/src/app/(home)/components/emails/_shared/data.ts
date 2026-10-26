@@ -1,3 +1,5 @@
+import { emailStatusTone } from "@reloop/ui/email-status";
+
 export interface EmailItem {
 	id: string;
 	to: string;
@@ -206,43 +208,11 @@ export function getAvatarInitial(email: string): string {
 }
 
 export function getEmailStatusColorClass(status: string): string {
-	switch (status.toLowerCase()) {
-		case "delivered":
-		case "sent":
-			return "text-success-base";
-		case "failed":
-		case "bounced":
-		case "spam":
-			return "text-error-base";
-		case "pending":
-			return "text-warning-base";
-		case "opened":
-			return "text-information-base";
-		case "clicked":
-			return "text-feature-base";
-		default:
-			return "text-text-sub-600";
-	}
+	return emailStatusTone(status).text;
 }
 
 export function getEmailStatusIcon(status: string): string {
-	switch (status.toLowerCase()) {
-		case "delivered":
-		case "sent":
-			return "check-circle";
-		case "failed":
-		case "bounced":
-		case "spam":
-			return "minus-circle";
-		case "pending":
-			return "clock";
-		case "opened":
-			return "mail-open";
-		case "clicked":
-			return "cursor-click";
-		default:
-			return "mail-single";
-	}
+	return emailStatusTone(status).icon;
 }
 
 export function getEmailStatusLabel(status: string): string {

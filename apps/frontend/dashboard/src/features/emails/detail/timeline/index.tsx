@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { Fragment, useMemo } from "react";
@@ -349,37 +350,7 @@ function getIconStyles(
 	const hover = isInteractive
 		? cn(HOVER_ICON[stepType] ?? HOVER_ICON.sent, "group-hover:-translate-y-px")
 		: undefined;
-	switch (stepType) {
-		case "sent":
-			return cn(
-				"border-information-base/20 bg-information-lighter/50 text-information-base",
-				hover,
-			);
-		case "failed":
-		case "bounced":
-		case "complaint":
-			return cn("border-error-light bg-error-lighter text-error-base", hover);
-		case "delivered":
-			return cn(
-				"border-success-base/20 bg-success-lighter/50 text-success-base",
-				hover,
-			);
-		case "opened":
-			return cn(
-				"border-orange-500/20 bg-orange-50/50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400",
-				hover,
-			);
-		case "clicked":
-			return cn(
-				"border-purple-500/20 bg-purple-50/50 text-purple-600 dark:bg-purple-950/30 dark:text-purple-400",
-				hover,
-			);
-		default:
-			return cn(
-				"border-information-base/20 bg-information-lighter/50 text-information-base",
-				hover,
-			);
-	}
+	return cn(emailStatusTone(stepType).box, hover);
 }
 
 function getBadgeStyles(
@@ -390,27 +361,8 @@ function getBadgeStyles(
 	if (!isCompleted) {
 		return "bg-bg-weak-50 text-text-sub-600 dark:bg-neutral-900 dark:text-neutral-400";
 	}
-	const hover = isInteractive && "group-hover:underline underline-offset-2";
-	switch (stepType) {
-		case "sent":
-			return cn("bg-information-lighter text-information-base", hover);
-		case "failed":
-		case "bounced":
-		case "complaint":
-			return cn("bg-error-lighter text-error-base", hover);
-		case "delivered":
-			return cn("bg-success-lighter text-success-base", hover);
-		case "opened":
-			return cn(
-				"bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
-				hover,
-			);
-		case "clicked":
-			return cn(
-				"bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400",
-				hover,
-			);
-		default:
-			return cn("bg-information-lighter text-information-base", hover);
-	}
+	return cn(
+		emailStatusTone(stepType).badge,
+		isInteractive && "underline-offset-2 group-hover:underline",
+	);
 }

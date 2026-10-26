@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
@@ -269,15 +270,15 @@ export function CampaignMetricsCards({
 					}
 				>
 					<BreakdownRow
-						icon="mail-open"
-						iconClass="text-blue-500"
+						icon={emailStatusTone("opened").icon}
+						iconClass={emailStatusTone("opened").text}
 						name="Unique opens"
 						count={opened}
 						rate={openRatePct}
 					/>
 					<BreakdownRow
-						icon="cursor-click"
-						iconClass="text-violet-500"
+						icon={emailStatusTone("clicked").icon}
+						iconClass={emailStatusTone("clicked").text}
 						name="Clicks"
 						count={clicked}
 						rate={clickRatePct}

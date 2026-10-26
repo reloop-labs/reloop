@@ -9,7 +9,10 @@ import {
 	parseAsStringLiteral,
 	useQueryState,
 } from "nuqs";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 
 export function EmptyState() {
 	const router = useRouter();
@@ -81,9 +84,7 @@ export function EmptyState() {
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Add domain
-					<ActionKbd className={actionKbdOnSolidClassName}>
-						C
-					</ActionKbd>
+					<ActionKbd className={actionKbdOnSolidClassName}>C</ActionKbd>
 				</FancyButton.Root>
 			)}
 		</div>

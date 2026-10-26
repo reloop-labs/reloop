@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import {
 	Select,
@@ -34,44 +35,44 @@ const statusOptions: {
 	{
 		id: "delivered",
 		label: "Delivered",
-		icon: "check-circle",
-		colorClass: "text-success-base",
+		icon: emailStatusTone("delivered").icon,
+		colorClass: emailStatusTone("delivered").text,
 	},
 	{
 		id: "sent",
 		label: "Sent",
-		icon: "check-circle",
-		colorClass: "text-success-base",
+		icon: emailStatusTone("sent").icon,
+		colorClass: emailStatusTone("sent").text,
 	},
 	{
 		id: "opened",
 		label: "Opened",
-		icon: "mail-open",
-		colorClass: "text-information-base",
+		icon: emailStatusTone("opened").icon,
+		colorClass: emailStatusTone("opened").text,
 	},
 	{
 		id: "clicked",
 		label: "Clicked",
-		icon: "cursor-click",
-		colorClass: "text-feature-base",
+		icon: emailStatusTone("clicked").icon,
+		colorClass: emailStatusTone("clicked").text,
 	},
 	{
 		id: "pending",
 		label: "Pending",
-		icon: "clock",
-		colorClass: "text-warning-base",
+		icon: emailStatusTone("pending").icon,
+		colorClass: emailStatusTone("pending").text,
 	},
 	{
 		id: "failed",
 		label: "Failed",
-		icon: "cross-circle",
-		colorClass: "text-error-base",
+		icon: emailStatusTone("failed").icon,
+		colorClass: emailStatusTone("failed").text,
 	},
 	{
 		id: "bounced",
 		label: "Bounced",
-		icon: "cross-circle",
-		colorClass: "text-error-base",
+		icon: emailStatusTone("bounced").icon,
+		colorClass: emailStatusTone("bounced").text,
 	},
 	{
 		id: "spam",

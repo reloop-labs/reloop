@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -83,8 +84,8 @@ function getCategoryBadge(category?: DeliverabilityCategory | string) {
 		case "clicked":
 			return {
 				label: "Clicked",
-				icon: "cursor-click",
-				className: "text-feature-base",
+				icon: emailStatusTone("clicked").icon,
+				className: emailStatusTone("clicked").text,
 			};
 		default:
 			return {

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import { emailStatusTone } from "@reloop/ui/email-status";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -70,30 +71,13 @@ const EVENT_POOL: Omit<WebhookEvent, "id">[] = [
 	},
 ];
 
+/** Same colours and icons as the dashboard, from the shared status tones. */
 const KIND_STYLE: Record<WebhookKind, { badge: string; icon: string }> = {
-	sent: {
-		badge:
-			"bg-bg-weak-50 text-text-sub-600 dark:bg-white/10 dark:text-white/70",
-		icon: "send-2",
-	},
-	delivered: {
-		badge:
-			"bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
-		icon: "check-circle",
-	},
-	opened: {
-		badge: "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
-		icon: "mail-open",
-	},
-	clicked: {
-		badge:
-			"bg-violet-50 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300",
-		icon: "cursor-click",
-	},
-	bounced: {
-		badge: "bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-300",
-		icon: "minus-circle",
-	},
+	sent: emailStatusTone("sent"),
+	delivered: emailStatusTone("delivered"),
+	opened: emailStatusTone("opened"),
+	clicked: emailStatusTone("clicked"),
+	bounced: emailStatusTone("bounced"),
 };
 
 const VISIBLE = 3;

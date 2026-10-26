@@ -209,6 +209,11 @@ export namespace DomainModel {
 					description: "Number of emails sent using this domain",
 				}),
 			),
+			receivedCount: t.Optional(
+				t.Number({
+					description: "Number of emails received by this domain's mailboxes",
+				}),
+			),
 			registrarCreatedAt: t.Optional(
 				t.Union([t.Date(), t.Null()], {
 					description: "Registrar creation date from RDAP",

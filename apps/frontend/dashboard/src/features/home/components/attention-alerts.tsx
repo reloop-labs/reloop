@@ -46,7 +46,7 @@ export function buildAttentionItems({
 				status: "error",
 				title:
 					failed.length === 1
-						? `${failed[0]!.domain} needs attention`
+						? `${failed[0]?.domain} needs attention`
 						: `${failed.length} domains need attention`,
 				description:
 					"Verification failed or the domain is suspended. Fix DNS or contact support to restore sending.",
@@ -59,11 +59,11 @@ export function buildAttentionItems({
 				status: "warning",
 				title:
 					pending.length === 1
-						? `Finish verifying ${pending[0]!.domain}`
+						? `Finish verifying ${pending[0]?.domain}`
 						: `Finish verifying ${pending.length} domains`,
 				description:
 					"Add the required DNS records, then verify. Sending works best from an active domain.",
-				href: `/domain/${pending[0]!.id}`,
+				href: `/domain/${pending[0]?.id}`,
 				cta: "Configure DNS",
 			});
 		}

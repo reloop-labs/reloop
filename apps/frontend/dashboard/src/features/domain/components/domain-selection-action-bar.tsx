@@ -11,7 +11,10 @@ import {
 	ActionBarSelection,
 	ActionBarSeparator,
 } from "#/components/data-table/action-bar";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Domain } from "../types";
 
 export function DomainSelectionActionBar({ table }: { table: Table<Domain> }) {
