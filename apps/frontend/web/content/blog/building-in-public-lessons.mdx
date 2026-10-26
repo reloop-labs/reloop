@@ -25,7 +25,7 @@ relatedSlugs:
 
 **Building in public is mostly a discipline, not a marketing tactic.** For us it has meant an open repository, a public changelog for everything we ship, docs written before people ask, and saying plainly what Reloop doesn't do yet. Those habits have shaped the product more than any launch.
 
-Reloop's first commit landed on July 31, 2025. Since then the repository has grown to more than 5,900 commits, 21 backend services, 66 public changelog entries and over 370 documentation pages. Here's what we've learned along the way. Every number in this post comes from the repo, so you can check it.
+Reloop's first commit landed on July 31, 2025, and we [introduced it publicly](/blog/introducing-reloop) that September. Since then the repository has grown to more than 5,900 commits, 21 backend services, 66 public changelog entries and over 370 documentation pages. Here's what we've learned along the way. Every number in this post comes from the repo, so you can check it.
 
 ---
 
@@ -50,7 +50,7 @@ We don't publish revenue dashboards or daily metrics threads. That's a valid ver
 
 Our first month of changelog entries, from August 2025, reads like a list of things nobody tweets about:
 
-- Domain DNS verification for SPF, DKIM and DMARC
+- Domain DNS verification for [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide)
 - KumoMTA as the SMTP engine
 - DNS record status badges and quick copy
 - A "send test email" tool in the dashboard
@@ -65,7 +65,7 @@ That order was deliberate. Email infrastructure lives or dies on deliverability.
 
 ## Lesson 2: Rewrite early, while it's cheap
 
-In September 2025, about six weeks in, we migrated the data layer to Drizzle ORM on PostgreSQL. In November 2025 we built background jobs on Inngest. Today that event layer runs on NATS JetStream inside our own stack.
+In September 2025, about six weeks in, we migrated the data layer to Drizzle ORM on PostgreSQL. In November 2025 we built background jobs on Inngest. Today that event layer runs on NATS JetStream [inside our own stack](/blog/how-we-built-email-delivery-queue-bullmq).
 
 Each of those was a rewrite of something that already worked. They were worth it because:
 
@@ -82,7 +82,7 @@ Each of those was a rewrite of something that already worked. They were worth it
 We've published 66 changelog entries since August 2025. A few things happen when every release has to be written up:
 
 1. **You ship smaller.** A changelog entry needs a clear "what changed". That pushes features into shippable pieces instead of month-long branches.
-2. **You think about the user's next step.** A feature written up for strangers has to make sense on its own. That's why entries like "Webhook Retry Engine & Test Delivery Tool" pair the capability with the way to try it.
+2. **You think about the user's next step.** A feature written up for strangers has to make sense on its own. That's why entries like "[Webhook Retry Engine](/blog/building-webhook-delivery-system) & Test Delivery Tool" pair the capability with the way to try it.
 3. **Users can see momentum.** For an infrastructure product, people need to trust it's maintained before they put password resets on it. A dated changelog is the most honest proof.
 
 The changelog isn't marketing copy. It's a record. Entries say what shipped, not what's coming.
@@ -113,7 +113,7 @@ What that looks like in practice:
 - An [`llms.txt`](/llms.txt) index of the docs, so agents can find the right page
 - Markdown versions of pages, which are cheaper and cleaner for models to read
 - An OpenAPI spec generated from the code, so it can't drift from the real API
-- An MCP server so an agent can send email, manage templates and read an inbox directly
+- An MCP server so an agent can send email, manage templates and [read an inbox](/blog/build-ai-agent-sends-emails) directly
 
 **What we'd tell others:** treat "can an AI assistant use our product correctly?" as a real acceptance test.
 
@@ -121,7 +121,7 @@ What that looks like in practice:
 
 ## Lesson 6: Open source changes who you're accountable to
 
-Reloop is licensed under Apache 2.0 and can be self-hosted with a single install command. That changes the relationship with users in ways we didn't fully expect.
+Reloop is licensed under Apache 2.0 and can be [self-hosted with a single install command](/blog/self-hosted-email-infrastructure). That changes the relationship with users in ways we didn't fully expect.
 
 - **People read the code before they trust it.** Security reviews and "how does this actually work?" questions are answered by the source, not by a sales call.
 - **Self-hosters run it in places you don't.** Different networks, DNS resolvers and hosting providers. That's why the self-hosting docs go into detail on things like outbound DNS and port 25.

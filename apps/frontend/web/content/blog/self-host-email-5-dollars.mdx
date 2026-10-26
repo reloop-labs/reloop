@@ -20,6 +20,7 @@ draft: false
 relatedSlugs:
   - self-hosted-email-infrastructure
   - spf-dkim-dmarc-setup-guide
+  - ip-warming-guide
 ---
 
 ## The math on managed email providers
@@ -89,7 +90,7 @@ Note your server's public IP address. You'll need it shortly.
 
 ### Important: check port 25
 
-Many VPS providers block outbound SMTP (port 25) by default to prevent spam abuse. Hetzner blocks it initially. Before setting up email, **request port 25 to be opened** through Hetzner's support panel. They typically approve within a few hours for legitimate use cases.
+Many VPS providers block outbound SMTP (port 25) by default to prevent spam abuse. Hetzner blocks it initially. Before setting up email, **request port 25 to be opened** through Hetzner's support panel. They typically approve within a few hours for legitimate use cases. For what each port is for, see [SMTP ports explained](/blog/smtp-ports-explained).
 
 While you wait, continue with DNS setup.
 
@@ -97,7 +98,7 @@ While you wait, continue with DNS setup.
 
 ## Step 2: Configure DNS
 
-Good DNS setup is what separates a self-hosted email stack that lands in the inbox from one that goes straight to spam. Do this before installing anything.
+Good DNS setup is what separates a self-hosted email stack that lands in the inbox from one that [goes straight to spam](/blog/why-emails-land-in-spam-fix). Do this before installing anything.
 
 ### A record: point your domain to the server
 
@@ -132,7 +133,7 @@ TTL: 3600
 
 ### SPF, DKIM, DMARC
 
-You'll add these after Reloop is running. The dashboard gives you the exact records to add. For now, add a placeholder SPF:
+You'll add these after Reloop is running. The dashboard gives you the exact records to add. If you want to know what each record does first, read our [SPF, DKIM and DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide). For now, add a placeholder SPF:
 
 ```
 Type: TXT
@@ -307,11 +308,13 @@ Check your inbox. If it's not there, check:
 2. `docker compose logs reloop-smtp`: SMTP handshake issues?
 3. DNS is propagated: `dig TXT yourdomain.com` shows your SPF record?
 
+A fresh server IP has no sending reputation yet. Ramp volume up over a few weeks with an [IP warming schedule](/blog/ip-warming-guide) instead of sending your whole list on day one.
+
 ---
 
 ## Step 8: Integrate with your application
 
-The Reloop API is compatible with the Resend API shape. If you're migrating from Resend, it's usually a one-line change:
+The Reloop API is compatible with the Resend API shape. If you're [migrating from Resend](/blog/reloop-vs-resend), it's usually a one-line change:
 
 ```typescript
 // Before (Resend)

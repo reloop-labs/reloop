@@ -33,6 +33,8 @@ relatedSlugs:
 
 This guide covers plain `smtplib`, the Reloop Python SDK, Django, FastAPI and Flask, then the production details: attachments, background sending and safe retries.
 
+Working in JavaScript? See [how to send email in Node.js](/blog/send-email-nodejs).
+
 ---
 
 ## Which approach should you use?
@@ -205,7 +207,7 @@ See [templates](/docs/learn/templates) for variables and defaults.
 
 ## Django
 
-Django's mail functions work with any SMTP provider. Add these settings and `send_mail`, password reset emails and admin error emails all go through Reloop:
+Django's mail functions work with any SMTP provider. Add these settings and `send_mail`, [password reset emails](/blog/password-reset-email-best-practices) and admin error emails all go through Reloop:
 
 ```python
 # settings.py
@@ -436,7 +438,7 @@ Base the key on the business event (`receipt-{order_id}`), not a new UUID per at
 ## Testing without sending real email
 
 - **Django:** the test runner swaps in the `locmem` backend automatically. Assert on `django.core.mail.outbox`.
-- **Anything else:** mock the client in unit tests, and send to [test addresses](/docs/guides/testing-email-addresses) in staging so you do not hurt your sender reputation with bounces.
+- **Anything else:** mock the client in unit tests, and send to [test addresses](/docs/guides/testing-email-addresses) in staging so you do not hurt your [sender reputation](/blog/why-emails-land-in-spam-fix) with bounces.
 - **Local SMTP:** run [Mailpit](https://mailpit.axllent.org) with `docker run -p 1025:1025 -p 8025:8025 axllent/mailpit` and point `smtplib.SMTP("localhost", 1025)` at it, without `starttls()` or `login()`. Open `http://localhost:8025` to see the messages.
 
 ---

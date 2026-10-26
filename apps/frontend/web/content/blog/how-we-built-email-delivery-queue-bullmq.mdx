@@ -26,7 +26,7 @@ relatedSlugs:
 
 **Reloop doesn't push every email through one big job queue.** It uses three systems, each for the job it's best at. The mail API runs every check synchronously and hands the message straight to **KumoMTA**, whose on-disk spool handles per-domain queueing, retries and SMTP delivery. KumoMTA publishes every delivery outcome to **NATS**, where independent consumers update logs, contacts, reputation and webhooks. **BullMQ** on Redis runs everything that needs scheduling or step-by-step pacing: campaigns, automations, webhook delivery and domain verification.
 
-This post walks through why we split it that way and what each piece actually does, with code from the [Reloop repo](https://github.com/reloop-labs/reloop).
+This post walks through why we split it that way and what each piece actually does, with code from the [Reloop repo](https://github.com/reloop-labs/reloop). The same pipeline ships in [self-hosted Reloop](/blog/self-hosted-email-infrastructure).
 
 ---
 
@@ -68,7 +68,7 @@ The obvious design is "API enqueues a job, worker sends it over SMTP." We didn't
 
 1. **An MTA is already a queue.** SMTP delivery needs per-destination queues, connection limits, retry schedules for 4xx responses, TLS policy and spooling to disk so nothing is lost on restart. KumoMTA does all of that. Rebuilding it on top of Redis would mean writing a worse MTA.
 2. **Errors should be synchronous.** If the sending domain isn't verified or every recipient is suppressed, the caller should get a `400` with a reason right away, not a `202` followed by a failed job they never look at.
-3. **Different work has different shapes.** A password reset should leave in milliseconds. A 50,000-recipient campaign should trickle out under rate limits for an hour. A webhook needs to retry for half a day. One queue with one retry policy fits none of them well.
+3. **Different work has different shapes.** A [password reset](/blog/password-reset-email-best-practices) should leave in milliseconds. A 50,000-recipient campaign should trickle out under rate limits for an hour. A webhook needs to retry for half a day. One queue with one retry policy fits none of them well.
 
 ---
 
@@ -153,7 +153,7 @@ KumoMTA's *tenant* field carries the TLS mode and, for organizations with a dedi
 --   'enforced|65.109.252.254|smtp.reloop.sh' dedicated IP
 ```
 
-`get_queue_config` turns that tenant into an egress pool, and `get_egress_source` binds the right local address and EHLO hostname, which must match the IP's PTR record. Shared-pool senders and dedicated-IP senders never share a connection.
+`get_queue_config` turns that tenant into an egress pool, and `get_egress_source` binds the right local address and EHLO hostname, which must match the IP's PTR record. Shared-pool senders and dedicated-IP senders never share a connection. New dedicated IPs still need an [IP warming schedule](/blog/ip-warming-guide) before they carry full volume.
 
 ### Bring-your-own SMTP
 
@@ -261,6 +261,8 @@ Webhook delivery is its own queue with a custom backoff: 5 s, 5 min, 30 min, 2 h
 - **Reject early, synchronously.** Most "email didn't arrive" tickets disappear when the API says why at send time.
 - **Publish outcomes, don't call services.** NATS queue groups let us add consumers without touching the send path.
 - **Pace bulk work explicitly.** A chain of delayed batch jobs is easier to reason about than thousands of jobs racing a rate limiter.
+
+For the lessons that aren't about queues, see [building in public](/blog/building-in-public-lessons).
 
 ---
 

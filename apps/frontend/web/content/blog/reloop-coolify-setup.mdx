@@ -34,7 +34,7 @@ This guide covers the whole path: requirements, deploy, DNS, first sign-in, syst
 
 [Coolify](https://coolify.io) is an open-source, self-hosted platform-as-a-service. Think Heroku or Render, but on your own server. It gives you a UI for Docker Compose stacks, databases, environment variables, backups and HTTPS.
 
-Reloop is open-source email infrastructure: API, SMTP relay, inboxes, campaigns and webhooks. It runs as a Docker Compose stack.
+[Reloop](/blog/introducing-reloop) is open-source email infrastructure: API, SMTP relay, inboxes, campaigns and webhooks. It runs as a Docker Compose stack.
 
 Put them together and you get your own email platform managed from the same dashboard as the rest of your apps. No shell scripts, no hand-written Caddy config.
 
@@ -52,7 +52,7 @@ Put them together and you get your own email platform managed from the same dash
 | DNS | Three hostnames pointing at the server |
 
 <Callout type="warning">
-  Many hosting providers block port 25 by default. Reloop delivers to other mail servers on outbound 25 and receives on inbound 25, so ask your provider to open it **before** you deploy. Also ask for a PTR (reverse DNS) record for the server IP pointing to your Reloop hostname.
+  Many hosting providers [block port 25](/blog/smtp-ports-explained) by default. Reloop delivers to other mail servers on outbound 25 and receives on inbound 25, so ask your provider to open it **before** you deploy. Also ask for a PTR (reverse DNS) record for the server IP pointing to your Reloop hostname.
 </Callout>
 
 Throughout this guide we'll use `reloop.example.com` as the Reloop hostname and `203.0.113.10` as the server IP. Replace both with your own.
@@ -154,7 +154,7 @@ The neat option is the last one: verify a domain in your new instance, create an
 
 In the Reloop dashboard, go to **Domains**, add the domain you'll send from (for example `mail.acme.com`), and add the SPF, DKIM, DMARC and MX records it shows. Coolify-hosted Reloop doesn't support auto-populating DNS, so add them by hand. The [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide) explains each one.
 
-Then create an API key and send from your app. Point the SDK at your instance:
+Then create an API key and send from your app. A fresh server IP has no reputation yet, so ramp volume up slowly with an [IP warming schedule](/blog/ip-warming-guide). Point the SDK at your instance:
 
 ```typescript
 import { Reloop } from "reloop-email";
@@ -228,7 +228,7 @@ If campaigns, automations or inbox replies fail right after deploy, the server p
 
 ## The other direction: send Coolify's mail through Reloop
 
-Coolify itself sends password resets, deployment alerts and backup notifications. Point it at Reloop SMTP (hosted or your own instance) under **Settings → Email**:
+Coolify itself sends [password resets](/blog/password-reset-email-best-practices), deployment alerts and backup notifications. Point it at Reloop SMTP (hosted or your own instance) under **Settings → Email**:
 
 | Field | Value |
 |---|---|

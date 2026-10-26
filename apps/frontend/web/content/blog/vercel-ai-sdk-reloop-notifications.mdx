@@ -27,7 +27,7 @@ relatedSlugs:
 
 **To let an AI SDK model send email, give it a tool whose `execute` function calls Reloop, and keep every risky decision on the server.** The model chooses *when* to notify and *what* to say. Your code decides *who* receives it, which address it comes from, and how often it can fire.
 
-This guide builds that tool with the current AI SDK (`tool()` with `inputSchema`, `stopWhen`), wires it into a Next.js route, and covers the guardrails that stop a confused model from emailing the wrong person.
+This guide builds that tool with the current AI SDK (`tool()` with `inputSchema`, `stopWhen`), wires it into a [Next.js route](/blog/send-email-nextjs-app-router), and covers the guardrails that stop a confused model from emailing the wrong person.
 
 ---
 
@@ -261,7 +261,7 @@ const { response, emailError } = await reloop.mail.send({
 });
 ```
 
-Your design team owns the template. The model only fills in `summary`.
+Your design team owns the template (or [drafts it with AI](/blog/ai-generate-transactional-email-templates)). The model only fills in `summary`.
 
 ---
 
@@ -274,7 +274,7 @@ To react to what happens next, subscribe a webhook to the [email events](/docs/w
 | Event | Useful for |
 |---|---|
 | `email.delivered` | Confirm the notification arrived |
-| `email.bounced` | Stop emailing that user; ask them to update their address |
+| `email.bounced` | [Stop emailing that user](/blog/email-bounce-processing-automation); ask them to update their address |
 | `email.complained` | Turn the assistant's email feature off for that user |
 | `email.opened` / `email.clicked` | Feed engagement back into the assistant's context |
 
@@ -303,7 +303,9 @@ To react to what happens next, subscribe a webhook to the [email events](/docs/w
   <Accordion title="Can the model email people other than the user?">
     It can if you build that tool, but don't make it the default. Use an
     allowlist (for example, the user's teammates), require approval with
-    `needsApproval`, and log who approved each send.
+    `needsApproval`, and log who approved each send. If the agent needs its
+    own address and has to read replies too, see
+    [how to give an AI agent its own email address](/blog/give-ai-agent-email-address).
   </Accordion>
 
   <Accordion title="Should I use the Reloop MCP server instead?">

@@ -29,6 +29,8 @@ relatedSlugs:
 
 This guide builds both patterns end to end on SvelteKit 2 and Svelte 5: install, a shared client, a contact form with progressive enhancement, a JSON endpoint for webhooks and cron, error handling, templates and deploys.
 
+Using another framework? See the [Next.js](/blog/send-email-nextjs-app-router), [Remix](/blog/send-email-remix) or plain [Node.js](/blog/send-email-nodejs) guides.
+
 ---
 
 ## What you'll build
@@ -192,7 +194,7 @@ This uses Svelte 5 runes: `$props()` for the action result and `$state()` for th
 
 ## 5. Send from a `+server.ts` endpoint
 
-Use an endpoint when the caller isn't your own UI: a Stripe webhook, a cron job, a mobile app, an AI agent.
+Use an endpoint when the caller isn't your own UI: a Stripe webhook, a cron job, a mobile app, [an AI agent](/blog/build-ai-agent-sends-emails).
 
 ```typescript
 // src/routes/api/send/+server.ts
@@ -262,7 +264,7 @@ Most apps end up using both: actions for product UI, endpoints for integrations.
 
 ## 7. Use a template instead of inline HTML
 
-Inline HTML is fine for a contact form. For anything you'll iterate on (welcome emails, receipts, password resets), keep the design in a Reloop template and send variables from code.
+Inline HTML is fine for a contact form. For anything you'll iterate on (welcome emails, receipts, [password resets](/blog/password-reset-email-best-practices)), keep the design in a Reloop template and send variables from code.
 
 ```typescript
 await reloop.mail.send({

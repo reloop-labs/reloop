@@ -26,7 +26,7 @@ relatedSlugs:
 
 **Email reduces churn when it reacts to a signal, not a calendar.** The four sequences worth building are: an inactivity check-in when usage drops, failed payment recovery when a card declines, a reminder before an annual renewal, and a short win-back after someone cancels. Each one starts from an event in your app, checks whether the problem is already fixed before every follow-up, and stops as soon as it is.
 
-This guide walks through each sequence with timing, example subject lines and what each email is for, then shows how to build them as automations in Reloop.
+This guide walks through each sequence with timing, example subject lines and what each email is for, then shows how to build them as automations in Reloop. It's the other end of the lifecycle from [welcome sequences](/blog/welcome-email-sequences-that-convert), which do the same job for new signups.
 
 ---
 
@@ -84,7 +84,7 @@ Rules for this sequence:
 Most billing providers also retry the card on their own schedule. Line your emails up with those retries so the reminder lands just before the next attempt.
 
 <Callout type="tip">
-  Send dunning from your transactional subdomain, not your marketing one. These emails must reach the inbox even if a newsletter has been marked as spam.
+  Send dunning from your transactional subdomain, not your marketing one. These emails must reach the inbox even if a newsletter has been marked as spam. If they're already landing in junk, start with [why emails land in spam](/blog/why-emails-land-in-spam-fix).
 </Callout>
 
 ---
@@ -98,7 +98,7 @@ Most billing providers also retry the card on their own schedule. Line your emai
 | 1 | 30 days before renewal | Remind, show the value they got | Your Acme plan renews on June 1 |
 | 2 | 7 days before renewal | Last reminder with the amount | Reminder: $1,200 renewal on June 1 |
 
-This one feels counter-intuitive: why remind people they're about to pay? Because a surprise annual charge is how you get angry cancellations, refund requests and chargebacks. A clear reminder with a short summary of what they used this year turns renewal into a non-event. In some places, renewal reminders for subscriptions are also a legal requirement, so check the rules where your customers are.
+This one feels counter-intuitive: why remind people they're about to pay? Because a surprise annual charge is how you get angry cancellations, refund requests and chargebacks. A clear reminder with a [short summary of what they used](/blog/transactional-email-as-growth-channel) this year turns renewal into a non-event. In some places, renewal reminders for subscriptions are also a legal requirement, so check the rules where your customers are.
 
 ---
 
@@ -215,7 +215,7 @@ await reloop.automations.create({
 
 If the customer pays, your webhook sets `billing_status` to `active`, the next condition doesn't match, and the sequence ends on its own.
 
-The "payment received" confirmation is a single transactional email, so send it straight from your `invoice.paid` handler with `reloop.mail.send` rather than through the automation.
+The "payment received" confirmation is a single [transactional email](/blog/transactional-email-best-practices), so send it straight from your `invoice.paid` handler with `reloop.mail.send` rather than through the automation.
 
 ### 4. Reuse the shape for the others
 

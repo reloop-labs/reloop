@@ -27,7 +27,7 @@ relatedSlugs:
 
 Transactional emails (password resets, receipts, order confirmations, notifications, onboarding sequences) are different from marketing email in one critical way: **the recipient expects them.** That expectation drives open rates of 45–65%, compared to 20–25% for marketing campaigns.
 
-But that expectation also creates an obligation. When someone clicks "Forgot password?" and your reset email takes 4 minutes to arrive, or lands in spam, it's not an inconvenience. It's a product failure. Your transactional email infrastructure is part of your product.
+But that expectation also creates an obligation. When someone clicks "Forgot password?" and your reset email takes 4 minutes to arrive, or [lands in spam](/blog/why-emails-land-in-spam-fix), it's not an inconvenience. It's a product failure. Your transactional email infrastructure is part of your product.
 
 This guide covers everything you need to get transactional email right: from domain architecture to template patterns, delivery behaviour, and what to monitor.
 
@@ -71,7 +71,7 @@ Before your first production send, your sending domain must have:
 - **DKIM**: signs each message cryptographically
 - **DMARC**: sets policy and sends you reports on failures
 
-Gmail and Yahoo have required all three since February 2024. Skipping any one of them will result in your email being rejected or spam-foldered by major ISPs.
+[Gmail and Yahoo have required all three](/blog/gmail-yahoo-bulk-sender-requirements) since February 2024. Skipping any one of them will result in your email being rejected or spam-foldered by major ISPs.
 
 See the [complete SPF, DKIM, DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide) for step-by-step configuration.
 
@@ -81,7 +81,7 @@ See the [complete SPF, DKIM, DMARC setup guide](/blog/spf-dkim-dmarc-setup-guide
 
 ### Send immediately, never batch transactional mail
 
-Transactional email must be sent with near-zero latency. A user who triggers a password reset expects that email within 30 seconds. If you're batching emails or running them through a slow queue, you're creating support tickets.
+Transactional email must be sent with near-zero latency. A user who triggers a [password reset](/blog/password-reset-email-best-practices) expects that email within 30 seconds. If you're batching emails or running them through a slow queue, you're creating support tickets.
 
 The correct pattern:
 1. User action triggers email send
@@ -116,7 +116,7 @@ If a send fails due to a temporary issue (rate limit, provider timeout), retry w
 - Attempt 3: 5 minutes
 - Attempt 4: give up and alert
 
-But never retry a hard bounce (invalid address, domain doesn't exist). Hard bounces are permanent. Re-sending damages your reputation. Reloop's bounce processing handles this automatically: addresses that hard bounce are suppressed and never re-sent to. To reduce hard bounces upstream, verify addresses at collection with a [free email validator](/tools/email-validator) (syntax, disposable domains, and MX checks) before they hit your transactional send queue.
+But never retry a hard bounce (invalid address, domain doesn't exist). Hard bounces are permanent. Re-sending damages your reputation. Reloop's [bounce processing](/blog/email-bounce-processing-automation) handles this automatically: addresses that hard bounce are suppressed and never re-sent to. To reduce hard bounces upstream, verify addresses at collection with a [free email validator](/tools/email-validator) (syntax, disposable domains, and MX checks) before they hit your transactional send queue.
 
 ---
 
@@ -223,7 +223,7 @@ A sudden drop in open rate for a specific email type (without a content change) 
 
 ### Use Reloop's webhook events
 
-Reloop emits events for every step of the email lifecycle: `email.sent`, `email.delivered`, `email.opened`, `email.clicked`, `email.bounced`, `email.complained`. Subscribe to these with a webhook and build dashboards, alerts, or automated responses (like removing a complained address from your list in real-time).
+Reloop emits events for every step of the email lifecycle: `email.sent`, `email.delivered`, `email.opened`, `email.clicked`, `email.bounced`, `email.complained`. Subscribe to these with a [webhook](/blog/building-webhook-delivery-system) and build dashboards, alerts, or automated responses (like removing a complained address from your list in real-time).
 
 ```typescript
 // Webhook handler: remove complaints from your user preferences

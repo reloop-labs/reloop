@@ -78,7 +78,7 @@ Bot Script ──> Temp Email ──> Free Sign-Up ──> Burns $5 in AI API Cr
 
 If 200 bot signups each consume $3 worth of OpenAI API tokens or GPU inference, that is **$600 per month charged directly to your infrastructure credit card**, with zero conversion chance.
 
-Gating signups with a disposable detector immediately kills 95%+ of low-effort multi-accounting scripts without requiring heavy, high-friction CAPTCHAs for legitimate users.
+[Gating signups with a disposable detector](/blog/block-disposable-emails-at-signup) immediately kills 95%+ of low-effort multi-accounting scripts without requiring heavy, high-friction CAPTCHAs for legitimate users.
 
 ---
 
@@ -90,7 +90,7 @@ Major mailbox providers (Google Workspace, Gmail, Microsoft 365, Yahoo) evaluate
 - Industry standard delivery targets keep hard bounces **under 2%**. 
 - Exceeding **5%** triggers immediate scrutiny, spam foldering, or rate-limiting.
 
-Because disposable inboxes are deleted minutes after creation, every automated email you send after signup (your welcome email, onboarding sequence, email verification link, or day-3 check-in) will **hard bounce**.
+Because disposable inboxes are deleted minutes after creation, every automated email you send after signup (your [welcome email](/blog/welcome-email-sequences-that-convert), onboarding sequence, email verification link, or day-3 check-in) will **hard bounce**.
 
 ```
 High Disposable Signups
@@ -112,12 +112,12 @@ Direct Churn, Lost Revenue, & Costly Remediation
 ```
 
 ### What does recovering a burned domain cost?
-When your transactional emails start landing in spam:
-* Legitimate paying customers can't log in (missing 2FA and password reset tokens), driving up customer support tickets.
+When your transactional emails [start landing in spam](/blog/why-emails-land-in-spam-fix):
+* Legitimate paying customers can't log in (missing 2FA and [password reset](/blog/password-reset-email-best-practices) tokens), driving up customer support tickets.
 * Trial activation rates plummet because users never see the onboarding steps.
 * Restoring a burned IP and domain requires hiring deliverability consultants, purchasing dedicated IPs, and executing a multi-month [IP warming schedule](/blog/ip-warming-guide), often costing **$5,000 to $15,000+** in lost revenue and tooling.
 
-Checking for disposable providers on signup keeps your hard bounce rate near zero, protecting the inbox placement of your revenue-generating emails.
+Checking for disposable providers on signup keeps your [hard bounce rate](/blog/email-bounce-processing-automation) near zero, protecting the inbox placement of your revenue-generating emails.
 
 ---
 

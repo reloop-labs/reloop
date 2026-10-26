@@ -35,6 +35,8 @@ relatedSlugs:
 
 This guide covers both with TypeScript examples you can copy, then goes through the parts that break in production: errors, retries, attachments and templates.
 
+Using a framework? See the guides for [Next.js](/blog/send-email-nextjs-app-router), [SvelteKit](/blog/send-email-sveltekit), [Remix](/blog/send-email-remix) and [Cloudflare Workers](/blog/send-email-cloudflare-workers). Writing Python instead? Read [how to send email in Python](/blog/send-email-python).
+
 ---
 
 ## Which approach should you use?
@@ -56,7 +58,7 @@ This guide covers both with TypeScript examples you can copy, then goes through 
 ## Prerequisites
 
 1. **Node.js 18 or later** (for native `fetch`)
-2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide). Sending from an unverified domain is the most common reason mail lands in spam.
+2. A **verified sending domain** with [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide). Sending from an unverified domain is the most common reason [mail lands in spam](/blog/why-emails-land-in-spam-fix).
 3. An **API key** from the [Reloop dashboard](https://reloop.sh/dashboard). Keys start with `rl_`.
 
 ```env

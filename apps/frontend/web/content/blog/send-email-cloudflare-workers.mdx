@@ -28,14 +28,16 @@ relatedSlugs:
 
 This guide covers both options, plus the parts that matter in production: secrets, sending without slowing down the response, safe retries, Queues and scheduled sends.
 
+Using a framework on top of Workers? The [SvelteKit](/blog/send-email-sveltekit), [Remix](/blog/send-email-remix) and [Next.js](/blog/send-email-nextjs-app-router) guides use the same API.
+
 ---
 
 ## Why HTTP and not SMTP
 
-Most email libraries for Node (Nodemailer, for example) open a TCP connection to an SMTP server. That doesn't fit the Workers runtime:
+Most email libraries for Node ([Nodemailer](/blog/send-email-nodejs), for example) open a TCP connection to an SMTP server. That doesn't fit the Workers runtime:
 
 - Workers run on V8 isolates, not a full Node.js process, so many Node networking APIs aren't available.
-- Every request should finish fast. An SMTP handshake with STARTTLS adds several round trips.
+- Every request should finish fast. An SMTP handshake with [STARTTLS](/blog/smtp-ports-explained) adds several round trips.
 - An HTTP API gives you a single request, a JSON response with an email ID, and structured errors.
 
 So the pattern on Workers is simple: **HTTP out, Reloop does the SMTP.**
@@ -289,7 +291,7 @@ export default {
 
 ## 5. Retry safely with `Idempotency-Key`
 
-Networks fail. If a `fetch` times out you don't know whether Reloop received it. Retrying blindly could send the same password reset twice.
+Networks fail. If a `fetch` times out you don't know whether Reloop received it. Retrying blindly could send the same [password reset](/blog/password-reset-email-best-practices) twice.
 
 Send an `Idempotency-Key` header and retries become safe. Reloop stores a successful response for 24 hours, and a repeat request with the same key and body returns the original result instead of sending again.
 

@@ -29,6 +29,8 @@ relatedSlugs:
 
 A note on names: Remix v2 and React Router v7 are now the same framework. React Router v7's "framework mode" is what Remix v3 would have been, and the Remix team recommends it for new apps. This guide uses React Router v7 code, and points out the one or two places where Remix v2 differs.
 
+Using a different framework? See the guides for [Next.js](/blog/send-email-nextjs-app-router), [SvelteKit](/blog/send-email-sveltekit) or plain [Node.js](/blog/send-email-nodejs).
+
 ---
 
 ## What you'll build
@@ -97,7 +99,7 @@ If you self-host Reloop, pass `baseUrl: "https://reloop.example.com"` as well.
 
 ## 4. Send from a route action
 
-Here's a signup route. The action validates the email, creates the user, and sends a welcome email.
+Here's a signup route. The action validates the email, creates the user, and sends a [welcome email](/blog/welcome-email-sequences-that-convert).
 
 ```tsx
 // app/routes/signup.tsx
@@ -262,7 +264,7 @@ await reloop.mail.send({
 
 ## 7. Receive delivery events with a resource route
 
-A route with an `action` and no default export is a resource route: a plain HTTP endpoint. That's the right place for Reloop webhooks (bounces, complaints, deliveries).
+A route with an `action` and no default export is a resource route: a plain HTTP endpoint. That's the right place for Reloop webhooks ([bounces](/blog/email-bounce-processing-automation), complaints, deliveries).
 
 ```typescript
 // app/routes/api.reloop-webhook.ts
@@ -353,7 +355,7 @@ On Cloudflare, the SDK needs the `nodejs_compat` flag. See [sending email from C
   </Accordion>
 
   <Accordion title="Can I use SMTP instead of the SDK?">
-    Yes. Point Nodemailer at `smtp.reloop.sh` on port 587 with your API key
+    Yes. Point Nodemailer at `smtp.reloop.sh` on [port 587](/blog/smtp-ports-explained) with your API key
     as both username and password. See the [SMTP docs](/docs/examples/smtp/introduction).
   </Accordion>
 

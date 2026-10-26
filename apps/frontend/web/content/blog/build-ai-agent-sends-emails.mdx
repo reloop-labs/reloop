@@ -125,7 +125,7 @@ const { mailbox, mailboxError } = await reloop.inbox.mailboxes.create({
 if (mailboxError) throw mailboxError;
 ```
 
-Receiving must be on for the domain, which adds an MX record pointing at Reloop. The free plan includes three agent inboxes. Pro includes five and Growth includes ten.
+Receiving must be on for the domain, which adds an MX record pointing at Reloop. The free plan includes three agent inboxes. Pro includes five and Growth includes ten. [How to give an AI agent its own email address](/blog/give-ai-agent-email-address) covers the domain and mailbox setup in more detail.
 
 ---
 
@@ -326,9 +326,10 @@ The email stays pending for five minutes. Show it in your review queue, and canc
 
 - **Learn from outcomes.** Subscribe to `email.opened`, `email.clicked` and replies on the thread, and feed them back into the agent's context.
 - **Label and route.** Use `inbox.threads.update` to mark threads important, or archive resolved ones with `inbox.threads.archive`.
+- **Send one-way notifications.** For alerts from a chat assistant or background job, see [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications).
 - **Give humans the same inbox.** People can work the same mailbox in the Reloop dashboard, so the agent and your team share one queue.
 
-For the infrastructure side (MX records, threading, storage, IMAP), read [how the infrastructure for an email agent works](/blog/email-infrastructure-for-ai-agents).
+For the infrastructure side (MX records, threading, storage, IMAP), read [how the infrastructure for an email agent works](/blog/email-infrastructure-for-ai-agents). If you're weighing hosted agent inbox providers, see [Reloop vs AgentMail](/blog/reloop-vs-agentmail).
 
 ---
 

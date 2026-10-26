@@ -35,7 +35,7 @@ The DNS part takes five minutes. The certificate is what takes time, so start th
 
 BIMI stands for Brand Indicators for Message Identification. It's a DNS record that tells mailbox providers where to find your logo, and optionally a certificate proving you're allowed to use it.
 
-It is **not** a deliverability shortcut. A BIMI record won't move you from spam to inbox. What it does:
+It is **not** a deliverability shortcut. A BIMI record won't move you from spam to inbox (if that's your problem, start with [why emails land in spam](/blog/why-emails-land-in-spam-fix)). What it does:
 
 - Puts your logo in the inbox list instead of a grey letter avatar
 - Makes phishing that imitates your brand easier to spot
@@ -198,13 +198,13 @@ Then send a real email to a Gmail and a Yahoo address. Logos can take up to 48 h
 | Logo shows with wrong crop | Logo not centered for a circle | Shrink the mark to the middle ~70% |
 | Recently fixed, still missing | Provider cache | Wait up to 48 hours |
 
-Also remember that mailbox providers can choose not to show logos for senders with poor reputation, high complaint rates, or very low volume. BIMI rewards senders who are already doing the basics right.
+Also remember that mailbox providers can choose not to show logos for senders with poor reputation, [high complaint rates](/blog/gmail-yahoo-bulk-sender-requirements), or very low volume. A new domain gets there by [warming up gradually](/blog/ip-warming-guide). BIMI rewards senders who are already doing the basics right.
 
 ---
 
 ## BIMI and Reloop
 
-Reloop doesn't need anything special for BIMI. The logo is tied to the domain in your From address, not to the sending service. As long as the mail you send through Reloop passes DMARC (which it does once the SPF and DKIM records from your domain page are verified), BIMI works for it automatically.
+[Reloop](/blog/introducing-reloop) doesn't need anything special for BIMI. The logo is tied to the domain in your From address, not to the sending service. As long as the mail you send through Reloop passes DMARC (which it does once the SPF and DKIM records from your domain page are verified), BIMI works for it automatically.
 
 A quick pre-flight for a Reloop sending domain:
 

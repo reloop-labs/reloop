@@ -26,7 +26,7 @@ relatedSlugs:
 
 **Migrating from SendGrid to Reloop takes most teams an afternoon of code changes and a week of careful cutover.** The code is the easy part: Reloop's send call is simpler than SendGrid's v3 payload, and if you use SMTP you only change four settings. The part that deserves care is moving your suppression list and ramping traffic so your sender reputation comes with you.
 
-This guide walks through the whole thing in the order we'd do it.
+This guide walks through the whole thing in the order we'd do it. If you're still deciding, start with [Reloop vs SendGrid](/blog/reloop-vs-sendgrid).
 
 ---
 
@@ -107,7 +107,7 @@ for (const list of lists) {
 }
 ```
 
-Suppressed addresses are rejected before they're sent, for both transactional and marketing mail. From here on, Reloop adds hard bounces and complaints to the list automatically.
+Suppressed addresses are rejected before they're sent, for both transactional and marketing mail. From here on, Reloop adds [hard bounces and complaints](/blog/email-bounce-processing-automation) to the list automatically.
 
 ---
 
@@ -187,7 +187,7 @@ if (emailError) {
 }
 ```
 
-Install the SDK with `npm install reloop-email`. There are official SDKs for [Python, Go, PHP, Ruby, Rust and more](/sdk) too.
+Install the SDK with `npm install reloop-email` (the [Node.js guide](/blog/send-email-nodejs) covers setup). There are official SDKs for [Python, Go, PHP, Ruby, Rust and more](/sdk) too.
 
 ### Field mapping
 
@@ -346,7 +346,7 @@ A schedule that works for most senders:
 | 4–7 | 50% | Gmail and Outlook inbox placement |
 | 8–14 | 100% | Complaint rate under 0.1% |
 
-Start with transactional mail (password resets, receipts). Those recipients expect the message and engage with it, which builds reputation quickly. Move marketing campaigns last.
+Start with transactional mail ([password resets](/blog/password-reset-email-best-practices), receipts). Those recipients expect the message and engage with it, which builds reputation quickly. Move marketing campaigns last.
 
 If you're sending high volume on a dedicated IP, follow the longer [IP warming schedule](/blog/ip-warming-guide) instead.
 

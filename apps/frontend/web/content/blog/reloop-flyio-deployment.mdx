@@ -43,7 +43,7 @@ Shared egress IPs make it worse. Anyone else's bad mail from the same IP range a
 
 | Approach | Reverse DNS | Reputation | Result |
 |---|---|---|---|
-| Direct SMTP from a Fly machine | Not configurable | Shared or brand new | Spam folder or rejected |
+| Direct SMTP from a Fly machine | Not configurable | Shared or brand new | [Spam folder](/blog/why-emails-land-in-spam-fix) or rejected |
 | Dedicated Fly egress IP | Not configurable | Yours, but cold | Still penalized by large providers |
 | Relay through Reloop | Handled | Warm, monitored | Inbox |
 
@@ -102,11 +102,11 @@ if (emailError) {
 }
 ```
 
-The SDK returns `{ response, emailError }` instead of throwing, so a failed send never crashes a request handler.
+The SDK returns `{ response, emailError }` instead of throwing, so a failed send never crashes a request handler. More patterns are in the [Node.js email guide](/blog/send-email-nodejs).
 
 ### Any language
 
-It's one `POST`, so it works from Elixir, Go, Python, Rails or anything else you deploy on Fly:
+It's one `POST`, so it works from Elixir, Go, [Python](/blog/send-email-python), Rails or anything else you deploy on Fly:
 
 ```bash
 curl -X POST https://reloop.sh/api/mail/v1/send \
@@ -157,7 +157,7 @@ config.action_mailer.smtp_settings = {
 }
 ```
 
-You're connecting to a relay on 587 with authentication, not delivering to recipients' MX on port 25, so the PTR problem above doesn't apply. Examples for other languages are in the [SMTP docs](/docs/examples/smtp/introduction).
+You're connecting to a [relay on 587](/blog/smtp-ports-explained) with authentication, not delivering to recipients' MX on port 25, so the PTR problem above doesn't apply. Examples for other languages are in the [SMTP docs](/docs/examples/smtp/introduction).
 
 ---
 

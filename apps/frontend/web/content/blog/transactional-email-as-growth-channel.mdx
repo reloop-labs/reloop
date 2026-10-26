@@ -92,7 +92,7 @@ Receipts get opened and kept. After the line items, one short line is enough: a 
 
 ### 4. Weekly or monthly digest
 
-A summary of what happened in the user's account ("312 new signups this week, up from 280") reminds people the product is working for them, even when they don't log in. It's one of the best inactivity defences there is.
+A summary of what happened in the user's account ("312 new signups this week, up from 280") reminds people the product is working for them, even when they don't log in. It's one of the best inactivity defences there is, alongside the [churn sequences](/blog/email-reduce-churn-sequences) that react when usage drops.
 
 Only send it when there's something real to report, and let users turn it off in a preference center.
 
@@ -106,7 +106,7 @@ Only send it when there's something real to report, and let users turn it off in
 
 ### 7. Password reset and magic link
 
-Don't add anything here. These must be fast, plain, and only about signing in. The growth play is reliability: a magic link that arrives in two seconds is part of a good first impression. One that lands in spam loses the user.
+Don't add anything here. These must be fast, plain, and only about signing in (our [password reset guide](/blog/password-reset-email-best-practices) covers what belongs in one). The growth play is reliability: a magic link that arrives in two seconds is part of a good first impression. One that [lands in spam](/blog/why-emails-land-in-spam-fix) loses the user.
 
 ---
 
@@ -131,7 +131,7 @@ Transactional growth emails carry per-user data: a name, a usage number, a date.
 
 ### 1. Create a template with variables
 
-In the Reloop dashboard, create a template for the usage alert. Template variables use triple braces and can have a default:
+In the Reloop dashboard, create a template for the usage alert, or [have AI draft it](/blog/ai-generate-transactional-email-templates) for you. Template variables use triple braces and can have a default:
 
 ```html
 <p>Hi {{{first_name}}},</p>
@@ -211,7 +211,7 @@ For a weekly digest, a cron job builds each user's summary and sends it with the
 Digests and milestone emails are optional. Put them in a [channel](/docs/learn/contacts/channels) (Reloop's subscription topics) so users can turn off "Weekly digest" in the preference center without unsubscribing from everything. Keep receipts, invites and security emails out of channels: users should always get those.
 
 <Callout type="tip">
-  Send transactional mail from its own subdomain (for example `mail.acme.com`) and marketing from another (`news.acme.com`). Reputation is tracked per domain, so a bad campaign can't drag down your password resets.
+  Send transactional mail from its own subdomain (for example `mail.acme.com`) and marketing from another (`news.acme.com`). Reputation is tracked per domain, so a bad campaign can't drag down your password resets. Each subdomain needs its own [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide) records.
 </Callout>
 
 ---

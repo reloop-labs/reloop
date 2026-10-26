@@ -19,9 +19,9 @@ author:
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
+  - best-cloudflare-email-alternatives
   - send-email-cloudflare-workers
   - reloop-vs-resend
-  - reloop-vs-aws-ses
 ---
 
 **Cloudflare now sends email.** Its Email Service adds outbound sending to the Email Routing product many teams already use for inbound, and from a Worker it's one binding and one `send()` call. **If your app lives entirely on Workers and only sends transactional mail, it's a strong, cheap option.** Reloop is the better fit when you need marketing mail, templates, contacts and automations, real inboxes, a domain that isn't on Cloudflare DNS, or the option to self-host.
@@ -206,6 +206,8 @@ Reloop is Apache 2.0. Start on Reloop Cloud, move to your own server with the [o
 - **You send high transactional volume.** Above roughly 200k emails a month, $0.35 per 1,000 beats our overage rate.
 - **You only need inbound forwarding.** Email Routing is free and unlimited.
 - **You want one vendor and one bill** for compute, storage and email.
+
+For more ways to send from Workers, see our roundup of the [best Cloudflare Email Service alternatives](/blog/best-cloudflare-email-alternatives).
 
 ## Where Reloop is the better choice
 

@@ -27,7 +27,7 @@ relatedSlugs:
 
 **A webhook system is only as good as what it does when your endpoint is down.** Reloop's webhook system delivers every event at least once: it stores the event, creates one delivery per subscribed endpoint, signs the body with HMAC-SHA256, and POSTs it from a BullMQ worker. If the endpoint fails, the delivery is retried up to 7 times over about 17 hours. Endpoints that keep failing are disabled instead of hammered, and any delivery can be replayed by hand.
 
-This post walks through how that works in the [Reloop codebase](https://github.com/reloop-labs/reloop), with the numbers taken straight from the code.
+This post walks through how that works in the [Reloop codebase](https://github.com/reloop-labs/reloop), with the numbers taken straight from the code. (The code is public because [we open-sourced the whole stack](/blog/why-we-open-sourced-email-infrastructure).)
 
 ---
 
@@ -62,7 +62,7 @@ Three tables carry the state:
 
 ## 1. Events are idempotent
 
-The same real-world event can show up more than once. KumoMTA can log twice, a NATS message can be redelivered, a service can restart mid-handler. If each of those created a new webhook, customers would see duplicate `email.delivered` calls.
+The same real-world event can show up more than once. KumoMTA (the MTA at the heart of our [delivery pipeline](/blog/how-we-built-email-delivery-queue-bullmq)) can log twice, a NATS message can be redelivered, a service can restart mid-handler. If each of those created a new webhook, customers would see duplicate `email.delivered` calls.
 
 So every dispatch carries a stable key. For delivery events it's built from the organization, event type, email ID, KumoMTA record type and record ID:
 
@@ -124,7 +124,7 @@ If Redis is unavailable, the check fails open and the delivery goes out. Losing 
 
 ### Filters
 
-Filtering is shallow on purpose. A customer who only wants bounces can set:
+Filtering is shallow on purpose. A customer who only wants bounces (say, to mirror our [bounce processing](/blog/email-bounce-processing-automation) into their own database) can set:
 
 ```json
 {
@@ -293,7 +293,8 @@ Replays are refused while the endpoint is disabled, failed or paused, with a `wh
     Email lifecycle (`email.sent`, `email.delivered`, `email.bounced`,
     `email.complained`, `email.opened`, `email.clicked`, `email.received`
     and more), plus domain, API key and contact events. See
-    [event types](/docs/webhooks/event-types).
+    [event types](/docs/webhooks/event-types). `email.received` is what lets
+    an [AI agent read and reply to email](/blog/build-ai-agent-sends-emails).
   </Accordion>
 </AccordionGroup>
 

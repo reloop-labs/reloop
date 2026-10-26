@@ -25,7 +25,7 @@ relatedSlugs:
   - building-webhook-delivery-system
 ---
 
-**Every bounce is a signal, and ignoring it is how good senders end up in spam.** In Reloop, bounce handling is automatic: KumoMTA publishes one record per delivery attempt, three independent services consume it, and within seconds the email log is updated, the address is suppressed so you can't mail it again, your webhook fires, and your organization's bounce rate is recalculated. If that rate crosses 5% (or complaints cross 0.3%), sending pauses before it damages anyone's reputation.
+**Every bounce is a signal, and ignoring it is how good senders [end up in spam](/blog/why-emails-land-in-spam-fix).** In Reloop, bounce handling is automatic: KumoMTA publishes one record per delivery attempt, three independent services consume it, and within seconds the email log is updated, the address is suppressed so you can't mail it again, your webhook fires, and your organization's bounce rate is recalculated. If that rate crosses 5% (or complaints cross 0.3%), sending pauses before it damages anyone's reputation.
 
 This post walks through that pipeline with code from the [Reloop repo](https://github.com/reloop-labs/reloop).
 
@@ -69,7 +69,7 @@ Each consumer runs in its own NATS queue group, so all four see every event, and
 
 ## Step 1: classify at the MTA
 
-KumoMTA, the open-source MTA we use for delivery, already separates permanent failures (5xx, logged as `Bounce`) from temporary ones (4xx, logged as `TransientFailure` and retried with backoff). It also gives each bounce a `bounce_classification`, which we store with the event so you can see *why* in the dashboard.
+KumoMTA, the open-source MTA at the core of our [delivery pipeline](/blog/how-we-built-email-delivery-queue-bullmq), already separates permanent failures (5xx, logged as `Bounce`) from temporary ones (4xx, logged as `TransientFailure` and retried with backoff). It also gives each bounce a `bounce_classification`, which we store with the event so you can see *why* in the dashboard.
 
 We add one rule on top. Gmail and other providers return a **4xx** for full mailboxes, so by default the MTA keeps retrying them for days. In practice, a mailbox that's full now is usually abandoned. So we rewrite those replies to a permanent `552`:
 
@@ -167,7 +167,7 @@ export const REPUTATION_THRESHOLDS = {
 };
 ```
 
-The rates are computed over the organization's last 24 hours of sends, straight from the email log. The complaint thresholds match Gmail and Yahoo's sender requirements. Each value can be changed with an environment variable on self-hosted installs.
+The rates are computed over the organization's last 24 hours of sends, straight from the email log. The complaint thresholds match [Gmail and Yahoo's sender requirements](/blog/gmail-yahoo-bulk-sender-requirements). Each value can be changed with an environment variable on self-hosted installs.
 
 | Signal | Warn at | Pause at |
 |---|---|---|
@@ -175,7 +175,7 @@ The rates are computed over the organization's last 24 hours of sends, straight 
 | Spam complaint rate | 0.1% | 0.3% |
 | Minimum volume before either applies | 100 sends in 24 h | |
 
-Below 100 sends nothing is evaluated, so a brand-new sender whose first two emails include one typo (a 50% bounce rate) doesn't get blocked.
+Below 100 sends nothing is evaluated, so a brand-new sender whose first two emails include one typo (a 50% bounce rate) doesn't get blocked. New senders should still ramp up volume with an [IP warming schedule](/blog/ip-warming-guide).
 
 ### Warnings before the pause
 
@@ -212,7 +212,7 @@ All of this happens without any code on your side:
 - The **email log** shows `bounced` with the remote server's exact reply.
 - The **contact** is marked blocked with the reason.
 - The **Suppression tab** lists it, and you can remove it if you need to.
-- Your **webhook** receives `email.bounced` or `email.complained` with the SMTP code and message.
+- Your **[webhook](/blog/building-webhook-delivery-system)** receives `email.bounced` or `email.complained` with the SMTP code and message.
 - If your rates climb, you get **emails before** sending pauses.
 
 If you also keep your own database of users, listen for `email.bounced` and flag the address so your app can ask the user to update it:

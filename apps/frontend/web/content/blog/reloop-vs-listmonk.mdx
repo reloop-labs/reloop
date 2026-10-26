@@ -19,9 +19,9 @@ author:
   avatar: /company/team/pranav-patel.jpg
 draft: false
 relatedSlugs:
+  - best-listmonk-alternatives
   - reloop-vs-postal
   - reloop-vs-mailchimp
-  - self-hosted-email-infrastructure
 ---
 
 **Listmonk and Reloop are both open source and both self-hostable, but they sit at different layers.** Listmonk is a newsletter and mailing list manager: it stores subscribers, builds campaigns and hands each message to an SMTP server you provide. Reloop is the email infrastructure itself: **it runs its own MTA, sends transactional and campaign mail, runs event-triggered automations, and receives mail into inboxes.** That's why many teams don't pick one: they point Listmonk at Reloop's SMTP.
@@ -183,6 +183,8 @@ Reloop is **Apache 2.0**, a permissive license without that requirement. For mos
 - **You want the smallest possible footprint.** A single Go binary and Postgres, running large campaigns in tens of megabytes of RAM.
 - **Your team thinks in SQL.** Segmenting with SQL expressions is hard to beat for flexibility.
 - **You already have a sending provider** you're happy with, such as SES at a contracted rate.
+
+If you want to compare more newsletter tools, hosted or self-hosted, see the [best Listmonk alternatives](/blog/best-listmonk-alternatives).
 
 ## Where Reloop is the better choice
 

@@ -39,7 +39,7 @@ There are two ways to use AI for transactional email, and only one of them is a 
 | **Generate the template** | An LLM writes the HTML once. You review it, save it, and send it with variables. | Receipts, password resets, welcome emails, invoices: almost everything |
 | **Generate every email** | An LLM writes a new body for each recipient at send time. | Genuinely one-off messages, like an agent replying in a support thread |
 
-Generating per send is slower, costs money on every email, and means nobody has reviewed the exact HTML a customer receives. A password reset shouldn't depend on a model being in a good mood. Generate the template, then let variables do the personalization.
+Generating per send is slower, costs money on every email, and means nobody has reviewed the exact HTML a customer receives. A [password reset](/blog/password-reset-email-best-practices) shouldn't depend on a model being in a good mood. Generate the template, then let variables do the personalization.
 
 ---
 
@@ -92,7 +92,7 @@ that may use the same variables.
 Three things matter more than everything else:
 
 1. **Declare the variables.** If you don't list them, the model invents names (`{{user.name}}`, `[FIRST NAME]`) that won't be substituted.
-2. **Describe the trigger.** "Sent 1 minute after signup, before they've created a project" produces a much better welcome email than "write a welcome email".
+2. **Describe the trigger.** "Sent 1 minute after signup, before they've created a project" produces a much better [welcome email](/blog/welcome-email-sequences-that-convert) than "write a welcome email".
 3. **Ask for plain copy.** Transactional email should read like a note from a person, not a landing page.
 
 <Callout type="info">
@@ -260,7 +260,7 @@ Templates aren't write-once. A useful loop:
 3. Save it as a new version, test it, publish it.
 4. If it's worse, restore the previous version from the template's history.
 
-Keep the variables identical between versions so your send code never changes.
+Keep the variables identical between versions so your send code never changes. To send the finished template from an AI app, see [Vercel AI SDK + Reloop](/blog/vercel-ai-sdk-reloop-notifications).
 
 ---
 

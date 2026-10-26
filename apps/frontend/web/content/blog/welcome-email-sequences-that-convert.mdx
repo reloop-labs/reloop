@@ -60,7 +60,7 @@ Here's a sequence that works for most self-serve SaaS products. Adjust the days 
 | 4 | Day 7 | Offer help from a person | Stuck? Reply to this email |
 | 5 | Day 14 | Last nudge, with a reason to come back now | Your workspace is ready when you are |
 
-Emails 2 to 5 only go to users who **haven't** activated yet. A user who activates on day 1 should get email 1 and nothing else from this sequence. Activated users move to a different track (tips for power users, team invites, upgrade prompts) or get no more automated email at all.
+Emails 2 to 5 only go to users who **haven't** activated yet. A user who activates on day 1 should get email 1 and nothing else from this sequence. Activated users move to a different track (tips for power users, [team invites, upgrade prompts](/blog/transactional-email-as-growth-channel)) or get no more automated email at all.
 
 ### Email 1: the welcome (immediately)
 
@@ -89,7 +89,7 @@ Pranav, Acme
 
 ### Email 2: remove the blocker (day 1)
 
-Look at where new users drop off. Usually it's one setup step: verifying a domain, installing a snippet, inviting a teammate. Email 2 explains that step and why it matters.
+Look at where new users drop off. Usually it's one setup step: [verifying a domain](/blog/spf-dkim-dmarc-setup-guide), installing a snippet, inviting a teammate. Email 2 explains that step and why it matters.
 
 Keep it short. Link straight to the screen where they do it, not to your homepage.
 
@@ -103,7 +103,7 @@ A plain-text email from a founder or support engineer asking "what's getting in 
 
 ### Email 5: the last nudge (day 14)
 
-Give them a reason to come back now: a template they can start from, a short video, a new feature. Then stop. Users who haven't activated after two weeks need a product change, not a sixth email.
+Give them a reason to come back now: a template they can start from, a short video, a new feature. Then stop. Users who haven't activated after two weeks need a product change, not a sixth email. Users who activate and later drift away are a job for [churn sequences](/blog/email-reduce-churn-sequences).
 
 <Callout type="tip">
   Send the welcome sequence from a person's name ("Pranav from Acme"), not "Acme Team" or `noreply@`. Use a `reply_to` address someone actually reads.
@@ -121,7 +121,7 @@ Give them a reason to come back now: a template they can start from, a short vid
 
 **Plain text is fine.** For emails 1, 4 and 5, a lightly formatted email that looks like it came from a person often does better than a designed newsletter.
 
-**Separate it from transactional mail.** Password resets and receipts should never wait behind a marketing queue or share a reputation with it. Send onboarding from its own subdomain if you can.
+**Separate it from transactional mail.** [Password resets](/blog/password-reset-email-best-practices) and receipts should never wait behind a marketing queue or share a reputation with it. Send onboarding from its own subdomain if you can.
 
 **Respect unsubscribes.** Every sequence email needs a working unsubscribe link, and unsubscribing should stop the sequence immediately.
 
@@ -224,7 +224,7 @@ When a condition doesn't match (the user has activated), that path has no next s
 
 ### 5. Start it on signup
 
-In your signup handler, track the event. Passing `email` creates the contact if it doesn't exist yet.
+In your signup handler, track the event. Passing `email` creates the contact if it doesn't exist yet. If you [block disposable emails at signup](/blog/block-disposable-emails-at-signup), do that check first so the sequence isn't wasted on throwaway inboxes.
 
 ```typescript
 const { automationError } = await reloop.automations.start({
