@@ -1,3 +1,5 @@
+import { describe, expect, it, spyOn } from "bun:test";
+import dns from "node:dns/promises";
 import { checkDomainReputationController } from "@be/tools/routes/tools/domain-reputation/domain-reputation.controllers";
 import {
 	checkDomainReputation,
@@ -59,12 +61,36 @@ describe("Domain Reputation Service", () => {
 		});
 
 		it("grades a Spamhaus DBL listing as F regardless of DNS hygiene", async () => {
-			// dbltest.com is Spamhaus' permanent DBL test point
-			const report = await checkDomainReputation("dbltest.com");
-			expect(report.details.blocklist.listedCount).toBeGreaterThanOrEqual(1);
-			expect(report.breakdown.blocklist.status).toBe("fail");
-			expect(report.grade).toBe("F");
-			expect(report.verdictLabel).toContain("Spamhaus DBL");
+			// Spamhaus blocks queries from public resolvers and cloud data centers (e.g. GitHub Actions/Azure)
+			// with 127.255.255.254, which evaluates to a query error instead of a listing.
+			// Mock the Resolver for dbltest.com to make the test deterministic across CI and local environments.
+			const originalResolve4 = dns.Resolver.prototype.resolve4;
+			const resolve4Spy = spyOn(
+				dns.Resolver.prototype,
+				"resolve4",
+			).mockImplementation(async function (
+				this: dns.Resolver,
+				hostname: string,
+				...args: unknown[]
+			) {
+				if (hostname === "dbltest.com.dbl.spamhaus.org") {
+					return ["127.0.1.2"];
+				}
+				return (
+					originalResolve4 as (...a: unknown[]) => Promise<string[]>
+				).apply(this, [hostname, ...args]);
+			} as unknown as typeof dns.Resolver.prototype.resolve4);
+
+			try {
+				// dbltest.com is Spamhaus' permanent DBL test point
+				const report = await checkDomainReputation("dbltest.com");
+				expect(report.details.blocklist.listedCount).toBeGreaterThanOrEqual(1);
+				expect(report.breakdown.blocklist.status).toBe("fail");
+				expect(report.grade).toBe("F");
+				expect(report.verdictLabel).toContain("Spamhaus DBL");
+			} finally {
+				resolve4Spy.mockRestore();
+			}
 		}, 15000);
 
 		it("does not count a null MX (RFC 7505) as a mail server", async () => {
