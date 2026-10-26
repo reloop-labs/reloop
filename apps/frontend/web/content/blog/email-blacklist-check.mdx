@@ -1,0 +1,261 @@
+---
+title: "Is My Email Blacklisted? How to Check Your Domain and IP (and Get Removed)"
+description: "Find out if your domain or sending IP is on an email blacklist in two minutes, what a listing actually means, and the exact steps to get delisted from Spamhaus, Barracuda, SpamCop and more."
+keywords:
+  - email blacklist check
+  - is my email blacklisted
+  - check if domain is blacklisted
+  - ip blacklist check
+  - how to get off email blacklist
+  - spamhaus delisting
+  - domain blacklist removal
+  - dnsbl lookup
+  - why are my emails bouncing
+publishedAt: 2026-10-26
+category: Deliverability
+tags: [deliverability, blacklist, blocklist, dnsbl, spamhaus, reputation]
+readTime: 10 min read
+author:
+  name: Twinkal Patel
+  role: Co-founder
+  avatar: /company/team/twinkal-p.jpg
+draft: false
+image: /blog/images/email-blacklist-check.png
+relatedSlugs:
+  - why-emails-land-in-spam-fix
+  - spf-dkim-dmarc-setup-guide
+  - gmail-yahoo-bulk-sender-requirements
+  - ip-warming-guide
+  - email-bounce-processing-automation
+---
+
+**To check if your email is blacklisted, enter your domain and your sending IP address into a blocklist checker such as the [free Reloop Blocklist Checker](/tools/blocklist-checker).** It looks both up on 42 public blacklists at once. If either one shows up on Spamhaus, Barracuda or SpamCop, fix whatever caused it first, then request removal on that list's own website.
+
+That is the two-minute version. The rest of this guide explains what a blacklist is, how to find the IP address you actually send from (most people check the wrong one), which listings matter, and how to get removed.
+
+---
+
+## What is an email blacklist?
+
+An email blacklist (also called a blocklist, DNSBL or RBL) is a public list of IP addresses and domain names that have been caught sending spam, hosting malware or behaving like a hacked server.
+
+Mail servers check these lists every time an email arrives. If the sender is on a list the receiving server trusts, the email gets:
+
+- **Rejected outright**, with a bounce message such as `550 5.7.1 Service unavailable; client host blocked using zen.spamhaus.org`
+- **Sent to spam**, with no error at all
+- **Delayed**, while the receiving server decides what to do
+
+There are two kinds of listing, and you should check both:
+
+| Type | What is listed | Example lists | What it affects |
+|------|----------------|---------------|-----------------|
+| **IP blacklist** | The server address your email leaves from | Spamhaus ZEN, Barracuda BRBL, SpamCop | Every email sent from that IP, whatever the domain |
+| **Domain blacklist** | Your domain name, wherever it appears | Spamhaus DBL, URIBL, SURBL | Any email that contains your domain, in the From address or in a link |
+
+<Callout type="info">
+  A domain listing follows you. Changing email providers fixes an IP listing, but if your domain is listed, every email that mentions it can be blocked until the listing is removed.
+</Callout>
+
+---
+
+## Signs you might be blacklisted
+
+You do not need to be technical to spot these:
+
+- Emails to some people bounce back with words like **"blocked"**, **"blacklisted"**, **"listed"**, **"Spamhaus"** or **"poor reputation"** in the error
+- Customers say your emails suddenly started landing in spam
+- Open rates fell sharply overnight without any change on your side
+- A whole company (one domain) stopped receiving your emails, while Gmail users still get them
+- Your website or email host sent you a warning about outgoing spam
+
+If one of these is happening, run a check before changing anything else.
+
+---
+
+## Step 1: Find the IP address you actually send from
+
+**This is where most blacklist checks go wrong.** Your website's IP address is usually not the address your email leaves from.
+
+It depends on how you send:
+
+| How you send email | Whose IP is it? |
+|--------------------|-----------------|
+| Gmail, Google Workspace, Outlook, Microsoft 365 | Google's or Microsoft's shared servers. You rarely need to check these; the provider handles them. |
+| An email service such as Reloop, SendGrid or Mailgun | The provider's IP, shared with other customers unless you pay for a dedicated IP |
+| Your own server, VPS or WordPress host | Your server's IP. You are fully responsible for it. |
+
+The reliable way to find it is from an email you have already sent:
+
+1. Send an email from your normal address to a Gmail account you own.
+2. Open it in Gmail, click the three dots, and choose **Show original**.
+3. Look for the SPF line. It names the IP address directly:
+
+```http
+Received-SPF: pass (google.com: domain of hello@yourdomain.com
+  designates 203.0.113.10 as permitted sender)
+```
+
+In this example `203.0.113.10` is your sending IP. Note it down alongside your domain name.
+
+---
+
+## Step 2: Check the domain and IP against blacklists
+
+### The quick way (anyone)
+
+Open the [Reloop Blocklist Checker](/tools/blocklist-checker) and enter your **domain**, then your **sending IP**. It checks:
+
+- **35 IP blacklists**, including Spamhaus ZEN, Barracuda BRBL, SpamCop, UCEPROTECT and Mailspike
+- **7 domain blacklists**, including Spamhaus DBL, URIBL and SURBL
+
+It is free and needs no sign-up. If a lookup on a list fails, it shows an error rather than a false "clean" result.
+
+<Callout type="tip">
+  Check your domain too, not just your IP. If your domain publishes dedicated `ip4:` addresses in its SPF record, the checker looks those IPs up automatically.
+</Callout>
+
+### The command-line way (developers)
+
+Blacklists are DNS zones, so you can query them with `dig`. Reverse the IP's four numbers and add the list's hostname:
+
+```bash
+# IP 203.0.113.10 against Spamhaus ZEN (note the reversed octets)
+dig +short 10.113.0.203.zen.spamhaus.org
+
+# Domain against Spamhaus DBL
+dig +short yourdomain.com.dbl.spamhaus.org
+```
+
+- **No answer**: not listed on that list.
+- **An answer in `127.0.0.x`**: listed. The last number tells you which sub-list.
+- **`127.255.255.254`**: not a listing. Spamhaus refuses queries sent through public DNS resolvers such as `8.8.8.8` or `1.1.1.1`. Run the query from a different resolver, or use a checker.
+
+To automate the check, call the public API (no API key, 60 requests per minute):
+
+```bash
+curl -X POST https://reloop.sh/api/tools/v1/blocklist-check \
+  -H "Content-Type: application/json" \
+  -d '{ "target": "203.0.113.10" }'
+```
+
+Add it to a daily cron job or uptime monitor so you hear about a listing before your customers do.
+
+---
+
+## Step 3: Decide if the listing actually matters
+
+**Not every listing is an emergency.** There are hundreds of blacklists and most large mailbox providers ignore the majority of them.
+
+| List | How much it matters | Notes |
+|------|---------------------|-------|
+| **Spamhaus ZEN / DBL** | Critical | Used by a very large share of mail servers. Fix it immediately. |
+| **Barracuda BRBL** | High | Common in business email filters. |
+| **SpamCop** | Medium to high | Clears itself about 24 hours after spam reports stop. |
+| **URIBL / SURBL** | High for links | Blocks emails containing your domain in links. |
+| **Spamhaus PBL** | Usually fine | Lists home and dynamic IPs that should not send mail directly. Expected for a home connection; a problem only if it is your mail server. |
+| **UCEPROTECT Level 2 / 3** | Low | Lists entire networks for a neighbour's behaviour. Few major providers use it. You don't need to pay for express removal. |
+
+<Callout type="warning">
+  Gmail, Outlook and Yahoo mostly rely on their own private reputation data, not public blacklists. A clean blacklist result does not guarantee inbox placement. Check [Google Postmaster Tools](https://postmaster.google.com) and Microsoft [SNDS](https://sendersupport.olc.protection.outlook.com/snds/) as well.
+</Callout>
+
+---
+
+## Step 4: Fix the cause before you ask for removal
+
+Blacklists list you for a reason. If you request removal without fixing it, you are relisted, often faster and for longer the second time.
+
+The usual causes, roughly from most to least common:
+
+1. **A hacked account or password.** Someone is sending spam through your email account, SMTP credentials or website contact form. Change passwords, rotate API keys and look for sending you don't recognise.
+2. **A bad email list.** Bought lists, old lists and scraped addresses contain **spam traps**: addresses that exist only to catch senders who don't get permission. Remove anyone who has not opted in or engaged recently.
+3. **A sudden volume spike.** Going from 50 emails a day to 50,000 on a new IP or domain looks like a spammer. [Warm up gradually](/blog/ip-warming-guide).
+4. **Too many bounces and complaints.** Keep hard bounces under 2% and spam complaints under 0.1%. [Automate bounce handling](/blog/email-bounce-processing-automation) so dead addresses are suppressed.
+5. **Missing authentication.** Without [SPF, DKIM and DMARC](/blog/spf-dkim-dmarc-setup-guide), anyone can send email pretending to be you, and your domain takes the blame.
+6. **A shared IP neighbour.** On a shared IP, another customer's spam can list the IP you share. Your provider should handle this; if it keeps happening, ask them about it or move to a provider that polices its IPs.
+
+---
+
+## Step 5: Request removal (delisting)
+
+Once the cause is fixed, go to the list's own removal page. **Removal is free on every reputable list.** Be careful with anyone who offers to delist you for a fee.
+
+| List | How to get removed |
+|------|--------------------|
+| **Spamhaus** | Look up your IP or domain at [check.spamhaus.org](https://check.spamhaus.org) and follow the removal instructions for that listing |
+| **Barracuda** | Submit the [Barracuda removal request form](https://www.barracudacentral.org/rbl/removal-request); usually processed within 12 to 24 hours |
+| **SpamCop** | No form. The listing expires about 24 hours after spam reports stop. |
+| **Microsoft (Outlook, Hotmail)** | If Outlook rejects you, request delisting at [sender.office.com](https://sender.office.com) |
+| **UCEPROTECT Level 1** | Expires automatically after 7 days without new spam |
+| **Others** | The checker links to each list's removal page when it finds a hit |
+
+When you write the removal request, say briefly what went wrong and what you changed. "A contact form was abused by a bot; we added a CAPTCHA and rotated credentials" gets processed much faster than "please remove us".
+
+After removal, run the check again 24 to 48 hours later to confirm the listing is gone.
+
+---
+
+## How to stay off blacklists for good
+
+- **Only email people who asked for it.** Never buy lists.
+- **Authenticate your domain** with SPF, DKIM and DMARC. Gmail and Yahoo now [require it for bulk senders](/blog/gmail-yahoo-bulk-sender-requirements).
+- **Suppress bounces and complaints automatically**, so you never email the same dead address twice.
+- **Use a separate subdomain for marketing**, such as `news.yourdomain.com`, so a campaign problem does not hit your password resets and receipts.
+- **Protect your forms** with CAPTCHA and rate limits, and [block disposable emails at signup](/blog/block-disposable-emails-at-signup).
+- **Monitor weekly.** A scheduled call to the blocklist API catches listings in hours instead of weeks.
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How do I check if my email domain is blacklisted for free?">
+    Enter your domain into the free [Reloop Blocklist Checker](/tools/blocklist-checker).
+    It looks the domain up on 7 domain blacklists, including Spamhaus DBL, URIBL
+    and SURBL, and checks any dedicated sending IPs listed in your SPF record. No
+    sign-up is needed.
+  </Accordion>
+
+  <Accordion title="Can a Gmail or Outlook address be blacklisted?">
+    Not in the usual sense. When you send from a free Gmail or Outlook address,
+    you send from Google's or Microsoft's servers, and those providers manage
+    their own IP reputation. Your individual account can still be limited or
+    suspended for sending spam, but that is not a public blacklist.
+  </Accordion>
+
+  <Accordion title="How long does it take to get off a blacklist?">
+    Most reputable lists remove a fixed listing within 24 to 48 hours. SpamCop
+    expires on its own about a day after reports stop, and UCEPROTECT Level 1
+    after 7 days. Repeat listings take longer each time.
+  </Accordion>
+
+  <Accordion title="Why am I blacklisted when I never sent spam?">
+    The most common reasons are a hacked password or contact form sending spam
+    without your knowledge, an old list that contains spam traps, or sharing an
+    IP address with another sender who did send spam. Spamhaus PBL also lists
+    home and dynamic IP addresses by design, which is not an accusation of
+    spam.
+  </Accordion>
+
+  <Accordion title="Is a blacklist the same as going to spam?">
+    No. A blacklist is one possible cause of spam placement. Missing SPF, DKIM
+    or DMARC, poor engagement and spammy content are others. If you are not
+    listed but still land in spam, follow our guide on [why emails land in
+    spam](/blog/why-emails-land-in-spam-fix).
+  </Accordion>
+
+  <Accordion title="Should I pay to be removed from a blacklist?">
+    No. Spamhaus, Barracuda, SpamCop and other major lists remove you for free
+    once the problem is fixed. Lists that charge for removal are generally not
+    ones the big mailbox providers rely on.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Send from IPs that stay clean"
+  description="Reloop suppresses bounces and complaints automatically, and signs every email with DKIM on your own domain. Free for 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>
