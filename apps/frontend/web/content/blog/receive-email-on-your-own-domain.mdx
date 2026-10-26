@@ -1,0 +1,312 @@
+---
+title: "How to Receive Email on Your Own Domain (Step-by-Step MX Record Tutorial)"
+description: "Receive email at an address on your own domain, such as support@yourdomain.com: how MX records work, how to add one without breaking your existing email, and how to read mail in a dashboard, Apple Mail or Outlook, or your own code."
+keywords:
+  - receive email on custom domain
+  - how to receive email on my domain
+  - mx record setup
+  - what is an mx record
+  - custom domain email inbox
+  - inbound email
+  - receive email with webhook
+  - imap custom domain
+  - set up email for my domain
+publishedAt: 2026-10-26
+category: Tutorials
+tags: [inbound, mx-records, dns, inbox, imap, webhooks]
+readTime: 11 min read
+author:
+  name: Twinkal Patel
+  role: Co-founder
+  avatar: /company/team/twinkal-p.jpg
+draft: false
+image: /blog/images/receive-email-on-your-own-domain.png
+relatedSlugs:
+  - give-ai-agent-email-address
+  - spf-dkim-dmarc-setup-guide
+  - build-ai-agent-sends-emails
+  - email-blacklist-check
+  - self-hosted-email-infrastructure
+---
+
+**To receive email on your own domain, add an MX record that points the domain (or a subdomain) to a mail server, then create a mailbox for the address.** With Reloop, the MX record is `inbound.reloop.sh` with priority `10`. After the record is live, mail sent to `you@yourdomain.com` arrives in seconds and you can read it in the dashboard, in Apple Mail or Outlook over IMAP, or in your own code through a webhook.
+
+That takes about ten minutes. The step that catches people out is choosing *which* domain to point, because one wrong MX record can quietly redirect all of your company's existing email. This tutorial walks through it safely.
+
+---
+
+## What you need
+
+- **A domain you own**, such as `yourdomain.com`, and access to its DNS settings (Cloudflare, GoDaddy, Namecheap, Route 53 or wherever you bought it)
+- **A free [Reloop account](/dashboard/signup)**. The free plan includes 3 inboxes. If you [self-host Reloop](/blog/self-hosted-email-infrastructure), there is no inbox limit.
+- **Ten minutes**, plus up to an hour for DNS changes to spread
+
+No servers or coding are needed unless you want to process mail in your own app (Step 6).
+
+---
+
+## How receiving email works (the 60-second version)
+
+When someone sends an email to `hello@yourdomain.com`, their mail server needs to know where to deliver it. It looks up the domain's **MX record** (Mail eXchanger) in DNS, a bit like looking up a postal address:
+
+```
+Sender's mail server:  "Where does mail for yourdomain.com go?"
+DNS:                   "MX 10 inbound.reloop.sh"
+Sender's mail server:  delivers the email to inbound.reloop.sh
+```
+
+A few rules worth knowing:
+
+- **No MX record, no email.** Without one, senders cannot deliver to the domain at all.
+- **The number is a priority.** Lower numbers are tried first. If a domain has `MX 1 google.com` and `MX 10 inbound.reloop.sh`, mail goes to Google.
+- **Each domain and subdomain has its own MX records.** `yourdomain.com` and `support.yourdomain.com` can deliver to completely different providers.
+- **Receiving and sending are separate.** MX controls where mail *arrives*. SPF, DKIM and DMARC control whether mail you *send* is trusted. You need both if you want to reply.
+
+That third rule is what makes the next step safe.
+
+---
+
+## Step 1: Choose the address (root domain or subdomain)
+
+**Check first whether your domain already receives email.** Run this, or use any online "MX lookup" tool:
+
+```bash
+dig MX yourdomain.com +short
+```
+
+| What you see | What it means | What to do |
+|--------------|---------------|------------|
+| Nothing | The domain receives no email today | You can use the root domain: `hello@yourdomain.com` |
+| `google.com`, `googlemail.com` | Google Workspace handles your mail | **Use a subdomain** |
+| `outlook.com`, `protection.outlook.com` | Microsoft 365 handles your mail | **Use a subdomain** |
+| Anything else | Another provider handles your mail | **Use a subdomain** |
+
+<Callout type="warning">
+  If your domain already receives email, **do not change its MX record.** Replacing or adding an MX record on the root domain diverts or splits your team's existing email. Use a subdomain such as `inbox.yourdomain.com` instead. It gets its own MX record and leaves your current email untouched.
+</Callout>
+
+Good subdomain names describe the job: `support.yourdomain.com`, `inbox.yourdomain.com`, `replies.yourdomain.com`. Your address then looks like `help@support.yourdomain.com`.
+
+---
+
+## Step 2: Add the domain to Reloop
+
+1. Open the [Reloop dashboard](https://reloop.sh/dashboard) and go to **Domains**.
+2. Click **Add domain** and enter the domain from Step 1, for example `support.yourdomain.com`.
+3. Make sure **Email Receiving** is turned on. It is on by default for new domains, and you can toggle it later on the domain page.
+
+Reloop now shows the DNS records for the domain: the MX record for receiving, plus SPF, DKIM and DMARC records for sending.
+
+---
+
+## Step 3: Add the MX record
+
+At your DNS provider, add this record:
+
+| Type | Name | Value | Priority |
+|------|------|-------|----------|
+| `MX` | `support` (the subdomain part only) or `@` for the root domain | `inbound.reloop.sh` | `10` |
+
+Most DNS providers add your domain to the end of the name automatically. Entering `support` creates the record for `support.yourdomain.com`. Entering `support.yourdomain.com` in some providers creates `support.yourdomain.com.yourdomain.com`, which does not work.
+
+<Callout type="tip">
+  On supported DNS providers, Reloop can add the records for you with **auto-populate**, so you don't have to copy them by hand.
+</Callout>
+
+**Add the sending records too** (SPF, DKIM and DMARC, listed on the same page) if you plan to reply from this address. Without them, your replies are likely to land in spam. Our [SPF, DKIM and DMARC guide](/blog/spf-dkim-dmarc-setup-guide) explains each one.
+
+### Check the record is live
+
+```bash
+dig MX support.yourdomain.com +short
+# 10 inbound.reloop.sh.
+```
+
+If you see `10 inbound.reloop.sh.`, you're done. If it is empty, wait a few minutes; DNS changes can take up to an hour to appear.
+
+---
+
+## Step 4: Create a mailbox
+
+The MX record gets mail to Reloop. A mailbox tells Reloop which address to keep it for.
+
+From the domain page, click **Create mailbox**, enter the address (for example `help@support.yourdomain.com`) and a display name such as "Acme Support".
+
+Developers can do the same with the SDK:
+
+```typescript
+const { mailbox, mailboxError } = await reloop.inbox.mailboxes.create({
+  domainId: "dom_...",
+  email: "help@support.yourdomain.com",
+  displayName: "Acme Support",
+});
+```
+
+---
+
+## Step 5: Send a test email
+
+From your personal Gmail or Outlook account, send an email to the new address. It should appear in the mailbox in the Reloop dashboard within a few seconds.
+
+Every message is grouped into a **thread** with the rest of its conversation and gets a spam score. Likely spam is still kept in the mailbox, marked as spam, so you can check it. Only blatant spam is refused before it arrives.
+
+---
+
+## Step 6: Choose how to read your email
+
+Pick whichever fits the people (or software) who will read the mail. You can use more than one at the same time.
+
+### Option A: In the browser (anyone)
+
+The Reloop dashboard works like a shared inbox: read, reply, star, archive, label threads and leave internal notes for your team.
+
+### Option B: In Apple Mail, Outlook or Thunderbird (anyone)
+
+Add the mailbox as an IMAP account in your usual mail app:
+
+| Setting | Value |
+|---------|-------|
+| Incoming server (IMAP) | `imap.reloop.sh` |
+| Port | `993` (SSL/TLS) |
+| Username | The mailbox address, e.g. `help@support.yourdomain.com` |
+| Password | A Reloop API key (starts with `rl_`) that can access this mailbox |
+| Outgoing server (SMTP) | `smtp.reloop.sh`, port `587`, STARTTLS, same username and password |
+
+Changes sync both ways. If you archive a message in Apple Mail, it shows as archived in the dashboard too.
+
+<Callout type="tip">
+  Create a separate API key for each person or device, restricted to that mailbox. If a laptop is lost, you revoke one key without affecting anything else.
+</Callout>
+
+### Option C: In your own app with a webhook (developers)
+
+To process incoming mail in code (create a support ticket, parse an order, let an AI agent reply), subscribe a webhook to the `email.received` event. Reloop calls your URL every time a message arrives:
+
+```json
+{
+  "type": "email.received",
+  "created_at": "2026-10-26T12:00:00.000Z",
+  "data": {
+    "email_id": "in_123456789",
+    "mailbox_id": "mb_123456789",
+    "from": "customer@example.com",
+    "from_name": "Ada",
+    "to": ["help@support.yourdomain.com"],
+    "subject": "Where is my order?",
+    "thread_id": "thr_123456789",
+    "has_attachments": false,
+    "is_spam": false
+  }
+}
+```
+
+A minimal handler verifies the signature, skips spam and loads the conversation:
+
+```typescript
+import { createHmac, timingSafeEqual } from "node:crypto";
+import { reloop } from "./lib/reloop";
+
+function verify(rawBody: string, header: string, secret: string): boolean {
+  const parts = Object.fromEntries(header.split(",").map((p) => p.trim().split("=")));
+  const t = Number(parts.t);
+  if (!t || Math.abs(Date.now() / 1000 - t) > 300) return false;
+  const expected = createHmac("sha256", secret).update(`${t}.${rawBody}`).digest();
+  const given = Buffer.from(parts.v1 ?? "", "hex");
+  return given.length === expected.length && timingSafeEqual(given, expected);
+}
+
+export async function POST(req: Request): Promise<Response> {
+  const raw = await req.text();
+  const header = req.headers.get("Reloop-Signature") ?? "";
+  if (!verify(raw, header, process.env.RELOOP_WEBHOOK_SECRET!)) {
+    return new Response("Bad signature", { status: 401 });
+  }
+
+  const event = JSON.parse(raw);
+  if (event.type !== "email.received" || event.data.is_spam) {
+    return new Response("skipped");
+  }
+
+  const { thread, threadError } = await reloop.inbox.threads.get(event.data.thread_id);
+  if (threadError) throw threadError;
+
+  await createSupportTicket(thread); // your logic
+
+  return new Response("ok");
+}
+```
+
+To answer in the same conversation, use `reloop.inbox.messages.reply(event.data.email_id, { text: "..." })`. Reloop sets the threading headers so Gmail and Outlook show the reply in the original thread.
+
+### Option D: With an AI assistant
+
+Connect the [Reloop MCP server](/docs/integrations/ai-tools/mcp-server) to Claude, Cursor or another AI client, and ask it to summarise or draft replies to your inbox. For an agent that runs on its own, follow [How to Give an AI Agent Its Own Email Address](/blog/give-ai-agent-email-address).
+
+---
+
+## Troubleshooting
+
+| Problem | Likely cause | Fix |
+|---------|--------------|-----|
+| Nothing arrives | MX record missing or not live yet | Run `dig MX support.yourdomain.com +short`. It should return `10 inbound.reloop.sh.`; wait up to an hour after adding it. |
+| Mail arrives at your old provider instead | Another MX record on the same name has a lower priority number | Remove the other record, or use a different subdomain |
+| Sender gets a `550 5.1.1 User unknown` bounce | No mailbox for that exact address | Create the mailbox in Step 4 and check the spelling |
+| Your company email stopped working | The MX record was changed on the root domain | Restore your original MX records (Google or Microsoft list them in their admin help) and use a subdomain |
+| Message missing from the inbox | It was marked as spam | Check messages flagged as spam before assuming it was lost |
+| Your replies land in the recipient's spam | Sending records not set up | Add SPF, DKIM and DMARC for the domain, then [check you're not blacklisted](/blog/email-blacklist-check) |
+| Mail app won't log in | Wrong password type | The password is a Reloop API key (`rl_...`), not your dashboard password |
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Can I receive email on my domain without Google Workspace or Microsoft 365?">
+    Yes. Any service that accepts mail for your domain works, as long as your MX
+    record points to it. With Reloop you add one MX record, create a mailbox,
+    and read the mail in the dashboard, in any IMAP mail app, or in your own
+    code. The free plan includes 3 inboxes.
+  </Accordion>
+
+  <Accordion title="Can I keep Gmail for my team and use Reloop for one address?">
+    Yes, with a subdomain. Keep your root domain's MX records pointing to
+    Google, and point a subdomain such as `support.yourdomain.com` to
+    `inbound.reloop.sh`. Each set of records works independently, so nothing
+    changes for your existing email.
+  </Accordion>
+
+  <Accordion title="Can I have two MX records for the same domain pointing to different providers?">
+    You can create them, but mail is not split the way you might expect.
+    Senders try the lowest priority number first and only use the other server
+    if the first one is unreachable. Some of your mail would end up in one
+    place and some in the other. Use a separate subdomain for each provider.
+  </Accordion>
+
+  <Accordion title="How long does an MX record take to work?">
+    Usually a few minutes, and up to an hour in most cases. If the record had
+    a long TTL before you changed it, some senders may use the old value until
+    it expires. Check progress with `dig MX yourdomain.com +short`.
+  </Accordion>
+
+  <Accordion title="Can I forward received email to my personal Gmail?">
+    Yes. Forward individual messages from the dashboard, or forward
+    automatically with an `email.received` webhook that calls
+    `reloop.inbox.messages.forward`. Reading the mailbox in the Gmail app
+    over IMAP is another option.
+  </Accordion>
+
+  <Accordion title="Do I need a server to receive email?">
+    No. Reloop's hosted service receives and stores the mail for you. You
+    only need a server if you want to run Reloop yourself, which our
+    [self-hosting guide](/blog/self-hosted-email-infrastructure) covers.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Cta
+  title="Get your first inbox in ten minutes"
+  description="One MX record, one mailbox. Read mail in the dashboard, any IMAP app, or your code. Free plan includes 3 inboxes and 6,000 emails a month."
+  href="/dashboard/signup"
+  label="Get started"
+/>
