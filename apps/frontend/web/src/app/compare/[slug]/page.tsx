@@ -12,6 +12,7 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { SectionSeparator } from "../../(home)/components/section-separator";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { CompareOtherLinks } from "../components/compare-other-links";
@@ -152,6 +153,7 @@ export default async function BlogComparePage({ params }: Props) {
 						features={page.features}
 					/>
 				</section>
+				<SectionSeparator hideTop className="h-24 sm:h-24" />
 
 				<PageSection narrow>
 					<div className="flex justify-center">

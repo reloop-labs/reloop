@@ -7,6 +7,7 @@ import {
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SectionSeparator } from "../../(home)/components/section-separator";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
@@ -157,6 +158,7 @@ const SendGridComparisonPage = () => {
 						features={sendgridFeatures}
 					/>
 				</section>
+				<SectionSeparator hideTop className="h-24 sm:h-24" />
 
 				<PageSection narrow>
 					<SectionHeading

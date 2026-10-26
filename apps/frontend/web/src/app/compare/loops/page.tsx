@@ -2,6 +2,7 @@ import { FaqSection } from "@reloop/web/components/faq-section";
 import { getComparePage } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import { SectionSeparator } from "../../(home)/components/section-separator";
 import { competitorBrands } from "../competitor-brands";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
@@ -180,6 +181,7 @@ const LoopsComparisonPage = () => {
 						categories={loopsComparisonCategories}
 					/>
 				</section>
+				<SectionSeparator hideTop className="h-24 sm:h-24" />
 
 				{/* Migration Section */}
 				<CompareSection maxWidth="full">

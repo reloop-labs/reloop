@@ -6,6 +6,7 @@ import {
 } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import { SectionSeparator } from "../../(home)/components/section-separator";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
@@ -111,6 +112,7 @@ const PostmarkComparisonPage = () => {
 						features={postmarkFeatures}
 					/>
 				</section>
+				<SectionSeparator hideTop className="h-24 sm:h-24" />
 
 				<PageSection narrow>
 					<SectionHeading

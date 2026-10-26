@@ -2,6 +2,7 @@ import type { FeatureCtaLink } from "@reloop/web/components/landing/types";
 import { getBlogComparePage } from "@reloop/web/lib/blog-compare-pages";
 import { getMigrationGuide } from "@reloop/web/lib/migration-guides";
 import type React from "react";
+import { SectionSeparator } from "../../(home)/components/section-separator";
 import { getCostSpotlight } from "../compare-hero-costs";
 import { getCompareSource } from "../compare-sources";
 import { getCompetitorByHref } from "../competitor-brands";
@@ -52,9 +53,17 @@ export function ComparisonPageShell({
 				highlights={highlights}
 				migrationHref={getMigrationGuide(slug) ? `/migrate/${slug}` : undefined}
 			/>
-			{afterHero}
-			{name ? (
-				<CompareCostSection providerId={slug} competitorName={name} />
+			{afterHero ? (
+				<>
+					{afterHero}
+					<SectionSeparator hideTop className="h-24 sm:h-24" />
+				</>
+			) : null}
+			{name && spotlight ? (
+				<>
+					<CompareCostSection providerId={slug} competitorName={name} />
+					<SectionSeparator hideTop className="h-24 sm:h-24" />
+				</>
 			) : null}
 			{children}
 		</div>
