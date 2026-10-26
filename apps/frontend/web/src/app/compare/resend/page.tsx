@@ -1,13 +1,14 @@
-import { FaqSection } from "@reloop/web/components/faq-section";
-import { getComparePage } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { formatUsd, getCostSpotlight } from "../compare-hero-costs";
+import {
+	costsCheckedAt,
+	formatUsd,
+	getCostSpotlight,
+} from "../compare-hero-costs";
 import { CompareFeatureGrid } from "../components/compare-feature-grid";
 import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
-import { CompareOtherLinks } from "../components/compare-other-links";
-import { CompareSection } from "../components/compare-section";
+import { CompareOtherPills } from "../components/compare-other-pills";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { resendComparisonCategories } from "./comparison-data";
 
@@ -58,11 +59,9 @@ export const metadata: Metadata = {
 };
 
 const ResendComparisonPage = () => {
-	const compare = getComparePage("resend");
-
 	return (
 		<>
-			<ComparePageJsonLd slug="resend" />
+			<ComparePageJsonLd slug="resend" withFaq={false} />
 			<ComparisonPageShell
 				pagePath={pagePath}
 				titleLines={["Reloop vs Resend"]}
@@ -76,6 +75,7 @@ const ResendComparisonPage = () => {
 					label: "Migrate from Resend",
 					href: "/compare/resend#migrate",
 				}}
+				openSourceNote="Resend isn't open source: you can't run it on your own server."
 				afterHero={
 					<section className="border-stroke-soft-100 border-b dark:border-white/10">
 						<CompareFeaturesHeading competitorName="Resend" />
@@ -86,17 +86,12 @@ const ResendComparisonPage = () => {
 					</section>
 				}
 			>
-				<FaqSection
-					id="compare-resend-faq"
-					title="Reloop vs Resend FAQ"
-					items={compare?.faqs ?? []}
-					compact
-					flush
+				<CompareOtherPills
+					currentHref={pagePath}
+					competitorName="Resend"
+					sourceHost="resend.com"
+					checkedOn={costsCheckedAt}
 				/>
-
-				<CompareSection maxWidth="full" noDivider>
-					<CompareOtherLinks currentHref={pagePath} />
-				</CompareSection>
 			</ComparisonPageShell>
 		</>
 	);

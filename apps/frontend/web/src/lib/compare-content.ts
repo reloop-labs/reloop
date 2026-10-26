@@ -560,7 +560,11 @@ export function buildCompareIndexMarkdown(): string {
 	return lines.join("\n");
 }
 
-export function buildCompareJsonLd(page: ComparePageContent) {
+/** `withFaq: false` for pages that don't show their FAQ, since FAQ markup must match visible content. */
+export function buildCompareJsonLd(
+	page: ComparePageContent,
+	{ withFaq = true }: { withFaq?: boolean } = {},
+) {
 	const siteUrl = getSiteUrl();
 	const url = `${siteUrl}/compare/${page.slug}`;
 	const graph: Record<string, unknown>[] = [
@@ -591,7 +595,7 @@ export function buildCompareJsonLd(page: ComparePageContent) {
 			{ name: `Reloop vs ${page.competitor}`, path: `/compare/${page.slug}` },
 		]),
 	];
-	if (page.faqs.length > 0) {
+	if (withFaq && page.faqs.length > 0) {
 		graph.push(faqPageJsonLd(page.faqs));
 	}
 	return graph;

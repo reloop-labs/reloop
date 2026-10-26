@@ -6,10 +6,17 @@ import {
 import { pricingProductJsonLd } from "@reloop/web/lib/schema";
 import { getSiteUrl } from "@reloop/web/lib/site";
 
-export function ComparePageJsonLd({ slug }: { slug: string }) {
+export function ComparePageJsonLd({
+	slug,
+	withFaq = true,
+}: {
+	slug: string;
+	/** Set false when the page doesn't render its FAQ. */
+	withFaq?: boolean;
+}) {
 	const page = getComparePage(slug);
 	if (!page) return null;
-	return <JsonLd data={buildCompareJsonLd(page)} />;
+	return <JsonLd data={buildCompareJsonLd(page, { withFaq })} />;
 }
 
 export function CompareIndexJsonLd() {

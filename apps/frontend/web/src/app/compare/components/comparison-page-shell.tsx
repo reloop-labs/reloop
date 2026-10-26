@@ -6,8 +6,11 @@ import { SectionSeparator } from "../../(home)/components/section-separator";
 import { getCostSpotlight } from "../compare-hero-costs";
 import { getCompareSource } from "../compare-sources";
 import { getCompetitorByHref } from "../competitor-brands";
+import { CompareAgentsSection } from "./compare-agents-section";
 import { CompareCostSection } from "./compare-cost-section";
 import { CompareHero } from "./compare-hero";
+import { CompareMigrateBanner } from "./compare-migrate-banner";
+import { CompareOpenSourceSection } from "./compare-open-source-section";
 
 /** How many rows of the written comparison the hero shows when there are no verified prices. */
 const HIGHLIGHT_ROWS = 5;
@@ -18,6 +21,7 @@ export function ComparisonPageShell({
 	description,
 	competitorName,
 	afterHero,
+	openSourceNote,
 	children,
 }: {
 	pagePath: string;
@@ -29,6 +33,8 @@ export function ComparisonPageShell({
 	competitorName?: string;
 	/** Rendered straight under the hero, above the price section. */
 	afterHero?: React.ReactNode;
+	/** One line on whether the competitor can be self-hosted, for "04 · Open source". */
+	openSourceNote?: string;
 	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
 	children: React.ReactNode;
@@ -63,6 +69,25 @@ export function ComparisonPageShell({
 				<>
 					<CompareCostSection providerId={slug} competitorName={name} />
 					<SectionSeparator hideTop className="h-24 sm:h-24" />
+				</>
+			) : null}
+			{/* "03" only reads right after 01 · Features and 02 · Price, i.e. when features sit under the hero. */}
+			{afterHero ? (
+				<>
+					<CompareAgentsSection />
+					<SectionSeparator hideTop className="h-24 sm:h-24" />
+					<CompareOpenSourceSection competitorNote={openSourceNote} />
+					<SectionSeparator hideTop className="h-24 sm:h-24" />
+					{name && getMigrationGuide(slug) ? (
+						<>
+							<CompareMigrateBanner
+								competitorName={name}
+								icon={brand?.icon}
+								guideHref={`/migrate/${slug}`}
+							/>
+							<SectionSeparator hideTop className="h-24 sm:h-24" />
+						</>
+					) : null}
 				</>
 			) : null}
 			{children}
