@@ -88,14 +88,14 @@ Management endpoints cover everything outside of email sending: domains, contact
 
 ## Email Sending Limits
 
-The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel. If any single layer is exceeded, the request is rejected.
+The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel. If any single layer is exceeded, the request is rejected. The organization daily layer applies only to plans with a daily sending limit (Free); Pay as you go, Pro and higher plans have no daily cap.
 
 | Layer | Limit | Window | What It Protects |
 |-------|-------|--------|-----------------|
 | IP | 20 requests | 60s | Prevents brute-force from a single source. |
 | User | 50 requests | 60s | Stops abuse from a single user within an organization. |
 | Organization | 100 requests | 60s | Prevents runaway integrations per tenant. |
-| Organization Daily | 5,000 requests | 24h | Hard daily cap per organization. |
+| Organization Daily | 5,000 requests | 24h | Daily cap per organization on the Free plan. Not applied to Pay as you go, Pro and higher. |
 | Global | 500 requests | 60s | Protects infrastructure from DDoS. |
 
 When a sending request is rate limited, the error response tells you which layer was exceeded:

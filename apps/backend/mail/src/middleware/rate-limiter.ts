@@ -17,6 +17,8 @@ interface RateLimitLayer {
 	max: number;
 	/** Window duration in seconds */
 	windowSeconds: number;
+	/** Count but never reject (keeps usage headers for uncapped plans). */
+	countOnly?: boolean;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -73,6 +75,25 @@ async function loadMonthlyUsed(organizationId: string): Promise<number | null> {
 }
 
 /**
+ * Whether the org's plan has a daily send cap. Plans without one (Pay as
+ * you go, Pro and up) must not hit the per-org daily layer. Fails open:
+ * an unknown plan is treated as uncapped, and the credits reservation still
+ * enforces the plan's own daily limit.
+ */
+async function loadHasDailyCap(organizationId: string): Promise<boolean> {
+	try {
+		const row = await db.query.organizationPlan.findFirst({
+			where: (p, { eq }) => eq(p.organizationId, organizationId),
+			columns: { dailyEmailLimit: true },
+		});
+		// No plan row yet means the org is provisioned on Free, which is capped.
+		return row ? row.dailyEmailLimit != null : true;
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Multi-layer rate limiter for the send-email endpoint.
  *
  * **Fail-open**: If Redis is unreachable, the request is allowed through
@@ -101,6 +122,7 @@ export async function checkRateLimit({
 
 	// Quota headers are best-effort and independent of Redis RL success.
 	const monthlyUsedPromise = loadMonthlyUsed(activeOrganizationId);
+	const hasDailyCapPromise = loadHasDailyCap(activeOrganizationId);
 
 	try {
 		const ip = getClientIp(headers);
@@ -130,6 +152,7 @@ export async function checkRateLimit({
 				key: `rl:send:org-day:${activeOrganizationId}`,
 				max: mailConfig.RATE_LIMIT_ORG_DAILY_MAX,
 				windowSeconds: 86400,
+				countOnly: !(await hasDailyCapPromise),
 			},
 			{
 				name: "global",
@@ -164,6 +187,7 @@ export async function checkRateLimit({
 		let tightestResult = first;
 
 		for (const result of results) {
+			if (result.layer.countOnly) continue;
 			const ratio = result.count / result.layer.max;
 			if (ratio > worstRatio) {
 				worstRatio = ratio;
@@ -201,7 +225,7 @@ export async function checkRateLimit({
 		);
 
 		for (const result of results) {
-			if (result.count > result.layer.max) {
+			if (!result.layer.countOnly && result.count > result.layer.max) {
 				const retryAfter = Math.max(result.ttl, 1);
 
 				Object.assign(
