@@ -6,8 +6,10 @@ import { listMigrationGuides } from "@reloop/web/lib/migration-guides";
 import Link from "next/link";
 import {
 	type CostSpotlight,
+	formatCompetitorPrice,
 	formatUsd,
 	getCostSpotlight,
+	getPostSpotlight,
 } from "../compare-hero-costs";
 import { competitorBrands } from "../competitor-brands";
 
@@ -41,21 +43,18 @@ const BRAND_CARDS: Record<string, BrandCard> = {
 	},
 	Loops: {
 		blurb: (q) =>
-			`Loops prices by contacts. At 10,000 contacts and a weekly send, Reloop costs ${q.reloop} a month and Loops ${q.theirs}, with no limit on contacts.`,
+			`Loops prices by contacts. At 100,000 emails a month, a weekly send to about 23,000 contacts, Reloop costs ${q.reloop} a month and Loops ${q.theirs}, with no limit on contacts.`,
 	},
 	Mailchimp: {
 		blurb: (q) =>
-			`Mailchimp charges for every contact on the list. At 10,000 contacts and a weekly send, Reloop costs ${q.reloop} a month and Mailchimp ${q.plan} ${q.theirs}.`,
+			`Mailchimp charges for every contact on the list. At 100,000 emails a month, a weekly send to about 23,000 contacts, Reloop costs ${q.reloop} a month and Mailchimp ${q.plan} ${q.theirs}.`,
 	},
 };
-
-const compactCount = (value: number) =>
-	new Intl.NumberFormat("en-US").format(value);
 
 function quoteFor(spotlight: CostSpotlight): CardQuote {
 	return {
 		reloop: formatUsd(spotlight.reloop.usd).toLowerCase(),
-		theirs: formatUsd(spotlight.competitor.usd).toLowerCase(),
+		theirs: formatCompetitorPrice(spotlight).toLowerCase(),
 		plan: spotlight.competitor.plan,
 	};
 }
@@ -94,17 +93,25 @@ function getComparisonEntries(includeBlogPosts: boolean): ComparisonEntry[] {
 
 	const fromBlog = listBlogComparePages()
 		.filter((page) => page.image)
-		.map(
-			(page): ComparisonEntry => ({
+		.map((page): ComparisonEntry => {
+			const spotlight = getPostSpotlight(
+				page.slug,
+				page.competitor,
+				page.publishedAt,
+			);
+			return {
 				name: page.competitor,
 				href: `/compare/${page.slug}`,
 				image: page.image ?? "",
 				description: page.description,
+				pricing: spotlight
+					? { spotlight, quote: quoteFor(spotlight) }
+					: undefined,
 				migrationHref: guideSlugs.has(page.slug)
 					? `/migrate/${page.slug}`
 					: undefined,
-			}),
-		);
+			};
+		});
 
 	return [...dedicated, ...fromBlog];
 }
@@ -147,8 +154,8 @@ function ComparisonBrandCard({
 
 			{pricing ? (
 				<p className="mt-5 rounded-lg bg-bg-weak-50 px-3 py-2 text-[13px] text-text-sub-600 tabular-nums dark:bg-white/[0.05] dark:text-white/50">
-					{compactCount(pricing.spotlight.volume)}{" "}
-					{pricing.spotlight.mode === "marketing" ? "contacts" : "emails"}:{" "}
+					{/* Every card leads with 100,000 emails a month, including contact-priced providers. */}
+					100,000 emails:{" "}
 					<span className="font-medium text-text-strong-950 dark:text-white">
 						{pricing.quote.reloop}
 					</span>{" "}

@@ -321,6 +321,10 @@ export function formatUsd(usd: number): string {
 	}).format(usd);
 }
 
+function contactsFor100k(): number {
+	return Math.round(100_000 / marketingSendsPerContact);
+}
+
 /** The one volume each hand-written compare page leads with, in its hero and card. */
 const SPOTLIGHT_VOLUMES: Record<string, { mode: CostMode; volume: number }> = {
 	resend: { mode: "transactional", volume: 100_000 },
@@ -328,17 +332,22 @@ const SPOTLIGHT_VOLUMES: Record<string, { mode: CostMode; volume: number }> = {
 	sendgrid: { mode: "transactional", volume: 100_000 },
 	"aws-ses": { mode: "transactional", volume: 100_000 },
 	postmark: { mode: "transactional", volume: 100_000 },
-	loops: { mode: "marketing", volume: 10_000 },
-	mailchimp: { mode: "marketing", volume: 10_000 },
+	// Contact-priced: the list that one weekly campaign turns into 100,000 emails a month.
+	loops: { mode: "marketing", volume: contactsFor100k() },
+	mailchimp: { mode: "marketing", volume: contactsFor100k() },
 };
 
 export type CostSpotlight = {
 	mode: CostMode;
 	volume: number;
-	/** "100,000 emails a month" or "10,000 contacts, one campaign a week". */
+	/** "100,000 emails a month", plus the list size for contact-priced providers. */
 	volumeLabel: string;
 	reloop: CostRow;
 	competitor: CostRow;
+	/** Set when the competitor's price isn't in US dollars. */
+	competitorCurrency?: "EUR";
+	/** "June 2026" when the price comes from a "Reloop vs X" post instead of costsCheckedAt. */
+	checkedAt?: string;
 };
 
 /** Reloop vs one provider at that provider's spotlight volume, or null when we have no verified prices. */
@@ -349,14 +358,109 @@ export function getCostSpotlight(providerId: string): CostSpotlight | null {
 	const reloop = rows.find((row) => row.id === "reloop");
 	const competitor = rows.find((row) => row.id === providerId);
 	if (!reloop || !competitor) return null;
-	const count = new Intl.NumberFormat("en-US").format(spot.volume);
+	const format = new Intl.NumberFormat("en-US").format;
+	const count = format(spot.volume);
 	return {
 		...spot,
 		volumeLabel:
 			spot.mode === "marketing"
-				? `${count} contacts, one campaign a week`
+				? `${format(Math.round((spot.volume * marketingSendsPerContact) / 1000) * 1000)} emails a month: a weekly campaign to about ${format(Math.round(spot.volume / 1000) * 1000)} contacts`
 				: `${count} emails a month`,
 		reloop,
 		competitor,
 	};
+}
+
+type PostQuote = CostQuote & {
+	currency?: "EUR";
+	/** When the price was read from the competitor's site instead of the post. */
+	checkedAt?: string;
+};
+
+/**
+ * Competitors without a hand-written page: their price at 100,000 emails a month,
+ * as stated in the "Reloop vs X" blog post. Keep in step with those posts.
+ */
+const POST_QUOTES_100K: Record<string, PostQuote> = {
+	agentmail: { plan: "Startup", usd: 200 },
+	// Starter base $9 + $73 for the 80,001-100,000 email credits tier, from brevo.com/pricing.md.
+	brevo: { plan: "Starter", usd: 82, checkedAt: costsCheckedAt },
+	"cloudflare-email": {
+		plan: "Workers Paid, $5 + $0.35 per 1,000",
+		usd: 39,
+	},
+	// Priced per profile: Essentials includes 5,000 profiles and 1M emails.
+	"customer-io": { plan: "Essentials, up to 5,000 profiles", usd: 100 },
+	// The 100,000 step of the Email API Starter slider on elasticemail.com.
+	"elastic-email": {
+		plan: "Email API Starter",
+		usd: 29,
+		checkedAt: costsCheckedAt,
+	},
+	lettermint: { plan: "Starter", usd: 85, currency: "EUR" },
+	mailersend: { plan: "Starter", usd: 68 },
+	listmonk: {
+		plan: "Self-hosted software. You pay for a server and an SMTP provider",
+		usd: 0,
+	},
+	mailjet: { plan: "Premium", usd: 112 },
+	mailpace: { plan: "Its only plan, $10 + $1 per 1,000", usd: 100 },
+	mailtrap: { plan: "Basic", usd: 30 },
+	mandrill: { plan: "Email blocks, plus a Mailchimp plan", usd: 80 },
+	plunk: { plan: "Pay as you go", usd: 100 },
+	postal: {
+		plan: "Self-hosted software. You pay for the server and its IPs",
+		usd: 0,
+	},
+	smtp2go: { plan: "Professional", usd: 75 },
+	sparkpost: { plan: "Startup", usd: 40 },
+	sweego: { plan: "Startup", usd: 79, currency: "EUR" },
+	usesend: { plan: "Pay as you go", usd: 40 },
+	zeptomail: { plan: "Prepaid credits", usd: 25 },
+};
+
+const POST_VOLUME = 100_000;
+
+/** "2026-06-04" -> "June 2026" */
+function monthYear(isoDate: string): string {
+	return new Date(isoDate).toLocaleDateString("en-US", {
+		month: "long",
+		year: "numeric",
+		timeZone: "UTC",
+	});
+}
+
+/** Reloop vs a blog-only competitor at 100,000 emails a month, or null when its post states no price. */
+export function getPostSpotlight(
+	slug: string,
+	competitorName: string,
+	publishedAt?: string,
+): CostSpotlight | null {
+	const quote = POST_QUOTES_100K[slug];
+	const reloop = quoteCosts("transactional", POST_VOLUME).find(
+		(row) => row.id === "reloop",
+	);
+	if (!quote || !reloop) return null;
+	return {
+		mode: "transactional",
+		volume: POST_VOLUME,
+		volumeLabel: "100,000 emails a month",
+		reloop,
+		competitor: {
+			id: slug,
+			name: competitorName,
+			plan: quote.plan,
+			usd: quote.usd,
+		},
+		competitorCurrency: quote.currency,
+		checkedAt:
+			quote.checkedAt ?? (publishedAt ? monthYear(publishedAt) : undefined),
+	};
+}
+
+/** The competitor's price as shown on cards: "$35", "€85" or "Free". */
+export function formatCompetitorPrice(spotlight: CostSpotlight): string {
+	return spotlight.competitorCurrency === "EUR"
+		? `€${spotlight.competitor.usd}`
+		: formatUsd(spotlight.competitor.usd);
 }

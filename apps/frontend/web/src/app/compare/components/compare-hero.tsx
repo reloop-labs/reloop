@@ -9,6 +9,7 @@ import type { SimpleIcon } from "simple-icons";
 import {
 	type CostSpotlight,
 	costsCheckedAt,
+	formatCompetitorPrice,
 	formatUsd,
 } from "../compare-hero-costs";
 import type { CompareSource } from "../compare-sources";
@@ -32,7 +33,9 @@ function BrandPill({ children }: { children: ReactNode }) {
 }
 
 function planNote(plan: string) {
-	return /plan|pay as you go/i.test(plan) ? plan : `${plan} plan`;
+	return /plan|pay as you go|credits|software|profiles/i.test(plan)
+		? plan
+		: `${plan} plan`;
 }
 
 /** Two prices side by side with a vs badge on the seam. */
@@ -70,10 +73,10 @@ function SpotlightCard({
 						{competitorName}
 					</p>
 					<p className="mt-5 font-semibold text-[2.75rem] text-text-sub-600 tabular-nums leading-none tracking-[-0.04em] sm:text-[3.5rem] dark:text-white/55">
-						{formatUsd(spotlight.competitor.usd)}
+						{formatCompetitorPrice(spotlight)}
 					</p>
 					<p className="mt-3 text-[14px] text-text-sub-600 dark:text-white/50">
-						a month
+						{spotlight.competitor.usd === 0 ? "to run yourself" : "a month"}
 					</p>
 					<p className="mt-6 text-[13px] text-text-sub-600 leading-snug dark:text-white/45">
 						{planNote(spotlight.competitor.plan)}
@@ -86,22 +89,32 @@ function SpotlightCard({
 					vs
 				</span>
 			</div>
-			<p className="mt-4 text-center text-[12.5px] text-text-sub-600 dark:text-white/40">
-				Monthly billing in US dollars. {competitorName}&apos;s price from{" "}
-				{source ? (
-					<a
-						href={source.href}
-						target="_blank"
-						rel="noreferrer"
-						className="underline decoration-stroke-soft-200 underline-offset-2 transition-colors hover:text-text-strong-950 dark:decoration-white/20 dark:hover:text-white"
-					>
-						its pricing page
-					</a>
-				) : (
-					"its pricing page"
-				)}
-				, {costsCheckedAt}.
-			</p>
+			{spotlight.competitor.usd === 0 ? (
+				<p className="mt-4 text-center text-[12.5px] text-text-sub-600 dark:text-white/40">
+					{competitorName} is free, open-source software: you run it and pay for
+					its servers. Reloop in US dollars, monthly billing.
+				</p>
+			) : (
+				<p className="mt-4 text-center text-[12.5px] text-text-sub-600 dark:text-white/40">
+					{spotlight.competitorCurrency === "EUR"
+						? `Monthly billing. Reloop in US dollars, ${competitorName} in euros.`
+						: "Monthly billing in US dollars."}{" "}
+					{competitorName}&apos;s price from{" "}
+					{source ? (
+						<a
+							href={source.href}
+							target="_blank"
+							rel="noreferrer"
+							className="underline decoration-stroke-soft-200 underline-offset-2 transition-colors hover:text-text-strong-950 dark:decoration-white/20 dark:hover:text-white"
+						>
+							its pricing page
+						</a>
+					) : (
+						"its pricing page"
+					)}
+					, {spotlight.checkedAt ?? costsCheckedAt}.
+				</p>
+			)}
 		</div>
 	);
 }

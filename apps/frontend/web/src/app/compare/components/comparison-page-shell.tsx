@@ -3,7 +3,7 @@ import { getBlogComparePage } from "@reloop/web/lib/blog-compare-pages";
 import { getMigrationGuide } from "@reloop/web/lib/migration-guides";
 import type React from "react";
 import { SectionSeparator } from "../../(home)/components/section-separator";
-import { getCostSpotlight } from "../compare-hero-costs";
+import { getCostSpotlight, getPostSpotlight } from "../compare-hero-costs";
 import { getCompareSource } from "../compare-sources";
 import { getCompetitorByHref } from "../competitor-brands";
 import { CompareAgentsSection } from "./compare-agents-section";
@@ -12,7 +12,7 @@ import { CompareHero } from "./compare-hero";
 import { CompareMigrateBanner } from "./compare-migrate-banner";
 import { CompareOpenSourceSection } from "./compare-open-source-section";
 
-/** How many rows of the written comparison the hero shows when there are no verified prices. */
+/** How many rows of the written comparison the hero shows when there is no price to show. */
 const HIGHLIGHT_ROWS = 5;
 
 export function ComparisonPageShell({
@@ -43,9 +43,14 @@ export function ComparisonPageShell({
 	const slug = pagePath.replace("/compare/", "");
 	const name = brand?.name ?? competitorName;
 	const spotlight = getCostSpotlight(slug);
-	const highlights = spotlight
+	const blogPage = spotlight ? null : getBlogComparePage(slug);
+	// Blog-only competitors get the same price card when their post states a 100k price.
+	const heroSpotlight =
+		spotlight ??
+		(name ? getPostSpotlight(slug, name, blogPage?.publishedAt) : null);
+	const highlights = heroSpotlight
 		? undefined
-		: getBlogComparePage(slug)?.features.slice(0, HIGHLIGHT_ROWS);
+		: blogPage?.features.slice(0, HIGHLIGHT_ROWS);
 
 	return (
 		<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
@@ -54,7 +59,7 @@ export function ComparisonPageShell({
 				competitorName={name}
 				icon={brand?.icon}
 				description={description}
-				spotlight={spotlight}
+				spotlight={heroSpotlight}
 				source={name ? getCompareSource(name) : null}
 				highlights={highlights}
 				migrationHref={getMigrationGuide(slug) ? `/migrate/${slug}` : undefined}
