@@ -72,7 +72,7 @@ const formatCount = (value: number) =>
 	new Intl.NumberFormat("en-US").format(value);
 
 /** Each block pads itself so the slider's dividers run edge to edge of the column. */
-const BLOCK_INSET = "px-6 sm:px-10 lg:px-12";
+const BLOCK_INSET = "px-4 sm:px-10 lg:px-12";
 
 export function CompareCostColumn({ mode }: { mode: CostMode }) {
 	const config = costModes[mode];

@@ -47,7 +47,20 @@ export async function assertHasCredits({
 		bcc?: string | string[];
 	};
 }): Promise<{ creditsRemaining: number; recipientCount: number }> {
-	const recipientCount = countEmailRecipients(body);
+	return assertHasCreditsFor({
+		organizationId,
+		recipientCount: countEmailRecipients(body),
+	});
+}
+
+/** Peek for an explicit recipient total (e.g. a whole batch). */
+export async function assertHasCreditsFor({
+	organizationId,
+	recipientCount,
+}: {
+	organizationId: string;
+	recipientCount: number;
+}): Promise<{ creditsRemaining: number; recipientCount: number }> {
 	const decision = await peekSendCredits({ organizationId, recipientCount });
 	if (!decision.ok) throwQuotaError(decision, recipientCount);
 	return {

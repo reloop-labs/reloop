@@ -1,0 +1,245 @@
+import { cn } from "@reloop/ui/cn";
+import { Logo } from "@reloop/ui/logo";
+import {
+	FeatureHintCard,
+	FeatureHintLabel,
+} from "@reloop/ui/pricing/feature-hint";
+import { PlanCheckmark, PlanCrossIcon } from "@reloop/ui/pricing/marks";
+import { Fragment } from "react";
+import type { SimpleIcon } from "simple-icons";
+import { getFeatureHint } from "../compare-feature-hints";
+import type {
+	ComparisonCategory,
+	ComparisonCell,
+	ComparisonFeatureRow,
+} from "../compare-types";
+import { competitorBrands } from "../competitor-brands";
+import { BrandIcon } from "./brand-icon";
+import { CompareTitleIcon } from "./compare-title-icon";
+
+/** Same column rhythm as the /pricing "Compare every plan" table, with two value columns. */
+const GRID_COLS =
+	"grid-cols-[minmax(200px,1.45fr)_repeat(2,minmax(150px,1fr))]";
+
+/** Reloop is the highlighted column, like the recommended plan on /pricing. */
+const RELOOP_TINT = "bg-bg-weak-50/40 dark:bg-white/[0.02]";
+
+const DASH = "—";
+
+/** Plain values that describe something missing or do-it-yourself, shown with a cross. */
+const MISSING =
+	/^(not\b|none\b|n\/a\b|unavailable|limited\b|hosted (saas )?only|build it yourself|separate product)|\bdiy\b/i;
+
+function normalizeCell(cell: ComparisonCell): { value: string; note?: string } {
+	return typeof cell === "string" ? { value: cell } : cell;
+}
+
+/** "Yes (Apache 2.0)" -> check + "Apache 2.0"; "No" -> cross; anything else is text. */
+function GridCell({ cell }: { cell: ComparisonCell }) {
+	const { value, note } = normalizeCell(cell);
+	const lower = value.toLowerCase();
+	const bare = value === "-" || value === DASH || lower === "n/a";
+	const explicitYes = /^yes(\b|$)/.test(lower);
+	const no = bare || /^no(\b|$)/.test(lower) || MISSING.test(value);
+	// Any other value describes something on offer ("Scale+", "1 included"), so it gets a check too.
+	const yes = explicitYes || !no;
+	// "Yes (Apache 2.0)" -> "Apache 2.0": what is left once the Yes / No is dropped.
+	const qualifier = value
+		.replace(new RegExp(`^(yes|no)[\\s${DASH}:,-]*`, "i"), "")
+		.replace(/^\((.*)\)$/, "$1")
+		.trim();
+	const usableNote = note && note !== "-" && note !== DASH ? note : undefined;
+	// A check or cross says yes/no already, so the text after it is the detail:
+	// the qualifier ("Apache 2.0"), else the note, else a plain Yes / No.
+	const markedText = qualifier || usableNote || (explicitYes ? "Yes" : "No");
+	const text = bare
+		? usableNote || "Not available"
+		: explicitYes || /^no(\b|$)/.test(lower)
+			? markedText
+			: value;
+	const shownNote = text === usableNote ? undefined : usableNote;
+
+	return (
+		<div className="flex items-start gap-3 text-left">
+			<span className="flex h-5 w-5 shrink-0 items-center justify-center">
+				{yes ? (
+					<PlanCheckmark className="size-5" />
+				) : no ? (
+					<PlanCrossIcon className="size-5" />
+				) : null}
+			</span>
+			<span className="min-w-0">
+				<span
+					className={cn(
+						"block text-[14px] leading-5",
+						no
+							? "text-text-sub-600 dark:text-white/50"
+							: "text-text-strong-950 dark:text-white/90",
+					)}
+				>
+					{text}
+				</span>
+				{shownNote ? (
+					<span className="mt-1 block text-[12.5px] text-text-sub-600 leading-snug dark:text-white/40">
+						{shownNote}
+					</span>
+				) : null}
+			</span>
+		</div>
+	);
+}
+
+/** Wavy-underlined label with a hover definition, like /pricing; plain text when we have no definition. */
+function RowLabel({ label, icon }: { label: string; icon?: string }) {
+	const hint = getFeatureHint(label);
+	if (!hint) return <>{label}</>;
+	return (
+		<FeatureHintLabel label={label}>
+			<FeatureHintCard
+				label={label}
+				description={hint}
+				icon={
+					icon ? (
+						<CompareTitleIcon
+							title={label}
+							icon={icon}
+							className="size-4 text-text-strong-950 dark:text-white"
+						/>
+					) : undefined
+				}
+			/>
+		</FeatureHintLabel>
+	);
+}
+
+function SpacerRow() {
+	return (
+		<>
+			<div className="h-14 border-stroke-soft-100 border-b dark:border-white/10" />
+			<div
+				className={cn(
+					"h-14 border-stroke-soft-100 border-b border-l dark:border-white/10",
+					RELOOP_TINT,
+				)}
+			/>
+			<div className="h-14 border-stroke-soft-100 border-b border-l dark:border-white/10" />
+		</>
+	);
+}
+
+/**
+ * Feature comparison laid out exactly like the /pricing comparison table:
+ * eyebrow + title cell, a highlighted Reloop column,
+ * hairline spacer rows, section titles with icons, and check / cross marks.
+ */
+export function CompareFeatureGrid({
+	competitorName,
+	categories: categoriesProp,
+	features,
+	icon = competitorBrands.find((brand) => brand.name === competitorName)?.icon,
+}: {
+	competitorName: string;
+	categories?: ComparisonCategory[];
+	/** Flat list for pages without categories; rendered as one untitled section. */
+	features?: ComparisonFeatureRow[];
+	icon?: Pick<SimpleIcon, "hex" | "path">;
+}) {
+	// Pricing rows live in the "02 · Price" section, so the feature table skips them.
+	// The data keeps them for the .md twins and agent content.
+	const categories = (
+		categoriesProp ??
+		(features ? [{ id: "features", label: "Features", features }] : [])
+	).filter((category) => !category.id.startsWith("pricing"));
+	const showSectionTitles = categories.length > 1;
+
+	return (
+		<div className="overflow-x-auto lg:overflow-visible">
+			<div
+				className={cn(
+					"grid w-full min-w-[560px] border-stroke-soft-100 border-t dark:border-white/10",
+					GRID_COLS,
+				)}
+			>
+				{/* Header row */}
+				<div className="z-30 flex flex-col gap-3 border-stroke-soft-100 border-b bg-bg-white-0/95 px-5 py-7 backdrop-blur-md sm:px-7 lg:sticky lg:top-16 lg:px-9 dark:border-white/10 dark:bg-black/95">
+					<p className="font-medium text-[12px] text-text-strong-950 uppercase dark:text-white">
+						Features
+					</p>
+					<h3 className="font-medium text-text-strong-950 leading-none dark:text-white">
+						Reloop vs {competitorName}
+					</h3>
+				</div>
+				<div className="z-30 flex flex-col justify-center border-stroke-soft-100 border-b border-l bg-bg-weak-50/95 px-5 py-7 backdrop-blur-md sm:px-8 lg:sticky lg:top-16 dark:border-white/10 dark:bg-white/[0.05]">
+					<span className="flex items-center gap-2.5 font-semibold text-[18px] text-text-strong-950 leading-none tracking-tight dark:text-white">
+						<span className="flex size-7 items-center justify-center overflow-hidden">
+							<Logo className="size-10 shrink-0" />
+						</span>
+						Reloop
+					</span>
+				</div>
+				<div className="z-30 flex flex-col justify-center border-stroke-soft-100 border-b border-l bg-bg-white-0/95 px-5 py-7 backdrop-blur-md sm:px-8 lg:sticky lg:top-16 dark:border-white/10 dark:bg-black/95">
+					<span className="flex items-center gap-2.5 font-semibold text-[18px] text-text-strong-950 leading-none tracking-tight dark:text-white">
+						{icon ? (
+							<BrandIcon
+								icon={icon}
+								fill="currentColor"
+								className="size-6 text-text-strong-950 dark:text-white"
+							/>
+						) : null}
+						{competitorName}
+					</span>
+				</div>
+
+				<SpacerRow />
+
+				{categories.map((category, categoryIndex) => (
+					<Fragment key={category.id}>
+						{categoryIndex > 0 ? <SpacerRow /> : null}
+						{showSectionTitles ? (
+							<>
+								<div className="flex items-center gap-2.5 border-stroke-soft-100 border-b px-5 pt-6 pb-3 sm:px-7 lg:px-9 dark:border-white/[0.07]">
+									<CompareTitleIcon
+										title={category.label}
+										icon={category.icon}
+										className="size-4 text-text-strong-950 dark:text-white/80"
+									/>
+									<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+										{category.label}
+									</span>
+								</div>
+								<div
+									className={cn(
+										"border-stroke-soft-100 border-b border-l pt-6 pb-3 dark:border-white/[0.07]",
+										RELOOP_TINT,
+									)}
+								/>
+								<div className="border-stroke-soft-100 border-b border-l pt-6 pb-3 dark:border-white/[0.07]" />
+							</>
+						) : null}
+						{category.features.map((row) => (
+							<div
+								key={row.label}
+								className="group/row col-span-full grid grid-cols-subgrid"
+							>
+								<div className="flex min-h-[60px] items-center border-stroke-soft-100 border-b px-5 py-4 text-[14px] text-text-strong-950 group-hover/row:bg-bg-weak-50/70 sm:px-7 lg:px-9 dark:border-white/[0.07] dark:text-white dark:group-hover/row:bg-white/[0.03]">
+									<RowLabel label={row.label} icon={row.icon} />
+								</div>
+								<div
+									className={cn(
+										"flex min-h-[60px] items-center border-stroke-soft-100 border-b border-l px-5 py-4 group-hover/row:bg-bg-weak-50/90 sm:px-8 dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.05]",
+										RELOOP_TINT,
+									)}
+								>
+									<GridCell cell={row.reloop} />
+								</div>
+								<div className="flex min-h-[60px] items-center border-stroke-soft-100 border-b border-l px-5 py-4 group-hover/row:bg-bg-weak-50/70 sm:px-8 dark:border-white/[0.07] dark:group-hover/row:bg-white/[0.03]">
+									<GridCell cell={row.competitor} />
+								</div>
+							</div>
+						))}
+					</Fragment>
+				))}
+			</div>
+		</div>
+	);
+}

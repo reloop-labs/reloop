@@ -12,9 +12,10 @@ import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CompareFeatureGrid } from "../components/compare-feature-grid";
+import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
-import { ComparisonTable } from "../components/comparison-table";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -141,12 +142,16 @@ export default async function BlogComparePage({ params }: Props) {
 					</PageSection>
 				) : null}
 
-				<PageSection alt>
-					<ComparisonTable
+				<section className="border-stroke-soft-100 border-b dark:border-white/10">
+					<CompareFeaturesHeading
+						competitorName={page.competitor}
+						checkedOn={page.publishedAt}
+					/>
+					<CompareFeatureGrid
 						competitorName={page.competitor}
 						features={page.features}
 					/>
-				</PageSection>
+				</section>
 
 				<PageSection narrow>
 					<div className="flex justify-center">

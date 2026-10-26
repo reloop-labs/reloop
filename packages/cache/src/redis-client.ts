@@ -218,6 +218,21 @@ export class RedisCache {
 	}
 
 	/**
+	 * Atomically increment a key's value by `amount` (INCRBY).
+	 * Uses the raw key (no prefix) — caller is responsible for namespacing.
+	 */
+	async incrementBy(rawKey: string, amount: number): Promise<number> {
+		try {
+			const redis = await this.getRedisClient();
+			return await redis.incrBy(rawKey, amount);
+		} catch (error) {
+			console.error(`Redis incrementBy error for key "${rawKey}":`, error);
+			this.redis = null;
+			throw error;
+		}
+	}
+
+	/**
 	 * Atomically get a value and delete it (GETDEL), honoring the instance prefix.
 	 * Best-effort like {@link get}: returns undefined on error so session and
 	 * one-time-code paths stay available when Redis is down.

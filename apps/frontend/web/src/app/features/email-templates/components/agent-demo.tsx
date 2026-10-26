@@ -123,7 +123,7 @@ export function AgentDemo() {
 			<div className="flex min-h-[420px] flex-col border-stroke-soft-100 border-b lg:min-h-[560px] lg:border-r lg:border-b-0 dark:border-white/10">
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-3 sm:px-5 dark:border-white/10">
 					<Icon
-						name="sparkling"
+						name="magic-wand"
 						className="size-4 text-text-strong-950 dark:text-white"
 						aria-hidden
 					/>
@@ -229,7 +229,7 @@ export function AgentDemo() {
 				{!showPreview && (
 					<div className="absolute inset-0 flex items-center justify-center">
 						<span className="flex items-center gap-2 text-[13px] text-text-soft-400 dark:text-white/35">
-							<Icon name="sparkling" className="size-4" aria-hidden />
+							<Icon name="magic-wand" className="size-4" aria-hidden />
 							Your email appears here
 						</span>
 					</div>

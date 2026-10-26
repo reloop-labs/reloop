@@ -194,7 +194,7 @@ function AiMock() {
 			<div className={cn(mockCard, "overflow-hidden")}>
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2.5 dark:border-white/10 dark:bg-white/[0.04]">
 					<Icon
-						name="sparkling"
+						name="magic-wand"
 						className="size-3.5 text-text-strong-950 dark:text-white"
 						aria-hidden
 					/>
@@ -363,7 +363,7 @@ const FEATURES: Feature[] = [
 	},
 	{
 		id: "ai-agent",
-		icon: "sparkling",
+		icon: "magic-wand",
 		title: "AI email agent",
 		description: (
 			<>

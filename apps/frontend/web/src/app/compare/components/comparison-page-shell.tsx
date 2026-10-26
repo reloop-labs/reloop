@@ -1,42 +1,61 @@
 import type { FeatureCtaLink } from "@reloop/web/components/landing/types";
+import { getBlogComparePage } from "@reloop/web/lib/blog-compare-pages";
+import { getMigrationGuide } from "@reloop/web/lib/migration-guides";
 import type React from "react";
+import { getCostSpotlight } from "../compare-hero-costs";
+import { getCompareSource } from "../compare-sources";
 import { getCompetitorByHref } from "../competitor-brands";
+import { CompareCostSection } from "./compare-cost-section";
 import { CompareHero } from "./compare-hero";
+
+/** How many rows of the written comparison the hero shows when there are no verified prices. */
+const HIGHLIGHT_ROWS = 5;
 
 export function ComparisonPageShell({
 	pagePath,
 	titleLines,
 	description,
-	updatedAt,
 	competitorName,
+	afterHero,
 	children,
 }: {
 	pagePath: string;
-	/** For competitors without an entry in competitor-brands (no brand icon yet). */
-	competitorName?: string;
 	titleLines: string[];
 	/** Kept so existing compare pages can still pass hero copy. */
 	description?: string;
 	updatedAt?: string;
+	/** For competitors without an entry in competitor-brands (no brand icon yet). */
+	competitorName?: string;
+	/** Rendered straight under the hero, above the price section. */
+	afterHero?: React.ReactNode;
 	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
 	children: React.ReactNode;
 }) {
 	const brand = getCompetitorByHref(pagePath);
+	const slug = pagePath.replace("/compare/", "");
+	const name = brand?.name ?? competitorName;
+	const spotlight = getCostSpotlight(slug);
+	const highlights = spotlight
+		? undefined
+		: getBlogComparePage(slug)?.features.slice(0, HIGHLIGHT_ROWS);
 
 	return (
-		<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x md:max-w-7xl dark:border-white/10">
-			{/*
-			 * Full-height frame: vertical rails span the entire page.
-			 * Section content is constrained inside each CompareSection / component.
-			 */}
+		<div className="relative mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-100 border-x md:max-w-7xl dark:border-white/10">
 			<CompareHero
 				titleLines={titleLines}
-				competitorName={brand?.name ?? competitorName}
+				competitorName={name}
 				icon={brand?.icon}
 				description={description}
-				updatedAt={updatedAt}
+				spotlight={spotlight}
+				source={name ? getCompareSource(name) : null}
+				highlights={highlights}
+				migrationHref={getMigrationGuide(slug) ? `/migrate/${slug}` : undefined}
 			/>
+			{afterHero}
+			{name ? (
+				<CompareCostSection providerId={slug} competitorName={name} />
+			) : null}
 			{children}
 		</div>
 	);

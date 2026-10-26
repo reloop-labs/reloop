@@ -274,7 +274,7 @@ export function BlogCta({
 					"mx-auto w-full",
 					framed
 						? // The footer opens with an h-24 spacer, so pt-24 centers the card between rules.
-							"px-6 pt-24 sm:px-10 lg:px-12"
+							"px-4 pt-24 sm:px-10 lg:px-12"
 						: "px-4 sm:px-6 lg:px-8",
 					// Flush CTAs end the page: the footer opens with its own h-24
 					// spacer, so mirror it on top to center the card between rules.

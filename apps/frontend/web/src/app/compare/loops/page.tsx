@@ -2,14 +2,14 @@ import { FaqSection } from "@reloop/web/components/faq-section";
 import { getComparePage } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { competitorBrands } from "../competitor-brands";
+import { CompareFeatureGrid } from "../components/compare-feature-grid";
+import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { CompareHeroStatStrip } from "../components/compare-hero-stat-strip";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareMigrate } from "../components/compare-migrate";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { CompareSection } from "../components/compare-section";
-import { ComparisonMatrix } from "../components/comparison-matrix";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { loopsComparisonCategories } from "./comparison-data";
 import { LoopsCostCalculator } from "./loops-cost-calculator";
@@ -173,30 +173,13 @@ const LoopsComparisonPage = () => {
 				</CompareSection>
 
 				{/* Feature Comparison Matrix */}
-				<CompareSection maxWidth="full" flushX>
-					<div className="mb-10 text-center">
-						<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
-							Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;Loops
-						</h2>
-						<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-							Compare capabilities, sending mechanisms, and open-source data
-							ownership.
-						</p>
-					</div>
-
-					<ComparisonMatrix
+				<section className="border-stroke-soft-100 border-b dark:border-white/10">
+					<CompareFeaturesHeading competitorName="Loops" />
+					<CompareFeatureGrid
 						competitorName="Loops"
 						categories={loopsComparisonCategories}
 					/>
-
-					<p className="mt-6 text-center text-[13px] text-text-sub-600 dark:text-white/40">
-						Seen something inaccurate?{" "}
-						<Link href="/contact" className="font-semibold text-primary-base">
-							Tell us
-						</Link>
-						. We correct comparison pages when public features change.
-					</p>
-				</CompareSection>
+				</section>
 
 				{/* Migration Section */}
 				<CompareSection maxWidth="full">

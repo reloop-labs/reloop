@@ -73,7 +73,7 @@ export const mcpClients: McpClient[] = [
 		id: "claude",
 		name: "Claude",
 		simpleIconKey: "siClaude",
-		fallbackIcon: "sparkling",
+		fallbackIcon: "magic-wand",
 		tagline: "Claude on the web and the desktop app.",
 		steps: ({ mcpUrl }) => [
 			{

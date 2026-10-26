@@ -31,7 +31,7 @@ function WebParityBanner() {
 			<div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 				<div className="max-w-xl">
 					<span className="inline-flex items-center gap-1.5 rounded-full bg-primary-alpha-10 px-2.5 py-1 font-medium text-[11px] text-primary-base">
-						<Icon name="sparkling" className="h-3 w-3" />
+						<Icon name="magic-wand" className="h-3 w-3" />
 						Full dashboard access
 					</span>
 					<h2 className="mt-3 font-semibold text-text-strong-950 text-title-h5 tracking-tight">

@@ -146,7 +146,7 @@ export default async function MigrationGuidePage({ params }: Props) {
 					{guide.steps.map((step, index) => (
 						<li
 							key={step.title}
-							className="grid gap-4 border-stroke-soft-100 border-b px-6 py-10 sm:grid-cols-[4rem_1fr_auto] sm:gap-8 sm:px-10 lg:px-12 dark:border-white/10"
+							className="grid gap-4 border-stroke-soft-100 border-b px-4 py-10 sm:grid-cols-[4rem_1fr_auto] sm:gap-8 sm:px-10 lg:px-12 dark:border-white/10"
 						>
 							<span className="flex size-9 items-center justify-center rounded-full border border-stroke-soft-100 font-medium text-[14px] text-text-strong-950 tabular-nums dark:border-white/10 dark:text-white">
 								{index + 1}
@@ -170,7 +170,7 @@ export default async function MigrationGuidePage({ params }: Props) {
 					))}
 				</ol>
 
-				<section className="flex flex-col gap-4 border-stroke-soft-100 border-b px-6 py-12 sm:px-10 lg:px-12 dark:border-white/10">
+				<section className="flex flex-col gap-4 border-stroke-soft-100 border-b px-4 py-12 sm:px-10 lg:px-12 dark:border-white/10">
 					{guide.notes.map((note) => (
 						<p
 							key={note}

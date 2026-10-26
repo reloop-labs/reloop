@@ -54,8 +54,8 @@ const mailService = new Elysia({
 	.use(
 		idempotencyPlugin({
 			redisUrl: mailConfig.REDIS_URL,
-			// send has its own DB-backed Idempotency-Key handling
-			excludePathSuffixes: ["/mail/v1/send"],
+			// send and send/batch have their own DB-backed Idempotency-Key handling
+			excludePathSuffixes: ["/mail/v1/send", "/mail/v1/send/batch"],
 		}),
 	)
 	.use(requireUserAgentPlugin())

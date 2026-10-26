@@ -7,10 +7,11 @@ import {
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CompareFeatureGrid } from "../components/compare-feature-grid";
+import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
-import { ComparisonTable } from "../components/comparison-table";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -113,10 +114,13 @@ const AwsSesComparisonPage = () => {
 					</div>
 				</PageSection>
 
-				<PageSection alt>
-					<SectionHeading title="SES vs Reloop capabilities" compact />
-					<ComparisonTable competitorName="AWS SES" features={awsSesFeatures} />
-				</PageSection>
+				<section className="border-stroke-soft-100 border-b dark:border-white/10">
+					<CompareFeaturesHeading competitorName="AWS SES" />
+					<CompareFeatureGrid
+						competitorName="AWS SES"
+						features={awsSesFeatures}
+					/>
+				</section>
 
 				<PageSection narrow>
 					<SectionHeading

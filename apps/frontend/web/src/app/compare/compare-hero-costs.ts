@@ -320,3 +320,43 @@ export function formatUsd(usd: number): string {
 		maximumFractionDigits: cents ? 2 : 0,
 	}).format(usd);
 }
+
+/** The one volume each hand-written compare page leads with, in its hero and card. */
+const SPOTLIGHT_VOLUMES: Record<string, { mode: CostMode; volume: number }> = {
+	resend: { mode: "transactional", volume: 100_000 },
+	mailgun: { mode: "transactional", volume: 100_000 },
+	sendgrid: { mode: "transactional", volume: 100_000 },
+	"aws-ses": { mode: "transactional", volume: 100_000 },
+	postmark: { mode: "transactional", volume: 100_000 },
+	loops: { mode: "marketing", volume: 10_000 },
+	mailchimp: { mode: "marketing", volume: 10_000 },
+};
+
+export type CostSpotlight = {
+	mode: CostMode;
+	volume: number;
+	/** "100,000 emails a month" or "10,000 contacts, one campaign a week". */
+	volumeLabel: string;
+	reloop: CostRow;
+	competitor: CostRow;
+};
+
+/** Reloop vs one provider at that provider's spotlight volume, or null when we have no verified prices. */
+export function getCostSpotlight(providerId: string): CostSpotlight | null {
+	const spot = SPOTLIGHT_VOLUMES[providerId];
+	if (!spot) return null;
+	const rows = quoteCosts(spot.mode, spot.volume);
+	const reloop = rows.find((row) => row.id === "reloop");
+	const competitor = rows.find((row) => row.id === providerId);
+	if (!reloop || !competitor) return null;
+	const count = new Intl.NumberFormat("en-US").format(spot.volume);
+	return {
+		...spot,
+		volumeLabel:
+			spot.mode === "marketing"
+				? `${count} contacts, one campaign a week`
+				: `${count} emails a month`,
+		reloop,
+		competitor,
+	};
+}

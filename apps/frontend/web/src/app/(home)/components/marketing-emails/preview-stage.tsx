@@ -212,7 +212,7 @@ function ManageFunnelsView() {
 			title: "Welcome to Reloop & Quickstart Guide",
 			desc: "Send onboarding email with API keys and SDK installation steps",
 			stats: "12,400 sent · 68.2% open rate",
-			icon: "sparkling" as const,
+			icon: "magic-wand" as const,
 		},
 		{
 			step: "Step 2",

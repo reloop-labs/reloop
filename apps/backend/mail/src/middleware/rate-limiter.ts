@@ -19,6 +19,11 @@ interface RateLimitLayer {
 	windowSeconds: number;
 	/** Count but never reject (keeps usage headers for uncapped plans). */
 	countOnly?: boolean;
+	/**
+	 * Volume layer: charged once per email, so a batch of N costs N. Request
+	 * layers (IP, user) stay at 1 per HTTP call.
+	 */
+	perEmail?: boolean;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -48,10 +53,15 @@ function getClientIp(headers: Headers): string {
  */
 async function checkLayer(
 	layer: RateLimitLayer,
+	cost: number,
 ): Promise<{ count: number; ttl: number }> {
-	const count = await redis.increment(layer.key);
+	const count =
+		cost === 1
+			? await redis.increment(layer.key)
+			: await redis.incrementBy(layer.key, cost);
 
-	if (count === 1) {
+	// First write into this window (count equals what we just added).
+	if (count === cost) {
 		await redis.expire(layer.key, layer.windowSeconds);
 	}
 
@@ -106,6 +116,7 @@ export async function checkRateLimit({
 	activeOrganizationId,
 	userId,
 	authType,
+	cost = 1,
 	log,
 }: {
 	headers: Headers;
@@ -113,6 +124,8 @@ export async function checkRateLimit({
 	userId?: string;
 	/** Internal service-to-service sends share a datacenter IP; skip the IP layer. */
 	authType?: "session" | "apikey" | "internal" | "oauth";
+	/** Emails in this request; volume layers charge this many (default 1). */
+	cost?: number;
 	log: {
 		warn: (msg: string, meta?: Record<string, unknown>) => void;
 		error: (msg: string, meta?: Record<string, unknown>) => void;
@@ -144,12 +157,14 @@ export async function checkRateLimit({
 			{
 				name: "organization",
 				key: `rl:send:org:${activeOrganizationId}`,
+				perEmail: true,
 				max: mailConfig.RATE_LIMIT_ORG_MAX,
 				windowSeconds: mailConfig.RATE_LIMIT_ORG_WINDOW_SECONDS,
 			},
 			{
 				name: "organization-daily",
 				key: `rl:send:org-day:${activeOrganizationId}`,
+				perEmail: true,
 				max: mailConfig.RATE_LIMIT_ORG_DAILY_MAX,
 				windowSeconds: 86400,
 				countOnly: !(await hasDailyCapPromise),
@@ -157,6 +172,7 @@ export async function checkRateLimit({
 			{
 				name: "global",
 				key: "rl:send:global",
+				perEmail: true,
 				max: mailConfig.RATE_LIMIT_GLOBAL_MAX,
 				windowSeconds: mailConfig.RATE_LIMIT_GLOBAL_WINDOW_SECONDS,
 			},
@@ -173,7 +189,10 @@ export async function checkRateLimit({
 
 		const results = await Promise.all(
 			layers.map(async (layer) => {
-				const { count, ttl } = await checkLayer(layer);
+				const { count, ttl } = await checkLayer(
+					layer,
+					layer.perEmail ? cost : 1,
+				);
 				return { layer, count, ttl };
 			}),
 		);

@@ -81,7 +81,7 @@ function categoryIcon(catId: string) {
 		case "blacklists":
 			return "alert-triangle";
 		case "content":
-			return "sparkling";
+			return "magic-wand";
 		case "body":
 			return "mail";
 		case "links":
@@ -254,7 +254,7 @@ export function ReportView({ report, onReset }: ReportViewProps) {
 
 					<div className="flex items-center gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/50 p-2.5 dark:border-white/10 dark:bg-white/[0.02]">
 						<div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
-							<Icon name="sparkling" className="size-3.5" />
+							<Icon name="magic-wand" className="size-3.5" />
 						</div>
 						<div className="min-w-0 flex-1">
 							<span className="block font-mono text-[9.5px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">

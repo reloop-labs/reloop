@@ -4,58 +4,46 @@ import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-pos
 import { listBlogComparePages } from "@reloop/web/lib/blog-compare-pages";
 import { listMigrationGuides } from "@reloop/web/lib/migration-guides";
 import Link from "next/link";
-import { type CostMode, formatUsd, quoteCosts } from "../compare-hero-costs";
+import {
+	type CostSpotlight,
+	formatUsd,
+	getCostSpotlight,
+} from "../compare-hero-costs";
 import { competitorBrands } from "../competitor-brands";
 
 type CardQuote = { reloop: string; theirs: string; plan: string };
 
 type BrandCard = {
-	mode: CostMode;
-	volume: number;
 	blurb: (quote: CardQuote) => string;
 };
 
 /** Card copy per competitor; prices come from the same quotes as the calculator. */
 const BRAND_CARDS: Record<string, BrandCard> = {
 	Resend: {
-		mode: "transactional",
-		volume: 100_000,
 		blurb: (q) =>
 			`Resend's free plan sends 3,000 emails a month; Reloop's sends 6,000. At 100,000 emails Reloop costs ${q.reloop} a month and Resend ${q.theirs}, and Reloop is open source.`,
 	},
 	Mailgun: {
-		mode: "transactional",
-		volume: 100_000,
 		blurb: (q) =>
 			`Mailgun bills $1.10 to $1.80 per 1,000 emails past the plan. At 100,000 emails Reloop costs ${q.reloop} a month and Mailgun ${q.plan} ${q.theirs}.`,
 	},
 	SendGrid: {
-		mode: "transactional",
-		volume: 100_000,
 		blurb: (q) =>
 			`SendGrid's free plan is a 60-day trial at 100 emails a day. At 100,000 emails Reloop costs ${q.reloop} a month and SendGrid ${q.plan} ${q.theirs}.`,
 	},
 	"AWS SES": {
-		mode: "transactional",
-		volume: 100_000,
 		blurb: (q) =>
 			`SES is the cheapest pipe at $0.10 per 1,000 emails, with no dashboard, templates or contacts. Reloop adds all three for ${q.reloop} a month at 100,000.`,
 	},
 	Postmark: {
-		mode: "transactional",
-		volume: 100_000,
 		blurb: (q) =>
 			`Postmark's free plan is 100 emails a month. At 100,000 emails Reloop costs ${q.reloop} a month and Postmark ${q.plan} ${q.theirs}.`,
 	},
 	Loops: {
-		mode: "marketing",
-		volume: 10_000,
 		blurb: (q) =>
 			`Loops prices by contacts. At 10,000 contacts and a weekly send, Reloop costs ${q.reloop} a month and Loops ${q.theirs}, with no limit on contacts.`,
 	},
 	Mailchimp: {
-		mode: "marketing",
-		volume: 10_000,
 		blurb: (q) =>
 			`Mailchimp charges for every contact on the list. At 10,000 contacts and a weekly send, Reloop costs ${q.reloop} a month and Mailchimp ${q.plan} ${q.theirs}.`,
 	},
@@ -64,14 +52,11 @@ const BRAND_CARDS: Record<string, BrandCard> = {
 const compactCount = (value: number) =>
 	new Intl.NumberFormat("en-US").format(value);
 
-function quoteFor(card: BrandCard, providerId: string): CardQuote {
-	const rows = quoteCosts(card.mode, card.volume);
-	const reloop = rows.find((row) => row.id === "reloop");
-	const theirs = rows.find((row) => row.id === providerId);
+function quoteFor(spotlight: CostSpotlight): CardQuote {
 	return {
-		reloop: formatUsd(reloop?.usd ?? 0).toLowerCase(),
-		theirs: formatUsd(theirs?.usd ?? 0).toLowerCase(),
-		plan: theirs?.plan ?? "",
+		reloop: formatUsd(spotlight.reloop.usd).toLowerCase(),
+		theirs: formatUsd(spotlight.competitor.usd).toLowerCase(),
+		plan: spotlight.competitor.plan,
 	};
 }
 
@@ -81,7 +66,7 @@ type ComparisonEntry = {
 	/** Cover image from the matching "Reloop vs X" blog post. */
 	image: string;
 	description: string;
-	pricing?: { card: BrandCard; quote: CardQuote };
+	pricing?: { spotlight: CostSpotlight; quote: CardQuote };
 	migrationHref?: string;
 };
 
@@ -91,7 +76,8 @@ function getComparisonEntries(includeBlogPosts: boolean): ComparisonEntry[] {
 	const dedicated = competitorBrands.map((brand): ComparisonEntry => {
 		const slug = brand.href.replace("/compare/", "");
 		const card = BRAND_CARDS[brand.name];
-		const quote = card ? quoteFor(card, slug) : null;
+		const spotlight = getCostSpotlight(slug);
+		const quote = spotlight ? quoteFor(spotlight) : null;
 		return {
 			name: brand.name,
 			href: brand.href,
@@ -100,7 +86,7 @@ function getComparisonEntries(includeBlogPosts: boolean): ComparisonEntry[] {
 				card && quote
 					? card.blurb(quote)
 					: "Compare Reloop's open-source engine, pricing and features.",
-			pricing: card && quote ? { card, quote } : undefined,
+			pricing: spotlight && quote ? { spotlight, quote } : undefined,
 			migrationHref: guideSlugs.has(slug) ? `/migrate/${slug}` : undefined,
 		};
 	});
@@ -161,8 +147,8 @@ function ComparisonBrandCard({
 
 			{pricing ? (
 				<p className="mt-5 rounded-lg bg-bg-weak-50 px-3 py-2 text-[13px] text-text-sub-600 tabular-nums dark:bg-white/[0.05] dark:text-white/50">
-					{compactCount(pricing.card.volume)}{" "}
-					{pricing.card.mode === "marketing" ? "contacts" : "emails"}:{" "}
+					{compactCount(pricing.spotlight.volume)}{" "}
+					{pricing.spotlight.mode === "marketing" ? "contacts" : "emails"}:{" "}
 					<span className="font-medium text-text-strong-950 dark:text-white">
 						{pricing.quote.reloop}
 					</span>{" "}
@@ -247,7 +233,7 @@ export function ComparisonGrid() {
 	return (
 		<section className="w-full bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
 			{/* Left-Aligned Header with Comparison Icon */}
-			<div className="flex flex-col items-start gap-2.5 px-6 py-12 sm:px-10 sm:py-14 lg:px-12">
+			<div className="flex flex-col items-start gap-2.5 px-4 py-12 sm:px-10 sm:py-14 lg:px-12">
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"

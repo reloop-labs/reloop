@@ -103,7 +103,7 @@ export function CompareTitleIcon({
 			return <Icon name="agent" className={combinedClassName} />;
 		}
 		if (key.includes("compose") || key.includes("helper")) {
-			return <Icon name="sparkling" className={combinedClassName} />;
+			return <Icon name="magic-wand" className={combinedClassName} />;
 		}
 		return <Icon name="mail-receive" className={combinedClassName} />;
 	}

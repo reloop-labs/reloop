@@ -15,7 +15,7 @@ export function TemplatesHero() {
 				/>
 				<div className="flex flex-col items-start px-4 pt-0 pb-16 text-left sm:px-8 sm:pb-20 lg:px-12">
 					<span className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 px-3 py-1 font-medium text-[13px] text-text-strong-950 shadow-xs dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
-						<Icon name="sparkling" className="size-3.5" aria-hidden />
+						<Icon name="magic-wand" className="size-3.5" aria-hidden />
 						Template agent
 					</span>
 

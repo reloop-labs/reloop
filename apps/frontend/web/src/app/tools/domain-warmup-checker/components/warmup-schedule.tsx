@@ -52,7 +52,7 @@ const SCHEDULE_SECTIONS: ScheduleSection[] = [
 	},
 	{
 		title: "Volume Scaling (8–30+ days)",
-		icon: "sparkling",
+		icon: "magic-wand",
 		rows: [
 			{
 				age: "8–14 days",

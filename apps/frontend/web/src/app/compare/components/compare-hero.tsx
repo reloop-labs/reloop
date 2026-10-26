@@ -1,139 +1,193 @@
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
+import { hostedSignupHref } from "@reloop/web/lib/site";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { SimpleIcon } from "simple-icons";
+import {
+	type CostSpotlight,
+	costsCheckedAt,
+	formatUsd,
+} from "../compare-hero-costs";
+import type { CompareSource } from "../compare-sources";
+import type { ComparisonFeatureRow } from "../compare-types";
+import { comparisonCellText } from "../compare-types";
 import { BrandIcon } from "./brand-icon";
-import { CompareHeroPricing } from "./compare-hero-pricing";
-
-type Rgb = [number, number, number];
-
-function hexToRgb(hex: string): Rgb {
-	const clean = hex.replace("#", "");
-	return [
-		Number.parseInt(clean.slice(0, 2), 16),
-		Number.parseInt(clean.slice(2, 4), 16),
-		Number.parseInt(clean.slice(4, 6), 16),
-	];
-}
 
 function isDarkBrandHex(hex: string) {
-	const clean = hex.replace("#", "").toLowerCase();
-	if (clean === "000" || clean === "000000") return true;
-	if (clean.length !== 6) return false;
-	const [r, g, b] = hexToRgb(clean);
+	const r = Number.parseInt(hex.slice(0, 2), 16);
+	const g = Number.parseInt(hex.slice(2, 4), 16);
+	const b = Number.parseInt(hex.slice(4, 6), 16);
 	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.25;
 }
 
-/** Lift near-black marks so the bloom still reads, keep hue otherwise. */
-function glowRgb(hex: string): Rgb {
-	const rgb = hexToRgb(hex);
-	if (!isDarkBrandHex(hex)) return rgb;
-	const [r, g, b] = rgb;
-	if (r + g + b < 24) return [212, 212, 216];
-	return [
-		Math.min(255, Math.round(r + (255 - r) * 0.55)),
-		Math.min(255, Math.round(g + (255 - g) * 0.55)),
-		Math.min(255, Math.round(b + (255 - b) * 0.55)),
-	];
-}
-
-function rgba(rgb: Rgb, alpha: number) {
-	return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
-}
-
-function BrandTile({ children }: { children: ReactNode }) {
+function BrandPill({ children }: { children: ReactNode }) {
 	return (
-		<div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] sm:size-20 md:size-24 dark:border-white/10 dark:bg-bg-black-950 dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.45)]">
+		<span className="inline-flex h-11 items-center gap-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3.5 font-semibold text-[15px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
 			{children}
-		</div>
-	);
-}
-
-function VsBadge() {
-	return (
-		<span className="relative z-10 inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 font-mono font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.14em] dark:border-white/10 dark:bg-black dark:text-white/50">
-			vs
 		</span>
 	);
 }
 
-/** Blog CTA atmosphere, tinted to the competitor mark. */
-function SubtleCtaAtmosphere({ hex }: { hex?: string }) {
-	const rgb = hex ? glowRgb(hex) : ([56, 189, 248] satisfies Rgb);
-	const rgbAlt: Rgb = [
-		Math.min(255, Math.round(rgb[0] + (255 - rgb[0]) * 0.22)),
-		Math.min(255, Math.round(rgb[1] + (255 - rgb[1]) * 0.22)),
-		Math.min(255, Math.round(rgb[2] + (255 - rgb[2]) * 0.22)),
-	];
-	const lineMask =
-		"radial-gradient(ellipse 85% 95% at 88% 110%, black 0%, transparent 68%), radial-gradient(ellipse 70% 90% at 4% -5%, black 0%, transparent 62%)";
+function planNote(plan: string) {
+	return /plan|pay as you go/i.test(plan) ? plan : `${plan} plan`;
+}
 
+/** Two prices side by side with a vs badge on the seam. */
+function SpotlightCard({
+	competitorName,
+	spotlight,
+	source,
+}: {
+	competitorName: string;
+	spotlight: CostSpotlight;
+	source?: CompareSource | null;
+}) {
 	return (
-		<div
-			aria-hidden
-			className="pointer-events-none absolute inset-0 overflow-hidden"
-		>
-			<div
-				className="absolute inset-0"
-				style={{
-					backgroundImage: `radial-gradient(ellipse 110% 160% at 82% 100%, ${rgba(rgb, 0.14)} 0%, transparent 62%)`,
-				}}
-			/>
-			<div
-				className="absolute inset-0"
-				style={{
-					backgroundImage: `radial-gradient(ellipse 90% 140% at 6% 0%, ${rgba(rgbAlt, 0.09)} 0%, transparent 60%)`,
-				}}
-			/>
-			<div
-				className="absolute inset-0"
-				style={{
-					backgroundImage: `repeating-linear-gradient(-45deg, transparent 0, transparent 3px, ${rgba(rgb, 0.07)} 3px, ${rgba(rgb, 0.07)} 3.55px)`,
-					maskImage: lineMask,
-					WebkitMaskImage: lineMask,
-				}}
-			/>
+		<div>
+			<p className="text-center font-mono text-[12px] text-text-sub-600 dark:text-white/45">
+				{spotlight.volumeLabel}
+			</p>
+			<div className="relative mt-4 grid grid-cols-2 overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-white/10">
+				<div className="bg-bg-white-0 p-6 sm:p-8 dark:bg-white/[0.03]">
+					<p className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+						Reloop
+					</p>
+					<p className="mt-5 font-semibold text-[2.75rem] text-text-strong-950 tabular-nums leading-none tracking-[-0.04em] sm:text-[3.5rem] dark:text-white">
+						{formatUsd(spotlight.reloop.usd)}
+					</p>
+					<p className="mt-3 text-[14px] text-text-sub-600 dark:text-white/50">
+						a month
+					</p>
+					<p className="mt-6 text-[13px] text-text-sub-600 leading-snug dark:text-white/45">
+						{planNote(spotlight.reloop.plan)}, API, SMTP and inbox included
+					</p>
+				</div>
+				<div className="border-stroke-soft-100 border-l bg-bg-weak-50 p-6 sm:p-8 dark:border-white/10 dark:bg-white/[0.06]">
+					<p className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+						{competitorName}
+					</p>
+					<p className="mt-5 font-semibold text-[2.75rem] text-text-sub-600 tabular-nums leading-none tracking-[-0.04em] sm:text-[3.5rem] dark:text-white/55">
+						{formatUsd(spotlight.competitor.usd)}
+					</p>
+					<p className="mt-3 text-[14px] text-text-sub-600 dark:text-white/50">
+						a month
+					</p>
+					<p className="mt-6 text-[13px] text-text-sub-600 leading-snug dark:text-white/45">
+						{planNote(spotlight.competitor.plan)}
+					</p>
+				</div>
+				<span
+					aria-hidden
+					className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 flex size-10 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 font-medium text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-black dark:text-white/50"
+				>
+					vs
+				</span>
+			</div>
+			<p className="mt-4 text-center text-[12.5px] text-text-sub-600 dark:text-white/40">
+				Monthly billing in US dollars. {competitorName}&apos;s price from{" "}
+				{source ? (
+					<a
+						href={source.href}
+						target="_blank"
+						rel="noreferrer"
+						className="underline decoration-stroke-soft-200 underline-offset-2 transition-colors hover:text-text-strong-950 dark:decoration-white/20 dark:hover:text-white"
+					>
+						its pricing page
+					</a>
+				) : (
+					"its pricing page"
+				)}
+				, {costsCheckedAt}.
+			</p>
 		</div>
 	);
 }
 
-function HatchGutter({ side }: { side: "left" | "right" }) {
+/** Without verified prices, show the first rows of the written comparison instead. */
+function HighlightsCard({
+	competitorName,
+	rows,
+}: {
+	competitorName: string;
+	rows: ComparisonFeatureRow[];
+}) {
 	return (
-		<div
-			aria-hidden
-			className={cn(
-				"w-6 shrink-0 self-stretch text-stroke-soft-200/80 sm:w-10 lg:w-12 dark:text-white/[0.08]",
-				side === "left"
-					? "border-stroke-soft-200 border-r dark:border-white/10"
-					: "border-stroke-soft-200 border-l dark:border-white/10",
-			)}
-			style={{
-				backgroundImage:
-					"repeating-linear-gradient(-45deg, transparent 0, transparent 6px, currentColor 6px, currentColor 6.75px)",
-			}}
-		/>
+		<div>
+			<p className="text-center font-mono text-[12px] text-text-sub-600 dark:text-white/45">
+				At a glance
+			</p>
+			<div className="mt-4 overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-white/10">
+				<table className="w-full text-left text-[13.5px]">
+					<thead className="bg-bg-weak-50 dark:bg-white/[0.04]">
+						<tr>
+							<th scope="col" className="px-4 py-3 font-normal">
+								<span className="sr-only">Feature</span>
+							</th>
+							<th
+								scope="col"
+								className="px-4 py-3 font-medium text-text-strong-950 dark:text-white"
+							>
+								Reloop
+							</th>
+							<th
+								scope="col"
+								className="px-4 py-3 font-medium text-text-strong-950 dark:text-white"
+							>
+								{competitorName}
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{rows.map((row) => (
+							<tr
+								key={row.label}
+								className="border-stroke-soft-100 border-t align-top dark:border-white/10"
+							>
+								<th
+									scope="row"
+									className="px-4 py-3 font-normal text-text-sub-600 dark:text-white/50"
+								>
+									{row.label}
+								</th>
+								<td className="px-4 py-3 font-medium text-text-strong-950 dark:text-white">
+									{comparisonCellText(row.reloop)}
+								</td>
+								<td className="px-4 py-3 text-text-sub-600 dark:text-white/60">
+									{comparisonCellText(row.competitor)}
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		</div>
 	);
 }
 
-/**
- * Compare top fold: SDK details header language, split around a center vs.
- * Dashed rules frame the brand row top and bottom.
- */
+/** Compare top fold: copy and actions on the left, the price (or key facts) on the right. */
 export function CompareHero({
 	titleLines,
 	competitorName,
 	icon,
 	description,
-	updatedAt,
+	spotlight,
+	source,
+	highlights,
+	migrationHref,
 }: {
 	titleLines: string[];
 	competitorName?: string;
 	icon?: Pick<SimpleIcon, "hex" | "path">;
 	description?: string;
-	updatedAt?: string;
+	spotlight?: CostSpotlight | null;
+	source?: CompareSource | null;
+	highlights?: ComparisonFeatureRow[];
+	migrationHref?: string;
 }) {
-	const parsed =
+	const name =
 		competitorName ??
 		titleLines
 			.join(" ")
@@ -144,106 +198,93 @@ export function CompareHero({
 	const competitorIsDark = icon ? isDarkBrandHex(icon.hex) : false;
 
 	return (
-		<section className="relative w-full border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
-			{/* Top meta row, same chrome as SDK details */}
-			<div className="flex items-center justify-between gap-4 border-stroke-soft-200 border-b border-dashed px-6 pt-28 pb-4 sm:px-10 sm:pt-32 lg:px-12 dark:border-white/10">
-				<nav
-					aria-label="Breadcrumb"
-					className="flex flex-wrap items-center gap-1.5 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.14em] dark:text-white/45"
-				>
-					<Link
-						href="/compare"
-						className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
+		<section className="w-full border-stroke-soft-100 border-b bg-bg-white-0 text-text-strong-950 dark:border-white/10 dark:bg-black dark:text-white">
+			<div className="grid gap-12 px-4 pt-28 pb-16 sm:px-10 sm:pt-36 sm:pb-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:gap-16 lg:px-12">
+				<div className="min-w-0">
+					<nav
+						aria-label="Breadcrumb"
+						className="flex items-center gap-2 text-[14px] text-text-sub-600 dark:text-white/50"
 					>
-						Compare
-					</Link>
-					<span className="text-text-soft-400 dark:text-white/25">/</span>
-					<span className="text-text-sub-600 dark:text-white/50">{parsed}</span>
-				</nav>
-				<span className="shrink-0 font-mono text-[10px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
-					[Comparison]
-				</span>
-			</div>
-
-			{/* Visible H1: brand tiles are logos, this text heading carries keyword intent. */}
-			<div className="relative border-stroke-soft-200 border-b border-dashed px-6 py-10 text-center sm:px-10 sm:py-12 dark:border-white/10">
-				<SubtleCtaAtmosphere hex={icon?.hex} />
-				<h1 className="relative font-semibold text-3xl text-text-strong-950 tracking-tight sm:text-4xl dark:text-white">
-					{title}
-				</h1>
-				{description ? (
-					<p className="relative mx-auto mt-4 max-w-2xl text-balance font-medium text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/55">
-						{description}
-					</p>
-				) : null}
-				{updatedAt ? (
-					<p className="relative mt-4 font-mono text-[11px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
-						Last updated {updatedAt} · By Reloop Labs ·{" "}
 						<Link
-							href="#methodology"
-							className="underline underline-offset-2 transition-colors hover:text-text-strong-950 dark:hover:text-white"
+							href="/compare"
+							className="transition-colors hover:text-text-strong-950 dark:hover:text-white"
 						>
-							Methodology
+							Compare
 						</Link>
-					</p>
-				) : null}
-			</div>
+						<span aria-hidden className="text-text-soft-400 dark:text-white/25">
+							/
+						</span>
+						<span className="text-text-strong-950 dark:text-white">{name}</span>
+					</nav>
 
-			{/* Divided brand row: larger tiles, titles centered underneath */}
-			<div className="relative flex overflow-hidden border-stroke-soft-200 border-b border-dashed dark:border-white/10">
-				<SubtleCtaAtmosphere hex={icon?.hex} />
-				<HatchGutter side="left" />
-
-				<div className="relative min-w-0 flex-1">
-					<div
-						aria-hidden
-						className="-translate-x-1/2 pointer-events-none absolute inset-y-0 left-1/2 border-stroke-soft-200 border-l border-dashed dark:border-white/10"
-					/>
-
-					<div className="relative mx-auto flex items-start justify-center gap-5 py-10 sm:gap-7 sm:py-12 md:gap-8">
-						<div className="flex w-28 flex-col items-center gap-3 sm:w-32 md:w-36">
-							<BrandTile>
-								<Logo className="size-[72%] origin-center scale-[1.55]" />
-							</BrandTile>
-							<p className="text-center font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-xl md:text-2xl dark:text-white">
-								Reloop
-							</p>
-						</div>
-
-						<div className="flex h-16 shrink-0 items-center sm:h-20 md:h-24">
-							<VsBadge />
-						</div>
-
-						<div className="flex w-28 flex-col items-center gap-3 sm:w-32 md:w-36">
+					<div className="mt-7 flex items-center gap-3">
+						<BrandPill>
+							<span className="flex size-6 items-center justify-center overflow-hidden">
+								<Logo className="size-8 shrink-0" />
+							</span>
+							Reloop
+						</BrandPill>
+						<span className="text-[14px] text-text-sub-600 dark:text-white/40">
+							vs
+						</span>
+						<BrandPill>
 							{icon ? (
-								<BrandTile>
-									<BrandIcon
-										icon={icon}
-										fill={competitorIsDark ? "currentColor" : `#${icon.hex}`}
-										className={cn(
-											"size-8 sm:size-9 md:size-11",
-											competitorIsDark &&
-												"text-text-strong-950 dark:text-white",
-										)}
-									/>
-								</BrandTile>
+								<BrandIcon
+									icon={icon}
+									fill={competitorIsDark ? "currentColor" : `#${icon.hex}`}
+									className={cn(
+										"size-5",
+										competitorIsDark && "text-text-strong-950 dark:text-white",
+									)}
+								/>
 							) : null}
-							<p className="text-center font-semibold text-[17px] text-text-strong-950 tracking-tight sm:text-xl md:text-2xl dark:text-white">
-								{parsed}
-							</p>
-						</div>
+							{name}
+						</BrandPill>
+					</div>
+
+					<h1 className="mt-6 text-balance font-semibold text-[2.5rem] text-text-strong-950 leading-[1.04] tracking-[-0.04em] sm:text-[3.5rem] lg:text-[4.1rem] dark:text-white">
+						{title}
+					</h1>
+					{description ? (
+						<p className="mt-5 max-w-[40rem] text-pretty text-[15px] text-text-sub-600 leading-relaxed sm:text-[18px] dark:text-white/60">
+							{description}
+						</p>
+					) : null}
+
+					<div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+						<FancyButton.Root
+							asChild
+							variant="neutral"
+							size="medium"
+							className="h-10 rounded-xl px-5 font-medium text-[14.5px] sm:h-11 sm:px-6 sm:text-[15.5px]"
+						>
+							<a href={hostedSignupHref}>
+								Get started
+								<Icon name="arrow-right" className="size-4" />
+							</a>
+						</FancyButton.Root>
+						{migrationHref ? (
+							<FancyButton.Root
+								asChild
+								variant="basic"
+								size="medium"
+								className="h-10 rounded-xl px-5 font-medium text-[14.5px] sm:h-11 sm:px-6 sm:text-[15.5px]"
+							>
+								<Link href={migrationHref}>Migration guide</Link>
+							</FancyButton.Root>
+						) : null}
 					</div>
 				</div>
 
-				<HatchGutter side="right" />
-			</div>
-
-			<div className="relative flex overflow-hidden">
-				<HatchGutter side="left" />
-				<div className="relative min-w-0 flex-1">
-					<CompareHeroPricing competitorName={parsed} />
-				</div>
-				<HatchGutter side="right" />
+				{spotlight ? (
+					<SpotlightCard
+						competitorName={name}
+						spotlight={spotlight}
+						source={source}
+					/>
+				) : highlights && highlights.length > 0 ? (
+					<HighlightsCard competitorName={name} rows={highlights} />
+				) : null}
 			</div>
 		</section>
 	);

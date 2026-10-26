@@ -48,7 +48,7 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 									Import Contacts with AI
 								</h2>
 								<span className="inline-flex items-center gap-1 rounded-md border border-purple-200 bg-purple-50 px-2 py-0.5 font-medium text-[11px] text-purple-700">
-									<Icon name="sparkling" className="h-3 w-3" />
+									<Icon name="magic-wand" className="h-3 w-3" />
 									AI Powered
 								</span>
 							</div>
@@ -80,7 +80,7 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 
 							<div className="flex items-start gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-text-sub-600 text-xs">
 								<Icon
-									name="sparkling"
+									name="magic-wand"
 									className="mt-0.5 h-4 w-4 shrink-0 text-purple-600"
 								/>
 								<div className="space-y-0.5">
@@ -122,7 +122,7 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 								</>
 							) : (
 								<>
-									<Icon name="sparkling" className="h-3.5 w-3.5" />
+									<Icon name="magic-wand" className="h-3.5 w-3.5" />
 									Extract & Import
 								</>
 							)}

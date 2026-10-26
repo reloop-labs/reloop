@@ -196,6 +196,49 @@ export namespace MailModel {
 
 	export type SendEmailResponse = typeof sendEmailResponse.static;
 
+	export const sendBatchBody = t.Array(sendEmailBody, {
+		minItems: 1,
+		maxItems: 100,
+		description:
+			"Up to 100 emails, each with the same fields as Send email. Recipients are not stored as contacts.",
+	});
+
+	export type SendBatchBody = typeof sendBatchBody.static;
+
+	export const batchItemError = t.Object({
+		index: t.Number({
+			description: "0-based position of the email in the request array",
+		}),
+		message: t.String({ description: "Why this email was not sent" }),
+		why: t.Optional(t.String()),
+		fix: t.Optional(t.String()),
+		status: t.Optional(
+			t.Number({ description: "HTTP status a single send would return" }),
+		),
+	});
+
+	export type BatchItemError = typeof batchItemError.static;
+
+	export const sendBatchResponse = t.Object({
+		data: t.Array(
+			t.Object({
+				index: t.Number({
+					description: "0-based position of the email in the request array",
+				}),
+				id: t.String({ description: "Email log database ID" }),
+				messageId: t.String({ description: "Unique message ID" }),
+				status: t.String({ description: "Email status" }),
+			}),
+			{ description: "Emails that were accepted, in request order" },
+		),
+		errors: t.Array(batchItemError, {
+			description:
+				"Emails that were not sent. Empty when every email was accepted.",
+		}),
+	});
+
+	export type SendBatchResponse = typeof sendBatchResponse.static;
+
 	export const getAttachmentParams = t.Object({
 		emailId: t.String({
 			description: "The Email ID",

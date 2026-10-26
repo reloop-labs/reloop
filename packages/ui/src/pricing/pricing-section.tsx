@@ -14,6 +14,8 @@ import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { HoverCard } from "radix-ui";
 import { Fragment } from "react";
+import { FeatureHintCard, FeatureHintLabel } from "./feature-hint";
+import { PlanCheckmark, PlanCrossIcon } from "./plan-marks";
 import { PricingCta, usePricingUi } from "./pricing-cta";
 
 function PlanCtaLink({
@@ -559,20 +561,14 @@ function FeatureTooltipContent({
 	};
 
 	return (
-		<div className="w-[280px] rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 dark:border-white/10 dark:bg-[#121212]">
-			<div className="flex items-center gap-2">
-				{getFeatureIcon(
-					label,
-					"size-4 shrink-0 text-text-strong-950 dark:text-white",
-				)}
-				<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
-					{label}
-				</h4>
-			</div>
-			<p className="mt-1.5 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/70">
-				{info.description}
-			</p>
-		</div>
+		<FeatureHintCard
+			label={label}
+			description={info.description}
+			icon={getFeatureIcon(
+				label,
+				"size-4 shrink-0 text-text-strong-950 dark:text-white",
+			)}
+		/>
 	);
 }
 
@@ -584,24 +580,9 @@ export function ComparisonRowLabel({
 	rowKey: string;
 }) {
 	return (
-		<HoverCard.Root openDelay={100} closeDelay={150}>
-			<HoverCard.Trigger asChild>
-				<span className="relative cursor-pointer text-body-default text-text-strong-950 underline decoration-[8%] decoration-text-opaque-disabled decoration-wavy underline-offset-[25%] transition-colors duration-200 hover:decoration-text-strong-950 dark:text-white dark:hover:decoration-white">
-					{label}
-				</span>
-			</HoverCard.Trigger>
-			<HoverCard.Portal>
-				<HoverCard.Content
-					side="top"
-					align="start"
-					sideOffset={10}
-					collisionPadding={16}
-					className="fade-in-0 zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 animate-in outline-none duration-150 data-[state=closed]:animate-out"
-				>
-					<FeatureTooltipContent label={label} rowKey={rowKey} />
-				</HoverCard.Content>
-			</HoverCard.Portal>
-		</HoverCard.Root>
+		<FeatureHintLabel label={label}>
+			<FeatureTooltipContent label={label} rowKey={rowKey} />
+		</FeatureHintLabel>
 	);
 }
 
@@ -800,66 +781,6 @@ export function PlanFeature({ feature }: { feature: string }) {
 				<span className="text-text-sub-600 dark:text-white/60">{feature}</span>
 			)}
 		</li>
-	);
-}
-
-function PlanCheckmark({ className }: { className?: string }) {
-	return (
-		<svg
-			fill="none"
-			height="24"
-			viewBox="0 0 20 20"
-			width="24"
-			xmlns="http://www.w3.org/2000/svg"
-			className={cn("text-text-strong-950 dark:text-white", className)}
-			style={
-				{
-					"--color-blue-accent": "currentColor",
-				} as React.CSSProperties
-			}
-			aria-label="Included"
-			role="img"
-		>
-			<circle
-				cx="10"
-				cy="10"
-				fill="var(--color-blue-accent)"
-				fillOpacity="0.1"
-				r="8"
-			/>
-			<path
-				d="M7 10.5L9 12.5L13 7.5"
-				stroke="var(--color-blue-accent)"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				strokeWidth="1.25"
-			/>
-		</svg>
-	);
-}
-
-function PlanCrossIcon({ className }: { className?: string }) {
-	return (
-		<svg
-			fill="none"
-			height="20"
-			viewBox="0 0 20 20"
-			width="20"
-			xmlns="http://www.w3.org/2000/svg"
-			className={className}
-			aria-label="Not included"
-			role="img"
-		>
-			<path
-				d="M7 7L13 13M13 7L7 13"
-				stroke="#060606"
-				strokeOpacity="0.37"
-				strokeWidth="1.25"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				className="dark:stroke-opacity-30 dark:stroke-white"
-			/>
-		</svg>
 	);
 }
 

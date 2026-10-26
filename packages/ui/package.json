@@ -104,6 +104,8 @@
 		"./loading-dot": "./src/components/loading-dot.tsx",
 		"./pricing/explorer": "./src/pricing/pricing-explorer.tsx",
 		"./pricing/cta": "./src/pricing/pricing-cta.tsx",
+		"./pricing/marks": "./src/pricing/plan-marks.tsx",
+		"./pricing/feature-hint": "./src/pricing/feature-hint.tsx",
 		"./email-status": "./src/utils/email-status.ts"
 	},
 	"dependencies": {

@@ -3,12 +3,14 @@ import { getComparePage } from "@reloop/web/lib/compare-content";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { formatUsd, getCostSpotlight } from "../compare-hero-costs";
 import { competitorBrands } from "../competitor-brands";
+import { CompareFeatureGrid } from "../components/compare-feature-grid";
+import { CompareFeaturesHeading } from "../components/compare-features-heading";
 import { ComparePageJsonLd } from "../components/compare-json-ld";
 import { CompareMigrate } from "../components/compare-migrate";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { CompareSection } from "../components/compare-section";
-import { ComparisonMatrix } from "../components/comparison-matrix";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { resendComparisonCategories } from "./comparison-data";
 
@@ -17,6 +19,12 @@ import { resendComparisonCategories } from "./comparison-data";
 export const instant = false;
 
 const pagePath = "/compare/resend";
+
+/** Prices come from the same quotes as the hero card, so the copy never disagrees with it. */
+const spotlight = getCostSpotlight("resend");
+const heroDescription = spotlight
+	? `Resend is a hosted email API on Amazon SES. Reloop is open source, and costs ${formatUsd(spotlight.reloop.usd)} a month at ${spotlight.volumeLabel.replace(" a month", "")}, Resend ${formatUsd(spotlight.competitor.usd)}.`
+	: "Resend is a hosted email API on Amazon SES. Reloop is open source, with its own mail servers.";
 const siteUrl = getSiteUrl();
 const pageUrl = `${siteUrl}${pagePath}`;
 
@@ -62,7 +70,7 @@ const ResendComparisonPage = () => {
 			<ComparisonPageShell
 				pagePath={pagePath}
 				titleLines={["Reloop vs Resend"]}
-				description="The open-source Resend alternative for 2026: same developer ergonomics with self-hosting, lower send-based pricing, its own MTA, and an agent inbox. By Reloop Labs — the team behind Reloop."
+				description={heroDescription}
 				updatedAt="October 26, 2026"
 				primaryCta={{
 					label: "Get Started ",
@@ -72,6 +80,15 @@ const ResendComparisonPage = () => {
 					label: "Migrate from Resend",
 					href: "/compare/resend#migrate",
 				}}
+				afterHero={
+					<section className="border-stroke-soft-100 border-b dark:border-white/10">
+						<CompareFeaturesHeading competitorName="Resend" />
+						<CompareFeatureGrid
+							competitorName="Resend"
+							categories={resendComparisonCategories}
+						/>
+					</section>
+				}
 			>
 				{/* Editorial overview: targets "Resend alternative" + verdict intent */}
 				<CompareSection maxWidth="2xl">
@@ -136,32 +153,6 @@ const ResendComparisonPage = () => {
 							</p>
 						</div>
 					</div>
-				</CompareSection>
-
-				{/* Feature matrix */}
-				<CompareSection maxWidth="full" flushX>
-					<div className="mb-10 text-center">
-						<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
-							Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;{resendBrand?.name}
-						</h2>
-						<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-							Reloop is an open-source alternative to{" "}
-							{resendBrand?.name || "Resend"} that runs its own MTA.
-							<br /> Sending, receiving, AI templates, and agent inboxes in one
-							codebase, hosted or self-hosted.
-						</p>
-					</div>
-					<ComparisonMatrix
-						competitorName="Resend"
-						categories={resendComparisonCategories}
-					/>
-					<p className="mt-6 text-center text-[13px] text-text-sub-600 dark:text-white/40">
-						Seen something inaccurate?{" "}
-						<Link href="/contact" className="font-semibold text-primary-base">
-							Tell us
-						</Link>
-						. We correct comparison pages when the facts change.
-					</p>
 				</CompareSection>
 
 				{/* Migration: Dub-style 3-step cards */}

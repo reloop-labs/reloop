@@ -78,7 +78,7 @@ export function AgentIntegrationsCard() {
 		<div className="group flex h-fit w-full flex-col">
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
 				<span className="flex items-center gap-2 font-medium text-sm text-text-sub-600 dark:text-white/60">
-					<Icon name="sparkling" className="h-4 w-4 shrink-0" />
+					<Icon name="magic-wand" className="h-4 w-4 shrink-0" />
 					<span>Agent Integrations</span>
 				</span>
 			</div>
