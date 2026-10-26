@@ -3287,14 +3287,14 @@ Management endpoints cover everything outside of email sending: domains, contact
 
 ## Email Sending Limits
 
-The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel. If any single layer is exceeded, the request is rejected.
+The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel. If any single layer is exceeded, the request is rejected. The organization daily layer applies only to plans with a daily sending limit (Free); Pay as you go, Pro and higher plans have no daily cap.
 
 | Layer | Limit | Window | What It Protects |
 |-------|-------|--------|-----------------|
 | IP | 20 requests | 60s | Prevents brute-force from a single source. |
 | User | 50 requests | 60s | Stops abuse from a single user within an organization. |
 | Organization | 100 requests | 60s | Prevents runaway integrations per tenant. |
-| Organization Daily | 5,000 requests | 24h | Hard daily cap per organization. |
+| Organization Daily | 5,000 requests | 24h | Daily cap per organization on the Free plan. Not applied to Pay as you go, Pro and higher. |
 | Global | 500 requests | 60s | Protects infrastructure from DDoS. |
 
 When a sending request is rate limited, the error response tells you which layer was exceeded:
@@ -6878,7 +6878,7 @@ npm install reloop-email
 Add your Reloop API key to your environment variables or a `.env` file:
 
 ```env
-RELOOP_API_KEY=re_your_api_key_here
+RELOOP_API_KEY=rl_your_api_key_here
 ```
 
 ## Sending an Email
@@ -7013,7 +7013,7 @@ composer require reloop-labs/reloop-php
 Add the API key to your `.env` file:
 
 ```env
-RELOOP_API_KEY=re_your_api_key_here
+RELOOP_API_KEY=rl_your_api_key_here
 ```
 
 ## Sending an Email
@@ -7070,7 +7070,7 @@ Add your API key to your settings:
 ```python
 # settings.py
 
-RELOOP_API_KEY = os.environ.get("RELOOP_API_KEY", "re_your_api_key_here")
+RELOOP_API_KEY = os.environ.get("RELOOP_API_KEY", "rl_your_api_key_here")
 ```
 
 ## Sending an Email
@@ -7135,8 +7135,10 @@ from reloop_email import Reloop
 app = FastAPI()
 reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
 
+# The SDK is synchronous. Use `def`, not `async def`, so FastAPI runs the
+# route in its thread pool instead of blocking the event loop.
 @app.post("/send-email")
-async def send_email():
+def send_email():
     try:
         result = reloop.mail.send({
             "from": "onboarding@reloop.sh",
@@ -7402,10 +7404,10 @@ To connect to the Reloop SMTP server, use the following configuration settings:
 | Setting | Value |
 | :--- | :--- |
 | **Host** | `smtp.reloop.sh` |
-| **Port** | `587` (TLS) or `2525` / `25` |
-| **Username** | Your Reloop API Key |
+| **Port** | `587`, or `2587` / `2025` if 587 is blocked |
+| **Username** | Any string, for example `reloop` |
 | **Password** | Your Reloop API Key |
-| **Encryption** | SSL/TLS (`465`) or STARTTLS (`587`) |
+| **Encryption** | STARTTLS on every port. Implicit TLS (port `465`) is not offered. |
 
 ## Code Examples
 
@@ -7487,7 +7489,7 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
   host: 'smtp.reloop.sh',
   port: 587,
-  secure: false, // true for port 465, false for other ports
+  secure: false, // Reloop uses STARTTLS; keep false on every port
   auth: {
     user: 'reloop',
     pass: process.env.RELOOP_API_KEY,
@@ -7549,8 +7551,8 @@ try {
     $mail->SMTPAuth   = true;
     $mail->Username   = 'reloop';
     $mail->Password   = getenv('RELOOP_API_KEY');
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-    $mail->Port       = 465;
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 587;
 
     // Recipients
     $mail->setFrom('onboarding@reloop.sh', 'Onboarding');
@@ -12820,42 +12822,75 @@ If you need assistance with account changes, contact [Reloop support](https://re
 Source: https://reloop.sh/docs/guides/receiving-emails
 Markdown: https://reloop.sh/docs/guides/receiving-emails.md
 
-How to receive inbound emails with Reloop.
+Reloop receives email for any domain you have added, stores it in a mailbox, threads it by conversation and gives every message a spam verdict. You can then read and reply from the dashboard, your code, an AI agent or a normal mail client.
 
-## Overview
-
-Understanding this topic is important for maintaining good email deliverability with Reloop.
-
-## Key Points
-
-- Follow email sending best practices to maintain a strong sender reputation
-- Monitor your delivery rates in the [Reloop dashboard](https://reloop.sh/dashboard)
-- Keep your email lists clean and up-to-date
-
-## Best Practices
+## Set up receiving
 
 <Steps>
-  <Step title="Monitor your metrics">
-    Regularly check your delivery, bounce, and complaint rates in the Reloop dashboard.
+  <Step title="Pick the hostname">
+    Use a subdomain such as `inbox.yourdomain.com` or `agents.yourdomain.com`. If your root domain already receives mail through Google Workspace or Microsoft 365, pointing its MX at Reloop would split or divert that mail. See [Sending vs receiving](/docs/guides/connect-domain/sending-vs-receiving) and [MX conflicts](/docs/guides/avoid-mx-conflicts).
   </Step>
-  <Step title="Follow authentication standards">
-    Ensure SPF, DKIM, and DMARC are properly configured for your domain.
+  <Step title="Turn on Email Receiving">
+    Add the domain in the [dashboard](https://reloop.sh/dashboard) or open an existing one. **Email Receiving** is on by default for new domains. You can toggle it on the domain detail page.
   </Step>
-  <Step title="Respect recipient preferences">
-    Always include an unsubscribe mechanism in marketing emails and honor opt-out requests promptly.
+  <Step title="Add the MX record">
+    At your DNS host, add the MX record Reloop shows for the domain:
+
+    | Type | Name | Value | Priority |
+    | --- | --- | --- | --- |
+    | `MX` | your subdomain, for example `inbox` | `inbound.reloop.sh` | `10` |
+
+    [Auto-populate](/docs/guides/connect-domain/auto-populate) adds it for you on supported DNS hosts.
+  </Step>
+  <Step title="Create a mailbox">
+    Create a mailbox for the address, for example `support@inbox.yourdomain.com`, from the domain page or with the API. Mail sent to that address now lands in the mailbox.
+  </Step>
+  <Step title="Send a test">
+    Send a message to the address from any personal account. It should appear in the mailbox within a few seconds.
   </Step>
 </Steps>
 
-<Tip>
-For detailed guidance on email deliverability, see our [Email Best Practices](/docs/integrations/agent-skills/email-best-practices) skill documentation.
-</Tip>
+## Read and reply
 
-## Learn More
+Choose how your app, agent or team works with received mail:
 
-- [Emails Going to Spam](/docs/guides/emails-going-to-spam)
-- [Warm-up Guide](/docs/guides/warmup-guide)
-- [Audience Hygiene](/docs/guides/audience-hygiene)
-- [Domains Guide](/docs/learn/domain)
+| Method | Best for | Docs |
+| --- | --- | --- |
+| **Dashboard** | People reading and replying by hand | [Agent inbox](/docs/learn/agent-inbox) |
+| **Webhooks** | Reacting to each new message in your code | [`email.received`](/docs/webhooks/emails/received) |
+| **API and SDKs** | Listing threads, fetching messages, replying in a thread | [API reference](/docs/api) |
+| **MCP** | Letting Claude, Cursor or another AI client read and answer mail | [MCP server](/docs/integrations/ai-tools/mcp-server) |
+| **IMAP** | Apple Mail, Outlook, Thunderbird or any IMAP client | See below |
+
+### Webhooks
+
+Subscribe a webhook to `email.received`. Each event includes the mailbox, sender, subject, `thread_id`, `is_spam` and the `email_id` you use to fetch the full message or reply. Always [verify the signature](/docs/webhooks/verify-webhooks-requests) before trusting the payload.
+
+To forward received mail to another address, see [Forward emails](/docs/guides/inbound-forward-emails).
+
+### IMAP
+
+| Setting | Value |
+| --- | --- |
+| Host | `imap.reloop.sh` |
+| Port | `993` (TLS) |
+| Username | The mailbox address, for example `support@inbox.yourdomain.com` |
+| Password | A Reloop API key with access to that mailbox |
+
+Changes sync both ways: messages you read, move or archive in your mail client show the same way in the dashboard and the API.
+
+## Troubleshooting
+
+- **Nothing arrives.** Check the MX record with `dig MX inbox.yourdomain.com +short`. It should return `10 inbound.reloop.sh.` DNS changes can take up to an hour to propagate.
+- **Mail arrives somewhere else.** Another MX record on the same hostname has a lower priority number. Remove it or use a different subdomain.
+- **Mail is marked as spam.** Every message gets a spam verdict. Messages with `is_spam: true` are still stored in the mailbox, so check for flagged messages before assuming mail was lost.
+
+## Learn more
+
+- [Agent inbox](/docs/learn/agent-inbox)
+- [Domains](/docs/learn/domain)
+- [Webhook event types](/docs/webhooks/event-types)
+- [Give an AI agent its own email address](/blog/give-ai-agent-email-address)
 
 ---
 
@@ -12989,7 +13024,7 @@ Learn how to set up Reloop as the email provider for your Supabase project.
     | Setting | Value |
     |---------|-------|
     | Host | `smtp.reloop.sh` |
-    | Port | `465` |
+    | Port | `587` |
     | Username | `reloop` |
     | Password | Your Reloop API key |
     | Sender email | An address from your verified domain |
@@ -14401,7 +14436,7 @@ Verify that the **From Email** configured in WP Mail SMTP belongs to a domain yo
 
 ### Connection Timeout (Port 587 Blocked)
 Some shared hosting providers block outgoing port `587` to prevent spam. If the connection fails or times out:
-1. Try changing the port to `2525` or `25` with `TLS` / `STARTTLS` encryption enabled.
+1. Try changing the port to `2587` or `2025` with `TLS` / `STARTTLS` encryption enabled.
 2. If those are blocked, contact your hosting provider's support team to request that they open outbound connections on port `587` for `smtp.reloop.sh`.
 
 ---
@@ -14501,21 +14536,102 @@ Click **Test Step** in Zapier. You should receive a `200 OK` response with a `me
 Source: https://reloop.sh/docs/learn/agent-inbox
 Markdown: https://reloop.sh/docs/learn/agent-inbox.md
 
-The Reloop **Agent Inbox** turns static inbound email addresses into active, programmable endpoints. Instead of simply forwarding raw emails, Reloop routes inbound messages through our AI processing engine to extract structured data, classify intent, and trigger downstream handlers.
-
-## Key capabilities
-
-* **AI classification**: Automatically categorize inbound messages (e.g. Support, Billing, Sales, Spam) and extract sentiment.
-* **Structured data extraction**: Parse variables out of the email body (like invoice numbers, customer names, or tracking codes) using JSON schemas.
-* **Automated routing**: Forward parsed payloads directly to custom webhooks or enqueue them in NATS messaging topics.
-* **Inline conversational replies**: Send automated AI-drafted replies or route them to human agents in the dashboard.
+An **agent inbox** is a mailbox on a domain you own, such as `support@inbox.yourdomain.com`. Reloop receives mail for it, groups messages into threads, flags spam, and lets you send and reply from the same address. The same mailbox works for a person in the dashboard, for your code through the API, and for an AI agent through MCP.
 
 ## How it works
 
-1. **Inbound gateway**: Email is received via your verified sending domain (e.g. `support@yourdomain.com`).
-2. **Parsing & normalization**: The HTML content, attachments, headers, and metadata are parsed.
-3. **AI evaluation**: The inbox's custom prompt evaluates the content against defined rules.
-4. **Action dispatch**: Webhooks are fired, database state is updated, or an automated reply is queued.
+1. **Mail arrives.** Your domain's MX record points to `inbound.reloop.sh`. Reloop accepts mail for every mailbox on that domain.
+2. **It is stored and threaded.** Each message lands in its mailbox and is attached to a thread with the earlier messages in the conversation.
+3. **It gets a spam verdict.** Every inbound message is scored. Messages scored as spam are still stored, with `is_spam: true`.
+4. **You are notified.** An `email.received` webhook fires with the mailbox, sender, subject, thread and message IDs.
+5. **You reply in the thread.** Replies are sent from the mailbox address and stay in the same conversation for the recipient.
+
+## Set up a mailbox
+
+<Steps>
+  <Step title="Add the domain and MX record">
+    Add a domain with **Email Receiving** turned on, and publish the MX record `inbound.reloop.sh`. Use a subdomain if your root domain already receives mail elsewhere. See [Receiving emails](/docs/guides/receiving-emails).
+  </Step>
+  <Step title="Create the mailbox">
+    Create it from the domain page in the [dashboard](https://reloop.sh/dashboard), with the [Mailboxes API](/docs/api/inbox/mailboxes), or with the Node.js SDK:
+
+    ```typescript
+    const { mailbox, mailboxError } = await reloop.inbox.mailboxes.create({
+      domainId: "dom_...",
+      email: "support@inbox.yourdomain.com",
+      displayName: "Acme Support",
+    });
+    ```
+  </Step>
+  <Step title="Send it a test">
+    Email the address from any personal account. The message appears in the mailbox within a few seconds.
+  </Step>
+</Steps>
+
+## Threads and messages
+
+| Concept | What it is |
+| --- | --- |
+| **Mailbox** | One address, such as `support@inbox.yourdomain.com`, with its own display name |
+| **Thread** | A conversation. Status is `active`, `archived`, `closed` or `trash`, and threads can be starred, labelled and marked read |
+| **Message** | One inbound or outbound email in a thread, with attachments and the raw source available |
+| **Draft** and **note** | Unsent replies, and internal notes your team leaves on a thread |
+
+Load the whole thread before replying, so a person or model sees every earlier message, inbound and outbound.
+
+## Send and reply
+
+- **Reply** or **reply all** to a message to keep the conversation in one thread. Reloop sets the threading headers for you.
+- **Forward** a message to another address.
+- **Send** a new message from the mailbox.
+- **Delay a send** with `scheduledAt`, or give it an undo window with `undoWindowSeconds`. A pending send can be cancelled until it goes out.
+
+The [Messages API](/docs/api/inbox/messages) and the SDK (`reloop.inbox.messages.reply`, `replyAll`, `forward`, `send`, `cancelPending`) cover all of these.
+
+## Ways to work with an inbox
+
+| Method | Best for |
+| --- | --- |
+| **Dashboard** | People reading, replying, labelling and leaving notes |
+| **Webhooks** | Reacting to each new message in your code. Subscribe to [`email.received`](/docs/webhooks/emails/received) and [verify the signature](/docs/webhooks/verify-webhooks-requests). |
+| **API and SDKs** | Listing threads, fetching messages, replying and sending ([Threads](/docs/api/inbox/threads), [Messages](/docs/api/inbox/messages)) |
+| **MCP** | Letting Claude, Cursor or another AI client read and answer mail. See [MCP server](/docs/integrations/ai-tools/mcp-server). |
+| **IMAP** | Apple Mail, Outlook, Thunderbird or any IMAP client |
+
+### IMAP settings
+
+| Setting | Value |
+| --- | --- |
+| Host | `imap.reloop.sh` |
+| Port | `993` (TLS) or `143` (STARTTLS) |
+| Username | The mailbox address |
+| Password | A Reloop API key from the mailbox's organization that is allowed to use that address |
+
+## Restrict what an agent can reach
+
+Give each agent an API key restricted to its own address or domain. A restricted key can only list, read, change and send from the mailboxes its scope allows. This applies to the whole inbox API, to sending, to SMTP and to IMAP login. Requests for any other mailbox return `403`.
+
+Treat inbound email as untrusted input. An email can contain instructions written to manipulate an AI agent, so do not let a model follow instructions found in a message, and require human approval before an agent sends anything consequential.
+
+## Limits
+
+Each plan includes a number of agent inboxes:
+
+| Plan | Agent inboxes |
+| --- | --- |
+| Free | 3 |
+| Pro | 5 |
+| Growth | 10 |
+| Enterprise | Custom |
+
+Creating or re-activating a mailbox beyond your plan's limit fails. Each mailbox has a 5 GB storage quota by default. Self-hosted Reloop has no inbox limit.
+
+## Learn more
+
+- [Receiving emails](/docs/guides/receiving-emails)
+- [Webhook event types](/docs/webhooks/event-types)
+- [MCP server](/docs/integrations/ai-tools/mcp-server)
+- [Domains](/docs/learn/domain)
 
 ---
 
@@ -15539,7 +15655,7 @@ Create and maintain beautiful email templates within Reloop. Use our interactive
 ## Key capabilities
 
 * **Lexical editor**: An intuitive visual drag-and-drop builder for creating complex responsive email layouts without writing HTML.
-* **Variable interpolation**: Embed variables (`{{ contact.first_name }}`) to personalize emails dynamically during execution.
+* **Variable interpolation**: Embed variables in triple braces (`{{{first_name}}}`) and pass their values in `template.variables` when you send through the API. Campaigns and workflows can also read contact fields directly (`{{contact.first_name}}`). Values are HTML-escaped when they are inserted into the HTML body, so a value like `<b>Ada</b>` shows as text rather than markup. Subjects and plain-text bodies get the value as-is.
 * **Layout inheritance**: Design universal headers/footers and extend them for newsletter, marketing, or transactional templates.
 * **Developer previews**: Instantly test how templates render in dark mode, light mode, or mobile screens.
 
