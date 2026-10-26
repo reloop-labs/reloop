@@ -121,6 +121,7 @@ export const RELOOP_ICON_NAMES = new Set<string>([
 	"logs",
 	"magic-wand",
 	"mail",
+	"mail-open",
 	"mail-receive",
 	"mail-receive-mask",
 	"mail-send",

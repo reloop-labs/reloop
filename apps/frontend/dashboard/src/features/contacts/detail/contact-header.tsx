@@ -179,7 +179,7 @@ function ContactStatsRow({ email }: { email: string }) {
 		},
 		{
 			label: "Opened",
-			icon: "eye-outline",
+			icon: "mail-open",
 			value: (stats?.opened ?? 0).toLocaleString(),
 		},
 		{

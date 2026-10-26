@@ -9,7 +9,7 @@ import { PAGE_EASE } from "../../domain/_shared/page-motion";
 const SUCCESS_STEPS = [
 	{ id: "sent", label: "Sent", icon: "send-1" },
 	{ id: "delivered", label: "Delivered", icon: "check-circle" },
-	{ id: "opened", label: "Opened", icon: "eye-outline" },
+	{ id: "opened", label: "Opened", icon: "mail-open" },
 	{ id: "clicked", label: "Clicked", icon: "cursor-click" },
 ] as const;
 

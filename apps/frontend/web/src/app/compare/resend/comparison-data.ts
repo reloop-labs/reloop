@@ -201,7 +201,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "Open tracking",
-				icon: "eye-outline",
+				icon: "mail-open",
 				reloop: "Yes",
 				competitor: "Yes",
 			},

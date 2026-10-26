@@ -126,7 +126,7 @@ export function CompareTitleIcon({
 	}
 
 	if (key.includes("open tracking") || key.includes("open")) {
-		return <Icon name="eye-outline" className={combinedClassName} />;
+		return <Icon name="mail-open" className={combinedClassName} />;
 	}
 
 	if (key.includes("click tracking") || key.includes("click")) {

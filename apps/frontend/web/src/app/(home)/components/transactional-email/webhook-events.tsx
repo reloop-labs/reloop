@@ -83,7 +83,7 @@ const KIND_STYLE: Record<WebhookKind, { badge: string; icon: string }> = {
 	},
 	opened: {
 		badge: "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
-		icon: "eye-outline",
+		icon: "mail-open",
 	},
 	clicked: {
 		badge:

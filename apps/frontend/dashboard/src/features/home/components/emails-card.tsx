@@ -45,7 +45,7 @@ const getEmailIcon = (status: string) => {
 		case "delivered":
 			return "check-circle";
 		case "opened":
-			return "eye-outline";
+			return "mail-open";
 		case "clicked":
 			return "cursor-click";
 		case "received":

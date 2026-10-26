@@ -271,9 +271,7 @@ function ResendButton({
 	return (
 		<Tooltip.Root delayDuration={0}>
 			<Tooltip.Trigger asChild>
-				<span className="inline-flex cursor-not-allowed">
-					{button}
-				</span>
+				<span className="inline-flex cursor-not-allowed">{button}</span>
 			</Tooltip.Trigger>
 			<Tooltip.Content
 				side="bottom"
@@ -423,7 +421,7 @@ function DeliveryTimeline({
 					label: "Delivered",
 					icon: "check-circle",
 				},
-				{ id: "opened", type: "opened", label: "Opened", icon: "eye-outline" },
+				{ id: "opened", type: "opened", label: "Opened", icon: "mail-open" },
 				{
 					id: "clicked",
 					type: "clicked",

@@ -166,7 +166,7 @@ export const mailgunComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "Open & click tracking",
-				icon: "eye-outline",
+				icon: "mail-open",
 				reloop: "Yes",
 				competitor: "Yes",
 			},

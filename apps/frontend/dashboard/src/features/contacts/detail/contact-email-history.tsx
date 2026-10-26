@@ -212,7 +212,7 @@ const getEmailStatusIcon = (status: string): IconName => {
 		case "scheduled":
 			return "clock";
 		case "opened":
-			return "eye-outline";
+			return "mail-open";
 		case "clicked":
 			return "cursor-click";
 		default:
@@ -519,7 +519,7 @@ function getEmailLifecycleBadges(entry: ActivityEntry): EmailBadgeItem[] {
 		badges.push({
 			key: "opened",
 			label: "Opened",
-			icon: "eye-outline",
+			icon: "mail-open",
 			className:
 				"bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
 		});

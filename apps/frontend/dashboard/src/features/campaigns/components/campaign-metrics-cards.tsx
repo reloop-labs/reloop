@@ -269,7 +269,7 @@ export function CampaignMetricsCards({
 					}
 				>
 					<BreakdownRow
-						icon="eye-outline"
+						icon="mail-open"
 						iconClass="text-blue-500"
 						name="Unique opens"
 						count={opened}

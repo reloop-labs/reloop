@@ -46,7 +46,7 @@ const statusOptions: {
 	{
 		id: "opened",
 		label: "Opened",
-		icon: "eye-outline",
+		icon: "mail-open",
 		colorClass: "text-information-base",
 	},
 	{

@@ -30,7 +30,7 @@ const TIMELINE: { label: string; detail: string; icon: string }[] = [
 	{ label: "Accepted", detail: "via SMTP · port 587", icon: "smtp" },
 	{ label: "DKIM signed", detail: "d=acme.com", icon: "shield" },
 	{ label: "Delivered", detail: "gmail.com · 1.2s", icon: "mail-send" },
-	{ label: "Opened", detail: "Chrome · macOS", icon: "eye-outline" },
+	{ label: "Opened", detail: "Chrome · macOS", icon: "mail-open" },
 	{ label: "Webhook sent", detail: "email.delivered → 200", icon: "webhook" },
 ];
 

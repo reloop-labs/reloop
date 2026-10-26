@@ -112,7 +112,7 @@ function getEmailStatusIcon(status: string): string {
 		case "pending":
 			return "clock";
 		case "opened":
-			return "eye-outline";
+			return "mail-open";
 		case "clicked":
 			return "cursor-click";
 		default:
