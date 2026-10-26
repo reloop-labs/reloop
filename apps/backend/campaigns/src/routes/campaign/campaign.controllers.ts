@@ -11,7 +11,7 @@ import {
 } from "@be/campaigns/lib/campaign/interpolate";
 import { assertVerifiedFromDomain } from "@be/campaigns/lib/campaign/resolve-audience";
 import { sendCampaignMail } from "@be/campaigns/lib/campaign/send-mail";
-import { snapshotAudience } from "@be/campaigns/lib/campaign/snapshot";
+import { previewAudienceCount } from "@be/campaigns/lib/campaign/snapshot";
 import {
 	type CampaignStatus,
 	canCancel,
@@ -162,7 +162,7 @@ export async function createCampaignController(params: {
 		});
 	} else if (scheduledAt) {
 		const row = await requireCampaign(created.id, organizationId);
-		await snapshotAudience(row);
+		await previewAudienceCount(row);
 		await scheduleCampaignStart({
 			campaignId: created.id,
 			organizationId,
@@ -361,7 +361,7 @@ export async function scheduleCampaignController(params: {
 	}
 	if (!row.subject.trim()) throw CampaignErrors.subjectRequired();
 	await assertVerifiedFromDomain(params.organizationId, row.fromEmail);
-	await snapshotAudience(row);
+	await previewAudienceCount(row);
 	const [updated] = await db
 		.update(schema.campaign)
 		.set({
@@ -421,6 +421,34 @@ export async function cancelCampaignController(params: {
 		updated ?? row,
 		await templateNameFor((updated ?? row).templateId),
 	);
+}
+
+/** Move a scheduled campaign back to draft, keeping its content. */
+export async function unscheduleCampaignController(params: {
+	id: string;
+	organizationId: string;
+}) {
+	const row = await requireCampaign(params.id, params.organizationId);
+	if (row.status !== "scheduled") {
+		throw CampaignErrors.notScheduled(row.id, row.status);
+	}
+	await cancelCampaignJobs(row.id);
+	// Guarded on status: the start job may have fired between read and write.
+	const [updated] = await db
+		.update(schema.campaign)
+		.set({ status: "draft", scheduledAt: null, updatedAt: new Date() })
+		.where(
+			and(
+				eq(schema.campaign.id, row.id),
+				eq(schema.campaign.status, "scheduled"),
+			),
+		)
+		.returning();
+	if (!updated) {
+		const current = await requireCampaign(row.id, params.organizationId);
+		throw CampaignErrors.notScheduled(current.id, current.status);
+	}
+	return toCampaignResponse(updated, await templateNameFor(updated.templateId));
 }
 
 export async function duplicateCampaignController(params: {

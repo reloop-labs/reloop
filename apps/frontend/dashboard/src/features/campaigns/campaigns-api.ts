@@ -101,6 +101,15 @@ export async function scheduleCampaignRequest(
 	return (await res.json()) as Campaign;
 }
 
+export async function unscheduleCampaignRequest(id: string): Promise<Campaign> {
+	const res = await fetch(`${BASE}/${id}/unschedule`, {
+		method: "POST",
+		credentials: "include",
+	});
+	if (!res.ok) throw new Error(await parseError(res));
+	return (await res.json()) as Campaign;
+}
+
 export async function duplicateCampaignRequest(id: string): Promise<Campaign> {
 	const res = await fetch(`${BASE}/${id}/duplicate`, {
 		method: "POST",

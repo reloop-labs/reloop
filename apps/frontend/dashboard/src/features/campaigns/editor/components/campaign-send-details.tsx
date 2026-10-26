@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { useEmailContainerWidth } from "#/features/templates/editor/hooks/use-email-container-width";
+import { isEditableStatus } from "../../utils";
 import { useCampaignEditorStore } from "../campaign-editor-store";
 import { CampaignAudienceField } from "./campaign-audience-field";
 import { CampaignFromField } from "./campaign-from-field";
@@ -13,7 +14,7 @@ export { CampaignSubjectField } from "./campaign-subject-field";
 
 export const CampaignSendDetails = () => {
 	const containerWidth = useEmailContainerWidth();
-	const isReadOnly = useCampaignEditorStore((s) => s.status !== "draft");
+	const isReadOnly = useCampaignEditorStore((s) => !isEditableStatus(s.status));
 
 	return (
 		<div

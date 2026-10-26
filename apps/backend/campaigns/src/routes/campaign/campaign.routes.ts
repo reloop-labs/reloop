@@ -24,6 +24,7 @@ import {
 	scheduleCampaignController,
 	sendCampaignController,
 	testCampaignController,
+	unscheduleCampaignController,
 	updateCampaignController,
 } from "./campaign.controllers";
 
@@ -167,6 +168,26 @@ export const campaignRoutes = new Elysia({
 			body: scheduleBody,
 			response: { 200: campaignResponseSchema, ...errorResponses },
 			detail: { tags: ["Campaigns"], summary: "Schedule a campaign" },
+		},
+	)
+	.post(
+		"/:id/unschedule",
+		async ({ params, organizationId }) => {
+			return await unscheduleCampaignController({
+				id: params.id,
+				organizationId,
+			});
+		},
+		{
+			auth: true,
+			params: t.Object({ id: t.String() }),
+			response: { 200: campaignResponseSchema, ...errorResponses },
+			detail: {
+				tags: ["Campaigns"],
+				summary: "Unschedule a campaign",
+				description:
+					"Moves a scheduled campaign back to draft and removes its pending send, keeping all content. Schedule it again or send it later. To stop a campaign that is already sending, use cancel.",
+			},
 		},
 	)
 	.post(

@@ -2,6 +2,10 @@ import {
 	decodeTrackingToken,
 	type OpenTrackingPayload,
 } from "@reloop/be-mail/lib/crypto";
+import {
+	engagementContext,
+	rawRequest,
+} from "@reloop/be-mail/lib/engagement-context";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
@@ -14,7 +18,15 @@ const TRANSPARENT_PIXEL = Buffer.from(
 	"base64",
 );
 
-export async function handleOpenTracking({ token }: { token: string }) {
+export async function handleOpenTracking({
+	token,
+	headers,
+	socketIp,
+}: {
+	token: string;
+	headers: Headers;
+	socketIp: string | null;
+}) {
 	const payload = decodeTrackingToken<OpenTrackingPayload>(
 		token,
 		mailConfig.TRACKING_SECRET,
@@ -46,9 +58,12 @@ export async function handleOpenTracking({ token }: { token: string }) {
 				.values({
 					emailLogId,
 					type: "opened",
-					metadata: {
-						userAgent: "unknown",
-					},
+					...rawRequest(headers, socketIp),
+					metadata: await engagementContext({
+						kind: "open",
+						headers,
+						socketIp,
+					}),
 				})
 				.returning({ id: emailEvent.id });
 

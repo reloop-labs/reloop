@@ -31,6 +31,7 @@ import {
 	listCampaigns,
 	scheduleCampaignRequest,
 	sendCampaignRequest,
+	unscheduleCampaignRequest,
 	updateCampaignRequest,
 } from "./campaigns-api";
 
@@ -42,6 +43,7 @@ interface CampaignsContextValue {
 	updateCampaign: (id: string, input: UpdateCampaignInput) => Promise<Campaign>;
 	sendCampaign: (id: string) => Promise<void>;
 	scheduleCampaign: (id: string, scheduledAt: string) => Promise<void>;
+	unscheduleCampaign: (id: string) => Promise<void>;
 	duplicateCampaign: (id: string) => Promise<Campaign>;
 	deleteCampaign: (id: string) => Promise<void>;
 }
@@ -105,6 +107,15 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 		[invalidate],
 	);
 
+	const unscheduleCampaign = useCallback(
+		async (id: string) => {
+			await unscheduleCampaignRequest(id);
+			await invalidate();
+			toast.success("Schedule removed. The campaign is a draft again.");
+		},
+		[invalidate],
+	);
+
 	const duplicateCampaign = useCallback(
 		async (id: string) => {
 			const existing = findCachedCampaign(queryClient, orgId, id);
@@ -136,6 +147,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			updateCampaign,
 			sendCampaign,
 			scheduleCampaign,
+			unscheduleCampaign,
 			duplicateCampaign,
 			deleteCampaign,
 		}),
@@ -144,6 +156,7 @@ export function CampaignsProvider({ children }: { children: ReactNode }) {
 			updateCampaign,
 			sendCampaign,
 			scheduleCampaign,
+			unscheduleCampaign,
 			duplicateCampaign,
 			deleteCampaign,
 		],

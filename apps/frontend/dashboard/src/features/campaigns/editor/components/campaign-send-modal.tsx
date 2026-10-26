@@ -35,7 +35,7 @@ interface DeliveryBreakdown {
 	isLoading: boolean;
 }
 
-function useDeliveryBreakdown(): DeliveryBreakdown {
+export function useDeliveryBreakdown(): DeliveryBreakdown {
 	const audienceType = useCampaignEditorStore((s) => s.audienceType);
 	const audienceTargetId = useCampaignEditorStore((s) => s.audienceTargetId);
 
@@ -405,7 +405,7 @@ export function CampaignSendModal({
 													{breakdown.isLoading ? (
 														<Skeleton className="h-5 w-14 rounded" />
 													) : (
-														<span className="font-semibold text-text-strong-950 text-base tabular-nums">
+														<span className="font-semibold text-base text-text-strong-950 tabular-nums">
 															{(breakdown.sendable ?? 0).toLocaleString()}
 														</span>
 													)}

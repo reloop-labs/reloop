@@ -2,6 +2,10 @@ import {
 	type ClickTrackingPayload,
 	decodeTrackingToken,
 } from "@reloop/be-mail/lib/crypto";
+import {
+	engagementContext,
+	rawRequest,
+} from "@reloop/be-mail/lib/engagement-context";
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import { mailConfig } from "@reloop/be-mail/mail.config";
 import { BusEvent, bus } from "@reloop/bus";
@@ -10,7 +14,15 @@ import { emailEvent, emailLog } from "@reloop/db/schema";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 
-export async function handleClickTracking({ token }: { token: string }) {
+export async function handleClickTracking({
+	token,
+	headers,
+	socketIp,
+}: {
+	token: string;
+	headers: Headers;
+	socketIp: string | null;
+}) {
 	const payload = decodeTrackingToken<ClickTrackingPayload>(
 		token,
 		mailConfig.TRACKING_SECRET,
@@ -48,8 +60,14 @@ export async function handleClickTracking({ token }: { token: string }) {
 				.values({
 					emailLogId,
 					type: "clicked",
+					...rawRequest(headers, socketIp),
 					metadata: {
 						url,
+						...(await engagementContext({
+							kind: "click",
+							headers,
+							socketIp,
+						})),
 					},
 				})
 				.returning({ id: emailEvent.id });

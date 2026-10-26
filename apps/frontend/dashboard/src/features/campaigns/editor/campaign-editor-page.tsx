@@ -12,6 +12,7 @@ import { useEditorStore } from "#/features/templates/editor/hooks/use-editor-sto
 import { EmailInspector } from "#/features/templates/editor/inspector";
 import { shouldShowSourceHtmlPreview } from "#/features/templates/editor/utils/should-show-source-html-preview";
 import { CampaignsProvider } from "../campaigns-provider";
+import { isEditableStatus } from "../utils";
 import { CampaignEditorProvider } from "./campaign-editor-provider";
 import { useCampaignEditorStore } from "./campaign-editor-store";
 import { CampaignSendDetails } from "./components/campaign-send-details";
@@ -25,7 +26,7 @@ export function CampaignEditorPage({ campaignId }: { campaignId: string }) {
 	);
 
 	const status = useCampaignEditorStore((s) => s.status);
-	const isReadOnly = status !== "draft";
+	const isReadOnly = !isEditableStatus(status);
 	const isCodeSplit = !isReadOnly && viewMode === "code";
 	const codeHtml = useEditorStore((s) => s.codeHtml);
 	const showHtmlCanvas = shouldShowSourceHtmlPreview({

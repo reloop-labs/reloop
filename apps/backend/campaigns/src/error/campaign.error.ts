@@ -61,8 +61,8 @@ export const CampaignErrors = {
 		createError({
 			status: 409,
 			message: "Campaign cannot be edited",
-			why: `Campaign "${id}" is not a draft.`,
-			fix: "Duplicate the campaign to make a new draft, or cancel it first if it is scheduled.",
+			why: `Campaign "${id}" has already started sending.`,
+			fix: "Duplicate the campaign to make a new draft.",
 		}),
 	cannotSend: (id: string, status: string) =>
 		createError({
@@ -91,6 +91,13 @@ export const CampaignErrors = {
 			message: "Campaign cannot be deleted",
 			why: `Campaign "${id}" is ${status}.`,
 			fix: "Only draft or cancelled campaigns can be deleted.",
+		}),
+	notScheduled: (id: string, status: string) =>
+		createError({
+			status: 409,
+			message: "Campaign is not scheduled",
+			why: `Campaign "${id}" is ${status}, so there is no schedule to remove.`,
+			fix: "Only scheduled campaigns can be unscheduled. Use cancel to stop a campaign that is sending.",
 		}),
 	invalidSchedule: () =>
 		createError({

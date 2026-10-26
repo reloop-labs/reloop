@@ -4,12 +4,14 @@ import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import {
 	CampaignsProvider,
 	useCampaignQuery,
 	useCampaigns,
 } from "./campaigns-provider";
+import { CampaignEngagementCard } from "./components/campaign-engagement-card";
 import { CampaignHeader } from "./components/campaign-header";
 import { CampaignMetricsCards } from "./components/campaign-metrics-cards";
 import { CampaignPreviewTabs } from "./components/campaign-preview-tabs";
@@ -18,13 +20,15 @@ import {
 	type CategoryTab,
 } from "./components/campaign-recipient-issues-card";
 import { DeleteCampaignModal } from "./components/delete-campaign";
+import { isEditableStatus } from "./utils";
 
 function CampaignDetailContent() {
 	const params = useParams();
 	const router = useRouter();
 	const campaignId = params?.campaignId as string;
 	const [, setDeleteId] = useQueryState("delete");
-	const { sendCampaign, duplicateCampaign } = useCampaigns();
+	const { sendCampaign, duplicateCampaign, unscheduleCampaign } =
+		useCampaigns();
 	const campaignQuery = useCampaignQuery(campaignId);
 
 	const [actionPending, setActionPending] = useState(false);
@@ -91,6 +95,20 @@ function CampaignDetailContent() {
 		}
 	};
 
+	const handleUnschedule = async () => {
+		if (!campaign) return;
+		setActionPending(true);
+		try {
+			await unscheduleCampaign(campaign.id);
+		} catch (err) {
+			toast.error(
+				err instanceof Error ? err.message : "Failed to remove schedule",
+			);
+		} finally {
+			setActionPending(false);
+		}
+	};
+
 	const handleDuplicate = async () => {
 		if (!campaign) return;
 		setActionPending(true);
@@ -111,7 +129,7 @@ function CampaignDetailContent() {
 	useHotkeys(
 		"e",
 		(e) => {
-			if (!campaign?.id || campaign?.status !== "draft") return;
+			if (!campaign?.id || !isEditableStatus(campaign.status)) return;
 			e.preventDefault();
 			router.push(`/campaigns/${campaign.id}/edit`);
 		},
@@ -221,6 +239,7 @@ function CampaignDetailContent() {
 					onDuplicate={() => void handleDuplicate()}
 					onSend={() => void handleSend()}
 					onDelete={handleDelete}
+					onUnschedule={() => void handleUnschedule()}
 					actionPending={actionPending}
 				/>
 
@@ -235,6 +254,10 @@ function CampaignDetailContent() {
 								?.scrollIntoView({ behavior: "smooth", block: "start" });
 						}}
 					/>
+				)}
+
+				{(campaign.status === "sending" || campaign.status === "sent") && (
+					<CampaignEngagementCard campaignId={campaign.id} />
 				)}
 
 				{/* Deliverability & Recipient Activity (Unsubscribed, Bounced, Suppressed, Complained, Clicks) */}

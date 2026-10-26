@@ -1,13 +1,17 @@
-import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { ActionKbd, actionKbdOnSolidClassName } from "#/features/dashboard/keyboard-shortcuts-reveal";
+import {
+	ActionKbd,
+	actionKbdOnSolidClassName,
+} from "#/features/dashboard/keyboard-shortcuts-reveal";
 import type { Campaign } from "../campaign-types";
+import { isEditableStatus } from "../utils";
 import { CampaignAvatar } from "./campaign-avatar";
 import {
 	CampaignHeaderMenu,
@@ -23,6 +27,7 @@ export function CampaignHeader({
 	onDuplicate,
 	onSend,
 	onDelete,
+	onUnschedule,
 	actionPending,
 }: {
 	campaign: Campaign | undefined;
@@ -32,6 +37,7 @@ export function CampaignHeader({
 	onDuplicate?: () => void;
 	onSend?: () => void;
 	onDelete?: () => void;
+	onUnschedule?: () => void;
 	actionPending?: boolean;
 }) {
 	const router = useRouter();
@@ -50,7 +56,7 @@ export function CampaignHeader({
 			window.open("https://reloop.sh/docs/campaigns", "_blank");
 			return;
 		}
-		if (id === "edit" && campaign?.id && campaign.status === "draft") {
+		if (id === "edit" && campaign?.id && isEditableStatus(campaign.status)) {
 			router.push(`/campaigns/${campaign.id}/edit`);
 			return;
 		}
@@ -145,7 +151,57 @@ export function CampaignHeader({
 						</Button.Root>
 					) : campaign ? (
 						<>
-							{campaign.status === "draft" ? (
+							{campaign.status === "scheduled" ? (
+								<>
+									{campaign.scheduledAt ? (
+										<span className="hidden text-paragraph-xs text-text-sub-600 tabular-nums sm:inline">
+											Sends{" "}
+											{new Date(campaign.scheduledAt).toLocaleString([], {
+												weekday: "short",
+												day: "numeric",
+												month: "short",
+												hour: "numeric",
+												minute: "2-digit",
+											})}
+										</span>
+									) : null}
+									<Button.Root
+										variant="neutral"
+										mode="stroke"
+										size="xsmall"
+										className="font-semibold"
+										onClick={onUnschedule}
+										disabled={actionPending}
+									>
+										Unschedule
+									</Button.Root>
+									<Button.Root
+										variant="neutral"
+										mode="stroke"
+										size="xsmall"
+										className="gap-1.5 font-semibold"
+										onClick={() =>
+											router.push(`/campaigns/${campaign.id}/edit`)
+										}
+										disabled={actionPending}
+									>
+										<Icon name="edit" className="h-3.5 w-3.5" />
+										<span>Edit</span>
+									</Button.Root>
+									<FancyButton.Root
+										variant="neutral"
+										size="xsmall"
+										onClick={() =>
+											router.push(
+												`/campaigns/${campaign.id}/edit?modal=schedule`,
+											)
+										}
+										disabled={actionPending}
+									>
+										Reschedule
+									</FancyButton.Root>
+								</>
+							) : campaign.status === "draft" ? (
 								<>
 									<Button.Root
 										variant="neutral"
@@ -173,7 +229,12 @@ export function CampaignHeader({
 									>
 										<Icon name="mail-send" className="h-3.5 w-3.5" />
 										<span>Send to all</span>
-										<ActionKbd className={cn(actionKbdOnSolidClassName, "ml-0.5 w-auto min-w-4 px-1")}>
+										<ActionKbd
+											className={cn(
+												actionKbdOnSolidClassName,
+												"ml-0.5 w-auto min-w-4 px-1",
+											)}
+										>
 											S
 										</ActionKbd>
 									</FancyButton.Root>
@@ -196,7 +257,7 @@ export function CampaignHeader({
 							)}
 
 							<CampaignHeaderMenu
-								canEdit={campaign.status === "draft"}
+								canEdit={isEditableStatus(campaign.status)}
 								onAction={handleMenuAction}
 							/>
 						</>

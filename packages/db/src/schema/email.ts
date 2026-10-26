@@ -161,6 +161,13 @@ export const emailEvent = pgTable(
 			.references(() => emailLog.id, { onDelete: "cascade" }),
 		type: emailEventTypeEnum("type").notNull(),
 		metadata: jsonb("metadata").$type<Record<string, any>>(),
+		/**
+		 * Raw headers of the open-pixel or click request (credentials removed),
+		 * kept so `metadata` can be re-derived when parsing rules improve.
+		 */
+		requestHeaders: jsonb("request_headers").$type<Record<string, string>>(),
+		/** Address the open/click request came from. */
+		clientIp: text("client_ip"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 	},
 	(table) => [

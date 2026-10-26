@@ -11,6 +11,7 @@ import { getRenderedEmailHtml } from "#/features/templates/editor/utils/get-rend
 
 import { updateCampaignRequest } from "../campaigns-api";
 import { useCampaignQuery } from "../campaigns-provider";
+import { isEditableStatus } from "../utils";
 import { useCampaignEditorStore } from "./campaign-editor-store";
 import { CampaignEditorHeader } from "./components/campaign-editor-header";
 import { useCampaignEditorHook } from "./hooks/use-campaign-editor-hook";
@@ -92,13 +93,13 @@ export function CampaignEditorProvider({
 	// Autosave logic
 	useEffect(() => {
 		if (!editor) return;
-		editor.setEditable(campaign?.status === "draft");
+		editor.setEditable(isEditableStatus(campaign?.status));
 	}, [editor, campaign?.status]);
 
 	saveRef.current = async () => {
 		if (!editor || !campaignId || isInitialHydrateRef.current || !campaign)
 			return;
-		if (campaign.status !== "draft") return;
+		if (!isEditableStatus(campaign.status)) return;
 		const state = useCampaignEditorStore.getState();
 		if (Date.now() < skipUntilRef.current) return;
 
@@ -222,7 +223,7 @@ export function CampaignEditorProvider({
 				    Rendering them here too would mount two BubbleMenu instances
 				    with the same PluginKey on one editor, which ProseMirror
 				    rejects ("Adding different instances of a keyed plugin"). */}
-				{campaign?.status === "draft" ? <EmailSlashCommand /> : null}
+				{isEditableStatus(campaign?.status) ? <EmailSlashCommand /> : null}
 			</div>
 		</EditorContext.Provider>
 	);

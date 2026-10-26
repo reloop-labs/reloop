@@ -322,6 +322,71 @@ export namespace LogsModel {
 	});
 	export type EmailLogFullEntry = typeof emailLogFullEntry.static;
 
+	export const engagementQuery = t.Object({
+		start_date: t.Optional(
+			t.String({
+				format: "date-time",
+				description: "Events at or after (ISO 8601)",
+			}),
+		),
+		end_date: t.Optional(
+			t.String({
+				format: "date-time",
+				description: "Events at or before (ISO 8601)",
+			}),
+		),
+		campaign_id: t.Optional(
+			t.String({ description: "Only emails sent by this campaign" }),
+		),
+		tz: t.Optional(
+			t.String({
+				description:
+					"IANA time zone for the best-time heatmap, e.g. Europe/Berlin. Defaults to UTC.",
+			}),
+		),
+	});
+	export type EngagementQuery = typeof engagementQuery.static;
+
+	const engagementBucket = t.Object({
+		name: t.String(),
+		count: t.Number({ description: "Distinct emails" }),
+	});
+
+	export const engagementResponse = t.Object({
+		object: t.Literal("engagement"),
+		totals: t.Object({
+			opens: t.Number({ description: "Emails opened by a person" }),
+			machineOpens: t.Number({
+				description:
+					"Emails only opened by Apple Mail Privacy Protection or a security scanner",
+			}),
+			clicks: t.Number({ description: "Emails with a click by a person" }),
+		}),
+		clients: t.Array(engagementBucket, {
+			description: "Email client or provider of human opens",
+		}),
+		devices: t.Array(engagementBucket),
+		countries: t.Array(engagementBucket, {
+			description: "ISO 3166-1 alpha-2 country codes",
+		}),
+		bestTime: t.Object({
+			timeZone: t.String(),
+			heatmap: t.Array(t.Array(t.Number()), {
+				description:
+					"7 rows (Monday first) by 24 hours: first human open of each email",
+			}),
+			best: t.Union([
+				t.Object({
+					day: t.Number({ description: "0 = Monday" }),
+					hour: t.Number(),
+				}),
+				t.Null(),
+			]),
+			sampleSize: t.Number(),
+		}),
+	});
+	export type EngagementResponse = typeof engagementResponse.static;
+
 	export const emailStatsQuery = t.Object({
 		organization_id: t.Optional(t.String()),
 		domain_id: t.Optional(t.String()),

@@ -344,6 +344,13 @@
       "when": 1793200000000,
       "tag": "0048_free_plan_limits",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1793300000000,
+      "tag": "0049_email_event_raw_request",
+      "breakpoints": true
     }
   ]
 }

@@ -11,7 +11,7 @@ import { useEffect, useRef } from "react";
 import { AnimatedSidebarToggleIcon } from "#/features/dashboard/sidebar/animated-sidebar-toggle-icon";
 import { usePlayAnimationOnHover } from "#/features/dashboard/sidebar/use-play-animation-on-hover";
 import { useSidebarCollapse } from "#/features/dashboard/sidebar/use-sidebar-collapse";
-import { getStatusLabel } from "../../utils";
+import { getStatusLabel, isEditableStatus } from "../../utils";
 import { useCampaignEditorStore } from "../campaign-editor-store";
 import { CampaignScheduleModal } from "./campaign-schedule-modal";
 import { CampaignSendModal } from "./campaign-send-modal";
@@ -109,7 +109,7 @@ function CampaignNameField() {
 	const { name, setName, status } = useCampaignEditorStore();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const measureRef = useRef<HTMLSpanElement>(null);
-	const isReadOnly = status !== "draft";
+	const isReadOnly = !isEditableStatus(status);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: DOM measurement of input text width
 	useEffect(() => {
@@ -171,7 +171,7 @@ export function CampaignEditorHeader() {
 	const fromEmail = useCampaignEditorStore((s) => s.fromEmail);
 	const subject = useCampaignEditorStore((s) => s.subject);
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
-	const isReadOnly = status !== "draft";
+	const isReadOnly = !isEditableStatus(status);
 	// Wait for the campaign to load (the store starts with an empty id) so a
 	// reload reopens the modal against the right campaign.
 	const isLoaded = campaignId !== "";
@@ -182,8 +182,8 @@ export function CampaignEditorHeader() {
 		(name: "test-email" | "schedule" | "send") => (open: boolean) =>
 			void setModal(open ? name : null);
 
-	// Test/send/schedule only apply to drafts: drop a stale ?modal= when a
-	// non-draft campaign loads. Checked once per campaign so a send that flips
+	// Test/send/schedule only apply to editable campaigns: drop a stale
+	// ?modal= when a campaign that already sent loads. Checked once per campaign so a send that flips
 	// the status doesn't cut the success state short.
 	const checkedCampaignRef = useRef<string | null>(null);
 	useEffect(() => {
@@ -262,6 +262,14 @@ export function CampaignEditorHeader() {
 								onClick={handleTestClick}
 							>
 								Test email
+							</FancyButton.Root>
+
+							<FancyButton.Root
+								variant="basic"
+								size="xsmall"
+								onClick={() => void setModal("schedule")}
+							>
+								{status === "scheduled" ? "Reschedule" : "Schedule"}
 							</FancyButton.Root>
 
 							<FancyButton.Root

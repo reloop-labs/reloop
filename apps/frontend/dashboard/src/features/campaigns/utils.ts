@@ -61,3 +61,23 @@ export const getAudienceIcon = (type?: AudienceTargetType): string => {
 			return "contacts";
 	}
 };
+
+/** Drafts and scheduled campaigns stay editable until the send starts. */
+export function isEditableStatus(status: string | undefined | null): boolean {
+	return status === "draft" || status === "scheduled";
+}
+
+/** Don't offer a schedule slot that starts in the next few minutes. */
+const MIN_SCHEDULE_LEAD_MS = 5 * 60_000;
+
+/** Next local occurrence of a weekday (0 = Monday) at the top of an hour. */
+export function nextSlot(day: number, hour: number, now = new Date()): Date {
+	const slot = new Date(now);
+	slot.setHours(hour, 0, 0, 0);
+	const today = (now.getDay() + 6) % 7;
+	slot.setDate(slot.getDate() + ((day - today + 7) % 7));
+	if (slot.getTime() < now.getTime() + MIN_SCHEDULE_LEAD_MS) {
+		slot.setDate(slot.getDate() + 7);
+	}
+	return slot;
+}

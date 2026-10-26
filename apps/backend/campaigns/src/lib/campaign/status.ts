@@ -5,8 +5,9 @@ export type CampaignStatus =
 	| "sent"
 	| "cancelled";
 
+/** Scheduled campaigns stay editable until the send starts. */
 export function canEdit(status: CampaignStatus): boolean {
-	return status === "draft";
+	return status === "draft" || status === "scheduled";
 }
 
 export function canSend(status: CampaignStatus): boolean {

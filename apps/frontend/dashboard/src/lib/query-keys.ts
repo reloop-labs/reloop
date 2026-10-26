@@ -120,6 +120,8 @@ export const queryKeys = {
 			endDate: string;
 			domain: string;
 		}) => [...queryKeys.metrics.all, "email-stats", params] as const,
+		engagement: (params: { campaignId?: string; days: number; tz: string }) =>
+			[...queryKeys.metrics.all, "engagement", params] as const,
 	},
 	emails: {
 		all: ["emails"] as const,

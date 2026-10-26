@@ -55,3 +55,22 @@ export async function snapshotAudience(campaign: Campaign): Promise<number> {
 
 	return recipientCount;
 }
+
+/**
+ * Scheduling checks the audience without freezing it: recipients are
+ * snapshotted when the send starts, so contacts who join or unsubscribe
+ * before then are respected. Records the current size for display.
+ */
+export async function previewAudienceCount(
+	campaign: Campaign,
+): Promise<number> {
+	const rows = await resolveSendableAudience(campaign);
+	if (rows.length === 0) {
+		throw CampaignErrors.emptyAudience();
+	}
+	await db
+		.update(schema.campaign)
+		.set({ recipientCount: rows.length, updatedAt: new Date() })
+		.where(eq(schema.campaign.id, campaign.id));
+	return rows.length;
+}
